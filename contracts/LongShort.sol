@@ -18,7 +18,9 @@ contract LongShort {
     uint256 public shortTokenPrice;
     int256 public assetPrice;
 
-    // Call this action before anywithdrawls or deposists
+    /**
+     * Necessary to update system state before any contract actions (deposits / withdraws)
+     */
     modifier refreshSystemState() {
         _updateSystemState();
         _;
@@ -35,6 +37,9 @@ contract LongShort {
         );
     }
 
+    /**
+     * Updates the value of the long and short sides within the system
+     */
     function _updateSystemState() internal {
         int256 newPrice = getLatestPrice();
         int256 percentageChange;
@@ -66,8 +71,6 @@ contract LongShort {
         }
 
         assetPrice = newPrice;
-        // Get the latest percentage price change.
-        // update the values and various prices.
     }
 
     /**
@@ -75,17 +78,6 @@ contract LongShort {
      */
     function getLatestPrice() public view returns (int256) {
         return priceFeed.latestAnswer();
-    }
-
-    /**
-     * Returns the latest price
-     */
-    function getPercentageChange(int256 originalPrice, int256 newPrice)
-        public
-        view
-        returns (int256)
-    {
-        return (newPrice - originalPrice) / originalPrice;
     }
 
     /**
