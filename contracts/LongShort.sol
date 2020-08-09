@@ -185,11 +185,10 @@ contract LongShort {
     /**
      * Updates the value of the long and short sides within the system
      */
-    function _updateSystemState() internal {
+    function _updateSystemState() public {
         // For system start, no value adjustment till positions on both sides exist
         // Consider attacks of possible zero balances later on in contract life?
         if (longValue == 0 && shortValue == 0) {
-            assetPrice = uint256(getLatestPrice());
             return;
         } else if (longValue == 0) {
             assetPrice = uint256(getLatestPrice());
