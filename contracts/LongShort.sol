@@ -75,8 +75,8 @@ contract LongShort {
         adaiContract = IADai(aDaiAddress);
 
         // Intialize price at $1 per token (adjust decimals)
-        longTokenPrice = 1;
-        shortTokenPrice = 1;
+        longTokenPrice = 10**18;
+        shortTokenPrice = 10**18;
     }
 
     /**
@@ -123,29 +123,26 @@ contract LongShort {
      * Currently works on 50/50 split between long and short
      * This can be dynamic and configurable
      */
-    function _accreditInterestMechanism() internal {
+    function _accreditInterestMechanism(
+        uint256 longPercentage,
+        uint256 shortPercentage
+    ) internal {
+        require(100 == shortPercentage.add(longPercentage));
         uint256 totalValueWithInterest = adaiContract.balanceOf(address(this));
 
         uint256 interestAccrued = totalValueWithInterest.sub(totalValueLocked);
         if (interestAccrued > 0) {
-            longValue = longValue.add(interestAccrued.div(2));
-            shortValue = shortValue.add(interestAccrued.div(2));
+            longValue = longValue.add(
+                interestAccrued.mul(longPercentage).div(100)
+            );
+            shortValue = shortValue.add(
+                interestAccrued.mul(shortPercentage).div(100)
+            );
             totalValueLocked = totalValueWithInterest;
         }
     }
 
-    /**
-     * Updates the value of the long and short sides within the system
-     */
-    function _updateSystemState() internal {
-        // For system start, no value adjustment till positions on both sides exist
-        // Consider attacks of possible zero balances later on in contract life?
-        if (longValue == 0 || shortValue == 0) {
-            return;
-        }
-
-        // Check why this is bad (casting to uint)
-        uint256 newPrice = uint256(getLatestPrice());
+    function _priceChangeMechanism(uint256 newPrice) internal {
         // If no new price update from oracle, proceed as normal
         if (assetPrice == newPrice) {
             return;
@@ -156,26 +153,71 @@ contract LongShort {
         // Long gains
         if (newPrice > assetPrice) {
             percentageChange = (newPrice.sub(assetPrice)).div(assetPrice);
-            if (getShortBeta() == 1) {
-                valueChange = shortValue.mul(percentageChange);
+            if (percentageChange >= 1) {
+                longValue = longValue.add(shortValue);
+                shortValue = 0;
             } else {
-                valueChange = longValue.mul(percentageChange);
+                if (getShortBeta() == 1) {
+                    valueChange = shortValue.mul(percentageChange);
+                } else {
+                    valueChange = longValue.mul(percentageChange);
+                }
+                longValue = longValue.add(valueChange);
+                shortValue = shortValue.sub(valueChange); // NB Check for going below zero and system instability
             }
-            longValue = longValue.add(valueChange);
-            shortValue = shortValue.sub(valueChange); // NB Check for going below zero and system instability
         } else {
             percentageChange = (assetPrice.sub(newPrice)).div(assetPrice);
-            if (getShortBeta() == 1) {
-                valueChange = shortValue.mul(percentageChange);
+            if (percentageChange >= 1) {
+                shortValue = shortValue.add(longValue);
+                longValue = 0;
             } else {
-                valueChange = longValue.mul(percentageChange);
+                if (getShortBeta() == 1) {
+                    valueChange = shortValue.mul(percentageChange);
+                } else {
+                    valueChange = longValue.mul(percentageChange);
+                }
+                longValue = longValue.sub(valueChange);
+                shortValue = shortValue.add(valueChange);
             }
-            longValue = longValue.sub(valueChange);
-            shortValue = shortValue.add(valueChange);
+        }
+    }
+
+    /**
+     * Updates the value of the long and short sides within the system
+     */
+    function _updateSystemState() internal {
+        // For system start, no value adjustment till positions on both sides exist
+        // Consider attacks of possible zero balances later on in contract life?
+        if (longValue == 0 && shortValue == 0) {
+            assetPrice = uint256(getLatestPrice());
+            return;
+        } else if (longValue == 0) {
+            assetPrice = uint256(getLatestPrice());
+            _accreditInterestMechanism(0, 100); // Give all interest to short side while we wait
+            shortTokenPrice = shortValue.div(shortTokens.totalSupply());
+            return;
+        } else if (shortValue == 0) {
+            assetPrice = uint256(getLatestPrice());
+            _accreditInterestMechanism(100, 0); // Give all interest to long side while we wait
+            longTokenPrice = longValue.div(longTokens.totalSupply());
+            return;
         }
 
-        // Now add interest to both sides
-        _accreditInterestMechanism();
+        // Check why this is bad (casting to uint)
+        uint256 newPrice = uint256(getLatestPrice());
+
+        // Adjusts long and short values based on price movements.
+        _priceChangeMechanism(newPrice);
+
+        // Now add interest to both sides in 50/50
+        // If the price moved by more than 100% and the one side is completly liquidated
+        if (longValue == 0) {
+            _accreditInterestMechanism(0, 100);
+        } else if (shortValue == 0) {
+            _accreditInterestMechanism(100, 0);
+        } else {
+            _accreditInterestMechanism(50, 50);
+        }
 
         // Update price of tokens
         // careful if total supply is zero intitally.
@@ -205,6 +247,10 @@ contract LongShort {
         uint256 amountToMint = amount.div(longTokenPrice);
         longValue = longValue.add(amount);
         longTokens.mint(msg.sender, amountToMint);
+
+        // longTokenPrice should remain unchanged after mint...
+        // Likely slight rounding errors. Figure this out.
+        require(longTokenPrice == longValue.div(longTokens.totalSupply()));
     }
 
     /**
@@ -213,9 +259,14 @@ contract LongShort {
     function mintShort(uint256 amount) external refreshSystemState {
         _addDeposit(amount);
 
+        // Check division errors here!
         uint256 amountToMint = amount.div(shortTokenPrice);
         shortValue = shortValue.add(amount);
         shortTokens.mint(msg.sender, amountToMint);
+
+        // shortTokenPrice should remain unchanged after mint...
+        // Likely slight rounding errors. Figure this out.
+        require(shortTokenPrice == shortValue.div(shortTokens.totalSupply()));
     }
 
     function _redeem(uint256 amount) internal {
@@ -235,6 +286,9 @@ contract LongShort {
         uint256 amountToRedeem = tokensToRedeem.mul(longTokenPrice);
         longValue = longValue.sub(amountToRedeem);
         _redeem(amountToRedeem);
+
+        // longTokenPrice should remain unchanged
+        require(longTokenPrice == longValue.div(longTokens.totalSupply()));
     }
 
     function redeemShort(uint256 tokensToRedeem) external refreshSystemState {
@@ -244,5 +298,8 @@ contract LongShort {
         uint256 amountToRedeem = tokensToRedeem.mul(shortTokenPrice);
         shortValue = shortValue.sub(amountToRedeem);
         _redeem(amountToRedeem);
+
+        // shortTokenPrice should remain unchanged after redeem
+        require(shortTokenPrice == shortValue.div(shortTokens.totalSupply()));
     }
 }
