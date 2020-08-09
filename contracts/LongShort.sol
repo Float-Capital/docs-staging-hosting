@@ -17,17 +17,22 @@ contract LongShort {
     // Oracle
     AggregatorInterface internal priceFeed;
 
-    uint256 public totalValueLocked;
-    int256 public longValue; // 11 000  $1.1 = 1 gov
-    int256 public shortValue; // 19 000 $0.9 = 1 gov
-
-    uint256 public longTokenPrice;
-    uint256 public shortTokenPrice; // gas costs.
+    // Value of the underlying from which we caluclate
+    // gains and losses by respective sides
     int256 public assetPrice;
 
+    uint256 public totalValueLocked;
+    int256 public longValue;
+    int256 public shortValue;
+
+    // Tokens representing short and long position and cost at which
+    // They can be minted or redeemed
     LongCoins public longTokens;
     ShortCoins public shortTokens;
+    uint256 public longTokenPrice;
+    uint256 public shortTokenPrice; // gas costs.
 
+    // DEFI contracts
     IERC20 public daiContract;
     IAaveLendingPool public aaveLendingContract;
     IADai public adaiContract;
@@ -152,6 +157,8 @@ contract LongShort {
             shortValue = shortValue + valueChange;
         }
 
+        _accreditInterestMechanism();
+
         // Update price of tokens
         // careful if total supply is zero intitally.
         //longTokenPrice = longValue / longTokens.totalSupply();
@@ -161,6 +168,20 @@ contract LongShort {
         // Build such that interest gets accredited to each side in 50/50 or other split
         // Before every contract action (unless actions happen within 5minutes I would say?)
         // Calculate
+    }
+
+    /**
+     * Adds and credits the interest due before new minting or withdrawl.
+     */
+    function _accreditInterestMechanism() internal {
+        uint256 totalValueWithInterest = adaiContract.balanceOf(address(this));
+
+        uint256 interestAccrued = totalValueWithInterest.sub(totalValueLocked);
+        if (interestAccrued > 0) {
+            // longValue = longValue + interestAccrued.div(2);
+            // shortValue = shortValue + interestAccrued.div(2);
+            totalValueLocked = totalValueWithInterest;
+        }
     }
 
     /**
