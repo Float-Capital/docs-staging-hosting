@@ -19,11 +19,11 @@ contract LongShort {
 
     // Value of the underlying from which we caluclate
     // gains and losses by respective sides
-    int256 public assetPrice;
+    uint256 public assetPrice;
 
     uint256 public totalValueLocked;
-    int256 public longValue;
-    int256 public shortValue;
+    uint256 public longValue;
+    uint256 public shortValue;
 
     // Tokens representing short and long position and cost at which
     // They can be minted or redeemed
@@ -96,13 +96,13 @@ contract LongShort {
     /**
      * Returns % of long position that is filled
      */
-    function getLongBeta() public view returns (int256) {
+    function getLongBeta() public view returns (uint256) {
         // TODO account for contract start when these are both zero
         // and an erronous beta of 1 reported.
         if (shortValue >= longValue) {
             return 1;
         } else {
-            return shortValue / (longValue);
+            return shortValue.div(longValue);
         }
     }
 
@@ -110,11 +110,27 @@ contract LongShort {
      * Returns % of short position that is filled
      * zero div  error if both are zero
      */
-    function getShortBeta() public view returns (int256) {
+    function getShortBeta() public view returns (uint256) {
         if (longValue >= shortValue) {
             return 1;
         } else {
-            return longValue / (shortValue);
+            return longValue.div(shortValue);
+        }
+    }
+
+    /**
+     * Adds and credits the interest due before new minting or withdrawl.
+     * Currently works on 50/50 split between long and short
+     * This can be dynamic and configurable
+     */
+    function _accreditInterestMechanism() internal {
+        uint256 totalValueWithInterest = adaiContract.balanceOf(address(this));
+
+        uint256 interestAccrued = totalValueWithInterest.sub(totalValueLocked);
+        if (interestAccrued > 0) {
+            longValue = longValue.add(interestAccrued.div(2));
+            shortValue = shortValue.add(interestAccrued.div(2));
+            totalValueLocked = totalValueWithInterest;
         }
     }
 
@@ -128,66 +144,48 @@ contract LongShort {
             return;
         }
 
-        int256 newPrice = getLatestPrice();
+        // Check why this is bad (casting to uint)
+        uint256 newPrice = uint256(getLatestPrice());
         // If no new price update from oracle, proceed as normal
         if (assetPrice == newPrice) {
             return;
         }
 
-        int256 percentageChange;
-        int256 valueChange = 0;
+        uint256 percentageChange;
+        uint256 valueChange = 0;
         // Long gains
         if (newPrice > assetPrice) {
-            percentageChange = (newPrice - assetPrice) / assetPrice;
+            percentageChange = (newPrice.sub(assetPrice)).div(assetPrice);
             if (getShortBeta() == 1) {
-                valueChange = shortValue * percentageChange;
+                valueChange = shortValue.mul(percentageChange);
             } else {
-                valueChange = longValue * percentageChange;
+                valueChange = longValue.mul(percentageChange);
             }
-            longValue = longValue + valueChange;
-            shortValue = shortValue - valueChange; // NB Check for going below zero and system instability
+            longValue = longValue.add(valueChange);
+            shortValue = shortValue.sub(valueChange); // NB Check for going below zero and system instability
         } else {
-            percentageChange = (assetPrice - newPrice) / assetPrice;
+            percentageChange = (assetPrice.sub(newPrice)).div(assetPrice);
             if (getShortBeta() == 1) {
-                valueChange = shortValue * percentageChange;
+                valueChange = shortValue.mul(percentageChange);
             } else {
-                valueChange = longValue * percentageChange;
+                valueChange = longValue.mul(percentageChange);
             }
-            longValue = longValue - valueChange;
-            shortValue = shortValue + valueChange;
+            longValue = longValue.sub(valueChange);
+            shortValue = shortValue.add(valueChange);
         }
 
+        // Now add interest to both sides
         _accreditInterestMechanism();
 
         // Update price of tokens
         // careful if total supply is zero intitally.
-        //longTokenPrice = longValue / longTokens.totalSupply();
-        //shortTokenPrice = shortValue / shortTokens.totalSupply();
+        longTokenPrice = longValue.div(longTokens.totalSupply());
+        shortTokenPrice = shortValue.div(shortTokens.totalSupply());
         assetPrice = newPrice;
-
-        // Build such that interest gets accredited to each side in 50/50 or other split
-        // Before every contract action (unless actions happen within 5minutes I would say?)
-        // Calculate
     }
 
-    /**
-     * Adds and credits the interest due before new minting or withdrawl.
-     */
-    function _accreditInterestMechanism() internal {
-        uint256 totalValueWithInterest = adaiContract.balanceOf(address(this));
-
-        uint256 interestAccrued = totalValueWithInterest.sub(totalValueLocked);
-        if (interestAccrued > 0) {
-            // longValue = longValue + interestAccrued.div(2);
-            // shortValue = shortValue + interestAccrued.div(2);
-            totalValueLocked = totalValueWithInterest;
-        }
-    }
-
-    /**
-     * Create a long position
-     */
-    function mintLong(uint256 amount) external refreshSystemState {
+    function _addDeposit(uint256 amount) internal {
+        require(amount > 0);
         aaveLendingContract = IAaveLendingPool(provider.getLendingPool());
         aaveLendingContractCore = provider.getLendingPoolCore();
 
@@ -196,8 +194,55 @@ contract LongShort {
         aaveLendingContract.deposit(address(daiContract), amount, 30);
 
         totalValueLocked = totalValueLocked.add(amount);
-        // Mint correct amount of long tokens based on current price
-        // add the value to the long position
-        // longTokens.mint(msg.sender, amount);
+    }
+
+    /**
+     * Create a long position
+     */
+    function mintLong(uint256 amount) external refreshSystemState {
+        _addDeposit(amount);
+
+        uint256 amountToMint = amount.div(longTokenPrice);
+        longValue = longValue.add(amount);
+        longTokens.mint(msg.sender, amountToMint);
+    }
+
+    /**
+     * Create a short position
+     */
+    function mintShort(uint256 amount) external refreshSystemState {
+        _addDeposit(amount);
+
+        uint256 amountToMint = amount.div(shortTokenPrice);
+        shortValue = shortValue.add(amount);
+        shortTokens.mint(msg.sender, amountToMint);
+    }
+
+    function _redeem(uint256 amount) internal {
+        totalValueLocked = totalValueLocked.sub(amount);
+
+        try adaiContract.redeem(amount)  {
+            daiContract.transfer(msg.sender, amount);
+        } catch {
+            adaiContract.transfer(msg.sender, amount);
+        }
+    }
+
+    function redeemLong(uint256 tokensToRedeem) external refreshSystemState {
+        // Burn the tokens to redeem
+        longTokens.burnFrom(msg.sender, tokensToRedeem);
+
+        uint256 amountToRedeem = tokensToRedeem.mul(longTokenPrice);
+        longValue = longValue.sub(amountToRedeem);
+        _redeem(amountToRedeem);
+    }
+
+    function redeemShort(uint256 tokensToRedeem) external refreshSystemState {
+        // Burn the tokens to redeem
+        shortTokens.burnFrom(msg.sender, tokensToRedeem);
+
+        uint256 amountToRedeem = tokensToRedeem.mul(shortTokenPrice);
+        shortValue = shortValue.sub(amountToRedeem);
+        _redeem(amountToRedeem);
     }
 }
