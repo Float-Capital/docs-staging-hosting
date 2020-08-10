@@ -12,6 +12,48 @@ import "./interfaces/ILendingPoolAddressesProvider.sol";
 import "./LongCoins.sol";
 import "./ShortCoins.sol";
 
+/**
+ * @dev {LongShort} contract, including:
+ *
+ *  - Ability for users to create synthetic long and short positions on value movements
+ *  - Value movements could be derived from tradional or alternative asset classes, derivates, binary outcomes, etc...
+ *  - Incentive mechansim providng fees to liquidity makers
+ *
+ * ******* SYSTEM FUNCTIONING V0.0 ***********
+ * System accepts stable coin (DAI) and has a total locked value = short position value + long position value
+ * If percentage movement as calucated from oracle is +10%, and short position value == long position value,
+ * Then value change = long position value * 10%
+ * long position value = long position value + value change
+ * short position value = short position value - value change
+ * Total contract value remains unchanged.
+ * long value has increased and each longtoken is now worth more as underlying pool avlue has increased.
+ *
+ * Tokens representing a shares in the short or long token pool can be minted
+ * at price (short position value) / (total short token value)
+ * or conversley burned to redeem the underlying share of the pool caluclated
+ * as (short position value) / (total short token value) per token
+ *
+ * Depending on demand of minting and burning for undelying on both sides (long/short of contract),
+ * most often short position value != long position value (there will be an imbalance)
+ * Imbalances also naturally occur as the contract adjusts these values after observing oracle value changes
+ * Incentives exist to best incentivize contract balance.
+ *
+ * Mechanim 1 - interest accural imbalance.
+ * The entire total locked value accures interest and distributes it 50/50 even if imbalance exists.
+ * I.e. Short side supplys $50 capital. Long side supply $150. Short side effectively earns interest on $100.
+ * Enhanced yeild exists for sides taking on the position with less demand.
+ *
+ * Mechanism 2 - liquidity fees earned.
+ *
+ * ******* KNOWN ATTACK VECTORS ***********
+ * (1) Feeless withdrawl:
+ * Long position $150, Short position $100. User should pay fee to remove short liquidity.
+ * Step1: User mints $51 of short position (No fee to add liquidity).
+ * Step2: User redeems $100 of short position (no fee as currently removing liquidity from bigger side)
+ * Possible solution, check after deposit/withdrawl if order book has flipped, then apply fees.
+ *
+ * (2) FlashLoan mint.
+ */
 contract LongShort {
     using SafeMath for uint256;
     // Oracle
@@ -116,6 +158,27 @@ contract LongShort {
         } else {
             return longValue.div(shortValue);
         }
+    }
+
+    /**
+     * Fees for depositing or leaving the pool if you are not a
+     * liquidity taker and not a liquidity maker...
+     * This is v1 mechanism
+     */
+    function _feesMechanism(
+        uint256 totalFees,
+        uint256 longPercentage,
+        uint256 shortPercentage
+    ) internal {
+        require(100 == shortPercentage.add(longPercentage));
+        require(totalFees > 0);
+
+        longValue = longValue.add(totalFees.mul(longPercentage).div(100));
+        shortValue = shortValue.add(totalFees.mul(shortPercentage).div(100));
+
+        // Refersh prices
+        longTokenPrice = longValue.div(longTokens.totalSupply());
+        shortTokenPrice = shortValue.div(shortTokens.totalSupply());
     }
 
     /**
@@ -242,14 +305,26 @@ contract LongShort {
      */
     function mintLong(uint256 amount) external refreshSystemState {
         _addDeposit(amount);
+        uint256 amountToMint = 0;
 
-        uint256 amountToMint = amount.div(longTokenPrice);
-        longValue = longValue.add(amount);
+        // Pay fees if you are diluting the position
+        if (getLongBeta() < 1) {
+            uint256 fees = amount.mul(5).div(1000);
+            uint256 depositLessFees = amount.sub(fees);
+            _feesMechanism(fees, 0, 100);
+
+            amountToMint = depositLessFees.div(longTokenPrice);
+            longValue = longValue.add(depositLessFees);
+        } else {
+            amountToMint = amount.div(longTokenPrice);
+            longValue = longValue.add(amount);
+        }
+
         longTokens.mint(msg.sender, amountToMint);
-
         // longTokenPrice should remain unchanged after mint...
         // Likely slight rounding errors. Figure this out.
         require(longTokenPrice == longValue.div(longTokens.totalSupply()));
+        require(longValue.add(shortValue) == totalValueLocked);
     }
 
     /**
@@ -257,15 +332,28 @@ contract LongShort {
      */
     function mintShort(uint256 amount) external refreshSystemState {
         _addDeposit(amount);
+        uint256 amountToMint = 0;
+
+        // Pay fees if you are diluting the position
+        if (getShortBeta() < 1) {
+            uint256 fees = amount.mul(5).div(1000);
+            uint256 depositLessFees = amount.sub(fees);
+            _feesMechanism(fees, 100, 0);
+
+            amountToMint = depositLessFees.div(shortTokenPrice);
+            shortValue = shortValue.add(depositLessFees);
+        } else {
+            amountToMint = amount.div(shortTokenPrice);
+            shortValue = shortValue.add(amount);
+        }
 
         // Check division errors here!
-        uint256 amountToMint = amount.div(shortTokenPrice);
-        shortValue = shortValue.add(amount);
         shortTokens.mint(msg.sender, amountToMint);
 
         // shortTokenPrice should remain unchanged after mint...
         // Likely slight rounding errors. Figure this out.
         require(shortTokenPrice == shortValue.div(shortTokens.totalSupply()));
+        require(longValue.add(shortValue) == totalValueLocked);
     }
 
     function _redeem(uint256 amount) internal {
@@ -288,17 +376,29 @@ contract LongShort {
 
         // longTokenPrice should remain unchanged
         require(longTokenPrice == longValue.div(longTokens.totalSupply()));
+        require(longValue.add(shortValue) == totalValueLocked);
     }
 
     function redeemShort(uint256 tokensToRedeem) external refreshSystemState {
         // Burn the tokens to redeem
         shortTokens.burnFrom(msg.sender, tokensToRedeem);
+        uint256 amountToRedeem = 0;
 
-        uint256 amountToRedeem = tokensToRedeem.mul(shortTokenPrice);
+        // Pay fees if you are diluting the position
+        if (getLongBeta() < 1) {
+            amountToRedeem = tokensToRedeem.mul(shortTokenPrice).mul(995).div(
+                1000
+            ); // In this case you are strengthning token price and need to reprice.
+        } else {
+            amountToRedeem = tokensToRedeem.mul(shortTokenPrice);
+        }
+
         shortValue = shortValue.sub(amountToRedeem);
+        shortTokenPrice = shortValue.div(shortTokens.totalSupply());
         _redeem(amountToRedeem);
 
-        // shortTokenPrice should remain unchanged after redeem
+        // shortTokenPrice should remain unchanged after redeem (except with fees)
         require(shortTokenPrice == shortValue.div(shortTokens.totalSupply()));
+        require(longValue.add(shortValue) == totalValueLocked);
     }
 }
