@@ -44,6 +44,8 @@ import "./ShortCoins.sol";
  * Enhanced yeild exists for sides taking on the position with less demand.
  *
  * Mechanism 2 - liquidity fees earned.
+ * The side which is shorter on liquidity will recieve fees strengthening their value
+ * Whenever liquidity is added to the opposing side or withdrawn from their side (i.e. when the imbalance increases)
  *
  * ******* KNOWN ATTACK VECTORS ***********
  * (1) Feeless withdrawl:
@@ -52,7 +54,12 @@ import "./ShortCoins.sol";
  * Step2: User redeems $100 of short position (no fee as currently removing liquidity from bigger side)
  * Possible solution, check after deposit/withdrawl if order book has flipped, then apply fees.
  *
- * (2) FlashLoan mint.
+ * (2) FlashLoan mint:
+ * Consider rapid large entries and exit of the system.
+ *
+ * (3) Oracle manipulation:
+ * If the oracle determining price change can be easy manipulated (and by a decent magnitude),
+ * Funds could be at risk. See: https://blog.trailofbits.com/2020/08/05/accidentally-stepping-on-a-defi-lego/
  */
 contract LongShort {
     using SafeMath for uint256;
@@ -366,12 +373,26 @@ contract LongShort {
         }
     }
 
+    /**
+     * Redeem long tokens for underlying
+     */
     function redeemLong(uint256 tokensToRedeem) external refreshSystemState {
         // Burn the tokens to redeem
         longTokens.burnFrom(msg.sender, tokensToRedeem);
+        uint256 amountToRedeem = 0;
 
-        uint256 amountToRedeem = tokensToRedeem.mul(longTokenPrice);
-        longValue = longValue.sub(amountToRedeem);
+        // Pay fees if you are diluting the position
+        if (getShortBeta() < 1) {
+            amountToRedeem = tokensToRedeem.mul(longTokenPrice).mul(995).div(
+                1000
+            ); // In this case you are strengthning token price and need to reprice.
+            longValue = longValue.sub(amountToRedeem);
+            longTokenPrice = longValue.div(longTokens.totalSupply());
+        } else {
+            amountToRedeem = tokensToRedeem.mul(longTokenPrice);
+            longValue = longValue.sub(amountToRedeem);
+        }
+
         _redeem(amountToRedeem);
 
         // longTokenPrice should remain unchanged
@@ -379,6 +400,9 @@ contract LongShort {
         require(longValue.add(shortValue) == totalValueLocked);
     }
 
+    /**
+     * Redeem short tokens for underlying
+     */
     function redeemShort(uint256 tokensToRedeem) external refreshSystemState {
         // Burn the tokens to redeem
         shortTokens.burnFrom(msg.sender, tokensToRedeem);
@@ -389,12 +413,13 @@ contract LongShort {
             amountToRedeem = tokensToRedeem.mul(shortTokenPrice).mul(995).div(
                 1000
             ); // In this case you are strengthning token price and need to reprice.
+            shortValue = shortValue.sub(amountToRedeem);
+            shortTokenPrice = shortValue.div(shortTokens.totalSupply());
         } else {
             amountToRedeem = tokensToRedeem.mul(shortTokenPrice);
+            shortValue = shortValue.sub(amountToRedeem);
         }
 
-        shortValue = shortValue.sub(amountToRedeem);
-        shortTokenPrice = shortValue.div(shortTokens.totalSupply());
         _redeem(amountToRedeem);
 
         // shortTokenPrice should remain unchanged after redeem (except with fees)
