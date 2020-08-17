@@ -395,13 +395,17 @@ contract LongShort {
         uint256 amountToRedeem = tokensToRedeem.mul(longTokenPrice);
         longValue = longValue.sub(amountToRedeem);
 
+        uint256 fees = 0;
         // Pay fees if you are diluting the position
         if (getShortBeta() < 1) {
-            uint256 fees = amountToRedeem.mul(5).div(1000);
-            amountToRedeem = amountToRedeem.sub(fees);
+            fees = amountToRedeem.mul(8).div(1000);
             _feesMechanism(fees, 100, 0);
+        } else {
+            fees = amountToRedeem.mul(3).div(1000);
+            _feesMechanism(fees, 50, 50);
         }
 
+        amountToRedeem = amountToRedeem.sub(fees);
         _redeem(amountToRedeem);
 
         // longTokenPrice should remain unchanged
@@ -418,13 +422,17 @@ contract LongShort {
         uint256 amountToRedeem = tokensToRedeem.mul(shortTokenPrice);
         shortValue = shortValue.sub(amountToRedeem);
 
+        uint256 fees = 0;
         // Pay fees if you are diluting the position
         if (getLongBeta() < 1) {
-            uint256 fees = amountToRedeem.mul(5).div(1000);
-            amountToRedeem = amountToRedeem.sub(fees);
+            fees = amountToRedeem.mul(8).div(1000);
             _feesMechanism(fees, 0, 100);
+        } else {
+            fees = amountToRedeem.mul(3).div(1000);
+            _feesMechanism(fees, 50, 50);
         }
 
+        amountToRedeem = amountToRedeem.sub(fees);
         _redeem(amountToRedeem);
 
         // shortTokenPrice should remain unchanged after redeem (except with fees)
