@@ -79,7 +79,7 @@ contract LongShort {
     LongCoins public longTokens;
     ShortCoins public shortTokens;
     uint256 public longTokenPrice;
-    uint256 public shortTokenPrice; // gas costs.
+    uint256 public shortTokenPrice;
 
     // DEFI contracts
     IERC20 public daiContract;
@@ -167,6 +167,11 @@ contract LongShort {
         }
     }
 
+    function _refreshTokensPrice() internal {
+        longTokenPrice = longValue.div(longTokens.totalSupply());
+        shortTokenPrice = shortValue.div(shortTokens.totalSupply());
+    }
+
     /**
      * Fees for depositing or leaving the pool if you are not a
      * liquidity taker and not a liquidity maker...
@@ -177,15 +182,8 @@ contract LongShort {
         uint256 longPercentage,
         uint256 shortPercentage
     ) internal {
-        require(100 == shortPercentage.add(longPercentage));
-        require(totalFees > 0);
-
-        longValue = longValue.add(totalFees.mul(longPercentage).div(100));
-        shortValue = shortValue.add(totalFees.mul(shortPercentage).div(100));
-
-        // Refersh prices
-        longTokenPrice = longValue.div(longTokens.totalSupply());
-        shortTokenPrice = shortValue.div(shortTokens.totalSupply());
+        _increaseLongShortSides(totalFees, longPercentage, shortPercentage);
+        _refreshTokensPrice();
     }
 
     /**
@@ -197,19 +195,31 @@ contract LongShort {
         uint256 longPercentage,
         uint256 shortPercentage
     ) internal {
-        require(100 == shortPercentage.add(longPercentage));
         uint256 totalValueWithInterest = adaiContract.balanceOf(address(this));
-
         uint256 interestAccrued = totalValueWithInterest.sub(totalValueLocked);
-        if (interestAccrued > 0) {
-            longValue = longValue.add(
-                interestAccrued.mul(longPercentage).div(100)
-            );
-            shortValue = shortValue.add(
-                interestAccrued.mul(shortPercentage).div(100)
-            );
-            totalValueLocked = totalValueWithInterest;
-        }
+        _increaseLongShortSides(
+            interestAccrued,
+            longPercentage,
+            shortPercentage
+        );
+
+        totalValueLocked = totalValueWithInterest;
+    }
+
+    /**
+     * Generic function to add value to the system
+     * Interest or fees
+     */
+    function _increaseLongShortSides(
+        uint256 amount,
+        uint256 longPercentage,
+        uint256 shortPercentage
+    ) internal {
+        require(100 == shortPercentage.add(longPercentage));
+        require(amount > 0);
+
+        longValue = longValue.add(amount.mul(longPercentage).div(100));
+        shortValue = shortValue.add(amount.mul(shortPercentage).div(100));
     }
 
     function _priceChangeMechanism(uint256 newPrice) internal {
@@ -224,6 +234,7 @@ contract LongShort {
         if (newPrice > assetPrice) {
             percentageChange = (newPrice.sub(assetPrice)).div(assetPrice);
             if (percentageChange >= 1) {
+                // More than 100% price movement, system liquidation.
                 longValue = longValue.add(shortValue);
                 shortValue = 0;
             } else {
@@ -233,7 +244,7 @@ contract LongShort {
                     valueChange = longValue.mul(percentageChange);
                 }
                 longValue = longValue.add(valueChange);
-                shortValue = shortValue.sub(valueChange); // NB Check for going below zero and system instability
+                shortValue = shortValue.sub(valueChange);
             }
         } else {
             percentageChange = (assetPrice.sub(newPrice)).div(assetPrice);
@@ -290,9 +301,10 @@ contract LongShort {
 
         // Update price of tokens
         // careful if total supply is zero intitally.
-        longTokenPrice = longValue.div(longTokens.totalSupply());
-        shortTokenPrice = shortValue.div(shortTokens.totalSupply());
+        _refreshTokensPrice();
         assetPrice = newPrice;
+
+        require(longValue.add(shortValue) == totalValueLocked); //for testing
     }
 
     function _addDeposit(uint256 amount) internal {
@@ -315,6 +327,7 @@ contract LongShort {
         uint256 amountToMint = 0;
 
         // Pay fees if you are diluting the position
+        // Make this more finegrained... and less coarse.
         if (getLongBeta() < 1) {
             uint256 fees = amount.mul(5).div(1000);
             uint256 depositLessFees = amount.sub(fees);
@@ -379,18 +392,14 @@ contract LongShort {
     function redeemLong(uint256 tokensToRedeem) external refreshSystemState {
         // Burn the tokens to redeem
         longTokens.burnFrom(msg.sender, tokensToRedeem);
-        uint256 amountToRedeem = 0;
+        uint256 amountToRedeem = tokensToRedeem.mul(longTokenPrice);
+        longValue = longValue.sub(amountToRedeem);
 
         // Pay fees if you are diluting the position
         if (getShortBeta() < 1) {
-            amountToRedeem = tokensToRedeem.mul(longTokenPrice).mul(995).div(
-                1000
-            ); // In this case you are strengthning token price and need to reprice.
-            longValue = longValue.sub(amountToRedeem);
-            longTokenPrice = longValue.div(longTokens.totalSupply());
-        } else {
-            amountToRedeem = tokensToRedeem.mul(longTokenPrice);
-            longValue = longValue.sub(amountToRedeem);
+            uint256 fees = amountToRedeem.mul(5).div(1000);
+            amountToRedeem = amountToRedeem.sub(fees);
+            _feesMechanism(fees, 100, 0);
         }
 
         _redeem(amountToRedeem);
@@ -406,18 +415,14 @@ contract LongShort {
     function redeemShort(uint256 tokensToRedeem) external refreshSystemState {
         // Burn the tokens to redeem
         shortTokens.burnFrom(msg.sender, tokensToRedeem);
-        uint256 amountToRedeem = 0;
+        uint256 amountToRedeem = tokensToRedeem.mul(shortTokenPrice);
+        shortValue = shortValue.sub(amountToRedeem);
 
         // Pay fees if you are diluting the position
         if (getLongBeta() < 1) {
-            amountToRedeem = tokensToRedeem.mul(shortTokenPrice).mul(995).div(
-                1000
-            ); // In this case you are strengthning token price and need to reprice.
-            shortValue = shortValue.sub(amountToRedeem);
-            shortTokenPrice = shortValue.div(shortTokens.totalSupply());
-        } else {
-            amountToRedeem = tokensToRedeem.mul(shortTokenPrice);
-            shortValue = shortValue.sub(amountToRedeem);
+            uint256 fees = amountToRedeem.mul(5).div(1000);
+            amountToRedeem = amountToRedeem.sub(fees);
+            _feesMechanism(fees, 0, 100);
         }
 
         _redeem(amountToRedeem);
