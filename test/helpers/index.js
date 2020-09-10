@@ -3,22 +3,18 @@
 
 const LONGSHORT_CONTRACT_NAME = "LongShort";
 const ERC20_CONTRACT_NAME = "ERC20PresetMinterPauserUpgradeSafe";
+const PRICE_ORACLE_NAME = "PriceOracle";
 
 const LongShort = artifacts.require(LONGSHORT_CONTRACT_NAME);
 const erc20 = artifacts.require(ERC20_CONTRACT_NAME);
+const PriceOracle = artifacts.require(PRICE_ORACLE_NAME);
 
 const initialize = async (admin) => {
   const long = await erc20.new({
     from: admin,
   });
-  await long.initialize("long tokens", "LONG", {
-    from: admin,
-  });
 
   const short = await erc20.new({
-    from: admin,
-  });
-  await short.initialize("short tokens", "SHORT", {
     from: admin,
   });
 
@@ -29,12 +25,23 @@ const initialize = async (admin) => {
     from: admin,
   });
 
+  const priceOracle = await PriceOracle.new(1, { from: admin });
+
+  // Need to give minting rights to long short contract
+  await long.initialize("long tokens", "LONG", {
+    from: admin,
+  });
+  await short.initialize("short tokens", "SHORT", {
+    from: admin,
+  });
+
   const longShort = await LongShort.new(
     long.address,
     short.address,
     dai.address,
     dai.address,
     dai.address,
+    priceOracle.address,
     {
       from: admin,
     }
@@ -45,6 +52,7 @@ const initialize = async (admin) => {
     long,
     short,
     dai,
+    priceOracle,
   };
 };
 

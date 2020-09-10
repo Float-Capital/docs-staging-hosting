@@ -15,6 +15,7 @@ contract("LongShort", (accounts) => {
   let long;
   let short;
   let dai;
+  let priceOracle;
 
   // Default test values
   const admin = accounts[0];
@@ -27,6 +28,7 @@ contract("LongShort", (accounts) => {
     long = result.long;
     short = result.short;
     dai = result.dai;
+    priceOracle = result.priceOracle;
   });
 
   it("longshort: contract initialises", async () => {

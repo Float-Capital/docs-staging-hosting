@@ -3,7 +3,7 @@ pragma solidity 0.6.12;
 
 import "@nomiclabs/buidler/console.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
-import "@chainlink/contracts/src/v0.6/interfaces/AggregatorInterface.sol";
+import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
 import "./interfaces/IAaveLendingPool.sol";
 import "./interfaces/IADai.sol";
@@ -64,7 +64,7 @@ import "./ShortCoins.sol";
 contract LongShort {
     using SafeMath for uint256;
     // Oracle
-    AggregatorInterface internal priceFeed;
+    AggregatorV3Interface internal priceFeed;
 
     // Value of the underlying from which we caluclate
     // gains and losses by respective sides
@@ -110,11 +110,11 @@ contract LongShort {
         // lendingPoolAddressProvider should be one of below depending on deployment
         // kovan 0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5
         // mainnet 0x24a42fD28C976A61Df5D00D0599C34c4f90748c8
-        address lendingPoolAddressProvider
+        address lendingPoolAddressProvider,
+        address _priceOracle
     ) public {
-        priceFeed = AggregatorInterface(
-            0x2445F2466898565374167859Ae5e3a231e48BB41
-        );
+        priceFeed = AggregatorV3Interface(_priceOracle);
+
         // Will need to make sure we are a minter! and pauser!
         longTokens = LongCoins(_longCoins);
         shortTokens = ShortCoins(_shortCoins);
@@ -132,14 +132,14 @@ contract LongShort {
      * Returns the latest price
      */
     function getLatestPrice() public view returns (int256) {
-        return priceFeed.latestAnswer();
-    }
-
-    /**
-     * Returns the timestamp of the latest price update
-     */
-    function getLatestPriceTimestamp() public view returns (uint256) {
-        return priceFeed.latestTimestamp();
+        (
+            uint80 roundID,
+            int256 price,
+            uint256 startedAt,
+            uint256 timeStamp,
+            uint80 answeredInRound
+        ) = priceFeed.latestRoundData();
+        return price;
     }
 
     /**
