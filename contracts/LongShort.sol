@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity ^0.6.8;
+pragma solidity 0.6.12;
 
 import "@nomiclabs/buidler/console.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
@@ -308,7 +308,7 @@ contract LongShort {
     }
 
     function _addDeposit(uint256 amount) internal {
-        require(amount > 0);
+        require(amount > 0, "USer needs to add positive amount");
         aaveLendingContract = IAaveLendingPool(provider.getLendingPool());
         aaveLendingContractCore = provider.getLendingPoolCore();
 
