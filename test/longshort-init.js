@@ -22,6 +22,8 @@ contract("LongShort", (accounts) => {
   const user1 = accounts[1];
   const user2 = accounts[2];
 
+  const defaultMintAmount = 1000;
+
   beforeEach(async () => {
     const result = await initialize(admin);
     longShort = result.longShort;
@@ -32,6 +34,6 @@ contract("LongShort", (accounts) => {
   });
 
   it("longshort: contract initialises", async () => {
-    assert.equal(0, 0);
+    await mintAndApprove(dai, defaultMintAmount, user1, longShort.address);
   });
 });
