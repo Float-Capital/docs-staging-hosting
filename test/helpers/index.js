@@ -1,4 +1,4 @@
-// const { BN } = require("@openzeppelin/test-helpers");
+const { BN } = require("@openzeppelin/test-helpers");
 // const { time } = require("@openzeppelin/test-helpers");
 
 const LONGSHORT_CONTRACT_NAME = "LongShort";
@@ -84,8 +84,9 @@ const initialize = async (admin) => {
 };
 
 const mintAndApprove = async (token, amount, user, approvedAddress) => {
-  await token.mint(user, amount);
-  await token.approve(approvedAddress, amount, {
+  let bnAmount = new BN(amount);
+  await token.mint(user, bnAmount);
+  await token.approve(approvedAddress, bnAmount, {
     from: user,
   });
 };

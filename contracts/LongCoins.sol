@@ -12,6 +12,6 @@ contract LongCoins is ERC20PresetMinterPauserUpgradeSafe {
         _setupRole(DEFAULT_ADMIN_ROLE, LongShortContract);
         _setupRole(MINTER_ROLE, LongShortContract);
         _setupRole(PAUSER_ROLE, LongShortContract);
-        // Renounce admin rights from this deployer
+        // TODO: Renounce admin rights from this deployer
     }
 }
