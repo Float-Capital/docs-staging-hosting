@@ -1,0 +1,4 @@
+# Interesting things to remember to test.
+
+1) Massive swing cases where the value increases or decreases by more than 100% in a single go.
+2) All value withdrawn from one side

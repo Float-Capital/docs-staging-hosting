@@ -8,6 +8,7 @@ const LONG_COINS = "LongCoins";
 const AAVE_LENDING_POOL = "AaveLendingPool";
 const LENDING_POOL_ADDRESS_PROVIDER = "LendingPoolAddressesProvider";
 const ADAI = "ADai";
+const SIMULATED_INSTANT_APY = 10;
 
 const LongShort = artifacts.require(LONGSHORT_CONTRACT_NAME);
 const erc20 = artifacts.require(LONG_COINS);
@@ -41,9 +42,14 @@ const initialize = async (admin) => {
   });
 
   // aave lending pool
-  aaveLendingPool = await AaveLendingPool.new(aDai.address, dai.address, {
-    from: admin,
-  });
+  aaveLendingPool = await AaveLendingPool.new(
+    aDai.address,
+    dai.address,
+    SIMULATED_INSTANT_APY,
+    {
+      from: admin,
+    }
+  );
 
   lendingPoolAddressProvider = await LendingPoolAddressProvider.new(
     aaveLendingPool.address,
@@ -95,4 +101,5 @@ module.exports = {
   initialize,
   ERC20_CONTRACT_NAME,
   mintAndApprove,
+  SIMULATED_INSTANT_APY,
 };

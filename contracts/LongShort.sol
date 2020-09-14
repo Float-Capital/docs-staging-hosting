@@ -398,10 +398,10 @@ contract LongShort {
         uint256 fees = 0;
         // Pay fees if you are diluting the position
         if (getShortBeta() < 1) {
-            fees = amountToRedeem.mul(8).div(1000);
+            fees = amountToRedeem.mul(10).div(1000);
             _feesMechanism(fees, 100, 0);
         } else {
-            fees = amountToRedeem.mul(3).div(1000);
+            fees = amountToRedeem.mul(5).div(1000);
             _feesMechanism(fees, 50, 50);
         }
 
@@ -425,10 +425,10 @@ contract LongShort {
         uint256 fees = 0;
         // Pay fees if you are diluting the position
         if (getLongBeta() < 1) {
-            fees = amountToRedeem.mul(8).div(1000);
+            fees = amountToRedeem.mul(10).div(1000);
             _feesMechanism(fees, 0, 100);
         } else {
-            fees = amountToRedeem.mul(3).div(1000);
+            fees = amountToRedeem.mul(5).div(1000);
             _feesMechanism(fees, 50, 50);
         }
 
