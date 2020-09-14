@@ -11,6 +11,7 @@ const {
   initialize,
   mintAndApprove,
   SIMULATED_INSTANT_APY,
+  simulateInterestEarned,
 } = require("./helpers");
 
 contract("LongShort", (accounts) => {

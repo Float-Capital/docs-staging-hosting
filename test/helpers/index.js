@@ -97,9 +97,20 @@ const mintAndApprove = async (token, amount, user, approvedAddress) => {
   });
 };
 
+const simulateInterestEarned = (amount, apy) => {
+  let bnAmount = new BN(amount);
+  return bnAmount.add(bnAmount.mul(new BN(apy)).div(new BN(100)));
+};
+
+const tokenPriceCalculator = (value, supply) => {
+  return new BN(value).div(new BN(supply));
+};
+
 module.exports = {
   initialize,
   ERC20_CONTRACT_NAME,
   mintAndApprove,
   SIMULATED_INSTANT_APY,
+  simulateInterestEarned,
+  tokenPriceCalculator,
 };
