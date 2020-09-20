@@ -32,4 +32,8 @@ contract AaveLendingPool is IAaveLendingPool {
 
         aDai.mint(msg.sender, amount);
     }
+
+    function mockSendInterest(address _address, uint256 _amount) public {
+        aDai.mint(_address, _amount);
+    }
 }

@@ -86,6 +86,7 @@ const initialize = async (admin) => {
     dai,
     aDai,
     priceOracle,
+    aaveLendingPool,
   };
 };
 
@@ -97,9 +98,14 @@ const mintAndApprove = async (token, amount, user, approvedAddress) => {
   });
 };
 
-const simulateInterestEarned = (amount, apy) => {
+const simulateTotalValueWithInterest = (amount, apy) => {
   let bnAmount = new BN(amount);
   return bnAmount.add(bnAmount.mul(new BN(apy)).div(new BN(100)));
+};
+
+const simulateInterestEarned = (amount, apy) => {
+  let bnAmount = new BN(amount);
+  return bnAmount.mul(new BN(apy)).div(new BN(100));
 };
 
 const tokenPriceCalculator = (value, supply) => {
@@ -113,4 +119,5 @@ module.exports = {
   SIMULATED_INSTANT_APY,
   simulateInterestEarned,
   tokenPriceCalculator,
+  simulateTotalValueWithInterest,
 };
