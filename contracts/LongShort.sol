@@ -322,19 +322,20 @@ contract LongShort {
         totalValueLocked = totalValueLocked.add(amount);
     }
 
-    // function _feeCalculator(uint256 amount) internal returns (uint256) {
-    //     uint256 fees = 0;
+    function _feeCalc(uint256 amount, uint256 betaDiff)
+        internal
+        returns (uint256)
+    {
+        uint256 fees = 0;
 
-    //     if (totalValueLocked < 10**23) {
-    //         fees = amount.mul(5).div(1000); // 0.5% fee when contract has low liquidity
-    //     } else {
-    //         // 0.5% blanket fee + 1% for every 0.1 you dilute the beta!
-    //         fees = amount
-    //             .mul((longBeta.sub(newAdjustedBeta)).mul(10).add(5))
-    //             .div(1000);
-    //     }
-    //     return fees;
-    // }
+        if (totalValueLocked < 10**23) {
+            fees = amount.mul(5).div(1000); // 0.5% fee when contract has low liquidity
+        } else {
+            // 0.5% blanket fee + 1% for every 0.1 you dilute the beta!
+            fees = amount.mul(betaDiff.mul(10).add(5)).div(1000);
+        }
+        return fees;
+    }
 
     /**
      * Create a long position
@@ -347,48 +348,26 @@ contract LongShort {
         uint256 fees = 0;
         uint256 depositLessFees = 0;
 
-        if (longBeta < 1 && longBeta != 0) {
-            // If the contract has less than $100 000 apply a blanket fee of 0.5% for imbalances.
-
-            if (totalValueLocked < 10**23) {
-                fees = amount.mul(5).div(1000); // 0.5% fee when contract has low liquidity
+        if (newAdjustedBeta >= 1 || newAdjustedBeta == 0) {
+            amountToMint = amount.div(longTokenPrice);
+            longValue = longValue.add(amount);
+        } else {
+            if (longBeta < 1) {
+                uint256 betaDiff = longBeta.sub(newAdjustedBeta);
+                fees = _feeCalc(amount, betaDiff);
             } else {
-                // 0.5% blanket fee + 1% for every 0.1 you dilute the beta!
-                fees = amount
-                    .mul((longBeta.sub(newAdjustedBeta)).mul(10).add(5))
-                    .div(1000);
+                // case where you are tipping the imbalance
+                uint256 feePayablePortion = amount.sub(
+                    shortValue.sub(longValue)
+                );
+                uint256 beta = 1;
+                uint256 betaDiff = beta.sub(newAdjustedBeta);
+                fees = _feeCalc(feePayablePortion, betaDiff);
             }
-
             depositLessFees = amount.sub(fees);
             _feesMechanism(fees, 0, 100);
             amountToMint = depositLessFees.div(longTokenPrice);
             longValue = longValue.add(depositLessFees);
-        } else {
-            // No fees while the short is yet to come in!
-            // If short value is zero since newAdjustedBeta would be zero while
-            if (newAdjustedBeta >= 1 || newAdjustedBeta == 0) {
-                amountToMint = amount.div(longTokenPrice);
-                longValue = longValue.add(amount);
-            } else {
-                uint256 feePayablePortion = amount.sub(
-                    shortValue.sub(longValue)
-                );
-
-                if (totalValueLocked < 10**23) {
-                    fees = feePayablePortion.mul(5).div(1000); // 0.5% fee when contract has low liquidity
-                } else {
-                    // 0.5% blanket fee + 1% for every 0.1 you dilute the beta!
-                    uint256 beta = 1;
-                    fees = feePayablePortion
-                        .mul(((beta).sub(newAdjustedBeta)).mul(10).add(5))
-                        .div(1000);
-                }
-
-                depositLessFees = amount.sub(fees);
-                _feesMechanism(fees, 0, 100);
-                amountToMint = depositLessFees.div(longTokenPrice);
-                longValue = longValue.add(depositLessFees);
-            }
         }
 
         longTokens.mint(msg.sender, amountToMint);
