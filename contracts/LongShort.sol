@@ -148,7 +148,7 @@ contract LongShort {
     function getLongBeta() public view returns (uint256) {
         // TODO account for contract start when these are both zero
         // and an erronous beta of 1 reported.
-        if (shortValue >= longValue) {
+        if ((shortValue >= longValue && shortValue > 0) || longValue == 0) {
             return 1;
         } else {
             return shortValue.div(longValue);
@@ -160,7 +160,7 @@ contract LongShort {
      * zero div  error if both are zero
      */
     function getShortBeta() public view returns (uint256) {
-        if (longValue >= shortValue) {
+        if ((longValue >= shortValue && longValue > 0) || shortValue == 0) {
             return 1;
         } else {
             return longValue.div(shortValue);
@@ -217,9 +217,11 @@ contract LongShort {
     ) internal {
         require(100 == shortPercentage.add(longPercentage));
         require(amount > 0);
+        uint256 longSideIncrease = amount.mul(longPercentage).div(100);
+        uint256 shortSideIncrease = amount.sub(longSideIncrease);
 
-        longValue = longValue.add(amount.mul(longPercentage).div(100));
-        shortValue = shortValue.add(amount.mul(shortPercentage).div(100));
+        longValue = longValue.add(longSideIncrease);
+        shortValue = shortValue.add(shortSideIncrease);
     }
 
     function _priceChangeMechanism(uint256 newPrice) internal {
@@ -296,6 +298,7 @@ contract LongShort {
         } else if (shortValue == 0) {
             _accreditInterestMechanism(100, 0);
         } else {
+            // TODO: Change this to an inverse min threshold rather than vanilla 50/50
             _accreditInterestMechanism(50, 50);
         }
 
@@ -319,42 +322,84 @@ contract LongShort {
         totalValueLocked = totalValueLocked.add(amount);
     }
 
+    // function _feeCalculator(uint256 amount) internal returns (uint256) {
+    //     uint256 fees = 0;
+
+    //     if (totalValueLocked < 10**23) {
+    //         fees = amount.mul(5).div(1000); // 0.5% fee when contract has low liquidity
+    //     } else {
+    //         // 0.5% blanket fee + 1% for every 0.1 you dilute the beta!
+    //         fees = amount
+    //             .mul((longBeta.sub(newAdjustedBeta)).mul(10).add(5))
+    //             .div(1000);
+    //     }
+    //     return fees;
+    // }
+
     /**
      * Create a long position
      */
     function mintLong(uint256 amount) external refreshSystemState {
         _addDeposit(amount);
         uint256 amountToMint = 0;
+        uint256 longBeta = getLongBeta();
+        uint256 newAdjustedBeta = shortValue.div(longValue.add(amount));
+        uint256 fees = 0;
+        uint256 depositLessFees = 0;
 
-        // Pay fees if you are diluting the position
-        // Make this more finegrained... and less coarse.
-        if (getLongBeta() < 1) {
-            uint256 fees = amount.mul(5).div(1000);
-            uint256 depositLessFees = amount.sub(fees);
+        if (longBeta < 1 && longBeta != 0) {
+            // If the contract has less than $100 000 apply a blanket fee of 0.5% for imbalances.
+
+            if (totalValueLocked < 10**23) {
+                fees = amount.mul(5).div(1000); // 0.5% fee when contract has low liquidity
+            } else {
+                // 0.5% blanket fee + 1% for every 0.1 you dilute the beta!
+                fees = amount
+                    .mul((longBeta.sub(newAdjustedBeta)).mul(10).add(5))
+                    .div(1000);
+            }
+
+            depositLessFees = amount.sub(fees);
             _feesMechanism(fees, 0, 100);
-
             amountToMint = depositLessFees.div(longTokenPrice);
             longValue = longValue.add(depositLessFees);
         } else {
-            amountToMint = amount.div(longTokenPrice);
-            longValue = longValue.add(amount);
+            // No fees while the short is yet to come in!
+            // If short value is zero since newAdjustedBeta would be zero while
+            if (newAdjustedBeta >= 1 || newAdjustedBeta == 0) {
+                amountToMint = amount.div(longTokenPrice);
+                longValue = longValue.add(amount);
+            } else {
+                uint256 feePayablePortion = amount.sub(
+                    shortValue.sub(longValue)
+                );
+
+                if (totalValueLocked < 10**23) {
+                    fees = feePayablePortion.mul(5).div(1000); // 0.5% fee when contract has low liquidity
+                } else {
+                    // 0.5% blanket fee + 1% for every 0.1 you dilute the beta!
+                    uint256 beta = 1;
+                    fees = feePayablePortion
+                        .mul(((beta).sub(newAdjustedBeta)).mul(10).add(5))
+                        .div(1000);
+                }
+
+                depositLessFees = amount.sub(fees);
+                _feesMechanism(fees, 0, 100);
+                amountToMint = depositLessFees.div(longTokenPrice);
+                longValue = longValue.add(depositLessFees);
+            }
         }
 
         longTokens.mint(msg.sender, amountToMint);
-        // longTokenPrice should remain unchanged after mint...
-        // Likely slight rounding errors. Figure this out.
         require(longTokenPrice == longValue.div(longTokens.totalSupply()));
         require(longValue.add(shortValue) == totalValueLocked);
     }
 
-    /**
-     * Create a short position
-     */
     function mintShort(uint256 amount) external refreshSystemState {
         _addDeposit(amount);
         uint256 amountToMint = 0;
 
-        // Pay fees if you are diluting the position
         if (getShortBeta() < 1) {
             uint256 fees = amount.mul(5).div(1000);
             uint256 depositLessFees = amount.sub(fees);
@@ -367,11 +412,8 @@ contract LongShort {
             shortValue = shortValue.add(amount);
         }
 
-        // Check division errors here!
         shortTokens.mint(msg.sender, amountToMint);
 
-        // shortTokenPrice should remain unchanged after mint...
-        // Likely slight rounding errors. Figure this out.
         require(shortTokenPrice == shortValue.div(shortTokens.totalSupply()));
         require(longValue.add(shortValue) == totalValueLocked);
     }
@@ -386,17 +428,12 @@ contract LongShort {
         }
     }
 
-    /**
-     * Redeem long tokens for underlying
-     */
     function redeemLong(uint256 tokensToRedeem) external refreshSystemState {
-        // Burn the tokens to redeem
         longTokens.burnFrom(msg.sender, tokensToRedeem);
         uint256 amountToRedeem = tokensToRedeem.mul(longTokenPrice);
         longValue = longValue.sub(amountToRedeem);
 
         uint256 fees = 0;
-        // Pay fees if you are diluting the position
         if (getShortBeta() < 1) {
             fees = amountToRedeem.mul(10).div(1000);
             _feesMechanism(fees, 100, 0);
@@ -408,22 +445,16 @@ contract LongShort {
         amountToRedeem = amountToRedeem.sub(fees);
         _redeem(amountToRedeem);
 
-        // longTokenPrice should remain unchanged
         require(longTokenPrice == longValue.div(longTokens.totalSupply()));
         require(longValue.add(shortValue) == totalValueLocked);
     }
 
-    /**
-     * Redeem short tokens for underlying
-     */
     function redeemShort(uint256 tokensToRedeem) external refreshSystemState {
-        // Burn the tokens to redeem
         shortTokens.burnFrom(msg.sender, tokensToRedeem);
         uint256 amountToRedeem = tokensToRedeem.mul(shortTokenPrice);
         shortValue = shortValue.sub(amountToRedeem);
 
         uint256 fees = 0;
-        // Pay fees if you are diluting the position
         if (getLongBeta() < 1) {
             fees = amountToRedeem.mul(10).div(1000);
             _feesMechanism(fees, 0, 100);
@@ -435,7 +466,6 @@ contract LongShort {
         amountToRedeem = amountToRedeem.sub(fees);
         _redeem(amountToRedeem);
 
-        // shortTokenPrice should remain unchanged after redeem (except with fees)
         require(shortTokenPrice == shortValue.div(shortTokens.totalSupply()));
         require(longValue.add(shortValue) == totalValueLocked);
     }
