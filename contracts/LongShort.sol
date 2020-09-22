@@ -124,6 +124,8 @@ contract LongShort {
         adaiContract = IADai(aDaiAddress);
 
         // Intialize price at $1 per token (adjust decimals)
+        // TODO: we need to ensure 1 dai (18 decimals) =  1 longToken (18 decimals)
+        // NB to ensure this is the case.
         longTokenPrice = 10**18;
         shortTokenPrice = 10**18;
     }
@@ -311,7 +313,7 @@ contract LongShort {
     }
 
     function _addDeposit(uint256 amount) internal {
-        require(amount > 0, "USer needs to add positive amount");
+        require(amount > 0, "User needs to add positive amount");
         aaveLendingContract = IAaveLendingPool(provider.getLendingPool());
         aaveLendingContractCore = provider.getLendingPoolCore();
 
@@ -343,21 +345,22 @@ contract LongShort {
     function mintLong(uint256 amount) external refreshSystemState {
         _addDeposit(amount);
         uint256 amountToMint = 0;
+        uint256 finalDepositAmount = 0;
         uint256 longBeta = getLongBeta();
         uint256 newAdjustedBeta = shortValue.div(longValue.add(amount));
 
         if (newAdjustedBeta >= 1 || newAdjustedBeta == 0) {
-            amountToMint = amount.div(longTokenPrice);
-            longValue = longValue.add(amount);
+            console.log("No fees being paid");
+            finalDepositAmount = amount;
         } else {
+            console.log("Am I triggered");
             uint256 fees = 0;
             uint256 depositLessFees = 0;
-            // Creating an even bigger imabalance. Pay fees on entire amount
+            // Case 1: purely increasing imabalance. Pay fees on entire amount
             if (longBeta < 1) {
                 fees = _feeCalc(amount, longBeta.sub(newAdjustedBeta));
             } else {
-                // case where you are tipping the imbalance.
-                // Only pay fees on portion over tipping point
+                // Case 2: Tipping/reversing imbalance. Only fees on tipping portion
                 uint256 feePayablePortion = amount.sub(
                     shortValue.sub(longValue)
                 );
@@ -368,13 +371,20 @@ contract LongShort {
             }
             depositLessFees = amount.sub(fees);
             _feesMechanism(fees, 0, 100);
-            amountToMint = depositLessFees.div(longTokenPrice);
-            longValue = longValue.add(depositLessFees);
+            finalDepositAmount = depositLessFees;
         }
+        amountToMint = finalDepositAmount.div(longTokenPrice);
+        longValue = longValue.add(finalDepositAmount);
 
         longTokens.mint(msg.sender, amountToMint);
-        require(longTokenPrice == longValue.div(longTokens.totalSupply()));
-        require(longValue.add(shortValue) == totalValueLocked);
+        require(
+            longTokenPrice == longValue.div(longTokens.totalSupply()),
+            "Mint affecting price changed (long)"
+        );
+        require(
+            longValue.add(shortValue) == totalValueLocked,
+            "Total locked inconsistent"
+        );
     }
 
     function mintShort(uint256 amount) external refreshSystemState {
@@ -395,8 +405,14 @@ contract LongShort {
 
         shortTokens.mint(msg.sender, amountToMint);
 
-        require(shortTokenPrice == shortValue.div(shortTokens.totalSupply()));
-        require(longValue.add(shortValue) == totalValueLocked);
+        require(
+            shortTokenPrice == shortValue.div(shortTokens.totalSupply()),
+            "Mint affecting price changed (short)"
+        );
+        require(
+            longValue.add(shortValue) == totalValueLocked,
+            "Total locked inconsistent"
+        );
     }
 
     function _redeem(uint256 amount) internal {

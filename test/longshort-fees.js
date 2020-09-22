@@ -42,7 +42,31 @@ contract("LongShort", (accounts) => {
     aaveLendingPool = result.aaveLendingPool;
   });
 
-  it("longshort: Check entry fees are as expected.", async () => {
-    // Entry fees should be dynamic and based on the order book imbalance magnitude.
+  it("longshort: No entry fees while one side has no capital", async () => {
+    await mintAndApprove(dai, defaultMintAmount, user1, longShort.address);
+    await longShort.mintLong(new BN(defaultMintAmount), { from: user1 });
+    console.log("1");
+
+    await mintAndApprove(dai, defaultMintAmount, user2, longShort.address);
+    await longShort.mintLong(new BN(defaultMintAmount), { from: user2 });
+    console.log("2");
+
+    await mintAndApprove(dai, defaultMintAmount, user1, longShort.address);
+    await longShort.mintLong(new BN(defaultMintAmount), { from: user1 });
+    console.log("3");
+
+    await mintAndApprove(dai, defaultMintAmount, user1, longShort.address);
+    await longShort.mintLong(new BN(defaultMintAmount), { from: user1 });
+    console.log("4");
+
+    // Short value should remain zero. No fees being paid. Even though order book imbalance getting larger.
+    // The system should refresh and update after minting long tokens and reflect the interest earned by the short side
+    const shortValueLocked = await longShort.shortValue.call();
+    const shortValueExpected = 0;
+    assert.equal(
+      shortValueLocked.toString(),
+      shortValueExpected.toString(),
+      "Short value not correctly shown"
+    );
   });
 });
