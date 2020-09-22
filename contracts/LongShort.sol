@@ -148,7 +148,7 @@ contract LongShort {
     function getLongBeta() public view returns (uint256) {
         // TODO account for contract start when these are both zero
         // and an erronous beta of 1 reported.
-        if ((shortValue >= longValue && shortValue > 0) || longValue == 0) {
+        if (shortValue >= longValue) {
             return 1;
         } else {
             return shortValue.div(longValue);
@@ -160,7 +160,7 @@ contract LongShort {
      * zero div  error if both are zero
      */
     function getShortBeta() public view returns (uint256) {
-        if ((longValue >= shortValue && longValue > 0) || shortValue == 0) {
+        if (longValue >= shortValue) {
             return 1;
         } else {
             return longValue.div(shortValue);
@@ -345,24 +345,26 @@ contract LongShort {
         uint256 amountToMint = 0;
         uint256 longBeta = getLongBeta();
         uint256 newAdjustedBeta = shortValue.div(longValue.add(amount));
-        uint256 fees = 0;
-        uint256 depositLessFees = 0;
 
         if (newAdjustedBeta >= 1 || newAdjustedBeta == 0) {
             amountToMint = amount.div(longTokenPrice);
             longValue = longValue.add(amount);
         } else {
+            uint256 fees = 0;
+            uint256 depositLessFees = 0;
+            // Creating an even bigger imabalance. Pay fees on entire amount
             if (longBeta < 1) {
-                uint256 betaDiff = longBeta.sub(newAdjustedBeta);
-                fees = _feeCalc(amount, betaDiff);
+                fees = _feeCalc(amount, longBeta.sub(newAdjustedBeta));
             } else {
-                // case where you are tipping the imbalance
+                // case where you are tipping the imbalance.
+                // Only pay fees on portion over tipping point
                 uint256 feePayablePortion = amount.sub(
                     shortValue.sub(longValue)
                 );
-                uint256 beta = 1;
-                uint256 betaDiff = beta.sub(newAdjustedBeta);
-                fees = _feeCalc(feePayablePortion, betaDiff);
+                fees = _feeCalc(
+                    feePayablePortion,
+                    uint256(1).sub(newAdjustedBeta)
+                );
             }
             depositLessFees = amount.sub(fees);
             _feesMechanism(fees, 0, 100);
