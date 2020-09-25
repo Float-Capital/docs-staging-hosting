@@ -66,6 +66,8 @@ contract LongShort {
     // Oracle
     AggregatorV3Interface internal priceFeed;
 
+    uint256 public constant TEN_TO_THE_18 = 10**18;
+
     // Value of the underlying from which we caluclate
     // gains and losses by respective sides
     uint256 public assetPrice;
@@ -126,8 +128,10 @@ contract LongShort {
         // Intialize price at $1 per token (adjust decimals)
         // TODO: we need to ensure 1 dai (18 decimals) =  1 longToken (18 decimals)
         // NB to ensure this is the case.
-        longTokenPrice = 10**18;
-        shortTokenPrice = 10**18;
+        // 1000000000000000
+        // = 1 long token
+        longTokenPrice = TEN_TO_THE_18;
+        shortTokenPrice = TEN_TO_THE_18;
     }
 
     /**
@@ -170,8 +174,12 @@ contract LongShort {
     }
 
     function _refreshTokensPrice() internal {
-        longTokenPrice = longValue.div(longTokens.totalSupply());
-        shortTokenPrice = shortValue.div(shortTokens.totalSupply());
+        longTokenPrice = longValue.mul(TEN_TO_THE_18).div(
+            longTokens.totalSupply()
+        );
+        shortTokenPrice = shortValue.mul(TEN_TO_THE_18).div(
+            shortTokens.totalSupply()
+        );
     }
 
     /**
@@ -199,6 +207,7 @@ contract LongShort {
     ) internal {
         uint256 totalValueWithInterest = adaiContract.balanceOf(address(this));
         uint256 interestAccrued = totalValueWithInterest.sub(totalValueLocked);
+
         _increaseLongShortSides(
             interestAccrued,
             longPercentage,
@@ -218,12 +227,14 @@ contract LongShort {
         uint256 shortPercentage
     ) internal {
         require(100 == shortPercentage.add(longPercentage));
-        require(amount > 0);
-        uint256 longSideIncrease = amount.mul(longPercentage).div(100);
-        uint256 shortSideIncrease = amount.sub(longSideIncrease);
-
-        longValue = longValue.add(longSideIncrease);
-        shortValue = shortValue.add(shortSideIncrease);
+        if (amount == 0) {
+            console.log("No interest gained to split");
+        } else {
+            uint256 longSideIncrease = amount.mul(longPercentage).div(100);
+            uint256 shortSideIncrease = amount.sub(longSideIncrease);
+            longValue = longValue.add(longSideIncrease);
+            shortValue = shortValue.add(shortSideIncrease);
+        }
     }
 
     function _priceChangeMechanism(uint256 newPrice) internal {
@@ -273,17 +284,27 @@ contract LongShort {
     function _updateSystemState() public {
         // For system start, no value adjustment till positions on both sides exist
         // Consider attacks of possible zero balances later on in contract life?
+        // console.log("VALUE BEFORE ACTIONS");
+        // console.log(longTokenPrice);
+        // console.log(shortTokenPrice);
         if (longValue == 0 && shortValue == 0) {
             return;
         } else if (longValue == 0) {
             assetPrice = uint256(getLatestPrice());
             _accreditInterestMechanism(0, 100); // Give all interest to short side while we wait
-            shortTokenPrice = shortValue.div(shortTokens.totalSupply());
+            shortTokenPrice = shortValue.mul(TEN_TO_THE_18).div(
+                shortTokens.totalSupply()
+            );
             return;
         } else if (shortValue == 0) {
             assetPrice = uint256(getLatestPrice());
             _accreditInterestMechanism(100, 0); // Give all interest to long side while we wait
-            longTokenPrice = longValue.div(longTokens.totalSupply());
+            longTokenPrice = longValue.mul(TEN_TO_THE_18).div(
+                longTokens.totalSupply()
+            );
+            // console.log("VALUE After ACTIONS");
+            // console.log(longTokenPrice);
+            // console.log(shortTokenPrice);
             return;
         }
 
@@ -348,12 +369,19 @@ contract LongShort {
         uint256 finalDepositAmount = 0;
         uint256 longBeta = getLongBeta();
         uint256 newAdjustedBeta = shortValue.div(longValue.add(amount));
+        console.log("-------------------");
+
+        console.log("Start of mint long");
+        console.log("longValue", longValue);
+        console.log(" Long token price", longTokenPrice);
+        console.log("long token supply", longTokens.totalSupply());
+        console.log("-------------------");
 
         if (newAdjustedBeta >= 1 || newAdjustedBeta == 0) {
-            console.log("No fees being paid");
+            //console.log("No fees being paid");
             finalDepositAmount = amount;
         } else {
-            console.log("Am I triggered");
+            //console.log("Am I triggered");
             uint256 fees = 0;
             uint256 depositLessFees = 0;
             // Case 1: purely increasing imabalance. Pay fees on entire amount
@@ -373,12 +401,25 @@ contract LongShort {
             _feesMechanism(fees, 0, 100);
             finalDepositAmount = depositLessFees;
         }
-        amountToMint = finalDepositAmount.div(longTokenPrice);
+        amountToMint = finalDepositAmount.mul(TEN_TO_THE_18).div(
+            longTokenPrice
+        );
         longValue = longValue.add(finalDepositAmount);
+        console.log("final deposit Amount", finalDepositAmount);
+        console.log("amount to mint", amountToMint);
 
         longTokens.mint(msg.sender, amountToMint);
+
+        console.log("-------------------");
+        console.log("end of mint long");
+        console.log("longValue", longValue);
+        console.log("Long token price", longTokenPrice);
+        console.log("long token supply", longTokens.totalSupply());
+        console.log("-------------------");
+
         require(
-            longTokenPrice == longValue.div(longTokens.totalSupply()),
+            longTokenPrice ==
+                longValue.mul(10**18).div(longTokens.totalSupply()),
             "Mint affecting price changed (long)"
         );
         require(
@@ -406,7 +447,8 @@ contract LongShort {
         shortTokens.mint(msg.sender, amountToMint);
 
         require(
-            shortTokenPrice == shortValue.div(shortTokens.totalSupply()),
+            shortTokenPrice ==
+                shortValue.mul(TEN_TO_THE_18).div(shortTokens.totalSupply()),
             "Mint affecting price changed (short)"
         );
         require(
@@ -427,7 +469,9 @@ contract LongShort {
 
     function redeemLong(uint256 tokensToRedeem) external refreshSystemState {
         longTokens.burnFrom(msg.sender, tokensToRedeem);
-        uint256 amountToRedeem = tokensToRedeem.mul(longTokenPrice);
+        uint256 amountToRedeem = tokensToRedeem.mul(longTokenPrice).div(
+            TEN_TO_THE_18
+        );
         longValue = longValue.sub(amountToRedeem);
 
         uint256 fees = 0;
@@ -442,13 +486,18 @@ contract LongShort {
         amountToRedeem = amountToRedeem.sub(fees);
         _redeem(amountToRedeem);
 
-        require(longTokenPrice == longValue.div(longTokens.totalSupply()));
+        require(
+            longTokenPrice ==
+                longValue.mul(TEN_TO_THE_18).div(longTokens.totalSupply())
+        );
         require(longValue.add(shortValue) == totalValueLocked);
     }
 
     function redeemShort(uint256 tokensToRedeem) external refreshSystemState {
         shortTokens.burnFrom(msg.sender, tokensToRedeem);
-        uint256 amountToRedeem = tokensToRedeem.mul(shortTokenPrice);
+        uint256 amountToRedeem = tokensToRedeem.mul(shortTokenPrice).div(
+            TEN_TO_THE_18
+        );
         shortValue = shortValue.sub(amountToRedeem);
 
         uint256 fees = 0;
@@ -463,7 +512,10 @@ contract LongShort {
         amountToRedeem = amountToRedeem.sub(fees);
         _redeem(amountToRedeem);
 
-        require(shortTokenPrice == shortValue.div(shortTokens.totalSupply()));
+        require(
+            shortTokenPrice ==
+                shortValue.mul(TEN_TO_THE_18).div(shortTokens.totalSupply())
+        );
         require(longValue.add(shortValue) == totalValueLocked);
     }
 }
