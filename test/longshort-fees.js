@@ -14,6 +14,7 @@ const {
   simulateInterestEarned,
   tokenPriceCalculator,
   simulateTotalValueWithInterest,
+  feeCalculation,
 } = require("./helpers");
 
 contract("LongShort", (accounts) => {
@@ -42,6 +43,24 @@ contract("LongShort", (accounts) => {
     dai = result.dai;
     priceOracle = result.priceOracle;
     aaveLendingPool = result.aaveLendingPool;
+
+    xyz = async (_amount, _longValue, _shortValue, isLongDeposit) => {
+      // check if imbalance or not
+      const baseFee = await longShort.baseFee.call();
+      const feeMultiplier = await longShort.feeMultiplier.call();
+      const minThreshold = await longShort.contractValueWhenScalingFeesKicksIn.call();
+      const feeUnitsOfPrecision = await longShort.feeUnitsOfPrecision.call();
+      return feeCalculation(
+        _amount,
+        _longValue,
+        _shortValue,
+        baseFee,
+        feeMultiplier,
+        minThreshold,
+        feeUnitsOfPrecision,
+        isLongDeposit
+      );
+    };
   });
 
   it("longshort: No entry fees while one side has no capital (long)", async () => {
@@ -106,12 +125,31 @@ contract("LongShort", (accounts) => {
     await mintAndApprove(dai, defaultMintAmount, user2, longShort.address);
     await longShort.mintLong(new BN(defaultMintAmount), { from: user2 });
 
+    // Short value before fee
+    const shortValBefore = await longShort.shortValue.call();
+
     // 0.5% fee on this [Fee's don't scale till contract value > $100]
     await mintAndApprove(dai, defaultMintAmount, user3, longShort.address);
     await longShort.mintLong(new BN(defaultMintAmount), { from: user3 });
 
-    const expectedFeesForAction = new BN(defaultMintAmount)
-      .mul(new BN(5))
-      .div(new BN(100));
+    const longVal = await longShort.longValue.call();
+    const shortVal = await longShort.shortValue.call();
+    //console.log(longVal.toString());
+    //console.log(shortVal.toString());
+
+    // Something wrong with my zeros
+    const expectedFeesForAction = await xyz(
+      defaultMintAmount,
+      longVal,
+      shortVal,
+      true
+    );
+    //console.log(expectedFeesForAction.toString());
+
+    assert.equal(
+      shortVal.sub(shortValBefore).toString(),
+      expectedFeesForAction.toString(),
+      "Fee not correct"
+    );
   });
 });

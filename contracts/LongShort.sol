@@ -94,7 +94,7 @@ contract LongShort {
     // TODO: Make variables not constant later.
     uint256 public constant baseFee = 50; // 0.5% [we div by 10000]
     uint256 public constant feeMultiplier = 100; // [= +1% fee for every 0.1 you tip the beta]
-    uint256 public constant feeUintsOfPrecision = 10000; // [div the above by 10000]
+    uint256 public constant feeUnitsOfPrecision = 10000; // [div the above by 10000]
     uint256 public constant contractValueWhenScalingFeesKicksIn = 10**23; // [above fee kicks in when contract >$100 000]
 
     /**
@@ -162,9 +162,9 @@ contract LongShort {
         // TODO account for contract start when these are both zero
         // and an erronous beta of 1 reported.
         if (shortValue >= longValue) {
-            return 1;
+            return TEN_TO_THE_18;
         } else {
-            return shortValue.div(longValue);
+            return shortValue.mul(TEN_TO_THE_18).div(longValue);
         }
     }
 
@@ -174,9 +174,9 @@ contract LongShort {
      */
     function getShortBeta() public view returns (uint256) {
         if (longValue >= shortValue) {
-            return 1;
+            return TEN_TO_THE_18;
         } else {
-            return longValue.div(shortValue);
+            return longValue.mul(TEN_TO_THE_18).div(shortValue);
         }
     }
 
@@ -235,7 +235,7 @@ contract LongShort {
     ) internal {
         require(100 == shortPercentage.add(longPercentage));
         if (amount == 0) {
-            console.log("No interest gained to split");
+            //console.log("No interest gained to split");
         } else {
             uint256 longSideIncrease = amount.mul(longPercentage).div(100);
             uint256 shortSideIncrease = amount.sub(longSideIncrease);
@@ -244,6 +244,7 @@ contract LongShort {
         }
     }
 
+    // TODO fix with beta
     function _priceChangeMechanism(uint256 newPrice) internal {
         // If no new price update from oracle, proceed as normal
         if (assetPrice == newPrice) {
@@ -363,13 +364,14 @@ contract LongShort {
         internal
         returns (uint256)
     {
-        uint256 fees = 0;
-        if (totalValueLocked < contractValueWhenScalingFeesKicksIn) {
-            fees = amount.mul(baseFee).div(feeUintsOfPrecision); // 0.5% fee when contract has low liquidity
-        } else {
+        // 0.5% fee when contract has low liquidity
+        uint256 fees = amount.mul(baseFee).div(feeUnitsOfPrecision);
+        if (totalValueLocked > contractValueWhenScalingFeesKicksIn) {
             // 0.5% blanket fee + 1% for every 0.1 you dilute the beta!
-            fees = amount.mul(betaDiff.mul(feeMultiplier).add(baseFee)).div(
-                feeUintsOfPrecision
+            fees = fees.add(
+                amount.mul(betaDiff).mul(baseFee).div(TEN_TO_THE_18).div(
+                    feeUnitsOfPrecision
+                )
             );
         }
         return fees;
@@ -387,12 +389,12 @@ contract LongShort {
     ) internal returns (uint256) {
         uint256 finalDepositAmount = 0;
 
-        if (newAdjustedBeta >= 1 || newAdjustedBeta == 0) {
+        if (newAdjustedBeta >= TEN_TO_THE_18 || newAdjustedBeta == 0) {
             finalDepositAmount = amount;
         } else {
             uint256 fees = 0;
             uint256 depositLessFees = 0;
-            if (oldBeta < 1) {
+            if (oldBeta < TEN_TO_THE_18) {
                 fees = _feeCalc(amount, oldBeta.sub(newAdjustedBeta));
             } else {
                 // Case 2: Tipping/reversing imbalance. Only fees on tipping portion
@@ -404,7 +406,7 @@ contract LongShort {
                 }
                 fees = _feeCalc(
                     feePayablePortion,
-                    uint256(1).sub(newAdjustedBeta)
+                    TEN_TO_THE_18.sub(newAdjustedBeta)
                 );
             }
             depositLessFees = amount.sub(fees);
@@ -425,7 +427,10 @@ contract LongShort {
         _addDeposit(amount);
         uint256 amountToMint = 0;
         uint256 longBeta = getLongBeta();
-        uint256 newAdjustedBeta = shortValue.div(longValue.add(amount));
+        uint256 newAdjustedBeta = shortValue.mul(TEN_TO_THE_18).div(
+            longValue.add(amount)
+        );
+        //console.log(newAdjustedBeta);
         uint256 finalDepositAmount = _calcFinalDepositAmount(
             amount,
             newAdjustedBeta,
