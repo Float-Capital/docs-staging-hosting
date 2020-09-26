@@ -109,7 +109,7 @@ const simulateInterestEarned = (amount, apy) => {
 };
 
 const tokenPriceCalculator = (value, supply) => {
-  return new BN(value).div(new BN(supply));
+  return new BN(value).mul(new BN("1000000000000000000")).div(new BN(supply));
 };
 
 module.exports = {

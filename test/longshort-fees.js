@@ -28,6 +28,7 @@ contract("LongShort", (accounts) => {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
+  const user3 = accounts[3];
 
   const defaultMintAmount = "100000000000000000000"; // 100 dai etc.
   //const defaultMintAmount = "8923490023525451345"; // 100 dai etc.
@@ -43,22 +44,18 @@ contract("LongShort", (accounts) => {
     aaveLendingPool = result.aaveLendingPool;
   });
 
-  it("longshort: No entry fees while one side has no capital", async () => {
+  it("longshort: No entry fees while one side has no capital (long)", async () => {
     await mintAndApprove(dai, defaultMintAmount, user1, longShort.address);
     await longShort.mintLong(new BN(defaultMintAmount), { from: user1 });
-    //console.log("1");
 
     await mintAndApprove(dai, defaultMintAmount, user2, longShort.address);
     await longShort.mintLong(new BN(defaultMintAmount), { from: user2 });
-    //console.log("2");
 
     await mintAndApprove(dai, defaultMintAmount, user1, longShort.address);
     await longShort.mintLong(new BN(defaultMintAmount), { from: user1 });
-    //console.log("3");
 
     await mintAndApprove(dai, defaultMintAmount, user1, longShort.address);
     await longShort.mintLong(new BN(defaultMintAmount), { from: user1 });
-    //console.log("4");
 
     // Short value should remain zero. No fees being paid. Even though order book imbalance getting larger.
     // The system should refresh and update after minting long tokens and reflect the interest earned by the short side
@@ -69,5 +66,52 @@ contract("LongShort", (accounts) => {
       shortValueExpected.toString(),
       "Short value not correctly shown"
     );
+  });
+
+  it("longshort: No entry fees while one side has no capital (short)", async () => {
+    await mintAndApprove(dai, defaultMintAmount, user1, longShort.address);
+    await longShort.mintShort(new BN(defaultMintAmount), { from: user1 });
+
+    await mintAndApprove(dai, defaultMintAmount, user2, longShort.address);
+    await longShort.mintShort(new BN(defaultMintAmount), { from: user2 });
+
+    await mintAndApprove(dai, defaultMintAmount, user1, longShort.address);
+    await longShort.mintShort(new BN(defaultMintAmount), { from: user1 });
+
+    await mintAndApprove(dai, defaultMintAmount, user1, longShort.address);
+    await longShort.mintShort(new BN(defaultMintAmount), { from: user1 });
+
+    const longValueLocked = await longShort.longValue.call();
+    const longValueExpected = 0;
+    assert.equal(
+      longValueLocked.toString(),
+      longValueExpected.toString(),
+      "long value not correctly shown"
+    );
+  });
+
+  // Other Fee cases to consider.
+  // (1) 100 initial long. Next a 110 short position comes in.
+  // (2) equal order book, full fee should be paid.
+  // (3) Imbalance order book, further skewing, full fee should be paid.
+  // (4) Imbalance order book, tipping case, partial fee to be paid.
+
+  it("longshort: fees case 2", async () => {
+    // Consider APY=0% for initial simplicity.
+    await aaveLendingPool.setSimulatedInstantAPY(0, { from: admin });
+
+    await mintAndApprove(dai, defaultMintAmount, user1, longShort.address);
+    await longShort.mintShort(new BN(defaultMintAmount), { from: user1 });
+
+    await mintAndApprove(dai, defaultMintAmount, user2, longShort.address);
+    await longShort.mintLong(new BN(defaultMintAmount), { from: user2 });
+
+    // 0.5% fee on this [Fee's don't scale till contract value > $100]
+    await mintAndApprove(dai, defaultMintAmount, user3, longShort.address);
+    await longShort.mintLong(new BN(defaultMintAmount), { from: user3 });
+
+    const expectedFeesForAction = new BN(defaultMintAmount)
+      .mul(new BN(5))
+      .div(new BN(100));
   });
 });

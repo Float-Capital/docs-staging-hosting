@@ -22,6 +22,10 @@ contract AaveLendingPool is IAaveLendingPool {
         simulatedInstantAPY = _simulatedInstantAPY;
     }
 
+    function setSimulatedInstantAPY(uint256 _simulatedInstantAPY) public {
+        simulatedInstantAPY = _simulatedInstantAPY;
+    }
+
     function deposit(
         address _reserve,
         uint256 _amount,
