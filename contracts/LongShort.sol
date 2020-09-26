@@ -464,7 +464,9 @@ contract LongShort {
         uint256 amountToMint = 0;
         //uint256 finalDepositAmount = 0;
         uint256 shortBeta = getShortBeta();
-        uint256 newAdjustedBeta = longValue.div(shortValue.add(amount));
+        uint256 newAdjustedBeta = longValue.mul(TEN_TO_THE_18).div(
+            shortValue.add(amount)
+        );
         uint256 finalDepositAmount = _calcFinalDepositAmount(
             amount,
             newAdjustedBeta,
