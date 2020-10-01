@@ -11,6 +11,7 @@ const {
   initialize,
   mintAndApprove,
   SIMULATED_INSTANT_APY,
+  simulateInterestEarned,
 } = require("./helpers");
 
 contract("LongShort", (accounts) => {
@@ -48,7 +49,7 @@ contract("LongShort", (accounts) => {
 
     assert.equal(
       user1LongTokens,
-      100,
+      defaultMintAmount,
       "Correct tokens not minted on initialization"
     );
     assert.equal(user1DaiTokens, 0, "Tokens not taken when minting position");
@@ -65,7 +66,7 @@ contract("LongShort", (accounts) => {
 
     assert.equal(
       user1ShortTokens,
-      100,
+      defaultMintAmount,
       "Correct tokens not minted on initialization"
     );
     assert.equal(user1DaiTokens, 0, "Tokens not taken when minting position");
@@ -80,7 +81,7 @@ contract("LongShort", (accounts) => {
     const user1ShortTokens = await short.balanceOf(user1);
     assert.equal(
       user1ShortTokens,
-      100,
+      defaultMintAmount,
       "Correct tokens not minted on initialization"
     );
     // Check the other values are set correctly
@@ -114,7 +115,7 @@ contract("LongShort", (accounts) => {
     const user2LongTokens = await long.balanceOf(user2);
     assert.equal(
       user2LongTokens,
-      100,
+      defaultMintAmount,
       "Correct tokens not minted on initialization"
     );
 
