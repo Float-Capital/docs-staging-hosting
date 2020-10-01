@@ -86,6 +86,7 @@ const initialize = async (admin) => {
     dai,
     aDai,
     priceOracle,
+    aaveLendingPool,
   };
 };
 
@@ -97,13 +98,69 @@ const mintAndApprove = async (token, amount, user, approvedAddress) => {
   });
 };
 
-const simulateInterestEarned = (amount, apy) => {
+const simulateTotalValueWithInterest = (amount, apy) => {
   let bnAmount = new BN(amount);
   return bnAmount.add(bnAmount.mul(new BN(apy)).div(new BN(100)));
 };
 
+const simulateInterestEarned = (amount, apy) => {
+  let bnAmount = new BN(amount);
+  return bnAmount.mul(new BN(apy)).div(new BN(100));
+};
+
 const tokenPriceCalculator = (value, supply) => {
-  return new BN(value).div(new BN(supply));
+  return new BN(value).mul(new BN("1000000000000000000")).div(new BN(supply));
+};
+
+const feeCalculation = (
+  _amount,
+  _longValue,
+  _shortValue,
+  _baseFee,
+  _feeMultiplier,
+  _minThreshold,
+  _feeUnitsOfPrecision,
+  isLongDeposit
+) => {
+  // check if imbalance or not
+  amount = new BN(_amount);
+  longValue = new BN(_longValue);
+  shortValue = new BN(_shortValue);
+  baseFee = new BN(_baseFee);
+  feeMultiplier = new BN(_feeMultiplier);
+  minThreshold = new BN(_minThreshold);
+  feeUnitsOfPrecision = new BN(_feeUnitsOfPrecision);
+  if (
+    amount
+      .add(longValue)
+      .add(shortValue)
+      .lt(minThreshold)
+  ) {
+    //console.log("am i going off");
+    // simple 0.5% fee
+    if (isLongDeposit) {
+      if (longValue.gt(shortValue)) {
+        return baseFee.mul(amount).div(feeUnitsOfPrecision);
+      } else if (longValue.add(amount).gt(shortValue)) {
+        let amountLiableForFee = amount.sub(shortValue.sub(longValue));
+        return baseFee.mul(amountLiableForFee).div(feeUnitsOfPrecision);
+      } else {
+        return new BN(0);
+      }
+    } else {
+      if (shortValue.gt(longValue)) {
+        return baseFee.mul(amount).div(feeUnitsOfPrecision);
+      } else if (shortValue.add(amount).gt(longValue)) {
+        let amountLiableForFee = amount.sub(longValue.sub(shortValue));
+        return baseFee.mul(amountLiableForFee).div(feeUnitsOfPrecision);
+      } else {
+        return new BN(0);
+      }
+    }
+  } else {
+    // use sliding fee. Implement here.
+  }
+  return new BN(0);
 };
 
 module.exports = {
@@ -113,4 +170,6 @@ module.exports = {
   SIMULATED_INSTANT_APY,
   simulateInterestEarned,
   tokenPriceCalculator,
+  simulateTotalValueWithInterest,
+  feeCalculation,
 };
