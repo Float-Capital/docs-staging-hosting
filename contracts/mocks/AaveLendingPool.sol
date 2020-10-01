@@ -22,6 +22,10 @@ contract AaveLendingPool is IAaveLendingPool {
         simulatedInstantAPY = _simulatedInstantAPY;
     }
 
+    function setSimulatedInstantAPY(uint256 _simulatedInstantAPY) public {
+        simulatedInstantAPY = _simulatedInstantAPY;
+    }
+
     function deposit(
         address _reserve,
         uint256 _amount,
@@ -31,6 +35,7 @@ contract AaveLendingPool is IAaveLendingPool {
         uint256 amount = _amount.add(_amount.mul(simulatedInstantAPY).div(100));
 
         aDai.mint(msg.sender, amount);
+        //aDai.mint(msg.sender, _amount);
     }
 
     function mockSendInterest(address _address, uint256 _amount) public {
