@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "compile": "buidler compile",
+    "test": "buidler test",
+    "coverage": "buidler coverage"
+  },
   "dependencies": {
     "@chainlink/contracts": "^0.0.8",
     "@nomiclabs/buidler": "^1.4.3",
