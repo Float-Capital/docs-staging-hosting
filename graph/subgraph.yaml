@@ -1,0 +1,26 @@
+specVersion: 0.0.2
+description: Graph for Long Short
+repository: https://github.com/avolabs-io/longshort
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: LongShort
+    network: ganache
+    source:
+      address: "OxAddress"
+      abi: LongShort
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - LongShort
+      abis:
+        - name: LongShort
+          file: ./abis/LongShort.json
+      eventHandlers:
+        - event: Event(event params as in contract)
+          handler: handleEvent
+      file: ./src/mapping.ts

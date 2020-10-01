@@ -1,0 +1,18 @@
+{
+  "name": "ict-graph",
+  "version": "0.1.0",
+  "license": "UNLICENSED",
+  "scripts": {
+    "create": "graph create avolabs-io/ict-graph --node https://api.thegraph.com/deploy/",
+    "create-local": "graph create avolabs-io/ict-graph --node http://127.0.0.1:8020",
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy-kovan": "graph deploy avolabs-io/ict-graph --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ./subgraph.kovan.yaml",
+    "deploy-mainnet": "graph deploy avolabs-io/ict-graph --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
+    "deploy-local": "graph deploy avolabs-io/ict-graph --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.18.0",
+    "@graphprotocol/graph-ts": "^0.18.0"
+  }
+}

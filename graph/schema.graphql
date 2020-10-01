@@ -1,0 +1,25 @@
+type EventParam @entity {
+  id: ID!
+  index: Int!
+  param: String!
+  paramType: String!
+}
+
+type EventParams @entity {
+  id: ID!
+  index: Int!
+  eventName: String!
+  params: [EventParam!]!
+}
+
+type StateChange @entity {
+  id: ID! # tx
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txEventParamList: [EventParams!]!
+}
+
+type Event @entity {
+  id: ID!
+  address: Bytes!
+}
