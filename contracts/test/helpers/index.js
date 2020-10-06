@@ -139,20 +139,26 @@ const feeCalculation = (
     //console.log("am i going off");
     // simple 0.5% fee
     if (isLongDeposit) {
+      // Adding to heavy side
       if (longValue.gt(shortValue)) {
         return baseFee.mul(amount).div(feeUnitsOfPrecision);
+        // Adding to thin side & tipping
       } else if (longValue.add(amount).gt(shortValue)) {
         let amountLiableForFee = amount.sub(shortValue.sub(longValue));
         return baseFee.mul(amountLiableForFee).div(feeUnitsOfPrecision);
+        // Adding to thin side
       } else {
         return new BN(0);
       }
     } else {
+      // Adding to heavy side
       if (shortValue.gt(longValue)) {
         return baseFee.mul(amount).div(feeUnitsOfPrecision);
+        // Adding to thin side & tipping
       } else if (shortValue.add(amount).gt(longValue)) {
         let amountLiableForFee = amount.sub(longValue.sub(shortValue));
         return baseFee.mul(amountLiableForFee).div(feeUnitsOfPrecision);
+        // Adding to thin side
       } else {
         return new BN(0);
       }

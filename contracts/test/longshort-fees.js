@@ -24,6 +24,7 @@ contract("LongShort", (accounts) => {
   let dai;
   let priceOracle;
   let aaveLendingPool;
+  let baseFee;
 
   // Default test values
   const admin = accounts[0];
@@ -32,6 +33,7 @@ contract("LongShort", (accounts) => {
   const user3 = accounts[3];
 
   const tenToThe18 = "000000000000000000";
+  const tenMintAmount = "10" + tenToThe18; // 100 dai etc.
   const oneHundredMintAmount = "100" + tenToThe18; // 100 dai etc.
   const defaultMintAmount = oneHundredMintAmount;
   const oneHundredThousandMintAmount = "100000" + tenToThe18; // 100 dai etc.
@@ -46,10 +48,10 @@ contract("LongShort", (accounts) => {
     dai = result.dai;
     priceOracle = result.priceOracle;
     aaveLendingPool = result.aaveLendingPool;
+    baseFee = await longShort.baseFee.call();
 
-    xyz = async (_amount, _longValue, _shortValue, isLongDeposit) => {
+    feeCalc = async (_amount, _longValue, _shortValue, isLongDeposit) => {
       // check if imbalance or not
-      const baseFee = await longShort.baseFee.call();
       const feeMultiplier = await longShort.feeMultiplier.call();
       const minThreshold = await longShort.contractValueWhenScalingFeesKicksIn.call();
       const feeUnitsOfPrecision = await longShort.feeUnitsOfPrecision.call();
@@ -113,46 +115,37 @@ contract("LongShort", (accounts) => {
   });
 
   // Other Fee cases to consider.
-  // (1) 100 initial long. Next a 110 short position comes in.
-  // (2) equal order book, full fee should be paid.
   // (3) Imbalance order book, further skewing, full fee should be paid.
-  // (4) Imbalance order book, tipping case, partial fee to be paid.
+  // (4) Total value on both sides is equal to total deposits after fee mechanism adjustments (tipping & equalizing)
 
-  it("longshort: fees case 1", async () => {
+  it("longshort: Tipping the order book first entry, partial fee on imbalance amount", async () => {
     // Consider APY=0% for initial simplicity.
     await aaveLendingPool.setSimulatedInstantAPY(0, { from: admin });
 
     await mintAndApprove(dai, defaultMintAmount, user1, longShort.address);
     await longShort.mintLong(new BN(defaultMintAmount), { from: user1 });
 
-    console.log("added long tokens");
-
-    const additionalMintAmount = new BN(defaultMintAmount).add(
-      new BN("10000000000000000000")
-    ); // 110
-
-    console.log("Additional mint amount", additionalMintAmount.toString());
-
-    await mintAndApprove(dai, additionalMintAmount, user2, longShort.address);
-    console.log("Approved short deposit");
-    await longShort.mintShort(new BN(additionalMintAmount), { from: user2 });
-    console.log("Deposited short tokens");
-
     const longVal = await longShort.longValue.call();
     const shortVal = await longShort.shortValue.call();
 
-    console.log("longVal", longVal.toString());
-    console.log("shortVal", shortVal.toString());
+    const additionalMintAmount = new BN(defaultMintAmount).add(
+      new BN(tenMintAmount)
+    ); // 110
 
-    const expectedFeesForAction = await xyz(
+    await mintAndApprove(dai, additionalMintAmount, user2, longShort.address);
+
+    await longShort.mintShort(new BN(additionalMintAmount), { from: user2 });
+
+    const newShortVal = await longShort.shortValue.call();
+
+    const shortValueExpected = additionalMintAmount.sub(newShortVal);
+
+    const expectedFeesForAction = await feeCalc(
       additionalMintAmount,
       longVal,
       shortVal,
       false
     );
-
-    // user 2 should pay 0.5% base fee on 110 joining the otherside
-    const shortValueExpected = "0.5% of mintLongDaiDeposit";
 
     assert.equal(
       shortValueExpected.toString(),
@@ -161,7 +154,7 @@ contract("LongShort", (accounts) => {
     );
   });
 
-  it("longshort: fees case 2", async () => {
+  it("longshort: Equalize the order book, full fee should be paid.", async () => {
     // Consider APY=0% for initial simplicity.
     await aaveLendingPool.setSimulatedInstantAPY(0, { from: admin });
 
@@ -184,13 +177,12 @@ contract("LongShort", (accounts) => {
     //console.log(shortVal.toString());
 
     // Something wrong with my zeros
-    const expectedFeesForAction = await xyz(
+    const expectedFeesForAction = await feeCalc(
       defaultMintAmount,
       longVal,
       shortVal,
       true
     );
-    console.log(expectedFeesForAction.toString());
 
     assert.equal(
       shortVal.sub(shortValBefore).toString(),
@@ -199,42 +191,106 @@ contract("LongShort", (accounts) => {
     );
   });
 
-  // (3) Imbalance order book, further skewing, full fee should be paid.
-  it("longshort: fees case 3", async () => {
+  it("longshort: Imbalance order book, further skewing, full fee should be paid", async () => {
     // Consider APY=0% for initial simplicity.
     await aaveLendingPool.setSimulatedInstantAPY(0, { from: admin });
 
     await mintAndApprove(dai, defaultMintAmount, user1, longShort.address);
-    await longShort.mintShort(new BN(defaultMintAmount), { from: user1 });
+    await longShort.mintLong(new BN(defaultMintAmount), { from: user1 });
 
-    await mintAndApprove(dai, defaultMintAmount, user2, longShort.address);
-    await longShort.mintLong(new BN(defaultMintAmount), { from: user2 });
+    const additionalMintAmount = new BN(defaultMintAmount).add(
+      new BN(tenMintAmount)
+    ); // 110
 
-    // Short value before fee
-    const shortValBefore = await longShort.shortValue.call();
+    await mintAndApprove(
+      dai,
+      additionalMintAmount.mul(new BN(2)), // extra minted for user 2
+      user2,
+      longShort.address
+    );
 
-    // 0.5% fee on this [Fee's don't scale till contract value > $100]
-    await mintAndApprove(dai, defaultMintAmount, user3, longShort.address);
-    await longShort.mintLong(new BN(defaultMintAmount), { from: user3 });
+    await longShort.mintShort(new BN(additionalMintAmount), { from: user2 });
 
     const longVal = await longShort.longValue.call();
     const shortVal = await longShort.shortValue.call();
-    //console.log(longVal.toString());
-    //console.log(shortVal.toString());
 
-    // Something wrong with my zeros
-    const expectedFeesForAction = await xyz(
+    // Imbalanced orderbook to the short side, (100 + imbalance fee) - (110 - imbalance fee)
+
+    await longShort.mintShort(new BN(defaultMintAmount), { from: user2 });
+
+    // further skewed orderbook to thin side
+
+    const newShortVal = await longShort.shortValue.call();
+
+    const shortValueExpected = new BN(defaultMintAmount).sub(
+      newShortVal.sub(shortVal)
+    );
+
+    const expectedFeesForAction = await feeCalc(
       defaultMintAmount,
       longVal,
       shortVal,
-      true
+      false
     );
-    //console.log(expectedFeesForAction.toString());
 
     assert.equal(
-      shortVal.sub(shortValBefore).toString(),
+      shortValueExpected.toString(),
       expectedFeesForAction.toString(),
       "Fee not correct"
     );
   });
+
+  // it("longshort: Tipping the order book back, partial fee on imbalance amount", async () => {
+  //   // Consider APY=0% for initial simplicity.
+  //   await aaveLendingPool.setSimulatedInstantAPY(0, { from: admin });
+
+  //   await mintAndApprove(dai, defaultMintAmount, user1, longShort.address);
+  //   await longShort.mintLong(new BN(defaultMintAmount), { from: user1 });
+
+  //   const additionalMintAmount = new BN(defaultMintAmount).add(
+  //     new BN(tenMintAmount)
+  //   ); // 110
+
+  //   await mintAndApprove(
+  //     dai,
+  //     additionalMintAmount.mul(new BN(2)), // extra minted for user 2
+  //     user2,
+  //     longShort.address
+  //   );
+
+  //   await longShort.mintShort(new BN(additionalMintAmount), { from: user2 });
+
+  //   const longVal = await longShort.longValue.call();
+  //   const shortVal = await longShort.shortValue.call();
+
+  //   // Imbalanced orderbook to the short side, (100 + imbalance fee) - (110 - imbalance fee)
+
+  //   await longShort.mintShort(new BN(defaultMintAmount), { from: user2 });
+
+  //   // further skewed orderbook to thin side
+
+  //   const newShortVal = await longShort.shortValue.call();
+  //   console.log("prevShortVal", shortVal.toString());
+  //   console.log("newShortVal", newShortVal.toString());
+
+  //   const shortValueExpected = new BN(defaultMintAmount).sub(
+  //     newShortVal.sub(shortVal)
+  //   );
+
+  //   const expectedFeesForAction = await feeCalc(
+  //     defaultMintAmount,
+  //     longVal,
+  //     shortVal,
+  //     false
+  //   );
+
+  //   console.log("shortValueExpected", shortValueExpected.toString());
+  //   console.log("expectedFeesForAction", expectedFeesForAction.toString());
+
+  //   assert.equal(
+  //     shortValueExpected.toString(),
+  //     expectedFeesForAction.toString(),
+  //     "Fee not correct"
+  //   );
+  // });
 });
