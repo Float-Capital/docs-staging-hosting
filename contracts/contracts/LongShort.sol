@@ -17,34 +17,34 @@ import "./ShortCoins.sol";
  *
  *  - Ability for users to create synthetic long and short positions on value movements
  *  - Value movements could be derived from tradional or alternative asset classes, derivates, binary outcomes, etc...
- *  - Incentive mechansim providng fees to liquidity makers
+ *  - Incentive mechansim providing fees to liquidity makers
  *
  * ******* SYSTEM FUNCTIONING V0.0 ***********
  * System accepts stable coin (DAI) and has a total locked value = short position value + long position value
- * If percentage movement as calucated from oracle is +10%, and short position value == long position value,
+ * If percentage movement as calculated from oracle is +10%, and short position value == long position value,
  * Then value change = long position value * 10%
  * long position value = long position value + value change
  * short position value = short position value - value change
  * Total contract value remains unchanged.
- * long value has increased and each longtoken is now worth more as underlying pool avlue has increased.
+ * long value has increased and each longtoken is now worth more as underlying pool value has increased.
  *
  * Tokens representing a shares in the short or long token pool can be minted
  * at price (short position value) / (total short token value)
- * or conversley burned to redeem the underlying share of the pool caluclated
+ * or conversely burned to redeem the underlying share of the pool calculated
  * as (short position value) / (total short token value) per token
  *
- * Depending on demand of minting and burning for undelying on both sides (long/short of contract),
+ * Depending on demand of minting and burning for underlying on both sides (long/short of contract),
  * most often short position value != long position value (there will be an imbalance)
  * Imbalances also naturally occur as the contract adjusts these values after observing oracle value changes
  * Incentives exist to best incentivize contract balance.
  *
- * Mechanim 1 - interest accural imbalance.
- * The entire total locked value accures interest and distributes it 50/50 even if imbalance exists.
+ * Mechanism 1 - interest accural imbalance.
+ * The entire total locked value accrues interest and distributes it 50/50 even if imbalance exists.
  * I.e. Short side supplys $50 capital. Long side supply $150. Short side effectively earns interest on $100.
- * Enhanced yeild exists for sides taking on the position with less demand.
+ * Enhanced yield exists for sides taking on the position with less demand.
  *
  * Mechanism 2 - liquidity fees earned.
- * The side which is shorter on liquidity will recieve fees strengthening their value
+ * The side which is shorter on liquidity will receive fees strengthening their value
  * Whenever liquidity is added to the opposing side or withdrawn from their side (i.e. when the imbalance increases)
  *
  * ******* KNOWN ATTACK VECTORS ***********
@@ -68,7 +68,7 @@ contract LongShort {
 
     uint256 public constant TEN_TO_THE_18 = 10**18;
 
-    // Value of the underlying from which we caluclate
+    // Value of the underlying from which we calculate
     // gains and losses by respective sides
     uint256 public assetPrice;
 
@@ -77,7 +77,7 @@ contract LongShort {
     uint256 public shortValue;
 
     // Tokens representing short and long position and cost at which
-    // They can be minted or redeemed
+    // they can be minted or redeemed
     LongCoins public longTokens;
     ShortCoins public shortTokens;
     uint256 public longTokenPrice;
@@ -170,7 +170,7 @@ contract LongShort {
 
     /**
      * Returns % of short position that is filled
-     * zero div  error if both are zero
+     * zero div error if both are zero
      */
     function getShortBeta() public view returns (uint256) {
         if (longValue >= shortValue) {
