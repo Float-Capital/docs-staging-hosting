@@ -181,12 +181,18 @@ contract LongShort {
     }
 
     function _refreshTokensPrice() internal {
-        longTokenPrice = longValue.mul(TEN_TO_THE_18).div(
-            longTokens.totalSupply()
-        );
-        shortTokenPrice = shortValue.mul(TEN_TO_THE_18).div(
-            shortTokens.totalSupply()
-        );
+        uint256 longTokenSupply = longTokens.totalSupply();
+        if (longTokenSupply > 0) {
+            longTokenPrice = longValue.mul(TEN_TO_THE_18).div(
+                longTokens.totalSupply()
+            );
+        }
+        uint256 shortTokenSupply = shortTokens.totalSupply();
+        if (shortTokenSupply > 0) {
+            shortTokenPrice = shortValue.mul(TEN_TO_THE_18).div(
+                shortTokenSupply
+            );
+        }
     }
 
     /**
