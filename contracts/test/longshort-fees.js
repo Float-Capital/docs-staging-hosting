@@ -240,57 +240,57 @@ contract("LongShort", (accounts) => {
     );
   });
 
-  // it("longshort: Tipping the order book back, partial fee on imbalance amount", async () => {
-  //   // Consider APY=0% for initial simplicity.
-  //   await aaveLendingPool.setSimulatedInstantAPY(0, { from: admin });
+  it("longshort: Tipping the order book back, partial fee on imbalance amount", async () => {
+    // Consider APY=0% for initial simplicity.
+    await aaveLendingPool.setSimulatedInstantAPY(0, { from: admin });
 
-  //   await mintAndApprove(dai, defaultMintAmount, user1, longShort.address);
-  //   await longShort.mintLong(new BN(defaultMintAmount), { from: user1 });
+    const additionalMintAmount = new BN(defaultMintAmount).add(
+      new BN(tenMintAmount)
+    ); // 110
 
-  //   const additionalMintAmount = new BN(defaultMintAmount).add(
-  //     new BN(tenMintAmount)
-  //   ); // 110
+    await mintAndApprove(
+      dai,
+      additionalMintAmount.mul(new BN(2)), // extra minted for user 1
+      user1,
+      longShort.address
+    );
+    await longShort.mintLong(new BN(defaultMintAmount), { from: user1 });
 
-  //   await mintAndApprove(
-  //     dai,
-  //     additionalMintAmount.mul(new BN(2)), // extra minted for user 2
-  //     user2,
-  //     longShort.address
-  //   );
+    await mintAndApprove(dai, additionalMintAmount, user2, longShort.address);
+    await longShort.mintShort(new BN(additionalMintAmount), { from: user2 });
 
-  //   await longShort.mintShort(new BN(additionalMintAmount), { from: user2 });
+    // Imbalanced orderbook to the short side, (100 + imbalance fee) - (110 - imbalance fee)
 
-  //   const longVal = await longShort.longValue.call();
-  //   const shortVal = await longShort.shortValue.call();
+    const longVal = await longShort.longValue.call();
+    const shortVal = await longShort.shortValue.call();
 
-  //   // Imbalanced orderbook to the short side, (100 + imbalance fee) - (110 - imbalance fee)
+    const furtherImbalanceMintAmount = new BN(tenMintAmount).add(
+      new BN(tenMintAmount)
+    ); // 20
 
-  //   await longShort.mintShort(new BN(defaultMintAmount), { from: user2 });
+    await longShort.mintLong(new BN(furtherImbalanceMintAmount), {
+      from: user1,
+    });
 
-  //   // further skewed orderbook to thin side
+    // Imbalanced orderbook back to the long side (tipped)
 
-  //   const newShortVal = await longShort.shortValue.call();
-  //   console.log("prevShortVal", shortVal.toString());
-  //   console.log("newShortVal", newShortVal.toString());
+    const newLongVal = await longShort.longValue.call();
 
-  //   const shortValueExpected = new BN(defaultMintAmount).sub(
-  //     newShortVal.sub(shortVal)
-  //   );
+    const longValueFeesFromContract = new BN(furtherImbalanceMintAmount).sub(
+      newLongVal.sub(longVal)
+    );
 
-  //   const expectedFeesForAction = await feeCalc(
-  //     defaultMintAmount,
-  //     longVal,
-  //     shortVal,
-  //     false
-  //   );
+    const expectedFeesForAction = await feeCalc(
+      furtherImbalanceMintAmount,
+      longVal,
+      shortVal,
+      true
+    );
 
-  //   console.log("shortValueExpected", shortValueExpected.toString());
-  //   console.log("expectedFeesForAction", expectedFeesForAction.toString());
-
-  //   assert.equal(
-  //     shortValueExpected.toString(),
-  //     expectedFeesForAction.toString(),
-  //     "Fee not correct"
-  //   );
-  // });
+    assert.equal(
+      longValueFeesFromContract.toString(),
+      expectedFeesForAction.toString(),
+      "Fee not correct"
+    );
+  });
 });
