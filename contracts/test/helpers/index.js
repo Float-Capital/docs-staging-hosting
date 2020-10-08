@@ -120,7 +120,8 @@ const feeCalculation = (
   _feeMultiplier,
   _minThreshold,
   _feeUnitsOfPrecision,
-  isLongDeposit
+  isLongDeposit,
+  thinBeta
 ) => {
   // check if imbalance or not
   amount = new BN(_amount);
@@ -130,43 +131,67 @@ const feeCalculation = (
   feeMultiplier = new BN(_feeMultiplier);
   minThreshold = new BN(_minThreshold);
   feeUnitsOfPrecision = new BN(_feeUnitsOfPrecision);
+
+  let fees;
+  //console.log("am i going off");
+  // simple 0.5% fee
+  if (isLongDeposit) {
+    // Adding to heavy side
+    if (longValue.gt(shortValue)) {
+      fees = baseFee.mul(amount).div(feeUnitsOfPrecision);
+      // Adding to thin side & tipping
+    } else if (longValue.add(amount).gt(shortValue)) {
+      let amountLiableForFee = amount.sub(shortValue.sub(longValue));
+      fees = baseFee.mul(amountLiableForFee).div(feeUnitsOfPrecision);
+      // Adding to thin side
+    } else {
+      fees = new BN(0);
+    }
+  } else {
+    // Adding to heavy side
+    if (shortValue.gt(longValue)) {
+      fees = baseFee.mul(amount).div(feeUnitsOfPrecision);
+      // Adding to thin side & tipping
+    } else if (shortValue.add(amount).gt(longValue)) {
+      let amountLiableForFee = amount.sub(longValue.sub(shortValue));
+      fees = baseFee.mul(amountLiableForFee).div(feeUnitsOfPrecision);
+      // Adding to thin side
+    } else {
+      fees = new BN(0);
+    }
+  }
+  // If greater than minFeeThreshold
   if (
     amount
       .add(longValue)
       .add(shortValue)
-      .lt(minThreshold)
+      .gte(minThreshold)
   ) {
-    //console.log("am i going off");
-    // simple 0.5% fee
-    if (isLongDeposit) {
-      // Adding to heavy side
-      if (longValue.gt(shortValue)) {
-        return baseFee.mul(amount).div(feeUnitsOfPrecision);
-        // Adding to thin side & tipping
-      } else if (longValue.add(amount).gt(shortValue)) {
-        let amountLiableForFee = amount.sub(shortValue.sub(longValue));
-        return baseFee.mul(amountLiableForFee).div(feeUnitsOfPrecision);
-        // Adding to thin side
-      } else {
-        return new BN(0);
-      }
-    } else {
-      // Adding to heavy side
-      if (shortValue.gt(longValue)) {
-        return baseFee.mul(amount).div(feeUnitsOfPrecision);
-        // Adding to thin side & tipping
-      } else if (shortValue.add(amount).gt(longValue)) {
-        let amountLiableForFee = amount.sub(longValue.sub(shortValue));
-        return baseFee.mul(amountLiableForFee).div(feeUnitsOfPrecision);
-        // Adding to thin side
-      } else {
-        return new BN(0);
-      }
+    const TEN_TO_THE_18 = "1" + "000000000000000000";
+    let betaDiff = new BN(TEN_TO_THE_18).sub(thinBeta); // TODO: when previous beta != 1
+
+    let residualAmount = new BN(amount);
+    let totalValueLocked = longValue.add(shortValue).add(amount);
+    let isAboveThreshold = totalValueLocked.gt(minThreshold);
+    let isPassingThesholdWithTransaction = totalValueLocked
+      .sub(amount)
+      .lt(minThreshold);
+    let amountIsPassingScalingFees =
+      isAboveThreshold && isPassingThesholdWithTransaction;
+    if (amountIsPassingScalingFees) {
+      residualAmount = totalValueLocked.sub(minThreshold);
     }
-  } else {
-    // use sliding fee. Implement here.
+
+    let additionalFees = new BN(residualAmount)
+      .mul(new BN(betaDiff))
+      .mul(new BN(10))
+      .mul(new BN(100))
+      .div(new BN(feeUnitsOfPrecision))
+      .div(new BN(TEN_TO_THE_18));
+
+    fees = fees.add(additionalFees);
   }
-  return new BN(0);
+  return fees;
 };
 
 module.exports = {
