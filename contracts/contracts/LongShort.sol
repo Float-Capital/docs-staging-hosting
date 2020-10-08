@@ -94,6 +94,7 @@ contract LongShort {
     // TODO: Make variables not constant later.
     uint256 public constant baseFee = 50; // 0.5% [we div by 10000]
     uint256 public constant feeMultiplier = 100; // [= +1% fee for every 0.1 you tip the beta]
+    uint256 public constant betaMultiplier = 10;
     uint256 public constant feeUnitsOfPrecision = 10000; // [div the above by 10000]
     uint256 public constant contractValueWhenScalingFeesKicksIn = 10**23; // [above fee kicks in when contract >$100 000]
 
@@ -374,11 +375,24 @@ contract LongShort {
         uint256 fees = amount.mul(baseFee).div(feeUnitsOfPrecision);
         if (totalValueLocked > contractValueWhenScalingFeesKicksIn) {
             // 0.5% blanket fee + 1% for every 0.1 you dilute the beta!
-            fees = fees.add(
-                amount.mul(betaDiff).mul(baseFee).div(TEN_TO_THE_18).div(
-                    feeUnitsOfPrecision
-                )
-            );
+
+            uint256 residualAmount = amount;
+            bool amountIsPassingScalingFees = !((totalValueLocked - amount) >
+                contractValueWhenScalingFeesKicksIn);
+            if (amountIsPassingScalingFees) {
+                residualAmount =
+                    totalValueLocked -
+                    contractValueWhenScalingFeesKicksIn;
+            }
+
+            uint256 additionalFees = residualAmount
+                .mul(betaDiff)
+                .mul(betaMultiplier)
+                .mul(feeMultiplier)
+                .div(feeUnitsOfPrecision)
+                .div(TEN_TO_THE_18);
+
+            fees = fees.add(additionalFees);
         }
         return fees;
     }
