@@ -377,12 +377,14 @@ contract LongShort {
             // 0.5% blanket fee + 1% for every 0.1 you dilute the beta!
 
             uint256 residualAmount = amount;
-            bool amountIsPassingScalingFees = !((totalValueLocked - amount) >
-                contractValueWhenScalingFeesKicksIn);
+            bool amountIsPassingScalingFees = totalValueLocked >
+                contractValueWhenScalingFeesKicksIn &&
+                (totalValueLocked.sub(amount)) <
+                contractValueWhenScalingFeesKicksIn;
             if (amountIsPassingScalingFees) {
-                residualAmount =
-                    totalValueLocked -
-                    contractValueWhenScalingFeesKicksIn;
+                residualAmount = totalValueLocked.sub(
+                    contractValueWhenScalingFeesKicksIn
+                );
             }
 
             uint256 additionalFees = residualAmount
