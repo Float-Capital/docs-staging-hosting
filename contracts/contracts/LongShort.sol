@@ -258,34 +258,48 @@ contract LongShort {
             return;
         }
 
+        // 100% -> 10**18
+        // 100% -> 1
         uint256 percentageChange;
         uint256 valueChange = 0;
         // Long gains
         if (newPrice > assetPrice) {
-            percentageChange = (newPrice.sub(assetPrice)).div(assetPrice);
-            if (percentageChange >= 1) {
+            percentageChange = (newPrice.sub(assetPrice))
+                .mul(TEN_TO_THE_18)
+                .div(assetPrice);
+            if (percentageChange >= TEN_TO_THE_18) {
                 // More than 100% price movement, system liquidation.
                 longValue = longValue.add(shortValue);
                 shortValue = 0;
             } else {
-                if (getShortBeta() == 1) {
-                    valueChange = shortValue.mul(percentageChange);
+                if (getShortBeta() == TEN_TO_THE_18) {
+                    valueChange = shortValue.mul(percentageChange).div(
+                        TEN_TO_THE_18
+                    );
                 } else {
-                    valueChange = longValue.mul(percentageChange);
+                    valueChange = longValue.mul(percentageChange).div(
+                        TEN_TO_THE_18
+                    );
                 }
                 longValue = longValue.add(valueChange);
                 shortValue = shortValue.sub(valueChange);
             }
         } else {
-            percentageChange = (assetPrice.sub(newPrice)).div(assetPrice);
-            if (percentageChange >= 1) {
+            percentageChange = (assetPrice.sub(newPrice))
+                .mul(TEN_TO_THE_18)
+                .div(assetPrice);
+            if (percentageChange >= TEN_TO_THE_18) {
                 shortValue = shortValue.add(longValue);
                 longValue = 0;
             } else {
-                if (getShortBeta() == 1) {
-                    valueChange = shortValue.mul(percentageChange);
+                if (getShortBeta() == TEN_TO_THE_18) {
+                    valueChange = shortValue.mul(percentageChange).div(
+                        TEN_TO_THE_18
+                    );
                 } else {
-                    valueChange = longValue.mul(percentageChange);
+                    valueChange = longValue.mul(percentageChange).div(
+                        TEN_TO_THE_18
+                    );
                 }
                 longValue = longValue.sub(valueChange);
                 shortValue = shortValue.add(valueChange);
