@@ -39,7 +39,7 @@ contract("LongShort", (accounts) => {
   const tenThousandMintAmount = "10000" + tenToThe18Zeros; // 100 dai etc.
   const fiftyThousandMintAmount = "50000" + tenToThe18Zeros; // 100 dai etc.
   const oneHundredThousandMintAmount = "100000" + tenToThe18Zeros; // 100 dai etc.
-  const oneUnitInWei = "1" + tenToThe18;
+  const oneUnitInWei = "1" + tenToThe18Zeros;
 
   beforeEach(async () => {
     const result = await initialize(admin);

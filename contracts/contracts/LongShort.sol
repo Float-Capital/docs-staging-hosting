@@ -307,35 +307,11 @@ contract LongShort {
         }
     }
 
-    function _systemStartEdgeCases() internal returns (bool) {
-        // For system start, no value adjustment till positions on both sides exist
-        // Consider attacks of possible zero balances later on in contract life?
-        if (longValue == 0 && shortValue == 0) {
-            return true;
-        } else if (longValue == 0) {
-            assetPrice = uint256(getLatestPrice());
-            _accreditInterestMechanism(0, 100); // Give all interest to short side while we wait
-            shortTokenPrice = shortValue.mul(TEN_TO_THE_18).div(
-                shortTokens.totalSupply()
-            );
-            return true;
-        } else if (shortValue == 0) {
-            assetPrice = uint256(getLatestPrice());
-            _accreditInterestMechanism(100, 0); // Give all interest to long side while we wait
-            longTokenPrice = longValue.mul(TEN_TO_THE_18).div(
-                longTokens.totalSupply()
-            );
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     /**
      * Updates the value of the long and short sides within the system
      */
     function _updateSystemState() public {
-        if (_systemStartEdgeCases()) {
+        if (longValue == 0 && shortValue == 0) {
             return;
         }
 
@@ -343,7 +319,9 @@ contract LongShort {
         uint256 newPrice = uint256(getLatestPrice());
 
         // Adjusts long and short values based on price movements.
-        _priceChangeMechanism(newPrice);
+        if (longValue > 0 && shortValue > 0) {
+            _priceChangeMechanism(newPrice);
+        }
 
         // Now add interest to both sides in 50/50
         // If the price moved by more than 100% and the one side is completly liquidated
@@ -356,8 +334,6 @@ contract LongShort {
             _accreditInterestMechanism(50, 50);
         }
 
-        // Update price of tokens
-        // careful if total supply is zero intitally.
         _refreshTokensPrice();
         assetPrice = newPrice;
 
