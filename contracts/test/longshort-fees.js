@@ -32,14 +32,13 @@ contract("LongShort", (accounts) => {
   const user2 = accounts[2];
   const user3 = accounts[3];
 
-  const tenToThe18 = "000000000000000000";
-  const tenMintAmount = "1" + tenToThe18; // 100 dai etc.
-  const oneHundredMintAmount = "100" + tenToThe18; // 100 dai etc.
+  const tenToThe18Zeros = "000000000000000000";
+  const tenMintAmount = "1" + tenToThe18Zeros; // 100 dai etc.
+  const oneHundredMintAmount = "100" + tenToThe18Zeros; // 100 dai etc.
   const defaultMintAmount = oneHundredMintAmount;
-  const tenThousandMintAmount = "10000" + tenToThe18; // 100 dai etc.
-  const fiftyThousandMintAmount = "50000" + tenToThe18; // 100 dai etc.
-  const oneHundredThousandMintAmount = "100000" + tenToThe18; // 100 dai etc.
-  //const defaultMintAmount = "8923490023525451345"; // 100 dai etc.
+  const tenThousandMintAmount = "10000" + tenToThe18Zeros; // 100 dai etc.
+  const fiftyThousandMintAmount = "50000" + tenToThe18Zeros; // 100 dai etc.
+  const oneHundredThousandMintAmount = "100000" + tenToThe18Zeros; // 100 dai etc.
   const oneUnitInWei = "1" + tenToThe18;
 
   beforeEach(async () => {
@@ -181,7 +180,6 @@ contract("LongShort", (accounts) => {
     const longVal = await longShort.longValue.call();
     const shortVal = await longShort.shortValue.call();
 
-    // Something wrong with my zeros
     const expectedFeesForAction = await feeCalc(
       defaultMintAmount,
       longVal,
@@ -378,30 +376,16 @@ contract("LongShort", (accounts) => {
     await longShort.mintShort(new BN(additionalMintAmount), { from: user2 });
 
     const newShortVal = await longShort.shortValue.call();
-    // console.log("newShortVal", newShortVal.toString());
 
     const shortDepositFeesFromContract = additionalMintAmount.sub(newShortVal);
-    // console.log(
-    //   "shortDepositFeesFromContract",
-    //   shortDepositFeesFromContract.toString()
-    // );
-
-    console.log(
-      new BN(additionalMintAmount).mul(new BN(tenToThe18)).toString()
-    );
-    console.log(new BN(fiftyThousandMintAmount).toString());
 
     let bn50 = new BN(fiftyThousandMintAmount);
-    console.log("bn50: ", bn50.toString());
-    let bn6 = new BN(6);
-    console.log("bn6: ", bn6.toString());
-    const shortBeta = bn50.div(bn6).div(new BN("10000"));
-    // shortBeta = shortBeta.div(new BN("10000"));
+
+    let bn60 = new BN(additionalMintAmount);
+
+    const shortBeta = bn50.mul(new BN("1000000000000000000")).div(bn60);
 
     const shortBetaFromContract = await getShortBeta();
-
-    console.log("shortbeta", shortBeta.toString());
-    console.log("shortBetaFromContract", shortBetaFromContract.toString());
 
     const expectedFeesForAction = await feeCalc(
       additionalMintAmount,
@@ -417,7 +401,4 @@ contract("LongShort", (accounts) => {
       "Fee not correct"
     );
   });
-
-  // Fee calcs when scaling kicks in fee tests
-  // (1)
 });

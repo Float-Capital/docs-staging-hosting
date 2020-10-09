@@ -172,12 +172,9 @@ const feeCalculation = (
 
     let residualAmount = new BN(amount);
     let totalValueLocked = longValue.add(shortValue).add(amount);
-    let isAboveThreshold = totalValueLocked.gt(minThreshold);
-    let isPassingThesholdWithTransaction = totalValueLocked
+    let amountIsPassingScalingFees = totalValueLocked
       .sub(amount)
       .lt(minThreshold);
-    let amountIsPassingScalingFees =
-      isAboveThreshold && isPassingThesholdWithTransaction;
     if (amountIsPassingScalingFees) {
       residualAmount = totalValueLocked.sub(minThreshold);
     }
