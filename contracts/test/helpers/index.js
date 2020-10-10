@@ -58,7 +58,9 @@ const initialize = async (admin) => {
     }
   );
 
-  const priceOracle = await PriceOracle.new(1, { from: admin });
+  const priceOracle = await PriceOracle.new("1000000000000000000", {
+    from: admin,
+  });
 
   const longShort = await LongShort.new(
     long.address,

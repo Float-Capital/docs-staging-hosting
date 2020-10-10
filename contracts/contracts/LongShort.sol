@@ -258,34 +258,48 @@ contract LongShort {
             return;
         }
 
+        // 100% -> 10**18
+        // 100% -> 1
         uint256 percentageChange;
         uint256 valueChange = 0;
         // Long gains
         if (newPrice > assetPrice) {
-            percentageChange = (newPrice.sub(assetPrice)).div(assetPrice);
-            if (percentageChange >= 1) {
+            percentageChange = (newPrice.sub(assetPrice))
+                .mul(TEN_TO_THE_18)
+                .div(assetPrice);
+            if (percentageChange >= TEN_TO_THE_18) {
                 // More than 100% price movement, system liquidation.
                 longValue = longValue.add(shortValue);
                 shortValue = 0;
             } else {
-                if (getShortBeta() == 1) {
-                    valueChange = shortValue.mul(percentageChange);
+                if (getShortBeta() == TEN_TO_THE_18) {
+                    valueChange = shortValue.mul(percentageChange).div(
+                        TEN_TO_THE_18
+                    );
                 } else {
-                    valueChange = longValue.mul(percentageChange);
+                    valueChange = longValue.mul(percentageChange).div(
+                        TEN_TO_THE_18
+                    );
                 }
                 longValue = longValue.add(valueChange);
                 shortValue = shortValue.sub(valueChange);
             }
         } else {
-            percentageChange = (assetPrice.sub(newPrice)).div(assetPrice);
-            if (percentageChange >= 1) {
+            percentageChange = (assetPrice.sub(newPrice))
+                .mul(TEN_TO_THE_18)
+                .div(assetPrice);
+            if (percentageChange >= TEN_TO_THE_18) {
                 shortValue = shortValue.add(longValue);
                 longValue = 0;
             } else {
-                if (getShortBeta() == 1) {
-                    valueChange = shortValue.mul(percentageChange);
+                if (getShortBeta() == TEN_TO_THE_18) {
+                    valueChange = shortValue.mul(percentageChange).div(
+                        TEN_TO_THE_18
+                    );
                 } else {
-                    valueChange = longValue.mul(percentageChange);
+                    valueChange = longValue.mul(percentageChange).div(
+                        TEN_TO_THE_18
+                    );
                 }
                 longValue = longValue.sub(valueChange);
                 shortValue = shortValue.add(valueChange);
@@ -293,35 +307,11 @@ contract LongShort {
         }
     }
 
-    function _systemStartEdgeCases() internal returns (bool) {
-        // For system start, no value adjustment till positions on both sides exist
-        // Consider attacks of possible zero balances later on in contract life?
-        if (longValue == 0 && shortValue == 0) {
-            return true;
-        } else if (longValue == 0) {
-            assetPrice = uint256(getLatestPrice());
-            _accreditInterestMechanism(0, 100); // Give all interest to short side while we wait
-            shortTokenPrice = shortValue.mul(TEN_TO_THE_18).div(
-                shortTokens.totalSupply()
-            );
-            return true;
-        } else if (shortValue == 0) {
-            assetPrice = uint256(getLatestPrice());
-            _accreditInterestMechanism(100, 0); // Give all interest to long side while we wait
-            longTokenPrice = longValue.mul(TEN_TO_THE_18).div(
-                longTokens.totalSupply()
-            );
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     /**
      * Updates the value of the long and short sides within the system
      */
     function _updateSystemState() public {
-        if (_systemStartEdgeCases()) {
+        if (longValue == 0 && shortValue == 0) {
             return;
         }
 
@@ -329,7 +319,9 @@ contract LongShort {
         uint256 newPrice = uint256(getLatestPrice());
 
         // Adjusts long and short values based on price movements.
-        _priceChangeMechanism(newPrice);
+        if (longValue > 0 && shortValue > 0) {
+            _priceChangeMechanism(newPrice);
+        }
 
         // Now add interest to both sides in 50/50
         // If the price moved by more than 100% and the one side is completly liquidated
@@ -342,8 +334,6 @@ contract LongShort {
             _accreditInterestMechanism(50, 50);
         }
 
-        // Update price of tokens
-        // careful if total supply is zero intitally.
         _refreshTokensPrice();
         assetPrice = newPrice;
 
