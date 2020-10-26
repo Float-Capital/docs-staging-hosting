@@ -56,10 +56,10 @@ contract PriceOracle is AggregatorV3Interface {
     }
 
     function increasePrice(int256 _percentage) public {
-        assetPrice = assetPrice + (assetPrice * _percentage) / 100;
+        assetPrice = assetPrice + ((assetPrice * _percentage) / (10**18));
     }
 
     function decreasePrice(int256 _percentage) public {
-        assetPrice = assetPrice - (assetPrice * _percentage) / 100;
+        assetPrice = assetPrice - ((assetPrice * _percentage) / (10**18));
     }
 }

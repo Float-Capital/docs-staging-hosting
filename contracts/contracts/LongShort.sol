@@ -17,34 +17,34 @@ import "./ShortCoins.sol";
  *
  *  - Ability for users to create synthetic long and short positions on value movements
  *  - Value movements could be derived from tradional or alternative asset classes, derivates, binary outcomes, etc...
- *  - Incentive mechansim providng fees to liquidity makers
+ *  - Incentive mechansim providing fees to liquidity makers
  *
  * ******* SYSTEM FUNCTIONING V0.0 ***********
  * System accepts stable coin (DAI) and has a total locked value = short position value + long position value
- * If percentage movement as calucated from oracle is +10%, and short position value == long position value,
+ * If percentage movement as calculated from oracle is +10%, and short position value == long position value,
  * Then value change = long position value * 10%
  * long position value = long position value + value change
  * short position value = short position value - value change
  * Total contract value remains unchanged.
- * long value has increased and each longtoken is now worth more as underlying pool avlue has increased.
+ * long value has increased and each longtoken is now worth more as underlying pool value has increased.
  *
  * Tokens representing a shares in the short or long token pool can be minted
  * at price (short position value) / (total short token value)
- * or conversley burned to redeem the underlying share of the pool caluclated
+ * or conversely burned to redeem the underlying share of the pool calculated
  * as (short position value) / (total short token value) per token
  *
- * Depending on demand of minting and burning for undelying on both sides (long/short of contract),
+ * Depending on demand of minting and burning for underlying on both sides (long/short of contract),
  * most often short position value != long position value (there will be an imbalance)
  * Imbalances also naturally occur as the contract adjusts these values after observing oracle value changes
  * Incentives exist to best incentivize contract balance.
  *
- * Mechanim 1 - interest accural imbalance.
- * The entire total locked value accures interest and distributes it 50/50 even if imbalance exists.
+ * Mechanism 1 - interest accural imbalance.
+ * The entire total locked value accrues interest and distributes it 50/50 even if imbalance exists.
  * I.e. Short side supplys $50 capital. Long side supply $150. Short side effectively earns interest on $100.
- * Enhanced yeild exists for sides taking on the position with less demand.
+ * Enhanced yield exists for sides taking on the position with less demand.
  *
  * Mechanism 2 - liquidity fees earned.
- * The side which is shorter on liquidity will recieve fees strengthening their value
+ * The side which is shorter on liquidity will receive fees strengthening their value
  * Whenever liquidity is added to the opposing side or withdrawn from their side (i.e. when the imbalance increases)
  *
  * ******* KNOWN ATTACK VECTORS ***********
@@ -68,7 +68,7 @@ contract LongShort {
 
     uint256 public constant TEN_TO_THE_18 = 10**18;
 
-    // Value of the underlying from which we caluclate
+    // Value of the underlying from which we calculate
     // gains and losses by respective sides
     uint256 public assetPrice;
 
@@ -77,7 +77,7 @@ contract LongShort {
     uint256 public shortValue;
 
     // Tokens representing short and long position and cost at which
-    // They can be minted or redeemed
+    // they can be minted or redeemed
     LongCoins public longTokens;
     ShortCoins public shortTokens;
     uint256 public longTokenPrice;
@@ -94,6 +94,7 @@ contract LongShort {
     // TODO: Make variables not constant later.
     uint256 public constant baseFee = 50; // 0.5% [we div by 10000]
     uint256 public constant feeMultiplier = 100; // [= +1% fee for every 0.1 you tip the beta]
+    uint256 public constant betaMultiplier = 10;
     uint256 public constant feeUnitsOfPrecision = 10000; // [div the above by 10000]
     uint256 public constant contractValueWhenScalingFeesKicksIn = 10**23; // [above fee kicks in when contract >$100 000]
 
@@ -170,7 +171,7 @@ contract LongShort {
 
     /**
      * Returns % of short position that is filled
-     * zero div  error if both are zero
+     * zero div error if both are zero
      */
     function getShortBeta() public view returns (uint256) {
         if (longValue >= shortValue) {
@@ -181,12 +182,18 @@ contract LongShort {
     }
 
     function _refreshTokensPrice() internal {
-        longTokenPrice = longValue.mul(TEN_TO_THE_18).div(
-            longTokens.totalSupply()
-        );
-        shortTokenPrice = shortValue.mul(TEN_TO_THE_18).div(
-            shortTokens.totalSupply()
-        );
+        uint256 longTokenSupply = longTokens.totalSupply();
+        if (longTokenSupply > 0) {
+            longTokenPrice = longValue.mul(TEN_TO_THE_18).div(
+                longTokens.totalSupply()
+            );
+        }
+        uint256 shortTokenSupply = shortTokens.totalSupply();
+        if (shortTokenSupply > 0) {
+            shortTokenPrice = shortValue.mul(TEN_TO_THE_18).div(
+                shortTokenSupply
+            );
+        }
     }
 
     /**
@@ -251,34 +258,48 @@ contract LongShort {
             return;
         }
 
+        // 100% -> 10**18
+        // 100% -> 1
         uint256 percentageChange;
         uint256 valueChange = 0;
         // Long gains
         if (newPrice > assetPrice) {
-            percentageChange = (newPrice.sub(assetPrice)).div(assetPrice);
-            if (percentageChange >= 1) {
+            percentageChange = (newPrice.sub(assetPrice))
+                .mul(TEN_TO_THE_18)
+                .div(assetPrice);
+            if (percentageChange >= TEN_TO_THE_18) {
                 // More than 100% price movement, system liquidation.
                 longValue = longValue.add(shortValue);
                 shortValue = 0;
             } else {
-                if (getShortBeta() == 1) {
-                    valueChange = shortValue.mul(percentageChange);
+                if (getShortBeta() == TEN_TO_THE_18) {
+                    valueChange = shortValue.mul(percentageChange).div(
+                        TEN_TO_THE_18
+                    );
                 } else {
-                    valueChange = longValue.mul(percentageChange);
+                    valueChange = longValue.mul(percentageChange).div(
+                        TEN_TO_THE_18
+                    );
                 }
                 longValue = longValue.add(valueChange);
                 shortValue = shortValue.sub(valueChange);
             }
         } else {
-            percentageChange = (assetPrice.sub(newPrice)).div(assetPrice);
-            if (percentageChange >= 1) {
+            percentageChange = (assetPrice.sub(newPrice))
+                .mul(TEN_TO_THE_18)
+                .div(assetPrice);
+            if (percentageChange >= TEN_TO_THE_18) {
                 shortValue = shortValue.add(longValue);
                 longValue = 0;
             } else {
-                if (getShortBeta() == 1) {
-                    valueChange = shortValue.mul(percentageChange);
+                if (getShortBeta() == TEN_TO_THE_18) {
+                    valueChange = shortValue.mul(percentageChange).div(
+                        TEN_TO_THE_18
+                    );
                 } else {
-                    valueChange = longValue.mul(percentageChange);
+                    valueChange = longValue.mul(percentageChange).div(
+                        TEN_TO_THE_18
+                    );
                 }
                 longValue = longValue.sub(valueChange);
                 shortValue = shortValue.add(valueChange);
@@ -286,35 +307,11 @@ contract LongShort {
         }
     }
 
-    function _systemStartEdgeCases() internal returns (bool) {
-        // For system start, no value adjustment till positions on both sides exist
-        // Consider attacks of possible zero balances later on in contract life?
-        if (longValue == 0 && shortValue == 0) {
-            return true;
-        } else if (longValue == 0) {
-            assetPrice = uint256(getLatestPrice());
-            _accreditInterestMechanism(0, 100); // Give all interest to short side while we wait
-            shortTokenPrice = shortValue.mul(TEN_TO_THE_18).div(
-                shortTokens.totalSupply()
-            );
-            return true;
-        } else if (shortValue == 0) {
-            assetPrice = uint256(getLatestPrice());
-            _accreditInterestMechanism(100, 0); // Give all interest to long side while we wait
-            longTokenPrice = longValue.mul(TEN_TO_THE_18).div(
-                longTokens.totalSupply()
-            );
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     /**
      * Updates the value of the long and short sides within the system
      */
     function _updateSystemState() public {
-        if (_systemStartEdgeCases()) {
+        if (longValue == 0 && shortValue == 0) {
             return;
         }
 
@@ -322,7 +319,9 @@ contract LongShort {
         uint256 newPrice = uint256(getLatestPrice());
 
         // Adjusts long and short values based on price movements.
-        _priceChangeMechanism(newPrice);
+        if (longValue > 0 && shortValue > 0) {
+            _priceChangeMechanism(newPrice);
+        }
 
         // Now add interest to both sides in 50/50
         // If the price moved by more than 100% and the one side is completly liquidated
@@ -335,8 +334,6 @@ contract LongShort {
             _accreditInterestMechanism(50, 50);
         }
 
-        // Update price of tokens
-        // careful if total supply is zero intitally.
         _refreshTokensPrice();
         assetPrice = newPrice;
 
@@ -368,11 +365,24 @@ contract LongShort {
         uint256 fees = amount.mul(baseFee).div(feeUnitsOfPrecision);
         if (totalValueLocked > contractValueWhenScalingFeesKicksIn) {
             // 0.5% blanket fee + 1% for every 0.1 you dilute the beta!
-            fees = fees.add(
-                amount.mul(betaDiff).mul(baseFee).div(TEN_TO_THE_18).div(
-                    feeUnitsOfPrecision
-                )
-            );
+
+            if (
+                (totalValueLocked.sub(amount)) <
+                contractValueWhenScalingFeesKicksIn
+            ) {
+                amount = totalValueLocked.sub(
+                    contractValueWhenScalingFeesKicksIn
+                );
+            }
+
+            uint256 additionalFees = amount
+                .mul(betaDiff)
+                .mul(betaMultiplier)
+                .mul(feeMultiplier)
+                .div(feeUnitsOfPrecision)
+                .div(TEN_TO_THE_18);
+
+            fees = fees.add(additionalFees);
         }
         return fees;
     }
