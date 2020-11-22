@@ -357,25 +357,26 @@ contract LongShort {
         totalValueLocked = totalValueLocked.add(amount);
     }
 
-    function _feeCalc(uint256 amount, uint256 betaDiff)
-        internal
-        returns (uint256)
-    {
+    function _feeCalc(
+        uint256 fullAmount,
+        uint256 feePayableAmount,
+        uint256 betaDiff
+    ) internal returns (uint256) {
         // 0.5% fee when contract has low liquidity
-        uint256 fees = amount.mul(baseFee).div(feeUnitsOfPrecision);
+        uint256 fees = feePayableAmount.mul(baseFee).div(feeUnitsOfPrecision);
         if (totalValueLocked > contractValueWhenScalingFeesKicksIn) {
             // 0.5% blanket fee + 1% for every 0.1 you dilute the beta!
 
             if (
-                (totalValueLocked.sub(amount)) <
+                (totalValueLocked.sub(fullAmount)) <
                 contractValueWhenScalingFeesKicksIn
             ) {
-                amount = totalValueLocked.sub(
+                feePayableAmount = totalValueLocked.sub(
                     contractValueWhenScalingFeesKicksIn
                 );
             }
 
-            uint256 additionalFees = amount
+            uint256 additionalFees = feePayableAmount
                 .mul(betaDiff)
                 .mul(betaMultiplier)
                 .mul(feeMultiplier)
@@ -405,7 +406,7 @@ contract LongShort {
             uint256 fees = 0;
             uint256 depositLessFees = 0;
             if (oldBeta < TEN_TO_THE_18) {
-                fees = _feeCalc(amount, oldBeta.sub(newAdjustedBeta));
+                fees = _feeCalc(amount, amount, oldBeta.sub(newAdjustedBeta));
             } else {
                 // Case 2: Tipping/reversing imbalance. Only fees on tipping portion
                 uint256 feePayablePortion = 0;
@@ -415,6 +416,7 @@ contract LongShort {
                     feePayablePortion = amount.sub(longValue.sub(shortValue));
                 }
                 fees = _feeCalc(
+                    amount,
                     feePayablePortion,
                     TEN_TO_THE_18.sub(newAdjustedBeta)
                 );
@@ -440,7 +442,6 @@ contract LongShort {
         uint256 newAdjustedBeta = shortValue.mul(TEN_TO_THE_18).div(
             longValue.add(amount)
         );
-        //console.log(newAdjustedBeta);
         uint256 finalDepositAmount = _calcFinalDepositAmount(
             amount,
             newAdjustedBeta,
@@ -512,6 +513,47 @@ contract LongShort {
         }
     }
 
+    function _calcFinalRedeemAmount(
+        uint256 amount,
+        uint256 newAdjustedBeta,
+        uint256 oldBeta,
+        bool isLong
+    ) internal returns (uint256) {
+        uint256 finalRedeemAmount = 0;
+
+        if (oldBeta >= TEN_TO_THE_18) {
+            finalRedeemAmount = amount;
+        } else {
+            uint256 fees = 0;
+            uint256 redeemLessFees = 0;
+            if (newAdjustedBeta < TEN_TO_THE_18) {
+                // correct
+                fees = _feeCalc(amount, amount, newAdjustedBeta.sub(oldBeta));
+            } else {
+                // Case 2: Tipping/reversing imbalance. Only fees on tipping portion
+                uint256 feePayablePortion = 0;
+                if (isLong) {
+                    feePayablePortion = amount.sub(longValue.sub(shortValue));
+                } else {
+                    feePayablePortion = amount.sub(shortValue.sub(longValue));
+                }
+                fees = _feeCalc(
+                    amount,
+                    feePayablePortion,
+                    TEN_TO_THE_18.sub(newAdjustedBeta)
+                );
+            }
+            redeemLessFees = amount.sub(fees);
+            if (isLong) {
+                _feesMechanism(fees, 0, 100);
+            } else {
+                _feesMechanism(fees, 100, 0);
+            }
+            finalRedeemAmount = redeemLessFees;
+        }
+        return finalRedeemAmount;
+    }
+
     // TODO: REDO redeem function with similair advanced fees strategy to minting functions.
     function redeemLong(uint256 tokensToRedeem) external refreshSystemState {
         longTokens.burnFrom(msg.sender, tokensToRedeem);
@@ -520,17 +562,22 @@ contract LongShort {
         );
         longValue = longValue.sub(amountToRedeem);
 
-        uint256 fees = 0;
-        if (getShortBeta() < 1) {
-            fees = amountToRedeem.mul(10).div(1000);
-            _feesMechanism(fees, 100, 0);
-        } else {
-            fees = amountToRedeem.mul(5).div(1000);
-            _feesMechanism(fees, 50, 50);
+        uint256 longBeta = getLongBeta();
+        uint256 newAdjustedBeta = 0;
+        if (longValue.sub(amountToRedeem) != 0) {
+            newAdjustedBeta = shortValue.mul(TEN_TO_THE_18).div(
+                longValue.sub(amountToRedeem)
+            );
         }
 
-        amountToRedeem = amountToRedeem.sub(fees);
-        _redeem(amountToRedeem);
+        uint256 finalRedeemAmount = _calcFinalRedeemAmount(
+            amountToRedeem,
+            newAdjustedBeta,
+            longBeta,
+            true
+        );
+
+        _redeem(finalRedeemAmount);
 
         require(
             longTokenPrice ==
@@ -546,17 +593,22 @@ contract LongShort {
         );
         shortValue = shortValue.sub(amountToRedeem);
 
-        uint256 fees = 0;
-        if (getLongBeta() < 1) {
-            fees = amountToRedeem.mul(10).div(1000);
-            _feesMechanism(fees, 0, 100);
-        } else {
-            fees = amountToRedeem.mul(5).div(1000);
-            _feesMechanism(fees, 50, 50);
+        uint256 shortBeta = getShortBeta();
+        uint256 newAdjustedBeta = 0;
+        if (shortValue.sub(amountToRedeem) != 0) {
+            newAdjustedBeta = longValue.mul(TEN_TO_THE_18).div(
+                shortValue.sub(amountToRedeem)
+            );
         }
 
-        amountToRedeem = amountToRedeem.sub(fees);
-        _redeem(amountToRedeem);
+        uint256 finalRedeemAmount = _calcFinalRedeemAmount(
+            amountToRedeem,
+            newAdjustedBeta,
+            shortBeta,
+            false
+        );
+
+        _redeem(finalRedeemAmount);
 
         require(
             shortTokenPrice ==
