@@ -60,6 +60,10 @@ import "./ShortCoins.sol";
  * (3) Oracle manipulation:
  * If the oracle determining price change can be easy manipulated (and by a decent magnitude),
  * Funds could be at risk. See: https://blog.trailofbits.com/2020/08/05/accidentally-stepping-on-a-defi-lego/
+ *
+ * ******* Work on gas effciencies ***********
+ * Layer 2 solutions
+ * Remove safe Math library
  */
 contract LongShort {
     using SafeMath for uint256;
@@ -91,7 +95,6 @@ contract LongShort {
     address public aaveLendingContractCore;
 
     // Fees (eventually to be community adjusted)
-    // TODO: Make variables not constant later.
     uint256 public constant baseFee = 50; // 0.5% [we div by 10000]
     uint256 public constant feeMultiplier = 100; // [= +1% fee for every 0.1 you tip the beta]
     uint256 public constant betaMultiplier = 10;
@@ -181,6 +184,9 @@ contract LongShort {
         }
     }
 
+    /**
+     * Adjusts the relevant token price.
+     */
     function _refreshTokensPrice() internal {
         uint256 longTokenSupply = longTokens.totalSupply();
         if (longTokenSupply > 0) {
@@ -240,10 +246,8 @@ contract LongShort {
         uint256 longPercentage,
         uint256 shortPercentage
     ) internal {
-        require(100 == shortPercentage.add(longPercentage));
-        if (amount == 0) {
-            //console.log("No interest gained to split");
-        } else {
+        require(100 == shortPercentage.add(longPercentage)); // Possibly remove this check as internal function. Save gas.
+        if (amount != 0) {
             uint256 longSideIncrease = amount.mul(longPercentage).div(100);
             uint256 shortSideIncrease = amount.sub(longSideIncrease);
             longValue = longValue.add(longSideIncrease);
@@ -309,6 +313,7 @@ contract LongShort {
 
     /**
      * Updates the value of the long and short sides within the system
+     * Note this is public. Anyone can call this function.
      */
     function _updateSystemState() public {
         if (longValue == 0 && shortValue == 0) {
@@ -316,6 +321,7 @@ contract LongShort {
         }
 
         // TODO: Check why/if this is bad (casting to uint)
+        // If a negative int is return this should fail.
         uint256 newPrice = uint256(getLatestPrice());
 
         // Adjusts long and short values based on price movements.
@@ -357,30 +363,34 @@ contract LongShort {
         totalValueLocked = totalValueLocked.add(amount);
     }
 
-    function _feeCalc(uint256 amount, uint256 betaDiff)
-        internal
-        returns (uint256)
-    {
+    function _feeCalc(
+        uint256 fullAmount,
+        uint256 feePayableAmount,
+        uint256 betaDiff
+    ) internal returns (uint256) {
         // 0.5% fee when contract has low liquidity
-        uint256 fees = amount.mul(baseFee).div(feeUnitsOfPrecision);
+        uint256 fees = feePayableAmount.mul(baseFee).div(feeUnitsOfPrecision);
         if (totalValueLocked > contractValueWhenScalingFeesKicksIn) {
             // 0.5% blanket fee + 1% for every 0.1 you dilute the beta!
-
+            // Be careful the above system will rapidly decrease the rate at which the contract can be
+            // grow quickly. Should let incentives guide this. No penalty on enterin at all ideally. Or
+            // at least it should be a lot smaller.
             if (
-                (totalValueLocked.sub(amount)) <
+                (totalValueLocked.sub(fullAmount)) <
                 contractValueWhenScalingFeesKicksIn
             ) {
-                amount = totalValueLocked.sub(
+                feePayableAmount = totalValueLocked.sub(
                     contractValueWhenScalingFeesKicksIn
                 );
             }
 
-            uint256 additionalFees = amount
-                .mul(betaDiff)
-                .mul(betaMultiplier)
-                .mul(feeMultiplier)
-                .div(feeUnitsOfPrecision)
-                .div(TEN_TO_THE_18);
+            uint256 additionalFees =
+                feePayableAmount
+                    .mul(betaDiff)
+                    .mul(betaMultiplier)
+                    .mul(feeMultiplier)
+                    .div(feeUnitsOfPrecision)
+                    .div(TEN_TO_THE_18);
 
             fees = fees.add(additionalFees);
         }
@@ -405,7 +415,7 @@ contract LongShort {
             uint256 fees = 0;
             uint256 depositLessFees = 0;
             if (oldBeta < TEN_TO_THE_18) {
-                fees = _feeCalc(amount, oldBeta.sub(newAdjustedBeta));
+                fees = _feeCalc(amount, amount, oldBeta.sub(newAdjustedBeta));
             } else {
                 // Case 2: Tipping/reversing imbalance. Only fees on tipping portion
                 uint256 feePayablePortion = 0;
@@ -415,6 +425,7 @@ contract LongShort {
                     feePayablePortion = amount.sub(longValue.sub(shortValue));
                 }
                 fees = _feeCalc(
+                    amount,
                     feePayablePortion,
                     TEN_TO_THE_18.sub(newAdjustedBeta)
                 );
@@ -437,16 +448,10 @@ contract LongShort {
         _addDeposit(amount);
         uint256 amountToMint = 0;
         uint256 longBeta = getLongBeta();
-        uint256 newAdjustedBeta = shortValue.mul(TEN_TO_THE_18).div(
-            longValue.add(amount)
-        );
-        //console.log(newAdjustedBeta);
-        uint256 finalDepositAmount = _calcFinalDepositAmount(
-            amount,
-            newAdjustedBeta,
-            longBeta,
-            true
-        );
+        uint256 newAdjustedBeta =
+            shortValue.mul(TEN_TO_THE_18).div(longValue.add(amount));
+        uint256 finalDepositAmount =
+            _calcFinalDepositAmount(amount, newAdjustedBeta, longBeta, true);
 
         amountToMint = finalDepositAmount.mul(TEN_TO_THE_18).div(
             longTokenPrice
@@ -455,6 +460,7 @@ contract LongShort {
         longTokens.mint(msg.sender, amountToMint);
 
         // Safety Checks
+        // Again consider gas implications.
         require(
             longTokenPrice ==
                 longValue.mul(TEN_TO_THE_18).div(longTokens.totalSupply()),
@@ -474,15 +480,10 @@ contract LongShort {
         uint256 amountToMint = 0;
         //uint256 finalDepositAmount = 0;
         uint256 shortBeta = getShortBeta();
-        uint256 newAdjustedBeta = longValue.mul(TEN_TO_THE_18).div(
-            shortValue.add(amount)
-        );
-        uint256 finalDepositAmount = _calcFinalDepositAmount(
-            amount,
-            newAdjustedBeta,
-            shortBeta,
-            false
-        );
+        uint256 newAdjustedBeta =
+            longValue.mul(TEN_TO_THE_18).div(shortValue.add(amount));
+        uint256 finalDepositAmount =
+            _calcFinalDepositAmount(amount, newAdjustedBeta, shortBeta, false);
 
         amountToMint = finalDepositAmount.mul(TEN_TO_THE_18).div(
             shortTokenPrice
@@ -505,32 +506,94 @@ contract LongShort {
     function _redeem(uint256 amount) internal {
         totalValueLocked = totalValueLocked.sub(amount);
 
-        try adaiContract.redeem(amount)  {
+        try adaiContract.redeem(amount) {
             daiContract.transfer(msg.sender, amount);
         } catch {
             adaiContract.transfer(msg.sender, amount);
         }
     }
 
-    // TODO: REDO redeem function with similair advanced fees strategy to minting functions.
-    function redeemLong(uint256 tokensToRedeem) external refreshSystemState {
-        longTokens.burnFrom(msg.sender, tokensToRedeem);
-        uint256 amountToRedeem = tokensToRedeem.mul(longTokenPrice).div(
-            TEN_TO_THE_18
-        );
-        longValue = longValue.sub(amountToRedeem);
+    /**
+     * 0.5% fee + extra 0.5% on amount of bad liquidity leaving
+     */
+    function _feeCalcRedeem(uint256 fullAmount, uint256 feePayableAmount)
+        internal
+        returns (uint256)
+    {
+        // base 0.5% fee
+        uint256 fees = fullAmount.mul(baseFee).div(feeUnitsOfPrecision);
 
+        // Extra 0.5% fee on deisrable liquidity leaving the book
+        uint256 additionalFees =
+            feePayableAmount.mul(baseFee).div(feeUnitsOfPrecision);
+
+        return fees.add(additionalFees);
+    }
+
+    function _calcFinalRedeemAmount(
+        uint256 amount,
+        uint256 newAdjustedBeta,
+        uint256 oldBeta,
+        bool isLong
+    ) internal returns (uint256) {
         uint256 fees = 0;
-        if (getShortBeta() < 1) {
-            fees = amountToRedeem.mul(10).div(1000);
-            _feesMechanism(fees, 100, 0);
+        uint256 finalRedeemAmount = 0;
+
+        // Even after withdrawl, the beta is still 1  [good for liquity balance]
+        if (newAdjustedBeta >= TEN_TO_THE_18) {
+            // Should still levy a small exit fee of 0.5%
+            if (oldBeta >= TEN_TO_THE_18) {
+                fees = _feeCalcRedeem(amount, 0);
+            } else {
+                uint256 feePayablePortion = 0;
+                if (isLong) {
+                    feePayablePortion = amount.sub(longValue.sub(shortValue));
+                } else {
+                    feePayablePortion = amount.sub(shortValue.sub(longValue));
+                }
+                fees = _feeCalcRedeem(amount, feePayablePortion);
+            }
         } else {
-            fees = amountToRedeem.mul(5).div(1000);
-            _feesMechanism(fees, 50, 50);
+            fees = _feeCalcRedeem(amount, amount);
         }
 
-        amountToRedeem = amountToRedeem.sub(fees);
-        _redeem(amountToRedeem);
+        finalRedeemAmount = amount.sub(fees);
+        if (isLong) {
+            _feesMechanism(fees, 0, 100);
+        } else {
+            _feesMechanism(fees, 100, 0);
+        }
+
+        return finalRedeemAmount;
+    }
+
+    // TODO: REDO redeem function with similair advanced fees strategy to minting functions.
+    function redeemLong(uint256 tokensToRedeem) external refreshSystemState {
+        // This will revert unless user gives permission to contract to burn these tokens.
+        longTokens.burnFrom(msg.sender, tokensToRedeem);
+
+        uint256 shortBeta = getShortBeta();
+        uint256 newAdjustedShortBeta = 0;
+
+        uint256 amountToRedeem =
+            tokensToRedeem.mul(longTokenPrice).div(TEN_TO_THE_18);
+
+        if (longValue.sub(amountToRedeem) != 0) {
+            newAdjustedShortBeta = shortValue.mul(TEN_TO_THE_18).div(
+                longValue.sub(amountToRedeem)
+            );
+        }
+
+        uint256 finalRedeemAmount =
+            _calcFinalRedeemAmount(
+                amountToRedeem,
+                newAdjustedShortBeta,
+                shortBeta,
+                true
+            );
+
+        longValue = longValue.sub(amountToRedeem);
+        _redeem(finalRedeemAmount);
 
         require(
             longTokenPrice ==
@@ -541,22 +604,29 @@ contract LongShort {
 
     function redeemShort(uint256 tokensToRedeem) external refreshSystemState {
         shortTokens.burnFrom(msg.sender, tokensToRedeem);
-        uint256 amountToRedeem = tokensToRedeem.mul(shortTokenPrice).div(
-            TEN_TO_THE_18
-        );
-        shortValue = shortValue.sub(amountToRedeem);
 
-        uint256 fees = 0;
-        if (getLongBeta() < 1) {
-            fees = amountToRedeem.mul(10).div(1000);
-            _feesMechanism(fees, 0, 100);
-        } else {
-            fees = amountToRedeem.mul(5).div(1000);
-            _feesMechanism(fees, 50, 50);
+        uint256 longBeta = getLongBeta();
+        uint256 newAdjustedLongBeta = 0;
+
+        uint256 amountToRedeem =
+            tokensToRedeem.mul(shortTokenPrice).div(TEN_TO_THE_18);
+
+        if (shortValue.sub(amountToRedeem) != 0) {
+            newAdjustedLongBeta = longValue.mul(TEN_TO_THE_18).div(
+                shortValue.sub(amountToRedeem)
+            );
         }
 
-        amountToRedeem = amountToRedeem.sub(fees);
-        _redeem(amountToRedeem);
+        uint256 finalRedeemAmount =
+            _calcFinalRedeemAmount(
+                amountToRedeem,
+                newAdjustedLongBeta,
+                longBeta,
+                false
+            );
+
+        shortValue = shortValue.sub(amountToRedeem);
+        _redeem(finalRedeemAmount);
 
         require(
             shortTokenPrice ==
