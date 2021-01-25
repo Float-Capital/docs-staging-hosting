@@ -20,6 +20,16 @@ const LendingPoolAddressProvider = artifacts.require(
 const ADai = artifacts.require(ADAI);
 
 const initialize = async (admin) => {
+  return initializeWithFeeArguments(admin, 10, 100, 50, 50);
+};
+
+const initializeWithFeeArguments = async (
+  admin,
+  _baseEntryFee,
+  _entryFeeMultiplier,
+  _baseExitFee,
+  _badLiquidityExitFee
+) => {
   // Long and short coins.
   const long = await erc20.new({
     from: admin,
@@ -32,14 +42,22 @@ const initialize = async (admin) => {
   const dai = await erc20.new({
     from: admin,
   });
-  await dai.initialize("short tokens", "SHORT", {
-    from: admin,
-  });
 
   // aDai
   aDai = await ADai.new(dai.address, {
     from: admin,
   });
+
+  await dai.setup("dai token", "DAI", aDai.address, {
+    from: admin,
+  });
+  // Hack this is result of keccak("MINTER_ROLE")
+  //"0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6"
+  await dai.grantRole(
+    "0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6",
+    aDai.address,
+    { from: admin }
+  );
 
   // aave lending pool
   aaveLendingPool = await AaveLendingPool.new(
@@ -69,6 +87,10 @@ const initialize = async (admin) => {
     aDai.address,
     lendingPoolAddressProvider.address,
     priceOracle.address,
+    _baseEntryFee,
+    _entryFeeMultiplier,
+    _baseExitFee,
+    _badLiquidityExitFee,
     {
       from: admin,
     }
@@ -119,7 +141,7 @@ const feeCalculation = (
   _longValue,
   _shortValue,
   _baseEntryFee,
-  _feeMultiplier,
+  _entryFeeMultiplier,
   _minThreshold,
   _feeUnitsOfPrecision,
   isLongDeposit,
@@ -130,7 +152,7 @@ const feeCalculation = (
   longValue = new BN(_longValue);
   shortValue = new BN(_shortValue);
   baseEntryFee = new BN(_baseEntryFee);
-  feeMultiplier = new BN(_feeMultiplier);
+  entryFeeMultiplier = new BN(_entryFeeMultiplier);
   minThreshold = new BN(_minThreshold);
   feeUnitsOfPrecision = new BN(_feeUnitsOfPrecision);
 
@@ -202,4 +224,5 @@ module.exports = {
   tokenPriceCalculator,
   simulateTotalValueWithInterest,
   feeCalculation,
+  initializeWithFeeArguments,
 };
