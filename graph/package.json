@@ -1,15 +1,15 @@
 {
-  "name": "ict-graph",
+  "name": "float-capital",
   "version": "0.1.0",
   "license": "UNLICENSED",
   "scripts": {
-    "create": "graph create avolabs-io/ict-graph --node https://api.thegraph.com/deploy/",
-    "create-local": "graph create avolabs-io/ict-graph --node http://127.0.0.1:8020",
+    "create": "graph create avolabs-io/float-capital --node https://api.thegraph.com/deploy/",
+    "create-local": "graph create avolabs-io/float-capital --node http://127.0.0.1:8020",
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy-kovan": "graph deploy avolabs-io/ict-graph --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ./subgraph.kovan.yaml",
-    "deploy-mainnet": "graph deploy avolabs-io/ict-graph --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
-    "deploy-local": "graph deploy avolabs-io/ict-graph --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
+    "deploy-goerli": "graph deploy avolabs-io/float-capital-goerli --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ./subgraph.yaml",
+    "deploy-mainnet": "graph deploy avolabs-io/float-capital --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
+    "deploy-local": "graph deploy avolabs-io/float-capital --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.19.0",

@@ -1,26 +1,45 @@
 specVersion: 0.0.2
-description: Graph for Long Short
-repository: https://github.com/avolabs-io/longshort
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: LongShort
-    network: ganache
+    network: goerli
     source:
-      address: "OxAddress"
+      address: "0xC748ceEF08b7bb5D01702EDA70051BaaD51CB011"
       abi: LongShort
-      startBlock: 0
+      startBlock: 4173013
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - LongShort
+        - feesLevied
+        - interestDistribution
+        - longMinted
+        - longRedeem
+        - priceUpdate
+        - shortMinted
+        - shortRedeem
+        - tokenPriceRefreshed
       abis:
         - name: LongShort
           file: ./abis/LongShort.json
       eventHandlers:
-        - event: Event(event params as in contract)
-          handler: handleEvent
+        - event: feesLevied(uint256,uint256,uint256)
+          handler: handlefeesLevied
+        - event: interestDistribution(uint256,uint256,uint256,uint256)
+          handler: handleinterestDistribution
+        - event: longMinted(uint256,uint256,uint256)
+          handler: handlelongMinted
+        - event: longRedeem(uint256,uint256,uint256)
+          handler: handlelongRedeem
+        - event: priceUpdate(uint256,uint256)
+          handler: handlepriceUpdate
+        - event: shortMinted(uint256,uint256,uint256)
+          handler: handleshortMinted
+        - event: shortRedeem(uint256,uint256,uint256)
+          handler: handleshortRedeem
+        - event: tokenPriceRefreshed(uint256,uint256)
+          handler: handletokenPriceRefreshed
       file: ./src/mapping.ts
