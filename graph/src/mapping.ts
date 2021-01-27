@@ -36,16 +36,12 @@ export function handlefeesLevied(event: feesLevied): void {
   let longPercentage = event.params.longPercentage;
   let shortPercentage = event.params.shortPercentage;
 
-  let totalFeesStr = totalFees.toString();
-  let longPercentageStr = longPercentage.toString();
-  let shortPercentageStr = shortPercentage.toString();
-
   saveEventToStateChange(
     txHash,
     timestamp,
     blockNumber,
     "feesLevied",
-    [totalFeesStr, longPercentageStr, shortPercentageStr],
+    bigIntArrayToStringArray([totalFees, longPercentage, shortPercentage]),
     ["totalFees", "longPercentage", "shortPercentage"],
     ["uint256", "uint256", "uint256"]
   );
@@ -61,17 +57,12 @@ export function handleinterestDistribution(event: interestDistribution): void {
   let longPercentage = event.params.longPercentage;
   let shortPercentage = event.params.shortPercentage;
 
-  let newTotalValueLockedStr = newTotalValueLocked.toString();
-  let totalInterestStr = totalInterest.toString();
-  let longPercentageStr = longPercentage.toString();
-  let shortPercentageStr = shortPercentage.toString();
-
   saveEventToStateChange(
     txHash,
     timestamp,
     blockNumber,
     "interestDistribution",
-    [newTotalValueLockedStr, totalInterestStr, longPercentageStr, shortPercentageStr],
+    bigIntArrayToStringArray([newTotalValueLocked, totalInterest, longPercentage, shortPercentage]),
     ["newValueTotalLocked", "totalInterest", "longPercentage", "shortPercentage"],
     ["uint256", "uint256", "uint256", "uint256"]
   );
@@ -86,16 +77,12 @@ export function handlelongMinted(event: longMinted): void {
   let finalDepositAmount = event.params.finalDepositAmount;
   let tokensMinted = event.params.tokensMinted;
 
-  let depositAddedStr =  depositAdded.toString();
-  let finalDepositAmountStr = finalDepositAmount.toString();
-  let tokensMintedStr = tokensMinted.toString();
-
   saveEventToStateChange(
     txHash,
     timestamp,
     blockNumber,
     "longMinted",
-    [depositAddedStr, finalDepositAmountStr, tokensMintedStr],
+    bigIntArrayToStringArray([depositAdded, finalDepositAmount, tokensMinted]),
     ["depositAdded", "finalDepositAmount", "tokensMinted"],
     ["uint256", "uint256", "uint256"]
   );
@@ -110,16 +97,12 @@ export function handlelongRedeem(event: longRedeem): void {
   let valueOfRedemption = event.params.valueOfRedemption;
   let finalRedeemValue = event.params.finalRedeemValue;
 
-  let tokensRedeemedStr = tokensRedeemed.toString();
-  let valueOfRedemptionStr = valueOfRedemption.toString();
-  let finalRedeemValueStr = finalRedeemValue.toString();
-
   saveEventToStateChange(
     txHash,
     timestamp,
     blockNumber,
     "longRedeem",
-    [tokensRedeemedStr, valueOfRedemptionStr, finalRedeemValueStr],
+    bigIntArrayToStringArray([tokensRedeemed, valueOfRedemption, finalRedeemValue]),
     ["tokensRedeemed", "valueOfRedemption", "finalRedeem"],
     ["uint256", "uint256", "uint256"]
   );
@@ -132,15 +115,13 @@ export function handlepriceUpdate(event: priceUpdate): void {
   let newPrice = event.params.newPrice;
   let oldPrice = event.params.oldPrice;
 
-  let newPriceStr = newPrice.toString();
-  let oldPriceStr = oldPrice.toString();
 
   saveEventToStateChange(
     txHash,
     timestamp,
     blockNumber,
     "priceUpdate",
-    [newPriceStr, oldPriceStr],
+    bigIntArrayToStringArray([newPrice, oldPrice]),
     ["newPrice", "oldPrice"],
     ["uint256", "uint256"]
   );
@@ -155,16 +136,12 @@ export function handleshortMinted(event: shortMinted): void {
   let finalDepositAmount = event.params.finalDepositAmount;
   let tokensMinted = event.params.tokensMinted;
 
-  let depositAddedStr = depositAdded.toString();
-  let finalDepositAmountStr = finalDepositAmount.toString();
-  let tokensMintedStr = tokensMinted.toString();
-
   saveEventToStateChange(
     txHash,
     timestamp,
     blockNumber,
     "shortMinted",
-    [depositAddedStr, finalDepositAmountStr, tokensMintedStr],
+    bigIntArrayToStringArray([depositAdded, finalDepositAmount, tokensMinted]),
     ["depositAdded", "finalDepositAmount", "tokensMinted"],
     ["uint256", "uint256", "uint256"]
   );
@@ -179,16 +156,12 @@ export function handleshortRedeem(event: shortRedeem): void {
   let valueOfRedemption = event.params.valueOfRedemption;
   let finalRedeemValue = event.params.finalRedeemValue;
 
-  let tokensRedeemedStr = tokensRedeemed.toString();
-  let valueOfRedemptionStr = valueOfRedemption.toString();
-  let finalRedeemValueStr = finalRedeemValue.toString();
-
   saveEventToStateChange(
     txHash,
     timestamp,
     blockNumber,
     "shortRedeem",
-    [tokensRedeemedStr, valueOfRedemptionStr, finalRedeemValueStr],
+    bigIntArrayToStringArray([tokensRedeemed, valueOfRedemption, finalRedeemValue]),
     ["tokensRedeemed", "valueOfRedemption", "finalRedeemValue"],
     ["uint256", "uint256", "uint256"]
   );
@@ -202,16 +175,22 @@ export function handletokenPriceRefreshed(event: tokenPriceRefreshed): void {
   let longTokenPrice = event.params.longTokenPrice;
   let shortTokenPrice = event.params.shortTokenPrice;
 
-  let longTokenPriceStr = longTokenPrice.toString();
-  let shortTokenPriceStr = shortTokenPrice.toString();
-
   saveEventToStateChange(
     txHash,
     timestamp,
     blockNumber,
     "tokenPriceRefreshed",
-    [longTokenPriceStr, shortTokenPriceStr],
+    bigIntArrayToStringArray([longTokenPrice, shortTokenPrice]),
     ["longTokenPrice", "shortTokenPrice"],
     ["uint256", "uint256"]
   );
+}
+
+// currently all params are BigInts -> in future may have to modify to support e.g. Addresses
+function bigIntArrayToStringArray(bigIntArr: BigInt[]): string[]{
+  let returnArr = new Array<string>(bigIntArr.length);
+  for (let i = 0; i < bigIntArr.length; i++){
+    returnArr[i] = bigIntArr[i].toString();
+  }
+  return returnArr;
 }
