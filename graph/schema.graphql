@@ -23,3 +23,15 @@ type Event @entity {
   id: ID!
   address: Bytes!
 }
+
+type FeesLevied @entity {
+  id: ID!
+  feeAmount: BigInt!
+  longFee: BigInt!
+  shortFee: BigInt!
+}
+
+type LongMint @entity {
+  id: ID!
+  user: Bytes!
+}
