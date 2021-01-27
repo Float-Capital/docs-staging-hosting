@@ -51,11 +51,79 @@ export function handlefeesLevied(event: feesLevied): void {
   );
 }
 
-export function handleinterestDistribution(event: interestDistribution): void {}
+export function handleinterestDistribution(event: interestDistribution): void {
+  let txHash = event.transaction.hash;
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
 
-export function handlelongMinted(event: longMinted): void {}
+  let newTotalValueLocked = event.params.newTotalValueLocked;
+  let totalInterest = event.params.totalInterest;
+  let longPercentage = event.params.longPercentage;
+  let shortPercentage = event.params.shortPercentage;
 
-export function handlelongRedeem(event: longRedeem): void {}
+  let newTotalValueLockedStr = newTotalValueLocked.toString();
+  let totalInterestStr = totalInterest.toString();
+  let longPercentageStr = longPercentage.toString();
+  let shortPercentageStr = shortPercentage.toString();
+
+  saveEventToStateChange(
+    txHash,
+    timestamp,
+    blockNumber,
+    "interestDistribution",
+    [newTotalValueLockedStr, totalInterestStr, longPercentageStr, shortPercentageStr],
+    ["newValueTotalLocked", "totalInterest", "longPercentage", "shortPercentage"],
+    ["uint256", "uint256", "uint256", "uint256"]
+  );
+}
+
+export function handlelongMinted(event: longMinted): void {
+  let txHash = event.transaction.hash;
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
+
+  let depositAdded = event.params.depositAdded;
+  let finalDepositAmount = event.params.finalDepositAmount;
+  let tokensMinted = event.params.tokensMinted;
+
+  let depositAddedStr =  depositAdded.toString();
+  let finalDepositAmountStr = finalDepositAmount.toString();
+  let tokensMintedStr = tokensMinted.toString();
+
+  saveEventToStateChange(
+    txHash,
+    timestamp,
+    blockNumber,
+    "longMinted",
+    [depositAddedStr, finalDepositAmountStr, tokensMintedStr],
+    ["depositAdded", "finalDepositAmount", "tokensMinted"],
+    ["uint256", "uint256", "uint256"]
+  );
+}
+
+export function handlelongRedeem(event: longRedeem): void {
+  let txHash = event.transaction.hash;
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
+
+  let tokensRedeemed = event.params.tokensRedeemed;
+  let valueOfRedemption = event.params.valueOfRedemption;
+  let finalRedeemValue = event.params.finalRedeemValue;
+
+  let tokensRedeemedStr = tokensRedeemed.toString();
+  let valueOfRedemptionStr = valueOfRedemption.toString();
+  let finalRedeemValueStr = finalRedeemValue.toString();
+
+  saveEventToStateChange(
+    txHash,
+    timestamp,
+    blockNumber,
+    "longRedeem",
+    [tokensRedeemedStr, valueOfRedemptionStr, finalRedeemValueStr],
+    ["tokensRedeemed", "valueOfRedemption", "finalRedeem"],
+    ["uint256", "uint256", "uint256"]
+  );
+}
 
 export function handlepriceUpdate(event: priceUpdate): void {
   let txHash = event.transaction.hash;
@@ -71,15 +139,79 @@ export function handlepriceUpdate(event: priceUpdate): void {
     txHash,
     timestamp,
     blockNumber,
-    "feesLevied",
+    "priceUpdate",
     [newPriceStr, oldPriceStr],
     ["newPrice", "oldPrice"],
     ["uint256", "uint256"]
   );
 }
 
-export function handleshortMinted(event: shortMinted): void {}
+export function handleshortMinted(event: shortMinted): void {
+  let txHash = event.transaction.hash;
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
 
-export function handleshortRedeem(event: shortRedeem): void {}
+  let depositAdded = event.params.depositAdded;
+  let finalDepositAmount = event.params.finalDepositAmount;
+  let tokensMinted = event.params.tokensMinted;
 
-export function handletokenPriceRefreshed(event: tokenPriceRefreshed): void {}
+  let depositAddedStr = depositAdded.toString();
+  let finalDepositAmountStr = finalDepositAmount.toString();
+  let tokensMintedStr = tokensMinted.toString();
+
+  saveEventToStateChange(
+    txHash,
+    timestamp,
+    blockNumber,
+    "shortMinted",
+    [depositAddedStr, finalDepositAmountStr, tokensMintedStr],
+    ["depositAdded", "finalDepositAmount", "tokensMinted"],
+    ["uint256", "uint256", "uint256"]
+  );
+}
+
+export function handleshortRedeem(event: shortRedeem): void {
+  let txHash = event.transaction.hash;
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
+
+  let tokensRedeemed = event.params.tokensRedeemed;
+  let valueOfRedemption = event.params.valueOfRedemption;
+  let finalRedeemValue = event.params.finalRedeemValue;
+
+  let tokensRedeemedStr = tokensRedeemed.toString();
+  let valueOfRedemptionStr = valueOfRedemption.toString();
+  let finalRedeemValueStr = finalRedeemValue.toString();
+
+  saveEventToStateChange(
+    txHash,
+    timestamp,
+    blockNumber,
+    "shortRedeem",
+    [tokensRedeemedStr, valueOfRedemptionStr, finalRedeemValueStr],
+    ["tokensRedeemed", "valueOfRedemption", "finalRedeemValue"],
+    ["uint256", "uint256", "uint256"]
+  );
+}
+
+export function handletokenPriceRefreshed(event: tokenPriceRefreshed): void {
+  let txHash = event.transaction.hash;
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
+
+  let longTokenPrice = event.params.longTokenPrice;
+  let shortTokenPrice = event.params.shortTokenPrice;
+
+  let longTokenPriceStr = longTokenPrice.toString();
+  let shortTokenPriceStr = shortTokenPrice.toString();
+
+  saveEventToStateChange(
+    txHash,
+    timestamp,
+    blockNumber,
+    "tokenPriceRefreshed",
+    [longTokenPriceStr, shortTokenPriceStr],
+    ["longTokenPrice", "shortTokenPrice"],
+    ["uint256", "uint256"]
+  );
+}
