@@ -2,7 +2,10 @@ module Link = Next.Link
 
 module Navigation = {
   @react.component
-  let make = () =>
+  let make = () => {
+    let router = Next.Router.useRouter()
+    let optCurrentUser = RootProvider.useCurrentUser()
+
     <nav className="p-2 h-12 flex border-b border-gray-200 justify-between items-center text-sm">
       <Link href="/">
         <a className="flex items-center w-1/3">
@@ -20,8 +23,19 @@ module Navigation = {
           className="px-3 font-bold" target="_blank" href="https://github.com/avolabs-io/longshort">
           {React.string("Github")}
         </a>
+        {switch optCurrentUser {
+        | Some(currentUser) => <p> {`logged in as ${currentUser}`->React.string} </p>
+        | None =>
+          <button
+            onClick={_ => {
+              router->Next.Router.push(`/login?nextPath=${router.asPath}`)
+            }}>
+            {"login"->React.string}
+          </button>
+        }}
       </div>
     </nav>
+  }
 }
 
 @react.component
