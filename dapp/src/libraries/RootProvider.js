@@ -6,6 +6,7 @@ import * as React from "react";
 import * as Ethers from "ethers";
 import * as JsPromise from "./Js.Promise/JsPromise.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
+import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as Web3Connectors from "../components/Login/Web3Connectors.js";
 import * as Core from "@web3-react/core";
 
@@ -125,7 +126,7 @@ function RootProvider$RootWithWeb3(Props) {
           var match = context.library;
           var match$1 = context.account;
           if (match !== undefined && match$1 !== undefined) {
-            JsPromise.$$catch(match.getBalance(match$1).then(function (newBalance) {
+            JsPromise.$$catch(Caml_option.valFromOption(match).providers.getBalance(match$1).then(function (newBalance) {
                       return Curry._1(dispatch, {
                                   _0: match$1,
                                   _1: Belt_Option.flatMap(newBalance, (function (balance) {

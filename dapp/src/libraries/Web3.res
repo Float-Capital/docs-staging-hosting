@@ -11,12 +11,6 @@ type ethersBigNumber = {toString: (. unit) => string}
 
 type rawProvider
 
-type rec web3Library = {
-  getBalance: (. ethAddress) => JsPromise.t<option<ethersBigNumber>>,
-  getSigner: (. ethAddress) => web3Library,
-  provider: rawProvider,
-}
-
 // type rpcDefinition = {
 //   @dead("rpcDefinition.method") method: string,
 //   @dead("rpcDefinition.params") params: array<string>,

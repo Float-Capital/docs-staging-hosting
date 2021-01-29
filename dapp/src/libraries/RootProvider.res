@@ -3,8 +3,8 @@ open RootProviderTypes
 type web3reactContext = {
   active: bool,
   activate: (. Web3Connectors.injectedType, unit => unit, bool) => JsPromise.t<unit>,
-  account: option<Web3.ethAddress>,
-  library: option<Web3.web3Library>,
+  account: option<Ethers.ethAddress>,
+  library: option<Ethers.Providers.t>,
   chainId: option<int>,
   deactivate: unit => unit,
 }
@@ -14,18 +14,18 @@ external useWeb3React: unit => web3reactContext = "useWeb3React"
 module Web3ReactProvider = {
   @module("@web3-react/core") @react.component
   external make: (
-    ~getLibrary: Web3.rawProvider => Web3.web3Library,
+    ~getLibrary: Ethers.Providers.t => Ethers.Providers.t,
     ~children: React.element,
   ) => React.element = "Web3ReactProvider"
 }
 
 @module("ethers") @scope("providers") @new
-external createWeb3Provider: Web3.rawProvider => Web3.web3Library = "Web3Provider"
+external createWeb3Provider: Ethers.Providers.t => Ethers.Providers.t = "Web3Provider"
 
 let getLibrary = provider => {
   let library = createWeb3Provider(provider)
 
-  let setPollingInterval: Web3.web3Library => Web3.web3Library = %raw(
+  let setPollingInterval: Ethers.Providers.t => Ethers.Providers.t = %raw(
     "lib => {lib.pollingInterval = 8000; return lib; }"
   )
   setPollingInterval(library)
@@ -105,12 +105,13 @@ module RootWithWeb3 = {
       switch (context.library, context.account) {
       | (Some(library), Some(account)) =>
         let _ =
-          library.getBalance(. account)
+          library
+          ->Ethers.Providers.getBalance(account)
           ->JsPromise.map(newBalance =>
             dispatch(
               LoadAddress(
                 account,
-                newBalance->Option.flatMap(balance => Eth.make(balance.toString(.))),
+                newBalance->Option.flatMap(balance => Eth.make(balance->Ethers.BigNumber.toString))
               ),
             )
           )
@@ -168,7 +169,7 @@ let useDeactivateWeb3: (unit, unit) => unit = () => {
 
   context.deactivate
 }
-let useWeb3: unit => option<Web3.web3Library> = () => {
+let useWeb3: unit => option<Ethers.Providers.t> = () => {
   let context = useWeb3React()
 
   context.library

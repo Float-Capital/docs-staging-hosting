@@ -4,4 +4,4 @@ external longshortContractGoerli: option<string> = "process.env.REACT_APP_LONGSH
 external longshortContractBinanceTest: option<string> =
   "process.env.REACT_APP_LONGSHORT_CONTRACT_GOERLI"
 
-let longshortContractAbi = [""]->Web3.makeAbi
+let longshortContractAbi = [""]->Ethers.makeAbi

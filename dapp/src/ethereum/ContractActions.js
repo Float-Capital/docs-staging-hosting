@@ -3,22 +3,39 @@
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Config from "../Config.js";
-import * as Ethers from "ethers";
+import * as Ethers from "./Ethers.js";
+import * as Ethers$1 from "ethers";
+import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
+import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as Core from "@web3-react/core";
 import * as LoyaltyTokenJson from "./abi/loyaltyToken.json";
 
 function getProviderOrSigner(library, account) {
   if (account !== undefined) {
-    return library.getSigner(account);
+    return Belt_Option.mapWithDefault(library.providers.getSigner(account), {
+                TAG: 0,
+                _0: library,
+                [Symbol.for("name")]: "Provider"
+              }, (function (signer) {
+                  return {
+                          TAG: 1,
+                          _0: signer,
+                          [Symbol.for("name")]: "Signer"
+                        };
+                }));
   } else {
-    return library;
+    return {
+            TAG: 0,
+            _0: library,
+            [Symbol.for("name")]: "Provider"
+          };
   }
 }
 
 var loyaltyTokenAbi = LoyaltyTokenJson.loyaltyToken;
 
 function getExchangeContract(stewardAddress, stewardAbi, library, account) {
-  return new Ethers.Contract(stewardAddress, stewardAbi, getProviderOrSigner(library, account));
+  return Ethers.Contract.make(stewardAddress, stewardAbi, getProviderOrSigner(library, account));
 }
 
 function getLongShortContractAddress(chainId) {
@@ -43,7 +60,7 @@ function useLongShortContract(param) {
                 var match = context.library;
                 var match$1 = context.chainId;
                 if (match !== undefined && match$1 !== undefined) {
-                  return getExchangeContract(getLongShortContractAddress(match$1), Config.longshortContractAbi, match, context.account);
+                  return Caml_option.some(getExchangeContract(getLongShortContractAddress(match$1), Config.longshortContractAbi, Caml_option.valFromOption(match), context.account));
                 }
                 
               }), [
@@ -61,8 +78,8 @@ function useChangePrice(animal) {
   useLongShortContract(undefined);
   return [
           (function (newPrice) {
-              Ethers.utils.parseUnits("0", 0);
-              Ethers.utils.parseUnits(newPrice, 0);
+              Ethers$1.utils.parseUnits("0", 0);
+              Ethers$1.utils.parseUnits(newPrice, 0);
               Curry._1(setTxState, (function (param) {
                       return /* Created */2;
                     }));

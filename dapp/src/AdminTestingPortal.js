@@ -5,10 +5,16 @@ import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as RootProvider from "./libraries/RootProvider.js";
+
+var context = React.createContext({
+      privateKeyMode: true,
+      ethersWallet: undefined
+    });
 
 var privKeyStorageId = "admin-private-key";
 
-function AdminTestingPortal$Authenticate(Props) {
+function AdminTestingPortal$AdminContext$Authenticate(Props) {
   var children = Props.children;
   var getPrivateKeyFromLocalStorage = function (__x) {
     return Caml_option.null_to_opt(__x.getItem(privKeyStorageId));
@@ -22,38 +28,57 @@ function AdminTestingPortal$Authenticate(Props) {
       });
   var setAuthHeader = match$1[1];
   var authHeader = match$1[0];
+  var match$2 = React.useState(function () {
+        return true;
+      });
+  var setPrivateKeyMode = match$2[1];
+  var privateKeyMode = match$2[0];
   var onChange = function (e) {
     return Curry._1(setAuthHeader, e.target.value);
   };
-  if (match[0]) {
-    return React.createElement(React.Fragment, undefined, React.createElement("button", {
-                    onClick: (function (param) {
-                        return Curry._1(setAuthSet, (function (param) {
-                                      return false;
-                                    }));
-                      })
-                  }, "Edit your auth key"), React.createElement("br", undefined), children);
-  } else {
-    return React.createElement("form", {
-                onSubmit: (function ($$event) {
-                    localStorage.setItem(privKeyStorageId, authHeader);
-                    $$event.preventDefault();
-                    return Curry._1(setAuthSet, (function (param) {
-                                  return true;
-                                }));
-                  })
-              }, React.createElement("label", undefined, "Auth Key: "), React.createElement("input", {
-                    name: "auth_key",
-                    type: "text",
-                    onChange: onChange
-                  }), React.createElement("button", {
-                    type: "submit"
-                  }, "submit"), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("p", undefined, "NOTE: you may need to reload the webpage after doing this to activate the key"));
-  }
+  var provider = context.Provider;
+  var state = {
+    privateKeyMode: privateKeyMode,
+    ethersWallet: undefined
+  };
+  var optCurrentUser = RootProvider.useCurrentUser(undefined);
+  var authDisplay = React.createElement("div", undefined, optCurrentUser !== undefined ? React.createElement("span", undefined, React.createElement("p", undefined, "Use injectod provider?"), React.createElement("input", {
+                  checked: !privateKeyMode,
+                  type: "checkbox",
+                  onChange: (function (param) {
+                      return Curry._1(setPrivateKeyMode, (function (param) {
+                                    return !privateKeyMode;
+                                  }));
+                    })
+                })) : null, match[0] || !privateKeyMode ? React.createElement(React.Fragment, undefined, privateKeyMode ? React.createElement(React.Fragment, undefined, React.createElement("button", {
+                        onClick: (function (param) {
+                            return Curry._1(setAuthSet, (function (param) {
+                                          return false;
+                                        }));
+                          })
+                      }, "Edit your auth key"), React.createElement("br", undefined)) : null, children) : React.createElement("form", {
+              onSubmit: (function ($$event) {
+                  localStorage.setItem(privKeyStorageId, authHeader);
+                  $$event.preventDefault();
+                  return Curry._1(setAuthSet, (function (param) {
+                                return true;
+                              }));
+                })
+            }, React.createElement("label", undefined, "Auth Key: "), React.createElement("input", {
+                  name: "auth_key",
+                  type: "text",
+                  onChange: onChange
+                }), React.createElement("button", {
+                  type: "submit"
+                }, "submit"), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("p", undefined, "NOTE: you may need to reload the webpage after doing this to activate the key")));
+  return React.createElement(provider, {
+              value: state,
+              children: authDisplay
+            });
 }
 
 function AdminTestingPortal$AdminActions(Props) {
-  return React.createElement("div", undefined, React.createElement(AdminTestingPortal$Authenticate, {
+  return React.createElement("div", undefined, React.createElement(AdminTestingPortal$AdminContext$Authenticate, {
                   children: React.createElement("h1", undefined, "Test Functions")
                 }));
 }
@@ -67,4 +92,4 @@ export {
   $$default as default,
   
 }
-/* Misc Not a pure module */
+/* context Not a pure module */

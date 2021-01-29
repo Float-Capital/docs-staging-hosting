@@ -1,9 +1,9 @@
 open Ethers
 
-let getProviderOrSigner = (library: Web3.web3Library, account: option<Web3.ethAddress>) =>
+let getProviderOrSigner = (library: Ethers.Providers.t, account: option<Ethers.ethAddress>) =>
   switch account {
-  | Some(account) => library.getSigner(. account)
-  | None => library
+  | Some(account) => library->Ethers.Providers.getSigner(account)->Option.mapWithDefault(Provider(library), signer=> Signer(signer))
+  | None => Provider(library)
   }
 
 type txHash = string
@@ -30,17 +30,14 @@ type stewardContract = {
 type ethersBnFormat
 @send external ethersBnToString: ethersBnFormat => string = "toString"
 
-@new @module("ethers")
-external getContract: (Web3.ethAddress, Web3.abi, Web3.web3Library) => stewardContract = "Contract"
-
 @module("./abi/loyaltyToken.json")
-external loyaltyTokenAbi: Web3.abi = "loyaltyToken"
+external loyaltyTokenAbi: Ethers.abi = "loyaltyToken"
 
 @module("ethers") @scope("utils")
 external parseUnits: (. string, int) => parsedUnits = "parseUnits"
 
 let getExchangeContract = (stewardAddress, stewardAbi, library, account) =>
-  getContract(stewardAddress, stewardAbi, getProviderOrSigner(library, account))
+  Ethers.Contract.make(stewardAddress, stewardAbi, getProviderOrSigner(library, account))
 
 @dead("+stewardAddressMaticMain")
 let stewardAddressMaticMain = "0x6D47CF86F6A490c6410fC082Fd1Ad29CF61492d0"

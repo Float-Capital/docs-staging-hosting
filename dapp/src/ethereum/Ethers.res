@@ -21,19 +21,72 @@ type txError = {
   @dead("txError.stack") stack: option<string>,
 }
 
-module Providers = {
-  type t
-  @new @module("ethers") @scope("providers")
-  external makeProvider: string => Web3.rawProvider = "JsonRpcProvider"
+type abi
+
+let makeAbi = (abiArray: array<string>): abi => abiArray->Obj.magic
+
+type ethAddress = string
+type ethersBigNumber
+
+module BigNumber = {
+  type t = ethersBigNumber
+
+  @send external add: (t, t) => t = "add"
+  @send external sub: (t, t) => t = "sub"
+  @send external mul: (t, t) => t = "mul"
+  @send external div: (t, t) => t = "div"
+  @send external gt: (t, t) => bool = "gt"
+  @send external lt: (t, t) => bool = "lt"
+  @dead("+eq") @send external eq: (t, t) => bool = "eq"
+  @send external cmp: (t, t) => int = "cmp"
+  @dead("+sqr") @send external sqr: t => t = "sqr"
+  @send external toString: t => string = "toString"
+  @send external toStringRad: (t, int) => string = "toString"
+
+  @send external toNumber: t => int = "toNumber"
+  @send external toNumberFloat: t => float = "toNumber"
 }
 
 @send
 external waitForTransaction: (Web3.rawProvider, string) => JsPromise.t<txResult> =
   "waitForTransaction"
 
+type providerType
+type walletType = {address: string, provider: providerType}
+
 module Wallet = {
-  type t = {address: string}
+  type t = walletType
 
   @new @module("ethers")
-  external makePrivKeyWallet: (string, Providers.t) => t = "Wallet"
+  external makePrivKeyWallet: (string, providerType) => t = "Wallet"
+}
+
+module Providers = {
+  type t = providerType
+
+  @new @module("ethers") @scope("providers")
+  external makeProvider: string => Web3.rawProvider = "JsonRpcProvider"
+
+  @send @scope("providers")
+  external getBalance: (t, ethAddress) => JsPromise.t<option<BigNumber.t>> = "getBalance"
+  @send @scope("providers")
+  external getSigner: (t, ethAddress) => option<Wallet.t> = "getSigner"
+}
+
+type providerOrSigner = 
+| Provider(Providers.t)
+| Signer(Wallet.t)
+
+module Contract = {
+  type t
+
+  @new @module("ethers")
+  external getContractSigner: (ethAddress, abi, Wallet.t) => t = "Contract"
+  @new @module("ethers")
+  external getContractProvider: (ethAddress, abi, Providers.t) => t = "Contract"
+
+  let make: (ethAddress,abi, providerOrSigner)=> t = (address, abi, providerSigner) => {switch providerSigner {
+      | Provider(provider) => getContractProvider(address,abi, provider)
+      | Signer(signer) => getContractSigner(address,abi, signer)
+    } }
 }
