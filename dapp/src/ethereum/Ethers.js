@@ -3,8 +3,11 @@
 
 var Providers = {};
 
+var Wallet = {};
+
 export {
   Providers ,
+  Wallet ,
   
 }
 /* No side effect */

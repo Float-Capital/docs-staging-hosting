@@ -48,12 +48,8 @@ function MainLayout$Navigation(Props) {
 
 function MainLayout(Props) {
   var children = Props.children;
-  var minWidth = {
-    minWidth: "20rem"
-  };
   return React.createElement("div", {
-              className: "flex lg:justify-center",
-              style: minWidth
+              className: "flex lg:justify-center"
             }, React.createElement("div", {
                   className: "max-w-5xl w-full lg:w-3/4 text-gray-900 font-base"
                 }, React.createElement(MainLayout$Navigation, {}), React.createElement("main", {

@@ -6,7 +6,7 @@
   },
   "refmt": 3,
   "bs-dependencies": [
-    "reason-react",
+    "@rescript/react",
     "@reasonml-community/graphql-ppx",
     "bs-moment",
     "bs-css",

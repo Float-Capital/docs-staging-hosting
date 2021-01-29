@@ -22,6 +22,7 @@ type txError = {
 }
 
 module Providers = {
+  type t
   @new @module("ethers") @scope("providers")
   external makeProvider: string => Web3.rawProvider = "JsonRpcProvider"
 }
@@ -29,3 +30,10 @@ module Providers = {
 @send
 external waitForTransaction: (Web3.rawProvider, string) => JsPromise.t<txResult> =
   "waitForTransaction"
+
+module Wallet = {
+  type t = {address: string}
+
+  @new @module("ethers")
+  external makePrivKeyWallet: (string, Providers.t) => t = "Wallet"
+}
