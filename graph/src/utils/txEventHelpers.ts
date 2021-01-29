@@ -24,7 +24,8 @@ function createEventParams(
       txHash.toHex() + "-" + eventIndex.toString() + "-" + index.toString()
     );
     eventParamFund.index = index;
-    eventParamFund.param = argNames[index];
+    eventParamFund.paramName = argNames[index];
+    eventParamFund.param = argValues[index];
     eventParamFund.paramType = argTypes[index];
     eventParamFund.save();
 
