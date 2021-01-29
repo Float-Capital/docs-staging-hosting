@@ -17,7 +17,7 @@ import "./ShortCoins.sol";
  *
  *  - Ability for users to create synthetic long and short positions on value movements
  *  - Value movements could be derived from tradional or alternative asset classes, derivates, binary outcomes, etc...
- *  - Incentive mechansim providing fees to liquidity makers
+ *  - Incentive mechansim providing fees to liquidity makers (users on both sides of order book)
  *
  * ******* SYSTEM FUNCTIONING V0.0 ***********
  * System accepts stable coin (DAI) and has a total locked value = short position value + long position value
@@ -49,15 +49,18 @@ import "./ShortCoins.sol";
  *
  * ******* KNOWN ATTACK VECTORS ***********
  * (1) Feeless withdrawl:
+ * [FIXED]
  * Long position $150, Short position $100. User should pay fee to remove short liquidity.
  * Step1: User mints $51 of short position (No fee to add liquidity).
  * Step2: User redeems $100 of short position (no fee as currently removing liquidity from bigger side)
  * Possible solution, check after deposit/withdrawl if order book has flipped, then apply fees.
  *
  * (2) FlashLoan mint:
+ * [ONGOING]
  * Consider rapid large entries and exit of the system.
  *
  * (3) Oracle manipulation:
+ * [ONGOING]
  * If the oracle determining price change can be easy manipulated (and by a decent magnitude),
  * Funds could be at risk. See: https://blog.trailofbits.com/2020/08/05/accidentally-stepping-on-a-defi-lego/
  *
@@ -106,38 +109,42 @@ contract LongShort {
     address public aaveLendingContractCore;
 
     // EVENTS
-    event tokenPriceRefreshed(uint256 longTokenPrice, uint256 shortTokenPrice);
-    event feesLevied(
+    event TokenPriceRefreshed(uint256 longTokenPrice, uint256 shortTokenPrice);
+    event FeesLevied(
         uint256 totalFees,
         uint256 longPercentage,
         uint256 shortPercentage
     );
-    event interestDistribution(
+    event InterestDistribution(
         uint256 newTotalValueLocked,
         uint256 totalInterest,
         uint256 longPercentage,
         uint256 shortPercentage
     );
-    event priceUpdate(uint256 oldPrice, uint256 newPrice);
-    event longMinted(
+    event PriceUpdate(uint256 oldPrice, uint256 newPrice, address user);
+    event LongMinted(
         uint256 depositAdded,
         uint256 finalDepositAmount,
-        uint256 tokensMinted
+        uint256 tokensMinted,
+        address user
     );
-    event shortMinted(
+    event ShortMinted(
         uint256 depositAdded,
         uint256 finalDepositAmount,
-        uint256 tokensMinted
+        uint256 tokensMinted,
+        address user
     );
-    event longRedeem(
+    event LongRedeem(
         uint256 tokensRedeemed,
         uint256 valueOfRedemption,
-        uint256 finalRedeemValue
+        uint256 finalRedeemValue,
+        address user
     );
-    event shortRedeem(
+    event ShortRedeem(
         uint256 tokensRedeemed,
         uint256 valueOfRedemption,
-        uint256 finalRedeemValue
+        uint256 finalRedeemValue,
+        address user
     );
 
     /**
@@ -248,7 +255,7 @@ contract LongShort {
                 shortTokenSupply
             );
         }
-        emit tokenPriceRefreshed(longTokenPrice, shortTokenPrice);
+        emit TokenPriceRefreshed(longTokenPrice, shortTokenPrice);
     }
 
     /**
@@ -263,7 +270,7 @@ contract LongShort {
     ) internal {
         _increaseLongShortSides(totalFees, longPercentage, shortPercentage);
 
-        emit feesLevied(totalFees, longPercentage, shortPercentage);
+        emit FeesLevied(totalFees, longPercentage, shortPercentage);
     }
 
     /**
@@ -286,7 +293,7 @@ contract LongShort {
 
         totalValueLocked = totalValueWithInterest;
 
-        emit interestDistribution(
+        emit InterestDistribution(
             totalValueWithInterest,
             interestAccrued,
             longPercentage,
@@ -380,7 +387,7 @@ contract LongShort {
         // TODO: Check why/if this is bad (casting to uint)
         // If a negative int is return this should fail.
         uint256 newPrice = uint256(getLatestPrice());
-        emit priceUpdate(assetPrice, newPrice);
+        emit PriceUpdate(assetPrice, newPrice, msg.sender);
 
         // Adjusts long and short values based on price movements.
         // $1
@@ -525,7 +532,7 @@ contract LongShort {
         longValue = longValue.add(finalDepositAmount);
         longTokens.mint(msg.sender, amountToMint);
 
-        emit longMinted(amount, finalDepositAmount, amountToMint);
+        emit LongMinted(amount, finalDepositAmount, amountToMint, msg.sender);
         // Safety Checks
         // Again consider gas implications.
         require(
@@ -561,7 +568,7 @@ contract LongShort {
         // NB : Important to refresh the token price before claculating amount to mint?
         // So user is buying them at the new price after their fee has increased the price.
 
-        emit shortMinted(amount, finalDepositAmount, amountToMint);
+        emit ShortMinted(amount, finalDepositAmount, amountToMint, msg.sender);
         // Safety Checks
         require(
             shortTokenPrice ==
@@ -658,7 +665,12 @@ contract LongShort {
         _refreshTokensPrice();
         _redeem(finalRedeemAmount);
 
-        emit longRedeem(tokensToRedeem, amountToRedeem, finalRedeemAmount);
+        emit LongRedeem(
+            tokensToRedeem,
+            amountToRedeem,
+            finalRedeemAmount,
+            msg.sender
+        );
     }
 
     function redeemShort(uint256 tokensToRedeem) external refreshSystemState {
@@ -685,6 +697,11 @@ contract LongShort {
         _refreshTokensPrice();
         _redeem(finalRedeemAmount);
 
-        emit shortRedeem(tokensToRedeem, amountToRedeem, finalRedeemAmount);
+        emit ShortRedeem(
+            tokensToRedeem,
+            amountToRedeem,
+            finalRedeemAmount,
+            msg.sender
+        );
     }
 }
