@@ -2,7 +2,10 @@ open Ethers
 
 let getProviderOrSigner = (library: Ethers.Providers.t, account: option<Ethers.ethAddress>) =>
   switch account {
-  | Some(account) => library->Ethers.Providers.getSigner(account)->Option.mapWithDefault(Provider(library), signer=> Signer(signer))
+  | Some(account) =>
+    library
+    ->Ethers.Providers.getSigner(account)
+    ->Option.mapWithDefault(Provider(library), signer => Signer(signer))
   | None => Provider(library)
   }
 
@@ -50,7 +53,7 @@ let getLongShortContractAddress = chainId =>
   | 80001 => "0xeb37A6dF956F1997085498aDd98b25a2f633d83F"
   | 5
   | _ => "0xba97BeC8d359D73c81D094421803D968A9FBf676"
-  }
+  }->Ethers.Utils.getAddressUnsafe
 
 let useLongShortContract = () => {
   let context = RootProvider.useWeb3React()
@@ -88,19 +91,19 @@ type transactionState =
   | Complete(txResult)
   | Failed
 
-let useChangePrice = animal => {
+let useChangePrice = _animal => {
   let (txState, setTxState) = React.useState(() => UnInitialised)
 
   let optLongShortContract = useLongShortContract()
 
   (
-    newPrice => {
-      let value = parseUnits(. "0", 0)
-      let newPriceEncoded = parseUnits(. newPrice, 0)
+    _newPrice => {
+      // let value = parseUnits(. "0", 0)
+      // let newPriceEncoded = parseUnits(. newPrice, 0)
 
       setTxState(_ => Created)
       switch optLongShortContract {
-      | Some(longShort) => // let updatePricePromise = steward.changePrice(.
+      | Some(_longShort) => // let updatePricePromise = steward.changePrice(.
         //   animal,
         //   newPriceEncoded,
         //   {

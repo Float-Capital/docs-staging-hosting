@@ -6,7 +6,7 @@ type abi
 
 let makeAbi = (abiArray: array<string>): abi => abiArray->Obj.magic
 
-type ethAddress = string
+// type ethAddress = string
 type ethersBigNumber = {toString: (. unit) => string}
 
 type rawProvider

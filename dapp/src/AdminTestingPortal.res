@@ -2,21 +2,20 @@
 
 module AdminContext = {
   type t = {privateKeyMode: bool, ethersWallet: option<Ethers.Wallet.t>}
-  let defaultContext = {privateKeyMode: true, ethersWallet: None}
-  let context = React.createContext(defaultContext)
+  let context = React.createContext(None)
 
-  module Authenticate = {
+  module Provider = {
     let privKeyStorageId = "admin-private-key"
     @react.component
     let make = (~children) => {
       let getPrivateKeyFromLocalStorage = Dom.Storage2.getItem(_, privKeyStorageId)
-
+      let optAuthHeader = Misc.optLocalstorage->Option.flatMap(getPrivateKeyFromLocalStorage)
       let (authSet, setAuthSet) = {
-        React.useState(_ =>
-          Misc.optLocalstorage->Option.flatMap(getPrivateKeyFromLocalStorage)->Option.isSome
-        )
+        React.useState(_ => optAuthHeader->Option.isSome)
       }
-      let (authHeader, setAuthHeader) = React.useState(() => "")
+      let (authHeader, setAuthHeader) = React.useState(() =>
+        optAuthHeader->Option.getWithDefault("")
+      )
       let (privateKeyMode, setPrivateKeyMode) = React.useState(() => true)
 
       let onChange = (e: ReactEvent.Form.t): unit => {
@@ -25,8 +24,6 @@ module AdminContext = {
       }
 
       let provider = React.Context.provider(context)
-
-      let state = {privateKeyMode: privateKeyMode, ethersWallet: None}
 
       let optCurrentUser = RootProvider.useCurrentUser()
 
@@ -76,7 +73,22 @@ module AdminContext = {
               </form>}
         </div>
 
-      React.createElement(provider, {"value": state, "children": authDisplay})
+      let optProvider = RootProvider.useWeb3()
+      let optEthersSigner = optProvider->Option.flatMap(provider =>
+        switch (privateKeyMode, authSet) {
+        | (false, _) =>
+          optCurrentUser->Option.flatMap(usersAddress =>
+            provider->Ethers.Providers.getSigner(usersAddress)
+          )
+        | (true, true) =>
+          optAuthHeader->Option.map(authHeader =>
+            Ethers.Wallet.makePrivKeyWallet(authHeader, provider)
+          )
+        | (true, false) => None
+        }
+      )
+
+      React.createElement(provider, {"value": optEthersSigner, "children": authDisplay})
     }
   }
 }
@@ -84,12 +96,16 @@ module AdminContext = {
 module AdminActions = {
   @react.component
   let make = () => {
-    <div>
-      <AdminContext.Authenticate>
+    let optEthersWallet = React.useContext(AdminContext.context)
+    switch optEthersWallet {
+    | Some(_ethersWallet) =>
+      <div>
         <h1> {"Test Functions"->React.string} </h1>
-      </AdminContext.Authenticate>
-    </div>
+        <div> <p> {"Mint"->React.string} </p> <Mint /> </div>
+      </div>
+    | None => React.null
+    }
   }
 }
 
-let default = () => <AdminActions />
+let default = () => <AdminContext.Provider> <AdminActions /> </AdminContext.Provider>

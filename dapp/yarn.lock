@@ -7386,6 +7386,23 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+re-classnames@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/re-classnames/-/re-classnames-5.0.1.tgz#f107e5b328b79ad423c33e991d9dd11d089400b3"
+  integrity sha512-tTdlHyRnS22+59xeOmj3/eOkW9gtP4Gw1pcIscl9csPvJEZTqnHEfIoGDiCPVKi3yreAOWtPFCPuWk49SlffAA==
+
+re-debouncer@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/re-debouncer/-/re-debouncer-2.1.0.tgz#2eaf7994ba41590f4f80d4a363ae8905156b7dc1"
+  integrity sha512-Iy9BecWF9X4V6zXfL3ROZpKGkCnpzYdjG/j6NIBxQn7gEwO2DzED5BsbfRUiPeqr7C0tAD0HPHF6tYIcQFEnyA==
+
+re-formality@^4.0.0-beta.7:
+  version "4.0.0-beta.7"
+  resolved "https://registry.yarnpkg.com/re-formality/-/re-formality-4.0.0-beta.7.tgz#c29787034bcc3874251d7d214208951d270e2e47"
+  integrity sha512-vlfjdlua/idT+vjNb25KxF7LDzrSrycaoYNGmyABB6MVLEjVCIKeck3PXlSnd/d3CD2iBvircz1QEsUf0tjTug==
+  dependencies:
+    re-debouncer "2.1.0"
+
 react-dom@^16.13.1:
   version "16.14.0"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.14.0.tgz#7ad838ec29a777fb3c75c3a190f661cf92ab8b89"
@@ -7479,11 +7496,6 @@ readdirp@~3.5.0:
   integrity sha512-cMhu7c/8rdhkHXWsY+osBhfSy0JikwpHK/5+imo+LpeasTF8ouErHrlYkwT0++njiyuDvc7OFY5T3ukvZ8qmFQ==
   dependencies:
     picomatch "^2.2.1"
-
-reason-apollo-client@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/reason-apollo-client/-/reason-apollo-client-1.0.0.tgz#8b1f59cae6d1727a8a61caf79af2a4f5ddc2ad18"
-  integrity sha512-kLQUf3czHDJoIlsCBrdGTGChc86mWLlAbMRaL16CWw8ukrrx1mdCzeQqkfavwJ45i1550K4N4tjpQ/ATGeyAxQ==
 
 reason-react@^0.9.1:
   version "0.9.1"

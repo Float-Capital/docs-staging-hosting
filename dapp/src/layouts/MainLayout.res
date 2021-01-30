@@ -24,7 +24,8 @@ module Navigation = {
           {React.string("Github")}
         </a>
         {switch optCurrentUser {
-        | Some(currentUser) => <p> {`logged in as ${currentUser}`->React.string} </p>
+        | Some(currentUser) =>
+          <p> {`logged in as ${currentUser->Ethers.Utils.toString}`->React.string} </p>
         | None =>
           <button
             onClick={_ => {

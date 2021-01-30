@@ -10,9 +10,9 @@ type web3reactContext = {
 
 type rec rootActions =
   | Logout
-  | LoadAddress(Web3.ethAddress, option<Eth.t>)
+  | LoadAddress(Ethers.ethAddress, option<Eth.t>)
 type ethState =
   | Disconnected
-  | Connected(Web3.ethAddress, option<Eth.t>)
+  | Connected(Ethers.ethAddress, option<Eth.t>)
 
 type state = {ethState: ethState}

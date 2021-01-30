@@ -12,7 +12,7 @@ import * as LoyaltyTokenJson from "./abi/loyaltyToken.json";
 
 function getProviderOrSigner(library, account) {
   if (account !== undefined) {
-    return Belt_Option.mapWithDefault(library.providers.getSigner(account), {
+    return Belt_Option.mapWithDefault(library.getSigner(Caml_option.valFromOption(account)), {
                 TAG: 0,
                 _0: library,
                 [Symbol.for("name")]: "Provider"
@@ -39,19 +39,11 @@ function getExchangeContract(stewardAddress, stewardAbi, library, account) {
 }
 
 function getLongShortContractAddress(chainId) {
-  if (chainId !== 5) {
-    if (chainId !== 137) {
-      if (chainId !== 80001) {
-        return "0xba97BeC8d359D73c81D094421803D968A9FBf676";
-      } else {
-        return "0xeb37A6dF956F1997085498aDd98b25a2f633d83F";
-      }
-    } else {
-      return "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
-    }
-  } else {
-    return "0xba97BeC8d359D73c81D094421803D968A9FBf676";
-  }
+  return Ethers$1.utils.getAddress(chainId !== 5 ? (
+                chainId !== 137 ? (
+                    chainId !== 80001 ? "0xba97BeC8d359D73c81D094421803D968A9FBf676" : "0xeb37A6dF956F1997085498aDd98b25a2f633d83F"
+                  ) : "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063"
+              ) : "0xba97BeC8d359D73c81D094421803D968A9FBf676");
 }
 
 function useLongShortContract(param) {
@@ -70,16 +62,14 @@ function useLongShortContract(param) {
             ]);
 }
 
-function useChangePrice(animal) {
+function useChangePrice(_animal) {
   var match = React.useState(function () {
         return /* UnInitialised */0;
       });
   var setTxState = match[1];
   useLongShortContract(undefined);
   return [
-          (function (newPrice) {
-              Ethers$1.utils.parseUnits("0", 0);
-              Ethers$1.utils.parseUnits(newPrice, 0);
+          (function (_newPrice) {
               Curry._1(setTxState, (function (param) {
                       return /* Created */2;
                     }));

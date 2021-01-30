@@ -1,3 +1,16 @@
+type ethAddressStr = string
+type ethAddress
+
+module Misc = {
+  let unsafeToOption: (unit => 'a) => option<'a> = unsafeFunc => {
+    try {
+      unsafeFunc()->Some
+    } catch {
+    | Js.Exn.Error(_obj) => None
+    }
+  }
+}
+
 type txResult = {
   @dead("txResult.blockHash") blockHash: string,
   @dead("txResult.blockNumber") blockNumber: int,
@@ -6,12 +19,12 @@ type txResult = {
   // contractAddress: null,
   // cumulativeGasUsed: Object { _hex: "0x26063", … },
   // events: Array(4) [ {…}, {…}, {…}, … ],
-  @dead("txResult.from") from: Web3.ethAddress,
+  @dead("txResult.from") from: ethAddress,
   // gasUsed: Object { _hex: "0x26063", … },
   // logs: Array(4) [ {…}, {…}, {…}, … ],
   // logsBloom: "0x00200000000000008000000000000000000020000001000000000000400020000000000000002000000000000000000000000002800010000000008000000000000000000000000000000008000000000040000000000000000000000000000000000000020000014000000000000800024000000000000000000010000000000000000000000000000000000000000000008000000000000000000000000200000008000000000000000000000000000000000800000000000000000000000000001002000000000000000000000000000000000000000020000000040020000000000000000080000000000000000000000000000000080000000000200000"
   @dead("txResult.status") status: int,
-  @dead("txResult._to") _to: Web3.ethAddress,
+  @dead("txResult._to") _to: ethAddress,
   transactionHash: string,
   @dead("txResult.transactionIndex") transactionIndex: int,
 }
@@ -25,7 +38,6 @@ type abi
 
 let makeAbi = (abiArray: array<string>): abi => abiArray->Obj.magic
 
-type ethAddress = string
 type ethersBigNumber
 
 module BigNumber = {
@@ -67,15 +79,14 @@ module Providers = {
   @new @module("ethers") @scope("providers")
   external makeProvider: string => Web3.rawProvider = "JsonRpcProvider"
 
-  @send @scope("providers")
-  external getBalance: (t, ethAddress) => JsPromise.t<option<BigNumber.t>> = "getBalance"
-  @send @scope("providers")
+  @send external getBalance: (t, ethAddress) => JsPromise.t<option<BigNumber.t>> = "getBalance"
+  @send
   external getSigner: (t, ethAddress) => option<Wallet.t> = "getSigner"
 }
 
-type providerOrSigner = 
-| Provider(Providers.t)
-| Signer(Wallet.t)
+type providerOrSigner =
+  | Provider(Providers.t)
+  | Signer(Wallet.t)
 
 module Contract = {
   type t
@@ -85,8 +96,37 @@ module Contract = {
   @new @module("ethers")
   external getContractProvider: (ethAddress, abi, Providers.t) => t = "Contract"
 
-  let make: (ethAddress,abi, providerOrSigner)=> t = (address, abi, providerSigner) => {switch providerSigner {
-      | Provider(provider) => getContractProvider(address,abi, provider)
-      | Signer(signer) => getContractSigner(address,abi, signer)
-    } }
+  let make: (ethAddress, abi, providerOrSigner) => t = (address, abi, providerSigner) => {
+    switch providerSigner {
+    | Provider(provider) => getContractProvider(address, abi, provider)
+    | Signer(signer) => getContractSigner(address, abi, signer)
+    }
+  }
+}
+
+module Utils = {
+  type ethUnit = [
+    | #wei
+    | #kwei
+    | #mwei
+    | #gwei
+    | #microether
+    | #milliether
+    | #ether
+    | #kether
+    | #mether
+    | #geher
+    | #tether
+  ]
+  @module("ethers") @scope("utils")
+  external parseEtherUnsafe: string => BigNumber.t = "parseEther"
+  let parseEther = etherString => Misc.unsafeToOption(() => parseEtherUnsafe(etherString))
+
+  @module("ethers") @scope("utils")
+  external getAddressUnsafe: string => ethAddress = "getAddress"
+  let getAddress: string => option<ethAddress> = addressString =>
+    Misc.unsafeToOption(() => getAddressUnsafe(addressString))
+
+  let toString: ethAddress => string = Obj.magic
+  let toLowerString: ethAddress => string = address => address->toString->Js.String.toLowerCase
 }

@@ -3,7 +3,8 @@
 import * as Eth from "./Eth.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as Ethers from "ethers";
+import * as Ethers from "../ethereum/Ethers.js";
+import * as Ethers$1 from "ethers";
 import * as JsPromise from "./Js.Promise/JsPromise.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
@@ -13,7 +14,7 @@ import * as Core from "@web3-react/core";
 var Web3ReactProvider = {};
 
 function getLibrary(provider) {
-  var library = new (Ethers.providers.Web3Provider)(provider);
+  var library = new (Ethers$1.providers.Web3Provider)(provider);
   var setPollingInterval = (lib => {lib.pollingInterval = 8000; return lib; });
   return setPollingInterval(library);
 }
@@ -125,20 +126,27 @@ function RootProvider$RootWithWeb3(Props) {
   React.useEffect((function () {
           var match = context.library;
           var match$1 = context.account;
-          if (match !== undefined && match$1 !== undefined) {
-            JsPromise.$$catch(Caml_option.valFromOption(match).providers.getBalance(match$1).then(function (newBalance) {
-                      return Curry._1(dispatch, {
-                                  _0: match$1,
-                                  _1: Belt_Option.flatMap(newBalance, (function (balance) {
-                                          return Eth.make(balance.toString());
-                                        })),
-                                  [Symbol.for("name")]: "LoadAddress"
-                                });
-                    }), (function (param) {
-                    
-                  }));
+          if (match === undefined) {
             return ;
           }
+          if (match$1 === undefined) {
+            return ;
+          }
+          var account = Caml_option.valFromOption(match$1);
+          var library = Caml_option.valFromOption(match);
+          console.log("1", library);
+          console.log("2", account);
+          JsPromise.$$catch(library.getBalance(account).then(function (newBalance) {
+                    return Curry._1(dispatch, {
+                                _0: account,
+                                _1: Belt_Option.flatMap(newBalance, (function (balance) {
+                                        return Eth.make(balance.toString());
+                                      })),
+                                [Symbol.for("name")]: "LoadAddress"
+                              });
+                  }), (function (param) {
+                  
+                }));
           
         }), [
         context.library,
@@ -160,7 +168,7 @@ function useCurrentUser(param) {
   var match = React.useContext(context);
   var match$1 = match[0].ethState;
   if (match$1) {
-    return match$1._0;
+    return Caml_option.some(match$1._0);
   }
   
 }
@@ -168,7 +176,7 @@ function useCurrentUser(param) {
 function useIsAddressCurrentUser(address) {
   var currentUser = useCurrentUser(undefined);
   if (currentUser !== undefined) {
-    return address.toLowerCase() === currentUser.toLowerCase();
+    return Ethers.Utils.toLowerString(address) === Ethers.Utils.toLowerString(Caml_option.valFromOption(currentUser));
   } else {
     return false;
   }

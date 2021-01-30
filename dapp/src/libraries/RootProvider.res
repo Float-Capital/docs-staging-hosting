@@ -104,6 +104,8 @@ module RootWithWeb3 = {
     React.useEffect4(() =>
       switch (context.library, context.account) {
       | (Some(library), Some(account)) =>
+        Js.log2("1", library)
+        Js.log2("2", account)
         let _ =
           library
           ->Ethers.Providers.getBalance(account)
@@ -111,7 +113,7 @@ module RootWithWeb3 = {
             dispatch(
               LoadAddress(
                 account,
-                newBalance->Option.flatMap(balance => Eth.make(balance->Ethers.BigNumber.toString))
+                newBalance->Option.flatMap(balance => Eth.make(balance->Ethers.BigNumber.toString)),
               ),
             )
           )
@@ -126,7 +128,7 @@ module RootWithWeb3 = {
   }
 }
 
-let useCurrentUser: unit => option<Web3.ethAddress> = () => {
+let useCurrentUser: unit => option<Ethers.ethAddress> = () => {
   let (state, _) = React.useContext(RootContext.context)
   switch state.ethState {
   | Connected(address, _balance) => Some(address)
@@ -134,11 +136,11 @@ let useCurrentUser: unit => option<Web3.ethAddress> = () => {
   }
 }
 
-let useIsAddressCurrentUser: Web3.ethAddress => bool = address => {
+let useIsAddressCurrentUser: Ethers.ethAddress => bool = address => {
   let currentUser = useCurrentUser()
   switch currentUser {
   | Some(currentUserAddress) =>
-    address->Js.String.toLowerCase == currentUserAddress->Js.String.toLowerCase
+    address->Ethers.Utils.toLowerString == currentUserAddress->Ethers.Utils.toLowerString
   | None => false
   }
 }

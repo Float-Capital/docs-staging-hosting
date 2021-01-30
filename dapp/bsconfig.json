@@ -6,15 +6,18 @@
   },
   "refmt": 3,
   "bs-dependencies": [
-    "@rescript/react",
     "@reasonml-community/graphql-ppx",
     "bs-moment",
     "bs-css",
     "bs-css-emotion",
-    "rescript-apollo-client"
+    "reason-react",
+    "rescript-apollo-client",
+    "re-formality",
+    "re-classnames"
   ],
   "ppx-flags": [
-    "@reasonml-community/graphql-ppx/ppx"
+    "@reasonml-community/graphql-ppx/ppx",
+    "re-formality/ppx"
   ],
   "graphql": {
     "apolloMode": true,
