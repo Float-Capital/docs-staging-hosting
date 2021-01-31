@@ -5,10 +5,11 @@ import * as React from "react";
 import * as Config from "../Config.js";
 import * as Ethers from "./Ethers.js";
 import * as Ethers$1 from "ethers";
+import * as Contracts from "./Contracts.js";
+import * as JsPromise from "../libraries/Js.Promise/JsPromise.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as Core from "@web3-react/core";
-import * as LoyaltyTokenJson from "./abi/loyaltyToken.json";
 
 function getProviderOrSigner(library, account) {
   if (account !== undefined) {
@@ -31,8 +32,6 @@ function getProviderOrSigner(library, account) {
           };
   }
 }
-
-var loyaltyTokenAbi = LoyaltyTokenJson.loyaltyToken;
 
 function getExchangeContract(stewardAddress, stewardAbi, library, account) {
   return Ethers.Contract.make(stewardAddress, stewardAbi, getProviderOrSigner(library, account));
@@ -62,18 +61,107 @@ function useLongShortContract(param) {
             ]);
 }
 
+function useTestErc20(tokenAddress) {
+  var context = Core.useWeb3React();
+  return React.useMemo((function () {
+                var library = context.library;
+                if (library !== undefined) {
+                  return Caml_option.some(Contracts.TestErc20.make(tokenAddress, getProviderOrSigner(Caml_option.valFromOption(library), context.account)));
+                }
+                
+              }), [
+              context.library,
+              context.account,
+              tokenAddress
+            ]);
+}
+
+function useProviderOrSigner(param) {
+  var context = Core.useWeb3React();
+  return React.useMemo((function () {
+                var library = context.library;
+                if (library !== undefined) {
+                  return getProviderOrSigner(Caml_option.valFromOption(library), context.account);
+                }
+                
+              }), [
+              context.library,
+              context.account
+            ]);
+}
+
 function useChangePrice(_animal) {
   var match = React.useState(function () {
-        return /* UnInitialised */0;
+        return /* UnInitialised */1;
       });
   var setTxState = match[1];
-  useLongShortContract(undefined);
+  useProviderOrSigner(undefined);
   return [
           (function (_newPrice) {
               Curry._1(setTxState, (function (param) {
-                      return /* Created */2;
+                      return /* Created */3;
                     }));
               
+            }),
+          match[0]
+        ];
+}
+
+function useAdminMint(param) {
+  var match = React.useState(function () {
+        return /* UnInitialised */1;
+      });
+  var setTxState = match[1];
+  var optProviderOrSigner = useProviderOrSigner(undefined);
+  return [
+          (function (recipient, amount, tokenAddress) {
+              console.log(recipient, amount);
+              Curry._1(setTxState, (function (param) {
+                      return /* Created */3;
+                    }));
+              if (optProviderOrSigner !== undefined) {
+                console.log("We have it!!!");
+                var erc20Instance = Contracts.TestErc20.make(tokenAddress, optProviderOrSigner);
+                var mintPromise = erc20Instance.mint(recipient, amount);
+                JsPromise.$$catch(mintPromise, (function (error) {
+                        return Curry._1(setTxState, (function (param) {
+                                      var msg = error.message;
+                                      return {
+                                              TAG: 2,
+                                              _0: msg !== undefined ? ": " + msg : "unknown error",
+                                              [Symbol.for("name")]: "Declined"
+                                            };
+                                    }));
+                      }));
+                JsPromise.$$catch(mintPromise.then(function (tx) {
+                            Curry._1(setTxState, (function (param) {
+                                    return {
+                                            TAG: 1,
+                                            _0: tx.hash,
+                                            [Symbol.for("name")]: "SignedAndSubmitted"
+                                          };
+                                  }));
+                            return tx.wait();
+                          }).then(function (txOutcome) {
+                          console.log(txOutcome);
+                          return Curry._1(setTxState, (function (param) {
+                                        return {
+                                                TAG: 4,
+                                                _0: txOutcome,
+                                                [Symbol.for("name")]: "Complete"
+                                              };
+                                      }));
+                        }), (function (error) {
+                        Curry._1(setTxState, (function (param) {
+                                return /* Failed */5;
+                              }));
+                        console.log(error);
+                        
+                      }));
+              } else {
+                console.log("NOooo :( :( !!!");
+              }
+              return "Result...";
             }),
           match[0]
         ];
@@ -85,13 +173,15 @@ var stewardAddressMumbai = "0x0C00CFE8EbB34fE7C31d4915a43Cde211e9F0F3B";
 
 export {
   getProviderOrSigner ,
-  loyaltyTokenAbi ,
   getExchangeContract ,
   stewardAddressMaticMain ,
   stewardAddressMumbai ,
   getLongShortContractAddress ,
   useLongShortContract ,
+  useTestErc20 ,
+  useProviderOrSigner ,
   useChangePrice ,
+  useAdminMint ,
   
 }
-/* loyaltyTokenAbi Not a pure module */
+/* react Not a pure module */

@@ -9,11 +9,6 @@ let getProviderOrSigner = (library: Ethers.Providers.t, account: option<Ethers.e
   | None => Provider(library)
   }
 
-type txHash = string
-type tx = {
-  hash: txHash,
-  wait: (. unit) => JsPromise.t<txResult>,
-}
 type parsedUnits
 type txOptions = {
   @live gasLimit: option<string>,
@@ -27,14 +22,20 @@ type estimateBuy = {
 }
 type stewardContract = {
   @dead("stewardContract.estimate") estimate: estimateBuy,
-  buy: (. tokenIdString, parsedUnits, parsedUnits, string, txOptions) => JsPromise.t<tx>,
+  buy: (
+    . tokenIdString,
+    parsedUnits,
+    parsedUnits,
+    string,
+    txOptions,
+  ) => JsPromise.t<Ethers.txSubmitted>,
 }
 
 type ethersBnFormat
 @send external ethersBnToString: ethersBnFormat => string = "toString"
 
-@module("./abi/loyaltyToken.json")
-external loyaltyTokenAbi: Ethers.abi = "loyaltyToken"
+// @module("./abi/loyaltyToken.json")
+// external loyaltyTokenAbi: Ethers.abi = "loyaltyToken"
 
 @module("ethers") @scope("utils")
 external parseUnits: (. string, int) => parsedUnits = "parseUnits"
@@ -74,7 +75,37 @@ let useLongShortContract = () => {
   , (context.library, context.account, context.chainId))
 }
 
+let useTestErc20 = tokenAddress => {
+  let context = RootProvider.useWeb3React()
+
+  React.useMemo3(() =>
+    switch context.library {
+    | Some(library) =>
+      Some(
+        Contracts.TestErc20.make(
+          ~address=tokenAddress,
+          ~providerOrSigner=getProviderOrSigner(library, context.account),
+        ),
+      )
+
+    | _ => None
+    }
+  , (context.library, context.account, tokenAddress))
+}
+
+let useProviderOrSigner = () => {
+  let context = RootProvider.useWeb3React()
+
+  React.useMemo2(() =>
+    switch context.library {
+    | Some(library) => Some(getProviderOrSigner(library, context.account))
+    | _ => None
+    }
+  , (context.library, context.account))
+}
+
 type transactionState =
+  | SignerUnavailable
   | UnInitialised
   | DaiPermit(BN.t)
   | SignMetaTx
@@ -92,9 +123,10 @@ type transactionState =
   | Failed
 
 let useChangePrice = _animal => {
+  // TODO: this should return `SignerUnavailable` if the user isn't logged in
   let (txState, setTxState) = React.useState(() => UnInitialised)
 
-  let optLongShortContract = useLongShortContract()
+  let optProviderOrSigner = useProviderOrSigner()
 
   (
     _newPrice => {
@@ -102,7 +134,7 @@ let useChangePrice = _animal => {
       // let newPriceEncoded = parseUnits(. newPrice, 0)
 
       setTxState(_ => Created)
-      switch optLongShortContract {
+      switch optProviderOrSigner {
       | Some(_longShort) => // let updatePricePromise = steward.changePrice(.
         //   animal,
         //   newPriceEncoded,
@@ -114,20 +146,57 @@ let useChangePrice = _animal => {
         // updatePricePromise->Promise.getOk(tx => {
         //   setTxState(_ => SignedAndSubmitted(tx.hash))
         //   let txMinedPromise = tx.wait(.)->Promise.Js.toResult
-        //   txMinedPromise->Promise.getOk(txOutcome => {
-        //     Js.log(txOutcome)
-        //     setTxState(_ => Complete(txOutcome))
-        //   })
-        //   txMinedPromise->Promise.getError(error => {
-        //     setTxState(_ => Failed)
-        //     Js.log(error)
-        //   })
+
         //   ()
         // })
         // updatePricePromise->Promise.getError(error => setTxState(_ => Declined(error.message)))
         ()
       | None => ()
       }
+    },
+    txState,
+  )
+}
+
+let useAdminMint = () => {
+  let (txState, setTxState) = React.useState(() => UnInitialised)
+
+  let optProviderOrSigner = useProviderOrSigner()
+  (
+    (~recipient, ~amount, ~tokenAddress) => {
+      Js.log2(recipient, amount)
+      setTxState(_ => Created)
+      switch optProviderOrSigner {
+      | Some(providerOrSigner) =>
+        Js.log("We have it!!!")
+        let erc20Instance = Contracts.TestErc20.make(~address=tokenAddress, ~providerOrSigner)
+        let mintPromise = erc20Instance->Contracts.TestErc20.mint(recipient, amount)
+        let _ = mintPromise->JsPromise.catch(error => {
+          setTxState(_ => Declined(
+            switch Js.Exn.message(error->Obj.magic) {
+            | Some(msg) => ": " ++ msg
+            | None => "unknown error"
+            },
+          ))->Obj.magic
+        })
+
+        let _ = mintPromise
+        ->JsPromise.then(tx => {
+          setTxState(_ => SignedAndSubmitted(tx.hash))
+          tx.wait(.)
+        })
+        ->JsPromise.map(txOutcome => {
+          Js.log(txOutcome)
+          setTxState(_ => Complete(txOutcome))
+        })
+        ->JsPromise.catch(error => {
+          setTxState(_ => Failed)
+          Js.log(error)
+        })
+
+      | None => Js.log("NOooo :( :( !!!")
+      }
+      "Result..."
     },
     txState,
   )

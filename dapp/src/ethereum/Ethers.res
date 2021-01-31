@@ -28,6 +28,11 @@ type txResult = {
   transactionHash: string,
   @dead("txResult.transactionIndex") transactionIndex: int,
 }
+type txHash = string
+type txSubmitted = {
+  hash: txHash,
+  wait: (. unit) => JsPromise.t<txResult>,
+}
 type txError = {
   @dead("txError.code") code: int, // -32000 = always failing tx ;  4001 = Rejected by signer.
   message: string,
@@ -91,6 +96,16 @@ type providerOrSigner =
 module Contract = {
   type t
 
+  type txOptions = {
+    @live gasLimit: option<string>,
+    @live value: BigNumber.t,
+  }
+
+  type tx = {
+    hash: txHash,
+    wait: (. unit) => JsPromise.t<txResult>,
+  }
+
   @new @module("ethers")
   external getContractSigner: (ethAddress, abi, Wallet.t) => t = "Contract"
   @new @module("ethers")
@@ -119,8 +134,10 @@ module Utils = {
     | #tether
   ]
   @module("ethers") @scope("utils")
-  external parseEtherUnsafe: string => BigNumber.t = "parseEther"
-  let parseEther = etherString => Misc.unsafeToOption(() => parseEtherUnsafe(etherString))
+  external parseUnitsUnsafe: (. string, ethUnit) => BigNumber.t = "parseUnits"
+  let parseUnits = (~amount, ~unit) => Misc.unsafeToOption(() => parseUnitsUnsafe(. amount, unit))
+
+  let parseEther = (~amount) => parseUnits(~amount, ~unit=#ether)
 
   @module("ethers") @scope("utils")
   external getAddressUnsafe: string => ethAddress = "getAddress"

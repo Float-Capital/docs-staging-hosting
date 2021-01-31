@@ -41,10 +41,14 @@ var Contract = {
   make: make
 };
 
-function parseEther(etherString) {
+function parseUnits(amount, unit) {
   return unsafeToOption(function (param) {
-              return Ethers.utils.parseEther(etherString);
+              return Ethers.utils.parseUnits(amount, unit);
             });
+}
+
+function parseEther(amount) {
+  return parseUnits(amount, "ether");
 }
 
 function getAddress(addressString) {
@@ -62,6 +66,7 @@ function toLowerString(address) {
 }
 
 var Utils = {
+  parseUnits: parseUnits,
   parseEther: parseEther,
   getAddress: getAddress,
   toString: toString,

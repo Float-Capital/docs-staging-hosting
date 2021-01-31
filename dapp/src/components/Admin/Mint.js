@@ -5,10 +5,75 @@ import * as Form from "./Form.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Ethers from "../../ethereum/Ethers.js";
+import * as Belt_Int from "bs-platform/lib/es6/belt_Int.js";
 import * as Formality from "re-formality/src/Formality.js";
+import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as Pervasives from "bs-platform/lib/es6/pervasives.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as ContractActions from "../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
+
+var contracts = {
+  "5": [
+    {
+      name: "aDai",
+      address: "0x54Dd8F08aF3822c9620d548773CBB9b165bbDE3D"
+    },
+    {
+      name: "Dai",
+      address: "0x03a733Bfa29eB0D74DE0Dfd33CCA425E0d8c3867"
+    },
+    {
+      name: "LongCoins",
+      address: "0x9cBf6D1cc2cb7d1C1d6062C0C6d6AF6CcFeD7106"
+    },
+    {
+      name: "ShortCoins",
+      address: "0x2B9b35a48A013c441f9E6fC3DE133312a1931d20"
+    }
+  ],
+  "97": [
+    {
+      name: "aDai",
+      address: "0x638DEcc5DA992265d799857DE68Ac2F3958a5Ce9"
+    },
+    {
+      name: "Dai",
+      address: "0x3264369236B39dc8Db9CFAc7360DA0c053F6b6C4"
+    },
+    {
+      name: "LongCoins",
+      address: "0x119dd3bFe097c25129AD23D625F0092856DFfEa6"
+    },
+    {
+      name: "ShortCoins",
+      address: "0x76a39Eb4a28CB003b78f5C73141f162b4eF6C722"
+    }
+  ]
+};
+
+var validators_tokenAddress = {
+  strategy: /* OnFirstBlur */0,
+  validate: (function (param) {
+      var validAddress = Ethers.Utils.getAddress(Belt_Option.mapWithDefault(param.tokenAddress, "", (function (details) {
+                  return details.address;
+                })));
+      if (validAddress !== undefined) {
+        return {
+                TAG: 0,
+                _0: Caml_option.valFromOption(validAddress),
+                [Symbol.for("name")]: "Ok"
+              };
+      } else {
+        return {
+                TAG: 1,
+                _0: "Address is invalid",
+                [Symbol.for("name")]: "Error"
+              };
+      }
+    })
+};
 
 var validators_amount = {
   strategy: /* OnFirstBlur */0,
@@ -64,14 +129,14 @@ var validators_address = {
 };
 
 var validators = {
-  rememberMe: undefined,
+  tokenAddress: validators_tokenAddress,
   amount: validators_amount,
   address: validators_address
 };
 
 function initialFieldsStatuses(_input) {
   return {
-          rememberMe: /* Pristine */0,
+          tokenAddress: /* Pristine */0,
           amount: /* Pristine */0,
           address: /* Pristine */0
         };
@@ -81,7 +146,7 @@ function initialState(input) {
   return {
           input: input,
           fieldsStatuses: {
-            rememberMe: /* Pristine */0,
+            tokenAddress: /* Pristine */0,
             amount: /* Pristine */0,
             address: /* Pristine */0
           },
@@ -92,18 +157,15 @@ function initialState(input) {
 }
 
 function validateForm(input, validators, fieldsStatuses) {
-  var match_0 = {
-    TAG: 0,
-    _0: input.rememberMe,
-    [Symbol.for("name")]: "Ok"
-  };
-  var match = fieldsStatuses.amount;
-  var match_0$1 = match ? match._0 : Curry._1(validators.amount.validate, input);
-  var match$1 = fieldsStatuses.address;
-  var match_0$2 = match$1 ? match$1._0 : Curry._1(validators.address.validate, input);
-  var rememberMeResult = match_0;
-  var rememberMeResult$1;
-  if (rememberMeResult.TAG === /* Ok */0) {
+  var match = fieldsStatuses.tokenAddress;
+  var match_0 = match ? match._0 : Curry._1(validators.tokenAddress.validate, input);
+  var match$1 = fieldsStatuses.amount;
+  var match_0$1 = match$1 ? match$1._0 : Curry._1(validators.amount.validate, input);
+  var match$2 = fieldsStatuses.address;
+  var match_0$2 = match$2 ? match$2._0 : Curry._1(validators.address.validate, input);
+  var tokenAddressResult = match_0;
+  var tokenAddressResult$1;
+  if (tokenAddressResult.TAG === /* Ok */0) {
     var amountResult = match_0$1;
     if (amountResult.TAG === /* Ok */0) {
       var addressResult = match_0$2;
@@ -113,12 +175,12 @@ function validateForm(input, validators, fieldsStatuses) {
                 output: {
                   address: addressResult._0,
                   amount: amountResult._0,
-                  rememberMe: rememberMeResult._0
+                  tokenAddress: tokenAddressResult._0
                 },
                 fieldsStatuses: {
-                  rememberMe: {
-                    _0: rememberMeResult,
-                    _1: /* Hidden */1,
+                  tokenAddress: {
+                    _0: tokenAddressResult,
+                    _1: /* Shown */0,
                     [Symbol.for("name")]: "Dirty"
                   },
                   amount: {
@@ -136,19 +198,19 @@ function validateForm(input, validators, fieldsStatuses) {
                 [Symbol.for("name")]: "Valid"
               };
       }
-      rememberMeResult$1 = rememberMeResult;
+      tokenAddressResult$1 = tokenAddressResult;
     } else {
-      rememberMeResult$1 = rememberMeResult;
+      tokenAddressResult$1 = tokenAddressResult;
     }
   } else {
-    rememberMeResult$1 = rememberMeResult;
+    tokenAddressResult$1 = tokenAddressResult;
   }
   return {
           TAG: 1,
           fieldsStatuses: {
-            rememberMe: {
-              _0: rememberMeResult$1,
-              _1: /* Hidden */1,
+            tokenAddress: {
+              _0: tokenAddressResult$1,
+              _1: /* Shown */0,
               [Symbol.for("name")]: "Dirty"
             },
             amount: {
@@ -174,11 +236,11 @@ function useForm(initialInput, onSubmit) {
   var match = Formality__ReactUpdate.useReducer(memoizedInitialState, (function (state, action) {
           if (typeof action === "number") {
             switch (action) {
-              case /* BlurRememberMeField */0 :
-                  var result = Formality.validateFieldOnBlurWithoutValidator(state.input.rememberMe, state.fieldsStatuses.rememberMe, (function (status) {
+              case /* BlurTokenAddressField */0 :
+                  var result = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.tokenAddress, validators_tokenAddress, (function (status) {
                           var init = state.fieldsStatuses;
                           return {
-                                  rememberMe: status,
+                                  tokenAddress: status,
                                   amount: init.amount,
                                   address: init.address
                                 };
@@ -202,7 +264,7 @@ function useForm(initialInput, onSubmit) {
                   var result$1 = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.amount, validators_amount, (function (status) {
                           var init = state.fieldsStatuses;
                           return {
-                                  rememberMe: init.rememberMe,
+                                  tokenAddress: init.tokenAddress,
                                   amount: status,
                                   address: init.address
                                 };
@@ -226,7 +288,7 @@ function useForm(initialInput, onSubmit) {
                   var result$2 = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.address, validators_address, (function (status) {
                           var init = state.fieldsStatuses;
                           return {
-                                  rememberMe: init.rememberMe,
+                                  tokenAddress: init.tokenAddress,
                                   amount: init.amount,
                                   address: status
                                 };
@@ -358,16 +420,16 @@ function useForm(initialInput, onSubmit) {
             }
           } else {
             switch (action.TAG | 0) {
-              case /* UpdateRememberMeField */0 :
+              case /* UpdateTokenAddressField */0 :
                   var nextInput = Curry._1(action._0, state.input);
                   return {
                           TAG: 0,
                           _0: {
                             input: nextInput,
-                            fieldsStatuses: Formality.validateFieldOnChangeWithoutValidator(nextInput.rememberMe, (function (status) {
+                            fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput, state.fieldsStatuses.tokenAddress, state.submissionStatus, validators_tokenAddress, (function (status) {
                                     var init = state.fieldsStatuses;
                                     return {
-                                            rememberMe: status,
+                                            tokenAddress: status,
                                             amount: init.amount,
                                             address: init.address
                                           };
@@ -387,7 +449,7 @@ function useForm(initialInput, onSubmit) {
                             fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput$1, state.fieldsStatuses.amount, state.submissionStatus, validators_amount, (function (status) {
                                     var init = state.fieldsStatuses;
                                     return {
-                                            rememberMe: init.rememberMe,
+                                            tokenAddress: init.tokenAddress,
                                             amount: status,
                                             address: init.address
                                           };
@@ -407,7 +469,7 @@ function useForm(initialInput, onSubmit) {
                             fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput$2, state.fieldsStatuses.address, state.submissionStatus, validators_address, (function (status) {
                                     var init = state.fieldsStatuses;
                                     return {
-                                            rememberMe: init.rememberMe,
+                                            tokenAddress: init.tokenAddress,
                                             amount: init.amount,
                                             address: status
                                           };
@@ -426,7 +488,7 @@ function useForm(initialInput, onSubmit) {
                             _0: {
                               input: input,
                               fieldsStatuses: {
-                                rememberMe: /* Pristine */0,
+                                tokenAddress: /* Pristine */0,
                                 amount: /* Pristine */0,
                                 address: /* Pristine */0
                               },
@@ -442,7 +504,7 @@ function useForm(initialInput, onSubmit) {
                             _0: {
                               input: state.input,
                               fieldsStatuses: {
-                                rememberMe: /* Pristine */0,
+                                tokenAddress: /* Pristine */0,
                                 amount: /* Pristine */0,
                                 address: /* Pristine */0
                               },
@@ -522,13 +584,13 @@ function useForm(initialInput, onSubmit) {
   var tmp;
   tmp = typeof match$1 === "number" || match$1.TAG !== /* Submitting */0 ? false : true;
   return {
-          updateRememberMe: (function (nextInputFn, nextValue) {
+          updateTokenAddress: (function (nextInputFn, nextValue) {
               return Curry._1(dispatch, {
                           TAG: 0,
                           _0: (function (__x) {
                               return Curry._2(nextInputFn, __x, nextValue);
                             }),
-                          [Symbol.for("name")]: "UpdateRememberMeField"
+                          [Symbol.for("name")]: "UpdateTokenAddressField"
                         });
             }),
           updateAmount: (function (nextInputFn, nextValue) {
@@ -549,8 +611,8 @@ function useForm(initialInput, onSubmit) {
                           [Symbol.for("name")]: "UpdateAddressField"
                         });
             }),
-          blurRememberMe: (function (param) {
-              return Curry._1(dispatch, /* BlurRememberMeField */0);
+          blurTokenAddress: (function (param) {
+              return Curry._1(dispatch, /* BlurTokenAddressField */0);
             }),
           blurAmount: (function (param) {
               return Curry._1(dispatch, /* BlurAmountField */1);
@@ -558,14 +620,14 @@ function useForm(initialInput, onSubmit) {
           blurAddress: (function (param) {
               return Curry._1(dispatch, /* BlurAddressField */2);
             }),
-          rememberMeResult: Formality.exposeFieldResult(state.fieldsStatuses.rememberMe),
+          tokenAddressResult: Formality.exposeFieldResult(state.fieldsStatuses.tokenAddress),
           amountResult: Formality.exposeFieldResult(state.fieldsStatuses.amount),
           addressResult: Formality.exposeFieldResult(state.fieldsStatuses.address),
           input: state.input,
           status: state.formStatus,
           dirty: (function (param) {
               var match = state.fieldsStatuses;
-              if (match.rememberMe || match.amount || match.address) {
+              if (match.tokenAddress || match.amount || match.address) {
                 return true;
               } else {
                 return false;
@@ -612,14 +674,17 @@ var LoginForm = {
 };
 
 var initialInput = {
-  address: "",
+  address: "0x738edd7F6a625C02030DbFca84885b4De5252903",
   amount: "",
-  rememberMe: false
+  tokenAddress: undefined
 };
 
 function Mint(Props) {
-  var form = useForm(initialInput, (function (output, form) {
-          console.log("Submitted with:", output);
+  var match = ContractActions.useAdminMint(undefined);
+  var mintTx = match[0];
+  var form = useForm(initialInput, (function (param, form) {
+          console.log("Submitted with... ", Pervasives.output);
+          console.log(Curry._3(mintTx, param.address, param.amount, param.tokenAddress), "other...");
           setTimeout((function (param) {
                   Curry._1(form.notifyOnSuccess, undefined);
                   setTimeout(form.reset, 3000);
@@ -627,36 +692,9 @@ function Mint(Props) {
                 }), 500);
           
         }));
-  var match = form.addressResult;
+  var match$1 = form.addressResult;
   var tmp;
-  tmp = match !== undefined ? (
-      match.TAG === /* Ok */0 ? React.createElement("div", {
-              className: Cn.fromList({
-                    hd: "form-message",
-                    tl: {
-                      hd: "form-message-for-field",
-                      tl: {
-                        hd: "success",
-                        tl: /* [] */0
-                      }
-                    }
-                  })
-            }, "✓") : React.createElement("div", {
-              className: Cn.fromList({
-                    hd: "form-message",
-                    tl: {
-                      hd: "form-message-for-field",
-                      tl: {
-                        hd: "failure",
-                        tl: /* [] */0
-                      }
-                    }
-                  })
-            }, match._0)
-    ) : null;
-  var match$1 = form.amountResult;
-  var tmp$1;
-  tmp$1 = match$1 !== undefined ? (
+  tmp = match$1 !== undefined ? (
       match$1.TAG === /* Ok */0 ? React.createElement("div", {
               className: Cn.fromList({
                     hd: "form-message",
@@ -681,10 +719,68 @@ function Mint(Props) {
                   })
             }, match$1._0)
     ) : null;
-  var match$2 = form.status;
+  var match$2 = form.amountResult;
+  var tmp$1;
+  tmp$1 = match$2 !== undefined ? (
+      match$2.TAG === /* Ok */0 ? React.createElement("div", {
+              className: Cn.fromList({
+                    hd: "form-message",
+                    tl: {
+                      hd: "form-message-for-field",
+                      tl: {
+                        hd: "success",
+                        tl: /* [] */0
+                      }
+                    }
+                  })
+            }, "✓") : React.createElement("div", {
+              className: Cn.fromList({
+                    hd: "form-message",
+                    tl: {
+                      hd: "form-message-for-field",
+                      tl: {
+                        hd: "failure",
+                        tl: /* [] */0
+                      }
+                    }
+                  })
+            }, match$2._0)
+    ) : null;
+  var match$3 = form.input.tokenAddress;
+  var match$4 = form.tokenAddressResult;
+  var tmp$2;
+  tmp$2 = match$4 !== undefined ? (
+      match$4.TAG === /* Ok */0 ? React.createElement("div", {
+              className: Cn.fromList({
+                    hd: "form-message",
+                    tl: {
+                      hd: "form-message-for-field",
+                      tl: {
+                        hd: "success",
+                        tl: /* [] */0
+                      }
+                    }
+                  })
+            }, "✓") : React.createElement("div", {
+              className: Cn.fromList({
+                    hd: "form-message",
+                    tl: {
+                      hd: "form-message-for-field",
+                      tl: {
+                        hd: "failure",
+                        tl: /* [] */0
+                      }
+                    }
+                  })
+            }, match$4._0)
+    ) : null;
+  var match$5 = form.status;
   return React.createElement(Form.make, {
               className: "form",
-              onSubmit: form.submit,
+              onSubmit: (function (param) {
+                  console.log("temp");
+                  return Curry._1(form.submit, undefined);
+                }),
               children: null
             }, React.createElement("div", {
                   className: "form-messages-area form-messages-area-lg"
@@ -710,7 +806,7 @@ function Mint(Props) {
                                             return {
                                                     address: value,
                                                     amount: input.amount,
-                                                    rememberMe: input.rememberMe
+                                                    tokenAddress: input.tokenAddress
                                                   };
                                           }), $$event.target.value);
                             })
@@ -732,33 +828,38 @@ function Mint(Props) {
                                             return {
                                                     address: input.address,
                                                     amount: value,
-                                                    rememberMe: input.rememberMe
+                                                    tokenAddress: input.tokenAddress
                                                   };
                                           }), $$event.target.value);
                             })
                         }), tmp$1), React.createElement("div", {
                       className: "form-row"
-                    }, React.createElement("input", {
+                    }, React.createElement("label", {
+                          htmlFor: "contractToMinFor"
+                        }, "Contract to mint for:"), React.createElement("select", {
                           className: "push-lg",
-                          id: "login--remember",
-                          checked: form.input.rememberMe,
+                          id: "contractToMinFor",
                           disabled: form.submitting,
-                          type: "checkbox",
+                          name: "contractToMinFor",
                           onBlur: (function (param) {
-                              return Curry._1(form.blurRememberMe, undefined);
+                              return Curry._1(form.blurTokenAddress, undefined);
                             }),
                           onChange: (function ($$event) {
-                              return Curry._2(form.updateRememberMe, (function (input, value) {
+                              return Curry._2(form.updateTokenAddress, (function (input, value) {
                                             return {
                                                     address: input.address,
                                                     amount: input.amount,
-                                                    rememberMe: value
+                                                    tokenAddress: value
                                                   };
-                                          }), $$event.target.checked);
+                                          }), Belt_Array.get(contracts[5], Belt_Option.getWithDefault(Belt_Int.fromString($$event.target.value), 0)));
                             })
-                        }), React.createElement("label", {
-                          htmlFor: "login--remember"
-                        }, "Remember me")), React.createElement("div", {
+                        }, match$3 !== undefined ? null : React.createElement("option", {
+                                value: "999"
+                              }, "Select a token"), Belt_Array.mapWithIndex(contracts[5], (function (i, contract) {
+                                return React.createElement("option", {
+                                            value: String(i)
+                                          }, contract.name);
+                              }))), tmp$2), React.createElement("div", {
                       className: "form-row"
                     }, React.createElement("button", {
                           className: Cn.fromList({
@@ -769,7 +870,7 @@ function Mint(Props) {
                                 }
                               }),
                           disabled: form.submitting
-                        }, form.submitting ? "Submitting..." : "Submit"), typeof match$2 === "number" && match$2 !== 0 ? React.createElement("div", {
+                        }, form.submitting ? "Submitting..." : "Submit"), typeof match$5 === "number" && match$5 !== 0 ? React.createElement("div", {
                             className: Cn.fromList({
                                   hd: "form-status",
                                   tl: {
@@ -783,6 +884,7 @@ function Mint(Props) {
 var make = Mint;
 
 export {
+  contracts ,
   LoginForm ,
   initialInput ,
   make ,
