@@ -10,6 +10,6 @@ graph-test:
 setup-binance-test-graph:
 	docker-compose -f docker-compose.binance-test.yaml up -d
 	yarn codegen
-	sleep 5
+	sleep 15
 	yarn create-local
 	yarn deploy-local-binance
