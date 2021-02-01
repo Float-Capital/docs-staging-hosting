@@ -97,126 +97,130 @@ let initialInput: LoginForm.input = {
 
 @react.component
 let make = () => {
-  let (mintTx, _txState) = ContractActions.useAdminMint()
-  let form = LoginForm.useForm(~initialInput, ~onSubmit=({address, amount, tokenAddress}, form) => {
+  let (mintTx, txState) = ContractActions.useAdminMint()
+  let form = LoginForm.useForm(~initialInput, ~onSubmit=(
+    {address, amount, tokenAddress},
+    _form,
+  ) => {
     Js.log2("Submitted with... ", output)
     mintTx(~recipient=address, ~amount, ~tokenAddress)->Js.log2("other...")
 
-    Js.Global.setTimeout(() => {
-      form.notifyOnSuccess(None)
-      form.reset->Js.Global.setTimeout(3000)->ignore
-    }, 500)->ignore
+    // Js.Global.setTimeout(() => {
+    //   form.notifyOnSuccess(None)
+    //   form.reset->Js.Global.setTimeout(3000)->ignore
+    // }, 500)->ignore
   })
-
-  <Form
-    className="form"
-    onSubmit={() => {
-      Js.log("temp")
-      form.submit()
-    }}>
-    <div className="form-messages-area form-messages-area-lg" />
-    <div className="form-content">
-      <h2 className="push-lg"> {"Login"->React.string} </h2>
-      <div className="form-row">
-        <label htmlFor="login--address" className="label-lg"> {"Address"->React.string} </label>
-        <input
-          id="login--address"
-          type_="text"
-          value=form.input.address
-          disabled=form.submitting
-          onBlur={_ => form.blurAddress()}
-          onChange={event =>
-            form.updateAddress(
-              (input, value) => {...input, address: value},
-              (event->ReactEvent.Form.target)["value"],
-            )}
-        />
-        {switch form.addressResult {
-        | Some(Error(message)) =>
-          <div className={Cn.fromList(list{"form-message", "form-message-for-field", "failure"})}>
-            {message->React.string}
-          </div>
-        | Some(Ok(_)) =>
-          <div className={Cn.fromList(list{"form-message", "form-message-for-field", "success"})}>
-            {j`✓`->React.string}
-          </div>
-        | None => React.null
-        }}
-      </div>
-      <div className="form-row">
-        <label htmlFor="login--amount" className="label-lg"> {"Amount"->React.string} </label>
-        <input
-          id="login--amount"
-          type_="text"
-          value=form.input.amount
-          disabled=form.submitting
-          onBlur={_ => form.blurAmount()}
-          onChange={event =>
-            form.updateAmount(
-              (input, value) => {...input, amount: value},
-              (event->ReactEvent.Form.target)["value"],
-            )}
-        />
-        {switch form.amountResult {
-        | Some(Error(message)) =>
-          <div className={Cn.fromList(list{"form-message", "form-message-for-field", "failure"})}>
-            {message->React.string}
-          </div>
-        | Some(Ok(_)) =>
-          <div className={Cn.fromList(list{"form-message", "form-message-for-field", "success"})}>
-            {j`✓`->React.string}
-          </div>
-        | None => React.null
-        }}
-      </div>
-      <div className="form-row">
-        <label htmlFor="contractToMinFor"> {"Contract to mint for:"->React.string} </label>
-        <select
-          name="contractToMinFor"
-          id="contractToMinFor"
-          disabled=form.submitting
-          className="push-lg"
-          onBlur={_ => form.blurTokenAddress()}
-          onChange={event => form.updateTokenAddress((input, value) => {
-              ...input,
-              tokenAddress: value,
-            }, contracts["5"][
-              (event->ReactEvent.Form.target)["value"]->Int.fromString->Option.getWithDefault(0)
-            ])}>
-          {switch form.input.tokenAddress {
-          | Some(_) => React.null
-          | None => <option value="999"> {"Select a token"->React.string} </option>
+  <TxTemplate txState>
+    <Form
+      className="form"
+      onSubmit={() => {
+        Js.log("temp")
+        form.submit()
+      }}>
+      <div className="form-messages-area form-messages-area-lg" />
+      <div className="form-content">
+        <h2 className="push-lg"> {"Login"->React.string} </h2>
+        <div className="form-row">
+          <label htmlFor="login--address" className="label-lg"> {"Address"->React.string} </label>
+          <input
+            id="login--address"
+            type_="text"
+            value=form.input.address
+            disabled=form.submitting
+            onBlur={_ => form.blurAddress()}
+            onChange={event =>
+              form.updateAddress(
+                (input, value) => {...input, address: value},
+                (event->ReactEvent.Form.target)["value"],
+              )}
+          />
+          {switch form.addressResult {
+          | Some(Error(message)) =>
+            <div className={Cn.fromList(list{"form-message", "form-message-for-field", "failure"})}>
+              {message->React.string}
+            </div>
+          | Some(Ok(_)) =>
+            <div className={Cn.fromList(list{"form-message", "form-message-for-field", "success"})}>
+              {j`✓`->React.string}
+            </div>
+          | None => React.null
           }}
-          {contracts["5"]
-          ->Array.mapWithIndex((i, contract) =>
-            <option value={i->Int.toString}> {contract["name"]->React.string} </option>
-          )
-          ->React.array}
-        </select>
-        {switch form.tokenAddressResult {
-        | Some(Error(message)) =>
-          <div className={Cn.fromList(list{"form-message", "form-message-for-field", "failure"})}>
-            {message->React.string}
-          </div>
-        | Some(Ok(_)) =>
-          <div className={Cn.fromList(list{"form-message", "form-message-for-field", "success"})}>
-            {j`✓`->React.string}
-          </div>
-        | None => React.null
-        }}
+        </div>
+        <div className="form-row">
+          <label htmlFor="login--amount" className="label-lg"> {"Amount"->React.string} </label>
+          <input
+            id="login--amount"
+            type_="text"
+            value=form.input.amount
+            disabled=form.submitting
+            onBlur={_ => form.blurAmount()}
+            onChange={event =>
+              form.updateAmount(
+                (input, value) => {...input, amount: value},
+                (event->ReactEvent.Form.target)["value"],
+              )}
+          />
+          {switch form.amountResult {
+          | Some(Error(message)) =>
+            <div className={Cn.fromList(list{"form-message", "form-message-for-field", "failure"})}>
+              {message->React.string}
+            </div>
+          | Some(Ok(_)) =>
+            <div className={Cn.fromList(list{"form-message", "form-message-for-field", "success"})}>
+              {j`✓`->React.string}
+            </div>
+          | None => React.null
+          }}
+        </div>
+        <div className="form-row">
+          <label htmlFor="contractToMinFor"> {"Contract to mint for:"->React.string} </label>
+          <select
+            name="contractToMinFor"
+            id="contractToMinFor"
+            disabled=form.submitting
+            className="push-lg"
+            onBlur={_ => form.blurTokenAddress()}
+            onChange={event => form.updateTokenAddress((input, value) => {
+                ...input,
+                tokenAddress: value,
+              }, contracts["5"][
+                (event->ReactEvent.Form.target)["value"]->Int.fromString->Option.getWithDefault(0)
+              ])}>
+            {switch form.input.tokenAddress {
+            | Some(_) => React.null
+            | None => <option value="999"> {"Select a token"->React.string} </option>
+            }}
+            {contracts["5"]
+            ->Array.mapWithIndex((i, contract) =>
+              <option value={i->Int.toString}> {contract["name"]->React.string} </option>
+            )
+            ->React.array}
+          </select>
+          {switch form.tokenAddressResult {
+          | Some(Error(message)) =>
+            <div className={Cn.fromList(list{"form-message", "form-message-for-field", "failure"})}>
+              {message->React.string}
+            </div>
+          | Some(Ok(_)) =>
+            <div className={Cn.fromList(list{"form-message", "form-message-for-field", "success"})}>
+              {j`✓`->React.string}
+            </div>
+          | None => React.null
+          }}
+        </div>
+        <div className="form-row">
+          <button className={Cn.fromList(list{"primary", "push-lg"})} disabled=form.submitting>
+            {(form.submitting ? "Submitting..." : "Submit")->React.string}
+          </button>
+          {switch form.status {
+          | Submitted =>
+            <div className={Cn.fromList(list{"form-status", "success"})}>
+              {j`✓ Logged In`->React.string}
+            </div>
+          | _ => React.null
+          }}
+        </div>
       </div>
-      <div className="form-row">
-        <button className={Cn.fromList(list{"primary", "push-lg"})} disabled=form.submitting>
-          {(form.submitting ? "Submitting..." : "Submit")->React.string}
-        </button>
-        {switch form.status {
-        | Submitted =>
-          <div className={Cn.fromList(list{"form-status", "success"})}>
-            {j`✓ Logged In`->React.string}
-          </div>
-        | _ => React.null
-        }}
-      </div>
-    </div>
-  </Form>
+    </Form>
+  </TxTemplate>
 }

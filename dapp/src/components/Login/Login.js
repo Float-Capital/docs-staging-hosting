@@ -23,7 +23,10 @@ function Login(Props) {
             router.push(nextPath);
           }
           
-        }), [nextPath]);
+        }), [
+        nextPath,
+        optCurrentUser
+      ]);
   return React.createElement("div", undefined, React.createElement("p", undefined, "Use one of the wallet providers below. ", React.createElement("small", undefined, "(Not sure where to go from here? ", React.createElement("a", {
                           href: "https://google.com",
                           rel: "noopener noreferrer",

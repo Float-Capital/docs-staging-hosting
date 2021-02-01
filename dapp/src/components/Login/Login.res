@@ -21,13 +21,13 @@ let make = () => {
   let nextPath = router.query->Js.Dict.get("nextPath")
   let optCurrentUser = RootProvider.useCurrentUser()
 
-  React.useEffect1(() => {
+  React.useEffect2(() => {
     switch (nextPath, optCurrentUser) {
     | (Some(nextPath), Some(_currentUser)) => router->Next.Router.push(nextPath)
     | _ => ()
     }
     None
-  }, [nextPath])
+  }, (nextPath, optCurrentUser))
 
   <div>
     <p>

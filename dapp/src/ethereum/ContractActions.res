@@ -105,12 +105,12 @@ let useProviderOrSigner = () => {
 }
 
 type transactionState =
-  | SignerUnavailable
+  // | SignerUnavailable
   | UnInitialised
-  | DaiPermit(BN.t)
-  | SignMetaTx
+  // | DaiPermit(BN.t)
+  // | SignMetaTx
   | Created
-  | SubmittedMetaTx
+  // | SubmittedMetaTx
   | SignedAndSubmitted(txHash)
   // TODO: get the error message when it is declined.
   //      4001 - means the transaction was declined by the signer
@@ -118,7 +118,7 @@ type transactionState =
   | Declined(string)
   // | DaiPermitDclined(string)
   // | SignMetaTxDclined(string)
-  | ServerError(string)
+  // | ServerError(string)
   | Complete(txResult)
   | Failed
 

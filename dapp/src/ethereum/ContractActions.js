@@ -92,14 +92,14 @@ function useProviderOrSigner(param) {
 
 function useChangePrice(_animal) {
   var match = React.useState(function () {
-        return /* UnInitialised */1;
+        return /* UnInitialised */0;
       });
   var setTxState = match[1];
   useProviderOrSigner(undefined);
   return [
           (function (_newPrice) {
               Curry._1(setTxState, (function (param) {
-                      return /* Created */3;
+                      return /* Created */1;
                     }));
               
             }),
@@ -109,7 +109,7 @@ function useChangePrice(_animal) {
 
 function useAdminMint(param) {
   var match = React.useState(function () {
-        return /* UnInitialised */1;
+        return /* UnInitialised */0;
       });
   var setTxState = match[1];
   var optProviderOrSigner = useProviderOrSigner(undefined);
@@ -117,7 +117,7 @@ function useAdminMint(param) {
           (function (recipient, amount, tokenAddress) {
               console.log(recipient, amount);
               Curry._1(setTxState, (function (param) {
-                      return /* Created */3;
+                      return /* Created */1;
                     }));
               if (optProviderOrSigner !== undefined) {
                 console.log("We have it!!!");
@@ -127,7 +127,7 @@ function useAdminMint(param) {
                         return Curry._1(setTxState, (function (param) {
                                       var msg = error.message;
                                       return {
-                                              TAG: 2,
+                                              TAG: 1,
                                               _0: msg !== undefined ? ": " + msg : "unknown error",
                                               [Symbol.for("name")]: "Declined"
                                             };
@@ -136,7 +136,7 @@ function useAdminMint(param) {
                 JsPromise.$$catch(mintPromise.then(function (tx) {
                             Curry._1(setTxState, (function (param) {
                                     return {
-                                            TAG: 1,
+                                            TAG: 0,
                                             _0: tx.hash,
                                             [Symbol.for("name")]: "SignedAndSubmitted"
                                           };
@@ -146,14 +146,14 @@ function useAdminMint(param) {
                           console.log(txOutcome);
                           return Curry._1(setTxState, (function (param) {
                                         return {
-                                                TAG: 4,
+                                                TAG: 2,
                                                 _0: txOutcome,
                                                 [Symbol.for("name")]: "Complete"
                                               };
                                       }));
                         }), (function (error) {
                         Curry._1(setTxState, (function (param) {
-                                return /* Failed */5;
+                                return /* Failed */2;
                               }));
                         console.log(error);
                         
