@@ -6,40 +6,40 @@ dataSources:
     name: LongShort
     network: goerli
     source:
-      address: "0xC748ceEF08b7bb5D01702EDA70051BaaD51CB011"
+      address: "0x0dFD477dD71664821DE0c376DD23c3dcdE207448"
       abi: LongShort
-      startBlock: 4173013
+      startBlock: 4190130
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - feesLevied
-        - interestDistribution
-        - longMinted
-        - longRedeem
-        - priceUpdate
-        - shortMinted
-        - shortRedeem
-        - tokenPriceRefreshed
+        - FeesLevied
+        - InterestDistribution
+        - LongMinted
+        - LongRedeem
+        - PriceUpdate
+        - ShortMinted
+        - ShortRedeem
+        - TokenPriceRefreshed
       abis:
         - name: LongShort
           file: ./abis/LongShort.json
       eventHandlers:
-        - event: feesLevied(uint256,uint256,uint256)
-          handler: handlefeesLevied
-        - event: interestDistribution(uint256,uint256,uint256,uint256)
-          handler: handleinterestDistribution
-        - event: longMinted(uint256,uint256,uint256)
-          handler: handlelongMinted
-        - event: longRedeem(uint256,uint256,uint256)
-          handler: handlelongRedeem
-        - event: priceUpdate(uint256,uint256)
-          handler: handlepriceUpdate
-        - event: shortMinted(uint256,uint256,uint256)
-          handler: handleshortMinted
-        - event: shortRedeem(uint256,uint256,uint256)
-          handler: handleshortRedeem
-        - event: tokenPriceRefreshed(uint256,uint256)
-          handler: handletokenPriceRefreshed
+        - event: FeesLevied(uint256,uint256,uint256)
+          handler: handleFeesLevied
+        - event: InterestDistribution(uint256,uint256,uint256,uint256)
+          handler: handleInterestDistribution
+        - event: LongMinted(uint256,uint256,uint256,address)
+          handler: handleLongMinted
+        - event: LongRedeem(uint256,uint256,uint256,address)
+          handler: handleLongRedeem
+        - event: PriceUpdate(uint256,uint256,address)
+          handler: handlePriceUpdate
+        - event: ShortMinted(uint256,uint256,uint256,address)
+          handler: handleShortMinted
+        - event: ShortRedeem(uint256,uint256,uint256,address)
+          handler: handleShortRedeem
+        - event: TokenPriceRefreshed(uint256,uint256)
+          handler: handleTokenPriceRefreshed
       file: ./src/mapping.ts

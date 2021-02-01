@@ -1,0 +1,45 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: LongShort
+    network: binancetest
+    source:
+      address: "0x60250481EcE03F321c12134FACC0fDfA9F95012C"
+      abi: LongShort
+      startBlock: 5820840
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - FeesLevied
+        - InterestDistribution
+        - LongMinted
+        - LongRedeem
+        - PriceUpdate
+        - ShortMinted
+        - ShortRedeem
+        - TokenPriceRefreshed
+      abis:
+        - name: LongShort
+          file: ./abis/LongShort.json
+      eventHandlers:
+        - event: FeesLevied(uint256,uint256,uint256)
+          handler: handleFeesLevied
+        - event: InterestDistribution(uint256,uint256,uint256,uint256)
+          handler: handleInterestDistribution
+        - event: LongMinted(uint256,uint256,uint256,address)
+          handler: handleLongMinted
+        - event: LongRedeem(uint256,uint256,uint256,address)
+          handler: handleLongRedeem
+        - event: PriceUpdate(uint256,uint256,address)
+          handler: handlePriceUpdate
+        - event: ShortMinted(uint256,uint256,uint256,address)
+          handler: handleShortMinted
+        - event: ShortRedeem(uint256,uint256,uint256,address)
+          handler: handleShortRedeem
+        - event: TokenPriceRefreshed(uint256,uint256)
+          handler: handleTokenPriceRefreshed
+      file: ./src/mapping.ts

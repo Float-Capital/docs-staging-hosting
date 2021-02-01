@@ -36,3 +36,17 @@ type LongMint @entity {
   id: ID!
   user: Bytes!
 }
+
+type SystemState @entity {
+  id: ID!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  # previousSyntheticPrice: Price!
+  synteticPrice: BigInt!
+  longTokenPrice: BigInt!
+  shortTokenPrice: BigInt!
+  totalLockedLong: BigInt!
+  totalLockedShort: BigInt!
+  totalValueLocked: BigInt!
+  setBy: Bytes! #Turn into a User entity
+}

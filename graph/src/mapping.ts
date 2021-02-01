@@ -1,12 +1,12 @@
 import {
-  feesLevied,
-  interestDistribution,
-  longMinted,
-  longRedeem,
-  priceUpdate,
-  shortMinted,
-  shortRedeem,
-  tokenPriceRefreshed,
+  FeesLevied,
+  InterestDistribution,
+  LongMinted,
+  LongRedeem,
+  PriceUpdate,
+  ShortMinted,
+  ShortRedeem,
+  TokenPriceRefreshed,
 } from "../generated/LongShort/LongShort";
 import { StateChange, EventParam, EventParams } from "../generated/schema";
 import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
@@ -28,7 +28,7 @@ import { saveEventToStateChange } from "./utils/txEventHelpers";
 //   );
 // }
 
-export function handlefeesLevied(event: feesLevied): void {
+export function handleFeesLevied(event: FeesLevied): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
@@ -40,14 +40,14 @@ export function handlefeesLevied(event: feesLevied): void {
     txHash,
     timestamp,
     blockNumber,
-    "feesLevied",
+    "FeesLevied",
     bigIntArrayToStringArray([totalFees, longPercentage, shortPercentage]),
     ["totalFees", "longPercentage", "shortPercentage"],
     ["uint256", "uint256", "uint256"]
   );
 }
 
-export function handleinterestDistribution(event: interestDistribution): void {
+export function handleInterestDistribution(event: InterestDistribution): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
@@ -61,14 +61,24 @@ export function handleinterestDistribution(event: interestDistribution): void {
     txHash,
     timestamp,
     blockNumber,
-    "interestDistribution",
-    bigIntArrayToStringArray([newTotalValueLocked, totalInterest, longPercentage, shortPercentage]),
-    ["newValueTotalLocked", "totalInterest", "longPercentage", "shortPercentage"],
+    "InterestDistribution",
+    bigIntArrayToStringArray([
+      newTotalValueLocked,
+      totalInterest,
+      longPercentage,
+      shortPercentage,
+    ]),
+    [
+      "newValueTotalLocked",
+      "totalInterest",
+      "longPercentage",
+      "shortPercentage",
+    ],
     ["uint256", "uint256", "uint256", "uint256"]
   );
 }
 
-export function handlelongMinted(event: longMinted): void {
+export function handleLongMinted(event: LongMinted): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
@@ -76,19 +86,24 @@ export function handlelongMinted(event: longMinted): void {
   let depositAdded = event.params.depositAdded;
   let finalDepositAmount = event.params.finalDepositAmount;
   let tokensMinted = event.params.tokensMinted;
+  let user = event.params.user;
 
   saveEventToStateChange(
     txHash,
     timestamp,
     blockNumber,
-    "longMinted",
-    bigIntArrayToStringArray([depositAdded, finalDepositAmount, tokensMinted]),
-    ["depositAdded", "finalDepositAmount", "tokensMinted"],
-    ["uint256", "uint256", "uint256"]
+    "LongMinted",
+    bigIntArrayToStringArray([
+      depositAdded,
+      finalDepositAmount,
+      tokensMinted,
+    ]).concat([user.toHex()]),
+    ["depositAdded", "finalDepositAmount", "tokensMinted", "user"],
+    ["uint256", "uint256", "uint256", "address"]
   );
 }
 
-export function handlelongRedeem(event: longRedeem): void {
+export function handleLongRedeem(event: LongRedeem): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
@@ -96,38 +111,43 @@ export function handlelongRedeem(event: longRedeem): void {
   let tokensRedeemed = event.params.tokensRedeemed;
   let valueOfRedemption = event.params.valueOfRedemption;
   let finalRedeemValue = event.params.finalRedeemValue;
+  let user = event.params.user;
 
   saveEventToStateChange(
     txHash,
     timestamp,
     blockNumber,
-    "longRedeem",
-    bigIntArrayToStringArray([tokensRedeemed, valueOfRedemption, finalRedeemValue]),
-    ["tokensRedeemed", "valueOfRedemption", "finalRedeem"],
-    ["uint256", "uint256", "uint256"]
+    "LongRedeem",
+    bigIntArrayToStringArray([
+      tokensRedeemed,
+      valueOfRedemption,
+      finalRedeemValue,
+    ]).concat([user.toHex()]),
+    ["tokensRedeemed", "valueOfRedemption", "finalRedeem", "user"],
+    ["uint256", "uint256", "uint256", "address"]
   );
 }
 
-export function handlepriceUpdate(event: priceUpdate): void {
+export function handlePriceUpdate(event: PriceUpdate): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
   let newPrice = event.params.newPrice;
   let oldPrice = event.params.oldPrice;
-
+  let user = event.params.user;
 
   saveEventToStateChange(
     txHash,
     timestamp,
     blockNumber,
-    "priceUpdate",
-    bigIntArrayToStringArray([newPrice, oldPrice]),
-    ["newPrice", "oldPrice"],
-    ["uint256", "uint256"]
+    "PriceUpdate",
+    bigIntArrayToStringArray([newPrice, oldPrice]).concat([user.toHex()]),
+    ["newPrice", "oldPrice", "user"],
+    ["uint256", "uint256", "address"]
   );
 }
 
-export function handleshortMinted(event: shortMinted): void {
+export function handleShortMinted(event: ShortMinted): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
@@ -135,19 +155,24 @@ export function handleshortMinted(event: shortMinted): void {
   let depositAdded = event.params.depositAdded;
   let finalDepositAmount = event.params.finalDepositAmount;
   let tokensMinted = event.params.tokensMinted;
+  let user = event.params.user;
 
   saveEventToStateChange(
     txHash,
     timestamp,
     blockNumber,
-    "shortMinted",
-    bigIntArrayToStringArray([depositAdded, finalDepositAmount, tokensMinted]),
-    ["depositAdded", "finalDepositAmount", "tokensMinted"],
-    ["uint256", "uint256", "uint256"]
+    "ShortMinted",
+    bigIntArrayToStringArray([
+      depositAdded,
+      finalDepositAmount,
+      tokensMinted,
+    ]).concat([user.toHex()]),
+    ["depositAdded", "finalDepositAmount", "tokensMinted", "user"],
+    ["uint256", "uint256", "uint256", "address"]
   );
 }
 
-export function handleshortRedeem(event: shortRedeem): void {
+export function handleShortRedeem(event: ShortRedeem): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
@@ -155,19 +180,24 @@ export function handleshortRedeem(event: shortRedeem): void {
   let tokensRedeemed = event.params.tokensRedeemed;
   let valueOfRedemption = event.params.valueOfRedemption;
   let finalRedeemValue = event.params.finalRedeemValue;
+  let user = event.params.user;
 
   saveEventToStateChange(
     txHash,
     timestamp,
     blockNumber,
-    "shortRedeem",
-    bigIntArrayToStringArray([tokensRedeemed, valueOfRedemption, finalRedeemValue]),
-    ["tokensRedeemed", "valueOfRedemption", "finalRedeemValue"],
-    ["uint256", "uint256", "uint256"]
+    "ShortRedeem",
+    bigIntArrayToStringArray([
+      tokensRedeemed,
+      valueOfRedemption,
+      finalRedeemValue,
+    ]).concat([user.toHex()]),
+    ["tokensRedeemed", "valueOfRedemption", "finalRedeemValue", "user"],
+    ["uint256", "uint256", "uint256", "address"]
   );
 }
 
-export function handletokenPriceRefreshed(event: tokenPriceRefreshed): void {
+export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
@@ -179,7 +209,7 @@ export function handletokenPriceRefreshed(event: tokenPriceRefreshed): void {
     txHash,
     timestamp,
     blockNumber,
-    "tokenPriceRefreshed",
+    "TokenPriceRefreshed",
     bigIntArrayToStringArray([longTokenPrice, shortTokenPrice]),
     ["longTokenPrice", "shortTokenPrice"],
     ["uint256", "uint256"]
@@ -187,9 +217,9 @@ export function handletokenPriceRefreshed(event: tokenPriceRefreshed): void {
 }
 
 // currently all params are BigInts -> in future may have to modify to support e.g. Addresses
-function bigIntArrayToStringArray(bigIntArr: BigInt[]): string[]{
+function bigIntArrayToStringArray(bigIntArr: BigInt[]): string[] {
   let returnArr = new Array<string>(bigIntArr.length);
-  for (let i = 0; i < bigIntArr.length; i++){
+  for (let i = 0; i < bigIntArr.length; i++) {
     returnArr[i] = bigIntArr[i].toString();
   }
   return returnArr;

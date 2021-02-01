@@ -15,7 +15,6 @@ type props = {
 }
 
 // We are not using `[@react.component]` since we will never
-
 // use <App/> within our Reason code. It's only used within `pages/_app.js`
 let default = (props: props): React.element => {
   let {component, pageProps} = props
@@ -24,11 +23,13 @@ let default = (props: props): React.element => {
 
   let content = React.createElement(component, pageProps)
 
-  switch router.route {
-  | "/examples" =>
-    <MainLayout>
-      <h1 className="font-bold"> {React.string("Examples Section")} </h1> <div> content </div>
-    </MainLayout>
-  | _ => <MainLayout> content </MainLayout>
-  }
+  <RootProvider>
+    {switch router.route {
+    | "/examples" =>
+      <MainLayout>
+        <h1 className="font-bold"> {React.string("Examples Section")} </h1> <div> content </div>
+      </MainLayout>
+    | _ => <MainLayout> content </MainLayout>
+    }}
+  </RootProvider>
 }
