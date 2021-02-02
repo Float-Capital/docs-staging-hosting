@@ -30,15 +30,17 @@ module AdminContext = {
       let authDisplay =
         <div>
           {switch optCurrentUser {
-          | Some(_) =>
-            <span>
-              <p> {"Use injectod provider?"->React.string} </p>
-              <input
-                type_="checkbox"
-                checked={!privateKeyMode}
-                onChange={_ => setPrivateKeyMode(_ => !privateKeyMode)}
-              />
-            </span>
+          | Some(_) => <>
+              <span className="inline-flex">
+                <p> {"Use injectod provider?"->React.string} </p>
+                <input
+                  type_="checkbox"
+                  checked={!privateKeyMode}
+                  onChange={_ => setPrivateKeyMode(_ => !privateKeyMode)}
+                />
+              </span>
+              <br />
+            </>
           | None => React.null
           }}
           {authSet || !privateKeyMode
@@ -101,7 +103,7 @@ module AdminActions = {
     | Some(_ethersWallet) =>
       <div>
         <h1> {"Test Functions"->React.string} </h1>
-        <div> <p> {"Mint"->React.string} </p> <Mint /> </div>
+        <div className={"border-dashed border-4 border-light-red-500"}> <Mint /> </div>
       </div>
     | None => React.null
     }

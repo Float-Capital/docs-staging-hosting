@@ -692,54 +692,18 @@ function Mint(Props) {
   var tmp;
   tmp = match$1 !== undefined ? (
       match$1.TAG === /* Ok */0 ? React.createElement("div", {
-              className: Cn.fromList({
-                    hd: "form-message",
-                    tl: {
-                      hd: "form-message-for-field",
-                      tl: {
-                        hd: "success",
-                        tl: /* [] */0
-                      }
-                    }
-                  })
+              className: "text-green-600"
             }, "✓") : React.createElement("div", {
-              className: Cn.fromList({
-                    hd: "form-message",
-                    tl: {
-                      hd: "form-message-for-field",
-                      tl: {
-                        hd: "failure",
-                        tl: /* [] */0
-                      }
-                    }
-                  })
+              className: "text-red-600"
             }, match$1._0)
     ) : null;
   var match$2 = form.amountResult;
   var tmp$1;
   tmp$1 = match$2 !== undefined ? (
       match$2.TAG === /* Ok */0 ? React.createElement("div", {
-              className: Cn.fromList({
-                    hd: "form-message",
-                    tl: {
-                      hd: "form-message-for-field",
-                      tl: {
-                        hd: "success",
-                        tl: /* [] */0
-                      }
-                    }
-                  })
+              className: "text-green-600"
             }, "✓") : React.createElement("div", {
-              className: Cn.fromList({
-                    hd: "form-message",
-                    tl: {
-                      hd: "form-message-for-field",
-                      tl: {
-                        hd: "failure",
-                        tl: /* [] */0
-                      }
-                    }
-                  })
+              className: "text-red-600"
             }, match$2._0)
     ) : null;
   var match$3 = form.input.tokenAddress;
@@ -747,135 +711,103 @@ function Mint(Props) {
   var tmp$2;
   tmp$2 = match$4 !== undefined ? (
       match$4.TAG === /* Ok */0 ? React.createElement("div", {
-              className: Cn.fromList({
-                    hd: "form-message",
-                    tl: {
-                      hd: "form-message-for-field",
-                      tl: {
-                        hd: "success",
-                        tl: /* [] */0
-                      }
-                    }
-                  })
+              className: "text-green-600"
             }, "✓") : React.createElement("div", {
-              className: Cn.fromList({
-                    hd: "form-message",
-                    tl: {
-                      hd: "form-message-for-field",
-                      tl: {
-                        hd: "failure",
-                        tl: /* [] */0
-                      }
-                    }
-                  })
+              className: "text-red-600"
             }, match$4._0)
     ) : null;
   var match$5 = form.status;
   return React.createElement(TxTemplate.make, {
               children: React.createElement(Form.make, {
-                    className: "form",
+                    className: "",
                     onSubmit: (function (param) {
                         console.log("temp");
                         return Curry._1(form.submit, undefined);
                       }),
-                    children: null
-                  }, React.createElement("div", {
-                        className: "form-messages-area form-messages-area-lg"
-                      }), React.createElement("div", {
-                        className: "form-content"
-                      }, React.createElement("h2", {
-                            className: "push-lg"
-                          }, "Login"), React.createElement("div", {
-                            className: "form-row"
-                          }, React.createElement("label", {
-                                className: "label-lg",
-                                htmlFor: "login--address"
-                              }, "Address"), React.createElement("input", {
-                                id: "login--address",
-                                disabled: form.submitting,
-                                type: "text",
-                                value: form.input.address,
-                                onBlur: (function (param) {
-                                    return Curry._1(form.blurAddress, undefined);
-                                  }),
-                                onChange: (function ($$event) {
-                                    return Curry._2(form.updateAddress, (function (input, value) {
-                                                  return {
-                                                          address: value,
-                                                          amount: input.amount,
-                                                          tokenAddress: input.tokenAddress
-                                                        };
-                                                }), $$event.target.value);
-                                  })
-                              }), tmp), React.createElement("div", {
-                            className: "form-row"
-                          }, React.createElement("label", {
-                                className: "label-lg",
-                                htmlFor: "login--amount"
-                              }, "Amount"), React.createElement("input", {
-                                id: "login--amount",
-                                disabled: form.submitting,
-                                type: "text",
-                                value: form.input.amount,
-                                onBlur: (function (param) {
-                                    return Curry._1(form.blurAmount, undefined);
-                                  }),
-                                onChange: (function ($$event) {
-                                    return Curry._2(form.updateAmount, (function (input, value) {
-                                                  return {
-                                                          address: input.address,
-                                                          amount: value,
-                                                          tokenAddress: input.tokenAddress
-                                                        };
-                                                }), $$event.target.value);
-                                  })
-                              }), tmp$1), React.createElement("div", {
-                            className: "form-row"
-                          }, React.createElement("label", {
-                                htmlFor: "contractToMinFor"
-                              }, "Contract to mint for:"), React.createElement("select", {
-                                className: "push-lg",
-                                id: "contractToMinFor",
-                                disabled: form.submitting,
-                                name: "contractToMinFor",
-                                onBlur: (function (param) {
-                                    return Curry._1(form.blurTokenAddress, undefined);
-                                  }),
-                                onChange: (function ($$event) {
-                                    return Curry._2(form.updateTokenAddress, (function (input, value) {
-                                                  return {
-                                                          address: input.address,
-                                                          amount: input.amount,
-                                                          tokenAddress: value
-                                                        };
-                                                }), Belt_Array.get(contracts[5], Belt_Option.getWithDefault(Belt_Int.fromString($$event.target.value), 0)));
-                                  })
-                              }, match$3 !== undefined ? null : React.createElement("option", {
-                                      value: "999"
-                                    }, "Select a token"), Belt_Array.mapWithIndex(contracts[5], (function (i, contract) {
-                                      return React.createElement("option", {
-                                                  value: String(i)
-                                                }, contract.name);
-                                    }))), tmp$2), React.createElement("div", {
-                            className: "form-row"
-                          }, React.createElement("button", {
-                                className: Cn.fromList({
-                                      hd: "primary",
-                                      tl: {
-                                        hd: "push-lg",
-                                        tl: /* [] */0
-                                      }
+                    children: React.createElement("div", {
+                          className: ""
+                        }, React.createElement("h2", {
+                              className: "text-xl"
+                            }, "Mint"), React.createElement("div", {
+                              className: ""
+                            }, React.createElement("label", {
+                                  htmlFor: "address"
+                                }, "Address: "), React.createElement("input", {
+                                  className: "border-2 border-grey-500",
+                                  id: "address",
+                                  disabled: form.submitting,
+                                  type: "text",
+                                  value: form.input.address,
+                                  onBlur: (function (param) {
+                                      return Curry._1(form.blurAddress, undefined);
                                     }),
-                                disabled: form.submitting
-                              }, form.submitting ? "Submitting..." : "Submit"), typeof match$5 === "number" && match$5 !== 0 ? React.createElement("div", {
-                                  className: Cn.fromList({
-                                        hd: "form-status",
-                                        tl: {
-                                          hd: "success",
-                                          tl: /* [] */0
-                                        }
-                                      })
-                                }, "✓ Logged In") : null))),
+                                  onChange: (function ($$event) {
+                                      return Curry._2(form.updateAddress, (function (input, value) {
+                                                    return {
+                                                            address: value,
+                                                            amount: input.amount,
+                                                            tokenAddress: input.tokenAddress
+                                                          };
+                                                  }), $$event.target.value);
+                                    })
+                                }), tmp), React.createElement("div", undefined, React.createElement("label", {
+                                  htmlFor: "amount"
+                                }, "Amount: "), React.createElement("input", {
+                                  className: "border-2 border-grey-500",
+                                  id: "amount",
+                                  disabled: form.submitting,
+                                  type: "text",
+                                  value: form.input.amount,
+                                  onBlur: (function (param) {
+                                      return Curry._1(form.blurAmount, undefined);
+                                    }),
+                                  onChange: (function ($$event) {
+                                      return Curry._2(form.updateAmount, (function (input, value) {
+                                                    return {
+                                                            address: input.address,
+                                                            amount: value,
+                                                            tokenAddress: input.tokenAddress
+                                                          };
+                                                  }), $$event.target.value);
+                                    })
+                                }), tmp$1), React.createElement("div", undefined, React.createElement("label", {
+                                  htmlFor: "contractToMinFor"
+                                }, "Contract to mint for:"), React.createElement("select", {
+                                  className: "push-lg",
+                                  id: "contractToMinFor",
+                                  disabled: form.submitting,
+                                  name: "contractToMinFor",
+                                  onBlur: (function (param) {
+                                      return Curry._1(form.blurTokenAddress, undefined);
+                                    }),
+                                  onChange: (function ($$event) {
+                                      return Curry._2(form.updateTokenAddress, (function (input, value) {
+                                                    return {
+                                                            address: input.address,
+                                                            amount: input.amount,
+                                                            tokenAddress: value
+                                                          };
+                                                  }), Belt_Array.get(contracts[5], Belt_Option.getWithDefault(Belt_Int.fromString($$event.target.value), 0)));
+                                    })
+                                }, match$3 !== undefined ? null : React.createElement("option", {
+                                        value: "999"
+                                      }, "Select a token"), Belt_Array.mapWithIndex(contracts[5], (function (i, contract) {
+                                        return React.createElement("option", {
+                                                    value: String(i)
+                                                  }, contract.name);
+                                      }))), tmp$2), React.createElement("div", undefined, React.createElement("button", {
+                                  className: "text-lg disabled:opacity-50 bg-green-500 rounded-lg",
+                                  disabled: form.submitting
+                                }, form.submitting ? "Submitting..." : "Submit"), typeof match$5 === "number" && match$5 !== 0 ? React.createElement("div", {
+                                    className: Cn.fromList({
+                                          hd: "form-status",
+                                          tl: {
+                                            hd: "success",
+                                            tl: /* [] */0
+                                          }
+                                        })
+                                  }, "✓ Finished Minting") : null))
+                  }),
               txState: match[1]
             });
 }
