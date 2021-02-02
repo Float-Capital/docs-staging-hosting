@@ -9,6 +9,6 @@ let default = () =>
     <P>
       {React.string(`Get exposure to a large variety of assets without requiring any additional collateral`)}
     </P>
-    <h2 className="text-2xl font-semibold mt-5"> {React.string("Quick Start")} </h2>
-    <pre> {React.string(`built by avolabs`)} </pre>
+    <h2 className="text-2xl font-semibold mt-5"> {React.string("Peace and respect from")} </h2>
+    <pre> {React.string(`avolabs`)} </pre>
   </div>

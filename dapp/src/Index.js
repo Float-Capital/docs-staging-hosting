@@ -9,6 +9,10 @@ function Index$P(Props) {
             }, children);
 }
 
+var P = {
+  make: Index$P
+};
+
 function $$default(param) {
   return React.createElement("div", undefined, React.createElement("h1", {
                   className: "text-3xl font-semibold"
@@ -16,10 +20,11 @@ function $$default(param) {
                   children: "Get exposure to a large variety of assets without requiring any additional collateral"
                 }), React.createElement("h2", {
                   className: "text-2xl font-semibold mt-5"
-                }, "Quick Start"), React.createElement("pre", undefined, "built by avolabs"));
+                }, "Peace and respect from"), React.createElement("pre", undefined, "avolabs"));
 }
 
 export {
+  P ,
   $$default ,
   $$default as default,
   

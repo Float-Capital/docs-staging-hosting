@@ -17,8 +17,8 @@ module Navigation = {
       </Link>
       <div className="flex w-2/3 justify-end">
         <Link href="/"> <a className="px-3"> {React.string("Home")} </a> </Link>
-        <Link href="/examples"> <a className="px-3"> {React.string("Examples")} </a> </Link>
-        <Link href="/scratchpad"> <a className="px-3"> {React.string("Skratch pad")} </a> </Link>
+        <Link href="/dapp"> <a className="px-3"> {React.string("Dapp")} </a> </Link>
+        <Link href="/admin"> <a className="px-3"> {React.string("Admin")} </a> </Link>
         <a
           className="px-3 font-bold" target="_blank" href="https://github.com/avolabs-io/longshort">
           {React.string("Github")}

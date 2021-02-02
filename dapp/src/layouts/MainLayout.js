@@ -27,15 +27,15 @@ function MainLayout$Navigation(Props) {
                             className: "px-3"
                           }, "Home")
                     }), React.createElement(Link, {
-                      href: "/examples",
+                      href: "/dapp",
                       children: React.createElement("a", {
                             className: "px-3"
-                          }, "Examples")
+                          }, "Dapp")
                     }), React.createElement(Link, {
-                      href: "/scratchpad",
+                      href: "/admin",
                       children: React.createElement("a", {
                             className: "px-3"
-                          }, "Skratch pad")
+                          }, "Admin")
                     }), React.createElement("a", {
                       className: "px-3 font-bold",
                       href: "https://github.com/avolabs-io/longshort",
@@ -48,6 +48,10 @@ function MainLayout$Navigation(Props) {
                       }, "login")));
 }
 
+var Navigation = {
+  make: MainLayout$Navigation
+};
+
 function MainLayout(Props) {
   var children = Props.children;
   return React.createElement("div", {
@@ -59,9 +63,13 @@ function MainLayout(Props) {
                     }, children)));
 }
 
+var Link$1;
+
 var make = MainLayout;
 
 export {
+  Link$1 as Link,
+  Navigation ,
   make ,
   
 }
