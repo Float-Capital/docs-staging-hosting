@@ -39,15 +39,17 @@ function AdminTestingPortal$AdminContext$Provider(Props) {
   };
   var provider = context.Provider;
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
-  var authDisplay = React.createElement("div", undefined, optCurrentUser !== undefined ? React.createElement("span", undefined, React.createElement("p", undefined, "Use injectod provider?"), React.createElement("input", {
-                  checked: !privateKeyMode,
-                  type: "checkbox",
-                  onChange: (function (param) {
-                      return Curry._1(setPrivateKeyMode, (function (param) {
-                                    return !privateKeyMode;
-                                  }));
-                    })
-                })) : null, authSet || !privateKeyMode ? React.createElement(React.Fragment, undefined, privateKeyMode ? React.createElement(React.Fragment, undefined, React.createElement("button", {
+  var authDisplay = React.createElement("div", undefined, optCurrentUser !== undefined ? React.createElement(React.Fragment, undefined, React.createElement("span", {
+                  className: "inline-flex"
+                }, React.createElement("p", undefined, "Use injectod provider?"), React.createElement("input", {
+                      checked: !privateKeyMode,
+                      type: "checkbox",
+                      onChange: (function (param) {
+                          return Curry._1(setPrivateKeyMode, (function (param) {
+                                        return !privateKeyMode;
+                                      }));
+                        })
+                    })), React.createElement("br", undefined)) : null, authSet || !privateKeyMode ? React.createElement(React.Fragment, undefined, privateKeyMode ? React.createElement(React.Fragment, undefined, React.createElement("button", {
                         onClick: (function (param) {
                             return Curry._1(setAuthSet, (function (param) {
                                           return false;
@@ -103,7 +105,9 @@ var AdminContext = {
 function AdminTestingPortal$AdminActions(Props) {
   var optEthersWallet = React.useContext(context);
   if (optEthersWallet !== undefined) {
-    return React.createElement("div", undefined, React.createElement("h1", undefined, "Test Functions"), React.createElement("div", undefined, React.createElement("p", undefined, "Mint"), React.createElement(Mint.make, {})));
+    return React.createElement("div", undefined, React.createElement("h1", undefined, "Test Functions"), React.createElement("div", {
+                    className: "border-dashed border-4 border-light-red-500"
+                  }, React.createElement(Mint.make, {})));
   } else {
     return null;
   }

@@ -110,20 +110,21 @@ let make = () => {
     //   form.reset->Js.Global.setTimeout(3000)->ignore
     // }, 500)->ignore
   })
+
   <TxTemplate txState>
     <Form
-      className="form"
+      className=""
       onSubmit={() => {
         Js.log("temp")
         form.submit()
       }}>
-      <div className="form-messages-area form-messages-area-lg" />
-      <div className="form-content">
-        <h2 className="push-lg"> {"Login"->React.string} </h2>
-        <div className="form-row">
-          <label htmlFor="login--address" className="label-lg"> {"Address"->React.string} </label>
+      <div className="">
+        <h2 className="text-xl"> {"Mint"->React.string} </h2>
+        <div className="">
+          <label htmlFor="address"> {"Address: "->React.string} </label>
           <input
-            id="login--address"
+            className="border-2 border-grey-500"
+            id="address"
             type_="text"
             value=form.input.address
             disabled=form.submitting
@@ -135,21 +136,16 @@ let make = () => {
               )}
           />
           {switch form.addressResult {
-          | Some(Error(message)) =>
-            <div className={Cn.fromList(list{"form-message", "form-message-for-field", "failure"})}>
-              {message->React.string}
-            </div>
-          | Some(Ok(_)) =>
-            <div className={Cn.fromList(list{"form-message", "form-message-for-field", "success"})}>
-              {j`✓`->React.string}
-            </div>
+          | Some(Error(message)) => <div className="text-red-600"> {message->React.string} </div>
+          | Some(Ok(_)) => <div className="text-green-600"> {j`✓`->React.string} </div>
           | None => React.null
           }}
         </div>
-        <div className="form-row">
-          <label htmlFor="login--amount" className="label-lg"> {"Amount"->React.string} </label>
+        <div>
+          <label htmlFor="amount"> {"Amount: "->React.string} </label>
           <input
-            id="login--amount"
+            id="amount"
+            className="border-2 border-grey-500"
             type_="text"
             value=form.input.amount
             disabled=form.submitting
@@ -161,18 +157,12 @@ let make = () => {
               )}
           />
           {switch form.amountResult {
-          | Some(Error(message)) =>
-            <div className={Cn.fromList(list{"form-message", "form-message-for-field", "failure"})}>
-              {message->React.string}
-            </div>
-          | Some(Ok(_)) =>
-            <div className={Cn.fromList(list{"form-message", "form-message-for-field", "success"})}>
-              {j`✓`->React.string}
-            </div>
+          | Some(Error(message)) => <div className="text-red-600"> {message->React.string} </div>
+          | Some(Ok(_)) => <div className="text-green-600"> {j`✓`->React.string} </div>
           | None => React.null
           }}
         </div>
-        <div className="form-row">
+        <div>
           <label htmlFor="contractToMinFor"> {"Contract to mint for:"->React.string} </label>
           <select
             name="contractToMinFor"
@@ -197,25 +187,21 @@ let make = () => {
             ->React.array}
           </select>
           {switch form.tokenAddressResult {
-          | Some(Error(message)) =>
-            <div className={Cn.fromList(list{"form-message", "form-message-for-field", "failure"})}>
-              {message->React.string}
-            </div>
-          | Some(Ok(_)) =>
-            <div className={Cn.fromList(list{"form-message", "form-message-for-field", "success"})}>
-              {j`✓`->React.string}
-            </div>
+          | Some(Error(message)) => <div className="text-red-600"> {message->React.string} </div>
+          | Some(Ok(_)) => <div className="text-green-600"> {j`✓`->React.string} </div>
           | None => React.null
           }}
         </div>
-        <div className="form-row">
-          <button className={Cn.fromList(list{"primary", "push-lg"})} disabled=form.submitting>
+        <div>
+          <button
+            className={"text-lg disabled:opacity-50 bg-green-500 rounded-lg"}
+            disabled=form.submitting>
             {(form.submitting ? "Submitting..." : "Submit")->React.string}
           </button>
           {switch form.status {
           | Submitted =>
             <div className={Cn.fromList(list{"form-status", "success"})}>
-              {j`✓ Logged In`->React.string}
+              {j`✓ Finished Minting`->React.string}
             </div>
           | _ => React.null
           }}
