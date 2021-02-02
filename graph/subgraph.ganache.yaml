@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: LongShort
-    network: goerli
+    network: ganache
     source:
-      address: "0x0dFD477dD71664821DE0c376DD23c3dcdE207448"
+      address: "0xa9e638f77Eea6036D05F00d0AC55169357De114E"
       abi: LongShort
-      startBlock: 4190130
+      startBlock: 0
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

@@ -40,13 +40,19 @@ type LongMint @entity {
 type SystemState @entity {
   id: ID!
   timestamp: BigInt!
+  txHash: Bytes!
   blockNumber: BigInt!
   # previousSyntheticPrice: Price!
-  synteticPrice: BigInt!
+  syntheticPrice: BigInt! # TODO: this should be a reference to another entity that holds the price
   longTokenPrice: BigInt!
   shortTokenPrice: BigInt!
   totalLockedLong: BigInt!
   totalLockedShort: BigInt!
   totalValueLocked: BigInt!
   setBy: Bytes! #Turn into a User entity
+}
+
+type GlobalState @entity {
+  id: ID!
+  latestSystemState: SystemState!
 }

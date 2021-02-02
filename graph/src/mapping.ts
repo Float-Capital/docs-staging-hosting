@@ -8,9 +8,11 @@ import {
   ShortRedeem,
   TokenPriceRefreshed,
 } from "../generated/LongShort/LongShort";
+
 import { StateChange, EventParam, EventParams } from "../generated/schema";
 import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
+import { getOrCreateLatestSystemState } from "./utils/globalStateManager";
 
 // export function handleEvent(event: EVENT): void {
 //   let txHash = event.transaction.hash;
@@ -52,10 +54,15 @@ export function handleInterestDistribution(event: InterestDistribution): void {
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
 
+  let contractCallCounter = event.params.contractCallCounter;
   let newTotalValueLocked = event.params.newTotalValueLocked;
   let totalInterest = event.params.totalInterest;
   let longPercentage = event.params.longPercentage;
   let shortPercentage = event.params.shortPercentage;
+
+  let state = getOrCreateLatestSystemState(contractCallCounter, event);
+
+  state.save();
 
   saveEventToStateChange(
     txHash,
@@ -132,9 +139,15 @@ export function handlePriceUpdate(event: PriceUpdate): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
+
+  let contractCallCounter = event.params.contractCallCounter;
   let newPrice = event.params.newPrice;
   let oldPrice = event.params.oldPrice;
   let user = event.params.user;
+
+  let state = getOrCreateLatestSystemState(contractCallCounter, event);
+
+  state.save();
 
   saveEventToStateChange(
     txHash,

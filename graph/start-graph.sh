@@ -22,7 +22,7 @@ function killAndExit {
 
 function graphCreate {
     echo '####### DEPLOYING GRAPH #######'
-    yarn codegen && yarn build && yarn create-local && yarn deploy-local
+    yarn codegen; yarn build; yarn create-local; yarn deploy-local
     if [ "$?" -ne 0 ];
     then
         echo "ERROR: Could not deploy graph successfully"
@@ -55,9 +55,9 @@ function doneLoop {
 }
 
 function start {
-    echo "####### CLEANUP #######"
-    sudo rm -rf data ganache-data
-    sudo rm -f ../contracts/.openzeppelin/dev-321.json
+    # echo "####### CLEANUP #######"
+    docker-compose down -v
+    rm ../contracts/.openzeppelin/dev-321.json
 
     echo "####### DOCKER-COMPOSE #######"
     docker-compose up 2>&1 > /dev/null &
