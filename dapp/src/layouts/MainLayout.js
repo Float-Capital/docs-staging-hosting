@@ -18,7 +18,7 @@ function MainLayout$Navigation(Props) {
                         className: "flex items-center w-1/3"
                       }, React.createElement("span", {
                             className: "text-xl text-green-800 ml-2 align-middle font-semibold"
-                          }, "Flows Finance"))
+                          }, "Float Capital"))
                 }), React.createElement("div", {
                   className: "flex w-2/3 justify-end"
                 }, React.createElement(Link, {

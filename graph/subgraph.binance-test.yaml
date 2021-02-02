@@ -26,20 +26,20 @@ dataSources:
         - name: LongShort
           file: ./abis/LongShort.json
       eventHandlers:
-        - event: FeesLevied(uint256,uint256,uint256)
+        - event: FeesLevied(uint256,uint256,uint256,uint256)
           handler: handleFeesLevied
-        - event: InterestDistribution(uint256,uint256,uint256,uint256)
+        - event: InterestDistribution(uint256,uint256,uint256,uint256,uint256)
           handler: handleInterestDistribution
-        - event: LongMinted(uint256,uint256,uint256,address)
+        - event: LongMinted(uint256,uint256,uint256,uint256,address)
           handler: handleLongMinted
-        - event: LongRedeem(uint256,uint256,uint256,address)
+        - event: LongRedeem(uint256,uint256,uint256,uint256,address)
           handler: handleLongRedeem
-        - event: PriceUpdate(uint256,uint256,address)
+        - event: PriceUpdate(uint256,uint256,uint256,address)
           handler: handlePriceUpdate
-        - event: ShortMinted(uint256,uint256,uint256,address)
+        - event: ShortMinted(uint256,uint256,uint256,uint256,address)
           handler: handleShortMinted
-        - event: ShortRedeem(uint256,uint256,uint256,address)
+        - event: ShortRedeem(uint256,uint256,uint256,uint256,address)
           handler: handleShortRedeem
-        - event: TokenPriceRefreshed(uint256,uint256)
+        - event: TokenPriceRefreshed(uint256,uint256,uint256)
           handler: handleTokenPriceRefreshed
       file: ./src/mapping.ts

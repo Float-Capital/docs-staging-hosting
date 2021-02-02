@@ -5,6 +5,12 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "contractCallCounter",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "totalFees",
         "type": "uint256"
       },
@@ -27,6 +33,12 @@
   {
     "anonymous": false,
     "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "contractCallCounter",
+        "type": "uint256"
+      },
       {
         "indexed": false,
         "internalType": "uint256",
@@ -61,6 +73,12 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "contractCallCounter",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "depositAdded",
         "type": "uint256"
       },
@@ -89,6 +107,12 @@
   {
     "anonymous": false,
     "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "contractCallCounter",
+        "type": "uint256"
+      },
       {
         "indexed": false,
         "internalType": "uint256",
@@ -123,6 +147,12 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "contractCallCounter",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "oldPrice",
         "type": "uint256"
       },
@@ -145,6 +175,12 @@
   {
     "anonymous": false,
     "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "contractCallCounter",
+        "type": "uint256"
+      },
       {
         "indexed": false,
         "internalType": "uint256",
@@ -179,6 +215,12 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "contractCallCounter",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "tokensRedeemed",
         "type": "uint256"
       },
@@ -210,6 +252,12 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "contractCallCounter",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "longTokenPrice",
         "type": "uint256"
       },
@@ -234,7 +282,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -247,7 +296,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -260,7 +310,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -273,7 +324,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -286,7 +338,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -299,7 +352,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -312,7 +366,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -325,7 +380,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -338,7 +394,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -351,7 +408,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -364,7 +422,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -377,7 +436,22 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "externalContractCounter",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -390,7 +464,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -403,7 +478,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -416,7 +492,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -429,7 +506,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -442,7 +520,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -455,7 +534,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -468,7 +548,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -481,7 +562,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -494,7 +576,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -565,7 +648,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -578,7 +662,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -591,7 +676,8 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
