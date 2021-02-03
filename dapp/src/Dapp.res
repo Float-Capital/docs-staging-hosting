@@ -1,3 +1,8 @@
+// module MintLong = {
+//   @react.component
+//   let make = () => {
+
+//   }}
 module Access = {
   @react.component
   let make = (~children) => {

@@ -4,7 +4,11 @@ let centerFlex = {
 }
 
 @react.component
-let make = (~children: React.element, ~txState: ContractActions.transactionState) => {
+let make = (
+  ~children: React.element,
+  ~txState: ContractActions.transactionState,
+  ~resetTxState=?,
+) => {
   let txExplererUrl = RootProvider.useEtherscanUrl()
 
   switch txState {
@@ -32,7 +36,11 @@ let make = (~children: React.element, ~txState: ContractActions.transactionState
           {("View the transaction on " ++ txExplererUrl)->React.string}
         </a>
       </p>
-      <p> {"TODO: add a button to reset this screen"->React.string} </p>
+      {switch resetTxState {
+      | Some(resetTxState) =>
+        <button onClick={_ => resetTxState()}> {"Go back"->React.string} </button>
+      | None => React.null
+      }}
     </>
   | ContractActions.Declined(message) => <>
       <h1> {"The transaction was declined by your wallet, please try again."->React.string} </h1>

@@ -37,7 +37,7 @@ let contracts = {
   ],
 }
 
-module LoginForm = %form(
+module AdminMintForm = %form(
   type input = {
     address: string,
     amount: string,
@@ -89,29 +89,33 @@ module LoginForm = %form(
   }
 )
 
-let initialInput: LoginForm.input = {
-  address: "0x738edd7F6a625C02030DbFca84885b4De5252903",
+let initialInput: AdminMintForm.input = {
+  address: "0x03a733bfa29eb0d74de0dfd33cca425e0d8c3867",
   amount: "",
   tokenAddress: None,
 }
 
 @react.component
 let make = () => {
-  let (mintTx, txState) = ContractActions.useAdminMint()
-  let form = LoginForm.useForm(~initialInput, ~onSubmit=(
+  let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction()
+
+  let form = AdminMintForm.useForm(~initialInput, ~onSubmit=(
     {address, amount, tokenAddress},
     _form,
   ) => {
     Js.log2("Submitted with... ", output)
-    mintTx(~recipient=address, ~amount, ~tokenAddress)->Js.log2("other...")
-
-    // Js.Global.setTimeout(() => {
-    //   form.notifyOnSuccess(None)
-    //   form.reset->Js.Global.setTimeout(3000)->ignore
-    // }, 500)->ignore
+    contractExecutionHandler(
+      ~contractAddress=tokenAddress,
+      ~contractFunction=Contracts.TestErc20.mint(~recipient=address, ~amount),
+    )
   })
 
-  <TxTemplate txState>
+  <TxTemplate
+    txState
+    resetTxState={() => {
+      form.reset()
+      setTxState(_ => ContractActions.UnInitialised)
+    }}>
     <Form
       className=""
       onSubmit={() => {

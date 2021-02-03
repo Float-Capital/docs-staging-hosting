@@ -48,17 +48,24 @@ type ethersBigNumber
 module BigNumber = {
   type t = ethersBigNumber
 
+  @module("ethers") @scope("BigNumber")
+  external fromUnsafe: string => float = "from"
+
   @send external add: (t, t) => t = "add"
   @send external sub: (t, t) => t = "sub"
   @send external mul: (t, t) => t = "mul"
   @send external div: (t, t) => t = "div"
+  @send external mod: (t, t) => t = "mod"
+  @send external pow: (t, t) => t = "pow"
+  @send external abs: t => t = "abs"
+
   @send external gt: (t, t) => bool = "gt"
+  @send external gte: (t, t) => bool = "gte"
   @send external lt: (t, t) => bool = "lt"
-  @dead("+eq") @send external eq: (t, t) => bool = "eq"
-  @send external cmp: (t, t) => int = "cmp"
-  @dead("+sqr") @send external sqr: t => t = "sqr"
+  @send external lte: (t, t) => bool = "lte"
+  @send external eq: (t, t) => bool = "eq"
+
   @send external toString: t => string = "toString"
-  @send external toStringRad: (t, int) => string = "toString"
 
   @send external toNumber: t => int = "toNumber"
   @send external toNumberFloat: t => float = "toNumber"
