@@ -13,8 +13,26 @@ var TestErc20 = {
   make: make
 };
 
+var abi$1 = Ethers.makeAbi([
+      "function mintLong(uint256 amount)",
+      "function mintShort(uint256 amount)",
+      "function redeemLong(uint256 tokensToRedeem)",
+      "function redeemShort(uint256 tokensToRedeem)",
+      "function _updateSystemState()"
+    ]);
+
+function make$1(address, providerOrSigner) {
+  return Ethers.Contract.make(address, abi$1, providerOrSigner);
+}
+
+var LongShort = {
+  abi: abi$1,
+  make: make$1
+};
+
 export {
   TestErc20 ,
+  LongShort ,
   
 }
 /* abi Not a pure module */

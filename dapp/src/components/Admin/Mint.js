@@ -665,7 +665,7 @@ function useForm(initialInput, onSubmit) {
         };
 }
 
-var LoginForm = {
+var AdminMintForm = {
   validators: validators,
   initialFieldsStatuses: initialFieldsStatuses,
   initialCollectionsStatuses: undefined,
@@ -675,18 +675,22 @@ var LoginForm = {
 };
 
 var initialInput = {
-  address: "0x738edd7F6a625C02030DbFca84885b4De5252903",
+  address: "0x03a733bfa29eb0d74de0dfd33cca425e0d8c3867",
   amount: "",
   tokenAddress: undefined
 };
 
 function Mint(Props) {
-  var match = ContractActions.useAdminMint(undefined);
-  var mintTx = match[0];
+  var match = ContractActions.useContractFunction(undefined);
+  var setTxState = match[2];
+  var contractExecutionHandler = match[0];
   var form = useForm(initialInput, (function (param, _form) {
+          var amount = param.amount;
+          var address = param.address;
           console.log("Submitted with... ", Pervasives.output);
-          console.log(Curry._3(mintTx, param.address, param.amount, param.tokenAddress), "other...");
-          
+          return Curry._2(contractExecutionHandler, param.tokenAddress, (function (param) {
+                        return param.mint(address, amount);
+                      }));
         }));
   var match$1 = form.addressResult;
   var tmp;
@@ -808,7 +812,13 @@ function Mint(Props) {
                                         })
                                   }, "✓ Finished Minting") : null))
                   }),
-              txState: match[1]
+              txState: match[1],
+              resetTxState: (function (param) {
+                  Curry._1(form.reset, undefined);
+                  return Curry._1(setTxState, (function (param) {
+                                return /* UnInitialised */0;
+                              }));
+                })
             });
 }
 
@@ -816,7 +826,7 @@ var make = Mint;
 
 export {
   contracts ,
-  LoginForm ,
+  AdminMintForm ,
   initialInput ,
   make ,
   

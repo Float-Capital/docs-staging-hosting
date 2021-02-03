@@ -2,9 +2,7 @@
 
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as Config from "../Config.js";
-import * as Ethers from "./Ethers.js";
-import * as Ethers$1 from "ethers";
+import * as Ethers from "ethers";
 import * as Contracts from "./Contracts.js";
 import * as JsPromise from "../libraries/Js.Promise/JsPromise.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
@@ -33,47 +31,12 @@ function getProviderOrSigner(library, account) {
   }
 }
 
-function getExchangeContract(stewardAddress, stewardAbi, library, account) {
-  return Ethers.Contract.make(stewardAddress, stewardAbi, getProviderOrSigner(library, account));
-}
-
 function getLongShortContractAddress(chainId) {
-  return Ethers$1.utils.getAddress(chainId !== 5 ? (
+  return Ethers.utils.getAddress(chainId !== 5 ? (
                 chainId !== 137 ? (
                     chainId !== 80001 ? "0xba97BeC8d359D73c81D094421803D968A9FBf676" : "0xeb37A6dF956F1997085498aDd98b25a2f633d83F"
                   ) : "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063"
               ) : "0xba97BeC8d359D73c81D094421803D968A9FBf676");
-}
-
-function useLongShortContract(param) {
-  var context = Core.useWeb3React();
-  return React.useMemo((function () {
-                var match = context.library;
-                var match$1 = context.chainId;
-                if (match !== undefined && match$1 !== undefined) {
-                  return Caml_option.some(getExchangeContract(getLongShortContractAddress(match$1), Config.longshortContractAbi, Caml_option.valFromOption(match), context.account));
-                }
-                
-              }), [
-              context.library,
-              context.account,
-              context.chainId
-            ]);
-}
-
-function useTestErc20(tokenAddress) {
-  var context = Core.useWeb3React();
-  return React.useMemo((function () {
-                var library = context.library;
-                if (library !== undefined) {
-                  return Caml_option.some(Contracts.TestErc20.make(tokenAddress, getProviderOrSigner(Caml_option.valFromOption(library), context.account)));
-                }
-                
-              }), [
-              context.library,
-              context.account,
-              tokenAddress
-            ]);
 }
 
 function useProviderOrSigner(param) {
@@ -90,39 +53,20 @@ function useProviderOrSigner(param) {
             ]);
 }
 
-function useChangePrice(_animal) {
-  var match = React.useState(function () {
-        return /* UnInitialised */0;
-      });
-  var setTxState = match[1];
-  useProviderOrSigner(undefined);
-  return [
-          (function (_newPrice) {
-              Curry._1(setTxState, (function (param) {
-                      return /* Created */1;
-                    }));
-              
-            }),
-          match[0]
-        ];
-}
-
-function useAdminMint(param) {
+function useContractFunction(param) {
   var match = React.useState(function () {
         return /* UnInitialised */0;
       });
   var setTxState = match[1];
   var optProviderOrSigner = useProviderOrSigner(undefined);
   return [
-          (function (recipient, amount, tokenAddress) {
-              console.log(recipient, amount);
+          (function (contractAddress, contractFunction) {
               Curry._1(setTxState, (function (param) {
                       return /* Created */1;
                     }));
               if (optProviderOrSigner !== undefined) {
-                console.log("We have it!!!");
-                var erc20Instance = Contracts.TestErc20.make(tokenAddress, optProviderOrSigner);
-                var mintPromise = erc20Instance.mint(recipient, amount);
+                var erc20Instance = Contracts.TestErc20.make(contractAddress, optProviderOrSigner);
+                var mintPromise = Curry._1(contractFunction, erc20Instance);
                 JsPromise.$$catch(mintPromise, (function (error) {
                         return Curry._1(setTxState, (function (param) {
                                       var msg = error.message;
@@ -161,27 +105,18 @@ function useAdminMint(param) {
               } else {
                 console.log("NOooo :( :( !!!");
               }
-              return "Result...";
+              
             }),
-          match[0]
+          match[0],
+          setTxState
         ];
 }
 
-var stewardAddressMaticMain = "0x6D47CF86F6A490c6410fC082Fd1Ad29CF61492d0";
-
-var stewardAddressMumbai = "0x0C00CFE8EbB34fE7C31d4915a43Cde211e9F0F3B";
-
 export {
   getProviderOrSigner ,
-  getExchangeContract ,
-  stewardAddressMaticMain ,
-  stewardAddressMumbai ,
   getLongShortContractAddress ,
-  useLongShortContract ,
-  useTestErc20 ,
   useProviderOrSigner ,
-  useChangePrice ,
-  useAdminMint ,
+  useContractFunction ,
   
 }
 /* react Not a pure module */
