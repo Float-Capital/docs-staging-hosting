@@ -16,15 +16,21 @@ module.exports = {
         src: "img/logo.svg",
       },
       items: [
+        // {
+        //   to: "https://float.capital",
+        //   activeBasePath: "/",
+        //   label: "Home",
+        //   position: "left",
+        // },
+        // {
+        //   to: "docs/",
+        //   activeBasePath: "docs",
+        //   label: "Docs",
+        //   position: "left",
+        // },
+        // { to: "blog", label: "Blog", position: "left" },
         {
-          to: "docs/",
-          activeBasePath: "docs",
-          label: "Docs",
-          position: "left",
-        },
-        { to: "blog", label: "Blog", position: "left" },
-        {
-          href: "https://github.com/facebook/docusaurus",
+          href: "https://github.com/avolabs-io",
           label: "GitHub",
           position: "right",
         },
@@ -37,12 +43,12 @@ module.exports = {
           title: "Docs",
           items: [
             {
-              label: "Style Guide",
+              label: "Introduction",
               to: "docs/",
             },
             {
-              label: "Second Doc",
-              to: "docs/doc2/",
+              label: "Resources",
+              to: "docs/resources/",
             },
           ],
         },
@@ -50,29 +56,29 @@ module.exports = {
           title: "Community",
           items: [
             {
-              label: "Stack Overflow",
-              href: "https://stackoverflow.com/questions/tagged/docusaurus",
-            },
-            {
               label: "Discord",
-              href: "https://discordapp.com/invite/docusaurus",
+              href: "#",
             },
             {
               label: "Twitter",
-              href: "https://twitter.com/docusaurus",
+              href: "#",
             },
           ],
         },
         {
           title: "More",
           items: [
+            // {
+            //   label: "Home",
+            //   to: "https://float.capital",
+            // },
             {
               label: "Blog",
               to: "blog",
             },
             {
               label: "GitHub",
-              href: "https://github.com/facebook/docusaurus",
+              href: "https://github.com/avolabs-io",
             },
           ],
         },
@@ -87,14 +93,11 @@ module.exports = {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
-          editUrl:
-            "https://github.com/facebook/docusaurus/edit/master/website/",
+          editUrl: "https://github.com/",
         },
         blog: {
           showReadingTime: true,
-          // Please change this to your repo.
-          editUrl:
-            "https://github.com/facebook/docusaurus/edit/master/website/blog/",
+          editUrl: "https://github.com/",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
