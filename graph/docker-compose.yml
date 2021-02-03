@@ -50,7 +50,7 @@ services:
     ports:
       - "5001:5001"
     volumes:
-      - ./data/ipfs:/data/ipfs
+      - ipfs-data:/data/ipfs
 
   postgres:
     image: postgres:13.1
@@ -62,4 +62,9 @@ services:
       POSTGRES_PASSWORD: let-me-in
       POSTGRES_DB: graph-node
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  ganache-data:
+  ipfs-data:
+  postgres-data:
