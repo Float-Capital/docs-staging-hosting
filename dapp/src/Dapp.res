@@ -14,4 +14,5 @@ module Access = {
     }
   }
 }
-let default = () => <Access> <h1> {"Dapp"->React.string} </h1> </Access>
+let default = () =>
+  <Access> <h1> {"Dapp"->React.string} </h1> <ApproveDai /> <hr /> <MintLong /> </Access>

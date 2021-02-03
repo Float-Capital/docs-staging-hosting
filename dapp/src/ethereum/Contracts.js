@@ -30,9 +30,21 @@ var LongShort = {
   make: make$1
 };
 
+var abi$2 = Ethers.makeAbi(["function approve(address spender, uint256 amount)"]);
+
+function make$2(address, providerOrSigner) {
+  return Ethers.Contract.make(address, abi$2, providerOrSigner);
+}
+
+var Erc20 = {
+  abi: abi$2,
+  make: make$2
+};
+
 export {
   TestErc20 ,
   LongShort ,
+  Erc20 ,
   
 }
 /* abi Not a pure module */

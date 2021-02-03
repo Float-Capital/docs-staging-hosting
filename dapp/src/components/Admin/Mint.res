@@ -90,7 +90,7 @@ module AdminMintForm = %form(
 )
 
 let initialInput: AdminMintForm.input = {
-  address: "0x03a733bfa29eb0d74de0dfd33cca425e0d8c3867",
+  address: "",
   amount: "",
   tokenAddress: None,
 }
@@ -103,9 +103,8 @@ let make = () => {
     {address, amount, tokenAddress},
     _form,
   ) => {
-    Js.log2("Submitted with... ", output)
     contractExecutionHandler(
-      ~contractAddress=tokenAddress,
+      ~makeContractInstance=Contracts.TestErc20.make(~address=tokenAddress),
       ~contractFunction=Contracts.TestErc20.mint(~recipient=address, ~amount),
     )
   })

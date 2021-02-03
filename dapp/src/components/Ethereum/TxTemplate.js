@@ -25,7 +25,7 @@ function TxTemplate(Props) {
                           className: centerFlex
                         }, React.createElement(Loader.make, {})));
       case /* Failed */2 :
-          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed.", React.createElement(Loader.make, {})), React.createElement("p", undefined, "It is possible that someone else bought the token before you, or the price changed. If you are unsure please feel free to contact our support."), children);
+          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed.", React.createElement(Loader.make, {})), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."), children);
       
     }
   } else {

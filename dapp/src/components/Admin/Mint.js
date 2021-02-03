@@ -6,9 +6,9 @@ import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Belt_Int from "bs-platform/lib/es6/belt_Int.js";
+import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
-import * as Pervasives from "bs-platform/lib/es6/pervasives.js";
 import * as TxTemplate from "../Ethereum/TxTemplate.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
@@ -675,7 +675,7 @@ var AdminMintForm = {
 };
 
 var initialInput = {
-  address: "0x03a733bfa29eb0d74de0dfd33cca425e0d8c3867",
+  address: "",
   amount: "",
   tokenAddress: undefined
 };
@@ -685,10 +685,12 @@ function Mint(Props) {
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
   var form = useForm(initialInput, (function (param, _form) {
+          var tokenAddress = param.tokenAddress;
           var amount = param.amount;
           var address = param.address;
-          console.log("Submitted with... ", Pervasives.output);
-          return Curry._2(contractExecutionHandler, param.tokenAddress, (function (param) {
+          return Curry._2(contractExecutionHandler, (function (param) {
+                        return Contracts.TestErc20.make(tokenAddress, param);
+                      }), (function (param) {
                         return param.mint(address, amount);
                       }));
         }));
