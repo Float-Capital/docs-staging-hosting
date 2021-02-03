@@ -26,7 +26,7 @@ function graphCreate {
     if [ "$?" -ne 0 ];
     then
         echo "ERROR: Could not deploy graph successfully"
-        killAndExit
+        # killAndExit
     fi
 }
 
