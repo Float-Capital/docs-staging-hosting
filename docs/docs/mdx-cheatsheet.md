@@ -1,6 +1,8 @@
 ---
-id: mdx
+id: mdx-cheatsheet
 title: Powered by MDX
+sidebar_label: Mdx cheatsheet
+slug: /mdx-cheatsheet
 ---
 
 You can write JSX and use React components within your Markdown thanks to [MDX](https://mdxjs.com/).
