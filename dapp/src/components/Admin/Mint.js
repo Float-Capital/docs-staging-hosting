@@ -4,6 +4,7 @@ import * as Cn from "re-classnames/src/Cn.js";
 import * as Form from "./Form.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
+import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Belt_Int from "bs-platform/lib/es6/belt_Int.js";
 import * as Contracts from "../../ethereum/Contracts.js";
@@ -12,47 +13,41 @@ import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as TxTemplate from "../Ethereum/TxTemplate.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as RootProvider from "../../libraries/RootProvider.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
 
-var contracts = {
-  "5": [
-    {
-      name: "aDai",
-      address: "0x54Dd8F08aF3822c9620d548773CBB9b165bbDE3D"
-    },
-    {
-      name: "Dai",
-      address: "0x03a733Bfa29eB0D74DE0Dfd33CCA425E0d8c3867"
-    },
-    {
-      name: "LongCoins",
-      address: "0x9cBf6D1cc2cb7d1C1d6062C0C6d6AF6CcFeD7106"
-    },
-    {
-      name: "ShortCoins",
-      address: "0x2B9b35a48A013c441f9E6fC3DE133312a1931d20"
-    }
-  ],
-  "97": [
-    {
-      name: "aDai",
-      address: "0x638DEcc5DA992265d799857DE68Ac2F3958a5Ce9"
-    },
-    {
-      name: "Dai",
-      address: "0x3264369236B39dc8Db9CFAc7360DA0c053F6b6C4"
-    },
-    {
-      name: "LongCoins",
-      address: "0x119dd3bFe097c25129AD23D625F0092856DFfEa6"
-    },
-    {
-      name: "ShortCoins",
-      address: "0x76a39Eb4a28CB003b78f5C73141f162b4eF6C722"
-    }
-  ]
-};
+function useMintContracts(param) {
+  var netIdStr = Belt_Option.mapWithDefault(RootProvider.useNetworkId(undefined), "5", (function (prim) {
+          return String(prim);
+        }));
+  return [
+          {
+            name: "aDai",
+            address: Config.getContractAddressString(netIdStr, (function (contract) {
+                    return contract.ADai;
+                  }))
+          },
+          {
+            name: "Dai",
+            address: Config.getContractAddressString(netIdStr, (function (contract) {
+                    return contract.Dai;
+                  }))
+          },
+          {
+            name: "LongCoins",
+            address: Config.getContractAddressString(netIdStr, (function (contract) {
+                    return contract.LongCoins;
+                  }))
+          },
+          {
+            name: "ShortCoins",
+            address: Config.getContractAddressString(netIdStr, (function (contract) {
+                    return contract.ShortCoins;
+                  }))
+          }
+        ];
+}
 
 var validators_tokenAddress = {
   strategy: /* OnFirstBlur */0,
@@ -684,6 +679,7 @@ function Mint(Props) {
   var match = ContractActions.useContractFunction(undefined);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
+  var contracts = useMintContracts(undefined);
   var form = useForm(initialInput, (function (param, _form) {
           var tokenAddress = param.tokenAddress;
           var amount = param.amount;
@@ -793,11 +789,11 @@ function Mint(Props) {
                                                             amount: input.amount,
                                                             tokenAddress: value
                                                           };
-                                                  }), Belt_Array.get(contracts[5], Belt_Option.getWithDefault(Belt_Int.fromString($$event.target.value), 0)));
+                                                  }), Belt_Array.get(contracts, Belt_Option.getWithDefault(Belt_Int.fromString($$event.target.value), 0)));
                                     })
                                 }, match$3 !== undefined ? null : React.createElement("option", {
                                         value: "999"
-                                      }, "Select a token"), Belt_Array.mapWithIndex(contracts[5], (function (i, contract) {
+                                      }, "Select a token"), Belt_Array.mapWithIndex(contracts, (function (i, contract) {
                                         return React.createElement("option", {
                                                     value: String(i)
                                                   }, contract.name);
@@ -827,7 +823,7 @@ function Mint(Props) {
 var make = Mint;
 
 export {
-  contracts ,
+  useMintContracts ,
   AdminMintForm ,
   initialInput ,
   make ,

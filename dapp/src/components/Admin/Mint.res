@@ -1,40 +1,25 @@
-let contracts = {
-  "5": [
+let useMintContracts = () => {
+  let netIdStr = RootProvider.useNetworkId()->Option.mapWithDefault("5", Int.toString)
+  let getNetworkedContractAddressString = Config.getContractAddressString(~netIdStr)
+
+  [
     {
       "name": "aDai",
-      "address": "0x54Dd8F08aF3822c9620d548773CBB9b165bbDE3D",
+      "address": getNetworkedContractAddressString(~closure=contract => contract.aDai),
     },
     {
       "name": "Dai",
-      "address": "0x03a733Bfa29eB0D74DE0Dfd33CCA425E0d8c3867",
+      "address": getNetworkedContractAddressString(~closure=contract => contract.dai),
     },
     {
       "name": "LongCoins",
-      "address": "0x9cBf6D1cc2cb7d1C1d6062C0C6d6AF6CcFeD7106",
+      "address": getNetworkedContractAddressString(~closure=contract => contract.longCoins),
     },
     {
       "name": "ShortCoins",
-      "address": "0x2B9b35a48A013c441f9E6fC3DE133312a1931d20",
+      "address": getNetworkedContractAddressString(~closure=contract => contract.shortCoins),
     },
-  ],
-  "97": [
-    {
-      "name": "aDai",
-      "address": "0x638DEcc5DA992265d799857DE68Ac2F3958a5Ce9",
-    },
-    {
-      "name": "Dai",
-      "address": "0x3264369236B39dc8Db9CFAc7360DA0c053F6b6C4",
-    },
-    {
-      "name": "LongCoins",
-      "address": "0x119dd3bFe097c25129AD23D625F0092856DFfEa6",
-    },
-    {
-      "name": "ShortCoins",
-      "address": "0x76a39Eb4a28CB003b78f5C73141f162b4eF6C722",
-    },
-  ],
+  ]
 }
 
 module AdminMintForm = %form(
@@ -98,6 +83,8 @@ let initialInput: AdminMintForm.input = {
 @react.component
 let make = () => {
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction()
+
+  let contracts = useMintContracts()
 
   let form = AdminMintForm.useForm(~initialInput, ~onSubmit=(
     {address, amount, tokenAddress},
@@ -176,14 +163,14 @@ let make = () => {
             onChange={event => form.updateTokenAddress((input, value) => {
                 ...input,
                 tokenAddress: value,
-              }, contracts["5"][
+              }, contracts[
                 (event->ReactEvent.Form.target)["value"]->Int.fromString->Option.getWithDefault(0)
               ])}>
             {switch form.input.tokenAddress {
             | Some(_) => React.null
             | None => <option value="999"> {"Select a token"->React.string} </option>
             }}
-            {contracts["5"]
+            {contracts
             ->Array.mapWithIndex((i, contract) =>
               <option value={i->Int.toString}> {contract["name"]->React.string} </option>
             )

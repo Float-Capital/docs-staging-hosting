@@ -4,8 +4,8 @@ import * as Cn from "re-classnames/src/Cn.js";
 import * as Form from "./Form.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
+import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
-import * as Ethers$1 from "ethers";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as TxTemplate from "../Ethereum/TxTemplate.js";
@@ -16,12 +16,9 @@ import * as ContractActions from "../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
 
 function useLongContractAddress(param) {
-  var match = RootProvider.useNetworkId(undefined);
-  return Ethers$1.utils.getAddress(match !== undefined && match !== 5 ? (
-                match !== 97 ? (
-                    match !== 321 ? "0x0dFD477dD71664821DE0c376DD23c3dcdE207448" : "0xa9e638f77Eea6036D05F00d0AC55169357De114E"
-                  ) : "0x60250481EcE03F321c12134FACC0fDfA9F95012C"
-              ) : "0x0dFD477dD71664821DE0c376DD23c3dcdE207448");
+  return Config.longShortContractAddress(Belt_Option.mapWithDefault(RootProvider.useNetworkId(undefined), "5", (function (prim) {
+                    return String(prim);
+                  })));
 }
 
 var validators = {
