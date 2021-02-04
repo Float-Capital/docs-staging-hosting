@@ -5,9 +5,34 @@
 
 body {
   @apply font-sans bg-white;
-  background: url("/img/water-tile-2.gif") repeat fixed center;
+  min-height: 100vh;
+  width: 100vw;
+  background: linear-gradient(
+      rgba(255, 255, 255, 0.3),
+      rgba(255, 255, 255, 0.3)
+    ),
+    url("/backgrounds/2.png");
+  /* url("/img/water_tile-2.gif"); */
+  background-position: top right;
+  background-size: cover;
+  /* repeat fixed center; */
   /* background: lightblue url("/img/pixel-water2.jpg") repeat fixed center; */
-  background-size: 100px 100px;
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-image {
+  height: 50px;
+  margin-right: 10px;
+}
+
+.logo-text {
+  height: 30px;
 }
 
 @tailwind utilities;

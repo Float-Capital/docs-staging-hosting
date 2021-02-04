@@ -6,12 +6,14 @@ module Navigation = {
     let router = Next.Router.useRouter()
     let optCurrentUser = RootProvider.useCurrentUser()
 
-    <nav className="p-2 h-12 flex border-b border-gray-200 justify-between items-center text-sm">
+    <nav className="p-2 h-12 flex justify-between items-center text-sm">
       <Link href="/">
         <a className="flex items-center w-1/3">
-          // <img className="w-5" src="/static/zeit-black-triangle.svg" />
           <span className="text-xl text-green-800 ml-2 align-middle font-semibold">
-            <img src="/img/float-capital-logo.png" />
+            <div className="logo-container">
+              // <img src="/img/water-tile.gif" className="logo-image" />
+              <img src="/img/float-capital-logo.png" className="logo-text" />
+            </div>
           </span>
         </a>
       </Link>
@@ -19,13 +21,18 @@ module Navigation = {
         <Link href="/"> <a className="px-3"> {React.string("Home")} </a> </Link>
         <Link href="/dapp"> <a className="px-3"> {React.string("Dapp")} </a> </Link>
         <Link href="/admin"> <a className="px-3"> {React.string("Admin")} </a> </Link>
-        <a
-          className="px-3 font-bold" target="_blank" href="https://github.com/avolabs-io/longshort">
+        <a className="px-3" target="_blank" href="https://docs.float.capital">
+          {React.string("Docs")}
+        </a>
+        <a className="px-3" target="_blank" href="https://github.com/avolabs-io/longshort">
           {React.string("Github")}
         </a>
         {switch optCurrentUser {
         | Some(currentUser) =>
-          <p> {`logged in as ${currentUser->Ethers.Utils.toString}`->React.string} </p>
+          <p>
+            {"logged in as "->React.string}
+            <DisplayAddress address={currentUser->Ethers.Utils.toString} />
+          </p>
         | None =>
           <button
             onClick={_ => {
