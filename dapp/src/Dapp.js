@@ -2,8 +2,12 @@
 
 import * as React from "react";
 import * as MintLong from "./components/Admin/MintLong.js";
+import * as MintShort from "./components/Admin/MintShort.js";
 import * as ApproveDai from "./components/Admin/ApproveDai.js";
+import * as RedeemLong from "./components/Admin/RedeemLong.js";
+import * as RedeemShort from "./components/Admin/RedeemShort.js";
 import * as RootProvider from "./libraries/RootProvider.js";
+import * as UpdateSystemState from "./components/Admin/UpdateSystemState.js";
 
 function Dapp$Access(Props) {
   var children = Props.children;
@@ -22,7 +26,7 @@ var Access = {
 function $$default(param) {
   return React.createElement(Dapp$Access, {
               children: null
-            }, React.createElement("h1", undefined, "Dapp"), React.createElement(ApproveDai.make, {}), React.createElement("hr", undefined), React.createElement(MintLong.make, {}));
+            }, React.createElement("h1", undefined, "Dapp"), React.createElement(ApproveDai.make, {}), React.createElement("hr", undefined), React.createElement(MintLong.make, {}), React.createElement("hr", undefined), React.createElement(RedeemLong.make, {}), React.createElement("hr", undefined), React.createElement(MintShort.make, {}), React.createElement("hr", undefined), React.createElement(RedeemShort.make, {}), React.createElement("hr", undefined), React.createElement(UpdateSystemState.make, {}));
 }
 
 export {
