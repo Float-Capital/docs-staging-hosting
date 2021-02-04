@@ -8,9 +8,27 @@ let useDaiContractAddress = () => {
   }->Ethers.Utils.getAddressUnsafe
 }
 
+let useLongTokenContractAddress = () => {
+  switch RootProvider.useNetworkId(){
+    | Some(97) => "0x9cbf6d1cc2cb7d1c1d6062c0c6d6af6ccfed7106" // TO-DO: REPLACE WITH CORRECT
+    | Some(5)
+    | Some (_)
+    | None => "0x9cbf6d1cc2cb7d1c1d6062c0c6d6af6ccfed7106" // GOERLI ADDRESS
+  }->Ethers.Utils.getAddressUnsafe
+}
+
+let useShortTokenContractAddress = () => {
+  switch RootProvider.useNetworkId(){
+    | Some(97) => "0x2b9b35a48a013c441f9e6fc3de133312a1931d20" // TO-DO: REPLACE WITH CORRECT
+    | Some(5)
+    | Some (_)
+    | None => "0x2b9b35a48a013c441f9e6fc3de133312a1931d20" // GOERLI ADDRESS
+  }->Ethers.Utils.getAddressUnsafe
+}
+
 module Erc20ApproveForm = %form(
-  type input = {amount: string}
-  type output = {amount: Ethers.BigNumber.t}
+  type input = {amount: string, tokenAddress: string}
+  type output = {amount: Ethers.BigNumber.t, tokenAddress: Ethers.ethAddress}
   let validators = {
     amount: {
       strategy: OnFirstBlur,
@@ -29,21 +47,33 @@ module Erc20ApproveForm = %form(
         }
       },
     },
+    tokenAddress: {
+      strategy: OnFirstBlur,
+      validate: ({tokenAddress}) => {
+        switch tokenAddress {
+          | "LONG" => useLongTokenContractAddress()->Ok
+          | "SHORT" => useShortTokenContractAddress()->Ok
+          | "DAI" => useDaiContractAddress()->Ok
+          | _ as value => Error(value)
+        }
+      }
+    }
   }
 )
+let selectOpts = ["DAI", "LONG", "SHORT"]
 
 let initialInput: Erc20ApproveForm.input = {
   amount: "",
+  tokenAddress: "DAI"
 }
 
 @react.component
 let make = () => {
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction()
 
-  let tokenAddress = useDaiContractAddress()
   let longShortAddress = MintLong.useLongContractAddress()
 
-  let form = Erc20ApproveForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
+  let form = Erc20ApproveForm.useForm(~initialInput, ~onSubmit=({amount, tokenAddress}, _form) => {
     contractExecutionHandler(
       ~makeContractInstance=Contracts.Erc20.make(~address=tokenAddress),
       ~contractFunction=Contracts.Erc20.approve(~spender=longShortAddress, ~amount),
@@ -63,8 +93,32 @@ let make = () => {
         form.submit()
       }}>
       <div className="">
-        <h2 className="text-xl"> {"Approve LongShort to spend your DAI"->React.string} </h2>
+        <h2 className="text-xl"> {"Approve LongShort to spend your tokens"->React.string} </h2>
         <div>
+          <div className="block my-3">
+          <label htmlFor="tokenAddress"> {"Choose the token: "->React.string} </label>
+          <select 
+            name="tokenAddress" 
+            id="tokenAddress" 
+            onChange={
+              event=>form.updateTokenAddress(
+                (_input, value) => {amount: _input.amount, tokenAddress: value},
+                (event->ReactEvent.Form.target)["value"],
+              )
+            }
+            onBlur={_ => form.blurAmount()}
+            disabled=form.submitting
+          >
+          {
+            selectOpts->Belt_Array.map(selectOptName => {
+              <option>
+              {selectOptName->React.string}
+              </option>
+            })->React.array
+          }
+          </select>
+          </div>
+
           <label htmlFor="amount"> {"Amount: "->React.string} </label>
           <input
             id="amount"
@@ -75,7 +129,7 @@ let make = () => {
             onBlur={_ => form.blurAmount()}
             onChange={event =>
               form.updateAmount(
-                (_input, value) => {amount: value},
+                (_input, value) => {amount: value, tokenAddress:_input.tokenAddress},
                 (event->ReactEvent.Form.target)["value"],
               )}
           />

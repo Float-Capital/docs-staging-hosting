@@ -40,7 +40,10 @@ module LongShort = {
     ~amount: Ethers.BigNumber.t,
   ) => JsPromise.t<Ethers.txSubmitted> = "mintLong"
   @send
-  external mintShort: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<Ethers.txSubmitted> =
+  external mintShort: (
+    ~contract: t,
+    ~amount: Ethers.BigNumber.t
+   ) => JsPromise.t<Ethers.txSubmitted> =
     "mintShort"
   @send
   external redeemLong: (
