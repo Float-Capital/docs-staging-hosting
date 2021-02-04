@@ -15,4 +15,17 @@ module Access = {
   }
 }
 let default = () =>
-  <Access> <h1> {"Dapp"->React.string} </h1> <ApproveDai /> <hr /> <MintLong /> </Access>
+  <Access> 
+  <h1> {"Dapp"->React.string} </h1>
+  <ApproveDai /> 
+  <hr />
+  <MintLong /> 
+  <hr/>
+  <RedeemLong />
+  <hr />
+  <MintShort />
+  <hr />
+  <RedeemShort />
+  <hr />
+  <UpdateSystemState />
+  </Access>
