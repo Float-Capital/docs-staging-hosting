@@ -7,6 +7,7 @@ import {
   ShortMinted,
   ShortRedeem,
   TokenPriceRefreshed,
+  ValueLockedInSystem,
 } from "../generated/LongShort/LongShort";
 
 import { StateChange, EventParam, EventParams } from "../generated/schema";
@@ -49,6 +50,25 @@ export function handleFeesLevied(event: FeesLevied): void {
   );
 }
 
+export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
+  //Void
+  let txHash = event.transaction.hash;
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
+  
+  let contractCallCounter = event.params.contractCallCounter;
+  let totalValueLocked = event.params.totalValueLocked;
+  let longValue = event.params.longValue;
+  let shortValue = event.params.shortValue;
+
+  let state = getOrCreateLatestSystemState(contractCallCounter, event);
+  state.totalValueLocked = totalValueLocked;
+  state.totalLockedLong = longValue;
+  state.totalLockedShort = shortValue;
+  state.save();
+}
+
+
 export function handleInterestDistribution(event: InterestDistribution): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
@@ -60,9 +80,8 @@ export function handleInterestDistribution(event: InterestDistribution): void {
   let longPercentage = event.params.longPercentage;
   let shortPercentage = event.params.shortPercentage;
 
-  let state = getOrCreateLatestSystemState(contractCallCounter, event);
-
-  state.save();
+  // let state = getOrCreateLatestSystemState(contractCallCounter, event);
+  // state.save();
 
   saveEventToStateChange(
     txHash,
@@ -146,7 +165,7 @@ export function handlePriceUpdate(event: PriceUpdate): void {
   let user = event.params.user;
 
   let state = getOrCreateLatestSystemState(contractCallCounter, event);
-
+  state.syntheticPrice = newPrice;
   state.save();
 
   saveEventToStateChange(
@@ -217,6 +236,13 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
 
   let longTokenPrice = event.params.longTokenPrice;
   let shortTokenPrice = event.params.shortTokenPrice;
+
+  let contractCallCounter = event.params.contractCallCounter;
+
+  let state = getOrCreateLatestSystemState(contractCallCounter, event);
+  state.longTokenPrice = longTokenPrice;
+  state.shortTokenPrice = shortTokenPrice;
+  state.save();
 
   saveEventToStateChange(
     txHash,
