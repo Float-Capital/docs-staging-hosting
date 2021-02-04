@@ -5,6 +5,9 @@
 
 body {
   @apply font-sans bg-white;
+  background: url("/img/water-tile-2.gif") repeat fixed center;
+  /* background: lightblue url("/img/pixel-water2.jpg") repeat fixed center; */
+  background-size: 100px 100px;
 }
 
 @tailwind utilities;

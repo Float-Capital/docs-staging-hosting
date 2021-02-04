@@ -11,7 +11,7 @@ module Navigation = {
         <a className="flex items-center w-1/3">
           // <img className="w-5" src="/static/zeit-black-triangle.svg" />
           <span className="text-xl text-green-800 ml-2 align-middle font-semibold">
-            {React.string("Float Capital")}
+            <img src="/img/float-capital-logo.png" />
           </span>
         </a>
       </Link>
