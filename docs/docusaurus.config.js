@@ -5,15 +5,15 @@ module.exports = {
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
-  favicon: "img/favicon.ico",
+  favicon: "favicons/favicon.ico",
   organizationName: "avolabs-io",
   projectName: "float.Capital docs",
   themeConfig: {
     navbar: {
-      title: "Float Capital",
+      title: "",
       logo: {
         alt: "Float Capital Logo",
-        src: "img/logo.svg",
+        src: "img/float-capital-logo-med.png",
       },
       items: [
         // {

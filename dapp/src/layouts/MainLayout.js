@@ -6,19 +6,25 @@ import Link from "next/link";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as Router from "next/router";
 import * as RootProvider from "../libraries/RootProvider.js";
+import * as DisplayAddress from "../components/UI/DisplayAddress.js";
 
 function MainLayout$Navigation(Props) {
   var router = Router.useRouter();
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
   return React.createElement("nav", {
-              className: "p-2 h-12 flex border-b border-gray-200 justify-between items-center text-sm"
+              className: "p-2 h-12 flex justify-between items-center text-sm"
             }, React.createElement(Link, {
                   href: "/",
                   children: React.createElement("a", {
                         className: "flex items-center w-1/3"
                       }, React.createElement("span", {
                             className: "text-xl text-green-800 ml-2 align-middle font-semibold"
-                          }, "Float Capital"))
+                          }, React.createElement("div", {
+                                className: "logo-container"
+                              }, React.createElement("img", {
+                                    className: "logo-text",
+                                    src: "/img/float-capital-logo.png"
+                                  }))))
                 }), React.createElement("div", {
                   className: "flex w-2/3 justify-end"
                 }, React.createElement(Link, {
@@ -37,10 +43,16 @@ function MainLayout$Navigation(Props) {
                             className: "px-3"
                           }, "Admin")
                     }), React.createElement("a", {
-                      className: "px-3 font-bold",
+                      className: "px-3",
+                      href: "https://docs.float.capital",
+                      target: "_blank"
+                    }, "Docs"), React.createElement("a", {
+                      className: "px-3",
                       href: "https://github.com/avolabs-io/longshort",
                       target: "_blank"
-                    }, "Github"), optCurrentUser !== undefined ? React.createElement("p", undefined, "logged in as " + Ethers.Utils.toString(Caml_option.valFromOption(optCurrentUser))) : React.createElement("button", {
+                    }, "Github"), optCurrentUser !== undefined ? React.createElement("p", undefined, "logged in as ", React.createElement(DisplayAddress.make, {
+                            address: Ethers.Utils.toString(Caml_option.valFromOption(optCurrentUser))
+                          })) : React.createElement("button", {
                         onClick: (function (param) {
                             router.push("/login?nextPath=" + router.asPath);
                             
