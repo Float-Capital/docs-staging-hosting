@@ -104,8 +104,6 @@ module RootWithWeb3 = {
     React.useEffect4(() =>
       switch (context.library, context.account) {
       | (Some(library), Some(account)) =>
-        Js.log2("1", library)
-        Js.log2("2", account)
         let _ =
           library
           ->Ethers.Providers.getBalance(account)

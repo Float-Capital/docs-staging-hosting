@@ -30,7 +30,10 @@ var LongShort = {
   make: make$1
 };
 
-var abi$2 = Ethers.makeAbi(["function approve(address spender, uint256 amount)"]);
+var abi$2 = Ethers.makeAbi([
+      "function approve(address spender, uint256 amount)",
+      "function balanceOf(address owner) public view returns (uint256 balance)"
+    ]);
 
 function make$2(address, providerOrSigner) {
   return Ethers.Contract.make(address, abi$2, providerOrSigner);

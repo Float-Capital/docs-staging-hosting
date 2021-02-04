@@ -57,6 +57,10 @@ function getAddress(addressString) {
             });
 }
 
+function formatEther(__x) {
+  return Ethers.utils.formatUnits(__x, "ether");
+}
+
 function toString(prim) {
   return prim;
 }
@@ -69,6 +73,7 @@ var Utils = {
   parseUnits: parseUnits,
   parseEther: parseEther,
   getAddress: getAddress,
+  formatEther: formatEther,
   toString: toString,
   toLowerString: toLowerString
 };

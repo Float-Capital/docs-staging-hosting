@@ -20,6 +20,7 @@ module Navigation = {
       <div className="flex w-2/3 justify-end">
         <Link href="/"> <a className="px-3"> {React.string("Home")} </a> </Link>
         <Link href="/dapp"> <a className="px-3"> {React.string("Dapp")} </a> </Link>
+        <Link href="/dashboard"> <a className="px-3"> {React.string("Dashboard")} </a> </Link>
         <Link href="/admin"> <a className="px-3"> {React.string("Admin")} </a> </Link>
         <a className="px-3" target="_blank" href="https://docs.float.capital">
           {React.string("Docs")}
