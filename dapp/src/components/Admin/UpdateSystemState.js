@@ -2,26 +2,16 @@
 
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as Ethers from "ethers";
+import * as MintLong from "./MintLong.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as TxTemplate from "../Ethereum/TxTemplate.js";
-import * as RootProvider from "../../libraries/RootProvider.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
-
-function useLongContractAddress(param) {
-  var match = RootProvider.useNetworkId(undefined);
-  return Ethers.utils.getAddress(match !== undefined && match !== 5 ? (
-                match !== 97 ? (
-                    match !== 321 ? "0x0dFD477dD71664821DE0c376DD23c3dcdE207448" : "0xa9e638f77Eea6036D05F00d0AC55169357De114E"
-                  ) : "0x60250481EcE03F321c12134FACC0fDfA9F95012C"
-              ) : "0x0dFD477dD71664821DE0c376DD23c3dcdE207448");
-}
 
 function UpdateSystemState(Props) {
   var match = ContractActions.useContractFunction(undefined);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
-  var tokenAddress = useLongContractAddress(undefined);
+  var tokenAddress = MintLong.useLongContractAddress(undefined);
   var onClick = function (param) {
     return Curry._2(contractExecutionHandler, (function (param) {
                   return Contracts.LongShort.make(tokenAddress, param);
@@ -46,6 +36,8 @@ function UpdateSystemState(Props) {
                 })
             });
 }
+
+var useLongContractAddress = MintLong.useLongContractAddress;
 
 var make = UpdateSystemState;
 

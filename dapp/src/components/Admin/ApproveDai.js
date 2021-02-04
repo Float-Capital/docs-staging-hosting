@@ -4,8 +4,8 @@ import * as Cn from "re-classnames/src/Cn.js";
 import * as Form from "./Form.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
+import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
-import * as Ethers$1 from "ethers";
 import * as MintLong from "./MintLong.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
@@ -17,42 +17,30 @@ import * as RootProvider from "../../libraries/RootProvider.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
 
-function useDaiContractAddress(param) {
-  var match = RootProvider.useNetworkId(undefined);
-  return Ethers$1.utils.getAddress(match !== undefined && match !== 5 && match === 97 ? "0x3264369236B39dc8Db9CFAc7360DA0c053F6b6C4" : "0x03a733Bfa29eB0D74DE0Dfd33CCA425E0d8c3867");
-}
-
-function useLongTokenContractAddress(param) {
-  RootProvider.useNetworkId(undefined);
-  return Ethers$1.utils.getAddress("0x9cbf6d1cc2cb7d1c1d6062c0c6d6af6ccfed7106");
-}
-
-function useShortTokenContractAddress(param) {
-  RootProvider.useNetworkId(undefined);
-  return Ethers$1.utils.getAddress("0x2b9b35a48a013c441f9e6fc3de133312a1931d20");
-}
-
 var validators_tokenAddress = {
   strategy: /* OnFirstBlur */0,
   validate: (function (param) {
       var tokenAddress = param.tokenAddress;
+      var netIdStr = Belt_Option.mapWithDefault(RootProvider.useNetworkId(undefined), "5", (function (prim) {
+              return String(prim);
+            }));
       switch (tokenAddress) {
         case "DAI" :
             return {
                     TAG: 0,
-                    _0: useDaiContractAddress(undefined),
+                    _0: Config.daiContractAddress(netIdStr),
                     [Symbol.for("name")]: "Ok"
                   };
         case "LONG" :
             return {
                     TAG: 0,
-                    _0: useLongTokenContractAddress(undefined),
+                    _0: Config.longTokenContractAddress(netIdStr),
                     [Symbol.for("name")]: "Ok"
                   };
         case "SHORT" :
             return {
                     TAG: 0,
-                    _0: useShortTokenContractAddress(undefined),
+                    _0: Config.shortTokenContractAddress(netIdStr),
                     [Symbol.for("name")]: "Ok"
                   };
         default:
@@ -671,9 +659,6 @@ function ApproveDai(Props) {
 var make = ApproveDai;
 
 export {
-  useDaiContractAddress ,
-  useLongTokenContractAddress ,
-  useShortTokenContractAddress ,
   Erc20ApproveForm ,
   selectOpts ,
   initialInput ,
