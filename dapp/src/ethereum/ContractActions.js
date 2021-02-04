@@ -3,7 +3,6 @@
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Ethers from "ethers";
-import * as Contracts from "./Contracts.js";
 import * as JsPromise from "../libraries/Js.Promise/JsPromise.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
@@ -60,13 +59,13 @@ function useContractFunction(param) {
   var setTxState = match[1];
   var optProviderOrSigner = useProviderOrSigner(undefined);
   return [
-          (function (contractAddress, contractFunction) {
+          (function (makeContractInstance, contractFunction) {
               Curry._1(setTxState, (function (param) {
                       return /* Created */1;
                     }));
               if (optProviderOrSigner !== undefined) {
-                var erc20Instance = Contracts.TestErc20.make(contractAddress, optProviderOrSigner);
-                var mintPromise = Curry._1(contractFunction, erc20Instance);
+                var contractInstance = Curry._1(makeContractInstance, optProviderOrSigner);
+                var mintPromise = Curry._1(contractFunction, contractInstance);
                 JsPromise.$$catch(mintPromise, (function (error) {
                         return Curry._1(setTxState, (function (param) {
                                       var msg = error.message;

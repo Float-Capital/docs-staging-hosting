@@ -51,12 +51,15 @@ let useContractFunction = () => {
 
   let optProviderOrSigner = useProviderOrSigner()
   (
-    (~contractAddress, ~contractFunction) => {
+    (
+      ~makeContractInstance,
+      ~contractFunction: (~contract: 'a) => JsPromise.t<Ethers.txSubmitted>,
+    ) => {
       setTxState(_ => Created)
       switch optProviderOrSigner {
       | Some(providerOrSigner) =>
-        let erc20Instance = Contracts.TestErc20.make(~address=contractAddress, ~providerOrSigner)
-        let mintPromise = contractFunction(~contract=erc20Instance)
+        let contractInstance = makeContractInstance(~providerOrSigner)
+        let mintPromise = contractFunction(~contract=contractInstance)
         let _ = mintPromise->JsPromise.catch(error => {
           setTxState(_ => Declined(
             switch Js.Exn.message(error->Obj.magic) {

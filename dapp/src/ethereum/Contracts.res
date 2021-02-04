@@ -1,5 +1,7 @@
+// NOTE: since the type of all of these contracts is a generic `Ethers.Contract.t`, this code can runtime error if the wrong functions are called on the wrong contracts.
+
 module TestErc20 = {
-  type t
+  type t = Ethers.Contract.t
 
   let abi = [
     "function mint(address,uint256)",
@@ -7,7 +9,7 @@ module TestErc20 = {
   ]->Ethers.makeAbi
 
   let make = (~address, ~providerOrSigner): t =>
-    Ethers.Contract.make(address, abi, providerOrSigner)->Obj.magic
+    Ethers.Contract.make(address, abi, providerOrSigner)
 
   @send
   external mint: (
@@ -18,7 +20,7 @@ module TestErc20 = {
 }
 
 module LongShort = {
-  type t
+  type t = Ethers.Contract.t
 
   let abi =
     [
@@ -30,33 +32,46 @@ module LongShort = {
     ]->Ethers.makeAbi
 
   let make = (~address, ~providerOrSigner): t =>
-    Ethers.Contract.make(address, abi, providerOrSigner)->Obj.magic
+    Ethers.Contract.make(address, abi, providerOrSigner)
 
   @send
   external mintLong: (
     ~contract: t,
-    Ethers.ethAddress,
-    Ethers.BigNumber.t,
+    ~amount: Ethers.BigNumber.t,
   ) => JsPromise.t<Ethers.txSubmitted> = "mintLong"
   @send
-  external mintShort: (
-    t,
-    Ethers.ethAddress,
-    Ethers.BigNumber.t,
-  ) => JsPromise.t<Ethers.txSubmitted> = "mintShort"
+  external mintShort: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<Ethers.txSubmitted> =
+    "mintShort"
   @send
   external redeemLong: (
-    t,
-    Ethers.ethAddress,
-    Ethers.BigNumber.t,
+    ~contract: t,
+    ~tokensToRedeem: Ethers.BigNumber.t,
   ) => JsPromise.t<Ethers.txSubmitted> = "redeemLong"
   @send
   external redeemShort: (
-    t,
-    Ethers.ethAddress,
-    Ethers.BigNumber.t,
+    ~contract: t,
+    ~tokensToRedeem: Ethers.BigNumber.t,
   ) => JsPromise.t<Ethers.txSubmitted> = "redeemShort"
   @send
-  external _updateSystemState: (t, Ethers.ethAddress) => JsPromise.t<Ethers.txSubmitted> =
+  external _updateSystemState: (~contract: t) => JsPromise.t<Ethers.txSubmitted> =
     "_updateSystemState"
+}
+
+module Erc20 = {
+  type t = Ethers.Contract.t
+
+  let abi = [
+    "function approve(address spender, uint256 amount)",
+    // "event Transfer(address indexed from, address indexed to, uint amount)",
+  ]->Ethers.makeAbi
+
+  let make = (~address, ~providerOrSigner): t =>
+    Ethers.Contract.make(address, abi, providerOrSigner)
+
+  @send
+  external approve: (
+    ~contract: t,
+    ~spender: Ethers.ethAddress,
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<Ethers.txSubmitted> = "approve"
 }

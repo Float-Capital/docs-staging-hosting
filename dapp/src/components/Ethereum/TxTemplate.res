@@ -49,9 +49,7 @@ let make = (
     </>
   | ContractActions.Failed => <>
       <h1> {"The transaction failed."->React.string} <Loader /> </h1>
-      <p>
-        {"It is possible that someone else bought the token before you, or the price changed. If you are unsure please feel free to contact our support."->React.string}
-      </p>
+      <p> {"This operation isn't permitted by the smart contract."->React.string} </p>
       children
     </>
   }
