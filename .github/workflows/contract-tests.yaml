@@ -1,13 +1,10 @@
 name: Deploy UI
 
-on:
-  push:
-    branches:
-      - master
+on: push
 
 jobs:
   # Source: https://github.community/t/run-job-only-if-folder-changed/118292/2
-  has-dapp-changes:
+  has-contract-changes:
     name: Check files
     outputs:
       run_job: ${{ steps.check_files.outputs.run_job }}
@@ -29,7 +26,7 @@ jobs:
           while IFS= read -r file
           do
             echo $file
-            if [[ $file != dapp/* ]]; then
+            if [[ $file != contracts/* ]]; then
               echo "This modified file is not under the 'db' folder."
               echo "::set-output name=run_job::false"
               break
@@ -41,19 +38,19 @@ jobs:
   push-ui-for-vercel:
     name: Push UI to repo for Vercel deployment.
     runs-on: ubuntu-latest
-    if: needs.has-dapp-changes.outputs.run_job == 'true'
+    if: needs.has-contract-changes.outputs.run_job == 'true'
 
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Pushes to another repository
-        uses: cpina/github-action-push-to-another-repository@master
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-        with:
-          source-directory: "dapp"
-          destination-github-username: "avolabs-machine"
-          destination-repository-name: "longshort-ui"
-          user-email: avolabsmachine@gmail.com
+      - name: install node packages
+        id: install_node_packages
+        run: |
+          cd contracts && yarn
+
+      - name: run contract tests
+        id: run_contract_tests
+        run: |
+          cd contracts && yarn test
