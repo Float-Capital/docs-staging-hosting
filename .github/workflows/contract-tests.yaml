@@ -1,4 +1,4 @@
-name: Deploy UI
+name: Run Contract Tests
 
 on: push
 
@@ -27,7 +27,7 @@ jobs:
           do
             echo $file
             if [[ $file != contracts/* ]]; then
-              echo "This modified file is not under the 'db' folder."
+              echo "This modified file is not under the 'contracts' folder."
               echo "::set-output name=run_job::false"
               break
             else
@@ -36,7 +36,7 @@ jobs:
           done < files.txt
 
   push-ui-for-vercel:
-    name: Push UI to repo for Vercel deployment.
+    name: Run contract tests
     runs-on: ubuntu-latest
     if: needs.has-contract-changes.outputs.run_job == 'true'
 

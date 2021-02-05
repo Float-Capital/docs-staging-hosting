@@ -30,7 +30,7 @@ jobs:
           do
             echo $file
             if [[ $file != dapp/* ]]; then
-              echo "This modified file is not under the 'db' folder."
+              echo "This modified file is not under the 'dapp' folder."
               echo "::set-output name=run_job::false"
               break
             else
