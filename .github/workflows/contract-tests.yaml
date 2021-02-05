@@ -5,7 +5,7 @@ on: push
 jobs:
   # Source: https://github.community/t/run-job-only-if-folder-changed/118292/2
   has-contract-changes:
-    name: Check files
+    name: Check for changes to contract files
     outputs:
       run_job: ${{ steps.check_files.outputs.run_job }}
     runs-on: ubuntu-latest
