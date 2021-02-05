@@ -21,11 +21,13 @@ jobs:
       - name: check modified files
         id: check_files
         run: |
+          git fetch origin master
+
           echo "=============== list modified files ==============="
           git diff --name-only origin/master...HEAD
 
           echo "========== check paths of modified files =========="
-          git diff --name-only master...HEAD > files.txt
+          git diff --name-only origin/master...HEAD > files.txt
           while IFS= read -r file
           do
             echo $file

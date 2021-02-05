@@ -18,6 +18,7 @@ jobs:
       - name: check modified files
         id: check_files
         run: |
+          git fetch origin master
           echo "=============== list modified files ==============="
           git diff --name-only origin/master...HEAD
 
