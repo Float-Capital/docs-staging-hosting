@@ -151,6 +151,10 @@ module Utils = {
   let getAddress: string => option<ethAddress> = addressString =>
     Misc.unsafeToOption(() => getAddressUnsafe(addressString))
 
+  @module("ethers") @scope("utils")
+  external formatUnits: (. BigNumber.t, ethUnit) => string = "formatUnits"
+  let formatEther = formatUnits(. _, #ether)
+
   let toString: ethAddress => string = Obj.magic
   let toLowerString: ethAddress => string = address => address->toString->Js.String.toLowerCase
 }

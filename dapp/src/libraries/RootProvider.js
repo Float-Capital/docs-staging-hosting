@@ -133,10 +133,7 @@ function RootProvider$RootWithWeb3(Props) {
             return ;
           }
           var account = Caml_option.valFromOption(match$1);
-          var library = Caml_option.valFromOption(match);
-          console.log("1", library);
-          console.log("2", account);
-          JsPromise.$$catch(library.getBalance(account).then(function (newBalance) {
+          JsPromise.$$catch(Caml_option.valFromOption(match).getBalance(account).then(function (newBalance) {
                     return Curry._1(dispatch, {
                                 _0: account,
                                 _1: Belt_Option.flatMap(newBalance, (function (balance) {
