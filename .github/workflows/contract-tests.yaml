@@ -7,41 +7,40 @@ jobs:
   has-contract-changes:
     name: Check for changes to contract files
     outputs:
-      run_job: ${{ steps.check_files.outputs.run_job }}
+      run_job: ${{ steps.has-contract-changes.outputs.run_job }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          fetch-depth: 2
+          fetch-depth: 100 # should be deep enough for our usecase
 
       - name: check modified files
-        id: check_files
+        id: has-contract-changes
         run: |
           git fetch origin master
 
-          git log --graph --oneline --all
 
           echo "=============== list modified files ==============="
-          git diff --name-only master...HEAD
+          git diff --name-only origin/master...HEAD
 
           echo "========== check paths of modified files =========="
-          git diff --name-only master...HEAD > files.txt
+          git diff --name-only origin/master...HEAD > files.txt
+
           while IFS= read -r file
           do
             echo $file
-            if [[ $file != contracts/* ]]; then
-              echo "This modified file is not under the 'contracts' folder."
-              echo "::set-output name=run_job::false"
-              break
-            else
+            if [[ $file == contracts/* ]]; then
+              echo "filename is correct"
               echo "::set-output name=run_job::true"
+              break
             fi
           done < files.txt
 
   push-ui-for-vercel:
     name: Run contract tests
     runs-on: ubuntu-latest
+    needs: has-contract-changes
     if: needs.has-contract-changes.outputs.run_job == 'true'
 
     steps:

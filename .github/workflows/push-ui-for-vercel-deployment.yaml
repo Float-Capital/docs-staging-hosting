@@ -10,39 +10,37 @@ jobs:
   has-dapp-changes:
     name: Check for changes to dapp files
     outputs:
-      run_job: ${{ steps.check_files.outputs.run_job }}
+      run_job: ${{ steps.has-dapp-changes.outputs.run_job }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          fetch-depth: 2
+          fetch-depth: 100
 
       - name: check modified files
-        id: check_files
+        id: has-dapp-changes
         run: |
           git fetch origin master
 
           echo "=============== list modified files ==============="
-          git diff --name-only master...HEAD
+          git diff --name-only origin/master...HEAD
 
           echo "========== check paths of modified files =========="
-          git diff --name-only master...HEAD > files.txt
+          git diff --name-only origin/master...HEAD > files.txt
           while IFS= read -r file
           do
             echo $file
-            if [[ $file != dapp/* ]]; then
-              echo "This modified file is not under the 'dapp' folder."
-              echo "::set-output name=run_job::false"
-              break
-            else
+            if [[ $file == dapp/* ]]; then
               echo "::set-output name=run_job::true"
+              break
             fi
           done < files.txt
 
   push-ui-for-vercel:
     name: Push UI to repo for Vercel deployment.
     runs-on: ubuntu-latest
+    needs: has-dapp-changes
     if: needs.has-dapp-changes.outputs.run_job == 'true'
 
     steps:
