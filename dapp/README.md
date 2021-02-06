@@ -2,23 +2,24 @@
 
 This is a NextJS based template with following setup:
 
-- Full Tailwind v2 config & basic css scaffold (+ production setup w/ purge-css & cssnano)
+- Full Tailwind v2 cofig & basic css scaffold (+ production setup w/ purge-css & cssnano)
 - [ReScript](https://rescript-lang.org) + React
 - Some ReScript Bindings for Next to get you started
 - Preconfigured Dependencies: `reason-react`
 
 ## Development
 
-Run ReScript in dev mode:
-
-```
-npm run res:start
-```
-
-In another tab, run the Next dev server:
+Run rescript compiler and nextjs server in 1.
 
 ```
 npm run dev
+```
+
+If you prefer running the the rescript compiler and next dev server separately, then these are the two cammands:
+
+```
+npm run res:start
+npm run next:dev
 ```
 
 ## Useful commands

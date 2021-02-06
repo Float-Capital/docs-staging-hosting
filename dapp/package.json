@@ -30,15 +30,16 @@
     "swr-sync-storage": "^1.0.1"
   },
   "scripts": {
-    "dev": "next",
+    "next:dev": "next",
     "debug": "NODE_OPTIONS='--inspect' next",
     "build": "bsb -clean-world -make-world && next build",
     "now-build": "bsb -clean-world -make-world && next build",
-    "export": "next export",
-    "start": "next start -p $PORT",
+    "next:export": "next export",
+    "next:start": "next start -p $PORT",
     "res:build": "bsb -make-world",
     "res:clean": "bsb -clean-world",
-    "res:start": "bsb -make-world -w"
+    "res:start": "bsb -make-world -w",
+    "dev": "npm-run-all --parallel res:start next:dev"
   },
   "devDependencies": {
     "@apollo/client": "^3.3.7",
@@ -47,6 +48,7 @@
     "autoprefixer": "^10.1.0",
     "bs-platform": "8.4.2",
     "cssnano": "^4.1.10",
+    "npm-run-all": "^4.1.5",
     "postcss": "^8.2.1",
     "postcss-cli": "^8.3.1",
     "reason-react": "^0.9.1",
