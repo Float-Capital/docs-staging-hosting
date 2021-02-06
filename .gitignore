@@ -121,3 +121,6 @@ dist
 settings.json
 
 .DS_Store
+
+# Place to put any files that are used for personal reference, convenience etc.
+/reference
