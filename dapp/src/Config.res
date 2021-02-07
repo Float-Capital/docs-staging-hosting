@@ -25,10 +25,7 @@ let allContracts: allChainContractDetails = %raw(`require('./contractAddresses.j
 let getContractAddressString = (~netIdStr, ~closure) => {
   allContracts
   ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(
-    Ethers.Utils.getAddressUnsafe("0x0000000000000000000000000000000000000000"),
-    closure,
-  )
+  ->Option.mapWithDefault(Constants.zeroAddress, closure)
   ->Ethers.Utils.toString
 }
 
@@ -36,33 +33,33 @@ let getContractAddressString = (~netIdStr, ~closure) => {
 let longShortContractAddress = (~netIdStr) => {
   allContracts
   ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(
-    Ethers.Utils.getAddressUnsafe("0x0000000000000000000000000000000000000000"),
-    contracts => contracts.longShort,
-  )
+  ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.longShort)
+}
+let useLongShortAddress = () => {
+  let netIdStr = RootProvider.useNetworkId()->Option.mapWithDefault("5", Int.toString)
+  longShortContractAddress(~netIdStr)
 }
 
 let daiContractAddress = (~netIdStr) => {
   allContracts
   ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(
-    Ethers.Utils.getAddressUnsafe("0x0000000000000000000000000000000000000000"),
-    contracts => contracts.dai,
-  )
+  ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.dai)
+}
+let useDaiAddress = () => {
+  let netIdStr = RootProvider.useNetworkId()->Option.mapWithDefault("5", Int.toString)
+  daiContractAddress(~netIdStr)
 }
 let longTokenContractAddress = (~netIdStr) => {
   allContracts
   ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(
-    Ethers.Utils.getAddressUnsafe("0x0000000000000000000000000000000000000000"),
-    contracts => contracts.longCoins,
-  )
+  ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.longCoins)
+}
+let useLongContractAddress = () => {
+  let netIdStr = RootProvider.useNetworkId()->Option.mapWithDefault("5", Int.toString)
+  longShortContractAddress(~netIdStr)
 }
 let shortTokenContractAddress = (~netIdStr) => {
   allContracts
   ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(
-    Ethers.Utils.getAddressUnsafe("0x0000000000000000000000000000000000000000"),
-    contracts => contracts.shortCoins,
-  )
+  ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.shortCoins)
 }

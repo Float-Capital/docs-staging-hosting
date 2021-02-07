@@ -32,7 +32,8 @@ var LongShort = {
 
 var abi$2 = Ethers.makeAbi([
       "function approve(address spender, uint256 amount)",
-      "function balanceOf(address owner) public view returns (uint256 balance)"
+      "function balanceOf(address owner) public view returns (uint256 balance)",
+      "function allowance(address owner, address spender) public view returns (uint256 remaining)"
     ]);
 
 function make$2(address, providerOrSigner) {

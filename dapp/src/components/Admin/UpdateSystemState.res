@@ -1,10 +1,8 @@
-let useLongContractAddress = MintLong.useLongContractAddress
-
 @react.component
 let make = (~signer) => {
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
 
-  let tokenAddress = useLongContractAddress()
+  let tokenAddress = Config.useLongContractAddress()
 
   let onClick = _ =>
     contractExecutionHandler(

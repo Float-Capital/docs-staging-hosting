@@ -1,4 +1,4 @@
-let useLongContractAddress = MintLong.useLongContractAddress
+let useLongContractAddress = Config.useLongContractAddress
 
 module LongRedeemForm = %form(
   type input = {amount: string}
