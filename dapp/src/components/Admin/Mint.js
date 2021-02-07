@@ -676,7 +676,8 @@ var initialInput = {
 };
 
 function Mint(Props) {
-  var match = ContractActions.useContractFunction(undefined);
+  var ethersWallet = Props.ethersWallet;
+  var match = ContractActions.useContractFunction(ethersWallet);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
   var contracts = useMintContracts(undefined);

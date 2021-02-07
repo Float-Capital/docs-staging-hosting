@@ -30,6 +30,15 @@ function getProviderOrSigner(library, account) {
   }
 }
 
+function getSigner(library, account) {
+  if (account !== undefined) {
+    return Belt_Option.mapWithDefault(library.getSigner(Caml_option.valFromOption(account)), undefined, (function (signer) {
+                  return signer;
+                }));
+  }
+  
+}
+
 function getLongShortContractAddress(chainId) {
   return Ethers.utils.getAddress(chainId !== 5 ? (
                 chainId !== 137 ? (
@@ -52,58 +61,65 @@ function useProviderOrSigner(param) {
             ]);
 }
 
-function useContractFunction(param) {
+function useSigner(param) {
+  var match = useProviderOrSigner(undefined);
+  if (match !== undefined && match.TAG !== /* Provider */0) {
+    return match._0;
+  }
+  
+}
+
+function useContractFunction(signer) {
   var match = React.useState(function () {
         return /* UnInitialised */0;
       });
   var setTxState = match[1];
-  var optProviderOrSigner = useProviderOrSigner(undefined);
   return [
           (function (makeContractInstance, contractFunction) {
               Curry._1(setTxState, (function (param) {
                       return /* Created */1;
                     }));
-              if (optProviderOrSigner !== undefined) {
-                var contractInstance = Curry._1(makeContractInstance, optProviderOrSigner);
-                var mintPromise = Curry._1(contractFunction, contractInstance);
-                JsPromise.$$catch(mintPromise, (function (error) {
-                        return Curry._1(setTxState, (function (param) {
-                                      var msg = error.message;
-                                      return {
-                                              TAG: 1,
-                                              _0: msg !== undefined ? ": " + msg : "unknown error",
-                                              [Symbol.for("name")]: "Declined"
-                                            };
-                                    }));
-                      }));
-                JsPromise.$$catch(mintPromise.then(function (tx) {
-                            Curry._1(setTxState, (function (param) {
+              var contractInstance = Curry._1(makeContractInstance, {
+                    TAG: 1,
+                    _0: signer,
+                    [Symbol.for("name")]: "Signer"
+                  });
+              var mintPromise = Curry._1(contractFunction, contractInstance);
+              JsPromise.$$catch(mintPromise, (function (error) {
+                      return Curry._1(setTxState, (function (param) {
+                                    var msg = error.message;
                                     return {
-                                            TAG: 0,
-                                            _0: tx.hash,
-                                            [Symbol.for("name")]: "SignedAndSubmitted"
+                                            TAG: 1,
+                                            _0: msg !== undefined ? ": " + msg : "unknown error",
+                                            [Symbol.for("name")]: "Declined"
                                           };
                                   }));
-                            return tx.wait();
-                          }).then(function (txOutcome) {
-                          console.log(txOutcome);
-                          return Curry._1(setTxState, (function (param) {
-                                        return {
-                                                TAG: 2,
-                                                _0: txOutcome,
-                                                [Symbol.for("name")]: "Complete"
-                                              };
-                                      }));
-                        }), (function (error) {
-                        Curry._1(setTxState, (function (param) {
-                                return /* Failed */2;
-                              }));
-                        console.log(error);
-                        
-                      }));
-              } else {
-                console.log("NOooo :( :( !!!");
-              }
+                    }));
+              JsPromise.$$catch(mintPromise.then(function (tx) {
+                          Curry._1(setTxState, (function (param) {
+                                  return {
+                                          TAG: 0,
+                                          _0: tx.hash,
+                                          [Symbol.for("name")]: "SignedAndSubmitted"
+                                        };
+                                }));
+                          return tx.wait();
+                        }).then(function (txOutcome) {
+                        console.log(txOutcome);
+                        return Curry._1(setTxState, (function (param) {
+                                      return {
+                                              TAG: 2,
+                                              _0: txOutcome,
+                                              [Symbol.for("name")]: "Complete"
+                                            };
+                                    }));
+                      }), (function (error) {
+                      Curry._1(setTxState, (function (param) {
+                              return /* Failed */2;
+                            }));
+                      console.log(error);
+                      
+                    }));
               
             }),
           match[0],
@@ -113,8 +129,10 @@ function useContractFunction(param) {
 
 export {
   getProviderOrSigner ,
+  getSigner ,
   getLongShortContractAddress ,
   useProviderOrSigner ,
+  useSigner ,
   useContractFunction ,
   
 }

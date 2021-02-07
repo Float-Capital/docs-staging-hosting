@@ -7,9 +7,6 @@ import "styles/main.css";
 // to the original React component function name.
 import ResApp from "src/App.js";
 
-import { ApolloProvider } from "@apollo/client";
-import { useApollo } from "../src/libraries/apolloClient";
-
 // Note:
 // We need to wrap the make call with
 // a Fast-Refresh conform function name,
@@ -18,10 +15,5 @@ import { useApollo } from "../src/libraries/apolloClient";
 // If you don't do this, your Fast-Refresh will
 // not work!
 export default function App(props) {
-  const apolloClient = useApollo(props.pageProps);
-  return (
-    <ApolloProvider client={apolloClient}>
-      <ResApp {...props} />
-    </ApolloProvider>
-  );
+  return <ResApp {...props} />;
 }

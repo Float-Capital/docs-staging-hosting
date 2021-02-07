@@ -6,7 +6,7 @@ dataSources:
     name: LongShort
     network: goerli
     source:
-      address: "0x0dFD477dD71664821DE0c376DD23c3dcdE207448"
+      address: "0xE1994334bEf8D23f31DA873673027977ded345dd"
       abi: LongShort
       startBlock: 4190130
     mapping:
