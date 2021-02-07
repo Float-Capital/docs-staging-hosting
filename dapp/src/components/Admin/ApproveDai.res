@@ -62,7 +62,6 @@ let make = (~signer) => {
     <Form
       className=""
       onSubmit={() => {
-        Js.log("temp")
         form.submit()
       }}>
       <div className="">

@@ -49,8 +49,6 @@ var validators_amount = {
                 [Symbol.for("name")]: "Error"
               };
       }
-      console.log("The amount");
-      console.log(value, optBalance);
       var checkRequiresApproval = function (amount) {
         if (optAmountApproved !== undefined && Caml_option.valFromOption(optAmountApproved).gte(amount)) {
           return false;
@@ -668,7 +666,6 @@ function MintLong(Props) {
                     children: React.createElement(Form.make, {
                           className: "",
                           onSubmit: (function (param) {
-                              console.log("temp");
                               return Curry._1(form.submit, undefined);
                             }),
                           children: React.createElement("div", {

@@ -14,8 +14,8 @@ type props = {
   pageProps: pageProps,
 }
 
-// // This sets up session storage caching for SWR
-// SwrPersist.syncWithSessionStorage->Misc.onlyExecuteClientSide
+// This sets up session storage caching for SWR
+SwrPersist.syncWithSessionStorage->Misc.onlyExecuteClientSide
 
 // This is a normal apollo client, it isn't optimized for nextjs yet.
 let client = (~uriLink: string) => {

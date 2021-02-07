@@ -586,7 +586,6 @@ function ApproveDai(Props) {
               children: React.createElement(Form.make, {
                     className: "",
                     onSubmit: (function (param) {
-                        console.log("temp");
                         return Curry._1(form.submit, undefined);
                       }),
                     children: React.createElement("div", {

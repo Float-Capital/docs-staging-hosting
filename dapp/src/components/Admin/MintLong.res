@@ -15,9 +15,6 @@ module AdminMintForm = %form(
         | {amount: value} when !(amountRegex->Js.Re.test_(value)) =>
           Error("Incorrect number format - please use '.' for floating points.")
         | {amount, optAmountApproved} =>
-          Js.log("The amount")
-          Js.log2(amount, optBalance)
-
           let checkRequiresApproval = amount =>
             switch optAmountApproved {
             | Some(approved) when approved->Ethers.BigNumber.gte(amount) => false
@@ -152,7 +149,6 @@ let make = (~signer) => {
       <Form
         className=""
         onSubmit={() => {
-          Js.log("temp")
           form.submit()
         }}>
         <div className="">
