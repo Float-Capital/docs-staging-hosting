@@ -5,6 +5,12 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "contractCallCounter",
         "type": "uint256"
       },
@@ -36,40 +42,9 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "contractCallCounter",
+        "name": "marketIndex",
         "type": "uint256"
       },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "newTotalValueLocked",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "totalInterest",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "longPercentage",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "shortPercentage",
-        "type": "uint256"
-      }
-    ],
-    "name": "InterestDistribution",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
       {
         "indexed": false,
         "internalType": "uint256",
@@ -110,6 +85,12 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "contractCallCounter",
         "type": "uint256"
       },
@@ -147,6 +128,12 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "contractCallCounter",
         "type": "uint256"
       },
@@ -175,6 +162,12 @@
   {
     "anonymous": false,
     "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      },
       {
         "indexed": false,
         "internalType": "uint256",
@@ -215,6 +208,12 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "contractCallCounter",
         "type": "uint256"
       },
@@ -252,6 +251,43 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "longTokenAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "shortTokenAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "assetPrice",
+        "type": "uint256"
+      }
+    ],
+    "name": "SyntheticTokenCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "contractCallCounter",
         "type": "uint256"
       },
@@ -273,7 +309,19 @@
   },
   {
     "anonymous": false,
+    "inputs": [],
+    "name": "V1",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
     "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      },
       {
         "indexed": false,
         "internalType": "uint256",
@@ -283,7 +331,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "totalValueLocked",
+        "name": "totalValueLockedInMarket",
         "type": "uint256"
       },
       {
@@ -316,7 +364,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      }
+    ],
     "name": "_updateSystemState",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -324,20 +378,7 @@
   },
   {
     "inputs": [],
-    "name": "aaveLendingContract",
-    "outputs": [
-      {
-        "internalType": "contract IAaveLendingPool",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "aaveLendingContractCore",
+    "name": "admin",
     "outputs": [
       {
         "internalType": "address",
@@ -349,20 +390,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "adaiContract",
-    "outputs": [
+    "inputs": [
       {
-        "internalType": "contract IADai",
+        "internalType": "uint256",
         "name": "",
-        "type": "address"
+        "type": "uint256"
       }
     ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "assetPrice",
     "outputs": [
       {
@@ -375,7 +409,32 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "badLiquidityEntryFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "name": "badLiquidityExitFee",
     "outputs": [
       {
@@ -388,7 +447,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "name": "baseEntryFee",
     "outputs": [
       {
@@ -401,34 +466,14 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "name": "baseExitFee",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "betaMultiplier",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "contractValueWhenScalingFeesKicksIn",
     "outputs": [
       {
         "internalType": "uint256",
@@ -453,20 +498,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "entryFeeMultiplier",
-    "outputs": [
+    "inputs": [
       {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "externalContractCounter",
     "outputs": [
       {
@@ -492,7 +530,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      }
+    ],
     "name": "getLatestPrice",
     "outputs": [
       {
@@ -505,7 +549,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      }
+    ],
     "name": "getLongBeta",
     "outputs": [
       {
@@ -518,7 +568,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      }
+    ],
     "name": "getShortBeta",
     "outputs": [
       {
@@ -532,6 +588,25 @@
   },
   {
     "inputs": [],
+    "name": "latestMarket",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "name": "longTokenPrice",
     "outputs": [
       {
@@ -544,7 +619,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "name": "longTokens",
     "outputs": [
       {
@@ -557,7 +638,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "name": "longValue",
     "outputs": [
       {
@@ -573,6 +660,30 @@
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "marketExists",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
       }
@@ -586,6 +697,11 @@
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
       }
@@ -596,20 +712,55 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "provider",
-    "outputs": [
+    "inputs": [
       {
-        "internalType": "contract ILendingPoolAddressesProvider",
-        "name": "",
+        "internalType": "string",
+        "name": "syntheticName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "syntheticSymbol",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "_oracleFeed",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_baseEntryFee",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_badLiquidityEntryFee",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_baseExitFee",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_badLiquidityExitFee",
+        "type": "uint256"
       }
     ],
-    "stateMutability": "view",
+    "name": "newSyntheticMarket",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      },
       {
         "internalType": "uint256",
         "name": "tokensToRedeem",
@@ -625,6 +776,11 @@
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
         "name": "tokensToRedeem",
         "type": "uint256"
       }
@@ -638,12 +794,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_longCoins",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_shortCoins",
+        "name": "_admin",
         "type": "address"
       },
       {
@@ -653,38 +804,8 @@
       },
       {
         "internalType": "address",
-        "name": "aDaiAddress",
+        "name": "_tokenFactory",
         "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "lendingPoolAddressProvider",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_priceOracle",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_baseEntryFee",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_entryFeeMultiplier",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_baseExitFee",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_badLiquidityExitFee",
-        "type": "uint256"
       }
     ],
     "name": "setup",
@@ -693,7 +814,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "name": "shortTokenPrice",
     "outputs": [
       {
@@ -706,11 +833,17 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "name": "shortTokens",
     "outputs": [
       {
-        "internalType": "contract ShortCoins",
+        "internalType": "contract SyntheticToken",
         "name": "",
         "type": "address"
       }
@@ -719,7 +852,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "name": "shortValue",
     "outputs": [
       {
@@ -733,7 +872,39 @@
   },
   {
     "inputs": [],
+    "name": "tokenFactory",
+    "outputs": [
+      {
+        "internalType": "contract TokenFactory",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "totalValueLocked",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "totalValueLockedInMarket",
     "outputs": [
       {
         "internalType": "uint256",
