@@ -102,10 +102,10 @@ contract LongShort is Initializable {
     mapping(uint256 => LongCoins) public shortTokens;
 
     // Fees for entering [make market specific (TODO)]
-    mapping(uint256 => uint256) baseEntryFee; // 0.1% [we div by 10000]
-    mapping(uint256 => uint256) badLiquidityEntryFee; // [= +1% fee for every 0.1 you tip the beta]
-    mapping(uint256 => uint256) baseExitFee; // 0.5% [we div by 10000]
-    mapping(uint256 => uint256) badLiquidityExitFee; // Extra charge for removing liquidity from the side with already less depth
+    mapping(uint256 => uint256) public baseEntryFee; // 0.1% [we div by 10000]
+    mapping(uint256 => uint256) public badLiquidityEntryFee; // [= +1% fee for every 0.1 you tip the beta]
+    mapping(uint256 => uint256) public baseExitFee; // 0.5% [we div by 10000]
+    mapping(uint256 => uint256) public badLiquidityExitFee; // Extra charge for removing liquidity from the side with already less depth
 
     // Tokens representing short and long position and cost at which
     // they can be minted or redeemed
@@ -216,12 +216,14 @@ contract LongShort is Initializable {
     ///// CONTRACT SET-UP //////////////
     ////////////////////////////////////
 
-    function setup(address daiAddress, address _tokenFactory)
-        public
-        initializer
-    {
-        tokenFactory = TokenFactory(_tokenFactory);
+    function setup(
+        address _admin,
+        address daiAddress,
+        address _tokenFactory
+    ) public initializer {
+        admin = _admin;
         daiContract = IERC20(daiAddress);
+        tokenFactory = TokenFactory(_tokenFactory);
     }
 
     ////////////////////////////////////
@@ -256,6 +258,7 @@ contract LongShort is Initializable {
         longTokenPrice[marketNumber] = TEN_TO_THE_18;
         shortTokenPrice[marketNumber] = TEN_TO_THE_18;
 
+        assetPrice[marketNumber] = uint256(getLatestPrice(marketNumber));
         marketExists[marketNumber] = true;
         latestMarket = marketNumber;
     }
@@ -391,7 +394,6 @@ contract LongShort is Initializable {
         if (assetPrice[marketIndex] == newPrice) {
             return;
         }
-
         // 100% -> 10**18
         // 100% -> 1
         uint256 percentageChange;
@@ -483,7 +485,7 @@ contract LongShort is Initializable {
         // $1.1 10% increase
         // $90 on short side. $110 on the long side.
         if (longValue[marketIndex] > 0 && shortValue[marketIndex] > 0) {
-            _priceChangeMechanism(assetPrice[marketIndex], newPrice);
+            _priceChangeMechanism(marketIndex, newPrice);
         }
 
         // NB: RE ADD INTEREST MECHNAISM, INCLUDE GOVERNANCE TOKENS
