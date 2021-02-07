@@ -18,6 +18,7 @@ export function getOrCreateLatestSystemState(
     latestSystemState.timestamp = event.block.timestamp;
     latestSystemState.txHash = event.transaction.hash;
     latestSystemState.blockNumber = event.block.number;
+    latestSystemState.marketIndex = ZERO;
     latestSystemState.syntheticPrice = ZERO;
     latestSystemState.longTokenPrice = ZERO;
     latestSystemState.shortTokenPrice = ZERO;
