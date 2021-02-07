@@ -548,7 +548,7 @@
     "name": "longTokens",
     "outputs": [
       {
-        "internalType": "contract LongCoins",
+        "internalType": "contract SyntheticToken",
         "name": "",
         "type": "address"
       }

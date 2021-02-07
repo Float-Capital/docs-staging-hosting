@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 let useMintContracts = () => {
   let netIdStr = RootProvider.useNetworkId()->Option.mapWithDefault("5", Int.toString)
   let getNetworkedContractAddressString = Config.getContractAddressString(~netIdStr)
@@ -12,7 +13,7 @@ let useMintContracts = () => {
       "address": getNetworkedContractAddressString(~closure=contract => contract.dai),
     },
     {
-      "name": "LongCoins",
+      "name": "SyntheticToken",
       "address": getNetworkedContractAddressString(~closure=contract => contract.longCoins),
     },
     {
