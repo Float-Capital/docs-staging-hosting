@@ -41,8 +41,8 @@ let initialInput: Erc20ApproveForm.input = {
 }
 
 @react.component
-let make = () => {
-  let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction()
+let make = (~signer) => {
+  let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
 
   let longShortAddress = MintLong.useLongContractAddress()
 

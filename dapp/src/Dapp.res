@@ -1,31 +1,28 @@
-// module MintLong = {
-//   @react.component
-//   let make = () => {
-
-//   }}
 module Access = {
   @react.component
-  let make = (~children) => {
-    let optUser = RootProvider.useCurrentUser()
+  let make = (~child) => {
+    let optSigner = ContractActions.useSigner()
 
-    switch optUser {
+    switch optSigner {
     | None => React.null
-    | Some(_user) => children
+    | Some(signer) => child(~signer)
     }
   }
 }
 let default = () =>
-  <Access> 
-  <h1> {"Dapp"->React.string} </h1>
-  <ApproveDai /> 
-  <hr />
-  <MintLong /> 
-  <hr/>
-  <RedeemLong />
-  <hr />
-  <MintShort />
-  <hr />
-  <RedeemShort />
-  <hr />
-  <UpdateSystemState />
-  </Access>
+  <Access
+    child={(~signer) => <>
+      <h1> {"Dapp"->React.string} </h1>
+      <ApproveDai signer />
+      <hr />
+      <MintLong signer />
+      <hr />
+      <RedeemLong signer />
+      <hr />
+      <MintShort signer />
+      <hr />
+      <RedeemShort signer />
+      <hr />
+      <UpdateSystemState signer />
+    </>}
+  />

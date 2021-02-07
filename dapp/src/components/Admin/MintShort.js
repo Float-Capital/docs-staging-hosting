@@ -427,7 +427,8 @@ var initialInput = {
 };
 
 function MintShort$1(Props) {
-  var match = ContractActions.useContractFunction(undefined);
+  var signer = Props.signer;
+  var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
   var tokenAddress = MintLong.useLongContractAddress(undefined);

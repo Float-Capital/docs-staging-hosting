@@ -8,7 +8,8 @@ import * as TxTemplate from "../Ethereum/TxTemplate.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 
 function UpdateSystemState(Props) {
-  var match = ContractActions.useContractFunction(undefined);
+  var signer = Props.signer;
+  var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
   var tokenAddress = MintLong.useLongContractAddress(undefined);
