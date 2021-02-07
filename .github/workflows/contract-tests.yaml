@@ -1,59 +1,59 @@
-name: Deploy UI
+name: Run Contract Tests
 
-on:
-  push:
-    branches:
-      - master
+on: push
 
 jobs:
   # Source: https://github.community/t/run-job-only-if-folder-changed/118292/2
-  has-dapp-changes:
-    name: Check for changes to dapp files
+  has-contract-changes:
+    name: Check for changes to contract files
     outputs:
-      run_job: ${{ steps.has-dapp-changes.outputs.run_job }}
+      run_job: ${{ steps.has-contract-changes.outputs.run_job }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          fetch-depth: 100
+          fetch-depth: 100 # should be deep enough for our usecase
 
       - name: check modified files
-        id: has-dapp-changes
+        id: has-contract-changes
         run: |
           git fetch origin master
+
 
           echo "=============== list modified files ==============="
           git diff --name-only origin/master...HEAD
 
           echo "========== check paths of modified files =========="
           git diff --name-only origin/master...HEAD > files.txt
+
           while IFS= read -r file
           do
             echo $file
-            if [[ $file == dapp/* ]]; then
+            if [[ $file == contracts/* ]]; then
+              echo "filename is correct"
               echo "::set-output name=run_job::true"
               break
             fi
           done < files.txt
 
   push-ui-for-vercel:
-    name: Push UI to repo for Vercel deployment.
+    name: Run contract tests
     runs-on: ubuntu-latest
-    needs: has-dapp-changes
-    if: needs.has-dapp-changes.outputs.run_job == 'true'
+    needs: has-contract-changes
+    if: needs.has-contract-changes.outputs.run_job == 'true'
 
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Pushes to another repository
-        uses: cpina/github-action-push-to-another-repository@master
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-        with:
-          source-directory: "dapp"
-          destination-github-username: "avolabs-machine"
-          destination-repository-name: "longshort-ui"
-          user-email: avolabsmachine@gmail.com
+      - name: install node packages
+        id: install_node_packages
+        run: |
+          cd contracts && yarn
+
+      - name: run contract tests
+        id: run_contract_tests
+        run: |
+          cd contracts && yarn test
