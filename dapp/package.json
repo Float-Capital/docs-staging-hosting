@@ -13,6 +13,7 @@
     "@web3-react/walletconnect-connector": "^6.1.6",
     "bs-css-emotion": "^2.3.0",
     "bs-moment": "^0.6.0",
+    "date-fns": "^2.17.0",
     "deepmerge": "^4.2.2",
     "ethers": "^5.0.26",
     "gentype": "^3.41.0",
@@ -39,7 +40,8 @@
     "res:build": "bsb -make-world",
     "res:clean": "bsb -clean-world",
     "res:start": "bsb -make-world -w",
-    "dev": "npm-run-all --parallel res:start next:dev"
+    "dev": "npm-run-all --parallel res:start next:dev",
+    "updateSchema": "get-graphql-schema https://api.thegraph.com/subgraphs/name/avolabs-io/float-capital-goerli -j > graphql_schema.json"
   },
   "devDependencies": {
     "@apollo/client": "^3.3.7",
@@ -48,11 +50,12 @@
     "autoprefixer": "^10.1.0",
     "bs-platform": "8.4.2",
     "cssnano": "^4.1.10",
+    "get-graphql-schema": "^2.1.2",
     "npm-run-all": "^4.1.5",
     "postcss": "^8.2.1",
     "postcss-cli": "^8.3.1",
     "reason-react": "^0.9.1",
-    "rescript-apollo-client": "^1.0.0",
+    "rescript-apollo-client": "^1.1.0",
     "tailwindcss": "^2.0.2",
     "yarn": "^1.22.10"
   }

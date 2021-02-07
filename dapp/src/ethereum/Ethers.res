@@ -49,7 +49,7 @@ module BigNumber = {
   type t = ethersBigNumber
 
   @module("ethers") @scope("BigNumber")
-  external fromUnsafe: string => float = "from"
+  external fromUnsafe: string => t = "from"
 
   @send external add: (t, t) => t = "add"
   @send external sub: (t, t) => t = "sub"
@@ -153,6 +153,7 @@ module Utils = {
 
   @module("ethers") @scope("utils")
   external formatUnits: (. BigNumber.t, ethUnit) => string = "formatUnits"
+
   let formatEther = formatUnits(. _, #ether)
 
   let toString: ethAddress => string = Obj.magic
