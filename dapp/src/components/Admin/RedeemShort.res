@@ -1,4 +1,4 @@
-let useLongContractAddress = MintLong.useLongContractAddress
+let useLongContractAddress = Config.useLongContractAddress
 module ShortRedeemForm = %form(
   type input = {amount: string}
   type output = {amount: Ethers.BigNumber.t}

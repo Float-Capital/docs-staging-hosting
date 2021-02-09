@@ -145,6 +145,7 @@ module Utils = {
   let parseUnits = (~amount, ~unit) => Misc.unsafeToOption(() => parseUnitsUnsafe(. amount, unit))
 
   let parseEther = (~amount) => parseUnits(~amount, ~unit=#ether)
+  let parseEtherUnsafe = (~amount) => parseUnitsUnsafe(. amount, #ether)
 
   @module("ethers") @scope("utils")
   external getAddressUnsafe: string => ethAddress = "getAddress"

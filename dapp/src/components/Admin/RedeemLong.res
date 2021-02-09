@@ -1,4 +1,4 @@
-let useLongContractAddress = MintLong.useLongContractAddress
+let useLongContractAddress = Config.useLongContractAddress
 
 module LongRedeemForm = %form(
   type input = {amount: string}
@@ -50,7 +50,6 @@ let make = (~signer) => {
     <Form
       className=""
       onSubmit={() => {
-        Js.log("temp")
         form.submit()
       }}>
       <div className="">

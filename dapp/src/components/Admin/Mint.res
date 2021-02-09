@@ -108,7 +108,6 @@ let make = (~ethersWallet) => {
     <Form
       className=""
       onSubmit={() => {
-        Js.log("temp")
         form.submit()
       }}>
       <div className="">

@@ -44,7 +44,7 @@ let initialInput: Erc20ApproveForm.input = {
 let make = (~signer) => {
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
 
-  let longShortAddress = MintLong.useLongContractAddress()
+  let longShortAddress = Config.useLongContractAddress()
 
   let form = Erc20ApproveForm.useForm(~initialInput, ~onSubmit=({amount, tokenAddress}, _form) => {
     contractExecutionHandler(
@@ -62,7 +62,6 @@ let make = (~signer) => {
     <Form
       className=""
       onSubmit={() => {
-        Js.log("temp")
         form.submit()
       }}>
       <div className="">

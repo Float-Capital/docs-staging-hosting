@@ -1,30 +1,3 @@
-SwrPersist.syncWithSessionStorage->Misc.onlyExecuteClientSide
-
-let useDaiBalance = () => {
-  let optChainId = RootProvider.useNetworkId()
-  let optUserId = RootProvider.useCurrentUser()
-  let optProviderOrSigner = ContractActions.useProviderOrSigner()
-
-  let fetchBalanceFunction = (_, chainId, userId) => {
-    let providerOrSigner = optProviderOrSigner->Option.getExn // Can safely get the value, since this function can ONLY be called when the signerOrProvider is defined.
-
-    Contracts.Erc20.balanceOf(
-      ~contract=Contracts.Erc20.make(
-        ~address=Config.daiContractAddress(~netIdStr=chainId->Int.toString),
-        ~providerOrSigner,
-      ),
-      ~owner=userId,
-    )
-  }
-
-  Swr.useSwrConditonal3(() =>
-    switch (optChainId, optProviderOrSigner, optUserId) {
-    | (Some(chainId), Some(_), Some(userId)) => Some(("chainBalance", chainId, userId))
-    | _ => None
-    }
-  , fetchBalanceFunction, ~config=None)
-}
-
 @react.component
 let make = () => {
   let {
@@ -32,7 +5,7 @@ let make = () => {
     isValidating: _isValidating,
     error: _errorLoadingBalance,
     mutate: _mutate,
-  } = useDaiBalance()
+  } = ContractHooks.useDaiBalance()
 
   <>
     {switch optBalance {

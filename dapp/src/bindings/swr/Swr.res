@@ -61,12 +61,19 @@ external useSwrConditonal2: (
 external useSwrConditonal3: (
   unit => option<('a, 'b, 'c)>,
   ('a, 'b, 'c) => JsPromise.t<'data>,
-  ~config: option<configInterface<('a, 'b), 'data>>,
+  ~config: option<configInterface<('a, 'b, 'c), 'data>>,
 ) => responseInterface<'data> = "default"
 
 @val @module("swr")
 external useSwrConditonal4: (
   unit => option<('a, 'b, 'c, 'd)>,
   ('a, 'b, 'c, 'd) => JsPromise.t<'data>,
-  ~config: option<configInterface<('a, 'b), 'data>>,
+  ~config: option<configInterface<('a, 'b, 'c, 'd), 'data>>,
+) => responseInterface<'data> = "default"
+
+@val @module("swr")
+external useSwrConditonal5: (
+  unit => option<('a, 'b, 'c, 'd, 'e)>,
+  ('a, 'b, 'c, 'd, 'e) => JsPromise.t<'data>,
+  ~config: option<configInterface<('a, 'b, 'c, 'd, 'e), 'data>>,
 ) => responseInterface<'data> = "default"

@@ -51,6 +51,10 @@ function parseEther(amount) {
   return parseUnits(amount, "ether");
 }
 
+function parseEtherUnsafe(amount) {
+  return Ethers.utils.parseUnits(amount, "ether");
+}
+
 function getAddress(addressString) {
   return unsafeToOption(function (param) {
               return Ethers.utils.getAddress(addressString);
@@ -72,6 +76,7 @@ function toLowerString(address) {
 var Utils = {
   parseUnits: parseUnits,
   parseEther: parseEther,
+  parseEtherUnsafe: parseEtherUnsafe,
   getAddress: getAddress,
   formatEther: formatEther,
   toString: toString,
