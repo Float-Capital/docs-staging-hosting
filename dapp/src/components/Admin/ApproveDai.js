@@ -20,7 +20,7 @@ var validators_tokenAddress = {
   strategy: /* OnFirstBlur */0,
   validate: (function (param) {
       var tokenAddress = param.tokenAddress;
-      var netIdStr = Belt_Option.mapWithDefault(RootProvider.useNetworkId(undefined), "5", (function (prim) {
+      var netIdStr = Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
               return String(prim);
             }));
       switch (tokenAddress) {
@@ -558,7 +558,7 @@ var initialInput = {
 };
 
 function ApproveDai(Props) {
-  var signer = Props.signer;
+  var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];

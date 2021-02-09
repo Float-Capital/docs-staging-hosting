@@ -22,6 +22,7 @@
     "moment": "^2.29.1",
     "next": "^10.0.4",
     "next-transpile-modules": "^4.1.0",
+    "nprogress": "^0.2.0",
     "re-classnames": "^5.0.1",
     "re-formality": "^4.0.0-beta.7",
     "react": "^16.13.1",

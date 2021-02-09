@@ -1,5 +1,5 @@
 let useDaiBalance = () => {
-  let optChainId = RootProvider.useNetworkId()
+  let optChainId = RootProvider.useChainId()
   let optUserId = RootProvider.useCurrentUser()
   let optProviderOrSigner = ContractActions.useProviderOrSigner()
 
@@ -24,7 +24,7 @@ let useDaiBalance = () => {
 }
 
 let useERC20Approved = (~erc20Address, ~spender) => {
-  let optChainId = RootProvider.useNetworkId()
+  let optChainId = RootProvider.useChainId()
   let optUserId = RootProvider.useCurrentUser()
   let optProviderOrSigner = ContractActions.useProviderOrSigner()
 

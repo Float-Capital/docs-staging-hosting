@@ -9,7 +9,7 @@ import * as RootProvider from "../../libraries/RootProvider.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 
 function useDaiBalance(param) {
-  var optChainId = RootProvider.useNetworkId(undefined);
+  var optChainId = RootProvider.useChainId(undefined);
   var optUserId = RootProvider.useCurrentUser(undefined);
   var optProviderOrSigner = ContractActions.useProviderOrSigner(undefined);
   var fetchBalanceFunction = function (param, chainId, userId) {
@@ -29,7 +29,7 @@ function useDaiBalance(param) {
 }
 
 function useERC20Approved(erc20Address, spender) {
-  var optChainId = RootProvider.useNetworkId(undefined);
+  var optChainId = RootProvider.useChainId(undefined);
   var optUserId = RootProvider.useCurrentUser(undefined);
   var optProviderOrSigner = ContractActions.useProviderOrSigner(undefined);
   var fetchBalanceFunction = function (param, param$1, param$2, param$3, userId) {

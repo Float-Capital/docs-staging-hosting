@@ -22,7 +22,7 @@ module Erc20ApproveForm = %form(
       strategy: OnFirstBlur,
       validate: ({tokenAddress}) => {
         // refactor at some stage as console is complaining about hook order
-        let netIdStr = RootProvider.useNetworkId()->Option.mapWithDefault("5", Int.toString)
+        let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
         switch tokenAddress {
         | "LONG" => Config.longTokenContractAddress(~netIdStr)->Ok
         | "SHORT" => Config.shortTokenContractAddress(~netIdStr)->Ok
@@ -41,7 +41,8 @@ let initialInput: Erc20ApproveForm.input = {
 }
 
 @react.component
-let make = (~signer) => {
+let make = () => {
+  let signer = ContractActions.useSignerExn()
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
 
   let longShortAddress = Config.useLongContractAddress()

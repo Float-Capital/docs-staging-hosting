@@ -35,6 +35,7 @@ let useProviderOrSigner = () => {
     }
   , (context.library, context.account))
 }
+let useProviderOrSignerExn = () => useProviderOrSigner()->Option.getExn
 let useSigner: unit => option<Ethers.Wallet.t> = () => {
   switch useProviderOrSigner() {
   | Some(Ethers.Provider(_))
@@ -43,6 +44,7 @@ let useSigner: unit => option<Ethers.Wallet.t> = () => {
   | Some(Ethers.Signer(signer)) => Some(signer)
   }
 }
+let useSignerExn = () => useSigner()->Option.getExn
 
 type transactionState =
   // | SignerUnavailable

@@ -1,5 +1,6 @@
 type inputAmount = {optAmountApproved: option<Ethers.BigNumber.t>, amount: string}
 type outputAmount = {requiresApproval: bool, amount: Ethers.BigNumber.t}
+
 module AdminMintForm = %form(
   type input = {amount: inputAmount, optBalance: option<Ethers.BigNumber.t>}
   type output = {amount: outputAmount, optBalance: option<Ethers.BigNumber.t>}
@@ -54,7 +55,9 @@ let initialInput: AdminMintForm.input = {
 }
 
 @react.component
-let make = (~signer) => {
+let make = () => {
+  let signer = ContractActions.useSignerExn()
+
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
   let (contractExecutionHandler2, txState2, setTxState2) = ContractActions.useContractFunction(
     ~signer,

@@ -36,7 +36,7 @@ let longShortContractAddress = (~netIdStr) => {
   ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.longShort)
 }
 let useLongShortAddress = () => {
-  let netIdStr = RootProvider.useNetworkId()->Option.mapWithDefault("5", Int.toString)
+  let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
   longShortContractAddress(~netIdStr)
 }
 
@@ -46,7 +46,7 @@ let daiContractAddress = (~netIdStr) => {
   ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.dai)
 }
 let useDaiAddress = () => {
-  let netIdStr = RootProvider.useNetworkId()->Option.mapWithDefault("5", Int.toString)
+  let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
   daiContractAddress(~netIdStr)
 }
 let longTokenContractAddress = (~netIdStr) => {
@@ -55,7 +55,7 @@ let longTokenContractAddress = (~netIdStr) => {
   ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.longCoins)
 }
 let useLongContractAddress = () => {
-  let netIdStr = RootProvider.useNetworkId()->Option.mapWithDefault("5", Int.toString)
+  let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
   longShortContractAddress(~netIdStr)
 }
 let shortTokenContractAddress = (~netIdStr) => {

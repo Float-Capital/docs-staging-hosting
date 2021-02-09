@@ -32,7 +32,7 @@ let client = (~uriLink: string) => {
 module GraphQl = {
   @react.component
   let make = (~children) => {
-    let networkId = RootProvider.useNetworkId()
+    let networkId = RootProvider.useChainId()
     let client = React.useMemo1(() =>
       client(
         ~uriLink={

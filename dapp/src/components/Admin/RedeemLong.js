@@ -427,7 +427,7 @@ var initialInput = {
 };
 
 function RedeemLong(Props) {
-  var signer = Props.signer;
+  var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
