@@ -5,7 +5,7 @@ import * as React from "react";
 import * as Ethers from "./ethereum/Ethers.js";
 import * as DaiBalance from "./components/ExampleViewFunctions/DaiBalance.js";
 import * as Router from "next/router";
-import * as RootProvider from "./libraries/RootProvider.js";
+import * as AccessControl from "./components/AccessControl.js";
 import * as GqlConverters from "./libraries/GqlConverters.js";
 import FromUnixTime from "date-fns/fromUnixTime";
 import FormatDistanceToNow from "date-fns/formatDistanceToNow";
@@ -148,27 +148,8 @@ var LatestSystemState = {
   useLazyWithVariables: LatestSystemState_useLazyWithVariables
 };
 
-function Dashboard$Access(Props) {
-  var children = Props.children;
-  var optUser = RootProvider.useCurrentUser(undefined);
-  var router = Router.useRouter();
-  if (optUser !== undefined) {
-    return children;
-  } else {
-    return React.createElement("h1", {
-                onClick: (function (param) {
-                    router.push("/login?nextPath=/dashboard");
-                    
-                  })
-              }, "Login to view your dashboard");
-  }
-}
-
-var Access = {
-  make: Dashboard$Access
-};
-
 function Dashboard(Props) {
+  var router = Router.useRouter();
   var match = Curry.app(use, [
         undefined,
         undefined,
@@ -205,8 +186,14 @@ function Dashboard(Props) {
   } else {
     tmp = "You might think this is impossible, but depending on the situation it might not be!";
   }
-  return React.createElement(Dashboard$Access, {
-              children: null
+  return React.createElement(AccessControl.make, {
+              children: null,
+              alternateComponent: React.createElement("h1", {
+                    onClick: (function (param) {
+                        router.push("/login?nextPath=/dashboard");
+                        
+                      })
+                  }, "Login to view your dashboard")
             }, React.createElement("h1", undefined, "Dashboard"), React.createElement(DaiBalance.make, {}), tmp);
 }
 
@@ -216,7 +203,6 @@ var $$default = Dashboard;
 
 export {
   LatestSystemState ,
-  Access ,
   make ,
   $$default ,
   $$default as default,

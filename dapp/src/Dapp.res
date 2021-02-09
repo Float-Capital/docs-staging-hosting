@@ -1,28 +1,24 @@
-module Access = {
+module Dapp = {
   @react.component
-  let make = (~child) => {
-    let optSigner = ContractActions.useSigner()
-
-    switch optSigner {
-    | None => React.null
-    | Some(signer) => child(~signer)
-    }
+  let make = () => {
+    let router = Next.Router.useRouter()
+    <AccessControl
+      alternateComponent={<h1 onClick={_ => router->Next.Router.push("/login?nextPath=/dashboard")}>
+        {"login to view this"->React.string}
+      </h1>}>
+      <h1> {"Dapp"->React.string} </h1>
+      <ApproveDai />
+      <hr />
+      <MintLong />
+      <hr />
+      <RedeemLong />
+      <hr />
+      <MintShort />
+      <hr />
+      <RedeemShort />
+      <hr />
+      <UpdateSystemState />
+    </AccessControl>
   }
 }
-let default = () =>
-  <Access
-    child={(~signer) => <>
-      <h1> {"Dapp"->React.string} </h1>
-      <ApproveDai signer />
-      <hr />
-      <MintLong signer />
-      <hr />
-      <RedeemLong signer />
-      <hr />
-      <MintShort signer />
-      <hr />
-      <RedeemShort signer />
-      <hr />
-      <UpdateSystemState signer />
-    </>}
-  />
+let default = () => <Dapp />

@@ -28,7 +28,8 @@ let initialInput: ShortRedeemForm.input = {
 }
 
 @react.component
-let make = (~signer) => {
+let make = () => {
+  let signer = ContractActions.useSignerExn()
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
 
   let tokenAddress = useLongContractAddress()

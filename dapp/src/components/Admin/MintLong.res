@@ -54,7 +54,9 @@ let initialInput: AdminMintForm.input = {
 }
 
 @react.component
-let make = (~signer) => {
+let make = () => {
+  let signer = ContractActions.useSignerExn()
+
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
   let (contractExecutionHandler2, txState2, setTxState2) = ContractActions.useContractFunction(
     ~signer,

@@ -162,16 +162,15 @@ var RootWithWeb3 = {
 };
 
 function useCurrentUser(param) {
-  var match = React.useContext(context);
-  var match$1 = match[0].ethState;
-  if (match$1) {
-    return Caml_option.some(match$1._0);
-  }
-  
+  return Core.useWeb3React().account;
+}
+
+function useCurrentUserExn(param) {
+  return Belt_Option.getExn(Core.useWeb3React().account);
 }
 
 function useIsAddressCurrentUser(address) {
-  var currentUser = useCurrentUser(undefined);
+  var currentUser = Core.useWeb3React().account;
   if (currentUser !== undefined) {
     return Ethers.Utils.toLowerString(address) === Ethers.Utils.toLowerString(Caml_option.valFromOption(currentUser));
   } else {
@@ -190,6 +189,10 @@ function useEthBalance(param) {
 
 function useNetworkId(param) {
   return Core.useWeb3React().chainId;
+}
+
+function useNetworkIdExn(param) {
+  return Belt_Option.getExn(Core.useWeb3React().chainId);
 }
 
 function useEtherscanUrl(param) {
@@ -266,9 +269,11 @@ export {
   RootContext ,
   RootWithWeb3 ,
   useCurrentUser ,
+  useCurrentUserExn ,
   useIsAddressCurrentUser ,
   useEthBalance ,
   useNetworkId ,
+  useNetworkIdExn ,
   useEtherscanUrl ,
   useDeactivateWeb3 ,
   useWeb3 ,

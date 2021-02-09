@@ -61,12 +61,20 @@ function useProviderOrSigner(param) {
             ]);
 }
 
+function useProviderOrSignerExn(param) {
+  return Belt_Option.getExn(useProviderOrSigner(undefined));
+}
+
 function useSigner(param) {
   var match = useProviderOrSigner(undefined);
   if (match !== undefined && match.TAG !== /* Provider */0) {
     return match._0;
   }
   
+}
+
+function useSignerExn(param) {
+  return Belt_Option.getExn(useSigner(undefined));
 }
 
 function useContractFunction(signer) {
@@ -132,7 +140,9 @@ export {
   getSigner ,
   getLongShortContractAddress ,
   useProviderOrSigner ,
+  useProviderOrSignerExn ,
   useSigner ,
+  useSignerExn ,
   useContractFunction ,
   
 }

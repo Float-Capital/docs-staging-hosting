@@ -127,12 +127,12 @@ module RootWithWeb3 = {
 }
 
 let useCurrentUser: unit => option<Ethers.ethAddress> = () => {
-  let (state, _) = React.useContext(RootContext.context)
-  switch state.ethState {
-  | Connected(address, _balance) => Some(address)
-  | Disconnected => None
-  }
+  let context = useWeb3React()
+
+  context.account
 }
+
+let useCurrentUserExn = () => useCurrentUser()->Option.getExn
 
 let useIsAddressCurrentUser: Ethers.ethAddress => bool = address => {
   let currentUser = useCurrentUser()
@@ -155,6 +155,8 @@ let useNetworkId: unit => option<int> = () => {
 
   context.chainId
 }
+let useNetworkIdExn = () => useNetworkId()->Option.getExn
+
 let useEtherscanUrl: unit => string = () => {
   let networkId = useNetworkId()
 

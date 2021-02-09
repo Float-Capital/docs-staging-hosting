@@ -8,7 +8,7 @@ import * as TxTemplate from "../Ethereum/TxTemplate.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 
 function UpdateSystemState(Props) {
-  var signer = Props.signer;
+  var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
