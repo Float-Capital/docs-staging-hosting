@@ -21,7 +21,7 @@ function longShortContractAddress(netIdStr) {
 }
 
 function useLongShortAddress(param) {
-  return longShortContractAddress(Belt_Option.mapWithDefault(RootProvider.useNetworkId(undefined), "5", (function (prim) {
+  return longShortContractAddress(Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
                     return String(prim);
                   })));
 }
@@ -33,7 +33,7 @@ function daiContractAddress(netIdStr) {
 }
 
 function useDaiAddress(param) {
-  return daiContractAddress(Belt_Option.mapWithDefault(RootProvider.useNetworkId(undefined), "5", (function (prim) {
+  return daiContractAddress(Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
                     return String(prim);
                   })));
 }
@@ -45,7 +45,7 @@ function longTokenContractAddress(netIdStr) {
 }
 
 function useLongContractAddress(param) {
-  return longShortContractAddress(Belt_Option.mapWithDefault(RootProvider.useNetworkId(undefined), "5", (function (prim) {
+  return longShortContractAddress(Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
                     return String(prim);
                   })));
 }

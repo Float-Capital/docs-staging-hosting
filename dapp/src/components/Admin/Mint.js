@@ -18,7 +18,7 @@ import * as ContractActions from "../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
 
 function useMintContracts(param) {
-  var netIdStr = Belt_Option.mapWithDefault(RootProvider.useNetworkId(undefined), "5", (function (prim) {
+  var netIdStr = Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
           return String(prim);
         }));
   return [

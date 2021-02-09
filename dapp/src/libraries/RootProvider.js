@@ -187,11 +187,11 @@ function useEthBalance(param) {
   
 }
 
-function useNetworkId(param) {
+function useChainId(param) {
   return Core.useWeb3React().chainId;
 }
 
-function useNetworkIdExn(param) {
+function useChainIdExn(param) {
   return Belt_Option.getExn(Core.useWeb3React().chainId);
 }
 
@@ -272,8 +272,8 @@ export {
   useCurrentUserExn ,
   useIsAddressCurrentUser ,
   useEthBalance ,
-  useNetworkId ,
-  useNetworkIdExn ,
+  useChainId ,
+  useChainIdExn ,
   useEtherscanUrl ,
   useDeactivateWeb3 ,
   useWeb3 ,

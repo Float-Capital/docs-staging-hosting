@@ -7,7 +7,7 @@ function AccessControl$EthNetwork(Props) {
   var children = Props.children;
   var alternateComponentOpt = Props.alternateComponent;
   var alternateComponent = alternateComponentOpt !== undefined ? Caml_option.valFromOption(alternateComponentOpt) : null;
-  var optChainID = RootProvider.useNetworkId(undefined);
+  var optChainID = RootProvider.useChainId(undefined);
   if (optChainID !== undefined) {
     return children;
   } else {

@@ -150,15 +150,15 @@ let useEthBalance: unit => option<Eth.t> = () => {
   | Disconnected => None
   }
 }
-let useNetworkId: unit => option<int> = () => {
+let useChainId: unit => option<int> = () => {
   let context = useWeb3React()
 
   context.chainId
 }
-let useNetworkIdExn = () => useNetworkId()->Option.getExn
+let useChainIdExn = () => useChainId()->Option.getExn
 
 let useEtherscanUrl: unit => string = () => {
-  let networkId = useNetworkId()
+  let networkId = useChainId()
 
   switch networkId {
   | Some(5) => "goerli.etherscan.io"

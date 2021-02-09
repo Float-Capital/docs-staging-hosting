@@ -1,5 +1,5 @@
 let useMintContracts = () => {
-  let netIdStr = RootProvider.useNetworkId()->Option.mapWithDefault("5", Int.toString)
+  let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
   let getNetworkedContractAddressString = Config.getContractAddressString(~netIdStr)
 
   [

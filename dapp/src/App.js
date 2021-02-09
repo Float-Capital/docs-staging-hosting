@@ -17,7 +17,7 @@ Misc.onlyExecuteClientSide(function (prim) {
 
 function App$GraphQl(Props) {
   var children = Props.children;
-  var networkId = RootProvider.useNetworkId(undefined);
+  var networkId = RootProvider.useChainId(undefined);
   var client = React.useMemo((function () {
           var uriLink = networkId !== undefined && networkId !== 5 && networkId !== 97 && networkId === 321 ? "goerli" : "https://api.thegraph.com/subgraphs/name/avolabs-io/float-capital-goerli";
           return ApolloClient.make(uriLink, undefined, undefined, undefined, ApolloClient__Cache_InMemory_InMemoryCache.make(undefined, undefined, undefined, undefined, undefined, undefined), undefined, undefined, true, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);

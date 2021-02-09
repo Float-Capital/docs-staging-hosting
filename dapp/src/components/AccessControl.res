@@ -1,7 +1,7 @@
 module EthNetwork = {
   @react.component
   let make = (~children, ~alternateComponent=React.null) => {
-    let optChainID = RootProvider.useNetworkId()
+    let optChainID = RootProvider.useChainId()
 
     switch optChainID {
     | None => alternateComponent
