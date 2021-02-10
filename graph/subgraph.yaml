@@ -14,6 +14,7 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
+        - V1
         - FeesLevied
         - SyntheticTokenCreated
         - LongMinted
@@ -26,9 +27,11 @@ dataSources:
         - name: LongShort
           file: ./abis/LongShort.json
       eventHandlers:
+        - event: V1()
+          handler: handleV1
         - event: FeesLevied(uint256,uint256,uint256,uint256,uint256)
           handler: handleFeesLevied
-        - event: SyntheticTokenCreated(uint256,address,address,uint256)
+        - event: SyntheticTokenCreated(uint256,address,address,uint256,string,string,address,uint256,uint256,uint256,uint256)
           handler: handleSyntheticTokenCreated
         - event: LongMinted(uint256,uint256,uint256,uint256,uint256,address)
           handler: handleLongMinted

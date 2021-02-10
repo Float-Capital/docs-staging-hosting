@@ -64,7 +64,7 @@ type SyntheticToken @entity {
 
 type FeeStructure @entity {
   id: ID!
-  baseEntryFee: Bytes!
+  baseEntryFee: BigInt!
   badLiquidityEntryFee: BigInt!
   baseExitFee: BigInt!
   badLiquidityExitFee: BigInt!
@@ -72,9 +72,13 @@ type FeeStructure @entity {
 
 type SyntheticMarket @entity {
   id: ID! # ID -> Market Index
+  timestampCreated: BigInt!
+  txHash: Bytes!
+  blockNumberCreated: BigInt!
+  name: String!
+  symbol: String!
   marketIndex: BigInt!
   totalValueLockedInMarket: BigInt!
-  referenceAssetPrice: BigInt!
   oracleAddress: Bytes!
   syntheticLong: SyntheticToken!
   syntheticShort: SyntheticToken!
@@ -84,6 +88,7 @@ type SyntheticMarket @entity {
 
 type GlobalState @entity {
   id: ID!
-  latestSyntheticMarket: SyntheticMarket!
+  contractVersion: BigInt!
+  # latestSyntheticMarket: SyntheticMarket!
   # latestMarket:
 }
