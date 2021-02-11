@@ -26,38 +26,39 @@ function MainLayout$Navigation(Props) {
                                     src: "/img/float-capital-logo.png"
                                   }))))
                 }), React.createElement("div", {
-                  className: "flex w-2/3 justify-end"
+                  className: "flex w-2/3 text-lg items-center justify-end"
                 }, React.createElement(Link, {
-                      href: "/",
-                      children: React.createElement("a", {
-                            className: "px-3"
-                          }, "Home")
-                    }), React.createElement(Link, {
                       href: "/dapp",
                       children: React.createElement("a", {
                             className: "px-3"
-                          }, "Dapp")
+                          }, "APP")
                     }), React.createElement(Link, {
                       href: "/dashboard",
                       children: React.createElement("a", {
                             className: "px-3"
-                          }, "Dashboard")
+                          }, "DASHBOARD")
                     }), React.createElement(Link, {
                       href: "/admin",
                       children: React.createElement("a", {
                             className: "px-3"
-                          }, "Admin")
+                          }, "ADMIN")
                     }), React.createElement("a", {
                       className: "px-3",
                       href: "https://docs.float.capital",
                       target: "_blank"
-                    }, "Docs"), React.createElement("a", {
+                    }, "DOCS"), React.createElement("a", {
                       className: "px-3",
                       href: "https://github.com/avolabs-io/longshort",
                       target: "_blank"
-                    }, "Github"), optCurrentUser !== undefined ? React.createElement("p", undefined, "logged in as ", React.createElement(DisplayAddress.make, {
+                    }, React.createElement("img", {
+                          className: "h-5",
+                          src: "/icons/github.svg"
+                        })), optCurrentUser !== undefined ? React.createElement("p", {
+                        className: "px-3"
+                      }, React.createElement(DisplayAddress.make, {
                             address: Ethers.Utils.toString(Caml_option.valFromOption(optCurrentUser))
                           })) : React.createElement("button", {
+                        className: "px-3",
                         onClick: (function (param) {
                             router.push("/login?nextPath=" + router.asPath);
                             

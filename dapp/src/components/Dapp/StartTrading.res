@@ -1,13 +1,17 @@
+module Link = Next.Link
+
 @react.component
-let make = (~onClick: _ => _) =>
+let make = () =>
   <div>
     <div className="screen-centered-container">
       <div className="start-trading">
         <div className="floating-container">
           <div className="floating">
-            <span className="floating-image-wrapper" onClick={onClick}>
-              <img src="/img/start-trading.png" className="start-trading" />
-            </span>
+            <Link href="/dapp">
+              <span className="floating-image-wrapper">
+                <img src="/img/start-trading.png" className="start-trading" />
+              </span>
+            </Link>
           </div>
         </div>
       </div>
