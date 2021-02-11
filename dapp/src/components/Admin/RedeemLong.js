@@ -5,6 +5,7 @@ import * as Form from "./Form.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Ethers from "../../ethereum/Ethers.js";
+import * as Ethers$1 from "ethers";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as TxTemplate from "../Ethereum/TxTemplate.js";
@@ -433,10 +434,11 @@ function RedeemLong(Props) {
   var contractExecutionHandler = match[0];
   var form = useForm(initialInput, (function (param, _form) {
           var amount = param.amount;
+          var arg = Ethers$1.BigNumber.from("1");
           return Curry._2(contractExecutionHandler, (function (param) {
                         return Contracts.LongShort.make(longTokenAddress, param);
                       }), (function (param) {
-                        return param.redeemLong(amount);
+                        return param.redeemLong(arg, amount);
                       }));
         }));
   var match$1 = form.amountResult;

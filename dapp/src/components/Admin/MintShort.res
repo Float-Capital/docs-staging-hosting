@@ -36,7 +36,10 @@ let make = (~shortTokenAddress) => {
   let form = MintShort.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
     contractExecutionHandler(
       ~makeContractInstance=Contracts.LongShort.make(~address=shortTokenAddress),
-      ~contractFunction=Contracts.LongShort.mintShort(~amount),
+      ~contractFunction=Contracts.LongShort.mintShort(
+        ~amount,
+        ~marketIndex=Ethers.BigNumber.fromUnsafe("1"),
+      ),
     )
   })
 

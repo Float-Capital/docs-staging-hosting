@@ -22,7 +22,6 @@ function TradeForm(Props) {
   var txState = match$1[1];
   var contractExecutionHandler = match$1[0];
   var longShortContractAddress = Config.useLongShortAddress(undefined);
-  Config.useDaiAddress(undefined);
   var match$2 = React.useState(function () {
         return "";
       });
