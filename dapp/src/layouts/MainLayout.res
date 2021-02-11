@@ -33,8 +33,8 @@ module Navigation = {
         </a>
         {switch optCurrentUser {
         | Some(currentUser) =>
-          <p className="px-3 hover:bg-white">
-            <DisplayAddress address={currentUser->Ethers.Utils.toString} />
+          <p className="px-3 bg-white hover:bg-black hover:text-gray-200">
+            <DisplayAddress address={currentUser->Ethers.Utils.toString} /> //TODO route to Profile page
           </p>
         | None =>
           <button

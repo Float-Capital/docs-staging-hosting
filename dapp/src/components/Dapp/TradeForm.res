@@ -45,9 +45,16 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
       {isMint
         ? <input className="trade-input" placeholder="redeem" />
         : <input className="trade-input" placeholder="mint" />}
-      <button className="trade-action" onClick={_ => mintFunction()}>
-        {"OPEN POSITION"->React.string}
-      </button>
+      <div>
+        <Button onClick={_ => mintFunction()} text="OPEN POSITION" />
+        <div className="float-button-outer-container">
+          <div className="float-button-container">
+            <button className="float-button" onClick={_ => mintFunction()}>
+              {"OPEN POSITION"->React.string}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     {
       let txExplererUrl = RootProvider.useEtherscanUrl()

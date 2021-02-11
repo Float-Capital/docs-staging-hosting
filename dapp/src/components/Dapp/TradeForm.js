@@ -2,6 +2,7 @@
 
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
+import * as Button from "../UI/Button.js";
 import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Loader from "../UI/Loader.js";
@@ -27,6 +28,15 @@ function TradeForm(Props) {
       });
   var setAmount = match$2[1];
   var amount = match$2[0];
+  var mintFunction = function (param) {
+    var arg = market.marketIndex;
+    var arg$1 = Ethers.Utils.parseEtherUnsafe(amount);
+    return Curry._2(contractExecutionHandler, (function (param) {
+                  return Contracts.LongShort.make(longShortContractAddress, param);
+                }), (function (param) {
+                  return param.mintLong(arg, arg$1);
+                }));
+  };
   var txExplererUrl = RootProvider.useEtherscanUrl(undefined);
   var tmp;
   if (typeof txState === "number") {
@@ -102,18 +112,21 @@ function TradeForm(Props) {
                       }) : React.createElement("input", {
                         className: "trade-input",
                         placeholder: "mint"
-                      }), React.createElement("button", {
-                      className: "trade-action",
-                      onClick: (function (param) {
-                          var arg = market.marketIndex;
-                          var arg$1 = Ethers.Utils.parseEtherUnsafe(amount);
-                          return Curry._2(contractExecutionHandler, (function (param) {
-                                        return Contracts.LongShort.make(longShortContractAddress, param);
-                                      }), (function (param) {
-                                        return param.mintLong(arg, arg$1);
-                                      }));
-                        })
-                    }, "OPEN POSITION")), tmp);
+                      }), React.createElement("div", undefined, React.createElement(Button.make, {
+                          onClick: (function (param) {
+                              return mintFunction(undefined);
+                            }),
+                          text: "OPEN POSITION"
+                        }), React.createElement("div", {
+                          className: "float-button-outer-container"
+                        }, React.createElement("div", {
+                              className: "float-button-container"
+                            }, React.createElement("button", {
+                                  className: "float-button",
+                                  onClick: (function (param) {
+                                      return mintFunction(undefined);
+                                    })
+                                }, "OPEN POSITION"))))), tmp);
 }
 
 var make = TradeForm;

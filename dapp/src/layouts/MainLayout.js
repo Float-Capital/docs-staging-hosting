@@ -49,7 +49,7 @@ function MainLayout$Navigation(Props) {
                           className: "h-5",
                           src: "/icons/github.svg"
                         })), optCurrentUser !== undefined ? React.createElement("p", {
-                        className: "px-3 hover:bg-white"
+                        className: "px-3 bg-white hover:bg-black hover:text-gray-200"
                       }, React.createElement(DisplayAddress.make, {
                             address: Ethers.Utils.toString(Caml_option.valFromOption(optCurrentUser))
                           })) : React.createElement("button", {
