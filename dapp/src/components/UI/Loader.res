@@ -1,3 +1,5 @@
 @react.component
 let make = () =>
-  <div className="loader-container"> <img src="/img/loading.gif" className="loader" /> </div>
+  <div className="screen-centered-container">
+    <img src="/img/loading.gif" className="loader" />
+  </div>
