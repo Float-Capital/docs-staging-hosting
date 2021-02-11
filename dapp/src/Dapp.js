@@ -61,7 +61,13 @@ function Dapp$Dapp(Props) {
                                     placeholder: "mint"
                                   }), React.createElement("button", {
                                   className: "trade-action"
-                                }, "OPEN POSITION"))), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("h1", undefined, "Dapp"), React.createElement(ApproveDai.make, {}), React.createElement("hr", undefined), React.createElement(MintLong.make, {}), React.createElement("hr", undefined), React.createElement(RedeemLong.make, {}), React.createElement("hr", undefined), React.createElement(MintShort.make, {}), React.createElement("hr", undefined), React.createElement(RedeemShort.make, {}), React.createElement("hr", undefined), React.createElement(UpdateSystemState.make, {})) : React.createElement(StartTrading.make, {
+                                }, "OPEN POSITION"))), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("h1", undefined, "Dapp"), React.createElement(ApproveDai.make, {}), React.createElement("hr", undefined), React.createElement(MintLong.make, {}), React.createElement("hr", undefined), React.createElement(RedeemLong.make, {
+                          longTokenAddress: longTokenAddress
+                        }), React.createElement("hr", undefined), React.createElement(MintShort.make, {
+                          shortTokenAddress: shortTokenAddress
+                        }), React.createElement("hr", undefined), React.createElement(RedeemShort.make, {
+                          shortTokenAddress: shortTokenAddress
+                        }), React.createElement("hr", undefined), React.createElement(UpdateSystemState.make, {})) : React.createElement(StartTrading.make, {
                       onClick: (function (param) {
                           return Curry._1(setIsStartTrading, (function (param) {
                                         return true;
@@ -74,47 +80,7 @@ function Dapp$Dapp(Props) {
                         
                       })
                   }, "login to view this")
-<<<<<<< HEAD
-            }, React.createElement("section", undefined, React.createElement("div", undefined, React.createElement("div", {
-                          className: "trade-form"
-                        }, React.createElement("h2", undefined, "FTSE 100"), React.createElement("select", {
-                              className: "trade-select",
-                              name: "longshort"
-                            }, React.createElement("option", {
-                                  value: "long"
-                                }, "Long 🐮"), React.createElement("option", {
-                                  value: "short"
-                                }, "Short 🐻")), isMint ? React.createElement("input", {
-                                className: "trade-input",
-                                placeholder: "mint"
-                              }) : React.createElement("input", {
-                                className: "trade-input",
-                                placeholder: "redeem"
-                              }), React.createElement("div", {
-                              className: "trade-switch",
-                              onClick: (function (param) {
-                                  return Curry._1(setIsMint, (function (param) {
-                                                return !isMint;
-                                              }));
-                                })
-                            }, "↑↓"), isMint ? React.createElement("input", {
-                                className: "trade-input",
-                                placeholder: "redeem"
-                              }) : React.createElement("input", {
-                                className: "trade-input",
-                                placeholder: "mint"
-                              }), React.createElement("button", {
-                              className: "trade-action"
-                            }, "OPEN POSITION"))), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("h1", undefined, "Dapp"), React.createElement(ApproveDai.make, {}), React.createElement("hr", undefined), React.createElement(MintLong.make, {}), React.createElement("hr", undefined), React.createElement(RedeemLong.make, {
-                      longTokenAddress: longTokenAddress
-                    }), React.createElement("hr", undefined), React.createElement(MintShort.make, {
-                      shortTokenAddress: shortTokenAddress
-                    }), React.createElement("hr", undefined), React.createElement(RedeemShort.make, {
-                      shortTokenAddress: shortTokenAddress
-                    }), React.createElement("hr", undefined)), React.createElement(UpdateSystemState.make, {}));
-=======
             });
->>>>>>> c835bf881875e0a5c4a8ba7b47d47c22a418e8e6
 }
 
 var Dapp = {

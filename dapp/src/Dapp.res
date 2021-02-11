@@ -46,11 +46,11 @@ module Dapp = {
             <hr />
             <MintLong />
             <hr />
-            <RedeemLong />
+            <RedeemLong longTokenAddress />
             <hr />
-            <MintShort />
+            <MintShort shortTokenAddress />
             <hr />
-            <RedeemShort />
+            <RedeemShort shortTokenAddress />
             <hr />
             <UpdateSystemState />
           </section>}

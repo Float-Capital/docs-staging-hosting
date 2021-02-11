@@ -1,37 +1,11 @@
-/* let useMintContracts = () => {
-  let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
-  let getNetworkedContractAddressString = Config.getContractAddressString(~netIdStr)
-
-  [
-    {
-      "name": "aDai",
-      "address": getNetworkedContractAddressString(~closure=contract => contract.aDai),
-    },
-    {
-      "name": "Dai",
-      "address": getNetworkedContractAddressString(~closure=contract => contract.dai),
-    },
-    {
-      "name": "SyntheticToken",
-      "address": getNetworkedContractAddressString(~closure=contract => contract.longCoins),
-    },
-    {
-      "name": "ShortCoins",
-      "address": getNetworkedContractAddressString(~closure=contract => contract.shortCoins),
-    },
-  ]
-} */
-
-/* module AdminMintForm = %form(
+module AdminMintForm = %form(
   type input = {
     address: string,
     amount: string,
-    tokenAddress: option<{"address": string, "name": string}>,
   }
   type output = {
     address: Ethers.ethAddress,
     amount: Ethers.BigNumber.t,
-    tokenAddress: Ethers.ethAddress,
   }
   let validators = {
     address: {
@@ -60,42 +34,25 @@
         }
       },
     },
-    tokenAddress: {
-      strategy: OnFirstBlur,
-      validate: ({tokenAddress}) => {
-        switch tokenAddress
-        ->Option.mapWithDefault("", details => details["address"])
-        ->Ethers.Utils.getAddress {
-        | Some(validAddress) => Ok(validAddress)
-        | None => Error("Address is invalid")
-        }
-      },
-    },
   }
 )
 
 let initialInput: AdminMintForm.input = {
   address: "",
   amount: "",
-  tokenAddress: None,
-} */
+}
 
 @react.component
 let make = (~ethersWallet) => {
-  Js.log(ethersWallet)
-  <h1> {"TODO: Reimplement - fetch contract addresses from graph"->React.string} </h1>
-  /* let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
+  let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
     ~signer=ethersWallet,
   )
 
-  let contracts = useMintContracts()
+  let daiContract = Config.useDaiAddress()
 
-  let form = AdminMintForm.useForm(~initialInput, ~onSubmit=(
-    {address, amount, tokenAddress},
-    _form,
-  ) => {
+  let form = AdminMintForm.useForm(~initialInput, ~onSubmit=({address, amount}, _form) => {
     contractExecutionHandler(
-      ~makeContractInstance=Contracts.TestErc20.make(~address=tokenAddress),
+      ~makeContractInstance=Contracts.TestErc20.make(~address=daiContract),
       ~contractFunction=Contracts.TestErc20.mint(~recipient=address, ~amount),
     )
   })
@@ -156,36 +113,6 @@ let make = (~ethersWallet) => {
           }}
         </div>
         <div>
-          <label htmlFor="contractToMinFor"> {"Contract to mint for:"->React.string} </label>
-          <select
-            name="contractToMinFor"
-            id="contractToMinFor"
-            disabled=form.submitting
-            className="push-lg"
-            onBlur={_ => form.blurTokenAddress()}
-            onChange={event => form.updateTokenAddress((input, value) => {
-                ...input,
-                tokenAddress: value,
-              }, contracts[
-                (event->ReactEvent.Form.target)["value"]->Int.fromString->Option.getWithDefault(0)
-              ])}>
-            {switch form.input.tokenAddress {
-            | Some(_) => React.null
-            | None => <option value="999"> {"Select a token"->React.string} </option>
-            }}
-            {contracts
-            ->Array.mapWithIndex((i, contract) =>
-              <option value={i->Int.toString}> {contract["name"]->React.string} </option>
-            )
-            ->React.array}
-          </select>
-          {switch form.tokenAddressResult {
-          | Some(Error(message)) => <div className="text-red-600"> {message->React.string} </div>
-          | Some(Ok(_)) => <div className="text-green-600"> {j`✓`->React.string} </div>
-          | None => React.null
-          }}
-        </div>
-        <div>
           <button
             className={"text-lg disabled:opacity-50 bg-green-500 rounded-lg"}
             disabled=form.submitting>
@@ -201,5 +128,5 @@ let make = (~ethersWallet) => {
         </div>
       </div>
     </Form>
-  </TxTemplate> */
+  </TxTemplate>
 }

@@ -15,6 +15,32 @@ module LatestSystemState = %graphql(`
     setBy
   }
 }`)
+
+module MarketDetails = %graphql(`
+{
+  syntheticMarkets {
+    name
+    symbol
+    marketIndex
+    totalValueLockedInMarket
+    oracleAddress
+    syntheticLong {
+      id
+      tokenAddress
+      totalValueLocked
+      tokenSupply
+      tokenPrice
+    }
+    syntheticShort {
+      id
+      tokenAddress
+      totalValueLocked
+      tokenSupply
+      tokenPrice
+    }
+  }
+}
+`)
 // module LatestStateChanges = %graphql(`
 // {
 //   stateChanges (first:5, orderBy:timestamp, orderDirection: desc) {
@@ -81,6 +107,38 @@ let make = () => {
       </>
     | {data: Some(_), error: None, loading: false} =>
       "Query returned wrong number of results"->React.string
+    | {data: None, error: None, loading: false} =>
+      "You might think this is impossible, but depending on the situation it might not be!"->React.string
+    }}
+    {switch MarketDetails.use() {
+    | {loading: true} => "Loading..."->React.string
+    | {error: Some(_error)} => "Error loading data"->React.string
+    | {data: Some({syntheticMarkets})} => <>
+        <h1> {"Markets"->React.string} </h1>
+        {syntheticMarkets
+        ->Array.map(({
+          name,
+          symbol,
+          marketIndex,
+          totalValueLockedInMarket,
+          oracleAddress,
+          syntheticLong: {
+            id: idLong,
+            tokenAddress: tokenAddressLong,
+            totalValueLocked: totalValueLockedLong,
+            tokenSupply: tokenSupplyLong,
+            tokenPrice: tokenPriceLong,
+          },
+          syntheticShort: {
+            id: idShort,
+            tokenAddress: tokenAddressShort,
+            totalValueLocked: totalValueLockedShort,
+            tokenSupply: tokenSupplyShort,
+            tokenPrice: tokenPriceShort,
+          },
+        }) => <div key=symbol> {name->React.string} </div>)
+        ->React.array}
+      </>
     | {data: None, error: None, loading: false} =>
       "You might think this is impossible, but depending on the situation it might not be!"->React.string
     }}
