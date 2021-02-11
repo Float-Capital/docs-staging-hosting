@@ -854,6 +854,11 @@
         "internalType": "address",
         "name": "_tokenFactory",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_staker",
+        "type": "address"
       }
     ],
     "name": "setup",
@@ -913,6 +918,19 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "staker",
+    "outputs": [
+      {
+        "internalType": "contract Staker",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
