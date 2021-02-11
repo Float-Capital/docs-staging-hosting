@@ -4,7 +4,9 @@ import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
+import * as Loader from "../UI/Loader.js";
 import * as Contracts from "../../ethereum/Contracts.js";
+import * as RootProvider from "../../libraries/RootProvider.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 
 function TradeForm(Props) {
@@ -17,6 +19,7 @@ function TradeForm(Props) {
   var isMint = match[0];
   var signer = ContractActions.useSignerExn(undefined);
   var match$1 = ContractActions.useContractFunction(signer);
+  var txState = match$1[1];
   var contractExecutionHandler = match$1[0];
   var longShortContractAddress = Config.useLongShortAddress(undefined);
   Config.useDaiAddress(undefined);
@@ -25,6 +28,44 @@ function TradeForm(Props) {
       });
   var setAmount = match$2[1];
   var amount = match$2[0];
+  var txExplererUrl = RootProvider.useEtherscanUrl(undefined);
+  var tmp;
+  if (typeof txState === "number") {
+    switch (txState) {
+      case /* UnInitialised */0 :
+          tmp = null;
+          break;
+      case /* Created */1 :
+          tmp = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, "Tx created."), React.createElement("div", undefined, React.createElement(Loader.make, {})));
+          break;
+      case /* Failed */2 :
+          tmp = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed.", React.createElement(Loader.make, {})), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."));
+          break;
+      
+    }
+  } else {
+    switch (txState.TAG | 0) {
+      case /* SignedAndSubmitted */0 :
+          tmp = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, React.createElement("a", {
+                        href: "https://" + txExplererUrl + "/tx/" + txState._0,
+                        rel: "noopener noreferrer",
+                        target: "_blank"
+                      }, "View the transaction on " + txExplererUrl)), React.createElement(Loader.make, {}));
+          break;
+      case /* Declined */1 :
+          tmp = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0));
+          break;
+      case /* Complete */2 :
+          var txHash = txState._0.transactionHash;
+          tmp = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Transaction Complete ", React.createElement(Loader.make, {})), React.createElement("p", undefined, React.createElement("a", {
+                        href: "https://" + txExplererUrl + "/tx/" + txHash,
+                        rel: "noopener noreferrer",
+                        target: "_blank"
+                      }, "View the transaction on " + txExplererUrl)));
+          break;
+      
+    }
+  }
   return React.createElement("div", {
               className: "screen-centered-container"
             }, React.createElement("div", {
@@ -73,7 +114,7 @@ function TradeForm(Props) {
                                         return param.mintLong(arg, arg$1);
                                       }));
                         })
-                    }, "OPEN POSITION")));
+                    }, "OPEN POSITION")), tmp);
 }
 
 var make = TradeForm;

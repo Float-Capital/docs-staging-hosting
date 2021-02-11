@@ -78,23 +78,16 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
               {("View the transaction on " ++ txExplererUrl)->React.string}
             </a>
           </p>
-          {switch resetTxState {
-          | Some(resetTxState) =>
-            <button onClick={_ => resetTxState()}> {"Go back"->React.string} </button>
-          | None => React.null
-          }}
         </>
       | ContractActions.Declined(message) => <>
           <h1>
             {"The transaction was declined by your wallet, please try again."->React.string}
           </h1>
           <p> {("Failure reason: " ++ message)->React.string} </p>
-          children
         </>
       | ContractActions.Failed => <>
           <h1> {"The transaction failed."->React.string} <Loader /> </h1>
           <p> {"This operation isn't permitted by the smart contract."->React.string} </p>
-          children
         </>
       }
     }
