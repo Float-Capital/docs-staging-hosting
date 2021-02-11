@@ -11,7 +11,6 @@ import * as ContractActions from "../../ethereum/ContractActions.js";
 
 function TradeForm(Props) {
   var market = Props.market;
-  console.log(market);
   var match = React.useState(function () {
         return true;
       });
