@@ -2,6 +2,7 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/presets/ERC20PresetMinterPauser.sol";
 import "./LongShort.sol";
+import "./FloatToken.sol";
 
 /*
     ###### Purpose of contract ########
@@ -25,13 +26,10 @@ contract Staker is Initializable {
     mapping(address => bool) syntheticValid;
 
     ///////// User Specific ///////////
+    mapping(address => uint256) public accumulatedFloat;
     mapping(address => mapping(address => uint256)) public userAmountStaked; // synthetic token type -> user -> amount staked
-    mapping(address => mapping(address => uint256)) public userTimestampOfStake; // synthetic token -> user -> avaiable withdrawl time
-    // More state needed here.
-    // mapping(address => mapping(address => uint256)) public userLastMintTime; // synthetic token -> user -> Last time of mint
-
-    // Keep track of user latest starting reward state. (index)
-    // User last end reward state (index)
+    mapping(address => mapping(address => uint256))
+        public userIndexOfLastClaimedReward;
 
     struct RewardState {
         uint256 timestamp;
@@ -45,12 +43,23 @@ contract Staker is Initializable {
 
     ///////// LongShort Contract ///////////
     LongShort public floatContract;
+    FloatToken public floatToken;
 
     ////////////////////////////////////
     /////////// EVENTS /////////////////
     ////////////////////////////////////
 
     event DeployV0();
+    event StateAdded(
+        address tokenAddress,
+        uint256 stateIndex,
+        uint256 timestamp,
+        uint256 accumulative
+    );
+    event StakeAdded(address user, address tokenAddress, uint256 amount);
+    event StakeWithdrawn(address user, address tokenAddress, uint256 amount);
+    event FloatMinted(address user, uint256 amount);
+    event FloatAccumulated(address user, address tokenAddress, uint256 amount);
 
     ////////////////////////////////////
     /////////// MODIFIERS //////////////
@@ -75,14 +84,14 @@ contract Staker is Initializable {
     ///// CONTRACT SET-UP //////////////
     ////////////////////////////////////
 
-    function initialize(address _admin, address _floatContract)
-        public
-        initializer
-    {
+    function initialize(
+        address _admin,
+        address _floatContract,
+        address _floatToken
+    ) public initializer {
         admin = _admin;
         floatContract = LongShort(_floatContract);
-
-        emit DeployV0();
+        floatToken = FloatToken(_floatToken);
     }
 
     ////////////////////////////////////
@@ -101,10 +110,8 @@ contract Staker is Initializable {
         address longTokenAddress,
         address shortTokenAddress
     ) external onlyFloat {
-        // use market index for time and
         syntheticValid[longTokenAddress] = true;
         syntheticValid[shortTokenAddress] = true;
-        // Implement adding the new synthetic here.
 
         syntheticRewardParams[longTokenAddress][0].timestamp = block.timestamp;
         syntheticRewardParams[longTokenAddress][0]
@@ -113,10 +120,12 @@ contract Staker is Initializable {
         syntheticRewardParams[shortTokenAddress][0].timestamp = block.timestamp;
         syntheticRewardParams[shortTokenAddress][0]
             .accumulativeFloatPerSecond = 0;
+
+        emit StateAdded(longTokenAddress, 0, block.timestamp, 0);
     }
 
     ////////////////////////////////////
-    /////////// HELPER FUNCTIONS ///////
+    // GLOBAL REWARD STATE FUNCTIONS ///
     ////////////////////////////////////
 
     function calculateFloatPerSecond(uint256 tokenPrice)
@@ -175,6 +184,14 @@ contract Staker is Initializable {
             .timestamp;
         // set next index
         latestRewardIndex[tokenAddress] = newIndex;
+
+        emit StateAdded(
+            tokenAddress,
+            newIndex,
+            block.timestamp,
+            syntheticRewardParams[tokenAddress][newIndex]
+                .accumulativeFloatPerSecond
+        );
     }
 
     function addNewStateForFloatRewards(
@@ -194,54 +211,129 @@ contract Staker is Initializable {
     }
 
     ////////////////////////////////////
+    // USER REWARD STATE FUNCTIONS ///
+    ////////////////////////////////////
+
+    function calculateAccumulatedFloat(address tokenAddress)
+        internal
+        returns (uint256)
+    {
+        // Safe Math will make this fail in case users try to claim immediately after
+        // after deposit before the next state is updated.
+        uint256 accumDelta =
+            syntheticRewardParams[tokenAddress][latestRewardIndex[tokenAddress]]
+                .accumulativeFloatPerSecond
+                .sub(
+                syntheticRewardParams[tokenAddress][
+                    userIndexOfLastClaimedReward[tokenAddress][msg.sender]
+                ]
+                    .accumulativeFloatPerSecond
+            );
+
+        return accumDelta * userAmountStaked[tokenAddress][msg.sender];
+    }
+
+    function creditAccumulatedFloat(address tokenAddress) internal {
+        uint256 additionalFloat = calculateAccumulatedFloat(tokenAddress);
+        // Set the user has claimed up until now.
+        userIndexOfLastClaimedReward[tokenAddress][
+            msg.sender
+        ] = latestRewardIndex[tokenAddress];
+
+        // Add float to their balance.
+        accumulatedFloat[msg.sender] =
+            accumulatedFloat[msg.sender] +
+            additionalFloat;
+
+        emit FloatAccumulated(msg.sender, tokenAddress, additionalFloat);
+    }
+
+    ////////////////////////////////////
     /////////// STAKING ////////////////
     ////////////////////////////////////
 
     /*
-    Staking function. 
+    Staking function.
+    User can stake (flexibly) and start earning float rewards.
+    Only approved float synthetic tokens can be staked.
+    Users can call this same function to "top-up" their stake.
     */
-    function stake(address fundAddress, uint256 amount)
+    function stake(address tokenAddress, uint256 amount)
         external
-        onlyValidSynthetic(fundAddress)
+        onlyValidSynthetic(tokenAddress)
     {
-        ERC20PresetMinterPauserUpgradeSafe(fundAddress).transferFrom(
+        ERC20PresetMinterPauserUpgradeSafe(tokenAddress).transferFrom(
             msg.sender,
             address(this),
             amount
         );
 
-        userAmountStaked[fundAddress][msg.sender] = userAmountStaked[
-            fundAddress
+        // If they already have staked, calculate and award them their float.
+        if (userAmountStaked[tokenAddress][msg.sender] > 0) {
+            if (
+                userIndexOfLastClaimedReward[tokenAddress][msg.sender] <
+                latestRewardIndex[tokenAddress]
+            ) {
+                creditAccumulatedFloat(tokenAddress);
+                mintFloat();
+            }
+        }
+
+        userAmountStaked[tokenAddress][msg.sender] = userAmountStaked[
+            tokenAddress
         ][msg.sender]
             .add(amount);
-        userTimestampOfStake[fundAddress][msg.sender] = block.timestamp;
 
-        // Update token generation itntervals
-        // Update time of last mint.
-        // Mint FLOAT tokens, send if already staked before and owed FLOAT
+        // We are currently smashing them out of earnings till the next state update.
+        // Figure out what happens when they fall inbetween state updates.
+        // Note this also effects top up people.
+        userIndexOfLastClaimedReward[tokenAddress][msg.sender] =
+            latestRewardIndex[tokenAddress] +
+            1;
+
+        emit StakeAdded(msg.sender, tokenAddress, amount);
     }
 
     ////////////////////////////////////
-    /////////// WITHDRAW ///////////////
+    /////// WITHDRAW n MINT ////////////
     ////////////////////////////////////
 
     /*
-    Withdraw function
+    Withdraw function.
+    Mint user any outstanding float before
     */
-    function withdraw(address fundAddress) external {
+    function withdraw(address tokenAddress, uint256 amount) external {
         require(
-            userAmountStaked[fundAddress][msg.sender] > 0,
+            userAmountStaked[tokenAddress][msg.sender] > 0,
             "nothing to withdraw"
         );
-        uint256 amount = userAmountStaked[fundAddress][msg.sender];
-        userAmountStaked[fundAddress][msg.sender] = 0;
-        ERC20PresetMinterPauserUpgradeSafe(fundAddress).transfer(
+        creditAccumulatedFloat(tokenAddress);
+
+        userAmountStaked[tokenAddress][msg.sender] = userAmountStaked[
+            tokenAddress
+        ][msg.sender]
+            .sub(amount);
+
+        ERC20PresetMinterPauserUpgradeSafe(tokenAddress).transfer(
             msg.sender,
             amount
         );
 
-        // Update token generation itntervals
-        // Update time of last mint.
-        // Mint FLOAT tokens, send
+        mintFloat();
+        emit StakeWithdrawn(msg.sender, tokenAddress, amount);
+    }
+
+    /*
+    Mint function.
+    If the user has accumulated float, we mint it to them.
+    */
+    function mintFloat() public {
+        if (accumulatedFloat[msg.sender] > 0) {
+            uint256 floatToMint = accumulatedFloat[msg.sender];
+            accumulatedFloat[msg.sender] = 0;
+            // mint and send user floatToMint
+            floatToken.mint(msg.sender, floatToMint);
+            emit FloatMinted(msg.sender, floatToMint);
+        }
     }
 }
