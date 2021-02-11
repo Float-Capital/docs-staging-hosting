@@ -6,17 +6,7 @@ external longshortContractBinanceTest: option<string> =
 
 let longshortContractAbi = [""]->Ethers.makeAbi
 
-type contractDetails = {
-  @as("ADai") aDai: Ethers.ethAddress,
-  @as("AaveLendingPool") aaveLendingPool: Ethers.ethAddress,
-  @as("Dai") dai: Ethers.ethAddress,
-  @as("LendingPoolAddressesProvider") lendingPoolAddressesProvider: Ethers.ethAddress,
-  @as("LongCoins") longCoins: Ethers.ethAddress,
-  @as("LongShort") longShort: Ethers.ethAddress,
-  @as("Migrations") migrations: Ethers.ethAddress,
-  @as("PriceOracle") priceOracle: Ethers.ethAddress,
-  @as("ShortCoins") shortCoins: Ethers.ethAddress,
-}
+type contractDetails = {@as("LongShort") longShort: Ethers.ethAddress}
 
 type allChainContractDetails = Js.Dict.t<contractDetails>
 
