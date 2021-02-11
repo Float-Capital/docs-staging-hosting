@@ -79,10 +79,10 @@ module.exports = {
             //   label: "Home",
             //   to: "https://float.capital",
             // },
-            {
-              label: "Blog",
-              to: "blog",
-            },
+            // {
+            //   label: "Blog",
+            //   to: "blog",
+            // },
             {
               label: "GitHub",
               href: "https://github.com/avolabs-io",
@@ -106,10 +106,10 @@ module.exports = {
           // Please change this to your repo.
           editUrl: "https://github.com/",
         },
-        blog: {
-          showReadingTime: true,
-          editUrl: "https://github.com/",
-        },
+        // blog: {
+        //   showReadingTime: true,
+        //   editUrl: "https://github.com/",
+        // },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
