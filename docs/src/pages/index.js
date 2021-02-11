@@ -2,10 +2,9 @@ import React, { useEffect } from "react";
 import Layout from "@theme/Layout";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import styles from "./styles.module.css";
+import Loader from "../components/Loader.jsx";
 
-function Redirect() {
-  // TODO make page a loading component
-
+const Redirect = () => {
   useEffect(() => {
     window.location.href = "docs/";
   }, []);
@@ -17,9 +16,11 @@ function Redirect() {
       title={`Float Capital Docs ${siteConfig.title}`}
       description="Float Capital Documentation"
     >
-      <main>Loading...</main>
+      <main>
+        <Loader />
+      </main>
     </Layout>
   );
-}
+};
 
 export default Redirect;
