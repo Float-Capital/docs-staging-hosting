@@ -30,31 +30,26 @@ function MainLayout$Navigation(Props) {
                 }, React.createElement(Link, {
                       href: "/dapp",
                       children: React.createElement("a", {
-                            className: "px-3"
+                            className: "px-3 hover:bg-white"
                           }, "APP")
                     }), React.createElement(Link, {
                       href: "/dashboard",
                       children: React.createElement("a", {
-                            className: "px-3"
+                            className: "px-3 hover:bg-white"
                           }, "DASHBOARD")
-                    }), React.createElement(Link, {
-                      href: "/admin",
-                      children: React.createElement("a", {
-                            className: "px-3"
-                          }, "ADMIN")
                     }), React.createElement("a", {
-                      className: "px-3",
+                      className: "px-3 hover:bg-white",
                       href: "https://docs.float.capital",
                       target: "_blank"
                     }, "DOCS"), React.createElement("a", {
-                      className: "px-3",
+                      className: "px-3 hover:opacity-60",
                       href: "https://github.com/avolabs-io/longshort",
                       target: "_blank"
                     }, React.createElement("img", {
                           className: "h-5",
                           src: "/icons/github.svg"
                         })), optCurrentUser !== undefined ? React.createElement("p", {
-                        className: "px-3"
+                        className: "px-3 hover:bg-white"
                       }, React.createElement(DisplayAddress.make, {
                             address: Ethers.Utils.toString(Caml_option.valFromOption(optCurrentUser))
                           })) : React.createElement("button", {

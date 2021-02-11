@@ -104,7 +104,7 @@ module AdminActions = {
       <div>
         <h1> {"Test Functions"->React.string} </h1>
         <div className={"border-dashed border-4 border-light-red-500"}>
-          <MintDai ethersWallet />
+          <ApproveDai /> <MintDai ethersWallet />
         </div>
       </div>
     | None => React.null

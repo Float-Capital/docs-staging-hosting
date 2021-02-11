@@ -5,6 +5,7 @@ import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Ethers from "ethers";
 import * as MintDai from "./MintDai.js";
+import * as ApproveDai from "./ApproveDai.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as RootProvider from "../../libraries/RootProvider.js";
@@ -107,7 +108,7 @@ function AdminTestingPortal$AdminActions(Props) {
   if (optEthersWallet !== undefined) {
     return React.createElement("div", undefined, React.createElement("h1", undefined, "Test Functions"), React.createElement("div", {
                     className: "border-dashed border-4 border-light-red-500"
-                  }, React.createElement(MintDai.make, {
+                  }, React.createElement(ApproveDai.make, {}), React.createElement(MintDai.make, {
                         ethersWallet: optEthersWallet
                       })));
   } else {

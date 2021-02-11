@@ -18,18 +18,24 @@ module Navigation = {
         </a>
       </Link>
       <div className="flex w-2/3 text-lg items-center justify-end">
-        <Link href="/dapp"> <a className="px-3"> {React.string("APP")} </a> </Link>
-        <Link href="/dashboard"> <a className="px-3"> {React.string("DASHBOARD")} </a> </Link>
-        <Link href="/admin"> <a className="px-3"> {React.string("ADMIN")} </a> </Link>
-        <a className="px-3" target="_blank" href="https://docs.float.capital">
+        <Link href="/dapp"> <a className="px-3 hover:bg-white"> {React.string("APP")} </a> </Link>
+        <Link href="/dashboard">
+          <a className="px-3 hover:bg-white"> {React.string("DASHBOARD")} </a>
+        </Link>
+        <a className="px-3 hover:bg-white" target="_blank" href="https://docs.float.capital">
           {React.string("DOCS")}
         </a>
-        <a className="px-3" target="_blank" href="https://github.com/avolabs-io/longshort">
+        <a
+          className="px-3 hover:opacity-60"
+          target="_blank"
+          href="https://github.com/avolabs-io/longshort">
           <img src="/icons/github.svg" className="h-5" />
         </a>
         {switch optCurrentUser {
         | Some(currentUser) =>
-          <p className="px-3"> <DisplayAddress address={currentUser->Ethers.Utils.toString} /> </p>
+          <p className="px-3 hover:bg-white">
+            <DisplayAddress address={currentUser->Ethers.Utils.toString} />
+          </p>
         | None =>
           <button
             className="px-3"

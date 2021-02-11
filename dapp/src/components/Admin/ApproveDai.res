@@ -1,4 +1,4 @@
-/* module Erc20ApproveForm = %form(
+module Erc20ApproveForm = %form(
   type input = {amount: string, tokenAddress: string}
   type output = {amount: Ethers.BigNumber.t, tokenAddress: Ethers.ethAddress}
   let validators = {
@@ -24,8 +24,8 @@
         // refactor at some stage as console is complaining about hook order
         let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
         switch tokenAddress {
-        | "LONG" => Config.longTokenContractAddress(~netIdStr)->Ok
-        | "SHORT" => Config.shortTokenContractAddress(~netIdStr)->Ok
+        // | "LONG" => Config.longTokenContractAddress(~netIdStr)->Ok
+        // | "SHORT" => Config.shortTokenContractAddress(~netIdStr)->Ok
         | "DAI" => Config.daiContractAddress(~netIdStr)->Ok
         | _ as value => Error(value)
         }
@@ -33,20 +33,20 @@
     },
   }
 )
-let selectOpts = ["DAI", "LONG", "SHORT"]
+// let selectOpts = ["DAI", "LONG", "SHORT"]
+let selectOpts = ["DAI"]
 
 let initialInput: Erc20ApproveForm.input = {
   amount: "",
   tokenAddress: "DAI",
-} */
+}
 
 @react.component
 let make = () => {
-  <h1> {"Re-implement with contract addresses fetched from graph"->React.string} </h1>
-  /* let signer = ContractActions.useSignerExn()
+  let signer = ContractActions.useSignerExn()
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
 
-  let longShortAddress = Config.useLongContractAddress()
+  let longShortAddress = Config.useLongShortAddress()
 
   let form = Erc20ApproveForm.useForm(~initialInput, ~onSubmit=({amount, tokenAddress}, _form) => {
     contractExecutionHandler(
@@ -125,5 +125,4 @@ let make = () => {
       </div>
     </Form>
   </TxTemplate>
- */
 }
