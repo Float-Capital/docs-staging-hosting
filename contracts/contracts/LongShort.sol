@@ -8,6 +8,7 @@ import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
 import "./SyntheticToken.sol";
 import "./TokenFactory.sol";
+import "./Staker.sol";
 
 /**
  * @dev {LongShort} contract, including:
@@ -82,6 +83,7 @@ contract LongShort is Initializable {
     // Can we accept multiple deposits?
     IERC20 public daiContract;
     TokenFactory public tokenFactory;
+    Staker public staker;
 
     ////// Constants ///////
     uint256 public constant TEN_TO_THE_18 = 10**18;
@@ -225,11 +227,13 @@ contract LongShort is Initializable {
     function setup(
         address _admin,
         address daiAddress,
-        address _tokenFactory
+        address _tokenFactory,
+        address _staker
     ) public initializer {
         admin = _admin;
         daiContract = IERC20(daiAddress);
         tokenFactory = TokenFactory(_tokenFactory);
+        staker = Staker(_staker);
 
         emit V1();
     }
@@ -269,6 +273,11 @@ contract LongShort is Initializable {
         assetPrice[marketNumber] = uint256(getLatestPrice(marketNumber));
         marketExists[marketNumber] = true;
         latestMarket = marketNumber;
+
+        staker.addNewStakingFund(
+            address(longTokens[marketNumber]),
+            address(shortTokens[marketNumber])
+        );
 
         emit SyntheticTokenCreated(
             marketNumber,
@@ -485,6 +494,18 @@ contract LongShort is Initializable {
         doesMarketExist(marketIndex)
         updateCounterIfExternalCall(marketIndex)
     {
+        // This is called right before any state change!
+        // So reward rate can be calculated just in time by
+        // staker without needing to be saved
+        staker.addNewStateForFloatRewards(
+            address(longTokens[marketIndex]),
+            address(shortTokens[marketIndex]),
+            longTokenPrice[marketIndex],
+            shortTokenPrice[marketIndex],
+            longValue[marketIndex],
+            shortValue[marketIndex]
+        );
+
         if (longValue[marketIndex] == 0 && shortValue[marketIndex] == 0) {
             return;
         }
@@ -562,7 +583,6 @@ contract LongShort is Initializable {
         daiContract.transfer(msg.sender, amount);
     }
 
-
     /*
      * Calculates fees for the given base amount and an additional penalty
      * amount that extra fees are paid on. Users are penalised for imbalancing
@@ -585,13 +605,10 @@ contract LongShort is Initializable {
             penaltyRate = badLiquidityExitFee[marketIndex];
         }
 
-        uint256 baseFee = baseAmount
-            .mul(baseRate)
-            .div(feeUnitsOfPrecision);
+        uint256 baseFee = baseAmount.mul(baseRate).div(feeUnitsOfPrecision);
 
-        uint256 penaltyFee = penaltyAmount
-            .mul(penaltyRate)
-            .div(feeUnitsOfPrecision);
+        uint256 penaltyFee =
+            penaltyAmount.mul(penaltyRate).div(feeUnitsOfPrecision);
 
         return baseFee.add(penaltyFee);
     }
@@ -612,17 +629,18 @@ contract LongShort is Initializable {
          // TODO: Is this what we want for new markets?
          if (isMint && (longValue == 0 || shortValue == 0)) {
             return _getFeesForAmounts(marketIndex, amount, 0, isMint);
-         }
+        }
 
-         uint256 fees = 0; // amount paid in fees
-         uint256 feeGap = 0; // amount that can be spent before higher fees
+        uint256 fees = 0; // amount paid in fees
+        uint256 feeGap = 0; // amount that can be spent before higher fees
 
-		bool isLongMintOrShortRedeem = isMint == isLong;
+        bool isLongMintOrShortRedeem = isMint == isLong;
         if (isLongMintOrShortRedeem) {
             if (shortValue > longValue) {
                 feeGap = shortValue - longValue;
             }
-        } else { // long redeem or short mint
+        } else {
+            // long redeem or short mint
             if (longValue > shortValue) {
                 feeGap = longValue - shortValue;
             }
@@ -630,13 +648,18 @@ contract LongShort is Initializable {
 
         // Case 1: fee gap is big enough that user pays no penalty fees
         if (feeGap >= amount) {
-            return _getFeesForAmounts(marketIndex, amount, 0, isMint); 
-        // Case 2: user pays penalty fees on the remained after fee gap
+            return _getFeesForAmounts(marketIndex, amount, 0, isMint);
+            // Case 2: user pays penalty fees on the remained after fee gap
         } else {
-            return _getFeesForAmounts(
-                marketIndex, amount, amount.sub(feeGap), isMint);
+            return
+                _getFeesForAmounts(
+                    marketIndex,
+                    amount,
+                    amount.sub(feeGap),
+                    isMint
+                );
         }
-     }
+    }
 
     ////////////////////////////////////
     /////////// MINT TOKENS ////////////
@@ -660,9 +683,8 @@ contract LongShort is Initializable {
         _refreshTokensPrice(marketIndex);
 
         // Mint long tokens with remaining value.
-        uint256 tokens = remaining
-            .mul(TEN_TO_THE_18)
-            .div(longTokenPrice[marketIndex]);
+        uint256 tokens =
+            remaining.mul(TEN_TO_THE_18).div(longTokenPrice[marketIndex]);
         longTokens[marketIndex].mint(msg.sender, tokens);
         longValue[marketIndex] = longValue[marketIndex].add(remaining);
 
@@ -701,9 +723,8 @@ contract LongShort is Initializable {
         _refreshTokensPrice(marketIndex);
 
         // Mint short tokens with remaining value.
-        uint256 tokens = remaining
-            .mul(TEN_TO_THE_18)
-            .div(shortTokenPrice[marketIndex]);
+        uint256 tokens =
+            remaining.mul(TEN_TO_THE_18).div(shortTokenPrice[marketIndex]);
         shortTokens[marketIndex].mint(msg.sender, tokens);
         shortValue[marketIndex] = shortValue[marketIndex].add(remaining);
 
@@ -737,11 +758,17 @@ contract LongShort is Initializable {
         longTokens[marketIndex].burnFrom(msg.sender, tokensToRedeem);
 
         // Compute fees.
-        uint256 amount = tokensToRedeem
-            .mul(longTokenPrice[marketIndex])
-            .div(TEN_TO_THE_18);
-        uint256 fees = _getFeesForAction(marketIndex, amount,
-            longValue[marketIndex], shortValue[marketIndex], false, true);
+        uint256 amount =
+            tokensToRedeem.mul(longTokenPrice[marketIndex]).div(TEN_TO_THE_18);
+        uint256 fees =
+            _getFeesForAction(
+                marketIndex,
+                amount,
+                longValue[marketIndex],
+                shortValue[marketIndex],
+                false,
+                true
+            );
         uint256 remaining = amount.sub(fees);
 
         // TODO: decide on redeeming fees mechanism.
@@ -778,11 +805,17 @@ contract LongShort is Initializable {
         shortTokens[marketIndex].burnFrom(msg.sender, tokensToRedeem);
 
         // Compute fees.
-        uint256 amount = tokensToRedeem
-            .mul(shortTokenPrice[marketIndex])
-            .div(TEN_TO_THE_18);
-        uint256 fees = _getFeesForAction(marketIndex, amount,
-            longValue[marketIndex], shortValue[marketIndex], false, false);
+        uint256 amount =
+            tokensToRedeem.mul(shortTokenPrice[marketIndex]).div(TEN_TO_THE_18);
+        uint256 fees =
+            _getFeesForAction(
+                marketIndex,
+                amount,
+                longValue[marketIndex],
+                shortValue[marketIndex],
+                false,
+                false
+            );
         uint256 remaining = amount.sub(fees);
 
         // TODO: decide on redeeming fees mechanism.
