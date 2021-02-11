@@ -6,7 +6,7 @@
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
     "build": "docusaurus build",
-    "swizzle": "docusaurus swizzle",    
+    "swizzle": "docusaurus swizzle",
     "serve": "docusaurus serve",
     "clear": "docusaurus clear",
     "make-cname-staging": "echo 'stagingdocs.float.capital' >static/CNAME",
@@ -15,15 +15,17 @@
     "switch-to-production": "git remote set-url origin https://github.com/avolabs-io/float-capital-docs.git",
     "switch-to-development": "git remote set-url origin https://github.com/avolabs-io/longshort.git",
     "predeploy": "yarn build",
-    "deploy": "gh-pages -d build",
-    "deploy-to-staging": "yarn make-cname-staging && yarn predeploy && yarn switch-to-staging && yarn deploy && yarn switch-to-development",
-    "deploy-to-production": "yarn make-cname-production && yarn predeploy && yarn switch-to-production && yarn deploy && yarn switch-to-development"
+    "deploy": "gh-pages -d build",    
+    "deploy-to-staging": "yarn make-cname-staging && yarn predeploy && yarn switch-to-staging && ENVIRONMENT=staging yarn deploy && yarn switch-to-development",
+    "deploy-to-production": "yarn make-cname-production && yarn predeploy && yarn switch-to-production && ENVIRONMENT=production yarn deploy && yarn switch-to-development"
   },
   "dependencies": {
     "@docusaurus/core": "2.0.0-alpha.70",
     "@docusaurus/preset-classic": "2.0.0-alpha.70",
     "@mdx-js/react": "^1.6.21",
     "clsx": "^1.1.1",
+    "docusaurus2-dotenv": "^1.4.0",
+    "gh-pages": "^3.1.0",
     "react": "^16.8.4",
     "react-dom": "^16.8.4"
   },

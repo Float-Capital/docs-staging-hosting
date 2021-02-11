@@ -1,7 +1,14 @@
+require("dotenv").config();
+
+const environment = process.env.ENVIRONMENT;
+
 module.exports = {
   title: "Float Capital | Docs",
   tagline: "Onchain decentralized exposure to 100% collatoralized derivatives",
-  url: "https://docs.float.capital",
+  url:
+    environment === "production"
+      ? "https://docs.float.capital"
+      : "https://stagingdocs.float.capital",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -91,7 +98,11 @@ module.exports = {
       "@docusaurus/preset-classic",
       {
         docs: {
-          sidebarPath: require.resolve("./sidebars.js"),
+          // sidebarPath: require.resolve("./sidebars.js"),
+          sidebarPath:
+            process.env.ENVIRONMENT == "staging"
+              ? require.resolve("./staging-sidebars.js")
+              : require.resolve("./sidebars.js"),
           // Please change this to your repo.
           editUrl: "https://github.com/",
         },
@@ -102,6 +113,14 @@ module.exports = {
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
+      },
+    ],
+  ],
+  plugins: [
+    [
+      "docusaurus2-dotenv",
+      {
+        systemvars: true,
       },
     ],
   ],
