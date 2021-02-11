@@ -1,2 +1,3 @@
 @react.component
-let make = () => <p> {"loading"->React.string} </p>
+let make = () =>
+  <div className="loader-container"> <img src="/img/loading.gif" className="loader" /> </div>
