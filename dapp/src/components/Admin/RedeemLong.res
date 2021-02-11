@@ -34,7 +34,10 @@ let make = (~longTokenAddress) => {
   let form = LongRedeemForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
     contractExecutionHandler(
       ~makeContractInstance=Contracts.LongShort.make(~address=longTokenAddress),
-      ~contractFunction=Contracts.LongShort.redeemLong(~tokensToRedeem=amount),
+      ~contractFunction=Contracts.LongShort.redeemLong(
+        ~marketIndex=Ethers.BigNumber.fromUnsafe("1"),
+        ~tokensToRedeem=amount,
+      ),
     )
   })
 

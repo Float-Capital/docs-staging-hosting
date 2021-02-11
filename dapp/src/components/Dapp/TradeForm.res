@@ -4,11 +4,11 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
 
   let signer = ContractActions.useSignerExn()
 
-  let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
+  let (contractExecutionHandler, txState, _setTxState) = ContractActions.useContractFunction(
+    ~signer,
+  )
 
   let longShortContractAddress = Config.useLongShortAddress()
-
-  let daiAddress = Config.useDaiAddress()
 
   let (amount, setAmount) = React.useState(_ => "")
 

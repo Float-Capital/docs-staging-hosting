@@ -585,10 +585,11 @@ function MintLong(Props) {
           var match = param.amount;
           var amount = match.amount;
           var mintFunction = function (param) {
+            var arg = Ethers$1.BigNumber.from("1");
             return Curry._2(contractExecutionHandler, (function (param) {
                           return Contracts.LongShort.make(longShortContractAddress, param);
                         }), (function (param) {
-                          return param.mintLong(amount);
+                          return param.mintLong(arg, amount);
                         }));
           };
           if (!match.requiresApproval) {

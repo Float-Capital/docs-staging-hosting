@@ -80,7 +80,10 @@ let make = () => {
     let mintFunction = () =>
       contractExecutionHandler(
         ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
-        ~contractFunction=Contracts.LongShort.mintLong(~amount),
+        ~contractFunction=Contracts.LongShort.mintLong(
+          ~marketIndex=Ethers.BigNumber.fromUnsafe("1"),
+          ~amount,
+        ),
       )
     switch requiresApproval {
     | true =>
