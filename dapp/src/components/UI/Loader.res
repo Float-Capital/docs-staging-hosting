@@ -1,2 +1,5 @@
 @react.component
-let make = () => <p> {"loading"->React.string} </p>
+let make = () =>
+  <div className="screen-centered-container">
+    <img src="/img/loading.gif" className="loader" />
+  </div>

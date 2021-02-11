@@ -9,6 +9,7 @@ import * as ApproveDai from "./components/Admin/ApproveDai.js";
 import * as RedeemLong from "./components/Admin/RedeemLong.js";
 import * as RedeemShort from "./components/Admin/RedeemShort.js";
 import * as Router from "next/router";
+import * as StartTrading from "./components/Dapp/StartTrading.js";
 import * as AccessControl from "./components/AccessControl.js";
 import * as UpdateSystemState from "./components/Admin/UpdateSystemState.js";
 
@@ -21,16 +22,59 @@ function Dapp$Dapp(Props) {
   var match = React.useState(function () {
         return true;
       });
-  var setIsMint = match[1];
-  var isMint = match[0];
+  var setIsStartTrading = match[1];
+  var match$1 = React.useState(function () {
+        return true;
+      });
+  var setIsMint = match$1[1];
+  var isMint = match$1[0];
   return React.createElement(AccessControl.make, {
-              children: null,
+              children: match[0] ? React.createElement("section", undefined, React.createElement("div", {
+                          className: "screen-centered-container"
+                        }, React.createElement("div", {
+                              className: "trade-form"
+                            }, React.createElement("h2", undefined, "FTSE 100"), React.createElement("select", {
+                                  className: "trade-select",
+                                  name: "longshort"
+                                }, React.createElement("option", {
+                                      value: "long"
+                                    }, "Long 🐮"), React.createElement("option", {
+                                      value: "short"
+                                    }, "Short 🐻")), isMint ? React.createElement("input", {
+                                    className: "trade-input",
+                                    placeholder: "mint"
+                                  }) : React.createElement("input", {
+                                    className: "trade-input",
+                                    placeholder: "redeem"
+                                  }), React.createElement("div", {
+                                  className: "trade-switch",
+                                  onClick: (function (param) {
+                                      return Curry._1(setIsMint, (function (param) {
+                                                    return !isMint;
+                                                  }));
+                                    })
+                                }, "↑↓"), isMint ? React.createElement("input", {
+                                    className: "trade-input",
+                                    placeholder: "redeem"
+                                  }) : React.createElement("input", {
+                                    className: "trade-input",
+                                    placeholder: "mint"
+                                  }), React.createElement("button", {
+                                  className: "trade-action"
+                                }, "OPEN POSITION"))), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("h1", undefined, "Dapp"), React.createElement(ApproveDai.make, {}), React.createElement("hr", undefined), React.createElement(MintLong.make, {}), React.createElement("hr", undefined), React.createElement(RedeemLong.make, {}), React.createElement("hr", undefined), React.createElement(MintShort.make, {}), React.createElement("hr", undefined), React.createElement(RedeemShort.make, {}), React.createElement("hr", undefined), React.createElement(UpdateSystemState.make, {})) : React.createElement(StartTrading.make, {
+                      onClick: (function (param) {
+                          return Curry._1(setIsStartTrading, (function (param) {
+                                        return true;
+                                      }));
+                        })
+                    }),
               alternateComponent: React.createElement("h1", {
                     onClick: (function (param) {
                         router.push("/login?nextPath=/dashboard");
                         
                       })
                   }, "login to view this")
+<<<<<<< HEAD
             }, React.createElement("section", undefined, React.createElement("div", undefined, React.createElement("div", {
                           className: "trade-form"
                         }, React.createElement("h2", undefined, "FTSE 100"), React.createElement("select", {
@@ -68,6 +112,9 @@ function Dapp$Dapp(Props) {
                     }), React.createElement("hr", undefined), React.createElement(RedeemShort.make, {
                       shortTokenAddress: shortTokenAddress
                     }), React.createElement("hr", undefined)), React.createElement(UpdateSystemState.make, {}));
+=======
+            });
+>>>>>>> c835bf881875e0a5c4a8ba7b47d47c22a418e8e6
 }
 
 var Dapp = {

@@ -3,7 +3,12 @@
 import * as React from "react";
 
 function Loader(Props) {
-  return React.createElement("p", undefined, "loading");
+  return React.createElement("div", {
+              className: "screen-centered-container"
+            }, React.createElement("img", {
+                  className: "loader",
+                  src: "/img/loading.gif"
+                }));
 }
 
 var make = Loader;

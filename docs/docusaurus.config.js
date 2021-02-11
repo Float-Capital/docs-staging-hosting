@@ -1,7 +1,14 @@
+require("dotenv").config();
+
+const environment = process.env.ENVIRONMENT;
+
 module.exports = {
   title: "Float Capital | Docs",
   tagline: "Onchain decentralized exposure to 100% collatoralized derivatives",
-  url: "https://docs.float.capital",
+  url:
+    environment === "production"
+      ? "https://docs.float.capital"
+      : "https://stagingdocs.float.capital",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -72,10 +79,10 @@ module.exports = {
             //   label: "Home",
             //   to: "https://float.capital",
             // },
-            {
-              label: "Blog",
-              to: "blog",
-            },
+            // {
+            //   label: "Blog",
+            //   to: "blog",
+            // },
             {
               label: "GitHub",
               href: "https://github.com/avolabs-io",
@@ -91,17 +98,29 @@ module.exports = {
       "@docusaurus/preset-classic",
       {
         docs: {
-          sidebarPath: require.resolve("./sidebars.js"),
+          // sidebarPath: require.resolve("./sidebars.js"),
+          sidebarPath:
+            process.env.ENVIRONMENT == "staging"
+              ? require.resolve("./staging-sidebars.js")
+              : require.resolve("./sidebars.js"),
           // Please change this to your repo.
           editUrl: "https://github.com/",
         },
-        blog: {
-          showReadingTime: true,
-          editUrl: "https://github.com/",
-        },
+        // blog: {
+        //   showReadingTime: true,
+        //   editUrl: "https://github.com/",
+        // },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
+      },
+    ],
+  ],
+  plugins: [
+    [
+      "docusaurus2-dotenv",
+      {
+        systemvars: true,
       },
     ],
   ],
