@@ -24,10 +24,10 @@ module LongShort = {
 
   let abi =
     [
-      "function mintLong(uint256 amount)",
-      "function mintShort(uint256 amount)",
-      "function redeemLong(uint256 tokensToRedeem)",
-      "function redeemShort(uint256 tokensToRedeem)",
+      "function mintLong(uint256 marketIndex,uint256 amount)",
+      "function mintShort(uint256 marketIndex,uint256 amount)",
+      "function redeemLong(uint256 marketIndex,uint256 tokensToRedeem)",
+      "function redeemShort(uint256 marketIndex,uint256 tokensToRedeem)",
       "function _updateSystemState()",
     ]->Ethers.makeAbi
 
@@ -37,21 +37,25 @@ module LongShort = {
   @send
   external mintLong: (
     ~contract: t,
+    ~marketIndex: Ethers.BigNumber.t,
     ~amount: Ethers.BigNumber.t,
   ) => JsPromise.t<Ethers.txSubmitted> = "mintLong"
   @send
   external mintShort: (
     ~contract: t,
+    ~marketIndex: Ethers.BigNumber.t,
     ~amount: Ethers.BigNumber.t,
   ) => JsPromise.t<Ethers.txSubmitted> = "mintShort"
   @send
   external redeemLong: (
     ~contract: t,
+    ~marketIndex: Ethers.BigNumber.t,
     ~tokensToRedeem: Ethers.BigNumber.t,
   ) => JsPromise.t<Ethers.txSubmitted> = "redeemLong"
   @send
   external redeemShort: (
     ~contract: t,
+    ~marketIndex: Ethers.BigNumber.t,
     ~tokensToRedeem: Ethers.BigNumber.t,
   ) => JsPromise.t<Ethers.txSubmitted> = "redeemShort"
   @send

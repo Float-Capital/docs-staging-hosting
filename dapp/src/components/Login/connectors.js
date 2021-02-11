@@ -93,7 +93,7 @@ export default [
     name: "MetaMask",
     connector: injected,
     img: "/img/wallet-icons/metamask.svg",
-    connectionPhrase: "Connect to your MetaMask Wallet",
+    connectionPhrase: "Connect via MetaMask",
   },
   {
     name: "WalletConnect",
