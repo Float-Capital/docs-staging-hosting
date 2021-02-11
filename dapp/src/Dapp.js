@@ -2,6 +2,7 @@
 
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
+import * as Ethers from "ethers";
 import * as MintLong from "./components/Admin/MintLong.js";
 import * as MintShort from "./components/Admin/MintShort.js";
 import * as ApproveDai from "./components/Admin/ApproveDai.js";
@@ -11,6 +12,10 @@ import * as Router from "next/router";
 import * as StartTrading from "./components/Dapp/StartTrading.js";
 import * as AccessControl from "./components/AccessControl.js";
 import * as UpdateSystemState from "./components/Admin/UpdateSystemState.js";
+
+var shortTokenAddress = Ethers.utils.getAddress("0x096c8301e153037df723c23e2de113941cb973ef");
+
+var longTokenAddress = Ethers.utils.getAddress("0x096c8301e153037df723c23e2de113941cb973ef");
 
 function Dapp$Dapp(Props) {
   var router = Router.useRouter();
@@ -56,7 +61,13 @@ function Dapp$Dapp(Props) {
                                     placeholder: "mint"
                                   }), React.createElement("button", {
                                   className: "trade-action"
-                                }, "OPEN POSITION"))), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("h1", undefined, "Dapp"), React.createElement(ApproveDai.make, {}), React.createElement("hr", undefined), React.createElement(MintLong.make, {}), React.createElement("hr", undefined), React.createElement(RedeemLong.make, {}), React.createElement("hr", undefined), React.createElement(MintShort.make, {}), React.createElement("hr", undefined), React.createElement(RedeemShort.make, {}), React.createElement("hr", undefined), React.createElement(UpdateSystemState.make, {})) : React.createElement(StartTrading.make, {
+                                }, "OPEN POSITION"))), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("h1", undefined, "Dapp"), React.createElement(ApproveDai.make, {}), React.createElement("hr", undefined), React.createElement(MintLong.make, {}), React.createElement("hr", undefined), React.createElement(RedeemLong.make, {
+                          longTokenAddress: longTokenAddress
+                        }), React.createElement("hr", undefined), React.createElement(MintShort.make, {
+                          shortTokenAddress: shortTokenAddress
+                        }), React.createElement("hr", undefined), React.createElement(RedeemShort.make, {
+                          shortTokenAddress: shortTokenAddress
+                        }), React.createElement("hr", undefined), React.createElement(UpdateSystemState.make, {})) : React.createElement(StartTrading.make, {
                       onClick: (function (param) {
                           return Curry._1(setIsStartTrading, (function (param) {
                                         return true;
@@ -81,9 +92,11 @@ function $$default(param) {
 }
 
 export {
+  shortTokenAddress ,
+  longTokenAddress ,
   Dapp ,
   $$default ,
   $$default as default,
   
 }
-/* react Not a pure module */
+/* shortTokenAddress Not a pure module */

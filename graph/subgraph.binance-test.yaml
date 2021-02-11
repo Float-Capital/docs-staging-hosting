@@ -6,7 +6,7 @@ dataSources:
     name: LongShort
     network: binancetest
     source:
-      address: "0x60250481EcE03F321c12134FACC0fDfA9F95012C"
+      address: "0xA911530C826290607fE65C41beBFFa6c646C35F3"
       abi: LongShort
       startBlock: 5820840
     mapping:

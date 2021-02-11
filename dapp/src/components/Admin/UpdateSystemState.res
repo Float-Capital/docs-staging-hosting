@@ -4,7 +4,7 @@ let make = () => {
 
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
 
-  let tokenAddress = Config.useLongContractAddress()
+  let tokenAddress = Config.useLongShortAddress()
 
   let onClick = _ =>
     contractExecutionHandler(

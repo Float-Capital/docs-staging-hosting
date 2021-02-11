@@ -1,4 +1,4 @@
-module Erc20ApproveForm = %form(
+/* module Erc20ApproveForm = %form(
   type input = {amount: string, tokenAddress: string}
   type output = {amount: Ethers.BigNumber.t, tokenAddress: Ethers.ethAddress}
   let validators = {
@@ -38,11 +38,12 @@ let selectOpts = ["DAI", "LONG", "SHORT"]
 let initialInput: Erc20ApproveForm.input = {
   amount: "",
   tokenAddress: "DAI",
-}
+} */
 
 @react.component
 let make = () => {
-  let signer = ContractActions.useSignerExn()
+  <h1> {"Re-implement with contract addresses fetched from graph"->React.string} </h1>
+  /* let signer = ContractActions.useSignerExn()
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
 
   let longShortAddress = Config.useLongContractAddress()
@@ -124,4 +125,5 @@ let make = () => {
       </div>
     </Form>
   </TxTemplate>
+ */
 }

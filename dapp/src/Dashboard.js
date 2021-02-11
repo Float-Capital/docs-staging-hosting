@@ -3,6 +3,7 @@
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Ethers from "./ethereum/Ethers.js";
+import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as DaiBalance from "./components/ExampleViewFunctions/DaiBalance.js";
 import * as Router from "next/router";
 import * as AccessControl from "./components/AccessControl.js";
@@ -148,6 +149,190 @@ var LatestSystemState = {
   useLazyWithVariables: LatestSystemState_useLazyWithVariables
 };
 
+var Raw$1 = {};
+
+var query$1 = (require("@apollo/client").gql`
+  query   {
+    syntheticMarkets  {
+      __typename
+      name
+      symbol
+      marketIndex
+      totalValueLockedInMarket
+      oracleAddress
+      syntheticLong  {
+        __typename
+        id
+        tokenAddress
+        totalValueLocked
+        tokenSupply
+        tokenPrice
+      }
+      syntheticShort  {
+        __typename
+        id
+        tokenAddress
+        totalValueLocked
+        tokenSupply
+        tokenPrice
+      }
+    }
+  }
+`);
+
+function parse$1(value) {
+  var value$1 = value.syntheticMarkets;
+  return {
+          syntheticMarkets: value$1.map(function (value) {
+                var value$1 = value.syntheticLong;
+                var value$2 = value.syntheticShort;
+                return {
+                        __typename: value.__typename,
+                        name: value.name,
+                        symbol: value.symbol,
+                        marketIndex: GqlConverters.$$BigInt.parse(value.marketIndex),
+                        totalValueLockedInMarket: GqlConverters.$$BigInt.parse(value.totalValueLockedInMarket),
+                        oracleAddress: GqlConverters.Bytes.parse(value.oracleAddress),
+                        syntheticLong: {
+                          __typename: value$1.__typename,
+                          id: value$1.id,
+                          tokenAddress: GqlConverters.Bytes.parse(value$1.tokenAddress),
+                          totalValueLocked: GqlConverters.$$BigInt.parse(value$1.totalValueLocked),
+                          tokenSupply: GqlConverters.$$BigInt.parse(value$1.tokenSupply),
+                          tokenPrice: GqlConverters.$$BigInt.parse(value$1.tokenPrice)
+                        },
+                        syntheticShort: {
+                          __typename: value$2.__typename,
+                          id: value$2.id,
+                          tokenAddress: GqlConverters.Bytes.parse(value$2.tokenAddress),
+                          totalValueLocked: GqlConverters.$$BigInt.parse(value$2.totalValueLocked),
+                          tokenSupply: GqlConverters.$$BigInt.parse(value$2.tokenSupply),
+                          tokenPrice: GqlConverters.$$BigInt.parse(value$2.tokenPrice)
+                        }
+                      };
+              })
+        };
+}
+
+function serialize$1(value) {
+  var value$1 = value.syntheticMarkets;
+  var syntheticMarkets = value$1.map(function (value) {
+        var value$1 = value.syntheticShort;
+        var value$2 = value$1.tokenPrice;
+        var value$3 = GqlConverters.$$BigInt.serialize(value$2);
+        var value$4 = value$1.tokenSupply;
+        var value$5 = GqlConverters.$$BigInt.serialize(value$4);
+        var value$6 = value$1.totalValueLocked;
+        var value$7 = GqlConverters.$$BigInt.serialize(value$6);
+        var value$8 = value$1.tokenAddress;
+        var value$9 = GqlConverters.Bytes.serialize(value$8);
+        var value$10 = value$1.id;
+        var value$11 = value$1.__typename;
+        var syntheticShort = {
+          __typename: value$11,
+          id: value$10,
+          tokenAddress: value$9,
+          totalValueLocked: value$7,
+          tokenSupply: value$5,
+          tokenPrice: value$3
+        };
+        var value$12 = value.syntheticLong;
+        var value$13 = value$12.tokenPrice;
+        var value$14 = GqlConverters.$$BigInt.serialize(value$13);
+        var value$15 = value$12.tokenSupply;
+        var value$16 = GqlConverters.$$BigInt.serialize(value$15);
+        var value$17 = value$12.totalValueLocked;
+        var value$18 = GqlConverters.$$BigInt.serialize(value$17);
+        var value$19 = value$12.tokenAddress;
+        var value$20 = GqlConverters.Bytes.serialize(value$19);
+        var value$21 = value$12.id;
+        var value$22 = value$12.__typename;
+        var syntheticLong = {
+          __typename: value$22,
+          id: value$21,
+          tokenAddress: value$20,
+          totalValueLocked: value$18,
+          tokenSupply: value$16,
+          tokenPrice: value$14
+        };
+        var value$23 = value.oracleAddress;
+        var value$24 = GqlConverters.Bytes.serialize(value$23);
+        var value$25 = value.totalValueLockedInMarket;
+        var value$26 = GqlConverters.$$BigInt.serialize(value$25);
+        var value$27 = value.marketIndex;
+        var value$28 = GqlConverters.$$BigInt.serialize(value$27);
+        var value$29 = value.symbol;
+        var value$30 = value.name;
+        var value$31 = value.__typename;
+        return {
+                __typename: value$31,
+                name: value$30,
+                symbol: value$29,
+                marketIndex: value$28,
+                totalValueLockedInMarket: value$26,
+                oracleAddress: value$24,
+                syntheticLong: syntheticLong,
+                syntheticShort: syntheticShort
+              };
+      });
+  return {
+          syntheticMarkets: syntheticMarkets
+        };
+}
+
+function serializeVariables$1(param) {
+  
+}
+
+function makeVariables$1(param) {
+  
+}
+
+function makeDefaultVariables$1(param) {
+  
+}
+
+var MarketDetails_inner = {
+  Raw: Raw$1,
+  query: query$1,
+  parse: parse$1,
+  serialize: serialize$1,
+  serializeVariables: serializeVariables$1,
+  makeVariables: makeVariables$1,
+  makeDefaultVariables: makeDefaultVariables$1
+};
+
+var include$1 = ApolloClient__React_Hooks_UseQuery.Extend({
+      query: query$1,
+      Raw: Raw$1,
+      parse: parse$1,
+      serialize: serialize$1,
+      serializeVariables: serializeVariables$1
+    });
+
+var use$1 = include$1.use;
+
+var MarketDetails_refetchQueryDescription = include$1.refetchQueryDescription;
+
+var MarketDetails_useLazy = include$1.useLazy;
+
+var MarketDetails_useLazyWithVariables = include$1.useLazyWithVariables;
+
+var MarketDetails = {
+  MarketDetails_inner: MarketDetails_inner,
+  Raw: Raw$1,
+  query: query$1,
+  parse: parse$1,
+  serialize: serialize$1,
+  serializeVariables: serializeVariables$1,
+  makeVariables: makeVariables$1,
+  makeDefaultVariables: makeDefaultVariables$1,
+  refetchQueryDescription: MarketDetails_refetchQueryDescription,
+  use: use$1,
+  useLazy: MarketDetails_useLazy,
+  useLazyWithVariables: MarketDetails_useLazyWithVariables
+};
+
 function Dashboard(Props) {
   var router = Router.useRouter();
   var match = Curry.app(use, [
@@ -186,6 +371,23 @@ function Dashboard(Props) {
   } else {
     tmp = "You might think this is impossible, but depending on the situation it might not be!";
   }
+  var match$4 = Curry.app(use$1, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ]);
+  var match$5 = match$4.data;
   return React.createElement(AccessControl.make, {
               children: null,
               alternateComponent: React.createElement("h1", {
@@ -194,7 +396,15 @@ function Dashboard(Props) {
                         
                       })
                   }, "Login to view your dashboard")
-            }, React.createElement("h1", undefined, "Dashboard"), React.createElement(DaiBalance.make, {}), tmp);
+            }, React.createElement("h1", undefined, "Dashboard"), React.createElement(DaiBalance.make, {}), tmp, match$4.loading ? "Loading..." : (
+                match$4.error !== undefined ? "Error loading data" : (
+                    match$5 !== undefined ? React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Markets"), Belt_Array.map(match$5.syntheticMarkets, (function (param) {
+                                  return React.createElement("div", {
+                                              key: param.symbol
+                                            }, param.name);
+                                }))) : "You might think this is impossible, but depending on the situation it might not be!"
+                  )
+              ));
 }
 
 var make = Dashboard;
@@ -203,6 +413,7 @@ var $$default = Dashboard;
 
 export {
   LatestSystemState ,
+  MarketDetails ,
   make ,
   $$default ,
   $$default as default,

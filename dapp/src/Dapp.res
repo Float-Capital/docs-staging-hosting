@@ -1,3 +1,6 @@
+let shortTokenAddress = Ethers.Utils.getAddressUnsafe("0x096c8301e153037df723c23e2de113941cb973ef")
+let longTokenAddress = Ethers.Utils.getAddressUnsafe("0x096c8301e153037df723c23e2de113941cb973ef")
+
 module Dapp = {
   @react.component
   let make = () => {
@@ -43,11 +46,11 @@ module Dapp = {
             <hr />
             <MintLong />
             <hr />
-            <RedeemLong />
+            <RedeemLong longTokenAddress />
             <hr />
-            <MintShort />
+            <MintShort shortTokenAddress />
             <hr />
-            <RedeemShort />
+            <RedeemShort shortTokenAddress />
             <hr />
             <UpdateSystemState />
           </section>}
