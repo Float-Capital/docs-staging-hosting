@@ -31,25 +31,10 @@ let useLongShortAddress = () => {
 }
 
 let daiContractAddress = (~netIdStr) => {
-  allContracts
-  ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.dai)
+  Js.log(netIdStr)
+  Ethers.Utils.getAddressUnsafe("0x096c8301e153037df723c23e2de113941cb973ef")
 }
 let useDaiAddress = () => {
   let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
   daiContractAddress(~netIdStr)
-}
-let longTokenContractAddress = (~netIdStr) => {
-  allContracts
-  ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.longCoins)
-}
-let useLongContractAddress = () => {
-  let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
-  longShortContractAddress(~netIdStr)
-}
-let shortTokenContractAddress = (~netIdStr) => {
-  allContracts
-  ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.shortCoins)
 }

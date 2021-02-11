@@ -4,7 +4,6 @@ import * as Cn from "re-classnames/src/Cn.js";
 import * as Form from "./Form.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
@@ -427,15 +426,15 @@ var initialInput = {
 };
 
 function RedeemLong(Props) {
+  var longTokenAddress = Props.longTokenAddress;
   var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
-  var tokenAddress = Config.useLongContractAddress(undefined);
   var form = useForm(initialInput, (function (param, _form) {
           var amount = param.amount;
           return Curry._2(contractExecutionHandler, (function (param) {
-                        return Contracts.LongShort.make(tokenAddress, param);
+                        return Contracts.LongShort.make(longTokenAddress, param);
                       }), (function (param) {
                         return param.redeemLong(amount);
                       }));
@@ -501,12 +500,9 @@ function RedeemLong(Props) {
             });
 }
 
-var useLongContractAddress = Config.useLongContractAddress;
-
 var make = RedeemLong;
 
 export {
-  useLongContractAddress ,
   LongRedeemForm ,
   initialInput ,
   make ,

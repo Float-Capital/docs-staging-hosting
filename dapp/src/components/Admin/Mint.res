@@ -1,4 +1,4 @@
-let useMintContracts = () => {
+/* let useMintContracts = () => {
   let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
   let getNetworkedContractAddressString = Config.getContractAddressString(~netIdStr)
 
@@ -20,9 +20,9 @@ let useMintContracts = () => {
       "address": getNetworkedContractAddressString(~closure=contract => contract.shortCoins),
     },
   ]
-}
+} */
 
-module AdminMintForm = %form(
+/* module AdminMintForm = %form(
   type input = {
     address: string,
     amount: string,
@@ -78,11 +78,13 @@ let initialInput: AdminMintForm.input = {
   address: "",
   amount: "",
   tokenAddress: None,
-}
+} */
 
 @react.component
 let make = (~ethersWallet) => {
-  let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
+  Js.log(ethersWallet)
+  <h1> {"TODO: Reimplement - fetch contract addresses from graph"->React.string} </h1>
+  /* let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
     ~signer=ethersWallet,
   )
 
@@ -199,5 +201,5 @@ let make = (~ethersWallet) => {
         </div>
       </div>
     </Form>
-  </TxTemplate>
+  </TxTemplate> */
 }
