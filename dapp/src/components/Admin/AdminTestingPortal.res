@@ -100,10 +100,10 @@ module AdminActions = {
   let make = () => {
     let optEthersWallet = React.useContext(AdminContext.context)
     switch optEthersWallet {
-    | Some(_ethersWallet) =>
+    | Some(ethersWallet) =>
       <div>
         <h1> {"Test Functions"->React.string} </h1>
-        <div className={"border-dashed border-4 border-light-red-500"}> <Mint /> </div>
+        <div className={"border-dashed border-4 border-light-red-500"}> <Mint ethersWallet /> </div>
       </div>
     | None => React.null
     }

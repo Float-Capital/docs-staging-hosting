@@ -1,0 +1,59 @@
+name: Run Contract Tests
+
+on: push
+
+jobs:
+  # Source: https://github.community/t/run-job-only-if-folder-changed/118292/2
+  has-contract-changes:
+    name: Check for changes to contract files
+    outputs:
+      run_job: ${{ steps.has-contract-changes.outputs.run_job }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 100 # should be deep enough for our usecase
+
+      - name: check modified files
+        id: has-contract-changes
+        run: |
+          git fetch origin master
+
+
+          echo "=============== list modified files ==============="
+          git diff --name-only origin/master...HEAD
+
+          echo "========== check paths of modified files =========="
+          git diff --name-only origin/master...HEAD > files.txt
+
+          while IFS= read -r file
+          do
+            echo $file
+            if [[ $file == contracts/* ]]; then
+              echo "filename is correct"
+              echo "::set-output name=run_job::true"
+              break
+            fi
+          done < files.txt
+
+  push-ui-for-vercel:
+    name: Run contract tests
+    runs-on: ubuntu-latest
+    needs: has-contract-changes
+    if: needs.has-contract-changes.outputs.run_job == 'true'
+
+    steps:
+      # Checks out a copy of your repository on the ubuntu-latest machine
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: install node packages
+        id: install_node_packages
+        run: |
+          cd contracts && yarn
+
+      - name: run contract tests
+        id: run_contract_tests
+        run: |
+          cd contracts && yarn test

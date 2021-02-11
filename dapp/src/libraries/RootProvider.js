@@ -133,10 +133,7 @@ function RootProvider$RootWithWeb3(Props) {
             return ;
           }
           var account = Caml_option.valFromOption(match$1);
-          var library = Caml_option.valFromOption(match);
-          console.log("1", library);
-          console.log("2", account);
-          JsPromise.$$catch(library.getBalance(account).then(function (newBalance) {
+          JsPromise.$$catch(Caml_option.valFromOption(match).getBalance(account).then(function (newBalance) {
                     return Curry._1(dispatch, {
                                 _0: account,
                                 _1: Belt_Option.flatMap(newBalance, (function (balance) {
@@ -165,16 +162,15 @@ var RootWithWeb3 = {
 };
 
 function useCurrentUser(param) {
-  var match = React.useContext(context);
-  var match$1 = match[0].ethState;
-  if (match$1) {
-    return Caml_option.some(match$1._0);
-  }
-  
+  return Core.useWeb3React().account;
+}
+
+function useCurrentUserExn(param) {
+  return Belt_Option.getExn(Core.useWeb3React().account);
 }
 
 function useIsAddressCurrentUser(address) {
-  var currentUser = useCurrentUser(undefined);
+  var currentUser = Core.useWeb3React().account;
   if (currentUser !== undefined) {
     return Ethers.Utils.toLowerString(address) === Ethers.Utils.toLowerString(Caml_option.valFromOption(currentUser));
   } else {
@@ -191,8 +187,12 @@ function useEthBalance(param) {
   
 }
 
-function useNetworkId(param) {
+function useChainId(param) {
   return Core.useWeb3React().chainId;
+}
+
+function useChainIdExn(param) {
+  return Belt_Option.getExn(Core.useWeb3React().chainId);
 }
 
 function useEtherscanUrl(param) {
@@ -269,9 +269,11 @@ export {
   RootContext ,
   RootWithWeb3 ,
   useCurrentUser ,
+  useCurrentUserExn ,
   useIsAddressCurrentUser ,
   useEthBalance ,
-  useNetworkId ,
+  useChainId ,
+  useChainIdExn ,
   useEtherscanUrl ,
   useDeactivateWeb3 ,
   useWeb3 ,

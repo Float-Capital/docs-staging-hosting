@@ -38,6 +38,11 @@ function MainLayout$Navigation(Props) {
                             className: "px-3"
                           }, "Dapp")
                     }), React.createElement(Link, {
+                      href: "/dashboard",
+                      children: React.createElement("a", {
+                            className: "px-3"
+                          }, "Dashboard")
+                    }), React.createElement(Link, {
                       href: "/admin",
                       children: React.createElement("a", {
                             className: "px-3"

@@ -7,8 +7,13 @@ import "styles/main.css";
 // to the original React component function name.
 import ResApp from "src/App.js";
 
-import { ApolloProvider } from "@apollo/client";
-import { useApollo } from "../src/libraries/apolloClient";
+// The following code comes form here: https://levelup.gitconnected.com/improve-ux-of-your-next-js-app-in-3-minutes-with-page-loading-indicator-3a42211330u
+import Router from "next/router";
+import NProgress from "nprogress"; //nprogress module
+import "nprogress/nprogress.css"; //styles of nprogress//Binding events.
+Router.events.on("routeChangeStart", () => NProgress.start());
+Router.events.on("routeChangeComplete", () => NProgress.done());
+Router.events.on("routeChangeError", () => NProgress.done());
 
 // Note:
 // We need to wrap the make call with
@@ -18,10 +23,5 @@ import { useApollo } from "../src/libraries/apolloClient";
 // If you don't do this, your Fast-Refresh will
 // not work!
 export default function App(props) {
-  const apolloClient = useApollo(props.pageProps);
-  return (
-    <ApolloProvider client={apolloClient}>
-      <ResApp {...props} />
-    </ApolloProvider>
-  );
+  return <ResApp {...props} />;
 }

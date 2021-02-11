@@ -1,5 +1,5 @@
 let useMintContracts = () => {
-  let netIdStr = RootProvider.useNetworkId()->Option.mapWithDefault("5", Int.toString)
+  let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
   let getNetworkedContractAddressString = Config.getContractAddressString(~netIdStr)
 
   [
@@ -12,7 +12,7 @@ let useMintContracts = () => {
       "address": getNetworkedContractAddressString(~closure=contract => contract.dai),
     },
     {
-      "name": "LongCoins",
+      "name": "SyntheticToken",
       "address": getNetworkedContractAddressString(~closure=contract => contract.longCoins),
     },
     {
@@ -81,8 +81,10 @@ let initialInput: AdminMintForm.input = {
 }
 
 @react.component
-let make = () => {
-  let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction()
+let make = (~ethersWallet) => {
+  let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
+    ~signer=ethersWallet,
+  )
 
   let contracts = useMintContracts()
 
@@ -105,7 +107,6 @@ let make = () => {
     <Form
       className=""
       onSubmit={() => {
-        Js.log("temp")
         form.submit()
       }}>
       <div className="">

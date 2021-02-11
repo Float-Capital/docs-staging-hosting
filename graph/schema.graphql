@@ -25,23 +25,25 @@ type Event @entity {
   address: Bytes!
 }
 
-type FeesLevied @entity {
-  id: ID!
-  feeAmount: BigInt!
-  longFee: BigInt!
-  shortFee: BigInt!
-}
+# type FeesLevied @entity {
+#   id: ID!
+#   feeAmount: BigInt!
+#   longFee: BigInt!
+#   shortFee: BigInt!
+# }
 
-type LongMint @entity {
-  id: ID!
-  user: Bytes!
-}
+# type LongMint @entity {
+#   id: ID!
+#   user: Bytes!
+# }
 
 type SystemState @entity {
-  id: ID!
+  id: ID! # marketIndex "-" callCounter
   timestamp: BigInt!
   txHash: Bytes!
   blockNumber: BigInt!
+  marketIndex: BigInt!
+  # syntheticMarket: SyntheticMarket!
   # previousSyntheticPrice: Price!
   syntheticPrice: BigInt! # TODO: this should be a reference to another entity that holds the price
   longTokenPrice: BigInt!
@@ -52,7 +54,41 @@ type SystemState @entity {
   setBy: Bytes! #Turn into a User entity
 }
 
+type SyntheticToken @entity {
+  id: ID! # token address
+  tokenAddress: Bytes!
+  tokenPrice: BigInt!
+  tokenSupply: BigInt!
+  totalValueLocked: BigInt!
+}
+
+type FeeStructure @entity {
+  id: ID!
+  baseEntryFee: BigInt!
+  badLiquidityEntryFee: BigInt!
+  baseExitFee: BigInt!
+  badLiquidityExitFee: BigInt!
+}
+
+type SyntheticMarket @entity {
+  id: ID! # ID -> Market Index
+  timestampCreated: BigInt!
+  txHash: Bytes!
+  blockNumberCreated: BigInt!
+  name: String!
+  symbol: String!
+  marketIndex: BigInt!
+  totalValueLockedInMarket: BigInt!
+  oracleAddress: Bytes!
+  syntheticLong: SyntheticToken!
+  syntheticShort: SyntheticToken!
+  latestSystemState: SystemState!
+  feeStructure: FeeStructure!
+}
+
 type GlobalState @entity {
   id: ID!
-  latestSystemState: SystemState!
+  contractVersion: BigInt!
+  # latestSyntheticMarket: SyntheticMarket!
+  # latestMarket:
 }

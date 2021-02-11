@@ -49,7 +49,7 @@ module BigNumber = {
   type t = ethersBigNumber
 
   @module("ethers") @scope("BigNumber")
-  external fromUnsafe: string => float = "from"
+  external fromUnsafe: string => t = "from"
 
   @send external add: (t, t) => t = "add"
   @send external sub: (t, t) => t = "sub"
@@ -145,11 +145,17 @@ module Utils = {
   let parseUnits = (~amount, ~unit) => Misc.unsafeToOption(() => parseUnitsUnsafe(. amount, unit))
 
   let parseEther = (~amount) => parseUnits(~amount, ~unit=#ether)
+  let parseEtherUnsafe = (~amount) => parseUnitsUnsafe(. amount, #ether)
 
   @module("ethers") @scope("utils")
   external getAddressUnsafe: string => ethAddress = "getAddress"
   let getAddress: string => option<ethAddress> = addressString =>
     Misc.unsafeToOption(() => getAddressUnsafe(addressString))
+
+  @module("ethers") @scope("utils")
+  external formatUnits: (. BigNumber.t, ethUnit) => string = "formatUnits"
+
+  let formatEther = formatUnits(. _, #ether)
 
   let toString: ethAddress => string = Obj.magic
   let toLowerString: ethAddress => string = address => address->toString->Js.String.toLowerCase

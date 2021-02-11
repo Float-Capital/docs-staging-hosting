@@ -8,6 +8,14 @@ let getProviderOrSigner = (library: Ethers.Providers.t, account: option<Ethers.e
     ->Option.mapWithDefault(Provider(library), signer => Signer(signer))
   | None => Provider(library)
   }
+let getSigner = (library: Ethers.Providers.t, account: option<Ethers.ethAddress>) =>
+  switch account {
+  | Some(account) =>
+    library
+    ->Ethers.Providers.getSigner(account)
+    ->Option.mapWithDefault(None, signer => Some(signer))
+  | None => None
+  }
 
 let getLongShortContractAddress = chainId =>
   switch chainId {
@@ -27,6 +35,16 @@ let useProviderOrSigner = () => {
     }
   , (context.library, context.account))
 }
+let useProviderOrSignerExn = () => useProviderOrSigner()->Option.getExn
+let useSigner: unit => option<Ethers.Wallet.t> = () => {
+  switch useProviderOrSigner() {
+  | Some(Ethers.Provider(_))
+  | None =>
+    None
+  | Some(Ethers.Signer(signer)) => Some(signer)
+  }
+}
+let useSignerExn = () => useSigner()->Option.getExn
 
 type transactionState =
   // | SignerUnavailable
@@ -46,46 +64,40 @@ type transactionState =
   | Complete(txResult)
   | Failed
 
-let useContractFunction = () => {
+let useContractFunction = (~signer: Ethers.Wallet.t) => {
   let (txState, setTxState) = React.useState(() => UnInitialised)
 
-  let optProviderOrSigner = useProviderOrSigner()
   (
     (
       ~makeContractInstance,
       ~contractFunction: (~contract: 'a) => JsPromise.t<Ethers.txSubmitted>,
     ) => {
       setTxState(_ => Created)
-      switch optProviderOrSigner {
-      | Some(providerOrSigner) =>
-        let contractInstance = makeContractInstance(~providerOrSigner)
-        let mintPromise = contractFunction(~contract=contractInstance)
-        let _ = mintPromise->JsPromise.catch(error => {
-          setTxState(_ => Declined(
-            switch Js.Exn.message(error->Obj.magic) {
-            | Some(msg) => ": " ++ msg
-            | None => "unknown error"
-            },
-          ))->Obj.magic
-        })
 
-        let _ = mintPromise
-        ->JsPromise.then(tx => {
-          setTxState(_ => SignedAndSubmitted(tx.hash))
-          tx.wait(.)
-        })
-        ->JsPromise.map(txOutcome => {
-          Js.log(txOutcome)
-          setTxState(_ => Complete(txOutcome))
-        })
-        ->JsPromise.catch(error => {
-          setTxState(_ => Failed)
-          Js.log(error)
-        })
+      let contractInstance = makeContractInstance(~providerOrSigner=Ethers.Signer(signer))
+      let mintPromise = contractFunction(~contract=contractInstance)
+      let _ = mintPromise->JsPromise.catch(error => {
+        setTxState(_ => Declined(
+          switch Js.Exn.message(error->Obj.magic) {
+          | Some(msg) => ": " ++ msg
+          | None => "unknown error"
+          },
+        ))->Obj.magic
+      })
 
-      | None => Js.log("NOooo :( :( !!!")
-      }
-      ()
+      let _ = mintPromise
+      ->JsPromise.then(tx => {
+        setTxState(_ => SignedAndSubmitted(tx.hash))
+        tx.wait(.)
+      })
+      ->JsPromise.map(txOutcome => {
+        Js.log(txOutcome)
+        setTxState(_ => Complete(txOutcome))
+      })
+      ->JsPromise.catch(error => {
+        setTxState(_ => Failed)
+        Js.log(error)
+      })
     },
     txState,
     setTxState,

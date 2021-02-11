@@ -1,6 +1,7 @@
 import {
+  V1,
   FeesLevied,
-  InterestDistribution,
+  SyntheticTokenCreated,
   LongMinted,
   LongRedeem,
   PriceUpdate,
@@ -10,10 +11,19 @@ import {
   ValueLockedInSystem,
 } from "../generated/LongShort/LongShort";
 
-import { StateChange, EventParam, EventParams } from "../generated/schema";
+import {
+  StateChange,
+  EventParam,
+  EventParams,
+  SyntheticMarket,
+  SyntheticToken,
+  FeeStructure,
+  GlobalState,
+} from "../generated/schema";
 import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import { getOrCreateLatestSystemState } from "./utils/globalStateManager";
+import { ZERO, TEN_TO_THE_18, GLOBAL_STATE_ID } from "./CONSTANTS";
 
 // export function handleEvent(event: EVENT): void {
 //   let txHash = event.transaction.hash;
@@ -31,10 +41,18 @@ import { getOrCreateLatestSystemState } from "./utils/globalStateManager";
 //   );
 // }
 
+export function handleV1(event: V1): void {
+  let globalState = new GlobalState(GLOBAL_STATE_ID);
+  globalState.contractVersion = BigInt.fromI32(1);
+  globalState.save();
+}
+
 export function handleFeesLevied(event: FeesLevied): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
+
+  let marketIndex = event.params.marketIndex;
   let totalFees = event.params.totalFees;
   let longPercentage = event.params.longPercentage;
   let shortPercentage = event.params.shortPercentage;
@@ -55,53 +73,116 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
-  
+
+  let marketIndex = event.params.marketIndex;
   let contractCallCounter = event.params.contractCallCounter;
-  let totalValueLocked = event.params.totalValueLocked;
+  let totalValueLocked = event.params.totalValueLockedInMarket;
   let longValue = event.params.longValue;
   let shortValue = event.params.shortValue;
 
-  let state = getOrCreateLatestSystemState(contractCallCounter, event);
+  let state = getOrCreateLatestSystemState(
+    marketIndex,
+    contractCallCounter,
+    event
+  );
   state.totalValueLocked = totalValueLocked;
   state.totalLockedLong = longValue;
   state.totalLockedShort = shortValue;
   state.save();
 }
 
-
-export function handleInterestDistribution(event: InterestDistribution): void {
+export function handleSyntheticTokenCreated(
+  event: SyntheticTokenCreated
+): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
 
-  let contractCallCounter = event.params.contractCallCounter;
-  let newTotalValueLocked = event.params.newTotalValueLocked;
-  let totalInterest = event.params.totalInterest;
-  let longPercentage = event.params.longPercentage;
-  let shortPercentage = event.params.shortPercentage;
+  let marketIndex = event.params.marketIndex;
+  let longTokenAddress = event.params.longTokenAddress;
+  let shortTokenAddress = event.params.shortTokenAddress;
+  let initialAssetPrice = event.params.assetPrice;
 
-  // let state = getOrCreateLatestSystemState(contractCallCounter, event);
-  // state.save();
+  let oracleAddress = event.params.oracleAddress;
+  let syntheticName = event.params.name;
+  let syntheticSymbol = event.params.symbol;
 
-  saveEventToStateChange(
-    txHash,
-    timestamp,
-    blockNumber,
-    "InterestDistribution",
-    bigIntArrayToStringArray([
-      newTotalValueLocked,
-      totalInterest,
-      longPercentage,
-      shortPercentage,
-    ]),
-    [
-      "newValueTotalLocked",
-      "totalInterest",
-      "longPercentage",
-      "shortPercentage",
-    ],
-    ["uint256", "uint256", "uint256", "uint256"]
+  let baseEntryFee = event.params.baseEntryFee;
+  let badLiquidityEntryFee = event.params.badLiquidityEntryFee;
+  let baseExitFee = event.params.baseExitFee;
+  let badLiquidityExitFee = event.params.badLiquidityExitFee;
+
+  let marketIndexString = marketIndex.toString();
+
+  let state = getOrCreateLatestSystemState(marketIndex, ZERO, event);
+
+  let fees = new FeeStructure(
+    marketIndexString + "-fees-" + longTokenAddress.toHexString()
   );
+  fees.baseEntryFee = baseEntryFee;
+  fees.badLiquidityEntryFee = badLiquidityEntryFee;
+  fees.baseExitFee = baseExitFee;
+  fees.badLiquidityExitFee = badLiquidityExitFee;
+
+  // create new synthetic token object.
+  let longToken = new SyntheticToken(
+    marketIndexString + "-" + longTokenAddress.toHexString()
+  );
+  longToken.tokenAddress = longTokenAddress;
+  longToken.tokenPrice = TEN_TO_THE_18;
+  longToken.tokenSupply = ZERO;
+  longToken.totalValueLocked = ZERO;
+
+  let shortToken = new SyntheticToken(
+    marketIndexString + "-" + shortTokenAddress.toHexString()
+  );
+  shortToken.tokenAddress = shortTokenAddress;
+  shortToken.tokenPrice = TEN_TO_THE_18;
+  shortToken.tokenSupply = ZERO;
+  shortToken.totalValueLocked = ZERO;
+
+  let syntheticMarket = new SyntheticMarket(marketIndexString);
+  syntheticMarket.timestampCreated = timestamp;
+  syntheticMarket.txHash = txHash;
+  syntheticMarket.blockNumberCreated = blockNumber;
+  syntheticMarket.name = syntheticName;
+  syntheticMarket.symbol = syntheticSymbol;
+  syntheticMarket.latestSystemState = state.id;
+  syntheticMarket.syntheticLong = longToken.id;
+  syntheticMarket.syntheticShort = shortToken.id;
+  syntheticMarket.marketIndex = marketIndex;
+  syntheticMarket.totalValueLockedInMarket = ZERO;
+  syntheticMarket.oracleAddress = oracleAddress;
+  syntheticMarket.feeStructure = fees.id;
+
+  state.syntheticPrice = initialAssetPrice; // change me
+
+  longToken.save();
+  shortToken.save();
+  state.save();
+  syntheticMarket.save();
+  fees.save();
+
+  // Add below back later
+  // saveEventToStateChange(
+  //   txHash,
+  //   timestamp,
+  //   blockNumber,
+  //   "InterestDistribution",
+  //   bigIntArrayToStringArray([
+  //     newTotalValueLocked,
+  //     totalInterest,
+  //     longPercentage,
+  //     shortPercentage,
+  //   ]),
+  //   [
+  //     "newValueTotalLocked",
+  //     "totalInterest",
+  //     "longPercentage",
+  //     "shortPercentage",
+  //   ],
+  //   ["uint256", "uint256", "uint256", "uint256"]
+  // );
 }
 
 export function handleLongMinted(event: LongMinted): void {
@@ -109,6 +190,7 @@ export function handleLongMinted(event: LongMinted): void {
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
 
+  let marketIndex = event.params.marketIndex;
   let depositAdded = event.params.depositAdded;
   let finalDepositAmount = event.params.finalDepositAmount;
   let tokensMinted = event.params.tokensMinted;
@@ -134,6 +216,7 @@ export function handleLongRedeem(event: LongRedeem): void {
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
 
+  let marketIndex = event.params.marketIndex;
   let tokensRedeemed = event.params.tokensRedeemed;
   let valueOfRedemption = event.params.valueOfRedemption;
   let finalRedeemValue = event.params.finalRedeemValue;
@@ -159,12 +242,17 @@ export function handlePriceUpdate(event: PriceUpdate): void {
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
 
+  let marketIndex = event.params.marketIndex;
   let contractCallCounter = event.params.contractCallCounter;
   let newPrice = event.params.newPrice;
   let oldPrice = event.params.oldPrice;
   let user = event.params.user;
 
-  let state = getOrCreateLatestSystemState(contractCallCounter, event);
+  let state = getOrCreateLatestSystemState(
+    marketIndex,
+    contractCallCounter,
+    event
+  );
   state.syntheticPrice = newPrice;
   state.save();
 
@@ -184,6 +272,7 @@ export function handleShortMinted(event: ShortMinted): void {
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
 
+  let marketIndex = event.params.marketIndex;
   let depositAdded = event.params.depositAdded;
   let finalDepositAmount = event.params.finalDepositAmount;
   let tokensMinted = event.params.tokensMinted;
@@ -209,6 +298,7 @@ export function handleShortRedeem(event: ShortRedeem): void {
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
 
+  let marketIndex = event.params.marketIndex;
   let tokensRedeemed = event.params.tokensRedeemed;
   let valueOfRedemption = event.params.valueOfRedemption;
   let finalRedeemValue = event.params.finalRedeemValue;
@@ -234,12 +324,17 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
 
+  let marketIndex = event.params.marketIndex;
   let longTokenPrice = event.params.longTokenPrice;
   let shortTokenPrice = event.params.shortTokenPrice;
 
   let contractCallCounter = event.params.contractCallCounter;
 
-  let state = getOrCreateLatestSystemState(contractCallCounter, event);
+  let state = getOrCreateLatestSystemState(
+    marketIndex,
+    contractCallCounter,
+    event
+  );
   state.longTokenPrice = longTokenPrice;
   state.shortTokenPrice = shortTokenPrice;
   state.save();

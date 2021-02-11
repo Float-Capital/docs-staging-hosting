@@ -13,6 +13,7 @@
     "@web3-react/walletconnect-connector": "^6.1.6",
     "bs-css-emotion": "^2.3.0",
     "bs-moment": "^0.6.0",
+    "date-fns": "^2.17.0",
     "deepmerge": "^4.2.2",
     "ethers": "^5.0.26",
     "gentype": "^3.41.0",
@@ -21,22 +22,27 @@
     "moment": "^2.29.1",
     "next": "^10.0.4",
     "next-transpile-modules": "^4.1.0",
+    "nprogress": "^0.2.0",
     "re-classnames": "^5.0.1",
     "re-formality": "^4.0.0-beta.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "swr": "^0.4.1",
+    "swr-sync-storage": "^1.0.1"
   },
   "scripts": {
-    "dev": "next",
+    "next:dev": "next",
     "debug": "NODE_OPTIONS='--inspect' next",
     "build": "bsb -clean-world -make-world && next build",
     "now-build": "bsb -clean-world -make-world && next build",
-    "export": "next export",
-    "start": "next start -p $PORT",
+    "next:export": "next export",
+    "next:start": "next start -p $PORT",
     "res:build": "bsb -make-world",
     "res:clean": "bsb -clean-world",
-    "res:start": "bsb -make-world -w"
+    "res:start": "bsb -make-world -w",
+    "dev": "npm-run-all --parallel res:start next:dev",
+    "updateSchema": "get-graphql-schema https://api.thegraph.com/subgraphs/name/avolabs-io/float-capital-goerli -j > graphql_schema.json"
   },
   "devDependencies": {
     "@apollo/client": "^3.3.7",
@@ -45,10 +51,12 @@
     "autoprefixer": "^10.1.0",
     "bs-platform": "8.4.2",
     "cssnano": "^4.1.10",
+    "get-graphql-schema": "^2.1.2",
+    "npm-run-all": "^4.1.5",
     "postcss": "^8.2.1",
     "postcss-cli": "^8.3.1",
     "reason-react": "^0.9.1",
-    "rescript-apollo-client": "^1.0.0",
+    "rescript-apollo-client": "^1.1.0",
     "tailwindcss": "^2.0.2",
     "yarn": "^1.22.10"
   }

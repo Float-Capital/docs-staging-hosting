@@ -18,7 +18,7 @@ import * as ContractActions from "../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
 
 function useMintContracts(param) {
-  var netIdStr = Belt_Option.mapWithDefault(RootProvider.useNetworkId(undefined), "5", (function (prim) {
+  var netIdStr = Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
           return String(prim);
         }));
   return [
@@ -35,7 +35,7 @@ function useMintContracts(param) {
                   }))
           },
           {
-            name: "LongCoins",
+            name: "SyntheticToken",
             address: Config.getContractAddressString(netIdStr, (function (contract) {
                     return contract.LongCoins;
                   }))
@@ -676,7 +676,8 @@ var initialInput = {
 };
 
 function Mint(Props) {
-  var match = ContractActions.useContractFunction(undefined);
+  var ethersWallet = Props.ethersWallet;
+  var match = ContractActions.useContractFunction(ethersWallet);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
   var contracts = useMintContracts(undefined);
@@ -723,7 +724,6 @@ function Mint(Props) {
               children: React.createElement(Form.make, {
                     className: "",
                     onSubmit: (function (param) {
-                        console.log("temp");
                         return Curry._1(form.submit, undefined);
                       }),
                     children: React.createElement("div", {

@@ -2,16 +2,17 @@
 
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as MintLong from "./MintLong.js";
+import * as Config from "../../Config.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as TxTemplate from "../Ethereum/TxTemplate.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 
 function UpdateSystemState(Props) {
-  var match = ContractActions.useContractFunction(undefined);
+  var signer = ContractActions.useSignerExn(undefined);
+  var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
-  var tokenAddress = MintLong.useLongContractAddress(undefined);
+  var tokenAddress = Config.useLongContractAddress(undefined);
   var onClick = function (param) {
     return Curry._2(contractExecutionHandler, (function (param) {
                   return Contracts.LongShort.make(tokenAddress, param);
@@ -37,12 +38,9 @@ function UpdateSystemState(Props) {
             });
 }
 
-var useLongContractAddress = MintLong.useLongContractAddress;
-
 var make = UpdateSystemState;
 
 export {
-  useLongContractAddress ,
   make ,
   
 }

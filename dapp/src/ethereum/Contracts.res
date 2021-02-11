@@ -42,9 +42,8 @@ module LongShort = {
   @send
   external mintShort: (
     ~contract: t,
-    ~amount: Ethers.BigNumber.t
-   ) => JsPromise.t<Ethers.txSubmitted> =
-    "mintShort"
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<Ethers.txSubmitted> = "mintShort"
   @send
   external redeemLong: (
     ~contract: t,
@@ -65,7 +64,9 @@ module Erc20 = {
 
   let abi = [
     "function approve(address spender, uint256 amount)",
-    // "event Transfer(address indexed from, address indexed to, uint amount)",
+    "function balanceOf(address owner) public view returns (uint256 balance)",
+    "function allowance(address owner, address spender) public view returns (uint256 remaining)",
+    // "event Transfer(address indexed _from, address indexed _to, uint256 _value)",
   ]->Ethers.makeAbi
 
   let make = (~address, ~providerOrSigner): t =>
@@ -77,4 +78,15 @@ module Erc20 = {
     ~spender: Ethers.ethAddress,
     ~amount: Ethers.BigNumber.t,
   ) => JsPromise.t<Ethers.txSubmitted> = "approve"
+
+  @send
+  external balanceOf: (~contract: t, ~owner: Ethers.ethAddress) => JsPromise.t<Ethers.BigNumber.t> =
+    "balanceOf"
+
+  @send
+  external allowance: (
+    ~contract: t,
+    ~owner: Ethers.ethAddress,
+    ~spender: Ethers.ethAddress,
+  ) => JsPromise.t<Ethers.BigNumber.t> = "allowance"
 }

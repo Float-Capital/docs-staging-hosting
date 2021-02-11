@@ -1,4 +1,4 @@
-let useLongContractAddress = MintLong.useLongContractAddress
+let useLongContractAddress = Config.useLongContractAddress
 module ShortRedeemForm = %form(
   type input = {amount: string}
   type output = {amount: Ethers.BigNumber.t}
@@ -29,7 +29,8 @@ let initialInput: ShortRedeemForm.input = {
 
 @react.component
 let make = () => {
-  let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction()
+  let signer = ContractActions.useSignerExn()
+  let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
 
   let tokenAddress = useLongContractAddress()
 

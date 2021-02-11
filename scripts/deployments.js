@@ -1,17 +1,20 @@
-var fs = require("fs");
-var path = require("path");
+const fs = require("fs");
+const path = require("path");
 
-var output = {};
+let output = {};
 
 const dir = "./contracts/build/contracts";
-var files = fs.readdirSync(dir);
+const files = fs.readdirSync(dir);
 files.map((file) => {
-  var data = fs.readFileSync(path.join(dir, file));
-  var build = JSON.parse(data.toString());
+  const data = fs.readFileSync(path.join(dir, file));
+  const build = JSON.parse(data.toString());
+  if (build.contractName == "migrations") {
+    return;
+  }
 
-  Object.keys(build.networks).forEach((nid) => {
-    output[nid] = output[nid] || {};
-    output[nid][build.contractName] = build.networks[nid].address;
+  Object.keys(build.networks).forEach((networkId) => {
+    output[networkId] = output[networkId] || {};
+    output[networkId][build.contractName] = build.networks[networkId].address;
   });
 });
 

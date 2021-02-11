@@ -6,7 +6,6 @@ import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
-import * as MintLong from "./MintLong.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
@@ -21,7 +20,7 @@ var validators_tokenAddress = {
   strategy: /* OnFirstBlur */0,
   validate: (function (param) {
       var tokenAddress = param.tokenAddress;
-      var netIdStr = Belt_Option.mapWithDefault(RootProvider.useNetworkId(undefined), "5", (function (prim) {
+      var netIdStr = Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
               return String(prim);
             }));
       switch (tokenAddress) {
@@ -559,10 +558,11 @@ var initialInput = {
 };
 
 function ApproveDai(Props) {
-  var match = ContractActions.useContractFunction(undefined);
+  var signer = ContractActions.useSignerExn(undefined);
+  var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
-  var longShortAddress = MintLong.useLongContractAddress(undefined);
+  var longShortAddress = Config.useLongContractAddress(undefined);
   var form = useForm(initialInput, (function (param, _form) {
           var tokenAddress = param.tokenAddress;
           var amount = param.amount;
@@ -586,7 +586,6 @@ function ApproveDai(Props) {
               children: React.createElement(Form.make, {
                     className: "",
                     onSubmit: (function (param) {
-                        console.log("temp");
                         return Curry._1(form.submit, undefined);
                       }),
                     children: React.createElement("div", {
