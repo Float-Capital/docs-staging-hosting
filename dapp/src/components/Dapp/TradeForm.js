@@ -6,6 +6,7 @@ import * as React from "react";
 import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Loader from "../UI/Loader.js";
+import * as Ethers$1 from "ethers";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
@@ -645,31 +646,69 @@ function TradeForm$1(Props) {
   var setTxState = match[2];
   var txState = match[1];
   var contractExecutionHandler = match[0];
-  ContractActions.useContractFunction(signer);
+  var match$1 = ContractActions.useContractFunction(signer);
+  var setTxStateApprove = match$1[2];
+  var txStateApprove = match$1[1];
+  var contractExecutionHandlerApprove = match$1[0];
+  var match$2 = React.useState(function () {
+        return function (param) {
+          
+        };
+      });
+  var setContractActionToCallAfterApproval = match$2[1];
+  var contractActionToCallAfterApproval = match$2[0];
   var longShortContractAddress = Config.useLongShortAddress(undefined);
   var daiAddressThatIsTemporarilyHardCoded = Config.useDaiAddress(undefined);
-  var match$1 = useBalanceAndApproved(daiAddressThatIsTemporarilyHardCoded, longShortContractAddress);
-  var optDaiAmountApproved = match$1[1];
-  var optDaiBalance = match$1[0];
-  var match$2 = useBalanceAndApproved(market.syntheticShort.tokenAddress, longShortContractAddress);
-  var match$3 = useBalanceAndApproved(market.syntheticLong.tokenAddress, longShortContractAddress);
+  var match$3 = useBalanceAndApproved(daiAddressThatIsTemporarilyHardCoded, longShortContractAddress);
+  var optDaiAmountApproved = match$3[1];
+  var optDaiBalance = match$3[0];
+  var match$4 = useBalanceAndApproved(market.syntheticShort.tokenAddress, longShortContractAddress);
+  var match$5 = useBalanceAndApproved(market.syntheticLong.tokenAddress, longShortContractAddress);
   var form = useForm(initialInput, (function (param, _form) {
           var isLong = param.isLong;
           var amount = param.amount;
           if (param.isMint) {
             if (isLong) {
+              var mintFunction = function (param) {
+                var arg = market.marketIndex;
+                return Curry._2(contractExecutionHandler, (function (param) {
+                              return Contracts.LongShort.make(longShortContractAddress, param);
+                            }), (function (param) {
+                              return param.mintLong(arg, amount);
+                            }));
+              };
+              if (!amount.gt(Belt_Option.getWithDefault(optDaiAmountApproved, Ethers$1.BigNumber.from("0")))) {
+                return mintFunction(undefined);
+              }
+              Curry._1(setContractActionToCallAfterApproval, (function (param) {
+                      return mintFunction;
+                    }));
+              var arg = amount.mul(Ethers$1.BigNumber.from("2"));
+              return Curry._2(contractExecutionHandlerApprove, (function (param) {
+                            return Contracts.Erc20.make(daiAddressThatIsTemporarilyHardCoded, param);
+                          }), (function (param) {
+                            return param.approve(longShortContractAddress, arg);
+                          }));
+            }
+            var mintFunction$1 = function (param) {
               var arg = market.marketIndex;
               return Curry._2(contractExecutionHandler, (function (param) {
                             return Contracts.LongShort.make(longShortContractAddress, param);
                           }), (function (param) {
-                            return param.mintLong(arg, amount);
+                            return param.mintShort(arg, amount);
                           }));
+            };
+            if (!amount.gt(Belt_Option.getWithDefault(optDaiAmountApproved, Ethers$1.BigNumber.from("0")))) {
+              return mintFunction$1(undefined);
             }
-            var arg$1 = market.marketIndex;
-            return Curry._2(contractExecutionHandler, (function (param) {
-                          return Contracts.LongShort.make(longShortContractAddress, param);
+            Curry._1(setContractActionToCallAfterApproval, (function (param) {
+                    return mintFunction$1;
+                  }));
+            var arg$1 = amount.mul(Ethers$1.BigNumber.from("2"));
+            return Curry._2(contractExecutionHandlerApprove, (function (param) {
+                          return Contracts.Erc20.make(daiAddressThatIsTemporarilyHardCoded, param);
                         }), (function (param) {
-                          return param.mintShort(arg$1, amount);
+                          return param.approve(longShortContractAddress, arg$1);
                         }));
           }
           if (isLong) {
@@ -687,13 +726,13 @@ function TradeForm$1(Props) {
                         return param.redeemShort(arg$3, amount);
                       }));
         }));
-  var match$4 = form.amountResult;
-  var formAmount = match$4 !== undefined && match$4.TAG === /* Ok */0 ? Caml_option.some(match$4._0) : undefined;
-  var match$5 = form.input.isMint;
-  var match$6 = form.input.isLong;
-  var match$7;
-  if (match$5) {
-    var position = match$6 ? "LONG" : "SHORT";
+  var match$6 = form.amountResult;
+  var formAmount = match$6 !== undefined && match$6.TAG === /* Ok */0 ? Caml_option.some(match$6._0) : undefined;
+  var match$7 = form.input.isMint;
+  var match$8 = form.input.isLong;
+  var match$9;
+  if (match$7) {
+    var position = match$8 ? "LONG" : "SHORT";
     var exit = 0;
     if (formAmount !== undefined && optDaiBalance !== undefined && optDaiAmountApproved !== undefined) {
       var amountApproved = Caml_option.valFromOption(optDaiAmountApproved);
@@ -706,7 +745,7 @@ function TradeForm$1(Props) {
             amount.gt(amountApproved)
           ]);
       var greaterThanBalance = amount.gt(Caml_option.valFromOption(optDaiBalance));
-      match$7 = greaterThanBalance ? [
+      match$9 = greaterThanBalance ? [
           "Amount is greater than your balance",
           prefix + "2Mint " + position,
           true
@@ -719,7 +758,7 @@ function TradeForm$1(Props) {
       exit = 1;
     }
     if (exit === 1) {
-      match$7 = [
+      match$9 = [
         undefined,
         "3Mint " + position,
         true
@@ -727,7 +766,7 @@ function TradeForm$1(Props) {
     }
     
   } else {
-    match$7 = match$6 ? [
+    match$9 = match$8 ? [
         undefined,
         "Redeem Long",
         false
@@ -737,15 +776,24 @@ function TradeForm$1(Props) {
         false
       ];
   }
-  var optAdditionalErrorMessage = match$7[0];
+  var optAdditionalErrorMessage = match$9[0];
+  React.useEffect((function () {
+          if (typeof txStateApprove !== "number" && txStateApprove.TAG === /* Complete */2) {
+            Curry._1(contractActionToCallAfterApproval, undefined);
+            Curry._1(setTxStateApprove, (function (param) {
+                    return /* UnInitialised */0;
+                  }));
+          }
+          
+        }), [txStateApprove]);
   var tmp;
   if (form.input.isMint) {
-    var match$8 = form.amountResult;
+    var match$10 = form.amountResult;
     var tmp$1;
     var exit$1 = 0;
     var message;
-    if (match$8 !== undefined) {
-      if (match$8.TAG === /* Ok */0) {
+    if (match$10 !== undefined) {
+      if (match$10.TAG === /* Ok */0) {
         if (optAdditionalErrorMessage !== undefined) {
           message = optAdditionalErrorMessage;
           exit$1 = 1;
@@ -755,7 +803,7 @@ function TradeForm$1(Props) {
               }, "✓");
         }
       } else {
-        message = match$8._0;
+        message = match$10._0;
         exit$1 = 1;
       }
     } else if (optAdditionalErrorMessage !== undefined) {
@@ -796,59 +844,81 @@ function TradeForm$1(Props) {
         });
   }
   var tmp$2;
-  if (Config.isDevMode) {
-    var txExplererUrl = RootProvider.useEtherscanUrl(undefined);
-    var resetTxButton = React.createElement("button", {
-          onClick: (function (param) {
-              return Curry._1(setTxState, (function (param) {
-                            return /* UnInitialised */0;
-                          }));
-            })
-        }, ">>Reset tx<<");
-    var tmp$3;
-    if (typeof txState === "number") {
-      switch (txState) {
-        case /* UnInitialised */0 :
-            tmp$3 = null;
-            break;
-        case /* Created */1 :
-            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, "Tx created."), React.createElement("div", undefined, React.createElement(Loader.make, {})));
-            break;
-        case /* Failed */2 :
-            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."), resetTxButton);
-            break;
-        
-      }
-    } else {
-      switch (txState.TAG | 0) {
-        case /* SignedAndSubmitted */0 :
-            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, React.createElement("a", {
-                          href: "https://" + txExplererUrl + "/tx/" + txState._0,
-                          rel: "noopener noreferrer",
-                          target: "_blank"
-                        }, "View the transaction on " + txExplererUrl)), React.createElement(Loader.make, {}));
-            break;
-        case /* Declined */1 :
-            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0), resetTxButton);
-            break;
-        case /* Complete */2 :
-            var txHash = txState._0.transactionHash;
-            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Transaction Complete "), React.createElement("p", undefined, React.createElement("a", {
-                          href: "https://" + txExplererUrl + "/tx/" + txHash,
-                          rel: "noopener noreferrer",
-                          target: "_blank"
-                        }, "View the transaction on " + txExplererUrl)), resetTxButton);
-            break;
-        
-      }
+  if (typeof txState === "number") {
+    switch (txState) {
+      case /* UnInitialised */0 :
+          tmp$2 = null;
+          break;
+      case /* Created */1 :
+          tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Approval "), React.createElement(Loader.make, {}));
+          break;
+      case /* Failed */2 :
+          tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."));
+          break;
+      
     }
-    var formatOptBalance = function (__x) {
-      return Belt_Option.mapWithDefault(__x, "Loading", Ethers.Utils.formatEther);
-    };
-    tmp$2 = React.createElement(React.Fragment, undefined, tmp$3, React.createElement("div", undefined, React.createElement("p", undefined, "dev only component to display balances"), React.createElement("p", undefined, "dai - balance: " + formatOptBalance(optDaiBalance) + " - approved: " + formatOptBalance(optDaiAmountApproved)), React.createElement("p", undefined, "long - balance: " + formatOptBalance(match$3[0]) + " - approved: " + formatOptBalance(match$3[1])), React.createElement("p", undefined, "short - balance: " + formatOptBalance(match$2[0]) + " - approved: " + formatOptBalance(match$2[1]))));
   } else {
-    tmp$2 = null;
+    switch (txState.TAG | 0) {
+      case /* SignedAndSubmitted */0 :
+          tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Approval - submitted ", React.createElement(Loader.make, {})), React.createElement(Loader.make, {}));
+          break;
+      case /* Declined */1 :
+          tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0));
+          break;
+      case /* Complete */2 :
+          tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Approval Complete, Sign the next transaction "));
+          break;
+      
+    }
   }
+  var txExplererUrl = RootProvider.useEtherscanUrl(undefined);
+  var resetTxButton = React.createElement("button", {
+        onClick: (function (param) {
+            return Curry._1(setTxState, (function (param) {
+                          return /* UnInitialised */0;
+                        }));
+          })
+      }, ">>Reset tx<<");
+  var tmp$3;
+  if (typeof txState === "number") {
+    switch (txState) {
+      case /* UnInitialised */0 :
+          tmp$3 = null;
+          break;
+      case /* Created */1 :
+          tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, "Tx created."), React.createElement("div", undefined, React.createElement(Loader.make, {})));
+          break;
+      case /* Failed */2 :
+          tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."), resetTxButton);
+          break;
+      
+    }
+  } else {
+    switch (txState.TAG | 0) {
+      case /* SignedAndSubmitted */0 :
+          tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, React.createElement("a", {
+                        href: "https://" + txExplererUrl + "/tx/" + txState._0,
+                        rel: "noopener noreferrer",
+                        target: "_blank"
+                      }, "View the transaction on " + txExplererUrl)), React.createElement(Loader.make, {}));
+          break;
+      case /* Declined */1 :
+          tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0), resetTxButton);
+          break;
+      case /* Complete */2 :
+          var txHash = txState._0.transactionHash;
+          tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Transaction Complete "), React.createElement("p", undefined, React.createElement("a", {
+                        href: "https://" + txExplererUrl + "/tx/" + txHash,
+                        rel: "noopener noreferrer",
+                        target: "_blank"
+                      }, "View the transaction on " + txExplererUrl)), resetTxButton);
+          break;
+      
+    }
+  }
+  var formatOptBalance = function (__x) {
+    return Belt_Option.mapWithDefault(__x, "Loading", Ethers.Utils.formatEther);
+  };
   return React.createElement("div", {
               className: "screen-centered-container"
             }, React.createElement(Form.make, {
@@ -897,8 +967,8 @@ function TradeForm$1(Props) {
                         placeholder: "mint"
                       }), React.createElement("button", {
                       className: "trade-action",
-                      disabled: match$7[2]
-                    }, match$7[1])), tmp$2);
+                      disabled: match$9[2]
+                    }, match$9[1])), tmp$2, tmp$3, React.createElement("div", undefined, React.createElement("p", undefined, "dev only component to display balances"), React.createElement("p", undefined, "dai - balance: " + formatOptBalance(optDaiBalance) + " - approved: " + formatOptBalance(optDaiAmountApproved)), React.createElement("p", undefined, "long - balance: " + formatOptBalance(match$5[0]) + " - approved: " + formatOptBalance(match$5[1])), React.createElement("p", undefined, "short - balance: " + formatOptBalance(match$4[0]) + " - approved: " + formatOptBalance(match$4[1]))));
 }
 
 var make = TradeForm$1;

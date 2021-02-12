@@ -68,8 +68,12 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
   let (
     contractExecutionHandlerApprove,
     txStateApprove,
-    _setTxStateApprove,
+    setTxStateApprove,
   ) = ContractActions.useContractFunction(~signer)
+  let (
+    contractActionToCallAfterApproval,
+    setContractActionToCallAfterApproval,
+  ) = React.useState(((), ()) => ())
 
   let longShortContractAddress = Config.useLongShortAddress()
   let daiAddressThatIsTemporarilyHardCoded = Config.useDaiAddress()
@@ -91,10 +95,51 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
   let form = TradeForm.useForm(~initialInput, ~onSubmit=({amount, isMint, isLong}, _form) => {
     switch (isMint, isLong) {
     | (true, true) =>
-      contractExecutionHandler(
-        ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
-        ~contractFunction=Contracts.LongShort.mintLong(~marketIndex=market.marketIndex, ~amount),
-      )
+      let mintFunction = () =>
+        contractExecutionHandler(
+          ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
+          ~contractFunction=Contracts.LongShort.mintLong(~marketIndex=market.marketIndex, ~amount),
+        )
+      switch isGreaterThanApproval(
+        ~amount,
+        ~amountApproved=optDaiAmountApproved->Option.getWithDefault(
+          Ethers.BigNumber.fromUnsafe("0"),
+        ),
+      ) {
+      | true =>
+        setContractActionToCallAfterApproval(_ => mintFunction)
+        contractExecutionHandlerApprove(
+          ~makeContractInstance=Contracts.Erc20.make(~address=daiAddressThatIsTemporarilyHardCoded),
+          ~contractFunction=Contracts.Erc20.approve(
+            ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
+            ~spender=longShortContractAddress,
+          ),
+        )
+      | false => mintFunction()
+      }
+    | (true, false) =>
+      let mintFunction = () =>
+        contractExecutionHandler(
+          ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
+          ~contractFunction=Contracts.LongShort.mintShort(~marketIndex=market.marketIndex, ~amount),
+        )
+      switch isGreaterThanApproval(
+        ~amount,
+        ~amountApproved=optDaiAmountApproved->Option.getWithDefault(
+          Ethers.BigNumber.fromUnsafe("0"),
+        ),
+      ) {
+      | true =>
+        setContractActionToCallAfterApproval(_ => mintFunction)
+        contractExecutionHandlerApprove(
+          ~makeContractInstance=Contracts.Erc20.make(~address=daiAddressThatIsTemporarilyHardCoded),
+          ~contractFunction=Contracts.Erc20.approve(
+            ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
+            ~spender=longShortContractAddress,
+          ),
+        )
+      | false => mintFunction()
+      }
     | (false, true) =>
       contractExecutionHandler(
         ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
@@ -102,11 +147,6 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
           ~marketIndex=market.marketIndex,
           ~tokensToRedeem=amount,
         ),
-      )
-    | (true, false) =>
-      contractExecutionHandler(
-        ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
-        ~contractFunction=Contracts.LongShort.mintShort(~marketIndex=market.marketIndex, ~amount),
       )
     | (false, false) =>
       contractExecutionHandler(
@@ -149,6 +189,17 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
     | (false, false) => (None, "Redeem Short", false)
     }
   }
+
+  // Execute the call after approval has completed
+  React.useEffect1(() => {
+    switch txStateApprove {
+    | Complete(_) =>
+      contractActionToCallAfterApproval()
+      setTxStateApprove(_ => ContractActions.UnInitialised)
+    | _ => ()
+    }
+    None
+  }, [txStateApprove])
 
   <div className="screen-centered-container">
     <Form
@@ -204,79 +255,93 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
         : <input className="trade-input" placeholder="mint" />}
       <button className="trade-action" disabled=buttonDisabled> {buttonText->React.string} </button>
     </Form>
-    {Config.isDevMode
-      ? <>
-          {
-            let txExplererUrl = RootProvider.useEtherscanUrl()
+    {// {Config.isDevMode // <- this can be used to hide this code when not developing
+    //   ? <>
 
-            let resetTxButton =
-              <button onClick={_ => setTxState(_ => ContractActions.UnInitialised)}>
-                {">>Reset tx<<"->React.string}
-              </button>
+    switch txState {
+    | ContractActions.UnInitialised => React.null
+    | ContractActions.Created => <> <h1> {"Processing Approval "->React.string} </h1> <Loader /> </>
+    | ContractActions.SignedAndSubmitted(txHash) => <>
+        <h1> {"Processing Approval - submitted "->React.string} <Loader /> </h1> <Loader />
+      </>
+    | ContractActions.Complete(result) =>
+      let txHash = result.transactionHash
+      <> <h1> {"Approval Complete, Sign the next transaction "->React.string} </h1> </>
+    | ContractActions.Declined(message) => <>
+        <h1> {"The transaction was declined by your wallet, please try again."->React.string} </h1>
+        <p> {("Failure reason: " ++ message)->React.string} </p>
+      </>
+    | ContractActions.Failed => <>
+        <h1> {"The transaction failed."->React.string} </h1>
+        <p> {"This operation isn't permitted by the smart contract."->React.string} </p>
+      </>
+    }}
+    {
+      let txExplererUrl = RootProvider.useEtherscanUrl()
 
-            switch txState {
-            | ContractActions.UnInitialised => React.null
-            | ContractActions.Created => <>
-                <h1> {"Processing Transaction "->React.string} <Loader /> </h1>
-                <p> {"Tx created."->React.string} </p>
-                <div> <Loader /> </div>
-              </>
-            | ContractActions.SignedAndSubmitted(txHash) => <>
-                <h1> {"Processing Transaction "->React.string} <Loader /> </h1>
-                <p>
-                  <a
-                    href=j`https://$txExplererUrl/tx/$txHash`
-                    target="_blank"
-                    rel="noopener noreferrer">
-                    {("View the transaction on " ++ txExplererUrl)->React.string}
-                  </a>
-                </p>
-                <Loader />
-              </>
-            | ContractActions.Complete(result) =>
-              let txHash = result.transactionHash
-              <>
-                <h1> {"Transaction Complete "->React.string} </h1>
-                <p>
-                  <a
-                    href=j`https://$txExplererUrl/tx/$txHash`
-                    target="_blank"
-                    rel="noopener noreferrer">
-                    {("View the transaction on " ++ txExplererUrl)->React.string}
-                  </a>
-                </p>
-                resetTxButton
-              </>
-            | ContractActions.Declined(message) => <>
-                <h1>
-                  {"The transaction was declined by your wallet, please try again."->React.string}
-                </h1>
-                <p> {("Failure reason: " ++ message)->React.string} </p>
-                resetTxButton
-              </>
-            | ContractActions.Failed => <>
-                <h1> {"The transaction failed."->React.string} </h1>
-                <p> {"This operation isn't permitted by the smart contract."->React.string} </p>
-                resetTxButton
-              </>
-            }
-          }
-          {
-            let formatOptBalance = Option.mapWithDefault(_, "Loading", Ethers.Utils.formatEther)
-            <div>
-              <p> {"dev only component to display balances"->React.string} </p>
-              <p>
-                {`dai - balance: ${optDaiBalance->formatOptBalance} - approved: ${optDaiAmountApproved->formatOptBalance}`->React.string}
-              </p>
-              <p>
-                {`long - balance: ${optLongBalance->formatOptBalance} - approved: ${optLongAmountApproved->formatOptBalance}`->React.string}
-              </p>
-              <p>
-                {`short - balance: ${optShortBalance->formatOptBalance} - approved: ${optShortAmountApproved->formatOptBalance}`->React.string}
-              </p>
-            </div>
-          }
+      let resetTxButton =
+        <button onClick={_ => setTxState(_ => ContractActions.UnInitialised)}>
+          {">>Reset tx<<"->React.string}
+        </button>
+
+      switch txState {
+      | ContractActions.UnInitialised => React.null
+      | ContractActions.Created => <>
+          <h1> {"Processing Transaction "->React.string} <Loader /> </h1>
+          <p> {"Tx created."->React.string} </p>
+          <div> <Loader /> </div>
         </>
-      : React.null}
+      | ContractActions.SignedAndSubmitted(txHash) => <>
+          <h1> {"Processing Transaction "->React.string} <Loader /> </h1>
+          <p>
+            <a href=j`https://$txExplererUrl/tx/$txHash` target="_blank" rel="noopener noreferrer">
+              {("View the transaction on " ++ txExplererUrl)->React.string}
+            </a>
+          </p>
+          <Loader />
+        </>
+      | ContractActions.Complete(result) =>
+        let txHash = result.transactionHash
+        <>
+          <h1> {"Transaction Complete "->React.string} </h1>
+          <p>
+            <a href=j`https://$txExplererUrl/tx/$txHash` target="_blank" rel="noopener noreferrer">
+              {("View the transaction on " ++ txExplererUrl)->React.string}
+            </a>
+          </p>
+          resetTxButton
+        </>
+      | ContractActions.Declined(message) => <>
+          <h1>
+            {"The transaction was declined by your wallet, please try again."->React.string}
+          </h1>
+          <p> {("Failure reason: " ++ message)->React.string} </p>
+          resetTxButton
+        </>
+      | ContractActions.Failed => <>
+          <h1> {"The transaction failed."->React.string} </h1>
+          <p> {"This operation isn't permitted by the smart contract."->React.string} </p>
+          resetTxButton
+        </>
+      }
+    }
+    {
+      let formatOptBalance = Option.mapWithDefault(_, "Loading", Ethers.Utils.formatEther)
+      <div>
+        <p> {"dev only component to display balances"->React.string} </p>
+        <p>
+          {`dai - balance: ${optDaiBalance->formatOptBalance} - approved: ${optDaiAmountApproved->formatOptBalance}`->React.string}
+        </p>
+        <p>
+          {`long - balance: ${optLongBalance->formatOptBalance} - approved: ${optLongAmountApproved->formatOptBalance}`->React.string}
+        </p>
+        <p>
+          {`short - balance: ${optShortBalance->formatOptBalance} - approved: ${optShortAmountApproved->formatOptBalance}`->React.string}
+        </p>
+      </div>
+    }
+
+    //   </>
+    // : React.null}
   </div>
 }
