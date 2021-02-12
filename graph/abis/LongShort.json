@@ -527,19 +527,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "daiContract",
-    "outputs": [
-      {
-        "internalType": "contract IERC20",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -566,6 +553,25 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "fundTokens",
+    "outputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -767,6 +773,11 @@
       },
       {
         "internalType": "address",
+        "name": "_fundToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "_oracleFeed",
         "type": "address"
       },
@@ -841,12 +852,12 @@
       },
       {
         "internalType": "address",
-        "name": "daiAddress",
+        "name": "_tokenFactory",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "_tokenFactory",
+        "name": "_staker",
         "type": "address"
       }
     ],
@@ -907,6 +918,19 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "staker",
+    "outputs": [
+      {
+        "internalType": "contract Staker",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",

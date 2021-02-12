@@ -7,10 +7,14 @@ const { BN } = require("@openzeppelin/test-helpers");
 
 const { mintAndApprove } = require("../test/helpers");
 
+// Keep track of deployed price oracle instances.
+let priceOracles = [];
+
 const deployTestMarket = async (
   syntheticSymbol,
   syntheticName,
   longShortInstance,
+  fundTokenInstance,
   deployer
 ) => {
   // Deploy a synthetic market:
@@ -21,10 +25,12 @@ const deployTestMarket = async (
   const _badLiquidityExitFee = 50;
 
   const priceOracle = await deployer.deploy(PriceOracle, "1000000000000000000");
+  priceOracles.push(priceOracle);
 
   await longShortInstance.newSyntheticMarket(
     syntheticName,
     syntheticSymbol,
+    fundTokenInstance.address,
     priceOracle.address,
     _baseEntryFee,
     _badLiquidityEntryFee,
@@ -32,7 +38,7 @@ const deployTestMarket = async (
     _badLiquidityExitFee
   );
 };
-module.exports = async function(deployer, network, accounts) {
+module.exports = async function (deployer, network, accounts) {
   console.log(99);
 
   const user1 = accounts[1];
@@ -41,16 +47,16 @@ module.exports = async function(deployer, network, accounts) {
 
   const oneHundredMintAmount = "100000000000000000000";
 
+  console.log(0);
+
+  const dai = await SyntheticToken.deployed();
+
   const longShort = await LongShort.deployed();
-  await deployTestMarket("FTSE100", "FTSE", longShort, deployer);
-  await deployTestMarket("GOLD", "GOLD", longShort, deployer);
-  await deployTestMarket("SP", "S&P500", longShort, deployer);
+  await deployTestMarket("FTSE100", "FTSE", longShort, dai, deployer);
+  await deployTestMarket("GOLD", "GOLD", longShort, dai, deployer);
+  await deployTestMarket("SP", "S&P500", longShort, dai, deployer);
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
 
-  const daiAddress = await longShort.daiContract.call();
-  let dai = await SyntheticToken.at(daiAddress);
-
-  // console.log("accounts", accounts);
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
     const longAddress = await longShort.longTokens.call(marketIndex);
     const shortAddress = await longShort.shortTokens.call(marketIndex);
@@ -79,6 +85,7 @@ module.exports = async function(deployer, network, accounts) {
     console.log(1);
 
     // increase oracle price
+    let priceOracle = priceOracles[marketIndex - 1];
     const tenPercentMovement = "100000000000000000";
     await priceOracle.increasePrice(tenPercentMovement);
 
