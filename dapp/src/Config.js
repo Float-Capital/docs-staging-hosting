@@ -3,9 +3,12 @@
 import * as Ethers from "./ethereum/Ethers.js";
 import * as Ethers$1 from "ethers";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
+import * as Caml_obj from "bs-platform/lib/es6/caml_obj.js";
 import * as Constants from "./Constants.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as RootProvider from "./libraries/RootProvider.js";
+
+var isDevMode = Caml_obj.caml_equal(process.env.REACT_APP_DEVMODE, "true");
 
 var longshortContractAbi = Ethers.makeAbi([""]);
 
@@ -39,6 +42,7 @@ function useDaiAddress(param) {
 }
 
 export {
+  isDevMode ,
   longshortContractAbi ,
   allContracts ,
   getContractAddressString ,
@@ -48,4 +52,4 @@ export {
   useDaiAddress ,
   
 }
-/* longshortContractAbi Not a pure module */
+/* isDevMode Not a pure module */
