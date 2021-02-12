@@ -3,154 +3,17 @@
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Ethers from "./ethereum/Ethers.js";
+import * as Queries from "./libraries/Queries.js";
+import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as DaiBalance from "./components/ExampleViewFunctions/DaiBalance.js";
 import * as Router from "next/router";
 import * as AccessControl from "./components/AccessControl.js";
-import * as GqlConverters from "./libraries/GqlConverters.js";
 import FromUnixTime from "date-fns/fromUnixTime";
 import FormatDistanceToNow from "date-fns/formatDistanceToNow";
-import * as ApolloClient__React_Hooks_UseQuery from "rescript-apollo-client/src/@apollo/client/react/hooks/ApolloClient__React_Hooks_UseQuery.js";
-
-var Raw = {};
-
-var query = (require("@apollo/client").gql`
-  query   {
-    systemStates(first: 1, orderBy: timestamp, orderDirection: desc)  {
-      __typename
-      timestamp
-      txHash
-      blockNumber
-      syntheticPrice
-      longTokenPrice
-      shortTokenPrice
-      totalLockedLong
-      totalLockedShort
-      totalValueLocked
-      setBy
-    }
-  }
-`);
-
-function parse(value) {
-  var value$1 = value.systemStates;
-  return {
-          systemStates: value$1.map(function (value) {
-                return {
-                        __typename: value.__typename,
-                        timestamp: GqlConverters.$$BigInt.parse(value.timestamp),
-                        txHash: GqlConverters.Bytes.parse(value.txHash),
-                        blockNumber: GqlConverters.$$BigInt.parse(value.blockNumber),
-                        syntheticPrice: GqlConverters.$$BigInt.parse(value.syntheticPrice),
-                        longTokenPrice: GqlConverters.$$BigInt.parse(value.longTokenPrice),
-                        shortTokenPrice: GqlConverters.$$BigInt.parse(value.shortTokenPrice),
-                        totalLockedLong: GqlConverters.$$BigInt.parse(value.totalLockedLong),
-                        totalLockedShort: GqlConverters.$$BigInt.parse(value.totalLockedShort),
-                        totalValueLocked: GqlConverters.$$BigInt.parse(value.totalValueLocked),
-                        setBy: GqlConverters.Bytes.parse(value.setBy)
-                      };
-              })
-        };
-}
-
-function serialize(value) {
-  var value$1 = value.systemStates;
-  var systemStates = value$1.map(function (value) {
-        var value$1 = value.setBy;
-        var value$2 = GqlConverters.Bytes.serialize(value$1);
-        var value$3 = value.totalValueLocked;
-        var value$4 = GqlConverters.$$BigInt.serialize(value$3);
-        var value$5 = value.totalLockedShort;
-        var value$6 = GqlConverters.$$BigInt.serialize(value$5);
-        var value$7 = value.totalLockedLong;
-        var value$8 = GqlConverters.$$BigInt.serialize(value$7);
-        var value$9 = value.shortTokenPrice;
-        var value$10 = GqlConverters.$$BigInt.serialize(value$9);
-        var value$11 = value.longTokenPrice;
-        var value$12 = GqlConverters.$$BigInt.serialize(value$11);
-        var value$13 = value.syntheticPrice;
-        var value$14 = GqlConverters.$$BigInt.serialize(value$13);
-        var value$15 = value.blockNumber;
-        var value$16 = GqlConverters.$$BigInt.serialize(value$15);
-        var value$17 = value.txHash;
-        var value$18 = GqlConverters.Bytes.serialize(value$17);
-        var value$19 = value.timestamp;
-        var value$20 = GqlConverters.$$BigInt.serialize(value$19);
-        var value$21 = value.__typename;
-        return {
-                __typename: value$21,
-                timestamp: value$20,
-                txHash: value$18,
-                blockNumber: value$16,
-                syntheticPrice: value$14,
-                longTokenPrice: value$12,
-                shortTokenPrice: value$10,
-                totalLockedLong: value$8,
-                totalLockedShort: value$6,
-                totalValueLocked: value$4,
-                setBy: value$2
-              };
-      });
-  return {
-          systemStates: systemStates
-        };
-}
-
-function serializeVariables(param) {
-  
-}
-
-function makeVariables(param) {
-  
-}
-
-function makeDefaultVariables(param) {
-  
-}
-
-var LatestSystemState_inner = {
-  Raw: Raw,
-  query: query,
-  parse: parse,
-  serialize: serialize,
-  serializeVariables: serializeVariables,
-  makeVariables: makeVariables,
-  makeDefaultVariables: makeDefaultVariables
-};
-
-var include = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query,
-      Raw: Raw,
-      parse: parse,
-      serialize: serialize,
-      serializeVariables: serializeVariables
-    });
-
-var use = include.use;
-
-var LatestSystemState_refetchQueryDescription = include.refetchQueryDescription;
-
-var LatestSystemState_useLazy = include.useLazy;
-
-var LatestSystemState_useLazyWithVariables = include.useLazyWithVariables;
-
-var LatestSystemState = {
-  LatestSystemState_inner: LatestSystemState_inner,
-  Raw: Raw,
-  query: query,
-  parse: parse,
-  serialize: serialize,
-  serializeVariables: serializeVariables,
-  makeVariables: makeVariables,
-  makeDefaultVariables: makeDefaultVariables,
-  refetchQueryDescription: LatestSystemState_refetchQueryDescription,
-  use: use,
-  useLazy: LatestSystemState_useLazy,
-  useLazyWithVariables: LatestSystemState_useLazyWithVariables
-};
 
 function Dashboard(Props) {
   var router = Router.useRouter();
-  var match = Curry.app(use, [
+  var match = Curry.app(Queries.LatestSystemState.use, [
         undefined,
         undefined,
         undefined,
@@ -186,6 +49,23 @@ function Dashboard(Props) {
   } else {
     tmp = "You might think this is impossible, but depending on the situation it might not be!";
   }
+  var match$4 = Curry.app(Queries.MarketDetails.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ]);
+  var match$5 = match$4.data;
   return React.createElement(AccessControl.make, {
               children: null,
               alternateComponent: React.createElement("h1", {
@@ -194,7 +74,15 @@ function Dashboard(Props) {
                         
                       })
                   }, "Login to view your dashboard")
-            }, React.createElement("h1", undefined, "Dashboard"), React.createElement(DaiBalance.make, {}), tmp);
+            }, React.createElement("h1", undefined, "Dashboard"), React.createElement(DaiBalance.make, {}), tmp, match$4.loading ? "Loading..." : (
+                match$4.error !== undefined ? "Error loading data" : (
+                    match$5 !== undefined ? React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Markets"), Belt_Array.map(match$5.syntheticMarkets, (function (param) {
+                                  return React.createElement("div", {
+                                              key: param.symbol
+                                            }, param.name);
+                                }))) : "You might think this is impossible, but depending on the situation it might not be!"
+                  )
+              ));
 }
 
 var make = Dashboard;
@@ -202,10 +90,9 @@ var make = Dashboard;
 var $$default = Dashboard;
 
 export {
-  LatestSystemState ,
   make ,
   $$default ,
   $$default as default,
   
 }
-/* query Not a pure module */
+/* react Not a pure module */

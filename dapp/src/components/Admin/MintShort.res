@@ -1,4 +1,4 @@
-let useLongContractAddress = Config.useLongContractAddress
+// let useLongContractAddress = Config.useLongContractAddress
 
 module MintShort = %form(
   type input = {amount: string}
@@ -29,16 +29,17 @@ let initialInput: MintShort.input = {
 }
 
 @react.component
-let make = () => {
+let make = (~shortTokenAddress) => {
   let signer = ContractActions.useSignerExn()
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
 
-  let tokenAddress = useLongContractAddress()
-
   let form = MintShort.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
     contractExecutionHandler(
-      ~makeContractInstance=Contracts.LongShort.make(~address=tokenAddress),
-      ~contractFunction=Contracts.LongShort.mintShort(~amount),
+      ~makeContractInstance=Contracts.LongShort.make(~address=shortTokenAddress),
+      ~contractFunction=Contracts.LongShort.mintShort(
+        ~amount,
+        ~marketIndex=Ethers.BigNumber.fromUnsafe("1"),
+      ),
     )
   })
 

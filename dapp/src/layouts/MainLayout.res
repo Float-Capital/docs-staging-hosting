@@ -17,25 +17,28 @@ module Navigation = {
           </span>
         </a>
       </Link>
-      <div className="flex w-2/3 justify-end">
-        <Link href="/"> <a className="px-3"> {React.string("Home")} </a> </Link>
-        <Link href="/dapp"> <a className="px-3"> {React.string("Dapp")} </a> </Link>
-        <Link href="/dashboard"> <a className="px-3"> {React.string("Dashboard")} </a> </Link>
-        <Link href="/admin"> <a className="px-3"> {React.string("Admin")} </a> </Link>
-        <a className="px-3" target="_blank" href="https://docs.float.capital">
-          {React.string("Docs")}
+      <div className="flex w-2/3 text-lg items-center justify-end">
+        <Link href="/dapp"> <a className="px-3 hover:bg-white"> {React.string("APP")} </a> </Link>
+        <Link href="/dashboard">
+          <a className="px-3 hover:bg-white"> {React.string("DASHBOARD")} </a>
+        </Link>
+        <a className="px-3 hover:bg-white" target="_blank" href="https://docs.float.capital">
+          {React.string("DOCS")}
         </a>
-        <a className="px-3" target="_blank" href="https://github.com/avolabs-io/longshort">
-          {React.string("Github")}
+        <a
+          className="px-3 hover:opacity-60"
+          target="_blank"
+          href="https://github.com/avolabs-io/longshort">
+          <img src="/icons/github.svg" className="h-5" />
         </a>
         {switch optCurrentUser {
         | Some(currentUser) =>
-          <p>
-            {"logged in as "->React.string}
+          <p className="px-3 hover:bg-white">
             <DisplayAddress address={currentUser->Ethers.Utils.toString} />
           </p>
         | None =>
           <button
+            className="px-3"
             onClick={_ => {
               router->Next.Router.push(`/login?nextPath=${router.asPath}`)
             }}>

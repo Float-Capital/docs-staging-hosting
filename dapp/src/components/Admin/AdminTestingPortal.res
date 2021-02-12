@@ -27,6 +27,25 @@ module AdminContext = {
 
       let optCurrentUser = RootProvider.useCurrentUser()
 
+      let optProvider = RootProvider.useWeb3()
+      let optEthersSigner = optProvider->Option.flatMap(provider =>
+        switch (privateKeyMode, authSet) {
+        | (false, _) =>
+          Js.log("a")
+          optCurrentUser->Option.flatMap(usersAddress =>
+            provider->Ethers.Providers.getSigner(usersAddress)
+          )
+        | (true, true) =>
+          Js.log("b")
+          optAuthHeader->Option.map(authHeader =>
+            Ethers.Wallet.makePrivKeyWallet(authHeader, provider)
+          )
+        | (true, false) =>
+          Js.log("c")
+          None
+        }
+      )
+
       let authDisplay =
         <div>
           {switch optCurrentUser {
@@ -75,21 +94,6 @@ module AdminContext = {
               </form>}
         </div>
 
-      let optProvider = RootProvider.useWeb3()
-      let optEthersSigner = optProvider->Option.flatMap(provider =>
-        switch (privateKeyMode, authSet) {
-        | (false, _) =>
-          optCurrentUser->Option.flatMap(usersAddress =>
-            provider->Ethers.Providers.getSigner(usersAddress)
-          )
-        | (true, true) =>
-          optAuthHeader->Option.map(authHeader =>
-            Ethers.Wallet.makePrivKeyWallet(authHeader, provider)
-          )
-        | (true, false) => None
-        }
-      )
-
       React.createElement(provider, {"value": optEthersSigner, "children": authDisplay})
     }
   }
@@ -99,13 +103,19 @@ module AdminActions = {
   @react.component
   let make = () => {
     let optEthersWallet = React.useContext(AdminContext.context)
+
     switch optEthersWallet {
     | Some(ethersWallet) =>
       <div>
         <h1> {"Test Functions"->React.string} </h1>
-        <div className={"border-dashed border-4 border-light-red-500"}> <Mint ethersWallet /> </div>
+        <div className={"border-dashed border-4 border-light-red-500"}>
+          <ApproveDai /> <MintDai ethersWallet />
+        </div>
       </div>
-    | None => React.null
+    | None =>
+      <h1>
+        {"No provider is selected. Even if you are using your own private key you still need to login with metamask for the connection to ethereum."->React.string}
+      </h1>
     }
   }
 }

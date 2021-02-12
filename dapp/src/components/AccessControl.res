@@ -5,7 +5,7 @@ module EthNetwork = {
 
     switch optChainID {
     | None => alternateComponent
-    | Some(_optUser) => children
+    | Some(_chainId) => children
     }
   }
 }
@@ -16,6 +16,6 @@ let make = (~children, ~alternateComponent=React.null) => {
 
   switch optUser {
   | None => alternateComponent
-  | Some(_optUser) => children
+  | Some(_user) => children
   }
 }

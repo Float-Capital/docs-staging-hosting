@@ -131,7 +131,6 @@ let useCurrentUser: unit => option<Ethers.ethAddress> = () => {
 
   context.account
 }
-
 let useCurrentUserExn = () => useCurrentUser()->Option.getExn
 
 let useIsAddressCurrentUser: Ethers.ethAddress => bool = address => {

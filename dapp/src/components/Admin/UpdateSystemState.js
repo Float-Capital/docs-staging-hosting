@@ -12,7 +12,7 @@ function UpdateSystemState(Props) {
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
-  var tokenAddress = Config.useLongContractAddress(undefined);
+  var tokenAddress = Config.useLongShortAddress(undefined);
   var onClick = function (param) {
     return Curry._2(contractExecutionHandler, (function (param) {
                   return Contracts.LongShort.make(tokenAddress, param);

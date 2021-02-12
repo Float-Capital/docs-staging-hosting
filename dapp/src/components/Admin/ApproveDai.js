@@ -23,31 +23,18 @@ var validators_tokenAddress = {
       var netIdStr = Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
               return String(prim);
             }));
-      switch (tokenAddress) {
-        case "DAI" :
-            return {
-                    TAG: 0,
-                    _0: Config.daiContractAddress(netIdStr),
-                    [Symbol.for("name")]: "Ok"
-                  };
-        case "LONG" :
-            return {
-                    TAG: 0,
-                    _0: Config.longTokenContractAddress(netIdStr),
-                    [Symbol.for("name")]: "Ok"
-                  };
-        case "SHORT" :
-            return {
-                    TAG: 0,
-                    _0: Config.shortTokenContractAddress(netIdStr),
-                    [Symbol.for("name")]: "Ok"
-                  };
-        default:
-          return {
-                  TAG: 1,
-                  _0: tokenAddress,
-                  [Symbol.for("name")]: "Error"
-                };
+      if (tokenAddress === "DAI") {
+        return {
+                TAG: 0,
+                _0: Config.daiContractAddress(netIdStr),
+                [Symbol.for("name")]: "Ok"
+              };
+      } else {
+        return {
+                TAG: 1,
+                _0: tokenAddress,
+                [Symbol.for("name")]: "Error"
+              };
       }
     })
 };
@@ -546,11 +533,7 @@ var Erc20ApproveForm = {
   useForm: useForm
 };
 
-var selectOpts = [
-  "DAI",
-  "LONG",
-  "SHORT"
-];
+var selectOpts = ["DAI"];
 
 var initialInput = {
   amount: "",
@@ -562,7 +545,7 @@ function ApproveDai(Props) {
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
-  var longShortAddress = Config.useLongContractAddress(undefined);
+  var longShortAddress = Config.useLongShortAddress(undefined);
   var form = useForm(initialInput, (function (param, _form) {
           var tokenAddress = param.tokenAddress;
           var amount = param.amount;
