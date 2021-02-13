@@ -28,6 +28,27 @@ function useDaiBalance(param) {
               }), fetchBalanceFunction, undefined);
 }
 
+function useErc20Balance(erc20Address) {
+  var optChainId = RootProvider.useChainId(undefined);
+  var optUserId = RootProvider.useCurrentUser(undefined);
+  var optProviderOrSigner = ContractActions.useProviderOrSigner(undefined);
+  var fetchBalanceFunction = function (param, param$1, param$2, userId) {
+    var providerOrSigner = Belt_Option.getExn(optProviderOrSigner);
+    return Contracts.Erc20.make(erc20Address, providerOrSigner).balanceOf(userId);
+  };
+  return Swr((function (param) {
+                if (optChainId !== undefined && optProviderOrSigner !== undefined && optUserId !== undefined) {
+                  return [
+                          "erc20balance",
+                          erc20Address,
+                          optChainId,
+                          Caml_option.valFromOption(optUserId)
+                        ];
+                }
+                
+              }), fetchBalanceFunction, undefined);
+}
+
 function useERC20Approved(erc20Address, spender) {
   var optChainId = RootProvider.useChainId(undefined);
   var optUserId = RootProvider.useCurrentUser(undefined);
@@ -52,6 +73,7 @@ function useERC20Approved(erc20Address, spender) {
 
 export {
   useDaiBalance ,
+  useErc20Balance ,
   useERC20Approved ,
   
 }

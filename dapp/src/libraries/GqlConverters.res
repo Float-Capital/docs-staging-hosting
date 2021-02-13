@@ -23,3 +23,16 @@ module Bytes = {
     }
   let serialize = bytesString => bytesString->Js.Json.string
 }
+
+module Address = {
+  type t = Ethers.ethAddress
+  let parse = json =>
+    switch json->Js.Json.decodeString->Option.flatMap(Ethers.Utils.getAddress) {
+    | Some(address) => address
+    | None =>
+      // In theory graphql should never allow this to not be a correct string
+      Js.log("CRITICAL - couldn't decode eth address from graph, should never happen!")
+      Constants.zeroAddress
+    }
+  let serialize = bytesString => bytesString->Ethers.Utils.toString->Js.Json.string
+}

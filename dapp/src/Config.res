@@ -1,8 +1,6 @@
 @val
-external longshortContractGoerli: option<string> = "process.env.REACT_APP_LONGSHORT_CONTRACT_GOERLI"
-@val
-external longshortContractBinanceTest: option<string> =
-  "process.env.REACT_APP_LONGSHORT_CONTRACT_GOERLI"
+external devMode: option<string> = "process.env.REACT_APP_DEVMODE"
+let isDevMode = devMode == Some("true")
 
 let longshortContractAbi = [""]->Ethers.makeAbi
 
