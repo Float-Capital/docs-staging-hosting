@@ -171,12 +171,6 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
       // NOTE: for simplicity skipping some permutations or edge cases.
       | (Some(amount), Some(balance), Some(amountApproved)) =>
         let prefix = isGreaterThanApproval(~amount, ~amountApproved) ? "" : "Approve & "
-        Js.log((
-          Ethers.Utils.formatEther(amount),
-          Ethers.Utils.formatEther(amountApproved),
-          prefix,
-          isGreaterThanApproval(~amount, ~amountApproved),
-        ))
         let greaterThanBalance = isGreaterThanBalance(~amount, ~balance)
         switch greaterThanBalance {
         | false => (None, `1MINT ${position}`, false)
