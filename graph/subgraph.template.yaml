@@ -1,0 +1,50 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: LongShort
+    network: <network>
+    source:
+      address: <long-short-address>
+      abi: LongShort
+      startBlock: <start-block>
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - V1
+        - FeesLevied
+        - SyntheticTokenCreated
+        - LongMinted
+        - LongRedeem
+        - PriceUpdate
+        - ShortMinted
+        - ShortRedeem
+        - TokenPriceRefreshed
+      abis:
+        - name: LongShort
+          file: ./abis/LongShort.json
+      eventHandlers:
+        - event: V1(address,address,address,address,address)
+          handler: handleV1
+        - event: FeesLevied(uint256,uint256,uint256,uint256,uint256)
+          handler: handleFeesLevied
+        - event: SyntheticTokenCreated(uint256,address,address,uint256,string,string,address,uint256,uint256,uint256,uint256)
+          handler: handleSyntheticTokenCreated
+        - event: LongMinted(uint256,uint256,uint256,uint256,uint256,address)
+          handler: handleLongMinted
+        - event: LongRedeem(uint256,uint256,uint256,uint256,uint256,address)
+          handler: handleLongRedeem
+        - event: PriceUpdate(uint256,uint256,uint256,uint256,address)
+          handler: handlePriceUpdate
+        - event: ShortMinted(uint256,uint256,uint256,uint256,uint256,address)
+          handler: handleShortMinted
+        - event: ShortRedeem(uint256,uint256,uint256,uint256,uint256,address)
+          handler: handleShortRedeem
+        - event: TokenPriceRefreshed(uint256,uint256,uint256,uint256)
+          handler: handleTokenPriceRefreshed
+        - event: ValueLockedInSystem(uint256,uint256,uint256,uint256,uint256)
+          handler: handleValueLockedInSystem
+      file: ./src/mapping.ts
