@@ -31,8 +31,6 @@ type SystemState @entity {
   txHash: Bytes!
   blockNumber: BigInt!
   marketIndex: BigInt!
-  # syntheticMarket: SyntheticMarket!
-  # previousSyntheticPrice: Price!
   syntheticPrice: BigInt! # TODO: this should be a reference to another entity that holds the price
   longTokenPrice: BigInt!
   shortTokenPrice: BigInt!
@@ -58,7 +56,6 @@ type SyntheticMarket @entity {
   name: String!
   symbol: String!
   marketIndex: BigInt!
-  totalValueLockedInMarket: BigInt!
   oracleAddress: Bytes!
   syntheticLongAddress: Bytes!
   syntheticShortAddress: Bytes!
@@ -94,12 +91,11 @@ type LongShortContract @entity {
 type GlobalState @entity {
   id: ID!
   contractVersion: BigInt!
+  latestMarketIndex: BigInt!
   oracleAggregator: oracleAggregator!
   yieldManager: YieldManager!
   adminAddress: Bytes!
   staker: Staker!
   tokenFactory: TokenFactory!
   longShort: LongShortContract!
-  # latestSyntheticMarket: SyntheticMarket!
-  # latestMarket:
 }

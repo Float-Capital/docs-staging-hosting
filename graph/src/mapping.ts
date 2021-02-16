@@ -83,6 +83,7 @@ export function handleV1(event: V1): void {
 
   let globalState = new GlobalState(GLOBAL_STATE_ID);
   globalState.contractVersion = BigInt.fromI32(1);
+  globalState.latestMarketIndex = ZERO;
   globalState.yieldManager = yieldManager.id;
   globalState.oracleAggregator = oracleAgregator.id;
   globalState.staker = staker.id;
@@ -179,15 +180,20 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.syntheticLongAddress = longTokenAddress;
   syntheticMarket.syntheticShortAddress = shortTokenAddress;
   syntheticMarket.marketIndex = marketIndex;
-  syntheticMarket.totalValueLockedInMarket = ZERO;
   syntheticMarket.oracleAddress = oracleAddress;
   syntheticMarket.feeStructure = fees.id;
 
   state.syntheticPrice = initialAssetPrice; // change me
 
+  let globalState = GlobalState.load(GLOBAL_STATE_ID);
+  globalState.latestMarketIndex = globalState.latestMarketIndex.plus(
+    BigInt.fromI32(1)
+  );
+
   state.save();
   syntheticMarket.save();
   fees.save();
+  globalState.save();
 
   // Add below back later
   // saveEventToStateChange(
