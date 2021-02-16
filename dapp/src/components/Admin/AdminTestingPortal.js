@@ -40,6 +40,25 @@ function AdminTestingPortal$AdminContext$Provider(Props) {
   };
   var provider = context.Provider;
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
+  var optProvider = RootProvider.useWeb3(undefined);
+  var optEthersSigner = Belt_Option.flatMap(optProvider, (function (provider) {
+          if (privateKeyMode) {
+            if (authSet) {
+              console.log("b");
+              return Belt_Option.map(optAuthHeader, (function (authHeader) {
+                            return new Ethers.Wallet(authHeader, provider);
+                          }));
+            } else {
+              console.log("c");
+              return ;
+            }
+          } else {
+            console.log("a");
+            return Belt_Option.flatMap(optCurrentUser, (function (usersAddress) {
+                          return provider.getSigner(usersAddress);
+                        }));
+          }
+        }));
   var authDisplay = React.createElement("div", undefined, optCurrentUser !== undefined ? React.createElement(React.Fragment, undefined, React.createElement("span", {
                   className: "inline-flex"
                 }, React.createElement("p", undefined, "Use injectod provider?"), React.createElement("input", {
@@ -71,22 +90,6 @@ function AdminTestingPortal$AdminContext$Provider(Props) {
                 }), React.createElement("button", {
                   type: "submit"
                 }, "submit"), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("p", undefined, "NOTE: you may need to reload the webpage after doing this to activate the key")));
-  var optProvider = RootProvider.useWeb3(undefined);
-  var optEthersSigner = Belt_Option.flatMap(optProvider, (function (provider) {
-          if (privateKeyMode) {
-            if (authSet) {
-              return Belt_Option.map(optAuthHeader, (function (authHeader) {
-                            return new Ethers.Wallet(authHeader, provider);
-                          }));
-            } else {
-              return ;
-            }
-          } else {
-            return Belt_Option.flatMap(optCurrentUser, (function (usersAddress) {
-                          return provider.getSigner(usersAddress);
-                        }));
-          }
-        }));
   return React.createElement(provider, {
               value: optEthersSigner,
               children: authDisplay
@@ -112,7 +115,7 @@ function AdminTestingPortal$AdminActions(Props) {
                         ethersWallet: optEthersWallet
                       })));
   } else {
-    return null;
+    return React.createElement("h1", undefined, "No provider is selected. Even if you are using your own private key you still need to login with metamask for the connection to ethereum.");
   }
 }
 

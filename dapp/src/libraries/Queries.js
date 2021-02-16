@@ -187,7 +187,7 @@ function parse$1(value) {
                         syntheticLong: {
                           __typename: value$1.__typename,
                           id: value$1.id,
-                          tokenAddress: GqlConverters.Bytes.parse(value$1.tokenAddress),
+                          tokenAddress: GqlConverters.Address.parse(value$1.tokenAddress),
                           totalValueLocked: GqlConverters.$$BigInt.parse(value$1.totalValueLocked),
                           tokenSupply: GqlConverters.$$BigInt.parse(value$1.tokenSupply),
                           tokenPrice: GqlConverters.$$BigInt.parse(value$1.tokenPrice)
@@ -195,7 +195,7 @@ function parse$1(value) {
                         syntheticShort: {
                           __typename: value$2.__typename,
                           id: value$2.id,
-                          tokenAddress: GqlConverters.Bytes.parse(value$2.tokenAddress),
+                          tokenAddress: GqlConverters.Address.parse(value$2.tokenAddress),
                           totalValueLocked: GqlConverters.$$BigInt.parse(value$2.totalValueLocked),
                           tokenSupply: GqlConverters.$$BigInt.parse(value$2.tokenSupply),
                           tokenPrice: GqlConverters.$$BigInt.parse(value$2.tokenPrice)
@@ -216,7 +216,7 @@ function serialize$1(value) {
         var value$6 = value$1.totalValueLocked;
         var value$7 = GqlConverters.$$BigInt.serialize(value$6);
         var value$8 = value$1.tokenAddress;
-        var value$9 = GqlConverters.Bytes.serialize(value$8);
+        var value$9 = GqlConverters.Address.serialize(value$8);
         var value$10 = value$1.id;
         var value$11 = value$1.__typename;
         var syntheticShort = {
@@ -235,7 +235,7 @@ function serialize$1(value) {
         var value$17 = value$12.totalValueLocked;
         var value$18 = GqlConverters.$$BigInt.serialize(value$17);
         var value$19 = value$12.tokenAddress;
-        var value$20 = GqlConverters.Bytes.serialize(value$19);
+        var value$20 = GqlConverters.Address.serialize(value$19);
         var value$21 = value$12.id;
         var value$22 = value$12.__typename;
         var syntheticLong = {

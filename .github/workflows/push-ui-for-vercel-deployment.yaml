@@ -16,18 +16,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          fetch-depth: 100
+          fetch-depth: 0
 
       - name: check modified files
         id: has-dapp-changes
         run: |
-          git fetch origin master
-
           echo "=============== list modified files ==============="
-          git diff --name-only origin/master...HEAD
+          git log -m -1 --name-only --pretty="format:" $(git rev-parse HEAD)
 
           echo "========== check paths of modified files =========="
-          git diff --name-only origin/master...HEAD > files.txt
+          git log -m -1 --name-only --pretty="format:" $(git rev-parse HEAD) > files.txt
+
           while IFS= read -r file
           do
             echo $file

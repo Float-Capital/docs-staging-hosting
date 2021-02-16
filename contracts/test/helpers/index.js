@@ -1,7 +1,9 @@
 const { BN } = require("@openzeppelin/test-helpers");
+const { web3 } = require("@nomiclabs/hardhat-web3");
 
 const LONGSHORT_CONTRACT_NAME = "LongShort";
-const PRICE_ORACLE_NAME = "PriceOracle";
+const YIELD_MANAGER = "YieldManagerMock";
+const ORACLE_AGREGATOR = "OracleManagerMock";
 const SYNTHETIC_TOKEN = "SyntheticToken";
 const TOKEN_FACTORY = "TokenFactory";
 const STAKER = "Staker";
@@ -12,20 +14,13 @@ const TEN_TO_THE_18 = "1000000000000000000";
 
 const erc20 = artifacts.require(SYNTHETIC_TOKEN);
 const LongShort = artifacts.require(LONGSHORT_CONTRACT_NAME);
-const PriceOracle = artifacts.require(PRICE_ORACLE_NAME);
+const OracleManagerMock = artifacts.require(ORACLE_AGREGATOR);
+const YieldManager = artifacts.require(YIELD_MANAGER);
 const TokenFactory = artifacts.require(TOKEN_FACTORY);
 const Staker = artifacts.require(STAKER);
 const FloatToken = artifacts.require(FLOAT_TOKEN);
 
 const initialize = async (admin) => {
-  const dai = await erc20.new({
-    from: admin,
-  });
-
-  await dai.initialize("dai token", "DAI", {
-    from: admin,
-  });
-
   const tokenFactory = await TokenFactory.new({
     from: admin,
   });
@@ -41,6 +36,12 @@ const initialize = async (admin) => {
   const longShort = await LongShort.new({
     from: admin,
   });
+  const oracleManagerMock = await OracleManagerMock.new({
+    from: admin,
+  });
+  const yieldManager = await YieldManager.new({
+    from: admin,
+  });
 
   await floatToken.setup("Float token", "FLOAT TOKEN", staker.address, {
     from: admin,
@@ -50,11 +51,20 @@ const initialize = async (admin) => {
     from: admin,
   });
 
+  await oracleManagerMock.setup(admin, longShort.address, {
+    from: admin,
+  });
+
+  await yieldManager.setup(admin, longShort.address, {
+    from: admin,
+  });
+
   await longShort.setup(
     admin,
-    dai.address,
     tokenFactory.address,
     staker.address,
+    oracleManagerMock.address,
+    yieldManager.address,
     {
       from: admin,
     }
@@ -65,9 +75,10 @@ const initialize = async (admin) => {
   });
 
   return {
-    dai,
     longShort,
     tokenFactory,
+    oracleManagerMock,
+    yieldManager,
   };
 };
 
@@ -81,14 +92,22 @@ const createSynthetic = async (
   _baseExitFee,
   _badLiquidityExitFee
 ) => {
-  const oracle = await PriceOracle.new(new BN(TEN_TO_THE_18), {
+  const fundToken = await erc20.new({
+    from: admin,
+  });
+
+  // For testing, we will use the fundToken's address as the oracle address. This is likely to chance in the future
+  const priceOracleAddress = fundToken.address;
+
+  await fundToken.initialize("fund token", "FND", {
     from: admin,
   });
 
   await longShort.newSyntheticMarket(
     syntheticName,
     syntheticSymbol,
-    oracle.address,
+    fundToken.address,
+    priceOracleAddress,
     _baseEntryFee,
     _badLiquidityEntryFee,
     _baseExitFee,
@@ -100,14 +119,14 @@ const createSynthetic = async (
   const longAddress = await longShort.longTokens.call(currentMarketIndex);
   const shortAddress = await longShort.shortTokens.call(currentMarketIndex);
 
-  let long = await erc20.at(longAddress);
-  let short = await erc20.at(shortAddress);
+  let longToken = await erc20.at(longAddress);
+  let shortToken = await erc20.at(shortAddress);
 
   return {
-    oracle,
     currentMarketIndex,
-    long,
-    short,
+    longToken,
+    shortToken,
+    fundToken,
   };
 };
 
@@ -212,6 +231,52 @@ const feeCalculation = (
   return fees;
 };
 
+const logGasPrices = async (
+  functionName,
+  receipt,
+  ethPriceUsd,
+  bnbPriceUsd,
+  ethGasPriceGwei,
+  bnbGasPriceGwei
+) => {
+  const ONE_GWEI = new BN("1000000000");
+  const ONE_ETH = new BN("1000000000000000000");
+  console.log(`Assessing gas for: ${functionName}`);
+
+  const gasUsed = receipt.receipt.gasUsed;
+  console.log(`GasUsed: ${gasUsed}`);
+
+  console.log(`------Cost for ETH Mainnet------`);
+  console.log(`gas price gwei: ${ethGasPriceGwei}`);
+  const totalCostEth = new BN(gasUsed).mul(
+    new BN(ethGasPriceGwei).mul(ONE_GWEI)
+  );
+  console.log(`USD Price: $${ethPriceUsd}`);
+  const ethCost =
+    Number(
+      totalCostEth
+        .mul(new BN(ethPriceUsd))
+        .mul(new BN(100))
+        .div(ONE_ETH)
+    ) / 100;
+  console.log(`Cost on ETH Mainnet: $${ethCost}`);
+
+  console.log(`------Cost for BSC ------`);
+  console.log(`gas price gwei: ${bnbGasPriceGwei}`);
+  const totalCostBsc = new BN(gasUsed).mul(
+    new BN(bnbGasPriceGwei).mul(ONE_GWEI)
+  );
+  console.log(`BNB Price: $${bnbPriceUsd}`);
+  const bscCost =
+    Number(
+      totalCostBsc
+        .mul(new BN(bnbPriceUsd))
+        .mul(new BN(100))
+        .div(ONE_ETH)
+    ) / 100;
+  console.log(`Cost on BSC: $${bscCost}`);
+};
+
 module.exports = {
   initialize,
   mintAndApprove,
@@ -221,4 +286,5 @@ module.exports = {
   simulateTotalValueWithInterest,
   feeCalculation,
   createSynthetic,
+  logGasPrices,
 };
