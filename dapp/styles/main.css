@@ -130,13 +130,20 @@ body {
 }
 
 .float-button-container {
+  margin-top: 2px;
   width: calc(100% - 0px);
   transform: translate(4px, 4px);
   border: 1px solid #0d4184;
   background-color: #0d4184;
-  padding: 1rem -1rem 1rem 1rem;
+  padding: 0.6rem -0.6rem 0.6rem 0.6rem;
   display: inline-block;
 }
+
+.float-button-container-small {
+  transform: translate(4px, 4px) !important;
+  padding: 0.6rem -1rem 0.6rem 0.6rem;
+}
+
 .float-button {
   width: calc(100% - 0px);
   transform: translate(-4px, -4px);
@@ -144,7 +151,7 @@ body {
   font-style: italic;
   font-weight: 300;
   font-family: menlo, sans-serif;
-  padding: 1rem 2rem;
+  padding: 0.6rem 1rem;
   border: 1px solid #0d4184;
   color: #0d4184;
   background-color: #fff;
@@ -154,8 +161,18 @@ body {
   text-decoration: none;
   cursor: pointer;
 }
+
+.float-button-small {
+  font-size: 12px !important;
+  padding: 0.5rem 0.5rem !important;
+  transform: translate(-2px, -2px) !important;
+}
+
 .float-button:hover {
   transform: translate(-2px, -2px);
+}
+.float-button-small:hover {
+  transform: translate(-4px, -4px);
 }
 .float-button:hover,
 .float-button:focus {

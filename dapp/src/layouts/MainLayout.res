@@ -37,13 +37,20 @@ module Navigation = {
             <DisplayAddress address={currentUser->Ethers.Utils.toString} /> //TODO route to Profile page
           </p>
         | None =>
-          <button
-            className="px-3"
+          <Button
             onClick={_ => {
               router->Next.Router.push(`/login?nextPath=${router.asPath}`)
-            }}>
-            {"login"->React.string}
-          </button>
+            }}
+            text="LOGIN"
+            variant="small"
+          />
+        // <button
+        //   className="px-3"
+        //   onClick={_ => {
+        //     router->Next.Router.push(`/login?nextPath=${router.asPath}`)
+        //   }}>
+        //   {"login"->React.string}
+        // </button>
         }}
       </div>
     </nav>

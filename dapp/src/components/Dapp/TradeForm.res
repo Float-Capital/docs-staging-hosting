@@ -12,6 +12,8 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
 
   let (amount, setAmount) = React.useState(_ => "")
 
+  // let (position, setPosition) = React.useState(_ => "")
+
   let mintFunction = () =>
     contractExecutionHandler(
       ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
@@ -45,16 +47,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
       {isMint
         ? <input className="trade-input" placeholder="redeem" />
         : <input className="trade-input" placeholder="mint" />}
-      <div>
-        <Button onClick={_ => mintFunction()} text="OPEN POSITION" />
-        <div className="float-button-outer-container">
-          <div className="float-button-container">
-            <button className="float-button" onClick={_ => mintFunction()}>
-              {"OPEN POSITION"->React.string}
-            </button>
-          </div>
-        </div>
-      </div>
+      <div> <Button onClick={_ => mintFunction()} text="OPEN POSITION" variant="large" /> </div>
     </div>
     {
       let txExplererUrl = RootProvider.useEtherscanUrl()
