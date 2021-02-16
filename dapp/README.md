@@ -1,5 +1,7 @@
 # FLOAT DAPP
 
+User interface for the FLOAT system.
+
 ## Development
 
 Run rescript compiler and nextjs server in 1.
