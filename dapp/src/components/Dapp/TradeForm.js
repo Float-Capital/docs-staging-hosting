@@ -735,15 +735,8 @@ function TradeForm$1(Props) {
     var position = match$8 ? "LONG" : "SHORT";
     var exit = 0;
     if (formAmount !== undefined && optDaiBalance !== undefined && optDaiAmountApproved !== undefined) {
-      var amountApproved = Caml_option.valFromOption(optDaiAmountApproved);
       var amount = Caml_option.valFromOption(formAmount);
-      var prefix = amount.gt(amountApproved) ? "" : "Approve & ";
-      console.log([
-            Ethers.Utils.formatEther(amount),
-            Ethers.Utils.formatEther(amountApproved),
-            prefix,
-            amount.gt(amountApproved)
-          ]);
+      var prefix = amount.gt(Caml_option.valFromOption(optDaiAmountApproved)) ? "" : "Approve & ";
       var greaterThanBalance = amount.gt(Caml_option.valFromOption(optDaiBalance));
       match$9 = greaterThanBalance ? [
           "Amount is greater than your balance",
