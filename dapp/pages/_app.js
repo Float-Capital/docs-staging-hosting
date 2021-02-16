@@ -1,5 +1,7 @@
 import "styles/main.css";
 
+import Head from "next/head";
+
 // Note:
 // Just renaming $$default to ResApp alone
 // doesn't help FastRefresh to detect the
@@ -23,5 +25,12 @@ Router.events.on("routeChangeError", () => NProgress.done());
 // If you don't do this, your Fast-Refresh will
 // not work!
 export default function App(props) {
-  return <ResApp {...props} />;
+  return (
+    <div>
+      <Head>
+        <link rel="shortcut icon" href="/favicons/favicon.ico" />
+      </Head>
+      <ResApp {...props} />
+    </div>
+  );
 }
