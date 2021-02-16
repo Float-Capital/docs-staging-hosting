@@ -22,10 +22,10 @@ jobs:
         id: has-dapp-changes
         run: |
           echo "=============== list modified files ==============="
-          git show --name-only
+          git log -m -1 --name-only --pretty="format:" $(git rev-parse HEAD)
 
           echo "========== check paths of modified files =========="
-          git show --name-only > files.txt
+          git log -m -1 --name-only --pretty="format:" $(git rev-parse HEAD) > files.txt
 
           while IFS= read -r file
           do
