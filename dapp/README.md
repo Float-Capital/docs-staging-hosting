@@ -1,12 +1,5 @@
 # FLOAT DAPP
 
-This is a NextJS based template with following setup:
-
-- Full Tailwind v2 cofig & basic css scaffold (+ production setup w/ purge-css & cssnano)
-- [ReScript](https://rescript-lang.org) + React
-- Some ReScript Bindings for Next to get you started
-- Preconfigured Dependencies: `reason-react`
-
 ## Development
 
 Run rescript compiler and nextjs server in 1.
