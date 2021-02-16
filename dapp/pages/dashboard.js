@@ -1,4 +1,14 @@
 import Dashboard from "src/Dashboard";
-export default function Examples(props) {
-  return <Dashboard {...props} />;
+import Head from "next/head";
+
+export default function DashboardPage(props) {
+  return (
+    <div>
+      <Head>
+        <title>Float Capital</title>
+        <meta property="og:title" content="Float Capital" key="title" />
+      </Head>
+      <Dashboard {...props} />
+    </div>
+  );
 }

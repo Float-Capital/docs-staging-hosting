@@ -162,7 +162,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
   | Some(Ok(amount)) => Some(amount)
   | _ => None
   }
-  let (optAdditionalErrorMessage, buttonText, buttonDisabled) = {
+  let (optAdditionalErrorMessage, _buttonText, _buttonDisabled) = {
     switch (form.input.isMint, form.input.isLong) {
     | (true, isLong) =>
       // let is(optDaiBalance, optDaiAmountApproved,
@@ -247,7 +247,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
       {form.input.isMint
         ? <input className="trade-input" placeholder="redeem" />
         : <input className="trade-input" placeholder="mint" />}
-      <button className="trade-action" disabled=buttonDisabled> {buttonText->React.string} </button>
+      <Button onClick={_ => Js.log("I was clicked")} variant="large"> "Something" </Button>
     </Form>
     {// {Config.isDevMode // <- this can be used to hide this code when not developing
     //   ? <>
@@ -255,12 +255,12 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
     switch txState {
     | ContractActions.UnInitialised => React.null
     | ContractActions.Created => <> <h1> {"Processing Approval "->React.string} </h1> <Loader /> </>
-    | ContractActions.SignedAndSubmitted(txHash) => <>
+    | ContractActions.SignedAndSubmitted(_txHash) => <>
         <h1> {"Processing Approval - submitted "->React.string} <Loader /> </h1> <Loader />
       </>
-    | ContractActions.Complete(result) =>
-      let txHash = result.transactionHash
-      <> <h1> {"Approval Complete, Sign the next transaction "->React.string} </h1> </>
+    | ContractActions.Complete({transactionHash: _txHash}) => <>
+        <h1> {"Approval Complete, Sign the next transaction "->React.string} </h1>
+      </>
     | ContractActions.Declined(message) => <>
         <h1> {"The transaction was declined by your wallet, please try again."->React.string} </h1>
         <p> {("Failure reason: " ++ message)->React.string} </p>

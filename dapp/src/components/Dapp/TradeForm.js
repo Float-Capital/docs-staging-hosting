@@ -3,6 +3,7 @@
 import * as Form from "../Admin/Form.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
+import * as Button from "../UI/Button.js";
 import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Loader from "../UI/Loader.js";
@@ -735,15 +736,8 @@ function TradeForm$1(Props) {
     var position = match$8 ? "LONG" : "SHORT";
     var exit = 0;
     if (formAmount !== undefined && optDaiBalance !== undefined && optDaiAmountApproved !== undefined) {
-      var amountApproved = Caml_option.valFromOption(optDaiAmountApproved);
       var amount = Caml_option.valFromOption(formAmount);
-      var prefix = amount.gt(amountApproved) ? "" : "Approve & ";
-      console.log([
-            Ethers.Utils.formatEther(amount),
-            Ethers.Utils.formatEther(amountApproved),
-            prefix,
-            amount.gt(amountApproved)
-          ]);
+      var prefix = amount.gt(Caml_option.valFromOption(optDaiAmountApproved)) ? "" : "Approve & ";
       var greaterThanBalance = amount.gt(Caml_option.valFromOption(optDaiBalance));
       match$9 = greaterThanBalance ? [
           "Amount is greater than your balance",
@@ -965,10 +959,14 @@ function TradeForm$1(Props) {
                       }) : React.createElement("input", {
                         className: "trade-input",
                         placeholder: "mint"
-                      }), React.createElement("button", {
-                      className: "trade-action",
-                      disabled: match$9[2]
-                    }, match$9[1])), tmp$2, tmp$3, React.createElement("div", undefined, React.createElement("p", undefined, "dev only component to display balances"), React.createElement("p", undefined, "dai - balance: " + formatOptBalance(optDaiBalance) + " - approved: " + formatOptBalance(optDaiAmountApproved)), React.createElement("p", undefined, "long - balance: " + formatOptBalance(match$5[0]) + " - approved: " + formatOptBalance(match$5[1])), React.createElement("p", undefined, "short - balance: " + formatOptBalance(match$4[0]) + " - approved: " + formatOptBalance(match$4[1]))));
+                      }), React.createElement(Button.make, {
+                      onClick: (function (param) {
+                          console.log("I was clicked");
+                          
+                        }),
+                      children: "Something",
+                      variant: "large"
+                    })), tmp$2, tmp$3, React.createElement("div", undefined, React.createElement("p", undefined, "dev only component to display balances"), React.createElement("p", undefined, "dai - balance: " + formatOptBalance(optDaiBalance) + " - approved: " + formatOptBalance(optDaiAmountApproved)), React.createElement("p", undefined, "long - balance: " + formatOptBalance(match$5[0]) + " - approved: " + formatOptBalance(match$5[1])), React.createElement("p", undefined, "short - balance: " + formatOptBalance(match$4[0]) + " - approved: " + formatOptBalance(match$4[1]))));
 }
 
 var make = TradeForm$1;
