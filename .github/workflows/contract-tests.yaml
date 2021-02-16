@@ -19,7 +19,6 @@ jobs:
         run: |
           git fetch origin master
 
-
           echo "=============== list modified files ==============="
           git diff --name-only origin/master...HEAD
 
@@ -30,7 +29,6 @@ jobs:
           do
             echo $file
             if [[ $file == contracts/* ]]; then
-              echo "filename is correct"
               echo "::set-output name=run_job::true"
               break
             fi
