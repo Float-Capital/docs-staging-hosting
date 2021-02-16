@@ -17,7 +17,6 @@ import {
   EventParam,
   EventParams,
   SyntheticMarket,
-  SyntheticToken,
   FeeStructure,
   GlobalState,
   OracleAgregator,
@@ -170,23 +169,6 @@ export function handleSyntheticTokenCreated(
   fees.baseExitFee = baseExitFee;
   fees.badLiquidityExitFee = badLiquidityExitFee;
 
-  // create new synthetic token object.
-  let longToken = new SyntheticToken(
-    marketIndexString + "-" + longTokenAddress.toHexString()
-  );
-  longToken.tokenAddress = longTokenAddress;
-  longToken.tokenPrice = TEN_TO_THE_18;
-  longToken.tokenSupply = ZERO;
-  longToken.totalValueLocked = ZERO;
-
-  let shortToken = new SyntheticToken(
-    marketIndexString + "-" + shortTokenAddress.toHexString()
-  );
-  shortToken.tokenAddress = shortTokenAddress;
-  shortToken.tokenPrice = TEN_TO_THE_18;
-  shortToken.tokenSupply = ZERO;
-  shortToken.totalValueLocked = ZERO;
-
   let syntheticMarket = new SyntheticMarket(marketIndexString);
   syntheticMarket.timestampCreated = timestamp;
   syntheticMarket.txHash = txHash;
@@ -194,8 +176,8 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.name = syntheticName;
   syntheticMarket.symbol = syntheticSymbol;
   syntheticMarket.latestSystemState = state.id;
-  syntheticMarket.syntheticLong = longToken.id;
-  syntheticMarket.syntheticShort = shortToken.id;
+  syntheticMarket.syntheticLongAddress = longTokenAddress;
+  syntheticMarket.syntheticShortAddress = shortTokenAddress;
   syntheticMarket.marketIndex = marketIndex;
   syntheticMarket.totalValueLockedInMarket = ZERO;
   syntheticMarket.oracleAddress = oracleAddress;
@@ -203,8 +185,6 @@ export function handleSyntheticTokenCreated(
 
   state.syntheticPrice = initialAssetPrice; // change me
 
-  longToken.save();
-  shortToken.save();
   state.save();
   syntheticMarket.save();
   fees.save();
@@ -289,10 +269,14 @@ export function handlePriceUpdate(event: PriceUpdate): void {
   let timestamp = event.block.timestamp;
 
   let marketIndex = event.params.marketIndex;
+  let marketIndexString = marketIndex.toString();
+
   let contractCallCounter = event.params.contractCallCounter;
   let newPrice = event.params.newPrice;
   let oldPrice = event.params.oldPrice;
   let user = event.params.user;
+
+  let syntheticMarket = SyntheticMarket.load(marketIndexString);
 
   let state = getOrCreateLatestSystemState(
     marketIndex,
@@ -300,7 +284,9 @@ export function handlePriceUpdate(event: PriceUpdate): void {
     event
   );
   state.syntheticPrice = newPrice;
+  syntheticMarket.latestSystemState = state.id;
   state.save();
+  syntheticMarket.save();
 
   saveEventToStateChange(
     txHash,
@@ -371,10 +357,13 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
   let timestamp = event.block.timestamp;
 
   let marketIndex = event.params.marketIndex;
+  let marketIndexString = marketIndex.toString();
   let longTokenPrice = event.params.longTokenPrice;
   let shortTokenPrice = event.params.shortTokenPrice;
 
   let contractCallCounter = event.params.contractCallCounter;
+
+  let syntheticMarket = SyntheticMarket.load(marketIndexString);
 
   let state = getOrCreateLatestSystemState(
     marketIndex,
@@ -383,7 +372,9 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
   );
   state.longTokenPrice = longTokenPrice;
   state.shortTokenPrice = shortTokenPrice;
+  syntheticMarket.latestSystemState = state.id;
   state.save();
+  syntheticMarket.save();
 
   saveEventToStateChange(
     txHash,

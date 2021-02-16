@@ -25,18 +25,6 @@ type Event @entity {
   address: Bytes!
 }
 
-# type FeesLevied @entity {
-#   id: ID!
-#   feeAmount: BigInt!
-#   longFee: BigInt!
-#   shortFee: BigInt!
-# }
-
-# type LongMint @entity {
-#   id: ID!
-#   user: Bytes!
-# }
-
 type SystemState @entity {
   id: ID! # marketIndex "-" callCounter
   timestamp: BigInt!
@@ -52,14 +40,6 @@ type SystemState @entity {
   totalLockedShort: BigInt!
   totalValueLocked: BigInt!
   setBy: Bytes! #Turn into a User entity
-}
-
-type SyntheticToken @entity {
-  id: ID! # token address
-  tokenAddress: Bytes!
-  tokenPrice: BigInt!
-  tokenSupply: BigInt!
-  totalValueLocked: BigInt!
 }
 
 type FeeStructure @entity {
@@ -80,8 +60,8 @@ type SyntheticMarket @entity {
   marketIndex: BigInt!
   totalValueLockedInMarket: BigInt!
   oracleAddress: Bytes!
-  syntheticLong: SyntheticToken!
-  syntheticShort: SyntheticToken!
+  syntheticLongAddress: Bytes!
+  syntheticShortAddress: Bytes!
   latestSystemState: SystemState!
   feeStructure: FeeStructure!
 }
