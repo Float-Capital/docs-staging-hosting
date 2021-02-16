@@ -92,6 +92,7 @@ type GlobalState @entity {
   id: ID!
   contractVersion: BigInt!
   latestMarketIndex: BigInt!
+  totalValueLockedInAllMarkets: BigInt! #note this can be dodgey if we accept different stable coins
   oracleAggregator: oracleAggregator!
   yieldManager: YieldManager!
   adminAddress: Bytes!
