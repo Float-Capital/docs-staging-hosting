@@ -2,12 +2,14 @@ const fs = require("fs");
 const path = require("path");
 const env = require('./env');
 const { exec } = require('child_process');
-const env = require("./env");
 
 const prefix = env.openZeppelinDir;
 
 const args = process.argv.splice(2);
 
+
+// PASS IN THE NETWORKS AS ARGS e.g. node scripts/verify.js goerli binanceTest
+// if none passed verifies for all the networks it's configured ofr
 let networks;
 if(args.length > 0){
     networks = args;
@@ -22,27 +24,25 @@ networks.forEach(network => {
         console.log(e)
         return;
     }
-
-    const address = (JSON.parse(input)).proxies["float-capital/LongShort"][0].implementation;
-
-    const variables = {
+    const inpObj = JSON.parse(input);
+    let variables = {
+        ...process.env,
         NETWORK: network,
-        CONTRACT: `LongShort@${address}`
     };
-
-    exec(`cd contracts && yarn verify-non-upgrade-contracts`, variables, (error) => {
-        if(error){
-            console.log(error);
-        }else{
-            console.log(`Successfully verified non-upgradeable contracts for  ${network}`);
-        }
+    Object.keys(env.implementationVarsToProxies).forEach(x => {
+        variables[x] = inpObj.proxies[env.implementationVarsToProxies[x]][0].implementation;
     });
-    exec(`cd contracts && yarn verify-upgradeable-contracts`, variables, (error) => {
+
+    exec(`cd contracts; yarn verify-contracts`, {
+        env: variables
+    }, (error, stdout) => {
+        console.log(`VERIFYING FOR ${network}`)
         if(error){
             console.log(error);
+            console.log(stdout);
         }else{
-            console.log(`Successfully verified upgradeable contracts for  ${network}`);
-        }    
+            console.log(`Successfully verified contracts for  ${network}`);
+        }
     });
 })
 

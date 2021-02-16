@@ -6,8 +6,12 @@ module.exports = {
         "dev-321.json": "subgraph.ganache.yaml"
     },
     networksToOpenZeppelin: {
-        "binancetest" : "dev-97.json",
-        "goerli": "goerli.json",
-        "ganache" : "dev-321.json"
+        "binanceTest" : "dev-97.json",
+        "goerli": "goerli.json"
+    },
+    implementationVarsToProxies: {
+        "LONGSHORT_IMPLEMENTATION": "float-capital/OracleAgregator",
+        "ORACLE_MANAGER_IMPLEMENTATION": "float-capital/YieldManager",
+        "YIELD_MANAGER_IMPLEMENTATION": "float-capital/LongShort" 
     }   
 }

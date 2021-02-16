@@ -2,7 +2,6 @@ const fs = require("fs");
 const path = require("path");
 const env = require("./env");
 
-let output = {};
 
 const addressKey = "<long-short-address>";
 
@@ -30,7 +29,7 @@ const preserveValues = (template, output) => {
             templateVal = outputLines[i].split(":")[1].trim();
             template = template.replace(p, templateVal);
         }
-    })
+    });
     return template;
 }
 
