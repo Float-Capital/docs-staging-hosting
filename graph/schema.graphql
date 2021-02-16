@@ -86,9 +86,40 @@ type SyntheticMarket @entity {
   feeStructure: FeeStructure!
 }
 
+type YieldManager @entity {
+  id: ID!
+  address: Bytes!
+}
+
+type OracleAgregator @entity {
+  id: ID!
+  address: Bytes!
+}
+
+type Staker @entity {
+  id: ID!
+  address: Bytes!
+}
+
+type TokenFactory @entity {
+  id: ID!
+  address: Bytes!
+}
+
+type LongShort @entity {
+  id: ID!
+  address: Bytes!
+}
+
 type GlobalState @entity {
   id: ID!
   contractVersion: BigInt!
+  oracleAgreagator: OracleAgregator!
+  yieldManager: YieldManager!
+  adminAddress: Bytes!
+  staker: Staker!
+  tokenFactory: TokenFactory!
+  longShort: LongShort!
   # latestSyntheticMarket: SyntheticMarket!
   # latestMarket:
 }

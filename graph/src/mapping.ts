@@ -9,6 +9,7 @@ import {
   ShortRedeem,
   TokenPriceRefreshed,
   ValueLockedInSystem,
+  LongShort,
 } from "../generated/LongShort/LongShort";
 
 import {
@@ -19,11 +20,25 @@ import {
   SyntheticToken,
   FeeStructure,
   GlobalState,
+  OracleAgregator,
+  YieldManager,
+  Staker,
+  TokenFactory,
+  LongShort,
 } from "../generated/schema";
 import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import { getOrCreateLatestSystemState } from "./utils/globalStateManager";
-import { ZERO, TEN_TO_THE_18, GLOBAL_STATE_ID } from "./CONSTANTS";
+import {
+  ZERO,
+  TEN_TO_THE_18,
+  GLOBAL_STATE_ID,
+  YIELD_MANAGER_ID,
+  ORACLE_AGREGATOR_ID,
+  STAKER_ID,
+  TOKEN_FACTORY_ID,
+  LONG_SHORT_ID,
+} from "./CONSTANTS";
 
 // export function handleEvent(event: EVENT): void {
 //   let txHash = event.transaction.hash;
@@ -42,8 +57,39 @@ import { ZERO, TEN_TO_THE_18, GLOBAL_STATE_ID } from "./CONSTANTS";
 // }
 
 export function handleV1(event: V1): void {
+  // This function will only ever get called once
+  if (GlobalState.load(GLOBAL_STATE_ID) != null) {
+    log.critical("the event was emitted more than once!", []);
+  }
+
+  let longShort = new LongShort(LONG_SHORT_ID);
+  longShort.address = event.address;
+  longShort.save();
+
+  let tokenFactory = new TokenFactory(TOKEN_FACTORY_ID);
+  tokenFactory.address = event.params.tokenFactory;
+  tokenFactory.save();
+
+  let staker = new Staker(STAKER_ID);
+  staker.address = event.params.staker;
+  staker.save();
+
+  let oracleAgregator = new OracleAgregator(ORACLE_AGREGATOR_ID);
+  oracleAgregator.address = event.params.oracleAgregator;
+  oracleAgregator.save();
+
+  let yieldManager = new YieldManager(YIELD_MANAGER_ID);
+  yieldManager.address = event.params.yieldManager;
+  yieldManager.save();
+
   let globalState = new GlobalState(GLOBAL_STATE_ID);
   globalState.contractVersion = BigInt.fromI32(1);
+  globalState.yieldManager = yieldManager.id;
+  globalState.oracleAgreagator = oracleAgregator.id;
+  globalState.staker = staker.id;
+  globalState.tokenFactory = tokenFactory.id;
+  globalState.adminAddress = event.params.admin;
+  globalState.longShort = longShort.id;
   globalState.save();
 }
 
