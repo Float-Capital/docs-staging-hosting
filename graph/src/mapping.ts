@@ -9,6 +9,7 @@ import {
   ShortRedeem,
   TokenPriceRefreshed,
   ValueLockedInSystem,
+  LongShort,
 } from "../generated/LongShort/LongShort";
 
 import {
@@ -23,6 +24,7 @@ import {
   YieldManager,
   Staker,
   TokenFactory,
+  LongShort,
 } from "../generated/schema";
 import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
@@ -35,6 +37,7 @@ import {
   ORACLE_AGREGATOR_ID,
   STAKER_ID,
   TOKEN_FACTORY_ID,
+  LONG_SHORT_ID,
 } from "./CONSTANTS";
 
 // export function handleEvent(event: EVENT): void {
@@ -59,6 +62,10 @@ export function handleV1(event: V1): void {
     log.critical("the event was emitted more than once!", []);
   }
 
+  let longShort = new LongShort(LONG_SHORT_ID);
+  longShort.address = event.address;
+  longShort.save();
+
   let tokenFactory = new TokenFactory(TOKEN_FACTORY_ID);
   tokenFactory.address = event.params.tokenFactory;
   tokenFactory.save();
@@ -82,6 +89,7 @@ export function handleV1(event: V1): void {
   globalState.staker = staker.id;
   globalState.tokenFactory = tokenFactory.id;
   globalState.adminAddress = event.params.admin;
+  globalState.longShort = longShort.id;
   globalState.save();
 }
 
