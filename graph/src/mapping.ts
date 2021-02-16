@@ -19,11 +19,11 @@ import {
   SyntheticMarket,
   FeeStructure,
   GlobalState,
-  OracleAgregator,
+  oracleAggregator,
   YieldManager,
   Staker,
   TokenFactory,
-  LongShort,
+  LongShortContract,
 } from "../generated/schema";
 import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
@@ -61,7 +61,7 @@ export function handleV1(event: V1): void {
     log.critical("the event was emitted more than once!", []);
   }
 
-  let longShort = new LongShort(LONG_SHORT_ID);
+  let longShort = new LongShortContract(LONG_SHORT_ID);
   longShort.address = event.address;
   longShort.save();
 
@@ -73,7 +73,7 @@ export function handleV1(event: V1): void {
   staker.address = event.params.staker;
   staker.save();
 
-  let oracleAgregator = new OracleAgregator(ORACLE_AGREGATOR_ID);
+  let oracleAgregator = new oracleAggregator(ORACLE_AGREGATOR_ID);
   oracleAgregator.address = event.params.oracleAgregator;
   oracleAgregator.save();
 
@@ -84,7 +84,7 @@ export function handleV1(event: V1): void {
   let globalState = new GlobalState(GLOBAL_STATE_ID);
   globalState.contractVersion = BigInt.fromI32(1);
   globalState.yieldManager = yieldManager.id;
-  globalState.oracleAgreagator = oracleAgregator.id;
+  globalState.oracleAggregator = oracleAgregator.id;
   globalState.staker = staker.id;
   globalState.tokenFactory = tokenFactory.id;
   globalState.adminAddress = event.params.admin;

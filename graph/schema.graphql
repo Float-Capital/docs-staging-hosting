@@ -71,7 +71,7 @@ type YieldManager @entity {
   address: Bytes!
 }
 
-type OracleAgregator @entity {
+type oracleAggregator @entity {
   id: ID!
   address: Bytes!
 }
@@ -86,7 +86,7 @@ type TokenFactory @entity {
   address: Bytes!
 }
 
-type LongShort @entity {
+type LongShortContract @entity {
   id: ID!
   address: Bytes!
 }
@@ -94,12 +94,12 @@ type LongShort @entity {
 type GlobalState @entity {
   id: ID!
   contractVersion: BigInt!
-  oracleAgreagator: OracleAgregator!
+  oracleAggregator: oracleAggregator!
   yieldManager: YieldManager!
   adminAddress: Bytes!
   staker: Staker!
   tokenFactory: TokenFactory!
-  longShort: LongShort!
+  longShort: LongShortContract!
   # latestSyntheticMarket: SyntheticMarket!
   # latestMarket:
 }
