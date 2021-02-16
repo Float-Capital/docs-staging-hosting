@@ -28,7 +28,7 @@ body {
 }
 
 .trade-form {
-  @apply flex flex-column max-w-xl m-auto p-6 border-white border-solid border-4;
+  @apply flex flex-col max-w-xl m-auto p-6 border-white border-solid border-4;
 }
 
 .trade-select {
