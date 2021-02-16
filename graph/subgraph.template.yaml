@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: LongShort
-    network: goerli
+    network: <network>
     source:
-      address: 0xc088f3F3C9fe36a72f919b4Fc6EB9c5785B95a28
+      address: <long-short-address>
       abi: LongShort
-      startBlock: 4190130
+      startBlock: <start-block>
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -27,7 +27,7 @@ dataSources:
         - name: LongShort
           file: ./abis/LongShort.json
       eventHandlers:
-        - event: V1(address,address,address,address,address)
+        - event: V1()
           handler: handleV1
         - event: FeesLevied(uint256,uint256,uint256,uint256,uint256)
           handler: handleFeesLevied
