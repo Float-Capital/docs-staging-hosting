@@ -964,7 +964,7 @@ function TradeForm$1(Props) {
                           console.log("I was clicked");
                           
                         }),
-                      text: match$9[1],
+                      children: "Something",
                       variant: "large"
                     })), tmp$2, tmp$3, React.createElement("div", undefined, React.createElement("p", undefined, "dev only component to display balances"), React.createElement("p", undefined, "dai - balance: " + formatOptBalance(optDaiBalance) + " - approved: " + formatOptBalance(optDaiAmountApproved)), React.createElement("p", undefined, "long - balance: " + formatOptBalance(match$5[0]) + " - approved: " + formatOptBalance(match$5[1])), React.createElement("p", undefined, "short - balance: " + formatOptBalance(match$4[0]) + " - approved: " + formatOptBalance(match$4[1]))));
 }

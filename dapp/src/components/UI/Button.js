@@ -4,7 +4,7 @@ import * as React from "react";
 
 function Button(Props) {
   var onClick = Props.onClick;
-  var text = Props.text;
+  var children = Props.children;
   var variant = Props.variant;
   return React.createElement("div", {
               className: "float-button-outer-container"
@@ -17,7 +17,7 @@ function Button(Props) {
                         variant === "small" ? "float-button-small" : ""
                       ),
                       onClick: onClick
-                    }, text)));
+                    }, children)));
 }
 
 var make = Button;

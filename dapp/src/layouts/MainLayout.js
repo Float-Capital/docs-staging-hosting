@@ -58,7 +58,7 @@ function MainLayout$Navigation(Props) {
                             router.push("/login?nextPath=" + router.asPath);
                             
                           }),
-                        text: "LOGIN",
+                        children: "LOGIN",
                         variant: "small"
                       })));
 }

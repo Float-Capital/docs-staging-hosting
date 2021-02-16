@@ -41,16 +41,9 @@ module Navigation = {
             onClick={_ => {
               router->Next.Router.push(`/login?nextPath=${router.asPath}`)
             }}
-            text="LOGIN"
-            variant="small"
-          />
-        // <button
-        //   className="px-3"
-        //   onClick={_ => {
-        //     router->Next.Router.push(`/login?nextPath=${router.asPath}`)
-        //   }}>
-        //   {"login"->React.string}
-        // </button>
+            variant="small">
+            "LOGIN"
+          </Button>
         }}
       </div>
     </nav>
