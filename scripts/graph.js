@@ -16,7 +16,7 @@ const graphPath = "./graph";
 const templateName = "subgraph.template.yaml";
 
 const addAddress = (template, input) => {
-    const address = (JSON.parse(input)).contracts.LongShort.address;
+    const address = `"${(JSON.parse(input)).contracts.LongShort.address}"`;
     return template.replace(addressKey, address);
 }
 
