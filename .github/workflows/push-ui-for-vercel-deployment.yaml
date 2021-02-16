@@ -16,13 +16,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          fetch-depth: 100
+          fetch-depth: 0
 
       - name: check modified files
         id: has-dapp-changes
         run: |
-          git fetch origin master
-
           echo "=============== list modified files ==============="
           git show --name-only
 

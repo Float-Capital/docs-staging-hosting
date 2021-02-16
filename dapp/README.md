@@ -1,4 +1,4 @@
-# ReScript / NextJS Starter
+# FLOAT DAPP
 
 This is a NextJS based template with following setup:
 
