@@ -15,7 +15,7 @@
     "switch-to-production": "git remote set-url origin https://github.com/avolabs-io/float-capital-docs.git",
     "switch-to-development": "git remote set-url origin https://github.com/avolabs-io/longshort.git",
     "predeploy": "yarn build",
-    "deploy": "gh-pages -d build",    
+    "deploy": "gh-pages -d build",
     "deploy-to-staging": "yarn make-cname-staging && yarn predeploy && yarn switch-to-staging && ENVIRONMENT=staging yarn deploy && yarn switch-to-development",
     "deploy-to-production": "yarn make-cname-production && yarn predeploy && yarn switch-to-production && ENVIRONMENT=production yarn deploy && yarn switch-to-development"
   },

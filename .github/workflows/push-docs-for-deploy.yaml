@@ -34,6 +34,7 @@ jobs:
           do
             echo $file
             if [[ $file == docs/* ]]; then
+              echo "Changes found in the docs - this will auto-deploy"
               echo "::set-output name=run_job::true"
               break
             fi
@@ -55,21 +56,25 @@ jobs:
         run: |
           cd docs && yarn
 
-      - name: build the docs
-        id: build_the_docs
-        run: |
-          cd docs && yarn predeploy
-
       - name: setup cname
         id: setup_cname
         run: |
           cd docs
           if [[ $(git branch --show-current) == master ]]; then
-            yarn make-cname-staging
-          else
             yarn make-cname-production
+          else
+            yarn make-cname-staging
           fi
 
+      - name: build the docs
+        id: build_the_docs
+        run: |
+          cd docs
+          if [[ $(git branch --show-current) == master ]]; then
+            ENVIRONMENT=production yarn predeploy
+          else
+            ENVIRONMENT=staging yarn predeploy
+          fi
       - name: Pushes to PROD
         uses: cpina/github-action-push-to-another-repository@master
         if: needs.has-docs-changes.outputs.docs-prod == 'true'
