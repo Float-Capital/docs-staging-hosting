@@ -60,12 +60,11 @@ jobs:
           cd docs
           if [[ $(git branch --show-current) == master ]]; then
             echo "USING PROD CNAME"
-
-            echo "##[set-output name=pushUpstream;]$(echo "float-capital-docs-staging")"
+            echo "##[set-output name=pushUpstream;]$(echo "float-capital-docs")"
             yarn make-cname-production
           else
             echo "USING DEV CNAME"
-            echo "##[set-output name=pushUpstream;]$(echo "float-capital-docs")"
+            echo "##[set-output name=pushUpstream;]$(echo "float-capital-docs-staging")"
             yarn make-cname-staging
           fi
 
