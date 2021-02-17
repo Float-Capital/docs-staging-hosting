@@ -23,7 +23,6 @@ jobs:
           if [[ $(git branch --show-current) == master ]]; then
             git log -m -1 --name-only --pretty="format:" $(git rev-parse HEAD) > files.txt
             echo "Will deploy docs to PROD"
-            echo "::set-output name=docs-prod::true"
           else
             git diff --name-only origin/master...HEAD > files.txt
             echo "Will deploy docs to STAGING"
@@ -61,9 +60,12 @@ jobs:
           cd docs
           if [[ $(git branch --show-current) == master ]]; then
             echo "USING PROD CNAME"
+
+            echo "##[set-output name=pushUpstream;]$(echo "float-capital-docs")"
             yarn make-cname-production
           else
             echo "USING DEV CNAME"
+            echo "##[set-output name=pushUpstream;]$(echo "float-capital-docs-staging")"
             yarn make-cname-staging
           fi
 
@@ -77,19 +79,7 @@ jobs:
             ENVIRONMENT=staging yarn predeploy
           fi
 
-      - name: Pushes to PROD
-        uses: cpina/github-action-push-to-another-repository@master
-        if: needs.has-docs-changes.outputs.docs-prod == 'true'
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-        with:
-          source-directory: "docs/build"
-          destination-github-username: "avolabs-io"
-          target-branch: gh-pages
-          destination-repository-name: float-capital-docs
-          user-email: avolabsmachine@gmail.com
-
-      - name: Pushes to STAGING
+      - name: Pushes to DEPLOYMENT repo
         uses: cpina/github-action-push-to-another-repository@master
         if: needs.has-docs-changes.outputs.docs-prod != 'true'
         env:
@@ -98,5 +88,5 @@ jobs:
           source-directory: "docs/build"
           destination-github-username: "avolabs-io"
           target-branch: gh-pages
-          destination-repository-name: float-capital-docs-staging
+          destination-repository-name: ${{ steps.setup_cname.outputs.pushUpstream }}
           user-email: avolabsmachine@gmail.com
