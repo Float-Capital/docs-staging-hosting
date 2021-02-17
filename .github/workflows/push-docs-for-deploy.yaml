@@ -60,8 +60,10 @@ jobs:
         run: |
           cd docs
           if [[ $(git branch --show-current) == master ]]; then
+            echo "USING PROD CNAME"
             yarn make-cname-production
           else
+            echo "USING DEV CNAME"
             yarn make-cname-staging
           fi
 
