@@ -24,7 +24,6 @@ jobs:
             git log -m -1 --name-only --pretty="format:" $(git rev-parse HEAD) > files.txt
             echo "Will deploy docs to PROD"
             echo "::set-output name=docs-prod::true"
-
           else
             git diff --name-only origin/master...HEAD > files.txt
             echo "Will deploy docs to STAGING"
@@ -75,6 +74,7 @@ jobs:
           else
             ENVIRONMENT=staging yarn predeploy
           fi
+
       - name: Pushes to PROD
         uses: cpina/github-action-push-to-another-repository@master
         if: needs.has-docs-changes.outputs.docs-prod == 'true'
