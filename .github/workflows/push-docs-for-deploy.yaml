@@ -60,6 +60,16 @@ jobs:
         run: |
           cd docs && yarn predeploy
 
+      - name: setup cname
+        id: setup_cname
+        run: |
+          cd docs
+          if [[ $(git branch --show-current) == master ]]; then
+            yarn make-cname-staging
+          else
+            yarn make-cname-production
+          fi
+
       - name: Pushes to PROD
         uses: cpina/github-action-push-to-another-repository@master
         if: needs.has-docs-changes.outputs.docs-prod == 'true'
@@ -68,6 +78,7 @@ jobs:
         with:
           source-directory: "docs/build"
           destination-github-username: "avolabs-io"
+          target-branch: gh-pages
           destination-repository-name: float-capital-docs
           user-email: avolabsmachine@gmail.com
 
@@ -79,5 +90,6 @@ jobs:
         with:
           source-directory: "docs/build"
           destination-github-username: "avolabs-io"
+          target-branch: gh-pages
           destination-repository-name: float-capital-docs-staging
           user-email: avolabsmachine@gmail.com
