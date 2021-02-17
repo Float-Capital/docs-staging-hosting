@@ -28,4 +28,4 @@ This command generates static content into the `build` directory and can be serv
 
 See package.json
 
-Deployment on Github actions to staging and prod
+Deployment on Github actions to staging and production
