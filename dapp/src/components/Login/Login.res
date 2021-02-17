@@ -1,8 +1,3 @@
-// @react.component
-// let make = () => {
-//   <<h1> {"Login"->React.string} </h1>
-// }
-
 type connectorObj = {
   name: string,
   connector: Web3Connectors.injectedType,
@@ -31,26 +26,18 @@ let make = () => {
 
   <div>
     <p>
-      {"Use one of the wallet providers below. "->React.string}
+      {"Connect with one of the wallets below. "->React.string}
       <small>
-        {"(Not sure where to go from here? "->React.string}
-        <a href="https://google.com" target="_blank" rel="noopener noreferrer">
-          <span>
-            {"TODO: put a guide in the blog or something that users can read on if they are confused"->React.string}
-          </span>
+        <a
+          className="hover:underline hover:opacity-75"
+          href="https://docs.float.capital/docs"
+          target="_blank"
+          rel="noopener noreferrer">
+          {"(Not sure where to go from here?) "->React.string}
         </a>
-        {")"->React.string}
       </small>
     </p>
-    <div
-      className={
-        open CssJs
-        style(.[
-          display(#grid),
-          gridTemplateColumns([#repeat(#autoFit, #minmax(px(176), fr(0.6)))]),
-          maxWidth(px(800)),
-        ])
-      }>
+    <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-6 gap-4 items-center my-5">
       {connectors
       ->Array.mapWithIndex((index, connector) =>
         <div
@@ -59,54 +46,13 @@ let make = () => {
             ReactEvent.Mouse.stopPropagation(e)
             activateConnector(connector.connector)
           }}
-          className={
-            open CssJs
-            style(.[zIndex(1), border(px(1), #solid, rgba(195, 195, 195, #num(0.14)))])
-          }>
-          <div
-            className={
-              open CssJs
-              style(.[
-                margin(px(8)),
-                display(#flex),
-                justifyContent(#center),
-                alignItems(#center),
-                flexDirection(column),
-                cursor(#pointer),
-                borderRadius(px(12)),
-                backgroundColor(white),
-                hover([backgroundColor(rgb(195, 195, 195))]),
-                transition(~duration=200, ~delay=0, ~timingFunction=easeInOut, "background-color"),
-              ])
-            }>
-            <div
-              className={
-                open Css
-                style(list{width(px(45)), height(px(45))})
-              }>
-              <img
-                src=connector.img
-                alt=connector.name
-                className={
-                  open Css
-                  style(list{width(#percent(100.)), height(#percent(100.))})
-                }
-              />
-            </div>
-            <div
-              className={
-                open Css
-                style(list{fontSize(px(24)), fontWeight(#num(700)), marginTop(em(0.5))})
-              }>
-              {connector.name->React.string}
-            </div>
-            <div
-              className={
-                open Css
-                style(list{fontSize(px(15)), marginTop(em(0.35)), color(rgb(169, 169, 188))})
-              }>
-              {connector.connectionPhrase->React.string}
-            </div>
+          className="p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 hover:bg-opacity-100 rounded">
+          <div className="w-10 h-10">
+            <img src=connector.img alt=connector.name className="w-full h-full" />
+          </div>
+          <div className="text-xl font-bold my-1"> {connector.name->React.string} </div>
+          <div className="text-base my-1 text-gray-400	">
+            {connector.connectionPhrase->React.string}
           </div>
         </div>
       )
