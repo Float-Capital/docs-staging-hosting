@@ -125,7 +125,6 @@ type GlobalState @entity {
   latestMarketIndex: BigInt!
   totalValueLockedInAllMarkets: BigInt! #note this can be dodgey if we accept different stable coins
   oracleAggregator: oracleAggregator!
-  # yieldManager: YieldManager!
   adminAddress: Bytes!
   staker: Staker!
   tokenFactory: TokenFactory!
