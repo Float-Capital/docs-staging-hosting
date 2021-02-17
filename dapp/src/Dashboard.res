@@ -6,6 +6,38 @@ let make = () => {
     alternateComponent={<h1 onClick={_ => router->Next.Router.push("/login?nextPath=/dashboard")}>
       {"Login to view your dashboard"->React.string}
     </h1>}>
+    <Toggle onClick={() => Js.log("Switch to diff currency")} preLabel="BUSD" postLabel="BNB" />
+    <div className="grid grid-cols-2 gap-4 items-center my-5">
+      <div className="col-span-2">
+        <div
+          className="p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 rounded">
+          <h2> {"Total Value Locked up "->React.string} </h2>
+          <h1> {"$ 123,456,789.00"->React.string} </h1>
+        </div>
+      </div>
+      <div>
+        <div
+          className="p-5 flex flex-col items-center justify-center bg-white bg-opacity-75  rounded">
+          <h2> {"Markets"->React.string} </h2>
+        </div>
+      </div>
+      <div>
+        <div
+          className="p-5 flex flex-col items-center justify-center bg-white bg-opacity-75  rounded">
+          <h2> {"Stake"->React.string} </h2>
+        </div>
+      </div>
+    </div>
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
     <h1> {"Dashboard"->React.string} </h1>
     <DaiBalance />
     {switch Queries.LatestSystemState.use() {

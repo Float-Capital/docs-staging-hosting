@@ -3,6 +3,7 @@
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Ethers from "./ethereum/Ethers.js";
+import * as Toggle from "./components/UI/Toggle.js";
 import * as Queries from "./libraries/Queries.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as DaiBalance from "./components/ExampleViewFunctions/DaiBalance.js";
@@ -74,7 +75,24 @@ function Dashboard(Props) {
                         
                       })
                   }, "Login to view your dashboard")
-            }, React.createElement("h1", undefined, "Dashboard"), React.createElement(DaiBalance.make, {}), tmp, match$4.loading ? "Loading..." : (
+            }, React.createElement(Toggle.make, {
+                  onClick: (function (param) {
+                      console.log("Switch to diff currency");
+                      
+                    }),
+                  preLabel: "BUSD",
+                  postLabel: "BNB"
+                }), React.createElement("div", {
+                  className: "grid grid-cols-2 gap-4 items-center my-5"
+                }, React.createElement("div", {
+                      className: "col-span-2"
+                    }, React.createElement("div", {
+                          className: "p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 rounded"
+                        }, React.createElement("h2", undefined, "Total Value Locked up "), React.createElement("h1", undefined, "$ 123,456,789.00"))), React.createElement("div", undefined, React.createElement("div", {
+                          className: "p-5 flex flex-col items-center justify-center bg-white bg-opacity-75  rounded"
+                        }, React.createElement("h2", undefined, "Markets"))), React.createElement("div", undefined, React.createElement("div", {
+                          className: "p-5 flex flex-col items-center justify-center bg-white bg-opacity-75  rounded"
+                        }, React.createElement("h2", undefined, "Stake")))), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("h1", undefined, "Dashboard"), React.createElement(DaiBalance.make, {}), tmp, match$4.loading ? "Loading..." : (
                 match$4.error !== undefined ? "Error loading data" : (
                     match$5 !== undefined ? React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Markets"), Belt_Array.map(match$5.syntheticMarkets, (function (param) {
                                   return React.createElement("div", {
