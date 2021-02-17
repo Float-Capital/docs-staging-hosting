@@ -1,0 +1,95 @@
+name: Deploy docs
+
+on: push
+
+jobs:
+  # Source: https://github.community/t/run-job-only-if-folder-changed/118292/2
+  has-docs-changes:
+    name: Check for changes to docs files
+    outputs:
+      run_job: ${{ steps.has-docs-changes.outputs.run_job }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 100 # should be deep enough for our usecase
+      - name: check modified files
+        id: has-docs-changes
+        run: |
+          git fetch origin master
+
+          echo "========== check paths of modified files =========="
+          if [[ $(git branch --show-current) == master ]]; then
+            git log -m -1 --name-only --pretty="format:" $(git rev-parse HEAD) > files.txt
+            echo "Will deploy docs to PROD"
+            echo "::set-output name=docs-prod::true"
+
+          else
+            git diff --name-only origin/master...HEAD > files.txt
+            echo "Will deploy docs to STAGING"
+          fi
+
+          while IFS= read -r file
+          do
+            echo $file
+            if [[ $file == docs/* ]]; then
+              echo "::set-output name=run_job::true"
+              break
+            fi
+          done < files.txt
+
+  run-deploy-staging:
+    name: docs staging deployment
+    runs-on: ubuntu-latest
+    needs: has-docs-changes
+    if: needs.has-docs-changes.outputs.run_job == 'true'
+
+    steps:
+      # Checks out a copy of your repository on the ubuntu-latest machine
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: install node packages
+        id: install_node_packages
+        run: |
+          cd docs && yarn
+
+      - name: build the docs
+        id: build_the_docs
+        run: |
+          cd docs && yarn predeploy
+
+      - name: setup cname
+        id: setup_cname
+        run: |
+          cd docs
+          if [[ $(git branch --show-current) == master ]]; then
+            yarn make-cname-staging
+          else
+            yarn make-cname-production
+          fi
+
+      - name: Pushes to PROD
+        uses: cpina/github-action-push-to-another-repository@master
+        if: needs.has-docs-changes.outputs.docs-prod == 'true'
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-directory: "docs/build"
+          destination-github-username: "avolabs-io"
+          target-branch: gh-pages
+          destination-repository-name: float-capital-docs
+          user-email: avolabsmachine@gmail.com
+
+      - name: Pushes to STAGING
+        uses: cpina/github-action-push-to-another-repository@master
+        if: needs.has-docs-changes.outputs.docs-prod != 'true'
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-directory: "docs/build"
+          destination-github-username: "avolabs-io"
+          target-branch: gh-pages
+          destination-repository-name: float-capital-docs-staging
+          user-email: avolabsmachine@gmail.com

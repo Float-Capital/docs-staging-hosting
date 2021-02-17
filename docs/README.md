@@ -26,4 +26,6 @@ This command generates static content into the `build` directory and can be serv
 
 ## Deployment
 
-See package.json
+Deployment on Github actions to staging and production
+
+See package.json for commands
