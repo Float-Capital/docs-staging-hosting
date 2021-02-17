@@ -84,6 +84,7 @@ export function handleV1(event: V1): void {
   let globalState = new GlobalState(GLOBAL_STATE_ID);
   globalState.contractVersion = BigInt.fromI32(1);
   globalState.latestMarketIndex = ZERO;
+  globalState.totalValueLockedInAllMarkets = ZERO;
   globalState.yieldManager = yieldManager.id;
   globalState.oracleAggregator = oracleAgregator.id;
   globalState.staker = staker.id;
@@ -122,7 +123,8 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
 
   let marketIndex = event.params.marketIndex;
   let contractCallCounter = event.params.contractCallCounter;
-  let totalValueLocked = event.params.totalValueLockedInMarket;
+  let totalValueLocked = event.params.totalValueLocked;
+  let totalValueLockedInMarket = event.params.totalValueLockedInMarket;
   let longValue = event.params.longValue;
   let shortValue = event.params.shortValue;
 
@@ -131,10 +133,15 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
     contractCallCounter,
     event
   );
-  state.totalValueLocked = totalValueLocked;
+  state.totalValueLocked = totalValueLockedInMarket;
   state.totalLockedLong = longValue;
   state.totalLockedShort = shortValue;
+
+  let globalState = GlobalState.load(GLOBAL_STATE_ID);
+  globalState.totalValueLockedInAllMarkets = totalValueLocked;
+
   state.save();
+  globalState.save();
 }
 
 export function handleSyntheticTokenCreated(

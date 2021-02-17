@@ -45,6 +45,6 @@ dataSources:
           handler: handleShortRedeem
         - event: TokenPriceRefreshed(uint256,uint256,uint256,uint256)
           handler: handleTokenPriceRefreshed
-        - event: ValueLockedInSystem(uint256,uint256,uint256,uint256,uint256)
+        - event: ValueLockedInSystem(uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleValueLockedInSystem
       file: ./src/mapping.ts
