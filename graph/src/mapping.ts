@@ -13,6 +13,15 @@ import {
 } from "../generated/LongShort/LongShort";
 
 import {
+  DeployV0,
+  StateAdded,
+  StakeAdded,
+  StakeWithdrawn,
+  FloatMinted,
+  FloatAccumulated,
+} from "../generated/Staker/Staker";
+
+import {
   StateChange,
   EventParam,
   EventParams,
@@ -40,22 +49,6 @@ import {
   LONG_SHORT_ID,
 } from "./CONSTANTS";
 
-// export function handleEvent(event: EVENT): void {
-//   let txHash = event.transaction.hash;
-//   let blockNumber = event.block.number;
-//   let timestamp = event.block.timestamp;
-
-//   saveEventToStateChange(
-//     txHash,
-//     timestamp,
-//     blockNumber,
-//     "EVENT",
-//     ["a", "b"],
-//     ["eventParam1", "eventParam2"],
-//     ["eventParamType", "eventParamType"]
-//   );
-// }
-
 export function handleV1(event: V1): void {
   // This function will only ever get called once
   if (GlobalState.load(GLOBAL_STATE_ID) != null) {
@@ -78,15 +71,10 @@ export function handleV1(event: V1): void {
   oracleAgregator.address = event.params.oracleAgregator;
   oracleAgregator.save();
 
-  let yieldManager = new YieldManager(YIELD_MANAGER_ID);
-  yieldManager.address = event.params.yieldManager;
-  yieldManager.save();
-
   let globalState = new GlobalState(GLOBAL_STATE_ID);
   globalState.contractVersion = BigInt.fromI32(1);
   globalState.latestMarketIndex = ZERO;
   globalState.totalValueLockedInAllMarkets = ZERO;
-  globalState.yieldManager = yieldManager.id;
   globalState.oracleAggregator = oracleAgregator.id;
   globalState.staker = staker.id;
   globalState.tokenFactory = tokenFactory.id;
@@ -417,6 +405,37 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
     ["longTokenPrice", "shortTokenPrice"],
     ["uint256", "uint256"]
   );
+}
+
+export function handleDeployV0(event: DeployV0): void {
+  let txHash = event.transaction.hash;
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
+}
+export function handleStateAdded(event: StateAdded): void {
+  let txHash = event.transaction.hash;
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
+}
+export function handleStakeAdded(event: StakeAdded): void {
+  let txHash = event.transaction.hash;
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
+}
+export function handleStakeWithdrawn(event: StakeWithdrawn): void {
+  let txHash = event.transaction.hash;
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
+}
+export function handleFloatMinted(event: FloatMinted): void {
+  let txHash = event.transaction.hash;
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
+}
+export function handleFloatAccumulated(event: FloatAccumulated): void {
+  let txHash = event.transaction.hash;
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
 }
 
 // currently all params are BigInts -> in future may have to modify to support e.g. Addresses

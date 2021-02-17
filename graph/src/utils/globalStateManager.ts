@@ -3,6 +3,7 @@ import {
   EventParam,
   SystemState,
   GlobalState,
+  User,
 } from "../../generated/schema";
 import { BigInt, Address, Bytes, log, ethereum } from "@graphprotocol/graph-ts";
 import { ZERO } from "../CONSTANTS";
@@ -30,4 +31,14 @@ export function getOrCreateLatestSystemState(
     latestSystemState.setBy = event.transaction.from;
   }
   return latestSystemState;
+}
+
+export function getOrCreateUser(address: Bytes): User | null {
+  let user = User.load(address.toHex());
+  if (user == null) {
+    user = new User(address.toHex());
+    user.address = address;
+  }
+
+  return user;
 }

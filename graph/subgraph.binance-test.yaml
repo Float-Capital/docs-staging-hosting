@@ -27,7 +27,7 @@ dataSources:
         - name: LongShort
           file: ./abis/LongShort.json
       eventHandlers:
-        - event: V1(address,address,address,address,address)
+        - event: V1(address,address,address,address)
           handler: handleV1
         - event: FeesLevied(uint256,uint256,uint256,uint256,uint256)
           handler: handleFeesLevied
@@ -47,4 +47,39 @@ dataSources:
           handler: handleTokenPriceRefreshed
         - event: ValueLockedInSystem(uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleValueLockedInSystem
+      file: ./src/mapping.ts
+
+  - kind: ethereum/contract
+    name: Staker
+    network: binancetest
+    source:
+      address: "0x325D57022CC82f732802DE4A4628bD1280833aB1"
+      abi: Staker
+      startBlock: 5820840
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - DeployV0
+        - StateAdded
+        - StakeWithdrawn
+        - FloatMinted
+        - FloatAccumulated
+      abis:
+        - name: Staker
+          file: ./abis/Staker.json
+      eventHandlers:
+        - event: DeployV0()
+          handler: handleDeployV0
+        - event: StateAdded(address,uint256,uint256,uint256)
+          handler: handleStateAdded
+        - event: StakeAdded(address,address,uint256)
+          handler: handleStateAdded
+        - event: StakeWithdrawn(address,address,uint256)
+          handler: handleStakeWithdrawn
+        - event: FloatMinted(address,uint256)
+          handler: handleFloatMinted
+        - event: FloatAccumulated(address,address,uint256)
+          handler: handleFloatAccumulated
       file: ./src/mapping.ts
