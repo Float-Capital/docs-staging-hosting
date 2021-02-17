@@ -2,8 +2,10 @@
 
 import * as React from "react";
 import Link from "next/link";
+import * as RootProvider from "../../libraries/RootProvider.js";
 
 function StartTrading(Props) {
+  var optCurrentUser = RootProvider.useCurrentUser(undefined);
   return React.createElement("div", undefined, React.createElement("div", {
                   className: "screen-centered-container"
                 }, React.createElement("div", {
@@ -13,7 +15,7 @@ function StartTrading(Props) {
                         }, React.createElement("div", {
                               className: "floating"
                             }, React.createElement(Link, {
-                                  href: "/dapp",
+                                  href: optCurrentUser !== undefined ? "/dapp" : "/login?nextPath=/dapp",
                                   children: React.createElement("span", {
                                         className: "floating-image-wrapper"
                                       }, React.createElement("img", {

@@ -1,13 +1,19 @@
 module Link = Next.Link
 
 @react.component
-let make = () =>
+let make = () => {
+  let optCurrentUser = RootProvider.useCurrentUser()
+
   <div>
     <div className="screen-centered-container">
       <div className="start-trading">
         <div className="floating-container">
           <div className="floating">
-            <Link href="/dapp">
+            <Link
+              href={switch optCurrentUser {
+              | Some(_) => "/dapp"
+              | None => "/login?nextPath=/dapp"
+              }}>
               <span className="floating-image-wrapper">
                 <img src="/img/start-trading.png" className="start-trading" />
               </span>
@@ -17,3 +23,4 @@ let make = () =>
       </div>
     </div>
   </div>
+}
