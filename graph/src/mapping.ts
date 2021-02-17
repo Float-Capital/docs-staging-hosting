@@ -24,6 +24,7 @@ import {
   Staker,
   TokenFactory,
   LongShortContract,
+  SyntheticToken,
 } from "../generated/schema";
 import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
@@ -167,6 +168,19 @@ export function handleSyntheticTokenCreated(
 
   let marketIndexString = marketIndex.toString();
 
+  // create new synthetic token object.
+  let longToken = new SyntheticToken(
+    marketIndexString + "-" + longTokenAddress.toHexString()
+  );
+  longToken.tokenAddress = longTokenAddress;
+  longToken.totalStaked = ZERO;
+
+  let shortToken = new SyntheticToken(
+    marketIndexString + "-" + shortTokenAddress.toHexString()
+  );
+  shortToken.tokenAddress = shortTokenAddress;
+  shortToken.totalStaked = ZERO;
+
   let state = getOrCreateLatestSystemState(marketIndex, ZERO, event);
 
   let fees = new FeeStructure(
@@ -184,8 +198,8 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.name = syntheticName;
   syntheticMarket.symbol = syntheticSymbol;
   syntheticMarket.latestSystemState = state.id;
-  syntheticMarket.syntheticLongAddress = longTokenAddress;
-  syntheticMarket.syntheticShortAddress = shortTokenAddress;
+  syntheticMarket.syntheticLong = longToken.id;
+  syntheticMarket.syntheticShort = shortToken.id;
   syntheticMarket.marketIndex = marketIndex;
   syntheticMarket.oracleAddress = oracleAddress;
   syntheticMarket.feeStructure = fees.id;
@@ -197,6 +211,11 @@ export function handleSyntheticTokenCreated(
     BigInt.fromI32(1)
   );
 
+  longToken.syntheticMarket = syntheticMarket.id;
+  shortToken.syntheticMarket = syntheticMarket.id;
+
+  longToken.save();
+  shortToken.save();
   state.save();
   syntheticMarket.save();
   fees.save();
