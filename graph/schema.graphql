@@ -72,21 +72,26 @@ type SyntheticMarket @entity {
 
 type User @entity {
   id: ID! # ID -> Public address
-  # timestampJoined: BigInt!
-  # txHash: Bytes!
-  # blockNumberJoined: BigInt!
-  stakes: [Stake!]!
+  address: Bytes!
+  # totalMintedFloat: BigInt!
+  # totalAccumulatedFloat: BigInt!
+}
+
+type CurrentStake @entity {
+  id: ID! # user address - fund address
+  user: User!
+  tokenType: SyntheticToken!
+  currentStake: Stake!
 }
 
 type Stake @entity {
   id: ID! #"user address-fund address-txHashString"
-  fund: SyntheticToken!
-  user: User!
   timestamp: BigInt!
   blockNumber: BigInt!
   creationTxHash: Bytes!
+  fund: SyntheticToken!
+  user: User!
   amount: BigInt!
-  # accumulatedFloat: BigInt!
 }
 
 type YieldManager @entity {
@@ -120,7 +125,7 @@ type GlobalState @entity {
   latestMarketIndex: BigInt!
   totalValueLockedInAllMarkets: BigInt! #note this can be dodgey if we accept different stable coins
   oracleAggregator: oracleAggregator!
-  yieldManager: YieldManager!
+  # yieldManager: YieldManager!
   adminAddress: Bytes!
   staker: Staker!
   tokenFactory: TokenFactory!
