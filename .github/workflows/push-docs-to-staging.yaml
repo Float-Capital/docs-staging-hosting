@@ -1,10 +1,11 @@
 name: Deploy docs to staging
 
 on:
-  push:
-    branches:
-      - "*"
-      - "!master"
+  push
+  # :
+  #   branches:
+  #     - "*"
+  #     - "!master"
 
 jobs:
   # Source: https://github.community/t/run-job-only-if-folder-changed/118292/2
