@@ -56,24 +56,28 @@ jobs:
         run: |
           cd docs && yarn
 
-      - name: build the docs
-        id: build_the_docs
-        run: |
-          cd docs && yarn predeploy
-
       - name: setup cname
         id: setup_cname
         run: |
           cd docs
           if [[ $(git branch --show-current) == master ]]; then
-            yarn make-cname-staging
-          else
             yarn make-cname-production
+          else
+            yarn make-cname-staging
           fi
 
+      - name: build the docs
+        id: build_the_docs
+        run: |
+          cd docs
+          if [[ $(git branch --show-current) == master ]]; then
+            ENVIRONMENT=production yarn predeploy
+          else
+            ENVIRONMENT=staging yarn predeploy
+          fi
       - name: Pushes to PROD
         uses: cpina/github-action-push-to-another-repository@master
-        # if: needs.has-docs-changes.outputs.docs-prod == 'true'
+        if: needs.has-docs-changes.outputs.docs-prod == 'true'
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
@@ -85,7 +89,7 @@ jobs:
 
       - name: Pushes to STAGING
         uses: cpina/github-action-push-to-another-repository@master
-        # if: needs.has-docs-changes.outputs.docs-prod != 'true'
+        if: needs.has-docs-changes.outputs.docs-prod != 'true'
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
