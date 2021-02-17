@@ -11,11 +11,15 @@ services:
     depends_on:
       - ipfs
       - postgres
-    postgres_pass: let-me-in
-    postgres_db: graph-node
-    ipfs: "ipfs:5001"
-    ethereum: "binancetest:https://data-seed-prebsc-1-s1.binance.org:8545/"
-    RUST_LOG: info
+    environment:
+      postgres_host: postgres
+      postgres_port: 5432
+      postgres_user: graph-node
+      postgres_pass: let-me-in
+      postgres_db: graph-node
+      ipfs: "ipfs:5001"
+      ethereum: "binancetest:https://data-seed-prebsc-1-s1.binance.org:8545/"
+      RUST_LOG: info
 
   ipfs:
     image: ipfs/go-ipfs:v0.4.23
