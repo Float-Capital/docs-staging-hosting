@@ -34,6 +34,7 @@ jobs:
           do
             echo $file
             if [[ $file == docs/* ]]; then
+              echo "Changes found in the docs - this will auto-deploy"
               echo "::set-output name=run_job::true"
               break
             fi
@@ -72,7 +73,7 @@ jobs:
 
       - name: Pushes to PROD
         uses: cpina/github-action-push-to-another-repository@master
-        if: needs.has-docs-changes.outputs.docs-prod == 'true'
+        # if: needs.has-docs-changes.outputs.docs-prod == 'true'
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
@@ -84,7 +85,7 @@ jobs:
 
       - name: Pushes to STAGING
         uses: cpina/github-action-push-to-another-repository@master
-        if: needs.has-docs-changes.outputs.docs-prod != 'true'
+        # if: needs.has-docs-changes.outputs.docs-prod != 'true'
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
