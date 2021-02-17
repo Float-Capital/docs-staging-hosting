@@ -17,14 +17,13 @@ import {
   EventParam,
   EventParams,
   SyntheticMarket,
-  SyntheticToken,
   FeeStructure,
   GlobalState,
-  OracleAgregator,
+  oracleAggregator,
   YieldManager,
   Staker,
   TokenFactory,
-  LongShort,
+  LongShortContract,
 } from "../generated/schema";
 import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
@@ -62,7 +61,7 @@ export function handleV1(event: V1): void {
     log.critical("the event was emitted more than once!", []);
   }
 
-  let longShort = new LongShort(LONG_SHORT_ID);
+  let longShort = new LongShortContract(LONG_SHORT_ID);
   longShort.address = event.address;
   longShort.save();
 
@@ -74,7 +73,7 @@ export function handleV1(event: V1): void {
   staker.address = event.params.staker;
   staker.save();
 
-  let oracleAgregator = new OracleAgregator(ORACLE_AGREGATOR_ID);
+  let oracleAgregator = new oracleAggregator(ORACLE_AGREGATOR_ID);
   oracleAgregator.address = event.params.oracleAgregator;
   oracleAgregator.save();
 
@@ -84,8 +83,10 @@ export function handleV1(event: V1): void {
 
   let globalState = new GlobalState(GLOBAL_STATE_ID);
   globalState.contractVersion = BigInt.fromI32(1);
+  globalState.latestMarketIndex = ZERO;
+  globalState.totalValueLockedInAllMarkets = ZERO;
   globalState.yieldManager = yieldManager.id;
-  globalState.oracleAgreagator = oracleAgregator.id;
+  globalState.oracleAggregator = oracleAgregator.id;
   globalState.staker = staker.id;
   globalState.tokenFactory = tokenFactory.id;
   globalState.adminAddress = event.params.admin;
@@ -122,7 +123,8 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
 
   let marketIndex = event.params.marketIndex;
   let contractCallCounter = event.params.contractCallCounter;
-  let totalValueLocked = event.params.totalValueLockedInMarket;
+  let totalValueLocked = event.params.totalValueLocked;
+  let totalValueLockedInMarket = event.params.totalValueLockedInMarket;
   let longValue = event.params.longValue;
   let shortValue = event.params.shortValue;
 
@@ -131,10 +133,15 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
     contractCallCounter,
     event
   );
-  state.totalValueLocked = totalValueLocked;
+  state.totalValueLocked = totalValueLockedInMarket;
   state.totalLockedLong = longValue;
   state.totalLockedShort = shortValue;
+
+  let globalState = GlobalState.load(GLOBAL_STATE_ID);
+  globalState.totalValueLockedInAllMarkets = totalValueLocked;
+
   state.save();
+  globalState.save();
 }
 
 export function handleSyntheticTokenCreated(
@@ -170,23 +177,6 @@ export function handleSyntheticTokenCreated(
   fees.baseExitFee = baseExitFee;
   fees.badLiquidityExitFee = badLiquidityExitFee;
 
-  // create new synthetic token object.
-  let longToken = new SyntheticToken(
-    marketIndexString + "-" + longTokenAddress.toHexString()
-  );
-  longToken.tokenAddress = longTokenAddress;
-  longToken.tokenPrice = TEN_TO_THE_18;
-  longToken.tokenSupply = ZERO;
-  longToken.totalValueLocked = ZERO;
-
-  let shortToken = new SyntheticToken(
-    marketIndexString + "-" + shortTokenAddress.toHexString()
-  );
-  shortToken.tokenAddress = shortTokenAddress;
-  shortToken.tokenPrice = TEN_TO_THE_18;
-  shortToken.tokenSupply = ZERO;
-  shortToken.totalValueLocked = ZERO;
-
   let syntheticMarket = new SyntheticMarket(marketIndexString);
   syntheticMarket.timestampCreated = timestamp;
   syntheticMarket.txHash = txHash;
@@ -194,20 +184,23 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.name = syntheticName;
   syntheticMarket.symbol = syntheticSymbol;
   syntheticMarket.latestSystemState = state.id;
-  syntheticMarket.syntheticLong = longToken.id;
-  syntheticMarket.syntheticShort = shortToken.id;
+  syntheticMarket.syntheticLongAddress = longTokenAddress;
+  syntheticMarket.syntheticShortAddress = shortTokenAddress;
   syntheticMarket.marketIndex = marketIndex;
-  syntheticMarket.totalValueLockedInMarket = ZERO;
   syntheticMarket.oracleAddress = oracleAddress;
   syntheticMarket.feeStructure = fees.id;
 
   state.syntheticPrice = initialAssetPrice; // change me
 
-  longToken.save();
-  shortToken.save();
+  let globalState = GlobalState.load(GLOBAL_STATE_ID);
+  globalState.latestMarketIndex = globalState.latestMarketIndex.plus(
+    BigInt.fromI32(1)
+  );
+
   state.save();
   syntheticMarket.save();
   fees.save();
+  globalState.save();
 
   // Add below back later
   // saveEventToStateChange(
@@ -289,10 +282,14 @@ export function handlePriceUpdate(event: PriceUpdate): void {
   let timestamp = event.block.timestamp;
 
   let marketIndex = event.params.marketIndex;
+  let marketIndexString = marketIndex.toString();
+
   let contractCallCounter = event.params.contractCallCounter;
   let newPrice = event.params.newPrice;
   let oldPrice = event.params.oldPrice;
   let user = event.params.user;
+
+  let syntheticMarket = SyntheticMarket.load(marketIndexString);
 
   let state = getOrCreateLatestSystemState(
     marketIndex,
@@ -300,7 +297,9 @@ export function handlePriceUpdate(event: PriceUpdate): void {
     event
   );
   state.syntheticPrice = newPrice;
+  syntheticMarket.latestSystemState = state.id;
   state.save();
+  syntheticMarket.save();
 
   saveEventToStateChange(
     txHash,
@@ -371,10 +370,13 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
   let timestamp = event.block.timestamp;
 
   let marketIndex = event.params.marketIndex;
+  let marketIndexString = marketIndex.toString();
   let longTokenPrice = event.params.longTokenPrice;
   let shortTokenPrice = event.params.shortTokenPrice;
 
   let contractCallCounter = event.params.contractCallCounter;
+
+  let syntheticMarket = SyntheticMarket.load(marketIndexString);
 
   let state = getOrCreateLatestSystemState(
     marketIndex,
@@ -383,7 +385,9 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
   );
   state.longTokenPrice = longTokenPrice;
   state.shortTokenPrice = shortTokenPrice;
+  syntheticMarket.latestSystemState = state.id;
   state.save();
+  syntheticMarket.save();
 
   saveEventToStateChange(
     txHash,

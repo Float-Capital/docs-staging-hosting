@@ -25,26 +25,12 @@ type Event @entity {
   address: Bytes!
 }
 
-# type FeesLevied @entity {
-#   id: ID!
-#   feeAmount: BigInt!
-#   longFee: BigInt!
-#   shortFee: BigInt!
-# }
-
-# type LongMint @entity {
-#   id: ID!
-#   user: Bytes!
-# }
-
 type SystemState @entity {
   id: ID! # marketIndex "-" callCounter
   timestamp: BigInt!
   txHash: Bytes!
   blockNumber: BigInt!
   marketIndex: BigInt!
-  # syntheticMarket: SyntheticMarket!
-  # previousSyntheticPrice: Price!
   syntheticPrice: BigInt! # TODO: this should be a reference to another entity that holds the price
   longTokenPrice: BigInt!
   shortTokenPrice: BigInt!
@@ -52,14 +38,6 @@ type SystemState @entity {
   totalLockedShort: BigInt!
   totalValueLocked: BigInt!
   setBy: Bytes! #Turn into a User entity
-}
-
-type SyntheticToken @entity {
-  id: ID! # token address
-  tokenAddress: Bytes!
-  tokenPrice: BigInt!
-  tokenSupply: BigInt!
-  totalValueLocked: BigInt!
 }
 
 type FeeStructure @entity {
@@ -78,10 +56,9 @@ type SyntheticMarket @entity {
   name: String!
   symbol: String!
   marketIndex: BigInt!
-  totalValueLockedInMarket: BigInt!
   oracleAddress: Bytes!
-  syntheticLong: SyntheticToken!
-  syntheticShort: SyntheticToken!
+  syntheticLongAddress: Bytes!
+  syntheticShortAddress: Bytes!
   latestSystemState: SystemState!
   feeStructure: FeeStructure!
 }
@@ -91,7 +68,7 @@ type YieldManager @entity {
   address: Bytes!
 }
 
-type OracleAgregator @entity {
+type oracleAggregator @entity {
   id: ID!
   address: Bytes!
 }
@@ -106,7 +83,7 @@ type TokenFactory @entity {
   address: Bytes!
 }
 
-type LongShort @entity {
+type LongShortContract @entity {
   id: ID!
   address: Bytes!
 }
@@ -114,12 +91,12 @@ type LongShort @entity {
 type GlobalState @entity {
   id: ID!
   contractVersion: BigInt!
-  oracleAgreagator: OracleAgregator!
+  latestMarketIndex: BigInt!
+  totalValueLockedInAllMarkets: BigInt! #note this can be dodgey if we accept different stable coins
+  oracleAggregator: oracleAggregator!
   yieldManager: YieldManager!
   adminAddress: Bytes!
   staker: Staker!
   tokenFactory: TokenFactory!
-  longShort: LongShort!
-  # latestSyntheticMarket: SyntheticMarket!
-  # latestMarket:
+  longShort: LongShortContract!
 }
