@@ -6,7 +6,7 @@ dataSources:
     name: LongShort
     network: goerli
     source:
-      address: "0x325D57022CC82f732802DE4A4628bD1280833aB1"
+      address: "0xef6b472d0F146c0B06AA5695741EcFD6Cc8C2fa3"
       abi: LongShort
       startBlock: 4190130
     mapping:
@@ -53,7 +53,7 @@ dataSources:
     name: Staker
     network: goerli
     source:
-      address: "0x325D57022CC82f732802DE4A4628bD1280833aB1"
+      address: "0xe9bA2Fd1be009507e9947e7ED1C9Eaac26dE5F8B"
       abi: Staker
       startBlock: 4190130
     mapping:
