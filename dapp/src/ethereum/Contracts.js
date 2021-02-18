@@ -18,6 +18,8 @@ var abi$1 = Ethers.makeAbi([
       "function mintShort(uint256 marketIndex,uint256 amount)",
       "function redeemLong(uint256 marketIndex,uint256 tokensToRedeem)",
       "function redeemShort(uint256 marketIndex,uint256 tokensToRedeem)",
+      "function mintLongAndStake(uint256 marketIndex, uint256 amount)",
+      "function mintShortAndStake(uint256 marketIndex, uint256 amount)",
       "function _updateSystemState()"
     ]);
 
@@ -31,23 +33,40 @@ var LongShort = {
 };
 
 var abi$2 = Ethers.makeAbi([
-      "function approve(address spender, uint256 amount)",
-      "function balanceOf(address owner) public view returns (uint256 balance)",
-      "function allowance(address owner, address spender) public view returns (uint256 remaining)"
+      "function stake(address tokenAddress, uint256 amount)",
+      "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)",
+      "function withdraw(address tokenAddress, uint256 amount)",
+      "function mintFloat()"
     ]);
 
 function make$2(address, providerOrSigner) {
   return Ethers.Contract.make(address, abi$2, providerOrSigner);
 }
 
-var Erc20 = {
+var Staker = {
   abi: abi$2,
   make: make$2
+};
+
+var abi$3 = Ethers.makeAbi([
+      "function approve(address spender, uint256 amount)",
+      "function balanceOf(address owner) public view returns (uint256 balance)",
+      "function allowance(address owner, address spender) public view returns (uint256 remaining)"
+    ]);
+
+function make$3(address, providerOrSigner) {
+  return Ethers.Contract.make(address, abi$3, providerOrSigner);
+}
+
+var Erc20 = {
+  abi: abi$3,
+  make: make$3
 };
 
 export {
   TestErc20 ,
   LongShort ,
+  Staker ,
   Erc20 ,
   
 }

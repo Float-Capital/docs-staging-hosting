@@ -103,6 +103,7 @@ module AdminActions = {
   @react.component
   let make = () => {
     let optEthersWallet = React.useContext(AdminContext.context)
+    let optNetwork = RootProvider.useChainId()
 
     switch optEthersWallet {
     | Some(ethersWallet) =>
@@ -110,8 +111,12 @@ module AdminActions = {
         <h1> {"Test Functions"->React.string} </h1>
         <div className={"border-dashed border-4 border-light-red-500"}>
           <ApproveDai />
-          <MintDai ethersWallet />
-          // {}
+          {switch optNetwork {
+          // Don't display the DAI mint button on testnet
+          | Some(97) => React.null
+          | _ => <MintDai ethersWallet />
+          }}
+          <hr />
           <h1> {"Market specific Functions:"->React.string} </h1>
           {switch Queries.MarketDetails.use() {
           | {loading: true} => "Loading..."->React.string
@@ -134,6 +139,7 @@ module AdminActions = {
                       <h1> {`Long(${tokenAddressLong->Ethers.Utils.toString})`->React.string} </h1>
                       <MintLong marketIndex />
                       <RedeemSynth marketIndex isLong=true />
+                      <MintAndStake marketIndex isLong=true />
                     </div>
                     <div>
                       <h1>
@@ -141,6 +147,7 @@ module AdminActions = {
                       </h1>
                       <MintShort marketIndex />
                       <RedeemSynth marketIndex isLong=false />
+                      <MintAndStake marketIndex isLong=false />
                     </div>
                   </div>
                 </div>

@@ -28,6 +28,8 @@ module LongShort = {
       "function mintShort(uint256 marketIndex,uint256 amount)",
       "function redeemLong(uint256 marketIndex,uint256 tokensToRedeem)",
       "function redeemShort(uint256 marketIndex,uint256 tokensToRedeem)",
+      "function mintLongAndStake(uint256 marketIndex, uint256 amount)",
+      "function mintShortAndStake(uint256 marketIndex, uint256 amount)",
       "function _updateSystemState()",
     ]->Ethers.makeAbi
 
@@ -59,8 +61,54 @@ module LongShort = {
     ~tokensToRedeem: Ethers.BigNumber.t,
   ) => JsPromise.t<Ethers.txSubmitted> = "redeemShort"
   @send
+  external mintShortAndStake: (
+    ~contract: t,
+    ~marketIndex: Ethers.BigNumber.t,
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<Ethers.txSubmitted> = "mintShortAndStake"
+  @send
+  external mintLongAndStake: (
+    ~contract: t,
+    ~marketIndex: Ethers.BigNumber.t,
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<Ethers.txSubmitted> = "mintLongAndStake"
+  @send
   external _updateSystemState: (~contract: t) => JsPromise.t<Ethers.txSubmitted> =
     "_updateSystemState"
+}
+
+module Staker = {
+  type t = Ethers.Contract.t
+
+  let abi =
+    [
+      "function stake(address tokenAddress, uint256 amount)",
+      "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)",
+      "function withdraw(address tokenAddress, uint256 amount)",
+      "function mintFloat()",
+    ]->Ethers.makeAbi
+
+  let make = (~address, ~providerOrSigner): t =>
+    Ethers.Contract.make(address, abi, providerOrSigner)
+
+  @send
+  external stake: (
+    ~contract: t,
+    ~tokenAddress: Ethers.ethAddress,
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<Ethers.txSubmitted> = "stake"
+  @send
+  external stakeAndEarnImmediately: (
+    ~contract: t,
+    ~tokenAddress: Ethers.ethAddress,
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<Ethers.txSubmitted> = "stakeAndEarnImmediately"
+  external withdraw: (
+    ~contract: t,
+    ~tokenAddress: Ethers.ethAddress,
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<Ethers.txSubmitted> = "withdraw"
+  external mintFloat: (~contract: t, unit) => JsPromise.t<Ethers.txSubmitted> = "mintFloat"
 }
 
 module Erc20 = {

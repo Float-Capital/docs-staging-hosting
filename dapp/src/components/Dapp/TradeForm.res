@@ -62,6 +62,7 @@ let isGreaterThanBalance = (~amount, ~balance) => {
 
 @react.component
 let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets) => {
+  Js.log(("THe market", market))
   let signer = ContractActions.useSignerExn()
 
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)

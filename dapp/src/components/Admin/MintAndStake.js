@@ -11,6 +11,7 @@ import * as Formality from "re-formality/src/Formality.js";
 import * as TxTemplate from "../Ethereum/TxTemplate.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as ContractHooks from "./ContractHooks.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
 
@@ -413,7 +414,7 @@ function useForm(initialInput, onSubmit) {
         };
 }
 
-var LongRedeemForm = {
+var AdminMintForm = {
   validators: validators,
   initialFieldsStatuses: initialFieldsStatuses,
   initialCollectionsStatuses: undefined,
@@ -426,34 +427,49 @@ var initialInput = {
   amount: ""
 };
 
-function RedeemSynth(Props) {
-  var isLong = Props.isLong;
+function MintAndStake(Props) {
   var marketIndex = Props.marketIndex;
+  var isLong = Props.isLong;
   var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
-  var longShortAddres = Config.useLongShortAddress(undefined);
+  var longShortContractAddress = Config.useLongShortAddress(undefined);
+  var daiAddress = Config.useDaiAddress(undefined);
+  var match$1 = ContractHooks.useERC20Approved(daiAddress, longShortContractAddress);
+  var optAmountApproved = match$1.data;
   var form = useForm(initialInput, (function (param, _form) {
           var amount = param.amount;
           return Curry._2(contractExecutionHandler, (function (param) {
-                        return Contracts.LongShort.make(longShortAddres, param);
+                        return Contracts.LongShort.make(longShortContractAddress, param);
                       }), isLong ? (function (param) {
-                          return param.redeemLong(marketIndex, amount);
+                          return param.mintShortAndStake(marketIndex, amount);
                         }) : (function (param) {
-                          return param.redeemShort(marketIndex, amount);
+                          return param.mintLongAndStake(marketIndex, amount);
                         }));
         }));
-  var match$1 = form.amountResult;
+  var submitButton = function (param) {
+    return React.createElement("button", {
+                className: "text-lg disabled:opacity-50 bg-green-500 rounded-lg",
+                disabled: form.submitting
+              }, form.submitting ? "Submitting..." : "Mint & Stake");
+  };
+  if (optAmountApproved === undefined) {
+    return React.createElement("p", undefined, "Loading approval");
+  }
+  var match$2 = form.amountResult;
   var tmp;
-  tmp = match$1 !== undefined ? (
-      match$1.TAG === /* Ok */0 ? React.createElement("div", {
+  tmp = match$2 !== undefined ? (
+      match$2.TAG === /* Ok */0 ? React.createElement("div", {
               className: "text-green-600"
             }, "✓") : React.createElement("div", {
               className: "text-red-600"
-            }, match$1._0)
+            }, match$2._0)
     ) : null;
-  var match$2 = form.status;
+  var match$3 = form.amountResult;
+  var tmp$1;
+  tmp$1 = match$3 !== undefined && match$3.TAG === /* Ok */0 && !Caml_option.valFromOption(optAmountApproved).gte(match$3._0) ? React.createElement("p", undefined, "THIS IS MORE THAN YOU HAVE APPROVED") : submitButton(undefined);
+  var match$4 = form.status;
   return React.createElement(TxTemplate.make, {
               children: React.createElement(Form.make, {
                     className: "",
@@ -464,7 +480,7 @@ function RedeemSynth(Props) {
                           className: ""
                         }, React.createElement("h2", {
                               className: "text-xl"
-                            }, "Redeem " + (
+                            }, "Mint & Stake " + (
                               isLong ? "LONG" : "SHORT"
                             ) + " Tokens"), React.createElement("div", undefined, React.createElement("label", {
                                   htmlFor: "amount"
@@ -484,10 +500,7 @@ function RedeemSynth(Props) {
                                                           };
                                                   }), $$event.target.value);
                                     })
-                                }), tmp), React.createElement("div", undefined, React.createElement("button", {
-                                  className: "text-lg disabled:opacity-50 bg-green-500 rounded-lg",
-                                  disabled: form.submitting
-                                }, form.submitting ? "Submitting..." : "Submit"), typeof match$2 === "number" && match$2 !== 0 ? React.createElement("div", {
+                                }), tmp), React.createElement("div", undefined, tmp$1, typeof match$4 === "number" && match$4 !== 0 ? React.createElement("div", {
                                     className: Cn.fromList({
                                           hd: "form-status",
                                           tl: {
@@ -495,7 +508,7 @@ function RedeemSynth(Props) {
                                             tl: /* [] */0
                                           }
                                         })
-                                  }, "✓ Finished Redeeming") : null))
+                                  }, "✓ Finished Minting") : null))
                   }),
               txState: match[1],
               resetTxState: (function (param) {
@@ -507,10 +520,10 @@ function RedeemSynth(Props) {
             });
 }
 
-var make = RedeemSynth;
+var make = MintAndStake;
 
 export {
-  LongRedeemForm ,
+  AdminMintForm ,
   initialInput ,
   make ,
   

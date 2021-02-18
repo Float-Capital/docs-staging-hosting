@@ -83,7 +83,7 @@ let make = () => {
               disabled=form.submitting>
               {selectOpts
               ->Belt_Array.map(selectOptName => {
-                <option> {selectOptName->React.string} </option>
+                <option key=selectOptName> {selectOptName->React.string} </option>
               })
               ->React.array}
             </select>

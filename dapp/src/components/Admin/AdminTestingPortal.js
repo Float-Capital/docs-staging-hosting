@@ -14,6 +14,7 @@ import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as RedeemSynth from "./RedeemSynth.js";
+import * as MintAndStake from "./MintAndStake.js";
 import * as RootProvider from "../../libraries/RootProvider.js";
 
 var context = React.createContext(undefined);
@@ -114,6 +115,7 @@ var AdminContext = {
 
 function AdminTestingPortal$AdminActions(Props) {
   var optEthersWallet = React.useContext(context);
+  var optNetwork = RootProvider.useChainId(undefined);
   if (optEthersWallet === undefined) {
     return React.createElement("h1", undefined, "No provider is selected. Even if you are using your own private key you still need to login with metamask for the connection to ethereum.");
   }
@@ -136,9 +138,13 @@ function AdminTestingPortal$AdminActions(Props) {
   var match$1 = match.data;
   return React.createElement("div", undefined, React.createElement("h1", undefined, "Test Functions"), React.createElement("div", {
                   className: "border-dashed border-4 border-light-red-500"
-                }, React.createElement(ApproveDai.make, {}), React.createElement(MintDai.make, {
-                      ethersWallet: optEthersWallet
-                    }), React.createElement("h1", undefined, "Market specific Functions:"), match.loading ? "Loading..." : (
+                }, React.createElement(ApproveDai.make, {}), optNetwork !== undefined ? (
+                    optNetwork !== 97 ? React.createElement(MintDai.make, {
+                            ethersWallet: optEthersWallet
+                          }) : null
+                  ) : React.createElement(MintDai.make, {
+                        ethersWallet: optEthersWallet
+                      }), React.createElement("hr", undefined), React.createElement("h1", undefined, "Market specific Functions:"), match.loading ? "Loading..." : (
                     match.error !== undefined ? "Error loading data" : (
                         match$1 !== undefined ? React.createElement(React.Fragment, undefined, Belt_Array.map(match$1.syntheticMarkets, (function (param) {
                                       var marketIndex = param.marketIndex;
@@ -155,11 +161,17 @@ function AdminTestingPortal$AdminActions(Props) {
                                                             }), React.createElement(RedeemSynth.make, {
                                                               isLong: true,
                                                               marketIndex: marketIndex
+                                                            }), React.createElement(MintAndStake.make, {
+                                                              marketIndex: marketIndex,
+                                                              isLong: true
                                                             })), React.createElement("div", undefined, React.createElement("h1", undefined, "Short(" + Ethers.Utils.toString(param.syntheticShort.tokenAddress) + ")"), React.createElement(MintShort.make, {
                                                               marketIndex: marketIndex
                                                             }), React.createElement(RedeemSynth.make, {
                                                               isLong: false,
                                                               marketIndex: marketIndex
+                                                            }), React.createElement(MintAndStake.make, {
+                                                              marketIndex: marketIndex,
+                                                              isLong: false
                                                             }))));
                                     }))) : "You might think this is impossible, but depending on the situation it might not be!"
                       )

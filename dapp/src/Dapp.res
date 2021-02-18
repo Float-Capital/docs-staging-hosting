@@ -16,8 +16,11 @@ module Dapp = {
         | {loading: true} => <Loader />
         | {error: Some(_error)} => "Error loading data"->React.string
         | {data: Some({syntheticMarkets})} =>
-          let firstMarket = syntheticMarkets->Array.getUnsafe(0)
-          <TradeForm market={firstMarket} />
+          let optFirstMarket = syntheticMarkets[0]
+          switch optFirstMarket {
+          | Some(firstMarket) => <TradeForm market={firstMarket} />
+          | None => <p> {"No markets exist"->React.string} </p>
+          }
         | {data: None, error: None, loading: false} =>
           "You might think this is impossible, but depending on the situation it might not be!"->React.string
         }}
