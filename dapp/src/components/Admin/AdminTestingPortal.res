@@ -133,14 +133,14 @@ module AdminActions = {
                     <div>
                       <h1> {`Long(${tokenAddressLong->Ethers.Utils.toString})`->React.string} </h1>
                       <MintLong marketIndex />
-                      <RedeemSynth synthTokenAddres=tokenAddressLong />
+                      <RedeemSynth marketIndex isLong=true />
                     </div>
                     <div>
                       <h1>
                         {`Short(${tokenAddressShort->Ethers.Utils.toString})`->React.string}
                       </h1>
                       <MintShort marketIndex />
-                      <RedeemSynth synthTokenAddres=tokenAddressShort />
+                      <RedeemSynth marketIndex isLong=false />
                     </div>
                   </div>
                 </div>

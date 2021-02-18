@@ -715,17 +715,19 @@ function TradeForm$1(Props) {
           }
           if (isLong) {
             var partial_arg = market.syntheticShort.tokenAddress;
+            var arg$2 = market.marketIndex;
             return Curry._2(contractExecutionHandler, (function (param) {
-                          return Contracts.SyntheticToken.make(partial_arg, param);
+                          return Contracts.LongShort.make(partial_arg, param);
                         }), (function (param) {
-                          return param.redeem(amount);
+                          return param.redeemLong(arg$2, amount);
                         }));
           }
           var partial_arg$1 = market.syntheticLong.tokenAddress;
+          var arg$3 = market.marketIndex;
           return Curry._2(contractExecutionHandler, (function (param) {
-                        return Contracts.SyntheticToken.make(partial_arg$1, param);
+                        return Contracts.LongShort.make(partial_arg$1, param);
                       }), (function (param) {
-                        return param.redeem(amount);
+                        return param.redeemShort(arg$3, amount);
                       }));
         }));
   var match$6 = form.amountResult;

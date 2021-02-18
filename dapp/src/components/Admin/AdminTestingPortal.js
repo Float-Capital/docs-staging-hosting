@@ -141,8 +141,6 @@ function AdminTestingPortal$AdminActions(Props) {
                     }), React.createElement("h1", undefined, "Market specific Functions:"), match.loading ? "Loading..." : (
                     match.error !== undefined ? "Error loading data" : (
                         match$1 !== undefined ? React.createElement(React.Fragment, undefined, Belt_Array.map(match$1.syntheticMarkets, (function (param) {
-                                      var tokenAddressShort = param.syntheticShort.tokenAddress;
-                                      var tokenAddressLong = param.syntheticLong.tokenAddress;
                                       var marketIndex = param.marketIndex;
                                       var symbol = param.symbol;
                                       return React.createElement("div", {
@@ -152,14 +150,16 @@ function AdminTestingPortal$AdminActions(Props) {
                                                       className: "w-full text-5xl underline text-center"
                                                     }, "Market " + param.name + " (" + symbol + ")"), React.createElement("div", {
                                                       className: "flex justify-between items-center w-full"
-                                                    }, React.createElement("div", undefined, React.createElement("h1", undefined, "Long(" + Ethers.Utils.toString(tokenAddressLong) + ")"), React.createElement(MintLong.make, {
+                                                    }, React.createElement("div", undefined, React.createElement("h1", undefined, "Long(" + Ethers.Utils.toString(param.syntheticLong.tokenAddress) + ")"), React.createElement(MintLong.make, {
                                                               marketIndex: marketIndex
                                                             }), React.createElement(RedeemSynth.make, {
-                                                              synthTokenAddres: tokenAddressLong
-                                                            })), React.createElement("div", undefined, React.createElement("h1", undefined, "Short(" + Ethers.Utils.toString(tokenAddressShort) + ")"), React.createElement(MintShort.make, {
+                                                              isLong: true,
+                                                              marketIndex: marketIndex
+                                                            })), React.createElement("div", undefined, React.createElement("h1", undefined, "Short(" + Ethers.Utils.toString(param.syntheticShort.tokenAddress) + ")"), React.createElement(MintShort.make, {
                                                               marketIndex: marketIndex
                                                             }), React.createElement(RedeemSynth.make, {
-                                                              synthTokenAddres: tokenAddressShort
+                                                              isLong: false,
+                                                              marketIndex: marketIndex
                                                             }))));
                                     }))) : "You might think this is impossible, but depending on the situation it might not be!"
                       )

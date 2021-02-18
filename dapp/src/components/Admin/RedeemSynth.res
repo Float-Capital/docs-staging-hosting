@@ -27,14 +27,14 @@ let initialInput: LongRedeemForm.input = {
 }
 
 @react.component
-let make = (~synthTokenAddres) => {
+let make = (~isLong, ~marketIndex) => {
   let signer = ContractActions.useSignerExn()
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
-
+  let longShortAddres = Config.useLongShortAddress()
   let form = LongRedeemForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
     contractExecutionHandler(
-      ~makeContractInstance=Contracts.SyntheticToken.make(~address=synthTokenAddres),
-      ~contractFunction=Contracts.SyntheticToken.redeem(~amount),
+      ~makeContractInstance=Contracts.LongShort.make(~address=longShortAddres),
+      ~contractFunction={isLong ? Contracts.LongShort.redeemLong(~marketIndex, ~tokensToRedeem=amount) : Contracts.LongShort.redeemShort(~marketIndex, ~tokensToRedeem=amount)},
     )
   })
 
