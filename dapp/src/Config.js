@@ -42,9 +42,18 @@ function useDaiAddress(param) {
                   })));
 }
 
+var goerliGraphEndpoint = "https://api.thegraph.com/subgraphs/name/avolabs-io/float-capital-goerli";
+
+var binancTestnetGraphEndpoint = "https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital/graphql";
+
+var localhostGraphEndpoint = "https://localhost:8000/subgraphs/name/avolabs-io/float-capital/graphql";
+
 export {
   isDevMode ,
   longshortContractAbi ,
+  goerliGraphEndpoint ,
+  binancTestnetGraphEndpoint ,
+  localhostGraphEndpoint ,
   allContracts ,
   getContractAddressString ,
   longShortContractAddress ,

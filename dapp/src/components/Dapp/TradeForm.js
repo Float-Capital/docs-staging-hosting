@@ -713,18 +713,18 @@ function TradeForm$1(Props) {
                         }));
           }
           if (isLong) {
-            var arg$2 = market.marketIndex;
+            var partial_arg = market.syntheticShort.tokenAddress;
             return Curry._2(contractExecutionHandler, (function (param) {
-                          return Contracts.LongShort.make(longShortContractAddress, param);
+                          return Contracts.SyntheticToken.make(partial_arg, param);
                         }), (function (param) {
-                          return param.redeemLong(arg$2, amount);
+                          return param.redeem(amount);
                         }));
           }
-          var arg$3 = market.marketIndex;
+          var partial_arg$1 = market.syntheticLong.tokenAddress;
           return Curry._2(contractExecutionHandler, (function (param) {
-                        return Contracts.LongShort.make(longShortContractAddress, param);
+                        return Contracts.SyntheticToken.make(partial_arg$1, param);
                       }), (function (param) {
-                        return param.redeemShort(arg$3, amount);
+                        return param.redeem(amount);
                       }));
         }));
   var match$6 = form.amountResult;
