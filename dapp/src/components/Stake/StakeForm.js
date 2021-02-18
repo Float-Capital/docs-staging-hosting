@@ -24,7 +24,7 @@ function StakeForm(Props) {
                               }, "Stake ↗️"), React.createElement("div", {
                                 className: "no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3",
                                 href: "#"
-                              }, "Redeem ↗️"))), React.createElement(MaxInput.make, {
+                              }, "Unstake ↗️"))), React.createElement(MaxInput.make, {
                         placeholder: "stake",
                         value: "",
                         disabled: false,

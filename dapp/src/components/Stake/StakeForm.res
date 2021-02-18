@@ -12,7 +12,7 @@ let make = () =>
              {`Stake ↗️`->React.string}
          </div>
          <div className="no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3" href="#">
-             {`Redeem ↗️`->React.string}
+             {`Unstake ↗️`->React.string}
          </div>
      </div>
     </div>

@@ -59,7 +59,7 @@ function Stake$Stake(Props) {
                                               symbol: param.syntheticMarket.name,
                                               apy: 0.2,
                                               balance: 0,
-                                              position: String(param.tokenType).toLowerCase()
+                                              tokenType: String(param.tokenType).toLowerCase()
                                             };
                                     })), (function (a, b) {
                                   var greater = b.symbol.localeCompare(a.symbol);
@@ -69,8 +69,8 @@ function Stake$Stake(Props) {
                                   if (greater < 0.0) {
                                     return 1;
                                   }
-                                  var match = a.position;
-                                  var match$1 = b.position;
+                                  var match = a.tokenType;
+                                  var match$1 = b.tokenType;
                                   switch (match) {
                                     case "long" :
                                         if (match$1 === "short") {
@@ -109,7 +109,7 @@ function Stake$Stake(Props) {
                                                 className: "flex flex-col"
                                               }, React.createElement("h3", {
                                                     className: "font-bold"
-                                                  }, "Token"), React.createElement("p", undefined, token.symbol, token.position === "short" ? "↘️" : "↗️")), React.createElement("div", {
+                                                  }, "Token"), React.createElement("p", undefined, token.symbol, token.tokenType === "short" ? "↘️" : "↗️")), React.createElement("div", {
                                                 className: "flex flex-col"
                                               }, React.createElement("h3", {
                                                     className: "font-bold"
@@ -129,7 +129,7 @@ function Stake$Stake(Props) {
                                                 children: "STAKE",
                                                 variant: "small"
                                               })),
-                                      key: token.symbol + token.position
+                                      key: token.symbol + token.tokenType
                                     });
                         })), tokenId !== undefined ? tokenId : null, React.createElement(StakeForm.make, {})),
               alternateComponent: React.createElement("h1", {
