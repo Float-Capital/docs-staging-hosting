@@ -142,17 +142,19 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
       }
     | (false, true) =>
       contractExecutionHandler(
-        ~makeContractInstance=Contracts.SyntheticToken.make(
-          ~address=market.syntheticShort.tokenAddress,
+        ~makeContractInstance=Contracts.LongShort.make(~address=market.syntheticShort.tokenAddress),
+        ~contractFunction=Contracts.LongShort.redeemLong(
+          ~marketIndex=market.marketIndex,
+          ~tokensToRedeem=amount,
         ),
-        ~contractFunction=Contracts.SyntheticToken.redeem(~amount),
       )
     | (false, false) =>
       contractExecutionHandler(
-        ~makeContractInstance=Contracts.SyntheticToken.make(
-          ~address=market.syntheticLong.tokenAddress,
+        ~makeContractInstance=Contracts.LongShort.make(~address=market.syntheticLong.tokenAddress),
+        ~contractFunction=Contracts.LongShort.redeemShort(
+          ~marketIndex=market.marketIndex,
+          ~tokensToRedeem=amount,
         ),
-        ~contractFunction=Contracts.SyntheticToken.redeem(~amount),
       )
     }
   })

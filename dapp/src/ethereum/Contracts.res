@@ -24,7 +24,7 @@ module LongShort = {
 
   let abi =
     [
-      "function mintLong(uint256 marketIndex,uint256 amount) @5000000",
+      "function mintLong(uint256 marketIndex,uint256 amount)",
       "function mintShort(uint256 marketIndex,uint256 amount)",
       "function redeemLong(uint256 marketIndex,uint256 tokensToRedeem)",
       "function redeemShort(uint256 marketIndex,uint256 tokensToRedeem)",
@@ -93,17 +93,4 @@ module Erc20 = {
     ~owner: Ethers.ethAddress,
     ~spender: Ethers.ethAddress,
   ) => JsPromise.t<Ethers.BigNumber.t> = "allowance"
-}
-
-module SyntheticToken = {
-  type t = Ethers.Contract.t
-
-  let abi = ["function redeem(uint256 amount)"]->Ethers.makeAbi
-
-  let make = (~address, ~providerOrSigner): t =>
-    Ethers.Contract.make(address, abi, providerOrSigner)
-
-  @send
-  external redeem: (~contract: t, ~amount: Ethers.BigNumber.t) => JsPromise.t<Ethers.txSubmitted> =
-    "redeem"
 }

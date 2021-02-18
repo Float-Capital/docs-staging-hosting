@@ -4,6 +4,7 @@ import * as Cn from "re-classnames/src/Cn.js";
 import * as Form from "./Form.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
+import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
@@ -426,18 +427,22 @@ var initialInput = {
 };
 
 function RedeemSynth(Props) {
-  var synthTokenAddres = Props.synthTokenAddres;
+  var isLong = Props.isLong;
+  var marketIndex = Props.marketIndex;
   var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
+  var longShortAddres = Config.useLongShortAddress(undefined);
   var form = useForm(initialInput, (function (param, _form) {
           var amount = param.amount;
           return Curry._2(contractExecutionHandler, (function (param) {
-                        return Contracts.SyntheticToken.make(synthTokenAddres, param);
-                      }), (function (param) {
-                        return param.redeem(amount);
-                      }));
+                        return Contracts.LongShort.make(longShortAddres, param);
+                      }), isLong ? (function (param) {
+                          return param.redeemLong(marketIndex, amount);
+                        }) : (function (param) {
+                          return param.redeemShort(marketIndex, amount);
+                        }));
         }));
   var match$1 = form.amountResult;
   var tmp;
