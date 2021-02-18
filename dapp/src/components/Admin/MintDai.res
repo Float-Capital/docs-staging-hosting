@@ -69,7 +69,7 @@ let make = (~ethersWallet) => {
         form.submit()
       }}>
       <div className="">
-        <h2 className="text-xl"> {"Mint"->React.string} </h2>
+        <h2 className="text-xl"> {"Mint DAI"->React.string} </h2>
         <div className="">
           <label htmlFor="address"> {"Address: "->React.string} </label>
           <input

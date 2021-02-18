@@ -196,54 +196,54 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
   }, [txStateApprove])
 
   <div className="screen-centered-container">
-  <ViewBox>
-    <Form      
-      className="this-is-required"
-      onSubmit={() => {
-        form.submit()
-      }}>
-      <h2> {`${market.name} (${market.symbol})`->React.string} </h2>
-      <select
-        name="longshort"
-        className="trade-select"
-        onChange={event =>
-          form.updateIsLong(
-            (input, isLong) => {...input, isLong: isLong},
-            (event->ReactEvent.Form.target)["value"] == "long",
-          )}
-        value={form.input.isLong ? "long" : "short"}
-        onBlur={_ => form.blurAmount()}
-        disabled=form.submitting>
-        <option value="long"> {`Long 🐮`->React.string} </option>
-        <option value="short"> {`Short 🐻`->React.string} </option>
-      </select>
-      {form.input.isMint
-        ? <>
-            // <div className="flex flex-row">
-            //   <input
-            //     className="h-16 bg-gray-100 text-grey-darker py-2 font-normal text-grey-darkest border border-gray-100 font-bold w-full py-1 px-2 outline-none text-lg text-gray-600"
-            //     type_="text"
-            //     placeholder="What do you want to learn?"
-            //   />
-            //   <span
-            //     className="flex items-center bg-gray-100 rounded rounded-l-none border-0 px-3 font-bold text-grey-100">
-            //     <span onClick={_ => form.updateAmount((input, amount) => {
-            //           ...input,
-            //           amount: amount,
-            //         }, switch optDaiBalance {
-            //         | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
-            //         | _ => "0"
-            //         })}> {"MAX"->React.string} </span>
-            //   </span>
-            // </div>
-            <MaxInput 
-              value=form.input.amount
-              disabled=form.submitting
-              onBlur={_ => form.blurAmount()} 
-              onChange={event => form.updateAmount((input, amount) => {
-                  ...input,
-                  amount: amount,
-                }, (event->ReactEvent.Form.target)["value"])}
+    <ViewBox>
+      <Form
+        className="this-is-required"
+        onSubmit={() => {
+          form.submit()
+        }}>
+        <h2> {`${market.name} (${market.symbol})`->React.string} </h2>
+        <select
+          name="longshort"
+          className="trade-select"
+          onChange={event =>
+            form.updateIsLong(
+              (input, isLong) => {...input, isLong: isLong},
+              (event->ReactEvent.Form.target)["value"] == "long",
+            )}
+          value={form.input.isLong ? "long" : "short"}
+          onBlur={_ => form.blurAmount()}
+          disabled=form.submitting>
+          <option value="long"> {`Long 🐮`->React.string} </option>
+          <option value="short"> {`Short 🐻`->React.string} </option>
+        </select>
+        {form.input.isMint
+          ? <>
+              // <div className="flex flex-row">
+              //   <input
+              //     className="h-16 bg-gray-100 text-grey-darker py-2 font-normal text-grey-darkest border border-gray-100 font-bold w-full py-1 px-2 outline-none text-lg text-gray-600"
+              //     type_="text"
+              //     placeholder="What do you want to learn?"
+              //   />
+              //   <span
+              //     className="flex items-center bg-gray-100 rounded rounded-l-none border-0 px-3 font-bold text-grey-100">
+              //     <span onClick={_ => form.updateAmount((input, amount) => {
+              //           ...input,
+              //           amount: amount,
+              //         }, switch optDaiBalance {
+              //         | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
+              //         | _ => "0"
+              //         })}> {"MAX"->React.string} </span>
+              //   </span>
+              // </div>
+              <MaxInput
+                value=form.input.amount
+                disabled=form.submitting
+                onBlur={_ => form.blurAmount()}
+                onChange={event => form.updateAmount((input, amount) => {
+                    ...input,
+                    amount: amount,
+                  }, (event->ReactEvent.Form.target)["value"])}
                 placeholder={"mint"}
                 onMaxClick={_ => form.updateAmount((input, amount) => {
                     ...input,
@@ -251,32 +251,32 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
                   }, switch optDaiBalance {
                   | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
                   | _ => "0"
-                  })
-                } 
-            />
-            {switch (form.amountResult, optAdditionalErrorMessage) {
-            | (Some(Error(message)), _)
-            | (_, Some(message)) =>
-              <div className="text-red-600"> {message->React.string} </div>
-            | (Some(Ok(_)), None) => <div className="text-green-600"> {j`✓`->React.string} </div>
-            | (None, None) => React.null
-            }}
-          </>
-        : <input className="trade-input" placeholder="redeem" />}
-      <div className="trade-switch" onClick={_ => form.updateIsMint((input, isMint) => {
-            ...input,
-            isMint: isMint,
-          }, !form.input.isMint)}> {j`↑↓`->React.string} </div>
-      {form.input.isMint
-        ? <input className="trade-input" placeholder="redeem" />
-        : <input className="trade-input" placeholder="mint" />}
-      <Button onClick={_ => Js.log("I was clicked")} variant="large">
-        {`${_buttonText} ${form.input.isMint ? "Mint" : "Redeem"} ${form.input.isLong
-            ? "long"
-            : "short"} position`}
-      </Button>
-    </Form>
-      </ViewBox>
+                  })}
+              />
+              {switch (form.amountResult, optAdditionalErrorMessage) {
+              | (Some(Error(message)), _)
+              | (_, Some(message)) =>
+                <div className="text-red-600"> {message->React.string} </div>
+              | (Some(Ok(_)), None) =>
+                <div className="text-green-600"> {j`✓`->React.string} </div>
+              | (None, None) => React.null
+              }}
+            </>
+          : <input className="trade-input" placeholder="redeem" />}
+        <div className="trade-switch" onClick={_ => form.updateIsMint((input, isMint) => {
+              ...input,
+              isMint: isMint,
+            }, !form.input.isMint)}> {j`↑↓`->React.string} </div>
+        {form.input.isMint
+          ? <input className="trade-input" placeholder="redeem" />
+          : <input className="trade-input" placeholder="mint" />}
+        <Button onClick={_ => Js.log("I was clicked")} variant="large">
+          {`${_buttonText} ${form.input.isMint ? "Mint" : "Redeem"} ${form.input.isLong
+              ? "long"
+              : "short"} position`}
+        </Button>
+      </Form>
+    </ViewBox>
     {// {Config.isDevMode // <- this can be used to hide this code when not developing
     //   ? <>
 

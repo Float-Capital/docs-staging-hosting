@@ -577,7 +577,7 @@ function MintDai(Props) {
                           className: ""
                         }, React.createElement("h2", {
                               className: "text-xl"
-                            }, "Mint"), React.createElement("div", {
+                            }, "Mint DAI"), React.createElement("div", {
                               className: ""
                             }, React.createElement("label", {
                                   htmlFor: "address"

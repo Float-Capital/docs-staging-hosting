@@ -595,7 +595,9 @@ function ApproveDai(Props) {
                                                       }), $$event.target.value);
                                         })
                                     }, Belt_Array.map(selectOpts, (function (selectOptName) {
-                                            return React.createElement("option", undefined, selectOptName);
+                                            return React.createElement("option", {
+                                                        key: selectOptName
+                                                      }, selectOptName);
                                           })))), React.createElement("label", {
                                   htmlFor: "amount"
                                 }, "Amount: "), React.createElement("input", {

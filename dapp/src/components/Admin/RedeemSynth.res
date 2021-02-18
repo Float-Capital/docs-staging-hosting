@@ -34,7 +34,11 @@ let make = (~isLong, ~marketIndex) => {
   let form = LongRedeemForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
     contractExecutionHandler(
       ~makeContractInstance=Contracts.LongShort.make(~address=longShortAddres),
-      ~contractFunction={isLong ? Contracts.LongShort.redeemLong(~marketIndex, ~tokensToRedeem=amount) : Contracts.LongShort.redeemShort(~marketIndex, ~tokensToRedeem=amount)},
+      ~contractFunction={
+        isLong
+          ? Contracts.LongShort.redeemLong(~marketIndex, ~tokensToRedeem=amount)
+          : Contracts.LongShort.redeemShort(~marketIndex, ~tokensToRedeem=amount)
+      },
     )
   })
 
@@ -50,7 +54,7 @@ let make = (~isLong, ~marketIndex) => {
         form.submit()
       }}>
       <div className="">
-        <h2 className="text-xl"> {"Redeem Long Tokens"->React.string} </h2>
+        <h2 className="text-xl"> {`Redeem ${isLong ? "LONG" : "SHORT"} Tokens`->React.string} </h2>
         <div>
           <label htmlFor="amount"> {"Amount: "->React.string} </label>
           <input
