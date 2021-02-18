@@ -6,7 +6,7 @@ dataSources:
     name: LongShort
     network: ganache
     source:
-      address: "0x9e86BA54E5498AdF90C8D0B43f55C4876679e1C2"
+      address: "0xa9e638f77Eea6036D05F00d0AC55169357De114E"
       abi: LongShort
       startBlock: 0
     mapping:
@@ -29,7 +29,7 @@ dataSources:
       eventHandlers:
         - event: V1(address,address,address,address)
           handler: handleV1
-        - event: FeesLevied(uint256,uint256,uint256,uint256,uint256)
+        - event: FeesLevied(uint256,uint256,uint256)
           handler: handleFeesLevied
         - event: SyntheticTokenCreated(uint256,address,address,uint256,string,string,address,uint256,uint256,uint256,uint256)
           handler: handleSyntheticTokenCreated
@@ -45,7 +45,7 @@ dataSources:
           handler: handleShortRedeem
         - event: TokenPriceRefreshed(uint256,uint256,uint256,uint256)
           handler: handleTokenPriceRefreshed
-        - event: ValueLockedInSystem(uint256,uint256,uint256,uint256,uint256,uint256)
+        - event: ValueLockedInSystem(uint256,uint256,uint256,uint256,uint256)
           handler: handleValueLockedInSystem
       file: ./src/mapping.ts
 
@@ -75,7 +75,7 @@ dataSources:
         - event: StateAdded(address,uint256,uint256,uint256)
           handler: handleStateAdded
         - event: StakeAdded(address,address,uint256)
-          handler: handleStateAdded
+          handler: handleStakeAdded
         - event: StakeWithdrawn(address,address,uint256)
           handler: handleStakeWithdrawn
         - event: FloatMinted(address,uint256)

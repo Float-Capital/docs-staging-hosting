@@ -34,10 +34,16 @@ import {
   TokenFactory,
   LongShortContract,
   SyntheticToken,
+  CurrentStake,
+  Stake,
+  User,
 } from "../generated/schema";
 import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
-import { getOrCreateLatestSystemState } from "./utils/globalStateManager";
+import {
+  getOrCreateLatestSystemState,
+  getOrCreateUser,
+} from "./utils/globalStateManager";
 import {
   ZERO,
   TEN_TO_THE_18,
@@ -74,7 +80,6 @@ export function handleV1(event: V1): void {
   let globalState = new GlobalState(GLOBAL_STATE_ID);
   globalState.contractVersion = BigInt.fromI32(1);
   globalState.latestMarketIndex = ZERO;
-  globalState.totalValueLockedInAllMarkets = ZERO;
   globalState.oracleAggregator = oracleAgregator.id;
   globalState.staker = staker.id;
   globalState.tokenFactory = tokenFactory.id;
@@ -90,18 +95,16 @@ export function handleFeesLevied(event: FeesLevied): void {
 
   let marketIndex = event.params.marketIndex;
   let totalFees = event.params.totalFees;
-  let longPercentage = event.params.longPercentage;
-  let shortPercentage = event.params.shortPercentage;
 
-  saveEventToStateChange(
-    txHash,
-    timestamp,
-    blockNumber,
-    "FeesLevied",
-    bigIntArrayToStringArray([totalFees, longPercentage, shortPercentage]),
-    ["totalFees", "longPercentage", "shortPercentage"],
-    ["uint256", "uint256", "uint256"]
-  );
+  // saveEventToStateChange(
+  //   txHash,
+  //   timestamp,
+  //   blockNumber,
+  //   "FeesLevied",
+  //   bigIntArrayToStringArray([totalFees, longPercentage, shortPercentage]),
+  //   ["totalFees", "longPercentage", "shortPercentage"],
+  //   ["uint256", "uint256", "uint256"]
+  // );
 }
 
 export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
@@ -112,7 +115,6 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
 
   let marketIndex = event.params.marketIndex;
   let contractCallCounter = event.params.contractCallCounter;
-  let totalValueLocked = event.params.totalValueLocked;
   let totalValueLockedInMarket = event.params.totalValueLockedInMarket;
   let longValue = event.params.longValue;
   let shortValue = event.params.shortValue;
@@ -126,11 +128,7 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
   state.totalLockedLong = longValue;
   state.totalLockedShort = shortValue;
 
-  let globalState = GlobalState.load(GLOBAL_STATE_ID);
-  globalState.totalValueLockedInAllMarkets = totalValueLocked;
-
   state.save();
-  globalState.save();
 }
 
 export function handleSyntheticTokenCreated(
@@ -157,15 +155,11 @@ export function handleSyntheticTokenCreated(
   let marketIndexString = marketIndex.toString();
 
   // create new synthetic token object.
-  let longToken = new SyntheticToken(
-    marketIndexString + "-" + longTokenAddress.toHexString()
-  );
+  let longToken = new SyntheticToken(longTokenAddress.toHexString());
   longToken.tokenAddress = longTokenAddress;
   longToken.totalStaked = ZERO;
 
-  let shortToken = new SyntheticToken(
-    marketIndexString + "-" + shortTokenAddress.toHexString()
-  );
+  let shortToken = new SyntheticToken(shortTokenAddress.toHexString());
   shortToken.tokenAddress = shortTokenAddress;
   shortToken.totalStaked = ZERO;
 
@@ -421,7 +415,48 @@ export function handleStakeAdded(event: StakeAdded): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
+
+  let userAddress = event.params.user;
+  let userAddressString = userAddress.toHex();
+  let tokenAddress = event.params.tokenAddress;
+  let tokenAddressString = tokenAddress.toHex();
+  let amount = event.params.amount;
+
+  let user = getOrCreateUser(userAddress);
+
+  let syntheticToken = SyntheticToken.load(tokenAddressString);
+
+  let stake = new Stake(txHash.toHex());
+  stake.timestamp = timestamp;
+  stake.blockNumber = blockNumber;
+  stake.creationTxHash = txHash;
+  stake.tokenType = syntheticToken.id;
+  stake.user = user.id;
+  stake.amount = amount;
+
+  let currentStake = CurrentStake.load(
+    tokenAddressString + "-" + userAddressString
+  );
+  if (currentStake == null) {
+    // They won't have a current stake.
+    currentStake = new CurrentStake(
+      tokenAddressString + "-" + userAddressString
+    );
+    currentStake.user = user.id;
+    currentStake.tokenType = syntheticToken.id;
+  } else {
+    // Note: Only add if still relevant and not withdrawn
+    let oldStake = Stake.load(currentStake.currentStake);
+    stake.amount = stake.amount.plus(oldStake.amount);
+  }
+  currentStake.currentStake = stake.id;
+
+  stake.save();
+  currentStake.save();
+  user.save();
+  syntheticToken.save();
 }
+
 export function handleStakeWithdrawn(event: StakeWithdrawn): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
