@@ -5,68 +5,73 @@ sidebar_label: FAQs
 slug: /faqs
 ---
 
-//These docs are under active development and need revision / correction / abridgement(possibly)
-//It's quite possible that I've used 'Float Capital' where I should have put 'LongShort' and vice versa. 
+## What is Float Capital?
 
+<!-- ### What is Float Capital? -->
 
-### What do LongShort Tokens do?
+### What do Float long short tokens do?
 
-Token holders gain anonymous decentralized exposure to the markets we offer. Holders benefit from price appreciation (holding long tokens) or depreciation (holding short tokens) of the underlying market, while also being compensated through the governance token (Float Tokens) when going against the herd by taking the side least in favor, and helping to balance the liquidity pools.
+Token holders gain anonymous decentralized exposure to the markets we offer. Holders benefit from price appreciation, holding long tokens 📈, or depreciation, holding short tokens📉, of the underlying market.
 
-### What is a Synthetic Asset?
+### What is the EthKillers market?
 
-A synthetic asset simulates the performance of an underlying asset but with some key benefits. Synthetics can offer investors reduced trading costs, tailored cash flow patterns, altered risk profiles, leverage and so on. LongShort however, is designed to be simple and safe. 
+The EthKillers is the first synthetic market offered by Float Capital. This Market is an average of the prices of the tokens of the three protocols `most likely` to replace ethereum, namely TRON, XRP and EOS. The EthKillers market allows users to gain long and short exposure to TRON, XRP and EOS collectively.
 
-### What makes LongShort Different? 
+<!-- ### What makes Float Capital different?
 
-LongShort is designed to be simple and safe: to be easy to use and transparent, also it does not provide leverage // and other things that make it safe? .  
+Float Capital is designed to be simple and safe: to be easy to use and transparent.
 
-### Long Tokens VS Short Tokens VS Float Tokens.. The Differences.
+Not over collateralized
+...
+-->
 
-Holders of Long Tokens benefit from increases in the price of the underlying market. Holders of Short Tokens benefit from decreases in the price of the underlying market. Holders of Float Tokens will benefit from the routine retirement of the Float Token done by the LongShort protocol using any fees left over after rewarding holders of the Long or Short token that's least in favor. The Float Token is the governance token and holders will therefore also have a say regarding changes to the protocol in the future.
+### Long tokens vs Short tokens vs Float tokens.. the differences.
 
-### What is the EthKillers Index? 
+Holders of Long tokens benefit from increases in the price of the underlying market. Holders of Short tokens benefit from decreases in the price of the underlying market. Each market has its own pair of long and short tokens. Holders of Float tokens will benefit from the routine retirement of the Float token done by the LongShort protocol. The Float Token is the governance token and holders will therefore have a say regarding changes to the protocol in the future.
 
-// needs more
-This is an average of the prices of the tokens of the five protocols most likely to replace ethereum, namely TRON, XRP, EOS [two more]. This is the first market offered by Float Capital.
-### What is an Oracle? 
+## Trading
 
-Simply put, it's a feed that communicates information from the real world to the blockchain. For the purposes of trading synthetic assets, the oracle would provide the price feed for the underlying. LongShort uses an oracle aggregator so that it is never relying on one single provider, and this increases the durability of the system. 
+### Are there any trading fees?
 
-### Are there Any Trading Fees? 
+Float Capital doesn't take any trading fees from traders. On certain markets enter and exit fees are incurred if users further imbalance the market. These fees are accrued to the under balanced side of the market.
 
-Float Capital doesn't take any fees. 
-// someone else please fill this in @denham
+### What are the benefits of taking the side of the market least in favor?
 
-### What are the Benefits of Taking the Side of the Market Least in Favor?
+On the dashboard there will be an indication of the imbalance between the long side liquidity and the short side liquidity. By watching this and taking the side of the underdogs, you will be rewarded with the interest on all the liquidity of both sides of the market. The liquidity is deposited in [Venus Protocol](https://app.venus.io/market/BUSD) where the token earns interest.
 
- On the dashboard there will be an indication of the imbalance between the longs and shorts. By watching this and taking the side of the underdogs, you will be rewarded by being allocated Float governance tokens. 
- 
- ### Why hold Float Governance Tokens?
+<!-- ### Why hold Float governance tokens?
 
- Holders of Float Tokens will benefit from the routine retirement of the Float Token done by the LongShort protocol using any fees left over after rewarding holders of the Long or Short token that's least in favor. The Float Token is the governance token and therefore holders will also have a say regarding changes to the protocol in the future.
+Holders of Float tokens will benefit from the routine retirement of the Float token done by the LongShort protocol using any fees left over after rewarding holders of the Long or Short token that's least in favor. The Float Token is the governance token and therefore holders will also have a say regarding changes to the protocol in the future. -->
 
-### Will I Really be able to stay completely anonymous? 
+<!-- ### Will I really be able to stay completely anonymous?
 
-Yes. KYC (Know Your Customer) is a due dilience process that traditional financial institutions are legally required to perform on you. It's completely normal for a traditional brokerage to know almost everything important about your financial life before they onboard you. With DAOs (Decentralized Autonomous Organisations) like Float Capital, everything is handled by the blockchain, so no one will ask what your salary is, the source and extent of your liquid net worth, or your level of trading experience.
+Yes. KYC (Know Your Customer) is a due diligence process that traditional financial institutions are legally required to perform on you. It's completely normal for a traditional brokerage to know almost everything important about your financial life before they onboard you. -->
+
+<!-- With DAOs (Decentralized Autonomous Organisations) like Float Capital, everything is handled by the blockchain, so no one will ask what your salary is, the source and extent of your liquid net worth, or your level of trading experience. -->
+
+### What are the market hours?
+
+Crypto markets are not limited to normal market hours. They are 24-hour and cannot be halted.
+
+## Terminology
+
+### What is a synthetic asset?
+
+A synthetic asset simulates the performance of an underlying asset but with some key benefits. Synthetics can offer investors reduced trading costs, tailored cash flow patterns, altered risk profiles, leverage and so on. Float Capital however, is designed to be simple and safe.
+
+### What is an oracle?
+
+Simply put, it's a feed that communicates information from the real world to the blockchain. For the purposes of trading synthetic assets, the oracle would provide the price feed for the underlying asset. Float Capital uses an oracle aggregator so that it is never relying on one single provider, and this increases the durability of the system.
+
+### What is a governance token?
+
+A governance token can be thought of a bit like equity in a company. Governance tokens give holders voting rights over proposed revisions to the protocol, allowing them to have their voices heard on how a protocol operates. Some governance tokens (Float tokens included) give holders added benefits. Similar to stock buybacks, fees earned by the LongShort protocol that aren't paid out to holders in return for helping to balance the liquidity pools, will be used to buy back Float Tokens in the open market, thus decreasing the supply in circulation, and increasing their value.
 
 ### What is Binance Smart Chain?
-It's another blockchain. LongShort is built on the Binance Smart Chain. 
 
-### What are the Market Hours?  
+The Binance Smart Chain is a programmable blockchain. Float Capital is built on the Binance Smart Chain.
 
-Crypto markets are not limited to normal market hours. They are 24-hour and cannot be halted.  
+<!--
+### Have the LongShort Smart Contracts been audited?
 
-### What is a Governance Token?
-
-A governance token can be thought of a bit like equity in a company. Governance tokens give holders voting rights over proposed revisions to smart contracts, allowing them to have their voices heard on how a protocol operates. Some governance tokens (Float tokens included) give holders added benefits. Similar to stock buybacks, fees earned by the LongShort protocol that aren't paid out to holders in return for helping to balance the liquidity pools, will be used to buy back Float Tokens in the open market, thus decreasing the supply in circulation, and increasing their value.  
-
-### Have the LongShort Smart Contracts been Audited?
-
-Yes, you can find the audit reports [link: here].
-
-
-
-
-
-
+Yes, you can find the audit reports [link: here]. -->
