@@ -21,18 +21,17 @@ module MarketDetails = %graphql(`
   syntheticMarkets {
     name
     symbol
-    marketIndex
+    marketIndex    
     oracleAddress
     syntheticLong {
       id
-      tokenAddress @ppxCustom(module: "Address")
+      tokenAddress @ppxCustom(module: "Address")            
     }
     syntheticShort {
       id
-      tokenAddress @ppxCustom(module: "Address")
+      tokenAddress @ppxCustom(module: "Address")            
     }
   }
-}
 }
 `)
 // syntheticMarkets {
