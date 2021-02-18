@@ -11,7 +11,7 @@ module.exports = {
     ganache: "dev-321.json",
   },
   implementationVarsToProxies: {
-    LONGSHORT_IMPLEMENTATION: "float-capital/OracleAgregator",
+    LONGSHORT_IMPLEMENTATION: "float-capital/oracleAggregator",
     ORACLE_MANAGER_IMPLEMENTATION: "float-capital/YieldManager",
     YIELD_MANAGER_IMPLEMENTATION: "float-capital/LongShort",
     STAKER_IMPLEMENTATION: "float-capital/Staker",

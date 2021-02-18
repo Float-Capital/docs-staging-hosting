@@ -6,7 +6,7 @@ dataSources:
     name: LongShort
     network: binancetest
     source:
-      address: "0xA911530C826290607fE65C41beBFFa6c646C35F3"
+      address: "0x3fc551818E8D7899648c94BB48dc9FD368772481"
       abi: LongShort
       startBlock: 5820840
     mapping:
@@ -29,7 +29,7 @@ dataSources:
       eventHandlers:
         - event: V1(address,address,address,address)
           handler: handleV1
-        - event: FeesLevied(uint256,uint256,uint256,uint256,uint256)
+        - event: FeesLevied(uint256,uint256,uint256)
           handler: handleFeesLevied
         - event: SyntheticTokenCreated(uint256,address,address,uint256,string,string,address,uint256,uint256,uint256,uint256)
           handler: handleSyntheticTokenCreated
@@ -45,7 +45,7 @@ dataSources:
           handler: handleShortRedeem
         - event: TokenPriceRefreshed(uint256,uint256,uint256,uint256)
           handler: handleTokenPriceRefreshed
-        - event: ValueLockedInSystem(uint256,uint256,uint256,uint256,uint256,uint256)
+        - event: ValueLockedInSystem(uint256,uint256,uint256,uint256,uint256)
           handler: handleValueLockedInSystem
       file: ./src/mapping.ts
 
@@ -53,7 +53,7 @@ dataSources:
     name: Staker
     network: binancetest
     source:
-      address: "0x325D57022CC82f732802DE4A4628bD1280833aB1"
+      address: "0x4B1975b9c309b99Ca97702aF0fDa73fd3BE29e25"
       abi: Staker
       startBlock: 5820840
     mapping:
@@ -75,7 +75,7 @@ dataSources:
         - event: StateAdded(address,uint256,uint256,uint256)
           handler: handleStateAdded
         - event: StakeAdded(address,address,uint256)
-          handler: handleStateAdded
+          handler: handleStakeAdded
         - event: StakeWithdrawn(address,address,uint256)
           handler: handleStakeWithdrawn
         - event: FloatMinted(address,uint256)

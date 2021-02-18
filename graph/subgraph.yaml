@@ -6,7 +6,7 @@ dataSources:
     name: LongShort
     network: goerli
     source:
-      address: "0x325D57022CC82f732802DE4A4628bD1280833aB1"
+      address: "0xef6b472d0F146c0B06AA5695741EcFD6Cc8C2fa3"
       abi: LongShort
       startBlock: 4190130
     mapping:
@@ -29,7 +29,7 @@ dataSources:
       eventHandlers:
         - event: V1(address,address,address,address)
           handler: handleV1
-        - event: FeesLevied(uint256,uint256,uint256,uint256,uint256)
+        - event: FeesLevied(uint256,uint256,uint256)
           handler: handleFeesLevied
         - event: SyntheticTokenCreated(uint256,address,address,uint256,string,string,address,uint256,uint256,uint256,uint256)
           handler: handleSyntheticTokenCreated
@@ -45,7 +45,7 @@ dataSources:
           handler: handleShortRedeem
         - event: TokenPriceRefreshed(uint256,uint256,uint256,uint256)
           handler: handleTokenPriceRefreshed
-        - event: ValueLockedInSystem(uint256,uint256,uint256,uint256,uint256,uint256)
+        - event: ValueLockedInSystem(uint256,uint256,uint256,uint256,uint256)
           handler: handleValueLockedInSystem
       file: ./src/mapping.ts
 
@@ -53,7 +53,7 @@ dataSources:
     name: Staker
     network: goerli
     source:
-      address: "0x325D57022CC82f732802DE4A4628bD1280833aB1"
+      address: "0xe9bA2Fd1be009507e9947e7ED1C9Eaac26dE5F8B"
       abi: Staker
       startBlock: 4190130
     mapping:
@@ -75,7 +75,7 @@ dataSources:
         - event: StateAdded(address,uint256,uint256,uint256)
           handler: handleStateAdded
         - event: StakeAdded(address,address,uint256)
-          handler: handleStateAdded
+          handler: handleStakeAdded
         - event: StakeWithdrawn(address,address,uint256)
           handler: handleStakeWithdrawn
         - event: FloatMinted(address,uint256)
