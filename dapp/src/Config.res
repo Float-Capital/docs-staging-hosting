@@ -36,7 +36,6 @@ let useLongShortAddress = () => {
 }
 
 let daiContractAddress = (~netIdStr) => {
-  Js.log(netIdStr)
   allContracts
   ->Js.Dict.get(netIdStr)
   ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.dai)

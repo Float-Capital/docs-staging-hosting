@@ -31,18 +31,14 @@ module AdminContext = {
       let optEthersSigner = optProvider->Option.flatMap(provider =>
         switch (privateKeyMode, authSet) {
         | (false, _) =>
-          Js.log("a")
           optCurrentUser->Option.flatMap(usersAddress =>
             provider->Ethers.Providers.getSigner(usersAddress)
           )
         | (true, true) =>
-          Js.log("b")
           optAuthHeader->Option.map(authHeader =>
             Ethers.Wallet.makePrivKeyWallet(authHeader, provider)
           )
-        | (true, false) =>
-          Js.log("c")
-          None
+        | (true, false) => None
         }
       )
 

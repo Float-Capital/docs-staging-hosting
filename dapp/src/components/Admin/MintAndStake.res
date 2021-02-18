@@ -1,4 +1,4 @@
-module AdminMintForm = %form(
+module MintAndStakeForm = %form(
   type input = {amount: string}
   type output = {amount: Ethers.BigNumber.t}
   let validators = {
@@ -22,7 +22,7 @@ module AdminMintForm = %form(
   }
 )
 
-let initialInput: AdminMintForm.input = {
+let initialInput: MintAndStakeForm.input = {
   amount: "",
 }
 
@@ -41,7 +41,7 @@ let make = (~marketIndex, ~isLong) => {
     mutate: _mutate,
   } = ContractHooks.useERC20Approved(~erc20Address=daiAddress, ~spender=longShortContractAddress)
 
-  let form = AdminMintForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
+  let form = MintAndStakeForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
     contractExecutionHandler(
       ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
       ~contractFunction=isLong
@@ -56,7 +56,6 @@ let make = (~marketIndex, ~isLong) => {
       {(form.submitting ? "Submitting..." : "Mint & Stake")->React.string}
     </button>
 
-  // TODO: combine these two TxTemplates into a new component specifically for approve first transactions
   switch optAmountApproved {
   | Some(approvedAmount) =>
     <TxTemplate
