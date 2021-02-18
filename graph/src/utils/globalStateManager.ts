@@ -4,6 +4,7 @@ import {
   SystemState,
   GlobalState,
   User,
+  SyntheticToken,
 } from "../../generated/schema";
 import { BigInt, Address, Bytes, log, ethereum } from "@graphprotocol/graph-ts";
 import { ZERO } from "../CONSTANTS";
@@ -41,4 +42,34 @@ export function getOrCreateUser(address: Bytes): User | null {
   }
 
   return user;
+}
+
+export function createSyntheticToken(
+  tokenAddress: Bytes
+): SyntheticToken | null {
+  let tokenAddressString = tokenAddress.toHex();
+  let syntheticToken = SyntheticToken.load(tokenAddressString);
+  if (syntheticToken == null) {
+    syntheticToken = new SyntheticToken(tokenAddressString);
+    syntheticToken.tokenAddress = tokenAddress;
+    syntheticToken.totalStaked = ZERO;
+  }
+  return syntheticToken;
+}
+
+export function createSyntheticTokenLong(
+  tokenAddress: Bytes
+): SyntheticToken | null {
+  let syntheticToken = createSyntheticToken(tokenAddress);
+  syntheticToken.tokenType = "Long";
+
+  return syntheticToken;
+}
+export function createSyntheticTokenShort(
+  tokenAddress: Bytes
+): SyntheticToken | null {
+  let syntheticToken = createSyntheticToken(tokenAddress);
+  syntheticToken.tokenType = "Short";
+
+  return syntheticToken;
 }
