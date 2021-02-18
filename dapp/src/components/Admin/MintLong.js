@@ -562,6 +562,7 @@ var initialInput = {
 };
 
 function MintLong(Props) {
+  var marketIndex = Props.marketIndex;
   var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
@@ -585,11 +586,10 @@ function MintLong(Props) {
           var match = param.amount;
           var amount = match.amount;
           var mintFunction = function (param) {
-            var arg = Ethers$1.BigNumber.from("1");
             return Curry._2(contractExecutionHandler, (function (param) {
                           return Contracts.LongShort.make(longShortContractAddress, param);
                         }), (function (param) {
-                          return param.mintLong(arg, amount);
+                          return param.mintLong(marketIndex, amount);
                         }));
           };
           if (!match.requiresApproval) {

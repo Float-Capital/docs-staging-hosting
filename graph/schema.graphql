@@ -116,7 +116,7 @@ type YieldManager @entity {
   address: Bytes!
 }
 
-type oracleAggregator @entity {
+type OracleAggregator @entity {
   id: ID!
   address: Bytes!
 }
@@ -140,7 +140,7 @@ type GlobalState @entity {
   id: ID!
   contractVersion: BigInt!
   latestMarketIndex: BigInt!
-  oracleAggregator: oracleAggregator!
+  OracleAggregator: OracleAggregator!
   adminAddress: Bytes!
   staker: Staker!
   tokenFactory: TokenFactory!

@@ -14,7 +14,7 @@ var TestErc20 = {
 };
 
 var abi$1 = Ethers.makeAbi([
-      "function mintLong(uint256 marketIndex,uint256 amount)",
+      "function mintLong(uint256 marketIndex,uint256 amount) @5000000",
       "function mintShort(uint256 marketIndex,uint256 amount)",
       "function redeemLong(uint256 marketIndex,uint256 tokensToRedeem)",
       "function redeemShort(uint256 marketIndex,uint256 tokensToRedeem)",

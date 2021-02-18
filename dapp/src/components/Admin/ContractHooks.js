@@ -14,6 +14,10 @@ function useDaiBalance(param) {
   var optProviderOrSigner = ContractActions.useProviderOrSigner(undefined);
   var fetchBalanceFunction = function (param, chainId, userId) {
     var providerOrSigner = Belt_Option.getExn(optProviderOrSigner);
+    console.log([
+          "The dai contract address",
+          Config.daiContractAddress(String(chainId))
+        ]);
     return Contracts.Erc20.make(Config.daiContractAddress(String(chainId)), providerOrSigner).balanceOf(userId);
   };
   return Swr((function (param) {

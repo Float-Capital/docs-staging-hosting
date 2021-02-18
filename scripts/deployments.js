@@ -18,4 +18,6 @@ files.map((file) => {
   });
 });
 
+output["97"]["Dai"] = "0x8301F2213c0eeD49a7E28Ae4c3e91722919B8B47";
+
 console.log(JSON.stringify(output, null, 2));

@@ -42,7 +42,7 @@
     "res:clean": "bsb -clean-world",
     "res:start": "bsb -make-world -w",
     "dev": "npm-run-all --parallel res:start next:dev",
-    "updateSchema": "get-graphql-schema https://api.thegraph.com/subgraphs/name/avolabs-io/float-capital-goerli -j > graphql_schema.json"
+    "updateSchema": "get-graphql-schema https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital -j > graphql_schema.json"
   },
   "devDependencies": {
     "@apollo/client": "^3.3.7",
