@@ -27,7 +27,7 @@ dataSources:
         - name: LongShort
           file: ./abis/LongShort.json
       eventHandlers:
-        - event: V1(address,address,address,address)
+        - event: V1(address,address,address)
           handler: handleV1
         - event: FeesLevied(uint256,uint256,uint256)
           handler: handleFeesLevied
