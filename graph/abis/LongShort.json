@@ -19,18 +19,6 @@
         "internalType": "uint256",
         "name": "totalFees",
         "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "longPercentage",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "shortPercentage",
-        "type": "uint256"
       }
     ],
     "name": "FeesLevied",
@@ -398,12 +386,6 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "totalValueLocked",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
         "name": "totalValueLockedInMarket",
         "type": "uint256"
       },
@@ -635,6 +617,25 @@
         "type": "uint256"
       }
     ],
+    "name": "getLiquidFunds",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      }
+    ],
     "name": "getLongBeta",
     "outputs": [
       {
@@ -659,6 +660,35 @@
       {
         "internalType": "uint256",
         "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "marketIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "getYieldSplit",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "marketAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "daoAmount",
         "type": "uint256"
       }
     ],
@@ -1040,8 +1070,14 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "totalValueLocked",
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "totalValueLockedInDao",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1061,6 +1097,25 @@
       }
     ],
     "name": "totalValueLockedInMarket",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "totalValueLockedInYieldManager",
     "outputs": [
       {
         "internalType": "uint256",
