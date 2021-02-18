@@ -126,38 +126,6 @@ let make = () => {
     | {data: None, error: None, loading: false} =>
       "You might think this is impossible, but depending on the situation it might not be!"->React.string
     }}
-    // {switch Queries.MarketDetails.use() {
-    // | {loading: true} => "Loading..."->React.string
-    // | {error: Some(_error)} => "Error loading data"->React.string
-    // | {data: Some({syntheticMarkets})} => <>
-    //     <h1> {"Markets"->React.string} </h1>
-    //     {syntheticMarkets
-    //     ->Array.map(({
-    //       name,
-    //       symbol,
-    //       // marketIndex,
-    //       // totalValueLockedInMarket,
-    //       // oracleAddress,
-    //       // syntheticLong: {
-    //       //   id: idLong,
-    //       //   tokenAddress: tokenAddressLong,
-    //       //   totalValueLocked: totalValueLockedLong,
-    //       //   tokenSupply: tokenSupplyLong,
-    //       //   tokenPrice: tokenPriceLong,
-    //       // },
-    //       // syntheticShort: {
-    //       //   id: idShort,
-    //       //   tokenAddress: tokenAddressShort,
-    //       //   totalValueLocked: totalValueLockedShort,
-    //       //   tokenSupply: tokenSupplyShort,
-    //       //   tokenPrice: tokenPriceShort,
-    //       // },
-    //     }) => <div key=symbol> {name->React.string} </div>)
-    //     ->React.array}
-    //   </>
-    // | {data: None, error: None, loading: false} =>
-    //   "You might think this is impossible, but depending on the situation it might not be!"->React.string
-    // }}
   </AccessControl>
 }
 
