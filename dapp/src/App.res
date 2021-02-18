@@ -63,10 +63,6 @@ let default = (props: props): React.element => {
   <RootProvider>
     <GraphQl>
       {switch router.route {
-      | "/examples" =>
-        <MainLayout>
-          <h1 className="font-bold"> {React.string("Examples Section")} </h1> <div> content </div>
-        </MainLayout>
       | _ => <MainLayout> content </MainLayout>
       }}
     </GraphQl>

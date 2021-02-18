@@ -194,8 +194,9 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
   }, [txStateApprove])
 
   <div className="screen-centered-container">
-    <Form
-      className="trade-form"
+  <ViewBox>
+    <Form      
+      className="this-is-required"
       onSubmit={() => {
         form.submit()
       }}>
@@ -280,6 +281,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
             : "short"} position`}
       </Button>
     </Form>
+      </ViewBox>
     {// {Config.isDevMode // <- this can be used to hide this code when not developing
     //   ? <>
 
