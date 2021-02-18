@@ -48,11 +48,17 @@ type FeeStructure @entity {
   badLiquidityExitFee: BigInt!
 }
 
+enum TokenType {
+  Long
+  Short
+}
+
 type SyntheticToken @entity {
   id: ID! # token address
   tokenAddress: Bytes!
   syntheticMarket: SyntheticMarket!
   totalStaked: BigInt!
+  tokenType: TokenType!
 }
 
 type SyntheticMarket @entity {
@@ -92,6 +98,17 @@ type Stake @entity {
   tokenType: SyntheticToken!
   user: User!
   amount: BigInt!
+  withdrawn: Boolean!
+}
+
+type State @entity {
+  id: ID! # token address - state indexed
+  blockNumber: BigInt!
+  creationTxHash: Bytes!
+  stateIndex: BigInt! #
+  tokenType: SyntheticToken!
+  timestamp: BigInt!
+  accumulativeFloatPerSecond: BigInt!
 }
 
 type YieldManager @entity {
