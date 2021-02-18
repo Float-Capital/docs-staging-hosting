@@ -3,11 +3,17 @@
 import * as Misc from "../../libraries/Misc.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as Ethers from "ethers";
+import * as Ethers from "../../ethereum/Ethers.js";
+import * as Ethers$1 from "ethers";
 import * as MintDai from "./MintDai.js";
+import * as Queries from "../../libraries/Queries.js";
+import * as MintLong from "./MintLong.js";
+import * as MintShort from "./MintShort.js";
 import * as ApproveDai from "./ApproveDai.js";
+import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as RedeemSynth from "./RedeemSynth.js";
 import * as RootProvider from "../../libraries/RootProvider.js";
 
 var context = React.createContext(undefined);
@@ -46,7 +52,7 @@ function AdminTestingPortal$AdminContext$Provider(Props) {
             if (authSet) {
               console.log("b");
               return Belt_Option.map(optAuthHeader, (function (authHeader) {
-                            return new Ethers.Wallet(authHeader, provider);
+                            return new Ethers$1.Wallet(authHeader, provider);
                           }));
             } else {
               console.log("c");
@@ -108,15 +114,56 @@ var AdminContext = {
 
 function AdminTestingPortal$AdminActions(Props) {
   var optEthersWallet = React.useContext(context);
-  if (optEthersWallet !== undefined) {
-    return React.createElement("div", undefined, React.createElement("h1", undefined, "Test Functions"), React.createElement("div", {
-                    className: "border-dashed border-4 border-light-red-500"
-                  }, React.createElement(ApproveDai.make, {}), React.createElement(MintDai.make, {
-                        ethersWallet: optEthersWallet
-                      })));
-  } else {
+  if (optEthersWallet === undefined) {
     return React.createElement("h1", undefined, "No provider is selected. Even if you are using your own private key you still need to login with metamask for the connection to ethereum.");
   }
+  var match = Curry.app(Queries.MarketDetails.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ]);
+  var match$1 = match.data;
+  return React.createElement("div", undefined, React.createElement("h1", undefined, "Test Functions"), React.createElement("div", {
+                  className: "border-dashed border-4 border-light-red-500"
+                }, React.createElement(ApproveDai.make, {}), React.createElement(MintDai.make, {
+                      ethersWallet: optEthersWallet
+                    }), React.createElement("h1", undefined, "Market specific Functions:"), match.loading ? "Loading..." : (
+                    match.error !== undefined ? "Error loading data" : (
+                        match$1 !== undefined ? React.createElement(React.Fragment, undefined, Belt_Array.map(match$1.syntheticMarkets, (function (param) {
+                                      var tokenAddressShort = param.syntheticShort.tokenAddress;
+                                      var tokenAddressLong = param.syntheticLong.tokenAddress;
+                                      var marketIndex = param.marketIndex;
+                                      var symbol = param.symbol;
+                                      return React.createElement("div", {
+                                                  key: symbol,
+                                                  className: "w-full"
+                                                }, React.createElement("h1", {
+                                                      className: "w-full text-5xl underline text-center"
+                                                    }, "Market " + param.name + " (" + symbol + ")"), React.createElement("div", {
+                                                      className: "flex justify-between items-center w-full"
+                                                    }, React.createElement("div", undefined, React.createElement("h1", undefined, "Long(" + Ethers.Utils.toString(tokenAddressLong) + ")"), React.createElement(MintLong.make, {
+                                                              marketIndex: marketIndex
+                                                            }), React.createElement(RedeemSynth.make, {
+                                                              synthTokenAddres: tokenAddressLong
+                                                            })), React.createElement("div", undefined, React.createElement("h1", undefined, "Short(" + Ethers.Utils.toString(tokenAddressShort) + ")"), React.createElement(MintShort.make, {
+                                                              marketIndex: marketIndex
+                                                            }), React.createElement(RedeemSynth.make, {
+                                                              synthTokenAddres: tokenAddressShort
+                                                            }))));
+                                    }))) : "You might think this is impossible, but depending on the situation it might not be!"
+                      )
+                  )));
 }
 
 var AdminActions = {

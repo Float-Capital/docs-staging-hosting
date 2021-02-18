@@ -109,7 +109,47 @@ module AdminActions = {
       <div>
         <h1> {"Test Functions"->React.string} </h1>
         <div className={"border-dashed border-4 border-light-red-500"}>
-          <ApproveDai /> <MintDai ethersWallet />
+          <ApproveDai />
+          <MintDai ethersWallet />
+          // {}
+          <h1> {"Market specific Functions:"->React.string} </h1>
+          {switch Queries.MarketDetails.use() {
+          | {loading: true} => "Loading..."->React.string
+          | {error: Some(_error)} => "Error loading data"->React.string
+          | {data: Some({syntheticMarkets})} => <>
+              {syntheticMarkets
+              ->Array.map(({
+                name,
+                symbol,
+                marketIndex,
+                syntheticLong: {tokenAddress: tokenAddressLong},
+                syntheticShort: {tokenAddress: tokenAddressShort},
+              }) =>
+                <div key=symbol className="w-full">
+                  <h1 className="w-full text-5xl underline text-center">
+                    {`Market ${name} (${symbol})`->React.string}
+                  </h1>
+                  <div className="flex justify-between items-center w-full">
+                    <div>
+                      <h1> {`Long(${tokenAddressLong->Ethers.Utils.toString})`->React.string} </h1>
+                      <MintLong marketIndex />
+                      <RedeemSynth synthTokenAddres=tokenAddressLong />
+                    </div>
+                    <div>
+                      <h1>
+                        {`Short(${tokenAddressShort->Ethers.Utils.toString})`->React.string}
+                      </h1>
+                      <MintShort marketIndex />
+                      <RedeemSynth synthTokenAddres=tokenAddressShort />
+                    </div>
+                  </div>
+                </div>
+              )
+              ->React.array}
+            </>
+          | {data: None, error: None, loading: false} =>
+            "You might think this is impossible, but depending on the situation it might not be!"->React.string
+          }}
         </div>
       </div>
     | None =>

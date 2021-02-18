@@ -6,6 +6,7 @@ let useDaiBalance = () => {
   let fetchBalanceFunction = (_, chainId, userId) => {
     let providerOrSigner = optProviderOrSigner->Option.getExn // Can safely get the value, since this function can ONLY be called when the signerOrProvider is defined.
 
+    Js.log(("The dai contract address", Config.daiContractAddress(~netIdStr=chainId->Int.toString)))
     Contracts.Erc20.balanceOf(
       ~contract=Contracts.Erc20.make(
         ~address=Config.daiContractAddress(~netIdStr=chainId->Int.toString),

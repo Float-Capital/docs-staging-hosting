@@ -22,21 +22,14 @@ module MarketDetails = %graphql(`
     name
     symbol
     marketIndex
-    totalValueLockedInMarket
     oracleAddress
     syntheticLong {
       id
       tokenAddress @ppxCustom(module: "Address")
-      totalValueLocked
-      tokenSupply
-      tokenPrice
     }
     syntheticShort {
       id
       tokenAddress @ppxCustom(module: "Address")
-      totalValueLocked
-      tokenSupply
-      tokenPrice
     }
   }
 }

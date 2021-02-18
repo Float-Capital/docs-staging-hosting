@@ -55,7 +55,7 @@ let initialInput: AdminMintForm.input = {
 }
 
 @react.component
-let make = () => {
+let make = (~marketIndex) => {
   let signer = ContractActions.useSignerExn()
 
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
@@ -80,10 +80,7 @@ let make = () => {
     let mintFunction = () =>
       contractExecutionHandler(
         ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
-        ~contractFunction=Contracts.LongShort.mintLong(
-          ~marketIndex=Ethers.BigNumber.fromUnsafe("1"),
-          ~amount,
-        ),
+        ~contractFunction=Contracts.LongShort.mintLong(~marketIndex, ~amount),
       )
     switch requiresApproval {
     | true =>
