@@ -27,9 +27,11 @@ networks
       console.log(e);
       return;
     }
+
     const inpObj = JSON.parse(input);
+    console.log(network, inpObj.proxies);
     let variables = {
-      ...process.env,
+      // ...process.env,
       NETWORK: network,
     };
     Object.keys(env.implementationVarsToProxies).forEach((x) => {
@@ -37,6 +39,9 @@ networks
         inpObj.proxies[env.implementationVarsToProxies[x]][0].implementation;
     });
 
+    console.log(
+      `NETWORK=${variables.NETWORK} LONGSHORT_IMPLEMENTATION=${variables.LONGSHORT_IMPLEMENTATION} ORACLE_MANAGER_IMPLEMENTATION=${variables.ORACLE_MANAGER_IMPLEMENTATION} YIELD_MANAGER_IMPLEMENTATION=${variables.YIELD_MANAGER_IMPLEMENTATION} STAKER_IMPLEMENTATION=${variables.STAKER_IMPLEMENTATION} yarn verify-contracts`
+    );
     exec(
       `cd contracts; yarn verify-contracts`,
       {
