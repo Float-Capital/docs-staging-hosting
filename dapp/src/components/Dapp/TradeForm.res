@@ -216,19 +216,48 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
       </select>
       {form.input.isMint
         ? <>
-            <input
-              id="amount"
-              className="trade-input"
-              type_="text"
-              placeholder="mint"
-              value=form.input.amount
-              disabled=form.submitting
-              onBlur={_ => form.blurAmount()}
-              onChange={event => form.updateAmount((input, amount) => {
-                  ...input,
-                  amount: amount,
-                }, (event->ReactEvent.Form.target)["value"])}
-            />
+            // <div className="flex flex-row">
+            //   <input
+            //     className="h-16 bg-gray-100 text-grey-darker py-2 font-normal text-grey-darkest border border-gray-100 font-bold w-full py-1 px-2 outline-none text-lg text-gray-600"
+            //     type_="text"
+            //     placeholder="What do you want to learn?"
+            //   />
+            //   <span
+            //     className="flex items-center bg-gray-100 rounded rounded-l-none border-0 px-3 font-bold text-grey-100">
+            //     <span onClick={_ => form.updateAmount((input, amount) => {
+            //           ...input,
+            //           amount: amount,
+            //         }, switch optDaiBalance {
+            //         | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
+            //         | _ => "0"
+            //         })}> {"MAX"->React.string} </span>
+            //   </span>
+            // </div>
+            <div className="flex flex-row m-3">
+              <input
+                id="amount"
+                className="py-2 font-normal text-grey-darkest w-full py-1 px-2 outline-none text-md text-gray-600"
+                type_="text"
+                placeholder="mint"
+                value=form.input.amount
+                disabled=form.submitting
+                onBlur={_ => form.blurAmount()}
+                onChange={event => form.updateAmount((input, amount) => {
+                    ...input,
+                    amount: amount,
+                  }, (event->ReactEvent.Form.target)["value"])}
+              />
+              <span
+                className="flex items-center bg-gray-100 hover:bg-white hover:text-grey-darkest px-5 font-bold">
+                <span onClick={_ => form.updateAmount((input, amount) => {
+                      ...input,
+                      amount: amount,
+                    }, switch optDaiBalance {
+                    | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
+                    | _ => "0"
+                    })}> {"MAX"->React.string} </span>
+              </span>
+            </div>
             {switch (form.amountResult, optAdditionalErrorMessage) {
             | (Some(Error(message)), _)
             | (_, Some(message)) =>
@@ -245,7 +274,11 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
       {form.input.isMint
         ? <input className="trade-input" placeholder="redeem" />
         : <input className="trade-input" placeholder="mint" />}
-      <Button onClick={_ => Js.log("I was clicked")} variant="large"> "Something" </Button>
+      <Button onClick={_ => Js.log("I was clicked")} variant="large">
+        {`${_buttonText} ${form.input.isMint ? "Mint" : "Redeem"} ${form.input.isLong
+            ? "long"
+            : "short"} position`}
+      </Button>
     </Form>
     {// {Config.isDevMode // <- this can be used to hide this code when not developing
     //   ? <>
@@ -319,7 +352,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
     }
     {
       let formatOptBalance = Option.mapWithDefault(_, "Loading", Ethers.Utils.formatEther)
-      <div>
+      <code>
         <p> {"dev only component to display balances"->React.string} </p>
         <p>
           {`dai - balance: ${optDaiBalance->formatOptBalance} - approved: ${optDaiAmountApproved->formatOptBalance}`->React.string}
@@ -330,7 +363,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
         <p>
           {`short - balance: ${optShortBalance->formatOptBalance} - approved: ${optShortAmountApproved->formatOptBalance}`->React.string}
         </p>
-      </div>
+      </code>
     }
 
     //   </>
