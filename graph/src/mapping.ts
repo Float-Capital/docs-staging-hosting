@@ -28,7 +28,7 @@ import {
   SyntheticMarket,
   FeeStructure,
   GlobalState,
-  oracleAggregator,
+  OracleAggregator,
   YieldManager,
   Staker,
   TokenFactory,
@@ -73,14 +73,14 @@ export function handleV1(event: V1): void {
   staker.address = event.params.staker;
   staker.save();
 
-  let oracleAgregator = new oracleAggregator(ORACLE_AGREGATOR_ID);
+  let oracleAgregator = new OracleAggregator(ORACLE_AGREGATOR_ID);
   oracleAgregator.address = event.params.oracleAgregator;
   oracleAgregator.save();
 
   let globalState = new GlobalState(GLOBAL_STATE_ID);
   globalState.contractVersion = BigInt.fromI32(1);
   globalState.latestMarketIndex = ZERO;
-  globalState.oracleAggregator = oracleAgregator.id;
+  globalState.OracleAggregator = oracleAgregator.id;
   globalState.staker = staker.id;
   globalState.tokenFactory = tokenFactory.id;
   globalState.adminAddress = event.params.admin;
