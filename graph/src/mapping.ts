@@ -37,12 +37,15 @@ import {
   CurrentStake,
   Stake,
   User,
+  State,
 } from "../generated/schema";
 import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import {
   getOrCreateLatestSystemState,
   getOrCreateUser,
+  createSyntheticTokenLong,
+  createSyntheticTokenShort,
 } from "./utils/globalStateManager";
 import {
   ZERO,
@@ -155,13 +158,9 @@ export function handleSyntheticTokenCreated(
   let marketIndexString = marketIndex.toString();
 
   // create new synthetic token object.
-  let longToken = new SyntheticToken(longTokenAddress.toHexString());
-  longToken.tokenAddress = longTokenAddress;
-  longToken.totalStaked = ZERO;
+  let longToken = createSyntheticTokenLong(longTokenAddress);
 
-  let shortToken = new SyntheticToken(shortTokenAddress.toHexString());
-  shortToken.tokenAddress = shortTokenAddress;
-  shortToken.totalStaked = ZERO;
+  let shortToken = createSyntheticTokenShort(shortTokenAddress);
 
   let state = getOrCreateLatestSystemState(marketIndex, ZERO, event);
 
@@ -410,6 +409,29 @@ export function handleStateAdded(event: StateAdded): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
+
+  let tokenAddress = event.params.tokenAddress;
+  let tokenAddressString = tokenAddress.toHex();
+  let stateIndex = event.params.stateIndex;
+  let accumulativeFloatPerSecond = event.params.accumulative;
+  // don't necessarily need to emit this since we can get it from event.block
+  let timestampOfState = event.params.timestamp;
+
+  let syntheticToken = SyntheticToken.load(tokenAddressString);
+  if (syntheticToken == null) {
+    log.critical("Token should be defined", []);
+  }
+
+  let state = new State(tokenAddressString + "-" + stateIndex.toString());
+  state.blockNumber = blockNumber;
+  state.creationTxHash = txHash;
+  state.stateIndex = stateIndex;
+  state.timestamp = timestamp;
+  state.tokenType = syntheticToken.id;
+  state.accumulativeFloatPerSecond = accumulativeFloatPerSecond;
+
+  syntheticToken.save();
+  state.save();
 }
 export function handleStakeAdded(event: StakeAdded): void {
   let txHash = event.transaction.hash;
@@ -433,6 +455,7 @@ export function handleStakeAdded(event: StakeAdded): void {
   stake.tokenType = syntheticToken.id;
   stake.user = user.id;
   stake.amount = amount;
+  stake.withdrawn = false;
 
   let currentStake = CurrentStake.load(
     tokenAddressString + "-" + userAddressString
@@ -447,7 +470,10 @@ export function handleStakeAdded(event: StakeAdded): void {
   } else {
     // Note: Only add if still relevant and not withdrawn
     let oldStake = Stake.load(currentStake.currentStake);
-    stake.amount = stake.amount.plus(oldStake.amount);
+    if (!oldStake.withdrawn) {
+      stake.amount = stake.amount.plus(oldStake.amount);
+      oldStake.withdrawn = true;
+    }
   }
   currentStake.currentStake = stake.id;
 
@@ -461,7 +487,42 @@ export function handleStakeWithdrawn(event: StakeWithdrawn): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
+
+  let userAddress = event.params.user;
+  let userAddressString = userAddress.toHex();
+  let tokenAddress = event.params.tokenAddress;
+  let tokenAddressString = tokenAddress.toHex();
+  let amount = event.params.amount;
+
+  let user = getOrCreateUser(userAddress);
+  let syntheticToken = SyntheticToken.load(tokenAddressString);
+  let currentStake = CurrentStake.load(
+    tokenAddressString + "-" + userAddressString
+  );
+  if (currentStake == null) {
+    log.critical("Stake should be defined", []);
+  }
+  let oldStake = Stake.load(currentStake.currentStake);
+
+  // If they are not withdrawing the full amount
+  if (!oldStake.amount.equals(amount)) {
+    let stake = new Stake(txHash.toHex());
+    stake.timestamp = timestamp;
+    stake.blockNumber = blockNumber;
+    stake.creationTxHash = txHash;
+    stake.tokenType = syntheticToken.id;
+    stake.user = user.id;
+    stake.withdrawn = false;
+    stake.amount = oldStake.amount.minus(amount);
+    currentStake.currentStake = stake.id;
+    stake.save();
+  }
+  oldStake.withdrawn = true;
+
+  oldStake.save();
+  currentStake.save();
 }
+
 export function handleFloatMinted(event: FloatMinted): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
