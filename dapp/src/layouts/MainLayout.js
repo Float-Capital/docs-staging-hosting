@@ -23,7 +23,7 @@ function MainLayout$Navigation(Props) {
                           }, React.createElement("div", {
                                 className: "logo-container"
                               }, React.createElement("img", {
-                                    className: "logo-text",
+                                    className: "h-6 md:h-10",
                                     src: "/img/float-capital-logo.png"
                                   }))))
                 }), React.createElement("div", {
@@ -33,6 +33,11 @@ function MainLayout$Navigation(Props) {
                       children: React.createElement("a", {
                             className: "px-3 hover:bg-white"
                           }, "APP")
+                    }), React.createElement(Link, {
+                      href: "/stake",
+                      children: React.createElement("a", {
+                            className: "px-3 hover:bg-white"
+                          }, "STAKE🔥")
                     }), React.createElement(Link, {
                       href: "/dashboard",
                       children: React.createElement("a", {

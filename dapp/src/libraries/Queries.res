@@ -22,25 +22,40 @@ module MarketDetails = %graphql(`
     name
     symbol
     marketIndex
-    totalValueLockedInMarket
     oracleAddress
     syntheticLong {
       id
       tokenAddress @ppxCustom(module: "Address")
-      totalValueLocked
-      tokenSupply
-      tokenPrice
     }
     syntheticShort {
       id
       tokenAddress @ppxCustom(module: "Address")
-      totalValueLocked
-      tokenSupply
-      tokenPrice
     }
   }
 }
+}
 `)
+// syntheticMarkets {
+//   name
+//   symbol
+//   marketIndex
+//   totalValueLockedInMarket
+//   oracleAddress
+//   syntheticLong {
+//     id
+//     tokenAddress @ppxCustom(module: "Address")
+//     totalValueLocked
+//     tokenSupply
+//     tokenPrice
+//   }
+//   syntheticShort {
+//     id
+//     tokenAddress @ppxCustom(module: "Address")
+//     totalValueLocked
+//     tokenSupply
+//     tokenPrice
+//   }
+// }
 // module LatestStateChanges = %graphql(`
 // {
 //   stateChanges (first:5, orderBy:timestamp, orderDirection: desc) {

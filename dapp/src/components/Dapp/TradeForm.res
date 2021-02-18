@@ -195,7 +195,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
 
   <div className="screen-centered-container">
     <Form
-      className="trade-form"
+      className="flex flex-col max-w-xl m-auto p-6 border-white border-solid border-4"
       onSubmit={() => {
         form.submit()
       }}>

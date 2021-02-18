@@ -930,7 +930,7 @@ function TradeForm$1(Props) {
   return React.createElement("div", {
               className: "screen-centered-container"
             }, React.createElement(Form.make, {
-                  className: "trade-form",
+                  className: "flex flex-col max-w-xl m-auto p-6 border-white border-solid border-4",
                   onSubmit: (function (param) {
                       return Curry._1(form.submit, undefined);
                     }),

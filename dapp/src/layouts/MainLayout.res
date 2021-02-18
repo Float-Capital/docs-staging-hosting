@@ -11,14 +11,16 @@ module Navigation = {
         <a className="flex items-center w-1/3">
           <span className="text-xl text-green-800 ml-2 align-middle font-semibold">
             <div className="logo-container">
-              // <img src="/img/water-tile.gif" className="logo-image" />
-              <img src="/img/float-capital-logo.png" className="logo-text" />
+              <img src="/img/float-capital-logo.png" className="h-6 md:h-10" />
             </div>
           </span>
         </a>
       </Link>
       <div className="flex w-2/3 text-lg items-center justify-end">
         <Link href="/dapp"> <a className="px-3 hover:bg-white"> {React.string("APP")} </a> </Link>
+        <Link href="/stake">
+          <a className="px-3 hover:bg-white"> {`STAKE🔥`->React.string} </a>
+        </Link>
         <Link href="/dashboard">
           <a className="px-3 hover:bg-white"> {React.string("DASHBOARD")} </a>
         </Link>

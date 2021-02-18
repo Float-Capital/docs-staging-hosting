@@ -27,10 +27,6 @@ body {
   @apply h-10;
 }
 
-.trade-form {
-  @apply flex flex-col max-w-xl m-auto p-6 border-white border-solid border-4;
-}
-
 .trade-select {
   margin: 12px;
   padding: 10px;
