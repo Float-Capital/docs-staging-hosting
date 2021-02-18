@@ -75,12 +75,14 @@ var Navigation = {
 function MainLayout(Props) {
   var children = Props.children;
   return React.createElement("div", {
-              className: "flex lg:justify-center"
+              className: "flex lg:justify-center min-h-screen"
             }, React.createElement("div", {
                   className: "max-w-5xl w-full lg:w-3/4 text-gray-900 font-base"
-                }, React.createElement(MainLayout$Navigation, {}), React.createElement("main", {
-                      className: "mt-4 mx-4"
-                    }, children)));
+                }, React.createElement("div", {
+                      className: "flex flex-col h-screen"
+                    }, React.createElement(MainLayout$Navigation, {}), React.createElement("div", {
+                          className: "m-auto w-full"
+                        }, children))));
 }
 
 var Link$1;

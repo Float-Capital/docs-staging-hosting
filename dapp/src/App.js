@@ -27,19 +27,13 @@ function App$GraphQl(Props) {
 }
 
 function $$default(props) {
-  var router = Router.useRouter();
+  Router.useRouter();
   var content = React.createElement(props.Component, props.pageProps);
-  var match = router.route;
-  var tmp = match === "/examples" ? React.createElement(MainLayout.make, {
-          children: null
-        }, React.createElement("h1", {
-              className: "font-bold"
-            }, "Examples Section"), React.createElement("div", undefined, content)) : React.createElement(MainLayout.make, {
-          children: content
-        });
   return React.createElement(RootProvider.make, {
               children: React.createElement(App$GraphQl, {
-                    children: tmp
+                    children: React.createElement(MainLayout.make, {
+                          children: content
+                        })
                   })
             });
 }

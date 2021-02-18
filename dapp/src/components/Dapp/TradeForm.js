@@ -8,6 +8,7 @@ import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Loader from "../UI/Loader.js";
 import * as Ethers$1 from "ethers";
+import * as ViewBox from "../UI/ViewBox.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
@@ -929,62 +930,64 @@ function TradeForm$1(Props) {
   };
   return React.createElement("div", {
               className: "screen-centered-container"
-            }, React.createElement(Form.make, {
-                  className: "flex flex-col max-w-xl m-auto p-6 border-white border-solid border-4",
-                  onSubmit: (function (param) {
-                      return Curry._1(form.submit, undefined);
-                    }),
-                  children: null
-                }, React.createElement("h2", undefined, market.name + " (" + market.symbol + ")"), React.createElement("select", {
-                      className: "trade-select",
-                      disabled: form.submitting,
-                      name: "longshort",
-                      value: form.input.isLong ? "long" : "short",
-                      onBlur: (function (param) {
-                          return Curry._1(form.blurAmount, undefined);
-                        }),
-                      onChange: (function ($$event) {
-                          return Curry._2(form.updateIsLong, (function (input, isLong) {
-                                        return {
-                                                amount: input.amount,
-                                                isMint: input.isMint,
-                                                isLong: isLong
-                                              };
-                                      }), $$event.target.value === "long");
-                        })
-                    }, React.createElement("option", {
-                          value: "long"
-                        }, "Long 🐮"), React.createElement("option", {
-                          value: "short"
-                        }, "Short 🐻")), tmp, React.createElement("div", {
-                      className: "trade-switch",
-                      onClick: (function (param) {
-                          return Curry._2(form.updateIsMint, (function (input, isMint) {
-                                        return {
-                                                amount: input.amount,
-                                                isMint: isMint,
-                                                isLong: input.isLong
-                                              };
-                                      }), !form.input.isMint);
-                        })
-                    }, "↑↓"), form.input.isMint ? React.createElement("input", {
-                        className: "trade-input",
-                        placeholder: "redeem"
-                      }) : React.createElement("input", {
-                        className: "trade-input",
-                        placeholder: "mint"
-                      }), React.createElement(Button.make, {
-                      onClick: (function (param) {
-                          console.log("I was clicked");
-                          
-                        }),
-                      children: match$9[1] + " " + (
-                        form.input.isMint ? "Mint" : "Redeem"
-                      ) + " " + (
-                        form.input.isLong ? "long" : "short"
-                      ) + " position",
-                      variant: "large"
-                    })), tmp$2, tmp$3, React.createElement("code", undefined, React.createElement("p", undefined, "dev only component to display balances"), React.createElement("p", undefined, "dai - balance: " + formatOptBalance(optDaiBalance) + " - approved: " + formatOptBalance(optDaiAmountApproved)), React.createElement("p", undefined, "long - balance: " + formatOptBalance(match$5[0]) + " - approved: " + formatOptBalance(match$5[1])), React.createElement("p", undefined, "short - balance: " + formatOptBalance(match$4[0]) + " - approved: " + formatOptBalance(match$4[1]))));
+            }, React.createElement(ViewBox.make, {
+                  children: React.createElement(Form.make, {
+                        className: "this-is-required",
+                        onSubmit: (function (param) {
+                            return Curry._1(form.submit, undefined);
+                          }),
+                        children: null
+                      }, React.createElement("h2", undefined, market.name + " (" + market.symbol + ")"), React.createElement("select", {
+                            className: "trade-select",
+                            disabled: form.submitting,
+                            name: "longshort",
+                            value: form.input.isLong ? "long" : "short",
+                            onBlur: (function (param) {
+                                return Curry._1(form.blurAmount, undefined);
+                              }),
+                            onChange: (function ($$event) {
+                                return Curry._2(form.updateIsLong, (function (input, isLong) {
+                                              return {
+                                                      amount: input.amount,
+                                                      isMint: input.isMint,
+                                                      isLong: isLong
+                                                    };
+                                            }), $$event.target.value === "long");
+                              })
+                          }, React.createElement("option", {
+                                value: "long"
+                              }, "Long 🐮"), React.createElement("option", {
+                                value: "short"
+                              }, "Short 🐻")), tmp, React.createElement("div", {
+                            className: "trade-switch",
+                            onClick: (function (param) {
+                                return Curry._2(form.updateIsMint, (function (input, isMint) {
+                                              return {
+                                                      amount: input.amount,
+                                                      isMint: isMint,
+                                                      isLong: input.isLong
+                                                    };
+                                            }), !form.input.isMint);
+                              })
+                          }, "↑↓"), form.input.isMint ? React.createElement("input", {
+                              className: "trade-input",
+                              placeholder: "redeem"
+                            }) : React.createElement("input", {
+                              className: "trade-input",
+                              placeholder: "mint"
+                            }), React.createElement(Button.make, {
+                            onClick: (function (param) {
+                                console.log("I was clicked");
+                                
+                              }),
+                            children: match$9[1] + " " + (
+                              form.input.isMint ? "Mint" : "Redeem"
+                            ) + " " + (
+                              form.input.isLong ? "long" : "short"
+                            ) + " position",
+                            variant: "large"
+                          }))
+                }), tmp$2, tmp$3, React.createElement("code", undefined, React.createElement("p", undefined, "dev only component to display balances"), React.createElement("p", undefined, "dai - balance: " + formatOptBalance(optDaiBalance) + " - approved: " + formatOptBalance(optDaiAmountApproved)), React.createElement("p", undefined, "long - balance: " + formatOptBalance(match$5[0]) + " - approved: " + formatOptBalance(match$5[1])), React.createElement("p", undefined, "short - balance: " + formatOptBalance(match$4[0]) + " - approved: " + formatOptBalance(match$4[1]))));
 }
 
 var make = TradeForm$1;

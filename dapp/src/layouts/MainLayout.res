@@ -54,9 +54,11 @@ module Navigation = {
 
 @react.component
 let make = (~children) => {
-  <div className="flex lg:justify-center">
+  <div className="flex lg:justify-center min-h-screen">
     <div className="max-w-5xl w-full lg:w-3/4 text-gray-900 font-base">
-      <Navigation /> <main className="mt-4 mx-4"> children </main>
+      <div className="flex flex-col h-screen">
+        <Navigation /> <div className="m-auto w-full"> children </div>
+      </div>
     </div>
   </div>
 }

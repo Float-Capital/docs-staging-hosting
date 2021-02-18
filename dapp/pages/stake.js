@@ -3,7 +3,7 @@ import Head from "next/head";
 
 export default function StakePage(props) {
   return (
-    <div>
+    <>
       <Head>
         <title>Float Capital | Stake</title>
         <meta
@@ -13,6 +13,6 @@ export default function StakePage(props) {
         />
       </Head>
       <Stake {...props} />
-    </div>
+    </>
   );
 }
