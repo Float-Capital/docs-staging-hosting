@@ -23,7 +23,7 @@ function MainLayout$Navigation(Props) {
                           }, React.createElement("div", {
                                 className: "logo-container"
                               }, React.createElement("img", {
-                                    className: "logo-text",
+                                    className: "h-6 md:h-10",
                                     src: "/img/float-capital-logo.png"
                                   }))))
                 }), React.createElement("div", {
@@ -33,6 +33,11 @@ function MainLayout$Navigation(Props) {
                       children: React.createElement("a", {
                             className: "px-3 hover:bg-white"
                           }, "APP")
+                    }), React.createElement(Link, {
+                      href: "/stake",
+                      children: React.createElement("a", {
+                            className: "px-3 hover:bg-white"
+                          }, "STAKE🔥")
                     }), React.createElement(Link, {
                       href: "/dashboard",
                       children: React.createElement("a", {
@@ -70,12 +75,14 @@ var Navigation = {
 function MainLayout(Props) {
   var children = Props.children;
   return React.createElement("div", {
-              className: "flex lg:justify-center"
+              className: "flex lg:justify-center min-h-screen"
             }, React.createElement("div", {
                   className: "max-w-5xl w-full lg:w-3/4 text-gray-900 font-base"
-                }, React.createElement(MainLayout$Navigation, {}), React.createElement("main", {
-                      className: "mt-4 mx-4"
-                    }, children)));
+                }, React.createElement("div", {
+                      className: "flex flex-col h-screen"
+                    }, React.createElement(MainLayout$Navigation, {}), React.createElement("div", {
+                          className: "m-auto w-full"
+                        }, children))));
 }
 
 var Link$1;
