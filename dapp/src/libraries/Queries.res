@@ -34,6 +34,19 @@ module MarketDetails = %graphql(`
   }
 }
 `)
+
+module SyntheticTokens = %graphql(`
+{
+  syntheticTokens{
+    id
+    syntheticMarket {
+      id
+      name
+    }
+    tokenType
+  }
+}
+`)
 // syntheticMarkets {
 //   name
 //   symbol

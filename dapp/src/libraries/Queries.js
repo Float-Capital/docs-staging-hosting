@@ -289,9 +289,144 @@ var MarketDetails = {
   useLazyWithVariables: MarketDetails_useLazyWithVariables
 };
 
+var Raw$2 = {};
+
+var query$2 = (require("@apollo/client").gql`
+  query   {
+    syntheticTokens  {
+      __typename
+      id
+      syntheticMarket  {
+        __typename
+        id
+        name
+      }
+      tokenType
+    }
+  }
+`);
+
+function parse$2(value) {
+  var value$1 = value.syntheticTokens;
+  return {
+          syntheticTokens: value$1.map(function (value) {
+                var value$1 = value.syntheticMarket;
+                var value$2 = value.tokenType;
+                var tmp;
+                switch (value$2) {
+                  case "Long" :
+                      tmp = "Long";
+                      break;
+                  case "Short" :
+                      tmp = "Short";
+                      break;
+                  default:
+                    tmp = {
+                      NAME: "FutureAddedValue",
+                      VAL: value$2
+                    };
+                }
+                return {
+                        __typename: value.__typename,
+                        id: value.id,
+                        syntheticMarket: {
+                          __typename: value$1.__typename,
+                          id: value$1.id,
+                          name: value$1.name
+                        },
+                        tokenType: tmp
+                      };
+              })
+        };
+}
+
+function serialize$2(value) {
+  var value$1 = value.syntheticTokens;
+  var syntheticTokens = value$1.map(function (value) {
+        var value$1 = value.tokenType;
+        var tokenType = typeof value$1 === "string" ? (
+            value$1 === "Long" ? "Long" : "Short"
+          ) : value$1.VAL;
+        var value$2 = value.syntheticMarket;
+        var value$3 = value$2.name;
+        var value$4 = value$2.id;
+        var value$5 = value$2.__typename;
+        var syntheticMarket = {
+          __typename: value$5,
+          id: value$4,
+          name: value$3
+        };
+        var value$6 = value.id;
+        var value$7 = value.__typename;
+        return {
+                __typename: value$7,
+                id: value$6,
+                syntheticMarket: syntheticMarket,
+                tokenType: tokenType
+              };
+      });
+  return {
+          syntheticTokens: syntheticTokens
+        };
+}
+
+function serializeVariables$2(param) {
+  
+}
+
+function makeVariables$2(param) {
+  
+}
+
+function makeDefaultVariables$2(param) {
+  
+}
+
+var SyntheticTokens_inner = {
+  Raw: Raw$2,
+  query: query$2,
+  parse: parse$2,
+  serialize: serialize$2,
+  serializeVariables: serializeVariables$2,
+  makeVariables: makeVariables$2,
+  makeDefaultVariables: makeDefaultVariables$2
+};
+
+var include$2 = ApolloClient__React_Hooks_UseQuery.Extend({
+      query: query$2,
+      Raw: Raw$2,
+      parse: parse$2,
+      serialize: serialize$2,
+      serializeVariables: serializeVariables$2
+    });
+
+var SyntheticTokens_refetchQueryDescription = include$2.refetchQueryDescription;
+
+var SyntheticTokens_use = include$2.use;
+
+var SyntheticTokens_useLazy = include$2.useLazy;
+
+var SyntheticTokens_useLazyWithVariables = include$2.useLazyWithVariables;
+
+var SyntheticTokens = {
+  SyntheticTokens_inner: SyntheticTokens_inner,
+  Raw: Raw$2,
+  query: query$2,
+  parse: parse$2,
+  serialize: serialize$2,
+  serializeVariables: serializeVariables$2,
+  makeVariables: makeVariables$2,
+  makeDefaultVariables: makeDefaultVariables$2,
+  refetchQueryDescription: SyntheticTokens_refetchQueryDescription,
+  use: SyntheticTokens_use,
+  useLazy: SyntheticTokens_useLazy,
+  useLazyWithVariables: SyntheticTokens_useLazyWithVariables
+};
+
 export {
   LatestSystemState ,
   MarketDetails ,
+  SyntheticTokens ,
   
 }
 /* query Not a pure module */

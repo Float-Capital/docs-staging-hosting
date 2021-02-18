@@ -236,31 +236,24 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
             //         })}> {"MAX"->React.string} </span>
             //   </span>
             // </div>
-            <div className="flex flex-row m-3">
-              <input
-                id="amount"
-                className="py-2 font-normal text-grey-darkest w-full py-1 px-2 outline-none text-md text-gray-600"
-                type_="text"
-                placeholder="mint"
-                value=form.input.amount
-                disabled=form.submitting
-                onBlur={_ => form.blurAmount()}
-                onChange={event => form.updateAmount((input, amount) => {
+            <MaxInput 
+              value=form.input.amount
+              disabled=form.submitting
+              onBlur={_ => form.blurAmount()} 
+              onChange={event => form.updateAmount((input, amount) => {
+                  ...input,
+                  amount: amount,
+                }, (event->ReactEvent.Form.target)["value"])}
+                placeholder={"mint"}
+                onMaxClick={_ => form.updateAmount((input, amount) => {
                     ...input,
                     amount: amount,
-                  }, (event->ReactEvent.Form.target)["value"])}
-              />
-              <span
-                className="flex items-center bg-gray-100 hover:bg-white hover:text-grey-darkest px-5 font-bold">
-                <span onClick={_ => form.updateAmount((input, amount) => {
-                      ...input,
-                      amount: amount,
-                    }, switch optDaiBalance {
-                    | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
-                    | _ => "0"
-                    })}> {"MAX"->React.string} </span>
-              </span>
-            </div>
+                  }, switch optDaiBalance {
+                  | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
+                  | _ => "0"
+                  })
+                } 
+            />
             {switch (form.amountResult, optAdditionalErrorMessage) {
             | (Some(Error(message)), _)
             | (_, Some(message)) =>
