@@ -2,10 +2,13 @@
 
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
+import * as Button from "./components/UI/Button.js";
 import * as Ethers from "./ethereum/Ethers.js";
+import * as Toggle from "./components/UI/Toggle.js";
 import * as Queries from "./libraries/Queries.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as DaiBalance from "./components/ExampleViewFunctions/DaiBalance.js";
+import * as FormatMoney from "./components/UI/FormatMoney.js";
 import * as Router from "next/router";
 import * as AccessControl from "./components/AccessControl.js";
 import FromUnixTime from "date-fns/fromUnixTime";
@@ -13,7 +16,7 @@ import FormatDistanceToNow from "date-fns/formatDistanceToNow";
 
 function Dashboard(Props) {
   var router = Router.useRouter();
-  var match = Curry.app(Queries.LatestSystemState.use, [
+  var match = Curry.app(Queries.MarketDetails.use, [
         undefined,
         undefined,
         undefined,
@@ -30,26 +33,7 @@ function Dashboard(Props) {
         undefined
       ]);
   var match$1 = match.data;
-  var tmp;
-  if (match.loading) {
-    tmp = "Loading...";
-  } else if (match.error !== undefined) {
-    tmp = "Error loading data";
-  } else if (match$1 !== undefined) {
-    var match$2 = match$1.systemStates;
-    if (match$2.length !== 1) {
-      tmp = "Query returned wrong number of results";
-    } else {
-      var match$3 = match$2[0];
-      var timeSinceUpdate = FormatDistanceToNow(FromUnixTime(match$3.timestamp.toNumber()));
-      tmp = React.createElement(React.Fragment, undefined, React.createElement("a", {
-                href: "https://goerli.etherscan.io/tx/" + match$3.txHash
-              }, "Latest update happened " + timeSinceUpdate + " ago. (view on block-explorer) by " + match$3.setBy), React.createElement("p", undefined, "SyntheticPrice " + Ethers.Utils.formatEther(match$3.syntheticPrice) + "$"), React.createElement("p", undefined, "Long Token Price " + Ethers.Utils.formatEther(match$3.longTokenPrice) + "$"), React.createElement("p", undefined, "Short Token Price " + Ethers.Utils.formatEther(match$3.shortTokenPrice) + "$"), React.createElement("p", undefined, "Total locked long " + Ethers.Utils.formatEther(match$3.totalLockedLong) + "$"), React.createElement("p", undefined, "Total Locked Short " + Ethers.Utils.formatEther(match$3.totalLockedShort) + "$"), React.createElement("p", undefined, "Total Locked " + Ethers.Utils.formatEther(match$3.totalValueLocked) + "$"), React.createElement("p", undefined, "TODO:"), React.createElement("p", undefined, "show the ratio of long to short in the same chart"), React.createElement("p", undefined, "show historic returns of long asset (history APY)"), React.createElement("p", undefined, "show current APY on opposing side (probably short)"));
-    }
-  } else {
-    tmp = "You might think this is impossible, but depending on the situation it might not be!";
-  }
-  var match$4 = Curry.app(Queries.MarketDetails.use, [
+  var match$2 = Curry.app(Queries.LatestSystemState.use, [
         undefined,
         undefined,
         undefined,
@@ -65,7 +49,26 @@ function Dashboard(Props) {
         undefined,
         undefined
       ]);
-  var match$5 = match$4.data;
+  var match$3 = match$2.data;
+  var tmp;
+  if (match$2.loading) {
+    tmp = "Loading...";
+  } else if (match$2.error !== undefined) {
+    tmp = "Error loading data";
+  } else if (match$3 !== undefined) {
+    var match$4 = match$3.systemStates;
+    if (match$4.length !== 1) {
+      tmp = "Query returned wrong number of results";
+    } else {
+      var match$5 = match$4[0];
+      var timeSinceUpdate = FormatDistanceToNow(FromUnixTime(match$5.timestamp.toNumber()));
+      tmp = React.createElement(React.Fragment, undefined, React.createElement("a", {
+                href: "https://goerli.etherscan.io/tx/" + match$5.txHash
+              }, "Latest update happened " + timeSinceUpdate + " ago. (view on block-explorer) by " + match$5.setBy), React.createElement("p", undefined, "SyntheticPrice " + Ethers.Utils.formatEther(match$5.syntheticPrice) + "$"), React.createElement("p", undefined, "Long Token Price " + Ethers.Utils.formatEther(match$5.longTokenPrice) + "$"), React.createElement("p", undefined, "Short Token Price " + Ethers.Utils.formatEther(match$5.shortTokenPrice) + "$"), React.createElement("p", undefined, "Total locked long " + Ethers.Utils.formatEther(match$5.totalLockedLong) + "$"), React.createElement("p", undefined, "Total Locked Short " + Ethers.Utils.formatEther(match$5.totalLockedShort) + "$"), React.createElement("p", undefined, "Total Locked " + Ethers.Utils.formatEther(match$5.totalValueLocked) + "$"), React.createElement("p", undefined, "TODO:"), React.createElement("p", undefined, "show the ratio of long to short in the same chart"), React.createElement("p", undefined, "show historic returns of long asset (history APY)"), React.createElement("p", undefined, "show current APY on opposing side (probably short)"));
+    }
+  } else {
+    tmp = "You might think this is impossible, but depending on the situation it might not be!";
+  }
   return React.createElement(AccessControl.make, {
               children: null,
               alternateComponent: React.createElement("h1", {
@@ -74,15 +77,43 @@ function Dashboard(Props) {
                         
                       })
                   }, "Login to view your dashboard")
-            }, React.createElement("h1", undefined, "Dashboard"), React.createElement(DaiBalance.make, {}), tmp, match$4.loading ? "Loading..." : (
-                match$4.error !== undefined ? "Error loading data" : (
-                    match$5 !== undefined ? React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Markets"), Belt_Array.map(match$5.syntheticMarkets, (function (param) {
-                                  return React.createElement("div", {
-                                              key: param.symbol
-                                            }, param.name);
-                                }))) : "You might think this is impossible, but depending on the situation it might not be!"
-                  )
-              ));
+            }, React.createElement(Toggle.make, {
+                  onClick: (function (param) {
+                      console.log("Switch to diff currency");
+                      
+                    }),
+                  preLabel: "BUSD",
+                  postLabel: "BNB"
+                }), React.createElement("div", {
+                  className: "grid grid-cols-2 gap-4 items-center my-5"
+                }, React.createElement("div", {
+                      className: "col-span-2"
+                    }, React.createElement("div", {
+                          className: "p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 rounded"
+                        }, React.createElement("h2", undefined, "Total Value Locked up "), React.createElement("h1", undefined, React.createElement(FormatMoney.make, {
+                                  number: 1234567.891
+                                })), React.createElement("h1", undefined, "$ 123,456,789.00"))), React.createElement("div", undefined, React.createElement("div", {
+                          className: "p-5 flex flex-col items-center bg-white bg-opacity-75  rounded"
+                        }, React.createElement("h2", undefined, "Markets"), match.loading ? "Loading..." : (
+                            match.error !== undefined ? "Error loading data" : (
+                                match$1 !== undefined ? React.createElement(React.Fragment, undefined, Belt_Array.map(match$1.syntheticMarkets, (function (param) {
+                                              var symbol = param.symbol;
+                                              return React.createElement("div", {
+                                                          key: symbol,
+                                                          className: "flex justify-between items-center w-full"
+                                                        }, React.createElement("p", undefined, param.name), React.createElement("p", undefined, symbol), React.createElement(Button.make, {
+                                                              onClick: (function (param) {
+                                                                  router.push("/dapp?market=" + symbol);
+                                                                  
+                                                                }),
+                                                              children: "TRADE",
+                                                              variant: "small"
+                                                            }));
+                                            }))) : "You might think this is impossible, but depending on the situation it might not be!"
+                              )
+                          ))), React.createElement("div", undefined, React.createElement("div", {
+                          className: "p-5 flex flex-col items-center justify-center bg-white bg-opacity-75  rounded"
+                        }, React.createElement("h2", undefined, "Stake")))), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("h1", undefined, "Dashboard"), React.createElement(DaiBalance.make, {}), tmp);
 }
 
 var make = Dashboard;
