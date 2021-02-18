@@ -9,6 +9,7 @@ import * as Ethers from "../../ethereum/Ethers.js";
 import * as Loader from "../UI/Loader.js";
 import * as Ethers$1 from "ethers";
 import * as ViewBox from "../UI/ViewBox.js";
+import * as MaxInput from "../UI/MaxInput.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
@@ -814,40 +815,32 @@ function TradeForm$1(Props) {
             className: "text-red-600"
           }, message);
     }
-    tmp = React.createElement(React.Fragment, undefined, React.createElement("div", {
-              className: "flex flex-row m-3"
-            }, React.createElement("input", {
-                  className: "py-2 font-normal text-grey-darkest w-full py-1 px-2 outline-none text-md text-gray-600",
-                  id: "amount",
-                  disabled: form.submitting,
-                  placeholder: "mint",
-                  type: "text",
-                  value: form.input.amount,
-                  onBlur: (function (param) {
-                      return Curry._1(form.blurAmount, undefined);
-                    }),
-                  onChange: (function ($$event) {
-                      return Curry._2(form.updateAmount, (function (input, amount) {
-                                    return {
-                                            amount: amount,
-                                            isMint: input.isMint,
-                                            isLong: input.isLong
-                                          };
-                                  }), $$event.target.value);
-                    })
-                }), React.createElement("span", {
-                  className: "flex items-center bg-gray-100 hover:bg-white hover:text-grey-darkest px-5 font-bold"
-                }, React.createElement("span", {
-                      onClick: (function (param) {
-                          return Curry._2(form.updateAmount, (function (input, amount) {
-                                        return {
-                                                amount: amount,
-                                                isMint: input.isMint,
-                                                isLong: input.isLong
-                                              };
-                                      }), optDaiBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optDaiBalance)) : "0");
-                        })
-                    }, "MAX"))), tmp$1);
+    tmp = React.createElement(React.Fragment, undefined, React.createElement(MaxInput.make, {
+              placeholder: "mint",
+              value: form.input.amount,
+              disabled: form.submitting,
+              onBlur: (function (param) {
+                  return Curry._1(form.blurAmount, undefined);
+                }),
+              onChange: (function ($$event) {
+                  return Curry._2(form.updateAmount, (function (input, amount) {
+                                return {
+                                        amount: amount,
+                                        isMint: input.isMint,
+                                        isLong: input.isLong
+                                      };
+                              }), $$event.target.value);
+                }),
+              onMaxClick: (function (param) {
+                  return Curry._2(form.updateAmount, (function (input, amount) {
+                                return {
+                                        amount: amount,
+                                        isMint: input.isMint,
+                                        isLong: input.isLong
+                                      };
+                              }), optDaiBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optDaiBalance)) : "0");
+                })
+            }), tmp$1);
   } else {
     tmp = React.createElement("input", {
           className: "trade-input",

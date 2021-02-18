@@ -16,36 +16,83 @@ module Stake = {
     let isHotAPY = apy => apy > 0.15
     let isShort = position => position == "short" // improve with types structure
 
-    let synthenticTokens = [
-      {
-        id: "0x00",
-        symbol: "ethK",
-        position: "long",
-        apy: 0.11,
-        balance: 0.,
-      },
-      {
-        id: "0x01",
-        symbol: "ethK",
-        position: "short",
-        balance: 10.,
-        apy: 0.11,
-      },
-      {
-        id: "0x02",
-        symbol: "ebdom",
-        position: "long",
-        balance: 0.,
-        apy: 0.2,
-      },
-      {
-        id: "0x03",
-        symbol: "ebdom",
-        position: "short",
-        balance: 0.,
-        apy: 0.2,
-      },
-    ]
+    let (synthenticTokens, setSyntheticTokens) = React.useState(() => [])
+    let tokens = Queries.SyntheticTokens.use();
+
+    React.useEffect1(() => {
+      switch(tokens){
+        | {loading: true} => None
+        | {error: Some(_error)} => {
+            Js.log("error")
+            setSyntheticTokens(_ => []);
+            None;
+          }
+        | {data: Some({syntheticTokens})} => {
+          setSyntheticTokens(_ => syntheticTokens -> Array.map(({
+            id,
+            syntheticMarket: {
+              name: symbol
+            },
+            tokenType: position
+          }) => ({
+            id,
+            symbol,
+            apy: 0.2,
+            balance: 0., /// need to pull this in at some stage
+            position: position->Js.String2.make->Js.String.toLowerCase
+          })) -> SortArray.stableSortBy((a, b) => 
+            switch(Js.String.localeCompare(a.symbol, b.symbol)){
+              | greater when greater > 0.0 => -1
+              | lesser when lesser < 0.0 => 1
+              | _ => {
+                switch((a.position, b.position)){
+                  | ("long", "short") => -1
+                  | ("short", "long") => 1
+                  | (_, _) => 0
+                }
+              }
+            }
+          ));
+          None
+        }
+        | {data: None, error: None, loading: false} => {
+                      setSyntheticTokens(_ => []);
+          Js.log("You might think this is impossible, but depending on the situation it might not be!");
+          None
+        }
+      }
+    },[tokens]);
+
+    // let synthenticTokens = [
+    //   {
+    //     id: "0x00",
+    //     symbol: "ethK",
+    //     position: "long",
+    //     apy: 0.11,
+    //     balance: 0.,
+    //   },
+    //   {
+    //     id: "0x01",
+    //     symbol: "ethK",
+    //     position: "short",
+    //     balance: 10.,
+    //     apy: 0.11,
+    //   },
+    //   {
+    //     id: "0x02",
+    //     symbol: "ebdom",
+    //     position: "long",
+    //     balance: 0.,
+    //     apy: 0.2,
+    //   },
+    //   {
+    //     id: "0x03",
+    //     symbol: "ebdom",
+    //     position: "short",
+    //     balance: 0.,
+    //     apy: 0.2,
+    //   },
+    // ]
 
     let tokenId = router.query->Js.Dict.get("tokenId")
 
@@ -57,7 +104,7 @@ module Stake = {
         <h1> {"Stake"->React.string} </h1>
         {synthenticTokens
         ->Array.map(token => {
-          <Card key=token.symbol>
+          <Card key={token.symbol++token.position}>
             <div className="flex justify-between items-center w-full">
               <div className="flex flex-col">
                 <h3 className="font-bold"> {"Token"->React.string} </h3>
@@ -95,6 +142,7 @@ module Stake = {
         | Some(id) => id->React.string
         | _ => React.null
         }}
+        <StakeForm/>
       </ViewBox>
     </AccessControl>
   }
