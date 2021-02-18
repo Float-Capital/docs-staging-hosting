@@ -4,7 +4,10 @@ let isDevMode = devMode == Some("true")
 
 let longshortContractAbi = [""]->Ethers.makeAbi
 
-type contractDetails = {@as("LongShort") longShort: Ethers.ethAddress}
+type contractDetails = {
+  @as("LongShort") longShort: Ethers.ethAddress,
+  @as("Dai") dai: Ethers.ethAddress,
+}
 
 type allChainContractDetails = Js.Dict.t<contractDetails>
 
@@ -30,8 +33,11 @@ let useLongShortAddress = () => {
 
 let daiContractAddress = (~netIdStr) => {
   Js.log(netIdStr)
-  Ethers.Utils.getAddressUnsafe("0x096c8301e153037df723c23e2de113941cb973ef")
+  allContracts
+  ->Js.Dict.get(netIdStr)
+  ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.dai)
 }
+
 let useDaiAddress = () => {
   let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
   daiContractAddress(~netIdStr)

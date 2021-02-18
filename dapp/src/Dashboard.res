@@ -12,13 +12,56 @@ let make = () => {
         <div
           className="p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 rounded">
           <h2> {"Total Value Locked up "->React.string} </h2>
+          <h1> <FormatMoney number={1234567.891} /> </h1>
           <h1> {"$ 123,456,789.00"->React.string} </h1>
         </div>
       </div>
       <div>
-        <div
-          className="p-5 flex flex-col items-center justify-center bg-white bg-opacity-75  rounded">
+        <div className="p-5 flex flex-col items-center bg-white bg-opacity-75  rounded">
           <h2> {"Markets"->React.string} </h2>
+          {switch Queries.MarketDetails.use() {
+          | {loading: true} => "Loading..."->React.string
+          | {error: Some(_error)} => "Error loading data"->React.string
+          | {data: Some({syntheticMarkets})} => <>
+              {syntheticMarkets
+              ->Array.map(({
+                name,
+                symbol,
+                // marketIndex,
+                // totalValueLockedInMarket,
+                // oracleAddress,
+                // syntheticLong: {
+                //   id: idLong,
+                //   tokenAddress: tokenAddressLong,
+                //   totalValueLocked: totalValueLockedLong,
+                //   tokenSupply: tokenSupplyLong,
+                //   tokenPrice: tokenPriceLong,
+                // },
+                // syntheticShort: {
+                //   id: idShort,
+                //   tokenAddress: tokenAddressShort,
+                //   totalValueLocked: totalValueLockedShort,
+                //   tokenSupply: tokenSupplyShort,
+                //   tokenPrice: tokenPriceShort,
+                // },
+              }) =>
+                <div className="flex justify-between items-center w-full" key=symbol>
+                  <p> {name->React.string} </p>
+                  <p> {symbol->React.string} </p>
+                  <Button
+                    onClick={_ => {
+                      router->Next.Router.push(`/dapp?market=${symbol}`)
+                    }}
+                    variant="small">
+                    "TRADE"
+                  </Button>
+                </div>
+              )
+              ->React.array}
+            </>
+          | {data: None, error: None, loading: false} =>
+            "You might think this is impossible, but depending on the situation it might not be!"->React.string
+          }}
         </div>
       </div>
       <div>
@@ -83,38 +126,38 @@ let make = () => {
     | {data: None, error: None, loading: false} =>
       "You might think this is impossible, but depending on the situation it might not be!"->React.string
     }}
-    {switch Queries.MarketDetails.use() {
-    | {loading: true} => "Loading..."->React.string
-    | {error: Some(_error)} => "Error loading data"->React.string
-    | {data: Some({syntheticMarkets})} => <>
-        <h1> {"Markets"->React.string} </h1>
-        {syntheticMarkets
-        ->Array.map(({
-          name,
-          symbol,
-          // marketIndex,
-          // totalValueLockedInMarket,
-          // oracleAddress,
-          // syntheticLong: {
-          //   id: idLong,
-          //   tokenAddress: tokenAddressLong,
-          //   totalValueLocked: totalValueLockedLong,
-          //   tokenSupply: tokenSupplyLong,
-          //   tokenPrice: tokenPriceLong,
-          // },
-          // syntheticShort: {
-          //   id: idShort,
-          //   tokenAddress: tokenAddressShort,
-          //   totalValueLocked: totalValueLockedShort,
-          //   tokenSupply: tokenSupplyShort,
-          //   tokenPrice: tokenPriceShort,
-          // },
-        }) => <div key=symbol> {name->React.string} </div>)
-        ->React.array}
-      </>
-    | {data: None, error: None, loading: false} =>
-      "You might think this is impossible, but depending on the situation it might not be!"->React.string
-    }}
+    // {switch Queries.MarketDetails.use() {
+    // | {loading: true} => "Loading..."->React.string
+    // | {error: Some(_error)} => "Error loading data"->React.string
+    // | {data: Some({syntheticMarkets})} => <>
+    //     <h1> {"Markets"->React.string} </h1>
+    //     {syntheticMarkets
+    //     ->Array.map(({
+    //       name,
+    //       symbol,
+    //       // marketIndex,
+    //       // totalValueLockedInMarket,
+    //       // oracleAddress,
+    //       // syntheticLong: {
+    //       //   id: idLong,
+    //       //   tokenAddress: tokenAddressLong,
+    //       //   totalValueLocked: totalValueLockedLong,
+    //       //   tokenSupply: tokenSupplyLong,
+    //       //   tokenPrice: tokenPriceLong,
+    //       // },
+    //       // syntheticShort: {
+    //       //   id: idShort,
+    //       //   tokenAddress: tokenAddressShort,
+    //       //   totalValueLocked: totalValueLockedShort,
+    //       //   tokenSupply: tokenSupplyShort,
+    //       //   tokenPrice: tokenPriceShort,
+    //       // },
+    //     }) => <div key=symbol> {name->React.string} </div>)
+    //     ->React.array}
+    //   </>
+    // | {data: None, error: None, loading: false} =>
+    //   "You might think this is impossible, but depending on the situation it might not be!"->React.string
+    // }}
   </AccessControl>
 }
 

@@ -1,5 +1,5 @@
 @react.component
-let make = (~onClick, ~preLabel: string, ~postLabel: string) => {
+let make = (~onClick, ~preLabel: string="", ~postLabel: string="") => {
   Js.log(onClick)
   <div className="flex justify-end ">
     <div className="flex items-center my-5">
