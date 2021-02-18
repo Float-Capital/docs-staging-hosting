@@ -8,7 +8,7 @@ dataSources:
     source:
       address: "0xF3ED066A184F58c9E2F1cd227B8adE98b5D05c62"
       abi: LongShort
-      startBlock: 5820840
+      startBlock: 6397160
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -55,7 +55,7 @@ dataSources:
     source:
       address: "0x30E356c7701cE7Cdf4b4eE87876335d6CEa49704"
       abi: Staker
-      startBlock: 5820840
+      startBlock: 6397160
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

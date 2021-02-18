@@ -18,7 +18,7 @@ services:
       postgres_pass: let-me-in
       postgres_db: graph-node
       ipfs: "ipfs:5001"
-      ethereum: "binancetest:https://data-seed-prebsc-1-s1.binance.org:8545/"
+      ethereum: "binancetest:https://data-seed-prebsc-2-s2.binance.org:8545/"
       RUST_LOG: info
 
   ipfs:
