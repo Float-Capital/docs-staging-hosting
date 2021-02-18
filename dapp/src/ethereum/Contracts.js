@@ -45,10 +45,22 @@ var Erc20 = {
   make: make$2
 };
 
+var abi$3 = Ethers.makeAbi(["function redeem(uint256 amount)"]);
+
+function make$3(address, providerOrSigner) {
+  return Ethers.Contract.make(address, abi$3, providerOrSigner);
+}
+
+var SyntheticToken = {
+  abi: abi$3,
+  make: make$3
+};
+
 export {
   TestErc20 ,
   LongShort ,
   Erc20 ,
+  SyntheticToken ,
   
 }
 /* abi Not a pure module */

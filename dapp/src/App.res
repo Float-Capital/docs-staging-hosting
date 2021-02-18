@@ -37,11 +37,11 @@ module GraphQl = {
       client(
         ~uriLink={
           switch networkId {
-          | Some(5) => "https://api.thegraph.com/subgraphs/name/avolabs-io/float-capital-goerli"
-          | Some(321) => "goerli"
-          | Some(97) => "https://api.thegraph.com/subgraphs/name/avolabs-io/float-capital-goerli"
+          | Some(5) => Config.goerliGraphEndpoint
+          | Some(321) => Config.localhostGraphEndpoint
+          | Some(97)
           | Some(_)
-          | None => "https://api.thegraph.com/subgraphs/name/avolabs-io/float-capital-goerli"
+          | None => Config.binancTestnetGraphEndpoint
           }
         },
       )

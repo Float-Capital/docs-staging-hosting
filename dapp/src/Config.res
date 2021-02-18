@@ -4,6 +4,10 @@ let isDevMode = devMode == Some("true")
 
 let longshortContractAbi = [""]->Ethers.makeAbi
 
+let goerliGraphEndpoint = "https://api.thegraph.com/subgraphs/name/avolabs-io/float-capital-goerli"
+let binancTestnetGraphEndpoint = "https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital/graphql"
+let localhostGraphEndpoint = "https://localhost:8000/subgraphs/name/avolabs-io/float-capital/graphql"
+
 type contractDetails = {@as("LongShort") longShort: Ethers.ethAddress}
 
 type allChainContractDetails = Js.Dict.t<contractDetails>

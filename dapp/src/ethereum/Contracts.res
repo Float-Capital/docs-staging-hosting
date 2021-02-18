@@ -94,3 +94,16 @@ module Erc20 = {
     ~spender: Ethers.ethAddress,
   ) => JsPromise.t<Ethers.BigNumber.t> = "allowance"
 }
+
+module SyntheticToken = {
+  type t = Ethers.Contract.t
+
+  let abi = ["function redeem(uint256 amount)"]->Ethers.makeAbi
+
+  let make = (~address, ~providerOrSigner): t =>
+    Ethers.Contract.make(address, abi, providerOrSigner)
+
+  @send
+  external redeem: (~contract: t, ~amount: Ethers.BigNumber.t) => JsPromise.t<Ethers.txSubmitted> =
+    "redeem"
+}
