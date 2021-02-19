@@ -27,9 +27,10 @@ function ActiveStakes(Props) {
                       var match$1 = match.tokenType;
                       var match$2 = match$1.syntheticMarket;
                       var amountFormatted = FormatMoney.formatMoney(Belt_Option.getWithDefault(Belt_Float.fromString(Ethers.Utils.formatEther(match.amount)), 0));
-                      return React.createElement("div", undefined, React.createElement("h1", undefined, match$2.name + "(" + match$2.symbol + ")"), React.createElement("p", undefined, "Stake of " + amountFormatted + " for " + match$1.tokenType + ", which is " + (
+                      var totalStakedFormatted = FormatMoney.formatMoney(Belt_Option.getWithDefault(Belt_Float.fromString(Ethers.Utils.formatEther(match$1.totalStaked)), 0));
+                      return React.createElement("div", undefined, React.createElement("h1", undefined, match$2.name + "(" + match$2.symbol + ")"), React.createElement("p", undefined, "Stake of " + amountFormatted + " for " + match$1.tokenType + " at address " + match$1.tokenAddress + ", which is " + (
                                       match.withdrawn ? "withdrawn" : "still active"
-                                    ) + ". This stake was created at " + match.timestamp.toString() + ", in transaction " + match.creationTxHash));
+                                    ) + ". This stake was created at " + match.timestamp.toString() + ", in transaction " + match.creationTxHash + ". Total staked: " + totalStakedFormatted));
                     })));
   } else {
     return "NO ACTIVE STAKES";

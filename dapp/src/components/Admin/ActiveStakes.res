@@ -8,11 +8,8 @@ let make = () => {
   | {data: Some({currentStakes})} => <>
       {currentStakes
       ->Array.map(({
-        id,
         currentStake: {
-          id: stakeId,
           timestamp,
-          blockNumber,
           creationTxHash,
           tokenType: {tokenAddress, totalStaked, tokenType, syntheticMarket: {name, symbol}},
           amount,
@@ -22,12 +19,18 @@ let make = () => {
         let amountFormatted = FormatMoney.formatMoney(
           ~number=amount->Ethers.Utils.formatEther->Float.fromString->Option.getWithDefault(0.),
         )
+        let totalStakedFormatted = FormatMoney.formatMoney(
+          ~number=totalStaked
+          ->Ethers.Utils.formatEther
+          ->Float.fromString
+          ->Option.getWithDefault(0.),
+        )
         <div>
           <h1> {`${name}(${symbol})`->React.string} </h1>
           <p>
-            {`Stake of ${amountFormatted} for ${tokenType->Obj.magic}, which is ${withdrawn
+            {`Stake of ${amountFormatted} for ${tokenType->Obj.magic} at address ${tokenAddress}, which is ${withdrawn
                 ? "withdrawn"
-                : "still active"}. This stake was created at ${timestamp->Ethers.BigNumber.toString}, in transaction ${creationTxHash}`->React.string}
+                : "still active"}. This stake was created at ${timestamp->Ethers.BigNumber.toString}, in transaction ${creationTxHash}. Total staked: ${totalStakedFormatted}`->React.string}
           </p>
         </div>
       })
