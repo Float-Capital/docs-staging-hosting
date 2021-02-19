@@ -47,6 +47,30 @@ module SyntheticTokens = %graphql(`
   }
 }
 `)
+
+module UsersStakes = %graphql(`
+{
+  currentStakes (where: {user: "0xd3cbce59318b2e570883719c8165f9390a12bdd6"}) {
+    id
+    currentStake {
+      id
+      timestamp
+      blockNumber
+      creationTxHash
+      tokenType {
+        tokenAddress
+        totalStaked
+      }
+      amount
+      withdrawn
+    }
+    user {
+      id
+      address
+    }
+  }
+}
+`)
 // syntheticMarkets {
 //   name
 //   symbol

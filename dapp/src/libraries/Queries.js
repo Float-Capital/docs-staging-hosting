@@ -423,10 +423,188 @@ var SyntheticTokens = {
   useLazyWithVariables: SyntheticTokens_useLazyWithVariables
 };
 
+var Raw$3 = {};
+
+var query$3 = (require("@apollo/client").gql`
+  query   {
+    currentStakes(where: {user: "0xd3cbce59318b2e570883719c8165f9390a12bdd6"})  {
+      __typename
+      id
+      currentStake  {
+        __typename
+        id
+        timestamp
+        blockNumber
+        creationTxHash
+        tokenType  {
+          __typename
+          tokenAddress
+          totalStaked
+        }
+        amount
+        withdrawn
+      }
+      user  {
+        __typename
+        id
+        address
+      }
+    }
+  }
+`);
+
+function parse$3(value) {
+  var value$1 = value.currentStakes;
+  return {
+          currentStakes: value$1.map(function (value) {
+                var value$1 = value.currentStake;
+                var value$2 = value$1.tokenType;
+                var value$3 = value.user;
+                return {
+                        __typename: value.__typename,
+                        id: value.id,
+                        currentStake: {
+                          __typename: value$1.__typename,
+                          id: value$1.id,
+                          timestamp: GqlConverters.$$BigInt.parse(value$1.timestamp),
+                          blockNumber: GqlConverters.$$BigInt.parse(value$1.blockNumber),
+                          creationTxHash: GqlConverters.Bytes.parse(value$1.creationTxHash),
+                          tokenType: {
+                            __typename: value$2.__typename,
+                            tokenAddress: GqlConverters.Bytes.parse(value$2.tokenAddress),
+                            totalStaked: GqlConverters.$$BigInt.parse(value$2.totalStaked)
+                          },
+                          amount: GqlConverters.$$BigInt.parse(value$1.amount),
+                          withdrawn: value$1.withdrawn
+                        },
+                        user: {
+                          __typename: value$3.__typename,
+                          id: value$3.id,
+                          address: GqlConverters.Bytes.parse(value$3.address)
+                        }
+                      };
+              })
+        };
+}
+
+function serialize$3(value) {
+  var value$1 = value.currentStakes;
+  var currentStakes = value$1.map(function (value) {
+        var value$1 = value.user;
+        var value$2 = value$1.address;
+        var value$3 = GqlConverters.Bytes.serialize(value$2);
+        var value$4 = value$1.id;
+        var value$5 = value$1.__typename;
+        var user = {
+          __typename: value$5,
+          id: value$4,
+          address: value$3
+        };
+        var value$6 = value.currentStake;
+        var value$7 = value$6.withdrawn;
+        var value$8 = value$6.amount;
+        var value$9 = GqlConverters.$$BigInt.serialize(value$8);
+        var value$10 = value$6.tokenType;
+        var value$11 = value$10.totalStaked;
+        var value$12 = GqlConverters.$$BigInt.serialize(value$11);
+        var value$13 = value$10.tokenAddress;
+        var value$14 = GqlConverters.Bytes.serialize(value$13);
+        var value$15 = value$10.__typename;
+        var tokenType = {
+          __typename: value$15,
+          tokenAddress: value$14,
+          totalStaked: value$12
+        };
+        var value$16 = value$6.creationTxHash;
+        var value$17 = GqlConverters.Bytes.serialize(value$16);
+        var value$18 = value$6.blockNumber;
+        var value$19 = GqlConverters.$$BigInt.serialize(value$18);
+        var value$20 = value$6.timestamp;
+        var value$21 = GqlConverters.$$BigInt.serialize(value$20);
+        var value$22 = value$6.id;
+        var value$23 = value$6.__typename;
+        var currentStake = {
+          __typename: value$23,
+          id: value$22,
+          timestamp: value$21,
+          blockNumber: value$19,
+          creationTxHash: value$17,
+          tokenType: tokenType,
+          amount: value$9,
+          withdrawn: value$7
+        };
+        var value$24 = value.id;
+        var value$25 = value.__typename;
+        return {
+                __typename: value$25,
+                id: value$24,
+                currentStake: currentStake,
+                user: user
+              };
+      });
+  return {
+          currentStakes: currentStakes
+        };
+}
+
+function serializeVariables$3(param) {
+  
+}
+
+function makeVariables$3(param) {
+  
+}
+
+function makeDefaultVariables$3(param) {
+  
+}
+
+var UsersStakes_inner = {
+  Raw: Raw$3,
+  query: query$3,
+  parse: parse$3,
+  serialize: serialize$3,
+  serializeVariables: serializeVariables$3,
+  makeVariables: makeVariables$3,
+  makeDefaultVariables: makeDefaultVariables$3
+};
+
+var include$3 = ApolloClient__React_Hooks_UseQuery.Extend({
+      query: query$3,
+      Raw: Raw$3,
+      parse: parse$3,
+      serialize: serialize$3,
+      serializeVariables: serializeVariables$3
+    });
+
+var UsersStakes_refetchQueryDescription = include$3.refetchQueryDescription;
+
+var UsersStakes_use = include$3.use;
+
+var UsersStakes_useLazy = include$3.useLazy;
+
+var UsersStakes_useLazyWithVariables = include$3.useLazyWithVariables;
+
+var UsersStakes = {
+  UsersStakes_inner: UsersStakes_inner,
+  Raw: Raw$3,
+  query: query$3,
+  parse: parse$3,
+  serialize: serialize$3,
+  serializeVariables: serializeVariables$3,
+  makeVariables: makeVariables$3,
+  makeDefaultVariables: makeDefaultVariables$3,
+  refetchQueryDescription: UsersStakes_refetchQueryDescription,
+  use: UsersStakes_use,
+  useLazy: UsersStakes_useLazy,
+  useLazyWithVariables: UsersStakes_useLazyWithVariables
+};
+
 export {
   LatestSystemState ,
   MarketDetails ,
   SyntheticTokens ,
+  UsersStakes ,
   
 }
 /* query Not a pure module */

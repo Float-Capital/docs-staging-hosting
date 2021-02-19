@@ -644,10 +644,6 @@ function isGreaterThanBalance(amount, balance) {
 
 function TradeForm$1(Props) {
   var market = Props.market;
-  console.log([
-        "THe market",
-        market
-      ]);
   var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];

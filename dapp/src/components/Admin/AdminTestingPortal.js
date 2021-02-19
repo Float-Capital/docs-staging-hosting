@@ -51,16 +51,13 @@ function AdminTestingPortal$AdminContext$Provider(Props) {
   var optEthersSigner = Belt_Option.flatMap(optProvider, (function (provider) {
           if (privateKeyMode) {
             if (authSet) {
-              console.log("b");
               return Belt_Option.map(optAuthHeader, (function (authHeader) {
                             return new Ethers$1.Wallet(authHeader, provider);
                           }));
             } else {
-              console.log("c");
               return ;
             }
           } else {
-            console.log("a");
             return Belt_Option.flatMap(optCurrentUser, (function (usersAddress) {
                           return provider.getSigner(usersAddress);
                         }));
@@ -116,10 +113,7 @@ var AdminContext = {
 function AdminTestingPortal$AdminActions(Props) {
   var optEthersWallet = React.useContext(context);
   var optNetwork = RootProvider.useChainId(undefined);
-  if (optEthersWallet === undefined) {
-    return React.createElement("h1", undefined, "No provider is selected. Even if you are using your own private key you still need to login with metamask for the connection to ethereum.");
-  }
-  var match = Curry.app(Queries.MarketDetails.use, [
+  var marketDetailsQuery = Curry.app(Queries.MarketDetails.use, [
         undefined,
         undefined,
         undefined,
@@ -135,7 +129,10 @@ function AdminTestingPortal$AdminActions(Props) {
         undefined,
         undefined
       ]);
-  var match$1 = match.data;
+  if (optEthersWallet === undefined) {
+    return React.createElement("h1", undefined, "No provider is selected. Even if you are using your own private key you still need to login with metamask for the connection to ethereum.");
+  }
+  var match = marketDetailsQuery.data;
   return React.createElement("div", undefined, React.createElement("h1", undefined, "Test Functions"), React.createElement("div", {
                   className: "border-dashed border-4 border-light-red-500"
                 }, React.createElement(ApproveDai.make, {}), optNetwork !== undefined ? (
@@ -144,9 +141,9 @@ function AdminTestingPortal$AdminActions(Props) {
                           }) : null
                   ) : React.createElement(MintDai.make, {
                         ethersWallet: optEthersWallet
-                      }), React.createElement("hr", undefined), React.createElement("h1", undefined, "Market specific Functions:"), match.loading ? "Loading..." : (
-                    match.error !== undefined ? "Error loading data" : (
-                        match$1 !== undefined ? React.createElement(React.Fragment, undefined, Belt_Array.map(match$1.syntheticMarkets, (function (param) {
+                      }), React.createElement("hr", undefined), React.createElement("h1", undefined, "Market specific Functions:"), marketDetailsQuery.loading ? "Loading..." : (
+                    marketDetailsQuery.error !== undefined ? "Error loading data" : (
+                        match !== undefined ? React.createElement(React.Fragment, undefined, Belt_Array.map(match.syntheticMarkets, (function (param) {
                                       var marketIndex = param.marketIndex;
                                       var symbol = param.symbol;
                                       return React.createElement("div", {

@@ -414,7 +414,7 @@ function useForm(initialInput, onSubmit) {
         };
 }
 
-var AdminMintForm = {
+var MintAndStakeForm = {
   validators: validators,
   initialFieldsStatuses: initialFieldsStatuses,
   initialCollectionsStatuses: undefined,
@@ -523,7 +523,7 @@ function MintAndStake(Props) {
 var make = MintAndStake;
 
 export {
-  AdminMintForm ,
+  MintAndStakeForm ,
   initialInput ,
   make ,
   

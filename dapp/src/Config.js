@@ -30,7 +30,6 @@ function useLongShortAddress(param) {
 }
 
 function daiContractAddress(netIdStr) {
-  console.log(netIdStr);
   return Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), Constants.zeroAddress, (function (contracts) {
                 return contracts.Dai;
               }));
