@@ -140,7 +140,6 @@ type GlobalState @entity {
   id: ID!
   contractVersion: BigInt!
   latestMarketIndex: BigInt!
-  OracleAggregator: OracleAggregator!
   adminAddress: Bytes!
   staker: Staker!
   tokenFactory: TokenFactory!
