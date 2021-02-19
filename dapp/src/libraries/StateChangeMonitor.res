@@ -38,11 +38,10 @@ let make = (~children) => {
     initialDataFreshnessId,
     initialDataFreshnessId,
   ))
-  let (executeQuery, queryResult) = LatestStateChange.useLazy()
+  let (executeQuery, queryResult) = LatestStateChange.useLazy(~fetchPolicy=CacheFirst, ())
   let isLoggedIn = RootProvider.useIsLoggedIn()
 
   React.useEffect1(() => {
-    Js.log(("we have a new statechange", queryResult))
     switch queryResult {
     | Executed({data: Some({stateChanges: [{id}]})}) =>
       if id != nextDataFreshnessId {

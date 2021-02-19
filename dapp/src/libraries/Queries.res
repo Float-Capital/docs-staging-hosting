@@ -49,8 +49,8 @@ module SyntheticTokens = %graphql(`
 `)
 
 module UsersStakes = %graphql(`
-{
-  currentStakes (where: {user: "0xd3cbce59318b2e570883719c8165f9390a12bdd6"}) {
+query ($userId: String!){
+  currentStakes (where: {user: $userId}) {
     id
     currentStake {
       id

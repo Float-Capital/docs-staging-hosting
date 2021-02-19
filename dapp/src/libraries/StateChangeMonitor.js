@@ -118,7 +118,7 @@ function StateChangeMonitor(Props) {
         undefined,
         undefined,
         undefined,
-        undefined,
+        /* CacheFirst */1,
         undefined,
         undefined,
         undefined,
@@ -131,10 +131,6 @@ function StateChangeMonitor(Props) {
   var executeQuery = match$2[0];
   var isLoggedIn = RootProvider.useIsLoggedIn(undefined);
   React.useEffect((function () {
-          console.log([
-                "we have a new statechange",
-                queryResult
-              ]);
           if (queryResult.TAG === /* Executed */0) {
             var match = queryResult._0.data;
             if (match !== undefined) {

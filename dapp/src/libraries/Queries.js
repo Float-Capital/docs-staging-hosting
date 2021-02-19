@@ -426,8 +426,8 @@ var SyntheticTokens = {
 var Raw$3 = {};
 
 var query$3 = (require("@apollo/client").gql`
-  query   {
-    currentStakes(where: {user: "0xd3cbce59318b2e570883719c8165f9390a12bdd6"})  {
+  query ($userId: String!)  {
+    currentStakes(where: {user: $userId})  {
       __typename
       id
       currentStake  {
@@ -547,16 +547,16 @@ function serialize$3(value) {
         };
 }
 
-function serializeVariables$3(param) {
-  
+function serializeVariables$3(inp) {
+  return {
+          userId: inp.userId
+        };
 }
 
-function makeVariables$3(param) {
-  
-}
-
-function makeDefaultVariables$3(param) {
-  
+function makeVariables$3(userId, param) {
+  return {
+          userId: userId
+        };
 }
 
 var UsersStakes_inner = {
@@ -565,8 +565,7 @@ var UsersStakes_inner = {
   parse: parse$3,
   serialize: serialize$3,
   serializeVariables: serializeVariables$3,
-  makeVariables: makeVariables$3,
-  makeDefaultVariables: makeDefaultVariables$3
+  makeVariables: makeVariables$3
 };
 
 var include$3 = ApolloClient__React_Hooks_UseQuery.Extend({
@@ -593,7 +592,6 @@ var UsersStakes = {
   serialize: serialize$3,
   serializeVariables: serializeVariables$3,
   makeVariables: makeVariables$3,
-  makeDefaultVariables: makeDefaultVariables$3,
   refetchQueryDescription: UsersStakes_refetchQueryDescription,
   use: UsersStakes_use,
   useLazy: UsersStakes_useLazy,
