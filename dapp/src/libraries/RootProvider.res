@@ -137,6 +137,7 @@ let useIsLoggedIn: unit => bool = () => {
   context.account->Option.isSome
 }
 
+@ocaml.doc(`WARNING: Will throw an exception if not logged in.`)
 let useCurrentUserExn = () => useCurrentUser()->Option.getExn
 
 let useIsAddressCurrentUser: Ethers.ethAddress => bool = address => {

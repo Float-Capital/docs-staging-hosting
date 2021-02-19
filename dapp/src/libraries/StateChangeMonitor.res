@@ -31,7 +31,7 @@ module LatestStateChange = %graphql(`
 }
 `)
 
-@ocamldoc("This component is a context that is responsible for managing state changes")
+@ocaml.doc("This component is a context that is responsible for managing state changes")
 @react.component
 let make = (~children) => {
   let ((currentDataFreshnessId, nextDataFreshnessId), setDataFreshnessId) = React.useState(_ => (

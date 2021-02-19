@@ -2,10 +2,12 @@
 
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
+import * as Ethers from "../../ethereum/Ethers.js";
 import * as Queries from "../../libraries/Queries.js";
 import * as StateChangeMonitor from "../../libraries/StateChangeMonitor.js";
 
 function useUsersStakes(address) {
+  var userId = Ethers.Utils.toString(address).toLowerCase();
   var match = Curry.app(Queries.UsersStakes.useLazy, [
         undefined,
         undefined,
@@ -23,7 +25,7 @@ function useUsersStakes(address) {
   var executeQuery = match[0];
   React.useEffect((function () {
           Curry._3(executeQuery, undefined, undefined, {
-                userId: address
+                userId: userId
               });
           
         }), [StateChangeMonitor.useDataFreshnessString(undefined)]);
@@ -42,7 +44,7 @@ function useUsersStakes(address) {
               undefined,
               undefined,
               {
-                userId: address
+                userId: userId
               }
             ]);
 }

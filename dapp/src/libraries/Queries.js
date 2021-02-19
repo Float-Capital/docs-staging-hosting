@@ -440,14 +440,15 @@ var query$3 = (require("@apollo/client").gql`
           __typename
           tokenAddress
           totalStaked
+          tokenType
+          syntheticMarket  {
+            __typename
+            name
+            symbol
+          }
         }
         amount
         withdrawn
-      }
-      user  {
-        __typename
-        id
-        address
       }
     }
   }
@@ -459,7 +460,22 @@ function parse$3(value) {
           currentStakes: value$1.map(function (value) {
                 var value$1 = value.currentStake;
                 var value$2 = value$1.tokenType;
-                var value$3 = value.user;
+                var value$3 = value$2.tokenType;
+                var tmp;
+                switch (value$3) {
+                  case "Long" :
+                      tmp = "Long";
+                      break;
+                  case "Short" :
+                      tmp = "Short";
+                      break;
+                  default:
+                    tmp = {
+                      NAME: "FutureAddedValue",
+                      VAL: value$3
+                    };
+                }
+                var value$4 = value$2.syntheticMarket;
                 return {
                         __typename: value.__typename,
                         id: value.id,
@@ -472,15 +488,16 @@ function parse$3(value) {
                           tokenType: {
                             __typename: value$2.__typename,
                             tokenAddress: GqlConverters.Bytes.parse(value$2.tokenAddress),
-                            totalStaked: GqlConverters.$$BigInt.parse(value$2.totalStaked)
+                            totalStaked: GqlConverters.$$BigInt.parse(value$2.totalStaked),
+                            tokenType: tmp,
+                            syntheticMarket: {
+                              __typename: value$4.__typename,
+                              name: value$4.name,
+                              symbol: value$4.symbol
+                            }
                           },
                           amount: GqlConverters.$$BigInt.parse(value$1.amount),
                           withdrawn: value$1.withdrawn
-                        },
-                        user: {
-                          __typename: value$3.__typename,
-                          id: value$3.id,
-                          address: GqlConverters.Bytes.parse(value$3.address)
                         }
                       };
               })
@@ -490,56 +507,60 @@ function parse$3(value) {
 function serialize$3(value) {
   var value$1 = value.currentStakes;
   var currentStakes = value$1.map(function (value) {
-        var value$1 = value.user;
-        var value$2 = value$1.address;
-        var value$3 = GqlConverters.Bytes.serialize(value$2);
-        var value$4 = value$1.id;
-        var value$5 = value$1.__typename;
-        var user = {
-          __typename: value$5,
-          id: value$4,
-          address: value$3
+        var value$1 = value.currentStake;
+        var value$2 = value$1.withdrawn;
+        var value$3 = value$1.amount;
+        var value$4 = GqlConverters.$$BigInt.serialize(value$3);
+        var value$5 = value$1.tokenType;
+        var value$6 = value$5.syntheticMarket;
+        var value$7 = value$6.symbol;
+        var value$8 = value$6.name;
+        var value$9 = value$6.__typename;
+        var syntheticMarket = {
+          __typename: value$9,
+          name: value$8,
+          symbol: value$7
         };
-        var value$6 = value.currentStake;
-        var value$7 = value$6.withdrawn;
-        var value$8 = value$6.amount;
-        var value$9 = GqlConverters.$$BigInt.serialize(value$8);
-        var value$10 = value$6.tokenType;
-        var value$11 = value$10.totalStaked;
+        var value$10 = value$5.tokenType;
+        var tokenType = typeof value$10 === "string" ? (
+            value$10 === "Long" ? "Long" : "Short"
+          ) : value$10.VAL;
+        var value$11 = value$5.totalStaked;
         var value$12 = GqlConverters.$$BigInt.serialize(value$11);
-        var value$13 = value$10.tokenAddress;
+        var value$13 = value$5.tokenAddress;
         var value$14 = GqlConverters.Bytes.serialize(value$13);
-        var value$15 = value$10.__typename;
-        var tokenType = {
+        var value$15 = value$5.__typename;
+        var tokenType$1 = {
           __typename: value$15,
           tokenAddress: value$14,
-          totalStaked: value$12
+          totalStaked: value$12,
+          tokenType: tokenType,
+          syntheticMarket: syntheticMarket
         };
-        var value$16 = value$6.creationTxHash;
+        var value$16 = value$1.creationTxHash;
         var value$17 = GqlConverters.Bytes.serialize(value$16);
-        var value$18 = value$6.blockNumber;
+        var value$18 = value$1.blockNumber;
         var value$19 = GqlConverters.$$BigInt.serialize(value$18);
-        var value$20 = value$6.timestamp;
+        var value$20 = value$1.timestamp;
         var value$21 = GqlConverters.$$BigInt.serialize(value$20);
-        var value$22 = value$6.id;
-        var value$23 = value$6.__typename;
+        var value$22 = value$1.id;
+        var value$23 = value$1.__typename;
         var currentStake = {
           __typename: value$23,
           id: value$22,
           timestamp: value$21,
           blockNumber: value$19,
           creationTxHash: value$17,
-          tokenType: tokenType,
-          amount: value$9,
-          withdrawn: value$7
+          tokenType: tokenType$1,
+          amount: value$4,
+          withdrawn: value$2
         };
         var value$24 = value.id;
         var value$25 = value.__typename;
         return {
                 __typename: value$25,
                 id: value$24,
-                currentStake: currentStake,
-                user: user
+                currentStake: currentStake
               };
       });
   return {

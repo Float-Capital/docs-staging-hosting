@@ -60,13 +60,14 @@ query ($userId: String!){
       tokenType {
         tokenAddress
         totalStaked
+        tokenType
+        syntheticMarket {
+          name
+          symbol
+        }
       }
       amount
       withdrawn
-    }
-    user {
-      id
-      address
     }
   }
 }
