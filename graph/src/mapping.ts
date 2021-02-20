@@ -460,6 +460,7 @@ export function handleStakeAdded(event: StakeAdded): void {
       tokenAddressString + "-" + userAddressString
     );
     currentStake.user = user.id;
+    currentStake.userAddress = user.address;
     currentStake.tokenType = syntheticToken.id;
   } else {
     // Note: Only add if still relevant and not withdrawn
