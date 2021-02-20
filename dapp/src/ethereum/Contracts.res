@@ -83,7 +83,7 @@ module Staker = {
   let abi =
     [
       "function stake(address tokenAddress, uint256 amount)",
-      "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)",
+      "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)  @1200000",
       "function withdraw(address tokenAddress, uint256 amount)",
       "function mintFloat()",
     ]->Ethers.makeAbi

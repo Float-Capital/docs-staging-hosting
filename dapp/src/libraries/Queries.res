@@ -48,6 +48,19 @@ module SyntheticTokens = %graphql(`
 }
 `)
 
+module SyntheticToken = %graphql(`
+query ($tokenId: String!){
+  syntheticToken(id: $tokenId){
+    id
+    syntheticMarket {
+      id
+      name
+    }
+    tokenType
+  }
+}
+`)
+
 module UsersStakes = %graphql(`
 query ($userId: String!){
   currentStakes (where: {user: $userId}) {
@@ -72,6 +85,7 @@ query ($userId: String!){
   }
 }
 `)
+
 module UsersActiveStakes = %graphql(`
 query ($userId: String!){
   currentStakes (where: {user: $userId, withdrawn: false}) {

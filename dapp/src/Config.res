@@ -12,6 +12,7 @@ let localhostGraphEndpoint = "https://localhost:8000/subgraphs/name/avolabs-io/f
 
 type contractDetails = {
   @as("LongShort") longShort: Ethers.ethAddress,
+  @as("Staker") staker: Ethers.ethAddress,
   @as("Dai") dai: Ethers.ethAddress,
 }
 
@@ -35,6 +36,16 @@ let longShortContractAddress = (~netIdStr) => {
 let useLongShortAddress = () => {
   let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
   longShortContractAddress(~netIdStr)
+}
+
+let stakerContractAddress = (~netIdStr) => {
+  allContracts
+  ->Js.Dict.get(netIdStr)
+  ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.staker)
+}
+let useStakerAddress = () => {
+  let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
+  stakerContractAddress(~netIdStr)
 }
 
 let daiContractAddress = (~netIdStr) => {

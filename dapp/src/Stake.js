@@ -38,6 +38,7 @@ function Stake$Stake(Props) {
         undefined,
         undefined
       ]);
+  var tokenId = Js_dict.get(router.query, "tokenId");
   React.useEffect((function () {
           var match = tokens.data;
           if (tokens.loading) {
@@ -97,41 +98,42 @@ function Stake$Stake(Props) {
           console.log("You might think this is impossible, but depending on the situation it might not be!");
           
         }), [tokens]);
-  var tokenId = Js_dict.get(router.query, "tokenId");
   return React.createElement(AccessControl.make, {
               children: React.createElement(ViewBox.make, {
-                    children: null
-                  }, React.createElement("h1", undefined, "Stake"), Belt_Array.map(match[0], (function (token) {
-                          return React.createElement(Card.make, {
-                                      children: React.createElement("div", {
-                                            className: "flex justify-between items-center w-full"
-                                          }, React.createElement("div", {
-                                                className: "flex flex-col"
-                                              }, React.createElement("h3", {
-                                                    className: "font-bold"
-                                                  }, "Token"), React.createElement("p", undefined, token.symbol, token.tokenType === "short" ? "↘️" : "↗️")), React.createElement("div", {
-                                                className: "flex flex-col"
-                                              }, React.createElement("h3", {
-                                                    className: "font-bold"
-                                                  }, "Balance"), React.createElement("p", undefined, String(token.balance))), React.createElement("div", {
-                                                className: "flex flex-col"
-                                              }, React.createElement("h3", {
-                                                    className: "font-bold"
-                                                  }, "R ", React.createElement("span", {
-                                                        className: "text-xs"
-                                                      }, "ℹ️")), React.createElement("p", undefined, String(token.apy * 100) + "%" + (
-                                                    token.apy > 0.15 ? "🔥" : ""
-                                                  ))), React.createElement(Button.make, {
-                                                onClick: (function (param) {
-                                                    router.push("/stake?tokenId=" + token.id);
-                                                    
-                                                  }),
-                                                children: "STAKE",
-                                                variant: "small"
-                                              })),
-                                      key: token.symbol + token.tokenType
-                                    });
-                        })), tokenId !== undefined ? tokenId : null, React.createElement(StakeForm.make, {})),
+                    children: tokenId !== undefined ? React.createElement("div", undefined, React.createElement(StakeForm.make, {
+                                tokenId: tokenId
+                              })) : React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Stake"), Belt_Array.map(match[0], (function (token) {
+                                  return React.createElement(Card.make, {
+                                              children: React.createElement("div", {
+                                                    className: "flex justify-between items-center w-full"
+                                                  }, React.createElement("div", {
+                                                        className: "flex flex-col"
+                                                      }, React.createElement("h3", {
+                                                            className: "font-bold"
+                                                          }, "Token"), React.createElement("p", undefined, token.symbol, token.tokenType === "short" ? "↘️" : "↗️")), React.createElement("div", {
+                                                        className: "flex flex-col"
+                                                      }, React.createElement("h3", {
+                                                            className: "font-bold"
+                                                          }, "Balance"), React.createElement("p", undefined, String(token.balance))), React.createElement("div", {
+                                                        className: "flex flex-col"
+                                                      }, React.createElement("h3", {
+                                                            className: "font-bold"
+                                                          }, "R ", React.createElement("span", {
+                                                                className: "text-xs"
+                                                              }, "ℹ️")), React.createElement("p", undefined, String(token.apy * 100) + "%" + (
+                                                            token.apy > 0.15 ? "🔥" : ""
+                                                          ))), React.createElement(Button.make, {
+                                                        onClick: (function (param) {
+                                                            router.push("/stake?tokenId=" + token.id);
+                                                            
+                                                          }),
+                                                        children: "STAKE",
+                                                        variant: "small"
+                                                      })),
+                                              key: token.symbol + token.tokenType
+                                            });
+                                })))
+                  }),
               alternateComponent: React.createElement("h1", {
                     onClick: (function (param) {
                         router.push("/login?nextPath=/dashboard");
