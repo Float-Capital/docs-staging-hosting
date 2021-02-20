@@ -24,10 +24,7 @@ module MintForm = %form(
       strategy: OnFirstChange,
       validate: ({isLong}) => isLong->Ok,
     },
-    isStaking: {
-      strategy: OnFirstChange,
-      validate: ({isStaking}) => isStaking->Ok,
-    },
+    isStaking: None,
   }
 )
 
@@ -147,7 +144,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
   }
 
   let (optAdditionalErrorMessage, _buttonText, _buttonDisabled) = {
-    let stakingText = form.input.isStaking ? " & stake" : ""
+    let stakingText = form.input.isStaking ? "" : "" // TODO: decide on this " & stake" : ""
     switch form.input.isLong {
     | isLong =>
       let position = isLong ? "long" : "short"
@@ -250,7 +247,9 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
                   (event->ReactEvent.Form.target)["checked"],
                 )}
             />
-            <p> {`Stake ${form.input.isLong ? "long" : "short"} tokens`->React.string} </p>
+            <p className="text-xs">
+              {`Stake ${form.input.isLong ? "long" : "short"} tokens`->React.string}
+            </p>
           </div>
           <p className="text-xxs hover:text-gray-500">
             <a href="https://docs.float.capital"> {"Learn more about staking?"->React.string} </a>

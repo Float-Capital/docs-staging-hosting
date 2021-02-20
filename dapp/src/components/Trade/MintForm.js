@@ -20,17 +20,6 @@ import * as ContractHooks from "../Admin/ContractHooks.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
 
-var validators_isStaking = {
-  strategy: /* OnFirstChange */1,
-  validate: (function (param) {
-      return {
-              TAG: 0,
-              _0: param.isStaking,
-              [Symbol.for("name")]: "Ok"
-            };
-    })
-};
-
 var validators_isLong = {
   strategy: /* OnFirstChange */1,
   validate: (function (param) {
@@ -76,7 +65,7 @@ var validators_amount = {
 };
 
 var validators = {
-  isStaking: validators_isStaking,
+  isStaking: undefined,
   isLong: validators_isLong,
   amount: validators_amount
 };
@@ -104,12 +93,15 @@ function initialState(input) {
 }
 
 function validateForm(input, validators, fieldsStatuses) {
-  var match = fieldsStatuses.isStaking;
-  var match_0 = match ? match._0 : Curry._1(validators.isStaking.validate, input);
-  var match$1 = fieldsStatuses.isLong;
-  var match_0$1 = match$1 ? match$1._0 : Curry._1(validators.isLong.validate, input);
-  var match$2 = fieldsStatuses.amount;
-  var match_0$2 = match$2 ? match$2._0 : Curry._1(validators.amount.validate, input);
+  var match_0 = {
+    TAG: 0,
+    _0: input.isStaking,
+    [Symbol.for("name")]: "Ok"
+  };
+  var match = fieldsStatuses.isLong;
+  var match_0$1 = match ? match._0 : Curry._1(validators.isLong.validate, input);
+  var match$1 = fieldsStatuses.amount;
+  var match_0$2 = match$1 ? match$1._0 : Curry._1(validators.amount.validate, input);
   var isStakingResult = match_0;
   var isStakingResult$1;
   if (isStakingResult.TAG === /* Ok */0) {
@@ -127,7 +119,7 @@ function validateForm(input, validators, fieldsStatuses) {
                 fieldsStatuses: {
                   isStaking: {
                     _0: isStakingResult,
-                    _1: /* Shown */0,
+                    _1: /* Hidden */1,
                     [Symbol.for("name")]: "Dirty"
                   },
                   isLong: {
@@ -157,7 +149,7 @@ function validateForm(input, validators, fieldsStatuses) {
           fieldsStatuses: {
             isStaking: {
               _0: isStakingResult$1,
-              _1: /* Shown */0,
+              _1: /* Hidden */1,
               [Symbol.for("name")]: "Dirty"
             },
             isLong: {
@@ -184,7 +176,7 @@ function useForm(initialInput, onSubmit) {
           if (typeof action === "number") {
             switch (action) {
               case /* BlurIsStakingField */0 :
-                  var result = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.isStaking, validators_isStaking, (function (status) {
+                  var result = Formality.validateFieldOnBlurWithoutValidator(state.input.isStaking, state.fieldsStatuses.isStaking, (function (status) {
                           var init = state.fieldsStatuses;
                           return {
                                   isStaking: status,
@@ -373,7 +365,7 @@ function useForm(initialInput, onSubmit) {
                           TAG: 0,
                           _0: {
                             input: nextInput,
-                            fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput, state.fieldsStatuses.isStaking, state.submissionStatus, validators_isStaking, (function (status) {
+                            fieldsStatuses: Formality.validateFieldOnChangeWithoutValidator(nextInput.isStaking, (function (status) {
                                     var init = state.fieldsStatuses;
                                     return {
                                             isStaking: status,
@@ -715,7 +707,7 @@ function MintForm$1(Props) {
         }));
   var match$6 = form.amountResult;
   var formAmount = match$6 !== undefined && match$6.TAG === /* Ok */0 ? Caml_option.some(match$6._0) : undefined;
-  var stakingText = form.input.isStaking ? " & stake" : "";
+  var stakingText = "";
   var isLong = form.input.isLong;
   var position = isLong ? "long" : "short";
   var match$7;
@@ -946,7 +938,9 @@ function MintForm$1(Props) {
                                                             };
                                                     }), $$event.target.checked);
                                       })
-                                  }), React.createElement("p", undefined, "Stake " + (
+                                  }), React.createElement("p", {
+                                    className: "text-xs"
+                                  }, "Stake " + (
                                     form.input.isLong ? "long" : "short"
                                   ) + " tokens")), React.createElement("p", {
                                 className: "text-xxs hover:text-gray-500"
