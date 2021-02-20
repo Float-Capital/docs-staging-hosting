@@ -30,6 +30,18 @@ function useLongShortAddress(param) {
                   })));
 }
 
+function stakerContractAddress(netIdStr) {
+  return Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), Constants.zeroAddress, (function (contracts) {
+                return contracts.Staker;
+              }));
+}
+
+function useStakerAddress(param) {
+  return stakerContractAddress(Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
+                    return String(prim);
+                  })));
+}
+
 function daiContractAddress(netIdStr) {
   return Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), Constants.zeroAddress, (function (contracts) {
                 return contracts.Dai;
@@ -58,6 +70,8 @@ export {
   getContractAddressString ,
   longShortContractAddress ,
   useLongShortAddress ,
+  stakerContractAddress ,
+  useStakerAddress ,
   daiContractAddress ,
   useDaiAddress ,
   

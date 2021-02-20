@@ -35,7 +35,9 @@ function TxTemplate(Props) {
                               href: "https://" + txExplererUrl + "/tx/" + txState._0,
                               rel: "noopener noreferrer",
                               target: "_blank"
-                            }, "View the transaction on " + txExplererUrl)), React.createElement(Loader.make, {}));
+                            }, "View the transaction on " + txExplererUrl)), React.createElement("div", {
+                          className: "bg-white"
+                        }, React.createElement(Loader.make, {})));
       case /* Declined */1 :
           return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0), children);
       case /* Complete */2 :

@@ -12,6 +12,27 @@ import * as DisplayAddress from "../components/UI/DisplayAddress.js";
 function MainLayout$Navigation(Props) {
   var router = Router.useRouter();
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
+  var tmp;
+  if (optCurrentUser !== undefined) {
+    var currentUser = Caml_option.valFromOption(optCurrentUser);
+    tmp = React.createElement(Link, {
+          href: "/profile?address=" + Globals.ethAdrToStr(currentUser),
+          children: React.createElement("p", {
+                className: "px-3 bg-white hover:bg-black hover:text-gray-200 text-base cursor-pointer"
+              }, React.createElement(DisplayAddress.make, {
+                    address: Globals.ethAdrToStr(currentUser)
+                  }))
+        });
+  } else {
+    tmp = React.createElement(Button.make, {
+          onClick: (function (param) {
+              router.push("/login?nextPath=" + router.asPath);
+              
+            }),
+          children: "LOGIN",
+          variant: "small"
+        });
+  }
   return React.createElement("nav", {
               className: "p-2 h-12 flex justify-between items-center text-sm"
             }, React.createElement(Link, {
@@ -34,6 +55,11 @@ function MainLayout$Navigation(Props) {
                             className: "px-3 hover:bg-white"
                           }, "MINT")
                     }), React.createElement(Link, {
+                      href: "/redeem",
+                      children: React.createElement("a", {
+                            className: "px-3 hover:bg-white"
+                          }, "REDEEM")
+                    }), React.createElement(Link, {
                       href: "/stake",
                       children: React.createElement("a", {
                             className: "px-3 hover:bg-white"
@@ -54,18 +80,7 @@ function MainLayout$Navigation(Props) {
                     }, React.createElement("img", {
                           className: "h-5",
                           src: "/icons/github.svg"
-                        })), optCurrentUser !== undefined ? React.createElement("p", {
-                        className: "px-3 bg-white hover:bg-black hover:text-gray-200 text-base"
-                      }, React.createElement(DisplayAddress.make, {
-                            address: Globals.ethAdrToStr(Caml_option.valFromOption(optCurrentUser))
-                          })) : React.createElement(Button.make, {
-                        onClick: (function (param) {
-                            router.push("/login?nextPath=" + router.asPath);
-                            
-                          }),
-                        children: "LOGIN",
-                        variant: "small"
-                      })));
+                        })), tmp));
 }
 
 var Navigation = {

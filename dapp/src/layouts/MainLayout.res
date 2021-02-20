@@ -19,6 +19,9 @@ module Navigation = {
       </Link>
       <div className="flex w-2/3 text-base items-center justify-end">
         <Link href="/mint"> <a className="px-3 hover:bg-white"> {React.string("MINT")} </a> </Link>
+        <Link href="/redeem">
+          <a className="px-3 hover:bg-white"> {React.string("REDEEM")} </a>
+        </Link>
         <Link href="/stake">
           <a className="px-3 hover:bg-white"> {`STAKE🔥`->React.string} </a>
         </Link>
@@ -36,9 +39,12 @@ module Navigation = {
         </a>
         {switch optCurrentUser {
         | Some(currentUser) =>
-          <p className="px-3 bg-white hover:bg-black hover:text-gray-200 text-base">
-            <DisplayAddress address={currentUser->ethAdrToStr} /> //TODO route to Profile page
-          </p>
+          <Link href={`/profile?address=${currentUser->ethAdrToStr}`}>
+            <p
+              className="px-3 bg-white hover:bg-black hover:text-gray-200 text-base cursor-pointer">
+              <DisplayAddress address={currentUser->ethAdrToStr} /> //TODO route to Profile page
+            </p>
+          </Link>
         | None =>
           <Button
             onClick={_ => {

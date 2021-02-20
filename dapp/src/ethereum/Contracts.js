@@ -18,8 +18,8 @@ var abi$1 = Ethers.makeAbi([
       "function mintShort(uint256 marketIndex,uint256 amount)",
       "function redeemLong(uint256 marketIndex,uint256 tokensToRedeem)",
       "function redeemShort(uint256 marketIndex,uint256 tokensToRedeem)",
-      "function mintLongAndStake(uint256 marketIndex, uint256 amount)",
-      "function mintShortAndStake(uint256 marketIndex, uint256 amount)",
+      "function mintLongAndStake(uint256 marketIndex, uint256 amount) @1000000",
+      "function mintShortAndStake(uint256 marketIndex, uint256 amount) @1000000",
       "function _updateSystemState()"
     ]);
 
@@ -34,7 +34,7 @@ var LongShort = {
 
 var abi$2 = Ethers.makeAbi([
       "function stake(address tokenAddress, uint256 amount)",
-      "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)",
+      "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)  @1200000",
       "function withdraw(address tokenAddress, uint256 amount)",
       "function mintFloat()"
     ]);
