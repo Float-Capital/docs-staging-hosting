@@ -165,6 +165,11 @@ function useCurrentUser(param) {
   return Core.useWeb3React().account;
 }
 
+function useIsLoggedIn(param) {
+  var context = Core.useWeb3React();
+  return Belt_Option.isSome(context.account);
+}
+
 function useCurrentUserExn(param) {
   return Belt_Option.getExn(Core.useWeb3React().account);
 }
@@ -269,6 +274,7 @@ export {
   RootContext ,
   RootWithWeb3 ,
   useCurrentUser ,
+  useIsLoggedIn ,
   useCurrentUserExn ,
   useIsAddressCurrentUser ,
   useEthBalance ,

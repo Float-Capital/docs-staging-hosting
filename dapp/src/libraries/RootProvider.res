@@ -131,6 +131,13 @@ let useCurrentUser: unit => option<Ethers.ethAddress> = () => {
 
   context.account
 }
+let useIsLoggedIn: unit => bool = () => {
+  let context = useWeb3React()
+
+  context.account->Option.isSome
+}
+
+@ocaml.doc(`WARNING: Will throw an exception if not logged in.`)
 let useCurrentUserExn = () => useCurrentUser()->Option.getExn
 
 let useIsAddressCurrentUser: Ethers.ethAddress => bool = address => {

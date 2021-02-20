@@ -47,6 +47,31 @@ module SyntheticTokens = %graphql(`
   }
 }
 `)
+
+module UsersStakes = %graphql(`
+query ($userId: String!){
+  currentStakes (where: {user: $userId}) {
+    id
+    currentStake {
+      id
+      timestamp
+      blockNumber
+      creationTxHash
+      tokenType {
+        tokenAddress
+        totalStaked
+        tokenType
+        syntheticMarket {
+          name
+          symbol
+        }
+      }
+      amount
+      withdrawn
+    }
+  }
+}
+`)
 // syntheticMarkets {
 //   name
 //   symbol

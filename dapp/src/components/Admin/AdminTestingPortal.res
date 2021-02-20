@@ -100,6 +100,7 @@ module AdminActions = {
   let make = () => {
     let optEthersWallet = React.useContext(AdminContext.context)
     let optNetwork = RootProvider.useChainId()
+    let marketDetailsQuery = Queries.MarketDetails.use()
 
     switch optEthersWallet {
     | Some(ethersWallet) =>
@@ -114,7 +115,7 @@ module AdminActions = {
           }}
           <hr />
           <h1> {"Market specific Functions:"->React.string} </h1>
-          {switch Queries.MarketDetails.use() {
+          {switch marketDetailsQuery {
           | {loading: true} => "Loading..."->React.string
           | {error: Some(_error)} => "Error loading data"->React.string
           | {data: Some({syntheticMarkets})} => <>
@@ -153,6 +154,8 @@ module AdminActions = {
           | {data: None, error: None, loading: false} =>
             "You might think this is impossible, but depending on the situation it might not be!"->React.string
           }}
+          <hr />
+          <div> <h1> {"Users active stakes"->React.string} </h1> <ActiveStakes /> </div>
         </div>
       </div>
     | None =>

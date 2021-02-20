@@ -7,6 +7,7 @@ import * as Router from "next/router";
 import * as ApolloClient from "rescript-apollo-client/src/ApolloClient.js";
 import * as RootProvider from "./libraries/RootProvider.js";
 import * as Client from "@apollo/client";
+import * as StateChangeMonitor from "./libraries/StateChangeMonitor.js";
 import * as ApolloClient__Cache_InMemory_InMemoryCache from "rescript-apollo-client/src/@apollo/client/cache/inmemory/ApolloClient__Cache_InMemory_InMemoryCache.js";
 
 function App$GraphQl(Props) {
@@ -31,8 +32,10 @@ function $$default(props) {
   var content = React.createElement(props.Component, props.pageProps);
   return React.createElement(RootProvider.make, {
               children: React.createElement(App$GraphQl, {
-                    children: React.createElement(MainLayout.make, {
-                          children: content
+                    children: React.createElement(StateChangeMonitor.make, {
+                          children: React.createElement(MainLayout.make, {
+                                children: content
+                              })
                         })
                   })
             });

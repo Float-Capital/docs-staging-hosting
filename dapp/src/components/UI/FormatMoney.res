@@ -1,5 +1,4 @@
-@react.component
-let make = (~number) => {
+let formatMoney = (~number) => {
   let decimals = (number *. 100.)->Belt.Int.fromFloat->mod(100)->Js.Math.abs_int->Belt.Int.toString
   let reverseArrayToString = arr => arr->Belt.Array.reverse->Js.Array.toString
   let removeCommas = str => str->Js.String2.replaceByRe(%re("/[,]/g"), "")
@@ -14,7 +13,6 @@ let make = (~number) => {
     ->reverseArrayToString
     ->removeCommas
     ->Js.String2.match_(%re("/.{1,3}/g"))
-
   let formattedMoney = switch reversedSeperatedNumber {
   | Some(arr) =>
     arr
@@ -24,5 +22,11 @@ let make = (~number) => {
     ->reverseArrayToString
   | None => ""
   }
-  <span> {`${formattedMoney}.${decimals}`->React.string} </span>
+
+  `${formattedMoney}.${decimals}`
+}
+@react.component
+let make = (~number) => {
+  let formattedMoney = formatMoney(~number)
+  <span> {formattedMoney->React.string} </span>
 }

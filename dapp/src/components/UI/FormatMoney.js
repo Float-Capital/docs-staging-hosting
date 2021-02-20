@@ -4,8 +4,7 @@ import * as React from "react";
 import * as Js_math from "bs-platform/lib/es6/js_math.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 
-function FormatMoney(Props) {
-  var number = Props.number;
+function formatMoney(number) {
   var decimals = String(Math.abs((number * 100 | 0) % 100));
   var removeCommas = function (str) {
     return str.replace(/[,]/g, "");
@@ -23,12 +22,19 @@ function FormatMoney(Props) {
   } else {
     formattedMoney = "";
   }
-  return React.createElement("span", undefined, formattedMoney + "." + decimals);
+  return formattedMoney + "." + decimals;
+}
+
+function FormatMoney(Props) {
+  var number = Props.number;
+  var formattedMoney = formatMoney(number);
+  return React.createElement("span", undefined, formattedMoney);
 }
 
 var make = FormatMoney;
 
 export {
+  formatMoney ,
   make ,
   
 }

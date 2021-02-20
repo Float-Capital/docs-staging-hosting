@@ -62,9 +62,11 @@ let default = (props: props): React.element => {
 
   <RootProvider>
     <GraphQl>
-      {switch router.route {
-      | _ => <MainLayout> content </MainLayout>
-      }}
+      <StateChangeMonitor>
+        {switch router.route {
+        | _ => <MainLayout> content </MainLayout>
+        }}
+      </StateChangeMonitor>
     </GraphQl>
   </RootProvider>
 }

@@ -3,12 +3,10 @@
 import * as React from "react";
 
 function Toggle(Props) {
-  var onClick = Props.onClick;
   var preLabelOpt = Props.preLabel;
   var postLabelOpt = Props.postLabel;
   var preLabel = preLabelOpt !== undefined ? preLabelOpt : "";
   var postLabel = postLabelOpt !== undefined ? postLabelOpt : "";
-  console.log(onClick);
   return React.createElement("div", {
               className: "flex justify-end "
             }, React.createElement("div", {
