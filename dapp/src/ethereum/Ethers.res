@@ -50,6 +50,8 @@ module BigNumber = {
 
   @module("ethers") @scope("BigNumber")
   external fromUnsafe: string => t = "from"
+  @module("ethers") @scope("BigNumber")
+  external fromInt: int => t = "from"
 
   @send external add: (t, t) => t = "add"
   @send external sub: (t, t) => t = "sub"
@@ -156,6 +158,20 @@ module Utils = {
   external formatUnits: (. BigNumber.t, ethUnit) => string = "formatUnits"
 
   let formatEther = formatUnits(. _, #ether)
+
+  let formatEtherToPrecision = (number, digits) => {
+    let digitMultiplier = Js.Math.pow_float(~base=10.0, ~exp=digits->Float.fromInt)
+    number
+    ->formatEther
+    ->Float.fromString
+    ->Option.getExn
+    ->(x => x *. digitMultiplier)
+    ->Js.Math.floor_float
+    ->(x => x /. digitMultiplier)
+    ->Float.toString
+  }
+
+  // ->mul(10->power(~decimals)->Float_to_Int)
 
   let toString: ethAddress => string = Obj.magic
   let toLowerString: ethAddress => string = address => address->toString->Js.String.toLowerCase

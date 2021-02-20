@@ -1,12 +1,12 @@
-module Mint = {
+module Redeem = {
   @react.component
   let make = () => {
     let router = Next.Router.useRouter()
     let markets = Queries.MarketDetails.use()
 
     <AccessControl
-      alternateComponent={<h1 onClick={_ => router->Next.Router.push("/login?nextPath=/mint")}>
-        {"login to view this"->React.string}
+      alternateComponent={<h1 onClick={_ => router->Next.Router.push("/login?nextPath=/redeem")}>
+        {"Login"->React.string}
       </h1>}>
       <section>
         {switch markets {
@@ -25,4 +25,4 @@ module Mint = {
     </AccessControl>
   }
 }
-let default = () => <Mint />
+let default = () => <Redeem />

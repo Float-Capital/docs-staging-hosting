@@ -1,4 +1,4 @@
-module TradeForm = %form(
+module MintForm = %form(
   type input = {amount: string, isMint: bool, isLong: bool}
   type output = {amount: Ethers.BigNumber.t, isMint: bool, isLong: bool}
 
@@ -31,7 +31,7 @@ module TradeForm = %form(
   }
 )
 
-let initialInput: TradeForm.input = {
+let initialInput: MintForm.input = {
   amount: "",
   isMint: true,
   isLong: false,
@@ -90,7 +90,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
     ~erc20Address=market.syntheticLong.tokenAddress,
   )
 
-  let form = TradeForm.useForm(~initialInput, ~onSubmit=({amount, isMint, isLong}, _form) => {
+  let form = MintForm.useForm(~initialInput, ~onSubmit=({amount, isMint, isLong}, _form) => {
     switch (isMint, isLong) {
     | (true, true) =>
       let mintFunction = () =>
@@ -171,10 +171,14 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
         let prefix = isGreaterThanApproval(~amount, ~amountApproved) ? "" : "Approve & "
         let greaterThanBalance = isGreaterThanBalance(~amount, ~balance)
         switch greaterThanBalance {
-        | false => (None, `1MINT ${position}`, false)
-        | true => (Some("Amount is greater than your balance"), `${prefix}2Mint ${position}`, true)
+        | false => (None, `MINT ${position} Position`, false)
+        | true => (
+            Some("Amount is greater than your balance"),
+            `${prefix}Mint ${position} Position`,
+            true,
+          )
         }
-      | _ => (None, `3Mint ${position}`, true)
+      | _ => (None, `Mint ${position} Position`, true)
       }
     // TODO: this doesn't check if the balance is greater for these two...
     | (false, true) => (None, "Redeem Long", false)
@@ -200,7 +204,12 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
         onSubmit={() => {
           form.submit()
         }}>
-        <h2> {`${market.name} (${market.symbol})`->React.string} </h2>
+        <div className="flex justify-between">
+          <h2> {`${market.name} (${market.symbol})`->React.string} </h2>
+          <Next.Link href="/redeem">
+            <span className="text-xs"> {"Redeem"->React.string} </span>
+          </Next.Link>
+        </div>
         <select
           name="longshort"
           className="trade-select"
@@ -234,7 +243,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
               //         })}> {"MAX"->React.string} </span>
               //   </span>
               // </div>
-              <MaxInput
+              <AmountInput
                 value=form.input.amount
                 disabled=form.submitting
                 onBlur={_ => form.blurAmount()}
@@ -268,11 +277,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
         {form.input.isMint
           ? <input className="trade-input" placeholder="redeem" />
           : <input className="trade-input" placeholder="mint" />}
-        <Button onClick={_ => Js.log("I was clicked")} variant="large">
-          {`${_buttonText} ${form.input.isMint ? "Mint" : "Redeem"} ${form.input.isLong
-              ? "long"
-              : "short"} position`}
-        </Button>
+        <Button onClick={_ => Js.log("I was clicked")} variant="large"> {_buttonText} </Button>
       </Form>
     </ViewBox>
     {Config.isDevMode // <- this can be used to hide this code when not developing

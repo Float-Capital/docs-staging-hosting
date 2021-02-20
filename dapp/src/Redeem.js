@@ -9,7 +9,7 @@ import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as Router from "next/router";
 import * as AccessControl from "./components/AccessControl.js";
 
-function Mint$Mint(Props) {
+function Redeem$Redeem(Props) {
   var router = Router.useRouter();
   var markets = Curry.app(Queries.MarketDetails.use, [
         undefined,
@@ -45,23 +45,23 @@ function Mint$Mint(Props) {
               children: React.createElement("section", undefined, tmp),
               alternateComponent: React.createElement("h1", {
                     onClick: (function (param) {
-                        router.push("/login?nextPath=/mint");
+                        router.push("/login?nextPath=/redeem");
                         
                       })
-                  }, "login to view this")
+                  }, "Login")
             });
 }
 
-var Mint = {
-  make: Mint$Mint
+var Redeem = {
+  make: Redeem$Redeem
 };
 
 function $$default(param) {
-  return React.createElement(Mint$Mint, {});
+  return React.createElement(Redeem$Redeem, {});
 }
 
 export {
-  Mint ,
+  Redeem ,
   $$default ,
   $$default as default,
   

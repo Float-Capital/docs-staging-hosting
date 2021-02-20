@@ -9,9 +9,10 @@ import * as Ethers from "../../ethereum/Ethers.js";
 import * as Loader from "../UI/Loader.js";
 import * as Ethers$1 from "ethers";
 import * as ViewBox from "../UI/ViewBox.js";
-import * as MaxInput from "../UI/MaxInput.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
+import Link from "next/link";
+import * as AmountInput from "../UI/AmountInput.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as RootProvider from "../../libraries/RootProvider.js";
@@ -19,23 +20,23 @@ import * as ContractHooks from "../Admin/ContractHooks.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
 
+var validators_isStaking = {
+  strategy: /* OnFirstChange */1,
+  validate: (function (param) {
+      return {
+              TAG: 0,
+              _0: param.isStaking,
+              [Symbol.for("name")]: "Ok"
+            };
+    })
+};
+
 var validators_isLong = {
   strategy: /* OnFirstChange */1,
   validate: (function (param) {
       return {
               TAG: 0,
               _0: param.isLong,
-              [Symbol.for("name")]: "Ok"
-            };
-    })
-};
-
-var validators_isMint = {
-  strategy: /* OnFirstChange */1,
-  validate: (function (param) {
-      return {
-              TAG: 0,
-              _0: param.isMint,
               [Symbol.for("name")]: "Ok"
             };
     })
@@ -75,15 +76,15 @@ var validators_amount = {
 };
 
 var validators = {
+  isStaking: validators_isStaking,
   isLong: validators_isLong,
-  isMint: validators_isMint,
   amount: validators_amount
 };
 
 function initialFieldsStatuses(_input) {
   return {
+          isStaking: /* Pristine */0,
           isLong: /* Pristine */0,
-          isMint: /* Pristine */0,
           amount: /* Pristine */0
         };
 }
@@ -92,8 +93,8 @@ function initialState(input) {
   return {
           input: input,
           fieldsStatuses: {
+            isStaking: /* Pristine */0,
             isLong: /* Pristine */0,
-            isMint: /* Pristine */0,
             amount: /* Pristine */0
           },
           collectionsStatuses: undefined,
@@ -103,34 +104,34 @@ function initialState(input) {
 }
 
 function validateForm(input, validators, fieldsStatuses) {
-  var match = fieldsStatuses.isLong;
-  var match_0 = match ? match._0 : Curry._1(validators.isLong.validate, input);
-  var match$1 = fieldsStatuses.isMint;
-  var match_0$1 = match$1 ? match$1._0 : Curry._1(validators.isMint.validate, input);
+  var match = fieldsStatuses.isStaking;
+  var match_0 = match ? match._0 : Curry._1(validators.isStaking.validate, input);
+  var match$1 = fieldsStatuses.isLong;
+  var match_0$1 = match$1 ? match$1._0 : Curry._1(validators.isLong.validate, input);
   var match$2 = fieldsStatuses.amount;
   var match_0$2 = match$2 ? match$2._0 : Curry._1(validators.amount.validate, input);
-  var isLongResult = match_0;
-  var isLongResult$1;
-  if (isLongResult.TAG === /* Ok */0) {
-    var isMintResult = match_0$1;
-    if (isMintResult.TAG === /* Ok */0) {
+  var isStakingResult = match_0;
+  var isStakingResult$1;
+  if (isStakingResult.TAG === /* Ok */0) {
+    var isLongResult = match_0$1;
+    if (isLongResult.TAG === /* Ok */0) {
       var amountResult = match_0$2;
       if (amountResult.TAG === /* Ok */0) {
         return {
                 TAG: 0,
                 output: {
                   amount: amountResult._0,
-                  isMint: isMintResult._0,
-                  isLong: isLongResult._0
+                  isLong: isLongResult._0,
+                  isStaking: isStakingResult._0
                 },
                 fieldsStatuses: {
-                  isLong: {
-                    _0: isLongResult,
+                  isStaking: {
+                    _0: isStakingResult,
                     _1: /* Shown */0,
                     [Symbol.for("name")]: "Dirty"
                   },
-                  isMint: {
-                    _0: isMintResult,
+                  isLong: {
+                    _0: isLongResult,
                     _1: /* Shown */0,
                     [Symbol.for("name")]: "Dirty"
                   },
@@ -144,22 +145,22 @@ function validateForm(input, validators, fieldsStatuses) {
                 [Symbol.for("name")]: "Valid"
               };
       }
-      isLongResult$1 = isLongResult;
+      isStakingResult$1 = isStakingResult;
     } else {
-      isLongResult$1 = isLongResult;
+      isStakingResult$1 = isStakingResult;
     }
   } else {
-    isLongResult$1 = isLongResult;
+    isStakingResult$1 = isStakingResult;
   }
   return {
           TAG: 1,
           fieldsStatuses: {
-            isLong: {
-              _0: isLongResult$1,
+            isStaking: {
+              _0: isStakingResult$1,
               _1: /* Shown */0,
               [Symbol.for("name")]: "Dirty"
             },
-            isMint: {
+            isLong: {
               _0: match_0$1,
               _1: /* Shown */0,
               [Symbol.for("name")]: "Dirty"
@@ -182,12 +183,12 @@ function useForm(initialInput, onSubmit) {
   var match = Formality__ReactUpdate.useReducer(memoizedInitialState, (function (state, action) {
           if (typeof action === "number") {
             switch (action) {
-              case /* BlurIsLongField */0 :
-                  var result = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.isLong, validators_isLong, (function (status) {
+              case /* BlurIsStakingField */0 :
+                  var result = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.isStaking, validators_isStaking, (function (status) {
                           var init = state.fieldsStatuses;
                           return {
-                                  isLong: status,
-                                  isMint: init.isMint,
+                                  isStaking: status,
+                                  isLong: init.isLong,
                                   amount: init.amount
                                 };
                         }));
@@ -206,12 +207,12 @@ function useForm(initialInput, onSubmit) {
                   } else {
                     return /* NoUpdate */0;
                   }
-              case /* BlurIsMintField */1 :
-                  var result$1 = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.isMint, validators_isMint, (function (status) {
+              case /* BlurIsLongField */1 :
+                  var result$1 = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.isLong, validators_isLong, (function (status) {
                           var init = state.fieldsStatuses;
                           return {
-                                  isLong: init.isLong,
-                                  isMint: status,
+                                  isStaking: init.isStaking,
+                                  isLong: status,
                                   amount: init.amount
                                 };
                         }));
@@ -234,8 +235,8 @@ function useForm(initialInput, onSubmit) {
                   var result$2 = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.amount, validators_amount, (function (status) {
                           var init = state.fieldsStatuses;
                           return {
+                                  isStaking: init.isStaking,
                                   isLong: init.isLong,
-                                  isMint: init.isMint,
                                   amount: status
                                 };
                         }));
@@ -366,17 +367,17 @@ function useForm(initialInput, onSubmit) {
             }
           } else {
             switch (action.TAG | 0) {
-              case /* UpdateIsLongField */0 :
+              case /* UpdateIsStakingField */0 :
                   var nextInput = Curry._1(action._0, state.input);
                   return {
                           TAG: 0,
                           _0: {
                             input: nextInput,
-                            fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput, state.fieldsStatuses.isLong, state.submissionStatus, validators_isLong, (function (status) {
+                            fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput, state.fieldsStatuses.isStaking, state.submissionStatus, validators_isStaking, (function (status) {
                                     var init = state.fieldsStatuses;
                                     return {
-                                            isLong: status,
-                                            isMint: init.isMint,
+                                            isStaking: status,
+                                            isLong: init.isLong,
                                             amount: init.amount
                                           };
                                   })),
@@ -386,17 +387,17 @@ function useForm(initialInput, onSubmit) {
                           },
                           [Symbol.for("name")]: "Update"
                         };
-              case /* UpdateIsMintField */1 :
+              case /* UpdateIsLongField */1 :
                   var nextInput$1 = Curry._1(action._0, state.input);
                   return {
                           TAG: 0,
                           _0: {
                             input: nextInput$1,
-                            fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput$1, state.fieldsStatuses.isMint, state.submissionStatus, validators_isMint, (function (status) {
+                            fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput$1, state.fieldsStatuses.isLong, state.submissionStatus, validators_isLong, (function (status) {
                                     var init = state.fieldsStatuses;
                                     return {
-                                            isLong: init.isLong,
-                                            isMint: status,
+                                            isStaking: init.isStaking,
+                                            isLong: status,
                                             amount: init.amount
                                           };
                                   })),
@@ -415,8 +416,8 @@ function useForm(initialInput, onSubmit) {
                             fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput$2, state.fieldsStatuses.amount, state.submissionStatus, validators_amount, (function (status) {
                                     var init = state.fieldsStatuses;
                                     return {
+                                            isStaking: init.isStaking,
                                             isLong: init.isLong,
-                                            isMint: init.isMint,
                                             amount: status
                                           };
                                   })),
@@ -434,8 +435,8 @@ function useForm(initialInput, onSubmit) {
                             _0: {
                               input: input,
                               fieldsStatuses: {
+                                isStaking: /* Pristine */0,
                                 isLong: /* Pristine */0,
-                                isMint: /* Pristine */0,
                                 amount: /* Pristine */0
                               },
                               collectionsStatuses: state.collectionsStatuses,
@@ -450,8 +451,8 @@ function useForm(initialInput, onSubmit) {
                             _0: {
                               input: state.input,
                               fieldsStatuses: {
+                                isStaking: /* Pristine */0,
                                 isLong: /* Pristine */0,
-                                isMint: /* Pristine */0,
                                 amount: /* Pristine */0
                               },
                               collectionsStatuses: state.collectionsStatuses,
@@ -530,22 +531,22 @@ function useForm(initialInput, onSubmit) {
   var tmp;
   tmp = typeof match$1 === "number" || match$1.TAG !== /* Submitting */0 ? false : true;
   return {
-          updateIsLong: (function (nextInputFn, nextValue) {
+          updateIsStaking: (function (nextInputFn, nextValue) {
               return Curry._1(dispatch, {
                           TAG: 0,
                           _0: (function (__x) {
                               return Curry._2(nextInputFn, __x, nextValue);
                             }),
-                          [Symbol.for("name")]: "UpdateIsLongField"
+                          [Symbol.for("name")]: "UpdateIsStakingField"
                         });
             }),
-          updateIsMint: (function (nextInputFn, nextValue) {
+          updateIsLong: (function (nextInputFn, nextValue) {
               return Curry._1(dispatch, {
                           TAG: 1,
                           _0: (function (__x) {
                               return Curry._2(nextInputFn, __x, nextValue);
                             }),
-                          [Symbol.for("name")]: "UpdateIsMintField"
+                          [Symbol.for("name")]: "UpdateIsLongField"
                         });
             }),
           updateAmount: (function (nextInputFn, nextValue) {
@@ -557,23 +558,23 @@ function useForm(initialInput, onSubmit) {
                           [Symbol.for("name")]: "UpdateAmountField"
                         });
             }),
-          blurIsLong: (function (param) {
-              return Curry._1(dispatch, /* BlurIsLongField */0);
+          blurIsStaking: (function (param) {
+              return Curry._1(dispatch, /* BlurIsStakingField */0);
             }),
-          blurIsMint: (function (param) {
-              return Curry._1(dispatch, /* BlurIsMintField */1);
+          blurIsLong: (function (param) {
+              return Curry._1(dispatch, /* BlurIsLongField */1);
             }),
           blurAmount: (function (param) {
               return Curry._1(dispatch, /* BlurAmountField */2);
             }),
+          isStakingResult: Formality.exposeFieldResult(state.fieldsStatuses.isStaking),
           isLongResult: Formality.exposeFieldResult(state.fieldsStatuses.isLong),
-          isMintResult: Formality.exposeFieldResult(state.fieldsStatuses.isMint),
           amountResult: Formality.exposeFieldResult(state.fieldsStatuses.amount),
           input: state.input,
           status: state.formStatus,
           dirty: (function (param) {
               var match = state.fieldsStatuses;
-              if (match.isLong || match.isMint || match.amount) {
+              if (match.isStaking || match.isLong || match.amount) {
                 return true;
               } else {
                 return false;
@@ -610,7 +611,7 @@ function useForm(initialInput, onSubmit) {
         };
 }
 
-var TradeForm = {
+var MintForm = {
   validators: validators,
   initialFieldsStatuses: initialFieldsStatuses,
   initialCollectionsStatuses: undefined,
@@ -621,8 +622,8 @@ var TradeForm = {
 
 var initialInput = {
   amount: "",
-  isMint: true,
-  isLong: false
+  isLong: false,
+  isStaking: true
 };
 
 function useBalanceAndApproved(erc20Address, spender) {
@@ -642,7 +643,7 @@ function isGreaterThanBalance(amount, balance) {
   return amount.gt(balance);
 }
 
-function TradeForm$1(Props) {
+function MintForm$1(Props) {
   var market = Props.market;
   var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
@@ -668,113 +669,81 @@ function TradeForm$1(Props) {
   var match$4 = ContractHooks.useErc20Balance(market.syntheticShort.tokenAddress);
   var match$5 = ContractHooks.useErc20Balance(market.syntheticLong.tokenAddress);
   var form = useForm(initialInput, (function (param, _form) {
-          var isLong = param.isLong;
           var amount = param.amount;
-          if (param.isMint) {
-            if (isLong) {
-              var mintFunction = function (param) {
-                var arg = market.marketIndex;
-                return Curry._2(contractExecutionHandler, (function (param) {
-                              return Contracts.LongShort.make(longShortContractAddress, param);
-                            }), (function (param) {
-                              return param.mintLong(arg, amount);
-                            }));
-              };
-              if (!amount.gt(Belt_Option.getWithDefault(optDaiAmountApproved, Ethers$1.BigNumber.from("0")))) {
-                return mintFunction(undefined);
-              }
-              Curry._1(setContractActionToCallAfterApproval, (function (param) {
-                      return mintFunction;
-                    }));
-              var arg = amount.mul(Ethers$1.BigNumber.from("2"));
-              return Curry._2(contractExecutionHandlerApprove, (function (param) {
-                            return Contracts.Erc20.make(daiAddressThatIsTemporarilyHardCoded, param);
-                          }), (function (param) {
-                            return param.approve(longShortContractAddress, arg);
-                          }));
-            }
-            var mintFunction$1 = function (param) {
+          if (param.isLong) {
+            var mintFunction = function (param) {
               var arg = market.marketIndex;
               return Curry._2(contractExecutionHandler, (function (param) {
                             return Contracts.LongShort.make(longShortContractAddress, param);
                           }), (function (param) {
-                            return param.mintShort(arg, amount);
+                            return param.mintLong(arg, amount);
                           }));
             };
             if (!amount.gt(Belt_Option.getWithDefault(optDaiAmountApproved, Ethers$1.BigNumber.from("0")))) {
-              return mintFunction$1(undefined);
+              return mintFunction(undefined);
             }
             Curry._1(setContractActionToCallAfterApproval, (function (param) {
-                    return mintFunction$1;
+                    return mintFunction;
                   }));
-            var arg$1 = amount.mul(Ethers$1.BigNumber.from("2"));
+            var arg = amount.mul(Ethers$1.BigNumber.from("2"));
             return Curry._2(contractExecutionHandlerApprove, (function (param) {
                           return Contracts.Erc20.make(daiAddressThatIsTemporarilyHardCoded, param);
                         }), (function (param) {
-                          return param.approve(longShortContractAddress, arg$1);
+                          return param.approve(longShortContractAddress, arg);
                         }));
           }
-          if (isLong) {
-            var partial_arg = market.syntheticShort.tokenAddress;
-            var arg$2 = market.marketIndex;
+          var mintFunction$1 = function (param) {
+            var arg = market.marketIndex;
             return Curry._2(contractExecutionHandler, (function (param) {
-                          return Contracts.LongShort.make(partial_arg, param);
+                          return Contracts.LongShort.make(longShortContractAddress, param);
                         }), (function (param) {
-                          return param.redeemLong(arg$2, amount);
+                          return param.mintShort(arg, amount);
                         }));
+          };
+          if (!amount.gt(Belt_Option.getWithDefault(optDaiAmountApproved, Ethers$1.BigNumber.from("0")))) {
+            return mintFunction$1(undefined);
           }
-          var partial_arg$1 = market.syntheticLong.tokenAddress;
-          var arg$3 = market.marketIndex;
-          return Curry._2(contractExecutionHandler, (function (param) {
-                        return Contracts.LongShort.make(partial_arg$1, param);
+          Curry._1(setContractActionToCallAfterApproval, (function (param) {
+                  return mintFunction$1;
+                }));
+          var arg$1 = amount.mul(Ethers$1.BigNumber.from("2"));
+          return Curry._2(contractExecutionHandlerApprove, (function (param) {
+                        return Contracts.Erc20.make(daiAddressThatIsTemporarilyHardCoded, param);
                       }), (function (param) {
-                        return param.redeemShort(arg$3, amount);
+                        return param.approve(longShortContractAddress, arg$1);
                       }));
         }));
   var match$6 = form.amountResult;
   var formAmount = match$6 !== undefined && match$6.TAG === /* Ok */0 ? Caml_option.some(match$6._0) : undefined;
-  var match$7 = form.input.isMint;
-  var match$8 = form.input.isLong;
-  var match$9;
-  if (match$7) {
-    var position = match$8 ? "LONG" : "SHORT";
-    var exit = 0;
-    if (formAmount !== undefined && optDaiBalance !== undefined && optDaiAmountApproved !== undefined) {
-      var amount = Caml_option.valFromOption(formAmount);
-      var prefix = amount.gt(Caml_option.valFromOption(optDaiAmountApproved)) ? "" : "Approve & ";
-      var greaterThanBalance = amount.gt(Caml_option.valFromOption(optDaiBalance));
-      match$9 = greaterThanBalance ? [
-          "Amount is greater than your balance",
-          prefix + "2Mint " + position,
-          true
-        ] : [
-          undefined,
-          "1MINT " + position,
-          false
-        ];
-    } else {
-      exit = 1;
-    }
-    if (exit === 1) {
-      match$9 = [
-        undefined,
-        "3Mint " + position,
+  var stakingText = form.input.isStaking ? " & stake" : "";
+  var isLong = form.input.isLong;
+  var position = isLong ? "long" : "short";
+  var match$7;
+  var exit = 0;
+  if (formAmount !== undefined && optDaiBalance !== undefined && optDaiAmountApproved !== undefined) {
+    var amount = Caml_option.valFromOption(formAmount);
+    var needsToApprove = amount.gt(Caml_option.valFromOption(optDaiAmountApproved));
+    var greaterThanBalance = amount.gt(Caml_option.valFromOption(optDaiBalance));
+    match$7 = greaterThanBalance ? [
+        "Amount is greater than your balance",
+        "Insufficient balance",
         true
-      ];
-    }
-    
-  } else {
-    match$9 = match$8 ? [
-        undefined,
-        "Redeem Long",
-        false
       ] : [
         undefined,
-        "Redeem Short",
+        needsToApprove ? "Approve & mint " + position + " position" : "Mint" + stakingText + " " + position + " position",
         false
       ];
+  } else {
+    exit = 1;
   }
-  var optAdditionalErrorMessage = match$9[0];
+  if (exit === 1) {
+    match$7 = [
+      undefined,
+      "Mint" + stakingText + " " + position + " position",
+      true
+    ];
+  }
+  var optAdditionalErrorMessage = match$7[0];
   React.useEffect((function () {
           if (typeof txStateApprove !== "number" && txStateApprove.TAG === /* Complete */2) {
             Curry._1(contractActionToCallAfterApproval, undefined);
@@ -784,95 +753,59 @@ function TradeForm$1(Props) {
           }
           
         }), [txStateApprove]);
+  var match$8 = form.amountResult;
   var tmp;
-  if (form.input.isMint) {
-    var match$10 = form.amountResult;
-    var tmp$1;
-    var exit$1 = 0;
-    var message;
-    if (match$10 !== undefined) {
-      if (match$10.TAG === /* Ok */0) {
-        if (optAdditionalErrorMessage !== undefined) {
-          message = optAdditionalErrorMessage;
-          exit$1 = 1;
-        } else {
-          tmp$1 = React.createElement("div", {
-                className: "text-green-600"
-              }, "✓");
-        }
-      } else {
-        message = match$10._0;
+  var exit$1 = 0;
+  var message;
+  if (match$8 !== undefined) {
+    if (match$8.TAG === /* Ok */0) {
+      if (optAdditionalErrorMessage !== undefined) {
+        message = optAdditionalErrorMessage;
         exit$1 = 1;
+      } else {
+        tmp = null;
       }
-    } else if (optAdditionalErrorMessage !== undefined) {
-      message = optAdditionalErrorMessage;
-      exit$1 = 1;
     } else {
-      tmp$1 = null;
+      message = match$8._0;
+      exit$1 = 1;
     }
-    if (exit$1 === 1) {
-      tmp$1 = React.createElement("div", {
-            className: "text-red-600"
-          }, message);
-    }
-    tmp = React.createElement(React.Fragment, undefined, React.createElement(MaxInput.make, {
-              placeholder: "mint",
-              value: form.input.amount,
-              disabled: form.submitting,
-              onBlur: (function (param) {
-                  return Curry._1(form.blurAmount, undefined);
-                }),
-              onChange: (function ($$event) {
-                  return Curry._2(form.updateAmount, (function (input, amount) {
-                                return {
-                                        amount: amount,
-                                        isMint: input.isMint,
-                                        isLong: input.isLong
-                                      };
-                              }), $$event.target.value);
-                }),
-              onMaxClick: (function (param) {
-                  return Curry._2(form.updateAmount, (function (input, amount) {
-                                return {
-                                        amount: amount,
-                                        isMint: input.isMint,
-                                        isLong: input.isLong
-                                      };
-                              }), optDaiBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optDaiBalance)) : "0");
-                })
-            }), tmp$1);
+  } else if (optAdditionalErrorMessage !== undefined) {
+    message = optAdditionalErrorMessage;
+    exit$1 = 1;
   } else {
-    tmp = React.createElement("input", {
-          className: "trade-input",
-          placeholder: "redeem"
-        });
+    tmp = null;
   }
-  var tmp$2;
+  if (exit$1 === 1) {
+    tmp = React.createElement("div", {
+          className: "text-red-600"
+        }, message);
+  }
+  var tmp$1;
   if (Config.isDevMode) {
-    var tmp$3;
+    var tmp$2;
     if (typeof txState === "number") {
       switch (txState) {
         case /* UnInitialised */0 :
-            tmp$3 = null;
+            tmp$2 = null;
             break;
         case /* Created */1 :
-            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Approval "), React.createElement(Loader.make, {}));
+            tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Approval "), React.createElement(Loader.make, {}));
             break;
         case /* Failed */2 :
-            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."));
+            tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."));
             break;
         
       }
     } else {
       switch (txState.TAG | 0) {
         case /* SignedAndSubmitted */0 :
-            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Approval - submitted ", React.createElement(Loader.make, {})), React.createElement(Loader.make, {}));
+            tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Approval - submitted ", React.createElement(Loader.make, {})), React.createElement(Loader.make, {}));
             break;
         case /* Declined */1 :
-            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0));
+            tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0));
             break;
         case /* Complete */2 :
-            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Approval Complete, Sign the next transaction "));
+            tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Approval Complete, Sign the next transaction "));
             break;
         
       }
@@ -885,35 +818,35 @@ function TradeForm$1(Props) {
                           }));
             })
         }, ">>Reset tx<<");
-    var tmp$4;
+    var tmp$3;
     if (typeof txState === "number") {
       switch (txState) {
         case /* UnInitialised */0 :
-            tmp$4 = null;
+            tmp$3 = null;
             break;
         case /* Created */1 :
-            tmp$4 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, "Tx created."), React.createElement("div", undefined, React.createElement(Loader.make, {})));
+            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, "Tx created."), React.createElement("div", undefined, React.createElement(Loader.make, {})));
             break;
         case /* Failed */2 :
-            tmp$4 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."), resetTxButton);
+            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."), resetTxButton);
             break;
         
       }
     } else {
       switch (txState.TAG | 0) {
         case /* SignedAndSubmitted */0 :
-            tmp$4 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, React.createElement("a", {
+            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, React.createElement("a", {
                           href: "https://" + txExplererUrl + "/tx/" + txState._0,
                           rel: "noopener noreferrer",
                           target: "_blank"
                         }, "View the transaction on " + txExplererUrl)), React.createElement(Loader.make, {}));
             break;
         case /* Declined */1 :
-            tmp$4 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0), resetTxButton);
+            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0), resetTxButton);
             break;
         case /* Complete */2 :
             var txHash = txState._0.transactionHash;
-            tmp$4 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Transaction Complete "), React.createElement("p", undefined, React.createElement("a", {
+            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Transaction Complete "), React.createElement("p", undefined, React.createElement("a", {
                           href: "https://" + txExplererUrl + "/tx/" + txHash,
                           rel: "noopener noreferrer",
                           target: "_blank"
@@ -925,9 +858,9 @@ function TradeForm$1(Props) {
     var formatOptBalance = function (__x) {
       return Belt_Option.mapWithDefault(__x, "Loading", Ethers.Utils.formatEther);
     };
-    tmp$2 = React.createElement(React.Fragment, undefined, tmp$3, tmp$4, React.createElement("code", undefined, React.createElement("p", undefined, "dev only component to display balances"), React.createElement("p", undefined, "dai - balance: " + formatOptBalance(optDaiBalance) + " - approved: " + formatOptBalance(optDaiAmountApproved)), React.createElement("p", undefined, "long - balance: " + formatOptBalance(match$5.data)), React.createElement("p", undefined, "short - balance: " + formatOptBalance(match$4.data))));
+    tmp$1 = React.createElement(React.Fragment, undefined, tmp$2, tmp$3, React.createElement("code", undefined, React.createElement("p", undefined, "dev only component to display balances"), React.createElement("p", undefined, "dai - balance: " + formatOptBalance(optDaiBalance) + " - approved: " + formatOptBalance(optDaiAmountApproved)), React.createElement("p", undefined, "long - balance: " + formatOptBalance(match$5.data)), React.createElement("p", undefined, "short - balance: " + formatOptBalance(match$4.data))));
   } else {
-    tmp$2 = null;
+    tmp$1 = null;
   }
   return React.createElement("div", {
               className: "screen-centered-container"
@@ -938,7 +871,14 @@ function TradeForm$1(Props) {
                             return Curry._1(form.submit, undefined);
                           }),
                         children: null
-                      }, React.createElement("h2", undefined, market.name + " (" + market.symbol + ")"), React.createElement("select", {
+                      }, React.createElement("div", {
+                            className: "flex justify-between"
+                          }, React.createElement("h2", undefined, market.name + " (" + market.symbol + ")"), React.createElement(Link, {
+                                href: "/redeem",
+                                children: React.createElement("span", {
+                                      className: "text-xs hover:text-gray-500 cursor-pointer"
+                                    }, "Redeem")
+                              })), React.createElement("select", {
                             className: "trade-select",
                             disabled: form.submitting,
                             name: "longshort",
@@ -950,8 +890,8 @@ function TradeForm$1(Props) {
                                 return Curry._2(form.updateIsLong, (function (input, isLong) {
                                               return {
                                                       amount: input.amount,
-                                                      isMint: input.isMint,
-                                                      isLong: isLong
+                                                      isLong: isLong,
+                                                      isStaking: input.isStaking
                                                     };
                                             }), $$event.target.value === "long");
                               })
@@ -959,42 +899,73 @@ function TradeForm$1(Props) {
                                 value: "long"
                               }, "Long 🐮"), React.createElement("option", {
                                 value: "short"
-                              }, "Short 🐻")), tmp, React.createElement("div", {
-                            className: "trade-switch",
-                            onClick: (function (param) {
-                                return Curry._2(form.updateIsMint, (function (input, isMint) {
+                              }, "Short 🐻")), React.createElement(AmountInput.make, {
+                            placeholder: "Mint",
+                            value: form.input.amount,
+                            optBalance: Belt_Option.getWithDefault(optDaiBalance, Ethers$1.BigNumber.from(0)),
+                            disabled: form.submitting,
+                            onBlur: (function (param) {
+                                return Curry._1(form.blurAmount, undefined);
+                              }),
+                            onChange: (function ($$event) {
+                                return Curry._2(form.updateAmount, (function (input, amount) {
                                               return {
-                                                      amount: input.amount,
-                                                      isMint: isMint,
-                                                      isLong: input.isLong
+                                                      amount: amount,
+                                                      isLong: input.isLong,
+                                                      isStaking: input.isStaking
                                                     };
-                                            }), !form.input.isMint);
+                                            }), $$event.target.value);
+                              }),
+                            onMaxClick: (function (param) {
+                                return Curry._2(form.updateAmount, (function (input, amount) {
+                                              return {
+                                                      amount: amount,
+                                                      isLong: input.isLong,
+                                                      isStaking: input.isStaking
+                                                    };
+                                            }), optDaiBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optDaiBalance)) : "0");
                               })
-                          }, "↑↓"), form.input.isMint ? React.createElement("input", {
-                              className: "trade-input",
-                              placeholder: "redeem"
-                            }) : React.createElement("input", {
-                              className: "trade-input",
-                              placeholder: "mint"
-                            }), React.createElement(Button.make, {
+                          }), tmp, React.createElement("div", {
+                            className: "flex justify-between items-center"
+                          }, React.createElement("div", {
+                                className: "flex items-center"
+                              }, React.createElement("input", {
+                                    className: "mx-2",
+                                    checked: form.input.isStaking,
+                                    disabled: form.submitting,
+                                    type: "checkbox",
+                                    onBlur: (function (param) {
+                                        return Curry._1(form.blurIsStaking, undefined);
+                                      }),
+                                    onChange: (function ($$event) {
+                                        return Curry._2(form.updateIsStaking, (function (input, value) {
+                                                      return {
+                                                              amount: input.amount,
+                                                              isLong: input.isLong,
+                                                              isStaking: value
+                                                            };
+                                                    }), $$event.target.checked);
+                                      })
+                                  }), React.createElement("p", undefined, "Stake " + (
+                                    form.input.isLong ? "long" : "short"
+                                  ) + " tokens")), React.createElement("p", {
+                                className: "text-xxs hover:text-gray-500"
+                              }, React.createElement("a", {
+                                    href: "https://docs.float.capital"
+                                  }, "Learn more about staking?"))), React.createElement(Button.make, {
                             onClick: (function (param) {
-                                console.log("I was clicked");
                                 
                               }),
-                            children: match$9[1] + " " + (
-                              form.input.isMint ? "Mint" : "Redeem"
-                            ) + " " + (
-                              form.input.isLong ? "long" : "short"
-                            ) + " position",
+                            children: match$7[1],
                             variant: "large"
                           }))
-                }), tmp$2);
+                }), tmp$1);
 }
 
-var make = TradeForm$1;
+var make = MintForm$1;
 
 export {
-  TradeForm ,
+  MintForm ,
   initialInput ,
   useBalanceAndApproved ,
   isGreaterThanApproval ,
