@@ -86,7 +86,7 @@ type User @entity {
 type CurrentStake @entity {
   id: ID! # user address - fund address
   user: User!
-  userAddress: bytes!
+  userAddress: Bytes!
   tokenType: SyntheticToken!
   currentStake: Stake!
 }
