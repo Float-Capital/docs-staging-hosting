@@ -87,54 +87,39 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
     ~erc20Address=market.syntheticLong.tokenAddress,
   )
 
-  let form = MintForm.useForm(~initialInput, ~onSubmit=({amount, isLong}, _form) => {
-    switch isLong {
+  let form = MintForm.useForm(~initialInput, ~onSubmit=({amount, isLong, isStaking}, _form) => {
+    let approveFunction = () =>
+      contractExecutionHandlerApprove(
+        ~makeContractInstance=Contracts.Erc20.make(~address=daiAddressThatIsTemporarilyHardCoded),
+        ~contractFunction=Contracts.Erc20.approve(
+          ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
+          ~spender=longShortContractAddress,
+        ),
+      )
+    let mintFunction = () =>
+      contractExecutionHandler(
+        ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
+        ~contractFunction=isLong
+          ? Contracts.LongShort.mintLong(~marketIndex=market.marketIndex, ~amount)
+          : Contracts.LongShort.mintShort(~marketIndex=market.marketIndex, ~amount),
+      )
+    let mintAndStakeFunction = () =>
+      contractExecutionHandler(
+        ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
+        ~contractFunction=isLong
+          ? Contracts.LongShort.mintLongAndStake(~marketIndex=market.marketIndex, ~amount)
+          : Contracts.LongShort.mintShortAndStake(~marketIndex=market.marketIndex, ~amount),
+      )
+    let needsToApprove = isGreaterThanApproval(
+      ~amount,
+      ~amountApproved=optDaiAmountApproved->Option.getWithDefault(Ethers.BigNumber.fromUnsafe("0")),
+    )
+
+    switch needsToApprove {
     | true =>
-      let mintFunction = () =>
-        contractExecutionHandler(
-          ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
-          ~contractFunction=Contracts.LongShort.mintLong(~marketIndex=market.marketIndex, ~amount),
-        )
-      switch isGreaterThanApproval(
-        ~amount,
-        ~amountApproved=optDaiAmountApproved->Option.getWithDefault(
-          Ethers.BigNumber.fromUnsafe("0"),
-        ),
-      ) {
-      | true =>
-        setContractActionToCallAfterApproval(_ => mintFunction)
-        contractExecutionHandlerApprove(
-          ~makeContractInstance=Contracts.Erc20.make(~address=daiAddressThatIsTemporarilyHardCoded),
-          ~contractFunction=Contracts.Erc20.approve(
-            ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
-            ~spender=longShortContractAddress,
-          ),
-        )
-      | false => mintFunction()
-      }
-    | false =>
-      let mintFunction = () =>
-        contractExecutionHandler(
-          ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
-          ~contractFunction=Contracts.LongShort.mintShort(~marketIndex=market.marketIndex, ~amount),
-        )
-      switch isGreaterThanApproval(
-        ~amount,
-        ~amountApproved=optDaiAmountApproved->Option.getWithDefault(
-          Ethers.BigNumber.fromUnsafe("0"),
-        ),
-      ) {
-      | true =>
-        setContractActionToCallAfterApproval(_ => mintFunction)
-        contractExecutionHandlerApprove(
-          ~makeContractInstance=Contracts.Erc20.make(~address=daiAddressThatIsTemporarilyHardCoded),
-          ~contractFunction=Contracts.Erc20.approve(
-            ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
-            ~spender=longShortContractAddress,
-          ),
-        )
-      | false => mintFunction()
-      }
+      setContractActionToCallAfterApproval(_ => isStaking ? mintAndStakeFunction : mintFunction)
+      approveFunction()
+    | false => isStaking ? mintAndStakeFunction() : mintFunction()
     }
   })
 
@@ -186,13 +171,13 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
         onSubmit={() => {
           form.submit()
         }}>
-        <div className="flex justify-between">
+        <div className="flex justify-between mb-2">
           <h2> {`${market.name} (${market.symbol})`->React.string} </h2>
-          <Next.Link href="/redeem">
-            <span className="text-xs hover:text-gray-500 cursor-pointer">
-              {"Redeem"->React.string}
-            </span>
-          </Next.Link>
+          // <Next.Link href="/redeem">
+          //   <span className="text-xs hover:text-gray-500 cursor-pointer">
+          //     {"Redeem"->React.string}
+          //   </span>
+          // </Next.Link>
         </div>
         <select
           name="longshort"
@@ -253,7 +238,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
             </label>
           </div>
           <p className="text-xxs hover:text-gray-500">
-            <a href="https://docs.float.capital"> {"Learn more about staking?"->React.string} </a>
+            <a href="https://docs.float.capital"> {"Learn more about staking"->React.string} </a>
           </p>
         </div>
         // <Toggle onClick={_ => Js.log("I was toggled")} preLabel="stake " postLabel="" />

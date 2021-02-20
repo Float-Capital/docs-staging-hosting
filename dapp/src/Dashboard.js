@@ -8,61 +8,11 @@ import * as Toggle from "./components/UI/Toggle.js";
 import * as Globals from "./libraries/Globals.js";
 import * as Queries from "./libraries/Queries.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
-import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
 import * as DaiBalance from "./components/ExampleViewFunctions/DaiBalance.js";
-import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as FormatMoney from "./components/UI/FormatMoney.js";
 import * as Router from "next/router";
-import * as DataFetchers from "./components/Data/DataFetchers.js";
-import * as RootProvider from "./libraries/RootProvider.js";
+import * as StakeDetails from "./StakeDetails.js";
 import * as AccessControl from "./components/AccessControl.js";
-import FromUnixTime from "date-fns/fromUnixTime";
-import FormatDistanceToNow from "date-fns/formatDistanceToNow";
-
-function timestampToDuration(timestamp) {
-  return FormatDistanceToNow(FromUnixTime(timestamp.toNumber()));
-}
-
-function Dashboard$StakeDetails(Props) {
-  var currentUser = RootProvider.useCurrentUserExn(undefined);
-  var activeStakes = DataFetchers.useUsersStakes(currentUser);
-  var match = activeStakes.data;
-  var tmp;
-  if (match !== undefined) {
-    var currentStakes = match.currentStakes;
-    tmp = currentStakes.length !== 0 ? React.createElement(React.Fragment, undefined, Belt_Array.map(currentStakes, (function (param) {
-                  var match = param.currentStake;
-                  var match$1 = match.tokenType;
-                  var match$2 = match$1.syntheticMarket;
-                  var amountFormatted = FormatMoney.formatMoney(Belt_Option.getWithDefault(Belt_Float.fromString(Ethers.Utils.formatEther(match.amount)), 0));
-                  var timeSinceStaking = FormatDistanceToNow(FromUnixTime(match.timestamp.toNumber()));
-                  if (match.withdrawn) {
-                    console.log("This is a bug in the graph, no withdrawn stakes should show in the `currentStakes`");
-                    return null;
-                  } else {
-                    return React.createElement(React.Fragment, undefined, React.createElement("h3", {
-                                    className: "text-xl"
-                                  }, match$2.name + "(" + match$2.symbol + ")"), React.createElement("p", undefined, "Stake of " + amountFormatted + " ", React.createElement("a", {
-                                        href: "https://testnet.bscscan.com/token/" + match$1.tokenAddress + "?a=" + Globals.ethAdrToStr(currentUser),
-                                        target: "_"
-                                      }, match$1.tokenType)), React.createElement("p", undefined, React.createElement("a", {
-                                        href: "https://testnet.bscscan.com/tx/" + match.creationTxHash
-                                      }, "Last updated " + timeSinceStaking + " ago")));
-                  }
-                }))) : React.createElement("h2", undefined, "You have no active stakes.");
-  } else {
-    tmp = activeStakes.error !== undefined ? "Error" : "Loading";
-  }
-  return React.createElement("div", {
-              className: "p-5 flex flex-col items-center justify-center bg-white bg-opacity-75  rounded"
-            }, React.createElement("h2", {
-                  className: "text-4xl"
-                }, "Stake"), tmp);
-}
-
-var StakeDetails = {
-  make: Dashboard$StakeDetails
-};
 
 function Dashboard(Props) {
   var router = Router.useRouter();
@@ -111,7 +61,7 @@ function Dashboard(Props) {
       tmp = "Query returned wrong number of results";
     } else {
       var match$5 = match$4[0];
-      var timeSinceUpdate = FormatDistanceToNow(FromUnixTime(match$5.timestamp.toNumber()));
+      var timeSinceUpdate = Globals.timestampToDuration(match$5.timestamp);
       tmp = React.createElement(React.Fragment, undefined, React.createElement("a", {
                 href: "https://goerli.etherscan.io/tx/" + match$5.txHash
               }, "Latest update happened " + timeSinceUpdate + " ago. (view on block-explorer) by " + match$5.setBy), React.createElement("p", undefined, "SyntheticPrice " + Ethers.Utils.formatEther(match$5.syntheticPrice) + "$"), React.createElement("p", undefined, "Long Token Price " + Ethers.Utils.formatEther(match$5.longTokenPrice) + "$"), React.createElement("p", undefined, "Short Token Price " + Ethers.Utils.formatEther(match$5.shortTokenPrice) + "$"), React.createElement("p", undefined, "Total locked long " + Ethers.Utils.formatEther(match$5.totalLockedLong) + "$"), React.createElement("p", undefined, "Total Locked Short " + Ethers.Utils.formatEther(match$5.totalLockedShort) + "$"), React.createElement("p", undefined, "Total Locked " + Ethers.Utils.formatEther(match$5.totalValueLocked) + "$"), React.createElement("p", undefined, "TODO:"), React.createElement("p", undefined, "show the ratio of long to short in the same chart"), React.createElement("p", undefined, "show historic returns of long asset (history APY)"), React.createElement("p", undefined, "show current APY on opposing side (probably short)"));
@@ -147,13 +97,14 @@ function Dashboard(Props) {
                         }, React.createElement("h2", undefined, "Markets"), match.loading ? "Loading..." : (
                             match.error !== undefined ? "Error loading data" : (
                                 match$1 !== undefined ? React.createElement(React.Fragment, undefined, Belt_Array.map(match$1.syntheticMarkets, (function (param) {
+                                              var marketIndex = param.marketIndex;
                                               var symbol = param.symbol;
                                               return React.createElement("div", {
                                                           key: symbol,
                                                           className: "flex justify-between items-center w-full"
                                                         }, React.createElement("p", undefined, param.name), React.createElement("p", undefined, symbol), React.createElement(Button.make, {
                                                               onClick: (function (param) {
-                                                                  router.push("/mint?market=" + symbol);
+                                                                  router.push("/mint?marketIndex=" + marketIndex.toString());
                                                                   
                                                                 }),
                                                               children: "TRADE",
@@ -161,7 +112,7 @@ function Dashboard(Props) {
                                                             }));
                                             }))) : "You might think this is impossible, but depending on the situation it might not be!"
                               )
-                          ))), React.createElement("div", undefined, React.createElement(Dashboard$StakeDetails, {}))), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("h1", undefined, "Dashboard"), React.createElement(DaiBalance.make, {}), tmp);
+                          ))), React.createElement("div", undefined, React.createElement(StakeDetails.make, {}))), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("h1", undefined, "Dashboard"), React.createElement(DaiBalance.make, {}), tmp);
 }
 
 var make = Dashboard;
@@ -169,8 +120,6 @@ var make = Dashboard;
 var $$default = Dashboard;
 
 export {
-  timestampToDuration ,
-  StakeDetails ,
   make ,
   $$default ,
   $$default as default,

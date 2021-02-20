@@ -11,7 +11,6 @@ import * as Ethers$1 from "ethers";
 import * as ViewBox from "../UI/ViewBox.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
-import Link from "next/link";
 import * as AmountInput from "../UI/AmountInput.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
@@ -661,21 +660,51 @@ function MintForm$1(Props) {
   var match$4 = ContractHooks.useErc20Balance(market.syntheticShort.tokenAddress);
   var match$5 = ContractHooks.useErc20Balance(market.syntheticLong.tokenAddress);
   var form = useForm(initialInput, (function (param, _form) {
+          var isStaking = param.isStaking;
+          var isLong = param.isLong;
           var amount = param.amount;
-          if (param.isLong) {
-            var mintFunction = function (param) {
+          var mintFunction = function (param) {
+            var tmp;
+            if (isLong) {
               var arg = market.marketIndex;
-              return Curry._2(contractExecutionHandler, (function (param) {
-                            return Contracts.LongShort.make(longShortContractAddress, param);
-                          }), (function (param) {
-                            return param.mintLong(arg, amount);
-                          }));
-            };
-            if (!amount.gt(Belt_Option.getWithDefault(optDaiAmountApproved, Ethers$1.BigNumber.from("0")))) {
-              return mintFunction(undefined);
+              tmp = (function (param) {
+                  return param.mintLong(arg, amount);
+                });
+            } else {
+              var arg$1 = market.marketIndex;
+              tmp = (function (param) {
+                  return param.mintShort(arg$1, amount);
+                });
             }
+            return Curry._2(contractExecutionHandler, (function (param) {
+                          return Contracts.LongShort.make(longShortContractAddress, param);
+                        }), tmp);
+          };
+          var mintAndStakeFunction = function (param) {
+            var tmp;
+            if (isLong) {
+              var arg = market.marketIndex;
+              tmp = (function (param) {
+                  return param.mintLongAndStake(arg, amount);
+                });
+            } else {
+              var arg$1 = market.marketIndex;
+              tmp = (function (param) {
+                  return param.mintShortAndStake(arg$1, amount);
+                });
+            }
+            return Curry._2(contractExecutionHandler, (function (param) {
+                          return Contracts.LongShort.make(longShortContractAddress, param);
+                        }), tmp);
+          };
+          var needsToApprove = amount.gt(Belt_Option.getWithDefault(optDaiAmountApproved, Ethers$1.BigNumber.from("0")));
+          if (needsToApprove) {
             Curry._1(setContractActionToCallAfterApproval, (function (param) {
-                    return mintFunction;
+                    if (isStaking) {
+                      return mintAndStakeFunction;
+                    } else {
+                      return mintFunction;
+                    }
                   }));
             var arg = amount.mul(Ethers$1.BigNumber.from("2"));
             return Curry._2(contractExecutionHandlerApprove, (function (param) {
@@ -683,27 +712,11 @@ function MintForm$1(Props) {
                         }), (function (param) {
                           return param.approve(longShortContractAddress, arg);
                         }));
+          } else if (isStaking) {
+            return mintAndStakeFunction(undefined);
+          } else {
+            return mintFunction(undefined);
           }
-          var mintFunction$1 = function (param) {
-            var arg = market.marketIndex;
-            return Curry._2(contractExecutionHandler, (function (param) {
-                          return Contracts.LongShort.make(longShortContractAddress, param);
-                        }), (function (param) {
-                          return param.mintShort(arg, amount);
-                        }));
-          };
-          if (!amount.gt(Belt_Option.getWithDefault(optDaiAmountApproved, Ethers$1.BigNumber.from("0")))) {
-            return mintFunction$1(undefined);
-          }
-          Curry._1(setContractActionToCallAfterApproval, (function (param) {
-                  return mintFunction$1;
-                }));
-          var arg$1 = amount.mul(Ethers$1.BigNumber.from("2"));
-          return Curry._2(contractExecutionHandlerApprove, (function (param) {
-                        return Contracts.Erc20.make(daiAddressThatIsTemporarilyHardCoded, param);
-                      }), (function (param) {
-                        return param.approve(longShortContractAddress, arg$1);
-                      }));
         }));
   var match$6 = form.amountResult;
   var formAmount = match$6 !== undefined && match$6.TAG === /* Ok */0 ? Caml_option.some(match$6._0) : undefined;
@@ -864,13 +877,8 @@ function MintForm$1(Props) {
                           }),
                         children: null
                       }, React.createElement("div", {
-                            className: "flex justify-between"
-                          }, React.createElement("h2", undefined, market.name + " (" + market.symbol + ")"), React.createElement(Link, {
-                                href: "/redeem",
-                                children: React.createElement("span", {
-                                      className: "text-xs hover:text-gray-500 cursor-pointer"
-                                    }, "Redeem")
-                              })), React.createElement("select", {
+                            className: "flex justify-between mb-2"
+                          }, React.createElement("h2", undefined, market.name + " (" + market.symbol + ")")), React.createElement("select", {
                             className: "trade-select",
                             disabled: form.submitting,
                             name: "longshort",
@@ -948,7 +956,7 @@ function MintForm$1(Props) {
                                 className: "text-xxs hover:text-gray-500"
                               }, React.createElement("a", {
                                     href: "https://docs.float.capital"
-                                  }, "Learn more about staking?"))), React.createElement(Button.make, {
+                                  }, "Learn more about staking"))), React.createElement(Button.make, {
                             onClick: (function (param) {
                                 
                               }),

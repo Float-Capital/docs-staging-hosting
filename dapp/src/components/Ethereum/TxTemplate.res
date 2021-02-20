@@ -25,7 +25,7 @@ let make = (
           {("View the transaction on " ++ txExplererUrl)->React.string}
         </a>
       </p>
-      <Loader />
+      <div className="bg-white"> <Loader /> </div>
     </>
   | ContractActions.Complete(result) =>
     let txHash = result.transactionHash
