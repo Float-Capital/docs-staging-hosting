@@ -2,6 +2,7 @@
 
 import * as Ethers from "../ethereum/Ethers.js";
 import * as Ethers$1 from "ethers";
+import * as Globals from "./Globals.js";
 import * as Js_json from "bs-platform/lib/es6/js_json.js";
 import * as Constants from "../Constants.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
@@ -55,9 +56,7 @@ function parse$2(json) {
   }
 }
 
-function serialize$2(bytesString) {
-  return Ethers.Utils.toString(bytesString);
-}
+var serialize$2 = Globals.ethAdrToStr;
 
 var Address = {
   parse: parse$2,

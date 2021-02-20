@@ -1,5 +1,7 @@
+open Globals
+
 let useUsersStakes = (~address) => {
-  let userId = address->Ethers.Utils.toString->Js.String.toLowerCase
+  let userId = address->ethAdrToStr->Js.String.toLowerCase
   let (executeQuery, _) = Queries.UsersStakes.useLazy()
 
   React.useEffect1(() => {

@@ -171,8 +171,7 @@ module Utils = {
     ->Float.toString
   }
 
-  // ->mul(10->power(~decimals)->Float_to_Int)
-
-  let toString: ethAddress => string = Obj.magic
-  let toLowerString: ethAddress => string = address => address->toString->Js.String.toLowerCase
+  let ethAdrToStr: ethAddress => string = Obj.magic
+  let ethAdrToLowerStr: ethAddress => string = address =>
+    address->ethAdrToStr->Js.String.toLowerCase
 }

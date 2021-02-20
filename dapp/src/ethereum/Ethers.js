@@ -72,11 +72,11 @@ function formatEtherToPrecision(number, digits) {
   return String(Math.floor(Belt_Option.getExn(Belt_Float.fromString(Ethers.utils.formatUnits(number, "ether"))) * digitMultiplier) / digitMultiplier);
 }
 
-function toString(prim) {
+function ethAdrToStr(prim) {
   return prim;
 }
 
-function toLowerString(address) {
+function ethAdrToLowerStr(address) {
   return address.toLowerCase();
 }
 
@@ -87,8 +87,8 @@ var Utils = {
   getAddress: getAddress,
   formatEther: formatEther,
   formatEtherToPrecision: formatEtherToPrecision,
-  toString: toString,
-  toLowerString: toLowerString
+  ethAdrToStr: ethAdrToStr,
+  ethAdrToLowerStr: ethAdrToLowerStr
 };
 
 export {

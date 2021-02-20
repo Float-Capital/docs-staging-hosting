@@ -5,14 +5,64 @@ import * as React from "react";
 import * as Button from "./components/UI/Button.js";
 import * as Ethers from "./ethereum/Ethers.js";
 import * as Toggle from "./components/UI/Toggle.js";
+import * as Globals from "./libraries/Globals.js";
 import * as Queries from "./libraries/Queries.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
 import * as DaiBalance from "./components/ExampleViewFunctions/DaiBalance.js";
+import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as FormatMoney from "./components/UI/FormatMoney.js";
 import * as Router from "next/router";
+import * as DataFetchers from "./components/Data/DataFetchers.js";
+import * as RootProvider from "./libraries/RootProvider.js";
 import * as AccessControl from "./components/AccessControl.js";
 import FromUnixTime from "date-fns/fromUnixTime";
 import FormatDistanceToNow from "date-fns/formatDistanceToNow";
+
+function timestampToDuration(timestamp) {
+  return FormatDistanceToNow(FromUnixTime(timestamp.toNumber()));
+}
+
+function Dashboard$StakeDetails(Props) {
+  var currentUser = RootProvider.useCurrentUserExn(undefined);
+  var activeStakes = DataFetchers.useUsersStakes(currentUser);
+  var match = activeStakes.data;
+  var tmp;
+  if (match !== undefined) {
+    var currentStakes = match.currentStakes;
+    tmp = currentStakes.length !== 0 ? React.createElement(React.Fragment, undefined, Belt_Array.map(currentStakes, (function (param) {
+                  var match = param.currentStake;
+                  var match$1 = match.tokenType;
+                  var match$2 = match$1.syntheticMarket;
+                  var amountFormatted = FormatMoney.formatMoney(Belt_Option.getWithDefault(Belt_Float.fromString(Ethers.Utils.formatEther(match.amount)), 0));
+                  var timeSinceStaking = FormatDistanceToNow(FromUnixTime(match.timestamp.toNumber()));
+                  if (match.withdrawn) {
+                    console.log("This is a bug in the graph, no withdrawn stakes should show in the `currentStakes`");
+                    return null;
+                  } else {
+                    return React.createElement(React.Fragment, undefined, React.createElement("h3", {
+                                    className: "text-xl"
+                                  }, match$2.name + "(" + match$2.symbol + ")"), React.createElement("p", undefined, "Stake of " + amountFormatted + " ", React.createElement("a", {
+                                        href: "https://testnet.bscscan.com/token/" + match$1.tokenAddress + "?a=" + Globals.ethAdrToStr(currentUser),
+                                        target: "_"
+                                      }, match$1.tokenType)), React.createElement("p", undefined, React.createElement("a", {
+                                        href: "https://testnet.bscscan.com/tx/" + match.creationTxHash
+                                      }, "Last updated " + timeSinceStaking + " ago")));
+                  }
+                }))) : React.createElement("h2", undefined, "You have no active stakes.");
+  } else {
+    tmp = activeStakes.error !== undefined ? "Error" : "Loading";
+  }
+  return React.createElement("div", {
+              className: "p-5 flex flex-col items-center justify-center bg-white bg-opacity-75  rounded"
+            }, React.createElement("h2", {
+                  className: "text-4xl"
+                }, "Stake"), tmp);
+}
+
+var StakeDetails = {
+  make: Dashboard$StakeDetails
+};
 
 function Dashboard(Props) {
   var router = Router.useRouter();
@@ -90,7 +140,7 @@ function Dashboard(Props) {
                       className: "col-span-2"
                     }, React.createElement("div", {
                           className: "p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 rounded"
-                        }, React.createElement("h2", undefined, "Total Value Locked up "), React.createElement("h1", undefined, React.createElement(FormatMoney.make, {
+                        }, React.createElement("h2", undefined, "Total Value Locked up"), React.createElement("h1", undefined, React.createElement(FormatMoney.make, {
                                   number: 1234567.891
                                 })), React.createElement("h1", undefined, "$ 123,456,789.00"))), React.createElement("div", undefined, React.createElement("div", {
                           className: "p-5 flex flex-col items-center bg-white bg-opacity-75  rounded"
@@ -111,9 +161,7 @@ function Dashboard(Props) {
                                                             }));
                                             }))) : "You might think this is impossible, but depending on the situation it might not be!"
                               )
-                          ))), React.createElement("div", undefined, React.createElement("div", {
-                          className: "p-5 flex flex-col items-center justify-center bg-white bg-opacity-75  rounded"
-                        }, React.createElement("h2", undefined, "Stake")))), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("h1", undefined, "Dashboard"), React.createElement(DaiBalance.make, {}), tmp);
+                          ))), React.createElement("div", undefined, React.createElement(Dashboard$StakeDetails, {}))), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("br", undefined), React.createElement("h1", undefined, "Dashboard"), React.createElement(DaiBalance.make, {}), tmp);
 }
 
 var make = Dashboard;
@@ -121,6 +169,8 @@ var make = Dashboard;
 var $$default = Dashboard;
 
 export {
+  timestampToDuration ,
+  StakeDetails ,
   make ,
   $$default ,
   $$default as default,

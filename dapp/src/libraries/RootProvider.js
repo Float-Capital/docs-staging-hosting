@@ -3,8 +3,8 @@
 import * as Eth from "./Eth.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as Ethers from "../ethereum/Ethers.js";
-import * as Ethers$1 from "ethers";
+import * as Ethers from "ethers";
+import * as Globals from "./Globals.js";
 import * as JsPromise from "./Js.Promise/JsPromise.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
@@ -14,7 +14,7 @@ import * as Core from "@web3-react/core";
 var Web3ReactProvider = {};
 
 function getLibrary(provider) {
-  var library = new (Ethers$1.providers.Web3Provider)(provider);
+  var library = new (Ethers.providers.Web3Provider)(provider);
   var setPollingInterval = (lib => {lib.pollingInterval = 8000; return lib; });
   return setPollingInterval(library);
 }
@@ -177,7 +177,7 @@ function useCurrentUserExn(param) {
 function useIsAddressCurrentUser(address) {
   var currentUser = Core.useWeb3React().account;
   if (currentUser !== undefined) {
-    return Ethers.Utils.toLowerString(address) === Ethers.Utils.toLowerString(Caml_option.valFromOption(currentUser));
+    return Globals.ethAdrToLowerStr(address) === Globals.ethAdrToLowerStr(Caml_option.valFromOption(currentUser));
   } else {
     return false;
   }
