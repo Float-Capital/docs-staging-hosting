@@ -48,6 +48,13 @@ type FeeStructure @entity {
   badLiquidityExitFee: BigInt!
 }
 
+type Transfer @entity {
+  id: ID!
+  from: String!
+  to: String!
+  value: BigInt!
+}
+
 enum TokenType {
   Long
   Short
