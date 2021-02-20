@@ -1,3 +1,5 @@
+open Globals
+
 // Functionality that is for testing only can go here (temporarily)
 
 module AdminContext = {
@@ -133,15 +135,13 @@ module AdminActions = {
                   </h1>
                   <div className="flex justify-between items-center w-full">
                     <div>
-                      <h1> {`Long(${tokenAddressLong->Ethers.Utils.toString})`->React.string} </h1>
+                      <h1> {`Long(${tokenAddressLong->ethAdrToStr})`->React.string} </h1>
                       <MintLong marketIndex />
                       <RedeemSynth marketIndex isLong=true />
                       <MintAndStake marketIndex isLong=true />
                     </div>
                     <div>
-                      <h1>
-                        {`Short(${tokenAddressShort->Ethers.Utils.toString})`->React.string}
-                      </h1>
+                      <h1> {`Short(${tokenAddressShort->ethAdrToStr})`->React.string} </h1>
                       <MintShort marketIndex />
                       <RedeemSynth marketIndex isLong=false />
                       <MintAndStake marketIndex isLong=false />

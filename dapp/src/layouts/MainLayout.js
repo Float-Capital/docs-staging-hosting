@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as Button from "../components/UI/Button.js";
-import * as Ethers from "../ethereum/Ethers.js";
+import * as Globals from "../libraries/Globals.js";
 import Link from "next/link";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as Router from "next/router";
@@ -57,7 +57,7 @@ function MainLayout$Navigation(Props) {
                         })), optCurrentUser !== undefined ? React.createElement("p", {
                         className: "px-3 bg-white hover:bg-black hover:text-gray-200"
                       }, React.createElement(DisplayAddress.make, {
-                            address: Ethers.Utils.toString(Caml_option.valFromOption(optCurrentUser))
+                            address: Globals.ethAdrToStr(Caml_option.valFromOption(optCurrentUser))
                           })) : React.createElement(Button.make, {
                         onClick: (function (param) {
                             router.push("/login?nextPath=" + router.asPath);

@@ -2,12 +2,12 @@
 
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as Ethers from "../../ethereum/Ethers.js";
+import * as Globals from "../../libraries/Globals.js";
 import * as Queries from "../../libraries/Queries.js";
 import * as StateChangeMonitor from "../../libraries/StateChangeMonitor.js";
 
 function useUsersStakes(address) {
-  var userId = Ethers.Utils.toString(address).toLowerCase();
+  var userId = Globals.ethAdrToStr(address).toLowerCase();
   var match = Curry.app(Queries.UsersStakes.useLazy, [
         undefined,
         undefined,

@@ -72,6 +72,29 @@ query ($userId: String!){
   }
 }
 `)
+module UsersActiveStakes = %graphql(`
+query ($userId: String!){
+  currentStakes (where: {user: $userId, withdrawn: false}) {
+    id
+    currentStake {
+      id
+      timestamp
+      blockNumber
+      creationTxHash
+      tokenType {
+        tokenAddress
+        totalStaked
+        tokenType
+        syntheticMarket {
+          name
+          symbol
+        }
+      }
+      amount
+    }
+  }
+}
+`)
 // syntheticMarkets {
 //   name
 //   symbol
