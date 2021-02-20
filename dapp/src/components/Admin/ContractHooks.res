@@ -2,8 +2,9 @@ let useDaiBalance = () => {
   let optChainId = RootProvider.useChainId()
   let optUserId = RootProvider.useCurrentUser()
   let optProviderOrSigner = ContractActions.useProviderOrSigner()
+  let dataFreshnessString = StateChangeMonitor.useDataFreshnessString()
 
-  let fetchBalanceFunction = (_, chainId, userId) => {
+  let fetchBalanceFunction = (_, _, chainId, userId) => {
     let providerOrSigner = optProviderOrSigner->Option.getExn // Can safely get the value, since this function can ONLY be called when the signerOrProvider is defined.
 
     Contracts.Erc20.balanceOf(
@@ -15,9 +16,10 @@ let useDaiBalance = () => {
     )
   }
 
-  Swr.useSwrConditonal3(() =>
+  Swr.useSwrConditonal4(() =>
     switch (optChainId, optProviderOrSigner, optUserId) {
-    | (Some(chainId), Some(_), Some(userId)) => Some(("chainBalance", chainId, userId))
+    | (Some(chainId), Some(_), Some(userId)) =>
+      Some((dataFreshnessString, "chainBalance", chainId, userId))
     | _ => None
     }
   , fetchBalanceFunction, ~config=None)
@@ -28,8 +30,9 @@ let useErc20Balance = (~erc20Address) => {
   let optChainId = RootProvider.useChainId()
   let optUserId = RootProvider.useCurrentUser()
   let optProviderOrSigner = ContractActions.useProviderOrSigner()
+  let dataFreshnessString = StateChangeMonitor.useDataFreshnessString()
 
-  let fetchBalanceFunction = (_, _, _, userId) => {
+  let fetchBalanceFunction = (_, _, _, _, userId) => {
     let providerOrSigner = optProviderOrSigner->Option.getExn // Can safely get the value, since this function can ONLY be called when the signerOrProvider is defined.
 
     Contracts.Erc20.balanceOf(
@@ -38,10 +41,10 @@ let useErc20Balance = (~erc20Address) => {
     )
   }
 
-  Swr.useSwrConditonal4(() =>
+  Swr.useSwrConditonal5(() =>
     switch (optChainId, optProviderOrSigner, optUserId) {
     | (Some(chainId), Some(_), Some(userId)) =>
-      Some(("erc20balance", erc20Address, chainId, userId))
+      Some((dataFreshnessString, "erc20balance", erc20Address, chainId, userId))
     | _ => None
     }
   , fetchBalanceFunction, ~config=None)
@@ -51,8 +54,9 @@ let useERC20Approved = (~erc20Address, ~spender) => {
   let optChainId = RootProvider.useChainId()
   let optUserId = RootProvider.useCurrentUser()
   let optProviderOrSigner = ContractActions.useProviderOrSigner()
+  let dataFreshnessString = StateChangeMonitor.useDataFreshnessString()
 
-  let fetchBalanceFunction = (_, _, _, _, userId) => {
+  let fetchBalanceFunction = (_, _, _, _, _, userId) => {
     let providerOrSigner = optProviderOrSigner->Option.getExn // Can safely get the value, since this function can ONLY be called when the signerOrProvider is defined.
 
     Contracts.Erc20.allowance(
@@ -62,10 +66,10 @@ let useERC20Approved = (~erc20Address, ~spender) => {
     )
   }
 
-  Swr.useSwrConditonal5(() =>
+  Swr.useSwrConditonal6(() =>
     switch (optChainId, optProviderOrSigner, optUserId) {
     | (Some(chainId), Some(_), Some(userId)) =>
-      Some(("allowance", erc20Address, spender, chainId, userId))
+      Some((dataFreshnessString, "allowance", erc20Address, spender, chainId, userId))
     | _ => None
     }
   , fetchBalanceFunction, ~config=None)

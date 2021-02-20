@@ -1,5 +1,5 @@
 @val
-external devMode: option<string> = "process.env.REACT_APP_DEVMODE"
+external devMode: option<string> = "process.env.NEXT_PUBLIC_DEVMODE"
 let isDevMode = devMode == Some("true")
 
 let longshortContractAbi = [""]->Ethers.makeAbi

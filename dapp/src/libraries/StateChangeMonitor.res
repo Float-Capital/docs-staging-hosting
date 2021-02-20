@@ -38,7 +38,7 @@ let make = (~children) => {
     initialDataFreshnessId,
     initialDataFreshnessId,
   ))
-  let (executeQuery, queryResult) = LatestStateChange.useLazy(~fetchPolicy=CacheFirst, ())
+  let (executeQuery, queryResult) = LatestStateChange.useLazy(~fetchPolicy=CacheAndNetwork, ())
   let isLoggedIn = RootProvider.useIsLoggedIn()
 
   React.useEffect1(() => {
