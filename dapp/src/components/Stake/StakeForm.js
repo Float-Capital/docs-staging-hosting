@@ -4,7 +4,7 @@ import * as Card from "../UI/Card.js";
 import * as Form from "../Admin/Form.js";
 import * as React from "react";
 import * as Button from "../UI/Button.js";
-import * as MaxInput from "../UI/MaxInput.js";
+import * as AmountInput from "../UI/AmountInput.js";
 
 function StakeForm(Props) {
   return React.createElement(Card.make, {
@@ -24,7 +24,7 @@ function StakeForm(Props) {
                               }, "Stake ↗️"), React.createElement("div", {
                                 className: "no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3",
                                 href: "#"
-                              }, "Unstake ↗️"))), React.createElement(MaxInput.make, {
+                              }, "Unstake ↗️"))), React.createElement(AmountInput.make, {
                         placeholder: "stake",
                         value: "",
                         disabled: false,

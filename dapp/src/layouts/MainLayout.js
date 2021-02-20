@@ -17,22 +17,22 @@ function MainLayout$Navigation(Props) {
             }, React.createElement(Link, {
                   href: "/",
                   children: React.createElement("a", {
-                        className: "flex items-center w-1/3"
+                        className: "flex items-center"
                       }, React.createElement("span", {
                             className: "text-xl text-green-800 ml-2 align-middle font-semibold"
                           }, React.createElement("div", {
                                 className: "logo-container"
                               }, React.createElement("img", {
-                                    className: "h-6 md:h-10",
+                                    className: "h-5 md:h-7",
                                     src: "/img/float-capital-logo.png"
                                   }))))
                 }), React.createElement("div", {
-                  className: "flex w-2/3 text-lg items-center justify-end"
+                  className: "flex w-2/3 text-base items-center justify-end"
                 }, React.createElement(Link, {
-                      href: "/dapp",
+                      href: "/mint",
                       children: React.createElement("a", {
                             className: "px-3 hover:bg-white"
-                          }, "APP")
+                          }, "MINT")
                     }), React.createElement(Link, {
                       href: "/stake",
                       children: React.createElement("a", {
@@ -55,7 +55,7 @@ function MainLayout$Navigation(Props) {
                           className: "h-5",
                           src: "/icons/github.svg"
                         })), optCurrentUser !== undefined ? React.createElement("p", {
-                        className: "px-3 bg-white hover:bg-black hover:text-gray-200"
+                        className: "px-3 bg-white hover:bg-black hover:text-gray-200 text-base"
                       }, React.createElement(DisplayAddress.make, {
                             address: Globals.ethAdrToStr(Caml_option.valFromOption(optCurrentUser))
                           })) : React.createElement(Button.make, {
@@ -77,7 +77,7 @@ function MainLayout(Props) {
   return React.createElement("div", {
               className: "flex lg:justify-center min-h-screen"
             }, React.createElement("div", {
-                  className: "max-w-5xl w-full lg:w-3/4 text-gray-900 font-base"
+                  className: "max-w-5xl w-full text-gray-900 font-base"
                 }, React.createElement("div", {
                       className: "flex flex-col h-screen"
                     }, React.createElement(MainLayout$Navigation, {}), React.createElement("div", {

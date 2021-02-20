@@ -1,14 +1,14 @@
-import Dapp from "src/Dapp";
+import Mint from "src/Mint";
 import Head from "next/head";
 
-export default function DappPage(props) {
+export default function MintPage(props) {
   return (
     <div>
       <Head>
-        <title>Float Capital</title>
+        <title>Float Capital | Mint</title>
         <meta property="og:title" content="Float Capital" key="title" />
       </Head>
-      <Dapp {...props} />
+      <Mint {...props} />
     </div>
   );
 }

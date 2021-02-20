@@ -15,7 +15,7 @@ function StartTrading(Props) {
                         }, React.createElement("div", {
                               className: "floating"
                             }, React.createElement(Link, {
-                                  href: optCurrentUser !== undefined ? "/dapp" : "/login?nextPath=/dapp",
+                                  href: optCurrentUser !== undefined ? "/mint" : "/login?nextPath=/mint",
                                   children: React.createElement("span", {
                                         className: "floating-image-wrapper"
                                       }, React.createElement("img", {

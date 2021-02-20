@@ -1,6 +1,6 @@
-module TradeForm = %form(
-  type input = {amount: string, isMint: bool, isLong: bool}
-  type output = {amount: Ethers.BigNumber.t, isMint: bool, isLong: bool}
+module MintForm = %form(
+  type input = {amount: string, isLong: bool, isStaking: bool}
+  type output = {amount: Ethers.BigNumber.t, isLong: bool, isStaking: bool}
 
   let validators = {
     amount: {
@@ -20,21 +20,18 @@ module TradeForm = %form(
         }
       },
     },
-    isMint: {
-      strategy: OnFirstChange,
-      validate: ({isMint}) => isMint->Ok,
-    },
     isLong: {
       strategy: OnFirstChange,
       validate: ({isLong}) => isLong->Ok,
     },
+    isStaking: None,
   }
 )
 
-let initialInput: TradeForm.input = {
+let initialInput: MintForm.input = {
   amount: "",
-  isMint: true,
   isLong: false,
+  isStaking: true,
 }
 
 let useBalanceAndApproved = (~erc20Address, ~spender) => {
@@ -90,9 +87,9 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
     ~erc20Address=market.syntheticLong.tokenAddress,
   )
 
-  let form = TradeForm.useForm(~initialInput, ~onSubmit=({amount, isMint, isLong}, _form) => {
-    switch (isMint, isLong) {
-    | (true, true) =>
+  let form = MintForm.useForm(~initialInput, ~onSubmit=({amount, isLong}, _form) => {
+    switch isLong {
+    | true =>
       let mintFunction = () =>
         contractExecutionHandler(
           ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
@@ -115,7 +112,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
         )
       | false => mintFunction()
       }
-    | (true, false) =>
+    | false =>
       let mintFunction = () =>
         contractExecutionHandler(
           ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
@@ -138,47 +135,36 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
         )
       | false => mintFunction()
       }
-    | (false, true) =>
-      contractExecutionHandler(
-        ~makeContractInstance=Contracts.LongShort.make(~address=market.syntheticShort.tokenAddress),
-        ~contractFunction=Contracts.LongShort.redeemLong(
-          ~marketIndex=market.marketIndex,
-          ~tokensToRedeem=amount,
-        ),
-      )
-    | (false, false) =>
-      contractExecutionHandler(
-        ~makeContractInstance=Contracts.LongShort.make(~address=market.syntheticLong.tokenAddress),
-        ~contractFunction=Contracts.LongShort.redeemShort(
-          ~marketIndex=market.marketIndex,
-          ~tokensToRedeem=amount,
-        ),
-      )
     }
   })
+
   let formAmount = switch form.amountResult {
   | Some(Ok(amount)) => Some(amount)
   | _ => None
   }
+
   let (optAdditionalErrorMessage, _buttonText, _buttonDisabled) = {
-    switch (form.input.isMint, form.input.isLong) {
-    | (true, isLong) =>
-      // let is(optDaiBalance, optDaiAmountApproved,
-      let position = isLong ? "LONG" : "SHORT"
+    let stakingText = form.input.isStaking ? "" : "" // TODO: decide on this " & stake" : ""
+    switch form.input.isLong {
+    | isLong =>
+      let position = isLong ? "long" : "short"
       switch (formAmount, optDaiBalance, optDaiAmountApproved) {
-      // NOTE: for simplicity skipping some permutations or edge cases.
       | (Some(amount), Some(balance), Some(amountApproved)) =>
-        let prefix = isGreaterThanApproval(~amount, ~amountApproved) ? "" : "Approve & "
+        let needsToApprove = isGreaterThanApproval(~amount, ~amountApproved)
         let greaterThanBalance = isGreaterThanBalance(~amount, ~balance)
         switch greaterThanBalance {
-        | false => (None, `1MINT ${position}`, false)
-        | true => (Some("Amount is greater than your balance"), `${prefix}2Mint ${position}`, true)
+        | true => (Some("Amount is greater than your balance"), `Insufficient balance`, true)
+        | false => (
+            None,
+            switch needsToApprove {
+            | true => `Approve & mint ${position} position`
+            | false => `Mint${stakingText} ${position} position`
+            },
+            false,
+          )
         }
-      | _ => (None, `3Mint ${position}`, true)
+      | _ => (None, `Mint${stakingText} ${position} position`, true)
       }
-    // TODO: this doesn't check if the balance is greater for these two...
-    | (false, true) => (None, "Redeem Long", false)
-    | (false, false) => (None, "Redeem Short", false)
     }
   }
 
@@ -200,7 +186,14 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
         onSubmit={() => {
           form.submit()
         }}>
-        <h2> {`${market.name} (${market.symbol})`->React.string} </h2>
+        <div className="flex justify-between">
+          <h2> {`${market.name} (${market.symbol})`->React.string} </h2>
+          <Next.Link href="/redeem">
+            <span className="text-xs hover:text-gray-500 cursor-pointer">
+              {"Redeem"->React.string}
+            </span>
+          </Next.Link>
+        </div>
         <select
           name="longshort"
           className="trade-select"
@@ -215,64 +208,56 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
           <option value="long"> {`Long 🐮`->React.string} </option>
           <option value="short"> {`Short 🐻`->React.string} </option>
         </select>
-        {form.input.isMint
-          ? <>
-              // <div className="flex flex-row">
-              //   <input
-              //     className="h-16 bg-gray-100 text-grey-darker py-2 font-normal text-grey-darkest border border-gray-100 font-bold w-full py-1 px-2 outline-none text-lg text-gray-600"
-              //     type_="text"
-              //     placeholder="What do you want to learn?"
-              //   />
-              //   <span
-              //     className="flex items-center bg-gray-100 rounded rounded-l-none border-0 px-3 font-bold text-grey-100">
-              //     <span onClick={_ => form.updateAmount((input, amount) => {
-              //           ...input,
-              //           amount: amount,
-              //         }, switch optDaiBalance {
-              //         | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
-              //         | _ => "0"
-              //         })}> {"MAX"->React.string} </span>
-              //   </span>
-              // </div>
-              <MaxInput
-                value=form.input.amount
-                disabled=form.submitting
-                onBlur={_ => form.blurAmount()}
-                onChange={event => form.updateAmount((input, amount) => {
-                    ...input,
-                    amount: amount,
-                  }, (event->ReactEvent.Form.target)["value"])}
-                placeholder={"mint"}
-                onMaxClick={_ => form.updateAmount((input, amount) => {
-                    ...input,
-                    amount: amount,
-                  }, switch optDaiBalance {
-                  | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
-                  | _ => "0"
-                  })}
-              />
-              {switch (form.amountResult, optAdditionalErrorMessage) {
-              | (Some(Error(message)), _)
-              | (_, Some(message)) =>
-                <div className="text-red-600"> {message->React.string} </div>
-              | (Some(Ok(_)), None) =>
-                <div className="text-green-600"> {j`✓`->React.string} </div>
-              | (None, None) => React.null
-              }}
-            </>
-          : <input className="trade-input" placeholder="redeem" />}
-        <div className="trade-switch" onClick={_ => form.updateIsMint((input, isMint) => {
+        <AmountInput
+          value=form.input.amount
+          optBalance={optDaiBalance->Option.getWithDefault(0->Ethers.BigNumber.fromInt)}
+          disabled=form.submitting
+          onBlur={_ => form.blurAmount()}
+          onChange={event => form.updateAmount((input, amount) => {
               ...input,
-              isMint: isMint,
-            }, !form.input.isMint)}> {j`↑↓`->React.string} </div>
-        {form.input.isMint
-          ? <input className="trade-input" placeholder="redeem" />
-          : <input className="trade-input" placeholder="mint" />}
-        <Button onClick={_ => Js.log("I was clicked")} variant="large">
-          {`${_buttonText} ${form.input.isMint ? "Mint" : "Redeem"} ${form.input.isLong
-              ? "long"
-              : "short"} position`}
-        </Button>
+              amount: amount,
+            }, (event->ReactEvent.Form.target)["value"])}
+          placeholder={"Mint"}
+          onMaxClick={_ => form.updateAmount((input, amount) => {
+              ...input,
+              amount: amount,
+            }, switch optDaiBalance {
+            | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
+            | _ => "0"
+            })}
+        />
+        {switch (form.amountResult, optAdditionalErrorMessage) {
+        | (Some(Error(message)), _)
+        | (_, Some(message)) =>
+          <div className="text-red-500 text-xs"> {message->React.string} </div>
+        | (Some(Ok(_)), None) => React.null
+        | (None, None) => React.null
+        }}
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <input
+              id="stake-checkbox"
+              type_="checkbox"
+              className="mr-2"
+              checked={form.input.isStaking}
+              disabled={form.submitting}
+              onBlur={_ => form.blurIsStaking()}
+              onChange={event =>
+                form.updateIsStaking(
+                  (input, value) => {...input, isStaking: value},
+                  (event->ReactEvent.Form.target)["checked"],
+                )}
+            />
+            <label htmlFor="stake-checkbox" className="text-xs">
+              {`Stake ${form.input.isLong ? "long" : "short"} tokens`->React.string}
+            </label>
+          </div>
+          <p className="text-xxs hover:text-gray-500">
+            <a href="https://docs.float.capital"> {"Learn more about staking?"->React.string} </a>
+          </p>
+        </div>
+        // <Toggle onClick={_ => Js.log("I was toggled")} preLabel="stake " postLabel="" />
+        <Button onClick={_ => ()} variant="large"> {_buttonText} </Button>
       </Form>
     </ViewBox>
     {Config.isDevMode // <- this can be used to hide this code when not developing

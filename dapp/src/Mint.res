@@ -1,14 +1,11 @@
-let shortTokenAddress = Ethers.Utils.getAddressUnsafe("0x096c8301e153037df723c23e2de113941cb973ef")
-let longTokenAddress = Ethers.Utils.getAddressUnsafe("0x096c8301e153037df723c23e2de113941cb973ef")
-
-module Dapp = {
+module Mint = {
   @react.component
   let make = () => {
     let router = Next.Router.useRouter()
     let markets = Queries.MarketDetails.use()
 
     <AccessControl
-      alternateComponent={<h1 onClick={_ => router->Next.Router.push("/login?nextPath=/dashboard")}>
+      alternateComponent={<h1 onClick={_ => router->Next.Router.push("/login?nextPath=/mint")}>
         {"login to view this"->React.string}
       </h1>}>
       <section>
@@ -18,7 +15,7 @@ module Dapp = {
         | {data: Some({syntheticMarkets})} =>
           let optFirstMarket = syntheticMarkets[0]
           switch optFirstMarket {
-          | Some(firstMarket) => <TradeForm market={firstMarket} />
+          | Some(firstMarket) => <MintForm market={firstMarket} />
           | None => <p> {"No markets exist"->React.string} </p>
           }
         | {data: None, error: None, loading: false} =>
@@ -28,4 +25,4 @@ module Dapp = {
     </AccessControl>
   }
 }
-let default = () => <Dapp />
+let default = () => <Mint />

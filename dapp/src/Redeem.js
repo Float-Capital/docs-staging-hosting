@@ -3,18 +3,13 @@
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Loader from "./components/UI/Loader.js";
-import * as Ethers from "ethers";
 import * as Queries from "./libraries/Queries.js";
-import * as TradeForm from "./components/Dapp/TradeForm.js";
+import * as MintForm from "./components/Trade/MintForm.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as Router from "next/router";
 import * as AccessControl from "./components/AccessControl.js";
 
-var shortTokenAddress = Ethers.utils.getAddress("0x096c8301e153037df723c23e2de113941cb973ef");
-
-var longTokenAddress = Ethers.utils.getAddress("0x096c8301e153037df723c23e2de113941cb973ef");
-
-function Dapp$Dapp(Props) {
+function Redeem$Redeem(Props) {
   var router = Router.useRouter();
   var markets = Curry.app(Queries.MarketDetails.use, [
         undefined,
@@ -40,7 +35,7 @@ function Dapp$Dapp(Props) {
     tmp = "Error loading data";
   } else if (match !== undefined) {
     var optFirstMarket = Belt_Array.get(match.syntheticMarkets, 0);
-    tmp = optFirstMarket !== undefined ? React.createElement(TradeForm.make, {
+    tmp = optFirstMarket !== undefined ? React.createElement(MintForm.make, {
             market: optFirstMarket
           }) : React.createElement("p", undefined, "No markets exist");
   } else {
@@ -50,27 +45,25 @@ function Dapp$Dapp(Props) {
               children: React.createElement("section", undefined, tmp),
               alternateComponent: React.createElement("h1", {
                     onClick: (function (param) {
-                        router.push("/login?nextPath=/dashboard");
+                        router.push("/login?nextPath=/redeem");
                         
                       })
-                  }, "login to view this")
+                  }, "Login")
             });
 }
 
-var Dapp = {
-  make: Dapp$Dapp
+var Redeem = {
+  make: Redeem$Redeem
 };
 
 function $$default(param) {
-  return React.createElement(Dapp$Dapp, {});
+  return React.createElement(Redeem$Redeem, {});
 }
 
 export {
-  shortTokenAddress ,
-  longTokenAddress ,
-  Dapp ,
+  Redeem ,
   $$default ,
   $$default as default,
   
 }
-/* shortTokenAddress Not a pure module */
+/* react Not a pure module */

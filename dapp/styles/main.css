@@ -28,16 +28,14 @@ body {
 }
 
 .trade-select {
-  margin: 12px;
   padding: 10px;
-  width: calc(100% - 20px);
+  width: calc(100%);
   outline: none;
 }
 
 .trade-input {
-  margin: 12px;
   padding: 6px;
-  width: calc(100% - 20px);
+  width: calc(100%);
   outline: none;
 }
 
@@ -107,7 +105,7 @@ body {
 
 .float-button-outer-container {
   position: relative;
-  margin: 0.8rem;
+  margin: 0.8rem 0rem;
 }
 
 .float-button-container {
