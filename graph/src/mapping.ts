@@ -21,6 +21,9 @@ import {
   FloatAccumulated,
 } from "../generated/Staker/Staker";
 
+import { erc20 } from "../generated/templates";
+import { Transfer as TransferEvent } from "../generated/templates/erc20/erc20";
+
 import {
   StateChange,
   EventParam,
@@ -37,6 +40,8 @@ import {
   Stake,
   User,
   State,
+  Token,
+  Transfer,
 } from "../generated/schema";
 import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
@@ -56,6 +61,29 @@ import {
   TOKEN_FACTORY_ID,
   LONG_SHORT_ID,
 } from "./CONSTANTS";
+
+export function handleTransfer(event: TransferEvent): void {
+  let txHash = event.transaction.hash;
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
+
+  let transactionHash = event.transaction.hash.toHex();
+  let transfer = new Transfer(transactionHash);
+  transfer.from = event.params.from.toHex();
+  transfer.to = event.params.to.toHex();
+  transfer.value = event.params.value;
+  transfer.save();
+
+  saveEventToStateChange(
+    txHash,
+    timestamp,
+    blockNumber,
+    "Transfer",
+    ["value"],
+    ["name"],
+    ["type"]
+  );
+}
 
 export function handleV1(event: V1): void {
   // This function will only ever get called once
@@ -150,6 +178,9 @@ export function handleSyntheticTokenCreated(
   let badLiquidityExitFee = event.params.badLiquidityExitFee;
 
   let marketIndexString = marketIndex.toString();
+
+  erc20.create(longTokenAddress);
+  erc20.create(shortTokenAddress);
 
   // create new synthetic token object.
   let longToken = createSyntheticTokenLong(longTokenAddress);
