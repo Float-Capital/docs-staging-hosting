@@ -17,7 +17,7 @@ module Navigation = {
         </a>
       </Link>
       <div className="flex w-2/3 text-lg items-center justify-end">
-        <Link href="/dapp"> <a className="px-3 hover:bg-white"> {React.string("APP")} </a> </Link>
+        <Link href="/mint"> <a className="px-3 hover:bg-white"> {React.string("MINT")} </a> </Link>
         <Link href="/stake">
           <a className="px-3 hover:bg-white"> {`STAKE🔥`->React.string} </a>
         </Link>
@@ -35,7 +35,7 @@ module Navigation = {
         </a>
         {switch optCurrentUser {
         | Some(currentUser) =>
-          <p className="px-3 bg-white hover:bg-black hover:text-gray-200">
+          <p className="px-3 bg-white hover:bg-black hover:text-gray-200 text-base">
             <DisplayAddress address={currentUser->Ethers.Utils.toString} /> //TODO route to Profile page
           </p>
         | None =>

@@ -29,10 +29,10 @@ function MainLayout$Navigation(Props) {
                 }), React.createElement("div", {
                   className: "flex w-2/3 text-lg items-center justify-end"
                 }, React.createElement(Link, {
-                      href: "/dapp",
+                      href: "/mint",
                       children: React.createElement("a", {
                             className: "px-3 hover:bg-white"
-                          }, "APP")
+                          }, "MINT")
                     }), React.createElement(Link, {
                       href: "/stake",
                       children: React.createElement("a", {
@@ -55,7 +55,7 @@ function MainLayout$Navigation(Props) {
                           className: "h-5",
                           src: "/icons/github.svg"
                         })), optCurrentUser !== undefined ? React.createElement("p", {
-                        className: "px-3 bg-white hover:bg-black hover:text-gray-200"
+                        className: "px-3 bg-white hover:bg-black hover:text-gray-200 text-base"
                       }, React.createElement(DisplayAddress.make, {
                             address: Ethers.Utils.toString(Caml_option.valFromOption(optCurrentUser))
                           })) : React.createElement(Button.make, {

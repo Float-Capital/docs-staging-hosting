@@ -50,7 +50,7 @@ let make = () => {
                   <p> {symbol->React.string} </p>
                   <Button
                     onClick={_ => {
-                      router->Next.Router.push(`/dapp?market=${symbol}`)
+                      router->Next.Router.push(`/mint?market=${symbol}`)
                     }}
                     variant="small">
                     "TRADE"

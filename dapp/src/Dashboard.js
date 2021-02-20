@@ -103,7 +103,7 @@ function Dashboard(Props) {
                                                           className: "flex justify-between items-center w-full"
                                                         }, React.createElement("p", undefined, param.name), React.createElement("p", undefined, symbol), React.createElement(Button.make, {
                                                               onClick: (function (param) {
-                                                                  router.push("/dapp?market=" + symbol);
+                                                                  router.push("/mint?market=" + symbol);
                                                                   
                                                                 }),
                                                               children: "TRADE",
