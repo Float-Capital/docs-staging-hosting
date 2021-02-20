@@ -236,6 +236,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <input
+              id="stake-checkbox"
               type_="checkbox"
               className="mx-2"
               checked={form.input.isStaking}
@@ -247,9 +248,9 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
                   (event->ReactEvent.Form.target)["checked"],
                 )}
             />
-            <p className="text-xs">
+            <label htmlFor="stake-checkbox" className="text-xs">
               {`Stake ${form.input.isLong ? "long" : "short"} tokens`->React.string}
-            </p>
+            </label>
           </div>
           <p className="text-xxs hover:text-gray-500">
             <a href="https://docs.float.capital"> {"Learn more about staking?"->React.string} </a>

@@ -923,6 +923,7 @@ function MintForm$1(Props) {
                                 className: "flex items-center"
                               }, React.createElement("input", {
                                     className: "mx-2",
+                                    id: "stake-checkbox",
                                     checked: form.input.isStaking,
                                     disabled: form.submitting,
                                     type: "checkbox",
@@ -938,8 +939,9 @@ function MintForm$1(Props) {
                                                             };
                                                     }), $$event.target.checked);
                                       })
-                                  }), React.createElement("p", {
-                                    className: "text-xs"
+                                  }), React.createElement("label", {
+                                    className: "text-xs",
+                                    htmlFor: "stake-checkbox"
                                   }, "Stake " + (
                                     form.input.isLong ? "long" : "short"
                                   ) + " tokens")), React.createElement("p", {
