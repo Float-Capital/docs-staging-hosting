@@ -769,7 +769,7 @@ function MintForm$1(Props) {
   }
   if (exit$1 === 1) {
     tmp = React.createElement("div", {
-          className: "text-red-600"
+          className: "text-red-500 text-xs"
         }, message);
   }
   var tmp$1;
@@ -922,7 +922,7 @@ function MintForm$1(Props) {
                           }, React.createElement("div", {
                                 className: "flex items-center"
                               }, React.createElement("input", {
-                                    className: "mx-2",
+                                    className: "mr-2",
                                     id: "stake-checkbox",
                                     checked: form.input.isStaking,
                                     disabled: form.submitting,

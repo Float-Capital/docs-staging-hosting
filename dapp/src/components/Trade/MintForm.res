@@ -229,7 +229,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
         {switch (form.amountResult, optAdditionalErrorMessage) {
         | (Some(Error(message)), _)
         | (_, Some(message)) =>
-          <div className="text-red-600"> {message->React.string} </div>
+          <div className="text-red-500 text-xs"> {message->React.string} </div>
         | (Some(Ok(_)), None) => React.null
         | (None, None) => React.null
         }}
@@ -238,7 +238,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
             <input
               id="stake-checkbox"
               type_="checkbox"
-              className="mx-2"
+              className="mr-2"
               checked={form.input.isStaking}
               disabled={form.submitting}
               onBlur={_ => form.blurIsStaking()}
