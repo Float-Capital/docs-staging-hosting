@@ -1,3 +1,4 @@
+open Globals
 module Link = Next.Link
 
 module Navigation = {
@@ -36,7 +37,7 @@ module Navigation = {
         {switch optCurrentUser {
         | Some(currentUser) =>
           <p className="px-3 bg-white hover:bg-black hover:text-gray-200">
-            <DisplayAddress address={currentUser->Ethers.Utils.toString} /> //TODO route to Profile page
+            <DisplayAddress address={currentUser->ethAdrToStr} /> //TODO route to Profile page
           </p>
         | None =>
           <Button

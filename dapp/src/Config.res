@@ -1,3 +1,5 @@
+open Globals
+
 @val
 external devMode: option<string> = "process.env.NEXT_PUBLIC_DEVMODE"
 let isDevMode = devMode == Some("true")
@@ -21,7 +23,7 @@ let getContractAddressString = (~netIdStr, ~closure) => {
   allContracts
   ->Js.Dict.get(netIdStr)
   ->Option.mapWithDefault(Constants.zeroAddress, closure)
-  ->Ethers.Utils.toString
+  ->ethAdrToStr
 }
 
 // refactor this at some stage to be a single function?

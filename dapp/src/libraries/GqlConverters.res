@@ -1,3 +1,5 @@
+open Globals
+
 module BigInt = {
   type t = Ethers.BigNumber.t
   let parse = json =>
@@ -34,5 +36,5 @@ module Address = {
       Js.log("CRITICAL - couldn't decode eth address from graph, should never happen!")
       Constants.zeroAddress
     }
-  let serialize = bytesString => bytesString->Ethers.Utils.toString->Js.Json.string
+  let serialize = bytesString => bytesString->ethAdrToStr->Js.Json.string
 }

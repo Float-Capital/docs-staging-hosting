@@ -65,11 +65,11 @@ function formatEther(__x) {
   return Ethers.utils.formatUnits(__x, "ether");
 }
 
-function toString(prim) {
+function ethAdrToStr(prim) {
   return prim;
 }
 
-function toLowerString(address) {
+function ethAdrToLowerStr(address) {
   return address.toLowerCase();
 }
 
@@ -79,8 +79,8 @@ var Utils = {
   parseEtherUnsafe: parseEtherUnsafe,
   getAddress: getAddress,
   formatEther: formatEther,
-  toString: toString,
-  toLowerString: toLowerString
+  ethAdrToStr: ethAdrToStr,
+  ethAdrToLowerStr: ethAdrToLowerStr
 };
 
 export {

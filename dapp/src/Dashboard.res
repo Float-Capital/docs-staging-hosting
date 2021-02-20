@@ -1,3 +1,72 @@
+open Globals
+
+let timestampToDuration = timestamp =>
+  timestamp->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime->DateFns.formatDistanceToNow
+
+module StakeDetails = {
+  @react.component
+  let make = () => {
+    let currentUser = RootProvider.useCurrentUserExn()
+    let activeStakes = DataFetchers.useUsersStakes(~address=currentUser)
+
+    <div className="p-5 flex flex-col items-center justify-center bg-white bg-opacity-75  rounded">
+      <h2 className="text-4xl"> {"Stake"->React.string} </h2>
+      {switch activeStakes {
+      | {data: Some({currentStakes: []})} => <h2> {"You have no active stakes."->React.string} </h2>
+      | {data: Some({currentStakes})} => <>
+          {currentStakes
+          ->Array.map(({
+            currentStake: {
+              timestamp,
+              creationTxHash,
+              tokenType: {tokenAddress, totalStaked, tokenType, syntheticMarket: {name, symbol}},
+              amount,
+              withdrawn,
+            },
+          }) => {
+            let amountFormatted = FormatMoney.formatMoney(
+              ~number=amount->Ethers.Utils.formatEther->Float.fromString->Option.getWithDefault(0.),
+            )
+            // let totalStakedFormatted = FormatMoney.formatMoney(
+            //   ~number=totalStaked
+            //   ->Ethers.Utils.formatEther
+            //   ->Float.fromString
+            //   ->Option.getWithDefault(0.),
+            // )
+            let timeSinceStaking = timestamp->timestampToDuration
+
+            withdrawn
+              ? {
+                  Js.log(
+                    "This is a bug in the graph, no withdrawn stakes should show in the `currentStakes`",
+                  )
+                  React.null
+                }
+              : <>
+                  <h3 className="text-xl"> {`${name}(${symbol})`->React.string} </h3>
+                  <p>
+                    {`Stake of ${amountFormatted} `->React.string}
+                    <a
+                      target="_"
+                      href={`https://testnet.bscscan.com/token/${tokenAddress}?a=${currentUser->ethAdrToStr}`}>
+                      {tokenType->Obj.magic->React.string}
+                    </a>
+                  </p>
+                  <p>
+                    <a href={`https://testnet.bscscan.com/tx/${creationTxHash}`}>
+                      {`Last updated ${timeSinceStaking} ago`->React.string}
+                    </a>
+                  </p>
+                </>
+          })
+          ->React.array}
+        </>
+      | {error: Some(_)} => "Error"->React.string
+      | _ => "Loading"->React.string
+      }}
+    </div>
+  }
+}
 @react.component
 let make = () => {
   let router = Next.Router.useRouter()
@@ -11,7 +80,7 @@ let make = () => {
       <div className="col-span-2">
         <div
           className="p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 rounded">
-          <h2> {"Total Value Locked up "->React.string} </h2>
+          <h2> {"Total Value Locked up"->React.string} </h2>
           <h1> <FormatMoney number={1234567.891} /> </h1>
           <h1> {"$ 123,456,789.00"->React.string} </h1>
         </div>
@@ -64,12 +133,7 @@ let make = () => {
           }}
         </div>
       </div>
-      <div>
-        <div
-          className="p-5 flex flex-col items-center justify-center bg-white bg-opacity-75  rounded">
-          <h2> {"Stake"->React.string} </h2>
-        </div>
-      </div>
+      <div> <StakeDetails /> </div>
     </div>
     <br />
     <br />
@@ -104,8 +168,8 @@ let make = () => {
           ],
         }),
       } =>
-      let timeSinceUpdate =
-        timestamp->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime->DateFns.formatDistanceToNow
+      let timeSinceUpdate = timestamp->timestampToDuration
+
       <>
         <a href={`https://goerli.etherscan.io/tx/${txHash}`}>
           {`Latest update happened ${timeSinceUpdate} ago. (view on block-explorer) by ${setBy}`->React.string}

@@ -3,8 +3,8 @@
 import * as Misc from "../../libraries/Misc.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as Ethers from "../../ethereum/Ethers.js";
-import * as Ethers$1 from "ethers";
+import * as Ethers from "ethers";
+import * as Globals from "../../libraries/Globals.js";
 import * as MintDai from "./MintDai.js";
 import * as Queries from "../../libraries/Queries.js";
 import * as MintLong from "./MintLong.js";
@@ -53,7 +53,7 @@ function AdminTestingPortal$AdminContext$Provider(Props) {
           if (privateKeyMode) {
             if (authSet) {
               return Belt_Option.map(optAuthHeader, (function (authHeader) {
-                            return new Ethers$1.Wallet(authHeader, provider);
+                            return new Ethers.Wallet(authHeader, provider);
                           }));
             } else {
               return ;
@@ -154,7 +154,7 @@ function AdminTestingPortal$AdminActions(Props) {
                                                       className: "w-full text-5xl underline text-center"
                                                     }, "Market " + param.name + " (" + symbol + ")"), React.createElement("div", {
                                                       className: "flex justify-between items-center w-full"
-                                                    }, React.createElement("div", undefined, React.createElement("h1", undefined, "Long(" + Ethers.Utils.toString(param.syntheticLong.tokenAddress) + ")"), React.createElement(MintLong.make, {
+                                                    }, React.createElement("div", undefined, React.createElement("h1", undefined, "Long(" + Globals.ethAdrToStr(param.syntheticLong.tokenAddress) + ")"), React.createElement(MintLong.make, {
                                                               marketIndex: marketIndex
                                                             }), React.createElement(RedeemSynth.make, {
                                                               isLong: true,
@@ -162,7 +162,7 @@ function AdminTestingPortal$AdminActions(Props) {
                                                             }), React.createElement(MintAndStake.make, {
                                                               marketIndex: marketIndex,
                                                               isLong: true
-                                                            })), React.createElement("div", undefined, React.createElement("h1", undefined, "Short(" + Ethers.Utils.toString(param.syntheticShort.tokenAddress) + ")"), React.createElement(MintShort.make, {
+                                                            })), React.createElement("div", undefined, React.createElement("h1", undefined, "Short(" + Globals.ethAdrToStr(param.syntheticShort.tokenAddress) + ")"), React.createElement(MintShort.make, {
                                                               marketIndex: marketIndex
                                                             }), React.createElement(RedeemSynth.make, {
                                                               isLong: false,

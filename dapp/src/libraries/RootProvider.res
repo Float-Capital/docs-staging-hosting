@@ -1,4 +1,5 @@
 open RootProviderTypes
+open Globals
 
 type web3reactContext = {
   active: bool,
@@ -143,8 +144,7 @@ let useCurrentUserExn = () => useCurrentUser()->Option.getExn
 let useIsAddressCurrentUser: Ethers.ethAddress => bool = address => {
   let currentUser = useCurrentUser()
   switch currentUser {
-  | Some(currentUserAddress) =>
-    address->Ethers.Utils.toLowerString == currentUserAddress->Ethers.Utils.toLowerString
+  | Some(currentUserAddress) => address->ethAdrToLowerStr == currentUserAddress->ethAdrToLowerStr
   | None => false
   }
 }
