@@ -665,8 +665,8 @@ function TradeForm$1(Props) {
   var match$3 = useBalanceAndApproved(daiAddressThatIsTemporarilyHardCoded, longShortContractAddress);
   var optDaiAmountApproved = match$3[1];
   var optDaiBalance = match$3[0];
-  var match$4 = useBalanceAndApproved(market.syntheticShort.tokenAddress, longShortContractAddress);
-  var match$5 = useBalanceAndApproved(market.syntheticLong.tokenAddress, longShortContractAddress);
+  var match$4 = ContractHooks.useErc20Balance(market.syntheticShort.tokenAddress);
+  var match$5 = ContractHooks.useErc20Balance(market.syntheticLong.tokenAddress);
   var form = useForm(initialInput, (function (param, _form) {
           var isLong = param.isLong;
           var amount = param.amount;
@@ -848,81 +848,87 @@ function TradeForm$1(Props) {
         });
   }
   var tmp$2;
-  if (typeof txState === "number") {
-    switch (txState) {
-      case /* UnInitialised */0 :
-          tmp$2 = null;
-          break;
-      case /* Created */1 :
-          tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Approval "), React.createElement(Loader.make, {}));
-          break;
-      case /* Failed */2 :
-          tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."));
-          break;
-      
+  if (Config.isDevMode) {
+    var tmp$3;
+    if (typeof txState === "number") {
+      switch (txState) {
+        case /* UnInitialised */0 :
+            tmp$3 = null;
+            break;
+        case /* Created */1 :
+            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Approval "), React.createElement(Loader.make, {}));
+            break;
+        case /* Failed */2 :
+            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."));
+            break;
+        
+      }
+    } else {
+      switch (txState.TAG | 0) {
+        case /* SignedAndSubmitted */0 :
+            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Approval - submitted ", React.createElement(Loader.make, {})), React.createElement(Loader.make, {}));
+            break;
+        case /* Declined */1 :
+            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0));
+            break;
+        case /* Complete */2 :
+            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Approval Complete, Sign the next transaction "));
+            break;
+        
+      }
     }
+    var txExplererUrl = RootProvider.useEtherscanUrl(undefined);
+    var resetTxButton = React.createElement("button", {
+          onClick: (function (param) {
+              return Curry._1(setTxState, (function (param) {
+                            return /* UnInitialised */0;
+                          }));
+            })
+        }, ">>Reset tx<<");
+    var tmp$4;
+    if (typeof txState === "number") {
+      switch (txState) {
+        case /* UnInitialised */0 :
+            tmp$4 = null;
+            break;
+        case /* Created */1 :
+            tmp$4 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, "Tx created."), React.createElement("div", undefined, React.createElement(Loader.make, {})));
+            break;
+        case /* Failed */2 :
+            tmp$4 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."), resetTxButton);
+            break;
+        
+      }
+    } else {
+      switch (txState.TAG | 0) {
+        case /* SignedAndSubmitted */0 :
+            tmp$4 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, React.createElement("a", {
+                          href: "https://" + txExplererUrl + "/tx/" + txState._0,
+                          rel: "noopener noreferrer",
+                          target: "_blank"
+                        }, "View the transaction on " + txExplererUrl)), React.createElement(Loader.make, {}));
+            break;
+        case /* Declined */1 :
+            tmp$4 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0), resetTxButton);
+            break;
+        case /* Complete */2 :
+            var txHash = txState._0.transactionHash;
+            tmp$4 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Transaction Complete "), React.createElement("p", undefined, React.createElement("a", {
+                          href: "https://" + txExplererUrl + "/tx/" + txHash,
+                          rel: "noopener noreferrer",
+                          target: "_blank"
+                        }, "View the transaction on " + txExplererUrl)), resetTxButton);
+            break;
+        
+      }
+    }
+    var formatOptBalance = function (__x) {
+      return Belt_Option.mapWithDefault(__x, "Loading", Ethers.Utils.formatEther);
+    };
+    tmp$2 = React.createElement(React.Fragment, undefined, tmp$3, tmp$4, React.createElement("code", undefined, React.createElement("p", undefined, "dev only component to display balances"), React.createElement("p", undefined, "dai - balance: " + formatOptBalance(optDaiBalance) + " - approved: " + formatOptBalance(optDaiAmountApproved)), React.createElement("p", undefined, "long - balance: " + formatOptBalance(match$5.data)), React.createElement("p", undefined, "short - balance: " + formatOptBalance(match$4.data))));
   } else {
-    switch (txState.TAG | 0) {
-      case /* SignedAndSubmitted */0 :
-          tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Approval - submitted ", React.createElement(Loader.make, {})), React.createElement(Loader.make, {}));
-          break;
-      case /* Declined */1 :
-          tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0));
-          break;
-      case /* Complete */2 :
-          tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Approval Complete, Sign the next transaction "));
-          break;
-      
-    }
+    tmp$2 = null;
   }
-  var txExplererUrl = RootProvider.useEtherscanUrl(undefined);
-  var resetTxButton = React.createElement("button", {
-        onClick: (function (param) {
-            return Curry._1(setTxState, (function (param) {
-                          return /* UnInitialised */0;
-                        }));
-          })
-      }, ">>Reset tx<<");
-  var tmp$3;
-  if (typeof txState === "number") {
-    switch (txState) {
-      case /* UnInitialised */0 :
-          tmp$3 = null;
-          break;
-      case /* Created */1 :
-          tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, "Tx created."), React.createElement("div", undefined, React.createElement(Loader.make, {})));
-          break;
-      case /* Failed */2 :
-          tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."), resetTxButton);
-          break;
-      
-    }
-  } else {
-    switch (txState.TAG | 0) {
-      case /* SignedAndSubmitted */0 :
-          tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, React.createElement("a", {
-                        href: "https://" + txExplererUrl + "/tx/" + txState._0,
-                        rel: "noopener noreferrer",
-                        target: "_blank"
-                      }, "View the transaction on " + txExplererUrl)), React.createElement(Loader.make, {}));
-          break;
-      case /* Declined */1 :
-          tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0), resetTxButton);
-          break;
-      case /* Complete */2 :
-          var txHash = txState._0.transactionHash;
-          tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Transaction Complete "), React.createElement("p", undefined, React.createElement("a", {
-                        href: "https://" + txExplererUrl + "/tx/" + txHash,
-                        rel: "noopener noreferrer",
-                        target: "_blank"
-                      }, "View the transaction on " + txExplererUrl)), resetTxButton);
-          break;
-      
-    }
-  }
-  var formatOptBalance = function (__x) {
-    return Belt_Option.mapWithDefault(__x, "Loading", Ethers.Utils.formatEther);
-  };
   return React.createElement("div", {
               className: "screen-centered-container"
             }, React.createElement(ViewBox.make, {
@@ -982,7 +988,7 @@ function TradeForm$1(Props) {
                             ) + " position",
                             variant: "large"
                           }))
-                }), tmp$2, tmp$3, React.createElement("code", undefined, React.createElement("p", undefined, "dev only component to display balances"), React.createElement("p", undefined, "dai - balance: " + formatOptBalance(optDaiBalance) + " - approved: " + formatOptBalance(optDaiAmountApproved)), React.createElement("p", undefined, "long - balance: " + formatOptBalance(match$5[0]) + " - approved: " + formatOptBalance(match$5[1])), React.createElement("p", undefined, "short - balance: " + formatOptBalance(match$4[0]) + " - approved: " + formatOptBalance(match$4[1]))));
+                }), tmp$2);
 }
 
 var make = TradeForm$1;

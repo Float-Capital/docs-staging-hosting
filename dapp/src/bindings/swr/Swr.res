@@ -77,3 +77,10 @@ external useSwrConditonal5: (
   ('a, 'b, 'c, 'd, 'e) => JsPromise.t<'data>,
   ~config: option<configInterface<('a, 'b, 'c, 'd, 'e), 'data>>,
 ) => responseInterface<'data> = "default"
+
+@val @module("swr")
+external useSwrConditonal6: (
+  unit => option<('a, 'b, 'c, 'd, 'e, 'f)>,
+  ('a, 'b, 'c, 'd, 'e, 'f) => JsPromise.t<'data>,
+  ~config: option<configInterface<('a, 'b, 'c, 'd, 'e, 'f), 'data>>,
+) => responseInterface<'data> = "default"

@@ -118,7 +118,7 @@ function StateChangeMonitor(Props) {
         undefined,
         undefined,
         undefined,
-        /* CacheFirst */1,
+        /* CacheAndNetwork */0,
         undefined,
         undefined,
         undefined,

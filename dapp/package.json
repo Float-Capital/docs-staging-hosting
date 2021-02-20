@@ -32,7 +32,7 @@
     "swr-sync-storage": "^1.0.1"
   },
   "scripts": {
-    "next:dev": "next",
+    "next:dev": "NEXT_PUBLIC_DEVMODE=true next",
     "debug": "NODE_OPTIONS='--inspect' next",
     "build": "bsb -clean-world -make-world && next build",
     "now-build": "bsb -clean-world -make-world && next build",

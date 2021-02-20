@@ -83,13 +83,11 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
     ~erc20Address=daiAddressThatIsTemporarilyHardCoded,
     ~spender=longShortContractAddress,
   )
-  let (optShortBalance, optShortAmountApproved) = useBalanceAndApproved(
+  let {Swr.data: optShortBalance} = ContractHooks.useErc20Balance(
     ~erc20Address=market.syntheticShort.tokenAddress,
-    ~spender=longShortContractAddress,
   )
-  let (optLongBalance, optLongAmountApproved) = useBalanceAndApproved(
+  let {Swr.data: optLongBalance} = ContractHooks.useErc20Balance(
     ~erc20Address=market.syntheticLong.tokenAddress,
-    ~spender=longShortContractAddress,
   )
 
   let form = TradeForm.useForm(~initialInput, ~onSubmit=({amount, isMint, isLong}, _form) => {
@@ -277,93 +275,97 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
         </Button>
       </Form>
     </ViewBox>
-    {// {Config.isDevMode // <- this can be used to hide this code when not developing
-    //   ? <>
+    {Config.isDevMode // <- this can be used to hide this code when not developing
+      ? <>
+          {switch txState {
+          | ContractActions.UnInitialised => React.null
+          | ContractActions.Created => <>
+              <h1> {"Processing Approval "->React.string} </h1> <Loader />
+            </>
+          | ContractActions.SignedAndSubmitted(_txHash) => <>
+              <h1> {"Processing Approval - submitted "->React.string} <Loader /> </h1> <Loader />
+            </>
+          | ContractActions.Complete({transactionHash: _txHash}) => <>
+              <h1> {"Approval Complete, Sign the next transaction "->React.string} </h1>
+            </>
+          | ContractActions.Declined(message) => <>
+              <h1>
+                {"The transaction was declined by your wallet, please try again."->React.string}
+              </h1>
+              <p> {("Failure reason: " ++ message)->React.string} </p>
+            </>
+          | ContractActions.Failed => <>
+              <h1> {"The transaction failed."->React.string} </h1>
+              <p> {"This operation isn't permitted by the smart contract."->React.string} </p>
+            </>
+          }}
+          {
+            let txExplererUrl = RootProvider.useEtherscanUrl()
 
-    switch txState {
-    | ContractActions.UnInitialised => React.null
-    | ContractActions.Created => <> <h1> {"Processing Approval "->React.string} </h1> <Loader /> </>
-    | ContractActions.SignedAndSubmitted(_txHash) => <>
-        <h1> {"Processing Approval - submitted "->React.string} <Loader /> </h1> <Loader />
-      </>
-    | ContractActions.Complete({transactionHash: _txHash}) => <>
-        <h1> {"Approval Complete, Sign the next transaction "->React.string} </h1>
-      </>
-    | ContractActions.Declined(message) => <>
-        <h1> {"The transaction was declined by your wallet, please try again."->React.string} </h1>
-        <p> {("Failure reason: " ++ message)->React.string} </p>
-      </>
-    | ContractActions.Failed => <>
-        <h1> {"The transaction failed."->React.string} </h1>
-        <p> {"This operation isn't permitted by the smart contract."->React.string} </p>
-      </>
-    }}
-    {
-      let txExplererUrl = RootProvider.useEtherscanUrl()
+            let resetTxButton =
+              <button onClick={_ => setTxState(_ => ContractActions.UnInitialised)}>
+                {">>Reset tx<<"->React.string}
+              </button>
 
-      let resetTxButton =
-        <button onClick={_ => setTxState(_ => ContractActions.UnInitialised)}>
-          {">>Reset tx<<"->React.string}
-        </button>
-
-      switch txState {
-      | ContractActions.UnInitialised => React.null
-      | ContractActions.Created => <>
-          <h1> {"Processing Transaction "->React.string} <Loader /> </h1>
-          <p> {"Tx created."->React.string} </p>
-          <div> <Loader /> </div>
+            switch txState {
+            | ContractActions.UnInitialised => React.null
+            | ContractActions.Created => <>
+                <h1> {"Processing Transaction "->React.string} <Loader /> </h1>
+                <p> {"Tx created."->React.string} </p>
+                <div> <Loader /> </div>
+              </>
+            | ContractActions.SignedAndSubmitted(txHash) => <>
+                <h1> {"Processing Transaction "->React.string} <Loader /> </h1>
+                <p>
+                  <a
+                    href=j`https://$txExplererUrl/tx/$txHash`
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    {("View the transaction on " ++ txExplererUrl)->React.string}
+                  </a>
+                </p>
+                <Loader />
+              </>
+            | ContractActions.Complete(result) =>
+              let txHash = result.transactionHash
+              <>
+                <h1> {"Transaction Complete "->React.string} </h1>
+                <p>
+                  <a
+                    href=j`https://$txExplererUrl/tx/$txHash`
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    {("View the transaction on " ++ txExplererUrl)->React.string}
+                  </a>
+                </p>
+                resetTxButton
+              </>
+            | ContractActions.Declined(message) => <>
+                <h1>
+                  {"The transaction was declined by your wallet, please try again."->React.string}
+                </h1>
+                <p> {("Failure reason: " ++ message)->React.string} </p>
+                resetTxButton
+              </>
+            | ContractActions.Failed => <>
+                <h1> {"The transaction failed."->React.string} </h1>
+                <p> {"This operation isn't permitted by the smart contract."->React.string} </p>
+                resetTxButton
+              </>
+            }
+          }
+          {
+            let formatOptBalance = Option.mapWithDefault(_, "Loading", Ethers.Utils.formatEther)
+            <code>
+              <p> {"dev only component to display balances"->React.string} </p>
+              <p>
+                {`dai - balance: ${optDaiBalance->formatOptBalance} - approved: ${optDaiAmountApproved->formatOptBalance}`->React.string}
+              </p>
+              <p> {`long - balance: ${optLongBalance->formatOptBalance}`->React.string} </p>
+              <p> {`short - balance: ${optShortBalance->formatOptBalance}`->React.string} </p>
+            </code>
+          }
         </>
-      | ContractActions.SignedAndSubmitted(txHash) => <>
-          <h1> {"Processing Transaction "->React.string} <Loader /> </h1>
-          <p>
-            <a href=j`https://$txExplererUrl/tx/$txHash` target="_blank" rel="noopener noreferrer">
-              {("View the transaction on " ++ txExplererUrl)->React.string}
-            </a>
-          </p>
-          <Loader />
-        </>
-      | ContractActions.Complete(result) =>
-        let txHash = result.transactionHash
-        <>
-          <h1> {"Transaction Complete "->React.string} </h1>
-          <p>
-            <a href=j`https://$txExplererUrl/tx/$txHash` target="_blank" rel="noopener noreferrer">
-              {("View the transaction on " ++ txExplererUrl)->React.string}
-            </a>
-          </p>
-          resetTxButton
-        </>
-      | ContractActions.Declined(message) => <>
-          <h1>
-            {"The transaction was declined by your wallet, please try again."->React.string}
-          </h1>
-          <p> {("Failure reason: " ++ message)->React.string} </p>
-          resetTxButton
-        </>
-      | ContractActions.Failed => <>
-          <h1> {"The transaction failed."->React.string} </h1>
-          <p> {"This operation isn't permitted by the smart contract."->React.string} </p>
-          resetTxButton
-        </>
-      }
-    }
-    {
-      let formatOptBalance = Option.mapWithDefault(_, "Loading", Ethers.Utils.formatEther)
-      <code>
-        <p> {"dev only component to display balances"->React.string} </p>
-        <p>
-          {`dai - balance: ${optDaiBalance->formatOptBalance} - approved: ${optDaiAmountApproved->formatOptBalance}`->React.string}
-        </p>
-        <p>
-          {`long - balance: ${optLongBalance->formatOptBalance} - approved: ${optLongAmountApproved->formatOptBalance}`->React.string}
-        </p>
-        <p>
-          {`short - balance: ${optShortBalance->formatOptBalance} - approved: ${optShortAmountApproved->formatOptBalance}`->React.string}
-        </p>
-      </code>
-    }
-
-    //   </>
-    // : React.null}
+      : React.null}
   </div>
 }

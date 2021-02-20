@@ -7,7 +7,7 @@ import * as Constants from "./Constants.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as RootProvider from "./libraries/RootProvider.js";
 
-var isDevMode = Caml_obj.caml_equal(process.env.REACT_APP_DEVMODE, "true");
+var isDevMode = Caml_obj.caml_equal(process.env.NEXT_PUBLIC_DEVMODE, "true");
 
 var longshortContractAbi = Ethers.makeAbi([""]);
 
