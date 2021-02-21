@@ -52,6 +52,7 @@ function StakeDetails$UsersActiveStakes(Props) {
     tmp = currentStakes.length !== 0 ? React.createElement(React.Fragment, undefined, Belt_Array.map(currentStakes, (function (param) {
                   var match = param.currentStake;
                   var match$1 = match.tokenType;
+                  var tokenAddress = match$1.tokenAddress;
                   var amountFormatted = FormatMoney.formatMoney(Belt_Option.getWithDefault(Belt_Float.fromString(Ethers.Utils.formatEther(match.amount)), 0));
                   var timeSinceStaking = Globals.timestampToDuration(match.timestamp);
                   if (match.withdrawn) {
@@ -76,11 +77,13 @@ function StakeDetails$UsersActiveStakes(Props) {
                                       }, match$1.tokenType), React.createElement("p", {
                                         className: "text-primary "
                                       }, React.createElement("a", {
-                                            href: "https://testnet.bscscan.com/token/" + Globals.ethAdrToStr(match$1.tokenAddress) + "?a=" + Globals.ethAdrToStr(currentUser),
+                                            href: "https://testnet.bscscan.com/token/" + Globals.ethAdrToStr(tokenAddress) + "?a=" + Globals.ethAdrToStr(currentUser),
                                             target: "_"
                                           }, React.createElement("span", {
                                                 className: "text-bold text-4xl"
-                                              }, amountFormatted), " Tokens"))));
+                                              }, amountFormatted), " Tokens")), React.createElement(StakeDetails$ClaimFloat, {
+                                        tokenAddresses: [tokenAddress]
+                                      })));
                   }
                 }))) : React.createElement("h2", undefined, "You have no active stakes.");
   } else {

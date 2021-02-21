@@ -19,16 +19,16 @@ let make = () => {
             data: Some({
               systemStates: [
                 {
-                  timestamp,
-                  txHash,
+                  // timestamp,
+                  // txHash,
                   // blockNumber,
-                  syntheticPrice,
-                  longTokenPrice,
-                  shortTokenPrice,
+                  // syntheticPrice,
+                  // longTokenPrice,
+                  // shortTokenPrice,
                   totalLockedLong,
                   totalLockedShort,
                   totalValueLocked,
-                  setBy,
+                  // setBy,
                 },
               ],
             }),

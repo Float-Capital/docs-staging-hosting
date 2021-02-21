@@ -5,7 +5,7 @@ module ClaimFloat = {
   let make = (~tokenAddresses) => {
     let signer = ContractActions.useSignerExn()
 
-    let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
+    let (contractExecutionHandler, _txState, _setTxState) = ContractActions.useContractFunction(
       ~signer,
     )
 
@@ -37,7 +37,11 @@ module UsersActiveStakes = {
             currentStake: {
               timestamp,
               creationTxHash,
-              tokenType: {tokenAddress, totalStaked, tokenType, syntheticMarket: {name, symbol}},
+              tokenType: {
+                tokenAddress,
+                /* totalStaked, */ tokenType,
+                syntheticMarket: {/* name, */ symbol},
+              },
               amount,
               withdrawn,
             },
@@ -88,6 +92,7 @@ module UsersActiveStakes = {
                         {" Tokens"->React.string}
                       </a>
                     </p>
+                    <ClaimFloat tokenAddresses=[tokenAddress] />
                   </div>
                 </Card>
           })

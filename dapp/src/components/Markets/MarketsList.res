@@ -26,13 +26,13 @@ let make = () => {
             symbol,
             marketIndex,
             syntheticLong: {
-              id: idLong,
-              tokenAddress: tokenAddressLong,
+              // id: idLong,
+              // tokenAddress: tokenAddressLong,
               totalStaked: totalStakedLong,
             },
             syntheticShort: {
-              id: idShort,
-              tokenAddress: tokenAddressShort,
+              // id: idShort,
+              // tokenAddress: tokenAddressShort,
               totalStaked: totalStakedShort,
             },
           }) =>
