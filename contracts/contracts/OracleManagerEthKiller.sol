@@ -2,39 +2,60 @@
 pragma solidity 0.7.6;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
-contract EthKillerOracleAggregator is Initializable {
-    using SafeMathUpgradeable for uint256;
+import "./interfaces/IBandOracle.sol";
 
+contract OracleManagerEthKiller is Initializable {
     address public admin; // This will likely be the Gnosis safe
 
+    // Oracle price, changes by average of the underlying asset changes.
     int256 public indexPrice;
 
+    // Underlying asset prices.
     int256 public tronPrice;
     int256 public eosPrice;
     int256 public xrpPrice;
 
-    function setup(address _admin) public initializer {
-        admin = _admin;
+    // Band oracle address.
+    IBandOracle public oracle;
 
-        // Initialising asset prices
+    ////////////////////////////////////
+    ///// CONTRACT SET-UP //////////////
+    ////////////////////////////////////
+
+    function setup(address _admin, address _bandOracle) public initializer {
+        admin = _admin;
+        oracle = IBandOracle(_bandOracle);
+
+        // Initial asset prices.
         tronPrice = _getAssetPrice(0);
         eosPrice = _getAssetPrice(1);
         xrpPrice = _getAssetPrice(2);
 
-        // Initialiasing base index price
+        // Initial base index price.
         indexPrice = 1e18;
     }
 
+    ////////////////////////////////////
+    ///// IMPLEMENTATION ///////////////
+    ////////////////////////////////////
+
     function _getAssetPrice(uint256 index) internal returns (int256) {
-        // index 0 = tron
-        // index 1 =  eos
-        // index 2 = ripple
-        // Call to band oracle for assets price
-        return 1e18;
+        string memory base;
+        if (index == 0) {
+            base = "TRX"; // tron
+        } else if (index == 1) {
+            base = "EOS"; // eos
+        } else {
+            base = "XRP"; // ripple
+        }
+
+        IBandOracle.ReferenceData memory data =
+            oracle.getReferenceData(base, "ETH");
+
+        return int256(data.rate);
     }
 
     function _calculatePrice() internal {
