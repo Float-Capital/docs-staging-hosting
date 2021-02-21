@@ -6,7 +6,7 @@ module Mint = {
     let marketIndex = router.query->Js.Dict.get("marketIndex")->Option.getWithDefault("1")
     <AccessControl
       alternateComponent={<h1 onClick={_ => router->Next.Router.push("/login?nextPath=/mint")}>
-        {"login to view this"->React.string}
+        <Login />
       </h1>}>
       <section>
         {switch markets {

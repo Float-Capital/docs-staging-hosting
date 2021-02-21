@@ -4,7 +4,7 @@ module Stake = {
     id: string,
     symbol: string,
     apy: float,
-    balance: float,
+    balance: Ethers.BigNumber.t,
     tokenType: string,
   }
 
@@ -33,11 +33,13 @@ module Stake = {
           setSyntheticTokens(_ =>
             syntheticTokens
             ->Array.map(({id, syntheticMarket: {name: symbol}, tokenType}) => {
-              id: id,
-              symbol: symbol,
-              apy: 0.2,
-              balance: 0., /// need to pull this in at some stage
-              tokenType: tokenType->Js.String2.make->Js.String.toLowerCase,
+              {
+                id: id,
+                symbol: symbol,
+                apy: 0.2,
+                balance: 0->Ethers.BigNumber.fromInt,
+                tokenType: tokenType->Js.String2.make->Js.String.toLowerCase,
+              }
             })
             ->SortArray.stableSortBy((a, b) =>
               switch Js.String.localeCompare(a.symbol, b.symbol) {
@@ -65,8 +67,8 @@ module Stake = {
     }, [tokens])
 
     <AccessControl
-      alternateComponent={<h1 onClick={_ => router->Next.Router.push("/login?nextPath=/dashboard")}>
-        {"login to view this"->React.string}
+      alternateComponent={<h1 onClick={_ => router->Next.Router.push("/login?nextPath=/stake")}>
+        <Login />
       </h1>}>
       <ViewBox>
         {switch tokenId {
@@ -78,7 +80,14 @@ module Stake = {
               <Card key={token.symbol ++ token.tokenType}>
                 <div className="flex justify-between items-center w-full">
                   <div className="flex flex-col">
-                    <h3 className="font-bold"> {"Token"->React.string} </h3>
+                    <div className="flex">
+                      <h3 className="font-bold"> {"Token"->React.string} </h3>
+                      <AddToMetamask
+                        tokenAddress={token.id}
+                        tokenSymbol={(token.tokenType->isShort ? `↘️` : `↗️`) ++
+                        token.symbol->Js.String2.replaceByRe(%re("/[aeiou]/ig"), "")}
+                      />
+                    </div>
                     <p>
                       {token.symbol->React.string}
                       {(token.tokenType->isShort ? `↘️` : `↗️`)->React.string}
@@ -86,7 +95,7 @@ module Stake = {
                   </div>
                   <div className="flex flex-col">
                     <h3 className="font-bold"> {"Balance"->React.string} </h3>
-                    <p> {token.balance->Belt.Float.toString->React.string} </p>
+                    <p> {token.balance->Ethers.BigNumber.toString->React.string} </p>
                   </div>
                   <div className="flex flex-col">
                     <h3 className="font-bold">
