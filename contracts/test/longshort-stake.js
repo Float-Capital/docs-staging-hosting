@@ -27,7 +27,7 @@ contract("LongShort (staking)", (accounts) => {
   const threeHundred = "3000000000000000000";
   const oneHundredAndFifty = "150000000000000000000";
   const twoHundred = "200000000000000000000";
-  const e18 = new BN("10000000000000000");
+  const e18 = new BN("1000000000000000000");
   const twentyFive = "25000000000000000000";
 
   let staker;
@@ -179,7 +179,7 @@ contract("LongShort (staking)", (accounts) => {
     await longShort._updateSystemState(marketIndex);
 
     const before = await time.latest();
-    await time.increase(1);
+    await time.increase(999);
     await longShort._updateSystemState(marketIndex);
     // earning from now
     const now = await time.latest();
@@ -194,6 +194,7 @@ contract("LongShort (staking)", (accounts) => {
       result.toString(),
       calculateFloatPerSecond(price)
         .mul(new BN((now - before).toString()))
+        .div(e18)
         .mul(new BN(oneHundred))
         .toString()
     );
@@ -206,6 +207,7 @@ contract("LongShort (staking)", (accounts) => {
       r2.toString(),
       calculateFloatPerSecond(price)
         .mul(new BN((now - before).toString()))
+        .div(e18)
         .mul(new BN(oneHundred))
         .toString()
     );
@@ -230,10 +232,10 @@ contract("LongShort (staking)", (accounts) => {
     await longShort._updateSystemState(marketIndex);
 
     const before = await time.latest();
-    await time.increase(1);
+    await time.increase(999);
     await longShort._updateSystemState(marketIndex);
 
-    await time.increase(1);
+    await time.increase(999);
     await longShort._updateSystemState(marketIndex);
     // earning from now
     const now = await time.latest();
@@ -248,6 +250,7 @@ contract("LongShort (staking)", (accounts) => {
       result.toString(),
       calculateFloatPerSecond(price)
         .mul(new BN((now - before).toString()))
+        .div(e18)
         .mul(new BN(oneHundred))
         .toString()
     );
@@ -260,7 +263,7 @@ contract("LongShort (staking)", (accounts) => {
       await longShort._updateSystemState(marketIndex);
     }
     const before = await time.latest();
-    await time.increase(1);
+    await time.increase(999);
     await longShort._updateSystemState(marketIndex);
     // earning from now
     const now = await time.latest();
@@ -276,6 +279,7 @@ contract("LongShort (staking)", (accounts) => {
       result.toString(),
       calculateFloatPerSecond(price)
         .mul(new BN((now - before).toString()))
+        .div(e18)
         .mul(new BN(oneHundred))
         .toString()
     );
@@ -296,7 +300,8 @@ contract("LongShort (staking)", (accounts) => {
 
   // mock for now - will have to refactor tests once we change how
   // r is calculated
-  const calculateFloatPerSecond = (tokenPrice) => tokenPrice;
+  const calculateFloatPerSecond = (tokenPrice) =>
+    tokenPrice.div(new BN("1000"));
 
   const amountStaked = async (token, user) =>
     await staker.userAmountStaked(token.address, user);
