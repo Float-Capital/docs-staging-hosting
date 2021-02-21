@@ -1,5 +1,5 @@
 @react.component
-let make = (~onClick, ~children: string, ~variant) =>
+let make = (~onClick, ~children: string, ~variant="small") =>
   <div className="float-button-outer-container">
     <div
       className={`float-button-container ${variant == "small"

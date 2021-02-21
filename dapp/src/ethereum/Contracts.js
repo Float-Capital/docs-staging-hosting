@@ -36,7 +36,7 @@ var abi$2 = Ethers.makeAbi([
       "function stake(address tokenAddress, uint256 amount)",
       "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)  @1200000",
       "function withdraw(address tokenAddress, uint256 amount)",
-      "function mintFloat()"
+      "function claimFloat(address[] memory tokenAddresses)"
     ]);
 
 function make$2(address, providerOrSigner) {

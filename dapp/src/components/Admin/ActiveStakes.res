@@ -1,3 +1,5 @@
+open Globals
+
 @react.component
 let make = () => {
   let currentUser = RootProvider.useCurrentUserExn()
@@ -28,7 +30,7 @@ let make = () => {
         <div>
           <h1> {`${name}(${symbol})`->React.string} </h1>
           <p>
-            {`Stake of ${amountFormatted} for ${tokenType->Obj.magic} at address ${tokenAddress}, which is ${withdrawn
+            {`Stake of ${amountFormatted} for ${tokenType->Obj.magic} at address ${tokenAddress->ethAdrToStr}, which is ${withdrawn
                 ? "withdrawn"
                 : "still active"}. This stake was created at ${timestamp->Ethers.BigNumber.toString}, in transaction ${creationTxHash}. Total staked: ${totalStakedFormatted}`->React.string}
           </p>

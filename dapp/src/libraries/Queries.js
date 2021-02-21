@@ -636,7 +636,7 @@ function parse$4(value) {
                           creationTxHash: GqlConverters.Bytes.parse(value$1.creationTxHash),
                           tokenType: {
                             __typename: value$2.__typename,
-                            tokenAddress: GqlConverters.Bytes.parse(value$2.tokenAddress),
+                            tokenAddress: GqlConverters.Address.parse(value$2.tokenAddress),
                             totalStaked: GqlConverters.$$BigInt.parse(value$2.totalStaked),
                             tokenType: tmp,
                             syntheticMarket: {
@@ -677,7 +677,7 @@ function serialize$4(value) {
         var value$11 = value$5.totalStaked;
         var value$12 = GqlConverters.$$BigInt.serialize(value$11);
         var value$13 = value$5.tokenAddress;
-        var value$14 = GqlConverters.Bytes.serialize(value$13);
+        var value$14 = GqlConverters.Address.serialize(value$13);
         var value$15 = value$5.__typename;
         var tokenType$1 = {
           __typename: value$15,

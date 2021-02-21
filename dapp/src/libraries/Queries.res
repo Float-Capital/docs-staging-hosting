@@ -73,7 +73,7 @@ query ($userId: String!){
       blockNumber
       creationTxHash
       tokenType {
-        tokenAddress
+        tokenAddress @ppxCustom(module: "Address")
         totalStaked
         tokenType
         syntheticMarket {
