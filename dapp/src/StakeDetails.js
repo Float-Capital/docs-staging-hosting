@@ -81,9 +81,11 @@ function StakeDetails$UsersActiveStakes(Props) {
                                             target: "_"
                                           }, React.createElement("span", {
                                                 className: "text-bold text-4xl"
-                                              }, amountFormatted), " Tokens")), React.createElement(StakeDetails$ClaimFloat, {
-                                        tokenAddresses: [tokenAddress]
-                                      })));
+                                              }, amountFormatted), " Tokens")), React.createElement("div", {
+                                        className: "flex items-center"
+                                      }, React.createElement(StakeDetails$ClaimFloat, {
+                                            tokenAddresses: [tokenAddress]
+                                          }))));
                   }
                 }))) : React.createElement("h2", undefined, "You have no active stakes.");
   } else {

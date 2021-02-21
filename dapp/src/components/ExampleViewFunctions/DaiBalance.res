@@ -10,11 +10,17 @@ let make = () => {
   <>
     {switch optBalance {
     | Some(balance) =>
-      <h1>
-        {`BUSD balance: $${FormatMoney.formatMoney(
-            ~number=balance->Ethers.Utils.formatEther->Float.fromString->Option.getWithDefault(0.),
-          )}`->React.string}
-      </h1>
+      <div className="flex justify-between w-full">
+        <p> {`BUSD balance: `->React.string} </p>
+        <p>
+          {`$${FormatMoney.formatMoney(
+              ~number=balance
+              ->Ethers.Utils.formatEther
+              ->Float.fromString
+              ->Option.getWithDefault(0.),
+            )}`->React.string}
+        </p>
+      </div>
     | None => <MiniLoader />
     }}
   </>

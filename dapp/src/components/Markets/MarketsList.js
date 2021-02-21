@@ -35,40 +35,34 @@ function MarketsList(Props) {
               children: React.createElement("div", {
                     className: "p-5 flex flex-col bg-white bg-opacity-75  rounded"
                   }, React.createElement("h2", {
-                        className: "text-lg font-medium"
+                        className: "text-xl font-medium"
                       }, "Markets"), React.createElement("div", {
-                        className: "flex justify-between items-center w-full mt-3"
+                        className: "grid grid-cols-4 gap-1 items-center"
                       }, React.createElement("p", {
-                            className: "font-bold underline"
+                            className: "font-bold underline text-xs"
                           }, "Market"), React.createElement("p", {
-                            className: "font-bold underline"
-                          }, "Symbol"), React.createElement("p", {
-                            className: "font-bold underline"
+                            className: "font-bold underline  text-xs"
                           }, "Long Liquidity"), React.createElement("p", {
-                            className: "font-bold underline"
+                            className: "font-bold underline text-xs"
                           }, "Short Liquidity"), React.createElement("p", {
-                            className: "font-bold underline"
-                          }, "Action")), marketDetailsQuery.loading ? React.createElement("div", {
+                            className: "font-bold underline text-xs"
+                          }, "")), marketDetailsQuery.loading ? React.createElement("div", {
                           className: "m-auto"
                         }, React.createElement(MiniLoader.make, {})) : (
                       marketDetailsQuery.error !== undefined ? "Error loading data" : (
                           match !== undefined ? React.createElement(React.Fragment, undefined, Belt_Array.map(match.syntheticMarkets, (function (param) {
                                         var match = param.latestSystemState;
                                         var marketIndex = param.marketIndex;
-                                        var symbol = param.symbol;
                                         return React.createElement("div", {
-                                                    key: symbol,
-                                                    className: "flex justify-between items-center w-full"
-                                                  }, React.createElement("p", undefined, param.name), React.createElement("p", undefined, symbol), React.createElement("p", undefined, "$" + Misc.toDollarCentsFixedNoRounding(Ethers.Utils.formatEther(match.totalLockedLong))), React.createElement("p", undefined, "$" + Misc.toDollarCentsFixedNoRounding(Ethers.Utils.formatEther(match.totalLockedShort))), React.createElement("div", {
-                                                        className: "grid grid-cols-2 gap-2"
-                                                      }, React.createElement(Button.make, {
-                                                            onClick: (function (param) {
-                                                                router.push("/mint?marketIndex=" + marketIndex.toString());
-                                                                
-                                                              }),
-                                                            children: "Mint",
-                                                            variant: "small"
-                                                          })));
+                                                    className: "grid grid-cols-4 gap-1 items-center"
+                                                  }, React.createElement("p", undefined, param.name), React.createElement("p", undefined, "$" + Misc.toDollarCentsFixedNoRounding(Ethers.Utils.formatEther(match.totalLockedLong))), React.createElement("p", undefined, "$" + Misc.toDollarCentsFixedNoRounding(Ethers.Utils.formatEther(match.totalLockedShort))), React.createElement(Button.make, {
+                                                        onClick: (function (param) {
+                                                            router.push("/mint?marketIndex=" + marketIndex.toString());
+                                                            
+                                                          }),
+                                                        children: "Mint",
+                                                        variant: "small"
+                                                      }));
                                       }))) : "You might think this is impossible, but depending on the situation it might not be!"
                         )
                     )),
