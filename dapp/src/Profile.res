@@ -5,12 +5,18 @@ module Profile = {
     let userAddress = router.query->Js.Dict.get("address")
     <AccessControl
       alternateComponent={<h1 onClick={_ => router->Next.Router.push(`/login?nextPath=/`)}>
-        {"Login"->React.string}
+        <Login />
       </h1>}>
       <section>
-        <h1> {" Profile "->React.string} </h1>
         {switch userAddress {
-        | Some(address) => <div> {address->React.string} <StakeDetails /> </div>
+        | Some(address) =>
+          <div>
+            <p className="text-xs"> {"User: "->React.string} {address->React.string} </p>
+            <div className="flex w-full justify-between">
+              <div className="w-full mr-3"> <Card> <DaiBalance /> </Card> </div>
+              <div className="w-full ml-3"> <StakeDetails /> </div>
+            </div>
+          </div>
         | _ => React.null
         }}
       </section>

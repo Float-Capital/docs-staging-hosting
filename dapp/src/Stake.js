@@ -2,8 +2,10 @@
 
 import * as Card from "./components/UI/Card.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
+import * as Login from "./components/Login/Login.js";
 import * as React from "react";
 import * as Button from "./components/UI/Button.js";
+import * as Ethers from "ethers";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
 import * as Queries from "./libraries/Queries.js";
 import * as ViewBox from "./components/UI/ViewBox.js";
@@ -11,6 +13,7 @@ import * as StakeForm from "./components/Stake/StakeForm.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as Router from "next/router";
 import * as AccessControl from "./components/AccessControl.js";
+import * as AddToMetamask from "./components/UI/AddToMetamask.js";
 import * as Belt_SortArray from "bs-platform/lib/es6/belt_SortArray.js";
 
 function Stake$Stake(Props) {
@@ -59,7 +62,7 @@ function Stake$Stake(Props) {
                                               id: param.id,
                                               symbol: param.syntheticMarket.name,
                                               apy: 0.2,
-                                              balance: 0,
+                                              balance: Ethers.BigNumber.from(0),
                                               tokenType: String(param.tokenType).toLowerCase()
                                             };
                                     })), (function (a, b) {
@@ -108,13 +111,20 @@ function Stake$Stake(Props) {
                                                     className: "flex justify-between items-center w-full"
                                                   }, React.createElement("div", {
                                                         className: "flex flex-col"
-                                                      }, React.createElement("h3", {
-                                                            className: "font-bold"
-                                                          }, "Token"), React.createElement("p", undefined, token.symbol, token.tokenType === "short" ? "↘️" : "↗️")), React.createElement("div", {
+                                                      }, React.createElement("div", {
+                                                            className: "flex"
+                                                          }, React.createElement("h3", {
+                                                                className: "font-bold"
+                                                              }, "Token"), React.createElement(AddToMetamask.make, {
+                                                                tokenAddress: token.id,
+                                                                tokenSymbol: (
+                                                                  token.tokenType === "short" ? "↘️" : "↗️"
+                                                                ) + token.symbol.replace(/[aeiou]/ig, "")
+                                                              })), React.createElement("p", undefined, token.symbol, token.tokenType === "short" ? "↘️" : "↗️")), React.createElement("div", {
                                                         className: "flex flex-col"
                                                       }, React.createElement("h3", {
                                                             className: "font-bold"
-                                                          }, "Balance"), React.createElement("p", undefined, String(token.balance))), React.createElement("div", {
+                                                          }, "Balance"), React.createElement("p", undefined, token.balance.toString())), React.createElement("div", {
                                                         className: "flex flex-col"
                                                       }, React.createElement("h3", {
                                                             className: "font-bold"
@@ -136,10 +146,10 @@ function Stake$Stake(Props) {
                   }),
               alternateComponent: React.createElement("h1", {
                     onClick: (function (param) {
-                        router.push("/login?nextPath=/dashboard");
+                        router.push("/login?nextPath=/stake");
                         
                       })
-                  }, "login to view this")
+                  }, React.createElement(Login.make, {}))
             });
 }
 

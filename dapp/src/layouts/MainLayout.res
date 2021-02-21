@@ -18,6 +18,9 @@ module Navigation = {
         </a>
       </Link>
       <div className="flex w-2/3 text-base items-center justify-end">
+        <Link href="/markets">
+          <a className="px-3 hover:bg-white"> {React.string("MARKETS")} </a>
+        </Link>
         <Link href="/mint"> <a className="px-3 hover:bg-white"> {React.string("MINT")} </a> </Link>
         <Link href="/redeem">
           <a className="px-3 hover:bg-white"> {React.string("REDEEM")} </a>

@@ -6,7 +6,7 @@ module Redeem = {
 
     <AccessControl
       alternateComponent={<h1 onClick={_ => router->Next.Router.push("/login?nextPath=/redeem")}>
-        {"Login"->React.string}
+        <Login />
       </h1>}>
       <section>
         {switch markets {

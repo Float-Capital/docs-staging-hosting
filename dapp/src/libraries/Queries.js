@@ -154,11 +154,13 @@ var query$1 = (require("@apollo/client").gql`
         __typename
         id
         tokenAddress
+        totalStaked
       }
       syntheticShort  {
         __typename
         id
         tokenAddress
+        totalStaked
       }
     }
   }
@@ -179,12 +181,14 @@ function parse$1(value) {
                         syntheticLong: {
                           __typename: value$1.__typename,
                           id: value$1.id,
-                          tokenAddress: GqlConverters.Address.parse(value$1.tokenAddress)
+                          tokenAddress: GqlConverters.Address.parse(value$1.tokenAddress),
+                          totalStaked: GqlConverters.$$BigInt.parse(value$1.totalStaked)
                         },
                         syntheticShort: {
                           __typename: value$2.__typename,
                           id: value$2.id,
-                          tokenAddress: GqlConverters.Address.parse(value$2.tokenAddress)
+                          tokenAddress: GqlConverters.Address.parse(value$2.tokenAddress),
+                          totalStaked: GqlConverters.$$BigInt.parse(value$2.totalStaked)
                         }
                       };
               })
@@ -195,38 +199,44 @@ function serialize$1(value) {
   var value$1 = value.syntheticMarkets;
   var syntheticMarkets = value$1.map(function (value) {
         var value$1 = value.syntheticShort;
-        var value$2 = value$1.tokenAddress;
-        var value$3 = GqlConverters.Address.serialize(value$2);
-        var value$4 = value$1.id;
-        var value$5 = value$1.__typename;
+        var value$2 = value$1.totalStaked;
+        var value$3 = GqlConverters.$$BigInt.serialize(value$2);
+        var value$4 = value$1.tokenAddress;
+        var value$5 = GqlConverters.Address.serialize(value$4);
+        var value$6 = value$1.id;
+        var value$7 = value$1.__typename;
         var syntheticShort = {
-          __typename: value$5,
-          id: value$4,
-          tokenAddress: value$3
+          __typename: value$7,
+          id: value$6,
+          tokenAddress: value$5,
+          totalStaked: value$3
         };
-        var value$6 = value.syntheticLong;
-        var value$7 = value$6.tokenAddress;
-        var value$8 = GqlConverters.Address.serialize(value$7);
-        var value$9 = value$6.id;
-        var value$10 = value$6.__typename;
+        var value$8 = value.syntheticLong;
+        var value$9 = value$8.totalStaked;
+        var value$10 = GqlConverters.$$BigInt.serialize(value$9);
+        var value$11 = value$8.tokenAddress;
+        var value$12 = GqlConverters.Address.serialize(value$11);
+        var value$13 = value$8.id;
+        var value$14 = value$8.__typename;
         var syntheticLong = {
-          __typename: value$10,
-          id: value$9,
-          tokenAddress: value$8
+          __typename: value$14,
+          id: value$13,
+          tokenAddress: value$12,
+          totalStaked: value$10
         };
-        var value$11 = value.oracleAddress;
-        var value$12 = GqlConverters.Bytes.serialize(value$11);
-        var value$13 = value.marketIndex;
-        var value$14 = GqlConverters.$$BigInt.serialize(value$13);
-        var value$15 = value.symbol;
-        var value$16 = value.name;
-        var value$17 = value.__typename;
+        var value$15 = value.oracleAddress;
+        var value$16 = GqlConverters.Bytes.serialize(value$15);
+        var value$17 = value.marketIndex;
+        var value$18 = GqlConverters.$$BigInt.serialize(value$17);
+        var value$19 = value.symbol;
+        var value$20 = value.name;
+        var value$21 = value.__typename;
         return {
-                __typename: value$17,
-                name: value$16,
-                symbol: value$15,
-                marketIndex: value$14,
-                oracleAddress: value$12,
+                __typename: value$21,
+                name: value$20,
+                symbol: value$19,
+                marketIndex: value$18,
+                oracleAddress: value$16,
                 syntheticLong: syntheticLong,
                 syntheticShort: syntheticShort
               };

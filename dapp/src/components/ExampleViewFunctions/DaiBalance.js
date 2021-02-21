@@ -2,13 +2,17 @@
 
 import * as React from "react";
 import * as Ethers from "../../ethereum/Ethers.js";
+import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
+import * as MiniLoader from "../UI/MiniLoader.js";
+import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as FormatMoney from "../UI/FormatMoney.js";
 import * as ContractHooks from "../Admin/ContractHooks.js";
 
 function DaiBalance(Props) {
   var match = ContractHooks.useDaiBalance(undefined);
   var optBalance = match.data;
-  return React.createElement(React.Fragment, undefined, optBalance !== undefined ? React.createElement("h1", undefined, "dai balance: " + Ethers.Utils.formatEther(Caml_option.valFromOption(optBalance)) + " DAI") : React.createElement("h1", undefined, "Loading dai balance"));
+  return React.createElement(React.Fragment, undefined, optBalance !== undefined ? React.createElement("h1", undefined, "BUSD balance: $" + FormatMoney.formatMoney(Belt_Option.getWithDefault(Belt_Float.fromString(Ethers.Utils.formatEther(Caml_option.valFromOption(optBalance))), 0))) : React.createElement(MiniLoader.make, {}));
 }
 
 var make = DaiBalance;
