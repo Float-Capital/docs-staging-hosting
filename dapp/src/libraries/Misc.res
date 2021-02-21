@@ -10,3 +10,9 @@ let onlyExecuteClientSide = functionForClientsideExecution =>
   if window->Js.typeof != "undefined" {
     functionForClientsideExecution()
   }
+
+let toDollarCentsFixedNoRounding = floatString =>
+  floatString
+  ->Js.String2.match_(%re("/^\d+[.]\d\d/g"))
+  ->Option.getWithDefault(["0.00"])
+  ->Array.getUnsafe(0)

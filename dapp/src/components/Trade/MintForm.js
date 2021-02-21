@@ -720,7 +720,8 @@ function MintForm$1(Props) {
         }));
   var match$6 = form.amountResult;
   var formAmount = match$6 !== undefined && match$6.TAG === /* Ok */0 ? Caml_option.some(match$6._0) : undefined;
-  var stakingText = "";
+  var stakingText = form.input.isStaking ? "Mint & Stake" : "Mint";
+  var approveConnector = form.input.isStaking ? "," : " &";
   var isLong = form.input.isLong;
   var position = isLong ? "long" : "short";
   var match$7;
@@ -735,7 +736,7 @@ function MintForm$1(Props) {
         true
       ] : [
         undefined,
-        needsToApprove ? "Approve & mint " + position + " position" : "Mint" + stakingText + " " + position + " position",
+        needsToApprove ? "Approve" + approveConnector + " " + stakingText + " " + position + " position" : stakingText + " " + position + " position",
         false
       ];
   } else {
@@ -744,7 +745,7 @@ function MintForm$1(Props) {
   if (exit === 1) {
     match$7 = [
       undefined,
-      "Mint" + stakingText + " " + position + " position",
+      stakingText + " " + position + " position",
       true
     ];
   }
@@ -955,7 +956,7 @@ function MintForm$1(Props) {
                                   ) + " tokens")), React.createElement("p", {
                                 className: "text-xxs hover:text-gray-500"
                               }, React.createElement("a", {
-                                    href: "https://docs.float.capital"
+                                    href: "https://docs.float.capital/docs/stake"
                                   }, "Learn more about staking"))), React.createElement(Button.make, {
                             onClick: (function (param) {
                                 

@@ -129,7 +129,8 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
   }
 
   let (optAdditionalErrorMessage, _buttonText, _buttonDisabled) = {
-    let stakingText = form.input.isStaking ? "" : "" // TODO: decide on this " & stake" : ""
+    let stakingText = form.input.isStaking ? "Mint & Stake" : "Mint" // TODO: decide on this " & stake" : ""
+    let approveConnector = form.input.isStaking ? "," : " &" // TODO: decide on this " & stake" : ""
     switch form.input.isLong {
     | isLong =>
       let position = isLong ? "long" : "short"
@@ -142,13 +143,13 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
         | false => (
             None,
             switch needsToApprove {
-            | true => `Approve & mint ${position} position`
-            | false => `Mint${stakingText} ${position} position`
+            | true => `Approve${approveConnector} ${stakingText} ${position} position`
+            | false => `${stakingText} ${position} position`
             },
             false,
           )
         }
-      | _ => (None, `Mint${stakingText} ${position} position`, true)
+      | _ => (None, `${stakingText} ${position} position`, true)
       }
     }
   }
@@ -238,7 +239,9 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
             </label>
           </div>
           <p className="text-xxs hover:text-gray-500">
-            <a href="https://docs.float.capital"> {"Learn more about staking"->React.string} </a>
+            <a href="https://docs.float.capital/docs/stake">
+              {"Learn more about staking"->React.string}
+            </a>
           </p>
         </div>
         // <Toggle onClick={_ => Js.log("I was toggled")} preLabel="stake " postLabel="" />

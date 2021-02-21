@@ -5,8 +5,8 @@ import * as Login from "./components/Login/Login.js";
 import * as React from "react";
 import * as Loader from "./components/UI/Loader.js";
 import * as Queries from "./libraries/Queries.js";
-import * as MintForm from "./components/Trade/MintForm.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as RedeemForm from "./components/Trade/RedeemForm.js";
 import * as Router from "next/router";
 import * as AccessControl from "./components/AccessControl.js";
 
@@ -36,7 +36,7 @@ function Redeem$Redeem(Props) {
     tmp = "Error loading data";
   } else if (match !== undefined) {
     var optFirstMarket = Belt_Array.get(match.syntheticMarkets, 0);
-    tmp = optFirstMarket !== undefined ? React.createElement(MintForm.make, {
+    tmp = optFirstMarket !== undefined ? React.createElement(RedeemForm.make, {
             market: optFirstMarket
           }) : React.createElement("p", undefined, "No markets exist");
   } else {

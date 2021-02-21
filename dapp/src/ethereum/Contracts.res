@@ -31,6 +31,8 @@ module LongShort = {
       "function mintLongAndStake(uint256 marketIndex, uint256 amount) @1000000",
       "function mintShortAndStake(uint256 marketIndex, uint256 amount) @1000000",
       "function _updateSystemState()",
+      "function longValue(uint256 marketIndex) public view returns (uint256)",
+      "function shortValue(uint256 marketIndex) public view returns (uint256)",
     ]->Ethers.makeAbi
 
   let make = (~address, ~providerOrSigner): t =>
@@ -75,6 +77,16 @@ module LongShort = {
   @send
   external _updateSystemState: (~contract: t) => JsPromise.t<Ethers.txSubmitted> =
     "_updateSystemState"
+  @send
+  external longValue: (
+    ~contract: t,
+    ~marketIndex: Ethers.BigNumber.t,
+  ) => JsPromise.t<Ethers.BigNumber.t> = "longValue"
+  @send
+  external shortValue: (
+    ~contract: t,
+    ~marketIndex: Ethers.BigNumber.t,
+  ) => JsPromise.t<Ethers.BigNumber.t> = "shortValue"
 }
 
 module Staker = {
@@ -85,7 +97,7 @@ module Staker = {
       "function stake(address tokenAddress, uint256 amount)",
       "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)  @1200000",
       "function withdraw(address tokenAddress, uint256 amount)",
-      "function mintFloat()",
+      "function claimFloat(address[] memory tokenAddresses)",
     ]->Ethers.makeAbi
 
   let make = (~address, ~providerOrSigner): t =>
@@ -103,12 +115,17 @@ module Staker = {
     ~tokenAddress: Ethers.ethAddress,
     ~amount: Ethers.BigNumber.t,
   ) => JsPromise.t<Ethers.txSubmitted> = "stakeAndEarnImmediately"
+  @send
   external withdraw: (
     ~contract: t,
     ~tokenAddress: Ethers.ethAddress,
     ~amount: Ethers.BigNumber.t,
   ) => JsPromise.t<Ethers.txSubmitted> = "withdraw"
-  external mintFloat: (~contract: t, unit) => JsPromise.t<Ethers.txSubmitted> = "mintFloat"
+  @send
+  external claimFloat: (
+    ~contract: t,
+    ~tokenAddresses: array<Ethers.ethAddress>,
+  ) => JsPromise.t<Ethers.txSubmitted> = "claimFloat"
 }
 
 module Erc20 = {

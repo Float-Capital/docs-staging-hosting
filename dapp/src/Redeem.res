@@ -15,7 +15,7 @@ module Redeem = {
         | {data: Some({syntheticMarkets})} =>
           let optFirstMarket = syntheticMarkets[0]
           switch optFirstMarket {
-          | Some(firstMarket) => <MintForm market={firstMarket} />
+          | Some(firstMarket) => <RedeemForm market={firstMarket} />
           | None => <p> {"No markets exist"->React.string} </p>
           }
         | {data: None, error: None, loading: false} =>

@@ -1,5 +1,6 @@
 @react.component
 let make = (~onClick, ~preLabel: string="", ~postLabel: string="") => {
+  let _ = onClick // To supress warnings about `onClick` not being used
   <div className="flex justify-end ">
     <div className="flex items-center my-5">
       <label htmlFor="toogleA" className="flex items-center cursor-pointer">

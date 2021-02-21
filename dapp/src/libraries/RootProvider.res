@@ -169,6 +169,7 @@ let useEtherscanUrl: unit => string = () => {
   switch networkId {
   | Some(5) => "goerli.etherscan.io"
   | Some(4) => "rinkeby.etherscan.io"
+  | Some(97) => "testnet.bscscan.com"
   | _ => "etherscan.io"
   }
 }

@@ -56,7 +56,9 @@ let make = (~tokenId) => {
     setContractActionToCallAfterApproval,
   ) = React.useState(((), ()) => ())
 
-  let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
+  let (contractExecutionHandler, _txState, _setTxState) = ContractActions.useContractFunction(
+    ~signer,
+  )
   let (
     contractExecutionHandlerApprove,
     txStateApprove,
@@ -65,7 +67,7 @@ let make = (~tokenId) => {
 
   let stakerContractAddress = Config.useStakerAddress()
 
-  let (optTokenBalance, optTokenAmountApproved) = useBalanceAndApproved(
+  let (optTokenBalance, _optTokenAmountApproved) = useBalanceAndApproved(
     ~erc20Address=tokenId->Ethers.Utils.getAddressUnsafe,
     ~spender=stakerContractAddress,
   )

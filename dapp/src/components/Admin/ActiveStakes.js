@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import * as Ethers from "../../ethereum/Ethers.js";
+import * as Globals from "../../libraries/Globals.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
@@ -28,7 +29,7 @@ function ActiveStakes(Props) {
                       var match$2 = match$1.syntheticMarket;
                       var amountFormatted = FormatMoney.formatMoney(Belt_Option.getWithDefault(Belt_Float.fromString(Ethers.Utils.formatEther(match.amount)), 0));
                       var totalStakedFormatted = FormatMoney.formatMoney(Belt_Option.getWithDefault(Belt_Float.fromString(Ethers.Utils.formatEther(match$1.totalStaked)), 0));
-                      return React.createElement("div", undefined, React.createElement("h1", undefined, match$2.name + "(" + match$2.symbol + ")"), React.createElement("p", undefined, "Stake of " + amountFormatted + " for " + match$1.tokenType + " at address " + match$1.tokenAddress + ", which is " + (
+                      return React.createElement("div", undefined, React.createElement("h1", undefined, match$2.name + "(" + match$2.symbol + ")"), React.createElement("p", undefined, "Stake of " + amountFormatted + " for " + match$1.tokenType + " at address " + Globals.ethAdrToStr(match$1.tokenAddress) + ", which is " + (
                                       match.withdrawn ? "withdrawn" : "still active"
                                     ) + ". This stake was created at " + match.timestamp.toString() + ", in transaction " + match.creationTxHash + ". Total staked: " + totalStakedFormatted));
                     })));

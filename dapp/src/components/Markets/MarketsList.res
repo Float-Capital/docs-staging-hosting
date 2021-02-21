@@ -12,8 +12,8 @@ let make = () => {
       <div className="flex justify-between items-center w-full mt-3">
         <p className="font-bold underline"> {"Market"->React.string} </p>
         <p className="font-bold underline"> {"Symbol"->React.string} </p>
-        <p className="font-bold underline"> {"Long staked"->React.string} </p>
-        <p className="font-bold underline"> {"Short staked"->React.string} </p>
+        <p className="font-bold underline"> {"Long Liquidity"->React.string} </p>
+        <p className="font-bold underline"> {"Short Liquidity"->React.string} </p>
         <p className="font-bold underline"> {"Action"->React.string} </p>
       </div>
       {switch marketDetailsQuery {
@@ -25,22 +25,31 @@ let make = () => {
             name,
             symbol,
             marketIndex,
-            syntheticLong: {
-              id: idLong,
-              tokenAddress: tokenAddressLong,
-              totalStaked: totalStakedLong,
-            },
-            syntheticShort: {
-              id: idShort,
-              tokenAddress: tokenAddressShort,
-              totalStaked: totalStakedShort,
-            },
+            // syntheticLong: {
+            //   // id: idLong,
+            //   // tokenAddress: tokenAddressLong,
+            //   totalStaked: totalStakedLong,
+            // },
+            // syntheticShort: {
+            //   // id: idShort,
+            //   // tokenAddress: tokenAddressShort,
+            //   totalStaked: totalStakedShort,
+            // },
+            latestSystemState: {totalLockedLong, totalLockedShort},
           }) =>
             <div className="flex justify-between items-center w-full" key=symbol>
               <p> {name->React.string} </p>
               <p> {symbol->React.string} </p>
-              <p> {totalStakedLong->Ethers.Utils.formatEther->React.string} </p>
-              <p> {totalStakedShort->Ethers.Utils.formatEther->React.string} </p>
+              <p>
+                {`$${totalLockedLong
+                  ->Ethers.Utils.formatEther
+                  ->Misc.toDollarCentsFixedNoRounding}`->React.string}
+              </p>
+              <p>
+                {`$${totalLockedShort
+                  ->Ethers.Utils.formatEther
+                  ->Misc.toDollarCentsFixedNoRounding}`->React.string}
+              </p>
               <div className="grid grid-cols-2 gap-2">
                 <Button
                   onClick={_ => {
@@ -50,15 +59,6 @@ let make = () => {
                   }}
                   variant="small">
                   "Mint"
-                </Button>
-                <Button
-                  onClick={_ => {
-                    router->Next.Router.push(
-                      `/redeem?marketIndex=${marketIndex->Ethers.BigNumber.toString}`,
-                    )
-                  }}
-                  variant="small">
-                  "Redeem"
                 </Button>
               </div>
             </div>
