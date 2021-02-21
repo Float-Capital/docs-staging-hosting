@@ -60,11 +60,6 @@ function MainLayout$Navigation(Props) {
                             className: "px-3 hover:bg-white"
                           }, "MINT")
                     }), React.createElement(Link, {
-                      href: "/redeem",
-                      children: React.createElement("a", {
-                            className: "px-3 hover:bg-white"
-                          }, "REDEEM")
-                    }), React.createElement(Link, {
                       href: "/stake",
                       children: React.createElement("a", {
                             className: "px-3 hover:bg-white"

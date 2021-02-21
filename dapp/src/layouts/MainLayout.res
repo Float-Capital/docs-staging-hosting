@@ -22,9 +22,9 @@ module Navigation = {
           <a className="px-3 hover:bg-white"> {React.string("MARKETS")} </a>
         </Link>
         <Link href="/mint"> <a className="px-3 hover:bg-white"> {React.string("MINT")} </a> </Link>
-        <Link href="/redeem">
-          <a className="px-3 hover:bg-white"> {React.string("REDEEM")} </a>
-        </Link>
+        // <Link href="/redeem">
+        //   <a className="px-3 hover:bg-white"> {React.string("REDEEM")} </a>
+        // </Link>
         <Link href="/stake">
           <a className="px-3 hover:bg-white"> {`STAKE🔥`->React.string} </a>
         </Link>

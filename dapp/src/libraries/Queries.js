@@ -15,8 +15,6 @@ var query = (require("@apollo/client").gql`
       syntheticPrice
       longTokenPrice
       shortTokenPrice
-      totalLockedLong
-      totalLockedShort
       totalValueLocked
       setBy
     }
@@ -35,8 +33,6 @@ function parse(value) {
                         syntheticPrice: GqlConverters.$$BigInt.parse(value.syntheticPrice),
                         longTokenPrice: GqlConverters.$$BigInt.parse(value.longTokenPrice),
                         shortTokenPrice: GqlConverters.$$BigInt.parse(value.shortTokenPrice),
-                        totalLockedLong: GqlConverters.$$BigInt.parse(value.totalLockedLong),
-                        totalLockedShort: GqlConverters.$$BigInt.parse(value.totalLockedShort),
                         totalValueLocked: GqlConverters.$$BigInt.parse(value.totalValueLocked),
                         setBy: GqlConverters.Bytes.parse(value.setBy)
                       };
@@ -51,33 +47,27 @@ function serialize(value) {
         var value$2 = GqlConverters.Bytes.serialize(value$1);
         var value$3 = value.totalValueLocked;
         var value$4 = GqlConverters.$$BigInt.serialize(value$3);
-        var value$5 = value.totalLockedShort;
+        var value$5 = value.shortTokenPrice;
         var value$6 = GqlConverters.$$BigInt.serialize(value$5);
-        var value$7 = value.totalLockedLong;
+        var value$7 = value.longTokenPrice;
         var value$8 = GqlConverters.$$BigInt.serialize(value$7);
-        var value$9 = value.shortTokenPrice;
+        var value$9 = value.syntheticPrice;
         var value$10 = GqlConverters.$$BigInt.serialize(value$9);
-        var value$11 = value.longTokenPrice;
+        var value$11 = value.blockNumber;
         var value$12 = GqlConverters.$$BigInt.serialize(value$11);
-        var value$13 = value.syntheticPrice;
-        var value$14 = GqlConverters.$$BigInt.serialize(value$13);
-        var value$15 = value.blockNumber;
+        var value$13 = value.txHash;
+        var value$14 = GqlConverters.Bytes.serialize(value$13);
+        var value$15 = value.timestamp;
         var value$16 = GqlConverters.$$BigInt.serialize(value$15);
-        var value$17 = value.txHash;
-        var value$18 = GqlConverters.Bytes.serialize(value$17);
-        var value$19 = value.timestamp;
-        var value$20 = GqlConverters.$$BigInt.serialize(value$19);
-        var value$21 = value.__typename;
+        var value$17 = value.__typename;
         return {
-                __typename: value$21,
-                timestamp: value$20,
-                txHash: value$18,
-                blockNumber: value$16,
-                syntheticPrice: value$14,
-                longTokenPrice: value$12,
-                shortTokenPrice: value$10,
-                totalLockedLong: value$8,
-                totalLockedShort: value$6,
+                __typename: value$17,
+                timestamp: value$16,
+                txHash: value$14,
+                blockNumber: value$12,
+                syntheticPrice: value$10,
+                longTokenPrice: value$8,
+                shortTokenPrice: value$6,
                 totalValueLocked: value$4,
                 setBy: value$2
               };
@@ -162,6 +152,11 @@ var query$1 = (require("@apollo/client").gql`
         tokenAddress
         totalStaked
       }
+      latestSystemState  {
+        __typename
+        totalLockedLong
+        totalLockedShort
+      }
     }
   }
 `);
@@ -172,6 +167,7 @@ function parse$1(value) {
           syntheticMarkets: value$1.map(function (value) {
                 var value$1 = value.syntheticLong;
                 var value$2 = value.syntheticShort;
+                var value$3 = value.latestSystemState;
                 return {
                         __typename: value.__typename,
                         name: value.name,
@@ -189,6 +185,11 @@ function parse$1(value) {
                           id: value$2.id,
                           tokenAddress: GqlConverters.Address.parse(value$2.tokenAddress),
                           totalStaked: GqlConverters.$$BigInt.parse(value$2.totalStaked)
+                        },
+                        latestSystemState: {
+                          __typename: value$3.__typename,
+                          totalLockedLong: GqlConverters.$$BigInt.parse(value$3.totalLockedLong),
+                          totalLockedShort: GqlConverters.$$BigInt.parse(value$3.totalLockedShort)
                         }
                       };
               })
@@ -198,47 +199,59 @@ function parse$1(value) {
 function serialize$1(value) {
   var value$1 = value.syntheticMarkets;
   var syntheticMarkets = value$1.map(function (value) {
-        var value$1 = value.syntheticShort;
-        var value$2 = value$1.totalStaked;
+        var value$1 = value.latestSystemState;
+        var value$2 = value$1.totalLockedShort;
         var value$3 = GqlConverters.$$BigInt.serialize(value$2);
-        var value$4 = value$1.tokenAddress;
-        var value$5 = GqlConverters.Address.serialize(value$4);
-        var value$6 = value$1.id;
-        var value$7 = value$1.__typename;
+        var value$4 = value$1.totalLockedLong;
+        var value$5 = GqlConverters.$$BigInt.serialize(value$4);
+        var value$6 = value$1.__typename;
+        var latestSystemState = {
+          __typename: value$6,
+          totalLockedLong: value$5,
+          totalLockedShort: value$3
+        };
+        var value$7 = value.syntheticShort;
+        var value$8 = value$7.totalStaked;
+        var value$9 = GqlConverters.$$BigInt.serialize(value$8);
+        var value$10 = value$7.tokenAddress;
+        var value$11 = GqlConverters.Address.serialize(value$10);
+        var value$12 = value$7.id;
+        var value$13 = value$7.__typename;
         var syntheticShort = {
-          __typename: value$7,
-          id: value$6,
-          tokenAddress: value$5,
-          totalStaked: value$3
+          __typename: value$13,
+          id: value$12,
+          tokenAddress: value$11,
+          totalStaked: value$9
         };
-        var value$8 = value.syntheticLong;
-        var value$9 = value$8.totalStaked;
-        var value$10 = GqlConverters.$$BigInt.serialize(value$9);
-        var value$11 = value$8.tokenAddress;
-        var value$12 = GqlConverters.Address.serialize(value$11);
-        var value$13 = value$8.id;
-        var value$14 = value$8.__typename;
+        var value$14 = value.syntheticLong;
+        var value$15 = value$14.totalStaked;
+        var value$16 = GqlConverters.$$BigInt.serialize(value$15);
+        var value$17 = value$14.tokenAddress;
+        var value$18 = GqlConverters.Address.serialize(value$17);
+        var value$19 = value$14.id;
+        var value$20 = value$14.__typename;
         var syntheticLong = {
-          __typename: value$14,
-          id: value$13,
-          tokenAddress: value$12,
-          totalStaked: value$10
+          __typename: value$20,
+          id: value$19,
+          tokenAddress: value$18,
+          totalStaked: value$16
         };
-        var value$15 = value.oracleAddress;
-        var value$16 = GqlConverters.Bytes.serialize(value$15);
-        var value$17 = value.marketIndex;
-        var value$18 = GqlConverters.$$BigInt.serialize(value$17);
-        var value$19 = value.symbol;
-        var value$20 = value.name;
-        var value$21 = value.__typename;
+        var value$21 = value.oracleAddress;
+        var value$22 = GqlConverters.Bytes.serialize(value$21);
+        var value$23 = value.marketIndex;
+        var value$24 = GqlConverters.$$BigInt.serialize(value$23);
+        var value$25 = value.symbol;
+        var value$26 = value.name;
+        var value$27 = value.__typename;
         return {
-                __typename: value$21,
-                name: value$20,
-                symbol: value$19,
-                marketIndex: value$18,
-                oracleAddress: value$16,
+                __typename: value$27,
+                name: value$26,
+                symbol: value$25,
+                marketIndex: value$24,
+                oracleAddress: value$22,
                 syntheticLong: syntheticLong,
-                syntheticShort: syntheticShort
+                syntheticShort: syntheticShort,
+                latestSystemState: latestSystemState
               };
       });
   return {

@@ -31,6 +31,8 @@ module LongShort = {
       "function mintLongAndStake(uint256 marketIndex, uint256 amount) @1000000",
       "function mintShortAndStake(uint256 marketIndex, uint256 amount) @1000000",
       "function _updateSystemState()",
+      "function longValue(uint256 marketIndex) public view returns (uint256)",
+      "function shortValue(uint256 marketIndex) public view returns (uint256)",
     ]->Ethers.makeAbi
 
   let make = (~address, ~providerOrSigner): t =>
@@ -75,6 +77,16 @@ module LongShort = {
   @send
   external _updateSystemState: (~contract: t) => JsPromise.t<Ethers.txSubmitted> =
     "_updateSystemState"
+  @send
+  external longValue: (
+    ~contract: t,
+    ~marketIndex: Ethers.BigNumber.t,
+  ) => JsPromise.t<Ethers.BigNumber.t> = "longValue"
+  @send
+  external shortValue: (
+    ~contract: t,
+    ~marketIndex: Ethers.BigNumber.t,
+  ) => JsPromise.t<Ethers.BigNumber.t> = "shortValue"
 }
 
 module Staker = {
