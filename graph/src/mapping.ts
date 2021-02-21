@@ -40,7 +40,6 @@ import {
   Stake,
   User,
   State,
-  Token,
   Transfer,
 } from "../generated/schema";
 import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
