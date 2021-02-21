@@ -37,7 +37,7 @@ module Navigation = {
         <a
           className="px-3 hover:opacity-60"
           target="_blank"
-          href="https://github.com/avolabs-io/longshort">
+          href="https://github.com/avolabs-io/float-contracts">
           <img src="/icons/github.svg" className="h-5" />
         </a>
         {switch optCurrentUser {

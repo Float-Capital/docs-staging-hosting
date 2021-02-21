@@ -9,7 +9,7 @@ module AdminMintForm = %form(
     amount: {
       strategy: OnFirstBlur,
       validate: ({amount, optBalance}) => {
-        let amountRegex = %bs.re(`/^[+]?\d+(\.\d+)?$/`)
+        let amountRegex = %re(`/^[+]?\d+(\.\d+)?$/`)
 
         switch amount {
         | {amount: ""} => Error("Amount is required")

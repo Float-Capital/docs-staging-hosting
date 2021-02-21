@@ -5,7 +5,7 @@ module Erc20ApproveForm = %form(
     amount: {
       strategy: OnFirstBlur,
       validate: ({amount}) => {
-        let addressRegex = %bs.re(`/^[+]?\d+(\.\d+)?$/`)
+        let addressRegex = %re(`/^[+]?\d+(\.\d+)?$/`)
         switch amount {
         | "" => Error("Amount is required")
         | _ as value when !(addressRegex->Js.Re.test_(value)) =>

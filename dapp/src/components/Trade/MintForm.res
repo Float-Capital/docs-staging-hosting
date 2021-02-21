@@ -6,7 +6,7 @@ module MintForm = %form(
     amount: {
       strategy: OnFirstBlur,
       validate: ({amount}) => {
-        let amountRegex = %bs.re(`/^[+]?\d+(\.\d+)?$/`)
+        let amountRegex = %re(`/^[+]?\d+(\.\d+)?$/`)
 
         switch amount {
         | "" => Error("Amount is required")
