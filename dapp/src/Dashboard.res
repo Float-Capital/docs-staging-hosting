@@ -115,7 +115,7 @@ let make = () => {
               <br />
               <h1> {"Dashboard"->React.string} </h1>
               <DaiBalance />
-              <a href={`https://goerli.etherscan.io/tx/${txHash}`}>
+              <a href={`https://testnet.bscscan.com/tx/${txHash}`}>
                 {`Latest update happened ${timeSinceUpdate} ago. (view on block-explorer) by ${setBy}`->React.string}
               </a>
               <p> {`SyntheticPrice ${syntheticPrice->Ethers.Utils.formatEther}$`->React.string} </p>

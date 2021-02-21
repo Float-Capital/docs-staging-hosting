@@ -5,8 +5,7 @@ import * as React from "react";
 function Button(Props) {
   var onClick = Props.onClick;
   var children = Props.children;
-  var variantOpt = Props.variant;
-  var variant = variantOpt !== undefined ? variantOpt : "small";
+  var variant = Props.variant;
   return React.createElement("div", {
               className: "float-button-outer-container"
             }, React.createElement("div", {
