@@ -5,7 +5,7 @@ import * as React from "react";
 function Card(Props) {
   var children = Props.children;
   return React.createElement("div", {
-              className: "py-3 px-5 my-2 mx-0 flex flex-col items-center bg-white bg-opacity-75  rounded"
+              className: "py-3 px-5 my-2 mx-0 flex flex-col items-center bg-white bg-opacity-75  rounded w-full"
             }, children);
 }
 

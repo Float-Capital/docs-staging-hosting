@@ -10,8 +10,12 @@ let make = () => {
   <>
     {switch optBalance {
     | Some(balance) =>
-      <h1> {`dai balance: ${balance->Ethers.Utils.formatEther} DAI`->React.string} </h1>
-    | None => <h1> {"Loading dai balance"->React.string} </h1>
+      <h1>
+        {`BUSD balance: $${FormatMoney.formatMoney(
+            ~number=balance->Ethers.Utils.formatEther->Float.fromString->Option.getWithDefault(0.),
+          )}`->React.string}
+      </h1>
+    | None => <MiniLoader />
     }}
   </>
 }

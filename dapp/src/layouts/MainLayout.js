@@ -50,6 +50,11 @@ function MainLayout$Navigation(Props) {
                 }), React.createElement("div", {
                   className: "flex w-2/3 text-base items-center justify-end"
                 }, React.createElement(Link, {
+                      href: "/markets",
+                      children: React.createElement("a", {
+                            className: "px-3 hover:bg-white"
+                          }, "MARKETS")
+                    }), React.createElement(Link, {
                       href: "/mint",
                       children: React.createElement("a", {
                             className: "px-3 hover:bg-white"

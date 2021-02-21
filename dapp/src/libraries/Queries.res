@@ -26,10 +26,12 @@ module MarketDetails = %graphql(`
     syntheticLong {
       id
       tokenAddress @ppxCustom(module: "Address")
+      totalStaked
     }
     syntheticShort {
       id
       tokenAddress @ppxCustom(module: "Address")
+      totalStaked
     }
   }
 }
