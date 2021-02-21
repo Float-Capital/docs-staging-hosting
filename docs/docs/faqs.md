@@ -5,6 +5,8 @@ sidebar_label: FAQs
 slug: /faqs
 ---
 
+NOTE: These docs are under active development 👷‍♀️👷
+
 ### Is your question not answered? Please ask on our [Discord](https://discord.gg/qesr2KZAhn) 🙏
 
 ---

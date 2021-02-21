@@ -5,4 +5,8 @@ sidebar_label: Resources
 slug: /resources
 ---
 
-These docs are actively being developed
+NOTE: These docs are under active development 👷‍♀️👷
+
+---
+
+Loads more coming here soon, stay tuned!

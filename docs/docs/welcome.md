@@ -5,13 +5,15 @@ sidebar_label: Welcome
 slug: /
 ---
 
+NOTE: These docs are under active development 👷‍♀️👷
+
+---
+
 Welcome to Float Capital! 👋
 
 This is the official documentation for the Float Capital, a new novel protocol allowing users to easily and safely create synthetic assets without overcollateralization 💡
 
 **Visit [float.capital](https://float.capital) to get involved** 📈
-
-NOTE: These docs are under active development 👷‍♀️👷
 
 ---
 
@@ -52,4 +54,5 @@ Float allows our global investor base to easily gain synthetic asset exposure, *
 Join our new and vibrant community to help steer the initial direction and development of the Float 💃
 
 - [Discord](https://discord.gg/qesr2KZAhn)
-- [Twitter](https://twitter.com/float_capital) (coming soon 😏)
+- Twitter (coming soon 😏)
+<!-- - [Twitter](https://twitter.com/float_capital) (coming soon 😏) -->
