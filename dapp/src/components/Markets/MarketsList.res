@@ -24,34 +24,15 @@ let make = () => {
           {syntheticMarkets
           ->Array.map(({
             name,
-            symbol,
             marketIndex,
-            // syntheticLong: {
-            //   // id: idLong,
-            //   // tokenAddress: tokenAddressLong,
-            //   totalStaked: totalStakedLong,
-            // },
-            // syntheticShort: {
-            //   // id: idShort,
-            //   // tokenAddress: tokenAddressShort,
-            //   totalStaked: totalStakedShort,
-            // },
             latestSystemState: {totalLockedLong, totalLockedShort},
           }) =>
             // <div className="flex justify-between items-center w-full" key=symbol>
             <div className="grid grid-cols-4 gap-1 items-center">
               <p> {name->React.string} </p>
               // <p> {symbol->React.string} </p>
-              <p>
-                {`$${totalLockedLong
-                  ->Ethers.Utils.formatEther
-                  ->Misc.toDollarCentsFixedNoRounding}`->React.string}
-              </p>
-              <p>
-                {`$${totalLockedShort
-                  ->Ethers.Utils.formatEther
-                  ->Misc.toDollarCentsFixedNoRounding}`->React.string}
-              </p>
+              <p> {`$${totalLockedLong->FormatMoney.formatEther}`->React.string} </p>
+              <p> {`$${totalLockedShort->FormatMoney.formatEther}`->React.string} </p>
               // <div className="grid grid-cols-2 gap-2">
               <Button
                 onClick={_ => {

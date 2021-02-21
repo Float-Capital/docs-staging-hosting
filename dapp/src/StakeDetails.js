@@ -5,13 +5,10 @@ import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Button from "./components/UI/Button.js";
 import * as Config from "./Config.js";
-import * as Ethers from "./ethereum/Ethers.js";
 import * as Globals from "./libraries/Globals.js";
 import * as Contracts from "./ethereum/Contracts.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
-import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
 import * as MiniLoader from "./components/UI/MiniLoader.js";
-import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as FormatMoney from "./components/UI/FormatMoney.js";
 import * as DataFetchers from "./components/Data/DataFetchers.js";
@@ -53,7 +50,7 @@ function StakeDetails$UsersActiveStakes(Props) {
                   var match = param.currentStake;
                   var match$1 = match.tokenType;
                   var tokenAddress = match$1.tokenAddress;
-                  var amountFormatted = FormatMoney.formatMoney(Belt_Option.getWithDefault(Belt_Float.fromString(Ethers.Utils.formatEther(match.amount)), 0));
+                  var amountFormatted = FormatMoney.formatEther(match.amount);
                   var timeSinceStaking = Globals.timestampToDuration(match.timestamp);
                   if (match.withdrawn) {
                     console.log("This is a bug in the graph, no withdrawn stakes should show in the `currentStakes`");

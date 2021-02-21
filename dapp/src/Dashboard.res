@@ -19,13 +19,7 @@ let make = () => {
               className="p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 rounded">
               <h2 className="text-lg"> {"Total value locked"->React.string} </h2>
               <p className="text-primary text-4xl">
-                {"BUSD "->React.string}
-                <FormatMoney
-                  number={totalValueLocked
-                  ->Ethers.Utils.formatEther
-                  ->Float.fromString
-                  ->Option.getWithDefault(0.)}
-                />
+                {`BUSD ${totalValueLocked->FormatMoney.formatEther}`->React.string}
               </p>
             </div>
           </div>

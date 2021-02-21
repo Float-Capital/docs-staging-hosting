@@ -46,9 +46,7 @@ module UsersActiveStakes = {
               withdrawn,
             },
           }) => {
-            let amountFormatted = FormatMoney.formatMoney(
-              ~number=amount->Ethers.Utils.formatEther->Float.fromString->Option.getWithDefault(0.),
-            )
+            let amountFormatted = FormatMoney.formatEther(amount)
             // let totalStakedFormatted = FormatMoney.formatMoney(
             //   ~number=totalStaked
             //   ->Ethers.Utils.formatEther
