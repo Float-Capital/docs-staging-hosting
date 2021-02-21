@@ -49,6 +49,9 @@ const preserveValues = (template, output) => {
     if (i != -1) {
       templateVal = outputLines[i].split(":")[1].trim();
       template = template.replace(p, templateVal);
+      template = template.replace(p, templateVal);
+      template = template.replace(p, templateVal);
+      // template = template.replaceAll(p, templateVal); // `replaceAll` only exists in javascript v15 or newer 
     }
   });
   return template;

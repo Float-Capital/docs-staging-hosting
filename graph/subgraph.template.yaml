@@ -87,7 +87,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: erc20
-    network: ganache
+    network: <network>
     source:
       abi: erc20
     mapping:
