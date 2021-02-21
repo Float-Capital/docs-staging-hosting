@@ -291,7 +291,7 @@ contract("LongShort (staking)", (accounts) => {
     if (token.address == longToken.address) {
       price = await longShort.longTokenPrice(marketIndex);
     } else {
-      price = await longShort.longTokenPrice(marketIndex);
+      price = await longShort.shortTokenPrice(marketIndex);
     }
     return {
       price,
