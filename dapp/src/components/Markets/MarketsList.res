@@ -8,13 +8,14 @@ let make = () => {
       <Login />
     </h1>}>
     <div className="p-5 flex flex-col bg-white bg-opacity-75  rounded">
-      <h2 className="text-lg font-medium"> {"Markets"->React.string} </h2>
-      <div className="flex justify-between items-center w-full mt-3">
-        <p className="font-bold underline"> {"Market"->React.string} </p>
-        <p className="font-bold underline"> {"Symbol"->React.string} </p>
-        <p className="font-bold underline"> {"Long Liquidity"->React.string} </p>
-        <p className="font-bold underline"> {"Short Liquidity"->React.string} </p>
-        <p className="font-bold underline"> {"Action"->React.string} </p>
+      <h2 className="text-xl font-medium"> {"Markets"->React.string} </h2>
+      // <div className="flex justify-between items-center w-full mt-3">
+      <div className="grid grid-cols-4 gap-1 items-center">
+        <p className="font-bold underline text-xs"> {"Market"->React.string} </p>
+        // <p className="font-bold underline"> {"Symbol"->React.string} </p>
+        <p className="font-bold underline  text-xs"> {"Long Liquidity"->React.string} </p>
+        <p className="font-bold underline text-xs"> {"Short Liquidity"->React.string} </p>
+        <p className="font-bold underline text-xs"> {""->React.string} </p>
       </div>
       {switch marketDetailsQuery {
       | {loading: true} => <div className="m-auto"> <MiniLoader /> </div>
@@ -37,9 +38,10 @@ let make = () => {
             // },
             latestSystemState: {totalLockedLong, totalLockedShort},
           }) =>
-            <div className="flex justify-between items-center w-full" key=symbol>
+            // <div className="flex justify-between items-center w-full" key=symbol>
+            <div className="grid grid-cols-4 gap-1 items-center">
               <p> {name->React.string} </p>
-              <p> {symbol->React.string} </p>
+              // <p> {symbol->React.string} </p>
               <p>
                 {`$${totalLockedLong
                   ->Ethers.Utils.formatEther
@@ -50,17 +52,17 @@ let make = () => {
                   ->Ethers.Utils.formatEther
                   ->Misc.toDollarCentsFixedNoRounding}`->React.string}
               </p>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  onClick={_ => {
-                    router->Next.Router.push(
-                      `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}`,
-                    )
-                  }}
-                  variant="small">
-                  "Mint"
-                </Button>
-              </div>
+              // <div className="grid grid-cols-2 gap-2">
+              <Button
+                onClick={_ => {
+                  router->Next.Router.push(
+                    `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}`,
+                  )
+                }}
+                variant="small">
+                "Mint"
+              </Button>
+              // </div>
             </div>
           )
           ->React.array}

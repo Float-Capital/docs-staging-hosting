@@ -4,7 +4,6 @@ module Stake = {
     id: string,
     symbol: string,
     apy: float,
-    balance: Ethers.BigNumber.t,
     tokenType: string,
   }
 
@@ -37,7 +36,6 @@ module Stake = {
                 id: id,
                 symbol: symbol,
                 apy: 0.2,
-                balance: 0->Ethers.BigNumber.fromInt,
                 tokenType: tokenType->Js.String2.make->Js.String.toLowerCase,
               }
             })
@@ -95,7 +93,7 @@ module Stake = {
                   </div>
                   <div className="flex flex-col">
                     <h3 className="font-bold"> {"Balance"->React.string} </h3>
-                    <p> {token.balance->Ethers.BigNumber.toString->React.string} </p>
+                    <TokenBalance erc20Address={token.id->Ethers.Utils.getAddressUnsafe} />
                   </div>
                   <div className="flex flex-col">
                     <h3 className="font-bold">

@@ -12,7 +12,9 @@ import * as ContractHooks from "../Admin/ContractHooks.js";
 function DaiBalance(Props) {
   var match = ContractHooks.useDaiBalance(undefined);
   var optBalance = match.data;
-  return React.createElement(React.Fragment, undefined, optBalance !== undefined ? React.createElement("h1", undefined, "BUSD balance: $" + FormatMoney.formatMoney(Belt_Option.getWithDefault(Belt_Float.fromString(Ethers.Utils.formatEther(Caml_option.valFromOption(optBalance))), 0))) : React.createElement(MiniLoader.make, {}));
+  return React.createElement(React.Fragment, undefined, optBalance !== undefined ? React.createElement("div", {
+                    className: "flex justify-between w-full"
+                  }, React.createElement("p", undefined, "BUSD balance: "), React.createElement("p", undefined, "$" + FormatMoney.formatMoney(Belt_Option.getWithDefault(Belt_Float.fromString(Ethers.Utils.formatEther(Caml_option.valFromOption(optBalance))), 0)))) : React.createElement(MiniLoader.make, {}));
 }
 
 var make = DaiBalance;

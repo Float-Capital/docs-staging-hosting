@@ -92,7 +92,12 @@ module UsersActiveStakes = {
                         {" Tokens"->React.string}
                       </a>
                     </p>
-                    <ClaimFloat tokenAddresses=[tokenAddress] />
+                    <div className="flex items-center">
+                      // <AddToMetamask
+                      //   tokenAddress={tokenAddress->Ethers.Utils.ethAdrToStr} tokenSymbol={"FLOAT"}
+                      // />
+                      <ClaimFloat tokenAddresses=[tokenAddress] />
+                    </div>
                   </div>
                 </Card>
           })

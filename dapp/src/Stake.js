@@ -12,6 +12,7 @@ import * as ViewBox from "./components/UI/ViewBox.js";
 import * as StakeForm from "./components/Stake/StakeForm.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as Router from "next/router";
+import * as TokenBalance from "./components/ExampleViewFunctions/TokenBalance.js";
 import * as AccessControl from "./components/AccessControl.js";
 import * as AddToMetamask from "./components/UI/AddToMetamask.js";
 import * as Belt_SortArray from "bs-platform/lib/es6/belt_SortArray.js";
@@ -62,7 +63,6 @@ function Stake$Stake(Props) {
                                               id: param.id,
                                               symbol: param.syntheticMarket.name,
                                               apy: 0.2,
-                                              balance: Ethers.BigNumber.from(0),
                                               tokenType: String(param.tokenType).toLowerCase()
                                             };
                                     })), (function (a, b) {
@@ -124,7 +124,9 @@ function Stake$Stake(Props) {
                                                         className: "flex flex-col"
                                                       }, React.createElement("h3", {
                                                             className: "font-bold"
-                                                          }, "Balance"), React.createElement("p", undefined, token.balance.toString())), React.createElement("div", {
+                                                          }, "Balance"), React.createElement(TokenBalance.make, {
+                                                            erc20Address: Ethers.utils.getAddress(token.id)
+                                                          })), React.createElement("div", {
                                                         className: "flex flex-col"
                                                       }, React.createElement("h3", {
                                                             className: "font-bold"
