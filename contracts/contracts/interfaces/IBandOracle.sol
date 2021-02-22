@@ -1,5 +1,6 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity 0.7.6;
+pragma abicoder v2;
 
 /* Standard Band oracle interface. Prices are queried by pair, i.e. what is
  * the price of the given base currency in units of the quote currency?
