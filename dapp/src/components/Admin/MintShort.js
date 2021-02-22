@@ -580,7 +580,7 @@ function MintShort(Props) {
   var functionToExecuteOnce = match$2[0];
   var shortShortContractAddress = Config.useLongShortAddress(undefined);
   var daiAddress = Config.useDaiAddress(undefined);
-  var match$3 = ContractHooks.useERC20Approved(daiAddress, shortShortContractAddress);
+  var match$3 = ContractHooks.useERC20ApprovedRefresh(daiAddress, shortShortContractAddress);
   var optAmountApproved = match$3.data;
   var form = useForm(initialInput, (function (param, _form) {
           var match = param.amount;
@@ -605,7 +605,7 @@ function MintShort(Props) {
                         return param.approve(shortShortContractAddress, arg);
                       }));
         }));
-  var match$4 = ContractHooks.useDaiBalance(undefined);
+  var match$4 = ContractHooks.useDaiBalanceRefresh(undefined);
   var optBalance = match$4.data;
   React.useEffect((function () {
           Curry._2(form.updateAmount, (function (input, param) {

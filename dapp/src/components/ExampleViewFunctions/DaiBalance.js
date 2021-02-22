@@ -7,7 +7,7 @@ import * as FormatMoney from "../UI/FormatMoney.js";
 import * as ContractHooks from "../Admin/ContractHooks.js";
 
 function DaiBalance(Props) {
-  var match = ContractHooks.useDaiBalance(undefined);
+  var match = ContractHooks.useDaiBalanceRefresh(undefined);
   var optBalance = match.data;
   return React.createElement(React.Fragment, undefined, optBalance !== undefined ? React.createElement("div", {
                     className: "flex justify-between w-full"

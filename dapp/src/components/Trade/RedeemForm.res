@@ -2,10 +2,10 @@
 @react.component
 let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets) => {
   Js.log(("Market", market))
-  let {Swr.data: optShortBalance} = ContractHooks.useErc20Balance(
+  let {Swr.data: optShortBalance} = ContractHooks.useErc20BalanceRefresh(
     ~erc20Address=market.syntheticShort.tokenAddress,
   )
-  let {Swr.data: optLongBalance} = ContractHooks.useErc20Balance(
+  let {Swr.data: optLongBalance} = ContractHooks.useErc20BalanceRefresh(
     ~erc20Address=market.syntheticLong.tokenAddress,
   )
   let hasShortBalance =

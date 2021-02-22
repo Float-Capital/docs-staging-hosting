@@ -35,18 +35,8 @@ let initialInput: MintForm.input = {
 }
 
 let useBalanceAndApproved = (~erc20Address, ~spender) => {
-  let {
-    Swr.data: optBalance,
-    isValidating: _isValidating,
-    error: _errorLoadingBalance,
-    mutate: _mutate,
-  } = ContractHooks.useErc20Balance(~erc20Address)
-  let {
-    data: optAmountApproved,
-    isValidating: _isValidating,
-    error: _errorLoadingBalance,
-    mutate: _mutate,
-  } = ContractHooks.useERC20Approved(~erc20Address, ~spender)
+  let {Swr.data: optBalance} = ContractHooks.useErc20BalanceRefresh(~erc20Address)
+  let {data: optAmountApproved} = ContractHooks.useERC20ApprovedRefresh(~erc20Address, ~spender)
   (optBalance, optAmountApproved)
 }
 
@@ -80,10 +70,10 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
     ~erc20Address=daiAddressThatIsTemporarilyHardCoded,
     ~spender=longShortContractAddress,
   )
-  let {Swr.data: optShortBalance} = ContractHooks.useErc20Balance(
+  let {Swr.data: optShortBalance} = ContractHooks.useErc20BalanceRefresh(
     ~erc20Address=market.syntheticShort.tokenAddress,
   )
-  let {Swr.data: optLongBalance} = ContractHooks.useErc20Balance(
+  let {Swr.data: optLongBalance} = ContractHooks.useErc20BalanceRefresh(
     ~erc20Address=market.syntheticLong.tokenAddress,
   )
 

@@ -12,8 +12,8 @@ function RedeemForm(Props) {
         "Market",
         market
       ]);
-  var match = ContractHooks.useErc20Balance(market.syntheticShort.tokenAddress);
-  var match$1 = ContractHooks.useErc20Balance(market.syntheticLong.tokenAddress);
+  var match = ContractHooks.useErc20BalanceRefresh(market.syntheticShort.tokenAddress);
+  var match$1 = ContractHooks.useErc20BalanceRefresh(market.syntheticLong.tokenAddress);
   var hasShortBalance = Belt_Option.mapWithDefault(match.data, false, (function (balance) {
           return balance.gt(Ethers.BigNumber.from(0));
         }));
