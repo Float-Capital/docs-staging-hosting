@@ -108,14 +108,7 @@ module RootWithWeb3 = {
         let _ =
           library
           ->Ethers.Providers.getBalance(account)
-          ->JsPromise.map(newBalance =>
-            dispatch(
-              LoadAddress(
-                account,
-                newBalance->Option.flatMap(balance => Eth.make(balance->Ethers.BigNumber.toString)),
-              ),
-            )
-          )
+          ->JsPromise.map(newBalance => dispatch(LoadAddress(account, newBalance)))
           ->JsPromise.catch(_ => ())
 
         None
@@ -149,7 +142,7 @@ let useIsAddressCurrentUser: Ethers.ethAddress => bool = address => {
   }
 }
 
-let useEthBalance: unit => option<Eth.t> = () => {
+let useEthBalance: unit => option<Ethers.BigNumber.t> = () => {
   let (state, _) = React.useContext(RootContext.context)
   switch state.ethState {
   | Connected(_address, balance) => balance
