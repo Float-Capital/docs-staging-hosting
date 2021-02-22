@@ -1,16 +1,11 @@
-let toCentsFixedNoRounding = floatString =>
-  floatString
-  ->Js.String2.match_(%re("/^\d+[.]\d\d/g"))
-  ->Option.getWithDefault(["0.00"])
-  ->Array.getUnsafe(0)
-
+@ocaml.doc(`Adds a comma between groups of 3 decimals`)
 let format = Js.String2.replaceByRe(_, %re("/\d(?=(\d{3})+\.)/g"), "$&,")
 
-let formatFloat = number => {
-  number->Js.Float.toFixedWithPrecision(~digits=2)->format
-}
+@ocaml.doc(`Formats a float to 2 digits precision with groups of 3 decimals separated by a comma`)
+let formatFloat = (~digits=2, number) => number->Js.Float.toFixedWithPrecision(~digits)->format
 
-let formatEther = rawNumber => rawNumber->Ethers.Utils.formatEther->format
+@ocaml.doc(`Formats a string float to 2 digits precision with groups of 3 decimals separated by a comma`)
+let toCentsFixedNoRounding = floatString => floatString->Js.Float.fromString->formatFloat
 
-let formatEtherRound = rawNumber =>
-  rawNumber->Ethers.Utils.formatEther->Js.Float.fromString->formatFloat
+@ocaml.doc(`Formats a BigNumber (10^18, wei) to 2 digits precision (ether) with groups of 3 decimals separated by a comma`)
+let formatEther = rawNumber => rawNumber->Ethers.Utils.formatEther->toCentsFixedNoRounding
