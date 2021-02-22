@@ -2,7 +2,7 @@
 let optLocalstorage: option<Dom.Storage.t> =
   Js.typeof(Dom.Storage.localStorage) == "undefined" ? None : Some(Dom.Storage.localStorage)
 
-@ocaml.doc("The global window object that exists in browsers") @bs.val
+@ocaml.doc("The global window object that exists in browsers") @val
 external window: 'a = "window"
 
 @ocaml.doc("This is useful for functions that shouldn't be run server side by Next.js for example")
@@ -10,9 +10,3 @@ let onlyExecuteClientSide = functionForClientsideExecution =>
   if window->Js.typeof != "undefined" {
     functionForClientsideExecution()
   }
-
-let toDollarCentsFixedNoRounding = floatString =>
-  floatString
-  ->Js.String2.match_(%re("/^\d+[.]\d\d/g"))
-  ->Option.getWithDefault(["0.00"])
-  ->Array.getUnsafe(0)

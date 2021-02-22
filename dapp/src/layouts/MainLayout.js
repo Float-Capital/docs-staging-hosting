@@ -75,7 +75,7 @@ function MainLayout$Navigation(Props) {
                       target: "_blank"
                     }, "DOCS"), React.createElement("a", {
                       className: "px-3 hover:opacity-60",
-                      href: "https://github.com/avolabs-io/longshort",
+                      href: "https://github.com/avolabs-io/float-contracts",
                       target: "_blank"
                     }, React.createElement("img", {
                           className: "h-5",

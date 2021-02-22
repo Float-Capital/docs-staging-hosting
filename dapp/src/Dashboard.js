@@ -3,11 +3,8 @@
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as Login from "./components/Login/Login.js";
 import * as React from "react";
-import * as Ethers from "./ethereum/Ethers.js";
 import * as Queries from "./libraries/Queries.js";
-import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
 import * as MiniLoader from "./components/UI/MiniLoader.js";
-import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as FormatMoney from "./components/UI/FormatMoney.js";
 import * as MarketsList from "./components/Markets/MarketsList.js";
 import * as Router from "next/router";
@@ -52,9 +49,7 @@ function Dashboard(Props) {
                     className: "text-lg"
                   }, "Total value locked"), React.createElement("p", {
                     className: "text-primary text-4xl"
-                  }, "BUSD ", React.createElement(FormatMoney.make, {
-                        number: Belt_Option.getWithDefault(Belt_Float.fromString(Ethers.Utils.formatEther(match$2.totalValueLocked)), 0)
-                      }))));
+                  }, "BUSD " + FormatMoney.formatEther(match$2.totalValueLocked))));
     }
   } else {
     tmp = "Error getting data";
