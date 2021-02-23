@@ -275,12 +275,6 @@ contract Staker is Initializable {
         }
     }
 
-    // Potential attack vector.
-    // Even if user has nothing to claim,
-    // if they call stake and they are only set to start earning rewards from next state point
-    // they can call this funciton and start earning rewards from a the previously available state point.
-    // TODO: Fix this attack
-    // NOW FIXED
     function claimFloat(address[] memory tokenAddresses) external {
         require(tokenAddresses.length <= 15); // Set some limit on loop length
         uint256 floatTotal = 0;
