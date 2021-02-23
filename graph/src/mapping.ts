@@ -18,7 +18,6 @@ import {
   StakeAdded,
   StakeWithdrawn,
   FloatMinted,
-  FloatAccumulated,
 } from "../generated/Staker/Staker";
 
 import { erc20 } from "../generated/templates";
@@ -109,6 +108,7 @@ export function handleV1(event: V1): void {
   globalState.tokenFactory = tokenFactory.id;
   globalState.adminAddress = event.params.admin;
   globalState.longShort = longShort.id;
+  globalState.totalFloatMinted = ZERO;
   globalState.save();
 }
 
@@ -451,7 +451,7 @@ export function handleStateAdded(event: StateAdded): void {
   state.creationTxHash = txHash;
   state.stateIndex = stateIndex;
   state.timestamp = timestamp;
-  state.tokenType = syntheticToken.id;
+  state.syntheticToken = syntheticToken.id;
   state.accumulativeFloatPerSecond = accumulativeFloatPerSecond;
 
   syntheticToken.save();
@@ -468,6 +468,13 @@ export function handleStakeAdded(event: StakeAdded): void {
   let tokenAddressString = tokenAddress.toHex();
   let amount = event.params.amount;
 
+  let lastMintIndex = event.params.lastMintIndex;
+
+  let state = State.load(tokenAddressString + "-" + lastMintIndex.toString());
+  if (state == null) {
+    log.critical("state not defined yet crash", []);
+  }
+
   let user = getOrCreateUser(userAddress);
 
   let syntheticToken = SyntheticToken.load(tokenAddressString);
@@ -476,7 +483,7 @@ export function handleStakeAdded(event: StakeAdded): void {
   stake.timestamp = timestamp;
   stake.blockNumber = blockNumber;
   stake.creationTxHash = txHash;
-  stake.tokenType = syntheticToken.id;
+  stake.syntheticToken = syntheticToken.id;
   stake.user = user.id;
   stake.amount = amount;
   stake.withdrawn = false;
@@ -491,7 +498,7 @@ export function handleStakeAdded(event: StakeAdded): void {
     );
     currentStake.user = user.id;
     currentStake.userAddress = user.address;
-    currentStake.tokenType = syntheticToken.id;
+    currentStake.syntheticToken = syntheticToken.id;
   } else {
     // Note: Only add if still relevant and not withdrawn
     let oldStake = Stake.load(currentStake.currentStake);
@@ -501,6 +508,7 @@ export function handleStakeAdded(event: StakeAdded): void {
     }
   }
   currentStake.currentStake = stake.id;
+  currentStake.lastMintState = state.id;
 
   stake.save();
   currentStake.save();
@@ -535,7 +543,7 @@ export function handleStakeWithdrawn(event: StakeWithdrawn): void {
     stake.timestamp = timestamp;
     stake.blockNumber = blockNumber;
     stake.creationTxHash = txHash;
-    stake.tokenType = syntheticToken.id;
+    stake.syntheticToken = syntheticToken.id;
     stake.user = user.id;
     stake.withdrawn = false;
     stake.amount = oldStake.amount.minus(amount);
@@ -552,11 +560,38 @@ export function handleFloatMinted(event: FloatMinted): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
-}
-export function handleFloatAccumulated(event: FloatAccumulated): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
+
+  let userAddress = event.params.user;
+  let userAddressString = userAddress.toHex();
+  let tokenAddress = event.params.tokenAddress;
+  let tokenAddressString = tokenAddress.toHex();
+  let amount = event.params.amount;
+  let lastMintIndex = event.params.lastMintIndex;
+
+  let state = State.load(tokenAddressString + "-" + lastMintIndex.toString());
+  if (state == null) {
+    log.critical("state not defined yet crash", []);
+  }
+  let syntheticToken = SyntheticToken.load(tokenAddressString);
+  syntheticToken.floatMintedFromSpecificToken = syntheticToken.floatMintedFromSpecificToken.plus(
+    amount
+  );
+
+  let user = getOrCreateUser(userAddress);
+  user.totalMintedFloat = user.totalMintedFloat.plus(amount);
+
+  let currentStake = CurrentStake.load(
+    tokenAddressString + "-" + userAddressString
+  );
+  currentStake.lastMintState = state.id;
+
+  let globalState = GlobalState.load(GLOBAL_STATE_ID);
+  globalState.totalFloatMinted = globalState.totalFloatMinted.plus(amount);
+
+  syntheticToken.save();
+  user.save();
+  currentStake.save();
+  globalState.save();
 }
 
 // currently all params are BigInts -> in future may have to modify to support e.g. Addresses

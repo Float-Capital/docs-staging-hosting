@@ -2,6 +2,7 @@ const { BN } = require("@openzeppelin/test-helpers");
 
 const Dai = artifacts.require("Dai");
 const LongShort = artifacts.require("LongShort");
+const Staker = artifacts.require("Staker");
 const SyntheticToken = artifacts.require("SyntheticToken");
 const YieldManagerMock = artifacts.require("YieldManagerMock");
 const OracleManagerMock = artifacts.require("OracleManagerMock");
@@ -115,6 +116,7 @@ module.exports = async function(deployer, network, accounts) {
   }
 
   const longShort = await LongShort.deployed();
+  const staker = await Staker.deployed();
   await deployTestMarket("FTSE100", "FTSE", longShort, token, admin, network);
   await deployTestMarket("GOLD", "GOLD", longShort, token, admin, network);
   await deployTestMarket("SP", "S&P500", longShort, token, admin, network);
@@ -191,5 +193,10 @@ module.exports = async function(deployer, network, accounts) {
         from: user3,
       }
     );
+
+    // update system state and mint and stake again mint float
+    await longShort._updateSystemState(marketIndex);
+
+    await staker.claimFloat([longAddress, shortAddress], { from: user3 });
   }
 };

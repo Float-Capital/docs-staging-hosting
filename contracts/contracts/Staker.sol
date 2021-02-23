@@ -59,10 +59,19 @@ contract Staker is IStaker, Initializable {
         uint256 timestamp,
         uint256 accumulative
     );
-    event StakeAdded(address user, address tokenAddress, uint256 amount);
+    event StakeAdded(
+        address user,
+        address tokenAddress,
+        uint256 amount,
+        uint256 lastMintIndex
+    );
     event StakeWithdrawn(address user, address tokenAddress, uint256 amount);
-    event FloatMinted(address user, uint256 amount);
-    event FloatAccumulated(address user, address tokenAddress, uint256 amount);
+    event FloatMinted(
+        address user,
+        address tokenAddress,
+        uint256 amount,
+        uint256 lastMintIndex
+    );
 
     ////////////////////////////////////
     /////////// MODIFIERS //////////////
@@ -228,7 +237,7 @@ contract Staker is IStaker, Initializable {
         // Safe Math will make this fail in case users try to claim immediately after
         // after deposit before the next state is updated.
         if (
-            userIndexOfLastClaimedReward[tokenAddress][user] >
+            userIndexOfLastClaimedReward[tokenAddress][user] >=
             latestRewardIndex[tokenAddress]
         ) {
             return 0;
@@ -257,8 +266,13 @@ contract Staker is IStaker, Initializable {
             ] = latestRewardIndex[tokenAddress];
 
             floatToken.mint(user, floatToMint);
-            emit FloatAccumulated(user, tokenAddress, floatToMint);
-            emit FloatMinted(user, floatToMint);
+
+            emit FloatMinted(
+                user,
+                tokenAddress,
+                floatToMint,
+                latestRewardIndex[tokenAddress]
+            );
         }
     }
 
@@ -268,17 +282,25 @@ contract Staker is IStaker, Initializable {
         for (uint256 i = 0; i < tokenAddresses.length; i++) {
             uint256 floatToMint =
                 calculateAccumulatedFloat(tokenAddresses[i], msg.sender);
-            // Set the user has claimed up until now.
-            userIndexOfLastClaimedReward[tokenAddresses[i]][
-                msg.sender
-            ] = latestRewardIndex[tokenAddresses[i]];
 
-            floatTotal += floatToMint;
-            emit FloatAccumulated(msg.sender, tokenAddresses[i], floatToMint);
+            if (floatToMint > 0) {
+                // Set the user has claimed up until now.
+                userIndexOfLastClaimedReward[tokenAddresses[i]][
+                    msg.sender
+                ] = latestRewardIndex[tokenAddresses[i]];
+
+                floatTotal += floatToMint;
+
+                emit FloatMinted(
+                    msg.sender,
+                    tokenAddresses[i],
+                    floatToMint,
+                    latestRewardIndex[tokenAddresses[i]]
+                );
+            }
         }
         if (floatTotal > 0) {
             floatToken.mint(msg.sender, floatTotal);
-            emit FloatMinted(msg.sender, floatTotal);
         }
     }
 
@@ -311,6 +333,12 @@ contract Staker is IStaker, Initializable {
         onlyValidSynthetic(tokenAddress)
     {
         _stake(tokenAddress, amount, msg.sender, false);
+        emit StakeAdded(
+            msg.sender,
+            tokenAddress,
+            amount,
+            userIndexOfLastClaimedReward[tokenAddress][msg.sender]
+        );
     }
 
     /*
@@ -333,6 +361,12 @@ contract Staker is IStaker, Initializable {
         userIndexOfLastClaimedReward[tokenAddress][
             msg.sender
         ] = latestRewardIndex[tokenAddress];
+        emit StakeAdded(
+            msg.sender,
+            tokenAddress,
+            amount,
+            userIndexOfLastClaimedReward[tokenAddress][msg.sender]
+        );
     }
 
     /**
@@ -342,13 +376,19 @@ contract Staker is IStaker, Initializable {
         address tokenAddress,
         uint256 amount,
         address user
-    ) external override onlyFloat() {
+    ) external override onlyFloat() onlyValidSynthetic(tokenAddress) {
         _stake(tokenAddress, amount, user, true);
 
         // system state is already updated on the float side
         userIndexOfLastClaimedReward[tokenAddress][user] = latestRewardIndex[
             tokenAddress
         ];
+        emit StakeAdded(
+            user,
+            tokenAddress,
+            amount,
+            userIndexOfLastClaimedReward[tokenAddress][user]
+        );
     }
 
     function _stake(
@@ -380,14 +420,13 @@ contract Staker is IStaker, Initializable {
         ]
             .add(amount);
 
-        // We are currently smashing them out of earnings till the next state update.
-        // Figure out what happens when they fall inbetween state updates.
-        // Note this also effects top up people.
+        // This currently disavatages people who top-up?
+        // Since they have capital locked that will skip a state of earning.
+        // This is very difficult for the top up case. Unless they create a state point,
+        // There is going to need to be some system compromise.
         userIndexOfLastClaimedReward[tokenAddress][user] =
             latestRewardIndex[tokenAddress] +
             1;
-
-        emit StakeAdded(user, tokenAddress, amount);
     }
 
     ////////////////////////////////////
@@ -403,6 +442,8 @@ contract Staker is IStaker, Initializable {
             userAmountStaked[tokenAddress][msg.sender] > 0,
             "nothing to withdraw"
         );
+        // Note when withdrawing, they will only accumulate float tokens up until the last
+        // state point that has been created. This is acceptable.
         mintAccumulatedFloat(tokenAddress, msg.sender);
 
         userAmountStaked[tokenAddress][msg.sender] = userAmountStaked[
