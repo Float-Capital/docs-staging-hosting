@@ -213,6 +213,25 @@ contract("LongShort (staking)", (accounts) => {
     );
   });
 
+  it("can stake directly from the synthetic token (without needing an approval)", async () => {
+    await mintAndApprove(
+      fundToken,
+      new BN(oneHundredAndFifty),
+      user1,
+      longShort.address
+    );
+    await longShort.mintLong(marketIndex, oneHundred, {
+      from: user1,
+    });
+    await longToken.stake(oneHundred, { from: user1 });
+
+    const amountStaked = await staker.userAmountStaked.call(longToken.address, user1);
+    assert.equal(
+      amountStaked.toString(),
+      oneHundred
+    );
+  });
+
   it("float earned is a function of time staked", async () => {
     await mintAndApprove(
       fundToken,

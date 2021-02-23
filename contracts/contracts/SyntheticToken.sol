@@ -26,6 +26,7 @@ contract SyntheticToken is ERC20PresetMinterPauserUpgradeable {
     }
 
     function stake(uint256 amount) external {
+        // NOTE: this is safe, this function will throw "ERC20: transfer amount exceeds balance" if amount exceeds users balance
         _transfer(msg.sender, address(staker), amount);
 
         staker.stakeDirect(msg.sender, amount);
