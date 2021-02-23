@@ -225,9 +225,7 @@ contract Staker is IStaker, Initializable {
         // Compute time since last state point for the given token.
         uint256 timeDelta = calculateTimeDelta(token);
 
-        // TODO: Should we be using the current 'r' value for the time period
-        //   between the last state point and now? Feels like we should be
-        //   using the last 'r' value rather.
+        // Compute new cumulative 'r' value total.
         return
             syntheticRewardParams[token][latestRewardIndex[token]]
                 .accumulativeFloatPerToken
