@@ -433,8 +433,8 @@ var initialInput = {
 };
 
 function useBalanceAndApproved(erc20Address, spender) {
-  var match = ContractHooks.useErc20Balance(erc20Address);
-  var match$1 = ContractHooks.useERC20Approved(erc20Address, spender);
+  var match = ContractHooks.useErc20BalanceRefresh(erc20Address);
+  var match$1 = ContractHooks.useERC20ApprovedRefresh(erc20Address, spender);
   return [
           match.data,
           match$1.data

@@ -29,7 +29,7 @@
     "templateTagLocation": "@apollo/client",
     "custom-fields": {
       "BigInt": "BigInt",
-      "Bytes": "Bytes"
+      "Bytes": "Address"
     }
   },
   "sources": [

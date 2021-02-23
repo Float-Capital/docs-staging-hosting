@@ -436,7 +436,7 @@ function MintAndStake(Props) {
   var contractExecutionHandler = match[0];
   var longShortContractAddress = Config.useLongShortAddress(undefined);
   var daiAddress = Config.useDaiAddress(undefined);
-  var match$1 = ContractHooks.useERC20Approved(daiAddress, longShortContractAddress);
+  var match$1 = ContractHooks.useERC20ApprovedRefresh(daiAddress, longShortContractAddress);
   var optAmountApproved = match$1.data;
   var form = useForm(initialInput, (function (param, _form) {
           var amount = param.amount;

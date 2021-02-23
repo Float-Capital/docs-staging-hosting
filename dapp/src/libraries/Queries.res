@@ -24,12 +24,12 @@ module MarketDetails = %graphql(`
     oracleAddress
     syntheticLong {
       id
-      tokenAddress @ppxCustom(module: "Address")
+      tokenAddress
       totalStaked
     }
     syntheticShort {
       id
-      tokenAddress @ppxCustom(module: "Address")
+      tokenAddress
       totalStaked
     }
     latestSystemState {
@@ -74,9 +74,9 @@ query ($userId: String!){
       id
       timestamp
       blockNumber
-      creationTxHash
+      creationTxHash  @ppxCustom(module: "Bytes")
       tokenType {
-        tokenAddress @ppxCustom(module: "Address")
+        tokenAddress
         totalStaked
         tokenType
         syntheticMarket {
@@ -122,14 +122,14 @@ query ($userId: String!){
 //   oracleAddress
 //   syntheticLong {
 //     id
-//     tokenAddress @ppxCustom(module: "Address")
+//     tokenAddress
 //     totalValueLocked
 //     tokenSupply
 //     tokenPrice
 //   }
 //   syntheticShort {
 //     id
-//     tokenAddress @ppxCustom(module: "Address")
+//     tokenAddress
 //     totalValueLocked
 //     tokenSupply
 //     tokenPrice

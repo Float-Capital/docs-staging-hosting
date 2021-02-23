@@ -28,13 +28,13 @@ function parse(value) {
                 return {
                         __typename: value.__typename,
                         timestamp: GqlConverters.$$BigInt.parse(value.timestamp),
-                        txHash: GqlConverters.Bytes.parse(value.txHash),
+                        txHash: GqlConverters.Address.parse(value.txHash),
                         blockNumber: GqlConverters.$$BigInt.parse(value.blockNumber),
                         syntheticPrice: GqlConverters.$$BigInt.parse(value.syntheticPrice),
                         longTokenPrice: GqlConverters.$$BigInt.parse(value.longTokenPrice),
                         shortTokenPrice: GqlConverters.$$BigInt.parse(value.shortTokenPrice),
                         totalValueLocked: GqlConverters.$$BigInt.parse(value.totalValueLocked),
-                        setBy: GqlConverters.Bytes.parse(value.setBy)
+                        setBy: GqlConverters.Address.parse(value.setBy)
                       };
               })
         };
@@ -44,7 +44,7 @@ function serialize(value) {
   var value$1 = value.systemStates;
   var systemStates = value$1.map(function (value) {
         var value$1 = value.setBy;
-        var value$2 = GqlConverters.Bytes.serialize(value$1);
+        var value$2 = GqlConverters.Address.serialize(value$1);
         var value$3 = value.totalValueLocked;
         var value$4 = GqlConverters.$$BigInt.serialize(value$3);
         var value$5 = value.shortTokenPrice;
@@ -56,7 +56,7 @@ function serialize(value) {
         var value$11 = value.blockNumber;
         var value$12 = GqlConverters.$$BigInt.serialize(value$11);
         var value$13 = value.txHash;
-        var value$14 = GqlConverters.Bytes.serialize(value$13);
+        var value$14 = GqlConverters.Address.serialize(value$13);
         var value$15 = value.timestamp;
         var value$16 = GqlConverters.$$BigInt.serialize(value$15);
         var value$17 = value.__typename;
@@ -173,7 +173,7 @@ function parse$1(value) {
                         name: value.name,
                         symbol: value.symbol,
                         marketIndex: GqlConverters.$$BigInt.parse(value.marketIndex),
-                        oracleAddress: GqlConverters.Bytes.parse(value.oracleAddress),
+                        oracleAddress: GqlConverters.Address.parse(value.oracleAddress),
                         syntheticLong: {
                           __typename: value$1.__typename,
                           id: value$1.id,
@@ -237,7 +237,7 @@ function serialize$1(value) {
           totalStaked: value$16
         };
         var value$21 = value.oracleAddress;
-        var value$22 = GqlConverters.Bytes.serialize(value$21);
+        var value$22 = GqlConverters.Address.serialize(value$21);
         var value$23 = value.marketIndex;
         var value$24 = GqlConverters.$$BigInt.serialize(value$23);
         var value$25 = value.symbol;
@@ -841,10 +841,10 @@ function parse$5(value) {
                           id: value$1.id,
                           timestamp: GqlConverters.$$BigInt.parse(value$1.timestamp),
                           blockNumber: GqlConverters.$$BigInt.parse(value$1.blockNumber),
-                          creationTxHash: GqlConverters.Bytes.parse(value$1.creationTxHash),
+                          creationTxHash: GqlConverters.Address.parse(value$1.creationTxHash),
                           tokenType: {
                             __typename: value$2.__typename,
-                            tokenAddress: GqlConverters.Bytes.parse(value$2.tokenAddress),
+                            tokenAddress: GqlConverters.Address.parse(value$2.tokenAddress),
                             totalStaked: GqlConverters.$$BigInt.parse(value$2.totalStaked),
                             tokenType: tmp,
                             syntheticMarket: {
@@ -883,7 +883,7 @@ function serialize$5(value) {
         var value$10 = value$4.totalStaked;
         var value$11 = GqlConverters.$$BigInt.serialize(value$10);
         var value$12 = value$4.tokenAddress;
-        var value$13 = GqlConverters.Bytes.serialize(value$12);
+        var value$13 = GqlConverters.Address.serialize(value$12);
         var value$14 = value$4.__typename;
         var tokenType$1 = {
           __typename: value$14,
@@ -893,7 +893,7 @@ function serialize$5(value) {
           syntheticMarket: syntheticMarket
         };
         var value$15 = value$1.creationTxHash;
-        var value$16 = GqlConverters.Bytes.serialize(value$15);
+        var value$16 = GqlConverters.Address.serialize(value$15);
         var value$17 = value$1.blockNumber;
         var value$18 = GqlConverters.$$BigInt.serialize(value$17);
         var value$19 = value$1.timestamp;

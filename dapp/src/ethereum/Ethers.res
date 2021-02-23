@@ -73,11 +73,11 @@ module BigNumber = {
   @send external toNumberFloat: t => float = "toNumber"
 }
 
-@send
-external waitForTransaction: (Web3.rawProvider, string) => JsPromise.t<txResult> =
-  "waitForTransaction"
-
 type providerType
+
+@send
+external waitForTransaction: (providerType, string) => JsPromise.t<txResult> = "waitForTransaction"
+
 type walletType = {address: string, provider: providerType}
 
 module Wallet = {
@@ -91,7 +91,7 @@ module Providers = {
   type t = providerType
 
   @new @module("ethers") @scope("providers")
-  external makeProvider: string => Web3.rawProvider = "JsonRpcProvider"
+  external makeProvider: string => t = "JsonRpcProvider"
 
   @send external getBalance: (t, ethAddress) => JsPromise.t<option<BigNumber.t>> = "getBalance"
   @send

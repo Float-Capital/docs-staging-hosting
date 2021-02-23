@@ -34,12 +34,10 @@ let make = (~marketIndex, ~isLong) => {
 
   let longShortContractAddress = Config.useLongShortAddress()
   let daiAddress = Config.useDaiAddress()
-  let {
-    data: optAmountApproved,
-    isValidating: _isValidating,
-    error: _errorLoadingBalance,
-    mutate: _mutate,
-  } = ContractHooks.useERC20Approved(~erc20Address=daiAddress, ~spender=longShortContractAddress)
+  let {data: optAmountApproved} = ContractHooks.useERC20ApprovedRefresh(
+    ~erc20Address=daiAddress,
+    ~spender=longShortContractAddress,
+  )
 
   let form = MintAndStakeForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
     contractExecutionHandler(
