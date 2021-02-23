@@ -48,7 +48,7 @@ function StakeDetails$UsersActiveStakes(Props) {
     var currentStakes = match.currentStakes;
     tmp = currentStakes.length !== 0 ? React.createElement(React.Fragment, undefined, Belt_Array.map(currentStakes, (function (param) {
                   var match = param.currentStake;
-                  var match$1 = match.tokenType;
+                  var match$1 = match.syntheticToken;
                   var tokenAddress = match$1.tokenAddress;
                   var amountFormatted = FormatMoney.formatEther(match.amount);
                   var timeSinceStaking = Globals.timestampToDuration(match.timestamp);

@@ -598,7 +598,7 @@ var query$4 = (require("@apollo/client").gql`
         timestamp
         blockNumber
         creationTxHash
-        tokenType  {
+        syntheticToken  {
           __typename
           tokenAddress
           totalStaked
@@ -621,7 +621,7 @@ function parse$4(value) {
   return {
           currentStakes: value$1.map(function (value) {
                 var value$1 = value.currentStake;
-                var value$2 = value$1.tokenType;
+                var value$2 = value$1.syntheticToken;
                 var value$3 = value$2.tokenType;
                 var tmp;
                 switch (value$3) {
@@ -647,7 +647,7 @@ function parse$4(value) {
                           timestamp: GqlConverters.$$BigInt.parse(value$1.timestamp),
                           blockNumber: GqlConverters.$$BigInt.parse(value$1.blockNumber),
                           creationTxHash: GqlConverters.Bytes.parse(value$1.creationTxHash),
-                          tokenType: {
+                          syntheticToken: {
                             __typename: value$2.__typename,
                             tokenAddress: GqlConverters.Address.parse(value$2.tokenAddress),
                             totalStaked: GqlConverters.$$BigInt.parse(value$2.totalStaked),
@@ -673,7 +673,7 @@ function serialize$4(value) {
         var value$2 = value$1.withdrawn;
         var value$3 = value$1.amount;
         var value$4 = GqlConverters.$$BigInt.serialize(value$3);
-        var value$5 = value$1.tokenType;
+        var value$5 = value$1.syntheticToken;
         var value$6 = value$5.syntheticMarket;
         var value$7 = value$6.symbol;
         var value$8 = value$6.name;
@@ -692,7 +692,7 @@ function serialize$4(value) {
         var value$13 = value$5.tokenAddress;
         var value$14 = GqlConverters.Address.serialize(value$13);
         var value$15 = value$5.__typename;
-        var tokenType$1 = {
+        var syntheticToken = {
           __typename: value$15,
           tokenAddress: value$14,
           totalStaked: value$12,
@@ -713,7 +713,7 @@ function serialize$4(value) {
           timestamp: value$21,
           blockNumber: value$19,
           creationTxHash: value$17,
-          tokenType: tokenType$1,
+          syntheticToken: syntheticToken,
           amount: value$4,
           withdrawn: value$2
         };
@@ -794,7 +794,7 @@ var query$5 = (require("@apollo/client").gql`
         timestamp
         blockNumber
         creationTxHash
-        tokenType  {
+        syntheticToken  {
           __typename
           tokenAddress
           totalStaked
@@ -816,7 +816,7 @@ function parse$5(value) {
   return {
           currentStakes: value$1.map(function (value) {
                 var value$1 = value.currentStake;
-                var value$2 = value$1.tokenType;
+                var value$2 = value$1.syntheticToken;
                 var value$3 = value$2.tokenType;
                 var tmp;
                 switch (value$3) {
@@ -842,7 +842,7 @@ function parse$5(value) {
                           timestamp: GqlConverters.$$BigInt.parse(value$1.timestamp),
                           blockNumber: GqlConverters.$$BigInt.parse(value$1.blockNumber),
                           creationTxHash: GqlConverters.Address.parse(value$1.creationTxHash),
-                          tokenType: {
+                          syntheticToken: {
                             __typename: value$2.__typename,
                             tokenAddress: GqlConverters.Address.parse(value$2.tokenAddress),
                             totalStaked: GqlConverters.$$BigInt.parse(value$2.totalStaked),
@@ -866,7 +866,7 @@ function serialize$5(value) {
         var value$1 = value.currentStake;
         var value$2 = value$1.amount;
         var value$3 = GqlConverters.$$BigInt.serialize(value$2);
-        var value$4 = value$1.tokenType;
+        var value$4 = value$1.syntheticToken;
         var value$5 = value$4.syntheticMarket;
         var value$6 = value$5.symbol;
         var value$7 = value$5.name;
@@ -885,7 +885,7 @@ function serialize$5(value) {
         var value$12 = value$4.tokenAddress;
         var value$13 = GqlConverters.Address.serialize(value$12);
         var value$14 = value$4.__typename;
-        var tokenType$1 = {
+        var syntheticToken = {
           __typename: value$14,
           tokenAddress: value$13,
           totalStaked: value$11,
@@ -906,7 +906,7 @@ function serialize$5(value) {
           timestamp: value$20,
           blockNumber: value$18,
           creationTxHash: value$16,
-          tokenType: tokenType$1,
+          syntheticToken: syntheticToken,
           amount: value$3
         };
         var value$23 = value.id;

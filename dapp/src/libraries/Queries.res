@@ -75,7 +75,7 @@ query ($userId: String!){
       timestamp
       blockNumber
       creationTxHash  @ppxCustom(module: "Bytes")
-      tokenType {
+      syntheticToken {
         tokenAddress
         totalStaked
         tokenType
@@ -100,7 +100,7 @@ query ($userId: String!){
       timestamp
       blockNumber
       creationTxHash
-      tokenType {
+      syntheticToken {
         tokenAddress
         totalStaked
         tokenType
