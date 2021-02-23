@@ -141,10 +141,7 @@ contract("LongShort (staking)", (accounts) => {
   });
 
   it("staker admin can change", async () => {
-    await expectRevert.unspecified(
-      staker.changeAdmin(user2, { from: user2 }),
-      "not admin"
-    );
+    await expectRevert(staker.changeAdmin(user2, { from: user2 }), "not admin");
     await staker.changeAdmin(user2, {
       from: admin,
     });
@@ -153,10 +150,11 @@ contract("LongShort (staking)", (accounts) => {
   });
 
   it("users who have no stake cannot withdraw", async () => {
-    expectRevert.unspecified(
+    await expectRevert(
       staker.withdraw(longToken.address, new BN(oneHundred), {
         from: user1,
-      })
+      }),
+      "nothing to withdraw"
     );
   });
 
@@ -210,6 +208,40 @@ contract("LongShort (staking)", (accounts) => {
         .div(e18)
         .mul(new BN(oneHundred))
         .toString()
+    );
+  });
+
+  it("can stake directly from the synthetic token (without needing an approval)", async () => {
+    await mintAndApprove(
+      fundToken,
+      new BN(oneHundredAndFifty),
+      user1,
+      longShort.address
+    );
+    await longShort.mintLong(marketIndex, oneHundred, {
+      from: user1,
+    });
+    await longToken.stake(oneHundred, { from: user1 });
+
+    const amountStaked = await staker.userAmountStaked.call(
+      longToken.address,
+      user1
+    );
+    assert.equal(amountStaked.toString(), oneHundred);
+  });
+  it("cannot stake more than your balance from the synthetic token (without needing an approval)", async () => {
+    await mintAndApprove(
+      fundToken,
+      new BN(oneHundredAndFifty),
+      user1,
+      longShort.address
+    );
+    await longShort.mintLong(marketIndex, oneHundred, {
+      from: user1,
+    });
+    await expectRevert(
+      longToken.stake(oneHundredAndFifty, { from: user1 }),
+      "ERC20: transfer amount exceeds balance"
     );
   });
 
