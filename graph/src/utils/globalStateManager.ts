@@ -39,6 +39,7 @@ export function getOrCreateUser(address: Bytes): User | null {
   if (user == null) {
     user = new User(address.toHex());
     user.address = address;
+    user.totalMintedFloat = ZERO;
   }
 
   return user;
@@ -53,6 +54,7 @@ export function createSyntheticToken(
     syntheticToken = new SyntheticToken(tokenAddressString);
     syntheticToken.tokenAddress = tokenAddress;
     syntheticToken.totalStaked = ZERO;
+    syntheticToken.floatMintedFromSpecificToken = ZERO;
   }
   return syntheticToken;
 }

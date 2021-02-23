@@ -77,7 +77,7 @@ function start {
     done
 
     echo "####### DEPLOYING CONTRACTS #######"
-    cd ../contracts && truffle migrate --reset --network graphTesting
+    cd ../contracts && yarn clean && truffle migrate --reset --network graphTesting
     if [ "$?" -ne 0 ];
     then
         echo "ERROR: Could not deploy contracts successfully"

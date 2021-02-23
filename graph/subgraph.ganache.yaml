@@ -74,14 +74,12 @@ dataSources:
           handler: handleDeployV0
         - event: StateAdded(address,uint256,uint256,uint256)
           handler: handleStateAdded
-        - event: StakeAdded(address,address,uint256)
+        - event: StakeAdded(address,address,uint256,uint256)
           handler: handleStakeAdded
         - event: StakeWithdrawn(address,address,uint256)
           handler: handleStakeWithdrawn
-        - event: FloatMinted(address,uint256)
+        - event: FloatMinted(address,address,uint256,uint256)
           handler: handleFloatMinted
-        - event: FloatAccumulated(address,address,uint256)
-          handler: handleFloatAccumulated
       file: ./src/mapping.ts
 
 templates:
