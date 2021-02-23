@@ -113,7 +113,7 @@ contract Staker is IStaker, Initializable {
         uint256 marketIndex,
         address longTokenAddress,
         address shortTokenAddress
-    ) external onlyFloat {
+    ) external override onlyFloat {
         syntheticValid[longTokenAddress] = true;
         syntheticValid[shortTokenAddress] = true;
         marketIndexOfToken[longTokenAddress] = marketIndex;
@@ -208,7 +208,7 @@ contract Staker is IStaker, Initializable {
         uint256 shortTokenPrice,
         uint256 longValue,
         uint256 shortValue
-    ) external onlyFloat {
+    ) external override onlyFloat {
         // If this is the first update this block
         // calculate the accumulative.
         if (calculateTimeDelta(longTokenAddress) != 0) {
@@ -292,8 +292,12 @@ contract Staker is IStaker, Initializable {
     Only approved float synthetic tokens can be staked.
     Users can call this same function to "top-up" their stake.
     */
-    function stakeDirect(uint256 amount) public onlyValidSynthetic(msg.sender) {
-        _stake(msg.sender, amount, msg.sender, true);
+    function stakeDirect(address from, uint256 amount)
+        public
+        override
+        onlyValidSynthetic(msg.sender)
+    {
+        _stake(msg.sender, amount, from, true);
     }
 
     /*
@@ -338,7 +342,7 @@ contract Staker is IStaker, Initializable {
         address tokenAddress,
         uint256 amount,
         address user
-    ) external onlyFloat() {
+    ) external override onlyFloat() {
         _stake(tokenAddress, amount, user, true);
 
         // system state is already updated on the float side
