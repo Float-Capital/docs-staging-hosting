@@ -300,8 +300,7 @@ contract("LongShort (staking)", (accounts) => {
 
   // mock for now - will have to refactor tests once we change how
   // r is calculated
-  const calculateFloatPerSecond = (tokenPrice) =>
-    tokenPrice.div(new BN("1000"));
+  const calculateFloatPerSecond = (tokenPrice) => tokenPrice;
 
   const amountStaked = async (token, user) =>
     await staker.userAmountStaked(token.address, user);

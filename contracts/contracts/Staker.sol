@@ -148,7 +148,7 @@ contract Staker is Initializable {
         // (4)  Perhaps which market
         // (5)  scalar for imbalance
         // (6) amount already locked from that token
-        return tokenPrice + 123456789;
+        return tokenPrice;
     }
 
     function calculateTimeDelta(address tokenAddress)
