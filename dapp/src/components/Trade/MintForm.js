@@ -618,8 +618,8 @@ var initialInput = {
 };
 
 function useBalanceAndApproved(erc20Address, spender) {
-  var match = ContractHooks.useErc20Balance(erc20Address);
-  var match$1 = ContractHooks.useERC20Approved(erc20Address, spender);
+  var match = ContractHooks.useErc20BalanceRefresh(erc20Address);
+  var match$1 = ContractHooks.useERC20ApprovedRefresh(erc20Address, spender);
   return [
           match.data,
           match$1.data
@@ -657,8 +657,8 @@ function MintForm$1(Props) {
   var match$3 = useBalanceAndApproved(daiAddressThatIsTemporarilyHardCoded, longShortContractAddress);
   var optDaiAmountApproved = match$3[1];
   var optDaiBalance = match$3[0];
-  var match$4 = ContractHooks.useErc20Balance(market.syntheticShort.tokenAddress);
-  var match$5 = ContractHooks.useErc20Balance(market.syntheticLong.tokenAddress);
+  var match$4 = ContractHooks.useErc20BalanceRefresh(market.syntheticShort.tokenAddress);
+  var match$5 = ContractHooks.useErc20BalanceRefresh(market.syntheticLong.tokenAddress);
   var form = useForm(initialInput, (function (param, _form) {
           var isStaking = param.isStaking;
           var isLong = param.isLong;

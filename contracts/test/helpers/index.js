@@ -5,6 +5,7 @@ const LONGSHORT_CONTRACT_NAME = "LongShort";
 const YIELD_MANAGER = "YieldManagerMock";
 const ORACLE_MANAGER = "OracleManagerMock";
 const STARDAND_ERC20 = "ERC20PresetMinterPauserUpgradeable";
+const SYNTHETIC_TOKEN = "SyntheticToken";
 const TOKEN_FACTORY = "TokenFactory";
 const STAKER = "Staker";
 const FLOAT_TOKEN = "FloatToken";
@@ -13,6 +14,7 @@ const SIMULATED_INSTANT_APY = 10;
 const TEN_TO_THE_18 = "1000000000000000000";
 
 const erc20 = artifacts.require(STARDAND_ERC20);
+const SyntheticToken = artifacts.require(SYNTHETIC_TOKEN);
 const LongShort = artifacts.require(LONGSHORT_CONTRACT_NAME);
 const OracleManager = artifacts.require(ORACLE_MANAGER);
 const YieldManager = artifacts.require(YIELD_MANAGER);
@@ -115,8 +117,8 @@ const createSynthetic = async (
   const currentMarketIndex = await longShort.latestMarket.call();
   const longAddress = await longShort.longTokens.call(currentMarketIndex);
   const shortAddress = await longShort.shortTokens.call(currentMarketIndex);
-  let longToken = await erc20.at(longAddress);
-  let shortToken = await erc20.at(shortAddress);
+  let longToken = await SyntheticToken.at(longAddress);
+  let shortToken = await SyntheticToken.at(shortAddress);
 
   return {
     fundToken,

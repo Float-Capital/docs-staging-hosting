@@ -4,6 +4,7 @@ pragma solidity 0.7.6;
 import "@openzeppelin/contracts-upgradeable/presets/ERC20PresetMinterPauserUpgradeable.sol";
 import "./LongShort.sol";
 import "./FloatToken.sol";
+import "./interfaces/IStaker.sol";
 
 /*
     ###### Purpose of contract ########
@@ -15,7 +16,7 @@ import "./FloatToken.sol";
 */
 
 /** @title Staker Contract (name is WIP) */
-contract Staker is Initializable {
+contract Staker is IStaker, Initializable {
     using SafeMathUpgradeable for uint256;
 
     ////////////////////////////////////
@@ -121,7 +122,7 @@ contract Staker is Initializable {
         uint256 marketIndex,
         address longTokenAddress,
         address shortTokenAddress
-    ) external onlyFloat {
+    ) external override onlyFloat {
         syntheticValid[longTokenAddress] = true;
         syntheticValid[shortTokenAddress] = true;
         marketIndexOfToken[longTokenAddress] = marketIndex;
@@ -157,7 +158,7 @@ contract Staker is Initializable {
         // (4)  Perhaps which market
         // (5)  scalar for imbalance
         // (6) amount already locked from that token
-        return tokenPrice + 123456789;
+        return tokenPrice;
     }
 
     function calculateTimeDelta(address tokenAddress)
@@ -216,7 +217,7 @@ contract Staker is Initializable {
         uint256 shortTokenPrice,
         uint256 longValue,
         uint256 shortValue
-    ) external onlyFloat {
+    ) external override onlyFloat {
         // If this is the first update this block
         // calculate the accumulative.
         if (calculateTimeDelta(longTokenAddress) != 0) {
@@ -313,6 +314,20 @@ contract Staker is Initializable {
     Only approved float synthetic tokens can be staked.
     Users can call this same function to "top-up" their stake.
     */
+    function stakeDirect(address from, uint256 amount)
+        public
+        override
+        onlyValidSynthetic(msg.sender)
+    {
+        _stake(msg.sender, amount, from, true);
+    }
+
+    /*
+    Staking function.
+    User can stake (flexibly) and start earning float rewards.
+    Only approved float synthetic tokens can be staked.
+    Users can call this same function to "top-up" their stake.
+    */
     function stake(address tokenAddress, uint256 amount)
         public
         onlyValidSynthetic(tokenAddress)
@@ -361,7 +376,7 @@ contract Staker is Initializable {
         address tokenAddress,
         uint256 amount,
         address user
-    ) external onlyFloat() onlyValidSynthetic(tokenAddress) {
+    ) external override onlyFloat() onlyValidSynthetic(tokenAddress) {
         _stake(tokenAddress, amount, user, true);
 
         // system state is already updated on the float side

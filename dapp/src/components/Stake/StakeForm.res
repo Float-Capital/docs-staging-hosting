@@ -28,18 +28,8 @@ let initialInput: StakeForm.input = {
 }
 
 let useBalanceAndApproved = (~erc20Address, ~spender) => {
-  let {
-    Swr.data: optBalance,
-    isValidating: _isValidating,
-    error: _errorLoadingBalance,
-    mutate: _mutate,
-  } = ContractHooks.useErc20Balance(~erc20Address)
-  let {
-    data: optAmountApproved,
-    isValidating: _isValidating,
-    error: _errorLoadingBalance,
-    mutate: _mutate,
-  } = ContractHooks.useERC20Approved(~erc20Address, ~spender)
+  let {Swr.data: optBalance} = ContractHooks.useErc20BalanceRefresh(~erc20Address)
+  let {data: optAmountApproved} = ContractHooks.useERC20ApprovedRefresh(~erc20Address, ~spender)
   (optBalance, optAmountApproved)
 }
 

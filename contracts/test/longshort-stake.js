@@ -27,7 +27,7 @@ contract("LongShort (staking)", (accounts) => {
   const threeHundred = "3000000000000000000";
   const oneHundredAndFifty = "150000000000000000000";
   const twoHundred = "200000000000000000000";
-  const e18 = new BN("10000000000000000");
+  const e18 = new BN("1000000000000000000");
   const twentyFive = "25000000000000000000";
 
   let staker;
@@ -141,10 +141,7 @@ contract("LongShort (staking)", (accounts) => {
   });
 
   it("staker admin can change", async () => {
-    await expectRevert.unspecified(
-      staker.changeAdmin(user2, { from: user2 }),
-      "not admin"
-    );
+    await expectRevert(staker.changeAdmin(user2, { from: user2 }), "not admin");
     await staker.changeAdmin(user2, {
       from: admin,
     });
@@ -153,10 +150,11 @@ contract("LongShort (staking)", (accounts) => {
   });
 
   it("users who have no stake cannot withdraw", async () => {
-    expectRevert.unspecified(
+    await expectRevert(
       staker.withdraw(longToken.address, new BN(oneHundred), {
         from: user1,
-      })
+      }),
+      "nothing to withdraw"
     );
   });
 
@@ -179,7 +177,7 @@ contract("LongShort (staking)", (accounts) => {
     await longShort._updateSystemState(marketIndex);
 
     const before = await time.latest();
-    await time.increase(1);
+    await time.increase(999);
     await longShort._updateSystemState(marketIndex);
     // earning from now
     const now = await time.latest();
@@ -194,6 +192,7 @@ contract("LongShort (staking)", (accounts) => {
       result.toString(),
       calculateFloatPerSecond(price)
         .mul(new BN((now - before).toString()))
+        .div(e18)
         .mul(new BN(oneHundred))
         .toString()
     );
@@ -206,8 +205,43 @@ contract("LongShort (staking)", (accounts) => {
       r2.toString(),
       calculateFloatPerSecond(price)
         .mul(new BN((now - before).toString()))
+        .div(e18)
         .mul(new BN(oneHundred))
         .toString()
+    );
+  });
+
+  it("can stake directly from the synthetic token (without needing an approval)", async () => {
+    await mintAndApprove(
+      fundToken,
+      new BN(oneHundredAndFifty),
+      user1,
+      longShort.address
+    );
+    await longShort.mintLong(marketIndex, oneHundred, {
+      from: user1,
+    });
+    await longToken.stake(oneHundred, { from: user1 });
+
+    const amountStaked = await staker.userAmountStaked.call(
+      longToken.address,
+      user1
+    );
+    assert.equal(amountStaked.toString(), oneHundred);
+  });
+  it("cannot stake more than your balance from the synthetic token (without needing an approval)", async () => {
+    await mintAndApprove(
+      fundToken,
+      new BN(oneHundredAndFifty),
+      user1,
+      longShort.address
+    );
+    await longShort.mintLong(marketIndex, oneHundred, {
+      from: user1,
+    });
+    await expectRevert(
+      longToken.stake(oneHundredAndFifty, { from: user1 }),
+      "ERC20: transfer amount exceeds balance"
     );
   });
 
@@ -230,10 +264,10 @@ contract("LongShort (staking)", (accounts) => {
     await longShort._updateSystemState(marketIndex);
 
     const before = await time.latest();
-    await time.increase(1);
+    await time.increase(999);
     await longShort._updateSystemState(marketIndex);
 
-    await time.increase(1);
+    await time.increase(999);
     await longShort._updateSystemState(marketIndex);
     // earning from now
     const now = await time.latest();
@@ -248,6 +282,7 @@ contract("LongShort (staking)", (accounts) => {
       result.toString(),
       calculateFloatPerSecond(price)
         .mul(new BN((now - before).toString()))
+        .div(e18)
         .mul(new BN(oneHundred))
         .toString()
     );
@@ -260,7 +295,7 @@ contract("LongShort (staking)", (accounts) => {
       await longShort._updateSystemState(marketIndex);
     }
     const before = await time.latest();
-    await time.increase(1);
+    await time.increase(999);
     await longShort._updateSystemState(marketIndex);
     // earning from now
     const now = await time.latest();
@@ -276,6 +311,7 @@ contract("LongShort (staking)", (accounts) => {
       result.toString(),
       calculateFloatPerSecond(price)
         .mul(new BN((now - before).toString()))
+        .div(e18)
         .mul(new BN(oneHundred))
         .toString()
     );
@@ -287,7 +323,7 @@ contract("LongShort (staking)", (accounts) => {
     if (token.address == longToken.address) {
       price = await longShort.longTokenPrice(marketIndex);
     } else {
-      price = await longShort.longTokenPrice(marketIndex);
+      price = await longShort.shortTokenPrice(marketIndex);
     }
     return {
       price,

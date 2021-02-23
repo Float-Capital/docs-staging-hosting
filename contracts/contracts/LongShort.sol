@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
-import "./Staker.sol";
+import "./interfaces/IStaker.sol";
 import "./TokenFactory.sol";
 import "./SyntheticToken.sol";
 import "./interfaces/ILongShort.sol";
@@ -85,7 +85,7 @@ contract LongShort is ILongShort, Initializable {
     TokenFactory public tokenFactory;
 
     // Staker for controlling governance token issuance.
-    Staker public staker;
+    IStaker public staker;
 
     // Fixed-precision constants.
     uint256 public constant TEN_TO_THE_18 = 10**18;
@@ -242,7 +242,7 @@ contract LongShort is ILongShort, Initializable {
     ) public initializer {
         admin = _admin;
         tokenFactory = TokenFactory(_tokenFactory);
-        staker = Staker(_staker);
+        staker = IStaker(_staker);
 
         emit V1(_admin, _tokenFactory, _staker);
     }
@@ -276,7 +276,8 @@ contract LongShort is ILongShort, Initializable {
             tokenFactory.createTokenLong(
                 syntheticName,
                 syntheticSymbol,
-                latestMarket
+                latestMarket,
+                address(staker)
             )
         );
 
@@ -285,7 +286,8 @@ contract LongShort is ILongShort, Initializable {
             tokenFactory.createTokenShort(
                 syntheticName,
                 syntheticSymbol,
-                latestMarket
+                latestMarket,
+                address(staker)
             )
         );
 

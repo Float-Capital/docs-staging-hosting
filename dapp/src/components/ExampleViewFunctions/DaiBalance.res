@@ -1,11 +1,6 @@
 @react.component
 let make = () => {
-  let {
-    data: optBalance,
-    isValidating: _isValidating,
-    error: _errorLoadingBalance,
-    mutate: _mutate,
-  } = ContractHooks.useDaiBalance()
+  let {data: optBalance} = ContractHooks.useDaiBalanceRefresh()
 
   <>
     {switch optBalance {

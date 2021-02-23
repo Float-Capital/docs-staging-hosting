@@ -5,8 +5,7 @@ let make = (~erc20Address) => {
     isValidating: _isValidating,
     error: _errorLoadingBalance,
     mutate: _mutate,
-  } = ContractHooks.useErc20Balance(~erc20Address)
-  // let useErc20Balance = (~erc20Address) => {
+  } = ContractHooks.useErc20BalanceRefresh(~erc20Address)
 
   <>
     {switch optBalance {
