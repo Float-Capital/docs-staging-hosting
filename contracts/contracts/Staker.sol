@@ -4,6 +4,7 @@ pragma solidity 0.7.6;
 import "@openzeppelin/contracts-upgradeable/presets/ERC20PresetMinterPauserUpgradeable.sol";
 import "./LongShort.sol";
 import "./FloatToken.sol";
+import "./interfaces/IStaker.sol";
 
 /*
     ###### Purpose of contract ########
@@ -15,7 +16,7 @@ import "./FloatToken.sol";
 */
 
 /** @title Staker Contract (name is WIP) */
-contract Staker is Initializable {
+contract Staker is IStaker, Initializable {
     using SafeMathUpgradeable for uint256;
 
     ////////////////////////////////////
@@ -284,6 +285,16 @@ contract Staker is Initializable {
     ////////////////////////////////////
     /////////// STAKING ////////////////
     ////////////////////////////////////
+
+    /*
+    Staking function.
+    User can stake (flexibly) and start earning float rewards.
+    Only approved float synthetic tokens can be staked.
+    Users can call this same function to "top-up" their stake.
+    */
+    function stakeDirect(uint256 amount) public onlyValidSynthetic(msg.sender) {
+        _stake(msg.sender, amount, msg.sender, true);
+    }
 
     /*
     Staking function.
