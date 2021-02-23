@@ -1,7 +1,9 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity 0.7.6;
 
+import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/presets/ERC20PresetMinterPauserUpgradeable.sol";
+
 import "./LongShort.sol";
 import "./FloatToken.sol";
 import "./interfaces/IStaker.sol";
@@ -19,53 +21,64 @@ import "./interfaces/IStaker.sol";
 contract Staker is IStaker, Initializable {
     using SafeMathUpgradeable for uint256;
 
-    ////////////////////////////////////
-    //////// VARIABLES /////////////////
-    ////////////////////////////////////
-
-    ///////// Global ///////////
-    address public admin;
-    mapping(address => bool) syntheticValid;
-
-    ///////// User Specific ///////////
-    mapping(address => mapping(address => uint256)) public userAmountStaked; // synthetic token type -> user -> amount staked
-    mapping(address => mapping(address => uint256))
-        public userIndexOfLastClaimedReward;
-
     struct RewardState {
         uint256 timestamp;
         uint256 accumulativeFloatPerToken;
     }
 
-    mapping(address => uint256) public marketIndexOfToken;
-    // token address -> state index -> float reward state
-    mapping(address => mapping(uint256 => RewardState))
-        public syntheticRewardParams;
-    // token address -> last state reward index set
-    mapping(address => uint256) public latestRewardIndex;
+    ////////////////////////////////////
+    //////// CONSTANTS /////////////////
+    ////////////////////////////////////
 
-    ///////// LongShort Contract ///////////
+    // Controls the k-factor, a multiplier for incentivising early stakers.
+    uint256 public constant K_FACTOR_PERIOD = 30 * 24 * 60 * 60; // secs
+    uint256 public constant K_FACTOR_INITIAL = 5e18; // scale of e18
+
+    ////////////////////////////////////
+    //////// VARIABLES /////////////////
+    ////////////////////////////////////
+
+    // Global state.
+    address public admin;
+    uint256 public initialTimestamp;
     LongShort public floatContract;
     FloatToken public floatToken;
+
+    // User state.
+    // token -> user -> value
+    mapping(address => mapping(address => uint256)) public userAmountStaked;
+    mapping(address => mapping(address => uint256))
+        public userIndexOfLastClaimedReward;
+
+    // Token state.
+    mapping(address => bool) syntheticValid; // token -> is valid?
+    mapping(address => uint256) public marketIndexOfToken; // token -> market index
+    mapping(address => mapping(uint256 => RewardState))
+        public syntheticRewardParams; // token -> index -> state
+    mapping(address => uint256) public latestRewardIndex; // token -> index
 
     ////////////////////////////////////
     /////////// EVENTS /////////////////
     ////////////////////////////////////
 
     event DeployV0();
+
     event StateAdded(
         address tokenAddress,
         uint256 stateIndex,
         uint256 timestamp,
         uint256 accumulative
     );
+
     event StakeAdded(
         address user,
         address tokenAddress,
         uint256 amount,
         uint256 lastMintIndex
     );
+
     event StakeWithdrawn(address user, address tokenAddress, uint256 amount);
+
     event FloatMinted(
         address user,
         address tokenAddress,
@@ -102,6 +115,7 @@ contract Staker is IStaker, Initializable {
         address _floatToken
     ) public initializer {
         admin = _admin;
+        initialTimestamp = block.timestamp;
         floatContract = LongShort(_floatContract);
         floatToken = FloatToken(_floatToken);
     }
@@ -144,85 +158,132 @@ contract Staker is IStaker, Initializable {
     // GLOBAL REWARD STATE FUNCTIONS ///
     ////////////////////////////////////
 
-    function calculateFloatPerSecond(uint256 tokenPrice)
-        public
-        view
-        returns (uint256)
-    {
-        // Note this function will be depedant on other things.
-        // I.e. See latex paper for full details
-        // Lets assume𝑟is some function of
-        // 1)  the order book imbalance
-        // 2)  the price of the token stake
-        // (3)  perhaps time (awarding early adopters more)
-        // (4)  Perhaps which market
-        // (5)  scalar for imbalance
-        // (6) amount already locked from that token
-        return tokenPrice;
+    /*
+     * Computes the current 'r' value, i.e. the number of float tokens a user
+     * earns per second for every unit of value they've staked on a token.
+     * The returned value has a fixed decimal scale of 1e18.
+     */
+    function calculateFloatPerSecond(
+        uint256 longValue,
+        uint256 shortValue,
+        uint256 timestamp,
+        bool isLong
+    ) public view returns (uint256) {
+        // Edge-case: no float is issued in an empty market.
+        if (longValue == 0 && shortValue == 0) {
+            return 0;
+        }
+
+        // A float issuance multiplier that starts high and decreases linearly
+        // over time to a value of 1. This incentivises users to stake early.
+        uint256 k = 1e18;
+        if (timestamp - initialTimestamp <= K_FACTOR_PERIOD) {
+            k =
+                1e18 -
+                ((K_FACTOR_INITIAL - 1e18) * (timestamp - initialTimestamp)) /
+                K_FACTOR_PERIOD;
+        }
+
+        // Float is scaled by the percentage of the total market value held in
+        // the opposite position. This incentivises users to stake on the
+        // weaker position.
+        if (isLong) {
+            return (k * shortValue) / (longValue + shortValue);
+        } else {
+            return (k * longValue) / (longValue + shortValue);
+        }
     }
 
-    function calculateTimeDelta(address tokenAddress)
-        internal
-        view
-        returns (uint256)
-    {
+    /*
+     * Computes the time since last state point for the given token in seconds.
+     */
+    function calculateTimeDelta(address token) internal view returns (uint256) {
         return
             block.timestamp -
-            syntheticRewardParams[tokenAddress][latestRewardIndex[tokenAddress]]
-                .timestamp;
+            syntheticRewardParams[token][latestRewardIndex[token]].timestamp;
     }
 
-    function calculateNewAccumulative(address tokenAddress, uint256 tokenPrice)
-        internal
-        view
-        returns (uint256)
-    {
-        uint256 floatPerSecond = calculateFloatPerSecond(tokenPrice);
-        uint256 timeDelta = calculateTimeDelta(tokenAddress);
+    /*
+     * Computes new cumulative sum of 'r' value since last state point. We use
+     * cumulative 'r' value to avoid looping during issuance.
+     */
+    function calculateNewCumulative(
+        uint256 longValue,
+        uint256 shortValue,
+        address token,
+        bool isLong
+    ) internal view returns (uint256) {
+        // Compute the current 'r' value for float issuance per second.
+        uint256 floatPerSecond =
+            calculateFloatPerSecond(
+                longValue,
+                shortValue,
+                block.timestamp,
+                isLong
+            );
+
+        // Compute time since last state point for the given token.
+        uint256 timeDelta = calculateTimeDelta(token);
+
+        // TODO: Should we be using the current 'r' value for the time period
+        //   between the last state point and now? Feels like we should be
+        //   using the last 'r' value rather.
         return
-            syntheticRewardParams[tokenAddress][latestRewardIndex[tokenAddress]]
+            syntheticRewardParams[token][latestRewardIndex[token]]
                 .accumulativeFloatPerToken
                 .add(timeDelta.mul(floatPerSecond).div(1e18));
     }
 
-    function setRewardObjects(address tokenAddress, uint256 tokenPrice)
-        internal
-    {
-        uint256 newIndex = latestRewardIndex[tokenAddress] + 1;
-        // Set accumulative
-        syntheticRewardParams[tokenAddress][newIndex]
-            .accumulativeFloatPerToken = calculateNewAccumulative(
-            tokenAddress,
-            tokenPrice
+    /*
+     * Creates a new state point for the given token and updates indexes.
+     */
+    function setRewardObjects(
+        uint256 longValue,
+        uint256 shortValue,
+        address token,
+        bool isLong
+    ) internal {
+        uint256 newIndex = latestRewardIndex[token] + 1;
+
+        // Set cumulative 'r' value on new state point.
+        syntheticRewardParams[token][newIndex]
+            .accumulativeFloatPerToken = calculateNewCumulative(
+            longValue,
+            shortValue,
+            token,
+            isLong
         );
-        // set timestsamp
-        syntheticRewardParams[tokenAddress][newIndex].timestamp = block
-            .timestamp;
-        // set next index
-        latestRewardIndex[tokenAddress] = newIndex;
+
+        // Set timestamp on new state point.
+        syntheticRewardParams[token][newIndex].timestamp = block.timestamp;
+
+        // Update latest index to point to new state point.
+        latestRewardIndex[token] = newIndex;
 
         emit StateAdded(
-            tokenAddress,
+            token,
             newIndex,
             block.timestamp,
-            syntheticRewardParams[tokenAddress][newIndex]
-                .accumulativeFloatPerToken
+            syntheticRewardParams[token][newIndex].accumulativeFloatPerToken
         );
     }
 
+    /*
+     * Adds new state points for the given long/short tokens. Called by the
+     * LongShort contract whenever there is a state change for a market.
+     */
     function addNewStateForFloatRewards(
-        address longTokenAddress,
-        address shortTokenAddress,
-        uint256 longTokenPrice,
-        uint256 shortTokenPrice,
+        address longToken,
+        address shortToken,
+        uint256 longPrice,
+        uint256 shortPrice,
         uint256 longValue,
         uint256 shortValue
     ) external override onlyFloat {
-        // If this is the first update this block
-        // calculate the accumulative.
-        if (calculateTimeDelta(longTokenAddress) != 0) {
-            setRewardObjects(longTokenAddress, longTokenPrice);
-            setRewardObjects(shortTokenAddress, shortTokenPrice);
+        // Only add a new state point if some time has passed.
+        if (calculateTimeDelta(longToken) > 0) {
+            setRewardObjects(longValue, shortValue, longToken, true);
+            setRewardObjects(longValue, shortValue, shortToken, false);
         }
     }
 
@@ -234,14 +295,15 @@ contract Staker is IStaker, Initializable {
         internal
         returns (uint256)
     {
-        // Safe Math will make this fail in case users try to claim immediately after
-        // after deposit before the next state is updated.
+        // Don't let users accumulate float immediately after staking, before
+        // the next reward state is indexed.
         if (
             userIndexOfLastClaimedReward[tokenAddress][user] >=
             latestRewardIndex[tokenAddress]
         ) {
             return 0;
         }
+
         uint256 accumDelta =
             syntheticRewardParams[tokenAddress][latestRewardIndex[tokenAddress]]
                 .accumulativeFloatPerToken
@@ -257,7 +319,6 @@ contract Staker is IStaker, Initializable {
 
     function mintAccumulatedFloat(address tokenAddress, address user) internal {
         uint256 floatToMint = calculateAccumulatedFloat(tokenAddress, user);
-        // Set the user has claimed up until now.
 
         if (floatToMint > 0) {
             // stops them setting this forward
