@@ -6,12 +6,16 @@ var Dotenv = require("dotenv");
 var AuthHook = require("./AuthHook.bs.js");
 var Pervasives = require("bs-platform/lib/js/pervasives.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
+var UserManager = require("./UserManager.bs.js");
 
 Dotenv.config();
 
 var app = Serbet.application(Belt_Option.getWithDefault(Belt_Option.flatMap(process.env.PORT, Pervasives.int_of_string_opt), 9898), {
-      hd: AuthHook.endpoint,
-      tl: /* [] */0
+      hd: UserManager.createUser,
+      tl: {
+        hd: AuthHook.endpoint,
+        tl: /* [] */0
+      }
     });
 
 exports.app = app;
