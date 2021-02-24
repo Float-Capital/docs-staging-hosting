@@ -42,7 +42,8 @@
     "res:clean": "bsb -clean-world",
     "res:start": "bsb -make-world -w",
     "dev": "npm-run-all --parallel res:start next:dev",
-    "updateSchema": "get-graphql-schema https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital -j > graphql_schema.json"
+    "updateSchema": "get-graphql-schema https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital -j > graphql_schema.json",
+    "update-testnet-ui": "cd .. && node scripts/deployments.js > dapp/src/contractAddresses.json ; cd dapp && yarn updateSchema ; yarn res:build"
   },
   "devDependencies": {
     "@apollo/client": "^3.3.7",

@@ -12,7 +12,8 @@
     "deploy-mainnet": "graph deploy avolabs-io/float-capital --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
     "deploy-local": "graph deploy avolabs-io/float-capital --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.ganache.yaml",
     "deploy-binance-test": "graph deploy avolabs-io/float-capital --ipfs http://test.graph.float.capital:5001 --node http://test.graph.float.capital:8020 ./subgraph.binance-test.yaml",
-    "deploy-local-binance": "graph deploy avolabs-io/float-capital --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.binance-test.yaml"
+    "deploy-local-binance": "graph deploy avolabs-io/float-capital --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.binance-test.yaml",
+    "update-testnet-graph": "yarn codegen ; cd .. && node ./scripts/graph.js ; cd graph && yarn deploy-binance-test"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.19.0",
