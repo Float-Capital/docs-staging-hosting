@@ -26,7 +26,7 @@ let validateEthSignature = (ethSignature, ethAddress) => {
   let web3 = Web3.make()
   let signersAddress = Web3.ecRecover(
     web3,
-    "flows.finance-signin-string:" ++ ethAddress,
+    "float.capital-signin-string:" ++ ethAddress,
     ethSignature,
   )
   signersAddress == ethAddress
@@ -59,7 +59,10 @@ let endpoint = Serbet.endpoint({
       }
     | _ =>
       Js.log("the login details aren't provided using public")
-      {xHasuraUserId: None, xHasuraRole: "public"}->authResponseToJson->Serbet.Endpoint.OkJson->Js.Promise.resolve
+      {xHasuraUserId: None, xHasuraRole: "public"}
+      ->authResponseToJson
+      ->Serbet.Endpoint.OkJson
+      ->Js.Promise.resolve
     }
   },
 })

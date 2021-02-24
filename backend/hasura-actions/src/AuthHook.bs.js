@@ -6,7 +6,7 @@ var Serbet = require("serbet/src/Serbet.bs.js");
 
 function validateEthSignature(ethSignature, ethAddress) {
   var web3 = new Web3();
-  var signersAddress = web3.eth.accounts.recover("flows.finance-signin-string:" + ethAddress, ethSignature);
+  var signersAddress = web3.eth.accounts.recover("float.capital-signin-string:" + ethAddress, ethSignature);
   return signersAddress === ethAddress;
 }
 
