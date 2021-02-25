@@ -1,8 +1,15 @@
 [
   {
     "anonymous": false,
-    "inputs": [],
-    "name": "DeployV0",
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "floatToken",
+        "type": "address"
+      }
+    ],
+    "name": "DeployV1",
     "type": "event"
   },
   {
@@ -124,6 +131,32 @@
     "type": "event"
   },
   {
+    "inputs": [],
+    "name": "K_FACTOR_INITIAL",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "K_FACTOR_PERIOD",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -150,22 +183,22 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "longTokenAddress",
+        "name": "longToken",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "shortTokenAddress",
+        "name": "shortToken",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "longTokenPrice",
+        "name": "longPrice",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "shortTokenPrice",
+        "name": "shortPrice",
         "type": "uint256"
       },
       {
@@ -201,8 +234,23 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "tokenPrice",
+        "name": "longValue",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "shortValue",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isLong",
+        "type": "bool"
       }
     ],
     "name": "calculateFloatPerSecond",
@@ -263,6 +311,19 @@
         "internalType": "contract FloatToken",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "initialTimestamp",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -361,6 +422,24 @@
       }
     ],
     "name": "stakeAndEarnImmediately",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "stakeDirect",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

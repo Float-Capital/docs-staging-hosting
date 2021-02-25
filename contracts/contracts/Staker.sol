@@ -61,7 +61,7 @@ contract Staker is IStaker, Initializable {
     /////////// EVENTS /////////////////
     ////////////////////////////////////
 
-    event DeployV0();
+    event DeployV1(address floatToken);
 
     event StateAdded(
         address tokenAddress,
@@ -118,6 +118,8 @@ contract Staker is IStaker, Initializable {
         initialTimestamp = block.timestamp;
         floatContract = LongShort(_floatContract);
         floatToken = FloatToken(_floatToken);
+
+        emit DeployV1(_floatToken);
     }
 
     ////////////////////////////////////
