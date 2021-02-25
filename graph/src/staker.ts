@@ -124,6 +124,8 @@ export function handleStakeAdded(event: StakeAdded): void {
   currentStake.currentStake = stake.id;
   currentStake.lastMintState = state.id;
 
+  syntheticToken.totalStaked = syntheticToken.totalStaked.plus(amount);
+
   stake.save();
   currentStake.save();
   user.save();
@@ -166,6 +168,9 @@ export function handleStakeWithdrawn(event: StakeWithdrawn): void {
   }
   oldStake.withdrawn = true;
 
+  syntheticToken.totalStaked = syntheticToken.totalStaked.minus(amount);
+
+  syntheticToken.save();
   oldStake.save();
   currentStake.save();
 }

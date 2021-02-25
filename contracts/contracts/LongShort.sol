@@ -807,11 +807,12 @@ contract LongShort is ILongShort, Initializable {
         external
         refreshSystemState(marketIndex)
     {
-        _mintLong(marketIndex, amount, msg.sender, address(staker));
+        uint256 tokensMinted =
+            _mintLong(marketIndex, amount, msg.sender, address(staker));
 
         staker.stakeTransferredTokens(
             address(longTokens[marketIndex]),
-            amount,
+            tokensMinted,
             msg.sender
         );
     }
@@ -823,11 +824,12 @@ contract LongShort is ILongShort, Initializable {
         external
         refreshSystemState(marketIndex)
     {
-        _mintShort(marketIndex, amount, msg.sender, address(staker));
+        uint256 tokensMinted =
+            _mintShort(marketIndex, amount, msg.sender, address(staker));
 
         staker.stakeTransferredTokens(
             address(shortTokens[marketIndex]),
-            amount,
+            tokensMinted,
             msg.sender
         );
     }
@@ -837,7 +839,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 amount,
         address user,
         address transferTo
-    ) internal {
+    ) internal returns (uint256) {
         // Deposit funds and compute fees.
         _depositFunds(marketIndex, amount);
         uint256 fees = _getFeesForAction(marketIndex, amount, true, true);
@@ -869,6 +871,7 @@ contract LongShort is ILongShort, Initializable {
             longValue[marketIndex],
             shortValue[marketIndex]
         );
+        return tokens;
     }
 
     function _mintShort(
@@ -876,7 +879,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 amount,
         address user,
         address transferTo
-    ) internal {
+    ) internal returns (uint256) {
         // Deposit funds and compute fees.
         _depositFunds(marketIndex, amount);
         uint256 fees = _getFeesForAction(marketIndex, amount, true, false);
@@ -908,6 +911,7 @@ contract LongShort is ILongShort, Initializable {
             longValue[marketIndex],
             shortValue[marketIndex]
         );
+        return tokens;
     }
 
     ////////////////////////////////////

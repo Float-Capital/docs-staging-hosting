@@ -70,8 +70,10 @@ module.exports = {
       network_id: 97,
       provider: lazyCreateNetwork(binanceTest),
       gas: 8000000,
-      gasPrice: 50000000000, // 50 gwei
+      gasPrice: 20000000000, // 20 gwei
       skipDryRun: true,
+      networkCheckTimeout: 1000000,
+      timeoutBlocks: 200,
     },
     development: defaultLocalhostNetwork,
     graphTesting: defaultLocalhostNetwork,
