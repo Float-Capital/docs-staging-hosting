@@ -89,6 +89,7 @@ type User @entity {
   id: ID! # ID -> Public address
   address: Bytes!
   totalMintedFloat: BigInt!
+  floatTokenBalance: BigInt!
   tokenBalances: [UserSyntheticTokenBalance!]
 }
 

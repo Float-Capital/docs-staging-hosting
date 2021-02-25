@@ -13,7 +13,7 @@ import {
 } from "../generated/LongShort/LongShort";
 
 import {
-  DeployV0,
+  DeployV1,
   StateAdded,
   StakeAdded,
   StakeWithdrawn,
@@ -47,6 +47,7 @@ import {
   Bytes,
   log,
   dataSource,
+  DataSourceContext,
 } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import {
@@ -56,7 +57,11 @@ import {
   createSyntheticTokenLong,
   createSyntheticTokenShort,
 } from "./utils/globalStateManager";
-import { createNewTokenDataSource } from "./utils/helperFunctions";
+import {
+  createNewTokenDataSource,
+  updateBalanceTransfer,
+  updateBalanceFloatTransfer,
+} from "./utils/helperFunctions";
 import {
   ZERO,
   TEN_TO_THE_18,
@@ -82,61 +87,27 @@ export function handleTransfer(event: TransferEvent): void {
 
   let context = dataSource.context();
   let tokenAddressString = context.getString("contractAddress");
+  let isFloatToken = context.getBoolean("isFloatToken");
 
-  let syntheticToken = SyntheticToken.load(tokenAddressString);
-  if (syntheticToken == null) {
-    log.critical("Token should be defined", []);
-  }
+  if (isFloatToken) {
+    updateBalanceFloatTransfer(fromAddress, amount, true);
+    updateBalanceFloatTransfer(toAddress, amount, false);
+  } else {
+    let syntheticToken = SyntheticToken.load(tokenAddressString);
+    if (syntheticToken == null) {
+      log.critical("Token should be defined", []);
+    }
 
-  let transactionHash = event.transaction.hash.toHex();
-  let transfer = new Transfer(transactionHash);
-  transfer.from = fromAddressString;
-  transfer.to = toAddressString;
-  transfer.value = amount;
-  transfer.token = syntheticToken.id;
-  transfer.save();
+    let transactionHash = event.transaction.hash.toHex();
+    let transfer = new Transfer(transactionHash);
+    transfer.from = fromAddressString;
+    transfer.to = toAddressString;
+    transfer.value = amount;
+    transfer.token = syntheticToken.id;
+    transfer.save();
 
-  // if zero address don't nothing to do.
-  if (fromAddressString != ZERO_ADDRESS) {
-    let fromUser = getOrCreateUser(fromAddress);
-    fromUser.save(); // necessary incase new user.
-
-    let balanceFromObject = getOrCreateBalanceObject(
-      tokenAddressString,
-      fromAddressString
-    );
-    balanceFromObject.tokenBalance = balanceFromObject.tokenBalance.minus(
-      amount
-    );
-
-    // Add to previouslyOwnedTokens if not already there
-    fromUser.tokenBalances =
-      fromUser.tokenBalances.indexOf(balanceFromObject.id) === -1
-        ? fromUser.tokenBalances.concat([balanceFromObject.id])
-        : fromUser.tokenBalances;
-
-    balanceFromObject.save();
-    fromUser.save();
-  }
-
-  // if zero address don't add to user.
-  if (toAddressString != ZERO_ADDRESS) {
-    let toUser = getOrCreateUser(toAddress);
-    toUser.save(); // necessary incase new user.
-
-    let balanceToObject = getOrCreateBalanceObject(
-      tokenAddressString,
-      toAddressString
-    );
-    balanceToObject.tokenBalance = balanceToObject.tokenBalance.plus(amount);
-
-    toUser.tokenBalances =
-      toUser.tokenBalances.indexOf(balanceToObject.id) === -1
-        ? toUser.tokenBalances.concat([balanceToObject.id])
-        : toUser.tokenBalances;
-
-    balanceToObject.save();
-    toUser.save();
+    updateBalanceTransfer(tokenAddressString, fromAddress, amount, true);
+    updateBalanceTransfer(tokenAddressString, toAddress, amount, false);
   }
 
   saveEventToStateChange(
@@ -186,16 +157,6 @@ export function handleFeesLevied(event: FeesLevied): void {
 
   let marketIndex = event.params.marketIndex;
   let totalFees = event.params.totalFees;
-
-  // saveEventToStateChange(
-  //   txHash,
-  //   timestamp,
-  //   blockNumber,
-  //   "FeesLevied",
-  //   bigIntArrayToStringArray([totalFees, longPercentage, shortPercentage]),
-  //   ["totalFees", "longPercentage", "shortPercentage"],
-  //   ["uint256", "uint256", "uint256"]
-  // );
 }
 
 export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
@@ -492,11 +453,20 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
   );
 }
 
-export function handleDeployV0(event: DeployV0): void {
+export function handleDeployV1(event: DeployV1): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
+
+  let floatAddress = event.params.floatToken;
+  //create new float token!!!
+
+  let context = new DataSourceContext();
+  context.setString("contractAddress", floatAddress.toHex());
+  context.setBoolean("isFloatToken", true);
+  erc20.createWithContext(floatAddress, context);
 }
+
 export function handleStateAdded(event: StateAdded): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;

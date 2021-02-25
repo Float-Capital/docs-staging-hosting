@@ -41,6 +41,7 @@ export function getOrCreateUser(address: Bytes): User | null {
     user = new User(address.toHex());
     user.address = address;
     user.totalMintedFloat = ZERO;
+    user.floatTokenBalance = ZERO;
     user.tokenBalances = [];
   }
 

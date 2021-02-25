@@ -70,8 +70,8 @@ dataSources:
         - name: Staker
           file: ./abis/Staker.json
       eventHandlers:
-        - event: DeployV0()
-          handler: handleDeployV0
+        - event: DeployV1(address)
+          handler: handleDeployV1
         - event: StateAdded(address,uint256,uint256,uint256)
           handler: handleStateAdded
         - event: StakeAdded(address,address,uint256,uint256)
