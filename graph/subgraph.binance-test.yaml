@@ -6,7 +6,7 @@ dataSources:
     name: LongShort
     network: binancetest
     source:
-      address: "0xd3D7f98650d7dbDb155eFBB8b7BFB028172b28FC"
+      address: "0x4f4Ab8b99c134EcD58810e164F1865Abbe839A84"
       abi: LongShort
       startBlock: 6397160
     mapping:
@@ -53,7 +53,7 @@ dataSources:
     name: Staker
     network: binancetest
     source:
-      address: "0x18eA194ffC9c4547bE436Cc4041d2665b805bb0C"
+      address: "0xB128254cDaDD77E17578d3E1535D19Fd4c351160"
       abi: Staker
       startBlock: 6397160
     mapping:
