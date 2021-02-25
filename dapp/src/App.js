@@ -3,29 +3,88 @@
 import * as React from "react";
 import * as Config from "./Config.js";
 import * as MainLayout from "./layouts/MainLayout.js";
+import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as Router from "next/router";
 import * as ApolloClient from "rescript-apollo-client/src/ApolloClient.js";
 import * as RootProvider from "./libraries/RootProvider.js";
 import * as Client from "@apollo/client";
 import * as StateChangeMonitor from "./libraries/StateChangeMonitor.js";
+import * as ReasonMLCommunity__ApolloClient from "rescript-apollo-client/src/ReasonMLCommunity__ApolloClient.js";
+import * as ApolloClient__Link_Http_HttpLink from "rescript-apollo-client/src/@apollo/client/link/http/ApolloClient__Link_Http_HttpLink.js";
 import * as ApolloClient__Cache_InMemory_InMemoryCache from "rescript-apollo-client/src/@apollo/client/cache/inmemory/ApolloClient__Cache_InMemory_InMemoryCache.js";
+
+var PageComponent = {};
+
+function chainContextToStr(chain) {
+  if (chain) {
+    return "db";
+  } else {
+    return "graph";
+  }
+}
+
+function createContext(queryType) {
+  return {
+          context: queryType
+        };
+}
+
+function httpLink(uri) {
+  return ApolloClient__Link_Http_HttpLink.make((function (param) {
+                return uri;
+              }), undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+}
+
+var headers = {
+  "eth-address": "0x738edd7F6a625C02030DbFca84885b4De5252903",
+  "eth-signature": "0x169b856dd3650bede1cfcd8fcb0957a0dcc259880e6264b666c521e6bd28f3822183f56d90a440c02b151014bf24d0454ce065a6a30dd6169c388be7f32fe2a41b"
+};
+
+function querySwitcherLink(graphUri, dbUri) {
+  return ReasonMLCommunity__ApolloClient.Link.split((function (operation) {
+                var context = operation.getContext();
+                if (context !== undefined) {
+                  if (context.context) {
+                    console.log("using the DB context!!!");
+                  } else {
+                    console.log("Wrong context");
+                  }
+                } else {
+                  console.log("NO context");
+                }
+                if (context !== undefined && context.context) {
+                  return false;
+                } else {
+                  return true;
+                }
+              }), httpLink(graphUri), ApolloClient__Link_Http_HttpLink.make((function (param) {
+                    return dbUri;
+                  }), undefined, undefined, Caml_option.some(headers), undefined, undefined, undefined, undefined));
+}
+
+function client(graphUri, dbUri) {
+  return ApolloClient.make(undefined, undefined, undefined, Caml_option.some(querySwitcherLink(graphUri, dbUri)), ApolloClient__Cache_InMemory_InMemoryCache.make(undefined, undefined, undefined, undefined, undefined, undefined), undefined, undefined, true, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+}
 
 function App$GraphQl(Props) {
   var children = Props.children;
   var networkId = RootProvider.useChainId(undefined);
-  var client = React.useMemo((function () {
-          var uriLink = networkId !== undefined ? (
-              networkId !== 5 ? (
-                  networkId !== 97 && networkId === 321 ? Config.localhostGraphEndpoint : Config.binancTestnetGraphEndpoint
-                ) : Config.goerliGraphEndpoint
-            ) : Config.binancTestnetGraphEndpoint;
-          return ApolloClient.make(uriLink, undefined, undefined, undefined, ApolloClient__Cache_InMemory_InMemoryCache.make(undefined, undefined, undefined, undefined, undefined, undefined), undefined, undefined, true, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+  var client$1 = React.useMemo((function () {
+          return client(networkId !== undefined ? (
+                        networkId !== 5 ? (
+                            networkId !== 97 && networkId === 321 ? Config.localhostGraphEndpoint : Config.binancTestnetGraphEndpoint
+                          ) : Config.goerliGraphEndpoint
+                      ) : Config.binancTestnetGraphEndpoint, "http://localhost:8080/v1/graphql");
         }), [networkId]);
   return React.createElement(Client.ApolloProvider, {
-              client: client,
+              client: client$1,
               children: children
             });
 }
+
+var GraphQl = {
+  make: App$GraphQl
+};
 
 function $$default(props) {
   Router.useRouter();
@@ -42,6 +101,14 @@ function $$default(props) {
 }
 
 export {
+  PageComponent ,
+  chainContextToStr ,
+  createContext ,
+  httpLink ,
+  headers ,
+  querySwitcherLink ,
+  client ,
+  GraphQl ,
   $$default ,
   $$default as default,
   

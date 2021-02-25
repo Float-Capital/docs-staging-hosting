@@ -18,6 +18,17 @@ let gqlClient = ClientConfig.createInstance(
   (),
 )
 
+type bodyObj = {
+  session_variables: AuthHook.authResponse
+}
+
+@get external getAuthHeaders: Express.Request.t => bodyObj = "body"
+
+let getUsersAddress: Express.Request.t => option<string> = request => { 
+  let {session_variables: {xHasuraUserId}} = request->getAuthHeaders
+  xHasuraUserId
+}
+
 let createUser = Serbet.endpoint({
   verb: POST,
   path: "/create-user",
@@ -25,8 +36,8 @@ let createUser = Serbet.endpoint({
     req.requireBody(value => {
       body_in_decode(value)
     })->JsPromise.map(({input: {usersAddress}}) => {
-      let result = AuthHook.getAuthHeaders(req.req)
-      Js.log(("RESULT", result))
+      let result = getUsersAddress(req.req)
+      Js.log(("Headers", result))
 
       Js.log(`Eth address to register ${usersAddress}`)
 

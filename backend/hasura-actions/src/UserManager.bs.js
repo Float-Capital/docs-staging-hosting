@@ -6,7 +6,6 @@ var Decco = require("decco/src/Decco.bs.js");
 var Serbet = require("serbet/src/Serbet.bs.js");
 var Js_dict = require("bs-platform/lib/js/js_dict.js");
 var Js_json = require("bs-platform/lib/js/js_json.js");
-var AuthHook = require("./AuthHook.bs.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var ClientConfig = require("./gql/ClientConfig.bs.js");
 
@@ -97,14 +96,19 @@ var gqlClient = ClientConfig.createInstance({
       "x-hasura-admin-secret": "testing"
     }, "http://graphql-engine:8080/v1/graphql", undefined);
 
+function getUsersAddress(request) {
+  var match = request.body;
+  return match.session_variables["X-Hasura-User-Id"];
+}
+
 var createUser = Serbet.endpoint(undefined, {
       path: "/create-user",
       verb: /* POST */1,
       handler: (function (req) {
           return Curry._1(req.requireBody, body_in_decode).then(function (param) {
-                      var result = AuthHook.getAuthHeaders(req.req);
+                      var result = getUsersAddress(req.req);
                       console.log([
-                            "RESULT",
+                            "Headers",
                             result
                           ]);
                       console.log("Eth address to register " + param.input.usersAddress);
@@ -126,5 +130,6 @@ exports.usersData_decode = usersData_decode;
 exports.body_in_decode = body_in_decode;
 exports.body_out_encode = body_out_encode;
 exports.gqlClient = gqlClient;
+exports.getUsersAddress = getUsersAddress;
 exports.createUser = createUser;
 /* gqlClient Not a pure module */

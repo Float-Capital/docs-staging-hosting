@@ -42,7 +42,8 @@
     "res:clean": "bsb -clean-world",
     "res:start": "bsb -make-world -w",
     "dev": "npm-run-all --parallel res:start next:dev",
-    "updateSchema": "get-graphql-schema https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital -j > graphql_schema.json"
+    "updateSchema": "get-graphql-schema https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital -j > graphql_schema.json",
+    "updateSchemaGraph": "get-graphql-schema http://localhost:8080/v1/graphql -h 'x-hasura-admin-secret=testing' -j > graphql_schema_db.json"
   },
   "devDependencies": {
     "@apollo/client": "^3.3.7",
@@ -56,7 +57,7 @@
     "postcss": "^8.2.1",
     "postcss-cli": "^8.3.1",
     "reason-react": "^0.9.1",
-    "rescript-apollo-client": "^1.1.0",
+    "rescript-apollo-client": "^1.1.1",
     "tailwindcss": "^2.0.2",
     "yarn": "^1.22.10"
   }

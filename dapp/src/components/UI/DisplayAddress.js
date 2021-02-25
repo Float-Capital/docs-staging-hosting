@@ -2,7 +2,7 @@
 
 import * as $$String from "bs-platform/lib/es6/string.js";
 
-function elipsifyMiddle(inputString, maxLength, trailingCharacters) {
+function ellipsifyMiddle(inputString, maxLength, trailingCharacters) {
   var stringLength = inputString.length;
   if (stringLength > maxLength && (trailingCharacters + maxLength | 0) < stringLength) {
     return $$String.sub(inputString, 0, maxLength - 3 | 0) + "..." + $$String.sub(inputString, Math.abs(stringLength - trailingCharacters | 0), trailingCharacters);
@@ -12,13 +12,13 @@ function elipsifyMiddle(inputString, maxLength, trailingCharacters) {
 }
 
 function DisplayAddress(Props) {
-  return elipsifyMiddle(Props.address, 9, 3);
+  return ellipsifyMiddle(Props.address, 8, 3);
 }
 
 var make = DisplayAddress;
 
 export {
-  elipsifyMiddle ,
+  ellipsifyMiddle ,
   make ,
   
 }

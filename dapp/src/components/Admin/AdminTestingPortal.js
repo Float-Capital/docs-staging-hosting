@@ -6,7 +6,8 @@ import * as React from "react";
 import * as Ethers from "ethers";
 import * as Globals from "../../libraries/Globals.js";
 import * as MintDai from "./MintDai.js";
-import * as Queries from "../../libraries/Queries.js";
+import * as Queries from "../../data/Queries.js";
+import * as AuthTest from "../Testing/AuthTest.js";
 import * as MintLong from "./MintLong.js";
 import * as MintShort from "./MintShort.js";
 import * as ApproveDai from "./ApproveDai.js";
@@ -14,7 +15,6 @@ import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as RedeemSynth from "./RedeemSynth.js";
-import * as ActiveStakes from "./ActiveStakes.js";
 import * as MintAndStake from "./MintAndStake.js";
 import * as RootProvider from "../../libraries/RootProvider.js";
 
@@ -173,7 +173,7 @@ function AdminTestingPortal$AdminActions(Props) {
                                                             }))));
                                     }))) : "You might think this is impossible, but depending on the situation it might not be!"
                       )
-                  ), React.createElement("hr", undefined), React.createElement("div", undefined, React.createElement("h1", undefined, "Users active stakes"), React.createElement(ActiveStakes.make, {}))));
+                  ), React.createElement("hr", undefined), React.createElement("div", undefined, React.createElement("h1", undefined, "Test Login"), React.createElement(AuthTest.make, {}))));
 }
 
 var AdminActions = {

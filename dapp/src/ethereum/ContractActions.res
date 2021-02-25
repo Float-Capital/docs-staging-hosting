@@ -36,6 +36,9 @@ let useProviderOrSigner = () => {
   , (context.library, context.account))
 }
 let useProviderOrSignerExn = () => useProviderOrSigner()->Option.getExn
+@ocaml.doc(`
+Get the signer for the current user if they exist
+`)
 let useSigner: unit => option<Ethers.Wallet.t> = () => {
   switch useProviderOrSigner() {
   | Some(Ethers.Provider(_))
@@ -44,6 +47,9 @@ let useSigner: unit => option<Ethers.Wallet.t> = () => {
   | Some(Ethers.Signer(signer)) => Some(signer)
   }
 }
+@ocaml.doc(`
+Get the signer for the current user and throw an exception if it doesn't exist
+`)
 let useSignerExn = () => useSigner()->Option.getExn
 
 type transactionState =
@@ -85,19 +91,20 @@ let useContractFunction = (~signer: Ethers.Wallet.t) => {
         ))->Obj.magic
       })
 
-      let _ = mintPromise
-      ->JsPromise.then(tx => {
-        setTxState(_ => SignedAndSubmitted(tx.hash))
-        tx.wait(.)
-      })
-      ->JsPromise.map(txOutcome => {
-        Js.log(txOutcome)
-        setTxState(_ => Complete(txOutcome))
-      })
-      ->JsPromise.catch(error => {
-        setTxState(_ => Failed)
-        Js.log(error)
-      })
+      let _ =
+        mintPromise
+        ->JsPromise.then(tx => {
+          setTxState(_ => SignedAndSubmitted(tx.hash))
+          tx.wait(.)
+        })
+        ->JsPromise.map(txOutcome => {
+          Js.log(txOutcome)
+          setTxState(_ => Complete(txOutcome))
+        })
+        ->JsPromise.catch(error => {
+          setTxState(_ => Failed)
+          Js.log(error)
+        })
     },
     txState,
     setTxState,

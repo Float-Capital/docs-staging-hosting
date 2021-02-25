@@ -26,16 +26,14 @@ let validateEthSignature = (ethSignature, ethAddress) => {
   let web3 = Web3.make()
   let signersAddress = Web3.ecRecover(
     web3,
-    "float.capital-signin-string:" ++ ethAddress,
+    `float.capital-signin-string:${ethAddress}`,
     ethSignature,
   )
   signersAddress == ethAddress
 }
 
-// NOT typesafe, but there is a level of trust from hasura :)
-let getAuthHeaders: Express.Request.t => authInput = %raw(`
-  (req) => req.body
-`)
+@get external getAuthHeaders: Express.Request.t => authInput = "body"
+
 let getJwt: Express.Request.t => string = %raw(`(req) => req.jwt`)
 
 let authResponseToJson: authResponse => Js.Json.t = Obj.magic

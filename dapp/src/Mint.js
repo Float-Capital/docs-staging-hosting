@@ -5,7 +5,7 @@ import * as Login from "./components/Login/Login.js";
 import * as React from "react";
 import * as Loader from "./components/UI/Loader.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
-import * as Queries from "./libraries/Queries.js";
+import * as Queries from "./data/Queries.js";
 import * as Belt_Int from "bs-platform/lib/es6/belt_Int.js";
 import * as MintForm from "./components/Trade/MintForm.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";

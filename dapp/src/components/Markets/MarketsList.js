@@ -4,7 +4,7 @@ import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as Login from "../Login/Login.js";
 import * as React from "react";
 import * as Button from "../UI/Button.js";
-import * as Queries from "../../libraries/Queries.js";
+import * as Queries from "../../data/Queries.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as MiniLoader from "../UI/MiniLoader.js";
 import * as FormatMoney from "../UI/FormatMoney.js";

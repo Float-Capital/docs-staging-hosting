@@ -10,8 +10,6 @@ function validateEthSignature(ethSignature, ethAddress) {
   return signersAddress === ethAddress;
 }
 
-var getAuthHeaders = ((req) => req.body);
-
 var getJwt = ((req) => req.jwt);
 
 function authResponseToJson(prim) {
@@ -22,7 +20,7 @@ var endpoint = Serbet.endpoint(undefined, {
       path: "/auth",
       verb: /* POST */1,
       handler: (function (req) {
-          var match = getAuthHeaders(req.req);
+          var match = req.req.body;
           var match$1 = match.headers;
           var ethAddress = match$1["eth-address"];
           var ethSignature = match$1["eth-signature"];
@@ -55,7 +53,6 @@ var endpoint = Serbet.endpoint(undefined, {
     });
 
 exports.validateEthSignature = validateEthSignature;
-exports.getAuthHeaders = getAuthHeaders;
 exports.getJwt = getJwt;
 exports.authResponseToJson = authResponseToJson;
 exports.endpoint = endpoint;
