@@ -21,6 +21,7 @@ export function createNewTokenDataSource(address: Address): void {
   context.setBoolean("isFloatToken", false);
   erc20.createWithContext(address, context);
 }
+
 export function updateBalanceTransfer(
   tokenAddressString: string,
   userAddress: Address,

@@ -47,7 +47,7 @@ dataSources:
           handler: handleTokenPriceRefreshed
         - event: ValueLockedInSystem(uint256,uint256,uint256,uint256,uint256)
           handler: handleValueLockedInSystem
-      file: ./src/mapping.ts
+      file: ./src/float.ts
 
   - kind: ethereum/contract
     name: Staker
@@ -80,7 +80,7 @@ dataSources:
           handler: handleStakeWithdrawn
         - event: FloatMinted(address,address,uint256,uint256)
           handler: handleFloatMinted
-      file: ./src/mapping.ts
+      file: ./src/staker.ts
 
 templates:
   - kind: ethereum/contract
@@ -101,4 +101,4 @@ templates:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-      file: ./src/mapping.ts
+      file: ./src/tokenTransfers.ts
