@@ -72,7 +72,7 @@ export function handleStateAdded(event: StateAdded): void {
     // The first state - set floatRatePerSecondOverInterval to zero
     state.floatRatePerSecondOverInterval = ZERO;
   } else {
-    let prevState = new State(
+    let prevState = State.load(
       tokenAddressString + "-" + stateIndex.minus(ONE).toString()
     );
     if (prevState == null) {
