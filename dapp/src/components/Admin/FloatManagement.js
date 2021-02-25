@@ -24,8 +24,12 @@ function FloatManagement(Props) {
         undefined,
         undefined,
         {
-          userId: Globals.ethAdrToStr(user)
+          userId: Globals.ethAdrToLowerStr(user)
         }
+      ]);
+  console.log([
+        "Query",
+        userQuery
       ]);
   var match = userQuery.data;
   var tmp;

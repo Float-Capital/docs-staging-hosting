@@ -3,8 +3,9 @@ open Globals
 @react.component
 let make = () => {
   let user = RootProvider.useCurrentUserExn()
-  let userQuery = Queries.UsersState.use({userId: user->ethAdrToStr})
+  let userQuery = Queries.UsersState.use({userId: user->ethAdrToLowerStr})
 
+  Js.log(("Query", userQuery))
   <div>
     {switch userQuery {
     | {data: Some({user: Some({totalMintedFloat})})} =>
