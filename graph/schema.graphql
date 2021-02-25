@@ -67,6 +67,7 @@ type SyntheticToken @entity {
   syntheticMarket: SyntheticMarket!
   tokenType: TokenType!
   totalStaked: BigInt!
+  tokenSupply: BigInt!
   floatMintedFromSpecificToken: BigInt!
 }
 
@@ -91,6 +92,7 @@ type User @entity {
   totalMintedFloat: BigInt!
   floatTokenBalance: BigInt!
   tokenBalances: [UserSyntheticTokenBalance!]
+  tokenMints: [UserSyntheticTokenMinted!]
 }
 
 type UserSyntheticTokenBalance @entity {
@@ -98,6 +100,13 @@ type UserSyntheticTokenBalance @entity {
   syntheticToken: SyntheticToken!
   user: User!
   tokenBalance: BigInt!
+}
+
+type UserSyntheticTokenMinted @entity {
+  id: ID! # token address - user address - "minted"
+  syntheticToken: SyntheticToken!
+  user: User!
+  tokensMinted: BigInt!
 }
 
 type CurrentStake @entity {

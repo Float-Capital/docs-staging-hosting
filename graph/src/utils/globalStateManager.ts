@@ -43,6 +43,7 @@ export function getOrCreateUser(address: Bytes): User | null {
     user.totalMintedFloat = ZERO;
     user.floatTokenBalance = ZERO;
     user.tokenBalances = [];
+    user.tokenMints = [];
   }
 
   return user;
@@ -82,6 +83,7 @@ export function createSyntheticToken(
     syntheticToken = new SyntheticToken(tokenAddressString);
     syntheticToken.tokenAddress = tokenAddress;
     syntheticToken.totalStaked = ZERO;
+    syntheticToken.tokenSupply = ZERO;
     syntheticToken.floatMintedFromSpecificToken = ZERO;
   }
   return syntheticToken;

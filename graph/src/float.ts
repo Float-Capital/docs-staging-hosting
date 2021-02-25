@@ -22,6 +22,7 @@ import {
   Staker,
   TokenFactory,
   LongShortContract,
+  UserSyntheticTokenMinted,
   SyntheticToken,
   CurrentStake,
   Stake,
@@ -37,7 +38,10 @@ import {
   createSyntheticTokenLong,
   createSyntheticTokenShort,
 } from "./utils/globalStateManager";
-import { createNewTokenDataSource } from "./utils/helperFunctions";
+import {
+  createNewTokenDataSource,
+  increaseUserMints,
+} from "./utils/helperFunctions";
 import {
   ZERO,
   TEN_TO_THE_18,
@@ -194,7 +198,12 @@ export function handleLongMinted(event: LongMinted): void {
   let depositAdded = event.params.depositAdded;
   let finalDepositAmount = event.params.finalDepositAmount;
   let tokensMinted = event.params.tokensMinted;
-  let user = event.params.user;
+  let userAddress = event.params.user;
+
+  let market = SyntheticMarket.load(marketIndex.toString());
+  let syntheticToken = SyntheticToken.load(market.syntheticLong);
+
+  increaseUserMints(userAddress, syntheticToken, tokensMinted);
 
   saveEventToStateChange(
     txHash,
@@ -205,7 +214,7 @@ export function handleLongMinted(event: LongMinted): void {
       depositAdded,
       finalDepositAmount,
       tokensMinted,
-    ]).concat([user.toHex()]),
+    ]).concat([userAddress.toHex()]),
     ["depositAdded", "finalDepositAmount", "tokensMinted", "user"],
     ["uint256", "uint256", "uint256", "address"]
   );
@@ -282,7 +291,12 @@ export function handleShortMinted(event: ShortMinted): void {
   let depositAdded = event.params.depositAdded;
   let finalDepositAmount = event.params.finalDepositAmount;
   let tokensMinted = event.params.tokensMinted;
-  let user = event.params.user;
+  let userAddress = event.params.user;
+
+  let market = SyntheticMarket.load(marketIndex.toString());
+  let syntheticToken = SyntheticToken.load(market.syntheticShort);
+
+  increaseUserMints(userAddress, syntheticToken, tokensMinted);
 
   saveEventToStateChange(
     txHash,
@@ -293,7 +307,7 @@ export function handleShortMinted(event: ShortMinted): void {
       depositAdded,
       finalDepositAmount,
       tokensMinted,
-    ]).concat([user.toHex()]),
+    ]).concat([userAddress.toHex()]),
     ["depositAdded", "finalDepositAmount", "tokensMinted", "user"],
     ["uint256", "uint256", "uint256", "address"]
   );

@@ -14,6 +14,10 @@ import {
   getOrCreateUser,
   getOrCreateBalanceObject,
 } from "./globalStateManager";
+import {
+  SyntheticToken,
+  UserSyntheticTokenMinted,
+} from "../../generated/schema";
 
 export function createNewTokenDataSource(address: Address): void {
   let context = new DataSourceContext();
@@ -56,6 +60,16 @@ export function updateBalanceTransfer(
 
     balanceFromObject.save();
     user.save();
+  } else {
+    let token = SyntheticToken.load(tokenAddressString);
+
+    if (send) {
+      token.tokenSupply = token.tokenSupply.plus(amount);
+    } else {
+      token.tokenSupply = token.tokenSupply.minus(amount);
+    }
+
+    token.save();
   }
 }
 
@@ -73,4 +87,38 @@ export function updateBalanceFloatTransfer(
     }
     user.save();
   }
+}
+
+export function increaseUserMints(
+  userAddress: Address,
+  syntheticToken: SyntheticToken | null,
+  tokensMinted: BigInt // user sending or receiving
+): void {
+  //load user
+  let user = getOrCreateUser(userAddress);
+  let userAddressString = user.address.toHex();
+  let tokenAddressString = syntheticToken.tokenAddress.toHex();
+
+  let minted = UserSyntheticTokenMinted.load(
+    tokenAddressString + "-" + userAddressString + "-minted"
+  );
+  if (minted == null) {
+    minted = new UserSyntheticTokenMinted(
+      tokenAddressString + "-" + userAddressString + "-minted"
+    );
+    minted.user = user.id;
+    minted.syntheticToken = syntheticToken.id;
+    minted.tokensMinted = ZERO;
+  }
+
+  minted.tokensMinted = minted.tokensMinted.plus(tokensMinted);
+
+  // Add to previouslyOwnedTokens if not already there
+  user.tokenMints =
+    user.tokenMints.indexOf(minted.id) === -1
+      ? user.tokenMints.concat([minted.id])
+      : user.tokenMints;
+
+  user.save();
+  minted.save();
 }
