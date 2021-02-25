@@ -28,7 +28,7 @@ import {
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import { getOrCreateUser } from "./utils/globalStateManager";
 
-import { ZERO, TEN_TO_THE_18, GLOBAL_STATE_ID } from "./CONSTANTS";
+import { ZERO, ONE, TEN_TO_THE_18, GLOBAL_STATE_ID } from "./CONSTANTS";
 
 export function handleDeployV1(event: DeployV1): void {
   let txHash = event.transaction.hash;
@@ -67,6 +67,38 @@ export function handleStateAdded(event: StateAdded): void {
   state.timestamp = timestamp;
   state.syntheticToken = syntheticToken.id;
   state.accumulativeFloatPerSecond = accumulativeFloatPerSecond;
+
+  if (stateIndex.equals(ZERO)) {
+    // The first state - set floatRatePerSecondOverInterval to zero
+    state.floatRatePerSecondOverInterval = ZERO;
+  } else {
+    let prevState = State.load(
+      tokenAddressString + "-" + stateIndex.minus(ONE).toString()
+    );
+    if (prevState == null) {
+      log.critical("There is no previous state for token {} at address {}", [
+        stateIndex.minus(ONE).toString(),
+        tokenAddressString,
+      ]);
+    }
+    let timeElapsedSinceLastStateChange = state.timestamp.minus(
+      prevState.timestamp
+    );
+    let changeInAccumulativeFloatPerSecond = state.accumulativeFloatPerSecond.minus(
+      prevState.accumulativeFloatPerSecond
+    );
+
+    if (
+      // NOTE: This hapens if two staking state changes happen in the same block.
+      timeElapsedSinceLastStateChange.equals(changeInAccumulativeFloatPerSecond)
+    ) {
+      state.floatRatePerSecondOverInterval = ZERO;
+    } else {
+      state.floatRatePerSecondOverInterval = changeInAccumulativeFloatPerSecond.div(
+        timeElapsedSinceLastStateChange
+      );
+    }
+  }
 
   syntheticToken.save();
   state.save();
