@@ -365,6 +365,11 @@ contract Staker is IStaker, Initializable {
         }
     }
 
+    function claimFloatImmediately(address tokenAddress) external {
+        floatContract._updateSystemState(marketIndexOfToken[tokenAddress]);
+        mintAccumulatedFloat(tokenAddress, msg.sender);
+    }
+
     ////////////////////////////////////
     /////////// STAKING ////////////////
     ////////////////////////////////////
