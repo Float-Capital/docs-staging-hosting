@@ -41,14 +41,22 @@ import {
   State,
   Transfer,
 } from "../generated/schema";
-import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
+import {
+  BigInt,
+  Address,
+  Bytes,
+  log,
+  dataSource,
+} from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import {
   getOrCreateLatestSystemState,
   getOrCreateUser,
+  getOrCreateBalanceObject,
   createSyntheticTokenLong,
   createSyntheticTokenShort,
 } from "./utils/globalStateManager";
+import { createNewTokenDataSource } from "./utils/helperFunctions";
 import {
   ZERO,
   TEN_TO_THE_18,
@@ -58,6 +66,7 @@ import {
   STAKER_ID,
   TOKEN_FACTORY_ID,
   LONG_SHORT_ID,
+  ZERO_ADDRESS,
 } from "./CONSTANTS";
 
 export function handleTransfer(event: TransferEvent): void {
@@ -65,19 +74,77 @@ export function handleTransfer(event: TransferEvent): void {
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
 
+  let fromAddress = event.params.from;
+  let fromAddressString = fromAddress.toHex();
+  let toAddress = event.params.to;
+  let toAddressString = toAddress.toHex();
+  let amount = event.params.value;
+
+  let context = dataSource.context();
+  let tokenAddressString = context.getString("contractAddress");
+
+  let syntheticToken = SyntheticToken.load(tokenAddressString);
+  if (syntheticToken == null) {
+    log.critical("Token should be defined", []);
+  }
+
   let transactionHash = event.transaction.hash.toHex();
   let transfer = new Transfer(transactionHash);
-  transfer.from = event.params.from.toHex();
-  transfer.to = event.params.to.toHex();
-  transfer.value = event.params.value;
+  transfer.from = fromAddressString;
+  transfer.to = toAddressString;
+  transfer.value = amount;
+  transfer.token = syntheticToken.id;
   transfer.save();
+
+  // if zero address don't nothing to do.
+  if (fromAddressString != ZERO_ADDRESS) {
+    let fromUser = getOrCreateUser(fromAddress);
+    fromUser.save(); // necessary incase new user.
+
+    let balanceFromObject = getOrCreateBalanceObject(
+      tokenAddressString,
+      fromAddressString
+    );
+    balanceFromObject.tokenBalance = balanceFromObject.tokenBalance.minus(
+      amount
+    );
+
+    // Add to previouslyOwnedTokens if not already there
+    fromUser.tokenBalances =
+      fromUser.tokenBalances.indexOf(balanceFromObject.id) === -1
+        ? fromUser.tokenBalances.concat([balanceFromObject.id])
+        : fromUser.tokenBalances;
+
+    balanceFromObject.save();
+    fromUser.save();
+  }
+
+  // if zero address don't add to user.
+  if (toAddressString != ZERO_ADDRESS) {
+    let toUser = getOrCreateUser(toAddress);
+    toUser.save(); // necessary incase new user.
+
+    let balanceToObject = getOrCreateBalanceObject(
+      tokenAddressString,
+      toAddressString
+    );
+    balanceToObject.tokenBalance = balanceToObject.tokenBalance.plus(amount);
+
+    toUser.tokenBalances =
+      toUser.tokenBalances.indexOf(balanceToObject.id) === -1
+        ? toUser.tokenBalances.concat([balanceToObject.id])
+        : toUser.tokenBalances;
+
+    balanceToObject.save();
+    toUser.save();
+  }
 
   saveEventToStateChange(
     txHash,
     timestamp,
     blockNumber,
     "Transfer",
-    ["value"],
+    [tokenAddressString],
     ["name"],
     ["type"]
   );
@@ -178,8 +245,9 @@ export function handleSyntheticTokenCreated(
 
   let marketIndexString = marketIndex.toString();
 
-  erc20.create(longTokenAddress);
-  erc20.create(shortTokenAddress);
+  // TODO: Add string name to these.
+  createNewTokenDataSource(longTokenAddress);
+  createNewTokenDataSource(shortTokenAddress);
 
   // create new synthetic token object.
   let longToken = createSyntheticTokenLong(longTokenAddress);
@@ -489,12 +557,12 @@ export function handleStakeAdded(event: StakeAdded): void {
   stake.withdrawn = false;
 
   let currentStake = CurrentStake.load(
-    tokenAddressString + "-" + userAddressString
+    tokenAddressString + "-" + userAddressString + "-currentStake"
   );
   if (currentStake == null) {
     // They won't have a current stake.
     currentStake = new CurrentStake(
-      tokenAddressString + "-" + userAddressString
+      tokenAddressString + "-" + userAddressString + "-currentStake"
     );
     currentStake.user = user.id;
     currentStake.userAddress = user.address;
@@ -530,7 +598,7 @@ export function handleStakeWithdrawn(event: StakeWithdrawn): void {
   let user = getOrCreateUser(userAddress);
   let syntheticToken = SyntheticToken.load(tokenAddressString);
   let currentStake = CurrentStake.load(
-    tokenAddressString + "-" + userAddressString
+    tokenAddressString + "-" + userAddressString + "-currentStake"
   );
   if (currentStake == null) {
     log.critical("Stake should be defined", []);
@@ -581,7 +649,7 @@ export function handleFloatMinted(event: FloatMinted): void {
   user.totalMintedFloat = user.totalMintedFloat.plus(amount);
 
   let currentStake = CurrentStake.load(
-    tokenAddressString + "-" + userAddressString
+    tokenAddressString + "-" + userAddressString + "-currentStake"
   );
   currentStake.lastMintState = state.id;
 

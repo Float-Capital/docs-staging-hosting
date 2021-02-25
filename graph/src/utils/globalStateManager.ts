@@ -5,6 +5,7 @@ import {
   GlobalState,
   User,
   SyntheticToken,
+  UserSyntheticTokenBalance,
 } from "../../generated/schema";
 import { BigInt, Address, Bytes, log, ethereum } from "@graphprotocol/graph-ts";
 import { ZERO } from "../CONSTANTS";
@@ -40,9 +41,35 @@ export function getOrCreateUser(address: Bytes): User | null {
     user = new User(address.toHex());
     user.address = address;
     user.totalMintedFloat = ZERO;
+    user.tokenBalances = [];
   }
 
   return user;
+}
+
+export function getOrCreateBalanceObject(
+  tokenAddressString: string,
+  userAddressString: string
+): UserSyntheticTokenBalance | null {
+  let balance = UserSyntheticTokenBalance.load(
+    tokenAddressString + "-" + userAddressString + "-balance"
+  );
+
+  if (balance == null) {
+    balance = new UserSyntheticTokenBalance(
+      tokenAddressString + "-" + userAddressString + "-balance"
+    );
+
+    let user = User.load(userAddressString);
+    balance.user = user.id;
+
+    let token = SyntheticToken.load(tokenAddressString);
+    balance.syntheticToken = token.id;
+
+    balance.tokenBalance = ZERO;
+  }
+
+  return balance;
 }
 
 export function createSyntheticToken(
