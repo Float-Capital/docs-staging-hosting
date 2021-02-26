@@ -26,12 +26,13 @@ let validateEthSignature = (ethSignature, ethAddress) => {
   open Web3Stuff
 
   let web3 = Web3.make()
+  let checksumAddress = Web3.toChecksumAddress(web3, ethAddress)
   let signersAddress = Web3.ecRecover(
     web3,
-    `float.capital-signin-string:${ethAddress}`,
+    `float.capital-signin-string:${checksumAddress}`,
     ethSignature,
   )
-  signersAddress == ethAddress
+  signersAddress == checksumAddress
 }
 
 @get external getAuthHeaders: Express.Request.t => authInput = "body"
@@ -50,7 +51,7 @@ let endpoint = Serbet.endpoint({
     | (Some(ethSignature), Some(ethAddress)) =>
       Js.log(`Signing in with ${ethSignature} and ${ethAddress}`)
       if validateEthSignature(ethSignature, ethAddress) {
-        {xHasuraUserId: Some(ethAddress), xHasuraRole: "user"}
+        {xHasuraUserId: Some(ethAddress->Js.String2.toLowerCase), xHasuraRole: "user"}
         ->authResponseToJson
         ->Serbet.Endpoint.OkJson
         ->Js.Promise.resolve

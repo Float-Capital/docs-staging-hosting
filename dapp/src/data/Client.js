@@ -27,19 +27,14 @@ function httpLink(uri) {
               }), undefined, undefined, undefined, undefined, undefined, undefined, undefined);
 }
 
-var defaultHeaders = {
-  "eth-address": undefined,
-  "eth-signature": undefined
-};
-
 function setSignInData(ethAddress, ethSignature) {
   localStorage.setItem(ethAddress, ethSignature);
   
 }
 
-function getHeaders(user) {
+function getAuthHeaders(user) {
   if (user === undefined) {
-    return defaultHeaders;
+    return ;
   }
   var u = Caml_option.valFromOption(user);
   var getUserSignature = function (__x) {
@@ -48,15 +43,15 @@ function getHeaders(user) {
   var uS = getUserSignature(localStorage);
   if (uS !== undefined) {
     return {
-            "eth-address": Ethers.Utils.ethAdrToStr(u),
+            "eth-address": Ethers.Utils.ethAdrToLowerStr(u),
             "eth-signature": uS
           };
-  } else {
-    return defaultHeaders;
   }
+  
 }
 
 function querySwitcherLink(graphUri, dbUri, user) {
+  var headers = getAuthHeaders(user);
   return ReasonMLCommunity__ApolloClient.Link.split((function (operation) {
                 var context = operation.getContext();
                 if (context !== undefined && context.context) {
@@ -66,7 +61,9 @@ function querySwitcherLink(graphUri, dbUri, user) {
                 }
               }), httpLink(graphUri), ApolloClient__Link_Http_HttpLink.make((function (param) {
                     return dbUri;
-                  }), undefined, undefined, Caml_option.some(getHeaders(user)), undefined, undefined, undefined, undefined));
+                  }), undefined, undefined, Caml_option.some(headers !== undefined ? headers : (function (prim) {
+                          return {};
+                        })), undefined, undefined, undefined, undefined));
 }
 
 function makeClient(graphUri, dbUri, user) {
@@ -77,9 +74,8 @@ export {
   chainContextToStr ,
   createContext ,
   httpLink ,
-  defaultHeaders ,
   setSignInData ,
-  getHeaders ,
+  getAuthHeaders ,
   querySwitcherLink ,
   makeClient ,
   

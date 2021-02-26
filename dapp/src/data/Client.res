@@ -20,26 +20,21 @@ let httpLink = (~uri) => ApolloClient.Link.HttpLink.make(~uri=_ => uri, ())
 
 type clientHeaders = {
     @as("eth-address")
-    ethAddress: option<string>,
+    ethAddress: string,
     @as("eth-signature")
-    ethSignature: option<string>
-}
-
-let defaultHeaders = {
-    ethAddress: None,
-    ethSignature: None
+    ethSignature: string,
 }
 
 let setSignInData = (~ethAddress: string, ~ethSignature: string) => Dom.Storage2.localStorage->Dom.Storage2.setItem(ethAddress, ethSignature)
 
-let getHeaders = (~user) => {
+let getAuthHeaders = (~user) => {
     switch(user){
-      | None => defaultHeaders
+      | None => None
       | Some(u) => {
           let getUserSignature = Dom.Storage2.getItem(_, u->ethAdrToLowerStr)
           switch(getUserSignature(Dom.Storage2.localStorage)){
-            | None => defaultHeaders
-            | Some(uS) => {ethAddress: Some(u->ethAdrToStr), ethSignature: Some(uS)}
+            | None => None
+            | Some(uS) => Some({ethAddress: u->ethAdrToLowerStr, ethSignature: uS})
           }
       }
     }
@@ -48,7 +43,6 @@ let getHeaders = (~user) => {
 
 let querySwitcherLink = (~graphUri, ~dbUri, ~user ) => ApolloClient.Link.split(~test=operation => {
     let context = operation->getContext
-
     switch context {
     | Some({context}) =>
       switch context {
@@ -57,9 +51,15 @@ let querySwitcherLink = (~graphUri, ~dbUri, ~user ) => ApolloClient.Link.split(~
       }
     | None => true
     }
+
   }, ~whenTrue=httpLink(
     ~uri=graphUri,
-  ), ~whenFalse=ApolloClient.Link.HttpLink.make(~uri=_ => dbUri, ~headers=getHeaders(~user)->Obj.magic, ()))
+  ), ~whenFalse=ApolloClient.Link.HttpLink.make(~uri=_ => dbUri, ~headers={
+    switch(getAuthHeaders(~user)){
+      | Some(headers) => headers->Obj.magic
+      | None => Js.Obj.empty->Obj.magic
+    }
+  }, ()))
 
 // This sets up session storage caching for SWR
 // SwrPersist.syncWithSessionStorage->Misc.onlyExecuteClientSide

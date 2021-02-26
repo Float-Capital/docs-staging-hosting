@@ -33,6 +33,9 @@ module Web3 = {
   @send @scope(("eth", "accounts"))
   external ecRecover: (t, string, string) => string = "recover";
 
+  @send @scope(("utils"))
+  external toChecksumAddress: (t, string) => string ="toChecksumAddress"
+
 // type ethAddress = string;
 
 // type ethersBigNumber = {toString: (. unit) => string};

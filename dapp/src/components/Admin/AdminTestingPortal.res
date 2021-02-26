@@ -160,7 +160,8 @@ module AdminActions = {
           <div> <h1> {"Users active stakes"->React.string} </h1> <ActiveStakes /> </div>
           <hr />
           <div> <h1> {"Float"->React.string} </h1> <FloatManagement /> </div>
-           <div> <h1> {"Test Login"->React.string} </h1> <AuthTest /> </div>
+          <hr />
+           <div> <h1> {"Auth Test"->React.string} </h1> <AuthTest /> </div>
         </div>
       </div>
     | None =>

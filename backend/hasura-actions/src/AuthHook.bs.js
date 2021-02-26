@@ -6,8 +6,9 @@ var Serbet = require("serbet/src/Serbet.bs.js");
 
 function validateEthSignature(ethSignature, ethAddress) {
   var web3 = new Web3();
-  var signersAddress = web3.eth.accounts.recover("float.capital-signin-string:" + ethAddress, ethSignature);
-  return signersAddress === ethAddress;
+  var checksumAddress = web3.utils.toChecksumAddress(ethAddress);
+  var signersAddress = web3.eth.accounts.recover("float.capital-signin-string:" + checksumAddress, ethSignature);
+  return signersAddress === checksumAddress;
 }
 
 var getJwt = ((req) => req.jwt);
@@ -30,7 +31,7 @@ var endpoint = Serbet.endpoint(undefined, {
               return Promise.resolve({
                           TAG: /* OkJson */4,
                           _0: {
-                            "x-hasura-user-id": ethAddress,
+                            "x-hasura-user-id": ethAddress.toLowerCase(),
                             "x-hasura-role": "user"
                           }
                         });
