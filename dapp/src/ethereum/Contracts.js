@@ -38,7 +38,8 @@ var abi$2 = Ethers.makeAbi([
       "function stake(address tokenAddress, uint256 amount)",
       "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)  @1200000",
       "function withdraw(address tokenAddress, uint256 amount)",
-      "function claimFloat(address[] memory tokenAddresses)"
+      "function claimFloat(address[] memory tokenAddresses)",
+      "function claimFloatImmediately(address tokenAddress)"
     ]);
 
 function make$2(address, providerOrSigner) {
@@ -51,7 +52,7 @@ var Staker = {
 };
 
 var abi$3 = Ethers.makeAbi([
-      "function approve(address spender, uint256 amount)",
+      "function approve(address spender, uint256 amount) @100000",
       "function balanceOf(address owner) public view returns (uint256 balance)",
       "function allowance(address owner, address spender) public view returns (uint256 remaining)"
     ]);

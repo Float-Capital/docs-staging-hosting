@@ -137,6 +137,7 @@ var query$1 = (require("@apollo/client").gql`
     user(id: $userId)  {
       __typename
       totalMintedFloat
+      floatTokenBalance
     }
   }
 `);
@@ -146,7 +147,8 @@ function parse$1(value) {
   return {
           user: !(value$1 == null) ? ({
                 __typename: value$1.__typename,
-                totalMintedFloat: GqlConverters.$$BigInt.parse(value$1.totalMintedFloat)
+                totalMintedFloat: GqlConverters.$$BigInt.parse(value$1.totalMintedFloat),
+                floatTokenBalance: GqlConverters.$$BigInt.parse(value$1.floatTokenBalance)
               }) : undefined
         };
 }
@@ -155,12 +157,15 @@ function serialize$1(value) {
   var value$1 = value.user;
   var user;
   if (value$1 !== undefined) {
-    var value$2 = value$1.totalMintedFloat;
+    var value$2 = value$1.floatTokenBalance;
     var value$3 = GqlConverters.$$BigInt.serialize(value$2);
-    var value$4 = value$1.__typename;
+    var value$4 = value$1.totalMintedFloat;
+    var value$5 = GqlConverters.$$BigInt.serialize(value$4);
+    var value$6 = value$1.__typename;
     user = {
-      __typename: value$4,
-      totalMintedFloat: value$3
+      __typename: value$6,
+      totalMintedFloat: value$5,
+      floatTokenBalance: value$3
     };
   } else {
     user = null;

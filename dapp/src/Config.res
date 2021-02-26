@@ -14,6 +14,7 @@ type contractDetails = {
   @as("LongShort") longShort: Ethers.ethAddress,
   @as("Staker") staker: Ethers.ethAddress,
   @as("Dai") dai: Ethers.ethAddress,
+  @as("FloatToken") floatToken: Ethers.ethAddress,
 }
 
 type allChainContractDetails = Js.Dict.t<contractDetails>
@@ -57,4 +58,15 @@ let daiContractAddress = (~netIdStr) => {
 let useDaiAddress = () => {
   let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
   daiContractAddress(~netIdStr)
+}
+
+let floatContractAddress = (~netIdStr) => {
+  allContracts
+  ->Js.Dict.get(netIdStr)
+  ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.floatToken)
+}
+
+let useFloatAddress = () => {
+  let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
+  floatContractAddress(~netIdStr)
 }

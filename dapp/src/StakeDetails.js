@@ -39,6 +39,30 @@ var ClaimFloat = {
   make: StakeDetails$ClaimFloat
 };
 
+function StakeDetails$ClaimFloatImmediately(Props) {
+  var tokenAddress = Props.tokenAddress;
+  var signer = ContractActions.useSignerExn(undefined);
+  var match = ContractActions.useContractFunction(signer);
+  var contractExecutionHandler = match[0];
+  var stakerAddress = Config.useStakerAddress(undefined);
+  return React.createElement(Button.make, {
+              onClick: (function (param) {
+                  console.log("Claim float");
+                  Curry._2(contractExecutionHandler, (function (param) {
+                          return Contracts.Staker.make(stakerAddress, param);
+                        }), (function (param) {
+                          return param.claimFloatImmediately(tokenAddress);
+                        }));
+                  
+                }),
+              children: "Claim Float"
+            });
+}
+
+var ClaimFloatImmediately = {
+  make: StakeDetails$ClaimFloatImmediately
+};
+
 function StakeDetails$UsersActiveStakes(Props) {
   var currentUser = Props.currentUser;
   var activeStakes = DataFetchers.useUsersStakes(currentUser);
@@ -80,8 +104,8 @@ function StakeDetails$UsersActiveStakes(Props) {
                                                 className: "text-bold text-4xl"
                                               }, amountFormatted), " Tokens")), React.createElement("div", {
                                         className: "flex items-center"
-                                      }, React.createElement(StakeDetails$ClaimFloat, {
-                                            tokenAddresses: [tokenAddress]
+                                      }, React.createElement(StakeDetails$ClaimFloatImmediately, {
+                                            tokenAddress: tokenAddress
                                           }))));
                   }
                 }))) : React.createElement("h2", undefined, "You have no active stakes.");
@@ -114,6 +138,7 @@ var make = StakeDetails;
 
 export {
   ClaimFloat ,
+  ClaimFloatImmediately ,
   UsersActiveStakes ,
   make ,
   

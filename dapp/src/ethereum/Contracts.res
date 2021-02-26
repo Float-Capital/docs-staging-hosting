@@ -98,6 +98,7 @@ module Staker = {
       "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)  @1200000",
       "function withdraw(address tokenAddress, uint256 amount)",
       "function claimFloat(address[] memory tokenAddresses)",
+      "function claimFloatImmediately(address tokenAddress)",
     ]->Ethers.makeAbi
 
   let make = (~address, ~providerOrSigner): t =>
@@ -126,13 +127,18 @@ module Staker = {
     ~contract: t,
     ~tokenAddresses: array<Ethers.ethAddress>,
   ) => JsPromise.t<Ethers.txSubmitted> = "claimFloat"
+  @send
+  external claimFloatImmediately: (
+    ~contract: t,
+    ~tokenAddress: Ethers.ethAddress,
+  ) => JsPromise.t<Ethers.txSubmitted> = "claimFloatImmediately"
 }
 
 module Erc20 = {
   type t = Ethers.Contract.t
 
   let abi = [
-    "function approve(address spender, uint256 amount)",
+    "function approve(address spender, uint256 amount) @100000",
     "function balanceOf(address owner) public view returns (uint256 balance)",
     "function allowance(address owner, address spender) public view returns (uint256 remaining)",
     // "event Transfer(address indexed _from, address indexed _to, uint256 _value)",

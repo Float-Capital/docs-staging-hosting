@@ -18,6 +18,7 @@ module UsersState = %graphql(`
 query ($userId: String!){
   user(id: $userId) {
     totalMintedFloat
+    floatTokenBalance
   }
 }`)
 

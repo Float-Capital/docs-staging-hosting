@@ -54,6 +54,18 @@ function useDaiAddress(param) {
                   })));
 }
 
+function floatContractAddress(netIdStr) {
+  return Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), Constants.zeroAddress, (function (contracts) {
+                return contracts.FloatToken;
+              }));
+}
+
+function useFloatAddress(param) {
+  return floatContractAddress(Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
+                    return String(prim);
+                  })));
+}
+
 var goerliGraphEndpoint = "https://api.thegraph.com/subgraphs/name/avolabs-io/float-capital-goerli";
 
 var binancTestnetGraphEndpoint = "https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital";
@@ -74,6 +86,8 @@ export {
   useStakerAddress ,
   daiContractAddress ,
   useDaiAddress ,
+  floatContractAddress ,
+  useFloatAddress ,
   
 }
 /* isDevMode Not a pure module */
