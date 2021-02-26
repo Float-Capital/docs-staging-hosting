@@ -13,7 +13,7 @@ let make = () => {
         currentStake: {
           timestamp,
           creationTxHash,
-          tokenType: {tokenAddress, totalStaked, tokenType, syntheticMarket: {name, symbol}},
+          syntheticToken: {tokenAddress, totalStaked, tokenType, syntheticMarket: {name, symbol}},
           amount,
           withdrawn,
         },

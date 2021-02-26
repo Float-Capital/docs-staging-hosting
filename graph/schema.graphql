@@ -53,6 +53,7 @@ type Transfer @entity {
   from: String!
   to: String!
   value: BigInt!
+  token: SyntheticToken!
 }
 
 enum TokenType {
@@ -66,6 +67,7 @@ type SyntheticToken @entity {
   syntheticMarket: SyntheticMarket!
   tokenType: TokenType!
   totalStaked: BigInt!
+  tokenSupply: BigInt!
   floatMintedFromSpecificToken: BigInt!
 }
 
@@ -88,17 +90,27 @@ type User @entity {
   id: ID! # ID -> Public address
   address: Bytes!
   totalMintedFloat: BigInt!
+  floatTokenBalance: BigInt!
+  tokenBalances: [UserSyntheticTokenBalance!]
+  tokenMints: [UserSyntheticTokenMinted!]
 }
 
 type UserSyntheticTokenBalance @entity {
-  id: ID! # ID ->
+  id: ID! # token address - user address - "balance"
   syntheticToken: SyntheticToken!
   user: User!
   tokenBalance: BigInt!
 }
 
+type UserSyntheticTokenMinted @entity {
+  id: ID! # token address - user address - "minted"
+  syntheticToken: SyntheticToken!
+  user: User!
+  tokensMinted: BigInt!
+}
+
 type CurrentStake @entity {
-  id: ID! # user address - fund address
+  id: ID! # token address - user address - "currentStake"
   user: User!
   userAddress: Bytes!
   syntheticToken: SyntheticToken!
@@ -107,7 +119,7 @@ type CurrentStake @entity {
 }
 
 type Stake @entity {
-  id: ID! #"user address-fund address-txHashString"
+  id: ID! # "txHashString"
   timestamp: BigInt!
   blockNumber: BigInt!
   creationTxHash: Bytes!
@@ -125,6 +137,7 @@ type State @entity {
   syntheticToken: SyntheticToken!
   timestamp: BigInt!
   accumulativeFloatPerSecond: BigInt!
+  floatRatePerSecondOverInterval: BigInt!
 }
 
 type YieldManager @entity {

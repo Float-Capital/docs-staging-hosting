@@ -22,7 +22,7 @@ function ActiveStakes(Props) {
   if (currentStakes.length !== 0) {
     return React.createElement(React.Fragment, undefined, Belt_Array.map(currentStakes, (function (param) {
                       var match = param.currentStake;
-                      var match$1 = match.tokenType;
+                      var match$1 = match.syntheticToken;
                       var match$2 = match$1.syntheticMarket;
                       var amountFormatted = FormatMoney.formatEther(match.amount);
                       var totalStakedFormatted = FormatMoney.formatEther(match$1.totalStaked);

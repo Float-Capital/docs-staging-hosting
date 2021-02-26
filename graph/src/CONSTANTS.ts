@@ -6,7 +6,9 @@ export const YIELD_MANAGER_ID = "yieldManager";
 export const STAKER_ID = "staker";
 export const TOKEN_FACTORY_ID = "tokenFactory";
 export const LONG_SHORT_ID = "longShort";
+export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export let ZERO = BigInt.fromI32(0);
+export let ONE = BigInt.fromI32(1);
 export let BILLION = BigInt.fromI32(1000000000); // 10^9
 export let TEN_TO_THE_18 = BILLION.times(BILLION);

@@ -37,7 +37,7 @@ module UsersActiveStakes = {
             currentStake: {
               timestamp,
               creationTxHash,
-              tokenType: {
+              syntheticToken: {
                 tokenAddress,
                 /* totalStaked, */ tokenType,
                 syntheticMarket: {/* name, */ symbol},

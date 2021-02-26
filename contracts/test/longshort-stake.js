@@ -1,12 +1,4 @@
-const {
-  BN,
-  expectRevert,
-  ether,
-  expectEvent,
-  balance,
-  time,
-} = require("@openzeppelin/test-helpers");
-
+const { BN, time, expectRevert } = require("@openzeppelin/test-helpers");
 const { inTransaction } = require("@openzeppelin/test-helpers/src/expectEvent");
 const { assert, expect } = require("chai");
 
@@ -21,14 +13,15 @@ contract("LongShort (staking)", (accounts) => {
   const user1 = accounts[1];
   const user2 = accounts[2];
   const user3 = accounts[3];
+  const initialMinter = accounts[4];
 
   const fifty = "50000000000000000000";
   const oneHundred = "1000000000000000000";
   const threeHundred = "3000000000000000000";
   const oneHundredAndFifty = "150000000000000000000";
   const twoHundred = "200000000000000000000";
-  const e18 = new BN("1000000000000000000");
   const twentyFive = "25000000000000000000";
+  const e18 = new BN("1000000000000000000");
 
   let staker;
   let longShort;
@@ -42,22 +35,22 @@ contract("LongShort (staking)", (accounts) => {
     longShort = result.longShort;
     staker = result.staker;
     floatToken = result.floatToken;
-    // no fees
-    const r2 = await createSynthetic(
+
+    const synth = await createSynthetic(
       admin,
       longShort,
       syntheticName,
       syntheticSymbol,
-      0,
+      0, // no entry/exit fees
       0,
       0,
       0
     );
 
-    longToken = r2.longToken;
-    shortToken = r2.shortToken;
-    marketIndex = r2.currentMarketIndex;
-    fundToken = r2.fundToken;
+    longToken = synth.longToken;
+    shortToken = synth.shortToken;
+    marketIndex = synth.currentMarketIndex;
+    fundToken = synth.fundToken;
   });
 
   it("users can stake long tokens", async () => {
@@ -88,7 +81,7 @@ contract("LongShort (staking)", (accounts) => {
     assert.equal(new BN(oneHundred).toString(), u3staked.toString());
   });
 
-  it("users must wait to earn float", async () => {
+  it("users don't earn float immediately", async () => {
     await mintThenStake(oneHundred, longToken, user1);
     await staker.withdraw(longToken.address, new BN(oneHundred), {
       from: user1,
@@ -105,9 +98,7 @@ contract("LongShort (staking)", (accounts) => {
     });
 
     const u1Float = await floatToken.balanceOf(user1);
-
     const u2Float = await floatToken.balanceOf(user2);
-
     const u3Float = await floatToken.balanceOf(user3);
 
     const zero = new BN("0").toString();
@@ -159,6 +150,10 @@ contract("LongShort (staking)", (accounts) => {
   });
 
   it("restaking credits you your float", async () => {
+    // Ensure markets aren't empty.
+    await populateMarket();
+
+    // Mint 150 long tokens for user1.
     await mintAndApprove(
       fundToken,
       new BN(oneHundredAndFifty),
@@ -171,44 +166,55 @@ contract("LongShort (staking)", (accounts) => {
     await longToken.approve(staker.address, oneHundredAndFifty, {
       from: user1,
     });
+
+    // Stake 100 of the tokens for float.
     await staker.stake(longToken.address, oneHundred, { from: user1 });
 
+    // Record a state point in staker.
     await time.increase(1);
     await longShort._updateSystemState(marketIndex);
 
+    // Get float parameters at current time for expected float calc.
     const before = await time.latest();
+    const { longValue, shortValue } = await getFloatPerSecondParameters(
+      longToken
+    );
+
+    // Wait a long time to accumulate some float.
     await time.increase(999);
+
+    // Trigger new state point in staker.
     await longShort._updateSystemState(marketIndex);
-    // earning from now
     const now = await time.latest();
 
-    price = await longShort.longTokenPrice(marketIndex);
+    // Restake with 25 more long tokens - this should credit you float.
     await staker.stake(longToken.address, twentyFive, { from: user1 });
+    let result = await floatToken.balanceOf(user1);
 
-    const result = await floatToken.balanceOf(user1);
+    // Compute expected float per second.
+    let expectedFloatPerSecond = await calculateFloatPerSecond(
+      longValue,
+      shortValue,
+      now,
+      true // we staked long tokens
+    );
 
-    // case 1: accumulated float credited
+    // Check that the credited float is what we expect.
     assert.equal(
       result.toString(),
-      calculateFloatPerSecond(price)
-        .mul(new BN((now - before).toString()))
+      expectedFloatPerSecond
+        .mul(new BN(now - before))
         .div(e18)
         .mul(new BN(oneHundred))
         .toString()
     );
 
+    // Restaking again immediately shouldn't credit the user again.
     await staker.stake(longToken.address, twentyFive, { from: user1 });
-    const r2 = await floatToken.balanceOf(user1);
+    let result2 = await floatToken.balanceOf(user1);
 
-    // case 2: not long enough for float to have been credited
-    assert.equal(
-      r2.toString(),
-      calculateFloatPerSecond(price)
-        .mul(new BN((now - before).toString()))
-        .div(e18)
-        .mul(new BN(oneHundred))
-        .toString()
-    );
+    // Check that the credited float is still the same.
+    assert.equal(result.toString(), result2.toString());
   });
 
   it("can stake directly from the synthetic token (without needing an approval)", async () => {
@@ -229,6 +235,7 @@ contract("LongShort (staking)", (accounts) => {
     );
     assert.equal(amountStaked.toString(), oneHundred);
   });
+
   it("cannot stake more than your balance from the synthetic token (without needing an approval)", async () => {
     await mintAndApprove(
       fundToken,
@@ -246,6 +253,10 @@ contract("LongShort (staking)", (accounts) => {
   });
 
   it("float earned is a function of time staked", async () => {
+    // Ensure markets aren't empty.
+    await populateMarket();
+
+    // Mint 100 long tokens for user1.
     await mintAndApprove(
       fundToken,
       new BN(oneHundred),
@@ -258,29 +269,46 @@ contract("LongShort (staking)", (accounts) => {
     await longToken.approve(staker.address, oneHundred, {
       from: user1,
     });
+
+    // Stake all of the 100 long tokens.
     await staker.stake(longToken.address, oneHundred, { from: user1 });
 
+    // Trigger a state point in staker.
     await time.increase(1);
     await longShort._updateSystemState(marketIndex);
 
+    // Get float parameters at current time for expected float calc.
     const before = await time.latest();
+    const { longValue, shortValue } = await getFloatPerSecondParameters(
+      longToken
+    );
+
+    // Wait a long time to accumulate some float.
     await time.increase(999);
     await longShort._updateSystemState(marketIndex);
 
+    // Wait even longer to accumulate more float.
     await time.increase(999);
     await longShort._updateSystemState(marketIndex);
-    // earning from now
     const now = await time.latest();
 
-    let { price } = await getFloatPerSecondParameters(longToken);
+    // Withdraw stake and earn accumulated float tokens.
     await staker.withdraw(longToken.address, new BN(oneHundred), {
       from: user1,
     });
     const result = await floatToken.balanceOf(user1);
 
+    // Compute expected float per second.
+    let expectedFloatPerSecond = await calculateFloatPerSecond(
+      longValue,
+      shortValue,
+      now,
+      true // we staked long tokens
+    );
+
     assert.equal(
       result.toString(),
-      calculateFloatPerSecond(price)
+      expectedFloatPerSecond
         .mul(new BN((now - before).toString()))
         .div(e18)
         .mul(new BN(oneHundred))
@@ -289,50 +317,79 @@ contract("LongShort (staking)", (accounts) => {
   });
 
   const basicFloatAccumulationTest = async (fn, token, iterations) => {
+    // Ensure markets aren't empty.
+    await populateMarket();
+
+    // Run test staking function and record some state points in staker.
     await fn(oneHundred, token, user1);
     for (let i = 0; i < iterations - 1; i++) {
       await time.increase(1);
       await longShort._updateSystemState(marketIndex);
     }
+
+    // Get float parameters at current time for expected float calculation.
     const before = await time.latest();
+    const { longValue, shortValue } = await getFloatPerSecondParameters(token);
+
+    // Wait a long time so user accumulates some float tokens.
     await time.increase(999);
+
+    // Trigger new state point.
     await longShort._updateSystemState(marketIndex);
-    // earning from now
     const now = await time.latest();
 
-    const { price } = await getFloatPerSecondParameters(token);
-
+    // Check how many float tokens the user actually has.
     await staker.withdraw(token.address, new BN(oneHundred), {
       from: user1,
     });
     const result = await floatToken.balanceOf(user1);
 
+    // Compute expected float per second.
+    let expectedFloatPerSecond = await calculateFloatPerSecond(
+      longValue,
+      shortValue,
+      now,
+      token == longToken
+    );
+
+    // Assert that the amount earned by the user matches the expected
+    // float issance per second for a stake of 100.
     assert.equal(
       result.toString(),
-      calculateFloatPerSecond(price)
-        .mul(new BN((now - before).toString()))
+      expectedFloatPerSecond
+        .mul(new BN(now - before))
         .div(e18)
         .mul(new BN(oneHundred))
         .toString()
     );
   };
 
-  // mock for now, update once we change r
-  const getFloatPerSecondParameters = async (token, staker) => {
-    let price;
-    if (token.address == longToken.address) {
-      price = await longShort.longTokenPrice(marketIndex);
-    } else {
-      price = await longShort.shortTokenPrice(marketIndex);
-    }
+  // Pulls market parameters from the LongShort contract so we can verify
+  // that 'r' value calculations are correct.
+  const getFloatPerSecondParameters = async () => {
+    let longValue = await longShort.longValue.call(marketIndex);
+    let shortValue = await longShort.shortValue.call(marketIndex);
+
     return {
-      price,
+      longValue,
+      shortValue,
     };
   };
 
-  // mock for now - will have to refactor tests once we change how
-  // r is calculated
-  const calculateFloatPerSecond = (tokenPrice) => tokenPrice;
+  // Computes the expected float per second for the given parameters.
+  const calculateFloatPerSecond = async (
+    longValue,
+    shortValue,
+    timestamp,
+    isLong
+  ) => {
+    return await staker.calculateFloatPerSecond.call(
+      longValue,
+      shortValue,
+      timestamp,
+      isLong
+    );
+  };
 
   const amountStaked = async (token, user) =>
     await staker.userAmountStaked(token.address, user);
@@ -374,5 +431,18 @@ contract("LongShort (staking)", (accounts) => {
         from: user,
       });
     }
+  };
+
+  const populateMarket = async () => {
+    await mintAndApprove(
+      fundToken,
+      twoHundred,
+      initialMinter,
+      longShort.address
+    );
+
+    await longShort.mintLong(marketIndex, oneHundred, { from: initialMinter });
+
+    await longShort.mintShort(marketIndex, oneHundred, { from: initialMinter });
   };
 });

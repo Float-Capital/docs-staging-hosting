@@ -199,20 +199,20 @@ function useChainIdExn(param) {
 
 function useEtherscanUrl(param) {
   var networkId = Core.useWeb3React().chainId;
-  if (networkId === undefined) {
-    return "etherscan.io";
-  }
-  var switcher = networkId - 4 | 0;
-  if (switcher === 0 || switcher === 1) {
-    if (switcher !== 0) {
-      return "goerli.etherscan.io";
+  if (networkId !== undefined) {
+    if (networkId === 5 || networkId === 4) {
+      if (networkId >= 5) {
+        return "goerli.etherscan.io";
+      } else {
+        return "rinkeby.etherscan.io";
+      }
+    } else if (networkId !== 97) {
+      return "etherscan.io";
     } else {
-      return "rinkeby.etherscan.io";
+      return "testnet.bscscan.com";
     }
-  } else if (switcher !== 93) {
-    return "etherscan.io";
   } else {
-    return "testnet.bscscan.com";
+    return "etherscan.io";
   }
 }
 

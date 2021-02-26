@@ -6,7 +6,7 @@ dataSources:
     name: LongShort
     network: binancetest
     source:
-      address: "0xd3D7f98650d7dbDb155eFBB8b7BFB028172b28FC"
+      address: "0x996A74CCFF58A62d3FB0f97Ed6fC2a24a92B3E1B"
       abi: LongShort
       startBlock: 6397160
     mapping:
@@ -47,13 +47,13 @@ dataSources:
           handler: handleTokenPriceRefreshed
         - event: ValueLockedInSystem(uint256,uint256,uint256,uint256,uint256)
           handler: handleValueLockedInSystem
-      file: ./src/mapping.ts
+      file: ./src/float.ts
 
   - kind: ethereum/contract
     name: Staker
     network: binancetest
     source:
-      address: "0x18eA194ffC9c4547bE436Cc4041d2665b805bb0C"
+      address: "0xF05d0a7283892bc69403eF544E3876168390AF9a"
       abi: Staker
       startBlock: 6397160
     mapping:
@@ -70,8 +70,8 @@ dataSources:
         - name: Staker
           file: ./abis/Staker.json
       eventHandlers:
-        - event: DeployV0()
-          handler: handleDeployV0
+        - event: DeployV1(address)
+          handler: handleDeployV1
         - event: StateAdded(address,uint256,uint256,uint256)
           handler: handleStateAdded
         - event: StakeAdded(address,address,uint256,uint256)
@@ -80,7 +80,7 @@ dataSources:
           handler: handleStakeWithdrawn
         - event: FloatMinted(address,address,uint256,uint256)
           handler: handleFloatMinted
-      file: ./src/mapping.ts
+      file: ./src/staker.ts
 
 templates:
   - kind: ethereum/contract
@@ -101,4 +101,4 @@ templates:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-      file: ./src/mapping.ts
+      file: ./src/tokenTransfers.ts

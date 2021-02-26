@@ -11,18 +11,6 @@ import {
   ValueLockedInSystem,
   LongShort,
 } from "../generated/LongShort/LongShort";
-
-import {
-  DeployV0,
-  StateAdded,
-  StakeAdded,
-  StakeWithdrawn,
-  FloatMinted,
-} from "../generated/Staker/Staker";
-
-import { erc20 } from "../generated/templates";
-import { Transfer as TransferEvent } from "../generated/templates/erc20/erc20";
-
 import {
   StateChange,
   EventParam,
@@ -34,6 +22,7 @@ import {
   Staker,
   TokenFactory,
   LongShortContract,
+  UserSyntheticTokenMinted,
   SyntheticToken,
   CurrentStake,
   Stake,
@@ -50,6 +39,10 @@ import {
   createSyntheticTokenShort,
 } from "./utils/globalStateManager";
 import {
+  createNewTokenDataSource,
+  increaseUserMints,
+} from "./utils/helperFunctions";
+import {
   ZERO,
   TEN_TO_THE_18,
   GLOBAL_STATE_ID,
@@ -58,30 +51,8 @@ import {
   STAKER_ID,
   TOKEN_FACTORY_ID,
   LONG_SHORT_ID,
+  ZERO_ADDRESS,
 } from "./CONSTANTS";
-
-export function handleTransfer(event: TransferEvent): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
-  let transactionHash = event.transaction.hash.toHex();
-  let transfer = new Transfer(transactionHash);
-  transfer.from = event.params.from.toHex();
-  transfer.to = event.params.to.toHex();
-  transfer.value = event.params.value;
-  transfer.save();
-
-  saveEventToStateChange(
-    txHash,
-    timestamp,
-    blockNumber,
-    "Transfer",
-    ["value"],
-    ["name"],
-    ["type"]
-  );
-}
 
 export function handleV1(event: V1): void {
   // This function will only ever get called once
@@ -119,16 +90,6 @@ export function handleFeesLevied(event: FeesLevied): void {
 
   let marketIndex = event.params.marketIndex;
   let totalFees = event.params.totalFees;
-
-  // saveEventToStateChange(
-  //   txHash,
-  //   timestamp,
-  //   blockNumber,
-  //   "FeesLevied",
-  //   bigIntArrayToStringArray([totalFees, longPercentage, shortPercentage]),
-  //   ["totalFees", "longPercentage", "shortPercentage"],
-  //   ["uint256", "uint256", "uint256"]
-  // );
 }
 
 export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
@@ -178,8 +139,9 @@ export function handleSyntheticTokenCreated(
 
   let marketIndexString = marketIndex.toString();
 
-  erc20.create(longTokenAddress);
-  erc20.create(shortTokenAddress);
+  // TODO: Add string name to these.
+  createNewTokenDataSource(longTokenAddress);
+  createNewTokenDataSource(shortTokenAddress);
 
   // create new synthetic token object.
   let longToken = createSyntheticTokenLong(longTokenAddress);
@@ -225,27 +187,6 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.save();
   fees.save();
   globalState.save();
-
-  // Add below back later
-  // saveEventToStateChange(
-  //   txHash,
-  //   timestamp,
-  //   blockNumber,
-  //   "InterestDistribution",
-  //   bigIntArrayToStringArray([
-  //     newTotalValueLocked,
-  //     totalInterest,
-  //     longPercentage,
-  //     shortPercentage,
-  //   ]),
-  //   [
-  //     "newValueTotalLocked",
-  //     "totalInterest",
-  //     "longPercentage",
-  //     "shortPercentage",
-  //   ],
-  //   ["uint256", "uint256", "uint256", "uint256"]
-  // );
 }
 
 export function handleLongMinted(event: LongMinted): void {
@@ -257,7 +198,12 @@ export function handleLongMinted(event: LongMinted): void {
   let depositAdded = event.params.depositAdded;
   let finalDepositAmount = event.params.finalDepositAmount;
   let tokensMinted = event.params.tokensMinted;
-  let user = event.params.user;
+  let userAddress = event.params.user;
+
+  let market = SyntheticMarket.load(marketIndex.toString());
+  let syntheticToken = SyntheticToken.load(market.syntheticLong);
+
+  increaseUserMints(userAddress, syntheticToken, tokensMinted);
 
   saveEventToStateChange(
     txHash,
@@ -268,7 +214,7 @@ export function handleLongMinted(event: LongMinted): void {
       depositAdded,
       finalDepositAmount,
       tokensMinted,
-    ]).concat([user.toHex()]),
+    ]).concat([userAddress.toHex()]),
     ["depositAdded", "finalDepositAmount", "tokensMinted", "user"],
     ["uint256", "uint256", "uint256", "address"]
   );
@@ -345,7 +291,12 @@ export function handleShortMinted(event: ShortMinted): void {
   let depositAdded = event.params.depositAdded;
   let finalDepositAmount = event.params.finalDepositAmount;
   let tokensMinted = event.params.tokensMinted;
-  let user = event.params.user;
+  let userAddress = event.params.user;
+
+  let market = SyntheticMarket.load(marketIndex.toString());
+  let syntheticToken = SyntheticToken.load(market.syntheticShort);
+
+  increaseUserMints(userAddress, syntheticToken, tokensMinted);
 
   saveEventToStateChange(
     txHash,
@@ -356,7 +307,7 @@ export function handleShortMinted(event: ShortMinted): void {
       depositAdded,
       finalDepositAmount,
       tokensMinted,
-    ]).concat([user.toHex()]),
+    ]).concat([userAddress.toHex()]),
     ["depositAdded", "finalDepositAmount", "tokensMinted", "user"],
     ["uint256", "uint256", "uint256", "address"]
   );
@@ -422,176 +373,6 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
     ["longTokenPrice", "shortTokenPrice"],
     ["uint256", "uint256"]
   );
-}
-
-export function handleDeployV0(event: DeployV0): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-}
-export function handleStateAdded(event: StateAdded): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
-  let tokenAddress = event.params.tokenAddress;
-  let tokenAddressString = tokenAddress.toHex();
-  let stateIndex = event.params.stateIndex;
-  let accumulativeFloatPerSecond = event.params.accumulative;
-  // don't necessarily need to emit this since we can get it from event.block
-  let timestampOfState = event.params.timestamp;
-
-  let syntheticToken = SyntheticToken.load(tokenAddressString);
-  if (syntheticToken == null) {
-    log.critical("Token should be defined", []);
-  }
-
-  let state = new State(tokenAddressString + "-" + stateIndex.toString());
-  state.blockNumber = blockNumber;
-  state.creationTxHash = txHash;
-  state.stateIndex = stateIndex;
-  state.timestamp = timestamp;
-  state.syntheticToken = syntheticToken.id;
-  state.accumulativeFloatPerSecond = accumulativeFloatPerSecond;
-
-  syntheticToken.save();
-  state.save();
-}
-export function handleStakeAdded(event: StakeAdded): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
-  let userAddress = event.params.user;
-  let userAddressString = userAddress.toHex();
-  let tokenAddress = event.params.tokenAddress;
-  let tokenAddressString = tokenAddress.toHex();
-  let amount = event.params.amount;
-
-  let lastMintIndex = event.params.lastMintIndex;
-
-  let state = State.load(tokenAddressString + "-" + lastMintIndex.toString());
-  if (state == null) {
-    log.critical("state not defined yet crash", []);
-  }
-
-  let user = getOrCreateUser(userAddress);
-
-  let syntheticToken = SyntheticToken.load(tokenAddressString);
-
-  let stake = new Stake(txHash.toHex());
-  stake.timestamp = timestamp;
-  stake.blockNumber = blockNumber;
-  stake.creationTxHash = txHash;
-  stake.syntheticToken = syntheticToken.id;
-  stake.user = user.id;
-  stake.amount = amount;
-  stake.withdrawn = false;
-
-  let currentStake = CurrentStake.load(
-    tokenAddressString + "-" + userAddressString
-  );
-  if (currentStake == null) {
-    // They won't have a current stake.
-    currentStake = new CurrentStake(
-      tokenAddressString + "-" + userAddressString
-    );
-    currentStake.user = user.id;
-    currentStake.userAddress = user.address;
-    currentStake.syntheticToken = syntheticToken.id;
-  } else {
-    // Note: Only add if still relevant and not withdrawn
-    let oldStake = Stake.load(currentStake.currentStake);
-    if (!oldStake.withdrawn) {
-      stake.amount = stake.amount.plus(oldStake.amount);
-      oldStake.withdrawn = true;
-    }
-  }
-  currentStake.currentStake = stake.id;
-  currentStake.lastMintState = state.id;
-
-  stake.save();
-  currentStake.save();
-  user.save();
-  syntheticToken.save();
-}
-
-export function handleStakeWithdrawn(event: StakeWithdrawn): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
-  let userAddress = event.params.user;
-  let userAddressString = userAddress.toHex();
-  let tokenAddress = event.params.tokenAddress;
-  let tokenAddressString = tokenAddress.toHex();
-  let amount = event.params.amount;
-
-  let user = getOrCreateUser(userAddress);
-  let syntheticToken = SyntheticToken.load(tokenAddressString);
-  let currentStake = CurrentStake.load(
-    tokenAddressString + "-" + userAddressString
-  );
-  if (currentStake == null) {
-    log.critical("Stake should be defined", []);
-  }
-  let oldStake = Stake.load(currentStake.currentStake);
-
-  // If they are not withdrawing the full amount
-  if (!oldStake.amount.equals(amount)) {
-    let stake = new Stake(txHash.toHex());
-    stake.timestamp = timestamp;
-    stake.blockNumber = blockNumber;
-    stake.creationTxHash = txHash;
-    stake.syntheticToken = syntheticToken.id;
-    stake.user = user.id;
-    stake.withdrawn = false;
-    stake.amount = oldStake.amount.minus(amount);
-    currentStake.currentStake = stake.id;
-    stake.save();
-  }
-  oldStake.withdrawn = true;
-
-  oldStake.save();
-  currentStake.save();
-}
-
-export function handleFloatMinted(event: FloatMinted): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
-  let userAddress = event.params.user;
-  let userAddressString = userAddress.toHex();
-  let tokenAddress = event.params.tokenAddress;
-  let tokenAddressString = tokenAddress.toHex();
-  let amount = event.params.amount;
-  let lastMintIndex = event.params.lastMintIndex;
-
-  let state = State.load(tokenAddressString + "-" + lastMintIndex.toString());
-  if (state == null) {
-    log.critical("state not defined yet crash", []);
-  }
-  let syntheticToken = SyntheticToken.load(tokenAddressString);
-  syntheticToken.floatMintedFromSpecificToken = syntheticToken.floatMintedFromSpecificToken.plus(
-    amount
-  );
-
-  let user = getOrCreateUser(userAddress);
-  user.totalMintedFloat = user.totalMintedFloat.plus(amount);
-
-  let currentStake = CurrentStake.load(
-    tokenAddressString + "-" + userAddressString
-  );
-  currentStake.lastMintState = state.id;
-
-  let globalState = GlobalState.load(GLOBAL_STATE_ID);
-  globalState.totalFloatMinted = globalState.totalFloatMinted.plus(amount);
-
-  syntheticToken.save();
-  user.save();
-  currentStake.save();
-  globalState.save();
 }
 
 // currently all params are BigInts -> in future may have to modify to support e.g. Addresses

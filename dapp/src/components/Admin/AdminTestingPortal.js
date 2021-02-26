@@ -15,8 +15,10 @@ import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as RedeemSynth from "./RedeemSynth.js";
+import * as ActiveStakes from "./ActiveStakes.js";
 import * as MintAndStake from "./MintAndStake.js";
 import * as RootProvider from "../../libraries/RootProvider.js";
+import * as FloatManagement from "./FloatManagement.js";
 
 var context = React.createContext(undefined);
 
@@ -173,7 +175,7 @@ function AdminTestingPortal$AdminActions(Props) {
                                                             }))));
                                     }))) : "You might think this is impossible, but depending on the situation it might not be!"
                       )
-                  ), React.createElement("hr", undefined), React.createElement("div", undefined, React.createElement("h1", undefined, "Test Login"), React.createElement(AuthTest.make, {}))));
+                  ), React.createElement("hr", undefined), React.createElement("div", undefined, React.createElement("h1", undefined, "Users active stakes"), React.createElement(ActiveStakes.make, {})), React.createElement("hr", undefined), React.createElement("div", undefined, React.createElement("h1", undefined, "Float"), React.createElement(FloatManagement.make, {})), React.createElement("div", undefined, React.createElement("h1", undefined, "Test Login"), React.createElement(AuthTest.make, {}))));
 }
 
 var AdminActions = {
