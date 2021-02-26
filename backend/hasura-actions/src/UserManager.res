@@ -1,7 +1,7 @@
 module ApolloQueryResult = ApolloClient.Types.ApolloQueryResult
 
 @decco.decode
-type usersData = {usersAddress: string, userName: option<string>}
+type usersData = {username: option<string>}
 @decco.decode
 type body_in = {input: usersData}
 
@@ -19,15 +19,25 @@ let gqlClient = ClientConfig.createInstance(
 )
 
 type bodyObj = {
-  session_variables: AuthHook.authResponse
+  session_variables: AuthHook.authResponse,
+  input: usersData
 }
 
-@get external getAuthHeaders: Express.Request.t => bodyObj = "body"
+@get external getBody: Express.Request.t => bodyObj = "body"
 
 let getUsersAddress: Express.Request.t => option<string> = request => { 
-  let {session_variables: {xHasuraUserId}} = request->getAuthHeaders
+  let {session_variables: {
+    xHasuraUserId
+  }} = request->getBody
   xHasuraUserId
 }
+
+type createUserInput = {
+  ethAddress: option<string>,
+  username: option<string>
+}
+
+let getUsername: Express.Request.t => option<string> = request => (request->getBody).input.username
 
 let createUser = Serbet.endpoint({
   verb: POST,
@@ -35,17 +45,23 @@ let createUser = Serbet.endpoint({
   handler: req =>
     req.requireBody(value => {
       body_in_decode(value)
-    })->JsPromise.map(({input: {usersAddress}}) => {
-      let result = getUsersAddress(req.req)
-      Js.log(("Headers", result))
+    })->JsPromise.then(_ => {
+      let userAddress = getUsersAddress(req.req)
+      let username = getUsername(req.req)
 
-      Js.log(`Eth address to register ${usersAddress}`)
-
-      {
-        success: true,
-        error: None,
-      }
-      ->body_out_encode
-      ->Serbet.Endpoint.OkJson
+      gqlClient.mutate(~mutation=module(Query.CreateUser), {object_: {ethAddress: userAddress, userName: username}})
+      -> JsPromise.map(result => 
+        switch result {
+        | Ok(_result) => {success: true, error: None}
+        | Error(error) =>
+          let {message}: ApolloClient__ApolloClient.ApolloError.t = error
+          {
+            success: false,
+            error: Some(message),
+          }
+        }
+        ->body_out_encode
+        ->Serbet.Endpoint.OkJson
+      )
     }),
 })

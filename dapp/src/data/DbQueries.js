@@ -5,32 +5,49 @@ import * as ApolloClient__React_Hooks_UseMutation from "rescript-apollo-client/s
 var Raw = {};
 
 var query = (require("@apollo/client").gql`
-  mutation test($userAddress: String!, $userName: String)  {
-    createUser(usersAddress: $userAddress, userName: $userName)  {
+  mutation test($userName: String)  {
+    createUser(username: $userName)  {
       __typename
       success
+      error
     }
   }
 `);
 
 function parse(value) {
   var value$1 = value.createUser;
+  var tmp;
+  if (value$1 == null) {
+    tmp = undefined;
+  } else {
+    var value$2 = value$1.error;
+    tmp = {
+      __typename: value$1.__typename,
+      success: value$1.success,
+      error: !(value$2 == null) ? value$2 : undefined
+    };
+  }
   return {
-          createUser: {
-            __typename: value$1.__typename,
-            success: value$1.success
-          }
+          createUser: tmp
         };
 }
 
 function serialize(value) {
   var value$1 = value.createUser;
-  var value$2 = value$1.success;
-  var value$3 = value$1.__typename;
-  var createUser = {
-    __typename: value$3,
-    success: value$2
-  };
+  var createUser;
+  if (value$1 !== undefined) {
+    var value$2 = value$1.error;
+    var error = value$2 !== undefined ? value$2 : null;
+    var value$3 = value$1.success;
+    var value$4 = value$1.__typename;
+    createUser = {
+      __typename: value$4,
+      success: value$3,
+      error: error
+    };
+  } else {
+    createUser = null;
+  }
   return {
           createUser: createUser
         };
@@ -39,15 +56,19 @@ function serialize(value) {
 function serializeVariables(inp) {
   var a = inp.userName;
   return {
-          userAddress: inp.userAddress,
           userName: a !== undefined ? a : undefined
         };
 }
 
-function makeVariables(userAddress, userName, param) {
+function makeVariables(userName, param) {
   return {
-          userAddress: userAddress,
           userName: userName
+        };
+}
+
+function makeDefaultVariables(param) {
+  return {
+          userName: undefined
         };
 }
 
@@ -57,7 +78,8 @@ var CreateUser_inner = {
   parse: parse,
   serialize: serialize,
   serializeVariables: serializeVariables,
-  makeVariables: makeVariables
+  makeVariables: makeVariables,
+  makeDefaultVariables: makeDefaultVariables
 };
 
 var include = ApolloClient__React_Hooks_UseMutation.Extend({
@@ -80,6 +102,7 @@ var CreateUser = {
   serialize: serialize,
   serializeVariables: serializeVariables,
   makeVariables: makeVariables,
+  makeDefaultVariables: makeDefaultVariables,
   use: CreateUser_use,
   useWithVariables: CreateUser_useWithVariables
 };

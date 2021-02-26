@@ -71,40 +71,10 @@
       },
       {
         "inputFields": null,
-        "kind": "SCALAR",
-        "possibleTypes": null,
-        "interfaces": null,
-        "name": "Float",
-        "enumValues": null,
-        "description": null,
-        "fields": null
-      },
-      {
-        "inputFields": null,
-        "kind": "SCALAR",
-        "possibleTypes": null,
-        "interfaces": null,
-        "name": "ID",
-        "enumValues": null,
-        "description": null,
-        "fields": null
-      },
-      {
-        "inputFields": null,
-        "kind": "SCALAR",
-        "possibleTypes": null,
-        "interfaces": null,
-        "name": "Int",
-        "enumValues": null,
-        "description": null,
-        "fields": null
-      },
-      {
-        "inputFields": null,
         "kind": "OBJECT",
         "possibleTypes": null,
         "interfaces": [],
-        "name": "Result",
+        "name": "CreateUserOutput",
         "enumValues": null,
         "description": null,
         "fields": [
@@ -137,6 +107,36 @@
             "description": null
           }
         ]
+      },
+      {
+        "inputFields": null,
+        "kind": "SCALAR",
+        "possibleTypes": null,
+        "interfaces": null,
+        "name": "Float",
+        "enumValues": null,
+        "description": null,
+        "fields": null
+      },
+      {
+        "inputFields": null,
+        "kind": "SCALAR",
+        "possibleTypes": null,
+        "interfaces": null,
+        "name": "ID",
+        "enumValues": null,
+        "description": null,
+        "fields": null
+      },
+      {
+        "inputFields": null,
+        "kind": "SCALAR",
+        "possibleTypes": null,
+        "interfaces": null,
+        "name": "Int",
+        "enumValues": null,
+        "description": null,
+        "fields": null
       },
       {
         "inputFields": null,
@@ -1254,26 +1254,12 @@
           {
             "args": [
               {
-                "name": "userName",
+                "name": "username",
                 "defaultValue": null,
                 "type": {
                   "kind": "SCALAR",
                   "name": "String",
                   "ofType": null
-                },
-                "description": null
-              },
-              {
-                "name": "usersAddress",
-                "defaultValue": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
                 },
                 "description": null
               }
@@ -1282,13 +1268,9 @@
             "deprecationReason": null,
             "name": "createUser",
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Result",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "CreateUserOutput",
+              "ofType": null
             },
             "description": "perform the action: \"createUser\""
           },

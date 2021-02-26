@@ -13,13 +13,12 @@
       columns:
       - ethAddress
       - userName
-      filter:
-        ethAddress:
-          _eq: X-Hasura-User-Id
+      filter: {}
   update_permissions:
   - role: user
     permission:
       columns:
+      - ethAddress
       - userName
       filter:
         ethAddress:

@@ -30,8 +30,8 @@ var endpoint = Serbet.endpoint(undefined, {
               return Promise.resolve({
                           TAG: /* OkJson */4,
                           _0: {
-                            "X-Hasura-User-Id": ethAddress,
-                            "X-Hasura-Role": "user"
+                            "x-hasura-user-id": ethAddress,
+                            "x-hasura-role": "user"
                           }
                         });
             } else {
@@ -45,8 +45,8 @@ var endpoint = Serbet.endpoint(undefined, {
           return Promise.resolve({
                       TAG: /* OkJson */4,
                       _0: {
-                        "X-Hasura-User-Id": undefined,
-                        "X-Hasura-Role": "public"
+                        "x-hasura-user-id": undefined,
+                        "x-hasura-role": "public"
                       }
                     });
         })

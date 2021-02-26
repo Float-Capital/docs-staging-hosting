@@ -3,6 +3,7 @@
 
 var Curry = require("bs-platform/lib/js/curry.js");
 var Decco = require("decco/src/Decco.bs.js");
+var Query = require("./Query.bs.js");
 var Serbet = require("serbet/src/Serbet.bs.js");
 var Js_dict = require("bs-platform/lib/js/js_dict.js");
 var Js_json = require("bs-platform/lib/js/js_json.js");
@@ -17,36 +18,22 @@ function usersData_decode(v) {
   if (dict.TAG !== /* JSONObject */2) {
     return Decco.error(undefined, "Not an object", v);
   }
-  var dict$1 = dict._0;
-  var usersAddress = Decco.stringFromJson(Belt_Option.getWithDefault(Js_dict.get(dict$1, "usersAddress"), null));
-  if (usersAddress.TAG === /* Ok */0) {
-    var userName = Decco.optionFromJson(Decco.stringFromJson, Belt_Option.getWithDefault(Js_dict.get(dict$1, "userName"), null));
-    if (userName.TAG === /* Ok */0) {
-      return {
-              TAG: /* Ok */0,
-              _0: {
-                usersAddress: usersAddress._0,
-                userName: userName._0
-              }
-            };
-    }
-    var e = userName._0;
+  var username = Decco.optionFromJson(Decco.stringFromJson, Belt_Option.getWithDefault(Js_dict.get(dict._0, "username"), null));
+  if (username.TAG === /* Ok */0) {
     return {
-            TAG: /* Error */1,
+            TAG: /* Ok */0,
             _0: {
-              path: ".userName" + e.path,
-              message: e.message,
-              value: e.value
+              username: username._0
             }
           };
   }
-  var e$1 = usersAddress._0;
+  var e = username._0;
   return {
           TAG: /* Error */1,
           _0: {
-            path: ".usersAddress" + e$1.path,
-            message: e$1.message,
-            value: e$1.value
+            path: ".username" + e.path,
+            message: e.message,
+            value: e.value
           }
         };
 }
@@ -98,7 +85,11 @@ var gqlClient = ClientConfig.createInstance({
 
 function getUsersAddress(request) {
   var match = request.body;
-  return match.session_variables["X-Hasura-User-Id"];
+  return match.session_variables["x-hasura-user-id"];
+}
+
+function getUsername(request) {
+  return request.body.input.username;
 }
 
 var createUser = Serbet.endpoint(undefined, {
@@ -106,19 +97,45 @@ var createUser = Serbet.endpoint(undefined, {
       verb: /* POST */1,
       handler: (function (req) {
           return Curry._1(req.requireBody, body_in_decode).then(function (param) {
-                      var result = getUsersAddress(req.req);
-                      console.log([
-                            "Headers",
-                            result
-                          ]);
-                      console.log("Eth address to register " + param.input.usersAddress);
-                      return {
-                              TAG: /* OkJson */4,
-                              _0: body_out_encode({
-                                    success: true,
-                                    error: undefined
-                                  })
-                            };
+                      var userAddress = getUsersAddress(req.req);
+                      var username = req.req.body.input.username;
+                      return Curry.app(gqlClient.reason_mutate, [
+                                    {
+                                      query: Query.CreateUser.query,
+                                      Raw: Query.CreateUser.Raw,
+                                      parse: Query.CreateUser.parse,
+                                      serialize: Query.CreateUser.serialize,
+                                      serializeVariables: Query.CreateUser.serializeVariables
+                                    },
+                                    undefined,
+                                    undefined,
+                                    undefined,
+                                    undefined,
+                                    undefined,
+                                    undefined,
+                                    undefined,
+                                    undefined,
+                                    undefined,
+                                    {
+                                      object: {
+                                        ethAddress: userAddress,
+                                        userName: username
+                                      }
+                                    }
+                                  ]).then(function (result) {
+                                  var tmp;
+                                  tmp = result.TAG === /* Ok */0 ? ({
+                                        success: true,
+                                        error: undefined
+                                      }) : ({
+                                        success: false,
+                                        error: result._0.message
+                                      });
+                                  return {
+                                          TAG: /* OkJson */4,
+                                          _0: body_out_encode(tmp)
+                                        };
+                                });
                     });
         })
     });
@@ -131,5 +148,6 @@ exports.body_in_decode = body_in_decode;
 exports.body_out_encode = body_out_encode;
 exports.gqlClient = gqlClient;
 exports.getUsersAddress = getUsersAddress;
+exports.getUsername = getUsername;
 exports.createUser = createUser;
 /* gqlClient Not a pure module */

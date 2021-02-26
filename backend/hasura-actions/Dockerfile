@@ -18,7 +18,7 @@ RUN yarn install
 
 ADD . /app
 
-RUN yarn re:build
+RUN yarn res:build
 
 # Run an empty command by default - to keep container running
 CMD yarn start

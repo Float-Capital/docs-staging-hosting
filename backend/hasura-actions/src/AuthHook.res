@@ -1,6 +1,8 @@
 type authResponse = {
+  @as("x-hasura-user-id")
   @as("X-Hasura-User-Id")
   xHasuraUserId: option<string>,
+  @as("x-hasura-role")
   @as("X-Hasura-Role")
   xHasuraRole: string,
   // [@bs.as "X-Hasura-Is-Owner"]

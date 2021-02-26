@@ -1,14 +1,13 @@
 type Mutation {
   createUser (
-    usersAddress: String!
-    userName: String
-  ): Result!
+    username: String
+  ): CreateUserOutput
 }
 
 
 
 
-type Result {
+type CreateUserOutput {
   success : Boolean!
   error : String
 }
