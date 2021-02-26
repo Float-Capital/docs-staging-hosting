@@ -51,9 +51,14 @@ module SyntheticTokens = %graphql(`
 {
   syntheticTokens{
     id
+    totalStaked
     syntheticMarket {
       id
       name
+      latestSystemState {
+        totalLockedLong
+        totalLockedShort
+      }
     }
     tokenType
   }
