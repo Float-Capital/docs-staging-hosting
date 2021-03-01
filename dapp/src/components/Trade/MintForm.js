@@ -611,12 +611,6 @@ var MintForm = {
   useForm: useForm
 };
 
-var initialInput = {
-  amount: "",
-  isLong: false,
-  isStaking: true
-};
-
 function useBalanceAndApproved(erc20Address, spender) {
   var match = ContractHooks.useErc20BalanceRefresh(erc20Address);
   var match$1 = ContractHooks.useERC20ApprovedRefresh(erc20Address, spender);
@@ -636,6 +630,7 @@ function isGreaterThanBalance(amount, balance) {
 
 function MintForm$1(Props) {
   var market = Props.market;
+  var initialIsLong = Props.initialIsLong;
   var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
@@ -659,7 +654,11 @@ function MintForm$1(Props) {
   var optDaiBalance = match$3[0];
   var match$4 = ContractHooks.useErc20BalanceRefresh(market.syntheticShort.tokenAddress);
   var match$5 = ContractHooks.useErc20BalanceRefresh(market.syntheticLong.tokenAddress);
-  var form = useForm(initialInput, (function (param, _form) {
+  var form = useForm({
+        amount: "",
+        isLong: initialIsLong,
+        isStaking: true
+      }, (function (param, _form) {
           var isStaking = param.isStaking;
           var isLong = param.isLong;
           var amount = param.amount;
@@ -966,6 +965,12 @@ function MintForm$1(Props) {
                           }))
                 }), tmp$1);
 }
+
+var initialInput = {
+  amount: "",
+  isLong: false,
+  isStaking: true
+};
 
 var make = MintForm$1;
 
