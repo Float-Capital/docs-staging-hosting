@@ -78,7 +78,7 @@ const deployContracts = async (options, accounts, deployer, networkName) => {
   );
 };
 
-module.exports = async function (deployer, networkName, accounts) {
+module.exports = async function(deployer, networkName, accounts) {
   deployer.then(async () => {
     // Initialise openzeppelin for upgradeable contracts.
     const options = await ConfigManager.initNetworkConfiguration({

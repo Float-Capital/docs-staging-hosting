@@ -68,7 +68,6 @@ contract TokenFactory is Initializable {
     function createTokenLong(
         string calldata syntheticName,
         string calldata syntheticSymbol,
-        uint256 marketIndex,
         address staker
     ) external onlyFLOAT returns (SyntheticToken) {
         SyntheticToken tokenContract;
@@ -86,7 +85,6 @@ contract TokenFactory is Initializable {
     function createTokenShort(
         string calldata syntheticName,
         string calldata syntheticSymbol,
-        uint256 marketIndex,
         address staker
     ) external onlyFLOAT returns (SyntheticToken) {
         SyntheticToken tokenContract;

@@ -40,6 +40,8 @@ contract Staker is IStaker, Initializable {
 
     // Global state.
     address public admin;
+    address public floatCapital;
+    uint16 public floatPercentage;
     uint256 public initialTimestamp;
     LongShort public floatContract;
     FloatToken public floatToken;
@@ -112,12 +114,15 @@ contract Staker is IStaker, Initializable {
     function initialize(
         address _admin,
         address _floatContract,
-        address _floatToken
+        address _floatToken,
+        address _floatCapital
     ) public initializer {
         admin = _admin;
+        floatCapital = _floatCapital;
         initialTimestamp = block.timestamp;
         floatContract = LongShort(_floatContract);
         floatToken = FloatToken(_floatToken);
+        floatPercentage = 1500;
 
         emit DeployV1(_floatToken);
     }
@@ -128,6 +133,11 @@ contract Staker is IStaker, Initializable {
 
     function changeAdmin(address _admin) external onlyAdmin {
         admin = _admin;
+    }
+
+    function changeFloatPercentage(uint16 _newPercentage) external onlyAdmin {
+        require(_newPercentage <= 10000);
+        floatPercentage = _newPercentage;
     }
 
     ////////////////////////////////////
@@ -304,6 +314,7 @@ contract Staker is IStaker, Initializable {
 
     function calculateAccumulatedFloat(address tokenAddress, address user)
         internal
+        view
         returns (uint256)
     {
         // Don't let users accumulate float immediately after staking, before
@@ -328,6 +339,14 @@ contract Staker is IStaker, Initializable {
         return accumDelta * userAmountStaked[tokenAddress][user];
     }
 
+    function _mintFloat(address user, uint256 floatToMint) internal {
+        floatToken.mint(user, floatToMint);
+        floatToken.mint(
+            floatCapital,
+            floatToMint.mul(floatPercentage).div(10000)
+        );
+    }
+
     function mintAccumulatedFloat(address tokenAddress, address user) internal {
         uint256 floatToMint = calculateAccumulatedFloat(tokenAddress, user);
 
@@ -337,7 +356,7 @@ contract Staker is IStaker, Initializable {
                 user
             ] = latestRewardIndex[tokenAddress];
 
-            floatToken.mint(user, floatToMint);
+            _mintFloat(user, floatToMint);
 
             emit FloatMinted(
                 user,
@@ -372,7 +391,7 @@ contract Staker is IStaker, Initializable {
             }
         }
         if (floatTotal > 0) {
-            floatToken.mint(msg.sender, floatTotal);
+            _mintFloat(msg.sender, floatTotal);
         }
     }
 
