@@ -165,6 +165,8 @@ export function handleStakeAdded(event: StakeAdded): void {
     currentStake.user = user.id;
     currentStake.userAddress = user.address;
     currentStake.syntheticToken = syntheticToken.id;
+
+    user.currentStakes = user.currentStakes.concat([currentStake.id]);
   } else {
     // Note: Only add if still relevant and not withdrawn
     let oldStake = Stake.load(currentStake.currentStake);
