@@ -5,6 +5,9 @@ module Stake = {
     symbol: string,
     apy: float,
     tokenType: string,
+    totalStaked: Ethers.BigNumber.t,
+    totalLockedLong: Ethers.BigNumber.t,
+    totalLockedShort: Ethers.BigNumber.t,
   }
 
   @react.component
@@ -14,6 +17,27 @@ module Stake = {
 
     let isHotAPY = apy => apy > 0.15
     let isShort = tokenType => tokenType == "short" // improve with types structure
+
+    let mapVal = apy =>
+      `${(apy *. 100.)->Js.Float.toFixedWithPrecision(~digits=2)}%${apy->isHotAPY
+          ? `🔥`
+          : ""}`->React.string
+
+    let basicApyCalc = (busdApy: float, longVal: float, shortVal: float, tokenType) => {
+      switch tokenType {
+      | "long" =>
+        switch longVal {
+        | 0.0 => busdApy
+        | _ => busdApy *. shortVal /. longVal
+        }
+      | "short" =>
+        switch shortVal {
+        | 0.0 => busdApy
+        | _ => busdApy *. longVal /. shortVal
+        }
+      | _ => busdApy
+      }
+    }
 
     let (synthenticTokens, setSyntheticTokens) = React.useState(() => [])
     let tokens = Queries.SyntheticTokens.use()
@@ -31,18 +55,29 @@ module Stake = {
       | {data: Some({syntheticTokens})} => {
           setSyntheticTokens(_ =>
             syntheticTokens
-            ->Array.map(({id, syntheticMarket: {name: symbol}, tokenType}) => {
+            ->Array.map(({
+              id,
+              syntheticMarket: {
+                name: symbol,
+                latestSystemState: {totalLockedLong, totalLockedShort},
+              },
+              tokenType,
+              totalStaked,
+            }) => {
               {
                 id: id,
                 symbol: symbol,
                 apy: 0.2,
+                totalLockedLong: totalLockedLong,
+                totalLockedShort: totalLockedShort,
                 tokenType: tokenType->Js.String2.make->Js.String.toLowerCase,
+                totalStaked: totalStaked,
               }
             })
             ->SortArray.stableSortBy((a, b) =>
               switch Js.String.localeCompare(a.symbol, b.symbol) {
-              | greater when greater > 0.0 => -1
-              | lesser when lesser < 0.0 => 1
+              | greater if greater > 0.0 => -1
+              | lesser if lesser < 0.0 => 1
               | _ =>
                 switch (a.tokenType, b.tokenType) {
                 | ("long", "short") => -1
@@ -72,38 +107,51 @@ module Stake = {
         {switch tokenId {
         | Some(tokenId) => <div> <StakeForm tokenId={tokenId} /> </div>
         | _ => <>
-            <h1> {"Stake"->React.string} </h1>
+            // center me
+            <div className="font-bold">
+              <h1> {"Stake to earn Float tokens"->React.string} </h1>
+            </div>
             {synthenticTokens
             ->Array.map(token => {
               <Card key={token.symbol ++ token.tokenType}>
                 <div className="flex justify-between items-center w-full">
                   <div className="flex flex-col">
                     <div className="flex">
-                      <h3 className="font-bold"> {"Token"->React.string} </h3>
-                      <AddToMetamask
-                        tokenAddress={token.id}
-                        tokenSymbol={(token.tokenType->isShort ? `↘️` : `↗️`) ++
-                        token.symbol->Js.String2.replaceByRe(%re("/[aeiou]/ig"), "")}
-                      />
+                      <h3 className="font-bold"> {"Synth"->React.string} </h3>
+                      // <AddToMetamask
+                      //   tokenAddress={token.id}
+                      //   tokenSymbol={(token.tokenType->isShort ? `↘️` : `↗️`) ++
+                      //   token.symbol->Js.String2.replaceByRe(%re("/[aeiou]/ig"), "")}
+                      // />
                     </div>
                     <p>
                       {token.symbol->React.string}
-                      {(token.tokenType->isShort ? `↘️` : `↗️`)->React.string}
+                      {
+                        // {(token.tokenType->isShort ? " (short) " : " (long) ")->React.string}
+                        (token.tokenType->isShort ? `↘️` : `↗️`)->React.string
+                      }
                     </p>
                   </div>
                   <div className="flex flex-col">
-                    <h3 className="font-bold"> {"Balance"->React.string} </h3>
-                    <TokenBalance erc20Address={token.id->Ethers.Utils.getAddressUnsafe} />
+                    <h3 className="font-bold"> {"Total staked"->React.string} </h3>
+                    <p> {token.totalStaked->FormatMoney.formatEther->React.string} </p>
                   </div>
+                  // <div className="flex flex-col">
+                  //   <h3 className="font-bold"> {"Your current stake"->React.string} </h3>
+                  //   <TokenBalance erc20Address={token.id->Ethers.Utils.getAddressUnsafe} />
+                  // </div>
                   <div className="flex flex-col">
                     <h3 className="font-bold">
-                      {`R `->React.string}
+                      {`APY `->React.string}
                       <span className="text-xs"> {`ℹ️`->React.string} </span>
                     </h3>
                     <p>
-                      {`${(token.apy *. 100.)->Belt.Float.toString}%${token.apy->isHotAPY
-                          ? `🔥`
-                          : ""}`->React.string}
+                      {basicApyCalc(
+                        0.12,
+                        token.totalLockedLong->Ethers.Utils.formatEther->Js.Float.fromString,
+                        token.totalLockedShort->Ethers.Utils.formatEther->Js.Float.fromString,
+                        token.tokenType,
+                      )->mapVal}
                     </p>
                   </div>
                   <Button

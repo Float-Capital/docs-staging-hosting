@@ -410,10 +410,16 @@ var query$3 = (require("@apollo/client").gql`
     syntheticTokens  {
       __typename
       id
+      totalStaked
       syntheticMarket  {
         __typename
         id
         name
+        latestSystemState  {
+          __typename
+          totalLockedLong
+          totalLockedShort
+        }
       }
       tokenType
     }
@@ -425,9 +431,10 @@ function parse$3(value) {
   return {
           syntheticTokens: value$1.map(function (value) {
                 var value$1 = value.syntheticMarket;
-                var value$2 = value.tokenType;
+                var value$2 = value$1.latestSystemState;
+                var value$3 = value.tokenType;
                 var tmp;
-                switch (value$2) {
+                switch (value$3) {
                   case "Long" :
                       tmp = "Long";
                       break;
@@ -437,16 +444,22 @@ function parse$3(value) {
                   default:
                     tmp = {
                       NAME: "FutureAddedValue",
-                      VAL: value$2
+                      VAL: value$3
                     };
                 }
                 return {
                         __typename: value.__typename,
                         id: value.id,
+                        totalStaked: GqlConverters.$$BigInt.parse(value.totalStaked),
                         syntheticMarket: {
                           __typename: value$1.__typename,
                           id: value$1.id,
-                          name: value$1.name
+                          name: value$1.name,
+                          latestSystemState: {
+                            __typename: value$2.__typename,
+                            totalLockedLong: GqlConverters.$$BigInt.parse(value$2.totalLockedLong),
+                            totalLockedShort: GqlConverters.$$BigInt.parse(value$2.totalLockedShort)
+                          }
                         },
                         tokenType: tmp
                       };
@@ -462,19 +475,34 @@ function serialize$3(value) {
             value$1 === "Long" ? "Long" : "Short"
           ) : value$1.VAL;
         var value$2 = value.syntheticMarket;
-        var value$3 = value$2.name;
-        var value$4 = value$2.id;
-        var value$5 = value$2.__typename;
-        var syntheticMarket = {
-          __typename: value$5,
-          id: value$4,
-          name: value$3
+        var value$3 = value$2.latestSystemState;
+        var value$4 = value$3.totalLockedShort;
+        var value$5 = GqlConverters.$$BigInt.serialize(value$4);
+        var value$6 = value$3.totalLockedLong;
+        var value$7 = GqlConverters.$$BigInt.serialize(value$6);
+        var value$8 = value$3.__typename;
+        var latestSystemState = {
+          __typename: value$8,
+          totalLockedLong: value$7,
+          totalLockedShort: value$5
         };
-        var value$6 = value.id;
-        var value$7 = value.__typename;
+        var value$9 = value$2.name;
+        var value$10 = value$2.id;
+        var value$11 = value$2.__typename;
+        var syntheticMarket = {
+          __typename: value$11,
+          id: value$10,
+          name: value$9,
+          latestSystemState: latestSystemState
+        };
+        var value$12 = value.totalStaked;
+        var value$13 = GqlConverters.$$BigInt.serialize(value$12);
+        var value$14 = value.id;
+        var value$15 = value.__typename;
         return {
-                __typename: value$7,
-                id: value$6,
+                __typename: value$15,
+                id: value$14,
+                totalStaked: value$13,
                 syntheticMarket: syntheticMarket,
                 tokenType: tokenType
               };
