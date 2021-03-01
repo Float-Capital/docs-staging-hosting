@@ -176,9 +176,11 @@ contract("LongShort (staking)", (accounts) => {
 
     // Get float parameters at current time for expected float calc.
     const before = await time.latest();
-    const { longValue, shortValue } = await getFloatPerSecondParameters(
-      longToken
-    );
+    const {
+      longValue,
+      shortValue,
+      longPrice,
+    } = await getFloatPerSecondParameters(longToken);
 
     // Wait a long time to accumulate some float.
     await time.increase(999);
@@ -195,6 +197,7 @@ contract("LongShort (staking)", (accounts) => {
     let expectedFloatPerSecond = await calculateFloatPerSecond(
       longValue,
       shortValue,
+      longPrice,
       now,
       true // we staked long tokens
     );
@@ -279,9 +282,11 @@ contract("LongShort (staking)", (accounts) => {
 
     // Get float parameters at current time for expected float calc.
     const before = await time.latest();
-    const { longValue, shortValue } = await getFloatPerSecondParameters(
-      longToken
-    );
+    const {
+      longValue,
+      shortValue,
+      longPrice,
+    } = await getFloatPerSecondParameters(longToken);
 
     // Wait a long time to accumulate some float.
     await time.increase(999);
@@ -302,6 +307,7 @@ contract("LongShort (staking)", (accounts) => {
     let expectedFloatPerSecond = await calculateFloatPerSecond(
       longValue,
       shortValue,
+      longPrice,
       now,
       true // we staked long tokens
     );
@@ -329,7 +335,11 @@ contract("LongShort (staking)", (accounts) => {
 
     // Get float parameters at current time for expected float calculation.
     const before = await time.latest();
-    const { longValue, shortValue } = await getFloatPerSecondParameters(token);
+    const {
+      longValue,
+      shortValue,
+      longPrice,
+    } = await getFloatPerSecondParameters(token);
 
     // Wait a long time so user accumulates some float tokens.
     await time.increase(999);
@@ -348,6 +358,7 @@ contract("LongShort (staking)", (accounts) => {
     let expectedFloatPerSecond = await calculateFloatPerSecond(
       longValue,
       shortValue,
+      longPrice,
       now,
       token == longToken
     );
@@ -369,10 +380,14 @@ contract("LongShort (staking)", (accounts) => {
   const getFloatPerSecondParameters = async () => {
     let longValue = await longShort.longValue.call(marketIndex);
     let shortValue = await longShort.shortValue.call(marketIndex);
+    let longPrice = await longShort.longTokenPrice.call(marketIndex);
+    let shortPrice = await longShort.shortTokenPrice.call(marketIndex);
 
     return {
       longValue,
       shortValue,
+      longPrice,
+      shortPrice,
     };
   };
 
@@ -380,12 +395,14 @@ contract("LongShort (staking)", (accounts) => {
   const calculateFloatPerSecond = async (
     longValue,
     shortValue,
+    tokenPrice,
     timestamp,
     isLong
   ) => {
     return await staker.calculateFloatPerSecond.call(
       longValue,
       shortValue,
+      tokenPrice,
       timestamp,
       isLong
     );
