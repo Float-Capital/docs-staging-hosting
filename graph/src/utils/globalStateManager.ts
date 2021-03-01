@@ -48,6 +48,7 @@ export function getOrCreateUser(
     user.timestampJoined = event.block.timestamp;
     user.totalGasUsed = ZERO;
     user.numberOfTransactions = ZERO;
+    user.currentStakes = [];
     user.tokenBalances = [];
     user.tokenMints = [];
     user.stateChangesAffectingUser = [];

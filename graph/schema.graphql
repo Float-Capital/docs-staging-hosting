@@ -96,7 +96,7 @@ type User @entity {
   timestampJoined: BigInt!
   totalGasUsed: BigInt!
   numberOfTransactions: BigInt!
-  # Add latest state change here.
+  currentStakes: [CurrentStake!]
   stateChangesAffectingUser: [StateChange!]
   tokenBalances: [UserSyntheticTokenBalance!]
   tokenMints: [UserSyntheticTokenMinted!]
