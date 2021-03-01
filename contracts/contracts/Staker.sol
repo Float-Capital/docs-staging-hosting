@@ -169,7 +169,6 @@ contract Staker is IStaker, Initializable {
         uint256 longValue,
         uint256 shortValue,
         uint256 tokenPrice, // price of the long or short token
-        uint256 timestamp, // TODO: remove, unneccesary callstack space
         bool isLong
     ) public view returns (uint256) {
         // Edge-case: no float is issued in an empty market.
@@ -180,10 +179,11 @@ contract Staker is IStaker, Initializable {
         // A float issuance multiplier that starts high and decreases linearly
         // over time to a value of 1. This incentivises users to stake early.
         uint256 k = 1e18;
-        if (timestamp - initialTimestamp <= K_FACTOR_PERIOD) {
+        if (block.timestamp - initialTimestamp <= K_FACTOR_PERIOD) {
             k =
                 1e18 -
-                ((K_FACTOR_INITIAL - 1e18) * (timestamp - initialTimestamp)) /
+                ((K_FACTOR_INITIAL - 1e18) *
+                    (block.timestamp - initialTimestamp)) /
                 K_FACTOR_PERIOD;
         }
 
@@ -225,13 +225,7 @@ contract Staker is IStaker, Initializable {
     ) internal view returns (uint256) {
         // Compute the current 'r' value for float issuance per second.
         uint256 floatPerSecond =
-            calculateFloatPerSecond(
-                longValue,
-                shortValue,
-                tokenPrice,
-                block.timestamp,
-                isLong
-            );
+            calculateFloatPerSecond(longValue, shortValue, tokenPrice, isLong);
 
         // Compute time since last state point for the given token.
         uint256 timeDelta = calculateTimeDelta(token);
