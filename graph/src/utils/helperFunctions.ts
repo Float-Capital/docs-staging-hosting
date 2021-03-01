@@ -30,12 +30,13 @@ export function updateBalanceTransfer(
   tokenAddressString: string,
   userAddress: Address,
   amount: BigInt,
-  send: boolean // user sending or receiving
+  send: boolean, // user sending or receiving,
+  event: ethereum.Event
 ): void {
   let userAddressString = userAddress.toHex();
 
   if (userAddressString != ZERO_ADDRESS) {
-    let user = getOrCreateUser(userAddress);
+    let user = getOrCreateUser(userAddress, event);
     user.save(); // necessary incase new user.
 
     let balanceFromObject = getOrCreateBalanceObject(
@@ -76,10 +77,11 @@ export function updateBalanceTransfer(
 export function updateBalanceFloatTransfer(
   userAddress: Address,
   amount: BigInt,
-  send: boolean // user sending or receiving
+  send: boolean, // user sending or receiving
+  event: ethereum.Event
 ): void {
   if (userAddress.toHex() != ZERO_ADDRESS) {
-    let user = getOrCreateUser(userAddress);
+    let user = getOrCreateUser(userAddress, event);
     if (send) {
       user.floatTokenBalance = user.floatTokenBalance.minus(amount);
     } else {
@@ -92,10 +94,11 @@ export function updateBalanceFloatTransfer(
 export function increaseUserMints(
   userAddress: Address,
   syntheticToken: SyntheticToken | null,
-  tokensMinted: BigInt // user sending or receiving
+  tokensMinted: BigInt, // user sending or receiving
+  event: ethereum.Event
 ): void {
   //load user
-  let user = getOrCreateUser(userAddress);
+  let user = getOrCreateUser(userAddress, event);
   let userAddressString = user.address.toHex();
   let tokenAddressString = syntheticToken.tokenAddress.toHex();
 

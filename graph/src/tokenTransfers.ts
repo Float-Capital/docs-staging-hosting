@@ -15,10 +15,6 @@ import {
 } from "./utils/helperFunctions";
 
 export function handleTransfer(event: TransferEvent): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
   let fromAddress = event.params.from;
   let fromAddressString = fromAddress.toHex();
   let toAddress = event.params.to;
@@ -30,8 +26,8 @@ export function handleTransfer(event: TransferEvent): void {
   let isFloatToken = context.getBoolean("isFloatToken");
 
   if (isFloatToken) {
-    updateBalanceFloatTransfer(fromAddress, amount, true);
-    updateBalanceFloatTransfer(toAddress, amount, false);
+    updateBalanceFloatTransfer(fromAddress, amount, true, event);
+    updateBalanceFloatTransfer(toAddress, amount, false, event);
   } else {
     let syntheticToken = SyntheticToken.load(tokenAddressString);
     if (syntheticToken == null) {
@@ -46,17 +42,16 @@ export function handleTransfer(event: TransferEvent): void {
     transfer.token = syntheticToken.id;
     transfer.save();
 
-    updateBalanceTransfer(tokenAddressString, fromAddress, amount, true);
-    updateBalanceTransfer(tokenAddressString, toAddress, amount, false);
+    updateBalanceTransfer(tokenAddressString, fromAddress, amount, true, event);
+    updateBalanceTransfer(tokenAddressString, toAddress, amount, false, event);
   }
 
   saveEventToStateChange(
-    txHash,
-    timestamp,
-    blockNumber,
+    event,
     "Transfer",
-    [tokenAddressString],
-    ["name"],
-    ["type"]
+    [fromAddressString, toAddressString, amount.toString()],
+    ["from", "to", "amount"],
+    ["address", "address", "uint256"],
+    [fromAddress, toAddress]
   );
 }

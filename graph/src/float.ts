@@ -55,6 +55,14 @@ import {
 } from "./CONSTANTS";
 
 export function handleV1(event: V1): void {
+  // event V1(address admin, address tokenFactory, address staker);
+
+  let admin = event.params.admin;
+  let tokenFactoryParam = event.params.tokenFactory;
+  let tokenFactoryString = tokenFactoryParam.toHex();
+  let stakerParam = event.params.staker;
+  let stakerString = stakerParam.toHex();
+
   // This function will only ever get called once
   if (GlobalState.load(GLOBAL_STATE_ID) != null) {
     log.critical("the event was emitted more than once!", []);
@@ -68,6 +76,7 @@ export function handleV1(event: V1): void {
   tokenFactory.address = event.params.tokenFactory;
   tokenFactory.save();
 
+  // Create these with event params as opposed to constants
   let staker = new Staker(STAKER_ID);
   staker.address = event.params.staker;
   staker.save();
@@ -81,6 +90,15 @@ export function handleV1(event: V1): void {
   globalState.longShort = longShort.id;
   globalState.totalFloatMinted = ZERO;
   globalState.save();
+
+  saveEventToStateChange(
+    event,
+    "V1",
+    [admin.toHex(), tokenFactoryString, stakerString],
+    ["admin", "tokenFactory", "staker"],
+    ["address", "address", "address"],
+    []
+  );
 }
 
 export function handleFeesLevied(event: FeesLevied): void {
@@ -90,14 +108,11 @@ export function handleFeesLevied(event: FeesLevied): void {
 
   let marketIndex = event.params.marketIndex;
   let totalFees = event.params.totalFees;
+
+  // State change - TODO
 }
 
 export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
-  //Void
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
   let marketIndex = event.params.marketIndex;
   let contractCallCounter = event.params.contractCallCounter;
   let totalValueLockedInMarket = event.params.totalValueLockedInMarket;
@@ -114,6 +129,27 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
   state.totalLockedShort = shortValue;
 
   state.save();
+
+  saveEventToStateChange(
+    event,
+    "ValueLockedInSystem",
+    bigIntArrayToStringArray([
+      marketIndex,
+      contractCallCounter,
+      totalValueLockedInMarket,
+      longValue,
+      shortValue,
+    ]),
+    [
+      "marketIndex",
+      "contractCallCounter",
+      "totalValueLockedInMarket",
+      "longValue",
+      "shortValue",
+    ],
+    ["uint256", "uint256", "uint256", "uint256", "uint256"],
+    []
+  );
 }
 
 export function handleSyntheticTokenCreated(
@@ -187,70 +223,121 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.save();
   fees.save();
   globalState.save();
+
+  saveEventToStateChange(
+    event,
+    "SyntheticTokenCreated",
+    [
+      marketIndex.toString(),
+      longTokenAddress.toHex(),
+      shortTokenAddress.toHex(),
+      initialAssetPrice.toString(),
+      syntheticName,
+      syntheticSymbol,
+      oracleAddress.toHex(),
+      baseEntryFee.toString(),
+      badLiquidityEntryFee.toString(),
+      baseExitFee.toString(),
+      badLiquidityExitFee.toString(),
+    ],
+    [
+      "marketIndex",
+      "longTokenAddress",
+      "shortTokenAddress",
+      "assetPrice",
+      "name",
+      "symbol",
+      "oracleAddress",
+      "baseEntryFee",
+      "badLiquidityEntryFee",
+      "baseExitFee",
+      "badLiquidityExitFee",
+    ],
+    [
+      "uint256",
+      "address",
+      "address",
+      "uint256",
+      "string",
+      "string",
+      "address",
+      "uint256",
+      "uint256",
+      "uint256",
+      "uint256",
+    ],
+    []
+  );
 }
 
 export function handleLongMinted(event: LongMinted): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
   let marketIndex = event.params.marketIndex;
   let depositAdded = event.params.depositAdded;
   let finalDepositAmount = event.params.finalDepositAmount;
   let tokensMinted = event.params.tokensMinted;
   let userAddress = event.params.user;
+  let contractCallCounter = event.params.contractCallCounter;
 
   let market = SyntheticMarket.load(marketIndex.toString());
   let syntheticToken = SyntheticToken.load(market.syntheticLong);
 
-  increaseUserMints(userAddress, syntheticToken, tokensMinted);
+  increaseUserMints(userAddress, syntheticToken, tokensMinted, event);
 
   saveEventToStateChange(
-    txHash,
-    timestamp,
-    blockNumber,
+    event,
     "LongMinted",
     bigIntArrayToStringArray([
+      marketIndex,
+      contractCallCounter,
       depositAdded,
       finalDepositAmount,
       tokensMinted,
     ]).concat([userAddress.toHex()]),
-    ["depositAdded", "finalDepositAmount", "tokensMinted", "user"],
-    ["uint256", "uint256", "uint256", "address"]
+    [
+      "marketIndex",
+      "contractCallCounter",
+      "depositAdded",
+      "finalDepositAmount",
+      "tokensMinted",
+      "user",
+    ],
+    ["uint256", "uint256", "uint256", "uint256", "uint256", "address"],
+    [userAddress]
   );
 }
 
 export function handleLongRedeem(event: LongRedeem): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
   let marketIndex = event.params.marketIndex;
   let tokensRedeemed = event.params.tokensRedeemed;
   let valueOfRedemption = event.params.valueOfRedemption;
   let finalRedeemValue = event.params.finalRedeemValue;
   let user = event.params.user;
+  let contractCallCounter = event.params.contractCallCounter;
 
   saveEventToStateChange(
-    txHash,
-    timestamp,
-    blockNumber,
+    event,
     "LongRedeem",
     bigIntArrayToStringArray([
+      marketIndex,
+      contractCallCounter,
       tokensRedeemed,
       valueOfRedemption,
       finalRedeemValue,
     ]).concat([user.toHex()]),
-    ["tokensRedeemed", "valueOfRedemption", "finalRedeem", "user"],
-    ["uint256", "uint256", "uint256", "address"]
+    [
+      "marketIndex",
+      "contractCallCounter",
+      "tokensRedeemed",
+      "valueOfRedemption",
+      "finalRedeem",
+      "user",
+    ],
+    ["uint256", "uint256", "uint256", "uint256", "uint256", "address"],
+    [user]
   );
 }
 
 export function handlePriceUpdate(event: PriceUpdate): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
   let marketIndex = event.params.marketIndex;
   let marketIndexString = marketIndex.toString();
 
@@ -272,78 +359,88 @@ export function handlePriceUpdate(event: PriceUpdate): void {
   syntheticMarket.save();
 
   saveEventToStateChange(
-    txHash,
-    timestamp,
-    blockNumber,
+    event,
     "PriceUpdate",
-    bigIntArrayToStringArray([newPrice, oldPrice]).concat([user.toHex()]),
-    ["newPrice", "oldPrice", "user"],
-    ["uint256", "uint256", "address"]
+    bigIntArrayToStringArray([
+      newPrice,
+      oldPrice,
+      marketIndex,
+      contractCallCounter,
+    ]).concat([user.toHex()]),
+    ["marketIndex", "contractCallCounter", "newPrice", "oldPrice", "user"],
+    ["uint256", "uint256", "uint256", "uint256", "address"],
+    [user]
   );
 }
 
 export function handleShortMinted(event: ShortMinted): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
   let marketIndex = event.params.marketIndex;
   let depositAdded = event.params.depositAdded;
   let finalDepositAmount = event.params.finalDepositAmount;
   let tokensMinted = event.params.tokensMinted;
   let userAddress = event.params.user;
+  let contractCallCounter = event.params.contractCallCounter;
 
   let market = SyntheticMarket.load(marketIndex.toString());
   let syntheticToken = SyntheticToken.load(market.syntheticShort);
 
-  increaseUserMints(userAddress, syntheticToken, tokensMinted);
+  increaseUserMints(userAddress, syntheticToken, tokensMinted, event);
 
   saveEventToStateChange(
-    txHash,
-    timestamp,
-    blockNumber,
+    event,
     "ShortMinted",
     bigIntArrayToStringArray([
+      marketIndex,
+      contractCallCounter,
       depositAdded,
       finalDepositAmount,
       tokensMinted,
     ]).concat([userAddress.toHex()]),
-    ["depositAdded", "finalDepositAmount", "tokensMinted", "user"],
-    ["uint256", "uint256", "uint256", "address"]
+    [
+      "marketIndex",
+      "contractCallCounter",
+      "depositAdded",
+      "finalDepositAmount",
+      "tokensMinted",
+      "user",
+    ],
+    ["uint256", "uint256", "uint256", "uint256", "uint256", "address"],
+    [userAddress]
   );
 }
 
 export function handleShortRedeem(event: ShortRedeem): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
   let marketIndex = event.params.marketIndex;
   let tokensRedeemed = event.params.tokensRedeemed;
   let valueOfRedemption = event.params.valueOfRedemption;
   let finalRedeemValue = event.params.finalRedeemValue;
   let user = event.params.user;
+  let contractCallCounter = event.params.contractCallCounter;
 
   saveEventToStateChange(
-    txHash,
-    timestamp,
-    blockNumber,
+    event,
     "ShortRedeem",
     bigIntArrayToStringArray([
+      marketIndex,
+      contractCallCounter,
       tokensRedeemed,
       valueOfRedemption,
       finalRedeemValue,
     ]).concat([user.toHex()]),
-    ["tokensRedeemed", "valueOfRedemption", "finalRedeemValue", "user"],
-    ["uint256", "uint256", "uint256", "address"]
+    [
+      "marketIndex",
+      "contractCallCounter",
+      "tokensRedeemed",
+      "valueOfRedemption",
+      "finalRedeem",
+      "user",
+    ],
+    ["uint256", "uint256", "uint256", "uint256", "uint256", "address"],
+    [user]
   );
 }
 
 export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
   let marketIndex = event.params.marketIndex;
   let marketIndexString = marketIndex.toString();
   let longTokenPrice = event.params.longTokenPrice;
@@ -365,13 +462,17 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
   syntheticMarket.save();
 
   saveEventToStateChange(
-    txHash,
-    timestamp,
-    blockNumber,
+    event,
     "TokenPriceRefreshed",
-    bigIntArrayToStringArray([longTokenPrice, shortTokenPrice]),
-    ["longTokenPrice", "shortTokenPrice"],
-    ["uint256", "uint256"]
+    bigIntArrayToStringArray([
+      marketIndex,
+      contractCallCounter,
+      longTokenPrice,
+      shortTokenPrice,
+    ]),
+    ["marketIndex", "contractCallCounter", "longTokenPrice", "shortTokenPrice"],
+    ["uint256", "uint256", "uint256", "uint256"],
+    []
   );
 }
 

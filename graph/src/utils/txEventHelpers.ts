@@ -1,5 +1,7 @@
 import { StateChange, EventParam, EventParams } from "../../generated/schema";
-import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
+import { BigInt, Address, Bytes, log, ethereum } from "@graphprotocol/graph-ts";
+import { ZERO, ONE, ZERO_ADDRESS } from "../CONSTANTS";
+import { getOrCreateUser } from "./globalStateManager";
 
 function getEventIndex(txHash: Bytes): i32 {
   let stateChange = StateChange.load(txHash.toHex());
@@ -55,16 +57,23 @@ function txEventParamsHelper(
 }
 
 function txStateChangeHelper(
-  txHash: Bytes,
-  timeStamp: BigInt,
-  blockNumber: BigInt,
+  event: ethereum.Event,
   eventName: string,
-  eventParamArray: Array<string>
+  eventParamArray: Array<string>,
+  affectedUsers: Array<Bytes>
 ): void {
+  let txHash = event.transaction.hash;
+
   let stateChange = StateChange.load(txHash.toHex());
   if (stateChange == null) {
     stateChange = new StateChange(txHash.toHex());
     stateChange.txEventParamList = [];
+    stateChange.affectedUsers = [];
+
+    let user = getOrCreateUser(event.transaction.from, event);
+    user.totalGasUsed = user.totalGasUsed.plus(event.block.gasUsed);
+    user.numberOfTransactions = user.numberOfTransactions.plus(ONE);
+    user.save();
   }
 
   let eventIndex: i32 = getEventIndex(txHash);
@@ -77,8 +86,25 @@ function txStateChangeHelper(
     eventParamArray
   );
 
-  stateChange.timestamp = timeStamp;
-  stateChange.blockNumber = blockNumber;
+  for (let index = 0; index < affectedUsers.length; index++) {
+    if (affectedUsers[index].toHex() != ZERO_ADDRESS) {
+      let user = getOrCreateUser(affectedUsers[index], event);
+      stateChange.affectedUsers =
+        stateChange.affectedUsers.indexOf(user.id) === -1
+          ? stateChange.affectedUsers.concat([user.id])
+          : stateChange.affectedUsers;
+
+      user.stateChangesAffectingUser =
+        user.stateChangesAffectingUser.indexOf(stateChange.id) === -1
+          ? user.stateChangesAffectingUser.concat([stateChange.id])
+          : user.stateChangesAffectingUser;
+
+      user.save();
+    }
+  }
+  stateChange.timestamp = event.block.timestamp;
+  stateChange.blockNumber = event.block.number;
+  stateChange.gasUsed = event.block.gasUsed;
   stateChange.txEventParamList = stateChange.txEventParamList.concat([
     eventParams.id,
   ]);
@@ -87,26 +113,19 @@ function txStateChangeHelper(
 }
 
 export function saveEventToStateChange(
-  txHash: Bytes,
-  timestamp: BigInt,
-  blockNumber: BigInt,
-  eventName: String,
+  event: ethereum.Event,
+  eventName: string,
   parameterValues: Array<string>,
   parameterNames: Array<string>,
-  parameterTypes: Array<string>
+  parameterTypes: Array<string>,
+  affectedUsers: Array<Bytes>
 ): void {
   let eventParamsArr: Array<string> = createEventParams(
-    txHash,
+    event.transaction.hash,
     parameterValues,
     parameterNames,
     parameterTypes
   );
 
-  txStateChangeHelper(
-    txHash,
-    timestamp,
-    blockNumber,
-    eventName,
-    eventParamsArr
-  );
+  txStateChangeHelper(event, eventName, eventParamsArr, affectedUsers);
 }

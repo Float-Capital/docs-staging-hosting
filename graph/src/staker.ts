@@ -31,16 +31,21 @@ import { getOrCreateUser } from "./utils/globalStateManager";
 import { ZERO, ONE, TEN_TO_THE_18, GLOBAL_STATE_ID } from "./CONSTANTS";
 
 export function handleDeployV1(event: DeployV1): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
   let floatAddress = event.params.floatToken;
 
   let context = new DataSourceContext();
   context.setString("contractAddress", floatAddress.toHex());
   context.setBoolean("isFloatToken", true);
   erc20.createWithContext(floatAddress, context);
+
+  saveEventToStateChange(
+    event,
+    "DeployV1",
+    [floatAddress.toHex()],
+    ["floatAddress"],
+    ["address"],
+    []
+  );
 }
 
 export function handleStateAdded(event: StateAdded): void {
@@ -102,7 +107,22 @@ export function handleStateAdded(event: StateAdded): void {
 
   syntheticToken.save();
   state.save();
+
+  saveEventToStateChange(
+    event,
+    "StateAdded",
+    [
+      tokenAddress.toHex(),
+      stateIndex.toString(),
+      timestamp.toString(),
+      accumulativeFloatPerSecond.toString(),
+    ],
+    ["tokenAddress", "stateIndex", "timestamp", "accumulative"],
+    ["address", "uint256", "uint256", "uint256"],
+    []
+  );
 }
+
 export function handleStakeAdded(event: StakeAdded): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
@@ -121,7 +141,7 @@ export function handleStakeAdded(event: StakeAdded): void {
     log.critical("state not defined yet crash", []);
   }
 
-  let user = getOrCreateUser(userAddress);
+  let user = getOrCreateUser(userAddress, event);
 
   let syntheticToken = SyntheticToken.load(tokenAddressString);
 
@@ -162,6 +182,20 @@ export function handleStakeAdded(event: StakeAdded): void {
   currentStake.save();
   user.save();
   syntheticToken.save();
+
+  saveEventToStateChange(
+    event,
+    "StakeAdded",
+    [
+      userAddressString,
+      tokenAddressString,
+      amount.toString(),
+      lastMintIndex.toString(),
+    ],
+    ["user", "tokenAddress", "amount", "lastMintIndex"],
+    ["address", "address", "uint256", "uint256"],
+    [userAddress]
+  );
 }
 
 export function handleStakeWithdrawn(event: StakeWithdrawn): void {
@@ -175,7 +209,7 @@ export function handleStakeWithdrawn(event: StakeWithdrawn): void {
   let tokenAddressString = tokenAddress.toHex();
   let amount = event.params.amount;
 
-  let user = getOrCreateUser(userAddress);
+  let user = getOrCreateUser(userAddress, event);
   let syntheticToken = SyntheticToken.load(tokenAddressString);
   let currentStake = CurrentStake.load(
     tokenAddressString + "-" + userAddressString + "-currentStake"
@@ -205,13 +239,18 @@ export function handleStakeWithdrawn(event: StakeWithdrawn): void {
   syntheticToken.save();
   oldStake.save();
   currentStake.save();
+
+  saveEventToStateChange(
+    event,
+    "StakeWithdrawn",
+    [userAddressString, tokenAddressString, amount.toString()],
+    ["user", "tokenAddress", "amount"],
+    ["address", "address", "uint256"],
+    [userAddress]
+  );
 }
 
 export function handleFloatMinted(event: FloatMinted): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
   let userAddress = event.params.user;
   let userAddressString = userAddress.toHex();
   let tokenAddress = event.params.tokenAddress;
@@ -228,7 +267,7 @@ export function handleFloatMinted(event: FloatMinted): void {
     amount
   );
 
-  let user = getOrCreateUser(userAddress);
+  let user = getOrCreateUser(userAddress, event);
   user.totalMintedFloat = user.totalMintedFloat.plus(amount);
 
   let currentStake = CurrentStake.load(
@@ -243,4 +282,18 @@ export function handleFloatMinted(event: FloatMinted): void {
   user.save();
   currentStake.save();
   globalState.save();
+
+  saveEventToStateChange(
+    event,
+    "FloatMinted",
+    [
+      userAddressString,
+      tokenAddressString,
+      amount.toString(),
+      lastMintIndex.toString(),
+    ],
+    ["user", "tokenAddress", "amount", "lastMintIndex"],
+    ["address", "address", "uint256", "uint256"],
+    [userAddress]
+  );
 }

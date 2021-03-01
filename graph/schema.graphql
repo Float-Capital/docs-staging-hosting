@@ -17,7 +17,9 @@ type StateChange @entity {
   id: ID! # tx
   timestamp: BigInt!
   blockNumber: BigInt!
+  gasUsed: BigInt!
   txEventParamList: [EventParams!]!
+  affectedUsers: [User!]
 }
 
 type Event @entity {
@@ -91,6 +93,11 @@ type User @entity {
   address: Bytes!
   totalMintedFloat: BigInt!
   floatTokenBalance: BigInt!
+  timestampJoined: BigInt!
+  totalGasUsed: BigInt!
+  numberOfTransactions: BigInt!
+  # Add latest state change here.
+  stateChangesAffectingUser: [StateChange!]
   tokenBalances: [UserSyntheticTokenBalance!]
   tokenMints: [UserSyntheticTokenMinted!]
 }
