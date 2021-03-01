@@ -141,6 +141,14 @@ body {
   cursor: pointer;
 }
 
+.tooltip {
+  @apply invisible absolute;
+}
+
+.has-tooltip:hover .tooltip {
+  @apply visible z-50;
+}
+
 .float-button-small {
   font-size: 12px !important;
   padding: 0.5rem 0.5rem !important;

@@ -42,6 +42,7 @@ module MarketDetails = %graphql(`
     latestSystemState {
       totalLockedLong
       totalLockedShort
+      totalValueLocked
     }
   }
 }
