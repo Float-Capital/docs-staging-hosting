@@ -688,7 +688,7 @@ contract LongShort is ILongShort, Initializable {
     }
 
     /*
-     * Returns locked funds from the market to the given user.
+     * Returns locked funds from the market to the sender.
      */
     function _withdrawFunds(uint256 marketIndex, uint256 amount) internal {
         require(totalValueLockedInMarket[marketIndex] >= amount);
