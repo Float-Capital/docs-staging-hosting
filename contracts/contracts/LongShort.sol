@@ -217,6 +217,11 @@ contract LongShort is ILongShort, Initializable {
         _;
     }
 
+    modifier treasuryOnly() {
+        require(msg.sender == treasury);
+        _;
+    }
+
     modifier doesMarketExist(uint256 marketIndex) {
         require(marketExists[marketIndex]);
         _;
@@ -647,11 +652,7 @@ contract LongShort is ILongShort, Initializable {
     /*
      * Returns locked funds from the market to the given user.
      */
-    function _withdrawFunds(
-        address to,
-        uint256 marketIndex,
-        uint256 amount
-    ) internal {
+    function _withdrawFunds(uint256 marketIndex, uint256 amount) internal {
         require(totalValueLockedInMarket[marketIndex] >= amount);
 
         // Withdraw requisite funds from the yield managers if necessary.
@@ -664,7 +665,7 @@ contract LongShort is ILongShort, Initializable {
         }
 
         // Transfer funds to the sender.
-        fundTokens[marketIndex].transfer(to, amount);
+        fundTokens[marketIndex].transfer(msg.sender, amount);
 
         // Update market state.
         totalValueLockedInMarket[marketIndex] = totalValueLockedInMarket[
@@ -956,7 +957,7 @@ contract LongShort is ILongShort, Initializable {
 
         // Withdraw funds with remaining amount.
         longValue[marketIndex] = longValue[marketIndex].sub(amount);
-        _withdrawFunds(msg.sender, marketIndex, remaining);
+        _withdrawFunds(marketIndex, remaining);
         _refreshTokensPrice(marketIndex);
 
         emit LongRedeem(
@@ -996,7 +997,7 @@ contract LongShort is ILongShort, Initializable {
 
         // Withdraw funds with remaining amount.
         shortValue[marketIndex] = shortValue[marketIndex].sub(amount);
-        _withdrawFunds(msg.sender, marketIndex, remaining);
+        _withdrawFunds(marketIndex, remaining);
         _refreshTokensPrice(marketIndex);
 
         emit ShortRedeem(
@@ -1015,5 +1016,41 @@ contract LongShort is ILongShort, Initializable {
             longValue[marketIndex],
             shortValue[marketIndex]
         );
+    }
+
+    ////////////////////////////////////
+    /////// TREASURY FUNCTIONS /////////
+    ////////////////////////////////////
+
+    /*
+     * Transfers the reserved treasury funds to the treasury contract. This is
+     * done async like this to avoid heaping transfer gas on users every time
+     * they pay fees or accrue yield.
+     *
+     * NOTE: doesn't affect markets, so no state refresh necessary
+     */
+    function transferTreasuryFunds(uint256 marketIndex) external treasuryOnly {
+        // Edge-case: no funds to transfer.
+        if (totalValueReservedForTreasury[marketIndex] == 0) {
+            return;
+        }
+
+        // We may have to withdraw requisite funds from the yield managers.
+        uint256 liquid = getLiquidFunds(marketIndex);
+        if (liquid < totalValueReservedForTreasury[marketIndex]) {
+            _transferFromYieldManager(
+                marketIndex,
+                totalValueReservedForTreasury[marketIndex] - liquid
+            );
+        }
+
+        // Transfer funds to the treasury.
+        fundTokens[marketIndex].transfer(
+            treasury,
+            totalValueReservedForTreasury[marketIndex]
+        );
+
+        // Update global state.
+        totalValueReservedForTreasury[marketIndex] = 0;
     }
 }
