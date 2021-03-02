@@ -10,8 +10,6 @@ const {
 const { initialize, mintAndApprove, createSynthetic } = require("./helpers");
 
 contract("LongShort (minting fees)", (accounts) => {
-  let longShort;
-
   const syntheticName = "FTSE100";
   const syntheticSymbol = "FTSE";
 
@@ -27,6 +25,7 @@ contract("LongShort (minting fees)", (accounts) => {
   const twoHundred = "200000000000000000000";
   const e18 = new BN("1000000000000000000");
 
+  let longShort;
   beforeEach(async () => {
     const result = await initialize(admin);
     longShort = result.longShort;

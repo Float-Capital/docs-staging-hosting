@@ -88,6 +88,7 @@ const initialize = async (admin) => {
     longShort,
     floatToken,
     tokenFactory,
+    treasury,
   };
 };
 

@@ -1024,8 +1024,8 @@ contract LongShort is ILongShort, Initializable {
 
     /*
      * Transfers the reserved treasury funds to the treasury contract. This is
-     * done async like this to avoid heaping transfer gas on users every time
-     * they pay fees or accrue yield.
+     * done async to avoid putting transfer gas costs on users every time they o
+     * pay fees or accrue yield.
      *
      * NOTE: doesn't affect markets, so no state refresh necessary
      */
