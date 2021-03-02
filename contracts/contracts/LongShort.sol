@@ -6,9 +6,9 @@ import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
-import "./interfaces/IStaker.sol";
 import "./TokenFactory.sol";
 import "./SyntheticToken.sol";
+import "./interfaces/IStaker.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/IYieldManager.sol";
 import "./interfaces/IOracleManager.sol";
@@ -80,6 +80,9 @@ contract LongShort is ILongShort, Initializable {
     address public admin; // This will likely be the Gnosis safe
     uint256 public latestMarket;
     mapping(uint256 => bool) public marketExists;
+
+    // Treasury contract that accrued fees and yield are sent to.
+    address public treasury;
 
     // Factory for dynamically creating synthetic long/short tokens.
     TokenFactory public tokenFactory;
@@ -237,10 +240,12 @@ contract LongShort is ILongShort, Initializable {
 
     function setup(
         address _admin,
+        address _treasury,
         address _tokenFactory,
         address _staker
     ) public initializer {
         admin = _admin;
+        treasury = _treasury;
         tokenFactory = TokenFactory(_tokenFactory);
         staker = IStaker(_staker);
 
@@ -248,9 +253,21 @@ contract LongShort is ILongShort, Initializable {
     }
 
     ////////////////////////////////////
-    /// MULTISIG ADMIN CREATE MARKETS //
+    /// MULTISIG ADMIN FUNCTIONS ///////
     ////////////////////////////////////
 
+    function changeAdmin(address _admin) external adminOnly {
+        admin = _admin;
+    }
+
+    function changeTreasury(address _treasury) external adminOnly {
+        treasury = _treasury;
+    }
+
+    /**
+     * Creates an entirely new long/short market tracking an underlying
+     * oracle price. Make sure the synthetic names/symbols are unique.
+     */
     function newSyntheticMarket(
         string calldata syntheticName,
         string calldata syntheticSymbol,
