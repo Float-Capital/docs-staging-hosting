@@ -5,16 +5,15 @@ import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as Login from "./components/Login/Login.js";
 import * as React from "react";
 import * as Button from "./components/UI/Button.js";
-import * as Ethers from "ethers";
+import * as Ethers from "./ethereum/Ethers.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
 import * as Queries from "./data/Queries.js";
 import * as ViewBox from "./components/UI/ViewBox.js";
 import * as StakeForm from "./components/Stake/StakeForm.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as FormatMoney from "./components/UI/FormatMoney.js";
 import * as Router from "next/router";
-import * as TokenBalance from "./components/ExampleViewFunctions/TokenBalance.js";
 import * as AccessControl from "./components/AccessControl.js";
-import * as AddToMetamask from "./components/UI/AddToMetamask.js";
 import * as Belt_SortArray from "bs-platform/lib/es6/belt_SortArray.js";
 
 function Stake$Stake(Props) {
@@ -22,6 +21,29 @@ function Stake$Stake(Props) {
   React.useState(function () {
         return true;
       });
+  var mapVal = function (apy) {
+    return (apy * 100).toFixed(2) + "%" + (
+            apy > 0.15 ? "🔥" : ""
+          );
+  };
+  var basicApyCalc = function (busdApy, longVal, shortVal, tokenType) {
+    switch (tokenType) {
+      case "long" :
+          if (longVal !== 0.0) {
+            return busdApy * shortVal / longVal;
+          } else {
+            return busdApy;
+          }
+      case "short" :
+          if (shortVal !== 0.0) {
+            return busdApy * longVal / shortVal;
+          } else {
+            return busdApy;
+          }
+      default:
+        return busdApy;
+    }
+  };
   var match = React.useState(function () {
         return [];
       });
@@ -59,11 +81,16 @@ function Stake$Stake(Props) {
             var syntheticTokens = match.syntheticTokens;
             Curry._1(setSyntheticTokens, (function (param) {
                     return Belt_SortArray.stableSortBy(Belt_Array.map(syntheticTokens, (function (param) {
+                                      var match = param.syntheticMarket;
+                                      var match$1 = match.latestSystemState;
                                       return {
                                               id: param.id,
-                                              symbol: param.syntheticMarket.name,
+                                              symbol: match.name,
                                               apy: 0.2,
-                                              tokenType: String(param.tokenType).toLowerCase()
+                                              tokenType: String(param.tokenType).toLowerCase(),
+                                              totalStaked: param.totalStaked,
+                                              totalLockedLong: match$1.totalLockedLong,
+                                              totalLockedShort: match$1.totalLockedShort
                                             };
                                     })), (function (a, b) {
                                   var greater = b.symbol.localeCompare(a.symbol);
@@ -105,7 +132,9 @@ function Stake$Stake(Props) {
               children: React.createElement(ViewBox.make, {
                     children: tokenId !== undefined ? React.createElement("div", undefined, React.createElement(StakeForm.make, {
                                 tokenId: tokenId
-                              })) : React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Stake"), Belt_Array.map(match[0], (function (token) {
+                              })) : React.createElement(React.Fragment, undefined, React.createElement("div", {
+                                className: "font-bold"
+                              }, React.createElement("h1", undefined, "Stake to earn Float tokens")), Belt_Array.map(match[0], (function (token) {
                                   return React.createElement(Card.make, {
                                               children: React.createElement("div", {
                                                     className: "flex justify-between items-center w-full"
@@ -115,26 +144,17 @@ function Stake$Stake(Props) {
                                                             className: "flex"
                                                           }, React.createElement("h3", {
                                                                 className: "font-bold"
-                                                              }, "Token"), React.createElement(AddToMetamask.make, {
-                                                                tokenAddress: token.id,
-                                                                tokenSymbol: (
-                                                                  token.tokenType === "short" ? "↘️" : "↗️"
-                                                                ) + token.symbol.replace(/[aeiou]/ig, "")
-                                                              })), React.createElement("p", undefined, token.symbol, token.tokenType === "short" ? "↘️" : "↗️")), React.createElement("div", {
+                                                              }, "Synth")), React.createElement("p", undefined, token.symbol, token.tokenType === "short" ? "↘️" : "↗️")), React.createElement("div", {
                                                         className: "flex flex-col"
                                                       }, React.createElement("h3", {
                                                             className: "font-bold"
-                                                          }, "Balance"), React.createElement(TokenBalance.make, {
-                                                            erc20Address: Ethers.utils.getAddress(token.id)
-                                                          })), React.createElement("div", {
+                                                          }, "Total staked"), React.createElement("p", undefined, FormatMoney.formatEther(token.totalStaked))), React.createElement("div", {
                                                         className: "flex flex-col"
                                                       }, React.createElement("h3", {
                                                             className: "font-bold"
-                                                          }, "R ", React.createElement("span", {
+                                                          }, "APY ", React.createElement("span", {
                                                                 className: "text-xs"
-                                                              }, "ℹ️")), React.createElement("p", undefined, String(token.apy * 100) + "%" + (
-                                                            token.apy > 0.15 ? "🔥" : ""
-                                                          ))), React.createElement(Button.make, {
+                                                              }, "ℹ️")), React.createElement("p", undefined, mapVal(basicApyCalc(0.12, Number(Ethers.Utils.formatEther(token.totalLockedLong)), Number(Ethers.Utils.formatEther(token.totalLockedShort)), token.tokenType)))), React.createElement(Button.make, {
                                                         onClick: (function (param) {
                                                             router.push("/stake?tokenId=" + token.id);
                                                             

@@ -40,6 +40,8 @@ contract Staker is IStaker, Initializable {
 
     // Global state.
     address public admin;
+    address public floatCapital;
+    uint16 public floatPercentage;
     uint256 public initialTimestamp;
     LongShort public floatContract;
     FloatToken public floatToken;
@@ -112,12 +114,15 @@ contract Staker is IStaker, Initializable {
     function initialize(
         address _admin,
         address _floatContract,
-        address _floatToken
+        address _floatToken,
+        address _floatCapital
     ) public initializer {
         admin = _admin;
+        floatCapital = _floatCapital;
         initialTimestamp = block.timestamp;
         floatContract = LongShort(_floatContract);
         floatToken = FloatToken(_floatToken);
+        floatPercentage = 1500;
 
         emit DeployV1(_floatToken);
     }
@@ -128,6 +133,11 @@ contract Staker is IStaker, Initializable {
 
     function changeAdmin(address _admin) external onlyAdmin {
         admin = _admin;
+    }
+
+    function changeFloatPercentage(uint16 _newPercentage) external onlyAdmin {
+        require(_newPercentage <= 10000);
+        floatPercentage = _newPercentage;
     }
 
     ////////////////////////////////////
@@ -162,13 +172,13 @@ contract Staker is IStaker, Initializable {
 
     /*
      * Computes the current 'r' value, i.e. the number of float tokens a user
-     * earns per second for every unit of value they've staked on a token.
-     * The returned value has a fixed decimal scale of 1e18.
+     * earns per second for every longshort token they've staked. The returned
+     * value has a fixed decimal scale of 1e18.
      */
     function calculateFloatPerSecond(
         uint256 longValue,
         uint256 shortValue,
-        uint256 timestamp,
+        uint256 tokenPrice, // price of the long or short token
         bool isLong
     ) public view returns (uint256) {
         // Edge-case: no float is issued in an empty market.
@@ -179,10 +189,11 @@ contract Staker is IStaker, Initializable {
         // A float issuance multiplier that starts high and decreases linearly
         // over time to a value of 1. This incentivises users to stake early.
         uint256 k = 1e18;
-        if (timestamp - initialTimestamp <= K_FACTOR_PERIOD) {
+        if (block.timestamp - initialTimestamp <= K_FACTOR_PERIOD) {
             k =
                 1e18 -
-                ((K_FACTOR_INITIAL - 1e18) * (timestamp - initialTimestamp)) /
+                ((K_FACTOR_INITIAL - 1e18) *
+                    (block.timestamp - initialTimestamp)) /
                 K_FACTOR_PERIOD;
         }
 
@@ -190,9 +201,15 @@ contract Staker is IStaker, Initializable {
         // the opposite position. This incentivises users to stake on the
         // weaker position.
         if (isLong) {
-            return (k * shortValue) / (longValue + shortValue);
+            return
+                ((k * shortValue) * tokenPrice) /
+                (longValue + shortValue) /
+                1e18;
         } else {
-            return (k * longValue) / (longValue + shortValue);
+            return
+                ((k * longValue) * tokenPrice) /
+                (longValue + shortValue) /
+                1e18;
         }
     }
 
@@ -212,17 +229,13 @@ contract Staker is IStaker, Initializable {
     function calculateNewCumulative(
         uint256 longValue,
         uint256 shortValue,
-        address token,
-        bool isLong
+        uint256 tokenPrice,
+        address token, // either long or short token address
+        bool isLong // tells us which one
     ) internal view returns (uint256) {
         // Compute the current 'r' value for float issuance per second.
         uint256 floatPerSecond =
-            calculateFloatPerSecond(
-                longValue,
-                shortValue,
-                block.timestamp,
-                isLong
-            );
+            calculateFloatPerSecond(longValue, shortValue, tokenPrice, isLong);
 
         // Compute time since last state point for the given token.
         uint256 timeDelta = calculateTimeDelta(token);
@@ -240,6 +253,7 @@ contract Staker is IStaker, Initializable {
     function setRewardObjects(
         uint256 longValue,
         uint256 shortValue,
+        uint256 tokenPrice, // long or short token price
         address token,
         bool isLong
     ) internal {
@@ -250,6 +264,7 @@ contract Staker is IStaker, Initializable {
             .accumulativeFloatPerToken = calculateNewCumulative(
             longValue,
             shortValue,
+            tokenPrice,
             token,
             isLong
         );
@@ -282,8 +297,14 @@ contract Staker is IStaker, Initializable {
     ) external override onlyFloat {
         // Only add a new state point if some time has passed.
         if (calculateTimeDelta(longToken) > 0) {
-            setRewardObjects(longValue, shortValue, longToken, true);
-            setRewardObjects(longValue, shortValue, shortToken, false);
+            setRewardObjects(longValue, shortValue, longPrice, longToken, true);
+            setRewardObjects(
+                longValue,
+                shortValue,
+                shortPrice,
+                shortToken,
+                false
+            );
         }
     }
 
@@ -293,6 +314,7 @@ contract Staker is IStaker, Initializable {
 
     function calculateAccumulatedFloat(address tokenAddress, address user)
         internal
+        view
         returns (uint256)
     {
         // Don't let users accumulate float immediately after staking, before
@@ -317,6 +339,14 @@ contract Staker is IStaker, Initializable {
         return accumDelta * userAmountStaked[tokenAddress][user];
     }
 
+    function _mintFloat(address user, uint256 floatToMint) internal {
+        floatToken.mint(user, floatToMint);
+        floatToken.mint(
+            floatCapital,
+            floatToMint.mul(floatPercentage).div(10000)
+        );
+    }
+
     function mintAccumulatedFloat(address tokenAddress, address user) internal {
         uint256 floatToMint = calculateAccumulatedFloat(tokenAddress, user);
 
@@ -326,7 +356,7 @@ contract Staker is IStaker, Initializable {
                 user
             ] = latestRewardIndex[tokenAddress];
 
-            floatToken.mint(user, floatToMint);
+            _mintFloat(user, floatToMint);
 
             emit FloatMinted(
                 user,
@@ -361,7 +391,7 @@ contract Staker is IStaker, Initializable {
             }
         }
         if (floatTotal > 0) {
-            floatToken.mint(msg.sender, floatTotal);
+            _mintFloat(msg.sender, floatTotal);
         }
     }
 

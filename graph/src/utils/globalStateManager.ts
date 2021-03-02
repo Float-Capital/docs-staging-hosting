@@ -35,15 +35,23 @@ export function getOrCreateLatestSystemState(
   return latestSystemState;
 }
 
-export function getOrCreateUser(address: Bytes): User | null {
+export function getOrCreateUser(
+  address: Bytes,
+  event: ethereum.Event
+): User | null {
   let user = User.load(address.toHex());
   if (user == null) {
     user = new User(address.toHex());
     user.address = address;
     user.totalMintedFloat = ZERO;
     user.floatTokenBalance = ZERO;
+    user.timestampJoined = event.block.timestamp;
+    user.totalGasUsed = ZERO;
+    user.numberOfTransactions = ZERO;
+    user.currentStakes = [];
     user.tokenBalances = [];
     user.tokenMints = [];
+    user.stateChangesAffectingUser = [];
   }
 
   return user;

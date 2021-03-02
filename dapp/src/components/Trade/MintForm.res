@@ -48,7 +48,7 @@ let isGreaterThanBalance = (~amount, ~balance) => {
 }
 
 @react.component
-let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets) => {
+let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets, ~initialIsLong) => {
   let signer = ContractActions.useSignerExn()
 
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
@@ -77,7 +77,10 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
     ~erc20Address=market.syntheticLong.tokenAddress,
   )
 
-  let form = MintForm.useForm(~initialInput, ~onSubmit=({amount, isLong, isStaking}, _form) => {
+  let form = MintForm.useForm(~initialInput={
+    ...initialInput,
+    isLong: initialIsLong
+  }, ~onSubmit=({amount, isLong, isStaking}, _form) => {
     let approveFunction = () =>
       contractExecutionHandlerApprove(
         ~makeContractInstance=Contracts.Erc20.make(~address=daiAddressThatIsTemporarilyHardCoded),

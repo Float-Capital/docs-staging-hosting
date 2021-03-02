@@ -43,6 +43,7 @@ contract OracleManagerEthKiller is Initializable {
 
     function _getAssetPrices()
         internal
+        view
         returns (
             int256,
             int256,
@@ -91,6 +92,7 @@ contract OracleManagerEthKiller is Initializable {
 
     function _calcAbsolutePercentageChange(int256 newPrice, int256 basePrice)
         internal
+        pure
         returns (int256)
     {
         return ((newPrice - basePrice) * (1e18)) / (basePrice);

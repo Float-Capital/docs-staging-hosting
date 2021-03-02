@@ -4,6 +4,7 @@ module Mint = {
     let router = Next.Router.useRouter()
     let markets = Queries.MarketDetails.use()
     let marketIndex = router.query->Js.Dict.get("marketIndex")->Option.getWithDefault("1")
+    let mintOption = router.query->Js.Dict.get("mintOption")->Option.getWithDefault("short")
     <AccessControl
       alternateComponent={<h1 onClick={_ => router->Next.Router.push("/login?nextPath=/mint")}>
         <Login />
@@ -16,7 +17,7 @@ module Mint = {
           let optFirstMarket =
             syntheticMarkets[marketIndex->Belt.Int.fromString->Option.getWithDefault(1) - 1]
           switch optFirstMarket {
-          | Some(firstMarket) => <MintForm market={firstMarket} />
+          | Some(firstMarket) => <MintForm market={firstMarket} initialIsLong={mintOption == "short" ? false : true}/>
           | None => <p> {"No markets exist"->React.string} </p>
           }
         | {data: None, error: None, loading: false} =>
