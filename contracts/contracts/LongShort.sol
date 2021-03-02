@@ -395,16 +395,15 @@ contract LongShort is ILongShort, Initializable {
     }
 
     /**
-     * Returns the amount of accrued interest that should go to the market,
-     * and the amount that should be locked into dao funds. To incentivise
-     * market balance, more interest goes to the market in proportion to how
+     * Returns the amount of accrued value that should go to the market,
+     * and the amount that should be locked into the treasury. To incentivise
+     * market balance, more value goes to the market in proportion to how
      * imbalanced it is.
-     * TODO: use this for the fee mechanism as well?
      */
-    function getYieldSplit(uint256 marketIndex, uint256 amount)
+    function getTreasurySplit(uint256 marketIndex, uint256 amount)
         public
         view
-        returns (uint256 marketAmount, uint256 daoAmount)
+        returns (uint256 marketAmount, uint256 treasuryAmount)
     {
         uint256 marketPcnt; // fixed-precision scale of 10000
         if (longValue[marketIndex] > shortValue[marketIndex]) {
@@ -420,11 +419,18 @@ contract LongShort is ILongShort, Initializable {
         }
 
         marketAmount = marketPcnt.mul(amount).div(10000);
-        daoAmount = amount.sub(marketAmount);
-        require(amount == marketAmount + daoAmount);
+        treasuryAmount = amount.sub(marketAmount);
+        require(amount == marketAmount + treasuryAmount);
 
-        return (marketAmount, daoAmount);
+        return (marketAmount, treasuryAmount);
     }
+
+    /**
+      * Returns the amount of accrued value that should go to each side of the
+      * market. To incentivise balance, more value goes to the weaker side in
+      * proportion to how imbalanced the market is.
+      */
+     //function getMarketSplit(uint256 
 
     /**
      * Adjusts the long/short token prices according to supply and value.
@@ -456,11 +462,19 @@ contract LongShort is ILongShort, Initializable {
      * Controls what happens with mint/redeem fees.
      */
     function _feesMechanism(uint256 marketIndex, uint256 totalFees) internal {
+        // Market gets a bigger share if the market is more imbalanced.
+        (uint256 marketAmount, uint256 treasuryAmount) =
+            getTreasurySplit(marketIndex, totalFees);
+
+        // Do a logical transfer from market funds into treasury.
+        totalValueLockedInMarket[marketIndex] -= treasuryAmount;
+        totalValueReservedForTreasury[marketIndex] += treasuryAmount;
+        
         // Initial mechanism just splits fees evenly across the long/short
         // market values. We may want to incentivise float token holders by
         // depositing some in the DAO later.
-        uint256 longAmount = totalFees.div(2);
-        uint256 shortAmount = totalFees.sub(longAmount);
+        uint256 longAmount = marketAmount.div(2);
+        uint256 shortAmount = marketAmount.sub(longAmount);
         longValue[marketIndex] = longValue[marketIndex].add(longAmount);
         shortValue[marketIndex] = shortValue[marketIndex].add(shortAmount);
 
@@ -480,14 +494,15 @@ contract LongShort is ILongShort, Initializable {
                 totalValueLockedInYieldManager[marketIndex]
             );
 
-        (uint256 marketAmount, uint256 daoAmount) =
-            getYieldSplit(marketIndex, amount);
+        // Market gets a bigger share if the market is more imbalanced.
+        (uint256 marketAmount, uint256 treasuryAmount) =
+            getTreasurySplit(marketIndex, amount);
 
         // We keep the interest locked in the yield manager, but update our
         // bookkeeping to logically simulate moving the funds around.
         totalValueLockedInYieldManager[marketIndex] += amount;
         totalValueLockedInMarket[marketIndex] += marketAmount;
-        totalValueReservedForTreasury[marketIndex] += daoAmount;
+        totalValueReservedForTreasury[marketIndex] += treasuryAmount;
 
         // TODO(guy): Implement actual interest split for market. The weaker
         // side should receive the stronger side's proportion of the interest
