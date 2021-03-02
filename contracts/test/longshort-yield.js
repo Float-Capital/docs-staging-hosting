@@ -204,8 +204,8 @@ contract("LongShort (yield mechanism)", (accounts) => {
       initialMintLong: oneHundred,
       initialMintShort: new BN(0),
       yieldFn: (yieldScale) => yieldScale, // 100%
-      expectedLongValue: oneHundredAndFifty, // all yield is split (TODO ACTUAL MECHANISM)
-      expectedShortValue: fifty,
+      expectedLongValue: oneHundred,
+      expectedShortValue: oneHundred, // all yield goes to weaker position
       expectedTreasuryValue: new BN(0), // no yield goes to dao
     })
   );
@@ -216,8 +216,8 @@ contract("LongShort (yield mechanism)", (accounts) => {
       initialMintLong: new BN(0),
       initialMintShort: oneHundred,
       yieldFn: (yieldScale) => yieldScale, // 100%
-      expectedLongValue: fifty, // all yield is split (TODO ACTUAL MECHANISM)
-      expectedShortValue: oneHundredAndFifty,
+      expectedLongValue: oneHundred, // all yield goes to weaker position
+      expectedShortValue: oneHundred,
       expectedTreasuryValue: new BN(0), // no yield goes to dao
     })
   );
@@ -228,8 +228,8 @@ contract("LongShort (yield mechanism)", (accounts) => {
       initialMintLong: oneHundred,
       initialMintShort: threeHundred,
       yieldFn: (yieldScale) => yieldScale, // 100%
-      expectedLongValue: twoHundred, // 50% split to market (TODO ACTUAL MECHANISM)
-      expectedShortValue: fourHundred,
+      expectedLongValue: twoHundred.add(fifty), // 37.5% goes to weaker side
+      expectedShortValue: threeHundred.add(fifty), // 12.5% goes to stronger side
       expectedTreasuryValue: twoHundred, // 50% split to dao
     })
   );
@@ -240,8 +240,8 @@ contract("LongShort (yield mechanism)", (accounts) => {
       initialMintLong: threeHundred,
       initialMintShort: oneHundred,
       yieldFn: (yieldScale) => yieldScale, // 100%
-      expectedLongValue: fourHundred, // 50% split to market (TODO ACTUAL MECHANISM)
-      expectedShortValue: twoHundred,
+      expectedLongValue: threeHundred.add(fifty), // 12.5% goes to stronger side
+      expectedShortValue: twoHundred.add(fifty), // 37.5% goes to weaker side
       expectedTreasuryValue: twoHundred, // 50% split to dao
     })
   );
