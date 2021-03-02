@@ -37,7 +37,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
         yieldFn,
         expectedShortValue,
         expectedLongValue,
-        expectedDaoValue,
+        expectedTreasuryValue,
       } = args;
 
       // Create synthetic market.
@@ -129,7 +129,9 @@ contract("LongShort (yield mechanism)", (accounts) => {
       // Get changes in long/short value and check they match expectations.
       const longValue = await longShort.longValue.call(marketIndex);
       const shortValue = await longShort.shortValue.call(marketIndex);
-      const daoValue = await longShort.totalValueLockedInDao.call(marketIndex);
+      const treasuryValue = await longShort.totalValueReservedForTreasury.call(
+        marketIndex
+      );
       assert.equal(
         longValue.toString(),
         expectedLongValue.toString(),
@@ -141,9 +143,9 @@ contract("LongShort (yield mechanism)", (accounts) => {
         "short value didn't match expectation after settlement"
       );
       assert.equal(
-        daoValue.toString(),
-        expectedDaoValue.toString(),
-        "dao value didn't match expectation after settlement"
+        treasuryValue.toString(),
+        expectedTreasuryValue.toString(),
+        "treasury value didn't match expectation after settlement"
       );
     };
   }
@@ -156,7 +158,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
       yieldFn: (yieldScale) => new BN(0),
       expectedLongValue: oneHundred,
       expectedShortValue: oneHundred,
-      expectedDaoValue: new BN(0),
+      expectedTreasuryValue: new BN(0),
     })
   );
 
@@ -168,7 +170,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
       yieldFn: (yieldScale) => new BN(0),
       expectedLongValue: oneHundred,
       expectedShortValue: twoHundred,
-      expectedDaoValue: new BN(0),
+      expectedTreasuryValue: new BN(0),
     })
   );
 
@@ -180,7 +182,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
       yieldFn: (yieldScale) => new BN(0),
       expectedLongValue: twoHundred,
       expectedShortValue: oneHundred,
-      expectedDaoValue: new BN(0),
+      expectedTreasuryValue: new BN(0),
     })
   );
 
@@ -192,7 +194,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
       yieldFn: (yieldScale) => yieldScale, // 100%
       expectedLongValue: oneHundred,
       expectedShortValue: oneHundred,
-      expectedDaoValue: twoHundred, // balanced - all yield goes to dao
+      expectedTreasuryValue: twoHundred, // balanced - all yield goes to dao
     })
   );
 
@@ -204,7 +206,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
       yieldFn: (yieldScale) => yieldScale, // 100%
       expectedLongValue: oneHundredAndFifty, // all yield is split (TODO ACTUAL MECHANISM)
       expectedShortValue: fifty,
-      expectedDaoValue: new BN(0), // no yield goes to dao
+      expectedTreasuryValue: new BN(0), // no yield goes to dao
     })
   );
 
@@ -216,7 +218,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
       yieldFn: (yieldScale) => yieldScale, // 100%
       expectedLongValue: fifty, // all yield is split (TODO ACTUAL MECHANISM)
       expectedShortValue: oneHundredAndFifty,
-      expectedDaoValue: new BN(0), // no yield goes to dao
+      expectedTreasuryValue: new BN(0), // no yield goes to dao
     })
   );
 
@@ -228,7 +230,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
       yieldFn: (yieldScale) => yieldScale, // 100%
       expectedLongValue: twoHundred, // 50% split to market (TODO ACTUAL MECHANISM)
       expectedShortValue: fourHundred,
-      expectedDaoValue: twoHundred, // 50% split to dao
+      expectedTreasuryValue: twoHundred, // 50% split to dao
     })
   );
 
@@ -240,7 +242,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
       yieldFn: (yieldScale) => yieldScale, // 100%
       expectedLongValue: fourHundred, // 50% split to market (TODO ACTUAL MECHANISM)
       expectedShortValue: twoHundred,
-      expectedDaoValue: twoHundred, // 50% split to dao
+      expectedTreasuryValue: twoHundred, // 50% split to dao
     })
   );
 });

@@ -99,7 +99,7 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint256 => uint256) public shortValue;
     mapping(uint256 => uint256) public totalValueLockedInMarket;
     mapping(uint256 => uint256) public totalValueLockedInYieldManager;
-    mapping(uint256 => uint256) public totalValueLockedInDao;
+    mapping(uint256 => uint256) public totalValueReservedForTreasury;
     mapping(uint256 => uint256) public assetPrice;
     mapping(uint256 => uint256) public longTokenPrice;
     mapping(uint256 => uint256) public shortTokenPrice;
@@ -354,7 +354,7 @@ contract LongShort is ILongShort, Initializable {
     function getLiquidFunds(uint256 marketIndex) public view returns (uint256) {
         return
             totalValueLockedInMarket[marketIndex]
-                .add(totalValueLockedInDao[marketIndex])
+                .add(totalValueReservedForTreasury[marketIndex])
                 .sub(totalValueLockedInYieldManager[marketIndex]);
     }
 
@@ -482,7 +482,7 @@ contract LongShort is ILongShort, Initializable {
         // bookkeeping to logically simulate moving the funds around.
         totalValueLockedInYieldManager[marketIndex] += amount;
         totalValueLockedInMarket[marketIndex] += marketAmount;
-        totalValueLockedInDao[marketIndex] += daoAmount;
+        totalValueReservedForTreasury[marketIndex] += daoAmount;
 
         // TODO(guy): Implement actual interest split for market. The weaker
         // side should receive the stronger side's proportion of the interest
@@ -645,9 +645,13 @@ contract LongShort is ILongShort, Initializable {
     }
 
     /*
-     * Returns locked funds from the market to the sender.
+     * Returns locked funds from the market to the given user.
      */
-    function _withdrawFunds(uint256 marketIndex, uint256 amount) internal {
+    function _withdrawFunds(
+        address to,
+        uint256 marketIndex,
+        uint256 amount
+    ) internal {
         require(totalValueLockedInMarket[marketIndex] >= amount);
 
         // Withdraw requisite funds from the yield managers if necessary.
@@ -660,7 +664,7 @@ contract LongShort is ILongShort, Initializable {
         }
 
         // Transfer funds to the sender.
-        fundTokens[marketIndex].transfer(msg.sender, amount);
+        fundTokens[marketIndex].transfer(to, amount);
 
         // Update market state.
         totalValueLockedInMarket[marketIndex] = totalValueLockedInMarket[
@@ -689,7 +693,7 @@ contract LongShort is ILongShort, Initializable {
         require(
             totalValueLockedInYieldManager[marketIndex] <=
                 totalValueLockedInMarket[marketIndex] +
-                    totalValueLockedInDao[marketIndex]
+                    totalValueReservedForTreasury[marketIndex]
         );
     }
 
@@ -706,11 +710,11 @@ contract LongShort is ILongShort, Initializable {
         totalValueLockedInYieldManager[marketIndex] -= amount;
 
         // Invariant: yield managers should never have more locked funds
-        // than the combined value of the market and dao funds.
+        // than the combined value of the market and held treasury funds.
         require(
             totalValueLockedInYieldManager[marketIndex] <=
                 totalValueLockedInMarket[marketIndex] +
-                    totalValueLockedInDao[marketIndex]
+                    totalValueReservedForTreasury[marketIndex]
         );
     }
 
@@ -952,7 +956,7 @@ contract LongShort is ILongShort, Initializable {
 
         // Withdraw funds with remaining amount.
         longValue[marketIndex] = longValue[marketIndex].sub(amount);
-        _withdrawFunds(marketIndex, remaining);
+        _withdrawFunds(msg.sender, marketIndex, remaining);
         _refreshTokensPrice(marketIndex);
 
         emit LongRedeem(
@@ -992,7 +996,7 @@ contract LongShort is ILongShort, Initializable {
 
         // Withdraw funds with remaining amount.
         shortValue[marketIndex] = shortValue[marketIndex].sub(amount);
-        _withdrawFunds(marketIndex, remaining);
+        _withdrawFunds(msg.sender, marketIndex, remaining);
         _refreshTokensPrice(marketIndex);
 
         emit ShortRedeem(
