@@ -31,8 +31,9 @@ contract Staker is IStaker, Initializable {
     ////////////////////////////////////
 
     // Controls the k-factor, a multiplier for incentivising early stakers.
-    uint256 public constant K_FACTOR_PERIOD = 30 * 24 * 60 * 60; // secs
-    uint256 public constant K_FACTOR_INITIAL = 5e18; // scale of e18
+    //   token market index -> value
+    mapping(uint256 => uint256) public kFactorPeriods; // seconds
+    mapping(uint256 => uint256) public kFactorInitialMultipliers; // e18 scale
 
     ////////////////////////////////////
     //////// VARIABLES /////////////////
@@ -47,7 +48,7 @@ contract Staker is IStaker, Initializable {
     FloatToken public floatToken;
 
     // User state.
-    // token -> user -> value
+    //   token -> user -> value
     mapping(address => mapping(address => uint256)) public userAmountStaked;
     mapping(address => mapping(address => uint256))
         public userIndexOfLastClaimedReward;
@@ -140,6 +141,15 @@ contract Staker is IStaker, Initializable {
         floatPercentage = _newPercentage;
     }
 
+    function changeKFactorParameters(
+        uint256 marketIndex,
+        uint256 period,
+        uint256 initialMultiplier
+    ) external onlyAdmin {
+        kFactorPeriods[marketIndex] = period;
+        kFactorInitialMultipliers[marketIndex] = initialMultiplier;
+    }
+
     ////////////////////////////////////
     /////////// STAKING SETUP //////////
     ////////////////////////////////////
@@ -173,44 +183,61 @@ contract Staker is IStaker, Initializable {
     /*
      * Computes the current 'r' value, i.e. the number of float tokens a user
      * earns per second for every longshort token they've staked. The returned
-     * value has a fixed decimal scale of 1e18.
+     * value has a fixed decimal scale of 1e45 (!!!) for numerical stability.
      */
     function calculateFloatPerSecond(
         uint256 longValue,
         uint256 shortValue,
-        uint256 tokenPrice, // price of the long or short token
-        bool isLong
+        uint256 tokenPrice, // price of the token
+        address token, // long or short token address
+        bool isLong // whether it's the long or short token
     ) public view returns (uint256) {
         // Edge-case: no float is issued in an empty market.
         if (longValue == 0 && shortValue == 0) {
             return 0;
         }
 
+        // Parameters controlling the float issuance multiplier.
+        (uint256 kPeriod, uint256 kInitialMultiplier) =
+            getKFactorParameters(marketIndexOfToken[token]);
+
         // A float issuance multiplier that starts high and decreases linearly
         // over time to a value of 1. This incentivises users to stake early.
         uint256 k = 1e18;
-        if (block.timestamp - initialTimestamp <= K_FACTOR_PERIOD) {
+        if (block.timestamp - initialTimestamp <= kPeriod) {
             k =
                 1e18 -
-                ((K_FACTOR_INITIAL - 1e18) *
+                ((kInitialMultiplier - 1e18) *
                     (block.timestamp - initialTimestamp)) /
-                K_FACTOR_PERIOD;
+                kPeriod;
         }
 
         // Float is scaled by the percentage of the total market value held in
         // the opposite position. This incentivises users to stake on the
         // weaker position.
         if (isLong) {
-            return
-                ((k * shortValue) * tokenPrice) /
-                (longValue + shortValue) /
-                1e18;
+            return ((k * shortValue) * tokenPrice) / (longValue + shortValue);
         } else {
-            return
-                ((k * longValue) * tokenPrice) /
-                (longValue + shortValue) /
-                1e18;
+            return ((k * longValue) * tokenPrice) / (longValue + shortValue);
         }
+    }
+
+    /*
+     * Returns the K factor parameters for the given market with sensible
+     * defaults if they haven't been set yet.
+     */
+    function getKFactorParameters(uint256 marketIndex)
+        internal
+        view
+        returns (uint256, uint256)
+    {
+        uint256 period = kFactorPeriods[marketIndex];
+        uint256 multiplier = kFactorInitialMultipliers[marketIndex];
+        if (multiplier == 0) {
+            multiplier = 1e18; // multiplier of 1 by default
+        }
+
+        return (period, multiplier);
     }
 
     /*
@@ -235,7 +262,13 @@ contract Staker is IStaker, Initializable {
     ) internal view returns (uint256) {
         // Compute the current 'r' value for float issuance per second.
         uint256 floatPerSecond =
-            calculateFloatPerSecond(longValue, shortValue, tokenPrice, isLong);
+            calculateFloatPerSecond(
+                longValue,
+                shortValue,
+                tokenPrice,
+                token,
+                isLong
+            );
 
         // Compute time since last state point for the given token.
         uint256 timeDelta = calculateTimeDelta(token);
@@ -244,7 +277,7 @@ contract Staker is IStaker, Initializable {
         return
             syntheticRewardParams[token][latestRewardIndex[token]]
                 .accumulativeFloatPerToken
-                .add(timeDelta.mul(floatPerSecond).div(1e18));
+                .add(timeDelta.mul(floatPerSecond).div(1e27));
     }
 
     /*

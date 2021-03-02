@@ -15,13 +15,14 @@ contract("LongShort (staking)", (accounts) => {
   const user3 = accounts[3];
   const initialMinter = accounts[4];
 
+  const five = "5000000000000000000";
   const fifty = "50000000000000000000";
   const oneHundred = "1000000000000000000";
   const threeHundred = "3000000000000000000";
   const oneHundredAndFifty = "150000000000000000000";
   const twoHundred = "200000000000000000000";
   const twentyFive = "25000000000000000000";
-  const e18 = new BN("1000000000000000000");
+  const e27 = new BN("1000000000000000000000000000");
 
   let staker;
   let longShort;
@@ -51,6 +52,16 @@ contract("LongShort (staking)", (accounts) => {
     shortToken = synth.shortToken;
     marketIndex = synth.currentMarketIndex;
     fundToken = synth.fundToken;
+
+    // Set some random market parameters for the staker.
+    await staker.changeKFactorParameters(
+      marketIndex,
+      60 * 60 * 24 * 30,
+      new BN(five),
+      {
+        from: admin,
+      }
+    );
   });
 
   it("users can stake long tokens", async () => {
@@ -188,25 +199,26 @@ contract("LongShort (staking)", (accounts) => {
     // Trigger new state point in staker.
     await longShort._updateSystemState(marketIndex);
 
-    // Restake with 25 more long tokens - this should credit you float.
-    await staker.stake(longToken.address, twentyFive, { from: user1 });
-    let result = await floatToken.balanceOf(user1);
-
     // Compute expected float per second.
     const now = await time.latest();
     let expectedFloatPerSecond = await calculateFloatPerSecond(
       longValue,
       shortValue,
       longPrice,
+      longToken.address,
       true // we staked long tokens
     );
+
+    // Restake with 25 more long tokens - this should credit you float.
+    await staker.stake(longToken.address, twentyFive, { from: user1 });
+    let result = await floatToken.balanceOf(user1);
 
     // Check that the credited float is what we expect.
     assert.equal(
       result.toString(),
       expectedFloatPerSecond
         .mul(new BN(now - before))
-        .div(e18)
+        .div(e27)
         .mul(new BN(oneHundred))
         .toString()
     );
@@ -268,55 +280,53 @@ contract("LongShort (staking)", (accounts) => {
     await longShort.mintLong(marketIndex, new BN(oneHundred), {
       from: user1,
     });
+
+    // Stake all of the 100 long tokens.
     await longToken.approve(staker.address, oneHundred, {
       from: user1,
     });
-
-    // Stake all of the 100 long tokens.
     await staker.stake(longToken.address, oneHundred, { from: user1 });
 
-    // Trigger a state point in staker.
+    // We need to wait for two state changes because of the top-up bug!
     await time.increase(1);
     await longShort._updateSystemState(marketIndex);
 
-    // Get float parameters at current time for expected float calc.
-    const before = await time.latest();
-    const {
-      longValue,
-      shortValue,
-      longPrice,
-    } = await getFloatPerSecondParameters(longToken);
-
     // Wait a long time to accumulate some float.
-    await time.increase(999);
+    await time.increase(1000);
     await longShort._updateSystemState(marketIndex);
-
-    // Wait even longer to accumulate more float.
-    await time.increase(999);
-    await longShort._updateSystemState(marketIndex);
-
-    // Compute expected float per second.
-    const now = await time.latest();
-    let expectedFloatPerSecond = await calculateFloatPerSecond(
-      longValue,
-      shortValue,
-      longPrice,
-      true // we staked long tokens
-    );
 
     // Withdraw stake and earn accumulated float tokens.
     await staker.withdraw(longToken.address, new BN(oneHundred), {
       from: user1,
     });
-    const result = await floatToken.balanceOf(user1);
+    const result1 = await floatToken.balanceOf(user1);
 
-    assert.equal(
-      result.toString(),
-      expectedFloatPerSecond
-        .mul(new BN((now - before).toString()))
-        .div(e18)
-        .mul(new BN(oneHundred))
-        .toString()
+    // Stake all of the 100 long tokens again.
+    await longToken.approve(staker.address, oneHundred, {
+      from: user1,
+    });
+    await staker.stake(longToken.address, oneHundred, { from: user1 });
+
+    // We need to wait for two state changes because of the top-up bug!
+    await time.increase(1);
+    await longShort._updateSystemState(marketIndex);
+
+    // Wait even longer to accumulate more float.
+    await time.increase(2000);
+    await longShort._updateSystemState(marketIndex);
+
+    // Withdraw stake and earn accumulated float tokens.
+    await staker.withdraw(longToken.address, new BN(oneHundred), {
+      from: user1,
+    });
+    const result2 = await floatToken.balanceOf(user1);
+
+    // Ensure the second time we staked, which was for twice as long,
+    // resulted in more float tokens than the first time.
+    assert(!result1.isZero(), "should have accumulated some float");
+    assert(
+      result2.sub(result1).gt(result1),
+      "waiting longer should have more float"
     );
   });
 
@@ -352,6 +362,7 @@ contract("LongShort (staking)", (accounts) => {
       longValue,
       shortValue,
       token == longToken ? longPrice : shortPrice,
+      token.address,
       token == longToken
     );
 
@@ -367,7 +378,7 @@ contract("LongShort (staking)", (accounts) => {
       result.toString(),
       expectedFloatPerSecond
         .mul(new BN(now - before))
-        .div(e18)
+        .div(e27)
         .mul(new BN(oneHundred))
         .toString()
     );
@@ -394,12 +405,14 @@ contract("LongShort (staking)", (accounts) => {
     longValue,
     shortValue,
     tokenPrice,
+    token,
     isLong
   ) => {
     return await staker.calculateFloatPerSecond.call(
       longValue,
       shortValue,
       tokenPrice,
+      token,
       isLong
     );
   };
