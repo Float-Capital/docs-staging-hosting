@@ -76,17 +76,17 @@ contract("LongShort (minting fees)", (accounts) => {
 
       // Mint the initial long tokens.
       if (initialMintLong != 0) {
-        await mintAndApprove(fund, initialMintLong, user1, longShort.address);
+        await mintAndApprove(fund, initialMintLong, user3, longShort.address);
         await longShort.mintLong(marketIndex, new BN(initialMintLong), {
-          from: user1,
+          from: user3,
         });
       }
 
       // Mint the initial short tokens.
       if (initialMintShort != 0) {
-        await mintAndApprove(fund, initialMintShort, user2, longShort.address);
+        await mintAndApprove(fund, initialMintShort, user3, longShort.address);
         await longShort.mintShort(marketIndex, new BN(initialMintShort), {
-          from: user2,
+          from: user3,
         });
       }
 
@@ -94,14 +94,14 @@ contract("LongShort (minting fees)", (accounts) => {
       const initialLongValue = await longShort.longValue.call(marketIndex);
       const initialShortValue = await longShort.shortValue.call(marketIndex);
 
-      // Verify that the locked-in value increased by the amount minted.
-      // NOTE: this may change if we change our fee mechanism, as currently we
-      //       split fees across the long/short value in the market.
-      assert.equal(
-        new BN(initialLongValue).add(new BN(initialShortValue)).toString(),
-        new BN(initialMintLong).add(new BN(initialMintShort)).toString(),
-        "Wrong value locked in market after initial mint."
-      );
+      // Work out expected fee.
+      const expectedBaseFee = baseFee
+        .mul(new BN(expectedBaseFeeAmount))
+        .div(feeUnitsOfPrecision);
+      const expectedPenaltyFee = penaltyFee
+        .mul(new BN(expectedPenaltyFeeAmount))
+        .div(feeUnitsOfPrecision);
+      const expectedTotalFee = expectedPenaltyFee.add(expectedBaseFee);
 
       // Mint the long tokens.
       if (mintLong != 0) {
@@ -119,30 +119,22 @@ contract("LongShort (minting fees)", (accounts) => {
         });
       }
 
-      // Compute fee paid by user.
-      // NOTE: may change if we change the fee mechanism, this code relies on
-      // the fee being split across both sides of the market.
-      let userFee;
-      const finalLongValue = await longShort.longValue.call(marketIndex);
-      const finalShortValue = await longShort.shortValue.call(marketIndex);
-      const diffLongValue = finalLongValue.sub(initialLongValue);
-      const diffShortValue = finalShortValue.sub(initialShortValue);
+      // The fee is the mint amount less the user's token value.
+      let totalFee;
       if (mintLong != 0) {
-        userFee = new BN(mintLong).sub(diffLongValue).add(diffShortValue);
+        let userBalance = await long.balanceOf(user1);
+        let tokenPrice = await longShort.longTokenPrice.call(marketIndex);
+        totalFee = new BN(mintLong).sub(userBalance.mul(tokenPrice).div(e18));
       } else {
-        userFee = new BN(mintShort).sub(diffShortValue).add(diffLongValue);
+        let userBalance = await short.balanceOf(user2);
+        let tokenPrice = await longShort.shortTokenPrice.call(marketIndex);
+        totalFee = new BN(mintShort).sub(userBalance.mul(tokenPrice).div(e18));
       }
 
-      // Check that the fees match what was expected.
-      const expectedBaseFee = baseFee
-        .mul(new BN(expectedBaseFeeAmount))
-        .div(feeUnitsOfPrecision);
-      const expectedPenaltyFee = penaltyFee
-        .mul(new BN(expectedPenaltyFeeAmount))
-        .div(feeUnitsOfPrecision);
-      assert.equal(
-        userFee.toString(),
-        expectedBaseFee.add(expectedPenaltyFee).toString(),
+      // Check that the fees match what was expected, with small variance to
+      // catch numerical errors due to dividing by e18.
+      assert(
+        totalFee.sub(expectedTotalFee).abs().lt(new BN(5)),
         "Fees were not calculated correctly."
       );
     };

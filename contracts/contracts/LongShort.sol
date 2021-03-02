@@ -405,6 +405,11 @@ contract LongShort is ILongShort, Initializable {
         view
         returns (uint256 marketAmount, uint256 treasuryAmount)
     {
+        // Edge case: all goes to market when market is empty.
+        if (totalValueLockedInMarket[marketIndex] == 0) {
+            return (amount, 0);
+        }
+
         uint256 marketPcnt; // fixed-precision scale of 10000
         if (longValue[marketIndex] > shortValue[marketIndex]) {
             marketPcnt = longValue[marketIndex]
@@ -426,11 +431,33 @@ contract LongShort is ILongShort, Initializable {
     }
 
     /**
-      * Returns the amount of accrued value that should go to each side of the
-      * market. To incentivise balance, more value goes to the weaker side in
-      * proportion to how imbalanced the market is.
-      */
-     //function getMarketSplit(uint256 
+     * Returns the amount of accrued value that should go to each side of the
+     * market. To incentivise balance, more value goes to the weaker side in
+     * proportion to how imbalanced the market is.
+     */
+    function getMarketSplit(uint256 marketIndex, uint256 amount)
+        public
+        view
+        returns (uint256 longAmount, uint256 shortAmount)
+    {
+        // Edge case: equal split when market is empty.
+        if (longValue[marketIndex] == 0 && shortValue[marketIndex] == 0) {
+            longAmount = amount.div(2);
+            shortAmount = amount.sub(longAmount);
+            return (longAmount, shortAmount);
+        }
+
+        // The percentage value that a position receives depends on the amount
+        // of total market value taken up by the _opposite_ position.
+        uint256 longPcnt =
+            shortValue[marketIndex].mul(10000).div(
+                longValue[marketIndex] + shortValue[marketIndex]
+            );
+
+        longAmount = amount.mul(longPcnt).div(10000);
+        shortAmount = amount.sub(longAmount);
+        return (longAmount, shortAmount);
+    }
 
     /**
      * Adjusts the long/short token prices according to supply and value.
@@ -469,12 +496,10 @@ contract LongShort is ILongShort, Initializable {
         // Do a logical transfer from market funds into treasury.
         totalValueLockedInMarket[marketIndex] -= treasuryAmount;
         totalValueReservedForTreasury[marketIndex] += treasuryAmount;
-        
-        // Initial mechanism just splits fees evenly across the long/short
-        // market values. We may want to incentivise float token holders by
-        // depositing some in the DAO later.
-        uint256 longAmount = marketAmount.div(2);
-        uint256 shortAmount = marketAmount.sub(longAmount);
+
+        // Splits mostly to the weaker position to incentivise balance.
+        (uint256 longAmount, uint256 shortAmount) =
+            getMarketSplit(marketIndex, marketAmount);
         longValue[marketIndex] = longValue[marketIndex].add(longAmount);
         shortValue[marketIndex] = shortValue[marketIndex].add(shortAmount);
 
@@ -504,11 +529,9 @@ contract LongShort is ILongShort, Initializable {
         totalValueLockedInMarket[marketIndex] += marketAmount;
         totalValueReservedForTreasury[marketIndex] += treasuryAmount;
 
-        // TODO(guy): Implement actual interest split for market. The weaker
-        // side should receive the stronger side's proportion of the interest
-        // to incentivise market balance (leveraged yield!).
-        uint256 longAmount = marketAmount.div(2);
-        uint256 shortAmount = marketAmount.sub(longAmount);
+        // Splits mostly to the weaker position to incentivise balance.
+        (uint256 longAmount, uint256 shortAmount) =
+            getMarketSplit(marketIndex, marketAmount);
         longValue[marketIndex] = longValue[marketIndex].add(longAmount);
         shortValue[marketIndex] = shortValue[marketIndex].add(shortAmount);
     }
