@@ -9,6 +9,7 @@ const SYNTHETIC_TOKEN = "SyntheticToken";
 const TOKEN_FACTORY = "TokenFactory";
 const STAKER = "Staker";
 const FLOAT_TOKEN = "FloatToken";
+const FLOAT_CAPITAL = "FloatCapital_v0";
 
 const SIMULATED_INSTANT_APY = 10;
 const TEN_TO_THE_18 = "1000000000000000000";
@@ -21,9 +22,14 @@ const YieldManager = artifacts.require(YIELD_MANAGER);
 const TokenFactory = artifacts.require(TOKEN_FACTORY);
 const Staker = artifacts.require(STAKER);
 const FloatToken = artifacts.require(FLOAT_TOKEN);
+const FloatCapital = artifacts.require(FLOAT_CAPITAL);
 
 const initialize = async (admin) => {
   const tokenFactory = await TokenFactory.new({
+    from: admin,
+  });
+
+  const floatCapital = await FloatCapital.new({
     from: admin,
   });
 
@@ -51,9 +57,15 @@ const initialize = async (admin) => {
     from: admin,
   });
 
-  await staker.initialize(admin, longShort.address, floatToken.address, {
-    from: admin,
-  });
+  await staker.initialize(
+    admin,
+    longShort.address,
+    floatToken.address,
+    floatCapital.address,
+    {
+      from: admin,
+    }
+  );
 
   return {
     staker,
@@ -201,7 +213,12 @@ const feeCalculation = (
     }
   }
   // If greater than minFeeThreshold
-  if (amount.add(longValue).add(shortValue).gte(minThreshold)) {
+  if (
+    amount
+      .add(longValue)
+      .add(shortValue)
+      .gte(minThreshold)
+  ) {
     const TEN_TO_THE_18 = "1" + "000000000000000000";
     let betaDiff = new BN(TEN_TO_THE_18).sub(thinBeta); // TODO: when previous beta != 1
 
@@ -249,7 +266,10 @@ const logGasPrices = async (
   console.log(`USD Price: $${ethPriceUsd}`);
   const ethCost =
     Number(
-      totalCostEth.mul(new BN(ethPriceUsd)).mul(new BN(100)).div(ONE_ETH)
+      totalCostEth
+        .mul(new BN(ethPriceUsd))
+        .mul(new BN(100))
+        .div(ONE_ETH)
     ) / 100;
   console.log(`Cost on ETH Mainnet: $${ethCost}`);
 
@@ -261,7 +281,10 @@ const logGasPrices = async (
   console.log(`BNB Price: $${bnbPriceUsd}`);
   const bscCost =
     Number(
-      totalCostBsc.mul(new BN(bnbPriceUsd)).mul(new BN(100)).div(ONE_ETH)
+      totalCostBsc
+        .mul(new BN(bnbPriceUsd))
+        .mul(new BN(100))
+        .div(ONE_ETH)
     ) / 100;
   console.log(`Cost on BSC: $${bscCost}`);
 };

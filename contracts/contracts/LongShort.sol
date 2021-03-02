@@ -276,7 +276,6 @@ contract LongShort is ILongShort, Initializable {
             tokenFactory.createTokenLong(
                 syntheticName,
                 syntheticSymbol,
-                latestMarket,
                 address(staker)
             )
         );
@@ -286,7 +285,6 @@ contract LongShort is ILongShort, Initializable {
             tokenFactory.createTokenShort(
                 syntheticName,
                 syntheticSymbol,
-                latestMarket,
                 address(staker)
             )
         );
