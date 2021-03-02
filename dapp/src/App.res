@@ -14,28 +14,15 @@ type props = {
   pageProps: pageProps,
 }
 
-// This sets up session storage caching for SWR
-// SwrPersist.syncWithSessionStorage->Misc.onlyExecuteClientSide
-
-// This is a normal apollo client, it isn't optimized for nextjs yet.
-let client = (~uriLink: string) => {
-  open ApolloClient
-  make(
-    ~cache=Cache.InMemoryCache.make(),
-    // I would turn this off in production
-    ~connectToDevTools=true,
-    ~uri=uriLink->Obj.magic,
-    (),
-  )
-}
 
 module GraphQl = {
   @react.component
   let make = (~children) => {
     let networkId = RootProvider.useChainId()
+    let user = RootProvider.useCurrentUser()
     let client = React.useMemo1(() =>
-      client(
-        ~uriLink={
+      Client.makeClient(
+        ~graphUri={
           switch networkId {
           | Some(5) => Config.goerliGraphEndpoint
           | Some(321) => Config.localhostGraphEndpoint
@@ -44,6 +31,8 @@ module GraphQl = {
           | None => Config.binancTestnetGraphEndpoint
           }
         },
+        ~dbUri="http://localhost:8080/v1/graphql",
+        ~user
       )
     , [networkId])
 

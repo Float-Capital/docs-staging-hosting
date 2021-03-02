@@ -3,7 +3,7 @@
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as Login from "./components/Login/Login.js";
 import * as React from "react";
-import * as Queries from "./libraries/Queries.js";
+import * as Queries from "./data/Queries.js";
 import * as MiniLoader from "./components/UI/MiniLoader.js";
 import * as FormatMoney from "./components/UI/FormatMoney.js";
 import * as MarketsList from "./components/Markets/MarketsList.js";

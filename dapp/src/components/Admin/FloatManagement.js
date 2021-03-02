@@ -3,7 +3,7 @@
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Globals from "../../libraries/Globals.js";
-import * as Queries from "../../libraries/Queries.js";
+import * as Queries from "../../data/Queries.js";
 import * as FormatMoney from "../UI/FormatMoney.js";
 import * as RootProvider from "../../libraries/RootProvider.js";
 

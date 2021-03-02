@@ -7,7 +7,7 @@ import * as React from "react";
 import * as Button from "./components/UI/Button.js";
 import * as Ethers from "./ethereum/Ethers.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
-import * as Queries from "./libraries/Queries.js";
+import * as Queries from "./data/Queries.js";
 import * as ViewBox from "./components/UI/ViewBox.js";
 import * as StakeForm from "./components/Stake/StakeForm.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";

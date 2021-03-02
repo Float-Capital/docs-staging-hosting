@@ -6,7 +6,8 @@ import * as React from "react";
 import * as Ethers from "ethers";
 import * as Globals from "../../libraries/Globals.js";
 import * as MintDai from "./MintDai.js";
-import * as Queries from "../../libraries/Queries.js";
+import * as Queries from "../../data/Queries.js";
+import * as AuthTest from "../Testing/AuthTest.js";
 import * as MintLong from "./MintLong.js";
 import * as MintShort from "./MintShort.js";
 import * as ApproveDai from "./ApproveDai.js";
@@ -174,7 +175,7 @@ function AdminTestingPortal$AdminActions(Props) {
                                                             }))));
                                     }))) : "You might think this is impossible, but depending on the situation it might not be!"
                       )
-                  ), React.createElement("hr", undefined), React.createElement("div", undefined, React.createElement("h1", undefined, "Users active stakes"), React.createElement(ActiveStakes.make, {})), React.createElement("hr", undefined), React.createElement("div", undefined, React.createElement("h1", undefined, "Float"), React.createElement(FloatManagement.make, {}))));
+                  ), React.createElement("hr", undefined), React.createElement("div", undefined, React.createElement("h1", undefined, "Users active stakes"), React.createElement(ActiveStakes.make, {})), React.createElement("hr", undefined), React.createElement("div", undefined, React.createElement("h1", undefined, "Float"), React.createElement(FloatManagement.make, {})), React.createElement("hr", undefined), React.createElement("div", undefined, React.createElement("h1", undefined, "Auth Test"), React.createElement(AuthTest.make, {}))));
 }
 
 var AdminActions = {

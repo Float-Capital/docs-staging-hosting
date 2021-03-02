@@ -4,7 +4,7 @@ import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as Login from "./components/Login/Login.js";
 import * as React from "react";
 import * as Loader from "./components/UI/Loader.js";
-import * as Queries from "./libraries/Queries.js";
+import * as Queries from "./data/Queries.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as RedeemForm from "./components/Trade/RedeemForm.js";
 import * as Router from "next/router";

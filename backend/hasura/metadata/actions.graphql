@@ -1,0 +1,14 @@
+type Mutation {
+  createUser (
+    username: String
+  ): CreateUserOutput
+}
+
+
+
+
+type CreateUserOutput {
+  success : Boolean!
+  error : String
+}
+

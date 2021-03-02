@@ -85,6 +85,10 @@ module Wallet = {
 
   @new @module("ethers")
   external makePrivKeyWallet: (string, providerType) => t = "Wallet"
+
+  type rawSignature
+  @send
+  external signMessage: (t, string) => JsPromise.t<rawSignature> = "signMessage"
 }
 
 module Providers = {

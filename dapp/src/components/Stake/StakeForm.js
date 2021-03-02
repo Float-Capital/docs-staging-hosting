@@ -9,7 +9,7 @@ import * as Ethers from "../../ethereum/Ethers.js";
 import * as Loader from "../UI/Loader.js";
 import * as Ethers$1 from "ethers";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
-import * as Queries from "../../libraries/Queries.js";
+import * as Queries from "../../data/Queries.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as AmountInput from "../UI/AmountInput.js";

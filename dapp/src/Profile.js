@@ -6,7 +6,7 @@ import * as Login from "./components/Login/Login.js";
 import * as React from "react";
 import * as Ethers from "ethers";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
-import * as Queries from "./libraries/Queries.js";
+import * as Queries from "./data/Queries.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as DaiBalance from "./components/ExampleViewFunctions/DaiBalance.js";
 import * as MiniLoader from "./components/UI/MiniLoader.js";

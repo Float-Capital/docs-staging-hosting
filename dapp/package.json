@@ -43,6 +43,7 @@
     "res:start": "bsb -make-world -w",
     "dev": "npm-run-all --parallel res:start next:dev",
     "updateSchema": "get-graphql-schema https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital -j > graphql_schema.json",
+    "updateSchemaGraph": "get-graphql-schema http://localhost:8080/v1/graphql -h 'x-hasura-admin-secret=testing' -j > graphql_schema_db.json",
     "update-testnet-ui": "cd .. && node scripts/deployments.js > dapp/src/contractAddresses.json ; cd dapp && yarn updateSchema ; yarn res:build"
   },
   "devDependencies": {

@@ -154,10 +154,14 @@ module AdminActions = {
           | {data: None, error: None, loading: false} =>
             "You might think this is impossible, but depending on the situation it might not be!"->React.string
           }}
+          // <hr />
+          // <div> <h1> {"Users active stakes"->React.string} </h1> <ActiveStakes /> </div>
           <hr />
           <div> <h1> {"Users active stakes"->React.string} </h1> <ActiveStakes /> </div>
           <hr />
           <div> <h1> {"Float"->React.string} </h1> <FloatManagement /> </div>
+          <hr />
+           <div> <h1> {"Auth Test"->React.string} </h1> <AuthTest /> </div>
         </div>
       </div>
     | None =>

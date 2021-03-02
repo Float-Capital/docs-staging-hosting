@@ -1,0 +1,14 @@
+actions:
+- name: createUser
+  definition:
+    kind: synchronous
+    handler: http://hasura-actions:9898/create-user
+    forward_client_headers: true
+  permissions:
+  - role: user
+custom_types:
+  enums: []
+  input_objects: []
+  objects:
+  - name: CreateUserOutput
+  scalars: []
