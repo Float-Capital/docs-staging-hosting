@@ -22,7 +22,7 @@ contract("LongShort (staking)", (accounts) => {
   const oneHundredAndFifty = "150000000000000000000";
   const twoHundred = "200000000000000000000";
   const twentyFive = "25000000000000000000";
-  const e27 = new BN("1000000000000000000000000000");
+  const e24 = new BN("1000000000000000000000000");
 
   let staker;
   let longShort;
@@ -218,7 +218,7 @@ contract("LongShort (staking)", (accounts) => {
       result.toString(),
       expectedFloatPerSecond
         .mul(new BN(now - before))
-        .div(e27)
+        .div(e24)
         .mul(new BN(oneHundred))
         .toString()
     );
@@ -366,6 +366,8 @@ contract("LongShort (staking)", (accounts) => {
       token == longToken
     );
 
+    console.log(expectedFloatPerSecond.div(e24).toString());
+
     // Check how many float tokens the user has actually accumulated.
     await staker.withdraw(token.address, new BN(oneHundred), {
       from: user1,
@@ -378,7 +380,7 @@ contract("LongShort (staking)", (accounts) => {
       result.toString(),
       expectedFloatPerSecond
         .mul(new BN(now - before))
-        .div(e27)
+        .div(e24)
         .mul(new BN(oneHundred))
         .toString()
     );

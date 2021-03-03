@@ -183,7 +183,7 @@ contract Staker is IStaker, Initializable {
     /*
      * Computes the current 'r' value, i.e. the number of float tokens a user
      * earns per second for every longshort token they've staked. The returned
-     * value has a fixed decimal scale of 1e45 (!!!) for numerical stability.
+     * value has a fixed decimal scale of 1e42 (!!!) for numerical stability.
      */
     function calculateFloatPerSecond(
         uint256 longValue,
@@ -277,7 +277,7 @@ contract Staker is IStaker, Initializable {
         return
             syntheticRewardParams[token][latestRewardIndex[token]]
                 .accumulativeFloatPerToken
-                .add(timeDelta.mul(floatPerSecond).div(1e27));
+                .add(timeDelta.mul(floatPerSecond).div(1e24));
     }
 
     /*
