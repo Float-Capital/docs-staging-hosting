@@ -19,7 +19,7 @@ function MainLayout$Navigation(Props) {
           href: "/profile?address=" + Globals.ethAdrToStr(currentUser),
           children: React.createElement("p", {
                 className: "px-3 bg-white hover:bg-black hover:text-gray-200 text-base cursor-pointer"
-              }, React.createElement(DisplayAddress.make, {
+              }, " 👤 ", React.createElement(DisplayAddress.make, {
                     address: Globals.ethAdrToStr(currentUser)
                   }))
         });

@@ -45,7 +45,7 @@ module Navigation = {
           <Link href={`/profile?address=${currentUser->ethAdrToStr}`}>
             <p
               className="px-3 bg-white hover:bg-black hover:text-gray-200 text-base cursor-pointer">
-              <DisplayAddress address={currentUser->ethAdrToStr} /> //TODO route to Profile page
+              {` 👤 `->React.string} <DisplayAddress address={currentUser->ethAdrToStr} />
             </p>
           </Link>
         | None =>
