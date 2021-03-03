@@ -251,7 +251,8 @@ contract Staker is IStaker, Initializable {
 
     /*
      * Computes new cumulative sum of 'r' value since last state point. We use
-     * cumulative 'r' value to avoid looping during issuance.
+     * cumulative 'r' value to avoid looping during issuance. Note that the
+     * cumulative sum is kept in 1e42 scale (!!!) to avoid numerical issues.
      */
     function calculateNewCumulative(
         uint256 longValue,
@@ -277,7 +278,7 @@ contract Staker is IStaker, Initializable {
         return
             syntheticRewardParams[token][latestRewardIndex[token]]
                 .accumulativeFloatPerToken
-                .add(timeDelta.mul(floatPerSecond).div(1e24));
+                .add(timeDelta.mul(floatPerSecond));
     }
 
     /*
@@ -369,7 +370,7 @@ contract Staker is IStaker, Initializable {
                     .accumulativeFloatPerToken
             );
 
-        return accumDelta * userAmountStaked[tokenAddress][user];
+        return accumDelta.mul(userAmountStaked[tokenAddress][user]).div(1e24);
     }
 
     function _mintFloat(address user, uint256 floatToMint) internal {
