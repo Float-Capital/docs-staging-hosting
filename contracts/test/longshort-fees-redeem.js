@@ -115,6 +115,19 @@ contract("LongShort (redeeming fees)", (accounts) => {
         "Wrong value locked in short side of market."
       );
 
+      // Work out expected fees and market split.
+      const baseFee = baseExitFee
+        .mul(new BN(expectedBaseFeeAmount))
+        .div(feeUnitsOfPrecision);
+      const extraFee = badLiquidityExitFee
+        .mul(new BN(expectedExtraFeeAmount))
+        .div(feeUnitsOfPrecision);
+      let splitAmounts = await longShort.getTreasurySplit.call(
+        marketIndex,
+        baseFee.add(extraFee)
+      );
+      let marketSplit = splitAmounts.marketAmount;
+
       // Redeem the tokens.
       if (redeemShort == 0) {
         await longShort.redeemLong(marketIndex, new BN(redeemLong), {
@@ -137,12 +150,6 @@ contract("LongShort (redeeming fees)", (accounts) => {
       }
 
       // Check that fees match what was expected.
-      const baseFee = baseExitFee
-        .mul(new BN(expectedBaseFeeAmount))
-        .div(feeUnitsOfPrecision);
-      const extraFee = badLiquidityExitFee
-        .mul(new BN(expectedExtraFeeAmount))
-        .div(feeUnitsOfPrecision);
       assert.equal(
         userFee.toString(),
         baseFee.add(extraFee).toString(),
@@ -155,12 +162,12 @@ contract("LongShort (redeeming fees)", (accounts) => {
         expectedLockedValue = new BN(mintShort)
           .add(new BN(mintLong))
           .sub(new BN(redeemLong))
-          .add(userFee);
+          .add(marketSplit);
       } else {
         expectedLockedValue = new BN(mintLong)
           .add(new BN(mintShort))
           .sub(new BN(redeemShort))
-          .add(userFee);
+          .add(marketSplit);
       }
       const actualLockedValue = await longShort.totalValueLockedInMarket.call(
         marketIndex

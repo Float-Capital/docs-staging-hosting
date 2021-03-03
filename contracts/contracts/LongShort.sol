@@ -6,9 +6,9 @@ import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
-import "./interfaces/IStaker.sol";
 import "./TokenFactory.sol";
 import "./SyntheticToken.sol";
+import "./interfaces/IStaker.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/IYieldManager.sol";
 import "./interfaces/IOracleManager.sol";
@@ -81,6 +81,9 @@ contract LongShort is ILongShort, Initializable {
     uint256 public latestMarket;
     mapping(uint256 => bool) public marketExists;
 
+    // Treasury contract that accrued fees and yield are sent to.
+    address public treasury;
+
     // Factory for dynamically creating synthetic long/short tokens.
     TokenFactory public tokenFactory;
 
@@ -96,7 +99,7 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint256 => uint256) public shortValue;
     mapping(uint256 => uint256) public totalValueLockedInMarket;
     mapping(uint256 => uint256) public totalValueLockedInYieldManager;
-    mapping(uint256 => uint256) public totalValueLockedInDao;
+    mapping(uint256 => uint256) public totalValueReservedForTreasury;
     mapping(uint256 => uint256) public assetPrice;
     mapping(uint256 => uint256) public longTokenPrice;
     mapping(uint256 => uint256) public shortTokenPrice;
@@ -214,6 +217,11 @@ contract LongShort is ILongShort, Initializable {
         _;
     }
 
+    modifier treasuryOnly() {
+        require(msg.sender == treasury);
+        _;
+    }
+
     modifier doesMarketExist(uint256 marketIndex) {
         require(marketExists[marketIndex]);
         _;
@@ -237,10 +245,12 @@ contract LongShort is ILongShort, Initializable {
 
     function setup(
         address _admin,
+        address _treasury,
         address _tokenFactory,
         address _staker
     ) public initializer {
         admin = _admin;
+        treasury = _treasury;
         tokenFactory = TokenFactory(_tokenFactory);
         staker = IStaker(_staker);
 
@@ -248,9 +258,21 @@ contract LongShort is ILongShort, Initializable {
     }
 
     ////////////////////////////////////
-    /// MULTISIG ADMIN CREATE MARKETS //
+    /// MULTISIG ADMIN FUNCTIONS ///////
     ////////////////////////////////////
 
+    function changeAdmin(address _admin) external adminOnly {
+        admin = _admin;
+    }
+
+    function changeTreasury(address _treasury) external adminOnly {
+        treasury = _treasury;
+    }
+
+    /**
+     * Creates an entirely new long/short market tracking an underlying
+     * oracle price. Make sure the synthetic names/symbols are unique.
+     */
     function newSyntheticMarket(
         string calldata syntheticName,
         string calldata syntheticSymbol,
@@ -337,7 +359,7 @@ contract LongShort is ILongShort, Initializable {
     function getLiquidFunds(uint256 marketIndex) public view returns (uint256) {
         return
             totalValueLockedInMarket[marketIndex]
-                .add(totalValueLockedInDao[marketIndex])
+                .add(totalValueReservedForTreasury[marketIndex])
                 .sub(totalValueLockedInYieldManager[marketIndex]);
     }
 
@@ -373,17 +395,21 @@ contract LongShort is ILongShort, Initializable {
     }
 
     /**
-     * Returns the amount of accrued interest that should go to the market,
-     * and the amount that should be locked into dao funds. To incentivise
-     * market balance, more interest goes to the market in proportion to how
+     * Returns the amount of accrued value that should go to the market,
+     * and the amount that should be locked into the treasury. To incentivise
+     * market balance, more value goes to the market in proportion to how
      * imbalanced it is.
-     * TODO: use this for the fee mechanism as well?
      */
-    function getYieldSplit(uint256 marketIndex, uint256 amount)
+    function getTreasurySplit(uint256 marketIndex, uint256 amount)
         public
         view
-        returns (uint256 marketAmount, uint256 daoAmount)
+        returns (uint256 marketAmount, uint256 treasuryAmount)
     {
+        // Edge case: all goes to market when market is empty.
+        if (totalValueLockedInMarket[marketIndex] == 0) {
+            return (amount, 0);
+        }
+
         uint256 marketPcnt; // fixed-precision scale of 10000
         if (longValue[marketIndex] > shortValue[marketIndex]) {
             marketPcnt = longValue[marketIndex]
@@ -398,10 +424,39 @@ contract LongShort is ILongShort, Initializable {
         }
 
         marketAmount = marketPcnt.mul(amount).div(10000);
-        daoAmount = amount.sub(marketAmount);
-        require(amount == marketAmount + daoAmount);
+        treasuryAmount = amount.sub(marketAmount);
+        require(amount == marketAmount + treasuryAmount);
 
-        return (marketAmount, daoAmount);
+        return (marketAmount, treasuryAmount);
+    }
+
+    /**
+     * Returns the amount of accrued value that should go to each side of the
+     * market. To incentivise balance, more value goes to the weaker side in
+     * proportion to how imbalanced the market is.
+     */
+    function getMarketSplit(uint256 marketIndex, uint256 amount)
+        public
+        view
+        returns (uint256 longAmount, uint256 shortAmount)
+    {
+        // Edge case: equal split when market is empty.
+        if (longValue[marketIndex] == 0 && shortValue[marketIndex] == 0) {
+            longAmount = amount.div(2);
+            shortAmount = amount.sub(longAmount);
+            return (longAmount, shortAmount);
+        }
+
+        // The percentage value that a position receives depends on the amount
+        // of total market value taken up by the _opposite_ position.
+        uint256 longPcnt =
+            shortValue[marketIndex].mul(10000).div(
+                longValue[marketIndex] + shortValue[marketIndex]
+            );
+
+        longAmount = amount.mul(longPcnt).div(10000);
+        shortAmount = amount.sub(longAmount);
+        return (longAmount, shortAmount);
     }
 
     /**
@@ -434,11 +489,17 @@ contract LongShort is ILongShort, Initializable {
      * Controls what happens with mint/redeem fees.
      */
     function _feesMechanism(uint256 marketIndex, uint256 totalFees) internal {
-        // Initial mechanism just splits fees evenly across the long/short
-        // market values. We may want to incentivise float token holders by
-        // depositing some in the DAO later.
-        uint256 longAmount = totalFees.div(2);
-        uint256 shortAmount = totalFees.sub(longAmount);
+        // Market gets a bigger share if the market is more imbalanced.
+        (uint256 marketAmount, uint256 treasuryAmount) =
+            getTreasurySplit(marketIndex, totalFees);
+
+        // Do a logical transfer from market funds into treasury.
+        totalValueLockedInMarket[marketIndex] -= treasuryAmount;
+        totalValueReservedForTreasury[marketIndex] += treasuryAmount;
+
+        // Splits mostly to the weaker position to incentivise balance.
+        (uint256 longAmount, uint256 shortAmount) =
+            getMarketSplit(marketIndex, marketAmount);
         longValue[marketIndex] = longValue[marketIndex].add(longAmount);
         shortValue[marketIndex] = shortValue[marketIndex].add(shortAmount);
 
@@ -458,20 +519,19 @@ contract LongShort is ILongShort, Initializable {
                 totalValueLockedInYieldManager[marketIndex]
             );
 
-        (uint256 marketAmount, uint256 daoAmount) =
-            getYieldSplit(marketIndex, amount);
+        // Market gets a bigger share if the market is more imbalanced.
+        (uint256 marketAmount, uint256 treasuryAmount) =
+            getTreasurySplit(marketIndex, amount);
 
         // We keep the interest locked in the yield manager, but update our
         // bookkeeping to logically simulate moving the funds around.
         totalValueLockedInYieldManager[marketIndex] += amount;
         totalValueLockedInMarket[marketIndex] += marketAmount;
-        totalValueLockedInDao[marketIndex] += daoAmount;
+        totalValueReservedForTreasury[marketIndex] += treasuryAmount;
 
-        // TODO(guy): Implement actual interest split for market. The weaker
-        // side should receive the stronger side's proportion of the interest
-        // to incentivise market balance (leveraged yield!).
-        uint256 longAmount = marketAmount.div(2);
-        uint256 shortAmount = marketAmount.sub(longAmount);
+        // Splits mostly to the weaker position to incentivise balance.
+        (uint256 longAmount, uint256 shortAmount) =
+            getMarketSplit(marketIndex, marketAmount);
         longValue[marketIndex] = longValue[marketIndex].add(longAmount);
         shortValue[marketIndex] = shortValue[marketIndex].add(shortAmount);
     }
@@ -672,7 +732,7 @@ contract LongShort is ILongShort, Initializable {
         require(
             totalValueLockedInYieldManager[marketIndex] <=
                 totalValueLockedInMarket[marketIndex] +
-                    totalValueLockedInDao[marketIndex]
+                    totalValueReservedForTreasury[marketIndex]
         );
     }
 
@@ -689,11 +749,11 @@ contract LongShort is ILongShort, Initializable {
         totalValueLockedInYieldManager[marketIndex] -= amount;
 
         // Invariant: yield managers should never have more locked funds
-        // than the combined value of the market and dao funds.
+        // than the combined value of the market and held treasury funds.
         require(
             totalValueLockedInYieldManager[marketIndex] <=
                 totalValueLockedInMarket[marketIndex] +
-                    totalValueLockedInDao[marketIndex]
+                    totalValueReservedForTreasury[marketIndex]
         );
     }
 
@@ -994,5 +1054,41 @@ contract LongShort is ILongShort, Initializable {
             longValue[marketIndex],
             shortValue[marketIndex]
         );
+    }
+
+    ////////////////////////////////////
+    /////// TREASURY FUNCTIONS /////////
+    ////////////////////////////////////
+
+    /*
+     * Transfers the reserved treasury funds to the treasury contract. This is
+     * done async to avoid putting transfer gas costs on users every time they o
+     * pay fees or accrue yield.
+     *
+     * NOTE: doesn't affect markets, so no state refresh necessary
+     */
+    function transferTreasuryFunds(uint256 marketIndex) external treasuryOnly {
+        // Edge-case: no funds to transfer.
+        if (totalValueReservedForTreasury[marketIndex] == 0) {
+            return;
+        }
+
+        // We may have to withdraw requisite funds from the yield managers.
+        uint256 liquid = getLiquidFunds(marketIndex);
+        if (liquid < totalValueReservedForTreasury[marketIndex]) {
+            _transferFromYieldManager(
+                marketIndex,
+                totalValueReservedForTreasury[marketIndex] - liquid
+            );
+        }
+
+        // Transfer funds to the treasury.
+        fundTokens[marketIndex].transfer(
+            treasury,
+            totalValueReservedForTreasury[marketIndex]
+        );
+
+        // Update global state.
+        totalValueReservedForTreasury[marketIndex] = 0;
     }
 }
