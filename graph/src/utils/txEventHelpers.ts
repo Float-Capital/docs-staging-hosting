@@ -1,6 +1,11 @@
-import { StateChange, EventParam, EventParams } from "../../generated/schema";
+import {
+  StateChange,
+  EventParam,
+  EventParams,
+  GlobalState,
+} from "../../generated/schema";
 import { BigInt, Address, Bytes, log, ethereum } from "@graphprotocol/graph-ts";
-import { ZERO, ONE, ZERO_ADDRESS } from "../CONSTANTS";
+import { ZERO, ONE, ZERO_ADDRESS, GLOBAL_STATE_ID } from "../CONSTANTS";
 import { getOrCreateUser } from "./globalStateManager";
 
 function getEventIndex(txHash: Bytes): i32 {
@@ -70,9 +75,18 @@ function txStateChangeHelper(
     stateChange.txEventParamList = [];
     stateChange.affectedUsers = [];
 
+    let globalState = GlobalState.load(GLOBAL_STATE_ID);
     let user = getOrCreateUser(event.transaction.from, event);
+
     user.totalGasUsed = user.totalGasUsed.plus(event.block.gasUsed);
     user.numberOfTransactions = user.numberOfTransactions.plus(ONE);
+
+    globalState.totalTxs = globalState.totalTxs.plus(ONE);
+    globalState.totalGasUsed = globalState.totalGasUsed.plus(
+      event.block.gasUsed
+    );
+
+    globalState.save();
     user.save();
   }
 

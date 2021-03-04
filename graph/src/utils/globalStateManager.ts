@@ -8,7 +8,7 @@ import {
   UserSyntheticTokenBalance,
 } from "../../generated/schema";
 import { BigInt, Address, Bytes, log, ethereum } from "@graphprotocol/graph-ts";
-import { ZERO } from "../CONSTANTS";
+import { ZERO, ONE, GLOBAL_STATE_ID } from "../CONSTANTS";
 
 export function getOrCreateLatestSystemState(
   marketIndex: BigInt,
@@ -52,6 +52,10 @@ export function getOrCreateUser(
     user.tokenBalances = [];
     user.tokenMints = [];
     user.stateChangesAffectingUser = [];
+
+    let globalState = GlobalState.load(GLOBAL_STATE_ID);
+    globalState.totalUsers = globalState.totalUsers.plus(ONE);
+    globalState.save();
   }
 
   return user;

@@ -182,4 +182,7 @@ type GlobalState @entity {
   tokenFactory: TokenFactory!
   longShort: LongShortContract!
   totalFloatMinted: BigInt!
+  totalTxs: BigInt!
+  totalGasUsed: BigInt!
+  totalUsers: BigInt!
 }

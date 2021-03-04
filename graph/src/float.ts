@@ -89,6 +89,9 @@ export function handleV1(event: V1): void {
   globalState.adminAddress = event.params.admin;
   globalState.longShort = longShort.id;
   globalState.totalFloatMinted = ZERO;
+  globalState.totalTxs = ZERO;
+  globalState.totalGasUsed = ZERO;
+  globalState.totalUsers = ZERO;
   globalState.save();
 
   saveEventToStateChange(
