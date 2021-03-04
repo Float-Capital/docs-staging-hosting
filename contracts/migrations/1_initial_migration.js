@@ -9,13 +9,8 @@ function sleep(ms) {
 
 module.exports = async function(deployer, network, accounts) {
   deployer.deploy(Migrations);
-  console.log(accounts);
-  // web3.eth.getBlock("latest", false, (error, result) => {
-  //   console.log(result.gasLimit);
-  //   // => 8000029
-  // });
-  // await sleep(8000);
-  // throw
+
+  // This code is only for the sake of deploying proxies to bsc to get rewards early...
   if (network == "bsc") {
     const options = await ConfigManager.initNetworkConfiguration({
       network: network,
@@ -24,14 +19,28 @@ module.exports = async function(deployer, network, accounts) {
 
     await add({
       contractsData: [
-        { name: "LongShortPlaceholder", alias: "LongShort" },
-        { name: "FloatTokenPlaceholder", alias: "FloatToken" },
-        { name: "StakerPlaceholder", alias: "Staker" },
-        { name: "TokenFactoryPlaceholder", alias: "TokenFactory" },
+        {
+          name: "LongShortPlaceholder",
+          alias: "LongShort",
+        },
+        {
+          name: "FloatTokenPlaceholder",
+          alias: "FloatToken",
+        },
+        {
+          name: "StakerPlaceholder",
+          alias: "Staker",
+        },
+        {
+          name: "TokenFactoryPlaceholder",
+          alias: "TokenFactory",
+        },
       ],
     });
     await sleep(1000);
-    await push({ ...options });
+    await push({
+      ...options,
+    });
     await sleep(1000);
 
     await create({
