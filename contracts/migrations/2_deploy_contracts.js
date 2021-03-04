@@ -3,15 +3,20 @@ const { scripts, ConfigManager } = require("@openzeppelin/cli");
 const { add, push, create } = scripts;
 
 const STAKER = "Staker";
+const SYNTHETIC_TOKEN = "Dai";
+const TREASURY = "Treasury_v0";
+const LONGSHORT = "LongShort";
 const FLOAT_TOKEN = "FloatToken";
 const TOKEN_FACTORY = "TokenFactory";
-const SYNTHETIC_TOKEN = "Dai";
+const FLOAT_CAPITAL = "FloatCapital_v0";
 
-const LongShort = artifacts.require("LongShort");
 const Staker = artifacts.require(STAKER);
+const Treasury = artifacts.require(TREASURY);
+const LongShort = artifacts.require(LONGSHORT);
 const Dai = artifacts.require(SYNTHETIC_TOKEN);
 const FloatToken = artifacts.require(FLOAT_TOKEN);
 const TokenFactory = artifacts.require(TOKEN_FACTORY);
+const FloatCapital = artifacts.require(FLOAT_CAPITAL);
 
 const deployContracts = async (options, accounts, deployer, networkName) => {
   const admin = accounts[0];
@@ -26,8 +31,10 @@ const deployContracts = async (options, accounts, deployer, networkName) => {
   // deployments. Use create(...) to deploy a proxy for an alias.
   add({
     contractsData: [
-      { name: "LongShort", alias: "LongShort" },
+      { name: LONGSHORT, alias: "LongShort" },
       { name: STAKER, alias: "Staker" },
+      { name: TREASURY, alias: "Treasury" },
+      { name: FLOAT_CAPITAL, alias: "FloatCapital" },
     ],
   });
   await push({ ...options, force: true });
@@ -45,6 +52,22 @@ const deployContracts = async (options, accounts, deployer, networkName) => {
   await deployer.deploy(FloatToken);
   let floatToken = await FloatToken.deployed();
 
+  const treasury = await create({
+    ...options,
+    contractAlias: "Treasury",
+    methodName: "initialize",
+    methodArgs: [admin],
+  });
+  const treasuryInstance = await Treasury.at(treasury.address);
+
+  const floatCapital = await create({
+    ...options,
+    contractAlias: "FloatCapital",
+    methodName: "initialize",
+    methodArgs: [admin],
+  });
+  const floatCapitalInstance = await FloatCapital.at(floatCapital.address);
+
   const staker = await create({
     ...options,
     contractAlias: "Staker",
@@ -55,9 +78,8 @@ const deployContracts = async (options, accounts, deployer, networkName) => {
     ...options,
     contractAlias: "LongShort",
     methodName: "setup",
-    methodArgs: [admin, tokenFactory.address, staker.address],
+    methodArgs: [admin, treasury.address, tokenFactory.address, staker.address],
   });
-
   const longShortInstance = await LongShort.at(longShort.address);
 
   await tokenFactory.setup(admin, longShort.address, {
@@ -68,20 +90,23 @@ const deployContracts = async (options, accounts, deployer, networkName) => {
     from: admin,
   });
 
+  // Initialize here as there are circular contract dependencies.
   await stakerInstance.initialize(
     admin,
     longShort.address,
     floatToken.address,
+    floatCapital.address,
     {
       from: admin,
     }
   );
 };
 
-module.exports = async function(deployer, networkName, accounts) {
+module.exports = async function (deployer, networkName, accounts) {
   if (networkName == "bsc") {
     throw "Don't save or run this migration if on mainnet (remove when ready)";
   }
+
   deployer.then(async () => {
     // Initialise openzeppelin for upgradeable contracts.
     const options = await ConfigManager.initNetworkConfiguration({
