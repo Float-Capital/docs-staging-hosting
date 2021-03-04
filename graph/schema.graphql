@@ -145,6 +145,7 @@ type State @entity {
   timestamp: BigInt!
   accumulativeFloatPerSecond: BigInt!
   floatRatePerSecondOverInterval: BigInt!
+  timeSinceLastUpdate: BigInt!
 }
 
 type YieldManager @entity {

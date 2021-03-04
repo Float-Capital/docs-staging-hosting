@@ -93,6 +93,8 @@ export function handleStateAdded(event: StateAdded): void {
       prevState.accumulativeFloatPerSecond
     );
 
+    state.timeSinceLastUpdate = timeElapsedSinceLastStateChange;
+
     if (
       // NOTE: This hapens if two staking state changes happen in the same block.
       timeElapsedSinceLastStateChange.equals(changeInAccumulativeFloatPerSecond)
