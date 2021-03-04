@@ -5,7 +5,6 @@ import * as React from "react";
 import * as Config from "../../Config.js";
 import * as Globals from "../../libraries/Globals.js";
 import * as Queries from "../../data/Queries.js";
-import * as Queries from "../../libraries/Queries.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as FormatMoney from "../UI/FormatMoney.js";
 import * as RootProvider from "../../libraries/RootProvider.js";
@@ -15,7 +14,7 @@ import * as ApolloClient__React_Hooks_UseQuery from "rescript-apollo-client/src/
 
 var Raw = {};
 
-var query = require("@apollo/client").gql`
+var query = (require("@apollo/client").gql`
   query   {
     syntheticMarkets  {
       __typename
@@ -31,75 +30,77 @@ var query = require("@apollo/client").gql`
       }
     }
   }
-`;
+`);
 
 function parse(value) {
   var value$1 = value.syntheticMarkets;
   return {
-    syntheticMarkets: value$1.map(function (value) {
-      var value$1 = value.syntheticLong;
-      var value$2 = value.syntheticShort;
-      return {
-        __typename: value.__typename,
-        name: value.name,
-        symbol: value.symbol,
-        syntheticLong: {
-          __typename: value$1.__typename,
-          floatMintedFromSpecificToken: GqlConverters.$$BigInt.parse(
-            value$1.floatMintedFromSpecificToken
-          ),
-        },
-        syntheticShort: {
-          __typename: value$2.__typename,
-          floatMintedFromSpecificToken: GqlConverters.$$BigInt.parse(
-            value$2.floatMintedFromSpecificToken
-          ),
-        },
-      };
-    }),
-  };
+          syntheticMarkets: value$1.map(function (value) {
+                var value$1 = value.syntheticLong;
+                var value$2 = value.syntheticShort;
+                return {
+                        __typename: value.__typename,
+                        name: value.name,
+                        symbol: value.symbol,
+                        syntheticLong: {
+                          __typename: value$1.__typename,
+                          floatMintedFromSpecificToken: GqlConverters.$$BigInt.parse(value$1.floatMintedFromSpecificToken)
+                        },
+                        syntheticShort: {
+                          __typename: value$2.__typename,
+                          floatMintedFromSpecificToken: GqlConverters.$$BigInt.parse(value$2.floatMintedFromSpecificToken)
+                        }
+                      };
+              })
+        };
 }
 
 function serialize(value) {
   var value$1 = value.syntheticMarkets;
   var syntheticMarkets = value$1.map(function (value) {
-    var value$1 = value.syntheticShort;
-    var value$2 = value$1.floatMintedFromSpecificToken;
-    var value$3 = GqlConverters.$$BigInt.serialize(value$2);
-    var value$4 = value$1.__typename;
-    var syntheticShort = {
-      __typename: value$4,
-      floatMintedFromSpecificToken: value$3,
-    };
-    var value$5 = value.syntheticLong;
-    var value$6 = value$5.floatMintedFromSpecificToken;
-    var value$7 = GqlConverters.$$BigInt.serialize(value$6);
-    var value$8 = value$5.__typename;
-    var syntheticLong = {
-      __typename: value$8,
-      floatMintedFromSpecificToken: value$7,
-    };
-    var value$9 = value.symbol;
-    var value$10 = value.name;
-    var value$11 = value.__typename;
-    return {
-      __typename: value$11,
-      name: value$10,
-      symbol: value$9,
-      syntheticLong: syntheticLong,
-      syntheticShort: syntheticShort,
-    };
-  });
+        var value$1 = value.syntheticShort;
+        var value$2 = value$1.floatMintedFromSpecificToken;
+        var value$3 = GqlConverters.$$BigInt.serialize(value$2);
+        var value$4 = value$1.__typename;
+        var syntheticShort = {
+          __typename: value$4,
+          floatMintedFromSpecificToken: value$3
+        };
+        var value$5 = value.syntheticLong;
+        var value$6 = value$5.floatMintedFromSpecificToken;
+        var value$7 = GqlConverters.$$BigInt.serialize(value$6);
+        var value$8 = value$5.__typename;
+        var syntheticLong = {
+          __typename: value$8,
+          floatMintedFromSpecificToken: value$7
+        };
+        var value$9 = value.symbol;
+        var value$10 = value.name;
+        var value$11 = value.__typename;
+        return {
+                __typename: value$11,
+                name: value$10,
+                symbol: value$9,
+                syntheticLong: syntheticLong,
+                syntheticShort: syntheticShort
+              };
+      });
   return {
-    syntheticMarkets: syntheticMarkets,
-  };
+          syntheticMarkets: syntheticMarkets
+        };
 }
 
-function serializeVariables(param) {}
+function serializeVariables(param) {
+  
+}
 
-function makeVariables(param) {}
+function makeVariables(param) {
+  
+}
 
-function makeDefaultVariables(param) {}
+function makeDefaultVariables(param) {
+  
+}
 
 var FloatBreakdown_inner = {
   Raw: Raw,
@@ -108,16 +109,16 @@ var FloatBreakdown_inner = {
   serialize: serialize,
   serializeVariables: serializeVariables,
   makeVariables: makeVariables,
-  makeDefaultVariables: makeDefaultVariables,
+  makeDefaultVariables: makeDefaultVariables
 };
 
 var include = ApolloClient__React_Hooks_UseQuery.Extend({
-  query: query,
-  Raw: Raw,
-  parse: parse,
-  serialize: serialize,
-  serializeVariables: serializeVariables,
-});
+      query: query,
+      Raw: Raw,
+      parse: parse,
+      serialize: serialize,
+      serializeVariables: serializeVariables
+    });
 
 var use = include.use;
 
@@ -139,12 +140,12 @@ var FloatBreakdown = {
   refetchQueryDescription: FloatBreakdown_refetchQueryDescription,
   use: use,
   useLazy: FloatBreakdown_useLazy,
-  useLazyWithVariables: FloatBreakdown_useLazyWithVariables,
+  useLazyWithVariables: FloatBreakdown_useLazyWithVariables
 };
 
 var Raw$1 = {};
 
-var query$1 = require("@apollo/client").gql`
+var query$1 = (require("@apollo/client").gql`
   query ($synthToken: String!)  {
     states(first: 1, orderBy: stateIndex, orderDirection: desc, where: {syntheticToken: $synthToken})  {
       __typename
@@ -153,58 +154,54 @@ var query$1 = require("@apollo/client").gql`
       floatRatePerSecondOverInterval
     }
   }
-`;
+`);
 
 function parse$1(value) {
   var value$1 = value.states;
   return {
-    states: value$1.map(function (value) {
-      return {
-        __typename: value.__typename,
-        stateIndex: GqlConverters.$$BigInt.parse(value.stateIndex),
-        accumulativeFloatPerSecond: GqlConverters.$$BigInt.parse(
-          value.accumulativeFloatPerSecond
-        ),
-        floatRatePerSecondOverInterval: GqlConverters.$$BigInt.parse(
-          value.floatRatePerSecondOverInterval
-        ),
-      };
-    }),
-  };
+          states: value$1.map(function (value) {
+                return {
+                        __typename: value.__typename,
+                        stateIndex: GqlConverters.$$BigInt.parse(value.stateIndex),
+                        accumulativeFloatPerSecond: GqlConverters.$$BigInt.parse(value.accumulativeFloatPerSecond),
+                        floatRatePerSecondOverInterval: GqlConverters.$$BigInt.parse(value.floatRatePerSecondOverInterval)
+                      };
+              })
+        };
 }
 
 function serialize$1(value) {
   var value$1 = value.states;
   var states = value$1.map(function (value) {
-    var value$1 = value.floatRatePerSecondOverInterval;
-    var value$2 = GqlConverters.$$BigInt.serialize(value$1);
-    var value$3 = value.accumulativeFloatPerSecond;
-    var value$4 = GqlConverters.$$BigInt.serialize(value$3);
-    var value$5 = value.stateIndex;
-    var value$6 = GqlConverters.$$BigInt.serialize(value$5);
-    var value$7 = value.__typename;
-    return {
-      __typename: value$7,
-      stateIndex: value$6,
-      accumulativeFloatPerSecond: value$4,
-      floatRatePerSecondOverInterval: value$2,
-    };
-  });
+        var value$1 = value.floatRatePerSecondOverInterval;
+        var value$2 = GqlConverters.$$BigInt.serialize(value$1);
+        var value$3 = value.accumulativeFloatPerSecond;
+        var value$4 = GqlConverters.$$BigInt.serialize(value$3);
+        var value$5 = value.stateIndex;
+        var value$6 = GqlConverters.$$BigInt.serialize(value$5);
+        var value$7 = value.__typename;
+        return {
+                __typename: value$7,
+                stateIndex: value$6,
+                accumulativeFloatPerSecond: value$4,
+                floatRatePerSecondOverInterval: value$2
+              };
+      });
   return {
-    states: states,
-  };
+          states: states
+        };
 }
 
 function serializeVariables$1(inp) {
   return {
-    synthToken: inp.synthToken,
-  };
+          synthToken: inp.synthToken
+        };
 }
 
 function makeVariables$1(synthToken, param) {
   return {
-    synthToken: synthToken,
-  };
+          synthToken: synthToken
+        };
 }
 
 var LatestFloatIssuance_inner = {
@@ -213,19 +210,18 @@ var LatestFloatIssuance_inner = {
   parse: parse$1,
   serialize: serialize$1,
   serializeVariables: serializeVariables$1,
-  makeVariables: makeVariables$1,
+  makeVariables: makeVariables$1
 };
 
 var include$1 = ApolloClient__React_Hooks_UseQuery.Extend({
-  query: query$1,
-  Raw: Raw$1,
-  parse: parse$1,
-  serialize: serialize$1,
-  serializeVariables: serializeVariables$1,
-});
+      query: query$1,
+      Raw: Raw$1,
+      parse: parse$1,
+      serialize: serialize$1,
+      serializeVariables: serializeVariables$1
+    });
 
-var LatestFloatIssuance_refetchQueryDescription =
-  include$1.refetchQueryDescription;
+var LatestFloatIssuance_refetchQueryDescription = include$1.refetchQueryDescription;
 
 var LatestFloatIssuance_use = include$1.use;
 
@@ -244,107 +240,77 @@ var LatestFloatIssuance = {
   refetchQueryDescription: LatestFloatIssuance_refetchQueryDescription,
   use: LatestFloatIssuance_use,
   useLazy: LatestFloatIssuance_useLazy,
-  useLazyWithVariables: LatestFloatIssuance_useLazyWithVariables,
+  useLazyWithVariables: LatestFloatIssuance_useLazyWithVariables
 };
 
 function FloatManagement(Props) {
   var user = RootProvider.useCurrentUserExn(undefined);
   var floatTokenAddress = Config.useFloatAddress(undefined);
   var userQuery = Curry.app(Queries.UsersState.use, [
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    {
-      userId: Globals.ethAdrToLowerStr(user),
-    },
-  ]);
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: Globals.ethAdrToLowerStr(user)
+        }
+      ]);
   var floatBreakdown = Curry.app(use, [
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-  ]);
-  console.log(["Query", userQuery]);
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ]);
+  console.log([
+        "Query",
+        userQuery
+      ]);
   var match = userQuery.data;
   var tmp;
   if (match !== undefined) {
     var match$1 = match.user;
-    tmp =
-      match$1 !== undefined
-        ? React.createElement(
-            React.Fragment,
-            undefined,
-            "you have minted " +
-              FormatMoney.formatEther(match$1.totalMintedFloat) +
-              " FLOAT, and currently have a balance of " +
-              FormatMoney.formatEther(match$1.floatTokenBalance),
-            React.createElement(AddToMetamask.make, {
-              tokenAddress: Globals.ethAdrToStr(floatTokenAddress),
-              tokenSymbol: "FLOAT",
-            })
-          )
-        : userQuery.error !== undefined
-        ? "Error loading users float data"
-        : "Loading total minted by user";
+    tmp = match$1 !== undefined ? React.createElement(React.Fragment, undefined, "you have minted " + FormatMoney.formatEther(match$1.totalMintedFloat) + " FLOAT, and currently have a balance of " + FormatMoney.formatEther(match$1.floatTokenBalance), React.createElement(AddToMetamask.make, {
+                tokenAddress: Globals.ethAdrToStr(floatTokenAddress),
+                tokenSymbol: "FLOAT"
+              })) : (
+        userQuery.error !== undefined ? "Error loading users float data" : "Loading total minted by user"
+      );
   } else {
-    tmp =
-      userQuery.error !== undefined
-        ? "Error loading users float data"
-        : "Loading total minted by user";
+    tmp = userQuery.error !== undefined ? "Error loading users float data" : "Loading total minted by user";
   }
   var match$2 = floatBreakdown.data;
-  return React.createElement(
-    "div",
-    undefined,
-    tmp,
-    React.createElement("hr", undefined),
-    React.createElement("hr", undefined),
-    match$2 !== undefined
-      ? Belt_Array.map(match$2.syntheticMarkets, function (param) {
-          return React.createElement(
-            "div",
-            undefined,
-            param.name + " (" + param.symbol + ") float minted:",
-            React.createElement("br", undefined),
-            "-from LONG side: " +
-              FormatMoney.formatEther(
-                param.syntheticLong.floatMintedFromSpecificToken
-              ),
-            React.createElement("br", undefined),
-            "-from SHORT side: " +
-              FormatMoney.formatEther(
-                param.syntheticShort.floatMintedFromSpecificToken
-              ),
-            React.createElement("hr", undefined)
-          );
-        })
-      : floatBreakdown.error !== undefined
-      ? "Error"
-      : "Loading total minted by user"
-  );
+  return React.createElement("div", undefined, tmp, React.createElement("hr", undefined), React.createElement("hr", undefined), match$2 !== undefined ? Belt_Array.map(match$2.syntheticMarkets, (function (param) {
+                      return React.createElement("div", undefined, param.name + " (" + param.symbol + ") float minted:", React.createElement("br", undefined), "-from LONG side: " + FormatMoney.formatEther(param.syntheticLong.floatMintedFromSpecificToken), React.createElement("br", undefined), "-from SHORT side: " + FormatMoney.formatEther(param.syntheticShort.floatMintedFromSpecificToken), React.createElement("hr", undefined));
+                    })) : (
+                floatBreakdown.error !== undefined ? "Error" : "Loading total minted by user"
+              ));
 }
 
 var make = FloatManagement;
 
-export { FloatBreakdown, LatestFloatIssuance, make };
+export {
+  FloatBreakdown ,
+  LatestFloatIssuance ,
+  make ,
+  
+}
 /* query Not a pure module */

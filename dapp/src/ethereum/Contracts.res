@@ -98,7 +98,7 @@ module Staker = {
       "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)  @1200000",
       "function withdraw(address tokenAddress, uint256 amount)",
       "function claimFloat(address[] memory tokenAddresses)",
-      "function claimFloatImmediately(address tokenAddress)",
+      "function claimFloatImmediately(address tokenAddress) @1200000",
     ]->Ethers.makeAbi
 
   let make = (~address, ~providerOrSigner): t =>
