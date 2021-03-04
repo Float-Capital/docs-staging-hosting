@@ -11,8 +11,8 @@ let make = () => {
           <div className="floating">
             <Link
               href={switch optCurrentUser {
-              | Some(_) => "/mint"
-              | None => "/login?nextPath=/mint"
+              | Some(_) => "/markets"
+              | None => "/login?nextPath=/markets"
               }}>
               <span className="floating-image-wrapper">
                 <img src="/img/start-trading.png" className="start-trading" />
