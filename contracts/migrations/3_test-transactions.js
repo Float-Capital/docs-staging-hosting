@@ -7,10 +7,14 @@ const SyntheticToken = artifacts.require("SyntheticToken");
 const YieldManagerMock = artifacts.require("YieldManagerMock");
 const OracleManagerMock = artifacts.require("OracleManagerMock");
 const YieldManagerVenus = artifacts.require("YieldManagerVenus");
+const OracleManagerEthKiller = artifacts.require("OracleManagerEthKiller");
 
 // BSC testnet BUSD and vBUSD token addresses (for venus).
-const bscBUSDAddress = "0x8301F2213c0eeD49a7E28Ae4c3e91722919B8B47";
-const bscVBUSDAddress = "0x08e0A5575De71037aE36AbfAfb516595fE68e5e4";
+const bscTestBUSDAddress = "0x8301F2213c0eeD49a7E28Ae4c3e91722919B8B47";
+const bscTestVBUSDAddress = "0x08e0A5575De71037aE36AbfAfb516595fE68e5e4";
+
+// BSC testnet BAND oracle address.
+const bscTestBANDAddress = "0xDA7a001b254CD22e46d3eAB04d937489c93174C3";
 
 const mintAndApprove = async (token, amount, user, approvedAddress) => {
   let bnAmount = new BN(amount);
@@ -34,24 +38,28 @@ const deployTestMarket = async (
   const _baseExitFee = 30;
   const _badLiquidityExitFee = 50;
 
-  // Deploy mock oracle manager for market.
-  // TODO: replace with aggregator feed on BSC testnet.
-  let oracleManager = await OracleManagerMock.new();
-  await oracleManager.setup(admin);
+  // We mock out the oracle manager unless we're on BSC testnet.
+  let oracleManager;
+  if (networkName == "binanceTest") {
+    oracleManager = await OracleManagerEthKiller.new();
+    await oracleManager.setup(admin, bscTestBANDAddress);
+  } else {
+    oracleManager = await OracleManagerMock.new();
+    await oracleManager.setup(admin);
+  }
 
   // We mock out the yield manager unless we're on BSC testnet.
   let yieldManager;
   let fundTokenAddress;
   if (networkName == "binanceTest") {
-    console.log("Deploying VENUS yield manager", syntheticName);
     yieldManager = await YieldManagerVenus.new();
-    fundTokenAddress = bscBUSDAddress;
+    fundTokenAddress = bscTestBUSDAddress;
 
     await yieldManager.setup(
       admin,
       longShortInstance.address,
-      bscBUSDAddress,
-      bscVBUSDAddress
+      bscTestBUSDAddress,
+      bscTestVBUSDAddress
     );
   } else {
     yieldManager = await YieldManagerMock.new();
@@ -97,7 +105,7 @@ const topupBalanceIfLow = async (from, to) => {
   }
 };
 
-module.exports = async function(deployer, network, accounts) {
+module.exports = async function (deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];

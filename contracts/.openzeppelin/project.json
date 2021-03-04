@@ -3,11 +3,11 @@
   "name": "float-capital",
   "version": "0.1.0",
   "contracts": {
-    "LongShort": "LongShortPlaceholder",
-    "Staker": "StakerPlaceholder",
+    "LongShort": "LongShort",
+    "Staker": "Staker",
     "OracleAggregator": "OracleManagerMock",
-    "FloatToken": "FloatTokenPlaceholder",
-    "TokenFactory": "TokenFactoryPlaceholder"
+    "Treasury": "Treasury_v0",
+    "FloatCapital": "FloatCapital_v0"
   },
   "dependencies": {},
   "compiler": {
