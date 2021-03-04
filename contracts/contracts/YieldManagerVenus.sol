@@ -63,6 +63,14 @@ contract YieldManagerVenus is IYieldManager, Initializable {
     }
 
     ////////////////////////////////////
+    /// MULTISIG ADMIN FUNCTIONS ///////
+    ////////////////////////////////////
+
+    function changeAdmin(address _admin) external adminOnly {
+        admin = _admin;
+    }
+
+    ////////////////////////////////////
     ///// IMPLEMENTATION ///////////////
     ////////////////////////////////////
 

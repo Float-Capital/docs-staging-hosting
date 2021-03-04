@@ -42,8 +42,12 @@ contract TokenFactory is Initializable {
     }
 
     ////////////////////////////////////
-    //////////// UTILS /////////////////
+    /// MULTISIG ADMIN FUNCTIONS ///////
     ////////////////////////////////////
+
+    function changeAdmin(address _admin) external adminOnly {
+        admin = _admin;
+    }
 
     function changeFloatAddress(address _floatContract) external adminOnly {
         floatContract = _floatContract;

@@ -23,6 +23,15 @@ contract OracleManagerEthKiller is Initializable {
     IBandOracle public oracle;
 
     ////////////////////////////////////
+    /////////// MODIFIERS //////////////
+    ////////////////////////////////////
+
+    modifier adminOnly() {
+        require(msg.sender == admin);
+        _;
+    }
+
+    ////////////////////////////////////
     ///// CONTRACT SET-UP //////////////
     ////////////////////////////////////
 
@@ -35,6 +44,14 @@ contract OracleManagerEthKiller is Initializable {
 
         // Initial base index price.
         indexPrice = 1e18;
+    }
+
+    ////////////////////////////////////
+    /// MULTISIG ADMIN FUNCTIONS ///////
+    ////////////////////////////////////
+
+    function changeAdmin(address _admin) external adminOnly {
+        admin = _admin;
     }
 
     ////////////////////////////////////
