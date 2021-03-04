@@ -35,12 +35,13 @@ networks
       NETWORK: network,
     };
     Object.keys(env.implementationVarsToProxies).forEach((x) => {
+      console.log(x, env.implementationVarsToProxies[x]);
       variables[x] =
         inpObj.proxies[env.implementationVarsToProxies[x]][0].implementation;
     });
 
     console.log(
-      `NETWORK=${variables.NETWORK} LONGSHORT_IMPLEMENTATION=${variables.LONGSHORT_IMPLEMENTATION} ORACLE_MANAGER_IMPLEMENTATION=${variables.ORACLE_MANAGER_IMPLEMENTATION} YIELD_MANAGER_IMPLEMENTATION=${variables.YIELD_MANAGER_IMPLEMENTATION} STAKER_IMPLEMENTATION=${variables.STAKER_IMPLEMENTATION} yarn verify-contracts`
+      `NETWORK=${variables.NETWORK} LONGSHORT_IMPLEMENTATION=${variables.LONGSHORT_IMPLEMENTATION} TREASURY_IMPLEMENTATION=${variables.TREASURY_IMPLEMENTATION} FLOAT_CAPITAL_IMPLEMENTATION=${variables.FLOAT_CAPITAL_IMPLEMENTATION} STAKER_IMPLEMENTATION=${variables.STAKER_IMPLEMENTATION} yarn verify-contracts`
     );
     exec(
       `cd contracts; yarn verify-contracts`,

@@ -11,7 +11,7 @@
     "clean": "rm -rf build/contracts/* artifacts cache",
     "save-deployment": "/bin/bash -c 'mkdir -p ./buildsDeployed/deployed; \\cp ./build/contracts/{Dai,FloatToken,LongShort,Migrations,OracleManagerMock,Staker,TokenFactory,YieldManagerMock}.json ./buildsDeployed/deployed/'",
     "prepair-upgrade": "npm run clean; mkdir -p ./build/contracts; cp -r ./buildsDeployed/deployed/* ./build/contracts/; npm run truffle-compile",
-    "verify-contracts": "truffle run verify Dai FloatToken LongShort@$LONGSHORT_IMPLEMENTATION OracleManagerMock@$ORACLE_MANAGER_IMPLEMENTATION Staker@$STAKER_IMPLEMENTATION TokenFactory --network $NETWORK",
+    "verify-contracts": "truffle run verify FloatToken LongShort@$LONGSHORT_IMPLEMENTATION Staker@$STAKER_IMPLEMENTATION FloatCapital_v0@$TREASURY_IMPLEMENTATIONTreasury_v0@$FLOAT_CAPITAL_IMPLEMENTATION FloatToken TokenFactory --network $NETWORK",
     "update-testnet-contracts": "yarn clean ; rm -f .openzeppelin/dev-97.json; truffle migrate --network binanceTest --reset"
   },
   "dependencies": {
@@ -33,6 +33,6 @@
     "chai": "^4.2.0",
     "ethereum-waffle": "^3.0.0",
     "truffle": "^5.2.2",
-    "truffle-plugin-verify": "^0.5.4"
+    "truffle-plugin-verify": "^0.5.6"
   }
 }
