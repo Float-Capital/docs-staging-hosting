@@ -32,6 +32,7 @@
     "@truffle/hdwallet-provider": "^1.2.1",
     "chai": "^4.2.0",
     "ethereum-waffle": "^3.0.0",
+    "truffle": "^5.2.2",
     "truffle-plugin-verify": "^0.5.4"
   }
 }
