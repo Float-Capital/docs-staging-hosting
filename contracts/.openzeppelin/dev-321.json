@@ -44,7 +44,7 @@
       "storage": [
         {
           "contract": "Initializable",
-          "path": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol",
+          "path": "@openzeppelin/contracts-upgradeable/utils/Initializable.sol",
           "label": "_initialized",
           "astId": 6086,
           "type": "t_bool",
@@ -52,7 +52,7 @@
         },
         {
           "contract": "Initializable",
-          "path": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol",
+          "path": "@openzeppelin/contracts-upgradeable/utils/Initializable.sol",
           "label": "_initializing",
           "astId": 6089,
           "type": "t_bool",
@@ -277,7 +277,7 @@
       "storage": [
         {
           "contract": "Initializable",
-          "path": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol",
+          "path": "@openzeppelin/contracts-upgradeable/utils/Initializable.sol",
           "label": "_initialized",
           "astId": 6086,
           "type": "t_bool",
@@ -285,7 +285,7 @@
         },
         {
           "contract": "Initializable",
-          "path": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol",
+          "path": "@openzeppelin/contracts-upgradeable/utils/Initializable.sol",
           "label": "_initializing",
           "astId": 6089,
           "type": "t_bool",
@@ -379,7 +379,7 @@
       "storage": [
         {
           "contract": "Initializable",
-          "path": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol",
+          "path": "@openzeppelin/contracts-upgradeable/utils/Initializable.sol",
           "label": "_initialized",
           "astId": 6086,
           "type": "t_bool",
@@ -387,7 +387,7 @@
         },
         {
           "contract": "Initializable",
-          "path": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol",
+          "path": "@openzeppelin/contracts-upgradeable/utils/Initializable.sol",
           "label": "_initializing",
           "astId": 6089,
           "type": "t_bool",

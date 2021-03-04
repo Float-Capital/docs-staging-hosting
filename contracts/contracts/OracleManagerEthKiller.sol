@@ -1,9 +1,8 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity 0.7.6;
-pragma abicoder v2;
+pragma solidity 0.8.2;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/Initializable.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
 import "./interfaces/IBandOracle.sol";
@@ -80,32 +79,32 @@ contract OracleManagerEthKiller is Initializable {
         IBandOracle.ReferenceData[] memory data =
             oracle.getReferenceDataBulk(baseSymbols, quoteSymbols);
 
-        return (
-            int256(data[0].rate),
-            int256(data[1].rate),
-            int256(data[2].rate)
-        );
-    }
+            return (
+                int256(data[0].rate),
+                int256(data[1].rate),
+                int256(data[2].rate)
+            );
+        }
 
     function _calculatePrice() internal {
         (int256 newTronPrice, int256 newEosPrice, int256 newXrpPrice) =
             _getAssetPrices();
 
         int256 valueOfChangeInIndex =
-            (indexPrice *
+                (indexPrice *
                 (_calcAbsolutePercentageChange(newTronPrice, tronPrice) +
                     _calcAbsolutePercentageChange(newEosPrice, eosPrice) +
                     _calcAbsolutePercentageChange(newXrpPrice, xrpPrice))) /
                 (3 * 1e18);
 
         // Set new prices
-        tronPrice = newTronPrice;
-        eosPrice = newEosPrice;
-        xrpPrice = newXrpPrice;
+            tronPrice = newTronPrice;
+            eosPrice = newEosPrice;
+            xrpPrice = newXrpPrice;
 
         // Set new index price
-        indexPrice = indexPrice + valueOfChangeInIndex;
-    }
+            indexPrice = indexPrice + valueOfChangeInIndex;
+        }
 
     function _calcAbsolutePercentageChange(int256 newPrice, int256 basePrice)
         internal
