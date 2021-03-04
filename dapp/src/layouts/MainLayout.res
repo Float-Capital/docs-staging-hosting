@@ -70,5 +70,6 @@ let make = (~children) => {
         <Navigation /> <div className="m-auto w-full"> children </div>
       </div>
     </div>
+    <Lost/>
   </div>
 }
