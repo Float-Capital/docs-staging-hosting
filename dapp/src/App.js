@@ -11,17 +11,19 @@ import * as StateChangeMonitor from "./libraries/StateChangeMonitor.js";
 
 var PageComponent = {};
 
-function App$GraphQl(Props) {
+var defaultClient = Client.makeClient(Config.localhostGraphEndpoint, "http://localhost:8080/v1/graphql", undefined);
+
+var context = React.createContext(defaultClient);
+
+var provider = context.Provider;
+
+function useApolloClient(param) {
+  return React.useContext(context);
+}
+
+function App$ApolloContext$GraphQl(Props) {
   var children = Props.children;
-  var networkId = RootProvider.useChainId(undefined);
-  var user = RootProvider.useCurrentUser(undefined);
-  var client = React.useMemo((function () {
-          return Client.makeClient(networkId !== undefined ? (
-                        networkId !== 5 ? (
-                            networkId !== 97 && networkId === 321 ? Config.localhostGraphEndpoint : Config.binancTestnetGraphEndpoint
-                          ) : Config.goerliGraphEndpoint
-                      ) : Config.binancTestnetGraphEndpoint, "http://localhost:8080/v1/graphql", user);
-        }), [networkId]);
+  var client = React.useContext(context);
   return React.createElement(Client$1.ApolloProvider, {
               client: client,
               children: children
@@ -29,14 +31,46 @@ function App$GraphQl(Props) {
 }
 
 var GraphQl = {
-  make: App$GraphQl
+  make: App$ApolloContext$GraphQl
+};
+
+function App$ApolloContext$Provider(Props) {
+  var client = Props.client;
+  var children = Props.children;
+  return React.createElement(provider, {
+              value: client,
+              children: children
+            });
+}
+
+var Provider = {
+  make: App$ApolloContext$Provider
+};
+
+function App$ApolloContext(Props) {
+  var children = Props.children;
+  return React.createElement(App$ApolloContext$Provider, {
+              client: defaultClient,
+              children: React.createElement(App$ApolloContext$GraphQl, {
+                    children: children
+                  })
+            });
+}
+
+var ApolloContext = {
+  context: context,
+  provider: provider,
+  useApolloClient: useApolloClient,
+  GraphQl: GraphQl,
+  Provider: Provider,
+  make: App$ApolloContext
 };
 
 function $$default(props) {
   Router.useRouter();
   var content = React.createElement(props.Component, props.pageProps);
   return React.createElement(RootProvider.make, {
-              children: React.createElement(App$GraphQl, {
+              children: React.createElement(App$ApolloContext, {
                     children: React.createElement(StateChangeMonitor.make, {
                           children: React.createElement(MainLayout.make, {
                                 children: content
@@ -48,9 +82,10 @@ function $$default(props) {
 
 export {
   PageComponent ,
-  GraphQl ,
+  defaultClient ,
+  ApolloContext ,
   $$default ,
   $$default as default,
   
 }
-/* react Not a pure module */
+/* defaultClient Not a pure module */

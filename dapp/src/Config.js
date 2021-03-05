@@ -12,6 +12,10 @@ var isDevMode = Caml_obj.caml_equal(process.env.NEXT_PUBLIC_DEVMODE, "true");
 
 var longshortContractAbi = Ethers.makeAbi([""]);
 
+function getDefaultNetworkId(optNetworkId) {
+  return Belt_Option.getWithDefault(optNetworkId, 97);
+}
+
 var allContracts = (require('./contractAddresses.json'));
 
 function getContractAddressString(netIdStr, closure) {
@@ -66,18 +70,19 @@ function useFloatAddress(param) {
                   })));
 }
 
-var goerliGraphEndpoint = "https://api.thegraph.com/subgraphs/name/avolabs-io/float-capital-goerli";
-
 var binancTestnetGraphEndpoint = "https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital";
 
 var localhostGraphEndpoint = "https://localhost:8000/subgraphs/name/avolabs-io/float-capital/graphql";
 
+var defaultNetworkId = 97;
+
 export {
   isDevMode ,
   longshortContractAbi ,
-  goerliGraphEndpoint ,
   binancTestnetGraphEndpoint ,
   localhostGraphEndpoint ,
+  defaultNetworkId ,
+  getDefaultNetworkId ,
   allContracts ,
   getContractAddressString ,
   longShortContractAddress ,
