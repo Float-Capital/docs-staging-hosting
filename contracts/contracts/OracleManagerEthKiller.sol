@@ -6,8 +6,9 @@ import "@openzeppelin/contracts-upgradeable/utils/Initializable.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
 import "./interfaces/IBandOracle.sol";
+import "./interfaces/IOracleManager.sol";
 
-contract OracleManagerEthKiller is Initializable {
+contract OracleManagerEthKiller is Initializable, IOracleManager {
     address public admin; // This will likely be the Gnosis safe
 
     // Oracle price, changes by average of the underlying asset changes.
@@ -82,7 +83,7 @@ contract OracleManagerEthKiller is Initializable {
         return (data[0].rate, data[1].rate, data[2].rate);
     }
 
-    function _calculatePrice() internal {
+    function updatePrice() external override {
         (uint256 newTronPrice, uint256 newEosPrice, uint256 newXrpPrice) =
             _getAssetPrices();
 
@@ -93,20 +94,11 @@ contract OracleManagerEthKiller is Initializable {
                     _calcAbsolutePercentageChange(newXrpPrice, xrpPrice))) /
                 (3 * 1e18);
 
-        if (tronPrice != newTronPrice) {
-            tronPrice = newTronPrice;
-        }
-        if (eosPrice != newEosPrice) {
-            eosPrice = newEosPrice;
-        }
-        if (xrpPrice != newXrpPrice) {
-            xrpPrice = newXrpPrice;
-        }
+        tronPrice = newTronPrice;
+        eosPrice = newEosPrice;
+        xrpPrice = newXrpPrice;
 
-        if (valueOfChangeInIndex != 0) {
-            // Set new index price
-            indexPrice = uint256(int256(indexPrice) + valueOfChangeInIndex);
-        }
+        indexPrice = uint256(int256(indexPrice) + valueOfChangeInIndex);
     }
 
     function _calcAbsolutePercentageChange(uint256 newPrice, uint256 basePrice)
@@ -119,8 +111,7 @@ contract OracleManagerEthKiller is Initializable {
             (int256(basePrice));
     }
 
-    function getLatestPrice() external returns (int256) {
-        _calculatePrice();
+    function getLatestPrice() external view override returns (int256) {
         return int256(indexPrice);
     }
 }
