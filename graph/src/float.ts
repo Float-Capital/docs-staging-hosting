@@ -365,10 +365,10 @@ export function handlePriceUpdate(event: PriceUpdate): void {
     event,
     "PriceUpdate",
     bigIntArrayToStringArray([
-      newPrice,
-      oldPrice,
       marketIndex,
       contractCallCounter,
+      oldPrice,
+      newPrice,
     ]).concat([user.toHex()]),
     ["marketIndex", "contractCallCounter", "newPrice", "oldPrice", "user"],
     ["uint256", "uint256", "uint256", "uint256", "address"],
