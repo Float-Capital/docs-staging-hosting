@@ -102,7 +102,7 @@ const deployContracts = async (options, accounts, deployer, networkName) => {
   );
 };
 
-module.exports = async function (deployer, networkName, accounts) {
+module.exports = async function(deployer, networkName, accounts) {
   if (networkName == "bsc") {
     throw "Don't save or run this migration if on mainnet (remove when ready)";
   }
