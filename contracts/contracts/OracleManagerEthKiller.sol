@@ -11,12 +11,12 @@ contract OracleManagerEthKiller is Initializable {
     address public admin; // This will likely be the Gnosis safe
 
     // Oracle price, changes by average of the underlying asset changes.
-    int256 public indexPrice;
+    uint256 public indexPrice;
 
     // Underlying asset prices.
-    int256 public tronPrice;
-    int256 public eosPrice;
-    int256 public xrpPrice;
+    uint256 public tronPrice;
+    uint256 public eosPrice;
+    uint256 public xrpPrice;
 
     // Band oracle address.
     IBandOracle public oracle;
@@ -61,9 +61,9 @@ contract OracleManagerEthKiller is Initializable {
         internal
         view
         returns (
-            int256,
-            int256,
-            int256
+            uint256,
+            uint256,
+            uint256
         )
     {
         string[] memory baseSymbols = new string[](3);
@@ -79,19 +79,15 @@ contract OracleManagerEthKiller is Initializable {
         IBandOracle.ReferenceData[] memory data =
             oracle.getReferenceDataBulk(baseSymbols, quoteSymbols);
 
-        return (
-            int256(data[0].rate),
-            int256(data[1].rate),
-            int256(data[2].rate)
-        );
+        return (data[0].rate, data[1].rate, data[2].rate);
     }
 
     function _calculatePrice() internal {
-        (int256 newTronPrice, int256 newEosPrice, int256 newXrpPrice) =
+        (uint256 newTronPrice, uint256 newEosPrice, uint256 newXrpPrice) =
             _getAssetPrices();
 
         int256 valueOfChangeInIndex =
-            (indexPrice *
+            (int256(indexPrice) *
                 (_calcAbsolutePercentageChange(newTronPrice, tronPrice) +
                     _calcAbsolutePercentageChange(newEosPrice, eosPrice) +
                     _calcAbsolutePercentageChange(newXrpPrice, xrpPrice))) /
@@ -109,20 +105,22 @@ contract OracleManagerEthKiller is Initializable {
 
         if (valueOfChangeInIndex != 0) {
             // Set new index price
-            indexPrice = indexPrice + valueOfChangeInIndex;
+            indexPrice = uint256(int256(indexPrice) + valueOfChangeInIndex);
         }
     }
 
-    function _calcAbsolutePercentageChange(int256 newPrice, int256 basePrice)
+    function _calcAbsolutePercentageChange(uint256 newPrice, uint256 basePrice)
         internal
         pure
         returns (int256)
     {
-        return ((newPrice - basePrice) * (1e18)) / (basePrice);
+        return
+            ((int256(newPrice) - int256(basePrice)) * (1e18)) /
+            (int256(basePrice));
     }
 
     function getLatestPrice() external returns (int256) {
         _calculatePrice();
-        return indexPrice;
+        return int256(indexPrice);
     }
 }
