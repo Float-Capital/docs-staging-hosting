@@ -11,7 +11,7 @@ import * as StateChangeMonitor from "./libraries/StateChangeMonitor.js";
 
 var PageComponent = {};
 
-var defaultClient = Client.makeClient(Config.localhostGraphEndpoint, "http://localhost:8080/v1/graphql", undefined);
+var defaultClient = Client.makeClient(Config.binancTestnetGraphEndpoint, "http://localhost:8080/v1/graphql", undefined);
 
 var context = React.createContext(defaultClient);
 
