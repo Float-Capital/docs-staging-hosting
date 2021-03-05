@@ -24,7 +24,7 @@ let allContracts: allChainContractDetails = %raw(`require('./contractAddresses.j
 let getContractAddressString = (~netIdStr, ~closure) => {
   allContracts
   ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(Constants.zeroAddress, closure)
+  ->Option.mapWithDefault(CONSTANTS.zeroAddress, closure)
   ->ethAdrToStr
 }
 
@@ -32,7 +32,7 @@ let getContractAddressString = (~netIdStr, ~closure) => {
 let longShortContractAddress = (~netIdStr) => {
   allContracts
   ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.longShort)
+  ->Option.mapWithDefault(CONSTANTS.zeroAddress, contracts => contracts.longShort)
 }
 let useLongShortAddress = () => {
   let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
@@ -42,7 +42,7 @@ let useLongShortAddress = () => {
 let stakerContractAddress = (~netIdStr) => {
   allContracts
   ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.staker)
+  ->Option.mapWithDefault(CONSTANTS.zeroAddress, contracts => contracts.staker)
 }
 let useStakerAddress = () => {
   let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
@@ -52,7 +52,7 @@ let useStakerAddress = () => {
 let daiContractAddress = (~netIdStr) => {
   allContracts
   ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.dai)
+  ->Option.mapWithDefault(CONSTANTS.zeroAddress, contracts => contracts.dai)
 }
 
 let useDaiAddress = () => {
@@ -63,7 +63,7 @@ let useDaiAddress = () => {
 let floatContractAddress = (~netIdStr) => {
   allContracts
   ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(Constants.zeroAddress, contracts => contracts.floatToken)
+  ->Option.mapWithDefault(CONSTANTS.zeroAddress, contracts => contracts.floatToken)
 }
 
 let useFloatAddress = () => {

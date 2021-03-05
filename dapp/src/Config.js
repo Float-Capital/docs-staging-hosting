@@ -4,7 +4,7 @@ import * as Ethers from "./ethereum/Ethers.js";
 import * as Globals from "./libraries/Globals.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
 import * as Caml_obj from "bs-platform/lib/es6/caml_obj.js";
-import * as Constants from "./Constants.js";
+import * as CONSTANTS from "./CONSTANTS.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as RootProvider from "./libraries/RootProvider.js";
 
@@ -15,11 +15,11 @@ var longshortContractAbi = Ethers.makeAbi([""]);
 var allContracts = (require('./contractAddresses.json'));
 
 function getContractAddressString(netIdStr, closure) {
-  return Globals.ethAdrToStr(Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), Constants.zeroAddress, closure));
+  return Globals.ethAdrToStr(Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), CONSTANTS.zeroAddress, closure));
 }
 
 function longShortContractAddress(netIdStr) {
-  return Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), Constants.zeroAddress, (function (contracts) {
+  return Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), CONSTANTS.zeroAddress, (function (contracts) {
                 return contracts.LongShort;
               }));
 }
@@ -31,7 +31,7 @@ function useLongShortAddress(param) {
 }
 
 function stakerContractAddress(netIdStr) {
-  return Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), Constants.zeroAddress, (function (contracts) {
+  return Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), CONSTANTS.zeroAddress, (function (contracts) {
                 return contracts.Staker;
               }));
 }
@@ -43,7 +43,7 @@ function useStakerAddress(param) {
 }
 
 function daiContractAddress(netIdStr) {
-  return Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), Constants.zeroAddress, (function (contracts) {
+  return Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), CONSTANTS.zeroAddress, (function (contracts) {
                 return contracts.Dai;
               }));
 }
@@ -55,7 +55,7 @@ function useDaiAddress(param) {
 }
 
 function floatContractAddress(netIdStr) {
-  return Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), Constants.zeroAddress, (function (contracts) {
+  return Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), CONSTANTS.zeroAddress, (function (contracts) {
                 return contracts.FloatToken;
               }));
 }

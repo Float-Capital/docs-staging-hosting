@@ -34,7 +34,7 @@ module Address = {
     | None =>
       // In theory graphql should never allow this to not be a correct string
       Js.log("CRITICAL - couldn't decode eth address from graph, should never happen!")
-      Constants.zeroAddress
+      CONSTANTS.zeroAddress
     }
   let serialize = bytesString => bytesString->ethAdrToStr->Js.Json.string
 }
