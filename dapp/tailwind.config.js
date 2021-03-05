@@ -15,6 +15,7 @@ module.exports = {
     extend: {
       colors: {
         primary: "#064085",
+        "light-purple": "#a6accd",
       },
       // // Doesn't include an opacity gradient, rather use direct css
       // backgroundImage: (theme) => ({
@@ -39,6 +40,12 @@ module.exports = {
       /// Below are custom sizes
       // "600px": "600px",
     },
+    minWidth: {
+      "3/4": "75%",
+    },
+    borderColor: (theme) => ({
+      ...theme("colors"),
+    }),
     /* We override the default font-families with our own default prefs  */
     fontFamily: {
       sans: [

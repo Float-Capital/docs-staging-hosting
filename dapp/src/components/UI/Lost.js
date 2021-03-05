@@ -15,7 +15,7 @@ function Lost(Props) {
     return null;
   } else {
     return React.createElement("div", {
-                className: "absolute bottom-3 right-5 flex flex-col items-end"
+                className: "fixed bottom-3 right-5 flex flex-col items-end"
               }, React.createElement("div", {
                     className: "font-alphbeta text-2xl cursor-pointer",
                     onClick: (function (param) {

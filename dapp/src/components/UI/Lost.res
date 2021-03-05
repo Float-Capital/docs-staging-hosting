@@ -6,7 +6,7 @@ let make = () => {
     switch(router.route){
         | "/"=> React.null
         | _ =>     
-                <div className="absolute bottom-3 right-5 flex flex-col items-end">
+                <div className="fixed bottom-3 right-5 flex flex-col items-end">
                     <div 
                         className="font-alphbeta text-2xl cursor-pointer"
                         onClick={(_) => setShow(show => !show)}

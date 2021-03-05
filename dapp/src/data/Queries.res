@@ -43,6 +43,8 @@ module MarketDetails = %graphql(`
       totalLockedLong
       totalLockedShort
       totalValueLocked
+      longTokenPrice
+      shortTokenPrice
     }
   }
 }
@@ -129,6 +131,17 @@ query ($userId: String!){
       }
       amount
     }
+  }
+}
+`)
+
+module GlobalState = %graphql(`
+query {
+  globalStates(first: 1){
+    totalFloatMinted,
+    totalTxs,
+    totalUsers,
+    totalGasUsed
   }
 }
 `)

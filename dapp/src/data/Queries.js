@@ -248,6 +248,8 @@ var query$2 = (require("@apollo/client").gql`
         totalLockedLong
         totalLockedShort
         totalValueLocked
+        longTokenPrice
+        shortTokenPrice
       }
     }
   }
@@ -282,7 +284,9 @@ function parse$2(value) {
                           __typename: value$3.__typename,
                           totalLockedLong: GqlConverters.$$BigInt.parse(value$3.totalLockedLong),
                           totalLockedShort: GqlConverters.$$BigInt.parse(value$3.totalLockedShort),
-                          totalValueLocked: GqlConverters.$$BigInt.parse(value$3.totalValueLocked)
+                          totalValueLocked: GqlConverters.$$BigInt.parse(value$3.totalValueLocked),
+                          longTokenPrice: GqlConverters.$$BigInt.parse(value$3.longTokenPrice),
+                          shortTokenPrice: GqlConverters.$$BigInt.parse(value$3.shortTokenPrice)
                         }
                       };
               })
@@ -293,58 +297,64 @@ function serialize$2(value) {
   var value$1 = value.syntheticMarkets;
   var syntheticMarkets = value$1.map(function (value) {
         var value$1 = value.latestSystemState;
-        var value$2 = value$1.totalValueLocked;
+        var value$2 = value$1.shortTokenPrice;
         var value$3 = GqlConverters.$$BigInt.serialize(value$2);
-        var value$4 = value$1.totalLockedShort;
+        var value$4 = value$1.longTokenPrice;
         var value$5 = GqlConverters.$$BigInt.serialize(value$4);
-        var value$6 = value$1.totalLockedLong;
+        var value$6 = value$1.totalValueLocked;
         var value$7 = GqlConverters.$$BigInt.serialize(value$6);
-        var value$8 = value$1.__typename;
-        var latestSystemState = {
-          __typename: value$8,
-          totalLockedLong: value$7,
-          totalLockedShort: value$5,
-          totalValueLocked: value$3
-        };
-        var value$9 = value.syntheticShort;
-        var value$10 = value$9.totalStaked;
+        var value$8 = value$1.totalLockedShort;
+        var value$9 = GqlConverters.$$BigInt.serialize(value$8);
+        var value$10 = value$1.totalLockedLong;
         var value$11 = GqlConverters.$$BigInt.serialize(value$10);
-        var value$12 = value$9.tokenAddress;
-        var value$13 = GqlConverters.Address.serialize(value$12);
-        var value$14 = value$9.id;
-        var value$15 = value$9.__typename;
+        var value$12 = value$1.__typename;
+        var latestSystemState = {
+          __typename: value$12,
+          totalLockedLong: value$11,
+          totalLockedShort: value$9,
+          totalValueLocked: value$7,
+          longTokenPrice: value$5,
+          shortTokenPrice: value$3
+        };
+        var value$13 = value.syntheticShort;
+        var value$14 = value$13.totalStaked;
+        var value$15 = GqlConverters.$$BigInt.serialize(value$14);
+        var value$16 = value$13.tokenAddress;
+        var value$17 = GqlConverters.Address.serialize(value$16);
+        var value$18 = value$13.id;
+        var value$19 = value$13.__typename;
         var syntheticShort = {
-          __typename: value$15,
-          id: value$14,
-          tokenAddress: value$13,
-          totalStaked: value$11
+          __typename: value$19,
+          id: value$18,
+          tokenAddress: value$17,
+          totalStaked: value$15
         };
-        var value$16 = value.syntheticLong;
-        var value$17 = value$16.totalStaked;
-        var value$18 = GqlConverters.$$BigInt.serialize(value$17);
-        var value$19 = value$16.tokenAddress;
-        var value$20 = GqlConverters.Address.serialize(value$19);
-        var value$21 = value$16.id;
-        var value$22 = value$16.__typename;
-        var syntheticLong = {
-          __typename: value$22,
-          id: value$21,
-          tokenAddress: value$20,
-          totalStaked: value$18
-        };
-        var value$23 = value.oracleAddress;
+        var value$20 = value.syntheticLong;
+        var value$21 = value$20.totalStaked;
+        var value$22 = GqlConverters.$$BigInt.serialize(value$21);
+        var value$23 = value$20.tokenAddress;
         var value$24 = GqlConverters.Address.serialize(value$23);
-        var value$25 = value.marketIndex;
-        var value$26 = GqlConverters.$$BigInt.serialize(value$25);
-        var value$27 = value.symbol;
-        var value$28 = value.name;
-        var value$29 = value.__typename;
+        var value$25 = value$20.id;
+        var value$26 = value$20.__typename;
+        var syntheticLong = {
+          __typename: value$26,
+          id: value$25,
+          tokenAddress: value$24,
+          totalStaked: value$22
+        };
+        var value$27 = value.oracleAddress;
+        var value$28 = GqlConverters.Address.serialize(value$27);
+        var value$29 = value.marketIndex;
+        var value$30 = GqlConverters.$$BigInt.serialize(value$29);
+        var value$31 = value.symbol;
+        var value$32 = value.name;
+        var value$33 = value.__typename;
         return {
-                __typename: value$29,
-                name: value$28,
-                symbol: value$27,
-                marketIndex: value$26,
-                oracleAddress: value$24,
+                __typename: value$33,
+                name: value$32,
+                symbol: value$31,
+                marketIndex: value$30,
+                oracleAddress: value$28,
                 syntheticLong: syntheticLong,
                 syntheticShort: syntheticShort,
                 latestSystemState: latestSystemState
@@ -1124,6 +1134,113 @@ var UsersActiveStakes = {
   useLazyWithVariables: UsersActiveStakes_useLazyWithVariables
 };
 
+var Raw$7 = {};
+
+var query$7 = (require("@apollo/client").gql`
+  query   {
+    globalStates(first: 1)  {
+      __typename
+      totalFloatMinted
+      totalTxs
+      totalUsers
+      totalGasUsed
+    }
+  }
+`);
+
+function parse$7(value) {
+  var value$1 = value.globalStates;
+  return {
+          globalStates: value$1.map(function (value) {
+                return {
+                        __typename: value.__typename,
+                        totalFloatMinted: GqlConverters.$$BigInt.parse(value.totalFloatMinted),
+                        totalTxs: GqlConverters.$$BigInt.parse(value.totalTxs),
+                        totalUsers: GqlConverters.$$BigInt.parse(value.totalUsers),
+                        totalGasUsed: GqlConverters.$$BigInt.parse(value.totalGasUsed)
+                      };
+              })
+        };
+}
+
+function serialize$7(value) {
+  var value$1 = value.globalStates;
+  var globalStates = value$1.map(function (value) {
+        var value$1 = value.totalGasUsed;
+        var value$2 = GqlConverters.$$BigInt.serialize(value$1);
+        var value$3 = value.totalUsers;
+        var value$4 = GqlConverters.$$BigInt.serialize(value$3);
+        var value$5 = value.totalTxs;
+        var value$6 = GqlConverters.$$BigInt.serialize(value$5);
+        var value$7 = value.totalFloatMinted;
+        var value$8 = GqlConverters.$$BigInt.serialize(value$7);
+        var value$9 = value.__typename;
+        return {
+                __typename: value$9,
+                totalFloatMinted: value$8,
+                totalTxs: value$6,
+                totalUsers: value$4,
+                totalGasUsed: value$2
+              };
+      });
+  return {
+          globalStates: globalStates
+        };
+}
+
+function serializeVariables$7(param) {
+  
+}
+
+function makeVariables$7(param) {
+  
+}
+
+function makeDefaultVariables$3(param) {
+  
+}
+
+var GlobalState_inner = {
+  Raw: Raw$7,
+  query: query$7,
+  parse: parse$7,
+  serialize: serialize$7,
+  serializeVariables: serializeVariables$7,
+  makeVariables: makeVariables$7,
+  makeDefaultVariables: makeDefaultVariables$3
+};
+
+var include$7 = ApolloClient__React_Hooks_UseQuery.Extend({
+      query: query$7,
+      Raw: Raw$7,
+      parse: parse$7,
+      serialize: serialize$7,
+      serializeVariables: serializeVariables$7
+    });
+
+var GlobalState_refetchQueryDescription = include$7.refetchQueryDescription;
+
+var GlobalState_use = include$7.use;
+
+var GlobalState_useLazy = include$7.useLazy;
+
+var GlobalState_useLazyWithVariables = include$7.useLazyWithVariables;
+
+var GlobalState = {
+  GlobalState_inner: GlobalState_inner,
+  Raw: Raw$7,
+  query: query$7,
+  parse: parse$7,
+  serialize: serialize$7,
+  serializeVariables: serializeVariables$7,
+  makeVariables: makeVariables$7,
+  makeDefaultVariables: makeDefaultVariables$3,
+  refetchQueryDescription: GlobalState_refetchQueryDescription,
+  use: GlobalState_use,
+  useLazy: GlobalState_useLazy,
+  useLazyWithVariables: GlobalState_useLazyWithVariables
+};
+
 export {
   LatestSystemState ,
   UsersState ,
@@ -1132,6 +1249,7 @@ export {
   SyntheticToken ,
   UsersStakes ,
   UsersActiveStakes ,
+  GlobalState ,
   
 }
 /* query Not a pure module */
