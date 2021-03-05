@@ -70,7 +70,7 @@ module.exports = {
     binanceTest: {
       network_id: 97,
       provider: lazyCreateNetwork(binanceTest),
-      gas: 29000000,
+      gas: 8000000,
       gasPrice: 40000000000, // see https://testnet.bscscan.com/chart/gasprice
       skipDryRun: true,
     },
@@ -102,7 +102,7 @@ module.exports = {
   },
   compilers: {
     solc: {
-      version: "0.7.6",
+      version: "0.8.2",
       settings: {
         optimizer: {
           enabled: true,

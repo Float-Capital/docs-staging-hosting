@@ -1,9 +1,8 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity 0.7.6;
-pragma abicoder v2;
+pragma solidity 0.8.2;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/Initializable.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
 import "./interfaces/IBandOracle.sol";
@@ -98,13 +97,20 @@ contract OracleManagerEthKiller is Initializable {
                     _calcAbsolutePercentageChange(newXrpPrice, xrpPrice))) /
                 (3 * 1e18);
 
-        // Set new prices
-        tronPrice = newTronPrice;
-        eosPrice = newEosPrice;
-        xrpPrice = newXrpPrice;
+        if (tronPrice != newTronPrice) {
+            tronPrice = newTronPrice;
+        }
+        if (eosPrice != newEosPrice) {
+            eosPrice = newEosPrice;
+        }
+        if (xrpPrice != newXrpPrice) {
+            xrpPrice = newXrpPrice;
+        }
 
-        // Set new index price
-        indexPrice = indexPrice + valueOfChangeInIndex;
+        if (valueOfChangeInIndex != 0) {
+            // Set new index price
+            indexPrice = indexPrice + valueOfChangeInIndex;
+        }
     }
 
     function _calcAbsolutePercentageChange(int256 newPrice, int256 basePrice)
