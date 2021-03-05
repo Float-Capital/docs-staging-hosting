@@ -348,7 +348,8 @@ contract LongShort is ILongShort, Initializable {
     /**
      * Returns the latest price
      */
-    function getLatestPrice(uint256 marketIndex) public view returns (int256) {
+    function getLatestPrice(uint256 marketIndex) internal returns (int256) {
+        oracleManagers[marketIndex].updatePrice();
         return oracleManagers[marketIndex].getLatestPrice();
     }
 

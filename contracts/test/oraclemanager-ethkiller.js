@@ -37,6 +37,7 @@ contract("OracleManager (EthKiller)", (accounts) => {
     return async () => {
       let { trxRate, eosRate, xrpRate, expectedPrice } = params;
 
+      await ethKiller.updatePrice();
       let initialPrice = await ethKiller.getLatestPrice.call();
       assert.equal(
         initialPrice.toString(),
@@ -49,6 +50,7 @@ contract("OracleManager (EthKiller)", (accounts) => {
       await bandOracle.setRate("EOS", "BUSD", eosRate);
       await bandOracle.setRate("XRP", "BUSD", xrpRate);
 
+      await ethKiller.updatePrice();
       let newPrice = await ethKiller.getLatestPrice.call();
       assert.equal(
         newPrice.toString(),
