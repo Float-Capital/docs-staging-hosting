@@ -3,17 +3,36 @@
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as Login from "./components/Login/Login.js";
 import * as React from "react";
+import * as Ethers from "./ethereum/Ethers.js";
 import * as Queries from "./data/Queries.js";
+import * as Tooltip from "./components/UI/Tooltip.js";
+import Link from "next/link";
 import * as MiniLoader from "./components/UI/MiniLoader.js";
+import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as DashboardLi from "./components/UI/Dashboard/DashboardLi.js";
+import * as DashboardUl from "./components/UI/Dashboard/DashboardUl.js";
 import * as FormatMoney from "./components/UI/FormatMoney.js";
-import * as MarketsList from "./components/Markets/MarketsList.js";
 import * as Router from "next/router";
-import * as StakeDetails from "./StakeDetails.js";
 import * as AccessControl from "./components/AccessControl.js";
+import * as DashboardCalcs from "./libraries/DashboardCalcs.js";
+import * as DashboardHeader from "./components/UI/Dashboard/DashboardHeader.js";
+import * as DashboardStakeCard from "./components/UI/Dashboard/DashboardStakeCard.js";
+import * as DashboardColumnCard from "./components/UI/Dashboard/DashboardColumnCard.js";
+
+function Dashboard$DashboardColumn(Props) {
+  var children = Props.children;
+  return React.createElement("div", {
+              className: "m-4 w-1/3"
+            }, children);
+}
+
+var DashboardColumn = {
+  make: Dashboard$DashboardColumn
+};
 
 function Dashboard(Props) {
   var router = Router.useRouter();
-  var systemStateQuery = Curry.app(Queries.LatestSystemState.use, [
+  var globalStateQuery = Curry.app(Queries.GlobalState.use, [
         undefined,
         undefined,
         undefined,
@@ -29,35 +48,142 @@ function Dashboard(Props) {
         undefined,
         undefined
       ]);
-  var match = systemStateQuery.data;
+  var marketDetailsQuery = Curry.app(Queries.MarketDetails.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ]);
+  var match = globalStateQuery.data;
   var tmp;
-  if (systemStateQuery.loading) {
+  if (globalStateQuery.loading) {
     tmp = React.createElement(MiniLoader.make, {});
-  } else if (systemStateQuery.error !== undefined) {
+  } else if (marketDetailsQuery.loading) {
+    tmp = React.createElement(MiniLoader.make, {});
+  } else if (marketDetailsQuery.error !== undefined || globalStateQuery.error !== undefined) {
     tmp = "Error loading data";
   } else if (match !== undefined) {
-    var match$1 = match.systemStates;
+    var match$1 = match.globalStates;
     if (match$1.length !== 1) {
       tmp = "Query returned wrong number of results";
     } else {
       var match$2 = match$1[0];
-      tmp = React.createElement("div", {
-            className: "col-span-2"
-          }, React.createElement("div", {
-                className: "p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 rounded"
-              }, React.createElement("h2", {
-                    className: "text-lg"
-                  }, "Total value locked"), React.createElement("p", {
-                    className: "text-primary text-4xl"
-                  }, "BUSD " + FormatMoney.formatEther(match$2.totalValueLocked))));
+      var match$3 = marketDetailsQuery.data;
+      if (match$3 !== undefined) {
+        var syntheticMarkets = match$3.syntheticMarkets;
+        var match$4 = DashboardCalcs.getTotalValueLockedAndTotalStaked(syntheticMarkets);
+        var totalValueStaked = match$4.totalValueStaked;
+        var totalValueLocked = match$4.totalValueLocked;
+        var totalSynthValue = DashboardCalcs.getTotalSynthValue(totalValueLocked, totalValueStaked);
+        var numberOfSynths = String((syntheticMarkets.length << 1));
+        tmp = React.createElement("div", {
+              className: "min-w-3/4 flex flex-col self-center items-center justify-start"
+            }, React.createElement("div", {
+                  className: "p-5 mt-7 self-center text-center  bg-white bg-opacity-75 rounded-lg shadow-lg"
+                }, React.createElement("span", {
+                      className: "font-alphbeta text-xl"
+                    }, "Total Value"), React.createElement("span", {
+                      className: "text-sm"
+                    }, " 🏦 of Float Protocol: "), React.createElement("span", {
+                      className: "text-green-700"
+                    }, "$" + FormatMoney.formatEther(totalValueLocked))), React.createElement("div", {
+                  className: "w-full flex justify-between mt-1"
+                }, React.createElement(Dashboard$DashboardColumn, {
+                      children: React.createElement(DashboardColumnCard.make, {
+                            children: null
+                          }, React.createElement(DashboardHeader.make, {
+                                children: "Float Protocol 🏗️"
+                              }), React.createElement(DashboardUl.make, {
+                                list: [
+                                  DashboardLi.Props.createDashboardLiProps(undefined, "📅 Live since:", "28/02/2020", undefined),
+                                  DashboardLi.Props.createDashboardLiProps(undefined, "📈 No. Txs:", match$2.totalTxs.toString(), undefined),
+                                  DashboardLi.Props.createDashboardLiProps(undefined, "👯‍♀️ No. Users:", match$2.totalUsers.toString(), undefined),
+                                  DashboardLi.Props.createDashboardLiProps(undefined, "⛽ Gas used:", match$2.totalGasUsed.toString(), undefined)
+                                ]
+                              }))
+                    }), React.createElement(Dashboard$DashboardColumn, {
+                      children: null
+                    }, React.createElement(DashboardColumnCard.make, {
+                          children: null
+                        }, React.createElement(DashboardHeader.make, {
+                              children: null
+                            }, "Synthetic Assets", React.createElement("img", {
+                                  className: "inline h-5 ml-2",
+                                  src: "/img/coin.png"
+                                })), React.createElement(DashboardUl.make, {
+                              list: [
+                                DashboardLi.Props.createDashboardLiProps(Caml_option.some(React.createElement(Tooltip.make, {
+                                              tip: "Redeemable value of synths in the open market"
+                                            })), "💰 Total Synth Value", "$" + FormatMoney.formatEther(totalSynthValue), undefined),
+                                DashboardLi.Props.createDashboardLiProps(undefined, "👷‍♀️ No. Synths:", numberOfSynths, undefined)
+                              ]
+                            }), React.createElement(Link, {
+                              href: "/markets",
+                              children: React.createElement("div", {
+                                    className: "w-full p-4 pr-5 text-sm cursor-pointer"
+                                  }, React.createElement("div", {
+                                        className: "ml-10"
+                                      }, "👀 See Markets"), React.createElement("div", {
+                                        className: "ml-20"
+                                      }, "to learn more..."))
+                            })), React.createElement(DashboardColumnCard.make, {
+                          children: null
+                        }, React.createElement(DashboardHeader.make, {
+                              children: "🌊🌊 Float Token 🌊🌊"
+                            }), React.createElement(DashboardUl.make, {
+                              list: [
+                                DashboardLi.Props.createDashboardLiProps(undefined, "😏 Float Price:", "...", undefined),
+                                DashboardLi.Props.createDashboardLiProps(Caml_option.some(React.createElement(Tooltip.make, {
+                                              tip: "The number of Float tokens in circulation"
+                                            })), "🕶️ Float Supply:", Ethers.Utils.formatEtherToPrecision(match$2.totalFloatMinted, 2), undefined),
+                                DashboardLi.Props.createDashboardLiProps(undefined, "🧢 Market cap: ", "...", undefined)
+                              ]
+                            }))), React.createElement(Dashboard$DashboardColumn, {
+                      children: React.createElement(DashboardColumnCard.make, {
+                            children: null
+                          }, React.createElement(DashboardHeader.make, {
+                                children: "Staking 🔥"
+                              }), React.createElement("div", {
+                                className: "text-center mt-5"
+                              }, React.createElement("span", {
+                                    className: "text-sm mr-1"
+                                  }, "💰 Total Staked Value"), "$" + FormatMoney.formatEther(totalValueStaked)), React.createElement("div", {
+                                className: "text-center mt-5 text-sm"
+                              }, "Trending"), React.createElement("div", {
+                                className: "pt-2 pb-5"
+                              }, React.createElement(DashboardStakeCard.make, {
+                                    marketName: "FTSE100",
+                                    isLong: true,
+                                    yieldStr: "87.5%",
+                                    rewardsStr: "637%"
+                                  }), React.createElement(DashboardStakeCard.make, {
+                                    marketName: "FTSE100",
+                                    isLong: true,
+                                    yieldStr: "87.5%",
+                                    rewardsStr: "637%"
+                                  })))
+                    })));
+      } else {
+        tmp = "Query returned wrong number of results";
+      }
     }
   } else {
-    tmp = "Error getting data";
+    tmp = marketDetailsQuery.data !== undefined ? "Query returned wrong number of results" : "Error getting data";
   }
   return React.createElement(AccessControl.make, {
               children: React.createElement("div", {
-                    className: "grid grid-cols-2 gap-4 items-center my-5"
-                  }, React.createElement(React.Fragment, undefined, tmp), React.createElement("div", undefined, React.createElement(MarketsList.make, {})), React.createElement("div", undefined, React.createElement(StakeDetails.make, {}))),
+                    className: "w-screen absolute flex flex-col left-0 top-0 mt-20"
+                  }, React.createElement(React.Fragment, undefined, tmp)),
               alternateComponent: React.createElement("h1", {
                     onClick: (function (param) {
                         router.push("/login?nextPath=/dashboard");
@@ -72,6 +198,7 @@ var make = Dashboard;
 var $$default = Dashboard;
 
 export {
+  DashboardColumn ,
   make ,
   $$default ,
   $$default as default,
