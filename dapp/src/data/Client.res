@@ -19,47 +19,54 @@ external getContext: ApolloClient__Link_Core_ApolloLink.Operation.Js_.t => optio
 let httpLink = (~uri) => ApolloClient.Link.HttpLink.make(~uri=_ => uri, ())
 
 type clientHeaders = {
-    @as("eth-address")
-    ethAddress: string,
-    @as("eth-signature")
-    ethSignature: string,
+  @as("eth-address")
+  ethAddress: string,
+  @as("eth-signature")
+  ethSignature: string,
 }
 
-let setSignInData = (~ethAddress: string, ~ethSignature: string) => Dom.Storage2.localStorage->Dom.Storage2.setItem(ethAddress, ethSignature)
+let setSignInData = (~ethAddress: string, ~ethSignature: string) =>
+  Dom.Storage2.localStorage->Dom.Storage2.setItem(ethAddress, ethSignature)
 
 let getAuthHeaders = (~user) => {
-    switch(user){
+  switch user {
+  | None => None
+  | Some(u) => {
+      let getUserSignature = Dom.Storage2.getItem(_, u->ethAdrToLowerStr)
+      switch getUserSignature(Dom.Storage2.localStorage) {
       | None => None
-      | Some(u) => {
-          let getUserSignature = Dom.Storage2.getItem(_, u->ethAdrToLowerStr)
-          switch(getUserSignature(Dom.Storage2.localStorage)){
-            | None => None
-            | Some(uS) => Some({ethAddress: u->ethAdrToLowerStr, ethSignature: uS})
-          }
+      | Some(uS) => Some({ethAddress: u->ethAdrToLowerStr, ethSignature: uS})
       }
     }
+  }
 }
 
-
-let querySwitcherLink = (~graphUri, ~dbUri, ~user ) => ApolloClient.Link.split(~test=operation => {
-    let context = operation->getContext
-    switch context {
-    | Some({context}) =>
+let querySwitcherLink = (~graphUri, ~dbUri, ~user) =>
+  ApolloClient.Link.split(
+    ~test=operation => {
+      let context = operation->getContext
       switch context {
-      | Graph => true
-      | DB => false
+      | Some({context}) =>
+        switch context {
+        | Graph => true
+        | DB => false
+        }
+      | None => true
       }
-    | None => true
-    }
-
-  }, ~whenTrue=httpLink(
-    ~uri=graphUri,
-  ), ~whenFalse=ApolloClient.Link.HttpLink.make(~uri=_ => dbUri, ~headers={
-    switch(getAuthHeaders(~user)){
-      | Some(headers) => headers->Obj.magic
-      | None => Js.Obj.empty->Obj.magic
-    }
-  }, ()))
+    },
+    ~whenTrue=httpLink(~uri=graphUri),
+    ~whenFalse=ApolloClient.Link.HttpLink.make(
+      ~uri=_ => dbUri,
+      ~headers={
+        // NOTE: the user is hardcoded to `NONE` and will need to be configured for database use in the future
+        switch getAuthHeaders(~user) {
+        | Some(headers) => headers->Obj.magic
+        | None => Js.Obj.empty->Obj.magic
+        }
+      },
+      (),
+    ),
+  )
 
 // This sets up session storage caching for SWR
 // SwrPersist.syncWithSessionStorage->Misc.onlyExecuteClientSide

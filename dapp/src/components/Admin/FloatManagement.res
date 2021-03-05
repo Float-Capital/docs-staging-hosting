@@ -1,18 +1,27 @@
 open Globals
 open GqlConverters
 
+%graphql(`
+fragment LongSynth on SyntheticToken {
+  floatMintedLong: floatMintedFromSpecificToken
+  longAddress: tokenAddress
+}
+fragment ShortSynth on SyntheticToken {
+   floatMintedShort: floatMintedFromSpecificToken
+   shortAddress: tokenAddress
+}
+`)
+
 module FloatBreakdown = %graphql(`
 {
   syntheticMarkets {
     name
     symbol
     syntheticLong {
-      floatMintedLong: floatMintedFromSpecificToken
-      longAddress: tokenAddress
+      ...LongSynth
     }
     syntheticShort {
-      floatMintedShort: floatMintedFromSpecificToken
-      shortAddress: tokenAddress
+      ...ShortSynth
     }
   }
 }
