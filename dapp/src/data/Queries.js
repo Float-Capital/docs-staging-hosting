@@ -138,18 +138,35 @@ var query$1 = (require("@apollo/client").gql`
       __typename
       totalMintedFloat
       floatTokenBalance
+      tokenMints  {
+        __typename
+        tokensMinted
+      }
     }
   }
 `);
 
 function parse$1(value) {
   var value$1 = value.user;
+  var tmp;
+  if (value$1 == null) {
+    tmp = undefined;
+  } else {
+    var value$2 = value$1.tokenMints;
+    tmp = {
+      __typename: value$1.__typename,
+      totalMintedFloat: GqlConverters.$$BigInt.parse(value$1.totalMintedFloat),
+      floatTokenBalance: GqlConverters.$$BigInt.parse(value$1.floatTokenBalance),
+      tokenMints: !(value$2 == null) ? value$2.map(function (value) {
+              return {
+                      __typename: value.__typename,
+                      tokensMinted: GqlConverters.$$BigInt.parse(value.tokensMinted)
+                    };
+            }) : undefined
+    };
+  }
   return {
-          user: !(value$1 == null) ? ({
-                __typename: value$1.__typename,
-                totalMintedFloat: GqlConverters.$$BigInt.parse(value$1.totalMintedFloat),
-                floatTokenBalance: GqlConverters.$$BigInt.parse(value$1.floatTokenBalance)
-              }) : undefined
+          user: tmp
         };
 }
 
@@ -157,15 +174,26 @@ function serialize$1(value) {
   var value$1 = value.user;
   var user;
   if (value$1 !== undefined) {
-    var value$2 = value$1.floatTokenBalance;
-    var value$3 = GqlConverters.$$BigInt.serialize(value$2);
-    var value$4 = value$1.totalMintedFloat;
-    var value$5 = GqlConverters.$$BigInt.serialize(value$4);
-    var value$6 = value$1.__typename;
+    var value$2 = value$1.tokenMints;
+    var tokenMints = value$2 !== undefined ? value$2.map(function (value) {
+            var value$1 = value.tokensMinted;
+            var value$2 = GqlConverters.$$BigInt.serialize(value$1);
+            var value$3 = value.__typename;
+            return {
+                    __typename: value$3,
+                    tokensMinted: value$2
+                  };
+          }) : null;
+    var value$3 = value$1.floatTokenBalance;
+    var value$4 = GqlConverters.$$BigInt.serialize(value$3);
+    var value$5 = value$1.totalMintedFloat;
+    var value$6 = GqlConverters.$$BigInt.serialize(value$5);
+    var value$7 = value$1.__typename;
     user = {
-      __typename: value$6,
-      totalMintedFloat: value$5,
-      floatTokenBalance: value$3
+      __typename: value$7,
+      totalMintedFloat: value$6,
+      floatTokenBalance: value$4,
+      tokenMints: tokenMints
     };
   } else {
     user = null;

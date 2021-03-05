@@ -19,6 +19,9 @@ query ($userId: String!){
   user(id: $userId) {
     totalMintedFloat
     floatTokenBalance
+    tokenMints {
+      tokensMinted
+    }
   }
 }`)
 

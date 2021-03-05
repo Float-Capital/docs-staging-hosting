@@ -17,39 +17,6 @@ module FloatBreakdown = %graphql(`
   }
 }
 `)
-/*
-0x374252d2c9f0075b7e2ca2a9868b44f1f62fba80
-totalMintedFloat: BigInt!
-floatTokenBalance: BigInt!
-timestampJoined: BigInt!
-totalGasUsed: BigInt!
-numberOfTransactions: BigInt!
-currentStakes: [CurrentStake!]
-stateChangesAffectingUser: [StateChange!]
-tokenBalances: [UserSyntheticTokenBalance!]
-tokenMints: [UserSyntheticTokenMinted!]
-*/
-
-module UsersState = %graphql(`
-query ($userId: String!){
-  user(id: $userId) {
-    totalMintedFloat
-    floatTokenBalance
-    tokenMints {
-      tokensMinted
-    }
-  }
-}`)
-
-// module LatestFloatIssuance = %graphql(`
-// query ($synthToken: String!) {
-//   states (first:1, orderBy: stateIndex, orderDirection:desc, where: {syntheticToken: $synthToken, timeSinceLastUpdate_gt: 0}) {
-//     stateIndex
-//     accumulativeFloatPerSecond
-//     floatRatePerSecondOverInterval
-//   }
-// }
-// `)
 
 module LastUserStakeUpdate = %graphql(`
 query ($synthToken: String!, $userAddress: String!) {
@@ -79,26 +46,11 @@ module Claimable = {
     })
     let currentTimestamp = Misc.Time.useCurrentTimeBN(~updateInterval=1000)
 
-    Js.log((
-      "params",
-      {
-        LastUserStakeUpdate.userAddress: userAddress,
-        synthToken: synthToken,
-      },
-    ))
-
-    /*
-accumulativeFloatPerSecond,
-floatRatePerSecondOverInterval,
-​​
-stateIndex
-*/
-
     {
       switch claimableQuery {
       | {
           data: Some({
-            states: [{accumulativeFloatPerSecond, floatRatePerSecondOverInterval, stateIndex}],
+            states: [{accumulativeFloatPerSecond, floatRatePerSecondOverInterval}],
             currentStakes: [
               {
                 lastMintState: {accumulativeFloatPerSecond: currentUserAccumulative, timestamp},
@@ -107,11 +59,6 @@ stateIndex
             ],
           }),
         } =>
-        Js.log((
-          "heey",
-          accumulativeFloatPerSecond->FormatMoney.formatEther,
-          currentUserAccumulative->FormatMoney.formatEther,
-        ))
         // TODO: check - is the divide by 10^18 necessary. We should make a field in the graph where the value is already pre-divided by 10^18
         let amountOfFloatToClaim =
           Ethers.BigNumber.sub(accumulativeFloatPerSecond, currentUserAccumulative)
@@ -120,7 +67,7 @@ stateIndex
 
         // NOTE: we are using the previous `floatRatePerSecondOverInterval` here as an approximation of the current value - it shouldn't change much
         let predictedAmountOfFloatToClaim =
-          currentTimestamp->Ethers.BigNumber.mul(
+          Ethers.BigNumber.sub(currentTimestamp, timestamp)->Ethers.BigNumber.mul(
             Ethers.BigNumber.mul(amount, floatRatePerSecondOverInterval)->Ethers.BigNumber.div(
               CONSTANTS.tenToThe18,
             ),
@@ -144,7 +91,7 @@ stateIndex
 let make = () => {
   let user = RootProvider.useCurrentUserExn()
   let floatTokenAddress = Config.useFloatAddress()
-  let userQuery = UsersState.use({userId: user->ethAdrToLowerStr})
+  let userQuery = Queries.UsersState.use({userId: user->ethAdrToLowerStr})
   let floatBreakdown = FloatBreakdown.use()
 
   <div>

@@ -5,6 +5,7 @@ import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Config from "../../Config.js";
 import * as Globals from "../../libraries/Globals.js";
+import * as Queries from "../../data/Queries.js";
 import * as CONSTANTS from "../../CONSTANTS.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as FormatMoney from "../UI/FormatMoney.js";
@@ -157,130 +158,6 @@ var FloatBreakdown = {
 var Raw$1 = {};
 
 var query$1 = (require("@apollo/client").gql`
-  query ($userId: String!)  {
-    user(id: $userId)  {
-      __typename
-      totalMintedFloat
-      floatTokenBalance
-      tokenMints  {
-        __typename
-        tokensMinted
-      }
-    }
-  }
-`);
-
-function parse$1(value) {
-  var value$1 = value.user;
-  var tmp;
-  if (value$1 == null) {
-    tmp = undefined;
-  } else {
-    var value$2 = value$1.tokenMints;
-    tmp = {
-      __typename: value$1.__typename,
-      totalMintedFloat: GqlConverters.$$BigInt.parse(value$1.totalMintedFloat),
-      floatTokenBalance: GqlConverters.$$BigInt.parse(value$1.floatTokenBalance),
-      tokenMints: !(value$2 == null) ? value$2.map(function (value) {
-              return {
-                      __typename: value.__typename,
-                      tokensMinted: GqlConverters.$$BigInt.parse(value.tokensMinted)
-                    };
-            }) : undefined
-    };
-  }
-  return {
-          user: tmp
-        };
-}
-
-function serialize$1(value) {
-  var value$1 = value.user;
-  var user;
-  if (value$1 !== undefined) {
-    var value$2 = value$1.tokenMints;
-    var tokenMints = value$2 !== undefined ? value$2.map(function (value) {
-            var value$1 = value.tokensMinted;
-            var value$2 = GqlConverters.$$BigInt.serialize(value$1);
-            var value$3 = value.__typename;
-            return {
-                    __typename: value$3,
-                    tokensMinted: value$2
-                  };
-          }) : null;
-    var value$3 = value$1.floatTokenBalance;
-    var value$4 = GqlConverters.$$BigInt.serialize(value$3);
-    var value$5 = value$1.totalMintedFloat;
-    var value$6 = GqlConverters.$$BigInt.serialize(value$5);
-    var value$7 = value$1.__typename;
-    user = {
-      __typename: value$7,
-      totalMintedFloat: value$6,
-      floatTokenBalance: value$4,
-      tokenMints: tokenMints
-    };
-  } else {
-    user = null;
-  }
-  return {
-          user: user
-        };
-}
-
-function serializeVariables$1(inp) {
-  return {
-          userId: inp.userId
-        };
-}
-
-function makeVariables$1(userId, param) {
-  return {
-          userId: userId
-        };
-}
-
-var UsersState_inner = {
-  Raw: Raw$1,
-  query: query$1,
-  parse: parse$1,
-  serialize: serialize$1,
-  serializeVariables: serializeVariables$1,
-  makeVariables: makeVariables$1
-};
-
-var include$1 = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query$1,
-      Raw: Raw$1,
-      parse: parse$1,
-      serialize: serialize$1,
-      serializeVariables: serializeVariables$1
-    });
-
-var use$1 = include$1.use;
-
-var UsersState_refetchQueryDescription = include$1.refetchQueryDescription;
-
-var UsersState_useLazy = include$1.useLazy;
-
-var UsersState_useLazyWithVariables = include$1.useLazyWithVariables;
-
-var UsersState = {
-  UsersState_inner: UsersState_inner,
-  Raw: Raw$1,
-  query: query$1,
-  parse: parse$1,
-  serialize: serialize$1,
-  serializeVariables: serializeVariables$1,
-  makeVariables: makeVariables$1,
-  refetchQueryDescription: UsersState_refetchQueryDescription,
-  use: use$1,
-  useLazy: UsersState_useLazy,
-  useLazyWithVariables: UsersState_useLazyWithVariables
-};
-
-var Raw$2 = {};
-
-var query$2 = (require("@apollo/client").gql`
   query ($synthToken: String!, $userAddress: String!)  {
     currentStakes(where: {userAddress: $userAddress, syntheticToken: $synthToken})  {
       __typename
@@ -303,7 +180,7 @@ var query$2 = (require("@apollo/client").gql`
   }
 `);
 
-function parse$2(value) {
+function parse$1(value) {
   var value$1 = value.currentStakes;
   var value$2 = value.states;
   return {
@@ -334,7 +211,7 @@ function parse$2(value) {
         };
 }
 
-function serialize$2(value) {
+function serialize$1(value) {
   var value$1 = value.states;
   var states = value$1.map(function (value) {
         var value$1 = value.floatRatePerSecondOverInterval;
@@ -385,14 +262,14 @@ function serialize$2(value) {
         };
 }
 
-function serializeVariables$2(inp) {
+function serializeVariables$1(inp) {
   return {
           synthToken: inp.synthToken,
           userAddress: inp.userAddress
         };
 }
 
-function makeVariables$2(synthToken, userAddress, param) {
+function makeVariables$1(synthToken, userAddress, param) {
   return {
           synthToken: synthToken,
           userAddress: userAddress
@@ -400,40 +277,40 @@ function makeVariables$2(synthToken, userAddress, param) {
 }
 
 var LastUserStakeUpdate_inner = {
-  Raw: Raw$2,
-  query: query$2,
-  parse: parse$2,
-  serialize: serialize$2,
-  serializeVariables: serializeVariables$2,
-  makeVariables: makeVariables$2
+  Raw: Raw$1,
+  query: query$1,
+  parse: parse$1,
+  serialize: serialize$1,
+  serializeVariables: serializeVariables$1,
+  makeVariables: makeVariables$1
 };
 
-var include$2 = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query$2,
-      Raw: Raw$2,
-      parse: parse$2,
-      serialize: serialize$2,
-      serializeVariables: serializeVariables$2
+var include$1 = ApolloClient__React_Hooks_UseQuery.Extend({
+      query: query$1,
+      Raw: Raw$1,
+      parse: parse$1,
+      serialize: serialize$1,
+      serializeVariables: serializeVariables$1
     });
 
-var use$2 = include$2.use;
+var use$1 = include$1.use;
 
-var LastUserStakeUpdate_refetchQueryDescription = include$2.refetchQueryDescription;
+var LastUserStakeUpdate_refetchQueryDescription = include$1.refetchQueryDescription;
 
-var LastUserStakeUpdate_useLazy = include$2.useLazy;
+var LastUserStakeUpdate_useLazy = include$1.useLazy;
 
-var LastUserStakeUpdate_useLazyWithVariables = include$2.useLazyWithVariables;
+var LastUserStakeUpdate_useLazyWithVariables = include$1.useLazyWithVariables;
 
 var LastUserStakeUpdate = {
   LastUserStakeUpdate_inner: LastUserStakeUpdate_inner,
-  Raw: Raw$2,
-  query: query$2,
-  parse: parse$2,
-  serialize: serialize$2,
-  serializeVariables: serializeVariables$2,
-  makeVariables: makeVariables$2,
+  Raw: Raw$1,
+  query: query$1,
+  parse: parse$1,
+  serialize: serialize$1,
+  serializeVariables: serializeVariables$1,
+  makeVariables: makeVariables$1,
   refetchQueryDescription: LastUserStakeUpdate_refetchQueryDescription,
-  use: use$2,
+  use: use$1,
   useLazy: LastUserStakeUpdate_useLazy,
   useLazyWithVariables: LastUserStakeUpdate_useLazyWithVariables
 };
@@ -441,7 +318,7 @@ var LastUserStakeUpdate = {
 function FloatManagement$Claimable(Props) {
   var userAddress = Props.userAddress;
   var synthToken = Props.synthToken;
-  var claimableQuery = Curry.app(use$2, [
+  var claimableQuery = Curry.app(use$1, [
         undefined,
         undefined,
         undefined,
@@ -461,13 +338,6 @@ function FloatManagement$Claimable(Props) {
         }
       ]);
   var currentTimestamp = Misc.Time.useCurrentTimeBN(1000);
-  console.log([
-        "params",
-        {
-          synthToken: synthToken,
-          userAddress: userAddress
-        }
-      ]);
   var match = claimableQuery.data;
   if (match !== undefined) {
     var match$1 = match.currentStakes;
@@ -476,16 +346,10 @@ function FloatManagement$Claimable(Props) {
       var match$3 = match.states;
       if (match$3.length === 1) {
         var amount = match$2.currentStake.amount;
-        var currentUserAccumulative = match$2.lastMintState.accumulativeFloatPerSecond;
-        var match$4 = match$3[0];
-        var accumulativeFloatPerSecond = match$4.accumulativeFloatPerSecond;
-        console.log([
-              "heey",
-              FormatMoney.formatEther(accumulativeFloatPerSecond),
-              FormatMoney.formatEther(currentUserAccumulative)
-            ]);
-        var amountOfFloatToClaim = accumulativeFloatPerSecond.sub(currentUserAccumulative).mul(amount).div(CONSTANTS.tenToThe18);
-        var predictedAmountOfFloatToClaim = currentTimestamp.mul(amount.mul(match$4.floatRatePerSecondOverInterval).div(CONSTANTS.tenToThe18));
+        var match$4 = match$2.lastMintState;
+        var match$5 = match$3[0];
+        var amountOfFloatToClaim = match$5.accumulativeFloatPerSecond.sub(match$4.accumulativeFloatPerSecond).mul(amount).div(CONSTANTS.tenToThe18);
+        var predictedAmountOfFloatToClaim = currentTimestamp.sub(match$4.timestamp).mul(amount.mul(match$5.floatRatePerSecondOverInterval).div(CONSTANTS.tenToThe18));
         var totalAmountOfFloatToClaim = amountOfFloatToClaim.add(predictedAmountOfFloatToClaim);
         return React.createElement(React.Fragment, undefined, "You have generated " + FormatMoney.formatEther(totalAmountOfFloatToClaim) + " FLOAT since your last mint");
       }
@@ -507,7 +371,7 @@ var Claimable = {
 function FloatManagement(Props) {
   var user = RootProvider.useCurrentUserExn(undefined);
   var floatTokenAddress = Config.useFloatAddress(undefined);
-  var userQuery = Curry.app(use$1, [
+  var userQuery = Curry.app(Queries.UsersState.use, [
         undefined,
         undefined,
         undefined,
@@ -576,7 +440,6 @@ var make = FloatManagement;
 
 export {
   FloatBreakdown ,
-  UsersState ,
   LastUserStakeUpdate ,
   Claimable ,
   make ,
