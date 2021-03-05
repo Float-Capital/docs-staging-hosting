@@ -4,7 +4,7 @@ import * as Ethers from "../ethereum/Ethers.js";
 import * as Ethers$1 from "ethers";
 import * as Globals from "./Globals.js";
 import * as Js_json from "bs-platform/lib/es6/js_json.js";
-import * as Constants from "../Constants.js";
+import * as CONSTANTS from "../CONSTANTS.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 
@@ -52,7 +52,7 @@ function parse$2(json) {
     return Caml_option.valFromOption(address);
   } else {
     console.log("CRITICAL - couldn't decode eth address from graph, should never happen!");
-    return Constants.zeroAddress;
+    return CONSTANTS.zeroAddress;
   }
 }
 

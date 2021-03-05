@@ -23,6 +23,29 @@ module ClaimFloat = {
     </Button>
   }
 }
+module ClaimFloatImmediately = {
+  @react.component
+  let make = (~tokenAddress) => {
+    let signer = ContractActions.useSignerExn()
+
+    let (contractExecutionHandler, _txState, _setTxState) = ContractActions.useContractFunction(
+      ~signer,
+    )
+
+    let stakerAddress = Config.useStakerAddress()
+
+    <Button
+      onClick={_ => {
+        Js.log("Claim float")
+        let _ = contractExecutionHandler(
+          ~makeContractInstance=Contracts.Staker.make(~address=stakerAddress),
+          ~contractFunction=Contracts.Staker.claimFloatImmediately(~tokenAddress),
+        )
+      }}>
+      "Claim Float"
+    </Button>
+  }
+}
 module UsersActiveStakes = {
   @react.component
   let make = (~currentUser) => {
@@ -94,7 +117,8 @@ module UsersActiveStakes = {
                       // <AddToMetamask
                       //   tokenAddress={tokenAddress->Ethers.Utils.ethAdrToStr} tokenSymbol={"FLOAT"}
                       // />
-                      <ClaimFloat tokenAddresses=[tokenAddress] />
+                      // <ClaimFloat tokenAddresses=[tokenAddress] />
+                      <ClaimFloatImmediately tokenAddress />
                     </div>
                   </div>
                 </Card>

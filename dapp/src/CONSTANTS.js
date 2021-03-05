@@ -6,9 +6,15 @@ var zeroAddressStr = "0x0000000000000000000000000000000000000000";
 
 var zeroAddress = Ethers.utils.getAddress(zeroAddressStr);
 
+var zeroBN = Ethers.BigNumber.from(0);
+
+var tenToThe18 = Ethers.BigNumber.from("1000000000000000000");
+
 export {
   zeroAddressStr ,
   zeroAddress ,
+  zeroBN ,
+  tenToThe18 ,
   
 }
 /* zeroAddress Not a pure module */
