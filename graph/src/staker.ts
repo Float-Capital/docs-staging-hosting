@@ -72,10 +72,12 @@ export function handleStateAdded(event: StateAdded): void {
   state.timestamp = timestamp;
   state.syntheticToken = syntheticToken.id;
   state.accumulativeFloatPerSecond = accumulativeFloatPerSecond;
+  state.accumulativeFloatPerSecond = accumulativeFloatPerSecond;
 
   if (stateIndex.equals(ZERO)) {
     // The first state - set floatRatePerSecondOverInterval to zero
     state.floatRatePerSecondOverInterval = ZERO;
+    state.timeSinceLastUpdate = ZERO;
   } else {
     let prevState = State.load(
       tokenAddressString + "-" + stateIndex.minus(ONE).toString()

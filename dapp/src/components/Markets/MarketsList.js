@@ -13,71 +13,57 @@ import * as AccessControl from "../AccessControl.js";
 function MarketsList(Props) {
   var router = Router.useRouter();
   var marketDetailsQuery = Curry.app(Queries.MarketDetails.use, [
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-  ]);
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ]);
   var match = marketDetailsQuery.data;
   return React.createElement(AccessControl.make, {
-    children: React.createElement(
-      "div",
-      {
-        className: "w-full max-w-4xl mx-auto",
-      },
-      marketDetailsQuery.loading
-        ? React.createElement(
-            "div",
-            {
-              className: "m-auto",
-            },
-            React.createElement(MiniLoader.make, {})
-          )
-        : marketDetailsQuery.error !== undefined
-        ? "Error loading data"
-        : match !== undefined
-        ? React.createElement(
-            React.Fragment,
-            undefined,
-            Belt_Array.map(match.syntheticMarkets, function (param) {
-              var match = param.latestSystemState;
-              var name = param.name;
-              return React.createElement(MarketCard.make, {
-                marketName: name,
-                totalLockedLong: match.totalLockedLong,
-                totalLockedShort: match.totalLockedShort,
-                totalValueLocked: match.totalValueLocked,
-                marketIndex: param.marketIndex,
-                router: router,
-                key: name,
-              });
-            })
-          )
-        : "You might think this is impossible, but depending on the situation it might not be!"
-    ),
-    alternateComponent: React.createElement(
-      "h1",
-      {
-        onClick: function (param) {
-          router.push("/login?nextPath=/dashboard");
-        },
-      },
-      React.createElement(Login.make, {})
-    ),
-  });
+              children: React.createElement("div", {
+                    className: "w-full max-w-4xl mx-auto"
+                  }, marketDetailsQuery.loading ? React.createElement("div", {
+                          className: "m-auto"
+                        }, React.createElement(MiniLoader.make, {})) : (
+                      marketDetailsQuery.error !== undefined ? "Error loading data" : (
+                          match !== undefined ? React.createElement(React.Fragment, undefined, Belt_Array.map(match.syntheticMarkets, (function (param) {
+                                        var match = param.latestSystemState;
+                                        var name = param.name;
+                                        return React.createElement(MarketCard.make, {
+                                                    marketName: name,
+                                                    totalLockedLong: match.totalLockedLong,
+                                                    totalLockedShort: match.totalLockedShort,
+                                                    totalValueLocked: match.totalValueLocked,
+                                                    marketIndex: param.marketIndex,
+                                                    router: router,
+                                                    key: name
+                                                  });
+                                      }))) : "You might think this is impossible, but depending on the situation it might not be!"
+                        )
+                    )),
+              alternateComponent: React.createElement("h1", {
+                    onClick: (function (param) {
+                        router.push("/login?nextPath=/dashboard");
+                        
+                      })
+                  }, React.createElement(Login.make, {}))
+            });
 }
 
 var make = MarketsList;
 
-export { make };
+export {
+  make ,
+  
+}
 /* Login Not a pure module */

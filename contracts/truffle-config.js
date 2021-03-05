@@ -18,7 +18,7 @@ const defaultLocalhostNetwork = {
   host: blockchainNodeHost, // Localhost (default: none)
   port: 8545, // Standard Ethereum port (default: none)
   network_id: "*", // Any network (default: none)
-  gasPrice: 1000000000, // 0.1 gwei
+  gasPrice: 4000000000, // 40 gwei
 };
 
 const providerProxyHandler = (rpcUrl, provider) => {
@@ -67,8 +67,13 @@ module.exports = {
       gasPrice: 10000000000, // 10 gwei
       skipDryRun: true,
     },
-    binanceTest: {},
-    // bsc: defaultLocalhostNetwork,
+    binanceTest: {
+      network_id: 97,
+      provider: lazyCreateNetwork(binanceTest),
+      gas: 8000000,
+      gasPrice: 40000000000, // see https://testnet.bscscan.com/chart/gasprice
+      skipDryRun: true,
+    },
     bsc: {
       network_id: 56,
       provider: new HDWalletProvider(
@@ -97,7 +102,7 @@ module.exports = {
   },
   compilers: {
     solc: {
-      version: "0.7.6",
+      version: "0.8.2",
       settings: {
         optimizer: {
           enabled: true,

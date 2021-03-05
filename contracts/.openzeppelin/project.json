@@ -5,7 +5,6 @@
   "contracts": {
     "LongShort": "LongShort",
     "Staker": "Staker",
-    "OracleAggregator": "OracleManagerMock",
     "Treasury": "Treasury_v0",
     "FloatCapital": "FloatCapital_v0"
   },
