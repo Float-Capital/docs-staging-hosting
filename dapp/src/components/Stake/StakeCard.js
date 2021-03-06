@@ -9,6 +9,7 @@ import * as StakeBar from "../UI/StakeCard/StakeBar.js";
 import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as FormatMoney from "../UI/FormatMoney.js";
+import * as Router from "next/router";
 import * as StakeCardSide from "../UI/StakeCard/StakeCardSide.js";
 
 var zero = Ethers$1.BigNumber.from("0");
@@ -84,27 +85,27 @@ function myfloatCalc(longVal, shortVal, kperiod, kmultiplier, initialTimestamp, 
 }
 
 function StakeCard(Props) {
-  var marketName = Props.marketName;
-  var totalLockedLong = Props.totalLockedLong;
-  var totalLockedShort = Props.totalLockedShort;
-  var router = Props.router;
-  var longTokenPrice = Props.longTokenPrice;
-  var shortTokenPrice = Props.shortTokenPrice;
-  var longStaked = Props.longStaked;
-  var shortStaked = Props.shortStaked;
-  var shortAddress = Props.shortAddress;
-  var longAddress = Props.longAddress;
-  var currentTimestamp = Props.currentTimestamp;
-  var createdTimestamp = Props.createdTimestamp;
-  var longDollarValueStaked = calculateDollarValue(longTokenPrice, longStaked);
-  var shortDollarValueStaked = calculateDollarValue(shortTokenPrice, shortStaked);
+  var param = Props.syntheticMarket;
+  var match = param.latestSystemState;
+  var totalLockedShort = match.totalLockedShort;
+  var totalLockedLong = match.totalLockedLong;
+  var currentTimestamp = match.timestamp;
+  var match$1 = param.syntheticShort;
+  var shortTokenAddress = match$1.shortTokenAddress;
+  var match$2 = param.syntheticLong;
+  var longTokenAddress = match$2.longTokenAddress;
+  var timestampCreated = param.timestampCreated;
+  var marketName = param.name;
+  var router = Router.useRouter();
+  var longDollarValueStaked = calculateDollarValue(match.longTokenPrice, match$2.longTotalStaked);
+  var shortDollarValueStaked = calculateDollarValue(match.shortTokenPrice, match$1.shortTotalStaked);
   var totalDollarValueStake = longDollarValueStaked.add(shortDollarValueStaked);
   var percentStrLong = percentStr(longDollarValueStaked, totalDollarValueStake);
   var percentStrShort = (100.0 - Belt_Option.getExn(Belt_Float.fromString(percentStrLong))).toFixed(2);
   var longApy = basicApyCalc(0.12, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
   var shortApy = basicApyCalc(0.12, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
-  var longFloatApy = myfloatCalc(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, createdTimestamp, currentTimestamp, "long");
-  var shortFloatApy = myfloatCalc(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, createdTimestamp, currentTimestamp, "short");
+  var longFloatApy = myfloatCalc(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
+  var shortFloatApy = myfloatCalc(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
   return React.createElement("div", {
               className: "p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg"
             }, React.createElement("div", {
@@ -135,14 +136,14 @@ function StakeCard(Props) {
                           className: "w-full flex justify-around"
                         }, React.createElement(Button.make, {
                               onClick: (function (param) {
-                                  router.push("/stake?tokenId=" + longAddress);
+                                  router.push("/stake?tokenId=" + longTokenAddress);
                                   
                                 }),
                               children: "Stake Long",
                               variant: "small"
                             }), React.createElement(Button.make, {
                               onClick: (function (param) {
-                                  router.push("/stake?tokenId=" + shortAddress);
+                                  router.push("/stake?tokenId=" + shortTokenAddress);
                                   
                                 }),
                               children: "Stake Short",

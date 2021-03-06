@@ -13,35 +13,7 @@ let make = () => {
       | {error: Some(_error)} => "Error loading data"->React.string
       | {data: Some({syntheticMarkets})} => <>
           {syntheticMarkets
-          ->Array.map(({
-            name,
-            timestampCreated,
-            latestSystemState: {
-              timestamp,
-              totalLockedLong,
-              totalLockedShort,
-              longTokenPrice,
-              shortTokenPrice,
-            },
-            syntheticShort: {shortTotalStaked, shortTokenAddress},
-            syntheticLong: {longTotalStaked, longTokenAddress},
-          }) =>
-            <StakeCard
-              key={name}
-              marketName={name}
-              totalLockedLong={totalLockedLong}
-              totalLockedShort={totalLockedShort}
-              router={router}
-              longTokenPrice={longTokenPrice}
-              shortTokenPrice={shortTokenPrice}
-              longStaked={longTotalStaked}
-              shortStaked={shortTotalStaked}
-              shortAddress={shortTokenAddress}
-              longAddress={longTokenAddress}
-              currentTimestamp={timestamp}
-              createdTimestamp={timestampCreated}
-            />
-          )
+          ->Array.map(syntheticMarket => <StakeCard key={syntheticMarket.name} syntheticMarket />)
           ->React.array}
         </>
       | {data: None, error: None, loading: false} =>

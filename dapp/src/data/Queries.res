@@ -57,7 +57,7 @@ module MarketDetails = %graphql(`
 // https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital/graphql?query=%7B%0A%20%20syntheticMarkets%20%7B%0A%20%20%20%20name%0A%20%20%20%20symbol%0A%20%20%20%20marketIndex%0A%20%20%20%20oracleAddress%0A%20%20%20%20syntheticLong%20%7B%0A%20%20%20%20%20%20id%0A%20%20%20%20%20%20tokenAddress%0A%20%20%20%20%20%20totalStaked%0A%20%20%20%20%7D%0A%20%20%20%20syntheticShort%20%7B%0A%20%20%20%20%20%20id%0A%20%20%20%20%20%20tokenAddress%0A%20%20%20%20%20%20totalStaked%0A%20%20%20%20%7D%0A%20%20%20%20latestSystemState%20%7B%0A%20%20%20%20%20%20totalLockedLong%0A%20%20%20%20%20%20totalLockedShort%0A%20%20%20%20%20%20totalValueLocked%0A%20%20%20%20%20%20longTokenPrice%0A%20%20%20%20%20%20shortTokenPrice%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D%0A
 module StakingDetails = %graphql(`
 {
-syntheticMarkets {
+  syntheticMarkets {
     name
     symbol
     marketIndex
