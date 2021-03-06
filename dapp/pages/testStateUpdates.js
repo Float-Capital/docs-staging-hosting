@@ -1,7 +1,7 @@
 import StateUpdates from "src/components/Testing/StateUpdates";
 import Head from "next/head";
 
-export default function StateUpdates(props) {
+export default function TestStateUpdates(props) {
   return (
     <div>
       <Head>

@@ -1,4 +1,4 @@
-import AdminTestingPortal from "src/components/Admin/AdminTestingPortal.js";
+import AdminTestingPortal from "src/components/Testing/Admin/AdminTestingPortal.js";
 import Head from "next/head";
 
 export default function AdminPage(props) {
