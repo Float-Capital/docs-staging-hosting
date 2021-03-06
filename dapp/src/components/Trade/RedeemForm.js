@@ -3,8 +3,8 @@
 import * as React from "react";
 import * as Ethers from "ethers";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
-import * as RedeemSynth from "../Admin/RedeemSynth.js";
-import * as ContractHooks from "../Admin/ContractHooks.js";
+import * as RedeemSynth from "../Testing/Admin/RedeemSynth.js";
+import * as ContractHooks from "../Testing/Admin/ContractHooks.js";
 
 function RedeemForm(Props) {
   var market = Props.market;

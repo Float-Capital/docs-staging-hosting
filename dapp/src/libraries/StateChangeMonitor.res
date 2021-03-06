@@ -2,56 +2,24 @@
 
 This context provides the very initial steps how to keep state fresh in the UI of the app.
 
+For external APIs (rest apis):
 General idea, libraries such as SWR (just an example) allow you to only re-fetch data when a value changes.
 This provider exposes a hook `useDataFreshnessString()` that provides such a string for use throughout the application so data is only updated when it changes.
 
-Over time the strategy for keeping data fresh can become more refined.
-The initial version is to reload all data every time a 'state change' happens on the contracts of the system.
-Over time, this can be refined to only reload when it is needed (eg. only reload if data related to the current user changes, or fragment into multiple data freshness strings).
+For graph data:
+Poll the graph for 'state changes' that effect the user that are more recent than the timestamp of the most recent 'state change' and then update the apollo cache directly with the changes directly. (see docs: https://www.apollographql.com/docs/react/caching/cache-interaction/#cachemodify) If this were successful, re-fetching queries wouldn't be necessary from the graph.
 
-Is this the best way to do things? - definitely not, but it is a sure way to get things working predictably and simply.
 
-Future plans - an better approach would be to poll the graph for 'state changes' that effect the user that are more recent than the timestamp of the most recent 'state change' and then update the apollo cache directly with the changes directly. (see docs: https://www.apollographql.com/docs/react/caching/cache-interaction/#cachemodify) If this were successful, re-fetching queries wouldn't be necessary from the graph.
-
-Another approach - use re-fetch callbacks on actions that the user makes. Basic idea, whenever the user makes a contract call that is expected to change contract state (that requires data to be refreshed). This is a great approach, but reliability and code complexity are the biggest concerns.
-
+Other Ideas (not implemented at all yet):
+Refetch callbacks - on user actions that the user makes. Basic idea, whenever the user makes a contract call that is expected to change contract state (that requires data to be refreshed). This is a great approach, but reliability and code complexity are the biggest concerns.
 Related to re-fetch callbacks are optimistic updates (we update the data how we think the users action will affect the state before the action is completed). These may be useful to add in some niche circumstances, but it isn't a substitute for correctly updating the data from a reliable source.
 */
 
-// EXAMPLE component that automatically updates some basic user data via direct cache modification.
-//         A poll query asks the graph every 3 seconds if there is a change. When there is a change it takes that data and directly modifies the cache.
 open GqlConverters
 open Globals
 
-%graphql(`
-fragment BasicUserInfo on User {
-  id
-  totalMintedFloat
-  floatTokenBalance
-  numberOfTransactions
-  totalGasUsed
-}
-`)
-
-module UserQuery = %graphql(`
-query ($userId: String!) {
-  user (id: $userId) {
-    ...BasicUserInfo
-  }
-}`)
-
-module StateChangePoll = %graphql(`
-query($userId: String!, $timestamp: BigInt!) {
-  stateChanges (where: {timestamp_gt: $timestamp}) {
-    timestamp
-    affectedUsers (where: {id: $userId}) {
-      ...BasicUserInfo
-    }
-  }
-}`)
-
 let queryLatestStateChanges = (~client: ApolloClient__Core_ApolloClient.t, ~pollVariables) => {
-  client.query(~query=module(StateChangePoll), ~fetchPolicy=NetworkOnly, pollVariables)
+  client.query(~query=module(Queries.StateChangePoll), ~fetchPolicy=NetworkOnly, pollVariables)
 }
 
 let initialDataFreshnessId = "refetchString"
@@ -77,7 +45,7 @@ let make = (~children) => {
 
   let handleQuery = currentUser => {
     let pollVariables = {
-      StateChangePoll.userId: currentUser,
+      Queries.StateChangePoll.userId: currentUser,
       timestamp: latestStateChangeTimestamp->BigInt.serialize,
     }
     let _ = queryLatestStateChanges(~client, ~pollVariables)->JsPromise.map(queryResult => {
@@ -92,7 +60,7 @@ let make = (~children) => {
           let _ = affectedUsers->Option.map(affectedUsers =>
             affectedUsers->Array.map(userData => {
               let _unusedRef = client.writeFragment(
-                ~fragment=module(BasicUserInfo),
+                ~fragment=module(Queries.BasicUserInfo),
                 ~data={
                   ...userData,
                   __typename: userData.__typename,
@@ -121,9 +89,6 @@ let make = (~children) => {
       None
     }
   }, (optCurrentUser, latestStateChangeTimestamp))
-
-  let lastChangeJsDate =
-    latestStateChangeTimestamp->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime
 
   React.createElement(provider, {"value": currentDataFreshnessId, "children": children})
 }
