@@ -1,7 +1,7 @@
-import StateUpdates from "src/components/ManualTesting/StateUpdates";
+import StateUpdates from "src/components/Testing/StateUpdates";
 import Head from "next/head";
 
-export default function AdminPage(props) {
+export default function StateUpdates(props) {
   return (
     <div>
       <Head>

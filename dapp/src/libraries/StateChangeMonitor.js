@@ -8,7 +8,6 @@ import * as Ethers from "ethers";
 import * as Globals from "./Globals.js";
 import * as Queries from "../data/Queries.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
-import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as RootProvider from "./RootProvider.js";
 import * as GqlConverters from "./GqlConverters.js";
@@ -23,25 +22,19 @@ function queryLatestStateChanges(client, pollVariables) {
             }, undefined, undefined, /* NetworkOnly */2, undefined, pollVariables);
 }
 
-var initialDataFreshnessId = "refetchString";
+var initialLatestStateChangeId = Ethers.BigNumber.from(Misc.Time.getCurrentTimestamp(undefined));
 
-var context = React.createContext(initialDataFreshnessId);
+var context = React.createContext(initialLatestStateChangeId.toString());
 
 var provider = context.Provider;
 
 function StateChangeMonitor(Props) {
   var children = Props.children;
   var match = React.useState(function () {
-        return [
-                initialDataFreshnessId,
-                initialDataFreshnessId
-              ];
+        return initialLatestStateChangeId;
       });
-  var match$1 = React.useState(function () {
-        return Ethers.BigNumber.from(Misc.Time.getCurrentTimestamp(undefined));
-      });
-  var setLatestStateChangeTimestamp = match$1[1];
-  var latestStateChangeTimestamp = match$1[0];
+  var setLatestStateChangeTimestamp = match[1];
+  var latestStateChangeTimestamp = match[0];
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
   var client = Client.useApolloClient(undefined);
   React.useEffect((function () {
@@ -65,28 +58,10 @@ function StateChangeMonitor(Props) {
                           Belt_Array.map(stateChanges, (function (param) {
                                   var timestamp = param.timestamp;
                                   if (timestamp.gt(latestStateChangeTimestamp)) {
-                                    Curry._1(setLatestStateChangeTimestamp, (function (param) {
-                                            return timestamp;
-                                          }));
+                                    return Curry._1(setLatestStateChangeTimestamp, (function (param) {
+                                                  return timestamp;
+                                                }));
                                   }
-                                  Belt_Option.map(param.affectedUsers, (function (affectedUsers) {
-                                          return Belt_Array.map(affectedUsers, (function (userData) {
-                                                        Curry._6(client.rescript_writeFragment, {
-                                                              query: Queries.BasicUserInfo.query,
-                                                              Raw: Queries.BasicUserInfo.Raw,
-                                                              parse: Queries.BasicUserInfo.parse,
-                                                              serialize: Queries.BasicUserInfo.serialize
-                                                            }, {
-                                                              __typename: userData.__typename,
-                                                              id: userData.id,
-                                                              totalMintedFloat: userData.totalMintedFloat,
-                                                              floatTokenBalance: userData.floatTokenBalance,
-                                                              numberOfTransactions: userData.numberOfTransactions,
-                                                              totalGasUsed: userData.totalGasUsed
-                                                            }, undefined, "User:" + "0x374252d2c9f0075b7e2ca2a9868b44f1f62fba80", undefined, undefined);
-                                                        
-                                                      }));
-                                        }));
                                   
                                 }));
                           return ;
@@ -104,7 +79,7 @@ function StateChangeMonitor(Props) {
         latestStateChangeTimestamp
       ]);
   return React.createElement(provider, {
-              value: match[0][0],
+              value: latestStateChangeTimestamp.toString(),
               children: children
             });
 }
@@ -117,11 +92,11 @@ var make = StateChangeMonitor;
 
 export {
   queryLatestStateChanges ,
-  initialDataFreshnessId ,
+  initialLatestStateChangeId ,
   context ,
   provider ,
   make ,
   useDataFreshnessString ,
   
 }
-/* context Not a pure module */
+/* initialLatestStateChangeId Not a pure module */
