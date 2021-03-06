@@ -18,56 +18,112 @@ Another approach - use re-fetch callbacks on actions that the user makes. Basic 
 Related to re-fetch callbacks are optimistic updates (we update the data how we think the users action will affect the state before the action is completed). These may be useful to add in some niche circumstances, but it isn't a substitute for correctly updating the data from a reliable source.
 */
 
+// EXAMPLE component that automatically updates some basic user data via direct cache modification.
+//         A poll query asks the graph every 3 seconds if there is a change. When there is a change it takes that data and directly modifies the cache.
+open GqlConverters
+open Globals
+
+%graphql(`
+fragment BasicUserInfo on User {
+  id
+  totalMintedFloat
+  floatTokenBalance
+  numberOfTransactions
+  totalGasUsed
+}
+`)
+
+module UserQuery = %graphql(`
+query ($userId: String!) {
+  user (id: $userId) {
+    ...BasicUserInfo
+  }
+}`)
+
+module StateChangePoll = %graphql(`
+query($userId: String!, $timestamp: BigInt!) {
+  stateChanges (where: {timestamp_gt: $timestamp}) {
+    timestamp
+    affectedUsers (where: {id: $userId}) {
+      ...BasicUserInfo
+    }
+  }
+}`)
+
+let queryLatestStateChanges = (~client: ApolloClient__Core_ApolloClient.t, ~pollVariables) => {
+  client.query(~query=module(StateChangePoll), ~fetchPolicy=NetworkOnly, pollVariables)
+}
+
 let initialDataFreshnessId = "refetchString"
 let context = React.createContext(initialDataFreshnessId)
 
 let provider = React.Context.provider(context)
 
-module LatestStateChange = %graphql(`
-{
-  stateChanges (first: 1, orderBy: timestamp, orderDirection:desc) {
-    id
-  }
-}
-`)
-
 @ocaml.doc("This component is a context that is responsible for managing state changes")
 @react.component
 let make = (~children) => {
-  let ((currentDataFreshnessId, nextDataFreshnessId), setDataFreshnessId) = React.useState(_ => (
+  let ((currentDataFreshnessId, _nextDataFreshnessId), _setDataFreshnessId) = React.useState(_ => (
     initialDataFreshnessId,
     initialDataFreshnessId,
   ))
-  let (executeQuery, queryResult) = LatestStateChange.useLazy(~fetchPolicy=CacheAndNetwork, ())
-  let isLoggedIn = RootProvider.useIsLoggedIn()
 
-  React.useEffect1(() => {
-    switch queryResult {
-    | Executed({data: Some({stateChanges: [{id}]})}) =>
-      if id != nextDataFreshnessId {
-        setDataFreshnessId(_ => (nextDataFreshnessId, id))
-      }
-    | Unexecuted(_)
-    | Executed(_) => ()
+  let (latestStateChangeTimestamp, setLatestStateChangeTimestamp) = React.useState(_ =>
+    Misc.Time.getCurrentTimestamp()->Ethers.BigNumber.fromInt
+  )
+
+  let optCurrentUser = RootProvider.useCurrentUser()
+
+  let client = Client.useApolloClient()
+
+  let handleQuery = currentUser => {
+    let pollVariables = {
+      StateChangePoll.userId: currentUser,
+      timestamp: latestStateChangeTimestamp->BigInt.serialize,
     }
+    let _ = queryLatestStateChanges(~client, ~pollVariables)->JsPromise.map(queryResult => {
+      switch queryResult {
+      | Ok({data: {stateChanges: []}}) => ()
+      | Ok({data: {stateChanges}}) =>
+        let _ = stateChanges->Array.map(({timestamp, affectedUsers}) => {
+          if timestamp->Ethers.BigNumber.gt(latestStateChangeTimestamp) {
+            setLatestStateChangeTimestamp(_ => timestamp)
+          }
 
-    None
-  }, [queryResult])
+          let _ = affectedUsers->Option.map(affectedUsers =>
+            affectedUsers->Array.map(userData => {
+              let _unusedRef = client.writeFragment(
+                ~fragment=module(BasicUserInfo),
+                ~data={
+                  ...userData,
+                  __typename: userData.__typename,
+                },
+                ~id=`User:${"0x374252d2c9f0075b7e2ca2a9868b44f1f62fba80"}`,
+                (),
+              )
+            })
+          )
+        })
+      | Error(_) => ()
+      }
+    })
+  }
 
-  // React.useEffect1(() => {
-  //   if isLoggedIn {
-  //     // Fetch the latest data initially on load.
-  //     executeQuery()
+  React.useEffect2(() => {
+    switch optCurrentUser {
+    | Some(currentUser) =>
+      // polling interval of 3 seconds seems reasonable since blocktimes on binance are 3 seconds
+      //   -- might be worth moving to block-polling from ethers.js: https://docs.ethers.io/v5/api/providers/provider/#Provider--events
+      let interval = Js.Global.setInterval(() => handleQuery(currentUser->ethAdrToLowerStr), 3000)
 
-  //     // seems reasonable since blocktimes on binance are 3 seconds
-  //     //   -- might be worth moving to block-polling from ethers.js: https://docs.ethers.io/v5/api/providers/provider/#Provider--events
-  //     let interval = Js.Global.setInterval(() => executeQuery(), 3000)
+      Some(() => Js.Global.clearInterval(interval))
+    | None =>
+      // Nothing on the website updates if the user isn't logged in... Might change this for specific things in the future (eg. gamification, interesting notifications etc)
+      None
+    }
+  }, (optCurrentUser, latestStateChangeTimestamp))
 
-  //     Some(() => Js.Global.clearInterval(interval))
-  //   } else {
-  //     None
-  //   }
-  // }, [isLoggedIn])
+  let lastChangeJsDate =
+    latestStateChangeTimestamp->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime
 
   React.createElement(provider, {"value": currentDataFreshnessId, "children": children})
 }

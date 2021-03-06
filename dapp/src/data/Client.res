@@ -82,3 +82,37 @@ let makeClient = (~graphUri, ~dbUri, ~user) => {
     (),
   )
 }
+
+@ocaml.doc(`the default client is the client connected to the default network`)
+let defaultClient = makeClient(
+  ~graphUri={
+    Config.binancTestnetGraphEndpoint
+  },
+  ~dbUri="http://localhost:8080/v1/graphql" /* NOTE CURRENTLY USED */,
+  ~user=None,
+)
+
+let context = React.createContext(defaultClient)
+
+let provider = React.Context.provider(context)
+let useApolloClient = () => React.useContext(context)
+
+module GraphQl = {
+  @react.component
+  let make = (~children) => {
+    let client = useApolloClient()
+    <ApolloClient.React.ApolloProvider client> children </ApolloClient.React.ApolloProvider>
+  }
+}
+
+module Provider = {
+  @react.component
+  let make = (~children) => {
+    React.createElement(provider, {"value": defaultClient, "children": children})
+  }
+}
+
+@react.component
+let make = (~children) => {
+  <Provider> <GraphQl> children </GraphQl> </Provider>
+}
