@@ -56,7 +56,7 @@ function parse$2(json) {
   }
 }
 
-var serialize$2 = Globals.ethAdrToStr;
+var serialize$2 = Globals.ethAdrToLowerStr;
 
 var Address = {
   parse: parse$2,

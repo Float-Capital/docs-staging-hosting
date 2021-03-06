@@ -128,8 +128,7 @@ function StateChangeMonitor(Props) {
         undefined
       ]);
   var queryResult = match$2[1];
-  var executeQuery = match$2[0];
-  var isLoggedIn = RootProvider.useIsLoggedIn(undefined);
+  RootProvider.useIsLoggedIn(undefined);
   React.useEffect((function () {
           if (queryResult.TAG === /* Executed */0) {
             var match = queryResult._0.data;
@@ -154,19 +153,6 @@ function StateChangeMonitor(Props) {
           }
           
         }), [queryResult]);
-  React.useEffect((function () {
-          if (!isLoggedIn) {
-            return ;
-          }
-          Curry._3(executeQuery, undefined, undefined, undefined);
-          var interval = setInterval((function (param) {
-                  return Curry._3(executeQuery, undefined, undefined, undefined);
-                }), 3000);
-          return (function (param) {
-                    clearInterval(interval);
-                    
-                  });
-        }), [isLoggedIn]);
   return React.createElement(provider, {
               value: match$1[0],
               children: children

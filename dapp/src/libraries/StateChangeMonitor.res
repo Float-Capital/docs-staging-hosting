@@ -54,20 +54,20 @@ let make = (~children) => {
     None
   }, [queryResult])
 
-  React.useEffect1(() => {
-    if isLoggedIn {
-      // Fetch the latest data initially on load.
-      executeQuery()
+  // React.useEffect1(() => {
+  //   if isLoggedIn {
+  //     // Fetch the latest data initially on load.
+  //     executeQuery()
 
-      // seems reasonable since blocktimes on binance are 3 seconds
-      //   -- might be worth moving to block-polling from ethers.js: https://docs.ethers.io/v5/api/providers/provider/#Provider--events
-      let interval = Js.Global.setInterval(() => executeQuery(), 3000)
+  //     // seems reasonable since blocktimes on binance are 3 seconds
+  //     //   -- might be worth moving to block-polling from ethers.js: https://docs.ethers.io/v5/api/providers/provider/#Provider--events
+  //     let interval = Js.Global.setInterval(() => executeQuery(), 3000)
 
-      Some(() => Js.Global.clearInterval(interval))
-    } else {
-      None
-    }
-  }, [isLoggedIn])
+  //     Some(() => Js.Global.clearInterval(interval))
+  //   } else {
+  //     None
+  //   }
+  // }, [isLoggedIn])
 
   React.createElement(provider, {"value": currentDataFreshnessId, "children": children})
 }

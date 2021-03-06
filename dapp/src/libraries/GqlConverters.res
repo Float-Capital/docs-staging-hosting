@@ -36,5 +36,5 @@ module Address = {
       Js.log("CRITICAL - couldn't decode eth address from graph, should never happen!")
       CONSTANTS.zeroAddress
     }
-  let serialize = bytesString => bytesString->ethAdrToStr->Js.Json.string
+  let serialize = bytesString => bytesString->ethAdrToLowerStr->Js.Json.string
 }
