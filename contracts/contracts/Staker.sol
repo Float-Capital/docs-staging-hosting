@@ -206,10 +206,9 @@ contract Staker is IStaker, Initializable {
         uint256 k = 1e18;
         if (block.timestamp - initialTimestamp <= kPeriod) {
             k =
-                1e18 -
-                ((kInitialMultiplier - 1e18) *
-                    (block.timestamp - initialTimestamp)) /
-                kPeriod;
+                kInitialMultiplier -
+                (((kInitialMultiplier - 1e18) *
+                    (block.timestamp - initialTimestamp)) / kPeriod);
         }
 
         // Float is scaled by the percentage of the total market value held in
