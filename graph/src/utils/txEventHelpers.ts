@@ -75,8 +75,9 @@ function txStateChangeHelper(
     stateChange.txEventParamList = [];
     stateChange.affectedUsers = [];
 
-    let globalState = GlobalState.load(GLOBAL_STATE_ID);
+    // Order important here since getOrCreateUser loads and saves global state for a new user
     let user = getOrCreateUser(event.transaction.from, event);
+    let globalState = GlobalState.load(GLOBAL_STATE_ID);
 
     user.totalGasUsed = user.totalGasUsed.plus(event.block.gasUsed);
     user.numberOfTransactions = user.numberOfTransactions.plus(ONE);
