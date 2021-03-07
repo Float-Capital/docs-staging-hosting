@@ -85,26 +85,29 @@ let myfloatCalc = (
 
 @react.component
 let make = (
-  ~marketName,
-  ~totalLockedLong,
-  ~totalLockedShort,
-  ~router,
-  ~longTokenPrice,
-  ~shortTokenPrice,
-  ~longStaked,
-  ~shortStaked,
-  ~shortAddress,
-  ~longAddress,
-  ~currentTimestamp,
-  ~createdTimestamp,
+  ~syntheticMarket as {
+    name: marketName,
+    timestampCreated,
+    latestSystemState: {
+      timestamp: currentTimestamp,
+      totalLockedLong,
+      totalLockedShort,
+      longTokenPrice,
+      shortTokenPrice,
+    },
+    syntheticShort: {shortTotalStaked, shortTokenAddress},
+    syntheticLong: {longTotalStaked, longTokenAddress},
+  }: Queries.StakingDetails.t_syntheticMarkets,
 ) => {
+  let router = Next.Router.useRouter()
+
   let longDollarValueStaked = calculateDollarValue(
     ~tokenPrice=longTokenPrice,
-    ~amountStaked=longStaked,
+    ~amountStaked=longTotalStaked,
   )
   let shortDollarValueStaked = calculateDollarValue(
     ~tokenPrice=shortTokenPrice,
-    ~amountStaked=shortStaked,
+    ~amountStaked=shortTotalStaked,
   )
   let totalDollarValueStake = longDollarValueStaked->Ethers.BigNumber.add(shortDollarValueStaked)
 
@@ -131,7 +134,7 @@ let make = (
     totalLockedShort,
     kperiodHardcode,
     kmultiplierHardcode,
-    createdTimestamp,
+    timestampCreated,
     currentTimestamp,
     "long",
   )
@@ -141,7 +144,7 @@ let make = (
     totalLockedShort,
     kperiodHardcode,
     kmultiplierHardcode,
-    createdTimestamp,
+    timestampCreated,
     currentTimestamp,
     "short",
   )
@@ -174,14 +177,14 @@ let make = (
         <div className="w-full flex justify-around">
           <Button
             onClick={_ => {
-              router->Next.Router.push(`/stake?tokenId=${longAddress}`)
+              router->Next.Router.push(`/stake?tokenId=${longTokenAddress}`)
             }}
             variant="small">
             "Stake Long"
           </Button>
           <Button
             onClick={_ => {
-              router->Next.Router.push(`/stake?tokenId=${shortAddress}`)
+              router->Next.Router.push(`/stake?tokenId=${shortTokenAddress}`)
             }}
             variant="small">
             "Stake Short"

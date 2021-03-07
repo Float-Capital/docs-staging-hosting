@@ -36,25 +36,10 @@ function StakeList(Props) {
                           className: "m-auto"
                         }, React.createElement(MiniLoader.make, {})) : (
                       stakeDetailsQuery.error !== undefined ? "Error loading data" : (
-                          match !== undefined ? React.createElement(React.Fragment, undefined, Belt_Array.map(match.syntheticMarkets, (function (param) {
-                                        var match = param.latestSystemState;
-                                        var match$1 = param.syntheticShort;
-                                        var match$2 = param.syntheticLong;
-                                        var name = param.name;
+                          match !== undefined ? React.createElement(React.Fragment, undefined, Belt_Array.map(match.syntheticMarkets, (function (syntheticMarket) {
                                         return React.createElement(StakeCard.make, {
-                                                    marketName: name,
-                                                    totalLockedLong: match.totalLockedLong,
-                                                    totalLockedShort: match.totalLockedShort,
-                                                    router: router,
-                                                    longTokenPrice: match.longTokenPrice,
-                                                    shortTokenPrice: match.shortTokenPrice,
-                                                    longStaked: match$2.longTotalStaked,
-                                                    shortStaked: match$1.shortTotalStaked,
-                                                    shortAddress: match$1.shortTokenAddress,
-                                                    longAddress: match$2.longTokenAddress,
-                                                    currentTimestamp: match.timestamp,
-                                                    createdTimestamp: param.timestampCreated,
-                                                    key: name
+                                                    syntheticMarket: syntheticMarket,
+                                                    key: syntheticMarket.name
                                                   });
                                       }))) : "You might think this is impossible, but depending on the situation it might not be!"
                         )
