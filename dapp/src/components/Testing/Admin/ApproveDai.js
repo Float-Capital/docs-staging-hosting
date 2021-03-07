@@ -4,53 +4,82 @@ import * as Cn from "re-classnames/src/Cn.js";
 import * as Form from "./Form.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as Ethers from "../../ethereum/Ethers.js";
-import * as Ethers$1 from "ethers";
-import * as Contracts from "../../ethereum/Contracts.js";
+import * as Config from "../../../Config.js";
+import * as Ethers from "../../../ethereum/Ethers.js";
+import * as Contracts from "../../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
-import * as TxTemplate from "../Ethereum/TxTemplate.js";
+import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as TxTemplate from "../../Ethereum/TxTemplate.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
-import * as ContractActions from "../../ethereum/ContractActions.js";
+import * as RootProvider from "../../../libraries/RootProvider.js";
+import * as ContractActions from "../../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
 
+var validators_tokenAddress = {
+  strategy: /* OnFirstBlur */0,
+  validate: (function (param) {
+      var tokenAddress = param.tokenAddress;
+      var netIdStr = Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
+              return String(prim);
+            }));
+      if (tokenAddress === "DAI") {
+        return {
+                TAG: 0,
+                _0: Config.daiContractAddress(netIdStr),
+                [Symbol.for("name")]: "Ok"
+              };
+      } else {
+        return {
+                TAG: 1,
+                _0: tokenAddress,
+                [Symbol.for("name")]: "Error"
+              };
+      }
+    })
+};
+
+var validators_amount = {
+  strategy: /* OnFirstBlur */0,
+  validate: (function (param) {
+      var amount = param.amount;
+      var addressRegex = /^[+]?\d+(\.\d+)?$/;
+      if (amount === "") {
+        return {
+                TAG: 1,
+                _0: "Amount is required",
+                [Symbol.for("name")]: "Error"
+              };
+      } else if (addressRegex.test(amount)) {
+        return Belt_Option.mapWithDefault(Ethers.Utils.parseEther(amount), {
+                    TAG: 1,
+                    _0: "Couldn't parse Ether value",
+                    [Symbol.for("name")]: "Error"
+                  }, (function (etherValue) {
+                      return {
+                              TAG: 0,
+                              _0: etherValue,
+                              [Symbol.for("name")]: "Ok"
+                            };
+                    }));
+      } else {
+        return {
+                TAG: 1,
+                _0: "Incorrect number format - please use '.' for floating points.",
+                [Symbol.for("name")]: "Error"
+              };
+      }
+    })
+};
+
 var validators = {
-  amount: {
-    strategy: /* OnFirstBlur */0,
-    validate: (function (param) {
-        var amount = param.amount;
-        var addressRegex = /^[+]?\d+(\.\d+)?$/;
-        if (amount === "") {
-          return {
-                  TAG: 1,
-                  _0: "Amount is required",
-                  [Symbol.for("name")]: "Error"
-                };
-        } else if (addressRegex.test(amount)) {
-          return Belt_Option.mapWithDefault(Ethers.Utils.parseEther(amount), {
-                      TAG: 1,
-                      _0: "Couldn't parse Ether value",
-                      [Symbol.for("name")]: "Error"
-                    }, (function (etherValue) {
-                        return {
-                                TAG: 0,
-                                _0: etherValue,
-                                [Symbol.for("name")]: "Ok"
-                              };
-                      }));
-        } else {
-          return {
-                  TAG: 1,
-                  _0: "Incorrect number format - please use '.' for floating points.",
-                  [Symbol.for("name")]: "Error"
-                };
-        }
-      })
-  }
+  tokenAddress: validators_tokenAddress,
+  amount: validators_amount
 };
 
 function initialFieldsStatuses(_input) {
   return {
+          tokenAddress: /* Pristine */0,
           amount: /* Pristine */0
         };
 }
@@ -59,6 +88,7 @@ function initialState(input) {
   return {
           input: input,
           fieldsStatuses: {
+            tokenAddress: /* Pristine */0,
             amount: /* Pristine */0
           },
           collectionsStatuses: undefined,
@@ -68,38 +98,58 @@ function initialState(input) {
 }
 
 function validateForm(input, validators, fieldsStatuses) {
-  var match = fieldsStatuses.amount;
-  var match$1 = match ? match._0 : Curry._1(validators.amount.validate, input);
-  if (match$1.TAG === /* Ok */0) {
-    return {
-            TAG: 0,
-            output: {
-              amount: match$1._0
-            },
-            fieldsStatuses: {
-              amount: {
-                _0: match$1,
-                _1: /* Shown */0,
-                [Symbol.for("name")]: "Dirty"
-              }
-            },
-            collectionsStatuses: undefined,
-            [Symbol.for("name")]: "Valid"
-          };
+  var match = fieldsStatuses.tokenAddress;
+  var match_0 = match ? match._0 : Curry._1(validators.tokenAddress.validate, input);
+  var match$1 = fieldsStatuses.amount;
+  var match_0$1 = match$1 ? match$1._0 : Curry._1(validators.amount.validate, input);
+  var tokenAddressResult = match_0;
+  var tokenAddressResult$1;
+  if (tokenAddressResult.TAG === /* Ok */0) {
+    var amountResult = match_0$1;
+    if (amountResult.TAG === /* Ok */0) {
+      return {
+              TAG: 0,
+              output: {
+                amount: amountResult._0,
+                tokenAddress: tokenAddressResult._0
+              },
+              fieldsStatuses: {
+                tokenAddress: {
+                  _0: tokenAddressResult,
+                  _1: /* Shown */0,
+                  [Symbol.for("name")]: "Dirty"
+                },
+                amount: {
+                  _0: amountResult,
+                  _1: /* Shown */0,
+                  [Symbol.for("name")]: "Dirty"
+                }
+              },
+              collectionsStatuses: undefined,
+              [Symbol.for("name")]: "Valid"
+            };
+    }
+    tokenAddressResult$1 = tokenAddressResult;
   } else {
-    return {
-            TAG: 1,
-            fieldsStatuses: {
-              amount: {
-                _0: match$1,
-                _1: /* Shown */0,
-                [Symbol.for("name")]: "Dirty"
-              }
-            },
-            collectionsStatuses: undefined,
-            [Symbol.for("name")]: "Invalid"
-          };
+    tokenAddressResult$1 = tokenAddressResult;
   }
+  return {
+          TAG: 1,
+          fieldsStatuses: {
+            tokenAddress: {
+              _0: tokenAddressResult$1,
+              _1: /* Shown */0,
+              [Symbol.for("name")]: "Dirty"
+            },
+            amount: {
+              _0: match_0$1,
+              _1: /* Shown */0,
+              [Symbol.for("name")]: "Dirty"
+            }
+          },
+          collectionsStatuses: undefined,
+          [Symbol.for("name")]: "Invalid"
+        };
 }
 
 function useForm(initialInput, onSubmit) {
@@ -109,10 +159,12 @@ function useForm(initialInput, onSubmit) {
   var match = Formality__ReactUpdate.useReducer(memoizedInitialState, (function (state, action) {
           if (typeof action === "number") {
             switch (action) {
-              case /* BlurAmountField */0 :
-                  var result = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.amount, validators.amount, (function (status) {
+              case /* BlurTokenAddressField */0 :
+                  var result = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.tokenAddress, validators_tokenAddress, (function (status) {
+                          var init = state.fieldsStatuses;
                           return {
-                                  amount: status
+                                  tokenAddress: status,
+                                  amount: init.amount
                                 };
                         }));
                   if (result !== undefined) {
@@ -130,7 +182,30 @@ function useForm(initialInput, onSubmit) {
                   } else {
                     return /* NoUpdate */0;
                   }
-              case /* Submit */1 :
+              case /* BlurAmountField */1 :
+                  var result$1 = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.amount, validators_amount, (function (status) {
+                          var init = state.fieldsStatuses;
+                          return {
+                                  tokenAddress: init.tokenAddress,
+                                  amount: status
+                                };
+                        }));
+                  if (result$1 !== undefined) {
+                    return {
+                            TAG: 0,
+                            _0: {
+                              input: state.input,
+                              fieldsStatuses: result$1,
+                              collectionsStatuses: state.collectionsStatuses,
+                              formStatus: state.formStatus,
+                              submissionStatus: state.submissionStatus
+                            },
+                            [Symbol.for("name")]: "Update"
+                          };
+                  } else {
+                    return /* NoUpdate */0;
+                  }
+              case /* Submit */2 :
                   var match = state.formStatus;
                   if (typeof match !== "number" && match.TAG === /* Submitting */0) {
                     return /* NoUpdate */0;
@@ -171,30 +246,30 @@ function useForm(initialInput, onSubmit) {
                               return Curry._2(onSubmit, output, {
                                           notifyOnSuccess: (function (input) {
                                               return Curry._1(dispatch, {
-                                                          TAG: 1,
+                                                          TAG: 2,
                                                           _0: input,
                                                           [Symbol.for("name")]: "SetSubmittedStatus"
                                                         });
                                             }),
                                           notifyOnFailure: (function (error) {
                                               return Curry._1(dispatch, {
-                                                          TAG: 2,
+                                                          TAG: 3,
                                                           _0: error,
                                                           [Symbol.for("name")]: "SetSubmissionFailedStatus"
                                                         });
                                             }),
                                           reset: (function (param) {
-                                              return Curry._1(dispatch, /* Reset */4);
+                                              return Curry._1(dispatch, /* Reset */5);
                                             }),
                                           dismissSubmissionResult: (function (param) {
-                                              return Curry._1(dispatch, /* DismissSubmissionResult */3);
+                                              return Curry._1(dispatch, /* DismissSubmissionResult */4);
                                             })
                                         });
                             }),
                           [Symbol.for("name")]: "UpdateWithSideEffects"
                         };
                   break;
-              case /* DismissSubmissionError */2 :
+              case /* DismissSubmissionError */3 :
                   var match$2 = state.formStatus;
                   if (typeof match$2 === "number" || match$2.TAG !== /* SubmissionFailed */1) {
                     return /* NoUpdate */0;
@@ -211,7 +286,7 @@ function useForm(initialInput, onSubmit) {
                             [Symbol.for("name")]: "Update"
                           };
                   }
-              case /* DismissSubmissionResult */3 :
+              case /* DismissSubmissionResult */4 :
                   var match$3 = state.formStatus;
                   if (typeof match$3 === "number") {
                     if (match$3 === /* Editing */0) {
@@ -232,7 +307,7 @@ function useForm(initialInput, onSubmit) {
                           },
                           [Symbol.for("name")]: "Update"
                         };
-              case /* Reset */4 :
+              case /* Reset */5 :
                   return {
                           TAG: 0,
                           _0: initialState(initialInput),
@@ -242,14 +317,35 @@ function useForm(initialInput, onSubmit) {
             }
           } else {
             switch (action.TAG | 0) {
-              case /* UpdateAmountField */0 :
+              case /* UpdateTokenAddressField */0 :
                   var nextInput = Curry._1(action._0, state.input);
                   return {
                           TAG: 0,
                           _0: {
                             input: nextInput,
-                            fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput, state.fieldsStatuses.amount, state.submissionStatus, validators.amount, (function (status) {
+                            fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput, state.fieldsStatuses.tokenAddress, state.submissionStatus, validators_tokenAddress, (function (status) {
+                                    var init = state.fieldsStatuses;
                                     return {
+                                            tokenAddress: status,
+                                            amount: init.amount
+                                          };
+                                  })),
+                            collectionsStatuses: state.collectionsStatuses,
+                            formStatus: state.formStatus,
+                            submissionStatus: state.submissionStatus
+                          },
+                          [Symbol.for("name")]: "Update"
+                        };
+              case /* UpdateAmountField */1 :
+                  var nextInput$1 = Curry._1(action._0, state.input);
+                  return {
+                          TAG: 0,
+                          _0: {
+                            input: nextInput$1,
+                            fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput$1, state.fieldsStatuses.amount, state.submissionStatus, validators_amount, (function (status) {
+                                    var init = state.fieldsStatuses;
+                                    return {
+                                            tokenAddress: init.tokenAddress,
                                             amount: status
                                           };
                                   })),
@@ -259,7 +355,7 @@ function useForm(initialInput, onSubmit) {
                           },
                           [Symbol.for("name")]: "Update"
                         };
-              case /* SetSubmittedStatus */1 :
+              case /* SetSubmittedStatus */2 :
                   var input = action._0;
                   if (input !== undefined) {
                     return {
@@ -267,6 +363,7 @@ function useForm(initialInput, onSubmit) {
                             _0: {
                               input: input,
                               fieldsStatuses: {
+                                tokenAddress: /* Pristine */0,
                                 amount: /* Pristine */0
                               },
                               collectionsStatuses: state.collectionsStatuses,
@@ -281,6 +378,7 @@ function useForm(initialInput, onSubmit) {
                             _0: {
                               input: state.input,
                               fieldsStatuses: {
+                                tokenAddress: /* Pristine */0,
                                 amount: /* Pristine */0
                               },
                               collectionsStatuses: state.collectionsStatuses,
@@ -290,7 +388,7 @@ function useForm(initialInput, onSubmit) {
                             [Symbol.for("name")]: "Update"
                           };
                   }
-              case /* SetSubmissionFailedStatus */2 :
+              case /* SetSubmissionFailedStatus */3 :
                   return {
                           TAG: 0,
                           _0: {
@@ -306,7 +404,7 @@ function useForm(initialInput, onSubmit) {
                           },
                           [Symbol.for("name")]: "Update"
                         };
-              case /* MapSubmissionError */3 :
+              case /* MapSubmissionError */4 :
                   var map = action._0;
                   var error$1 = state.formStatus;
                   if (typeof error$1 === "number") {
@@ -359,24 +457,37 @@ function useForm(initialInput, onSubmit) {
   var tmp;
   tmp = typeof match$1 === "number" || match$1.TAG !== /* Submitting */0 ? false : true;
   return {
-          updateAmount: (function (nextInputFn, nextValue) {
+          updateTokenAddress: (function (nextInputFn, nextValue) {
               return Curry._1(dispatch, {
                           TAG: 0,
+                          _0: (function (__x) {
+                              return Curry._2(nextInputFn, __x, nextValue);
+                            }),
+                          [Symbol.for("name")]: "UpdateTokenAddressField"
+                        });
+            }),
+          updateAmount: (function (nextInputFn, nextValue) {
+              return Curry._1(dispatch, {
+                          TAG: 1,
                           _0: (function (__x) {
                               return Curry._2(nextInputFn, __x, nextValue);
                             }),
                           [Symbol.for("name")]: "UpdateAmountField"
                         });
             }),
-          blurAmount: (function (param) {
-              return Curry._1(dispatch, /* BlurAmountField */0);
+          blurTokenAddress: (function (param) {
+              return Curry._1(dispatch, /* BlurTokenAddressField */0);
             }),
+          blurAmount: (function (param) {
+              return Curry._1(dispatch, /* BlurAmountField */1);
+            }),
+          tokenAddressResult: Formality.exposeFieldResult(state.fieldsStatuses.tokenAddress),
           amountResult: Formality.exposeFieldResult(state.fieldsStatuses.amount),
           input: state.input,
           status: state.formStatus,
           dirty: (function (param) {
               var match = state.fieldsStatuses;
-              if (match.amount) {
+              if (match.tokenAddress || match.amount) {
                 return true;
               } else {
                 return false;
@@ -392,28 +503,28 @@ function useForm(initialInput, onSubmit) {
             }),
           submitting: tmp,
           submit: (function (param) {
-              return Curry._1(dispatch, /* Submit */1);
+              return Curry._1(dispatch, /* Submit */2);
             }),
           dismissSubmissionError: (function (param) {
-              return Curry._1(dispatch, /* DismissSubmissionError */2);
+              return Curry._1(dispatch, /* DismissSubmissionError */3);
             }),
           dismissSubmissionResult: (function (param) {
-              return Curry._1(dispatch, /* DismissSubmissionResult */3);
+              return Curry._1(dispatch, /* DismissSubmissionResult */4);
             }),
           mapSubmissionError: (function (map) {
               return Curry._1(dispatch, {
-                          TAG: 3,
+                          TAG: 4,
                           _0: map,
                           [Symbol.for("name")]: "MapSubmissionError"
                         });
             }),
           reset: (function (param) {
-              return Curry._1(dispatch, /* Reset */4);
+              return Curry._1(dispatch, /* Reset */5);
             })
         };
 }
 
-var ShortRedeemForm = {
+var Erc20ApproveForm = {
   validators: validators,
   initialFieldsStatuses: initialFieldsStatuses,
   initialCollectionsStatuses: undefined,
@@ -422,23 +533,26 @@ var ShortRedeemForm = {
   useForm: useForm
 };
 
+var selectOpts = ["DAI"];
+
 var initialInput = {
-  amount: ""
+  amount: "",
+  tokenAddress: "DAI"
 };
 
-function RedeemShort(Props) {
-  var shortTokenAddress = Props.shortTokenAddress;
+function ApproveDai(Props) {
   var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
+  var longShortAddress = Config.useLongShortAddress(undefined);
   var form = useForm(initialInput, (function (param, _form) {
+          var tokenAddress = param.tokenAddress;
           var amount = param.amount;
-          var arg = Ethers$1.BigNumber.from("1");
           return Curry._2(contractExecutionHandler, (function (param) {
-                        return Contracts.LongShort.make(shortTokenAddress, param);
+                        return Contracts.Erc20.make(tokenAddress, param);
                       }), (function (param) {
-                        return param.redeemShort(arg, amount);
+                        return param.approve(longShortAddress, amount);
                       }));
         }));
   var match$1 = form.amountResult;
@@ -455,14 +569,36 @@ function RedeemShort(Props) {
               children: React.createElement(Form.make, {
                     className: "",
                     onSubmit: (function (param) {
-                        console.log("temp");
                         return Curry._1(form.submit, undefined);
                       }),
                     children: React.createElement("div", {
                           className: ""
                         }, React.createElement("h2", {
                               className: "text-xl"
-                            }, "Redeem Short Tokens"), React.createElement("div", undefined, React.createElement("label", {
+                            }, "Approve LongShort to spend your tokens"), React.createElement("div", undefined, React.createElement("div", {
+                                  className: "block my-3"
+                                }, React.createElement("label", {
+                                      htmlFor: "tokenAddress"
+                                    }, "Choose the token: "), React.createElement("select", {
+                                      id: "tokenAddress",
+                                      disabled: form.submitting,
+                                      name: "tokenAddress",
+                                      onBlur: (function (param) {
+                                          return Curry._1(form.blurAmount, undefined);
+                                        }),
+                                      onChange: (function ($$event) {
+                                          return Curry._2(form.updateTokenAddress, (function (_input, value) {
+                                                        return {
+                                                                amount: _input.amount,
+                                                                tokenAddress: value
+                                                              };
+                                                      }), $$event.target.value);
+                                        })
+                                    }, Belt_Array.map(selectOpts, (function (selectOptName) {
+                                            return React.createElement("option", {
+                                                        key: selectOptName
+                                                      }, selectOptName);
+                                          })))), React.createElement("label", {
                                   htmlFor: "amount"
                                 }, "Amount: "), React.createElement("input", {
                                   className: "border-2 border-grey-500",
@@ -476,7 +612,8 @@ function RedeemShort(Props) {
                                   onChange: (function ($$event) {
                                       return Curry._2(form.updateAmount, (function (_input, value) {
                                                     return {
-                                                            amount: value
+                                                            amount: value,
+                                                            tokenAddress: _input.tokenAddress
                                                           };
                                                   }), $$event.target.value);
                                     })
@@ -491,7 +628,7 @@ function RedeemShort(Props) {
                                             tl: /* [] */0
                                           }
                                         })
-                                  }, "✓ Finished Redeeming") : null))
+                                  }, "✓ Finished Approving") : null))
                   }),
               txState: match[1],
               resetTxState: (function (param) {
@@ -503,10 +640,11 @@ function RedeemShort(Props) {
             });
 }
 
-var make = RedeemShort;
+var make = ApproveDai;
 
 export {
-  ShortRedeemForm ,
+  Erc20ApproveForm ,
+  selectOpts ,
   initialInput ,
   make ,
   

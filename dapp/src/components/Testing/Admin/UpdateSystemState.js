@@ -2,10 +2,10 @@
 
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as Config from "../../Config.js";
-import * as Contracts from "../../ethereum/Contracts.js";
-import * as TxTemplate from "../Ethereum/TxTemplate.js";
-import * as ContractActions from "../../ethereum/ContractActions.js";
+import * as Config from "../../../Config.js";
+import * as Contracts from "../../../ethereum/Contracts.js";
+import * as TxTemplate from "../../Ethereum/TxTemplate.js";
+import * as ContractActions from "../../../ethereum/ContractActions.js";
 
 function UpdateSystemState(Props) {
   var signer = ContractActions.useSignerExn(undefined);

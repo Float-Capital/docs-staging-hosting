@@ -14,42 +14,6 @@ type props = {
   pageProps: pageProps,
 }
 
-@ocaml.doc(`the default client is the client connected to the default network`)
-let defaultClient = Client.makeClient(
-  ~graphUri={
-    Config.binancTestnetGraphEndpoint
-  },
-  ~dbUri="http://localhost:8080/v1/graphql" /* NOTE CURRENTLY USED */,
-  ~user=None,
-)
-
-module ApolloContext = {
-  let context = React.createContext(defaultClient)
-
-  let provider = React.Context.provider(context)
-  let useApolloClient = () => React.useContext(context)
-
-  module GraphQl = {
-    @react.component
-    let make = (~children) => {
-      let client = useApolloClient()
-      <ApolloClient.React.ApolloProvider client> children </ApolloClient.React.ApolloProvider>
-    }
-  }
-
-  module Provider = {
-    @react.component
-    let make = (~client, ~children) => {
-      React.createElement(provider, {"value": client, "children": children})
-    }
-  }
-
-  @react.component
-  let make = (~children) => {
-    <Provider client=defaultClient> <GraphQl> children </GraphQl> </Provider>
-  }
-}
-
 // We are not using `@react.component` since we will never
 // use <App/> within our Rescript code. It's only used within `pages/_app.js`
 let default = (props: props): React.element => {
@@ -60,12 +24,12 @@ let default = (props: props): React.element => {
   let content = React.createElement(component, pageProps)
 
   <RootProvider>
-    <ApolloContext>
+    <Client>
       <StateChangeMonitor>
         {switch router.route {
         | _ => <MainLayout> content </MainLayout>
         }}
       </StateChangeMonitor>
-    </ApolloContext>
+    </Client>
   </RootProvider>
 }

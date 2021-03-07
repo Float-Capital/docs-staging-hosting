@@ -1,5 +1,38 @@
 open GqlConverters
 
+%graphql(`
+fragment BasicUserInfo on User {
+  id
+  totalMintedFloat
+  floatTokenBalance
+  numberOfTransactions
+  totalGasUsed
+}
+`)
+
+module UserQuery = %graphql(`
+query ($userId: String!) {
+  user (id: $userId) {
+    ...BasicUserInfo
+  }
+}`)
+
+module StateChangePoll = %graphql(`
+query($userId: String!, $timestamp: BigInt!) {
+  stateChanges (where: {timestamp_gt: $timestamp}) {
+    timestamp
+    affectedUsers (where: {id: $userId}) {
+      ...BasicUserInfo
+    }
+  }
+}`)
+
+%graphql(`
+fragment LongSynth on SyntheticToken {
+  floatMintedLong: floatMintedFromSpecificToken
+  longAddress: tokenAddress
+}`)
+
 module LatestSystemState = %graphql(`
 {
   systemStates (first:1, orderBy:timestamp, orderDirection: desc) {

@@ -3,13 +3,13 @@
 import Swr from "swr";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as Config from "../../Config.js";
-import * as Contracts from "../../ethereum/Contracts.js";
+import * as Config from "../../../Config.js";
+import * as Contracts from "../../../ethereum/Contracts.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
-import * as RootProvider from "../../libraries/RootProvider.js";
-import * as ContractActions from "../../ethereum/ContractActions.js";
-import * as StateChangeMonitor from "../../libraries/StateChangeMonitor.js";
+import * as RootProvider from "../../../libraries/RootProvider.js";
+import * as ContractActions from "../../../ethereum/ContractActions.js";
+import * as StateChangeMonitor from "../../../libraries/StateChangeMonitor.js";
 
 function useDaiBalance(param) {
   var optChainId = RootProvider.useChainId(undefined);

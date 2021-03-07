@@ -4,82 +4,102 @@ import * as Cn from "re-classnames/src/Cn.js";
 import * as Form from "./Form.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as Config from "../../Config.js";
-import * as Ethers from "../../ethereum/Ethers.js";
-import * as Contracts from "../../ethereum/Contracts.js";
+import * as Config from "../../../Config.js";
+import * as Ethers from "../../../ethereum/Ethers.js";
+import * as Ethers$1 from "ethers";
+import * as Contracts from "../../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
-import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
-import * as TxTemplate from "../Ethereum/TxTemplate.js";
+import * as TxTemplate from "../../Ethereum/TxTemplate.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
-import * as RootProvider from "../../libraries/RootProvider.js";
-import * as ContractActions from "../../ethereum/ContractActions.js";
+import * as ContractHooks from "./ContractHooks.js";
+import * as ContractActions from "../../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
 
-var validators_tokenAddress = {
+var validators_optBalance = {
   strategy: /* OnFirstBlur */0,
   validate: (function (param) {
-      var tokenAddress = param.tokenAddress;
-      var netIdStr = Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
-              return String(prim);
-            }));
-      if (tokenAddress === "DAI") {
-        return {
-                TAG: 0,
-                _0: Config.daiContractAddress(netIdStr),
-                [Symbol.for("name")]: "Ok"
-              };
-      } else {
-        return {
-                TAG: 1,
-                _0: tokenAddress,
-                [Symbol.for("name")]: "Error"
-              };
-      }
+      return {
+              TAG: 0,
+              _0: param.optBalance,
+              [Symbol.for("name")]: "Ok"
+            };
     })
 };
 
 var validators_amount = {
   strategy: /* OnFirstBlur */0,
   validate: (function (param) {
+      var optBalance = param.optBalance;
       var amount = param.amount;
-      var addressRegex = /^[+]?\d+(\.\d+)?$/;
-      if (amount === "") {
+      var amountRegex = /^[+]?\d+(\.\d+)?$/;
+      var value = amount.amount;
+      var optAmountApproved = amount.optAmountApproved;
+      if (value === "") {
         return {
                 TAG: 1,
                 _0: "Amount is required",
                 [Symbol.for("name")]: "Error"
               };
-      } else if (addressRegex.test(amount)) {
-        return Belt_Option.mapWithDefault(Ethers.Utils.parseEther(amount), {
-                    TAG: 1,
-                    _0: "Couldn't parse Ether value",
-                    [Symbol.for("name")]: "Error"
-                  }, (function (etherValue) {
-                      return {
-                              TAG: 0,
-                              _0: etherValue,
-                              [Symbol.for("name")]: "Ok"
-                            };
-                    }));
-      } else {
+      }
+      if (!amountRegex.test(value)) {
         return {
                 TAG: 1,
                 _0: "Incorrect number format - please use '.' for floating points.",
                 [Symbol.for("name")]: "Error"
               };
       }
+      var checkRequiresApproval = function (amount) {
+        if (optAmountApproved !== undefined && Caml_option.valFromOption(optAmountApproved).gte(amount)) {
+          return false;
+        } else {
+          return true;
+        }
+      };
+      return Belt_Option.mapWithDefault(Ethers.Utils.parseEther(value), {
+                  TAG: 1,
+                  _0: "Couldn't parse Ether value",
+                  [Symbol.for("name")]: "Error"
+                }, (function (etherValue) {
+                    if (optBalance === undefined) {
+                      return {
+                              TAG: 0,
+                              _0: {
+                                requiresApproval: checkRequiresApproval(etherValue),
+                                amount: etherValue
+                              },
+                              [Symbol.for("name")]: "Ok"
+                            };
+                    }
+                    var balance = Caml_option.valFromOption(optBalance);
+                    if (balance.gte(etherValue)) {
+                      return {
+                              TAG: 0,
+                              _0: {
+                                requiresApproval: checkRequiresApproval(etherValue),
+                                amount: etherValue
+                              },
+                              [Symbol.for("name")]: "Ok"
+                            };
+                    } else {
+                      return {
+                              TAG: 1,
+                              _0: "You cannot spend more than your balance of " + Ethers.Utils.formatEther(balance),
+                              [Symbol.for("name")]: "Error"
+                            };
+                    }
+                  }));
     })
 };
 
 var validators = {
-  tokenAddress: validators_tokenAddress,
+  optBalance: validators_optBalance,
   amount: validators_amount
 };
 
 function initialFieldsStatuses(_input) {
   return {
-          tokenAddress: /* Pristine */0,
+          optBalance: /* Pristine */0,
           amount: /* Pristine */0
         };
 }
@@ -88,7 +108,7 @@ function initialState(input) {
   return {
           input: input,
           fieldsStatuses: {
-            tokenAddress: /* Pristine */0,
+            optBalance: /* Pristine */0,
             amount: /* Pristine */0
           },
           collectionsStatuses: undefined,
@@ -98,24 +118,24 @@ function initialState(input) {
 }
 
 function validateForm(input, validators, fieldsStatuses) {
-  var match = fieldsStatuses.tokenAddress;
-  var match_0 = match ? match._0 : Curry._1(validators.tokenAddress.validate, input);
+  var match = fieldsStatuses.optBalance;
+  var match_0 = match ? match._0 : Curry._1(validators.optBalance.validate, input);
   var match$1 = fieldsStatuses.amount;
   var match_0$1 = match$1 ? match$1._0 : Curry._1(validators.amount.validate, input);
-  var tokenAddressResult = match_0;
-  var tokenAddressResult$1;
-  if (tokenAddressResult.TAG === /* Ok */0) {
+  var optBalanceResult = match_0;
+  var optBalanceResult$1;
+  if (optBalanceResult.TAG === /* Ok */0) {
     var amountResult = match_0$1;
     if (amountResult.TAG === /* Ok */0) {
       return {
               TAG: 0,
               output: {
                 amount: amountResult._0,
-                tokenAddress: tokenAddressResult._0
+                optBalance: optBalanceResult._0
               },
               fieldsStatuses: {
-                tokenAddress: {
-                  _0: tokenAddressResult,
+                optBalance: {
+                  _0: optBalanceResult,
                   _1: /* Shown */0,
                   [Symbol.for("name")]: "Dirty"
                 },
@@ -129,15 +149,15 @@ function validateForm(input, validators, fieldsStatuses) {
               [Symbol.for("name")]: "Valid"
             };
     }
-    tokenAddressResult$1 = tokenAddressResult;
+    optBalanceResult$1 = optBalanceResult;
   } else {
-    tokenAddressResult$1 = tokenAddressResult;
+    optBalanceResult$1 = optBalanceResult;
   }
   return {
           TAG: 1,
           fieldsStatuses: {
-            tokenAddress: {
-              _0: tokenAddressResult$1,
+            optBalance: {
+              _0: optBalanceResult$1,
               _1: /* Shown */0,
               [Symbol.for("name")]: "Dirty"
             },
@@ -159,11 +179,11 @@ function useForm(initialInput, onSubmit) {
   var match = Formality__ReactUpdate.useReducer(memoizedInitialState, (function (state, action) {
           if (typeof action === "number") {
             switch (action) {
-              case /* BlurTokenAddressField */0 :
-                  var result = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.tokenAddress, validators_tokenAddress, (function (status) {
+              case /* BlurOptBalanceField */0 :
+                  var result = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.optBalance, validators_optBalance, (function (status) {
                           var init = state.fieldsStatuses;
                           return {
-                                  tokenAddress: status,
+                                  optBalance: status,
                                   amount: init.amount
                                 };
                         }));
@@ -186,7 +206,7 @@ function useForm(initialInput, onSubmit) {
                   var result$1 = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.amount, validators_amount, (function (status) {
                           var init = state.fieldsStatuses;
                           return {
-                                  tokenAddress: init.tokenAddress,
+                                  optBalance: init.optBalance,
                                   amount: status
                                 };
                         }));
@@ -317,16 +337,16 @@ function useForm(initialInput, onSubmit) {
             }
           } else {
             switch (action.TAG | 0) {
-              case /* UpdateTokenAddressField */0 :
+              case /* UpdateOptBalanceField */0 :
                   var nextInput = Curry._1(action._0, state.input);
                   return {
                           TAG: 0,
                           _0: {
                             input: nextInput,
-                            fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput, state.fieldsStatuses.tokenAddress, state.submissionStatus, validators_tokenAddress, (function (status) {
+                            fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput, state.fieldsStatuses.optBalance, state.submissionStatus, validators_optBalance, (function (status) {
                                     var init = state.fieldsStatuses;
                                     return {
-                                            tokenAddress: status,
+                                            optBalance: status,
                                             amount: init.amount
                                           };
                                   })),
@@ -345,7 +365,7 @@ function useForm(initialInput, onSubmit) {
                             fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput$1, state.fieldsStatuses.amount, state.submissionStatus, validators_amount, (function (status) {
                                     var init = state.fieldsStatuses;
                                     return {
-                                            tokenAddress: init.tokenAddress,
+                                            optBalance: init.optBalance,
                                             amount: status
                                           };
                                   })),
@@ -363,7 +383,7 @@ function useForm(initialInput, onSubmit) {
                             _0: {
                               input: input,
                               fieldsStatuses: {
-                                tokenAddress: /* Pristine */0,
+                                optBalance: /* Pristine */0,
                                 amount: /* Pristine */0
                               },
                               collectionsStatuses: state.collectionsStatuses,
@@ -378,7 +398,7 @@ function useForm(initialInput, onSubmit) {
                             _0: {
                               input: state.input,
                               fieldsStatuses: {
-                                tokenAddress: /* Pristine */0,
+                                optBalance: /* Pristine */0,
                                 amount: /* Pristine */0
                               },
                               collectionsStatuses: state.collectionsStatuses,
@@ -457,13 +477,13 @@ function useForm(initialInput, onSubmit) {
   var tmp;
   tmp = typeof match$1 === "number" || match$1.TAG !== /* Submitting */0 ? false : true;
   return {
-          updateTokenAddress: (function (nextInputFn, nextValue) {
+          updateOptBalance: (function (nextInputFn, nextValue) {
               return Curry._1(dispatch, {
                           TAG: 0,
                           _0: (function (__x) {
                               return Curry._2(nextInputFn, __x, nextValue);
                             }),
-                          [Symbol.for("name")]: "UpdateTokenAddressField"
+                          [Symbol.for("name")]: "UpdateOptBalanceField"
                         });
             }),
           updateAmount: (function (nextInputFn, nextValue) {
@@ -475,19 +495,19 @@ function useForm(initialInput, onSubmit) {
                           [Symbol.for("name")]: "UpdateAmountField"
                         });
             }),
-          blurTokenAddress: (function (param) {
-              return Curry._1(dispatch, /* BlurTokenAddressField */0);
+          blurOptBalance: (function (param) {
+              return Curry._1(dispatch, /* BlurOptBalanceField */0);
             }),
           blurAmount: (function (param) {
               return Curry._1(dispatch, /* BlurAmountField */1);
             }),
-          tokenAddressResult: Formality.exposeFieldResult(state.fieldsStatuses.tokenAddress),
+          optBalanceResult: Formality.exposeFieldResult(state.fieldsStatuses.optBalance),
           amountResult: Formality.exposeFieldResult(state.fieldsStatuses.amount),
           input: state.input,
           status: state.formStatus,
           dirty: (function (param) {
               var match = state.fieldsStatuses;
-              if (match.tokenAddress || match.amount) {
+              if (match.optBalance || match.amount) {
                 return true;
               } else {
                 return false;
@@ -524,7 +544,7 @@ function useForm(initialInput, onSubmit) {
         };
 }
 
-var Erc20ApproveForm = {
+var AdminMintForm = {
   validators: validators,
   initialFieldsStatuses: initialFieldsStatuses,
   initialCollectionsStatuses: undefined,
@@ -533,102 +553,162 @@ var Erc20ApproveForm = {
   useForm: useForm
 };
 
-var selectOpts = ["DAI"];
-
 var initialInput = {
-  amount: "",
-  tokenAddress: "DAI"
+  amount: {
+    optAmountApproved: undefined,
+    amount: ""
+  },
+  optBalance: undefined
 };
 
-function ApproveDai(Props) {
+function MintShort(Props) {
+  var marketIndex = Props.marketIndex;
   var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
-  var longShortAddress = Config.useLongShortAddress(undefined);
+  var match$1 = ContractActions.useContractFunction(signer);
+  var setTxState2 = match$1[2];
+  var txState2 = match$1[1];
+  var contractExecutionHandler2 = match$1[0];
+  var match$2 = React.useState(function () {
+        return function (param) {
+          
+        };
+      });
+  var setFunctionToExecuteOnce = match$2[1];
+  var functionToExecuteOnce = match$2[0];
+  var shortShortContractAddress = Config.useLongShortAddress(undefined);
+  var daiAddress = Config.useDaiAddress(undefined);
+  var match$3 = ContractHooks.useERC20ApprovedRefresh(daiAddress, shortShortContractAddress);
+  var optAmountApproved = match$3.data;
   var form = useForm(initialInput, (function (param, _form) {
-          var tokenAddress = param.tokenAddress;
-          var amount = param.amount;
-          return Curry._2(contractExecutionHandler, (function (param) {
-                        return Contracts.Erc20.make(tokenAddress, param);
+          var match = param.amount;
+          var amount = match.amount;
+          var mintFunction = function (param) {
+            return Curry._2(contractExecutionHandler, (function (param) {
+                          return Contracts.LongShort.make(shortShortContractAddress, param);
+                        }), (function (param) {
+                          return param.mintShort(marketIndex, amount);
+                        }));
+          };
+          if (!match.requiresApproval) {
+            return mintFunction(undefined);
+          }
+          Curry._1(setFunctionToExecuteOnce, (function (param) {
+                  return mintFunction;
+                }));
+          var arg = amount.mul(Ethers$1.BigNumber.from("2"));
+          return Curry._2(contractExecutionHandler2, (function (param) {
+                        return Contracts.Erc20.make(daiAddress, param);
                       }), (function (param) {
-                        return param.approve(longShortAddress, amount);
+                        return param.approve(shortShortContractAddress, arg);
                       }));
         }));
-  var match$1 = form.amountResult;
+  var match$4 = ContractHooks.useDaiBalanceRefresh(undefined);
+  var optBalance = match$4.data;
+  React.useEffect((function () {
+          Curry._2(form.updateAmount, (function (input, param) {
+                  return {
+                          amount: {
+                            optAmountApproved: param.optAmountApproved,
+                            amount: input.amount.amount
+                          },
+                          optBalance: input.optBalance
+                        };
+                }), {
+                optAmountApproved: optAmountApproved,
+                amount: ""
+              });
+          
+        }), [optAmountApproved]);
+  React.useEffect((function () {
+          Curry._2(form.updateOptBalance, (function (input, value) {
+                  return {
+                          amount: input.amount,
+                          optBalance: value
+                        };
+                }), optBalance);
+          
+        }), [optBalance]);
+  React.useEffect((function () {
+          if (typeof txState2 !== "number" && txState2.TAG === /* Complete */2) {
+            Curry._1(functionToExecuteOnce, undefined);
+            Curry._1(setTxState2, (function (param) {
+                    return /* UnInitialised */0;
+                  }));
+          }
+          
+        }), [txState2]);
+  var match$5 = form.amountResult;
+  var requiresApprove;
+  var exit = 0;
+  if (match$5 !== undefined && match$5.TAG === /* Ok */0) {
+    requiresApprove = match$5._0.requiresApproval;
+  } else {
+    exit = 1;
+  }
+  if (exit === 1) {
+    requiresApprove = optAmountApproved !== undefined && Caml_option.valFromOption(optAmountApproved).gte(Ethers.Utils.parseEtherUnsafe("1")) ? false : true;
+  }
+  var submitButtonText = requiresApprove ? "Approve and Mint" : "Mint";
+  var match$6 = form.amountResult;
   var tmp;
-  tmp = match$1 !== undefined ? (
-      match$1.TAG === /* Ok */0 ? React.createElement("div", {
+  tmp = match$6 !== undefined ? (
+      match$6.TAG === /* Ok */0 ? React.createElement("div", {
               className: "text-green-600"
             }, "✓") : React.createElement("div", {
               className: "text-red-600"
-            }, match$1._0)
+            }, match$6._0)
     ) : null;
-  var match$2 = form.status;
+  var match$7 = form.status;
   return React.createElement(TxTemplate.make, {
-              children: React.createElement(Form.make, {
-                    className: "",
-                    onSubmit: (function (param) {
-                        return Curry._1(form.submit, undefined);
-                      }),
-                    children: React.createElement("div", {
-                          className: ""
-                        }, React.createElement("h2", {
-                              className: "text-xl"
-                            }, "Approve LongShort to spend your tokens"), React.createElement("div", undefined, React.createElement("div", {
-                                  className: "block my-3"
-                                }, React.createElement("label", {
-                                      htmlFor: "tokenAddress"
-                                    }, "Choose the token: "), React.createElement("select", {
-                                      id: "tokenAddress",
-                                      disabled: form.submitting,
-                                      name: "tokenAddress",
-                                      onBlur: (function (param) {
-                                          return Curry._1(form.blurAmount, undefined);
-                                        }),
-                                      onChange: (function ($$event) {
-                                          return Curry._2(form.updateTokenAddress, (function (_input, value) {
-                                                        return {
-                                                                amount: _input.amount,
-                                                                tokenAddress: value
-                                                              };
-                                                      }), $$event.target.value);
-                                        })
-                                    }, Belt_Array.map(selectOpts, (function (selectOptName) {
-                                            return React.createElement("option", {
-                                                        key: selectOptName
-                                                      }, selectOptName);
-                                          })))), React.createElement("label", {
-                                  htmlFor: "amount"
-                                }, "Amount: "), React.createElement("input", {
-                                  className: "border-2 border-grey-500",
-                                  id: "amount",
-                                  disabled: form.submitting,
-                                  type: "text",
-                                  value: form.input.amount,
-                                  onBlur: (function (param) {
-                                      return Curry._1(form.blurAmount, undefined);
-                                    }),
-                                  onChange: (function ($$event) {
-                                      return Curry._2(form.updateAmount, (function (_input, value) {
-                                                    return {
-                                                            amount: value,
-                                                            tokenAddress: _input.tokenAddress
-                                                          };
-                                                  }), $$event.target.value);
-                                    })
-                                }), tmp), React.createElement("div", undefined, React.createElement("button", {
-                                  className: "text-lg disabled:opacity-50 bg-green-500 rounded-lg",
-                                  disabled: form.submitting
-                                }, form.submitting ? "Submitting..." : "Submit"), typeof match$2 === "number" && match$2 !== 0 ? React.createElement("div", {
-                                    className: Cn.fromList({
-                                          hd: "form-status",
-                                          tl: {
-                                            hd: "success",
-                                            tl: /* [] */0
-                                          }
-                                        })
-                                  }, "✓ Finished Approving") : null))
+              children: React.createElement(TxTemplate.make, {
+                    children: React.createElement(Form.make, {
+                          className: "",
+                          onSubmit: (function (param) {
+                              return Curry._1(form.submit, undefined);
+                            }),
+                          children: React.createElement("div", {
+                                className: ""
+                              }, React.createElement("h2", {
+                                    className: "text-xl"
+                                  }, "Mint Short Tokens"), React.createElement("div", undefined, React.createElement("label", {
+                                        htmlFor: "amount"
+                                      }, "Amount: "), React.createElement("input", {
+                                        className: "border-2 border-grey-500",
+                                        id: "amount",
+                                        disabled: form.submitting,
+                                        type: "text",
+                                        value: form.input.amount.amount,
+                                        onBlur: (function (param) {
+                                            return Curry._1(form.blurAmount, undefined);
+                                          }),
+                                        onChange: (function ($$event) {
+                                            return Curry._2(form.updateAmount, (function (input, value) {
+                                                          return {
+                                                                  amount: value,
+                                                                  optBalance: input.optBalance
+                                                                };
+                                                        }), {
+                                                        optAmountApproved: optAmountApproved,
+                                                        amount: $$event.target.value
+                                                      });
+                                          })
+                                      }), tmp), React.createElement("div", undefined, React.createElement("button", {
+                                        className: "text-lg disabled:opacity-50 bg-green-500 rounded-lg",
+                                        disabled: form.submitting
+                                      }, form.submitting ? "Submitting..." : submitButtonText), typeof match$7 === "number" && match$7 !== 0 ? React.createElement("div", {
+                                          className: Cn.fromList({
+                                                hd: "form-status",
+                                                tl: {
+                                                  hd: "success",
+                                                  tl: /* [] */0
+                                                }
+                                              })
+                                        }, "✓ Finished Minting") : null))
+                        }),
+                    txState: txState2
                   }),
               txState: match[1],
               resetTxState: (function (param) {
@@ -640,11 +720,10 @@ function ApproveDai(Props) {
             });
 }
 
-var make = ApproveDai;
+var make = MintShort;
 
 export {
-  Erc20ApproveForm ,
-  selectOpts ,
+  AdminMintForm ,
   initialInput ,
   make ,
   

@@ -4,14 +4,14 @@ import * as Cn from "re-classnames/src/Cn.js";
 import * as Form from "./Form.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as Ethers from "../../ethereum/Ethers.js";
-import * as Ethers$1 from "ethers";
-import * as Contracts from "../../ethereum/Contracts.js";
+import * as Config from "../../../Config.js";
+import * as Ethers from "../../../ethereum/Ethers.js";
+import * as Contracts from "../../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
-import * as TxTemplate from "../Ethereum/TxTemplate.js";
+import * as TxTemplate from "../../Ethereum/TxTemplate.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
-import * as ContractActions from "../../ethereum/ContractActions.js";
+import * as ContractActions from "../../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
 
 var validators = {
@@ -426,20 +426,23 @@ var initialInput = {
   amount: ""
 };
 
-function RedeemLong(Props) {
-  var longTokenAddress = Props.longTokenAddress;
+function RedeemSynth(Props) {
+  var isLong = Props.isLong;
+  var marketIndex = Props.marketIndex;
   var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
+  var longShortAddres = Config.useLongShortAddress(undefined);
   var form = useForm(initialInput, (function (param, _form) {
           var amount = param.amount;
-          var arg = Ethers$1.BigNumber.from("1");
           return Curry._2(contractExecutionHandler, (function (param) {
-                        return Contracts.LongShort.make(longTokenAddress, param);
-                      }), (function (param) {
-                        return param.redeemLong(arg, amount);
-                      }));
+                        return Contracts.LongShort.make(longShortAddres, param);
+                      }), isLong ? (function (param) {
+                          return param.redeemLong(marketIndex, amount);
+                        }) : (function (param) {
+                          return param.redeemShort(marketIndex, amount);
+                        }));
         }));
   var match$1 = form.amountResult;
   var tmp;
@@ -461,7 +464,9 @@ function RedeemLong(Props) {
                           className: ""
                         }, React.createElement("h2", {
                               className: "text-xl"
-                            }, "Redeem Long Tokens"), React.createElement("div", undefined, React.createElement("label", {
+                            }, "Redeem " + (
+                              isLong ? "LONG" : "SHORT"
+                            ) + " Tokens"), React.createElement("div", undefined, React.createElement("label", {
                                   htmlFor: "amount"
                                 }, "Amount: "), React.createElement("input", {
                                   className: "border-2 border-grey-500",
@@ -502,7 +507,7 @@ function RedeemLong(Props) {
             });
 }
 
-var make = RedeemLong;
+var make = RedeemSynth;
 
 export {
   LongRedeemForm ,

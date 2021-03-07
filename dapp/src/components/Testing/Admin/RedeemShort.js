@@ -4,15 +4,14 @@ import * as Cn from "re-classnames/src/Cn.js";
 import * as Form from "./Form.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as Config from "../../Config.js";
-import * as Ethers from "../../ethereum/Ethers.js";
-import * as Contracts from "../../ethereum/Contracts.js";
+import * as Ethers from "../../../ethereum/Ethers.js";
+import * as Ethers$1 from "ethers";
+import * as Contracts from "../../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
-import * as TxTemplate from "../Ethereum/TxTemplate.js";
+import * as TxTemplate from "../../Ethereum/TxTemplate.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
-import * as ContractHooks from "./ContractHooks.js";
-import * as ContractActions from "../../ethereum/ContractActions.js";
+import * as ContractActions from "../../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
 
 var validators = {
@@ -414,7 +413,7 @@ function useForm(initialInput, onSubmit) {
         };
 }
 
-var MintAndStakeForm = {
+var ShortRedeemForm = {
   validators: validators,
   initialFieldsStatuses: initialFieldsStatuses,
   initialCollectionsStatuses: undefined,
@@ -427,62 +426,43 @@ var initialInput = {
   amount: ""
 };
 
-function MintAndStake(Props) {
-  var marketIndex = Props.marketIndex;
-  var isLong = Props.isLong;
+function RedeemShort(Props) {
+  var shortTokenAddress = Props.shortTokenAddress;
   var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
-  var longShortContractAddress = Config.useLongShortAddress(undefined);
-  var daiAddress = Config.useDaiAddress(undefined);
-  var match$1 = ContractHooks.useERC20ApprovedRefresh(daiAddress, longShortContractAddress);
-  var optAmountApproved = match$1.data;
   var form = useForm(initialInput, (function (param, _form) {
           var amount = param.amount;
+          var arg = Ethers$1.BigNumber.from("1");
           return Curry._2(contractExecutionHandler, (function (param) {
-                        return Contracts.LongShort.make(longShortContractAddress, param);
-                      }), isLong ? (function (param) {
-                          return param.mintShortAndStake(marketIndex, amount);
-                        }) : (function (param) {
-                          return param.mintLongAndStake(marketIndex, amount);
-                        }));
+                        return Contracts.LongShort.make(shortTokenAddress, param);
+                      }), (function (param) {
+                        return param.redeemShort(arg, amount);
+                      }));
         }));
-  var submitButton = function (param) {
-    return React.createElement("button", {
-                className: "text-lg disabled:opacity-50 bg-green-500 rounded-lg",
-                disabled: form.submitting
-              }, form.submitting ? "Submitting..." : "Mint & Stake");
-  };
-  if (optAmountApproved === undefined) {
-    return React.createElement("p", undefined, "Loading approval");
-  }
-  var match$2 = form.amountResult;
+  var match$1 = form.amountResult;
   var tmp;
-  tmp = match$2 !== undefined ? (
-      match$2.TAG === /* Ok */0 ? React.createElement("div", {
+  tmp = match$1 !== undefined ? (
+      match$1.TAG === /* Ok */0 ? React.createElement("div", {
               className: "text-green-600"
             }, "✓") : React.createElement("div", {
               className: "text-red-600"
-            }, match$2._0)
+            }, match$1._0)
     ) : null;
-  var match$3 = form.amountResult;
-  var tmp$1;
-  tmp$1 = match$3 !== undefined && match$3.TAG === /* Ok */0 && !Caml_option.valFromOption(optAmountApproved).gte(match$3._0) ? React.createElement("p", undefined, "THIS IS MORE THAN YOU HAVE APPROVED") : submitButton(undefined);
-  var match$4 = form.status;
+  var match$2 = form.status;
   return React.createElement(TxTemplate.make, {
               children: React.createElement(Form.make, {
                     className: "",
                     onSubmit: (function (param) {
+                        console.log("temp");
                         return Curry._1(form.submit, undefined);
                       }),
                     children: React.createElement("div", {
                           className: ""
                         }, React.createElement("h2", {
                               className: "text-xl"
-                            }, "Mint & Stake " + (
-                              isLong ? "LONG" : "SHORT"
-                            ) + " Tokens"), React.createElement("div", undefined, React.createElement("label", {
+                            }, "Redeem Short Tokens"), React.createElement("div", undefined, React.createElement("label", {
                                   htmlFor: "amount"
                                 }, "Amount: "), React.createElement("input", {
                                   className: "border-2 border-grey-500",
@@ -500,7 +480,10 @@ function MintAndStake(Props) {
                                                           };
                                                   }), $$event.target.value);
                                     })
-                                }), tmp), React.createElement("div", undefined, tmp$1, typeof match$4 === "number" && match$4 !== 0 ? React.createElement("div", {
+                                }), tmp), React.createElement("div", undefined, React.createElement("button", {
+                                  className: "text-lg disabled:opacity-50 bg-green-500 rounded-lg",
+                                  disabled: form.submitting
+                                }, form.submitting ? "Submitting..." : "Submit"), typeof match$2 === "number" && match$2 !== 0 ? React.createElement("div", {
                                     className: Cn.fromList({
                                           hd: "form-status",
                                           tl: {
@@ -508,7 +491,7 @@ function MintAndStake(Props) {
                                             tl: /* [] */0
                                           }
                                         })
-                                  }, "✓ Finished Minting") : null))
+                                  }, "✓ Finished Redeeming") : null))
                   }),
               txState: match[1],
               resetTxState: (function (param) {
@@ -520,10 +503,10 @@ function MintAndStake(Props) {
             });
 }
 
-var make = MintAndStake;
+var make = RedeemShort;
 
 export {
-  MintAndStakeForm ,
+  ShortRedeemForm ,
   initialInput ,
   make ,
   
