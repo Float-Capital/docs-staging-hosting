@@ -69,7 +69,7 @@ module RootWithWeb3 = {
         if authorised && !triedLoginAlready {
           ignore(
             context.activate(. Web3Connectors.injected, () => (), true)->JsPromise.catch(_ => {
-              setTriedLoginAlready(_ => true)
+              setTriedLoginAlready(_ => true)->JsPromise.resolve
             }),
           )
           ()
@@ -109,7 +109,7 @@ module RootWithWeb3 = {
           library
           ->Ethers.Providers.getBalance(account)
           ->JsPromise.map(newBalance => dispatch(LoadAddress(account, newBalance)))
-          ->JsPromise.catch(_ => ())
+          ->JsPromise.catch(_ => JsPromise.resolve())
 
         None
       | _ => None
@@ -198,7 +198,7 @@ let useActivateConnector: unit => (connection, Web3Connectors.injectedType => un
         ->JsPromise.catch(error => {
           Js.log("Error connecting to network:")
           Js.log(error)
-          setConnectionStatus(_ => ErrorConnecting)
+          setConnectionStatus(_ => ErrorConnecting)->JsPromise.resolve
         })
       setConnectionStatus(_ => Connecting)
     },

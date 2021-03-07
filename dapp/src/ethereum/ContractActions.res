@@ -103,7 +103,7 @@ let useContractFunction = (~signer: Ethers.Wallet.t) => {
         })
         ->JsPromise.catch(error => {
           setTxState(_ => Failed)
-          Js.log(error)
+          Js.log(error)->JsPromise.resolve
         })
     },
     txState,
