@@ -1,4 +1,4 @@
-import Stake from "src/Stake";
+import StakeNew from "src/StakeNew";
 import Head from "next/head";
 
 export default function StakePage(props) {
@@ -12,7 +12,7 @@ export default function StakePage(props) {
           key="title"
         />
       </Head>
-      <Stake {...props} />
+      <StakeNew {...props} />
     </>
   );
 }
