@@ -9,9 +9,7 @@ function MarketCardSide(Props) {
   var isLong = Props.isLong;
   var value = Props.value;
   var beta = Props.beta;
-  return React.createElement("div", {
-              className: "w-1/4 flex items-center flex-grow text-sm flex-col"
-            }, React.createElement("h2", {
+  return React.createElement(React.Fragment, undefined, React.createElement("h2", {
                   className: "font-bold text-sm"
                 }, marketName, React.createElement("span", {
                       className: "text-xs"

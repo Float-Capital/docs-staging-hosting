@@ -1,4 +1,4 @@
-import Markets from "src/Markets";
+import Markets from "src/components/Markets/MarketsList";
 import Head from "next/head";
 
 export default function MarketsPage(props) {
