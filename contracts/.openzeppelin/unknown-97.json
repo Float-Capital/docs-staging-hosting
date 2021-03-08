@@ -1,0 +1,363 @@
+{
+  "manifestVersion": "3.1",
+  "impls": {
+    "16e35a1287a812b4f05f3e1de66f372d3baaab516a7ef1bf6f61e8f8487cd66b": {
+      "address": "0x8997dF3a03640dadE91618c309bb5480c4f74e92",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/utils/Initializable.sol"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/utils/Initializable.sol"
+          },
+          {
+            "contract": "Staker",
+            "label": "kFactorPeriods",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/Staker.sol"
+          },
+          {
+            "contract": "Staker",
+            "label": "kFactorInitialMultipliers",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/Staker.sol"
+          },
+          {
+            "contract": "Staker",
+            "label": "admin",
+            "type": "t_address",
+            "src": "contracts/Staker.sol"
+          },
+          {
+            "contract": "Staker",
+            "label": "floatCapital",
+            "type": "t_address",
+            "src": "contracts/Staker.sol"
+          },
+          {
+            "contract": "Staker",
+            "label": "floatPercentage",
+            "type": "t_uint16",
+            "src": "contracts/Staker.sol"
+          },
+          {
+            "contract": "Staker",
+            "label": "initialTimestamp",
+            "type": "t_uint256",
+            "src": "contracts/Staker.sol"
+          },
+          {
+            "contract": "Staker",
+            "label": "floatContract",
+            "type": "t_address",
+            "src": "contracts/Staker.sol"
+          },
+          {
+            "contract": "Staker",
+            "label": "floatToken",
+            "type": "t_address",
+            "src": "contracts/Staker.sol"
+          },
+          {
+            "contract": "Staker",
+            "label": "userAmountStaked",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/Staker.sol"
+          },
+          {
+            "contract": "Staker",
+            "label": "userIndexOfLastClaimedReward",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/Staker.sol"
+          },
+          {
+            "contract": "Staker",
+            "label": "syntheticValid",
+            "type": "t_mapping(unknown,t_bool)",
+            "src": "contracts/Staker.sol"
+          },
+          {
+            "contract": "Staker",
+            "label": "marketIndexOfToken",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/Staker.sol"
+          },
+          {
+            "contract": "Staker",
+            "label": "syntheticRewardParams",
+            "type": "t_mapping(unknown,t_struct(RewardState)6_storage)",
+            "src": "contracts/Staker.sol"
+          },
+          {
+            "contract": "Staker",
+            "label": "latestRewardIndex",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/Staker.sol"
+          }
+        ],
+        "types": {
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_mapping(unknown,t_uint256)": {
+            "label": "mapping(key => uint256)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_uint16": {
+            "label": "uint16"
+          },
+          "t_mapping(unknown,t_bool)": {
+            "label": "mapping(key => bool)"
+          },
+          "t_struct(RewardState)6_storage": {
+            "label": "RewardState",
+            "members": [
+              {
+                "label": "timestamp",
+                "type": "t_uint256"
+              },
+              {
+                "label": "accumulativeFloatPerToken",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_mapping(unknown,t_struct(RewardState)6_storage)": {
+            "label": "RewardState)"
+          }
+        }
+      }
+    },
+    "3017ec1cc6c3fc6099fd7b3b1bc74d087b24f3b7b02141b30c43d481990f2cf4": {
+      "address": "0xeFef1247b9f41b302751b276Dbd2A357078cd96d",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/utils/Initializable.sol"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/utils/Initializable.sol"
+          },
+          {
+            "contract": "Treasury_v0",
+            "label": "admin",
+            "type": "t_address",
+            "src": "contracts/Treasury_v0.sol"
+          }
+        ],
+        "types": {
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_address": {
+            "label": "address"
+          }
+        }
+      }
+    },
+    "df77a18560ee815b8734e4ac8366331bdcde9e05530c3462d043c18f3ae56d87": {
+      "address": "0xfEd7b3C0eAbD222Af451201a0719711fe26Dc7E1",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/utils/Initializable.sol"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/utils/Initializable.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "admin",
+            "type": "t_address",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "latestMarket",
+            "type": "t_uint256",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "marketExists",
+            "type": "t_mapping(unknown,t_bool)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "treasury",
+            "type": "t_address",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "tokenFactory",
+            "type": "t_address",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "staker",
+            "type": "t_address",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "longValue",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "shortValue",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "totalValueLockedInMarket",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "totalValueLockedInYieldManager",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "totalValueReservedForTreasury",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "assetPrice",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "longTokenPrice",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "shortTokenPrice",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "externalContractCounter",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "fundTokens",
+            "type": "t_mapping(unknown,t_address)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "yieldManagers",
+            "type": "t_mapping(unknown,t_address)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "oracleManagers",
+            "type": "t_mapping(unknown,t_address)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "longTokens",
+            "type": "t_mapping(unknown,t_address)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "shortTokens",
+            "type": "t_mapping(unknown,t_address)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "baseEntryFee",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "badLiquidityEntryFee",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "baseExitFee",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/LongShort.sol"
+          },
+          {
+            "contract": "LongShort",
+            "label": "badLiquidityExitFee",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/LongShort.sol"
+          }
+        ],
+        "types": {
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_mapping(unknown,t_bool)": {
+            "label": "mapping(key => bool)"
+          },
+          "t_mapping(unknown,t_uint256)": {
+            "label": "mapping(key => uint256)"
+          },
+          "t_mapping(unknown,t_address)": {
+            "label": "mapping(key => address)"
+          }
+        }
+      }
+    }
+  },
+  "admin": {
+    "address": "0xBA31775E8d4bd188D51d5a31592c618C797BdfE3"
+  }
+}

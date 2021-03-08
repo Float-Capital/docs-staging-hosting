@@ -8,9 +8,9 @@ build
 
 # Openzeppelin
 .openzeppelin/.session
-.openzeppelin/dev-*.json
-!.openzeppelin/dev-97.json
-!.openzeppelin/dev-321.json
+.openzeppelin/unknown-*.json
+!.openzeppelin/unknown-97.json
+!.openzeppelin/unknown-321.json
 
 # Secrets
 secretsManager.js

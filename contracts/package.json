@@ -9,10 +9,10 @@
     "test": "hardhat test",
     "coverage": "hardhat coverage",
     "clean": "rm -rf build/contracts/* artifacts cache",
-    "save-deployment": "/bin/bash -c 'mkdir -p ./buildsDeployed/deployed; \\cp ./build/contracts/{Dai,FloatToken,LongShort,Migrations,OracleManagerMock,Staker,TokenFactory,YieldManagerMock}.json ./buildsDeployed/deployed/'",
+    "save-deployment": "/bin/bash -c 'mkdir -p ./buildsDeployed/deployed; \\cp ./build/contracts/{FloatCapital_v0,FloatToken,LongShort,Migrations,Staker,TokenFactory,Treasury_v0,Dai}.json ./buildsDeployed/deployed/'",
     "prepair-upgrade": "npm run clean; mkdir -p ./build/contracts; cp -r ./buildsDeployed/deployed/* ./build/contracts/; npm run truffle-compile",
     "verify-contracts": "truffle run verify FloatToken LongShort@$LONGSHORT_IMPLEMENTATION Staker@$STAKER_IMPLEMENTATION FloatCapital_v0@$TREASURY_IMPLEMENTATIONTreasury_v0@$FLOAT_CAPITAL_IMPLEMENTATION FloatToken TokenFactory --network $NETWORK",
-    "update-testnet-contracts": "yarn clean ; rm -f .openzeppelin/dev-97.json; truffle migrate --network binanceTest --reset"
+    "update-testnet-contracts": "npm prepair-upgrade; rm -f .openzeppelin/unknown-{97,1337}.json; truffle migrate --network binanceTest --reset; mv .openzeppelin/unknown-1337.json .openzeppelin/unknown-97.json; npm save-deployment"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.0.8",
@@ -22,13 +22,13 @@
     "@openzeppelin/contracts": "4.0.0-beta.1",
     "@openzeppelin/contracts-upgradeable": "4.0.0-beta.0",
     "@openzeppelin/test-helpers": "^0.5.6",
-    "@openzeppelin/upgrades": "^2.8.0",
     "hardhat": "^2.0.9",
     "hardhat-gas-reporter": "^1.0.4",
     "solidity-coverage": "^0.7.14"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/truffle-upgrades": "^1.5.0",
     "@truffle/hdwallet-provider": "^1.2.1",
     "chai": "^4.2.0",
     "ethereum-waffle": "^3.0.0",
