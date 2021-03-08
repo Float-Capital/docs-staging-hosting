@@ -51,9 +51,9 @@ module.exports = async function(deployer, networkName, accounts) {
     initializer: "initialize",
   });
 
-  const staker = await deployProxy(Staker, {
+  const staker = await deployProxy(EmptyPlaceholderContract, {
     deployer,
-    initializer: false /* This is dangerous since someone else could initialize the staker inbetween us. At least we will know if this happens and the migration will fail.*/,
+    initializer: false,
   });
 
   const longShort = await deployProxy(
@@ -74,10 +74,12 @@ module.exports = async function(deployer, networkName, accounts) {
   });
 
   // Initialize here as there are circular contract dependencies.
-  await staker.initialize(
-    admin,
+  await upgradeProxy(staker.address, BoxV2, [
+  	admin,
     longShort.address,
     floatToken.address,
+    floatCapital.address,
+], Staker, { deployer });
     floatCapital.address,
     {
       from: admin,
