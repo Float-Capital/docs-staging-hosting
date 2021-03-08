@@ -3,23 +3,11 @@
 import * as React from "react";
 import * as StartTrading from "./components/UI/StartTrading.js";
 
-function Index$P(Props) {
-  var children = Props.children;
-  return React.createElement("p", {
-              className: "mb-2"
-            }, children);
-}
-
-var P = {
-  make: Index$P
-};
-
 function $$default(param) {
-  return React.createElement("div", undefined, React.createElement(StartTrading.make, {}));
+  return React.createElement(StartTrading.make, {});
 }
 
 export {
-  P ,
   $$default ,
   $$default as default,
   

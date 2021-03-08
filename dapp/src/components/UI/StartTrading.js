@@ -6,23 +6,17 @@ import * as RootProvider from "../../libraries/RootProvider.js";
 
 function StartTrading(Props) {
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
-  return React.createElement("div", undefined, React.createElement("div", {
-                  className: "screen-centered-container"
-                }, React.createElement("div", {
-                      className: "start-trading"
-                    }, React.createElement("div", {
-                          className: "floating-container"
-                        }, React.createElement("div", {
-                              className: "floating"
-                            }, React.createElement(Link, {
-                                  href: optCurrentUser !== undefined ? "/markets" : "/login?nextPath=/markets",
-                                  children: React.createElement("span", {
-                                        className: "floating-image-wrapper"
-                                      }, React.createElement("img", {
-                                            className: "start-trading",
-                                            src: "/img/start-trading.png"
-                                          }))
-                                }))))));
+  return React.createElement("div", {
+              className: "floating w-full"
+            }, React.createElement(Link, {
+                  href: optCurrentUser !== undefined ? "/markets" : "/login?nextPath=/markets",
+                  children: React.createElement("span", {
+                        className: "cursor-pointer opacity-70 w-full flex justify-center"
+                      }, React.createElement("img", {
+                            className: "p-4",
+                            src: "/img/start-trading.png"
+                          }))
+                }));
 }
 
 var Link$1;
