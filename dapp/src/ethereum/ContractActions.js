@@ -125,8 +125,7 @@ function useContractFunction(signer) {
                       Curry._1(setTxState, (function (param) {
                               return /* Failed */2;
                             }));
-                      console.log(error);
-                      
+                      return Promise.resolve((console.log(error), undefined));
                     }));
               
             }),

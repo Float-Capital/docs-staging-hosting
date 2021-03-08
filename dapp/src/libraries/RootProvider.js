@@ -77,9 +77,9 @@ function RootProvider$RootWithWeb3(Props) {
                   JsPromise.$$catch(context.activate(Web3Connectors.injected, (function (param) {
                               
                             }), true), (function (param) {
-                          return Curry._1(setTriedLoginAlready, (function (param) {
-                                        return true;
-                                      }));
+                          return Promise.resolve(Curry._1(setTriedLoginAlready, (function (param) {
+                                            return true;
+                                          })));
                         }));
                   return ;
                 } else {
@@ -139,7 +139,7 @@ function RootProvider$RootWithWeb3(Props) {
                                 [Symbol.for("name")]: "LoadAddress"
                               });
                   }), (function (param) {
-                  
+                  return Promise.resolve(undefined);
                 }));
           
         }), [
@@ -242,9 +242,9 @@ function useActivateConnector(param) {
                       }), (function (error) {
                       console.log("Error connecting to network:");
                       console.log(error);
-                      return Curry._1(setConnectionStatus, (function (param) {
-                                    return /* ErrorConnecting */3;
-                                  }));
+                      return Promise.resolve(Curry._1(setConnectionStatus, (function (param) {
+                                        return /* ErrorConnecting */3;
+                                      })));
                     }));
               return Curry._1(setConnectionStatus, (function (param) {
                             return /* Connecting */2;
