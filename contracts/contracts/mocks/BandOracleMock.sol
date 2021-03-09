@@ -3,7 +3,6 @@ pragma solidity 0.8.2;
 pragma abicoder v2;
 
 import "@openzeppelin/contracts-upgradeable/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
 
 import "../interfaces/IBandOracle.sol";
@@ -13,8 +12,6 @@ import "../interfaces/IBandOracle.sol";
  * to be set arbitrarily for testing.
  */
 contract BandOracleMock is IBandOracle, Initializable {
-    using SafeMathUpgradeable for uint256;
-
     // Admin contracts.
     address public admin;
 

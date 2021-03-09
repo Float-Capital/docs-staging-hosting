@@ -3,7 +3,6 @@ pragma solidity 0.8.2;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-upgradeable/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
 import "./interfaces/IYieldManager.sol";
 import "./interfaces/IVToken.sol";
@@ -16,8 +15,6 @@ import "./interfaces/IVToken.sol";
  *     see: https://docs.venus.io/docs/vtokens
  */
 contract YieldManagerVenus is IYieldManager, Initializable {
-    using SafeMathUpgradeable for uint256;
-
     // Admin contracts.
     address public admin;
     address public longShort;

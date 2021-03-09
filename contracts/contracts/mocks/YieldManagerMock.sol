@@ -2,7 +2,6 @@
 pragma solidity 0.8.2;
 
 import "@openzeppelin/contracts-upgradeable/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
 
 import "../interfaces/IYieldManager.sol";
@@ -13,8 +12,6 @@ import "../interfaces/IYieldManager.sol";
  * needs to be able to mint the underlying token to simulate yield.
  */
 contract YieldManagerMock is IYieldManager, Initializable {
-    using SafeMathUpgradeable for uint256;
-
     // Admin contracts.
     address public admin;
     address public longShort;
@@ -68,12 +65,11 @@ contract YieldManagerMock is IYieldManager, Initializable {
      * Adds the token's accrued yield to the token holdings.
      */
     function settle() public {
-        uint256 totalYieldRate =
-            yieldRate.mul(block.timestamp.sub(lastSettled));
-        uint256 totalYield = totalHeld.mul(totalYieldRate).div(yieldScale);
+        uint256 totalYieldRate = yieldRate * (block.timestamp - lastSettled);
+        uint256 totalYield = (totalHeld * totalYieldRate) / yieldScale;
 
         lastSettled = block.timestamp;
-        totalHeld = totalHeld.add(totalYield);
+        totalHeld = totalHeld + totalYield;
         token.mint(address(this), totalYield);
     }
 
@@ -81,10 +77,10 @@ contract YieldManagerMock is IYieldManager, Initializable {
      * Adds the given yield to the token holdings.
      */
     function settleWithYield(uint256 yield) public adminOnly {
-        uint256 totalYield = totalHeld.mul(yield).div(yieldScale);
+        uint256 totalYield = (totalHeld * yield) / yieldScale;
 
         lastSettled = block.timestamp;
-        totalHeld = totalHeld.add(totalYield);
+        totalHeld = totalHeld + totalYield;
         token.mint(address(this), totalYield);
     }
 
@@ -101,7 +97,7 @@ contract YieldManagerMock is IYieldManager, Initializable {
 
         // Transfer tokens to manager contract.
         token.transferFrom(longShort, address(this), amount);
-        totalHeld = totalHeld.add(amount);
+        totalHeld = totalHeld + amount;
     }
 
     function withdrawToken(uint256 amount) public override longShortOnly {
@@ -111,7 +107,7 @@ contract YieldManagerMock is IYieldManager, Initializable {
 
         // Transfer tokens back to LongShort contract.
         token.transfer(longShort, amount);
-        totalHeld = totalHeld.sub(amount);
+        totalHeld = totalHeld - amount;
     }
 
     function getTotalHeld() public override returns (uint256 amount) {

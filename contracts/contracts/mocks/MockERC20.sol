@@ -1,11 +1,9 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.2;
 
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "hardhat/console.sol";
 
 contract MockERC20 {
-    using SafeMathUpgradeable for uint256;
     address public steward;
 
     mapping(address => uint256) public _balances;
@@ -28,12 +26,12 @@ contract MockERC20 {
     }
 
     function mint(address user, uint256 amount) public returns (bool) {
-        _balances[user] = _balances[user].add(amount);
+        _balances[user] = _balances[user] + amount;
         return true;
     }
 
     function burnFrom(address user, uint256 amount) public {
-        _balances[user] = _balances[user].sub(amount);
+        _balances[user] = _balances[user] - amount;
     }
 
     function approve(address user, uint256 amount) external returns (bool) {
@@ -42,8 +40,8 @@ contract MockERC20 {
     }
 
     function transfer(address to, uint256 amount) external returns (bool) {
-        _balances[msg.sender] = _balances[msg.sender].sub(amount);
-        _balances[to] = _balances[to].add(amount);
+        _balances[msg.sender] = _balances[msg.sender] - amount;
+        _balances[to] = _balances[to] + amount;
         return true;
     }
 
@@ -60,9 +58,9 @@ contract MockERC20 {
         address to,
         uint256 amount
     ) external returns (bool) {
-        _balances[sender] = _balances[sender].sub(amount);
-        _balances[to] = _balances[to].add(amount);
-        _allowance[sender][to] = _allowance[sender][to].sub(amount);
+        _balances[sender] = _balances[sender] - amount;
+        _balances[to] = _balances[to] + amount;
+        _allowance[sender][to] = _allowance[sender][to] - amount;
         return true;
     }
 
