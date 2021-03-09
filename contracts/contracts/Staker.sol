@@ -19,8 +19,6 @@ import "./interfaces/IStaker.sol";
 
 /** @title Staker Contract (name is WIP) */
 contract Staker is IStaker, Initializable {
-    using SafeMathUpgradeable for uint256;
-
     struct RewardState {
         uint256 timestamp;
         uint256 accumulativeFloatPerToken;
@@ -276,8 +274,7 @@ contract Staker is IStaker, Initializable {
         // Compute new cumulative 'r' value total.
         return
             syntheticRewardParams[token][latestRewardIndex[token]]
-                .accumulativeFloatPerToken
-                .add(timeDelta.mul(floatPerSecond));
+                .accumulativeFloatPerToken + (timeDelta * floatPerSecond);
     }
 
     /*
@@ -361,23 +358,18 @@ contract Staker is IStaker, Initializable {
 
         uint256 accumDelta =
             syntheticRewardParams[tokenAddress][latestRewardIndex[tokenAddress]]
-                .accumulativeFloatPerToken
-                .sub(
+                .accumulativeFloatPerToken -
                 syntheticRewardParams[tokenAddress][
                     userIndexOfLastClaimedReward[tokenAddress][user]
                 ]
-                    .accumulativeFloatPerToken
-            );
+                    .accumulativeFloatPerToken;
 
-        return accumDelta.mul(userAmountStaked[tokenAddress][user]).div(1e24);
+        return (accumDelta * userAmountStaked[tokenAddress][user]) / 1e24;
     }
 
     function _mintFloat(address user, uint256 floatToMint) internal {
         floatToken.mint(user, floatToMint);
-        floatToken.mint(
-            floatCapital,
-            floatToMint.mul(floatPercentage).div(10000)
-        );
+        floatToken.mint(floatCapital, (floatToMint * floatPercentage) / 10000);
     }
 
     function mintAccumulatedFloat(address tokenAddress, address user) internal {
@@ -544,10 +536,9 @@ contract Staker is IStaker, Initializable {
             }
         }
 
-        userAmountStaked[tokenAddress][user] = userAmountStaked[tokenAddress][
-            user
-        ]
-            .add(amount);
+        userAmountStaked[tokenAddress][user] =
+            userAmountStaked[tokenAddress][user] +
+            amount;
 
         // This currently disavatages people who top-up?
         // Since they have capital locked that will skip a state of earning.
@@ -575,10 +566,9 @@ contract Staker is IStaker, Initializable {
         // state point that has been created. This is acceptable.
         mintAccumulatedFloat(tokenAddress, msg.sender);
 
-        userAmountStaked[tokenAddress][msg.sender] = userAmountStaked[
-            tokenAddress
-        ][msg.sender]
-            .sub(amount);
+        userAmountStaked[tokenAddress][msg.sender] =
+            userAmountStaked[tokenAddress][msg.sender] -
+            amount;
 
         ERC20PresetMinterPauserUpgradeable(tokenAddress).transfer(
             msg.sender,

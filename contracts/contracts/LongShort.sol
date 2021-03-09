@@ -3,7 +3,6 @@ pragma solidity 0.8.2;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
 import "./TokenFactory.sol";
@@ -70,8 +69,6 @@ import "./interfaces/IOracleManager.sol";
  * Remove safe Math library
  */
 contract LongShort is ILongShort, Initializable {
-    using SafeMathUpgradeable for uint256;
-
     ////////////////////////////////////
     //////// VARIABLES /////////////////
     ////////////////////////////////////
@@ -359,9 +356,9 @@ contract LongShort is ILongShort, Initializable {
      */
     function getLiquidFunds(uint256 marketIndex) public view returns (uint256) {
         return
-            totalValueLockedInMarket[marketIndex]
-                .add(totalValueReservedForTreasury[marketIndex])
-                .sub(totalValueLockedInYieldManager[marketIndex]);
+            totalValueLockedInMarket[marketIndex] +
+            totalValueReservedForTreasury[marketIndex] -
+            totalValueLockedInYieldManager[marketIndex];
     }
 
     /**
@@ -374,9 +371,8 @@ contract LongShort is ILongShort, Initializable {
             return TEN_TO_THE_18;
         } else {
             return
-                shortValue[marketIndex].mul(TEN_TO_THE_18).div(
-                    longValue[marketIndex]
-                );
+                (shortValue[marketIndex] * TEN_TO_THE_18) /
+                longValue[marketIndex];
         }
     }
 
@@ -389,9 +385,8 @@ contract LongShort is ILongShort, Initializable {
             return TEN_TO_THE_18;
         } else {
             return
-                longValue[marketIndex].mul(TEN_TO_THE_18).div(
-                    shortValue[marketIndex]
-                );
+                (longValue[marketIndex] * TEN_TO_THE_18) /
+                shortValue[marketIndex];
         }
     }
 
@@ -413,19 +408,17 @@ contract LongShort is ILongShort, Initializable {
 
         uint256 marketPcnt; // fixed-precision scale of 10000
         if (longValue[marketIndex] > shortValue[marketIndex]) {
-            marketPcnt = longValue[marketIndex]
-                .sub(shortValue[marketIndex])
-                .mul(10000)
-                .div(totalValueLockedInMarket[marketIndex]);
+            marketPcnt =
+                ((longValue[marketIndex] - shortValue[marketIndex]) * 10000) /
+                totalValueLockedInMarket[marketIndex];
         } else {
-            marketPcnt = shortValue[marketIndex]
-                .sub(longValue[marketIndex])
-                .mul(10000)
-                .div(totalValueLockedInMarket[marketIndex]);
+            marketPcnt =
+                ((shortValue[marketIndex] - longValue[marketIndex]) * 10000) /
+                totalValueLockedInMarket[marketIndex];
         }
 
-        marketAmount = marketPcnt.mul(amount).div(10000);
-        treasuryAmount = amount.sub(marketAmount);
+        marketAmount = (marketPcnt * amount) / 10000;
+        treasuryAmount = amount - marketAmount;
         require(amount == marketAmount + treasuryAmount);
 
         return (marketAmount, treasuryAmount);
@@ -443,20 +436,19 @@ contract LongShort is ILongShort, Initializable {
     {
         // Edge case: equal split when market is empty.
         if (longValue[marketIndex] == 0 && shortValue[marketIndex] == 0) {
-            longAmount = amount.div(2);
-            shortAmount = amount.sub(longAmount);
+            longAmount = amount / 2;
+            shortAmount = amount - longAmount;
             return (longAmount, shortAmount);
         }
 
         // The percentage value that a position receives depends on the amount
         // of total market value taken up by the _opposite_ position.
         uint256 longPcnt =
-            shortValue[marketIndex].mul(10000).div(
-                longValue[marketIndex] + shortValue[marketIndex]
-            );
+            (shortValue[marketIndex] * 10000) /
+                (longValue[marketIndex] + shortValue[marketIndex]);
 
-        longAmount = amount.mul(longPcnt).div(10000);
-        shortAmount = amount.sub(longAmount);
+        longAmount = (amount * longPcnt) / 10000;
+        shortAmount = amount - longAmount;
         return (longAmount, shortAmount);
     }
 
@@ -466,16 +458,16 @@ contract LongShort is ILongShort, Initializable {
     function _refreshTokensPrice(uint256 marketIndex) internal {
         uint256 longTokenSupply = longTokens[marketIndex].totalSupply();
         if (longTokenSupply > 0) {
-            longTokenPrice[marketIndex] = longValue[marketIndex]
-                .mul(TEN_TO_THE_18)
-                .div(longTokenSupply);
+            longTokenPrice[marketIndex] =
+                (longValue[marketIndex] * TEN_TO_THE_18) /
+                longTokenSupply;
         }
 
         uint256 shortTokenSupply = shortTokens[marketIndex].totalSupply();
         if (shortTokenSupply > 0) {
-            shortTokenPrice[marketIndex] = shortValue[marketIndex]
-                .mul(TEN_TO_THE_18)
-                .div(shortTokenSupply);
+            shortTokenPrice[marketIndex] =
+                (shortValue[marketIndex] * TEN_TO_THE_18) /
+                shortTokenSupply;
         }
 
         emit TokenPriceRefreshed(
@@ -501,8 +493,8 @@ contract LongShort is ILongShort, Initializable {
         // Splits mostly to the weaker position to incentivise balance.
         (uint256 longAmount, uint256 shortAmount) =
             getMarketSplit(marketIndex, marketAmount);
-        longValue[marketIndex] = longValue[marketIndex].add(longAmount);
-        shortValue[marketIndex] = shortValue[marketIndex].add(shortAmount);
+        longValue[marketIndex] = longValue[marketIndex] + longAmount;
+        shortValue[marketIndex] = shortValue[marketIndex] + shortAmount;
 
         emit FeesLevied(
             marketIndex,
@@ -516,9 +508,8 @@ contract LongShort is ILongShort, Initializable {
      */
     function _yieldMechanism(uint256 marketIndex) internal {
         uint256 amount =
-            yieldManagers[marketIndex].getTotalHeld().sub(
-                totalValueLockedInYieldManager[marketIndex]
-            );
+            yieldManagers[marketIndex].getTotalHeld() -
+                totalValueLockedInYieldManager[marketIndex];
 
         // Market gets a bigger share if the market is more imbalanced.
         (uint256 marketAmount, uint256 treasuryAmount) =
@@ -533,8 +524,8 @@ contract LongShort is ILongShort, Initializable {
         // Splits mostly to the weaker position to incentivise balance.
         (uint256 longAmount, uint256 shortAmount) =
             getMarketSplit(marketIndex, marketAmount);
-        longValue[marketIndex] = longValue[marketIndex].add(longAmount);
-        shortValue[marketIndex] = shortValue[marketIndex].add(shortAmount);
+        longValue[marketIndex] = longValue[marketIndex] + longAmount;
+        shortValue[marketIndex] = shortValue[marketIndex] + shortAmount;
     }
 
     // TODO fix with beta
@@ -551,57 +542,49 @@ contract LongShort is ILongShort, Initializable {
         uint256 valueChange = 0;
         // Long gains
         if (newPrice > assetPrice[marketIndex]) {
-            percentageChange = (newPrice.sub(assetPrice[marketIndex]))
-                .mul(TEN_TO_THE_18)
-                .div(assetPrice[marketIndex]);
+            percentageChange =
+                ((newPrice - assetPrice[marketIndex]) * TEN_TO_THE_18) /
+                assetPrice[marketIndex];
             if (percentageChange >= TEN_TO_THE_18) {
                 // More than 100% price movement, system liquidation.
-                longValue[marketIndex] = longValue[marketIndex].add(
-                    shortValue[marketIndex]
-                );
+                longValue[marketIndex] =
+                    longValue[marketIndex] +
+                    shortValue[marketIndex];
                 shortValue[marketIndex] = 0;
             } else {
                 if (getShortBeta(marketIndex) == TEN_TO_THE_18) {
-                    valueChange = shortValue[marketIndex]
-                        .mul(percentageChange)
-                        .div(TEN_TO_THE_18);
+                    valueChange =
+                        (shortValue[marketIndex] * percentageChange) /
+                        TEN_TO_THE_18;
                 } else {
-                    valueChange = longValue[marketIndex]
-                        .mul(percentageChange)
-                        .div(TEN_TO_THE_18);
+                    valueChange =
+                        (longValue[marketIndex] * percentageChange) /
+                        TEN_TO_THE_18;
                 }
-                longValue[marketIndex] = longValue[marketIndex].add(
-                    valueChange
-                );
-                shortValue[marketIndex] = shortValue[marketIndex].sub(
-                    valueChange
-                );
+                longValue[marketIndex] = longValue[marketIndex] + valueChange;
+                shortValue[marketIndex] = shortValue[marketIndex] - valueChange;
             }
         } else {
-            percentageChange = (assetPrice[marketIndex].sub(newPrice))
-                .mul(TEN_TO_THE_18)
-                .div(assetPrice[marketIndex]);
+            percentageChange =
+                ((assetPrice[marketIndex] - newPrice) * TEN_TO_THE_18) /
+                assetPrice[marketIndex];
             if (percentageChange >= TEN_TO_THE_18) {
-                shortValue[marketIndex] = shortValue[marketIndex].add(
-                    longValue[marketIndex]
-                );
+                shortValue[marketIndex] =
+                    shortValue[marketIndex] +
+                    longValue[marketIndex];
                 longValue[marketIndex] = 0;
             } else {
                 if (getShortBeta(marketIndex) == TEN_TO_THE_18) {
-                    valueChange = shortValue[marketIndex]
-                        .mul(percentageChange)
-                        .div(TEN_TO_THE_18);
+                    valueChange =
+                        (shortValue[marketIndex] * percentageChange) /
+                        TEN_TO_THE_18;
                 } else {
-                    valueChange = longValue[marketIndex]
-                        .mul(percentageChange)
-                        .div(TEN_TO_THE_18);
+                    valueChange =
+                        (longValue[marketIndex] * percentageChange) /
+                        TEN_TO_THE_18;
                 }
-                longValue[marketIndex] = longValue[marketIndex].sub(
-                    valueChange
-                );
-                shortValue[marketIndex] = shortValue[marketIndex].add(
-                    valueChange
-                );
+                longValue[marketIndex] = longValue[marketIndex] - valueChange;
+                shortValue[marketIndex] = shortValue[marketIndex] + valueChange;
             }
         }
     }
@@ -663,7 +646,7 @@ contract LongShort is ILongShort, Initializable {
 
         // Invariant: long/short values should never differ from total value.
         require(
-            longValue[marketIndex].add(shortValue[marketIndex]) ==
+            longValue[marketIndex] + shortValue[marketIndex] ==
                 totalValueLockedInMarket[marketIndex],
             "Total locked inconsistent"
         );
@@ -676,10 +659,9 @@ contract LongShort is ILongShort, Initializable {
         fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
 
         // Update global value state.
-        totalValueLockedInMarket[marketIndex] = totalValueLockedInMarket[
-            marketIndex
-        ]
-            .add(amount);
+        totalValueLockedInMarket[marketIndex] =
+            totalValueLockedInMarket[marketIndex] +
+            amount;
 
         // Transfer funds to the yield managers.
         // TODO: we could consider pooling funds in the LongShort contract and
@@ -707,10 +689,9 @@ contract LongShort is ILongShort, Initializable {
         fundTokens[marketIndex].transfer(msg.sender, amount);
 
         // Update market state.
-        totalValueLockedInMarket[marketIndex] = totalValueLockedInMarket[
-            marketIndex
-        ]
-            .sub(amount);
+        totalValueLockedInMarket[marketIndex] =
+            totalValueLockedInMarket[marketIndex] -
+            amount;
     }
 
     /*
@@ -780,12 +761,12 @@ contract LongShort is ILongShort, Initializable {
             penaltyRate = badLiquidityExitFee[marketIndex];
         }
 
-        uint256 baseFee = baseAmount.mul(baseRate).div(feeUnitsOfPrecision);
+        uint256 baseFee = (baseAmount * baseRate) / feeUnitsOfPrecision;
 
         uint256 penaltyFee =
-            penaltyAmount.mul(penaltyRate).div(feeUnitsOfPrecision);
+            (penaltyAmount * penaltyRate) / feeUnitsOfPrecision;
 
-        return baseFee.add(penaltyFee);
+        return baseFee + penaltyFee;
     }
 
     /**
@@ -829,7 +810,7 @@ contract LongShort is ILongShort, Initializable {
                 _getFeesForAmounts(
                     marketIndex,
                     amount,
-                    amount.sub(feeGap),
+                    amount - feeGap,
                     isMint
                 );
         }
@@ -902,7 +883,7 @@ contract LongShort is ILongShort, Initializable {
         // Deposit funds and compute fees.
         _depositFunds(marketIndex, amount);
         uint256 fees = _getFeesForAction(marketIndex, amount, true, true);
-        uint256 remaining = amount.sub(fees);
+        uint256 remaining = amount - fees;
 
         // Distribute fees across the market.
         _feesMechanism(marketIndex, fees);
@@ -910,9 +891,9 @@ contract LongShort is ILongShort, Initializable {
 
         // Mint long tokens with remaining value.
         uint256 tokens =
-            remaining.mul(TEN_TO_THE_18).div(longTokenPrice[marketIndex]);
+            (remaining * TEN_TO_THE_18) / longTokenPrice[marketIndex];
         longTokens[marketIndex].mint(transferTo, tokens);
-        longValue[marketIndex] = longValue[marketIndex].add(remaining);
+        longValue[marketIndex] = longValue[marketIndex] + remaining;
 
         emit LongMinted(
             marketIndex,
@@ -942,7 +923,7 @@ contract LongShort is ILongShort, Initializable {
         // Deposit funds and compute fees.
         _depositFunds(marketIndex, amount);
         uint256 fees = _getFeesForAction(marketIndex, amount, true, false);
-        uint256 remaining = amount.sub(fees);
+        uint256 remaining = amount - fees;
 
         // Distribute fees across the market.
         _feesMechanism(marketIndex, fees);
@@ -950,9 +931,9 @@ contract LongShort is ILongShort, Initializable {
 
         // Mint short tokens with remaining value.
         uint256 tokens =
-            remaining.mul(TEN_TO_THE_18).div(shortTokenPrice[marketIndex]);
+            (remaining * TEN_TO_THE_18) / shortTokenPrice[marketIndex];
         shortTokens[marketIndex].mint(transferTo, tokens);
-        shortValue[marketIndex] = shortValue[marketIndex].add(remaining);
+        shortValue[marketIndex] = shortValue[marketIndex] + remaining;
 
         emit ShortMinted(
             marketIndex,
@@ -987,15 +968,15 @@ contract LongShort is ILongShort, Initializable {
 
         // Compute fees.
         uint256 amount =
-            tokensToRedeem.mul(longTokenPrice[marketIndex]).div(TEN_TO_THE_18);
+            (tokensToRedeem * longTokenPrice[marketIndex]) / TEN_TO_THE_18;
         uint256 fees = _getFeesForAction(marketIndex, amount, false, true);
-        uint256 remaining = amount.sub(fees);
+        uint256 remaining = amount - fees;
 
         // Distribute fees across the market.
         _feesMechanism(marketIndex, fees);
 
         // Withdraw funds with remaining amount.
-        longValue[marketIndex] = longValue[marketIndex].sub(amount);
+        longValue[marketIndex] = longValue[marketIndex] - amount;
         _withdrawFunds(marketIndex, remaining);
         _refreshTokensPrice(marketIndex);
 
@@ -1027,15 +1008,15 @@ contract LongShort is ILongShort, Initializable {
 
         // Compute fees.
         uint256 amount =
-            tokensToRedeem.mul(shortTokenPrice[marketIndex]).div(TEN_TO_THE_18);
+            (tokensToRedeem * shortTokenPrice[marketIndex]) / TEN_TO_THE_18;
         uint256 fees = _getFeesForAction(marketIndex, amount, false, false);
-        uint256 remaining = amount.sub(fees);
+        uint256 remaining = amount - fees;
 
         // Distribute fees across the market.
         _feesMechanism(marketIndex, fees);
 
         // Withdraw funds with remaining amount.
-        shortValue[marketIndex] = shortValue[marketIndex].sub(amount);
+        shortValue[marketIndex] = shortValue[marketIndex] - amount;
         _withdrawFunds(marketIndex, remaining);
         _refreshTokensPrice(marketIndex);
 
