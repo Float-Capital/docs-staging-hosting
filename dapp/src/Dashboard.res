@@ -2,7 +2,7 @@ open DashboardLi.Props
 
 module Divider = {
   @react.component
-  let make = (~children) => <div className={"my-4 w-full md:w-1/3 px-3"}>{children}</div>
+  let make = (~children) => <div className={"my-4 w-full md:w-1/3 px-3 md:px-0 md:m-4"}>{children}</div>
 } 
 
 module Card = {
@@ -54,7 +54,7 @@ module TrendingStakes = {
 }
 
 let totalValueCard = (~totalValueLocked) => 
-  <div className={"mx-3 p-5 self-center text-center bg-white bg-opacity-75 rounded-lg shadow-lg"}>
+  <div className={"mx-3 p-5 md:mt-7 self-center text-center bg-white bg-opacity-75 rounded-lg shadow-lg"}>
     <span className="font-alphbeta text-xl">{"Total Value"->React.string}</span>
     <span className="text-sm">{` 🏦 of Float Protocol: `->React.string}</span>
     <span className="text-green-700">{`$${totalValueLocked->FormatMoney.formatEther}`->React.string}</span>

@@ -21,7 +21,7 @@ import * as DashboardStakeCard from "./components/UI/Dashboard/DashboardStakeCar
 function Dashboard$Divider(Props) {
   var children = Props.children;
   return React.createElement("div", {
-              className: "my-4 w-full md:w-1/3 px-3"
+              className: "my-4 w-full md:w-1/3 px-3 md:px-0 md:m-4"
             }, children);
 }
 
@@ -102,7 +102,7 @@ var TrendingStakes = {
 
 function totalValueCard(totalValueLocked) {
   return React.createElement("div", {
-              className: "mx-3 p-5 self-center text-center bg-white bg-opacity-75 rounded-lg shadow-lg"
+              className: "mx-3 p-5 md:mt-7 self-center text-center bg-white bg-opacity-75 rounded-lg shadow-lg"
             }, React.createElement("span", {
                   className: "font-alphbeta text-xl"
                 }, "Total Value"), React.createElement("span", {
