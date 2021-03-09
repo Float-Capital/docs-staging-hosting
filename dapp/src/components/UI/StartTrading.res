@@ -4,23 +4,15 @@ module Link = Next.Link
 let make = () => {
   let optCurrentUser = RootProvider.useCurrentUser()
 
-  <div>
-    <div className="screen-centered-container">
-      <div className="start-trading">
-        <div className="floating-container">
-          <div className="floating">
-            <Link
-              href={switch optCurrentUser {
-              | Some(_) => "/markets"
-              | None => "/login?nextPath=/markets"
-              }}>
-              <span className="floating-image-wrapper">
-                <img src="/img/start-trading.png" className="start-trading" />
-              </span>
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div className="floating w-full">
+    <Link
+      href={switch optCurrentUser {
+      | Some(_) => "/markets"
+      | None => "/login?nextPath=/markets"
+      }}>
+      <span className="cursor-pointer opacity-70 w-full flex justify-center">
+        <img src="/img/start-trading.png" className="p-4" />
+      </span>
+    </Link>
   </div>
 }
