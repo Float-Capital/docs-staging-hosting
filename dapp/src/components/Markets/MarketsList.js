@@ -14,7 +14,6 @@ import * as MiniLoader from "../UI/MiniLoader.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as FormatMoney from "../UI/FormatMoney.js";
 import * as Router from "next/router";
-import * as MarketCardSide from "../UI/MarketCard/MarketCardSide.js";
 
 function percentStr(n, outOf) {
   if (outOf.eq(CONSTANTS.zeroBN)) {
@@ -51,8 +50,50 @@ function MarketsList$MarketCard(Props) {
   var percentStrShort = (100.0 - Belt_Option.getExn(Belt_Float.fromString(percentStrLong))).toFixed(2);
   var longBeta = calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, true);
   var shortBeta = calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, false);
+  var marketPositionHeadings = function (isLong) {
+    return React.createElement("div", {
+                className: "flex flex-col items-center justify-center"
+              }, React.createElement("h2", {
+                    className: "font-bold text-sm"
+                  }, marketName, React.createElement("span", {
+                        className: "text-xs"
+                      }, isLong ? "↗️" : "↘️")), React.createElement("div", {
+                    className: "pt-2 mt-auto"
+                  }, React.createElement("h3", {
+                        className: "text-xs mt-1"
+                      }, React.createElement("span", {
+                            className: "font-bold"
+                          }, isLong ? "LONG" : "SHORT"), " Liquidity")));
+  };
+  var marketPositionValues = function (isLong) {
+    var value = FormatMoney.formatEther(isLong ? totalLockedLong : totalLockedShort);
+    var beta = isLong ? longBeta : shortBeta;
+    return React.createElement("div", {
+                className: "text-sm text-center m-auto"
+              }, React.createElement("div", {
+                    className: "text-2xl tracking-widest font-alphbeta my-3"
+                  }, "$" + value), React.createElement("span", {
+                    className: "font-bold"
+                  }, "Exposure"), React.createElement(Tooltip.make, {
+                    tip: "The impact " + marketName + " price movements have on " + (
+                      isLong ? "long" : "short"
+                    ) + " value"
+                  }), React.createElement("span", {
+                    className: "font-bold"
+                  }, ": "), beta + "%");
+  };
+  var liquidityRatio = function (param) {
+    return React.createElement("div", {
+                className: "w-full"
+              }, totalValueLocked.eq(CONSTANTS.zeroBN) ? null : React.createElement(MarketBar.make, {
+                      percentStrLong: percentStrLong,
+                      percentStrShort: percentStrShort
+                    }));
+  };
   var mintButtons = function (param) {
-    return React.createElement(React.Fragment, undefined, React.createElement(Button.make, {
+    return React.createElement("div", {
+                className: "flex w-full justify-around"
+              }, React.createElement(Button.make, {
                     onClick: (function (param) {
                         router.push("/mint?marketIndex=" + marketIndex.toString() + "&mintOption=long");
                         
@@ -80,12 +121,9 @@ function MarketsList$MarketCard(Props) {
                   className: "flex flex-wrap justify-center w-full"
                 }, React.createElement("div", {
                       className: "order-2 md:order-1 w-1/2 md:w-1/4 flex items-center flex grow flex-wrap flex-col"
-                    }, React.createElement(MarketCardSide.make, {
-                          marketName: marketName,
-                          isLong: true,
-                          value: totalLockedLong,
-                          beta: longBeta
-                        })), React.createElement("div", {
+                    }, marketPositionHeadings(true), React.createElement("div", {
+                          className: "md:block hidden"
+                        }, marketPositionValues(true))), React.createElement("div", {
                       className: "order-1 md:order-2 w-full md:w-1/2 flex items-center flex-col"
                     }, React.createElement("h2", {
                           className: "text-xs mt-1"
@@ -93,21 +131,19 @@ function MarketsList$MarketCard(Props) {
                               className: "font-bold"
                             }, "TOTAL"), " Liquidity"), React.createElement("div", {
                           className: "text-3xl font-alphbeta tracking-wider py-1"
-                        }, "$" + FormatMoney.formatEther(totalValueLocked)), totalValueLocked.eq(CONSTANTS.zeroBN) ? null : React.createElement(MarketBar.make, {
-                            percentStrLong: percentStrLong,
-                            percentStrShort: percentStrShort
-                          }), React.createElement("div", {
-                          className: "hidden md:flex w-full justify-around"
-                        }, mintButtons(undefined))), React.createElement("div", {
-                      className: "order-3 w-1/2 md:w-1/4 flex items-center flex-grow flex-wrap flex-col"
-                    }, React.createElement(MarketCardSide.make, {
-                          marketName: marketName,
-                          isLong: false,
-                          value: totalLockedShort,
-                          beta: shortBeta
-                        }))), React.createElement("div", {
-                  className: "flex md:hidden justify-around"
-                }, mintButtons(undefined)));
+                        }, "$" + FormatMoney.formatEther(totalValueLocked)), React.createElement("div", {
+                          className: "md:block hidden w-full"
+                        }, liquidityRatio(undefined), mintButtons(undefined))), React.createElement("div", {
+                      className: "order-3 w-1/2 md:w-1/4 flex-grow flex-wrap flex-col"
+                    }, marketPositionHeadings(false), React.createElement("div", {
+                          className: "md:block hidden"
+                        }, marketPositionValues(false)))), React.createElement("div", {
+                  className: "block md:hidden pt-5"
+                }, React.createElement("div", {
+                      className: "px-8"
+                    }, liquidityRatio(undefined)), React.createElement("div", {
+                      className: "flex md:hidden"
+                    }, marketPositionValues(true), marketPositionValues(false)), mintButtons(undefined)));
 }
 
 var MarketCard = {
@@ -133,7 +169,7 @@ function MarketsList$MarketsList(Props) {
       ]);
   var match = marketDetailsQuery.data;
   return React.createElement("div", {
-              className: "w-full max-w-4xl mx-auto"
+              className: "w-full max-w-4xl mx-auto px-3"
             }, marketDetailsQuery.loading ? React.createElement("div", {
                     className: "m-auto"
                   }, React.createElement(MiniLoader.make, {})) : (
