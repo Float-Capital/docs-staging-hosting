@@ -10,7 +10,7 @@ module StakeForm = %form(
 
         switch amount {
         | "" => Error("Amount is required")
-        | value when !(amountRegex->Js.Re.test_(value)) =>
+        | value if !(amountRegex->Js.Re.test_(value)) =>
           Error("Incorrect number format - please use '.' for floating points.")
         | amount =>
           Ethers.Utils.parseEther(~amount)->Option.mapWithDefault(
@@ -34,12 +34,8 @@ let useBalanceAndApproved = (~erc20Address, ~spender) => {
 }
 
 @react.component
-let make = (~tokenId) => {
-  let router = Next.Router.useRouter()
-  let tokenId = router.query->Js.Dict.get("tokenId")->Option.getWithDefault(tokenId)
+let make = (~tokenId, ~signer) => {
   let token = Queries.SyntheticToken.use({tokenId: tokenId})
-
-  let signer = ContractActions.useSignerExn()
 
   let (
     contractActionToCallAfterApproval,
@@ -131,17 +127,69 @@ let make = (~tokenId) => {
               amount: amount,
             }, (event->ReactEvent.Form.target)["value"])}
           placeholder={"Stake"}
-          onMaxClick={_ => form.updateAmount((_, amount) => {
-              amount: amount,
-            }, switch optTokenBalance {
-            | Some(tokenBalance) => tokenBalance->Ethers.Utils.formatEther
-            | _ => "0"
-            })}
+          onMaxClick={_ =>
+            form.updateAmount(
+              (_, amount) => {
+                amount: amount,
+              },
+              switch optTokenBalance {
+              | Some(tokenBalance) => tokenBalance->Ethers.Utils.formatEther
+              | _ => "0"
+              },
+            )}
         />
         <Button onClick={_ => ()} variant="large">
           {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
         </Button>
       </Form>
+    | {data: None, error: None, loading: false} => {
+        Js.log(
+          "You might think this is impossible, but depending on the situation it might not be!",
+        )
+        <> </>
+      }
+    | {data: Some({syntheticToken: None}), error: None, loading: false} => <>
+        {"this is not a valid token to stake"->React.string}
+      </>
+    }}
+  </>
+}
+
+@react.component
+let make = (~tokenId) => {
+  let token = Queries.SyntheticToken.use({tokenId: tokenId})
+
+  <>
+    {switch token {
+    | {loading: true} => <Loader />
+    | {error: Some(_error)} => {
+        Js.log("Unable to fetch token")
+        <> {"Unable to fetch token"->React.string} </>
+      }
+    | {data: Some({syntheticToken: Some(synthetic)})} =>
+      <form>
+        <div className="px-8 pt-2">
+          <div className="-mb-px flex justify-between">
+            <div
+              className="no-underline text-teal-dark border-b-2 border-teal-dark tracking-wide font-bold py-3 mr-8"
+              href="#">
+              {`Stake ↗️`->React.string}
+            </div>
+            <div
+              className="no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3"
+              href="#">
+              {`Unstake ↗️`->React.string}
+            </div>
+          </div>
+        </div>
+        <input
+          id="amount"
+          className="py-2 font-normal text-grey-darkest w-full py-1 px-2 outline-none text-md text-gray-600"
+          type_="text"
+          disabled={true}
+        />
+        <Button onClick={_ => ()} variant="large"> {`Login to`} </Button>
+      </form>
     | {data: None, error: None, loading: false} => {
         Js.log(
           "You might think this is impossible, but depending on the situation it might not be!",

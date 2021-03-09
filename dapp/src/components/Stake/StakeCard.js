@@ -136,14 +136,14 @@ function StakeCard(Props) {
                           className: "w-full flex justify-around"
                         }, React.createElement(Button.make, {
                               onClick: (function (param) {
-                                  router.push("/stake?tokenId=" + longTokenAddress);
+                                  router.push("/stake?tokenAddress=" + longTokenAddress);
                                   
                                 }),
                               children: "Stake Long",
                               variant: "small"
                             }), React.createElement(Button.make, {
                               onClick: (function (param) {
-                                  router.push("/stake?tokenId=" + shortTokenAddress);
+                                  router.push("/stake?tokenAddress=" + shortTokenAddress);
                                   
                                 }),
                               children: "Stake Short",
