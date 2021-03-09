@@ -60,26 +60,71 @@ module MarketCard = {
       ~isLong=false,
     )
 
-    let mintButtons = () => <>
-      <Button
-        onClick={_ => {
-          router->Next.Router.push(
-            `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&mintOption=long`,
-          )
+    let marketPositionHeadings = (~isLong) =>
+      <div className="flex flex-col items-center justify-center">
+        <h2 className="font-bold text-sm">
+          {marketName->React.string}
+          <span className="text-xs">
+            {isLong ? `↗️`->React.string : `↘️`->React.string}
+          </span>
+        </h2>
+        <div className="pt-2 mt-auto">
+          <h3 className="text-xs mt-1">
+            <span className="font-bold">
+              {isLong ? "LONG"->React.string : "SHORT"->React.string}
+            </span>
+            {" Liquidity"->React.string}
+          </h3>
+        </div>
+      </div>
+
+    let marketPositionValues = (~isLong) => {
+      let value = (isLong ? totalLockedLong : totalLockedShort)->FormatMoney.formatEther
+      let beta = isLong ? longBeta : shortBeta
+      <div className="text-sm text-center m-auto">
+        <div className="text-2xl tracking-widest font-alphbeta my-3">
+          {`$${value}`->React.string}
+        </div>
+        <span className="font-bold"> {`Exposure`->React.string} </span>
+        <Tooltip
+          tip={`The impact ${marketName} price movements have on ${isLong
+              ? "long"
+              : "short"} value`}
+        />
+        <span className="font-bold"> {`: `->React.string} </span>
+        {`${beta}%`->React.string}
+      </div>
+    }
+
+    let liquidityRatio = () =>
+      <div className={`w-full`}>
+        {switch !(totalValueLocked->Ethers.BigNumber.eq(CONSTANTS.zeroBN)) {
+        | true => <MarketBar percentStrLong={percentStrLong} percentStrShort={percentStrShort} />
+        | false => React.null
         }}
-        variant="small">
-        "Mint Long"
-      </Button>
-      <Button
-        onClick={_ => {
-          router->Next.Router.push(
-            `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&mintOption=short`,
-          )
-        }}
-        variant="small">
-        "Mint Short"
-      </Button>
-    </>
+      </div>
+
+    let mintButtons = () =>
+      <div className={`flex w-full justify-around`}>
+        <Button
+          onClick={_ => {
+            router->Next.Router.push(
+              `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&mintOption=long`,
+            )
+          }}
+          variant="small">
+          "Mint Long"
+        </Button>
+        <Button
+          onClick={_ => {
+            router->Next.Router.push(
+              `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&mintOption=short`,
+            )
+          }}
+          variant="small">
+          "Mint Short"
+        </Button>
+      </div>
 
     <div className="p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg">
       <div className="flex justify-center w-full my-1">
@@ -90,9 +135,8 @@ module MarketCard = {
       <div className="flex flex-wrap justify-center w-full">
         <div
           className="order-2 md:order-1 w-1/2 md:w-1/4 flex items-center flex grow flex-wrap flex-col">
-          <MarketCardSide
-            marketName={marketName} isLong={true} value={totalLockedLong} beta={longBeta}
-          />
+          {marketPositionHeadings(~isLong={true})}
+          <div className="md:block hidden"> {marketPositionValues(~isLong={true})} </div>
         </div>
         <div className="order-1 md:order-2 w-full md:w-1/2 flex items-center flex-col">
           <h2 className="text-xs mt-1">
@@ -102,19 +146,20 @@ module MarketCard = {
           <div className="text-3xl font-alphbeta tracking-wider py-1">
             {`$${totalValueLocked->FormatMoney.formatEther}`->React.string}
           </div>
-          {switch !(totalValueLocked->Ethers.BigNumber.eq(CONSTANTS.zeroBN)) {
-          | true => <MarketBar percentStrLong={percentStrLong} percentStrShort={percentStrShort} />
-          | false => React.null
-          }}
-          <div className="hidden md:flex w-full justify-around"> {mintButtons()} </div>
+          <div className="md:block hidden w-full"> {liquidityRatio()} {mintButtons()} </div>
         </div>
-        <div className="order-3 w-1/2 md:w-1/4 flex items-center flex-grow flex-wrap flex-col">
-          <MarketCardSide
-            marketName={marketName} isLong={false} value={totalLockedShort} beta={shortBeta}
-          />
+        <div className="order-3 w-1/2 md:w-1/4 flex-grow flex-wrap flex-col">
+          {marketPositionHeadings(~isLong={false})}
+          <div className="md:block hidden"> {marketPositionValues(~isLong={false})} </div>
         </div>
       </div>
-      <div className="flex md:hidden justify-around"> {mintButtons()} </div>
+      <div className="block md:hidden pt-5">
+        <div className="px-8"> {liquidityRatio()} </div>
+        <div className="flex md:hidden">
+          {marketPositionValues(~isLong={true})} {marketPositionValues(~isLong={false})}
+        </div>
+        {mintButtons()}
+      </div>
     </div>
   }
 }
@@ -124,7 +169,7 @@ module MarketsList = {
   let make = () => {
     let marketDetailsQuery = Queries.MarketDetails.use()
 
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto px-3">
       {switch marketDetailsQuery {
       | {loading: true} => <div className="m-auto"> <MiniLoader /> </div>
       | {error: Some(_error)} => "Error loading data"->React.string
