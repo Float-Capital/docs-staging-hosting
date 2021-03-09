@@ -10,11 +10,14 @@ var zeroBN = Ethers.BigNumber.from(0);
 
 var tenToThe18 = Ethers.BigNumber.from("1000000000000000000");
 
+var oneHundredEth = Ethers.BigNumber.from("100000000000000000000");
+
 export {
   zeroAddressStr ,
   zeroAddress ,
   zeroBN ,
   tenToThe18 ,
+  oneHundredEth ,
   
 }
 /* zeroAddress Not a pure module */
