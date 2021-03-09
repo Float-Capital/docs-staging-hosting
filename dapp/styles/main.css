@@ -90,6 +90,10 @@ body {
   margin: 0.8rem 0rem;
 }
 
+.float-button-outer-container-tiny {
+  margin: 0rem;
+}
+
 .float-button-container {
   margin-top: 2px;
   width: calc(100% - 0px);
@@ -103,6 +107,10 @@ body {
 .float-button-container-small {
   transform: translate(4px, 4px) !important;
   padding: 0.6rem -1rem 0.6rem 0.6rem;
+}
+
+.float-button-container-tiny {
+  transform: translate(0px, 0px) !important;
 }
 
 .float-button {
@@ -135,6 +143,12 @@ body {
   font-size: 12px !important;
   padding: 0.5rem 0.5rem !important;
   transform: translate(-2px, -2px) !important;
+}
+
+.float-button-tiny {
+  font-size: 8px !important;
+  padding: 0.2rem 0.2rem !important;
+  transform: translate(-4px, -4px) !important;
 }
 
 .float-button:hover {

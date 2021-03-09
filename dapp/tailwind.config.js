@@ -41,6 +41,7 @@ module.exports = {
       // "600px": "600px",
     },
     minWidth: {
+      "1/2": "50%",
       "3/4": "75%",
     },
     borderColor: (theme) => ({
