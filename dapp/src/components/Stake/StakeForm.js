@@ -2,20 +2,19 @@
 
 import * as Form from "../Testing/Admin/Form.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
+import * as Login from "../Login/Login.js";
 import * as React from "react";
 import * as Button from "../UI/Button.js";
 import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Loader from "../UI/Loader.js";
 import * as Ethers$1 from "ethers";
-import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
 import * as Queries from "../../data/Queries.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as AmountInput from "../UI/AmountInput.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
-import * as Router from "next/router";
 import * as ContractHooks from "../Testing/Admin/ContractHooks.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
@@ -441,10 +440,9 @@ function useBalanceAndApproved(erc20Address, spender) {
         ];
 }
 
-function StakeForm$1(Props) {
+function StakeForm$ConnectedStakeForm(Props) {
   var tokenId = Props.tokenId;
-  var router = Router.useRouter();
-  var tokenId$1 = Belt_Option.getWithDefault(Js_dict.get(router.query, "tokenId"), tokenId);
+  var signer = Props.signer;
   var token = Curry.app(Queries.SyntheticToken.use, [
         undefined,
         undefined,
@@ -460,10 +458,9 @@ function StakeForm$1(Props) {
         undefined,
         undefined,
         {
-          tokenId: tokenId$1
+          tokenId: tokenId
         }
       ]);
-  var signer = ContractActions.useSignerExn(undefined);
   var match = React.useState(function () {
         return function (param) {
           
@@ -478,7 +475,7 @@ function StakeForm$1(Props) {
   var txStateApprove = match$2[1];
   var contractExecutionHandlerApprove = match$2[0];
   var stakerContractAddress = Config.useStakerAddress(undefined);
-  var match$3 = useBalanceAndApproved(Ethers$1.utils.getAddress(tokenId$1), stakerContractAddress);
+  var match$3 = useBalanceAndApproved(Ethers$1.utils.getAddress(tokenId), stakerContractAddress);
   var optTokenBalance = match$3[0];
   React.useEffect((function () {
           if (typeof txStateApprove !== "number" && txStateApprove.TAG === /* Complete */2) {
@@ -492,7 +489,7 @@ function StakeForm$1(Props) {
   var form = useForm(initialInput, (function (param, _form) {
           var amount = param.amount;
           var stakeAndEarnImmediatlyFunction = function (param) {
-            var arg = Ethers$1.utils.getAddress(tokenId$1);
+            var arg = Ethers$1.utils.getAddress(tokenId);
             return Curry._2(contractExecutionHandler, (function (param) {
                           return Contracts.Staker.make(stakerContractAddress, param);
                         }), (function (param) {
@@ -502,7 +499,7 @@ function StakeForm$1(Props) {
           Curry._1(setContractActionToCallAfterApproval, (function (param) {
                   return stakeAndEarnImmediatlyFunction;
                 }));
-          var partial_arg = Ethers$1.utils.getAddress(tokenId$1);
+          var partial_arg = Ethers$1.utils.getAddress(tokenId);
           var arg = amount.mul(Ethers$1.BigNumber.from("2"));
           return Curry._2(contractExecutionHandlerApprove, (function (param) {
                         return Contracts.Erc20.make(partial_arg, param);
@@ -571,12 +568,102 @@ function StakeForm$1(Props) {
   return React.createElement(React.Fragment, undefined, tmp);
 }
 
+var ConnectedStakeForm = {
+  make: StakeForm$ConnectedStakeForm
+};
+
+function StakeForm$1(Props) {
+  var tokenId = Props.tokenId;
+  var token = Curry.app(Queries.SyntheticToken.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          tokenId: tokenId
+        }
+      ]);
+  var match = React.useState(function () {
+        return false;
+      });
+  var setShowLogin = match[1];
+  var signer = ContractActions.useSigner(undefined);
+  if (signer !== undefined) {
+    return React.createElement(StakeForm$ConnectedStakeForm, {
+                tokenId: tokenId,
+                signer: signer
+              });
+  }
+  if (match[0]) {
+    return React.createElement(Login.make, {});
+  }
+  var match$1 = token.data;
+  if (token.error !== undefined) {
+    console.log("Unable to fetch token");
+    return React.createElement(React.Fragment, undefined, "Unable to fetch token");
+  }
+  if (!token.loading) {
+    if (match$1 !== undefined) {
+      if (match$1.syntheticToken === undefined) {
+        return React.createElement(React.Fragment, undefined, "Could not find this market - please check the URL carefully.");
+      }
+      
+    } else {
+      console.log("You might think this is impossible, but depending on the situation it might not be!");
+      return React.createElement(React.Fragment, undefined);
+    }
+  }
+  return React.createElement("form", {
+              disabled: true,
+              onClick: (function (param) {
+                  return Curry._1(setShowLogin, (function (param) {
+                                return true;
+                              }));
+                })
+            }, React.createElement("div", {
+                  className: "px-8 pt-2"
+                }, React.createElement("div", {
+                      className: "-mb-px flex justify-between"
+                    }, React.createElement("div", {
+                          className: "no-underline text-teal-dark border-b-2 border-teal-dark tracking-wide font-bold py-3 mr-8",
+                          href: "#"
+                        }, "Stake ↗️"), React.createElement("div", {
+                          className: "no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3",
+                          href: "#"
+                        }, "Unstake ↗️"))), React.createElement("div", {
+                  className: "flex flex-row my-3"
+                }, React.createElement("input", {
+                      className: "py-2 font-normal text-grey-darkest w-full py-1 px-2 outline-none text-md text-gray-600",
+                      id: "amount",
+                      placeholder: "Stake",
+                      type: "text"
+                    }), React.createElement("span", {
+                      className: "flex items-center bg-gray-200 hover:bg-white hover:text-gray-700 px-5 font-bold"
+                    }, React.createElement("span", undefined, "MAX"))), React.createElement(Button.make, {
+                  onClick: (function (param) {
+                      
+                    }),
+                  children: "Login to",
+                  variant: "large"
+                }));
+}
+
 var make = StakeForm$1;
 
 export {
   StakeForm ,
   initialInput ,
   useBalanceAndApproved ,
+  ConnectedStakeForm ,
   make ,
   
 }
