@@ -2,27 +2,39 @@
 
 import * as React from "react";
 
+function isHotAPY(apy) {
+  return apy > 0.15;
+}
+
+function mapVal(apy) {
+  return (apy * 100).toFixed(2) + "%" + (
+          apy > 0.15 ? "🔥" : ""
+        );
+}
+
 function DashboardStakeCard(Props) {
   var marketName = Props.marketName;
   var isLong = Props.isLong;
-  var yieldStr = Props.yieldStr;
-  var rewardsStr = Props.rewardsStr;
+  var $$yield = Props.yield;
+  var rewards = Props.rewards;
   return React.createElement("div", {
               className: "mb-5 flex w-11/12 mx-auto border-2 border-light-purple rounded-lg z-10 shadow"
             }, React.createElement("div", {
-                  className: "w-1/3 my-2 ml-5 text-sm"
+                  className: "my-2 ml-5 text-sm"
                 }, marketName, React.createElement("br", {
                       className: "mt-1"
                     }), isLong ? "Long↗️" : "Short↘️"), React.createElement("div", {
-                  className: "text-center my-2 ml-5 text-sm"
-                }, "Yield: " + yieldStr, React.createElement("br", {
+                  className: "text-center w-full my-2 text-sm"
+                }, "Yield: " + mapVal($$yield), React.createElement("br", {
                       className: "mt-1"
-                    }), "Float rewards: " + rewardsStr));
+                    }), "Float rewards: " + mapVal(rewards)));
 }
 
 var make = DashboardStakeCard;
 
 export {
+  isHotAPY ,
+  mapVal ,
   make ,
   
 }
