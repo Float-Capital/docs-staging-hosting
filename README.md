@@ -1,28 +1,20 @@
-# LongShrt
+# Float.Capital
 
-Mono repo for the project long short
+Mono repo for the project https://float.capital
+
+## About
+
+Float Capital is synthetic asset platform requiring no overcollaterilsation. 
+
+Learn more at https://docs.float.capital 
 
 ## Contents
 
 - [Contracts](#contracts)
 - [Dapp](#dapp)
 - [Graph](#graph)
-- [UI](#ui)
+- [Docs](#Docs)
+- [Backend](#Backend)
 
-### Contracts
 
-TODO
 
-### Dapp
-
-TODO
-
-### Graph
-
-TODO
-
-### UI
-
-`cd ui/website`
-`yarn`
-`yarn start`
