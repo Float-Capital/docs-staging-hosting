@@ -177,14 +177,14 @@ let make = (
         <div className="w-full flex justify-around">
           <Button
             onClick={_ => {
-              router->Next.Router.push(`/stake?tokenId=${longTokenAddress}`)
+              router->Next.Router.push(`/stake?tokenAddress=${longTokenAddress}`)
             }}
             variant="small">
             "Stake Long"
           </Button>
           <Button
             onClick={_ => {
-              router->Next.Router.push(`/stake?tokenId=${shortTokenAddress}`)
+              router->Next.Router.push(`/stake?tokenAddress=${shortTokenAddress}`)
             }}
             variant="small">
             "Stake Short"

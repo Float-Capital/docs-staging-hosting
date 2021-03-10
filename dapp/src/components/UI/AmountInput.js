@@ -7,11 +7,12 @@ import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 function AmountInput(Props) {
   var placeholder = Props.placeholder;
   var value = Props.value;
-  var optBalance = Props.optBalance;
+  var optBalanceOpt = Props.optBalance;
   var disabled = Props.disabled;
   var onBlur = Props.onBlur;
   var onChange = Props.onChange;
   var onMaxClick = Props.onMaxClick;
+  var optBalance = optBalanceOpt !== undefined ? Caml_option.valFromOption(optBalanceOpt) : undefined;
   return React.createElement("div", {
               className: "flex flex-row my-3"
             }, React.createElement("input", {

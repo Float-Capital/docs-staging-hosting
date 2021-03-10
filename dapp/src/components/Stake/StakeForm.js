@@ -2,20 +2,19 @@
 
 import * as Form from "../Testing/Admin/Form.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
+import * as Login from "../Login/Login.js";
 import * as React from "react";
 import * as Button from "../UI/Button.js";
 import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Loader from "../UI/Loader.js";
 import * as Ethers$1 from "ethers";
-import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
 import * as Queries from "../../data/Queries.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as AmountInput from "../UI/AmountInput.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
-import * as Router from "next/router";
 import * as ContractHooks from "../Testing/Admin/ContractHooks.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
@@ -441,10 +440,147 @@ function useBalanceAndApproved(erc20Address, spender) {
         ];
 }
 
+function StakeForm$StakeFormInput(Props) {
+  var onSubmitOpt = Props.onSubmit;
+  var valueOpt = Props.value;
+  var optBalanceOpt = Props.optBalance;
+  var disabledOpt = Props.disabled;
+  var onChangeOpt = Props.onChange;
+  var onBlurOpt = Props.onBlur;
+  var onMaxClickOpt = Props.onMaxClick;
+  var synthetic = Props.synthetic;
+  var onSubmit = onSubmitOpt !== undefined ? onSubmitOpt : (function (param) {
+        
+      });
+  var value = valueOpt !== undefined ? valueOpt : "";
+  var optBalance = optBalanceOpt !== undefined ? Caml_option.valFromOption(optBalanceOpt) : undefined;
+  var disabled = disabledOpt !== undefined ? disabledOpt : false;
+  var onChange = onChangeOpt !== undefined ? onChangeOpt : (function (param) {
+        
+      });
+  var onBlur = onBlurOpt !== undefined ? onBlurOpt : (function (param) {
+        
+      });
+  var onMaxClick = onMaxClickOpt !== undefined ? onMaxClickOpt : (function (param) {
+        
+      });
+  return React.createElement(Form.make, {
+              className: "",
+              onSubmit: onSubmit,
+              children: null
+            }, React.createElement("div", {
+                  className: "px-8 pt-2"
+                }, React.createElement("div", {
+                      className: "-mb-px flex justify-between"
+                    }, React.createElement("div", {
+                          className: "no-underline text-teal-dark border-b-2 border-teal-dark tracking-wide font-bold py-3 mr-8",
+                          href: "#"
+                        }, "Stake ↗️"), React.createElement("div", {
+                          className: "no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3",
+                          href: "#"
+                        }, "Unstake ↗️"))), React.createElement(AmountInput.make, {
+                  placeholder: "Stake",
+                  value: value,
+                  optBalance: optBalance,
+                  disabled: disabled,
+                  onBlur: onBlur,
+                  onChange: onChange,
+                  onMaxClick: onMaxClick
+                }), React.createElement(Button.make, {
+                  onClick: (function (param) {
+                      
+                    }),
+                  children: "Stake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name,
+                  variant: "large"
+                }));
+}
+
+var StakeFormInput = {
+  make: StakeForm$StakeFormInput
+};
+
+function StakeForm$ConnectedStakeForm(Props) {
+  var tokenId = Props.tokenId;
+  var signer = Props.signer;
+  var synthetic = Props.synthetic;
+  var match = React.useState(function () {
+        return function (param) {
+          
+        };
+      });
+  var setContractActionToCallAfterApproval = match[1];
+  var contractActionToCallAfterApproval = match[0];
+  var match$1 = ContractActions.useContractFunction(signer);
+  var contractExecutionHandler = match$1[0];
+  var match$2 = ContractActions.useContractFunction(signer);
+  var setTxStateApprove = match$2[2];
+  var txStateApprove = match$2[1];
+  var contractExecutionHandlerApprove = match$2[0];
+  var stakerContractAddress = Config.useStakerAddress(undefined);
+  var match$3 = useBalanceAndApproved(Ethers$1.utils.getAddress(tokenId), stakerContractAddress);
+  var optTokenBalance = match$3[0];
+  React.useEffect((function () {
+          if (typeof txStateApprove !== "number" && txStateApprove.TAG === /* Complete */2) {
+            Curry._1(contractActionToCallAfterApproval, undefined);
+            Curry._1(setTxStateApprove, (function (param) {
+                    return /* UnInitialised */0;
+                  }));
+          }
+          
+        }), [txStateApprove]);
+  var form = useForm(initialInput, (function (param, _form) {
+          var amount = param.amount;
+          var stakeAndEarnImmediatlyFunction = function (param) {
+            var arg = Ethers$1.utils.getAddress(tokenId);
+            return Curry._2(contractExecutionHandler, (function (param) {
+                          return Contracts.Staker.make(stakerContractAddress, param);
+                        }), (function (param) {
+                          return param.stakeAndEarnImmediately(arg, amount);
+                        }));
+          };
+          Curry._1(setContractActionToCallAfterApproval, (function (param) {
+                  return stakeAndEarnImmediatlyFunction;
+                }));
+          var partial_arg = Ethers$1.utils.getAddress(tokenId);
+          var arg = amount.mul(Ethers$1.BigNumber.from("2"));
+          return Curry._2(contractExecutionHandlerApprove, (function (param) {
+                        return Contracts.Erc20.make(partial_arg, param);
+                      }), (function (param) {
+                        return param.approve(stakerContractAddress, arg);
+                      }));
+        }));
+  return React.createElement(StakeForm$StakeFormInput, {
+              onSubmit: form.submit,
+              value: form.input.amount,
+              optBalance: optTokenBalance,
+              disabled: form.submitting,
+              onChange: (function ($$event) {
+                  return Curry._2(form.updateAmount, (function (param, amount) {
+                                return {
+                                        amount: amount
+                                      };
+                              }), $$event.target.value);
+                }),
+              onBlur: (function (param) {
+                  return Curry._1(form.blurAmount, undefined);
+                }),
+              onMaxClick: (function (param) {
+                  return Curry._2(form.updateAmount, (function (param, amount) {
+                                return {
+                                        amount: amount
+                                      };
+                              }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
+                }),
+              synthetic: synthetic
+            });
+}
+
+var ConnectedStakeForm = {
+  make: StakeForm$ConnectedStakeForm
+};
+
 function StakeForm$1(Props) {
   var tokenId = Props.tokenId;
-  var router = Router.useRouter();
-  var tokenId$1 = Belt_Option.getWithDefault(Js_dict.get(router.query, "tokenId"), tokenId);
   var token = Curry.app(Queries.SyntheticToken.use, [
         undefined,
         undefined,
@@ -460,115 +596,49 @@ function StakeForm$1(Props) {
         undefined,
         undefined,
         {
-          tokenId: tokenId$1
+          tokenId: tokenId
         }
       ]);
-  var signer = ContractActions.useSignerExn(undefined);
   var match = React.useState(function () {
-        return function (param) {
-          
-        };
+        return false;
       });
-  var setContractActionToCallAfterApproval = match[1];
-  var contractActionToCallAfterApproval = match[0];
-  var match$1 = ContractActions.useContractFunction(signer);
-  var contractExecutionHandler = match$1[0];
-  var match$2 = ContractActions.useContractFunction(signer);
-  var setTxStateApprove = match$2[2];
-  var txStateApprove = match$2[1];
-  var contractExecutionHandlerApprove = match$2[0];
-  var stakerContractAddress = Config.useStakerAddress(undefined);
-  var match$3 = useBalanceAndApproved(Ethers$1.utils.getAddress(tokenId$1), stakerContractAddress);
-  var optTokenBalance = match$3[0];
-  React.useEffect((function () {
-          if (typeof txStateApprove !== "number" && txStateApprove.TAG === /* Complete */2) {
-            Curry._1(contractActionToCallAfterApproval, undefined);
-            Curry._1(setTxStateApprove, (function (param) {
-                    return /* UnInitialised */0;
-                  }));
-          }
-          
-        }), [txStateApprove]);
-  var form = useForm(initialInput, (function (param, _form) {
-          var amount = param.amount;
-          var stakeAndEarnImmediatlyFunction = function (param) {
-            var arg = Ethers$1.utils.getAddress(tokenId$1);
-            return Curry._2(contractExecutionHandler, (function (param) {
-                          return Contracts.Staker.make(stakerContractAddress, param);
-                        }), (function (param) {
-                          return param.stakeAndEarnImmediately(arg, amount);
-                        }));
-          };
-          Curry._1(setContractActionToCallAfterApproval, (function (param) {
-                  return stakeAndEarnImmediatlyFunction;
-                }));
-          var partial_arg = Ethers$1.utils.getAddress(tokenId$1);
-          var arg = amount.mul(Ethers$1.BigNumber.from("2"));
-          return Curry._2(contractExecutionHandlerApprove, (function (param) {
-                        return Contracts.Erc20.make(partial_arg, param);
-                      }), (function (param) {
-                        return param.approve(stakerContractAddress, arg);
-                      }));
-        }));
-  var match$4 = token.data;
-  var tmp;
-  if (token.loading) {
-    tmp = React.createElement(Loader.make, {});
-  } else if (token.error !== undefined) {
+  var setShowLogin = match[1];
+  var match$1 = token.data;
+  if (token.error !== undefined) {
     console.log("Unable to fetch token");
-    tmp = React.createElement(React.Fragment, undefined, "Unable to fetch token");
-  } else if (match$4 !== undefined) {
-    var synthetic = match$4.syntheticToken;
-    tmp = synthetic !== undefined ? React.createElement(Form.make, {
-            className: "",
-            onSubmit: (function (param) {
-                return Curry._1(form.submit, undefined);
-              }),
-            children: null
-          }, React.createElement("div", {
-                className: "px-8 pt-2"
-              }, React.createElement("div", {
-                    className: "-mb-px flex justify-between"
-                  }, React.createElement("div", {
-                        className: "no-underline text-teal-dark border-b-2 border-teal-dark tracking-wide font-bold py-3 mr-8",
-                        href: "#"
-                      }, "Stake ↗️"), React.createElement("div", {
-                        className: "no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3",
-                        href: "#"
-                      }, "Unstake ↗️"))), React.createElement(AmountInput.make, {
-                placeholder: "Stake",
-                value: form.input.amount,
-                optBalance: Belt_Option.getWithDefault(optTokenBalance, Ethers$1.BigNumber.from(0)),
-                disabled: form.submitting,
-                onBlur: (function (param) {
-                    return Curry._1(form.blurAmount, undefined);
-                  }),
-                onChange: (function ($$event) {
-                    return Curry._2(form.updateAmount, (function (param, amount) {
-                                  return {
-                                          amount: amount
-                                        };
-                                }), $$event.target.value);
-                  }),
-                onMaxClick: (function (param) {
-                    return Curry._2(form.updateAmount, (function (param, amount) {
-                                  return {
-                                          amount: amount
-                                        };
-                                }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
-                  })
-              }), React.createElement(Button.make, {
-                onClick: (function (param) {
-                    
-                  }),
-                children: "Stake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name,
-                variant: "large"
-              })) : React.createElement(React.Fragment, undefined, "this is not a valid token to stake");
-  } else {
-    console.log("You might think this is impossible, but depending on the situation it might not be!");
-    tmp = React.createElement(React.Fragment, undefined);
+    return React.createElement(React.Fragment, undefined, "Unable to fetch token");
   }
-  return React.createElement(React.Fragment, undefined, tmp);
+  if (token.loading) {
+    return React.createElement(Loader.make, {});
+  }
+  if (match$1 === undefined) {
+    return React.createElement(React.Fragment, undefined, "Could not find this market - please check the URL carefully.");
+  }
+  var synthetic = match$1.syntheticToken;
+  if (synthetic === undefined) {
+    return React.createElement(React.Fragment, undefined, "Could not find this market - please check the URL carefully.");
+  }
+  var signer = ContractActions.useSigner(undefined);
+  if (signer !== undefined) {
+    return React.createElement(StakeForm$ConnectedStakeForm, {
+                tokenId: tokenId,
+                signer: signer,
+                synthetic: synthetic
+              });
+  } else if (match[0]) {
+    return React.createElement(Login.make, {});
+  } else {
+    return React.createElement("div", {
+                onClick: (function (param) {
+                    return Curry._1(setShowLogin, (function (param) {
+                                  return true;
+                                }));
+                  })
+              }, React.createElement(StakeForm$StakeFormInput, {
+                    disabled: true,
+                    synthetic: synthetic
+                  }));
+  }
 }
 
 var make = StakeForm$1;
@@ -577,6 +647,8 @@ export {
   StakeForm ,
   initialInput ,
   useBalanceAndApproved ,
+  StakeFormInput ,
+  ConnectedStakeForm ,
   make ,
   
 }

@@ -2,6 +2,7 @@
 require("@nomiclabs/hardhat-truffle5");
 require("solidity-coverage");
 require("hardhat-gas-reporter");
+require("hardhat-spdx-license-identifier");
 
 // This is a sample Buidler task. To learn how to create your own go to
 // https://buidler.dev/guides/create-task.html
@@ -34,5 +35,9 @@ module.exports = {
     currency: "USD",
     gasPrice: 80,
     coinmarketcap: "9aacee3e-7c04-4978-8f93-63198c0fbfef",
+  },
+  spdxLicenseIdentifier: {
+    overwrite: true,
+    runOnCompile: true,
   },
 };

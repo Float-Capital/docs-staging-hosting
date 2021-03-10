@@ -902,7 +902,7 @@ function MintForm$1(Props) {
                               }, "Short 🐻")), React.createElement(AmountInput.make, {
                             placeholder: "Mint",
                             value: form.input.amount,
-                            optBalance: Belt_Option.getWithDefault(optDaiBalance, Ethers$1.BigNumber.from(0)),
+                            optBalance: optDaiBalance,
                             disabled: form.submitting,
                             onBlur: (function (param) {
                                 return Curry._1(form.blurAmount, undefined);
