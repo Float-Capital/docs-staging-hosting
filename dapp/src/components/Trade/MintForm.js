@@ -6,7 +6,6 @@ import * as React from "react";
 import * as Button from "../UI/Button.js";
 import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
-import * as Loader from "../UI/Loader.js";
 import * as Ethers$1 from "ethers";
 import * as ViewBox from "../UI/ViewBox.js";
 import * as Contracts from "../../ethereum/Contracts.js";
@@ -627,6 +626,7 @@ function isGreaterThanBalance(amount, balance) {
   return amount.gt(balance);
 }
 
+<<<<<<< HEAD
 function MintForm$SubmitButtonAndTxTracker(Props) {
   var txStateApprove = Props.txStateApprove;
   var txStateMint = Props.txStateMint;
@@ -731,12 +731,118 @@ var SubmitButtonAndTxTracker = {
 };
 
 function MintForm$1(Props) {
+=======
+function MintForm$MintFormInput(Props) {
+  var onSubmitOpt = Props.onSubmit;
+  var market = Props.market;
+  var onChangeSideOpt = Props.onChangeSide;
+  var isLong = Props.isLong;
+  var onBlurSideOpt = Props.onBlurSide;
+  var valueAmountInputOpt = Props.valueAmountInput;
+  var optDaiBalanceOpt = Props.optDaiBalance;
+  var onBlurAmountInputOpt = Props.onBlurAmountInput;
+  var onChangeAmountInputOpt = Props.onChangeAmountInput;
+  var onMaxClickOpt = Props.onMaxClick;
+  var optErrorMessageOpt = Props.optErrorMessage;
+  var isStakingOpt = Props.isStaking;
+  var disabled = Props.disabled;
+  var onBlurIsStakingOpt = Props.onBlurIsStaking;
+  var onChangeIsStaking = Props.onChangeIsStaking;
+  var buttonText = Props.buttonText;
+  var onSubmit = onSubmitOpt !== undefined ? onSubmitOpt : (function (param) {
+        
+      });
+  var onChangeSide = onChangeSideOpt !== undefined ? onChangeSideOpt : (function (param) {
+        
+      });
+  var onBlurSide = onBlurSideOpt !== undefined ? onBlurSideOpt : (function (param) {
+        
+      });
+  var valueAmountInput = valueAmountInputOpt !== undefined ? valueAmountInputOpt : "";
+  var optDaiBalance = optDaiBalanceOpt !== undefined ? Caml_option.valFromOption(optDaiBalanceOpt) : undefined;
+  var onBlurAmountInput = onBlurAmountInputOpt !== undefined ? onBlurAmountInputOpt : (function (param) {
+        
+      });
+  var onChangeAmountInput = onChangeAmountInputOpt !== undefined ? onChangeAmountInputOpt : (function (param) {
+        
+      });
+  var onMaxClick = onMaxClickOpt !== undefined ? onMaxClickOpt : (function (param) {
+        
+      });
+  var optErrorMessage = optErrorMessageOpt !== undefined ? Caml_option.valFromOption(optErrorMessageOpt) : undefined;
+  var isStaking = isStakingOpt !== undefined ? isStakingOpt : true;
+  var onBlurIsStaking = onBlurIsStakingOpt !== undefined ? onBlurIsStakingOpt : (function (param) {
+        
+      });
+  return React.createElement(ViewBox.make, {
+              children: React.createElement(Form.make, {
+                    className: "this-is-required",
+                    onSubmit: onSubmit,
+                    children: null
+                  }, React.createElement("div", {
+                        className: "flex justify-between mb-2"
+                      }, React.createElement("h2", undefined, market.name + " (" + market.symbol + ")")), React.createElement("select", {
+                        className: "trade-select",
+                        disabled: disabled,
+                        name: "longshort",
+                        value: isLong ? "long" : "short",
+                        onBlur: onBlurSide,
+                        onChange: onChangeSide
+                      }, React.createElement("option", {
+                            value: "long"
+                          }, "Long 🐮"), React.createElement("option", {
+                            value: "short"
+                          }, "Short 🐻")), React.createElement(AmountInput.make, {
+                        placeholder: "Mint",
+                        value: valueAmountInput,
+                        optBalance: optDaiBalance,
+                        disabled: disabled,
+                        onBlur: onBlurAmountInput,
+                        onChange: onChangeAmountInput,
+                        onMaxClick: onMaxClick
+                      }), optErrorMessage !== undefined ? React.createElement("div", {
+                          className: "text-red-500 text-xs"
+                        }, optErrorMessage) : null, React.createElement("div", {
+                        className: "flex justify-between items-center"
+                      }, React.createElement("div", {
+                            className: "flex items-center"
+                          }, React.createElement("input", {
+                                className: "mr-2",
+                                id: "stake-checkbox",
+                                checked: isStaking,
+                                disabled: disabled,
+                                type: "checkbox",
+                                onBlur: onBlurIsStaking,
+                                onChange: onChangeIsStaking
+                              }), React.createElement("label", {
+                                className: "text-xs",
+                                htmlFor: "stake-checkbox"
+                              }, "Stake " + (
+                                isLong ? "long" : "short"
+                              ) + " tokens")), React.createElement("p", {
+                            className: "text-xxs hover:text-gray-500"
+                          }, React.createElement("a", {
+                                href: "https://docs.float.capital/docs/stake"
+                              }, "Learn more about staking"))), React.createElement(Button.make, {
+                        onClick: (function (param) {
+                            
+                          }),
+                        children: buttonText,
+                        variant: "large"
+                      }))
+            });
+}
+
+var MintFormInput = {
+  make: MintForm$MintFormInput
+};
+
+function MintForm$MintFormSignedIn(Props) {
+>>>>>>> 4b6a062... WIP login wall
   var market = Props.market;
   var initialIsLong = Props.initialIsLong;
-  var signer = ContractActions.useSignerExn(undefined);
+  var signer = Props.signer;
   var match = ContractActions.useContractFunction(signer);
-  var setTxState = match[2];
-  var txState = match[1];
   var contractExecutionHandler = match[0];
   var match$1 = ContractActions.useContractFunction(signer);
   var setTxStateApprove = match$1[2];
@@ -754,6 +860,11 @@ function MintForm$1(Props) {
   var match$3 = useBalanceAndApproved(daiAddressThatIsTemporarilyHardCoded, longShortContractAddress);
   var optDaiAmountApproved = match$3[1];
   var optDaiBalance = match$3[0];
+<<<<<<< HEAD
+=======
+  ContractHooks.useErc20BalanceRefresh(market.syntheticShort.tokenAddress);
+  ContractHooks.useErc20BalanceRefresh(market.syntheticLong.tokenAddress);
+>>>>>>> 4b6a062... WIP login wall
   var form = useForm({
         amount: "",
         isLong: initialIsLong,
@@ -819,17 +930,24 @@ function MintForm$1(Props) {
         }));
   var match$4 = form.amountResult;
   var formAmount = match$4 !== undefined && match$4.TAG === /* Ok */0 ? Caml_option.some(match$4._0) : undefined;
+<<<<<<< HEAD
   var tokenToMint = form.input.isLong ? "long " + market.name : "short " + market.name;
+=======
+>>>>>>> 4b6a062... WIP login wall
   var stakingText = form.input.isStaking ? "Mint & Stake" : "Mint";
   var approveConnector = form.input.isStaking ? "," : " &";
   var isLong = form.input.isLong;
   var position = isLong ? "long" : "short";
+<<<<<<< HEAD
   var match$5;
+=======
+>>>>>>> 4b6a062... WIP login wall
   var exit = 0;
   if (formAmount !== undefined && optDaiBalance !== undefined && optDaiAmountApproved !== undefined) {
     var amount = Caml_option.valFromOption(formAmount);
     var needsToApprove = amount.gt(Caml_option.valFromOption(optDaiAmountApproved));
     var greaterThanBalance = amount.gt(Caml_option.valFromOption(optDaiBalance));
+<<<<<<< HEAD
     match$5 = greaterThanBalance ? [
         "Amount is greater than your balance",
         "Insufficient balance",
@@ -850,12 +968,31 @@ function MintForm$1(Props) {
     ];
   }
   var optAdditionalErrorMessage = match$5[0];
+=======
+    if (greaterThanBalance) {
+      "Amount is greater than your balance";
+      "Insufficient balance";
+      true;
+    } else {
+      if (needsToApprove) {
+        "Approve" + approveConnector + " " + stakingText + " " + position + " position";
+      } else {
+        stakingText + " " + position + " position";
+      }
+      false;
+    }
+  } else {
+    exit = 1;
+  }
+  exit === 1;
+>>>>>>> 4b6a062... WIP login wall
   React.useEffect((function () {
           if (typeof txStateApprove !== "number" && txStateApprove.TAG === /* Complete */2) {
             Curry._1(contractActionToCallAfterApproval, undefined);
           }
           
         }), [txStateApprove]);
+<<<<<<< HEAD
   var resetFormButton = function (param) {
     return React.createElement(Button.make, {
                 onClick: (function (param) {
@@ -1028,6 +1165,21 @@ function MintForm$1(Props) {
                             buttonDisabled: match$5[2]
                           }))
                 }));
+=======
+  return React.createElement("div", {
+              className: "screen-centered-container"
+            });
+}
+
+var MintFormSignedIn = {
+  make: MintForm$MintFormSignedIn
+};
+
+function MintForm$1(Props) {
+  return React.createElement("div", {
+              className: "screen-centered-container"
+            });
+>>>>>>> 4b6a062... WIP login wall
 }
 
 var initialInput = {
@@ -1044,7 +1196,12 @@ export {
   useBalanceAndApproved ,
   isGreaterThanApproval ,
   isGreaterThanBalance ,
+<<<<<<< HEAD
   SubmitButtonAndTxTracker ,
+=======
+  MintFormInput ,
+  MintFormSignedIn ,
+>>>>>>> 4b6a062... WIP login wall
   make ,
   
 }
