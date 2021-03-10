@@ -39,22 +39,26 @@ module User = {
               <span className="text-sm"> {`💸 Why not mint some more? 💸`->React.string} </span>
             </UserColumnTextCenter>
           </UserColumnCard>
-        </UserColumn>
-        <UserColumn>
+          <br />
           <UserColumnCard>
-            <UserColumnHeader> {`Staking 🔥`->React.string} </UserColumnHeader>
-            <UserFloatBox accruing=`3.14159265` balance=`100.04` minted=`107.83` />
+            <UserColumnHeader> {`Staking`->React.string} </UserColumnHeader>
             <UserColumnTextCenter>
               <UserColumnText head=`💰 Staked value` body=`$15,678` />
             </UserColumnTextCenter>
             <br />
-            <UserColumnHeader subheader={true}> {`Stakes`->React.string} </UserColumnHeader>
+            // <UserColumnHeader subheader={true}> {`Stakes`->React.string} </UserColumnHeader>
             <UserMarketBox name=`FTSE 100` isLong={true} tokens=`2.81` value=`450`>
               <UserMarketUnstake />
             </UserMarketBox>
             <UserMarketBox name=`FTSE 100` isLong={false} tokens=`21.24` value=`400`>
               <UserMarketUnstake />
             </UserMarketBox>
+          </UserColumnCard>
+        </UserColumn>
+        <UserColumn>
+          <UserColumnCard>
+            <UserColumnHeader> {`Float rewards 🔥`->React.string} </UserColumnHeader>
+            <UserFloatBox accruing=`3.14159265` balance=`100.04` minted=`107.83` />
           </UserColumnCard>
         </UserColumn>
       </UserColumnContainer>
