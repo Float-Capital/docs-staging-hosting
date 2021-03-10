@@ -112,14 +112,14 @@ function totalValueCard(totalValueLocked) {
                 }, "$" + FormatMoney.formatEther(totalValueLocked)));
 }
 
-function floatProtocolCard(totalTxs, totalUsers, totalGasUsed) {
+function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed) {
   return React.createElement(Dashboard$Card, {
               children: null
             }, React.createElement(Dashboard$Header, {
                   children: "Float Protocol 🏗️"
                 }), React.createElement(DashboardUl.make, {
                   list: [
-                    DashboardLi.Props.createDashboardLiProps(undefined, "📅 Live since:", "28/02/2020", undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "📅 Live since:", new Date(liveSince.toNumber()).toDateString(), undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "📈 No. Txs:", totalTxs.toString(), undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "👯‍♀️ No. Users:", totalUsers.toString(), undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "⛽ Gas used:", totalGasUsed.toString(), undefined)
@@ -247,7 +247,7 @@ function Dashboard(Props) {
             }, totalValueCard(totalValueLocked), React.createElement("div", {
                   className: "w-full flex flex-col md:flex-row justify-between mt-1"
                 }, React.createElement(Dashboard$Divider, {
-                      children: floatProtocolCard(match$2.totalTxs, match$2.totalUsers, match$2.totalGasUsed)
+                      children: floatProtocolCard(match$2.timestampLaunched, match$2.totalTxs, match$2.totalUsers, match$2.totalGasUsed)
                     }), React.createElement(Dashboard$Divider, {
                       children: null
                     }, syntheticAssetsCard(totalSynthValue, numberOfSynths), floatTokenCard(match$2.totalFloatMinted)), React.createElement(Dashboard$Divider, {

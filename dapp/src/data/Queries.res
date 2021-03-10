@@ -209,7 +209,8 @@ query {
     totalFloatMinted,
     totalTxs,
     totalUsers,
-    totalGasUsed
+    totalGasUsed,
+    timestampLaunched
   }
 }
 `)

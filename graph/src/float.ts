@@ -92,6 +92,7 @@ export function handleV1(event: V1): void {
   globalState.totalTxs = ZERO;
   globalState.totalGasUsed = ZERO;
   globalState.totalUsers = ZERO;
+  globalState.timestampLaunched = event.block.timestamp;
   globalState.save();
 
   saveEventToStateChange(
