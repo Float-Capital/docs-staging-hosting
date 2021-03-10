@@ -6,7 +6,9 @@ abstract contract IStaker {
     function addNewStakingFund(
         uint256 marketIndex,
         address longTokenAddress,
-        address shortTokenAddress
+        address shortTokenAddress,
+        uint256 kInitialMultiplier,
+        uint256 kPeriod
     ) external virtual;
 
     function addNewStateForFloatRewards(

@@ -14,60 +14,11 @@ import "./interfaces/IYieldManager.sol";
 import "./interfaces/IOracleManager.sol";
 
 /**
- * @dev {LongShort} contract, including:
- *
+ * @dev {LongShort} contract:
+ **** visit https://float.capital *****
  *  - Ability for users to create synthetic long and short positions on value movements
  *  - Value movements could be derived from tradional or alternative asset classes, derivates, binary outcomes, etc...
  *  - Incentive mechansim providing fees to liquidity makers (users on both sides of order book)
- *
- * ******* SYSTEM FUNCTIONING V0.0 ***********
- * System accepts stable coin (DAI) and has a total locked value = short position value + long position value
- * If percentage movement as calculated from oracle is +10%, and short position value == long position value,
- * Then value change = long position value * 10%
- * long position value = long position value + value change
- * short position value = short position value - value change
- * Total contract value remains unchanged.
- * long value has increased and each longtoken is now worth more as underlying pool value has increased.
- *
- * Tokens representing a shares in the short or long token pool can be minted
- * at price (short position value) / (total short token value)
- * or conversely burned to redeem the underlying share of the pool calculated
- * as (short position value) / (total short token value) per token
- *
- * Depending on demand of minting and burning for underlying on both sides (long/short of contract),
- * most often short position value != long position value (there will be an imbalance)
- * Imbalances also naturally occur as the contract adjusts these values after observing oracle value changes
- * Incentives exist to best incentivize contract balance.
- *
- * Mechanism 1 - interest accural imbalance.
- * The entire total locked value accrues interest and distributes it 50/50 even if imbalance exists.
- * I.e. Short side supplys $50 capital. Long side supply $150. Short side effectively earns interest on $100.
- * Enhanced yield exists for sides taking on the position with less demand.
- *
- * Mechanism 2 - liquidity fees earned.
- * The side which is shorter on liquidity will receive fees strengthening their value
- * Whenever liquidity is added to the opposing side or withdrawn from their side (i.e. when the imbalance increases)
- *
- * ******* KNOWN ATTACK VECTORS ***********
- * (1) Feeless withdrawl:
- * [FIXED]
- * Long position $150, Short position $100. User should pay fee to remove short liquidity.
- * Step1: User mints $51 of short position (No fee to add liquidity).
- * Step2: User redeems $100 of short position (no fee as currently removing liquidity from bigger side)
- * Possible solution, check after deposit/withdrawl if order book has flipped, then apply fees.
- *
- * (2) FlashLoan mint:
- * [ONGOING]
- * Consider rapid large entries and exit of the system.
- *
- * (3) Oracle manipulation:
- * [ONGOING]
- * If the oracle determining price change can be easy manipulated (and by a decent magnitude),
- * Funds could be at risk. See: https://blog.trailofbits.com/2020/08/05/accidentally-stepping-on-a-defi-lego/
- *
- * ******* Work on gas effciencies ***********
- * Layer 2 solutions
- * Remove safe Math library
  */
 contract LongShort is ILongShort, Initializable {
     ////////////////////////////////////
@@ -151,11 +102,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 assetPrice,
         string name,
         string symbol,
-        address oracleAddress,
-        uint256 baseEntryFee,
-        uint256 badLiquidityEntryFee,
-        uint256 baseExitFee,
-        uint256 badLiquidityExitFee
+        address oracleAddress
     );
 
     event PriceUpdate(
@@ -200,6 +147,14 @@ contract LongShort is ILongShort, Initializable {
         uint256 valueOfRedemption,
         uint256 finalRedeemValue,
         address user
+    );
+
+    event FeesChanges(
+        uint256 marketIndex,
+        uint256 baseEntryFee,
+        uint256 badLiquidityEntryFee,
+        uint256 baseExitFee,
+        uint256 badLiquidityExitFee
     );
 
     ////////////////////////////////////
@@ -267,6 +222,43 @@ contract LongShort is ILongShort, Initializable {
         treasury = _treasury;
     }
 
+    function changeFees(
+        uint256 marketIndex,
+        uint256 _baseEntryFee,
+        uint256 _badLiquidityEntryFee,
+        uint256 _baseExitFee,
+        uint256 _badLiquidityExitFee
+    ) external adminOnly {
+        _changeFees(
+            marketIndex,
+            _baseEntryFee,
+            _baseExitFee,
+            _badLiquidityEntryFee,
+            _badLiquidityExitFee
+        );
+    }
+
+    function _changeFees(
+        uint256 marketIndex,
+        uint256 _baseEntryFee,
+        uint256 _badLiquidityEntryFee,
+        uint256 _baseExitFee,
+        uint256 _badLiquidityExitFee
+    ) internal {
+        baseEntryFee[marketIndex] = _baseEntryFee;
+        baseExitFee[marketIndex] = _baseExitFee;
+        badLiquidityEntryFee[marketIndex] = _badLiquidityEntryFee;
+        badLiquidityExitFee[marketIndex] = _badLiquidityExitFee;
+
+        emit FeesChanges(
+            latestMarket,
+            _baseEntryFee,
+            _badLiquidityEntryFee,
+            _baseExitFee,
+            _badLiquidityExitFee
+        );
+    }
+
     /**
      * Creates an entirely new long/short market tracking an underlying
      * oracle price. Make sure the synthetic names/symbols are unique.
@@ -276,20 +268,9 @@ contract LongShort is ILongShort, Initializable {
         string calldata syntheticSymbol,
         address _fundToken,
         address _oracleManager,
-        address _yieldManager,
-        uint256 _baseEntryFee,
-        uint256 _badLiquidityEntryFee,
-        uint256 _baseExitFee,
-        uint256 _badLiquidityExitFee
+        address _yieldManager
     ) external adminOnly {
         latestMarket++;
-        marketExists[latestMarket] = true;
-
-        // Initial minting/redeeming fees.
-        baseEntryFee[latestMarket] = _baseEntryFee;
-        baseExitFee[latestMarket] = _baseExitFee;
-        badLiquidityEntryFee[latestMarket] = _badLiquidityEntryFee;
-        badLiquidityExitFee[latestMarket] = _badLiquidityExitFee;
 
         // Create new synthetic long token.
         longTokens[latestMarket] = SyntheticToken(
@@ -324,18 +305,37 @@ contract LongShort is ILongShort, Initializable {
             assetPrice[latestMarket],
             syntheticName,
             syntheticSymbol,
-            _oracleManager,
+            _oracleManager
+        );
+    }
+
+    function initializeMarket(
+        uint256 marketIndex,
+        uint256 _baseEntryFee,
+        uint256 _badLiquidityEntryFee,
+        uint256 _baseExitFee,
+        uint256 _badLiquidityExitFee,
+        uint256 kInitialMultiplier,
+        uint256 kPeriod
+    ) external adminOnly {
+        require(!marketExists[marketIndex] && marketIndex <= latestMarket);
+        marketExists[marketIndex] = true;
+
+        _changeFees(
+            marketIndex,
             _baseEntryFee,
-            _badLiquidityEntryFee,
             _baseExitFee,
+            _badLiquidityEntryFee,
             _badLiquidityExitFee
         );
 
         // Add new staker funds with fresh synthetic tokens.
         staker.addNewStakingFund(
             latestMarket,
-            address(longTokens[latestMarket]),
-            address(shortTokens[latestMarket])
+            address(longTokens[marketIndex]),
+            address(shortTokens[marketIndex]),
+            kInitialMultiplier,
+            kPeriod
         );
     }
 
