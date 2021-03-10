@@ -45,58 +45,59 @@ function onQuerySuccess(param, param$1) {
                                     body: "✅"
                                   })))
                     }), React.createElement(UserUI.UserColumn.make, {
+                      children: null
+                    }, React.createElement(UserUI.UserColumnCard.make, {
+                          children: null
+                        }, React.createElement(UserUI.UserColumnHeader.make, {
+                              children: null
+                            }, "Synthetic Assets", React.createElement("img", {
+                                  className: "inline h-5 ml-2",
+                                  src: "/img/coin.png"
+                                })), React.createElement(UserUI.UserColumnTextCenter.make, {
+                              children: React.createElement(UserUI.UserColumnText.make, {
+                                    head: "💰 Synth value",
+                                    body: "$9,123"
+                                  })
+                            }), React.createElement("br", undefined), React.createElement(UserUI.UserMarketBox.make, {
+                              name: "FTSE 100",
+                              isLong: true,
+                              tokens: "23.81",
+                              value: "450",
+                              children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {})
+                            }), React.createElement("br", undefined), React.createElement(UserUI.UserColumnTextCenter.make, {
+                              children: React.createElement("span", {
+                                    className: "text-sm"
+                                  }, "💸 Why not mint some more? 💸")
+                            })), React.createElement("br", undefined), React.createElement(UserUI.UserColumnCard.make, {
+                          children: null
+                        }, React.createElement(UserUI.UserColumnHeader.make, {
+                              children: "Staking"
+                            }), React.createElement(UserUI.UserColumnTextCenter.make, {
+                              children: React.createElement(UserUI.UserColumnText.make, {
+                                    head: "💰 Staked value",
+                                    body: "$15,678"
+                                  })
+                            }), React.createElement("br", undefined), React.createElement(UserUI.UserMarketBox.make, {
+                              name: "FTSE 100",
+                              isLong: true,
+                              tokens: "2.81",
+                              value: "450",
+                              children: React.createElement(UserUI.UserMarketUnstake.make, {})
+                            }), React.createElement(UserUI.UserMarketBox.make, {
+                              name: "FTSE 100",
+                              isLong: false,
+                              tokens: "21.24",
+                              value: "400",
+                              children: React.createElement(UserUI.UserMarketUnstake.make, {})
+                            }))), React.createElement(UserUI.UserColumn.make, {
                       children: React.createElement(UserUI.UserColumnCard.make, {
                             children: null
                           }, React.createElement(UserUI.UserColumnHeader.make, {
-                                children: null
-                              }, "Synthetic Assets", React.createElement("img", {
-                                    className: "inline h-5 ml-2",
-                                    src: "/img/coin.png"
-                                  })), React.createElement(UserUI.UserColumnTextCenter.make, {
-                                children: React.createElement(UserUI.UserColumnText.make, {
-                                      head: "💰 Synth value",
-                                      body: "$9,123"
-                                    })
-                              }), React.createElement("br", undefined), React.createElement(UserUI.UserMarketBox.make, {
-                                name: "FTSE 100",
-                                isLong: true,
-                                tokens: "23.81",
-                                value: "450",
-                                children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {})
-                              }), React.createElement("br", undefined), React.createElement(UserUI.UserColumnTextCenter.make, {
-                                children: React.createElement("span", {
-                                      className: "text-sm"
-                                    }, "💸 Why not mint some more? 💸")
-                              }))
-                    }), React.createElement(UserUI.UserColumn.make, {
-                      children: React.createElement(UserUI.UserColumnCard.make, {
-                            children: null
-                          }, React.createElement(UserUI.UserColumnHeader.make, {
-                                children: "Staking 🔥"
+                                children: "Float rewards 🔥"
                               }), React.createElement(UserUI.UserFloatBox.make, {
                                 accruing: "3.14159265",
                                 balance: "100.04",
                                 minted: "107.83"
-                              }), React.createElement(UserUI.UserColumnTextCenter.make, {
-                                children: React.createElement(UserUI.UserColumnText.make, {
-                                      head: "💰 Staked value",
-                                      body: "$15,678"
-                                    })
-                              }), React.createElement("br", undefined), React.createElement(UserUI.UserColumnHeader.make, {
-                                children: "Stakes",
-                                subheader: true
-                              }), React.createElement(UserUI.UserMarketBox.make, {
-                                name: "FTSE 100",
-                                isLong: true,
-                                tokens: "2.81",
-                                value: "450",
-                                children: React.createElement(UserUI.UserMarketUnstake.make, {})
-                              }), React.createElement(UserUI.UserMarketBox.make, {
-                                name: "FTSE 100",
-                                isLong: false,
-                                tokens: "21.24",
-                                value: "400",
-                                children: React.createElement(UserUI.UserMarketUnstake.make, {})
                               }))
                     })));
 }

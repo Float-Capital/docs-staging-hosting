@@ -1,4 +1,4 @@
-import Profile from "src/Profile";
+import User from "src/User";
 import Head from "next/head";
 
 export default function ProfilePage(props) {
@@ -12,7 +12,7 @@ export default function ProfilePage(props) {
           key="title"
         />
       </Head>
-      <Profile {...props} />
+      <User {...props} />
     </div>
   );
 }
