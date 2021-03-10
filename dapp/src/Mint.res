@@ -17,7 +17,8 @@ module Mint = {
           let optFirstMarket =
             syntheticMarkets[marketIndex->Belt.Int.fromString->Option.getWithDefault(1) - 1]
           switch optFirstMarket {
-          | Some(firstMarket) => <MintForm market={firstMarket} initialIsLong={mintOption == "short" ? false : true}/>
+          | Some(firstMarket) =>
+            <MintForm market={firstMarket} initialIsLong={mintOption == "short" ? false : true} />
           | None => <p> {"No markets exist"->React.string} </p>
           }
         | {data: None, error: None, loading: false} =>

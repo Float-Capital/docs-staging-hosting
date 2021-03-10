@@ -603,6 +603,7 @@ function StakeForm$1(Props) {
         return false;
       });
   var setShowLogin = match[1];
+  var optSigner = ContractActions.useSigner(undefined);
   var match$1 = token.data;
   if (token.error !== undefined) {
     console.log("Unable to fetch token");
@@ -615,29 +616,29 @@ function StakeForm$1(Props) {
     return React.createElement(React.Fragment, undefined, "Could not find this market - please check the URL carefully.");
   }
   var synthetic = match$1.syntheticToken;
-  if (synthetic === undefined) {
-    return React.createElement(React.Fragment, undefined, "Could not find this market - please check the URL carefully.");
-  }
-  var signer = ContractActions.useSigner(undefined);
-  if (signer !== undefined) {
-    return React.createElement(StakeForm$ConnectedStakeForm, {
-                tokenId: tokenId,
-                signer: signer,
-                synthetic: synthetic
-              });
-  } else if (match[0]) {
-    return React.createElement(Login.make, {});
+  if (synthetic !== undefined) {
+    if (optSigner !== undefined) {
+      return React.createElement(StakeForm$ConnectedStakeForm, {
+                  tokenId: tokenId,
+                  signer: optSigner,
+                  synthetic: synthetic
+                });
+    } else if (match[0]) {
+      return React.createElement(Login.make, {});
+    } else {
+      return React.createElement("div", {
+                  onClick: (function (param) {
+                      return Curry._1(setShowLogin, (function (param) {
+                                    return true;
+                                  }));
+                    })
+                }, React.createElement(StakeForm$StakeFormInput, {
+                      disabled: true,
+                      synthetic: synthetic
+                    }));
+    }
   } else {
-    return React.createElement("div", {
-                onClick: (function (param) {
-                    return Curry._1(setShowLogin, (function (param) {
-                                  return true;
-                                }));
-                  })
-              }, React.createElement(StakeForm$StakeFormInput, {
-                    disabled: true,
-                    synthetic: synthetic
-                  }));
+    return React.createElement(React.Fragment, undefined, "Could not find this market - please check the URL carefully.");
   }
 }
 
