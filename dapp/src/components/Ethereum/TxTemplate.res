@@ -1,6 +1,6 @@
 let centerFlex = {
   open CssJs
-  style(.[display(#flex), justifyContent(#center)])
+  style(. [display(#flex), justifyContent(#center)])
 }
 
 @react.component

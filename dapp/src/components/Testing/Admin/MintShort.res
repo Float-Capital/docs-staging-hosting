@@ -13,12 +13,12 @@ module AdminMintForm = %form(
 
         switch amount {
         | {amount: ""} => Error("Amount is required")
-        | {amount: value} when !(amountRegex->Js.Re.test_(value)) =>
+        | {amount: value} if !(amountRegex->Js.Re.test_(value)) =>
           Error("Incorrect number format - please use '.' for floating points.")
         | {amount, optAmountApproved} =>
           let checkRequiresApproval = amount =>
             switch optAmountApproved {
-            | Some(approved) when approved->Ethers.BigNumber.gte(amount) => false
+            | Some(approved) if approved->Ethers.BigNumber.gte(amount) => false
             | Some(_)
             | None => true
             }
@@ -27,7 +27,7 @@ module AdminMintForm = %form(
             Error("Couldn't parse Ether value"),
             etherValue =>
               switch optBalance {
-              | Some(balance) when balance->Ethers.BigNumber.gte(etherValue) =>
+              | Some(balance) if balance->Ethers.BigNumber.gte(etherValue) =>
                 {amount: etherValue, requiresApproval: checkRequiresApproval(etherValue)}->Ok
               | Some(balance) =>
                 Error(
@@ -127,7 +127,7 @@ let make = (~marketIndex) => {
     // If this hasn't been set we just cheeck if the approved amount is greater than 1
     switch optAmountApproved {
     | Some(amountApproved)
-      when amountApproved->Ethers.BigNumber.gte(Ethers.Utils.parseEtherUnsafe(~amount="1")) => false
+      if amountApproved->Ethers.BigNumber.gte(Ethers.Utils.parseEtherUnsafe(~amount="1")) => false
     | Some(_)
     | None => true
     }
@@ -158,13 +158,17 @@ let make = (~marketIndex) => {
               value=form.input.amount.amount
               disabled=form.submitting
               onBlur={_ => form.blurAmount()}
-              onChange={event => form.updateAmount((input, value) => {
-                  ...input,
-                  amount: value,
-                }, {
-                  amount: (event->ReactEvent.Form.target)["value"],
-                  optAmountApproved: optAmountApproved,
-                })}
+              onChange={event =>
+                form.updateAmount(
+                  (input, value) => {
+                    ...input,
+                    amount: value,
+                  },
+                  {
+                    amount: (event->ReactEvent.Form.target)["value"],
+                    optAmountApproved: optAmountApproved,
+                  },
+                )}
             />
             {switch form.amountResult {
             | Some(Error(message)) => <div className="text-red-600"> {message->React.string} </div>

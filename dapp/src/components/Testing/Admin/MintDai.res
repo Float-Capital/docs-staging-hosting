@@ -24,7 +24,7 @@ module AdminMintForm = %form(
 
         switch amount {
         | "" => Error("Amount is required")
-        | _ as value when !(addressRegex->Js.Re.test_(value)) =>
+        | _ as value if !(addressRegex->Js.Re.test_(value)) =>
           Error("Incorrect number format - please use '.' for floating points.")
         | _ =>
           Ethers.Utils.parseEther(~amount)->Option.mapWithDefault(

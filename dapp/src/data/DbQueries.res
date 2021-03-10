@@ -28,5 +28,3 @@ mutation updateUser($userName: String!, $userAddress: String!)
   }
   }
 `)
-
-
