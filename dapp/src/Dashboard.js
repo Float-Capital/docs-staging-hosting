@@ -17,6 +17,8 @@ import * as Router from "next/router";
 import * as AccessControl from "./components/AccessControl.js";
 import * as DashboardCalcs from "./libraries/DashboardCalcs.js";
 import * as DashboardStakeCard from "./components/UI/Dashboard/DashboardStakeCard.js";
+import FromUnixTime from "date-fns/fromUnixTime";
+import FormatDistanceToNow from "date-fns/formatDistanceToNow";
 
 function Dashboard$Divider(Props) {
   var children = Props.children;
@@ -113,13 +115,14 @@ function totalValueCard(totalValueLocked) {
 }
 
 function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed) {
+  var dateObj = FromUnixTime(liveSince.toNumber());
   return React.createElement(Dashboard$Card, {
               children: null
             }, React.createElement(Dashboard$Header, {
                   children: "Float Protocol 🏗️"
                 }), React.createElement(DashboardUl.make, {
                   list: [
-                    DashboardLi.Props.createDashboardLiProps(undefined, "📅 Live since:", new Date(liveSince.toNumber()).toDateString(), undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "📅 Live since:", dateObj.toDateString() + " (" + FormatDistanceToNow(dateObj) + ")", undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "📈 No. Txs:", totalTxs.toString(), undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "👯‍♀️ No. Users:", totalUsers.toString(), undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "⛽ Gas used:", totalGasUsed.toString(), undefined)
@@ -228,37 +231,32 @@ function Dashboard(Props) {
     tmp = React.createElement(MiniLoader.make, {});
   } else if (marketDetailsQuery.error !== undefined || globalStateQuery.error !== undefined) {
     tmp = "Error loading data";
-  } else if (match !== undefined) {
+  } else if (marketDetailsQuery.data !== undefined && match !== undefined) {
     var match$1 = match.globalStates;
     if (match$1.length !== 1) {
-      tmp = "Query returned wrong number of results";
+      tmp = "Error getting data";
     } else {
       var match$2 = match$1[0];
-      var match$3 = marketDetailsQuery.data;
-      if (match$3 !== undefined) {
-        var syntheticMarkets = match$3.syntheticMarkets;
-        var match$4 = DashboardCalcs.getTotalValueLockedAndTotalStaked(syntheticMarkets);
-        var totalValueStaked = match$4.totalValueStaked;
-        var totalValueLocked = match$4.totalValueLocked;
-        var totalSynthValue = DashboardCalcs.getTotalSynthValue(totalValueLocked, totalValueStaked);
-        var numberOfSynths = String((syntheticMarkets.length << 1));
-        tmp = React.createElement("div", {
-              className: "min-w-3/4 max-w-full flex flex-col self-center items-center justify-start"
-            }, totalValueCard(totalValueLocked), React.createElement("div", {
-                  className: "w-full flex flex-col md:flex-row justify-between mt-1"
-                }, React.createElement(Dashboard$Divider, {
-                      children: floatProtocolCard(match$2.timestampLaunched, match$2.totalTxs, match$2.totalUsers, match$2.totalGasUsed)
-                    }), React.createElement(Dashboard$Divider, {
-                      children: null
-                    }, syntheticAssetsCard(totalSynthValue, numberOfSynths), floatTokenCard(match$2.totalFloatMinted)), React.createElement(Dashboard$Divider, {
-                      children: stakingCard(totalValueStaked)
-                    })));
-      } else {
-        tmp = "Query returned wrong number of results";
-      }
+      var syntheticMarkets = marketDetailsQuery.data.syntheticMarkets;
+      var match$3 = DashboardCalcs.getTotalValueLockedAndTotalStaked(syntheticMarkets);
+      var totalValueStaked = match$3.totalValueStaked;
+      var totalValueLocked = match$3.totalValueLocked;
+      var totalSynthValue = DashboardCalcs.getTotalSynthValue(totalValueLocked, totalValueStaked);
+      var numberOfSynths = String((syntheticMarkets.length << 1));
+      tmp = React.createElement("div", {
+            className: "min-w-3/4 max-w-full flex flex-col self-center items-center justify-start"
+          }, totalValueCard(totalValueLocked), React.createElement("div", {
+                className: "w-full flex flex-col md:flex-row justify-between mt-1"
+              }, React.createElement(Dashboard$Divider, {
+                    children: floatProtocolCard(match$2.timestampLaunched, match$2.totalTxs, match$2.totalUsers, match$2.totalGasUsed)
+                  }), React.createElement(Dashboard$Divider, {
+                    children: null
+                  }, syntheticAssetsCard(totalSynthValue, numberOfSynths), floatTokenCard(match$2.totalFloatMinted)), React.createElement(Dashboard$Divider, {
+                    children: stakingCard(totalValueStaked)
+                  })));
     }
   } else {
-    tmp = marketDetailsQuery.data !== undefined ? "Query returned wrong number of results" : "Error getting data";
+    tmp = "Error getting data";
   }
   return React.createElement(AccessControl.make, {
               children: React.createElement("div", {
