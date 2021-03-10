@@ -144,47 +144,31 @@ let stakingCard = (~totalValueStaked) =>
 
 @react.component
 let make = () => {
-  let router = Next.Router.useRouter()
   let globalStateQuery = Queries.GlobalState.use()
   let marketDetailsQuery = Queries.MarketDetails.use()
 
-  <AccessControl
-    alternateComponent={<h1 onClick={_ => router->Next.Router.push("/login?nextPath=/dashboard")}>
-      <Login />
-    </h1>}>
-    <div className="w-screen absolute flex flex-col left-0 top-0 mt-20 overflow-x-hidden">
-      {<>
-        {switch (globalStateQuery, marketDetailsQuery) {
-        | ({loading: true}, _)
-        | (_, {loading: true}) =>
-          <MiniLoader />
-        | ({error: Some(_error)}, _)
-        | (_, {error: Some(_error)}) =>
-          "Error loading data"->React.string
-        | (
-            {
-              data: Some({
-                globalStates: [
-                  {totalFloatMinted, totalTxs, totalUsers, totalGasUsed, timestampLaunched},
-                ],
-              }),
-            },
-            {data: Some({syntheticMarkets})},
-          ) => {
-            let {
-              totalValueLocked,
-              totalValueStaked,
-            } = DashboardCalcs.getTotalValueLockedAndTotalStaked(syntheticMarkets)
-            let totalSynthValue = DashboardCalcs.getTotalSynthValue(
-              ~totalValueLocked,
-              ~totalValueStaked,
-            )
-            let numberOfSynths = (syntheticMarkets->Array.length * 2)->Js.String2.make
+  <div className="w-screen absolute flex flex-col left-0 top-0 mt-20 overflow-x-hidden">
+    {switch (globalStateQuery, marketDetailsQuery) {
+    | ({loading: true}, _)
+    | (_, {loading: true}) =>
+      <MiniLoader />
+    | ({error: Some(_error)}, _)
+    | (_, {error: Some(_error)}) =>
+      "Error loading data"->React.string
+    | (
+        {data: Some({globalStates: [{totalFloatMinted, totalTxs, totalUsers, totalGasUsed,
+        timestampLaunched}]})},
+        {data: Some({syntheticMarkets})},
+      ) =>
+      let {totalValueLocked, totalValueStaked} = DashboardCalcs.getTotalValueLockedAndTotalStaked(
+        syntheticMarkets,
+      )
+      let totalSynthValue = DashboardCalcs.getTotalSynthValue(~totalValueLocked, ~totalValueStaked)
+      let numberOfSynths = (syntheticMarkets->Array.length * 2)->Js.String2.make
 
-            <div
-              className="min-w-3/4 max-w-full flex flex-col self-center items-center justify-start">
-              {totalValueCard(~totalValueLocked)}
-              <div className={"w-full flex flex-col md:flex-row justify-between mt-1"}>
+      <div className="min-w-3/4 max-w-full flex flex-col self-center items-center justify-start">
+        {totalValueCard(~totalValueLocked)}
+        <div className={"w-full flex flex-col md:flex-row justify-between mt-1"}>
                 <Divider>
                   {floatProtocolCard(
                     ~liveSince=timestampLaunched,
@@ -193,22 +177,20 @@ let make = () => {
                     ~totalGasUsed,
                   )}
                 </Divider>
-                <Divider>
-                  {syntheticAssetsCard(~totalSynthValue, ~numberOfSynths)}
-                  {floatTokenCard(~totalFloatMinted)}
-                </Divider>
-                <Divider> {stakingCard(~totalValueStaked)} </Divider>
-              </div>
-            </div>
-          }
-        | (_, {data: Some(_), error: None, loading: false})
-        | ({data: Some(_), error: None, loading: false}, _)
-        | (_, {data: None, error: None, loading: false}) =>
-          "Error getting data"->React.string
-        }}
-      </>}
-    </div>
-  </AccessControl>
+                          <Divider>
+            {syntheticAssetsCard(~totalSynthValue, ~numberOfSynths)}
+            {floatTokenCard(~totalFloatMinted)}
+          </Divider>
+          <Divider> {stakingCard(~totalValueStaked)} </Divider>
+        </div>
+      </div>
+
+    | (_, {data: Some(_), error: None, loading: false})
+    | ({data: Some(_), error: None, loading: false}, _) =>
+      "Query returned wrong number of results"->React.string
+    | (_, {data: None, error: None, loading: false}) => "Error getting data"->React.string
+    }}
+  </div>
 }
 
 let default = make

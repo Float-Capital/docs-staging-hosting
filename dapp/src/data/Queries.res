@@ -8,6 +8,21 @@ fragment BasicUserInfo on User {
   numberOfTransactions
   totalGasUsed
 }
+fragment SyntheticInfo on SyntheticToken {
+  id
+  totalStaked
+  syntheticMarket {
+    id
+    name
+    symbol
+    latestSystemState {
+      totalLockedLong
+      totalLockedShort
+    }
+  }
+  tokenType
+  tokenAddress
+}
 `)
 
 module UserQuery = %graphql(`
@@ -121,17 +136,7 @@ module StakingDetails = %graphql(`
 module SyntheticTokens = %graphql(`
 {
   syntheticTokens{
-    id
-    totalStaked
-    syntheticMarket {
-      id
-      name
-      latestSystemState {
-        totalLockedLong
-        totalLockedShort
-      }
-    }
-    tokenType
+    ...SyntheticInfo
   }
 }
 `)
@@ -139,13 +144,7 @@ module SyntheticTokens = %graphql(`
 module SyntheticToken = %graphql(`
 query ($tokenId: String!){
   syntheticToken(id: $tokenId){
-    id
-    syntheticMarket {
-      id
-      name
-    }
-    tokenType
-    floatMintedFromSpecificToken
+    ...SyntheticInfo
   }
 }
 `)
@@ -160,15 +159,9 @@ query ($userId: String!){
       blockNumber
       creationTxHash  @ppxCustom(module: "Bytes")
       syntheticToken {
-        tokenAddress
-        totalStaked
-        tokenType
-        syntheticMarket {
-          name
-          symbol
-        }
+        ...SyntheticInfo
       }
-        amount
+      amount
       withdrawn
     }
     lastMintState {
@@ -188,14 +181,7 @@ query ($userId: String!){
       blockNumber
       creationTxHash
       syntheticToken {
-        tokenAddress
-        totalStaked
-        tokenType
-        syntheticMarket {
-          name
-          symbol
-        }
-        floatMintedFromSpecificToken
+        ...SyntheticInfo
       }
       amount
     }

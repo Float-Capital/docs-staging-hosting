@@ -10,7 +10,7 @@ module MintForm = %form(
 
         switch amount {
         | "" => Error("Amount is required")
-        | value when !(amountRegex->Js.Re.test_(value)) =>
+        | value if !(amountRegex->Js.Re.test_(value)) =>
           Error("Incorrect number format - please use '.' for floating points.")
         | amount =>
           Ethers.Utils.parseEther(~amount)->Option.mapWithDefault(
@@ -48,7 +48,10 @@ let isGreaterThanBalance = (~amount, ~balance) => {
 }
 
 @react.component
-let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets, ~initialIsLong) => {
+let make = (
+  ~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets,
+  ~initialIsLong,
+) => {
   let signer = ContractActions.useSignerExn()
 
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
@@ -77,44 +80,49 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
     ~erc20Address=market.syntheticLong.tokenAddress,
   )
 
-  let form = MintForm.useForm(~initialInput={
-    ...initialInput,
-    isLong: initialIsLong
-  }, ~onSubmit=({amount, isLong, isStaking}, _form) => {
-    let approveFunction = () =>
-      contractExecutionHandlerApprove(
-        ~makeContractInstance=Contracts.Erc20.make(~address=daiAddressThatIsTemporarilyHardCoded),
-        ~contractFunction=Contracts.Erc20.approve(
-          ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
-          ~spender=longShortContractAddress,
+  let form = MintForm.useForm(
+    ~initialInput={
+      ...initialInput,
+      isLong: initialIsLong,
+    },
+    ~onSubmit=({amount, isLong, isStaking}, _form) => {
+      let approveFunction = () =>
+        contractExecutionHandlerApprove(
+          ~makeContractInstance=Contracts.Erc20.make(~address=daiAddressThatIsTemporarilyHardCoded),
+          ~contractFunction=Contracts.Erc20.approve(
+            ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
+            ~spender=longShortContractAddress,
+          ),
+        )
+      let mintFunction = () =>
+        contractExecutionHandler(
+          ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
+          ~contractFunction=isLong
+            ? Contracts.LongShort.mintLong(~marketIndex=market.marketIndex, ~amount)
+            : Contracts.LongShort.mintShort(~marketIndex=market.marketIndex, ~amount),
+        )
+      let mintAndStakeFunction = () =>
+        contractExecutionHandler(
+          ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
+          ~contractFunction=isLong
+            ? Contracts.LongShort.mintLongAndStake(~marketIndex=market.marketIndex, ~amount)
+            : Contracts.LongShort.mintShortAndStake(~marketIndex=market.marketIndex, ~amount),
+        )
+      let needsToApprove = isGreaterThanApproval(
+        ~amount,
+        ~amountApproved=optDaiAmountApproved->Option.getWithDefault(
+          Ethers.BigNumber.fromUnsafe("0"),
         ),
       )
-    let mintFunction = () =>
-      contractExecutionHandler(
-        ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
-        ~contractFunction=isLong
-          ? Contracts.LongShort.mintLong(~marketIndex=market.marketIndex, ~amount)
-          : Contracts.LongShort.mintShort(~marketIndex=market.marketIndex, ~amount),
-      )
-    let mintAndStakeFunction = () =>
-      contractExecutionHandler(
-        ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
-        ~contractFunction=isLong
-          ? Contracts.LongShort.mintLongAndStake(~marketIndex=market.marketIndex, ~amount)
-          : Contracts.LongShort.mintShortAndStake(~marketIndex=market.marketIndex, ~amount),
-      )
-    let needsToApprove = isGreaterThanApproval(
-      ~amount,
-      ~amountApproved=optDaiAmountApproved->Option.getWithDefault(Ethers.BigNumber.fromUnsafe("0")),
-    )
 
-    switch needsToApprove {
-    | true =>
-      setContractActionToCallAfterApproval(_ => isStaking ? mintAndStakeFunction : mintFunction)
-      approveFunction()
-    | false => isStaking ? mintAndStakeFunction() : mintFunction()
-    }
-  })
+      switch needsToApprove {
+      | true =>
+        setContractActionToCallAfterApproval(_ => isStaking ? mintAndStakeFunction : mintFunction)
+        approveFunction()
+      | false => isStaking ? mintAndStakeFunction() : mintFunction()
+      }
+    },
+  )
 
   let formAmount = switch form.amountResult {
   | Some(Ok(amount)) => Some(amount)
@@ -189,7 +197,7 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
         </select>
         <AmountInput
           value=form.input.amount
-          optBalance={optDaiBalance->Option.getWithDefault(0->Ethers.BigNumber.fromInt)}
+          optBalance={optDaiBalance}
           disabled=form.submitting
           onBlur={_ => form.blurAmount()}
           onChange={event => form.updateAmount((input, amount) => {
@@ -197,13 +205,17 @@ let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarket
               amount: amount,
             }, (event->ReactEvent.Form.target)["value"])}
           placeholder={"Mint"}
-          onMaxClick={_ => form.updateAmount((input, amount) => {
-              ...input,
-              amount: amount,
-            }, switch optDaiBalance {
-            | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
-            | _ => "0"
-            })}
+          onMaxClick={_ =>
+            form.updateAmount(
+              (input, amount) => {
+                ...input,
+                amount: amount,
+              },
+              switch optDaiBalance {
+              | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
+              | _ => "0"
+              },
+            )}
         />
         {switch (form.amountResult, optAdditionalErrorMessage) {
         | (Some(Error(message)), _)
