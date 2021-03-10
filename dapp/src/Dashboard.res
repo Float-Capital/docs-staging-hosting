@@ -65,7 +65,10 @@ let floatProtocolCard = (~liveSince, ~totalTxs, ~totalUsers, ~totalGasUsed) =>
       list={[
         createDashboardLiProps(
           ~prefix=`📅 Live since:`,
-          ~value=liveSince->Ethers.BigNumber.toNumberFloat->Js.Date.fromFloat->Js.Date.toDateString,
+          ~value={
+            let dateObj = liveSince->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime
+            `${dateObj->Js.Date.toDateString} (${dateObj->DateFns.formatDistanceToNow})`
+          },
           (),
         ),
         createDashboardLiProps(
@@ -149,7 +152,6 @@ let make = () => {
     alternateComponent={<h1 onClick={_ => router->Next.Router.push("/login?nextPath=/dashboard")}>
       <Login />
     </h1>}>
-    // <Toggle onClick={() => Js.log("Switch to diff currency")} preLabel="BUSD" postLabel="BNB" />
     <div className="w-screen absolute flex flex-col left-0 top-0 mt-20 overflow-x-hidden">
       {<>
         {switch (globalStateQuery, marketDetailsQuery) {
@@ -199,25 +201,12 @@ let make = () => {
               </div>
             </div>
           }
-        // <div className="col-span-2">
-        //   <div
-        //     className="p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 rounded">
-        //     <h2 className="text-lg"> {"Total value locked"->React.string} </h2>
-        //     <p className="text-primary text-4xl">
-        //       {`BUSD ${totalValueLocked->FormatMoney.formatEther}`->React.string}
-        //     </p>
-        //   </div>
-        // </div>
-
         | (_, {data: Some(_), error: None, loading: false})
-        | ({data: Some(_), error: None, loading: false}, _) =>
-          "Query returned wrong number of results"->React.string
-        | (_, {data: None, error: None, loading: false}) => "Error getting data"->React.string
-        // ^ the other side of this was giving me a "this pattern is unused" for some reason
+        | ({data: Some(_), error: None, loading: false}, _)
+        | (_, {data: None, error: None, loading: false}) =>
+          "Error getting data"->React.string
         }}
       </>}
-      // <div> <MarketsList /> </div>
-      // <div> <StakeDetails /> </div>
     </div>
   </AccessControl>
 }
