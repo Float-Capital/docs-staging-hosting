@@ -11,7 +11,7 @@ function StartTrading(Props) {
             }, React.createElement(Link, {
                   href: optCurrentUser !== undefined ? "/markets" : "/login?nextPath=/markets",
                   children: React.createElement("span", {
-                        className: "cursor-pointer opacity-70 w-full flex justify-center"
+                        className: "cursor-pointer hover:opacity-70 w-full flex justify-center"
                       }, React.createElement("img", {
                             className: "p-4",
                             src: "/img/start-trading.png"

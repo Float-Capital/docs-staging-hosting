@@ -10,7 +10,7 @@ let make = () => {
       | Some(_) => "/markets"
       | None => "/login?nextPath=/markets"
       }}>
-      <span className="cursor-pointer opacity-70 w-full flex justify-center">
+      <span className="cursor-pointer hover:opacity-70 w-full flex justify-center">
         <img src="/img/start-trading.png" className="p-4" />
       </span>
     </Link>
