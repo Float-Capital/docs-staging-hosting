@@ -30,7 +30,7 @@ function StakeCardSide(Props) {
                     }, React.createElement("span", {
                           className: "font-bold"
                         }, isLong ? "LONG" : "SHORT"), " APY"), React.createElement("div", {
-                      className: "text-2xl tracking-widest font-alphbeta my-3"
+                      className: "text-2xl tracking-widest font-alphbeta"
                     }, mapVal(apy))), React.createElement("div", {
                   className: "flex flex-col items-center justify-center pt-0 mt-auto"
                 }, React.createElement("h3", {

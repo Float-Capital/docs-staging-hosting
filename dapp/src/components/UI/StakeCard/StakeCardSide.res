@@ -17,7 +17,7 @@ let make = (~marketName, ~isLong, ~apy, ~floatApy) => {
         <span className="font-bold"> {isLong ? "LONG"->React.string : "SHORT"->React.string} </span>
         {" APY"->React.string}
       </h3>
-      <div className="text-2xl tracking-widest font-alphbeta my-3"> {apy->mapVal} </div>
+      <div className="text-2xl tracking-widest font-alphbeta"> {apy->mapVal} </div>
     </div>
     <div className="flex flex-col items-center justify-center pt-0 mt-auto">
       <h3 className="text-xs mt-1">
