@@ -440,27 +440,69 @@ function useBalanceAndApproved(erc20Address, spender) {
         ];
 }
 
+function StakeForm$StakeFormInput(Props) {
+  var onSubmitOpt = Props.onSubmit;
+  var valueOpt = Props.value;
+  var optBalanceOpt = Props.optBalance;
+  var disabledOpt = Props.disabled;
+  var onChangeOpt = Props.onChange;
+  var onBlurOpt = Props.onBlur;
+  var onMaxClickOpt = Props.onMaxClick;
+  var synthetic = Props.synthetic;
+  var onSubmit = onSubmitOpt !== undefined ? onSubmitOpt : (function (param) {
+        
+      });
+  var value = valueOpt !== undefined ? valueOpt : "";
+  var optBalance = optBalanceOpt !== undefined ? Caml_option.valFromOption(optBalanceOpt) : undefined;
+  var disabled = disabledOpt !== undefined ? disabledOpt : false;
+  var onChange = onChangeOpt !== undefined ? onChangeOpt : (function (param) {
+        
+      });
+  var onBlur = onBlurOpt !== undefined ? onBlurOpt : (function (param) {
+        
+      });
+  var onMaxClick = onMaxClickOpt !== undefined ? onMaxClickOpt : (function (param) {
+        
+      });
+  return React.createElement(Form.make, {
+              className: "",
+              onSubmit: onSubmit,
+              children: null
+            }, React.createElement("div", {
+                  className: "px-8 pt-2"
+                }, React.createElement("div", {
+                      className: "-mb-px flex justify-between"
+                    }, React.createElement("div", {
+                          className: "no-underline text-teal-dark border-b-2 border-teal-dark tracking-wide font-bold py-3 mr-8",
+                          href: "#"
+                        }, "Stake ↗️"), React.createElement("div", {
+                          className: "no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3",
+                          href: "#"
+                        }, "Unstake ↗️"))), React.createElement(AmountInput.make, {
+                  placeholder: "Stake",
+                  value: value,
+                  optBalance: optBalance,
+                  disabled: disabled,
+                  onBlur: onBlur,
+                  onChange: onChange,
+                  onMaxClick: onMaxClick
+                }), React.createElement(Button.make, {
+                  onClick: (function (param) {
+                      
+                    }),
+                  children: "Stake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name,
+                  variant: "large"
+                }));
+}
+
+var StakeFormInput = {
+  make: StakeForm$StakeFormInput
+};
+
 function StakeForm$ConnectedStakeForm(Props) {
   var tokenId = Props.tokenId;
   var signer = Props.signer;
-  var token = Curry.app(Queries.SyntheticToken.use, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        {
-          tokenId: tokenId
-        }
-      ]);
+  var synthetic = Props.synthetic;
   var match = React.useState(function () {
         return function (param) {
           
@@ -507,65 +549,30 @@ function StakeForm$ConnectedStakeForm(Props) {
                         return param.approve(stakerContractAddress, arg);
                       }));
         }));
-  var match$4 = token.data;
-  var tmp;
-  if (token.loading) {
-    tmp = React.createElement(Loader.make, {});
-  } else if (token.error !== undefined) {
-    console.log("Unable to fetch token");
-    tmp = React.createElement(React.Fragment, undefined, "Unable to fetch token");
-  } else if (match$4 !== undefined) {
-    var synthetic = match$4.syntheticToken;
-    tmp = synthetic !== undefined ? React.createElement(Form.make, {
-            className: "",
-            onSubmit: (function (param) {
-                return Curry._1(form.submit, undefined);
-              }),
-            children: null
-          }, React.createElement("div", {
-                className: "px-8 pt-2"
-              }, React.createElement("div", {
-                    className: "-mb-px flex justify-between"
-                  }, React.createElement("div", {
-                        className: "no-underline text-teal-dark border-b-2 border-teal-dark tracking-wide font-bold py-3 mr-8",
-                        href: "#"
-                      }, "Stake ↗️"), React.createElement("div", {
-                        className: "no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3",
-                        href: "#"
-                      }, "Unstake ↗️"))), React.createElement(AmountInput.make, {
-                placeholder: "Stake",
-                value: form.input.amount,
-                optBalance: Belt_Option.getWithDefault(optTokenBalance, Ethers$1.BigNumber.from(0)),
-                disabled: form.submitting,
-                onBlur: (function (param) {
-                    return Curry._1(form.blurAmount, undefined);
-                  }),
-                onChange: (function ($$event) {
-                    return Curry._2(form.updateAmount, (function (param, amount) {
-                                  return {
-                                          amount: amount
-                                        };
-                                }), $$event.target.value);
-                  }),
-                onMaxClick: (function (param) {
-                    return Curry._2(form.updateAmount, (function (param, amount) {
-                                  return {
-                                          amount: amount
-                                        };
-                                }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
-                  })
-              }), React.createElement(Button.make, {
-                onClick: (function (param) {
-                    
-                  }),
-                children: "Stake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name,
-                variant: "large"
-              })) : React.createElement(React.Fragment, undefined, "this is not a valid token to stake");
-  } else {
-    console.log("You might think this is impossible, but depending on the situation it might not be!");
-    tmp = React.createElement(React.Fragment, undefined);
-  }
-  return React.createElement(React.Fragment, undefined, tmp);
+  return React.createElement(StakeForm$StakeFormInput, {
+              onSubmit: form.submit,
+              value: form.input.amount,
+              optBalance: optTokenBalance,
+              disabled: form.submitting,
+              onChange: (function ($$event) {
+                  return Curry._2(form.updateAmount, (function (param, amount) {
+                                return {
+                                        amount: amount
+                                      };
+                              }), $$event.target.value);
+                }),
+              onBlur: (function (param) {
+                  return Curry._1(form.blurAmount, undefined);
+                }),
+              onMaxClick: (function (param) {
+                  return Curry._2(form.updateAmount, (function (param, amount) {
+                                return {
+                                        amount: amount
+                                      };
+                              }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
+                }),
+              synthetic: synthetic
+            });
 }
 
 var ConnectedStakeForm = {
@@ -596,65 +603,42 @@ function StakeForm$1(Props) {
         return false;
       });
   var setShowLogin = match[1];
-  var signer = ContractActions.useSigner(undefined);
-  if (signer !== undefined) {
-    return React.createElement(StakeForm$ConnectedStakeForm, {
-                tokenId: tokenId,
-                signer: signer
-              });
-  }
-  if (match[0]) {
-    return React.createElement(Login.make, {});
-  }
   var match$1 = token.data;
   if (token.error !== undefined) {
     console.log("Unable to fetch token");
     return React.createElement(React.Fragment, undefined, "Unable to fetch token");
   }
-  if (!token.loading) {
-    if (match$1 !== undefined) {
-      if (match$1.syntheticToken === undefined) {
-        return React.createElement(React.Fragment, undefined, "Could not find this market - please check the URL carefully.");
-      }
-      
-    } else {
-      console.log("You might think this is impossible, but depending on the situation it might not be!");
-      return React.createElement(React.Fragment, undefined);
-    }
+  if (token.loading) {
+    return React.createElement(Loader.make, {});
   }
-  return React.createElement("form", {
-              disabled: true,
-              onClick: (function (param) {
-                  return Curry._1(setShowLogin, (function (param) {
-                                return true;
-                              }));
-                })
-            }, React.createElement("div", {
-                  className: "px-8 pt-2"
-                }, React.createElement("div", {
-                      className: "-mb-px flex justify-between"
-                    }, React.createElement("div", {
-                          className: "no-underline text-teal-dark border-b-2 border-teal-dark tracking-wide font-bold py-3 mr-8",
-                          href: "#"
-                        }, "Stake ↗️"), React.createElement("div", {
-                          className: "no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3",
-                          href: "#"
-                        }, "Unstake ↗️"))), React.createElement("div", {
-                  className: "flex flex-row my-3"
-                }, React.createElement("input", {
-                      className: "py-2 font-normal text-grey-darkest w-full py-1 px-2 outline-none text-md text-gray-600",
-                      id: "amount",
-                      placeholder: "Stake",
-                      type: "text"
-                    }), React.createElement("span", {
-                      className: "flex items-center bg-gray-200 hover:bg-white hover:text-gray-700 px-5 font-bold"
-                    }, React.createElement("span", undefined, "MAX"))), React.createElement(Button.make, {
-                  onClick: (function (param) {
-                      
-                    }),
-                  children: "Login to",
-                  variant: "large"
-                }));
+  if (match$1 === undefined) {
+    return React.createElement(React.Fragment, undefined, "Could not find this market - please check the URL carefully.");
+  }
+  var synthetic = match$1.syntheticToken;
+  if (synthetic === undefined) {
+    return React.createElement(React.Fragment, undefined, "Could not find this market - please check the URL carefully.");
+  }
+  var signer = ContractActions.useSigner(undefined);
+  if (signer !== undefined) {
+    return React.createElement(StakeForm$ConnectedStakeForm, {
+                tokenId: tokenId,
+                signer: signer,
+                synthetic: synthetic
+              });
+  } else if (match[0]) {
+    return React.createElement(Login.make, {});
+  } else {
+    return React.createElement("div", {
+                onClick: (function (param) {
+                    return Curry._1(setShowLogin, (function (param) {
+                                  return true;
+                                }));
+                  })
+              }, React.createElement(StakeForm$StakeFormInput, {
+                    disabled: true,
+                    synthetic: synthetic
+                  }));
+  }
 }
 
 var make = StakeForm$1;
@@ -663,6 +647,7 @@ export {
   StakeForm ,
   initialInput ,
   useBalanceAndApproved ,
+  StakeFormInput ,
   ConnectedStakeForm ,
   make ,
   

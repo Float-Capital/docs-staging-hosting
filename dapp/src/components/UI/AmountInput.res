@@ -1,5 +1,5 @@
 @react.component
-let make = (~placeholder, ~value, ~optBalance=?, ~disabled, ~onBlur, ~onChange, ~onMaxClick) =>
+let make = (~placeholder, ~value, ~optBalance=None, ~disabled, ~onBlur, ~onChange, ~onMaxClick) =>
   <div className="flex flex-row my-3">
     <input
       id="amount"

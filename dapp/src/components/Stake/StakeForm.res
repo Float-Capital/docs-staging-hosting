@@ -33,11 +33,43 @@ let useBalanceAndApproved = (~erc20Address, ~spender) => {
   (optBalance, optAmountApproved)
 }
 
+module StakeFormInput = {
+  @react.component
+  let make = (
+    ~onSubmit=_ => (),
+    ~value="",
+    ~optBalance=None,
+    ~disabled=false,
+    ~onChange=_ => (),
+    ~onBlur=_ => (),
+    ~onMaxClick=_ => (),
+    ~synthetic: Queries.SyntheticInfo.t,
+  ) =>
+    <Form className="" onSubmit>
+      <div className="px-8 pt-2">
+        <div className="-mb-px flex justify-between">
+          <div
+            className="no-underline text-teal-dark border-b-2 border-teal-dark tracking-wide font-bold py-3 mr-8"
+            href="#">
+            {`Stake ↗️`->React.string}
+          </div>
+          <div
+            className="no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3"
+            href="#">
+            {`Unstake ↗️`->React.string}
+          </div>
+        </div>
+      </div>
+      <AmountInput value optBalance disabled onBlur onChange placeholder={"Stake"} onMaxClick />
+      <Button onClick={_ => ()} variant="large">
+        {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
+      </Button>
+    </Form>
+}
+
 module ConnectedStakeForm = {
   @react.component
-  let make = (~tokenId, ~signer) => {
-    let token = Queries.SyntheticToken.use({tokenId: tokenId})
-
+  let make = (~tokenId, ~signer, ~synthetic: Queries.SyntheticInfo.t) => {
     let (
       contractActionToCallAfterApproval,
       setContractActionToCallAfterApproval,
@@ -94,128 +126,53 @@ module ConnectedStakeForm = {
       approveFunction()
     })
 
-    <>
-      {switch token {
-      | {loading: true} => <Loader />
-      | {error: Some(_error)} => {
-          Js.log("Unable to fetch token")
-          <> {"Unable to fetch token"->React.string} </>
-        }
-      | {data: Some({syntheticToken: Some(synthetic)})} =>
-        <Form
-          className=""
-          onSubmit={() => {
-            form.submit()
-          }}>
-          <div className="px-8 pt-2">
-            <div className="-mb-px flex justify-between">
-              <div
-                className="no-underline text-teal-dark border-b-2 border-teal-dark tracking-wide font-bold py-3 mr-8"
-                href="#">
-                {`Stake ↗️`->React.string}
-              </div>
-              <div
-                className="no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3"
-                href="#">
-                {`Unstake ↗️`->React.string}
-              </div>
-            </div>
-          </div>
-          <AmountInput
-            value={form.input.amount}
-            optBalance={optTokenBalance->Option.getWithDefault(0->Ethers.BigNumber.fromInt)}
-            disabled=form.submitting
-            onBlur={_ => form.blurAmount()}
-            onChange={event => form.updateAmount((_, amount) => {
-                amount: amount,
-              }, (event->ReactEvent.Form.target)["value"])}
-            placeholder={"Stake"}
-            onMaxClick={_ =>
-              form.updateAmount(
-                (_, amount) => {
-                  amount: amount,
-                },
-                switch optTokenBalance {
-                | Some(tokenBalance) => tokenBalance->Ethers.Utils.formatEther
-                | _ => "0"
-                },
-              )}
-          />
-          <Button onClick={_ => ()} variant="large">
-            {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
-          </Button>
-        </Form>
-      | {data: None, error: None, loading: false} => {
-          Js.log(
-            "You might think this is impossible, but depending on the situation it might not be!",
-          )
-          <> </>
-        }
-      | {data: Some({syntheticToken: None}), error: None, loading: false} => <>
-          {"this is not a valid token to stake"->React.string}
-        </>
-      }}
-    </>
+    <StakeFormInput
+      onSubmit=form.submit
+      value={form.input.amount}
+      optBalance={optTokenBalance}
+      disabled=form.submitting
+      onBlur={_ => form.blurAmount()}
+      onChange={event => form.updateAmount((_, amount) => {
+          amount: amount,
+        }, (event->ReactEvent.Form.target)["value"])}
+      onMaxClick={_ =>
+        form.updateAmount(
+          (_, amount) => {
+            amount: amount,
+          },
+          switch optTokenBalance {
+          | Some(tokenBalance) => tokenBalance->Ethers.Utils.formatEther
+          | _ => "0"
+          },
+        )}
+      synthetic
+    />
   }
 }
-
 @react.component
 let make = (~tokenId) => {
   let token = Queries.SyntheticToken.use({tokenId: tokenId})
   let (showLogin, setShowLogin) = React.useState(() => false)
 
-  switch ContractActions.useSigner() {
-  | Some(signer) => <ConnectedStakeForm signer tokenId />
-  | None =>
-    showLogin
-      ? <Login />
-      : {
-          switch token {
-          | {error: Some(_error)} => {
-              Js.log("Unable to fetch token")
-              <> {"Unable to fetch token"->React.string} </>
-            }
-          | {loading: true}
-          | {data: Some({syntheticToken: Some(_)})} =>
-            <form disabled=true onClick={_ => setShowLogin(_ => true)}>
-              <div className="px-8 pt-2">
-                <div className="-mb-px flex justify-between">
-                  <div
-                    className="no-underline text-teal-dark border-b-2 border-teal-dark tracking-wide font-bold py-3 mr-8"
-                    href="#">
-                    {`Stake ↗️`->React.string}
-                  </div>
-                  <div
-                    className="no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3"
-                    href="#">
-                    {`Unstake ↗️`->React.string}
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-row my-3">
-                <input
-                  id="amount"
-                  className="py-2 font-normal text-grey-darkest w-full py-1 px-2 outline-none text-md text-gray-600"
-                  type_="text"
-                  placeholder={"Stake"}
-                />
-                <span
-                  className="flex items-center bg-gray-200 hover:bg-white hover:text-gray-700 px-5 font-bold">
-                  <span> {"MAX"->React.string} </span>
-                </span>
-              </div>
-              <Button onClick={_ => ()} variant="large"> {`Login to`} </Button>
-            </form>
-          | {data: None, error: None, loading: false} => {
-              Js.log(
-                "You might think this is impossible, but depending on the situation it might not be!",
-              )
-              <> </>
-            }
-          | {data: Some({syntheticToken: None}), error: None, loading: false} => <>
-              {"Could not find this market - please check the URL carefully."->React.string}
-            </>
-          }
-        }
+  switch token {
+  | {error: Some(_error)} => {
+      Js.log("Unable to fetch token")
+      <> {"Unable to fetch token"->React.string} </>
+    }
+  | {loading: true} => <Loader />
+  | {data: Some({syntheticToken: Some(synthetic)})} =>
+    switch ContractActions.useSigner() {
+    | Some(signer) => <ConnectedStakeForm signer tokenId synthetic />
+    | None =>
+      showLogin
+        ? <Login />
+        : <div onClick={_ => setShowLogin(_ => true)}>
+            <StakeFormInput disabled=true synthetic />
+          </div>
+    }
+  | {data: None, error: None, loading: false}
+  | {data: Some({syntheticToken: None}), error: None, loading: false} => <>
+      {"Could not find this market - please check the URL carefully."->React.string}
+    </>
   }
 }
