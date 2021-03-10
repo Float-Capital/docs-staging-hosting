@@ -153,6 +153,7 @@ module ConnectedStakeForm = {
 let make = (~tokenId) => {
   let token = Queries.SyntheticToken.use({tokenId: tokenId})
   let (showLogin, setShowLogin) = React.useState(() => false)
+  let optSigner = ContractActions.useSigner()
 
   switch token {
   | {error: Some(_error)} => {
@@ -161,7 +162,7 @@ let make = (~tokenId) => {
     }
   | {loading: true} => <Loader />
   | {data: Some({syntheticToken: Some(synthetic)})} =>
-    switch ContractActions.useSigner() {
+    switch optSigner {
     | Some(signer) => <ConnectedStakeForm signer tokenId synthetic />
     | None =>
       showLogin
