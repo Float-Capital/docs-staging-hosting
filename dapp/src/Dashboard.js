@@ -7,6 +7,7 @@ import * as Ethers from "./ethereum/Ethers.js";
 import * as Queries from "./data/Queries.js";
 import * as Tooltip from "./components/UI/Tooltip.js";
 import Link from "next/link";
+import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as MiniLoader from "./components/UI/MiniLoader.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as DashboardLi from "./components/UI/Dashboard/DashboardLi.js";
@@ -15,20 +16,175 @@ import * as FormatMoney from "./components/UI/FormatMoney.js";
 import * as Router from "next/router";
 import * as AccessControl from "./components/AccessControl.js";
 import * as DashboardCalcs from "./libraries/DashboardCalcs.js";
-import * as DashboardHeader from "./components/UI/Dashboard/DashboardHeader.js";
 import * as DashboardStakeCard from "./components/UI/Dashboard/DashboardStakeCard.js";
-import * as DashboardColumnCard from "./components/UI/Dashboard/DashboardColumnCard.js";
 
-function Dashboard$DashboardColumn(Props) {
+function Dashboard$Divider(Props) {
   var children = Props.children;
   return React.createElement("div", {
-              className: "m-4 w-1/3"
+              className: "my-4 w-full md:w-1/3 px-3 md:px-0 md:m-4"
             }, children);
 }
 
-var DashboardColumn = {
-  make: Dashboard$DashboardColumn
+var Divider = {
+  make: Dashboard$Divider
 };
+
+function Dashboard$Card(Props) {
+  var children = Props.children;
+  return React.createElement("div", {
+              className: "bg-white w-full bg-opacity-75 rounded-lg shadow-lg mb-5"
+            }, children);
+}
+
+var Card = {
+  make: Dashboard$Card
+};
+
+function Dashboard$Header(Props) {
+  var children = Props.children;
+  return React.createElement("h1", {
+              className: "font-bold text-center pt-5 text-lg font-alphbeta"
+            }, children);
+}
+
+var Header = {
+  make: Dashboard$Header
+};
+
+function Dashboard$TrendingStakes(Props) {
+  var stakeDetailsQuery = Curry.app(Queries.StakingDetails.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ]);
+  var match = stakeDetailsQuery.data;
+  if (stakeDetailsQuery.loading) {
+    return React.createElement("div", {
+                className: "m-auto"
+              }, React.createElement(MiniLoader.make, {}));
+  }
+  if (stakeDetailsQuery.error !== undefined) {
+    return "Error loading data";
+  }
+  if (match === undefined) {
+    return "You might think this is impossible, but depending on the situation it might not be!";
+  }
+  var trendingStakes = DashboardCalcs.trendingStakes(match.syntheticMarkets);
+  return Belt_Array.map(trendingStakes, (function (param) {
+                var isLong = param.isLong;
+                var marketName = param.marketName;
+                return React.createElement(DashboardStakeCard.make, {
+                            marketName: marketName,
+                            isLong: isLong,
+                            yield: param.apy,
+                            rewards: param.floatApy,
+                            key: marketName + (
+                              isLong ? "-long" : "-short"
+                            )
+                          });
+              }));
+}
+
+var TrendingStakes = {
+  make: Dashboard$TrendingStakes
+};
+
+function totalValueCard(totalValueLocked) {
+  return React.createElement("div", {
+              className: "mx-3 p-5 md:mt-7 self-center text-center bg-white bg-opacity-75 rounded-lg shadow-lg"
+            }, React.createElement("span", {
+                  className: "font-alphbeta text-xl"
+                }, "Total Value"), React.createElement("span", {
+                  className: "text-sm"
+                }, " 🏦 of Float Protocol: "), React.createElement("span", {
+                  className: "text-green-700"
+                }, "$" + FormatMoney.formatEther(totalValueLocked)));
+}
+
+function floatProtocolCard(totalTxs, totalUsers, totalGasUsed) {
+  return React.createElement(Dashboard$Card, {
+              children: null
+            }, React.createElement(Dashboard$Header, {
+                  children: "Float Protocol 🏗️"
+                }), React.createElement(DashboardUl.make, {
+                  list: [
+                    DashboardLi.Props.createDashboardLiProps(undefined, "📅 Live since:", "28/02/2020", undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "📈 No. Txs:", totalTxs.toString(), undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "👯‍♀️ No. Users:", totalUsers.toString(), undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "⛽ Gas used:", totalGasUsed.toString(), undefined)
+                  ]
+                }));
+}
+
+function syntheticAssetsCard(totalSynthValue, numberOfSynths) {
+  return React.createElement(Dashboard$Card, {
+              children: null
+            }, React.createElement(Dashboard$Header, {
+                  children: null
+                }, "Synthetic Assets", React.createElement("img", {
+                      className: "inline h-5 ml-2",
+                      src: "/img/coin.png"
+                    })), React.createElement(DashboardUl.make, {
+                  list: [
+                    DashboardLi.Props.createDashboardLiProps(Caml_option.some(React.createElement(Tooltip.make, {
+                                  tip: "Redeemable value of synths in the open market"
+                                })), "💰 Total Synth Value: ", "$" + FormatMoney.formatEther(totalSynthValue), undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "👷‍♀️ No. Synths:", numberOfSynths, undefined)
+                  ]
+                }), React.createElement(Link, {
+                  href: "/markets",
+                  children: React.createElement("div", {
+                        className: "w-full p-4 pr-5 text-sm cursor-pointer"
+                      }, React.createElement("div", {
+                            className: "ml-10"
+                          }, "👀 See Markets"), React.createElement("div", {
+                            className: "ml-20"
+                          }, "to learn more..."))
+                }));
+}
+
+function floatTokenCard(totalFloatMinted) {
+  return React.createElement(Dashboard$Card, {
+              children: null
+            }, React.createElement(Dashboard$Header, {
+                  children: "🌊🌊 Float Token 🌊🌊"
+                }), React.createElement(DashboardUl.make, {
+                  list: [
+                    DashboardLi.Props.createDashboardLiProps(undefined, "😏 Float Price:", "...", undefined),
+                    DashboardLi.Props.createDashboardLiProps(Caml_option.some(React.createElement(Tooltip.make, {
+                                  tip: "The number of Float tokens in circulation"
+                                })), "🕶️ Float Supply:", Ethers.Utils.formatEtherToPrecision(totalFloatMinted, 2), undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "🧢 Market cap: ", "...", undefined)
+                  ]
+                }));
+}
+
+function stakingCard(totalValueStaked) {
+  return React.createElement(Dashboard$Card, {
+              children: null
+            }, React.createElement(Dashboard$Header, {
+                  children: "Staking 🔥"
+                }), React.createElement("div", {
+                  className: "text-center mt-5"
+                }, React.createElement("span", {
+                      className: "text-sm mr-1"
+                    }, "💰 Total Staked Value: "), "$" + FormatMoney.formatEther(totalValueStaked)), React.createElement("div", {
+                  className: "text-center mt-5 text-sm"
+                }, "Trending"), React.createElement("div", {
+                  className: "pt-2 pb-5"
+                }, React.createElement(Dashboard$TrendingStakes, {})));
+}
 
 function Dashboard(Props) {
   var router = Router.useRouter();
@@ -87,91 +243,15 @@ function Dashboard(Props) {
         var totalSynthValue = DashboardCalcs.getTotalSynthValue(totalValueLocked, totalValueStaked);
         var numberOfSynths = String((syntheticMarkets.length << 1));
         tmp = React.createElement("div", {
-              className: "min-w-3/4 flex flex-col self-center items-center justify-start"
-            }, React.createElement("div", {
-                  className: "p-5 mt-7 self-center text-center  bg-white bg-opacity-75 rounded-lg shadow-lg"
-                }, React.createElement("span", {
-                      className: "font-alphbeta text-xl"
-                    }, "Total Value"), React.createElement("span", {
-                      className: "text-sm"
-                    }, " 🏦 of Float Protocol: "), React.createElement("span", {
-                      className: "text-green-700"
-                    }, "$" + FormatMoney.formatEther(totalValueLocked))), React.createElement("div", {
-                  className: "w-full flex justify-between mt-1"
-                }, React.createElement(Dashboard$DashboardColumn, {
-                      children: React.createElement(DashboardColumnCard.make, {
-                            children: null
-                          }, React.createElement(DashboardHeader.make, {
-                                children: "Float Protocol 🏗️"
-                              }), React.createElement(DashboardUl.make, {
-                                list: [
-                                  DashboardLi.Props.createDashboardLiProps(undefined, "📅 Live since:", "28/02/2020", undefined),
-                                  DashboardLi.Props.createDashboardLiProps(undefined, "📈 No. Txs:", match$2.totalTxs.toString(), undefined),
-                                  DashboardLi.Props.createDashboardLiProps(undefined, "👯‍♀️ No. Users:", match$2.totalUsers.toString(), undefined),
-                                  DashboardLi.Props.createDashboardLiProps(undefined, "⛽ Gas used:", match$2.totalGasUsed.toString(), undefined)
-                                ]
-                              }))
-                    }), React.createElement(Dashboard$DashboardColumn, {
+              className: "min-w-3/4 max-w-full flex flex-col self-center items-center justify-start"
+            }, totalValueCard(totalValueLocked), React.createElement("div", {
+                  className: "w-full flex flex-col md:flex-row justify-between mt-1"
+                }, React.createElement(Dashboard$Divider, {
+                      children: floatProtocolCard(match$2.totalTxs, match$2.totalUsers, match$2.totalGasUsed)
+                    }), React.createElement(Dashboard$Divider, {
                       children: null
-                    }, React.createElement(DashboardColumnCard.make, {
-                          children: null
-                        }, React.createElement(DashboardHeader.make, {
-                              children: null
-                            }, "Synthetic Assets", React.createElement("img", {
-                                  className: "inline h-5 ml-2",
-                                  src: "/img/coin.png"
-                                })), React.createElement(DashboardUl.make, {
-                              list: [
-                                DashboardLi.Props.createDashboardLiProps(Caml_option.some(React.createElement(Tooltip.make, {
-                                              tip: "Redeemable value of synths in the open market"
-                                            })), "💰 Total Synth Value", "$" + FormatMoney.formatEther(totalSynthValue), undefined),
-                                DashboardLi.Props.createDashboardLiProps(undefined, "👷‍♀️ No. Synths:", numberOfSynths, undefined)
-                              ]
-                            }), React.createElement(Link, {
-                              href: "/markets",
-                              children: React.createElement("div", {
-                                    className: "w-full p-4 pr-5 text-sm cursor-pointer"
-                                  }, React.createElement("div", {
-                                        className: "ml-10"
-                                      }, "👀 See Markets"), React.createElement("div", {
-                                        className: "ml-20"
-                                      }, "to learn more..."))
-                            })), React.createElement(DashboardColumnCard.make, {
-                          children: null
-                        }, React.createElement(DashboardHeader.make, {
-                              children: "🌊🌊 Float Token 🌊🌊"
-                            }), React.createElement(DashboardUl.make, {
-                              list: [
-                                DashboardLi.Props.createDashboardLiProps(undefined, "😏 Float Price:", "...", undefined),
-                                DashboardLi.Props.createDashboardLiProps(Caml_option.some(React.createElement(Tooltip.make, {
-                                              tip: "The number of Float tokens in circulation"
-                                            })), "🕶️ Float Supply:", Ethers.Utils.formatEtherToPrecision(match$2.totalFloatMinted, 2), undefined),
-                                DashboardLi.Props.createDashboardLiProps(undefined, "🧢 Market cap: ", "...", undefined)
-                              ]
-                            }))), React.createElement(Dashboard$DashboardColumn, {
-                      children: React.createElement(DashboardColumnCard.make, {
-                            children: null
-                          }, React.createElement(DashboardHeader.make, {
-                                children: "Staking 🔥"
-                              }), React.createElement("div", {
-                                className: "text-center mt-5"
-                              }, React.createElement("span", {
-                                    className: "text-sm mr-1"
-                                  }, "💰 Total Staked Value"), "$" + FormatMoney.formatEther(totalValueStaked)), React.createElement("div", {
-                                className: "text-center mt-5 text-sm"
-                              }, "Trending"), React.createElement("div", {
-                                className: "pt-2 pb-5"
-                              }, React.createElement(DashboardStakeCard.make, {
-                                    marketName: "FTSE100",
-                                    isLong: true,
-                                    yieldStr: "87.5%",
-                                    rewardsStr: "637%"
-                                  }), React.createElement(DashboardStakeCard.make, {
-                                    marketName: "FTSE100",
-                                    isLong: true,
-                                    yieldStr: "87.5%",
-                                    rewardsStr: "637%"
-                                  })))
+                    }, syntheticAssetsCard(totalSynthValue, numberOfSynths), floatTokenCard(match$2.totalFloatMinted)), React.createElement(Dashboard$Divider, {
+                      children: stakingCard(totalValueStaked)
                     })));
       } else {
         tmp = "Query returned wrong number of results";
@@ -182,7 +262,7 @@ function Dashboard(Props) {
   }
   return React.createElement(AccessControl.make, {
               children: React.createElement("div", {
-                    className: "w-screen absolute flex flex-col left-0 top-0 mt-20"
+                    className: "w-screen absolute flex flex-col left-0 top-0 mt-20 overflow-x-hidden"
                   }, React.createElement(React.Fragment, undefined, tmp)),
               alternateComponent: React.createElement("h1", {
                     onClick: (function (param) {
@@ -198,7 +278,15 @@ var make = Dashboard;
 var $$default = Dashboard;
 
 export {
-  DashboardColumn ,
+  Divider ,
+  Card ,
+  Header ,
+  TrendingStakes ,
+  totalValueCard ,
+  floatProtocolCard ,
+  syntheticAssetsCard ,
+  floatTokenCard ,
+  stakingCard ,
   make ,
   $$default ,
   $$default as default,
