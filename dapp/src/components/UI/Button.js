@@ -7,16 +7,25 @@ function Button(Props) {
   var children = Props.children;
   var variantOpt = Props.variant;
   var variant = variantOpt !== undefined ? variantOpt : "small";
+  var outerContainerClass = "float-button-outer-container " + (
+    variant === "tiny" ? "float-button-outer-container-tiny" : ""
+  );
+  var containerClass = "float-button-container " + (
+    variant === "small" ? "float-button-container-small" : ""
+  ) + " " + (
+    variant === "tiny" ? "float-button-container-tiny" : ""
+  );
+  var buttonClass = "float-button " + (
+    variant === "small" ? "float-button-small" : ""
+  ) + " " + (
+    variant === "tiny" ? "float-button-tiny" : ""
+  );
   return React.createElement("div", {
-              className: "float-button-outer-container"
+              className: outerContainerClass
             }, React.createElement("div", {
-                  className: "float-button-container " + (
-                    variant === "small" ? "float-button-container-small" : ""
-                  )
+                  className: containerClass
                 }, React.createElement("button", {
-                      className: "float-button " + (
-                        variant === "small" ? "float-button-small" : ""
-                      ),
+                      className: buttonClass,
                       onClick: onClick
                     }, children)));
 }
