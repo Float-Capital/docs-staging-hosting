@@ -6,7 +6,7 @@ import * as StakeForm from "./components/Stake/StakeForm.js";
 import * as StakeList from "./components/Stake/StakeList.js";
 import * as Router from "next/router";
 
-function StakeNew$Markets(Props) {
+function Stake$Markets(Props) {
   var router = Router.useRouter();
   var stakeOption = Js_dict.get(router.query, "tokenAddress");
   return React.createElement(React.Fragment, undefined, stakeOption !== undefined ? React.createElement(StakeForm.make, {
@@ -15,11 +15,11 @@ function StakeNew$Markets(Props) {
 }
 
 var Markets = {
-  make: StakeNew$Markets
+  make: Stake$Markets
 };
 
 function $$default(param) {
-  return React.createElement(StakeNew$Markets, {});
+  return React.createElement(Stake$Markets, {});
 }
 
 export {
