@@ -58,12 +58,19 @@ let totalValueCard = (~totalValueLocked) =>
     </span>
   </div>
 
-let floatProtocolCard = (~totalTxs, ~totalUsers, ~totalGasUsed) =>
+let floatProtocolCard = (~liveSince, ~totalTxs, ~totalUsers, ~totalGasUsed) =>
   <Card>
     <Header> {`Float Protocol 🏗️`->React.string} </Header>
     <DashboardUl
       list={[
-        createDashboardLiProps(~prefix=`📅 Live since:`, ~value="28/02/2020", ()),
+        createDashboardLiProps(
+          ~prefix=`📅 Live since:`,
+          ~value={
+            let dateObj = liveSince->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime
+            `${dateObj->Js.Date.toDateString} (${dateObj->DateFns.formatDistanceToNow})`
+          },
+          (),
+        ),
         createDashboardLiProps(
           ~prefix=`📈 No. Txs:`,
           ~value=totalTxs->Ethers.BigNumber.toString,
@@ -149,7 +156,8 @@ let make = () => {
     | (_, {error: Some(_error)}) =>
       "Error loading data"->React.string
     | (
-        {data: Some({globalStates: [{totalFloatMinted, totalTxs, totalUsers, totalGasUsed}]})},
+        {data: Some({globalStates: [{totalFloatMinted, totalTxs, totalUsers, totalGasUsed,
+        timestampLaunched}]})},
         {data: Some({syntheticMarkets})},
       ) =>
       let {totalValueLocked, totalValueStaked} = DashboardCalcs.getTotalValueLockedAndTotalStaked(
@@ -161,8 +169,15 @@ let make = () => {
       <div className="min-w-3/4 max-w-full flex flex-col self-center items-center justify-start">
         {totalValueCard(~totalValueLocked)}
         <div className={"w-full flex flex-col md:flex-row justify-between mt-1"}>
-          <Divider> {floatProtocolCard(~totalTxs, ~totalUsers, ~totalGasUsed)} </Divider>
-          <Divider>
+                <Divider>
+                  {floatProtocolCard(
+                    ~liveSince=timestampLaunched,
+                    ~totalTxs,
+                    ~totalUsers,
+                    ~totalGasUsed,
+                  )}
+                </Divider>
+                          <Divider>
             {syntheticAssetsCard(~totalSynthValue, ~numberOfSynths)}
             {floatTokenCard(~totalFloatMinted)}
           </Divider>
