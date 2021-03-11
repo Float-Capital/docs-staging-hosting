@@ -143,8 +143,8 @@ type State @entity {
   stateIndex: BigInt! #
   syntheticToken: SyntheticToken!
   timestamp: BigInt!
-  accumulativeFloatPerSecond: BigInt!
-  floatRatePerSecondOverInterval: BigInt!
+  accumulativeFloatPerToken: BigInt!
+  floatRatePerTokenOverInterval: BigInt!
   timeSinceLastUpdate: BigInt!
 }
 

@@ -156,8 +156,13 @@ let make = () => {
     | (_, {error: Some(_error)}) =>
       "Error loading data"->React.string
     | (
-        {data: Some({globalStates: [{totalFloatMinted, totalTxs, totalUsers, totalGasUsed,
-        timestampLaunched}]})},
+        {
+          data: Some({
+            globalStates: [
+              {totalFloatMinted, totalTxs, totalUsers, totalGasUsed, timestampLaunched},
+            ],
+          }),
+        },
         {data: Some({syntheticMarkets})},
       ) =>
       let {totalValueLocked, totalValueStaked} = DashboardCalcs.getTotalValueLockedAndTotalStaked(
@@ -169,15 +174,10 @@ let make = () => {
       <div className="min-w-3/4 max-w-full flex flex-col self-center items-center justify-start">
         {totalValueCard(~totalValueLocked)}
         <div className={"w-full flex flex-col md:flex-row justify-between mt-1"}>
-                <Divider>
-                  {floatProtocolCard(
-                    ~liveSince=timestampLaunched,
-                    ~totalTxs,
-                    ~totalUsers,
-                    ~totalGasUsed,
-                  )}
-                </Divider>
-                          <Divider>
+          <Divider>
+            {floatProtocolCard(~liveSince=timestampLaunched, ~totalTxs, ~totalUsers, ~totalGasUsed)}
+          </Divider>
+          <Divider>
             {syntheticAssetsCard(~totalSynthValue, ~numberOfSynths)}
             {floatTokenCard(~totalFloatMinted)}
           </Divider>

@@ -73,7 +73,8 @@ let make = () => {
   <>
     <hr />
     {switch (userQuery, haveLocalSignInDetails) {
-    | ({data: Some({user: userArray})}, true) if userArray->Array.length > 0 => <div>
+    | ({data: Some({user: userArray})}, true) if userArray->Array.length > 0 =>
+      <div>
         {"You are signed in!"->React.string}
         {switch userArray[0] {
         | Some({userName: None}) => <div> {`You have no username!`->React.string} </div>
@@ -105,7 +106,8 @@ let make = () => {
           </button>
         </Form>
       </div>
-    | ({data: Some({user: userArray})}, _) => <button
+    | ({data: Some({user: userArray})}, _) =>
+      <button
         className="bg-green-500 rounded-lg my-2"
         onClick={_ => {
           let uAS = userAddress->ethAdrToStr

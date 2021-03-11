@@ -9500,7 +9500,7 @@
             "deprecationReason": null,
             "description": null,
             "isDeprecated": false,
-            "name": "accumulativeFloatPerSecond",
+            "name": "accumulativeFloatPerToken",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -9516,7 +9516,7 @@
             "deprecationReason": null,
             "description": null,
             "isDeprecated": false,
-            "name": "floatRatePerSecondOverInterval",
+            "name": "floatRatePerTokenOverInterval",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -10981,7 +10981,7 @@
           {
             "defaultValue": null,
             "description": null,
-            "name": "accumulativeFloatPerSecond",
+            "name": "accumulativeFloatPerToken",
             "type": {
               "kind": "SCALAR",
               "name": "BigInt",
@@ -10991,7 +10991,7 @@
           {
             "defaultValue": null,
             "description": null,
-            "name": "accumulativeFloatPerSecond_not",
+            "name": "accumulativeFloatPerToken_not",
             "type": {
               "kind": "SCALAR",
               "name": "BigInt",
@@ -11001,7 +11001,7 @@
           {
             "defaultValue": null,
             "description": null,
-            "name": "accumulativeFloatPerSecond_gt",
+            "name": "accumulativeFloatPerToken_gt",
             "type": {
               "kind": "SCALAR",
               "name": "BigInt",
@@ -11011,7 +11011,7 @@
           {
             "defaultValue": null,
             "description": null,
-            "name": "accumulativeFloatPerSecond_lt",
+            "name": "accumulativeFloatPerToken_lt",
             "type": {
               "kind": "SCALAR",
               "name": "BigInt",
@@ -11021,7 +11021,7 @@
           {
             "defaultValue": null,
             "description": null,
-            "name": "accumulativeFloatPerSecond_gte",
+            "name": "accumulativeFloatPerToken_gte",
             "type": {
               "kind": "SCALAR",
               "name": "BigInt",
@@ -11031,7 +11031,7 @@
           {
             "defaultValue": null,
             "description": null,
-            "name": "accumulativeFloatPerSecond_lte",
+            "name": "accumulativeFloatPerToken_lte",
             "type": {
               "kind": "SCALAR",
               "name": "BigInt",
@@ -11041,7 +11041,7 @@
           {
             "defaultValue": null,
             "description": null,
-            "name": "accumulativeFloatPerSecond_in",
+            "name": "accumulativeFloatPerToken_in",
             "type": {
               "kind": "LIST",
               "name": null,
@@ -11059,7 +11059,7 @@
           {
             "defaultValue": null,
             "description": null,
-            "name": "accumulativeFloatPerSecond_not_in",
+            "name": "accumulativeFloatPerToken_not_in",
             "type": {
               "kind": "LIST",
               "name": null,
@@ -11077,7 +11077,7 @@
           {
             "defaultValue": null,
             "description": null,
-            "name": "floatRatePerSecondOverInterval",
+            "name": "floatRatePerTokenOverInterval",
             "type": {
               "kind": "SCALAR",
               "name": "BigInt",
@@ -11087,7 +11087,7 @@
           {
             "defaultValue": null,
             "description": null,
-            "name": "floatRatePerSecondOverInterval_not",
+            "name": "floatRatePerTokenOverInterval_not",
             "type": {
               "kind": "SCALAR",
               "name": "BigInt",
@@ -11097,7 +11097,7 @@
           {
             "defaultValue": null,
             "description": null,
-            "name": "floatRatePerSecondOverInterval_gt",
+            "name": "floatRatePerTokenOverInterval_gt",
             "type": {
               "kind": "SCALAR",
               "name": "BigInt",
@@ -11107,7 +11107,7 @@
           {
             "defaultValue": null,
             "description": null,
-            "name": "floatRatePerSecondOverInterval_lt",
+            "name": "floatRatePerTokenOverInterval_lt",
             "type": {
               "kind": "SCALAR",
               "name": "BigInt",
@@ -11117,7 +11117,7 @@
           {
             "defaultValue": null,
             "description": null,
-            "name": "floatRatePerSecondOverInterval_gte",
+            "name": "floatRatePerTokenOverInterval_gte",
             "type": {
               "kind": "SCALAR",
               "name": "BigInt",
@@ -11127,7 +11127,7 @@
           {
             "defaultValue": null,
             "description": null,
-            "name": "floatRatePerSecondOverInterval_lte",
+            "name": "floatRatePerTokenOverInterval_lte",
             "type": {
               "kind": "SCALAR",
               "name": "BigInt",
@@ -11137,7 +11137,7 @@
           {
             "defaultValue": null,
             "description": null,
-            "name": "floatRatePerSecondOverInterval_in",
+            "name": "floatRatePerTokenOverInterval_in",
             "type": {
               "kind": "LIST",
               "name": null,
@@ -11155,7 +11155,7 @@
           {
             "defaultValue": null,
             "description": null,
-            "name": "floatRatePerSecondOverInterval_not_in",
+            "name": "floatRatePerTokenOverInterval_not_in",
             "type": {
               "kind": "LIST",
               "name": null,
@@ -11315,13 +11315,13 @@
             "deprecationReason": null,
             "description": null,
             "isDeprecated": false,
-            "name": "accumulativeFloatPerSecond"
+            "name": "accumulativeFloatPerToken"
           },
           {
             "deprecationReason": null,
             "description": null,
             "isDeprecated": false,
-            "name": "floatRatePerSecondOverInterval"
+            "name": "floatRatePerTokenOverInterval"
           },
           {
             "deprecationReason": null,
