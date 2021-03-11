@@ -4,6 +4,7 @@ const rinkebyProviderUrl = "";
 const goerliProviderUrl = "";
 const kovanProviderUrl = "";
 const binanceTest = "";
+const bsc = "";
 
 const etherscanApiKey = "";
 const bscscanApiKey = "";
@@ -14,6 +15,7 @@ module.exports = {
   goerliProviderUrl,
   kovanProviderUrl,
   binanceTest,
+  bsc,
   etherscanApiKey,
   bscscanApiKey,
 };
