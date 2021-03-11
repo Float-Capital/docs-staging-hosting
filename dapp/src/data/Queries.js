@@ -190,6 +190,125 @@ var SyntheticInfo = {
 var Raw$2 = {};
 
 var query$2 = ((frag_0) => require("@apollo/client").gql`
+  fragment SyntheticMarketInfo on SyntheticMarket   {
+    __typename
+    name
+    symbol
+    marketIndex
+    timestampCreated
+    oracleAddress
+    syntheticLong  {
+      ...SyntheticInfo
+    }
+    syntheticShort  {
+      ...SyntheticInfo
+    }
+    latestSystemState  {
+      __typename
+      timestamp
+      totalLockedLong
+      totalLockedShort
+      totalValueLocked
+      longTokenPrice
+      shortTokenPrice
+    }
+  }
+  ${frag_0}
+`)(query$1);
+
+function parse$2(value) {
+  var value$1 = value.latestSystemState;
+  return {
+          __typename: value.__typename,
+          name: value.name,
+          symbol: value.symbol,
+          marketIndex: GqlConverters.$$BigInt.parse(value.marketIndex),
+          timestampCreated: GqlConverters.$$BigInt.parse(value.timestampCreated),
+          oracleAddress: GqlConverters.Address.parse(value.oracleAddress),
+          syntheticLong: parse$1(value.syntheticLong),
+          syntheticShort: parse$1(value.syntheticShort),
+          latestSystemState: {
+            __typename: value$1.__typename,
+            timestamp: GqlConverters.$$BigInt.parse(value$1.timestamp),
+            totalLockedLong: GqlConverters.$$BigInt.parse(value$1.totalLockedLong),
+            totalLockedShort: GqlConverters.$$BigInt.parse(value$1.totalLockedShort),
+            totalValueLocked: GqlConverters.$$BigInt.parse(value$1.totalValueLocked),
+            longTokenPrice: GqlConverters.$$BigInt.parse(value$1.longTokenPrice),
+            shortTokenPrice: GqlConverters.$$BigInt.parse(value$1.shortTokenPrice)
+          }
+        };
+}
+
+function serialize$2(value) {
+  var value$1 = value.latestSystemState;
+  var value$2 = value$1.shortTokenPrice;
+  var value$3 = GqlConverters.$$BigInt.serialize(value$2);
+  var value$4 = value$1.longTokenPrice;
+  var value$5 = GqlConverters.$$BigInt.serialize(value$4);
+  var value$6 = value$1.totalValueLocked;
+  var value$7 = GqlConverters.$$BigInt.serialize(value$6);
+  var value$8 = value$1.totalLockedShort;
+  var value$9 = GqlConverters.$$BigInt.serialize(value$8);
+  var value$10 = value$1.totalLockedLong;
+  var value$11 = GqlConverters.$$BigInt.serialize(value$10);
+  var value$12 = value$1.timestamp;
+  var value$13 = GqlConverters.$$BigInt.serialize(value$12);
+  var value$14 = value$1.__typename;
+  var latestSystemState = {
+    __typename: value$14,
+    timestamp: value$13,
+    totalLockedLong: value$11,
+    totalLockedShort: value$9,
+    totalValueLocked: value$7,
+    longTokenPrice: value$5,
+    shortTokenPrice: value$3
+  };
+  var value$15 = value.syntheticShort;
+  var syntheticShort = serialize$1(value$15);
+  var value$16 = value.syntheticLong;
+  var syntheticLong = serialize$1(value$16);
+  var value$17 = value.oracleAddress;
+  var value$18 = GqlConverters.Address.serialize(value$17);
+  var value$19 = value.timestampCreated;
+  var value$20 = GqlConverters.$$BigInt.serialize(value$19);
+  var value$21 = value.marketIndex;
+  var value$22 = GqlConverters.$$BigInt.serialize(value$21);
+  var value$23 = value.symbol;
+  var value$24 = value.name;
+  var value$25 = value.__typename;
+  return {
+          __typename: value$25,
+          name: value$24,
+          symbol: value$23,
+          marketIndex: value$22,
+          timestampCreated: value$20,
+          oracleAddress: value$18,
+          syntheticLong: syntheticLong,
+          syntheticShort: syntheticShort,
+          latestSystemState: latestSystemState
+        };
+}
+
+function verifyArgsAndParse$2(_SyntheticMarketInfo, value) {
+  return parse$2(value);
+}
+
+function verifyName$2(param) {
+  
+}
+
+var SyntheticMarketInfo = {
+  Raw: Raw$2,
+  query: query$2,
+  parse: parse$2,
+  serialize: serialize$2,
+  verifyArgsAndParse: verifyArgsAndParse$2,
+  verifyName: verifyName$2
+};
+
+var Raw$3 = {};
+
+var query$3 = ((frag_0) => require("@apollo/client").gql`
   query ($userId: String!)  {
     user(id: $userId)  {
       ...BasicUserInfo
@@ -198,14 +317,14 @@ var query$2 = ((frag_0) => require("@apollo/client").gql`
   ${frag_0}
 `)(query);
 
-function parse$2(value) {
+function parse$3(value) {
   var value$1 = value.user;
   return {
           user: !(value$1 == null) ? parse(value$1) : undefined
         };
 }
 
-function serialize$2(value) {
+function serialize$3(value) {
   var value$1 = value.user;
   var user = value$1 !== undefined ? serialize(value$1) : null;
   return {
@@ -226,19 +345,19 @@ function makeVariables(userId, param) {
 }
 
 var UserQuery_inner = {
-  Raw: Raw$2,
-  query: query$2,
-  parse: parse$2,
-  serialize: serialize$2,
+  Raw: Raw$3,
+  query: query$3,
+  parse: parse$3,
+  serialize: serialize$3,
   serializeVariables: serializeVariables,
   makeVariables: makeVariables
 };
 
 var include = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query$2,
-      Raw: Raw$2,
-      parse: parse$2,
-      serialize: serialize$2,
+      query: query$3,
+      Raw: Raw$3,
+      parse: parse$3,
+      serialize: serialize$3,
       serializeVariables: serializeVariables
     });
 
@@ -252,10 +371,10 @@ var UserQuery_useLazyWithVariables = include.useLazyWithVariables;
 
 var UserQuery = {
   UserQuery_inner: UserQuery_inner,
-  Raw: Raw$2,
-  query: query$2,
-  parse: parse$2,
-  serialize: serialize$2,
+  Raw: Raw$3,
+  query: query$3,
+  parse: parse$3,
+  serialize: serialize$3,
   serializeVariables: serializeVariables,
   makeVariables: makeVariables,
   refetchQueryDescription: UserQuery_refetchQueryDescription,
@@ -264,9 +383,9 @@ var UserQuery = {
   useLazyWithVariables: UserQuery_useLazyWithVariables
 };
 
-var Raw$3 = {};
+var Raw$4 = {};
 
-var query$3 = ((frag_0) => require("@apollo/client").gql`
+var query$4 = ((frag_0) => require("@apollo/client").gql`
   query ($userId: String!, $timestamp: BigInt!)  {
     stateChanges(where: {timestamp_gt: $timestamp})  {
       __typename
@@ -279,7 +398,7 @@ var query$3 = ((frag_0) => require("@apollo/client").gql`
   ${frag_0}
 `)(query);
 
-function parse$3(value) {
+function parse$4(value) {
   var value$1 = value.stateChanges;
   return {
           stateChanges: value$1.map(function (value) {
@@ -293,7 +412,7 @@ function parse$3(value) {
         };
 }
 
-function serialize$3(value) {
+function serialize$4(value) {
   var value$1 = value.stateChanges;
   var stateChanges = value$1.map(function (value) {
         var value$1 = value.affectedUsers;
@@ -327,19 +446,19 @@ function makeVariables$1(userId, timestamp, param) {
 }
 
 var StateChangePoll_inner = {
-  Raw: Raw$3,
-  query: query$3,
-  parse: parse$3,
-  serialize: serialize$3,
+  Raw: Raw$4,
+  query: query$4,
+  parse: parse$4,
+  serialize: serialize$4,
   serializeVariables: serializeVariables$1,
   makeVariables: makeVariables$1
 };
 
 var include$1 = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query$3,
-      Raw: Raw$3,
-      parse: parse$3,
-      serialize: serialize$3,
+      query: query$4,
+      Raw: Raw$4,
+      parse: parse$4,
+      serialize: serialize$4,
       serializeVariables: serializeVariables$1
     });
 
@@ -353,10 +472,10 @@ var StateChangePoll_useLazyWithVariables = include$1.useLazyWithVariables;
 
 var StateChangePoll = {
   StateChangePoll_inner: StateChangePoll_inner,
-  Raw: Raw$3,
-  query: query$3,
-  parse: parse$3,
-  serialize: serialize$3,
+  Raw: Raw$4,
+  query: query$4,
+  parse: parse$4,
+  serialize: serialize$4,
   serializeVariables: serializeVariables$1,
   makeVariables: makeVariables$1,
   refetchQueryDescription: StateChangePoll_refetchQueryDescription,
@@ -365,9 +484,9 @@ var StateChangePoll = {
   useLazyWithVariables: StateChangePoll_useLazyWithVariables
 };
 
-var Raw$4 = {};
+var Raw$5 = {};
 
-var query$4 = (require("@apollo/client").gql`
+var query$5 = (require("@apollo/client").gql`
   fragment LongSynth on SyntheticToken   {
     __typename
     floatMintedLong: floatMintedFromSpecificToken
@@ -375,7 +494,7 @@ var query$4 = (require("@apollo/client").gql`
   }
 `);
 
-function parse$4(value) {
+function parse$5(value) {
   return {
           __typename: value.__typename,
           floatMintedLong: GqlConverters.$$BigInt.parse(value.floatMintedLong),
@@ -383,7 +502,7 @@ function parse$4(value) {
         };
 }
 
-function serialize$4(value) {
+function serialize$5(value) {
   var value$1 = value.longAddress;
   var value$2 = GqlConverters.Address.serialize(value$1);
   var value$3 = value.floatMintedLong;
@@ -396,26 +515,26 @@ function serialize$4(value) {
         };
 }
 
-function verifyArgsAndParse$2(_LongSynth, value) {
-  return parse$4(value);
+function verifyArgsAndParse$3(_LongSynth, value) {
+  return parse$5(value);
 }
 
-function verifyName$2(param) {
+function verifyName$3(param) {
   
 }
 
 var LongSynth = {
-  Raw: Raw$4,
-  query: query$4,
-  parse: parse$4,
-  serialize: serialize$4,
-  verifyArgsAndParse: verifyArgsAndParse$2,
-  verifyName: verifyName$2
+  Raw: Raw$5,
+  query: query$5,
+  parse: parse$5,
+  serialize: serialize$5,
+  verifyArgsAndParse: verifyArgsAndParse$3,
+  verifyName: verifyName$3
 };
 
-var Raw$5 = {};
+var Raw$6 = {};
 
-var query$5 = (require("@apollo/client").gql`
+var query$6 = (require("@apollo/client").gql`
   query   {
     systemStates(first: 1, orderBy: timestamp, orderDirection: desc)  {
       __typename
@@ -431,7 +550,7 @@ var query$5 = (require("@apollo/client").gql`
   }
 `);
 
-function parse$5(value) {
+function parse$6(value) {
   var value$1 = value.systemStates;
   return {
           systemStates: value$1.map(function (value) {
@@ -450,7 +569,7 @@ function parse$5(value) {
         };
 }
 
-function serialize$5(value) {
+function serialize$6(value) {
   var value$1 = value.systemStates;
   var systemStates = value$1.map(function (value) {
         var value$1 = value.setBy;
@@ -500,20 +619,20 @@ function makeDefaultVariables(param) {
 }
 
 var LatestSystemState_inner = {
-  Raw: Raw$5,
-  query: query$5,
-  parse: parse$5,
-  serialize: serialize$5,
+  Raw: Raw$6,
+  query: query$6,
+  parse: parse$6,
+  serialize: serialize$6,
   serializeVariables: serializeVariables$2,
   makeVariables: makeVariables$2,
   makeDefaultVariables: makeDefaultVariables
 };
 
 var include$2 = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query$5,
-      Raw: Raw$5,
-      parse: parse$5,
-      serialize: serialize$5,
+      query: query$6,
+      Raw: Raw$6,
+      parse: parse$6,
+      serialize: serialize$6,
       serializeVariables: serializeVariables$2
     });
 
@@ -527,10 +646,10 @@ var LatestSystemState_useLazyWithVariables = include$2.useLazyWithVariables;
 
 var LatestSystemState = {
   LatestSystemState_inner: LatestSystemState_inner,
-  Raw: Raw$5,
-  query: query$5,
-  parse: parse$5,
-  serialize: serialize$5,
+  Raw: Raw$6,
+  query: query$6,
+  parse: parse$6,
+  serialize: serialize$6,
   serializeVariables: serializeVariables$2,
   makeVariables: makeVariables$2,
   makeDefaultVariables: makeDefaultVariables,
@@ -540,9 +659,9 @@ var LatestSystemState = {
   useLazyWithVariables: LatestSystemState_useLazyWithVariables
 };
 
-var Raw$6 = {};
+var Raw$7 = {};
 
-var query$6 = (require("@apollo/client").gql`
+var query$7 = (require("@apollo/client").gql`
   query ($userId: String!)  {
     user(id: $userId)  {
       __typename
@@ -556,7 +675,7 @@ var query$6 = (require("@apollo/client").gql`
   }
 `);
 
-function parse$6(value) {
+function parse$7(value) {
   var value$1 = value.user;
   var tmp;
   if (value$1 == null) {
@@ -580,7 +699,7 @@ function parse$6(value) {
         };
 }
 
-function serialize$6(value) {
+function serialize$7(value) {
   var value$1 = value.user;
   var user;
   if (value$1 !== undefined) {
@@ -626,19 +745,19 @@ function makeVariables$3(userId, param) {
 }
 
 var UsersState_inner = {
-  Raw: Raw$6,
-  query: query$6,
-  parse: parse$6,
-  serialize: serialize$6,
+  Raw: Raw$7,
+  query: query$7,
+  parse: parse$7,
+  serialize: serialize$7,
   serializeVariables: serializeVariables$3,
   makeVariables: makeVariables$3
 };
 
 var include$3 = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query$6,
-      Raw: Raw$6,
-      parse: parse$6,
-      serialize: serialize$6,
+      query: query$7,
+      Raw: Raw$7,
+      parse: parse$7,
+      serialize: serialize$7,
       serializeVariables: serializeVariables$3
     });
 
@@ -652,10 +771,10 @@ var UsersState_useLazyWithVariables = include$3.useLazyWithVariables;
 
 var UsersState = {
   UsersState_inner: UsersState_inner,
-  Raw: Raw$6,
-  query: query$6,
-  parse: parse$6,
-  serialize: serialize$6,
+  Raw: Raw$7,
+  query: query$7,
+  parse: parse$7,
+  serialize: serialize$7,
   serializeVariables: serializeVariables$3,
   makeVariables: makeVariables$3,
   refetchQueryDescription: UsersState_refetchQueryDescription,
@@ -664,9 +783,9 @@ var UsersState = {
   useLazyWithVariables: UsersState_useLazyWithVariables
 };
 
-var Raw$7 = {};
+var Raw$8 = {};
 
-var query$7 = (require("@apollo/client").gql`
+var query$8 = (require("@apollo/client").gql`
   query   {
     syntheticMarkets  {
       __typename
@@ -698,7 +817,7 @@ var query$7 = (require("@apollo/client").gql`
   }
 `);
 
-function parse$7(value) {
+function parse$8(value) {
   var value$1 = value.syntheticMarkets;
   return {
           syntheticMarkets: value$1.map(function (value) {
@@ -736,7 +855,7 @@ function parse$7(value) {
         };
 }
 
-function serialize$7(value) {
+function serialize$8(value) {
   var value$1 = value.syntheticMarkets;
   var syntheticMarkets = value$1.map(function (value) {
         var value$1 = value.latestSystemState;
@@ -821,20 +940,20 @@ function makeDefaultVariables$1(param) {
 }
 
 var MarketDetails_inner = {
-  Raw: Raw$7,
-  query: query$7,
-  parse: parse$7,
-  serialize: serialize$7,
+  Raw: Raw$8,
+  query: query$8,
+  parse: parse$8,
+  serialize: serialize$8,
   serializeVariables: serializeVariables$4,
   makeVariables: makeVariables$4,
   makeDefaultVariables: makeDefaultVariables$1
 };
 
 var include$4 = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query$7,
-      Raw: Raw$7,
-      parse: parse$7,
-      serialize: serialize$7,
+      query: query$8,
+      Raw: Raw$8,
+      parse: parse$8,
+      serialize: serialize$8,
       serializeVariables: serializeVariables$4
     });
 
@@ -848,10 +967,10 @@ var MarketDetails_useLazyWithVariables = include$4.useLazyWithVariables;
 
 var MarketDetails = {
   MarketDetails_inner: MarketDetails_inner,
-  Raw: Raw$7,
-  query: query$7,
-  parse: parse$7,
-  serialize: serialize$7,
+  Raw: Raw$8,
+  query: query$8,
+  parse: parse$8,
+  serialize: serialize$8,
   serializeVariables: serializeVariables$4,
   makeVariables: makeVariables$4,
   makeDefaultVariables: makeDefaultVariables$1,
@@ -861,155 +980,27 @@ var MarketDetails = {
   useLazyWithVariables: MarketDetails_useLazyWithVariables
 };
 
-var Raw$8 = {};
+var Raw$9 = {};
 
-var query$8 = (require("@apollo/client").gql`
+var query$9 = ((frag_0) => require("@apollo/client").gql`
   query   {
     syntheticMarkets  {
-      __typename
-      name
-      symbol
-      marketIndex
-      timestampCreated
-      oracleAddress
-      syntheticLong  {
-        __typename
-        longTokenAddress: id
-        tokenAddress
-        longTotalStaked: totalStaked
-      }
-      syntheticShort  {
-        __typename
-        shortTokenAddress: id
-        tokenAddress
-        shortTotalStaked: totalStaked
-      }
-      latestSystemState  {
-        __typename
-        timestamp
-        totalLockedLong
-        totalLockedShort
-        totalValueLocked
-        longTokenPrice
-        shortTokenPrice
-      }
+      ...SyntheticMarketInfo
     }
   }
-`);
+  ${frag_0}
+`)(query$2);
 
-function parse$8(value) {
+function parse$9(value) {
   var value$1 = value.syntheticMarkets;
   return {
-          syntheticMarkets: value$1.map(function (value) {
-                var value$1 = value.syntheticLong;
-                var value$2 = value.syntheticShort;
-                var value$3 = value.latestSystemState;
-                return {
-                        __typename: value.__typename,
-                        name: value.name,
-                        symbol: value.symbol,
-                        marketIndex: GqlConverters.$$BigInt.parse(value.marketIndex),
-                        timestampCreated: GqlConverters.$$BigInt.parse(value.timestampCreated),
-                        oracleAddress: GqlConverters.Address.parse(value.oracleAddress),
-                        syntheticLong: {
-                          __typename: value$1.__typename,
-                          longTokenAddress: value$1.longTokenAddress,
-                          tokenAddress: GqlConverters.Address.parse(value$1.tokenAddress),
-                          longTotalStaked: GqlConverters.$$BigInt.parse(value$1.longTotalStaked)
-                        },
-                        syntheticShort: {
-                          __typename: value$2.__typename,
-                          shortTokenAddress: value$2.shortTokenAddress,
-                          tokenAddress: GqlConverters.Address.parse(value$2.tokenAddress),
-                          shortTotalStaked: GqlConverters.$$BigInt.parse(value$2.shortTotalStaked)
-                        },
-                        latestSystemState: {
-                          __typename: value$3.__typename,
-                          timestamp: GqlConverters.$$BigInt.parse(value$3.timestamp),
-                          totalLockedLong: GqlConverters.$$BigInt.parse(value$3.totalLockedLong),
-                          totalLockedShort: GqlConverters.$$BigInt.parse(value$3.totalLockedShort),
-                          totalValueLocked: GqlConverters.$$BigInt.parse(value$3.totalValueLocked),
-                          longTokenPrice: GqlConverters.$$BigInt.parse(value$3.longTokenPrice),
-                          shortTokenPrice: GqlConverters.$$BigInt.parse(value$3.shortTokenPrice)
-                        }
-                      };
-              })
+          syntheticMarkets: value$1.map(parse$2)
         };
 }
 
-function serialize$8(value) {
+function serialize$9(value) {
   var value$1 = value.syntheticMarkets;
-  var syntheticMarkets = value$1.map(function (value) {
-        var value$1 = value.latestSystemState;
-        var value$2 = value$1.shortTokenPrice;
-        var value$3 = GqlConverters.$$BigInt.serialize(value$2);
-        var value$4 = value$1.longTokenPrice;
-        var value$5 = GqlConverters.$$BigInt.serialize(value$4);
-        var value$6 = value$1.totalValueLocked;
-        var value$7 = GqlConverters.$$BigInt.serialize(value$6);
-        var value$8 = value$1.totalLockedShort;
-        var value$9 = GqlConverters.$$BigInt.serialize(value$8);
-        var value$10 = value$1.totalLockedLong;
-        var value$11 = GqlConverters.$$BigInt.serialize(value$10);
-        var value$12 = value$1.timestamp;
-        var value$13 = GqlConverters.$$BigInt.serialize(value$12);
-        var value$14 = value$1.__typename;
-        var latestSystemState = {
-          __typename: value$14,
-          timestamp: value$13,
-          totalLockedLong: value$11,
-          totalLockedShort: value$9,
-          totalValueLocked: value$7,
-          longTokenPrice: value$5,
-          shortTokenPrice: value$3
-        };
-        var value$15 = value.syntheticShort;
-        var value$16 = value$15.shortTotalStaked;
-        var value$17 = GqlConverters.$$BigInt.serialize(value$16);
-        var value$18 = value$15.tokenAddress;
-        var value$19 = GqlConverters.Address.serialize(value$18);
-        var value$20 = value$15.shortTokenAddress;
-        var value$21 = value$15.__typename;
-        var syntheticShort = {
-          __typename: value$21,
-          shortTokenAddress: value$20,
-          tokenAddress: value$19,
-          shortTotalStaked: value$17
-        };
-        var value$22 = value.syntheticLong;
-        var value$23 = value$22.longTotalStaked;
-        var value$24 = GqlConverters.$$BigInt.serialize(value$23);
-        var value$25 = value$22.tokenAddress;
-        var value$26 = GqlConverters.Address.serialize(value$25);
-        var value$27 = value$22.longTokenAddress;
-        var value$28 = value$22.__typename;
-        var syntheticLong = {
-          __typename: value$28,
-          longTokenAddress: value$27,
-          tokenAddress: value$26,
-          longTotalStaked: value$24
-        };
-        var value$29 = value.oracleAddress;
-        var value$30 = GqlConverters.Address.serialize(value$29);
-        var value$31 = value.timestampCreated;
-        var value$32 = GqlConverters.$$BigInt.serialize(value$31);
-        var value$33 = value.marketIndex;
-        var value$34 = GqlConverters.$$BigInt.serialize(value$33);
-        var value$35 = value.symbol;
-        var value$36 = value.name;
-        var value$37 = value.__typename;
-        return {
-                __typename: value$37,
-                name: value$36,
-                symbol: value$35,
-                marketIndex: value$34,
-                timestampCreated: value$32,
-                oracleAddress: value$30,
-                syntheticLong: syntheticLong,
-                syntheticShort: syntheticShort,
-                latestSystemState: latestSystemState
-              };
-      });
+  var syntheticMarkets = value$1.map(serialize$2);
   return {
           syntheticMarkets: syntheticMarkets
         };
@@ -1028,20 +1019,20 @@ function makeDefaultVariables$2(param) {
 }
 
 var StakingDetails_inner = {
-  Raw: Raw$8,
-  query: query$8,
-  parse: parse$8,
-  serialize: serialize$8,
+  Raw: Raw$9,
+  query: query$9,
+  parse: parse$9,
+  serialize: serialize$9,
   serializeVariables: serializeVariables$5,
   makeVariables: makeVariables$5,
   makeDefaultVariables: makeDefaultVariables$2
 };
 
 var include$5 = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query$8,
-      Raw: Raw$8,
-      parse: parse$8,
-      serialize: serialize$8,
+      query: query$9,
+      Raw: Raw$9,
+      parse: parse$9,
+      serialize: serialize$9,
       serializeVariables: serializeVariables$5
     });
 
@@ -1055,10 +1046,10 @@ var StakingDetails_useLazyWithVariables = include$5.useLazyWithVariables;
 
 var StakingDetails = {
   StakingDetails_inner: StakingDetails_inner,
-  Raw: Raw$8,
-  query: query$8,
-  parse: parse$8,
-  serialize: serialize$8,
+  Raw: Raw$9,
+  query: query$9,
+  parse: parse$9,
+  serialize: serialize$9,
   serializeVariables: serializeVariables$5,
   makeVariables: makeVariables$5,
   makeDefaultVariables: makeDefaultVariables$2,
@@ -1068,9 +1059,9 @@ var StakingDetails = {
   useLazyWithVariables: StakingDetails_useLazyWithVariables
 };
 
-var Raw$9 = {};
+var Raw$10 = {};
 
-var query$9 = ((frag_0) => require("@apollo/client").gql`
+var query$10 = ((frag_0) => require("@apollo/client").gql`
   query   {
     syntheticTokens  {
       ...SyntheticInfo
@@ -1079,14 +1070,14 @@ var query$9 = ((frag_0) => require("@apollo/client").gql`
   ${frag_0}
 `)(query$1);
 
-function parse$9(value) {
+function parse$10(value) {
   var value$1 = value.syntheticTokens;
   return {
           syntheticTokens: value$1.map(parse$1)
         };
 }
 
-function serialize$9(value) {
+function serialize$10(value) {
   var value$1 = value.syntheticTokens;
   var syntheticTokens = value$1.map(serialize$1);
   return {
@@ -1107,20 +1098,20 @@ function makeDefaultVariables$3(param) {
 }
 
 var SyntheticTokens_inner = {
-  Raw: Raw$9,
-  query: query$9,
-  parse: parse$9,
-  serialize: serialize$9,
+  Raw: Raw$10,
+  query: query$10,
+  parse: parse$10,
+  serialize: serialize$10,
   serializeVariables: serializeVariables$6,
   makeVariables: makeVariables$6,
   makeDefaultVariables: makeDefaultVariables$3
 };
 
 var include$6 = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query$9,
-      Raw: Raw$9,
-      parse: parse$9,
-      serialize: serialize$9,
+      query: query$10,
+      Raw: Raw$10,
+      parse: parse$10,
+      serialize: serialize$10,
       serializeVariables: serializeVariables$6
     });
 
@@ -1134,10 +1125,10 @@ var SyntheticTokens_useLazyWithVariables = include$6.useLazyWithVariables;
 
 var SyntheticTokens = {
   SyntheticTokens_inner: SyntheticTokens_inner,
-  Raw: Raw$9,
-  query: query$9,
-  parse: parse$9,
-  serialize: serialize$9,
+  Raw: Raw$10,
+  query: query$10,
+  parse: parse$10,
+  serialize: serialize$10,
   serializeVariables: serializeVariables$6,
   makeVariables: makeVariables$6,
   makeDefaultVariables: makeDefaultVariables$3,
@@ -1147,9 +1138,9 @@ var SyntheticTokens = {
   useLazyWithVariables: SyntheticTokens_useLazyWithVariables
 };
 
-var Raw$10 = {};
+var Raw$11 = {};
 
-var query$10 = ((frag_0) => require("@apollo/client").gql`
+var query$11 = ((frag_0) => require("@apollo/client").gql`
   query ($tokenId: String!)  {
     syntheticToken(id: $tokenId)  {
       ...SyntheticInfo
@@ -1158,14 +1149,14 @@ var query$10 = ((frag_0) => require("@apollo/client").gql`
   ${frag_0}
 `)(query$1);
 
-function parse$10(value) {
+function parse$11(value) {
   var value$1 = value.syntheticToken;
   return {
           syntheticToken: !(value$1 == null) ? parse$1(value$1) : undefined
         };
 }
 
-function serialize$10(value) {
+function serialize$11(value) {
   var value$1 = value.syntheticToken;
   var syntheticToken = value$1 !== undefined ? serialize$1(value$1) : null;
   return {
@@ -1186,19 +1177,19 @@ function makeVariables$7(tokenId, param) {
 }
 
 var SyntheticToken_inner = {
-  Raw: Raw$10,
-  query: query$10,
-  parse: parse$10,
-  serialize: serialize$10,
+  Raw: Raw$11,
+  query: query$11,
+  parse: parse$11,
+  serialize: serialize$11,
   serializeVariables: serializeVariables$7,
   makeVariables: makeVariables$7
 };
 
 var include$7 = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query$10,
-      Raw: Raw$10,
-      parse: parse$10,
-      serialize: serialize$10,
+      query: query$11,
+      Raw: Raw$11,
+      parse: parse$11,
+      serialize: serialize$11,
       serializeVariables: serializeVariables$7
     });
 
@@ -1212,10 +1203,10 @@ var SyntheticToken_useLazyWithVariables = include$7.useLazyWithVariables;
 
 var SyntheticToken = {
   SyntheticToken_inner: SyntheticToken_inner,
-  Raw: Raw$10,
-  query: query$10,
-  parse: parse$10,
-  serialize: serialize$10,
+  Raw: Raw$11,
+  query: query$11,
+  parse: parse$11,
+  serialize: serialize$11,
   serializeVariables: serializeVariables$7,
   makeVariables: makeVariables$7,
   refetchQueryDescription: SyntheticToken_refetchQueryDescription,
@@ -1224,9 +1215,9 @@ var SyntheticToken = {
   useLazyWithVariables: SyntheticToken_useLazyWithVariables
 };
 
-var Raw$11 = {};
+var Raw$12 = {};
 
-var query$11 = ((frag_0) => require("@apollo/client").gql`
+var query$12 = ((frag_0) => require("@apollo/client").gql`
   query ($userId: String!)  {
     currentStakes(where: {user: $userId})  {
       __typename
@@ -1252,7 +1243,7 @@ var query$11 = ((frag_0) => require("@apollo/client").gql`
   ${frag_0}
 `)(query$1);
 
-function parse$11(value) {
+function parse$12(value) {
   var value$1 = value.currentStakes;
   return {
           currentStakes: value$1.map(function (value) {
@@ -1280,7 +1271,7 @@ function parse$11(value) {
         };
 }
 
-function serialize$11(value) {
+function serialize$12(value) {
   var value$1 = value.currentStakes;
   var currentStakes = value$1.map(function (value) {
         var value$1 = value.lastMintState;
@@ -1341,19 +1332,19 @@ function makeVariables$8(userId, param) {
 }
 
 var UsersStakes_inner = {
-  Raw: Raw$11,
-  query: query$11,
-  parse: parse$11,
-  serialize: serialize$11,
+  Raw: Raw$12,
+  query: query$12,
+  parse: parse$12,
+  serialize: serialize$12,
   serializeVariables: serializeVariables$8,
   makeVariables: makeVariables$8
 };
 
 var include$8 = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query$11,
-      Raw: Raw$11,
-      parse: parse$11,
-      serialize: serialize$11,
+      query: query$12,
+      Raw: Raw$12,
+      parse: parse$12,
+      serialize: serialize$12,
       serializeVariables: serializeVariables$8
     });
 
@@ -1367,10 +1358,10 @@ var UsersStakes_useLazyWithVariables = include$8.useLazyWithVariables;
 
 var UsersStakes = {
   UsersStakes_inner: UsersStakes_inner,
-  Raw: Raw$11,
-  query: query$11,
-  parse: parse$11,
-  serialize: serialize$11,
+  Raw: Raw$12,
+  query: query$12,
+  parse: parse$12,
+  serialize: serialize$12,
   serializeVariables: serializeVariables$8,
   makeVariables: makeVariables$8,
   refetchQueryDescription: UsersStakes_refetchQueryDescription,
@@ -1379,9 +1370,9 @@ var UsersStakes = {
   useLazyWithVariables: UsersStakes_useLazyWithVariables
 };
 
-var Raw$12 = {};
+var Raw$13 = {};
 
-var query$12 = ((frag_0) => require("@apollo/client").gql`
+var query$13 = ((frag_0) => require("@apollo/client").gql`
   query ($userId: String!)  {
     currentStakes(where: {user: $userId, withdrawn: false})  {
       __typename
@@ -1402,7 +1393,7 @@ var query$12 = ((frag_0) => require("@apollo/client").gql`
   ${frag_0}
 `)(query$1);
 
-function parse$12(value) {
+function parse$13(value) {
   var value$1 = value.currentStakes;
   return {
           currentStakes: value$1.map(function (value) {
@@ -1424,7 +1415,7 @@ function parse$12(value) {
         };
 }
 
-function serialize$12(value) {
+function serialize$13(value) {
   var value$1 = value.currentStakes;
   var currentStakes = value$1.map(function (value) {
         var value$1 = value.currentStake;
@@ -1475,19 +1466,19 @@ function makeVariables$9(userId, param) {
 }
 
 var UsersActiveStakes_inner = {
-  Raw: Raw$12,
-  query: query$12,
-  parse: parse$12,
-  serialize: serialize$12,
+  Raw: Raw$13,
+  query: query$13,
+  parse: parse$13,
+  serialize: serialize$13,
   serializeVariables: serializeVariables$9,
   makeVariables: makeVariables$9
 };
 
 var include$9 = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query$12,
-      Raw: Raw$12,
-      parse: parse$12,
-      serialize: serialize$12,
+      query: query$13,
+      Raw: Raw$13,
+      parse: parse$13,
+      serialize: serialize$13,
       serializeVariables: serializeVariables$9
     });
 
@@ -1501,10 +1492,10 @@ var UsersActiveStakes_useLazyWithVariables = include$9.useLazyWithVariables;
 
 var UsersActiveStakes = {
   UsersActiveStakes_inner: UsersActiveStakes_inner,
-  Raw: Raw$12,
-  query: query$12,
-  parse: parse$12,
-  serialize: serialize$12,
+  Raw: Raw$13,
+  query: query$13,
+  parse: parse$13,
+  serialize: serialize$13,
   serializeVariables: serializeVariables$9,
   makeVariables: makeVariables$9,
   refetchQueryDescription: UsersActiveStakes_refetchQueryDescription,
@@ -1513,9 +1504,9 @@ var UsersActiveStakes = {
   useLazyWithVariables: UsersActiveStakes_useLazyWithVariables
 };
 
-var Raw$13 = {};
+var Raw$14 = {};
 
-var query$13 = (require("@apollo/client").gql`
+var query$14 = (require("@apollo/client").gql`
   query   {
     globalStates(first: 1)  {
       __typename
@@ -1528,7 +1519,7 @@ var query$13 = (require("@apollo/client").gql`
   }
 `);
 
-function parse$13(value) {
+function parse$14(value) {
   var value$1 = value.globalStates;
   return {
           globalStates: value$1.map(function (value) {
@@ -1544,7 +1535,7 @@ function parse$13(value) {
         };
 }
 
-function serialize$13(value) {
+function serialize$14(value) {
   var value$1 = value.globalStates;
   var globalStates = value$1.map(function (value) {
         var value$1 = value.timestampLaunched;
@@ -1585,20 +1576,20 @@ function makeDefaultVariables$4(param) {
 }
 
 var GlobalState_inner = {
-  Raw: Raw$13,
-  query: query$13,
-  parse: parse$13,
-  serialize: serialize$13,
+  Raw: Raw$14,
+  query: query$14,
+  parse: parse$14,
+  serialize: serialize$14,
   serializeVariables: serializeVariables$10,
   makeVariables: makeVariables$10,
   makeDefaultVariables: makeDefaultVariables$4
 };
 
 var include$10 = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query$13,
-      Raw: Raw$13,
-      parse: parse$13,
-      serialize: serialize$13,
+      query: query$14,
+      Raw: Raw$14,
+      parse: parse$14,
+      serialize: serialize$14,
       serializeVariables: serializeVariables$10
     });
 
@@ -1612,10 +1603,10 @@ var GlobalState_useLazyWithVariables = include$10.useLazyWithVariables;
 
 var GlobalState = {
   GlobalState_inner: GlobalState_inner,
-  Raw: Raw$13,
-  query: query$13,
-  parse: parse$13,
-  serialize: serialize$13,
+  Raw: Raw$14,
+  query: query$14,
+  parse: parse$14,
+  serialize: serialize$14,
   serializeVariables: serializeVariables$10,
   makeVariables: makeVariables$10,
   makeDefaultVariables: makeDefaultVariables$4,
@@ -1628,6 +1619,7 @@ var GlobalState = {
 export {
   BasicUserInfo ,
   SyntheticInfo ,
+  SyntheticMarketInfo ,
   UserQuery ,
   StateChangePoll ,
   LongSynth ,

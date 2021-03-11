@@ -23,6 +23,27 @@ fragment SyntheticInfo on SyntheticToken {
   tokenType
   tokenAddress
 }
+fragment SyntheticMarketInfo on SyntheticMarket {
+  name
+  symbol
+  marketIndex
+  timestampCreated
+  oracleAddress
+  syntheticLong {
+    ...SyntheticInfo
+  }
+  syntheticShort {
+    ...SyntheticInfo
+  }
+  latestSystemState {
+    timestamp
+    totalLockedLong
+    totalLockedShort
+    totalValueLocked
+    longTokenPrice
+    shortTokenPrice
+  }
+}
 `)
 
 module UserQuery = %graphql(`
@@ -106,36 +127,14 @@ module MarketDetails = %graphql(`
 module StakingDetails = %graphql(`
 {
   syntheticMarkets {
-    name
-    symbol
-    marketIndex
-    timestampCreated
-    oracleAddress
-    syntheticLong {
-      longTokenAddress: id
-      tokenAddress
-      longTotalStaked: totalStaked
-    }
-    syntheticShort {
-      shortTokenAddress: id
-      tokenAddress
-      shortTotalStaked: totalStaked
-    }
-    latestSystemState {
-      timestamp
-      totalLockedLong
-      totalLockedShort
-      totalValueLocked
-      longTokenPrice
-      shortTokenPrice
-    }
+    ...SyntheticMarketInfo
   }
 }
 `)
 
 module SyntheticTokens = %graphql(`
 {
-  syntheticTokens{
+  syntheticTokens {
     ...SyntheticInfo
   }
 }

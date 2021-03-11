@@ -12,7 +12,7 @@ type stakeApyType = {
   floatApy: float,
 }
 
-let trendingStakes = (~syntheticMarkets: array<Queries.StakingDetails.t_syntheticMarkets>) => {
+let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>) => {
   syntheticMarkets
   ->Array.reduce([], (
     previous,

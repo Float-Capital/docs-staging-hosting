@@ -1,3 +1,5 @@
+open Globals
+
 // Big numbers
 let zero = Ethers.BigNumber.fromUnsafe("0")
 let oneHundred = Ethers.BigNumber.fromUnsafe("100000000000000000000") // 10 ^ 20
@@ -95,9 +97,9 @@ let make = (
       longTokenPrice,
       shortTokenPrice,
     },
-    syntheticShort: {shortTotalStaked, shortTokenAddress},
-    syntheticLong: {longTotalStaked, longTokenAddress},
-  }: Queries.StakingDetails.t_syntheticMarkets,
+    syntheticShort: {totalStaked: shortTotalStaked, tokenAddress: shortTokenAddress},
+    syntheticLong: {totalStaked: longTotalStaked, tokenAddress: longTokenAddress},
+  }: Queries.SyntheticMarketInfo.t,
 ) => {
   let router = Next.Router.useRouter()
 
@@ -177,14 +179,14 @@ let make = (
         <div className="w-full flex justify-around">
           <Button
             onClick={_ => {
-              router->Next.Router.push(`/stake?tokenAddress=${longTokenAddress}`)
+              router->Next.Router.push(`/stake?tokenAddress=${longTokenAddress->ethAdrToLowerStr}`)
             }}
             variant="small">
             "Stake Long"
           </Button>
           <Button
             onClick={_ => {
-              router->Next.Router.push(`/stake?tokenAddress=${shortTokenAddress}`)
+              router->Next.Router.push(`/stake?tokenAddress=${shortTokenAddress->ethAdrToLowerStr}`)
             }}
             variant="small">
             "Stake Short"
