@@ -3,7 +3,7 @@ const path = require("path");
 
 let output = {};
 
-const dir = "./contracts/build/contracts";
+const dir = "./contracts/buildsDeployed/deployed";
 const files = fs.readdirSync(dir);
 files.map((file) => {
   const data = fs.readFileSync(path.join(dir, file));
