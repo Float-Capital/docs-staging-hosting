@@ -4,6 +4,7 @@ import {
   StakeAdded,
   StakeWithdrawn,
   FloatMinted,
+  KFactorParametersChanges,
 } from "../generated/Staker/Staker";
 import { erc20 } from "../generated/templates";
 import {
@@ -125,6 +126,10 @@ export function handleStateAdded(event: StateAdded): void {
     []
   );
 }
+
+export function handleKFactorParametersChanges(
+  event: KFactorParametersChanges
+): void {}
 
 export function handleStakeAdded(event: StakeAdded): void {
   let txHash = event.transaction.hash;

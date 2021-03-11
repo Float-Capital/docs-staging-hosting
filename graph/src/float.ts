@@ -10,6 +10,7 @@ import {
   TokenPriceRefreshed,
   ValueLockedInSystem,
   LongShort,
+  FeesChanges,
 } from "../generated/LongShort/LongShort";
 import {
   StateChange,
@@ -172,10 +173,10 @@ export function handleSyntheticTokenCreated(
   let syntheticName = event.params.name;
   let syntheticSymbol = event.params.symbol;
 
-  let baseEntryFee = event.params.baseEntryFee;
-  let badLiquidityEntryFee = event.params.badLiquidityEntryFee;
-  let baseExitFee = event.params.baseExitFee;
-  let badLiquidityExitFee = event.params.badLiquidityExitFee;
+  let baseEntryFee = ZERO;
+  let badLiquidityEntryFee = ZERO;
+  let baseExitFee = ZERO;
+  let badLiquidityExitFee = ZERO;
 
   let marketIndexString = marketIndex.toString();
 
@@ -210,6 +211,8 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.marketIndex = marketIndex;
   syntheticMarket.oracleAddress = oracleAddress;
   syntheticMarket.feeStructure = fees.id;
+  syntheticMarket.kPeriod = ZERO;
+  syntheticMarket.kMultiplier = ZERO;
 
   state.syntheticPrice = initialAssetPrice; // change me
 
@@ -272,6 +275,13 @@ export function handleSyntheticTokenCreated(
     ],
     []
   );
+}
+
+export function handleFeesChanges(event: FeesChanges): void {
+  let baseEntryFee = event.params.baseEntryFee;
+  let badLiquidityEntryFee = event.params.badLiquidityEntryFee;
+  let baseExitFee = event.params.baseExitFee;
+  let badLiquidityExitFee = event.params.badLiquidityExitFee;
 }
 
 export function handleLongMinted(event: LongMinted): void {
