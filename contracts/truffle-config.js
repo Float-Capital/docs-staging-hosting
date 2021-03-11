@@ -78,13 +78,7 @@ module.exports = {
     },
     bsc: {
       network_id: 56,
-      provider: new HDWalletProvider(
-        mnemonic,
-        "https://bsc-dataseed1.defibit.io/",
-        // "https://bsc-dataseed4.binance.org/",
-        // "https://bsc-dataseed3.binance.org/",
-        0
-      ),
+      provider: lazyCreateNetwork(bsc),
       gas: 29000000,
       gasPrice: 12000000000, // 20 gwei
       skipDryRun: true,
