@@ -4,6 +4,7 @@ import * as React from "react";
 import * as Button from "../UI/Button.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Ethers$1 from "ethers";
+import * as Globals from "../../libraries/Globals.js";
 import * as Tooltip from "../UI/Tooltip.js";
 import * as StakeBar from "../UI/StakeCard/StakeBar.js";
 import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
@@ -91,14 +92,14 @@ function StakeCard(Props) {
   var totalLockedLong = match.totalLockedLong;
   var currentTimestamp = match.timestamp;
   var match$1 = param.syntheticShort;
-  var shortTokenAddress = match$1.shortTokenAddress;
+  var shortTokenAddress = match$1.tokenAddress;
   var match$2 = param.syntheticLong;
-  var longTokenAddress = match$2.longTokenAddress;
+  var longTokenAddress = match$2.tokenAddress;
   var timestampCreated = param.timestampCreated;
   var marketName = param.name;
   var router = Router.useRouter();
-  var longDollarValueStaked = calculateDollarValue(match.longTokenPrice, match$2.longTotalStaked);
-  var shortDollarValueStaked = calculateDollarValue(match.shortTokenPrice, match$1.shortTotalStaked);
+  var longDollarValueStaked = calculateDollarValue(match.longTokenPrice, match$2.totalStaked);
+  var shortDollarValueStaked = calculateDollarValue(match.shortTokenPrice, match$1.totalStaked);
   var totalDollarValueStake = longDollarValueStaked.add(shortDollarValueStaked);
   var percentStrLong = percentStr(longDollarValueStaked, totalDollarValueStake);
   var percentStrShort = (100.0 - Belt_Option.getExn(Belt_Float.fromString(percentStrLong))).toFixed(2);
@@ -136,14 +137,14 @@ function StakeCard(Props) {
                           className: "w-full flex justify-around"
                         }, React.createElement(Button.make, {
                               onClick: (function (param) {
-                                  router.push("/stake?tokenAddress=" + longTokenAddress);
+                                  router.push("/stake?tokenAddress=" + Globals.ethAdrToLowerStr(longTokenAddress));
                                   
                                 }),
                               children: "Stake Long",
                               variant: "small"
                             }), React.createElement(Button.make, {
                               onClick: (function (param) {
-                                  router.push("/stake?tokenAddress=" + shortTokenAddress);
+                                  router.push("/stake?tokenAddress=" + Globals.ethAdrToLowerStr(shortTokenAddress));
                                   
                                 }),
                               children: "Stake Short",

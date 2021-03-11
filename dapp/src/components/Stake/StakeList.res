@@ -1,6 +1,7 @@
 @react.component
 let make = () => {
-  let stakeDetailsQuery = Queries.StakingDetails.use()
+  let stakeDetailsQuery = DataHooks.useGetStakes()
+  Js.log("I rerendered")
 
   <div className="w-full max-w-4xl mx-auto">
     {switch stakeDetailsQuery {
