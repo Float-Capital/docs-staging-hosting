@@ -136,14 +136,25 @@ const createSynthetic = async (
     fundToken.address,
     oracleManager.address,
     yieldManager.address,
-    _baseEntryFee,
-    _badLiquidityEntryFee,
-    _baseExitFee,
-    _badLiquidityExitFee,
     { from: admin }
   );
 
   const currentMarketIndex = await longShort.latestMarket.call();
+
+  let kInitialMultiplier = 0;
+  let kPeriod = 0;
+
+  await longShort.initializeMarket(
+    currentMarketIndex,
+    _baseEntryFee,
+    _baseExitFee,
+    _badLiquidityEntryFee,
+    _badLiquidityExitFee,
+    kInitialMultiplier,
+    kPeriod,
+    { from: admin }
+  );
+
   const longAddress = await longShort.longTokens.call(currentMarketIndex);
   const shortAddress = await longShort.shortTokens.call(currentMarketIndex);
   let longToken = await SyntheticToken.at(longAddress);
@@ -230,7 +241,12 @@ const feeCalculation = (
     }
   }
   // If greater than minFeeThreshold
-  if (amount.add(longValue).add(shortValue).gte(minThreshold)) {
+  if (
+    amount
+      .add(longValue)
+      .add(shortValue)
+      .gte(minThreshold)
+  ) {
     const TEN_TO_THE_18 = "1" + "000000000000000000";
     let betaDiff = new BN(TEN_TO_THE_18).sub(thinBeta); // TODO: when previous beta != 1
 
@@ -278,7 +294,10 @@ const logGasPrices = async (
   console.log(`USD Price: $${ethPriceUsd}`);
   const ethCost =
     Number(
-      totalCostEth.mul(new BN(ethPriceUsd)).mul(new BN(100)).div(ONE_ETH)
+      totalCostEth
+        .mul(new BN(ethPriceUsd))
+        .mul(new BN(100))
+        .div(ONE_ETH)
     ) / 100;
   console.log(`Cost on ETH Mainnet: $${ethCost}`);
 
@@ -290,7 +309,10 @@ const logGasPrices = async (
   console.log(`BNB Price: $${bnbPriceUsd}`);
   const bscCost =
     Number(
-      totalCostBsc.mul(new BN(bnbPriceUsd)).mul(new BN(100)).div(ONE_ETH)
+      totalCostBsc
+        .mul(new BN(bnbPriceUsd))
+        .mul(new BN(100))
+        .div(ONE_ETH)
     ) / 100;
   console.log(`Cost on BSC: $${bscCost}`);
 };

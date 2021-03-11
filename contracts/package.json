@@ -33,7 +33,7 @@
     "chai": "^4.2.0",
     "ethereum-waffle": "^3.0.0",
     "hardhat-spdx-license-identifier": "^2.0.3",
-    "truffle": "^5.2.2",
+    "truffle": "5.2.3",
     "truffle-plugin-verify": "^0.5.6"
   }
 }

@@ -88,6 +88,12 @@ contract Staker is IStaker, Initializable {
         uint256 lastMintIndex
     );
 
+    event KFactorParametersChanges(
+        uint256 marketIndex,
+        uint256 period,
+        uint256 multiplier
+    );
+
     ////////////////////////////////////
     /////////// MODIFIERS //////////////
     ////////////////////////////////////
@@ -145,8 +151,18 @@ contract Staker is IStaker, Initializable {
         uint256 period,
         uint256 initialMultiplier
     ) external onlyAdmin {
+        _changeKFactorParameters(marketIndex, period, initialMultiplier);
+    }
+
+    function _changeKFactorParameters(
+        uint256 marketIndex,
+        uint256 period,
+        uint256 initialMultiplier
+    ) internal {
         kFactorPeriods[marketIndex] = period;
         kFactorInitialMultipliers[marketIndex] = initialMultiplier;
+
+        emit KFactorParametersChanges(marketIndex, period, initialMultiplier);
     }
 
     ////////////////////////////////////
@@ -156,7 +172,9 @@ contract Staker is IStaker, Initializable {
     function addNewStakingFund(
         uint256 marketIndex,
         address longTokenAddress,
-        address shortTokenAddress
+        address shortTokenAddress,
+        uint256 kInitialMultiplier,
+        uint256 kPeriod
     ) external override onlyFloat {
         syntheticValid[longTokenAddress] = true;
         syntheticValid[shortTokenAddress] = true;
@@ -170,6 +188,8 @@ contract Staker is IStaker, Initializable {
         syntheticRewardParams[shortTokenAddress][0].timestamp = block.timestamp;
         syntheticRewardParams[shortTokenAddress][0]
             .accumulativeFloatPerToken = 0;
+
+        _changeKFactorParameters(marketIndex, kInitialMultiplier, kPeriod);
 
         emit StateAdded(longTokenAddress, 0, block.timestamp, 0);
         emit StateAdded(shortTokenAddress, 0, block.timestamp, 0);

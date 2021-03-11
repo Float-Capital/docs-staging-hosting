@@ -80,11 +80,21 @@ const deployTestMarket = async (
     syntheticSymbol,
     fundTokenAddress,
     oracleManager.address,
-    yieldManager.address,
+    yieldManager.address
+  );
+
+  const currentMarketIndex = await longShortInstance.latestMarket.call();
+  let kInitialMultiplier = 0;
+  let kPeriod = 0;
+
+  await longShortInstance.initializeMarket(
+    currentMarketIndex,
     _baseEntryFee,
-    _badLiquidityEntryFee,
     _baseExitFee,
-    _badLiquidityExitFee
+    _badLiquidityEntryFee,
+    _badLiquidityExitFee,
+    kInitialMultiplier,
+    kPeriod
   );
 };
 
@@ -105,7 +115,7 @@ const topupBalanceIfLow = async (from, to) => {
   }
 };
 
-module.exports = async function (deployer, network, accounts) {
+module.exports = async function(deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
