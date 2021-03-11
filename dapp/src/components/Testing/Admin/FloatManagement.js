@@ -230,7 +230,7 @@ var query$3 = (require("@apollo/client").gql`
       lastMintState  {
         __typename
         timestamp
-        accumulativeFloatPerSecond
+        accumulativeFloatPerToken
       }
       currentStake  {
         __typename
@@ -240,8 +240,8 @@ var query$3 = (require("@apollo/client").gql`
     states(first: 1, orderBy: stateIndex, orderDirection: desc, where: {syntheticToken: $synthToken, timeSinceLastUpdate_gt: 0})  {
       __typename
       stateIndex
-      accumulativeFloatPerSecond
-      floatRatePerSecondOverInterval
+      accumulativeFloatPerToken
+      floatRatePerTokenOverInterval
     }
   }
 `);
@@ -258,7 +258,7 @@ function parse$3(value) {
                         lastMintState: {
                           __typename: value$1.__typename,
                           timestamp: GqlConverters.$$BigInt.parse(value$1.timestamp),
-                          accumulativeFloatPerSecond: GqlConverters.$$BigInt.parse(value$1.accumulativeFloatPerSecond)
+                          accumulativeFloatPerToken: GqlConverters.$$BigInt.parse(value$1.accumulativeFloatPerToken)
                         },
                         currentStake: {
                           __typename: value$2.__typename,
@@ -270,8 +270,8 @@ function parse$3(value) {
                 return {
                         __typename: value.__typename,
                         stateIndex: GqlConverters.$$BigInt.parse(value.stateIndex),
-                        accumulativeFloatPerSecond: GqlConverters.$$BigInt.parse(value.accumulativeFloatPerSecond),
-                        floatRatePerSecondOverInterval: GqlConverters.$$BigInt.parse(value.floatRatePerSecondOverInterval)
+                        accumulativeFloatPerToken: GqlConverters.$$BigInt.parse(value.accumulativeFloatPerToken),
+                        floatRatePerTokenOverInterval: GqlConverters.$$BigInt.parse(value.floatRatePerTokenOverInterval)
                       };
               })
         };
@@ -280,9 +280,9 @@ function parse$3(value) {
 function serialize$3(value) {
   var value$1 = value.states;
   var states = value$1.map(function (value) {
-        var value$1 = value.floatRatePerSecondOverInterval;
+        var value$1 = value.floatRatePerTokenOverInterval;
         var value$2 = GqlConverters.$$BigInt.serialize(value$1);
-        var value$3 = value.accumulativeFloatPerSecond;
+        var value$3 = value.accumulativeFloatPerToken;
         var value$4 = GqlConverters.$$BigInt.serialize(value$3);
         var value$5 = value.stateIndex;
         var value$6 = GqlConverters.$$BigInt.serialize(value$5);
@@ -290,8 +290,8 @@ function serialize$3(value) {
         return {
                 __typename: value$7,
                 stateIndex: value$6,
-                accumulativeFloatPerSecond: value$4,
-                floatRatePerSecondOverInterval: value$2
+                accumulativeFloatPerToken: value$4,
+                floatRatePerTokenOverInterval: value$2
               };
       });
   var value$2 = value.currentStakes;
@@ -305,7 +305,7 @@ function serialize$3(value) {
           amount: value$3
         };
         var value$5 = value.lastMintState;
-        var value$6 = value$5.accumulativeFloatPerSecond;
+        var value$6 = value$5.accumulativeFloatPerToken;
         var value$7 = GqlConverters.$$BigInt.serialize(value$6);
         var value$8 = value$5.timestamp;
         var value$9 = GqlConverters.$$BigInt.serialize(value$8);
@@ -313,7 +313,7 @@ function serialize$3(value) {
         var lastMintState = {
           __typename: value$10,
           timestamp: value$9,
-          accumulativeFloatPerSecond: value$7
+          accumulativeFloatPerToken: value$7
         };
         var value$11 = value.__typename;
         return {
@@ -414,8 +414,8 @@ function FloatManagement$Claimable(Props) {
         var amount = match$2.currentStake.amount;
         var match$4 = match$2.lastMintState;
         var match$5 = match$3[0];
-        var amountOfFloatToClaim = match$5.accumulativeFloatPerSecond.sub(match$4.accumulativeFloatPerSecond).mul(amount).div(CONSTANTS.tenToThe18);
-        var predictedAmountOfFloatToClaim = currentTimestamp.sub(match$4.timestamp).mul(amount.mul(match$5.floatRatePerSecondOverInterval).div(CONSTANTS.tenToThe18));
+        var amountOfFloatToClaim = match$5.accumulativeFloatPerToken.sub(match$4.accumulativeFloatPerToken).mul(amount).div(CONSTANTS.tenToThe18);
+        var predictedAmountOfFloatToClaim = currentTimestamp.sub(match$4.timestamp).mul(amount.mul(match$5.floatRatePerTokenOverInterval).div(CONSTANTS.tenToThe18));
         var totalAmountOfFloatToClaim = amountOfFloatToClaim.add(predictedAmountOfFloatToClaim);
         return React.createElement(React.Fragment, undefined, "You have generated " + FormatMoney.formatEther(totalAmountOfFloatToClaim) + " FLOAT since your last mint");
       }

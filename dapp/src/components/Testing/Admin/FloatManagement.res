@@ -32,7 +32,7 @@ query ($synthToken: String!, $userAddress: String!) {
   currentStakes (where: {userAddress: $userAddress, syntheticToken: $synthToken}) {
     lastMintState {
       timestamp
-      accumulativeFloatPerSecond
+      accumulativeFloatPerToken
     }
     currentStake {
       amount
@@ -40,8 +40,8 @@ query ($synthToken: String!, $userAddress: String!) {
   }
   states (first:1, orderBy: stateIndex, orderDirection:desc, where: {syntheticToken: $synthToken, timeSinceLastUpdate_gt: 0}) {
     stateIndex
-    accumulativeFloatPerSecond
-    floatRatePerSecondOverInterval
+    accumulativeFloatPerToken
+    floatRatePerTokenOverInterval
   }
 }
 `)
@@ -59,10 +59,10 @@ module Claimable = {
       switch claimableQuery {
       | {
           data: Some({
-            states: [{accumulativeFloatPerSecond, floatRatePerSecondOverInterval}],
+            states: [{accumulativeFloatPerToken, floatRatePerTokenOverInterval}],
             currentStakes: [
               {
-                lastMintState: {accumulativeFloatPerSecond: currentUserAccumulative, timestamp},
+                lastMintState: {accumulativeFloatPerToken: currentUserAccumulative, timestamp},
                 currentStake: {amount},
               },
             ],
@@ -70,14 +70,14 @@ module Claimable = {
         } =>
         // TODO: check - is the divide by 10^18 necessary. We should make a field in the graph where the value is already pre-divided by 10^18
         let amountOfFloatToClaim =
-          Ethers.BigNumber.sub(accumulativeFloatPerSecond, currentUserAccumulative)
+          Ethers.BigNumber.sub(accumulativeFloatPerToken, currentUserAccumulative)
           ->Ethers.BigNumber.mul(amount)
           ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
 
-        // NOTE: we are using the previous `floatRatePerSecondOverInterval` here as an approximation of the current value - it shouldn't change much
+        // NOTE: we are using the previous `floatRatePerTokenOverInterval` here as an approximation of the current value - it shouldn't change much
         let predictedAmountOfFloatToClaim =
           Ethers.BigNumber.sub(currentTimestamp, timestamp)->Ethers.BigNumber.mul(
-            Ethers.BigNumber.mul(amount, floatRatePerSecondOverInterval)->Ethers.BigNumber.div(
+            Ethers.BigNumber.mul(amount, floatRatePerTokenOverInterval)->Ethers.BigNumber.div(
               CONSTANTS.tenToThe18,
             ),
           )

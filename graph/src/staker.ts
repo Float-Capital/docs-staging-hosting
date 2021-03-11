@@ -56,7 +56,7 @@ export function handleStateAdded(event: StateAdded): void {
   let tokenAddress = event.params.tokenAddress;
   let tokenAddressString = tokenAddress.toHex();
   let stateIndex = event.params.stateIndex;
-  let accumulativeFloatPerSecond = event.params.accumulative;
+  let accumulativeFloatPerToken = event.params.accumulative;
   // don't necessarily need to emit this since we can get it from event.block
   let timestampOfState = event.params.timestamp;
 
@@ -71,11 +71,11 @@ export function handleStateAdded(event: StateAdded): void {
   state.stateIndex = stateIndex;
   state.timestamp = timestamp;
   state.syntheticToken = syntheticToken.id;
-  state.accumulativeFloatPerSecond = accumulativeFloatPerSecond;
+  state.accumulativeFloatPerToken = accumulativeFloatPerToken;
 
   if (stateIndex.equals(ZERO)) {
-    // The first state - set floatRatePerSecondOverInterval to zero
-    state.floatRatePerSecondOverInterval = ZERO;
+    // The first state - set floatRatePerTokenOverInterval to zero
+    state.floatRatePerTokenOverInterval = ZERO;
     state.timeSinceLastUpdate = ZERO;
   } else {
     let prevState = State.load(
@@ -90,8 +90,8 @@ export function handleStateAdded(event: StateAdded): void {
     let timeElapsedSinceLastStateChange = state.timestamp.minus(
       prevState.timestamp
     );
-    let changeInAccumulativeFloatPerSecond = state.accumulativeFloatPerSecond.minus(
-      prevState.accumulativeFloatPerSecond
+    let changeInAccumulativeFloatPerSecond = state.accumulativeFloatPerToken.minus(
+      prevState.accumulativeFloatPerToken
     );
 
     state.timeSinceLastUpdate = timeElapsedSinceLastStateChange;
@@ -100,9 +100,9 @@ export function handleStateAdded(event: StateAdded): void {
       // NOTE: This hapens if two staking state changes happen in the same block.
       timeElapsedSinceLastStateChange.equals(changeInAccumulativeFloatPerSecond)
     ) {
-      state.floatRatePerSecondOverInterval = ZERO;
+      state.floatRatePerTokenOverInterval = ZERO;
     } else {
-      state.floatRatePerSecondOverInterval = changeInAccumulativeFloatPerSecond.div(
+      state.floatRatePerTokenOverInterval = changeInAccumulativeFloatPerSecond.div(
         timeElapsedSinceLastStateChange
       );
     }
@@ -118,7 +118,7 @@ export function handleStateAdded(event: StateAdded): void {
       tokenAddress.toHex(),
       stateIndex.toString(),
       timestamp.toString(),
-      accumulativeFloatPerSecond.toString(),
+      accumulativeFloatPerToken.toString(),
     ],
     ["tokenAddress", "stateIndex", "timestamp", "accumulative"],
     ["address", "uint256", "uint256", "uint256"],
