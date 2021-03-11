@@ -78,6 +78,7 @@ export function getOrCreateBalanceObject(
     newBalance.syntheticToken = token.id;
 
     newBalance.tokenBalance = ZERO;
+    newBalance.timeLastUpdated = ZERO;
 
     return newBalance;
   } else {

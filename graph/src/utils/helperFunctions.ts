@@ -43,6 +43,8 @@ export function updateBalanceTransfer(
       tokenAddressString,
       userAddressString
     );
+    balanceFromObject.timeLastUpdated = event.block.timestamp;
+
     if (send) {
       balanceFromObject.tokenBalance = balanceFromObject.tokenBalance.minus(
         amount

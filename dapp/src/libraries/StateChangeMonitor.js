@@ -8,6 +8,7 @@ import * as Ethers from "ethers";
 import * as Globals from "./Globals.js";
 import * as Queries from "../data/Queries.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as RootProvider from "./RootProvider.js";
 import * as GqlConverters from "./GqlConverters.js";
@@ -58,9 +59,30 @@ function StateChangeMonitor(Props) {
                           Belt_Array.map(stateChanges, (function (param) {
                                   var timestamp = param.timestamp;
                                   if (timestamp.gt(latestStateChangeTimestamp)) {
-                                    return Curry._1(setLatestStateChangeTimestamp, (function (param) {
-                                                  return timestamp;
-                                                }));
+                                    Curry._1(setLatestStateChangeTimestamp, (function (param) {
+                                            return timestamp;
+                                          }));
+                                    Belt_Option.map(param.affectedUsers, (function (users) {
+                                            return Belt_Array.map(users, (function (param) {
+                                                          return Curry._6(client.rescript_query, {
+                                                                        query: Queries.UsersBalances.query,
+                                                                        Raw: Queries.UsersBalances.Raw,
+                                                                        parse: Queries.UsersBalances.parse,
+                                                                        serialize: Queries.UsersBalances.serialize,
+                                                                        serializeVariables: Queries.UsersBalances.serializeVariables
+                                                                      }, undefined, undefined, undefined, undefined, {
+                                                                        userId: param.basicUserInfo.id
+                                                                      }).then(function (usersBalances) {
+                                                                      if (usersBalances.TAG === /* Ok */0) {
+                                                                        console.log("This is the data", usersBalances._0.data);
+                                                                        return ;
+                                                                      }
+                                                                      console.log(usersBalances._0);
+                                                                      
+                                                                    });
+                                                        }));
+                                          }));
+                                    return ;
                                   }
                                   
                                 }));

@@ -47,9 +47,25 @@ let make = (~children) => {
       switch queryResult {
       | Ok({data: {stateChanges: []}}) => ()
       | Ok({data: {stateChanges}}) =>
-        let _ = stateChanges->Array.map(({timestamp, affectedUsers: _}) => {
+        let _ = stateChanges->Array.map(({timestamp, affectedUsers}) => {
           if timestamp->Ethers.BigNumber.gt(latestStateChangeTimestamp) {
             setLatestStateChangeTimestamp(_ => timestamp)
+            // Update cache of values for all affected users
+            let _ = affectedUsers->Option.map(users =>
+              users->Array.map(({tokenBalances, basicUserInfo: {id}}) => {
+                client.query(
+                  ~query=module(Queries.UsersBalances),
+                  {userId: id},
+                )->JsPromise.map(usersBalances => {
+                  switch usersBalances {
+                  | Ok({data}) =>
+                    Js.log2("This is the data", data)
+                    ()
+                  | Error(error) => Js.log(error)
+                  }
+                })
+              })
+            )
           }
         })
       | Error(_) => ()
