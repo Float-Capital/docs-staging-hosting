@@ -66,7 +66,7 @@ function MarketsList$MarketCard(Props) {
                           }, isLong ? "LONG" : "SHORT"), " Liquidity")));
   };
   var marketPositionValues = function (isLong) {
-    var value = FormatMoney.formatEther(isLong ? totalLockedLong : totalLockedShort);
+    var value = FormatMoney.formatEther(undefined, isLong ? totalLockedLong : totalLockedShort);
     var beta = isLong ? longBeta : shortBeta;
     return React.createElement("div", {
                 className: "text-sm text-center m-auto"
@@ -131,7 +131,7 @@ function MarketsList$MarketCard(Props) {
                               className: "font-bold"
                             }, "TOTAL"), " Liquidity"), React.createElement("div", {
                           className: "text-3xl font-alphbeta tracking-wider py-1"
-                        }, "$" + FormatMoney.formatEther(totalValueLocked)), React.createElement("div", {
+                        }, "$" + FormatMoney.formatEther(undefined, totalValueLocked)), React.createElement("div", {
                           className: "md:block hidden w-full"
                         }, liquidityRatio(undefined), mintButtons(undefined))), React.createElement("div", {
                       className: "order-3 w-1/2 md:w-1/4 flex-grow flex-wrap flex-col"

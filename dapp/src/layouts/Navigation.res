@@ -110,7 +110,7 @@ let make = () => {
         </a>
         {switch optCurrentUser {
         | Some(currentUser) =>
-          <Link href={`/profile?address=${currentUser->ethAdrToStr}`}>
+          <Link href={`/user/${currentUser->ethAdrToStr}`}>
             <p
               className="px-3 bg-white hover:bg-black hover:text-gray-200 text-base cursor-pointer">
               {` 👤 `->React.string} <DisplayAddress address={currentUser->ethAdrToStr} />
@@ -179,7 +179,7 @@ let make = () => {
             | Some(currentUser) =>
               <p
                 onClick={_ => {
-                  router->Next.Router.push(`/profile?address=${currentUser->ethAdrToStr}`)
+                  router->Next.Router.push(`/user/${currentUser->ethAdrToStr}`)
                   setIsOpen(_ => false)
                 }}
                 className="px-3 bg-white hover:bg-black hover:text-gray-200 text-base cursor-pointer">

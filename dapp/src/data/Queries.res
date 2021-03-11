@@ -18,6 +18,8 @@ fragment SyntheticInfo on SyntheticToken {
     latestSystemState {
       totalLockedLong
       totalLockedShort
+      shortTokenPrice
+      longTokenPrice
     }
   }
   tokenType
@@ -170,20 +172,21 @@ query ($userId: String!){
 }
 `)
 
-module UsersActiveStakes = %graphql(`
-query ($userId: String!){
-  currentStakes (where: {user: $userId, withdrawn: false}) {
-    id
-    currentStake {
-      id
+module UsersFloatDetails = %graphql(`
+query ($userId: String!, $synthToken: String!) {
+  currentStakes (where: {user: $userId, syntheticToken: $synthToken}) {
+    lastMintState {
       timestamp
-      blockNumber
-      creationTxHash
-      syntheticToken {
-        ...SyntheticInfo
-      }
+      accumulativeFloatPerToken
+    }
+    currentStake {
       amount
     }
+  }
+  states (first:1, orderBy: stateIndex, orderDirection:desc, where: {syntheticToken: $synthToken, timeSinceLastUpdate_gt: 0}) {
+    stateIndex
+    accumulativeFloatPerToken
+    floatRatePerTokenOverInterval
   }
 }
 `)
@@ -199,39 +202,3 @@ query {
   }
 }
 `)
-// syntheticMarkets {
-//   name
-//   symbol
-//   marketIndex
-//   totalValueLockedInMarket
-//   oracleAddress
-//   syntheticLong {
-//     id
-//     tokenAddress
-//     totalValueLocked
-//     tokenSupply
-//     tokenPrice
-//   }
-//   syntheticShort {
-//     id
-//     tokenAddress
-//     totalValueLocked
-//     tokenSupply
-//     tokenPrice
-//   }
-// }
-// module LatestStateChanges = %graphql(`
-// {
-//   stateChanges (first:5, orderBy:timestamp, orderDirection: desc) {
-//     txEventParamList {
-//       eventName
-//       index
-//       params {
-//         index
-//         param
-//         paramType
-//       }
-//     }
-//   }
-// }
-// `)

@@ -49,49 +49,17 @@ query ($synthToken: String!, $userAddress: String!) {
 module Claimable = {
   @react.component
   let make = (~userAddress, ~synthToken) => {
-    let claimableQuery = LastUserStakeUpdate.use({
-      userAddress: userAddress,
-      synthToken: synthToken,
-    })
-    let currentTimestamp = Misc.Time.useCurrentTimeBN(~updateInterval=1000)
+    let floatDetails = DataHooks.useFloatDetailsForUser(~userId=userAddress, ~synthToken)
 
-    {
-      switch claimableQuery {
-      | {
-          data: Some({
-            states: [{accumulativeFloatPerToken, floatRatePerTokenOverInterval}],
-            currentStakes: [
-              {
-                lastMintState: {accumulativeFloatPerToken: currentUserAccumulative, timestamp},
-                currentStake: {amount},
-              },
-            ],
-          }),
-        } =>
-        // TODO: check - is the divide by 10^18 necessary. We should make a field in the graph where the value is already pre-divided by 10^18
-        let amountOfFloatToClaim =
-          Ethers.BigNumber.sub(accumulativeFloatPerToken, currentUserAccumulative)
-          ->Ethers.BigNumber.mul(amount)
-          ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
+    switch floatDetails {
+    | Response((claimableFloat, predictedFloat)) => {
+        let totalFloat =
+          Ethers.BigNumber.add(claimableFloat, predictedFloat)->FormatMoney.formatEther(~digits=6)
 
-        // NOTE: we are using the previous `floatRatePerTokenOverInterval` here as an approximation of the current value - it shouldn't change much
-        let predictedAmountOfFloatToClaim =
-          Ethers.BigNumber.sub(currentTimestamp, timestamp)->Ethers.BigNumber.mul(
-            Ethers.BigNumber.mul(amount, floatRatePerTokenOverInterval)->Ethers.BigNumber.div(
-              CONSTANTS.tenToThe18,
-            ),
-          )
-        let totalAmountOfFloatToClaim = Ethers.BigNumber.add(
-          amountOfFloatToClaim,
-          predictedAmountOfFloatToClaim,
-        )
-
-        <>
-          {`You have generated ${totalAmountOfFloatToClaim->FormatMoney.formatEther} FLOAT since your last mint`->React.string}
-        </>
-      | {error: Some(_)} => "Error loading users float data"->React.string
-      | _ => "Loading stake due"->React.string
+        <div> {`You have accrued ${totalFloat} FLOAT since your last mint!`->React.string} </div>
       }
+    | GraphError(msg) => `Error: ${msg}`->React.string
+    | Loading => `Loading float details...`->React.string
     }
   }
 }
@@ -128,19 +96,14 @@ let make = () => {
           <br />
           {`-from LONG side: ${floatMintedLong->FormatMoney.formatEther}`->React.string}
           <br />
+          {<Claimable
+            synthToken={longAddress->ethAdrToLowerStr} userAddress={user->ethAdrToLowerStr}
+          />}
           {`-from SHORT side: ${floatMintedShort->FormatMoney.formatEther}`->React.string}
           <br />
-          {Ethers.BigNumber.gt(floatMintedLong, CONSTANTS.zeroBN)
-            ? <Claimable
-                synthToken={longAddress->ethAdrToLowerStr} userAddress={user->ethAdrToLowerStr}
-              />
-            : React.null}
-          <br />
-          {Ethers.BigNumber.gt(floatMintedShort, CONSTANTS.zeroBN)
-            ? <Claimable
-                synthToken={shortAddress->ethAdrToLowerStr} userAddress={user->ethAdrToLowerStr}
-              />
-            : React.null}
+          {<Claimable
+            synthToken={shortAddress->ethAdrToLowerStr} userAddress={user->ethAdrToLowerStr}
+          />}
           <hr />
         </div>
       )

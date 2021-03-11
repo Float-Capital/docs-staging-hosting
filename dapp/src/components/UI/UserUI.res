@@ -131,6 +131,41 @@ module UserMarketUnstake = {
   }
 }
 
+module UserStakesCard = {
+  @react.component
+  let make = (~stakes) => {
+    let totalValue = ref(CONSTANTS.zeroBN)
+    let stakeBoxes =
+      Js.Array.mapi((stake: Queries.UsersStakes.UsersStakes_inner.t_currentStakes, i) => {
+        let key = `user-stakes-${Belt.Int.toString(i)}`
+        let name = stake.currentStake.syntheticToken.syntheticMarket.symbol
+        let tokens = stake.currentStake.syntheticToken.totalStaked->FormatMoney.formatEther
+        let isLong = stake.currentStake.syntheticToken.tokenType->Obj.magic == "Long"
+        let state = stake.currentStake.syntheticToken.syntheticMarket.latestSystemState
+        let value =
+          stake.currentStake.syntheticToken.totalStaked
+          ->Ethers.BigNumber.mul(isLong ? state.longTokenPrice : state.shortTokenPrice)
+          ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
+        totalValue := Ethers.BigNumber.add(totalValue.contents, value)
+
+        <UserMarketBox key name isLong tokens value={value->FormatMoney.formatEther}>
+          <UserMarketUnstake />
+        </UserMarketBox>
+      }, stakes)->React.array
+
+    <UserColumnCard>
+      <UserColumnHeader> {`Staking`->React.string} </UserColumnHeader>
+      <UserColumnTextCenter>
+        <UserColumnText
+          head=`💰 Staked value` body={`$${totalValue.contents->FormatMoney.formatEther}`}
+        />
+      </UserColumnTextCenter>
+      <br />
+      {stakeBoxes}
+    </UserColumnCard>
+  }
+}
+
 module UserFloatBox = {
   @react.component
   let make = (~accruing, ~balance, ~minted) => {

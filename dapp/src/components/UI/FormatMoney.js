@@ -11,13 +11,14 @@ function formatFloat(digitsOpt, number) {
   return format(number.toFixed(digits));
 }
 
-function toCentsFixedNoRounding(floatString) {
-  return formatFloat(undefined, Number(floatString));
+function toCentsFixedNoRounding(digitsOpt, floatString) {
+  var digits = digitsOpt !== undefined ? digitsOpt : 2;
+  return formatFloat(digits, Number(floatString));
 }
 
-function formatEther(rawNumber) {
-  var floatString = Ethers.Utils.formatEther(rawNumber);
-  return formatFloat(undefined, Number(floatString));
+function formatEther(digitsOpt, rawNumber) {
+  var digits = digitsOpt !== undefined ? digitsOpt : 2;
+  return toCentsFixedNoRounding(digits, Ethers.Utils.formatEther(rawNumber));
 }
 
 export {
