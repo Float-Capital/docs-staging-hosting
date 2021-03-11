@@ -14,7 +14,7 @@ export function getOrCreateLatestSystemState(
   marketIndex: BigInt,
   latestStateChangeCounter: BigInt,
   event: ethereum.Event
-): SystemState | null {
+): SystemState {
   let systemStateId = latestStateChangeCounter.toString();
   let marketIndexId = marketIndex.toString();
   let latestSystemState = SystemState.load(marketIndexId + "-" + systemStateId);
@@ -32,13 +32,10 @@ export function getOrCreateLatestSystemState(
     latestSystemState.totalValueLocked = ZERO;
     latestSystemState.setBy = event.transaction.from;
   }
-  return latestSystemState;
+  return latestSystemState as SystemState;
 }
 
-export function getOrCreateUser(
-  address: Bytes,
-  event: ethereum.Event
-): User | null {
+export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
   let user = User.load(address.toHex());
   if (user == null) {
     user = new User(address.toHex());
@@ -58,37 +55,37 @@ export function getOrCreateUser(
     globalState.save();
   }
 
-  return user;
+  return user as User;
 }
 
 export function getOrCreateBalanceObject(
   tokenAddressString: string,
   userAddressString: string
-): UserSyntheticTokenBalance | null {
+): UserSyntheticTokenBalance {
   let balance = UserSyntheticTokenBalance.load(
     tokenAddressString + "-" + userAddressString + "-balance"
   );
 
   if (balance == null) {
-    balance = new UserSyntheticTokenBalance(
+    let newBalance = new UserSyntheticTokenBalance(
       tokenAddressString + "-" + userAddressString + "-balance"
     );
 
     let user = User.load(userAddressString);
-    balance.user = user.id;
+    newBalance.user = user.id;
 
     let token = SyntheticToken.load(tokenAddressString);
-    balance.syntheticToken = token.id;
+    newBalance.syntheticToken = token.id;
 
-    balance.tokenBalance = ZERO;
+    newBalance.tokenBalance = ZERO;
+
+    return newBalance;
+  } else {
+    return balance as UserSyntheticTokenBalance;
   }
-
-  return balance;
 }
 
-export function createSyntheticToken(
-  tokenAddress: Bytes
-): SyntheticToken | null {
+export function createSyntheticToken(tokenAddress: Bytes): SyntheticToken {
   let tokenAddressString = tokenAddress.toHex();
   let syntheticToken = SyntheticToken.load(tokenAddressString);
   if (syntheticToken == null) {
@@ -98,22 +95,18 @@ export function createSyntheticToken(
     syntheticToken.tokenSupply = ZERO;
     syntheticToken.floatMintedFromSpecificToken = ZERO;
   }
-  return syntheticToken;
+  return syntheticToken as SyntheticToken;
 }
 
-export function createSyntheticTokenLong(
-  tokenAddress: Bytes
-): SyntheticToken | null {
+export function createSyntheticTokenLong(tokenAddress: Bytes): SyntheticToken {
   let syntheticToken = createSyntheticToken(tokenAddress);
   syntheticToken.tokenType = "Long";
 
-  return syntheticToken;
+  return syntheticToken as SyntheticToken;
 }
-export function createSyntheticTokenShort(
-  tokenAddress: Bytes
-): SyntheticToken | null {
+export function createSyntheticTokenShort(tokenAddress: Bytes): SyntheticToken {
   let syntheticToken = createSyntheticToken(tokenAddress);
   syntheticToken.tokenType = "Short";
 
-  return syntheticToken;
+  return syntheticToken as SyntheticToken;
 }
