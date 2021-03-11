@@ -7,6 +7,7 @@ const LONGSHORT = "LongShort";
 const FLOAT_TOKEN = "FloatToken";
 const TOKEN_FACTORY = "TokenFactory";
 const FLOAT_CAPITAL = "FloatCapital_v0";
+const PLACEHOLDER = "EmptyPlaceholderContract";
 
 const Staker = artifacts.require(STAKER);
 const Treasury = artifacts.require(TREASURY);
@@ -15,6 +16,7 @@ const Dai = artifacts.require(SYNTHETIC_TOKEN);
 const FloatToken = artifacts.require(FLOAT_TOKEN);
 const TokenFactory = artifacts.require(TOKEN_FACTORY);
 const FloatCapital = artifacts.require(FLOAT_CAPITAL);
+const EmptyPlaceholderContract = artifacts.require(PLACEHOLDER);
 
 module.exports = async function(deployer, networkName, accounts) {
   if (networkName == "bsc") {
@@ -74,15 +76,15 @@ module.exports = async function(deployer, networkName, accounts) {
   });
 
   // Initialize here as there are circular contract dependencies.
-  await upgradeProxy(staker.address, BoxV2, [
-  	admin,
-    longShort.address,
-    floatToken.address,
-    floatCapital.address,
-], Staker, { deployer });
-    floatCapital.address,
+  await upgradeProxy(
+    staker.address,
+    BoxV2,
+    [admin, longShort.address, floatToken.address, floatCapital.address],
+    Staker,
+    { deployer }
+  );
+  floatCapital.address,
     {
       from: admin,
-    }
-  );
+    };
 };
