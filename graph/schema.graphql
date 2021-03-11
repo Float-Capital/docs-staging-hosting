@@ -86,6 +86,8 @@ type SyntheticMarket @entity {
   syntheticShort: SyntheticToken!
   latestSystemState: SystemState!
   feeStructure: FeeStructure!
+  kPeriod: BigInt!
+  kMultiplier: BigInt!
 }
 
 type User @entity {

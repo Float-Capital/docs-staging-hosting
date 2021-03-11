@@ -22,7 +22,7 @@ contract("LongShort (staking)", (accounts) => {
   const oneHundredAndFifty = "150000000000000000000";
   const twoHundred = "200000000000000000000";
   const twentyFive = "25000000000000000000";
-  const e24 = new BN("1000000000000000000000000");
+  const e42 = new BN("1000000000000000000000000000000000000000000");
 
   let staker;
   let longShort;
@@ -219,7 +219,7 @@ contract("LongShort (staking)", (accounts) => {
       expectedFloatPerSecond
         .mul(new BN(now - before))
         .mul(new BN(oneHundred))
-        .div(e24)
+        .div(e42)
         .toString()
     );
 
@@ -379,7 +379,7 @@ contract("LongShort (staking)", (accounts) => {
       expectedFloatPerSecond
         .mul(new BN(now - before))
         .mul(new BN(oneHundred))
-        .div(e24)
+        .div(e42)
         .toString()
     );
   };

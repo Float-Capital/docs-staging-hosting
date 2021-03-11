@@ -385,7 +385,7 @@ contract Staker is IStaker, Initializable {
                 ]
                     .accumulativeFloatPerToken;
 
-        return (accumDelta * userAmountStaked[tokenAddress][user]) / 1e24;
+        return (accumDelta * userAmountStaked[tokenAddress][user]) / 1e42;
     }
 
     function _mintFloat(address user, uint256 floatToMint) internal {
