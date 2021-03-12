@@ -324,26 +324,43 @@ var query$3 = (require("@apollo/client").gql`
     __typename
     id
     tokenBalance
+    syntheticToken  {
+      __typename
+      id
+    }
   }
 `);
 
 function parse$3(value) {
+  var value$1 = value.syntheticToken;
   return {
           __typename: value.__typename,
           id: value.id,
-          tokenBalance: GqlConverters.$$BigInt.parse(value.tokenBalance)
+          tokenBalance: GqlConverters.$$BigInt.parse(value.tokenBalance),
+          syntheticToken: {
+            __typename: value$1.__typename,
+            id: value$1.id
+          }
         };
 }
 
 function serialize$3(value) {
-  var value$1 = value.tokenBalance;
-  var value$2 = GqlConverters.$$BigInt.serialize(value$1);
-  var value$3 = value.id;
-  var value$4 = value.__typename;
+  var value$1 = value.syntheticToken;
+  var value$2 = value$1.id;
+  var value$3 = value$1.__typename;
+  var syntheticToken = {
+    __typename: value$3,
+    id: value$2
+  };
+  var value$4 = value.tokenBalance;
+  var value$5 = GqlConverters.$$BigInt.serialize(value$4);
+  var value$6 = value.id;
+  var value$7 = value.__typename;
   return {
-          __typename: value$4,
-          id: value$3,
-          tokenBalance: value$2
+          __typename: value$7,
+          id: value$6,
+          tokenBalance: value$5,
+          syntheticToken: syntheticToken
         };
 }
 

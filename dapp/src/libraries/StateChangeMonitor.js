@@ -66,65 +66,88 @@ function StateChangeMonitor(Props) {
                                             return Belt_Array.map(users, (function (param) {
                                                           var tokenBalances = param.tokenBalances;
                                                           var id = param.basicUserInfo.id;
-                                                          var balanceReadQuery = Curry._5(client.rescript_readQuery, {
-                                                                query: Queries.UsersBalances.query,
-                                                                Raw: Queries.UsersBalances.Raw,
-                                                                parse: Queries.UsersBalances.parse,
-                                                                serialize: Queries.UsersBalances.serialize,
-                                                                serializeVariables: Queries.UsersBalances.serializeVariables
-                                                              }, undefined, undefined, undefined, {
-                                                                userId: id
-                                                              });
-                                                          if (balanceReadQuery !== undefined && balanceReadQuery.TAG === /* Ok */0) {
-                                                            var match = balanceReadQuery._0.user;
-                                                            if (match !== undefined) {
-                                                              var usersCurrentBalances = match.tokenBalances;
-                                                              if (usersCurrentBalances !== undefined && tokenBalances !== undefined) {
-                                                                var containsBalanceItem = function (listOfBalances, param) {
-                                                                  var comparisonId = param.id;
-                                                                  return Belt_Array.getIndexBy(listOfBalances, (function (param) {
-                                                                                return comparisonId === param.id;
-                                                                              }));
-                                                                };
-                                                                var updatedTokenBalances = Belt_Array.reduce(tokenBalances, usersCurrentBalances, (function (currentBalances, newBalance) {
-                                                                        var index = containsBalanceItem(currentBalances, newBalance);
-                                                                        if (index !== undefined) {
-                                                                          Belt_Array.set(currentBalances, index, newBalance);
-                                                                          return currentBalances;
-                                                                        } else {
-                                                                          return Belt_Array.concat(currentBalances, [newBalance]);
+                                                          var __typename = param.__typename;
+                                                          console.log("Handling affected user!", users);
+                                                          if (tokenBalances !== undefined) {
+                                                            Belt_Array.map(tokenBalances, (function (tokenBalance) {
+                                                                    Curry._6(client.rescript_writeQuery, {
+                                                                          query: Queries.UsersBalance.query,
+                                                                          Raw: Queries.UsersBalance.Raw,
+                                                                          parse: Queries.UsersBalance.parse,
+                                                                          serialize: Queries.UsersBalance.serialize,
+                                                                          serializeVariables: Queries.UsersBalance.serializeVariables
+                                                                        }, undefined, {
+                                                                          user: {
+                                                                            __typename: __typename,
+                                                                            tokenBalances: [tokenBalance]
+                                                                          }
+                                                                        }, undefined, undefined, {
+                                                                          userId: id,
+                                                                          tokenAdr: tokenBalance.syntheticToken.id
+                                                                        });
+                                                                    
+                                                                  }));
+                                                            var balanceReadQuery = Curry._5(client.rescript_readQuery, {
+                                                                  query: Queries.UsersBalances.query,
+                                                                  Raw: Queries.UsersBalances.Raw,
+                                                                  parse: Queries.UsersBalances.parse,
+                                                                  serialize: Queries.UsersBalances.serialize,
+                                                                  serializeVariables: Queries.UsersBalances.serializeVariables
+                                                                }, undefined, undefined, undefined, {
+                                                                  userId: id
+                                                                });
+                                                            if (balanceReadQuery !== undefined && balanceReadQuery.TAG === /* Ok */0) {
+                                                              var match = balanceReadQuery._0.user;
+                                                              if (match !== undefined) {
+                                                                var usersCurrentBalances = match.tokenBalances;
+                                                                if (usersCurrentBalances !== undefined) {
+                                                                  var containsBalanceItem = function (listOfBalances, param) {
+                                                                    var comparisonId = param.id;
+                                                                    return Belt_Array.getIndexBy(listOfBalances, (function (param) {
+                                                                                  return comparisonId === param.id;
+                                                                                }));
+                                                                  };
+                                                                  var updatedTokenBalances = Belt_Array.reduce(tokenBalances, usersCurrentBalances, (function (currentBalances, newBalance) {
+                                                                          var index = containsBalanceItem(currentBalances, newBalance);
+                                                                          if (index !== undefined) {
+                                                                            Belt_Array.set(currentBalances, index, newBalance);
+                                                                            return currentBalances;
+                                                                          } else {
+                                                                            return Belt_Array.concat(currentBalances, [newBalance]);
+                                                                          }
+                                                                        }));
+                                                                  Curry._6(client.rescript_writeQuery, {
+                                                                        query: Queries.UsersBalances.query,
+                                                                        Raw: Queries.UsersBalances.Raw,
+                                                                        parse: Queries.UsersBalances.parse,
+                                                                        serialize: Queries.UsersBalances.serialize,
+                                                                        serializeVariables: Queries.UsersBalances.serializeVariables
+                                                                      }, undefined, {
+                                                                        user: {
+                                                                          __typename: match.__typename,
+                                                                          tokenBalances: updatedTokenBalances
                                                                         }
-                                                                      }));
-                                                                Curry._6(client.rescript_writeQuery, {
-                                                                      query: Queries.UsersBalances.query,
-                                                                      Raw: Queries.UsersBalances.Raw,
-                                                                      parse: Queries.UsersBalances.parse,
-                                                                      serialize: Queries.UsersBalances.serialize,
-                                                                      serializeVariables: Queries.UsersBalances.serializeVariables
-                                                                    }, undefined, {
-                                                                      user: {
-                                                                        __typename: match.__typename,
-                                                                        tokenBalances: updatedTokenBalances
-                                                                      }
-                                                                    }, undefined, undefined, {
-                                                                      userId: id
-                                                                    });
-                                                                return ;
+                                                                      }, undefined, undefined, {
+                                                                        userId: id
+                                                                      });
+                                                                  return ;
+                                                                }
+                                                                
                                                               }
                                                               
                                                             }
-                                                            
+                                                            Curry._6(client.rescript_query, {
+                                                                  query: Queries.UsersBalances.query,
+                                                                  Raw: Queries.UsersBalances.Raw,
+                                                                  parse: Queries.UsersBalances.parse,
+                                                                  serialize: Queries.UsersBalances.serialize,
+                                                                  serializeVariables: Queries.UsersBalances.serializeVariables
+                                                                }, undefined, undefined, undefined, undefined, {
+                                                                  userId: id
+                                                                });
+                                                            return ;
                                                           }
-                                                          console.log("No balances loaded for user yet, will fetch the users balances from graph");
-                                                          Curry._6(client.rescript_query, {
-                                                                query: Queries.UsersBalances.query,
-                                                                Raw: Queries.UsersBalances.Raw,
-                                                                parse: Queries.UsersBalances.parse,
-                                                                serialize: Queries.UsersBalances.serialize,
-                                                                serializeVariables: Queries.UsersBalances.serializeVariables
-                                                              }, undefined, undefined, undefined, undefined, {
-                                                                userId: id
-                                                              });
+                                                          console.log("No balance changes");
                                                           
                                                         }));
                                           }));

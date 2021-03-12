@@ -49,6 +49,9 @@ fragment SyntheticMarketInfo on SyntheticMarket {
 fragment UserTokenBalance on UserSyntheticTokenBalance {
   id
   tokenBalance
+  syntheticToken {
+    id
+  }
 }
 `)
 
