@@ -10,7 +10,7 @@ function TokenBalance(Props) {
   var erc20Address = Props.erc20Address;
   var match = ContractHooks.useErc20BalanceRefresh(erc20Address);
   var optBalance = match.data;
-  return React.createElement(React.Fragment, undefined, optBalance !== undefined ? React.createElement("p", undefined, FormatMoney.formatEther(Caml_option.valFromOption(optBalance))) : React.createElement(MiniLoader.make, {}));
+  return React.createElement(React.Fragment, undefined, optBalance !== undefined ? React.createElement("p", undefined, FormatMoney.formatEther(undefined, Caml_option.valFromOption(optBalance))) : React.createElement(MiniLoader.make, {}));
 }
 
 var make = TokenBalance;

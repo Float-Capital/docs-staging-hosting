@@ -130,7 +130,7 @@ function StakeCard(Props) {
                               className: "font-bold"
                             }, "📈 TOTAL"), " Staked"), React.createElement("div", {
                           className: "text-3xl font-alphbeta tracking-wider py-1"
-                        }, "$" + FormatMoney.formatEther(totalDollarValueStake)), totalDollarValueStake.eq(zero) ? null : React.createElement(StakeBar.make, {
+                        }, "$" + FormatMoney.formatEther(undefined, totalDollarValueStake)), totalDollarValueStake.eq(zero) ? null : React.createElement(StakeBar.make, {
                             percentStrLong: percentStrLong,
                             percentStrShort: percentStrShort
                           }), React.createElement("div", {

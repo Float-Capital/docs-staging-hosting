@@ -106,7 +106,7 @@ function Navigation(Props) {
   if (optCurrentUser !== undefined) {
     var currentUser = Caml_option.valFromOption(optCurrentUser);
     tmp = React.createElement(Link, {
-          href: "/profile?address=" + Globals.ethAdrToStr(currentUser),
+          href: "/user/" + Globals.ethAdrToStr(currentUser),
           children: React.createElement("p", {
                 className: "px-3 bg-white hover:bg-black hover:text-gray-200 text-base cursor-pointer"
               }, " 👤 ", React.createElement(DisplayAddress.make, {
@@ -129,7 +129,7 @@ function Navigation(Props) {
     tmp$1 = React.createElement("p", {
           className: "px-3 bg-white hover:bg-black hover:text-gray-200 text-base cursor-pointer",
           onClick: (function (param) {
-              router.push("/profile?address=" + Globals.ethAdrToStr(currentUser$1));
+              router.push("/user/" + Globals.ethAdrToStr(currentUser$1));
               return Curry._1(setIsOpen, (function (param) {
                             return false;
                           }));

@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import * as Button from "./Button.js";
+import * as CONSTANTS from "../../CONSTANTS.js";
+import * as FormatMoney from "./FormatMoney.js";
 
 function UserUI$UserContainer(Props) {
   var children = Props.children;
@@ -207,6 +209,44 @@ var UserMarketUnstake = {
   make: UserUI$UserMarketUnstake
 };
 
+function UserUI$UserStakesCard(Props) {
+  var stakes = Props.stakes;
+  var totalValue = {
+    contents: CONSTANTS.zeroBN
+  };
+  var stakeBoxes = stakes.map(function (stake, i) {
+        var key = "user-stakes-" + String(i);
+        var name = stake.currentStake.syntheticToken.syntheticMarket.symbol;
+        var tokens = FormatMoney.formatEther(undefined, stake.currentStake.syntheticToken.totalStaked);
+        var isLong = stake.currentStake.syntheticToken.tokenType === "Long";
+        var state = stake.currentStake.syntheticToken.syntheticMarket.latestSystemState;
+        var value = stake.currentStake.syntheticToken.totalStaked.mul(isLong ? state.longTokenPrice : state.shortTokenPrice).div(CONSTANTS.tenToThe18);
+        totalValue.contents = totalValue.contents.add(value);
+        return React.createElement(UserUI$UserMarketBox, {
+                    name: name,
+                    isLong: isLong,
+                    tokens: tokens,
+                    value: FormatMoney.formatEther(undefined, value),
+                    children: React.createElement(UserUI$UserMarketUnstake, {}),
+                    key: key
+                  });
+      });
+  return React.createElement(UserUI$UserColumnCard, {
+              children: null
+            }, React.createElement(UserUI$UserColumnHeader, {
+                  children: "Staking"
+                }), React.createElement(UserUI$UserColumnTextCenter, {
+                  children: React.createElement(UserUI$UserColumnText, {
+                        head: "💰 Staked value",
+                        body: "$" + FormatMoney.formatEther(undefined, totalValue.contents)
+                      })
+                }), React.createElement("br", undefined), stakeBoxes);
+}
+
+var UserStakesCard = {
+  make: UserUI$UserStakesCard
+};
+
 function UserUI$UserFloatBox(Props) {
   var accruing = Props.accruing;
   var balance = Props.balance;
@@ -253,6 +293,7 @@ export {
   UserMarketBox ,
   UserMarketStakeOrRedeem ,
   UserMarketUnstake ,
+  UserStakesCard ,
   UserFloatBox ,
   
 }

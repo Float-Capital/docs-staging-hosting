@@ -74,7 +74,7 @@ function StakeDetails$UsersActiveStakes(Props) {
                   var match = param.currentStake;
                   var match$1 = match.syntheticToken;
                   var tokenAddress = match$1.tokenAddress;
-                  var amountFormatted = FormatMoney.formatEther(match.amount);
+                  var amountFormatted = FormatMoney.formatEther(undefined, match.amount);
                   var timeSinceStaking = Globals.timestampToDuration(match.timestamp);
                   if (match.withdrawn) {
                     console.log("This is a bug in the graph, no withdrawn stakes should show in the `currentStakes`");

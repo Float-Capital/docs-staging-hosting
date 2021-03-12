@@ -11,7 +11,7 @@ function DaiBalance(Props) {
   var optBalance = match.data;
   return React.createElement(React.Fragment, undefined, optBalance !== undefined ? React.createElement("div", {
                     className: "flex justify-between w-full"
-                  }, React.createElement("p", undefined, "BUSD balance: "), React.createElement("p", undefined, "$" + FormatMoney.formatEther(Caml_option.valFromOption(optBalance)))) : React.createElement(MiniLoader.make, {}));
+                  }, React.createElement("p", undefined, "BUSD balance: "), React.createElement("p", undefined, "$" + FormatMoney.formatEther(undefined, Caml_option.valFromOption(optBalance)))) : React.createElement(MiniLoader.make, {}));
 }
 
 var make = DaiBalance;

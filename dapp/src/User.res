@@ -1,11 +1,18 @@
 open UserUI
+open DataHooks
 
 module User = {
-  let onQueryError = user => {
-    <UserContainer> {`Error loading user data for: ${user}`->React.string} </UserContainer>
+  @ocaml.doc(`Represents all the data required to render the user page.`)
+  type userData = {
+    user: string,
+    stakes: array<Queries.UsersStakes.UsersStakes_inner.t_currentStakes>,
   }
 
-  let onQuerySuccess = (_, _) => {
+  let onQueryError = (msg: string) => {
+    <UserContainer> {`Error: ${msg}`->React.string} </UserContainer>
+  }
+
+  let onQuerySuccess = (data: userData) => {
     <UserContainer>
       <UserBanner />
       <UserColumnContainer>
@@ -40,20 +47,7 @@ module User = {
             </UserColumnTextCenter>
           </UserColumnCard>
           <br />
-          <UserColumnCard>
-            <UserColumnHeader> {`Staking`->React.string} </UserColumnHeader>
-            <UserColumnTextCenter>
-              <UserColumnText head=`💰 Staked value` body=`$15,678` />
-            </UserColumnTextCenter>
-            <br />
-            // <UserColumnHeader subheader={true}> {`Stakes`->React.string} </UserColumnHeader>
-            <UserMarketBox name=`FTSE 100` isLong={true} tokens=`2.81` value=`450`>
-              <UserMarketUnstake />
-            </UserMarketBox>
-            <UserMarketBox name=`FTSE 100` isLong={false} tokens=`21.24` value=`400`>
-              <UserMarketUnstake />
-            </UserMarketBox>
-          </UserColumnCard>
+          <UserStakesCard stakes={data.stakes} />
         </UserColumn>
         <UserColumn>
           <UserColumnCard>
@@ -69,17 +63,16 @@ module User = {
   let make = () => {
     let router = Next.Router.useRouter()
     let user = switch Js.Dict.get(router.query, `user`) {
-    | None => `no user provided`
-    | Some(userStr) => userStr
+    | None => `no user provided` // TODO: something more useful!
+    | Some(userStr) => userStr->Js.String.toLowerCase
     }
-    let userQuery = Queries.UserQuery.use({
-      userId: user,
-    })
 
-    switch userQuery {
-    | {error: Some(_)} => onQueryError(user)
-    | {data: Some(_)} => onQuerySuccess(user, `asdf`)
-    | _ => <Loader />
+    let activeStakes = useStakesForUser(~userId=user)
+
+    switch activeStakes {
+    | Response(stakes) => onQuerySuccess({user: user, stakes: stakes})
+    | GraphError(msg) => onQueryError(msg)
+    | Loading => <Loader />
     }
   }
 }
