@@ -53,17 +53,49 @@ let make = (~children) => {
             // Update cache of values for all affected users
             let _ = affectedUsers->Option.map(users =>
               users->Array.map(({tokenBalances, basicUserInfo: {id}}) => {
-                client.query(
+                let balanceReadQuery = client.readQuery(
                   ~query=module(Queries.UsersBalances),
                   {userId: id},
-                )->JsPromise.map(usersBalances => {
-                  switch usersBalances {
-                  | Ok({data}) =>
-                    Js.log2("This is the data", data)
-                    ()
-                  | Error(error) => Js.log(error)
+                )
+                switch (balanceReadQuery, tokenBalances) {
+                | (
+                    Some(Ok({user: Some({__typename, tokenBalances: Some(usersCurrentBalances)})})),
+                    Some(newTokenBalances),
+                  ) =>
+                  Js.log(usersCurrentBalances)
+                  let containsBalanceItem = (
+                    listOfBalances: array<Queries.UserTokenBalance.t>,
+                    {id: comparisonId}: Queries.UserTokenBalance.t,
+                  ) => {
+                    listOfBalances->Array.getIndexBy(({id}) => comparisonId == id)
                   }
-                })
+                  let updatedTokenBalances = newTokenBalances->Array.reduce(usersCurrentBalances, (
+                    currentBalances,
+                    newBalance,
+                  ) =>
+                    switch currentBalances->containsBalanceItem(newBalance) {
+                    | Some(index) =>
+                      let _ = currentBalances[index] = newBalance // Hmm, this is the rescript team trying to make the syntax too friendly :/ Anyway, this thing returns a bool if the 'set' was successful.
+                      currentBalances
+                    | None => currentBalances->Array.concat([newBalance])
+                    }
+                  )
+                  let _ = client.writeQuery(
+                    ~query=module(Queries.UsersBalances),
+                    ~data={
+                      user: Some({
+                        __typename: __typename,
+                        tokenBalances: Some(updatedTokenBalances),
+                      }),
+                    },
+                    {userId: id},
+                  )
+                | _ =>
+                  Js.log(
+                    "No balances loaded for user yet, will featch the users balances from graph",
+                  )
+                  let _ = client.query(~query=module(Queries.UsersBalances), {userId: id})
+                }
               })
             )
           }

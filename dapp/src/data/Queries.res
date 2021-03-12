@@ -57,6 +57,15 @@ query ($userId: String!) {
   }
 }`)
 
+module UsersBalance = %graphql(`
+query ($userId: String!, $tokenAdr: String!) {
+  user (id: $userId) {
+    tokenBalances (where: {syntheticToken: $tokenAdr}) {
+      ...UserTokenBalance
+    }
+  }
+}`)
+
 module UsersBalances = %graphql(`
 query ($userId: String!) {
   user (id: $userId) {

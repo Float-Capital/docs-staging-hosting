@@ -19360,22 +19360,6 @@
             "deprecationReason": null,
             "description": null,
             "isDeprecated": false,
-            "name": "timeLastUpdated",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "BigInt",
-                "ofType": null
-              }
-            }
-          },
-          {
-            "args": [],
-            "deprecationReason": null,
-            "description": null,
-            "isDeprecated": false,
             "name": "numberOfTransactions",
             "type": {
               "kind": "NON_NULL",
@@ -19703,6 +19687,22 @@
             "deprecationReason": null,
             "description": null,
             "isDeprecated": false,
+            "name": "timeLastUpdated",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "BigInt",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
             "name": "syntheticToken",
             "type": {
               "kind": "NON_NULL",
@@ -19839,6 +19839,24 @@
           {
             "defaultValue": null,
             "description": null,
+            "name": "id_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
             "name": "timeLastUpdated",
             "type": {
               "kind": "SCALAR",
@@ -19927,24 +19945,6 @@
                 "ofType": {
                   "kind": "SCALAR",
                   "name": "BigInt",
-                  "ofType": null
-                }
-              }
-            }
-          },
-          {
-            "defaultValue": null,
-            "description": null,
-            "name": "id_not_in",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "ID",
                   "ofType": null
                 }
               }
