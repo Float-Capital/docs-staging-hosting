@@ -62,7 +62,6 @@ let make = (~children) => {
                     Some(Ok({user: Some({__typename, tokenBalances: Some(usersCurrentBalances)})})),
                     Some(newTokenBalances),
                   ) =>
-                  Js.log(usersCurrentBalances)
                   let containsBalanceItem = (
                     listOfBalances: array<Queries.UserTokenBalance.t>,
                     {id: comparisonId}: Queries.UserTokenBalance.t,
@@ -75,7 +74,7 @@ let make = (~children) => {
                   ) =>
                     switch currentBalances->containsBalanceItem(newBalance) {
                     | Some(index) =>
-                      let _ = currentBalances[index] = newBalance // Hmm, this is the rescript team trying to make the syntax too friendly :/ Anyway, this thing returns a bool if the 'set' was successful.
+                      let _ = currentBalances[index] = newBalance // this is the rescript team trying to make the syntax too friendly :/ Anyway, this thing returns a bool if the 'set' was successful.
                       currentBalances
                     | None => currentBalances->Array.concat([newBalance])
                     }
@@ -92,7 +91,7 @@ let make = (~children) => {
                   )
                 | _ =>
                   Js.log(
-                    "No balances loaded for user yet, will featch the users balances from graph",
+                    "No balances loaded for user yet, will fetch the users balances from graph",
                   )
                   let _ = client.query(~query=module(Queries.UsersBalances), {userId: id})
                 }

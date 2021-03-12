@@ -80,7 +80,6 @@ function StateChangeMonitor(Props) {
                                                             if (match !== undefined) {
                                                               var usersCurrentBalances = match.tokenBalances;
                                                               if (usersCurrentBalances !== undefined && tokenBalances !== undefined) {
-                                                                console.log(usersCurrentBalances);
                                                                 var containsBalanceItem = function (listOfBalances, param) {
                                                                   var comparisonId = param.id;
                                                                   return Belt_Array.getIndexBy(listOfBalances, (function (param) {
@@ -116,7 +115,7 @@ function StateChangeMonitor(Props) {
                                                             }
                                                             
                                                           }
-                                                          console.log("No balances loaded for user yet, will featch the users balances from graph");
+                                                          console.log("No balances loaded for user yet, will fetch the users balances from graph");
                                                           Curry._6(client.rescript_query, {
                                                                 query: Queries.UsersBalances.query,
                                                                 Raw: Queries.UsersBalances.Raw,

@@ -8,6 +8,8 @@ import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Loader from "../UI/Loader.js";
 import * as Ethers$1 from "ethers";
+import * as Globals from "../../libraries/Globals.js";
+import * as Queries from "../../data/Queries.js";
 import * as ViewBox from "../UI/ViewBox.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
@@ -632,6 +634,7 @@ function MintForm$1(Props) {
   var market = Props.market;
   var initialIsLong = Props.initialIsLong;
   var signer = ContractActions.useSignerExn(undefined);
+  var user = RootProvider.useCurrentUserExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var txState = match[1];
@@ -652,8 +655,44 @@ function MintForm$1(Props) {
   var match$3 = useBalanceAndApproved(daiAddressThatIsTemporarilyHardCoded, longShortContractAddress);
   var optDaiAmountApproved = match$3[1];
   var optDaiBalance = match$3[0];
-  var match$4 = ContractHooks.useErc20BalanceRefresh(market.syntheticShort.tokenAddress);
-  var match$5 = ContractHooks.useErc20BalanceRefresh(market.syntheticLong.tokenAddress);
+  var longBalanceQuery = Curry.app(Queries.UsersBalance.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: Globals.ethAdrToLowerStr(user),
+          tokenAdr: Globals.ethAdrToLowerStr(market.syntheticLong.tokenAddress)
+        }
+      ]);
+  var shortBalanceQuery = Curry.app(Queries.UsersBalance.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: Globals.ethAdrToLowerStr(user),
+          tokenAdr: Globals.ethAdrToLowerStr(market.syntheticShort.tokenAddress)
+        }
+      ]);
   var form = useForm({
         amount: "",
         isLong: initialIsLong,
@@ -717,19 +756,19 @@ function MintForm$1(Props) {
             return mintFunction(undefined);
           }
         }));
-  var match$6 = form.amountResult;
-  var formAmount = match$6 !== undefined && match$6.TAG === /* Ok */0 ? Caml_option.some(match$6._0) : undefined;
+  var match$4 = form.amountResult;
+  var formAmount = match$4 !== undefined && match$4.TAG === /* Ok */0 ? Caml_option.some(match$4._0) : undefined;
   var stakingText = form.input.isStaking ? "Mint & Stake" : "Mint";
   var approveConnector = form.input.isStaking ? "," : " &";
   var isLong = form.input.isLong;
   var position = isLong ? "long" : "short";
-  var match$7;
+  var match$5;
   var exit = 0;
   if (formAmount !== undefined && optDaiBalance !== undefined && optDaiAmountApproved !== undefined) {
     var amount = Caml_option.valFromOption(formAmount);
     var needsToApprove = amount.gt(Caml_option.valFromOption(optDaiAmountApproved));
     var greaterThanBalance = amount.gt(Caml_option.valFromOption(optDaiBalance));
-    match$7 = greaterThanBalance ? [
+    match$5 = greaterThanBalance ? [
         "Amount is greater than your balance",
         "Insufficient balance",
         true
@@ -742,13 +781,13 @@ function MintForm$1(Props) {
     exit = 1;
   }
   if (exit === 1) {
-    match$7 = [
+    match$5 = [
       undefined,
       stakingText + " " + position + " position",
       true
     ];
   }
-  var optAdditionalErrorMessage = match$7[0];
+  var optAdditionalErrorMessage = match$5[0];
   React.useEffect((function () {
           if (typeof txStateApprove !== "number" && txStateApprove.TAG === /* Complete */2) {
             Curry._1(contractActionToCallAfterApproval, undefined);
@@ -758,12 +797,12 @@ function MintForm$1(Props) {
           }
           
         }), [txStateApprove]);
-  var match$8 = form.amountResult;
+  var match$6 = form.amountResult;
   var tmp;
   var exit$1 = 0;
   var message;
-  if (match$8 !== undefined) {
-    if (match$8.TAG === /* Ok */0) {
+  if (match$6 !== undefined) {
+    if (match$6.TAG === /* Ok */0) {
       if (optAdditionalErrorMessage !== undefined) {
         message = optAdditionalErrorMessage;
         exit$1 = 1;
@@ -771,7 +810,7 @@ function MintForm$1(Props) {
         tmp = null;
       }
     } else {
-      message = match$8._0;
+      message = match$6._0;
       exit$1 = 1;
     }
   } else if (optAdditionalErrorMessage !== undefined) {
@@ -863,7 +902,51 @@ function MintForm$1(Props) {
     var formatOptBalance = function (__x) {
       return Belt_Option.mapWithDefault(__x, "Loading", Ethers.Utils.formatEther);
     };
-    tmp$1 = React.createElement(React.Fragment, undefined, tmp$2, tmp$3, React.createElement("code", undefined, React.createElement("p", undefined, "dev only component to display balances"), React.createElement("p", undefined, "dai - balance: " + formatOptBalance(optDaiBalance) + " - approved: " + formatOptBalance(optDaiAmountApproved)), React.createElement("p", undefined, "long - balance: " + formatOptBalance(match$5.data)), React.createElement("p", undefined, "short - balance: " + formatOptBalance(match$4.data))));
+    var match$7 = longBalanceQuery.data;
+    var tmp$4;
+    var exit$2 = 0;
+    if (match$7 !== undefined) {
+      var match$8 = match$7.user;
+      if (match$8 !== undefined) {
+        var match$9 = match$8.tokenBalances;
+        if (match$9 !== undefined && match$9.length === 1) {
+          var match$10 = match$9[0];
+          tmp$4 = React.createElement("p", undefined, "long - balance: " + Ethers.Utils.formatEther(match$10.tokenBalance));
+        } else {
+          exit$2 = 1;
+        }
+      } else {
+        exit$2 = 1;
+      }
+    } else {
+      exit$2 = 1;
+    }
+    if (exit$2 === 1) {
+      tmp$4 = React.createElement("p", undefined, "loading LONG balance");
+    }
+    var match$11 = shortBalanceQuery.data;
+    var tmp$5;
+    var exit$3 = 0;
+    if (match$11 !== undefined) {
+      var match$12 = match$11.user;
+      if (match$12 !== undefined) {
+        var match$13 = match$12.tokenBalances;
+        if (match$13 !== undefined && match$13.length === 1) {
+          var match$14 = match$13[0];
+          tmp$5 = React.createElement("p", undefined, "short - balance: " + Ethers.Utils.formatEther(match$14.tokenBalance));
+        } else {
+          exit$3 = 1;
+        }
+      } else {
+        exit$3 = 1;
+      }
+    } else {
+      exit$3 = 1;
+    }
+    if (exit$3 === 1) {
+      tmp$5 = React.createElement("p", undefined, "loading SHORT balance");
+    }
+    tmp$1 = React.createElement(React.Fragment, undefined, tmp$2, tmp$3, React.createElement("code", undefined, React.createElement("p", undefined, "dev only component to display balances"), React.createElement("p", undefined, "dai - balance: " + formatOptBalance(optDaiBalance) + " - approved: " + formatOptBalance(optDaiAmountApproved)), tmp$4, tmp$5));
   } else {
     tmp$1 = null;
   }
@@ -960,7 +1043,7 @@ function MintForm$1(Props) {
                             onClick: (function (param) {
                                 
                               }),
-                            children: match$7[1],
+                            children: match$5[1],
                             variant: "large"
                           }))
                 }), tmp$1);
