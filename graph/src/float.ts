@@ -173,11 +173,6 @@ export function handleSyntheticTokenCreated(
   let syntheticName = event.params.name;
   let syntheticSymbol = event.params.symbol;
 
-  let baseEntryFee = ZERO;
-  let badLiquidityEntryFee = ZERO;
-  let baseExitFee = ZERO;
-  let badLiquidityExitFee = ZERO;
-
   let marketIndexString = marketIndex.toString();
 
   // TODO: Add string name to these.
@@ -191,13 +186,11 @@ export function handleSyntheticTokenCreated(
 
   let state = getOrCreateLatestSystemState(marketIndex, ZERO, event);
 
-  let fees = new FeeStructure(
-    marketIndexString + "-fees-" + longTokenAddress.toHexString()
-  );
-  fees.baseEntryFee = baseEntryFee;
-  fees.badLiquidityEntryFee = badLiquidityEntryFee;
-  fees.baseExitFee = baseExitFee;
-  fees.badLiquidityExitFee = badLiquidityExitFee;
+  let fees = new FeeStructure(marketIndexString + "-fees");
+  fees.baseEntryFee = ZERO;
+  fees.badLiquidityEntryFee = ZERO;
+  fees.baseExitFee = ZERO;
+  fees.badLiquidityExitFee = ZERO;
 
   let syntheticMarket = new SyntheticMarket(marketIndexString);
   syntheticMarket.timestampCreated = timestamp;
@@ -242,10 +235,6 @@ export function handleSyntheticTokenCreated(
       syntheticName,
       syntheticSymbol,
       oracleAddress.toHex(),
-      baseEntryFee.toString(),
-      badLiquidityEntryFee.toString(),
-      baseExitFee.toString(),
-      badLiquidityExitFee.toString(),
     ],
     [
       "marketIndex",
@@ -255,33 +244,49 @@ export function handleSyntheticTokenCreated(
       "name",
       "symbol",
       "oracleAddress",
-      "baseEntryFee",
-      "badLiquidityEntryFee",
-      "baseExitFee",
-      "badLiquidityExitFee",
     ],
-    [
-      "uint256",
-      "address",
-      "address",
-      "uint256",
-      "string",
-      "string",
-      "address",
-      "uint256",
-      "uint256",
-      "uint256",
-      "uint256",
-    ],
+    ["uint256", "address", "address", "uint256", "string", "string", "address"],
     []
   );
 }
 
 export function handleFeesChanges(event: FeesChanges): void {
+  let marketIndex = event.params.marketIndex;
   let baseEntryFee = event.params.baseEntryFee;
   let badLiquidityEntryFee = event.params.badLiquidityEntryFee;
   let baseExitFee = event.params.baseExitFee;
   let badLiquidityExitFee = event.params.badLiquidityExitFee;
+
+  let marketIndexString = marketIndex.toString();
+
+  let fees = FeeStructure.load(marketIndexString + "-fees");
+  fees.baseEntryFee = baseEntryFee;
+  fees.badLiquidityEntryFee = badLiquidityEntryFee;
+  fees.baseExitFee = baseExitFee;
+  fees.badLiquidityExitFee = badLiquidityExitFee;
+
+  fees.save();
+
+  saveEventToStateChange(
+    event,
+    "FeesChanges",
+    [
+      marketIndex.toString(),
+      baseEntryFee.toString(),
+      badLiquidityEntryFee.toString(),
+      baseExitFee.toString(),
+      badLiquidityExitFee.toString(),
+    ],
+    [
+      "marketIndex",
+      "baseEntryFee",
+      "badLiquidityEntryFee",
+      "baseExitFee",
+      "badLiquidityExitFee",
+    ],
+    ["uint256", "uint256", "uint256", "uint256", "uint256"],
+    []
+  );
 }
 
 export function handleLongMinted(event: LongMinted): void {

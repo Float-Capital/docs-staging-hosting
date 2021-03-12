@@ -13,6 +13,7 @@ import {
   EventParams,
   GlobalState,
   SyntheticToken,
+  SyntheticMarket,
   CurrentStake,
   Stake,
   User,
@@ -129,7 +130,30 @@ export function handleStateAdded(event: StateAdded): void {
 
 export function handleKFactorParametersChanges(
   event: KFactorParametersChanges
-): void {}
+): void {
+  let marketIndex = event.params.marketIndex;
+  let period = event.params.period;
+  let multiplier = event.params.multiplier;
+
+  let syntheticMarket = SyntheticMarket.load(marketIndex.toString());
+  if (syntheticMarket == null) {
+    log.critical("syntheticMarket should be defined", []);
+  }
+
+  syntheticMarket.kPeriod = period;
+  syntheticMarket.kMultiplier = ONE;
+
+  syntheticMarket.save();
+
+  saveEventToStateChange(
+    event,
+    "KFactorParametersChanges",
+    [marketIndex.toString(), period.toString(), multiplier.toString()],
+    ["marketIndex", "period", "multiplier"],
+    ["uint256", "uint256", "uint256"],
+    []
+  );
+}
 
 export function handleStakeAdded(event: StakeAdded): void {
   let txHash = event.transaction.hash;
