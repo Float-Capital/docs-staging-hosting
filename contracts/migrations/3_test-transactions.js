@@ -84,8 +84,8 @@ const deployTestMarket = async (
   );
 
   const currentMarketIndex = await longShortInstance.latestMarket.call();
-  let kInitialMultiplier = 0;
-  let kPeriod = 0;
+  const kInitialMultiplier = new BN("5000000000000000000"); // 5x
+  let kPeriod = 864000; // 10 days
 
   await longShortInstance.initializeMarket(
     currentMarketIndex,
