@@ -81,6 +81,8 @@ var query$1 = (require("@apollo/client").gql`
         __typename
         totalLockedLong
         totalLockedShort
+        shortTokenPrice
+        longTokenPrice
       }
     }
     tokenType
@@ -118,7 +120,9 @@ function parse$1(value) {
             latestSystemState: {
               __typename: value$2.__typename,
               totalLockedLong: GqlConverters.$$BigInt.parse(value$2.totalLockedLong),
-              totalLockedShort: GqlConverters.$$BigInt.parse(value$2.totalLockedShort)
+              totalLockedShort: GqlConverters.$$BigInt.parse(value$2.totalLockedShort),
+              shortTokenPrice: GqlConverters.$$BigInt.parse(value$2.shortTokenPrice),
+              longTokenPrice: GqlConverters.$$BigInt.parse(value$2.longTokenPrice)
             }
           },
           tokenType: tmp,
@@ -135,35 +139,41 @@ function serialize$1(value) {
     ) : value$3.VAL;
   var value$4 = value.syntheticMarket;
   var value$5 = value$4.latestSystemState;
-  var value$6 = value$5.totalLockedShort;
+  var value$6 = value$5.longTokenPrice;
   var value$7 = GqlConverters.$$BigInt.serialize(value$6);
-  var value$8 = value$5.totalLockedLong;
+  var value$8 = value$5.shortTokenPrice;
   var value$9 = GqlConverters.$$BigInt.serialize(value$8);
-  var value$10 = value$5.__typename;
+  var value$10 = value$5.totalLockedShort;
+  var value$11 = GqlConverters.$$BigInt.serialize(value$10);
+  var value$12 = value$5.totalLockedLong;
+  var value$13 = GqlConverters.$$BigInt.serialize(value$12);
+  var value$14 = value$5.__typename;
   var latestSystemState = {
-    __typename: value$10,
-    totalLockedLong: value$9,
-    totalLockedShort: value$7
-  };
-  var value$11 = value$4.symbol;
-  var value$12 = value$4.name;
-  var value$13 = value$4.id;
-  var value$14 = value$4.__typename;
-  var syntheticMarket = {
     __typename: value$14,
-    id: value$13,
-    name: value$12,
-    symbol: value$11,
+    totalLockedLong: value$13,
+    totalLockedShort: value$11,
+    shortTokenPrice: value$9,
+    longTokenPrice: value$7
+  };
+  var value$15 = value$4.symbol;
+  var value$16 = value$4.name;
+  var value$17 = value$4.id;
+  var value$18 = value$4.__typename;
+  var syntheticMarket = {
+    __typename: value$18,
+    id: value$17,
+    name: value$16,
+    symbol: value$15,
     latestSystemState: latestSystemState
   };
-  var value$15 = value.totalStaked;
-  var value$16 = GqlConverters.$$BigInt.serialize(value$15);
-  var value$17 = value.id;
-  var value$18 = value.__typename;
+  var value$19 = value.totalStaked;
+  var value$20 = GqlConverters.$$BigInt.serialize(value$19);
+  var value$21 = value.id;
+  var value$22 = value.__typename;
   return {
-          __typename: value$18,
-          id: value$17,
-          totalStaked: value$16,
+          __typename: value$22,
+          id: value$21,
+          totalStaked: value$20,
           syntheticMarket: syntheticMarket,
           tokenType: tokenType,
           tokenAddress: value$2
@@ -1372,100 +1382,126 @@ var UsersStakes = {
 
 var Raw$13 = {};
 
-var query$13 = ((frag_0) => require("@apollo/client").gql`
-  query ($userId: String!)  {
-    currentStakes(where: {user: $userId, withdrawn: false})  {
+var query$13 = (require("@apollo/client").gql`
+  query ($userId: String!, $synthToken: String!)  {
+    currentStakes(where: {user: $userId, syntheticToken: $synthToken})  {
       __typename
-      id
+      lastMintState  {
+        __typename
+        timestamp
+        accumulativeFloatPerToken
+      }
       currentStake  {
         __typename
-        id
-        timestamp
-        blockNumber
-        creationTxHash
-        syntheticToken  {
-          ...SyntheticInfo
-        }
         amount
       }
     }
+    states(first: 1, orderBy: stateIndex, orderDirection: desc, where: {syntheticToken: $synthToken, timeSinceLastUpdate_gt: 0})  {
+      __typename
+      stateIndex
+      accumulativeFloatPerToken
+      floatRatePerTokenOverInterval
+    }
   }
-  ${frag_0}
-`)(query$1);
+`);
 
 function parse$13(value) {
   var value$1 = value.currentStakes;
+  var value$2 = value.states;
   return {
           currentStakes: value$1.map(function (value) {
-                var value$1 = value.currentStake;
+                var value$1 = value.lastMintState;
+                var value$2 = value.currentStake;
                 return {
                         __typename: value.__typename,
-                        id: value.id,
-                        currentStake: {
+                        lastMintState: {
                           __typename: value$1.__typename,
-                          id: value$1.id,
                           timestamp: GqlConverters.$$BigInt.parse(value$1.timestamp),
-                          blockNumber: GqlConverters.$$BigInt.parse(value$1.blockNumber),
-                          creationTxHash: GqlConverters.Address.parse(value$1.creationTxHash),
-                          syntheticToken: parse$1(value$1.syntheticToken),
-                          amount: GqlConverters.$$BigInt.parse(value$1.amount)
+                          accumulativeFloatPerToken: GqlConverters.$$BigInt.parse(value$1.accumulativeFloatPerToken)
+                        },
+                        currentStake: {
+                          __typename: value$2.__typename,
+                          amount: GqlConverters.$$BigInt.parse(value$2.amount)
                         }
+                      };
+              }),
+          states: value$2.map(function (value) {
+                return {
+                        __typename: value.__typename,
+                        stateIndex: GqlConverters.$$BigInt.parse(value.stateIndex),
+                        accumulativeFloatPerToken: GqlConverters.$$BigInt.parse(value.accumulativeFloatPerToken),
+                        floatRatePerTokenOverInterval: GqlConverters.$$BigInt.parse(value.floatRatePerTokenOverInterval)
                       };
               })
         };
 }
 
 function serialize$13(value) {
-  var value$1 = value.currentStakes;
-  var currentStakes = value$1.map(function (value) {
+  var value$1 = value.states;
+  var states = value$1.map(function (value) {
+        var value$1 = value.floatRatePerTokenOverInterval;
+        var value$2 = GqlConverters.$$BigInt.serialize(value$1);
+        var value$3 = value.accumulativeFloatPerToken;
+        var value$4 = GqlConverters.$$BigInt.serialize(value$3);
+        var value$5 = value.stateIndex;
+        var value$6 = GqlConverters.$$BigInt.serialize(value$5);
+        var value$7 = value.__typename;
+        return {
+                __typename: value$7,
+                stateIndex: value$6,
+                accumulativeFloatPerToken: value$4,
+                floatRatePerTokenOverInterval: value$2
+              };
+      });
+  var value$2 = value.currentStakes;
+  var currentStakes = value$2.map(function (value) {
         var value$1 = value.currentStake;
         var value$2 = value$1.amount;
         var value$3 = GqlConverters.$$BigInt.serialize(value$2);
-        var value$4 = value$1.syntheticToken;
-        var syntheticToken = serialize$1(value$4);
-        var value$5 = value$1.creationTxHash;
-        var value$6 = GqlConverters.Address.serialize(value$5);
-        var value$7 = value$1.blockNumber;
-        var value$8 = GqlConverters.$$BigInt.serialize(value$7);
-        var value$9 = value$1.timestamp;
-        var value$10 = GqlConverters.$$BigInt.serialize(value$9);
-        var value$11 = value$1.id;
-        var value$12 = value$1.__typename;
+        var value$4 = value$1.__typename;
         var currentStake = {
-          __typename: value$12,
-          id: value$11,
-          timestamp: value$10,
-          blockNumber: value$8,
-          creationTxHash: value$6,
-          syntheticToken: syntheticToken,
+          __typename: value$4,
           amount: value$3
         };
-        var value$13 = value.id;
-        var value$14 = value.__typename;
+        var value$5 = value.lastMintState;
+        var value$6 = value$5.accumulativeFloatPerToken;
+        var value$7 = GqlConverters.$$BigInt.serialize(value$6);
+        var value$8 = value$5.timestamp;
+        var value$9 = GqlConverters.$$BigInt.serialize(value$8);
+        var value$10 = value$5.__typename;
+        var lastMintState = {
+          __typename: value$10,
+          timestamp: value$9,
+          accumulativeFloatPerToken: value$7
+        };
+        var value$11 = value.__typename;
         return {
-                __typename: value$14,
-                id: value$13,
+                __typename: value$11,
+                lastMintState: lastMintState,
                 currentStake: currentStake
               };
       });
   return {
-          currentStakes: currentStakes
+          currentStakes: currentStakes,
+          states: states
         };
 }
 
 function serializeVariables$9(inp) {
   return {
-          userId: inp.userId
+          userId: inp.userId,
+          synthToken: inp.synthToken
         };
 }
 
-function makeVariables$9(userId, param) {
+function makeVariables$9(userId, synthToken, param) {
   return {
-          userId: userId
+          userId: userId,
+          synthToken: synthToken
         };
 }
 
-var UsersActiveStakes_inner = {
+var UsersFloatDetails_inner = {
   Raw: Raw$13,
   query: query$13,
   parse: parse$13,
@@ -1482,26 +1518,26 @@ var include$9 = ApolloClient__React_Hooks_UseQuery.Extend({
       serializeVariables: serializeVariables$9
     });
 
-var UsersActiveStakes_refetchQueryDescription = include$9.refetchQueryDescription;
+var UsersFloatDetails_refetchQueryDescription = include$9.refetchQueryDescription;
 
-var UsersActiveStakes_use = include$9.use;
+var UsersFloatDetails_use = include$9.use;
 
-var UsersActiveStakes_useLazy = include$9.useLazy;
+var UsersFloatDetails_useLazy = include$9.useLazy;
 
-var UsersActiveStakes_useLazyWithVariables = include$9.useLazyWithVariables;
+var UsersFloatDetails_useLazyWithVariables = include$9.useLazyWithVariables;
 
-var UsersActiveStakes = {
-  UsersActiveStakes_inner: UsersActiveStakes_inner,
+var UsersFloatDetails = {
+  UsersFloatDetails_inner: UsersFloatDetails_inner,
   Raw: Raw$13,
   query: query$13,
   parse: parse$13,
   serialize: serialize$13,
   serializeVariables: serializeVariables$9,
   makeVariables: makeVariables$9,
-  refetchQueryDescription: UsersActiveStakes_refetchQueryDescription,
-  use: UsersActiveStakes_use,
-  useLazy: UsersActiveStakes_useLazy,
-  useLazyWithVariables: UsersActiveStakes_useLazyWithVariables
+  refetchQueryDescription: UsersFloatDetails_refetchQueryDescription,
+  use: UsersFloatDetails_use,
+  useLazy: UsersFloatDetails_useLazy,
+  useLazyWithVariables: UsersFloatDetails_useLazyWithVariables
 };
 
 var Raw$14 = {};
@@ -1630,7 +1666,7 @@ export {
   SyntheticTokens ,
   SyntheticToken ,
   UsersStakes ,
-  UsersActiveStakes ,
+  UsersFloatDetails ,
   GlobalState ,
   
 }

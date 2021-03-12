@@ -24,8 +24,8 @@ function ActiveStakes(Props) {
                       var match = param.currentStake;
                       var match$1 = match.syntheticToken;
                       var match$2 = match$1.syntheticMarket;
-                      var amountFormatted = FormatMoney.formatEther(match.amount);
-                      var totalStakedFormatted = FormatMoney.formatEther(match$1.totalStaked);
+                      var amountFormatted = FormatMoney.formatEther(undefined, match.amount);
+                      var totalStakedFormatted = FormatMoney.formatEther(undefined, match$1.totalStaked);
                       return React.createElement("div", undefined, React.createElement("h1", undefined, match$2.name + "(" + match$2.symbol + ")"), React.createElement("p", undefined, "Stake of " + amountFormatted + " for " + match$1.tokenType + " at address " + Globals.ethAdrToStr(match$1.tokenAddress) + ", which is " + (
                                       match.withdrawn ? "withdrawn" : "still active"
                                     ) + ". This stake was created at " + match.timestamp.toString() + ", in transaction " + match.creationTxHash + ". Total staked: " + totalStakedFormatted));
