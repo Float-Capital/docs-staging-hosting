@@ -141,7 +141,7 @@ export function handleKFactorParametersChanges(
   }
 
   syntheticMarket.kPeriod = period;
-  syntheticMarket.kMultiplier = ONE;
+  syntheticMarket.kMultiplier = multiplier;
 
   syntheticMarket.save();
 
