@@ -188,4 +188,5 @@ type GlobalState @entity {
   totalGasUsed: BigInt!
   totalUsers: BigInt!
   timestampLaunched: BigInt!
+  txHash: Bytes!
 }
