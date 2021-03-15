@@ -1,5 +1,3 @@
-open Globals
-
 module MintForm = %form(
   type input = {amount: string, isLong: bool, isStaking: bool}
   type output = {amount: Ethers.BigNumber.t, isLong: bool, isStaking: bool}
@@ -55,7 +53,6 @@ let make = (
   ~initialIsLong,
 ) => {
   let signer = ContractActions.useSignerExn()
-  let user = RootProvider.useCurrentUserExn()
 
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
   let (
@@ -76,14 +73,6 @@ let make = (
     ~erc20Address=daiAddressThatIsTemporarilyHardCoded,
     ~spender=longShortContractAddress,
   )
-  let longBalanceQuery = Queries.UsersBalance.use({
-    userId: user->ethAdrToLowerStr,
-    tokenAdr: market.syntheticLong.tokenAddress->ethAdrToLowerStr,
-  })
-  let shortBalanceQuery = Queries.UsersBalance.use({
-    userId: user->ethAdrToLowerStr,
-    tokenAdr: market.syntheticShort.tokenAddress->ethAdrToLowerStr,
-  })
 
   let form = MintForm.useForm(
     ~initialInput={
@@ -366,84 +355,5 @@ let make = (
         }}
       </Form>
     </ViewBox>
-    {Config.isDevMode // <- this can be used to hide this code when not developing
-      ? <>
-          {
-            let txExplererUrl = RootProvider.useEtherscanUrl()
-
-            let resetTxButton =
-              <button onClick={_ => setTxState(_ => ContractActions.UnInitialised)}>
-                {">>Reset tx<<"->React.string}
-              </button>
-
-            switch txState {
-            | ContractActions.UnInitialised => React.null
-            | ContractActions.Created => <>
-                <h1> {"Processing Transaction "->React.string} </h1>
-                <p> {"Tx created."->React.string} </p>
-                <div />
-              </>
-            | ContractActions.SignedAndSubmitted(txHash) => <>
-                <h1> {"Processing Transaction "->React.string} </h1>
-                <p>
-                  <a
-                    href=j`https://$txExplererUrl/tx/$txHash`
-                    target="_blank"
-                    rel="noopener noreferrer">
-                    {("View the transaction on " ++ txExplererUrl)->React.string}
-                  </a>
-                </p>
-              </>
-            | ContractActions.Complete(result) =>
-              let txHash = result.transactionHash
-              <>
-                <h1> {"Transaction Complete "->React.string} </h1>
-                <p>
-                  <a
-                    href=j`https://$txExplererUrl/tx/$txHash`
-                    target="_blank"
-                    rel="noopener noreferrer">
-                    {("View the transaction on " ++ txExplererUrl)->React.string}
-                  </a>
-                </p>
-                resetTxButton
-              </>
-            | ContractActions.Declined(message) => <>
-                <h1>
-                  {"The transaction was declined by your wallet, please try again."->React.string}
-                </h1>
-                <p> {("Failure reason: " ++ message)->React.string} </p>
-                resetTxButton
-              </>
-            | ContractActions.Failed => <>
-                <h1> {"The transaction failed."->React.string} </h1>
-                <p> {"This operation isn't permitted by the smart contract."->React.string} </p>
-                resetTxButton
-              </>
-            }
-          }
-          {
-            let formatOptBalance = Option.mapWithDefault(_, "Loading", Ethers.Utils.formatEther)
-            <code>
-              <p> {"dev only component to display balances"->React.string} </p>
-              <p>
-                {`dai - balance: ${optDaiBalance->formatOptBalance} - approved: ${optDaiAmountApproved->formatOptBalance}`->React.string}
-              </p>
-              {switch longBalanceQuery {
-              | {data: Some({user: Some({tokenBalances: Some([{tokenBalance}])})})} =>
-                <p> {`long - balance: ${tokenBalance->Ethers.Utils.formatEther}`->React.string} </p>
-              | _ => <p> {`loading LONG balance`->React.string} </p>
-              }}
-              {switch shortBalanceQuery {
-              | {data: Some({user: Some({tokenBalances: Some([{tokenBalance}])})})} =>
-                <p>
-                  {`short - balance: ${tokenBalance->Ethers.Utils.formatEther}`->React.string}
-                </p>
-              | _ => <p> {`loading SHORT balance`->React.string} </p>
-              }}
-            </code>
-          }
-        </>
-      : React.null}
   </div>
 }

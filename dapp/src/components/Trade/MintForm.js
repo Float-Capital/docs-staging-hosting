@@ -8,15 +8,12 @@ import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Loader from "../UI/Loader.js";
 import * as Ethers$1 from "ethers";
-import * as Globals from "../../libraries/Globals.js";
-import * as Queries from "../../data/Queries.js";
 import * as ViewBox from "../UI/ViewBox.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as AmountInput from "../UI/AmountInput.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
-import * as RootProvider from "../../libraries/RootProvider.js";
 import * as ContractHooks from "../Testing/Admin/ContractHooks.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
@@ -634,7 +631,6 @@ function MintForm$1(Props) {
   var market = Props.market;
   var initialIsLong = Props.initialIsLong;
   var signer = ContractActions.useSignerExn(undefined);
-  var user = RootProvider.useCurrentUserExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var txState = match[1];
@@ -655,44 +651,6 @@ function MintForm$1(Props) {
   var match$3 = useBalanceAndApproved(daiAddressThatIsTemporarilyHardCoded, longShortContractAddress);
   var optDaiAmountApproved = match$3[1];
   var optDaiBalance = match$3[0];
-  var longBalanceQuery = Curry.app(Queries.UsersBalance.use, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        {
-          userId: Globals.ethAdrToLowerStr(user),
-          tokenAdr: Globals.ethAdrToLowerStr(market.syntheticLong.tokenAddress)
-        }
-      ]);
-  var shortBalanceQuery = Curry.app(Queries.UsersBalance.use, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        {
-          userId: Globals.ethAdrToLowerStr(user),
-          tokenAdr: Globals.ethAdrToLowerStr(market.syntheticShort.tokenAddress)
-        }
-      ]);
   var form = useForm({
         amount: "",
         isLong: initialIsLong,
@@ -972,104 +930,6 @@ function MintForm$1(Props) {
       }
     }
   }
-  var tmp$3;
-  if (Config.isDevMode) {
-    var txExplererUrl = RootProvider.useEtherscanUrl(undefined);
-    var resetTxButton = React.createElement("button", {
-          onClick: (function (param) {
-              return Curry._1(setTxState, (function (param) {
-                            return /* UnInitialised */0;
-                          }));
-            })
-        }, ">>Reset tx<<");
-    var tmp$4;
-    if (typeof txState === "number") {
-      switch (txState) {
-        case /* UnInitialised */0 :
-            tmp$4 = null;
-            break;
-        case /* Created */1 :
-            tmp$4 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction "), React.createElement("p", undefined, "Tx created."), React.createElement("div", undefined));
-            break;
-        case /* Failed */2 :
-            tmp$4 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."), resetTxButton);
-            break;
-        
-      }
-    } else {
-      switch (txState.TAG | 0) {
-        case /* SignedAndSubmitted */0 :
-            tmp$4 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction "), React.createElement("p", undefined, React.createElement("a", {
-                          href: "https://" + txExplererUrl + "/tx/" + txState._0,
-                          rel: "noopener noreferrer",
-                          target: "_blank"
-                        }, "View the transaction on " + txExplererUrl)));
-            break;
-        case /* Declined */1 :
-            tmp$4 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0), resetTxButton);
-            break;
-        case /* Complete */2 :
-            var txHash = txState._0.transactionHash;
-            tmp$4 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Transaction Complete "), React.createElement("p", undefined, React.createElement("a", {
-                          href: "https://" + txExplererUrl + "/tx/" + txHash,
-                          rel: "noopener noreferrer",
-                          target: "_blank"
-                        }, "View the transaction on " + txExplererUrl)), resetTxButton);
-            break;
-        
-      }
-    }
-    var formatOptBalance = function (__x) {
-      return Belt_Option.mapWithDefault(__x, "Loading", Ethers.Utils.formatEther);
-    };
-    var match$7 = longBalanceQuery.data;
-    var tmp$5;
-    var exit$6 = 0;
-    if (match$7 !== undefined) {
-      var match$8 = match$7.user;
-      if (match$8 !== undefined) {
-        var match$9 = match$8.tokenBalances;
-        if (match$9 !== undefined && match$9.length === 1) {
-          var match$10 = match$9[0];
-          tmp$5 = React.createElement("p", undefined, "long - balance: " + Ethers.Utils.formatEther(match$10.tokenBalance));
-        } else {
-          exit$6 = 1;
-        }
-      } else {
-        exit$6 = 1;
-      }
-    } else {
-      exit$6 = 1;
-    }
-    if (exit$6 === 1) {
-      tmp$5 = React.createElement("p", undefined, "loading LONG balance");
-    }
-    var match$11 = shortBalanceQuery.data;
-    var tmp$6;
-    var exit$7 = 0;
-    if (match$11 !== undefined) {
-      var match$12 = match$11.user;
-      if (match$12 !== undefined) {
-        var match$13 = match$12.tokenBalances;
-        if (match$13 !== undefined && match$13.length === 1) {
-          var match$14 = match$13[0];
-          tmp$6 = React.createElement("p", undefined, "short - balance: " + Ethers.Utils.formatEther(match$14.tokenBalance));
-        } else {
-          exit$7 = 1;
-        }
-      } else {
-        exit$7 = 1;
-      }
-    } else {
-      exit$7 = 1;
-    }
-    if (exit$7 === 1) {
-      tmp$6 = React.createElement("p", undefined, "loading SHORT balance");
-    }
-    tmp$3 = React.createElement(React.Fragment, undefined, tmp$4, React.createElement("code", undefined, React.createElement("p", undefined, "dev only component to display balances"), React.createElement("p", undefined, "dai - balance: " + formatOptBalance(optDaiBalance) + " - approved: " + formatOptBalance(optDaiAmountApproved)), tmp$5, tmp$6));
-  } else {
-    tmp$3 = null;
-  }
   return React.createElement("div", {
               className: "screen-centered-container"
             }, React.createElement(ViewBox.make, {
@@ -1162,7 +1022,7 @@ function MintForm$1(Props) {
                                       }, React.createElement("a", {
                                             href: "https://docs.float.capital/docs/stake"
                                           }, "Learn more about staking")))), tmp$1), tmp$2)
-                }), tmp$3);
+                }));
 }
 
 var initialInput = {
