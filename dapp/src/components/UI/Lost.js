@@ -2,6 +2,7 @@
 
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
+import * as Config from "../../Config.js";
 import * as Router from "next/router";
 
 function Lost(Props) {
@@ -34,7 +35,7 @@ function Lost(Props) {
                                 target: "_blank"
                               }, "View our docs")), React.createElement("li", undefined, React.createElement("a", {
                                 className: "text-sm block text-right hover:bg-white",
-                                href: "https://discord.gg/dqDwgrVYcU",
+                                href: Config.discordInviteLink,
                                 target: "_blank"
                               }, "Join our discord")))));
   }

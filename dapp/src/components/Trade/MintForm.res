@@ -134,6 +134,8 @@ let make = (
   | _ => None
   }
 
+  let tokenToMint = form.input.isLong ? `long ${market.name}` : `short ${market.name}`
+
   let (optAdditionalErrorMessage, _buttonText, _buttonDisabled) = {
     let stakingText = form.input.isStaking ? "Mint & Stake" : "Mint" // TODO: decide on this " & stake" : ""
     let approveConnector = form.input.isStaking ? "," : " &" // TODO: decide on this " & stake" : ""
@@ -180,11 +182,6 @@ let make = (
         }}>
         <div className="flex justify-between mb-2">
           <h2> {`${market.name} (${market.symbol})`->React.string} </h2>
-          // <Next.Link href="/redeem">
-          //   <span className="text-xs hover:text-gray-500 cursor-pointer">
-          //     {"Redeem"->React.string}
-          //   </span>
-          // </Next.Link>
         </div>
         <select
           name="longshort"
@@ -254,34 +251,96 @@ let make = (
             </a>
           </p>
         </div>
-        // <Toggle onClick={_ => Js.log("I was toggled")} preLabel="stake " postLabel="" />
-        <Button onClick={_ => ()} variant="large"> {_buttonText} </Button>
+        {switch (txStateApprove, txState) {
+        | (ContractActions.Created, _) => <>
+            <h1>
+              {`Please Approve that Float can use your ${Config.paymentTokenName}`->React.string}
+            </h1>
+          </>
+        | (ContractActions.SignedAndSubmitted(txHash), _) =>
+          <h1>
+            <a target="_" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
+              {"Processing Approval "->React.string}
+            </a>
+          </h1>
+        | (ContractActions.Complete({transactionHash}), ContractActions.Created)
+        | (ContractActions.Complete({transactionHash}), ContractActions.UnInitialised) => <>
+            <h1>
+              <a target="_" href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
+                {`✅ Approval Complete`->React.string}
+              </a>
+            </h1>
+            <h1> {`Sign the next transaction to mint your`->React.string} </h1>
+          </>
+        | (ContractActions.Declined(message), _) => <>
+            <h1>
+              {"The transaction was declined by your wallet, you need to accept the transaction to proceed."->React.string}
+            </h1>
+            <p> {("Failure reason: " ++ message)->React.string} </p>
+          </>
+        | (ContractActions.Failed, _) => <>
+            <h1> {"The transaction failed."->React.string} </h1>
+            <p>
+              <a target="_" href=Config.discordInviteLink>
+                {"This shouldn't happen, please let us help you on discord."->React.string}
+              </a>
+            </p>
+          </>
+        | (_, ContractActions.Created) => <>
+            <h1>
+              {`Sign the transaction to mint ${tokenToMint} with your ${Config.paymentTokenName}`->React.string}
+            </h1>
+          </>
+        | (
+            ContractActions.Complete({transactionHash}),
+            ContractActions.SignedAndSubmitted(txHash),
+          ) => <>
+            <h1>
+              <a target="_" href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
+                {`✅ Approval Complete`->React.string}
+              </a>
+            </h1>
+            <h1>
+              <a target="_" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
+                {`Processing minting ${tokenToMint} with your ${Config.paymentTokenName}`->React.string}
+              </a>
+            </h1>
+          </>
+        | (_, ContractActions.SignedAndSubmitted(txHash)) => <>
+            <h1>
+              <a target="_" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
+                {`Processing minting ${tokenToMint} with your ${Config.paymentTokenName}`->React.string}
+              </a>
+            </h1>
+          </>
+        | (_, ContractActions.Complete({transactionHash})) => <>
+            <h1>
+              <a target="_" href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
+                {`✅ Transaction Complete`->React.string}
+              </a>
+            </h1>
+            <h1 />
+          </>
+        | (_, ContractActions.Declined(message)) => <>
+            <h1>
+              {"The transaction was declined by your wallet, you need to accept the transaction to proceed."->React.string}
+            </h1>
+            <p> {("Failure reason: " ++ message)->React.string} </p>
+          </>
+        | (_, ContractActions.Failed) => <>
+            <h1> {"The transaction failed."->React.string} </h1>
+            <p>
+              <a target="_" href=Config.discordInviteLink>
+                {"This shouldn't happen, please let us help you on discord."->React.string}
+              </a>
+            </p>
+          </>
+        | _ => <Button onClick={_ => ()} variant="large"> {_buttonText} </Button>
+        }}
       </Form>
     </ViewBox>
     {Config.isDevMode // <- this can be used to hide this code when not developing
       ? <>
-          {switch txState {
-          | ContractActions.UnInitialised => React.null
-          | ContractActions.Created => <>
-              <h1> {"Processing Approval "->React.string} </h1> <Loader />
-            </>
-          | ContractActions.SignedAndSubmitted(_txHash) => <>
-              <h1> {"Processing Approval - submitted "->React.string} <Loader /> </h1> <Loader />
-            </>
-          | ContractActions.Complete({transactionHash: _txHash}) => <>
-              <h1> {"Approval Complete, Sign the next transaction "->React.string} </h1>
-            </>
-          | ContractActions.Declined(message) => <>
-              <h1>
-                {"The transaction was declined by your wallet, please try again."->React.string}
-              </h1>
-              <p> {("Failure reason: " ++ message)->React.string} </p>
-            </>
-          | ContractActions.Failed => <>
-              <h1> {"The transaction failed."->React.string} </h1>
-              <p> {"This operation isn't permitted by the smart contract."->React.string} </p>
-            </>
-          }}
           {
             let txExplererUrl = RootProvider.useEtherscanUrl()
 
@@ -293,12 +352,12 @@ let make = (
             switch txState {
             | ContractActions.UnInitialised => React.null
             | ContractActions.Created => <>
-                <h1> {"Processing Transaction "->React.string} <Loader /> </h1>
+                <h1> {"Processing Transaction "->React.string} </h1>
                 <p> {"Tx created."->React.string} </p>
-                <div> <Loader /> </div>
+                <div />
               </>
             | ContractActions.SignedAndSubmitted(txHash) => <>
-                <h1> {"Processing Transaction "->React.string} <Loader /> </h1>
+                <h1> {"Processing Transaction "->React.string} </h1>
                 <p>
                   <a
                     href=j`https://$txExplererUrl/tx/$txHash`
@@ -307,7 +366,6 @@ let make = (
                     {("View the transaction on " ++ txExplererUrl)->React.string}
                   </a>
                 </p>
-                <Loader />
               </>
             | ContractActions.Complete(result) =>
               let txHash = result.transactionHash

@@ -9,7 +9,11 @@ let longshortContractAbi = [""]->Ethers.makeAbi
 let binancTestnetGraphEndpoint = "https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital"
 let localhostGraphEndpoint = "https://localhost:8000/subgraphs/name/avolabs-io/float-capital/graphql"
 let defaultNetworkId = 97
+let paymentTokenName = "BUSD"
+let defaultBlockExplorer = "https://testnet.bscscan.com/"
 let getDefaultNetworkId = optNetworkId => optNetworkId->Option.getWithDefault(defaultNetworkId)
+
+let discordInviteLink = "https://discord.gg/dqDwgrVYcU"
 
 type contractDetails = {
   @as("LongShort") longShort: Ethers.ethAddress,
