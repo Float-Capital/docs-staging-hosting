@@ -47,9 +47,68 @@ let make = (~children) => {
       switch queryResult {
       | Ok({data: {stateChanges: []}}) => ()
       | Ok({data: {stateChanges}}) =>
-        let _ = stateChanges->Array.map(({timestamp, affectedUsers: _}) => {
+        let _ = stateChanges->Array.map(({timestamp, affectedUsers}) => {
           if timestamp->Ethers.BigNumber.gt(latestStateChangeTimestamp) {
             setLatestStateChangeTimestamp(_ => timestamp)
+            // Update cache of values for all affected users
+            let _ = affectedUsers->Option.map(users =>
+              users->Array.map(({__typename, tokenBalances, basicUserInfo: {id}}) => {
+                Js.log2("Handling affected user!", users)
+                switch tokenBalances {
+                | Some(newTokenBalances) =>
+                  // Balances update correctly even without this extra piece of code, but why not have this also?
+                  let _ = newTokenBalances->Array.map(tokenBalance => {
+                    let _ = client.writeQuery(
+                      ~query=module(Queries.UsersBalance),
+                      ~data={
+                        user: Some({__typename: __typename, tokenBalances: Some([tokenBalance])}),
+                      },
+                      {tokenAdr: tokenBalance.syntheticToken.id, userId: id},
+                    )
+                  })
+
+                  let balanceReadQuery = client.readQuery(
+                    ~query=module(Queries.UsersBalances),
+                    {userId: id},
+                  )
+                  switch balanceReadQuery {
+                  | Some(Ok({
+                      user: Some({__typename, tokenBalances: Some(usersCurrentBalances)}),
+                    })) =>
+                    let containsBalanceItem = (
+                      listOfBalances: array<Queries.UserTokenBalance.t>,
+                      {id: comparisonId}: Queries.UserTokenBalance.t,
+                    ) => {
+                      listOfBalances->Array.getIndexBy(({id}) => comparisonId == id)
+                    }
+                    let updatedTokenBalances = newTokenBalances->Array.reduce(
+                      usersCurrentBalances,
+                      (currentBalances, newBalance) =>
+                        switch currentBalances->containsBalanceItem(newBalance) {
+                        | Some(index) =>
+                          let _ = currentBalances[index] = newBalance // this is the rescript team trying to make the syntax too friendly :/ Anyway, this thing returns a bool if the 'set' was successful.
+                          currentBalances
+                        | None => currentBalances->Array.concat([newBalance])
+                        },
+                    )
+                    let _ = client.writeQuery(
+                      ~query=module(Queries.UsersBalances),
+                      ~data={
+                        user: Some({
+                          __typename: __typename,
+                          tokenBalances: Some(updatedTokenBalances),
+                        }),
+                      },
+                      {userId: id},
+                    )
+                  | _ =>
+                    let _ = client.query(~query=module(Queries.UsersBalances), {userId: id})
+                  }
+
+                | None => Js.log("No balance changes")
+                }
+              })
+            )
           }
         })
       | Error(_) => ()

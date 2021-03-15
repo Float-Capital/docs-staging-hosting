@@ -106,6 +106,7 @@ type User @entity {
 
 type UserSyntheticTokenBalance @entity {
   id: ID! # token address - user address - "balance"
+  timeLastUpdated: BigInt!
   syntheticToken: SyntheticToken!
   user: User!
   tokenBalance: BigInt!

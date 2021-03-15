@@ -46,6 +46,13 @@ fragment SyntheticMarketInfo on SyntheticMarket {
     shortTokenPrice
   }
 }
+fragment UserTokenBalance on UserSyntheticTokenBalance {
+  id
+  tokenBalance
+  syntheticToken {
+    id
+  }
+}
 `)
 
 module UserQuery = %graphql(`
@@ -55,12 +62,33 @@ query ($userId: String!) {
   }
 }`)
 
+module UsersBalance = %graphql(`
+query ($userId: String!, $tokenAdr: String!) {
+  user (id: $userId) {
+    tokenBalances (where: {syntheticToken: $tokenAdr}) {
+      ...UserTokenBalance
+    }
+  }
+}`)
+
+module UsersBalances = %graphql(`
+query ($userId: String!) {
+  user (id: $userId) {
+    tokenBalances { # Maybe we can filter to only get balances greater than 0? Probably not worth it.
+      ...UserTokenBalance
+    }
+  }
+}`)
+
 module StateChangePoll = %graphql(`
 query($userId: String!, $timestamp: BigInt!) {
   stateChanges (where: {timestamp_gt: $timestamp}) {
     timestamp
     affectedUsers (where: {id: $userId}) {
       ...BasicUserInfo
+      tokenBalances (where: {timeLastUpdated_gt: $timestamp}) {
+        ...UserTokenBalance
+      }
     }
   }
 }`)

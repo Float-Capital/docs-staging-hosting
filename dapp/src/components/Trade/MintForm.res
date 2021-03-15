@@ -1,3 +1,5 @@
+open Globals
+
 module MintForm = %form(
   type input = {amount: string, isLong: bool, isStaking: bool}
   type output = {amount: Ethers.BigNumber.t, isLong: bool, isStaking: bool}
@@ -53,6 +55,7 @@ let make = (
   ~initialIsLong,
 ) => {
   let signer = ContractActions.useSignerExn()
+  let user = RootProvider.useCurrentUserExn()
 
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
   let (
@@ -73,12 +76,14 @@ let make = (
     ~erc20Address=daiAddressThatIsTemporarilyHardCoded,
     ~spender=longShortContractAddress,
   )
-  let {Swr.data: optShortBalance} = ContractHooks.useErc20BalanceRefresh(
-    ~erc20Address=market.syntheticShort.tokenAddress,
-  )
-  let {Swr.data: optLongBalance} = ContractHooks.useErc20BalanceRefresh(
-    ~erc20Address=market.syntheticLong.tokenAddress,
-  )
+  let longBalanceQuery = Queries.UsersBalance.use({
+    userId: user->ethAdrToLowerStr,
+    tokenAdr: market.syntheticLong.tokenAddress->ethAdrToLowerStr,
+  })
+  let shortBalanceQuery = Queries.UsersBalance.use({
+    userId: user->ethAdrToLowerStr,
+    tokenAdr: market.syntheticShort.tokenAddress->ethAdrToLowerStr,
+  })
 
   let form = MintForm.useForm(
     ~initialInput={
@@ -339,8 +344,18 @@ let make = (
               <p>
                 {`dai - balance: ${optDaiBalance->formatOptBalance} - approved: ${optDaiAmountApproved->formatOptBalance}`->React.string}
               </p>
-              <p> {`long - balance: ${optLongBalance->formatOptBalance}`->React.string} </p>
-              <p> {`short - balance: ${optShortBalance->formatOptBalance}`->React.string} </p>
+              {switch longBalanceQuery {
+              | {data: Some({user: Some({tokenBalances: Some([{tokenBalance}])})})} =>
+                <p> {`long - balance: ${tokenBalance->Ethers.Utils.formatEther}`->React.string} </p>
+              | _ => <p> {`loading LONG balance`->React.string} </p>
+              }}
+              {switch shortBalanceQuery {
+              | {data: Some({user: Some({tokenBalances: Some([{tokenBalance}])})})} =>
+                <p>
+                  {`short - balance: ${tokenBalance->Ethers.Utils.formatEther}`->React.string}
+                </p>
+              | _ => <p> {`loading SHORT balance`->React.string} </p>
+              }}
             </code>
           }
         </>
