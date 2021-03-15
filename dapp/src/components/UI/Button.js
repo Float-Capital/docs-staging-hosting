@@ -3,10 +3,11 @@
 import * as React from "react";
 
 function Button(Props) {
-  var onClick = Props.onClick;
   var children = Props.children;
   var variantOpt = Props.variant;
+  var disabledOpt = Props.disabled;
   var variant = variantOpt !== undefined ? variantOpt : "small";
+  var disabled = disabledOpt !== undefined ? disabledOpt : false;
   var outerContainerClass = "float-button-outer-container " + (
     variant === "tiny" ? "float-button-outer-container-tiny" : ""
   );
@@ -25,8 +26,14 @@ function Button(Props) {
             }, React.createElement("div", {
                   className: containerClass
                 }, React.createElement("button", {
-                      className: buttonClass,
-                      onClick: onClick
+                      className: buttonClass + (
+                        disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-300" : ""
+                      ),
+                      disabled: disabled,
+                      onClick: (function (param) {
+                          console.log("WAS CLICKED");
+                          
+                        })
                     }, children)));
 }
 
