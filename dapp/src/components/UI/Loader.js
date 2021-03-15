@@ -2,6 +2,19 @@
 
 import * as React from "react";
 
+function Loader$Overlay(Props) {
+  return React.createElement("div", {
+              className: "absolute top-0 left-0 w-full h-full flex justify-center"
+            }, React.createElement("img", {
+                  className: "object-contain",
+                  src: "/img/loading.gif"
+                }));
+}
+
+var Overlay = {
+  make: Loader$Overlay
+};
+
 function Loader(Props) {
   return React.createElement("div", {
               className: "screen-centered-container"
@@ -14,6 +27,7 @@ function Loader(Props) {
 var make = Loader;
 
 export {
+  Overlay ,
   make ,
   
 }

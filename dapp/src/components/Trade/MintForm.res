@@ -176,80 +176,92 @@ let make = (
   <div className="screen-centered-container">
     <ViewBox>
       <Form
-        className="this-is-required"
+        className=""
         onSubmit={() => {
           form.submit()
         }}>
-        <div className="flex justify-between mb-2">
-          <h2> {`${market.name} (${market.symbol})`->React.string} </h2>
-        </div>
-        <select
-          name="longshort"
-          className="trade-select"
-          onChange={event =>
-            form.updateIsLong(
-              (input, isLong) => {...input, isLong: isLong},
-              (event->ReactEvent.Form.target)["value"] == "long",
-            )}
-          value={form.input.isLong ? "long" : "short"}
-          onBlur={_ => form.blurAmount()}
-          disabled=form.submitting>
-          <option value="long"> {`Long 🐮`->React.string} </option>
-          <option value="short"> {`Short 🐻`->React.string} </option>
-        </select>
-        <AmountInput
-          value=form.input.amount
-          optBalance={optDaiBalance}
-          disabled=form.submitting
-          onBlur={_ => form.blurAmount()}
-          onChange={event => form.updateAmount((input, amount) => {
-              ...input,
-              amount: amount,
-            }, (event->ReactEvent.Form.target)["value"])}
-          placeholder={"Mint"}
-          onMaxClick={_ =>
-            form.updateAmount(
-              (input, amount) => {
-                ...input,
-                amount: amount,
-              },
-              switch optDaiBalance {
-              | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
-              | _ => "0"
-              },
-            )}
-        />
-        {switch (form.amountResult, optAdditionalErrorMessage) {
-        | (Some(Error(message)), _)
-        | (_, Some(message)) =>
-          <div className="text-red-500 text-xs"> {message->React.string} </div>
-        | (Some(Ok(_)), None) => React.null
-        | (None, None) => React.null
-        }}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <input
-              id="stake-checkbox"
-              type_="checkbox"
-              className="mr-2"
-              checked={form.input.isStaking}
-              disabled={form.submitting}
-              onBlur={_ => form.blurIsStaking()}
+        <div className="relative">
+          <div>
+            <div className="flex justify-between mb-2">
+              <h2> {`${market.name} (${market.symbol})`->React.string} </h2>
+            </div>
+            <select
+              name="longshort"
+              className="trade-select"
               onChange={event =>
-                form.updateIsStaking(
-                  (input, value) => {...input, isStaking: value},
-                  (event->ReactEvent.Form.target)["checked"],
+                form.updateIsLong(
+                  (input, isLong) => {...input, isLong: isLong},
+                  (event->ReactEvent.Form.target)["value"] == "long",
+                )}
+              value={form.input.isLong ? "long" : "short"}
+              onBlur={_ => form.blurAmount()}
+              disabled=form.submitting>
+              <option value="long"> {`Long 🐮`->React.string} </option>
+              <option value="short"> {`Short 🐻`->React.string} </option>
+            </select>
+            <AmountInput
+              value=form.input.amount
+              optBalance={optDaiBalance}
+              disabled=form.submitting
+              onBlur={_ => form.blurAmount()}
+              onChange={event => form.updateAmount((input, amount) => {
+                  ...input,
+                  amount: amount,
+                }, (event->ReactEvent.Form.target)["value"])}
+              placeholder={"Mint"}
+              onMaxClick={_ =>
+                form.updateAmount(
+                  (input, amount) => {
+                    ...input,
+                    amount: amount,
+                  },
+                  switch optDaiBalance {
+                  | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
+                  | _ => "0"
+                  },
                 )}
             />
-            <label htmlFor="stake-checkbox" className="text-xs">
-              {`Stake ${form.input.isLong ? "long" : "short"} tokens`->React.string}
-            </label>
+            {switch (form.amountResult, optAdditionalErrorMessage) {
+            | (Some(Error(message)), _)
+            | (_, Some(message)) =>
+              <div className="text-red-500 text-xs"> {message->React.string} </div>
+            | (Some(Ok(_)), None) => React.null
+            | (None, None) => React.null
+            }}
+            <div className="flex justify-between items-center">
+              <div className="flex items-center">
+                <input
+                  id="stake-checkbox"
+                  type_="checkbox"
+                  className="mr-2"
+                  checked={form.input.isStaking}
+                  disabled={form.submitting}
+                  onBlur={_ => form.blurIsStaking()}
+                  onChange={event =>
+                    form.updateIsStaking(
+                      (input, value) => {...input, isStaking: value},
+                      (event->ReactEvent.Form.target)["checked"],
+                    )}
+                />
+                <label htmlFor="stake-checkbox" className="text-xs">
+                  {`Stake ${form.input.isLong ? "long" : "short"} tokens`->React.string}
+                </label>
+              </div>
+              <p className="text-xxs hover:text-gray-500">
+                <a href="https://docs.float.capital/docs/stake">
+                  {"Learn more about staking"->React.string}
+                </a>
+              </p>
+            </div>
           </div>
-          <p className="text-xxs hover:text-gray-500">
-            <a href="https://docs.float.capital/docs/stake">
-              {"Learn more about staking"->React.string}
-            </a>
-          </p>
+          {switch (txStateApprove, txState) {
+          | (ContractActions.SignedAndSubmitted(_), _)
+          | (ContractActions.Created, _)
+          | (_, ContractActions.SignedAndSubmitted(_))
+          | (_, ContractActions.Created) =>
+            <Loader.Overlay />
+          | _ => React.null
+          }}
         </div>
         {switch (txStateApprove, txState) {
         | (ContractActions.Created, _) => <>
