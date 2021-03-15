@@ -162,12 +162,21 @@ let make = (
     }
   }
 
+  let resetFormButton = () =>
+    <Button
+      onClick={_ => {
+        form.reset()
+        setTxStateApprove(_ => ContractActions.UnInitialised)
+        setTxState(_ => ContractActions.UnInitialised)
+      }}>
+      {"Reset & Mint Again"}
+    </Button>
+
   // Execute the call after approval has completed
   React.useEffect1(() => {
     switch txStateApprove {
-    | Complete(_) =>
-      contractActionToCallAfterApproval()
-      setTxStateApprove(_ => ContractActions.UnInitialised)
+    | Complete(_) => contractActionToCallAfterApproval()
+    // setTxStateApprove(_ => ContractActions.UnInitialised)
     | _ => ()
     }
     None
@@ -286,17 +295,19 @@ let make = (
           </>
         | (ContractActions.Declined(message), _) => <>
             <h1>
-              {"The transaction was declined by your wallet, you need to accept the transaction to proceed."->React.string}
+              {`❌ The transaction was declined by your wallet, you need to accept the transaction to proceed.`->React.string}
             </h1>
             <p> {("Failure reason: " ++ message)->React.string} </p>
+            {resetFormButton()}
           </>
         | (ContractActions.Failed, _) => <>
-            <h1> {"The transaction failed."->React.string} </h1>
+            <h1> {`❌ The transaction failed.`->React.string} </h1>
             <p>
               <a target="_" href=Config.discordInviteLink>
                 {"This shouldn't happen, please let us help you on discord."->React.string}
               </a>
             </p>
+            {resetFormButton()}
           </>
         | (_, ContractActions.Created) => <>
             <h1>
@@ -317,6 +328,7 @@ let make = (
                 {`Processing minting ${tokenToMint} with your ${Config.paymentTokenName}`->React.string}
               </a>
             </h1>
+            {resetFormButton()}
           </>
         | (_, ContractActions.SignedAndSubmitted(txHash)) => <>
             <h1>
@@ -324,6 +336,7 @@ let make = (
                 {`Processing minting ${tokenToMint} with your ${Config.paymentTokenName}`->React.string}
               </a>
             </h1>
+            {resetFormButton()}
           </>
         | (_, ContractActions.Complete({transactionHash})) => <>
             <h1>
@@ -331,21 +344,23 @@ let make = (
                 {`✅ Transaction Complete`->React.string}
               </a>
             </h1>
-            <h1 />
+            {resetFormButton()}
           </>
         | (_, ContractActions.Declined(message)) => <>
             <h1>
-              {"The transaction was declined by your wallet, you need to accept the transaction to proceed."->React.string}
+              {`❌ The transaction was declined by your wallet, you need to accept the transaction to proceed.`->React.string}
             </h1>
             <p> {("Failure reason: " ++ message)->React.string} </p>
+            {resetFormButton()}
           </>
         | (_, ContractActions.Failed) => <>
-            <h1> {"The transaction failed."->React.string} </h1>
+            <h1> {`❌ The transaction failed.`->React.string} </h1>
             <p>
               <a target="_" href=Config.discordInviteLink>
                 {"This shouldn't happen, please let us help you on discord."->React.string}
               </a>
             </p>
+            {resetFormButton()}
           </>
         | _ => <Button onClick={_ => ()} variant="large"> {_buttonText} </Button>
         }}

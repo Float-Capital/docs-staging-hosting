@@ -789,12 +789,23 @@ function MintForm$1(Props) {
     ];
   }
   var optAdditionalErrorMessage = match$5[0];
+  var resetFormButton = function (param) {
+    return React.createElement(Button.make, {
+                onClick: (function (param) {
+                    Curry._1(form.reset, undefined);
+                    Curry._1(setTxStateApprove, (function (param) {
+                            return /* UnInitialised */0;
+                          }));
+                    return Curry._1(setTxState, (function (param) {
+                                  return /* UnInitialised */0;
+                                }));
+                  }),
+                children: "Reset & Mint Again"
+              });
+  };
   React.useEffect((function () {
           if (typeof txStateApprove !== "number" && txStateApprove.TAG === /* Complete */2) {
             Curry._1(contractActionToCallAfterApproval, undefined);
-            Curry._1(setTxStateApprove, (function (param) {
-                    return /* UnInitialised */0;
-                  }));
           }
           
         }), [txStateApprove]);
@@ -866,10 +877,10 @@ function MintForm$1(Props) {
           tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Please Approve that Float can use your " + Config.paymentTokenName));
           break;
       case /* Failed */2 :
-          tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, React.createElement("a", {
+          tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "❌ The transaction failed."), React.createElement("p", undefined, React.createElement("a", {
                         href: Config.discordInviteLink,
                         target: "_"
-                      }, "This shouldn't happen, please let us help you on discord.")));
+                      }, "This shouldn't happen, please let us help you on discord.")), resetFormButton(undefined));
           break;
       
     }
@@ -882,7 +893,7 @@ function MintForm$1(Props) {
                   }, "Processing Approval "));
           break;
       case /* Declined */1 :
-          tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, you need to accept the transaction to proceed."), React.createElement("p", undefined, "Failure reason: " + txStateApprove._0));
+          tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "❌ The transaction was declined by your wallet, you need to accept the transaction to proceed."), React.createElement("p", undefined, "Failure reason: " + txStateApprove._0), resetFormButton(undefined));
           break;
       case /* Complete */2 :
           var transactionHash = txStateApprove._0.transactionHash;
@@ -903,7 +914,7 @@ function MintForm$1(Props) {
                         }, "✅ Approval Complete")), React.createElement("h1", undefined, React.createElement("a", {
                           href: Config.defaultBlockExplorer + "tx/" + txState._0,
                           target: "_"
-                        }, "Processing minting " + tokenToMint + " with your " + Config.paymentTokenName)));
+                        }, "Processing minting " + tokenToMint + " with your " + Config.paymentTokenName)), resetFormButton(undefined));
           } else {
             exit$4 = 1;
           }
@@ -933,10 +944,10 @@ function MintForm$1(Props) {
             tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Sign the transaction to mint " + tokenToMint + " with your " + Config.paymentTokenName));
             break;
         case /* Failed */2 :
-            tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, React.createElement("a", {
+            tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "❌ The transaction failed."), React.createElement("p", undefined, React.createElement("a", {
                           href: Config.discordInviteLink,
                           target: "_"
-                        }, "This shouldn't happen, please let us help you on discord.")));
+                        }, "This shouldn't happen, please let us help you on discord.")), resetFormButton(undefined));
             break;
         
       }
@@ -946,16 +957,16 @@ function MintForm$1(Props) {
             tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, React.createElement("a", {
                           href: Config.defaultBlockExplorer + "tx/" + txState._0,
                           target: "_"
-                        }, "Processing minting " + tokenToMint + " with your " + Config.paymentTokenName)));
+                        }, "Processing minting " + tokenToMint + " with your " + Config.paymentTokenName)), resetFormButton(undefined));
             break;
         case /* Declined */1 :
-            tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, you need to accept the transaction to proceed."), React.createElement("p", undefined, "Failure reason: " + txState._0));
+            tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "❌ The transaction was declined by your wallet, you need to accept the transaction to proceed."), React.createElement("p", undefined, "Failure reason: " + txState._0), resetFormButton(undefined));
             break;
         case /* Complete */2 :
             tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, React.createElement("a", {
                           href: Config.defaultBlockExplorer + "tx/" + txState._0.transactionHash,
                           target: "_"
-                        }, "✅ Transaction Complete")), React.createElement("h1", undefined));
+                        }, "✅ Transaction Complete")), resetFormButton(undefined));
             break;
         
       }

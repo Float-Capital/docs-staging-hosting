@@ -1,7 +1,7 @@
 module Overlay = {
   @react.component
   let make = () =>
-    <div className="absolute top-0 left-0 w-full h-full flex justify-center">
+    <div className="absolute top-0 left-0 w-full h-full flex justify-center align-center">
       <img src="/img/loading.gif" className="object-contain" />
     </div>
 }
