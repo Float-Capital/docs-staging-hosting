@@ -169,6 +169,11 @@ body {
   color: #fff;
   background-color: #0d4184;
 }
+.float-button:disabled:active {
+  transform: translate(-2px, -2px);
+  color: #0d4184;
+  background-color: rgb(209, 213, 219);
+}
 
 .float-button::-moz-focus-inner {
   border: 0;

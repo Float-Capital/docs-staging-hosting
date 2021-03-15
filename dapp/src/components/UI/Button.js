@@ -3,6 +3,7 @@
 import * as React from "react";
 
 function Button(Props) {
+  var onClick = Props.onClick;
   var children = Props.children;
   var variantOpt = Props.variant;
   var disabledOpt = Props.disabled;
@@ -30,10 +31,7 @@ function Button(Props) {
                         disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-300" : ""
                       ),
                       disabled: disabled,
-                      onClick: (function (param) {
-                          console.log("WAS CLICKED");
-                          
-                        })
+                      onClick: onClick
                     }, children)));
 }
 

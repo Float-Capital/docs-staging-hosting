@@ -19,7 +19,7 @@ let make = (~onClick, ~children: string, ~variant="small", ~disabled=false) => {
         className={`${buttonClass}${disabled
             ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-300"
             : ""}`}
-        onClick={_ => Js.log("WAS CLICKED")}>
+        onClick>
         {children->React.string}
       </button>
     </div>
