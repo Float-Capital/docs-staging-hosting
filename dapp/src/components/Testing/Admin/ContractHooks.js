@@ -11,26 +11,6 @@ import * as RootProvider from "../../../libraries/RootProvider.js";
 import * as ContractActions from "../../../ethereum/ContractActions.js";
 import * as StateChangeMonitor from "../../../libraries/StateChangeMonitor.js";
 
-function useDaiBalance(param) {
-  var optChainId = RootProvider.useChainId(undefined);
-  var optUserId = RootProvider.useCurrentUser(undefined);
-  var optProviderOrSigner = ContractActions.useProviderOrSigner(undefined);
-  var fetchBalanceFunction = function (param, chainId, userId) {
-    var providerOrSigner = Belt_Option.getExn(optProviderOrSigner);
-    return Contracts.Erc20.make(Config.daiContractAddress(String(chainId)), providerOrSigner).balanceOf(userId);
-  };
-  return Swr((function (param) {
-                if (optChainId !== undefined && optProviderOrSigner !== undefined && optUserId !== undefined) {
-                  return [
-                          "chainBalance",
-                          optChainId,
-                          Caml_option.valFromOption(optUserId)
-                        ];
-                }
-                
-              }), fetchBalanceFunction, undefined);
-}
-
 function useErc20Balance(erc20Address) {
   var optChainId = RootProvider.useChainId(undefined);
   var optUserId = RootProvider.useCurrentUser(undefined);
@@ -84,13 +64,15 @@ function useSwrAutoUpdate(useHook) {
   return result;
 }
 
-function useDaiBalanceRefresh(param) {
+function useErc20BalanceRefresh(erc20Address) {
   return useSwrAutoUpdate(function (param) {
-              return useDaiBalance(undefined);
+              return useErc20Balance(erc20Address);
             });
 }
 
-function useErc20BalanceRefresh(erc20Address) {
+function useDaiBalanceRefresh(param) {
+  var chainId = Belt_Option.getWithDefault(RootProvider.useChainId(undefined), Config.defaultNetworkId);
+  var erc20Address = Config.daiContractAddress(String(chainId));
   return useSwrAutoUpdate(function (param) {
               return useErc20Balance(erc20Address);
             });
@@ -103,12 +85,11 @@ function useERC20ApprovedRefresh(erc20Address, spender) {
 }
 
 export {
-  useDaiBalance ,
   useErc20Balance ,
   useERC20Approved ,
   useSwrAutoUpdate ,
-  useDaiBalanceRefresh ,
   useErc20BalanceRefresh ,
+  useDaiBalanceRefresh ,
   useERC20ApprovedRefresh ,
   
 }
