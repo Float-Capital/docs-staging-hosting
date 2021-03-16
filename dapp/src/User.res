@@ -1,6 +1,52 @@
 open UserUI
 open DataHooks
 
+module UsersBalances = {
+  @react.component
+  let make = (~userId) => {
+    /*
+    TODO:
+    * Use the nicer way to get token prices: https://github.com/avolabs-io/longshort/issues/228
+    * calculate the correct estimated value
+    * get the total value of the users tokens
+ */
+    let usersTokensQuery = DataHooks.useUsersBalances(~userId)
+
+    <UserColumnCard>
+      <UserColumnHeader>
+        {`Synthetic Assets`->React.string} <img className="inline h-5 ml-2" src="/img/coin.png" />
+      </UserColumnHeader>
+      {switch usersTokensQuery {
+      | Loading => <div className="m-auto"> <MiniLoader /> </div>
+      | GraphError(string) => string->React.string
+      | Response({totalBalance, balances}) => <>
+          <UserColumnTextCenter>
+            <UserColumnText
+              head=`💰 Synth value` body={`$${totalBalance->FormatMoney.formatEther}`}
+            />
+          </UserColumnTextCenter>
+          <br />
+          {balances
+          ->Array.map(({name, isLong, tokenBalance, tokensValue}) =>
+            <UserMarketBox
+              name
+              isLong
+              tokens={FormatMoney.formatEther(tokenBalance)}
+              value={FormatMoney.formatEther(tokensValue)}>
+              <UserMarketStakeOrRedeem />
+            </UserMarketBox>
+          )
+          ->React.array}
+        </>
+      }}
+      <br />
+      <UserColumnTextCenter>
+        <span className="text-sm"> {`💸 Why not mint some more? 💸`->React.string} </span>
+      </UserColumnTextCenter>
+    </UserColumnCard>
+  }
+}
+
 module User = {
   @ocaml.doc(`Represents all the data required to render the user page.`)
   type userData = {
@@ -12,7 +58,7 @@ module User = {
     <UserContainer> {`Error: ${msg}`->React.string} </UserContainer>
   }
 
-  let onQuerySuccess = (data: userData) => {
+  let onQuerySuccess = ({stakes, user}: userData) => {
     <UserContainer>
       <UserBanner />
       <UserColumnContainer>
@@ -29,25 +75,7 @@ module User = {
           </UserColumnCard>
         </UserColumn>
         <UserColumn>
-          <UserColumnCard>
-            <UserColumnHeader>
-              {`Synthetic Assets`->React.string}
-              <img className="inline h-5 ml-2" src="/img/coin.png" />
-            </UserColumnHeader>
-            <UserColumnTextCenter>
-              <UserColumnText head=`💰 Synth value` body=`$9,123` />
-            </UserColumnTextCenter>
-            <br />
-            <UserMarketBox name=`FTSE 100` isLong={true} tokens=`23.81` value=`450`>
-              <UserMarketStakeOrRedeem />
-            </UserMarketBox>
-            <br />
-            <UserColumnTextCenter>
-              <span className="text-sm"> {`💸 Why not mint some more? 💸`->React.string} </span>
-            </UserColumnTextCenter>
-          </UserColumnCard>
-          <br />
-          <UserStakesCard stakes={data.stakes} />
+          <UsersBalances userId=user /> <br /> <UserStakesCard stakes={stakes} />
         </UserColumn>
         <UserColumn>
           <UserColumnCard>

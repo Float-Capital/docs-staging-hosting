@@ -168,10 +168,96 @@ function useStakesForUser(userId) {
   }
 }
 
+function useUsersBalances(userId) {
+  var usersTokensQuery = Curry.app(Queries.UsersBalances.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: userId
+        }
+      ]);
+  var match = usersTokensQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.user;
+    if (match$1 === undefined) {
+      return {
+              TAG: 1,
+              _0: {
+                totalBalance: CONSTANTS.zeroBN,
+                balances: []
+              },
+              [Symbol.for("name")]: "Response"
+            };
+    }
+    var tokenBalances = match$1.tokenBalances;
+    if (tokenBalances === undefined) {
+      return {
+              TAG: 1,
+              _0: {
+                totalBalance: CONSTANTS.zeroBN,
+                balances: []
+              },
+              [Symbol.for("name")]: "Response"
+            };
+    }
+    var result = Belt_Array.reduce(tokenBalances, {
+          totalBalance: CONSTANTS.zeroBN,
+          balances: []
+        }, (function (param, param$1) {
+            var match = param$1.syntheticToken;
+            var match$1 = match.syntheticMarket;
+            var match$2 = match$1.latestSystemState;
+            var tokenBalance = param$1.tokenBalance;
+            var isLong = match.tokenType === "Long";
+            var newToken_name = match$1.name;
+            var newToken_tokensValue = (
+                  isLong ? match$2.longTokenPrice : match$2.shortTokenPrice
+                ).mul(tokenBalance).div(CONSTANTS.tenToThe18);
+            var newToken = {
+              name: newToken_name,
+              isLong: isLong,
+              tokenBalance: tokenBalance,
+              tokensValue: newToken_tokensValue
+            };
+            return {
+                    totalBalance: param.totalBalance.add(newToken_tokensValue),
+                    balances: Belt_Array.concat(param.balances, [newToken])
+                  };
+          }));
+    return {
+            TAG: 1,
+            _0: result,
+            [Symbol.for("name")]: "Response"
+          };
+  }
+  var match$2 = usersTokensQuery.error;
+  if (match$2 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
 export {
   useGetStakes ,
   useFloatDetailsForUser ,
   useStakesForUser ,
+  useUsersBalances ,
   
 }
 /* Misc Not a pure module */

@@ -46,11 +46,25 @@ fragment SyntheticMarketInfo on SyntheticMarket {
     shortTokenPrice
   }
 }
+fragment SyntheticMarketPrice on SyntheticMarket {
+  id
+  name
+  symbol
+  latestSystemState {
+    id
+    longTokenPrice
+    shortTokenPrice
+  }
+}
 fragment UserTokenBalance on UserSyntheticTokenBalance {
   id
   tokenBalance
   syntheticToken {
     id
+    tokenType
+    syntheticMarket {
+      ...SyntheticMarketPrice
+    }
   }
 }
 `)
