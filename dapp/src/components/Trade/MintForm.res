@@ -113,7 +113,6 @@ module SubmitButtonAndTxTracker = {
             {`Processing minting ${tokenToMint} with your ${Config.paymentTokenName}`->React.string}
           </a>
         </h1>
-        {resetFormButton()}
       </>
     | (_, ContractActions.SignedAndSubmitted(txHash)) => <>
         <h1>
@@ -121,7 +120,6 @@ module SubmitButtonAndTxTracker = {
             {`Processing minting ${tokenToMint} with your ${Config.paymentTokenName}`->React.string}
           </a>
         </h1>
-        {resetFormButton()}
       </>
     | (_, ContractActions.Complete({transactionHash})) => <>
         <h1>
@@ -163,40 +161,16 @@ module MintFormInput = {
     ~valueAmountInput="",
     ~optDaiBalance=None,
     ~onBlurAmount=_ => (),
-    /* {_ => form.blurAmount()} */
     ~onChangeAmountInput=_ => (),
-    /* {event =>
-              form.updateIsLong(
-                (input, isLong) => {...input, isLong: isLong},
-                (event->ReactEvent.Form.target)["value"] == "long",
-              )} */
     ~onMaxClick=_ => (),
-    /* {_ =>
-              form.updateAmount(
-                (input, amount) => {
-                  ...input,
-                  amount: amount,
-                },
-                switch optDaiBalance {
-                | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
-                | _ => "0"
-                },
-              )} */
     ~optErrorMessage=None,
     ~isStaking=true,
     ~disabled=false,
     ~onBlurIsStaking=_ => (),
-    /* {_ => form.blurIsStaking()} */
     ~onChangeIsStaking=_ => (),
-    /* {event =>
-                  form.updateIsStaking(
-                    (input, value) => {...input, isStaking: value},
-                    (event->ReactEvent.Form.target)["checked"],
-                  )}*/
-    // ~buttonText,
     ~txStateApprove=ContractActions.UnInitialised,
     ~txStateMint=ContractActions.UnInitialised,
-    ~submitButton=React.null,
+    ~submitButton=<Button variant="large"> "Login & Mint" </Button>,
   ) => {
     let formInput =
       <>
@@ -400,6 +374,8 @@ module MintFormSignedIn = {
     }, [txStateApprove])
 
     <MintFormInput
+      txStateApprove
+      txStateMint=txState
       onSubmit={form.submit}
       market
       onChangeSide={event =>
@@ -408,7 +384,7 @@ module MintFormSignedIn = {
           (event->ReactEvent.Form.target)["value"] == "long",
         )}
       isLong={form.input.isLong}
-      onBlurSide={_ => form.blurAmount()}
+      onBlurSide={_ => form.blurIsStaking()}
       valueAmountInput=form.input.amount
       optDaiBalance
       onBlurAmount={_ => form.blurAmount()}
@@ -448,10 +424,14 @@ let make = (
   ~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets,
   ~initialIsLong,
 ) => {
-  // ~signer,
+  let router = Next.Router.useRouter()
+
   let optSigner = ContractActions.useSigner()
   switch optSigner {
   | Some(signer) => <MintFormSignedIn signer market initialIsLong />
-  | None => <MintFormInput market isLong=initialIsLong />
+  | None =>
+    <div onClick={_ => router->Next.Router.push(`/login?nextPath=${router.asPath}`)}>
+      <MintFormInput market isLong=initialIsLong />
+    </div>
   }
 }

@@ -14,6 +14,7 @@ import * as Formality from "re-formality/src/Formality.js";
 import * as AmountInput from "../UI/AmountInput.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as Router from "next/router";
 import * as ContractHooks from "../Testing/Admin/ContractHooks.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
@@ -675,7 +676,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                               }, "✅ Approval Complete")), React.createElement("h1", undefined, React.createElement("a", {
                                 href: Config.defaultBlockExplorer + "tx/" + txStateMint._0,
                                 target: "_"
-                              }, "Processing minting " + tokenToMint + " with your " + Config.paymentTokenName)), Curry._1(resetFormButton, undefined));
+                              }, "Processing minting " + tokenToMint + " with your " + Config.paymentTokenName)));
           }
           if (exit === 2) {
             return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, React.createElement("a", {
@@ -713,7 +714,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
           return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, React.createElement("a", {
                               href: Config.defaultBlockExplorer + "tx/" + txStateMint._0,
                               target: "_"
-                            }, "Processing minting " + tokenToMint + " with your " + Config.paymentTokenName)), Curry._1(resetFormButton, undefined));
+                            }, "Processing minting " + tokenToMint + " with your " + Config.paymentTokenName)));
       case /* Declined */1 :
           return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "❌ The transaction was declined by your wallet, you need to accept the transaction to proceed."), React.createElement("p", undefined, "Failure reason: " + txStateMint._0), Curry._1(resetFormButton, undefined));
       case /* Complete */2 :
@@ -780,7 +781,10 @@ function MintForm$MintFormInput(Props) {
       });
   var txStateApprove = txStateApproveOpt !== undefined ? txStateApproveOpt : /* UnInitialised */0;
   var txStateMint = txStateMintOpt !== undefined ? txStateMintOpt : /* UnInitialised */0;
-  var submitButton = submitButtonOpt !== undefined ? Caml_option.valFromOption(submitButtonOpt) : null;
+  var submitButton = submitButtonOpt !== undefined ? Caml_option.valFromOption(submitButtonOpt) : React.createElement(Button.make, {
+          children: "Login & Mint",
+          variant: "large"
+        });
   var formInput = React.createElement(React.Fragment, undefined, React.createElement("div", {
             className: "flex justify-between mb-2"
           }, React.createElement("h2", undefined, market.name + " (" + market.symbol + ")")), React.createElement("select", {
@@ -879,6 +883,7 @@ function MintForm$MintFormSignedIn(Props) {
   var signer = Props.signer;
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
+  var txState = match[1];
   var contractExecutionHandler = match[0];
   var match$1 = ContractActions.useContractFunction(signer);
   var setTxStateApprove = match$1[2];
@@ -1028,7 +1033,7 @@ function MintForm$MintFormSignedIn(Props) {
                 }),
               isLong: form.input.isLong,
               onBlurSide: (function (param) {
-                  return Curry._1(form.blurAmount, undefined);
+                  return Curry._1(form.blurIsStaking, undefined);
                 }),
               valueAmountInput: form.input.amount,
               optDaiBalance: optDaiBalance,
@@ -1068,9 +1073,11 @@ function MintForm$MintFormSignedIn(Props) {
                                       };
                               }), $$event.target.checked);
                 }),
+              txStateApprove: txStateApprove,
+              txStateMint: txState,
               submitButton: React.createElement(MintForm$SubmitButtonAndTxTracker, {
                     txStateApprove: txStateApprove,
-                    txStateMint: match[1],
+                    txStateMint: txState,
                     resetFormButton: resetFormButton,
                     tokenToMint: tokenToMint,
                     buttonText: match$5[1],
@@ -1086,6 +1093,7 @@ var MintFormSignedIn = {
 function MintForm$1(Props) {
   var market = Props.market;
   var initialIsLong = Props.initialIsLong;
+  var router = Router.useRouter();
   var optSigner = ContractActions.useSigner(undefined);
   if (optSigner !== undefined) {
     return React.createElement(MintForm$MintFormSignedIn, {
@@ -1094,10 +1102,15 @@ function MintForm$1(Props) {
                 signer: optSigner
               });
   } else {
-    return React.createElement(MintForm$MintFormInput, {
-                market: market,
-                isLong: initialIsLong
-              });
+    return React.createElement("div", {
+                onClick: (function (param) {
+                    router.push("/login?nextPath=" + router.asPath);
+                    
+                  })
+              }, React.createElement(MintForm$MintFormInput, {
+                    market: market,
+                    isLong: initialIsLong
+                  }));
   }
 }
 

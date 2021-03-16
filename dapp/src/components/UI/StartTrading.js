@@ -2,10 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import * as RootProvider from "../../libraries/RootProvider.js";
 
 function StartTrading(Props) {
-  RootProvider.useCurrentUser(undefined);
   return React.createElement("div", {
               className: "floating w-full"
             }, React.createElement(Link, {
