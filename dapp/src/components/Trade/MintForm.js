@@ -6,6 +6,7 @@ import * as React from "react";
 import * as Button from "../UI/Button.js";
 import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
+import * as Loader from "../UI/Loader.js";
 import * as Ethers$1 from "ethers";
 import * as ViewBox from "../UI/ViewBox.js";
 import * as Contracts from "../../ethereum/Contracts.js";
@@ -626,7 +627,6 @@ function isGreaterThanBalance(amount, balance) {
   return amount.gt(balance);
 }
 
-<<<<<<< HEAD
 function MintForm$SubmitButtonAndTxTracker(Props) {
   var txStateApprove = Props.txStateApprove;
   var txStateMint = Props.txStateMint;
@@ -730,8 +730,6 @@ var SubmitButtonAndTxTracker = {
   make: MintForm$SubmitButtonAndTxTracker
 };
 
-function MintForm$1(Props) {
-=======
 function MintForm$MintFormInput(Props) {
   var onSubmitOpt = Props.onSubmit;
   var market = Props.market;
@@ -740,15 +738,17 @@ function MintForm$MintFormInput(Props) {
   var onBlurSideOpt = Props.onBlurSide;
   var valueAmountInputOpt = Props.valueAmountInput;
   var optDaiBalanceOpt = Props.optDaiBalance;
-  var onBlurAmountInputOpt = Props.onBlurAmountInput;
+  var onBlurAmountOpt = Props.onBlurAmount;
   var onChangeAmountInputOpt = Props.onChangeAmountInput;
   var onMaxClickOpt = Props.onMaxClick;
   var optErrorMessageOpt = Props.optErrorMessage;
   var isStakingOpt = Props.isStaking;
-  var disabled = Props.disabled;
+  var disabledOpt = Props.disabled;
   var onBlurIsStakingOpt = Props.onBlurIsStaking;
-  var onChangeIsStaking = Props.onChangeIsStaking;
-  var buttonText = Props.buttonText;
+  var onChangeIsStakingOpt = Props.onChangeIsStaking;
+  var txStateApproveOpt = Props.txStateApprove;
+  var txStateMintOpt = Props.txStateMint;
+  var submitButtonOpt = Props.submitButton;
   var onSubmit = onSubmitOpt !== undefined ? onSubmitOpt : (function (param) {
         
       });
@@ -760,7 +760,7 @@ function MintForm$MintFormInput(Props) {
       });
   var valueAmountInput = valueAmountInputOpt !== undefined ? valueAmountInputOpt : "";
   var optDaiBalance = optDaiBalanceOpt !== undefined ? Caml_option.valFromOption(optDaiBalanceOpt) : undefined;
-  var onBlurAmountInput = onBlurAmountInputOpt !== undefined ? onBlurAmountInputOpt : (function (param) {
+  var onBlurAmount = onBlurAmountOpt !== undefined ? onBlurAmountOpt : (function (param) {
         
       });
   var onChangeAmountInput = onChangeAmountInputOpt !== undefined ? onChangeAmountInputOpt : (function (param) {
@@ -771,66 +771,102 @@ function MintForm$MintFormInput(Props) {
       });
   var optErrorMessage = optErrorMessageOpt !== undefined ? Caml_option.valFromOption(optErrorMessageOpt) : undefined;
   var isStaking = isStakingOpt !== undefined ? isStakingOpt : true;
+  var disabled = disabledOpt !== undefined ? disabledOpt : false;
   var onBlurIsStaking = onBlurIsStakingOpt !== undefined ? onBlurIsStakingOpt : (function (param) {
         
       });
-  return React.createElement(ViewBox.make, {
-              children: React.createElement(Form.make, {
-                    className: "this-is-required",
-                    onSubmit: onSubmit,
-                    children: null
-                  }, React.createElement("div", {
-                        className: "flex justify-between mb-2"
-                      }, React.createElement("h2", undefined, market.name + " (" + market.symbol + ")")), React.createElement("select", {
-                        className: "trade-select",
-                        disabled: disabled,
-                        name: "longshort",
-                        value: isLong ? "long" : "short",
-                        onBlur: onBlurSide,
-                        onChange: onChangeSide
-                      }, React.createElement("option", {
-                            value: "long"
-                          }, "Long 🐮"), React.createElement("option", {
-                            value: "short"
-                          }, "Short 🐻")), React.createElement(AmountInput.make, {
-                        placeholder: "Mint",
-                        value: valueAmountInput,
-                        optBalance: optDaiBalance,
-                        disabled: disabled,
-                        onBlur: onBlurAmountInput,
-                        onChange: onChangeAmountInput,
-                        onMaxClick: onMaxClick
-                      }), optErrorMessage !== undefined ? React.createElement("div", {
-                          className: "text-red-500 text-xs"
-                        }, optErrorMessage) : null, React.createElement("div", {
-                        className: "flex justify-between items-center"
+  var onChangeIsStaking = onChangeIsStakingOpt !== undefined ? onChangeIsStakingOpt : (function (param) {
+        
+      });
+  var txStateApprove = txStateApproveOpt !== undefined ? txStateApproveOpt : /* UnInitialised */0;
+  var txStateMint = txStateMintOpt !== undefined ? txStateMintOpt : /* UnInitialised */0;
+  var submitButton = submitButtonOpt !== undefined ? Caml_option.valFromOption(submitButtonOpt) : null;
+  var formInput = React.createElement(React.Fragment, undefined, React.createElement("div", {
+            className: "flex justify-between mb-2"
+          }, React.createElement("h2", undefined, market.name + " (" + market.symbol + ")")), React.createElement("select", {
+            className: "trade-select",
+            disabled: disabled,
+            name: "longshort",
+            value: isLong ? "long" : "short",
+            onBlur: onBlurSide,
+            onChange: onChangeSide
+          }, React.createElement("option", {
+                value: "long"
+              }, "Long 🐮"), React.createElement("option", {
+                value: "short"
+              }, "Short 🐻")), React.createElement(AmountInput.make, {
+            placeholder: "Mint",
+            value: valueAmountInput,
+            optBalance: optDaiBalance,
+            disabled: disabled,
+            onBlur: onBlurAmount,
+            onChange: onChangeAmountInput,
+            onMaxClick: onMaxClick
+          }), optErrorMessage !== undefined ? React.createElement("div", {
+              className: "text-red-500 text-xs"
+            }, optErrorMessage) : null, React.createElement("div", {
+            className: "flex justify-between items-center"
+          }, React.createElement("div", {
+                className: "flex items-center"
+              }, React.createElement("input", {
+                    className: "mr-2",
+                    id: "stake-checkbox",
+                    checked: isStaking,
+                    disabled: disabled,
+                    type: "checkbox",
+                    onBlur: onBlurIsStaking,
+                    onChange: onChangeIsStaking
+                  }), React.createElement("label", {
+                    className: "text-xs",
+                    htmlFor: "stake-checkbox"
+                  }, "Stake " + (
+                    isLong ? "long" : "short"
+                  ) + " tokens")), React.createElement("p", {
+                className: "text-xxs hover:text-gray-500"
+              }, React.createElement("a", {
+                    href: "https://docs.float.capital/docs/stake"
+                  }, "Learn more about staking"))));
+  var tmp;
+  var exit = 0;
+  var exit$1 = 0;
+  if (typeof txStateApprove === "number") {
+    if (txStateApprove === /* Created */1) {
+      exit = 1;
+    } else {
+      exit$1 = 2;
+    }
+  } else if (txStateApprove.TAG === /* SignedAndSubmitted */0) {
+    exit = 1;
+  } else {
+    exit$1 = 2;
+  }
+  if (exit$1 === 2) {
+    if (typeof txStateMint === "number") {
+      if (txStateMint === /* Created */1) {
+        exit = 1;
+      } else {
+        tmp = null;
+      }
+    } else if (txStateMint.TAG === /* SignedAndSubmitted */0) {
+      exit = 1;
+    } else {
+      tmp = null;
+    }
+  }
+  if (exit === 1) {
+    tmp = React.createElement(Loader.Overlay.make, {});
+  }
+  return React.createElement("div", {
+              className: "screen-centered-container"
+            }, React.createElement(ViewBox.make, {
+                  children: React.createElement(Form.make, {
+                        className: "",
+                        onSubmit: onSubmit,
+                        children: null
                       }, React.createElement("div", {
-                            className: "flex items-center"
-                          }, React.createElement("input", {
-                                className: "mr-2",
-                                id: "stake-checkbox",
-                                checked: isStaking,
-                                disabled: disabled,
-                                type: "checkbox",
-                                onBlur: onBlurIsStaking,
-                                onChange: onChangeIsStaking
-                              }), React.createElement("label", {
-                                className: "text-xs",
-                                htmlFor: "stake-checkbox"
-                              }, "Stake " + (
-                                isLong ? "long" : "short"
-                              ) + " tokens")), React.createElement("p", {
-                            className: "text-xxs hover:text-gray-500"
-                          }, React.createElement("a", {
-                                href: "https://docs.float.capital/docs/stake"
-                              }, "Learn more about staking"))), React.createElement(Button.make, {
-                        onClick: (function (param) {
-                            
-                          }),
-                        children: buttonText,
-                        variant: "large"
-                      }))
-            });
+                            className: "relative"
+                          }, formInput, tmp), submitButton)
+                }));
 }
 
 var MintFormInput = {
@@ -838,11 +874,11 @@ var MintFormInput = {
 };
 
 function MintForm$MintFormSignedIn(Props) {
->>>>>>> 4b6a062... WIP login wall
   var market = Props.market;
   var initialIsLong = Props.initialIsLong;
   var signer = Props.signer;
   var match = ContractActions.useContractFunction(signer);
+  var setTxState = match[2];
   var contractExecutionHandler = match[0];
   var match$1 = ContractActions.useContractFunction(signer);
   var setTxStateApprove = match$1[2];
@@ -860,11 +896,6 @@ function MintForm$MintFormSignedIn(Props) {
   var match$3 = useBalanceAndApproved(daiAddressThatIsTemporarilyHardCoded, longShortContractAddress);
   var optDaiAmountApproved = match$3[1];
   var optDaiBalance = match$3[0];
-<<<<<<< HEAD
-=======
-  ContractHooks.useErc20BalanceRefresh(market.syntheticShort.tokenAddress);
-  ContractHooks.useErc20BalanceRefresh(market.syntheticLong.tokenAddress);
->>>>>>> 4b6a062... WIP login wall
   var form = useForm({
         amount: "",
         isLong: initialIsLong,
@@ -930,24 +961,31 @@ function MintForm$MintFormSignedIn(Props) {
         }));
   var match$4 = form.amountResult;
   var formAmount = match$4 !== undefined && match$4.TAG === /* Ok */0 ? Caml_option.some(match$4._0) : undefined;
-<<<<<<< HEAD
+  var resetFormButton = function (param) {
+    return React.createElement(Button.make, {
+                onClick: (function (param) {
+                    Curry._1(form.reset, undefined);
+                    Curry._1(setTxStateApprove, (function (param) {
+                            return /* UnInitialised */0;
+                          }));
+                    return Curry._1(setTxState, (function (param) {
+                                  return /* UnInitialised */0;
+                                }));
+                  }),
+                children: "Reset & Mint Again"
+              });
+  };
   var tokenToMint = form.input.isLong ? "long " + market.name : "short " + market.name;
-=======
->>>>>>> 4b6a062... WIP login wall
   var stakingText = form.input.isStaking ? "Mint & Stake" : "Mint";
   var approveConnector = form.input.isStaking ? "," : " &";
   var isLong = form.input.isLong;
   var position = isLong ? "long" : "short";
-<<<<<<< HEAD
   var match$5;
-=======
->>>>>>> 4b6a062... WIP login wall
   var exit = 0;
   if (formAmount !== undefined && optDaiBalance !== undefined && optDaiAmountApproved !== undefined) {
     var amount = Caml_option.valFromOption(formAmount);
     var needsToApprove = amount.gt(Caml_option.valFromOption(optDaiAmountApproved));
     var greaterThanBalance = amount.gt(Caml_option.valFromOption(optDaiBalance));
-<<<<<<< HEAD
     match$5 = greaterThanBalance ? [
         "Amount is greater than your balance",
         "Insufficient balance",
@@ -967,207 +1005,77 @@ function MintForm$MintFormSignedIn(Props) {
       true
     ];
   }
-  var optAdditionalErrorMessage = match$5[0];
-=======
-    if (greaterThanBalance) {
-      "Amount is greater than your balance";
-      "Insufficient balance";
-      true;
-    } else {
-      if (needsToApprove) {
-        "Approve" + approveConnector + " " + stakingText + " " + position + " position";
-      } else {
-        stakingText + " " + position + " position";
-      }
-      false;
-    }
-  } else {
-    exit = 1;
-  }
-  exit === 1;
->>>>>>> 4b6a062... WIP login wall
   React.useEffect((function () {
           if (typeof txStateApprove !== "number" && txStateApprove.TAG === /* Complete */2) {
             Curry._1(contractActionToCallAfterApproval, undefined);
+            Curry._1(setTxStateApprove, (function (param) {
+                    return /* UnInitialised */0;
+                  }));
           }
           
         }), [txStateApprove]);
-<<<<<<< HEAD
-  var resetFormButton = function (param) {
-    return React.createElement(Button.make, {
-                onClick: (function (param) {
-                    Curry._1(form.reset, undefined);
-                    Curry._1(setTxStateApprove, (function (param) {
-                            return /* UnInitialised */0;
-                          }));
-                    return Curry._1(setTxState, (function (param) {
-                                  return /* UnInitialised */0;
-                                }));
-                  }),
-                children: "Reset & Mint Again"
-              });
-  };
-  var match$6 = form.amountResult;
-  var tmp;
-  var exit$1 = 0;
-  var message;
-  if (match$6 !== undefined) {
-    if (match$6.TAG === /* Ok */0) {
-      if (optAdditionalErrorMessage !== undefined) {
-        message = optAdditionalErrorMessage;
-        exit$1 = 1;
-      } else {
-        tmp = null;
-      }
-    } else {
-      message = match$6._0;
-      exit$1 = 1;
-    }
-  } else if (optAdditionalErrorMessage !== undefined) {
-    message = optAdditionalErrorMessage;
-    exit$1 = 1;
-  } else {
-    tmp = null;
-  }
-  if (exit$1 === 1) {
-    tmp = React.createElement("div", {
-          className: "text-red-500 text-xs"
-        }, message);
-  }
-  var formInput = React.createElement(React.Fragment, undefined, React.createElement("div", {
-            className: "flex justify-between mb-2"
-          }, React.createElement("h2", undefined, market.name + " (" + market.symbol + ")")), React.createElement("select", {
-            className: "trade-select",
-            disabled: form.submitting,
-            name: "longshort",
-            value: form.input.isLong ? "long" : "short",
-            onBlur: (function (param) {
-                return Curry._1(form.blurAmount, undefined);
-              }),
-            onChange: (function ($$event) {
-                return Curry._2(form.updateIsLong, (function (input, isLong) {
-                              return {
-                                      amount: input.amount,
-                                      isLong: isLong,
-                                      isStaking: input.isStaking
-                                    };
-                            }), $$event.target.value === "long");
-              })
-          }, React.createElement("option", {
-                value: "long"
-              }, "Long 🐮"), React.createElement("option", {
-                value: "short"
-              }, "Short 🐻")), React.createElement(AmountInput.make, {
-            placeholder: "Mint",
-            value: form.input.amount,
-            optBalance: optDaiBalance,
-            disabled: form.submitting,
-            onBlur: (function (param) {
-                return Curry._1(form.blurAmount, undefined);
-              }),
-            onChange: (function ($$event) {
-                return Curry._2(form.updateAmount, (function (input, amount) {
-                              return {
-                                      amount: amount,
-                                      isLong: input.isLong,
-                                      isStaking: input.isStaking
-                                    };
-                            }), $$event.target.value);
-              }),
-            onMaxClick: (function (param) {
-                return Curry._2(form.updateAmount, (function (input, amount) {
-                              return {
-                                      amount: amount,
-                                      isLong: input.isLong,
-                                      isStaking: input.isStaking
-                                    };
-                            }), optDaiBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optDaiBalance)) : "0");
-              })
-          }), tmp, React.createElement("div", {
-            className: "flex justify-between items-center"
-          }, React.createElement("div", {
-                className: "flex items-center"
-              }, React.createElement("input", {
-                    className: "mr-2",
-                    id: "stake-checkbox",
-                    checked: form.input.isStaking,
-                    disabled: form.submitting,
-                    type: "checkbox",
-                    onBlur: (function (param) {
-                        return Curry._1(form.blurIsStaking, undefined);
-                      }),
-                    onChange: (function ($$event) {
-                        return Curry._2(form.updateIsStaking, (function (input, value) {
-                                      return {
-                                              amount: input.amount,
-                                              isLong: input.isLong,
-                                              isStaking: value
-                                            };
-                                    }), $$event.target.checked);
-                      })
-                  }), React.createElement("label", {
-                    className: "text-xs",
-                    htmlFor: "stake-checkbox"
-                  }, "Stake " + (
-                    form.input.isLong ? "long" : "short"
-                  ) + " tokens")), React.createElement("p", {
-                className: "text-xxs hover:text-gray-500"
-              }, React.createElement("a", {
-                    href: "https://docs.float.capital/docs/stake"
-                  }, "Learn more about staking"))));
-  var tmp$1;
-  var exit$2 = 0;
-  var exit$3 = 0;
-  if (typeof txStateApprove === "number") {
-    if (txStateApprove === /* Created */1) {
-      exit$2 = 1;
-    } else {
-      exit$3 = 2;
-    }
-  } else if (txStateApprove.TAG === /* SignedAndSubmitted */0) {
-    exit$2 = 1;
-  } else {
-    exit$3 = 2;
-  }
-  if (exit$3 === 2) {
-    if (typeof txState === "number") {
-      if (txState === /* Created */1) {
-        exit$2 = 1;
-      } else {
-        tmp$1 = null;
-      }
-    } else if (txState.TAG === /* SignedAndSubmitted */0) {
-      exit$2 = 1;
-    } else {
-      tmp$1 = null;
-    }
-  }
-  if (exit$2 === 1) {
-    tmp$1 = React.createElement(Loader.Overlay.make, {});
-  }
-  return React.createElement("div", {
-              className: "screen-centered-container"
-            }, React.createElement(ViewBox.make, {
-                  children: React.createElement(Form.make, {
-                        className: "",
-                        onSubmit: (function (param) {
-                            return Curry._1(form.submit, undefined);
-                          }),
-                        children: null
-                      }, React.createElement("div", {
-                            className: "relative"
-                          }, formInput, tmp$1), React.createElement(MintForm$SubmitButtonAndTxTracker, {
-                            txStateApprove: txStateApprove,
-                            txStateMint: txState,
-                            resetFormButton: resetFormButton,
-                            tokenToMint: tokenToMint,
-                            buttonText: match$5[1],
-                            buttonDisabled: match$5[2]
-                          }))
-                }));
-=======
-  return React.createElement("div", {
-              className: "screen-centered-container"
+  return React.createElement(MintForm$MintFormInput, {
+              onSubmit: form.submit,
+              market: market,
+              onChangeSide: (function ($$event) {
+                  return Curry._2(form.updateIsLong, (function (input, isLong) {
+                                return {
+                                        amount: input.amount,
+                                        isLong: isLong,
+                                        isStaking: input.isStaking
+                                      };
+                              }), $$event.target.value === "long");
+                }),
+              isLong: form.input.isLong,
+              onBlurSide: (function (param) {
+                  return Curry._1(form.blurAmount, undefined);
+                }),
+              valueAmountInput: form.input.amount,
+              optDaiBalance: optDaiBalance,
+              onBlurAmount: (function (param) {
+                  return Curry._1(form.blurAmount, undefined);
+                }),
+              onChangeAmountInput: (function ($$event) {
+                  return Curry._2(form.updateAmount, (function (input, amount) {
+                                return {
+                                        amount: amount,
+                                        isLong: input.isLong,
+                                        isStaking: input.isStaking
+                                      };
+                              }), $$event.target.value);
+                }),
+              onMaxClick: (function (param) {
+                  return Curry._2(form.updateAmount, (function (input, amount) {
+                                return {
+                                        amount: amount,
+                                        isLong: input.isLong,
+                                        isStaking: input.isStaking
+                                      };
+                              }), optDaiBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optDaiBalance)) : "0");
+                }),
+              optErrorMessage: match$5[0],
+              isStaking: form.input.isStaking,
+              disabled: form.submitting,
+              onBlurIsStaking: (function (param) {
+                  return Curry._1(form.blurIsStaking, undefined);
+                }),
+              onChangeIsStaking: (function ($$event) {
+                  return Curry._2(form.updateIsStaking, (function (input, value) {
+                                return {
+                                        amount: input.amount,
+                                        isLong: input.isLong,
+                                        isStaking: value
+                                      };
+                              }), $$event.target.checked);
+                }),
+              submitButton: React.createElement(MintForm$SubmitButtonAndTxTracker, {
+                    txStateApprove: txStateApprove,
+                    txStateMint: match[1],
+                    resetFormButton: resetFormButton,
+                    tokenToMint: tokenToMint,
+                    buttonText: match$5[1],
+                    buttonDisabled: match$5[2]
+                  })
             });
 }
 
@@ -1176,10 +1084,21 @@ var MintFormSignedIn = {
 };
 
 function MintForm$1(Props) {
-  return React.createElement("div", {
-              className: "screen-centered-container"
-            });
->>>>>>> 4b6a062... WIP login wall
+  var market = Props.market;
+  var initialIsLong = Props.initialIsLong;
+  var optSigner = ContractActions.useSigner(undefined);
+  if (optSigner !== undefined) {
+    return React.createElement(MintForm$MintFormSignedIn, {
+                market: market,
+                initialIsLong: initialIsLong,
+                signer: optSigner
+              });
+  } else {
+    return React.createElement(MintForm$MintFormInput, {
+                market: market,
+                isLong: initialIsLong
+              });
+  }
 }
 
 var initialInput = {
@@ -1196,12 +1115,9 @@ export {
   useBalanceAndApproved ,
   isGreaterThanApproval ,
   isGreaterThanBalance ,
-<<<<<<< HEAD
   SubmitButtonAndTxTracker ,
-=======
   MintFormInput ,
   MintFormSignedIn ,
->>>>>>> 4b6a062... WIP login wall
   make ,
   
 }

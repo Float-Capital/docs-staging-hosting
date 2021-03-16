@@ -5,11 +5,11 @@ import Link from "next/link";
 import * as RootProvider from "../../libraries/RootProvider.js";
 
 function StartTrading(Props) {
-  var optCurrentUser = RootProvider.useCurrentUser(undefined);
+  RootProvider.useCurrentUser(undefined);
   return React.createElement("div", {
               className: "floating w-full"
             }, React.createElement(Link, {
-                  href: optCurrentUser !== undefined ? "/markets" : "/login?nextPath=/markets",
+                  href: "/markets",
                   children: React.createElement("span", {
                         className: "cursor-pointer hover:opacity-70 w-full flex justify-center"
                       }, React.createElement("img", {
