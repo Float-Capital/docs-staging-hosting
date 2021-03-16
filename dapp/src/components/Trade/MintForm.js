@@ -8,15 +8,12 @@ import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Loader from "../UI/Loader.js";
 import * as Ethers$1 from "ethers";
-import * as Globals from "../../libraries/Globals.js";
-import * as Queries from "../../data/Queries.js";
 import * as ViewBox from "../UI/ViewBox.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as AmountInput from "../UI/AmountInput.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
-import * as RootProvider from "../../libraries/RootProvider.js";
 import * as ContractHooks from "../Testing/Admin/ContractHooks.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
@@ -33,7 +30,7 @@ var validators_isLong = {
 };
 
 var validators_amount = {
-  strategy: /* OnFirstBlur */0,
+  strategy: /* OnFirstSuccessOrFirstBlur */3,
   validate: (function (param) {
       var amount = param.amount;
       var amountRegex = /^[+]?\d+(\.\d+)?$/;
@@ -630,11 +627,113 @@ function isGreaterThanBalance(amount, balance) {
   return amount.gt(balance);
 }
 
+function MintForm$SubmitButtonAndTxTracker(Props) {
+  var txStateApprove = Props.txStateApprove;
+  var txStateMint = Props.txStateMint;
+  var resetFormButton = Props.resetFormButton;
+  var tokenToMint = Props.tokenToMint;
+  var buttonText = Props.buttonText;
+  var buttonDisabled = Props.buttonDisabled;
+  if (typeof txStateApprove === "number") {
+    switch (txStateApprove) {
+      case /* UnInitialised */0 :
+          break;
+      case /* Created */1 :
+          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Please Approve that Float can use your " + Config.paymentTokenName));
+      case /* Failed */2 :
+          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "❌ The transaction failed."), React.createElement("p", undefined, React.createElement("a", {
+                              href: Config.discordInviteLink,
+                              target: "_"
+                            }, "This shouldn't happen, please let us help you on discord.")), Curry._1(resetFormButton, undefined));
+      
+    }
+  } else {
+    switch (txStateApprove.TAG | 0) {
+      case /* SignedAndSubmitted */0 :
+          return React.createElement("h1", undefined, React.createElement("a", {
+                          href: Config.defaultBlockExplorer + "tx/" + txStateApprove._0,
+                          target: "_"
+                        }, "Processing Approval "));
+      case /* Declined */1 :
+          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "❌ The transaction was declined by your wallet, you need to accept the transaction to proceed."), React.createElement("p", undefined, "Failure reason: " + txStateApprove._0), Curry._1(resetFormButton, undefined));
+      case /* Complete */2 :
+          var transactionHash = txStateApprove._0.transactionHash;
+          var exit = 0;
+          if (typeof txStateMint === "number") {
+            switch (txStateMint) {
+              case /* UnInitialised */0 :
+              case /* Created */1 :
+                  exit = 2;
+                  break;
+              default:
+                
+            }
+          } else if (txStateMint.TAG === /* SignedAndSubmitted */0) {
+            return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, React.createElement("a", {
+                                href: Config.defaultBlockExplorer + "tx/" + transactionHash,
+                                target: "_"
+                              }, "✅ Approval Complete")), React.createElement("h1", undefined, React.createElement("a", {
+                                href: Config.defaultBlockExplorer + "tx/" + txStateMint._0,
+                                target: "_"
+                              }, "Processing minting " + tokenToMint + " with your " + Config.paymentTokenName)), Curry._1(resetFormButton, undefined));
+          }
+          if (exit === 2) {
+            return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, React.createElement("a", {
+                                href: Config.defaultBlockExplorer + "tx/" + transactionHash,
+                                target: "_"
+                              }, "✅ Approval Complete")), React.createElement("h1", undefined, "Sign the next transaction to mint your"));
+          }
+          break;
+      
+    }
+  }
+  if (typeof txStateMint === "number") {
+    switch (txStateMint) {
+      case /* UnInitialised */0 :
+          return React.createElement(Button.make, {
+                      onClick: (function (param) {
+                          
+                        }),
+                      children: buttonText,
+                      variant: "large",
+                      disabled: buttonDisabled
+                    });
+      case /* Created */1 :
+          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Sign the transaction to mint " + tokenToMint + " with your " + Config.paymentTokenName));
+      case /* Failed */2 :
+          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "❌ The transaction failed."), React.createElement("p", undefined, React.createElement("a", {
+                              href: Config.discordInviteLink,
+                              target: "_"
+                            }, "This shouldn't happen, please let us help you on discord.")), Curry._1(resetFormButton, undefined));
+      
+    }
+  } else {
+    switch (txStateMint.TAG | 0) {
+      case /* SignedAndSubmitted */0 :
+          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, React.createElement("a", {
+                              href: Config.defaultBlockExplorer + "tx/" + txStateMint._0,
+                              target: "_"
+                            }, "Processing minting " + tokenToMint + " with your " + Config.paymentTokenName)), Curry._1(resetFormButton, undefined));
+      case /* Declined */1 :
+          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "❌ The transaction was declined by your wallet, you need to accept the transaction to proceed."), React.createElement("p", undefined, "Failure reason: " + txStateMint._0), Curry._1(resetFormButton, undefined));
+      case /* Complete */2 :
+          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, React.createElement("a", {
+                              href: Config.defaultBlockExplorer + "tx/" + txStateMint._0.transactionHash,
+                              target: "_"
+                            }, "✅ Transaction Complete")), Curry._1(resetFormButton, undefined));
+      
+    }
+  }
+}
+
+var SubmitButtonAndTxTracker = {
+  make: MintForm$SubmitButtonAndTxTracker
+};
+
 function MintForm$1(Props) {
   var market = Props.market;
   var initialIsLong = Props.initialIsLong;
   var signer = ContractActions.useSignerExn(undefined);
-  var user = RootProvider.useCurrentUserExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var txState = match[1];
@@ -655,44 +754,6 @@ function MintForm$1(Props) {
   var match$3 = useBalanceAndApproved(daiAddressThatIsTemporarilyHardCoded, longShortContractAddress);
   var optDaiAmountApproved = match$3[1];
   var optDaiBalance = match$3[0];
-  var longBalanceQuery = Curry.app(Queries.UsersBalance.use, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        {
-          userId: Globals.ethAdrToLowerStr(user),
-          tokenAdr: Globals.ethAdrToLowerStr(market.syntheticLong.tokenAddress)
-        }
-      ]);
-  var shortBalanceQuery = Curry.app(Queries.UsersBalance.use, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        {
-          userId: Globals.ethAdrToLowerStr(user),
-          tokenAdr: Globals.ethAdrToLowerStr(market.syntheticShort.tokenAddress)
-        }
-      ]);
   var form = useForm({
         amount: "",
         isLong: initialIsLong,
@@ -758,6 +819,7 @@ function MintForm$1(Props) {
         }));
   var match$4 = form.amountResult;
   var formAmount = match$4 !== undefined && match$4.TAG === /* Ok */0 ? Caml_option.some(match$4._0) : undefined;
+  var tokenToMint = form.input.isLong ? "long " + market.name : "short " + market.name;
   var stakingText = form.input.isStaking ? "Mint & Stake" : "Mint";
   var approveConnector = form.input.isStaking ? "," : " &";
   var isLong = form.input.isLong;
@@ -775,7 +837,7 @@ function MintForm$1(Props) {
       ] : [
         undefined,
         needsToApprove ? "Approve" + approveConnector + " " + stakingText + " " + position + " position" : stakingText + " " + position + " position",
-        false
+        !Curry._1(form.valid, undefined)
       ];
   } else {
     exit = 1;
@@ -791,12 +853,23 @@ function MintForm$1(Props) {
   React.useEffect((function () {
           if (typeof txStateApprove !== "number" && txStateApprove.TAG === /* Complete */2) {
             Curry._1(contractActionToCallAfterApproval, undefined);
-            Curry._1(setTxStateApprove, (function (param) {
-                    return /* UnInitialised */0;
-                  }));
           }
           
         }), [txStateApprove]);
+  var resetFormButton = function (param) {
+    return React.createElement(Button.make, {
+                onClick: (function (param) {
+                    Curry._1(form.reset, undefined);
+                    Curry._1(setTxStateApprove, (function (param) {
+                            return /* UnInitialised */0;
+                          }));
+                    return Curry._1(setTxState, (function (param) {
+                                  return /* UnInitialised */0;
+                                }));
+                  }),
+                children: "Reset & Mint Again"
+              });
+  };
   var match$6 = form.amountResult;
   var tmp;
   var exit$1 = 0;
@@ -824,229 +897,137 @@ function MintForm$1(Props) {
           className: "text-red-500 text-xs"
         }, message);
   }
+  var formInput = React.createElement(React.Fragment, undefined, React.createElement("div", {
+            className: "flex justify-between mb-2"
+          }, React.createElement("h2", undefined, market.name + " (" + market.symbol + ")")), React.createElement("select", {
+            className: "trade-select",
+            disabled: form.submitting,
+            name: "longshort",
+            value: form.input.isLong ? "long" : "short",
+            onBlur: (function (param) {
+                return Curry._1(form.blurAmount, undefined);
+              }),
+            onChange: (function ($$event) {
+                return Curry._2(form.updateIsLong, (function (input, isLong) {
+                              return {
+                                      amount: input.amount,
+                                      isLong: isLong,
+                                      isStaking: input.isStaking
+                                    };
+                            }), $$event.target.value === "long");
+              })
+          }, React.createElement("option", {
+                value: "long"
+              }, "Long 🐮"), React.createElement("option", {
+                value: "short"
+              }, "Short 🐻")), React.createElement(AmountInput.make, {
+            placeholder: "Mint",
+            value: form.input.amount,
+            optBalance: optDaiBalance,
+            disabled: form.submitting,
+            onBlur: (function (param) {
+                return Curry._1(form.blurAmount, undefined);
+              }),
+            onChange: (function ($$event) {
+                return Curry._2(form.updateAmount, (function (input, amount) {
+                              return {
+                                      amount: amount,
+                                      isLong: input.isLong,
+                                      isStaking: input.isStaking
+                                    };
+                            }), $$event.target.value);
+              }),
+            onMaxClick: (function (param) {
+                return Curry._2(form.updateAmount, (function (input, amount) {
+                              return {
+                                      amount: amount,
+                                      isLong: input.isLong,
+                                      isStaking: input.isStaking
+                                    };
+                            }), optDaiBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optDaiBalance)) : "0");
+              })
+          }), tmp, React.createElement("div", {
+            className: "flex justify-between items-center"
+          }, React.createElement("div", {
+                className: "flex items-center"
+              }, React.createElement("input", {
+                    className: "mr-2",
+                    id: "stake-checkbox",
+                    checked: form.input.isStaking,
+                    disabled: form.submitting,
+                    type: "checkbox",
+                    onBlur: (function (param) {
+                        return Curry._1(form.blurIsStaking, undefined);
+                      }),
+                    onChange: (function ($$event) {
+                        return Curry._2(form.updateIsStaking, (function (input, value) {
+                                      return {
+                                              amount: input.amount,
+                                              isLong: input.isLong,
+                                              isStaking: value
+                                            };
+                                    }), $$event.target.checked);
+                      })
+                  }), React.createElement("label", {
+                    className: "text-xs",
+                    htmlFor: "stake-checkbox"
+                  }, "Stake " + (
+                    form.input.isLong ? "long" : "short"
+                  ) + " tokens")), React.createElement("p", {
+                className: "text-xxs hover:text-gray-500"
+              }, React.createElement("a", {
+                    href: "https://docs.float.capital/docs/stake"
+                  }, "Learn more about staking"))));
   var tmp$1;
-  if (Config.isDevMode) {
-    var tmp$2;
-    if (typeof txState === "number") {
-      switch (txState) {
-        case /* UnInitialised */0 :
-            tmp$2 = null;
-            break;
-        case /* Created */1 :
-            tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Approval "), React.createElement(Loader.make, {}));
-            break;
-        case /* Failed */2 :
-            tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."));
-            break;
-        
-      }
-    } else {
-      switch (txState.TAG | 0) {
-        case /* SignedAndSubmitted */0 :
-            tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Approval - submitted ", React.createElement(Loader.make, {})), React.createElement(Loader.make, {}));
-            break;
-        case /* Declined */1 :
-            tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0));
-            break;
-        case /* Complete */2 :
-            tmp$2 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Approval Complete, Sign the next transaction "));
-            break;
-        
-      }
-    }
-    var txExplererUrl = RootProvider.useEtherscanUrl(undefined);
-    var resetTxButton = React.createElement("button", {
-          onClick: (function (param) {
-              return Curry._1(setTxState, (function (param) {
-                            return /* UnInitialised */0;
-                          }));
-            })
-        }, ">>Reset tx<<");
-    var tmp$3;
-    if (typeof txState === "number") {
-      switch (txState) {
-        case /* UnInitialised */0 :
-            tmp$3 = null;
-            break;
-        case /* Created */1 :
-            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, "Tx created."), React.createElement("div", undefined, React.createElement(Loader.make, {})));
-            break;
-        case /* Failed */2 :
-            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."), resetTxButton);
-            break;
-        
-      }
-    } else {
-      switch (txState.TAG | 0) {
-        case /* SignedAndSubmitted */0 :
-            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, React.createElement("a", {
-                          href: "https://" + txExplererUrl + "/tx/" + txState._0,
-                          rel: "noopener noreferrer",
-                          target: "_blank"
-                        }, "View the transaction on " + txExplererUrl)), React.createElement(Loader.make, {}));
-            break;
-        case /* Declined */1 :
-            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0), resetTxButton);
-            break;
-        case /* Complete */2 :
-            var txHash = txState._0.transactionHash;
-            tmp$3 = React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Transaction Complete "), React.createElement("p", undefined, React.createElement("a", {
-                          href: "https://" + txExplererUrl + "/tx/" + txHash,
-                          rel: "noopener noreferrer",
-                          target: "_blank"
-                        }, "View the transaction on " + txExplererUrl)), resetTxButton);
-            break;
-        
-      }
-    }
-    var formatOptBalance = function (__x) {
-      return Belt_Option.mapWithDefault(__x, "Loading", Ethers.Utils.formatEther);
-    };
-    var match$7 = longBalanceQuery.data;
-    var tmp$4;
-    var exit$2 = 0;
-    if (match$7 !== undefined) {
-      var match$8 = match$7.user;
-      if (match$8 !== undefined) {
-        var match$9 = match$8.tokenBalances;
-        if (match$9 !== undefined && match$9.length === 1) {
-          var match$10 = match$9[0];
-          tmp$4 = React.createElement("p", undefined, "long - balance: " + Ethers.Utils.formatEther(match$10.tokenBalance));
-        } else {
-          exit$2 = 1;
-        }
-      } else {
-        exit$2 = 1;
-      }
-    } else {
+  var exit$2 = 0;
+  var exit$3 = 0;
+  if (typeof txStateApprove === "number") {
+    if (txStateApprove === /* Created */1) {
       exit$2 = 1;
-    }
-    if (exit$2 === 1) {
-      tmp$4 = React.createElement("p", undefined, "loading LONG balance");
-    }
-    var match$11 = shortBalanceQuery.data;
-    var tmp$5;
-    var exit$3 = 0;
-    if (match$11 !== undefined) {
-      var match$12 = match$11.user;
-      if (match$12 !== undefined) {
-        var match$13 = match$12.tokenBalances;
-        if (match$13 !== undefined && match$13.length === 1) {
-          var match$14 = match$13[0];
-          tmp$5 = React.createElement("p", undefined, "short - balance: " + Ethers.Utils.formatEther(match$14.tokenBalance));
-        } else {
-          exit$3 = 1;
-        }
-      } else {
-        exit$3 = 1;
-      }
     } else {
-      exit$3 = 1;
+      exit$3 = 2;
     }
-    if (exit$3 === 1) {
-      tmp$5 = React.createElement("p", undefined, "loading SHORT balance");
-    }
-    tmp$1 = React.createElement(React.Fragment, undefined, tmp$2, tmp$3, React.createElement("code", undefined, React.createElement("p", undefined, "dev only component to display balances"), React.createElement("p", undefined, "dai - balance: " + formatOptBalance(optDaiBalance) + " - approved: " + formatOptBalance(optDaiAmountApproved)), tmp$4, tmp$5));
+  } else if (txStateApprove.TAG === /* SignedAndSubmitted */0) {
+    exit$2 = 1;
   } else {
-    tmp$1 = null;
+    exit$3 = 2;
+  }
+  if (exit$3 === 2) {
+    if (typeof txState === "number") {
+      if (txState === /* Created */1) {
+        exit$2 = 1;
+      } else {
+        tmp$1 = null;
+      }
+    } else if (txState.TAG === /* SignedAndSubmitted */0) {
+      exit$2 = 1;
+    } else {
+      tmp$1 = null;
+    }
+  }
+  if (exit$2 === 1) {
+    tmp$1 = React.createElement(Loader.Overlay.make, {});
   }
   return React.createElement("div", {
               className: "screen-centered-container"
             }, React.createElement(ViewBox.make, {
                   children: React.createElement(Form.make, {
-                        className: "this-is-required",
+                        className: "",
                         onSubmit: (function (param) {
                             return Curry._1(form.submit, undefined);
                           }),
                         children: null
                       }, React.createElement("div", {
-                            className: "flex justify-between mb-2"
-                          }, React.createElement("h2", undefined, market.name + " (" + market.symbol + ")")), React.createElement("select", {
-                            className: "trade-select",
-                            disabled: form.submitting,
-                            name: "longshort",
-                            value: form.input.isLong ? "long" : "short",
-                            onBlur: (function (param) {
-                                return Curry._1(form.blurAmount, undefined);
-                              }),
-                            onChange: (function ($$event) {
-                                return Curry._2(form.updateIsLong, (function (input, isLong) {
-                                              return {
-                                                      amount: input.amount,
-                                                      isLong: isLong,
-                                                      isStaking: input.isStaking
-                                                    };
-                                            }), $$event.target.value === "long");
-                              })
-                          }, React.createElement("option", {
-                                value: "long"
-                              }, "Long 🐮"), React.createElement("option", {
-                                value: "short"
-                              }, "Short 🐻")), React.createElement(AmountInput.make, {
-                            placeholder: "Mint",
-                            value: form.input.amount,
-                            optBalance: optDaiBalance,
-                            disabled: form.submitting,
-                            onBlur: (function (param) {
-                                return Curry._1(form.blurAmount, undefined);
-                              }),
-                            onChange: (function ($$event) {
-                                return Curry._2(form.updateAmount, (function (input, amount) {
-                                              return {
-                                                      amount: amount,
-                                                      isLong: input.isLong,
-                                                      isStaking: input.isStaking
-                                                    };
-                                            }), $$event.target.value);
-                              }),
-                            onMaxClick: (function (param) {
-                                return Curry._2(form.updateAmount, (function (input, amount) {
-                                              return {
-                                                      amount: amount,
-                                                      isLong: input.isLong,
-                                                      isStaking: input.isStaking
-                                                    };
-                                            }), optDaiBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optDaiBalance)) : "0");
-                              })
-                          }), tmp, React.createElement("div", {
-                            className: "flex justify-between items-center"
-                          }, React.createElement("div", {
-                                className: "flex items-center"
-                              }, React.createElement("input", {
-                                    className: "mr-2",
-                                    id: "stake-checkbox",
-                                    checked: form.input.isStaking,
-                                    disabled: form.submitting,
-                                    type: "checkbox",
-                                    onBlur: (function (param) {
-                                        return Curry._1(form.blurIsStaking, undefined);
-                                      }),
-                                    onChange: (function ($$event) {
-                                        return Curry._2(form.updateIsStaking, (function (input, value) {
-                                                      return {
-                                                              amount: input.amount,
-                                                              isLong: input.isLong,
-                                                              isStaking: value
-                                                            };
-                                                    }), $$event.target.checked);
-                                      })
-                                  }), React.createElement("label", {
-                                    className: "text-xs",
-                                    htmlFor: "stake-checkbox"
-                                  }, "Stake " + (
-                                    form.input.isLong ? "long" : "short"
-                                  ) + " tokens")), React.createElement("p", {
-                                className: "text-xxs hover:text-gray-500"
-                              }, React.createElement("a", {
-                                    href: "https://docs.float.capital/docs/stake"
-                                  }, "Learn more about staking"))), React.createElement(Button.make, {
-                            onClick: (function (param) {
-                                
-                              }),
-                            children: match$5[1],
-                            variant: "large"
+                            className: "relative"
+                          }, formInput, tmp$1), React.createElement(MintForm$SubmitButtonAndTxTracker, {
+                            txStateApprove: txStateApprove,
+                            txStateMint: txState,
+                            resetFormButton: resetFormButton,
+                            tokenToMint: tokenToMint,
+                            buttonText: match$5[1],
+                            buttonDisabled: match$5[2]
                           }))
-                }), tmp$1);
+                }));
 }
 
 var initialInput = {
@@ -1063,6 +1044,7 @@ export {
   useBalanceAndApproved ,
   isGreaterThanApproval ,
   isGreaterThanBalance ,
+  SubmitButtonAndTxTracker ,
   make ,
   
 }

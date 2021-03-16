@@ -162,7 +162,6 @@ body {
   outline: none;
   border: 1px solid #0d4184;
   color: #0d4184;
-  background-color: #fff;
 }
 .float-button:active {
   transform: translate(0px, 0px);

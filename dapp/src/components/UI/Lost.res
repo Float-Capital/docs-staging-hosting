@@ -25,7 +25,7 @@ let make = () => {
           <li>
             <a
               className="text-sm block text-right hover:bg-white"
-              href="https://discord.gg/dqDwgrVYcU"
+              href=Config.discordInviteLink
               target="_blank">
               {"Join our discord"->React.string}
             </a>

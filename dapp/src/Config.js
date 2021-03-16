@@ -76,13 +76,22 @@ var localhostGraphEndpoint = "https://localhost:8000/subgraphs/name/avolabs-io/f
 
 var defaultNetworkId = 97;
 
+var paymentTokenName = "BUSD";
+
+var defaultBlockExplorer = "https://testnet.bscscan.com/";
+
+var discordInviteLink = "https://discord.gg/dqDwgrVYcU";
+
 export {
   isDevMode ,
   longshortContractAbi ,
   binancTestnetGraphEndpoint ,
   localhostGraphEndpoint ,
   defaultNetworkId ,
+  paymentTokenName ,
+  defaultBlockExplorer ,
   getDefaultNetworkId ,
+  discordInviteLink ,
   allContracts ,
   getContractAddressString ,
   longShortContractAddress ,

@@ -1,5 +1,5 @@
 @react.component
-let make = (~onClick, ~children: string, ~variant="small") => {
+let make = (~onClick, ~children: string, ~variant="small", ~disabled=false) => {
   let outerContainerClass = `float-button-outer-container ${variant == "tiny"
       ? "float-button-outer-container-tiny"
       : ""}`
@@ -14,7 +14,14 @@ let make = (~onClick, ~children: string, ~variant="small") => {
 
   <div className={outerContainerClass}>
     <div className={containerClass}>
-      <button className={buttonClass} onClick> {children->React.string} </button>
+      <button
+        disabled={disabled}
+        className={`${buttonClass}${disabled
+            ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-300"
+            : ""}`}
+        onClick={_ => Js.log("WAS CLICKED")}>
+        {children->React.string}
+      </button>
     </div>
   </div>
 }
