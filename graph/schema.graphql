@@ -31,7 +31,7 @@ type Price @entity {
   id: ID! # <marketIndex>-<long/short>-<timestamp>
   price: BigInt!
   timeUpdated: BigInt!
-  # tokenAddress: Bytes! # TODO: think of a good way to include the token address, or a reference to the SyntheticToken possibly
+  token: SyntheticToken!
 }
 
 type LatestPrice @entity {
@@ -48,6 +48,8 @@ type SystemState @entity {
   syntheticPrice: BigInt! # TODO: this should be a reference to another entity that holds the price
   longTokenPrice: LatestPrice!
   shortTokenPrice: LatestPrice!
+  longToken: SyntheticToken!
+  shortToken: SyntheticToken!
   totalLockedLong: BigInt!
   totalLockedShort: BigInt!
   totalValueLocked: BigInt!
@@ -83,6 +85,8 @@ type SyntheticToken @entity {
   totalStaked: BigInt!
   tokenSupply: BigInt!
   floatMintedFromSpecificToken: BigInt!
+  latestPrice: LatestPrice!
+  priceHistory: [Price!]!
 }
 
 type SyntheticMarket @entity {
