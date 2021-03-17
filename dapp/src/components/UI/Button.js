@@ -3,10 +3,13 @@
 import * as React from "react";
 
 function Button(Props) {
-  var onClick = Props.onClick;
+  var onClickOpt = Props.onClick;
   var children = Props.children;
   var variantOpt = Props.variant;
   var disabledOpt = Props.disabled;
+  var onClick = onClickOpt !== undefined ? onClickOpt : (function (param) {
+        
+      });
   var variant = variantOpt !== undefined ? variantOpt : "small";
   var disabled = disabledOpt !== undefined ? disabledOpt : false;
   var outerContainerClass = "float-button-outer-container " + (

@@ -1,5 +1,5 @@
 @react.component
-let make = (~onClick, ~children: string, ~variant="small", ~disabled=false) => {
+let make = (~onClick=_ => (), ~children: string, ~variant="small", ~disabled=false) => {
   let outerContainerClass = `float-button-outer-container ${variant == "tiny"
       ? "float-button-outer-container-tiny"
       : ""}`
