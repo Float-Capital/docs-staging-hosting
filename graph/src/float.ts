@@ -224,8 +224,10 @@ export function handleSyntheticTokenCreated(
   );
 
   longToken.syntheticMarket = syntheticMarket.id;
+  longToken.latestPrice = state.latestTokenPriceLong.id;
   longToken.priceHistory = [state.tokenPriceLong.id];
   shortToken.syntheticMarket = syntheticMarket.id;
+  shortToken.latestPrice = state.latestTokenPriceShort.id;
   shortToken.priceHistory = [state.tokenPriceShort.id];
 
   longToken.save();

@@ -13,12 +13,17 @@ import {
 import { BigInt, Address, Bytes, log, ethereum } from "@graphprotocol/graph-ts";
 import { ZERO, ONE, GLOBAL_STATE_ID, TEN_TO_THE_18 } from "../CONSTANTS";
 
-function createInitialTokenPrice(id: string, tokenId: string): Price {
+function createInitialTokenPrice(
+  id: string,
+  tokenId: string,
+  timestamp: BigInt
+): Price {
   let initialTokenPrice = Price.load("defaultTokenPrice");
   if (initialTokenPrice == null) {
     initialTokenPrice = new Price("defaultTokenPrice");
     initialTokenPrice.price = TEN_TO_THE_18;
     initialTokenPrice.token = tokenId;
+    initialTokenPrice.timeUpdated = timestamp;
   }
 
   return initialTokenPrice as Price;
@@ -28,6 +33,8 @@ class InitialState {
   systemState: SystemState;
   tokenPriceLong: Price;
   tokenPriceShort: Price;
+  latestTokenPriceLong: LatestPrice;
+  latestTokenPriceShort: LatestPrice;
 }
 export function createInitialSystemState(
   marketIndex: BigInt,
@@ -44,11 +51,13 @@ export function createInitialSystemState(
 
   let initialLongTokenPrice = createInitialTokenPrice(
     initialLongPriceId,
-    longTokenId
+    longTokenId,
+    timestamp
   );
   let initialShortTokenPrice = createInitialTokenPrice(
     initialShortPriceId,
-    shortTokenId
+    shortTokenId,
+    timestamp
   );
   let longCurrentTokenPrice = new LatestPrice(
     "latestPrice-" + marketIndexId + "-long"
@@ -58,6 +67,8 @@ export function createInitialSystemState(
   );
   longCurrentTokenPrice.price = initialLongTokenPrice.id;
   shortCurrentTokenPrice.price = initialShortTokenPrice.id;
+  initialLongTokenPrice.save();
+  initialShortTokenPrice.save();
   longCurrentTokenPrice.save();
   shortCurrentTokenPrice.save();
   let latestSystemState = new SystemState(marketIndexId + "-" + systemStateId);
@@ -79,6 +90,8 @@ export function createInitialSystemState(
     systemState: latestSystemState,
     tokenPriceLong: initialLongTokenPrice,
     tokenPriceShort: initialShortTokenPrice,
+    latestTokenPriceLong: longCurrentTokenPrice,
+    latestTokenPriceShort: shortCurrentTokenPrice,
   };
 }
 export function getOrCreateLatestSystemState(
