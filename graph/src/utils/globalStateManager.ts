@@ -4,11 +4,24 @@ import {
   SystemState,
   GlobalState,
   User,
+  Price,
   SyntheticToken,
   UserSyntheticTokenBalance,
+  LatestPrice,
 } from "../../generated/schema";
 import { BigInt, Address, Bytes, log, ethereum } from "@graphprotocol/graph-ts";
-import { ZERO, ONE, GLOBAL_STATE_ID } from "../CONSTANTS";
+import { ZERO, ONE, GLOBAL_STATE_ID, ZERO_ADDRESS_BYTES } from "../CONSTANTS";
+
+export function getOrCreateDefaultTokenPrice(): Price {
+  let initialTokenPrice = Price.load("defaultTokenPrice");
+  if (initialTokenPrice == null) {
+    initialTokenPrice = new Price("defaultTokenPrice");
+    initialTokenPrice.price = ZERO;
+    // initialTokenPrice.tokenAddress = ZERO_ADDRESS_BYTES;
+  }
+
+  return initialTokenPrice as Price;
+}
 
 export function getOrCreateLatestSystemState(
   marketIndex: BigInt,
@@ -19,14 +32,21 @@ export function getOrCreateLatestSystemState(
   let marketIndexId = marketIndex.toString();
   let latestSystemState = SystemState.load(marketIndexId + "-" + systemStateId);
   if (latestSystemState == null) {
+    let initialTokenPrice = getOrCreateDefaultTokenPrice();
+    let longCurrentTokenPrice = new LatestPrice(
+      "latestPrice-" + marketIndexId + "-long"
+    );
+    let shortCrrentTokenPrice = new LatestPrice(
+      "latestPrice-" + marketIndexId + "-short"
+    );
     latestSystemState = new SystemState(marketIndexId + "-" + systemStateId);
     latestSystemState.timestamp = event.block.timestamp;
     latestSystemState.txHash = event.transaction.hash;
     latestSystemState.blockNumber = event.block.number;
     latestSystemState.marketIndex = marketIndex;
     latestSystemState.syntheticPrice = ZERO;
-    latestSystemState.longTokenPrice = ZERO;
-    latestSystemState.shortTokenPrice = ZERO;
+    latestSystemState.longTokenPrice = longCurrentTokenPrice.id;
+    latestSystemState.shortTokenPrice = shortCrrentTokenPrice.id;
     latestSystemState.totalLockedLong = ZERO;
     latestSystemState.totalLockedShort = ZERO;
     latestSystemState.totalValueLocked = ZERO;

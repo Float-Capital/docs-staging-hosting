@@ -30,6 +30,8 @@ import {
   User,
   State,
   Transfer,
+  LatestPrice,
+  Price,
 } from "../generated/schema";
 import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
@@ -459,11 +461,52 @@ export function handleShortRedeem(event: ShortRedeem): void {
   );
 }
 
+function updateLatestTokenPrice(
+  isLong: boolean,
+  marketIndexId: string,
+  newPrice: BigInt,
+  timestamp: BigInt
+): void {
+  let suffixStr = isLong ? "long" : "short";
+  let latestPrice = LatestPrice.load(
+    "latestPrice-" + marketIndexId + "-" + suffixStr
+  );
+
+  if (latestPrice == null) {
+    log.critical(
+      "LATEST PRICE IS UNDEFINED - make sure it is initialised on market creation",
+      []
+    );
+  }
+
+  let prevPrice = Price.load(latestPrice.price);
+
+  if (prevPrice == null) {
+    log.critical(
+      "PRICE IS UNDEFINED - make sure it is initialised on market creation",
+      []
+    );
+  }
+
+  if (prevPrice.price.notEqual(newPrice)) {
+    let newPriceEntity = new Price(
+      marketIndexId + "-" + suffixStr + "-" + timestamp.toString()
+    );
+    newPriceEntity.price = newPrice;
+    newPriceEntity.timeUpdated = newPrice;
+
+    newPriceEntity.save();
+
+    latestPrice.price = newPriceEntity.id;
+    latestPrice.save();
+  }
+}
 export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
   let marketIndex = event.params.marketIndex;
   let marketIndexString = marketIndex.toString();
   let longTokenPrice = event.params.longTokenPrice;
   let shortTokenPrice = event.params.shortTokenPrice;
+  let timestamp = event.block.timestamp;
 
   let contractCallCounter = event.params.contractCallCounter;
 
@@ -474,8 +517,9 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
     contractCallCounter,
     event
   );
-  state.longTokenPrice = longTokenPrice;
-  state.shortTokenPrice = shortTokenPrice;
+
+  updateLatestTokenPrice(true, marketIndexString, longTokenPrice, timestamp);
+  updateLatestTokenPrice(false, marketIndexString, shortTokenPrice, timestamp);
   syntheticMarket.latestSystemState = state.id;
   state.save();
   syntheticMarket.save();
