@@ -216,11 +216,12 @@ function UserUI$UserStakesCard(Props) {
   };
   var stakeBoxes = stakes.map(function (stake, i) {
         var key = "user-stakes-" + String(i);
-        var name = stake.currentStake.syntheticToken.syntheticMarket.symbol;
-        var tokens = FormatMoney.formatEther(undefined, stake.currentStake.syntheticToken.totalStaked);
-        var isLong = stake.currentStake.syntheticToken.tokenType === "Long";
-        var state = stake.currentStake.syntheticToken.syntheticMarket.latestSystemState;
-        var value = stake.currentStake.syntheticToken.totalStaked.mul(isLong ? state.longTokenPrice : state.shortTokenPrice).div(CONSTANTS.tenToThe18);
+        var syntheticToken = stake.currentStake.syntheticToken;
+        var name = syntheticToken.syntheticMarket.symbol;
+        var tokens = FormatMoney.formatEther(undefined, syntheticToken.totalStaked);
+        var isLong = syntheticToken.tokenType === "Long";
+        var price = syntheticToken.latestPrice.price.price;
+        var value = stake.currentStake.syntheticToken.totalStaked.mul(price).div(CONSTANTS.tenToThe18);
         totalValue.contents = totalValue.contents.add(value);
         return React.createElement(UserUI$UserMarketBox, {
                     name: name,

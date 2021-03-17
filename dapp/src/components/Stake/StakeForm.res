@@ -43,7 +43,7 @@ module StakeFormInput = {
     ~onChange=_ => (),
     ~onBlur=_ => (),
     ~onMaxClick=_ => (),
-    ~synthetic: Queries.SyntheticInfo.t,
+    ~synthetic: Queries.SyntheticTokenInfo.t,
   ) =>
     <Form className="" onSubmit>
       <div className="px-8 pt-2">
@@ -69,7 +69,7 @@ module StakeFormInput = {
 
 module ConnectedStakeForm = {
   @react.component
-  let make = (~tokenId, ~signer, ~synthetic: Queries.SyntheticInfo.t) => {
+  let make = (~tokenId, ~signer, ~synthetic: Queries.SyntheticTokenInfo.t) => {
     let (
       contractActionToCallAfterApproval,
       setContractActionToCallAfterApproval,

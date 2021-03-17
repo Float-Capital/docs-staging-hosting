@@ -8,7 +8,13 @@ fragment BasicUserInfo on User {
   numberOfTransactions
   totalGasUsed
 }
-fragment SyntheticInfo on SyntheticToken {
+fragment LatestSynthPrice on LatestPrice {
+  id
+  price {
+    price
+  }
+}
+fragment SyntheticTokenInfo on SyntheticToken {
   id
   totalStaked
   syntheticMarket {
@@ -18,9 +24,10 @@ fragment SyntheticInfo on SyntheticToken {
     latestSystemState {
       totalLockedLong
       totalLockedShort
-      shortTokenPrice
-      longTokenPrice
     }
+  }
+  latestPrice {
+    ...LatestSynthPrice
   }
   tokenType
   tokenAddress
@@ -32,29 +39,28 @@ fragment SyntheticMarketInfo on SyntheticMarket {
   timestampCreated
   oracleAddress
   syntheticLong {
-    ...SyntheticInfo
+    ...SyntheticTokenInfo
   }
   syntheticShort {
-    ...SyntheticInfo
+    ...SyntheticTokenInfo
   }
   latestSystemState {
     timestamp
     totalLockedLong
     totalLockedShort
     totalValueLocked
-    longTokenPrice
-    shortTokenPrice
+    longTokenPrice {
+      ...LatestSynthPrice
+    }
+    shortTokenPrice {
+      ...LatestSynthPrice
+    }
   }
 }
 fragment SyntheticMarketPrice on SyntheticMarket {
   id
   name
   symbol
-  latestSystemState {
-    id
-    longTokenPrice
-    shortTokenPrice
-  }
 }
 fragment UserTokenBalance on UserSyntheticTokenBalance {
   id
@@ -64,6 +70,9 @@ fragment UserTokenBalance on UserSyntheticTokenBalance {
     tokenType
     syntheticMarket {
       ...SyntheticMarketPrice
+    }
+    latestPrice {
+      ...LatestSynthPrice
     }
   }
 }
@@ -120,8 +129,12 @@ module LatestSystemState = %graphql(`
     txHash 
     blockNumber
     syntheticPrice
-    longTokenPrice
-    shortTokenPrice
+    longTokenPrice {
+      ...LatestSynthPrice
+    }
+    shortTokenPrice {
+      ...LatestSynthPrice
+    }
     totalValueLocked
     setBy
   }
@@ -160,8 +173,12 @@ module MarketDetails = %graphql(`
       totalLockedLong
       totalLockedShort
       totalValueLocked
-      longTokenPrice
-      shortTokenPrice
+      longTokenPrice  {
+        ...LatestSynthPrice
+      }
+      shortTokenPrice {
+        ...LatestSynthPrice
+      }
     }
   }
 }
@@ -179,7 +196,7 @@ module StakingDetails = %graphql(`
 module SyntheticTokens = %graphql(`
 {
   syntheticTokens {
-    ...SyntheticInfo
+    ...SyntheticTokenInfo
   }
 }
 `)
@@ -187,7 +204,7 @@ module SyntheticTokens = %graphql(`
 module SyntheticToken = %graphql(`
 query ($tokenId: String!){
   syntheticToken(id: $tokenId){
-    ...SyntheticInfo
+    ...SyntheticTokenInfo
   }
 }
 `)
@@ -202,7 +219,7 @@ query ($userId: String!){
       blockNumber
       creationTxHash  @ppxCustom(module: "Bytes")
       syntheticToken {
-        ...SyntheticInfo
+        ...SyntheticTokenInfo
       }
       amount
       withdrawn
