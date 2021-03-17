@@ -81,6 +81,7 @@ type SyntheticToken @entity {
   id: ID! # token address
   tokenAddress: Bytes!
   syntheticMarket: SyntheticMarket!
+  latestStakerState: State!
   tokenType: TokenType!
   totalStaked: BigInt!
   tokenSupply: BigInt!

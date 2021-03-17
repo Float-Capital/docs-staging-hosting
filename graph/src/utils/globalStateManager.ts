@@ -5,6 +5,7 @@ import {
   GlobalState,
   User,
   Price,
+  State,
   SyntheticToken,
   UserSyntheticTokenBalance,
   LatestPrice,
@@ -137,6 +138,28 @@ export function getOrCreateLatestSystemState(
   return latestSystemState as SystemState;
 }
 
+export function getOrCreateStakerState(
+  tokenAddress: string,
+  stateIndex: BigInt,
+  event: ethereum.Event
+): State {
+  let stateId = tokenAddress + "-" + stateIndex.toString();
+  let state = State.load(stateId);
+  if (state == null) {
+    state = new State(stateId);
+    state.blockNumber = event.block.number;
+    state.creationTxHash = event.transaction.hash;
+    state.stateIndex = ZERO;
+    state.syntheticToken = tokenAddress;
+    state.timestamp = event.block.timestamp;
+    state.accumulativeFloatPerToken = ZERO;
+    state.floatRatePerTokenOverInterval = ZERO;
+    state.timeSinceLastUpdate = ZERO;
+  }
+
+  return state as State;
+}
+
 export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
   let user = User.load(address.toHex());
   if (user == null) {
@@ -199,6 +222,7 @@ export function createSyntheticToken(tokenAddress: Bytes): SyntheticToken {
     syntheticToken.floatMintedFromSpecificToken = ZERO;
     syntheticToken.priceHistory = [];
   }
+
   return syntheticToken as SyntheticToken;
 }
 
@@ -208,6 +232,7 @@ export function createSyntheticTokenLong(tokenAddress: Bytes): SyntheticToken {
 
   return syntheticToken as SyntheticToken;
 }
+
 export function createSyntheticTokenShort(tokenAddress: Bytes): SyntheticToken {
   let syntheticToken = createSyntheticToken(tokenAddress);
   syntheticToken.tokenType = "Short";
