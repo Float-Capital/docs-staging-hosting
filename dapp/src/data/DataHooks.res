@@ -78,18 +78,6 @@ let useTotalClaimableFloatForUser = (~userId, ~synthTokens) => {
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
   }
-  //let initialState = Response((CONSTANTS.zeroBN, CONSTANTS.zeroBN))
-  //      switch floatDetailsQuery {
-  //      | {
-  //          data: Some({
-  //            states: [{accumulativeFloatPerToken, floatRatePerTokenOverInterval}],
-  //            currentStakes: [
-  //              {
-  //                lastMintState: {accumulativeFloatPerToken: lastAccumulativeFloatPerToken, timestamp},
-  //                currentStake: {amount},
-  //              },
-  //            ],
-  //})
 }
 
 @ocaml.doc(`Returns a live estimate of how much float the user is owed for the given synthetic token stake.`)
