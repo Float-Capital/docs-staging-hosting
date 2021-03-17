@@ -5,7 +5,55 @@ import * as Loader from "./components/UI/Loader.js";
 import * as UserUI from "./components/UI/UserUI.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
 import * as DataHooks from "./data/DataHooks.js";
+import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as MiniLoader from "./components/UI/MiniLoader.js";
+import * as FormatMoney from "./components/UI/FormatMoney.js";
 import * as Router from "next/router";
+
+function User$UsersBalances(Props) {
+  var userId = Props.userId;
+  var usersTokensQuery = DataHooks.useUsersBalances(userId);
+  var tmp;
+  if (typeof usersTokensQuery === "number") {
+    tmp = React.createElement("div", {
+          className: "m-auto"
+        }, React.createElement(MiniLoader.make, {}));
+  } else if (usersTokensQuery.TAG === /* GraphError */0) {
+    tmp = usersTokensQuery._0;
+  } else {
+    var match = usersTokensQuery._0;
+    tmp = React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnTextCenter.make, {
+              children: React.createElement(UserUI.UserColumnText.make, {
+                    head: "💰 Synth value",
+                    body: "$" + FormatMoney.formatEther(undefined, match.totalBalance)
+                  })
+            }), React.createElement("br", undefined), Belt_Array.map(match.balances, (function (param) {
+                return React.createElement(UserUI.UserMarketBox.make, {
+                            name: param.name,
+                            isLong: param.isLong,
+                            tokens: FormatMoney.formatEther(undefined, param.tokenBalance),
+                            value: FormatMoney.formatEther(undefined, param.tokensValue),
+                            children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {})
+                          });
+              })));
+  }
+  return React.createElement(UserUI.UserColumnCard.make, {
+              children: null
+            }, React.createElement(UserUI.UserColumnHeader.make, {
+                  children: null
+                }, "Synthetic Assets", React.createElement("img", {
+                      className: "inline h-5 ml-2",
+                      src: "/img/coin.png"
+                    })), tmp, React.createElement("br", undefined), React.createElement(UserUI.UserColumnTextCenter.make, {
+                  children: React.createElement("span", {
+                        className: "text-sm"
+                      }, "💸 Why not mint some more? 💸")
+                }));
+}
+
+var UsersBalances = {
+  make: User$UsersBalances
+};
 
 function onQueryError(msg) {
   return React.createElement(UserUI.UserContainer.make, {
@@ -13,7 +61,7 @@ function onQueryError(msg) {
             });
 }
 
-function onQuerySuccess(data) {
+function onQuerySuccess(param) {
   return React.createElement(UserUI.UserContainer.make, {
               children: null
             }, React.createElement(UserUI.UserBanner.make, {}), React.createElement(UserUI.UserColumnContainer.make, {
@@ -45,30 +93,10 @@ function onQuerySuccess(data) {
                                   })))
                     }), React.createElement(UserUI.UserColumn.make, {
                       children: null
-                    }, React.createElement(UserUI.UserColumnCard.make, {
-                          children: null
-                        }, React.createElement(UserUI.UserColumnHeader.make, {
-                              children: null
-                            }, "Synthetic Assets", React.createElement("img", {
-                                  className: "inline h-5 ml-2",
-                                  src: "/img/coin.png"
-                                })), React.createElement(UserUI.UserColumnTextCenter.make, {
-                              children: React.createElement(UserUI.UserColumnText.make, {
-                                    head: "💰 Synth value",
-                                    body: "$9,123"
-                                  })
-                            }), React.createElement("br", undefined), React.createElement(UserUI.UserMarketBox.make, {
-                              name: "FTSE 100",
-                              isLong: true,
-                              tokens: "23.81",
-                              value: "450",
-                              children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {})
-                            }), React.createElement("br", undefined), React.createElement(UserUI.UserColumnTextCenter.make, {
-                              children: React.createElement("span", {
-                                    className: "text-sm"
-                                  }, "💸 Why not mint some more? 💸")
-                            })), React.createElement("br", undefined), React.createElement(UserUI.UserStakesCard.make, {
-                          stakes: data.stakes
+                    }, React.createElement(User$UsersBalances, {
+                          userId: param.user
+                        }), React.createElement("br", undefined), React.createElement(UserUI.UserStakesCard.make, {
+                          stakes: param.stakes
                         })), React.createElement(UserUI.UserColumn.make, {
                       children: React.createElement(UserUI.UserColumnCard.make, {
                             children: null
@@ -110,6 +138,7 @@ function $$default(param) {
 }
 
 export {
+  UsersBalances ,
   User ,
   $$default ,
   $$default as default,

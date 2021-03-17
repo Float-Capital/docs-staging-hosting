@@ -85,3 +85,52 @@ let useStakesForUser = (~userId) => {
   | _ => Loading
   }
 }
+
+type userSynthBalance = {
+  name: string,
+  isLong: bool,
+  tokenBalance: Ethers.BigNumber.t,
+  tokensValue: Ethers.BigNumber.t,
+}
+type usersBalanceSummary = {
+  totalBalance: Ethers.BigNumber.t,
+  balances: array<userSynthBalance>,
+}
+@ocaml.doc(`Returns a sumary of the users float tokens`)
+let useUsersBalances = (~userId) => {
+  let usersTokensQuery = Queries.UsersBalances.use({userId: userId})
+
+  switch usersTokensQuery {
+  | {data: Some({user: Some({tokenBalances: Some(tokenBalances)})})} =>
+    let result = tokenBalances->Array.reduce({totalBalance: CONSTANTS.zeroBN, balances: []}, (
+      {totalBalance, balances},
+      {
+        tokenBalance,
+        syntheticToken: {
+          tokenType,
+          syntheticMarket: {name, latestSystemState: {longTokenPrice, shortTokenPrice}},
+        },
+      },
+    ) => {
+      let isLong = tokenType == #Long
+      let newToken = {
+        name: name,
+        isLong: isLong,
+        tokenBalance: tokenBalance,
+        tokensValue: (isLong ? longTokenPrice : shortTokenPrice)
+        ->Ethers.BigNumber.mul(tokenBalance)
+        ->Ethers.BigNumber.div(CONSTANTS.tenToThe18),
+      }
+      {
+        totalBalance: totalBalance->Ethers.BigNumber.add(newToken.tokensValue),
+        balances: balances->Array.concat([newToken]),
+      }
+    })
+    Response(result)
+  | {data: Some({user: Some({tokenBalances: None})})}
+  | {data: Some({user: None})} =>
+    Response({totalBalance: CONSTANTS.zeroBN, balances: []})
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
+  }
+}
