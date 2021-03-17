@@ -138,13 +138,14 @@ module UserStakesCard = {
     let stakeBoxes =
       Js.Array.mapi((stake: Queries.UsersStakes.UsersStakes_inner.t_currentStakes, i) => {
         let key = `user-stakes-${Belt.Int.toString(i)}`
-        let name = stake.currentStake.syntheticToken.syntheticMarket.symbol
-        let tokens = stake.currentStake.syntheticToken.totalStaked->FormatMoney.formatEther
-        let isLong = stake.currentStake.syntheticToken.tokenType->Obj.magic == "Long"
-        let state = stake.currentStake.syntheticToken.syntheticMarket.latestSystemState
+        let syntheticToken = stake.currentStake.syntheticToken
+        let name = syntheticToken.syntheticMarket.symbol
+        let tokens = syntheticToken.totalStaked->FormatMoney.formatEther
+        let isLong = syntheticToken.tokenType->Obj.magic == "Long"
+        let price = syntheticToken.latestPrice.price.price
         let value =
           stake.currentStake.syntheticToken.totalStaked
-          ->Ethers.BigNumber.mul(isLong ? state.longTokenPrice : state.shortTokenPrice)
+          ->Ethers.BigNumber.mul(price)
           ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
         totalValue := Ethers.BigNumber.add(totalValue.contents, value)
 

@@ -216,14 +216,10 @@ function useUsersBalances(userId) {
           balances: []
         }, (function (param, param$1) {
             var match = param$1.syntheticToken;
-            var match$1 = match.syntheticMarket;
-            var match$2 = match$1.latestSystemState;
             var tokenBalance = param$1.tokenBalance;
             var isLong = match.tokenType === "Long";
-            var newToken_name = match$1.name;
-            var newToken_tokensValue = (
-                  isLong ? match$2.longTokenPrice : match$2.shortTokenPrice
-                ).mul(tokenBalance).div(CONSTANTS.tenToThe18);
+            var newToken_name = match.syntheticMarket.name;
+            var newToken_tokensValue = match.latestPrice.price.price.mul(tokenBalance).div(CONSTANTS.tenToThe18);
             var newToken = {
               name: newToken_name,
               isLong: isLong,

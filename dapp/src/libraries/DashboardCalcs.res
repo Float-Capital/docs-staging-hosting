@@ -97,7 +97,11 @@ let getTotalValueLockedAndTotalStaked = (syntheticMarkets: syntheticMarketsType)
       {
         syntheticLong: {totalStaked: longStaked},
         syntheticShort: {totalStaked: shortStaked},
-        latestSystemState: {totalValueLocked, longTokenPrice, shortTokenPrice},
+        latestSystemState: {
+          totalValueLocked,
+          longTokenPrice: {price: {price: longTokenPrice}},
+          shortTokenPrice: {price: {price: shortTokenPrice}},
+        },
       },
     ) => {
       totalValueLocked: previous.totalValueLocked->Ethers.BigNumber.add(totalValueLocked),
