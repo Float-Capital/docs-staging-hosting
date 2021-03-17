@@ -27,6 +27,18 @@ type Event @entity {
   address: Bytes!
 }
 
+type Price @entity {
+  id: ID! # <marketIndex>-<long/short>-<timestamp>
+  price: BigInt!
+  timeUpdated: BigInt!
+  token: SyntheticToken!
+}
+
+type LatestPrice @entity {
+  id: ID! # latestPrice-<marketIndex>-<long/short>
+  price: Price!
+}
+
 type SystemState @entity {
   id: ID! # marketIndex "-" callCounter
   timestamp: BigInt!
@@ -34,8 +46,10 @@ type SystemState @entity {
   blockNumber: BigInt!
   marketIndex: BigInt!
   syntheticPrice: BigInt! # TODO: this should be a reference to another entity that holds the price
-  longTokenPrice: BigInt!
-  shortTokenPrice: BigInt!
+  longTokenPrice: LatestPrice!
+  shortTokenPrice: LatestPrice!
+  longToken: SyntheticToken!
+  shortToken: SyntheticToken!
   totalLockedLong: BigInt!
   totalLockedShort: BigInt!
   totalValueLocked: BigInt!
@@ -71,6 +85,8 @@ type SyntheticToken @entity {
   totalStaked: BigInt!
   tokenSupply: BigInt!
   floatMintedFromSpecificToken: BigInt!
+  latestPrice: LatestPrice!
+  priceHistory: [Price!]!
 }
 
 type SyntheticMarket @entity {

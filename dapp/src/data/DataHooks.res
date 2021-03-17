@@ -106,10 +106,7 @@ let useUsersBalances = (~userId) => {
       {totalBalance, balances},
       {
         tokenBalance,
-        syntheticToken: {
-          tokenType,
-          syntheticMarket: {name, latestSystemState: {longTokenPrice, shortTokenPrice}},
-        },
+        syntheticToken: {tokenType, syntheticMarket: {name}, latestPrice: {price: {price}}},
       },
     ) => {
       let isLong = tokenType == #Long
@@ -117,7 +114,7 @@ let useUsersBalances = (~userId) => {
         name: name,
         isLong: isLong,
         tokenBalance: tokenBalance,
-        tokensValue: (isLong ? longTokenPrice : shortTokenPrice)
+        tokensValue: price
         ->Ethers.BigNumber.mul(tokenBalance)
         ->Ethers.BigNumber.div(CONSTANTS.tenToThe18),
       }

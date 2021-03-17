@@ -61,7 +61,7 @@ function getTotalValueLockedAndTotalStaked(syntheticMarkets) {
                 var match = param.latestSystemState;
                 return {
                         totalValueLocked: previous.totalValueLocked.add(match.totalValueLocked),
-                        totalValueStaked: previous.totalValueStaked.add(tokenSupplyToTokenValue(match.longTokenPrice, param.syntheticLong.totalStaked)).add(tokenSupplyToTokenValue(match.shortTokenPrice, param.syntheticShort.totalStaked))
+                        totalValueStaked: previous.totalValueStaked.add(tokenSupplyToTokenValue(match.longTokenPrice.price.price, param.syntheticLong.totalStaked)).add(tokenSupplyToTokenValue(match.shortTokenPrice.price.price, param.syntheticShort.totalStaked))
                       };
               }));
 }

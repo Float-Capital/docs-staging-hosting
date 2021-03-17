@@ -98,8 +98,8 @@ function StakeCard(Props) {
   var timestampCreated = param.timestampCreated;
   var marketName = param.name;
   var router = Router.useRouter();
-  var longDollarValueStaked = calculateDollarValue(match.longTokenPrice, match$2.totalStaked);
-  var shortDollarValueStaked = calculateDollarValue(match.shortTokenPrice, match$1.totalStaked);
+  var longDollarValueStaked = calculateDollarValue(match.longTokenPrice.price.price, match$2.totalStaked);
+  var shortDollarValueStaked = calculateDollarValue(match.shortTokenPrice.price.price, match$1.totalStaked);
   var totalDollarValueStake = longDollarValueStaked.add(shortDollarValueStaked);
   var percentStrLong = percentStr(longDollarValueStaked, totalDollarValueStake);
   var percentStrShort = (100.0 - Belt_Option.getExn(Belt_Float.fromString(percentStrLong))).toFixed(2);
