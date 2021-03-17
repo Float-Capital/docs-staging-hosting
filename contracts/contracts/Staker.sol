@@ -159,6 +159,11 @@ contract Staker is IStaker, Initializable {
         uint256 period,
         uint256 initialMultiplier
     ) internal {
+        require(
+            initialMultiplier >= 1e18,
+            "Initial kFactorMultiplier must be >= 1e18"
+        );
+
         kFactorPeriods[marketIndex] = period;
         kFactorInitialMultipliers[marketIndex] = initialMultiplier;
 
@@ -189,7 +194,7 @@ contract Staker is IStaker, Initializable {
         syntheticRewardParams[shortTokenAddress][0]
             .accumulativeFloatPerToken = 0;
 
-        _changeKFactorParameters(marketIndex, kInitialMultiplier, kPeriod);
+        _changeKFactorParameters(marketIndex, kPeriod, kInitialMultiplier);
 
         emit StateAdded(longTokenAddress, 0, block.timestamp, 0);
         emit StateAdded(shortTokenAddress, 0, block.timestamp, 0);
