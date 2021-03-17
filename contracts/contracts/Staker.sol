@@ -225,6 +225,10 @@ contract Staker is IStaker, Initializable {
         (uint256 kPeriod, uint256 kInitialMultiplier) =
             getKFactorParameters(marketIndexOfToken[token]);
 
+        // Sanity check - under normal circumstances, the multipliers should
+        // *never* be set to a value < 1e18, as there are guards against this.
+        assert(kInitialMultiplier >= 1e18);
+
         // A float issuance multiplier that starts high and decreases linearly
         // over time to a value of 1. This incentivises users to stake early.
         uint256 k = 1e18;
