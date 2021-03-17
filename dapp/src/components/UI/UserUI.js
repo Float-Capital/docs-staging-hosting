@@ -253,7 +253,11 @@ var UserStakesCard = {
 function UserUI$UserFloatBox(Props) {
   var userId = Props.userId;
   var stakes = Props.stakes;
+  var synthTokens = stakes.map(function (stake, i) {
+        return stake.currentStake.syntheticToken.id;
+      });
   var floatBalances = DataHooks.useFloatBalancesForUser(userId);
+  var claimableFloat = DataHooks.useTotalClaimableFloatForUser(userId, synthTokens);
   if (typeof floatBalances === "number") {
     return React.createElement(MiniLoader.make, {});
   }
@@ -261,20 +265,16 @@ function UserUI$UserFloatBox(Props) {
     return floatBalances._0;
   }
   var floatBalances$1 = floatBalances._0;
-  var floatBalance = FormatMoney.formatEther(undefined, floatBalances$1.floatBalance);
-  var floatMinted = FormatMoney.formatEther(undefined, floatBalances$1.floatMinted);
-  var synthTokens = stakes.map(function (stake, i) {
-        return stake.currentStake.syntheticToken.id;
-      });
-  var msg = DataHooks.useTotalClaimableFloatForUser(userId, synthTokens);
-  if (typeof msg === "number") {
+  var floatBalance = FormatMoney.formatEther(6, floatBalances$1.floatBalance);
+  var floatMinted = FormatMoney.formatEther(6, floatBalances$1.floatMinted);
+  if (typeof claimableFloat === "number") {
     return React.createElement(MiniLoader.make, {});
   }
-  if (msg.TAG === /* GraphError */0) {
-    return msg._0;
+  if (claimableFloat.TAG === /* GraphError */0) {
+    return claimableFloat._0;
   }
-  var match = msg._0;
-  var floatAccrued = FormatMoney.formatEther(undefined, match[0].add(match[1]));
+  var match = claimableFloat._0;
+  var floatAccrued = FormatMoney.formatEther(6, match[0].add(match[1]));
   return React.createElement("div", {
               className: "w-11/12 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow"
             }, React.createElement(UserUI$UserColumnTextList, {

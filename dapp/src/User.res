@@ -29,6 +29,7 @@ module UsersBalances = {
           {balances
           ->Array.map(({name, isLong, tokenBalance, tokensValue}) =>
             <UserMarketBox
+              key={`${name}-${isLong ? "long" : "short"}`}
               name
               isLong
               tokens={FormatMoney.formatEther(tokenBalance)}

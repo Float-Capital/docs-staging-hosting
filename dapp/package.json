@@ -44,6 +44,7 @@
     "dev": "npm-run-all --parallel res:start next:dev",
     "update-schema-local": "get-graphql-schema http://localhost:8000/subgraphs/name/avolabs-io/float-capital -j > graphql_schema.json",
     "update-schema": "get-graphql-schema https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital -j > graphql_schema.json",
+    "update-schema2": "get-graphql-schema https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital2 -j > graphql_schema.json",
     "update-dbschema-local": "get-graphql-schema http://localhost:8080/v1/graphql -h 'x-hasura-admin-secret=testing' -j > graphql_schema_db.json",
     "update-testnet-ui": "cd .. && node scripts/deployments.js > dapp/src/contractAddresses.json ; cd dapp && yarn update-schema ; yarn res:build"
   },

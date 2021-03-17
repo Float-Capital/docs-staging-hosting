@@ -28,12 +28,17 @@ function User$UsersBalances(Props) {
                     body: "$" + FormatMoney.formatEther(undefined, match.totalBalance)
                   })
             }), React.createElement("br", undefined), Belt_Array.map(match.balances, (function (param) {
+                var isLong = param.isLong;
+                var name = param.name;
                 return React.createElement(UserUI.UserMarketBox.make, {
-                            name: param.name,
-                            isLong: param.isLong,
+                            name: name,
+                            isLong: isLong,
                             tokens: FormatMoney.formatEther(undefined, param.tokenBalance),
                             value: FormatMoney.formatEther(undefined, param.tokensValue),
-                            children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {})
+                            children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {}),
+                            key: name + "-" + (
+                              isLong ? "long" : "short"
+                            )
                           });
               })));
   }

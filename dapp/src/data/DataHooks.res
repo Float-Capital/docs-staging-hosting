@@ -33,29 +33,25 @@ type graphResponse<'a> = Loading | GraphError(string) | Response('a)
 @ocaml.doc(`Returns a live estimate of how much total float the user is owed for the given synthetic tokens.`)
 let useTotalClaimableFloatForUser = (~userId, ~synthTokens) => {
   let currentTimestamp = Misc.Time.useCurrentTimeBN(~updateInterval=1000)
-  let initialState = Response((CONSTANTS.zeroBN, CONSTANTS.zeroBN))
-  synthTokens->Array.reduce(initialState, (curState, synthToken) => {
-    switch curState {
-      | Loading => Loading
-      | GraphError(msg) => GraphError(msg)
-      | Response((totalClaimable, totalPredicted)) => {
-        let floatDetailsQuery = Queries.UsersFloatDetails.use({
-          userId: userId,
-          synthToken: synthToken,
-        })
+  let floatQuery = Queries.UsersFloatDetails.use({
+    userId: userId,
+    synthTokens: synthTokens,
+  })
 
-        switch floatDetailsQuery {
-        | {
-            data: Some({
-              states: [{accumulativeFloatPerToken, floatRatePerTokenOverInterval}],
-              currentStakes: [
-                {
-                  lastMintState: {accumulativeFloatPerToken: lastAccumulativeFloatPerToken, timestamp},
-                  currentStake: {amount},
-                },
-              ],
-            }),
-          } => {
+  switch floatQuery {
+  | {data: Some({currentStakes: stakes})} => {
+      let initialState = Response((CONSTANTS.zeroBN, CONSTANTS.zeroBN))
+      stakes->Array.reduce(initialState, (curState, stake) => {
+        switch curState {
+        | Loading => Loading
+        | GraphError(msg) => GraphError(msg)
+        | Response((totalClaimable, totalPredicted)) => {
+            let amount = stake.currentStake.amount
+            let timestamp = stake.lastMintState.timestamp
+            let lastAccumulativeFloatPerToken = stake.lastMintState.accumulativeFloatPerToken
+            let accumulativeFloatPerToken = stake.syntheticToken.latestStakerState.accumulativeFloatPerToken
+            let floatRatePerTokenOverInterval = stake.syntheticToken.latestStakerState.floatRatePerTokenOverInterval
+
             // The amount of float the user is owed up to the last staker state.
             // Note that accumulativeFloatPerToken is in e42 scale (see Staker.sol).
             let claimableFloat =
@@ -76,17 +72,29 @@ let useTotalClaimableFloatForUser = (~userId, ~synthTokens) => {
 
             Response((claimableFloat, predictedFloat))
           }
-        | {error: Some({message})} => GraphError(message)
-        | _ => Loading
         }
-      }
+      })
     }
-  })
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
+  }
+  //let initialState = Response((CONSTANTS.zeroBN, CONSTANTS.zeroBN))
+  //      switch floatDetailsQuery {
+  //      | {
+  //          data: Some({
+  //            states: [{accumulativeFloatPerToken, floatRatePerTokenOverInterval}],
+  //            currentStakes: [
+  //              {
+  //                lastMintState: {accumulativeFloatPerToken: lastAccumulativeFloatPerToken, timestamp},
+  //                currentStake: {amount},
+  //              },
+  //            ],
+  //})
 }
 
 @ocaml.doc(`Returns a live estimate of how much float the user is owed for the given synthetic token stake.`)
 let useClaimableFloatForUser = (~userId, ~synthToken) => {
-  useTotalClaimableFloatForUser(~userId=userId, ~synthTokens=[synthToken])
+  useTotalClaimableFloatForUser(~userId, ~synthTokens=[synthToken])
 }
 
 @ocaml.doc(`Returns a list of stakes for the given user.`)
@@ -152,7 +160,7 @@ let useUsersBalances = (~userId) => {
 
 type floatBalancesData = {
   floatBalance: Ethers.BigNumber.t,
-  floatMinted: Ethers.BigNumber.t
+  floatMinted: Ethers.BigNumber.t,
 }
 
 @ocaml.doc(`Returns held and minted float token balances for the given user.`)
@@ -162,19 +170,19 @@ let useFloatBalancesForUser = (~userId) => {
   })
 
   switch usersStateQuery {
-    | {data: Some({user})} => {
-      switch user {
-        | Some(userData) => Response({
-          floatBalance: userData.floatTokenBalance,
-          floatMinted: userData.totalMintedFloat,
-        })
-        | None => Response({
-          floatBalance: CONSTANTS.zeroBN,
-          floatMinted: CONSTANTS.zeroBN,
-        })
-      }
+  | {data: Some({user})} => switch user {
+    | Some(userData) =>
+      Response({
+        floatBalance: userData.floatTokenBalance,
+        floatMinted: userData.totalMintedFloat,
+      })
+    | None =>
+      Response({
+        floatBalance: CONSTANTS.zeroBN,
+        floatMinted: CONSTANTS.zeroBN,
+      })
     }
-    | {error: Some({message})} => GraphError(message)
-    | _ => Loading
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
   }
 }

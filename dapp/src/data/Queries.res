@@ -232,8 +232,8 @@ query ($userId: String!){
 `)
 
 module UsersFloatDetails = %graphql(`
-query ($userId: String!, $synthToken: String!) {
-  currentStakes (where: {user: $userId, syntheticToken: $synthToken}) {
+query ($userId: String!, $synthTokens: [String!]!) {
+  currentStakes(where: {user: $userId, syntheticToken_in: $synthTokens}) {
     lastMintState {
       timestamp
       accumulativeFloatPerToken
@@ -241,11 +241,14 @@ query ($userId: String!, $synthToken: String!) {
     currentStake {
       amount
     }
-  }
-  states (first:1, orderBy: stateIndex, orderDirection:desc, where: {syntheticToken: $synthToken, timeSinceLastUpdate_gt: 0}) {
-    stateIndex
-    accumulativeFloatPerToken
-    floatRatePerTokenOverInterval
+    syntheticToken {
+      id
+      latestStakerState {
+        accumulativeFloatPerToken
+        floatRatePerTokenOverInterval
+        timestamp
+      }
+    }
   }
 }
 `)

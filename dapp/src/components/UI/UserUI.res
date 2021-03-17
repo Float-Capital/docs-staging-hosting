@@ -170,26 +170,34 @@ module UserStakesCard = {
 module UserFloatBox = {
   @react.component
   let make = (~userId, ~stakes) => {
-    let floatBalances = DataHooks.useFloatBalancesForUser(~userId=userId)
+    let synthTokens = Js.Array.mapi(
+      (stake: Queries.UsersStakes.UsersStakes_inner.t_currentStakes, i) => {
+        stake.currentStake.syntheticToken.id
+      },
+      stakes,
+    )
+
+    let floatBalances = DataHooks.useFloatBalancesForUser(~userId)
+    let claimableFloat = DataHooks.useTotalClaimableFloatForUser(~userId, ~synthTokens)
+
     switch floatBalances {
-      | Loading => <MiniLoader />
-      | GraphError(msg) => msg->React.string
-      | Response(floatBalances) => {
-        let floatBalance = floatBalances.floatBalance->FormatMoney.formatEther
-        let floatMinted = floatBalances.floatMinted->FormatMoney.formatEther
-        let synthTokens = Js.Array.mapi((stake: Queries.UsersStakes.UsersStakes_inner.t_currentStakes, i) => {
-          stake.currentStake.syntheticToken.id
-        }, stakes)
+    | Loading => <MiniLoader />
+    | GraphError(msg) => msg->React.string
+    | Response(floatBalances) => {
+        let floatBalance = floatBalances.floatBalance->FormatMoney.formatEther(~digits=6)
+        let floatMinted = floatBalances.floatMinted->FormatMoney.formatEther(~digits=6)
 
-        switch DataHooks.useTotalClaimableFloatForUser(~userId=userId, ~synthTokens=synthTokens) {
-          | Loading => <MiniLoader />
-          | GraphError(msg) => msg->React.string
-          | Response((totalClaimable, totalPredicted)) => {
-            let floatAccrued = totalClaimable
+        switch claimableFloat {
+        | Loading => <MiniLoader />
+        | GraphError(msg) => msg->React.string
+        | Response((totalClaimable, totalPredicted)) => {
+            let floatAccrued =
+              totalClaimable
               ->Ethers.BigNumber.add(totalPredicted)
-              ->FormatMoney.formatEther
+              ->FormatMoney.formatEther(~digits=6)
 
-            <div className=`w-11/12 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>
+            <div
+              className=`w-11/12 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>
               <UserColumnTextList>
                 <UserColumnText head=`float accruing` body={floatAccrued} />
                 <UserColumnText head=`float balance` body={floatBalance} />
