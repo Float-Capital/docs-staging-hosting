@@ -71,62 +71,87 @@ function useGetStakes(param) {
   return stakeDetailsQuery;
 }
 
-function useFloatDetailsForUser(userId, synthToken) {
+function useTotalClaimableFloatForUser(userId, synthTokens) {
   var currentTimestamp = Misc.Time.useCurrentTimeBN(1000);
-  var floatDetailsQuery = Curry.app(Queries.UsersFloatDetails.use, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        {
-          userId: userId,
-          synthToken: synthToken
-        }
-      ]);
-  var match = floatDetailsQuery.data;
-  if (match !== undefined) {
-    var match$1 = match.currentStakes;
-    if (match$1.length === 1) {
-      var match$2 = match$1[0];
-      var match$3 = match.states;
-      if (match$3.length === 1) {
-        var amount = match$2.currentStake.amount;
-        var match$4 = match$2.lastMintState;
-        var match$5 = match$3[0];
-        var claimableFloat = match$5.accumulativeFloatPerToken.sub(match$4.accumulativeFloatPerToken).mul(amount).div(CONSTANTS.tenToThe42);
-        var predictedFloat = currentTimestamp.sub(match$4.timestamp).mul(match$5.floatRatePerTokenOverInterval).mul(amount).div(CONSTANTS.tenToThe42);
-        return {
-                TAG: 1,
-                _0: [
-                  claimableFloat,
-                  predictedFloat
-                ],
-                [Symbol.for("name")]: "Response"
-              };
-      }
-      
-    }
-    
-  }
-  var match$6 = floatDetailsQuery.error;
-  if (match$6 !== undefined) {
-    return {
-            TAG: 0,
-            _0: match$6.message,
-            [Symbol.for("name")]: "GraphError"
-          };
-  } else {
-    return /* Loading */0;
-  }
+  var initialState = {
+    TAG: 1,
+    _0: [
+      CONSTANTS.zeroBN,
+      CONSTANTS.zeroBN
+    ],
+    [Symbol.for("name")]: "Response"
+  };
+  return Belt_Array.reduce(synthTokens, initialState, (function (curState, synthToken) {
+                if (typeof curState === "number") {
+                  return /* Loading */0;
+                }
+                if (curState.TAG === /* GraphError */0) {
+                  return {
+                          TAG: 0,
+                          _0: curState._0,
+                          [Symbol.for("name")]: "GraphError"
+                        };
+                }
+                var match = curState._0;
+                var floatDetailsQuery = Curry.app(Queries.UsersFloatDetails.use, [
+                      undefined,
+                      undefined,
+                      undefined,
+                      undefined,
+                      undefined,
+                      undefined,
+                      undefined,
+                      undefined,
+                      undefined,
+                      undefined,
+                      undefined,
+                      undefined,
+                      undefined,
+                      {
+                        userId: userId,
+                        synthToken: synthToken
+                      }
+                    ]);
+                var match$1 = floatDetailsQuery.data;
+                if (match$1 !== undefined) {
+                  var match$2 = match$1.currentStakes;
+                  if (match$2.length === 1) {
+                    var match$3 = match$2[0];
+                    var match$4 = match$1.states;
+                    if (match$4.length === 1) {
+                      var amount = match$3.currentStake.amount;
+                      var match$5 = match$3.lastMintState;
+                      var match$6 = match$4[0];
+                      var claimableFloat = match$6.accumulativeFloatPerToken.sub(match$5.accumulativeFloatPerToken).mul(amount).div(CONSTANTS.tenToThe42).add(match[0]);
+                      var predictedFloat = currentTimestamp.sub(match$5.timestamp).mul(match$6.floatRatePerTokenOverInterval).mul(amount).div(CONSTANTS.tenToThe42).add(match[1]);
+                      return {
+                              TAG: 1,
+                              _0: [
+                                claimableFloat,
+                                predictedFloat
+                              ],
+                              [Symbol.for("name")]: "Response"
+                            };
+                    }
+                    
+                  }
+                  
+                }
+                var match$7 = floatDetailsQuery.error;
+                if (match$7 !== undefined) {
+                  return {
+                          TAG: 0,
+                          _0: match$7.message,
+                          [Symbol.for("name")]: "GraphError"
+                        };
+                } else {
+                  return /* Loading */0;
+                }
+              }));
+}
+
+function useClaimableFloatForUser(userId, synthToken) {
+  return useTotalClaimableFloatForUser(userId, [synthToken]);
 }
 
 function useStakesForUser(userId) {
@@ -249,11 +274,67 @@ function useUsersBalances(userId) {
   }
 }
 
+function useFloatBalancesForUser(userId) {
+  var usersStateQuery = Curry.app(Queries.UsersState.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: userId
+        }
+      ]);
+  var match = usersStateQuery.data;
+  if (match !== undefined) {
+    var user = match.user;
+    if (user !== undefined) {
+      return {
+              TAG: 1,
+              _0: {
+                floatBalance: user.floatTokenBalance,
+                floatMinted: user.totalMintedFloat
+              },
+              [Symbol.for("name")]: "Response"
+            };
+    } else {
+      return {
+              TAG: 1,
+              _0: {
+                floatBalance: CONSTANTS.zeroBN,
+                floatMinted: CONSTANTS.zeroBN
+              },
+              [Symbol.for("name")]: "Response"
+            };
+    }
+  }
+  var match$1 = usersStateQuery.error;
+  if (match$1 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$1.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
 export {
   useGetStakes ,
-  useFloatDetailsForUser ,
+  useTotalClaimableFloatForUser ,
+  useClaimableFloatForUser ,
   useStakesForUser ,
   useUsersBalances ,
+  useFloatBalancesForUser ,
   
 }
 /* Misc Not a pure module */

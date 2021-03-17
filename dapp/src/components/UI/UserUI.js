@@ -3,6 +3,8 @@
 import * as React from "react";
 import * as Button from "./Button.js";
 import * as CONSTANTS from "../../CONSTANTS.js";
+import * as DataHooks from "../../data/DataHooks.js";
+import * as MiniLoader from "./MiniLoader.js";
 import * as FormatMoney from "./FormatMoney.js";
 
 function UserUI$UserContainer(Props) {
@@ -249,22 +251,43 @@ var UserStakesCard = {
 };
 
 function UserUI$UserFloatBox(Props) {
-  var accruing = Props.accruing;
-  var balance = Props.balance;
-  var minted = Props.minted;
+  var userId = Props.userId;
+  var stakes = Props.stakes;
+  var floatBalances = DataHooks.useFloatBalancesForUser(userId);
+  if (typeof floatBalances === "number") {
+    return React.createElement(MiniLoader.make, {});
+  }
+  if (floatBalances.TAG === /* GraphError */0) {
+    return floatBalances._0;
+  }
+  var floatBalances$1 = floatBalances._0;
+  var floatBalance = FormatMoney.formatEther(undefined, floatBalances$1.floatBalance);
+  var floatMinted = FormatMoney.formatEther(undefined, floatBalances$1.floatMinted);
+  var synthTokens = stakes.map(function (stake, i) {
+        return stake.currentStake.syntheticToken.id;
+      });
+  var msg = DataHooks.useTotalClaimableFloatForUser(userId, synthTokens);
+  if (typeof msg === "number") {
+    return React.createElement(MiniLoader.make, {});
+  }
+  if (msg.TAG === /* GraphError */0) {
+    return msg._0;
+  }
+  var match = msg._0;
+  var floatAccrued = FormatMoney.formatEther(undefined, match[0].add(match[1]));
   return React.createElement("div", {
               className: "w-11/12 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow"
             }, React.createElement(UserUI$UserColumnTextList, {
                   children: null
                 }, React.createElement(UserUI$UserColumnText, {
                       head: "float accruing",
-                      body: accruing
+                      body: floatAccrued
                     }), React.createElement(UserUI$UserColumnText, {
                       head: "float balance",
-                      body: balance
+                      body: floatBalance
                     }), React.createElement(UserUI$UserColumnText, {
                       head: "float minted",
-                      body: minted
+                      body: floatMinted
                     })), React.createElement("div", {
                   className: "flex justify-around flex-row my-1"
                 }, "🌊", React.createElement(Button.make, {
