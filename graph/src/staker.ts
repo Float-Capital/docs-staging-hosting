@@ -28,7 +28,10 @@ import {
   DataSourceContext,
 } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
-import { getOrCreateUser } from "./utils/globalStateManager";
+import {
+  getOrCreateUser,
+  getOrCreateStakerState,
+} from "./utils/globalStateManager";
 
 import { ZERO, ONE, TEN_TO_THE_18, GLOBAL_STATE_ID } from "./CONSTANTS";
 
@@ -67,7 +70,7 @@ export function handleStateAdded(event: StateAdded): void {
     log.critical("Token should be defined", []);
   }
 
-  let state = new State(tokenAddressString + "-" + stateIndex.toString());
+  let state = getOrCreateStakerState(tokenAddressString, stateIndex, event);
   state.blockNumber = blockNumber;
   state.creationTxHash = txHash;
   state.stateIndex = stateIndex;
@@ -110,6 +113,7 @@ export function handleStateAdded(event: StateAdded): void {
     }
   }
 
+  syntheticToken.latestStakerState = state.id;
   syntheticToken.save();
   state.save();
 
