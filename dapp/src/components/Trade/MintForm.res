@@ -267,7 +267,6 @@ module MintFormSignedIn = {
     let longShortContractAddress = Config.useLongShortAddress()
     let daiAddressThatIsTemporarilyHardCoded = Config.useDaiAddress()
 
-    // NOTE: this is heavy and slow, we fetch 6 values from the blockchain every time this component mounts. Maybe move some of this to the graph?
     let (optDaiBalance, optDaiAmountApproved) = useBalanceAndApproved(
       ~erc20Address=daiAddressThatIsTemporarilyHardCoded,
       ~spender=longShortContractAddress,
