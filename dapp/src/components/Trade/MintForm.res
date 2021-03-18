@@ -63,14 +63,17 @@ module SubmitButtonAndTxTracker = {
           {`Please Approve that Float can use your ${Config.paymentTokenName}`->React.string}
         </h1>
       </>
-    | (ContractActions.SignedAndSubmitted(txHash), _) =>
-      <h1>
-        <a target="_" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
-          {"Processing Approval "->React.string}
-        </a>
-      </h1>
+    | (ContractActions.SignedAndSubmitted(txHash), _) => <>
+        <hr />
+        <h1>
+          <a target="_" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
+            {"Processing Approval "->React.string}
+          </a>
+        </h1>
+      </>
     | (ContractActions.Complete({transactionHash}), ContractActions.Created)
     | (ContractActions.Complete({transactionHash}), ContractActions.UnInitialised) => <>
+        <hr />
         <h1>
           <a target="_" href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
             {`✅ Approval Complete`->React.string}
@@ -79,6 +82,7 @@ module SubmitButtonAndTxTracker = {
         <h1> {`Sign the next transaction to mint your`->React.string} </h1>
       </>
     | (ContractActions.Declined(message), _) => <>
+        <hr />
         <h1>
           {`❌ The transaction was declined by your wallet, you need to accept the transaction to proceed.`->React.string}
         </h1>
@@ -86,6 +90,7 @@ module SubmitButtonAndTxTracker = {
         {resetFormButton()}
       </>
     | (ContractActions.Failed, _) => <>
+        <hr />
         <h1> {`❌ The transaction failed.`->React.string} </h1>
         <p>
           <a target="_" href=Config.discordInviteLink>
@@ -95,6 +100,7 @@ module SubmitButtonAndTxTracker = {
         {resetFormButton()}
       </>
     | (_, ContractActions.Created) => <>
+        <hr />
         <h1>
           {`Sign the transaction to mint ${tokenToMint} with your ${Config.paymentTokenName}`->React.string}
         </h1>
@@ -103,6 +109,7 @@ module SubmitButtonAndTxTracker = {
         ContractActions.Complete({transactionHash}),
         ContractActions.SignedAndSubmitted(txHash),
       ) => <>
+        <hr />
         <h1>
           <a target="_" href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
             {`✅ Approval Complete`->React.string}
@@ -115,16 +122,18 @@ module SubmitButtonAndTxTracker = {
         </h1>
       </>
     | (_, ContractActions.SignedAndSubmitted(txHash)) => <>
+        <hr />
         <h1>
           <a target="_" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
-            {`Processing minting ${tokenToMint} with your ${Config.paymentTokenName}`->React.string}
+            {`Processing minting ${tokenToMint} with your ${Config.paymentTokenName} (click to view)`->React.string}
           </a>
         </h1>
       </>
     | (_, ContractActions.Complete({transactionHash})) => <>
+        <hr />
         <h1>
           <a target="_" href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
-            {`✅ Transaction Complete`->React.string}
+            {`✅ Transaction Complete (click to view)`->React.string}
           </a>
         </h1>
         {resetFormButton()}
@@ -137,6 +146,7 @@ module SubmitButtonAndTxTracker = {
         {resetFormButton()}
       </>
     | (_, ContractActions.Failed) => <>
+        <hr />
         <h1> {`❌ The transaction failed.`->React.string} </h1>
         <p>
           <a target="_" href=Config.discordInviteLink>

@@ -642,7 +642,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
       case /* Created */1 :
           return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Please Approve that Float can use your " + Config.paymentTokenName));
       case /* Failed */2 :
-          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "❌ The transaction failed."), React.createElement("p", undefined, React.createElement("a", {
+          return React.createElement(React.Fragment, undefined, React.createElement("hr", undefined), React.createElement("h1", undefined, "❌ The transaction failed."), React.createElement("p", undefined, React.createElement("a", {
                               href: Config.discordInviteLink,
                               target: "_"
                             }, "This shouldn't happen, please let us help you on discord.")), Curry._1(resetFormButton, undefined));
@@ -651,12 +651,12 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
   } else {
     switch (txStateApprove.TAG | 0) {
       case /* SignedAndSubmitted */0 :
-          return React.createElement("h1", undefined, React.createElement("a", {
-                          href: Config.defaultBlockExplorer + "tx/" + txStateApprove._0,
-                          target: "_"
-                        }, "Processing Approval "));
+          return React.createElement(React.Fragment, undefined, React.createElement("hr", undefined), React.createElement("h1", undefined, React.createElement("a", {
+                              href: Config.defaultBlockExplorer + "tx/" + txStateApprove._0,
+                              target: "_"
+                            }, "Processing Approval ")));
       case /* Declined */1 :
-          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "❌ The transaction was declined by your wallet, you need to accept the transaction to proceed."), React.createElement("p", undefined, "Failure reason: " + txStateApprove._0), Curry._1(resetFormButton, undefined));
+          return React.createElement(React.Fragment, undefined, React.createElement("hr", undefined), React.createElement("h1", undefined, "❌ The transaction was declined by your wallet, you need to accept the transaction to proceed."), React.createElement("p", undefined, "Failure reason: " + txStateApprove._0), Curry._1(resetFormButton, undefined));
       case /* Complete */2 :
           var transactionHash = txStateApprove._0.transactionHash;
           var exit = 0;
@@ -670,7 +670,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                 
             }
           } else if (txStateMint.TAG === /* SignedAndSubmitted */0) {
-            return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, React.createElement("a", {
+            return React.createElement(React.Fragment, undefined, React.createElement("hr", undefined), React.createElement("h1", undefined, React.createElement("a", {
                                 href: Config.defaultBlockExplorer + "tx/" + transactionHash,
                                 target: "_"
                               }, "✅ Approval Complete")), React.createElement("h1", undefined, React.createElement("a", {
@@ -679,7 +679,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                               }, "Processing minting " + tokenToMint + " with your " + Config.paymentTokenName)));
           }
           if (exit === 2) {
-            return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, React.createElement("a", {
+            return React.createElement(React.Fragment, undefined, React.createElement("hr", undefined), React.createElement("h1", undefined, React.createElement("a", {
                                 href: Config.defaultBlockExplorer + "tx/" + transactionHash,
                                 target: "_"
                               }, "✅ Approval Complete")), React.createElement("h1", undefined, "Sign the next transaction to mint your"));
@@ -700,9 +700,9 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                       disabled: buttonDisabled
                     });
       case /* Created */1 :
-          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Sign the transaction to mint " + tokenToMint + " with your " + Config.paymentTokenName));
+          return React.createElement(React.Fragment, undefined, React.createElement("hr", undefined), React.createElement("h1", undefined, "Sign the transaction to mint " + tokenToMint + " with your " + Config.paymentTokenName));
       case /* Failed */2 :
-          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "❌ The transaction failed."), React.createElement("p", undefined, React.createElement("a", {
+          return React.createElement(React.Fragment, undefined, React.createElement("hr", undefined), React.createElement("h1", undefined, "❌ The transaction failed."), React.createElement("p", undefined, React.createElement("a", {
                               href: Config.discordInviteLink,
                               target: "_"
                             }, "This shouldn't happen, please let us help you on discord.")), Curry._1(resetFormButton, undefined));
@@ -711,17 +711,17 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
   } else {
     switch (txStateMint.TAG | 0) {
       case /* SignedAndSubmitted */0 :
-          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, React.createElement("a", {
+          return React.createElement(React.Fragment, undefined, React.createElement("hr", undefined), React.createElement("h1", undefined, React.createElement("a", {
                               href: Config.defaultBlockExplorer + "tx/" + txStateMint._0,
                               target: "_"
-                            }, "Processing minting " + tokenToMint + " with your " + Config.paymentTokenName)));
+                            }, "Processing minting " + tokenToMint + " with your " + Config.paymentTokenName + " (click to view)")));
       case /* Declined */1 :
           return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "❌ The transaction was declined by your wallet, you need to accept the transaction to proceed."), React.createElement("p", undefined, "Failure reason: " + txStateMint._0), Curry._1(resetFormButton, undefined));
       case /* Complete */2 :
-          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, React.createElement("a", {
+          return React.createElement(React.Fragment, undefined, React.createElement("hr", undefined), React.createElement("h1", undefined, React.createElement("a", {
                               href: Config.defaultBlockExplorer + "tx/" + txStateMint._0.transactionHash,
                               target: "_"
-                            }, "✅ Transaction Complete")), Curry._1(resetFormButton, undefined));
+                            }, "✅ Transaction Complete (click to view)")), Curry._1(resetFormButton, undefined));
       
     }
   }
