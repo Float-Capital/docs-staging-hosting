@@ -7,6 +7,7 @@ import * as Client from "./Client.js";
 import * as Queries from "./Queries.js";
 import * as CONSTANTS from "../CONSTANTS.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import FromUnixTime from "date-fns/fromUnixTime";
 
 function useGetStakes(param) {
   var stakeDetailsQuery = Curry.app(Queries.StakingDetails.use, [
@@ -69,6 +70,35 @@ function useGetStakes(param) {
           
         }), []);
   return stakeDetailsQuery;
+}
+
+function liftGraphResponse2(a, b) {
+  if (typeof a === "number") {
+    return /* Loading */0;
+  } else if (a.TAG === /* GraphError */0) {
+    return {
+            TAG: 0,
+            _0: a._0,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else if (typeof b === "number") {
+    return /* Loading */0;
+  } else if (b.TAG === /* GraphError */0) {
+    return {
+            TAG: 0,
+            _0: b._0,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return {
+            TAG: 1,
+            _0: [
+              a._0,
+              b._0
+            ],
+            [Symbol.for("name")]: "Response"
+          };
+  }
 }
 
 function useTotalClaimableFloatForUser(userId, synthTokens) {
@@ -321,13 +351,65 @@ function useFloatBalancesForUser(userId) {
   }
 }
 
+function useBasicUserInfo(userId) {
+  var userQuery = Curry.app(Queries.UserQuery.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: userId
+        }
+      ]);
+  var match = userQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.user;
+    if (match$1 !== undefined) {
+      return {
+              TAG: 1,
+              _0: {
+                id: match$1.id,
+                joinedAt: FromUnixTime(match$1.timestampJoined.toNumber()),
+                gasUsed: match$1.totalGasUsed,
+                floatMinted: match$1.totalMintedFloat,
+                floatBalance: match$1.floatTokenBalance,
+                transactionCount: match$1.numberOfTransactions
+              },
+              [Symbol.for("name")]: "Response"
+            };
+    }
+    
+  }
+  var match$2 = userQuery.error;
+  if (match$2 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
 export {
   useGetStakes ,
+  liftGraphResponse2 ,
   useTotalClaimableFloatForUser ,
   useClaimableFloatForUser ,
   useStakesForUser ,
   useUsersBalances ,
   useFloatBalancesForUser ,
+  useBasicUserInfo ,
   
 }
 /* Misc Not a pure module */

@@ -30,6 +30,20 @@ let useGetStakes = () => {
 @ocaml.doc(`Represents a graphql query response.`)
 type graphResponse<'a> = Loading | GraphError(string) | Response('a)
 
+@ocaml.doc(`Combines two graphql responses into a single tuple response.`)
+let liftGraphResponse2 = (a, b) => {
+  switch a {
+  | Response(ar) =>
+    switch b {
+    | Response(br) => Response((ar, br))
+    | GraphError(x) => GraphError(x)
+    | Loading => Loading
+    }
+  | GraphError(x) => GraphError(x)
+  | Loading => Loading
+  }
+}
+
 @ocaml.doc(`Returns a live estimate of how much total float the user is owed for the given synthetic tokens.`)
 let useTotalClaimableFloatForUser = (~userId, ~synthTokens) => {
   let currentTimestamp = Misc.Time.useCurrentTimeBN(~updateInterval=1000)
@@ -158,7 +172,8 @@ let useFloatBalancesForUser = (~userId) => {
   })
 
   switch usersStateQuery {
-  | {data: Some({user})} => switch user {
+  | {data: Some({user})} =>
+    switch user {
     | Some(userData) =>
       Response({
         floatBalance: userData.floatTokenBalance,
@@ -170,6 +185,46 @@ let useFloatBalancesForUser = (~userId) => {
         floatMinted: CONSTANTS.zeroBN,
       })
     }
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
+  }
+}
+
+type basicUserInfo = {
+  id: string,
+  joinedAt: Js.Date.t,
+  gasUsed: Ethers.BigNumber.t,
+  floatMinted: Ethers.BigNumber.t,
+  floatBalance: Ethers.BigNumber.t,
+  transactionCount: Ethers.BigNumber.t,
+}
+
+@ocaml.doc(`Returns basic user info for the given user.`)
+let useBasicUserInfo = (~userId) => {
+  let userQuery = Queries.UserQuery.use({
+    userId: userId,
+  })
+
+  switch userQuery {
+  | {
+      data: Some({
+        user: Some({
+          id,
+          timestampJoined,
+          totalMintedFloat,
+          floatTokenBalance,
+          numberOfTransactions,
+          totalGasUsed,
+        }),
+      }),
+    } => Response({
+      id: id,
+      joinedAt: timestampJoined->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime,
+      gasUsed: totalGasUsed,
+      floatMinted: totalMintedFloat,
+      floatBalance: floatTokenBalance,
+      transactionCount: numberOfTransactions,
+    })
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
   }
