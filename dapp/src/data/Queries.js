@@ -1833,8 +1833,8 @@ var UsersStakes = {
 var Raw$18 = {};
 
 var query$18 = (require("@apollo/client").gql`
-  query ($userId: String!, $synthToken: String!)  {
-    currentStakes(where: {user: $userId, syntheticToken: $synthToken})  {
+  query ($userId: String!, $synthTokens: [String!]!)  {
+    currentStakes(where: {user: $userId, syntheticToken_in: $synthTokens})  {
       __typename
       lastMintState  {
         __typename
@@ -1845,23 +1845,28 @@ var query$18 = (require("@apollo/client").gql`
         __typename
         amount
       }
-    }
-    states(first: 1, orderBy: stateIndex, orderDirection: desc, where: {syntheticToken: $synthToken, timeSinceLastUpdate_gt: 0})  {
-      __typename
-      stateIndex
-      accumulativeFloatPerToken
-      floatRatePerTokenOverInterval
+      syntheticToken  {
+        __typename
+        id
+        latestStakerState  {
+          __typename
+          accumulativeFloatPerToken
+          floatRatePerTokenOverInterval
+          timestamp
+        }
+      }
     }
   }
 `);
 
 function parse$18(value) {
   var value$1 = value.currentStakes;
-  var value$2 = value.states;
   return {
           currentStakes: value$1.map(function (value) {
                 var value$1 = value.lastMintState;
                 var value$2 = value.currentStake;
+                var value$3 = value.syntheticToken;
+                var value$4 = value$3.latestStakerState;
                 return {
                         __typename: value.__typename,
                         lastMintState: {
@@ -1872,82 +1877,93 @@ function parse$18(value) {
                         currentStake: {
                           __typename: value$2.__typename,
                           amount: GqlConverters.$$BigInt.parse(value$2.amount)
+                        },
+                        syntheticToken: {
+                          __typename: value$3.__typename,
+                          id: value$3.id,
+                          latestStakerState: {
+                            __typename: value$4.__typename,
+                            accumulativeFloatPerToken: GqlConverters.$$BigInt.parse(value$4.accumulativeFloatPerToken),
+                            floatRatePerTokenOverInterval: GqlConverters.$$BigInt.parse(value$4.floatRatePerTokenOverInterval),
+                            timestamp: GqlConverters.$$BigInt.parse(value$4.timestamp)
+                          }
                         }
-                      };
-              }),
-          states: value$2.map(function (value) {
-                return {
-                        __typename: value.__typename,
-                        stateIndex: GqlConverters.$$BigInt.parse(value.stateIndex),
-                        accumulativeFloatPerToken: GqlConverters.$$BigInt.parse(value.accumulativeFloatPerToken),
-                        floatRatePerTokenOverInterval: GqlConverters.$$BigInt.parse(value.floatRatePerTokenOverInterval)
                       };
               })
         };
 }
 
 function serialize$18(value) {
-  var value$1 = value.states;
-  var states = value$1.map(function (value) {
-        var value$1 = value.floatRatePerTokenOverInterval;
-        var value$2 = GqlConverters.$$BigInt.serialize(value$1);
-        var value$3 = value.accumulativeFloatPerToken;
+  var value$1 = value.currentStakes;
+  var currentStakes = value$1.map(function (value) {
+        var value$1 = value.syntheticToken;
+        var value$2 = value$1.latestStakerState;
+        var value$3 = value$2.timestamp;
         var value$4 = GqlConverters.$$BigInt.serialize(value$3);
-        var value$5 = value.stateIndex;
+        var value$5 = value$2.floatRatePerTokenOverInterval;
         var value$6 = GqlConverters.$$BigInt.serialize(value$5);
-        var value$7 = value.__typename;
-        return {
-                __typename: value$7,
-                stateIndex: value$6,
-                accumulativeFloatPerToken: value$4,
-                floatRatePerTokenOverInterval: value$2
-              };
-      });
-  var value$2 = value.currentStakes;
-  var currentStakes = value$2.map(function (value) {
-        var value$1 = value.currentStake;
-        var value$2 = value$1.amount;
-        var value$3 = GqlConverters.$$BigInt.serialize(value$2);
-        var value$4 = value$1.__typename;
+        var value$7 = value$2.accumulativeFloatPerToken;
+        var value$8 = GqlConverters.$$BigInt.serialize(value$7);
+        var value$9 = value$2.__typename;
+        var latestStakerState = {
+          __typename: value$9,
+          accumulativeFloatPerToken: value$8,
+          floatRatePerTokenOverInterval: value$6,
+          timestamp: value$4
+        };
+        var value$10 = value$1.id;
+        var value$11 = value$1.__typename;
+        var syntheticToken = {
+          __typename: value$11,
+          id: value$10,
+          latestStakerState: latestStakerState
+        };
+        var value$12 = value.currentStake;
+        var value$13 = value$12.amount;
+        var value$14 = GqlConverters.$$BigInt.serialize(value$13);
+        var value$15 = value$12.__typename;
         var currentStake = {
-          __typename: value$4,
-          amount: value$3
+          __typename: value$15,
+          amount: value$14
         };
-        var value$5 = value.lastMintState;
-        var value$6 = value$5.accumulativeFloatPerToken;
-        var value$7 = GqlConverters.$$BigInt.serialize(value$6);
-        var value$8 = value$5.timestamp;
-        var value$9 = GqlConverters.$$BigInt.serialize(value$8);
-        var value$10 = value$5.__typename;
+        var value$16 = value.lastMintState;
+        var value$17 = value$16.accumulativeFloatPerToken;
+        var value$18 = GqlConverters.$$BigInt.serialize(value$17);
+        var value$19 = value$16.timestamp;
+        var value$20 = GqlConverters.$$BigInt.serialize(value$19);
+        var value$21 = value$16.__typename;
         var lastMintState = {
-          __typename: value$10,
-          timestamp: value$9,
-          accumulativeFloatPerToken: value$7
+          __typename: value$21,
+          timestamp: value$20,
+          accumulativeFloatPerToken: value$18
         };
-        var value$11 = value.__typename;
+        var value$22 = value.__typename;
         return {
-                __typename: value$11,
+                __typename: value$22,
                 lastMintState: lastMintState,
-                currentStake: currentStake
+                currentStake: currentStake,
+                syntheticToken: syntheticToken
               };
       });
   return {
-          currentStakes: currentStakes,
-          states: states
+          currentStakes: currentStakes
         };
 }
 
 function serializeVariables$11(inp) {
+  var a = inp.synthTokens;
   return {
           userId: inp.userId,
-          synthToken: inp.synthToken
+          synthTokens: a.map(function (b) {
+                return b;
+              })
         };
 }
 
-function makeVariables$11(userId, synthToken, param) {
+function makeVariables$11(userId, synthTokens, param) {
   return {
           userId: userId,
-          synthToken: synthToken
+          synthTokens: synthTokens
         };
 }
 

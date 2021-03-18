@@ -28,12 +28,17 @@ function User$UsersBalances(Props) {
                     body: "$" + FormatMoney.formatEther(undefined, match.totalBalance)
                   })
             }), React.createElement("br", undefined), Belt_Array.map(match.balances, (function (param) {
+                var isLong = param.isLong;
+                var name = param.name;
                 return React.createElement(UserUI.UserMarketBox.make, {
-                            name: param.name,
-                            isLong: param.isLong,
+                            name: name,
+                            isLong: isLong,
                             tokens: FormatMoney.formatEther(undefined, param.tokenBalance),
                             value: FormatMoney.formatEther(undefined, param.tokensValue),
-                            children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {})
+                            children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {}),
+                            key: name + "-" + (
+                              isLong ? "long" : "short"
+                            )
                           });
               })));
   }
@@ -62,6 +67,8 @@ function onQueryError(msg) {
 }
 
 function onQuerySuccess(param) {
+  var stakes = param.stakes;
+  var user = param.user;
   return React.createElement(UserUI.UserContainer.make, {
               children: null
             }, React.createElement(UserUI.UserBanner.make, {}), React.createElement(UserUI.UserColumnContainer.make, {
@@ -94,18 +101,17 @@ function onQuerySuccess(param) {
                     }), React.createElement(UserUI.UserColumn.make, {
                       children: null
                     }, React.createElement(User$UsersBalances, {
-                          userId: param.user
+                          userId: user
                         }), React.createElement("br", undefined), React.createElement(UserUI.UserStakesCard.make, {
-                          stakes: param.stakes
+                          stakes: stakes
                         })), React.createElement(UserUI.UserColumn.make, {
                       children: React.createElement(UserUI.UserColumnCard.make, {
                             children: null
                           }, React.createElement(UserUI.UserColumnHeader.make, {
                                 children: "Float rewards 🔥"
                               }), React.createElement(UserUI.UserFloatBox.make, {
-                                accruing: "3.14159265",
-                                balance: "100.04",
-                                minted: "107.83"
+                                userId: user,
+                                stakes: stakes
                               }))
                     })));
 }

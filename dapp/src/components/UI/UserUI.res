@@ -169,18 +169,49 @@ module UserStakesCard = {
 
 module UserFloatBox = {
   @react.component
-  let make = (~accruing, ~balance, ~minted) => {
-    <div className=`w-11/12 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>
-      <UserColumnTextList>
-        <UserColumnText head=`float accruing` body={accruing} />
-        <UserColumnText head=`float balance` body={balance} />
-        <UserColumnText head=`float minted` body={minted} />
-      </UserColumnTextList>
-      <div className=`flex justify-around flex-row my-1`>
-        {`🌊`->React.string}
-        <Button variant="tiny" onClick={_ => ()}> {`claim float`} </Button>
-        {`🌊`->React.string}
-      </div>
-    </div>
+  let make = (~userId, ~stakes) => {
+    let synthTokens = Js.Array.mapi(
+      (stake: Queries.UsersStakes.UsersStakes_inner.t_currentStakes, i) => {
+        stake.currentStake.syntheticToken.id
+      },
+      stakes,
+    )
+
+    let floatBalances = DataHooks.useFloatBalancesForUser(~userId)
+    let claimableFloat = DataHooks.useTotalClaimableFloatForUser(~userId, ~synthTokens)
+
+    switch floatBalances {
+    | Loading => <MiniLoader />
+    | GraphError(msg) => msg->React.string
+    | Response(floatBalances) => {
+        let floatBalance = floatBalances.floatBalance->FormatMoney.formatEther(~digits=6)
+        let floatMinted = floatBalances.floatMinted->FormatMoney.formatEther(~digits=6)
+
+        switch claimableFloat {
+        | Loading => <MiniLoader />
+        | GraphError(msg) => msg->React.string
+        | Response((totalClaimable, totalPredicted)) => {
+            let floatAccrued =
+              totalClaimable
+              ->Ethers.BigNumber.add(totalPredicted)
+              ->FormatMoney.formatEther(~digits=6)
+
+            <div
+              className=`w-11/12 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>
+              <UserColumnTextList>
+                <UserColumnText head=`float accruing` body={floatAccrued} />
+                <UserColumnText head=`float balance` body={floatBalance} />
+                <UserColumnText head=`float minted` body={floatMinted} />
+              </UserColumnTextList>
+              <div className=`flex justify-around flex-row my-1`>
+                {`🌊`->React.string}
+                <Button variant="tiny" onClick={_ => ()}> {`claim float`} </Button>
+                {`🌊`->React.string}
+              </div>
+            </div>
+          }
+        }
+      }
+    }
   }
 }

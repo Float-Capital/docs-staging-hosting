@@ -49,7 +49,7 @@ query ($synthToken: String!, $userAddress: String!) {
 module Claimable = {
   @react.component
   let make = (~userAddress, ~synthToken) => {
-    let floatDetails = DataHooks.useFloatDetailsForUser(~userId=userAddress, ~synthToken)
+    let floatDetails = DataHooks.useClaimableFloatForUser(~userId=userAddress, ~synthToken)
 
     switch floatDetails {
     | Response((claimableFloat, predictedFloat)) => {

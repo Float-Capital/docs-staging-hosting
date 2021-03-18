@@ -29,6 +29,7 @@ module UsersBalances = {
           {balances
           ->Array.map(({name, isLong, tokenBalance, tokensValue}) =>
             <UserMarketBox
+              key={`${name}-${isLong ? "long" : "short"}`}
               name
               isLong
               tokens={FormatMoney.formatEther(tokenBalance)}
@@ -80,7 +81,7 @@ module User = {
         <UserColumn>
           <UserColumnCard>
             <UserColumnHeader> {`Float rewards 🔥`->React.string} </UserColumnHeader>
-            <UserFloatBox accruing=`3.14159265` balance=`100.04` minted=`107.83` />
+            <UserFloatBox userId={user} stakes={stakes} />
           </UserColumnCard>
         </UserColumn>
       </UserColumnContainer>

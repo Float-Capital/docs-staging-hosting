@@ -383,7 +383,7 @@ var LastUserStakeUpdate = {
 function FloatManagement$Claimable(Props) {
   var userAddress = Props.userAddress;
   var synthToken = Props.synthToken;
-  var floatDetails = DataHooks.useFloatDetailsForUser(userAddress, synthToken);
+  var floatDetails = DataHooks.useClaimableFloatForUser(userAddress, synthToken);
   if (typeof floatDetails === "number") {
     return "Loading float details...";
   }
