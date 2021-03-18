@@ -552,8 +552,6 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
     event
   );
 
-  systemState.longTokenPrice = longTokenPrice.toString();
-  systemState.shortTokenPrice = shortTokenPrice.toString();
   syntheticMarket.latestSystemState = systemState.id;
   systemState.save();
   syntheticMarket.save();
