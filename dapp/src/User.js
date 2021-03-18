@@ -9,8 +9,10 @@ import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as MiniLoader from "./components/UI/MiniLoader.js";
 import * as FormatMoney from "./components/UI/FormatMoney.js";
 import * as Router from "next/router";
+import * as DisplayAddress from "./components/UI/DisplayAddress.js";
+import Format from "date-fns/format";
 
-function User$UsersBalances(Props) {
+function User$UserBalancesCard(Props) {
   var userId = Props.userId;
   var usersTokensQuery = DataHooks.useUsersBalances(userId);
   var tmp;
@@ -56,8 +58,43 @@ function User$UsersBalances(Props) {
                 }));
 }
 
-var UsersBalances = {
-  make: User$UsersBalances
+var UserBalancesCard = {
+  make: User$UserBalancesCard
+};
+
+function User$UserProfileCard(Props) {
+  var userInfo = Props.userInfo;
+  var addressStr = DisplayAddress.ellipsifyMiddle(userInfo.id, 8, 3);
+  var joinedStr = Format(userInfo.joinedAt, "P");
+  var txStr = userInfo.transactionCount.toString();
+  var gasStr = FormatMoney.formatInt(userInfo.gasUsed.toString());
+  return React.createElement(UserUI.UserColumnCard.make, {
+              children: null
+            }, React.createElement(UserUI.UserProfileHeader.make, {
+                  userId: userInfo.id
+                }), React.createElement(UserUI.UserColumnTextList.make, {
+                  children: null
+                }, React.createElement(UserUI.UserColumnText.make, {
+                      head: "📮 Address",
+                      body: addressStr
+                    }), React.createElement(UserUI.UserColumnText.make, {
+                      head: "🎉 Joined",
+                      body: joinedStr
+                    }), React.createElement(UserUI.UserColumnText.make, {
+                      head: "⛽ Gas used",
+                      body: gasStr
+                    }), React.createElement(UserUI.UserColumnText.make, {
+                      head: "🏃 No. txs",
+                      body: txStr
+                    }), React.createElement(UserUI.UserColumnText.make, {
+                      icon: "/img/discord.png",
+                      head: "Discord",
+                      body: "✅"
+                    })));
+}
+
+var UserProfileCard = {
+  make: User$UserProfileCard
 };
 
 function onQueryError(msg) {
@@ -66,52 +103,29 @@ function onQueryError(msg) {
             });
 }
 
-function onQuerySuccess(param) {
-  var stakes = param.stakes;
-  var user = param.user;
+function onQuerySuccess(data) {
   return React.createElement(UserUI.UserContainer.make, {
               children: null
             }, React.createElement(UserUI.UserBanner.make, {}), React.createElement(UserUI.UserColumnContainer.make, {
                   children: null
                 }, React.createElement(UserUI.UserColumn.make, {
-                      children: React.createElement(UserUI.UserColumnCard.make, {
-                            children: null
-                          }, React.createElement(UserUI.UserProfileHeader.make, {
-                                name: "moose-code",
-                                level: "1"
-                              }), React.createElement(UserUI.UserColumnTextList.make, {
-                                children: null
-                              }, React.createElement(UserUI.UserColumnText.make, {
-                                    head: "📮 Address",
-                                    body: "0x1234...1234"
-                                  }), React.createElement(UserUI.UserColumnText.make, {
-                                    head: "🎉 Joined",
-                                    body: "03/02/2021"
-                                  }), React.createElement(UserUI.UserColumnText.make, {
-                                    head: "⛽ Gas used",
-                                    body: "6,789,000"
-                                  }), React.createElement(UserUI.UserColumnText.make, {
-                                    head: "🏃 No. txs",
-                                    body: "11"
-                                  }), React.createElement(UserUI.UserColumnText.make, {
-                                    icon: "/img/discord.png",
-                                    head: "Discord",
-                                    body: "✅"
-                                  })))
+                      children: React.createElement(User$UserProfileCard, {
+                            userInfo: data.userInfo
+                          })
                     }), React.createElement(UserUI.UserColumn.make, {
                       children: null
-                    }, React.createElement(User$UsersBalances, {
-                          userId: user
+                    }, React.createElement(User$UserBalancesCard, {
+                          userId: data.user
                         }), React.createElement("br", undefined), React.createElement(UserUI.UserStakesCard.make, {
-                          stakes: stakes
+                          stakes: data.stakes
                         })), React.createElement(UserUI.UserColumn.make, {
                       children: React.createElement(UserUI.UserColumnCard.make, {
                             children: null
                           }, React.createElement(UserUI.UserColumnHeader.make, {
                                 children: "Float rewards 🔥"
                               }), React.createElement(UserUI.UserFloatBox.make, {
-                                userId: user,
-                                stakes: stakes
+                                userId: data.user,
+                                stakes: data.stakes
                               }))
                     })));
 }
@@ -120,17 +134,21 @@ function User$User(Props) {
   var router = Router.useRouter();
   var userStr = Js_dict.get(router.query, "user");
   var user = userStr !== undefined ? userStr.toLowerCase() : "no user provided";
-  var activeStakes = DataHooks.useStakesForUser(user);
-  if (typeof activeStakes === "number") {
+  var stakesQuery = DataHooks.useStakesForUser(user);
+  var userInfoQuery = DataHooks.useBasicUserInfo(user);
+  var msg = DataHooks.liftGraphResponse2(stakesQuery, userInfoQuery);
+  if (typeof msg === "number") {
     return React.createElement(Loader.make, {});
-  } else if (activeStakes.TAG === /* GraphError */0) {
-    return onQueryError(activeStakes._0);
-  } else {
-    return onQuerySuccess({
-                user: user,
-                stakes: activeStakes._0
-              });
   }
+  if (msg.TAG === /* GraphError */0) {
+    return onQueryError(msg._0);
+  }
+  var match = msg._0;
+  return onQuerySuccess({
+              user: user,
+              userInfo: match[1],
+              stakes: match[0]
+            });
 }
 
 var User = {
@@ -144,7 +162,8 @@ function $$default(param) {
 }
 
 export {
-  UsersBalances ,
+  UserBalancesCard ,
+  UserProfileCard ,
   User ,
   $$default ,
   $$default as default,

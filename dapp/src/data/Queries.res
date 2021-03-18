@@ -7,6 +7,7 @@ fragment BasicUserInfo on User {
   floatTokenBalance
   numberOfTransactions
   totalGasUsed
+  timestampJoined
 }
 fragment LatestSynthPrice on LatestPrice {
   id

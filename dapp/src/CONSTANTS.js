@@ -10,6 +10,8 @@ var zeroBN = Ethers.BigNumber.from(0);
 
 var tenToThe6 = Ethers.BigNumber.from("1000000");
 
+var tenToThe9 = Ethers.BigNumber.from("1000000000");
+
 var tenToThe18 = Ethers.BigNumber.from("1000000000000000000");
 
 var tenToThe42 = tenToThe6.mul(tenToThe18).mul(tenToThe18);
@@ -21,6 +23,7 @@ export {
   zeroAddress ,
   zeroBN ,
   tenToThe6 ,
+  tenToThe9 ,
   tenToThe18 ,
   tenToThe42 ,
   oneHundredEth ,

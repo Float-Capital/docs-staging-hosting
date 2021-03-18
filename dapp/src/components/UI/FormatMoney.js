@@ -6,6 +6,10 @@ function format(__x) {
   return __x.replace(/\d(?=(\d{3})+\.)/g, "$&,");
 }
 
+function formatInt(__x) {
+  return __x.replace(/\d(?=(\d{3})+$)/g, "$&,");
+}
+
 function formatFloat(digitsOpt, number) {
   var digits = digitsOpt !== undefined ? digitsOpt : 2;
   return format(number.toFixed(digits));
@@ -23,6 +27,7 @@ function formatEther(digitsOpt, rawNumber) {
 
 export {
   format ,
+  formatInt ,
   formatFloat ,
   toCentsFixedNoRounding ,
   formatEther ,

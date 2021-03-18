@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import * as Button from "./Button.js";
+import * as Ethers from "ethers";
 import * as CONSTANTS from "../../CONSTANTS.js";
 import * as DataHooks from "../../data/DataHooks.js";
 import * as MiniLoader from "./MiniLoader.js";
@@ -81,8 +82,7 @@ var UserColumnHeader = {
 };
 
 function UserUI$UserProfileHeader(Props) {
-  var name = Props.name;
-  var level = Props.level;
+  var level = Ethers.BigNumber.from(1);
   return React.createElement("div", {
               className: "w-full flex flex-row justify-around"
             }, React.createElement("div", {
@@ -92,7 +92,7 @@ function UserUI$UserProfileHeader(Props) {
                       src: "/img/mario.png"
                     })), React.createElement("div", {
                   className: "flex flex-col text-center justify-center"
-                }, React.createElement("div", undefined, name), React.createElement("div", undefined, "Lvl. " + level)));
+                }, React.createElement("div", undefined, "moose-code"), React.createElement("div", undefined, "Lvl. " + level.toString())));
 }
 
 var UserProfileHeader = {

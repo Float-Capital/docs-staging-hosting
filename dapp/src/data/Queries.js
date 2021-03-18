@@ -14,6 +14,7 @@ var query = (require("@apollo/client").gql`
     floatTokenBalance
     numberOfTransactions
     totalGasUsed
+    timestampJoined
   }
 `);
 
@@ -24,28 +25,32 @@ function parse(value) {
           totalMintedFloat: GqlConverters.$$BigInt.parse(value.totalMintedFloat),
           floatTokenBalance: GqlConverters.$$BigInt.parse(value.floatTokenBalance),
           numberOfTransactions: GqlConverters.$$BigInt.parse(value.numberOfTransactions),
-          totalGasUsed: GqlConverters.$$BigInt.parse(value.totalGasUsed)
+          totalGasUsed: GqlConverters.$$BigInt.parse(value.totalGasUsed),
+          timestampJoined: GqlConverters.$$BigInt.parse(value.timestampJoined)
         };
 }
 
 function serialize(value) {
-  var value$1 = value.totalGasUsed;
+  var value$1 = value.timestampJoined;
   var value$2 = GqlConverters.$$BigInt.serialize(value$1);
-  var value$3 = value.numberOfTransactions;
+  var value$3 = value.totalGasUsed;
   var value$4 = GqlConverters.$$BigInt.serialize(value$3);
-  var value$5 = value.floatTokenBalance;
+  var value$5 = value.numberOfTransactions;
   var value$6 = GqlConverters.$$BigInt.serialize(value$5);
-  var value$7 = value.totalMintedFloat;
+  var value$7 = value.floatTokenBalance;
   var value$8 = GqlConverters.$$BigInt.serialize(value$7);
-  var value$9 = value.id;
-  var value$10 = value.__typename;
+  var value$9 = value.totalMintedFloat;
+  var value$10 = GqlConverters.$$BigInt.serialize(value$9);
+  var value$11 = value.id;
+  var value$12 = value.__typename;
   return {
-          __typename: value$10,
-          id: value$9,
-          totalMintedFloat: value$8,
-          floatTokenBalance: value$6,
-          numberOfTransactions: value$4,
-          totalGasUsed: value$2
+          __typename: value$12,
+          id: value$11,
+          totalMintedFloat: value$10,
+          floatTokenBalance: value$8,
+          numberOfTransactions: value$6,
+          totalGasUsed: value$4,
+          timestampJoined: value$2
         };
 }
 

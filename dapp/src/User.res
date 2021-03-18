@@ -1,7 +1,7 @@
 open UserUI
 open DataHooks
 
-module UsersBalances = {
+module UserBalancesCard = {
   @react.component
   let make = (~userId) => {
     /*
@@ -48,10 +48,37 @@ module UsersBalances = {
   }
 }
 
+module UserProfileCard = {
+  @react.component
+  let make = (~userInfo) => {
+    let addressStr = DisplayAddress.ellipsifyMiddle(
+      ~inputString=userInfo.id,
+      ~maxLength=8,
+      ~trailingCharacters=3,
+    )
+    let joinedStr = userInfo.joinedAt->DateFns.format("P")
+    let txStr = userInfo.transactionCount->Ethers.BigNumber.toString
+    let gasStr = userInfo.gasUsed->Ethers.BigNumber.toString->FormatMoney.formatInt
+
+    <UserColumnCard>
+      <UserProfileHeader userId={userInfo.id} />
+      <UserColumnTextList>
+        <UserColumnText head=`📮 Address` body={addressStr} />
+        <UserColumnText head=`🎉 Joined` body={joinedStr} />
+        <UserColumnText head=`⛽ Gas used` body={gasStr} />
+        <UserColumnText head=`🏃 No. txs` body={txStr} />
+        // TODO: fetch from graph somehow
+        <UserColumnText icon="/img/discord.png" head=`Discord` body=`✅` />
+      </UserColumnTextList>
+    </UserColumnCard>
+  }
+}
+
 module User = {
   @ocaml.doc(`Represents all the data required to render the user page.`)
   type userData = {
     user: string,
+    userInfo: DataHooks.basicUserInfo,
     stakes: array<Queries.UsersStakes.UsersStakes_inner.t_currentStakes>,
   }
 
@@ -59,29 +86,18 @@ module User = {
     <UserContainer> {`Error: ${msg}`->React.string} </UserContainer>
   }
 
-  let onQuerySuccess = ({stakes, user}: userData) => {
+  let onQuerySuccess = (data: userData) => {
     <UserContainer>
       <UserBanner />
       <UserColumnContainer>
+        <UserColumn> <UserProfileCard userInfo={data.userInfo} /> </UserColumn>
         <UserColumn>
-          <UserColumnCard>
-            <UserProfileHeader name="moose-code" level="1" />
-            <UserColumnTextList>
-              <UserColumnText head=`📮 Address` body=`0x1234...1234` />
-              <UserColumnText head=`🎉 Joined` body=`03/02/2021` />
-              <UserColumnText head=`⛽ Gas used` body=`6,789,000` />
-              <UserColumnText head=`🏃 No. txs` body=`11` />
-              <UserColumnText icon="/img/discord.png" head=`Discord` body=`✅` />
-            </UserColumnTextList>
-          </UserColumnCard>
-        </UserColumn>
-        <UserColumn>
-          <UsersBalances userId=user /> <br /> <UserStakesCard stakes={stakes} />
+          <UserBalancesCard userId={data.user} /> <br /> <UserStakesCard stakes={data.stakes} />
         </UserColumn>
         <UserColumn>
           <UserColumnCard>
             <UserColumnHeader> {`Float rewards 🔥`->React.string} </UserColumnHeader>
-            <UserFloatBox userId={user} stakes={stakes} />
+            <UserFloatBox userId={data.user} stakes={data.stakes} />
           </UserColumnCard>
         </UserColumn>
       </UserColumnContainer>
@@ -96,10 +112,12 @@ module User = {
     | Some(userStr) => userStr->Js.String.toLowerCase
     }
 
-    let activeStakes = useStakesForUser(~userId=user)
+    let stakesQuery = useStakesForUser(~userId=user)
+    let userInfoQuery = useBasicUserInfo(~userId=user)
 
-    switch activeStakes {
-    | Response(stakes) => onQuerySuccess({user: user, stakes: stakes})
+    switch liftGraphResponse2(stakesQuery, userInfoQuery) {
+    | Response((stakes, userInfo)) =>
+      onQuerySuccess({user: user, stakes: stakes, userInfo: userInfo})
     | GraphError(msg) => onQueryError(msg)
     | Loading => <Loader />
     }

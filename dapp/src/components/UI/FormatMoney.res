@@ -1,5 +1,8 @@
-@ocaml.doc(`Adds a comma between groups of 3 decimals`)
+@ocaml.doc(`Adds a comma between groups of 3 digits to a floating point string`)
 let format = Js.String2.replaceByRe(_, %re("/\d(?=(\d{3})+\.)/g"), "$&,")
+
+@ocaml.doc(`Adds a comma between groups of 3 digits to an integer string`)
+let formatInt = Js.String2.replaceByRe(_, %re("/\d(?=(\d{3})+$)/g"), "$&,")
 
 @ocaml.doc(`Formats a float to 2 digits precision with groups of 3 decimals separated by a comma`)
 let formatFloat = (~digits=2, number) => number->Js.Float.toFixedWithPrecision(~digits)->format
