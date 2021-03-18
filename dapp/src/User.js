@@ -37,7 +37,9 @@ function User$UserBalancesCard(Props) {
                             isLong: isLong,
                             tokens: FormatMoney.formatEther(undefined, param.tokenBalance),
                             value: FormatMoney.formatEther(undefined, param.tokensValue),
-                            children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {}),
+                            children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {
+                                  synthAddress: param.addr
+                                }),
                             key: name + "-" + (
                               isLong ? "long" : "short"
                             )
@@ -70,9 +72,7 @@ function User$UserProfileCard(Props) {
   var gasStr = FormatMoney.formatInt(userInfo.gasUsed.toString());
   return React.createElement(UserUI.UserColumnCard.make, {
               children: null
-            }, React.createElement(UserUI.UserProfileHeader.make, {
-                  userId: userInfo.id
-                }), React.createElement(UserUI.UserColumnTextList.make, {
+            }, React.createElement(UserUI.UserProfileHeader.make, {}), React.createElement(UserUI.UserColumnTextList.make, {
                   children: null
                 }, React.createElement(UserUI.UserColumnText.make, {
                       head: "📮 Address",
@@ -119,14 +119,10 @@ function onQuerySuccess(data) {
                         }), React.createElement("br", undefined), React.createElement(UserUI.UserStakesCard.make, {
                           stakes: data.stakes
                         })), React.createElement(UserUI.UserColumn.make, {
-                      children: React.createElement(UserUI.UserColumnCard.make, {
-                            children: null
-                          }, React.createElement(UserUI.UserColumnHeader.make, {
-                                children: "Float rewards 🔥"
-                              }), React.createElement(UserUI.UserFloatBox.make, {
-                                userId: data.user,
-                                stakes: data.stakes
-                              }))
+                      children: React.createElement(UserUI.UserFloatCard.make, {
+                            userId: data.user,
+                            stakes: data.stakes
+                          })
                     })));
 }
 

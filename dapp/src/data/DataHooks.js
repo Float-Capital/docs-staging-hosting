@@ -4,10 +4,40 @@ import * as Misc from "../libraries/Misc.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Client from "./Client.js";
+import * as Ethers from "ethers";
 import * as Queries from "./Queries.js";
 import * as CONSTANTS from "../CONSTANTS.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import FromUnixTime from "date-fns/fromUnixTime";
+
+function liftGraphResponse2(a, b) {
+  if (typeof a === "number") {
+    return /* Loading */0;
+  } else if (a.TAG === /* GraphError */0) {
+    return {
+            TAG: 0,
+            _0: a._0,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else if (typeof b === "number") {
+    return /* Loading */0;
+  } else if (b.TAG === /* GraphError */0) {
+    return {
+            TAG: 0,
+            _0: b._0,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return {
+            TAG: 1,
+            _0: [
+              a._0,
+              b._0
+            ],
+            [Symbol.for("name")]: "Response"
+          };
+  }
+}
 
 function useGetStakes(param) {
   var stakeDetailsQuery = Curry.app(Queries.StakingDetails.use, [
@@ -69,35 +99,23 @@ function useGetStakes(param) {
               });
           
         }), []);
-  return stakeDetailsQuery;
-}
-
-function liftGraphResponse2(a, b) {
-  if (typeof a === "number") {
-    return /* Loading */0;
-  } else if (a.TAG === /* GraphError */0) {
+  var match = stakeDetailsQuery.data;
+  if (match !== undefined) {
     return {
-            TAG: 0,
-            _0: a._0,
-            [Symbol.for("name")]: "GraphError"
+            TAG: 1,
+            _0: match.syntheticMarkets,
+            [Symbol.for("name")]: "Response"
           };
-  } else if (typeof b === "number") {
-    return /* Loading */0;
-  } else if (b.TAG === /* GraphError */0) {
+  }
+  var match$1 = stakeDetailsQuery.error;
+  if (match$1 !== undefined) {
     return {
             TAG: 0,
-            _0: b._0,
+            _0: match$1.message,
             [Symbol.for("name")]: "GraphError"
           };
   } else {
-    return {
-            TAG: 1,
-            _0: [
-              a._0,
-              b._0
-            ],
-            [Symbol.for("name")]: "Response"
-          };
+    return /* Loading */0;
   }
 }
 
@@ -266,9 +284,11 @@ function useUsersBalances(userId) {
             var match = param$1.syntheticToken;
             var tokenBalance = param$1.tokenBalance;
             var isLong = match.tokenType === "Long";
+            var newToken_addr = Ethers.utils.getAddress(match.id);
             var newToken_name = match.syntheticMarket.name;
             var newToken_tokensValue = match.latestPrice.price.price.mul(tokenBalance).div(CONSTANTS.tenToThe18);
             var newToken = {
+              addr: newToken_addr,
               name: newToken_name,
               isLong: isLong,
               tokenBalance: tokenBalance,
@@ -402,8 +422,8 @@ function useBasicUserInfo(userId) {
 }
 
 export {
-  useGetStakes ,
   liftGraphResponse2 ,
+  useGetStakes ,
   useTotalClaimableFloatForUser ,
   useClaimableFloatForUser ,
   useStakesForUser ,

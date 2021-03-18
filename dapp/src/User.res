@@ -27,14 +27,14 @@ module UserBalancesCard = {
           </UserColumnTextCenter>
           <br />
           {balances
-          ->Array.map(({name, isLong, tokenBalance, tokensValue}) =>
+          ->Array.map(({addr, name, isLong, tokenBalance, tokensValue}) =>
             <UserMarketBox
               key={`${name}-${isLong ? "long" : "short"}`}
               name
               isLong
               tokens={FormatMoney.formatEther(tokenBalance)}
               value={FormatMoney.formatEther(tokensValue)}>
-              <UserMarketStakeOrRedeem />
+              <UserMarketStakeOrRedeem synthAddress={addr} />
             </UserMarketBox>
           )
           ->React.array}
@@ -61,7 +61,7 @@ module UserProfileCard = {
     let gasStr = userInfo.gasUsed->Ethers.BigNumber.toString->FormatMoney.formatInt
 
     <UserColumnCard>
-      <UserProfileHeader userId={userInfo.id} />
+      <UserProfileHeader />
       <UserColumnTextList>
         <UserColumnText head=`📮 Address` body={addressStr} />
         <UserColumnText head=`🎉 Joined` body={joinedStr} />
@@ -94,12 +94,7 @@ module User = {
         <UserColumn>
           <UserBalancesCard userId={data.user} /> <br /> <UserStakesCard stakes={data.stakes} />
         </UserColumn>
-        <UserColumn>
-          <UserColumnCard>
-            <UserColumnHeader> {`Float rewards 🔥`->React.string} </UserColumnHeader>
-            <UserFloatBox userId={data.user} stakes={data.stakes} />
-          </UserColumnCard>
-        </UserColumn>
+        <UserColumn> <UserFloatCard userId={data.user} stakes={data.stakes} /> </UserColumn>
       </UserColumnContainer>
     </UserContainer>
   }
