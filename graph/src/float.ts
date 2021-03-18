@@ -9,36 +9,24 @@ import {
   ShortRedeem,
   TokenPriceRefreshed,
   ValueLockedInSystem,
-  LongShort,
   FeesChanges,
 } from "../generated/LongShort/LongShort";
 import {
-  StateChange,
-  EventParam,
-  EventParams,
   SyntheticMarket,
   FeeStructure,
   GlobalState,
-  YieldManager,
   Staker,
   TokenFactory,
   LongShortContract,
-  UserSyntheticTokenMinted,
   SyntheticToken,
-  CurrentStake,
-  Stake,
-  User,
-  State,
-  Transfer,
   LatestPrice,
   Price,
 } from "../generated/schema";
-import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
+import { BigInt, log } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import {
   getOrCreateLatestSystemState,
   getOrCreateStakerState,
-  getOrCreateUser,
   createSyntheticTokenLong,
   createSyntheticTokenShort,
   createInitialSystemState,
@@ -49,14 +37,10 @@ import {
 } from "./utils/helperFunctions";
 import {
   ZERO,
-  TEN_TO_THE_18,
   GLOBAL_STATE_ID,
-  YIELD_MANAGER_ID,
-  ORACLE_AGREGATOR_ID,
   STAKER_ID,
   TOKEN_FACTORY_ID,
   LONG_SHORT_ID,
-  ZERO_ADDRESS,
 } from "./CONSTANTS";
 
 export function handleV1(event: V1): void {

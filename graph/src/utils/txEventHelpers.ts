@@ -4,8 +4,8 @@ import {
   EventParams,
   GlobalState,
 } from "../../generated/schema";
-import { BigInt, Address, Bytes, log, ethereum } from "@graphprotocol/graph-ts";
-import { ZERO, ONE, ZERO_ADDRESS, GLOBAL_STATE_ID } from "../CONSTANTS";
+import { Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { ONE, ZERO_ADDRESS, GLOBAL_STATE_ID } from "../CONSTANTS";
 import { getOrCreateUser } from "./globalStateManager";
 
 function getEventIndex(txHash: Bytes): i32 {

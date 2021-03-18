@@ -1,13 +1,6 @@
 import { Transfer as TransferEvent } from "../generated/templates/erc20/erc20";
 import { SyntheticToken, Transfer } from "../generated/schema";
-import {
-  BigInt,
-  Address,
-  Bytes,
-  log,
-  dataSource,
-  DataSourceContext,
-} from "@graphprotocol/graph-ts";
+import { log, dataSource } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import {
   updateBalanceTransfer,
