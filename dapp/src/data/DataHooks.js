@@ -5,9 +5,11 @@ import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Client from "./Client.js";
 import * as Ethers from "ethers";
+import * as Globals from "../libraries/Globals.js";
 import * as Queries from "./Queries.js";
 import * as CONSTANTS from "../CONSTANTS.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import FromUnixTime from "date-fns/fromUnixTime";
 
 function liftGraphResponse2(a, b) {
@@ -421,8 +423,98 @@ function useBasicUserInfo(userId) {
   }
 }
 
+function useSyntheticTokenBalance(user, tokenAddress) {
+  var syntheticBalanceQuery = Curry.app(Queries.UsersBalance.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: Globals.ethAdrToLowerStr(user),
+          tokenAdr: Globals.ethAdrToLowerStr(tokenAddress)
+        }
+      ]);
+  var match = syntheticBalanceQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.user;
+    if (match$1 !== undefined) {
+      var match$2 = match$1.tokenBalances;
+      if (match$2 !== undefined && match$2.length === 1) {
+        var match$3 = match$2[0];
+        return {
+                TAG: 1,
+                _0: match$3.tokenBalance,
+                [Symbol.for("name")]: "Response"
+              };
+      }
+      
+    }
+    
+  }
+  var match$4 = syntheticBalanceQuery.error;
+  if (match$4 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$4.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
+function graphResponseToOption(maybeData) {
+  if (typeof maybeData === "number" || maybeData.TAG === /* GraphError */0) {
+    return ;
+  } else {
+    return Caml_option.some(maybeData._0);
+  }
+}
+
+function graphResponseToResult(maybeData) {
+  if (typeof maybeData === "number") {
+    return {
+            TAG: 0,
+            _0: /* Loading */0,
+            [Symbol.for("name")]: "Ok"
+          };
+  } else if (maybeData.TAG === /* GraphError */0) {
+    return {
+            TAG: 1,
+            _0: maybeData._0,
+            [Symbol.for("name")]: "Error"
+          };
+  } else {
+    return {
+            TAG: 0,
+            _0: {
+              _0: maybeData._0,
+              [Symbol.for("name")]: "Data"
+            },
+            [Symbol.for("name")]: "Ok"
+          };
+  }
+}
+
+var Util = {
+  graphResponseToOption: graphResponseToOption,
+  graphResponseToResult: graphResponseToResult
+};
+
+var ethAdrToLowerStr = Globals.ethAdrToLowerStr;
+
 export {
   liftGraphResponse2 ,
+  ethAdrToLowerStr ,
   useGetStakes ,
   useTotalClaimableFloatForUser ,
   useClaimableFloatForUser ,
@@ -430,6 +522,8 @@ export {
   useUsersBalances ,
   useFloatBalancesForUser ,
   useBasicUserInfo ,
+  useSyntheticTokenBalance ,
+  Util ,
   
 }
 /* Misc Not a pure module */

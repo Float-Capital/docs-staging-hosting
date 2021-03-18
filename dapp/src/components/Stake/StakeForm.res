@@ -1,4 +1,3 @@
-open Globals
 module StakeForm = %form(
   type input = {amount: string}
   type output = {amount: Ethers.BigNumber.t}
@@ -88,14 +87,11 @@ module ConnectedStakeForm = {
     let stakerContractAddress = Config.useStakerAddress()
 
     let user = RootProvider.useCurrentUserExn()
-    let syntheticBalanceQuery = Queries.UsersBalance.use({
-      userId: user->ethAdrToLowerStr,
-      tokenAdr: synthetic.tokenAddress->ethAdrToLowerStr,
-    })
-    let optTokenBalance = switch syntheticBalanceQuery {
-    | {data: Some({user: Some({tokenBalances: Some([{tokenBalance}])})})} => Some(tokenBalance)
-    | _ => None
-    }
+    let optTokenBalance =
+      DataHooks.useSyntheticTokenBalance(
+        ~user,
+        ~tokenAddress=synthetic.tokenAddress,
+      )->DataHooks.Util.graphResponseToOption
 
     // Execute the call after approval has completed
     React.useEffect1(() => {

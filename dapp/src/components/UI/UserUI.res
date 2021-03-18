@@ -123,7 +123,9 @@ module UserMarketStakeOrRedeem = {
     let stake = _ =>
       router->Next.Router.push(`/stake?tokenAddress=${synthAddress->Ethers.Utils.ethAdrToLowerStr}`)
     let redeem = _ =>
-      router->Next.Router.push(`/redeem?tokenAddress=${synthAddress->Ethers.Utils.ethAdrToLowerStr}`)
+      router->Next.Router.push(
+        `/redeem?tokenAddress=${synthAddress->Ethers.Utils.ethAdrToLowerStr}`,
+      )
 
     <div className=`flex flex-col`>
       <Button variant="tiny" onClick={stake}> {`stake`} </Button>
@@ -187,12 +189,10 @@ module UserStakesCard = {
 module UserFloatCard = {
   @react.component
   let make = (~userId, ~stakes) => {
-    let synthTokens = Js.Array.map(
-      (stake: Queries.UsersStakes.UsersStakes_inner.t_currentStakes) => {
+    let synthTokens =
+      stakes->Array.map((stake: Queries.UsersStakes.UsersStakes_inner.t_currentStakes) => {
         stake.currentStake.syntheticToken.id
-      },
-      stakes,
-    )
+      })
 
     // TODO: fix these URLs once minting float gets implemented
     let router = Next.Router.useRouter()

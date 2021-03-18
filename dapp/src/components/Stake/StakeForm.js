@@ -9,9 +9,9 @@ import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Loader from "../UI/Loader.js";
 import * as Ethers$1 from "ethers";
-import * as Globals from "../../libraries/Globals.js";
 import * as Queries from "../../data/Queries.js";
 import * as Contracts from "../../ethereum/Contracts.js";
+import * as DataHooks from "../../data/DataHooks.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as AmountInput from "../UI/AmountInput.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
@@ -520,43 +520,7 @@ function StakeForm$ConnectedStakeForm(Props) {
   var contractExecutionHandlerApprove = match$2[0];
   var stakerContractAddress = Config.useStakerAddress(undefined);
   var user = RootProvider.useCurrentUserExn(undefined);
-  var syntheticBalanceQuery = Curry.app(Queries.UsersBalance.use, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        {
-          userId: Globals.ethAdrToLowerStr(user),
-          tokenAdr: Globals.ethAdrToLowerStr(synthetic.tokenAddress)
-        }
-      ]);
-  var match$3 = syntheticBalanceQuery.data;
-  var optTokenBalance;
-  if (match$3 !== undefined) {
-    var match$4 = match$3.user;
-    if (match$4 !== undefined) {
-      var match$5 = match$4.tokenBalances;
-      if (match$5 !== undefined && match$5.length === 1) {
-        var match$6 = match$5[0];
-        optTokenBalance = Caml_option.some(match$6.tokenBalance);
-      } else {
-        optTokenBalance = undefined;
-      }
-    } else {
-      optTokenBalance = undefined;
-    }
-  } else {
-    optTokenBalance = undefined;
-  }
+  var optTokenBalance = DataHooks.Util.graphResponseToOption(DataHooks.useSyntheticTokenBalance(user, synthetic.tokenAddress));
   React.useEffect((function () {
           if (typeof txStateApprove !== "number" && txStateApprove.TAG === /* Complete */2) {
             Curry._1(contractActionToCallAfterApproval, undefined);
