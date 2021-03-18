@@ -268,18 +268,7 @@ function useUsersBalances(userId) {
               [Symbol.for("name")]: "Response"
             };
     }
-    var tokenBalances = match$1.tokenBalances;
-    if (tokenBalances === undefined) {
-      return {
-              TAG: 1,
-              _0: {
-                totalBalance: CONSTANTS.zeroBN,
-                balances: []
-              },
-              [Symbol.for("name")]: "Response"
-            };
-    }
-    var result = Belt_Array.reduce(tokenBalances, {
+    var result = Belt_Array.reduce(match$1.tokenBalances, {
           totalBalance: CONSTANTS.zeroBN,
           balances: []
         }, (function (param, param$1) {
@@ -448,7 +437,7 @@ function useSyntheticTokenBalance(user, tokenAddress) {
     var match$1 = match.user;
     if (match$1 !== undefined) {
       var match$2 = match$1.tokenBalances;
-      if (match$2 !== undefined && match$2.length === 1) {
+      if (match$2.length === 1) {
         var match$3 = match$2[0];
         return {
                 TAG: 1,

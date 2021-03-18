@@ -38,7 +38,7 @@ query ($synthToken: String!, $userAddress: String!) {
       amount
     }
   }
-  states (first:1, orderBy: stateIndex, orderDirection:desc, where: {syntheticToken: $synthToken, timeSinceLastUpdate_gt: 0}) {
+  stakeStates (first:1, orderBy: stateIndex, orderDirection:desc, where: {syntheticToken: $synthToken, timeSinceLastUpdate_gt: 0}) {
     stateIndex
     accumulativeFloatPerToken
     floatRatePerTokenOverInterval

@@ -137,7 +137,7 @@ let useUsersBalances = (~userId) => {
   let usersTokensQuery = Queries.UsersBalances.use({userId: userId})
 
   switch usersTokensQuery {
-  | {data: Some({user: Some({tokenBalances: Some(tokenBalances)})})} =>
+  | {data: Some({user: Some({tokenBalances})})} =>
     let result = tokenBalances->Array.reduce({totalBalance: CONSTANTS.zeroBN, balances: []}, (
       {totalBalance, balances},
       {
@@ -161,9 +161,7 @@ let useUsersBalances = (~userId) => {
       }
     })
     Response(result)
-  | {data: Some({user: Some({tokenBalances: None})})}
-  | {data: Some({user: None})} =>
-    Response({totalBalance: CONSTANTS.zeroBN, balances: []})
+  | {data: Some({user: None})} => Response({totalBalance: CONSTANTS.zeroBN, balances: []})
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
   }
@@ -247,7 +245,7 @@ let useSyntheticTokenBalance = (~user, ~tokenAddress) => {
   })
 
   switch syntheticBalanceQuery {
-  | {data: Some({user: Some({tokenBalances: Some([{tokenBalance}])})})} => Response(tokenBalance)
+  | {data: Some({user: Some({tokenBalances: [{tokenBalance}]})})} => Response(tokenBalance)
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
   }

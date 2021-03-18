@@ -637,7 +637,7 @@ function parse$7(value) {
     var value$2 = value$1.tokenBalances;
     tmp = {
       __typename: value$1.__typename,
-      tokenBalances: !(value$2 == null) ? value$2.map(parse$5) : undefined
+      tokenBalances: value$2.map(parse$5)
     };
   }
   return {
@@ -650,7 +650,7 @@ function serialize$7(value) {
   var user;
   if (value$1 !== undefined) {
     var value$2 = value$1.tokenBalances;
-    var tokenBalances = value$2 !== undefined ? value$2.map(serialize$5) : null;
+    var tokenBalances = value$2.map(serialize$5);
     var value$3 = value$1.__typename;
     user = {
       __typename: value$3,
@@ -740,7 +740,7 @@ function parse$8(value) {
     var value$2 = value$1.tokenBalances;
     tmp = {
       __typename: value$1.__typename,
-      tokenBalances: !(value$2 == null) ? value$2.map(parse$5) : undefined
+      tokenBalances: value$2.map(parse$5)
     };
   }
   return {
@@ -753,7 +753,7 @@ function serialize$8(value) {
   var user;
   if (value$1 !== undefined) {
     var value$2 = value$1.tokenBalances;
-    var tokenBalances = value$2 !== undefined ? value$2.map(serialize$5) : null;
+    var tokenBalances = value$2.map(serialize$5);
     var value$3 = value$1.__typename;
     user = {
       __typename: value$3,
@@ -846,14 +846,14 @@ function parse$9(value) {
                 return {
                         __typename: value.__typename,
                         timestamp: GqlConverters.$$BigInt.parse(value.timestamp),
-                        affectedUsers: !(value$1 == null) ? value$1.map(function (value) {
-                                var value$1 = value["tokenBalances"];
-                                return {
-                                        __typename: value["__typename"],
-                                        basicUserInfo: parse(value),
-                                        tokenBalances: !(value$1 == null) ? value$1.map(parse$5) : undefined
-                                      };
-                              }) : undefined
+                        affectedUsers: value$1.map(function (value) {
+                              var value$1 = value["tokenBalances"];
+                              return {
+                                      __typename: value["__typename"],
+                                      basicUserInfo: parse(value),
+                                      tokenBalances: value$1.map(parse$5)
+                                    };
+                            })
                       };
               })
         };
@@ -863,15 +863,15 @@ function serialize$9(value) {
   var value$1 = value.stateChanges;
   var stateChanges = value$1.map(function (value) {
         var value$1 = value.affectedUsers;
-        var affectedUsers = value$1 !== undefined ? value$1.map(function (value) {
-                var value$1 = value.tokenBalances;
-                var tokenBalances = value$1 !== undefined ? value$1.map(serialize$5) : null;
-                var value$2 = value.__typename;
-                return [serialize(value.basicUserInfo)].reduce(GraphQL_PPX.deepMerge, {
-                            __typename: value$2,
-                            tokenBalances: tokenBalances
-                          });
-              }) : null;
+        var affectedUsers = value$1.map(function (value) {
+              var value$1 = value.tokenBalances;
+              var tokenBalances = value$1.map(serialize$5);
+              var value$2 = value.__typename;
+              return [serialize(value.basicUserInfo)].reduce(GraphQL_PPX.deepMerge, {
+                          __typename: value$2,
+                          tokenBalances: tokenBalances
+                        });
+            });
         var value$2 = value.timestamp;
         var value$3 = GqlConverters.$$BigInt.serialize(value$2);
         var value$4 = value.__typename;
@@ -1146,12 +1146,12 @@ function parse$12(value) {
       __typename: value$1.__typename,
       totalMintedFloat: GqlConverters.$$BigInt.parse(value$1.totalMintedFloat),
       floatTokenBalance: GqlConverters.$$BigInt.parse(value$1.floatTokenBalance),
-      tokenMints: !(value$2 == null) ? value$2.map(function (value) {
-              return {
-                      __typename: value.__typename,
-                      tokensMinted: GqlConverters.$$BigInt.parse(value.tokensMinted)
-                    };
-            }) : undefined
+      tokenMints: value$2.map(function (value) {
+            return {
+                    __typename: value.__typename,
+                    tokensMinted: GqlConverters.$$BigInt.parse(value.tokensMinted)
+                  };
+          })
     };
   }
   return {
@@ -1164,15 +1164,15 @@ function serialize$12(value) {
   var user;
   if (value$1 !== undefined) {
     var value$2 = value$1.tokenMints;
-    var tokenMints = value$2 !== undefined ? value$2.map(function (value) {
-            var value$1 = value.tokensMinted;
-            var value$2 = GqlConverters.$$BigInt.serialize(value$1);
-            var value$3 = value.__typename;
-            return {
-                    __typename: value$3,
-                    tokensMinted: value$2
-                  };
-          }) : null;
+    var tokenMints = value$2.map(function (value) {
+          var value$1 = value.tokensMinted;
+          var value$2 = GqlConverters.$$BigInt.serialize(value$1);
+          var value$3 = value.__typename;
+          return {
+                  __typename: value$3,
+                  tokensMinted: value$2
+                };
+        });
     var value$3 = value$1.floatTokenBalance;
     var value$4 = GqlConverters.$$BigInt.serialize(value$3);
     var value$5 = value$1.totalMintedFloat;
