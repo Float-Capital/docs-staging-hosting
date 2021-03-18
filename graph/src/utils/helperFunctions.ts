@@ -2,10 +2,7 @@ import { erc20 } from "../../generated/templates";
 import {
   BigInt,
   Address,
-  Bytes,
-  log,
   ethereum,
-  dataSource,
   DataSourceContext,
 } from "@graphprotocol/graph-ts";
 import { ZERO, ZERO_ADDRESS } from "../CONSTANTS";

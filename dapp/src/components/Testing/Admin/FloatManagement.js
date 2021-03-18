@@ -236,7 +236,7 @@ var query$3 = (require("@apollo/client").gql`
         amount
       }
     }
-    states(first: 1, orderBy: stateIndex, orderDirection: desc, where: {syntheticToken: $synthToken, timeSinceLastUpdate_gt: 0})  {
+    stakeStates(first: 1, orderBy: stateIndex, orderDirection: desc, where: {syntheticToken: $synthToken, timeSinceLastUpdate_gt: 0})  {
       __typename
       stateIndex
       accumulativeFloatPerToken
@@ -247,7 +247,7 @@ var query$3 = (require("@apollo/client").gql`
 
 function parse$3(value) {
   var value$1 = value.currentStakes;
-  var value$2 = value.states;
+  var value$2 = value.stakeStates;
   return {
           currentStakes: value$1.map(function (value) {
                 var value$1 = value.lastMintState;
@@ -265,7 +265,7 @@ function parse$3(value) {
                         }
                       };
               }),
-          states: value$2.map(function (value) {
+          stakeStates: value$2.map(function (value) {
                 return {
                         __typename: value.__typename,
                         stateIndex: GqlConverters.$$BigInt.parse(value.stateIndex),
@@ -277,8 +277,8 @@ function parse$3(value) {
 }
 
 function serialize$3(value) {
-  var value$1 = value.states;
-  var states = value$1.map(function (value) {
+  var value$1 = value.stakeStates;
+  var stakeStates = value$1.map(function (value) {
         var value$1 = value.floatRatePerTokenOverInterval;
         var value$2 = GqlConverters.$$BigInt.serialize(value$1);
         var value$3 = value.accumulativeFloatPerToken;
@@ -323,7 +323,7 @@ function serialize$3(value) {
       });
   return {
           currentStakes: currentStakes,
-          states: states
+          stakeStates: stakeStates
         };
 }
 

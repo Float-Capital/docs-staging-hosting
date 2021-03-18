@@ -6,7 +6,7 @@ type connectorObj = {
 }
 
 @module("./connectors")
-external connectors: Js.Array.t<connectorObj> = "default"
+external connectors: array<connectorObj> = "default"
 
 @react.component
 let make = () => {

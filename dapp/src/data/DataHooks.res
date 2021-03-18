@@ -16,6 +16,8 @@ let liftGraphResponse2 = (a, b) => {
 }
 
 @ocaml.doc(`Returns details of the given user's staked tokens.`)
+let {ethAdrToLowerStr} = module(Globals)
+
 let useGetStakes = () => {
   let stakeDetailsQuery = Queries.StakingDetails.use()
   let client = Client.useApolloClient()
@@ -135,7 +137,7 @@ let useUsersBalances = (~userId) => {
   let usersTokensQuery = Queries.UsersBalances.use({userId: userId})
 
   switch usersTokensQuery {
-  | {data: Some({user: Some({tokenBalances: Some(tokenBalances)})})} =>
+  | {data: Some({user: Some({tokenBalances})})} =>
     let result = tokenBalances->Array.reduce({totalBalance: CONSTANTS.zeroBN, balances: []}, (
       {totalBalance, balances},
       {
@@ -159,9 +161,7 @@ let useUsersBalances = (~userId) => {
       }
     })
     Response(result)
-  | {data: Some({user: Some({tokenBalances: None})})}
-  | {data: Some({user: None})} =>
-    Response({totalBalance: CONSTANTS.zeroBN, balances: []})
+  | {data: Some({user: None})} => Response({totalBalance: CONSTANTS.zeroBN, balances: []})
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
   }
@@ -236,4 +236,39 @@ let useBasicUserInfo = (~userId) => {
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
   }
+}
+
+let useSyntheticTokenBalance = (~user, ~tokenAddress) => {
+  let syntheticBalanceQuery = Queries.UsersBalance.use({
+    userId: user->ethAdrToLowerStr,
+    tokenAdr: tokenAddress->ethAdrToLowerStr,
+  })
+
+  switch syntheticBalanceQuery {
+  | {data: Some({user: Some({tokenBalances: [{tokenBalance}]})})} => Response(tokenBalance)
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
+  }
+}
+
+@ocaml.doc(`Utilities and helpers for react hooks that fetch data from graphql`)
+module Util = {
+  @ocaml.doc(`Convert a graphResponse into an option`)
+  let graphResponseToOption: graphResponse<'a> => option<'a> = maybeData =>
+    switch maybeData {
+    | Response(data) => Some(data)
+    | GraphError(_)
+    | Loading =>
+      None
+    }
+
+  type potentialData<'a> = Data('a) | Loading
+
+  @ocaml.doc(`Convert a graphResponse into a result type`)
+  let graphResponseToResult: graphResponse<'a> => result<potentialData<'a>, string> = maybeData =>
+    switch maybeData {
+    | Response(data) => Ok(Data(data))
+    | Loading => Ok(Loading)
+    | GraphError(error) => Error(error)
+    }
 }

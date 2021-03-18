@@ -1,17 +1,15 @@
 import {
-  StateChange,
-  EventParam,
   SystemState,
   GlobalState,
   User,
   Price,
-  State,
+  StakeState,
   SyntheticToken,
   UserSyntheticTokenBalance,
   LatestPrice,
   SyntheticMarket,
 } from "../../generated/schema";
-import { BigInt, Address, Bytes, log, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, Bytes, log, ethereum } from "@graphprotocol/graph-ts";
 import { ZERO, ONE, GLOBAL_STATE_ID, TEN_TO_THE_18 } from "../CONSTANTS";
 
 function createInitialTokenPrice(
@@ -142,11 +140,11 @@ export function getOrCreateStakerState(
   tokenAddress: string,
   stateIndex: BigInt,
   event: ethereum.Event
-): State {
+): StakeState {
   let stateId = tokenAddress + "-" + stateIndex.toString();
-  let state = State.load(stateId);
+  let state = StakeState.load(stateId);
   if (state == null) {
-    state = new State(stateId);
+    state = new StakeState(stateId);
     state.blockNumber = event.block.number;
     state.creationTxHash = event.transaction.hash;
     state.stateIndex = ZERO;
@@ -157,7 +155,7 @@ export function getOrCreateStakerState(
     state.timeSinceLastUpdate = ZERO;
   }
 
-  return state as State;
+  return state as StakeState;
 }
 
 export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {

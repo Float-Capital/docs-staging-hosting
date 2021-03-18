@@ -6,6 +6,7 @@ import * as Ethers from "../../ethereum/Ethers.js";
 import * as Ethers$1 from "ethers";
 import * as CONSTANTS from "../../CONSTANTS.js";
 import * as DataHooks from "../../data/DataHooks.js";
+import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as MiniLoader from "./MiniLoader.js";
 import * as FormatMoney from "./FormatMoney.js";
 import * as Router from "next/router";
@@ -268,9 +269,9 @@ var UserStakesCard = {
 function UserUI$UserFloatCard(Props) {
   var userId = Props.userId;
   var stakes = Props.stakes;
-  var synthTokens = stakes.map(function (stake) {
-        return stake.currentStake.syntheticToken.id;
-      });
+  var synthTokens = Belt_Array.map(stakes, (function (stake) {
+          return stake.currentStake.syntheticToken.id;
+        }));
   var router = Router.useRouter();
   var claimFloat = function (param) {
     router.push("/stake");

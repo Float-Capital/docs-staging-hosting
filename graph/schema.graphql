@@ -19,7 +19,7 @@ type StateChange @entity {
   blockNumber: BigInt!
   gasUsed: BigInt!
   txEventParamList: [EventParams!]!
-  affectedUsers: [User!]
+  affectedUsers: [User!]!
 }
 
 type Event @entity {
@@ -81,7 +81,7 @@ type SyntheticToken @entity {
   id: ID! # token address
   tokenAddress: Bytes!
   syntheticMarket: SyntheticMarket!
-  latestStakerState: State!
+  latestStakerState: StakeState!
   tokenType: TokenType!
   totalStaked: BigInt!
   tokenSupply: BigInt!
@@ -115,10 +115,10 @@ type User @entity {
   timestampJoined: BigInt!
   totalGasUsed: BigInt!
   numberOfTransactions: BigInt!
-  currentStakes: [CurrentStake!]
-  stateChangesAffectingUser: [StateChange!]
-  tokenBalances: [UserSyntheticTokenBalance!]
-  tokenMints: [UserSyntheticTokenMinted!]
+  currentStakes: [CurrentStake!]!
+  stateChangesAffectingUser: [StateChange!]!
+  tokenBalances: [UserSyntheticTokenBalance!]!
+  tokenMints: [UserSyntheticTokenMinted!]!
 }
 
 type UserSyntheticTokenBalance @entity {
@@ -142,7 +142,7 @@ type CurrentStake @entity {
   userAddress: Bytes!
   syntheticToken: SyntheticToken!
   currentStake: Stake!
-  lastMintState: State!
+  lastMintState: StakeState!
 }
 
 type Stake @entity {
@@ -156,7 +156,7 @@ type Stake @entity {
   withdrawn: Boolean!
 }
 
-type State @entity {
+type StakeState @entity {
   id: ID! # token address - state indexed
   blockNumber: BigInt!
   creationTxHash: Bytes!
