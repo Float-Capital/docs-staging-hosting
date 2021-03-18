@@ -1,3 +1,21 @@
+@ocaml.doc(`Represents a graphql query response.`)
+type graphResponse<'a> = Loading | GraphError(string) | Response('a)
+
+@ocaml.doc(`Combines two graphql responses into a single tuple response.`)
+let liftGraphResponse2 = (a, b) => {
+  switch a {
+  | Response(ar) =>
+    switch b {
+    | Response(br) => Response((ar, br))
+    | GraphError(x) => GraphError(x)
+    | Loading => Loading
+    }
+  | GraphError(x) => GraphError(x)
+  | Loading => Loading
+  }
+}
+
+@ocaml.doc(`Returns details of the given user's staked tokens.`)
 let useGetStakes = () => {
   let stakeDetailsQuery = Queries.StakingDetails.use()
   let client = Client.useApolloClient()
@@ -24,23 +42,10 @@ let useGetStakes = () => {
     None
   })
 
-  stakeDetailsQuery
-}
-
-@ocaml.doc(`Represents a graphql query response.`)
-type graphResponse<'a> = Loading | GraphError(string) | Response('a)
-
-@ocaml.doc(`Combines two graphql responses into a single tuple response.`)
-let liftGraphResponse2 = (a, b) => {
-  switch a {
-  | Response(ar) =>
-    switch b {
-    | Response(br) => Response((ar, br))
-    | GraphError(x) => GraphError(x)
-    | Loading => Loading
-    }
-  | GraphError(x) => GraphError(x)
-  | Loading => Loading
+  switch stakeDetailsQuery {
+  | {data: Some({syntheticMarkets})} => Response(syntheticMarkets)
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
   }
 }
 
@@ -113,6 +118,7 @@ let useStakesForUser = (~userId) => {
 }
 
 type userSynthBalance = {
+  addr: Ethers.ethAddress,
   name: string,
   isLong: bool,
   tokenBalance: Ethers.BigNumber.t,
@@ -134,11 +140,12 @@ let useUsersBalances = (~userId) => {
       {totalBalance, balances},
       {
         tokenBalance,
-        syntheticToken: {tokenType, syntheticMarket: {name}, latestPrice: {price: {price}}},
+        syntheticToken: {id, tokenType, syntheticMarket: {name}, latestPrice: {price: {price}}},
       },
     ) => {
       let isLong = tokenType == #Long
       let newToken = {
+        addr: id->Ethers.Utils.getAddressUnsafe,
         name: name,
         isLong: isLong,
         tokenBalance: tokenBalance,
@@ -217,7 +224,8 @@ let useBasicUserInfo = (~userId) => {
           totalGasUsed,
         }),
       }),
-    } => Response({
+    } =>
+    Response({
       id: id,
       joinedAt: timestampJoined->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime,
       gasUsed: totalGasUsed,

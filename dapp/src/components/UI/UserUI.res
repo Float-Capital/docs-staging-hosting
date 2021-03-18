@@ -49,7 +49,7 @@ module UserColumnHeader = {
 
 module UserProfileHeader = {
   @react.component
-  let make = (~userId) => {
+  let make = () => {
     let name = `moose-code` // TODO: get from graph
     let level = Ethers.BigNumber.fromInt(1) // TODO: get from graph
 
@@ -117,20 +117,32 @@ module UserMarketBox = {
 
 module UserMarketStakeOrRedeem = {
   @react.component
-  let make = () => {
+  let make = (~synthAddress) => {
+    // TODO: fix these URLs once redeeming gets implemented
+    let router = Next.Router.useRouter()
+    let stake = _ =>
+      router->Next.Router.push(`/stake?tokenAddress=${synthAddress->Ethers.Utils.ethAdrToLowerStr}`)
+    let redeem = _ =>
+      router->Next.Router.push(`/redeem?tokenAddress=${synthAddress->Ethers.Utils.ethAdrToLowerStr}`)
+
     <div className=`flex flex-col`>
-      <Button variant="tiny" onClick={_ => ()}> {`stake`} </Button>
-      <Button variant="tiny" onClick={_ => ()}> {`redeem`} </Button>
+      <Button variant="tiny" onClick={stake}> {`stake`} </Button>
+      <Button variant="tiny" onClick={redeem}> {`redeem`} </Button>
     </div>
   }
 }
 
 module UserMarketUnstake = {
   @react.component
-  let make = () => {
+  let make = (~synthAddress) => {
+    // TODO: fix these URLs once unstaking gets implemented
+    let router = Next.Router.useRouter()
+    let unstake = _ =>
+      router->Next.Router.push(`/stake?tokenAddress=${synthAddress->Ethers.Utils.ethAdrToLowerStr}`)
+
     <div className=`flex flex-col`>
       <span className="text-xxs self-center"> <i> {`4 days ago`->React.string} </i> </span>
-      <Button variant="tiny" onClick={_ => ()}> {`redeem`} </Button>
+      <Button variant="tiny" onClick={unstake}> {`unstake`} </Button>
     </div>
   }
 }
@@ -143,6 +155,7 @@ module UserStakesCard = {
       Js.Array.mapi((stake: Queries.UsersStakes.UsersStakes_inner.t_currentStakes, i) => {
         let key = `user-stakes-${Belt.Int.toString(i)}`
         let syntheticToken = stake.currentStake.syntheticToken
+        let addr = syntheticToken.id->Ethers.Utils.getAddressUnsafe
         let name = syntheticToken.syntheticMarket.symbol
         let tokens = syntheticToken.totalStaked->FormatMoney.formatEther
         let isLong = syntheticToken.tokenType->Obj.magic == "Long"
@@ -154,7 +167,7 @@ module UserStakesCard = {
         totalValue := Ethers.BigNumber.add(totalValue.contents, value)
 
         <UserMarketBox key name isLong tokens value={value->FormatMoney.formatEther}>
-          <UserMarketUnstake />
+          <UserMarketUnstake synthAddress={addr} />
         </UserMarketBox>
       }, stakes)->React.array
 
@@ -171,51 +184,47 @@ module UserStakesCard = {
   }
 }
 
-module UserFloatBox = {
+module UserFloatCard = {
   @react.component
   let make = (~userId, ~stakes) => {
-    let synthTokens = Js.Array.mapi(
-      (stake: Queries.UsersStakes.UsersStakes_inner.t_currentStakes, i) => {
+    let synthTokens = Js.Array.map(
+      (stake: Queries.UsersStakes.UsersStakes_inner.t_currentStakes) => {
         stake.currentStake.syntheticToken.id
       },
       stakes,
     )
 
+    // TODO: fix these URLs once minting float gets implemented
+    let router = Next.Router.useRouter()
+    let claimFloat = _ => router->Next.Router.push(`/stake`)
     let floatBalances = DataHooks.useFloatBalancesForUser(~userId)
     let claimableFloat = DataHooks.useTotalClaimableFloatForUser(~userId, ~synthTokens)
 
-    switch floatBalances {
-    | Loading => <MiniLoader />
-    | GraphError(msg) => msg->React.string
-    | Response(floatBalances) => {
-        let floatBalance = floatBalances.floatBalance->FormatMoney.formatEther(~digits=6)
-        let floatMinted = floatBalances.floatMinted->FormatMoney.formatEther(~digits=6)
+    <UserColumnCard>
+      <UserColumnHeader> {`Float rewards 🔥`->React.string} </UserColumnHeader>
+      {switch DataHooks.liftGraphResponse2(floatBalances, claimableFloat) {
+      | Loading => <MiniLoader />
+      | GraphError(msg) => msg->React.string
+      | Response((floatBalances, (totalClaimable, totalPredicted))) => {
+          let floatBalance = floatBalances.floatBalance->FormatMoney.formatEther(~digits=6)
+          let floatMinted = floatBalances.floatMinted->FormatMoney.formatEther(~digits=6)
+          let floatAccrued =
+            totalClaimable->Ethers.BigNumber.add(totalPredicted)->FormatMoney.formatEther(~digits=6)
 
-        switch claimableFloat {
-        | Loading => <MiniLoader />
-        | GraphError(msg) => msg->React.string
-        | Response((totalClaimable, totalPredicted)) => {
-            let floatAccrued =
-              totalClaimable
-              ->Ethers.BigNumber.add(totalPredicted)
-              ->FormatMoney.formatEther(~digits=6)
-
-            <div
-              className=`w-11/12 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>
-              <UserColumnTextList>
-                <UserColumnText head=`float accruing` body={floatAccrued} />
-                <UserColumnText head=`float balance` body={floatBalance} />
-                <UserColumnText head=`float minted` body={floatMinted} />
-              </UserColumnTextList>
-              <div className=`flex justify-around flex-row my-1`>
-                {`🌊`->React.string}
-                <Button variant="tiny" onClick={_ => ()}> {`claim float`} </Button>
-                {`🌊`->React.string}
-              </div>
+          <div className=`w-11/12 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>
+            <UserColumnTextList>
+              <UserColumnText head=`float accruing` body={floatAccrued} />
+              <UserColumnText head=`float balance` body={floatBalance} />
+              <UserColumnText head=`float minted` body={floatMinted} />
+            </UserColumnTextList>
+            <div className=`flex justify-around flex-row my-1`>
+              {`🌊`->React.string}
+              <Button variant="tiny" onClick={claimFloat}> {`claim float`} </Button>
+              {`🌊`->React.string}
             </div>
-          }
+          </div>
         }
-      }
-    }
+      }}
+    </UserColumnCard>
   }
 }
