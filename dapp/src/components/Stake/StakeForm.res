@@ -61,7 +61,7 @@ module StakeFormInput = {
         </div>
       </div>
       <AmountInput value optBalance disabled onBlur onChange placeholder={"Stake"} onMaxClick />
-      <Button onClick={_ => ()} variant="large">
+      <Button>
         {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
       </Button>
     </Form>

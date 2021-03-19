@@ -106,24 +106,22 @@ module MarketCard = {
 
     let mintButtons = () =>
       <div className={`flex w-full justify-around`}>
-        <Button
+        <Button.Small
           onClick={_ => {
             router->Next.Router.push(
               `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&mintOption=long`,
             )
-          }}
-          variant="small">
+          }}>
           "Mint Long"
-        </Button>
-        <Button
+        </Button.Small>
+        <Button.Small
           onClick={_ => {
             router->Next.Router.push(
               `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&mintOption=short`,
             )
-          }}
-          variant="small">
+          }}>
           "Mint Short"
-        </Button>
+        </Button.Small>
       </div>
 
     <div className="p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg">

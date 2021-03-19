@@ -187,14 +187,12 @@ function UserUI$UserMarketStakeOrRedeem(Props) {
   };
   return React.createElement("div", {
               className: "flex flex-col"
-            }, React.createElement(Button.make, {
+            }, React.createElement(Button.Tiny.make, {
                   onClick: stake,
-                  children: "stake",
-                  variant: "tiny"
-                }), React.createElement(Button.make, {
+                  children: "stake"
+                }), React.createElement(Button.Tiny.make, {
                   onClick: redeem,
-                  children: "redeem",
-                  variant: "tiny"
+                  children: "redeem"
                 }));
 }
 
@@ -213,10 +211,9 @@ function UserUI$UserMarketUnstake(Props) {
               className: "flex flex-col"
             }, React.createElement("span", {
                   className: "text-xxs self-center"
-                }, React.createElement("i", undefined, "4 days ago")), React.createElement(Button.make, {
+                }, React.createElement("i", undefined, "4 days ago")), React.createElement(Button.Tiny.make, {
                   onClick: unstake,
-                  children: "unstake",
-                  variant: "tiny"
+                  children: "unstake"
                 }));
 }
 
@@ -307,10 +304,9 @@ function UserUI$UserFloatCard(Props) {
                   body: floatMinted
                 })), React.createElement("div", {
               className: "flex justify-around flex-row my-1"
-            }, "🌊", React.createElement(Button.make, {
+            }, "🌊", React.createElement(Button.Tiny.make, {
                   onClick: claimFloat,
-                  children: "claim float",
-                  variant: "tiny"
+                  children: "claim float"
                 }), "🌊"));
   }
   return React.createElement(UserUI$UserColumnCard, {

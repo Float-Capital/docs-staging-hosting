@@ -85,52 +85,6 @@ body {
   animation: float 5s ease-in-out infinite;
 }
 
-.float-button-outer-container {
-  position: relative;
-  margin: 0.8rem 0rem;
-}
-
-.float-button-outer-container-tiny {
-  margin: 0rem;
-}
-
-.float-button-container {
-  margin-top: 2px;
-  width: calc(100% - 0px);
-  transform: translate(4px, 4px);
-  border: 1px solid #0d4184;
-  background-color: #0d4184;
-  padding: 0.6rem -0.6rem 0.6rem 0.6rem;
-  display: inline-block;
-}
-
-.float-button-container-small {
-  transform: translate(4px, 4px) !important;
-  padding: 0.6rem -1rem 0.6rem 0.6rem;
-}
-
-.float-button-container-tiny {
-  transform: translate(0px, 0px) !important;
-}
-
-.float-button {
-  width: calc(100% - 0px);
-  transform: translate(-4px, -4px);
-  transition: all 0.1s linear 0s;
-  font-style: italic;
-  font-weight: 300;
-  font-family: menlo, sans-serif;
-  padding: 0.6rem 1rem;
-  border: 1px solid #0d4184;
-  color: #0d4184;
-  background-color: #fff;
-  text-transform: uppercase;
-  letter-spacing: 0.2rem;
-  margin: 0;
-  text-decoration: none;
-  cursor: pointer;
-}
-
 .tooltip {
   @apply invisible absolute;
 }
@@ -139,43 +93,8 @@ body {
   @apply visible z-50;
 }
 
-.float-button-small {
-  font-size: 12px !important;
-  padding: 0.5rem 0.5rem !important;
-  transform: translate(-2px, -2px) !important;
-}
-
-.float-button-tiny {
-  font-size: 8px !important;
-  padding: 0.2rem 0.2rem !important;
-  transform: translate(-4px, -4px) !important;
-}
-
-.float-button:hover {
-  transform: translate(-2px, -2px);
-}
-.float-button-small:hover {
-  transform: translate(-4px, -4px);
-}
-.float-button:hover,
-.float-button:focus {
-  outline: none;
-  border: 1px solid #0d4184;
-  color: #0d4184;
-}
-.float-button:active {
-  transform: translate(0px, 0px);
-  outline: none;
-  color: #fff;
-  background-color: #0d4184;
-}
-.float-button:disabled:active {
-  transform: translate(-2px, -2px);
-  color: #0d4184;
-  background-color: rgb(209, 213, 219);
-}
-
-.float-button::-moz-focus-inner {
+/* Stop firefox from putting this stile on button when focused */
+button::-moz-focus-inner {
   border: 0;
 }
 

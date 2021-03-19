@@ -128,8 +128,8 @@ module UserMarketStakeOrRedeem = {
       )
 
     <div className=`flex flex-col`>
-      <Button variant="tiny" onClick={stake}> {`stake`} </Button>
-      <Button variant="tiny" onClick={redeem}> {`redeem`} </Button>
+      <Button.Tiny onClick={stake}> {`stake`} </Button.Tiny>
+      <Button.Tiny onClick={redeem}> {`redeem`} </Button.Tiny>
     </div>
   }
 }
@@ -144,7 +144,7 @@ module UserMarketUnstake = {
 
     <div className=`flex flex-col`>
       <span className="text-xxs self-center"> <i> {`4 days ago`->React.string} </i> </span>
-      <Button variant="tiny" onClick={unstake}> {`unstake`} </Button>
+      <Button.Tiny onClick={unstake}> {`unstake`} </Button.Tiny>
     </div>
   }
 }
@@ -219,7 +219,7 @@ module UserFloatCard = {
             </UserColumnTextList>
             <div className=`flex justify-around flex-row my-1`>
               {`🌊`->React.string}
-              <Button variant="tiny" onClick={claimFloat}> {`claim float`} </Button>
+              <Button.Tiny onClick={claimFloat}> {`claim float`} </Button.Tiny>
               {`🌊`->React.string}
             </div>
           </div>

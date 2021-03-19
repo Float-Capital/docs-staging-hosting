@@ -1,3 +1,4 @@
+const primaryColor = "#0d4184";
 module.exports = {
   purge: {
     // Specify the paths to all of the template files in your project
@@ -14,8 +15,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#064085",
-        "light-purple": "#a6accd",
+        primary: primaryColor,
       },
       // // Doesn't include an opacity gradient, rather use direct css
       // backgroundImage: (theme) => ({
@@ -46,7 +46,24 @@ module.exports = {
     },
     borderColor: (theme) => ({
       ...theme("colors"),
+      DEFAULT: primaryColor,
     }),
+    backgroundColor: (theme) => ({
+      ...theme("colors"),
+      primary: primaryColor,
+    }),
+    textColor: {
+      primary: primaryColor,
+    },
+    letterSpacing: {
+      tighter: "-.05em",
+      tight: "-.025em",
+      normal: "0",
+      wide: ".025em",
+      wider: ".05em",
+      widest: ".1em",
+      "btn-text": "0.2em",
+    },
     /* We override the default font-families with our own default prefs  */
     fontFamily: {
       sans: [

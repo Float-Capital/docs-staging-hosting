@@ -696,7 +696,6 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                           
                         }),
                       children: buttonText,
-                      variant: "large",
                       disabled: buttonDisabled
                     });
       case /* Created */1 :
@@ -782,8 +781,7 @@ function MintForm$MintFormInput(Props) {
   var txStateApprove = txStateApproveOpt !== undefined ? txStateApproveOpt : /* UnInitialised */0;
   var txStateMint = txStateMintOpt !== undefined ? txStateMintOpt : /* UnInitialised */0;
   var submitButton = submitButtonOpt !== undefined ? Caml_option.valFromOption(submitButtonOpt) : React.createElement(Button.make, {
-          children: "Login & Mint",
-          variant: "large"
+          children: "Login & Mint"
         });
   var formInput = React.createElement(React.Fragment, undefined, React.createElement("div", {
             className: "flex justify-between mb-2"

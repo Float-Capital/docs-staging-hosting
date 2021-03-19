@@ -177,20 +177,18 @@ let make = (
         | false => React.null
         }}
         <div className="w-full flex justify-around">
-          <Button
+          <Button.Small
             onClick={_ => {
               router->Next.Router.push(`/stake?tokenAddress=${longTokenAddress->ethAdrToLowerStr}`)
-            }}
-            variant="small">
+            }}>
             "Stake Long"
-          </Button>
-          <Button
+          </Button.Small>
+          <Button.Small
             onClick={_ => {
               router->Next.Router.push(`/stake?tokenAddress=${shortTokenAddress->ethAdrToLowerStr}`)
-            }}
-            variant="small">
+            }}>
             "Stake Short"
-          </Button>
+          </Button.Small>
         </div>
       </div>
       <StakeCardSide
