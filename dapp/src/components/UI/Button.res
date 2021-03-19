@@ -1,6 +1,13 @@
 let buttonOuterStyle = `relative my-3`
 let buttonShaddowStyle = `transform translate-x-1 translate-y-1 w-full bg-primary inline-block`
-let buttonTopStyle = `transform -translate-x-1 -translate-y-1 hover:-translate-x-0.5 hover:-translate-y-0.5 w-full transition ease-linear duration-0 italic cursor-pointer bg-white border text-primary uppercase tracking-btn-text `
+/*
+.float-button:active {
+  outline: none;
+  color: #fff;
+  background-color: #0d4184;
+}
+*/
+let buttonTopStyle = `transform -translate-x-1 -translate-y-1 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 w-full transition ease-linear duration-0 italic cursor-pointer bg-white border text-primary active:text-white active:bg-primary active:outline-none uppercase tracking-btn-text`
 
 module Tiny = {
   @react.component

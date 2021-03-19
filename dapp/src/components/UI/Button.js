@@ -6,7 +6,7 @@ var buttonOuterStyle = "relative my-3";
 
 var buttonShaddowStyle = "transform translate-x-1 translate-y-1 w-full bg-primary inline-block";
 
-var buttonTopStyle = "transform -translate-x-1 -translate-y-1 hover:-translate-x-0.5 hover:-translate-y-0.5 w-full transition ease-linear duration-0 italic cursor-pointer bg-white border text-primary uppercase tracking-btn-text ";
+var buttonTopStyle = "transform -translate-x-1 -translate-y-1 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 w-full transition ease-linear duration-0 italic cursor-pointer bg-white border text-primary active:text-white active:bg-primary active:outline-none uppercase tracking-btn-text";
 
 function Button$Tiny(Props) {
   var onClickOpt = Props.onClick;

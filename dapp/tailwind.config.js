@@ -14,9 +14,10 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
-      colors: {
+      textColor: (theme) => ({
+        ...theme("colors"),
         primary: primaryColor,
-      },
+      }),
       // // Doesn't include an opacity gradient, rather use direct css
       // backgroundImage: (theme) => ({
       //   "float-pixels": "url('/backgrounds/2.png')",
@@ -97,6 +98,12 @@ module.exports = {
   },
   variants: {
     width: ["responsive"],
+    extend: {
+      backgroundColor: ["active"],
+      translate: ["active"],
+      textColor: ["active"],
+      outline: ["active"],
+    },
   },
   plugins: [],
 };
