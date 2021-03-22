@@ -112,6 +112,10 @@ module Router = {
   }
 
   @send external push: (router, string) => unit = "push"
+  type pushOptions = {shallow: bool}
+  @send external pushOptions: (router, string, option<unit>, pushOptions) => unit = "push"
+  let pushShallow = (routerObj, queryString) =>
+    pushOptions(routerObj, queryString, None, {shallow: true})
   @send external pushObj: (router, pathObj) => unit = "push"
 
   @module("next/router") external useRouter: unit => router = "useRouter"

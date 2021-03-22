@@ -41,6 +41,7 @@ module MarketCard = {
     }: Queries.MarketDetails.t_syntheticMarkets,
   ) => {
     let router = Next.Router.useRouter()
+    let marketIndexOption = router.query->Js.Dict.get("marketIndex")
     let percentStrLong = percentStr(~n=totalLockedLong, ~outOf=totalValueLocked)
     let percentStrShort =
       (100.0 -. percentStrLong->Float.fromString->Option.getExn)
@@ -108,8 +109,8 @@ module MarketCard = {
       <div className={`flex w-full justify-around`}>
         <Button
           onClick={_ => {
-            router->Next.Router.push(
-              `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&mintOption=long`,
+            router->Next.Router.pushShallow(
+              `/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}&mintOption=long`,
             )
           }}
           variant="small">
@@ -117,8 +118,8 @@ module MarketCard = {
         </Button>
         <Button
           onClick={_ => {
-            router->Next.Router.push(
-              `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&mintOption=short`,
+            router->Next.Router.pushShallow(
+              `/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}&mintOption=short`,
             )
           }}
           variant="small">
@@ -126,41 +127,50 @@ module MarketCard = {
         </Button>
       </div>
 
-    <div className="p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg">
-      <div className="flex justify-center w-full my-1">
-        <h1 className="font-bold text-xl font-alphbeta">
-          {marketName->React.string} <Tooltip tip={`This market tracks ${marketName}`} />
-        </h1>
-      </div>
-      <div className="flex flex-wrap justify-center w-full">
-        <div
-          className="order-2 md:order-1 w-1/2 md:w-1/4 flex items-center flex grow flex-wrap flex-col">
-          {marketPositionHeadings(~isLong={true})}
-          <div className="md:block hidden"> {marketPositionValues(~isLong={true})} </div>
+    <>
+      <div className="p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg">
+        <div className="flex justify-center w-full my-1">
+          <h1 className="font-bold text-xl font-alphbeta">
+            {marketName->React.string} <Tooltip tip={`This market tracks ${marketName}`} />
+          </h1>
         </div>
-        <div className="order-1 md:order-2 w-full md:w-1/2 flex items-center flex-col">
-          <h2 className="text-xs mt-1">
-            <span className="font-bold"> {"TOTAL"->React.string} </span>
-            {" Liquidity"->React.string}
-          </h2>
-          <div className="text-3xl font-alphbeta tracking-wider py-1">
-            {`$${totalValueLocked->FormatMoney.formatEther}`->React.string}
+        <div className="flex flex-wrap justify-center w-full">
+          <div
+            className="order-2 md:order-1 w-1/2 md:w-1/4 flex items-center flex grow flex-wrap flex-col">
+            {marketPositionHeadings(~isLong={true})}
+            <div className="md:block hidden"> {marketPositionValues(~isLong={true})} </div>
           </div>
-          <div className="md:block hidden w-full"> {liquidityRatio()} {mintButtons()} </div>
+          <div className="order-1 md:order-2 w-full md:w-1/2 flex items-center flex-col">
+            <h2 className="text-xs mt-1">
+              <span className="font-bold"> {"TOTAL"->React.string} </span>
+              {" Liquidity"->React.string}
+            </h2>
+            <div className="text-3xl font-alphbeta tracking-wider py-1">
+              {`$${totalValueLocked->FormatMoney.formatEther}`->React.string}
+            </div>
+            <div className="md:block hidden w-full"> {liquidityRatio()} {mintButtons()} </div>
+          </div>
+          <div className="order-3 w-1/2 md:w-1/4 flex-grow flex-wrap flex-col">
+            {marketPositionHeadings(~isLong={false})}
+            <div className="md:block hidden"> {marketPositionValues(~isLong={false})} </div>
+          </div>
         </div>
-        <div className="order-3 w-1/2 md:w-1/4 flex-grow flex-wrap flex-col">
-          {marketPositionHeadings(~isLong={false})}
-          <div className="md:block hidden"> {marketPositionValues(~isLong={false})} </div>
+        <div className="block md:hidden pt-5">
+          <div className="px-8"> {liquidityRatio()} </div>
+          <div className="flex md:hidden">
+            {marketPositionValues(~isLong={true})} {marketPositionValues(~isLong={false})}
+          </div>
+          {mintButtons()}
         </div>
       </div>
-      <div className="block md:hidden pt-5">
-        <div className="px-8"> {liquidityRatio()} </div>
-        <div className="flex md:hidden">
-          {marketPositionValues(~isLong={true})} {marketPositionValues(~isLong={false})}
-        </div>
-        {mintButtons()}
-      </div>
-    </div>
+      {marketIndexOption->Option.mapWithDefault(React.null, queryMarketIndex => {
+        if queryMarketIndex == marketIndex->Ethers.BigNumber.toString {
+          <Mint.Mint />
+        } else {
+          React.null
+        }
+      })}
+    </>
   }
 }
 
