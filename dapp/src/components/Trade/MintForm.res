@@ -1,6 +1,6 @@
 module MintForm = %form(
-  type input = {amount: string, isLong: bool, isStaking: bool}
-  type output = {amount: Ethers.BigNumber.t, isLong: bool, isStaking: bool}
+  type input = {amount: string, isStaking: bool}
+  type output = {amount: Ethers.BigNumber.t, isStaking: bool}
 
   let validators = {
     amount: {
@@ -20,17 +20,12 @@ module MintForm = %form(
         }
       },
     },
-    isLong: {
-      strategy: OnFirstChange,
-      validate: ({isLong}) => isLong->Ok,
-    },
     isStaking: None,
   }
 )
 
 let initialInput: MintForm.input = {
   amount: "",
-  isLong: false,
   isStaking: true,
 }
 
@@ -258,7 +253,7 @@ module MintFormSignedIn = {
   @react.component
   let make = (
     ~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets,
-    ~initialIsLong,
+    ~isLong,
     ~signer,
   ) => {
     let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
@@ -282,51 +277,43 @@ module MintFormSignedIn = {
       ~spender=longShortContractAddress,
     )
 
-    let form = MintForm.useForm(
-      ~initialInput={
-        ...initialInput,
-        isLong: initialIsLong,
-      },
-      ~onSubmit=({amount, isLong, isStaking}, _form) => {
-        let approveFunction = () =>
-          contractExecutionHandlerApprove(
-            ~makeContractInstance=Contracts.Erc20.make(
-              ~address=daiAddressThatIsTemporarilyHardCoded,
-            ),
-            ~contractFunction=Contracts.Erc20.approve(
-              ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
-              ~spender=longShortContractAddress,
-            ),
-          )
-        let mintFunction = () =>
-          contractExecutionHandler(
-            ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
-            ~contractFunction=isLong
-              ? Contracts.LongShort.mintLong(~marketIndex=market.marketIndex, ~amount)
-              : Contracts.LongShort.mintShort(~marketIndex=market.marketIndex, ~amount),
-          )
-        let mintAndStakeFunction = () =>
-          contractExecutionHandler(
-            ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
-            ~contractFunction=isLong
-              ? Contracts.LongShort.mintLongAndStake(~marketIndex=market.marketIndex, ~amount)
-              : Contracts.LongShort.mintShortAndStake(~marketIndex=market.marketIndex, ~amount),
-          )
-        let needsToApprove = isGreaterThanApproval(
-          ~amount,
-          ~amountApproved=optDaiAmountApproved->Option.getWithDefault(
-            Ethers.BigNumber.fromUnsafe("0"),
+    let form = MintForm.useForm(~initialInput, ~onSubmit=({amount, isStaking}, _form) => {
+      let approveFunction = () =>
+        contractExecutionHandlerApprove(
+          ~makeContractInstance=Contracts.Erc20.make(~address=daiAddressThatIsTemporarilyHardCoded),
+          ~contractFunction=Contracts.Erc20.approve(
+            ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
+            ~spender=longShortContractAddress,
           ),
         )
+      let mintFunction = () =>
+        contractExecutionHandler(
+          ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
+          ~contractFunction=isLong
+            ? Contracts.LongShort.mintLong(~marketIndex=market.marketIndex, ~amount)
+            : Contracts.LongShort.mintShort(~marketIndex=market.marketIndex, ~amount),
+        )
+      let mintAndStakeFunction = () =>
+        contractExecutionHandler(
+          ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
+          ~contractFunction=isLong
+            ? Contracts.LongShort.mintLongAndStake(~marketIndex=market.marketIndex, ~amount)
+            : Contracts.LongShort.mintShortAndStake(~marketIndex=market.marketIndex, ~amount),
+        )
+      let needsToApprove = isGreaterThanApproval(
+        ~amount,
+        ~amountApproved=optDaiAmountApproved->Option.getWithDefault(
+          Ethers.BigNumber.fromUnsafe("0"),
+        ),
+      )
 
-        switch needsToApprove {
-        | true =>
-          setContractActionToCallAfterApproval(_ => isStaking ? mintAndStakeFunction : mintFunction)
-          approveFunction()
-        | false => isStaking ? mintAndStakeFunction() : mintFunction()
-        }
-      },
-    )
+      switch needsToApprove {
+      | true =>
+        setContractActionToCallAfterApproval(_ => isStaking ? mintAndStakeFunction : mintFunction)
+        approveFunction()
+      | false => isStaking ? mintAndStakeFunction() : mintFunction()
+      }
+    })
 
     let formAmount = switch form.amountResult {
     | Some(Ok(amount)) => Some(amount)
@@ -343,31 +330,29 @@ module MintFormSignedIn = {
         {"Reset & Mint Again"}
       </Button>
 
-    let tokenToMint = form.input.isLong ? `long ${market.name}` : `short ${market.name}`
+    let tokenToMint = isLong ? `long ${market.name}` : `short ${market.name}`
 
     let (optAdditionalErrorMessage, buttonText, buttonDisabled) = {
       let stakingText = form.input.isStaking ? "Mint & Stake" : "Mint" // TODO: decide on this " & stake" : ""
       let approveConnector = form.input.isStaking ? "," : " &" // TODO: decide on this " & stake" : ""
-      switch form.input.isLong {
-      | isLong =>
-        let position = isLong ? "long" : "short"
-        switch (formAmount, optDaiBalance, optDaiAmountApproved) {
-        | (Some(amount), Some(balance), Some(amountApproved)) =>
-          let needsToApprove = isGreaterThanApproval(~amount, ~amountApproved)
-          let greaterThanBalance = isGreaterThanBalance(~amount, ~balance)
-          switch greaterThanBalance {
-          | true => (Some("Amount is greater than your balance"), `Insufficient balance`, true)
-          | false => (
-              None,
-              switch needsToApprove {
-              | true => `Approve${approveConnector} ${stakingText} ${position} position`
-              | false => `${stakingText} ${position} position`
-              },
-              !form.valid(),
-            )
-          }
-        | _ => (None, `${stakingText} ${position} position`, true)
+
+      let position = isLong ? "long" : "short"
+      switch (formAmount, optDaiBalance, optDaiAmountApproved) {
+      | (Some(amount), Some(balance), Some(amountApproved)) =>
+        let needsToApprove = isGreaterThanApproval(~amount, ~amountApproved)
+        let greaterThanBalance = isGreaterThanBalance(~amount, ~balance)
+        switch greaterThanBalance {
+        | true => (Some("Amount is greater than your balance"), `Insufficient balance`, true)
+        | false => (
+            None,
+            switch needsToApprove {
+            | true => `Approve${approveConnector} ${stakingText} ${position} position`
+            | false => `${stakingText} ${position} position`
+            },
+            !form.valid(),
+          )
         }
+      | _ => (None, `${stakingText} ${position} position`, true)
       }
     }
 
@@ -382,17 +367,18 @@ module MintFormSignedIn = {
       None
     }, [txStateApprove])
 
+    let router = Next.Router.useRouter()
+
     <MintFormInput
       txStateApprove
       txStateMint=txState
       onSubmit={form.submit}
       market
-      onChangeSide={event =>
-        form.updateIsLong(
-          (input, isLong) => {...input, isLong: isLong},
-          (event->ReactEvent.Form.target)["value"] == "long",
-        )}
-      isLong={form.input.isLong}
+      onChangeSide={event => {
+        router.query->Js.Dict.set("mintOption", (event->ReactEvent.Form.target)["value"])
+        router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
+      }}
+      isLong={isLong}
       onBlurSide={_ => form.blurIsStaking()}
       valueAmountInput=form.input.amount
       optDaiBalance
@@ -429,18 +415,15 @@ module MintFormSignedIn = {
 }
 
 @react.component
-let make = (
-  ~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets,
-  ~initialIsLong,
-) => {
+let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets, ~isLong) => {
   let router = Next.Router.useRouter()
 
   let optSigner = ContractActions.useSigner()
   switch optSigner {
-  | Some(signer) => <MintFormSignedIn signer market initialIsLong />
+  | Some(signer) => <MintFormSignedIn signer market isLong />
   | None =>
     <div onClick={_ => router->Next.Router.push(`/login?nextPath=${router.asPath}`)}>
-      <MintFormInput market isLong=initialIsLong />
+      <MintFormInput market isLong />
     </div>
   }
 }

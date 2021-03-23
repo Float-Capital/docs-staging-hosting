@@ -169,7 +169,7 @@ function Navigation(Props) {
                           href: "/markets",
                           children: React.createElement("a", {
                                 className: "px-3 hover:bg-white"
-                              }, "MARKETS")
+                              }, "MINT")
                         }), React.createElement(Link, {
                           href: "/stake",
                           children: React.createElement("a", {
