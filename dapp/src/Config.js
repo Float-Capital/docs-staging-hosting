@@ -76,6 +76,8 @@ var localhostGraphEndpoint = "https://localhost:8000/subgraphs/name/avolabs-io/f
 
 var defaultNetworkId = 97;
 
+var defaultNetworkName = "Binance Smart Chain";
+
 var paymentTokenName = "BUSD";
 
 var defaultBlockExplorer = "https://testnet.bscscan.com/";
@@ -88,6 +90,7 @@ export {
   binancTestnetGraphEndpoint ,
   localhostGraphEndpoint ,
   defaultNetworkId ,
+  defaultNetworkName ,
   paymentTokenName ,
   defaultBlockExplorer ,
   getDefaultNetworkId ,
