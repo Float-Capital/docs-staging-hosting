@@ -5,7 +5,7 @@ let buttonTopStyle = `transform -translate-x-1 -translate-y-1 hover:-translate-x
 module Tiny = {
   @react.component
   let make = (~onClick=_ => (), ~children: string, ~disabled=false) => {
-    // No idea why a float is needed here, without it some small buttons looks kak
+    // No idea why a flex is needed here, without it some small buttons looks kak
     <div className="flex">
       <div className={`${buttonOuterStyle} w-full`}>
         <div className={`${buttonShaddowStyle} h-full`}>
