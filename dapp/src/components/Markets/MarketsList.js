@@ -97,18 +97,16 @@ function MarketsList$MarketCard(Props) {
   var mintButtons = function (param) {
     return React.createElement("div", {
                 className: "flex w-full justify-around"
-              }, React.createElement(Button.make, {
+              }, React.createElement(Button.Small.make, {
                     onClick: (function (param) {
                         return Next.Router.pushShallow(router, "/markets?marketIndex=" + marketIndex.toString() + "&mintOption=long");
                       }),
-                    children: "Mint Long",
-                    variant: "small"
-                  }), React.createElement(Button.make, {
+                    children: "Mint Long"
+                  }), React.createElement(Button.Small.make, {
                     onClick: (function (param) {
                         return Next.Router.pushShallow(router, "/markets?marketIndex=" + marketIndex.toString() + "&mintOption=short");
                       }),
-                    children: "Mint Short",
-                    variant: "small"
+                    children: "Mint Short"
                   }));
   };
   return React.createElement(React.Fragment, undefined, React.createElement("div", {

@@ -489,11 +489,7 @@ function StakeForm$StakeFormInput(Props) {
                   onChange: onChange,
                   onMaxClick: onMaxClick
                 }), React.createElement(Button.make, {
-                  onClick: (function (param) {
-                      
-                    }),
-                  children: "Stake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name,
-                  variant: "large"
+                  children: "Stake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name
                 }));
 }
 

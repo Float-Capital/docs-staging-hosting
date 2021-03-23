@@ -150,7 +150,7 @@ module SubmitButtonAndTxTracker = {
         </p>
         {resetFormButton()}
       </>
-    | _ => <Button disabled=buttonDisabled onClick={_ => ()} variant="large"> {buttonText} </Button>
+    | _ => <Button disabled=buttonDisabled onClick={_ => ()}> {buttonText} </Button>
     }
   }
 }
@@ -175,7 +175,7 @@ module MintFormInput = {
     ~onChangeIsStaking=_ => (),
     ~txStateApprove=ContractActions.UnInitialised,
     ~txStateMint=ContractActions.UnInitialised,
-    ~submitButton=<Button variant="large"> "Login & Mint" </Button>,
+    ~submitButton=<Button> "Login & Mint" </Button>,
   ) => {
     let formInput =
       <>

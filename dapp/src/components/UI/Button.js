@@ -2,35 +2,78 @@
 
 import * as React from "react";
 
-function Button(Props) {
+var buttonOuterStyle = "relative my-3";
+
+var buttonShaddowStyle = "transform translate-x-1 translate-y-1 w-full bg-primary inline-block";
+
+var buttonTopStyle = "transform -translate-x-1 -translate-y-1 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 w-full transition ease-linear duration-0 italic cursor-pointer bg-white border text-primary active:text-white active:bg-primary active:outline-none uppercase tracking-btn-text";
+
+function Button$Tiny(Props) {
   var onClickOpt = Props.onClick;
   var children = Props.children;
-  var variantOpt = Props.variant;
   var disabledOpt = Props.disabled;
   var onClick = onClickOpt !== undefined ? onClickOpt : (function (param) {
         
       });
-  var variant = variantOpt !== undefined ? variantOpt : "small";
   var disabled = disabledOpt !== undefined ? disabledOpt : false;
-  var outerContainerClass = "float-button-outer-container " + (
-    variant === "tiny" ? "float-button-outer-container-tiny" : ""
-  );
-  var containerClass = "float-button-container " + (
-    variant === "small" ? "float-button-container-small" : ""
-  ) + " " + (
-    variant === "tiny" ? "float-button-container-tiny" : ""
-  );
-  var buttonClass = "float-button " + (
-    variant === "small" ? "float-button-small" : ""
-  ) + " " + (
-    variant === "tiny" ? "float-button-tiny" : ""
-  );
   return React.createElement("div", {
-              className: outerContainerClass
+              className: "flex"
             }, React.createElement("div", {
-                  className: containerClass
+                  className: buttonOuterStyle + " w-full"
+                }, React.createElement("div", {
+                      className: buttonShaddowStyle + " h-full"
+                    }, React.createElement("button", {
+                          className: buttonTopStyle + " min-h-full px-2 text-xxs " + (
+                            disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-300" : ""
+                          ),
+                          disabled: disabled,
+                          onClick: onClick
+                        }, children))));
+}
+
+var Tiny = {
+  make: Button$Tiny
+};
+
+function Button$Small(Props) {
+  var onClickOpt = Props.onClick;
+  var children = Props.children;
+  var disabledOpt = Props.disabled;
+  var onClick = onClickOpt !== undefined ? onClickOpt : (function (param) {
+        
+      });
+  var disabled = disabledOpt !== undefined ? disabledOpt : false;
+  return React.createElement("div", {
+              className: buttonOuterStyle
+            }, React.createElement("div", {
+                  className: buttonShaddowStyle + " border"
                 }, React.createElement("button", {
-                      className: buttonClass + (
+                      className: buttonTopStyle + " p-2 text-sm " + (
+                        disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-300" : ""
+                      ),
+                      disabled: disabled,
+                      onClick: onClick
+                    }, children)));
+}
+
+var Small = {
+  make: Button$Small
+};
+
+function Button(Props) {
+  var onClickOpt = Props.onClick;
+  var children = Props.children;
+  var disabledOpt = Props.disabled;
+  var onClick = onClickOpt !== undefined ? onClickOpt : (function (param) {
+        
+      });
+  var disabled = disabledOpt !== undefined ? disabledOpt : false;
+  return React.createElement("div", {
+              className: buttonOuterStyle
+            }, React.createElement("div", {
+                  className: buttonShaddowStyle + " border-0"
+                }, React.createElement("button", {
+                      className: buttonTopStyle + " p-3 text-base " + (
                         disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-300" : ""
                       ),
                       disabled: disabled,
@@ -41,6 +84,11 @@ function Button(Props) {
 var make = Button;
 
 export {
+  buttonOuterStyle ,
+  buttonShaddowStyle ,
+  buttonTopStyle ,
+  Tiny ,
+  Small ,
   make ,
   
 }

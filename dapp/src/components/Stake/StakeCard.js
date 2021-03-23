@@ -135,20 +135,18 @@ function StakeCard(Props) {
                             percentStrShort: percentStrShort
                           }), React.createElement("div", {
                           className: "w-full flex justify-around"
-                        }, React.createElement(Button.make, {
+                        }, React.createElement(Button.Small.make, {
                               onClick: (function (param) {
                                   router.push("/stake?tokenAddress=" + Globals.ethAdrToLowerStr(longTokenAddress));
                                   
                                 }),
-                              children: "Stake Long",
-                              variant: "small"
-                            }), React.createElement(Button.make, {
+                              children: "Stake Long"
+                            }), React.createElement(Button.Small.make, {
                               onClick: (function (param) {
                                   router.push("/stake?tokenAddress=" + Globals.ethAdrToLowerStr(shortTokenAddress));
                                   
                                 }),
-                              children: "Stake Short",
-                              variant: "small"
+                              children: "Stake Short"
                             }))), React.createElement(StakeCardSide.make, {
                       marketName: marketName,
                       isLong: false,
