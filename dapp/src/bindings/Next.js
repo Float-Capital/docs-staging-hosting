@@ -25,9 +25,17 @@ function pushShallow(routerObj, queryString) {
   
 }
 
+function pushObjShallow(routerObj, pathObj) {
+  routerObj.push(pathObj, undefined, {
+        shallow: true
+      });
+  
+}
+
 var Router = {
   Events: Events,
-  pushShallow: pushShallow
+  pushShallow: pushShallow,
+  pushObjShallow: pushObjShallow
 };
 
 var Head = {};

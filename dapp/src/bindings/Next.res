@@ -117,6 +117,9 @@ module Router = {
   let pushShallow = (routerObj, queryString) =>
     pushOptions(routerObj, queryString, None, {shallow: true})
   @send external pushObj: (router, pathObj) => unit = "push"
+  @send external pushObjOptions: (router, pathObj, option<unit>, pushOptions) => unit = "push"
+  let pushObjShallow = (routerObj, pathObj) =>
+    pushObjOptions(routerObj, pathObj, None, {shallow: true})
 
   @module("next/router") external useRouter: unit => router = "useRouter"
 

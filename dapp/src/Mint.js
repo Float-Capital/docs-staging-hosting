@@ -41,7 +41,7 @@ function Mint$Mint(Props) {
     var optFirstMarket = Belt_Array.get(match.syntheticMarkets, Belt_Option.getWithDefault(Belt_Int.fromString(marketIndex), 1) - 1 | 0);
     tmp = optFirstMarket !== undefined ? React.createElement(MintForm.make, {
             market: optFirstMarket,
-            initialIsLong: mintOption !== "short"
+            isLong: mintOption !== "short"
           }) : React.createElement("p", undefined, "No markets exist");
   } else {
     tmp = "You might think this is impossible, but depending on the situation it might not be!";
