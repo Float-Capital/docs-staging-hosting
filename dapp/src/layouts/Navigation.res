@@ -91,7 +91,7 @@ let make = () => {
       </Link>
       <div className="hidden md:flex w-2/3 text-base items-center justify-end">
         <Link href="/markets">
-          <a className="px-3 hover:bg-white"> {React.string("MARKETS")} </a>
+          <a className="px-3 hover:bg-white"> {React.string("MINT")} </a>
         </Link>
         <Link href="/stake">
           <a className="px-3 hover:bg-white"> {`STAKE🔥`->React.string} </a>
