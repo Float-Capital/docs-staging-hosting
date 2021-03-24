@@ -5,6 +5,7 @@ import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Button from "./components/UI/Button.js";
 import * as Config from "./Config.js";
+import * as Ethers from "ethers";
 import * as Globals from "./libraries/Globals.js";
 import * as Contracts from "./ethereum/Contracts.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
@@ -21,13 +22,15 @@ function StakeDetails$ClaimFloat(Props) {
   var match = ContractActions.useContractFunction(signer);
   var contractExecutionHandler = match[0];
   var stakerAddress = Config.useStakerAddress(undefined);
-  return React.createElement(Button.make, {
+  return React.createElement(Button.Tiny.make, {
               onClick: (function (param) {
-                  console.log("Claim float");
+                  var arg = Belt_Array.map(tokenAddresses, (function (prim) {
+                          return Ethers.utils.getAddress(prim);
+                        }));
                   Curry._2(contractExecutionHandler, (function (param) {
                           return Contracts.Staker.make(stakerAddress, param);
                         }), (function (param) {
-                          return param.claimFloat(tokenAddresses);
+                          return param.claimFloat(arg);
                         }));
                   
                 }),
@@ -45,7 +48,7 @@ function StakeDetails$ClaimFloatImmediately(Props) {
   var match = ContractActions.useContractFunction(signer);
   var contractExecutionHandler = match[0];
   var stakerAddress = Config.useStakerAddress(undefined);
-  return React.createElement(Button.make, {
+  return React.createElement(Button.Tiny.make, {
               onClick: (function (param) {
                   console.log("Claim float");
                   Curry._2(contractExecutionHandler, (function (param) {

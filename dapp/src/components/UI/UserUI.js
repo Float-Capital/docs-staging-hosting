@@ -4,12 +4,16 @@ import * as React from "react";
 import * as Button from "./Button.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Ethers$1 from "ethers";
+import * as Globals from "../../libraries/Globals.js";
 import * as CONSTANTS from "../../CONSTANTS.js";
 import * as DataHooks from "../../data/DataHooks.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as MiniLoader from "./MiniLoader.js";
+import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as FormatMoney from "./FormatMoney.js";
 import * as Router from "next/router";
+import * as RootProvider from "../../libraries/RootProvider.js";
+import * as StakeDetails from "../../StakeDetails.js";
 
 function UserUI$UserContainer(Props) {
   var children = Props.children;
@@ -269,13 +273,12 @@ function UserUI$UserFloatCard(Props) {
   var synthTokens = Belt_Array.map(stakes, (function (stake) {
           return stake.currentStake.syntheticToken.id;
         }));
-  var router = Router.useRouter();
-  var claimFloat = function (param) {
-    router.push("/stake");
-    
-  };
   var floatBalances = DataHooks.useFloatBalancesForUser(userId);
   var claimableFloat = DataHooks.useTotalClaimableFloatForUser(userId, synthTokens);
+  var optLoggedInUser = RootProvider.useCurrentUser(undefined);
+  var isCurrentUser = Belt_Option.mapWithDefault(optLoggedInUser, false, (function (user) {
+          return Globals.ethAdrToLowerStr(user) === userId;
+        }));
   var msg = DataHooks.liftGraphResponse2(floatBalances, claimableFloat);
   var tmp;
   if (typeof msg === "number") {
@@ -302,12 +305,11 @@ function UserUI$UserFloatCard(Props) {
                 }), React.createElement(UserUI$UserColumnText, {
                   head: "float minted",
                   body: floatMinted
-                })), React.createElement("div", {
-              className: "flex justify-around flex-row my-1"
-            }, "🌊", React.createElement(Button.Tiny.make, {
-                  onClick: claimFloat,
-                  children: "claim float"
-                }), "🌊"));
+                })), isCurrentUser ? React.createElement("div", {
+                className: "flex justify-around flex-row my-1"
+              }, "🌊", React.createElement(StakeDetails.ClaimFloat.make, {
+                    tokenAddresses: synthTokens
+                  }), "🌊") : null);
   }
   return React.createElement(UserUI$UserColumnCard, {
               children: null

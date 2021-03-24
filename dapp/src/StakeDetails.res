@@ -11,16 +11,17 @@ module ClaimFloat = {
 
     let stakerAddress = Config.useStakerAddress()
 
-    <Button
+    <Button.Tiny
       onClick={_ => {
-        Js.log("Claim float")
         let _ = contractExecutionHandler(
           ~makeContractInstance=Contracts.Staker.make(~address=stakerAddress),
-          ~contractFunction=Contracts.Staker.claimFloat(~tokenAddresses),
+          ~contractFunction=Contracts.Staker.claimFloat(
+            ~tokenAddresses=tokenAddresses->Array.map(Ethers.Utils.getAddressUnsafe),
+          ),
         )
       }}>
       "Claim Float"
-    </Button>
+    </Button.Tiny>
   }
 }
 module ClaimFloatImmediately = {
@@ -34,7 +35,7 @@ module ClaimFloatImmediately = {
 
     let stakerAddress = Config.useStakerAddress()
 
-    <Button
+    <Button.Tiny
       onClick={_ => {
         Js.log("Claim float")
         let _ = contractExecutionHandler(
@@ -43,7 +44,7 @@ module ClaimFloatImmediately = {
         )
       }}>
       "Claim Float"
-    </Button>
+    </Button.Tiny>
   }
 }
 module UsersActiveStakes = {

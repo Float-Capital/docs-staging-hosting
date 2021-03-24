@@ -1,3 +1,5 @@
+open Globals
+
 module UserContainer = {
   @react.component
   let make = (~children) => {
@@ -194,11 +196,11 @@ module UserFloatCard = {
         stake.currentStake.syntheticToken.id
       })
 
-    // TODO: fix these URLs once minting float gets implemented
-    let router = Next.Router.useRouter()
-    let claimFloat = _ => router->Next.Router.push(`/stake`)
     let floatBalances = DataHooks.useFloatBalancesForUser(~userId)
     let claimableFloat = DataHooks.useTotalClaimableFloatForUser(~userId, ~synthTokens)
+    let optLoggedInUser = RootProvider.useCurrentUser()
+    let isCurrentUser =
+      optLoggedInUser->Option.mapWithDefault(false, user => user->ethAdrToLowerStr == userId)
 
     <UserColumnCard>
       <UserColumnHeader> {`Float rewards 🔥`->React.string} </UserColumnHeader>
@@ -217,11 +219,13 @@ module UserFloatCard = {
               <UserColumnText head=`float balance` body={floatBalance} />
               <UserColumnText head=`float minted` body={floatMinted} />
             </UserColumnTextList>
-            <div className=`flex justify-around flex-row my-1`>
-              {`🌊`->React.string}
-              <Button.Tiny onClick={claimFloat}> {`claim float`} </Button.Tiny>
-              {`🌊`->React.string}
-            </div>
+            {isCurrentUser
+              ? <div className=`flex justify-around flex-row my-1`>
+                  {`🌊`->React.string}
+                  <StakeDetails.ClaimFloat tokenAddresses=synthTokens />
+                  {`🌊`->React.string}
+                </div>
+              : React.null}
           </div>
         }
       }}
