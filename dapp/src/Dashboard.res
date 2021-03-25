@@ -62,7 +62,6 @@ let floatProtocolCard = (~liveSince, ~totalTxs, ~totalUsers, ~totalGasUsed, ~txH
   <Card>
     <Header> {`Float Protocol 🏗️`->React.string} </Header>
     <DashboardUl
-      link={`https://testnet.bscscan.com/tx/${txHash}`}
       list={[
         createDashboardLiProps(
           ~prefix=`📅 Live since:`,
@@ -70,6 +69,7 @@ let floatProtocolCard = (~liveSince, ~totalTxs, ~totalUsers, ~totalGasUsed, ~txH
             let dateObj = liveSince->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime
             `${dateObj->Js.Date.toDateString} (${dateObj->DateFns.formatDistanceToNow})`
           },
+          ~link={`https://testnet.bscscan.com/tx/${txHash}`},
           (),
         ),
         createDashboardLiProps(
