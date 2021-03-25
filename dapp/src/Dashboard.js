@@ -237,8 +237,6 @@ function Dashboard(Props) {
       var match$3 = marketDetailsQuery.data;
       if (match$3 !== undefined) {
         var syntheticMarkets = match$3.syntheticMarkets;
-        var txHash = match$2.txHash;
-        console.log(txHash);
         var match$4 = DashboardCalcs.getTotalValueLockedAndTotalStaked(syntheticMarkets);
         var totalValueStaked = match$4.totalValueStaked;
         var totalValueLocked = match$4.totalValueLocked;
@@ -249,7 +247,7 @@ function Dashboard(Props) {
             }, totalValueCard(totalValueLocked), React.createElement("div", {
                   className: "w-full flex flex-col md:flex-row justify-between mt-1"
                 }, React.createElement(Dashboard$Divider, {
-                      children: floatProtocolCard(match$2.timestampLaunched, match$2.totalTxs, match$2.totalUsers, match$2.totalGasUsed, txHash)
+                      children: floatProtocolCard(match$2.timestampLaunched, match$2.totalTxs, match$2.totalUsers, match$2.totalGasUsed, match$2.txHash)
                     }), React.createElement(Dashboard$Divider, {
                       children: null
                     }, syntheticAssetsCard(totalSynthValue, numberOfSynths), floatTokenCard(match$2.totalFloatMinted)), React.createElement(Dashboard$Divider, {
