@@ -118,7 +118,8 @@ function onQuerySuccess(data) {
                     }, React.createElement(User$UserBalancesCard, {
                           userId: data.user
                         }), React.createElement("br", undefined), React.createElement(UserUI.UserStakesCard.make, {
-                          stakes: data.stakes
+                          stakes: data.stakes,
+                          userId: data.user
                         })), React.createElement(UserUI.UserColumn.make, {
                       children: React.createElement(UserUI.UserFloatCard.make, {
                             userId: data.user,

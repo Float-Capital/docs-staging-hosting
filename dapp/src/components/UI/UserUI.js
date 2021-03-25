@@ -8,6 +8,7 @@ import * as Ethers from "../../ethereum/Ethers.js";
 import * as Ethers$1 from "ethers";
 import * as Globals from "../../libraries/Globals.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
+import * as Unstake from "../Unstake.js";
 import * as CONSTANTS from "../../CONSTANTS.js";
 import * as DataHooks from "../../data/DataHooks.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
@@ -209,6 +210,7 @@ var UserMarketStakeOrRedeem = {
 
 function UserUI$UserMarketUnstake(Props) {
   var synthAddress = Props.synthAddress;
+  var userId = Props.userId;
   var router = Router.useRouter();
   var synthAddressStr = Globals.ethAdrToLowerStr(synthAddress);
   var showUnstakeModal = Belt_Option.mapWithDefault(Js_dict.get(router.query, "unstake"), false, (function (address) {
@@ -228,22 +230,28 @@ function UserUI$UserMarketUnstake(Props) {
                 query: router.query
               });
   };
+  var optLoggedInUser = RootProvider.useCurrentUser(undefined);
+  var isCurrentUser = Belt_Option.mapWithDefault(optLoggedInUser, false, (function (user) {
+          return Globals.ethAdrToLowerStr(user) === userId;
+        }));
   return React.createElement("div", {
               className: "flex flex-col"
             }, React.createElement("span", {
                   className: "text-xxs self-center"
-                }, React.createElement("i", undefined, "4 days ago")), React.createElement(Button.Tiny.make, {
-                  onClick: openUnstakeModal,
-                  children: "unstake"
-                }), showUnstakeModal ? React.createElement(Modal.make, {
-                    closeModal: closeUnstakeModal,
-                    children: React.createElement(React.Fragment, undefined, React.createElement("button", {
+                }, React.createElement("i", undefined, "4 days ago")), isCurrentUser ? React.createElement(React.Fragment, undefined, React.createElement(Button.Tiny.make, {
+                        onClick: openUnstakeModal,
+                        children: "unstake"
+                      }), showUnstakeModal ? React.createElement(Modal.make, {
+                          closeModal: closeUnstakeModal,
+                          children: null
+                        }, React.createElement("button", {
                               className: "p-1 ml-auto float-right text-3xl leading-none outline-none focus:outline-none",
                               onClick: closeUnstakeModal
                             }, React.createElement("span", {
                                   className: "opacity-4 block outline-none focus:outline-none"
-                                }, "×")))
-                  }) : null);
+                                }, "×")), React.createElement(Unstake.make, {
+                              tokenId: synthAddressStr
+                            })) : null) : null);
 }
 
 var UserMarketUnstake = {
@@ -252,6 +260,7 @@ var UserMarketUnstake = {
 
 function UserUI$UserStakesCard(Props) {
   var stakes = Props.stakes;
+  var userId = Props.userId;
   var totalValue = {
     contents: CONSTANTS.zeroBN
   };
@@ -271,7 +280,8 @@ function UserUI$UserStakesCard(Props) {
                     tokens: tokens,
                     value: FormatMoney.formatEther(undefined, value),
                     children: React.createElement(UserUI$UserMarketUnstake, {
-                          synthAddress: addr
+                          synthAddress: addr,
+                          userId: userId
                         }),
                     key: key
                   });

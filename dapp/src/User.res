@@ -92,7 +92,9 @@ module User = {
       <UserColumnContainer>
         <UserColumn> <UserProfileCard userInfo={data.userInfo} /> </UserColumn>
         <UserColumn>
-          <UserBalancesCard userId={data.user} /> <br /> <UserStakesCard stakes={data.stakes} />
+          <UserBalancesCard userId={data.user} />
+          <br />
+          <UserStakesCard stakes={data.stakes} userId={data.user} />
         </UserColumn>
         <UserColumn> <UserFloatCard userId={data.user} stakes={data.stakes} /> </UserColumn>
       </UserColumnContainer>

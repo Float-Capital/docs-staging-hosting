@@ -138,7 +138,7 @@ module UserMarketStakeOrRedeem = {
 
 module UserMarketUnstake = {
   @react.component
-  let make = (~synthAddress) => {
+  let make = (~synthAddress, ~userId) => {
     // TODO: fix these URLs once unstaking gets implemented
     let router = Next.Router.useRouter()
     let synthAddressStr = synthAddress->ethAdrToLowerStr
@@ -156,21 +156,28 @@ module UserMarketUnstake = {
       router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
     }
 
+    let optLoggedInUser = RootProvider.useCurrentUser()
+    let isCurrentUser =
+      optLoggedInUser->Option.mapWithDefault(false, user => user->ethAdrToLowerStr == userId)
+
     <div className=`flex flex-col`>
       <span className="text-xxs self-center"> <i> {`4 days ago`->React.string} </i> </span>
-      <Button.Tiny onClick={openUnstakeModal}> {`unstake`} </Button.Tiny>
-      {showUnstakeModal
-        ? <Modal closeModal=closeUnstakeModal>
-            {<>
-              <button
-                className="p-1 ml-auto float-right text-3xl leading-none outline-none focus:outline-none"
-                onClick=closeUnstakeModal>
-                <span className="opacity-4 block outline-none focus:outline-none">
-                  {`×`->React.string}
-                </span>
-              </button>
-            </>}
-          </Modal>
+      {isCurrentUser
+        ? <>
+            <Button.Tiny onClick={openUnstakeModal}> {`unstake`} </Button.Tiny>
+            {showUnstakeModal
+              ? <Modal closeModal=closeUnstakeModal>
+                  <button
+                    className="p-1 ml-auto float-right text-3xl leading-none outline-none focus:outline-none"
+                    onClick=closeUnstakeModal>
+                    <span className="opacity-4 block outline-none focus:outline-none">
+                      {`×`->React.string}
+                    </span>
+                  </button>
+                  <Unstake tokenId=synthAddressStr />
+                </Modal>
+              : React.null}
+          </>
         : React.null}
     </div>
   }
@@ -178,7 +185,7 @@ module UserMarketUnstake = {
 
 module UserStakesCard = {
   @react.component
-  let make = (~stakes) => {
+  let make = (~stakes, ~userId) => {
     let totalValue = ref(CONSTANTS.zeroBN)
     let stakeBoxes =
       Js.Array.mapi((stake: Queries.UsersStakes.UsersStakes_inner.t_currentStakes, i) => {
@@ -196,7 +203,7 @@ module UserStakesCard = {
         totalValue := Ethers.BigNumber.add(totalValue.contents, value)
 
         <UserMarketBox key name isLong tokens value={value->FormatMoney.formatEther}>
-          <UserMarketUnstake synthAddress={addr} />
+          <UserMarketUnstake synthAddress={addr} userId />
         </UserMarketBox>
       }, stakes)->React.array
 
