@@ -1,3 +1,5 @@
+open Globals
+
 module UserContainer = {
   @react.component
   let make = (~children) => {
@@ -136,22 +138,54 @@ module UserMarketStakeOrRedeem = {
 
 module UserMarketUnstake = {
   @react.component
-  let make = (~synthAddress) => {
+  let make = (~synthAddress, ~userId) => {
     // TODO: fix these URLs once unstaking gets implemented
     let router = Next.Router.useRouter()
-    let unstake = _ =>
-      router->Next.Router.push(`/stake?tokenAddress=${synthAddress->Ethers.Utils.ethAdrToLowerStr}`)
+    let synthAddressStr = synthAddress->ethAdrToLowerStr
+    let showUnstakeModal =
+      router.query
+      ->Js.Dict.get("unstake")
+      ->Option.mapWithDefault(false, address => address == synthAddressStr)
+
+    let openUnstakeModal = _ => {
+      router.query->Js.Dict.set("unstake", synthAddressStr)
+      router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
+    }
+    let closeUnstakeModal = _ => {
+      Js.Dict.unsafeDeleteKey(. router.query, "unstake")
+      router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
+    }
+
+    let optLoggedInUser = RootProvider.useCurrentUser()
+    let isCurrentUser =
+      optLoggedInUser->Option.mapWithDefault(false, user => user->ethAdrToLowerStr == userId)
 
     <div className=`flex flex-col`>
       <span className="text-xxs self-center"> <i> {`4 days ago`->React.string} </i> </span>
-      <Button.Tiny onClick={unstake}> {`unstake`} </Button.Tiny>
+      {isCurrentUser
+        ? <>
+            <Button.Tiny onClick={openUnstakeModal}> {`unstake`} </Button.Tiny>
+            {showUnstakeModal
+              ? <Modal closeModal=closeUnstakeModal>
+                  <button
+                    className="p-1 ml-auto float-right text-3xl leading-none outline-none focus:outline-none"
+                    onClick=closeUnstakeModal>
+                    <span className="opacity-4 block outline-none focus:outline-none">
+                      {`×`->React.string}
+                    </span>
+                  </button>
+                  <Unstake tokenId=synthAddressStr />
+                </Modal>
+              : React.null}
+          </>
+        : React.null}
     </div>
   }
 }
 
 module UserStakesCard = {
   @react.component
-  let make = (~stakes) => {
+  let make = (~stakes, ~userId) => {
     let totalValue = ref(CONSTANTS.zeroBN)
     let stakeBoxes =
       Js.Array.mapi((stake: Queries.UsersStakes.UsersStakes_inner.t_currentStakes, i) => {
@@ -169,7 +203,7 @@ module UserStakesCard = {
         totalValue := Ethers.BigNumber.add(totalValue.contents, value)
 
         <UserMarketBox key name isLong tokens value={value->FormatMoney.formatEther}>
-          <UserMarketUnstake synthAddress={addr} />
+          <UserMarketUnstake synthAddress={addr} userId />
         </UserMarketBox>
       }, stakes)->React.array
 
@@ -194,11 +228,11 @@ module UserFloatCard = {
         stake.currentStake.syntheticToken.id
       })
 
-    // TODO: fix these URLs once minting float gets implemented
-    let router = Next.Router.useRouter()
-    let claimFloat = _ => router->Next.Router.push(`/stake`)
     let floatBalances = DataHooks.useFloatBalancesForUser(~userId)
     let claimableFloat = DataHooks.useTotalClaimableFloatForUser(~userId, ~synthTokens)
+    let optLoggedInUser = RootProvider.useCurrentUser()
+    let isCurrentUser =
+      optLoggedInUser->Option.mapWithDefault(false, user => user->ethAdrToLowerStr == userId)
 
     <UserColumnCard>
       <UserColumnHeader> {`Float rewards 🔥`->React.string} </UserColumnHeader>
@@ -217,11 +251,13 @@ module UserFloatCard = {
               <UserColumnText head=`float balance` body={floatBalance} />
               <UserColumnText head=`float minted` body={floatMinted} />
             </UserColumnTextList>
-            <div className=`flex justify-around flex-row my-1`>
-              {`🌊`->React.string}
-              <Button.Tiny onClick={claimFloat}> {`claim float`} </Button.Tiny>
-              {`🌊`->React.string}
-            </div>
+            {isCurrentUser
+              ? <div className=`flex justify-around flex-row my-1`>
+                  {`🌊`->React.string}
+                  <StakeDetails.ClaimFloat tokenAddresses=synthTokens />
+                  {`🌊`->React.string}
+                </div>
+              : React.null}
           </div>
         }
       }}

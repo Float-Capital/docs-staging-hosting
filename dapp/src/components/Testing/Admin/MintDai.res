@@ -19,20 +19,7 @@ module AdminMintForm = %form(
     },
     amount: {
       strategy: OnFirstBlur,
-      validate: ({amount}) => {
-        let addressRegex = %re(`/^[+]?\d+(\.\d+)?$/`)
-
-        switch amount {
-        | "" => Error("Amount is required")
-        | _ as value if !(addressRegex->Js.Re.test_(value)) =>
-          Error("Incorrect number format - please use '.' for floating points.")
-        | _ =>
-          Ethers.Utils.parseEther(~amount)->Option.mapWithDefault(
-            Error("Couldn't parse Ether value"),
-            etherValue => etherValue->Ok,
-          )
-        }
-      },
+      validate: ({amount}) => Form.Validators.etherNumberInput(amount),
     },
   }
 )

@@ -388,17 +388,25 @@ function useBasicUserInfo(userId) {
       return {
               TAG: 1,
               _0: {
-                id: match$1.id,
-                joinedAt: FromUnixTime(match$1.timestampJoined.toNumber()),
-                gasUsed: match$1.totalGasUsed,
-                floatMinted: match$1.totalMintedFloat,
-                floatBalance: match$1.floatTokenBalance,
-                transactionCount: match$1.numberOfTransactions
+                _0: {
+                  id: match$1.id,
+                  joinedAt: FromUnixTime(match$1.timestampJoined.toNumber()),
+                  gasUsed: match$1.totalGasUsed,
+                  floatMinted: match$1.totalMintedFloat,
+                  floatBalance: match$1.floatTokenBalance,
+                  transactionCount: match$1.numberOfTransactions
+                },
+                [Symbol.for("name")]: "ExistingUser"
               },
               [Symbol.for("name")]: "Response"
             };
+    } else {
+      return {
+              TAG: 1,
+              _0: /* NewUser */0,
+              [Symbol.for("name")]: "Response"
+            };
     }
-    
   }
   var match$2 = userQuery.error;
   if (match$2 !== undefined) {

@@ -92,7 +92,9 @@ module User = {
       <UserColumnContainer>
         <UserColumn> <UserProfileCard userInfo={data.userInfo} /> </UserColumn>
         <UserColumn>
-          <UserBalancesCard userId={data.user} /> <br /> <UserStakesCard stakes={data.stakes} />
+          <UserBalancesCard userId={data.user} />
+          <br />
+          <UserStakesCard stakes={data.stakes} userId={data.user} />
         </UserColumn>
         <UserColumn> <UserFloatCard userId={data.user} stakes={data.stakes} /> </UserColumn>
       </UserColumnContainer>
@@ -111,7 +113,12 @@ module User = {
     let userInfoQuery = useBasicUserInfo(~userId=user)
 
     switch liftGraphResponse2(stakesQuery, userInfoQuery) {
-    | Response((stakes, userInfo)) =>
+    | Response((_stakes, NewUser)) => <>
+        <a target="_" href={`${Config.defaultBlockExplorer}address/${user}`}>
+          <h1> {"This user has never interacted with float.capital"->React.string} </h1>
+        </a>
+      </>
+    | Response((stakes, ExistingUser(userInfo))) =>
       onQuerySuccess({user: user, stakes: stakes, userInfo: userInfo})
     | GraphError(msg) => onQueryError(msg)
     | Loading => <Loader />

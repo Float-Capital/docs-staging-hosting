@@ -10,10 +10,6 @@ module StakeForm = %form(
   }
 )
 
-let initialInput: StakeForm.input = {
-  amount: "",
-}
-
 let useBalanceAndApproved = (~erc20Address, ~spender) => {
   let {Swr.data: optBalance} = ContractHooks.useErc20BalanceRefresh(~erc20Address)
   let {data: optAmountApproved} = ContractHooks.useERC20ApprovedRefresh(~erc20Address, ~spender)
@@ -36,20 +32,14 @@ module StakeFormInput = {
       <div className="px-8 pt-2">
         <div className="-mb-px flex justify-between">
           <div
-            className="no-underline text-teal-dark border-b-2 border-teal-dark tracking-wide font-bold py-3 mr-8"
-            href="#">
-            {`Stake ↗️`->React.string}
+            className="no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3">
+            {`Unstake ↗️`->React.string}
           </div>
-          // <div
-          //   className="no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3"
-          //   href="#">
-          //   {`Unstake ↗️`->React.string}
-          // </div>
         </div>
       </div>
       <AmountInput value optBalance disabled onBlur onChange placeholder={"Stake"} onMaxClick />
-      <Button>
-        {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
+      <Button onClick={_ => onSubmit()}>
+        {`Unstake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
       </Button>
     </Form>
 }
@@ -57,19 +47,9 @@ module StakeFormInput = {
 module ConnectedStakeForm = {
   @react.component
   let make = (~tokenId, ~signer, ~synthetic: Queries.SyntheticTokenInfo.t) => {
-    let (
-      contractActionToCallAfterApproval,
-      setContractActionToCallAfterApproval,
-    ) = React.useState(((), ()) => ())
-
     let (contractExecutionHandler, _txState, _setTxState) = ContractActions.useContractFunction(
       ~signer,
     )
-    let (
-      contractExecutionHandlerApprove,
-      txStateApprove,
-      setTxStateApprove,
-    ) = ContractActions.useContractFunction(~signer)
 
     let stakerContractAddress = Config.useStakerAddress()
 
@@ -80,39 +60,22 @@ module ConnectedStakeForm = {
         ~tokenAddress=synthetic.tokenAddress,
       )->DataHooks.Util.graphResponseToOption
 
-    // Execute the call after approval has completed
-    React.useEffect1(() => {
-      switch txStateApprove {
-      | Complete(_) =>
-        contractActionToCallAfterApproval()
-        setTxStateApprove(_ => ContractActions.UnInitialised)
-      | _ => ()
-      }
-      None
-    }, [txStateApprove])
+    let initialInput: StakeForm.input = {
+      amount: "",
+    }
 
     let form = StakeForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
-      let approveFunction = () =>
-        contractExecutionHandlerApprove(
-          ~makeContractInstance=Contracts.Erc20.make(
-            ~address=tokenId->Ethers.Utils.getAddressUnsafe,
-          ),
-          ~contractFunction=Contracts.Erc20.approve(
-            ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
-            ~spender=stakerContractAddress,
-          ),
-        )
+      Js.log("Clicking the unstake form!!")
       let stakeAndEarnImmediatlyFunction = () =>
         contractExecutionHandler(
           ~makeContractInstance=Contracts.Staker.make(~address=stakerContractAddress),
-          ~contractFunction=Contracts.Staker.stakeAndEarnImmediately(
+          ~contractFunction=Contracts.Staker.withdraw(
             ~tokenAddress=tokenId->Ethers.Utils.getAddressUnsafe,
             ~amount,
           ),
         )
 
-      setContractActionToCallAfterApproval(_ => stakeAndEarnImmediatlyFunction)
-      approveFunction()
+      stakeAndEarnImmediatlyFunction()
     })
 
     <StakeFormInput
@@ -138,6 +101,7 @@ module ConnectedStakeForm = {
     />
   }
 }
+
 @react.component
 let make = (~tokenId) => {
   let token = Queries.SyntheticToken.use({tokenId: tokenId})

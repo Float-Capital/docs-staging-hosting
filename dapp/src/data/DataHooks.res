@@ -205,7 +205,7 @@ type basicUserInfo = {
   floatBalance: Ethers.BigNumber.t,
   transactionCount: Ethers.BigNumber.t,
 }
-
+type userInfo = ExistingUser(basicUserInfo) | NewUser
 @ocaml.doc(`Returns basic user info for the given user.`)
 let useBasicUserInfo = (~userId) => {
   let userQuery = Queries.UserQuery.use({
@@ -225,14 +225,17 @@ let useBasicUserInfo = (~userId) => {
         }),
       }),
     } =>
-    Response({
-      id: id,
-      joinedAt: timestampJoined->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime,
-      gasUsed: totalGasUsed,
-      floatMinted: totalMintedFloat,
-      floatBalance: floatTokenBalance,
-      transactionCount: numberOfTransactions,
-    })
+    Response(
+      ExistingUser({
+        id: id,
+        joinedAt: timestampJoined->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime,
+        gasUsed: totalGasUsed,
+        floatMinted: totalMintedFloat,
+        floatBalance: floatTokenBalance,
+        transactionCount: numberOfTransactions,
+      }),
+    )
+  | {data: Some({user: None})} => Response(NewUser)
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
   }
