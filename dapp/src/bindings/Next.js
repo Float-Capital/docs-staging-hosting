@@ -18,8 +18,24 @@ var Link = {};
 
 var Events = {};
 
+function pushShallow(routerObj, queryString) {
+  routerObj.push(queryString, undefined, {
+        shallow: true
+      });
+  
+}
+
+function pushObjShallow(routerObj, pathObj) {
+  routerObj.push(pathObj, undefined, {
+        shallow: true
+      });
+  
+}
+
 var Router = {
-  Events: Events
+  Events: Events,
+  pushShallow: pushShallow,
+  pushObjShallow: pushObjShallow
 };
 
 var Head = {};

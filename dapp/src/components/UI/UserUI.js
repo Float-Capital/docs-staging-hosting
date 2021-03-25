@@ -2,8 +2,14 @@
 
 import * as React from "react";
 import * as Button from "./Button.js";
+import * as Ethers from "../../ethereum/Ethers.js";
+import * as Ethers$1 from "ethers";
 import * as CONSTANTS from "../../CONSTANTS.js";
+import * as DataHooks from "../../data/DataHooks.js";
+import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as MiniLoader from "./MiniLoader.js";
 import * as FormatMoney from "./FormatMoney.js";
+import * as Router from "next/router";
 
 function UserUI$UserContainer(Props) {
   var children = Props.children;
@@ -79,8 +85,7 @@ var UserColumnHeader = {
 };
 
 function UserUI$UserProfileHeader(Props) {
-  var name = Props.name;
-  var level = Props.level;
+  var level = Ethers$1.BigNumber.from(1);
   return React.createElement("div", {
               className: "w-full flex flex-row justify-around"
             }, React.createElement("div", {
@@ -90,7 +95,7 @@ function UserUI$UserProfileHeader(Props) {
                       src: "/img/mario.png"
                     })), React.createElement("div", {
                   className: "flex flex-col text-center justify-center"
-                }, React.createElement("div", undefined, name), React.createElement("div", undefined, "Lvl. " + level)));
+                }, React.createElement("div", undefined, "moose-code"), React.createElement("div", undefined, "Lvl. " + level.toString())));
 }
 
 var UserProfileHeader = {
@@ -170,20 +175,24 @@ var UserMarketBox = {
 };
 
 function UserUI$UserMarketStakeOrRedeem(Props) {
+  var synthAddress = Props.synthAddress;
+  var router = Router.useRouter();
+  var stake = function (param) {
+    router.push("/stake?tokenAddress=" + Ethers.Utils.ethAdrToLowerStr(synthAddress));
+    
+  };
+  var redeem = function (param) {
+    router.push("/redeem?tokenAddress=" + Ethers.Utils.ethAdrToLowerStr(synthAddress));
+    
+  };
   return React.createElement("div", {
               className: "flex flex-col"
-            }, React.createElement(Button.make, {
-                  onClick: (function (param) {
-                      
-                    }),
-                  children: "stake",
-                  variant: "tiny"
-                }), React.createElement(Button.make, {
-                  onClick: (function (param) {
-                      
-                    }),
-                  children: "redeem",
-                  variant: "tiny"
+            }, React.createElement(Button.Tiny.make, {
+                  onClick: stake,
+                  children: "stake"
+                }), React.createElement(Button.Tiny.make, {
+                  onClick: redeem,
+                  children: "redeem"
                 }));
 }
 
@@ -192,16 +201,19 @@ var UserMarketStakeOrRedeem = {
 };
 
 function UserUI$UserMarketUnstake(Props) {
+  var synthAddress = Props.synthAddress;
+  var router = Router.useRouter();
+  var unstake = function (param) {
+    router.push("/stake?tokenAddress=" + Ethers.Utils.ethAdrToLowerStr(synthAddress));
+    
+  };
   return React.createElement("div", {
               className: "flex flex-col"
             }, React.createElement("span", {
                   className: "text-xxs self-center"
-                }, React.createElement("i", undefined, "4 days ago")), React.createElement(Button.make, {
-                  onClick: (function (param) {
-                      
-                    }),
-                  children: "redeem",
-                  variant: "tiny"
+                }, React.createElement("i", undefined, "4 days ago")), React.createElement(Button.Tiny.make, {
+                  onClick: unstake,
+                  children: "unstake"
                 }));
 }
 
@@ -216,18 +228,22 @@ function UserUI$UserStakesCard(Props) {
   };
   var stakeBoxes = stakes.map(function (stake, i) {
         var key = "user-stakes-" + String(i);
-        var name = stake.currentStake.syntheticToken.syntheticMarket.symbol;
-        var tokens = FormatMoney.formatEther(undefined, stake.currentStake.syntheticToken.totalStaked);
-        var isLong = stake.currentStake.syntheticToken.tokenType === "Long";
-        var state = stake.currentStake.syntheticToken.syntheticMarket.latestSystemState;
-        var value = stake.currentStake.syntheticToken.totalStaked.mul(isLong ? state.longTokenPrice : state.shortTokenPrice).div(CONSTANTS.tenToThe18);
+        var syntheticToken = stake.currentStake.syntheticToken;
+        var addr = Ethers$1.utils.getAddress(syntheticToken.id);
+        var name = syntheticToken.syntheticMarket.symbol;
+        var tokens = FormatMoney.formatEther(undefined, syntheticToken.totalStaked);
+        var isLong = syntheticToken.tokenType === "Long";
+        var price = syntheticToken.latestPrice.price.price;
+        var value = stake.currentStake.syntheticToken.totalStaked.mul(price).div(CONSTANTS.tenToThe18);
         totalValue.contents = totalValue.contents.add(value);
         return React.createElement(UserUI$UserMarketBox, {
                     name: name,
                     isLong: isLong,
                     tokens: tokens,
                     value: FormatMoney.formatEther(undefined, value),
-                    children: React.createElement(UserUI$UserMarketUnstake, {}),
+                    children: React.createElement(UserUI$UserMarketUnstake, {
+                          synthAddress: addr
+                        }),
                     key: key
                   });
       });
@@ -247,36 +263,61 @@ var UserStakesCard = {
   make: UserUI$UserStakesCard
 };
 
-function UserUI$UserFloatBox(Props) {
-  var accruing = Props.accruing;
-  var balance = Props.balance;
-  var minted = Props.minted;
-  return React.createElement("div", {
-              className: "w-11/12 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow"
-            }, React.createElement(UserUI$UserColumnTextList, {
-                  children: null
-                }, React.createElement(UserUI$UserColumnText, {
-                      head: "float accruing",
-                      body: accruing
-                    }), React.createElement(UserUI$UserColumnText, {
-                      head: "float balance",
-                      body: balance
-                    }), React.createElement(UserUI$UserColumnText, {
-                      head: "float minted",
-                      body: minted
-                    })), React.createElement("div", {
-                  className: "flex justify-around flex-row my-1"
-                }, "🌊", React.createElement(Button.make, {
-                      onClick: (function (param) {
-                          
-                        }),
-                      children: "claim float",
-                      variant: "tiny"
-                    }), "🌊"));
+function UserUI$UserFloatCard(Props) {
+  var userId = Props.userId;
+  var stakes = Props.stakes;
+  var synthTokens = Belt_Array.map(stakes, (function (stake) {
+          return stake.currentStake.syntheticToken.id;
+        }));
+  var router = Router.useRouter();
+  var claimFloat = function (param) {
+    router.push("/stake");
+    
+  };
+  var floatBalances = DataHooks.useFloatBalancesForUser(userId);
+  var claimableFloat = DataHooks.useTotalClaimableFloatForUser(userId, synthTokens);
+  var msg = DataHooks.liftGraphResponse2(floatBalances, claimableFloat);
+  var tmp;
+  if (typeof msg === "number") {
+    tmp = React.createElement(MiniLoader.make, {});
+  } else if (msg.TAG === /* GraphError */0) {
+    tmp = msg._0;
+  } else {
+    var match = msg._0;
+    var match$1 = match[1];
+    var floatBalances$1 = match[0];
+    var floatBalance = FormatMoney.formatEther(6, floatBalances$1.floatBalance);
+    var floatMinted = FormatMoney.formatEther(6, floatBalances$1.floatMinted);
+    var floatAccrued = FormatMoney.formatEther(6, match$1[0].add(match$1[1]));
+    tmp = React.createElement("div", {
+          className: "w-11/12 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow"
+        }, React.createElement(UserUI$UserColumnTextList, {
+              children: null
+            }, React.createElement(UserUI$UserColumnText, {
+                  head: "float accruing",
+                  body: floatAccrued
+                }), React.createElement(UserUI$UserColumnText, {
+                  head: "float balance",
+                  body: floatBalance
+                }), React.createElement(UserUI$UserColumnText, {
+                  head: "float minted",
+                  body: floatMinted
+                })), React.createElement("div", {
+              className: "flex justify-around flex-row my-1"
+            }, "🌊", React.createElement(Button.Tiny.make, {
+                  onClick: claimFloat,
+                  children: "claim float"
+                }), "🌊"));
+  }
+  return React.createElement(UserUI$UserColumnCard, {
+              children: null
+            }, React.createElement(UserUI$UserColumnHeader, {
+                  children: "Float rewards 🔥"
+                }), tmp);
 }
 
-var UserFloatBox = {
-  make: UserUI$UserFloatBox
+var UserFloatCard = {
+  make: UserUI$UserFloatCard
 };
 
 export {
@@ -294,7 +335,7 @@ export {
   UserMarketStakeOrRedeem ,
   UserMarketUnstake ,
   UserStakesCard ,
-  UserFloatBox ,
+  UserFloatCard ,
   
 }
 /* react Not a pure module */

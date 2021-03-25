@@ -38,7 +38,7 @@ query ($synthToken: String!, $userAddress: String!) {
       amount
     }
   }
-  states (first:1, orderBy: stateIndex, orderDirection:desc, where: {syntheticToken: $synthToken, timeSinceLastUpdate_gt: 0}) {
+  stakeStates (first:1, orderBy: stateIndex, orderDirection:desc, where: {syntheticToken: $synthToken, timeSinceLastUpdate_gt: 0}) {
     stateIndex
     accumulativeFloatPerToken
     floatRatePerTokenOverInterval
@@ -49,7 +49,7 @@ query ($synthToken: String!, $userAddress: String!) {
 module Claimable = {
   @react.component
   let make = (~userAddress, ~synthToken) => {
-    let floatDetails = DataHooks.useFloatDetailsForUser(~userId=userAddress, ~synthToken)
+    let floatDetails = DataHooks.useClaimableFloatForUser(~userId=userAddress, ~synthToken)
 
     switch floatDetails {
     | Response((claimableFloat, predictedFloat)) => {

@@ -11,10 +11,12 @@ import * as Loader from "../UI/Loader.js";
 import * as Ethers$1 from "ethers";
 import * as Queries from "../../data/Queries.js";
 import * as Contracts from "../../ethereum/Contracts.js";
+import * as DataHooks from "../../data/DataHooks.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as AmountInput from "../UI/AmountInput.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as RootProvider from "../../libraries/RootProvider.js";
 import * as ContractHooks from "../Testing/Admin/ContractHooks.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
@@ -487,11 +489,7 @@ function StakeForm$StakeFormInput(Props) {
                   onChange: onChange,
                   onMaxClick: onMaxClick
                 }), React.createElement(Button.make, {
-                  onClick: (function (param) {
-                      
-                    }),
-                  children: "Stake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name,
-                  variant: "large"
+                  children: "Stake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name
                 }));
 }
 
@@ -517,8 +515,8 @@ function StakeForm$ConnectedStakeForm(Props) {
   var txStateApprove = match$2[1];
   var contractExecutionHandlerApprove = match$2[0];
   var stakerContractAddress = Config.useStakerAddress(undefined);
-  var match$3 = useBalanceAndApproved(Ethers$1.utils.getAddress(tokenId), stakerContractAddress);
-  var optTokenBalance = match$3[0];
+  var user = RootProvider.useCurrentUserExn(undefined);
+  var optTokenBalance = DataHooks.Util.graphResponseToOption(DataHooks.useSyntheticTokenBalance(user, synthetic.tokenAddress));
   React.useEffect((function () {
           if (typeof txStateApprove !== "number" && txStateApprove.TAG === /* Complete */2) {
             Curry._1(contractActionToCallAfterApproval, undefined);

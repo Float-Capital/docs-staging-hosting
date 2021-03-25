@@ -19,12 +19,24 @@ type StateChange @entity {
   blockNumber: BigInt!
   gasUsed: BigInt!
   txEventParamList: [EventParams!]!
-  affectedUsers: [User!]
+  affectedUsers: [User!]!
 }
 
 type Event @entity {
   id: ID!
   address: Bytes!
+}
+
+type Price @entity {
+  id: ID! # <marketIndex>-<long/short>-<timestamp>
+  price: BigInt!
+  timeUpdated: BigInt!
+  token: SyntheticToken!
+}
+
+type LatestPrice @entity {
+  id: ID! # latestPrice-<marketIndex>-<long/short>
+  price: Price!
 }
 
 type SystemState @entity {
@@ -34,8 +46,10 @@ type SystemState @entity {
   blockNumber: BigInt!
   marketIndex: BigInt!
   syntheticPrice: BigInt! # TODO: this should be a reference to another entity that holds the price
-  longTokenPrice: BigInt!
-  shortTokenPrice: BigInt!
+  longTokenPrice: LatestPrice!
+  shortTokenPrice: LatestPrice!
+  longToken: SyntheticToken!
+  shortToken: SyntheticToken!
   totalLockedLong: BigInt!
   totalLockedShort: BigInt!
   totalValueLocked: BigInt!
@@ -67,10 +81,13 @@ type SyntheticToken @entity {
   id: ID! # token address
   tokenAddress: Bytes!
   syntheticMarket: SyntheticMarket!
+  latestStakerState: StakeState!
   tokenType: TokenType!
   totalStaked: BigInt!
   tokenSupply: BigInt!
   floatMintedFromSpecificToken: BigInt!
+  latestPrice: LatestPrice!
+  priceHistory: [Price!]!
 }
 
 type SyntheticMarket @entity {
@@ -98,14 +115,15 @@ type User @entity {
   timestampJoined: BigInt!
   totalGasUsed: BigInt!
   numberOfTransactions: BigInt!
-  currentStakes: [CurrentStake!]
-  stateChangesAffectingUser: [StateChange!]
-  tokenBalances: [UserSyntheticTokenBalance!]
-  tokenMints: [UserSyntheticTokenMinted!]
+  currentStakes: [CurrentStake!]!
+  stateChangesAffectingUser: [StateChange!]!
+  tokenBalances: [UserSyntheticTokenBalance!]!
+  tokenMints: [UserSyntheticTokenMinted!]!
 }
 
 type UserSyntheticTokenBalance @entity {
   id: ID! # token address - user address - "balance"
+  timeLastUpdated: BigInt!
   syntheticToken: SyntheticToken!
   user: User!
   tokenBalance: BigInt!
@@ -124,7 +142,7 @@ type CurrentStake @entity {
   userAddress: Bytes!
   syntheticToken: SyntheticToken!
   currentStake: Stake!
-  lastMintState: State!
+  lastMintState: StakeState!
 }
 
 type Stake @entity {
@@ -138,7 +156,7 @@ type Stake @entity {
   withdrawn: Boolean!
 }
 
-type State @entity {
+type StakeState @entity {
   id: ID! # token address - state indexed
   blockNumber: BigInt!
   creationTxHash: Bytes!

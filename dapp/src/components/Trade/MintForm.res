@@ -1,10 +1,10 @@
 module MintForm = %form(
-  type input = {amount: string, isLong: bool, isStaking: bool}
-  type output = {amount: Ethers.BigNumber.t, isLong: bool, isStaking: bool}
+  type input = {amount: string, isStaking: bool}
+  type output = {amount: Ethers.BigNumber.t, isStaking: bool}
 
   let validators = {
     amount: {
-      strategy: OnFirstBlur,
+      strategy: OnFirstSuccessOrFirstBlur,
       validate: ({amount}) => {
         let amountRegex = %re(`/^[+]?\d+(\.\d+)?$/`)
 
@@ -20,17 +20,12 @@ module MintForm = %form(
         }
       },
     },
-    isLong: {
-      strategy: OnFirstChange,
-      validate: ({isLong}) => isLong->Ok,
-    },
     isStaking: None,
   }
 )
 
 let initialInput: MintForm.input = {
   amount: "",
-  isLong: false,
   isStaking: true,
 }
 
@@ -47,45 +42,242 @@ let isGreaterThanBalance = (~amount, ~balance) => {
   amount->Ethers.BigNumber.gt(balance)
 }
 
-@react.component
-let make = (
-  ~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets,
-  ~initialIsLong,
-) => {
-  let signer = ContractActions.useSignerExn()
+module SubmitButtonAndTxTracker = {
+  @react.component
+  let make = (
+    ~txStateApprove,
+    ~txStateMint,
+    ~resetFormButton,
+    ~tokenToMint,
+    ~buttonText,
+    ~buttonDisabled,
+  ) => {
+    switch (txStateApprove, txStateMint) {
+    | (ContractActions.Created, _) => <>
+        <h1>
+          {`Please Approve that Float can use your ${Config.paymentTokenName}`->React.string}
+        </h1>
+      </>
+    | (ContractActions.SignedAndSubmitted(txHash), _) => <>
+        <hr />
+        <h1>
+          <a target="_" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
+            {"Processing Approval "->React.string}
+          </a>
+        </h1>
+      </>
+    | (ContractActions.Complete({transactionHash}), ContractActions.Created)
+    | (ContractActions.Complete({transactionHash}), ContractActions.UnInitialised) => <>
+        <hr />
+        <h1>
+          <a target="_" href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
+            {`✅ Approval Complete`->React.string}
+          </a>
+        </h1>
+        <h1> {`Sign the next transaction to mint your`->React.string} </h1>
+      </>
+    | (ContractActions.Declined(message), _) => <>
+        <hr />
+        <h1>
+          {`❌ The transaction was declined by your wallet, you need to accept the transaction to proceed.`->React.string}
+        </h1>
+        <p> {("Failure reason: " ++ message)->React.string} </p>
+        {resetFormButton()}
+      </>
+    | (ContractActions.Failed, _) => <>
+        <hr />
+        <h1> {`❌ The transaction failed.`->React.string} </h1>
+        <p>
+          <a target="_" href=Config.discordInviteLink>
+            {"This shouldn't happen, please let us help you on discord."->React.string}
+          </a>
+        </p>
+        {resetFormButton()}
+      </>
+    | (_, ContractActions.Created) => <>
+        <hr />
+        <h1>
+          {`Sign the transaction to mint ${tokenToMint} with your ${Config.paymentTokenName}`->React.string}
+        </h1>
+      </>
+    | (
+        ContractActions.Complete({transactionHash}),
+        ContractActions.SignedAndSubmitted(txHash),
+      ) => <>
+        <hr />
+        <h1>
+          <a target="_" href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
+            {`✅ Approval Complete`->React.string}
+          </a>
+        </h1>
+        <h1>
+          <a target="_" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
+            {`Processing minting ${tokenToMint} with your ${Config.paymentTokenName}`->React.string}
+          </a>
+        </h1>
+      </>
+    | (_, ContractActions.SignedAndSubmitted(txHash)) => <>
+        <hr />
+        <h1>
+          <a target="_" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
+            {`Processing minting ${tokenToMint} with your ${Config.paymentTokenName} (click to view)`->React.string}
+          </a>
+        </h1>
+      </>
+    | (_, ContractActions.Complete({transactionHash})) => <>
+        <hr />
+        <h1>
+          <a target="_" href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
+            {`✅ Transaction Complete (click to view)`->React.string}
+          </a>
+        </h1>
+        {resetFormButton()}
+      </>
+    | (_, ContractActions.Declined(message)) => <>
+        <h1>
+          {`❌ The transaction was declined by your wallet, you need to accept the transaction to proceed.`->React.string}
+        </h1>
+        <p> {("Failure reason: " ++ message)->React.string} </p>
+        {resetFormButton()}
+      </>
+    | (_, ContractActions.Failed) => <>
+        <hr />
+        <h1> {`❌ The transaction failed.`->React.string} </h1>
+        <p>
+          <a target="_" href=Config.discordInviteLink>
+            {"This shouldn't happen, please let us help you on discord."->React.string}
+          </a>
+        </p>
+        {resetFormButton()}
+      </>
+    | _ => <Button disabled=buttonDisabled onClick={_ => ()}> {buttonText} </Button>
+    }
+  }
+}
 
-  let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
-  let (
-    contractExecutionHandlerApprove,
-    txStateApprove,
-    setTxStateApprove,
-  ) = ContractActions.useContractFunction(~signer)
-  let (
-    contractActionToCallAfterApproval,
-    setContractActionToCallAfterApproval,
-  ) = React.useState(((), ()) => ())
+module MintFormInput = {
+  @react.component
+  let make = (
+    ~onSubmit=_ => (),
+    ~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets,
+    ~onChangeSide=_ => (),
+    ~isLong,
+    ~onBlurSide=_ => (),
+    ~valueAmountInput="",
+    ~optDaiBalance=None,
+    ~onBlurAmount=_ => (),
+    ~onChangeAmountInput=_ => (),
+    ~onMaxClick=_ => (),
+    ~optErrorMessage=None,
+    ~isStaking=true,
+    ~disabled=false,
+    ~onBlurIsStaking=_ => (),
+    ~onChangeIsStaking=_ => (),
+    ~txStateApprove=ContractActions.UnInitialised,
+    ~txStateMint=ContractActions.UnInitialised,
+    ~submitButton=<Button> "Login & Mint" </Button>,
+  ) => {
+    let formInput =
+      <>
+        <div className="flex justify-between mb-2">
+          <h2> {`${market.name} (${market.symbol})`->React.string} </h2>
+        </div>
+        <select
+          name="longshort"
+          className="trade-select"
+          onChange=onChangeSide
+          value={isLong ? "long" : "short"}
+          onBlur=onBlurSide
+          disabled>
+          <option value="long"> {`Long 🐮`->React.string} </option>
+          <option value="short"> {`Short 🐻`->React.string} </option>
+        </select>
+        <AmountInput
+          value=valueAmountInput
+          optBalance={optDaiBalance}
+          disabled
+          onBlur=onBlurAmount
+          onChange=onChangeAmountInput
+          placeholder={"Mint"}
+          onMaxClick
+        />
+        {switch optErrorMessage {
+        | Some(message) => <div className="text-red-500 text-xs"> {message->React.string} </div>
+        | None => React.null
+        }}
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <input
+              id="stake-checkbox"
+              type_="checkbox"
+              className="mr-2"
+              checked={isStaking}
+              disabled
+              onBlur=onBlurIsStaking
+              onChange=onChangeIsStaking
+            />
+            <label htmlFor="stake-checkbox" className="text-xs">
+              {`Stake ${isLong ? "long" : "short"} tokens`->React.string}
+            </label>
+          </div>
+          <p className="text-xxs hover:text-gray-500">
+            <a href="https://docs.float.capital/docs/stake">
+              {"Learn more about staking"->React.string}
+            </a>
+          </p>
+        </div>
+      </>
 
-  let longShortContractAddress = Config.useLongShortAddress()
-  let daiAddressThatIsTemporarilyHardCoded = Config.useDaiAddress()
+    <div className="screen-centered-container">
+      <ViewBox>
+        <Form className="" onSubmit>
+          <div className="relative">
+            {formInput}
+            {switch (txStateApprove, txStateMint) {
+            | (ContractActions.SignedAndSubmitted(_), _)
+            | (ContractActions.Created, _)
+            | (_, ContractActions.SignedAndSubmitted(_))
+            | (_, ContractActions.Created) =>
+              <Loader.Overlay />
+            | _ => React.null
+            }}
+          </div>
+          {submitButton}
+        </Form>
+      </ViewBox>
+    </div>
+  }
+}
 
-  // NOTE: this is heavy and slow, we fetch 6 values from the blockchain every time this component mounts. Maybe move some of this to the graph?
-  let (optDaiBalance, optDaiAmountApproved) = useBalanceAndApproved(
-    ~erc20Address=daiAddressThatIsTemporarilyHardCoded,
-    ~spender=longShortContractAddress,
-  )
-  let {Swr.data: optShortBalance} = ContractHooks.useErc20BalanceRefresh(
-    ~erc20Address=market.syntheticShort.tokenAddress,
-  )
-  let {Swr.data: optLongBalance} = ContractHooks.useErc20BalanceRefresh(
-    ~erc20Address=market.syntheticLong.tokenAddress,
-  )
+module MintFormSignedIn = {
+  @react.component
+  let make = (
+    ~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets,
+    ~isLong,
+    ~signer,
+  ) => {
+    let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
+      ~signer,
+    )
+    let (
+      contractExecutionHandlerApprove,
+      txStateApprove,
+      setTxStateApprove,
+    ) = ContractActions.useContractFunction(~signer)
+    let (
+      contractActionToCallAfterApproval,
+      setContractActionToCallAfterApproval,
+    ) = React.useState(((), ()) => ())
 
-  let form = MintForm.useForm(
-    ~initialInput={
-      ...initialInput,
-      isLong: initialIsLong,
-    },
-    ~onSubmit=({amount, isLong, isStaking}, _form) => {
+    let longShortContractAddress = Config.useLongShortAddress()
+    let daiAddressThatIsTemporarilyHardCoded = Config.useDaiAddress()
+
+    let (optDaiBalance, optDaiAmountApproved) = useBalanceAndApproved(
+      ~erc20Address=daiAddressThatIsTemporarilyHardCoded,
+      ~spender=longShortContractAddress,
+    )
+
+    let form = MintForm.useForm(~initialInput, ~onSubmit=({amount, isStaking}, _form) => {
       let approveFunction = () =>
         contractExecutionHandlerApprove(
           ~makeContractInstance=Contracts.Erc20.make(~address=daiAddressThatIsTemporarilyHardCoded),
@@ -121,19 +313,29 @@ let make = (
         approveFunction()
       | false => isStaking ? mintAndStakeFunction() : mintFunction()
       }
-    },
-  )
+    })
 
-  let formAmount = switch form.amountResult {
-  | Some(Ok(amount)) => Some(amount)
-  | _ => None
-  }
+    let formAmount = switch form.amountResult {
+    | Some(Ok(amount)) => Some(amount)
+    | _ => None
+    }
 
-  let (optAdditionalErrorMessage, _buttonText, _buttonDisabled) = {
-    let stakingText = form.input.isStaking ? "Mint & Stake" : "Mint" // TODO: decide on this " & stake" : ""
-    let approveConnector = form.input.isStaking ? "," : " &" // TODO: decide on this " & stake" : ""
-    switch form.input.isLong {
-    | isLong =>
+    let resetFormButton = () =>
+      <Button
+        onClick={_ => {
+          form.reset()
+          setTxStateApprove(_ => ContractActions.UnInitialised)
+          setTxState(_ => ContractActions.UnInitialised)
+        }}>
+        {"Reset & Mint Again"}
+      </Button>
+
+    let tokenToMint = isLong ? `long ${market.name}` : `short ${market.name}`
+
+    let (optAdditionalErrorMessage, buttonText, buttonDisabled) = {
+      let stakingText = form.input.isStaking ? "Mint & Stake" : "Mint" // TODO: decide on this " & stake" : ""
+      let approveConnector = form.input.isStaking ? "," : " &" // TODO: decide on this " & stake" : ""
+
       let position = isLong ? "long" : "short"
       switch (formAmount, optDaiBalance, optDaiAmountApproved) {
       | (Some(amount), Some(balance), Some(amountApproved)) =>
@@ -147,203 +349,81 @@ let make = (
             | true => `Approve${approveConnector} ${stakingText} ${position} position`
             | false => `${stakingText} ${position} position`
             },
-            false,
+            !form.valid(),
           )
         }
       | _ => (None, `${stakingText} ${position} position`, true)
       }
     }
+
+    // Execute the call after approval has completed
+    React.useEffect1(() => {
+      switch txStateApprove {
+      | Complete(_) =>
+        contractActionToCallAfterApproval()
+        setTxStateApprove(_ => ContractActions.UnInitialised)
+      | _ => ()
+      }
+      None
+    }, [txStateApprove])
+
+    let router = Next.Router.useRouter()
+
+    <MintFormInput
+      txStateApprove
+      txStateMint=txState
+      onSubmit={form.submit}
+      market
+      onChangeSide={event => {
+        router.query->Js.Dict.set("mintOption", (event->ReactEvent.Form.target)["value"])
+        router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
+      }}
+      isLong={isLong}
+      onBlurSide={_ => form.blurIsStaking()}
+      valueAmountInput=form.input.amount
+      optDaiBalance
+      onBlurAmount={_ => form.blurAmount()}
+      onChangeAmountInput={event => form.updateAmount((input, amount) => {
+          ...input,
+          amount: amount,
+        }, (event->ReactEvent.Form.target)["value"])}
+      onMaxClick={_ =>
+        form.updateAmount(
+          (input, amount) => {
+            ...input,
+            amount: amount,
+          },
+          switch optDaiBalance {
+          | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
+          | _ => "0"
+          },
+        )}
+      isStaking={form.input.isStaking}
+      disabled={form.submitting}
+      onBlurIsStaking={_ => form.blurIsStaking()}
+      onChangeIsStaking={event =>
+        form.updateIsStaking(
+          (input, value) => {...input, isStaking: value},
+          (event->ReactEvent.Form.target)["checked"],
+        )}
+      optErrorMessage=optAdditionalErrorMessage
+      submitButton={<SubmitButtonAndTxTracker
+        buttonText resetFormButton tokenToMint txStateApprove txStateMint=txState buttonDisabled
+      />}
+    />
   }
+}
 
-  // Execute the call after approval has completed
-  React.useEffect1(() => {
-    switch txStateApprove {
-    | Complete(_) =>
-      contractActionToCallAfterApproval()
-      setTxStateApprove(_ => ContractActions.UnInitialised)
-    | _ => ()
-    }
-    None
-  }, [txStateApprove])
+@react.component
+let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets, ~isLong) => {
+  let router = Next.Router.useRouter()
 
-  <div className="screen-centered-container">
-    <ViewBox>
-      <Form
-        className="this-is-required"
-        onSubmit={() => {
-          form.submit()
-        }}>
-        <div className="flex justify-between mb-2">
-          <h2> {`${market.name} (${market.symbol})`->React.string} </h2>
-          // <Next.Link href="/redeem">
-          //   <span className="text-xs hover:text-gray-500 cursor-pointer">
-          //     {"Redeem"->React.string}
-          //   </span>
-          // </Next.Link>
-        </div>
-        <select
-          name="longshort"
-          className="trade-select"
-          onChange={event =>
-            form.updateIsLong(
-              (input, isLong) => {...input, isLong: isLong},
-              (event->ReactEvent.Form.target)["value"] == "long",
-            )}
-          value={form.input.isLong ? "long" : "short"}
-          onBlur={_ => form.blurAmount()}
-          disabled=form.submitting>
-          <option value="long"> {`Long 🐮`->React.string} </option>
-          <option value="short"> {`Short 🐻`->React.string} </option>
-        </select>
-        <AmountInput
-          value=form.input.amount
-          optBalance={optDaiBalance}
-          disabled=form.submitting
-          onBlur={_ => form.blurAmount()}
-          onChange={event => form.updateAmount((input, amount) => {
-              ...input,
-              amount: amount,
-            }, (event->ReactEvent.Form.target)["value"])}
-          placeholder={"Mint"}
-          onMaxClick={_ =>
-            form.updateAmount(
-              (input, amount) => {
-                ...input,
-                amount: amount,
-              },
-              switch optDaiBalance {
-              | Some(daiBalance) => daiBalance->Ethers.Utils.formatEther
-              | _ => "0"
-              },
-            )}
-        />
-        {switch (form.amountResult, optAdditionalErrorMessage) {
-        | (Some(Error(message)), _)
-        | (_, Some(message)) =>
-          <div className="text-red-500 text-xs"> {message->React.string} </div>
-        | (Some(Ok(_)), None) => React.null
-        | (None, None) => React.null
-        }}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <input
-              id="stake-checkbox"
-              type_="checkbox"
-              className="mr-2"
-              checked={form.input.isStaking}
-              disabled={form.submitting}
-              onBlur={_ => form.blurIsStaking()}
-              onChange={event =>
-                form.updateIsStaking(
-                  (input, value) => {...input, isStaking: value},
-                  (event->ReactEvent.Form.target)["checked"],
-                )}
-            />
-            <label htmlFor="stake-checkbox" className="text-xs">
-              {`Stake ${form.input.isLong ? "long" : "short"} tokens`->React.string}
-            </label>
-          </div>
-          <p className="text-xxs hover:text-gray-500">
-            <a href="https://docs.float.capital/docs/stake">
-              {"Learn more about staking"->React.string}
-            </a>
-          </p>
-        </div>
-        // <Toggle onClick={_ => Js.log("I was toggled")} preLabel="stake " postLabel="" />
-        <Button onClick={_ => ()} variant="large"> {_buttonText} </Button>
-      </Form>
-    </ViewBox>
-    {Config.isDevMode // <- this can be used to hide this code when not developing
-      ? <>
-          {switch txState {
-          | ContractActions.UnInitialised => React.null
-          | ContractActions.Created => <>
-              <h1> {"Processing Approval "->React.string} </h1> <Loader />
-            </>
-          | ContractActions.SignedAndSubmitted(_txHash) => <>
-              <h1> {"Processing Approval - submitted "->React.string} <Loader /> </h1> <Loader />
-            </>
-          | ContractActions.Complete({transactionHash: _txHash}) => <>
-              <h1> {"Approval Complete, Sign the next transaction "->React.string} </h1>
-            </>
-          | ContractActions.Declined(message) => <>
-              <h1>
-                {"The transaction was declined by your wallet, please try again."->React.string}
-              </h1>
-              <p> {("Failure reason: " ++ message)->React.string} </p>
-            </>
-          | ContractActions.Failed => <>
-              <h1> {"The transaction failed."->React.string} </h1>
-              <p> {"This operation isn't permitted by the smart contract."->React.string} </p>
-            </>
-          }}
-          {
-            let txExplererUrl = RootProvider.useEtherscanUrl()
-
-            let resetTxButton =
-              <button onClick={_ => setTxState(_ => ContractActions.UnInitialised)}>
-                {">>Reset tx<<"->React.string}
-              </button>
-
-            switch txState {
-            | ContractActions.UnInitialised => React.null
-            | ContractActions.Created => <>
-                <h1> {"Processing Transaction "->React.string} <Loader /> </h1>
-                <p> {"Tx created."->React.string} </p>
-                <div> <Loader /> </div>
-              </>
-            | ContractActions.SignedAndSubmitted(txHash) => <>
-                <h1> {"Processing Transaction "->React.string} <Loader /> </h1>
-                <p>
-                  <a
-                    href=j`https://$txExplererUrl/tx/$txHash`
-                    target="_blank"
-                    rel="noopener noreferrer">
-                    {("View the transaction on " ++ txExplererUrl)->React.string}
-                  </a>
-                </p>
-                <Loader />
-              </>
-            | ContractActions.Complete(result) =>
-              let txHash = result.transactionHash
-              <>
-                <h1> {"Transaction Complete "->React.string} </h1>
-                <p>
-                  <a
-                    href=j`https://$txExplererUrl/tx/$txHash`
-                    target="_blank"
-                    rel="noopener noreferrer">
-                    {("View the transaction on " ++ txExplererUrl)->React.string}
-                  </a>
-                </p>
-                resetTxButton
-              </>
-            | ContractActions.Declined(message) => <>
-                <h1>
-                  {"The transaction was declined by your wallet, please try again."->React.string}
-                </h1>
-                <p> {("Failure reason: " ++ message)->React.string} </p>
-                resetTxButton
-              </>
-            | ContractActions.Failed => <>
-                <h1> {"The transaction failed."->React.string} </h1>
-                <p> {"This operation isn't permitted by the smart contract."->React.string} </p>
-                resetTxButton
-              </>
-            }
-          }
-          {
-            let formatOptBalance = Option.mapWithDefault(_, "Loading", Ethers.Utils.formatEther)
-            <code>
-              <p> {"dev only component to display balances"->React.string} </p>
-              <p>
-                {`dai - balance: ${optDaiBalance->formatOptBalance} - approved: ${optDaiAmountApproved->formatOptBalance}`->React.string}
-              </p>
-              <p> {`long - balance: ${optLongBalance->formatOptBalance}`->React.string} </p>
-              <p> {`short - balance: ${optShortBalance->formatOptBalance}`->React.string} </p>
-            </code>
-          }
-        </>
-      : React.null}
-  </div>
+  let optSigner = ContractActions.useSigner()
+  switch optSigner {
+  | Some(signer) => <MintFormSignedIn signer market isLong />
+  | None =>
+    <div onClick={_ => router->Next.Router.push(`/login?nextPath=${router.asPath}`)}>
+      <MintFormInput market isLong />
+    </div>
+  }
 }

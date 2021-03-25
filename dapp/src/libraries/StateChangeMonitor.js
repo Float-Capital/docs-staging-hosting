@@ -58,9 +58,88 @@ function StateChangeMonitor(Props) {
                           Belt_Array.map(stateChanges, (function (param) {
                                   var timestamp = param.timestamp;
                                   if (timestamp.gt(latestStateChangeTimestamp)) {
-                                    return Curry._1(setLatestStateChangeTimestamp, (function (param) {
-                                                  return timestamp;
-                                                }));
+                                    Curry._1(setLatestStateChangeTimestamp, (function (param) {
+                                            return timestamp;
+                                          }));
+                                    Belt_Array.map(param.affectedUsers, (function (param) {
+                                            var tokenBalances = param.tokenBalances;
+                                            var id = param.basicUserInfo.id;
+                                            var __typename = param.__typename;
+                                            Belt_Array.map(tokenBalances, (function (tokenBalance) {
+                                                    Curry._6(client.rescript_writeQuery, {
+                                                          query: Queries.UsersBalance.query,
+                                                          Raw: Queries.UsersBalance.Raw,
+                                                          parse: Queries.UsersBalance.parse,
+                                                          serialize: Queries.UsersBalance.serialize,
+                                                          serializeVariables: Queries.UsersBalance.serializeVariables
+                                                        }, undefined, {
+                                                          user: {
+                                                            __typename: __typename,
+                                                            tokenBalances: [tokenBalance]
+                                                          }
+                                                        }, undefined, undefined, {
+                                                          userId: id,
+                                                          tokenAdr: tokenBalance.syntheticToken.id
+                                                        });
+                                                    
+                                                  }));
+                                            var balanceReadQuery = Curry._5(client.rescript_readQuery, {
+                                                  query: Queries.UsersBalances.query,
+                                                  Raw: Queries.UsersBalances.Raw,
+                                                  parse: Queries.UsersBalances.parse,
+                                                  serialize: Queries.UsersBalances.serialize,
+                                                  serializeVariables: Queries.UsersBalances.serializeVariables
+                                                }, undefined, undefined, undefined, {
+                                                  userId: id
+                                                });
+                                            if (balanceReadQuery !== undefined && balanceReadQuery.TAG === /* Ok */0) {
+                                              var match = balanceReadQuery._0.user;
+                                              if (match !== undefined) {
+                                                var containsBalanceItem = function (listOfBalances, param) {
+                                                  var comparisonId = param.id;
+                                                  return Belt_Array.getIndexBy(listOfBalances, (function (param) {
+                                                                return comparisonId === param.id;
+                                                              }));
+                                                };
+                                                var updatedTokenBalances = Belt_Array.reduce(tokenBalances, match.tokenBalances, (function (currentBalances, newBalance) {
+                                                        var index = containsBalanceItem(currentBalances, newBalance);
+                                                        if (index !== undefined) {
+                                                          Belt_Array.set(currentBalances, index, newBalance);
+                                                          return currentBalances;
+                                                        } else {
+                                                          return Belt_Array.concat(currentBalances, [newBalance]);
+                                                        }
+                                                      }));
+                                                Curry._6(client.rescript_writeQuery, {
+                                                      query: Queries.UsersBalances.query,
+                                                      Raw: Queries.UsersBalances.Raw,
+                                                      parse: Queries.UsersBalances.parse,
+                                                      serialize: Queries.UsersBalances.serialize,
+                                                      serializeVariables: Queries.UsersBalances.serializeVariables
+                                                    }, undefined, {
+                                                      user: {
+                                                        __typename: match.__typename,
+                                                        tokenBalances: updatedTokenBalances
+                                                      }
+                                                    }, undefined, undefined, {
+                                                      userId: id
+                                                    });
+                                                return ;
+                                              }
+                                              
+                                            }
+                                            Curry._6(client.rescript_query, {
+                                                  query: Queries.UsersBalances.query,
+                                                  Raw: Queries.UsersBalances.Raw,
+                                                  parse: Queries.UsersBalances.parse,
+                                                  serialize: Queries.UsersBalances.serialize,
+                                                  serializeVariables: Queries.UsersBalances.serializeVariables
+                                                }, undefined, undefined, undefined, undefined, {
+                                                  userId: id
+                                                });
+                                            
+                                          }));
+                                    return ;
                                   }
                                   
                                 }));

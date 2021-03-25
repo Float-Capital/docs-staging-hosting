@@ -114,13 +114,12 @@ function Navigation(Props) {
                   }))
         });
   } else {
-    tmp = React.createElement(Button.make, {
+    tmp = React.createElement(Button.Small.make, {
           onClick: (function (param) {
               router.push("/login?nextPath=" + router.asPath);
               
             }),
-          children: "LOGIN",
-          variant: "small"
+          children: "LOGIN"
         });
   }
   var tmp$1;
@@ -138,15 +137,14 @@ function Navigation(Props) {
               address: Globals.ethAdrToStr(currentUser$1)
             }));
   } else {
-    tmp$1 = React.createElement(Button.make, {
+    tmp$1 = React.createElement(Button.Small.make, {
           onClick: (function (param) {
               router.push("/login?nextPath=" + router.asPath);
               return Curry._1(setIsOpen, (function (param) {
                             return false;
                           }));
             }),
-          children: "LOGIN",
-          variant: "small"
+          children: "LOGIN"
         });
   }
   return React.createElement(React.Fragment, undefined, React.createElement("nav", {
@@ -169,7 +167,7 @@ function Navigation(Props) {
                           href: "/markets",
                           children: React.createElement("a", {
                                 className: "px-3 hover:bg-white"
-                              }, "MARKETS")
+                              }, "MINT")
                         }), React.createElement(Link, {
                           href: "/stake",
                           children: React.createElement("a", {

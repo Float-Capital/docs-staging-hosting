@@ -8,22 +8,20 @@ import * as MiniLoader from "../UI/MiniLoader.js";
 
 function StakeList(Props) {
   var stakeDetailsQuery = DataHooks.useGetStakes(undefined);
-  console.log("I rerendered");
-  var match = stakeDetailsQuery.data;
+  var tmp;
+  tmp = typeof stakeDetailsQuery === "number" ? React.createElement("div", {
+          className: "m-auto"
+        }, React.createElement(MiniLoader.make, {})) : (
+      stakeDetailsQuery.TAG === /* GraphError */0 ? "Error: " + stakeDetailsQuery._0 : React.createElement("div", undefined, Belt_Array.map(stakeDetailsQuery._0, (function (syntheticMarket) {
+                    return React.createElement(StakeCard.make, {
+                                syntheticMarket: syntheticMarket,
+                                key: syntheticMarket.name
+                              });
+                  })))
+    );
   return React.createElement("div", {
               className: "w-full max-w-4xl mx-auto"
-            }, stakeDetailsQuery.loading ? React.createElement("div", {
-                    className: "m-auto"
-                  }, React.createElement(MiniLoader.make, {})) : (
-                stakeDetailsQuery.error !== undefined ? "Error loading data" : (
-                    match !== undefined ? React.createElement(React.Fragment, undefined, Belt_Array.map(match.syntheticMarkets, (function (syntheticMarket) {
-                                  return React.createElement(StakeCard.make, {
-                                              syntheticMarket: syntheticMarket,
-                                              key: syntheticMarket.name
-                                            });
-                                }))) : "You might think this is impossible, but depending on the situation it might not be!"
-                  )
-              ));
+            }, tmp);
 }
 
 var make = StakeList;

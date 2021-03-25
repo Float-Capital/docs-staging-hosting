@@ -5,7 +5,97 @@ import * as Loader from "./components/UI/Loader.js";
 import * as UserUI from "./components/UI/UserUI.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
 import * as DataHooks from "./data/DataHooks.js";
+import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as MiniLoader from "./components/UI/MiniLoader.js";
+import * as FormatMoney from "./components/UI/FormatMoney.js";
 import * as Router from "next/router";
+import * as DisplayAddress from "./components/UI/DisplayAddress.js";
+import Format from "date-fns/format";
+
+function User$UserBalancesCard(Props) {
+  var userId = Props.userId;
+  var usersTokensQuery = DataHooks.useUsersBalances(userId);
+  var tmp;
+  if (typeof usersTokensQuery === "number") {
+    tmp = React.createElement("div", {
+          className: "m-auto"
+        }, React.createElement(MiniLoader.make, {}));
+  } else if (usersTokensQuery.TAG === /* GraphError */0) {
+    tmp = usersTokensQuery._0;
+  } else {
+    var match = usersTokensQuery._0;
+    tmp = React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnTextCenter.make, {
+              children: React.createElement(UserUI.UserColumnText.make, {
+                    head: "💰 Synth value",
+                    body: "$" + FormatMoney.formatEther(undefined, match.totalBalance)
+                  })
+            }), React.createElement("br", undefined), Belt_Array.map(match.balances, (function (param) {
+                var isLong = param.isLong;
+                var name = param.name;
+                return React.createElement(UserUI.UserMarketBox.make, {
+                            name: name,
+                            isLong: isLong,
+                            tokens: FormatMoney.formatEther(undefined, param.tokenBalance),
+                            value: FormatMoney.formatEther(undefined, param.tokensValue),
+                            children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {
+                                  synthAddress: param.addr
+                                }),
+                            key: name + "-" + (
+                              isLong ? "long" : "short"
+                            )
+                          });
+              })));
+  }
+  return React.createElement(UserUI.UserColumnCard.make, {
+              children: null
+            }, React.createElement(UserUI.UserColumnHeader.make, {
+                  children: null
+                }, "Synthetic Assets", React.createElement("img", {
+                      className: "inline h-5 ml-2",
+                      src: "/img/coin.png"
+                    })), tmp, React.createElement("br", undefined), React.createElement(UserUI.UserColumnTextCenter.make, {
+                  children: React.createElement("span", {
+                        className: "text-sm"
+                      }, "💸 Why not mint some more? 💸")
+                }));
+}
+
+var UserBalancesCard = {
+  make: User$UserBalancesCard
+};
+
+function User$UserProfileCard(Props) {
+  var userInfo = Props.userInfo;
+  var addressStr = DisplayAddress.ellipsifyMiddle(userInfo.id, 8, 3);
+  var joinedStr = Format(userInfo.joinedAt, "P");
+  var txStr = userInfo.transactionCount.toString();
+  var gasStr = FormatMoney.formatInt(userInfo.gasUsed.toString());
+  return React.createElement(UserUI.UserColumnCard.make, {
+              children: null
+            }, React.createElement(UserUI.UserProfileHeader.make, {}), React.createElement(UserUI.UserColumnTextList.make, {
+                  children: null
+                }, React.createElement(UserUI.UserColumnText.make, {
+                      head: "📮 Address",
+                      body: addressStr
+                    }), React.createElement(UserUI.UserColumnText.make, {
+                      head: "🎉 Joined",
+                      body: joinedStr
+                    }), React.createElement(UserUI.UserColumnText.make, {
+                      head: "⛽ Gas used",
+                      body: gasStr
+                    }), React.createElement(UserUI.UserColumnText.make, {
+                      head: "🏃 No. txs",
+                      body: txStr
+                    }), React.createElement(UserUI.UserColumnText.make, {
+                      icon: "/img/discord.png",
+                      head: "Discord",
+                      body: "✅"
+                    })));
+}
+
+var UserProfileCard = {
+  make: User$UserProfileCard
+};
 
 function onQueryError(msg) {
   return React.createElement(UserUI.UserContainer.make, {
@@ -19,66 +109,20 @@ function onQuerySuccess(data) {
             }, React.createElement(UserUI.UserBanner.make, {}), React.createElement(UserUI.UserColumnContainer.make, {
                   children: null
                 }, React.createElement(UserUI.UserColumn.make, {
-                      children: React.createElement(UserUI.UserColumnCard.make, {
-                            children: null
-                          }, React.createElement(UserUI.UserProfileHeader.make, {
-                                name: "moose-code",
-                                level: "1"
-                              }), React.createElement(UserUI.UserColumnTextList.make, {
-                                children: null
-                              }, React.createElement(UserUI.UserColumnText.make, {
-                                    head: "📮 Address",
-                                    body: "0x1234...1234"
-                                  }), React.createElement(UserUI.UserColumnText.make, {
-                                    head: "🎉 Joined",
-                                    body: "03/02/2021"
-                                  }), React.createElement(UserUI.UserColumnText.make, {
-                                    head: "⛽ Gas used",
-                                    body: "6,789,000"
-                                  }), React.createElement(UserUI.UserColumnText.make, {
-                                    head: "🏃 No. txs",
-                                    body: "11"
-                                  }), React.createElement(UserUI.UserColumnText.make, {
-                                    icon: "/img/discord.png",
-                                    head: "Discord",
-                                    body: "✅"
-                                  })))
+                      children: React.createElement(User$UserProfileCard, {
+                            userInfo: data.userInfo
+                          })
                     }), React.createElement(UserUI.UserColumn.make, {
                       children: null
-                    }, React.createElement(UserUI.UserColumnCard.make, {
-                          children: null
-                        }, React.createElement(UserUI.UserColumnHeader.make, {
-                              children: null
-                            }, "Synthetic Assets", React.createElement("img", {
-                                  className: "inline h-5 ml-2",
-                                  src: "/img/coin.png"
-                                })), React.createElement(UserUI.UserColumnTextCenter.make, {
-                              children: React.createElement(UserUI.UserColumnText.make, {
-                                    head: "💰 Synth value",
-                                    body: "$9,123"
-                                  })
-                            }), React.createElement("br", undefined), React.createElement(UserUI.UserMarketBox.make, {
-                              name: "FTSE 100",
-                              isLong: true,
-                              tokens: "23.81",
-                              value: "450",
-                              children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {})
-                            }), React.createElement("br", undefined), React.createElement(UserUI.UserColumnTextCenter.make, {
-                              children: React.createElement("span", {
-                                    className: "text-sm"
-                                  }, "💸 Why not mint some more? 💸")
-                            })), React.createElement("br", undefined), React.createElement(UserUI.UserStakesCard.make, {
+                    }, React.createElement(User$UserBalancesCard, {
+                          userId: data.user
+                        }), React.createElement("br", undefined), React.createElement(UserUI.UserStakesCard.make, {
                           stakes: data.stakes
                         })), React.createElement(UserUI.UserColumn.make, {
-                      children: React.createElement(UserUI.UserColumnCard.make, {
-                            children: null
-                          }, React.createElement(UserUI.UserColumnHeader.make, {
-                                children: "Float rewards 🔥"
-                              }), React.createElement(UserUI.UserFloatBox.make, {
-                                accruing: "3.14159265",
-                                balance: "100.04",
-                                minted: "107.83"
-                              }))
+                      children: React.createElement(UserUI.UserFloatCard.make, {
+                            userId: data.user,
+                            stakes: data.stakes
+                          })
                     })));
 }
 
@@ -86,17 +130,21 @@ function User$User(Props) {
   var router = Router.useRouter();
   var userStr = Js_dict.get(router.query, "user");
   var user = userStr !== undefined ? userStr.toLowerCase() : "no user provided";
-  var activeStakes = DataHooks.useStakesForUser(user);
-  if (typeof activeStakes === "number") {
+  var stakesQuery = DataHooks.useStakesForUser(user);
+  var userInfoQuery = DataHooks.useBasicUserInfo(user);
+  var msg = DataHooks.liftGraphResponse2(stakesQuery, userInfoQuery);
+  if (typeof msg === "number") {
     return React.createElement(Loader.make, {});
-  } else if (activeStakes.TAG === /* GraphError */0) {
-    return onQueryError(activeStakes._0);
-  } else {
-    return onQuerySuccess({
-                user: user,
-                stakes: activeStakes._0
-              });
   }
+  if (msg.TAG === /* GraphError */0) {
+    return onQueryError(msg._0);
+  }
+  var match = msg._0;
+  return onQuerySuccess({
+              user: user,
+              userInfo: match[1],
+              stakes: match[0]
+            });
 }
 
 var User = {
@@ -110,6 +158,8 @@ function $$default(param) {
 }
 
 export {
+  UserBalancesCard ,
+  UserProfileCard ,
   User ,
   $$default ,
   $$default as default,

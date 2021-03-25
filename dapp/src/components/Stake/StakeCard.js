@@ -98,8 +98,8 @@ function StakeCard(Props) {
   var timestampCreated = param.timestampCreated;
   var marketName = param.name;
   var router = Router.useRouter();
-  var longDollarValueStaked = calculateDollarValue(match.longTokenPrice, match$2.totalStaked);
-  var shortDollarValueStaked = calculateDollarValue(match.shortTokenPrice, match$1.totalStaked);
+  var longDollarValueStaked = calculateDollarValue(match.longTokenPrice.price.price, match$2.totalStaked);
+  var shortDollarValueStaked = calculateDollarValue(match.shortTokenPrice.price.price, match$1.totalStaked);
   var totalDollarValueStake = longDollarValueStaked.add(shortDollarValueStaked);
   var percentStrLong = percentStr(longDollarValueStaked, totalDollarValueStake);
   var percentStrShort = (100.0 - Belt_Option.getExn(Belt_Float.fromString(percentStrLong))).toFixed(2);
@@ -135,20 +135,18 @@ function StakeCard(Props) {
                             percentStrShort: percentStrShort
                           }), React.createElement("div", {
                           className: "w-full flex justify-around"
-                        }, React.createElement(Button.make, {
+                        }, React.createElement(Button.Small.make, {
                               onClick: (function (param) {
                                   router.push("/stake?tokenAddress=" + Globals.ethAdrToLowerStr(longTokenAddress));
                                   
                                 }),
-                              children: "Stake Long",
-                              variant: "small"
-                            }), React.createElement(Button.make, {
+                              children: "Stake Long"
+                            }), React.createElement(Button.Small.make, {
                               onClick: (function (param) {
                                   router.push("/stake?tokenAddress=" + Globals.ethAdrToLowerStr(shortTokenAddress));
                                   
                                 }),
-                              children: "Stake Short",
-                              variant: "small"
+                              children: "Stake Short"
                             }))), React.createElement(StakeCardSide.make, {
                       marketName: marketName,
                       isLong: false,

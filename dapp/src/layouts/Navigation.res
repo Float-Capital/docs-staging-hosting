@@ -91,7 +91,7 @@ let make = () => {
       </Link>
       <div className="hidden md:flex w-2/3 text-base items-center justify-end">
         <Link href="/markets">
-          <a className="px-3 hover:bg-white"> {React.string("MARKETS")} </a>
+          <a className="px-3 hover:bg-white"> {React.string("MINT")} </a>
         </Link>
         <Link href="/stake">
           <a className="px-3 hover:bg-white"> {`STAKE🔥`->React.string} </a>
@@ -117,13 +117,12 @@ let make = () => {
             </p>
           </Link>
         | None =>
-          <Button
+          <Button.Small
             onClick={_ => {
               router->Next.Router.push(`/login?nextPath=${router.asPath}`)
-            }}
-            variant="small">
+            }}>
             "LOGIN"
-          </Button>
+          </Button.Small>
         }}
       </div>
       <div className="flex w-2/3 text-base items-center justify-end visible md:hidden">
@@ -187,14 +186,13 @@ let make = () => {
               </p>
 
             | None =>
-              <Button
+              <Button.Small
                 onClick={_ => {
                   router->Next.Router.push(`/login?nextPath=${router.asPath}`)
                   setIsOpen(_ => false)
-                }}
-                variant="small">
+                }}>
                 "LOGIN"
-              </Button>
+              </Button.Small>
             }}
           </div>
         </div>

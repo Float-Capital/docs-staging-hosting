@@ -49,14 +49,18 @@ module UserColumnHeader = {
 
 module UserProfileHeader = {
   @react.component
-  let make = (~name, ~level) => {
+  let make = () => {
+    let name = `moose-code` // TODO: get from graph
+    let level = Ethers.BigNumber.fromInt(1) // TODO: get from graph
+
     <div className="w-full flex flex-row justify-around">
       <div
         className="w-24 h-24 rounded-full border-2 border-light-purple flex items-center justify-center">
         <img className="inline h-10" src="/img/mario.png" />
       </div>
       <div className="flex flex-col text-center justify-center">
-        <div> {name->React.string} </div> <div> {`Lvl. ${level}`->React.string} </div>
+        <div> {name->React.string} </div>
+        <div> {`Lvl. ${level->Ethers.BigNumber.toString}`->React.string} </div>
       </div>
     </div>
   }
@@ -113,20 +117,34 @@ module UserMarketBox = {
 
 module UserMarketStakeOrRedeem = {
   @react.component
-  let make = () => {
+  let make = (~synthAddress) => {
+    // TODO: fix these URLs once redeeming gets implemented
+    let router = Next.Router.useRouter()
+    let stake = _ =>
+      router->Next.Router.push(`/stake?tokenAddress=${synthAddress->Ethers.Utils.ethAdrToLowerStr}`)
+    let redeem = _ =>
+      router->Next.Router.push(
+        `/redeem?tokenAddress=${synthAddress->Ethers.Utils.ethAdrToLowerStr}`,
+      )
+
     <div className=`flex flex-col`>
-      <Button variant="tiny" onClick={_ => ()}> {`stake`} </Button>
-      <Button variant="tiny" onClick={_ => ()}> {`redeem`} </Button>
+      <Button.Tiny onClick={stake}> {`stake`} </Button.Tiny>
+      <Button.Tiny onClick={redeem}> {`redeem`} </Button.Tiny>
     </div>
   }
 }
 
 module UserMarketUnstake = {
   @react.component
-  let make = () => {
+  let make = (~synthAddress) => {
+    // TODO: fix these URLs once unstaking gets implemented
+    let router = Next.Router.useRouter()
+    let unstake = _ =>
+      router->Next.Router.push(`/stake?tokenAddress=${synthAddress->Ethers.Utils.ethAdrToLowerStr}`)
+
     <div className=`flex flex-col`>
       <span className="text-xxs self-center"> <i> {`4 days ago`->React.string} </i> </span>
-      <Button variant="tiny" onClick={_ => ()}> {`redeem`} </Button>
+      <Button.Tiny onClick={unstake}> {`unstake`} </Button.Tiny>
     </div>
   }
 }
@@ -138,18 +156,20 @@ module UserStakesCard = {
     let stakeBoxes =
       Js.Array.mapi((stake: Queries.UsersStakes.UsersStakes_inner.t_currentStakes, i) => {
         let key = `user-stakes-${Belt.Int.toString(i)}`
-        let name = stake.currentStake.syntheticToken.syntheticMarket.symbol
-        let tokens = stake.currentStake.syntheticToken.totalStaked->FormatMoney.formatEther
-        let isLong = stake.currentStake.syntheticToken.tokenType->Obj.magic == "Long"
-        let state = stake.currentStake.syntheticToken.syntheticMarket.latestSystemState
+        let syntheticToken = stake.currentStake.syntheticToken
+        let addr = syntheticToken.id->Ethers.Utils.getAddressUnsafe
+        let name = syntheticToken.syntheticMarket.symbol
+        let tokens = syntheticToken.totalStaked->FormatMoney.formatEther
+        let isLong = syntheticToken.tokenType->Obj.magic == "Long"
+        let price = syntheticToken.latestPrice.price.price
         let value =
           stake.currentStake.syntheticToken.totalStaked
-          ->Ethers.BigNumber.mul(isLong ? state.longTokenPrice : state.shortTokenPrice)
+          ->Ethers.BigNumber.mul(price)
           ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
         totalValue := Ethers.BigNumber.add(totalValue.contents, value)
 
         <UserMarketBox key name isLong tokens value={value->FormatMoney.formatEther}>
-          <UserMarketUnstake />
+          <UserMarketUnstake synthAddress={addr} />
         </UserMarketBox>
       }, stakes)->React.array
 
@@ -166,20 +186,45 @@ module UserStakesCard = {
   }
 }
 
-module UserFloatBox = {
+module UserFloatCard = {
   @react.component
-  let make = (~accruing, ~balance, ~minted) => {
-    <div className=`w-11/12 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>
-      <UserColumnTextList>
-        <UserColumnText head=`float accruing` body={accruing} />
-        <UserColumnText head=`float balance` body={balance} />
-        <UserColumnText head=`float minted` body={minted} />
-      </UserColumnTextList>
-      <div className=`flex justify-around flex-row my-1`>
-        {`🌊`->React.string}
-        <Button variant="tiny" onClick={_ => ()}> {`claim float`} </Button>
-        {`🌊`->React.string}
-      </div>
-    </div>
+  let make = (~userId, ~stakes) => {
+    let synthTokens =
+      stakes->Array.map((stake: Queries.UsersStakes.UsersStakes_inner.t_currentStakes) => {
+        stake.currentStake.syntheticToken.id
+      })
+
+    // TODO: fix these URLs once minting float gets implemented
+    let router = Next.Router.useRouter()
+    let claimFloat = _ => router->Next.Router.push(`/stake`)
+    let floatBalances = DataHooks.useFloatBalancesForUser(~userId)
+    let claimableFloat = DataHooks.useTotalClaimableFloatForUser(~userId, ~synthTokens)
+
+    <UserColumnCard>
+      <UserColumnHeader> {`Float rewards 🔥`->React.string} </UserColumnHeader>
+      {switch DataHooks.liftGraphResponse2(floatBalances, claimableFloat) {
+      | Loading => <MiniLoader />
+      | GraphError(msg) => msg->React.string
+      | Response((floatBalances, (totalClaimable, totalPredicted))) => {
+          let floatBalance = floatBalances.floatBalance->FormatMoney.formatEther(~digits=6)
+          let floatMinted = floatBalances.floatMinted->FormatMoney.formatEther(~digits=6)
+          let floatAccrued =
+            totalClaimable->Ethers.BigNumber.add(totalPredicted)->FormatMoney.formatEther(~digits=6)
+
+          <div className=`w-11/12 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>
+            <UserColumnTextList>
+              <UserColumnText head=`float accruing` body={floatAccrued} />
+              <UserColumnText head=`float balance` body={floatBalance} />
+              <UserColumnText head=`float minted` body={floatMinted} />
+            </UserColumnTextList>
+            <div className=`flex justify-around flex-row my-1`>
+              {`🌊`->React.string}
+              <Button.Tiny onClick={claimFloat}> {`claim float`} </Button.Tiny>
+              {`🌊`->React.string}
+            </div>
+          </div>
+        }
+      }}
+    </UserColumnCard>
   }
 }

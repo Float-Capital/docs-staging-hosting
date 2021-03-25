@@ -4,9 +4,42 @@ import * as Misc from "../libraries/Misc.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Client from "./Client.js";
+import * as Ethers from "ethers";
+import * as Globals from "../libraries/Globals.js";
 import * as Queries from "./Queries.js";
 import * as CONSTANTS from "../CONSTANTS.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import FromUnixTime from "date-fns/fromUnixTime";
+
+function liftGraphResponse2(a, b) {
+  if (typeof a === "number") {
+    return /* Loading */0;
+  } else if (a.TAG === /* GraphError */0) {
+    return {
+            TAG: 0,
+            _0: a._0,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else if (typeof b === "number") {
+    return /* Loading */0;
+  } else if (b.TAG === /* GraphError */0) {
+    return {
+            TAG: 0,
+            _0: b._0,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return {
+            TAG: 1,
+            _0: [
+              a._0,
+              b._0
+            ],
+            [Symbol.for("name")]: "Response"
+          };
+  }
+}
 
 function useGetStakes(param) {
   var stakeDetailsQuery = Curry.app(Queries.StakingDetails.use, [
@@ -68,12 +101,29 @@ function useGetStakes(param) {
               });
           
         }), []);
-  return stakeDetailsQuery;
+  var match = stakeDetailsQuery.data;
+  if (match !== undefined) {
+    return {
+            TAG: 1,
+            _0: match.syntheticMarkets,
+            [Symbol.for("name")]: "Response"
+          };
+  }
+  var match$1 = stakeDetailsQuery.error;
+  if (match$1 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$1.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
 }
 
-function useFloatDetailsForUser(userId, synthToken) {
+function useTotalClaimableFloatForUser(userId, synthTokens) {
   var currentTimestamp = Misc.Time.useCurrentTimeBN(1000);
-  var floatDetailsQuery = Curry.app(Queries.UsersFloatDetails.use, [
+  var floatQuery = Curry.app(Queries.UsersFloatDetails.use, [
         undefined,
         undefined,
         undefined,
@@ -89,44 +139,62 @@ function useFloatDetailsForUser(userId, synthToken) {
         undefined,
         {
           userId: userId,
-          synthToken: synthToken
+          synthTokens: synthTokens
         }
       ]);
-  var match = floatDetailsQuery.data;
+  var match = floatQuery.data;
   if (match !== undefined) {
-    var match$1 = match.currentStakes;
-    if (match$1.length === 1) {
-      var match$2 = match$1[0];
-      var match$3 = match.states;
-      if (match$3.length === 1) {
-        var amount = match$2.currentStake.amount;
-        var match$4 = match$2.lastMintState;
-        var match$5 = match$3[0];
-        var claimableFloat = match$5.accumulativeFloatPerToken.sub(match$4.accumulativeFloatPerToken).mul(amount).div(CONSTANTS.tenToThe42);
-        var predictedFloat = currentTimestamp.sub(match$4.timestamp).mul(match$5.floatRatePerTokenOverInterval).mul(amount).div(CONSTANTS.tenToThe42);
-        return {
-                TAG: 1,
-                _0: [
-                  claimableFloat,
-                  predictedFloat
-                ],
-                [Symbol.for("name")]: "Response"
-              };
-      }
-      
-    }
-    
+    var initialState = {
+      TAG: 1,
+      _0: [
+        CONSTANTS.zeroBN,
+        CONSTANTS.zeroBN
+      ],
+      [Symbol.for("name")]: "Response"
+    };
+    return Belt_Array.reduce(match.currentStakes, initialState, (function (curState, stake) {
+                  if (typeof curState === "number") {
+                    return /* Loading */0;
+                  }
+                  if (curState.TAG === /* GraphError */0) {
+                    return {
+                            TAG: 0,
+                            _0: curState._0,
+                            [Symbol.for("name")]: "GraphError"
+                          };
+                  }
+                  var match = curState._0;
+                  var amount = stake.currentStake.amount;
+                  var timestamp = stake.lastMintState.timestamp;
+                  var lastAccumulativeFloatPerToken = stake.lastMintState.accumulativeFloatPerToken;
+                  var accumulativeFloatPerToken = stake.syntheticToken.latestStakerState.accumulativeFloatPerToken;
+                  var floatRatePerTokenOverInterval = stake.syntheticToken.latestStakerState.floatRatePerTokenOverInterval;
+                  var claimableFloat = accumulativeFloatPerToken.sub(lastAccumulativeFloatPerToken).mul(amount).div(CONSTANTS.tenToThe42).add(match[0]);
+                  var predictedFloat = currentTimestamp.sub(timestamp).mul(floatRatePerTokenOverInterval).mul(amount).div(CONSTANTS.tenToThe42).add(match[1]);
+                  return {
+                          TAG: 1,
+                          _0: [
+                            claimableFloat,
+                            predictedFloat
+                          ],
+                          [Symbol.for("name")]: "Response"
+                        };
+                }));
   }
-  var match$6 = floatDetailsQuery.error;
-  if (match$6 !== undefined) {
+  var match$1 = floatQuery.error;
+  if (match$1 !== undefined) {
     return {
             TAG: 0,
-            _0: match$6.message,
+            _0: match$1.message,
             [Symbol.for("name")]: "GraphError"
           };
   } else {
     return /* Loading */0;
   }
+}
+
+function useClaimableFloatForUser(userId, synthToken) {
+  return useTotalClaimableFloatForUser(userId, [synthToken]);
 }
 
 function useStakesForUser(userId) {
@@ -168,10 +236,283 @@ function useStakesForUser(userId) {
   }
 }
 
+function useUsersBalances(userId) {
+  var usersTokensQuery = Curry.app(Queries.UsersBalances.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: userId
+        }
+      ]);
+  var match = usersTokensQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.user;
+    if (match$1 === undefined) {
+      return {
+              TAG: 1,
+              _0: {
+                totalBalance: CONSTANTS.zeroBN,
+                balances: []
+              },
+              [Symbol.for("name")]: "Response"
+            };
+    }
+    var result = Belt_Array.reduce(match$1.tokenBalances, {
+          totalBalance: CONSTANTS.zeroBN,
+          balances: []
+        }, (function (param, param$1) {
+            var match = param$1.syntheticToken;
+            var tokenBalance = param$1.tokenBalance;
+            var isLong = match.tokenType === "Long";
+            var newToken_addr = Ethers.utils.getAddress(match.id);
+            var newToken_name = match.syntheticMarket.name;
+            var newToken_tokensValue = match.latestPrice.price.price.mul(tokenBalance).div(CONSTANTS.tenToThe18);
+            var newToken = {
+              addr: newToken_addr,
+              name: newToken_name,
+              isLong: isLong,
+              tokenBalance: tokenBalance,
+              tokensValue: newToken_tokensValue
+            };
+            return {
+                    totalBalance: param.totalBalance.add(newToken_tokensValue),
+                    balances: Belt_Array.concat(param.balances, [newToken])
+                  };
+          }));
+    return {
+            TAG: 1,
+            _0: result,
+            [Symbol.for("name")]: "Response"
+          };
+  }
+  var match$2 = usersTokensQuery.error;
+  if (match$2 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
+function useFloatBalancesForUser(userId) {
+  var usersStateQuery = Curry.app(Queries.UsersState.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: userId
+        }
+      ]);
+  var match = usersStateQuery.data;
+  if (match !== undefined) {
+    var user = match.user;
+    if (user !== undefined) {
+      return {
+              TAG: 1,
+              _0: {
+                floatBalance: user.floatTokenBalance,
+                floatMinted: user.totalMintedFloat
+              },
+              [Symbol.for("name")]: "Response"
+            };
+    } else {
+      return {
+              TAG: 1,
+              _0: {
+                floatBalance: CONSTANTS.zeroBN,
+                floatMinted: CONSTANTS.zeroBN
+              },
+              [Symbol.for("name")]: "Response"
+            };
+    }
+  }
+  var match$1 = usersStateQuery.error;
+  if (match$1 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$1.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
+function useBasicUserInfo(userId) {
+  var userQuery = Curry.app(Queries.UserQuery.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: userId
+        }
+      ]);
+  var match = userQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.user;
+    if (match$1 !== undefined) {
+      return {
+              TAG: 1,
+              _0: {
+                id: match$1.id,
+                joinedAt: FromUnixTime(match$1.timestampJoined.toNumber()),
+                gasUsed: match$1.totalGasUsed,
+                floatMinted: match$1.totalMintedFloat,
+                floatBalance: match$1.floatTokenBalance,
+                transactionCount: match$1.numberOfTransactions
+              },
+              [Symbol.for("name")]: "Response"
+            };
+    }
+    
+  }
+  var match$2 = userQuery.error;
+  if (match$2 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
+function useSyntheticTokenBalance(user, tokenAddress) {
+  var syntheticBalanceQuery = Curry.app(Queries.UsersBalance.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: Globals.ethAdrToLowerStr(user),
+          tokenAdr: Globals.ethAdrToLowerStr(tokenAddress)
+        }
+      ]);
+  var match = syntheticBalanceQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.user;
+    if (match$1 !== undefined) {
+      var match$2 = match$1.tokenBalances;
+      if (match$2.length === 1) {
+        var match$3 = match$2[0];
+        return {
+                TAG: 1,
+                _0: match$3.tokenBalance,
+                [Symbol.for("name")]: "Response"
+              };
+      }
+      
+    }
+    
+  }
+  var match$4 = syntheticBalanceQuery.error;
+  if (match$4 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$4.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
+function graphResponseToOption(maybeData) {
+  if (typeof maybeData === "number" || maybeData.TAG === /* GraphError */0) {
+    return ;
+  } else {
+    return Caml_option.some(maybeData._0);
+  }
+}
+
+function graphResponseToResult(maybeData) {
+  if (typeof maybeData === "number") {
+    return {
+            TAG: 0,
+            _0: /* Loading */0,
+            [Symbol.for("name")]: "Ok"
+          };
+  } else if (maybeData.TAG === /* GraphError */0) {
+    return {
+            TAG: 1,
+            _0: maybeData._0,
+            [Symbol.for("name")]: "Error"
+          };
+  } else {
+    return {
+            TAG: 0,
+            _0: {
+              _0: maybeData._0,
+              [Symbol.for("name")]: "Data"
+            },
+            [Symbol.for("name")]: "Ok"
+          };
+  }
+}
+
+var Util = {
+  graphResponseToOption: graphResponseToOption,
+  graphResponseToResult: graphResponseToResult
+};
+
+var ethAdrToLowerStr = Globals.ethAdrToLowerStr;
+
 export {
+  liftGraphResponse2 ,
+  ethAdrToLowerStr ,
   useGetStakes ,
-  useFloatDetailsForUser ,
+  useTotalClaimableFloatForUser ,
+  useClaimableFloatForUser ,
   useStakesForUser ,
+  useUsersBalances ,
+  useFloatBalancesForUser ,
+  useBasicUserInfo ,
+  useSyntheticTokenBalance ,
+  Util ,
   
 }
 /* Misc Not a pure module */

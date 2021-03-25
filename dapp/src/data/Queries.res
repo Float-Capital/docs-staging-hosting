@@ -7,8 +7,15 @@ fragment BasicUserInfo on User {
   floatTokenBalance
   numberOfTransactions
   totalGasUsed
+  timestampJoined
 }
-fragment SyntheticInfo on SyntheticToken {
+fragment LatestSynthPrice on LatestPrice {
+  id
+  price {
+    price
+  }
+}
+fragment SyntheticTokenInfo on SyntheticToken {
   id
   totalStaked
   syntheticMarket {
@@ -18,9 +25,10 @@ fragment SyntheticInfo on SyntheticToken {
     latestSystemState {
       totalLockedLong
       totalLockedShort
-      shortTokenPrice
-      longTokenPrice
     }
+  }
+  latestPrice {
+    ...LatestSynthPrice
   }
   tokenType
   tokenAddress
@@ -32,18 +40,41 @@ fragment SyntheticMarketInfo on SyntheticMarket {
   timestampCreated
   oracleAddress
   syntheticLong {
-    ...SyntheticInfo
+    ...SyntheticTokenInfo
   }
   syntheticShort {
-    ...SyntheticInfo
+    ...SyntheticTokenInfo
   }
   latestSystemState {
     timestamp
     totalLockedLong
     totalLockedShort
     totalValueLocked
-    longTokenPrice
-    shortTokenPrice
+    longTokenPrice {
+      ...LatestSynthPrice
+    }
+    shortTokenPrice {
+      ...LatestSynthPrice
+    }
+  }
+}
+fragment SyntheticMarketPrice on SyntheticMarket {
+  id
+  name
+  symbol
+}
+fragment UserTokenBalance on UserSyntheticTokenBalance {
+  id
+  tokenBalance
+  syntheticToken {
+    id
+    tokenType
+    syntheticMarket {
+      ...SyntheticMarketPrice
+    }
+    latestPrice {
+      ...LatestSynthPrice
+    }
   }
 }
 `)
@@ -55,12 +86,33 @@ query ($userId: String!) {
   }
 }`)
 
+module UsersBalance = %graphql(`
+query ($userId: String!, $tokenAdr: String!) {
+  user (id: $userId) {
+    tokenBalances (where: {syntheticToken: $tokenAdr}) {
+      ...UserTokenBalance
+    }
+  }
+}`)
+
+module UsersBalances = %graphql(`
+query ($userId: String!) {
+  user (id: $userId) {
+    tokenBalances { # Maybe we can filter to only get balances greater than 0? Probably not worth it.
+      ...UserTokenBalance
+    }
+  }
+}`)
+
 module StateChangePoll = %graphql(`
 query($userId: String!, $timestamp: BigInt!) {
   stateChanges (where: {timestamp_gt: $timestamp}) {
     timestamp
     affectedUsers (where: {id: $userId}) {
       ...BasicUserInfo
+      tokenBalances (where: {timeLastUpdated_gt: $timestamp}) {
+        ...UserTokenBalance
+      }
     }
   }
 }`)
@@ -78,8 +130,12 @@ module LatestSystemState = %graphql(`
     txHash 
     blockNumber
     syntheticPrice
-    longTokenPrice
-    shortTokenPrice
+    longTokenPrice {
+      ...LatestSynthPrice
+    }
+    shortTokenPrice {
+      ...LatestSynthPrice
+    }
     totalValueLocked
     setBy
   }
@@ -96,7 +152,6 @@ query ($userId: String!){
   }
 }`)
 
-// https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital/graphql?query=%7B%0A%20%20syntheticMarkets%20%7B%0A%20%20%20%20name%0A%20%20%20%20symbol%0A%20%20%20%20marketIndex%0A%20%20%20%20oracleAddress%0A%20%20%20%20syntheticLong%20%7B%0A%20%20%20%20%20%20id%0A%20%20%20%20%20%20tokenAddress%0A%20%20%20%20%20%20totalStaked%0A%20%20%20%20%7D%0A%20%20%20%20syntheticShort%20%7B%0A%20%20%20%20%20%20id%0A%20%20%20%20%20%20tokenAddress%0A%20%20%20%20%20%20totalStaked%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D
 module MarketDetails = %graphql(`
 {
   syntheticMarkets {
@@ -118,14 +173,17 @@ module MarketDetails = %graphql(`
       totalLockedLong
       totalLockedShort
       totalValueLocked
-      longTokenPrice
-      shortTokenPrice
+      longTokenPrice  {
+        ...LatestSynthPrice
+      }
+      shortTokenPrice {
+        ...LatestSynthPrice
+      }
     }
   }
 }
 `)
 
-// https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital/graphql?query=%7B%0A%20%20syntheticMarkets%20%7B%0A%20%20%20%20name%0A%20%20%20%20symbol%0A%20%20%20%20marketIndex%0A%20%20%20%20oracleAddress%0A%20%20%20%20syntheticLong%20%7B%0A%20%20%20%20%20%20id%0A%20%20%20%20%20%20tokenAddress%0A%20%20%20%20%20%20totalStaked%0A%20%20%20%20%7D%0A%20%20%20%20syntheticShort%20%7B%0A%20%20%20%20%20%20id%0A%20%20%20%20%20%20tokenAddress%0A%20%20%20%20%20%20totalStaked%0A%20%20%20%20%7D%0A%20%20%20%20latestSystemState%20%7B%0A%20%20%20%20%20%20totalLockedLong%0A%20%20%20%20%20%20totalLockedShort%0A%20%20%20%20%20%20totalValueLocked%0A%20%20%20%20%20%20longTokenPrice%0A%20%20%20%20%20%20shortTokenPrice%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D%0A
 module StakingDetails = %graphql(`
 {
   syntheticMarkets {
@@ -137,7 +195,7 @@ module StakingDetails = %graphql(`
 module SyntheticTokens = %graphql(`
 {
   syntheticTokens {
-    ...SyntheticInfo
+    ...SyntheticTokenInfo
   }
 }
 `)
@@ -145,7 +203,7 @@ module SyntheticTokens = %graphql(`
 module SyntheticToken = %graphql(`
 query ($tokenId: String!){
   syntheticToken(id: $tokenId){
-    ...SyntheticInfo
+    ...SyntheticTokenInfo
   }
 }
 `)
@@ -160,7 +218,7 @@ query ($userId: String!){
       blockNumber
       creationTxHash  @ppxCustom(module: "Bytes")
       syntheticToken {
-        ...SyntheticInfo
+        ...SyntheticTokenInfo
       }
       amount
       withdrawn
@@ -173,8 +231,8 @@ query ($userId: String!){
 `)
 
 module UsersFloatDetails = %graphql(`
-query ($userId: String!, $synthToken: String!) {
-  currentStakes (where: {user: $userId, syntheticToken: $synthToken}) {
+query ($userId: String!, $synthTokens: [String!]!) {
+  currentStakes(where: {user: $userId, syntheticToken_in: $synthTokens}) {
     lastMintState {
       timestamp
       accumulativeFloatPerToken
@@ -182,11 +240,14 @@ query ($userId: String!, $synthToken: String!) {
     currentStake {
       amount
     }
-  }
-  states (first:1, orderBy: stateIndex, orderDirection:desc, where: {syntheticToken: $synthToken, timeSinceLastUpdate_gt: 0}) {
-    stateIndex
-    accumulativeFloatPerToken
-    floatRatePerTokenOverInterval
+    syntheticToken {
+      id
+      latestStakerState {
+        accumulativeFloatPerToken
+        floatRatePerTokenOverInterval
+        timestamp
+      }
+    }
   }
 }
 `)

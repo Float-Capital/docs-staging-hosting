@@ -1,10 +1,84 @@
 open UserUI
 open DataHooks
 
+module UserBalancesCard = {
+  @react.component
+  let make = (~userId) => {
+    /*
+    TODO:
+    * Use the nicer way to get token prices: https://github.com/avolabs-io/longshort/issues/228
+    * calculate the correct estimated value
+    * get the total value of the users tokens
+ */
+    let usersTokensQuery = DataHooks.useUsersBalances(~userId)
+
+    <UserColumnCard>
+      <UserColumnHeader>
+        {`Synthetic Assets`->React.string} <img className="inline h-5 ml-2" src="/img/coin.png" />
+      </UserColumnHeader>
+      {switch usersTokensQuery {
+      | Loading => <div className="m-auto"> <MiniLoader /> </div>
+      | GraphError(string) => string->React.string
+      | Response({totalBalance, balances}) => <>
+          <UserColumnTextCenter>
+            <UserColumnText
+              head=`💰 Synth value` body={`$${totalBalance->FormatMoney.formatEther}`}
+            />
+          </UserColumnTextCenter>
+          <br />
+          {balances
+          ->Array.map(({addr, name, isLong, tokenBalance, tokensValue}) =>
+            <UserMarketBox
+              key={`${name}-${isLong ? "long" : "short"}`}
+              name
+              isLong
+              tokens={FormatMoney.formatEther(tokenBalance)}
+              value={FormatMoney.formatEther(tokensValue)}>
+              <UserMarketStakeOrRedeem synthAddress={addr} />
+            </UserMarketBox>
+          )
+          ->React.array}
+        </>
+      }}
+      <br />
+      <UserColumnTextCenter>
+        <span className="text-sm"> {`💸 Why not mint some more? 💸`->React.string} </span>
+      </UserColumnTextCenter>
+    </UserColumnCard>
+  }
+}
+
+module UserProfileCard = {
+  @react.component
+  let make = (~userInfo) => {
+    let addressStr = DisplayAddress.ellipsifyMiddle(
+      ~inputString=userInfo.id,
+      ~maxLength=8,
+      ~trailingCharacters=3,
+    )
+    let joinedStr = userInfo.joinedAt->DateFns.format("P")
+    let txStr = userInfo.transactionCount->Ethers.BigNumber.toString
+    let gasStr = userInfo.gasUsed->Ethers.BigNumber.toString->FormatMoney.formatInt
+
+    <UserColumnCard>
+      <UserProfileHeader />
+      <UserColumnTextList>
+        <UserColumnText head=`📮 Address` body={addressStr} />
+        <UserColumnText head=`🎉 Joined` body={joinedStr} />
+        <UserColumnText head=`⛽ Gas used` body={gasStr} />
+        <UserColumnText head=`🏃 No. txs` body={txStr} />
+        // TODO: fetch from graph somehow
+        <UserColumnText icon="/img/discord.png" head=`Discord` body=`✅` />
+      </UserColumnTextList>
+    </UserColumnCard>
+  }
+}
+
 module User = {
   @ocaml.doc(`Represents all the data required to render the user page.`)
   type userData = {
     user: string,
+    userInfo: DataHooks.basicUserInfo,
     stakes: array<Queries.UsersStakes.UsersStakes_inner.t_currentStakes>,
   }
 
@@ -16,45 +90,11 @@ module User = {
     <UserContainer>
       <UserBanner />
       <UserColumnContainer>
+        <UserColumn> <UserProfileCard userInfo={data.userInfo} /> </UserColumn>
         <UserColumn>
-          <UserColumnCard>
-            <UserProfileHeader name="moose-code" level="1" />
-            <UserColumnTextList>
-              <UserColumnText head=`📮 Address` body=`0x1234...1234` />
-              <UserColumnText head=`🎉 Joined` body=`03/02/2021` />
-              <UserColumnText head=`⛽ Gas used` body=`6,789,000` />
-              <UserColumnText head=`🏃 No. txs` body=`11` />
-              <UserColumnText icon="/img/discord.png" head=`Discord` body=`✅` />
-            </UserColumnTextList>
-          </UserColumnCard>
+          <UserBalancesCard userId={data.user} /> <br /> <UserStakesCard stakes={data.stakes} />
         </UserColumn>
-        <UserColumn>
-          <UserColumnCard>
-            <UserColumnHeader>
-              {`Synthetic Assets`->React.string}
-              <img className="inline h-5 ml-2" src="/img/coin.png" />
-            </UserColumnHeader>
-            <UserColumnTextCenter>
-              <UserColumnText head=`💰 Synth value` body=`$9,123` />
-            </UserColumnTextCenter>
-            <br />
-            <UserMarketBox name=`FTSE 100` isLong={true} tokens=`23.81` value=`450`>
-              <UserMarketStakeOrRedeem />
-            </UserMarketBox>
-            <br />
-            <UserColumnTextCenter>
-              <span className="text-sm"> {`💸 Why not mint some more? 💸`->React.string} </span>
-            </UserColumnTextCenter>
-          </UserColumnCard>
-          <br />
-          <UserStakesCard stakes={data.stakes} />
-        </UserColumn>
-        <UserColumn>
-          <UserColumnCard>
-            <UserColumnHeader> {`Float rewards 🔥`->React.string} </UserColumnHeader>
-            <UserFloatBox accruing=`3.14159265` balance=`100.04` minted=`107.83` />
-          </UserColumnCard>
-        </UserColumn>
+        <UserColumn> <UserFloatCard userId={data.user} stakes={data.stakes} /> </UserColumn>
       </UserColumnContainer>
     </UserContainer>
   }
@@ -67,10 +107,12 @@ module User = {
     | Some(userStr) => userStr->Js.String.toLowerCase
     }
 
-    let activeStakes = useStakesForUser(~userId=user)
+    let stakesQuery = useStakesForUser(~userId=user)
+    let userInfoQuery = useBasicUserInfo(~userId=user)
 
-    switch activeStakes {
-    | Response(stakes) => onQuerySuccess({user: user, stakes: stakes})
+    switch liftGraphResponse2(stakesQuery, userInfoQuery) {
+    | Response((stakes, userInfo)) =>
+      onQuerySuccess({user: user, stakes: stakes, userInfo: userInfo})
     | GraphError(msg) => onQueryError(msg)
     | Loading => <Loader />
     }

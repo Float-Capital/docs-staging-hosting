@@ -44,6 +44,7 @@
     "dev": "npm-run-all --parallel res:start next:dev",
     "update-schema-local": "get-graphql-schema http://localhost:8000/subgraphs/name/avolabs-io/float-capital -j > graphql_schema.json",
     "update-schema": "get-graphql-schema https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital -j > graphql_schema.json",
+    "update-schema2": "get-graphql-schema https://test.graph.float.capital/subgraphs/name/avolabs-io/float-capital2 -j > graphql_schema.json",
     "update-dbschema-local": "get-graphql-schema http://localhost:8080/v1/graphql -h 'x-hasura-admin-secret=testing' -j > graphql_schema_db.json",
     "update-testnet-ui": "cd .. && node scripts/deployments.js > dapp/src/contractAddresses.json ; cd dapp && yarn update-schema ; yarn res:build"
   },
@@ -52,7 +53,7 @@
     "@reasonml-community/graphql-ppx": "^1.0.2",
     "add": "^2.0.6",
     "autoprefixer": "^10.1.0",
-    "bs-platform": "^9.0.1",
+    "bs-platform": "9.0.2",
     "cssnano": "^4.1.10",
     "get-graphql-schema": "^2.1.2",
     "npm-run-all": "^4.1.5",

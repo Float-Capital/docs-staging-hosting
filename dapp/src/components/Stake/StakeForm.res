@@ -43,7 +43,7 @@ module StakeFormInput = {
     ~onChange=_ => (),
     ~onBlur=_ => (),
     ~onMaxClick=_ => (),
-    ~synthetic: Queries.SyntheticInfo.t,
+    ~synthetic: Queries.SyntheticTokenInfo.t,
   ) =>
     <Form className="" onSubmit>
       <div className="px-8 pt-2">
@@ -61,7 +61,7 @@ module StakeFormInput = {
         </div>
       </div>
       <AmountInput value optBalance disabled onBlur onChange placeholder={"Stake"} onMaxClick />
-      <Button onClick={_ => ()} variant="large">
+      <Button>
         {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
       </Button>
     </Form>
@@ -69,7 +69,7 @@ module StakeFormInput = {
 
 module ConnectedStakeForm = {
   @react.component
-  let make = (~tokenId, ~signer, ~synthetic: Queries.SyntheticInfo.t) => {
+  let make = (~tokenId, ~signer, ~synthetic: Queries.SyntheticTokenInfo.t) => {
     let (
       contractActionToCallAfterApproval,
       setContractActionToCallAfterApproval,
@@ -86,10 +86,12 @@ module ConnectedStakeForm = {
 
     let stakerContractAddress = Config.useStakerAddress()
 
-    let (optTokenBalance, _optTokenAmountApproved) = useBalanceAndApproved(
-      ~erc20Address=tokenId->Ethers.Utils.getAddressUnsafe,
-      ~spender=stakerContractAddress,
-    )
+    let user = RootProvider.useCurrentUserExn()
+    let optTokenBalance =
+      DataHooks.useSyntheticTokenBalance(
+        ~user,
+        ~tokenAddress=synthetic.tokenAddress,
+      )->DataHooks.Util.graphResponseToOption
 
     // Execute the call after approval has completed
     React.useEffect1(() => {

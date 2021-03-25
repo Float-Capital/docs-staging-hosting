@@ -9,35 +9,27 @@ import {
   ShortRedeem,
   TokenPriceRefreshed,
   ValueLockedInSystem,
-  LongShort,
   FeesChanges,
 } from "../generated/LongShort/LongShort";
 import {
-  StateChange,
-  EventParam,
-  EventParams,
   SyntheticMarket,
   FeeStructure,
   GlobalState,
-  YieldManager,
   Staker,
   TokenFactory,
   LongShortContract,
-  UserSyntheticTokenMinted,
   SyntheticToken,
-  CurrentStake,
-  Stake,
-  User,
-  State,
-  Transfer,
+  LatestPrice,
+  Price,
 } from "../generated/schema";
-import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
+import { BigInt, log } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import {
   getOrCreateLatestSystemState,
-  getOrCreateUser,
+  getOrCreateStakerState,
   createSyntheticTokenLong,
   createSyntheticTokenShort,
+  createInitialSystemState,
 } from "./utils/globalStateManager";
 import {
   createNewTokenDataSource,
@@ -45,14 +37,10 @@ import {
 } from "./utils/helperFunctions";
 import {
   ZERO,
-  TEN_TO_THE_18,
   GLOBAL_STATE_ID,
-  YIELD_MANAGER_ID,
-  ORACLE_AGREGATOR_ID,
   STAKER_ID,
   TOKEN_FACTORY_ID,
   LONG_SHORT_ID,
-  ZERO_ADDRESS,
 } from "./CONSTANTS";
 
 export function handleV1(event: V1): void {
@@ -125,16 +113,16 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
   let longValue = event.params.longValue;
   let shortValue = event.params.shortValue;
 
-  let state = getOrCreateLatestSystemState(
+  let systemState = getOrCreateLatestSystemState(
     marketIndex,
     contractCallCounter,
     event
   );
-  state.totalValueLocked = totalValueLockedInMarket;
-  state.totalLockedLong = longValue;
-  state.totalLockedShort = shortValue;
+  systemState.totalValueLocked = totalValueLockedInMarket;
+  systemState.totalLockedLong = longValue;
+  systemState.totalLockedShort = shortValue;
 
-  state.save();
+  systemState.save();
 
   saveEventToStateChange(
     event,
@@ -182,10 +170,15 @@ export function handleSyntheticTokenCreated(
 
   // create new synthetic token object.
   let longToken = createSyntheticTokenLong(longTokenAddress);
-
   let shortToken = createSyntheticTokenShort(shortTokenAddress);
 
-  let state = getOrCreateLatestSystemState(marketIndex, ZERO, event);
+  let initialState = createInitialSystemState(
+    marketIndex,
+    ZERO,
+    event,
+    longToken.id,
+    shortToken.id
+  );
 
   let fees = new FeeStructure(marketIndexString + "-fees");
   fees.baseEntryFee = ZERO;
@@ -199,7 +192,7 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.blockNumberCreated = blockNumber;
   syntheticMarket.name = syntheticName;
   syntheticMarket.symbol = syntheticSymbol;
-  syntheticMarket.latestSystemState = state.id;
+  syntheticMarket.latestSystemState = initialState.systemState.id;
   syntheticMarket.syntheticLong = longToken.id;
   syntheticMarket.syntheticShort = shortToken.id;
   syntheticMarket.marketIndex = marketIndex;
@@ -207,20 +200,38 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.feeStructure = fees.id;
   syntheticMarket.kPeriod = ZERO;
   syntheticMarket.kMultiplier = ZERO;
-
-  state.syntheticPrice = initialAssetPrice; // change me
+  initialState.systemState.syntheticPrice = initialAssetPrice; // change me
 
   let globalState = GlobalState.load(GLOBAL_STATE_ID);
   globalState.latestMarketIndex = globalState.latestMarketIndex.plus(
     BigInt.fromI32(1)
   );
 
+  let initialLongStakerState = getOrCreateStakerState(
+    shortToken.id,
+    ZERO,
+    event
+  );
   longToken.syntheticMarket = syntheticMarket.id;
-  shortToken.syntheticMarket = syntheticMarket.id;
+  longToken.latestPrice = initialState.latestTokenPriceLong.id;
+  longToken.priceHistory = [initialState.tokenPriceLong.id];
+  longToken.latestStakerState = initialLongStakerState.id;
 
+  let initialShortStakerState = getOrCreateStakerState(
+    shortToken.id,
+    ZERO,
+    event
+  );
+  shortToken.syntheticMarket = syntheticMarket.id;
+  shortToken.latestPrice = initialState.latestTokenPriceShort.id;
+  shortToken.priceHistory = [initialState.tokenPriceShort.id];
+  shortToken.latestStakerState = initialShortStakerState.id;
+
+  initialLongStakerState.save();
+  initialShortStakerState.save();
   longToken.save();
   shortToken.save();
-  state.save();
+  initialState.systemState.save();
   syntheticMarket.save();
   fees.save();
   globalState.save();
@@ -368,14 +379,14 @@ export function handlePriceUpdate(event: PriceUpdate): void {
 
   let syntheticMarket = SyntheticMarket.load(marketIndexString);
 
-  let state = getOrCreateLatestSystemState(
+  let systemState = getOrCreateLatestSystemState(
     marketIndex,
     contractCallCounter,
     event
   );
-  state.syntheticPrice = newPrice;
-  syntheticMarket.latestSystemState = state.id;
-  state.save();
+  systemState.syntheticPrice = newPrice;
+  syntheticMarket.latestSystemState = systemState.id;
+  systemState.save();
   syntheticMarket.save();
 
   saveEventToStateChange(
@@ -460,26 +471,78 @@ export function handleShortRedeem(event: ShortRedeem): void {
   );
 }
 
+function updateLatestTokenPrice(
+  isLong: boolean,
+  marketIndexId: string,
+  newPrice: BigInt,
+  timestamp: BigInt
+): void {
+  let suffixStr = isLong ? "long" : "short";
+  let latestPrice = LatestPrice.load(
+    "latestPrice-" + marketIndexId + "-" + suffixStr
+  );
+
+  if (latestPrice == null) {
+    log.critical(
+      "LATEST PRICE IS UNDEFINED - make sure it is initialised on market creation",
+      []
+    );
+  }
+
+  let prevPrice = Price.load(latestPrice.price);
+
+  if (prevPrice == null) {
+    log.critical(
+      "PRICE IS UNDEFINED - make sure it is initialised on market creation",
+      []
+    );
+  }
+
+  if (prevPrice.price.notEqual(newPrice)) {
+    let newPriceEntity = new Price(
+      marketIndexId + "-" + suffixStr + "-" + timestamp.toString()
+    );
+    newPriceEntity.price = newPrice;
+    newPriceEntity.timeUpdated = newPrice;
+    newPriceEntity.token = prevPrice.token;
+
+    newPriceEntity.save();
+
+    latestPrice.price = newPriceEntity.id;
+    latestPrice.save();
+
+    let syntheticToken = SyntheticToken.load(newPriceEntity.token);
+    if (syntheticToken == null) {
+      log.critical("Synthetic Token with id {} is undefined.", [
+        newPriceEntity.token,
+      ]);
+    }
+    syntheticToken.priceHistory.push(newPriceEntity.id);
+  }
+}
 export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
   let marketIndex = event.params.marketIndex;
   let marketIndexString = marketIndex.toString();
   let longTokenPrice = event.params.longTokenPrice;
   let shortTokenPrice = event.params.shortTokenPrice;
+  let timestamp = event.block.timestamp;
 
   let contractCallCounter = event.params.contractCallCounter;
 
   let syntheticMarket = SyntheticMarket.load(marketIndexString);
 
-  let state = getOrCreateLatestSystemState(
+  let systemState = getOrCreateLatestSystemState(
     marketIndex,
     contractCallCounter,
     event
   );
-  state.longTokenPrice = longTokenPrice;
-  state.shortTokenPrice = shortTokenPrice;
-  syntheticMarket.latestSystemState = state.id;
-  state.save();
+
+  syntheticMarket.latestSystemState = systemState.id;
+  systemState.save();
   syntheticMarket.save();
+
+  updateLatestTokenPrice(true, marketIndexString, longTokenPrice, timestamp);
+  updateLatestTokenPrice(false, marketIndexString, shortTokenPrice, timestamp);
 
   saveEventToStateChange(
     event,

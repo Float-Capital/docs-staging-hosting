@@ -8,29 +8,21 @@ import {
 } from "../generated/Staker/Staker";
 import { erc20 } from "../generated/templates";
 import {
-  StateChange,
-  EventParam,
-  EventParams,
   GlobalState,
   SyntheticToken,
   SyntheticMarket,
   CurrentStake,
   Stake,
-  User,
-  State,
-  Transfer,
+  StakeState,
 } from "../generated/schema";
-import {
-  BigInt,
-  Address,
-  Bytes,
-  log,
-  DataSourceContext,
-} from "@graphprotocol/graph-ts";
+import { log, DataSourceContext } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
-import { getOrCreateUser } from "./utils/globalStateManager";
+import {
+  getOrCreateUser,
+  getOrCreateStakerState,
+} from "./utils/globalStateManager";
 
-import { ZERO, ONE, TEN_TO_THE_18, GLOBAL_STATE_ID } from "./CONSTANTS";
+import { ZERO, ONE, GLOBAL_STATE_ID } from "./CONSTANTS";
 
 export function handleDeployV1(event: DeployV1): void {
   let floatAddress = event.params.floatToken;
@@ -67,7 +59,7 @@ export function handleStateAdded(event: StateAdded): void {
     log.critical("Token should be defined", []);
   }
 
-  let state = new State(tokenAddressString + "-" + stateIndex.toString());
+  let state = getOrCreateStakerState(tokenAddressString, stateIndex, event);
   state.blockNumber = blockNumber;
   state.creationTxHash = txHash;
   state.stateIndex = stateIndex;
@@ -80,7 +72,7 @@ export function handleStateAdded(event: StateAdded): void {
     state.floatRatePerTokenOverInterval = ZERO;
     state.timeSinceLastUpdate = ZERO;
   } else {
-    let prevState = State.load(
+    let prevState = StakeState.load(
       tokenAddressString + "-" + stateIndex.minus(ONE).toString()
     );
     if (prevState == null) {
@@ -110,6 +102,7 @@ export function handleStateAdded(event: StateAdded): void {
     }
   }
 
+  syntheticToken.latestStakerState = state.id;
   syntheticToken.save();
   state.save();
 
@@ -168,7 +161,9 @@ export function handleStakeAdded(event: StakeAdded): void {
 
   let lastMintIndex = event.params.lastMintIndex;
 
-  let state = State.load(tokenAddressString + "-" + lastMintIndex.toString());
+  let state = StakeState.load(
+    tokenAddressString + "-" + lastMintIndex.toString()
+  );
   if (state == null) {
     log.critical("state not defined yet crash", []);
   }
@@ -292,7 +287,9 @@ export function handleFloatMinted(event: FloatMinted): void {
   let amount = event.params.amount;
   let lastMintIndex = event.params.lastMintIndex;
 
-  let state = State.load(tokenAddressString + "-" + lastMintIndex.toString());
+  let state = StakeState.load(
+    tokenAddressString + "-" + lastMintIndex.toString()
+  );
   if (state == null) {
     log.critical("state not defined yet crash", []);
   }
