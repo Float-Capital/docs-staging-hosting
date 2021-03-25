@@ -1,19 +1,30 @@
+module OptionallyIntoLink = {
+  @react.component
+  let make = (~link, ~children) =>
+    link->Option.mapWithDefault(children, link => <a href={link}> {children} </a>)
+}
+
 module Props = {
   type definition = {
     prefix: string,
     value: string,
     suffix: React.element,
+    link: option<string>,
   }
 
-  let createDashboardLiProps = (~suffix=React.null, ~prefix, ~value, ()) => {
+  let createDashboardLiProps = (~suffix=React.null, ~prefix, ~value, ~link=?, ()) => {
     prefix: prefix,
     value: value,
     suffix: suffix,
+    link: link,
   }
 }
 
 @react.component
-let make = (~prefix, ~value, ~first, ~suffix) =>
-  <li className={first ? "" : "pt-2"}>
-    <span className="text-sm mr-2"> {prefix->React.string} </span> {value->React.string} {suffix}
-  </li>
+let make = (~prefix, ~value, ~first, ~suffix, ~link=None) => {
+  <OptionallyIntoLink link>
+    <li className={first ? "" : "pt-2"}>
+      <span className="text-sm mr-2"> {prefix->React.string} </span> {value->React.string} {suffix}
+    </li>
+  </OptionallyIntoLink>
+}

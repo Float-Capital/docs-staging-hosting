@@ -119,12 +119,11 @@ function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed, txHash
                   children: "Float Protocol 🏗️"
                 }), React.createElement(DashboardUl.make, {
                   list: [
-                    DashboardLi.Props.createDashboardLiProps(undefined, "📅 Live since:", dateObj.toDateString() + " (" + FormatDistanceToNow(dateObj) + ")", undefined),
-                    DashboardLi.Props.createDashboardLiProps(undefined, "📈 No. Txs:", totalTxs.toString(), undefined),
-                    DashboardLi.Props.createDashboardLiProps(undefined, "👯‍♀️ No. Users:", totalUsers.toString(), undefined),
-                    DashboardLi.Props.createDashboardLiProps(undefined, "⛽ Gas used:", totalGasUsed.toString(), undefined)
-                  ],
-                  link: "https://testnet.bscscan.com/tx/" + txHash
+                    DashboardLi.Props.createDashboardLiProps(undefined, "📅 Live since:", dateObj.toDateString() + " (" + FormatDistanceToNow(dateObj) + ")", "https://testnet.bscscan.com/tx/" + txHash, undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "📈 No. Txs:", totalTxs.toString(), undefined, undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "👯‍♀️ No. Users:", totalUsers.toString(), undefined, undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "⛽ Gas used:", totalGasUsed.toString(), undefined, undefined)
+                  ]
                 }));
 }
 
@@ -140,8 +139,8 @@ function syntheticAssetsCard(totalSynthValue, numberOfSynths) {
                   list: [
                     DashboardLi.Props.createDashboardLiProps(Caml_option.some(React.createElement(Tooltip.make, {
                                   tip: "Redeemable value of synths in the open market"
-                                })), "💰 Total Synth Value: ", "$" + FormatMoney.formatEther(undefined, totalSynthValue), undefined),
-                    DashboardLi.Props.createDashboardLiProps(undefined, "👷‍♀️ No. Synths:", numberOfSynths, undefined)
+                                })), "💰 Total Synth Value: ", "$" + FormatMoney.formatEther(undefined, totalSynthValue), undefined, undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "👷‍♀️ No. Synths:", numberOfSynths, undefined, undefined)
                   ]
                 }), React.createElement(Link, {
                   href: "/markets",
@@ -162,11 +161,11 @@ function floatTokenCard(totalFloatMinted) {
                   children: "🌊🌊 Float Token 🌊🌊"
                 }), React.createElement(DashboardUl.make, {
                   list: [
-                    DashboardLi.Props.createDashboardLiProps(undefined, "😏 Float Price:", "...", undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "😏 Float Price:", "...", undefined, undefined),
                     DashboardLi.Props.createDashboardLiProps(Caml_option.some(React.createElement(Tooltip.make, {
                                   tip: "The number of Float tokens in circulation"
-                                })), "🕶️ Float Supply:", Ethers.Utils.formatEtherToPrecision(totalFloatMinted, 2), undefined),
-                    DashboardLi.Props.createDashboardLiProps(undefined, "🧢 Market cap: ", "...", undefined)
+                                })), "🕶️ Float Supply:", Ethers.Utils.formatEtherToPrecision(totalFloatMinted, 2), undefined, undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "🧢 Market cap: ", "...", undefined, undefined)
                   ]
                 }));
 }
