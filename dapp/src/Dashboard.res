@@ -62,7 +62,7 @@ let floatProtocolCard = (~liveSince, ~totalTxs, ~totalUsers, ~totalGasUsed, ~txH
   <Card>
     <Header> {`Float Protocol 🏗️`->React.string} </Header>
     <DashboardUl
-      link={`https://testnet.bscscan.com/tx/${txHash->Js.String2.make}`}
+      link={`https://testnet.bscscan.com/tx/${txHash}`}
       list={[
         createDashboardLiProps(
           ~prefix=`📅 Live since:`,
@@ -170,7 +170,7 @@ let make = () => {
         syntheticMarkets,
       )
       let totalSynthValue = DashboardCalcs.getTotalSynthValue(~totalValueLocked, ~totalValueStaked)
-      let numberOfSynths = (syntheticMarkets->Array.length * 2)->Js.String2.make
+      let numberOfSynths = (syntheticMarkets->Array.length * 2)->Int.toString
 
       <div className="min-w-3/4 max-w-full flex flex-col self-center items-center justify-start">
         {totalValueCard(~totalValueLocked)}

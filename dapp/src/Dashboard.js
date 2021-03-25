@@ -124,7 +124,7 @@ function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed, txHash
                     DashboardLi.Props.createDashboardLiProps(undefined, "👯‍♀️ No. Users:", totalUsers.toString(), undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "⛽ Gas used:", totalGasUsed.toString(), undefined)
                   ],
-                  link: "https://testnet.bscscan.com/tx/" + String(txHash)
+                  link: "https://testnet.bscscan.com/tx/" + txHash
                 }));
 }
 
