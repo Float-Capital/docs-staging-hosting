@@ -93,7 +93,6 @@ var UserColumnHeader = {
 };
 
 function UserUI$UserProfileHeader(Props) {
-  var level = Ethers$1.BigNumber.from(1);
   return React.createElement("div", {
               className: "w-full flex flex-row justify-around"
             }, React.createElement("div", {
@@ -101,9 +100,7 @@ function UserUI$UserProfileHeader(Props) {
                 }, React.createElement("img", {
                       className: "inline h-10",
                       src: "/img/mario.png"
-                    })), React.createElement("div", {
-                  className: "flex flex-col text-center justify-center"
-                }, React.createElement("div", undefined, "moose-code"), React.createElement("div", undefined, "Lvl. " + level.toString())));
+                    })));
 }
 
 var UserProfileHeader = {

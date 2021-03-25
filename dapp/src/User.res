@@ -88,7 +88,7 @@ module User = {
 
   let onQuerySuccess = (data: userData) => {
     <UserContainer>
-      <UserBanner />
+      // <UserBanner />
       <UserColumnContainer>
         <UserColumn> <UserProfileCard userInfo={data.userInfo} /> </UserColumn>
         <UserColumn>
