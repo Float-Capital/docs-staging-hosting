@@ -2,21 +2,30 @@
 
 import * as React from "react";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as DashboardLi from "./DashboardLi.js";
 
 function DashboardUl(Props) {
   var list = Props.list;
-  return React.createElement("ul", {
-              className: "p-6 pt-3 pl-10"
-            }, Belt_Array.mapWithIndex(list, (function (index, x) {
-                    return React.createElement(DashboardLi.make, {
-                                prefix: x.prefix,
-                                value: x.value,
-                                first: index === 0,
-                                suffix: x.suffix,
-                                key: x.prefix + x.value
-                              });
-                  })));
+  var link = Props.link;
+  var content = React.createElement("ul", {
+        className: "p-6 pt-3 pl-10"
+      }, Belt_Array.mapWithIndex(list, (function (index, param) {
+              var prefix = param.prefix;
+              return React.createElement(DashboardLi.make, {
+                          prefix: prefix,
+                          value: param.value,
+                          first: index === 0,
+                          suffix: param.suffix,
+                          key: prefix + String(index)
+                        });
+            })));
+  return Belt_Option.mapWithDefault(link, content, (function (linkStr) {
+                return React.createElement("a", {
+                            href: linkStr,
+                            target: "_blank"
+                          }, content);
+              }));
 }
 
 var make = DashboardUl;

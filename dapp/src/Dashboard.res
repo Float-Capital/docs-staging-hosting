@@ -58,10 +58,11 @@ let totalValueCard = (~totalValueLocked) =>
     </span>
   </div>
 
-let floatProtocolCard = (~liveSince, ~totalTxs, ~totalUsers, ~totalGasUsed) =>
+let floatProtocolCard = (~liveSince, ~totalTxs, ~totalUsers, ~totalGasUsed, ~txHash) =>
   <Card>
     <Header> {`Float Protocol 🏗️`->React.string} </Header>
     <DashboardUl
+      link={`https://testnet.bscscan.com/tx/${txHash}`}
       list={[
         createDashboardLiProps(
           ~prefix=`📅 Live since:`,
@@ -159,7 +160,7 @@ let make = () => {
         {
           data: Some({
             globalStates: [
-              {totalFloatMinted, totalTxs, totalUsers, totalGasUsed, timestampLaunched},
+              {totalFloatMinted, totalTxs, totalUsers, totalGasUsed, timestampLaunched, txHash},
             ],
           }),
         },
@@ -169,13 +170,19 @@ let make = () => {
         syntheticMarkets,
       )
       let totalSynthValue = DashboardCalcs.getTotalSynthValue(~totalValueLocked, ~totalValueStaked)
-      let numberOfSynths = (syntheticMarkets->Array.length * 2)->Js.String2.make
+      let numberOfSynths = (syntheticMarkets->Array.length * 2)->Int.toString
 
       <div className="min-w-3/4 max-w-full flex flex-col self-center items-center justify-start">
         {totalValueCard(~totalValueLocked)}
         <div className={"w-full flex flex-col md:flex-row justify-between mt-1"}>
           <Divider>
-            {floatProtocolCard(~liveSince=timestampLaunched, ~totalTxs, ~totalUsers, ~totalGasUsed)}
+            {floatProtocolCard(
+              ~liveSince=timestampLaunched,
+              ~totalTxs,
+              ~totalUsers,
+              ~totalGasUsed,
+              ~txHash,
+            )}
           </Divider>
           <Divider>
             {syntheticAssetsCard(~totalSynthValue, ~numberOfSynths)}

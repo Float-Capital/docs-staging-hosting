@@ -259,7 +259,8 @@ query {
     totalTxs,
     totalUsers,
     totalGasUsed,
-    timestampLaunched
+    timestampLaunched,
+    txHash @ppxCustom(module: "Bytes")
   }
 }
 `)

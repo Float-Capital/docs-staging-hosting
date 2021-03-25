@@ -2022,6 +2022,7 @@ var query$19 = (require("@apollo/client").gql`
       totalUsers
       totalGasUsed
       timestampLaunched
+      txHash
     }
   }
 `);
@@ -2036,7 +2037,8 @@ function parse$19(value) {
                         totalTxs: GqlConverters.$$BigInt.parse(value.totalTxs),
                         totalUsers: GqlConverters.$$BigInt.parse(value.totalUsers),
                         totalGasUsed: GqlConverters.$$BigInt.parse(value.totalGasUsed),
-                        timestampLaunched: GqlConverters.$$BigInt.parse(value.timestampLaunched)
+                        timestampLaunched: GqlConverters.$$BigInt.parse(value.timestampLaunched),
+                        txHash: GqlConverters.Bytes.parse(value.txHash)
                       };
               })
         };
@@ -2045,24 +2047,27 @@ function parse$19(value) {
 function serialize$19(value) {
   var value$1 = value.globalStates;
   var globalStates = value$1.map(function (value) {
-        var value$1 = value.timestampLaunched;
-        var value$2 = GqlConverters.$$BigInt.serialize(value$1);
-        var value$3 = value.totalGasUsed;
+        var value$1 = value.txHash;
+        var value$2 = GqlConverters.Bytes.serialize(value$1);
+        var value$3 = value.timestampLaunched;
         var value$4 = GqlConverters.$$BigInt.serialize(value$3);
-        var value$5 = value.totalUsers;
+        var value$5 = value.totalGasUsed;
         var value$6 = GqlConverters.$$BigInt.serialize(value$5);
-        var value$7 = value.totalTxs;
+        var value$7 = value.totalUsers;
         var value$8 = GqlConverters.$$BigInt.serialize(value$7);
-        var value$9 = value.totalFloatMinted;
+        var value$9 = value.totalTxs;
         var value$10 = GqlConverters.$$BigInt.serialize(value$9);
-        var value$11 = value.__typename;
+        var value$11 = value.totalFloatMinted;
+        var value$12 = GqlConverters.$$BigInt.serialize(value$11);
+        var value$13 = value.__typename;
         return {
-                __typename: value$11,
-                totalFloatMinted: value$10,
-                totalTxs: value$8,
-                totalUsers: value$6,
-                totalGasUsed: value$4,
-                timestampLaunched: value$2
+                __typename: value$13,
+                totalFloatMinted: value$12,
+                totalTxs: value$10,
+                totalUsers: value$8,
+                totalGasUsed: value$6,
+                timestampLaunched: value$4,
+                txHash: value$2
               };
       });
   return {

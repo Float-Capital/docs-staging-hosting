@@ -111,7 +111,7 @@ function totalValueCard(totalValueLocked) {
                 }, "$" + FormatMoney.formatEther(undefined, totalValueLocked)));
 }
 
-function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed) {
+function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed, txHash) {
   var dateObj = FromUnixTime(liveSince.toNumber());
   return React.createElement(Dashboard$Card, {
               children: null
@@ -123,7 +123,8 @@ function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed) {
                     DashboardLi.Props.createDashboardLiProps(undefined, "📈 No. Txs:", totalTxs.toString(), undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "👯‍♀️ No. Users:", totalUsers.toString(), undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "⛽ Gas used:", totalGasUsed.toString(), undefined)
-                  ]
+                  ],
+                  link: "https://testnet.bscscan.com/tx/" + txHash
                 }));
 }
 
@@ -246,7 +247,7 @@ function Dashboard(Props) {
             }, totalValueCard(totalValueLocked), React.createElement("div", {
                   className: "w-full flex flex-col md:flex-row justify-between mt-1"
                 }, React.createElement(Dashboard$Divider, {
-                      children: floatProtocolCard(match$2.timestampLaunched, match$2.totalTxs, match$2.totalUsers, match$2.totalGasUsed)
+                      children: floatProtocolCard(match$2.timestampLaunched, match$2.totalTxs, match$2.totalUsers, match$2.totalGasUsed, match$2.txHash)
                     }), React.createElement(Dashboard$Divider, {
                       children: null
                     }, syntheticAssetsCard(totalSynthValue, numberOfSynths), floatTokenCard(match$2.totalFloatMinted)), React.createElement(Dashboard$Divider, {
