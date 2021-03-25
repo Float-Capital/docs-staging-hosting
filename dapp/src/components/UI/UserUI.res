@@ -141,12 +141,37 @@ module UserMarketUnstake = {
   let make = (~synthAddress) => {
     // TODO: fix these URLs once unstaking gets implemented
     let router = Next.Router.useRouter()
-    let unstake = _ =>
-      router->Next.Router.push(`/stake?tokenAddress=${synthAddress->Ethers.Utils.ethAdrToLowerStr}`)
+    let synthAddressStr = synthAddress->ethAdrToLowerStr
+    let showUnstakeModal =
+      router.query
+      ->Js.Dict.get("unstake")
+      ->Option.mapWithDefault(false, address => address == synthAddressStr)
+
+    let openUnstakeModal = _ => {
+      router.query->Js.Dict.set("unstake", synthAddressStr)
+      router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
+    }
+    let closeUnstakeModal = _ => {
+      Js.Dict.unsafeDeleteKey(. router.query, "unstake")
+      router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
+    }
 
     <div className=`flex flex-col`>
       <span className="text-xxs self-center"> <i> {`4 days ago`->React.string} </i> </span>
-      <Button.Tiny onClick={unstake}> {`unstake`} </Button.Tiny>
+      <Button.Tiny onClick={openUnstakeModal}> {`unstake`} </Button.Tiny>
+      {showUnstakeModal
+        ? <Modal closeModal=closeUnstakeModal>
+            {<>
+              <button
+                className="p-1 ml-auto float-right text-3xl leading-none outline-none focus:outline-none"
+                onClick=closeUnstakeModal>
+                <span className="opacity-4 block outline-none focus:outline-none">
+                  {`×`->React.string}
+                </span>
+              </button>
+            </>}
+          </Modal>
+        : React.null}
     </div>
   }
 }

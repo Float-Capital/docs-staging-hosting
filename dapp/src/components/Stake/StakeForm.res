@@ -5,20 +5,7 @@ module StakeForm = %form(
   let validators = {
     amount: {
       strategy: OnFirstBlur,
-      validate: ({amount}) => {
-        let amountRegex = %re(`/^[+]?\d+(\.\d+)?$/`)
-
-        switch amount {
-        | "" => Error("Amount is required")
-        | value if !(amountRegex->Js.Re.test_(value)) =>
-          Error("Incorrect number format - please use '.' for floating points.")
-        | amount =>
-          Ethers.Utils.parseEther(~amount)->Option.mapWithDefault(
-            Error("Couldn't parse Ether value"),
-            etherValue => etherValue->Ok,
-          )
-        }
-      },
+      validate: ({amount}) => Form.Validators.etherNumberInput(amount),
     },
   }
 )
@@ -53,11 +40,11 @@ module StakeFormInput = {
             href="#">
             {`Stake ↗️`->React.string}
           </div>
-          <div
-            className="no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3"
-            href="#">
-            {`Unstake ↗️`->React.string}
-          </div>
+          // <div
+          //   className="no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3"
+          //   href="#">
+          //   {`Unstake ↗️`->React.string}
+          // </div>
         </div>
       </div>
       <AmountInput value optBalance disabled onBlur onChange placeholder={"Stake"} onMaxClick />
