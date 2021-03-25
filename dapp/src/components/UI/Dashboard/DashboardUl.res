@@ -1,5 +1,3 @@
-module OptionallyIntoLink = DashboardLi.OptionallyIntoLink
-
 @react.component
 let make = (~list, ~link=?) => {
   let content =
