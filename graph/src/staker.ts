@@ -161,21 +161,8 @@ export function handleStakeAdded(event: StakeAdded): void {
 
   let lastMintIndex = event.params.lastMintIndex;
 
-  let state = StakeState.load(
-    tokenAddressString + "-" + lastMintIndex.toString()
-  );
-  if (state == null) {
-    ///// NOTE: This is a quick hack - code should be removed when #259 is resolved
-    lastMintIndex = lastMintIndex.minus(ONE);
-    state = StakeState.load(
-      tokenAddressString + "-" + lastMintIndex.toString()
-    );
-    if (state == null) {
-      log.critical("state not defined yet in `handleStakeAdded`, tx hash {}", [
-        event.transaction.hash.toHex(),
-      ]);
-    }
-  }
+  // NOTE: This will create a new (empyt) StakerState if the user is not staking immediately
+  let state = getOrCreateStakerState(tokenAddressString, lastMintIndex, event);
 
   let user = getOrCreateUser(userAddress, event);
 
