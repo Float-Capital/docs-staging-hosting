@@ -106,7 +106,7 @@ function totalValueCard(totalValueLocked) {
                   className: "font-alphbeta text-xl"
                 }, "Total Value"), React.createElement("span", {
                   className: "text-sm"
-                }, " 🏦 of Float Protocol: "), React.createElement("span", {
+                }, " 🏦 in Float Protocol: "), React.createElement("span", {
                   className: "text-green-700"
                 }, "$" + FormatMoney.formatEther(undefined, totalValueLocked)));
 }
@@ -122,7 +122,7 @@ function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed, txHash
                     DashboardLi.Props.createDashboardLiProps(undefined, "📅 Live since:", dateObj.toDateString() + " (" + FormatDistanceToNow(dateObj) + ")", "https://testnet.bscscan.com/tx/" + txHash, undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "📈 No. Txs:", totalTxs.toString(), undefined, undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "👯‍♀️ No. Users:", totalUsers.toString(), undefined, undefined),
-                    DashboardLi.Props.createDashboardLiProps(undefined, "⛽ Gas used:", totalGasUsed.toString(), undefined, undefined)
+                    DashboardLi.Props.createDashboardLiProps(undefined, "⛽ Gas used:", FormatMoney.formatInt(totalGasUsed.toString()), undefined, undefined)
                   ]
                 }));
 }
@@ -145,12 +145,14 @@ function syntheticAssetsCard(totalSynthValue, numberOfSynths) {
                 }), React.createElement(Link, {
                   href: "/markets",
                   children: React.createElement("div", {
-                        className: "w-full p-4 pr-5 text-sm cursor-pointer"
+                        className: "w-full pb-4 text-sm cursor-pointer hover:opacity-70 mx-auto"
                       }, React.createElement("div", {
-                            className: "ml-10"
-                          }, "👀 See Markets"), React.createElement("div", {
-                            className: "ml-20"
-                          }, "to learn more..."))
+                            className: "flex justify-center"
+                          }, React.createElement("div", {
+                                className: "inline-block mx-auto"
+                              }, React.createElement("p", undefined, "👀 See markets"), React.createElement("p", {
+                                    className: "ml-5"
+                                  }, "to learn more..."))))
                 }));
 }
 
@@ -179,8 +181,10 @@ function stakingCard(totalValueStaked) {
                   className: "text-center mt-5"
                 }, React.createElement("span", {
                       className: "text-sm mr-1"
-                    }, "💰 Total Staked Value: "), "$" + FormatMoney.formatEther(undefined, totalValueStaked)), React.createElement("div", {
-                  className: "text-center mt-5 text-sm"
+                    }, "💰 Total Staked Value: "), React.createElement("span", {
+                      className: "text-green-700"
+                    }, "$" + FormatMoney.formatEther(undefined, totalValueStaked))), React.createElement("div", {
+                  className: "text-left mt-4 pl-4 text-sm"
                 }, "Trending"), React.createElement("div", {
                   className: "pt-2 pb-5"
                 }, React.createElement(Dashboard$TrendingStakes, {})));

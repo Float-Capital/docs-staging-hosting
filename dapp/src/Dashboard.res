@@ -52,7 +52,7 @@ let totalValueCard = (~totalValueLocked) =>
   <div
     className={"mx-3 p-5 md:mt-7 self-center text-center bg-white bg-opacity-75 rounded-lg shadow-lg"}>
     <span className="font-alphbeta text-xl"> {"Total Value"->React.string} </span>
-    <span className="text-sm"> {` 🏦 of Float Protocol: `->React.string} </span>
+    <span className="text-sm"> {` 🏦 in Float Protocol: `->React.string} </span>
     <span className="text-green-700">
       {`$${totalValueLocked->FormatMoney.formatEther}`->React.string}
     </span>
@@ -84,7 +84,7 @@ let floatProtocolCard = (~liveSince, ~totalTxs, ~totalUsers, ~totalGasUsed, ~txH
         ),
         createDashboardLiProps(
           ~prefix=`⛽ Gas used:`,
-          ~value=totalGasUsed->Ethers.BigNumber.toString,
+          ~value=totalGasUsed->Ethers.BigNumber.toString->FormatMoney.formatInt,
           (),
         ),
       ]}
@@ -108,9 +108,13 @@ let syntheticAssetsCard = (~totalSynthValue, ~numberOfSynths) =>
       ]
     />
     <Next.Link href="/markets">
-      <div className="w-full p-4 pr-5 text-sm cursor-pointer">
-        <div className="ml-10"> {`👀 See Markets`->React.string} </div>
-        <div className="ml-20"> {`to learn more...`->React.string} </div>
+      <div className="w-full pb-4 text-sm cursor-pointer hover:opacity-70 mx-auto">
+        <div className="flex justify-center">
+          <div className="inline-block mx-auto">
+            <p> {`👀 See markets`->React.string} </p>
+            <p className="ml-5"> {`to learn more...`->React.string} </p>
+          </div>
+        </div>
       </div>
     </Next.Link>
   </Card>
@@ -137,9 +141,11 @@ let stakingCard = (~totalValueStaked) =>
     <Header> {`Staking 🔥`->React.string} </Header>
     <div className="text-center mt-5">
       <span className="text-sm mr-1"> {`💰 Total Staked Value: `->React.string} </span>
-      {`$${totalValueStaked->FormatMoney.formatEther}`->React.string}
+      <span className="text-green-700">
+        {`$${totalValueStaked->FormatMoney.formatEther}`->React.string}
+      </span>
     </div>
-    <div className="text-center mt-5 text-sm"> {`Trending`->React.string} </div>
+    <div className="text-left mt-4 pl-4 text-sm"> {`Trending`->React.string} </div>
     <div className="pt-2 pb-5"> <TrendingStakes /> </div>
   </Card>
 

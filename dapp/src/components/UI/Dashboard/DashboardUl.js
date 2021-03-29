@@ -9,7 +9,7 @@ function DashboardUl(Props) {
   var list = Props.list;
   var link = Props.link;
   var content = React.createElement("ul", {
-        className: "p-6 pt-3 pl-10"
+        className: "p-6 py-4 pl-10"
       }, Belt_Array.mapWithIndex(list, (function (index, param) {
               var prefix = param.prefix;
               return React.createElement(DashboardLi.make, {
