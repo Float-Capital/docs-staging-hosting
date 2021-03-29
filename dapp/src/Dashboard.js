@@ -120,8 +120,8 @@ function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed, txHash
                 }), React.createElement(DashboardUl.make, {
                   list: [
                     DashboardLi.Props.createDashboardLiProps(undefined, "📅 Live since:", dateObj.toDateString() + " (" + FormatDistanceToNow(dateObj) + ")", "https://testnet.bscscan.com/tx/" + txHash, undefined),
-                    DashboardLi.Props.createDashboardLiProps(undefined, "📈 No. Txs:", totalTxs.toString(), undefined, undefined),
-                    DashboardLi.Props.createDashboardLiProps(undefined, "👯‍♀️ No. Users:", totalUsers.toString(), undefined, undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "📈 No. txs:", totalTxs.toString(), undefined, undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "👯‍♀️ No. users:", totalUsers.toString(), undefined, undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "⛽ Gas used:", FormatMoney.formatInt(totalGasUsed.toString()), undefined, undefined)
                   ]
                 }));
@@ -139,8 +139,8 @@ function syntheticAssetsCard(totalSynthValue, numberOfSynths) {
                   list: [
                     DashboardLi.Props.createDashboardLiProps(Caml_option.some(React.createElement(Tooltip.make, {
                                   tip: "Redeemable value of synths in the open market"
-                                })), "💰 Total Synth Value: ", "$" + FormatMoney.formatEther(undefined, totalSynthValue), undefined, undefined),
-                    DashboardLi.Props.createDashboardLiProps(undefined, "👷‍♀️ No. Synths:", numberOfSynths, undefined, undefined)
+                                })), "💰 Total synth value: ", "$" + FormatMoney.formatEther(undefined, totalSynthValue), undefined, undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "👷‍♀️ No. synths:", numberOfSynths, undefined, undefined)
                   ]
                 }), React.createElement(Link, {
                   href: "/markets",
@@ -163,10 +163,10 @@ function floatTokenCard(totalFloatMinted) {
                   children: "🌊🌊 Float Token 🌊🌊"
                 }), React.createElement(DashboardUl.make, {
                   list: [
-                    DashboardLi.Props.createDashboardLiProps(undefined, "😏 Float Price:", "...", undefined, undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "😏 Float price:", "...", undefined, undefined),
                     DashboardLi.Props.createDashboardLiProps(Caml_option.some(React.createElement(Tooltip.make, {
                                   tip: "The number of Float tokens in circulation"
-                                })), "🕶️ Float Supply:", Ethers.Utils.formatEtherToPrecision(totalFloatMinted, 2), undefined, undefined),
+                                })), "🕶️ Float supply:", Ethers.Utils.formatEtherToPrecision(totalFloatMinted, 2), undefined, undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "🧢 Market cap: ", "...", undefined, undefined)
                   ]
                 }));
@@ -181,7 +181,7 @@ function stakingCard(totalValueStaked) {
                   className: "text-center mt-5"
                 }, React.createElement("span", {
                       className: "text-sm mr-1"
-                    }, "💰 Total Staked Value: "), React.createElement("span", {
+                    }, "💰 Total staked value: "), React.createElement("span", {
                       className: "text-green-700"
                     }, "$" + FormatMoney.formatEther(undefined, totalValueStaked))), React.createElement("div", {
                   className: "text-left mt-4 pl-4 text-sm"

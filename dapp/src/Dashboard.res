@@ -73,12 +73,12 @@ let floatProtocolCard = (~liveSince, ~totalTxs, ~totalUsers, ~totalGasUsed, ~txH
           (),
         ),
         createDashboardLiProps(
-          ~prefix=`📈 No. Txs:`,
+          ~prefix=`📈 No. txs:`,
           ~value=totalTxs->Ethers.BigNumber.toString,
           (),
         ),
         createDashboardLiProps(
-          ~prefix=`👯‍♀️ No. Users:`,
+          ~prefix=`👯‍♀️ No. users:`,
           ~value=totalUsers->Ethers.BigNumber.toString,
           (),
         ),
@@ -99,12 +99,12 @@ let syntheticAssetsCard = (~totalSynthValue, ~numberOfSynths) =>
     <DashboardUl
       list=[
         createDashboardLiProps(
-          ~prefix=`💰 Total Synth Value: `,
+          ~prefix=`💰 Total synth value: `,
           ~value=`$${totalSynthValue->FormatMoney.formatEther}`,
           ~suffix=<Tooltip tip={"Redeemable value of synths in the open market"} />,
           (),
         ),
-        createDashboardLiProps(~prefix=`👷‍♀️ No. Synths:`, ~value=numberOfSynths, ()),
+        createDashboardLiProps(~prefix=`👷‍♀️ No. synths:`, ~value=numberOfSynths, ()),
       ]
     />
     <Next.Link href="/markets">
@@ -124,9 +124,9 @@ let floatTokenCard = (~totalFloatMinted) =>
     <Header> {`🌊🌊 Float Token 🌊🌊`->React.string} </Header>
     <DashboardUl
       list={[
-        createDashboardLiProps(~prefix=`😏 Float Price:`, ~value="...", ()),
+        createDashboardLiProps(~prefix=`😏 Float price:`, ~value="...", ()),
         createDashboardLiProps(
-          ~prefix=`🕶️ Float Supply:`,
+          ~prefix=`🕶️ Float supply:`,
           ~value=totalFloatMinted->Ethers.Utils.formatEtherToPrecision(2),
           ~suffix=<Tooltip tip="The number of Float tokens in circulation" />,
           (),
@@ -140,7 +140,7 @@ let stakingCard = (~totalValueStaked) =>
   <Card>
     <Header> {`Staking 🔥`->React.string} </Header>
     <div className="text-center mt-5">
-      <span className="text-sm mr-1"> {`💰 Total Staked Value: `->React.string} </span>
+      <span className="text-sm mr-1"> {`💰 Total staked value: `->React.string} </span>
       <span className="text-green-700">
         {`$${totalValueStaked->FormatMoney.formatEther}`->React.string}
       </span>
