@@ -107,52 +107,52 @@ function StakeCard(Props) {
   var shortApy = basicApyCalc(0.12, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
   var longFloatApy = myfloatCalc(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
   var shortFloatApy = myfloatCalc(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
-  return React.createElement("div", {
-              className: "p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg"
-            }, React.createElement("div", {
-                  className: "flex justify-center w-full my-1"
-                }, React.createElement("h1", {
-                      className: "font-bold text-xl font-alphbeta"
-                    }, marketName, React.createElement(Tooltip.make, {
-                          tip: "This market tracks " + marketName
-                        }))), React.createElement("div", {
-                  className: "flex justify-center w-full"
-                }, React.createElement(StakeCardSide.make, {
-                      marketName: marketName,
-                      isLong: true,
-                      apy: longApy,
-                      floatApy: Number(Ethers.Utils.formatEther(longFloatApy))
-                    }), React.createElement("div", {
-                      className: "w-1/2 flex items-center flex-col"
-                    }, React.createElement("h2", {
-                          className: "text-xs mt-1"
-                        }, React.createElement("span", {
-                              className: "font-bold"
-                            }, "📈 TOTAL"), " Staked"), React.createElement("div", {
-                          className: "text-3xl font-alphbeta tracking-wider py-1"
-                        }, "$" + FormatMoney.formatEther(undefined, totalDollarValueStake)), totalDollarValueStake.eq(zero) ? null : React.createElement(StakeBar.make, {
-                            percentStrLong: percentStrLong,
-                            percentStrShort: percentStrShort
-                          }), React.createElement("div", {
-                          className: "w-full flex justify-around"
-                        }, React.createElement(Button.Small.make, {
-                              onClick: (function (param) {
-                                  router.push("/stake?tokenAddress=" + Globals.ethAdrToLowerStr(longTokenAddress));
-                                  
-                                }),
-                              children: "Stake Long"
-                            }), React.createElement(Button.Small.make, {
-                              onClick: (function (param) {
-                                  router.push("/stake?tokenAddress=" + Globals.ethAdrToLowerStr(shortTokenAddress));
-                                  
-                                }),
-                              children: "Stake Short"
-                            }))), React.createElement(StakeCardSide.make, {
-                      marketName: marketName,
-                      isLong: false,
-                      apy: shortApy,
-                      floatApy: Number(Ethers.Utils.formatEther(shortFloatApy))
-                    })));
+  return React.createElement(React.Fragment, undefined, React.createElement("div", {
+                  className: "p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg"
+                }, React.createElement("div", {
+                      className: "flex justify-center w-full my-1"
+                    }, React.createElement("h1", {
+                          className: "font-bold text-xl font-alphbeta"
+                        }, marketName, React.createElement(Tooltip.make, {
+                              tip: "This market tracks " + marketName
+                            }))), React.createElement("div", {
+                      className: "flex justify-center w-full"
+                    }, React.createElement(StakeCardSide.make, {
+                          marketName: marketName,
+                          isLong: true,
+                          apy: longApy,
+                          floatApy: Number(Ethers.Utils.formatEther(longFloatApy))
+                        }), React.createElement("div", {
+                          className: "w-1/2 flex items-center flex-col"
+                        }, React.createElement("h2", {
+                              className: "text-xs mt-1"
+                            }, React.createElement("span", {
+                                  className: "font-bold"
+                                }, "📈 TOTAL"), " Staked"), React.createElement("div", {
+                              className: "text-3xl font-alphbeta tracking-wider py-1"
+                            }, "$" + FormatMoney.formatEther(undefined, totalDollarValueStake)), totalDollarValueStake.eq(zero) ? null : React.createElement(StakeBar.make, {
+                                percentStrLong: percentStrLong,
+                                percentStrShort: percentStrShort
+                              }), React.createElement("div", {
+                              className: "w-full flex justify-around"
+                            }, React.createElement(Button.Small.make, {
+                                  onClick: (function (param) {
+                                      router.push("/stake?tokenAddress=" + Globals.ethAdrToLowerStr(longTokenAddress));
+                                      
+                                    }),
+                                  children: "Stake Long"
+                                }), React.createElement(Button.Small.make, {
+                                  onClick: (function (param) {
+                                      router.push("/stake?tokenAddress=" + Globals.ethAdrToLowerStr(shortTokenAddress));
+                                      
+                                    }),
+                                  children: "Stake Short"
+                                }))), React.createElement(StakeCardSide.make, {
+                          marketName: marketName,
+                          isLong: false,
+                          apy: shortApy,
+                          floatApy: Number(Ethers.Utils.formatEther(shortFloatApy))
+                        }))));
 }
 
 var make = StakeCard;

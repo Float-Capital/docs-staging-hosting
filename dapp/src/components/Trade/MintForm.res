@@ -221,7 +221,10 @@ module MintFormInput = {
             </label>
           </div>
           <p className="text-xxs hover:text-gray-500">
-            <a href="https://docs.float.capital/docs/stake">
+            <a
+              href="https://docs.float.capital/docs/stake"
+              target="_blank"
+              rel="noopenner noreferrer">
               {"Learn more about staking"->React.string}
             </a>
           </p>
