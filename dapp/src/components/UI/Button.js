@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-var buttonOuterStyle = "relative my-3";
+var buttonOuterStyle = "relative my-1";
 
 var buttonShaddowStyle = "transform translate-x-1 translate-y-1 w-full bg-primary inline-block";
 
@@ -23,7 +23,7 @@ function Button$Tiny(Props) {
                 }, React.createElement("div", {
                       className: buttonShaddowStyle + " h-full"
                     }, React.createElement("button", {
-                          className: buttonTopStyle + " min-h-full px-2 text-xxs " + (
+                          className: buttonTopStyle + " min-h-full focus:outline-none px-2 text-xxs " + (
                             disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-300" : ""
                           ),
                           disabled: disabled,
@@ -48,7 +48,7 @@ function Button$Small(Props) {
             }, React.createElement("div", {
                   className: buttonShaddowStyle + " border"
                 }, React.createElement("button", {
-                      className: buttonTopStyle + " p-2 text-sm " + (
+                      className: buttonTopStyle + " p-2 text-sm focus:outline-none " + (
                         disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-300" : ""
                       ),
                       disabled: disabled,
@@ -73,7 +73,7 @@ function Button(Props) {
             }, React.createElement("div", {
                   className: buttonShaddowStyle + " border-0"
                 }, React.createElement("button", {
-                      className: buttonTopStyle + " p-3 text-base " + (
+                      className: buttonTopStyle + " p-3 focus:outline-none text-base " + (
                         disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-300" : ""
                       ),
                       disabled: disabled,

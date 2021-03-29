@@ -51,14 +51,15 @@ module UserColumnHeader = {
 
 module UserProfileHeader = {
   @react.component
-  let make = () => {
+  let make = (~address: string) => {
     // let name = `moose-code` // TODO: get from graph
     // let level = Ethers.BigNumber.fromInt(1) // TODO: get from graph
 
     <div className="w-full flex flex-row justify-around">
       <div
         className="w-24 h-24 rounded-full border-2 border-light-purple flex items-center justify-center">
-        <img className="inline h-10" src="/img/mario.png" />
+        // <img className="inline h-10" src="/img/mario.png" />
+        <img className="inline h-10 rounded" src={Blockies.makeBlockie(address)} />
       </div>
       // <div className="flex flex-col text-center justify-center">
       //   <div> {name->React.string} </div>
@@ -85,7 +86,7 @@ module UserColumnTextCenter = {
 module UserColumnText = {
   @react.component
   let make = (~icon=?, ~head, ~body=``) => {
-    <div className=`ml-4 mb-1`>
+    <div className=`mb-1`>
       {switch icon {
       | Some(path) => <img className=`inline mr-1 h-5` src={path} />
       | None => ""->React.string
@@ -104,7 +105,7 @@ module UserMarketBox = {
       <div className=`w-1/3 text-sm self-center`>
         {name->React.string}
         <br className=`mt-1` />
-        {(isLong ? `Long ↗️` : `Short ↘️`)->React.string}
+        {(isLong ? `Long↗️` : `Short↘️`)->React.string}
       </div>
       <div className=`w-1/3 text-sm mx-2 text-center self-center`>
         <span className=`text-sm`> {tokens->React.string} </span>
@@ -245,11 +246,12 @@ module UserFloatCard = {
           let floatAccrued =
             totalClaimable->Ethers.BigNumber.add(totalPredicted)->FormatMoney.formatEther(~digits=6)
 
-          <div className=`w-11/12 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>
+          <div
+            className=`w-11/12 px-2 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>
             <UserColumnTextList>
-              <UserColumnText head=`float accruing` body={floatAccrued} />
-              <UserColumnText head=`float balance` body={floatBalance} />
-              <UserColumnText head=`float minted` body={floatMinted} />
+              <UserColumnText head=`Float accruing` body={floatAccrued} />
+              <UserColumnText head=`Float balance` body={floatBalance} />
+              <UserColumnText head=`Float minted` body={floatMinted} />
             </UserColumnTextList>
             {isCurrentUser
               ? <div className=`flex justify-around flex-row my-1`>

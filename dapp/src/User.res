@@ -40,10 +40,6 @@ module UserBalancesCard = {
           ->React.array}
         </>
       }}
-      <br />
-      <UserColumnTextCenter>
-        <span className="text-sm"> {`💸 Why not mint some more? 💸`->React.string} </span>
-      </UserColumnTextCenter>
     </UserColumnCard>
   }
 }
@@ -61,7 +57,7 @@ module UserProfileCard = {
     let gasStr = userInfo.gasUsed->Ethers.BigNumber.toString->FormatMoney.formatInt
 
     <UserColumnCard>
-      <UserProfileHeader />
+      <UserProfileHeader address={addressStr} />
       <UserColumnTextList>
         <UserColumnText head=`📮 Address` body={addressStr} />
         <UserColumnText head=`🎉 Joined` body={joinedStr} />
@@ -91,12 +87,12 @@ module User = {
       // <UserBanner />
       <UserColumnContainer>
         <UserColumn> <UserProfileCard userInfo={data.userInfo} /> </UserColumn>
+        <UserColumn> <UserBalancesCard userId={data.user} /> </UserColumn>
         <UserColumn>
-          <UserBalancesCard userId={data.user} />
+          <UserFloatCard userId={data.user} stakes={data.stakes} />
           <br />
           <UserStakesCard stakes={data.stakes} userId={data.user} />
         </UserColumn>
-        <UserColumn> <UserFloatCard userId={data.user} stakes={data.stakes} /> </UserColumn>
       </UserColumnContainer>
     </UserContainer>
   }

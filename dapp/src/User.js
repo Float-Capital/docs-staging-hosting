@@ -54,11 +54,7 @@ function User$UserBalancesCard(Props) {
                 }, "Synthetic Assets", React.createElement("img", {
                       className: "inline h-5 ml-2",
                       src: "/img/coin.png"
-                    })), tmp, React.createElement("br", undefined), React.createElement(UserUI.UserColumnTextCenter.make, {
-                  children: React.createElement("span", {
-                        className: "text-sm"
-                      }, "💸 Why not mint some more? 💸")
-                }));
+                    })), tmp);
 }
 
 var UserBalancesCard = {
@@ -73,7 +69,9 @@ function User$UserProfileCard(Props) {
   var gasStr = FormatMoney.formatInt(userInfo.gasUsed.toString());
   return React.createElement(UserUI.UserColumnCard.make, {
               children: null
-            }, React.createElement(UserUI.UserProfileHeader.make, {}), React.createElement(UserUI.UserColumnTextList.make, {
+            }, React.createElement(UserUI.UserProfileHeader.make, {
+                  address: addressStr
+                }), React.createElement(UserUI.UserColumnTextList.make, {
                   children: null
                 }, React.createElement(UserUI.UserColumnText.make, {
                       head: "📮 Address",
@@ -113,18 +111,18 @@ function onQuerySuccess(data) {
                               userInfo: data.userInfo
                             })
                       }), React.createElement(UserUI.UserColumn.make, {
+                        children: React.createElement(User$UserBalancesCard, {
+                              userId: data.user
+                            })
+                      }), React.createElement(UserUI.UserColumn.make, {
                         children: null
-                      }, React.createElement(User$UserBalancesCard, {
-                            userId: data.user
+                      }, React.createElement(UserUI.UserFloatCard.make, {
+                            userId: data.user,
+                            stakes: data.stakes
                           }), React.createElement("br", undefined), React.createElement(UserUI.UserStakesCard.make, {
                             stakes: data.stakes,
                             userId: data.user
-                          })), React.createElement(UserUI.UserColumn.make, {
-                        children: React.createElement(UserUI.UserFloatCard.make, {
-                              userId: data.user,
-                              stakes: data.stakes
-                            })
-                      }))
+                          })))
             });
 }
 
