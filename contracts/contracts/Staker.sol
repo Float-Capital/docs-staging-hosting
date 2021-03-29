@@ -484,6 +484,15 @@ contract Staker is IStaker, Initializable {
         onlyValidSynthetic(tokenAddress)
     {
         _stake(tokenAddress, amount, msg.sender, false);
+
+        // This currently disavatages people who top-up?
+        // Since they have capital locked that will skip a state of earning.
+        // This is very difficult for the top up case. Unless they create a state point,
+        // There is going to need to be some system compromise.
+        userIndexOfLastClaimedReward[tokenAddress][msg.sender] =
+            latestRewardIndex[tokenAddress] +
+            1;
+
         emit StakeAdded(
             msg.sender,
             tokenAddress,
@@ -506,7 +515,11 @@ contract Staker is IStaker, Initializable {
         floatContract._updateSystemState(marketIndexOfToken[tokenAddress]);
 
         // Stake for user.
-        stake(tokenAddress, amount);
+        _stake(tokenAddress, amount, msg.sender, false);
+
+        userIndexOfLastClaimedReward[tokenAddress][
+            msg.sender
+        ] = latestRewardIndex[tokenAddress];
 
         // Now we can set the users reward state to the just created state.
         userIndexOfLastClaimedReward[tokenAddress][
@@ -530,7 +543,7 @@ contract Staker is IStaker, Initializable {
     ) external override onlyFloat() onlyValidSynthetic(tokenAddress) {
         _stake(tokenAddress, amount, user, true);
 
-        // system state is already updated on the float side
+        // NOTE: system state is already updated on the float side - make sure this function is impossible to call otherwise
         userIndexOfLastClaimedReward[tokenAddress][user] = latestRewardIndex[
             tokenAddress
         ];
@@ -569,14 +582,6 @@ contract Staker is IStaker, Initializable {
         userAmountStaked[tokenAddress][user] =
             userAmountStaked[tokenAddress][user] +
             amount;
-
-        // This currently disavatages people who top-up?
-        // Since they have capital locked that will skip a state of earning.
-        // This is very difficult for the top up case. Unless they create a state point,
-        // There is going to need to be some system compromise.
-        userIndexOfLastClaimedReward[tokenAddress][user] =
-            latestRewardIndex[tokenAddress] +
-            1;
     }
 
     ////////////////////////////////////

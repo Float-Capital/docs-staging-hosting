@@ -161,12 +161,8 @@ export function handleStakeAdded(event: StakeAdded): void {
 
   let lastMintIndex = event.params.lastMintIndex;
 
-  let state = StakeState.load(
-    tokenAddressString + "-" + lastMintIndex.toString()
-  );
-  if (state == null) {
-    log.critical("state not defined yet crash", []);
-  }
+  // NOTE: This will create a new (empyt) StakerState if the user is not staking immediately
+  let state = getOrCreateStakerState(tokenAddressString, lastMintIndex, event);
 
   let user = getOrCreateUser(userAddress, event);
 
@@ -291,7 +287,9 @@ export function handleFloatMinted(event: FloatMinted): void {
     tokenAddressString + "-" + lastMintIndex.toString()
   );
   if (state == null) {
-    log.critical("state not defined yet crash", []);
+    log.critical("state not defined yet in `handleFloatMinted`, tx hash {}", [
+      event.transaction.hash.toHex(),
+    ]);
   }
   let syntheticToken = SyntheticToken.load(tokenAddressString);
   syntheticToken.floatMintedFromSpecificToken = syntheticToken.floatMintedFromSpecificToken.plus(
