@@ -8,22 +8,18 @@ import * as DashboardLi from "./DashboardLi.js";
 function DashboardUl(Props) {
   var list = Props.list;
   var link = Props.link;
-  var content = React.createElement(DashboardLi.OptionallyIntoLink.make, {
-        link: link,
-        children: React.createElement("ul", {
-              className: "p-6 pt-3 pl-10"
-            }, Belt_Array.mapWithIndex(list, (function (index, param) {
-                    var prefix = param.prefix;
-                    return React.createElement(DashboardLi.make, {
-                                prefix: prefix,
-                                value: param.value,
-                                first: index === 0,
-                                suffix: param.suffix,
-                                link: param.link,
-                                key: prefix + String(index)
-                              });
-                  })))
-      });
+  var content = React.createElement("ul", {
+        className: "p-6 py-4 pl-10"
+      }, Belt_Array.mapWithIndex(list, (function (index, param) {
+              var prefix = param.prefix;
+              return React.createElement(DashboardLi.make, {
+                          prefix: prefix,
+                          value: param.value,
+                          first: index === 0,
+                          suffix: param.suffix,
+                          key: prefix + String(index)
+                        });
+            })));
   return Belt_Option.mapWithDefault(link, content, (function (linkStr) {
                 return React.createElement("a", {
                             href: linkStr,
@@ -32,12 +28,9 @@ function DashboardUl(Props) {
               }));
 }
 
-var OptionallyIntoLink;
-
 var make = DashboardUl;
 
 export {
-  OptionallyIntoLink ,
   make ,
   
 }

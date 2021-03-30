@@ -18,6 +18,7 @@ import * as FormatMoney from "./FormatMoney.js";
 import * as Router from "next/router";
 import * as RootProvider from "../../libraries/RootProvider.js";
 import * as StakeDetails from "../../StakeDetails.js";
+import EthereumBlockiesBase64 from "ethereum-blockies-base64";
 
 function UserUI$UserContainer(Props) {
   var children = Props.children;
@@ -93,13 +94,14 @@ var UserColumnHeader = {
 };
 
 function UserUI$UserProfileHeader(Props) {
+  var address = Props.address;
   return React.createElement("div", {
               className: "w-full flex flex-row justify-around"
             }, React.createElement("div", {
                   className: "w-24 h-24 rounded-full border-2 border-light-purple flex items-center justify-center"
                 }, React.createElement("img", {
-                      className: "inline h-10",
-                      src: "/img/mario.png"
+                      className: "inline h-10 rounded",
+                      src: EthereumBlockiesBase64(address)
                     })));
 }
 
@@ -135,7 +137,7 @@ function UserUI$UserColumnText(Props) {
   var bodyOpt = Props.body;
   var body = bodyOpt !== undefined ? bodyOpt : "";
   return React.createElement("div", {
-              className: "ml-4 mb-1"
+              className: "mb-1"
             }, icon !== undefined ? React.createElement("img", {
                     className: "inline mr-1 h-5",
                     src: icon
@@ -160,7 +162,7 @@ function UserUI$UserMarketBox(Props) {
                   className: "w-1/3 text-sm self-center"
                 }, name, React.createElement("br", {
                       className: "mt-1"
-                    }), isLong ? "Long ↗️" : "Short ↘️"), React.createElement("div", {
+                    }), isLong ? "Long↗️" : "Short↘️"), React.createElement("div", {
                   className: "w-1/3 text-sm mx-2 text-center self-center"
                 }, React.createElement("span", {
                       className: "text-sm"
@@ -325,17 +327,17 @@ function UserUI$UserFloatCard(Props) {
     var floatMinted = FormatMoney.formatEther(6, floatBalances$1.floatMinted);
     var floatAccrued = FormatMoney.formatEther(6, match$1[0].add(match$1[1]));
     tmp = React.createElement("div", {
-          className: "w-11/12 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow"
+          className: "w-11/12 px-2 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow"
         }, React.createElement(UserUI$UserColumnTextList, {
               children: null
             }, React.createElement(UserUI$UserColumnText, {
-                  head: "float accruing",
+                  head: "Float accruing",
                   body: floatAccrued
                 }), React.createElement(UserUI$UserColumnText, {
-                  head: "float balance",
+                  head: "Float balance",
                   body: floatBalance
                 }), React.createElement(UserUI$UserColumnText, {
-                  head: "float minted",
+                  head: "Float minted",
                   body: floatMinted
                 })), isCurrentUser ? React.createElement("div", {
                 className: "flex justify-around flex-row my-1"

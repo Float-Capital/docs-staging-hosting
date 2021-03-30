@@ -151,52 +151,58 @@ let make = (
     "short",
   )
 
-  <div className="p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg">
-    <div className="flex justify-center w-full my-1">
-      <h1 className="font-bold text-xl font-alphbeta">
-        {marketName->React.string} <Tooltip tip={`This market tracks ${marketName}`} />
-      </h1>
-    </div>
-    <div className="flex justify-center w-full">
-      <StakeCardSide
-        marketName={marketName}
-        isLong={true}
-        apy={longApy}
-        floatApy={longFloatApy->Ethers.Utils.formatEther->Js.Float.fromString}
-      />
-      <div className="w-1/2 flex items-center flex-col">
-        <h2 className="text-xs mt-1">
-          <span className="font-bold"> {`📈 TOTAL`->React.string} </span>
-          {" Staked"->React.string}
-        </h2>
-        <div className="text-3xl font-alphbeta tracking-wider py-1">
-          {`$${totalDollarValueStake->FormatMoney.formatEther}`->React.string}
-        </div>
-        {switch !(totalDollarValueStake->Ethers.BigNumber.eq(zero)) {
-        | true => <StakeBar percentStrLong={percentStrLong} percentStrShort={percentStrShort} />
-        | false => React.null
-        }}
-        <div className="w-full flex justify-around">
-          <Button.Small
-            onClick={_ => {
-              router->Next.Router.push(`/stake?tokenAddress=${longTokenAddress->ethAdrToLowerStr}`)
-            }}>
-            "Stake Long"
-          </Button.Small>
-          <Button.Small
-            onClick={_ => {
-              router->Next.Router.push(`/stake?tokenAddress=${shortTokenAddress->ethAdrToLowerStr}`)
-            }}>
-            "Stake Short"
-          </Button.Small>
-        </div>
+  <>
+    <div className="p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg">
+      <div className="flex justify-center w-full my-1">
+        <h1 className="font-bold text-xl font-alphbeta">
+          {marketName->React.string} <Tooltip tip={`This market tracks ${marketName}`} />
+        </h1>
       </div>
-      <StakeCardSide
-        marketName={marketName}
-        isLong={false}
-        apy={shortApy}
-        floatApy={shortFloatApy->Ethers.Utils.formatEther->Js.Float.fromString}
-      />
+      <div className="flex justify-center w-full">
+        <StakeCardSide
+          marketName={marketName}
+          isLong={true}
+          apy={longApy}
+          floatApy={longFloatApy->Ethers.Utils.formatEther->Js.Float.fromString}
+        />
+        <div className="w-1/2 flex items-center flex-col">
+          <h2 className="text-xs mt-1">
+            <span className="font-bold"> {`📈 TOTAL`->React.string} </span>
+            {" Staked"->React.string}
+          </h2>
+          <div className="text-3xl font-alphbeta tracking-wider py-1">
+            {`$${totalDollarValueStake->FormatMoney.formatEther}`->React.string}
+          </div>
+          {switch !(totalDollarValueStake->Ethers.BigNumber.eq(zero)) {
+          | true => <StakeBar percentStrLong={percentStrLong} percentStrShort={percentStrShort} />
+          | false => React.null
+          }}
+          <div className="w-full flex justify-around">
+            <Button.Small
+              onClick={_ => {
+                router->Next.Router.push(
+                  `/stake?tokenAddress=${longTokenAddress->ethAdrToLowerStr}`,
+                )
+              }}>
+              "Stake Long"
+            </Button.Small>
+            <Button.Small
+              onClick={_ => {
+                router->Next.Router.push(
+                  `/stake?tokenAddress=${shortTokenAddress->ethAdrToLowerStr}`,
+                )
+              }}>
+              "Stake Short"
+            </Button.Small>
+          </div>
+        </div>
+        <StakeCardSide
+          marketName={marketName}
+          isLong={false}
+          apy={shortApy}
+          floatApy={shortFloatApy->Ethers.Utils.formatEther->Js.Float.fromString}
+        />
+      </div>
     </div>
-  </div>
+  </>
 }

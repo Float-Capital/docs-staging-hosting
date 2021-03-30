@@ -737,7 +737,9 @@ function MintForm$MintFormInput(Props) {
                   ) + " tokens")), React.createElement("p", {
                 className: "text-xxs hover:text-gray-500"
               }, React.createElement("a", {
-                    href: "https://docs.float.capital/docs/stake"
+                    href: "https://docs.float.capital/docs/stake",
+                    rel: "noopenner noreferrer",
+                    target: "_blank"
                   }, "Learn more about staking"))));
   var tmp;
   var exit = 0;
