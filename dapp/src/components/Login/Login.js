@@ -35,7 +35,7 @@ function Login(Props) {
                 }, Belt_Array.mapWithIndex(connectors, (function (index, connector) {
                         return React.createElement("div", {
                                     key: String(index),
-                                    className: "p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 hover:bg-opacity-100 rounded",
+                                    className: "p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 hover:bg-gray-200 active:bg-gray-300 rounded ",
                                     onClick: (function (e) {
                                         e.stopPropagation();
                                         return Curry._1(activateConnector, connector.connector);

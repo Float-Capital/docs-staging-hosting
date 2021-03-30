@@ -46,7 +46,7 @@ let make = () => {
             ReactEvent.Mouse.stopPropagation(e)
             activateConnector(connector.connector)
           }}
-          className="p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 hover:bg-opacity-100 rounded">
+          className="p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 hover:bg-gray-200 active:bg-gray-300 rounded ">
           <div className="w-10 h-10">
             <img src=connector.img alt=connector.name className="w-full h-full" />
           </div>
