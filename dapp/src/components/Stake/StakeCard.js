@@ -5,8 +5,10 @@ import * as Button from "../UI/Button.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Ethers$1 from "ethers";
 import * as Globals from "../../libraries/Globals.js";
+import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
 import * as Tooltip from "../UI/Tooltip.js";
 import * as StakeBar from "../UI/StakeCard/StakeBar.js";
+import * as StakeForm from "./StakeForm.js";
 import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as FormatMoney from "../UI/FormatMoney.js";
@@ -107,6 +109,7 @@ function StakeCard(Props) {
   var shortApy = basicApyCalc(0.12, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
   var longFloatApy = myfloatCalc(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
   var shortFloatApy = myfloatCalc(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
+  var stakeOption = Js_dict.get(router.query, "tokenAddress");
   return React.createElement(React.Fragment, undefined, React.createElement("div", {
                   className: "p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg"
                 }, React.createElement("div", {
@@ -152,7 +155,9 @@ function StakeCard(Props) {
                           isLong: false,
                           apy: shortApy,
                           floatApy: Number(Ethers.Utils.formatEther(shortFloatApy))
-                        }))));
+                        })), stakeOption !== undefined && (stakeOption === Globals.ethAdrToLowerStr(longTokenAddress) || stakeOption === Globals.ethAdrToLowerStr(shortTokenAddress)) ? React.createElement(StakeForm.make, {
+                        tokenId: stakeOption
+                      }) : null));
 }
 
 var make = StakeCard;

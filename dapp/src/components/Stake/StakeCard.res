@@ -151,6 +151,8 @@ let make = (
     "short",
   )
 
+  let stakeOption = router.query->Js.Dict.get("tokenAddress")
+
   <>
     <div className="p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg">
       <div className="flex justify-center w-full my-1">
@@ -203,6 +205,14 @@ let make = (
           floatApy={shortFloatApy->Ethers.Utils.formatEther->Js.Float.fromString}
         />
       </div>
+      {switch stakeOption {
+      | Some(tokenAddress) =>
+        tokenAddress == longTokenAddress->ethAdrToLowerStr ||
+          tokenAddress == shortTokenAddress->ethAdrToLowerStr
+          ? <StakeForm tokenId=tokenAddress />
+          : React.null
+      | None => React.null
+      }}
     </div>
   </>
 }

@@ -440,17 +440,10 @@ function StakeForm$StakeFormInput(Props) {
         
       });
   return React.createElement(Form.make, {
-              className: "",
+              className: "mx-auto max-w-3xl",
               onSubmit: onSubmit,
               children: null
-            }, React.createElement("div", {
-                  className: "px-8 pt-2"
-                }, React.createElement("div", {
-                      className: "-mb-px flex justify-between"
-                    }, React.createElement("div", {
-                          className: "no-underline text-teal-dark border-b-2 border-teal-dark tracking-wide font-bold py-3 mr-8",
-                          href: "#"
-                        }, "Stake ↗️"))), React.createElement(AmountInput.make, {
+            }, React.createElement(AmountInput.make, {
                   placeholder: "Stake",
                   value: value,
                   optBalance: optBalance,
