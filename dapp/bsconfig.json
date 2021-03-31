@@ -13,7 +13,8 @@
     "reason-react",
     "rescript-apollo-client",
     "re-formality",
-    "re-classnames"
+    "re-classnames",
+    "@ahrefs/bs-recharts"
   ],
   "ppx-flags": [
     "@reasonml-community/graphql-ppx/ppx",
