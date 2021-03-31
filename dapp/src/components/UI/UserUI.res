@@ -188,25 +188,24 @@ module UserStakesCard = {
   @react.component
   let make = (~stakes, ~userId) => {
     let totalValue = ref(CONSTANTS.zeroBN)
-    let stakeBoxes =
-      Js.Array.mapi((stake: Queries.UsersStakes.UsersStakes_inner.t_currentStakes, i) => {
-        let key = `user-stakes-${Belt.Int.toString(i)}`
-        let syntheticToken = stake.currentStake.syntheticToken
-        let addr = syntheticToken.id->Ethers.Utils.getAddressUnsafe
-        let name = syntheticToken.syntheticMarket.symbol
-        let tokens = syntheticToken.totalStaked->FormatMoney.formatEther
-        let isLong = syntheticToken.tokenType->Obj.magic == "Long"
-        let price = syntheticToken.latestPrice.price.price
-        let value =
-          stake.currentStake.syntheticToken.totalStaked
-          ->Ethers.BigNumber.mul(price)
-          ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
-        totalValue := Ethers.BigNumber.add(totalValue.contents, value)
+    let stakeBoxes = Js.Array.mapi((stake: Queries.CurrentStakeDetailed.t, i) => {
+      let key = `user-stakes-${Belt.Int.toString(i)}`
+      let syntheticToken = stake.currentStake.syntheticToken
+      let addr = syntheticToken.id->Ethers.Utils.getAddressUnsafe
+      let name = syntheticToken.syntheticMarket.symbol
+      let tokens = syntheticToken.totalStaked->FormatMoney.formatEther
+      let isLong = syntheticToken.tokenType->Obj.magic == "Long"
+      let price = syntheticToken.latestPrice.price.price
+      let value =
+        stake.currentStake.syntheticToken.totalStaked
+        ->Ethers.BigNumber.mul(price)
+        ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
+      totalValue := Ethers.BigNumber.add(totalValue.contents, value)
 
-        <UserMarketBox key name isLong tokens value={value->FormatMoney.formatEther}>
-          <UserMarketUnstake synthAddress={addr} userId />
-        </UserMarketBox>
-      }, stakes)->React.array
+      <UserMarketBox key name isLong tokens value={value->FormatMoney.formatEther}>
+        <UserMarketUnstake synthAddress={addr} userId />
+      </UserMarketBox>
+    }, stakes)->React.array
 
     <UserColumnCard>
       <UserColumnHeader> {`Staking`->React.string} </UserColumnHeader>
@@ -224,10 +223,9 @@ module UserStakesCard = {
 module UserFloatCard = {
   @react.component
   let make = (~userId, ~stakes) => {
-    let synthTokens =
-      stakes->Array.map((stake: Queries.UsersStakes.UsersStakes_inner.t_currentStakes) => {
-        stake.currentStake.syntheticToken.id
-      })
+    let synthTokens = stakes->Array.map((stake: Queries.CurrentStakeDetailed.t) => {
+      stake.currentStake.syntheticToken.id
+    })
 
     let floatBalances = DataHooks.useFloatBalancesForUser(~userId)
     let claimableFloat = DataHooks.useTotalClaimableFloatForUser(~userId, ~synthTokens)

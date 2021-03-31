@@ -77,6 +77,53 @@ fragment UserTokenBalance on UserSyntheticTokenBalance {
     }
   }
 }
+fragment StakeDetail on Stake {
+  id
+  timestamp
+  blockNumber
+  creationTxHash  @ppxCustom(module: "Bytes")
+  syntheticToken {
+    ...SyntheticTokenInfo
+  }
+  amount
+  withdrawn
+}
+# TODO: Break this up into smaller fragments, find more overlap between 'CurrentStakeDetailed' and 'CurrentStakeHighLevel'
+fragment CurrentStakeHighLevel on CurrentStake {
+  id
+  lastMintState {
+    timestamp
+    accumulativeFloatPerToken
+  }
+  currentStake {
+    amount
+  }
+  syntheticToken {
+    id
+    latestStakerState {
+      accumulativeFloatPerToken
+      floatRatePerTokenOverInterval
+      timestamp
+    }
+  }
+}
+fragment CurrentStakeDetailed on CurrentStake {
+  id
+  currentStake {
+    id
+    timestamp
+    blockNumber
+    creationTxHash  @ppxCustom(module: "Bytes")
+    syntheticToken {
+      ...SyntheticTokenInfo
+    }
+    amount
+    withdrawn
+  }
+  lastMintState {
+    id
+  }
+}
 `)
 
 module UserQuery = %graphql(`
@@ -113,6 +160,10 @@ query($userId: String!, $timestamp: BigInt!) {
       tokenBalances (where: {timeLastUpdated_gt: $timestamp}) {
         ...UserTokenBalance
       }
+    }
+    affectedStakes (where: {user: $userId}) {
+      ...CurrentStakeDetailed
+      ...CurrentStakeHighLevel
     }
   }
 }`)
@@ -211,21 +262,7 @@ query ($tokenId: String!){
 module UsersStakes = %graphql(`
 query ($userId: String!){
   currentStakes (where: {user: $userId}) {
-    id
-    currentStake {
-      id
-      timestamp
-      blockNumber
-      creationTxHash  @ppxCustom(module: "Bytes")
-      syntheticToken {
-        ...SyntheticTokenInfo
-      }
-      amount
-      withdrawn
-    }
-    lastMintState {
-      id
-    }
+    ...CurrentStakeDetailed
   }
 }
 `)
@@ -233,21 +270,7 @@ query ($userId: String!){
 module UsersFloatDetails = %graphql(`
 query ($userId: String!, $synthTokens: [String!]!) {
   currentStakes(where: {user: $userId, syntheticToken_in: $synthTokens}) {
-    lastMintState {
-      timestamp
-      accumulativeFloatPerToken
-    }
-    currentStake {
-      amount
-    }
-    syntheticToken {
-      id
-      latestStakerState {
-        accumulativeFloatPerToken
-        floatRatePerTokenOverInterval
-        timestamp
-      }
-    }
+    ...CurrentStakeHighLevel
   }
 }
 `)
