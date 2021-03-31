@@ -22,7 +22,7 @@ import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate
 
 var validators = {
   amount: {
-    strategy: /* OnFirstBlur */0,
+    strategy: /* OnFirstSuccessOrFirstBlur */3,
     validate: (function (param) {
         return Form.Validators.etherNumberInput(param.amount);
       })
@@ -419,6 +419,7 @@ function StakeForm$StakeFormInput(Props) {
   var onSubmitOpt = Props.onSubmit;
   var valueOpt = Props.value;
   var optBalanceOpt = Props.optBalance;
+  var buttonDisabledOpt = Props.buttonDisabled;
   var disabledOpt = Props.disabled;
   var onChangeOpt = Props.onChange;
   var onBlurOpt = Props.onBlur;
@@ -429,6 +430,7 @@ function StakeForm$StakeFormInput(Props) {
       });
   var value = valueOpt !== undefined ? valueOpt : "";
   var optBalance = optBalanceOpt !== undefined ? Caml_option.valFromOption(optBalanceOpt) : undefined;
+  var buttonDisabled = buttonDisabledOpt !== undefined ? buttonDisabledOpt : false;
   var disabled = disabledOpt !== undefined ? disabledOpt : false;
   var onChange = onChangeOpt !== undefined ? onChangeOpt : (function (param) {
         
@@ -452,7 +454,8 @@ function StakeForm$StakeFormInput(Props) {
                   onChange: onChange,
                   onMaxClick: onMaxClick
                 }), React.createElement(Button.make, {
-                  children: "Stake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name
+                  children: "Stake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name,
+                  disabled: buttonDisabled
                 }));
 }
 
@@ -510,10 +513,21 @@ function StakeForm$ConnectedStakeForm(Props) {
                         return param.approve(stakerContractAddress, arg);
                       }));
         }));
+  var match$3 = form.amountResult;
+  var formAmount = match$3 !== undefined && match$3.TAG === /* Ok */0 ? Caml_option.some(match$3._0) : undefined;
+  var baseFormDisabled = form.submitting || !Curry._1(form.valid, undefined);
+  var buttonDisabled;
+  if (formAmount !== undefined && optTokenBalance !== undefined) {
+    var greaterThanBalance = Caml_option.valFromOption(formAmount).gt(Caml_option.valFromOption(optTokenBalance));
+    buttonDisabled = greaterThanBalance ? true : baseFormDisabled;
+  } else {
+    buttonDisabled = baseFormDisabled;
+  }
   return React.createElement(StakeForm$StakeFormInput, {
               onSubmit: form.submit,
               value: form.input.amount,
               optBalance: optTokenBalance,
+              buttonDisabled: buttonDisabled,
               disabled: form.submitting,
               onChange: (function ($$event) {
                   return Curry._2(form.updateAmount, (function (param, amount) {

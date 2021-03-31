@@ -4,7 +4,7 @@ module StakeForm = %form(
 
   let validators = {
     amount: {
-      strategy: OnFirstBlur,
+      strategy: OnFirstSuccessOrFirstBlur,
       validate: ({amount}) => Form.Validators.etherNumberInput(amount),
     },
   }
@@ -26,12 +26,13 @@ module StakeFormInput = {
     ~onSubmit=_ => (),
     ~value="",
     ~optBalance=None,
+    ~buttonDisabled=false,
     ~disabled=false,
     ~onChange=_ => (),
     ~onBlur=_ => (),
     ~onMaxClick=_ => (),
     ~synthetic: Queries.SyntheticTokenInfo.t,
-  ) =>
+  ) => {
     <Form className="mx-auto max-w-3xl" onSubmit>
       // <div className="px-8 pt-2">
       //   <div className="-mb-px flex justify-between">
@@ -48,10 +49,11 @@ module StakeFormInput = {
       //   </div>
       // </div>
       <AmountInput value optBalance disabled onBlur onChange placeholder={"Stake"} onMaxClick />
-      <Button>
+      <Button disabled={buttonDisabled}>
         {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
       </Button>
     </Form>
+  }
 }
 
 module ConnectedStakeForm = {
@@ -115,11 +117,30 @@ module ConnectedStakeForm = {
       approveFunction()
     })
 
+    let formAmount = switch form.amountResult {
+    | Some(Ok(amount)) => Some(amount)
+    | _ => None
+    }
+
+    let buttonDisabled = {
+      let baseFormDisabled = form.submitting || !form.valid()
+      switch (formAmount, optTokenBalance) {
+      | (Some(amount), Some(amountStaked)) =>
+        let greaterThanBalance = amount->Ethers.BigNumber.gt(amountStaked)
+        switch greaterThanBalance {
+        | true => true
+        | false => baseFormDisabled
+        }
+      | _ => baseFormDisabled
+      }
+    }
+
     <StakeFormInput
       onSubmit=form.submit
       value={form.input.amount}
       optBalance={optTokenBalance}
-      disabled=form.submitting
+      disabled={form.submitting}
+      buttonDisabled
       onBlur={_ => form.blurAmount()}
       onChange={event => form.updateAmount((_, amount) => {
           amount: amount,
