@@ -5,9 +5,6 @@ import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 // import { LedgerConnector } from "@web3-react/ledger-connector";
 // import { TrezorConnector } from "@web3-react/trezor-connector";
 // import { FrameConnector } from "@web3-react/frame-connector";
-import { FortmaticConnector } from "@web3-react/fortmatic-connector";
-import { PortisConnector } from "@web3-react/portis-connector";
-import { SquarelinkConnector } from "@web3-react/squarelink-connector";
 import { TorusConnector } from "@web3-react/torus-connector";
 // import { AuthereumConnector } from "@web3-react/authereum-connector";
 
@@ -66,20 +63,8 @@ export const walletconnect = new WalletConnectConnector({
 
 // export const frame = new FrameConnector({ supportedChainIds: [1] });
 
-export const fortmatic = new FortmaticConnector({
-  apiKey: "pk_live_BE64CE1BB4A49C37",
-  chainId: 1,
-});
 
-export const portis = new PortisConnector({
-  dAppId: "1456ad21-b5a7-4364-9eba-e6237a7cc1e9", // d
-  networks: [1, 100],
-});
 
-export const squarelink = new SquarelinkConnector({
-  clientId: "3904cdd1b675af615ca9",
-  networks: [1, 100],
-});
 
 export const torus = new TorusConnector(
   { chainId: 1 },
@@ -106,23 +91,5 @@ export default [
     connector: torus,
     connectionPhrase: "Connect via Torus",
     img: "/img/wallet-icons/torus.svg",
-  },
-  {
-    name: "Portis",
-    connector: portis,
-    connectionPhrase: "Connect via Portis",
-    img: "/img/wallet-icons/portis.svg",
-  },
-  {
-    name: "Fortmatic",
-    connector: fortmatic,
-    connectionPhrase: "Connect via Fortmatic",
-    img: "/img/wallet-icons/fortmatic.svg",
-  },
-  {
-    name: "Squarelink",
-    connector: squarelink,
-    connectionPhrase: "Connect via Squarelink",
-    img: "/img/wallet-icons/squarelink.svg",
   },
 ];
