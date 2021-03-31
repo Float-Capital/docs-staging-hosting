@@ -8,6 +8,9 @@ fragment BasicUserInfo on User {
   numberOfTransactions
   totalGasUsed
   timestampJoined
+  tokenMints {
+    tokensMinted
+  }
 }
 fragment LatestSynthPrice on LatestPrice {
   id
@@ -189,17 +192,6 @@ module LatestSystemState = %graphql(`
     }
     totalValueLocked
     setBy
-  }
-}`)
-
-module UsersState = %graphql(`
-query ($userId: String!){
-  user(id: $userId) {
-    totalMintedFloat
-    floatTokenBalance
-    tokenMints {
-      tokensMinted
-    }
   }
 }`)
 

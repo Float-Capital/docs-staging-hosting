@@ -309,7 +309,7 @@ function useUsersBalances(userId) {
 }
 
 function useFloatBalancesForUser(userId) {
-  var usersStateQuery = Curry.app(Queries.UsersState.use, [
+  var usersStateQuery = Curry.app(Queries.UserQuery.use, [
         undefined,
         undefined,
         undefined,
