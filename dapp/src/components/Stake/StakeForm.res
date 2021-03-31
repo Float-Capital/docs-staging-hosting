@@ -32,7 +32,7 @@ module StakeFormInput = {
     ~onBlur=_ => (),
     ~onMaxClick=_ => (),
     ~synthetic: Queries.SyntheticTokenInfo.t,
-  ) => {
+  ) =>
     <Form className="mx-auto max-w-3xl" onSubmit>
       // <div className="px-8 pt-2">
       //   <div className="-mb-px flex justify-between">
@@ -53,7 +53,6 @@ module StakeFormInput = {
         {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
       </Button>
     </Form>
-  }
 }
 
 module ConnectedStakeForm = {
