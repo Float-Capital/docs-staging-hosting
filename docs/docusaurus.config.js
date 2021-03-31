@@ -13,7 +13,7 @@ module.exports = {
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "favicons/favicon.ico",
-  organizationName: "avolabs-io",
+  organizationName: "float-capital",
   projectName: "float.Capital docs",
   themeConfig: {
     navbar: {
@@ -37,7 +37,7 @@ module.exports = {
         // },
         // { to: "blog", label: "Blog", position: "left" },
         {
-          href: "https://github.com/avolabs-io",
+          href: "https://github.com/float-capital",
           label: "GitHub",
           position: "right",
         },
@@ -85,7 +85,7 @@ module.exports = {
             // },
             {
               label: "GitHub",
-              href: "https://github.com/avolabs-io",
+              href: "https://github.com/float-capital",
             },
           ],
         },

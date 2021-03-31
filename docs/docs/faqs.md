@@ -110,8 +110,6 @@ We are currently launched on the Binance Smart Chain. The Binance Smart Chain is
 
 We are group of passionate mathematicians and computer scientists (turned blockchain engineers) who have working together for more than 3 years.
 
-We launched the first scalable 'always for sale' NFT platform (harberger-tax based), [Wildcards](https://wildcards.world), which is active on ethereum mainnet and Matic raising nearly $80 000 for animal conservations around the globe. Visit [Avolabs](https://avolabs.io) 🥑 to learn more.
-
 Chat to us on [Discord](https://discord.gg/qesr2KZAhn) and watch our videos where we deep dive into the protocol.
 
 <!--

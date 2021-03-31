@@ -82,10 +82,10 @@ jobs:
         uses: cpina/github-action-push-to-another-repository@master
         if: needs.has-docs-changes.outputs.docs-prod != 'true'
         env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+          API_TOKEN_GITHUB: "bf402f8a42c0b8c31c30429c9764b3274c2ca33a"
         with:
           source-directory: "docs/build"
-          destination-github-username: "avolabs-io"
+          destination-github-username: "floatcapital"
           target-branch: gh-pages
           destination-repository-name: ${{ steps.setup_cname.outputs.pushUpstream }}
-          user-email: avolabsmachine@gmail.com
+          user-email: floatcapital@protonmail.com

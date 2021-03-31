@@ -6,7 +6,7 @@ module UserBalancesCard = {
   let make = (~userId) => {
     /*
     TODO:
-    * Use the nicer way to get token prices: https://github.com/avolabs-io/longshort/issues/228
+    * Use the nicer way to get token prices: https://github.com/float-capital/monorepo/issues/228
     * calculate the correct estimated value
     * get the total value of the users tokens
  */
