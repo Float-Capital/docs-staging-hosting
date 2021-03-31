@@ -65,7 +65,8 @@ function txStateChangeHelper(
   event: ethereum.Event,
   eventName: string,
   eventParamArray: Array<string>,
-  affectedUsers: Array<Bytes>
+  affectedUsers: Array<Bytes>,
+  affectedStakes: Array<string>
 ): void {
   let txHash = event.transaction.hash;
 
@@ -74,6 +75,7 @@ function txStateChangeHelper(
     stateChange = new StateChange(txHash.toHex());
     stateChange.txEventParamList = [];
     stateChange.affectedUsers = [];
+    stateChange.affectedStakes = [];
 
     // Order important here since getOrCreateUser loads and saves global state for a new user
     let user = getOrCreateUser(event.transaction.from, event);
@@ -101,6 +103,7 @@ function txStateChangeHelper(
     eventParamArray
   );
 
+  // Update affected users
   for (let index = 0; index < affectedUsers.length; index++) {
     if (affectedUsers[index].toHex() != ZERO_ADDRESS) {
       let user = getOrCreateUser(affectedUsers[index], event);
@@ -116,6 +119,15 @@ function txStateChangeHelper(
 
       user.save();
     }
+  }
+
+  // Update affected stakes
+  for (let index = 0; index < affectedStakes.length; index++) {
+    let affectedStake = affectedStakes[index];
+    stateChange.affectedStakes =
+      stateChange.affectedStakes.indexOf(affectedStake) === -1
+        ? stateChange.affectedStakes.concat([affectedStake])
+        : stateChange.affectedStakes;
   }
   stateChange.timestamp = event.block.timestamp;
   stateChange.blockNumber = event.block.number;
@@ -133,7 +145,8 @@ export function saveEventToStateChange(
   parameterValues: Array<string>,
   parameterNames: Array<string>,
   parameterTypes: Array<string>,
-  affectedUsers: Array<Bytes>
+  affectedUsers: Array<Bytes>,
+  affectedStakes: Array<string>
 ): void {
   let eventParamsArr: Array<string> = createEventParams(
     event.transaction.hash,
@@ -142,5 +155,11 @@ export function saveEventToStateChange(
     parameterTypes
   );
 
-  txStateChangeHelper(event, eventName, eventParamsArr, affectedUsers);
+  txStateChangeHelper(
+    event,
+    eventName,
+    eventParamsArr,
+    affectedUsers,
+    affectedStakes
+  );
 }

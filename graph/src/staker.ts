@@ -38,6 +38,7 @@ export function handleDeployV1(event: DeployV1): void {
     [floatAddress.toHex()],
     ["floatAddress"],
     ["address"],
+    [],
     []
   );
 }
@@ -117,6 +118,7 @@ export function handleStateAdded(event: StateAdded): void {
     ],
     ["tokenAddress", "stateIndex", "timestamp", "accumulative"],
     ["address", "uint256", "uint256", "uint256"],
+    [],
     []
   );
 }
@@ -144,6 +146,7 @@ export function handleKFactorParametersChanges(
     [marketIndex.toString(), period.toString(), multiplier.toString()],
     ["marketIndex", "period", "multiplier"],
     ["uint256", "uint256", "uint256"],
+    [],
     []
   );
 }
@@ -219,7 +222,8 @@ export function handleStakeAdded(event: StakeAdded): void {
     ],
     ["user", "tokenAddress", "amount", "lastMintIndex"],
     ["address", "address", "uint256", "uint256"],
-    [userAddress]
+    [userAddress],
+    [currentStake.id]
   );
 }
 
@@ -271,7 +275,8 @@ export function handleStakeWithdrawn(event: StakeWithdrawn): void {
     [userAddressString, tokenAddressString, amount.toString()],
     ["user", "tokenAddress", "amount"],
     ["address", "address", "uint256"],
-    [userAddress]
+    [userAddress],
+    [currentStake.id]
   );
 }
 
@@ -323,6 +328,7 @@ export function handleFloatMinted(event: FloatMinted): void {
     ],
     ["user", "tokenAddress", "amount", "lastMintIndex"],
     ["address", "address", "uint256", "uint256"],
-    [userAddress]
+    [userAddress],
+    [currentStake.id]
   );
 }

@@ -20,6 +20,7 @@ type StateChange @entity {
   gasUsed: BigInt!
   txEventParamList: [EventParams!]!
   affectedUsers: [User!]!
+  affectedStakes: [CurrentStake!]!
 }
 
 type Event @entity {
