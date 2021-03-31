@@ -45,6 +45,7 @@ export function handleTransfer(event: TransferEvent): void {
     [fromAddressString, toAddressString, amount.toString()],
     ["from", "to", "amount"],
     ["address", "address", "uint256"],
-    [fromAddress, toAddress]
+    [fromAddress, toAddress],
+    []
   );
 }
