@@ -82,7 +82,7 @@ export function handleV1(event: V1): void {
   globalState.totalGasUsed = ZERO;
   globalState.totalUsers = ZERO;
   globalState.timestampLaunched = event.block.timestamp;
-  globalState.txHash = event.transaction.hash
+  globalState.txHash = event.transaction.hash;
   globalState.save();
 
   saveEventToStateChange(
@@ -91,6 +91,7 @@ export function handleV1(event: V1): void {
     [admin.toHex(), tokenFactoryString, stakerString],
     ["admin", "tokenFactory", "staker"],
     ["address", "address", "address"],
+    [],
     []
   );
 }
@@ -142,6 +143,7 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
       "shortValue",
     ],
     ["uint256", "uint256", "uint256", "uint256", "uint256"],
+    [],
     []
   );
 }
@@ -258,6 +260,7 @@ export function handleSyntheticTokenCreated(
       "oracleAddress",
     ],
     ["uint256", "address", "address", "uint256", "string", "string", "address"],
+    [],
     []
   );
 }
@@ -297,6 +300,7 @@ export function handleFeesChanges(event: FeesChanges): void {
       "badLiquidityExitFee",
     ],
     ["uint256", "uint256", "uint256", "uint256", "uint256"],
+    [],
     []
   );
 }
@@ -333,7 +337,8 @@ export function handleLongMinted(event: LongMinted): void {
       "user",
     ],
     ["uint256", "uint256", "uint256", "uint256", "uint256", "address"],
-    [userAddress]
+    [userAddress],
+    []
   );
 }
 
@@ -364,7 +369,8 @@ export function handleLongRedeem(event: LongRedeem): void {
       "user",
     ],
     ["uint256", "uint256", "uint256", "uint256", "uint256", "address"],
-    [user]
+    [user],
+    []
   );
 }
 
@@ -400,7 +406,8 @@ export function handlePriceUpdate(event: PriceUpdate): void {
     ]).concat([user.toHex()]),
     ["marketIndex", "contractCallCounter", "newPrice", "oldPrice", "user"],
     ["uint256", "uint256", "uint256", "uint256", "address"],
-    [user]
+    [user],
+    []
   );
 }
 
@@ -436,7 +443,8 @@ export function handleShortMinted(event: ShortMinted): void {
       "user",
     ],
     ["uint256", "uint256", "uint256", "uint256", "uint256", "address"],
-    [userAddress]
+    [userAddress],
+    []
   );
 }
 
@@ -467,7 +475,8 @@ export function handleShortRedeem(event: ShortRedeem): void {
       "user",
     ],
     ["uint256", "uint256", "uint256", "uint256", "uint256", "address"],
-    [user]
+    [user],
+    []
   );
 }
 
@@ -555,6 +564,7 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
     ]),
     ["marketIndex", "contractCallCounter", "longTokenPrice", "shortTokenPrice"],
     ["uint256", "uint256", "uint256", "uint256"],
+    [],
     []
   );
 }
