@@ -29,6 +29,8 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "request": "^2.88.0",
+    "rescript-future": "^1.1.0",
+    "rescript-request": "^1.1.0",
     "swr": "^0.4.1",
     "swr-sync-storage": "^1.0.1"
   },

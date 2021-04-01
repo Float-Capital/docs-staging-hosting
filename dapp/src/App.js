@@ -3,6 +3,7 @@
 import * as React from "react";
 import * as Client from "./data/Client.js";
 import * as MainLayout from "./layouts/MainLayout.js";
+import * as APYProvider from "./libraries/APYProvider.js";
 import * as Router from "next/router";
 import * as RootProvider from "./libraries/RootProvider.js";
 import * as StateChangeMonitor from "./libraries/StateChangeMonitor.js";
@@ -15,8 +16,10 @@ function $$default(props) {
   return React.createElement(RootProvider.make, {
               children: React.createElement(Client.make, {
                     children: React.createElement(StateChangeMonitor.make, {
-                          children: React.createElement(MainLayout.make, {
-                                children: content
+                          children: React.createElement(APYProvider.make, {
+                                children: React.createElement(MainLayout.make, {
+                                      children: content
+                                    })
                               })
                         })
                   })
