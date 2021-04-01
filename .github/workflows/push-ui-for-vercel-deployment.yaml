@@ -54,5 +54,5 @@ jobs:
         with:
           source-directory: "dapp"
           destination-github-username: "floatcapital"
-          destination-repository-name: "monorepo"
+          destination-repository-name: "float-ui-deploy"
           user-email: floatcapital@protonmail.com

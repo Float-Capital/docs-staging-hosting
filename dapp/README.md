@@ -7,8 +7,10 @@ User interface for the FLOAT system.
 Run rescript compiler and nextjs server in 1.
 
 ```
-npm run dev
+yarn dev
 ```
+
+It may be beneficial to run `yarn res:clean` jumping between branches and the rescript compilor cache gets confused for some reason.
 
 If you prefer running the the rescript compiler and next dev server separately, then these are the two cammands:
 
