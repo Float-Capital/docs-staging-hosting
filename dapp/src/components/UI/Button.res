@@ -12,7 +12,7 @@ module Tiny = {
           <button
             disabled={disabled}
             className={`${buttonTopStyle} min-h-full focus:outline-none px-2 text-xxs ${disabled
-                ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-300"
+                ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-200 cursor-not-allowed"
                 : ""}`}
             onClick>
             {children->React.string}
@@ -30,7 +30,7 @@ module Small = {
         <button
           disabled={disabled}
           className={`${buttonTopStyle} p-2 text-sm focus:outline-none ${disabled
-              ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-300"
+              ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-200 cursor-not-allowed"
               : ""}`}
           onClick>
           {children->React.string}
@@ -47,7 +47,7 @@ let make = (~onClick=_ => (), ~children: string, ~disabled=false) => {
       <button
         disabled={disabled}
         className={`${buttonTopStyle} p-3 focus:outline-none text-base ${disabled
-            ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-300"
+            ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-200 cursor-not-allowed"
             : ""}`}
         onClick>
         {children->React.string}

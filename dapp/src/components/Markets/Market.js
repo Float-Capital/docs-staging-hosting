@@ -2,14 +2,30 @@
 
 import * as Mint from "../../Mint.js";
 import * as React from "react";
-import * as LineGraph from "../LineGraph.js";
+import Link from "next/link";
 import * as MarketCard from "./MarketCard.js";
+import * as PriceGraph from "../PriceGraph.js";
 
 function Market(Props) {
   var marketData = Props.marketData;
-  return React.createElement("div", undefined, React.createElement(MarketCard.make, {
+  return React.createElement("div", undefined, React.createElement(Link, {
+                  href: "/markets",
+                  children: React.createElement("div", {
+                        className: "uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mt-2"
+                      }, "◀", React.createElement("span", {
+                            className: "text-xs"
+                          }, " Back to markets"))
+                }), React.createElement(MarketCard.make, {
                   marketData: marketData
-                }), React.createElement(LineGraph.make, {}), React.createElement(Mint.Mint.make, {}), React.createElement("p", undefined, "stake position form"));
+                }), React.createElement("div", {
+                  className: "flex justify-center items-stretch"
+                }, React.createElement("div", {
+                      className: "flex-1 p-1 mb-8 mr-8 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
+                    }, React.createElement(PriceGraph.make, {
+                          marketName: marketData.name
+                        })), React.createElement("div", {
+                      className: "flex-1  p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
+                    }, React.createElement(Mint.Mint.make, {}))));
 }
 
 var make = Market;

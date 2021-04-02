@@ -41,8 +41,6 @@ let make = (
 ) => {
   let router = Next.Router.useRouter()
   let marketIndexOption = router.query->Js.Dict.get("marketIndex")
-  Js.log("marketIndexOption")
-  Js.log(marketIndexOption)
   let percentStrLong = percentStr(~n=totalLockedLong, ~outOf=totalValueLocked)
   let percentStrShort =
     (100.0 -. percentStrLong->Float.fromString->Option.getExn)
@@ -78,11 +76,11 @@ let make = (
   let marketPositionValues = (~isLong) => {
     let value = (isLong ? totalLockedLong : totalLockedShort)->FormatMoney.formatEther
     let beta = isLong ? longBeta : shortBeta
-    <div className="text-sm text-center m-auto">
+    <div className="text-sm text-center m-auto mb-4">
       <div className="text-2xl tracking-widest font-alphbeta my-3">
         {`$${value}`->React.string}
       </div>
-      <span className="font-bold"> {`Exposure`->React.string} </span>
+      <span className="font-bold"> {`Exposure `->React.string} </span>
       <Tooltip
         tip={`The impact ${marketName} price movements have on ${isLong ? "long" : "short"} value`}
       />
@@ -140,7 +138,9 @@ let make = (
           <div className="text-3xl font-alphbeta tracking-wider py-1">
             {`$${totalValueLocked->FormatMoney.formatEther}`->React.string}
           </div>
-          <div className="md:block hidden w-full"> {liquidityRatio()} {mintButtons()} </div>
+          <div className="md:block hidden w-full">
+            {liquidityRatio()} {Option.isNone(marketIndexOption) ? mintButtons() : React.null}
+          </div>
         </div>
         <div className="order-3 w-1/2 md:w-1/4 flex-grow flex-wrap flex-col">
           {marketPositionHeadings(~isLong={false})}
@@ -152,18 +152,8 @@ let make = (
         <div className="flex md:hidden">
           {marketPositionValues(~isLong={true})} {marketPositionValues(~isLong={false})}
         </div>
-        {switch marketIndexOption {
-        | Some(_) => mintButtons()
-        | None => React.null
-        }}
+        {Option.isNone(marketIndexOption) ? mintButtons() : React.null}
       </div>
     </div>
-    {marketIndexOption->Option.mapWithDefault(React.null, queryMarketIndex => {
-      if queryMarketIndex == marketIndex->Ethers.BigNumber.toString {
-        <Mint.Mint />
-      } else {
-        React.null
-      }
-    })}
   </>
 }
