@@ -1,13 +1,10 @@
 import Mint from "src/Mint";
-import Head from "next/head";
+import HtmlHeader from "src/components/HtmlHeader.js";
 
 export default function MintPage(props) {
   return (
     <div>
-      <Head>
-        <title>Float Capital | Mint</title>
-        <meta property="og:title" content="Float Capital" key="title" />
-      </Head>
+      <HtmlHeader page="Mint"></HtmlHeader>
       <Mint {...props} />
     </div>
   );
