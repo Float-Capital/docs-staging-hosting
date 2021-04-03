@@ -38,7 +38,7 @@ function AddBinanceToMetamask(Props) {
                 })
             }, React.createElement("div", {
                   className: "text-sm"
-                }, "Go to the BSC network "), React.createElement("img", {
+                }, "Go to the BSC Test Network "), React.createElement("img", {
                   className: "h-5 ml-1",
                   src: "/icons/metamask.svg"
                 }));

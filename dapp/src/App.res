@@ -16,6 +16,7 @@ type props = {
 
 // We are not using `@react.component` since we will never
 // use <App/> within our Rescript code. It's only used within `pages/_app.js`
+
 let default = (props: props): React.element => {
   let {component, pageProps} = props
 
@@ -23,13 +24,20 @@ let default = (props: props): React.element => {
 
   let content = React.createElement(component, pageProps)
 
-  <RootProvider>
-    <Client>
-      <StateChangeMonitor>
-        {switch router.route {
-        | _ => <MainLayout> content </MainLayout>
-        }}
-      </StateChangeMonitor>
-    </Client>
-  </RootProvider>
+  // let (state, dispatch) = React.useReducer(ToastProvider.toastReducer, "")
+
+  <ToastProvider>
+    // <Button onClick={_ => dispatch(Show("this new message"))}> {"Show"} </Button>
+    // <Button onClick={_ => dispatch(Hide)}> {"Hide"} </Button>
+    <RootProvider>
+      <Client>
+        <StateChangeMonitor>
+          {switch router.route {
+          | _ => <MainLayout> content </MainLayout>
+          }}
+        </StateChangeMonitor>
+      </Client>
+      <Toast />
+    </RootProvider>
+  </ToastProvider>
 }
