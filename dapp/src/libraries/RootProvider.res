@@ -43,6 +43,7 @@ let reducer = (_prevState, action) =>
       ethState: Disconnected,
     }
   }
+
 module RootContext = {
   let context = React.createContext((initialState, _ => ()))
   // Create a provider component
@@ -149,6 +150,7 @@ let useEthBalance: unit => option<Ethers.BigNumber.t> = () => {
   | Disconnected => None
   }
 }
+
 let useChainId: unit => option<int> = () => {
   let context = useWeb3React()
 
@@ -189,6 +191,8 @@ Note: the `connectionStatus` only shows the connection status of the current con
 let useActivateConnector: unit => (connection, Web3Connectors.injectedType => unit) = () => {
   let context = useWeb3React()
   let (connectionStatus, setConnectionStatus) = React.useState(() => Standby)
+  let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
+
   (
     connectionStatus,
     provider => {
@@ -196,8 +200,11 @@ let useActivateConnector: unit => (connection, Web3Connectors.injectedType => un
         context.activate(. provider, () => (), true)
         ->JsPromise.map(() => setConnectionStatus(_ => Connected))
         ->JsPromise.catch(error => {
-          Js.log("Error connecting to network:")
-          Js.log(error)
+          let errorMessage = switch error->Js.Exn.asJsExn {
+          | Some(err) => err->Js.Exn.message->Option.mapWithDefault("", x => x)
+          | None => ""
+          }
+          toastDispatch(ToastProvider.Show(`Error connecting to the network, ${errorMessage}`))
           setConnectionStatus(_ => ErrorConnecting)->JsPromise.resolve
         })
       setConnectionStatus(_ => Connecting)

@@ -7,8 +7,10 @@ import * as Globals from "./Globals.js";
 import * as JsPromise from "./Js.Promise/JsPromise.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as ToastProvider from "../components/UI/ToastProvider.js";
 import * as Web3Connectors from "../components/Login/Web3Connectors.js";
 import * as Core from "@web3-react/core";
+import * as Caml_js_exceptions from "bs-platform/lib/es6/caml_js_exceptions.js";
 
 var Web3ReactProvider = {};
 
@@ -230,6 +232,7 @@ function useActivateConnector(param) {
         return /* Standby */0;
       });
   var setConnectionStatus = match[1];
+  var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
   return [
           match[0],
           (function (provider) {
@@ -240,8 +243,14 @@ function useActivateConnector(param) {
                                       return /* Connected */1;
                                     }));
                       }), (function (error) {
-                      console.log("Error connecting to network:");
-                      console.log(error);
+                      var err = Caml_js_exceptions.caml_as_js_exn(error);
+                      var errorMessage = err !== undefined ? Belt_Option.mapWithDefault(Caml_option.valFromOption(err).message, "", (function (x) {
+                                return x;
+                              })) : "";
+                      Curry._1(toastDispatch, {
+                            _0: "Error connecting to the network, " + errorMessage,
+                            [Symbol.for("name")]: "Show"
+                          });
                       return Promise.resolve(Curry._1(setConnectionStatus, (function (param) {
                                         return /* ErrorConnecting */3;
                                       })));
