@@ -24,7 +24,7 @@ function Button$Tiny(Props) {
                       className: buttonShaddowStyle + " h-full"
                     }, React.createElement("button", {
                           className: buttonTopStyle + " min-h-full focus:outline-none px-2 text-xxs " + (
-                            disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-300" : ""
+                            disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-200 cursor-not-allowed" : ""
                           ),
                           disabled: disabled,
                           onClick: onClick
@@ -49,7 +49,7 @@ function Button$Small(Props) {
                   className: buttonShaddowStyle + " border"
                 }, React.createElement("button", {
                       className: buttonTopStyle + " p-2 text-sm focus:outline-none " + (
-                        disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-300" : ""
+                        disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-200 cursor-not-allowed" : ""
                       ),
                       disabled: disabled,
                       onClick: onClick
@@ -74,7 +74,7 @@ function Button(Props) {
                   className: buttonShaddowStyle + " border-0"
                 }, React.createElement("button", {
                       className: buttonTopStyle + " p-3 focus:outline-none text-base " + (
-                        disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-300" : ""
+                        disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-200 cursor-not-allowed" : ""
                       ),
                       disabled: disabled,
                       onClick: onClick
