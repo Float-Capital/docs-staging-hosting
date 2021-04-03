@@ -75,7 +75,7 @@ module User = {
   type userData = {
     user: string,
     userInfo: DataHooks.basicUserInfo,
-    stakes: array<Queries.UsersStakes.UsersStakes_inner.t_currentStakes>,
+    stakes: array<Queries.CurrentStakeDetailed.t>,
   }
 
   let onQueryError = (msg: string) => {

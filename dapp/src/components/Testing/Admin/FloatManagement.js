@@ -402,7 +402,7 @@ var Claimable = {
 function FloatManagement(Props) {
   var user = RootProvider.useCurrentUserExn(undefined);
   var floatTokenAddress = Config.useFloatAddress(undefined);
-  var userQuery = Curry.app(Queries.UsersState.use, [
+  var userQuery = Curry.app(Queries.UserQuery.use, [
         undefined,
         undefined,
         undefined,

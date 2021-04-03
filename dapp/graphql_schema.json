@@ -11983,6 +11983,81 @@
                 }
               }
             }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "CurrentStake_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CurrentStake_filter",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "affectedStakes",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "CurrentStake",
+                    "ofType": null
+                  }
+                }
+              }
+            }
           }
         ],
         "inputFields": null,
@@ -12523,6 +12598,78 @@
                 }
               }
             }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "affectedStakes",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "affectedStakes_not",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "affectedStakes_contains",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "affectedStakes_not_contains",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
           }
         ],
         "interfaces": null,
@@ -12568,6 +12715,12 @@
             "description": null,
             "isDeprecated": false,
             "name": "affectedUsers"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "affectedStakes"
           }
         ],
         "fields": null,

@@ -16,111 +16,63 @@ function getDefaultNetworkId(optNetworkId) {
   return Belt_Option.getWithDefault(optNetworkId, 97);
 }
 
-var allContracts = require("./contractAddresses.json");
+var allContracts = (require('./contractAddresses.json'));
 
 function getContractAddressString(netIdStr, closure) {
-  return Globals.ethAdrToStr(
-    Belt_Option.mapWithDefault(
-      Js_dict.get(allContracts, netIdStr),
-      CONSTANTS.zeroAddress,
-      closure
-    )
-  );
+  return Globals.ethAdrToStr(Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), CONSTANTS.zeroAddress, closure));
 }
 
 function longShortContractAddress(netIdStr) {
-  return Belt_Option.mapWithDefault(
-    Js_dict.get(allContracts, netIdStr),
-    CONSTANTS.zeroAddress,
-    function (contracts) {
-      return contracts.LongShort;
-    }
-  );
+  return Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), CONSTANTS.zeroAddress, (function (contracts) {
+                return contracts.LongShort;
+              }));
 }
 
 function useLongShortAddress(param) {
-  return longShortContractAddress(
-    Belt_Option.mapWithDefault(
-      RootProvider.useChainId(undefined),
-      "5",
-      function (prim) {
-        return String(prim);
-      }
-    )
-  );
+  return longShortContractAddress(Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
+                    return String(prim);
+                  })));
 }
 
 function stakerContractAddress(netIdStr) {
-  return Belt_Option.mapWithDefault(
-    Js_dict.get(allContracts, netIdStr),
-    CONSTANTS.zeroAddress,
-    function (contracts) {
-      return contracts.Staker;
-    }
-  );
+  return Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), CONSTANTS.zeroAddress, (function (contracts) {
+                return contracts.Staker;
+              }));
 }
 
 function useStakerAddress(param) {
-  return stakerContractAddress(
-    Belt_Option.mapWithDefault(
-      RootProvider.useChainId(undefined),
-      "5",
-      function (prim) {
-        return String(prim);
-      }
-    )
-  );
+  return stakerContractAddress(Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
+                    return String(prim);
+                  })));
 }
 
 function daiContractAddress(netIdStr) {
-  return Belt_Option.mapWithDefault(
-    Js_dict.get(allContracts, netIdStr),
-    CONSTANTS.zeroAddress,
-    function (contracts) {
-      return contracts.Dai;
-    }
-  );
+  return Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), CONSTANTS.zeroAddress, (function (contracts) {
+                return contracts.Dai;
+              }));
 }
 
 function useDaiAddress(param) {
-  return daiContractAddress(
-    Belt_Option.mapWithDefault(
-      RootProvider.useChainId(undefined),
-      "5",
-      function (prim) {
-        return String(prim);
-      }
-    )
-  );
+  return daiContractAddress(Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
+                    return String(prim);
+                  })));
 }
 
 function floatContractAddress(netIdStr) {
-  return Belt_Option.mapWithDefault(
-    Js_dict.get(allContracts, netIdStr),
-    CONSTANTS.zeroAddress,
-    function (contracts) {
-      return contracts.FloatToken;
-    }
-  );
+  return Belt_Option.mapWithDefault(Js_dict.get(allContracts, netIdStr), CONSTANTS.zeroAddress, (function (contracts) {
+                return contracts.FloatToken;
+              }));
 }
 
 function useFloatAddress(param) {
-  return floatContractAddress(
-    Belt_Option.mapWithDefault(
-      RootProvider.useChainId(undefined),
-      "5",
-      function (prim) {
-        return String(prim);
-      }
-    )
-  );
+  return floatContractAddress(Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
+                    return String(prim);
+                  })));
 }
 
-var binancTestnetGraphEndpoint =
-  "https://test.graph.float.capital/subgraphs/name/float-capital/float-capital";
+var binancTestnetGraphEndpoint = "https://test.graph.float.capital/subgraphs/name/float-capital/float-capital";
 
-var localhostGraphEndpoint =
-  "https://localhost:8000/subgraphs/name/float-capital/float-capital/graphql";
+var localhostGraphEndpoint = "https://localhost:8000/subgraphs/name/float-capital/float-capital/graphql";
 
 var defaultNetworkId = 97;
 
@@ -133,25 +85,26 @@ var defaultBlockExplorer = "https://testnet.bscscan.com/";
 var discordInviteLink = "https://discord.gg/dqDwgrVYcU";
 
 export {
-  isDevMode,
-  longshortContractAbi,
-  binancTestnetGraphEndpoint,
-  localhostGraphEndpoint,
-  defaultNetworkId,
-  defaultNetworkName,
-  paymentTokenName,
-  defaultBlockExplorer,
-  getDefaultNetworkId,
-  discordInviteLink,
-  allContracts,
-  getContractAddressString,
-  longShortContractAddress,
-  useLongShortAddress,
-  stakerContractAddress,
-  useStakerAddress,
-  daiContractAddress,
-  useDaiAddress,
-  floatContractAddress,
-  useFloatAddress,
-};
+  isDevMode ,
+  longshortContractAbi ,
+  binancTestnetGraphEndpoint ,
+  localhostGraphEndpoint ,
+  defaultNetworkId ,
+  defaultNetworkName ,
+  paymentTokenName ,
+  defaultBlockExplorer ,
+  getDefaultNetworkId ,
+  discordInviteLink ,
+  allContracts ,
+  getContractAddressString ,
+  longShortContractAddress ,
+  useLongShortAddress ,
+  stakerContractAddress ,
+  useStakerAddress ,
+  daiContractAddress ,
+  useDaiAddress ,
+  floatContractAddress ,
+  useFloatAddress ,
+  
+}
 /* isDevMode Not a pure module */
