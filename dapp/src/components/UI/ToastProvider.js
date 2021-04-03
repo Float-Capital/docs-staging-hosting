@@ -2,7 +2,11 @@
 
 import * as React from "react";
 
-var context = React.createContext("");
+var context = React.createContext([
+      "",
+      "",
+      /* Info */2
+    ]);
 
 var provider = context.Provider;
 
@@ -54,11 +58,23 @@ function ToastProvider(Props) {
   var children = Props.children;
   var match = React.useReducer((function (_state, action) {
           if (action) {
-            return action._0;
+            return [
+                    action._0,
+                    action._1,
+                    action._2
+                  ];
           } else {
-            return "";
+            return [
+                    "",
+                    "",
+                    /* Info */2
+                  ];
           }
-        }), "");
+        }), [
+        "",
+        "",
+        /* Info */2
+      ]);
   return React.createElement(ToastProvider$ToastContext$Provider, {
               value: match[0],
               children: React.createElement(ToastProvider$DispatchToastContext$Provider, {

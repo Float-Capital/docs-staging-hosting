@@ -204,7 +204,13 @@ let useActivateConnector: unit => (connection, Web3Connectors.injectedType => un
           | Some(err) => err->Js.Exn.message->Option.mapWithDefault("", x => x)
           | None => ""
           }
-          toastDispatch(ToastProvider.Show(`Error connecting to the network, ${errorMessage}`))
+          toastDispatch(
+            ToastProvider.Show(
+              "Error connecting to the network",
+              errorMessage,
+              ToastProvider.Error,
+            ),
+          )
           setConnectionStatus(_ => ErrorConnecting)->JsPromise.resolve
         })
       setConnectionStatus(_ => Connecting)

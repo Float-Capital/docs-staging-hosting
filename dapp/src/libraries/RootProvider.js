@@ -248,7 +248,9 @@ function useActivateConnector(param) {
                                 return x;
                               })) : "";
                       Curry._1(toastDispatch, {
-                            _0: "Error connecting to the network, " + errorMessage,
+                            _0: "Error connecting to the network",
+                            _1: errorMessage,
+                            _2: /* Error */0,
                             [Symbol.for("name")]: "Show"
                           });
                       return Promise.resolve(Curry._1(setConnectionStatus, (function (param) {

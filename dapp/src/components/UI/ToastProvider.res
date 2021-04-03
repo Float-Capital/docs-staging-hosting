@@ -1,9 +1,10 @@
 type message = string
+type infoMessage = string
 type _type = Error | Warning | Info | Success
-type action = Show(message) | Hide
+type action = Show(message, infoMessage, _type) | Hide
 
 module ToastContext = {
-  let context = React.createContext("")
+  let context = React.createContext(("", "", Info))
 
   module Provider = {
     let provider = React.Context.provider(context)
@@ -32,10 +33,10 @@ module DispatchToastContext = {
 let make = (~children) => {
   let (state, dispatch) = React.useReducer((_state, action) => {
     switch action {
-    | Show(message) => message
-    | Hide => ""
+    | Show(message, infoMessage, _type) => (message, infoMessage, _type)
+    | Hide => ("", "", Info)
     }
-  }, "")
+  }, ("", "", Info))
   <ToastContext.Provider value=state>
     <DispatchToastContext.Provider value=dispatch>
       <div> {children} </div>

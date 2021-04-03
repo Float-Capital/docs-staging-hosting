@@ -1,6 +1,6 @@
 @react.component
 let make = () => {
-  let toastMessage = React.useContext(ToastProvider.ToastContext.context)
+  let toast = React.useContext(ToastProvider.ToastContext.context)
   let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
 
   React.useEffect1(() => {
@@ -8,14 +8,29 @@ let make = () => {
       toastDispatch(Hide)
     }, 3000)
     Some(() => Js.Global.clearTimeout(timeout))
-  }, [toastMessage])
+  }, [toast])
+
+  let (toastHeading, toastInfo, _type) = toast
+
+  let color = switch _type {
+  | Error => "red"
+  | Warning => "yellow"
+  | Success => "green"
+  | Info => "blue"
+  }
 
   <div
-    className="fixed bottom-3 flex flex-col transition-all duration-700"
-    style={ReactDOM.Style.make(~display=toastMessage->String.length > 0 ? "block" : "none", ())}>
-    <div className="text-xl bg-white bg-opacity-80 my-4 mx-10 py-2 px-4">
-      <span className="animate-ping inline-flex h-3 w-3 mr-2 rounded-full bg-blue-400 opacity-75" />
-      {toastMessage->React.string}
+    className="fixed bottom-3 flex flex-col"
+    style={ReactDOM.Style.make(~display=toastHeading->String.length > 0 ? "block" : "none", ())}>
+    <div
+      className={`flex flex-row items-center text-xl rounded-sm bg-white bg-opacity-80 my-4 mx-10 py-2 px-4 border border-${color}-400 border-opacity-30`}>
+      <div
+        className={`animate-ping inline-flex h-3 w-3 mr-4 rounded-full bg-${color}-400 opacity-75`}
+      />
+      <div>
+        <div> {toastHeading->React.string} </div>
+        <div className="text-xs"> {toastInfo->React.string} </div>
+      </div>
     </div>
   </div>
 }
