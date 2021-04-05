@@ -151,7 +151,7 @@ function Navigation(Props) {
                               }, React.createElement("div", {
                                     className: "logo-container"
                                   }, React.createElement("img", {
-                                        className: "h-5 md:h-7",
+                                        className: "h-8 md:h-7 w-full md:w-auto",
                                         src: "/img/float-capital-logo.png"
                                       }))))
                     }), React.createElement("div", {
