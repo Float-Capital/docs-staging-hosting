@@ -55,7 +55,7 @@ let make = () => {
   switch ethObj {
   | Some(ethObj) =>
     <div onClick={_event => addToMetamask(ethObj)} className="flex justify-start align-center">
-      <div className="text-sm"> {"Go to the BSC network "->React.string} </div>
+      <div className="text-sm"> {"Go to the BSC Test Network "->React.string} </div>
       <img src="/icons/metamask.svg" className="h-5 ml-1" />
     </div>
   | None => React.null

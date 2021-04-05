@@ -76,7 +76,7 @@ var localhostGraphEndpoint = "https://localhost:8000/subgraphs/name/float-capita
 
 var defaultNetworkId = 97;
 
-var defaultNetworkName = "Binance Smart Chain";
+var defaultNetworkName = "Binance Smart Chain Test Network";
 
 var paymentTokenName = "BUSD";
 
