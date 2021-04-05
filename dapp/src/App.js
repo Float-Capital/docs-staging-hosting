@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import * as Client from "./data/Client.js";
+import * as ComingSoon from "./components/ComingSoon.js";
 import * as MainLayout from "./layouts/MainLayout.js";
 import * as Router from "next/router";
 import * as RootProvider from "./libraries/RootProvider.js";
@@ -14,12 +15,12 @@ function $$default(props) {
   var content = React.createElement(props.Component, props.pageProps);
   return React.createElement(RootProvider.make, {
               children: React.createElement(Client.make, {
-                    children: React.createElement(StateChangeMonitor.make, {
-                          children: React.createElement(MainLayout.make, {
-                                children: content
-                              })
-                        })
-                  })
+                    children: null
+                  }, React.createElement(ComingSoon.make, {}), React.createElement(StateChangeMonitor.make, {
+                        children: React.createElement(MainLayout.make, {
+                              children: content
+                            })
+                      }))
             });
 }
 
