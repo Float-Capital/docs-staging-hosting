@@ -25,7 +25,7 @@ let make = () => {
   }, (nextPath, optCurrentUser))
 
   <div>
-    <p> {"Connect with one of the wallets below. "->React.string} </p>
+    <p className="mx-2 md:mx-0"> {"Connect with one of the wallets below. "->React.string} </p>
     <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-6 gap-4 items-center my-5">
       {connectors
       ->Array.mapWithIndex((index, connector) =>
