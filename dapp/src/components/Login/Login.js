@@ -25,17 +25,12 @@ function Login(Props) {
         nextPath,
         optCurrentUser
       ]);
-  return React.createElement("div", undefined, React.createElement("p", undefined, "Connect with one of the wallets below. ", React.createElement("small", undefined, React.createElement("a", {
-                          className: "hover:underline hover:opacity-75",
-                          href: "https://docs.float.capital/docs",
-                          rel: "noopener noreferrer",
-                          target: "_blank"
-                        }, "(Not sure where to go from here?) "))), React.createElement("div", {
+  return React.createElement("div", undefined, React.createElement("p", undefined, "Connect with one of the wallets below. "), React.createElement("div", {
                   className: "grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-6 gap-4 items-center my-5"
                 }, Belt_Array.mapWithIndex(connectors, (function (index, connector) {
                         return React.createElement("div", {
                                     key: String(index),
-                                    className: "p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 hover:bg-gray-200 active:bg-gray-300 rounded ",
+                                    className: "mx-2 md:mx-0 p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 hover:bg-gray-200 active:bg-gray-300 rounded ",
                                     onClick: (function (e) {
                                         e.stopPropagation();
                                         return Curry._1(activateConnector, connector.connector);
