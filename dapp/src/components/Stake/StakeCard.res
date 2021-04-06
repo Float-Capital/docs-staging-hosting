@@ -110,7 +110,7 @@ let make = (
 ) => {
   let router = Next.Router.useRouter()
 
-  let apy = APYProvider.useAPY()
+  let apy = useAPY()
 
   let longDollarValueStaked = calculateDollarValue(
     ~tokenPrice=longTokenPrice,
