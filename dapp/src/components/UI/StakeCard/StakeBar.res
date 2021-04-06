@@ -3,10 +3,12 @@ let make = (~percentStrLong, ~percentStrShort) => {
   <div className="relative w-full h-6 my-1">
     <div className="w-full flex h-8 justify-between items-center absolute bottom-0 z-10">
       <div className="font-bold text-xs ml-2 text-gray-100">
-        {`${percentStrLong}% 🐮`->React.string}
+        {`${percentStrLong}%`->React.string}
+        <span className="text-lg"> {` 🐮`->React.string} </span>
       </div>
       <div className="font-bold text-xs mr-2 text-gray-100">
-        {`🐻 ${percentStrShort}% `->React.string}
+        <span className="text-lg"> {`🐻 `->React.string} </span>
+        {`${percentStrShort}% `->React.string}
       </div>
     </div>
     <div className="w-full flex h-8 absolute bottom-0 z-0">

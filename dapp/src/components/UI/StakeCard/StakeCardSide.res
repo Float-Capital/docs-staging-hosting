@@ -9,8 +9,9 @@ let mapVal = apy =>
 
 
 @react.component
-let make = (~marketName, ~isLong, ~apy, ~floatApy) => {
-  <div className="w-1/4 flex items-center flex-grow text-sm flex-col">
+let make = (~orderPostion, ~orderPostionMobile, ~marketName, ~isLong, ~apy, ~floatApy) => {
+  <div
+    className={`order-${orderPostionMobile->Int.toString} md:order-${orderPostion->Int.toString} w-1/2 md:w-1/4 flex items-center flex grow flex-wrap flex-col`}>
     <h2 className="font-bold text-sm">
       {marketName->React.string}
       <span className="text-xs"> {isLong ? `↗️`->React.string : `↘️`->React.string} </span>

@@ -1,17 +1,10 @@
 import Markets from "src/components/Markets/MarketsList";
-import Head from "next/head";
+import HtmlHeader from "src/components/HtmlHeader.js";
 
 export default function MarketsPage(props) {
   return (
     <div>
-      <Head>
-        <title>Float Capital | Markets</title>
-        <meta
-          property="og:title"
-          content="Float Capital | Markets"
-          key="title"
-        />
-      </Head>
+      <HtmlHeader page="Markets"></HtmlHeader>
       <Markets {...props} />
     </div>
   );

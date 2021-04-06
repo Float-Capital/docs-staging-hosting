@@ -66,7 +66,7 @@ function MarketsList$MarketsList(Props) {
     tmp = "";
   }
   return React.createElement("div", {
-              className: "w-full max-w-4xl mx-auto px-3"
+              className: "w-full max-w-5xl mx-auto px-2 md:px-0"
             }, tmp);
 }
 

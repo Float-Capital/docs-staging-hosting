@@ -6,7 +6,7 @@ let floatingMenuZoomStyle = shouldDisplay => {
     position(#fixed),
     top(px(0)),
     left(px(0)),
-    width(#percent(100.)),
+    width(vw(100.)),
     height(vh(100.)),
     visibility(shouldDisplay ? #visible : #hidden),
     backgroundColor(rgba(255, 255, 255, #num(shouldDisplay ? 0.5 : 0.))),
@@ -16,10 +16,9 @@ let floatingMenuZoomStyle = shouldDisplay => {
     selector(
       ".zoom-in-effect",
       [
-        background(rgba(59, 130, 250, #num(0.3))),
+        background(rgba(59, 130, 250, #num(0.6))),
         width(vw(100.)),
         height(vh(100.)),
-        borderRadius(#percent(50.)),
         border(px(1), #solid, grey),
         display(#flex),
         flex(#none),
@@ -84,7 +83,7 @@ let make = () => {
         <a className="flex items-center">
           <span className="text-xl text-green-800 ml-2 align-middle font-semibold">
             <div className="logo-container">
-              <img src="/img/float-capital-logo.png" className="h-5 md:h-7" />
+              <img src="/img/float-capital-logo.png" className="h-8 md:h-7 w-full md:w-auto" />
             </div>
           </span>
         </a>
@@ -131,21 +130,21 @@ let make = () => {
           {isOpen ? <> {closeSvg()} </> : hamburgerSvg()}
         </div>
         <div className={floatingMenuZoomStyle(isOpen)}>
-          <div className="zoom-in-effect flex flex-col">
+          <div className="zoom-in-effect flex flex-col text-3xl text-white">
             <div
               onClick={_ => {
                 router->Next.Router.push(`/markets`)
                 setIsOpen(_ => false)
               }}
-              className="px-3 hover:bg-white">
-              {React.string("MARKETS")}
+              className="px-3 bg-black m-2">
+              {React.string("MINT")}
             </div>
             <div
               onClick={_ => {
                 router->Next.Router.push(`/stake`)
                 setIsOpen(_ => false)
               }}
-              className="px-3 hover:bg-white">
+              className="px-3 bg-black m-2">
               {`STAKE🔥`->React.string}
             </div>
             <div
@@ -153,14 +152,14 @@ let make = () => {
                 router->Next.Router.push(`/dashboard`)
                 setIsOpen(_ => false)
               }}
-              className="px-3 hover:bg-white">
+              className="px-3 bg-black m-2">
               {`DASHBOARD`->React.string}
             </div>
             <a
               onClick={_ => {
                 setIsOpen(_ => false)
               }}
-              className="px-3 hover:bg-white"
+              className="px-3 bg-black m-2"
               target="_blank"
               href="https://docs.float.capital">
               {React.string("DOCS")}
@@ -169,10 +168,10 @@ let make = () => {
               onClick={_ => {
                 setIsOpen(_ => false)
               }}
-              className="px-3 hover:opacity-60"
+              className="px-3 hover:opacity-60 m-4"
               target="_blank"
-              href="https://github.com/Float-Capital">
-              <img src="/icons/github.svg" className="h-5" />
+              href="https://github.com/float-capital/float-contracts">
+              <img src="/icons/github.svg" className="h-10" />
             </a>
             {switch optCurrentUser {
             | Some(currentUser) =>
@@ -181,7 +180,7 @@ let make = () => {
                   router->Next.Router.push(`/user/${currentUser->ethAdrToStr}`)
                   setIsOpen(_ => false)
                 }}
-                className="px-3 bg-white hover:bg-black hover:text-gray-200 text-base cursor-pointer">
+                className="px-3 bg-white text-black hover:bg-black hover:text-gray-200 text-base cursor-pointer text-3xl">
                 {` 👤 `->React.string} <DisplayAddress address={currentUser->ethAdrToStr} />
               </p>
 

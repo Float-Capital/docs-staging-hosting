@@ -55,14 +55,14 @@ module SubmitButtonAndTxTracker = {
     switch (txStateApprove, txStateMint) {
     | (ContractActions.Created, _) => <>
         <h1>
-          {`Please Approve that Float can use your ${Config.paymentTokenName}`->React.string}
+          {`Please approve your ${Config.paymentTokenName} token on Float`->React.string}
         </h1>
       </>
     | (ContractActions.SignedAndSubmitted(txHash), _) => <>
         <hr />
         <h1>
           <a target="_" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
-            {"Processing Approval "->React.string}
+            {"Processing approval "->React.string}
           </a>
         </h1>
       </>
@@ -71,7 +71,7 @@ module SubmitButtonAndTxTracker = {
         <hr />
         <h1>
           <a target="_" href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
-            {`✅ Approval Complete`->React.string}
+            {`✅ Approval complete`->React.string}
           </a>
         </h1>
         <h1> {`Sign the next transaction to mint your`->React.string} </h1>

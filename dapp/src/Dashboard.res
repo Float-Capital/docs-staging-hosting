@@ -1,22 +1,5 @@
 open DashboardLi.Props
-
-module Divider = {
-  @react.component
-  let make = (~children) =>
-    <div className={"my-4 w-full md:w-1/3 px-3 md:px-0 md:m-4"}> {children} </div>
-}
-
-module Card = {
-  @react.component
-  let make = (~children) =>
-    <div className={"bg-white w-full bg-opacity-75 rounded-lg shadow-lg mb-5"}> {children} </div>
-}
-
-module Header = {
-  @react.component
-  let make = (~children) =>
-    <h1 className="font-bold text-center pt-5 text-lg font-alphbeta"> {children} </h1>
-}
+open Masonry
 
 module TrendingStakes = {
   open APYProvider
@@ -56,7 +39,7 @@ module TrendingStakes = {
 
 let totalValueCard = (~totalValueLocked) =>
   <div
-    className={"mx-3 p-5 md:mt-7 self-center text-center bg-white bg-opacity-75 rounded-lg shadow-lg"}>
+    className={"mb-2 md:mb-5 mx-3 p-5 md:mt-7 self-center text-center bg-white bg-opacity-75 rounded-lg shadow-lg"}>
     <span className="font-alphbeta text-xl"> {"Total Value"->React.string} </span>
     <span className="text-sm"> {` 🏦 in Float Protocol: `->React.string} </span>
     <span className="text-green-700">
@@ -186,7 +169,7 @@ let make = () => {
 
       <div className="min-w-3/4 max-w-full flex flex-col self-center items-center justify-start">
         {totalValueCard(~totalValueLocked)}
-        <div className={"w-full flex flex-col md:flex-row justify-between mt-1"}>
+        <Container>
           <Divider>
             {floatProtocolCard(
               ~liveSince=timestampLaunched,
@@ -201,7 +184,7 @@ let make = () => {
             {floatTokenCard(~totalFloatMinted)}
           </Divider>
           <Divider> {stakingCard(~totalValueStaked)} </Divider>
-        </div>
+        </Container>
       </div>
 
     | (_, {data: Some(_), error: None, loading: false})

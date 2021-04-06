@@ -1,13 +1,10 @@
 import Login from "src/components/Login/Login";
-import Head from "next/head";
+import HtmlHeader from "src/components/HtmlHeader.js";
 
 export default function LoginPage(props) {
   return (
     <div>
-      <Head>
-        <title>Float Capital</title>
-        <meta property="og:title" content="Float Capital" key="title" />
-      </Head>
+      <HtmlHeader page="Login"></HtmlHeader>
       <Login {...props} />
     </div>
   );

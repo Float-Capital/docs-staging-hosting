@@ -45,6 +45,13 @@ module.exports = {
       "1/2": "50%",
       "3/4": "75%",
     },
+    minHeight: {
+      "1/2": "50%",
+      "3/4": "75%",
+      full: "100%",
+      "half-screen": "50vh",
+      screen: "100vh",
+    },
     borderColor: (theme) => ({
       ...theme("colors"),
       DEFAULT: primaryColor,

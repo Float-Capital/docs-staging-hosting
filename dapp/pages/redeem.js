@@ -1,13 +1,10 @@
 import Redeem from "src/Redeem";
-import Head from "next/head";
+import HtmlHeader from "src/components/HtmlHeader.js";
 
 export default function RedeemPage(props) {
   return (
     <div>
-      <Head>
-        <title>Float Capital | Redeem</title>
-        <meta property="og:title" content="Float Capital" key="title" />
-      </Head>
+      <HtmlHeader page="Redeem"></HtmlHeader>
       <Redeem {...props} />
     </div>
   );
