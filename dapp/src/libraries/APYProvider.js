@@ -236,7 +236,10 @@ function useAPY(param) {
                   }));
           }
           
-        }), [setShouldFetchData]);
+        }), [
+        shouldFetchData,
+        setShouldFetchData
+      ]);
   return match.apy;
 }
 

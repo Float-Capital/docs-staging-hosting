@@ -104,11 +104,11 @@ let make = (~children) =>
 
 let useAPY = () => {
   let {shouldFetchData, setShouldFetchData, apy} = React.useContext(APYProviderContext.context)
-  React.useEffect1(_ => {
+  React.useEffect2(_ => {
     if !shouldFetchData {
       setShouldFetchData(_ => true)
     }
     None
-  }, [setShouldFetchData])
+  }, (shouldFetchData, setShouldFetchData))
   apy
 }
