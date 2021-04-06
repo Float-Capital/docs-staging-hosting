@@ -7,7 +7,6 @@ let mapVal = apy =>
       ? `🔥`
       : ""}`->React.string
 
-
 @react.component
 let make = (~orderPostion, ~orderPostionMobile, ~marketName, ~isLong, ~apy, ~floatApy) => {
   <div
@@ -21,13 +20,11 @@ let make = (~orderPostion, ~orderPostionMobile, ~marketName, ~isLong, ~apy, ~flo
         <span className="font-bold"> {isLong ? "LONG"->React.string : "SHORT"->React.string} </span>
         {" APY"->React.string}
       </h3>
-      {
-        switch(apy){
-        | Loaded(apyVal) => <div className="text-2xl tracking-widest font-alphbeta"> {apyVal->mapVal} </div>
-        | _ => <MiniLoader/>
-      }
-      }
-      
+      {switch apy {
+      | Loaded(apyVal) =>
+        <div className="text-2xl tracking-widest font-alphbeta"> {apyVal->mapVal} </div>
+      | _ => <MiniLoader />
+      }}
     </div>
     <div className="flex flex-col items-center justify-center pt-0 mt-auto">
       <h3 className="text-xs mt-1">
