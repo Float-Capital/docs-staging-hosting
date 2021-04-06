@@ -7,9 +7,9 @@ let make = (~marketData) => {
       </div>
     </Next.Link>
     <MarketCard marketData />
-    <div className="flex justify-center items-stretch">
+    <div className="flex flex-col md:flex-row justify-center items-stretch">
       <div
-        className="flex-1 p-1 mb-8 mr-8 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg">
+        className="flex-1 w-full min-h-10 p-1 mb-8 mr-8 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg">
         <PriceGraph marketName={marketData.name} />
       </div>
       <div className="flex-1  p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg">

@@ -18,9 +18,9 @@ function Market(Props) {
                 }), React.createElement(MarketCard.make, {
                   marketData: marketData
                 }), React.createElement("div", {
-                  className: "flex justify-center items-stretch"
+                  className: "flex flex-col md:flex-row justify-center items-stretch"
                 }, React.createElement("div", {
-                      className: "flex-1 p-1 mb-8 mr-8 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
+                      className: "flex-1 w-full min-h-10 p-1 mb-8 mr-8 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
                     }, React.createElement(PriceGraph.make, {
                           marketName: marketData.name
                         })), React.createElement("div", {

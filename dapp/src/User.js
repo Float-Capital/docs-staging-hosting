@@ -7,6 +7,7 @@ import * as Ethers from "./ethereum/Ethers.js";
 import * as Loader from "./components/UI/Loader.js";
 import * as UserUI from "./components/UI/UserUI.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
+import * as Masonry from "./components/UI/Masonry.js";
 import * as DataHooks from "./data/DataHooks.js";
 import Link from "next/link";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
@@ -69,7 +70,7 @@ var UserBalancesCard = {
 function User$UserProfileCard(Props) {
   var userInfo = Props.userInfo;
   var addressStr = DisplayAddress.ellipsifyMiddle(userInfo.id, 8, 3);
-  var joinedStr = Format(userInfo.joinedAt, "P");
+  var joinedStr = Format(userInfo.joinedAt, "do MMM yyyy");
   var txStr = userInfo.transactionCount.toString();
   var gasStr = FormatMoney.formatInt(userInfo.gasUsed.toString());
   return React.createElement(UserUI.UserColumnCard.make, {
@@ -77,24 +78,22 @@ function User$UserProfileCard(Props) {
             }, React.createElement(UserUI.UserProfileHeader.make, {
                   address: addressStr
                 }), React.createElement(UserUI.UserColumnTextList.make, {
-                  children: null
-                }, React.createElement(UserUI.UserColumnText.make, {
-                      head: "📮 Address",
-                      body: addressStr
-                    }), React.createElement(UserUI.UserColumnText.make, {
-                      head: "🎉 Joined",
-                      body: joinedStr
-                    }), React.createElement(UserUI.UserColumnText.make, {
-                      head: "⛽ Gas used",
-                      body: gasStr
-                    }), React.createElement(UserUI.UserColumnText.make, {
-                      head: "🏃 No. txs",
-                      body: txStr
-                    }), React.createElement(UserUI.UserColumnText.make, {
-                      icon: "/img/discord.png",
-                      head: "Discord",
-                      body: "✅"
-                    })));
+                  children: React.createElement("div", {
+                        className: "p-4"
+                      }, React.createElement(UserUI.UserColumnText.make, {
+                            head: "📮 Address",
+                            body: addressStr
+                          }), React.createElement(UserUI.UserColumnText.make, {
+                            head: "🎉 Joined",
+                            body: joinedStr
+                          }), React.createElement(UserUI.UserColumnText.make, {
+                            head: "⛽ Gas used",
+                            body: gasStr
+                          }), React.createElement(UserUI.UserColumnText.make, {
+                            head: "🏃 No. txs",
+                            body: txStr
+                          }))
+                }));
 }
 
 var UserProfileCard = {
@@ -109,22 +108,22 @@ function onQueryError(msg) {
 
 function onQuerySuccess(data) {
   return React.createElement(UserUI.UserContainer.make, {
-              children: React.createElement(UserUI.UserColumnContainer.make, {
+              children: React.createElement(Masonry.Container.make, {
                     children: null
-                  }, React.createElement(UserUI.UserColumn.make, {
+                  }, React.createElement(Masonry.Divider.make, {
                         children: React.createElement(User$UserProfileCard, {
                               userInfo: data.userInfo
                             })
-                      }), React.createElement(UserUI.UserColumn.make, {
+                      }), React.createElement(Masonry.Divider.make, {
                         children: React.createElement(User$UserBalancesCard, {
                               userId: data.user
                             })
-                      }), React.createElement(UserUI.UserColumn.make, {
+                      }), React.createElement(Masonry.Divider.make, {
                         children: null
                       }, React.createElement(UserUI.UserFloatCard.make, {
                             userId: data.user,
                             stakes: data.stakes
-                          }), React.createElement("br", undefined), React.createElement(UserUI.UserStakesCard.make, {
+                          }), React.createElement(UserUI.UserStakesCard.make, {
                             stakes: data.stakes,
                             userId: data.user
                           })))

@@ -1,5 +1,6 @@
 open UserUI
 open DataHooks
+open Masonry
 
 module UserBalancesCard = {
   @react.component
@@ -52,19 +53,21 @@ module UserProfileCard = {
       ~maxLength=8,
       ~trailingCharacters=3,
     )
-    let joinedStr = userInfo.joinedAt->DateFns.format("P")
+    let joinedStr = userInfo.joinedAt->DateFns.format("do MMM yyyy")
     let txStr = userInfo.transactionCount->Ethers.BigNumber.toString
     let gasStr = userInfo.gasUsed->Ethers.BigNumber.toString->FormatMoney.formatInt
 
     <UserColumnCard>
       <UserProfileHeader address={addressStr} />
       <UserColumnTextList>
-        <UserColumnText head=`📮 Address` body={addressStr} />
-        <UserColumnText head=`🎉 Joined` body={joinedStr} />
-        <UserColumnText head=`⛽ Gas used` body={gasStr} />
-        <UserColumnText head=`🏃 No. txs` body={txStr} />
+        <div className="p-4">
+          <UserColumnText head=`📮 Address` body={addressStr} />
+          <UserColumnText head=`🎉 Joined` body={joinedStr} />
+          <UserColumnText head=`⛽ Gas used` body={gasStr} />
+          <UserColumnText head=`🏃 No. txs` body={txStr} />
+        </div>
         // TODO: fetch from graph somehow
-        <UserColumnText icon="/img/discord.png" head=`Discord` body=`✅` />
+        // <UserColumnText icon="/img/discord.png" head=`Discord` body=`✅` />
       </UserColumnTextList>
     </UserColumnCard>
   }
@@ -85,15 +88,14 @@ module User = {
   let onQuerySuccess = (data: userData) => {
     <UserContainer>
       // <UserBanner />
-      <UserColumnContainer>
-        <UserColumn> <UserProfileCard userInfo={data.userInfo} /> </UserColumn>
-        <UserColumn> <UserBalancesCard userId={data.user} /> </UserColumn>
-        <UserColumn>
+      <Container>
+        <Divider> <UserProfileCard userInfo={data.userInfo} /> </Divider>
+        <Divider> <UserBalancesCard userId={data.user} /> </Divider>
+        <Divider>
           <UserFloatCard userId={data.user} stakes={data.stakes} />
-          <br />
           <UserStakesCard stakes={data.stakes} userId={data.user} />
-        </UserColumn>
-      </UserColumnContainer>
+        </Divider>
+      </Container>
     </UserContainer>
   }
 

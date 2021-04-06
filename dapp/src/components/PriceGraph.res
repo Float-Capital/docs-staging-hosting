@@ -92,6 +92,8 @@ let make = (~marketName) => {
     (maxYRange->float_of_int +. maxYRange->float_of_int *. 0.05)->Float.toInt,
   ]
 
+  let isMobile = View.useIsTailwindMobile()
+
   <>
     <div className={`flex-1 p-1 my-4 mr-6 flex flex-col relative`}>
       {noDataAvailable
@@ -102,7 +104,8 @@ let make = (~marketName) => {
         : React.null}
       {<>
         <h3 className="ml-5"> {`${marketName} Price`->React.string} </h3>
-        <ResponsiveContainer height=Prc(100.) width=Prc(100.) className="w-full text-xs m-0 p-0">
+        <ResponsiveContainer
+          height={isMobile ? Px(200.) : Prc(100.)} width=Prc(100.) className="w-full text-xs m-0 p-0">
           <LineChart margin={"top": 0, "right": 0, "bottom": 0, "left": 0} data={displayData}>
             <Line _type=#natural dataKey="price" stroke="#0d4184" strokeWidth={2} dot={false} />
             <Tooltip />

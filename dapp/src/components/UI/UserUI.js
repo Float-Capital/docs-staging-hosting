@@ -70,7 +70,7 @@ var UserColumn = {
 function UserUI$UserColumnCard(Props) {
   var children = Props.children;
   return React.createElement("div", {
-              className: "bg-white w-full bg-opacity-75 rounded-lg shadow-lg p-4"
+              className: "bg-white w-full bg-opacity-75 rounded-lg shadow-lg p-2 mb-2 md:mb-4"
             }, children);
 }
 
