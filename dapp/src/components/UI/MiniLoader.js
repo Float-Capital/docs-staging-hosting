@@ -4,7 +4,7 @@ import * as React from "react";
 
 function MiniLoader(Props) {
   return React.createElement("img", {
-              className: "w-6",
+              className: "w-6 mx-auto",
               src: "/img/mini-loading.gif"
             });
 }

@@ -25,18 +25,7 @@ let make = () => {
   }, (nextPath, optCurrentUser))
 
   <div>
-    <p>
-      {"Connect with one of the wallets below. "->React.string}
-      <small>
-        <a
-          className="hover:underline hover:opacity-75"
-          href="https://docs.float.capital/docs"
-          target="_blank"
-          rel="noopener noreferrer">
-          {"(Not sure where to go from here?) "->React.string}
-        </a>
-      </small>
-    </p>
+    <p className="mx-2 md:mx-0"> {"Connect with one of the wallets below. "->React.string} </p>
     <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-6 gap-4 items-center my-5">
       {connectors
       ->Array.mapWithIndex((index, connector) =>
@@ -46,7 +35,7 @@ let make = () => {
             ReactEvent.Mouse.stopPropagation(e)
             activateConnector(connector.connector)
           }}
-          className="p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 hover:bg-gray-200 active:bg-gray-300 rounded ">
+          className="mx-2 md:mx-0 p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 hover:bg-gray-200 active:bg-gray-300 rounded ">
           <div className="w-10 h-10">
             <img src=connector.img alt=connector.name className="w-full h-full" />
           </div>

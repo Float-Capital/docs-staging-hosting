@@ -1,17 +1,10 @@
 import Stake from "src/Stake";
-import Head from "next/head";
+import HtmlHeader from "src/components/HtmlHeader.js";
 
 export default function StakePage(props) {
   return (
     <>
-      <Head>
-        <title>Float Capital | Stake</title>
-        <meta
-          property="og:title"
-          content="Float Capital | Stake key"
-          key="title"
-        />
-      </Head>
+      <HtmlHeader page="Stake"></HtmlHeader>
       <Stake {...props} />
     </>
   );

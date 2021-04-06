@@ -153,6 +153,22 @@ let make = (
 
   let stakeOption = router.query->Js.Dict.get("tokenAddress")
 
+  let stakeButtons = () =>
+    <div className="flex flex-wrap justify-evenly">
+      <Button.Small
+        onClick={_ => {
+          router->Next.Router.push(`/stake?tokenAddress=${longTokenAddress->ethAdrToLowerStr}`)
+        }}>
+        "Stake Long"
+      </Button.Small>
+      <Button.Small
+        onClick={_ => {
+          router->Next.Router.push(`/stake?tokenAddress=${shortTokenAddress->ethAdrToLowerStr}`)
+        }}>
+        "Stake Short"
+      </Button.Small>
+    </div>
+
   <>
     <div className="p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg">
       <div className="flex justify-center w-full my-1">
@@ -160,14 +176,16 @@ let make = (
           {marketName->React.string} <Tooltip tip={`This market tracks ${marketName}`} />
         </h1>
       </div>
-      <div className="flex justify-center w-full">
+      <div className="flex flex-wrap justify-center w-full">
         <StakeCardSide
+          orderPostionMobile={2}
+          orderPostion={1}
           marketName={marketName}
           isLong={true}
           apy={longApy}
           floatApy={longFloatApy->Ethers.Utils.formatEther->Js.Float.fromString}
         />
-        <div className="w-1/2 flex items-center flex-col">
+        <div className="w-full md:w-1/2 flex items-center flex-col order-1 md:order-2">
           <h2 className="text-xs mt-1">
             <span className="font-bold"> {`📈 TOTAL`->React.string} </span>
             {" Staked"->React.string}
@@ -179,31 +197,17 @@ let make = (
           | true => <StakeBar percentStrLong={percentStrLong} percentStrShort={percentStrShort} />
           | false => React.null
           }}
-          <div className="w-full flex justify-around">
-            <Button.Small
-              onClick={_ => {
-                router->Next.Router.push(
-                  `/stake?tokenAddress=${longTokenAddress->ethAdrToLowerStr}`,
-                )
-              }}>
-              "Stake Long"
-            </Button.Small>
-            <Button.Small
-              onClick={_ => {
-                router->Next.Router.push(
-                  `/stake?tokenAddress=${shortTokenAddress->ethAdrToLowerStr}`,
-                )
-              }}>
-              "Stake Short"
-            </Button.Small>
-          </div>
+          <div className="md:block hidden w-full flex justify-around"> {stakeButtons()} </div>
         </div>
         <StakeCardSide
+          orderPostionMobile={3}
+          orderPostion={3}
           marketName={marketName}
           isLong={false}
           apy={shortApy}
           floatApy={shortFloatApy->Ethers.Utils.formatEther->Js.Float.fromString}
         />
+        <div className="block md:hidden pt-5 order-4 w-full"> {stakeButtons()} </div>
       </div>
       {switch stakeOption {
       | Some(tokenAddress) =>

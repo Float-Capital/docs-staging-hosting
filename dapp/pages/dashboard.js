@@ -1,13 +1,10 @@
 import Dashboard from "src/Dashboard";
-import Head from "next/head";
+import HtmlHeader from "src/components/HtmlHeader.js";
 
 export default function DashboardPage(props) {
   return (
     <div>
-      <Head>
-        <title>Float Capital</title>
-        <meta property="og:title" content="Float Capital" key="title" />
-      </Head>
+      <HtmlHeader page="Dashboard"></HtmlHeader>
       <Dashboard {...props} />
     </div>
   );

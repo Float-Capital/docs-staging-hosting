@@ -551,7 +551,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
       case /* UnInitialised */0 :
           break;
       case /* Created */1 :
-          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Please Approve that Float can use your " + Config.paymentTokenName));
+          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Please approve your " + Config.paymentTokenName + " token on Float"));
       case /* Failed */2 :
           return React.createElement(React.Fragment, undefined, React.createElement("hr", undefined), React.createElement("h1", undefined, "❌ The transaction failed."), React.createElement("p", undefined, React.createElement("a", {
                               href: Config.discordInviteLink,
@@ -565,7 +565,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
           return React.createElement(React.Fragment, undefined, React.createElement("hr", undefined), React.createElement("h1", undefined, React.createElement("a", {
                               href: Config.defaultBlockExplorer + "tx/" + txStateApprove._0,
                               target: "_"
-                            }, "Processing Approval ")));
+                            }, "Processing approval ")));
       case /* Declined */1 :
           return React.createElement(React.Fragment, undefined, React.createElement("hr", undefined), React.createElement("h1", undefined, "❌ The transaction was declined by your wallet, you need to accept the transaction to proceed."), React.createElement("p", undefined, "Failure reason: " + txStateApprove._0), Curry._1(resetFormButton, undefined));
       case /* Complete */2 :
@@ -593,7 +593,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
             return React.createElement(React.Fragment, undefined, React.createElement("hr", undefined), React.createElement("h1", undefined, React.createElement("a", {
                                 href: Config.defaultBlockExplorer + "tx/" + transactionHash,
                                 target: "_"
-                              }, "✅ Approval Complete")), React.createElement("h1", undefined, "Sign the next transaction to mint your"));
+                              }, "✅ Approval complete")), React.createElement("h1", undefined, "Sign the next transaction to mint your"));
           }
           break;
       

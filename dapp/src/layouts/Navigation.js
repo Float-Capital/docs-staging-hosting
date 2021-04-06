@@ -17,10 +17,7 @@ function floatingMenuZoomStyle(shouldDisplay) {
               CssJs.position("fixed"),
               CssJs.top(CssJs.px(0)),
               CssJs.left(CssJs.px(0)),
-              CssJs.width({
-                    NAME: "percent",
-                    VAL: 100
-                  }),
+              CssJs.width(CssJs.vw(100)),
               CssJs.height(CssJs.vh(100)),
               CssJs.visibility(shouldDisplay ? "visible" : "hidden"),
               CssJs.backgroundColor(CssJs.rgba(255, 255, 255, {
@@ -32,14 +29,10 @@ function floatingMenuZoomStyle(shouldDisplay) {
               CssJs.selector(".zoom-in-effect", [
                     CssJs.background(CssJs.rgba(59, 130, 250, {
                               NAME: "num",
-                              VAL: 0.3
+                              VAL: 0.6
                             })),
                     CssJs.width(CssJs.vw(100)),
                     CssJs.height(CssJs.vh(100)),
-                    CssJs.borderRadius({
-                          NAME: "percent",
-                          VAL: 50
-                        }),
                     CssJs.border(CssJs.px(1), "solid", CssJs.grey),
                     CssJs.display("flex"),
                     CssJs.flex("none"),
@@ -126,7 +119,7 @@ function Navigation(Props) {
   if (optCurrentUser !== undefined) {
     var currentUser$1 = Caml_option.valFromOption(optCurrentUser);
     tmp$1 = React.createElement("p", {
-          className: "px-3 bg-white hover:bg-black hover:text-gray-200 text-base cursor-pointer",
+          className: "px-3 bg-white text-black hover:bg-black hover:text-gray-200 text-base cursor-pointer text-3xl",
           onClick: (function (param) {
               router.push("/user/" + Globals.ethAdrToStr(currentUser$1));
               return Curry._1(setIsOpen, (function (param) {
@@ -158,7 +151,7 @@ function Navigation(Props) {
                               }, React.createElement("div", {
                                     className: "logo-container"
                                   }, React.createElement("img", {
-                                        className: "h-5 md:h-7",
+                                        className: "h-8 md:h-7 w-full md:w-auto",
                                         src: "/img/float-capital-logo.png"
                                       }))))
                     }), React.createElement("div", {
@@ -201,17 +194,17 @@ function Navigation(Props) {
                         }, isOpen ? React.createElement(React.Fragment, undefined, closeSvg(undefined)) : hamburgerSvg(undefined)), React.createElement("div", {
                           className: floatingMenuZoomStyle(isOpen)
                         }, React.createElement("div", {
-                              className: "zoom-in-effect flex flex-col"
+                              className: "zoom-in-effect flex flex-col text-3xl text-white"
                             }, React.createElement("div", {
-                                  className: "px-3 hover:bg-white",
+                                  className: "px-3 bg-black m-2",
                                   onClick: (function (param) {
                                       router.push("/markets");
                                       return Curry._1(setIsOpen, (function (param) {
                                                     return false;
                                                   }));
                                     })
-                                }, "MARKETS"), React.createElement("div", {
-                                  className: "px-3 hover:bg-white",
+                                }, "MINT"), React.createElement("div", {
+                                  className: "px-3 bg-black m-2",
                                   onClick: (function (param) {
                                       router.push("/stake");
                                       return Curry._1(setIsOpen, (function (param) {
@@ -219,7 +212,7 @@ function Navigation(Props) {
                                                   }));
                                     })
                                 }, "STAKE🔥"), React.createElement("div", {
-                                  className: "px-3 hover:bg-white",
+                                  className: "px-3 bg-black m-2",
                                   onClick: (function (param) {
                                       router.push("/dashboard");
                                       return Curry._1(setIsOpen, (function (param) {
@@ -227,7 +220,7 @@ function Navigation(Props) {
                                                   }));
                                     })
                                 }, "DASHBOARD"), React.createElement("a", {
-                                  className: "px-3 hover:bg-white",
+                                  className: "px-3 bg-black m-2",
                                   href: "https://docs.float.capital",
                                   target: "_blank",
                                   onClick: (function (param) {
@@ -236,7 +229,7 @@ function Navigation(Props) {
                                                   }));
                                     })
                                 }, "DOCS"), React.createElement("a", {
-                                  className: "px-3 hover:opacity-60",
+                                  className: "px-3 hover:opacity-60 m-4",
                                   href: "https://github.com/float-capital/float-contracts",
                                   target: "_blank",
                                   onClick: (function (param) {
@@ -245,7 +238,7 @@ function Navigation(Props) {
                                                   }));
                                     })
                                 }, React.createElement("img", {
-                                      className: "h-5",
+                                      className: "h-10",
                                       src: "/icons/github.svg"
                                     })), tmp$1)))));
 }

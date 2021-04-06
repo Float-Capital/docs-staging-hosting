@@ -1,13 +1,10 @@
 import IndexRes from "src/Index.js";
-import Head from "next/head";
+import HtmlHeader from "src/components/HtmlHeader.js";
 
 export default function Index(props) {
   return (
     <div>
-      <Head>
-        <title>Float Capital</title>
-        <meta property="og:title" content="Float Capital" key="title" />
-      </Head>
+      <HtmlHeader page="Home"></HtmlHeader>
       <IndexRes {...props} />
     </div>
   );

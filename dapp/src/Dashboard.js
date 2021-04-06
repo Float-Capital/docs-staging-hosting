@@ -3,6 +3,7 @@
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Ethers from "./ethereum/Ethers.js";
+import * as Masonry from "./components/UI/Masonry.js";
 import * as Queries from "./data/Queries.js";
 import * as Tooltip from "./components/UI/Tooltip.js";
 import Link from "next/link";
@@ -16,39 +17,6 @@ import * as DashboardCalcs from "./libraries/DashboardCalcs.js";
 import * as DashboardStakeCard from "./components/UI/Dashboard/DashboardStakeCard.js";
 import FromUnixTime from "date-fns/fromUnixTime";
 import FormatDistanceToNow from "date-fns/formatDistanceToNow";
-
-function Dashboard$Divider(Props) {
-  var children = Props.children;
-  return React.createElement("div", {
-              className: "my-4 w-full md:w-1/3 px-3 md:px-0 md:m-4"
-            }, children);
-}
-
-var Divider = {
-  make: Dashboard$Divider
-};
-
-function Dashboard$Card(Props) {
-  var children = Props.children;
-  return React.createElement("div", {
-              className: "bg-white w-full bg-opacity-75 rounded-lg shadow-lg mb-5"
-            }, children);
-}
-
-var Card = {
-  make: Dashboard$Card
-};
-
-function Dashboard$Header(Props) {
-  var children = Props.children;
-  return React.createElement("h1", {
-              className: "font-bold text-center pt-5 text-lg font-alphbeta"
-            }, children);
-}
-
-var Header = {
-  make: Dashboard$Header
-};
 
 function Dashboard$TrendingStakes(Props) {
   var stakeDetailsQuery = Curry.app(Queries.StakingDetails.use, [
@@ -101,7 +69,7 @@ var TrendingStakes = {
 
 function totalValueCard(totalValueLocked) {
   return React.createElement("div", {
-              className: "mx-3 p-5 md:mt-7 self-center text-center bg-white bg-opacity-75 rounded-lg shadow-lg"
+              className: "mb-2 md:mb-5 mx-3 p-5 md:mt-7 self-center text-center bg-white bg-opacity-75 rounded-lg shadow-lg"
             }, React.createElement("span", {
                   className: "font-alphbeta text-xl"
                 }, "Total Value"), React.createElement("span", {
@@ -113,9 +81,9 @@ function totalValueCard(totalValueLocked) {
 
 function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed, txHash) {
   var dateObj = FromUnixTime(liveSince.toNumber());
-  return React.createElement(Dashboard$Card, {
+  return React.createElement(Masonry.Card.make, {
               children: null
-            }, React.createElement(Dashboard$Header, {
+            }, React.createElement(Masonry.Header.make, {
                   children: "Float Protocol 🏗️"
                 }), React.createElement(DashboardUl.make, {
                   list: [
@@ -128,9 +96,9 @@ function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed, txHash
 }
 
 function syntheticAssetsCard(totalSynthValue, numberOfSynths) {
-  return React.createElement(Dashboard$Card, {
+  return React.createElement(Masonry.Card.make, {
               children: null
-            }, React.createElement(Dashboard$Header, {
+            }, React.createElement(Masonry.Header.make, {
                   children: null
                 }, "Synthetic Assets", React.createElement("img", {
                       className: "inline h-5 ml-2",
@@ -157,9 +125,9 @@ function syntheticAssetsCard(totalSynthValue, numberOfSynths) {
 }
 
 function floatTokenCard(totalFloatMinted) {
-  return React.createElement(Dashboard$Card, {
+  return React.createElement(Masonry.Card.make, {
               children: null
-            }, React.createElement(Dashboard$Header, {
+            }, React.createElement(Masonry.Header.make, {
                   children: "🌊🌊 Float Token 🌊🌊"
                 }), React.createElement(DashboardUl.make, {
                   list: [
@@ -173,9 +141,9 @@ function floatTokenCard(totalFloatMinted) {
 }
 
 function stakingCard(totalValueStaked) {
-  return React.createElement(Dashboard$Card, {
+  return React.createElement(Masonry.Card.make, {
               children: null
-            }, React.createElement(Dashboard$Header, {
+            }, React.createElement(Masonry.Header.make, {
                   children: "Staking 🔥"
                 }), React.createElement("div", {
                   className: "text-center mt-5"
@@ -247,13 +215,13 @@ function Dashboard(Props) {
         var numberOfSynths = String((syntheticMarkets.length << 1));
         tmp = React.createElement("div", {
               className: "min-w-3/4 max-w-full flex flex-col self-center items-center justify-start"
-            }, totalValueCard(totalValueLocked), React.createElement("div", {
-                  className: "w-full flex flex-col md:flex-row justify-between mt-1"
-                }, React.createElement(Dashboard$Divider, {
+            }, totalValueCard(totalValueLocked), React.createElement(Masonry.Container.make, {
+                  children: null
+                }, React.createElement(Masonry.Divider.make, {
                       children: floatProtocolCard(match$2.timestampLaunched, match$2.totalTxs, match$2.totalUsers, match$2.totalGasUsed, match$2.txHash)
-                    }), React.createElement(Dashboard$Divider, {
+                    }), React.createElement(Masonry.Divider.make, {
                       children: null
-                    }, syntheticAssetsCard(totalSynthValue, numberOfSynths), floatTokenCard(match$2.totalFloatMinted)), React.createElement(Dashboard$Divider, {
+                    }, syntheticAssetsCard(totalSynthValue, numberOfSynths), floatTokenCard(match$2.totalFloatMinted)), React.createElement(Masonry.Divider.make, {
                       children: stakingCard(totalValueStaked)
                     })));
       } else {
@@ -273,9 +241,6 @@ var make = Dashboard;
 var $$default = Dashboard;
 
 export {
-  Divider ,
-  Card ,
-  Header ,
   TrendingStakes ,
   totalValueCard ,
   floatProtocolCard ,

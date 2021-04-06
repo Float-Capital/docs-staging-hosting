@@ -13,12 +13,14 @@ function mapVal(apy) {
 }
 
 function StakeCardSide(Props) {
+  var orderPostion = Props.orderPostion;
+  var orderPostionMobile = Props.orderPostionMobile;
   var marketName = Props.marketName;
   var isLong = Props.isLong;
   var apy = Props.apy;
   var floatApy = Props.floatApy;
   return React.createElement("div", {
-              className: "w-1/4 flex items-center flex-grow text-sm flex-col"
+              className: "order-" + String(orderPostionMobile) + " md:order-" + String(orderPostion) + " w-1/2 md:w-1/4 flex items-center flex grow flex-wrap flex-col"
             }, React.createElement("h2", {
                   className: "font-bold text-sm"
                 }, marketName, React.createElement("span", {
