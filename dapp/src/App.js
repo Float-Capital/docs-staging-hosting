@@ -19,12 +19,12 @@ function $$default(props) {
               children: React.createElement(RootProvider.make, {
                     children: null
                   }, React.createElement(Client.make, {
-                        children: React.createElement(StateChangeMonitor.make, {
-                              children: React.createElement(MainLayout.make, {
-                                    children: content
-                                  })
-                            })
-                      }), React.createElement(Toast.make, {}))
+                        children: null
+                      }, React.createElement(ComingSoon.make, {}), React.createElement(StateChangeMonitor.make, {
+                            children: React.createElement(MainLayout.make, {
+                                  children: content
+                                })
+                          })), React.createElement(Toast.make, {}))
             });
 }
 

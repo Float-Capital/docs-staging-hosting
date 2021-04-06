@@ -10,9 +10,9 @@ let make = (~children) => {
           | Some(chainId) if chainId == Config.defaultNetworkId => children
           | None => children
           | Some(_) => <>
-              <h2> {"You are connected to the wrong network."->React.string} </h2>
-              <h4>
-                {`Please connect to ${Config.defaultNetworkName}. (Try click on the below button)`->React.string}
+              <h2> {"You are currently connected to the wrong network."->React.string} </h2>
+              <h4 className="text-lg">
+                {`Please connect to ${Config.defaultNetworkName}.`->React.string}
               </h4>
               <AddBinanceToMetamask />
             </>

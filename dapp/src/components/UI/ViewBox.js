@@ -5,7 +5,7 @@ import * as React from "react";
 function ViewBox(Props) {
   var children = Props.children;
   return React.createElement("div", {
-              className: "flex flex-col max-w-xl w-full m-auto p-6 "
+              className: "flex flex-col max-w-xl w-full m-auto p-6 h-full "
             }, children);
 }
 

@@ -40,6 +40,26 @@ module Small = {
   }
 }
 
+module Element = {
+@react.component
+let make = (~onClick=_ => (), ~children: React.element, ~disabled=false) => {
+  <div className="inline-block">
+  <div className={`${buttonOuterStyle}`} >
+    <div className={`${buttonShaddowStyle} border-0 `}>
+      <button
+        disabled={disabled}
+        className={`${buttonTopStyle} p-3 focus:outline-none text-base mx-auto ${disabled
+            ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-200 cursor-not-allowed"
+            : ""}`}
+        onClick>
+        {children}
+      </button>
+    </div>  
+  </div>
+  </div>
+}
+}
+
 @react.component
 let make = (~onClick=_ => (), ~children: string, ~disabled=false) => {
   <div className=buttonOuterStyle>

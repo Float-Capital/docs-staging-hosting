@@ -9,9 +9,10 @@ let longshortContractAbi = [""]->Ethers.makeAbi
 let binancTestnetGraphEndpoint = "https://test.graph.float.capital/subgraphs/name/float-capital/float-capital"
 let localhostGraphEndpoint = "https://localhost:8000/subgraphs/name/float-capital/float-capital/graphql"
 let defaultNetworkId = 97
-let defaultNetworkName = "Binance Smart Chain Test Network"
+let defaultNetworkName = "Binance Smart Chain testnet"
 let paymentTokenName = "BUSD"
 let defaultBlockExplorer = "https://testnet.bscscan.com/"
+let defaultBlockExplorerName = "bscscan"
 let getDefaultNetworkId = optNetworkId => optNetworkId->Option.getWithDefault(defaultNetworkId)
 
 let discordInviteLink = "https://discord.gg/dqDwgrVYcU"

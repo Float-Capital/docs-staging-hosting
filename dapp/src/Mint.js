@@ -46,7 +46,9 @@ function Mint$Mint(Props) {
   } else {
     tmp = "You might think this is impossible, but depending on the situation it might not be!";
   }
-  return React.createElement("section", undefined, tmp);
+  return React.createElement("section", {
+              className: "h-full"
+            }, tmp);
 }
 
 var Mint = {

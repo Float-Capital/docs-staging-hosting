@@ -54,10 +54,14 @@ let make = () => {
 
   switch ethObj {
   | Some(ethObj) =>
-    <div onClick={_event => addToMetamask(ethObj)} className="flex justify-start align-center">
-      <div className="text-sm"> {"Go to the BSC Test Network "->React.string} </div>
-      <img src="/icons/metamask.svg" className="h-5 ml-1" />
+    <Button.Element onClick={_event => addToMetamask(ethObj)}>
+    <div className="mx-auto">
+    <div className="flex flex-row items-center">
+      <div className="text-sm"> {"Add BSC Testnet to metamask "->React.string} </div>
+      <img src="/icons/metamask.svg" className="h-6 ml-1" />
     </div>
+    </div>
+    </Button.Element>    
   | None => React.null
   }
 }

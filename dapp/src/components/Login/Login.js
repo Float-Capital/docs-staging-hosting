@@ -2,6 +2,7 @@
 
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
+import * as Config from "../../Config.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as Router from "next/router";
@@ -27,7 +28,9 @@ function Login(Props) {
       ]);
   return React.createElement("div", undefined, React.createElement("p", {
                   className: "mx-2 md:mx-0"
-                }, "Connect with one of the wallets below. "), React.createElement("div", {
+                }, "Connect with one of the wallets below. "), React.createElement("p", {
+                  className: "text-xs"
+                }, "Please make sure to connect to " + Config.defaultNetworkName + "."), React.createElement("div", {
                   className: "grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-6 gap-4 items-center my-5"
                 }, Belt_Array.mapWithIndex(connectors, (function (index, connector) {
                         return React.createElement("div", {
