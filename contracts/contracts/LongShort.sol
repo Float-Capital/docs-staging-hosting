@@ -27,8 +27,8 @@ contract LongShort is ILongShort, Initializable {
 
     // Global state.
     address public admin; // This will likely be the Gnosis safe
-    uint256 public latestMarket;
-    mapping(uint256 => bool) public marketExists;
+    uint32 public latestMarket;
+    mapping(uint32 => bool) public marketExists;
 
     // Treasury contract that accrued fees and yield are sent to.
     address public treasury;
@@ -44,28 +44,28 @@ contract LongShort is ILongShort, Initializable {
     uint256 public constant feeUnitsOfPrecision = 10000;
 
     // Market state.
-    mapping(uint256 => uint256) public longValue;
-    mapping(uint256 => uint256) public shortValue;
-    mapping(uint256 => uint256) public totalValueLockedInMarket;
-    mapping(uint256 => uint256) public totalValueLockedInYieldManager;
-    mapping(uint256 => uint256) public totalValueReservedForTreasury;
-    mapping(uint256 => uint256) public assetPrice;
-    mapping(uint256 => uint256) public longTokenPrice;
-    mapping(uint256 => uint256) public shortTokenPrice;
-    mapping(uint256 => IERC20Upgradeable) public fundTokens;
-    mapping(uint256 => IYieldManager) public yieldManagers;
-    mapping(uint256 => IOracleManager) public oracleManagers;
+    mapping(uint32 => uint256) public longValue;
+    mapping(uint32 => uint256) public shortValue;
+    mapping(uint32 => uint256) public totalValueLockedInMarket;
+    mapping(uint32 => uint256) public totalValueLockedInYieldManager;
+    mapping(uint32 => uint256) public totalValueReservedForTreasury;
+    mapping(uint32 => uint256) public assetPrice;
+    mapping(uint32 => uint256) public longTokenPrice;
+    mapping(uint32 => uint256) public shortTokenPrice;
+    mapping(uint32 => IERC20Upgradeable) public fundTokens;
+    mapping(uint32 => IYieldManager) public yieldManagers;
+    mapping(uint32 => IOracleManager) public oracleManagers;
 
     // Synthetic long/short tokens users can mint and redeem.
-    mapping(uint256 => SyntheticToken) public longTokens;
-    mapping(uint256 => SyntheticToken) public shortTokens;
+    mapping(uint32 => SyntheticToken) public longTokens;
+    mapping(uint32 => SyntheticToken) public shortTokens;
 
     // Fees for minting/redeeming long/short tokens. Users are penalised
     // with extra fees for imbalancing the market.
-    mapping(uint256 => uint256) public baseEntryFee;
-    mapping(uint256 => uint256) public badLiquidityEntryFee;
-    mapping(uint256 => uint256) public baseExitFee;
-    mapping(uint256 => uint256) public badLiquidityExitFee;
+    mapping(uint32 => uint256) public baseEntryFee;
+    mapping(uint32 => uint256) public badLiquidityEntryFee;
+    mapping(uint32 => uint256) public baseExitFee;
+    mapping(uint32 => uint256) public badLiquidityExitFee;
 
     ////////////////////////////////////
     /////////// EVENTS /////////////////
@@ -74,22 +74,22 @@ contract LongShort is ILongShort, Initializable {
     event V1(address admin, address tokenFactory, address staker);
 
     event ValueLockedInSystem(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 totalValueLockedInMarket,
         uint256 longValue,
         uint256 shortValue
     );
 
     event TokenPriceRefreshed(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 longTokenPrice,
         uint256 shortTokenPrice
     );
 
-    event FeesLevied(uint256 marketIndex, uint256 totalFees);
+    event FeesLevied(uint32 marketIndex, uint256 totalFees);
 
     event SyntheticTokenCreated(
-        uint256 marketIndex,
+        uint32 marketIndex,
         address longTokenAddress,
         address shortTokenAddress,
         uint256 assetPrice,
@@ -99,14 +99,14 @@ contract LongShort is ILongShort, Initializable {
     );
 
     event PriceUpdate(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 oldPrice,
         uint256 newPrice,
         address user
     );
 
     event LongMinted(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 depositAdded,
         uint256 finalDepositAmount,
         uint256 tokensMinted,
@@ -114,7 +114,7 @@ contract LongShort is ILongShort, Initializable {
     );
 
     event ShortMinted(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 depositAdded,
         uint256 finalDepositAmount,
         uint256 tokensMinted,
@@ -122,7 +122,7 @@ contract LongShort is ILongShort, Initializable {
     );
 
     event LongRedeem(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 tokensRedeemed,
         uint256 valueOfRedemption,
         uint256 finalRedeemValue,
@@ -130,7 +130,7 @@ contract LongShort is ILongShort, Initializable {
     );
 
     event ShortRedeem(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 tokensRedeemed,
         uint256 valueOfRedemption,
         uint256 finalRedeemValue,
@@ -138,7 +138,7 @@ contract LongShort is ILongShort, Initializable {
     );
 
     event FeesChanges(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 baseEntryFee,
         uint256 badLiquidityEntryFee,
         uint256 baseExitFee,
@@ -163,12 +163,12 @@ contract LongShort is ILongShort, Initializable {
         _;
     }
 
-    modifier doesMarketExist(uint256 marketIndex) {
+    modifier doesMarketExist(uint32 marketIndex) {
         require(marketExists[marketIndex], "market doesn't exist");
         _;
     }
 
-    modifier refreshSystemState(uint256 marketIndex) {
+    modifier refreshSystemState(uint32 marketIndex) {
         _updateSystemStateInternal(marketIndex);
         _;
     }
@@ -204,7 +204,7 @@ contract LongShort is ILongShort, Initializable {
     }
 
     function changeFees(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 _baseEntryFee,
         uint256 _badLiquidityEntryFee,
         uint256 _baseExitFee,
@@ -220,7 +220,7 @@ contract LongShort is ILongShort, Initializable {
     }
 
     function _changeFees(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 _baseEntryFee,
         uint256 _badLiquidityEntryFee,
         uint256 _baseExitFee,
@@ -291,7 +291,7 @@ contract LongShort is ILongShort, Initializable {
     }
 
     function initializeMarket(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 _baseEntryFee,
         uint256 _badLiquidityEntryFee,
         uint256 _baseExitFee,
@@ -327,7 +327,7 @@ contract LongShort is ILongShort, Initializable {
     /**
      * Returns the latest price
      */
-    function getLatestPrice(uint256 marketIndex) internal returns (int256) {
+    function getLatestPrice(uint32 marketIndex) internal returns (int256) {
         oracleManagers[marketIndex].updatePrice();
         return oracleManagers[marketIndex].getLatestPrice();
     }
@@ -336,7 +336,7 @@ contract LongShort is ILongShort, Initializable {
      * Returns the amount of funds that LongShort can directly transfer.
      * Funds locked in the yield managers have to be withdrawn first.
      */
-    function getLiquidFunds(uint256 marketIndex) public view returns (uint256) {
+    function getLiquidFunds(uint32 marketIndex) public view returns (uint256) {
         return
             totalValueLockedInMarket[marketIndex] +
             totalValueReservedForTreasury[marketIndex] -
@@ -346,7 +346,7 @@ contract LongShort is ILongShort, Initializable {
     /**
      * Returns % of long position that is filled
      */
-    function getLongBeta(uint256 marketIndex) public view returns (uint256) {
+    function getLongBeta(uint32 marketIndex) public view returns (uint256) {
         // TODO account for contract start when these are both zero
         // and an erronous beta of 1 reported.
         if (shortValue[marketIndex] >= longValue[marketIndex]) {
@@ -362,7 +362,7 @@ contract LongShort is ILongShort, Initializable {
      * Returns % of short position that is filled
      * zero div error if both are zero
      */
-    function getShortBeta(uint256 marketIndex) public view returns (uint256) {
+    function getShortBeta(uint32 marketIndex) public view returns (uint256) {
         if (longValue[marketIndex] >= shortValue[marketIndex]) {
             return TEN_TO_THE_18;
         } else {
@@ -378,7 +378,7 @@ contract LongShort is ILongShort, Initializable {
      * market balance, more value goes to the market in proportion to how
      * imbalanced it is.
      */
-    function getTreasurySplit(uint256 marketIndex, uint256 amount)
+    function getTreasurySplit(uint32 marketIndex, uint256 amount)
         public
         view
         returns (uint256 marketAmount, uint256 treasuryAmount)
@@ -411,7 +411,7 @@ contract LongShort is ILongShort, Initializable {
      * market. To incentivise balance, more value goes to the weaker side in
      * proportion to how imbalanced the market is.
      */
-    function getMarketSplit(uint256 marketIndex, uint256 amount)
+    function getMarketSplit(uint32 marketIndex, uint256 amount)
         public
         view
         returns (uint256 longAmount, uint256 shortAmount)
@@ -437,7 +437,7 @@ contract LongShort is ILongShort, Initializable {
     /**
      * Adjusts the long/short token prices according to supply and value.
      */
-    function _refreshTokensPrice(uint256 marketIndex) internal {
+    function _refreshTokensPrice(uint32 marketIndex) internal {
         uint256 longTokenSupply = longTokens[marketIndex].totalSupply();
         if (longTokenSupply > 0) {
             longTokenPrice[marketIndex] =
@@ -462,7 +462,7 @@ contract LongShort is ILongShort, Initializable {
     /**
      * Controls what happens with mint/redeem fees.
      */
-    function _feesMechanism(uint256 marketIndex, uint256 totalFees) internal {
+    function _feesMechanism(uint32 marketIndex, uint256 totalFees) internal {
         // Market gets a bigger share if the market is more imbalanced.
         (uint256 marketAmount, uint256 treasuryAmount) =
             getTreasurySplit(marketIndex, totalFees);
@@ -483,7 +483,7 @@ contract LongShort is ILongShort, Initializable {
     /**
      * Controls what happens with accrued yield manager interest.
      */
-    function _yieldMechanism(uint256 marketIndex) internal {
+    function _yieldMechanism(uint32 marketIndex) internal {
         uint256 amount =
             yieldManagers[marketIndex].getTotalHeld() -
                 totalValueLockedInYieldManager[marketIndex];
@@ -506,7 +506,7 @@ contract LongShort is ILongShort, Initializable {
     }
 
     // TODO fix with beta
-    function _priceChangeMechanism(uint256 marketIndex, uint256 newPrice)
+    function _priceChangeMechanism(uint32 marketIndex, uint256 newPrice)
         internal
     {
         // If no new price update from oracle, proceed as normal
@@ -570,7 +570,7 @@ contract LongShort is ILongShort, Initializable {
      * Updates the value of the long and short sides within the system
      * Note this is public. Anyone can call this function.
      */
-    function _updateSystemStateInternal(uint256 marketIndex)
+    function _updateSystemStateInternal(uint32 marketIndex)
         internal
         doesMarketExist(marketIndex)
     {
@@ -625,13 +625,11 @@ contract LongShort is ILongShort, Initializable {
         );
     }
 
-    function _updateSystemState(uint256 marketIndex) external {
+    function _updateSystemState(uint32 marketIndex) external {
         _updateSystemStateInternal(marketIndex);
     }
 
-    function _updateSystemStateMulti(uint256[] calldata marketIndexes)
-        external
-    {
+    function _updateSystemStateMulti(uint32[] calldata marketIndexes) external {
         for (uint256 i = 0; i < marketIndexes.length; i++) {
             _updateSystemStateInternal(marketIndexes[i]);
         }
@@ -640,7 +638,7 @@ contract LongShort is ILongShort, Initializable {
     /*
      * Locks funds from the sender into the given market.
      */
-    function _depositFunds(uint256 marketIndex, uint256 amount) internal {
+    function _depositFunds(uint32 marketIndex, uint256 amount) internal {
         fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
 
         // Update global value state.
@@ -658,7 +656,7 @@ contract LongShort is ILongShort, Initializable {
     /*
      * Returns locked funds from the market to the sender.
      */
-    function _withdrawFunds(uint256 marketIndex, uint256 amount) internal {
+    function _withdrawFunds(uint32 marketIndex, uint256 amount) internal {
         require(totalValueLockedInMarket[marketIndex] >= amount);
 
         // Withdraw requisite funds from the yield managers if necessary.
@@ -682,7 +680,7 @@ contract LongShort is ILongShort, Initializable {
     /*
      * Transfers locked funds from LongShort into the yield manager.
      */
-    function _transferToYieldManager(uint256 marketIndex, uint256 amount)
+    function _transferToYieldManager(uint32 marketIndex, uint256 amount)
         internal
     {
         fundTokens[marketIndex].approve(
@@ -706,7 +704,7 @@ contract LongShort is ILongShort, Initializable {
     /*
      * Transfers locked funds from the yield manager into LongShort.
      */
-    function _transferFromYieldManager(uint256 marketIndex, uint256 amount)
+    function _transferFromYieldManager(uint32 marketIndex, uint256 amount)
         internal
     {
         require(totalValueLockedInYieldManager[marketIndex] >= amount);
@@ -730,7 +728,7 @@ contract LongShort is ILongShort, Initializable {
      * the market.
      */
     function _getFeesForAmounts(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 baseAmount, // e18
         uint256 penaltyAmount, // e18
         bool isMint // true for mint, false for redeem
@@ -759,7 +757,7 @@ contract LongShort is ILongShort, Initializable {
      * with higher fees for imbalancing the market.
      */
     function _getFeesForAction(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 amount, // 1e18
         bool isMint, // true for mint, false for redeem
         bool isLong // true for long side, false for short side
@@ -808,7 +806,7 @@ contract LongShort is ILongShort, Initializable {
     /**
      * Create a long position
      */
-    function mintLong(uint256 marketIndex, uint256 amount)
+    function mintLong(uint32 marketIndex, uint256 amount)
         external
         refreshSystemState(marketIndex)
     {
@@ -818,7 +816,7 @@ contract LongShort is ILongShort, Initializable {
     /**
      * Creates a short position
      */
-    function mintShort(uint256 marketIndex, uint256 amount)
+    function mintShort(uint32 marketIndex, uint256 amount)
         external
         refreshSystemState(marketIndex)
     {
@@ -828,7 +826,7 @@ contract LongShort is ILongShort, Initializable {
     /**
      * Creates a long position and stakes it
      */
-    function mintLongAndStake(uint256 marketIndex, uint256 amount)
+    function mintLongAndStake(uint32 marketIndex, uint256 amount)
         external
         refreshSystemState(marketIndex)
     {
@@ -845,7 +843,7 @@ contract LongShort is ILongShort, Initializable {
     /**
      * Creates a short position and stakes it
      */
-    function mintShortAndStake(uint256 marketIndex, uint256 amount)
+    function mintShortAndStake(uint32 marketIndex, uint256 amount)
         external
         refreshSystemState(marketIndex)
     {
@@ -860,7 +858,7 @@ contract LongShort is ILongShort, Initializable {
     }
 
     function _mintLong(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 amount,
         address user,
         address transferTo
@@ -892,7 +890,7 @@ contract LongShort is ILongShort, Initializable {
     }
 
     function _mintShort(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 amount,
         address user,
         address transferTo
@@ -927,7 +925,7 @@ contract LongShort is ILongShort, Initializable {
     /////////// REDEEM TOKENS //////////
     ////////////////////////////////////
 
-    function redeemLong(uint256 marketIndex, uint256 tokensToRedeem)
+    function redeemLong(uint32 marketIndex, uint256 tokensToRedeem)
         external
         override
         refreshSystemState(marketIndex)
@@ -965,7 +963,7 @@ contract LongShort is ILongShort, Initializable {
         );
     }
 
-    function redeemShort(uint256 marketIndex, uint256 tokensToRedeem)
+    function redeemShort(uint32 marketIndex, uint256 tokensToRedeem)
         external
         override
         refreshSystemState(marketIndex)
@@ -1014,7 +1012,7 @@ contract LongShort is ILongShort, Initializable {
      *
      * NOTE: doesn't affect markets, so no state refresh necessary
      */
-    function transferTreasuryFunds(uint256 marketIndex) external treasuryOnly {
+    function transferTreasuryFunds(uint32 marketIndex) external treasuryOnly {
         // Edge-case: no funds to transfer.
         if (totalValueReservedForTreasury[marketIndex] == 0) {
             return;
