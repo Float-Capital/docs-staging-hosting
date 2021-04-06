@@ -104,7 +104,7 @@ let make = () => {
         <a
           className="px-3 hover:opacity-60"
           target="_blank"
-          href="https://github.com/float-capital/float-contracts">
+          href="https://github.com/Float-Capital">
           <img src="/icons/github.svg" className="h-5" />
         </a>
         {switch optCurrentUser {

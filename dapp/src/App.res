@@ -24,13 +24,10 @@ let default = (props: props): React.element => {
 
   let content = React.createElement(component, pageProps)
 
-  // let (state, dispatch) = React.useReducer(ToastProvider.toastReducer, "")
-
   <ToastProvider>
-    // <Button onClick={_ => dispatch(Show("this new message"))}> {"Show"} </Button>
-    // <Button onClick={_ => dispatch(Hide)}> {"Hide"} </Button>
     <RootProvider>
       <Client>
+        <ComingSoon />
         <StateChangeMonitor>
           {switch router.route {
           | _ => <MainLayout> content </MainLayout>

@@ -3,6 +3,7 @@
 import * as Toast from "./components/UI/Toast.js";
 import * as React from "react";
 import * as Client from "./data/Client.js";
+import * as ComingSoon from "./components/ComingSoon.js";
 import * as MainLayout from "./layouts/MainLayout.js";
 import * as Router from "next/router";
 import * as RootProvider from "./libraries/RootProvider.js";
