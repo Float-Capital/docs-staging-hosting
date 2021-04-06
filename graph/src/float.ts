@@ -109,14 +109,14 @@ export function handleFeesLevied(event: FeesLevied): void {
 
 export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
   let marketIndex = event.params.marketIndex;
-  let contractCallCounter = event.params.contractCallCounter;
   let totalValueLockedInMarket = event.params.totalValueLockedInMarket;
   let longValue = event.params.longValue;
   let shortValue = event.params.shortValue;
+  let txHash = event.transaction.hash;
 
   let systemState = getOrCreateLatestSystemState(
     marketIndex,
-    contractCallCounter,
+    txHash,
     event
   );
   systemState.totalValueLocked = totalValueLockedInMarket;
@@ -130,19 +130,17 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
     "ValueLockedInSystem",
     bigIntArrayToStringArray([
       marketIndex,
-      contractCallCounter,
       totalValueLockedInMarket,
       longValue,
       shortValue,
     ]),
     [
       "marketIndex",
-      "contractCallCounter",
       "totalValueLockedInMarket",
       "longValue",
       "shortValue",
     ],
-    ["uint256", "uint256", "uint256", "uint256", "uint256"],
+    ["uint256", "uint256", "uint256", "uint256"],
     [],
     []
   );
@@ -311,7 +309,6 @@ export function handleLongMinted(event: LongMinted): void {
   let finalDepositAmount = event.params.finalDepositAmount;
   let tokensMinted = event.params.tokensMinted;
   let userAddress = event.params.user;
-  let contractCallCounter = event.params.contractCallCounter;
 
   let market = SyntheticMarket.load(marketIndex.toString());
   let syntheticToken = SyntheticToken.load(market.syntheticLong);
@@ -323,20 +320,18 @@ export function handleLongMinted(event: LongMinted): void {
     "LongMinted",
     bigIntArrayToStringArray([
       marketIndex,
-      contractCallCounter,
       depositAdded,
       finalDepositAmount,
       tokensMinted,
     ]).concat([userAddress.toHex()]),
     [
       "marketIndex",
-      "contractCallCounter",
       "depositAdded",
       "finalDepositAmount",
       "tokensMinted",
       "user",
     ],
-    ["uint256", "uint256", "uint256", "uint256", "uint256", "address"],
+    ["uint256", "uint256", "uint256", "uint256", "address"],
     [userAddress],
     []
   );
@@ -348,27 +343,24 @@ export function handleLongRedeem(event: LongRedeem): void {
   let valueOfRedemption = event.params.valueOfRedemption;
   let finalRedeemValue = event.params.finalRedeemValue;
   let user = event.params.user;
-  let contractCallCounter = event.params.contractCallCounter;
 
   saveEventToStateChange(
     event,
     "LongRedeem",
     bigIntArrayToStringArray([
       marketIndex,
-      contractCallCounter,
       tokensRedeemed,
       valueOfRedemption,
       finalRedeemValue,
     ]).concat([user.toHex()]),
     [
       "marketIndex",
-      "contractCallCounter",
       "tokensRedeemed",
       "valueOfRedemption",
       "finalRedeem",
       "user",
     ],
-    ["uint256", "uint256", "uint256", "uint256", "uint256", "address"],
+    ["uint256", "uint256", "uint256", "uint256", "address"],
     [user],
     []
   );
@@ -378,16 +370,16 @@ export function handlePriceUpdate(event: PriceUpdate): void {
   let marketIndex = event.params.marketIndex;
   let marketIndexString = marketIndex.toString();
 
-  let contractCallCounter = event.params.contractCallCounter;
   let newPrice = event.params.newPrice;
   let oldPrice = event.params.oldPrice;
   let user = event.params.user;
+  let txHash = event.transaction.hash;
 
   let syntheticMarket = SyntheticMarket.load(marketIndexString);
 
   let systemState = getOrCreateLatestSystemState(
     marketIndex,
-    contractCallCounter,
+    txHash,
     event
   );
   systemState.syntheticPrice = newPrice;
@@ -400,12 +392,11 @@ export function handlePriceUpdate(event: PriceUpdate): void {
     "PriceUpdate",
     bigIntArrayToStringArray([
       marketIndex,
-      contractCallCounter,
       oldPrice,
       newPrice,
     ]).concat([user.toHex()]),
-    ["marketIndex", "contractCallCounter", "newPrice", "oldPrice", "user"],
-    ["uint256", "uint256", "uint256", "uint256", "address"],
+    ["marketIndex", "newPrice", "oldPrice", "user"],
+    ["uint256", "uint256", "uint256", "address"],
     [user],
     []
   );
@@ -417,7 +408,6 @@ export function handleShortMinted(event: ShortMinted): void {
   let finalDepositAmount = event.params.finalDepositAmount;
   let tokensMinted = event.params.tokensMinted;
   let userAddress = event.params.user;
-  let contractCallCounter = event.params.contractCallCounter;
 
   let market = SyntheticMarket.load(marketIndex.toString());
   let syntheticToken = SyntheticToken.load(market.syntheticShort);
@@ -429,20 +419,18 @@ export function handleShortMinted(event: ShortMinted): void {
     "ShortMinted",
     bigIntArrayToStringArray([
       marketIndex,
-      contractCallCounter,
       depositAdded,
       finalDepositAmount,
       tokensMinted,
     ]).concat([userAddress.toHex()]),
     [
       "marketIndex",
-      "contractCallCounter",
       "depositAdded",
       "finalDepositAmount",
       "tokensMinted",
       "user",
     ],
-    ["uint256", "uint256", "uint256", "uint256", "uint256", "address"],
+    ["uint256",  "uint256", "uint256", "uint256", "address"],
     [userAddress],
     []
   );
@@ -454,27 +442,24 @@ export function handleShortRedeem(event: ShortRedeem): void {
   let valueOfRedemption = event.params.valueOfRedemption;
   let finalRedeemValue = event.params.finalRedeemValue;
   let user = event.params.user;
-  let contractCallCounter = event.params.contractCallCounter;
 
   saveEventToStateChange(
     event,
     "ShortRedeem",
     bigIntArrayToStringArray([
       marketIndex,
-      contractCallCounter,
       tokensRedeemed,
       valueOfRedemption,
       finalRedeemValue,
     ]).concat([user.toHex()]),
     [
       "marketIndex",
-      "contractCallCounter",
       "tokensRedeemed",
       "valueOfRedemption",
       "finalRedeem",
       "user",
     ],
-    ["uint256", "uint256", "uint256", "uint256", "uint256", "address"],
+    ["uint256", "uint256", "uint256", "uint256", "address"],
     [user],
     []
   );
@@ -535,14 +520,14 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
   let longTokenPrice = event.params.longTokenPrice;
   let shortTokenPrice = event.params.shortTokenPrice;
   let timestamp = event.block.timestamp;
+  let txHash = event.transaction.hash;
 
-  let contractCallCounter = event.params.contractCallCounter;
 
   let syntheticMarket = SyntheticMarket.load(marketIndexString);
 
   let systemState = getOrCreateLatestSystemState(
     marketIndex,
-    contractCallCounter,
+    txHash,
     event
   );
 
@@ -558,12 +543,11 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
     "TokenPriceRefreshed",
     bigIntArrayToStringArray([
       marketIndex,
-      contractCallCounter,
       longTokenPrice,
       shortTokenPrice,
     ]),
-    ["marketIndex", "contractCallCounter", "longTokenPrice", "shortTokenPrice"],
-    ["uint256", "uint256", "uint256", "uint256"],
+    ["marketIndex", "longTokenPrice", "shortTokenPrice"],
+    ["uint256", "uint256", "uint256"],
     [],
     []
   );
