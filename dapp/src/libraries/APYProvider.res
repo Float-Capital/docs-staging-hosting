@@ -51,6 +51,16 @@ module AaveAPYResponse = {
 }
 
 let determineAaveApy = setApy => {
+  let logError = (~reason=None, ()) => {
+    switch reason {
+    | Some(r) => {
+        Js.log(`Couldn't fetch AAVE Dai APY. Reason:`)
+        Js.log(r)
+      }
+    | None => Js.log(`Couldn't fetch AAVE Dai APY for unknown reason.`)
+    }
+  }
+
   let _ = Request.make(
     ~url="https://api.thegraph.com/subgraphs/name/aave/aave-v2-matic",
     ~responseType=Json,
@@ -76,20 +86,14 @@ let determineAaveApy = setApy => {
               ->Option.getUnsafe
             setApy(_ => Loaded(apy))
 
-          | _ => Js.log(`Couldn't fetch AAVE Dai APY.`)
+          | _ => logError()
           }
         }
-      | Error(e) => {
-          Js.log(`Couldn't fetch AAVE Dai APY. Reason:`)
-          Js.log(e)
-        }
+      | Error(e) => logError(~reason=Some(e), ())
       }
 
-    | Error(e) => {
-        Js.log(`Couldn't fetch AAVE Dai APY. Reason:`)
-        Js.log(e)
-      }
-    | _ => Js.log(`Couldn't fetch AAVE Dai APY for unknown reason.`)
+    | Error(e) => logError(~reason=Some(e), ())
+    | _ => logError()
     }
   )
 }

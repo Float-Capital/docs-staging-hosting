@@ -176,39 +176,43 @@ var AaveAPYResponse = {
 };
 
 function determineAaveApy(setApy) {
+  var logError = function (reasonOpt, param) {
+    var reason = reasonOpt !== undefined ? Caml_option.valFromOption(reasonOpt) : undefined;
+    if (reason !== undefined) {
+      console.log("Couldn't fetch AAVE Dai APY. Reason:");
+      console.log(Caml_option.valFromOption(reason));
+    } else {
+      console.log("Couldn't fetch AAVE Dai APY for unknown reason.");
+    }
+    
+  };
   Future.get($$Request.make("https://api.thegraph.com/subgraphs/name/aave/aave-v2-matic", "POST", /* Json */4, "{\"query\":\"{\\n  reserves(where:{symbol: \\\"DAI\\\"}){\\n    liquidityRate\\n  }\\n}\\n\",\"variables\":null}", Caml_option.some(Js_dict.fromArray([[
                       "Content-type",
                       "application/json"
                     ]])), undefined, undefined, undefined, undefined, undefined), (function (response) {
-          if (response.TAG === /* Ok */0) {
-            var response$1 = response._0.response;
-            if (response$1 !== undefined) {
-              var decoded = t_decode(Caml_option.valFromOption(response$1));
-              if (decoded.TAG === /* Ok */0) {
-                var inner = Belt_Array.get(decoded._0.data.reserves, 0);
-                if (inner !== undefined) {
-                  var apy = Belt_Float.fromString(Ethers.Utils.formatEther(Ethers$1.BigNumber.from(inner.liquidityRate).div(Ethers$1.BigNumber.from(1000000000))));
-                  return Curry._1(setApy, (function (param) {
-                                return {
-                                        TAG: 0,
-                                        _0: apy,
-                                        [Symbol.for("name")]: "Loaded"
-                                      };
-                              }));
-                }
-                console.log("Couldn't fetch AAVE Dai APY.");
-                return ;
-              }
-              console.log("Couldn't fetch AAVE Dai APY. Reason:");
-              console.log(decoded._0);
-              return ;
-            }
-            console.log("Couldn't fetch AAVE Dai APY for unknown reason.");
-            return ;
+          if (response.TAG !== /* Ok */0) {
+            return logError(Caml_option.some(response._0), undefined);
           }
-          console.log("Couldn't fetch AAVE Dai APY. Reason:");
-          console.log(response._0);
-          
+          var response$1 = response._0.response;
+          if (response$1 === undefined) {
+            return logError(undefined, undefined);
+          }
+          var decoded = t_decode(Caml_option.valFromOption(response$1));
+          if (decoded.TAG !== /* Ok */0) {
+            return logError(Caml_option.some(decoded._0), undefined);
+          }
+          var inner = Belt_Array.get(decoded._0.data.reserves, 0);
+          if (inner === undefined) {
+            return logError(undefined, undefined);
+          }
+          var apy = Belt_Float.fromString(Ethers.Utils.formatEther(Ethers$1.BigNumber.from(inner.liquidityRate).div(Ethers$1.BigNumber.from(1000000000))));
+          return Curry._1(setApy, (function (param) {
+                        return {
+                                TAG: 0,
+                                _0: apy,
+                                [Symbol.for("name")]: "Loaded"
+                              };
+                      }));
         }));
   
 }
