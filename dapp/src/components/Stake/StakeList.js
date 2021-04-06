@@ -20,7 +20,7 @@ function StakeList(Props) {
                   })))
     );
   return React.createElement("div", {
-              className: "w-full max-w-4xl mx-auto"
+              className: "w-full max-w-5xl mx-auto px-2 md:px-0"
             }, tmp);
 }
 

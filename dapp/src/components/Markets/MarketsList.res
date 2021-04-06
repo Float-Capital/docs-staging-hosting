@@ -5,7 +5,7 @@ module MarketsList = {
     let marketIndexOption = router.query->Js.Dict.get("marketIndex")
     let marketDetailsQuery = Queries.MarketDetails.use()
 
-    <div className="w-full max-w-4xl mx-auto px-3">
+    <div className="w-full max-w-5xl mx-auto px-2 md:px-0">
       {switch marketDetailsQuery {
       | {loading: true} => <div className="m-auto"> <MiniLoader /> </div>
       | {error: Some(_error)} => "Error loading data"->React.string

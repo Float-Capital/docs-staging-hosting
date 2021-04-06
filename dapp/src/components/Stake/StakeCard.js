@@ -110,6 +110,23 @@ function StakeCard(Props) {
   var longFloatApy = myfloatCalc(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
   var shortFloatApy = myfloatCalc(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
   var stakeOption = Js_dict.get(router.query, "tokenAddress");
+  var stakeButtons = function (param) {
+    return React.createElement("div", {
+                className: "flex flex-wrap justify-evenly"
+              }, React.createElement(Button.Small.make, {
+                    onClick: (function (param) {
+                        router.push("/stake?tokenAddress=" + Globals.ethAdrToLowerStr(longTokenAddress));
+                        
+                      }),
+                    children: "Stake Long"
+                  }), React.createElement(Button.Small.make, {
+                    onClick: (function (param) {
+                        router.push("/stake?tokenAddress=" + Globals.ethAdrToLowerStr(shortTokenAddress));
+                        
+                      }),
+                    children: "Stake Short"
+                  }));
+  };
   return React.createElement(React.Fragment, undefined, React.createElement("div", {
                   className: "p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg"
                 }, React.createElement("div", {
@@ -119,14 +136,16 @@ function StakeCard(Props) {
                         }, marketName, React.createElement(Tooltip.make, {
                               tip: "This market tracks " + marketName
                             }))), React.createElement("div", {
-                      className: "flex justify-center w-full"
+                      className: "flex flex-wrap justify-center w-full"
                     }, React.createElement(StakeCardSide.make, {
+                          orderPostion: 1,
+                          orderPostionMobile: 2,
                           marketName: marketName,
                           isLong: true,
                           apy: longApy,
                           floatApy: Number(Ethers.Utils.formatEther(longFloatApy))
                         }), React.createElement("div", {
-                          className: "w-1/2 flex items-center flex-col"
+                          className: "w-full md:w-1/2 flex items-center flex-col order-1 md:order-2"
                         }, React.createElement("h2", {
                               className: "text-xs mt-1"
                             }, React.createElement("span", {
@@ -137,25 +156,17 @@ function StakeCard(Props) {
                                 percentStrLong: percentStrLong,
                                 percentStrShort: percentStrShort
                               }), React.createElement("div", {
-                              className: "w-full flex justify-around"
-                            }, React.createElement(Button.Small.make, {
-                                  onClick: (function (param) {
-                                      router.push("/stake?tokenAddress=" + Globals.ethAdrToLowerStr(longTokenAddress));
-                                      
-                                    }),
-                                  children: "Stake Long"
-                                }), React.createElement(Button.Small.make, {
-                                  onClick: (function (param) {
-                                      router.push("/stake?tokenAddress=" + Globals.ethAdrToLowerStr(shortTokenAddress));
-                                      
-                                    }),
-                                  children: "Stake Short"
-                                }))), React.createElement(StakeCardSide.make, {
+                              className: "md:block hidden w-full flex justify-around"
+                            }, stakeButtons(undefined))), React.createElement(StakeCardSide.make, {
+                          orderPostion: 3,
+                          orderPostionMobile: 3,
                           marketName: marketName,
                           isLong: false,
                           apy: shortApy,
                           floatApy: Number(Ethers.Utils.formatEther(shortFloatApy))
-                        })), stakeOption !== undefined && (stakeOption === Globals.ethAdrToLowerStr(longTokenAddress) || stakeOption === Globals.ethAdrToLowerStr(shortTokenAddress)) ? React.createElement(StakeForm.make, {
+                        }), React.createElement("div", {
+                          className: "block md:hidden pt-5 order-4 w-full"
+                        }, stakeButtons(undefined))), stakeOption !== undefined && (stakeOption === Globals.ethAdrToLowerStr(longTokenAddress) || stakeOption === Globals.ethAdrToLowerStr(shortTokenAddress)) ? React.createElement(StakeForm.make, {
                         tokenId: stakeOption
                       }) : null));
 }
