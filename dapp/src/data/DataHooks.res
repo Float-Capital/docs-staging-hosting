@@ -174,7 +174,7 @@ type floatBalancesData = {
 
 @ocaml.doc(`Returns held and minted float token balances for the given user.`)
 let useFloatBalancesForUser = (~userId) => {
-  let usersStateQuery = Queries.UsersState.use({
+  let usersStateQuery = Queries.UserQuery.use({
     userId: userId,
   })
 

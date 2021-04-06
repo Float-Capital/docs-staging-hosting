@@ -60,6 +60,13 @@ body {
   height: 100%;
 }
 
+.v-align-in-responsive-height {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .loader {
   position: absolute;
   top: 50%;

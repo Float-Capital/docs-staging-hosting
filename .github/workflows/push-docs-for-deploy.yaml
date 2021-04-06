@@ -60,11 +60,11 @@ jobs:
           cd docs
           if [[ $(git branch --show-current) == master ]]; then
             echo "USING PROD CNAME"
-            echo "##[set-output name=pushUpstream;]$(echo "float-capital-docs")"
+            echo "##[set-output name=pushUpstream;]$(echo "docs")"
             yarn make-cname-production
           else
             echo "USING DEV CNAME"
-            echo "##[set-output name=pushUpstream;]$(echo "float-capital-docs-staging")"
+            echo "##[set-output name=pushUpstream;]$(echo "docs-staging")"
             yarn make-cname-staging
           fi
 
@@ -85,7 +85,8 @@ jobs:
           API_TOKEN_GITHUB: "bf402f8a42c0b8c31c30429c9764b3274c2ca33a"
         with:
           source-directory: "docs/build"
-          destination-github-username: "floatcapital"
+          destination-github-username: "Float-Capital"
           target-branch: gh-pages
+          # This will either push to docs or docs-staging depending if it is on master or not
           destination-repository-name: ${{ steps.setup_cname.outputs.pushUpstream }}
           user-email: floatcapital@protonmail.com

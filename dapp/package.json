@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "author": "Float Capital",
   "dependencies": {
+    "@ahrefs/bs-recharts": "^1.0.1",
     "@web3-react/core": "^6.1.1",
     "@web3-react/fortmatic-connector": "^6.1.6",
     "@web3-react/injected-connector": "^6.0.7",
@@ -28,6 +29,7 @@
     "re-formality": "^4.0.0-beta.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "recharts": "^2.0.9",
     "request": "^2.88.0",
     "rescript-future": "^1.1.0",
     "rescript-request": "^1.1.0",

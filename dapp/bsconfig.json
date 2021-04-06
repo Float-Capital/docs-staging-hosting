@@ -15,7 +15,8 @@
     "re-formality",
     "re-classnames",
     "rescript-future",
-    "rescript-request"
+    "rescript-request",
+    "@ahrefs/bs-recharts"
   ],
   "ppx-flags": [
     "@reasonml-community/graphql-ppx/ppx",

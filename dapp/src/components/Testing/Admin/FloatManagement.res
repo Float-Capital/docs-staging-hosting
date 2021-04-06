@@ -68,7 +68,7 @@ module Claimable = {
 let make = () => {
   let user = RootProvider.useCurrentUserExn()
   let floatTokenAddress = Config.useFloatAddress()
-  let userQuery = Queries.UsersState.use({userId: user->ethAdrToLowerStr})
+  let userQuery = Queries.UserQuery.use({userId: user->ethAdrToLowerStr})
   let floatBreakdown = FloatBreakdown.use()
 
   <div>
