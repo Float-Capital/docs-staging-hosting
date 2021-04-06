@@ -80,7 +80,7 @@ let determineAaveApy = setApy => {
           | Some(inner) =>
             let apy =
               Ethers.BigNumber.fromUnsafe(inner.liquidityRate)
-              ->Ethers.BigNumber.div(Ethers.BigNumber.fromInt(1000000000)) // input is 1e27
+              ->Ethers.BigNumber.div(CONSTANTS.tenToThe9) // input is 1e27
               ->Ethers.Utils.formatEther
               ->Float.fromString
               ->Option.getUnsafe

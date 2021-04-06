@@ -9,6 +9,7 @@ import * as Ethers$1 from "ethers";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
 import * as Js_json from "bs-platform/lib/es6/js_json.js";
 import * as $$Request from "rescript-request/src/Request.js";
+import * as CONSTANTS from "../CONSTANTS.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
@@ -205,7 +206,7 @@ function determineAaveApy(setApy) {
           if (inner === undefined) {
             return logError(undefined, undefined);
           }
-          var apy = Belt_Float.fromString(Ethers.Utils.formatEther(Ethers$1.BigNumber.from(inner.liquidityRate).div(Ethers$1.BigNumber.from(1000000000))));
+          var apy = Belt_Float.fromString(Ethers.Utils.formatEther(Ethers$1.BigNumber.from(inner.liquidityRate).div(CONSTANTS.tenToThe9)));
           return Curry._1(setApy, (function (param) {
                         return {
                                 TAG: 0,
