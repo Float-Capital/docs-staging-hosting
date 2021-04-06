@@ -422,7 +422,7 @@ contract Staker is IStaker, Initializable {
         }
     }
 
-    function claimFloat(address[] memory tokenAddresses) external {
+    function claimFloat(address[] calldata tokenAddresses) public {
         require(tokenAddresses.length <= 15); // Set some limit on loop length
         uint256 floatTotal = 0;
         for (uint256 i = 0; i < tokenAddresses.length; i++) {
@@ -450,9 +450,22 @@ contract Staker is IStaker, Initializable {
         }
     }
 
-    function claimFloatImmediately(address tokenAddress) external {
-        floatContract._updateSystemState(marketIndexOfToken[tokenAddress]);
-        mintAccumulatedFloat(tokenAddress, msg.sender);
+    // TODO: check if there is any gas benefit to this function over `claimFloatCustom`
+    function claimFloatImmediately(address[] calldata tokenAddresses) external {
+        for (uint256 i = 0; i < tokenAddresses.length; i++) {
+            floatContract._updateSystemState(
+                marketIndexOfToken[tokenAddresses[i]]
+            );
+        }
+        claimFloat(tokenAddresses);
+    }
+
+    function claimFloatCustom(
+        address[] calldata tokenAddresses,
+        uint256[] calldata marketIndexes
+    ) external {
+        floatContract._updateSystemStateMulti(marketIndexes);
+        claimFloat(tokenAddresses);
     }
 
     ////////////////////////////////////

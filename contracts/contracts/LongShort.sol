@@ -154,22 +154,22 @@ contract LongShort is ILongShort, Initializable {
      */
 
     modifier adminOnly() {
-        require(msg.sender == admin);
+        require(msg.sender == admin, "only admin");
         _;
     }
 
     modifier treasuryOnly() {
-        require(msg.sender == treasury);
+        require(msg.sender == treasury, "only treasury");
         _;
     }
 
     modifier doesMarketExist(uint256 marketIndex) {
-        require(marketExists[marketIndex]);
+        require(marketExists[marketIndex], "market doesn't exist");
         _;
     }
 
     modifier refreshSystemState(uint256 marketIndex) {
-        _updateSystemState(marketIndex);
+        _updateSystemStateInternal(marketIndex);
         _;
     }
 
@@ -570,8 +570,8 @@ contract LongShort is ILongShort, Initializable {
      * Updates the value of the long and short sides within the system
      * Note this is public. Anyone can call this function.
      */
-    function _updateSystemState(uint256 marketIndex)
-        public
+    function _updateSystemStateInternal(uint256 marketIndex)
+        internal
         doesMarketExist(marketIndex)
     {
         // This is called right before any state change!
@@ -619,11 +619,22 @@ contract LongShort is ILongShort, Initializable {
         );
 
         // Invariant: long/short values should never differ from total value.
-        require(
+        assert(
             longValue[marketIndex] + shortValue[marketIndex] ==
-                totalValueLockedInMarket[marketIndex],
-            "Total locked inconsistent"
+                totalValueLockedInMarket[marketIndex]
         );
+    }
+
+    function _updateSystemState(uint256 marketIndex) external {
+        _updateSystemStateInternal(marketIndex);
+    }
+
+    function _updateSystemStateMulti(uint256[] calldata marketIndexes)
+        external
+    {
+        for (uint256 i = 0; i < marketIndexes.length; i++) {
+            _updateSystemStateInternal(marketIndexes[i]);
+        }
     }
 
     /*
