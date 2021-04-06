@@ -1,9 +1,12 @@
+open APYProvider
+
 let isHotAPY = apy => apy > 0.15
 
 let mapVal = apy =>
   `${(apy *. 100.)->Js.Float.toFixedWithPrecision(~digits=2)}%${apy->isHotAPY
       ? `🔥`
       : ""}`->React.string
+
 
 @react.component
 let make = (~marketName, ~isLong, ~apy, ~floatApy) => {
@@ -17,7 +20,13 @@ let make = (~marketName, ~isLong, ~apy, ~floatApy) => {
         <span className="font-bold"> {isLong ? "LONG"->React.string : "SHORT"->React.string} </span>
         {" APY"->React.string}
       </h3>
-      <div className="text-2xl tracking-widest font-alphbeta"> {apy->mapVal} </div>
+      {
+        switch(apy){
+        | Loaded(apyVal) => <div className="text-2xl tracking-widest font-alphbeta"> {apyVal->mapVal} </div>
+        | _ => <MiniLoader/>
+      }
+      }
+      
     </div>
     <div className="flex flex-col items-center justify-center pt-0 mt-auto">
       <h3 className="text-xs mt-1">

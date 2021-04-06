@@ -16,11 +16,13 @@
     "re-classnames",
     "rescript-future",
     "rescript-request",
-    "@ahrefs/bs-recharts"
+    "@ahrefs/bs-recharts",
+    "decco"
   ],
   "ppx-flags": [
     "@reasonml-community/graphql-ppx/ppx",
-    "re-formality/ppx"
+    "re-formality/ppx",
+    "decco/ppx"
   ],
   "graphql": {
     "apolloMode": true,

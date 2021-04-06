@@ -8,6 +8,7 @@ import * as Tooltip from "./components/UI/Tooltip.js";
 import Link from "next/link";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as MiniLoader from "./components/UI/MiniLoader.js";
+import * as APYProvider from "./libraries/APYProvider.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as DashboardLi from "./components/UI/Dashboard/DashboardLi.js";
 import * as DashboardUl from "./components/UI/Dashboard/DashboardUl.js";
@@ -67,6 +68,7 @@ function Dashboard$TrendingStakes(Props) {
         undefined,
         undefined
       ]);
+  var apy = APYProvider.useAPY(undefined);
   var match = stakeDetailsQuery.data;
   if (stakeDetailsQuery.loading) {
     return React.createElement("div", {
@@ -79,7 +81,13 @@ function Dashboard$TrendingStakes(Props) {
   if (match === undefined) {
     return "You might think this is impossible, but depending on the situation it might not be!";
   }
-  var trendingStakes = DashboardCalcs.trendingStakes(match.syntheticMarkets);
+  if (typeof apy === "number") {
+    return React.createElement(MiniLoader.make, {});
+  }
+  if (apy.TAG !== /* Loaded */0) {
+    return React.createElement(MiniLoader.make, {});
+  }
+  var trendingStakes = DashboardCalcs.trendingStakes(match.syntheticMarkets, apy._0);
   return Belt_Array.map(trendingStakes, (function (param) {
                 var isLong = param.isLong;
                 var marketName = param.marketName;

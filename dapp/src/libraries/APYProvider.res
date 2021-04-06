@@ -1,7 +1,5 @@
 type t = Loading | Loaded(float) | Error(string)
 
-let vUnderlyingAssetAddress = "0x95c78222b3d6e262426483d42cfa53685a67ab9d"
-
 type providerT = {
   apy: t,
   shouldFetchData: bool,
@@ -31,8 +29,7 @@ module GenericAPYProvider = {
     let (apy, setApy) = React.useState(_ => Loading)
     let (shouldFetchData, setShouldFetchData) = React.useState(_ => false)
     React.useEffect3(_ => {
-      // if apy == Loading && shouldFetchData {
-      if true {
+      if apy == Loading && shouldFetchData {
         apyDeterminer(setApy)
       }
       None
@@ -45,37 +42,69 @@ module GenericAPYProvider = {
   }
 }
 
+module AaveAPYResponse = {
+  @decco.decode type i_list = {liquidityRate: string}
 
-type venusResponse = {
-  data: string
+  @decco.decode type inner = {reserves: array<i_list>}
+
+  @decco.decode type t = {data: inner}
 }
 
-let determineVenusApy = _ => {
+let determineAaveApy = setApy => {
   let _ = Request.make(
-    ~url="http://api.venus.io/api/vtoken?addresses=0x2ff3d0f6990a40261c66e1ff2017acbc282eb6d0",
+    ~url="https://api.thegraph.com/subgraphs/name/aave/aave-v2-matic",
     ~responseType=Json,
     ~headers=Js.Dict.fromArray([("Content-type", "application/json")]),
+    ~body="{\"query\":\"{\\n  reserves(where:{symbol: \\\"DAI\\\"}){\\n    liquidityRate\\n  }\\n}\\n\",\"variables\":null}",
+    ~method=#POST,
     (),
   )->Future.get(response =>
     switch response {
-    | Ok({response: Some(response)}) => Js.log(response)
-    | Error(e) => {
-      Js.log(`Couldn't fetch Venus APY. Reason:`)
-      Js.log(e)
+    | Ok({response: Some(response)}) =>
+      let decoded = response->AaveAPYResponse.t_decode
+
+      switch decoded {
+      | Ok(result) => {
+          let inner = result.data.reserves[0]
+          switch inner {
+          | Some(inner) =>
+            let apy =
+              Ethers.BigNumber.fromUnsafe(inner.liquidityRate)
+              ->Ethers.BigNumber.div(Ethers.BigNumber.fromInt(1000000000)) // input is 1e27
+              ->Ethers.Utils.formatEther
+              ->Float.fromString
+              ->Option.getUnsafe
+            setApy(_ => Loaded(apy))
+
+          | _ => Js.log(`Couldn't fetch AAVE Dai APY.`)
+          }
+        }
+      | Error(e) => {
+          Js.log(`Couldn't fetch AAVE Dai APY. Reason:`)
+          Js.log(e)
+        }
       }
-    |_  => Js.log(`Couldn't fetch Venus APY.`)
+
+    | Error(e) => {
+        Js.log(`Couldn't fetch AAVE Dai APY. Reason:`)
+        Js.log(e)
+      }
+    | _ => Js.log(`Couldn't fetch AAVE Dai APY for unknown reason.`)
     }
   )
 }
 
 @react.component
 let make = (~children) =>
-  <GenericAPYProvider apyDeterminer={determineVenusApy}> {children} </GenericAPYProvider>
+  <GenericAPYProvider apyDeterminer={determineAaveApy}> {children} </GenericAPYProvider>
 
 let useAPY = () => {
   let {shouldFetchData, setShouldFetchData, apy} = React.useContext(APYProviderContext.context)
-  if !shouldFetchData {
-    setShouldFetchData(_ => true)
-  }
+  React.useEffect1(_ => {
+    if !shouldFetchData {
+      setShouldFetchData(_ => true)
+    }
+    None
+  }, [setShouldFetchData])
   apy
 }

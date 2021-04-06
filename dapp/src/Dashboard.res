@@ -19,27 +19,33 @@ module Header = {
 }
 
 module TrendingStakes = {
+  open APYProvider
   @react.component
   let make = () => {
     let stakeDetailsQuery = Queries.StakingDetails.use()
+    let apy = APYProvider.useAPY()
 
     {
       switch stakeDetailsQuery {
       | {loading: true} => <div className="m-auto"> <MiniLoader /> </div>
       | {error: Some(_error)} => "Error loading data"->React.string
-      | {data: Some({syntheticMarkets})} => {
-          let trendingStakes = DashboardCalcs.trendingStakes(~syntheticMarkets)
-          trendingStakes
-          ->Array.map(({marketName, isLong, apy, floatApy}) =>
-            <DashboardStakeCard
-              marketName={marketName}
-              isLong={isLong}
-              yield={apy}
-              rewards={floatApy}
-              key={marketName ++ (isLong ? "-long" : "-short")}
-            />
-          )
-          ->React.array
+      | {data: Some({syntheticMarkets})} =>
+        switch apy {
+        | Loaded(apyVal) => {
+            let trendingStakes = DashboardCalcs.trendingStakes(~syntheticMarkets, ~apy=apyVal)
+            trendingStakes
+            ->Array.map(({marketName, isLong, apy, floatApy}) =>
+              <DashboardStakeCard
+                marketName={marketName}
+                isLong={isLong}
+                yield={apy}
+                rewards={floatApy}
+                key={marketName ++ (isLong ? "-long" : "-short")}
+              />
+            )
+            ->React.array
+          }
+        | _ => <MiniLoader />
         }
       | {data: None, error: None, loading: false} =>
         "You might think this is impossible, but depending on the situation it might not be!"->React.string

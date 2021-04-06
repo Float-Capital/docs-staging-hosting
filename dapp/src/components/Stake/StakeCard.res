@@ -1,4 +1,5 @@
 open Globals
+open APYProvider
 
 // Big numbers
 let zero = Ethers.BigNumber.fromUnsafe("0")
@@ -35,6 +36,12 @@ let basicApyCalc = (busdApy: float, longVal: float, shortVal: float, tokenType) 
   | _ => busdApy
   }
 }
+
+let mappedBasicCalc = (apy, longVal, shortVal, tokenType) =>
+  switch apy {
+  | Loaded(apyVal) => Loaded(basicApyCalc(apyVal, longVal, shortVal, tokenType))
+  | a => a
+  }
 
 // TODO: emit and pull these from graph. "kperiod, kInitialMultiplier."
 // For now going to hardcode them.
@@ -103,6 +110,8 @@ let make = (
 ) => {
   let router = Next.Router.useRouter()
 
+  let apy = APYProvider.useAPY()
+
   let longDollarValueStaked = calculateDollarValue(
     ~tokenPrice=longTokenPrice,
     ~amountStaked=longTotalStaked,
@@ -119,18 +128,19 @@ let make = (
       ->Js.Float.toFixedWithPrecision(~digits=2)
 
   // TODO: pull in APY from venus api
-  let longApy = basicApyCalc(
-    0.12,
+  let longApy = mappedBasicCalc(
+    apy,
     totalLockedLong->Ethers.Utils.formatEther->Js.Float.fromString,
     totalLockedShort->Ethers.Utils.formatEther->Js.Float.fromString,
     "long",
   )
-  let shortApy = basicApyCalc(
-    0.12,
+  let shortApy = mappedBasicCalc(
+    apy,
     totalLockedLong->Ethers.Utils.formatEther->Js.Float.fromString,
     totalLockedShort->Ethers.Utils.formatEther->Js.Float.fromString,
     "short",
   )
+
   let longFloatApy = myfloatCalc(
     totalLockedLong,
     totalLockedShort,
