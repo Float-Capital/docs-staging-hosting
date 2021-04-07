@@ -28,6 +28,7 @@ module UserBalancesCard = {
           </UserColumnTextCenter>
           <br />
           {balances
+          ->Array.keep(({tokenBalance}) => !(tokenBalance->Ethers.BigNumber.eq(CONSTANTS.zeroBN)))
           ->Array.map(({addr, name, isLong, tokenBalance, tokensValue}) =>
             <UserMarketBox
               key={`${name}-${isLong ? "long" : "short"}`}
