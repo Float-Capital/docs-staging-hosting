@@ -222,18 +222,7 @@ module MintFormInput = {
     <div className="screen-centered-container h-full">
       <ViewBox>
         <Form className="h-full" onSubmit>
-          <div className="relative">
-            {formInput}
-            {switch (txStateApprove, txStateMint) {
-            | (ContractActions.SignedAndSubmitted(_), _)
-            | (ContractActions.Created, _)
-            | (_, ContractActions.SignedAndSubmitted(_))
-            | (_, ContractActions.Created) =>
-              <span />
-            | _ => React.null
-            }}
-          </div>
-          {submitButton}
+          <div className="relative"> {formInput} </div> {submitButton}
         </Form>
       </ViewBox>
     </div>

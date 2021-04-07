@@ -690,8 +690,6 @@ function MintForm$MintFormInput(Props) {
   var disabledOpt = Props.disabled;
   var onBlurIsStakingOpt = Props.onBlurIsStaking;
   var onChangeIsStakingOpt = Props.onChangeIsStaking;
-  var txStateApproveOpt = Props.txStateApprove;
-  var txStateMintOpt = Props.txStateMint;
   var submitButtonOpt = Props.submitButton;
   var onSubmit = onSubmitOpt !== undefined ? onSubmitOpt : (function (param) {
         
@@ -722,8 +720,6 @@ function MintForm$MintFormInput(Props) {
   var onChangeIsStaking = onChangeIsStakingOpt !== undefined ? onChangeIsStakingOpt : (function (param) {
         
       });
-  var txStateApprove = txStateApproveOpt !== undefined ? txStateApproveOpt : /* UnInitialised */0;
-  var txStateMint = txStateMintOpt !== undefined ? txStateMintOpt : /* UnInitialised */0;
   var submitButton = submitButtonOpt !== undefined ? Caml_option.valFromOption(submitButtonOpt) : React.createElement(Button.make, {
           children: "Login & Mint"
         });
@@ -774,26 +770,6 @@ function MintForm$MintFormInput(Props) {
                     rel: "noopenner noreferrer",
                     target: "_blank"
                   }, "Learn more about staking"))));
-  var tmp;
-  var exit = 0;
-  if (typeof txStateApprove === "number") {
-    if (txStateApprove === /* Created */1) {
-      tmp = React.createElement("span", undefined);
-    } else {
-      exit = 1;
-    }
-  } else if (txStateApprove.TAG === /* SignedAndSubmitted */0) {
-    tmp = React.createElement("span", undefined);
-  } else {
-    exit = 1;
-  }
-  if (exit === 1) {
-    tmp = typeof txStateMint === "number" ? (
-        txStateMint === /* Created */1 ? React.createElement("span", undefined) : null
-      ) : (
-        txStateMint.TAG === /* SignedAndSubmitted */0 ? React.createElement("span", undefined) : null
-      );
-  }
   return React.createElement("div", {
               className: "screen-centered-container h-full"
             }, React.createElement(ViewBox.make, {
@@ -803,7 +779,7 @@ function MintForm$MintFormInput(Props) {
                         children: null
                       }, React.createElement("div", {
                             className: "relative"
-                          }, formInput, tmp), submitButton)
+                          }, formInput), submitButton)
                 }));
 }
 
