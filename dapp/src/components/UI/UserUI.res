@@ -188,11 +188,11 @@ module UserStakesCard = {
       let syntheticToken = stake.currentStake.syntheticToken
       let addr = syntheticToken.id->Ethers.Utils.getAddressUnsafe
       let name = syntheticToken.syntheticMarket.symbol
-      let tokens = syntheticToken.totalStaked->FormatMoney.formatEther
+      let tokens = stake.currentStake.amount->FormatMoney.formatEther
       let isLong = syntheticToken.tokenType->Obj.magic == "Long"
       let price = syntheticToken.latestPrice.price.price
       let value =
-        stake.currentStake.syntheticToken.totalStaked
+        stake.currentStake.amount
         ->Ethers.BigNumber.mul(price)
         ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
       totalValue := Ethers.BigNumber.add(totalValue.contents, value)
