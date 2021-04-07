@@ -1,3 +1,5 @@
+open APYProvider
+
 let isHotAPY = apy => apy > 0.15
 
 let mapVal = apy =>
@@ -18,7 +20,11 @@ let make = (~orderPostion, ~orderPostionMobile, ~marketName, ~isLong, ~apy, ~flo
         <span className="font-bold"> {isLong ? "LONG"->React.string : "SHORT"->React.string} </span>
         {" APY"->React.string}
       </h3>
-      <div className="text-2xl tracking-widest font-alphbeta"> {apy->mapVal} </div>
+      {switch apy {
+      | Loaded(apyVal) =>
+        <div className="text-2xl tracking-widest font-alphbeta"> {apyVal->mapVal} </div>
+      | _ => <MiniLoader />
+      }}
     </div>
     <div className="flex flex-col items-center justify-center pt-0 mt-auto">
       <h3 className="text-xs mt-1">

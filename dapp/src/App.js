@@ -5,6 +5,7 @@ import * as React from "react";
 import * as Client from "./data/Client.js";
 import * as ComingSoon from "./components/ComingSoon.js";
 import * as MainLayout from "./layouts/MainLayout.js";
+import * as APYProvider from "./libraries/APYProvider.js";
 import * as Router from "next/router";
 import * as RootProvider from "./libraries/RootProvider.js";
 import * as ToastProvider from "./components/UI/ToastProvider.js";
@@ -19,11 +20,13 @@ function $$default(props) {
               children: React.createElement(RootProvider.make, {
                     children: null
                   }, React.createElement(Client.make, {
-                        children: React.createElement(StateChangeMonitor.make, {
-                              children: React.createElement(MainLayout.make, {
-                                    children: content
-                                  })
-                            })
+                        children: React.createElement(APYProvider.make, {
+                              children: null
+                            }, React.createElement(ComingSoon.make, {}), React.createElement(StateChangeMonitor.make, {
+                                  children: React.createElement(MainLayout.make, {
+                                        children: content
+                                      })
+                                }))
                       }), React.createElement(Toast.make, {}))
             });
 }

@@ -177,7 +177,7 @@ function Navigation(Props) {
                           target: "_blank"
                         }, "DOCS"), React.createElement("a", {
                           className: "px-3 hover:opacity-60",
-                          href: "https://github.com/float-capital/float-contracts",
+                          href: "https://github.com/Float-Capital",
                           target: "_blank"
                         }, React.createElement("img", {
                               className: "h-5",

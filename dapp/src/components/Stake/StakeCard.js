@@ -10,6 +10,7 @@ import * as Tooltip from "../UI/Tooltip.js";
 import * as StakeBar from "../UI/StakeCard/StakeBar.js";
 import * as StakeForm from "./StakeForm.js";
 import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
+import * as APYProvider from "../../libraries/APYProvider.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as FormatMoney from "../UI/FormatMoney.js";
 import * as Router from "next/router";
@@ -49,6 +50,18 @@ function basicApyCalc(busdApy, longVal, shortVal, tokenType) {
         }
     default:
       return busdApy;
+  }
+}
+
+function mappedBasicCalc(apy, longVal, shortVal, tokenType) {
+  if (typeof apy === "number" || apy.TAG !== /* Loaded */0) {
+    return apy;
+  } else {
+    return {
+            TAG: 0,
+            _0: basicApyCalc(apy._0, longVal, shortVal, tokenType),
+            [Symbol.for("name")]: "Loaded"
+          };
   }
 }
 
@@ -100,13 +113,14 @@ function StakeCard(Props) {
   var timestampCreated = param.timestampCreated;
   var marketName = param.name;
   var router = Router.useRouter();
+  var apy = APYProvider.useAPY(undefined);
   var longDollarValueStaked = calculateDollarValue(match.longTokenPrice.price.price, match$2.totalStaked);
   var shortDollarValueStaked = calculateDollarValue(match.shortTokenPrice.price.price, match$1.totalStaked);
   var totalDollarValueStake = longDollarValueStaked.add(shortDollarValueStaked);
   var percentStrLong = percentStr(longDollarValueStaked, totalDollarValueStake);
   var percentStrShort = (100.0 - Belt_Option.getExn(Belt_Float.fromString(percentStrLong))).toFixed(2);
-  var longApy = basicApyCalc(0.12, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
-  var shortApy = basicApyCalc(0.12, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
+  var longApy = mappedBasicCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
+  var shortApy = mappedBasicCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
   var longFloatApy = myfloatCalc(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
   var shortFloatApy = myfloatCalc(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
   var stakeOption = Js_dict.get(router.query, "tokenAddress");
@@ -180,6 +194,7 @@ export {
   percentStr ,
   calculateDollarValue ,
   basicApyCalc ,
+  mappedBasicCalc ,
   kperiodHardcode ,
   kmultiplierHardcode ,
   kCalc ,
