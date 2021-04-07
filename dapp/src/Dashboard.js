@@ -240,7 +240,7 @@ function Dashboard(Props) {
     tmp = marketDetailsQuery.data !== undefined ? "Query returned wrong number of results" : "Error getting data";
   }
   return React.createElement("div", {
-              className: "w-screen absolute flex flex-col left-0 top-0 mt-20 overflow-x-hidden"
+              className: "w-screen absolute flex flex-col left-0 top-0 mt-40 overflow-x-hidden"
             }, tmp);
 }
 
