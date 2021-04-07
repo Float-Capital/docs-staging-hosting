@@ -52,7 +52,6 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint256 => uint256) public assetPrice;
     mapping(uint256 => uint256) public longTokenPrice;
     mapping(uint256 => uint256) public shortTokenPrice;
-    mapping(uint256 => uint256) public externalContractCounter;
     mapping(uint256 => IERC20Upgradeable) public fundTokens;
     mapping(uint256 => IYieldManager) public yieldManagers;
     mapping(uint256 => IOracleManager) public oracleManagers;
@@ -76,7 +75,6 @@ contract LongShort is ILongShort, Initializable {
 
     event ValueLockedInSystem(
         uint256 marketIndex,
-        uint256 contractCallCounter,
         uint256 totalValueLockedInMarket,
         uint256 longValue,
         uint256 shortValue
@@ -84,16 +82,11 @@ contract LongShort is ILongShort, Initializable {
 
     event TokenPriceRefreshed(
         uint256 marketIndex,
-        uint256 contractCallCounter,
         uint256 longTokenPrice,
         uint256 shortTokenPrice
     );
 
-    event FeesLevied(
-        uint256 marketIndex,
-        uint256 contractCallCounter,
-        uint256 totalFees
-    );
+    event FeesLevied(uint256 marketIndex, uint256 totalFees);
 
     event SyntheticTokenCreated(
         uint256 marketIndex,
@@ -107,7 +100,6 @@ contract LongShort is ILongShort, Initializable {
 
     event PriceUpdate(
         uint256 marketIndex,
-        uint256 contractCallCounter,
         uint256 oldPrice,
         uint256 newPrice,
         address user
@@ -115,7 +107,6 @@ contract LongShort is ILongShort, Initializable {
 
     event LongMinted(
         uint256 marketIndex,
-        uint256 contractCallCounter,
         uint256 depositAdded,
         uint256 finalDepositAmount,
         uint256 tokensMinted,
@@ -124,7 +115,6 @@ contract LongShort is ILongShort, Initializable {
 
     event ShortMinted(
         uint256 marketIndex,
-        uint256 contractCallCounter,
         uint256 depositAdded,
         uint256 finalDepositAmount,
         uint256 tokensMinted,
@@ -133,7 +123,6 @@ contract LongShort is ILongShort, Initializable {
 
     event LongRedeem(
         uint256 marketIndex,
-        uint256 contractCallCounter,
         uint256 tokensRedeemed,
         uint256 valueOfRedemption,
         uint256 finalRedeemValue,
@@ -142,7 +131,6 @@ contract LongShort is ILongShort, Initializable {
 
     event ShortRedeem(
         uint256 marketIndex,
-        uint256 contractCallCounter,
         uint256 tokensRedeemed,
         uint256 valueOfRedemption,
         uint256 finalRedeemValue,
@@ -182,13 +170,6 @@ contract LongShort is ILongShort, Initializable {
 
     modifier refreshSystemState(uint256 marketIndex) {
         _updateSystemState(marketIndex);
-        _;
-    }
-
-    modifier updateCounterIfExternalCall(uint256 marketIndex) {
-        if (msg.sender != address(this)) {
-            externalContractCounter[marketIndex]++;
-        }
         _;
     }
 
@@ -473,7 +454,6 @@ contract LongShort is ILongShort, Initializable {
 
         emit TokenPriceRefreshed(
             marketIndex,
-            externalContractCounter[marketIndex],
             longTokenPrice[marketIndex],
             shortTokenPrice[marketIndex]
         );
@@ -497,11 +477,7 @@ contract LongShort is ILongShort, Initializable {
         longValue[marketIndex] = longValue[marketIndex] + longAmount;
         shortValue[marketIndex] = shortValue[marketIndex] + shortAmount;
 
-        emit FeesLevied(
-            marketIndex,
-            externalContractCounter[marketIndex],
-            totalFees
-        );
+        emit FeesLevied(marketIndex, totalFees);
     }
 
     /**
@@ -597,7 +573,6 @@ contract LongShort is ILongShort, Initializable {
     function _updateSystemState(uint256 marketIndex)
         public
         doesMarketExist(marketIndex)
-        updateCounterIfExternalCall(marketIndex)
     {
         // This is called right before any state change!
         // So reward rate can be calculated just in time by
@@ -620,7 +595,6 @@ contract LongShort is ILongShort, Initializable {
         uint256 newPrice = uint256(getLatestPrice(marketIndex));
         emit PriceUpdate(
             marketIndex,
-            externalContractCounter[marketIndex],
             assetPrice[marketIndex],
             newPrice,
             msg.sender
@@ -639,7 +613,6 @@ contract LongShort is ILongShort, Initializable {
 
         emit ValueLockedInSystem(
             marketIndex,
-            externalContractCounter[marketIndex],
             totalValueLockedInMarket[marketIndex],
             longValue[marketIndex],
             shortValue[marketIndex]
@@ -896,18 +869,10 @@ contract LongShort is ILongShort, Initializable {
         longTokens[marketIndex].mint(transferTo, tokens);
         longValue[marketIndex] = longValue[marketIndex] + remaining;
 
-        emit LongMinted(
-            marketIndex,
-            externalContractCounter[marketIndex],
-            amount,
-            remaining,
-            tokens,
-            user
-        );
+        emit LongMinted(marketIndex, amount, remaining, tokens, user);
 
         emit ValueLockedInSystem(
             marketIndex,
-            externalContractCounter[marketIndex],
             totalValueLockedInMarket[marketIndex],
             longValue[marketIndex],
             shortValue[marketIndex]
@@ -936,18 +901,10 @@ contract LongShort is ILongShort, Initializable {
         shortTokens[marketIndex].mint(transferTo, tokens);
         shortValue[marketIndex] = shortValue[marketIndex] + remaining;
 
-        emit ShortMinted(
-            marketIndex,
-            externalContractCounter[marketIndex],
-            amount,
-            remaining,
-            tokens,
-            user
-        );
+        emit ShortMinted(marketIndex, amount, remaining, tokens, user);
 
         emit ValueLockedInSystem(
             marketIndex,
-            externalContractCounter[marketIndex],
             totalValueLockedInMarket[marketIndex],
             longValue[marketIndex],
             shortValue[marketIndex]
@@ -983,7 +940,6 @@ contract LongShort is ILongShort, Initializable {
 
         emit LongRedeem(
             marketIndex,
-            externalContractCounter[marketIndex],
             tokensToRedeem,
             amount,
             remaining,
@@ -992,7 +948,6 @@ contract LongShort is ILongShort, Initializable {
 
         emit ValueLockedInSystem(
             marketIndex,
-            externalContractCounter[marketIndex],
             totalValueLockedInMarket[marketIndex],
             longValue[marketIndex],
             shortValue[marketIndex]
@@ -1023,7 +978,6 @@ contract LongShort is ILongShort, Initializable {
 
         emit ShortRedeem(
             marketIndex,
-            externalContractCounter[marketIndex],
             tokensToRedeem,
             amount,
             remaining,
@@ -1032,7 +986,6 @@ contract LongShort is ILongShort, Initializable {
 
         emit ValueLockedInSystem(
             marketIndex,
-            externalContractCounter[marketIndex],
             totalValueLockedInMarket[marketIndex],
             longValue[marketIndex],
             shortValue[marketIndex]
