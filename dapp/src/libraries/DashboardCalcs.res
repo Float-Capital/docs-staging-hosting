@@ -12,7 +12,7 @@ type stakeApyType = {
   floatApy: float,
 }
 
-let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>) => {
+let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>, ~apy) => {
   syntheticMarkets
   ->Array.reduce([], (
     previous,
@@ -23,13 +23,13 @@ let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>) =
     },
   ) => {
     let longApy = StakeCard.basicApyCalc(
-      0.12,
+      apy,
       totalLockedLong->Ethers.Utils.formatEther->Js.Float.fromString,
       totalLockedShort->Ethers.Utils.formatEther->Js.Float.fromString,
       "long",
     )
     let shortApy = StakeCard.basicApyCalc(
-      0.12,
+      apy,
       totalLockedLong->Ethers.Utils.formatEther->Js.Float.fromString,
       totalLockedShort->Ethers.Utils.formatEther->Js.Float.fromString,
       "short",

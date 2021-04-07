@@ -4,25 +4,29 @@ pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
 import "./interfaces/IYieldManager.sol";
-import "./interfaces/IVToken.sol";
+import "./interfaces/aave/ILendingPool.sol";
 
 /*
- * YieldManagerVenus is an implementation of a yield manager that earns
- * APY through the venus.io protocol. Each underlying asset (such as BUSD)
- * has a corresponding vToken (such as vBUSD) that continuously accrues
+ * YieldManagerAave is an implementation of a yield manager that earns
+ * APY through the Aave protocol. Each underlying asset (such as DAI)
+ * has a corresponding aToken (such as aDAI) that continuously accrues
  * interest based on a lend/borrow liquidity ratio.
- *     see: https://docs.venus.io/docs/vtokens
+ *     see: https://docs.aave.com/portal/
  */
-contract YieldManagerVenus is IYieldManager, Initializable {
+contract YieldManagerAave is IYieldManager, Initializable {
     // Admin contracts.
     address public admin;
     address public longShort;
 
     // Global state.
     ERC20 token; // underlying asset token
-    IvToken vToken; // corresponding vToken
+    IERC20Upgradeable aToken; // corresponding aToken
+    ILendingPool lendingPool;
+
+    uint16 referralCode;
 
     ////////////////////////////////////
     /////////// MODIFIERS //////////////
@@ -44,20 +48,25 @@ contract YieldManagerVenus is IYieldManager, Initializable {
 
     /*
      * Initialises the yield manager with the given underlying asset token
-     * and corresponding venus vToken. We have to check whether it's BNB,
+     * and corresponding venus aToken. We have to check whether it's BNB,
      * since BNB has a different interface to other ERC20 tokens in venus.io.
      */
     function setup(
         address _admin,
         address _longShort,
         address _token,
-        address _vToken
+        address _aToken,
+        address _lendingPool,
+        uint16 _aaveReferalCode
     ) public initializer {
         admin = _admin;
         longShort = _longShort;
 
+        referralCode = _aaveReferalCode;
+
         token = ERC20(_token);
-        vToken = IvToken(_vToken);
+        aToken = IERC20Upgradeable(_aToken);
+        lendingPool = ILendingPool(_lendingPool);
     }
 
     ////////////////////////////////////
@@ -76,29 +85,33 @@ contract YieldManagerVenus is IYieldManager, Initializable {
         // Transfer tokens to manager contract.
         token.transferFrom(longShort, address(this), amount);
 
-        // Transfer tokens to vToken contract to mint vTokens.
-        token.approve(address(vToken), amount);
-        uint256 result = vToken.mint(amount);
+        // Transfer tokens to aToken contract to mint aTokens.
+        token.approve(address(aToken), amount);
 
-        // See https://docs.venus.io/docs/vtokens#error-codes.
-        require(result == 0);
+        // Deposit the desired amount of tokens into the aave pool
+        lendingPool.deposit(
+            address(token),
+            amount,
+            address(this),
+            referralCode
+        );
     }
 
     function withdrawToken(uint256 amount) public override longShortOnly {
-        // Redeem vToken for underlying asset tokens.
-        // TODO(guy): Handle edge-case where there isn't enough liquidity
-        //   on venus.io to redeem enough underlying assets.
-        uint256 result = vToken.redeemUnderlying(amount);
+        // Redeem aToken for underlying asset tokens.
+        uint256 amountWithdrawn =
+            lendingPool.withdraw(address(token), amount, address(this));
 
-        // See https://docs.venus.io/docs/vtokens#error-codes.
-        require(result == 0);
+        // TODO: if it only manages to do a partial withdraw this will revert. Make it partially work.
+        //       Not 100% sure this is how aave v2 works, need to read their code more carefully.
+        require(amountWithdrawn == amount);
 
         // Transfer tokens back to LongShort contract.
         token.transfer(longShort, amount);
     }
 
     function getTotalHeld() public override returns (uint256 amount) {
-        return vToken.balanceOfUnderlying(address(this));
+        return aToken.balanceOf(address(this));
     }
 
     function getHeldToken() public view override returns (address _token) {

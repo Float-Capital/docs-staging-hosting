@@ -6,7 +6,7 @@ import * as StakeCard from "../components/Stake/StakeCard.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as Belt_SortArray from "bs-platform/lib/es6/belt_SortArray.js";
 
-function trendingStakes(syntheticMarkets) {
+function trendingStakes(syntheticMarkets, apy) {
   return Belt_Array.slice(Belt_SortArray.stableSortBy(Belt_Array.reduce(syntheticMarkets, [], (function (previous, param) {
                         var match = param.latestSystemState;
                         var totalLockedShort = match.totalLockedShort;
@@ -14,8 +14,8 @@ function trendingStakes(syntheticMarkets) {
                         var currentTimestamp = match.timestamp;
                         var timestampCreated = param.timestampCreated;
                         var marketName = param.name;
-                        var longApy = StakeCard.basicApyCalc(0.12, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
-                        var shortApy = StakeCard.basicApyCalc(0.12, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
+                        var longApy = StakeCard.basicApyCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
+                        var shortApy = StakeCard.basicApyCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
                         var longFloatApy = StakeCard.myfloatCalc(totalLockedLong, totalLockedShort, StakeCard.kperiodHardcode, StakeCard.kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
                         var shortFloatApy = StakeCard.myfloatCalc(totalLockedLong, totalLockedShort, StakeCard.kperiodHardcode, StakeCard.kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
                         return Belt_Array.concat(previous, [
