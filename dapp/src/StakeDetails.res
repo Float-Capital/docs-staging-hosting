@@ -1,52 +1,5 @@
 open Globals
 
-module ClaimFloat = {
-  @react.component
-  let make = (~tokenAddresses) => {
-    let signer = ContractActions.useSignerExn()
-
-    let (contractExecutionHandler, _txState, _setTxState) = ContractActions.useContractFunction(
-      ~signer,
-    )
-
-    let stakerAddress = Config.useStakerAddress()
-
-    <Button.Tiny
-      onClick={_ => {
-        let _ = contractExecutionHandler(
-          ~makeContractInstance=Contracts.Staker.make(~address=stakerAddress),
-          ~contractFunction=Contracts.Staker.claimFloat(
-            ~tokenAddresses=tokenAddresses->Array.map(Ethers.Utils.getAddressUnsafe),
-          ),
-        )
-      }}>
-      "Claim Float"
-    </Button.Tiny>
-  }
-}
-module ClaimFloatImmediately = {
-  @react.component
-  let make = (~tokenAddress) => {
-    let signer = ContractActions.useSignerExn()
-
-    let (contractExecutionHandler, _txState, _setTxState) = ContractActions.useContractFunction(
-      ~signer,
-    )
-
-    let stakerAddress = Config.useStakerAddress()
-
-    <Button.Tiny
-      onClick={_ => {
-        Js.log("Claim float")
-        let _ = contractExecutionHandler(
-          ~makeContractInstance=Contracts.Staker.make(~address=stakerAddress),
-          ~contractFunction=Contracts.Staker.claimFloatImmediately(~tokenAddress),
-        )
-      }}>
-      "Claim Float"
-    </Button.Tiny>
-  }
-}
 module UsersActiveStakes = {
   @react.component
   let make = (~currentUser) => {
@@ -119,7 +72,7 @@ module UsersActiveStakes = {
                       //   tokenAddress={tokenAddress->Ethers.Utils.ethAdrToStr} tokenSymbol={"FLOAT"}
                       // />
                       // <ClaimFloat tokenAddresses=[tokenAddress] />
-                      <ClaimFloatImmediately tokenAddress />
+                      <ClaimFloatImmediatlyPerToken tokenAddress />
                     </div>
                   </div>
                 </Card>

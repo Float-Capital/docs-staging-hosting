@@ -3,8 +3,13 @@
 //     * https://tailwindui.com/components/application-ui/overlays/modals
 
 @react.component
-let make = (~closeModal=_ => (), ~children) => {
+let make = (~id, ~closeModal=_ => (), ~children) => {
   let (showModal, setShowModal) = React.useState(_ => true)
+
+  React.useEffect1(() => {
+    setShowModal(_ => true)
+    None
+  }, [id])
 
   let closeButton =
     <button

@@ -4,6 +4,7 @@ import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 
 function Modal(Props) {
+  var id = Props.id;
   var closeModalOpt = Props.closeModal;
   var children = Props.children;
   var closeModal = closeModalOpt !== undefined ? closeModalOpt : (function (param) {
@@ -13,6 +14,12 @@ function Modal(Props) {
         return true;
       });
   var setShowModal = match[1];
+  React.useEffect((function () {
+          Curry._1(setShowModal, (function (param) {
+                  return true;
+                }));
+          
+        }), [id]);
   var closeButton = React.createElement("button", {
         className: "p-1 ml-auto float-right text-3xl leading-none outline-none focus:outline-none",
         onClick: (function (param) {

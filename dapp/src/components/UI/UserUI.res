@@ -252,7 +252,10 @@ module UserFloatCard = {
             {isCurrentUser
               ? <div className=`flex justify-around flex-row my-1`>
                   {`🌊`->React.string}
-                  <StakeDetails.ClaimFloat tokenAddresses=synthTokens />
+                  <ClaimFloat tokenAddresses=synthTokens />
+                  <Tooltip
+                    tip={`Claiming float is still under development, only partial withdrawals are possible currently`}
+                  />
                   {`🌊`->React.string}
                 </div>
               : React.null}

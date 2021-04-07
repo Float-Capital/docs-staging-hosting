@@ -52,8 +52,6 @@ module SubmitButtonAndTxTracker = {
     ~buttonText,
     ~buttonDisabled,
   ) => {
-    let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
-
     switch (txStateApprove, txStateMint) {
     | (ContractActions.Created, _) =>
       <div className="text-center m-3">

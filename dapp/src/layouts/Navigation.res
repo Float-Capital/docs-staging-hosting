@@ -102,9 +102,7 @@ let make = () => {
           {React.string("DOCS")}
         </a>
         <a
-          className="px-3 hover:opacity-60"
-          target="_blank"
-          href="https://github.com/Float-Capital">
+          className="px-3 hover:opacity-60" target="_blank" href="https://github.com/Float-Capital">
           <img src="/icons/github.svg" className="h-5" />
         </a>
         {switch optCurrentUser {

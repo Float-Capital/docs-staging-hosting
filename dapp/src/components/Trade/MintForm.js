@@ -548,7 +548,6 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
   var tokenToMint = Props.tokenToMint;
   var buttonText = Props.buttonText;
   var buttonDisabled = Props.buttonDisabled;
-  React.useContext(ToastProvider.DispatchToastContext.context);
   var exit = 0;
   if (typeof txStateApprove === "number") {
     switch (txStateApprove) {
