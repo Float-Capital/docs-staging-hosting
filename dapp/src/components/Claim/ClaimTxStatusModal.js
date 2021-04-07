@@ -5,7 +5,7 @@ import * as React from "react";
 import * as Config from "../../Config.js";
 import * as MiniLoader from "../UI/MiniLoader.js";
 
-function ClaimTxStatus(Props) {
+function ClaimTxStatusModal(Props) {
   var txState = Props.txState;
   if (typeof txState === "number") {
     switch (txState) {
@@ -68,7 +68,7 @@ function ClaimTxStatus(Props) {
   }
 }
 
-var make = ClaimTxStatus;
+var make = ClaimTxStatusModal;
 
 export {
   make ,

@@ -18,9 +18,9 @@ import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as Router from "next/router";
 import * as RootProvider from "../../libraries/RootProvider.js";
 import * as ContractHooks from "../Testing/Admin/ContractHooks.js";
-import * as StakeTxStatus from "./StakeTxStatus.js";
 import * as ToastProvider from "../UI/ToastProvider.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
+import * as StakeTxStatusModal from "./StakeTxStatusModal.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
 
 var validators = {
@@ -422,16 +422,19 @@ function StakeForm$StakeFormInput(Props) {
   var onSubmitOpt = Props.onSubmit;
   var valueOpt = Props.value;
   var optBalanceOpt = Props.optBalance;
+  var buttonDisabledOpt = Props.buttonDisabled;
   var disabledOpt = Props.disabled;
   var onChangeOpt = Props.onChange;
   var onBlurOpt = Props.onBlur;
   var onMaxClickOpt = Props.onMaxClick;
-  var submitButtonOpt = Props.submitButton;
+  var synthetic = Props.synthetic;
+  var txStatusModalsOpt = Props.txStatusModals;
   var onSubmit = onSubmitOpt !== undefined ? onSubmitOpt : (function (param) {
         
       });
   var value = valueOpt !== undefined ? valueOpt : "";
   var optBalance = optBalanceOpt !== undefined ? Caml_option.valFromOption(optBalanceOpt) : undefined;
+  var buttonDisabled = buttonDisabledOpt !== undefined ? buttonDisabledOpt : false;
   var disabled = disabledOpt !== undefined ? disabledOpt : false;
   var onChange = onChangeOpt !== undefined ? onChangeOpt : (function (param) {
         
@@ -442,9 +445,7 @@ function StakeForm$StakeFormInput(Props) {
   var onMaxClick = onMaxClickOpt !== undefined ? onMaxClickOpt : (function (param) {
         
       });
-  var submitButton = submitButtonOpt !== undefined ? Caml_option.valFromOption(submitButtonOpt) : React.createElement(Button.make, {
-          children: "Login & Stake"
-        });
+  var txStatusModals = txStatusModalsOpt !== undefined ? Caml_option.valFromOption(txStatusModalsOpt) : null;
   return React.createElement(Form.make, {
               className: "mx-auto max-w-3xl",
               onSubmit: onSubmit,
@@ -457,7 +458,13 @@ function StakeForm$StakeFormInput(Props) {
                   onBlur: onBlur,
                   onChange: onChange,
                   onMaxClick: onMaxClick
-                }), submitButton);
+                }), React.createElement(Button.make, {
+                  onClick: (function (param) {
+                      
+                    }),
+                  children: "Stake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name,
+                  disabled: buttonDisabled
+                }), txStatusModals);
 }
 
 var StakeFormInput = {
@@ -673,13 +680,11 @@ function StakeForm$ConnectedStakeForm(Props) {
                               }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
                 }),
               synthetic: synthetic,
-              submitButton: React.createElement(StakeTxStatus.make, {
+              txStatusModals: React.createElement(StakeTxStatusModal.make, {
                     txStateApprove: txStateApprove,
                     txStateStake: txState,
                     resetFormButton: resetFormButton,
-                    tokenToStake: tokenToStake,
-                    buttonText: "Stake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name,
-                    buttonDisabled: buttonDisabled
+                    tokenToStake: tokenToStake
                   })
             });
 }

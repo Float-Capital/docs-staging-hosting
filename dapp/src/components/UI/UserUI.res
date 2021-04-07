@@ -169,7 +169,9 @@ module UserMarketUnstake = {
         ? <>
             <Button.Tiny onClick={openUnstakeModal}> {`unstake`} </Button.Tiny>
             {showUnstakeModal
-              ? <Modal closeModal=closeUnstakeModal> <Unstake tokenId=synthAddressStr /> </Modal>
+              ? <Modal id={"unstake"} closeModal=closeUnstakeModal>
+                  <Unstake tokenId=synthAddressStr />
+                </Modal>
               : React.null}
           </>
         : React.null}

@@ -1,21 +1,14 @@
 @react.component
-let make = (
-  ~txStateApprove,
-  ~txStateStake,
-  ~resetFormButton,
-  ~tokenToStake,
-  ~buttonText,
-  ~buttonDisabled,
-) => {
+let make = (~txStateApprove, ~txStateStake, ~resetFormButton, ~tokenToStake) => {
   switch (txStateApprove, txStateStake) {
   | (ContractActions.Created, _) =>
-    <Modal>
+    <Modal id={"stake-approve-1"}>
       <div className="text-center m-3">
         <p> {`Confirm approve transaction in your wallet `->React.string} </p>
       </div>
     </Modal>
   | (ContractActions.SignedAndSubmitted(txHash), _) =>
-    <Modal>
+    <Modal id={"stake-approve-2"}>
       <div className="text-center m-3">
         <MiniLoader />
         <p> {"Approval transaction pending... "->React.string} </p>
@@ -26,14 +19,14 @@ let make = (
     </Modal>
   | (ContractActions.Complete({transactionHash}), ContractActions.Created)
   | (ContractActions.Complete({transactionHash}), ContractActions.UnInitialised) =>
-    <Modal>
+    <Modal id={"stake-approve-3"}>
       <div className="text-center m-3">
         <p> {`Confirm transaction to stake ${tokenToStake}`->React.string} </p>
       </div>
     </Modal>
   | (ContractActions.Declined(message), _) => <> {resetFormButton()} </>
   | (ContractActions.Failed, _) =>
-    <Modal>
+    <Modal id={"stake-approve-4"}>
       <div className="text-center m-3">
         <p> {`The transaction failed.`->React.string} </p>
         <p>
@@ -45,13 +38,13 @@ let make = (
       </div>
     </Modal>
   | (_, ContractActions.Created) =>
-    <Modal>
+    <Modal id={"stake-1"}>
       <div className="text-center m-3">
         <h1> {`Confirm the transaction to stake ${tokenToStake}`->React.string} </h1>
       </div>
     </Modal>
   | (ContractActions.Complete({transactionHash}), ContractActions.SignedAndSubmitted(txHash)) =>
-    <Modal>
+    <Modal id={"stake-2"}>
       <div className="text-center m-3">
         <p>
           <a
@@ -72,7 +65,7 @@ let make = (
       </div>
     </Modal>
   | (_, ContractActions.SignedAndSubmitted(txHash)) =>
-    <Modal>
+    <Modal id={"stake-3"}>
       <div className="text-center m-3">
         <MiniLoader />
         <p> {"Staking transaction pending... "->React.string} </p>
@@ -86,13 +79,13 @@ let make = (
       </div>
     </Modal>
   | (_, ContractActions.Complete({transactionHash})) =>
-    <Modal>
+    <Modal id={"stake-4"}>
       <div className="text-center m-3">
         <p> {`Transaction complete`->React.string} </p> {resetFormButton()}
       </div>
     </Modal>
   | (_, ContractActions.Declined(message)) =>
-    <Modal>
+    <Modal id={"stake-5"}>
       <div className="text-center m-3">
         <p> {`The transaction was rejected by your wallet`->React.string} </p>
         <a target="_" rel="noopenner noreferer" href=Config.discordInviteLink>
@@ -102,7 +95,7 @@ let make = (
       </div>
     </Modal>
   | (_, ContractActions.Failed) =>
-    <Modal>
+    <Modal id={"stake-6"}>
       <div className="text-center m-3">
         <h1> {`The transaction failed.`->React.string} </h1>
         <p>
@@ -113,6 +106,6 @@ let make = (
         {resetFormButton()}
       </div>
     </Modal>
-  | _ => <Button disabled=buttonDisabled onClick={_ => ()}> {buttonText} </Button>
+  | _ => React.null
   }
 }

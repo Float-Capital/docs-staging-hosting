@@ -242,6 +242,7 @@ function UserUI$UserMarketUnstake(Props) {
                         onClick: openUnstakeModal,
                         children: "unstake"
                       }), showUnstakeModal ? React.createElement(Modal.make, {
+                          id: "unstake",
                           closeModal: closeUnstakeModal,
                           children: React.createElement(Unstake.make, {
                                 tokenId: synthAddressStr

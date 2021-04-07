@@ -32,7 +32,7 @@ module StakeFormInput = {
     ~onBlur=_ => (),
     ~onMaxClick=_ => (),
     ~synthetic: Queries.SyntheticTokenInfo.t,
-    ~submitButton=<Button> "Login & Stake" </Button>,
+    ~txStatusModals=React.null,
   ) =>
     <Form className="mx-auto max-w-3xl" onSubmit>
       // <div className="px-8 pt-2">
@@ -50,12 +50,10 @@ module StakeFormInput = {
       //   </div>
       // </div>
       <AmountInput value optBalance disabled onBlur onChange placeholder={"Stake"} onMaxClick />
-      {
-        // <Button disabled={buttonDisabled}>
-        //   {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
-        // </Button>
-        submitButton
-      }
+      <Button disabled=buttonDisabled onClick={_ => ()}>
+        {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
+      </Button>
+      {txStatusModals}
     </Form>
 }
 
@@ -226,13 +224,8 @@ module ConnectedStakeForm = {
           },
         )}
       synthetic
-      submitButton={<StakeTxStatus
-        buttonText={`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
-        resetFormButton
-        tokenToStake
-        txStateApprove
-        txStateStake=txState
-        buttonDisabled
+      txStatusModals={<StakeTxStatusModal
+        resetFormButton tokenToStake txStateApprove txStateStake=txState
       />}
     />
   }

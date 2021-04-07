@@ -7,9 +7,9 @@ import * as Config from "../../Config.js";
 import * as Ethers from "ethers";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
-import * as ClaimTxStatus from "./ClaimTxStatus.js";
 import * as ToastProvider from "../UI/ToastProvider.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
+import * as ClaimTxStatusModal from "./ClaimTxStatusModal.js";
 
 function ClaimFloat(Props) {
   var tokenAddresses = Props.tokenAddresses;
@@ -73,28 +73,20 @@ function ClaimFloat(Props) {
           }
           
         }), [txState]);
-  var claimFloatCall = function (param) {
-    var arg = Belt_Array.map(tokenAddresses, (function (prim) {
-            return Ethers.utils.getAddress(prim);
-          }));
-    return Curry._2(contractExecutionHandler, (function (param) {
-                  return Contracts.Staker.make(stakerAddress, param);
-                }), (function (param) {
-                  return param.claimFloat(arg);
-                }));
-  };
   return React.createElement(React.Fragment, undefined, React.createElement(Button.Tiny.make, {
                   onClick: (function (param) {
-                      return claimFloatCall(undefined);
+                      var arg = Belt_Array.map(tokenAddresses, (function (prim) {
+                              return Ethers.utils.getAddress(prim);
+                            }));
+                      return Curry._2(contractExecutionHandler, (function (param) {
+                                    return Contracts.Staker.make(stakerAddress, param);
+                                  }), (function (param) {
+                                    return param.claimFloat(arg);
+                                  }));
                     }),
                   children: "Claim Float"
-                }), React.createElement(ClaimTxStatus.make, {
-                  txState: txState,
-                  buttonText: "Claim Float",
-                  buttonDisabled: false,
-                  onClick: (function (param) {
-                      return claimFloatCall(undefined);
-                    })
+                }), React.createElement(ClaimTxStatusModal.make, {
+                  txState: txState
                 }));
 }
 

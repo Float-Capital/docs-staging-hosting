@@ -46,8 +46,6 @@ let make = (~tokenAddresses) => {
 
   <>
     <Button.Tiny onClick={_ => claimFloatCall()}> "Claim Float" </Button.Tiny>
-    <ClaimTxStatus
-      txState buttonText={"Claim Float"} buttonDisabled={false} onClick={_ => claimFloatCall()}
-    />
+    <ClaimTxStatusModal txState />
   </>
 }

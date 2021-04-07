@@ -3,17 +3,14 @@
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as Modal from "../UI/Modal.js";
 import * as React from "react";
-import * as Button from "../UI/Button.js";
 import * as Config from "../../Config.js";
 import * as MiniLoader from "../UI/MiniLoader.js";
 
-function StakeTxStatus(Props) {
+function StakeTxStatusModal(Props) {
   var txStateApprove = Props.txStateApprove;
   var txStateStake = Props.txStateStake;
   var resetFormButton = Props.resetFormButton;
   var tokenToStake = Props.tokenToStake;
-  var buttonText = Props.buttonText;
-  var buttonDisabled = Props.buttonDisabled;
   var exit = 0;
   if (typeof txStateApprove === "number") {
     switch (txStateApprove) {
@@ -22,12 +19,14 @@ function StakeTxStatus(Props) {
           break;
       case /* Created */1 :
           return React.createElement(Modal.make, {
+                      id: "stake-approve-1",
                       children: React.createElement("div", {
                             className: "text-center m-3"
                           }, React.createElement("p", undefined, "Confirm approve transaction in your wallet "))
                     });
       case /* Failed */2 :
           return React.createElement(Modal.make, {
+                      id: "stake-approve-4",
                       children: React.createElement("div", {
                             className: "text-center m-3"
                           }, React.createElement("p", undefined, "The transaction failed."), React.createElement("p", undefined, React.createElement("a", {
@@ -42,6 +41,7 @@ function StakeTxStatus(Props) {
     switch (txStateApprove.TAG | 0) {
       case /* SignedAndSubmitted */0 :
           return React.createElement(Modal.make, {
+                      id: "stake-approve-2",
                       children: React.createElement("div", {
                             className: "text-center m-3"
                           }, React.createElement(MiniLoader.make, {}), React.createElement("p", undefined, "Approval transaction pending... "), React.createElement("a", {
@@ -65,6 +65,7 @@ function StakeTxStatus(Props) {
           } else {
             if (txStateStake.TAG === /* SignedAndSubmitted */0) {
               return React.createElement(Modal.make, {
+                          id: "stake-2",
                           children: React.createElement("div", {
                                 className: "text-center m-3"
                               }, React.createElement("p", undefined, React.createElement("a", {
@@ -89,21 +90,17 @@ function StakeTxStatus(Props) {
         if (typeof txStateStake === "number") {
           switch (txStateStake) {
             case /* UnInitialised */0 :
-                return React.createElement(Button.make, {
-                            onClick: (function (param) {
-                                
-                              }),
-                            children: buttonText,
-                            disabled: buttonDisabled
-                          });
+                return null;
             case /* Created */1 :
                 return React.createElement(Modal.make, {
+                            id: "stake-1",
                             children: React.createElement("div", {
                                   className: "text-center m-3"
                                 }, React.createElement("h1", undefined, "Confirm the transaction to stake " + tokenToStake))
                           });
             case /* Failed */2 :
                 return React.createElement(Modal.make, {
+                            id: "stake-6",
                             children: React.createElement("div", {
                                   className: "text-center m-3"
                                 }, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, React.createElement("a", {
@@ -118,6 +115,7 @@ function StakeTxStatus(Props) {
           switch (txStateStake.TAG | 0) {
             case /* SignedAndSubmitted */0 :
                 return React.createElement(Modal.make, {
+                            id: "stake-3",
                             children: React.createElement("div", {
                                   className: "text-center m-3"
                                 }, React.createElement(MiniLoader.make, {}), React.createElement("p", undefined, "Staking transaction pending... "), React.createElement("a", {
@@ -129,6 +127,7 @@ function StakeTxStatus(Props) {
                           });
             case /* Declined */1 :
                 return React.createElement(Modal.make, {
+                            id: "stake-5",
                             children: React.createElement("div", {
                                   className: "text-center m-3"
                                 }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement("a", {
@@ -139,6 +138,7 @@ function StakeTxStatus(Props) {
                           });
             case /* Complete */2 :
                 return React.createElement(Modal.make, {
+                            id: "stake-4",
                             children: React.createElement("div", {
                                   className: "text-center m-3"
                                 }, React.createElement("p", undefined, "Transaction complete"), Curry._1(resetFormButton, undefined))
@@ -148,6 +148,7 @@ function StakeTxStatus(Props) {
         }
     case 2 :
         return React.createElement(Modal.make, {
+                    id: "stake-approve-3",
                     children: React.createElement("div", {
                           className: "text-center m-3"
                         }, React.createElement("p", undefined, "Confirm transaction to stake " + tokenToStake))
@@ -156,7 +157,7 @@ function StakeTxStatus(Props) {
   }
 }
 
-var make = StakeTxStatus;
+var make = StakeTxStatusModal;
 
 export {
   make ,
