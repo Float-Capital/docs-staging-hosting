@@ -414,7 +414,6 @@ function useBalanceAndApproved(erc20Address, spender) {
 function Unstake$StakeFormInput(Props) {
   var onSubmitOpt = Props.onSubmit;
   var valueOpt = Props.value;
-  var optBalanceOpt = Props.optBalance;
   var disabledOpt = Props.disabled;
   var onChangeOpt = Props.onChange;
   var onBlurOpt = Props.onBlur;
@@ -424,7 +423,6 @@ function Unstake$StakeFormInput(Props) {
         
       });
   var value = valueOpt !== undefined ? valueOpt : "";
-  var optBalance = optBalanceOpt !== undefined ? Caml_option.valFromOption(optBalanceOpt) : undefined;
   var disabled = disabledOpt !== undefined ? disabledOpt : false;
   var onChange = onChangeOpt !== undefined ? onChangeOpt : (function (param) {
         
@@ -439,16 +437,10 @@ function Unstake$StakeFormInput(Props) {
               className: "",
               onSubmit: onSubmit,
               children: null
-            }, React.createElement("div", {
-                  className: "px-8 pt-2"
-                }, React.createElement("div", {
-                      className: "-mb-px flex justify-between"
-                    }, React.createElement("div", {
-                          className: "no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3"
-                        }, "Unstake ↗️"))), React.createElement(AmountInput.make, {
-                  placeholder: "Stake",
+            }, React.createElement(AmountInput.make, {
+                  placeholder: "Unstake",
                   value: value,
-                  optBalance: optBalance,
+                  optBalance: undefined,
                   disabled: disabled,
                   onBlur: onBlur,
                   onChange: onChange,
@@ -478,7 +470,6 @@ function Unstake$ConnectedStakeForm(Props) {
         amount: ""
       }, (function (param, _form) {
           var amount = param.amount;
-          console.log("Clicking the unstake form!!");
           var arg = Ethers$1.utils.getAddress(tokenId);
           return Curry._2(contractExecutionHandler, (function (param) {
                         return Contracts.Staker.make(stakerContractAddress, param);

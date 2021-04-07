@@ -15,8 +15,11 @@ import * as DataHooks from "../../data/DataHooks.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as AmountInput from "../UI/AmountInput.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as Router from "next/router";
 import * as RootProvider from "../../libraries/RootProvider.js";
 import * as ContractHooks from "../Testing/Admin/ContractHooks.js";
+import * as StakeTxStatus from "./StakeTxStatus.js";
+import * as ToastProvider from "../UI/ToastProvider.js";
 import * as ContractActions from "../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
 
@@ -419,18 +422,16 @@ function StakeForm$StakeFormInput(Props) {
   var onSubmitOpt = Props.onSubmit;
   var valueOpt = Props.value;
   var optBalanceOpt = Props.optBalance;
-  var buttonDisabledOpt = Props.buttonDisabled;
   var disabledOpt = Props.disabled;
   var onChangeOpt = Props.onChange;
   var onBlurOpt = Props.onBlur;
   var onMaxClickOpt = Props.onMaxClick;
-  var synthetic = Props.synthetic;
+  var submitButtonOpt = Props.submitButton;
   var onSubmit = onSubmitOpt !== undefined ? onSubmitOpt : (function (param) {
         
       });
   var value = valueOpt !== undefined ? valueOpt : "";
   var optBalance = optBalanceOpt !== undefined ? Caml_option.valFromOption(optBalanceOpt) : undefined;
-  var buttonDisabled = buttonDisabledOpt !== undefined ? buttonDisabledOpt : false;
   var disabled = disabledOpt !== undefined ? disabledOpt : false;
   var onChange = onChangeOpt !== undefined ? onChangeOpt : (function (param) {
         
@@ -441,6 +442,9 @@ function StakeForm$StakeFormInput(Props) {
   var onMaxClick = onMaxClickOpt !== undefined ? onMaxClickOpt : (function (param) {
         
       });
+  var submitButton = submitButtonOpt !== undefined ? Caml_option.valFromOption(submitButtonOpt) : React.createElement(Button.make, {
+          children: "Login & Stake"
+        });
   return React.createElement(Form.make, {
               className: "mx-auto max-w-3xl",
               onSubmit: onSubmit,
@@ -453,10 +457,7 @@ function StakeForm$StakeFormInput(Props) {
                   onBlur: onBlur,
                   onChange: onChange,
                   onMaxClick: onMaxClick
-                }), React.createElement(Button.make, {
-                  children: "Stake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name,
-                  disabled: buttonDisabled
-                }));
+                }), submitButton);
 }
 
 var StakeFormInput = {
@@ -475,6 +476,8 @@ function StakeForm$ConnectedStakeForm(Props) {
   var setContractActionToCallAfterApproval = match[1];
   var contractActionToCallAfterApproval = match[0];
   var match$1 = ContractActions.useContractFunction(signer);
+  var setTxState = match$1[2];
+  var txState = match$1[1];
   var contractExecutionHandler = match$1[0];
   var match$2 = ContractActions.useContractFunction(signer);
   var setTxStateApprove = match$2[2];
@@ -483,15 +486,123 @@ function StakeForm$ConnectedStakeForm(Props) {
   var stakerContractAddress = Config.useStakerAddress(undefined);
   var user = RootProvider.useCurrentUserExn(undefined);
   var optTokenBalance = DataHooks.Util.graphResponseToOption(DataHooks.useSyntheticTokenBalance(user, synthetic.tokenAddress));
+  var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
+  var router = Router.useRouter();
+  var optCurrentUser = RootProvider.useCurrentUser(undefined);
+  var userPage = optCurrentUser !== undefined ? "/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser)) : "/";
   React.useEffect((function () {
-          if (typeof txStateApprove !== "number" && txStateApprove.TAG === /* Complete */2) {
-            Curry._1(contractActionToCallAfterApproval, undefined);
-            Curry._1(setTxStateApprove, (function (param) {
-                    return /* UnInitialised */0;
-                  }));
+          if (typeof txStateApprove === "number") {
+            switch (txStateApprove) {
+              case /* UnInitialised */0 :
+                  break;
+              case /* Created */1 :
+                  Curry._1(toastDispatch, {
+                        _0: "Approve transaction in your wallet",
+                        _1: "",
+                        _2: /* Info */2,
+                        [Symbol.for("name")]: "Show"
+                      });
+                  break;
+              case /* Failed */2 :
+                  Curry._1(toastDispatch, {
+                        _0: "The transaction failed",
+                        _1: "",
+                        _2: /* Error */0,
+                        [Symbol.for("name")]: "Show"
+                      });
+                  break;
+              
+            }
+          } else {
+            switch (txStateApprove.TAG | 0) {
+              case /* SignedAndSubmitted */0 :
+                  Curry._1(toastDispatch, {
+                        _0: "Approval transaction pending",
+                        _1: "",
+                        _2: /* Info */2,
+                        [Symbol.for("name")]: "Show"
+                      });
+                  break;
+              case /* Declined */1 :
+                  Curry._1(toastDispatch, {
+                        _0: "The transaction was rejected by your wallet",
+                        _1: txStateApprove._0,
+                        _2: /* Error */0,
+                        [Symbol.for("name")]: "Show"
+                      });
+                  break;
+              case /* Complete */2 :
+                  Curry._1(contractActionToCallAfterApproval, undefined);
+                  Curry._1(setTxStateApprove, (function (param) {
+                          return /* UnInitialised */0;
+                        }));
+                  Curry._1(toastDispatch, {
+                        _0: "Approve transaction confirmed",
+                        _1: "",
+                        _2: /* Success */3,
+                        [Symbol.for("name")]: "Show"
+                      });
+                  break;
+              
+            }
           }
           
         }), [txStateApprove]);
+  React.useEffect((function () {
+          if (typeof txState === "number") {
+            switch (txState) {
+              case /* UnInitialised */0 :
+                  break;
+              case /* Created */1 :
+                  Curry._1(toastDispatch, {
+                        _0: "Confirm the transaction to stake",
+                        _1: "",
+                        _2: /* Info */2,
+                        [Symbol.for("name")]: "Show"
+                      });
+                  break;
+              case /* Failed */2 :
+                  Curry._1(toastDispatch, {
+                        _0: "The transaction failed",
+                        _1: "",
+                        _2: /* Error */0,
+                        [Symbol.for("name")]: "Show"
+                      });
+                  break;
+              
+            }
+          } else {
+            switch (txState.TAG | 0) {
+              case /* SignedAndSubmitted */0 :
+                  Curry._1(toastDispatch, {
+                        _0: "Staking transaction pending",
+                        _1: "",
+                        _2: /* Info */2,
+                        [Symbol.for("name")]: "Show"
+                      });
+                  break;
+              case /* Declined */1 :
+                  Curry._1(toastDispatch, {
+                        _0: "The transaction was rejected by your wallet",
+                        _1: txState._0,
+                        _2: /* Warning */1,
+                        [Symbol.for("name")]: "Show"
+                      });
+                  break;
+              case /* Complete */2 :
+                  Curry._1(toastDispatch, {
+                        _0: "Staking transaction confirmed",
+                        _1: "",
+                        _2: /* Success */3,
+                        [Symbol.for("name")]: "Show"
+                      });
+                  router.push(userPage);
+                  break;
+              
+            }
+          }
+          
+        }), [txState]);
   var form = useForm(initialInput, (function (param, _form) {
           var amount = param.amount;
           var stakeAndEarnImmediatlyFunction = function (param) {
@@ -523,6 +634,21 @@ function StakeForm$ConnectedStakeForm(Props) {
   } else {
     buttonDisabled = baseFormDisabled;
   }
+  var tokenToStake = synthetic.tokenType + " " + synthetic.syntheticMarket.name;
+  var resetFormButton = function (param) {
+    return React.createElement(Button.make, {
+                onClick: (function (param) {
+                    Curry._1(form.reset, undefined);
+                    Curry._1(setTxStateApprove, (function (param) {
+                            return /* UnInitialised */0;
+                          }));
+                    return Curry._1(setTxState, (function (param) {
+                                  return /* UnInitialised */0;
+                                }));
+                  }),
+                children: "Reset & Stake Again"
+              });
+  };
   return React.createElement(StakeForm$StakeFormInput, {
               onSubmit: form.submit,
               value: form.input.amount,
@@ -546,7 +672,15 @@ function StakeForm$ConnectedStakeForm(Props) {
                                       };
                               }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
                 }),
-              synthetic: synthetic
+              synthetic: synthetic,
+              submitButton: React.createElement(StakeTxStatus.make, {
+                    txStateApprove: txStateApprove,
+                    txStateStake: txState,
+                    resetFormButton: resetFormButton,
+                    tokenToStake: tokenToStake,
+                    buttonText: "Stake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name,
+                    buttonDisabled: buttonDisabled
+                  })
             });
 }
 

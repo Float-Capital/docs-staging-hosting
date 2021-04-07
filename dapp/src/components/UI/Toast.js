@@ -10,7 +10,7 @@ function Toast(Props) {
   React.useEffect((function () {
           var timeout = setTimeout((function (param) {
                   return Curry._1(toastDispatch, /* Hide */0);
-                }), 3000);
+                }), 5000);
           return (function (param) {
                     clearTimeout(timeout);
                     
@@ -37,12 +37,17 @@ function Toast(Props) {
               className: "fixed bottom-3 flex flex-col",
               style: {
                 display: toastHeading.length !== 0 ? "block" : "none"
-              }
+              },
+              onClick: (function (param) {
+                  return Curry._1(toastDispatch, /* Hide */0);
+                })
             }, React.createElement("div", {
-                  className: "flex flex-row items-center text-xl rounded-sm bg-white bg-opacity-80 my-4 mx-10 py-2 px-4 border border-" + color + "-400 border-opacity-30"
+                  className: "flex flex-row items-center text-xl rounded-sm bg-white my-4 mx-10 py-2 px-4 border border-" + color + "-400 border-opacity-30"
                 }, React.createElement("div", {
-                      className: "animate-ping inline-flex h-3 w-3 mr-4 rounded-full bg-" + color + "-400 opacity-75"
-                    }), React.createElement("div", undefined, React.createElement("div", undefined, toastHeading), React.createElement("div", {
+                      className: "animate-ping inline-flex h-3 w-3 mr-4 rounded-full bg-" + color + "-400 opacity-90"
+                    }), React.createElement("div", undefined, React.createElement("div", {
+                          className: "text-sm"
+                        }, toastHeading), React.createElement("div", {
                           className: "text-xs"
                         }, toast[1]))));
 }

@@ -169,16 +169,7 @@ module UserMarketUnstake = {
         ? <>
             <Button.Tiny onClick={openUnstakeModal}> {`unstake`} </Button.Tiny>
             {showUnstakeModal
-              ? <Modal closeModal=closeUnstakeModal>
-                  <button
-                    className="p-1 ml-auto float-right text-3xl leading-none outline-none focus:outline-none"
-                    onClick=closeUnstakeModal>
-                    <span className="opacity-4 block outline-none focus:outline-none">
-                      {`×`->React.string}
-                    </span>
-                  </button>
-                  <Unstake tokenId=synthAddressStr />
-                </Modal>
+              ? <Modal closeModal=closeUnstakeModal> <Unstake tokenId=synthAddressStr /> </Modal>
               : React.null}
           </>
         : React.null}
@@ -210,7 +201,7 @@ module UserStakesCard = {
     }, stakes)->React.array
 
     <UserColumnCard>
-      <UserColumnHeader> {`Staking`->React.string} </UserColumnHeader>
+      <UserColumnHeader> {`Staked assets 🔐`->React.string} </UserColumnHeader>
       <UserColumnTextCenter>
         <UserColumnText
           head=`💰 Staked value` body={`$${totalValue.contents->FormatMoney.formatEther}`}
@@ -236,7 +227,12 @@ module UserFloatCard = {
       optLoggedInUser->Option.mapWithDefault(false, user => user->ethAdrToLowerStr == userId)
 
     <UserColumnCard>
-      <UserColumnHeader> {`Float rewards 🔥`->React.string} </UserColumnHeader>
+      <UserColumnHeader>
+        <div className="flex flex-row items-center justify-center">
+          <h3> {`Float rewards`->React.string} </h3>
+          <img src="/img/float-token-coin-v3.svg" className="ml-2 h-5" />
+        </div>
+      </UserColumnHeader>
       {switch DataHooks.liftGraphResponse2(floatBalances, claimableFloat) {
       | Loading => <MiniLoader />
       | GraphError(msg) => msg->React.string

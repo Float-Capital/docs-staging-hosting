@@ -32,6 +32,7 @@ module StakeFormInput = {
     ~onBlur=_ => (),
     ~onMaxClick=_ => (),
     ~synthetic: Queries.SyntheticTokenInfo.t,
+    ~submitButton=<Button> "Login & Stake" </Button>,
   ) =>
     <Form className="mx-auto max-w-3xl" onSubmit>
       // <div className="px-8 pt-2">
@@ -49,9 +50,12 @@ module StakeFormInput = {
       //   </div>
       // </div>
       <AmountInput value optBalance disabled onBlur onChange placeholder={"Stake"} onMaxClick />
-      <Button disabled={buttonDisabled}>
-        {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
-      </Button>
+      {
+        // <Button disabled={buttonDisabled}>
+        //   {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
+        // </Button>
+        submitButton
+      }
     </Form>
 }
 
@@ -63,7 +67,7 @@ module ConnectedStakeForm = {
       setContractActionToCallAfterApproval,
     ) = React.useState(((), ()) => ())
 
-    let (contractExecutionHandler, _txState, _setTxState) = ContractActions.useContractFunction(
+    let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
       ~signer,
     )
     let (
@@ -81,16 +85,71 @@ module ConnectedStakeForm = {
         ~tokenAddress=synthetic.tokenAddress,
       )->DataHooks.Util.graphResponseToOption
 
+    let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
+    let router = Next.Router.useRouter()
+    let optCurrentUser = RootProvider.useCurrentUser()
+    let userPage = switch optCurrentUser {
+    | Some(address) => `/user/${address->Ethers.Utils.ethAdrToLowerStr}`
+    | None => `/`
+    }
+
     // Execute the call after approval has completed
     React.useEffect1(() => {
       switch txStateApprove {
+      | Created =>
+        toastDispatch(
+          ToastProvider.Show(`Approve transaction in your wallet`, "", ToastProvider.Info),
+        )
+      | Declined(reason) =>
+        toastDispatch(
+          ToastProvider.Show(
+            `The transaction was rejected by your wallet`,
+            reason,
+            ToastProvider.Error,
+          ),
+        )
+      | SignedAndSubmitted(_) =>
+        toastDispatch(ToastProvider.Show(`Approval transaction pending`, "", ToastProvider.Info))
       | Complete(_) =>
         contractActionToCallAfterApproval()
         setTxStateApprove(_ => ContractActions.UnInitialised)
+        toastDispatch(
+          ToastProvider.Show(`Approve transaction confirmed`, "", ToastProvider.Success),
+        )
+      | Failed =>
+        toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
       | _ => ()
       }
       None
     }, [txStateApprove])
+
+    React.useEffect1(() => {
+      switch txState {
+      | Created =>
+        toastDispatch(
+          ToastProvider.Show(`Confirm the transaction to stake`, "", ToastProvider.Info),
+        )
+      | SignedAndSubmitted(_) =>
+        toastDispatch(ToastProvider.Show(`Staking transaction pending`, "", ToastProvider.Info))
+      | Complete(_) =>
+        toastDispatch(
+          ToastProvider.Show(`Staking transaction confirmed`, "", ToastProvider.Success),
+        )
+        router->Next.Router.push(userPage)
+      | Failed =>
+        toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
+      | Declined(reason) =>
+        toastDispatch(
+          ToastProvider.Show(
+            `The transaction was rejected by your wallet`,
+            reason,
+            ToastProvider.Warning,
+          ),
+        )
+      | _ => ()
+      }
+      None
+    }, [txState])
 
     let form = StakeForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
       let approveFunction = () =>
@@ -134,6 +193,18 @@ module ConnectedStakeForm = {
       }
     }
 
+    let tokenToStake = `${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`
+
+    let resetFormButton = () =>
+      <Button
+        onClick={_ => {
+          form.reset()
+          setTxStateApprove(_ => ContractActions.UnInitialised)
+          setTxState(_ => ContractActions.UnInitialised)
+        }}>
+        {"Reset & Stake Again"}
+      </Button>
+
     <StakeFormInput
       onSubmit=form.submit
       value={form.input.amount}
@@ -155,6 +226,14 @@ module ConnectedStakeForm = {
           },
         )}
       synthetic
+      submitButton={<StakeTxStatus
+        buttonText={`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
+        resetFormButton
+        tokenToStake
+        txStateApprove
+        txStateStake=txState
+        buttonDisabled
+      />}
     />
   }
 }

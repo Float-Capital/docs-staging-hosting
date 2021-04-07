@@ -242,15 +242,10 @@ function UserUI$UserMarketUnstake(Props) {
                         children: "unstake"
                       }), showUnstakeModal ? React.createElement(Modal.make, {
                           closeModal: closeUnstakeModal,
-                          children: null
-                        }, React.createElement("button", {
-                              className: "p-1 ml-auto float-right text-3xl leading-none outline-none focus:outline-none",
-                              onClick: closeUnstakeModal
-                            }, React.createElement("span", {
-                                  className: "opacity-4 block outline-none focus:outline-none"
-                                }, "×")), React.createElement(Unstake.make, {
-                              tokenId: synthAddressStr
-                            })) : null) : null);
+                          children: React.createElement(Unstake.make, {
+                                tokenId: synthAddressStr
+                              })
+                        }) : null) : null);
 }
 
 var UserMarketUnstake = {
@@ -288,7 +283,7 @@ function UserUI$UserStakesCard(Props) {
   return React.createElement(UserUI$UserColumnCard, {
               children: null
             }, React.createElement(UserUI$UserColumnHeader, {
-                  children: "Staking"
+                  children: "Staked assets 🔐"
                 }), React.createElement(UserUI$UserColumnTextCenter, {
                   children: React.createElement(UserUI$UserColumnText, {
                         head: "💰 Staked value",
@@ -348,7 +343,12 @@ function UserUI$UserFloatCard(Props) {
   return React.createElement(UserUI$UserColumnCard, {
               children: null
             }, React.createElement(UserUI$UserColumnHeader, {
-                  children: "Float rewards 🔥"
+                  children: React.createElement("div", {
+                        className: "flex flex-row items-center justify-center"
+                      }, React.createElement("h3", undefined, "Float rewards"), React.createElement("img", {
+                            className: "ml-2 h-5",
+                            src: "/img/float-token-coin-v3.svg"
+                          }))
                 }), tmp);
 }
 

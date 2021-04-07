@@ -29,15 +29,10 @@ module StakeFormInput = {
     ~synthetic: Queries.SyntheticTokenInfo.t,
   ) =>
     <Form className="" onSubmit>
-      <div className="px-8 pt-2">
-        <div className="-mb-px flex justify-between">
-          <div
-            className="no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3">
-            {`Unstake ↗️`->React.string}
-          </div>
-        </div>
-      </div>
-      <AmountInput value optBalance disabled onBlur onChange placeholder={"Stake"} onMaxClick />
+      // optBalance Todo
+      <AmountInput
+        value optBalance={None} disabled onBlur onChange placeholder={"Unstake"} onMaxClick
+      />
       <Button onClick={_ => onSubmit()}>
         {`Unstake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
       </Button>
@@ -65,7 +60,6 @@ module ConnectedStakeForm = {
     }
 
     let form = StakeForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
-      Js.log("Clicking the unstake form!!")
       let stakeAndEarnImmediatlyFunction = () =>
         contractExecutionHandler(
           ~makeContractInstance=Contracts.Staker.make(~address=stakerContractAddress),
