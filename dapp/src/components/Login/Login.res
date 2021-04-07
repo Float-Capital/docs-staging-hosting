@@ -29,7 +29,7 @@ let make = () => {
     <p className="text-xs">
       {`Please make sure to connect to ${Config.defaultNetworkName}.`->React.string}
     </p>
-    <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-6 gap-4 items-center my-5">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center my-5">
       {connectors
       ->Array.mapWithIndex((index, connector) =>
         <div

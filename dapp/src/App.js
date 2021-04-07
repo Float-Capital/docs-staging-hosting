@@ -28,7 +28,6 @@ function $$default(props) {
                                       })
                                 }))
                       }), React.createElement(Toast.make, {}))
-
             });
 }
 
