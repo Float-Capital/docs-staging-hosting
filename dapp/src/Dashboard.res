@@ -143,7 +143,7 @@ let make = () => {
   let globalStateQuery = Queries.GlobalState.use()
   let marketDetailsQuery = Queries.MarketDetails.use()
 
-  <div className="w-screen absolute flex flex-col left-0 top-0 mt-20 overflow-x-hidden">
+  <div className="w-screen absolute flex flex-col left-0 top-0 mt-40 overflow-x-hidden">
     {switch (globalStateQuery, marketDetailsQuery) {
     | ({loading: true}, _)
     | (_, {loading: true}) =>
