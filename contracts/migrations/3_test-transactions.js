@@ -165,6 +165,17 @@ module.exports = async function (deployer, network, accounts) {
   }
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
+  
+  let verifyString = "truffle run verify"
+  if (network == "kovan") {
+    for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
+      verifyString += ` YieldManagerAave@${await longShort.yieldManagers(marketIndex)} OracleManagerEthKiller@${await longShort.oracleManagers(marketIndex)} SyntheticToken@${await longShort.longTokens(marketIndex)} SyntheticToken@${await longShort.shortTokens(marketIndex)} --network kovan`
+    }
+
+    console.log(`To verify market specific contracts run the following:
+    
+    \`${verifyString}\``)
+  }
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
     console.log(`Simulating transactions for marketIndex: ${marketIndex}`);
 

@@ -1,4 +1,5 @@
 const { deployProxy } = require("@openzeppelin/truffle-upgrades");
+const { admin: { getInstance: getAdminInstance } } = require("@openzeppelin/truffle-upgrades");
 
 const STAKER = "Staker";
 const SYNTHETIC_TOKEN = "Dai";
@@ -84,4 +85,12 @@ module.exports = async function (deployer, networkName, accounts) {
       from: admin,
     }
   );
+
+
+  if (networkName == "kovan") {
+    const adminInstance = await getAdminInstance()
+    console.log(`To verify all these contracts run the following:
+    
+    \`truffle run verify TokenFactory FloatToken Treasury_v0@${await adminInstance.getProxyImplementation(treasury.address)} FloatCapital_v0@${await adminInstance.getProxyImplementation(floatCapital.address)} Staker@${await adminInstance.getProxyImplementation(staker.address)} LongShort@${await adminInstance.getProxyImplementation(longShort.address)} --network kovan\``)
+  }
 };
