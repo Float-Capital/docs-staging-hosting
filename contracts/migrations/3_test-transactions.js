@@ -68,12 +68,12 @@ const deployTestMarket = async (
     );
   } else if (networkName == "kovan") {
     yieldManager = await YieldManagerAave.new();
-    fundTokenAddress = bscTestBUSDAddress;
+    fundTokenAddress = kovanDaiAddress;
 
     await yieldManager.setup(
       admin,
       longShortInstance.address,
-      bscTestBUSDAddress,
+      kovanDaiAddress,
       bscTestVBUSDAddress,
       aavePoolAddressKovan,
       0
@@ -132,7 +132,7 @@ const topupBalanceIfLow = async (from, to) => {
   }
 };
 
-module.exports = async function (deployer, network, accounts) {
+module.exports = async function(deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
@@ -165,16 +165,26 @@ module.exports = async function (deployer, network, accounts) {
   }
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
-  
-  let verifyString = "truffle run verify"
+
+  let verifyString = "truffle run verify";
   if (network == "kovan") {
-    for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
-      verifyString += ` YieldManagerAave@${await longShort.yieldManagers(marketIndex)} OracleManagerEthKiller@${await longShort.oracleManagers(marketIndex)} SyntheticToken@${await longShort.longTokens(marketIndex)} SyntheticToken@${await longShort.shortTokens(marketIndex)}`
+    for (
+      let marketIndex = 1;
+      marketIndex <= currentMarketIndex;
+      ++marketIndex
+    ) {
+      verifyString += ` YieldManagerAave@${await longShort.yieldManagers(
+        marketIndex
+      )} OracleManagerEthKiller@${await longShort.oracleManagers(
+        marketIndex
+      )} SyntheticToken@${await longShort.longTokens(
+        marketIndex
+      )} SyntheticToken@${await longShort.shortTokens(marketIndex)}`;
     }
 
     console.log(`To verify market specific contracts run the following:
     
-    \`${verifyString}\` --network kovan`)
+    \`${verifyString}\` --network kovan`);
   }
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
     console.log(`Simulating transactions for marketIndex: ${marketIndex}`);
@@ -188,9 +198,14 @@ module.exports = async function (deployer, network, accounts) {
     if (network == "kovan") {
       await token.approve(longShort.address, largeApprove, {
         from: user1,
-      })
+      });
     } else {
-      await mintAndApprove(token, oneHundredMintAmount, user1, longShort.address);
+      await mintAndApprove(
+        token,
+        oneHundredMintAmount,
+        user1,
+        longShort.address
+      );
     }
     await longShort.mintLong(marketIndex, new BN(oneHundredMintAmount), {
       from: user1,
@@ -199,9 +214,14 @@ module.exports = async function (deployer, network, accounts) {
     if (network == "kovan") {
       await token.approve(longShort.address, largeApprove, {
         from: user2,
-      })
+      });
     } else {
-      await mintAndApprove(token, oneHundredMintAmount, user2, longShort.address);
+      await mintAndApprove(
+        token,
+        oneHundredMintAmount,
+        user2,
+        longShort.address
+      );
     }
     await longShort.mintShort(marketIndex, new BN(oneHundredMintAmount), {
       from: user2,
@@ -210,9 +230,14 @@ module.exports = async function (deployer, network, accounts) {
     if (network == "kovan") {
       await token.approve(longShort.address, largeApprove, {
         from: user3,
-      })
+      });
     } else {
-      await mintAndApprove(token, oneHundredMintAmount, user3, longShort.address);
+      await mintAndApprove(
+        token,
+        oneHundredMintAmount,
+        user3,
+        longShort.address
+      );
     }
     await longShort.mintShort(marketIndex, new BN(oneHundredMintAmount), {
       from: user3,
@@ -244,7 +269,12 @@ module.exports = async function (deployer, network, accounts) {
     });
 
     if (network != "kovan") {
-      await mintAndApprove(token, oneHundredMintAmount, user3, longShort.address);
+      await mintAndApprove(
+        token,
+        oneHundredMintAmount,
+        user3,
+        longShort.address
+      );
     }
     await longShort.mintLongAndStake(
       marketIndex,
@@ -255,7 +285,12 @@ module.exports = async function (deployer, network, accounts) {
     );
 
     if (network != "kovan") {
-      await mintAndApprove(token, oneHundredMintAmount, user3, longShort.address);
+      await mintAndApprove(
+        token,
+        oneHundredMintAmount,
+        user3,
+        longShort.address
+      );
     }
     await longShort.mintShortAndStake(
       marketIndex,
