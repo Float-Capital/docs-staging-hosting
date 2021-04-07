@@ -60,7 +60,7 @@ function User$UserBalancesCard(Props) {
               children: null
             }, React.createElement(UserUI.UserColumnHeader.make, {
                   children: null
-                }, "Synthetic Assets", React.createElement("img", {
+                }, "Synthetic assets", React.createElement("img", {
                       className: "inline h-5 ml-2",
                       src: "/img/coin.png"
                     })), tmp);
@@ -114,22 +114,22 @@ function onQuerySuccess(data) {
               children: React.createElement(Masonry.Container.make, {
                     children: null
                   }, React.createElement(Masonry.Divider.make, {
-                        children: React.createElement(User$UserProfileCard, {
-                              userInfo: data.userInfo
-                            })
-                      }), React.createElement(Masonry.Divider.make, {
+                        children: null
+                      }, React.createElement(User$UserProfileCard, {
+                            userInfo: data.userInfo
+                          }), React.createElement(UserUI.UserFloatCard.make, {
+                            userId: data.user,
+                            stakes: data.stakes
+                          })), React.createElement(Masonry.Divider.make, {
                         children: React.createElement(User$UserBalancesCard, {
                               userId: data.user
                             })
                       }), React.createElement(Masonry.Divider.make, {
-                        children: null
-                      }, React.createElement(UserUI.UserFloatCard.make, {
-                            userId: data.user,
-                            stakes: data.stakes
-                          }), React.createElement(UserUI.UserStakesCard.make, {
-                            stakes: data.stakes,
-                            userId: data.user
-                          })))
+                        children: React.createElement(UserUI.UserStakesCard.make, {
+                              stakes: data.stakes,
+                              userId: data.user
+                            })
+                      }))
             });
 }
 

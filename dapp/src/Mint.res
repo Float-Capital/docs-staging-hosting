@@ -6,7 +6,7 @@ module Mint = {
     let marketIndex = router.query->Js.Dict.get("marketIndex")->Option.getWithDefault("1")
     let mintOption = router.query->Js.Dict.get("mintOption")->Option.getWithDefault("short")
 
-    <section>
+    <section className="h-full">
       {switch markets {
       | {loading: true} => <Loader />
       | {error: Some(_error)} => "Error loading data"->React.string

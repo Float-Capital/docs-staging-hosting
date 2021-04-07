@@ -15,7 +15,7 @@ module UserBalancesCard = {
 
     <UserColumnCard>
       <UserColumnHeader>
-        {`Synthetic Assets`->React.string} <img className="inline h-5 ml-2" src="/img/coin.png" />
+        {`Synthetic assets`->React.string} <img className="inline h-5 ml-2" src="/img/coin.png" />
       </UserColumnHeader>
       {switch usersTokensQuery {
       | Loading => <div className="m-auto"> <MiniLoader /> </div>
@@ -90,12 +90,12 @@ module User = {
     <UserContainer>
       // <UserBanner />
       <Container>
-        <Divider> <UserProfileCard userInfo={data.userInfo} /> </Divider>
-        <Divider> <UserBalancesCard userId={data.user} /> </Divider>
         <Divider>
+          <UserProfileCard userInfo={data.userInfo} />
           <UserFloatCard userId={data.user} stakes={data.stakes} />
-          <UserStakesCard stakes={data.stakes} userId={data.user} />
         </Divider>
+        <Divider> <UserBalancesCard userId={data.user} /> </Divider>
+        <Divider> <UserStakesCard stakes={data.stakes} userId={data.user} /> </Divider>
       </Container>
     </UserContainer>
   }

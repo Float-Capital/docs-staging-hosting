@@ -76,11 +76,13 @@ var localhostGraphEndpoint = "https://localhost:8000/subgraphs/name/float-capita
 
 var defaultNetworkId = 97;
 
-var defaultNetworkName = "Binance Smart Chain Test Network";
+var defaultNetworkName = "Binance Smart Chain testnet";
 
 var paymentTokenName = "BUSD";
 
 var defaultBlockExplorer = "https://testnet.bscscan.com/";
+
+var defaultBlockExplorerName = "bscscan";
 
 var discordInviteLink = "https://discord.gg/dqDwgrVYcU";
 
@@ -93,6 +95,7 @@ export {
   defaultNetworkName ,
   paymentTokenName ,
   defaultBlockExplorer ,
+  defaultBlockExplorerName ,
   getDefaultNetworkId ,
   discordInviteLink ,
   allContracts ,

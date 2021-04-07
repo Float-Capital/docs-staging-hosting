@@ -2,6 +2,7 @@
 
 import * as Misc from "../../libraries/Misc.js";
 import * as React from "react";
+import * as Button from "./Button.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 
 function AddBinanceToMetamask(Props) {
@@ -10,8 +11,7 @@ function AddBinanceToMetamask(Props) {
     return null;
   }
   var ethObj$1 = Caml_option.valFromOption(ethObj);
-  return React.createElement("div", {
-              className: "flex justify-start align-center",
+  return React.createElement(Button.$$Element.make, {
               onClick: (function (_event) {
                   return Misc.onlyExecuteClientSide(function (param) {
                               ethObj$1.request({
@@ -35,13 +35,18 @@ function AddBinanceToMetamask(Props) {
                                   });
                               
                             });
-                })
-            }, React.createElement("div", {
-                  className: "text-sm"
-                }, "Go to the BSC Test Network "), React.createElement("img", {
-                  className: "h-5 ml-1",
-                  src: "/icons/metamask.svg"
-                }));
+                }),
+              children: React.createElement("div", {
+                    className: "mx-auto"
+                  }, React.createElement("div", {
+                        className: "flex flex-row items-center"
+                      }, React.createElement("div", {
+                            className: "text-sm"
+                          }, "Add BSC Testnet to metamask "), React.createElement("img", {
+                            className: "h-6 ml-1",
+                            src: "/icons/metamask.svg"
+                          })))
+            });
 }
 
 var make = AddBinanceToMetamask;

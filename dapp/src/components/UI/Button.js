@@ -60,6 +60,33 @@ var Small = {
   make: Button$Small
 };
 
+function Button$Element(Props) {
+  var onClickOpt = Props.onClick;
+  var children = Props.children;
+  var disabledOpt = Props.disabled;
+  var onClick = onClickOpt !== undefined ? onClickOpt : (function (param) {
+        
+      });
+  var disabled = disabledOpt !== undefined ? disabledOpt : false;
+  return React.createElement("div", {
+              className: "inline-block"
+            }, React.createElement("div", {
+                  className: buttonOuterStyle
+                }, React.createElement("div", {
+                      className: buttonShaddowStyle + " border-0 "
+                    }, React.createElement("button", {
+                          className: buttonTopStyle + " p-3 focus:outline-none text-base mx-auto " + (
+                            disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-200 cursor-not-allowed" : ""
+                          ),
+                          disabled: disabled,
+                          onClick: onClick
+                        }, children))));
+}
+
+var $$Element = {
+  make: Button$Element
+};
+
 function Button(Props) {
   var onClickOpt = Props.onClick;
   var children = Props.children;
@@ -89,6 +116,7 @@ export {
   buttonTopStyle ,
   Tiny ,
   Small ,
+  $$Element ,
   make ,
   
 }

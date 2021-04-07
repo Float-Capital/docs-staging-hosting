@@ -8,16 +8,17 @@ import * as Ethers from "../../ethereum/Ethers.js";
 import * as Ethers$1 from "ethers";
 import * as Globals from "../../libraries/Globals.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
+import * as Tooltip from "./Tooltip.js";
 import * as Unstake from "../Unstake.js";
 import * as CONSTANTS from "../../CONSTANTS.js";
 import * as DataHooks from "../../data/DataHooks.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as ClaimFloat from "../Claim/ClaimFloat.js";
 import * as MiniLoader from "./MiniLoader.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as FormatMoney from "./FormatMoney.js";
 import * as Router from "next/router";
 import * as RootProvider from "../../libraries/RootProvider.js";
-import * as StakeDetails from "../../StakeDetails.js";
 import EthereumBlockiesBase64 from "ethereum-blockies-base64";
 
 function UserUI$UserContainer(Props) {
@@ -241,16 +242,12 @@ function UserUI$UserMarketUnstake(Props) {
                         onClick: openUnstakeModal,
                         children: "unstake"
                       }), showUnstakeModal ? React.createElement(Modal.make, {
+                          id: "unstake",
                           closeModal: closeUnstakeModal,
-                          children: null
-                        }, React.createElement("button", {
-                              className: "p-1 ml-auto float-right text-3xl leading-none outline-none focus:outline-none",
-                              onClick: closeUnstakeModal
-                            }, React.createElement("span", {
-                                  className: "opacity-4 block outline-none focus:outline-none"
-                                }, "×")), React.createElement(Unstake.make, {
-                              tokenId: synthAddressStr
-                            })) : null) : null);
+                          children: React.createElement(Unstake.make, {
+                                tokenId: synthAddressStr
+                              })
+                        }) : null) : null);
 }
 
 var UserMarketUnstake = {
@@ -288,7 +285,7 @@ function UserUI$UserStakesCard(Props) {
   return React.createElement(UserUI$UserColumnCard, {
               children: null
             }, React.createElement(UserUI$UserColumnHeader, {
-                  children: "Staking"
+                  children: "Staked assets 🔐"
                 }), React.createElement(UserUI$UserColumnTextCenter, {
                   children: React.createElement(UserUI$UserColumnText, {
                         head: "💰 Staked value",
@@ -341,14 +338,21 @@ function UserUI$UserFloatCard(Props) {
                   body: floatMinted
                 })), isCurrentUser ? React.createElement("div", {
                 className: "flex justify-around flex-row my-1"
-              }, "🌊", React.createElement(StakeDetails.ClaimFloat.make, {
+              }, "🌊", React.createElement(ClaimFloat.make, {
                     tokenAddresses: synthTokens
+                  }), React.createElement(Tooltip.make, {
+                    tip: "Claiming float is still under development, only partial withdrawals are possible currently"
                   }), "🌊") : null);
   }
   return React.createElement(UserUI$UserColumnCard, {
               children: null
             }, React.createElement(UserUI$UserColumnHeader, {
-                  children: "Float rewards 🔥"
+                  children: React.createElement("div", {
+                        className: "flex flex-row items-center justify-center"
+                      }, React.createElement("h3", undefined, "Float rewards"), React.createElement("img", {
+                            className: "ml-2 h-5",
+                            src: "/img/float-token-coin-v3.svg"
+                          }))
                 }), tmp);
 }
 

@@ -53,103 +53,91 @@ module SubmitButtonAndTxTracker = {
     ~buttonDisabled,
   ) => {
     switch (txStateApprove, txStateMint) {
-    | (ContractActions.Created, _) => <>
-        <h1>
-          {`Please approve your ${Config.paymentTokenName} token on Float`->React.string}
-        </h1>
-      </>
-    | (ContractActions.SignedAndSubmitted(txHash), _) => <>
-        <hr />
-        <h1>
-          <a target="_" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
-            {"Processing approval "->React.string}
-          </a>
-        </h1>
-      </>
+    | (ContractActions.Created, _) =>
+      <div className="text-center m-3">
+        <p> {`Please approve your ${Config.paymentTokenName} token `->React.string} </p>
+      </div>
+    | (ContractActions.SignedAndSubmitted(txHash), _) =>
+      <div className="text-center m-3">
+        <MiniLoader />
+        <p> {"Approval transaction pending... "->React.string} </p>
+        <a target="_" rel="noopenner noreferer" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
+          <p> {`View on ${Config.defaultBlockExplorerName}`->React.string} </p>
+        </a>
+      </div>
     | (ContractActions.Complete({transactionHash}), ContractActions.Created)
-    | (ContractActions.Complete({transactionHash}), ContractActions.UnInitialised) => <>
-        <hr />
-        <h1>
-          <a target="_" href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
-            {`✅ Approval complete`->React.string}
-          </a>
-        </h1>
-        <h1> {`Sign the next transaction to mint your`->React.string} </h1>
-      </>
-    | (ContractActions.Declined(message), _) => <>
-        <hr />
-        <h1>
-          {`❌ The transaction was declined by your wallet, you need to accept the transaction to proceed.`->React.string}
-        </h1>
-        <p> {("Failure reason: " ++ message)->React.string} </p>
-        {resetFormButton()}
-      </>
-    | (ContractActions.Failed, _) => <>
-        <hr />
-        <h1> {`❌ The transaction failed.`->React.string} </h1>
+    | (ContractActions.Complete({transactionHash}), ContractActions.UnInitialised) =>
+      <div className="text-center m-3">
+        <p> {`Confirm transaction to mint ${tokenToMint}`->React.string} </p>
+      </div>
+    | (ContractActions.Declined(message), _) => <> {resetFormButton()} </>
+    | (ContractActions.Failed, _) =>
+      <div className="text-center m-3">
+        <p> {`The transaction failed.`->React.string} </p>
         <p>
-          <a target="_" href=Config.discordInviteLink>
-            {"This shouldn't happen, please let us help you on discord."->React.string}
+          <a target="_" rel="noopenner noreferer" href=Config.discordInviteLink>
+            {"Connect with us on discord, if you would like some assistance"->React.string}
           </a>
         </p>
         {resetFormButton()}
-      </>
-    | (_, ContractActions.Created) => <>
-        <hr />
-        <h1>
-          {`Sign the transaction to mint ${tokenToMint} with your ${Config.paymentTokenName}`->React.string}
-        </h1>
-      </>
-    | (
-        ContractActions.Complete({transactionHash}),
-        ContractActions.SignedAndSubmitted(txHash),
-      ) => <>
-        <hr />
-        <h1>
-          <a target="_" href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
-            {`✅ Approval Complete`->React.string}
-          </a>
-        </h1>
-        <h1>
-          <a target="_" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
-            {`Processing minting ${tokenToMint} with your ${Config.paymentTokenName}`->React.string}
-          </a>
-        </h1>
-      </>
-    | (_, ContractActions.SignedAndSubmitted(txHash)) => <>
-        <hr />
-        <h1>
-          <a target="_" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
-            {`Processing minting ${tokenToMint} with your ${Config.paymentTokenName} (click to view)`->React.string}
-          </a>
-        </h1>
-      </>
-    | (_, ContractActions.Complete({transactionHash})) => <>
-        <hr />
-        <h1>
-          <a target="_" href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
-            {`✅ Transaction Complete (click to view)`->React.string}
-          </a>
-        </h1>
-        {resetFormButton()}
-      </>
-    | (_, ContractActions.Declined(message)) => <>
-        <h1>
-          {`❌ The transaction was declined by your wallet, you need to accept the transaction to proceed.`->React.string}
-        </h1>
-        <p> {("Failure reason: " ++ message)->React.string} </p>
-        {resetFormButton()}
-      </>
-    | (_, ContractActions.Failed) => <>
-        <hr />
-        <h1> {`❌ The transaction failed.`->React.string} </h1>
+      </div>
+    | (_, ContractActions.Created) =>
+      <div className="text-center m-3">
+        <h1> {`Sign the transaction to mint ${tokenToMint}`->React.string} </h1>
+      </div>
+    | (ContractActions.Complete({transactionHash}), ContractActions.SignedAndSubmitted(txHash)) =>
+      <div className="text-center m-3">
         <p>
-          <a target="_" href=Config.discordInviteLink>
-            {"This shouldn't happen, please let us help you on discord."->React.string}
+          <a
+            target="_"
+            rel="noopenner noreferer"
+            href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
+            {`Approval confirmed`->React.string}
+          </a>
+        </p>
+        <h1>
+          <a
+            target="_"
+            rel="noopenner noreferer"
+            href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
+            {`Pending minting ${tokenToMint}`->React.string}
+          </a>
+        </h1>
+      </div>
+    | (_, ContractActions.SignedAndSubmitted(txHash)) =>
+      <div className="text-center m-3">
+        <MiniLoader />
+        <p> {"Minting transaction pending... "->React.string} </p>
+        <a
+          className="hover:underline"
+          target="_"
+          rel="noopenner noreferer"
+          href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
+          <p> {`View on ${Config.defaultBlockExplorerName}`->React.string} </p>
+        </a>
+      </div>
+    | (_, ContractActions.Complete({transactionHash})) =>
+      <div className="text-center m-3">
+        <p> {`Transaction complete`->React.string} </p> {resetFormButton()}
+      </div>
+    | (_, ContractActions.Declined(message)) =>
+      <div className="text-center m-3">
+        <p> {`The transaction was rejected by your wallet`->React.string} </p>
+        <a target="_" rel="noopenner noreferer" href=Config.discordInviteLink>
+          {"Connect with us on discord, if you would like some assistance"->React.string}
+        </a>
+        {resetFormButton()}
+      </div>
+    | (_, ContractActions.Failed) =>
+      <div className="text-center m-3">
+        <h1> {`The transaction failed.`->React.string} </h1>
+        <p>
+          <a target="_" rel="noopenner noreferer" href=Config.discordInviteLink>
+            {"Connect with us on discord, if you would like some assistance"->React.string}
           </a>
         </p>
         {resetFormButton()}
-      </>
+      </div>
     | _ => <Button disabled=buttonDisabled onClick={_ => ()}> {buttonText} </Button>
     }
   }
@@ -231,21 +219,10 @@ module MintFormInput = {
         </div>
       </>
 
-    <div className="screen-centered-container">
+    <div className="screen-centered-container h-full">
       <ViewBox>
-        <Form className="" onSubmit>
-          <div className="relative">
-            {formInput}
-            {switch (txStateApprove, txStateMint) {
-            | (ContractActions.SignedAndSubmitted(_), _)
-            | (ContractActions.Created, _)
-            | (_, ContractActions.SignedAndSubmitted(_))
-            | (_, ContractActions.Created) =>
-              <Loader.Overlay />
-            | _ => React.null
-            }}
-          </div>
-          {submitButton}
+        <Form className="h-full" onSubmit>
+          <div className="relative"> {formInput} </div> {submitButton}
         </Form>
       </ViewBox>
     </div>
@@ -359,18 +336,73 @@ module MintFormSignedIn = {
       }
     }
 
+    let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
+    let router = Next.Router.useRouter()
+    let optCurrentUser = RootProvider.useCurrentUser()
+    let userPage = switch optCurrentUser {
+    | Some(address) => `/user/${address->Ethers.Utils.ethAdrToLowerStr}`
+    | None => `/`
+    }
+
     // Execute the call after approval has completed
     React.useEffect1(() => {
       switch txStateApprove {
+      | Created =>
+        toastDispatch(
+          ToastProvider.Show(
+            `Please approve your ${Config.paymentTokenName} token`,
+            "",
+            ToastProvider.Info,
+          ),
+        )
+      | Declined(reason) =>
+        toastDispatch(
+          ToastProvider.Show(
+            `The transaction was rejected by your wallet`,
+            reason,
+            ToastProvider.Error,
+          ),
+        )
+      | SignedAndSubmitted(_) =>
+        toastDispatch(ToastProvider.Show(`Approval transaction processing`, "", ToastProvider.Info))
       | Complete(_) =>
         contractActionToCallAfterApproval()
         setTxStateApprove(_ => ContractActions.UnInitialised)
+        toastDispatch(
+          ToastProvider.Show(`Approve transaction confirmed`, "", ToastProvider.Success),
+        )
+      | Failed =>
+        toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
       | _ => ()
       }
       None
     }, [txStateApprove])
 
-    let router = Next.Router.useRouter()
+    React.useEffect1(() => {
+      switch txState {
+      | Created =>
+        toastDispatch(
+          ToastProvider.Show(`Sign the transaction to mint ${tokenToMint}`, "", ToastProvider.Info),
+        )
+      | SignedAndSubmitted(_) =>
+        toastDispatch(ToastProvider.Show(`Minting transaction pending`, "", ToastProvider.Info))
+      | Complete(_) =>
+        toastDispatch(ToastProvider.Show(`Mint transaction confirmed`, "", ToastProvider.Success))
+        router->Next.Router.push(userPage)
+      | Failed =>
+        toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
+      | Declined(reason) =>
+        toastDispatch(
+          ToastProvider.Show(
+            `The transaction was rejected by your wallet`,
+            reason,
+            ToastProvider.Warning,
+          ),
+        )
+      | _ => ()
+      }
+      None
+    }, [txState])
 
     <MintFormInput
       txStateApprove

@@ -15,17 +15,17 @@ function Market(Props) {
                       }, "◀", React.createElement("span", {
                             className: "text-xs"
                           }, " Back to markets"))
-                }), React.createElement(MarketCard.make, {
-                  marketData: marketData
                 }), React.createElement("div", {
                   className: "flex flex-col md:flex-row justify-center items-stretch"
                 }, React.createElement("div", {
-                      className: "flex-1 w-full min-h-10 p-1 mb-8 mr-8 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
+                      className: "flex-1  p-1 mb-2 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
+                    }, React.createElement(Mint.Mint.make, {})), React.createElement("div", {
+                      className: "flex-1 w-full min-h-10 p-1 mb-2 ml-8 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
                     }, React.createElement(PriceGraph.make, {
                           marketName: marketData.name
-                        })), React.createElement("div", {
-                      className: "flex-1  p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
-                    }, React.createElement(Mint.Mint.make, {}))));
+                        }))), React.createElement(MarketCard.make, {
+                  marketData: marketData
+                }));
 }
 
 var make = Market;
