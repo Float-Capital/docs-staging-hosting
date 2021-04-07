@@ -17,6 +17,7 @@ const bscTestVBUSDAddress = "0x08e0A5575De71037aE36AbfAfb516595fE68e5e4";
 const kovanDaiAddress = "0xff795577d9ac8bd7d90ee22b6c1703490b6512fd";
 
 const aavePoolAddressKovan = "0xE0fBa4Fc209b4948668006B2bE61711b7f465bAe";
+const kovanADai = "0xdcf0af9e59c002fa3aa091a46196b37530fd48a8";
 
 // BSC testnet BAND oracle address. - (the same address is used for both kovan and bsc testnet - convenient)
 const testnetBANDAddress = "0xDA7a001b254CD22e46d3eAB04d937489c93174C3";
@@ -74,7 +75,7 @@ const deployTestMarket = async (
       admin,
       longShortInstance.address,
       kovanDaiAddress,
-      bscTestVBUSDAddress,
+      kovanADai,
       aavePoolAddressKovan,
       0
     );
@@ -247,7 +248,7 @@ module.exports = async function(deployer, network, accounts) {
     const onePointOne = new BN("1100000000000000000");
     const oracleManagerAddr = await longShort.oracleManagers.call(marketIndex);
     const oracleManager = await OracleManagerMock.at(oracleManagerAddr);
-    await oracleManager.setPrice(onePointOne);
+    if (network == "kovan") if (network != "kovan") await oracleManager.setPrice(onePointOne);
     await longShort._updateSystemState(marketIndex);
 
     // Simulate user 2 redeeming half his tokens.
