@@ -1,0 +1,110 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: LongShort
+    network: kovan
+    source:
+      address: "0xA696f77436A4e631c96CA8b9fa2DCD1b250Eb1E3"
+      abi: LongShort
+      startBlock: 24185640
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - V1
+        - FeesLevied
+        - SyntheticTokenCreated
+        - LongMinted
+        - LongRedeem
+        - PriceUpdate
+        - ShortMinted
+        - ShortRedeem
+        - TokenPriceRefreshed
+        - FeesChanges
+        - ValueLockedInSystem
+      abis:
+        - name: LongShort
+          file: ./abis/LongShort.json
+      eventHandlers:
+        - event: V1(address,address,address)
+          handler: handleV1
+        - event: FeesLevied(uint256,uint256)
+          handler: handleFeesLevied
+        - event: SyntheticTokenCreated(uint256,address,address,uint256,string,string,address)
+          handler: handleSyntheticTokenCreated
+        - event: LongMinted(uint256,uint256,uint256,uint256,address)
+          handler: handleLongMinted
+        - event: LongRedeem(uint256,uint256,uint256,uint256,address)
+          handler: handleLongRedeem
+        - event: PriceUpdate(uint256,uint256,uint256,address)
+          handler: handlePriceUpdate
+        - event: ShortMinted(uint256,uint256,uint256,uint256,address)
+          handler: handleShortMinted
+        - event: ShortRedeem(uint256,uint256,uint256,uint256,address)
+          handler: handleShortRedeem
+        - event: TokenPriceRefreshed(uint256,uint256,uint256)
+          handler: handleTokenPriceRefreshed
+        - event: ValueLockedInSystem(uint256,uint256,uint256,uint256)
+          handler: handleValueLockedInSystem
+        - event: FeesChanges(uint256,uint256,uint256,uint256,uint256)
+          handler: handleFeesChanges
+      file: ./src/float.ts
+
+  - kind: ethereum/contract
+    name: Staker
+    network: kovan
+    source:
+      address: "0xaF19574FC130D9425B4786e0eC68672bEAc973A9"
+      abi: Staker
+      startBlock: 24184974
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - DeployV0
+        - StateAdded
+        - StakeWithdrawn
+        - FloatMinted
+        - FloatAccumulated
+      abis:
+        - name: Staker
+          file: ./abis/Staker.json
+      eventHandlers:
+        - event: DeployV1(address)
+          handler: handleDeployV1
+        - event: StateAdded(address,uint256,uint256,uint256)
+          handler: handleStateAdded
+        - event: StakeAdded(address,address,uint256,uint256)
+          handler: handleStakeAdded
+        - event: StakeWithdrawn(address,address,uint256)
+          handler: handleStakeWithdrawn
+        - event: FloatMinted(address,address,uint256,uint256)
+          handler: handleFloatMinted
+        - event: KFactorParametersChanges(uint256,uint256,uint256)
+          handler: handleKFactorParametersChanges
+      file: ./src/staker.ts
+
+templates:
+  - kind: ethereum/contract
+    name: erc20
+    network: kovan
+    source:
+      abi: erc20
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      abis:
+        - name: erc20
+          file: ./abis/SyntheticToken.json
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Transfer
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/tokenTransfers.ts
