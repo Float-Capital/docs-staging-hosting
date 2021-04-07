@@ -184,7 +184,7 @@ module.exports = async function(deployer, network, accounts) {
 
     console.log(`To verify market specific contracts run the following:
     
-    \`${verifyString}\` --network kovan`);
+    \`${verifyString} --network kovan\``);
   }
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
     console.log(`Simulating transactions for marketIndex: ${marketIndex}`);

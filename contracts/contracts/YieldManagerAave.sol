@@ -86,7 +86,7 @@ contract YieldManagerAave is IYieldManager, Initializable {
         token.transferFrom(longShort, address(this), amount);
 
         // Transfer tokens to aToken contract to mint aTokens.
-        token.approve(address(aToken), amount);
+        token.approve(address(lendingPool), amount);
 
         // Deposit the desired amount of tokens into the aave pool
         lendingPool.deposit(
