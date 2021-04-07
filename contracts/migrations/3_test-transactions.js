@@ -147,10 +147,10 @@ module.exports = async function (deployer, network, accounts) {
 
   // We use fake DAI if we're not on BSC testnet.
   let token;
-  if (network != "binanceTest") {
-    token = await Dai.deployed();
-  } else if (network == "kovan") {
+  if (network == "kovan") {
     token = await Dai.at(kovanDaiAddress);
+  } else if (network != "binanceTest") {
+    token = await Dai.deployed();
   }
 
   const longShort = await LongShort.deployed();
