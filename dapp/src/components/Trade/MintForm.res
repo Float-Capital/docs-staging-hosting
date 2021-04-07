@@ -56,24 +56,10 @@ module SubmitButtonAndTxTracker = {
 
     switch (txStateApprove, txStateMint) {
     | (ContractActions.Created, _) =>
-      React.useEffect1(() => {
-        toastDispatch(
-          ToastProvider.Show(
-            `Please approve your ${Config.paymentTokenName} token`,
-            "",
-            ToastProvider.Info,
-          ),
-        )
-        None
-      }, [])
       <div className="text-center m-3">
         <p> {`Please approve your ${Config.paymentTokenName} token `->React.string} </p>
       </div>
     | (ContractActions.SignedAndSubmitted(txHash), _) =>
-      React.useEffect1(() => {
-        toastDispatch(ToastProvider.Show(`Approval transaction processing`, "", ToastProvider.Info))
-        None
-      }, [])
       <div className="text-center m-3">
         <MiniLoader />
         <p> {"Approval transaction pending... "->React.string} </p>
@@ -83,39 +69,11 @@ module SubmitButtonAndTxTracker = {
       </div>
     | (ContractActions.Complete({transactionHash}), ContractActions.Created)
     | (ContractActions.Complete({transactionHash}), ContractActions.UnInitialised) =>
-      React.useEffect1(() => {
-        toastDispatch(
-          ToastProvider.Show(`Approval transaction confirmed`, "", ToastProvider.Success),
-        )
-        None
-      }, [])
-      // Put inside timeout for 3 seconds
-      // React.useEffect1(() => {
-      //   toastDispatch(
-      //     ToastProvider.Show(`Confirm transaction to mint ${tokenToMint}`, "", ToastProvider.Success),
-      //   )
-      //   None
-      // }, [])
       <div className="text-center m-3">
         <p> {`Confirm transaction to mint ${tokenToMint}`->React.string} </p>
       </div>
-    | (ContractActions.Declined(message), _) =>
-      React.useEffect1(() => {
-        toastDispatch(
-          ToastProvider.Show(
-            `The transaction was rejected by your wallet`,
-            message,
-            ToastProvider.Error,
-          ),
-        )
-        None
-      }, [])
-      <> {resetFormButton()} </>
+    | (ContractActions.Declined(message), _) => <> {resetFormButton()} </>
     | (ContractActions.Failed, _) =>
-      React.useEffect1(() => {
-        toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
-        None
-      }, [])
       <div className="text-center m-3">
         <p> {`The transaction failed.`->React.string} </p>
         <p>
@@ -126,27 +84,17 @@ module SubmitButtonAndTxTracker = {
         {resetFormButton()}
       </div>
     | (_, ContractActions.Created) =>
-      React.useEffect1(() => {
-        toastDispatch(
-          ToastProvider.Show(`Sign the transaction to mint ${tokenToMint}`, "", ToastProvider.Info),
-        )
-        None
-      }, [])
       <div className="text-center m-3">
         <h1> {`Sign the transaction to mint ${tokenToMint}`->React.string} </h1>
       </div>
     | (ContractActions.Complete({transactionHash}), ContractActions.SignedAndSubmitted(txHash)) =>
-      React.useEffect1(() => {
-        toastDispatch(ToastProvider.Show(`Approval confirmed`, "", ToastProvider.Success))
-        None
-      }, [])
       <div className="text-center m-3">
         <p>
           <a
             target="_"
             rel="noopenner noreferer"
             href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
-            {`Approval confirmes`->React.string}
+            {`Approval confirmed`->React.string}
           </a>
         </p>
         <h1>
@@ -159,10 +107,6 @@ module SubmitButtonAndTxTracker = {
         </h1>
       </div>
     | (_, ContractActions.SignedAndSubmitted(txHash)) =>
-      React.useEffect1(() => {
-        toastDispatch(ToastProvider.Show(`Minting transaction pending`, "", ToastProvider.Info))
-        None
-      }, [])
       <div className="text-center m-3">
         <MiniLoader />
         <p> {"Minting transaction pending... "->React.string} </p>
@@ -175,24 +119,10 @@ module SubmitButtonAndTxTracker = {
         </a>
       </div>
     | (_, ContractActions.Complete({transactionHash})) =>
-      React.useEffect1(() => {
-        toastDispatch(ToastProvider.Show(`Transaction complete`, "", ToastProvider.Success))
-        None
-      }, [])
       <div className="text-center m-3">
         <p> {`Transaction complete`->React.string} </p> {resetFormButton()}
       </div>
     | (_, ContractActions.Declined(message)) =>
-      React.useEffect1(() => {
-        toastDispatch(
-          ToastProvider.Show(
-            `The transaction was rejected by your wallet`,
-            message,
-            ToastProvider.Error,
-          ),
-        )
-        None
-      }, [])
       <div className="text-center m-3">
         <p> {`The transaction was rejected by your wallet`->React.string} </p>
         <a target="_" rel="noopenner noreferer" href=Config.discordInviteLink>
@@ -201,10 +131,6 @@ module SubmitButtonAndTxTracker = {
         {resetFormButton()}
       </div>
     | (_, ContractActions.Failed) =>
-      React.useEffect1(() => {
-        toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
-        None
-      }, [])
       <div className="text-center m-3">
         <h1> {`The transaction failed.`->React.string} </h1>
         <p>
@@ -423,18 +349,73 @@ module MintFormSignedIn = {
       }
     }
 
+    let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
+    let router = Next.Router.useRouter()
+    let optCurrentUser = RootProvider.useCurrentUser()
+    let userPage = switch optCurrentUser {
+    | Some(address) => `/user/${address->Ethers.Utils.ethAdrToLowerStr}`
+    | None => `/`
+    }
+
     // Execute the call after approval has completed
     React.useEffect1(() => {
       switch txStateApprove {
+      | Created =>
+        toastDispatch(
+          ToastProvider.Show(
+            `Please approve your ${Config.paymentTokenName} token`,
+            "",
+            ToastProvider.Info,
+          ),
+        )
+      | Declined(reason) =>
+        toastDispatch(
+          ToastProvider.Show(
+            `The transaction was rejected by your wallet`,
+            reason,
+            ToastProvider.Error,
+          ),
+        )
+      | SignedAndSubmitted(_) =>
+        toastDispatch(ToastProvider.Show(`Approval transaction processing`, "", ToastProvider.Info))
       | Complete(_) =>
         contractActionToCallAfterApproval()
         setTxStateApprove(_ => ContractActions.UnInitialised)
+        toastDispatch(
+          ToastProvider.Show(`Approve transaction confirmed`, "", ToastProvider.Success),
+        )
+      | Failed =>
+        toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
       | _ => ()
       }
       None
     }, [txStateApprove])
 
-    let router = Next.Router.useRouter()
+    React.useEffect1(() => {
+      switch txState {
+      | Created =>
+        toastDispatch(
+          ToastProvider.Show(`Sign the transaction to mint ${tokenToMint}`, "", ToastProvider.Info),
+        )
+      | SignedAndSubmitted(_) =>
+        toastDispatch(ToastProvider.Show(`Minting transaction pending`, "", ToastProvider.Info))
+      | Complete(_) =>
+        toastDispatch(ToastProvider.Show(`Mint transaction confirmed`, "", ToastProvider.Success))
+        router->Next.Router.push(userPage)
+      | Failed =>
+        toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
+      | Declined(reason) =>
+        toastDispatch(
+          ToastProvider.Show(
+            `The transaction was rejected by your wallet`,
+            reason,
+            ToastProvider.Warning,
+          ),
+        )
+      | _ => ()
+      }
+      None
+    }, [txState])
 
     <MintFormInput
       txStateApprove
