@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.2;
+pragma solidity 0.8.3;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
@@ -54,7 +54,7 @@ contract Staker is IStaker, Initializable {
 
     // Token state.
     mapping(address => bool) syntheticValid; // token -> is valid?
-    mapping(address => uint256) public marketIndexOfToken; // token -> market index
+    mapping(address => uint32) public marketIndexOfToken; // token -> market index
     mapping(address => mapping(uint256 => RewardState))
         public syntheticRewardParams; // token -> index -> state
     mapping(address => uint256) public latestRewardIndex; // token -> index
@@ -89,7 +89,7 @@ contract Staker is IStaker, Initializable {
     );
 
     event KFactorParametersChanges(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 period,
         uint256 multiplier
     );
@@ -147,7 +147,7 @@ contract Staker is IStaker, Initializable {
     }
 
     function changeKFactorParameters(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 period,
         uint256 initialMultiplier
     ) external onlyAdmin {
@@ -155,7 +155,7 @@ contract Staker is IStaker, Initializable {
     }
 
     function _changeKFactorParameters(
-        uint256 marketIndex,
+        uint32 marketIndex,
         uint256 period,
         uint256 initialMultiplier
     ) internal {
@@ -175,7 +175,7 @@ contract Staker is IStaker, Initializable {
     ////////////////////////////////////
 
     function addNewStakingFund(
-        uint256 marketIndex,
+        uint32 marketIndex,
         address longTokenAddress,
         address shortTokenAddress,
         uint256 kInitialMultiplier,
@@ -253,7 +253,7 @@ contract Staker is IStaker, Initializable {
      * Returns the K factor parameters for the given market with sensible
      * defaults if they haven't been set yet.
      */
-    function getKFactorParameters(uint256 marketIndex)
+    function getKFactorParameters(uint32 marketIndex)
         internal
         view
         returns (uint256, uint256)
@@ -422,7 +422,7 @@ contract Staker is IStaker, Initializable {
         }
     }
 
-    function claimFloat(address[] memory tokenAddresses) external {
+    function claimFloat(address[] calldata tokenAddresses) public {
         require(tokenAddresses.length <= 15); // Set some limit on loop length
         uint256 floatTotal = 0;
         for (uint256 i = 0; i < tokenAddresses.length; i++) {
@@ -450,9 +450,22 @@ contract Staker is IStaker, Initializable {
         }
     }
 
-    function claimFloatImmediately(address tokenAddress) external {
-        floatContract._updateSystemState(marketIndexOfToken[tokenAddress]);
-        mintAccumulatedFloat(tokenAddress, msg.sender);
+    // TODO: check if there is any gas benefit to this function over `claimFloatCustom`
+    function claimFloatImmediately(address[] calldata tokenAddresses) external {
+        for (uint256 i = 0; i < tokenAddresses.length; i++) {
+            floatContract._updateSystemState(
+                marketIndexOfToken[tokenAddresses[i]]
+            );
+        }
+        claimFloat(tokenAddresses);
+    }
+
+    function claimFloatCustom(
+        address[] calldata tokenAddresses,
+        uint32[] calldata marketIndexes
+    ) external {
+        floatContract._updateSystemStateMulti(marketIndexes);
+        claimFloat(tokenAddresses);
     }
 
     ////////////////////////////////////

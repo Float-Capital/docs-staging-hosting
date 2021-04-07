@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.2;
+pragma solidity 0.8.3;
 pragma abicoder v2;
 
-import "@openzeppelin/contracts-upgradeable/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./interfaces/IOracleManager.sol";
 import "./interfaces/IBandOracle.sol";

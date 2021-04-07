@@ -7,14 +7,19 @@ const SyntheticToken = artifacts.require("SyntheticToken");
 const YieldManagerMock = artifacts.require("YieldManagerMock");
 const OracleManagerMock = artifacts.require("OracleManagerMock");
 const YieldManagerVenus = artifacts.require("YieldManagerVenus");
+const YieldManagerAave = artifacts.require("YieldManagerAave");
 const OracleManagerEthKiller = artifacts.require("OracleManagerEthKiller");
 
 // BSC testnet BUSD and vBUSD token addresses (for venus).
 const bscTestBUSDAddress = "0x8301F2213c0eeD49a7E28Ae4c3e91722919B8B47";
 const bscTestVBUSDAddress = "0x08e0A5575De71037aE36AbfAfb516595fE68e5e4";
 
-// BSC testnet BAND oracle address.
-const bscTestBANDAddress = "0xDA7a001b254CD22e46d3eAB04d937489c93174C3";
+const kovanDaiAddress = "0xff795577d9ac8bd7d90ee22b6c1703490b6512fd";
+
+const aavePoolAddressKovan = "0xE0fBa4Fc209b4948668006B2bE61711b7f465bAe";
+
+// BSC testnet BAND oracle address. - (the same address is used for both kovan and bsc testnet - convenient)
+const testnetBANDAddress = "0xDA7a001b254CD22e46d3eAB04d937489c93174C3";
 
 const mintAndApprove = async (token, amount, user, approvedAddress) => {
   let bnAmount = new BN(amount);
@@ -40,9 +45,9 @@ const deployTestMarket = async (
 
   // We mock out the oracle manager unless we're on BSC testnet.
   let oracleManager;
-  if (networkName == "binanceTest") {
+  if (networkName == "binanceTest" || networkName == "kovan") {
     oracleManager = await OracleManagerEthKiller.new();
-    await oracleManager.setup(admin, bscTestBANDAddress);
+    await oracleManager.setup(admin, testnetBANDAddress);
   } else {
     oracleManager = await OracleManagerMock.new();
     await oracleManager.setup(admin);
@@ -60,6 +65,18 @@ const deployTestMarket = async (
       longShortInstance.address,
       bscTestBUSDAddress,
       bscTestVBUSDAddress
+    );
+  } else if (networkName == "kovan") {
+    yieldManager = await YieldManagerAave.new();
+    fundTokenAddress = bscTestBUSDAddress;
+
+    await yieldManager.setup(
+      admin,
+      longShortInstance.address,
+      bscTestBUSDAddress,
+      bscTestVBUSDAddress,
+      aavePoolAddressKovan,
+      0
     );
   } else {
     yieldManager = await YieldManagerMock.new();
@@ -115,7 +132,7 @@ const topupBalanceIfLow = async (from, to) => {
   }
 };
 
-module.exports = async function(deployer, network, accounts) {
+module.exports = async function (deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
@@ -126,10 +143,13 @@ module.exports = async function(deployer, network, accounts) {
   await topupBalanceIfLow(admin, user3);
 
   const oneHundredMintAmount = "100000000000000000000";
+  const largeApprove = "10000000000000000000000000000000";
 
   // We use fake DAI if we're not on BSC testnet.
   let token;
-  if (network != "binanceTest") {
+  if (network == "kovan") {
+    token = await Dai.at(kovanDaiAddress);
+  } else if (network != "binanceTest") {
     token = await Dai.deployed();
   }
 
@@ -145,6 +165,17 @@ module.exports = async function(deployer, network, accounts) {
   }
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
+  
+  let verifyString = "truffle run verify"
+  if (network == "kovan") {
+    for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
+      verifyString += ` YieldManagerAave@${await longShort.yieldManagers(marketIndex)} OracleManagerEthKiller@${await longShort.oracleManagers(marketIndex)} SyntheticToken@${await longShort.longTokens(marketIndex)} SyntheticToken@${await longShort.shortTokens(marketIndex)}`
+    }
+
+    console.log(`To verify market specific contracts run the following:
+    
+    \`${verifyString}\` --network kovan`)
+  }
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
     console.log(`Simulating transactions for marketIndex: ${marketIndex}`);
 
@@ -154,17 +185,35 @@ module.exports = async function(deployer, network, accounts) {
     let long = await SyntheticToken.at(longAddress);
     let short = await SyntheticToken.at(shortAddress);
 
-    await mintAndApprove(token, oneHundredMintAmount, user1, longShort.address);
+    if (network == "kovan") {
+      await token.approve(longShort.address, largeApprove, {
+        from: user1,
+      })
+    } else {
+      await mintAndApprove(token, oneHundredMintAmount, user1, longShort.address);
+    }
     await longShort.mintLong(marketIndex, new BN(oneHundredMintAmount), {
       from: user1,
     });
 
-    await mintAndApprove(token, oneHundredMintAmount, user2, longShort.address);
+    if (network == "kovan") {
+      await token.approve(longShort.address, largeApprove, {
+        from: user2,
+      })
+    } else {
+      await mintAndApprove(token, oneHundredMintAmount, user2, longShort.address);
+    }
     await longShort.mintShort(marketIndex, new BN(oneHundredMintAmount), {
       from: user2,
     });
 
-    await mintAndApprove(token, oneHundredMintAmount, user3, longShort.address);
+    if (network == "kovan") {
+      await token.approve(longShort.address, largeApprove, {
+        from: user3,
+      })
+    } else {
+      await mintAndApprove(token, oneHundredMintAmount, user3, longShort.address);
+    }
     await longShort.mintShort(marketIndex, new BN(oneHundredMintAmount), {
       from: user3,
     });
@@ -194,7 +243,9 @@ module.exports = async function(deployer, network, accounts) {
       from: user1,
     });
 
-    await mintAndApprove(token, oneHundredMintAmount, user3, longShort.address);
+    if (network != "kovan") {
+      await mintAndApprove(token, oneHundredMintAmount, user3, longShort.address);
+    }
     await longShort.mintLongAndStake(
       marketIndex,
       new BN(oneHundredMintAmount),
@@ -203,7 +254,9 @@ module.exports = async function(deployer, network, accounts) {
       }
     );
 
-    await mintAndApprove(token, oneHundredMintAmount, user3, longShort.address);
+    if (network != "kovan") {
+      await mintAndApprove(token, oneHundredMintAmount, user3, longShort.address);
+    }
     await longShort.mintShortAndStake(
       marketIndex,
       new BN(oneHundredMintAmount),

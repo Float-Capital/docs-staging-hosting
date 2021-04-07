@@ -1,4 +1,5 @@
 const { deployProxy } = require("@openzeppelin/truffle-upgrades");
+const { admin: { getInstance: getAdminInstance } } = require("@openzeppelin/truffle-upgrades");
 
 const STAKER = "Staker";
 const SYNTHETIC_TOKEN = "Dai";
@@ -7,7 +8,6 @@ const LONGSHORT = "LongShort";
 const FLOAT_TOKEN = "FloatToken";
 const TOKEN_FACTORY = "TokenFactory";
 const FLOAT_CAPITAL = "FloatCapital_v0";
-const PLACEHOLDER = "EmptyPlaceholderContract";
 
 const Staker = artifacts.require(STAKER);
 const Treasury = artifacts.require(TREASURY);
@@ -16,9 +16,8 @@ const Dai = artifacts.require(SYNTHETIC_TOKEN);
 const FloatToken = artifacts.require(FLOAT_TOKEN);
 const TokenFactory = artifacts.require(TOKEN_FACTORY);
 const FloatCapital = artifacts.require(FLOAT_CAPITAL);
-const EmptyPlaceholderContract = artifacts.require(PLACEHOLDER);
 
-module.exports = async function(deployer, networkName, accounts) {
+module.exports = async function (deployer, networkName, accounts) {
   if (networkName == "bsc") {
     throw "Don't save or run this migration if on mainnet (remove when ready)";
   }
@@ -31,7 +30,7 @@ module.exports = async function(deployer, networkName, accounts) {
   }
 
   // We use actual bUSD for the BSC testnet instead of fake DAI.
-  if (networkName != "binanceTest") {
+  if (networkName != "binanceTest" && networkName != "kovan") {
     await deployer.deploy(Dai);
     let dai = await Dai.deployed();
     await dai.initialize("dai token", "DAI");
@@ -39,6 +38,7 @@ module.exports = async function(deployer, networkName, accounts) {
 
   await deployer.deploy(TokenFactory);
   let tokenFactory = await TokenFactory.deployed();
+
 
   await deployer.deploy(FloatToken);
   let floatToken = await FloatToken.deployed();
@@ -85,4 +85,12 @@ module.exports = async function(deployer, networkName, accounts) {
       from: admin,
     }
   );
+
+
+  if (networkName == "kovan") {
+    const adminInstance = await getAdminInstance()
+    console.log(`To verify all these contracts run the following:
+    
+    \`truffle run verify TokenFactory FloatToken Treasury_v0@${await adminInstance.getProxyImplementation(treasury.address)} FloatCapital_v0@${await adminInstance.getProxyImplementation(floatCapital.address)} Staker@${await adminInstance.getProxyImplementation(staker.address)} LongShort@${await adminInstance.getProxyImplementation(longShort.address)} --network kovan\``)
+  }
 };

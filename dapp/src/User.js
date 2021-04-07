@@ -8,6 +8,7 @@ import * as Loader from "./components/UI/Loader.js";
 import * as UserUI from "./components/UI/UserUI.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
 import * as Masonry from "./components/UI/Masonry.js";
+import * as CONSTANTS from "./CONSTANTS.js";
 import * as DataHooks from "./data/DataHooks.js";
 import Link from "next/link";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
@@ -36,7 +37,9 @@ function User$UserBalancesCard(Props) {
                     head: "💰 Synth value",
                     body: "$" + FormatMoney.formatEther(undefined, match.totalBalance)
                   })
-            }), React.createElement("br", undefined), Belt_Array.map(match.balances, (function (param) {
+            }), React.createElement("br", undefined), Belt_Array.map(Belt_Array.keep(match.balances, (function (param) {
+                    return !param.tokenBalance.eq(CONSTANTS.zeroBN);
+                  })), (function (param) {
                 var isLong = param.isLong;
                 var name = param.name;
                 return React.createElement(UserUI.UserMarketBox.make, {

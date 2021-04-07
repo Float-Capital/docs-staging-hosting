@@ -95,10 +95,10 @@ export function createInitialSystemState(
 }
 export function getOrCreateLatestSystemState(
   marketIndex: BigInt,
-  latestStateChangeCounter: BigInt,
+  txHash: Bytes,
   event: ethereum.Event
 ): SystemState {
-  let systemStateId = latestStateChangeCounter.toString();
+  let systemStateId = txHash.toHex();
   let marketIndexId = marketIndex.toString();
   let latestSystemState = SystemState.load(marketIndexId + "-" + systemStateId);
   if (latestSystemState == null) {

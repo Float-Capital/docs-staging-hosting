@@ -27,12 +27,14 @@ let default = (props: props): React.element => {
   <ToastProvider>
     <RootProvider>
       <Client>
-        <ComingSoon />
-        <StateChangeMonitor>
-          {switch router.route {
-          | _ => <MainLayout> content </MainLayout>
-          }}
-        </StateChangeMonitor>
+        <APYProvider>
+          <ComingSoon />
+          <StateChangeMonitor>
+            {switch router.route {
+            | _ => <MainLayout> content </MainLayout>
+            }}
+          </StateChangeMonitor>
+        </APYProvider>
       </Client>
       <Toast />
     </RootProvider>
