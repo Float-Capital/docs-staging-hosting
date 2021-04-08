@@ -60,22 +60,15 @@ let tokenRedeemPosition = (
 
   let hasTokens = hasShortTokens || hasLongTokens
   let hasBothTokens = hasShortTokens && hasLongTokens
-  let isLongAndHasLongTokens = isLong && hasLongTokens
-  let isShortAndHasLongTokens = !isLong && hasShortTokens
 
-  let isActuallyLong = hasBothTokens ? isLong : !isLongAndHasLongTokens
-
-  let syntheticTokenAddress: Ethers.ethAddress = switch hasBothTokens {
-  | true => isLong ? market.syntheticLong.tokenAddress : market.syntheticShort.tokenAddress
+  let (isActuallyLong, syntheticTokenAddress) = switch hasBothTokens {
+  | true =>
+    isLong ? (true, market.syntheticLong.tokenAddress) : (false, market.syntheticShort.tokenAddress)
   | false =>
-    !isLongAndHasLongTokens ? market.syntheticLong.tokenAddress : market.syntheticShort.tokenAddress
+    hasLongTokens
+      ? (true, market.syntheticLong.tokenAddress)
+      : (false, market.syntheticShort.tokenAddress)
   }
-
-  // TODO
-  // if isLong and hasLongTokens => true
-  // if isLong and hasShortTokens => false
-  // if !isLong and hasLongTokens => false
-  // if !isLong and hasShortTokens => true
 
   (isActuallyLong, syntheticTokenAddress, hasTokens, hasBothTokens)
 }

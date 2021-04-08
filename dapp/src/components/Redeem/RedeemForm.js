@@ -480,16 +480,26 @@ function tokenRedeemPosition(market, isLong, longTokenBalance, shortTokenBalance
   var hasShortTokens = shortTokenBalance.gt(CONSTANTS.zeroBN);
   var hasTokens = hasShortTokens || hasLongTokens;
   var hasBothTokens = hasShortTokens && hasLongTokens;
-  var isLongAndHasLongTokens = isLong && hasLongTokens;
-  var isActuallyLong = hasBothTokens ? isLong : !isLongAndHasLongTokens;
-  var syntheticTokenAddress = hasBothTokens ? (
-      isLong ? market.syntheticLong.tokenAddress : market.syntheticShort.tokenAddress
+  var match = hasBothTokens ? (
+      isLong ? [
+          true,
+          market.syntheticLong.tokenAddress
+        ] : [
+          false,
+          market.syntheticShort.tokenAddress
+        ]
     ) : (
-      isLongAndHasLongTokens ? market.syntheticShort.tokenAddress : market.syntheticLong.tokenAddress
+      hasLongTokens ? [
+          true,
+          market.syntheticLong.tokenAddress
+        ] : [
+          false,
+          market.syntheticShort.tokenAddress
+        ]
     );
   return [
-          isActuallyLong,
-          syntheticTokenAddress,
+          match[0],
+          match[1],
           hasTokens,
           hasBothTokens
         ];
