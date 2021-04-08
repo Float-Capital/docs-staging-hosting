@@ -22,9 +22,9 @@ contract YieldManagerAave is IYieldManager, Initializable {
     address public longShort;
 
     // Global state.
-    ERC20 token; // underlying asset token
-    IERC20Upgradeable aToken; // corresponding aToken
-    ILendingPool lendingPool;
+    ERC20 public token; // underlying asset token
+    IERC20Upgradeable public aToken; // corresponding aToken
+    ILendingPool public lendingPool;
 
     uint16 referralCode;
 
@@ -86,7 +86,7 @@ contract YieldManagerAave is IYieldManager, Initializable {
         token.transferFrom(longShort, address(this), amount);
 
         // Transfer tokens to aToken contract to mint aTokens.
-        token.approve(address(aToken), amount);
+        token.approve(address(lendingPool), amount);
 
         // Deposit the desired amount of tokens into the aave pool
         lendingPool.deposit(
