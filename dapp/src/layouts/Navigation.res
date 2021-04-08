@@ -90,7 +90,7 @@ let make = () => {
       </Link>
       <div className="hidden md:flex w-2/3 text-base items-center justify-end">
         <Link href="/markets">
-          <a className="px-3 hover:bg-white"> {React.string("MINT")} </a>
+          <a className="px-3 hover:bg-white"> {React.string("MARKETS")} </a>
         </Link>
         <Link href="/stake">
           <a className="px-3 hover:bg-white"> {`STAKE🔥`->React.string} </a>
@@ -135,7 +135,7 @@ let make = () => {
                 setIsOpen(_ => false)
               }}
               className="px-3 bg-black m-2">
-              {React.string("MINT")}
+              {React.string("MARKETS")}
             </div>
             <div
               onClick={_ => {

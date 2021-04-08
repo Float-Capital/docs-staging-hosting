@@ -411,6 +411,12 @@ module MintFormSignedIn = {
       market
       onChangeSide={event => {
         router.query->Js.Dict.set("mintOption", (event->ReactEvent.Form.target)["value"])
+        router.query->Js.Dict.set(
+          "token",
+          isLong
+            ? market.syntheticLong.tokenAddress->Ethers.Utils.ethAdrToLowerStr
+            : market.syntheticShort.tokenAddress->Ethers.Utils.ethAdrToLowerStr,
+        )
         router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
       }}
       isLong={isLong}
