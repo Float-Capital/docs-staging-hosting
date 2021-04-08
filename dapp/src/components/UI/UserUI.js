@@ -265,10 +265,10 @@ function UserUI$UserStakesCard(Props) {
         var syntheticToken = stake.currentStake.syntheticToken;
         var addr = Ethers$1.utils.getAddress(syntheticToken.id);
         var name = syntheticToken.syntheticMarket.symbol;
-        var tokens = FormatMoney.formatEther(undefined, syntheticToken.totalStaked);
+        var tokens = FormatMoney.formatEther(undefined, stake.currentStake.amount);
         var isLong = syntheticToken.tokenType === "Long";
         var price = syntheticToken.latestPrice.price.price;
-        var value = stake.currentStake.syntheticToken.totalStaked.mul(price).div(CONSTANTS.tenToThe18);
+        var value = stake.currentStake.amount.mul(price).div(CONSTANTS.tenToThe18);
         totalValue.contents = totalValue.contents.add(value);
         return React.createElement(UserUI$UserMarketBox, {
                     name: name,
