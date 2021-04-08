@@ -159,23 +159,33 @@ export function getOrCreateStakerState(
 }
 
 export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
+  log.warning("U FIRST", []);
   let user = User.load(address.toHex());
+  log.warning("U SECOND", []);
   if (user == null) {
+    log.warning("U 3", []);
     user = new User(address.toHex());
+    log.warning("U 4", []);
     user.address = address;
     user.totalMintedFloat = ZERO;
     user.floatTokenBalance = ZERO;
     user.timestampJoined = event.block.timestamp;
+    log.warning("U 5", []);
     user.totalGasUsed = ZERO;
     user.numberOfTransactions = ZERO;
     user.currentStakes = [];
     user.tokenBalances = [];
     user.tokenMints = [];
+    log.warning("U 6", []);
     user.stateChangesAffectingUser = [];
-
+    
+    log.warning("U 7", []);
     let globalState = GlobalState.load(GLOBAL_STATE_ID);
+    log.warning("U 8", []);
     globalState.totalUsers = globalState.totalUsers.plus(ONE);
+    log.warning("U 9", []);
     globalState.save();
+    log.warning("U 10", []);
   }
 
   return user as User;

@@ -44,6 +44,7 @@ import {
 } from "./CONSTANTS";
 
 export function handleV1(event: V1): void {
+  log.warning("I WAS ALREADY CALLEDDD!!!!", [])
   // event V1(address admin, address tokenFactory, address staker);
 
   let admin = event.params.admin;
@@ -149,6 +150,7 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
 export function handleSyntheticTokenCreated(
   event: SyntheticTokenCreated
 ): void {
+  log.warning("Create synthetic token",[])
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
