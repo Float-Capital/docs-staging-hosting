@@ -44,7 +44,6 @@ import {
 } from "./CONSTANTS";
 
 export function handleV1(event: V1): void {
-  log.warning("I WAS ALREADY CALLEDDD!!!!", [])
   // event V1(address admin, address tokenFactory, address staker);
 
   let admin = event.params.admin;
@@ -115,11 +114,7 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
   let shortValue = event.params.shortValue;
   let txHash = event.transaction.hash;
 
-  let systemState = getOrCreateLatestSystemState(
-    marketIndex,
-    txHash,
-    event
-  );
+  let systemState = getOrCreateLatestSystemState(marketIndex, txHash, event);
   systemState.totalValueLocked = totalValueLockedInMarket;
   systemState.totalLockedLong = longValue;
   systemState.totalLockedShort = shortValue;
@@ -135,12 +130,7 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
       longValue,
       shortValue,
     ]),
-    [
-      "marketIndex",
-      "totalValueLockedInMarket",
-      "longValue",
-      "shortValue",
-    ],
+    ["marketIndex", "totalValueLockedInMarket", "longValue", "shortValue"],
     ["uint256", "uint256", "uint256", "uint256"],
     [],
     []
@@ -150,7 +140,6 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
 export function handleSyntheticTokenCreated(
   event: SyntheticTokenCreated
 ): void {
-  log.warning("Create synthetic token",[])
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
@@ -379,11 +368,7 @@ export function handlePriceUpdate(event: PriceUpdate): void {
 
   let syntheticMarket = SyntheticMarket.load(marketIndexString);
 
-  let systemState = getOrCreateLatestSystemState(
-    marketIndex,
-    txHash,
-    event
-  );
+  let systemState = getOrCreateLatestSystemState(marketIndex, txHash, event);
   systemState.syntheticPrice = newPrice;
   syntheticMarket.latestSystemState = systemState.id;
   systemState.save();
@@ -392,11 +377,9 @@ export function handlePriceUpdate(event: PriceUpdate): void {
   saveEventToStateChange(
     event,
     "PriceUpdate",
-    bigIntArrayToStringArray([
-      marketIndex,
-      oldPrice,
-      newPrice,
-    ]).concat([user.toHex()]),
+    bigIntArrayToStringArray([marketIndex, oldPrice, newPrice]).concat([
+      user.toHex(),
+    ]),
     ["marketIndex", "newPrice", "oldPrice", "user"],
     ["uint256", "uint256", "uint256", "address"],
     [user],
@@ -432,7 +415,7 @@ export function handleShortMinted(event: ShortMinted): void {
       "tokensMinted",
       "user",
     ],
-    ["uint256",  "uint256", "uint256", "uint256", "address"],
+    ["uint256", "uint256", "uint256", "uint256", "address"],
     [userAddress],
     []
   );
@@ -524,14 +507,9 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
   let timestamp = event.block.timestamp;
   let txHash = event.transaction.hash;
 
-
   let syntheticMarket = SyntheticMarket.load(marketIndexString);
 
-  let systemState = getOrCreateLatestSystemState(
-    marketIndex,
-    txHash,
-    event
-  );
+  let systemState = getOrCreateLatestSystemState(marketIndex, txHash, event);
 
   syntheticMarket.latestSystemState = systemState.id;
   systemState.save();
@@ -543,11 +521,7 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
   saveEventToStateChange(
     event,
     "TokenPriceRefreshed",
-    bigIntArrayToStringArray([
-      marketIndex,
-      longTokenPrice,
-      shortTokenPrice,
-    ]),
+    bigIntArrayToStringArray([marketIndex, longTokenPrice, shortTokenPrice]),
     ["marketIndex", "longTokenPrice", "shortTokenPrice"],
     ["uint256", "uint256", "uint256"],
     [],

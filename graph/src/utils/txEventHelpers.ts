@@ -4,7 +4,7 @@ import {
   EventParams,
   GlobalState,
 } from "../../generated/schema";
-import { Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { ONE, ZERO_ADDRESS, GLOBAL_STATE_ID } from "../CONSTANTS";
 import { getOrCreateUser } from "./globalStateManager";
 
@@ -68,43 +68,33 @@ function txStateChangeHelper(
   affectedUsers: Array<Bytes>,
   affectedStakes: Array<string>
 ): void {
-    log.warning("inIN 1", [])
-    let txHash = event.transaction.hash;
-    log.warning("inIN 2", [])
-    
-    let stateChange = StateChange.load(txHash.toHex());
-    log.warning("inIN 3", [])
-    if (stateChange == null) {
-      stateChange = new StateChange(txHash.toHex());
-      stateChange.txEventParamList = [];
-      stateChange.affectedUsers = [];
-      stateChange.affectedStakes = [];
-      log.warning("inIN 4", [])
-      
-      // Order important here since getOrCreateUser loads and saves global state for a new user
-      let user = getOrCreateUser(event.transaction.from, event);
-      log.warning("inIN 4 -- 1", [])
+  let txHash = event.transaction.hash;
+
+  let stateChange = StateChange.load(txHash.toHex());
+  if (stateChange == null) {
+    stateChange = new StateChange(txHash.toHex());
+    stateChange.txEventParamList = [];
+    stateChange.affectedUsers = [];
+    stateChange.affectedStakes = [];
+
+    // Order important here since getOrCreateUser loads and saves global state for a new user
+    let user = getOrCreateUser(event.transaction.from, event);
     let globalState = GlobalState.load(GLOBAL_STATE_ID);
-    
-    log.warning("inIN 5", [])
+
     user.totalGasUsed = user.totalGasUsed.plus(event.block.gasUsed);
     user.numberOfTransactions = user.numberOfTransactions.plus(ONE);
-  log.warning("inIN 6", [])
-  
-  globalState.totalTxs = globalState.totalTxs.plus(ONE);
-  globalState.totalGasUsed = globalState.totalGasUsed.plus(
-    event.block.gasUsed
+
+    globalState.totalTxs = globalState.totalTxs.plus(ONE);
+    globalState.totalGasUsed = globalState.totalGasUsed.plus(
+      event.block.gasUsed
     );
-    log.warning("inIN 7", [])
-    
+
     globalState.save();
-    log.warning("inIN 8", [])
     user.save();
   }
-  
+
   let eventIndex: i32 = getEventIndex(txHash);
-  
-  log.warning("inIN 9", [])
+
   // create EventParams
   let eventParams = txEventParamsHelper(
     eventName,
@@ -112,27 +102,25 @@ function txStateChangeHelper(
     txHash,
     eventParamArray
   );
-  
-  log.warning("inIN 10", [])
+
   // Update affected users
   for (let index = 0; index < affectedUsers.length; index++) {
     if (affectedUsers[index].toHex() != ZERO_ADDRESS) {
       let user = getOrCreateUser(affectedUsers[index], event);
       stateChange.affectedUsers =
-      stateChange.affectedUsers.indexOf(user.id) === -1
-      ? stateChange.affectedUsers.concat([user.id])
+        stateChange.affectedUsers.indexOf(user.id) === -1
+          ? stateChange.affectedUsers.concat([user.id])
           : stateChange.affectedUsers;
-          
-          user.stateChangesAffectingUser =
-          user.stateChangesAffectingUser.indexOf(stateChange.id) === -1
+
+      user.stateChangesAffectingUser =
+        user.stateChangesAffectingUser.indexOf(stateChange.id) === -1
           ? user.stateChangesAffectingUser.concat([stateChange.id])
           : user.stateChangesAffectingUser;
-          
-          user.save();
-        }
-      }
-      
-      log.warning("inIN 11", [])
+
+      user.save();
+    }
+  }
+
   // Update affected stakes
   for (let index = 0; index < affectedStakes.length; index++) {
     let affectedStake = affectedStakes[index];
@@ -147,7 +135,6 @@ function txStateChangeHelper(
   stateChange.txEventParamList = stateChange.txEventParamList.concat([
     eventParams.id,
   ]);
-        log.warning("inIN 12", [])
 
   stateChange.save();
 }
@@ -161,21 +148,18 @@ export function saveEventToStateChange(
   affectedUsers: Array<Bytes>,
   affectedStakes: Array<string>
 ): void {
-  log.warning("inner 1", [])
   let eventParamsArr: Array<string> = createEventParams(
     event.transaction.hash,
     parameterValues,
     parameterNames,
     parameterTypes
   );
-log.warning("inner 2", [])
 
-txStateChangeHelper(
-  event,
+  txStateChangeHelper(
+    event,
     eventName,
     eventParamsArr,
     affectedUsers,
     affectedStakes
   );
-    log.warning("inner 3", [])
 }
