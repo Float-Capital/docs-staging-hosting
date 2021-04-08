@@ -2,6 +2,7 @@
 
 import * as Mint from "../../Mint.js";
 import * as React from "react";
+import * as Redeem from "../Redeem/Redeem.js";
 import Link from "next/link";
 import * as MarketCard from "./MarketCard.js";
 import * as PriceGraph from "../PriceGraph.js";
@@ -16,6 +17,10 @@ function Market(Props) {
                             className: "text-xs"
                           }, " Back to markets"))
                 }), React.createElement("div", {
+                  className: "flex flex-col md:flex-row justify-center items-stretch"
+                }, React.createElement("div", {
+                      className: "flex-1  p-1 mb-2 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
+                    }, React.createElement(Redeem.make, {}))), React.createElement("div", {
                   className: "flex flex-col md:flex-row justify-center items-stretch"
                 }, React.createElement("div", {
                       className: "flex-1  p-1 mb-2 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"

@@ -160,7 +160,7 @@ function Navigation(Props) {
                           href: "/markets",
                           children: React.createElement("a", {
                                 className: "px-3 hover:bg-white"
-                              }, "MINT")
+                              }, "MARKETS")
                         }), React.createElement(Link, {
                           href: "/stake",
                           children: React.createElement("a", {
@@ -203,7 +203,7 @@ function Navigation(Props) {
                                                     return false;
                                                   }));
                                     })
-                                }, "MINT"), React.createElement("div", {
+                                }, "MARKETS"), React.createElement("div", {
                                   className: "px-3 bg-black m-2",
                                   onClick: (function (param) {
                                       router.push("/stake");

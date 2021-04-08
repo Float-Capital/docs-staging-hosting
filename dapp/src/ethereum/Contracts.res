@@ -26,8 +26,8 @@ module LongShort = {
     [
       "function mintLong(uint256 marketIndex,uint256 amount) @770000",
       "function mintShort(uint256 marketIndex,uint256 amount) @770000",
-      "function redeemLong(uint256 marketIndex,uint256 tokensToRedeem)",
-      "function redeemShort(uint256 marketIndex,uint256 tokensToRedeem)",
+      "function redeemLong(uint256 marketIndex,uint256 tokensToRedeem) @1100000",
+      "function redeemShort(uint256 marketIndex,uint256 tokensToRedeem) @1100000",
       "function mintLongAndStake(uint256 marketIndex, uint256 amount) @1000000",
       "function mintShortAndStake(uint256 marketIndex, uint256 amount) @1000000",
       "function _updateSystemState()",

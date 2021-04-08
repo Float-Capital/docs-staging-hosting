@@ -8,6 +8,11 @@ let make = (~marketData: Queries.MarketDetails.t_syntheticMarkets) => {
     </Next.Link>
     <div className="flex flex-col md:flex-row justify-center items-stretch">
       <div className="flex-1  p-1 mb-2 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg">
+        <Redeem />
+      </div>
+    </div>
+    <div className="flex flex-col md:flex-row justify-center items-stretch">
+      <div className="flex-1  p-1 mb-2 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg">
         <Mint.Mint />
       </div>
       <div
