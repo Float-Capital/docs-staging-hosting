@@ -14,6 +14,7 @@
     "deploy-local": "graph deploy float-capital/float-capital --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.ganache.yaml",
     "deploy-binance-test": "graph deploy float-capital/float-capital --ipfs http://test.graph.float.capital:5001 --node http://test.graph.float.capital:8020 ./subgraph.binance-test.yaml",
     "deploy-binance-test2": "graph deploy float-capital/float-capital2 --ipfs http://test.graph.float.capital:5001 --node http://test.graph.float.capital:8020 ./subgraph.binance-test.yaml",
+    "deploy-local-kovan": "graph deploy float-capital/float-capital --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.kovan.yaml",
     "deploy-local-binance": "graph deploy float-capital/float-capital --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.binance-test.yaml",
     "update-testnet-graph": "yarn codegen ; cd .. && node ./scripts/graph.js ; cd graph && yarn deploy-binance-test"
   },

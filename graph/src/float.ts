@@ -44,6 +44,7 @@ import {
 } from "./CONSTANTS";
 
 export function handleV1(event: V1): void {
+  log.warning("Started up the engines", []);
   // event V1(address admin, address tokenFactory, address staker);
 
   let admin = event.params.admin;

@@ -57,9 +57,9 @@ dataSources:
     name: Staker
     network: kovan
     source:
-      address: "0xaF19574FC130D9425B4786e0eC68672bEAc973A9"
+      address: "0x9Fb0c1d09b02C975EF14CCE71174481a667CA193"
       abi: Staker
-      startBlock: 24184974
+      startBlock: 24185634
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
