@@ -6,6 +6,32 @@ import Link from "next/link";
 import * as MarketCard from "./MarketCard.js";
 import * as PriceGraph from "../PriceGraph.js";
 
+function Market$Tab(Props) {
+  var selectedOpt = Props.selected;
+  var activeOpt = Props.active;
+  var text = Props.text;
+  var onClickOpt = Props.onClick;
+  var selected = selectedOpt !== undefined ? selectedOpt : false;
+  var active = activeOpt !== undefined ? activeOpt : true;
+  var onClick = onClickOpt !== undefined ? onClickOpt : (function (param) {
+        
+      });
+  var bg = selected ? "bg-white" : "bg-gray-100";
+  var opacity = selected ? "bg-opacity-70" : "opacity-70";
+  var margin = selected ? "pb-1.5" : "mb-0.5";
+  var activeStyle = active ? "cursor-pointer" : "cursor-not-allowed";
+  return React.createElement("li", {
+              className: "mr-3 mb-0"
+            }, React.createElement("div", {
+                  className: bg + "  " + opacity + "  " + margin + " " + activeStyle + " inline-block  rounded-t-lg py-1 px-4",
+                  onClick: onClick
+                }, text));
+}
+
+var Tab = {
+  make: Market$Tab
+};
+
 function Market(Props) {
   var marketData = Props.marketData;
   return React.createElement("div", undefined, React.createElement(Link, {
@@ -18,8 +44,29 @@ function Market(Props) {
                 }), React.createElement("div", {
                   className: "flex flex-col md:flex-row justify-center items-stretch"
                 }, React.createElement("div", {
-                      className: "flex-1  p-1 mb-2 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
-                    }, React.createElement(Mint.Mint.make, {})), React.createElement("div", {
+                      className: "flex-1  p-1 mb-2 "
+                    }, React.createElement("ul", {
+                          className: "list-reset flex items-end"
+                        }, [
+                          React.createElement(Market$Tab, {
+                                selected: true,
+                                text: "Mint"
+                              }),
+                          React.createElement(Market$Tab, {
+                                active: false,
+                                text: "Redeem"
+                              }),
+                          React.createElement(Market$Tab, {
+                                active: false,
+                                text: "Stake"
+                              }),
+                          React.createElement(Market$Tab, {
+                                active: false,
+                                text: "Unstake"
+                              })
+                        ]), React.createElement("div", {
+                          className: "rounded-b-lg rounded-r-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
+                        }, React.createElement(Mint.Mint.make, {}))), React.createElement("div", {
                       className: "flex-1 w-full min-h-10 p-1 mb-2 ml-8 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
                     }, React.createElement(PriceGraph.make, {
                           marketName: marketData.name
@@ -31,6 +78,7 @@ function Market(Props) {
 var make = Market;
 
 export {
+  Tab ,
   make ,
   
 }
