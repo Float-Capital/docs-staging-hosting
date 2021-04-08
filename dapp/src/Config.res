@@ -6,13 +6,13 @@ let isDevMode = devMode == Some("true")
 
 let longshortContractAbi = [""]->Ethers.makeAbi
 
-let binancTestnetGraphEndpoint = "https://test.graph.float.capital/subgraphs/name/float-capital/float-capital"
+let binancTestnetGraphEndpoint = "https://api.thegraph.com/subgraphs/name/float-capital/testnet"
 let localhostGraphEndpoint = "https://localhost:8000/subgraphs/name/float-capital/float-capital/graphql"
-let defaultNetworkId = 97
-let defaultNetworkName = "Binance Smart Chain testnet"
-let paymentTokenName = "BUSD"
-let defaultBlockExplorer = "https://testnet.bscscan.com/"
-let defaultBlockExplorerName = "bscscan"
+let defaultNetworkId = 42
+let defaultNetworkName = "Kovan testnet"
+let paymentTokenName = "DAI"
+let defaultBlockExplorer = "https://kovan.etherscan.io/"
+let defaultBlockExplorerName = "etherscan"
 let getDefaultNetworkId = optNetworkId => optNetworkId->Option.getWithDefault(defaultNetworkId)
 
 let discordInviteLink = "https://discord.gg/dqDwgrVYcU"

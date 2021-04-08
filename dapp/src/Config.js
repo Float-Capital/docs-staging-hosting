@@ -13,7 +13,7 @@ var isDevMode = Caml_obj.caml_equal(process.env.NEXT_PUBLIC_DEVMODE, "true");
 var longshortContractAbi = Ethers.makeAbi([""]);
 
 function getDefaultNetworkId(optNetworkId) {
-  return Belt_Option.getWithDefault(optNetworkId, 97);
+  return Belt_Option.getWithDefault(optNetworkId, 42);
 }
 
 var allContracts = (require('./contractAddresses.json'));
@@ -70,19 +70,19 @@ function useFloatAddress(param) {
                   })));
 }
 
-var binancTestnetGraphEndpoint = "https://test.graph.float.capital/subgraphs/name/float-capital/float-capital";
+var binancTestnetGraphEndpoint = "https://api.thegraph.com/subgraphs/name/float-capital/testnet";
 
 var localhostGraphEndpoint = "https://localhost:8000/subgraphs/name/float-capital/float-capital/graphql";
 
-var defaultNetworkId = 97;
+var defaultNetworkId = 42;
 
-var defaultNetworkName = "Binance Smart Chain testnet";
+var defaultNetworkName = "Kovan testnet";
 
-var paymentTokenName = "BUSD";
+var paymentTokenName = "DAI";
 
-var defaultBlockExplorer = "https://testnet.bscscan.com/";
+var defaultBlockExplorer = "https://kovan.etherscan.io/";
 
-var defaultBlockExplorerName = "bscscan";
+var defaultBlockExplorerName = "etherscan";
 
 var discordInviteLink = "https://discord.gg/dqDwgrVYcU";
 
