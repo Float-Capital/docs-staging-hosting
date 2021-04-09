@@ -2,7 +2,7 @@
 <rss version="2.0">
     <channel>
         <title>Float Capital | Docs Blog</title>
-        <link>https://docs.float.capital/blog</link>
+        <link>https://stagingdocs.float.capital/blog</link>
         <description>Float Capital | Docs Blog</description>
         <lastBuildDate>Sun, 25 Oct 2015 23:29:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
