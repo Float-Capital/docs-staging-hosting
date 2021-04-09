@@ -104,7 +104,7 @@ A governance token can be thought of a bit like equity in a company. Governance 
 
 ### What is Blockchain are you on?
 
-We are currently launched on the Binance Smart Chain. The Binance Smart Chain is an EVM (Ethereum Virtual Machine) compatible blockchain. Float Capital is built on the Binance Smart Chain.
+We are currently launched on the Kovan testnet. Float Capital will be launched on the Polygon (formerly Matic) network. Polygon is an EVM (Ethereum Virtual Machine) compatible blockchain.
 
 ### Who is the team behind FLOAT?
 

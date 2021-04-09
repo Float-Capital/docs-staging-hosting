@@ -14,7 +14,6 @@ let make = (~children) => {
               <h4 className="text-lg">
                 {`Please connect to ${Config.defaultNetworkName}.`->React.string}
               </h4>
-              <AddBinanceToMetamask />
             </>
           }}
         </div>

@@ -18,6 +18,7 @@ files.map((file) => {
   });
 });
 
-output["97"]["Dai"] = "0x8301F2213c0eeD49a7E28Ae4c3e91722919B8B47";
-
+if (typeof output["42"] === "object") {
+  output["42"]["Dai"] = "0xff795577d9ac8bd7d90ee22b6c1703490b6512fd";
+}
 console.log(JSON.stringify(output, null, 2));

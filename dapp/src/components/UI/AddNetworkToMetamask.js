@@ -3,9 +3,10 @@
 import * as Misc from "../../libraries/Misc.js";
 import * as React from "react";
 import * as Button from "./Button.js";
+import * as Config from "../../Config.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 
-function AddBinanceToMetamask(Props) {
+function AddNetworkToMetamask(Props) {
   var ethObj = window.ethereum;
   if (ethObj === undefined) {
     return null;
@@ -17,20 +18,14 @@ function AddBinanceToMetamask(Props) {
                               ethObj$1.request({
                                     method: "wallet_addEthereumChain",
                                     params: [{
-                                        chainId: "0x61",
-                                        chainName: "BSC testnet",
+                                        chainId: "0x2A",
+                                        chainName: "Kovan",
                                         nativeCurrency: {
-                                          name: "Test BNB",
-                                          symbol: "BNB",
+                                          name: "Test Eth",
+                                          symbol: "ETH",
                                           decimals: 18
                                         },
-                                        rpcUrls: [
-                                          "https://data-seed-prebsc-1-s2.binance.org:8545/",
-                                          "https://data-seed-prebsc-2-s2.binance.org:8545/",
-                                          "https://data-seed-prebsc-1-s3.binance.org:8545/",
-                                          "https://data-seed-prebsc-2-s3.binance.org:8545/"
-                                        ],
-                                        blockExplorerUrls: ["https://testnet.bscscan.com/"]
+                                        blockExplorerUrls: ["https://kovan.etherscan.io/"]
                                       }]
                                   });
                               
@@ -42,14 +37,14 @@ function AddBinanceToMetamask(Props) {
                         className: "flex flex-row items-center"
                       }, React.createElement("div", {
                             className: "text-sm"
-                          }, "Add BSC Testnet to metamask "), React.createElement("img", {
+                          }, "Add " + Config.defaultNetworkName + " to metamask "), React.createElement("img", {
                             className: "h-6 ml-1",
                             src: "/icons/metamask.svg"
                           })))
             });
 }
 
-var make = AddBinanceToMetamask;
+var make = AddNetworkToMetamask;
 
 export {
   make ,
