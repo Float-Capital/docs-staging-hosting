@@ -6,7 +6,7 @@ let isDevMode = devMode == Some("true")
 
 let longshortContractAbi = [""]->Ethers.makeAbi
 
-let binancTestnetGraphEndpoint = "https://api.thegraph.com/subgraphs/name/float-capital/testnet"
+let testnetGraphEndpoint = "https://api.thegraph.com/subgraphs/name/float-capital/testnet"
 let localhostGraphEndpoint = "https://localhost:8000/subgraphs/name/float-capital/float-capital/graphql"
 let defaultNetworkId = 42
 let defaultNetworkName = "Kovan testnet"

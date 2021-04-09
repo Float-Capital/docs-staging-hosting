@@ -70,7 +70,7 @@ function useFloatAddress(param) {
                   })));
 }
 
-var binancTestnetGraphEndpoint = "https://api.thegraph.com/subgraphs/name/float-capital/testnet";
+var testnetGraphEndpoint = "https://api.thegraph.com/subgraphs/name/float-capital/testnet";
 
 var localhostGraphEndpoint = "https://localhost:8000/subgraphs/name/float-capital/float-capital/graphql";
 
@@ -89,7 +89,7 @@ var discordInviteLink = "https://discord.gg/dqDwgrVYcU";
 export {
   isDevMode ,
   longshortContractAbi ,
-  binancTestnetGraphEndpoint ,
+  testnetGraphEndpoint ,
   localhostGraphEndpoint ,
   defaultNetworkId ,
   defaultNetworkName ,
