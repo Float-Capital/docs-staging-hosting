@@ -925,9 +925,8 @@ contract LongShort is ILongShort, Initializable {
     /////////// REDEEM TOKENS //////////
     ////////////////////////////////////
 
-    function redeemLong(uint32 marketIndex, uint256 tokensToRedeem)
-        external
-        override
+    function _redeemLong(uint32 marketIndex, uint256 tokensToRedeem)
+        internal
         refreshSystemState(marketIndex)
     {
         // Burn tokens - will revert unless user gives permission.
@@ -963,9 +962,8 @@ contract LongShort is ILongShort, Initializable {
         );
     }
 
-    function redeemShort(uint32 marketIndex, uint256 tokensToRedeem)
-        external
-        override
+    function _redeemShort(uint32 marketIndex, uint256 tokensToRedeem)
+        internal
         refreshSystemState(marketIndex)
     {
         // Burn tokens - will revert unless user gives permission to contract.
@@ -999,6 +997,30 @@ contract LongShort is ILongShort, Initializable {
             longValue[marketIndex],
             shortValue[marketIndex]
         );
+    }
+
+    function redeemLong(uint32 marketIndex, uint256 tokensToRedeem)
+        external
+        override
+    {
+        _redeemLong(marketIndex, tokensToRedeem);
+    }
+
+    function redeemLongAll(uint32 marketIndex) external {
+        uint256 tokensToRedeem = longTokens[marketIndex].balanceOf(msg.sender);
+        _redeemLong(marketIndex, tokensToRedeem);
+    }
+
+    function redeemShort(uint32 marketIndex, uint256 tokensToRedeem)
+        external
+        override
+    {
+        _redeemShort(marketIndex, tokensToRedeem);
+    }
+
+    function redeemShortAll(uint32 marketIndex) external {
+        uint256 tokensToRedeem = longTokens[marketIndex].balanceOf(msg.sender);
+        _redeemShort(marketIndex, tokensToRedeem);
     }
 
     ////////////////////////////////////

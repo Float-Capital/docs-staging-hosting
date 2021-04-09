@@ -605,7 +605,7 @@ contract Staker is IStaker, Initializable {
     Withdraw function.
     Mint user any outstanding float before
     */
-    function withdraw(address tokenAddress, uint256 amount) external {
+    function _withdraw(address tokenAddress, uint256 amount) internal {
         require(
             userAmountStaked[tokenAddress][msg.sender] > 0,
             "nothing to withdraw"
@@ -624,5 +624,13 @@ contract Staker is IStaker, Initializable {
         );
 
         emit StakeWithdrawn(msg.sender, tokenAddress, amount);
+    }
+
+    function withdraw(address tokenAddress, uint256 amount) external {
+        _withdraw(tokenAddress, amount);
+    }
+
+    function withdrawAll(address tokenAddress, uint256 amount) external {
+        _withdraw(tokenAddress, userAmountStaked[tokenAddress][msg.sender]);
     }
 }
