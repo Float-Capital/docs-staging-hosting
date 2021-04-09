@@ -1019,7 +1019,7 @@ contract LongShort is ILongShort, Initializable {
     }
 
     function redeemShortAll(uint32 marketIndex) external {
-        uint256 tokensToRedeem = longTokens[marketIndex].balanceOf(msg.sender);
+        uint256 tokensToRedeem = shortTokens[marketIndex].balanceOf(msg.sender);
         _redeemShort(marketIndex, tokensToRedeem);
     }
 
