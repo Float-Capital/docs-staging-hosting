@@ -11,7 +11,7 @@ type reqParams = {
   chainId: string,
   chainName: string,
   nativeCurrency: nativeCurrency,
-  rpcUrls: array<string>,
+  // rpcUrls: array<string>,
   blockExplorerUrls: array<string>,
 }
 
@@ -32,20 +32,20 @@ let make = () => {
           method: "wallet_addEthereumChain",
           params: [
             {
-              chainId: "0x61",
-              chainName: "BSC testnet",
+              chainId: "0x2A",
+              chainName: "Kovan",
               nativeCurrency: {
-                name: "Test BNB",
-                symbol: "BNB",
+                name: "Test Eth",
+                symbol: "ETH",
                 decimals: 18,
               },
-              rpcUrls: [
-                "https://data-seed-prebsc-1-s2.binance.org:8545/",
-                "https://data-seed-prebsc-2-s2.binance.org:8545/",
-                "https://data-seed-prebsc-1-s3.binance.org:8545/",
-                "https://data-seed-prebsc-2-s3.binance.org:8545/",
-              ],
-              blockExplorerUrls: ["https://testnet.bscscan.com/"],
+              // rpcUrls: [
+              //   "https://data-seed-prebsc-1-s2.binance.org:8545/",
+              //   "https://data-seed-prebsc-2-s2.binance.org:8545/",
+              //   "https://data-seed-prebsc-1-s3.binance.org:8545/",
+              //   "https://data-seed-prebsc-2-s3.binance.org:8545/",
+              // ],
+              blockExplorerUrls: ["https://kovan.etherscan.io/"],
             },
           ],
         },
@@ -55,13 +55,15 @@ let make = () => {
   switch ethObj {
   | Some(ethObj) =>
     <Button.Element onClick={_event => addToMetamask(ethObj)}>
-    <div className="mx-auto">
-    <div className="flex flex-row items-center">
-      <div className="text-sm"> {"Add BSC Testnet to metamask "->React.string} </div>
-      <img src="/icons/metamask.svg" className="h-6 ml-1" />
-    </div>
-    </div>
-    </Button.Element>    
+      <div className="mx-auto">
+        <div className="flex flex-row items-center">
+          <div className="text-sm">
+            {`Add ${Config.defaultNetworkName} to metamask `->React.string}
+          </div>
+          <img src="/icons/metamask.svg" className="h-6 ml-1" />
+        </div>
+      </div>
+    </Button.Element>
   | None => React.null
   }
 }
