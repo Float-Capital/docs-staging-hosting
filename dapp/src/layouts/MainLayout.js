@@ -5,7 +5,6 @@ import * as React from "react";
 import * as Config from "../Config.js";
 import * as Navigation from "./Navigation.js";
 import * as RootProvider from "../libraries/RootProvider.js";
-import * as AddBinanceToMetamask from "../components/UI/AddBinanceToMetamask.js";
 
 function MainLayout(Props) {
   var children = Props.children;
@@ -20,7 +19,7 @@ function MainLayout(Props) {
                           className: "m-auto w-full"
                         }, chainId !== undefined && chainId !== Config.defaultNetworkId ? React.createElement(React.Fragment, undefined, React.createElement("h2", undefined, "You are currently connected to the wrong network."), React.createElement("h4", {
                                     className: "text-lg"
-                                  }, "Please connect to " + Config.defaultNetworkName + "."), React.createElement(AddBinanceToMetamask.make, {})) : children))), React.createElement(Lost.make, {}));
+                                  }, "Please connect to " + Config.defaultNetworkName + ".")) : children))), React.createElement(Lost.make, {}));
 }
 
 var make = MainLayout;

@@ -170,6 +170,9 @@ export function handleStakeAdded(event: StakeAdded): void {
   let user = getOrCreateUser(userAddress, event);
 
   let syntheticToken = SyntheticToken.load(tokenAddressString);
+  if (syntheticToken == null) {
+    log.critical("Token should be defined", []);
+  }
 
   let stake = new Stake(txHash.toHex());
   stake.timestamp = timestamp;

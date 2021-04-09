@@ -9,19 +9,19 @@ NOTE: These docs are under active development 👷‍♀️👷
 
 ---
 
-## BSC testnet
+## Kovan testnet
 
 NOTE: these testnet addresses are frequently changing during development 👷‍♀️👷
 
-See our contract **[Deployer address](https://testnet.bscscan.com/address/0x738edd7f6a625c02030dbfca84885b4de5252903)** to keep abreast with the latest deployments.
+See our contract **[Deployer address](https://kovan.etherscan.io/address/0x473766AdEaAb0A9C68D47f49d110B4870680b703)** to keep abreast with the latest deployments.
 
-"FloatToken": "0xbd9F3CBc0B8A6649Dc1a97dEC2A9aA2D609699dF",
-"LongShort": "0xd3D7f98650d7dbDb155eFBB8b7BFB028172b28FC",
-"Migrations": "0xd98Dd79dFa31327F7bBe74382517e98393Dfc7e9",
-"Staker": "0x18eA194ffC9c4547bE436Cc4041d2665b805bb0C",
-"TokenFactory": "0x1eDf7e6013B750c7f62e2210BD1F3C766765B7De",
-"Dai": "0x8301F2213c0eeD49a7E28Ae4c3e91722919B8B47"
+"FloatToken": "0x7fC0cC819332728DD3A78a63de7Ea250e344f199",
+"LongShort": "0xA696f77436A4e631c96CA8b9fa2DCD1b250Eb1E3",
+"Migrations": "0xec6282Ee87D2248649A2F6D0111C428d75945393",
+"Staker": "0x9Fb0c1d09b02C975EF14CCE71174481a667CA193",
+"TokenFactory": "0xa1AdE283A830CE4CA2ba4c45c611e9Ef23D77608",
+"Dai": "0xff795577d9ac8bd7d90ee22b6c1703490b6512fd"
 
-## BSC
+## Polygon
 
-Our BSC mainnet launch is pending further testing.
+Our Polygon mainnet launch is pending further testing.

@@ -14,15 +14,15 @@ var TestErc20 = {
 };
 
 var abi$1 = Ethers.makeAbi([
-      "function mintLong(uint256 marketIndex,uint256 amount) @770000",
-      "function mintShort(uint256 marketIndex,uint256 amount) @770000",
-      "function redeemLong(uint256 marketIndex,uint256 tokensToRedeem) @1100000",
-      "function redeemShort(uint256 marketIndex,uint256 tokensToRedeem) @1100000",
-      "function mintLongAndStake(uint256 marketIndex, uint256 amount) @1000000",
-      "function mintShortAndStake(uint256 marketIndex, uint256 amount) @1000000",
+      "function mintLong(uint32 marketIndex,uint256 amount) @770000",
+      "function mintShort(uint32 marketIndex,uint256 amount) @770000",
+      "function redeemLong(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
+      "function redeemShort(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
+      "function mintLongAndStake(uint32 marketIndex, uint256 amount) @1000000",
+      "function mintShortAndStake(uint32 marketIndex, uint256 amount) @1000000",
       "function _updateSystemState()",
-      "function longValue(uint256 marketIndex) public view returns (uint256)",
-      "function shortValue(uint256 marketIndex) public view returns (uint256)"
+      "function longValue(uint32 marketIndex) public view returns (uint256)",
+      "function shortValue(uint32 marketIndex) public view returns (uint256)"
     ]);
 
 function make$1(address, providerOrSigner) {

@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: LongShort
-    network: goerli
+    network: kovan
     source:
-      address: "0x283336F6B3D0ad399B899Df53F0D0D97237D93fe"
+      address: "0xA696f77436A4e631c96CA8b9fa2DCD1b250Eb1E3"
       abi: LongShort
-      startBlock: 4190130
+      startBlock: 24185640
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -55,11 +55,11 @@ dataSources:
 
   - kind: ethereum/contract
     name: Staker
-    network: goerli
+    network: kovan
     source:
-      address: "0xeb74255d3fE3d938320f3A5139F2b98828E7c00e"
+      address: "0x9Fb0c1d09b02C975EF14CCE71174481a667CA193"
       abi: Staker
-      startBlock: 4190130
+      startBlock: 24185634
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -91,7 +91,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: erc20
-    network: goerli
+    network: kovan
     source:
       abi: erc20
     mapping:
