@@ -7,13 +7,13 @@ import * as React from "react";
 import * as Button from "./UI/Button.js";
 import * as Config from "../Config.js";
 import * as Ethers from "../ethereum/Ethers.js";
-import * as Loader from "./UI/Loader.js";
 import * as Ethers$1 from "ethers";
 import * as Queries from "../data/Queries.js";
 import * as Contracts from "../ethereum/Contracts.js";
 import * as DataHooks from "../data/DataHooks.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as MiniLoader from "./UI/MiniLoader.js";
 import * as AmountInput from "./UI/AmountInput.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
@@ -548,7 +548,7 @@ function Unstake(Props) {
     return React.createElement(React.Fragment, undefined, "Unable to fetch token");
   }
   if (token.loading) {
-    return React.createElement(Loader.make, {});
+    return React.createElement(MiniLoader.make, {});
   }
   if (match$1 === undefined) {
     return React.createElement(React.Fragment, undefined, "Could not find this market - please check the URL carefully.");
