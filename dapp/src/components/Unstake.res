@@ -31,7 +31,7 @@ module StakeFormInput = {
     <Form className="" onSubmit>
       // optBalance Todo
       <AmountInput
-        value optBalance={None} disabled onBlur onChange placeholder={"Unstake"} onMaxClick
+        value optBalance={optBalance} disabled onBlur onChange placeholder={"Unstake"} onMaxClick
       />
       <Button onClick={_ => onSubmit()}>
         {`Unstake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
@@ -49,11 +49,15 @@ module ConnectedStakeForm = {
     let stakerContractAddress = Config.useStakerAddress()
 
     let user = RootProvider.useCurrentUserExn()
+
     let optTokenBalance =
-      DataHooks.useSyntheticTokenBalance(
-        ~user,
-        ~tokenAddress=synthetic.tokenAddress,
-      )->DataHooks.Util.graphResponseToOption
+      DataHooks.useStakesForUser(~userId=user->Ethers.Utils.ethAdrToLowerStr)
+      ->DataHooks.Util.graphResponseToOption
+      ->Option.flatMap(a =>
+        (
+          a->Array.keep(({currentStake: {syntheticToken: {id}}}) => id == tokenId)
+        )[0]->Option.flatMap(({currentStake: {amount}}) => Some(amount))
+      )
 
     let initialInput: StakeForm.input = {
       amount: "",

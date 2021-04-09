@@ -13,7 +13,9 @@ import * as Queries from "../data/Queries.js";
 import * as Contracts from "../ethereum/Contracts.js";
 import * as DataHooks from "../data/DataHooks.js";
 import * as Formality from "re-formality/src/Formality.js";
+import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as AmountInput from "./UI/AmountInput.js";
+import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as RootProvider from "../libraries/RootProvider.js";
 import * as ContractHooks from "./Testing/Admin/ContractHooks.js";
@@ -414,6 +416,7 @@ function useBalanceAndApproved(erc20Address, spender) {
 function Unstake$StakeFormInput(Props) {
   var onSubmitOpt = Props.onSubmit;
   var valueOpt = Props.value;
+  var optBalanceOpt = Props.optBalance;
   var disabledOpt = Props.disabled;
   var onChangeOpt = Props.onChange;
   var onBlurOpt = Props.onBlur;
@@ -423,6 +426,7 @@ function Unstake$StakeFormInput(Props) {
         
       });
   var value = valueOpt !== undefined ? valueOpt : "";
+  var optBalance = optBalanceOpt !== undefined ? Caml_option.valFromOption(optBalanceOpt) : undefined;
   var disabled = disabledOpt !== undefined ? disabledOpt : false;
   var onChange = onChangeOpt !== undefined ? onChangeOpt : (function (param) {
         
@@ -440,7 +444,7 @@ function Unstake$StakeFormInput(Props) {
             }, React.createElement(AmountInput.make, {
                   placeholder: "Unstake",
                   value: value,
-                  optBalance: undefined,
+                  optBalance: optBalance,
                   disabled: disabled,
                   onBlur: onBlur,
                   onChange: onChange,
@@ -465,7 +469,13 @@ function Unstake$ConnectedStakeForm(Props) {
   var contractExecutionHandler = match[0];
   var stakerContractAddress = Config.useStakerAddress(undefined);
   var user = RootProvider.useCurrentUserExn(undefined);
-  var optTokenBalance = DataHooks.Util.graphResponseToOption(DataHooks.useSyntheticTokenBalance(user, synthetic.tokenAddress));
+  var optTokenBalance = Belt_Option.flatMap(DataHooks.Util.graphResponseToOption(DataHooks.useStakesForUser(Ethers.Utils.ethAdrToLowerStr(user))), (function (a) {
+          return Belt_Option.flatMap(Belt_Array.get(Belt_Array.keep(a, (function (param) {
+                                return param.currentStake.syntheticToken.id === tokenId;
+                              })), 0), (function (param) {
+                        return Caml_option.some(param.currentStake.amount);
+                      }));
+        }));
   var form = useForm({
         amount: ""
       }, (function (param, _form) {
