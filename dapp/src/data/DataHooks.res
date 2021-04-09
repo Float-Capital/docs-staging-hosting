@@ -254,6 +254,20 @@ let useSyntheticTokenBalance = (~user, ~tokenAddress) => {
   }
 }
 
+let useSyntheticTokenBalanceOrZero = (~user, ~tokenAddress) => {
+  let syntheticBalanceQuery = Queries.UsersBalance.use({
+    userId: user->ethAdrToLowerStr,
+    tokenAdr: tokenAddress->ethAdrToLowerStr,
+  })
+
+  switch syntheticBalanceQuery {
+  | {data: Some({user: Some({tokenBalances: [{tokenBalance}]})})} => Response(tokenBalance)
+  | {data: Some(_)} => Response(CONSTANTS.zeroBN)
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
+  }
+}
+
 @ocaml.doc(`Utilities and helpers for react hooks that fetch data from graphql`)
 module Util = {
   @ocaml.doc(`Convert a graphResponse into an option`)
@@ -274,4 +288,15 @@ module Util = {
     | Loading => Ok(Loading)
     | GraphError(error) => Error(error)
     }
+
+  @ocaml.doc(`Convert an Apollo useQuery into a graphResponse type`)
+  let queryToResponse = (
+    query: ApolloClient__React_Hooks_UseQuery.QueryResult.t<'a, 'b, 'c, 'd>,
+  ) => {
+    switch query {
+    | {error: Some({message})} => GraphError(message)
+    | {data: Some(response)} => Response(response)
+    | _ => Loading
+    }
+  }
 }

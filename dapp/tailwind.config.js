@@ -50,6 +50,7 @@ module.exports = {
       "3/4": "75%",
       full: "100%",
       "half-screen": "50vh",
+      "market-interaction-card": "16.5rem",
       screen: "100vh",
     },
     borderColor: (theme) => ({

@@ -241,7 +241,7 @@ let make = (~tokenId) => {
       Js.log("Unable to fetch token")
       <> {"Unable to fetch token"->React.string} </>
     }
-  | {loading: true} => <Loader />
+  | {loading: true} => <MiniLoader />
   | {data: Some({syntheticToken: Some(synthetic)})} =>
     switch optSigner {
     | Some(signer) => <ConnectedStakeForm signer tokenId synthetic />

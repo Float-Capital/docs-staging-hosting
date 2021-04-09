@@ -469,6 +469,63 @@ function useSyntheticTokenBalance(user, tokenAddress) {
   }
 }
 
+function useSyntheticTokenBalanceOrZero(user, tokenAddress) {
+  var syntheticBalanceQuery = Curry.app(Queries.UsersBalance.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: Globals.ethAdrToLowerStr(user),
+          tokenAdr: Globals.ethAdrToLowerStr(tokenAddress)
+        }
+      ]);
+  var match = syntheticBalanceQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.user;
+    if (match$1 === undefined) {
+      return {
+              TAG: 1,
+              _0: CONSTANTS.zeroBN,
+              [Symbol.for("name")]: "Response"
+            };
+    }
+    var match$2 = match$1.tokenBalances;
+    if (match$2.length !== 1) {
+      return {
+              TAG: 1,
+              _0: CONSTANTS.zeroBN,
+              [Symbol.for("name")]: "Response"
+            };
+    }
+    var match$3 = match$2[0];
+    return {
+            TAG: 1,
+            _0: match$3.tokenBalance,
+            [Symbol.for("name")]: "Response"
+          };
+  }
+  var match$4 = syntheticBalanceQuery.error;
+  if (match$4 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$4.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
 function graphResponseToOption(maybeData) {
   if (typeof maybeData === "number" || maybeData.TAG === /* GraphError */0) {
     return ;
@@ -502,9 +559,30 @@ function graphResponseToResult(maybeData) {
   }
 }
 
+function queryToResponse(query) {
+  var response = query.data;
+  var match = query.error;
+  if (match !== undefined) {
+    return {
+            TAG: 0,
+            _0: match.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else if (response !== undefined) {
+    return {
+            TAG: 1,
+            _0: Caml_option.valFromOption(response),
+            [Symbol.for("name")]: "Response"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
 var Util = {
   graphResponseToOption: graphResponseToOption,
-  graphResponseToResult: graphResponseToResult
+  graphResponseToResult: graphResponseToResult,
+  queryToResponse: queryToResponse
 };
 
 var ethAdrToLowerStr = Globals.ethAdrToLowerStr;
@@ -520,6 +598,7 @@ export {
   useFloatBalancesForUser ,
   useBasicUserInfo ,
   useSyntheticTokenBalance ,
+  useSyntheticTokenBalanceOrZero ,
   Util ,
   
 }
