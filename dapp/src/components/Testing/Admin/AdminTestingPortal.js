@@ -19,7 +19,6 @@ import * as ActiveStakes from "./ActiveStakes.js";
 import * as MintAndStake from "./MintAndStake.js";
 import * as RootProvider from "../../../libraries/RootProvider.js";
 import * as FloatManagement from "./FloatManagement.js";
-import * as AddBinanceToMetamask from "../../UI/AddBinanceToMetamask.js";
 
 var context = React.createContext(undefined);
 
@@ -137,7 +136,7 @@ function AdminTestingPortal$AdminActions(Props) {
     return React.createElement("h1", undefined, "No provider is selected. Even if you are using your own private key you still need to login with metamask for the connection to ethereum.");
   }
   var match = marketDetailsQuery.data;
-  return React.createElement("div", undefined, React.createElement(AddBinanceToMetamask.make, {}), React.createElement("h1", undefined, "Test Functions"), React.createElement("div", {
+  return React.createElement("div", undefined, React.createElement("h1", undefined, "Test Functions"), React.createElement("div", {
                   className: "border-dashed border-4 border-light-red-500"
                 }, React.createElement(ApproveDai.make, {}), optNetwork !== undefined ? (
                     optNetwork !== 97 ? React.createElement(MintDai.make, {
