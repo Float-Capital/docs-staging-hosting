@@ -3,7 +3,6 @@
 import * as Mint from "../../Mint.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as Redeem from "../Redeem/Redeem.js";
 import Link from "next/link";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as MarketCard from "./MarketCard.js";
@@ -60,7 +59,7 @@ function Market$MarketInteractionCard(Props) {
   var setSelected = match[1];
   var selected = match[0];
   return React.createElement("div", {
-              className: "flex-1  p-1 mb-2 "
+              className: "flex-1 p-1 mb-2 "
             }, React.createElement("ul", {
                   className: "list-reset flex items-end"
                 }, Belt_Array.map(allTabs, (function (tab) {
@@ -95,9 +94,7 @@ function Market(Props) {
                           }, " Back to markets"))
                 }), React.createElement("div", {
                   className: "flex flex-col md:flex-row justify-center items-stretch"
-
                 }, React.createElement(Market$MarketInteractionCard, {}), React.createElement("div", {
-
                       className: "flex-1 w-full min-h-10 p-1 mb-2 ml-8 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
                     }, React.createElement(PriceGraph.make, {
                           marketName: marketData.name

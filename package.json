@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "next-ga": "^2.3.4",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.2"
+  }
+}
