@@ -128,12 +128,11 @@ type UserCollateralTokenApproval @entity {
 }
 
 type UserCollateralTokenBalance @entity {
-  id: ID! # userAddress-tokenAddress
-  # approvalsHistory: [TokenApproval!]!
+  id: ID! # token address - user address - "balance"
+  timeLastUpdated: BigInt!
   collateralToken: CollateralToken!
   user: User!
   balance: BigInt!
-  lastChange: BigInt!
 }
 
 type SyntheticMarket @entity {
@@ -164,6 +163,7 @@ type User @entity {
   currentStakes: [CurrentStake!]!
   stateChangesAffectingUser: [StateChange!]!
   tokenBalances: [UserSyntheticTokenBalance!]!
+  collatoralBalances: [UserCollateralTokenBalance!]!
   tokenMints: [UserSyntheticTokenMinted!]!
   collatoralTokenApprovals: [UserCollateralTokenApproval!]!
 }
