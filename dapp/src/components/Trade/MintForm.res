@@ -65,12 +65,12 @@ module SubmitButtonAndTxTracker = {
           <p> {`View on ${Config.blockExplorerName}`->React.string} </p>
         </a>
       </div>
-    | (ContractActions.Complete({transactionHash}), ContractActions.Created)
-    | (ContractActions.Complete({transactionHash}), ContractActions.UnInitialised) =>
+    | (ContractActions.Complete({transactionHash: _}), ContractActions.Created)
+    | (ContractActions.Complete({transactionHash: _}), ContractActions.UnInitialised) =>
       <div className="text-center m-3">
         <p> {`Confirm transaction to mint ${tokenToMint}`->React.string} </p>
       </div>
-    | (ContractActions.Declined(message), _) => <> {resetFormButton()} </>
+    | (ContractActions.Declined(_message), _) => <> {resetFormButton()} </>
     | (ContractActions.Failed, _) =>
       <div className="text-center m-3">
         <p> {`The transaction failed.`->React.string} </p>
@@ -113,11 +113,11 @@ module SubmitButtonAndTxTracker = {
           <p> {`View on ${Config.blockExplorerName}`->React.string} </p>
         </a>
       </div>
-    | (_, ContractActions.Complete({transactionHash})) =>
+    | (_, ContractActions.Complete({transactionHash: _})) =>
       <div className="text-center m-3">
         <p> {`Transaction complete`->React.string} </p> {resetFormButton()}
       </div>
-    | (_, ContractActions.Declined(message)) =>
+    | (_, ContractActions.Declined(_message)) =>
       <div className="text-center m-3">
         <p> {`The transaction was rejected by your wallet`->React.string} </p>
         <a target="_" rel="noopenner noreferer" href=Config.discordInviteLink>

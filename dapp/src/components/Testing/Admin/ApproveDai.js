@@ -9,9 +9,7 @@ import * as Contracts from "../../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as TxTemplate from "../../Ethereum/TxTemplate.js";
-import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
-import * as RootProvider from "../../../libraries/RootProvider.js";
 import * as ContractActions from "../../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
 
@@ -19,9 +17,6 @@ var validators_tokenAddress = {
   strategy: /* OnFirstBlur */0,
   validate: (function (param) {
       var tokenAddress = param.tokenAddress;
-      Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
-              return String(prim);
-            }));
       if (tokenAddress === "DAI") {
         return {
                 TAG: 0,

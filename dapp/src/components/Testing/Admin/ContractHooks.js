@@ -71,7 +71,6 @@ function useErc20BalanceRefresh(erc20Address) {
 }
 
 function useDaiBalanceRefresh(param) {
-  Belt_Option.getWithDefault(RootProvider.useChainId(undefined), Config.networkId);
   return useSwrAutoUpdate(function (param) {
               return useErc20Balance(Config.dai);
             });

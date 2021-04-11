@@ -511,12 +511,11 @@ function MintDai(Props) {
   var match = ContractActions.useContractFunction(ethersWallet);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
-  var daiContract = Config.useDaiAddress(undefined);
   var form = useForm(initialInput, (function (param, _form) {
           var amount = param.amount;
           var address = param.address;
           return Curry._2(contractExecutionHandler, (function (param) {
-                        return Contracts.TestErc20.make(daiContract, param);
+                        return Contracts.TestErc20.make(Config.dai, param);
                       }), (function (param) {
                         return param.mint(address, amount);
                       }));

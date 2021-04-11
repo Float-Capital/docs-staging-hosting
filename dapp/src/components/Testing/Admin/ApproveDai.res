@@ -9,8 +9,6 @@ module Erc20ApproveForm = %form(
     tokenAddress: {
       strategy: OnFirstBlur,
       validate: ({tokenAddress}) => {
-        // refactor at some stage as console is complaining about hook order
-        let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
         switch tokenAddress {
         // | "LONG" => Config.longTokenContractAddress(~netIdStr)->Ok
         // | "SHORT" => Config.shortTokenContractAddress(~netIdStr)->Ok

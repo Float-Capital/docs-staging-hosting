@@ -61,9 +61,7 @@ let useSwrAutoUpdate = useHook => {
 let useErc20BalanceRefresh = (~erc20Address) =>
   useSwrAutoUpdate(() => useErc20Balance(~erc20Address))
 let useDaiBalanceRefresh = () => {
-  let chainId = RootProvider.useChainId()->Option.getWithDefault(Config.networkId)
-  let daiContractAddress = Config.dai
-  useErc20BalanceRefresh(~erc20Address=daiContractAddress)
+  useErc20BalanceRefresh(~erc20Address=Config.dai)
 }
 
 let useERC20ApprovedRefresh = (~erc20Address, ~spender) =>
