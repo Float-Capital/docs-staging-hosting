@@ -65,12 +65,27 @@ type FeeStructure @entity {
   badLiquidityExitFee: BigInt!
 }
 
-type Transfer @entity {
+interface GenericTransfer {
+  id: ID!
+  from: String!
+  to: String!
+  value: BigInt!
+}
+
+type Transfer implements GenericTransfer @entity {
   id: ID!
   from: String!
   to: String!
   value: BigInt!
   token: SyntheticToken!
+}
+
+type CollateralTransfer implements GenericTransfer @entity {
+  id: ID!
+  from: String!
+  to: String!
+  value: BigInt!
+  token: CollateralToken!
 }
 
 enum TokenType {
@@ -89,6 +104,36 @@ type SyntheticToken @entity {
   floatMintedFromSpecificToken: BigInt!
   latestPrice: LatestPrice!
   priceHistory: [Price!]!
+}
+
+type CollateralToken @entity {
+  id: ID! # token address
+  linkedMarkets: [SyntheticMarket!]!
+}
+
+type TokenApproval @entity {
+  id: ID! # userAddress-tokenAddress
+  collateralToken: CollateralToken!
+  user: User!
+  approved: BigInt!
+  timestamp: BigInt!
+}
+
+type UserCollateralTokenApproval @entity {
+  id: ID! # userAddress-tokenAddress
+  approvalsHistory: [TokenApproval!]!
+  updateTimestamp: BigInt!
+  collateralToken: CollateralToken!
+  currentApproval: TokenApproval!
+}
+
+type UserCollateralTokenBalance @entity {
+  id: ID! # userAddress-tokenAddress
+  # approvalsHistory: [TokenApproval!]!
+  collateralToken: CollateralToken!
+  user: User!
+  balance: BigInt!
+  lastChange: BigInt!
 }
 
 type SyntheticMarket @entity {
@@ -120,6 +165,7 @@ type User @entity {
   stateChangesAffectingUser: [StateChange!]!
   tokenBalances: [UserSyntheticTokenBalance!]!
   tokenMints: [UserSyntheticTokenMinted!]!
+  collatoralTokenApprovals: [UserCollateralTokenApproval!]!
 }
 
 type UserSyntheticTokenBalance @entity {

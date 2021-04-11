@@ -8,9 +8,11 @@ import {
   UserSyntheticTokenBalance,
   LatestPrice,
   SyntheticMarket,
+  CollateralToken,
 } from "../../generated/schema";
-import { BigInt, Bytes, log, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, Bytes, log, ethereum, Address } from "@graphprotocol/graph-ts";
 import { ZERO, ONE, GLOBAL_STATE_ID, TEN_TO_THE_18 } from "../CONSTANTS";
+import { createNewTokenDataSource } from "./helperFunctions";
 
 function createInitialTokenPrice(
   id: string,
@@ -170,6 +172,7 @@ export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
     user.numberOfTransactions = ZERO;
     user.currentStakes = [];
     user.tokenBalances = [];
+    user.collatoralTokenApprovals = [];
     user.tokenMints = [];
     user.stateChangesAffectingUser = [];
 
@@ -209,6 +212,25 @@ export function getOrCreateBalanceObject(
   }
 }
 
+export function updateOrCreateCollateralToken(
+  tokenAddress: Address,
+  syntheticMarket: SyntheticMarket
+): CollateralToken {
+  let tokenAddressString = tokenAddress.toHex();
+  let collateralToken = CollateralToken.load(tokenAddressString);
+  if (collateralToken == null) {
+    collateralToken = new CollateralToken(tokenAddressString);
+    collateralToken.linkedMarkets = [];
+    createNewTokenDataSource(tokenAddress);
+  }
+
+  collateralToken.linkedMarkets = collateralToken.linkedMarkets.concat([
+    syntheticMarket.id,
+  ]);
+
+  return collateralToken as CollateralToken;
+}
+
 export function createSyntheticToken(tokenAddress: Bytes): SyntheticToken {
   let tokenAddressString = tokenAddress.toHex();
   let syntheticToken = SyntheticToken.load(tokenAddressString);
@@ -230,7 +252,6 @@ export function createSyntheticTokenLong(tokenAddress: Bytes): SyntheticToken {
 
   return syntheticToken as SyntheticToken;
 }
-
 export function createSyntheticTokenShort(tokenAddress: Bytes): SyntheticToken {
   let syntheticToken = createSyntheticToken(tokenAddress);
   syntheticToken.tokenType = "Short";

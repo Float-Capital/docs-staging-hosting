@@ -30,6 +30,7 @@ import {
   createSyntheticTokenLong,
   createSyntheticTokenShort,
   createInitialSystemState,
+  updateOrCreateCollateralToken,
 } from "./utils/globalStateManager";
 import {
   createNewTokenDataSource,
@@ -147,6 +148,7 @@ export function handleSyntheticTokenCreated(
   let marketIndex = event.params.marketIndex;
   let longTokenAddress = event.params.longTokenAddress;
   let shortTokenAddress = event.params.shortTokenAddress;
+  let collateralTokenAddress = event.params.fundToken;
   let initialAssetPrice = event.params.assetPrice;
 
   let oracleAddress = event.params.oracleAddress;
@@ -193,6 +195,12 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.kMultiplier = ZERO;
   initialState.systemState.syntheticPrice = initialAssetPrice; // change me
 
+  // create new synthetic token object.
+  let collateralToken = updateOrCreateCollateralToken(
+    collateralTokenAddress,
+    syntheticMarket
+  );
+
   let globalState = GlobalState.load(GLOBAL_STATE_ID);
   globalState.latestMarketIndex = globalState.latestMarketIndex.plus(
     BigInt.fromI32(1)
@@ -220,6 +228,7 @@ export function handleSyntheticTokenCreated(
 
   initialLongStakerState.save();
   initialShortStakerState.save();
+  collateralToken.save();
   longToken.save();
   shortToken.save();
   initialState.systemState.save();
