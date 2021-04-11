@@ -4,12 +4,14 @@ import {
   Address,
   ethereum,
   DataSourceContext,
+  log,
 } from "@graphprotocol/graph-ts";
 import { ZERO, ZERO_ADDRESS } from "../CONSTANTS";
 
 import {
   getOrCreateUser,
   getOrCreateBalanceObject,
+  getOrCreateCollatoralBalanceObject,
 } from "./globalStateManager";
 import {
   SyntheticToken,
@@ -71,6 +73,40 @@ export function updateBalanceTransfer(
 
     token.save();
   }
+}
+
+export function updateCollatoralBalanceTransfer(
+  tokenAddressString: string,
+  userAddress: Address,
+  amount: BigInt,
+  send: boolean, // user sending or receiving,
+  event: ethereum.Event
+): void {
+  let userAddressString = userAddress.toHex();
+
+  let user = getOrCreateUser(userAddress, event);
+  user.save(); // necessary incase new user.
+
+  let balanceFromObject = getOrCreateCollatoralBalanceObject(
+    tokenAddressString,
+    userAddressString
+  );
+  balanceFromObject.timeLastUpdated = event.block.timestamp;
+
+  if (send) {
+    balanceFromObject.balance = balanceFromObject.balance.minus(amount);
+  } else {
+    balanceFromObject.balance = balanceFromObject.balance.plus(amount);
+  }
+
+  // Add to previouslyOwnedTokens if not already there
+  user.collatoralBalances =
+    user.collatoralBalances.indexOf(balanceFromObject.id) === -1
+      ? user.collatoralBalances.concat([balanceFromObject.id])
+      : user.collatoralBalances;
+
+  balanceFromObject.save();
+  user.save();
 }
 
 export function updateBalanceFloatTransfer(
