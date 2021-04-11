@@ -467,7 +467,6 @@ function Unstake$ConnectedStakeForm(Props) {
   var synthetic = Props.synthetic;
   var match = ContractActions.useContractFunction(signer);
   var contractExecutionHandler = match[0];
-  var stakerContractAddress = Config.useStakerAddress(undefined);
   var user = RootProvider.useCurrentUserExn(undefined);
   var optTokenBalance = Belt_Option.flatMap(DataHooks.Util.graphResponseToOption(DataHooks.useStakesForUser(Ethers.Utils.ethAdrToLowerStr(user))), (function (a) {
           return Belt_Option.flatMap(Belt_Array.get(Belt_Array.keep(a, (function (param) {
@@ -482,7 +481,7 @@ function Unstake$ConnectedStakeForm(Props) {
           var amount = param.amount;
           var arg = Ethers$1.utils.getAddress(tokenId);
           return Curry._2(contractExecutionHandler, (function (param) {
-                        return Contracts.Staker.make(stakerContractAddress, param);
+                        return Contracts.Staker.make(Config.staker, param);
                       }), (function (param) {
                         return param.withdraw(arg, amount);
                       }));

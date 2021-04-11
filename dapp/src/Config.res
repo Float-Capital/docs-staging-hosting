@@ -1,21 +1,6 @@
-open Globals
-
 @val
-external devMode: option<string> = "process.env.NEXT_PUBLIC_DEVMODE"
-let isDevMode = devMode == Some("true")
-
-let longshortContractAbi = [""]->Ethers.makeAbi
-
-let testnetGraphEndpoint = "https://api.thegraph.com/subgraphs/name/float-capital/testnet"
-let localhostGraphEndpoint = "https://localhost:8000/subgraphs/name/float-capital/float-capital/graphql"
-let defaultNetworkId = 42
-let defaultNetworkName = "Kovan testnet"
-let paymentTokenName = "DAI"
-let defaultBlockExplorer = "https://kovan.etherscan.io/"
-let defaultBlockExplorerName = "etherscan"
-let getDefaultNetworkId = optNetworkId => optNetworkId->Option.getWithDefault(defaultNetworkId)
-
-let discordInviteLink = "https://discord.gg/dqDwgrVYcU"
+external optConfigOverride: option<string> = "process.env.CONFIG_FILE"
+let defaultConfig = "./config.json"
 
 type contractDetails = {
   @as("LongShort") longShort: Ethers.ethAddress,
@@ -23,57 +8,33 @@ type contractDetails = {
   @as("Dai") dai: Ethers.ethAddress,
   @as("FloatToken") floatToken: Ethers.ethAddress,
 }
-
-type allChainContractDetails = Js.Dict.t<contractDetails>
-
-let allContracts: allChainContractDetails = %raw(`require('./contractAddresses.json')`)
-
-let getContractAddressString = (~netIdStr, ~closure) => {
-  allContracts
-  ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(CONSTANTS.zeroAddress, closure)
-  ->ethAdrToStr
+type configShape = {
+  graphEndpoint: string,
+  networkId: int,
+  networkName: string,
+  paymentTokenName: string,
+  blockExplorer: string,
+  blockExplorerName: string,
+  discordInviteLink: string,
+  contracts: contractDetails,
 }
+let getConfig: string => option<configShape> = %raw(`(configLocation) => require(configLocation)`)
 
-// refactor this at some stage to be a single function?
-let longShortContractAddress = (~netIdStr) => {
-  allContracts
-  ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(CONSTANTS.zeroAddress, contracts => contracts.longShort)
-}
-let useLongShortAddress = () => {
-  let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
-  longShortContractAddress(~netIdStr)
-}
+let configPath = optConfigOverride->Option.getWithDefault(defaultConfig)
+let config =
+  getConfig(configPath)->Option.getWithDefault(
+    Js.Exn.raiseError(`Could not find config file at ${configPath}`),
+  )
 
-let stakerContractAddress = (~netIdStr) => {
-  allContracts
-  ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(CONSTANTS.zeroAddress, contracts => contracts.staker)
-}
-let useStakerAddress = () => {
-  let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
-  stakerContractAddress(~netIdStr)
-}
+// NOTE: no validation happens on the config. IT IS NOT TYPE SAFE.
 
-let daiContractAddress = (~netIdStr) => {
-  allContracts
-  ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(CONSTANTS.zeroAddress, contracts => contracts.dai)
-}
-
-let useDaiAddress = () => {
-  let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
-  daiContractAddress(~netIdStr)
-}
-
-let floatContractAddress = (~netIdStr) => {
-  allContracts
-  ->Js.Dict.get(netIdStr)
-  ->Option.mapWithDefault(CONSTANTS.zeroAddress, contracts => contracts.floatToken)
-}
-
-let useFloatAddress = () => {
-  let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
-  floatContractAddress(~netIdStr)
-}
+let {
+  graphEndpoint,
+  networkId,
+  networkName,
+  paymentTokenName,
+  blockExplorer,
+  blockExplorerName,
+  discordInviteLink,
+  contracts: {longShort, staker, dai, floatToken},
+} = config

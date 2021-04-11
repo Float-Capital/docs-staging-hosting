@@ -73,7 +73,7 @@ function makeClient(graphUri, dbUri, user) {
   return ApolloClient.make(undefined, undefined, undefined, Caml_option.some(querySwitcherLink(graphUri, dbUri, user)), ApolloClient__Cache_InMemory_InMemoryCache.make(undefined, undefined, undefined, undefined, undefined, undefined), undefined, undefined, true, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
 }
 
-var defaultClient = makeClient(Config.testnetGraphEndpoint, "http://localhost:8080/v1/graphql", undefined);
+var defaultClient = makeClient(Config.graphEndpoint, "http://localhost:8080/v1/graphql", undefined);
 
 var context = React.createContext(defaultClient);
 

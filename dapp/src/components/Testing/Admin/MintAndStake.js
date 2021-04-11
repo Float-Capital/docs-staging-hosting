@@ -406,14 +406,12 @@ function MintAndStake(Props) {
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
-  var longShortContractAddress = Config.useLongShortAddress(undefined);
-  var daiAddress = Config.useDaiAddress(undefined);
-  var match$1 = ContractHooks.useERC20ApprovedRefresh(daiAddress, longShortContractAddress);
+  var match$1 = ContractHooks.useERC20ApprovedRefresh(Config.dai, Config.longShort);
   var optAmountApproved = match$1.data;
   var form = useForm(initialInput, (function (param, _form) {
           var amount = param.amount;
           return Curry._2(contractExecutionHandler, (function (param) {
-                        return Contracts.LongShort.make(longShortContractAddress, param);
+                        return Contracts.LongShort.make(Config.longShort, param);
                       }), isLong ? (function (param) {
                           return param.mintShortAndStake(marketIndex, amount);
                         }) : (function (param) {

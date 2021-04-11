@@ -16,8 +16,8 @@ let make = (~txState) => {
           className="hover:underline"
           target="_"
           rel="noopenner noreferer"
-          href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
-          <p> {`view tx on ${Config.defaultBlockExplorerName}`->React.string} </p>
+          href={`${Config.blockExplorer}tx/${txHash}`}>
+          <p> {`view tx on ${Config.blockExplorerName}`->React.string} </p>
         </a>
       </div>
     </Modal>

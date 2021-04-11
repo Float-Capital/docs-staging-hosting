@@ -12,8 +12,8 @@ let make = (~txStateApprove, ~txStateStake, ~resetFormButton, ~tokenToStake) => 
       <div className="text-center m-3">
         <MiniLoader />
         <p> {"Approval transaction pending... "->React.string} </p>
-        <a target="_" rel="noopenner noreferer" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
-          <p> {`View on ${Config.defaultBlockExplorerName}`->React.string} </p>
+        <a target="_" rel="noopenner noreferer" href={`${Config.blockExplorer}tx/${txHash}`}>
+          <p> {`View on ${Config.blockExplorerName}`->React.string} </p>
         </a>
       </div>
     </Modal>
@@ -50,15 +50,12 @@ let make = (~txStateApprove, ~txStateStake, ~resetFormButton, ~tokenToStake) => 
           <a
             target="_"
             rel="noopenner noreferer"
-            href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
+            href={`${Config.blockExplorer}tx/${transactionHash}`}>
             {`Approval confirmed`->React.string}
           </a>
         </p>
         <h1>
-          <a
-            target="_"
-            rel="noopenner noreferer"
-            href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
+          <a target="_" rel="noopenner noreferer" href={`${Config.blockExplorer}tx/${txHash}`}>
             {`Pending staking ${tokenToStake}`->React.string}
           </a>
         </h1>
@@ -73,8 +70,8 @@ let make = (~txStateApprove, ~txStateStake, ~resetFormButton, ~tokenToStake) => 
           className="hover:underline"
           target="_"
           rel="noopenner noreferer"
-          href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
-          <p> {`View on ${Config.defaultBlockExplorerName}`->React.string} </p>
+          href={`${Config.blockExplorer}tx/${txHash}`}>
+          <p> {`View on ${Config.blockExplorerName}`->React.string} </p>
         </a>
       </div>
     </Modal>

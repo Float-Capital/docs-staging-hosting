@@ -144,7 +144,7 @@ function User$User(Props) {
     return React.createElement(UserUI.UserColumnTextCenter.make, {
                 children: React.createElement("a", {
                       className: "mt-4 hover:text-gray-600",
-                      href: Config.defaultBlockExplorer + "address/" + user,
+                      href: Config.blockExplorer + "address/" + user,
                       rel: "noopener noreferrer",
                       target: "_"
                     }, React.createElement("h1", undefined, "This user has not interacted with float.capital yet"))

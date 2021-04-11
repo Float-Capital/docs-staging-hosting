@@ -27,7 +27,7 @@ let make = () => {
   <div>
     <p className="mx-2 md:mx-0"> {"Connect with one of the wallets below. "->React.string} </p>
     <p className="text-xs">
-      {`Please make sure to connect to ${Config.defaultNetworkName}.`->React.string}
+      {`Please make sure to connect to ${Config.networkName}.`->React.string}
     </p>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center my-5">
       {connectors

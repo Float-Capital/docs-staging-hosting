@@ -40,10 +40,10 @@ function ClaimTxStatusModal(Props) {
                             className: "text-center m-3"
                           }, React.createElement(MiniLoader.make, {}), React.createElement("p", undefined, "Claiming transaction pending... "), React.createElement("a", {
                                 className: "hover:underline",
-                                href: Config.defaultBlockExplorer + "tx/" + txState._0,
+                                href: Config.blockExplorer + "tx/" + txState._0,
                                 rel: "noopenner noreferer",
                                 target: "_"
-                              }, React.createElement("p", undefined, "view tx on " + Config.defaultBlockExplorerName)))
+                              }, React.createElement("p", undefined, "view tx on " + Config.blockExplorerName)))
                     });
       case /* Declined */1 :
           return React.createElement(Modal.make, {

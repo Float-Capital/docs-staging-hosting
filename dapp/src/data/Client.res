@@ -86,7 +86,7 @@ let makeClient = (~graphUri, ~dbUri, ~user) => {
 @ocaml.doc(`the default client is the client connected to the default network`)
 let defaultClient = makeClient(
   ~graphUri={
-    Config.testnetGraphEndpoint
+    Config.graphEndpoint
   },
   ~dbUri="http://localhost:8080/v1/graphql" /* NOTE CURRENTLY USED */,
   ~user=None,

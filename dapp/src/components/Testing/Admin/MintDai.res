@@ -35,11 +35,9 @@ let make = (~ethersWallet) => {
     ~signer=ethersWallet,
   )
 
-  let daiContract = Config.useDaiAddress()
-
   let form = AdminMintForm.useForm(~initialInput, ~onSubmit=({address, amount}, _form) => {
     contractExecutionHandler(
-      ~makeContractInstance=Contracts.TestErc20.make(~address=daiContract),
+      ~makeContractInstance=Contracts.TestErc20.make(~address=Config.dai),
       ~contractFunction=Contracts.TestErc20.mint(~recipient=address, ~amount),
     )
   })
