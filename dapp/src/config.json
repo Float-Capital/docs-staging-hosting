@@ -1,0 +1,19 @@
+{
+  "graphEndpoint": "https://api.thegraph.com/subgraphs/name/float-capital/testnet",
+  "networkId": 43,
+  "networkName": "Kovan testnet",
+  "paymentTokenName": "DAI",
+  "blockExplorer": "https://kovan.etherscan.io/",
+  "blockExplorerName": "etherscan",
+  "discordInviteLink": "https://discord.gg/dqDwgrVYcU",
+  "contracts": {
+    "FloatCapital_v0": "0xdd24b29b7d8717823961daD540758523ECCa79BE",
+    "FloatToken": "0xb4e4b3173E8cF526d17D90B944247B8271027fBe",
+    "LongShort": "0xFC216bc2fecb5B09D738B2480203a0d39ebc0230",
+    "Migrations": "0xEf8ff1B1c5A38b987e87f3F1AA9506b818244C4C",
+    "Staker": "0x2a3BCa1745192df3c73E2D09f6dE27044bca5f94",
+    "TokenFactory": "0xF3E0770b545c98392C6cf0176E943430D9eD7f9F",
+    "Treasury_v0": "0x5667cBd70434E9E60A12191F165d6bb0D75d5274",
+    "Dai": "0xff795577d9ac8bd7d90ee22b6c1703490b6512fd"
+  }
+}

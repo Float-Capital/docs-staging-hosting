@@ -67,7 +67,6 @@ module Claimable = {
 @react.component
 let make = () => {
   let user = RootProvider.useCurrentUserExn()
-  let floatTokenAddress = Config.useFloatAddress()
   let userQuery = Queries.UserQuery.use({userId: user->ethAdrToLowerStr})
   let floatBreakdown = FloatBreakdown.use()
 
@@ -75,7 +74,7 @@ let make = () => {
     {switch userQuery {
     | {data: Some({user: Some({totalMintedFloat, floatTokenBalance})})} => <>
         {`you have minted ${totalMintedFloat->FormatMoney.formatEther} FLOAT, and currently have a balance of ${floatTokenBalance->FormatMoney.formatEther}`->React.string}
-        <AddToMetamask tokenAddress={floatTokenAddress->ethAdrToStr} tokenSymbol="FLOAT" />
+        <AddToMetamask tokenAddress={Config.floatToken->ethAdrToStr} tokenSymbol="FLOAT" />
       </>
     | {error: Some(_)} => "Error loading users float data"->React.string
     | _ => "Loading total minted by user"->React.string

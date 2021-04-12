@@ -12,11 +12,10 @@ function ClaimFloatImmediatlyPerToken(Props) {
   var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var contractExecutionHandler = match[0];
-  var stakerAddress = Config.useStakerAddress(undefined);
   return React.createElement(Button.Tiny.make, {
               onClick: (function (param) {
                   Curry._2(contractExecutionHandler, (function (param) {
-                          return Contracts.Staker.make(stakerAddress, param);
+                          return Contracts.Staker.make(Config.staker, param);
                         }), (function (param) {
                           return param.claimFloatImmediately(tokenAddress);
                         }));

@@ -17,10 +17,9 @@ let initialInput: LongRedeemForm.input = {
 let make = (~isLong, ~marketIndex) => {
   let signer = ContractActions.useSignerExn()
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
-  let longShortAddres = Config.useLongShortAddress()
   let form = LongRedeemForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
     contractExecutionHandler(
-      ~makeContractInstance=Contracts.LongShort.make(~address=longShortAddres),
+      ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
       ~contractFunction={
         isLong
           ? Contracts.LongShort.redeemLong(~marketIndex, ~tokensToRedeem=amount)

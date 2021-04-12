@@ -401,7 +401,6 @@ var Claimable = {
 
 function FloatManagement(Props) {
   var user = RootProvider.useCurrentUserExn(undefined);
-  var floatTokenAddress = Config.useFloatAddress(undefined);
   var userQuery = Curry.app(Queries.UserQuery.use, [
         undefined,
         undefined,
@@ -441,7 +440,7 @@ function FloatManagement(Props) {
   if (match !== undefined) {
     var match$1 = match.user;
     tmp = match$1 !== undefined ? React.createElement(React.Fragment, undefined, "you have minted " + FormatMoney.formatEther(undefined, match$1.totalMintedFloat) + " FLOAT, and currently have a balance of " + FormatMoney.formatEther(undefined, match$1.floatTokenBalance), React.createElement(AddToMetamask.make, {
-                tokenAddress: Globals.ethAdrToStr(floatTokenAddress),
+                tokenAddress: Globals.ethAdrToStr(Config.floatToken),
                 tokenSymbol: "FLOAT"
               })) : (
         userQuery.error !== undefined ? "Error loading users float data" : "Loading total minted by user"

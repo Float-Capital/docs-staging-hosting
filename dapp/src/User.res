@@ -118,7 +118,7 @@ module User = {
           className="mt-4 hover:text-gray-600"
           target="_"
           rel="noopener noreferrer"
-          href={`${Config.defaultBlockExplorer}address/${user}`}>
+          href={`${Config.blockExplorer}address/${user}`}>
           <h1> {"This user has not interacted with float.capital yet"->React.string} </h1>
         </a>
       </UserColumnTextCenter>

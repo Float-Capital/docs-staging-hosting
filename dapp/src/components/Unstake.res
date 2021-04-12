@@ -46,8 +46,6 @@ module ConnectedStakeForm = {
       ~signer,
     )
 
-    let stakerContractAddress = Config.useStakerAddress()
-
     let user = RootProvider.useCurrentUserExn()
 
     let optTokenBalance =
@@ -66,7 +64,7 @@ module ConnectedStakeForm = {
     let form = StakeForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
       let stakeAndEarnImmediatlyFunction = () =>
         contractExecutionHandler(
-          ~makeContractInstance=Contracts.Staker.make(~address=stakerContractAddress),
+          ~makeContractInstance=Contracts.Staker.make(~address=Config.staker),
           ~contractFunction=Contracts.Staker.withdraw(
             ~tokenAddress=tokenId->Ethers.Utils.getAddressUnsafe,
             ~amount,

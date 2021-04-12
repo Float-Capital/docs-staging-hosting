@@ -61,16 +61,16 @@ module SubmitButtonAndTxTracker = {
       <div className="text-center m-3">
         <MiniLoader />
         <p> {"Approval transaction pending... "->React.string} </p>
-        <a target="_" rel="noopenner noreferer" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
-          <p> {`View on ${Config.defaultBlockExplorerName}`->React.string} </p>
+        <a target="_" rel="noopenner noreferer" href={`${Config.blockExplorer}tx/${txHash}`}>
+          <p> {`View on ${Config.blockExplorerName}`->React.string} </p>
         </a>
       </div>
-    | (ContractActions.Complete({transactionHash}), ContractActions.Created)
-    | (ContractActions.Complete({transactionHash}), ContractActions.UnInitialised) =>
+    | (ContractActions.Complete({transactionHash: _}), ContractActions.Created)
+    | (ContractActions.Complete({transactionHash: _}), ContractActions.UnInitialised) =>
       <div className="text-center m-3">
         <p> {`Confirm transaction to mint ${tokenToMint}`->React.string} </p>
       </div>
-    | (ContractActions.Declined(message), _) => <> {resetFormButton()} </>
+    | (ContractActions.Declined(_message), _) => <> {resetFormButton()} </>
     | (ContractActions.Failed, _) =>
       <div className="text-center m-3">
         <p> {`The transaction failed.`->React.string} </p>
@@ -91,15 +91,12 @@ module SubmitButtonAndTxTracker = {
           <a
             target="_"
             rel="noopenner noreferer"
-            href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
+            href={`${Config.blockExplorer}tx/${transactionHash}`}>
             {`Approval confirmed`->React.string}
           </a>
         </p>
         <h1>
-          <a
-            target="_"
-            rel="noopenner noreferer"
-            href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
+          <a target="_" rel="noopenner noreferer" href={`${Config.blockExplorer}tx/${txHash}`}>
             {`Pending minting ${tokenToMint}`->React.string}
           </a>
         </h1>
@@ -112,15 +109,15 @@ module SubmitButtonAndTxTracker = {
           className="hover:underline"
           target="_"
           rel="noopenner noreferer"
-          href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
-          <p> {`View on ${Config.defaultBlockExplorerName}`->React.string} </p>
+          href={`${Config.blockExplorer}tx/${txHash}`}>
+          <p> {`View on ${Config.blockExplorerName}`->React.string} </p>
         </a>
       </div>
-    | (_, ContractActions.Complete({transactionHash})) =>
+    | (_, ContractActions.Complete({transactionHash: _})) =>
       <div className="text-center m-3">
         <p> {`Transaction complete`->React.string} </p> {resetFormButton()}
       </div>
-    | (_, ContractActions.Declined(message)) =>
+    | (_, ContractActions.Declined(_message)) =>
       <div className="text-center m-3">
         <p> {`The transaction was rejected by your wallet`->React.string} </p>
         <a target="_" rel="noopenner noreferer" href=Config.discordInviteLink>
@@ -249,33 +246,30 @@ module MintFormSignedIn = {
       setContractActionToCallAfterApproval,
     ) = React.useState(((), ()) => ())
 
-    let longShortContractAddress = Config.useLongShortAddress()
-    let daiAddressThatIsTemporarilyHardCoded = Config.useDaiAddress()
-
     let (optDaiBalance, optDaiAmountApproved) = useBalanceAndApproved(
-      ~erc20Address=daiAddressThatIsTemporarilyHardCoded,
-      ~spender=longShortContractAddress,
+      ~erc20Address=Config.dai,
+      ~spender=Config.longShort,
     )
 
     let form = MintForm.useForm(~initialInput, ~onSubmit=({amount, isStaking}, _form) => {
       let approveFunction = () =>
         contractExecutionHandlerApprove(
-          ~makeContractInstance=Contracts.Erc20.make(~address=daiAddressThatIsTemporarilyHardCoded),
+          ~makeContractInstance=Contracts.Erc20.make(~address=Config.dai),
           ~contractFunction=Contracts.Erc20.approve(
             ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
-            ~spender=longShortContractAddress,
+            ~spender=Config.longShort,
           ),
         )
       let mintFunction = () =>
         contractExecutionHandler(
-          ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
+          ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
           ~contractFunction=isLong
             ? Contracts.LongShort.mintLong(~marketIndex=market.marketIndex, ~amount)
             : Contracts.LongShort.mintShort(~marketIndex=market.marketIndex, ~amount),
         )
       let mintAndStakeFunction = () =>
         contractExecutionHandler(
-          ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
+          ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
           ~contractFunction=isLong
             ? Contracts.LongShort.mintLongAndStake(~marketIndex=market.marketIndex, ~amount)
             : Contracts.LongShort.mintShortAndStake(~marketIndex=market.marketIndex, ~amount),

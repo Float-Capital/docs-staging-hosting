@@ -8,9 +8,12 @@ import {
   UserSyntheticTokenBalance,
   LatestPrice,
   SyntheticMarket,
+  CollateralToken,
+  UserCollateralTokenBalance,
 } from "../../generated/schema";
-import { BigInt, Bytes, log, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, Bytes, log, ethereum, Address } from "@graphprotocol/graph-ts";
 import { ZERO, ONE, GLOBAL_STATE_ID, TEN_TO_THE_18 } from "../CONSTANTS";
+import { createNewTokenDataSource } from "./helperFunctions";
 
 function createInitialTokenPrice(
   id: string,
@@ -170,6 +173,8 @@ export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
     user.numberOfTransactions = ZERO;
     user.currentStakes = [];
     user.tokenBalances = [];
+    user.collatoralTokenApprovals = [];
+    user.collatoralBalances = [];
     user.tokenMints = [];
     user.stateChangesAffectingUser = [];
 
@@ -195,9 +200,17 @@ export function getOrCreateBalanceObject(
     );
 
     let user = User.load(userAddressString);
+    if (user == null) {
+      log.critical("User is undefined with address {}", [userAddressString]);
+    }
     newBalance.user = user.id;
 
     let token = SyntheticToken.load(tokenAddressString);
+    if (token == null) {
+      log.critical("Synthetic Token is undefined with address {}", [
+        tokenAddressString,
+      ]);
+    }
     newBalance.syntheticToken = token.id;
 
     newBalance.tokenBalance = ZERO;
@@ -207,6 +220,61 @@ export function getOrCreateBalanceObject(
   } else {
     return balance as UserSyntheticTokenBalance;
   }
+}
+
+export function getOrCreateCollatoralBalanceObject(
+  tokenAddressString: string,
+  userAddressString: string
+): UserCollateralTokenBalance {
+  let balance = UserCollateralTokenBalance.load(
+    tokenAddressString + "-" + userAddressString + "-balance"
+  );
+
+  if (balance == null) {
+    let newBalance = new UserCollateralTokenBalance(
+      tokenAddressString + "-" + userAddressString + "-balance"
+    );
+
+    let user = User.load(userAddressString);
+    if (user == null) {
+      log.critical("User is undefined with address {}", [userAddressString]);
+    }
+    newBalance.user = user.id;
+
+    let token = CollateralToken.load(tokenAddressString);
+    if (token == null) {
+      log.critical("Synthetic Token is undefined with address {}", [
+        tokenAddressString,
+      ]);
+    }
+    newBalance.collateralToken = token.id;
+
+    newBalance.balance = ZERO;
+    newBalance.timeLastUpdated = ZERO;
+
+    return newBalance;
+  } else {
+    return balance as UserCollateralTokenBalance;
+  }
+}
+
+export function updateOrCreateCollateralToken(
+  tokenAddress: Address,
+  syntheticMarket: SyntheticMarket
+): CollateralToken {
+  let tokenAddressString = tokenAddress.toHex();
+  let collateralToken = CollateralToken.load(tokenAddressString);
+  if (collateralToken == null) {
+    collateralToken = new CollateralToken(tokenAddressString);
+    collateralToken.linkedMarkets = [];
+    createNewTokenDataSource(tokenAddress);
+  }
+
+  collateralToken.linkedMarkets = collateralToken.linkedMarkets.concat([
+    syntheticMarket.id,
+  ]);
+
+  return collateralToken as CollateralToken;
 }
 
 export function createSyntheticToken(tokenAddress: Bytes): SyntheticToken {
@@ -230,7 +298,6 @@ export function createSyntheticTokenLong(tokenAddress: Bytes): SyntheticToken {
 
   return syntheticToken as SyntheticToken;
 }
-
 export function createSyntheticTokenShort(tokenAddress: Bytes): SyntheticToken {
   let syntheticToken = createSyntheticToken(tokenAddress);
   syntheticToken.tokenType = "Short";
