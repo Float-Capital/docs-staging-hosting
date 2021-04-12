@@ -6,7 +6,7 @@ dataSources:
     name: LongShort
     network: kovan
     source:
-      address: "0xA696f77436A4e631c96CA8b9fa2DCD1b250Eb1E3"
+      address: "0xFC216bc2fecb5B09D738B2480203a0d39ebc0230"
       abi: LongShort
       startBlock: 24185640
     mapping:
@@ -57,7 +57,7 @@ dataSources:
     name: Staker
     network: kovan
     source:
-      address: "0x9Fb0c1d09b02C975EF14CCE71174481a667CA193"
+      address: "0x2a3BCa1745192df3c73E2D09f6dE27044bca5f94"
       abi: Staker
       startBlock: 24185634
     mapping:
