@@ -1,4 +1,8 @@
-const bsconfig = require('./bsconfig.json');
+const bsconfig = require("./bsconfig.json");
+
+let defaultConfig = "./config.json";
+// ^relative to src/Config.js
+// CONFIG_FILE env variable should also be relative to it I think
 
 const transpileModules = ["bs-platform"].concat(bsconfig["bs-dependencies"]);
 const withTM = require("next-transpile-modules")(transpileModules);
@@ -11,16 +15,18 @@ const config = {
     ENV: process.env.NODE_ENV,
   },
   webpack: (config, options) => {
+    config.resolve.alias["config_file"] =
+      process.env.CONFIG_FILE || defaultConfig;
     const { isServer } = options;
     if (!isServer) {
       // We shim fs for things like the blog slugs component
       // where we need fs access in the server-side part
       config.node = {
-        fs: 'empty'
-      }
+        fs: "empty",
+      };
     }
-    return config
-  }
+    return config;
+  },
 };
 
 module.exports = withTM(config);
