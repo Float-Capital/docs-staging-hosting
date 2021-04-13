@@ -37,7 +37,7 @@ let make = (~tokenAddresses) => {
   let claimFloatCall = _ =>
     contractExecutionHandler(
       ~makeContractInstance=Contracts.Staker.make(~address=Config.staker),
-      ~contractFunction=Contracts.Staker.claimFloat(
+      ~contractFunction=Contracts.Staker.claimFloatImmediately(
         ~tokenAddresses=tokenAddresses->Array.map(Ethers.Utils.getAddressUnsafe),
       ),
     )
