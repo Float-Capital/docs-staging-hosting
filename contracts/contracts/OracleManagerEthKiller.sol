@@ -84,7 +84,7 @@ contract OracleManagerEthKiller is Initializable, IOracleManager {
         return (data[0].rate, data[1].rate, data[2].rate);
     }
 
-    function updatePrice() external override {
+    function updatePrice() external override returns (int256) {
         (uint256 newTronPrice, uint256 newEosPrice, uint256 newXrpPrice) =
             _getAssetPrices();
 
@@ -100,6 +100,8 @@ contract OracleManagerEthKiller is Initializable, IOracleManager {
         xrpPrice = newXrpPrice;
 
         indexPrice = uint256(int256(indexPrice) + valueOfChangeInIndex);
+
+        return int256(indexPrice);
     }
 
     function _calcAbsolutePercentageChange(uint256 newPrice, uint256 basePrice)
