@@ -47,7 +47,7 @@ function Mint$Mint(Props) {
     tmp = "You might think this is impossible, but depending on the situation it might not be!";
   }
   return React.createElement("section", {
-              className: "h-full"
+              className: "h-full px-6"
             }, tmp);
 }
 

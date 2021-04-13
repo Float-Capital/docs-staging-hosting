@@ -46,6 +46,15 @@ let tabToStr = tab =>
   | Unstake => "Unstake"
   }
 
+let strToTab = tab =>
+  switch tab->Js.String.toLowerCase {
+  | "mint" => Mint
+  | "redeem" => Redeem
+  | "stake" => Stake
+  | "unstake" => Unstake
+  | _ => Mint
+  }
+
 type marketInfo = {
   longId: string,
   shortId: string,
@@ -176,7 +185,7 @@ module SelectOptions = {
     let router = Next.Router.useRouter()
     marketInfo->Option.mapWithDefault(React.null, marketInfo => {
       let onChangeSide = event => {
-        router.query->Js.Dict.set("mintOption", (event->ReactEvent.Form.target)["value"])
+        router.query->Js.Dict.set("actionOption", (event->ReactEvent.Form.target)["value"])
         router.query->Js.Dict.set(
           "token",
           isLong
@@ -270,7 +279,7 @@ module UnstakeOrStakeInteractionWrapper = {
       </>
     | Default => default
     | Loading => <MiniLoader />
-    | Error(s) => <div className="pl-6"> {s->React.string} </div>
+    | Error(s) => <div className="p-6"> {s->React.string} </div>
     }
   }
 }
@@ -279,9 +288,11 @@ module UnstakeOrStakeInteractionWrapper = {
 let make = () => {
   let router = Next.Router.useRouter()
   let user = RootProvider.useCurrentUser()
-  let (selected, setSelected) = React.useState(_ => Mint)
-  let mintOption = router.query->Js.Dict.get("mintOption")->Option.getWithDefault("short")
-  let longSelected = mintOption == "long"
+
+  let selectedTab = router.query->Js.Dict.get("tab")->Option.getWithDefault("Mint")
+  let (selected, setSelected) = React.useState(_ => selectedTab->strToTab)
+  let actionOption = router.query->Js.Dict.get("actionOption")->Option.getWithDefault("short")
+  let longSelected = actionOption == "long"
   let marketInfo = useMarketInfo()
   let userHasBalances = useUserHasBalances(
     ~user,
@@ -299,14 +310,18 @@ let make = () => {
           text={tab->tabToStr}
           key={tab->tabToStr}
           selected={tab == selected}
-          onClick={_ => setSelected(_ => tab)}
+          onClick={_ => {
+            setSelected(_ => tab)
+            router.query->Js.Dict.set("tab", tab->tabToStr->Js.String.toLowerCase)
+            router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
+          }}
         />
       })
       ->React.array}
     </ul>
     <div
       className="rounded-b-lg min-h-market-interaction-card rounded-r-lg flex flex-col bg-white bg-opacity-70 shadow-lg">
-      {selected != Mint ? header(~marketInfo) : React.null}
+      {header(~marketInfo)}
       {switch selected {
       | Mint => <Mint.Mint />
       | Redeem => {

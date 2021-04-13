@@ -107,6 +107,22 @@ function tabToStr(tab) {
   }
 }
 
+function strToTab(tab) {
+  var match = tab.toLowerCase();
+  switch (match) {
+    case "mint" :
+        return /* Mint */0;
+    case "redeem" :
+        return /* Redeem */1;
+    case "stake" :
+        return /* Stake */2;
+    case "unstake" :
+        return /* Unstake */3;
+    default:
+      return /* Mint */0;
+  }
+}
+
 function useUserHasBalances(user, marketInfo) {
   var userOrZeroAddress = Belt_Option.getWithDefault(user, CONSTANTS.zeroAddress);
   var match = Belt_Option.mapWithDefault(marketInfo, [
@@ -226,7 +242,7 @@ function MarketInteractionCard$SelectOptions(Props) {
   var router = Router.useRouter();
   return Belt_Option.mapWithDefault(marketInfo, null, (function (marketInfo) {
                 var onChangeSide = function ($$event) {
-                  router.query["mintOption"] = $$event.target.value;
+                  router.query["actionOption"] = $$event.target.value;
                   router.query["token"] = isLong ? Ethers.Utils.ethAdrToLowerStr(marketInfo.longAddress) : Ethers.Utils.ethAdrToLowerStr(marketInfo.shortAddress);
                   return Next.Router.pushObjShallow(router, {
                               pathname: router.pathname,
@@ -354,7 +370,7 @@ function MarketInteractionCard$UnstakeOrStakeInteractionWrapper(Props) {
                       })));
   } else {
     return React.createElement("div", {
-                className: "pl-6"
+                className: "p-6"
               }, display._0);
   }
 }
@@ -367,13 +383,14 @@ var UnstakeOrStakeInteractionWrapper = {
 function MarketInteractionCard(Props) {
   var router = Router.useRouter();
   var user = RootProvider.useCurrentUser(undefined);
+  var selectedTab = Belt_Option.getWithDefault(Js_dict.get(router.query, "tab"), "Mint");
   var match = React.useState(function () {
-        return /* Mint */0;
+        return strToTab(selectedTab);
       });
   var setSelected = match[1];
   var selected = match[0];
-  var mintOption = Belt_Option.getWithDefault(Js_dict.get(router.query, "mintOption"), "short");
-  var longSelected = mintOption === "long";
+  var actionOption = Belt_Option.getWithDefault(Js_dict.get(router.query, "actionOption"), "short");
+  var longSelected = actionOption === "long";
   var marketInfo = useMarketInfo(undefined);
   var userHasBalances = useUserHasBalances(user, DataHooks.Util.graphResponseToOption(marketInfo));
   var userHasStakes = useUserHasStakes(user, DataHooks.Util.graphResponseToOption(marketInfo));
@@ -448,15 +465,20 @@ function MarketInteractionCard(Props) {
                                     selected: tab === selected,
                                     text: tabToStr(tab),
                                     onClick: (function (param) {
-                                        return Curry._1(setSelected, (function (param) {
-                                                      return tab;
-                                                    }));
+                                        Curry._1(setSelected, (function (param) {
+                                                return tab;
+                                              }));
+                                        router.query["tab"] = tabToStr(tab).toLowerCase();
+                                        return Next.Router.pushObjShallow(router, {
+                                                    pathname: router.pathname,
+                                                    query: router.query
+                                                  });
                                       }),
                                     key: tabToStr(tab)
                                   });
                       }))), React.createElement("div", {
                   className: "rounded-b-lg min-h-market-interaction-card rounded-r-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
-                }, selected !== /* Mint */0 ? header(marketInfo) : null, tmp));
+                }, header(marketInfo), tmp));
 }
 
 var defaultUserHasPositions = {
@@ -473,6 +495,7 @@ export {
   optAddressWithDefaultZero ,
   allTabs ,
   tabToStr ,
+  strToTab ,
   defaultUserHasPositions ,
   useUserHasBalances ,
   useUserHasStakes ,
