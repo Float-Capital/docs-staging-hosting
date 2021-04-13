@@ -1,0 +1,16 @@
+type FiveMinPrice @entity {
+  id: ID!
+  startPrice: BigInt!
+  endPrice: BigInt!
+  averagePrice: BigInt!
+  intervalComplete: Boolean!
+  numberOfBlocksInInterval: BigInt!
+}
+
+type Oracle @entity {
+  id: ID!
+  marketIndex: BigInt!
+  latestPrice: BigInt!
+  fiveMinPrices: [FiveMinPrice!]!
+  latestFiveMinPrice: FiveMinPrice!
+}

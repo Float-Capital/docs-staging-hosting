@@ -1,0 +1,24 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: LongShort
+    network: ganache
+    source:
+      address: "0xa9e638f77Eea6036D05F00d0AC55169357De114E"
+      abi: LongShort
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - SyntheticTokenCreated
+      abis:
+        - name: LongShort
+          file: ./abis/LongShort.json
+      eventHandlers:
+        - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
+          handler: handleSyntheticTokenCreated
+      file: ./src/priceHistory.ts
