@@ -893,13 +893,13 @@
     "absolutePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/FloatCapital_v0.sol",
     "exportedSymbols": {
       "AddressUpgradeable": [
-        8555
+        8576
       ],
       "FloatCapital_v0": [
         48
       ],
       "Initializable": [
-        7244
+        7265
       ]
     },
     "id": 49,
@@ -923,7 +923,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 49,
-        "sourceUnit": 7245,
+        "sourceUnit": 7266,
         "src": "57:75:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -936,7 +936,7 @@
               "id": 7,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 7244,
+              "referencedDeclaration": 7265,
               "src": "199:13:1"
             },
             "id": 8,
@@ -945,7 +945,7 @@
           }
         ],
         "contractDependencies": [
-          7244
+          7265
         ],
         "contractKind": "contract",
         "documentation": {
@@ -958,7 +958,7 @@
         "id": 48,
         "linearizedBaseContracts": [
           48,
-          7244
+          7265
         ],
         "name": "FloatCapital_v0",
         "nameLocation": "180:15:1",
@@ -1203,7 +1203,7 @@
                   "id": 26,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 7243,
+                  "referencedDeclaration": 7264,
                   "src": "633:11:1"
                 },
                 "nodeType": "ModifierInvocation",
@@ -1397,13 +1397,13 @@
     "absolutePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/FloatCapital_v0.sol",
     "exportedSymbols": {
       "AddressUpgradeable": [
-        8555
+        8576
       ],
       "FloatCapital_v0": [
         48
       ],
       "Initializable": [
-        7244
+        7265
       ]
     },
     "id": 49,
@@ -1427,7 +1427,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 49,
-        "sourceUnit": 7245,
+        "sourceUnit": 7266,
         "src": "57:75:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -1440,7 +1440,7 @@
               "id": 7,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 7244,
+              "referencedDeclaration": 7265,
               "src": "199:13:1"
             },
             "id": 8,
@@ -1449,7 +1449,7 @@
           }
         ],
         "contractDependencies": [
-          7244
+          7265
         ],
         "contractKind": "contract",
         "documentation": {
@@ -1462,7 +1462,7 @@
         "id": 48,
         "linearizedBaseContracts": [
           48,
-          7244
+          7265
         ],
         "name": "FloatCapital_v0",
         "nameLocation": "180:15:1",
@@ -1707,7 +1707,7 @@
                   "id": 26,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 7243,
+                  "referencedDeclaration": 7264,
                   "src": "633:11:1"
                 },
                 "nodeType": "ModifierInvocation",
@@ -1905,11 +1905,11 @@
     "42": {
       "events": {},
       "links": {},
-      "address": "0xdd24b29b7d8717823961daD540758523ECCa79BE"
+      "address": "0x635BF6D73d365359d078e25dcE6Ec1596485276a"
     }
   },
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-04-11T12:39:03.310Z",
+  "updatedAt": "2021-04-13T11:56:40.889Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
