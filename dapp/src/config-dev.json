@@ -1,6 +1,6 @@
 {
   "graphEndpoint": "https://api.thegraph.com/subgraphs/name/float-capital/testnet",
-  "networkId": 43,
+  "networkId": 42,
   "networkName": "Kovan testnet",
   "paymentTokenName": "DAI",
   "blockExplorer": "https://kovan.etherscan.io/",
