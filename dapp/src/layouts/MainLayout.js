@@ -17,9 +17,9 @@ function MainLayout(Props) {
                       className: "flex flex-col h-screen"
                     }, React.createElement(Navigation.make, {}), React.createElement("div", {
                           className: "m-auto w-full"
-                        }, chainId !== undefined && chainId !== Config.defaultNetworkId ? React.createElement(React.Fragment, undefined, React.createElement("h2", undefined, "You are currently connected to the wrong network."), React.createElement("h4", {
+                        }, chainId !== undefined && chainId !== Config.networkId ? React.createElement(React.Fragment, undefined, React.createElement("h2", undefined, "You are currently connected to the wrong network."), React.createElement("h4", {
                                     className: "text-lg"
-                                  }, "Please connect to " + Config.defaultNetworkName + ".")) : children))), React.createElement(Lost.make, {}));
+                                  }, "Please connect to " + Config.networkName + ".")) : children))), React.createElement(Lost.make, {}));
 }
 
 var make = MainLayout;

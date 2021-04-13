@@ -37,7 +37,7 @@ function AddNetworkToMetamask(Props) {
                         className: "flex flex-row items-center"
                       }, React.createElement("div", {
                             className: "text-sm"
-                          }, "Add " + Config.defaultNetworkName + " to metamask "), React.createElement("img", {
+                          }, "Add " + Config.networkName + " to metamask "), React.createElement("img", {
                             className: "h-6 ml-1",
                             src: "/icons/metamask.svg"
                           })))

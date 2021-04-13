@@ -6,8 +6,6 @@ let make = (~tokenAddresses) => {
     ~signer,
   )
 
-  let stakerAddress = Config.useStakerAddress()
-
   let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
 
   React.useEffect1(() => {
@@ -38,7 +36,7 @@ let make = (~tokenAddresses) => {
 
   let claimFloatCall = _ =>
     contractExecutionHandler(
-      ~makeContractInstance=Contracts.Staker.make(~address=stakerAddress),
+      ~makeContractInstance=Contracts.Staker.make(~address=Config.staker),
       ~contractFunction=Contracts.Staker.claimFloat(
         ~tokenAddresses=tokenAddresses->Array.map(Ethers.Utils.getAddressUnsafe),
       ),

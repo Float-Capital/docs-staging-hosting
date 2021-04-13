@@ -2,8 +2,8 @@
   "manifestVersion": "3.1",
   "impls": {
     "bceeed5d9f703bac0383cf9afcd57f0891b5bb1359e392c65b5a2dbb5194574f": {
-      "address": "0x299a0D36fE1033fC08Dfc69d771b1c0a5a1a4a28",
-      "txHash": "0xea4bf0f2ddcacc11d4943cb7ae9baea017c2ecd6282734bcd918e08ff11ff4b4",
+      "address": "0x021e3170d41e1Ee0F694cC66a5952668DbE8938d",
+      "txHash": "0x20e8911c31cc8cfd23a45c4700e0772c488694475ebb3c713de9097afff3ffd6",
       "layout": {
         "storage": [
           {
@@ -35,9 +35,9 @@
         }
       }
     },
-    "fb910417eb7966675804c62066d9061e2da1ffd56f06247d70f04c16a844a8b3": {
-      "address": "0xeE0e21D3DB604743Bf3C7cf6ff77DE33c9662266",
-      "txHash": "0xe7075a5b6a490b8b48f4a650f9e6ca7a88fce1ab89071e1ffcf7521abd00c695",
+    "58733c5b61e31940ec31933c43a0bf207dabececf8958f0d80c4c1906ea73090": {
+      "address": "0x27E05A3C718123CDF2D83f92de84F1890E9085A9",
+      "txHash": "0x35086cdb16b259498831d6b6edf7b02adec04535ad93301653c4e3af62fd4f4b",
       "layout": {
         "storage": [
           {
@@ -91,7 +91,7 @@
           {
             "contract": "Staker",
             "label": "floatContract",
-            "type": "t_contract(LongShort)2482",
+            "type": "t_contract(LongShort)2553",
             "src": "Staker.sol:46"
           },
           {
@@ -127,7 +127,7 @@
           {
             "contract": "Staker",
             "label": "syntheticRewardParams",
-            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(RewardState)2948_storage))",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(RewardState)3019_storage))",
             "src": "Staker.sol:58"
           },
           {
@@ -150,7 +150,7 @@
           "t_uint16": {
             "label": "uint16"
           },
-          "t_contract(LongShort)2482": {
+          "t_contract(LongShort)2553": {
             "label": "contract LongShort"
           },
           "t_contract(FloatToken)104": {
@@ -174,13 +174,13 @@
           "t_uint32": {
             "label": "uint32"
           },
-          "t_mapping(t_address,t_mapping(t_uint256,t_struct(RewardState)2948_storage))": {
+          "t_mapping(t_address,t_mapping(t_uint256,t_struct(RewardState)3019_storage))": {
             "label": "mapping(address => mapping(uint256 => struct Staker.RewardState))"
           },
-          "t_mapping(t_uint256,t_struct(RewardState)2948_storage)": {
+          "t_mapping(t_uint256,t_struct(RewardState)3019_storage)": {
             "label": "mapping(uint256 => struct Staker.RewardState)"
           },
-          "t_struct(RewardState)2948_storage": {
+          "t_struct(RewardState)3019_storage": {
             "label": "struct Staker.RewardState",
             "members": [
               {
@@ -196,9 +196,9 @@
         }
       }
     },
-    "832f97c9b8d49f65215ef4effef7b72d9b5f122d67f1ddc53f59be51d0f27ebb": {
-      "address": "0xF7d970aa0ff0b274382BB65A96Ec01bd82E09fe2",
-      "txHash": "0x44b66226dd122290eaf5f00b2a6fe03f36e4d2a214cd5465972fee206acad8d5",
+    "ccd7f5453b8bee364630c986c0aba8a84a21cfbec63bada6d924133507252040": {
+      "address": "0x26ceBB6B15237458b1c5682E3D7A459083E285C4",
+      "txHash": "0x7cb861f068605056042b8b4f59cd62b7b8929aa96387c275cb6bff0bf82c9c69",
       "layout": {
         "storage": [
           {
@@ -240,13 +240,13 @@
           {
             "contract": "LongShort",
             "label": "tokenFactory",
-            "type": "t_contract(TokenFactory)4552",
+            "type": "t_contract(TokenFactory)4654",
             "src": "LongShort.sol:37"
           },
           {
             "contract": "LongShort",
             "label": "staker",
-            "type": "t_contract(IStaker)5121",
+            "type": "t_contract(IStaker)5223",
             "src": "LongShort.sol:40"
           },
           {
@@ -300,31 +300,31 @@
           {
             "contract": "LongShort",
             "label": "fundTokens",
-            "type": "t_mapping(t_uint32,t_contract(IERC20Upgradeable)7861)",
+            "type": "t_mapping(t_uint32,t_contract(IERC20Upgradeable)7963)",
             "src": "LongShort.sol:55"
           },
           {
             "contract": "LongShort",
             "label": "yieldManagers",
-            "type": "t_mapping(t_uint32,t_contract(IYieldManager)5178)",
+            "type": "t_mapping(t_uint32,t_contract(IYieldManager)5280)",
             "src": "LongShort.sol:56"
           },
           {
             "contract": "LongShort",
             "label": "oracleManagers",
-            "type": "t_mapping(t_uint32,t_contract(IOracleManager)5074)",
+            "type": "t_mapping(t_uint32,t_contract(IOracleManager)5176)",
             "src": "LongShort.sol:57"
           },
           {
             "contract": "LongShort",
             "label": "longTokens",
-            "type": "t_mapping(t_uint32,t_contract(SyntheticToken)4293)",
+            "type": "t_mapping(t_uint32,t_contract(SyntheticToken)4395)",
             "src": "LongShort.sol:60"
           },
           {
             "contract": "LongShort",
             "label": "shortTokens",
-            "type": "t_mapping(t_uint32,t_contract(SyntheticToken)4293)",
+            "type": "t_mapping(t_uint32,t_contract(SyntheticToken)4395)",
             "src": "LongShort.sol:61"
           },
           {
@@ -365,10 +365,10 @@
           "t_bool": {
             "label": "bool"
           },
-          "t_contract(TokenFactory)4552": {
+          "t_contract(TokenFactory)4654": {
             "label": "contract TokenFactory"
           },
-          "t_contract(IStaker)5121": {
+          "t_contract(IStaker)5223": {
             "label": "contract IStaker"
           },
           "t_mapping(t_uint32,t_uint256)": {
@@ -377,28 +377,28 @@
           "t_uint256": {
             "label": "uint256"
           },
-          "t_mapping(t_uint32,t_contract(IERC20Upgradeable)7861)": {
+          "t_mapping(t_uint32,t_contract(IERC20Upgradeable)7963)": {
             "label": "mapping(uint32 => contract IERC20Upgradeable)"
           },
-          "t_contract(IERC20Upgradeable)7861": {
+          "t_contract(IERC20Upgradeable)7963": {
             "label": "contract IERC20Upgradeable"
           },
-          "t_mapping(t_uint32,t_contract(IYieldManager)5178)": {
+          "t_mapping(t_uint32,t_contract(IYieldManager)5280)": {
             "label": "mapping(uint32 => contract IYieldManager)"
           },
-          "t_contract(IYieldManager)5178": {
+          "t_contract(IYieldManager)5280": {
             "label": "contract IYieldManager"
           },
-          "t_mapping(t_uint32,t_contract(IOracleManager)5074)": {
+          "t_mapping(t_uint32,t_contract(IOracleManager)5176)": {
             "label": "mapping(uint32 => contract IOracleManager)"
           },
-          "t_contract(IOracleManager)5074": {
+          "t_contract(IOracleManager)5176": {
             "label": "contract IOracleManager"
           },
-          "t_mapping(t_uint32,t_contract(SyntheticToken)4293)": {
+          "t_mapping(t_uint32,t_contract(SyntheticToken)4395)": {
             "label": "mapping(uint32 => contract SyntheticToken)"
           },
-          "t_contract(SyntheticToken)4293": {
+          "t_contract(SyntheticToken)4395": {
             "label": "contract SyntheticToken"
           }
         }
@@ -406,7 +406,7 @@
     }
   },
   "admin": {
-    "address": "0x4545fA1aDcdFbFDd5Db8015158ec4020990a6f70",
-    "txHash": "0x6cb653e90bbcdf031971302e228583a45cc4def8012f4329cbf5f1b050f87503"
+    "address": "0x3DbFce59Cf6D19668a9F997341fA7096F6434e95",
+    "txHash": "0x32e80672b2a1992d294ab31f0ba0673674d9c55e43f453ad9025b8bac81bc3b3"
   }
 }

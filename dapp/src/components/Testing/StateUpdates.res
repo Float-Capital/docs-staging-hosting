@@ -13,11 +13,10 @@ module TestTxButton = {
     let (contractExecutionHandler, _txState, _setTxState) = ContractActions.useContractFunction(
       ~signer,
     )
-    let longShortAddress = Config.useLongShortAddress()
     <button
       onClick={_ => {
         contractExecutionHandler(
-          ~makeContractInstance=Contracts.LongShort.make(~address=longShortAddress),
+          ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
           ~contractFunction=Contracts.LongShort.mintShortAndStake(
             ~marketIndex=3->Ethers.BigNumber.fromInt,
             ~amount=Ethers.Utils.parseEther(~amount="1")->Obj.magic,

@@ -74,8 +74,6 @@ module ConnectedStakeForm = {
       setTxStateApprove,
     ) = ContractActions.useContractFunction(~signer)
 
-    let stakerContractAddress = Config.useStakerAddress()
-
     let user = RootProvider.useCurrentUserExn()
     let optTokenBalance =
       DataHooks.useSyntheticTokenBalance(
@@ -157,12 +155,12 @@ module ConnectedStakeForm = {
           ),
           ~contractFunction=Contracts.Erc20.approve(
             ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
-            ~spender=stakerContractAddress,
+            ~spender=Config.staker,
           ),
         )
       let stakeAndEarnImmediatlyFunction = () =>
         contractExecutionHandler(
-          ~makeContractInstance=Contracts.Staker.make(~address=stakerContractAddress),
+          ~makeContractInstance=Contracts.Staker.make(~address=Config.staker),
           ~contractFunction=Contracts.Staker.stakeAndEarnImmediately(
             ~tokenAddress=tokenId->Ethers.Utils.getAddressUnsafe,
             ~amount,

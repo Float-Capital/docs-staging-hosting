@@ -9,9 +9,7 @@ import * as Contracts from "../../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as TxTemplate from "../../Ethereum/TxTemplate.js";
-import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
-import * as RootProvider from "../../../libraries/RootProvider.js";
 import * as ContractActions from "../../../ethereum/ContractActions.js";
 import * as Formality__ReactUpdate from "re-formality/src/Formality__ReactUpdate.js";
 
@@ -19,13 +17,10 @@ var validators_tokenAddress = {
   strategy: /* OnFirstBlur */0,
   validate: (function (param) {
       var tokenAddress = param.tokenAddress;
-      var netIdStr = Belt_Option.mapWithDefault(RootProvider.useChainId(undefined), "5", (function (prim) {
-              return String(prim);
-            }));
       if (tokenAddress === "DAI") {
         return {
                 TAG: 0,
-                _0: Config.daiContractAddress(netIdStr),
+                _0: Config.dai,
                 [Symbol.for("name")]: "Ok"
               };
       } else {
@@ -518,14 +513,13 @@ function ApproveDai(Props) {
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
-  var longShortAddress = Config.useLongShortAddress(undefined);
   var form = useForm(initialInput, (function (param, _form) {
           var tokenAddress = param.tokenAddress;
           var amount = param.amount;
           return Curry._2(contractExecutionHandler, (function (param) {
                         return Contracts.Erc20.make(tokenAddress, param);
                       }), (function (param) {
-                        return param.approve(longShortAddress, amount);
+                        return param.approve(Config.longShort, amount);
                       }));
         }));
   var match$1 = form.amountResult;

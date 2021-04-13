@@ -12,19 +12,19 @@ let make = (~txStateApprove, ~txStateStake, ~resetFormButton, ~tokenToStake) => 
       <div className="text-center m-3">
         <MiniLoader />
         <p> {"Approval transaction pending... "->React.string} </p>
-        <a target="_" rel="noopenner noreferer" href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
-          <p> {`View on ${Config.defaultBlockExplorerName}`->React.string} </p>
+        <a target="_" rel="noopenner noreferer" href={`${Config.blockExplorer}tx/${txHash}`}>
+          <p> {`View on ${Config.blockExplorerName}`->React.string} </p>
         </a>
       </div>
     </Modal>
-  | (ContractActions.Complete({transactionHash}), ContractActions.Created)
-  | (ContractActions.Complete({transactionHash}), ContractActions.UnInitialised) =>
+  | (ContractActions.Complete({transactionHash: _}), ContractActions.Created)
+  | (ContractActions.Complete({transactionHash: _}), ContractActions.UnInitialised) =>
     <Modal id={"stake-approve-3"}>
       <div className="text-center m-3">
         <p> {`Confirm transaction to stake ${tokenToStake}`->React.string} </p>
       </div>
     </Modal>
-  | (ContractActions.Declined(message), _) => <> {resetFormButton()} </>
+  | (ContractActions.Declined(_message), _) => <> {resetFormButton()} </>
   | (ContractActions.Failed, _) =>
     <Modal id={"stake-approve-4"}>
       <div className="text-center m-3">
@@ -50,15 +50,12 @@ let make = (~txStateApprove, ~txStateStake, ~resetFormButton, ~tokenToStake) => 
           <a
             target="_"
             rel="noopenner noreferer"
-            href={`${Config.defaultBlockExplorer}tx/${transactionHash}`}>
+            href={`${Config.blockExplorer}tx/${transactionHash}`}>
             {`Approval confirmed`->React.string}
           </a>
         </p>
         <h1>
-          <a
-            target="_"
-            rel="noopenner noreferer"
-            href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
+          <a target="_" rel="noopenner noreferer" href={`${Config.blockExplorer}tx/${txHash}`}>
             {`Pending staking ${tokenToStake}`->React.string}
           </a>
         </h1>
@@ -73,18 +70,18 @@ let make = (~txStateApprove, ~txStateStake, ~resetFormButton, ~tokenToStake) => 
           className="hover:underline"
           target="_"
           rel="noopenner noreferer"
-          href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
-          <p> {`View on ${Config.defaultBlockExplorerName}`->React.string} </p>
+          href={`${Config.blockExplorer}tx/${txHash}`}>
+          <p> {`View on ${Config.blockExplorerName}`->React.string} </p>
         </a>
       </div>
     </Modal>
-  | (_, ContractActions.Complete({transactionHash})) =>
+  | (_, ContractActions.Complete({transactionHash: _})) =>
     <Modal id={"stake-4"}>
       <div className="text-center m-3">
         <p> {`Transaction complete`->React.string} </p> {resetFormButton()}
       </div>
     </Modal>
-  | (_, ContractActions.Declined(message)) =>
+  | (_, ContractActions.Declined(_message)) =>
     <Modal id={"stake-5"}>
       <div className="text-center m-3">
         <p> {`The transaction was rejected by your wallet`->React.string} </p>

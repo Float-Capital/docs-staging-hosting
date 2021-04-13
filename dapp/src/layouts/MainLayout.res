@@ -7,12 +7,12 @@ let make = (~children) => {
         <Navigation />
         <div className="m-auto w-full">
           {switch chainId {
-          | Some(chainId) if chainId == Config.defaultNetworkId => children
+          | Some(chainId) if chainId == Config.networkId => children
           | None => children
           | Some(_) => <>
               <h2> {"You are currently connected to the wrong network."->React.string} </h2>
               <h4 className="text-lg">
-                {`Please connect to ${Config.defaultNetworkName}.`->React.string}
+                {`Please connect to ${Config.networkName}.`->React.string}
               </h4>
             </>
           }}

@@ -4,11 +4,9 @@ let make = () => {
 
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
 
-  let tokenAddress = Config.useLongShortAddress()
-
   let onClick = _ =>
     contractExecutionHandler(
-      ~makeContractInstance=Contracts.LongShort.make(~address=tokenAddress),
+      ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
       ~contractFunction=Contracts.LongShort._updateSystemState,
     )
 

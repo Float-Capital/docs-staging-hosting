@@ -45,10 +45,10 @@ function StakeTxStatusModal(Props) {
                       children: React.createElement("div", {
                             className: "text-center m-3"
                           }, React.createElement(MiniLoader.make, {}), React.createElement("p", undefined, "Approval transaction pending... "), React.createElement("a", {
-                                href: Config.defaultBlockExplorer + "tx/" + txStateApprove._0,
+                                href: Config.blockExplorer + "tx/" + txStateApprove._0,
                                 rel: "noopenner noreferer",
                                 target: "_"
-                              }, React.createElement("p", undefined, "View on " + Config.defaultBlockExplorerName)))
+                              }, React.createElement("p", undefined, "View on " + Config.blockExplorerName)))
                     });
       case /* Declined */1 :
           return React.createElement(React.Fragment, undefined, Curry._1(resetFormButton, undefined));
@@ -69,11 +69,11 @@ function StakeTxStatusModal(Props) {
                           children: React.createElement("div", {
                                 className: "text-center m-3"
                               }, React.createElement("p", undefined, React.createElement("a", {
-                                        href: Config.defaultBlockExplorer + "tx/" + txStateApprove._0.transactionHash,
+                                        href: Config.blockExplorer + "tx/" + txStateApprove._0.transactionHash,
                                         rel: "noopenner noreferer",
                                         target: "_"
                                       }, "Approval confirmed")), React.createElement("h1", undefined, React.createElement("a", {
-                                        href: Config.defaultBlockExplorer + "tx/" + txStateStake._0,
+                                        href: Config.blockExplorer + "tx/" + txStateStake._0,
                                         rel: "noopenner noreferer",
                                         target: "_"
                                       }, "Pending staking " + tokenToStake)))
@@ -120,10 +120,10 @@ function StakeTxStatusModal(Props) {
                                   className: "text-center m-3"
                                 }, React.createElement(MiniLoader.make, {}), React.createElement("p", undefined, "Staking transaction pending... "), React.createElement("a", {
                                       className: "hover:underline",
-                                      href: Config.defaultBlockExplorer + "tx/" + txStateStake._0,
+                                      href: Config.blockExplorer + "tx/" + txStateStake._0,
                                       rel: "noopenner noreferer",
                                       target: "_"
-                                    }, React.createElement("p", undefined, "View on " + Config.defaultBlockExplorerName)))
+                                    }, React.createElement("p", undefined, "View on " + Config.blockExplorerName)))
                           });
             case /* Declined */1 :
                 return React.createElement(Modal.make, {

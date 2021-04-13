@@ -92,6 +92,7 @@ contract LongShort is ILongShort, Initializable {
         uint32 marketIndex,
         address longTokenAddress,
         address shortTokenAddress,
+        address fundToken,
         uint256 assetPrice,
         string name,
         string symbol,
@@ -283,6 +284,7 @@ contract LongShort is ILongShort, Initializable {
             latestMarket,
             address(longTokens[latestMarket]),
             address(shortTokens[latestMarket]),
+            _fundToken,
             assetPrice[latestMarket],
             syntheticName,
             syntheticSymbol,
@@ -925,9 +927,8 @@ contract LongShort is ILongShort, Initializable {
     /////////// REDEEM TOKENS //////////
     ////////////////////////////////////
 
-    function redeemLong(uint32 marketIndex, uint256 tokensToRedeem)
-        external
-        override
+    function _redeemLong(uint32 marketIndex, uint256 tokensToRedeem)
+        internal
         refreshSystemState(marketIndex)
     {
         // Burn tokens - will revert unless user gives permission.
@@ -963,9 +964,8 @@ contract LongShort is ILongShort, Initializable {
         );
     }
 
-    function redeemShort(uint32 marketIndex, uint256 tokensToRedeem)
-        external
-        override
+    function _redeemShort(uint32 marketIndex, uint256 tokensToRedeem)
+        internal
         refreshSystemState(marketIndex)
     {
         // Burn tokens - will revert unless user gives permission to contract.
@@ -999,6 +999,30 @@ contract LongShort is ILongShort, Initializable {
             longValue[marketIndex],
             shortValue[marketIndex]
         );
+    }
+
+    function redeemLong(uint32 marketIndex, uint256 tokensToRedeem)
+        external
+        override
+    {
+        _redeemLong(marketIndex, tokensToRedeem);
+    }
+
+    function redeemLongAll(uint32 marketIndex) external {
+        uint256 tokensToRedeem = longTokens[marketIndex].balanceOf(msg.sender);
+        _redeemLong(marketIndex, tokensToRedeem);
+    }
+
+    function redeemShort(uint32 marketIndex, uint256 tokensToRedeem)
+        external
+        override
+    {
+        _redeemShort(marketIndex, tokensToRedeem);
+    }
+
+    function redeemShortAll(uint32 marketIndex) external {
+        uint256 tokensToRedeem = shortTokens[marketIndex].balanceOf(msg.sender);
+        _redeemShort(marketIndex, tokensToRedeem);
     }
 
     ////////////////////////////////////

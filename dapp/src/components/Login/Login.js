@@ -30,7 +30,7 @@ function Login(Props) {
                   className: "mx-2 md:mx-0"
                 }, "Connect with one of the wallets below. "), React.createElement("p", {
                   className: "text-xs"
-                }, "Please make sure to connect to " + Config.defaultNetworkName + "."), React.createElement("div", {
+                }, "Please make sure to connect to " + Config.networkName + "."), React.createElement("div", {
                   className: "grid grid-cols-1 md:grid-cols-3 gap-4 items-center my-5"
                 }, Belt_Array.mapWithIndex(connectors, (function (index, connector) {
                         return React.createElement("div", {
