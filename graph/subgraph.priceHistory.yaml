@@ -1,6 +1,6 @@
 specVersion: 0.0.2
 schema:
-  file: ./schema.graphql
+  file: ./schema.priceHistory.graphql
 dataSources:
   - kind: ethereum/contract
     name: LongShort
@@ -18,7 +18,28 @@ dataSources:
       abis:
         - name: LongShort
           file: ./abis/LongShort.json
+        - name: OracleManager
+          file: ./abis/OracleManager.json
       eventHandlers:
         - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
           handler: handleSyntheticTokenCreated
+      blockHandlers:
+        - handler: handleBlock
+      file: ./src/priceHistory.ts
+
+templates:
+  - kind: ethereum/contract
+    name: OracleManager
+    network: ganache
+    source:
+      abi: OracleManager
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      abis:
+        - name: OracleManager
+          file: ./abis/OracleManager.json
+      language: wasm/assemblyscript
+      entities: []
+      eventHandlers: []
       file: ./src/priceHistory.ts

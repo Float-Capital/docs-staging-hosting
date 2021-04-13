@@ -10,7 +10,14 @@ type FiveMinPrice @entity {
 type Oracle @entity {
   id: ID!
   marketIndex: BigInt!
+  marketName: String!
+  marketSymbol: String!
   latestPrice: BigInt!
   fiveMinPrices: [FiveMinPrice!]!
   latestFiveMinPrice: FiveMinPrice!
+}
+
+type Global @entity {
+  id: ID!
+  oracles: [Oracle!]!
 }
