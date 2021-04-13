@@ -47,6 +47,15 @@ module MarketInteractionCard = {
     | Unstake => "Unstake"
     }
 
+  let strToTab = tab =>
+    switch tab->Js.String.toLowerCase {
+    | "mint" => Mint
+    | "redeem" => Redeem
+    | "stake" => Stake
+    | "unstake" => Unstake
+    | _ => Mint
+    }
+
   type marketInfo = {
     longId: string,
     shortId: string,
@@ -202,7 +211,7 @@ module MarketInteractionCard = {
       let router = Next.Router.useRouter()
       marketInfo->Option.mapWithDefault(React.null, marketInfo => {
         let onChangeSide = event => {
-          router.query->Js.Dict.set("mintOption", (event->ReactEvent.Form.target)["value"])
+          router.query->Js.Dict.set("actionOption", (event->ReactEvent.Form.target)["value"])
           router.query->Js.Dict.set(
             "token",
             isLong
@@ -282,7 +291,7 @@ module MarketInteractionCard = {
             | GraphError(s) => <div> {s->React.string} </div>
             }}
           </>,
-          ~default=<div className="pl-6">
+          ~default=<div className="p-6">
             {"No stakes in this market to unstake"->React.string}
           </div>,
         )}
@@ -294,10 +303,12 @@ module MarketInteractionCard = {
   let make = () => {
     let router = Next.Router.useRouter()
     let user = RootProvider.useCurrentUser()
-    let (selected, setSelected) = React.useState(_ => Mint)
-    let mintOption = router.query->Js.Dict.get("mintOption")->Option.getWithDefault("short")
-    let longSelected = mintOption == "long"
+    let selectedTab = router.query->Js.Dict.get("tab")->Option.getWithDefault("Mint")
+    let (selected, setSelected) = React.useState(_ => selectedTab->strToTab)
+    let actionOption = router.query->Js.Dict.get("actionOption")->Option.getWithDefault("short")
+    let longSelected = actionOption == "long"
     let marketInfo = useMarketInfo()
+
     <div className="flex-1 p-1 mb-2 ">
       <ul className="list-reset flex items-end">
         {allTabs
@@ -306,16 +317,20 @@ module MarketInteractionCard = {
             text={tab->tabToStr}
             key={tab->tabToStr}
             selected={tab == selected}
-            onClick={_ => setSelected(_ => tab)}
+            onClick={_ => {
+              setSelected(_ => tab)
+              router.query->Js.Dict.set("tab", tab->tabToStr->Js.String.toLowerCase)
+              router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
+            }}
           />
         })
         ->React.array}
       </ul>
       <div
         className="rounded-b-lg min-h-market-interaction-card rounded-r-lg flex flex-col bg-white bg-opacity-70 shadow-lg">
-        {selected != Mint ? header(~marketInfo) : React.null}
+        {header(~marketInfo)}
         {switch selected {
-        | Mint => <Mint.Mint />
+        | Mint => wrapper(~children=<Mint.Mint />)
         | Redeem => wrapper(~children=<Redeem />)
         | Stake => <StakeInteractionWrapper isLong=longSelected marketInfo user />
         | Unstake => <UnstakeInteractionWrapper isLong=longSelected marketInfo user />
@@ -328,7 +343,7 @@ module MarketInteractionCard = {
 let make = (~marketData: Queries.MarketDetails.t_syntheticMarkets) => {
   <div>
     <Next.Link href="/markets">
-      <div className="uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mt-2">
+      <div className="uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer my-2">
         {`◀`->React.string} <span className="text-xs"> {" Back to markets"->React.string} </span>
       </div>
     </Next.Link>

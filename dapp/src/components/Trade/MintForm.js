@@ -8,7 +8,6 @@ import * as Button from "../UI/Button.js";
 import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Ethers$1 from "ethers";
-import * as ViewBox from "../UI/ViewBox.js";
 import * as Contracts from "../../ethereum/Contracts.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as MiniLoader from "../UI/MiniLoader.js";
@@ -676,7 +675,6 @@ var SubmitButtonAndTxTracker = {
 
 function MintForm$MintFormInput(Props) {
   var onSubmitOpt = Props.onSubmit;
-  var market = Props.market;
   var onChangeSideOpt = Props.onChangeSide;
   var isLong = Props.isLong;
   var onBlurSideOpt = Props.onBlurSide;
@@ -723,9 +721,7 @@ function MintForm$MintFormInput(Props) {
   var submitButton = submitButtonOpt !== undefined ? Caml_option.valFromOption(submitButtonOpt) : React.createElement(Button.make, {
           children: "Login & Mint"
         });
-  var formInput = React.createElement(React.Fragment, undefined, React.createElement("div", {
-            className: "flex justify-between mb-2"
-          }, React.createElement("h2", undefined, market.name + " (" + market.symbol + ")")), React.createElement("select", {
+  var formInput = React.createElement(React.Fragment, undefined, React.createElement("select", {
             className: "trade-select",
             disabled: disabled,
             name: "longshort",
@@ -771,16 +767,14 @@ function MintForm$MintFormInput(Props) {
                     target: "_blank"
                   }, "Learn more about staking"))));
   return React.createElement("div", {
-              className: "screen-centered-container h-full"
-            }, React.createElement(ViewBox.make, {
-                  children: React.createElement(Form.make, {
-                        className: "h-full",
-                        onSubmit: onSubmit,
-                        children: null
-                      }, React.createElement("div", {
-                            className: "relative"
-                          }, formInput), submitButton)
-                }));
+              className: "screen-centered-container h-full "
+            }, React.createElement(Form.make, {
+                  className: "h-full",
+                  onSubmit: onSubmit,
+                  children: null
+                }, React.createElement("div", {
+                      className: "relative"
+                    }, formInput), submitButton));
 }
 
 var MintFormInput = {
@@ -1035,7 +1029,7 @@ function MintForm$MintFormSignedIn(Props) {
               onSubmit: form.submit,
               market: market,
               onChangeSide: (function ($$event) {
-                  router.query["mintOption"] = $$event.target.value;
+                  router.query["actionOption"] = $$event.target.value;
                   router.query["token"] = isLong ? Ethers.Utils.ethAdrToLowerStr(market.syntheticLong.tokenAddress) : Ethers.Utils.ethAdrToLowerStr(market.syntheticShort.tokenAddress);
                   return Next.Router.pushObjShallow(router, {
                               pathname: router.pathname,

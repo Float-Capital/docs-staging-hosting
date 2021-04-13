@@ -533,8 +533,6 @@ function RedeemForm$ConnectedRedeemForm(Props) {
   var match = tokenRedeemPosition(market, isLong, longTokenBalance, shortTokenBalance);
   var syntheticTokenAddress = match[1];
   var isActuallyLong = match[0];
-  console.log("isActuallyLong");
-  console.log(isActuallyLong);
   var match$1 = ContractActions.useContractFunction(signer);
   var txState = match$1[1];
   var contractExecutionHandler = match$1[0];
@@ -722,7 +720,7 @@ function RedeemForm$ConnectedRedeemForm(Props) {
                                 }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
                   }),
                 onChangeSide: (function ($$event) {
-                    router.query["mintOption"] = $$event.target.value;
+                    router.query["actionOption"] = $$event.target.value;
                     router.query["token"] = isActuallyLong ? Ethers.Utils.ethAdrToLowerStr(market.syntheticLong.tokenAddress) : Ethers.Utils.ethAdrToLowerStr(market.syntheticShort.tokenAddress);
                     return Next.Router.pushObjShallow(router, {
                                 pathname: router.pathname,

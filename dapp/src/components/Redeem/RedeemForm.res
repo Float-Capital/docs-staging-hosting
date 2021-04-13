@@ -114,9 +114,6 @@ module ConnectedRedeemForm = {
       ~shortTokenBalance,
     )
 
-    Js.log("isActuallyLong")
-    Js.log(isActuallyLong)
-
     let (contractExecutionHandler, txState, _setTxState) = ContractActions.useContractFunction(
       ~signer,
     )
@@ -266,7 +263,7 @@ module ConnectedRedeemForm = {
               },
             )}
           onChangeSide={event => {
-            router.query->Js.Dict.set("mintOption", (event->ReactEvent.Form.target)["value"])
+            router.query->Js.Dict.set("actionOption", (event->ReactEvent.Form.target)["value"])
             router.query->Js.Dict.set(
               "token",
               isActuallyLong

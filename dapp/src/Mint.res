@@ -4,7 +4,7 @@ module Mint = {
     let router = Next.Router.useRouter()
     let markets = Queries.MarketDetails.use()
     let marketIndex = router.query->Js.Dict.get("marketIndex")->Option.getWithDefault("1")
-    let mintOption = router.query->Js.Dict.get("mintOption")->Option.getWithDefault("short")
+    let actionOption = router.query->Js.Dict.get("actionOption")->Option.getWithDefault("short")
 
     <section className="h-full">
       {switch markets {
@@ -15,7 +15,7 @@ module Mint = {
           syntheticMarkets[marketIndex->Belt.Int.fromString->Option.getWithDefault(1) - 1]
         switch optFirstMarket {
         | Some(firstMarket) =>
-          <MintForm market={firstMarket} isLong={mintOption == "short" ? false : true} />
+          <MintForm market={firstMarket} isLong={actionOption == "short" ? false : true} />
         | None => <p> {"No markets exist"->React.string} </p>
         }
       | {data: None, error: None, loading: false} =>
