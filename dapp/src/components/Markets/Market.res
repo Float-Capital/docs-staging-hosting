@@ -2,7 +2,7 @@
 let make = (~marketData: Queries.MarketDetails.t_syntheticMarkets) => {
   <div>
     <Next.Link href="/markets">
-      <div className="uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mt-2">
+      <div className="uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer my-2">
         {`◀`->React.string} <span className="text-xs"> {" Back to markets"->React.string} </span>
       </div>
     </Next.Link>

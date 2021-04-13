@@ -11,7 +11,7 @@ function Market(Props) {
   return React.createElement("div", undefined, React.createElement(Link, {
                   href: "/markets",
                   children: React.createElement("div", {
-                        className: "uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mt-2"
+                        className: "uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer my-2"
                       }, "◀", React.createElement("span", {
                             className: "text-xs"
                           }, " Back to markets"))

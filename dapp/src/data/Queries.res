@@ -267,6 +267,17 @@ query ($userId: String!, $synthTokens: [String!]!) {
 }
 `)
 
+module TokenMarketId = %graphql(`
+query ($tokenId: String!) {
+  syntheticToken(id: $tokenId){
+    id
+    syntheticMarket{
+      id
+    }
+  }
+}
+`)
+
 module GlobalState = %graphql(`
 query {
   globalStates(first: 1){

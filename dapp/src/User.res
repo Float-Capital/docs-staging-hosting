@@ -36,7 +36,7 @@ module UserBalancesCard = {
               isLong
               tokens={FormatMoney.formatEther(tokenBalance)}
               value={FormatMoney.formatEther(tokensValue)}>
-              <UserMarketStakeOrRedeem synthAddress={addr} />
+              <UserMarketStakeOrRedeem synthAddress={addr->Ethers.Utils.ethAdrToLowerStr} isLong />
             </UserMarketBox>
           )
           ->React.array}
@@ -137,7 +137,9 @@ module User = {
                     </p>
                   </UserColumnTextCenter>
                   <div className="w-40 mx-auto">
-                    <Next.Link href="/markets"> <Button.Small> {`MINT`} </Button.Small> </Next.Link>
+                    <Next.Link href="/markets">
+                      <Button.Small> {`MARKETS`} </Button.Small>
+                    </Next.Link>
                   </div>
                 </>
               : notCurrentUserMessage()

@@ -164,9 +164,6 @@ module MintFormInput = {
   ) => {
     let formInput =
       <>
-        <div className="flex justify-between mb-2">
-          <h2> {`${market.name} (${market.symbol})`->React.string} </h2>
-        </div>
         <select
           name="longshort"
           className="trade-select"
@@ -216,12 +213,10 @@ module MintFormInput = {
         </div>
       </>
 
-    <div className="screen-centered-container h-full">
-      <ViewBox>
-        <Form className="h-full" onSubmit>
-          <div className="relative"> {formInput} </div> {submitButton}
-        </Form>
-      </ViewBox>
+    <div className="screen-centered-container h-full ">
+      <Form className="h-full" onSubmit>
+        <div className="relative"> {formInput} </div> {submitButton}
+      </Form>
     </div>
   }
 }
@@ -404,7 +399,7 @@ module MintFormSignedIn = {
       onSubmit={form.submit}
       market
       onChangeSide={event => {
-        router.query->Js.Dict.set("mintOption", (event->ReactEvent.Form.target)["value"])
+        router.query->Js.Dict.set("actionOption", (event->ReactEvent.Form.target)["value"])
         router.query->Js.Dict.set(
           "token",
           isLong
