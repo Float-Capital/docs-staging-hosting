@@ -96,7 +96,7 @@ Simply put, it's a feed that communicates information from the real world to the
 
 ### What is a governance token?
 
-A governance token can be thought of a bit like equity in a company. Governance tokens give holders voting rights over proposed revisions to the protocol, allowing them to have their voices heard on how a protocol operates. Some governance tokens (Float tokens included) give holders added benefits. Similar to stock buybacks, fees earned by the LongShort protocol that isn't paid out to holders in return for helping to balance the liquidity pools, will be used to buy back Float Tokens in the open market, thus decreasing the supply in circulation, and increasing their value.
+A governance token can be thought of a bit like equity in a company. Governance tokens give holders voting rights over proposed revisions to the protocol, allowing them to have their voices heard on how a protocol operates. Some governance tokens (Float tokens included) give holders added benefits. Similar to stock buybacks, fees earned by the LongShort protocol that aren't paid out to holders in return for helping to balance the liquidity pools, will be used to buy back Float Tokens in the open market, thus decreasing the supply in circulation, and increasing their value.
 
 ---
 
