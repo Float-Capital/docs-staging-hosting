@@ -48,6 +48,7 @@ export function createFiveMinPrice(
   );
 
   fiveMinPrice.intervalIndex = intervalIndex;
+  fiveMinPrice.startTimestamp = intervalIndex.times(FIVE_MINUTES_IN_SECONDS);
   fiveMinPrice.startPrice = currentOraclePrice;
   fiveMinPrice.endPrice = currentOraclePrice;
   fiveMinPrice.averagePrice = currentOraclePrice;
