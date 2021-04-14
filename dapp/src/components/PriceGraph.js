@@ -4,17 +4,123 @@ import * as View from "../libraries/View.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
 import * as Button from "./UI/Button.js";
+import * as Client from "../data/Client.js";
+import * as Ethers from "../ethereum/Ethers.js";
 import * as Js_math from "bs-platform/lib/es6/js_math.js";
 import * as Recharts from "recharts";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
+import * as MiniLoader from "./UI/MiniLoader.js";
+import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
+import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as GqlConverters from "../libraries/GqlConverters.js";
+import Format from "date-fns/format";
 import * as BsRecharts__XAxis from "@ahrefs/bs-recharts/src/BsRecharts__XAxis.js";
 import * as BsRecharts__YAxis from "@ahrefs/bs-recharts/src/BsRecharts__YAxis.js";
 import * as BsRecharts__Tooltip from "@ahrefs/bs-recharts/src/BsRecharts__Tooltip.js";
 import * as BsRecharts__ResponsiveContainer from "@ahrefs/bs-recharts/src/BsRecharts__ResponsiveContainer.js";
+import * as ApolloClient__React_Hooks_UseQuery from "rescript-apollo-client/src/@apollo/client/react/hooks/ApolloClient__React_Hooks_UseQuery.js";
 
-function PriceGraph(Props) {
+var Raw = {};
+
+var query = (require("@apollo/client").gql`
+  query   {
+    fiveMinPrices(first: 25, orderBy: intervalIndex, orderDirection: desc, where: {oracle: "0x49b6eb4bb38178790b51a5630f08923580e10e8d"})  {
+      __typename
+      startTimestamp
+      endPrice
+    }
+  }
+`);
+
+function parse(value) {
+  var value$1 = value.fiveMinPrices;
+  return {
+          fiveMinPrices: value$1.map(function (value) {
+                return {
+                        __typename: value.__typename,
+                        startTimestamp: GqlConverters.$$Date.parse(value.startTimestamp),
+                        endPrice: GqlConverters.$$BigInt.parse(value.endPrice)
+                      };
+              })
+        };
+}
+
+function serialize(value) {
+  var value$1 = value.fiveMinPrices;
+  var fiveMinPrices = value$1.map(function (value) {
+        var value$1 = value.endPrice;
+        var value$2 = GqlConverters.$$BigInt.serialize(value$1);
+        var value$3 = value.startTimestamp;
+        var value$4 = GqlConverters.$$Date.serialize(value$3);
+        var value$5 = value.__typename;
+        return {
+                __typename: value$5,
+                startTimestamp: value$4,
+                endPrice: value$2
+              };
+      });
+  return {
+          fiveMinPrices: fiveMinPrices
+        };
+}
+
+function serializeVariables(param) {
+  
+}
+
+function makeVariables(param) {
+  
+}
+
+function makeDefaultVariables(param) {
+  
+}
+
+var PriceHistory_inner = {
+  Raw: Raw,
+  query: query,
+  parse: parse,
+  serialize: serialize,
+  serializeVariables: serializeVariables,
+  makeVariables: makeVariables,
+  makeDefaultVariables: makeDefaultVariables
+};
+
+var include = ApolloClient__React_Hooks_UseQuery.Extend({
+      query: query,
+      Raw: Raw,
+      parse: parse,
+      serialize: serialize,
+      serializeVariables: serializeVariables
+    });
+
+var use = include.use;
+
+var PriceHistory_refetchQueryDescription = include.refetchQueryDescription;
+
+var PriceHistory_useLazy = include.useLazy;
+
+var PriceHistory_useLazyWithVariables = include.useLazyWithVariables;
+
+var PriceHistory = {
+  PriceHistory_inner: PriceHistory_inner,
+  Raw: Raw,
+  query: query,
+  parse: parse,
+  serialize: serialize,
+  serializeVariables: serializeVariables,
+  makeVariables: makeVariables,
+  makeDefaultVariables: makeDefaultVariables,
+  refetchQueryDescription: PriceHistory_refetchQueryDescription,
+  use: use,
+  useLazy: PriceHistory_useLazy,
+  useLazyWithVariables: PriceHistory_useLazyWithVariables
+};
+
+function PriceGraph$LoadedGraph(Props) {
   var marketName = Props.marketName;
-  var data = [];
+  var data = Props.data;
   var dummyData = [
     {
       date: "1 Feb",
@@ -92,8 +198,8 @@ function PriceGraph(Props) {
           }
         }), d$1 !== undefined ? d$1.price : 0);
   var yAxisRange = [
-    minYRange - minYRange * 0.05 | 0,
-    maxYRange + maxYRange * 0.05 | 0
+    minYRange - minYRange * 0.05,
+    maxYRange + maxYRange * 0.05
   ];
   var isMobile = View.useIsTailwindMobile(undefined);
   return React.createElement(React.Fragment, undefined, React.createElement("div", {
@@ -245,10 +351,55 @@ function PriceGraph(Props) {
                             })))));
 }
 
+var LoadedGraph = {
+  make: PriceGraph$LoadedGraph
+};
+
+function PriceGraph(Props) {
+  var marketName = Props.marketName;
+  var priceHistory = Curry.app(use, [
+        undefined,
+        Caml_option.some(Client.createContext(/* PriceHistory */1)),
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ]);
+  var loading = React.createElement("div", undefined, React.createElement("p", undefined, "Loading data for " + marketName), React.createElement(MiniLoader.make, {}));
+  var match = priceHistory.data;
+  if (priceHistory.error !== undefined) {
+    return "Error loading data";
+  }
+  if (match === undefined) {
+    return loading;
+  }
+  var priceData = Belt_Array.map(match.fiveMinPrices, (function (param) {
+          return {
+                  date: Format(param.startTimestamp, "do MMM yyyy"),
+                  price: Belt_Option.getExn(Belt_Float.fromString(Ethers.Utils.formatEther(param.endPrice)))
+                };
+        }));
+  console.log(priceData);
+  return React.createElement(PriceGraph$LoadedGraph, {
+              marketName: marketName,
+              data: priceData
+            });
+}
+
 var make = PriceGraph;
 
 export {
+  PriceHistory ,
+  LoadedGraph ,
   make ,
   
 }
-/* View Not a pure module */
+/* query Not a pure module */

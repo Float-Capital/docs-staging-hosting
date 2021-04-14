@@ -1,15 +1,16 @@
 open Globals
 
+let jsonToBigInt = json =>
+  switch json->Js.Json.decodeString {
+  | Some(str) => Ethers.BigNumber.fromUnsafe(str)
+  | None =>
+    // In theory graphql should never allow this to not be a correct string
+    Js.log("CRITICAL - should never happen!")
+    Ethers.BigNumber.fromUnsafe("0")
+  }
 module BigInt = {
   type t = Ethers.BigNumber.t
-  let parse = json =>
-    switch json->Js.Json.decodeString {
-    | Some(str) => Ethers.BigNumber.fromUnsafe(str)
-    | None =>
-      // In theory graphql should never allow this to not be a correct string
-      Js.log("CRITICAL - should never happen!")
-      Ethers.BigNumber.fromUnsafe("0")
-    }
+  let parse = jsonToBigInt
   let serialize = bn => bn->Ethers.BigNumber.toString->Js.Json.string
 }
 
@@ -37,4 +38,10 @@ module Address = {
       CONSTANTS.zeroAddress
     }
   let serialize = bytesString => bytesString->ethAdrToLowerStr->Js.Json.string
+}
+
+module Date = {
+  type t = Js.Date.t
+  let parse = json => json->jsonToBigInt->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime
+  let serialize = _jsDate => "not implemented"->Js.Json.string
 }
