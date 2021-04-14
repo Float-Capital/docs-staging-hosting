@@ -42,7 +42,7 @@ export function createFiveMinPrice(
   oracleAddressStr: string,
   currentOraclePrice: BigInt
 ): FiveMinPrice {
-  let intervalIndex = timestamp.mod(FIVE_MINUTES_IN_SECONDS);
+  let intervalIndex = timestamp.div(FIVE_MINUTES_IN_SECONDS);
   let fiveMinPrice = new FiveMinPrice(
     oracleAddressStr + "-" + intervalIndex.toString()
   );
@@ -113,8 +113,10 @@ export function handleBlock(block: ethereum.Block): void {
   let timestamp = block.timestamp;
 
   let allOracles = state.oracles;
+  log.warning("Block", []);
   for (let i = 0; i < allOracles.length; ++i) {
     let curentOracleId = allOracles[i];
+    log.warning("Oracle {}", [curentOracleId]);
     let oracle = Oracle.load(curentOracleId);
     if (oracle == null) {
       log.critical("Oracle with address {} is undefined", [curentOracleId]);
@@ -130,8 +132,14 @@ export function handleBlock(block: ethereum.Block): void {
     oracle.latestPrice = currentOraclePrice;
 
     // FIVE_MINUTES_IN_SECONDS;
-    let currentPriceIndex = timestamp.mod(FIVE_MINUTES_IN_SECONDS);
+    let currentPriceIndex = timestamp.div(FIVE_MINUTES_IN_SECONDS);
+    log.warning("currentPriceIndex {} == {}", [
+      currentPriceIndex.toString(),
+      latestFiveMinPrice.intervalIndex.toString(),
+    ]);
     if (currentPriceIndex.equals(latestFiveMinPrice.intervalIndex)) {
+      log.warning("Updating", []);
+
       let newNumberOfBlocksInInterval = latestFiveMinPrice.numberOfBlocksInInterval.plus(
         ONE
       );
@@ -145,6 +153,7 @@ export function handleBlock(block: ethereum.Block): void {
 
       latestFiveMinPrice.save();
     } else {
+      log.warning("creating new!", []);
       let fiveMinPrice = createFiveMinPrice(
         timestamp,
         oracle.id,

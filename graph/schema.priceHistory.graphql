@@ -1,6 +1,6 @@
 type FiveMinPrice @entity {
   id: ID!
-  intervalIndex: BigInt! # This is `timestamp modulo 5 minutes`
+  intervalIndex: BigInt! # This is `timestamp/5 minutes`
   startPrice: BigInt!
   endPrice: BigInt!
   averagePrice: BigInt!

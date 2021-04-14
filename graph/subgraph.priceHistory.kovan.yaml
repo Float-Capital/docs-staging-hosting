@@ -6,9 +6,9 @@ dataSources:
     name: LongShort
     network: kovan
     source:
-      address: "0xE9B20f4281D7F0aC7ba2bb55485F4c8a50ca326B"
+      address: "0xD3Af43e2e3A2B0d1eF315499355EfEcbD0136Ac2"
       abi: LongShort
-      startBlock: 4190130
+      startBlock: 24243670
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -23,12 +23,14 @@ dataSources:
       eventHandlers:
         - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
           handler: handleSyntheticTokenCreated
+      blockHandlers:
+        - handler: handleBlock
       file: ./src/priceHistory.ts
 
 templates:
   - kind: ethereum/contract
     name: OracleManager
-    network: ganache
+    network: kovan
     source:
       abi: OracleManager
     mapping:
