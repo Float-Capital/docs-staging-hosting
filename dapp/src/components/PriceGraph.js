@@ -199,8 +199,13 @@ function PriceGraph$LoadedGraph(Props) {
         }), d$1 !== undefined ? d$1.price : 0);
   var totalRange = maxYRange - minYRange;
   var yAxisRange = [
+<<<<<<< HEAD
     minYRange - totalRange * 0.05,
     maxYRange + totalRange * 0.05
+=======
+    minYRange - minYRange * 0.05,
+    maxYRange + maxYRange * 0.05
+>>>>>>> Update the UI to have a demo implementation of the price data graph (everything hard-coded)
   ];
   var isMobile = View.useIsTailwindMobile(undefined);
   return React.createElement(React.Fragment, undefined, React.createElement("div", {
