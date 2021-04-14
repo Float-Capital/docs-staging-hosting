@@ -233,13 +233,8 @@ module MintFormSignedIn = {
         contractExecutionHandler(
           ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
           ~contractFunction=isLong
-            ? Contracts.LongShort.mintLong(
-                ~marketIndex=market.marketIndex,
-                ~amount,
-              )
-            : Contracts.LongShort.mintShort(
-                ~marketIndex=market.marketIndex,
-                ~amount,
+            ? Contracts.LongShort.mintLong(~marketIndex=market.marketIndex, ~amount)
+            : Contracts.LongShort.mintShort(~marketIndex=market.marketIndex, ~amount),
         )
       let mintAndStakeFunction = () =>
         contractExecutionHandler(

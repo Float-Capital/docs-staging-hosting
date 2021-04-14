@@ -781,15 +781,13 @@ function MintForm$MintFormSignedIn(Props) {
             var tmp;
             if (isLong) {
               var arg = market.marketIndex;
-              var arg$1 = amount.mul(Ethers$1.BigNumber.from("3"));
               tmp = (function (param) {
-                  return param.mintLong(arg, arg$1);
+                  return param.mintLong(arg, amount);
                 });
             } else {
-              var arg$2 = market.marketIndex;
-              var arg$3 = amount.mul(Ethers$1.BigNumber.from("3"));
+              var arg$1 = market.marketIndex;
               tmp = (function (param) {
-                  return param.mintShort(arg$2, arg$3);
+                  return param.mintShort(arg$1, amount);
                 });
             }
             return Curry._2(contractExecutionHandler, (function (param) {
