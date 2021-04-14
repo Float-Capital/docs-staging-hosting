@@ -6,9 +6,9 @@ dataSources:
     name: LongShort
     network: kovan
     source:
-      address: "0xD3Af43e2e3A2B0d1eF315499355EfEcbD0136Ac2"
+      address: "0xA1c26CB492e50647d9742975f0876ae77d57D03e"
       abi: LongShort
-      startBlock: 24243670
+      startBlock: 24240369
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
