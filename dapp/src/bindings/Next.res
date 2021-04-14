@@ -115,11 +115,11 @@ module Router = {
   type pushOptions = {shallow: bool, scroll: bool}
   @send external pushOptions: (router, string, option<unit>, pushOptions) => unit = "push"
   let pushShallow = (routerObj, queryString) =>
-    pushOptions(routerObj, queryString, None, {shallow: true, scroll: false})
+    pushOptions(routerObj, queryString, None, {shallow: true, scroll: true})
   @send external pushObj: (router, pathObj) => unit = "push"
   @send external pushObjOptions: (router, pathObj, option<unit>, pushOptions) => unit = "push"
   let pushObjShallow = (routerObj, pathObj) =>
-    pushObjOptions(routerObj, pathObj, None, {shallow: true, scroll: false})
+    pushObjOptions(routerObj, pathObj, None, {shallow: true, scroll: true})
 
   @send external pushPromise: (router, string) => JsPromise.t<unit> = "push"
   @send external pushObjPromise: (router, pathObj) => JsPromise.t<unit> = "push"

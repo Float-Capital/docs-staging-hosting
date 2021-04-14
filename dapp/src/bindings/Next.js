@@ -21,7 +21,7 @@ var Events = {};
 function pushShallow(routerObj, queryString) {
   routerObj.push(queryString, undefined, {
         shallow: true,
-        scroll: false
+        scroll: true
       });
   
 }
@@ -29,7 +29,7 @@ function pushShallow(routerObj, queryString) {
 function pushObjShallow(routerObj, pathObj) {
   routerObj.push(pathObj, undefined, {
         shallow: true,
-        scroll: false
+        scroll: true
       });
   
 }
