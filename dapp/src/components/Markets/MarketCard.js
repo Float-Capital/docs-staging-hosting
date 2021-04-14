@@ -94,12 +94,12 @@ function MarketCard(Props) {
                 className: "flex w-full justify-around"
               }, React.createElement(Button.Small.make, {
                     onClick: (function (param) {
-                        return Next.Router.pushShallow(router, "/markets?marketIndex=" + marketIndex.toString() + "&mintOption=long");
+                        return Next.Router.pushShallow(router, "/markets?marketIndex=" + marketIndex.toString() + "&actionOption=long");
                       }),
                     children: "Mint Long"
                   }), React.createElement(Button.Small.make, {
                     onClick: (function (param) {
-                        return Next.Router.pushShallow(router, "/markets?marketIndex=" + marketIndex.toString() + "&mintOption=short");
+                        return Next.Router.pushShallow(router, "/markets?marketIndex=" + marketIndex.toString() + "&actionOption=short");
                       }),
                     children: "Mint Short"
                   }));
