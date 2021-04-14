@@ -1,0 +1,26 @@
+type FiveMinPrice @entity {
+  id: ID!
+  intervalIndex: BigInt! # This is `timestamp/5 minutes`
+  startPrice: BigInt!
+  endPrice: BigInt!
+  averagePrice: BigInt!
+  intervalComplete: Boolean!
+  numberOfBlocksInInterval: BigInt!
+  oracle: Oracle!
+}
+
+type Oracle @entity {
+  id: ID!
+  address: Bytes!
+  marketIndex: BigInt!
+  marketName: String!
+  marketSymbol: String!
+  latestPrice: BigInt!
+  fiveMinPrices: [FiveMinPrice!]!
+  latestFiveMinPrice: FiveMinPrice!
+}
+
+type Global @entity {
+  id: ID!
+  oracles: [Oracle!]!
+}

@@ -22,7 +22,13 @@ function killAndExit {
 
 function graphCreate {
     echo '####### DEPLOYING GRAPH #######'
-    yarn codegen; yarn build; yarn create-local; yarn deploy-local
+    if [ "$PRICE_HISTORY" == "TRUE" ]
+    then
+        yarn codegen-price-history; yarn build-price-history; yarn create-price-history-local; yarn deploy-price-history-local
+    else
+        yarn codegen; yarn build; yarn create-local; yarn deploy-local
+    fi
+
     if [ "$?" -ne 0 ];
     then
         echo "ERROR: Could not deploy graph successfully"
@@ -32,7 +38,13 @@ function graphCreate {
 
 function graphRedeploy {
     echo '####### REDEPLOYING GRAPH #######'
-    yarn codegen && yarn build && yarn deploy-local
+    if [ "$PRICE_HISTORY" == "TRUE" ]
+    then
+        yarn codegen-price-history && yarn build-price-history && yarn deploy-price-history-local
+    else
+        yarn codegen && yarn build && yarn deploy-local
+    fi
+
     if [ "$?" -ne 0 ];
     then
         echo "ERROR: Could not redeploy graph successfully"
