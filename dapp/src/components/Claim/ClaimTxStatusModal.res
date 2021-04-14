@@ -16,16 +16,16 @@ let make = (~txState) => {
           className="hover:underline"
           target="_"
           rel="noopenner noreferer"
-          href={`${Config.defaultBlockExplorer}tx/${txHash}`}>
-          <p> {`view tx on ${Config.defaultBlockExplorerName}`->React.string} </p>
+          href={`${Config.blockExplorer}tx/${txHash}`}>
+          <p> {`view tx on ${Config.blockExplorerName}`->React.string} </p>
         </a>
       </div>
     </Modal>
-  | ContractActions.Complete({transactionHash}) =>
+  | ContractActions.Complete({transactionHash: _}) =>
     <Modal id={3}>
       <div className="text-center m-3"> <p> {`Transaction complete 🎉`->React.string} </p> </div>
     </Modal>
-  | ContractActions.Declined(message) =>
+  | ContractActions.Declined(_message) =>
     <Modal id={4}>
       <div className="text-center m-3">
         <p> {`The transaction was rejected by your wallet`->React.string} </p>

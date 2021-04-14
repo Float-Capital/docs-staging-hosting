@@ -533,8 +533,6 @@ function RedeemForm$ConnectedRedeemForm(Props) {
   var match = tokenRedeemPosition(market, isLong, longTokenBalance, shortTokenBalance);
   var syntheticTokenAddress = match[1];
   var isActuallyLong = match[0];
-  console.log("isActuallyLong");
-  console.log(isActuallyLong);
   var match$1 = ContractActions.useContractFunction(signer);
   var txState = match$1[1];
   var contractExecutionHandler = match$1[0];
@@ -549,9 +547,8 @@ function RedeemForm$ConnectedRedeemForm(Props) {
       });
   var setContractActionToCallAfterApproval = match$3[1];
   var contractActionToCallAfterApproval = match$3[0];
-  var longShortAddres = Config.useLongShortAddress(undefined);
   var marketIndex = market.marketIndex;
-  var match$4 = useBalanceAndApproved(syntheticTokenAddress, longShortAddres);
+  var match$4 = useBalanceAndApproved(syntheticTokenAddress, Config.longShort);
   var optTokenAmountApproved = match$4[1];
   var optTokenBalance = match$4[0];
   var form = useForm({
@@ -560,7 +557,7 @@ function RedeemForm$ConnectedRedeemForm(Props) {
           var amount = param.amount;
           var redeemFunction = function (param) {
             return Curry._2(contractExecutionHandler, (function (param) {
-                          return Contracts.LongShort.make(longShortAddres, param);
+                          return Contracts.LongShort.make(Config.longShort, param);
                         }), isActuallyLong ? (function (param) {
                             return param.redeemLong(marketIndex, amount);
                           }) : (function (param) {
@@ -576,7 +573,7 @@ function RedeemForm$ConnectedRedeemForm(Props) {
             return Curry._2(contractExecutionHandlerApprove, (function (param) {
                           return Contracts.Erc20.make(syntheticTokenAddress, param);
                         }), (function (param) {
-                          return param.approve(longShortAddres, arg);
+                          return param.approve(Config.longShort, arg);
                         }));
           } else {
             return redeemFunction(undefined);
@@ -722,7 +719,7 @@ function RedeemForm$ConnectedRedeemForm(Props) {
                                 }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
                   }),
                 onChangeSide: (function ($$event) {
-                    router.query["mintOption"] = $$event.target.value;
+                    router.query["actionOption"] = $$event.target.value;
                     router.query["token"] = isActuallyLong ? Ethers.Utils.ethAdrToLowerStr(market.syntheticLong.tokenAddress) : Ethers.Utils.ethAdrToLowerStr(market.syntheticShort.tokenAddress);
                     return Next.Router.pushObjShallow(router, {
                                 pathname: router.pathname,

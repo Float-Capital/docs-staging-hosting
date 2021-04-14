@@ -6,12 +6,10 @@ let make = (~tokenAddress) => {
     ~signer,
   )
 
-  let stakerAddress = Config.useStakerAddress()
-
   <Button.Tiny
     onClick={_ => {
       let _ = contractExecutionHandler(
-        ~makeContractInstance=Contracts.Staker.make(~address=stakerAddress),
+        ~makeContractInstance=Contracts.Staker.make(~address=Config.staker),
         ~contractFunction=Contracts.Staker.claimFloatImmediately(~tokenAddress),
       )
     }}>

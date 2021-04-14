@@ -578,16 +578,14 @@ function MintLong(Props) {
       });
   var setFunctionToExecuteOnce = match$2[1];
   var functionToExecuteOnce = match$2[0];
-  var longShortContractAddress = Config.useLongShortAddress(undefined);
-  var daiAddress = Config.useDaiAddress(undefined);
-  var match$3 = ContractHooks.useERC20ApprovedRefresh(daiAddress, longShortContractAddress);
+  var match$3 = ContractHooks.useERC20ApprovedRefresh(Config.dai, Config.longShort);
   var optAmountApproved = match$3.data;
   var form = useForm(initialInput, (function (param, _form) {
           var match = param.amount;
           var amount = match.amount;
           var mintFunction = function (param) {
             return Curry._2(contractExecutionHandler, (function (param) {
-                          return Contracts.LongShort.make(longShortContractAddress, param);
+                          return Contracts.LongShort.make(Config.longShort, param);
                         }), (function (param) {
                           return param.mintLong(marketIndex, amount);
                         }));
@@ -600,9 +598,9 @@ function MintLong(Props) {
                 }));
           var arg = amount.mul(Ethers$1.BigNumber.from("2"));
           return Curry._2(contractExecutionHandler2, (function (param) {
-                        return Contracts.Erc20.make(daiAddress, param);
+                        return Contracts.Erc20.make(Config.dai, param);
                       }), (function (param) {
-                        return param.approve(longShortContractAddress, arg);
+                        return param.approve(Config.longShort, arg);
                       }));
         }));
   var match$4 = ContractHooks.useDaiBalanceRefresh(undefined);

@@ -17,6 +17,7 @@ import { saveEventToStateChange } from "./utils/txEventHelpers";
 import {
   updateBalanceTransfer,
   updateBalanceFloatTransfer,
+  updateCollatoralBalanceTransfer,
 } from "./utils/helperFunctions";
 import { GLOBAL_STATE_ID } from "./CONSTANTS";
 import { getOrCreateUser } from "./utils/globalStateManager";
@@ -47,7 +48,7 @@ export function handleTransfer(event: TransferEvent): void {
 
     if (syntheticToken != null) {
       let transactionHash = event.transaction.hash.toHex();
-      let transfer = new Transfer(transactionHash);
+      let transfer = new Transfer(transactionHash + "-" + syntheticToken.id);
       transfer.from = fromAddressString;
       transfer.to = toAddressString;
       transfer.value = amount;
@@ -70,15 +71,17 @@ export function handleTransfer(event: TransferEvent): void {
       );
     } else if (collateralToken != null) {
       let transactionHash = event.transaction.hash.toHex();
-      let transfer = new CollateralTransfer(transactionHash);
+      let transfer = new CollateralTransfer(
+        transactionHash + "-" + collateralToken.id
+      );
       transfer.from = fromAddressString;
       transfer.to = toAddressString;
       transfer.value = amount;
-      transfer.token = syntheticToken.id;
+      transfer.token = collateralToken.id;
       transfer.save();
 
       if (User.load(fromAddressString) != null) {
-        updateBalanceTransfer(
+        updateCollatoralBalanceTransfer(
           tokenAddressString,
           fromAddress,
           amount,
@@ -87,7 +90,7 @@ export function handleTransfer(event: TransferEvent): void {
         );
       }
       if (User.load(toAddressString) != null) {
-        updateBalanceTransfer(
+        updateCollatoralBalanceTransfer(
           tokenAddressString,
           toAddress,
           amount,

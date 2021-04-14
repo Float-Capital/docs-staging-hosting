@@ -9,6 +9,7 @@ import {
   LatestPrice,
   SyntheticMarket,
   CollateralToken,
+  UserCollateralTokenBalance,
 } from "../../generated/schema";
 import { BigInt, Bytes, log, ethereum, Address } from "@graphprotocol/graph-ts";
 import { ZERO, ONE, GLOBAL_STATE_ID, TEN_TO_THE_18 } from "../CONSTANTS";
@@ -173,6 +174,7 @@ export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
     user.currentStakes = [];
     user.tokenBalances = [];
     user.collatoralTokenApprovals = [];
+    user.collatoralBalances = [];
     user.tokenMints = [];
     user.stateChangesAffectingUser = [];
 
@@ -198,9 +200,17 @@ export function getOrCreateBalanceObject(
     );
 
     let user = User.load(userAddressString);
+    if (user == null) {
+      log.critical("User is undefined with address {}", [userAddressString]);
+    }
     newBalance.user = user.id;
 
     let token = SyntheticToken.load(tokenAddressString);
+    if (token == null) {
+      log.critical("Synthetic Token is undefined with address {}", [
+        tokenAddressString,
+      ]);
+    }
     newBalance.syntheticToken = token.id;
 
     newBalance.tokenBalance = ZERO;
@@ -209,6 +219,42 @@ export function getOrCreateBalanceObject(
     return newBalance;
   } else {
     return balance as UserSyntheticTokenBalance;
+  }
+}
+
+export function getOrCreateCollatoralBalanceObject(
+  tokenAddressString: string,
+  userAddressString: string
+): UserCollateralTokenBalance {
+  let balance = UserCollateralTokenBalance.load(
+    tokenAddressString + "-" + userAddressString + "-balance"
+  );
+
+  if (balance == null) {
+    let newBalance = new UserCollateralTokenBalance(
+      tokenAddressString + "-" + userAddressString + "-balance"
+    );
+
+    let user = User.load(userAddressString);
+    if (user == null) {
+      log.critical("User is undefined with address {}", [userAddressString]);
+    }
+    newBalance.user = user.id;
+
+    let token = CollateralToken.load(tokenAddressString);
+    if (token == null) {
+      log.critical("Synthetic Token is undefined with address {}", [
+        tokenAddressString,
+      ]);
+    }
+    newBalance.collateralToken = token.id;
+
+    newBalance.balance = ZERO;
+    newBalance.timeLastUpdated = ZERO;
+
+    return newBalance;
+  } else {
+    return balance as UserCollateralTokenBalance;
   }
 }
 

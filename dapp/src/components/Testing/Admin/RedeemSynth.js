@@ -405,11 +405,10 @@ function RedeemSynth(Props) {
   var match = ContractActions.useContractFunction(signer);
   var setTxState = match[2];
   var contractExecutionHandler = match[0];
-  var longShortAddres = Config.useLongShortAddress(undefined);
   var form = useForm(initialInput, (function (param, _form) {
           var amount = param.amount;
           return Curry._2(contractExecutionHandler, (function (param) {
-                        return Contracts.LongShort.make(longShortAddres, param);
+                        return Contracts.LongShort.make(Config.longShort, param);
                       }), isLong ? (function (param) {
                           return param.redeemLong(marketIndex, amount);
                         }) : (function (param) {

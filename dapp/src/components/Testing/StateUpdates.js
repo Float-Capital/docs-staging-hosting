@@ -31,13 +31,12 @@ function StateUpdates$TestTxButton(Props) {
   var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var contractExecutionHandler = match[0];
-  var longShortAddress = Config.useLongShortAddress(undefined);
   return React.createElement("button", {
               onClick: (function (param) {
                   var arg = Ethers$1.BigNumber.from(3);
                   var arg$1 = Ethers.Utils.parseEther("1");
                   return Curry._2(contractExecutionHandler, (function (param) {
-                                return Contracts.LongShort.make(longShortAddress, param);
+                                return Contracts.LongShort.make(Config.longShort, param);
                               }), (function (param) {
                                 return param.mintShortAndStake(arg, arg$1);
                               }));

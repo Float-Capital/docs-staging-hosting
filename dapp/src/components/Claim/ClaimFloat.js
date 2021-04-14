@@ -17,7 +17,6 @@ function ClaimFloat(Props) {
   var match = ContractActions.useContractFunction(signer);
   var txState = match[1];
   var contractExecutionHandler = match[0];
-  var stakerAddress = Config.useStakerAddress(undefined);
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
   React.useEffect((function () {
           if (typeof txState === "number") {
@@ -79,7 +78,7 @@ function ClaimFloat(Props) {
                               return Ethers.utils.getAddress(prim);
                             }));
                       return Curry._2(contractExecutionHandler, (function (param) {
-                                    return Contracts.Staker.make(stakerAddress, param);
+                                    return Contracts.Staker.make(Config.staker, param);
                                   }), (function (param) {
                                     return param.claimFloat(arg);
                                   }));

@@ -9,12 +9,10 @@ module Erc20ApproveForm = %form(
     tokenAddress: {
       strategy: OnFirstBlur,
       validate: ({tokenAddress}) => {
-        // refactor at some stage as console is complaining about hook order
-        let netIdStr = RootProvider.useChainId()->Option.mapWithDefault("5", Int.toString)
         switch tokenAddress {
         // | "LONG" => Config.longTokenContractAddress(~netIdStr)->Ok
         // | "SHORT" => Config.shortTokenContractAddress(~netIdStr)->Ok
-        | "DAI" => Config.daiContractAddress(~netIdStr)->Ok
+        | "DAI" => Config.dai->Ok
         | _ as value => Error(value)
         }
       },
@@ -34,12 +32,10 @@ let make = () => {
   let signer = ContractActions.useSignerExn()
   let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(~signer)
 
-  let longShortAddress = Config.useLongShortAddress()
-
   let form = Erc20ApproveForm.useForm(~initialInput, ~onSubmit=({amount, tokenAddress}, _form) => {
     contractExecutionHandler(
       ~makeContractInstance=Contracts.Erc20.make(~address=tokenAddress),
-      ~contractFunction=Contracts.Erc20.approve(~spender=longShortAddress, ~amount),
+      ~contractFunction=Contracts.Erc20.approve(~spender=Config.longShort, ~amount),
     )
   })
 

@@ -48,7 +48,8 @@ function User$UserBalancesCard(Props) {
                             tokens: FormatMoney.formatEther(undefined, param.tokenBalance),
                             value: FormatMoney.formatEther(undefined, param.tokensValue),
                             children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {
-                                  synthAddress: param.addr
+                                  synthAddress: Ethers.Utils.ethAdrToLowerStr(param.addr),
+                                  isLong: isLong
                                 }),
                             key: name + "-" + (
                               isLong ? "long" : "short"
@@ -144,7 +145,7 @@ function User$User(Props) {
     return React.createElement(UserUI.UserColumnTextCenter.make, {
                 children: React.createElement("a", {
                       className: "mt-4 hover:text-gray-600",
-                      href: Config.defaultBlockExplorer + "address/" + user,
+                      href: Config.blockExplorer + "address/" + user,
                       rel: "noopener noreferrer",
                       target: "_"
                     }, React.createElement("h1", undefined, "This user has not interacted with float.capital yet"))
@@ -179,7 +180,7 @@ function User$User(Props) {
                             }, React.createElement(Link, {
                                   href: "/markets",
                                   children: React.createElement(Button.Small.make, {
-                                        children: "MINT"
+                                        children: "MARKETS"
                                       })
                                 }))) : notCurrentUserMessage(undefined)));
   }

@@ -102,7 +102,7 @@ let make = (
       <Button.Small
         onClick={_ => {
           router->Next.Router.pushShallow(
-            `/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}&mintOption=long`,
+            `/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=long`,
           )
         }}>
         "Mint Long"
@@ -110,7 +110,7 @@ let make = (
       <Button.Small
         onClick={_ => {
           router->Next.Router.pushShallow(
-            `/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}&mintOption=short`,
+            `/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=short`,
           )
         }}>
         "Mint Short"

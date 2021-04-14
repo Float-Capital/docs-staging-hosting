@@ -300,3 +300,13 @@ module Util = {
     }
   }
 }
+
+let useTokenMarketId = (~tokenId) => {
+  let marketIdQuery = Queries.TokenMarketId.use({tokenId: tokenId})
+  switch marketIdQuery {
+  | {data: Some({syntheticToken: Some({syntheticMarket: {id}})})} => Response(id)
+  | {data: Some(_)} => Response("1")
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
+  }
+}

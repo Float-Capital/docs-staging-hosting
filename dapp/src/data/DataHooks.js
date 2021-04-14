@@ -585,6 +585,54 @@ var Util = {
   queryToResponse: queryToResponse
 };
 
+function useTokenMarketId(tokenId) {
+  var marketIdQuery = Curry.app(Queries.TokenMarketId.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          tokenId: tokenId
+        }
+      ]);
+  var match = marketIdQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.syntheticToken;
+    if (match$1 !== undefined) {
+      return {
+              TAG: 1,
+              _0: match$1.syntheticMarket.id,
+              [Symbol.for("name")]: "Response"
+            };
+    } else {
+      return {
+              TAG: 1,
+              _0: "1",
+              [Symbol.for("name")]: "Response"
+            };
+    }
+  }
+  var match$2 = marketIdQuery.error;
+  if (match$2 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
 var ethAdrToLowerStr = Globals.ethAdrToLowerStr;
 
 export {
@@ -600,6 +648,7 @@ export {
   useSyntheticTokenBalance ,
   useSyntheticTokenBalanceOrZero ,
   Util ,
+  useTokenMarketId ,
   
 }
 /* Misc Not a pure module */

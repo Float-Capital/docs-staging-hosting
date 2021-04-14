@@ -51,9 +51,7 @@ let make = () => {
     <Button.Element onClick={_event => addToMetamask(ethObj)}>
       <div className="mx-auto">
         <div className="flex flex-row items-center">
-          <div className="text-sm">
-            {`Add ${Config.defaultNetworkName} to metamask `->React.string}
-          </div>
+          <div className="text-sm"> {`Add ${Config.networkName} to metamask `->React.string} </div>
           <img src="/icons/metamask.svg" className="h-6 ml-1" />
         </div>
       </div>

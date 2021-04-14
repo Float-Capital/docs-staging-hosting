@@ -114,9 +114,6 @@ module ConnectedRedeemForm = {
       ~shortTokenBalance,
     )
 
-    Js.log("isActuallyLong")
-    Js.log(isActuallyLong)
-
     let (contractExecutionHandler, txState, _setTxState) = ContractActions.useContractFunction(
       ~signer,
     )
@@ -131,8 +128,6 @@ module ConnectedRedeemForm = {
       setContractActionToCallAfterApproval,
     ) = React.useState(((), ()) => ())
 
-    let longShortAddres = Config.useLongShortAddress()
-
     let initialInput: RedeemForm.input = {
       amount: "",
     }
@@ -141,7 +136,7 @@ module ConnectedRedeemForm = {
 
     let (optTokenBalance, optTokenAmountApproved) = useBalanceAndApproved(
       ~erc20Address=syntheticTokenAddress,
-      ~spender=longShortAddres,
+      ~spender=Config.longShort,
     )
 
     let form = RedeemForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
@@ -150,12 +145,12 @@ module ConnectedRedeemForm = {
           ~makeContractInstance=Contracts.Erc20.make(~address=syntheticTokenAddress),
           ~contractFunction=Contracts.Erc20.approve(
             ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
-            ~spender=longShortAddres,
+            ~spender=Config.longShort,
           ),
         )
       let redeemFunction = () =>
         contractExecutionHandler(
-          ~makeContractInstance=Contracts.LongShort.make(~address=longShortAddres),
+          ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
           ~contractFunction={
             isActuallyLong
               ? Contracts.LongShort.redeemLong(~marketIndex, ~tokensToRedeem=amount)
@@ -266,7 +261,7 @@ module ConnectedRedeemForm = {
               },
             )}
           onChangeSide={event => {
-            router.query->Js.Dict.set("mintOption", (event->ReactEvent.Form.target)["value"])
+            router.query->Js.Dict.set("actionOption", (event->ReactEvent.Form.target)["value"])
             router.query->Js.Dict.set(
               "token",
               isActuallyLong

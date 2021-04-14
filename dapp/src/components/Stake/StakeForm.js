@@ -490,7 +490,6 @@ function StakeForm$ConnectedStakeForm(Props) {
   var setTxStateApprove = match$2[2];
   var txStateApprove = match$2[1];
   var contractExecutionHandlerApprove = match$2[0];
-  var stakerContractAddress = Config.useStakerAddress(undefined);
   var user = RootProvider.useCurrentUserExn(undefined);
   var optTokenBalance = DataHooks.Util.graphResponseToOption(DataHooks.useSyntheticTokenBalance(user, synthetic.tokenAddress));
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
@@ -615,7 +614,7 @@ function StakeForm$ConnectedStakeForm(Props) {
           var stakeAndEarnImmediatlyFunction = function (param) {
             var arg = Ethers$1.utils.getAddress(tokenId);
             return Curry._2(contractExecutionHandler, (function (param) {
-                          return Contracts.Staker.make(stakerContractAddress, param);
+                          return Contracts.Staker.make(Config.staker, param);
                         }), (function (param) {
                           return param.stakeAndEarnImmediately(arg, amount);
                         }));
@@ -628,7 +627,7 @@ function StakeForm$ConnectedStakeForm(Props) {
           return Curry._2(contractExecutionHandlerApprove, (function (param) {
                         return Contracts.Erc20.make(partial_arg, param);
                       }), (function (param) {
-                        return param.approve(stakerContractAddress, arg);
+                        return param.approve(Config.staker, arg);
                       }));
         }));
   var match$3 = form.amountResult;

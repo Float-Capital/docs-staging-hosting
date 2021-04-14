@@ -64,11 +64,9 @@ let make = (~marketIndex) => {
   )
   let (functionToExecuteOnce, setFunctionToExecuteOnce) = React.useState(((), ()) => ())
 
-  let longShortContractAddress = Config.useLongShortAddress()
-  let daiAddress = Config.useDaiAddress()
   let {data: optAmountApproved} = ContractHooks.useERC20ApprovedRefresh(
-    ~erc20Address=daiAddress,
-    ~spender=longShortContractAddress,
+    ~erc20Address=Config.dai,
+    ~spender=Config.longShort,
   )
 
   let form = AdminMintForm.useForm(~initialInput, ~onSubmit=(
@@ -77,17 +75,17 @@ let make = (~marketIndex) => {
   ) => {
     let mintFunction = () =>
       contractExecutionHandler(
-        ~makeContractInstance=Contracts.LongShort.make(~address=longShortContractAddress),
+        ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
         ~contractFunction=Contracts.LongShort.mintLong(~marketIndex, ~amount),
       )
     switch requiresApproval {
     | true =>
       setFunctionToExecuteOnce(_ => mintFunction)
       contractExecutionHandler2(
-        ~makeContractInstance=Contracts.Erc20.make(~address=daiAddress),
+        ~makeContractInstance=Contracts.Erc20.make(~address=Config.dai),
         ~contractFunction=Contracts.Erc20.approve(
           ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
-          ~spender=longShortContractAddress,
+          ~spender=Config.longShort,
         ),
       )
     | false => mintFunction()
