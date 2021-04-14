@@ -7,7 +7,7 @@ slug: /faqs
 
 NOTE: These docs are under active development 👷‍♀️👷
 
-### Is your question not answered? Please ask on our [Discord](https://discord.gg/qesr2KZAhn) 🙏
+### Still have questions? Feel free to reach out to us on [Discord](https://discord.gg/qesr2KZAhn) 🙏
 
 ---
 
@@ -17,13 +17,13 @@ NOTE: These docs are under active development 👷‍♀️👷
 
 ### What is a synthetic asset?
 
-A synthetic asset simulates the performance of an underlying asset but with some key benefits. Synthetics can offer investors reduced trading costs, tailored cash flow patterns, altered risk profiles, leverage and so on. Float Capital however, is designed to be simple and safe.
+A synthetic asset simulates the performance of an underlying asset but with some key benefits. Synthetics can offer investors reduced trading costs, tailored cash flow patterns, altered risk profiles, leverage and so on. Float Capital, however, is designed to be simple and safe.
 
-As an example, normally to get exposure to an asset, say Gold, you would need to physically buy Gold, then sell it at a later stage to realise a return. Buying a synthetic asset allows you get identical exposure to the risk and return benefits of the asset, without having to actually own the underlying asset.
+As an example, normally to get exposure to an asset, say Gold, you would need to physically buy Gold, then sell it at a later stage to realise a return. Buying a synthetic asset allows you to get identical exposure to the risk and return benefits of the asset, without having to own the underlying asset.
 
 ### What synthetic assets does Float Capital currently support?
 
-Our first synthetic asset is a 'index' known as the ethereum killers (ETHKillers). The EthKillers is the first synthetic market offered by Float Capital. This Market is an average of the prices of the tokens of the three protocols seen as alternatives to ethereum, namely TRON, XRP and EOS. The EthKillers market allows users to gain long or short exposure to an equally weighted basket containing TRON, XRP and EOS.
+Our first synthetic asset is an 'index' known as the ethereum killers (ETHKillers). The EthKillers is the first synthetic market offered by Float Capital. This Market is an average of the prices of the tokens of the three protocols seen as alternatives to ethereum, namely TRON, XRP and EOS. The EthKillers market allows users to gain long or short exposure to an equally weighted basket containing TRON, XRP and EOS.
 
 The next synthetic market we plan to release is an asset tracking bitcoin vs ethereum dominance. We plan to release many more awesome synthetics. Join our [Discord](https://discord.gg/qesr2KZAhn) and give us your suggestions on which markets to release next.
 
@@ -31,7 +31,7 @@ The next synthetic market we plan to release is an asset tracking bitcoin vs eth
 
 For every synthetic market we offer (i.e. ETHKillers), users can create long or short tokens for this market.
 
-Holding long tokens allows you to benefit from price appreciation 📈 of the underlying market. Holding short tokens allows you to benefit from price depreciation 📉 of the underlying market.
+Holding long tokens allows you to benefit from the price appreciation 📈 of the underlying market. Holding short tokens allows you to benefit from the price depreciation 📉 of the underlying market.
 
 <!-- ### What makes Float Capital different?
 
@@ -63,7 +63,7 @@ Float Capital currently doesn't take any trading fees from traders. All fees lev
 
 ### What are the benefits of adding good liquidity?
 
-Good liquidity earns a higher percentage of fees from the protocol. Good liquidity also earns a super charged yield, through earning yield on all the underlying assets. Finally, staking good liquidity also allows users to earn FLOAT tokens at a higher rate. The whitepaper provides comprehensive details on these incentives.
+Good liquidity earns a higher percentage of fees from the protocol. Good liquidity also earns a supercharged yield, through earning yield on all the underlying assets. Finally, staking good liquidity also allows users to earn FLOAT tokens at a higher rate. The whitepaper provides comprehensive details on these incentives.
 
 <!-- Underlying protocol assets generate yield
 On the dashboard there will be an indication of the imbalance between the long side liquidity and the short side liquidity. By watching this and taking adding good liquidity, you will be rewarded with the interest on all the liquidity of both sides of the market. The liquidity is deposited in [Venus Protocol](https://app.venus.io/market/BUSD) where the token earns interest. -->
@@ -96,13 +96,13 @@ Simply put, it's a feed that communicates information from the real world to the
 
 ### What is a governance token?
 
-A governance token can be thought of a bit like equity in a company. Governance tokens give holders voting rights over proposed revisions to the protocol, allowing them to have their voices heard on how a protocol operates. Some governance tokens (Float tokens included) give holders added benefits. Similar to stock buybacks, fees earned by the LongShort protocol that aren't paid out to holders in return for helping to balance the liquidity pools, will be used to buy back Float Tokens in the open market, thus decreasing the supply in circulation, and increasing their value.
+A governance token can be thought of a bit like equity in a company. Governance tokens give holders voting rights over proposed revisions to the protocol, allowing them to have their voices heard on how a protocol operates. Some governance tokens (Float tokens included) give holders added benefits. Similar to stock buybacks, fees earned by the LongShort protocol that isn't paid out to holders in return for helping to balance the liquidity pools, will be used to buy back Float Tokens in the open market, thus decreasing the supply in circulation, and increasing their value.
 
 ---
 
-## Other things your might want to know
+## Other things you may want to know
 
-### What is Blockchain are you on?
+### What Blockchain are you on?
 
 We are currently launched on the Kovan testnet. Float Capital will be launched on the Polygon (formerly Matic) network. Polygon is an EVM (Ethereum Virtual Machine) compatible blockchain.
 

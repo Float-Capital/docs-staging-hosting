@@ -13,9 +13,9 @@ The FLOAT token is the governance token for Float Capital.
 
 Float tokens are earned through staking any Float synthetic token in our token contract.
 
-The amount of Float earned is a function of length of time and value staked, whether you are staking good or bad liquidity, amongst other paramaters elaborated on in our whitepaper.
+The amount of Float earned is a function of the length of time and value staked, whether you are staking good or bad liquidity, amongst other parameters elaborated on in our whitepaper.
 
-The design of this emission schedule ensures that the Float token supply is only increasing as increasing amounts of liquidity are locked in the protocol over time. I.e. the the supply of float is designed to grow with the size of the protocol.
+The design of this emission schedule ensures that the Float token supply is only increasing as increasing amounts of liquidity are locked in the protocol over time. I.e. the supply of Float is designed to grow with the size of the protocol.
 
 Float token holders will govern important protocol decisions such as fee parameters and deciding which new synthetic markets to create.
 

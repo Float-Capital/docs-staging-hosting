@@ -11,7 +11,7 @@ NOTE: These docs are under active development 👷‍♀️👷
 
 Welcome to Float Capital! 👋
 
-This is the official documentation for the Float Capital, a new novel protocol allowing users to easily and safely create synthetic assets without overcollateralization 💡
+This is the official documentation for the Float Capital, a new novel protocol allowing users to easily and safely create synthetic assets without over-collateralization 💡
 
 **Visit [float.capital](https://float.capital) to get involved** 📈
 
@@ -29,20 +29,20 @@ Float is a new novel protocol, creating an efficient synthetic asset marketplace
 
 ## Float Capital Vision ✊
 
-The vision of Float is to provide decentralized, trustless, and non-KYC gated exposure to various asset classes. Traditional financial markets are often complex, opaque and geographically separated, making it difficult for the average user to hold a diversified basket of assets. Further, traditional markets encompass layers of various services providers, all carrying subtle yet significant fees, tending to erode away a large amount of the end users investment returns.
+The vision of Float is to provide decentralized, trustless, and non-KYC gated exposure to various asset classes. Traditional financial markets are often complex, opaque and geographically separated, making it difficult for the average user to hold a diversified basket of assets. Further, traditional markets encompass layers of various services providers, all carrying subtle yet significant fees, tending to erode a large amount of the end-users investment returns.
 
-Smart contracts allow us to seamlessly, trustly and most importantly, efficiently, coordinate a financial system where exposure to asset classes can be built in a peer-to-peer marketplace.
+Smart contracts allow for trustworthy and efficient coordination of a financial system where the user’s exposure to various assets can be built in a peer-to-peer marketplace.
 
 **Float is a financial paradigm where code is law.**
 
-Float allows our global investor base to easily gain synthetic asset exposure, **without overcollateralization or leverage**, or any other financial mechanism designed to make you fail. Instead, Float uses a novel protocol (yes its not simply a fork of some existing protocol), allowing users to gain floating exposure to a synthetic asset, where economic mechanisms exist, incentivising exposure to the synthetic asset to remain within a certain band.
+Float allows our global investor base to easily gain synthetic asset exposure, **without over-collateralization or leverage**, or any other financial mechanism designed to make you fail. Instead, Float uses a novel protocol (yes it's not simply a fork of some existing protocol), allowing users to gain floating exposure to a synthetic asset, where economic mechanisms exist, incentivising exposure to the synthetic asset to remain within a certain band.
 
 ---
 
 ## Learn more 🤓
 
 - Read the whitepaper 📄 (coming soon 😏)
-- [How the protocol works?](https://docs.float.capital/docs/overview)
+- [How does the protocol work?](https://docs.float.capital/docs/overview)
 - [How to mint a synthetic asset position?](https://docs.float.capital/docs/mint)
 - [What is the FLOAT token?](https://docs.float.capital/docs/mint)
 - [How to stake and earn FLOAT?](https://docs.float.capital/docs/mint)
