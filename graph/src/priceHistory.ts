@@ -63,7 +63,7 @@ function getLatestOraclePrice(oracleAddress: Address): BigInt {
 
   let latestPriceQuery = oracleInstance.try_updatePrice();
   if (latestPriceQuery.reverted) {
-    log.warning(
+    log.critical(
       "Unable to get latest price from oracle manager at {}. Please check the ABI is correct",
       [oracleAddress.toHex()]
     );
@@ -113,10 +113,8 @@ export function handleBlock(block: ethereum.Block): void {
   let timestamp = block.timestamp;
 
   let allOracles = state.oracles;
-  log.warning("Block", []);
   for (let i = 0; i < allOracles.length; ++i) {
     let curentOracleId = allOracles[i];
-    log.warning("Oracle {}", [curentOracleId]);
     let oracle = Oracle.load(curentOracleId);
     if (oracle == null) {
       log.critical("Oracle with address {} is undefined", [curentOracleId]);
@@ -133,13 +131,7 @@ export function handleBlock(block: ethereum.Block): void {
 
     // FIVE_MINUTES_IN_SECONDS;
     let currentPriceIndex = timestamp.div(FIVE_MINUTES_IN_SECONDS);
-    log.warning("currentPriceIndex {} == {}", [
-      currentPriceIndex.toString(),
-      latestFiveMinPrice.intervalIndex.toString(),
-    ]);
     if (currentPriceIndex.equals(latestFiveMinPrice.intervalIndex)) {
-      log.warning("Updating", []);
-
       let newNumberOfBlocksInInterval = latestFiveMinPrice.numberOfBlocksInInterval.plus(
         ONE
       );
@@ -153,7 +145,6 @@ export function handleBlock(block: ethereum.Block): void {
 
       latestFiveMinPrice.save();
     } else {
-      log.warning("creating new!", []);
       let fiveMinPrice = createFiveMinPrice(
         timestamp,
         oracle.id,
