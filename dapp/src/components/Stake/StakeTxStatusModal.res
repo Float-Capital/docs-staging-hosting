@@ -12,9 +12,7 @@ let make = (~txStateApprove, ~txStateStake, ~resetFormButton, ~tokenToStake) => 
       <div className="text-center m-3">
         <MiniLoader />
         <p> {"Approval transaction pending... "->React.string} </p>
-        <a target="_" rel="noopenner noreferer" href={`${Config.blockExplorer}tx/${txHash}`}>
-          <p> {`View on ${Config.blockExplorerName}`->React.string} </p>
-        </a>
+        <ViewOnBlockExplorer txHash />
       </div>
     </Modal>
   | (ContractActions.Complete({transactionHash: _}), ContractActions.Created)
@@ -25,15 +23,12 @@ let make = (~txStateApprove, ~txStateStake, ~resetFormButton, ~tokenToStake) => 
       </div>
     </Modal>
   | (ContractActions.Declined(_message), _) => <> {resetFormButton()} </>
-  | (ContractActions.Failed, _) =>
+  | (ContractActions.Failed(txHash), _) =>
     <Modal id={"stake-approve-4"}>
       <div className="text-center m-3">
         <p> {`The transaction failed.`->React.string} </p>
-        <p>
-          <a target="_" rel="noopenner noreferer" href=Config.discordInviteLink>
-            {"Connect with us on discord, if you would like some assistance"->React.string}
-          </a>
-        </p>
+        <ViewOnBlockExplorer txHash />
+        <MessageUsOnDiscord />
         {resetFormButton()}
       </div>
     </Modal>
@@ -66,40 +61,29 @@ let make = (~txStateApprove, ~txStateStake, ~resetFormButton, ~tokenToStake) => 
       <div className="text-center m-3">
         <MiniLoader />
         <p> {"Staking transaction pending... "->React.string} </p>
-        <a
-          className="hover:underline"
-          target="_"
-          rel="noopenner noreferer"
-          href={`${Config.blockExplorer}tx/${txHash}`}>
-          <p> {`View on ${Config.blockExplorerName}`->React.string} </p>
-        </a>
+        <ViewOnBlockExplorer txHash />
       </div>
     </Modal>
   | (_, ContractActions.Complete({transactionHash: _})) =>
     <Modal id={"stake-4"}>
       <div className="text-center m-3">
-        <p> {`Transaction complete`->React.string} </p> {resetFormButton()}
+        <p> {`Transaction complete 🎉`->React.string} </p> {resetFormButton()}
       </div>
     </Modal>
   | (_, ContractActions.Declined(_message)) =>
     <Modal id={"stake-5"}>
       <div className="text-center m-3">
         <p> {`The transaction was rejected by your wallet`->React.string} </p>
-        <a target="_" rel="noopenner noreferer" href=Config.discordInviteLink>
-          {"Connect with us on discord, if you would like some assistance"->React.string}
-        </a>
+        <MessageUsOnDiscord />
         {resetFormButton()}
       </div>
     </Modal>
-  | (_, ContractActions.Failed) =>
+  | (_, ContractActions.Failed(txHash)) =>
     <Modal id={"stake-6"}>
       <div className="text-center m-3">
         <h1> {`The transaction failed.`->React.string} </h1>
-        <p>
-          <a target="_" rel="noopenner noreferer" href=Config.discordInviteLink>
-            {"Connect with us on discord, if you would like some assistance"->React.string}
-          </a>
-        </p>
+        <ViewOnBlockExplorer txHash />
+        <MessageUsOnDiscord />
         {resetFormButton()}
       </div>
     </Modal>

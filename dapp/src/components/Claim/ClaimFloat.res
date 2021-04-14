@@ -28,7 +28,8 @@ let make = (~tokenAddresses) => {
       toastDispatch(
         ToastProvider.Show(`Claim transaction confirmed 🎉`, "", ToastProvider.Success),
       )
-    | Failed => toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
+    | Failed(_) =>
+      toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
     | _ => ()
     }
     None

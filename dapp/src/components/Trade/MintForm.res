@@ -54,85 +54,59 @@ module SubmitButtonAndTxTracker = {
   ) => {
     switch (txStateApprove, txStateMint) {
     | (ContractActions.Created, _) =>
-      <div className="text-center m-3">
+      <div className="text-center mx-3 my-6">
         <p> {`Please approve your ${Config.paymentTokenName} token `->React.string} </p>
       </div>
     | (ContractActions.SignedAndSubmitted(txHash), _) =>
       <div className="text-center m-3">
         <MiniLoader />
         <p> {"Approval transaction pending... "->React.string} </p>
-        <a target="_" rel="noopenner noreferer" href={`${Config.blockExplorer}tx/${txHash}`}>
-          <p> {`View on ${Config.blockExplorerName}`->React.string} </p>
-        </a>
+        <ViewOnBlockExplorer txHash />
       </div>
     | (ContractActions.Complete({transactionHash: _}), ContractActions.Created)
     | (ContractActions.Complete({transactionHash: _}), ContractActions.UnInitialised) =>
-      <div className="text-center m-3">
+      <div className="text-center mx-3 my-6">
         <p> {`Confirm transaction to mint ${tokenToMint}`->React.string} </p>
       </div>
     | (ContractActions.Declined(_message), _) => <> {resetFormButton()} </>
-    | (ContractActions.Failed, _) =>
+    | (ContractActions.Failed(txHash), _) =>
       <div className="text-center m-3">
         <p> {`The transaction failed.`->React.string} </p>
-        <p>
-          <a target="_" rel="noopenner noreferer" href=Config.discordInviteLink>
-            {"Connect with us on discord, if you would like some assistance"->React.string}
-          </a>
-        </p>
+        <ViewOnBlockExplorer txHash />
+        <MessageUsOnDiscord />
         {resetFormButton()}
       </div>
     | (_, ContractActions.Created) =>
       <div className="text-center m-3">
-        <h1> {`Sign the transaction to mint ${tokenToMint}`->React.string} </h1>
+        <h1> {`Confirm the transaction to mint ${tokenToMint}`->React.string} </h1>
       </div>
     | (ContractActions.Complete({transactionHash}), ContractActions.SignedAndSubmitted(txHash)) =>
       <div className="text-center m-3">
-        <p>
-          <a
-            target="_"
-            rel="noopenner noreferer"
-            href={`${Config.blockExplorer}tx/${transactionHash}`}>
-            {`Approval confirmed`->React.string}
-          </a>
-        </p>
-        <h1>
-          <a target="_" rel="noopenner noreferer" href={`${Config.blockExplorer}tx/${txHash}`}>
-            {`Pending minting ${tokenToMint}`->React.string}
-          </a>
-        </h1>
+        <p> {`Approval confirmed 🎉`->React.string} </p>
+        <ViewOnBlockExplorer txHash={transactionHash} />
+        <h1> {`Pending minting ${tokenToMint}`->React.string} <ViewOnBlockExplorer txHash /> </h1>
       </div>
     | (_, ContractActions.SignedAndSubmitted(txHash)) =>
       <div className="text-center m-3">
         <MiniLoader />
         <p> {"Minting transaction pending... "->React.string} </p>
-        <a
-          className="hover:underline"
-          target="_"
-          rel="noopenner noreferer"
-          href={`${Config.blockExplorer}tx/${txHash}`}>
-          <p> {`View on ${Config.blockExplorerName}`->React.string} </p>
-        </a>
+        <ViewOnBlockExplorer txHash />
       </div>
     | (_, ContractActions.Complete({transactionHash: _})) =>
       <div className="text-center m-3">
-        <p> {`Transaction complete`->React.string} </p> {resetFormButton()}
+        <p> {`Transaction complete 🎉`->React.string} </p> {resetFormButton()}
       </div>
     | (_, ContractActions.Declined(_message)) =>
       <div className="text-center m-3">
         <p> {`The transaction was rejected by your wallet`->React.string} </p>
-        <a target="_" rel="noopenner noreferer" href=Config.discordInviteLink>
-          {"Connect with us on discord, if you would like some assistance"->React.string}
-        </a>
+        <MessageUsOnDiscord />
         {resetFormButton()}
       </div>
-    | (_, ContractActions.Failed) =>
+    | (_, ContractActions.Failed(txHash)) =>
       <div className="text-center m-3">
         <h1> {`The transaction failed.`->React.string} </h1>
-        <p>
-          <a target="_" rel="noopenner noreferer" href=Config.discordInviteLink>
-            {"Connect with us on discord, if you would like some assistance"->React.string}
-          </a>
-        </p>
+        <ViewOnBlockExplorer txHash />
+        <MessageUsOnDiscord />
         {resetFormButton()}
       </div>
     | _ => <Button disabled=buttonDisabled onClick={_ => ()}> {buttonText} </Button>
@@ -259,8 +233,17 @@ module MintFormSignedIn = {
         contractExecutionHandler(
           ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
           ~contractFunction=isLong
-            ? Contracts.LongShort.mintLong(~marketIndex=market.marketIndex, ~amount)
-            : Contracts.LongShort.mintShort(~marketIndex=market.marketIndex, ~amount),
+            ? Contracts.LongShort.mintLong(
+                ~marketIndex=market.marketIndex,
+                ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("3")),
+              )
+            : Contracts.LongShort.mintShort(
+                ~marketIndex=market.marketIndex,
+                ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("3")),
+              ),
+          // TODO fix after, used for testing a failed tx
+          // ? Contracts.LongShort.mintLong(~marketIndex=market.marketIndex, ~amount)
+          // : Contracts.LongShort.mintShort(~marketIndex=market.marketIndex, ~amount),
         )
       let mintAndStakeFunction = () =>
         contractExecutionHandler(
@@ -360,7 +343,7 @@ module MintFormSignedIn = {
         toastDispatch(
           ToastProvider.Show(`Approve transaction confirmed`, "", ToastProvider.Success),
         )
-      | Failed =>
+      | Failed(_) =>
         toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
       | _ => ()
       }
@@ -378,7 +361,7 @@ module MintFormSignedIn = {
       | Complete(_) =>
         toastDispatch(ToastProvider.Show(`Mint transaction confirmed`, "", ToastProvider.Success))
         router->Next.Router.push(userPage)
-      | Failed =>
+      | Failed(_) =>
         toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
       | Declined(reason) =>
         toastDispatch(
