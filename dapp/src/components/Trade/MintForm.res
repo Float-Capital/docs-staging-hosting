@@ -235,15 +235,11 @@ module MintFormSignedIn = {
           ~contractFunction=isLong
             ? Contracts.LongShort.mintLong(
                 ~marketIndex=market.marketIndex,
-                ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("3")),
+                ~amount,
               )
             : Contracts.LongShort.mintShort(
                 ~marketIndex=market.marketIndex,
-                ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("3")),
-              ),
-          // TODO fix after, used for testing a failed tx
-          // ? Contracts.LongShort.mintLong(~marketIndex=market.marketIndex, ~amount)
-          // : Contracts.LongShort.mintShort(~marketIndex=market.marketIndex, ~amount),
+                ~amount,
         )
       let mintAndStakeFunction = () =>
         contractExecutionHandler(
