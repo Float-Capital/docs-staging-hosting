@@ -203,7 +203,7 @@ module ConnectedRedeemForm = {
         toastDispatch(
           ToastProvider.Show(`Approve transaction confirmed`, "", ToastProvider.Success),
         )
-      | Failed =>
+      | Failed(_) =>
         toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
       | _ => ()
       }
@@ -221,7 +221,7 @@ module ConnectedRedeemForm = {
       | Complete(_) =>
         toastDispatch(ToastProvider.Show(`Redeem transaction confirmed`, "", ToastProvider.Success))
         router->Next.Router.push(userPage)
-      | Failed =>
+      | Failed(_) =>
         toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
       | Declined(reason) =>
         toastDispatch(

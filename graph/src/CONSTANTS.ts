@@ -15,3 +15,5 @@ export let ZERO = BigInt.fromI32(0);
 export let ONE = BigInt.fromI32(1);
 export let BILLION = BigInt.fromI32(1000000000); // 10^9
 export let TEN_TO_THE_18 = BILLION.times(BILLION);
+
+export let FIVE_MINUTES_IN_SECONDS = BigInt.fromI32(300);

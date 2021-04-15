@@ -11207,55 +11207,55 @@
     "absolutePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/FloatToken.sol",
     "exportedSymbols": {
       "AccessControlEnumerableUpgradeable": [
-        6846
+        6867
       ],
       "AccessControlUpgradeable": [
-        7197
+        7218
       ],
       "AddressUpgradeable": [
-        8555
+        8576
       ],
       "ContextUpgradeable": [
-        8600
+        8621
       ],
       "ERC165Upgradeable": [
-        8646
+        8667
       ],
       "ERC20BurnableUpgradeable": [
-        8049
+        8070
       ],
       "ERC20PausableUpgradeable": [
-        8114
+        8135
       ],
       "ERC20PresetMinterPauserUpgradeable": [
-        8311
+        8332
       ],
       "ERC20Upgradeable": [
-        7885
+        7906
       ],
       "EnumerableSetUpgradeable": [
-        9173
+        9194
       ],
       "FloatToken": [
         104
       ],
       "IAccessControlEnumerableUpgradeable": [
-        6648
+        6669
       ],
       "IAccessControlUpgradeable": [
-        6890
+        6911
       ],
       "IERC165Upgradeable": [
-        8658
+        8679
       ],
       "IERC20Upgradeable": [
-        7963
+        7984
       ],
       "Initializable": [
-        7244
+        7265
       ],
       "PausableUpgradeable": [
-        7357
+        7378
       ]
     },
     "id": 105,
@@ -11279,7 +11279,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 105,
-        "sourceUnit": 8312,
+        "sourceUnit": 8333,
         "src": "57:104:2",
         "symbolAliases": [],
         "unitAlias": ""
@@ -11292,7 +11292,7 @@
               "id": 52,
               "name": "ERC20PresetMinterPauserUpgradeable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 8311,
+              "referencedDeclaration": 8332,
               "src": "186:34:2"
             },
             "id": 53,
@@ -11301,40 +11301,40 @@
           }
         ],
         "contractDependencies": [
-          6648,
-          6846,
-          6890,
-          7197,
-          7244,
-          7357,
-          7885,
-          7963,
-          8049,
-          8114,
-          8311,
-          8600,
-          8646,
-          8658
+          6669,
+          6867,
+          6911,
+          7218,
+          7265,
+          7378,
+          7906,
+          7984,
+          8070,
+          8135,
+          8332,
+          8621,
+          8667,
+          8679
         ],
         "contractKind": "contract",
         "fullyImplemented": true,
         "id": 104,
         "linearizedBaseContracts": [
           104,
-          8311,
-          8114,
-          7357,
-          8049,
-          7885,
-          7963,
-          6846,
-          7197,
-          8646,
-          8658,
-          6890,
-          8600,
-          6648,
-          7244
+          8332,
+          8135,
+          7378,
+          8070,
+          7906,
+          7984,
+          6867,
+          7218,
+          8667,
+          8679,
+          6911,
+          8621,
+          6669,
+          7265
         ],
         "name": "FloatToken",
         "nameLocation": "172:10:2",
@@ -11389,7 +11389,7 @@
                       "name": "initialize",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 8148,
+                      "referencedDeclaration": 8169,
                       "src": "370:10:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$__$",
@@ -11423,7 +11423,7 @@
                         "name": "DEFAULT_ADMIN_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 6935,
+                        "referencedDeclaration": 6956,
                         "src": "416:18:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -11458,9 +11458,9 @@
                       "name": "_setupRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        6841
+                        6862
                       ],
-                      "referencedDeclaration": 6841,
+                      "referencedDeclaration": 6862,
                       "src": "405:10:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -11494,7 +11494,7 @@
                         "name": "MINTER_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 8153,
+                        "referencedDeclaration": 8174,
                         "src": "471:11:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -11529,9 +11529,9 @@
                       "name": "_setupRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        6841
+                        6862
                       ],
-                      "referencedDeclaration": 6841,
+                      "referencedDeclaration": 6862,
                       "src": "460:10:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -11565,7 +11565,7 @@
                         "name": "PAUSER_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 8158,
+                        "referencedDeclaration": 8179,
                         "src": "519:11:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -11600,9 +11600,9 @@
                       "name": "_setupRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        6841
+                        6862
                       ],
-                      "referencedDeclaration": 6841,
+                      "referencedDeclaration": 6862,
                       "src": "508:10:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -11636,7 +11636,7 @@
                         "name": "DEFAULT_ADMIN_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 6935,
+                        "referencedDeclaration": 6956,
                         "src": "570:18:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -11685,9 +11685,9 @@
                       "name": "renounceRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        6817
+                        6838
                       ],
-                      "referencedDeclaration": 6817,
+                      "referencedDeclaration": 6838,
                       "src": "557:12:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -11721,7 +11721,7 @@
                         "name": "MINTER_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 8153,
+                        "referencedDeclaration": 8174,
                         "src": "624:11:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -11770,9 +11770,9 @@
                       "name": "renounceRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        6817
+                        6838
                       ],
-                      "referencedDeclaration": 6817,
+                      "referencedDeclaration": 6838,
                       "src": "611:12:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -11806,7 +11806,7 @@
                         "name": "PAUSER_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 8158,
+                        "referencedDeclaration": 8179,
                         "src": "671:11:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -11855,9 +11855,9 @@
                       "name": "renounceRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        6817
+                        6838
                       ],
-                      "referencedDeclaration": 6817,
+                      "referencedDeclaration": 6838,
                       "src": "658:12:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -11897,7 +11897,7 @@
                   "id": 61,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 7243,
+                  "referencedDeclaration": 7264,
                   "src": "348:11:2"
                 },
                 "nodeType": "ModifierInvocation",
@@ -12019,55 +12019,55 @@
     "absolutePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/FloatToken.sol",
     "exportedSymbols": {
       "AccessControlEnumerableUpgradeable": [
-        6846
+        6867
       ],
       "AccessControlUpgradeable": [
-        7197
+        7218
       ],
       "AddressUpgradeable": [
-        8555
+        8576
       ],
       "ContextUpgradeable": [
-        8600
+        8621
       ],
       "ERC165Upgradeable": [
-        8646
+        8667
       ],
       "ERC20BurnableUpgradeable": [
-        8049
+        8070
       ],
       "ERC20PausableUpgradeable": [
-        8114
+        8135
       ],
       "ERC20PresetMinterPauserUpgradeable": [
-        8311
+        8332
       ],
       "ERC20Upgradeable": [
-        7885
+        7906
       ],
       "EnumerableSetUpgradeable": [
-        9173
+        9194
       ],
       "FloatToken": [
         104
       ],
       "IAccessControlEnumerableUpgradeable": [
-        6648
+        6669
       ],
       "IAccessControlUpgradeable": [
-        6890
+        6911
       ],
       "IERC165Upgradeable": [
-        8658
+        8679
       ],
       "IERC20Upgradeable": [
-        7963
+        7984
       ],
       "Initializable": [
-        7244
+        7265
       ],
       "PausableUpgradeable": [
-        7357
+        7378
       ]
     },
     "id": 105,
@@ -12091,7 +12091,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 105,
-        "sourceUnit": 8312,
+        "sourceUnit": 8333,
         "src": "57:104:2",
         "symbolAliases": [],
         "unitAlias": ""
@@ -12104,7 +12104,7 @@
               "id": 52,
               "name": "ERC20PresetMinterPauserUpgradeable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 8311,
+              "referencedDeclaration": 8332,
               "src": "186:34:2"
             },
             "id": 53,
@@ -12113,40 +12113,40 @@
           }
         ],
         "contractDependencies": [
-          6648,
-          6846,
-          6890,
-          7197,
-          7244,
-          7357,
-          7885,
-          7963,
-          8049,
-          8114,
-          8311,
-          8600,
-          8646,
-          8658
+          6669,
+          6867,
+          6911,
+          7218,
+          7265,
+          7378,
+          7906,
+          7984,
+          8070,
+          8135,
+          8332,
+          8621,
+          8667,
+          8679
         ],
         "contractKind": "contract",
         "fullyImplemented": true,
         "id": 104,
         "linearizedBaseContracts": [
           104,
-          8311,
-          8114,
-          7357,
-          8049,
-          7885,
-          7963,
-          6846,
-          7197,
-          8646,
-          8658,
-          6890,
-          8600,
-          6648,
-          7244
+          8332,
+          8135,
+          7378,
+          8070,
+          7906,
+          7984,
+          6867,
+          7218,
+          8667,
+          8679,
+          6911,
+          8621,
+          6669,
+          7265
         ],
         "name": "FloatToken",
         "nameLocation": "172:10:2",
@@ -12201,7 +12201,7 @@
                       "name": "initialize",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 8148,
+                      "referencedDeclaration": 8169,
                       "src": "370:10:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$__$",
@@ -12235,7 +12235,7 @@
                         "name": "DEFAULT_ADMIN_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 6935,
+                        "referencedDeclaration": 6956,
                         "src": "416:18:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -12270,9 +12270,9 @@
                       "name": "_setupRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        6841
+                        6862
                       ],
-                      "referencedDeclaration": 6841,
+                      "referencedDeclaration": 6862,
                       "src": "405:10:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -12306,7 +12306,7 @@
                         "name": "MINTER_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 8153,
+                        "referencedDeclaration": 8174,
                         "src": "471:11:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -12341,9 +12341,9 @@
                       "name": "_setupRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        6841
+                        6862
                       ],
-                      "referencedDeclaration": 6841,
+                      "referencedDeclaration": 6862,
                       "src": "460:10:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -12377,7 +12377,7 @@
                         "name": "PAUSER_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 8158,
+                        "referencedDeclaration": 8179,
                         "src": "519:11:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -12412,9 +12412,9 @@
                       "name": "_setupRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        6841
+                        6862
                       ],
-                      "referencedDeclaration": 6841,
+                      "referencedDeclaration": 6862,
                       "src": "508:10:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -12448,7 +12448,7 @@
                         "name": "DEFAULT_ADMIN_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 6935,
+                        "referencedDeclaration": 6956,
                         "src": "570:18:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -12497,9 +12497,9 @@
                       "name": "renounceRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        6817
+                        6838
                       ],
-                      "referencedDeclaration": 6817,
+                      "referencedDeclaration": 6838,
                       "src": "557:12:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -12533,7 +12533,7 @@
                         "name": "MINTER_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 8153,
+                        "referencedDeclaration": 8174,
                         "src": "624:11:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -12582,9 +12582,9 @@
                       "name": "renounceRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        6817
+                        6838
                       ],
-                      "referencedDeclaration": 6817,
+                      "referencedDeclaration": 6838,
                       "src": "611:12:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -12618,7 +12618,7 @@
                         "name": "PAUSER_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 8158,
+                        "referencedDeclaration": 8179,
                         "src": "671:11:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -12667,9 +12667,9 @@
                       "name": "renounceRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        6817
+                        6838
                       ],
-                      "referencedDeclaration": 6817,
+                      "referencedDeclaration": 6838,
                       "src": "658:12:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -12709,7 +12709,7 @@
                   "id": 61,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 7243,
+                  "referencedDeclaration": 7264,
                   "src": "348:11:2"
                 },
                 "nodeType": "ModifierInvocation",
@@ -12987,12 +12987,12 @@
         }
       },
       "links": {},
-      "address": "0xb4e4b3173E8cF526d17D90B944247B8271027fBe",
-      "transactionHash": "0x1b07fced763804befefa81ac775c68f87eedc1d50529f59b9539c185a9a9c41e"
+      "address": "0xCdF5FB5f4F8eAfd64749ac97c3C65D224Bf0A007",
+      "transactionHash": "0x09bb4aa8d7c411bed99c62970f3443da4ddff6e90594bb74bb46a2ca66390ee2"
     }
   },
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-04-11T12:39:03.281Z",
+  "updatedAt": "2021-04-13T11:56:40.873Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

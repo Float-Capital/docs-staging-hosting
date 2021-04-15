@@ -4,7 +4,6 @@ import * as React from "react";
 import * as Button from "./Button.js";
 import * as Ethers from "ethers";
 import * as Globals from "../../libraries/Globals.js";
-import * as Tooltip from "./Tooltip.js";
 import * as CONSTANTS from "../../CONSTANTS.js";
 import * as DataHooks from "../../data/DataHooks.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
@@ -329,8 +328,6 @@ function UserUI$UserFloatCard(Props) {
                 className: "flex justify-around flex-row my-1"
               }, "🌊", React.createElement(ClaimFloat.make, {
                     tokenAddresses: synthTokens
-                  }), React.createElement(Tooltip.make, {
-                    tip: "Claiming float is still under development, only partial withdrawals are possible currently"
                   }), "🌊") : null);
   }
   return React.createElement(UserUI$UserColumnCard, {

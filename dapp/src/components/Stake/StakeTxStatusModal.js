@@ -5,6 +5,8 @@ import * as Modal from "../UI/Modal.js";
 import * as React from "react";
 import * as Config from "../../Config.js";
 import * as MiniLoader from "../UI/MiniLoader.js";
+import * as MessageUsOnDiscord from "../Ethereum/MessageUsOnDiscord.js";
+import * as ViewOnBlockExplorer from "../Ethereum/ViewOnBlockExplorer.js";
 
 function StakeTxStatusModal(Props) {
   var txStateApprove = Props.txStateApprove;
@@ -13,30 +15,15 @@ function StakeTxStatusModal(Props) {
   var tokenToStake = Props.tokenToStake;
   var exit = 0;
   if (typeof txStateApprove === "number") {
-    switch (txStateApprove) {
-      case /* UnInitialised */0 :
-          exit = 1;
-          break;
-      case /* Created */1 :
-          return React.createElement(Modal.make, {
-                      id: "stake-approve-1",
-                      children: React.createElement("div", {
-                            className: "text-center m-3"
-                          }, React.createElement("p", undefined, "Confirm approve transaction in your wallet "))
-                    });
-      case /* Failed */2 :
-          return React.createElement(Modal.make, {
-                      id: "stake-approve-4",
-                      children: React.createElement("div", {
-                            className: "text-center m-3"
-                          }, React.createElement("p", undefined, "The transaction failed."), React.createElement("p", undefined, React.createElement("a", {
-                                    href: Config.discordInviteLink,
-                                    rel: "noopenner noreferer",
-                                    target: "_"
-                                  }, "Connect with us on discord, if you would like some assistance")), Curry._1(resetFormButton, undefined))
-                    });
-      
+    if (txStateApprove !== /* UnInitialised */0) {
+      return React.createElement(Modal.make, {
+                  id: "stake-approve-1",
+                  children: React.createElement("div", {
+                        className: "text-center m-3"
+                      }, React.createElement("p", undefined, "Confirm approve transaction in your wallet "))
+                });
     }
+    exit = 1;
   } else {
     switch (txStateApprove.TAG | 0) {
       case /* SignedAndSubmitted */0 :
@@ -44,24 +31,15 @@ function StakeTxStatusModal(Props) {
                       id: "stake-approve-2",
                       children: React.createElement("div", {
                             className: "text-center m-3"
-                          }, React.createElement(MiniLoader.make, {}), React.createElement("p", undefined, "Approval transaction pending... "), React.createElement("a", {
-                                href: Config.blockExplorer + "tx/" + txStateApprove._0,
-                                rel: "noopenner noreferer",
-                                target: "_"
-                              }, React.createElement("p", undefined, "View on " + Config.blockExplorerName)))
+                          }, React.createElement(MiniLoader.make, {}), React.createElement("p", undefined, "Approval transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                                txHash: txStateApprove._0
+                              }))
                     });
       case /* Declined */1 :
           return React.createElement(React.Fragment, undefined, Curry._1(resetFormButton, undefined));
       case /* Complete */2 :
           if (typeof txStateStake === "number") {
-            switch (txStateStake) {
-              case /* UnInitialised */0 :
-              case /* Created */1 :
-                  exit = 2;
-                  break;
-              default:
-                exit = 1;
-            }
+            exit = 2;
           } else {
             if (txStateStake.TAG === /* SignedAndSubmitted */0) {
               return React.createElement(Modal.make, {
@@ -82,69 +60,66 @@ function StakeTxStatusModal(Props) {
             exit = 1;
           }
           break;
+      case /* Failed */3 :
+          return React.createElement(Modal.make, {
+                      id: "stake-approve-4",
+                      children: React.createElement("div", {
+                            className: "text-center m-3"
+                          }, React.createElement("p", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
+                                txHash: txStateApprove._0
+                              }), React.createElement(MessageUsOnDiscord.make, {}), Curry._1(resetFormButton, undefined))
+                    });
       
     }
   }
   switch (exit) {
     case 1 :
         if (typeof txStateStake === "number") {
-          switch (txStateStake) {
-            case /* UnInitialised */0 :
-                return null;
-            case /* Created */1 :
-                return React.createElement(Modal.make, {
-                            id: "stake-1",
-                            children: React.createElement("div", {
-                                  className: "text-center m-3"
-                                }, React.createElement("h1", undefined, "Confirm the transaction to stake " + tokenToStake))
-                          });
-            case /* Failed */2 :
-                return React.createElement(Modal.make, {
-                            id: "stake-6",
-                            children: React.createElement("div", {
-                                  className: "text-center m-3"
-                                }, React.createElement("h1", undefined, "The transaction failed."), React.createElement("p", undefined, React.createElement("a", {
-                                          href: Config.discordInviteLink,
-                                          rel: "noopenner noreferer",
-                                          target: "_"
-                                        }, "Connect with us on discord, if you would like some assistance")), Curry._1(resetFormButton, undefined))
-                          });
-            
+          if (txStateStake === /* UnInitialised */0) {
+            return null;
+          } else {
+            return React.createElement(Modal.make, {
+                        id: "stake-1",
+                        children: React.createElement("div", {
+                              className: "text-center m-3"
+                            }, React.createElement("h1", undefined, "Confirm the transaction to stake " + tokenToStake))
+                      });
           }
-        } else {
-          switch (txStateStake.TAG | 0) {
-            case /* SignedAndSubmitted */0 :
-                return React.createElement(Modal.make, {
-                            id: "stake-3",
-                            children: React.createElement("div", {
-                                  className: "text-center m-3"
-                                }, React.createElement(MiniLoader.make, {}), React.createElement("p", undefined, "Staking transaction pending... "), React.createElement("a", {
-                                      className: "hover:underline",
-                                      href: Config.blockExplorer + "tx/" + txStateStake._0,
-                                      rel: "noopenner noreferer",
-                                      target: "_"
-                                    }, React.createElement("p", undefined, "View on " + Config.blockExplorerName)))
-                          });
-            case /* Declined */1 :
-                return React.createElement(Modal.make, {
-                            id: "stake-5",
-                            children: React.createElement("div", {
-                                  className: "text-center m-3"
-                                }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement("a", {
-                                      href: Config.discordInviteLink,
-                                      rel: "noopenner noreferer",
-                                      target: "_"
-                                    }, "Connect with us on discord, if you would like some assistance"), Curry._1(resetFormButton, undefined))
-                          });
-            case /* Complete */2 :
-                return React.createElement(Modal.make, {
-                            id: "stake-4",
-                            children: React.createElement("div", {
-                                  className: "text-center m-3"
-                                }, React.createElement("p", undefined, "Transaction complete"), Curry._1(resetFormButton, undefined))
-                          });
-            
-          }
+        }
+        switch (txStateStake.TAG | 0) {
+          case /* SignedAndSubmitted */0 :
+              return React.createElement(Modal.make, {
+                          id: "stake-3",
+                          children: React.createElement("div", {
+                                className: "text-center m-3"
+                              }, React.createElement(MiniLoader.make, {}), React.createElement("p", undefined, "Staking transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                                    txHash: txStateStake._0
+                                  }))
+                        });
+          case /* Declined */1 :
+              return React.createElement(Modal.make, {
+                          id: "stake-5",
+                          children: React.createElement("div", {
+                                className: "text-center m-3"
+                              }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {}), Curry._1(resetFormButton, undefined))
+                        });
+          case /* Complete */2 :
+              return React.createElement(Modal.make, {
+                          id: "stake-4",
+                          children: React.createElement("div", {
+                                className: "text-center m-3"
+                              }, React.createElement("p", undefined, "Transaction complete 🎉"), Curry._1(resetFormButton, undefined))
+                        });
+          case /* Failed */3 :
+              return React.createElement(Modal.make, {
+                          id: "stake-6",
+                          children: React.createElement("div", {
+                                className: "text-center m-3"
+                              }, React.createElement("h1", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
+                                    txHash: txStateStake._0
+                                  }), React.createElement(MessageUsOnDiscord.make, {}), Curry._1(resetFormButton, undefined))
+                        });
+          
         }
     case 2 :
         return React.createElement(Modal.make, {

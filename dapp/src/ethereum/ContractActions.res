@@ -17,14 +17,6 @@ let getSigner = (library: Ethers.Providers.t, account: option<Ethers.ethAddress>
   | None => None
   }
 
-let getLongShortContractAddress = chainId =>
-  switch chainId {
-  | 137 => "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063"
-  | 80001 => "0xeb37A6dF956F1997085498aDd98b25a2f633d83F"
-  | 5
-  | _ => "0xba97BeC8d359D73c81D094421803D968A9FBf676"
-  }->Ethers.Utils.getAddressUnsafe
-
 let useProviderOrSigner = () => {
   let context = RootProvider.useWeb3React()
 
@@ -68,7 +60,7 @@ type transactionState =
   // | SignMetaTxDclined(string)
   // | ServerError(string)
   | Complete(txResult)
-  | Failed
+  | Failed(string)
 
 let useContractFunction = (~signer: Ethers.Wallet.t) => {
   let (txState, setTxState) = React.useState(() => UnInitialised)
@@ -98,11 +90,32 @@ let useContractFunction = (~signer: Ethers.Wallet.t) => {
           tx.wait(.)
         })
         ->JsPromise.map(txOutcome => {
-          Js.log(txOutcome)
           setTxState(_ => Complete(txOutcome))
         })
         ->JsPromise.catch(error => {
-          setTxState(_ => Failed)
+          let txHash = switch error->Js.Exn.asJsExn {
+          | Some(err) => {
+              let exceptionMessage = err->Js.Exn.message->Option.getWithDefault("")
+
+              let txHashRegex = %re(`/transactionHash="(.{66})/`)
+
+              let txHashOpt = txHashRegex->Js.Re.exec_(exceptionMessage)
+
+              let txHashNullable = switch txHashOpt {
+              | Some(hash) => Js.Re.captures(hash)[1]->Option.getWithDefault(Js.Nullable.return(""))
+              | None => Js.Nullable.return("")
+              }
+
+              let txHash: string = switch Js.Nullable.toOption(txHashNullable) {
+              | Some(hash) => hash
+              | None => ""
+              }
+              txHash
+            }
+          | None => ""
+          }
+
+          setTxState(_ => Failed(txHash))
           Js.log(error)->JsPromise.resolve
         })
     },

@@ -20,14 +20,16 @@ var Events = {};
 
 function pushShallow(routerObj, queryString) {
   routerObj.push(queryString, undefined, {
-        shallow: true
+        shallow: true,
+        scroll: true
       });
   
 }
 
 function pushObjShallow(routerObj, pathObj) {
   routerObj.push(pathObj, undefined, {
-        shallow: true
+        shallow: true,
+        scroll: true
       });
   
 }

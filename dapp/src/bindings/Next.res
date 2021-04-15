@@ -112,19 +112,44 @@ module Router = {
   }
 
   @send external push: (router, string) => unit = "push"
-  type pushOptions = {shallow: bool}
+  type pushOptions = {shallow: bool, scroll: bool}
   @send external pushOptions: (router, string, option<unit>, pushOptions) => unit = "push"
   let pushShallow = (routerObj, queryString) =>
-    pushOptions(routerObj, queryString, None, {shallow: true})
+    pushOptions(routerObj, queryString, None, {shallow: true, scroll: true})
   @send external pushObj: (router, pathObj) => unit = "push"
   @send external pushObjOptions: (router, pathObj, option<unit>, pushOptions) => unit = "push"
   let pushObjShallow = (routerObj, pathObj) =>
-    pushObjOptions(routerObj, pathObj, None, {shallow: true})
+    pushObjOptions(routerObj, pathObj, None, {shallow: true, scroll: true})
+
+  @send external pushPromise: (router, string) => JsPromise.t<unit> = "push"
+  @send external pushObjPromise: (router, pathObj) => JsPromise.t<unit> = "push"
+  @send
+  external pushObjOptionsPromise: (
+    router,
+    pathObj,
+    option<unit>,
+    pushOptions,
+  ) => JsPromise.t<unit> = "push"
+  @send
+  external pushOptionsPromise: (router, string, option<unit>, pushOptions) => JsPromise.t<unit> =
+    "push"
 
   @module("next/router") external useRouter: unit => router = "useRouter"
 
   @send external replace: (router, string) => unit = "replace"
   @send external replaceObj: (router, pathObj) => unit = "replace"
+
+  @send external replacePromise: (router, string) => JsPromise.t<unit> = "replace"
+  @send
+  external replaceObjOptionsPromise: (
+    router,
+    pathObj,
+    option<unit>,
+    pushOptions,
+  ) => JsPromise.t<unit> = "replace"
+  @send
+  external replaceOptionsPromise: (router, string, option<unit>, pushOptions) => JsPromise.t<unit> =
+    "replace"
 }
 
 module Head = {

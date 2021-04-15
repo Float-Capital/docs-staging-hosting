@@ -92,11 +92,18 @@ let myfloatCalc = (
   }
 }
 
+type handleStakeButtonPress =
+  | WaitingForInteraction
+  | Loading
+  | Form(string)
+  | Redirect({marketIndex: string, actionOption: string})
+
 @react.component
 let make = (
   ~syntheticMarket as {
     name: marketName,
     timestampCreated,
+    marketIndex,
     latestSystemState: {
       timestamp: currentTimestamp,
       totalLockedLong,
@@ -107,9 +114,11 @@ let make = (
     syntheticShort: {totalStaked: shortTotalStaked, tokenAddress: shortTokenAddress},
     syntheticLong: {totalStaked: longTotalStaked, tokenAddress: longTokenAddress},
   }: Queries.SyntheticMarketInfo.t,
+  ~optUserBalanceAddressSet=None: option<DataHooks.graphResponse<HashSet.String.t>>,
 ) => {
   let router = Next.Router.useRouter()
 
+  let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
   let apy = useAPY()
 
   let longDollarValueStaked = calculateDollarValue(
@@ -167,17 +176,97 @@ let make = (
     <div className="flex flex-wrap justify-evenly">
       <Button.Small
         onClick={_ => {
-          router->Next.Router.push(`/stake?tokenAddress=${longTokenAddress->ethAdrToLowerStr}`)
+          router->Next.Router.pushOptions(
+            `/stake?tokenAddress=${longTokenAddress->ethAdrToLowerStr}`,
+            None,
+            {shallow: true, scroll: false},
+          )
         }}>
         "Stake Long"
       </Button.Small>
       <Button.Small
         onClick={_ => {
-          router->Next.Router.push(`/stake?tokenAddress=${shortTokenAddress->ethAdrToLowerStr}`)
+          router->Next.Router.pushOptions(
+            `/stake?tokenAddress=${shortTokenAddress->ethAdrToLowerStr}`,
+            None,
+            {shallow: true, scroll: false},
+          )
         }}>
         "Stake Short"
       </Button.Small>
     </div>
+
+  let stakeButtonPressState: handleStakeButtonPress =
+    stakeOption->Option.mapWithDefault(WaitingForInteraction, tokenAddress => {
+      let longAdrLower = longTokenAddress->ethAdrToLowerStr
+      let shortAdrLower = shortTokenAddress->ethAdrToLowerStr
+
+      if tokenAddress == longAdrLower || tokenAddress == shortAdrLower {
+        let redirect = () => Redirect({
+          actionOption: tokenAddress == longAdrLower ? "long" : "short",
+          marketIndex: marketIndex->Ethers.BigNumber.toString,
+        })
+        switch optUserBalanceAddressSet {
+        | Some(Loading) => Loading
+        | Some(Response(set)) =>
+          set->HashSet.String.has(
+            tokenAddress->Ethers.Utils.getAddressUnsafe->Ethers.Utils.ethAdrToStr,
+          )
+            ? Form(tokenAddress)
+            : redirect()
+        | _ => redirect()
+        }
+      } else {
+        WaitingForInteraction
+      }
+    })
+
+  React.useEffect1(_ => {
+    switch stakeButtonPressState {
+    | Redirect({actionOption, marketIndex}) => {
+        let routeToMint = () =>
+          router
+          ->Next.Router.pushPromise(
+            `/markets?marketIndex=${marketIndex}&actionOption=${actionOption}&tab=mint`,
+          )
+          ->JsPromise.then(_ => {
+            let _ = toastDispatch(
+              ToastProvider.Show(
+                `Mint some  ${marketName} ${actionOption} tokens to stake.`,
+                "",
+                ToastProvider.Info,
+              ),
+            )
+            ()->JsPromise.resolve
+          })
+          ->JsPromise.catch(e => {
+            Js.log(e)
+            ()->JsPromise.resolve
+          })
+        let _ =
+          router
+          ->Next.Router.replaceOptionsPromise(`/stake`, None, {shallow: true, scroll: false}) // for if user presses back
+          ->JsPromise.then(_ => routeToMint()->JsPromise.resolve)
+          ->JsPromise.catch(e => {
+            Js.log(e)
+            routeToMint()->JsPromise.resolve
+          })
+      }
+    | _ => ()
+    }
+    None
+  }, [stakeButtonPressState])
+
+  let closeStakeFormButton = () =>
+    <button
+      className="absolute left-full pl-4 text-3xl leading-none outline-none focus:outline-none"
+      onClick={_ => {
+        router->Next.Router.pushOptions(`/stake`, None, {shallow: true, scroll: false})
+      }}>
+      <span className="opacity-4 block outline-none focus:outline-none">
+        {`×`->React.string}
+      </span>
+    </button>
 
   <>
     <div className="p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg">
@@ -219,13 +308,13 @@ let make = (
         />
         <div className="block md:hidden pt-5 order-4 w-full"> {stakeButtons()} </div>
       </div>
-      {switch stakeOption {
-      | Some(tokenAddress) =>
-        tokenAddress == longTokenAddress->ethAdrToLowerStr ||
-          tokenAddress == shortTokenAddress->ethAdrToLowerStr
-          ? <StakeForm tokenId=tokenAddress />
-          : React.null
-      | None => React.null
+      {switch stakeButtonPressState {
+      | Form(tokenAddress) =>
+        <div className="w-96 mx-auto relative">
+          {closeStakeFormButton()} <StakeForm tokenId=tokenAddress />
+        </div>
+      | Loading => <Loader />
+      | _ => React.null
       }}
     </div>
   </>

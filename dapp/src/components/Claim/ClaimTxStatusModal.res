@@ -12,13 +12,7 @@ let make = (~txState) => {
       <div className="text-center m-3">
         <MiniLoader />
         <p> {"Claiming transaction pending... "->React.string} </p>
-        <a
-          className="hover:underline"
-          target="_"
-          rel="noopenner noreferer"
-          href={`${Config.blockExplorer}tx/${txHash}`}>
-          <p> {`view tx on ${Config.blockExplorerName}`->React.string} </p>
-        </a>
+        <ViewOnBlockExplorer txHash />
       </div>
     </Modal>
   | ContractActions.Complete({transactionHash: _}) =>
@@ -29,20 +23,15 @@ let make = (~txState) => {
     <Modal id={4}>
       <div className="text-center m-3">
         <p> {`The transaction was rejected by your wallet`->React.string} </p>
-        <a target="_" rel="noopenner noreferer" href=Config.discordInviteLink>
-          {"Connect with us on discord, if you would like some assistance"->React.string}
-        </a>
+        <MessageUsOnDiscord />
       </div>
     </Modal>
-  | ContractActions.Failed =>
+  | ContractActions.Failed(txHash) =>
     <Modal id={5}>
       <div className="text-center m-3">
         <h1> {`The transaction failed.`->React.string} </h1>
-        <p>
-          <a target="_" rel="noopenner noreferer" href=Config.discordInviteLink>
-            {"Connect with us on discord, if you would like some assistance"->React.string}
-          </a>
-        </p>
+        <ViewOnBlockExplorer txHash />
+        <MessageUsOnDiscord />
       </div>
     </Modal>
   | _ => React.null

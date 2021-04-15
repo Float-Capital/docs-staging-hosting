@@ -10,14 +10,6 @@ import * as ReasonMLCommunity__ApolloClient from "rescript-apollo-client/src/Rea
 import * as ApolloClient__Link_Http_HttpLink from "rescript-apollo-client/src/@apollo/client/link/http/ApolloClient__Link_Http_HttpLink.js";
 import * as ApolloClient__Cache_InMemory_InMemoryCache from "rescript-apollo-client/src/@apollo/client/cache/inmemory/ApolloClient__Cache_InMemory_InMemoryCache.js";
 
-function chainContextToStr(chain) {
-  if (chain) {
-    return "db";
-  } else {
-    return "graph";
-  }
-}
-
 function createContext(queryType) {
   return {
           context: queryType
@@ -53,27 +45,42 @@ function getAuthHeaders(user) {
   
 }
 
-function querySwitcherLink(graphUri, dbUri, user) {
+function querySwitcherLink(user) {
   var headers = getAuthHeaders(user);
   return ReasonMLCommunity__ApolloClient.Link.split((function (operation) {
                 var context = operation.getContext();
-                if (context !== undefined && context.context) {
-                  return false;
+                if (context === undefined) {
+                  return true;
+                }
+                var context$1 = context.context;
+                if (context$1 !== undefined) {
+                  return context$1 === 0;
                 } else {
                   return true;
                 }
-              }), httpLink(graphUri), ApolloClient__Link_Http_HttpLink.make((function (param) {
-                    return dbUri;
-                  }), undefined, undefined, Caml_option.some(headers !== undefined ? headers : (function (prim) {
-                          return {};
-                        })), undefined, undefined, undefined, undefined));
+              }), httpLink(Config.graphEndpoint), ReasonMLCommunity__ApolloClient.Link.split((function (operation) {
+                    var context = operation.getContext();
+                    var isPriceHistory;
+                    if (context !== undefined) {
+                      var match = context.context;
+                      isPriceHistory = match !== undefined ? match === 1 : false;
+                    } else {
+                      isPriceHistory = false;
+                    }
+                    console.log("isPriceHistory", isPriceHistory);
+                    return isPriceHistory;
+                  }), httpLink(Config.priceHistoryGraphEndpoint), ApolloClient__Link_Http_HttpLink.make((function (param) {
+                        return "TODO: no (hasura) backend configured yet - http://localhost:8080/v1/graphql";
+                      }), undefined, undefined, Caml_option.some(headers !== undefined ? headers : (function (prim) {
+                              return {};
+                            })), undefined, undefined, undefined, undefined)));
 }
 
-function makeClient(graphUri, dbUri, user) {
-  return ApolloClient.make(undefined, undefined, undefined, Caml_option.some(querySwitcherLink(graphUri, dbUri, user)), ApolloClient__Cache_InMemory_InMemoryCache.make(undefined, undefined, undefined, undefined, undefined, undefined), undefined, undefined, true, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+function makeClient(user) {
+  return ApolloClient.make(undefined, undefined, undefined, Caml_option.some(querySwitcherLink(user)), ApolloClient__Cache_InMemory_InMemoryCache.make(undefined, undefined, undefined, undefined, undefined, undefined), undefined, undefined, true, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
 }
 
-var defaultClient = makeClient(Config.graphEndpoint, "http://localhost:8080/v1/graphql", undefined);
+var defaultClient = makeClient(undefined);
 
 var context = React.createContext(defaultClient);
 
@@ -120,7 +127,6 @@ function Client$1(Props) {
 var make = Client$1;
 
 export {
-  chainContextToStr ,
   createContext ,
   httpLink ,
   setSignInData ,

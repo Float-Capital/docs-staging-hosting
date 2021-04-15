@@ -14,9 +14,21 @@ import Router from "next/router";
 import withGA from "next-ga";
 import NProgress from "nprogress"; //nprogress module
 import "nprogress/nprogress.css"; //styles of nprogress//Binding events.
-Router.events.on("routeChangeStart", () => NProgress.start());
-Router.events.on("routeChangeComplete", () => NProgress.done());
-Router.events.on("routeChangeError", () => NProgress.done());
+Router.events.on("routeChangeStart", (_url, options) => {
+  if (!options?.shallow) {
+    NProgress.start();
+  }
+});
+Router.events.on("routeChangeComplete", (_url, options) => {
+  if (!options?.shallow) {
+    NProgress.done();
+  }
+});
+Router.events.on("routeChangeError", (_url, options) => {
+  if (!options?.shallow) {
+    NProgress.done();
+  }
+});
 
 const googleAnalyticsMeasurementId = "G-CP1WC8846P";
 
