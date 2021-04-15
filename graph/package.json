@@ -4,13 +4,20 @@
   "license": "UNLICENSED",
   "scripts": {
     "create-local": "graph create float-capital/float-capital --node http://127.0.0.1:8020",
+    "create-price-history-local": "graph create float-capital/float-oracle-prices --node http://127.0.0.1:8020",
     "codegen": "graph codegen",
+    "codegen-price-history": "graph codegen -o generated-price-history subgraph.priceHistory.yaml",
     "build": "graph build",
+    "build-price-history": "graph build subgraph.priceHistory.yaml",
     "deploy-mainnet": "graph deploy float-capital/float-capital --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
     "deploy-testnet": "graph deploy float-capital/testnet --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ./subgraph.kovan.yaml",
     "deploy-testnet-dev": "graph deploy float-capital/testnet-dev --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ./subgraph.kovan.yaml",
+    "deploy-price-history-testnet": "graph deploy float-capital/testnet-price-history --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ./subgraph.priceHistory.kovan.yaml",
+    "deploy-price-history-testnet-dev": "graph deploy float-capital/testnet-price-history-dev --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ./subgraph.priceHistory.kovan.yaml",
     "deploy-local": "graph deploy float-capital/float-capital --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.ganache.yaml",
+    "deploy-price-history-local": "graph deploy float-capital/float-oracle-prices --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.priceHistory.yaml",
     "deploy-local-kovan": "graph deploy float-capital/float-capital --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.kovan.yaml",
+    "deploy-price-history-local-kovan": "graph deploy float-capital/float-oracle-prices --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.priceHistory.kovan.yaml",
     "update-testnet-graph": "yarn codegen ; cd .. && node ./scripts/graph.js ; cd graph && yarn deploy-testnet"
   },
   "devDependencies": {

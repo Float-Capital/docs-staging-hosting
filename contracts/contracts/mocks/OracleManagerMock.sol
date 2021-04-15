@@ -44,7 +44,9 @@ contract OracleManagerMock is IOracleManager, Initializable {
         currentPrice = newPrice;
     }
 
-    function updatePrice() external override {}
+    function updatePrice() external override returns (int256) {
+        return currentPrice;
+    }
 
     function getLatestPrice() external view override returns (int256) {
         return currentPrice;

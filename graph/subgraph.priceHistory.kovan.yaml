@@ -1,0 +1,45 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.priceHistory.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: LongShort
+    network: kovan
+    source:
+      address: "0xA1c26CB492e50647d9742975f0876ae77d57D03e"
+      abi: LongShort
+      startBlock: 24240369
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - SyntheticTokenCreated
+      abis:
+        - name: LongShort
+          file: ./abis/LongShort.json
+        - name: OracleManager
+          file: ./abis/OracleManager.json
+      eventHandlers:
+        - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
+          handler: handleSyntheticTokenCreated
+      blockHandlers:
+        - handler: handleBlock
+      file: ./src/priceHistory.ts
+
+templates:
+  - kind: ethereum/contract
+    name: OracleManager
+    network: kovan
+    source:
+      abi: OracleManager
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      abis:
+        - name: OracleManager
+          file: ./abis/OracleManager.json
+      language: wasm/assemblyscript
+      entities: []
+      eventHandlers: []
+      file: ./src/priceHistory.ts

@@ -7,8 +7,9 @@ import * as Js_json from "bs-platform/lib/es6/js_json.js";
 import * as CONSTANTS from "../CONSTANTS.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import FromUnixTime from "date-fns/fromUnixTime";
 
-function parse(json) {
+function jsonToBigInt(json) {
   var str = Js_json.decodeString(json);
   if (str !== undefined) {
     return Ethers$1.BigNumber.from(str);
@@ -23,11 +24,11 @@ function serialize(bn) {
 }
 
 var $$BigInt = {
-  parse: parse,
+  parse: jsonToBigInt,
   serialize: serialize
 };
 
-function parse$1(json) {
+function parse(json) {
   var str = Js_json.decodeString(json);
   if (str !== undefined) {
     return str;
@@ -42,11 +43,11 @@ function serialize$1(bytesString) {
 }
 
 var Bytes = {
-  parse: parse$1,
+  parse: parse,
   serialize: serialize$1
 };
 
-function parse$2(json) {
+function parse$1(json) {
   var address = Belt_Option.flatMap(Js_json.decodeString(json), Ethers.Utils.getAddress);
   if (address !== undefined) {
     return Caml_option.valFromOption(address);
@@ -59,14 +60,29 @@ function parse$2(json) {
 var serialize$2 = Globals.ethAdrToLowerStr;
 
 var Address = {
-  parse: parse$2,
+  parse: parse$1,
   serialize: serialize$2
 };
 
+function parse$2(json) {
+  return FromUnixTime(jsonToBigInt(json).toNumber());
+}
+
+function serialize$3(_jsDate) {
+  return "not implemented";
+}
+
+var $$Date = {
+  parse: parse$2,
+  serialize: serialize$3
+};
+
 export {
+  jsonToBigInt ,
   $$BigInt ,
   Bytes ,
   Address ,
+  $$Date ,
   
 }
 /* Ethers Not a pure module */

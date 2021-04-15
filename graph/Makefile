@@ -6,6 +6,10 @@ clear-data:
 graph-test:
 	./start-graph.sh
 
+.PHONY: graph-price-history-test
+graph-price-history-test:
+	PRICE_HISTORY="TRUE" ./start-graph.sh
+
 .PHONY: setup-binance-test-graph
 setup-binance-test-graph:
 	docker-compose -f docker-compose.binance-test.yaml up -d

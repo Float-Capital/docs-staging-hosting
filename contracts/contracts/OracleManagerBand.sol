@@ -57,13 +57,18 @@ contract OracleManagerBand is IOracleManager, Initializable {
     ////////////////////////////////////
     ///// IMPLEMENTATION ///////////////
     ////////////////////////////////////
-
-    function updatePrice() external override {}
-
-    function getLatestPrice() external view override returns (int256) {
+    function _getLatestPrice() internal view returns (int256) {
         IBandOracle.ReferenceData memory data =
             bandOracle.getReferenceData(base, quote);
 
         return int256(data.rate);
+    }
+
+    function getLatestPrice() external view override returns (int256) {
+        return _getLatestPrice();
+    }
+
+    function updatePrice() external override returns (int256) {
+        return _getLatestPrice();
     }
 }

@@ -7,6 +7,8 @@ var match = config.contracts;
 
 var graphEndpoint = config.graphEndpoint;
 
+var priceHistoryGraphEndpoint = config.priceHistoryGraphEndpoint;
+
 var networkId = config.networkId;
 
 var networkName = config.networkName;
@@ -30,6 +32,7 @@ var floatToken = match.FloatToken;
 export {
   config ,
   graphEndpoint ,
+  priceHistoryGraphEndpoint ,
   networkId ,
   networkName ,
   paymentTokenName ,
