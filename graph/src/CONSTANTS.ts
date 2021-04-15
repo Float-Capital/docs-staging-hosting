@@ -19,12 +19,17 @@ export let TEN_TO_THE_18 = BILLION.times(BILLION);
 export let FIVE_MINUTES_IN_SECONDS = BigInt.fromI32(300);
 export let ONE_HOUR_IN_SECONDS = BigInt.fromI32(3600);
 export let ONE_DAY_IN_SECONDS = BigInt.fromI32(86400);
+export let THREE_DAYS_IN_SECONDS = BigInt.fromI32(259200);
 export let ONE_WEEK_IN_SECONDS = BigInt.fromI32(604800);
+export let TWO_WEEKS_IN_SECONDS = BigInt.fromI32(1209600);
 export let ONE_MONTH_IN_SECONDS = BigInt.fromI32(2628029); // Assuming a month has ~30.417 days in it on average
+
 export let PRICE_HISTORY_INTERVALS: BigInt[] = [
   FIVE_MINUTES_IN_SECONDS,
   ONE_HOUR_IN_SECONDS,
   ONE_DAY_IN_SECONDS,
+  THREE_DAYS_IN_SECONDS,
   ONE_WEEK_IN_SECONDS,
+  TWO_WEEKS_IN_SECONDS,
   ONE_MONTH_IN_SECONDS,
 ];
