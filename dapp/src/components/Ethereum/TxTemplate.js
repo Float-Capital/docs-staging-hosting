@@ -17,42 +17,39 @@ function TxTemplate(Props) {
   var resetTxState = Props.resetTxState;
   var txExplererUrl = RootProvider.useEtherscanUrl(undefined);
   if (typeof txState === "number") {
-    switch (txState) {
-      case /* UnInitialised */0 :
-          return children;
-      case /* Created */1 :
-          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, "Tx created."), React.createElement("div", {
-                          className: centerFlex
-                        }, React.createElement(Loader.make, {})));
-      case /* Failed */2 :
-          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed.", React.createElement(Loader.make, {})), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."), children);
-      
+    if (txState === /* UnInitialised */0) {
+      return children;
+    } else {
+      return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, "Tx created."), React.createElement("div", {
+                      className: centerFlex
+                    }, React.createElement(Loader.make, {})));
     }
-  } else {
-    switch (txState.TAG | 0) {
-      case /* SignedAndSubmitted */0 :
-          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, React.createElement("a", {
-                              href: "https://" + txExplererUrl + "/tx/" + txState._0,
-                              rel: "noopener noreferrer",
-                              target: "_blank"
-                            }, "View the transaction on " + txExplererUrl)), React.createElement("div", {
-                          className: "bg-white"
-                        }, React.createElement(Loader.make, {})));
-      case /* Declined */1 :
-          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0), children);
-      case /* Complete */2 :
-          var txHash = txState._0.transactionHash;
-          return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Transaction Complete ", React.createElement(Loader.make, {})), React.createElement("p", undefined, React.createElement("a", {
-                              href: "https://" + txExplererUrl + "/tx/" + txHash,
-                              rel: "noopener noreferrer",
-                              target: "_blank"
-                            }, "View the transaction on " + txExplererUrl)), resetTxState !== undefined ? React.createElement("button", {
-                            onClick: (function (param) {
-                                return Curry._1(resetTxState, undefined);
-                              })
-                          }, "Go back") : null);
-      
-    }
+  }
+  switch (txState.TAG | 0) {
+    case /* SignedAndSubmitted */0 :
+        return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, React.createElement("a", {
+                            href: "https://" + txExplererUrl + "/tx/" + txState._0,
+                            rel: "noopener noreferrer",
+                            target: "_blank"
+                          }, "View the transaction on " + txExplererUrl)), React.createElement("div", {
+                        className: "bg-white"
+                      }, React.createElement(Loader.make, {})));
+    case /* Declined */1 :
+        return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction was declined by your wallet, please try again."), React.createElement("p", undefined, "Failure reason: " + txState._0), children);
+    case /* Complete */2 :
+        var txHash = txState._0.transactionHash;
+        return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Transaction Complete ", React.createElement(Loader.make, {})), React.createElement("p", undefined, React.createElement("a", {
+                            href: "https://" + txExplererUrl + "/tx/" + txHash,
+                            rel: "noopener noreferrer",
+                            target: "_blank"
+                          }, "View the transaction on " + txExplererUrl)), resetTxState !== undefined ? React.createElement("button", {
+                          onClick: (function (param) {
+                              return Curry._1(resetTxState, undefined);
+                            })
+                        }, "Go back") : null);
+    case /* Failed */3 :
+        return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "The transaction failed.", React.createElement(Loader.make, {})), React.createElement("p", undefined, "This operation isn't permitted by the smart contract."), children);
+    
   }
 }
 

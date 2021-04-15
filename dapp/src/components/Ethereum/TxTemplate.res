@@ -47,7 +47,7 @@ let make = (
       <p> {("Failure reason: " ++ message)->React.string} </p>
       children
     </>
-  | ContractActions.Failed => <>
+  | ContractActions.Failed(_) => <>
       <h1> {"The transaction failed."->React.string} <Loader /> </h1>
       <p> {"This operation isn't permitted by the smart contract."->React.string} </p>
       children

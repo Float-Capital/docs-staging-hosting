@@ -112,7 +112,7 @@ module ConnectedStakeForm = {
         toastDispatch(
           ToastProvider.Show(`Approve transaction confirmed`, "", ToastProvider.Success),
         )
-      | Failed =>
+      | Failed(_) =>
         toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
       | _ => ()
       }
@@ -132,7 +132,7 @@ module ConnectedStakeForm = {
           ToastProvider.Show(`Staking transaction confirmed`, "", ToastProvider.Success),
         )
         router->Next.Router.push(userPage)
-      | Failed =>
+      | Failed(_) =>
         toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
       | Declined(reason) =>
         toastDispatch(

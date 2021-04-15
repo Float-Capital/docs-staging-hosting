@@ -2,11 +2,12 @@
 
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
-import * as Ethers from "ethers";
 import * as JsPromise from "../libraries/Js.Promise/JsPromise.js";
+import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as Core from "@web3-react/core";
+import * as Caml_js_exceptions from "bs-platform/lib/es6/caml_js_exceptions.js";
 
 function getProviderOrSigner(library, account) {
   if (account !== undefined) {
@@ -37,14 +38,6 @@ function getSigner(library, account) {
                 }));
   }
   
-}
-
-function getLongShortContractAddress(chainId) {
-  return Ethers.utils.getAddress(chainId !== 5 ? (
-                chainId !== 137 ? (
-                    chainId !== 80001 ? "0xba97BeC8d359D73c81D094421803D968A9FBf676" : "0xeb37A6dF956F1997085498aDd98b25a2f633d83F"
-                  ) : "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063"
-              ) : "0xba97BeC8d359D73c81D094421803D968A9FBf676");
 }
 
 function useProviderOrSigner(param) {
@@ -113,7 +106,6 @@ function useContractFunction(signer) {
                                 }));
                           return tx.wait();
                         }).then(function (txOutcome) {
-                        console.log(txOutcome);
                         return Curry._1(setTxState, (function (param) {
                                       return {
                                               TAG: 2,
@@ -122,8 +114,23 @@ function useContractFunction(signer) {
                                             };
                                     }));
                       }), (function (error) {
+                      var err = Caml_js_exceptions.caml_as_js_exn(error);
+                      var txHash;
+                      if (err !== undefined) {
+                        var exceptionMessage = Belt_Option.getWithDefault(Caml_option.valFromOption(err).message, "");
+                        var txHashRegex = /transactionHash="(.{66})/;
+                        var txHashOpt = txHashRegex.exec(exceptionMessage);
+                        var txHashNullable = txHashOpt !== null ? Belt_Option.getWithDefault(Belt_Array.get(txHashOpt, 1), "") : "";
+                        txHash = (txHashNullable == null) ? "" : txHashNullable;
+                      } else {
+                        txHash = "";
+                      }
                       Curry._1(setTxState, (function (param) {
-                              return /* Failed */2;
+                              return {
+                                      TAG: 3,
+                                      _0: txHash,
+                                      [Symbol.for("name")]: "Failed"
+                                    };
                             }));
                       return Promise.resolve((console.log(error), undefined));
                     }));
@@ -137,7 +144,6 @@ function useContractFunction(signer) {
 export {
   getProviderOrSigner ,
   getSigner ,
-  getLongShortContractAddress ,
   useProviderOrSigner ,
   useProviderOrSignerExn ,
   useSigner ,
