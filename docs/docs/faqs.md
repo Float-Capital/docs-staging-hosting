@@ -5,11 +5,9 @@ sidebar_label: FAQs
 slug: /faqs
 ---
 
-NOTE: These docs are under active development 👷‍♀️👷
+<sub><sup> NOTE: These docs are under active development 👷‍♀️👷 </sup></sub>
 
-### Still have questions? Feel free to reach out to us on [Discord](https://discord.gg/qesr2KZAhn) 🙏
-
----
+Still have questions? Feel free to reach out to us on [Discord](https://discord.gg/qesr2KZAhn) 🙏
 
 ## The basics
 
@@ -116,3 +114,5 @@ Chat to us on [Discord](https://discord.gg/qesr2KZAhn) and watch our videos wher
 ### Have the LongShort Smart Contracts been audited?
 
 Yes, you can find the audit reports [link: here]. -->
+
+Still have questions? Feel free to reach out to us on [Discord](https://discord.gg/qesr2KZAhn) 🙏

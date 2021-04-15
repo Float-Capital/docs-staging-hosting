@@ -5,7 +5,7 @@ sidebar_label: Stake
 slug: /stake
 ---
 
-NOTE: These docs are under active development 👷‍♀️👷
+<sub><sup> NOTE: These docs are under active development 👷‍♀️👷 </sup></sub>
 
 ---
 

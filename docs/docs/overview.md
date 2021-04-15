@@ -5,7 +5,7 @@ sidebar_label: Overview
 slug: /overview
 ---
 
-NOTE: These docs are under active development 👷‍♀️👷
+<sub><sup> NOTE: These docs are under active development 👷‍♀️👷 </sup></sub>
 
 ---
 

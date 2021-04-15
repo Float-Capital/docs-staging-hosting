@@ -5,7 +5,7 @@ sidebar_label: Synthetic Asset Tokens
 slug: /synthetic-asset-tokens
 ---
 
-NOTE: These docs are under active development 👷‍♀️👷
+<sub><sup> NOTE: These docs are under active development 👷‍♀️👷 </sup></sub>
 
 ---
 
