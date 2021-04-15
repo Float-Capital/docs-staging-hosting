@@ -8,11 +8,11 @@ type priceData = {
 
 module PriceHistory = %graphql(`
 query @ppxConfig(schema: "graphql_schema_price_history.json") {
-  fiveMinPrices(first: 25, orderBy: intervalIndex, orderDirection:desc, where: {
-    oracle: "0x49b6eb4bb38178790b51a5630f08923580e10e8d"
-  }) {
-    startTimestamp @ppxCustom(module: "Date")
-    endPrice
+  priceIntervalManager(id: "0x49b6eb4bb38178790b51a5630f08923580e10e8d-300") {
+    prices(first: 25, orderBy: intervalIndex, orderDirection:desc) {
+      startTimestamp @ppxCustom(module: "Date")
+      endPrice
+    }
   }
 }`)
 
@@ -181,15 +181,17 @@ let make = (~marketName) => {
   {
     switch priceHistory {
     | {error: Some(_error)} => "Error loading data"->React.string
-    | {data: Some({fiveMinPrices})} =>
-      let priceData = fiveMinPrices->Array.map(({startTimestamp, endPrice}) => {
+    | {data: Some({priceIntervalManager: Some({prices})})} =>
+      let priceData = prices->Array.map(({startTimestamp, endPrice}) => {
         {
           date: startTimestamp->DateFns.format("do MMM yyyy"),
           price: endPrice->Ethers.Utils.formatEther->Float.fromString->Option.getExn,
         }
       })
-      Js.log(priceData)
+      Js.log(prices)
       <LoadedGraph marketName data=priceData />
+    | {data: Some({priceIntervalManager: None})} =>
+      "Unable to find prices for this market"->React.string
     | {data: None, error: None, loading: false}
     | {loading: true} => loading
     }
