@@ -81,6 +81,17 @@ let btnTextFromGraphSetting = graphSetting =>
   | Year => "1Y"
   }
 
+let axisLabelsFromGraphSetting = graphSetting =>
+  switch graphSetting {
+  // https://date-fns.org/v2.19.0/docs/format
+  | Max => "do MMM yyyy" /// TODO: implement! These numbers should be calculated dynamically based on the time the market has existed
+  | Day => "hh"
+  | Week => "iii"
+  | Month => "iii"
+  | ThreeMonth => "MMM"
+  | Year => "MMM"
+  }
+
 let zoomAndNumDataPointsFromGraphSetting = graphSetting =>
   switch graphSetting {
   | Max => (3600, 10000) /// TODO: implement! These numbers should be calculated dynamically based on the time the market has existed
@@ -124,7 +135,7 @@ let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
         | {data: Some({priceIntervalManager: Some({prices})})} =>
           let priceData = prices->Array.map(({startTimestamp, endPrice}) => {
             {
-              date: startTimestamp->DateFns.format("do MMM yyyy"),
+              date: startTimestamp->DateFns.format(axisLabelsFromGraphSetting(graphSetting)),
               price: endPrice->Ethers.Utils.formatEther->Float.fromString->Option.getExn,
             }
           })

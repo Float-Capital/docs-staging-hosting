@@ -309,6 +309,22 @@ function btnTextFromGraphSetting(graphSetting) {
   }
 }
 
+function axisLabelsFromGraphSetting(graphSetting) {
+  switch (graphSetting) {
+    case /* Day */0 :
+        return "hh";
+    case /* Week */1 :
+    case /* Month */2 :
+        return "iii";
+    case /* ThreeMonth */3 :
+    case /* Year */4 :
+        return "MMM";
+    case /* Max */5 :
+        return "do MMM yyyy";
+    
+  }
+}
+
 function zoomAndNumDataPointsFromGraphSetting(graphSetting) {
   switch (graphSetting) {
     case /* Day */0 :
@@ -391,7 +407,7 @@ function PriceGraph(Props) {
     if (match$3 !== undefined) {
       var priceData = Belt_Array.map(match$3.prices, (function (param) {
               return {
-                      date: Format(param.startTimestamp, "do MMM yyyy"),
+                      date: Format(param.startTimestamp, axisLabelsFromGraphSetting(graphSetting)),
                       price: Belt_Option.getExn(Belt_Float.fromString(Ethers.Utils.formatEther(param.endPrice)))
                     };
             }));
@@ -440,6 +456,7 @@ export {
   LoadedGraph ,
   minThreshodFromGraphSetting ,
   btnTextFromGraphSetting ,
+  axisLabelsFromGraphSetting ,
   zoomAndNumDataPointsFromGraphSetting ,
   make ,
   
