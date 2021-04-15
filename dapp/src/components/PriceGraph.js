@@ -145,6 +145,8 @@ var PriceHistory = {
 
 function PriceGraph$LoadedGraph(Props) {
   var data = Props.data;
+  var tooltipFormat = Props.tooltipFormat;
+  var xAxisFormat = Props.xAxisFormat;
   var d = Belt_Array.get(data, 0);
   var minYRange = data.reduce((function (min, dataPoint) {
           if (dataPoint.price < min) {
@@ -200,7 +202,9 @@ function PriceGraph$LoadedGraph(Props) {
                               undefined,
                               undefined,
                               undefined,
-                              undefined,
+                              (function (value) {
+                                  return Format(value, tooltipFormat);
+                                }),
                               undefined,
                               undefined,
                               undefined,
@@ -228,7 +232,9 @@ function PriceGraph$LoadedGraph(Props) {
                               undefined,
                               undefined,
                               undefined,
-                              undefined,
+                              (function (value) {
+                                  return Format(value, xAxisFormat);
+                                }),
                               undefined,
                               undefined,
                               undefined,
@@ -256,7 +262,9 @@ function PriceGraph$LoadedGraph(Props) {
                               undefined,
                               undefined,
                               undefined,
-                              undefined,
+                              (function (value) {
+                                  return value.toFixed(3);
+                                }),
                               undefined,
                               undefined,
                               undefined,
@@ -355,7 +363,7 @@ function zoomAndNumDataPointsFromGraphSetting(graphSetting) {
     case /* Max */5 :
         return [
                 3600,
-                10000
+                1000
               ];
     
   }
@@ -405,15 +413,16 @@ function PriceGraph(Props) {
   } else if (match$2 !== undefined) {
     var match$3 = match$2.priceIntervalManager;
     if (match$3 !== undefined) {
-      var priceData = Belt_Array.map(match$3.prices, (function (param) {
-              return {
-                      date: Format(param.startTimestamp, axisLabelsFromGraphSetting(graphSetting)),
-                      price: Belt_Option.getExn(Belt_Float.fromString(Ethers.Utils.formatEther(param.endPrice)))
-                    };
+      var priceData = Belt_Array.reduceReverse(match$3.prices, [], (function (accumulative, param) {
+              return Belt_Array.concat(accumulative, [{
+                            date: param.startTimestamp,
+                            price: Belt_Option.getExn(Belt_Float.fromString(Ethers.Utils.formatEther(param.endPrice)))
+                          }]);
             }));
-      console.log(priceData);
       tmp = React.createElement(PriceGraph$LoadedGraph, {
-            data: priceData
+            data: priceData,
+            tooltipFormat: "hha do MMM yyyy",
+            xAxisFormat: "hh aaa"
           });
     } else {
       tmp = overlayMessage("Unable to find prices for this market");

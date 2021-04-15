@@ -3,7 +3,8 @@ open GqlConverters
 let {ethAdrToLowerStr} = module(Ethers.Utils)
 
 type priceData = {
-  date: string,
+  date: Js.Date.t,
+  // date: string,
   price: float,
 }
 
@@ -19,11 +20,7 @@ query ($intervalId: String!, $numDataPoints: Int!) @ppxConfig(schema: "graphql_s
 
 module LoadedGraph = {
   @react.component
-  let make = (~data) => {
-    // let noDataAvailable = data->Array.length == 0
-
-    // let displayData = noDataAvailable ? dummyData : data
-
+  let make = (~data, ~tooltipFormat, ~xAxisFormat) => {
     let minYRange = data->Js.Array2.reduce(
       (min, dataPoint) => dataPoint.price < min ? dataPoint.price : min,
       switch data[0] {
@@ -49,9 +46,14 @@ module LoadedGraph = {
       height={isMobile ? Px(200.) : Prc(100.)} width=Prc(100.) className="w-full text-xs m-0 p-0">
       <LineChart margin={"top": 0, "right": 0, "bottom": 0, "left": 0} data>
         <Line _type=#natural dataKey="price" stroke="#0d4184" strokeWidth={2} dot={false} />
-        <Tooltip />
-        <XAxis dataKey="date" />
-        <YAxis _type=#number domain={yAxisRange} axisLine={false} />
+        <Tooltip labelFormatter={value => value->DateFns.format(tooltipFormat)} />
+        <XAxis dataKey="date" tickFormatter={value => value->DateFns.format(xAxisFormat)} />
+        <YAxis
+          _type=#number
+          tickFormatter={value => value->Js.Float.toFixedWithPrecision(~digits=3)}
+          domain={yAxisRange}
+          axisLine={false}
+        />
       </LineChart>
     </ResponsiveContainer>
   }
@@ -94,7 +96,7 @@ let axisLabelsFromGraphSetting = graphSetting =>
 
 let zoomAndNumDataPointsFromGraphSetting = graphSetting =>
   switch graphSetting {
-  | Max => (3600, 10000) /// TODO: implement! These numbers should be calculated dynamically based on the time the market has existed
+  | Max => (3600, 1000) /// TODO: implement! These numbers should be calculated dynamically based on the time the market has existed
   | Day => (3600, 24)
   | Week => (43200, 14)
   | Month => (86400, 30)
@@ -133,14 +135,18 @@ let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
         {switch priceHistory {
         | {error: Some(_error)} => "Error loading data"->React.string
         | {data: Some({priceIntervalManager: Some({prices})})} =>
-          let priceData = prices->Array.map(({startTimestamp, endPrice}) => {
-            {
-              date: startTimestamp->DateFns.format(axisLabelsFromGraphSetting(graphSetting)),
-              price: endPrice->Ethers.Utils.formatEther->Float.fromString->Option.getExn,
-            }
+          let priceData = prices->Array.reduceReverse([], (
+            accumulative,
+            {startTimestamp, endPrice},
+          ) => {
+            accumulative->Array.concat([
+              {
+                date: startTimestamp,
+                price: endPrice->Ethers.Utils.formatEther->Float.fromString->Option.getExn,
+              },
+            ])
           })
-          Js.log(priceData)
-          <LoadedGraph data=priceData />
+          <LoadedGraph tooltipFormat="hha do MMM yyyy" xAxisFormat="hh aaa" data=priceData />
         | {data: Some({priceIntervalManager: None})} =>
           overlayMessage("Unable to find prices for this market")
         | {data: None, error: None, loading: false}
