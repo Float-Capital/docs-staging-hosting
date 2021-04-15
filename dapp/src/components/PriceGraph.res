@@ -8,9 +8,9 @@ type priceData = {
 }
 
 module PriceHistory = %graphql(`
-query ($intervalId: String!) @ppxConfig(schema: "graphql_schema_price_history.json") {
+query ($intervalId: String!, $numDataPoints: Int!) @ppxConfig(schema: "graphql_schema_price_history.json") {
   priceIntervalManager(id: $intervalId) {
-    prices(first: 25, orderBy: intervalIndex, orderDirection:desc) {
+    prices(first: $numDataPoints, orderBy: intervalIndex, orderDirection:desc) {
       startTimestamp @ppxCustom(module: "Date")
       endPrice
     }
@@ -59,12 +59,54 @@ module LoadedGraph = {
 
 type graphZoom = Day | Week | Month | ThreeMonth | Year | Max
 
+let minThreshodFromGraphSetting = graphSetting =>
+  switch graphSetting {
+  // TODO: these values should be constants
+  | Max => 0
+  | Day => 86400
+  | Week => 604800
+  | Month => 2628029
+  | ThreeMonth => 7884087
+  | Year => 31536000
+  }
+
+let btnTextFromGraphSetting = graphSetting =>
+  switch graphSetting {
+  // TODO: these values should be constants
+  | Max => "MAX"
+  | Day => "1D"
+  | Week => "1W"
+  | Month => "1M"
+  | ThreeMonth => "3M"
+  | Year => "1Y"
+  }
+
+let zoomAndNumDataPointsFromGraphSetting = graphSetting =>
+  switch graphSetting {
+  | Max => (3600, 10000) /// TODO: implement! These numbers should be calculated dynamically based on the time the market has existed
+  | Day => (3600, 24)
+  | Week => (43200, 14)
+  | Month => (86400, 30)
+  | ThreeMonth => (259200, 30)
+  | Year => (1209600, 26)
+  }
+
 @react.component
 let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
+  let currentTimestamp = Misc.Time.getCurrentTimestamp()
+  let timestampCreatedInt = timestampCreated->Ethers.BigNumber.toNumber
+
+  let timeMaketHasExisted = currentTimestamp - timestampCreatedInt
+
   // TODO: use timestampCreated to determine which buttons to disable
+  let (graphSetting, setGraphSetting) = React.useState(_ => Max)
+  let (intervalLength, numDataPoints) = graphSetting->zoomAndNumDataPointsFromGraphSetting
   let priceHistory = PriceHistory.use(
     ~context=Client.createContext(Client.PriceHistory),
-    {intervalId: `${oracleAddress->ethAdrToLowerStr}-300`},
+    {
+      intervalId: `${oracleAddress->ethAdrToLowerStr}-${intervalLength->Int.toString}`,
+      numDataPoints: numDataPoints,
+    },
   )
 
   let overlayMessage = message =>
@@ -86,6 +128,7 @@ let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
               price: endPrice->Ethers.Utils.formatEther->Float.fromString->Option.getExn,
             }
           })
+          Js.log(priceData)
           <LoadedGraph data=priceData />
         | {data: Some({priceIntervalManager: None})} =>
           overlayMessage("Unable to find prices for this market")
@@ -94,45 +137,18 @@ let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
           overlayMessage(`Loading data for ${marketName}`)
         }}
         <div className="flex flex-row justify-between ml-5">
-          <Button.Tiny
-            onClick={_ => {
-              Js.log("1D")
-            }}>
-            "1D"
-          </Button.Tiny>
-          <Button.Tiny
-            onClick={_ => {
-              Js.log("1W")
-            }}>
-            "1W"
-          </Button.Tiny>
-          <Button.Tiny
-            onClick={_ => {
-              Js.log("1M")
-            }}>
-            "1M"
-          </Button.Tiny>
-          <Button.Tiny
-            onClick={_ => {
-              Js.log("3M")
-            }}
-            disabled={true}>
-            "3M"
-          </Button.Tiny>
-          <Button.Tiny
-            onClick={_ => {
-              Js.log("1Y")
-            }}
-            disabled={true}>
-            "1Y"
-          </Button.Tiny>
-          <Button.Tiny
-            onClick={_ => {
-              Js.log("MAX")
-            }}
-            disabled={true}>
-            "MAX"
-          </Button.Tiny>
+          {[Day, Week, Month, ThreeMonth, Year, Max]
+          ->Array.map(buttonSetting =>
+            <Button.Tiny
+              disabled={minThreshodFromGraphSetting(buttonSetting) > timeMaketHasExisted}
+              active={graphSetting == buttonSetting}
+              onClick={_ => {
+                setGraphSetting(_ => buttonSetting)
+              }}>
+              {btnTextFromGraphSetting(buttonSetting)}
+            </Button.Tiny>
+          )
+          ->React.array}
         </div>
       </>}
     </div>

@@ -8,14 +8,18 @@ var buttonShaddowStyle = "transform translate-x-1 translate-y-1 w-full bg-primar
 
 var buttonTopStyle = "transform -translate-x-1 -translate-y-1 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 w-full transition ease-linear duration-0 italic cursor-pointer bg-white border text-primary active:text-white active:bg-primary active:outline-none uppercase tracking-btn-text";
 
+var activeStyles = "translate-x-0 translate-y-0 text-white bg-primary outline-none";
+
 function Button$Tiny(Props) {
   var onClickOpt = Props.onClick;
   var children = Props.children;
   var disabledOpt = Props.disabled;
+  var activeOpt = Props.active;
   var onClick = onClickOpt !== undefined ? onClickOpt : (function (param) {
         
       });
   var disabled = disabledOpt !== undefined ? disabledOpt : false;
+  var active = activeOpt !== undefined ? activeOpt : false;
   return React.createElement("div", {
               className: "flex"
             }, React.createElement("div", {
@@ -25,6 +29,8 @@ function Button$Tiny(Props) {
                     }, React.createElement("button", {
                           className: buttonTopStyle + " min-h-full focus:outline-none px-2 text-xxs " + (
                             disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-200 cursor-not-allowed" : ""
+                          ) + " " + (
+                            active ? activeStyles : ""
                           ),
                           disabled: disabled,
                           onClick: onClick
@@ -114,6 +120,7 @@ export {
   buttonOuterStyle ,
   buttonShaddowStyle ,
   buttonTopStyle ,
+  activeStyles ,
   Tiny ,
   Small ,
   $$Element ,
