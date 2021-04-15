@@ -215,6 +215,7 @@ export function handleBlock(block: ethereum.Block): void {
         ]);
         priceIntervalManager.latestPriceInterval = nextIntervalPrice.id;
         nextIntervalPrice.save();
+        priceIntervalManager.save();
       }
 
       oracle.save();
