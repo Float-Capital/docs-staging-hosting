@@ -188,6 +188,7 @@ let make = (~marketName) => {
           price: endPrice->Ethers.Utils.formatEther->Float.fromString->Option.getExn,
         }
       })
+      Js.log(prices)
       <LoadedGraph marketName data=priceData />
     | {data: Some({priceIntervalManager: None})} =>
       "Unable to find prices for this market"->React.string

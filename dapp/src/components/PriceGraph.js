@@ -410,12 +410,14 @@ function PriceGraph(Props) {
   if (match$1 === undefined) {
     return "Unable to find prices for this market";
   }
-  var priceData = Belt_Array.map(match$1.prices, (function (param) {
+  var prices = match$1.prices;
+  var priceData = Belt_Array.map(prices, (function (param) {
           return {
                   date: Format(param.startTimestamp, "do MMM yyyy"),
                   price: Belt_Option.getExn(Belt_Float.fromString(Ethers.Utils.formatEther(param.endPrice)))
                 };
         }));
+  console.log(prices);
   return React.createElement(PriceGraph$LoadedGraph, {
               marketName: marketName,
               data: priceData
