@@ -10,7 +10,7 @@ let make = (~tokenAddress) => {
     onClick={_ => {
       let _ = contractExecutionHandler(
         ~makeContractInstance=Contracts.Staker.make(~address=Config.staker),
-        ~contractFunction=Contracts.Staker.claimFloatImmediately(~tokenAddress),
+        ~contractFunction=Contracts.Staker.claimFloatImmediately(~tokenAddresses=[tokenAddress]),
       )
     }}>
     "Claim Float"

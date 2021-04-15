@@ -80,7 +80,7 @@ function ClaimFloat(Props) {
                       return Curry._2(contractExecutionHandler, (function (param) {
                                     return Contracts.Staker.make(Config.staker, param);
                                   }), (function (param) {
-                                    return param.claimFloat(arg);
+                                    return param.claimFloatImmediately(arg);
                                   }));
                     }),
                   children: "Claim Float"
