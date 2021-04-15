@@ -9,7 +9,7 @@ NOTE: These docs are under active development 👷‍♀️👷
 
 ---
 
-## Minting float synthetic tokens 💰
+## Minting Float synthetic tokens 💰
 
 Minting involves minting a long or short synthetic token for a particular synthetic asset.
 
@@ -18,6 +18,6 @@ mints you $1000 worth of long tokens, giving you long exposure to this synthetic
 
 Our Synthetic markets currently accept bUSD, allowing you to mint your synthetic position.
 
-## Buying float synthetic tokens on a DEX 🥞
+## Buying Float synthetic tokens on a DEX 🥞
 
-You can also simply buy synthetic float tokens off a decentralized exchange such as pancake swap (coming soon) instead of minting exposure directly from the smart contracts.
+You can also simply buy synthetic Float tokens off a decentralized exchange such as pancake swap (coming soon) instead of minting exposure directly from the smart contracts.
