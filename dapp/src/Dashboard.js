@@ -20,7 +20,7 @@ import FromUnixTime from "date-fns/fromUnixTime";
 import FormatDistanceToNow from "date-fns/formatDistanceToNow";
 
 function Dashboard$TrendingStakes(Props) {
-  var stakeDetailsQuery = Curry.app(Queries.StakingDetails.use, [
+  var marketDetailsQuery = Curry.app(Queries.MarketDetails.use, [
         undefined,
         undefined,
         undefined,
@@ -37,13 +37,13 @@ function Dashboard$TrendingStakes(Props) {
         undefined
       ]);
   var apy = APYProvider.useAPY(undefined);
-  var match = stakeDetailsQuery.data;
-  if (stakeDetailsQuery.loading) {
+  var match = marketDetailsQuery.data;
+  if (marketDetailsQuery.loading) {
     return React.createElement("div", {
                 className: "m-auto"
               }, React.createElement(MiniLoader.make, {}));
   }
-  if (stakeDetailsQuery.error !== undefined) {
+  if (marketDetailsQuery.error !== undefined) {
     return "Error loading data";
   }
   if (match === undefined) {

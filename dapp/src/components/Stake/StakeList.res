@@ -1,9 +1,9 @@
 @react.component
 let make = () => {
-  let stakeDetailsQuery = DataHooks.useGetStakes()
+  let marketDetailsQuery = DataHooks.useGetMarkets()
 
   <div className="w-full max-w-5xl mx-auto px-2 md:px-0">
-    {switch stakeDetailsQuery {
+    {switch marketDetailsQuery {
     | Response(syntheticMarkets) =>
       <div>
         {syntheticMarkets

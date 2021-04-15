@@ -7,12 +7,12 @@ import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as MiniLoader from "../UI/MiniLoader.js";
 
 function StakeList(Props) {
-  var stakeDetailsQuery = DataHooks.useGetStakes(undefined);
+  var marketDetailsQuery = DataHooks.useGetMarkets(undefined);
   var tmp;
-  tmp = typeof stakeDetailsQuery === "number" ? React.createElement("div", {
+  tmp = typeof marketDetailsQuery === "number" ? React.createElement("div", {
           className: "m-auto"
         }, React.createElement(MiniLoader.make, {})) : (
-      stakeDetailsQuery.TAG === /* GraphError */0 ? "Error: " + stakeDetailsQuery._0 : React.createElement("div", undefined, Belt_Array.map(stakeDetailsQuery._0, (function (syntheticMarket) {
+      marketDetailsQuery.TAG === /* GraphError */0 ? "Error: " + marketDetailsQuery._0 : React.createElement("div", undefined, Belt_Array.map(marketDetailsQuery._0, (function (syntheticMarket) {
                     return React.createElement(StakeCard.make, {
                                 syntheticMarket: syntheticMarket,
                                 key: syntheticMarket.name

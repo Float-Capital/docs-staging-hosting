@@ -1,5 +1,5 @@
 @react.component
-let make = (~marketData: Queries.MarketDetails.t_syntheticMarkets) => {
+let make = (~marketData: Queries.SyntheticMarketInfo.t) => {
   <div>
     <Next.Link href="/markets">
       <div className="uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer my-2">

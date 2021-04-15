@@ -41,8 +41,8 @@ function liftGraphResponse2(a, b) {
   }
 }
 
-function useGetStakes(param) {
-  var stakeDetailsQuery = Curry.app(Queries.StakingDetails.use, [
+function useGetMarkets(param) {
+  var marketDetailsQuery = Curry.app(Queries.MarketDetails.use, [
         undefined,
         undefined,
         undefined,
@@ -61,11 +61,11 @@ function useGetStakes(param) {
   var client = Client.useApolloClient(undefined);
   React.useEffect((function () {
           Curry._6(client.rescript_query, {
-                  query: Queries.StakingDetails.query,
-                  Raw: Queries.StakingDetails.Raw,
-                  parse: Queries.StakingDetails.parse,
-                  serialize: Queries.StakingDetails.serialize,
-                  serializeVariables: Queries.StakingDetails.serializeVariables
+                  query: Queries.MarketDetails.query,
+                  Raw: Queries.MarketDetails.Raw,
+                  parse: Queries.MarketDetails.parse,
+                  serialize: Queries.MarketDetails.serialize,
+                  serializeVariables: Queries.MarketDetails.serializeVariables
                 }, undefined, undefined, undefined, undefined, undefined).then(function (queryResult) {
                 if (queryResult.TAG !== /* Ok */0) {
                   return ;
@@ -101,7 +101,7 @@ function useGetStakes(param) {
               });
           
         }), []);
-  var match = stakeDetailsQuery.data;
+  var match = marketDetailsQuery.data;
   if (match !== undefined) {
     return {
             TAG: 1,
@@ -109,7 +109,7 @@ function useGetStakes(param) {
             [Symbol.for("name")]: "Response"
           };
   }
-  var match$1 = stakeDetailsQuery.error;
+  var match$1 = marketDetailsQuery.error;
   if (match$1 !== undefined) {
     return {
             TAG: 0,
@@ -638,7 +638,7 @@ var ethAdrToLowerStr = Globals.ethAdrToLowerStr;
 export {
   liftGraphResponse2 ,
   ethAdrToLowerStr ,
-  useGetStakes ,
+  useGetMarkets ,
   useTotalClaimableFloatForUser ,
   useClaimableFloatForUser ,
   useStakesForUser ,

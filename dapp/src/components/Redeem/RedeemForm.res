@@ -28,7 +28,7 @@ module RedeemFormInput = {
     ~onChangeSide=_ => (),
     ~isLong=false,
     ~hasBothTokens=false,
-    ~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets,
+    ~market: Queries.SyntheticMarketInfo.t,
   ) => {
     let tokenType = isLong ? "long" : "short"
     <Form className="" onSubmit>
@@ -50,7 +50,7 @@ module RedeemFormInput = {
 }
 
 let tokenRedeemPosition = (
-  ~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets,
+  ~market: Queries.SyntheticMarketInfo.t,
   ~isLong,
   ~longTokenBalance,
   ~shortTokenBalance,
@@ -88,11 +88,7 @@ let useBalanceAndApproved = (~erc20Address, ~spender) => {
 
 module ConnectedRedeemForm = {
   @react.component
-  let make = (
-    ~signer,
-    ~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets,
-    ~isLong,
-  ) => {
+  let make = (~signer, ~market: Queries.SyntheticMarketInfo.t, ~isLong) => {
     let router = Next.Router.useRouter()
 
     let user = RootProvider.useCurrentUserExn()
@@ -280,7 +276,7 @@ module ConnectedRedeemForm = {
 }
 
 @react.component
-let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets, ~isLong) => {
+let make = (~market: Queries.SyntheticMarketInfo.t, ~isLong) => {
   let optSigner = ContractActions.useSigner()
   let router = Next.Router.useRouter()
 
