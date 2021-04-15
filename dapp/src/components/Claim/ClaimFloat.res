@@ -28,7 +28,8 @@ let make = (~tokenAddresses) => {
       toastDispatch(
         ToastProvider.Show(`Claim transaction confirmed 🎉`, "", ToastProvider.Success),
       )
-    | Failed => toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
+    | Failed(_) =>
+      toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
     | _ => ()
     }
     None
@@ -37,7 +38,7 @@ let make = (~tokenAddresses) => {
   let claimFloatCall = _ =>
     contractExecutionHandler(
       ~makeContractInstance=Contracts.Staker.make(~address=Config.staker),
-      ~contractFunction=Contracts.Staker.claimFloat(
+      ~contractFunction=Contracts.Staker.claimFloatImmediately(
         ~tokenAddresses=tokenAddresses->Array.map(Ethers.Utils.getAddressUnsafe),
       ),
     )

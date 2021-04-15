@@ -533,8 +533,6 @@ function RedeemForm$ConnectedRedeemForm(Props) {
   var match = tokenRedeemPosition(market, isLong, longTokenBalance, shortTokenBalance);
   var syntheticTokenAddress = match[1];
   var isActuallyLong = match[0];
-  console.log("isActuallyLong");
-  console.log(isActuallyLong);
   var match$1 = ContractActions.useContractFunction(signer);
   var txState = match$1[1];
   var contractExecutionHandler = match$1[0];
@@ -586,27 +584,15 @@ function RedeemForm$ConnectedRedeemForm(Props) {
   var userPage = optCurrentUser !== undefined ? "/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser)) : "/";
   React.useEffect((function () {
           if (typeof txStateApprove === "number") {
-            switch (txStateApprove) {
-              case /* UnInitialised */0 :
-                  break;
-              case /* Created */1 :
-                  Curry._1(toastDispatch, {
-                        _0: "Please approve your " + Config.paymentTokenName + " token",
-                        _1: "",
-                        _2: /* Info */2,
-                        [Symbol.for("name")]: "Show"
-                      });
-                  break;
-              case /* Failed */2 :
-                  Curry._1(toastDispatch, {
-                        _0: "The transaction failed",
-                        _1: "",
-                        _2: /* Error */0,
-                        [Symbol.for("name")]: "Show"
-                      });
-                  break;
-              
+            if (txStateApprove !== /* UnInitialised */0) {
+              Curry._1(toastDispatch, {
+                    _0: "Please approve your " + Config.paymentTokenName + " token",
+                    _1: "",
+                    _2: /* Info */2,
+                    [Symbol.for("name")]: "Show"
+                  });
             }
+            
           } else {
             switch (txStateApprove.TAG | 0) {
               case /* SignedAndSubmitted */0 :
@@ -637,25 +623,7 @@ function RedeemForm$ConnectedRedeemForm(Props) {
                         [Symbol.for("name")]: "Show"
                       });
                   break;
-              
-            }
-          }
-          
-        }), [txStateApprove]);
-  React.useEffect((function () {
-          if (typeof txState === "number") {
-            switch (txState) {
-              case /* UnInitialised */0 :
-                  break;
-              case /* Created */1 :
-                  Curry._1(toastDispatch, {
-                        _0: "Confirm the transaction to redeem tokens",
-                        _1: "",
-                        _2: /* Info */2,
-                        [Symbol.for("name")]: "Show"
-                      });
-                  break;
-              case /* Failed */2 :
+              case /* Failed */3 :
                   Curry._1(toastDispatch, {
                         _0: "The transaction failed",
                         _1: "",
@@ -665,6 +633,20 @@ function RedeemForm$ConnectedRedeemForm(Props) {
                   break;
               
             }
+          }
+          
+        }), [txStateApprove]);
+  React.useEffect((function () {
+          if (typeof txState === "number") {
+            if (txState !== /* UnInitialised */0) {
+              Curry._1(toastDispatch, {
+                    _0: "Confirm the transaction to redeem tokens",
+                    _1: "",
+                    _2: /* Info */2,
+                    [Symbol.for("name")]: "Show"
+                  });
+            }
+            
           } else {
             switch (txState.TAG | 0) {
               case /* SignedAndSubmitted */0 :
@@ -691,6 +673,14 @@ function RedeemForm$ConnectedRedeemForm(Props) {
                         [Symbol.for("name")]: "Show"
                       });
                   router.push(userPage);
+                  break;
+              case /* Failed */3 :
+                  Curry._1(toastDispatch, {
+                        _0: "The transaction failed",
+                        _1: "",
+                        _2: /* Error */0,
+                        [Symbol.for("name")]: "Show"
+                      });
                   break;
               
             }
@@ -721,7 +711,7 @@ function RedeemForm$ConnectedRedeemForm(Props) {
                                 }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
                   }),
                 onChangeSide: (function ($$event) {
-                    router.query["mintOption"] = $$event.target.value;
+                    router.query["actionOption"] = $$event.target.value;
                     router.query["token"] = isActuallyLong ? Ethers.Utils.ethAdrToLowerStr(market.syntheticLong.tokenAddress) : Ethers.Utils.ethAdrToLowerStr(market.syntheticShort.tokenAddress);
                     return Next.Router.pushObjShallow(router, {
                                 pathname: router.pathname,

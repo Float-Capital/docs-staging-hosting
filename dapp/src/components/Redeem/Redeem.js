@@ -30,7 +30,7 @@ function Redeem(Props) {
         undefined
       ]);
   var marketIndex = Belt_Option.getWithDefault(Js_dict.get(router.query, "marketIndex"), "1");
-  var mintOption = Belt_Option.getWithDefault(Js_dict.get(router.query, "mintOption"), "short");
+  var actionOption = Belt_Option.getWithDefault(Js_dict.get(router.query, "actionOption"), "short");
   var match = markets.data;
   var tmp;
   if (markets.loading) {
@@ -41,7 +41,7 @@ function Redeem(Props) {
     var optFirstMarket = Belt_Array.get(match.syntheticMarkets, Belt_Option.getWithDefault(Belt_Int.fromString(marketIndex), 1) - 1 | 0);
     tmp = optFirstMarket !== undefined ? React.createElement(RedeemForm.make, {
             market: optFirstMarket,
-            isLong: mintOption !== "short"
+            isLong: actionOption !== "short"
           }) : React.createElement("p", undefined, "No markets exist");
   } else {
     tmp = "You might think this is impossible, but depending on the situation it might not be!";

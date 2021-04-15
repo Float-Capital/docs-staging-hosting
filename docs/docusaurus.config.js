@@ -16,6 +16,9 @@ module.exports = {
   organizationName: "float-capital",
   projectName: "float.Capital docs",
   themeConfig: {
+    googleAnalytics: {
+      trackingID: "G-C6SBFSRFEQ",
+    },
     navbar: {
       title: "",
       logo: {

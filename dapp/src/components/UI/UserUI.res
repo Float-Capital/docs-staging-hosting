@@ -122,14 +122,20 @@ module UserMarketBox = {
 
 module UserMarketStakeOrRedeem = {
   @react.component
-  let make = (~synthAddress) => {
-    // TODO: fix these URLs once redeeming gets implemented
+  let make = (~synthAddress, ~isLong) => {
+    let marketIdResponse = DataHooks.useTokenMarketId(~tokenId=synthAddress)
+
+    let marketId =
+      DataHooks.Util.graphResponseToOption(marketIdResponse)->Option.getWithDefault("1")
+
     let router = Next.Router.useRouter()
     let stake = _ =>
-      router->Next.Router.push(`/stake?tokenAddress=${synthAddress->Ethers.Utils.ethAdrToLowerStr}`)
+      router->Next.Router.push(
+        `/markets?marketIndex=${marketId}&actionOption=${isLong ? "long" : "short"}&tab=stake`,
+      )
     let redeem = _ =>
       router->Next.Router.push(
-        `/redeem?tokenAddress=${synthAddress->Ethers.Utils.ethAdrToLowerStr}`,
+        `/markets?marketIndex=${marketId}&actionOption=${isLong ? "long" : "short"}&tab=redeem`,
       )
 
     <div className=`flex flex-col`>
@@ -141,23 +147,19 @@ module UserMarketStakeOrRedeem = {
 
 module UserMarketUnstake = {
   @react.component
-  let make = (~synthAddress, ~userId) => {
-    // TODO: fix these URLs once unstaking gets implemented
-    let router = Next.Router.useRouter()
+  let make = (~synthAddress, ~userId, ~isLong) => {
     let synthAddressStr = synthAddress->ethAdrToLowerStr
-    let showUnstakeModal =
-      router.query
-      ->Js.Dict.get("unstake")
-      ->Option.mapWithDefault(false, address => address == synthAddressStr)
 
-    let openUnstakeModal = _ => {
-      router.query->Js.Dict.set("unstake", synthAddressStr)
-      router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
-    }
-    let closeUnstakeModal = _ => {
-      Js.Dict.unsafeDeleteKey(. router.query, "unstake")
-      router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
-    }
+    let marketIdResponse = DataHooks.useTokenMarketId(~tokenId=synthAddressStr)
+
+    let marketId =
+      DataHooks.Util.graphResponseToOption(marketIdResponse)->Option.getWithDefault("1")
+
+    let router = Next.Router.useRouter()
+    let unstake = _ =>
+      router->Next.Router.push(
+        `/markets?marketIndex=${marketId}&tab=unstake&actionOption=${isLong ? "long" : "short"}`,
+      )
 
     let optLoggedInUser = RootProvider.useCurrentUser()
     let isCurrentUser =
@@ -165,16 +167,7 @@ module UserMarketUnstake = {
 
     <div className=`flex flex-col`>
       <span className="text-xxs self-center"> <i> {`4 days ago`->React.string} </i> </span>
-      {isCurrentUser
-        ? <>
-            <Button.Tiny onClick={openUnstakeModal}> {`unstake`} </Button.Tiny>
-            {showUnstakeModal
-              ? <Modal id={"unstake"} closeModal=closeUnstakeModal>
-                  <Unstake tokenId=synthAddressStr />
-                </Modal>
-              : React.null}
-          </>
-        : React.null}
+      {isCurrentUser ? <Button.Tiny onClick={unstake}> {`unstake`} </Button.Tiny> : React.null}
     </div>
   }
 }
@@ -198,7 +191,7 @@ module UserStakesCard = {
       totalValue := Ethers.BigNumber.add(totalValue.contents, value)
 
       <UserMarketBox key name isLong tokens value={value->FormatMoney.formatEther}>
-        <UserMarketUnstake synthAddress={addr} userId />
+        <UserMarketUnstake synthAddress={addr} userId isLong />
       </UserMarketBox>
     }, stakes)->React.array
 
@@ -255,9 +248,6 @@ module UserFloatCard = {
               ? <div className=`flex justify-around flex-row my-1`>
                   {`🌊`->React.string}
                   <ClaimFloat tokenAddresses=synthTokens />
-                  <Tooltip
-                    tip={`Claiming float is still under development, only partial withdrawals are possible currently`}
-                  />
                   {`🌊`->React.string}
                 </div>
               : React.null}
