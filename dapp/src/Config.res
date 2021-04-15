@@ -6,6 +6,7 @@ type contractDetails = {
 }
 type configShape = {
   graphEndpoint: string,
+  priceHistoryGraphEndpoint: string,
   networkId: int,
   networkName: string,
   paymentTokenName: string,
@@ -20,6 +21,7 @@ let config: configShape = %raw(`require('config_file')`)
 
 let {
   graphEndpoint,
+  priceHistoryGraphEndpoint,
   networkId,
   networkName,
   paymentTokenName,

@@ -413,7 +413,7 @@ function AuthTest(Props) {
   var userAddress = RootProvider.useCurrentUserExn(undefined);
   var userQuery = Curry.app(DbQueries.GetUser.use, [
         undefined,
-        Caml_option.some(Client.createContext(/* DB */1)),
+        Caml_option.some(Client.createContext(/* DB */2)),
         undefined,
         undefined,
         undefined,
@@ -492,7 +492,7 @@ function AuthTest(Props) {
   var form = useForm({
         username: ""
       }, (function (param, _form) {
-          Curry._8(updateUsernameMutate, undefined, Caml_option.some(Client.createContext(/* DB */1)), undefined, undefined, undefined, undefined, undefined, {
+          Curry._8(updateUsernameMutate, undefined, Caml_option.some(Client.createContext(/* DB */2)), undefined, undefined, undefined, undefined, undefined, {
                 userName: param.username,
                 userAddress: Globals.ethAdrToLowerStr(userAddress)
               });
@@ -555,7 +555,7 @@ function AuthTest(Props) {
                                       return true;
                                     }));
                       } else {
-                        Curry._8(createProfileMutate, undefined, Caml_option.some(Client.createContext(/* DB */1)), undefined, undefined, undefined, undefined, undefined, {
+                        Curry._8(createProfileMutate, undefined, Caml_option.some(Client.createContext(/* DB */2)), undefined, undefined, undefined, undefined, undefined, {
                               userName: undefined
                             });
                         return ;
