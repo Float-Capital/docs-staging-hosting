@@ -13,6 +13,8 @@ slug: /redeem
 
 Redeeming your Float synthetic tokens involves burning these tokens for the proportional underlying collateral.
 
-## Selling your Float synthetic tokens on a DEX 🥞
+## Selling your Float synthetic tokens on a DEX
 
 You can also sell synthetic Float tokens on a DEX (coming soon)
+
+<!-- https://quickswap.exchange/#/swap -->

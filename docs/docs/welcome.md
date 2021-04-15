@@ -44,8 +44,8 @@ Float allows our global investor base to easily gain synthetic asset exposure, *
 - Read the whitepaper 📄 (coming soon 😏)
 - [How does the protocol work?](/docs/overview)
 - [How to mint a synthetic asset position?](/docs/mint)
-- [What is the FLOAT token?](/docs/float-token)
-- [How to stake and earn FLOAT?](/docs/stake)
+- [What is the Float token?](/docs/float-token)
+- [How to stake and earn Float?](/docs/stake)
 
 ---
 

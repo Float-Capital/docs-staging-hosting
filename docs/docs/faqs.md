@@ -27,7 +27,7 @@ The next synthetic market we plan to release is an asset tracking bitcoin vs eth
 
 ### What are 'long' and 'short' tokens?
 
-For every synthetic market we offer (i.e. ETHKillers), users can create long or short tokens for this market.
+For every synthetic market we offer (eg. ETHKillers), users can create long or short tokens for this market.
 
 Holding long tokens allows you to benefit from the price appreciation 📈 of the underlying market. Holding short tokens allows you to benefit from the price depreciation 📉 of the underlying market.
 
@@ -49,22 +49,22 @@ Holders of Long tokens benefit from increases in the price of the underlying mar
 
 ### Why call it Float Capital?
 
-Exposure to synthetic assets 'floats' in a band between 0% to 100%. The protocol uses various strong incentives to ensure that synthetic asset exposure is most often near 100%.
+Exposure to synthetic assets 'floats' in a band between 0% to 100%. The protocol uses various strong [incentives](/docs/overview) to ensure that synthetic asset exposure is most often near 100%.
 
-### What is 'bad liquidity' and 'good liquidity'
+### What is _bad liquidity_ and _good liquidity_
 
-The basis of Float Capital is creating a 'peer-to-peer' exposure market where long positions on one synthetic asset, are offset by short positions on that same synthetic asset. Good liquidity refers to liquidity added or removed from the protocol that makes the balance of long and short positions more balanced, while bad liquidity indicates the opposite.
+The basis of Float Capital is creating a 'peer-to-peer' exposure market where long positions on one synthetic asset, are offset by short positions on that same synthetic asset. _Good liquidity_ refers to liquidity added or removed from the protocol that makes the balance of long and short positions more balanced, while _bad liquidity_ indicates the opposite.
 
 ### Are there any trading fees?
 
-Float Capital currently doesn't take any trading fees from traders. All fees levied are accrued either to FLOAT token holders or to users already providing liquidity in that synthetic market. Fees are generally only levied when 'bad liquidity' is entering the protocol or 'good liquidity' is leaving the protocol.
+Float Capital currently doesn't take any trading fees from traders. All fees levied are accrued either to Float token holders or to users already providing liquidity in that synthetic market. Fees are generally only levied when _bad liquidity_ is entering the protocol or _good liquidity_ is leaving the protocol.
 
 ### What are the benefits of adding good liquidity?
 
-Good liquidity earns a higher percentage of fees from the protocol. Good liquidity also earns a supercharged yield, through earning yield on all the underlying assets. Finally, staking good liquidity also allows users to earn FLOAT tokens at a higher rate. The whitepaper provides comprehensive details on these incentives.
+_Good liquidity_ earns a higher percentage of fees from the protocol. _Good liquidity_ also earns a supercharged yield, through earning yield on all the underlying assets. Finally, staking good liquidity also allows users to earn Float tokens at a higher rate. The whitepaper provides comprehensive details on these incentives.
 
 <!-- Underlying protocol assets generate yield
-On the dashboard there will be an indication of the imbalance between the long side liquidity and the short side liquidity. By watching this and taking adding good liquidity, you will be rewarded with the interest on all the liquidity of both sides of the market. The liquidity is deposited in [Venus Protocol](https://app.venus.io/market/BUSD) where the token earns interest. -->
+On the dashboard there will be an indication of the imbalance between the long side liquidity and the short side liquidity. By watching this and taking adding good liquidity, you will be rewarded with the interest on all the liquidity of both sides of the market. The liquidity is deposited in [Aave](https://aave.com) where the token earns interest. -->
 
 <!-- ### Why hold Float governance tokens?
 
@@ -104,11 +104,11 @@ A governance token can be thought of a bit like equity in a company. Governance 
 
 We are currently launched on the Kovan testnet. Float Capital will be launched on the Polygon (formerly Matic) network. Polygon is an EVM (Ethereum Virtual Machine) compatible blockchain.
 
-### Who is the team behind FLOAT?
+### Who is the team behind Float?
 
-We are group of passionate mathematicians and computer scientists (turned blockchain engineers) who have working together for more than 3 years.
+We are group of passionate mathematicians and computer scientists (turned blockchain engineers) who have been working together for more than 3 years.
 
-Chat to us on [Discord](https://discord.gg/qesr2KZAhn) and watch our videos where we deep dive into the protocol.
+Chat to us on [Discord](https://discord.gg/qesr2KZAhn) for a deep dive into the protocol.
 
 <!--
 ### Have the LongShort Smart Contracts been audited?
