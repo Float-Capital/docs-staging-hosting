@@ -34,16 +34,16 @@ fragment LatestSystemStateBasic on SystemState {
 # Used in:
 #  Fragments: SyntheticMarketInfo
 fragment LatestSystemStateInfo on SystemState {
-    timestamp
-    totalLockedLong
-    totalLockedShort
-    totalValueLocked
-    longTokenPrice {
-      ...LatestSynthPrice
-    }
-    shortTokenPrice {
-      ...LatestSynthPrice
-    }
+  timestamp
+  totalLockedLong
+  totalLockedShort
+  totalValueLocked
+  longTokenPrice {
+    ...LatestSynthPrice
+  }
+  shortTokenPrice {
+    ...LatestSynthPrice
+  }
 }
 
 # Used in:
@@ -57,36 +57,36 @@ fragment SyntheticMarketIdentifiers on SyntheticMarket {
 # Used in:
 #   Fragments: SyntheticTokenInfo
 fragment SyntheticMarketBasic on SyntheticMarket {
-    id
-    name
-    symbol
-    latestSystemState {
-      ...LatestSystemStateBasic
-    }
+  id
+  name
+  symbol
+  latestSystemState {
+    ...LatestSystemStateBasic
+  }
 }
 
 # Used in:
 #   Fragments: UserTokenBalance
 fragment SyntheticTokenBasic on SyntheticToken {
-    id
-    tokenType
-    syntheticMarket {
-      ...SyntheticMarketIdentifiers
-    }
-    latestPrice {
-      ...LatestSynthPrice
-    }
+  id
+  tokenType
+  syntheticMarket {
+    ...SyntheticMarketIdentifiers
+  }
+  latestPrice {
+    ...LatestSynthPrice
+  }
 }
 
 # Used in:
 #   Fragments: CurrentStakeHighLevel
 fragment SyntheticTokenStakeInfo on SyntheticToken {
-    id
-    latestStakerState {
-      accumulativeFloatPerToken
-      floatRatePerTokenOverInterval
-      timestamp
-    }
+  id
+  latestStakerState {
+    accumulativeFloatPerToken
+    floatRatePerTokenOverInterval
+    timestamp
+  }
 }
 
 # Used in:
@@ -170,6 +170,15 @@ fragment CurrentStakeDetailed on CurrentStake {
   lastMintState {
     id
   }
+}
+
+fragment GlobalStateInfo on GlobalState {
+  totalFloatMinted,
+  totalTxs,
+  totalUsers,
+  totalGasUsed,
+  timestampLaunched,
+  txHash @ppxCustom(module: "Bytes")
 }
 `)
 
@@ -280,12 +289,7 @@ query ($tokenId: String!) {
 module GlobalState = %graphql(`
 query {
   globalStates(first: 1){
-    totalFloatMinted,
-    totalTxs,
-    totalUsers,
-    totalGasUsed,
-    timestampLaunched,
-    txHash @ppxCustom(module: "Bytes")
+    ...GlobalStateInfo
   }
 }
 `)
