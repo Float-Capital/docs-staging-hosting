@@ -98,7 +98,8 @@ module LoadedGraph = {
       },
     )
 
-    let yAxisRange = [minYRange -. minYRange *. 0.05, maxYRange +. maxYRange *. 0.05]
+	let totalRange = maxYRange -. minYRange
+    let yAxisRange = [minYRange -. (totalRange *. 0.05), maxYRange +. (totalRange *. 0.05)]
 
     let isMobile = View.useIsTailwindMobile()
 
