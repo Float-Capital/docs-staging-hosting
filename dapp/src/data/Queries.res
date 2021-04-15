@@ -1,6 +1,8 @@
 open GqlConverters
 
 %graphql(`
+# Used in:
+#   Queries: StateChangePoll, UserQuery
 fragment BasicUserInfo on User {
   id
   totalMintedFloat
@@ -12,23 +14,89 @@ fragment BasicUserInfo on User {
     tokensMinted
   }
 }
+
+# Used in: 
+#   Fragments: SyntheticTokenInfo, SyntheticMarketInfo, UserTokenBalance, CurrentStakesDetailed
 fragment LatestSynthPrice on LatestPrice {
   id
   price {
     price
   }
 }
+
+# Used in:
+#   Fragments: SyntheticMarketBasic
+fragment LatestSystemStateBasic on SystemState {
+  totalLockedLong
+  totalLockedShort
+}
+
+# Used in:
+#  Fragments: SyntheticMarketInfo
+fragment LatestSystemStateInfo on SystemState {
+  timestamp
+  totalLockedLong
+  totalLockedShort
+  totalValueLocked
+  longTokenPrice {
+    ...LatestSynthPrice
+  }
+  shortTokenPrice {
+    ...LatestSynthPrice
+  }
+}
+
+# Used in:
+#   Fragments: SyntheticTokenBasic
+fragment SyntheticMarketIdentifiers on SyntheticMarket {
+  id
+  name
+  symbol
+}
+
+# Used in:
+#   Fragments: SyntheticTokenInfo
+fragment SyntheticMarketBasic on SyntheticMarket {
+  id
+  name
+  symbol
+  latestSystemState {
+    ...LatestSystemStateBasic
+  }
+}
+
+# Used in:
+#   Fragments: UserTokenBalance
+fragment SyntheticTokenBasic on SyntheticToken {
+  id
+  tokenType
+  syntheticMarket {
+    ...SyntheticMarketIdentifiers
+  }
+  latestPrice {
+    ...LatestSynthPrice
+  }
+}
+
+# Used in:
+#   Fragments: CurrentStakeHighLevel
+fragment SyntheticTokenStakeInfo on SyntheticToken {
+  id
+  latestStakerState {
+    accumulativeFloatPerToken
+    floatRatePerTokenOverInterval
+    timestamp
+  }
+}
+
+# Used in:
+#   Fragments: SyntheticMarketInfo, StakeDetailed, CurrentStakesDetailed
+#   Queries: SyntheticToken, SyntheticTokens
 fragment SyntheticTokenInfo on SyntheticToken {
   id
   totalStaked
   syntheticMarket {
-    id
-    name
-    symbol
-    latestSystemState {
-      totalLockedLong
-      totalLockedShort
-    }
+    ...SyntheticMarketBasic
   }
   latestPrice {
     ...LatestSynthPrice
@@ -36,6 +104,10 @@ fragment SyntheticTokenInfo on SyntheticToken {
   tokenType
   tokenAddress
 }
+
+
+# Used in: 
+#   Queries: MarketDetails
 fragment SyntheticMarketInfo on SyntheticMarket {
   name
   symbol
@@ -49,49 +121,23 @@ fragment SyntheticMarketInfo on SyntheticMarket {
     ...SyntheticTokenInfo
   }
   latestSystemState {
-    timestamp
-    totalLockedLong
-    totalLockedShort
-    totalValueLocked
-    longTokenPrice {
-      ...LatestSynthPrice
-    }
-    shortTokenPrice {
-      ...LatestSynthPrice
-    }
+    ...LatestSystemStateInfo
   }
 }
-fragment SyntheticMarketPrice on SyntheticMarket {
-  id
-  name
-  symbol
-}
+
+# Used in:
+#   Queries: UsersBalance, UserBalances
 fragment UserTokenBalance on UserSyntheticTokenBalance {
   id
   tokenBalance
   syntheticToken {
-    id
-    tokenType
-    syntheticMarket {
-      ...SyntheticMarketPrice
-    }
-    latestPrice {
-      ...LatestSynthPrice
-    }
+    ...SyntheticTokenBasic
   }
 }
-fragment StakeDetail on Stake {
-  id
-  timestamp
-  blockNumber
-  creationTxHash  @ppxCustom(module: "Bytes")
-  syntheticToken {
-    ...SyntheticTokenInfo
-  }
-  amount
-  withdrawn
-}
+
 # TODO: Break this up into smaller fragments, find more overlap between 'CurrentStakeDetailed' and 'CurrentStakeHighLevel'
+# Used in: 
+#   Queries: StateChangePoll, UserFloatDetails
 fragment CurrentStakeHighLevel on CurrentStake {
   id
   lastMintState {
@@ -102,14 +148,12 @@ fragment CurrentStakeHighLevel on CurrentStake {
     amount
   }
   syntheticToken {
-    id
-    latestStakerState {
-      accumulativeFloatPerToken
-      floatRatePerTokenOverInterval
-      timestamp
-    }
+    ...SyntheticTokenStakeInfo
   }
 }
+
+# Used in:
+#   Queries: UsersStakes, StateChangePoll
 fragment CurrentStakeDetailed on CurrentStake {
   id
   currentStake {
@@ -127,8 +171,20 @@ fragment CurrentStakeDetailed on CurrentStake {
     id
   }
 }
+
+# Used in:
+#   Queries: GlobalState
+fragment GlobalStateInfo on GlobalState {
+  totalFloatMinted,
+  totalTxs,
+  totalUsers,
+  totalGasUsed,
+  timestampLaunched,
+  txHash @ppxCustom(module: "Bytes")
+}
 `)
 
+// Used externally in StateUpdates.res, FloatManagement.res, UserUI.res
 module UserQuery = %graphql(`
 query ($userId: String!) {
   user (id: $userId) {
@@ -136,6 +192,7 @@ query ($userId: String!) {
   }
 }`)
 
+// Used externally in: MarketInteractionCard.res, RedeemForm.res, StakeForm.res,
 module UsersBalance = %graphql(`
 query ($userId: String!, $tokenAdr: String!) {
   user (id: $userId) {
@@ -145,6 +202,7 @@ query ($userId: String!, $tokenAdr: String!) {
   }
 }`)
 
+// Used externally in: useUsersBalances (datahook), User.res, StakeList.res
 module UsersBalances = %graphql(`
 query ($userId: String!) {
   user (id: $userId) {
@@ -154,6 +212,7 @@ query ($userId: String!) {
   }
 }`)
 
+// Used externally in: StateUpdates.res, StateChangeMonitor.res
 module StateChangePoll = %graphql(`
 query($userId: String!, $timestamp: BigInt!) {
   stateChanges (where: {timestamp_gt: $timestamp}) {
@@ -171,78 +230,25 @@ query($userId: String!, $timestamp: BigInt!) {
   }
 }`)
 
-%graphql(`
-fragment LongSynth on SyntheticToken {
-  floatMintedLong: floatMintedFromSpecificToken
-  longAddress: tokenAddress
-}`)
-
-module LatestSystemState = %graphql(`
-{
-  systemStates (first:1, orderBy:timestamp, orderDirection: desc) {
-    timestamp
-    txHash 
-    blockNumber
-    syntheticPrice
-    longTokenPrice {
-      ...LatestSynthPrice
-    }
-    shortTokenPrice {
-      ...LatestSynthPrice
-    }
-    totalValueLocked
-    setBy
-  }
-}`)
-
+// Used externally in Dashboard.res, Market.res, MarketCard.res, MarketInteractionCard.res, MarketsList.res, Redeem.res, RedeemForm.res, MintForm.res
 module MarketDetails = %graphql(`
-{
-  syntheticMarkets {
-    name
-    symbol
-    marketIndex
-    oracleAddress
-    syntheticLong {
-      id
-      tokenAddress
-      totalStaked
-    }
-    syntheticShort {
-      id
-      tokenAddress
-      totalStaked
-    }
-    latestSystemState {
-      totalLockedLong
-      totalLockedShort
-      totalValueLocked
-      longTokenPrice  {
-        ...LatestSynthPrice
-      }
-      shortTokenPrice {
-        ...LatestSynthPrice
-      }
-    }
-  }
-}
-`)
-
-module StakingDetails = %graphql(`
-{
+query {
   syntheticMarkets {
     ...SyntheticMarketInfo
   }
 }
 `)
 
+// Used externally in: Profile.res
 module SyntheticTokens = %graphql(`
-{
+query {
   syntheticTokens {
     ...SyntheticTokenInfo
   }
 }
 `)
 
+// Used externally in: Unstake.res, StakeForm.res
 module SyntheticToken = %graphql(`
 query ($tokenId: String!){
   syntheticToken(id: $tokenId){
@@ -251,6 +257,7 @@ query ($tokenId: String!){
 }
 `)
 
+// Used externally in: DataHooks.useStakesForUser, Unstake.res, User.res, MarketInteractionCard.res
 module UsersStakes = %graphql(`
 query ($userId: String!){
   currentStakes (where: {user: $userId}) {
@@ -259,6 +266,7 @@ query ($userId: String!){
 }
 `)
 
+// Used externally in: DataHooks.useTotalClaimableFloatForUser, UserUI
 module UsersFloatDetails = %graphql(`
 query ($userId: String!, $synthTokens: [String!]!) {
   currentStakes(where: {user: $userId, syntheticToken_in: $synthTokens}) {
@@ -267,6 +275,7 @@ query ($userId: String!, $synthTokens: [String!]!) {
 }
 `)
 
+// Used externally in: UserUI.res
 module TokenMarketId = %graphql(`
 query ($tokenId: String!) {
   syntheticToken(id: $tokenId){
@@ -278,15 +287,11 @@ query ($tokenId: String!) {
 }
 `)
 
+// Used externally in: Dashboard.res
 module GlobalState = %graphql(`
 query {
   globalStates(first: 1){
-    totalFloatMinted,
-    totalTxs,
-    totalUsers,
-    totalGasUsed,
-    timestampLaunched,
-    txHash @ppxCustom(module: "Bytes")
+    ...GlobalStateInfo
   }
 }
 `)

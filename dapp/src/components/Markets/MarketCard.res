@@ -37,7 +37,7 @@ let make = (
     name: marketName,
     marketIndex,
     latestSystemState: {totalLockedLong, totalLockedShort, totalValueLocked},
-  }: Queries.MarketDetails.t_syntheticMarkets,
+  }: Queries.SyntheticMarketInfo.t,
 ) => {
   let router = Next.Router.useRouter()
   let marketIndexOption = router.query->Js.Dict.get("marketIndex")

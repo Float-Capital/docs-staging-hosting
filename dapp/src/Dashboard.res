@@ -5,11 +5,11 @@ module TrendingStakes = {
   open APYProvider
   @react.component
   let make = () => {
-    let stakeDetailsQuery = Queries.StakingDetails.use()
+    let marketDetailsQuery = Queries.MarketDetails.use()
     let apy = APYProvider.useAPY()
 
     {
-      switch stakeDetailsQuery {
+      switch marketDetailsQuery {
       | {loading: true} => <div className="m-auto"> <MiniLoader /> </div>
       | {error: Some(_error)} => "Error loading data"->React.string
       | {data: Some({syntheticMarkets})} =>

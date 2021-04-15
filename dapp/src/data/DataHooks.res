@@ -18,12 +18,12 @@ let liftGraphResponse2 = (a, b) => {
 @ocaml.doc(`Returns details of the given user's staked tokens.`)
 let {ethAdrToLowerStr} = module(Globals)
 
-let useGetStakes = () => {
-  let stakeDetailsQuery = Queries.StakingDetails.use()
+let useGetMarkets = () => {
+  let marketDetailsQuery = Queries.MarketDetails.use()
   let client = Client.useApolloClient()
 
   React.useEffect0(() => {
-    let _ = client.query(~query=module(Queries.StakingDetails), ())->JsPromise.map(queryResult =>
+    let _ = client.query(~query=module(Queries.MarketDetails), ())->JsPromise.map(queryResult =>
       switch queryResult {
       | Ok({data: {syntheticMarkets}}) =>
         let _ = syntheticMarkets->Array.map(({syntheticLong, syntheticShort}) => {
@@ -44,7 +44,7 @@ let useGetStakes = () => {
     None
   })
 
-  switch stakeDetailsQuery {
+  switch marketDetailsQuery {
   | {data: Some({syntheticMarkets})} => Response(syntheticMarkets)
   | {error: Some({message})} => GraphError(message)
   | _ => Loading

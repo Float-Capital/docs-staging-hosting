@@ -1,4 +1,4 @@
-type syntheticMarketsType = array<Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets>
+type syntheticMarketsType = array<Queries.SyntheticMarketInfo.t>
 
 type totalValueLockedAndTotalStaked = {
   totalValueLocked: Ethers.BigNumber.t,

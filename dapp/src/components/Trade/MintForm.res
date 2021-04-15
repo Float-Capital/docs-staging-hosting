@@ -118,7 +118,7 @@ module MintFormInput = {
   @react.component
   let make = (
     ~onSubmit=_ => (),
-    ~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets,
+    ~market: Queries.SyntheticMarketInfo.t,
     ~onChangeSide=_ => (),
     ~isLong,
     ~onBlurSide=_ => (),
@@ -197,11 +197,7 @@ module MintFormInput = {
 
 module MintFormSignedIn = {
   @react.component
-  let make = (
-    ~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets,
-    ~isLong,
-    ~signer,
-  ) => {
+  let make = (~market: Queries.SyntheticMarketInfo.t, ~isLong, ~signer) => {
     let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
       ~signer,
     )
@@ -419,7 +415,7 @@ module MintFormSignedIn = {
 }
 
 @react.component
-let make = (~market: Queries.MarketDetails.MarketDetails_inner.t_syntheticMarkets, ~isLong) => {
+let make = (~market: Queries.SyntheticMarketInfo.t, ~isLong) => {
   let router = Next.Router.useRouter()
 
   let optSigner = ContractActions.useSigner()
