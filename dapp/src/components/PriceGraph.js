@@ -25,43 +25,67 @@ var Raw = {};
 
 var query = (require("@apollo/client").gql`
   query   {
-    fiveMinPrices(first: 25, orderBy: intervalIndex, orderDirection: desc, where: {oracle: "0x49b6eb4bb38178790b51a5630f08923580e10e8d"})  {
+    priceIntervalManager(id: "0x49b6eb4bb38178790b51a5630f08923580e10e8d-300")  {
       __typename
-      startTimestamp
-      endPrice
+      prices(first: 25, orderBy: intervalIndex, orderDirection: desc)  {
+        __typename
+        startTimestamp
+        endPrice
+      }
     }
   }
 `);
 
 function parse(value) {
-  var value$1 = value.fiveMinPrices;
+  var value$1 = value.priceIntervalManager;
+  var tmp;
+  if (value$1 == null) {
+    tmp = undefined;
+  } else {
+    var value$2 = value$1.prices;
+    tmp = {
+      __typename: value$1.__typename,
+      prices: value$2.map(function (value) {
+            return {
+                    __typename: value.__typename,
+                    startTimestamp: GqlConverters.$$Date.parse(value.startTimestamp),
+                    endPrice: GqlConverters.$$BigInt.parse(value.endPrice)
+                  };
+          })
+    };
+  }
   return {
-          fiveMinPrices: value$1.map(function (value) {
-                return {
-                        __typename: value.__typename,
-                        startTimestamp: GqlConverters.$$Date.parse(value.startTimestamp),
-                        endPrice: GqlConverters.$$BigInt.parse(value.endPrice)
-                      };
-              })
+          priceIntervalManager: tmp
         };
 }
 
 function serialize(value) {
-  var value$1 = value.fiveMinPrices;
-  var fiveMinPrices = value$1.map(function (value) {
-        var value$1 = value.endPrice;
-        var value$2 = GqlConverters.$$BigInt.serialize(value$1);
-        var value$3 = value.startTimestamp;
-        var value$4 = GqlConverters.$$Date.serialize(value$3);
-        var value$5 = value.__typename;
-        return {
-                __typename: value$5,
-                startTimestamp: value$4,
-                endPrice: value$2
-              };
-      });
+  var value$1 = value.priceIntervalManager;
+  var priceIntervalManager;
+  if (value$1 !== undefined) {
+    var value$2 = value$1.prices;
+    var prices = value$2.map(function (value) {
+          var value$1 = value.endPrice;
+          var value$2 = GqlConverters.$$BigInt.serialize(value$1);
+          var value$3 = value.startTimestamp;
+          var value$4 = GqlConverters.$$Date.serialize(value$3);
+          var value$5 = value.__typename;
+          return {
+                  __typename: value$5,
+                  startTimestamp: value$4,
+                  endPrice: value$2
+                };
+        });
+    var value$3 = value$1.__typename;
+    priceIntervalManager = {
+      __typename: value$3,
+      prices: prices
+    };
+  } else {
+    priceIntervalManager = null;
+  }
   return {
-          fiveMinPrices: fiveMinPrices
+          priceIntervalManager: priceIntervalManager
         };
 }
 
@@ -199,13 +223,8 @@ function PriceGraph$LoadedGraph(Props) {
         }), d$1 !== undefined ? d$1.price : 0);
   var totalRange = maxYRange - minYRange;
   var yAxisRange = [
-<<<<<<< HEAD
     minYRange - totalRange * 0.05,
     maxYRange + totalRange * 0.05
-=======
-    minYRange - minYRange * 0.05,
-    maxYRange + maxYRange * 0.05
->>>>>>> Update the UI to have a demo implementation of the price data graph (everything hard-coded)
   ];
   var isMobile = View.useIsTailwindMobile(undefined);
   return React.createElement(React.Fragment, undefined, React.createElement("div", {
@@ -387,13 +406,16 @@ function PriceGraph(Props) {
   if (match === undefined) {
     return loading;
   }
-  var priceData = Belt_Array.map(match.fiveMinPrices, (function (param) {
+  var match$1 = match.priceIntervalManager;
+  if (match$1 === undefined) {
+    return "Unable to find prices for this market";
+  }
+  var priceData = Belt_Array.map(match$1.prices, (function (param) {
           return {
                   date: Format(param.startTimestamp, "do MMM yyyy"),
                   price: Belt_Option.getExn(Belt_Float.fromString(Ethers.Utils.formatEther(param.endPrice)))
                 };
         }));
-  console.log(priceData);
   return React.createElement(PriceGraph$LoadedGraph, {
               marketName: marketName,
               data: priceData
