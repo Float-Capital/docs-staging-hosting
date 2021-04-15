@@ -7,8 +7,6 @@ slug: /addresses
 
 <sub><sup> NOTE: These docs are under active development 👷‍♀️👷 </sup></sub>
 
----
-
 ## Kovan testnet
 
 NOTE: these testnet addresses are frequently changing during development 👷‍♀️👷

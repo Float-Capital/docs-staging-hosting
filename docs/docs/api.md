@@ -9,4 +9,10 @@ slug: /api
 
 ---
 
-We will soon be releasing examples of how you can make requests to our GraphQL server. We are leveraging the [TheGraph](https://thegraph.com/) infrastructure which should sound familiar.
+Float Capital uses [TheGraph](https://thegraph.com/), a GraphQL API, for querying data from our smart contracts.
+
+## [Kovan Subgraph](https://thegraph.com/explorer/subgraph/float-capital/testnet)
+
+## Polygon Subgraph (Coming soon)
+
+We will be releasing examples soon on how you can make requests to our GraphQL server.

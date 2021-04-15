@@ -7,17 +7,14 @@ slug: /mint
 
 <sub><sup> NOTE: These docs are under active development 👷‍♀️👷 </sup></sub>
 
----
-
 ## Minting Float synthetic tokens 💰
 
-Minting involves minting a long or short synthetic token for a particular synthetic asset.
+Minting a token is how you can invest in a market. If you believe a market's price is going to go _up_ you can mint a long position in that market, inversely, if you believe a market's price is going to go _down_ then you would mint a short position in that market.
 
-If you would like $1000 long exposure to a certain synthetic asset, you essentially call the 'mintLong' function on our smart contract which
-mints you $1000 worth of long tokens, giving you long exposure to this synthetic asset.
+For example, if you would like $1 000 long exposure to a certain synthetic asset, you would visit the [markets](https://float.capital/markets) page and select to either _mint long_ or _mint short_. Minting a long position would mint you $1 000 worth of long tokens, giving you long exposure to this synthetic asset.
 
-Our Synthetic markets currently accept bUSD, allowing you to mint your synthetic position.
+Our synthetic markets currently accept DAI, allowing you to mint your synthetic position.
 
-## Buying Float synthetic tokens on a DEX 🥞
+## Buying Float synthetic tokens on a DEX
 
-You can also simply buy synthetic Float tokens off a decentralized exchange such as pancake swap (coming soon) instead of minting exposure directly from the smart contracts.
+You can also simply buy synthetic Float tokens off a decentralized exchange such as [quickswap](https://quickswap.exchange/) (liquidity pool coming soon) instead of minting exposure directly from the smart contracts.

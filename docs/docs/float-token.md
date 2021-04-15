@@ -7,8 +7,6 @@ slug: /float-token
 
 <sub><sup> NOTE: These docs are under active development 👷‍♀️👷 </sup></sub>
 
----
-
 The Float token is the governance token for Float Capital.
 
 Float tokens are earned through staking any Float synthetic token in our token contract.

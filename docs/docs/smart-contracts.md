@@ -27,4 +27,6 @@ contract Float is Legendary {
 
 ```
 
-You'll find our contracts on [Github](https://discord.gg/qesr2KZAhn)
+View the currently deployed contracts on etherscan at the contract [addresses](/docs/addresses).
+
+Join our [discord](https://discord.gg/qesr2KZAhn) for more details of the current stage of development

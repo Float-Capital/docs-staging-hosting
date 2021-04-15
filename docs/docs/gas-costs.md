@@ -11,11 +11,14 @@ slug: /gas-costs
 
 Note these costs are subject to change:
 
-| Contract function | Gas Used | Estimated Polygon cost 10 gwei/gas |
-| ----------------- | :------: | ---------------------------------: |
-| Mint              | 600 000  |                             $0.002 |
-| Stake             | 100 000  |                            $0.0003 |
-| Mint & Stake      | 650 000  |                            $0.0022 |
-| Redeem            | 300 000  |                             $0.001 |
+| Contract function | Gas Used | Estimated Polygon cost at 10 gwei/gas |
+| ----------------- | :------: | ------------------------------------: |
+| Mint              | 600 000  |                                $0.002 |
+| Mint & Stake      | 650 000  |                               $0.0022 |
+| Stake             | 100 000  |                               $0.0003 |
+| Redeem            | 300 000  |                                $0.001 |
+| Claim             | 375 000  |                               $0.0012 |
+
+<!-- | Unstake             | 000 000  |                               $0.0000 | TODO-->
 
 <!-- | Update system state | 250 000  |                           $0.001 | -->

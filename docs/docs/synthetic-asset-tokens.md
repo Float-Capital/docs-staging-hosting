@@ -7,8 +7,6 @@ slug: /synthetic-asset-tokens
 
 <sub><sup> NOTE: These docs are under active development 👷‍♀️👷 </sup></sub>
 
----
-
 ## Tell me more?
 
 Two types of [synthetic tokens](/docs/faqs#what-is-a-synthetic-asset) are created for each synthetic market, synthetic long and short tokens. Synthetic long tokens benefit from the price appreciation 📈 of the underlying asset. Synthetic short tokens benefit from the price depreciation 📉 of the underlying asset.
