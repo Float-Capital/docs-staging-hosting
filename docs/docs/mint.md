@@ -7,6 +7,8 @@ slug: /mint
 
 <sub><sup> NOTE: These docs are under active development 👷‍♀️👷 </sup></sub>
 
+---
+
 ## Minting Float synthetic tokens 💰
 
 Minting a token is how you can invest in a market. If you believe a market's price is going to go _up_ you can mint a long position in that market, inversely, if you believe a market's price is going to go _down_ then you would mint a short position in that market.

@@ -7,6 +7,8 @@ slug: /governance
 
 <sub><sup> NOTE: These docs are under active development 👷‍♀️👷 </sup></sub>
 
+---
+
 Float token holders will govern important protocol decisions.
 
 ![governance](/img/governance.png)

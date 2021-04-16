@@ -7,6 +7,8 @@ slug: /overview
 
 <sub><sup> NOTE: These docs are under active development 👷‍♀️👷 </sup></sub>
 
+---
+
 ## Basics of the protocol
 
 In its most basic form, the Float protocol creates a 'peer-to-peer' exposure market where long positions on one synthetic asset, are offset by short positions on that same synthetic asset (synth).

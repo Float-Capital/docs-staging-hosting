@@ -7,6 +7,8 @@ slug: /faqs
 
 <sub><sup> NOTE: These docs are under active development 👷‍♀️👷 </sup></sub>
 
+---
+
 Still have questions? Feel free to reach out to us on [Discord](https://discord.gg/qesr2KZAhn) 🙏
 
 ## The basics
