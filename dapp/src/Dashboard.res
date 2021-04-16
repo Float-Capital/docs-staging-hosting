@@ -47,7 +47,6 @@ let totalValueCard = (~totalValueLocked) =>
     </span>
   </div>
 
-// let joinedStr = userInfo.joinedAt->DateFns.format("do MMM yyyy")
 let floatProtocolCard = (~liveSince, ~totalTxs, ~totalUsers, ~totalGasUsed, ~txHash) =>
   <Card>
     <Header> {`Float Protocol 🏗️`->React.string} </Header>
