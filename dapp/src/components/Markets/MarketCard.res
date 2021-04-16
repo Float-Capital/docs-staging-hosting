@@ -1,13 +1,3 @@
-let percentStr = (~n: Ethers.BigNumber.t, ~outOf: Ethers.BigNumber.t) =>
-  if outOf->Ethers.BigNumber.eq(CONSTANTS.zeroBN) {
-    "0.00"
-  } else {
-    n
-    ->Ethers.BigNumber.mul(CONSTANTS.oneHundredEth)
-    ->Ethers.BigNumber.div(outOf)
-    ->Ethers.Utils.formatEtherToPrecision(2)
-  }
-
 let calculateBeta = (
   ~totalValueLocked: Ethers.BigNumber.t,
   ~totalLockedLong,
@@ -23,9 +13,9 @@ let calculateBeta = (
   } else if totalLockedLong->Ethers.BigNumber.eq(totalLockedShort) {
     "100"
   } else if isLong && totalLockedShort->Ethers.BigNumber.lt(totalLockedLong) {
-    percentStr(~n=totalLockedShort, ~outOf=totalLockedLong)
+    Globals.percentStr(~n=totalLockedShort, ~outOf=totalLockedLong)
   } else if !isLong && totalLockedLong->Ethers.BigNumber.lt(totalLockedShort) {
-    percentStr(~n=totalLockedLong, ~outOf=totalLockedShort)
+    Globals.percentStr(~n=totalLockedLong, ~outOf=totalLockedShort)
   } else {
     "100"
   }
@@ -41,10 +31,6 @@ let make = (
 ) => {
   let router = Next.Router.useRouter()
   let marketIndexOption = router.query->Js.Dict.get("marketIndex")
-  let percentStrLong = percentStr(~n=totalLockedLong, ~outOf=totalValueLocked)
-  let percentStrShort =
-    (100.0 -. percentStrLong->Float.fromString->Option.getExn)
-      ->Js.Float.toFixedWithPrecision(~digits=2)
 
   let longBeta = calculateBeta(~totalLockedLong, ~totalLockedShort, ~totalValueLocked, ~isLong=true)
 
@@ -92,7 +78,7 @@ let make = (
   let liquidityRatio = () =>
     <div className={`w-full`}>
       {switch !(totalValueLocked->Ethers.BigNumber.eq(CONSTANTS.zeroBN)) {
-      | true => <MarketBar percentStrLong={percentStrLong} percentStrShort={percentStrShort} />
+      | true => <MarketBar totalLockedLong totalValueLocked />
       | false => React.null
       }}
     </div>

@@ -6,17 +6,6 @@ let zero = Ethers.BigNumber.fromUnsafe("0")
 let oneHundred = Ethers.BigNumber.fromUnsafe("100000000000000000000") // 10 ^ 20
 let oneInWei = Ethers.BigNumber.fromUnsafe("1000000000000000000") // 10 ^ 18
 
-// Helper calculation functions
-let percentStr = (~n: Ethers.BigNumber.t, ~outOf: Ethers.BigNumber.t) =>
-  if outOf->Ethers.BigNumber.eq(zero) {
-    "0.00"
-  } else {
-    n
-    ->Ethers.BigNumber.mul(oneHundred)
-    ->Ethers.BigNumber.div(outOf)
-    ->Ethers.Utils.formatEtherToPrecision(2)
-  }
-
 let calculateDollarValue = (~tokenPrice: Ethers.BigNumber.t, ~amountStaked: Ethers.BigNumber.t) => {
   tokenPrice->Ethers.BigNumber.mul(amountStaked)->Ethers.BigNumber.div(oneInWei)
 }
@@ -106,6 +95,7 @@ let make = (
     marketIndex,
     latestSystemState: {
       timestamp: currentTimestamp,
+      totalValueLocked,
       totalLockedLong,
       totalLockedShort,
       longTokenPrice: {price: {price: longTokenPrice}},
@@ -131,12 +121,7 @@ let make = (
   )
   let totalDollarValueStake = longDollarValueStaked->Ethers.BigNumber.add(shortDollarValueStaked)
 
-  let percentStrLong = percentStr(~n=longDollarValueStaked, ~outOf=totalDollarValueStake)
-  let percentStrShort =
-    (100.0 -. percentStrLong->Float.fromString->Option.getExn)
-      ->Js.Float.toFixedWithPrecision(~digits=2)
-
-  // TODO: pull in APY from venus api
+  // TODO: pull in APY from aave api
   let longApy = mappedBasicCalc(
     apy,
     totalLockedLong->Ethers.Utils.formatEther->Js.Float.fromString,
@@ -257,6 +242,14 @@ let make = (
     None
   }, [stakeButtonPressState])
 
+  let liquidityRatio = () =>
+    <div className={`w-full`}>
+      {switch !(totalValueLocked->Ethers.BigNumber.eq(CONSTANTS.zeroBN)) {
+      | true => <MarketBar totalLockedLong totalValueLocked />
+      | false => React.null
+      }}
+    </div>
+
   let closeStakeFormButton = () =>
     <button
       className="absolute left-full pl-4 text-3xl leading-none outline-none focus:outline-none"
@@ -285,17 +278,42 @@ let make = (
           floatApy={longFloatApy->Ethers.Utils.formatEther->Js.Float.fromString}
         />
         <div className="w-full md:w-1/2 flex items-center flex-col order-1 md:order-2">
-          <h2 className="text-xs mt-1">
-            <span className="font-bold"> {`📈 TOTAL`->React.string} </span>
-            {" Staked"->React.string}
-          </h2>
-          <div className="text-3xl font-alphbeta tracking-wider py-1">
-            {`$${totalDollarValueStake->FormatMoney.formatEther}`->React.string}
+          <div className="flex flex-row items-center justify-between w-full ">
+            <div>
+              <div>
+                <h2 className="text-xxs mt-1">
+                  <span className="font-bold"> {`📈 Long`->React.string} </span>
+                  {" staked"->React.string}
+                </h2>
+              </div>
+              <div className="text-sm font-alphbeta tracking-wider py-1">
+                {`$${longDollarValueStaked->FormatMoney.formatEther}`->React.string}
+              </div>
+            </div>
+            <div>
+              <div>
+                <h2 className="text-xs mt-1">
+                  <span className="font-bold"> {`TOTAL`->React.string} </span>
+                  {" Staked"->React.string}
+                </h2>
+              </div>
+              <div className="text-3xl font-alphbeta tracking-wider py-1">
+                {`$${totalDollarValueStake->FormatMoney.formatEther}`->React.string}
+              </div>
+            </div>
+            <div className="text-right">
+              <div>
+                <h2 className="text-xxs mt-1">
+                  <span className="font-bold"> {`Short`->React.string} </span>
+                  {` staked 📉`->React.string}
+                </h2>
+              </div>
+              <div className="text-sm font-alphbeta tracking-wider py-1">
+                {`$${shortDollarValueStaked->FormatMoney.formatEther}`->React.string}
+              </div>
+            </div>
           </div>
-          {switch !(totalDollarValueStake->Ethers.BigNumber.eq(zero)) {
-          | true => <StakeBar percentStrLong={percentStrLong} percentStrShort={percentStrShort} />
-          | false => React.null
-          }}
+          {liquidityRatio()}
           <div className="md:block hidden w-full flex justify-around"> {stakeButtons()} </div>
         </div>
         <StakeCardSide

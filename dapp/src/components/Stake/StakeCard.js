@@ -9,10 +9,10 @@ import * as Ethers$1 from "ethers";
 import * as Globals from "../../libraries/Globals.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
 import * as Tooltip from "../UI/Tooltip.js";
-import * as StakeBar from "../UI/StakeCard/StakeBar.js";
+import * as CONSTANTS from "../../CONSTANTS.js";
 import * as JsPromise from "../../libraries/Js.Promise/JsPromise.js";
+import * as MarketBar from "../UI/MarketCard/MarketBar.js";
 import * as StakeForm from "./StakeForm.js";
-import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
 import * as APYProvider from "../../libraries/APYProvider.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
@@ -27,14 +27,6 @@ var zero = Ethers$1.BigNumber.from("0");
 var oneHundred = Ethers$1.BigNumber.from("100000000000000000000");
 
 var oneInWei = Ethers$1.BigNumber.from("1000000000000000000");
-
-function percentStr(n, outOf) {
-  if (outOf.eq(zero)) {
-    return "0.00";
-  } else {
-    return Ethers.Utils.formatEtherToPrecision(n.mul(oneHundred).div(outOf), 2);
-  }
-}
 
 function calculateDollarValue(tokenPrice, amountStaked) {
   return tokenPrice.mul(amountStaked).div(oneInWei);
@@ -110,6 +102,7 @@ function StakeCard(Props) {
   var param = Props.syntheticMarket;
   var $staropt$star = Props.optUserBalanceAddressSet;
   var match = param.latestSystemState;
+  var totalValueLocked = match.totalValueLocked;
   var totalLockedShort = match.totalLockedShort;
   var totalLockedLong = match.totalLockedLong;
   var currentTimestamp = match.timestamp;
@@ -127,8 +120,6 @@ function StakeCard(Props) {
   var longDollarValueStaked = calculateDollarValue(match.longTokenPrice.price.price, match$2.totalStaked);
   var shortDollarValueStaked = calculateDollarValue(match.shortTokenPrice.price.price, match$1.totalStaked);
   var totalDollarValueStake = longDollarValueStaked.add(shortDollarValueStaked);
-  var percentStrLong = percentStr(longDollarValueStaked, totalDollarValueStake);
-  var percentStrShort = (100.0 - Belt_Option.getExn(Belt_Float.fromString(percentStrLong))).toFixed(2);
   var longApy = mappedBasicCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
   var shortApy = mappedBasicCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
   var longFloatApy = myfloatCalc(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
@@ -217,6 +208,14 @@ function StakeCard(Props) {
           }
           
         }), [stakeButtonPressState]);
+  var liquidityRatio = function (param) {
+    return React.createElement("div", {
+                className: "w-full"
+              }, totalValueLocked.eq(CONSTANTS.zeroBN) ? null : React.createElement(MarketBar.make, {
+                      totalLockedLong: totalLockedLong,
+                      totalValueLocked: totalValueLocked
+                    }));
+  };
   var closeStakeFormButton = function (param) {
     return React.createElement("button", {
                 className: "absolute left-full pl-4 text-3xl leading-none outline-none focus:outline-none",
@@ -260,16 +259,29 @@ function StakeCard(Props) {
                           floatApy: Number(Ethers.Utils.formatEther(longFloatApy))
                         }), React.createElement("div", {
                           className: "w-full md:w-1/2 flex items-center flex-col order-1 md:order-2"
-                        }, React.createElement("h2", {
-                              className: "text-xs mt-1"
-                            }, React.createElement("span", {
-                                  className: "font-bold"
-                                }, "📈 TOTAL"), " Staked"), React.createElement("div", {
-                              className: "text-3xl font-alphbeta tracking-wider py-1"
-                            }, "$" + FormatMoney.formatEther(undefined, totalDollarValueStake)), totalDollarValueStake.eq(zero) ? null : React.createElement(StakeBar.make, {
-                                percentStrLong: percentStrLong,
-                                percentStrShort: percentStrShort
-                              }), React.createElement("div", {
+                        }, React.createElement("div", {
+                              className: "flex flex-row items-center justify-between w-full "
+                            }, React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("h2", {
+                                          className: "text-xxs mt-1"
+                                        }, React.createElement("span", {
+                                              className: "font-bold"
+                                            }, "📈 Long"), " staked")), React.createElement("div", {
+                                      className: "text-sm font-alphbeta tracking-wider py-1"
+                                    }, "$" + FormatMoney.formatEther(undefined, longDollarValueStaked))), React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("h2", {
+                                          className: "text-xs mt-1"
+                                        }, React.createElement("span", {
+                                              className: "font-bold"
+                                            }, "TOTAL"), " Staked")), React.createElement("div", {
+                                      className: "text-3xl font-alphbeta tracking-wider py-1"
+                                    }, "$" + FormatMoney.formatEther(undefined, totalDollarValueStake))), React.createElement("div", {
+                                  className: "text-right"
+                                }, React.createElement("div", undefined, React.createElement("h2", {
+                                          className: "text-xxs mt-1"
+                                        }, React.createElement("span", {
+                                              className: "font-bold"
+                                            }, "Short"), " staked 📉")), React.createElement("div", {
+                                      className: "text-sm font-alphbeta tracking-wider py-1"
+                                    }, "$" + FormatMoney.formatEther(undefined, shortDollarValueStaked)))), liquidityRatio(undefined), React.createElement("div", {
                               className: "md:block hidden w-full flex justify-around"
                             }, stakeButtons(undefined))), React.createElement(StakeCardSide.make, {
                           orderPostion: 3,
@@ -289,7 +301,6 @@ export {
   zero ,
   oneHundred ,
   oneInWei ,
-  percentStr ,
   calculateDollarValue ,
   basicApyCalc ,
   mappedBasicCalc ,

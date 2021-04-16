@@ -3,24 +3,15 @@
 import * as Next from "../../bindings/Next.js";
 import * as React from "react";
 import * as Button from "../UI/Button.js";
-import * as Ethers from "../../ethereum/Ethers.js";
+import * as Globals from "../../libraries/Globals.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
 import * as Tooltip from "../UI/Tooltip.js";
 import * as CONSTANTS from "../../CONSTANTS.js";
 import * as MarketBar from "../UI/MarketCard/MarketBar.js";
 import Link from "next/link";
-import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as FormatMoney from "../UI/FormatMoney.js";
 import * as Router from "next/router";
-
-function percentStr(n, outOf) {
-  if (outOf.eq(CONSTANTS.zeroBN)) {
-    return "0.00";
-  } else {
-    return Ethers.Utils.formatEtherToPrecision(n.mul(CONSTANTS.oneHundredEth).div(outOf), 2);
-  }
-}
 
 function calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, isLong) {
   if (totalValueLocked.eq(CONSTANTS.zeroBN) || totalLockedLong.eq(CONSTANTS.zeroBN) || totalLockedShort.eq(CONSTANTS.zeroBN)) {
@@ -28,9 +19,9 @@ function calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, isLo
   } else if (totalLockedLong.eq(totalLockedShort)) {
     return "100";
   } else if (isLong && totalLockedShort.lt(totalLockedLong)) {
-    return percentStr(totalLockedShort, totalLockedLong);
+    return Globals.percentStr(totalLockedShort, totalLockedLong);
   } else if (!isLong && totalLockedLong.lt(totalLockedShort)) {
-    return percentStr(totalLockedLong, totalLockedShort);
+    return Globals.percentStr(totalLockedLong, totalLockedShort);
   } else {
     return "100";
   }
@@ -46,8 +37,6 @@ function MarketCard(Props) {
   var marketName = param.name;
   var router = Router.useRouter();
   var marketIndexOption = Js_dict.get(router.query, "marketIndex");
-  var percentStrLong = percentStr(totalLockedLong, totalValueLocked);
-  var percentStrShort = (100.0 - Belt_Option.getExn(Belt_Float.fromString(percentStrLong))).toFixed(2);
   var longBeta = calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, true);
   var shortBeta = calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, false);
   var marketPositionHeadings = function (isLong) {
@@ -86,8 +75,8 @@ function MarketCard(Props) {
     return React.createElement("div", {
                 className: "w-full"
               }, totalValueLocked.eq(CONSTANTS.zeroBN) ? null : React.createElement(MarketBar.make, {
-                      percentStrLong: percentStrLong,
-                      percentStrShort: percentStrShort
+                      totalLockedLong: totalLockedLong,
+                      totalValueLocked: totalValueLocked
                     }));
   };
   var mintButtons = function (param) {
@@ -150,7 +139,6 @@ function MarketCard(Props) {
 var make = MarketCard;
 
 export {
-  percentStr ,
   calculateBeta ,
   make ,
   
