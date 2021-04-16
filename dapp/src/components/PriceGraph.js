@@ -145,7 +145,6 @@ var PriceHistory = {
 
 function PriceGraph$LoadedGraph(Props) {
   var data = Props.data;
-  var tooltipFormat = Props.tooltipFormat;
   var xAxisFormat = Props.xAxisFormat;
   var d = Belt_Array.get(data, 0);
   var minYRange = data.reduce((function (min, dataPoint) {
@@ -203,7 +202,7 @@ function PriceGraph$LoadedGraph(Props) {
                               undefined,
                               undefined,
                               (function (value) {
-                                  return Format(value, tooltipFormat);
+                                  return Format(value, "hha do MMM yyyy");
                                 }),
                               undefined,
                               undefined,
@@ -317,14 +316,15 @@ function btnTextFromGraphSetting(graphSetting) {
   }
 }
 
-function axisLabelsFromGraphSetting(graphSetting) {
+function dateFormattersFromGraphSetting(graphSetting) {
   switch (graphSetting) {
     case /* Day */0 :
-        return "hh";
+        return "hh aa";
     case /* Week */1 :
     case /* Month */2 :
         return "iii";
     case /* ThreeMonth */3 :
+        return "iii MMM";
     case /* Year */4 :
         return "MMM";
     case /* Max */5 :
@@ -421,8 +421,7 @@ function PriceGraph(Props) {
             }));
       tmp = React.createElement(PriceGraph$LoadedGraph, {
             data: priceData,
-            tooltipFormat: "hha do MMM yyyy",
-            xAxisFormat: "hh aaa"
+            xAxisFormat: dateFormattersFromGraphSetting(graphSetting)
           });
     } else {
       tmp = overlayMessage("Unable to find prices for this market");
@@ -465,7 +464,7 @@ export {
   LoadedGraph ,
   minThreshodFromGraphSetting ,
   btnTextFromGraphSetting ,
-  axisLabelsFromGraphSetting ,
+  dateFormattersFromGraphSetting ,
   zoomAndNumDataPointsFromGraphSetting ,
   make ,
   

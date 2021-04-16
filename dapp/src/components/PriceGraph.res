@@ -20,7 +20,7 @@ query ($intervalId: String!, $numDataPoints: Int!) @ppxConfig(schema: "graphql_s
 
 module LoadedGraph = {
   @react.component
-  let make = (~data, ~tooltipFormat, ~xAxisFormat) => {
+  let make = (~data, ~xAxisFormat) => {
     let minYRange = data->Js.Array2.reduce(
       (min, dataPoint) => dataPoint.price < min ? dataPoint.price : min,
       switch data[0] {
@@ -46,7 +46,7 @@ module LoadedGraph = {
       height={isMobile ? Px(200.) : Prc(100.)} width=Prc(100.) className="w-full text-xs m-0 p-0">
       <LineChart margin={"top": 0, "right": 0, "bottom": 0, "left": 0} data>
         <Line _type=#natural dataKey="price" stroke="#0d4184" strokeWidth={2} dot={false} />
-        <Tooltip labelFormatter={value => value->DateFns.format(tooltipFormat)} />
+        <Tooltip labelFormatter={value => value->DateFns.format("hha do MMM yyyy")} />
         <XAxis dataKey="date" tickFormatter={value => value->DateFns.format(xAxisFormat)} />
         <YAxis
           _type=#number
@@ -83,14 +83,14 @@ let btnTextFromGraphSetting = graphSetting =>
   | Year => "1Y"
   }
 
-let axisLabelsFromGraphSetting = graphSetting =>
+let dateFormattersFromGraphSetting = graphSetting =>
   switch graphSetting {
   // https://date-fns.org/v2.19.0/docs/format
   | Max => "do MMM yyyy" /// TODO: implement! These numbers should be calculated dynamically based on the time the market has existed
-  | Day => "hh"
+  | Day => "hh aa"
   | Week => "iii"
   | Month => "iii"
-  | ThreeMonth => "MMM"
+  | ThreeMonth => "iii MMM"
   | Year => "MMM"
   }
 
@@ -146,7 +146,7 @@ let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
               },
             ])
           })
-          <LoadedGraph tooltipFormat="hha do MMM yyyy" xAxisFormat="hh aaa" data=priceData />
+          <LoadedGraph xAxisFormat={dateFormattersFromGraphSetting(graphSetting)} data=priceData />
         | {data: Some({priceIntervalManager: None})} =>
           overlayMessage("Unable to find prices for this market")
         | {data: None, error: None, loading: false}
