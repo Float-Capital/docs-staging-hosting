@@ -9,6 +9,7 @@ import * as Client from "../data/Client.js";
 import * as Ethers from "../ethereum/Ethers.js";
 import * as Js_int from "bs-platform/lib/es6/js_int.js";
 import * as Js_math from "bs-platform/lib/es6/js_math.js";
+import * as Caml_obj from "bs-platform/lib/es6/caml_obj.js";
 import * as Recharts from "recharts";
 import * as CONSTANTS from "../CONSTANTS.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
@@ -271,6 +272,9 @@ var LoadedGraph = {
 };
 
 function minThreshodFromGraphSetting(graphSetting) {
+  if (typeof graphSetting !== "number") {
+    return 0;
+  }
   switch (graphSetting) {
     case /* Day */0 :
         return CONSTANTS.oneDayInSeconds;
@@ -282,13 +286,14 @@ function minThreshodFromGraphSetting(graphSetting) {
         return CONSTANTS.threeMonthsInSeconds;
     case /* Year */4 :
         return CONSTANTS.oneYearInSeconds;
-    case /* Max */5 :
-        return 0;
     
   }
 }
 
 function btnTextFromGraphSetting(graphSetting) {
+  if (typeof graphSetting !== "number") {
+    return "MAX";
+  }
   switch (graphSetting) {
     case /* Day */0 :
         return "1D";
@@ -300,13 +305,14 @@ function btnTextFromGraphSetting(graphSetting) {
         return "3M";
     case /* Year */4 :
         return "1Y";
-    case /* Max */5 :
-        return "MAX";
     
   }
 }
 
 function dateFormattersFromGraphSetting(graphSetting) {
+  if (typeof graphSetting !== "number") {
+    return "do MMM yyyy";
+  }
   switch (graphSetting) {
     case /* Day */0 :
         return "hh aa";
@@ -317,13 +323,17 @@ function dateFormattersFromGraphSetting(graphSetting) {
         return "iii MMM";
     case /* Year */4 :
         return "MMM";
-    case /* Max */5 :
-        return "do MMM yyyy";
     
   }
 }
 
 function zoomAndNumDataPointsFromGraphSetting(graphSetting) {
+  if (typeof graphSetting !== "number") {
+    return [
+            CONSTANTS.oneHourInSeconds,
+            1000
+          ];
+  }
   switch (graphSetting) {
     case /* Day */0 :
         return [
@@ -350,31 +360,26 @@ function zoomAndNumDataPointsFromGraphSetting(graphSetting) {
                 CONSTANTS.twoWeeksInSeconds,
                 26
               ];
-    case /* Max */5 :
-        return [
-                CONSTANTS.oneHourInSeconds,
-                1000
-              ];
     
   }
 }
 
-function extractGraphPriceInfo(rawPriceData) {
+function extractGraphPriceInfo(rawPriceData, graphZoomSetting) {
   return Belt_Array.reduceReverse(rawPriceData, {
               dataArray: [],
               minYValue: Js_int.max,
-              maxYValue: 0
-            }, (function (param, param$1) {
-                var maxYValue = param.maxYValue;
-                var minYValue = param.minYValue;
-                var price = Belt_Option.getExn(Belt_Float.fromString(Ethers.Utils.formatEther(param$1.endPrice)));
+              maxYValue: 0,
+              dateFormat: dateFormattersFromGraphSetting(graphZoomSetting)
+            }, (function (data, param) {
+                var price = Belt_Option.getExn(Belt_Float.fromString(Ethers.Utils.formatEther(param.endPrice)));
                 return {
-                        dataArray: Belt_Array.concat(param.dataArray, [{
-                                date: param$1.startTimestamp,
+                        dataArray: Belt_Array.concat(data.dataArray, [{
+                                date: param.startTimestamp,
                                 price: price
                               }]),
-                        minYValue: price < minYValue ? price : minYValue,
-                        maxYValue: price > maxYValue ? price : maxYValue
+                        minYValue: price < data.minYValue ? price : data.minYValue,
+                        maxYValue: price > data.maxYValue ? price : data.maxYValue,
+                        dateFormat: data.dateFormat
                       };
               }));
 }
@@ -392,19 +397,36 @@ function generateDummyData(endTimestamp) {
                 1,
                 1,
                 1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
                 1
               ], [
                 {
                   dataArray: [],
                   minYValue: 200,
-                  maxYValue: 100
+                  maxYValue: 100,
+                  dateFormat: "iii"
                 },
                 endTimestamp
               ], (function (param, _i) {
                   var timestamp = param[1];
-                  var match = param[0];
-                  var maxYValue = match.maxYValue;
-                  var minYValue = match.minYValue;
+                  var data = param[0];
                   var newTimestamp = timestamp - CONSTANTS.oneDayInSeconds;
                   var randomPrice = Js_math.random_int(100, 200);
                   return [
@@ -412,9 +434,10 @@ function generateDummyData(endTimestamp) {
                             dataArray: Belt_Array.concat([{
                                     date: FromUnixTime(timestamp),
                                     price: randomPrice
-                                  }], match.dataArray),
-                            minYValue: randomPrice < minYValue ? randomPrice : minYValue,
-                            maxYValue: randomPrice > maxYValue ? randomPrice : maxYValue
+                                  }], data.dataArray),
+                            minYValue: randomPrice < data.minYValue ? randomPrice : data.minYValue,
+                            maxYValue: randomPrice > data.maxYValue ? randomPrice : data.maxYValue,
+                            dateFormat: data.dateFormat
                           },
                           newTimestamp
                         ];
@@ -426,14 +449,17 @@ function PriceGraph(Props) {
   var oracleAddress = Props.oracleAddress;
   var timestampCreated = Props.timestampCreated;
   var currentTimestamp = Misc.Time.getCurrentTimestamp(undefined);
+  var timestampCreatedInt = timestampCreated.toNumber();
+  var timeMaketHasExisted = currentTimestamp - timestampCreatedInt | 0;
   var match = React.useState(function () {
         return generateDummyData(currentTimestamp);
       });
   var match$1 = match[0];
-  var timestampCreatedInt = timestampCreated.toNumber();
-  var timeMaketHasExisted = currentTimestamp - timestampCreatedInt | 0;
   var match$2 = React.useState(function () {
-        return /* Max */5;
+        return {
+                _0: timeMaketHasExisted,
+                [Symbol.for("name")]: "Max"
+              };
       });
   var setGraphSetting = match$2[1];
   var graphSetting = match$2[0];
@@ -471,7 +497,7 @@ function PriceGraph(Props) {
     if (match$5 !== undefined) {
       var prices = match$5.prices;
       Curry._1(match[1], (function (param) {
-              return extractGraphPriceInfo(prices);
+              return extractGraphPriceInfo(prices, graphSetting);
             }));
       tmp = null;
     } else {
@@ -497,7 +523,10 @@ function PriceGraph(Props) {
                           /* Month */2,
                           /* ThreeMonth */3,
                           /* Year */4,
-                          /* Max */5
+                          {
+                            _0: timeMaketHasExisted,
+                            [Symbol.for("name")]: "Max"
+                          }
                         ], (function (buttonSetting) {
                             return React.createElement(Button.Tiny.make, {
                                         onClick: (function (param) {
@@ -507,7 +536,7 @@ function PriceGraph(Props) {
                                           }),
                                         children: btnTextFromGraphSetting(buttonSetting),
                                         disabled: minThreshodFromGraphSetting(buttonSetting) > timeMaketHasExisted,
-                                        active: graphSetting === buttonSetting
+                                        active: Caml_obj.caml_equal(graphSetting, buttonSetting)
                                       });
                           })))));
 }

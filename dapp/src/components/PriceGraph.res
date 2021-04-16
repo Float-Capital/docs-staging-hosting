@@ -42,11 +42,12 @@ module LoadedGraph = {
   }
 }
 
-type graphZoom = Day | Week | Month | ThreeMonth | Year | Max
+type marketSecondsExisted = int
+type graphZoom = Day | Week | Month | ThreeMonth | Year | Max(marketSecondsExisted)
 
 let minThreshodFromGraphSetting = graphSetting =>
   switch graphSetting {
-  | Max => 0
+  | Max(_timeMaketHasExisted) => 0
   | Day => CONSTANTS.oneDayInSeconds
   | Week => CONSTANTS.oneWeekInSeconds
   | Month => CONSTANTS.oneMonthInSeconds
@@ -56,7 +57,8 @@ let minThreshodFromGraphSetting = graphSetting =>
 
 let btnTextFromGraphSetting = graphSetting =>
   switch graphSetting {
-  | Max => "MAX"
+  // TODO: these values should be constants
+  | Max(_timeMaketHasExisted) => "MAX"
   | Day => "1D"
   | Week => "1W"
   | Month => "1M"
@@ -67,7 +69,7 @@ let btnTextFromGraphSetting = graphSetting =>
 let dateFormattersFromGraphSetting = graphSetting =>
   switch graphSetting {
   // https://date-fns.org/v2.19.0/docs/format
-  | Max => "do MMM yyyy" /// TODO: implement! These numbers should be calculated dynamically based on the time the market has existed
+  | Max(_timeMaketHasExisted) => "do MMM yyyy" /// TODO: implement! These numbers should be calculated dynamically based on the time the market has existed
   | Day => "hh aa"
   | Week => "iii"
   | Month => "iii"
@@ -77,7 +79,7 @@ let dateFormattersFromGraphSetting = graphSetting =>
 
 let zoomAndNumDataPointsFromGraphSetting = graphSetting =>
   switch graphSetting {
-  | Max => (CONSTANTS.oneHourInSeconds, 1000) /// TODO: implement! These numbers should be calculated dynamically based on the time the market has existed
+  | Max(_timeMaketHasExisted) => (CONSTANTS.oneHourInSeconds, 1000) /// TODO: implement! These numbers should be calculated dynamically based on the time the market has existed
   | Day => (CONSTANTS.oneHourInSeconds, 24)
   | Week => (CONSTANTS.halfDayInSeconds, 14)
   | Month => (CONSTANTS.oneDayInSeconds, 30)
@@ -85,47 +87,96 @@ let zoomAndNumDataPointsFromGraphSetting = graphSetting =>
   | Year => (CONSTANTS.twoWeeksInSeconds, 26)
   }
 
-type dataInfo = {dataArray: array<priceData>, minYValue: float, maxYValue: float}
+type dataInfo = {
+  dataArray: array<priceData>,
+  minYValue: float,
+  maxYValue: float,
+  dateFormat: string,
+}
 
 @ocaml.doc(`Takes the raw prices returned from the graph and transforms them into the correct format for recharts to display, as well as getting the max+min y-values.`)
 let extractGraphPriceInfo = (
   rawPriceData: array<PriceHistory.PriceHistory_inner.t_priceIntervalManager_prices>,
+  graphZoomSetting,
 ) =>
   rawPriceData->Array.reduceReverse(
-    {dataArray: [], minYValue: Js.Int.max->Float.fromInt, maxYValue: 0.},
-    ({dataArray, minYValue, maxYValue}, {startTimestamp, endPrice}) => {
+    {
+      dataArray: [],
+      minYValue: Js.Int.max->Float.fromInt,
+      maxYValue: 0.,
+      dateFormat: graphZoomSetting->dateFormattersFromGraphSetting,
+    },
+    (data, {startTimestamp, endPrice}) => {
       let price = endPrice->Ethers.Utils.formatEther->Float.fromString->Option.getExn
       {
-        dataArray: dataArray->Array.concat([
+        ...data,
+        dataArray: data.dataArray->Array.concat([
           {
             date: startTimestamp,
             price: price,
           },
         ]),
-        minYValue: price < minYValue ? price : minYValue,
-        maxYValue: price > maxYValue ? price : maxYValue,
+        minYValue: price < data.minYValue ? price : data.minYValue,
+        maxYValue: price > data.maxYValue ? price : data.maxYValue,
       }
     },
   )
 
+@ocaml.doc(`Generate random data to show on page load as a place holder`)
 let generateDummyData = endTimestamp => {
   let oneDayInSecondsFloat = CONSTANTS.oneDayInSeconds->Float.fromInt
 
-  let (result, _) = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]->Array.reduce(
-    ({dataArray: [], minYValue: 200., maxYValue: 100.}, endTimestamp->Float.fromInt),
-    (({dataArray, minYValue, maxYValue}, timestamp), _i) => {
+  // TODO: when I'm not on an airplane, look in docs how to generate this array easily.
+  let (result, _) = [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+  ]->Array.reduce(
+    (
+      {dataArray: [], minYValue: 200., maxYValue: 100., dateFormat: "iii"},
+      endTimestamp->Float.fromInt,
+    ),
+    ((data, timestamp), _i) => {
       let newTimestamp = timestamp -. oneDayInSecondsFloat
       let randomPrice = Js.Math.random_int(100, 200)->Float.fromInt
       (
         {
+          ...data,
           dataArray: [
             {
               date: timestamp->DateFns.fromUnixTime,
               price: randomPrice,
             },
-          ]->Array.concat(dataArray),
-          minYValue: randomPrice < minYValue ? randomPrice : minYValue,
-          maxYValue: randomPrice > maxYValue ? randomPrice : maxYValue,
+          ]->Array.concat(data.dataArray),
+          minYValue: randomPrice < data.minYValue ? randomPrice : data.minYValue,
+          maxYValue: randomPrice > data.maxYValue ? randomPrice : data.maxYValue,
         },
         newTimestamp,
       )
@@ -137,15 +188,14 @@ let generateDummyData = endTimestamp => {
 @react.component
 let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
   let currentTimestamp = Misc.Time.getCurrentTimestamp()
+
+  let timestampCreatedInt = timestampCreated->Ethers.BigNumber.toNumber
+  let timeMaketHasExisted = currentTimestamp - timestampCreatedInt
+
   let ({dataArray, minYValue, maxYValue}, setDisplayData) = React.useState(_ =>
     generateDummyData(currentTimestamp)
   )
-  let timestampCreatedInt = timestampCreated->Ethers.BigNumber.toNumber
-
-  let timeMaketHasExisted = currentTimestamp - timestampCreatedInt
-
-  // TODO: use timestampCreated to determine which buttons to disable
-  let (graphSetting, setGraphSetting) = React.useState(_ => Max)
+  let (graphSetting, setGraphSetting) = React.useState(_ => Max(timeMaketHasExisted))
   let (intervalLength, numDataPoints) = graphSetting->zoomAndNumDataPointsFromGraphSetting
   let priceHistory = PriceHistory.use(
     ~context=Client.createContext(Client.PriceHistory),
@@ -173,7 +223,7 @@ let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
       {switch priceHistory {
       | {error: Some(_error)} => "Error loading data"->React.string
       | {data: Some({priceIntervalManager: Some({prices})})} =>
-        setDisplayData(_ => prices->extractGraphPriceInfo)
+        setDisplayData(_ => prices->extractGraphPriceInfo(graphSetting))
         React.null
       | {data: Some({priceIntervalManager: None})} =>
         overlayMessage("Unable to find prices for this market")
@@ -182,7 +232,7 @@ let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
         overlayMessage(`Loading data for ${marketName}`)
       }}
       <div className="flex flex-row justify-between ml-5">
-        {[Day, Week, Month, ThreeMonth, Year, Max]
+        {[Day, Week, Month, ThreeMonth, Year, Max(timeMaketHasExisted)]
         ->Array.map(buttonSetting =>
           <Button.Tiny
             disabled={minThreshodFromGraphSetting(buttonSetting) > timeMaketHasExisted}
