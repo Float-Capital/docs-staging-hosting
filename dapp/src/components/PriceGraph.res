@@ -20,25 +20,9 @@ query ($intervalId: String!, $numDataPoints: Int!) @ppxConfig(schema: "graphql_s
 
 module LoadedGraph = {
   @react.component
-  let make = (~data, ~xAxisFormat) => {
-    let minYRange = data->Js.Array2.reduce(
-      (min, dataPoint) => dataPoint.price < min ? dataPoint.price : min,
-      switch data[0] {
-      | Some(d) => d.price
-      | None => 0.
-      },
-    )
-
-    let maxYRange = data->Js.Array2.reduce(
-      (max, dataPoint) => dataPoint.price > max ? dataPoint.price : max,
-      switch data[0] {
-      | Some(d) => d.price
-      | None => 0.
-      },
-    )
-
-    let totalRange = maxYRange -. minYRange
-    let yAxisRange = [minYRange -. totalRange *. 0.05, maxYRange +. totalRange *. 0.05]
+  let make = (~data, ~xAxisFormat, ~minYValue, ~maxYValue) => {
+    let totalRange = maxYValue -. minYValue
+    let yAxisRange = [minYValue -. totalRange *. 0.05, maxYValue +. totalRange *. 0.05]
 
     let isMobile = View.useIsTailwindMobile()
 
@@ -104,6 +88,29 @@ let zoomAndNumDataPointsFromGraphSetting = graphSetting =>
   | Year => (1209600, 26)
   }
 
+type dataInfo = {dataArray: array<priceData>, minYValue: float, maxYValue: float}
+
+@ocaml.doc(`Takes the raw prices returned from the graph and transforms them into the correct format for recharts to display, as well as getting the max+min y-values.`)
+let extractGraphPriceInfo = (
+  rawPriceData: array<PriceHistory.PriceHistory_inner.t_priceIntervalManager_prices>,
+) =>
+  rawPriceData->Array.reduceReverse(
+    {dataArray: [], minYValue: Js.Int.max->Float.fromInt, maxYValue: 0.},
+    ({dataArray, minYValue, maxYValue}, {startTimestamp, endPrice}) => {
+      let price = endPrice->Ethers.Utils.formatEther->Float.fromString->Option.getExn
+      {
+        dataArray: dataArray->Array.concat([
+          {
+            date: startTimestamp,
+            price: price,
+          },
+        ]),
+        minYValue: price < minYValue ? price : minYValue,
+        maxYValue: price > maxYValue ? price : maxYValue,
+      }
+    },
+  )
+
 @react.component
 let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
   let currentTimestamp = Misc.Time.getCurrentTimestamp()
@@ -135,18 +142,13 @@ let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
         {switch priceHistory {
         | {error: Some(_error)} => "Error loading data"->React.string
         | {data: Some({priceIntervalManager: Some({prices})})} =>
-          let priceData = prices->Array.reduceReverse([], (
-            accumulative,
-            {startTimestamp, endPrice},
-          ) => {
-            accumulative->Array.concat([
-              {
-                date: startTimestamp,
-                price: endPrice->Ethers.Utils.formatEther->Float.fromString->Option.getExn,
-              },
-            ])
-          })
-          <LoadedGraph xAxisFormat={dateFormattersFromGraphSetting(graphSetting)} data=priceData />
+          let {dataArray, minYValue, maxYValue} = prices->extractGraphPriceInfo
+          <LoadedGraph
+            xAxisFormat={dateFormattersFromGraphSetting(graphSetting)}
+            data=dataArray
+            minYValue
+            maxYValue
+          />
         | {data: Some({priceIntervalManager: None})} =>
           overlayMessage("Unable to find prices for this market")
         | {data: None, error: None, loading: false}

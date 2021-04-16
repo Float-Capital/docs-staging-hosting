@@ -7,6 +7,7 @@ import * as React from "react";
 import * as Button from "./UI/Button.js";
 import * as Client from "../data/Client.js";
 import * as Ethers from "../ethereum/Ethers.js";
+import * as Js_int from "bs-platform/lib/es6/js_int.js";
 import * as Recharts from "recharts";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
@@ -146,26 +147,12 @@ var PriceHistory = {
 function PriceGraph$LoadedGraph(Props) {
   var data = Props.data;
   var xAxisFormat = Props.xAxisFormat;
-  var d = Belt_Array.get(data, 0);
-  var minYRange = data.reduce((function (min, dataPoint) {
-          if (dataPoint.price < min) {
-            return dataPoint.price;
-          } else {
-            return min;
-          }
-        }), d !== undefined ? d.price : 0);
-  var d$1 = Belt_Array.get(data, 0);
-  var maxYRange = data.reduce((function (max, dataPoint) {
-          if (dataPoint.price > max) {
-            return dataPoint.price;
-          } else {
-            return max;
-          }
-        }), d$1 !== undefined ? d$1.price : 0);
-  var totalRange = maxYRange - minYRange;
+  var minYValue = Props.minYValue;
+  var maxYValue = Props.maxYValue;
+  var totalRange = maxYValue - minYValue;
   var yAxisRange = [
-    minYRange - totalRange * 0.05,
-    maxYRange + totalRange * 0.05
+    minYValue - totalRange * 0.05,
+    maxYValue + totalRange * 0.05
   ];
   var isMobile = View.useIsTailwindMobile(undefined);
   return React.createElement(Recharts.ResponsiveContainer, Curry._3(BsRecharts__ResponsiveContainer.makeProps(isMobile ? ({
@@ -369,6 +356,26 @@ function zoomAndNumDataPointsFromGraphSetting(graphSetting) {
   }
 }
 
+function extractGraphPriceInfo(rawPriceData) {
+  return Belt_Array.reduceReverse(rawPriceData, {
+              dataArray: [],
+              minYValue: Js_int.max,
+              maxYValue: 0
+            }, (function (param, param$1) {
+                var maxYValue = param.maxYValue;
+                var minYValue = param.minYValue;
+                var price = Belt_Option.getExn(Belt_Float.fromString(Ethers.Utils.formatEther(param$1.endPrice)));
+                return {
+                        dataArray: Belt_Array.concat(param.dataArray, [{
+                                date: param$1.startTimestamp,
+                                price: price
+                              }]),
+                        minYValue: price < minYValue ? price : minYValue,
+                        maxYValue: price > maxYValue ? price : maxYValue
+                      };
+              }));
+}
+
 function PriceGraph(Props) {
   var marketName = Props.marketName;
   var oracleAddress = Props.oracleAddress;
@@ -413,15 +420,12 @@ function PriceGraph(Props) {
   } else if (match$2 !== undefined) {
     var match$3 = match$2.priceIntervalManager;
     if (match$3 !== undefined) {
-      var priceData = Belt_Array.reduceReverse(match$3.prices, [], (function (accumulative, param) {
-              return Belt_Array.concat(accumulative, [{
-                            date: param.startTimestamp,
-                            price: Belt_Option.getExn(Belt_Float.fromString(Ethers.Utils.formatEther(param.endPrice)))
-                          }]);
-            }));
+      var match$4 = extractGraphPriceInfo(match$3.prices);
       tmp = React.createElement(PriceGraph$LoadedGraph, {
-            data: priceData,
-            xAxisFormat: dateFormattersFromGraphSetting(graphSetting)
+            data: match$4.dataArray,
+            xAxisFormat: dateFormattersFromGraphSetting(graphSetting),
+            minYValue: match$4.minYValue,
+            maxYValue: match$4.maxYValue
           });
     } else {
       tmp = overlayMessage("Unable to find prices for this market");
@@ -466,6 +470,7 @@ export {
   btnTextFromGraphSetting ,
   dateFormattersFromGraphSetting ,
   zoomAndNumDataPointsFromGraphSetting ,
+  extractGraphPriceInfo ,
   make ,
   
 }
