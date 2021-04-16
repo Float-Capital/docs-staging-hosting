@@ -121,7 +121,6 @@ let make = (
   )
   let totalDollarValueStake = longDollarValueStaked->Ethers.BigNumber.add(shortDollarValueStaked)
 
-  // TODO: pull in APY from aave api
   let longApy = mappedBasicCalc(
     apy,
     totalLockedLong->Ethers.Utils.formatEther->Js.Float.fromString,
