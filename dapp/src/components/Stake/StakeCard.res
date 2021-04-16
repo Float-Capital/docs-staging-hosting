@@ -10,19 +10,19 @@ let calculateDollarValue = (~tokenPrice: Ethers.BigNumber.t, ~amountStaked: Ethe
   tokenPrice->Ethers.BigNumber.mul(amountStaked)->Ethers.BigNumber.div(oneInWei)
 }
 
-let basicApyCalc = (busdApy: float, longVal: float, shortVal: float, tokenType) => {
+let basicApyCalc = (collateralTokenApy: float, longVal: float, shortVal: float, tokenType) => {
   switch tokenType {
   | "long" =>
     switch longVal {
-    | 0.0 => busdApy
-    | _ => busdApy *. shortVal /. longVal
+    | 0.0 => collateralTokenApy
+    | _ => collateralTokenApy *. shortVal /. longVal
     }
   | "short" =>
     switch shortVal {
-    | 0.0 => busdApy
-    | _ => busdApy *. longVal /. shortVal
+    | 0.0 => collateralTokenApy
+    | _ => collateralTokenApy *. longVal /. shortVal
     }
-  | _ => busdApy
+  | _ => collateralTokenApy
   }
 }
 

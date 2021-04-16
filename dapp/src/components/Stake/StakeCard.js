@@ -32,22 +32,22 @@ function calculateDollarValue(tokenPrice, amountStaked) {
   return tokenPrice.mul(amountStaked).div(oneInWei);
 }
 
-function basicApyCalc(busdApy, longVal, shortVal, tokenType) {
+function basicApyCalc(collateralTokenApy, longVal, shortVal, tokenType) {
   switch (tokenType) {
     case "long" :
         if (longVal !== 0.0) {
-          return busdApy * shortVal / longVal;
+          return collateralTokenApy * shortVal / longVal;
         } else {
-          return busdApy;
+          return collateralTokenApy;
         }
     case "short" :
         if (shortVal !== 0.0) {
-          return busdApy * longVal / shortVal;
+          return collateralTokenApy * longVal / shortVal;
         } else {
-          return busdApy;
+          return collateralTokenApy;
         }
     default:
-      return busdApy;
+      return collateralTokenApy;
   }
 }
 
