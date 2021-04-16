@@ -8,6 +8,7 @@ import * as Button from "./UI/Button.js";
 import * as Client from "../data/Client.js";
 import * as Ethers from "../ethereum/Ethers.js";
 import * as Js_int from "bs-platform/lib/es6/js_int.js";
+import * as Js_math from "bs-platform/lib/es6/js_math.js";
 import * as Recharts from "recharts";
 import * as CONSTANTS from "../CONSTANTS.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
@@ -19,6 +20,7 @@ import Format from "date-fns/format";
 import * as BsRecharts__XAxis from "@ahrefs/bs-recharts/src/BsRecharts__XAxis.js";
 import * as BsRecharts__YAxis from "@ahrefs/bs-recharts/src/BsRecharts__YAxis.js";
 import * as BsRecharts__Tooltip from "@ahrefs/bs-recharts/src/BsRecharts__Tooltip.js";
+import FromUnixTime from "date-fns/fromUnixTime";
 import * as BsRecharts__ResponsiveContainer from "@ahrefs/bs-recharts/src/BsRecharts__ResponsiveContainer.js";
 import * as ApolloClient__React_Hooks_UseQuery from "rescript-apollo-client/src/@apollo/client/react/hooks/ApolloClient__React_Hooks_UseQuery.js";
 
@@ -377,19 +379,65 @@ function extractGraphPriceInfo(rawPriceData) {
               }));
 }
 
+function generateDummyData(endTimestamp) {
+  return Belt_Array.reduce([
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+              ], [
+                {
+                  dataArray: [],
+                  minYValue: 200,
+                  maxYValue: 100
+                },
+                endTimestamp
+              ], (function (param, _i) {
+                  var timestamp = param[1];
+                  var match = param[0];
+                  var maxYValue = match.maxYValue;
+                  var minYValue = match.minYValue;
+                  var newTimestamp = timestamp - CONSTANTS.oneDayInSeconds;
+                  var randomPrice = Js_math.random_int(100, 200);
+                  return [
+                          {
+                            dataArray: Belt_Array.concat([{
+                                    date: FromUnixTime(timestamp),
+                                    price: randomPrice
+                                  }], match.dataArray),
+                            minYValue: randomPrice < minYValue ? randomPrice : minYValue,
+                            maxYValue: randomPrice > maxYValue ? randomPrice : maxYValue
+                          },
+                          newTimestamp
+                        ];
+                }))[0];
+}
+
 function PriceGraph(Props) {
   var marketName = Props.marketName;
   var oracleAddress = Props.oracleAddress;
   var timestampCreated = Props.timestampCreated;
   var currentTimestamp = Misc.Time.getCurrentTimestamp(undefined);
+  var match = React.useState(function () {
+        return generateDummyData(currentTimestamp);
+      });
+  var match$1 = match[0];
   var timestampCreatedInt = timestampCreated.toNumber();
   var timeMaketHasExisted = currentTimestamp - timestampCreatedInt | 0;
-  var match = React.useState(function () {
+  var match$2 = React.useState(function () {
         return /* Max */5;
       });
-  var setGraphSetting = match[1];
-  var graphSetting = match[0];
-  var match$1 = zoomAndNumDataPointsFromGraphSetting(graphSetting);
+  var setGraphSetting = match$2[1];
+  var graphSetting = match$2[0];
+  var match$3 = zoomAndNumDataPointsFromGraphSetting(graphSetting);
   var priceHistory = Curry.app(use, [
         undefined,
         Caml_option.some(Client.createContext(/* PriceHistory */1)),
@@ -405,8 +453,8 @@ function PriceGraph(Props) {
         undefined,
         undefined,
         {
-          intervalId: ethAdrToLowerStr(oracleAddress) + "-" + String(match$1[0]),
-          numDataPoints: match$1[1]
+          intervalId: ethAdrToLowerStr(oracleAddress) + "-" + String(match$3[0]),
+          numDataPoints: match$3[1]
         }
       ]);
   var overlayMessage = function (message) {
@@ -414,20 +462,18 @@ function PriceGraph(Props) {
                 className: "v-align-in-responsive-height text-center text-gray-500 bg-white bg-opacity-90 p-2 z-10 rounded-lg"
               }, message);
   };
-  var match$2 = priceHistory.data;
+  var match$4 = priceHistory.data;
   var tmp;
   if (priceHistory.error !== undefined) {
     tmp = "Error loading data";
-  } else if (match$2 !== undefined) {
-    var match$3 = match$2.priceIntervalManager;
-    if (match$3 !== undefined) {
-      var match$4 = extractGraphPriceInfo(match$3.prices);
-      tmp = React.createElement(PriceGraph$LoadedGraph, {
-            data: match$4.dataArray,
-            xAxisFormat: dateFormattersFromGraphSetting(graphSetting),
-            minYValue: match$4.minYValue,
-            maxYValue: match$4.maxYValue
-          });
+  } else if (match$4 !== undefined) {
+    var match$5 = match$4.priceIntervalManager;
+    if (match$5 !== undefined) {
+      var prices = match$5.prices;
+      Curry._1(match[1], (function (param) {
+              return extractGraphPriceInfo(prices);
+            }));
+      tmp = null;
     } else {
       tmp = overlayMessage("Unable to find prices for this market");
     }
@@ -436,29 +482,34 @@ function PriceGraph(Props) {
   }
   return React.createElement(React.Fragment, undefined, React.createElement("div", {
                   className: "flex-1 p-1 my-4 mr-6 flex flex-col relative"
-                }, React.createElement(React.Fragment, undefined, React.createElement("h3", {
-                          className: "ml-5"
-                        }, marketName + " Price"), tmp, React.createElement("div", {
-                          className: "flex flex-row justify-between ml-5"
-                        }, Belt_Array.map([
-                              /* Day */0,
-                              /* Week */1,
-                              /* Month */2,
-                              /* ThreeMonth */3,
-                              /* Year */4,
-                              /* Max */5
-                            ], (function (buttonSetting) {
-                                return React.createElement(Button.Tiny.make, {
-                                            onClick: (function (param) {
-                                                return Curry._1(setGraphSetting, (function (param) {
-                                                              return buttonSetting;
-                                                            }));
-                                              }),
-                                            children: btnTextFromGraphSetting(buttonSetting),
-                                            disabled: minThreshodFromGraphSetting(buttonSetting) > timeMaketHasExisted,
-                                            active: graphSetting === buttonSetting
-                                          });
-                              }))))));
+                }, React.createElement("h3", {
+                      className: "ml-5"
+                    }, marketName + " Price"), React.createElement(PriceGraph$LoadedGraph, {
+                      data: match$1.dataArray,
+                      xAxisFormat: dateFormattersFromGraphSetting(graphSetting),
+                      minYValue: match$1.minYValue,
+                      maxYValue: match$1.maxYValue
+                    }), tmp, React.createElement("div", {
+                      className: "flex flex-row justify-between ml-5"
+                    }, Belt_Array.map([
+                          /* Day */0,
+                          /* Week */1,
+                          /* Month */2,
+                          /* ThreeMonth */3,
+                          /* Year */4,
+                          /* Max */5
+                        ], (function (buttonSetting) {
+                            return React.createElement(Button.Tiny.make, {
+                                        onClick: (function (param) {
+                                            return Curry._1(setGraphSetting, (function (param) {
+                                                          return buttonSetting;
+                                                        }));
+                                          }),
+                                        children: btnTextFromGraphSetting(buttonSetting),
+                                        disabled: minThreshodFromGraphSetting(buttonSetting) > timeMaketHasExisted,
+                                        active: graphSetting === buttonSetting
+                                      });
+                          })))));
 }
 
 var make = PriceGraph;
@@ -472,6 +523,7 @@ export {
   dateFormattersFromGraphSetting ,
   zoomAndNumDataPointsFromGraphSetting ,
   extractGraphPriceInfo ,
+  generateDummyData ,
   make ,
   
 }

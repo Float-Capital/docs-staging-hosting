@@ -108,9 +108,38 @@ let extractGraphPriceInfo = (
     },
   )
 
+let generateDummyData = endTimestamp => {
+  let oneDayInSecondsFloat = CONSTANTS.oneDayInSeconds->Float.fromInt
+
+  let (result, _) = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]->Array.reduce(
+    ({dataArray: [], minYValue: 200., maxYValue: 100.}, endTimestamp->Float.fromInt),
+    (({dataArray, minYValue, maxYValue}, timestamp), _i) => {
+      let newTimestamp = timestamp -. oneDayInSecondsFloat
+      let randomPrice = Js.Math.random_int(100, 200)->Float.fromInt
+      (
+        {
+          dataArray: [
+            {
+              date: timestamp->DateFns.fromUnixTime,
+              price: randomPrice,
+            },
+          ]->Array.concat(dataArray),
+          minYValue: randomPrice < minYValue ? randomPrice : minYValue,
+          maxYValue: randomPrice > maxYValue ? randomPrice : maxYValue,
+        },
+        newTimestamp,
+      )
+    },
+  )
+  result
+}
+
 @react.component
 let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
   let currentTimestamp = Misc.Time.getCurrentTimestamp()
+  let ({dataArray, minYValue, maxYValue}, setDisplayData) = React.useState(_ =>
+    generateDummyData(currentTimestamp)
+  )
   let timestampCreatedInt = timestampCreated->Ethers.BigNumber.toNumber
 
   let timeMaketHasExisted = currentTimestamp - timestampCreatedInt
@@ -134,39 +163,38 @@ let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
 
   <>
     <div className={`flex-1 p-1 my-4 mr-6 flex flex-col relative`}>
-      {<>
-        <h3 className="ml-5"> {`${marketName} Price`->React.string} </h3>
-        {switch priceHistory {
-        | {error: Some(_error)} => "Error loading data"->React.string
-        | {data: Some({priceIntervalManager: Some({prices})})} =>
-          let {dataArray, minYValue, maxYValue} = prices->extractGraphPriceInfo
-          <LoadedGraph
-            xAxisFormat={dateFormattersFromGraphSetting(graphSetting)}
-            data=dataArray
-            minYValue
-            maxYValue
-          />
-        | {data: Some({priceIntervalManager: None})} =>
-          overlayMessage("Unable to find prices for this market")
-        | {data: None, error: None, loading: false}
-        | {loading: true} =>
-          overlayMessage(`Loading data for ${marketName}`)
-        }}
-        <div className="flex flex-row justify-between ml-5">
-          {[Day, Week, Month, ThreeMonth, Year, Max]
-          ->Array.map(buttonSetting =>
-            <Button.Tiny
-              disabled={minThreshodFromGraphSetting(buttonSetting) > timeMaketHasExisted}
-              active={graphSetting == buttonSetting}
-              onClick={_ => {
-                setGraphSetting(_ => buttonSetting)
-              }}>
-              {btnTextFromGraphSetting(buttonSetting)}
-            </Button.Tiny>
-          )
-          ->React.array}
-        </div>
-      </>}
+      <h3 className="ml-5"> {`${marketName} Price`->React.string} </h3>
+      <LoadedGraph
+        xAxisFormat={dateFormattersFromGraphSetting(graphSetting)}
+        data=dataArray
+        minYValue
+        maxYValue
+      />
+      {switch priceHistory {
+      | {error: Some(_error)} => "Error loading data"->React.string
+      | {data: Some({priceIntervalManager: Some({prices})})} =>
+        setDisplayData(_ => prices->extractGraphPriceInfo)
+        React.null
+      | {data: Some({priceIntervalManager: None})} =>
+        overlayMessage("Unable to find prices for this market")
+      | {data: None, error: None, loading: false}
+      | {loading: true} =>
+        overlayMessage(`Loading data for ${marketName}`)
+      }}
+      <div className="flex flex-row justify-between ml-5">
+        {[Day, Week, Month, ThreeMonth, Year, Max]
+        ->Array.map(buttonSetting =>
+          <Button.Tiny
+            disabled={minThreshodFromGraphSetting(buttonSetting) > timeMaketHasExisted}
+            active={graphSetting == buttonSetting}
+            onClick={_ => {
+              setGraphSetting(_ => buttonSetting)
+            }}>
+            {btnTextFromGraphSetting(buttonSetting)}
+          </Button.Tiny>
+        )
+        ->React.array}
+      </div>
     </div>
   </>
 }
