@@ -73,7 +73,7 @@ function MarketCard(Props) {
               }, React.createElement("div", {
                     className: "text-2xl tracking-widest font-alphbeta my-3"
                   }, value, React.createElement("span", {
-                        className: "text-sm text-gray-600"
+                        className: "text-xs text-gray-600 font-mono"
                       }, Config.paymentTokenName)), React.createElement("span", {
                     className: "font-bold"
                   }, "Exposure "), React.createElement(Tooltip.make, {
@@ -130,7 +130,7 @@ function MarketCard(Props) {
                                 }, "TOTAL"), " Liquidity"), React.createElement("div", {
                               className: "text-3xl font-alphbeta tracking-wider py-1"
                             }, FormatMoney.formatEther(undefined, totalValueLocked), React.createElement("span", {
-                                  className: "text-sm text-gray-600"
+                                  className: "text-xs text-gray-600 font-mono"
                                 }, Config.paymentTokenName)), React.createElement("div", {
                               className: "md:block hidden w-full"
                             }, liquidityRatio(undefined), Belt_Option.isNone(marketIndexOption) ? mintButtons(undefined) : null)), React.createElement("div", {

@@ -152,6 +152,7 @@ module MintFormInput = {
           onBlur=onBlurAmount
           onChange=onChangeAmountInput
           placeholder={"Mint"}
+          optCurrency={Some(Config.paymentTokenName)}
           onMaxClick
         />
         {switch optErrorMessage {

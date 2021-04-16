@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import * as Button from "./Button.js";
-import * as Config from "../../Config.js";
 import * as Ethers from "ethers";
 import * as Globals from "../../libraries/Globals.js";
 import * as CONSTANTS from "../../CONSTANTS.js";
@@ -278,7 +277,7 @@ function UserUI$UserStakesCard(Props) {
                 }), React.createElement(UserUI$UserColumnTextCenter, {
                   children: React.createElement(UserUI$UserColumnText, {
                         head: "💰 Staked value",
-                        body: FormatMoney.formatEther(undefined, totalValue.contents) + Config.paymentTokenName
+                        body: "$" + FormatMoney.formatEther(undefined, totalValue.contents)
                       })
                 }), React.createElement("br", undefined), stakeBoxes);
 }
