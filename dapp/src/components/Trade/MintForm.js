@@ -988,7 +988,6 @@ function MintForm$MintFormSignedIn(Props) {
         }), [txState]);
   return React.createElement(MintForm$MintFormInput, {
               onSubmit: form.submit,
-              market: market,
               onChangeSide: (function ($$event) {
                   router.query["actionOption"] = $$event.target.value;
                   router.query["token"] = isLong ? Ethers.Utils.ethAdrToLowerStr(market.syntheticLong.tokenAddress) : Ethers.Utils.ethAdrToLowerStr(market.syntheticShort.tokenAddress);
@@ -1036,8 +1035,6 @@ function MintForm$MintFormSignedIn(Props) {
                                       };
                               }), $$event.target.checked);
                 }),
-              txStateApprove: txStateApprove,
-              txStateMint: txState,
               submitButton: React.createElement(MintForm$SubmitButtonAndTxTracker, {
                     txStateApprove: txStateApprove,
                     txStateMint: txState,
@@ -1071,7 +1068,6 @@ function MintForm$1(Props) {
                     
                   })
               }, React.createElement(MintForm$MintFormInput, {
-                    market: market,
                     isLong: isLong
                   }));
   }
