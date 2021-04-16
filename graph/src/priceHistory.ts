@@ -7,11 +7,7 @@ import {
   PriceIntervalManager,
 } from "../generated-price-history/schema";
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import {
-  ONE,
-  FIVE_MINUTES_IN_SECONDS,
-  PRICE_HISTORY_INTERVALS,
-} from "./CONSTANTS";
+import { ONE, PRICE_HISTORY_INTERVALS } from "./CONSTANTS";
 
 export function getOrCreateGlobalState(): Global {
   let globalState = Global.load("GLOBAL");
@@ -47,7 +43,7 @@ export function createPriceInterval(
   intervalLength: BigInt,
   currentOraclePrice: BigInt
 ): PriceInterval {
-  let intervalIndex = timestamp.div(FIVE_MINUTES_IN_SECONDS);
+  let intervalIndex = timestamp.div(intervalLength);
   let priceHistory = new PriceInterval(
     oracleAddressStr +
       "-" +
@@ -58,7 +54,7 @@ export function createPriceInterval(
 
   priceHistory.intervalIndex = intervalIndex;
   priceHistory.intervalLength = intervalLength;
-  priceHistory.startTimestamp = intervalIndex.times(FIVE_MINUTES_IN_SECONDS);
+  priceHistory.startTimestamp = intervalIndex.times(intervalLength);
   priceHistory.startPrice = currentOraclePrice;
   priceHistory.endPrice = currentOraclePrice;
   priceHistory.averagePrice = currentOraclePrice;
@@ -140,6 +136,9 @@ export function handleSyntheticTokenCreated(
     priceIntervalManager.prices = priceIntervalManager.prices.concat([
       initialPriceInterval.id,
     ]);
+    oracle.priceIntervals = oracle.priceIntervals.concat([
+      priceIntervalManager.id,
+    ]);
 
     priceIntervalManager.save();
     initialPriceInterval.save();
@@ -189,7 +188,7 @@ export function handleBlock(block: ethereum.Block): void {
       oracle.latestPrice = currentOraclePrice;
 
       // FIVE_MINUTES_IN_SECONDS;
-      let currentPriceIndex = timestamp.div(FIVE_MINUTES_IN_SECONDS);
+      let currentPriceIndex = timestamp.div(latestPriceInterval.intervalLength);
       if (currentPriceIndex.equals(latestPriceInterval.intervalIndex)) {
         let newNumberOfBlocksInInterval = latestPriceInterval.numberOfBlocksInInterval.plus(
           ONE
