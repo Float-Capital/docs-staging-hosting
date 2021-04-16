@@ -45,7 +45,9 @@ function DashboardLi(Props) {
                     className: first ? "" : "pt-2"
                   }, React.createElement("span", {
                         className: "text-sm mr-2"
-                      }, prefix), value, suffix)
+                      }, prefix), React.createElement("span", {
+                        className: "text-md"
+                      }, value, suffix))
             });
 }
 

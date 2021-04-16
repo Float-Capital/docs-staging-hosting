@@ -22,8 +22,8 @@ function StakeCardSide(Props) {
   var floatApy = Props.floatApy;
   var tmp;
   tmp = typeof apy === "number" ? React.createElement(MiniLoader.make, {}) : (
-      apy.TAG === /* Loaded */0 ? React.createElement("div", {
-              className: "text-2xl tracking-widest font-alphbeta"
+      apy.TAG === /* Loaded */0 ? React.createElement("p", {
+              className: "text-xl tracking-widest font-alphbeta"
             }, mapVal(apy._0)) : React.createElement(MiniLoader.make, {})
     );
   return React.createElement("div", {
@@ -35,18 +35,18 @@ function StakeCardSide(Props) {
                     }, isLong ? "↗️" : "↘️")), React.createElement("div", {
                   className: "flex flex-col items-center justify-center pt-0 mt-auto"
                 }, React.createElement("h3", {
-                      className: "text-xs mt-1"
+                      className: "text-xs mt-2"
                     }, React.createElement("span", {
                           className: "font-bold"
-                        }, isLong ? "LONG" : "SHORT"), " APY"), tmp), React.createElement("div", {
-                  className: "flex flex-col items-center justify-center pt-0 mt-auto"
+                        }, isLong ? "LONG" : "SHORT"), " FLOAT rewards"), React.createElement("p", {
+                      className: "text-2xl md:text-4xl tracking-widest font-alphbeta"
+                    }, mapVal(floatApy))), React.createElement("div", {
+                  className: "flex flex-col items-center justify-center pt-0 mt-auto text-gray-600"
                 }, React.createElement("h3", {
-                      className: "text-xs mt-1"
+                      className: "text-xxs mt-1"
                     }, React.createElement("span", {
                           className: "font-bold"
-                        }, isLong ? "LONG" : "SHORT"), " FLOAT rewards"), React.createElement("div", {
-                      className: "text-2xl tracking-widest font-alphbeta my-3"
-                    }, mapVal(floatApy))));
+                        }, isLong ? "LONG" : "SHORT"), " APY"), tmp));
 }
 
 var make = StakeCardSide;

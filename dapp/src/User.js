@@ -74,7 +74,7 @@ var UserBalancesCard = {
 function User$UserProfileCard(Props) {
   var userInfo = Props.userInfo;
   var addressStr = DisplayAddress.ellipsifyMiddle(userInfo.id, 8, 3);
-  var joinedStr = Format(userInfo.joinedAt, "do MMM yyyy");
+  var joinedStr = Format(userInfo.joinedAt, "do MMM ''yy");
   var txStr = userInfo.transactionCount.toString();
   var gasStr = FormatMoney.formatInt(userInfo.gasUsed.toString());
   return React.createElement(UserUI.UserColumnCard.make, {
