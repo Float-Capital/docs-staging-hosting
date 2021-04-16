@@ -8,7 +8,7 @@ module.exports = {
       "governance",
       "addresses",
     ],
-    "User Guide": ["mint", "redeem", "stake", "gas-costs"],
+    "User Guide": ["mint", "redeem", "stake", "gas-costs", "testnet"],
     Developer: ["smart-contracts", "api"],
     Resources: ["resources"],
   },

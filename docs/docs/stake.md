@@ -5,13 +5,13 @@ sidebar_label: Stake
 slug: /stake
 ---
 
-NOTE: These docs are under active development 👷‍♀️👷
+<sub><sup> NOTE: These docs are under active development 👷‍♀️👷 </sup></sub>
 
 ---
 
 ## Staking your Float synthetic tokens 🏦
 
-Your Float synthetic tokens can be staked to earned Float (governance) tokens.
+Your Float synthetic tokens can be staked to earned [Float (governance) tokens](/docs/float-token).
 
 Float earned is a function of the value, time and the balance of the liquidity in the market amongst other factors.
 
@@ -19,4 +19,4 @@ Simply follow instructions in the staking page to stake, or immediately choose t
 
 ## Withdrawing your staked Float synthetic tokens
 
-Staked tokens can simply be withdrawn at any point by the user.
+Staked tokens can simply be unstaked at any point by the user.
