@@ -78,7 +78,8 @@ let make = (
     let beta = isLong ? longBeta : shortBeta
     <div className="text-sm text-center m-auto mb-4">
       <div className="text-2xl tracking-widest font-alphbeta my-3">
-        {`$${value}`->React.string}
+        {value->React.string}
+        <span className="text-sm text-gray-600"> {Config.paymentTokenName->React.string} </span>
       </div>
       <span className="font-bold"> {`Exposure `->React.string} </span>
       <Tooltip
@@ -136,7 +137,8 @@ let make = (
             {" Liquidity"->React.string}
           </h2>
           <div className="text-3xl font-alphbeta tracking-wider py-1">
-            {`$${totalValueLocked->FormatMoney.formatEther}`->React.string}
+            {totalValueLocked->FormatMoney.formatEther->React.string}
+            <span className="text-sm text-gray-600"> {Config.paymentTokenName->React.string} </span>
           </div>
           <div className="md:block hidden w-full">
             {liquidityRatio()} {Option.isNone(marketIndexOption) ? mintButtons() : React.null}

@@ -199,7 +199,8 @@ module UserStakesCard = {
       <UserColumnHeader> {`Staked assets 🔐`->React.string} </UserColumnHeader>
       <UserColumnTextCenter>
         <UserColumnText
-          head=`💰 Staked value` body={`$${totalValue.contents->FormatMoney.formatEther}`}
+          head=`💰 Staked value`
+          body={`${totalValue.contents->FormatMoney.formatEther}${Config.paymentTokenName}`}
         />
       </UserColumnTextCenter>
       <br />

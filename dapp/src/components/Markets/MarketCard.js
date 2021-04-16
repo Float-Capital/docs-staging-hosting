@@ -3,6 +3,7 @@
 import * as Next from "../../bindings/Next.js";
 import * as React from "react";
 import * as Button from "../UI/Button.js";
+import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
 import * as Tooltip from "../UI/Tooltip.js";
@@ -71,7 +72,9 @@ function MarketCard(Props) {
                 className: "text-sm text-center m-auto mb-4"
               }, React.createElement("div", {
                     className: "text-2xl tracking-widest font-alphbeta my-3"
-                  }, "$" + value), React.createElement("span", {
+                  }, value, React.createElement("span", {
+                        className: "text-sm text-gray-600"
+                      }, Config.paymentTokenName)), React.createElement("span", {
                     className: "font-bold"
                   }, "Exposure "), React.createElement(Tooltip.make, {
                     tip: "The impact " + marketName + " price movements have on " + (
@@ -126,7 +129,9 @@ function MarketCard(Props) {
                                   className: "font-bold"
                                 }, "TOTAL"), " Liquidity"), React.createElement("div", {
                               className: "text-3xl font-alphbeta tracking-wider py-1"
-                            }, "$" + FormatMoney.formatEther(undefined, totalValueLocked)), React.createElement("div", {
+                            }, FormatMoney.formatEther(undefined, totalValueLocked), React.createElement("span", {
+                                  className: "text-sm text-gray-600"
+                                }, Config.paymentTokenName)), React.createElement("div", {
                               className: "md:block hidden w-full"
                             }, liquidityRatio(undefined), Belt_Option.isNone(marketIndexOption) ? mintButtons(undefined) : null)), React.createElement("div", {
                           className: "order-3 w-1/2 md:w-1/4 flex-grow flex-wrap flex-col"
