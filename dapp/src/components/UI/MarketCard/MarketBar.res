@@ -1,5 +1,10 @@
 @react.component
-let make = (~percentStrLong, ~percentStrShort) => {
+let make = (~totalLockedLong, ~totalValueLocked) => {
+  let percentStrLong = Globals.percentStr(~n=totalLockedLong, ~outOf=totalValueLocked)
+  let percentStrShort =
+    (100.0 -. percentStrLong->Float.fromString->Option.getExn)
+      ->Js.Float.toFixedWithPrecision(~digits=2)
+
   <div className="relative w-full h-6 my-1">
     <div className="w-full flex h-8 justify-between items-center absolute bottom-0 z-10">
       <div className="font-bold text-xs ml-2 text-gray-100">
