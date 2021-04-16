@@ -4,7 +4,6 @@ let {ethAdrToLowerStr} = module(Ethers.Utils)
 
 type priceData = {
   date: Js.Date.t,
-  // date: string,
   price: float,
 }
 
@@ -47,7 +46,6 @@ type graphZoom = Day | Week | Month | ThreeMonth | Year | Max
 
 let minThreshodFromGraphSetting = graphSetting =>
   switch graphSetting {
-  // TODO: these values should be constants
   | Max => 0
   | Day => CONSTANTS.oneDayInSeconds
   | Week => CONSTANTS.oneWeekInSeconds
@@ -58,7 +56,6 @@ let minThreshodFromGraphSetting = graphSetting =>
 
 let btnTextFromGraphSetting = graphSetting =>
   switch graphSetting {
-  // TODO: these values should be constants
   | Max => "MAX"
   | Day => "1D"
   | Week => "1W"
