@@ -68,10 +68,21 @@ let btnTextFromGraphSetting = graphSetting =>
   | Year => "1Y"
   }
 
+let getMaxTimeDateFormatter = timeMarketExists => {
+  switch timeMarketExists {
+  | time if time < CONSTANTS.halfDayInSeconds => "hh aa"
+  | time if time < CONSTANTS.oneWeekInSeconds => "iii"
+  | time if time < CONSTANTS.twoWeeksInSeconds => "iii MMM"
+  | time if time < CONSTANTS.threeMonthsInSeconds => "iii MMM"
+  | time if time < CONSTANTS.oneYearInSeconds => "MMM"
+  | _ => "MMM"
+  }
+}
+
 let dateFormattersFromGraphSetting = graphSetting =>
   switch graphSetting {
   // https://date-fns.org/v2.19.0/docs/format
-  | Max(_timeMaketHasExisted) => "do MMM yyyy" /// TODO: implement! These numbers should be calculated dynamically based on the time the market has existed
+  | Max(timeMaketHasExisted) => timeMaketHasExisted->getMaxTimeDateFormatter
   | Day => "hh aa"
   | Week => "iii"
   | Month => "iii"
@@ -79,9 +90,40 @@ let dateFormattersFromGraphSetting = graphSetting =>
   | Year => "MMM"
   }
 
+let getMaxTimeIntervalAndAmount = timeMarketExists => {
+  switch timeMarketExists {
+  | time if time < CONSTANTS.halfDayInSeconds => (
+      CONSTANTS.fiveMinutesInSeconds,
+      // timeMarketExists / CONSTANTS.fiveMinutesInSeconds + 1, // Max data points: 144
+      1000,
+    )
+  | time if time < CONSTANTS.oneWeekInSeconds => (
+      CONSTANTS.oneHourInSeconds,
+      // timeMarketExists / CONSTANTS.oneHourInSeconds + 1, // Min data points: 13; Max data points: 84
+      1000,
+    )
+  | time if time < CONSTANTS.twoWeeksInSeconds => (
+      CONSTANTS.halfDayInSeconds,
+      // timeMarketExists / CONSTANTS.halfDayInSeconds + 1, // Min data points: 13; Max data points: 84
+      1000,
+    )
+  | time if time < CONSTANTS.threeMonthsInSeconds => (
+      CONSTANTS.oneDayInSeconds,
+      // timeMarketExists / CONSTANTS.oneDayInSeconds + 1, // Min data points: 15; Max data points: 90
+      1000,
+    )
+  | time if time < CONSTANTS.oneYearInSeconds => (
+      CONSTANTS.oneWeekInSeconds,
+      // timeMarketExists / CONSTANTS.oneWeekInSeconds + 1, // Min data points: 13; Max data points: 56
+      1000,
+    )
+  | _ => (CONSTANTS.twoWeeksInSeconds, 1000)
+  }
+}
+
 let zoomAndNumDataPointsFromGraphSetting = graphSetting =>
   switch graphSetting {
-  | Max(_timeMaketHasExisted) => (CONSTANTS.oneHourInSeconds, 1000) /// TODO: implement! These numbers should be calculated dynamically based on the time the market has existed
+  | Max(timeMaketHasExisted) => timeMaketHasExisted->getMaxTimeIntervalAndAmount
   | Day => (CONSTANTS.oneHourInSeconds, 24)
   | Week => (CONSTANTS.halfDayInSeconds, 14)
   | Month => (CONSTANTS.oneDayInSeconds, 30)

@@ -313,9 +313,21 @@ function btnTextFromGraphSetting(graphSetting) {
   }
 }
 
+function getMaxTimeDateFormatter(timeMarketExists) {
+  if (timeMarketExists < CONSTANTS.halfDayInSeconds) {
+    return "hh aa";
+  } else if (timeMarketExists < CONSTANTS.oneWeekInSeconds) {
+    return "iii";
+  } else if (timeMarketExists < CONSTANTS.twoWeeksInSeconds || timeMarketExists < CONSTANTS.threeMonthsInSeconds) {
+    return "iii MMM";
+  } else {
+    return "MMM";
+  }
+}
+
 function dateFormattersFromGraphSetting(graphSetting) {
   if (typeof graphSetting !== "number") {
-    return "do MMM yyyy";
+    return getMaxTimeDateFormatter(graphSetting._0);
   }
   switch (graphSetting) {
     case /* Day */0 :
@@ -331,12 +343,43 @@ function dateFormattersFromGraphSetting(graphSetting) {
   }
 }
 
-function zoomAndNumDataPointsFromGraphSetting(graphSetting) {
-  if (typeof graphSetting !== "number") {
+function getMaxTimeIntervalAndAmount(timeMarketExists) {
+  if (timeMarketExists < CONSTANTS.halfDayInSeconds) {
+    return [
+            CONSTANTS.fiveMinutesInSeconds,
+            1000
+          ];
+  } else if (timeMarketExists < CONSTANTS.oneWeekInSeconds) {
     return [
             CONSTANTS.oneHourInSeconds,
             1000
           ];
+  } else if (timeMarketExists < CONSTANTS.twoWeeksInSeconds) {
+    return [
+            CONSTANTS.halfDayInSeconds,
+            1000
+          ];
+  } else if (timeMarketExists < CONSTANTS.threeMonthsInSeconds) {
+    return [
+            CONSTANTS.oneDayInSeconds,
+            1000
+          ];
+  } else if (timeMarketExists < CONSTANTS.oneYearInSeconds) {
+    return [
+            CONSTANTS.oneWeekInSeconds,
+            1000
+          ];
+  } else {
+    return [
+            CONSTANTS.twoWeeksInSeconds,
+            1000
+          ];
+  }
+}
+
+function zoomAndNumDataPointsFromGraphSetting(graphSetting) {
+  if (typeof graphSetting !== "number") {
+    return getMaxTimeIntervalAndAmount(graphSetting._0);
   }
   switch (graphSetting) {
     case /* Day */0 :
@@ -549,7 +592,9 @@ export {
   LoadedGraph ,
   minThreshodFromGraphSetting ,
   btnTextFromGraphSetting ,
+  getMaxTimeDateFormatter ,
   dateFormattersFromGraphSetting ,
+  getMaxTimeIntervalAndAmount ,
   zoomAndNumDataPointsFromGraphSetting ,
   extractGraphPriceInfo ,
   generateDummyData ,
