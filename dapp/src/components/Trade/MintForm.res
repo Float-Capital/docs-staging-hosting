@@ -118,7 +118,6 @@ module MintFormInput = {
   @react.component
   let make = (
     ~onSubmit=_ => (),
-    ~market: Queries.SyntheticMarketInfo.t,
     ~onChangeSide=_ => (),
     ~isLong,
     ~onBlurSide=_ => (),
@@ -132,8 +131,6 @@ module MintFormInput = {
     ~disabled=false,
     ~onBlurIsStaking=_ => (),
     ~onChangeIsStaking=_ => (),
-    ~txStateApprove=ContractActions.UnInitialised,
-    ~txStateMint=ContractActions.UnInitialised,
     ~submitButton=<Button> "Login & Mint" </Button>,
   ) => {
     let formInput =
@@ -364,10 +361,7 @@ module MintFormSignedIn = {
     }, [txState])
 
     <MintFormInput
-      txStateApprove
-      txStateMint=txState
       onSubmit={form.submit}
-      market
       onChangeSide={event => {
         router.query->Js.Dict.set("actionOption", (event->ReactEvent.Form.target)["value"])
         router.query->Js.Dict.set(
@@ -423,7 +417,7 @@ let make = (~market: Queries.SyntheticMarketInfo.t, ~isLong) => {
   | Some(signer) => <MintFormSignedIn signer market isLong />
   | None =>
     <div onClick={_ => router->Next.Router.push(`/login?nextPath=${router.asPath}`)}>
-      <MintFormInput market isLong />
+      <MintFormInput isLong />
     </div>
   }
 }

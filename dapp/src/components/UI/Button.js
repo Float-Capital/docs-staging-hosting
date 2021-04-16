@@ -4,26 +4,36 @@ import * as React from "react";
 
 var buttonOuterStyle = "relative my-1";
 
-var buttonShaddowStyle = "transform translate-x-1 translate-y-1 w-full bg-primary inline-block";
+function buttonShaddowStyle(active) {
+  return (
+          active ? "" : "transform translate-x-1 translate-y-1"
+        ) + " w-full bg-primary inline-block";
+}
 
-var buttonTopStyle = "transform -translate-x-1 -translate-y-1 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 w-full transition ease-linear duration-0 italic cursor-pointer bg-white border text-primary active:text-white active:bg-primary active:outline-none uppercase tracking-btn-text";
+function buttonTopStyle(active) {
+  return (
+          active ? "text-white bg-primary outline-none" : "transform -translate-x-1 -translate-y-1 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 active:text-white active:bg-primary active:outline-none"
+        ) + " w-full transition ease-linear duration-0 italic cursor-pointer bg-white border text-primary uppercase tracking-btn-text";
+}
 
 function Button$Tiny(Props) {
   var onClickOpt = Props.onClick;
   var children = Props.children;
   var disabledOpt = Props.disabled;
+  var activeOpt = Props.active;
   var onClick = onClickOpt !== undefined ? onClickOpt : (function (param) {
         
       });
   var disabled = disabledOpt !== undefined ? disabledOpt : false;
+  var active = activeOpt !== undefined ? activeOpt : false;
   return React.createElement("div", {
               className: "flex"
             }, React.createElement("div", {
                   className: buttonOuterStyle + " w-full"
                 }, React.createElement("div", {
-                      className: buttonShaddowStyle + " h-full"
+                      className: buttonShaddowStyle(active) + " h-full"
                     }, React.createElement("button", {
-                          className: buttonTopStyle + " min-h-full focus:outline-none px-2 text-xxs " + (
+                          className: buttonTopStyle(active) + " min-h-full focus:outline-none px-2 text-xxs " + (
                             disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-200 cursor-not-allowed" : ""
                           ),
                           disabled: disabled,
@@ -39,16 +49,18 @@ function Button$Small(Props) {
   var onClickOpt = Props.onClick;
   var children = Props.children;
   var disabledOpt = Props.disabled;
+  var activeOpt = Props.active;
   var onClick = onClickOpt !== undefined ? onClickOpt : (function (param) {
         
       });
   var disabled = disabledOpt !== undefined ? disabledOpt : false;
+  var active = activeOpt !== undefined ? activeOpt : false;
   return React.createElement("div", {
               className: buttonOuterStyle
             }, React.createElement("div", {
-                  className: buttonShaddowStyle + " border"
+                  className: buttonShaddowStyle(active) + " border"
                 }, React.createElement("button", {
-                      className: buttonTopStyle + " p-2 text-sm focus:outline-none " + (
+                      className: buttonTopStyle(active) + " p-2 text-sm focus:outline-none " + (
                         disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-200 cursor-not-allowed" : ""
                       ),
                       disabled: disabled,
@@ -64,18 +76,20 @@ function Button$Element(Props) {
   var onClickOpt = Props.onClick;
   var children = Props.children;
   var disabledOpt = Props.disabled;
+  var activeOpt = Props.active;
   var onClick = onClickOpt !== undefined ? onClickOpt : (function (param) {
         
       });
   var disabled = disabledOpt !== undefined ? disabledOpt : false;
+  var active = activeOpt !== undefined ? activeOpt : false;
   return React.createElement("div", {
               className: "inline-block"
             }, React.createElement("div", {
                   className: buttonOuterStyle
                 }, React.createElement("div", {
-                      className: buttonShaddowStyle + " border-0 "
+                      className: buttonShaddowStyle(active) + " border-0 "
                     }, React.createElement("button", {
-                          className: buttonTopStyle + " p-3 focus:outline-none text-base mx-auto " + (
+                          className: buttonTopStyle(active) + " p-3 focus:outline-none text-base mx-auto " + (
                             disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-200 cursor-not-allowed" : ""
                           ),
                           disabled: disabled,
@@ -91,16 +105,18 @@ function Button(Props) {
   var onClickOpt = Props.onClick;
   var children = Props.children;
   var disabledOpt = Props.disabled;
+  var activeOpt = Props.active;
   var onClick = onClickOpt !== undefined ? onClickOpt : (function (param) {
         
       });
   var disabled = disabledOpt !== undefined ? disabledOpt : false;
+  var active = activeOpt !== undefined ? activeOpt : false;
   return React.createElement("div", {
               className: buttonOuterStyle
             }, React.createElement("div", {
-                  className: buttonShaddowStyle + " border-0"
+                  className: buttonShaddowStyle(active) + " border-0"
                 }, React.createElement("button", {
-                      className: buttonTopStyle + " p-3 focus:outline-none text-base " + (
+                      className: buttonTopStyle(active) + " p-3 focus:outline-none text-base " + (
                         disabled ? " transform -translate-x-0.5 -translate-y-0.5 bg-gray-200 cursor-not-allowed" : ""
                       ),
                       disabled: disabled,

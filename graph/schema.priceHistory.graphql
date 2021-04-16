@@ -1,6 +1,7 @@
-type FiveMinPrice @entity {
+type PriceInterval @entity {
   id: ID!
-  intervalIndex: BigInt! # This is `timestamp/5 minutes`
+  intervalIndex: BigInt! # This is `timestamp/60[] minutes`
+  intervalLength: BigInt!
   startTimestamp: BigInt!
   startPrice: BigInt!
   endPrice: BigInt!
@@ -10,6 +11,14 @@ type FiveMinPrice @entity {
   oracle: Oracle!
 }
 
+type PriceIntervalManager @entity {
+  id: ID! # oracleAddress-intervalLength
+  intervalLength: BigInt!
+  oracle: Oracle!
+  latestPriceInterval: PriceInterval!
+  prices: [PriceInterval!]!
+}
+
 type Oracle @entity {
   id: ID!
   address: Bytes!
@@ -17,8 +26,7 @@ type Oracle @entity {
   marketName: String!
   marketSymbol: String!
   latestPrice: BigInt!
-  fiveMinPrices: [FiveMinPrice!]!
-  latestFiveMinPrice: FiveMinPrice!
+  priceIntervals: [PriceIntervalManager!]!
 }
 
 type Global @entity {
