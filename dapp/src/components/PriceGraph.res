@@ -49,11 +49,11 @@ let minThreshodFromGraphSetting = graphSetting =>
   switch graphSetting {
   // TODO: these values should be constants
   | Max => 0
-  | Day => 86400
-  | Week => 604800
-  | Month => 2628029
-  | ThreeMonth => 7884087
-  | Year => 31536000
+  | Day => CONSTANTS.oneDayInSeconds
+  | Week => CONSTANTS.oneWeekInSeconds
+  | Month => CONSTANTS.oneMonthInSeconds
+  | ThreeMonth => CONSTANTS.threeMonthsInSeconds
+  | Year => CONSTANTS.oneYearInSeconds
   }
 
 let btnTextFromGraphSetting = graphSetting =>
@@ -80,12 +80,12 @@ let dateFormattersFromGraphSetting = graphSetting =>
 
 let zoomAndNumDataPointsFromGraphSetting = graphSetting =>
   switch graphSetting {
-  | Max => (3600, 1000) /// TODO: implement! These numbers should be calculated dynamically based on the time the market has existed
-  | Day => (3600, 24)
-  | Week => (43200, 14)
-  | Month => (86400, 30)
-  | ThreeMonth => (259200, 30)
-  | Year => (1209600, 26)
+  | Max => (CONSTANTS.oneHourInSeconds, 1000) /// TODO: implement! These numbers should be calculated dynamically based on the time the market has existed
+  | Day => (CONSTANTS.oneHourInSeconds, 24)
+  | Week => (CONSTANTS.halfDayInSeconds, 14)
+  | Month => (CONSTANTS.oneDayInSeconds, 30)
+  | ThreeMonth => (CONSTANTS.threeMonthsInSeconds, 30)
+  | Year => (CONSTANTS.twoWeeksInSeconds, 26)
   }
 
 type dataInfo = {dataArray: array<priceData>, minYValue: float, maxYValue: float}

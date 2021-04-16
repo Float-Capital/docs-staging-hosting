@@ -9,6 +9,7 @@ import * as Client from "../data/Client.js";
 import * as Ethers from "../ethereum/Ethers.js";
 import * as Js_int from "bs-platform/lib/es6/js_int.js";
 import * as Recharts from "recharts";
+import * as CONSTANTS from "../CONSTANTS.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
@@ -270,15 +271,15 @@ var LoadedGraph = {
 function minThreshodFromGraphSetting(graphSetting) {
   switch (graphSetting) {
     case /* Day */0 :
-        return 86400;
+        return CONSTANTS.oneDayInSeconds;
     case /* Week */1 :
-        return 604800;
+        return CONSTANTS.oneWeekInSeconds;
     case /* Month */2 :
-        return 2628029;
+        return CONSTANTS.oneMonthInSeconds;
     case /* ThreeMonth */3 :
-        return 7884087;
+        return CONSTANTS.threeMonthsInSeconds;
     case /* Year */4 :
-        return 31536000;
+        return CONSTANTS.oneYearInSeconds;
     case /* Max */5 :
         return 0;
     
@@ -324,32 +325,32 @@ function zoomAndNumDataPointsFromGraphSetting(graphSetting) {
   switch (graphSetting) {
     case /* Day */0 :
         return [
-                3600,
+                CONSTANTS.oneHourInSeconds,
                 24
               ];
     case /* Week */1 :
         return [
-                43200,
+                CONSTANTS.halfDayInSeconds,
                 14
               ];
     case /* Month */2 :
         return [
-                86400,
+                CONSTANTS.oneDayInSeconds,
                 30
               ];
     case /* ThreeMonth */3 :
         return [
-                259200,
+                CONSTANTS.threeMonthsInSeconds,
                 30
               ];
     case /* Year */4 :
         return [
-                1209600,
+                CONSTANTS.twoWeeksInSeconds,
                 26
               ];
     case /* Max */5 :
         return [
-                3600,
+                CONSTANTS.oneHourInSeconds,
                 1000
               ];
     
