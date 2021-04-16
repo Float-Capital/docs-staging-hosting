@@ -100,7 +100,8 @@ let make = (
   let mintButtons = () =>
     <div className={`flex w-full justify-around`}>
       <Button.Small
-        onClick={_ => {
+        onClick={event => {
+          ReactEvent.Mouse.preventDefault(event)
           router->Next.Router.pushShallow(
             `/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=long`,
           )
@@ -108,7 +109,8 @@ let make = (
         "Mint Long"
       </Button.Small>
       <Button.Small
-        onClick={_ => {
+        onClick={event => {
+          ReactEvent.Mouse.preventDefault(event)
           router->Next.Router.pushShallow(
             `/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=short`,
           )
@@ -117,10 +119,11 @@ let make = (
       </Button.Small>
     </div>
 
-  <>
-    <div className="p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg">
+  <Next.Link href={`/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
+    <div
+      className="p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg hover:shadow-xl">
       <div className="flex justify-center w-full my-1">
-        <h1 className="font-bold text-xl font-alphbeta">
+        <h1 className="font-bold text-xl font-alphbeta cursor-pointer">
           {marketName->React.string} <Tooltip tip={`This market tracks ${marketName}`} />
         </h1>
       </div>
@@ -155,5 +158,5 @@ let make = (
         {Option.isNone(marketIndexOption) ? mintButtons() : React.null}
       </div>
     </div>
-  </>
+  </Next.Link>
 }
