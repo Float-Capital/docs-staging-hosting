@@ -7,6 +7,7 @@ type priceData = {
   price: float,
 }
 
+// This module isn't used anywhere else in the code. If it is in the future, hoist it up into the Queries module.
 module PriceHistory = %graphql(`
 query ($intervalId: String!, $numDataPoints: Int!) @ppxConfig(schema: "graphql_schema_price_history.json") {
   priceIntervalManager(id: $intervalId) {
@@ -127,38 +128,7 @@ let generateDummyData = endTimestamp => {
   let oneDayInSecondsFloat = CONSTANTS.oneDayInSeconds->Float.fromInt
 
   // TODO: when I'm not on an airplane, look in docs how to generate this array easily.
-  let (result, _) = [
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-  ]->Array.reduce(
+  let (result, _) = Array.makeUninitialized(30)->Array.reduce(
     (
       {dataArray: [], minYValue: 200., maxYValue: 100., dateFormat: "iii"},
       endTimestamp->Float.fromInt,

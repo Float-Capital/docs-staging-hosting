@@ -385,38 +385,7 @@ function extractGraphPriceInfo(rawPriceData, graphZoomSetting) {
 }
 
 function generateDummyData(endTimestamp) {
-  return Belt_Array.reduce([
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1
-              ], [
+  return Belt_Array.reduce(new Array(30), [
                 {
                   dataArray: [],
                   minYValue: 200,
