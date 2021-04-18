@@ -86,7 +86,7 @@ function StateUpdates$ExampleStateUpdates(Props) {
   } else {
     tmp = "Your data will load once you log in";
   }
-  return React.createElement(React.Fragment, undefined, React.createElement("div", undefined, "Latest timestamp: " + Format(lastChangeJsDate, "PPPppp") + " (" + FormatDistanceToNow(lastChangeJsDate) + " ago)"), React.createElement("hr", undefined), React.createElement("hr", undefined), React.createElement("hr", undefined), React.createElement("div", undefined, tmp), React.createElement(AccessControl.make, {
+  return React.createElement(React.Fragment, undefined, React.createElement("div", undefined, "Latest timestamp: " + Format(lastChangeJsDate, "ha do MMM ''yy") + " (" + FormatDistanceToNow(lastChangeJsDate) + " ago)"), React.createElement("hr", undefined), React.createElement("hr", undefined), React.createElement("hr", undefined), React.createElement("div", undefined, tmp), React.createElement(AccessControl.make, {
                   children: React.createElement(StateUpdates$TestTxButton, {}),
                   alternateComponent: React.createElement("h1", undefined, "LOGIN TO MAKE TEST TRANSACTIONS")
                 }));

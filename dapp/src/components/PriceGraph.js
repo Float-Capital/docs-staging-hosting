@@ -197,7 +197,7 @@ function PriceGraph$LoadedGraph(Props) {
                               undefined,
                               undefined,
                               (function (value) {
-                                  return Format(value, "hha do MMM yyyy");
+                                  return Format(value, "ha do MMM ''yy");
                                 }),
                               undefined,
                               undefined,
@@ -315,7 +315,7 @@ function btnTextFromGraphSetting(graphSetting) {
 
 function getMaxTimeDateFormatter(timeMarketExists) {
   if (timeMarketExists < CONSTANTS.halfDayInSeconds) {
-    return "hh aa";
+    return "ha";
   } else if (timeMarketExists < CONSTANTS.oneWeekInSeconds) {
     return "iii";
   } else if (timeMarketExists < CONSTANTS.twoWeeksInSeconds || timeMarketExists < CONSTANTS.threeMonthsInSeconds) {
@@ -331,7 +331,7 @@ function dateFormattersFromGraphSetting(graphSetting) {
   }
   switch (graphSetting) {
     case /* Day */0 :
-        return "hh aa";
+        return "ha";
     case /* Week */1 :
     case /* Month */2 :
         return "iii";

@@ -54,7 +54,7 @@ module UserProfileCard = {
       ~maxLength=8,
       ~trailingCharacters=3,
     )
-    let joinedStr = userInfo.joinedAt->DateFns.format("do MMM ''yy")
+    let joinedStr = userInfo.joinedAt->DateFns.format(#"do MMM ''yy")
     let txStr = userInfo.transactionCount->Ethers.BigNumber.toString
     let gasStr = userInfo.gasUsed->Ethers.BigNumber.toString->FormatMoney.formatInt
 

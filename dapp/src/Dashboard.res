@@ -56,7 +56,7 @@ let floatProtocolCard = (~liveSince, ~totalTxs, ~totalUsers, ~totalGasUsed, ~txH
           ~prefix=`📅 Live since:`,
           ~value={
             let dateObj = liveSince->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime
-            `${dateObj->DateFns.format("do MMM ''yy")} (${dateObj->DateFns.formatDistanceToNow})`
+            `${dateObj->DateFns.format(#"do MMM ''yy")} (${dateObj->DateFns.formatDistanceToNow})`
           },
           ~link={`${Config.blockExplorer}/tx/${txHash}`},
           (),

@@ -31,7 +31,7 @@ module LoadedGraph = {
       height={isMobile ? Px(200.) : Prc(100.)} width=Prc(100.) className="w-full text-xs m-0 p-0">
       <LineChart margin={"top": 0, "right": 0, "bottom": 0, "left": 0} data>
         <Line _type=#natural dataKey="price" stroke="#0d4184" strokeWidth={2} dot={false} />
-        <Tooltip labelFormatter={value => value->DateFns.format("hha do MMM yyyy")} />
+        <Tooltip labelFormatter={value => value->DateFns.format(#"ha do MMM ''yy")} />
         <XAxis dataKey="date" tickFormatter={value => value->DateFns.format(xAxisFormat)} />
         <YAxis
           _type=#number
@@ -70,12 +70,12 @@ let btnTextFromGraphSetting = graphSetting =>
 
 let getMaxTimeDateFormatter = timeMarketExists => {
   switch timeMarketExists {
-  | time if time < CONSTANTS.halfDayInSeconds => "hh aa"
-  | time if time < CONSTANTS.oneWeekInSeconds => "iii"
-  | time if time < CONSTANTS.twoWeeksInSeconds => "iii MMM"
-  | time if time < CONSTANTS.threeMonthsInSeconds => "iii MMM"
-  | time if time < CONSTANTS.oneYearInSeconds => "MMM"
-  | _ => "MMM"
+  | time if time < CONSTANTS.halfDayInSeconds => #ha
+  | time if time < CONSTANTS.oneWeekInSeconds => #iii
+  | time if time < CONSTANTS.twoWeeksInSeconds => #"iii MMM"
+  | time if time < CONSTANTS.threeMonthsInSeconds => #"iii MMM"
+  | time if time < CONSTANTS.oneYearInSeconds => #MMM
+  | _ => #MMM
   }
 }
 
@@ -83,11 +83,11 @@ let dateFormattersFromGraphSetting = graphSetting =>
   switch graphSetting {
   // https://date-fns.org/v2.19.0/docs/format
   | Max(timeMaketHasExisted) => timeMaketHasExisted->getMaxTimeDateFormatter
-  | Day => "hh aa"
-  | Week => "iii"
-  | Month => "iii"
-  | ThreeMonth => "iii MMM"
-  | Year => "MMM"
+  | Day => #ha
+  | Week => #iii
+  | Month => #iii
+  | ThreeMonth => #"iii MMM"
+  | Year => #MMM
   }
 
 let getMaxTimeIntervalAndAmount = timeMarketExists => {
@@ -135,7 +135,7 @@ type dataInfo = {
   dataArray: array<priceData>,
   minYValue: float,
   maxYValue: float,
-  dateFormat: string,
+  dateFormat: DateFns.dateFormats,
 }
 
 @ocaml.doc(`Takes the raw prices returned from the graph and transforms them into the correct format for recharts to display, as well as getting the max+min y-values.`)
@@ -173,7 +173,7 @@ let generateDummyData = endTimestamp => {
   // TODO: when I'm not on an airplane, look in docs how to generate this array easily.
   let (result, _, _) = Array.makeUninitialized(60)->Array.reduce(
     (
-      {dataArray: [], minYValue: 200., maxYValue: 100., dateFormat: "iii"},
+      {dataArray: [], minYValue: 200., maxYValue: 100., dateFormat: #iii},
       endTimestamp->Float.fromInt,
       500. /* target price of the graph */,
     ),
