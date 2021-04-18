@@ -11,6 +11,7 @@ type priceData = {
 module PriceHistory = %graphql(`
 query ($intervalId: String!, $numDataPoints: Int!) @ppxConfig(schema: "graphql_schema_price_history.json") {
   priceIntervalManager(id: $intervalId) {
+    id
     prices(first: $numDataPoints, orderBy: intervalIndex, orderDirection:desc) {
       startTimestamp @ppxCustom(module: "Date")
       endPrice
@@ -128,14 +129,16 @@ let generateDummyData = endTimestamp => {
   let oneDayInSecondsFloat = CONSTANTS.oneDayInSeconds->Float.fromInt
 
   // TODO: when I'm not on an airplane, look in docs how to generate this array easily.
-  let (result, _) = Array.makeUninitialized(30)->Array.reduce(
+  let (result, _, _) = Array.makeUninitialized(60)->Array.reduce(
     (
       {dataArray: [], minYValue: 200., maxYValue: 100., dateFormat: "iii"},
       endTimestamp->Float.fromInt,
+      500.,
     ),
-    ((data, timestamp), _i) => {
+    ((data, timestamp, prevPrice), _i) => {
       let newTimestamp = timestamp -. oneDayInSecondsFloat
-      let randomPrice = Js.Math.random_int(100, 200)->Float.fromInt
+      let randomDelta = Js.Math.random_int(-30, 25)->Float.fromInt
+      let randomPrice = prevPrice +. randomDelta
       (
         {
           ...data,
@@ -149,6 +152,7 @@ let generateDummyData = endTimestamp => {
           maxYValue: randomPrice > data.maxYValue ? randomPrice : data.maxYValue,
         },
         newTimestamp,
+        randomPrice,
       )
     },
   )
@@ -165,6 +169,8 @@ let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
   let ({dataArray, minYValue, maxYValue}, setDisplayData) = React.useState(_ =>
     generateDummyData(currentTimestamp)
   )
+  let (overlayMessageText, setOverlayMessageText) = React.useState(_ => None)
+
   let (graphSetting, setGraphSetting) = React.useState(_ => Max(timeMaketHasExisted))
   let (intervalLength, numDataPoints) = graphSetting->zoomAndNumDataPointsFromGraphSetting
   let priceHistory = PriceHistory.use(
@@ -174,6 +180,24 @@ let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
       numDataPoints: numDataPoints,
     },
   )
+
+  React.useEffect2(() => {
+    {
+      switch priceHistory {
+      | {error: Some(_error)} => setOverlayMessageText(_ => Some("Error loading data"))
+      | {data: Some({priceIntervalManager: Some({prices})})} =>
+        setOverlayMessageText(_ => None)
+        setDisplayData(_ => prices->extractGraphPriceInfo(graphSetting))
+      | {data: Some({priceIntervalManager: None})} =>
+        setOverlayMessageText(_ => Some("Unable to find prices for this market"))
+      | {data: None, error: None, loading: false}
+      | {loading: true} =>
+        setOverlayMessageText(_ => Some(`Loading data for ${marketName}`))
+      }
+    }
+
+    None
+  }, (graphSetting, priceHistory.loading))
 
   let overlayMessage = message =>
     <div
@@ -190,29 +214,21 @@ let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
         minYValue
         maxYValue
       />
-      {switch priceHistory {
-      | {error: Some(_error)} => "Error loading data"->React.string
-      | {data: Some({priceIntervalManager: Some({prices})})} =>
-        setDisplayData(_ => prices->extractGraphPriceInfo(graphSetting))
-        React.null
-      | {data: Some({priceIntervalManager: None})} =>
-        overlayMessage("Unable to find prices for this market")
-      | {data: None, error: None, loading: false}
-      | {loading: true} =>
-        overlayMessage(`Loading data for ${marketName}`)
-      }}
+      {overlayMessageText->Option.mapWithDefault(React.null, overlayMessage)}
       <div className="flex flex-row justify-between ml-5">
         {[Day, Week, Month, ThreeMonth, Year, Max(timeMaketHasExisted)]
-        ->Array.map(buttonSetting =>
+        ->Array.map(buttonSetting => {
+          let text = btnTextFromGraphSetting(buttonSetting)
           <Button.Tiny
+            key={text}
             disabled={minThreshodFromGraphSetting(buttonSetting) > timeMaketHasExisted}
             active={graphSetting == buttonSetting}
             onClick={_ => {
               setGraphSetting(_ => buttonSetting)
             }}>
-            {btnTextFromGraphSetting(buttonSetting)}
+            {text}
           </Button.Tiny>
-        )
+        })
         ->React.array}
       </div>
     </div>

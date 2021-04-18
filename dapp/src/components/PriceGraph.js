@@ -33,6 +33,7 @@ var query = (require("@apollo/client").gql`
   query ($intervalId: String!, $numDataPoints: Int!)  {
     priceIntervalManager(id: $intervalId)  {
       __typename
+      id
       prices(first: $numDataPoints, orderBy: intervalIndex, orderDirection: desc)  {
         __typename
         startTimestamp
@@ -51,6 +52,7 @@ function parse(value) {
     var value$2 = value$1.prices;
     tmp = {
       __typename: value$1.__typename,
+      id: value$1.id,
       prices: value$2.map(function (value) {
             return {
                     __typename: value.__typename,
@@ -82,9 +84,11 @@ function serialize(value) {
                   endPrice: value$2
                 };
         });
-    var value$3 = value$1.__typename;
+    var value$3 = value$1.id;
+    var value$4 = value$1.__typename;
     priceIntervalManager = {
-      __typename: value$3,
+      __typename: value$4,
+      id: value$3,
       prices: prices
     };
   } else {
@@ -385,19 +389,21 @@ function extractGraphPriceInfo(rawPriceData, graphZoomSetting) {
 }
 
 function generateDummyData(endTimestamp) {
-  return Belt_Array.reduce(new Array(30), [
+  return Belt_Array.reduce(new Array(60), [
                 {
                   dataArray: [],
                   minYValue: 200,
                   maxYValue: 100,
                   dateFormat: "iii"
                 },
-                endTimestamp
+                endTimestamp,
+                500
               ], (function (param, _i) {
                   var timestamp = param[1];
                   var data = param[0];
                   var newTimestamp = timestamp - CONSTANTS.oneDayInSeconds;
-                  var randomPrice = Js_math.random_int(100, 200);
+                  var randomDelta = Js_math.random_int(-30, 25);
+                  var randomPrice = param[2] + randomDelta;
                   return [
                           {
                             dataArray: Belt_Array.concat([{
@@ -408,7 +414,8 @@ function generateDummyData(endTimestamp) {
                             maxYValue: randomPrice > data.maxYValue ? randomPrice : data.maxYValue,
                             dateFormat: data.dateFormat
                           },
-                          newTimestamp
+                          newTimestamp,
+                          randomPrice
                         ];
                 }))[0];
 }
@@ -423,16 +430,21 @@ function PriceGraph(Props) {
   var match = React.useState(function () {
         return generateDummyData(currentTimestamp);
       });
+  var setDisplayData = match[1];
   var match$1 = match[0];
   var match$2 = React.useState(function () {
+        
+      });
+  var setOverlayMessageText = match$2[1];
+  var match$3 = React.useState(function () {
         return {
                 _0: timeMaketHasExisted,
                 [Symbol.for("name")]: "Max"
               };
       });
-  var setGraphSetting = match$2[1];
-  var graphSetting = match$2[0];
-  var match$3 = zoomAndNumDataPointsFromGraphSetting(graphSetting);
+  var setGraphSetting = match$3[1];
+  var graphSetting = match$3[0];
+  var match$4 = zoomAndNumDataPointsFromGraphSetting(graphSetting);
   var priceHistory = Curry.app(use, [
         undefined,
         Caml_option.some(Client.createContext(/* PriceHistory */1)),
@@ -448,33 +460,50 @@ function PriceGraph(Props) {
         undefined,
         undefined,
         {
-          intervalId: ethAdrToLowerStr(oracleAddress) + "-" + String(match$3[0]),
-          numDataPoints: match$3[1]
+          intervalId: ethAdrToLowerStr(oracleAddress) + "-" + String(match$4[0]),
+          numDataPoints: match$4[1]
         }
+      ]);
+  React.useEffect((function () {
+          var exit = 0;
+          var match = priceHistory.data;
+          if (priceHistory.error !== undefined) {
+            Curry._1(setOverlayMessageText, (function (param) {
+                    return "Error loading data";
+                  }));
+          } else if (match !== undefined) {
+            var match$1 = match.priceIntervalManager;
+            if (match$1 !== undefined) {
+              var prices = match$1.prices;
+              Curry._1(setOverlayMessageText, (function (param) {
+                      
+                    }));
+              Curry._1(setDisplayData, (function (param) {
+                      return extractGraphPriceInfo(prices, graphSetting);
+                    }));
+            } else {
+              Curry._1(setOverlayMessageText, (function (param) {
+                      return "Unable to find prices for this market";
+                    }));
+            }
+          } else {
+            exit = 1;
+          }
+          if (exit === 1) {
+            Curry._1(setOverlayMessageText, (function (param) {
+                    return "Loading data for " + marketName;
+                  }));
+          }
+          
+        }), [
+        graphSetting,
+        priceHistory.loading
       ]);
   var overlayMessage = function (message) {
     return React.createElement("div", {
                 className: "v-align-in-responsive-height text-center text-gray-500 bg-white bg-opacity-90 p-2 z-10 rounded-lg"
               }, message);
   };
-  var match$4 = priceHistory.data;
-  var tmp;
-  if (priceHistory.error !== undefined) {
-    tmp = "Error loading data";
-  } else if (match$4 !== undefined) {
-    var match$5 = match$4.priceIntervalManager;
-    if (match$5 !== undefined) {
-      var prices = match$5.prices;
-      Curry._1(match[1], (function (param) {
-              return extractGraphPriceInfo(prices, graphSetting);
-            }));
-      tmp = null;
-    } else {
-      tmp = overlayMessage("Unable to find prices for this market");
-    }
-  } else {
-    tmp = priceHistory.loading ? overlayMessage("Loading data for " + marketName) : overlayMessage("Loading data for " + marketName);
-  }
   return React.createElement(React.Fragment, undefined, React.createElement("div", {
                   className: "flex-1 p-1 my-4 mr-6 flex flex-col relative"
                 }, React.createElement("h3", {
@@ -484,7 +513,7 @@ function PriceGraph(Props) {
                       xAxisFormat: dateFormattersFromGraphSetting(graphSetting),
                       minYValue: match$1.minYValue,
                       maxYValue: match$1.maxYValue
-                    }), tmp, React.createElement("div", {
+                    }), Belt_Option.mapWithDefault(match$2[0], null, overlayMessage), React.createElement("div", {
                       className: "flex flex-row justify-between ml-5"
                     }, Belt_Array.map([
                           /* Day */0,
@@ -497,15 +526,17 @@ function PriceGraph(Props) {
                             [Symbol.for("name")]: "Max"
                           }
                         ], (function (buttonSetting) {
+                            var text = btnTextFromGraphSetting(buttonSetting);
                             return React.createElement(Button.Tiny.make, {
                                         onClick: (function (param) {
                                             return Curry._1(setGraphSetting, (function (param) {
                                                           return buttonSetting;
                                                         }));
                                           }),
-                                        children: btnTextFromGraphSetting(buttonSetting),
+                                        children: text,
                                         disabled: minThreshodFromGraphSetting(buttonSetting) > timeMaketHasExisted,
-                                        active: Caml_obj.caml_equal(graphSetting, buttonSetting)
+                                        active: Caml_obj.caml_equal(graphSetting, buttonSetting),
+                                        key: text
                                       });
                           })))));
 }
