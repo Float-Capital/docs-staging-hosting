@@ -133,11 +133,11 @@ let generateDummyData = endTimestamp => {
     (
       {dataArray: [], minYValue: 200., maxYValue: 100., dateFormat: "iii"},
       endTimestamp->Float.fromInt,
-      500.,
+      500. /* target price of the graph */,
     ),
     ((data, timestamp, prevPrice), _i) => {
       let newTimestamp = timestamp -. oneDayInSecondsFloat
-      let randomDelta = Js.Math.random_int(-30, 25)->Float.fromInt
+      let randomDelta = Js.Math.random_int(-30, 25)->Float.fromInt // The graph goes up and down randomly between -30 and 25, but since the graph is reversed it goes goes up more than down (30 up, 25 down)
       let randomPrice = prevPrice +. randomDelta
       (
         {
