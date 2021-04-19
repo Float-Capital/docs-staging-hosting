@@ -2,6 +2,7 @@
 
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
+import * as Config from "./Config.js";
 import * as Ethers from "./ethereum/Ethers.js";
 import * as Masonry from "./components/UI/Masonry.js";
 import * as Queries from "./data/Queries.js";
@@ -15,6 +16,7 @@ import * as DashboardLi from "./components/UI/Dashboard/DashboardLi.js";
 import * as DashboardUl from "./components/UI/Dashboard/DashboardUl.js";
 import * as FormatMoney from "./components/UI/FormatMoney.js";
 import * as DashboardCalcs from "./libraries/DashboardCalcs.js";
+import Format from "date-fns/format";
 import * as DashboardStakeCard from "./components/UI/Dashboard/DashboardStakeCard.js";
 import FromUnixTime from "date-fns/fromUnixTime";
 import FormatDistanceToNow from "date-fns/formatDistanceToNow";
@@ -95,7 +97,7 @@ function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed, txHash
                   children: "Float Protocol 🏗️"
                 }), React.createElement(DashboardUl.make, {
                   list: [
-                    DashboardLi.Props.createDashboardLiProps(undefined, "📅 Live since:", dateObj.toDateString() + " (" + FormatDistanceToNow(dateObj) + ")", "https://testnet.bscscan.com/tx/" + txHash, undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "📅 Live since:", Format(dateObj, "do MMM ''yy") + " (" + FormatDistanceToNow(dateObj) + ")", Config.blockExplorer + "/tx/" + txHash, undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "📈 No. txs:", totalTxs.toString(), undefined, undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "👯‍♀️ No. users:", totalUsers.toString(), undefined, undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "⛽ Gas used:", FormatMoney.formatInt(totalGasUsed.toString()), undefined, undefined)

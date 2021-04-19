@@ -56,9 +56,9 @@ let floatProtocolCard = (~liveSince, ~totalTxs, ~totalUsers, ~totalGasUsed, ~txH
           ~prefix=`📅 Live since:`,
           ~value={
             let dateObj = liveSince->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime
-            `${dateObj->Js.Date.toDateString} (${dateObj->DateFns.formatDistanceToNow})`
+            `${dateObj->DateFns.format("do MMM ''yy")} (${dateObj->DateFns.formatDistanceToNow})`
           },
-          ~link={`https://testnet.bscscan.com/tx/${txHash}`},
+          ~link={`${Config.blockExplorer}/tx/${txHash}`},
           (),
         ),
         createDashboardLiProps(
