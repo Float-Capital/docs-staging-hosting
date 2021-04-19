@@ -1,5 +1,14 @@
 @react.component
-let make = (~placeholder, ~value, ~optBalance=None, ~disabled, ~onBlur, ~onChange, ~onMaxClick) =>
+let make = (
+  ~placeholder,
+  ~value,
+  ~optBalance=None,
+  ~disabled,
+  ~onBlur,
+  ~onChange,
+  ~onMaxClick,
+  ~optCurrency=None,
+) =>
   <div className="flex flex-row my-3">
     <input
       id="amount"
@@ -11,6 +20,13 @@ let make = (~placeholder, ~value, ~optBalance=None, ~disabled, ~onBlur, ~onChang
       onBlur={onBlur}
       onChange={onChange}
     />
+    {switch optCurrency {
+    | Some(currency) =>
+      <span className="flex items-center bg-white pr-3 text-md text-gray-300">
+        {currency->React.string}
+      </span>
+    | _ => React.null
+    }}
     {switch optBalance {
     | Some(balance) =>
       <span className="flex items-center bg-white px-1 text-xxs text-gray-400">

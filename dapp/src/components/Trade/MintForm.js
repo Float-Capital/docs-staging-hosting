@@ -710,7 +710,8 @@ function MintForm$MintFormInput(Props) {
             disabled: disabled,
             onBlur: onBlurAmount,
             onChange: onChangeAmountInput,
-            onMaxClick: onMaxClick
+            onMaxClick: onMaxClick,
+            optCurrency: Config.paymentTokenName
           }), optErrorMessage !== undefined ? React.createElement("div", {
               className: "text-red-500 text-xs"
             }, optErrorMessage) : null, React.createElement("div", {
