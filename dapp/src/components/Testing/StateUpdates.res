@@ -50,7 +50,7 @@ module ExampleStateUpdates = {
     <>
       <div>
         {`Latest timestamp: ${lastChangeJsDate->DateFns.format(
-            "PPPppp",
+            #"ha do MMM ''yy",
           )} (${lastChangeJsDate->DateFns.formatDistanceToNow} ago)`->React.string}
       </div>
       <hr />
