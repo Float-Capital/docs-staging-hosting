@@ -34,6 +34,8 @@ module UserBalancesCard = {
               key={`${name}-${isLong ? "long" : "short"}`}
               name
               isLong
+              tokenAddress={addr}
+              metamaskMenu={true}
               tokens={FormatMoney.formatEther(tokenBalance)}
               value={FormatMoney.formatEther(tokensValue)}>
               <UserMarketStakeOrRedeem synthAddress={addr->Ethers.Utils.ethAdrToLowerStr} isLong />

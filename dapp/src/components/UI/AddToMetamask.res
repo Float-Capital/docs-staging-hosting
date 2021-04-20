@@ -34,17 +34,25 @@ let requestStructure = (~tokenAddress, ~tokenSymbol) => {
 }
 
 @react.component
-let make = (~tokenAddress, ~tokenSymbol) => {
+let make = (
+  ~tokenAddress,
+  ~tokenSymbol,
+  ~callback=_ => (),
+  ~children=<img src="/icons/metamask.svg" className="h-5 ml-1" />,
+) => {
   let addToMetamask = ethObj =>
     Misc.onlyExecuteClientSide(() => {
       request(ethObj, requestStructure(~tokenAddress, ~tokenSymbol))
+      callback()
     })
 
   switch ethObj {
   | Some(ethObj) =>
     <div onClick={_event => addToMetamask(ethObj)} className="flex justify-start align-center">
-      //   <div className="text-sm"> {"Add token to "->React.string} </div>
-      <img src="/icons/metamask.svg" className="h-5 ml-1" />
+      {
+        //   <div className="text-sm"> {"Add token to "->React.string} </div>
+        children
+      }
     </div>
   | None => React.null
   }
