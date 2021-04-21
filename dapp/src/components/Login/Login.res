@@ -1,12 +1,37 @@
-type connectorObj = {
-  name: string,
-  connector: Web3Connectors.injectedType,
-  img: string,
-  connectionPhrase: string,
+open Web3Connectors
+
+module ConnectorConfig = {
+  let pollingInterval = 8000
+
+  let rpcUrl = "https://kovan.infura.io/v3/84842078b09946638c03157f83405213"
 }
 
-@module("./connectors")
-external connectors: array<connectorObj> = "default"
+let connectors = [
+  {
+    name: "MetaMask",
+    connector: injected,
+    img: "/img/wallet-icons/metamask.svg",
+    connectionPhrase: "Connect to your MetaMask Wallet",
+  },
+  {
+    name: "WalletConnect",
+    connector: WalletConnectConnector.make({
+      // TODO: make this easier to configure
+      rpc: {"42": ConnectorConfig.rpcUrl},
+      bridge: "https://bridge.walletconnect.org",
+      qrcode: true,
+      pollingInterval: ConnectorConfig.pollingInterval,
+    }),
+    connectionPhrase: "Connect via WalletConnect",
+    img: "/img/wallet-icons/walletConnect.svg",
+  },
+  {
+    name: "Torus",
+    connector: TorusConnector.make({chainId: 1}),
+    connectionPhrase: "Connect via Torus",
+    img: "/img/wallet-icons/torus.svg",
+  },
+]
 
 @react.component
 let make = () => {

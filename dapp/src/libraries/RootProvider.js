@@ -8,7 +8,7 @@ import * as JsPromise from "./Js.Promise/JsPromise.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as ToastProvider from "../components/UI/ToastProvider.js";
-import * as Web3Connectors from "../components/Login/Web3Connectors.js";
+import * as Web3Connectors from "../bindings/web3-react/Web3Connectors.js";
 import * as Core from "@web3-react/core";
 import * as Caml_js_exceptions from "bs-platform/lib/es6/caml_js_exceptions.js";
 
