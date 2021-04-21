@@ -13,7 +13,7 @@ slug: /terminology
 
 ### EthKillers
 
-The EthKillers is the first synthetic market offered by Float Capital and tracks an equally weighted index comprised of [TRON](https://tron.network/), [XRP](https://ripple.com/xrp/), and [EOS](https://eos.io/) that were nicknamed EthKillers as they were said to be the _killers_ of Ethereum.
+The EthKillers is the intended first synthetic market offered by Float Capital and tracks an equally weighted index comprised of [TRON](https://tron.network/), [XRP](https://ripple.com/xrp/), and [EOS](https://eos.io/) that were nicknamed EthKillers as they were said to be the _killers_ of Ethereum.
 
 ### Floating Exposure
 
@@ -41,28 +41,37 @@ Inversely to [going long](/docs/terminology#going-long), going short is usually 
 
 ### Index
 
-A collection of stocks that fit a similar theme. These stocks are bundled together in what’s known as a "basket" to mimic an economy, market, or sector, allowing investors to broadly track different securities. Examples of an index would be the S&P 500, the Dow Jones, and the FTSE 100.
+A collection of assets, for example stocks, that fit a similar theme. These stocks are bundled together in what’s known as a "basket" to mimic an economy, market, or sector, allowing investors to broadly track different securities. Examples of an index would be the S&P 500, the Dow Jones, and the FTSE 100.
+
+To quote John Bogle the founder of Vanguard and investment pioneer
+
+> Don't look for the needle in the haystack. Just buy the haystack.
+
+An index allows you to reap the benefits of diversification through owning a large universe of assets
 
 ### Minting
 
-Users gain exposure from minting a token in a long or short synthetic asset by depositing DAI as collateral. The user **mints** synthetic tokens.
+Users simply use there dollars to buy a synthetic asset. In fancy terms, spending you DAI (dollars) and minting (receiving) a synthetic asset in return.
 
 ### Staking
 
 The act of locking tokens to receive rewards, e.g staking EthKillers long tokens to earn Float tokens.
 
-
 ### Over-collateralization
 
 Used to define a situation where more collateral of an asset/assets value is used than what is needed to cover potential loss.
+
+For example a 200% over collateralization, requires a lock up $200 of collateral to receive $100 worth of a synthetic asset.
+
+Float Capital **does not require** over-collateralization!
 
 ### Oracle
 
 An oracle in the general blockchain sense is a data feed that provides some form of real world data on the blockchain. For Float Capital, oracles provide reliable price data for a market.
 
-### Yield enhanced
+### Yield enhancement
 
-A platform feature that rewards users a yield on the underlying collateral ([DAI](/docs/terminology#dai)) when they provide liquidity in the market. Users that provide liquidity on the under balanced side of the market are rewarded a higher yield. This is an incentive mechanism to balance the market. The underlying collateral is deposited in [Aave](https://aave.com/).
+A Float platform feature that rewards users by giving them a yield on the underlying collateral ([DAI](/docs/terminology#dai)) when they provide liquidity in the market. Users that provide liquidity on the under balanced side of the market are rewarded a higher yield. This is an incentive mechanism to balance the market. The underlying collateral is deposited in [Aave](https://aave.com/).
 
 ### DAI
 
