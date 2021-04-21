@@ -63,7 +63,8 @@ function StateChangeMonitor(Props) {
                                           }));
                                     Belt_Array.map(param.affectedUsers, (function (param) {
                                             var tokenBalances = param.tokenBalances;
-                                            var id = param.basicUserInfo.id;
+                                            var userInfo = param.basicUserInfo;
+                                            var id = userInfo.id;
                                             var __typename = param.__typename;
                                             Belt_Array.map(tokenBalances, (function (tokenBalance) {
                                                     Curry._6(client.rescript_writeQuery, {
@@ -83,6 +84,17 @@ function StateChangeMonitor(Props) {
                                                         });
                                                     
                                                   }));
+                                            Curry._6(client.rescript_writeQuery, {
+                                                  query: Queries.UserQuery.query,
+                                                  Raw: Queries.UserQuery.Raw,
+                                                  parse: Queries.UserQuery.parse,
+                                                  serialize: Queries.UserQuery.serialize,
+                                                  serializeVariables: Queries.UserQuery.serializeVariables
+                                                }, undefined, {
+                                                  user: userInfo
+                                                }, undefined, undefined, {
+                                                  userId: id
+                                                });
                                             var balanceReadQuery = Curry._5(client.rescript_readQuery, {
                                                   query: Queries.UsersBalances.query,
                                                   Raw: Queries.UsersBalances.Raw,

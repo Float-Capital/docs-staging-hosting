@@ -29,11 +29,14 @@ module UserBalancesCard = {
           <br />
           {balances
           ->Array.keep(({tokenBalance}) => !(tokenBalance->Ethers.BigNumber.eq(CONSTANTS.zeroBN)))
-          ->Array.map(({addr, name, isLong, tokenBalance, tokensValue}) =>
+          ->Array.map(({addr, name, symbol, isLong, tokenBalance, tokensValue}) =>
             <UserMarketBox
               key={`${name}-${isLong ? "long" : "short"}`}
               name
               isLong
+              tokenAddress={addr}
+              symbol
+              metamaskMenu={true}
               tokens={FormatMoney.formatEther(tokenBalance)}
               value={FormatMoney.formatEther(tokensValue)}>
               <UserMarketStakeOrRedeem synthAddress={addr->Ethers.Utils.ethAdrToLowerStr} isLong />

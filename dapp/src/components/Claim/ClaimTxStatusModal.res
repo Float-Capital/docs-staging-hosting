@@ -18,6 +18,18 @@ let make = (~txState) => {
   | ContractActions.Complete({transactionHash: _}) =>
     <Modal id={3}>
       <div className="text-center m-3"> <p> {`Transaction complete 🎉`->React.string} </p> </div>
+      {if InjectedEthereum.isMetamask() {
+        <AddToMetamask
+          tokenAddress={Config.config.contracts.floatToken->Ethers.Utils.ethAdrToStr}
+          tokenSymbol={"FLOAT"}>
+          <button
+            className="w-36 h-12 text-sm shadow-md rounded-lg border-2 focus:outline-none border-gray-200 hover:bg-gray-200 flex justify-center items-center mx-auto">
+            {"Add FLOAT to"->React.string} <img src="/icons/metamask.svg" className="h-5 ml-1" />
+          </button>
+        </AddToMetamask>
+      } else {
+        React.null
+      }}
     </Modal>
   | ContractActions.Declined(_message) =>
     <Modal id={4}>

@@ -122,6 +122,7 @@ let useStakesForUser = (~userId) => {
 type userSynthBalance = {
   addr: Ethers.ethAddress,
   name: string,
+  symbol: string,
   isLong: bool,
   tokenBalance: Ethers.BigNumber.t,
   tokensValue: Ethers.BigNumber.t,
@@ -142,7 +143,12 @@ let useUsersBalances = (~userId) => {
       {totalBalance, balances},
       {
         tokenBalance,
-        syntheticToken: {id, tokenType, syntheticMarket: {name}, latestPrice: {price: {price}}},
+        syntheticToken: {
+          id,
+          tokenType,
+          syntheticMarket: {name, symbol},
+          latestPrice: {price: {price}},
+        },
       },
     ) => {
       let isLong = tokenType == #Long
@@ -151,6 +157,7 @@ let useUsersBalances = (~userId) => {
         name: name,
         isLong: isLong,
         tokenBalance: tokenBalance,
+        symbol: symbol,
         tokensValue: price
         ->Ethers.BigNumber.mul(tokenBalance)
         ->Ethers.BigNumber.div(CONSTANTS.tenToThe18),

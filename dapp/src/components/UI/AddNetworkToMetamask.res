@@ -1,6 +1,3 @@
-type ethereum
-@val @scope("window") external ethObj: option<ethereum> = "ethereum"
-
 type nativeCurrency = {
   name: string,
   symbol: string,
@@ -20,7 +17,7 @@ type requestObj = {
   params: array<reqParams>,
 }
 
-@send external request: (ethereum, requestObj) => unit = "request"
+@send external request: (InjectedEthereum.t, requestObj) => unit = "request"
 
 @react.component
 let make = () => {
@@ -46,7 +43,7 @@ let make = () => {
       )
     })
 
-  switch ethObj {
+  switch InjectedEthereum.ethObj {
   | Some(ethObj) =>
     <Button.Element onClick={_event => addToMetamask(ethObj)}>
       <div className="mx-auto">
