@@ -67,6 +67,8 @@ let make = (~children) => {
                 )
               })
 
+			  // NOTE: This is only necessary in the case that the `UserQuery` hasn't been made yet (for example if they haven't navigated to their profile
+			  //     - even in that case it isn't strictly needed, since when navigating to a page that needs this data the page will load it freshly anyway.
               let _ = client.writeQuery(
                 ~query=module(Queries.UserQuery),
                 ~data={
