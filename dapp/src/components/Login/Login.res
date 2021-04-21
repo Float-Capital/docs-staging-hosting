@@ -10,7 +10,6 @@ let connectors = [
   {
     name: "WalletConnect",
     connector: WalletConnectConnector.make({
-      // TODO: make this easier to configure
       rpc: Js.Dict.fromArray([(Config.networkId->Int.toString, Config.rpcEndopint)]),
       bridge: "https://bridge.walletconnect.org",
       qrcode: true,

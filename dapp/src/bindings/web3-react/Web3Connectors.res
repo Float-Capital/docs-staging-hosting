@@ -7,8 +7,6 @@ type connectorObj = {
   connectionPhrase: string,
 }
 
-// TODO: move this config to a global file
-
 module InjectedConnector = {
   type connectorOptions = {supportedChainIds: array<int>}
   @module("@web3-react/injected-connector") @new
