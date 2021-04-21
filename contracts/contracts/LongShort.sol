@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BUSL-1.1
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.3;
 
@@ -146,6 +146,8 @@ contract LongShort is ILongShort, Initializable {
         uint256 badLiquidityExitFee
     );
 
+    event OracleUpdated(uint32 marketIndex, address oracle);
+
     ////////////////////////////////////
     /////////// MODIFIERS //////////////
     ////////////////////////////////////
@@ -239,6 +241,19 @@ contract LongShort is ILongShort, Initializable {
             _baseExitFee,
             _badLiquidityExitFee
         );
+    }
+
+    /**
+     * Update oracle for a market
+     */
+    function updateMarketOracle(uint32 marketIndex, address _oracleManager)
+        external
+        adminOnly
+    {
+        // If not a oracle contract this would break things.. Test's arn't validating this
+        // Ie require isOracle interface
+        oracleManagers[marketIndex] = IOracleManager(_oracleManager);
+        emit OracleUpdated(marketIndex, _oracleManager);
     }
 
     /**

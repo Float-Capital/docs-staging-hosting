@@ -273,5 +273,5 @@ module.exports = async function(deployer, network, accounts) {
     await longShort._updateSystemState(marketIndex);
 
     await staker.claimFloat([longAddress, shortAddress], { from: user3 });
-  }
+  }  
 };
