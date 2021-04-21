@@ -1,11 +1,5 @@
 open Web3Connectors
 
-module ConnectorConfig = {
-  let pollingInterval = 8000
-
-  let rpcUrl = "https://kovan.infura.io/v3/84842078b09946638c03157f83405213"
-}
-
 let connectors = [
   {
     name: "MetaMask",
@@ -17,10 +11,10 @@ let connectors = [
     name: "WalletConnect",
     connector: WalletConnectConnector.make({
       // TODO: make this easier to configure
-      rpc: {"42": ConnectorConfig.rpcUrl},
+      rpc: Js.Dict.fromArray([(Config.networkId->Int.toString, Config.rpcEndopint)]),
       bridge: "https://bridge.walletconnect.org",
       qrcode: true,
-      pollingInterval: ConnectorConfig.pollingInterval,
+      pollingInterval: Config.web3PollingInterval,
     }),
     connectionPhrase: "Connect via WalletConnect",
     img: "/img/wallet-icons/walletConnect.svg",

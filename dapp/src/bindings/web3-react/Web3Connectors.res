@@ -15,14 +15,14 @@ module InjectedConnector = {
   external make: connectorOptions => injectedType = "InjectedConnector"
 }
 module WalletConnectConnector = {
-  type connectorOptions<'a> = {
-    rpc: 'a,
+  type connectorOptions = {
+    rpc: Js.Dict.t<string>,
     bridge: string,
     qrcode: bool,
     pollingInterval: int,
   }
   @module("@web3-react/walletconnect-connector") @new
-  external make: connectorOptions<'a> => injectedType = "WalletConnectConnector"
+  external make: connectorOptions => injectedType = "WalletConnectConnector"
 }
 module TorusConnector = {
   type connectorOptions = {chainId: int}

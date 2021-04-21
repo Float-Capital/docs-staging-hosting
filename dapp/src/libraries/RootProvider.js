@@ -2,6 +2,7 @@
 
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
+import * as Config from "../Config.js";
 import * as Ethers from "ethers";
 import * as Globals from "./Globals.js";
 import * as JsPromise from "./Js.Promise/JsPromise.js";
@@ -16,8 +17,8 @@ var Web3ReactProvider = {};
 
 function getLibrary(provider) {
   var library = new (Ethers.providers.Web3Provider)(provider);
-  var setPollingInterval = (lib => {lib.pollingInterval = 8000; return lib; });
-  return setPollingInterval(library);
+  var setPollingInterval = ((lib, pollingInterval) => {lib.pollingInterval = pollingInterval; return lib; });
+  return setPollingInterval(library, Config.web3PollingInterval);
 }
 
 var initialState = {

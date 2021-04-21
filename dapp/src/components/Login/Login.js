@@ -11,13 +11,6 @@ import * as Web3Connectors from "../../bindings/web3-react/Web3Connectors.js";
 import * as TorusConnector from "@web3-react/torus-connector";
 import * as WalletconnectConnector from "@web3-react/walletconnect-connector";
 
-var rpcUrl = "https://kovan.infura.io/v3/84842078b09946638c03157f83405213";
-
-var ConnectorConfig = {
-  pollingInterval: 8000,
-  rpcUrl: rpcUrl
-};
-
 var connectors = [
   {
     name: "MetaMask",
@@ -28,12 +21,13 @@ var connectors = [
   {
     name: "WalletConnect",
     connector: new WalletconnectConnector.WalletConnectConnector({
-          rpc: {
-            "42": rpcUrl
-          },
+          rpc: Js_dict.fromArray([[
+                  String(Config.networkId),
+                  Config.rpcEndopint
+                ]]),
           bridge: "https://bridge.walletconnect.org",
           qrcode: true,
-          pollingInterval: 8000
+          pollingInterval: Config.web3PollingInterval
         }),
     img: "/img/wallet-icons/walletConnect.svg",
     connectionPhrase: "Connect via WalletConnect"
@@ -96,7 +90,6 @@ var make = Login;
 var $$default = Login;
 
 export {
-  ConnectorConfig ,
   connectors ,
   make ,
   $$default ,
