@@ -1,5 +1,7 @@
 const { deployProxy } = require("@openzeppelin/truffle-upgrades");
-const { admin: { getInstance: getAdminInstance } } = require("@openzeppelin/truffle-upgrades");
+const {
+  admin: { getInstance: getAdminInstance },
+} = require("@openzeppelin/truffle-upgrades");
 
 const STAKER = "Staker";
 const SYNTHETIC_TOKEN = "Dai";
@@ -17,8 +19,8 @@ const FloatToken = artifacts.require(FLOAT_TOKEN);
 const TokenFactory = artifacts.require(TOKEN_FACTORY);
 const FloatCapital = artifacts.require(FLOAT_CAPITAL);
 
-module.exports = async function (deployer, networkName, accounts) {
-  if (networkName == "bsc") {
+module.exports = async function(deployer, networkName, accounts) {
+  if (networkName == "matic") {
     throw "Don't save or run this migration if on mainnet (remove when ready)";
   }
 
@@ -38,7 +40,6 @@ module.exports = async function (deployer, networkName, accounts) {
 
   await deployer.deploy(TokenFactory);
   let tokenFactory = await TokenFactory.deployed();
-
 
   await deployer.deploy(FloatToken);
   let floatToken = await FloatToken.deployed();
@@ -86,11 +87,18 @@ module.exports = async function (deployer, networkName, accounts) {
     }
   );
 
-
   if (networkName == "kovan") {
-    const adminInstance = await getAdminInstance()
+    const adminInstance = await getAdminInstance();
     console.log(`To verify all these contracts run the following:
     
-    \`truffle run verify TokenFactory FloatToken Treasury_v0@${await adminInstance.getProxyImplementation(treasury.address)} FloatCapital_v0@${await adminInstance.getProxyImplementation(floatCapital.address)} Staker@${await adminInstance.getProxyImplementation(staker.address)} LongShort@${await adminInstance.getProxyImplementation(longShort.address)} --network kovan\``)
+    \`truffle run verify TokenFactory FloatToken Treasury_v0@${await adminInstance.getProxyImplementation(
+      treasury.address
+    )} FloatCapital_v0@${await adminInstance.getProxyImplementation(
+      floatCapital.address
+    )} Staker@${await adminInstance.getProxyImplementation(
+      staker.address
+    )} LongShort@${await adminInstance.getProxyImplementation(
+      longShort.address
+    )} --network kovan\``);
   }
 };

@@ -2,6 +2,7 @@
 
 import * as Card from "./components/UI/Card.js";
 import * as React from "react";
+import * as Config from "./Config.js";
 import * as Globals from "./libraries/Globals.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as MiniLoader from "./components/UI/MiniLoader.js";
@@ -38,7 +39,7 @@ function StakeDetails$UsersActiveStakes(Props) {
                                             className: "text-xl"
                                           }, match$1.syntheticMarket.symbol)), React.createElement("a", {
                                         className: "text-xs hover:text-gray-500 hover:underline  ml-5",
-                                        href: "https://testnet.bscscan.com/tx/" + match.creationTxHash
+                                        href: Config.blockExplorer + "/tx/" + match.creationTxHash
                                       }, "Last updated " + timeSinceStaking + " ago")), React.createElement("div", {
                                     className: "flex justify-between items-end w-full"
                                   }, React.createElement("h4", {
@@ -46,7 +47,7 @@ function StakeDetails$UsersActiveStakes(Props) {
                                       }, match$1.tokenType), React.createElement("p", {
                                         className: "text-primary "
                                       }, React.createElement("a", {
-                                            href: "https://testnet.bscscan.com/token/" + Globals.ethAdrToStr(tokenAddress) + "?a=" + Globals.ethAdrToStr(currentUser),
+                                            href: Config.blockExplorer + "/token/" + Globals.ethAdrToStr(tokenAddress) + "?a=" + Globals.ethAdrToStr(currentUser),
                                             target: "_"
                                           }, React.createElement("span", {
                                                 className: "text-bold text-4xl"

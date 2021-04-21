@@ -199,25 +199,6 @@ function useChainIdExn(param) {
   return Belt_Option.getExn(Core.useWeb3React().chainId);
 }
 
-function useEtherscanUrl(param) {
-  var networkId = Core.useWeb3React().chainId;
-  if (networkId !== undefined) {
-    if (networkId === 5 || networkId === 4) {
-      if (networkId >= 5) {
-        return "goerli.etherscan.io";
-      } else {
-        return "rinkeby.etherscan.io";
-      }
-    } else if (networkId !== 97) {
-      return "etherscan.io";
-    } else {
-      return "testnet.bscscan.com";
-    }
-  } else {
-    return "etherscan.io";
-  }
-}
-
 function useDeactivateWeb3(param) {
   return Core.useWeb3React().deactivate;
 }
@@ -290,7 +271,6 @@ export {
   useEthBalance ,
   useChainId ,
   useChainIdExn ,
-  useEtherscanUrl ,
   useDeactivateWeb3 ,
   useWeb3 ,
   useActivateConnector ,

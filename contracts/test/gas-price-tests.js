@@ -19,9 +19,9 @@ contract("LongShort (gas prices)", (accounts) => {
   //////// GAS ASSUMPTIONS ///////////
   ////////////////////////////////////
   const ethPriceUsd = 1723;
-  const bnbPriceUsd = 123;
+  const maticPriceUsd = 0.34;
   const ethGasPriceGwei = 80;
-  const bnbGasPriceGwei = 20;
+  const maticGasPriceGwei = 1;
   ////////////////////////////////////
   //////// ^^^^^^^^^^^^^^^ ///////////
   ////////////////////////////////////
@@ -89,9 +89,9 @@ contract("LongShort (gas prices)", (accounts) => {
       "mintLong",
       receipt,
       ethPriceUsd,
-      bnbPriceUsd,
+      maticPriceUsd,
       ethGasPriceGwei,
-      bnbGasPriceGwei
+      maticGasPriceGwei
     );
   });
 
@@ -108,9 +108,9 @@ contract("LongShort (gas prices)", (accounts) => {
       "mintLongAndStake",
       receipt,
       ethPriceUsd,
-      bnbPriceUsd,
+      maticPriceUsd,
       ethGasPriceGwei,
-      bnbGasPriceGwei
+      maticGasPriceGwei
     );
   });
 
@@ -143,9 +143,9 @@ contract("LongShort (gas prices)", (accounts) => {
       "mintLong",
       receipt,
       ethPriceUsd,
-      bnbPriceUsd,
+      maticPriceUsd,
       ethGasPriceGwei,
-      bnbGasPriceGwei
+      maticGasPriceGwei
     );
   });
 });
