@@ -158,16 +158,6 @@ let useChainId: unit => option<int> = () => {
 }
 let useChainIdExn = () => useChainId()->Option.getExn
 
-let useEtherscanUrl: unit => string = () => {
-  let networkId = useChainId()
-
-  switch networkId {
-  | Some(5) => "goerli.etherscan.io"
-  | Some(4) => "rinkeby.etherscan.io"
-  | Some(97) => "testnet.bscscan.com"
-  | _ => "etherscan.io"
-  }
-}
 let useDeactivateWeb3: (unit, unit) => unit = () => {
   let context = useWeb3React()
 

@@ -9,8 +9,6 @@ let make = (
   ~txState: ContractActions.transactionState,
   ~resetTxState=?,
 ) => {
-  let txExplererUrl = RootProvider.useEtherscanUrl()
-
   switch txState {
   | ContractActions.UnInitialised => children
   | ContractActions.Created => <>
@@ -21,8 +19,8 @@ let make = (
   | ContractActions.SignedAndSubmitted(txHash) => <>
       <h1> {"Processing Transaction "->React.string} <Loader /> </h1>
       <p>
-        <a href=j`https://$txExplererUrl/tx/$txHash` target="_blank" rel="noopener noreferrer">
-          {("View the transaction on " ++ txExplererUrl)->React.string}
+        <a href={`${Config.blockExplorer}/tx/${txHash}`} target="_blank" rel="noopener noreferrer">
+          {`View the transaction on ${Config.blockExplorerName}`->React.string}
         </a>
       </p>
       <div className="bg-white"> <Loader /> </div>
@@ -32,8 +30,11 @@ let make = (
     <>
       <h1> {"Transaction Complete "->React.string} <Loader /> </h1>
       <p>
-        <a href=j`https://$txExplererUrl/tx/$txHash` target="_blank" rel="noopener noreferrer">
-          {("View the transaction on " ++ txExplererUrl)->React.string}
+        <a
+          href={`https://${Config.blockExplorer}/tx/${txHash}`}
+          target="_blank"
+          rel="noopener noreferrer">
+          {`View the transaction on ${Config.blockExplorerName}`->React.string}
         </a>
       </p>
       {switch resetTxState {

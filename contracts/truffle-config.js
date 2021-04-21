@@ -6,10 +6,7 @@ const {
   rinkebyProviderUrl,
   kovanProviderUrl,
   goerliProviderUrl,
-  binanceTest,
-  bsc,
   etherscanApiKey,
-  bscscanApiKey,
 } = require("./secretsManager.js");
 
 const blockchainNodeHost = process.env.BLOCKCHAIN_NODE_HOST || "localhost";
@@ -69,22 +66,6 @@ module.exports = {
       gasPrice: 10000000000, // 10 gwei
       skipDryRun: true,
     },
-    binanceTest: {
-      network_id: 97,
-      provider: lazyCreateNetwork(binanceTest),
-      gas: 8000000,
-      gasPrice: 40000000000, // see https://testnet.bscscan.com/chart/gasprice
-      skipDryRun: true,
-    },
-    bsc: {
-      network_id: 56,
-      provider: lazyCreateNetwork(bsc),
-      gas: 29000000,
-      gasPrice: 12000000000, // 20 gwei
-      skipDryRun: true,
-      networkCheckTimeout: 1000000,
-      timeoutBlocks: 200,
-    },
     development: defaultLocalhostNetwork,
     graphTesting: defaultLocalhostNetwork,
     test: defaultLocalhostNetwork,
@@ -110,6 +91,5 @@ module.exports = {
   },
   api_keys: {
     etherscan: etherscanApiKey,
-    bscscan: bscscanApiKey,
   },
 };

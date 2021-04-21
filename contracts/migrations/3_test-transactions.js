@@ -6,20 +6,18 @@ const Staker = artifacts.require("Staker");
 const SyntheticToken = artifacts.require("SyntheticToken");
 const YieldManagerMock = artifacts.require("YieldManagerMock");
 const OracleManagerMock = artifacts.require("OracleManagerMock");
-const YieldManagerVenus = artifacts.require("YieldManagerVenus");
 const YieldManagerAave = artifacts.require("YieldManagerAave");
 const OracleManagerEthKiller = artifacts.require("OracleManagerEthKiller");
-
-// BSC testnet BUSD and vBUSD token addresses (for venus).
-const bscTestBUSDAddress = "0x8301F2213c0eeD49a7E28Ae4c3e91722919B8B47";
-const bscTestVBUSDAddress = "0x08e0A5575De71037aE36AbfAfb516595fE68e5e4";
 
 const kovanDaiAddress = "0xff795577d9ac8bd7d90ee22b6c1703490b6512fd";
 
 const aavePoolAddressKovan = "0xE0fBa4Fc209b4948668006B2bE61711b7f465bAe";
 const kovanADai = "0xdcf0af9e59c002fa3aa091a46196b37530fd48a8";
 
-// BSC testnet BAND oracle address. - (the same address is used for both kovan and bsc testnet - convenient)
+/* See docs:
+ *  https://kovan.etherscan.io/address/0xDA7a001b254CD22e46d3eAB04d937489c93174C3#code
+ *  https://docs.matic.network/docs/develop/oracles/bandstandarddataset/
+ */
 const testnetBANDAddress = "0xDA7a001b254CD22e46d3eAB04d937489c93174C3";
 
 const mintAndApprove = async (token, amount, user, approvedAddress) => {
@@ -46,7 +44,7 @@ const deployTestMarket = async (
 
   // We mock out the oracle manager unless we're on BSC testnet.
   let oracleManager;
-  if (networkName == "binanceTest" || networkName == "kovan") {
+  if (networkName == "kovan") {
     oracleManager = await OracleManagerEthKiller.new();
     await oracleManager.setup(admin, testnetBANDAddress);
   } else {
@@ -57,17 +55,7 @@ const deployTestMarket = async (
   // We mock out the yield manager unless we're on BSC testnet.
   let yieldManager;
   let fundTokenAddress;
-  if (networkName == "binanceTest") {
-    yieldManager = await YieldManagerVenus.new();
-    fundTokenAddress = bscTestBUSDAddress;
-
-    await yieldManager.setup(
-      admin,
-      longShortInstance.address,
-      bscTestBUSDAddress,
-      bscTestVBUSDAddress
-    );
-  } else if (networkName == "kovan") {
+  if (networkName == "kovan") {
     yieldManager = await YieldManagerAave.new();
     fundTokenAddress = kovanDaiAddress;
 
@@ -150,7 +138,7 @@ module.exports = async function(deployer, network, accounts) {
   let token;
   if (network == "kovan") {
     token = await Dai.at(kovanDaiAddress);
-  } else if (network != "binanceTest") {
+  } else {
     token = await Dai.deployed();
   }
 
@@ -159,11 +147,6 @@ module.exports = async function(deployer, network, accounts) {
   await deployTestMarket("FTSE100", "FTSE", longShort, token, admin, network);
   await deployTestMarket("GOLD", "GOLD", longShort, token, admin, network);
   await deployTestMarket("SP", "S&P500", longShort, token, admin, network);
-
-  // Don't try to mint tokens and fake transactions on BSC testnet.
-  if (network == "binanceTest") {
-    return;
-  }
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
 
