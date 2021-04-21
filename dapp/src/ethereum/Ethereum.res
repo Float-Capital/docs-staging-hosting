@@ -4,5 +4,5 @@ type t
 @get external getIsMetamask: t => option<bool> = "isMetaMask"
 
 let isMetamask = ethOpt => {
-  ethOpt->Option.mapWithDefault(false, e => e->getIsMetamask->Option.getWithDefault(false))
+  ethOpt->Option.flatMap(e => e->getIsMetamask)->Option.getWithDefault(false)
 }
