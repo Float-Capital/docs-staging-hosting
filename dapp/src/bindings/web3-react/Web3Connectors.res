@@ -29,29 +29,5 @@ module TorusConnector = {
   @module("@web3-react/torus-connector") @new
   external make: connectorOptions => injectedType = "TorusConnector"
 }
-module PortisConnector = {
-  type connectorOptions = {
-    dAppId: string,
-    networks: array<int>,
-  }
-  @module("@web3-react/portis-connector") @new
-  external make: connectorOptions => injectedType = "PortisConnector"
-}
-module FortmaticConnector = {
-  type connectorOptions = {
-    apiKey: string,
-    chainId: int,
-  }
-  @module("@web3-react/fortmatic-connector") @new
-  external make: connectorOptions => injectedType = "FortmaticConnector"
-}
-module SquarelinkConnector = {
-  type connectorOptions = {
-    clientId: string,
-    networks: array<int>,
-  }
-  @module("@web3-react/squarelink-connector") @new
-  external make: connectorOptions => injectedType = "SquarelinkConnector"
-}
 
 let injected = InjectedConnector.make({supportedChainIds: [Config.networkId]})

@@ -9,12 +9,6 @@ var WalletConnectConnector = {};
 
 var TorusConnector = {};
 
-var PortisConnector = {};
-
-var FortmaticConnector = {};
-
-var SquarelinkConnector = {};
-
 var injected = new InjectedConnector.InjectedConnector({
       supportedChainIds: [Config.networkId]
     });
@@ -23,9 +17,6 @@ export {
   InjectedConnector$1 as InjectedConnector,
   WalletConnectConnector ,
   TorusConnector ,
-  PortisConnector ,
-  FortmaticConnector ,
-  SquarelinkConnector ,
   injected ,
   
 }
