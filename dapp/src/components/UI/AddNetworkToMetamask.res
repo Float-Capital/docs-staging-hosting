@@ -17,7 +17,7 @@ type requestObj = {
   params: array<reqParams>,
 }
 
-@send external request: (Ethereum.t, requestObj) => unit = "request"
+@send external request: (InjectedEthereum.t, requestObj) => unit = "request"
 
 @react.component
 let make = () => {
@@ -43,7 +43,7 @@ let make = () => {
       )
     })
 
-  switch Ethereum.ethObj {
+  switch InjectedEthereum.ethObj {
   | Some(ethObj) =>
     <Button.Element onClick={_event => addToMetamask(ethObj)}>
       <div className="mx-auto">

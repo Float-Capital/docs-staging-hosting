@@ -18,7 +18,7 @@ let make = (~txState) => {
   | ContractActions.Complete({transactionHash: _}) =>
     <Modal id={3}>
       <div className="text-center m-3"> <p> {`Transaction complete 🎉`->React.string} </p> </div>
-      {if Ethereum.ethObj->Ethereum.isMetamask {
+      {if InjectedEthereum.isMetamask() {
         <AddToMetamask
           tokenAddress={Config.config.contracts.floatToken->Ethers.Utils.ethAdrToStr}
           tokenSymbol={"FLOAT"}>

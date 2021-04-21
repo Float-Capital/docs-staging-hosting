@@ -7,7 +7,6 @@ import * as Ethers from "../../ethereum/Ethers.js";
 import * as Ethers$1 from "ethers";
 import * as Globals from "../../libraries/Globals.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
-import * as Ethereum from "../../ethereum/Ethereum.js";
 import * as CONSTANTS from "../../CONSTANTS.js";
 import * as DataHooks from "../../data/DataHooks.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
@@ -19,6 +18,7 @@ import * as FormatMoney from "./FormatMoney.js";
 import * as Router from "next/router";
 import * as RootProvider from "../../libraries/RootProvider.js";
 import * as AddToMetamask from "./AddToMetamask.js";
+import * as InjectedEthereum from "../../ethereum/InjectedEthereum.js";
 import EthereumBlockiesBase64 from "ethereum-blockies-base64";
 
 function UserUI$UserContainer(Props) {
@@ -221,7 +221,7 @@ function UserUI$MetamaskMenu(Props) {
                     
                   });
         }), [wrapper]);
-  if (Ethereum.isMetamask(window.ethereum)) {
+  if (InjectedEthereum.isMetamask(undefined)) {
     return React.createElement("div", {
                 className: "relative"
               }, React.createElement("div", {

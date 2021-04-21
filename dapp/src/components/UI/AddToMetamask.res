@@ -15,7 +15,7 @@ type requestObj = {
   params: reqParams,
 }
 
-@send external request: (Ethereum.t, requestObj) => unit = "request"
+@send external request: (InjectedEthereum.t, requestObj) => unit = "request"
 
 let requestStructure = (~tokenAddress, ~tokenSymbol) => {
   method: "wallet_watchAsset",
@@ -43,7 +43,7 @@ let make = (
       callback()
     })
 
-  switch Ethereum.ethObj {
+  switch InjectedEthereum.ethObj {
   | Some(ethObj) =>
     <div onClick={_event => addToMetamask(ethObj)} className="flex justify-start align-center">
       {

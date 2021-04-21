@@ -166,7 +166,7 @@ module MetamaskMenu = {
       addClickListener(handleMousedown)
       Some(_ => removeClickListener(handleMousedown))
     }, [wrapper])
-    if Ethereum.ethObj->Ethereum.isMetamask {
+    if InjectedEthereum.isMetamask() {
       <div className="relative">
         <div
           className="absolute top-1 w-4 h-4 cursor-pointer z-20"
