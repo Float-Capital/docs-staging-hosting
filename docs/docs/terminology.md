@@ -17,11 +17,11 @@ The EthKillers is the first synthetic market offered by Float Capital and tracks
 
 ### Floating Exposure
 
-Because the value of long and short sides are not always equal, there is "floating exposure" to the market. Users gain floating exposure to synthetic assets by joining either side of the market, one side of the market will always have 100% exposure while the other side of the market’s exposure will float between 0 - 100%. economic mechanisms exist to incentivize a balance in the market to remain within a certain band. An equally weighted market will have equal exposure on both sides (100%, 100%).
+Because the value of liquidity locked in the long and short sides respectively may differ, "floating exposure" to the underlying synthetic asset may exist. I.e. If there was $90 in the long side and $100 in the short side, the long side would have 100% exposure and the short side would have ($90/$100), 90% exposure to the underlying synthetic asset. Economic mechanisms exist to incentivize equal liquidity in the long and short sides, hence providing close to 100% market exposure for both sides.
 
 ### Governance Token
 
-Tokens that allow holders the opportunity to influence future protocols that will help shape the future of the project. Holders are able to vote on new feature proposals and even change the governance system. Think of these tokens as being fairly similar to equity in a company.
+Token that allows users to govern the direction of the protocol and hence help shape the future of the project. Holders are able to vote on new feature proposals and even change the governance system.
 
 ### Float Token
 
@@ -51,9 +51,6 @@ Users gain exposure from minting a token in a long or short synthetic asset by d
 
 The act of locking tokens to receive rewards, e.g staking EthKillers long tokens to earn Float tokens.
 
-### Non-KYC
-
-**KYC** means "Know Your Customer" and is the process of verifying a customer’s identity. A Non-KYC is a customer that is not required to give their personal details in order to access the markets.
 
 ### Over-collateralization
 
