@@ -779,8 +779,6 @@ function MintForm$MintFormSignedIn(Props) {
   var tokenBalanceQuery = DataHooks.useSyntheticTokenBalanceOrZero(user, tokenAddress);
   var initialMint;
   initialMint = typeof tokenBalanceQuery === "number" || tokenBalanceQuery.TAG === /* GraphError */0 ? false : tokenBalanceQuery._0.eq(CONSTANTS.zeroBN);
-  console.log(tokenBalanceQuery);
-  console.log(initialMint);
   var match$3 = useBalanceAndApproved(Config.dai, Config.longShort);
   var optDaiAmountApproved = match$3[1];
   var optDaiBalance = match$3[0];
@@ -981,7 +979,6 @@ function MintForm$MintFormSignedIn(Props) {
                         _2: /* Success */3,
                         [Symbol.for("name")]: "Show"
                       });
-                  console.log(initialMint);
                   var route = initialMint ? userPage + "?minted=" + Ethers.Utils.ethAdrToStr(tokenAddress) : userPage;
                   router.push(route);
                   break;

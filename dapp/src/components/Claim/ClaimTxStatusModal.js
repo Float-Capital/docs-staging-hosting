@@ -2,7 +2,11 @@
 
 import * as Modal from "../UI/Modal.js";
 import * as React from "react";
+import * as Config from "../../Config.js";
+import * as Ethers from "../../ethereum/Ethers.js";
+import * as Ethereum from "../../ethereum/Ethereum.js";
 import * as MiniLoader from "../UI/MiniLoader.js";
+import * as AddToMetamask from "../UI/AddToMetamask.js";
 import * as MessageUsOnDiscord from "../Ethereum/MessageUsOnDiscord.js";
 import * as ViewOnBlockExplorer from "../Ethereum/ViewOnBlockExplorer.js";
 
@@ -40,10 +44,19 @@ function ClaimTxStatusModal(Props) {
     case /* Complete */2 :
         return React.createElement(Modal.make, {
                     id: 3,
-                    children: React.createElement("div", {
-                          className: "text-center m-3"
-                        }, React.createElement("p", undefined, "Transaction complete 🎉"))
-                  });
+                    children: null
+                  }, React.createElement("div", {
+                        className: "text-center m-3"
+                      }, React.createElement("p", undefined, "Transaction complete 🎉")), Ethereum.isMetamask(window.ethereum) ? React.createElement(AddToMetamask.make, {
+                          tokenAddress: Ethers.Utils.ethAdrToStr(Config.config.contracts.FloatToken),
+                          tokenSymbol: "FLOAT",
+                          children: React.createElement("button", {
+                                className: "w-36 h-12 text-sm shadow-md rounded-lg border-2 focus:outline-none border-gray-200 hover:bg-gray-200 flex justify-center items-center mx-auto"
+                              }, "Add FLOAT to", React.createElement("img", {
+                                    className: "h-5 ml-1",
+                                    src: "/icons/metamask.svg"
+                                  }))
+                        }) : null);
     case /* Failed */3 :
         return React.createElement(Modal.make, {
                     id: 5,

@@ -218,8 +218,6 @@ module MintFormSignedIn = {
     | Response(balance) => balance->Ethers.BigNumber.eq(CONSTANTS.zeroBN)
     | _ => false
     }
-    Js.log(tokenBalanceQuery)
-    Js.log(initialMint)
 
     let (optDaiBalance, optDaiAmountApproved) = useBalanceAndApproved(
       ~erc20Address=Config.dai,

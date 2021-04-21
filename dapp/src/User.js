@@ -50,6 +50,7 @@ function User$UserBalancesCard(Props) {
                             value: FormatMoney.formatEther(undefined, param.tokensValue),
                             tokenAddress: addr,
                             metamaskMenu: true,
+                            symbol: param.symbol,
                             children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {
                                   synthAddress: Ethers.Utils.ethAdrToLowerStr(addr),
                                   isLong: isLong

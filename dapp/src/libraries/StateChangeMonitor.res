@@ -51,7 +51,11 @@ let make = (~children) => {
           if timestamp->Ethers.BigNumber.gt(latestStateChangeTimestamp) {
             setLatestStateChangeTimestamp(_ => timestamp)
             // Update cache of values for all affected users
-            let _ = affectedUsers->Array.map(({__typename, tokenBalances, basicUserInfo: {id}}) => {
+            let _ = affectedUsers->Array.map(({
+              __typename,
+              tokenBalances,
+              basicUserInfo: {id} as userInfo,
+            }) => {
               // Balances update correctly even without this extra piece of code, but why not have this also?
               let _ = tokenBalances->Array.map(tokenBalance => {
                 let _ = client.writeQuery(
@@ -62,6 +66,14 @@ let make = (~children) => {
                   {tokenAdr: tokenBalance.syntheticToken.id, userId: id},
                 )
               })
+
+              let _ = client.writeQuery(
+                ~query=module(Queries.UserQuery),
+                ~data={
+                  user: Some(userInfo),
+                },
+                {userId: id},
+              )
 
               let balanceReadQuery = client.readQuery(
                 ~query=module(Queries.UsersBalances),

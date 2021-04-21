@@ -118,14 +118,6 @@ module MetamaskMenu = {
   @send
   external contains: (Dom.element, Dom.element) => bool = "contains"
 
-  type ethereum
-  @val @scope("window") external ethObj: option<ethereum> = "ethereum"
-  @get external getIsMetamask: ethereum => option<bool> = "isMetaMask"
-
-  let isMetamask = ethOpt => {
-    ethOpt->Option.mapWithDefault(false, e => e->getIsMetamask->Option.getWithDefault(false))
-  }
-
   let addClickListener = addDocumentEventListner("mousedown")
   let removeClickListener = removeDocumentEventListner("mousedown")
 
@@ -135,7 +127,7 @@ module MetamaskMenu = {
     let router = Next.Router.useRouter()
 
     let initialShowPing = switch Js.Dict.get(router.query, `minted`) {
-    | None => false // TODO: something more useful!
+    | None => false
     | Some(addr) => addr == tokenAddress
     }
 
@@ -144,7 +136,7 @@ module MetamaskMenu = {
     React.useEffect1(_ => {
       if initialShowPing {
         setShowPing(_ => true)
-        let _ = Js.Global.setTimeout(_ => setShowPing(_ => false), 4000)
+        let _ = Js.Global.setTimeout(_ => setShowPing(_ => false), 6000)
         None
       } else {
         None
@@ -174,7 +166,7 @@ module MetamaskMenu = {
       addClickListener(handleMousedown)
       Some(_ => removeClickListener(handleMousedown))
     }, [wrapper])
-    if ethObj->isMetamask {
+    if Ethereum.ethObj->Ethereum.isMetamask {
       <div className="relative">
         <div
           className="absolute top-1 w-4 h-4 cursor-pointer z-20"
@@ -219,6 +211,7 @@ module UserMarketBox = {
     ~value,
     ~tokenAddress=CONSTANTS.zeroAddress,
     ~metamaskMenu=false,
+    ~symbol="",
     ~children,
   ) => {
     <div
@@ -227,7 +220,7 @@ module UserMarketBox = {
         <div className="absolute left-1 top-2">
           <MetamaskMenu
             tokenAddress={tokenAddress->Ethers.Utils.ethAdrToStr}
-            tokenName={`${isLong ? "s" : "l"}${name}`}
+            tokenName={`${isLong ? "fu" : "fd"}${symbol}`}
           />
         </div>
       } else {

@@ -7,6 +7,7 @@ import * as Ethers from "../../ethereum/Ethers.js";
 import * as Ethers$1 from "ethers";
 import * as Globals from "../../libraries/Globals.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
+import * as Ethereum from "../../ethereum/Ethereum.js";
 import * as CONSTANTS from "../../CONSTANTS.js";
 import * as DataHooks from "../../data/DataHooks.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
@@ -158,12 +159,6 @@ var threeDotsSvg = React.createElement("svg", {
           fillRule: "evenodd"
         }));
 
-function isMetamask(ethOpt) {
-  return Belt_Option.mapWithDefault(ethOpt, false, (function (e) {
-                return Belt_Option.getWithDefault(e.isMetaMask, false);
-              }));
-}
-
 function addClickListener(param) {
   document.addEventListener("mousedown", param);
   
@@ -197,7 +192,7 @@ function UserUI$MetamaskMenu(Props) {
                     return Curry._1(setShowPing, (function (param) {
                                   return false;
                                 }));
-                  }), 4000);
+                  }), 6000);
             return ;
           }
           
@@ -226,7 +221,7 @@ function UserUI$MetamaskMenu(Props) {
                     
                   });
         }), [wrapper]);
-  if (isMetamask(window.ethereum)) {
+  if (Ethereum.isMetamask(window.ethereum)) {
     return React.createElement("div", {
                 className: "relative"
               }, React.createElement("div", {
@@ -264,7 +259,6 @@ function UserUI$MetamaskMenu(Props) {
 }
 
 var MetamaskMenu = {
-  isMetamask: isMetamask,
   addClickListener: addClickListener,
   removeClickListener: removeClickListener,
   make: UserUI$MetamaskMenu
@@ -277,9 +271,11 @@ function UserUI$UserMarketBox(Props) {
   var value = Props.value;
   var tokenAddressOpt = Props.tokenAddress;
   var metamaskMenuOpt = Props.metamaskMenu;
+  var symbolOpt = Props.symbol;
   var children = Props.children;
   var tokenAddress = tokenAddressOpt !== undefined ? Caml_option.valFromOption(tokenAddressOpt) : CONSTANTS.zeroAddress;
   var metamaskMenu = metamaskMenuOpt !== undefined ? metamaskMenuOpt : false;
+  var symbol = symbolOpt !== undefined ? symbolOpt : "";
   return React.createElement("div", {
               className: "flex w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative"
             }, metamaskMenu ? React.createElement("div", {
@@ -287,8 +283,8 @@ function UserUI$UserMarketBox(Props) {
                   }, React.createElement(UserUI$MetamaskMenu, {
                         tokenAddress: Ethers.Utils.ethAdrToStr(tokenAddress),
                         tokenName: (
-                          isLong ? "s" : "l"
-                        ) + name
+                          isLong ? "fu" : "fd"
+                        ) + symbol
                       })) : null, React.createElement("div", {
                   className: "pl-3 w-1/3 text-sm self-center"
                 }, name, React.createElement("br", {

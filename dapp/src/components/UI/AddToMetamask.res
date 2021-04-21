@@ -1,6 +1,3 @@
-type ethereum
-@val @scope("window") external ethObj: option<ethereum> = "ethereum"
-
 type paramOptions = {
   address: string,
   symbol: string,
@@ -18,7 +15,7 @@ type requestObj = {
   params: reqParams,
 }
 
-@send external request: (ethereum, requestObj) => unit = "request"
+@send external request: (Ethereum.t, requestObj) => unit = "request"
 
 let requestStructure = (~tokenAddress, ~tokenSymbol) => {
   method: "wallet_watchAsset",
@@ -46,7 +43,7 @@ let make = (
       callback()
     })
 
-  switch ethObj {
+  switch Ethereum.ethObj {
   | Some(ethObj) =>
     <div onClick={_event => addToMetamask(ethObj)} className="flex justify-start align-center">
       {
