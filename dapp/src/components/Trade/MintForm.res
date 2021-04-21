@@ -355,7 +355,7 @@ module MintFormSignedIn = {
         toastDispatch(ToastProvider.Show(`Minting transaction pending`, "", ToastProvider.Info))
       | Complete(_) => {
           toastDispatch(ToastProvider.Show(`Mint transaction confirmed`, "", ToastProvider.Success))
-          let route = if initialMint {
+          let route = if initialMint && !form.input.isStaking {
             `${userPage}?minted=${tokenAddress->Ethers.Utils.ethAdrToStr}`
           } else {
             userPage

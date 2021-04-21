@@ -979,7 +979,7 @@ function MintForm$MintFormSignedIn(Props) {
                         _2: /* Success */3,
                         [Symbol.for("name")]: "Show"
                       });
-                  var route = initialMint ? userPage + "?minted=" + Ethers.Utils.ethAdrToStr(tokenAddress) : userPage;
+                  var route = initialMint && !form.input.isStaking ? userPage + "?minted=" + Ethers.Utils.ethAdrToStr(tokenAddress) : userPage;
                   router.push(route);
                   break;
               case /* Failed */3 :
