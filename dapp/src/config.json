@@ -3,10 +3,12 @@
   "priceHistoryGraphEndpoint": "https://api.thegraph.com/subgraphs/name/float-capital/testnet-price-history",
   "networkId": 42,
   "networkName": "Kovan testnet",
+  "rpcEndopint": "https://kovan.infura.io/v3/84842078b09946638c03157f83405213",
   "paymentTokenName": "DAI",
   "blockExplorer": "https://kovan.etherscan.io/",
   "blockExplorerName": "etherscan",
   "discordInviteLink": "https://discord.gg/dqDwgrVYcU",
+  "web3PollingInterval": 8000,
   "contracts": {
     "FloatCapital_v0": "0x635BF6D73d365359d078e25dcE6Ec1596485276a",
     "FloatToken": "0xCdF5FB5f4F8eAfd64749ac97c3C65D224Bf0A007",

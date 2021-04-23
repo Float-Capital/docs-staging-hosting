@@ -6,10 +6,41 @@ import * as Config from "../../Config.js";
 import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
 import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
 import * as Router from "next/router";
-import Connectors from "./connectors";
 import * as RootProvider from "../../libraries/RootProvider.js";
+import * as Web3Connectors from "../../bindings/web3-react/Web3Connectors.js";
+import * as TorusConnector from "@web3-react/torus-connector";
+import * as WalletconnectConnector from "@web3-react/walletconnect-connector";
 
-var connectors = Connectors;
+var connectors = [
+  {
+    name: "MetaMask",
+    connector: Web3Connectors.injected,
+    img: "/img/wallet-icons/metamask.svg",
+    connectionPhrase: "Connect to your MetaMask Wallet"
+  },
+  {
+    name: "WalletConnect",
+    connector: new WalletconnectConnector.WalletConnectConnector({
+          rpc: Js_dict.fromArray([[
+                  String(Config.networkId),
+                  Config.rpcEndopint
+                ]]),
+          bridge: "https://bridge.walletconnect.org",
+          qrcode: true,
+          pollingInterval: Config.web3PollingInterval
+        }),
+    img: "/img/wallet-icons/walletConnect.svg",
+    connectionPhrase: "Connect via WalletConnect"
+  },
+  {
+    name: "Torus",
+    connector: new TorusConnector.TorusConnector({
+          chainId: 1
+        }),
+    img: "/img/wallet-icons/torus.svg",
+    connectionPhrase: "Connect via Torus"
+  }
+];
 
 function Login(Props) {
   var match = RootProvider.useActivateConnector(undefined);

@@ -26,10 +26,11 @@ external createWeb3Provider: Ethers.Providers.t => Ethers.Providers.t = "Web3Pro
 let getLibrary = provider => {
   let library = createWeb3Provider(provider)
 
-  let setPollingInterval: Ethers.Providers.t => Ethers.Providers.t = %raw(
-    "lib => {lib.pollingInterval = 8000; return lib; }"
+  let setPollingInterval: (Ethers.Providers.t, int) => Ethers.Providers.t = %raw(
+    "(lib, pollingInterval) => {lib.pollingInterval = pollingInterval; return lib; }"
   )
-  setPollingInterval(library)
+
+  setPollingInterval(library, Config.web3PollingInterval)
 }
 
 let initialState = {
