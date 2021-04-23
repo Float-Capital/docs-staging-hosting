@@ -12,18 +12,21 @@ import * as Caml_js_exceptions from "rescript/lib/es6/caml_js_exceptions.js";
 function getProviderOrSigner(library, account) {
   if (account !== undefined) {
     return Belt_Option.mapWithDefault(library.getSigner(Caml_option.valFromOption(account)), {
-                TAG: /* Provider */0,
-                _0: library
+                TAG: 0,
+                _0: library,
+                [Symbol.for("name")]: "Provider"
               }, (function (signer) {
                   return {
-                          TAG: /* Signer */1,
-                          _0: signer
+                          TAG: 1,
+                          _0: signer,
+                          [Symbol.for("name")]: "Signer"
                         };
                 }));
   } else {
     return {
-            TAG: /* Provider */0,
-            _0: library
+            TAG: 0,
+            _0: library,
+            [Symbol.for("name")]: "Provider"
           };
   }
 }
@@ -78,32 +81,36 @@ function useContractFunction(signer) {
                       return /* Created */1;
                     }));
               var contractInstance = Curry._1(makeContractInstance, {
-                    TAG: /* Signer */1,
-                    _0: signer
+                    TAG: 1,
+                    _0: signer,
+                    [Symbol.for("name")]: "Signer"
                   });
               var mintPromise = Curry._1(contractFunction, contractInstance);
               JsPromise.$$catch(mintPromise, (function (error) {
                       return Curry._1(setTxState, (function (param) {
                                     var msg = error.message;
                                     return {
-                                            TAG: /* Declined */1,
-                                            _0: msg !== undefined ? ": " + msg : "unknown error"
+                                            TAG: 1,
+                                            _0: msg !== undefined ? ": " + msg : "unknown error",
+                                            [Symbol.for("name")]: "Declined"
                                           };
                                   }));
                     }));
               JsPromise.$$catch(mintPromise.then(function (tx) {
                           Curry._1(setTxState, (function (param) {
                                   return {
-                                          TAG: /* SignedAndSubmitted */0,
-                                          _0: tx.hash
+                                          TAG: 0,
+                                          _0: tx.hash,
+                                          [Symbol.for("name")]: "SignedAndSubmitted"
                                         };
                                 }));
                           return tx.wait();
                         }).then(function (txOutcome) {
                         return Curry._1(setTxState, (function (param) {
                                       return {
-                                              TAG: /* Complete */2,
-                                              _0: txOutcome
+                                              TAG: 2,
+                                              _0: txOutcome,
+                                              [Symbol.for("name")]: "Complete"
                                             };
                                     }));
                       }), (function (error) {
@@ -120,8 +127,9 @@ function useContractFunction(signer) {
                       }
                       Curry._1(setTxState, (function (param) {
                               return {
-                                      TAG: /* Failed */3,
-                                      _0: txHash
+                                      TAG: 3,
+                                      _0: txHash,
+                                      [Symbol.for("name")]: "Failed"
                                     };
                             }));
                       return Promise.resolve((console.log(error), undefined));

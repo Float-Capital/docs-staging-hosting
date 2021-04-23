@@ -9,23 +9,27 @@ function etherNumberInput(numberStr) {
   var numberStrRegex = /^[+]?\d+(\.\d+)?$/;
   if (numberStr === "") {
     return {
-            TAG: /* Error */1,
-            _0: "Amount is required"
+            TAG: 1,
+            _0: "Amount is required",
+            [Symbol.for("name")]: "Error"
           };
   } else if (numberStrRegex.test(numberStr)) {
     return Belt_Option.mapWithDefault(Ethers.Utils.parseEther(numberStr), {
-                TAG: /* Error */1,
-                _0: "Couldn't parse Ether value"
+                TAG: 1,
+                _0: "Couldn't parse Ether value",
+                [Symbol.for("name")]: "Error"
               }, (function (etherValue) {
                   return {
-                          TAG: /* Ok */0,
-                          _0: etherValue
+                          TAG: 0,
+                          _0: etherValue,
+                          [Symbol.for("name")]: "Ok"
                         };
                 }));
   } else {
     return {
-            TAG: /* Error */1,
-            _0: "Incorrect number format - please use '.' for floating points."
+            TAG: 1,
+            _0: "Incorrect number format - please use '.' for floating points.",
+            [Symbol.for("name")]: "Error"
           };
   }
 }

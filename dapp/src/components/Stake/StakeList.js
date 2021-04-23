@@ -20,18 +20,20 @@ function StakeList(Props) {
             return /* Loading */0;
           } else if (currentBalancesOrAdrZeroBalances.TAG === /* GraphError */0) {
             return {
-                    TAG: /* GraphError */0,
-                    _0: currentBalancesOrAdrZeroBalances._0
+                    TAG: 0,
+                    _0: currentBalancesOrAdrZeroBalances._0,
+                    [Symbol.for("name")]: "GraphError"
                   };
           } else {
             return {
-                    TAG: /* Response */1,
+                    TAG: 1,
                     _0: Belt_Array.reduce(currentBalancesOrAdrZeroBalances._0.balances, Belt_HashSetString.fromArray([]), (function (set, balance) {
                             if (balance.tokenBalance.gt(CONSTANTS.zeroBN)) {
                               Belt_HashSetString.add(set, Ethers.Utils.ethAdrToStr(balance.addr));
                             }
                             return set;
-                          }))
+                          })),
+                    [Symbol.for("name")]: "Response"
                   };
           }
         }));

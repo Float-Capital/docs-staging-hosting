@@ -17,23 +17,26 @@ function liftGraphResponse2(a, b) {
     return /* Loading */0;
   } else if (a.TAG === /* GraphError */0) {
     return {
-            TAG: /* GraphError */0,
-            _0: a._0
+            TAG: 0,
+            _0: a._0,
+            [Symbol.for("name")]: "GraphError"
           };
   } else if (typeof b === "number") {
     return /* Loading */0;
   } else if (b.TAG === /* GraphError */0) {
     return {
-            TAG: /* GraphError */0,
-            _0: b._0
+            TAG: 0,
+            _0: b._0,
+            [Symbol.for("name")]: "GraphError"
           };
   } else {
     return {
-            TAG: /* Response */1,
+            TAG: 1,
             _0: [
               a._0,
               b._0
-            ]
+            ],
+            [Symbol.for("name")]: "Response"
           };
   }
 }
@@ -101,15 +104,17 @@ function useGetMarkets(param) {
   var match = marketDetailsQuery.data;
   if (match !== undefined) {
     return {
-            TAG: /* Response */1,
-            _0: match.syntheticMarkets
+            TAG: 1,
+            _0: match.syntheticMarkets,
+            [Symbol.for("name")]: "Response"
           };
   }
   var match$1 = marketDetailsQuery.error;
   if (match$1 !== undefined) {
     return {
-            TAG: /* GraphError */0,
-            _0: match$1.message
+            TAG: 0,
+            _0: match$1.message,
+            [Symbol.for("name")]: "GraphError"
           };
   } else {
     return /* Loading */0;
@@ -140,11 +145,12 @@ function useTotalClaimableFloatForUser(userId, synthTokens) {
   var match = floatQuery.data;
   if (match !== undefined) {
     var initialState = {
-      TAG: /* Response */1,
+      TAG: 1,
       _0: [
         CONSTANTS.zeroBN,
         CONSTANTS.zeroBN
-      ]
+      ],
+      [Symbol.for("name")]: "Response"
     };
     return Belt_Array.reduce(match.currentStakes, initialState, (function (curState, stake) {
                   if (typeof curState === "number") {
@@ -152,8 +158,9 @@ function useTotalClaimableFloatForUser(userId, synthTokens) {
                   }
                   if (curState.TAG === /* GraphError */0) {
                     return {
-                            TAG: /* GraphError */0,
-                            _0: curState._0
+                            TAG: 0,
+                            _0: curState._0,
+                            [Symbol.for("name")]: "GraphError"
                           };
                   }
                   var match = curState._0;
@@ -165,19 +172,21 @@ function useTotalClaimableFloatForUser(userId, synthTokens) {
                   var claimableFloat = accumulativeFloatPerToken.sub(lastAccumulativeFloatPerToken).mul(amount).div(CONSTANTS.tenToThe42).add(match[0]);
                   var predictedFloat = currentTimestamp.sub(timestamp).mul(floatRatePerTokenOverInterval).mul(amount).div(CONSTANTS.tenToThe42).add(match[1]);
                   return {
-                          TAG: /* Response */1,
+                          TAG: 1,
                           _0: [
                             claimableFloat,
                             predictedFloat
-                          ]
+                          ],
+                          [Symbol.for("name")]: "Response"
                         };
                 }));
   }
   var match$1 = floatQuery.error;
   if (match$1 !== undefined) {
     return {
-            TAG: /* GraphError */0,
-            _0: match$1.message
+            TAG: 0,
+            _0: match$1.message,
+            [Symbol.for("name")]: "GraphError"
           };
   } else {
     return /* Loading */0;
@@ -210,15 +219,17 @@ function useStakesForUser(userId) {
   var match = activeStakesQuery.data;
   if (match !== undefined) {
     return {
-            TAG: /* Response */1,
-            _0: match.currentStakes
+            TAG: 1,
+            _0: match.currentStakes,
+            [Symbol.for("name")]: "Response"
           };
   }
   var match$1 = activeStakesQuery.error;
   if (match$1 !== undefined) {
     return {
-            TAG: /* GraphError */0,
-            _0: match$1.message
+            TAG: 0,
+            _0: match$1.message,
+            [Symbol.for("name")]: "GraphError"
           };
   } else {
     return /* Loading */0;
@@ -249,11 +260,12 @@ function useUsersBalances(userId) {
     var match$1 = match.user;
     if (match$1 === undefined) {
       return {
-              TAG: /* Response */1,
+              TAG: 1,
               _0: {
                 totalBalance: CONSTANTS.zeroBN,
                 balances: []
-              }
+              },
+              [Symbol.for("name")]: "Response"
             };
     }
     var result = Belt_Array.reduce(match$1.tokenBalances, {
@@ -282,15 +294,17 @@ function useUsersBalances(userId) {
                   };
           }));
     return {
-            TAG: /* Response */1,
-            _0: result
+            TAG: 1,
+            _0: result,
+            [Symbol.for("name")]: "Response"
           };
   }
   var match$2 = usersTokensQuery.error;
   if (match$2 !== undefined) {
     return {
-            TAG: /* GraphError */0,
-            _0: match$2.message
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
           };
   } else {
     return /* Loading */0;
@@ -321,27 +335,30 @@ function useFloatBalancesForUser(userId) {
     var user = match.user;
     if (user !== undefined) {
       return {
-              TAG: /* Response */1,
+              TAG: 1,
               _0: {
                 floatBalance: user.floatTokenBalance,
                 floatMinted: user.totalMintedFloat
-              }
+              },
+              [Symbol.for("name")]: "Response"
             };
     } else {
       return {
-              TAG: /* Response */1,
+              TAG: 1,
               _0: {
                 floatBalance: CONSTANTS.zeroBN,
                 floatMinted: CONSTANTS.zeroBN
-              }
+              },
+              [Symbol.for("name")]: "Response"
             };
     }
   }
   var match$1 = usersStateQuery.error;
   if (match$1 !== undefined) {
     return {
-            TAG: /* GraphError */0,
-            _0: match$1.message
+            TAG: 0,
+            _0: match$1.message,
+            [Symbol.for("name")]: "GraphError"
           };
   } else {
     return /* Loading */0;
@@ -372,8 +389,8 @@ function useBasicUserInfo(userId) {
     var match$1 = match.user;
     if (match$1 !== undefined) {
       return {
-              TAG: /* Response */1,
-              _0: /* ExistingUser */{
+              TAG: 1,
+              _0: {
                 _0: {
                   id: match$1.id,
                   joinedAt: FromUnixTime(match$1.timestampJoined.toNumber()),
@@ -381,21 +398,25 @@ function useBasicUserInfo(userId) {
                   floatMinted: match$1.totalMintedFloat,
                   floatBalance: match$1.floatTokenBalance,
                   transactionCount: match$1.numberOfTransactions
-                }
-              }
+                },
+                [Symbol.for("name")]: "ExistingUser"
+              },
+              [Symbol.for("name")]: "Response"
             };
     } else {
       return {
-              TAG: /* Response */1,
-              _0: /* NewUser */0
+              TAG: 1,
+              _0: /* NewUser */0,
+              [Symbol.for("name")]: "Response"
             };
     }
   }
   var match$2 = userQuery.error;
   if (match$2 !== undefined) {
     return {
-            TAG: /* GraphError */0,
-            _0: match$2.message
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
           };
   } else {
     return /* Loading */0;
@@ -430,8 +451,9 @@ function useSyntheticTokenBalance(user, tokenAddress) {
       if (match$2.length === 1) {
         var match$3 = match$2[0];
         return {
-                TAG: /* Response */1,
-                _0: match$3.tokenBalance
+                TAG: 1,
+                _0: match$3.tokenBalance,
+                [Symbol.for("name")]: "Response"
               };
       }
       
@@ -441,8 +463,9 @@ function useSyntheticTokenBalance(user, tokenAddress) {
   var match$4 = syntheticBalanceQuery.error;
   if (match$4 !== undefined) {
     return {
-            TAG: /* GraphError */0,
-            _0: match$4.message
+            TAG: 0,
+            _0: match$4.message,
+            [Symbol.for("name")]: "GraphError"
           };
   } else {
     return /* Loading */0;
@@ -474,28 +497,32 @@ function useSyntheticTokenBalanceOrZero(user, tokenAddress) {
     var match$1 = match.user;
     if (match$1 === undefined) {
       return {
-              TAG: /* Response */1,
-              _0: CONSTANTS.zeroBN
+              TAG: 1,
+              _0: CONSTANTS.zeroBN,
+              [Symbol.for("name")]: "Response"
             };
     }
     var match$2 = match$1.tokenBalances;
     if (match$2.length !== 1) {
       return {
-              TAG: /* Response */1,
-              _0: CONSTANTS.zeroBN
+              TAG: 1,
+              _0: CONSTANTS.zeroBN,
+              [Symbol.for("name")]: "Response"
             };
     }
     var match$3 = match$2[0];
     return {
-            TAG: /* Response */1,
-            _0: match$3.tokenBalance
+            TAG: 1,
+            _0: match$3.tokenBalance,
+            [Symbol.for("name")]: "Response"
           };
   }
   var match$4 = syntheticBalanceQuery.error;
   if (match$4 !== undefined) {
     return {
-            TAG: /* GraphError */0,
-            _0: match$4.message
+            TAG: 0,
+            _0: match$4.message,
+            [Symbol.for("name")]: "GraphError"
           };
   } else {
     return /* Loading */0;
@@ -513,20 +540,24 @@ function graphResponseToOption(maybeData) {
 function graphResponseToResult(maybeData) {
   if (typeof maybeData === "number") {
     return {
-            TAG: /* Ok */0,
-            _0: /* Loading */0
+            TAG: 0,
+            _0: /* Loading */0,
+            [Symbol.for("name")]: "Ok"
           };
   } else if (maybeData.TAG === /* GraphError */0) {
     return {
-            TAG: /* Error */1,
-            _0: maybeData._0
+            TAG: 1,
+            _0: maybeData._0,
+            [Symbol.for("name")]: "Error"
           };
   } else {
     return {
-            TAG: /* Ok */0,
-            _0: /* Data */{
-              _0: maybeData._0
-            }
+            TAG: 0,
+            _0: {
+              _0: maybeData._0,
+              [Symbol.for("name")]: "Data"
+            },
+            [Symbol.for("name")]: "Ok"
           };
   }
 }
@@ -536,13 +567,15 @@ function queryToResponse(query) {
   var match = query.error;
   if (match !== undefined) {
     return {
-            TAG: /* GraphError */0,
-            _0: match.message
+            TAG: 0,
+            _0: match.message,
+            [Symbol.for("name")]: "GraphError"
           };
   } else if (response !== undefined) {
     return {
-            TAG: /* Response */1,
-            _0: Caml_option.valFromOption(response)
+            TAG: 1,
+            _0: Caml_option.valFromOption(response),
+            [Symbol.for("name")]: "Response"
           };
   } else {
     return /* Loading */0;
@@ -579,21 +612,24 @@ function useTokenMarketId(tokenId) {
     var match$1 = match.syntheticToken;
     if (match$1 !== undefined) {
       return {
-              TAG: /* Response */1,
-              _0: match$1.syntheticMarket.id
+              TAG: 1,
+              _0: match$1.syntheticMarket.id,
+              [Symbol.for("name")]: "Response"
             };
     } else {
       return {
-              TAG: /* Response */1,
-              _0: "1"
+              TAG: 1,
+              _0: "1",
+              [Symbol.for("name")]: "Response"
             };
     }
   }
   var match$2 = marketIdQuery.error;
   if (match$2 !== undefined) {
     return {
-            TAG: /* GraphError */0,
-            _0: match$2.message
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
           };
   } else {
     return /* Loading */0;

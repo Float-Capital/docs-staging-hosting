@@ -86,7 +86,7 @@ function totalValueCard(totalValueLocked) {
                   className: "text-sm"
                 }, " 🏦 in Float Protocol: "), React.createElement("span", {
                   className: "text-green-700"
-                }, "$${totalValueLocked->FormatMoney.formatEther}"));
+                }, "$" + FormatMoney.formatEther(undefined, totalValueLocked)));
 }
 
 function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed, txHash) {
@@ -117,7 +117,7 @@ function syntheticAssetsCard(totalSynthValue, numberOfSynths) {
                   list: [
                     DashboardLi.Props.createDashboardLiProps(Caml_option.some(React.createElement(Tooltip.make, {
                                   tip: "Redeemable value of synths in the open market"
-                                })), "💰 Total synth value: ", "$${totalSynthValue->FormatMoney.formatEther}", undefined, undefined),
+                                })), "💰 Total synth value: ", "$" + FormatMoney.formatEther(undefined, totalSynthValue), undefined, undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "👷‍♀️ No. synths:", numberOfSynths, undefined, undefined)
                   ]
                 }), React.createElement(Link, {
@@ -161,7 +161,7 @@ function stakingCard(totalValueStaked) {
                       className: "text-sm mr-1"
                     }, "💰 Total staked value: "), React.createElement("span", {
                       className: "text-green-700"
-                    }, "$${totalValueStaked->FormatMoney.formatEther}")), React.createElement("div", {
+                    }, "$" + FormatMoney.formatEther(undefined, totalValueStaked))), React.createElement("div", {
                   className: "text-left mt-4 pl-4 text-sm"
                 }, "Trending"), React.createElement("div", {
                   className: "pt-2 pb-5"

@@ -16,6 +16,7 @@ import * as StakeForm from "./StakeForm.js";
 import * as APYProvider from "../../libraries/APYProvider.js";
 import * as Belt_Option from "rescript/lib/es6/belt_Option.js";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
+import * as FormatMoney from "../UI/FormatMoney.js";
 import * as Router from "next/router";
 import * as StakeCardSide from "../UI/StakeCard/StakeCardSide.js";
 import * as ToastProvider from "../UI/ToastProvider.js";
@@ -55,8 +56,9 @@ function mappedBasicCalc(apy, longVal, shortVal, tokenType) {
     return apy;
   } else {
     return {
-            TAG: /* Loaded */0,
-            _0: basicApyCalc(apy._0, longVal, shortVal, tokenType)
+            TAG: 0,
+            _0: basicApyCalc(apy._0, longVal, shortVal, tokenType),
+            [Symbol.for("name")]: "Loaded"
           };
   }
 }
@@ -117,7 +119,7 @@ function StakeCard(Props) {
   var apy = APYProvider.useAPY(undefined);
   var longDollarValueStaked = calculateDollarValue(match.longTokenPrice.price.price, match$2.totalStaked);
   var shortDollarValueStaked = calculateDollarValue(match.shortTokenPrice.price.price, match$1.totalStaked);
-  longDollarValueStaked.add(shortDollarValueStaked);
+  var totalDollarValueStake = longDollarValueStaked.add(shortDollarValueStaked);
   var longApy = mappedBasicCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
   var shortApy = mappedBasicCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
   var longFloatApy = myfloatCalc(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
@@ -154,9 +156,10 @@ function StakeCard(Props) {
           }
           var redirect = function (param) {
             return {
-                    TAG: /* Redirect */1,
+                    TAG: 1,
                     marketIndex: marketIndex.toString(),
-                    actionOption: tokenAddress === longAdrLower ? "long" : "short"
+                    actionOption: tokenAddress === longAdrLower ? "long" : "short",
+                    [Symbol.for("name")]: "Redirect"
                   };
           };
           if (optUserBalanceAddressSet !== undefined) {
@@ -166,8 +169,9 @@ function StakeCard(Props) {
               return redirect(undefined);
             } else {
               return {
-                      TAG: /* Form */0,
-                      _0: tokenAddress
+                      TAG: 0,
+                      _0: tokenAddress,
+                      [Symbol.for("name")]: "Form"
                     };
             }
           } else {
@@ -180,10 +184,11 @@ function StakeCard(Props) {
             var marketIndex = stakeButtonPressState.marketIndex;
             var routeToMint = function (param) {
               return JsPromise.$$catch(router.push("/markets?marketIndex=" + marketIndex + "&actionOption=" + actionOption + "&tab=mint").then(function (param) {
-                              Curry._1(toastDispatch, /* Show */{
+                              Curry._1(toastDispatch, {
                                     _0: "Mint some  " + marketName + " " + actionOption + " tokens to stake.",
                                     _1: "",
-                                    _2: /* Info */2
+                                    _2: /* Info */2,
+                                    [Symbol.for("name")]: "Show"
                                   });
                               return Promise.resolve(undefined);
                             }), (function (e) {
@@ -273,7 +278,7 @@ function StakeCard(Props) {
                                               className: "font-bold pr-1"
                                             }, "TOTAL"), " Staked")), React.createElement("div", {
                                       className: "text-3xl font-alphbeta tracking-wider py-1"
-                                    }, "$${totalDollarValueStake->FormatMoney.formatEther}")), React.createElement("div", {
+                                    }, "$" + FormatMoney.formatEther(undefined, totalDollarValueStake))), React.createElement("div", {
                                   className: "text-right"
                                 }, React.createElement("div", undefined, React.createElement("h2", {
                                           className: "text-xxs mt-1"

@@ -164,14 +164,17 @@ function PriceGraph$LoadedGraph(Props) {
   ];
   var isMobile = View.useIsTailwindMobile(undefined);
   return React.createElement(Recharts.ResponsiveContainer, Curry._3(BsRecharts__ResponsiveContainer.makeProps(isMobile ? ({
-                            TAG: /* Px */0,
-                            _0: 200
+                            TAG: 0,
+                            _0: 200,
+                            [Symbol.for("name")]: "Px"
                           }) : ({
-                            TAG: /* Prc */1,
-                            _0: 100
+                            TAG: 1,
+                            _0: 100,
+                            [Symbol.for("name")]: "Prc"
                           }), {
-                        TAG: /* Prc */1,
-                        _0: 100
+                        TAG: 1,
+                        _0: 100,
+                        [Symbol.for("name")]: "Prc"
                       })(undefined, "w-full text-xs m-0 p-0", undefined, undefined, undefined), React.createElement(Recharts.LineChart, {
                       data: data,
                       margin: {
@@ -477,8 +480,9 @@ function PriceGraph(Props) {
       });
   var setOverlayMessageText = match$2[1];
   var match$3 = React.useState(function () {
-        return /* Max */{
-                _0: timeMaketHasExisted
+        return {
+                _0: timeMaketHasExisted,
+                [Symbol.for("name")]: "Max"
               };
       });
   var setGraphSetting = match$3[1];
@@ -560,8 +564,9 @@ function PriceGraph(Props) {
                           /* Month */2,
                           /* ThreeMonth */3,
                           /* Year */4,
-                          /* Max */{
-                            _0: timeMaketHasExisted
+                          {
+                            _0: timeMaketHasExisted,
+                            [Symbol.for("name")]: "Max"
                           }
                         ], (function (buttonSetting) {
                             var text = btnTextFromGraphSetting(buttonSetting);

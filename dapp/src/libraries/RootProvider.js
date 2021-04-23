@@ -28,9 +28,10 @@ var initialState = {
 function reducer(_prevState, action) {
   if (action) {
     return {
-            ethState: /* Connected */{
+            ethState: {
               _0: action._0,
-              _1: action._1
+              _1: action._1,
+              [Symbol.for("name")]: "Connected"
             }
           };
   } else {
@@ -135,9 +136,10 @@ function RootProvider$RootWithWeb3(Props) {
           }
           var account = Caml_option.valFromOption(match$1);
           JsPromise.$$catch(Caml_option.valFromOption(match).getBalance(account).then(function (newBalance) {
-                    return Curry._1(dispatch, /* LoadAddress */{
+                    return Curry._1(dispatch, {
                                 _0: account,
-                                _1: newBalance
+                                _1: newBalance,
+                                [Symbol.for("name")]: "LoadAddress"
                               });
                   }), (function (param) {
                   return Promise.resolve(undefined);
@@ -227,10 +229,11 @@ function useActivateConnector(param) {
                       var errorMessage = err !== undefined ? Belt_Option.mapWithDefault(Caml_option.valFromOption(err).message, "", (function (x) {
                                 return x;
                               })) : "";
-                      Curry._1(toastDispatch, /* Show */{
+                      Curry._1(toastDispatch, {
                             _0: "Error connecting to the network",
                             _1: errorMessage,
-                            _2: /* Error */0
+                            _2: /* Error */0,
+                            [Symbol.for("name")]: "Show"
                           });
                       return Promise.resolve(Curry._1(setConnectionStatus, (function (param) {
                                         return /* ErrorConnecting */3;

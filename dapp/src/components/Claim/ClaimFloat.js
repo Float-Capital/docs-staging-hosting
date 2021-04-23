@@ -21,41 +21,46 @@ function ClaimFloat(Props) {
   React.useEffect((function () {
           if (typeof txState === "number") {
             if (txState !== /* UnInitialised */0) {
-              Curry._1(toastDispatch, /* Show */{
+              Curry._1(toastDispatch, {
                     _0: "Confirm claim transaction in your wallet",
                     _1: "",
-                    _2: /* Info */2
+                    _2: /* Info */2,
+                    [Symbol.for("name")]: "Show"
                   });
             }
             
           } else {
             switch (txState.TAG | 0) {
               case /* SignedAndSubmitted */0 :
-                  Curry._1(toastDispatch, /* Show */{
+                  Curry._1(toastDispatch, {
                         _0: "claim transaction pending",
                         _1: "",
-                        _2: /* Info */2
+                        _2: /* Info */2,
+                        [Symbol.for("name")]: "Show"
                       });
                   break;
               case /* Declined */1 :
-                  Curry._1(toastDispatch, /* Show */{
+                  Curry._1(toastDispatch, {
                         _0: "The transaction was rejected by your wallet",
                         _1: txState._0,
-                        _2: /* Error */0
+                        _2: /* Error */0,
+                        [Symbol.for("name")]: "Show"
                       });
                   break;
               case /* Complete */2 :
-                  Curry._1(toastDispatch, /* Show */{
+                  Curry._1(toastDispatch, {
                         _0: "Claim transaction confirmed 🎉",
                         _1: "",
-                        _2: /* Success */3
+                        _2: /* Success */3,
+                        [Symbol.for("name")]: "Show"
                       });
                   break;
               case /* Failed */3 :
-                  Curry._1(toastDispatch, /* Show */{
+                  Curry._1(toastDispatch, {
                         _0: "The transaction failed",
                         _1: "",
-                        _2: /* Error */0
+                        _2: /* Error */0,
+                        [Symbol.for("name")]: "Show"
                       });
                   break;
               

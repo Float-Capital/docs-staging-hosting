@@ -91,20 +91,22 @@ function i_list_decode(v) {
   var liquidityRate = Decco.stringFromJson(Belt_Option.getWithDefault(Js_dict.get(dict._0, "liquidityRate"), null));
   if (liquidityRate.TAG === /* Ok */0) {
     return {
-            TAG: /* Ok */0,
+            TAG: 0,
             _0: {
               liquidityRate: liquidityRate._0
-            }
+            },
+            [Symbol.for("name")]: "Ok"
           };
   }
   var e = liquidityRate._0;
   return {
-          TAG: /* Error */1,
+          TAG: 1,
           _0: {
             path: ".liquidityRate" + e.path,
             message: e.message,
             value: e.value
-          }
+          },
+          [Symbol.for("name")]: "Error"
         };
 }
 
@@ -119,20 +121,22 @@ function inner_decode(v) {
   var reserves = Decco.arrayFromJson(i_list_decode, Belt_Option.getWithDefault(Js_dict.get(dict._0, "reserves"), null));
   if (reserves.TAG === /* Ok */0) {
     return {
-            TAG: /* Ok */0,
+            TAG: 0,
             _0: {
               reserves: reserves._0
-            }
+            },
+            [Symbol.for("name")]: "Ok"
           };
   }
   var e = reserves._0;
   return {
-          TAG: /* Error */1,
+          TAG: 1,
           _0: {
             path: ".reserves" + e.path,
             message: e.message,
             value: e.value
-          }
+          },
+          [Symbol.for("name")]: "Error"
         };
 }
 
@@ -147,20 +151,22 @@ function t_decode(v) {
   var data = inner_decode(Belt_Option.getWithDefault(Js_dict.get(dict._0, "data"), null));
   if (data.TAG === /* Ok */0) {
     return {
-            TAG: /* Ok */0,
+            TAG: 0,
             _0: {
               data: data._0
-            }
+            },
+            [Symbol.for("name")]: "Ok"
           };
   }
   var e = data._0;
   return {
-          TAG: /* Error */1,
+          TAG: 1,
           _0: {
             path: ".data" + e.path,
             message: e.message,
             value: e.value
-          }
+          },
+          [Symbol.for("name")]: "Error"
         };
 }
 
@@ -203,8 +209,9 @@ function determineAaveApy(setApy) {
           var apy = Belt_Float.fromString(Ethers.Utils.formatEther(Ethers$1.BigNumber.from(inner.liquidityRate).div(CONSTANTS.tenToThe9)));
           return Curry._1(setApy, (function (param) {
                         return {
-                                TAG: /* Loaded */0,
-                                _0: apy
+                                TAG: 0,
+                                _0: apy,
+                                [Symbol.for("name")]: "Loaded"
                               };
                       }));
         }));

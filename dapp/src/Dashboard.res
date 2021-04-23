@@ -43,7 +43,7 @@ let totalValueCard = (~totalValueLocked) =>
     <span className="font-alphbeta text-xl"> {"Total Value"->React.string} </span>
     <span className="text-sm"> {` 🏦 in Float Protocol: `->React.string} </span>
     <span className="text-green-700">
-      {`$${totalValueLocked->FormatMoney.formatEther}`->React.string}
+      {`\$${totalValueLocked->FormatMoney.formatEther}`->React.string}
     </span>
   </div>
 
@@ -89,7 +89,7 @@ let syntheticAssetsCard = (~totalSynthValue, ~numberOfSynths) =>
       list=[
         createDashboardLiProps(
           ~prefix=`💰 Total synth value: `,
-          ~value=`$${totalSynthValue->FormatMoney.formatEther}`,
+          ~value=`\$${totalSynthValue->FormatMoney.formatEther}`,
           ~suffix=<Tooltip tip={"Redeemable value of synths in the open market"} />,
           (),
         ),
@@ -131,7 +131,7 @@ let stakingCard = (~totalValueStaked) =>
     <div className="text-center mt-5">
       <span className="text-sm mr-1"> {`💰 Total staked value: `->React.string} </span>
       <span className="text-green-700">
-        {`$${totalValueStaked->FormatMoney.formatEther}`->React.string}
+        {`\$${totalValueStaked->FormatMoney.formatEther}`->React.string}
       </span>
     </div>
     <div className="text-left mt-4 pl-4 text-sm"> {`Trending`->React.string} </div>

@@ -23,7 +23,7 @@ module UserBalancesCard = {
       | Response({totalBalance, balances}) => <>
           <UserColumnTextCenter>
             <UserColumnText
-              head=`💰 Synth value` body={`$${totalBalance->FormatMoney.formatEther}`}
+              head=`💰 Synth value` body={`\$${totalBalance->FormatMoney.formatEther}`}
             />
           </UserColumnTextCenter>
           <br />

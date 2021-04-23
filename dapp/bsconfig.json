@@ -28,11 +28,13 @@
     "rescript-future",
     "rescript-request",
     "@ahrefs/bs-recharts",
+    "re-formality",
     "decco"
   ],
   "ppx-flags": [
     "@reasonml-community/graphql-ppx/ppx",
-    "decco/ppx"
+    "decco/ppx",
+    "re-formality/ppx"
   ],
   "sources": [
     {

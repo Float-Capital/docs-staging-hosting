@@ -297,7 +297,7 @@ let make = (
                 </h2>
               </div>
               <div className="text-3xl font-alphbeta tracking-wider py-1">
-                {`$${totalDollarValueStake->FormatMoney.formatEther}`->React.string}
+                {`\$${totalDollarValueStake->FormatMoney.formatEther}`->React.string}
               </div>
             </div>
             <div className="text-right">
