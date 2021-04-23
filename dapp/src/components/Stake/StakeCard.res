@@ -291,8 +291,8 @@ let make = (
             </div>
             <div>
               <div>
-                <h2 className="text-xs mt-1">
-                  <span className="font-bold"> {`TOTAL`->React.string} </span>
+                <h2 className="text-xs mt-1 flex justify-center">
+                  <span className="font-bold pr-1"> {`TOTAL`->React.string} </span>
                   {" Staked"->React.string}
                 </h2>
               </div>
