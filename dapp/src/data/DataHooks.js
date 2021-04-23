@@ -273,14 +273,17 @@ function useUsersBalances(userId) {
           balances: []
         }, (function (param, param$1) {
             var match = param$1.syntheticToken;
+            var match$1 = match.syntheticMarket;
             var tokenBalance = param$1.tokenBalance;
             var isLong = match.tokenType === "Long";
             var newToken_addr = Ethers.utils.getAddress(match.id);
-            var newToken_name = match.syntheticMarket.name;
+            var newToken_name = match$1.name;
+            var newToken_symbol = match$1.symbol;
             var newToken_tokensValue = match.latestPrice.price.price.mul(tokenBalance).div(CONSTANTS.tenToThe18);
             var newToken = {
               addr: newToken_addr,
               name: newToken_name,
+              symbol: newToken_symbol,
               isLong: isLong,
               tokenBalance: tokenBalance,
               tokensValue: newToken_tokensValue

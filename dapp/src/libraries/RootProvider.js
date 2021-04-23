@@ -2,13 +2,14 @@
 
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
+import * as Config from "../Config.js";
 import * as Ethers from "ethers";
 import * as Globals from "./Globals.js";
 import * as JsPromise from "./Js.Promise/JsPromise.js";
 import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
 import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
 import * as ToastProvider from "../components/UI/ToastProvider.js";
-import * as Web3Connectors from "../components/Login/Web3Connectors.js";
+import * as Web3Connectors from "../bindings/web3-react/Web3Connectors.js";
 import * as Core from "@web3-react/core";
 import * as Caml_js_exceptions from "bs-platform/lib/es6/caml_js_exceptions.js";
 
@@ -16,8 +17,8 @@ var Web3ReactProvider = {};
 
 function getLibrary(provider) {
   var library = new (Ethers.providers.Web3Provider)(provider);
-  var setPollingInterval = (lib => {lib.pollingInterval = 8000; return lib; });
-  return setPollingInterval(library);
+  var setPollingInterval = ((lib, pollingInterval) => {lib.pollingInterval = pollingInterval; return lib; });
+  return setPollingInterval(library, Config.web3PollingInterval);
 }
 
 var initialState = {
@@ -199,25 +200,6 @@ function useChainIdExn(param) {
   return Belt_Option.getExn(Core.useWeb3React().chainId);
 }
 
-function useEtherscanUrl(param) {
-  var networkId = Core.useWeb3React().chainId;
-  if (networkId !== undefined) {
-    if (networkId === 5 || networkId === 4) {
-      if (networkId >= 5) {
-        return "goerli.etherscan.io";
-      } else {
-        return "rinkeby.etherscan.io";
-      }
-    } else if (networkId !== 97) {
-      return "etherscan.io";
-    } else {
-      return "testnet.bscscan.com";
-    }
-  } else {
-    return "etherscan.io";
-  }
-}
-
 function useDeactivateWeb3(param) {
   return Core.useWeb3React().deactivate;
 }
@@ -290,7 +272,6 @@ export {
   useEthBalance ,
   useChainId ,
   useChainIdExn ,
-  useEtherscanUrl ,
   useDeactivateWeb3 ,
   useWeb3 ,
   useActivateConnector ,

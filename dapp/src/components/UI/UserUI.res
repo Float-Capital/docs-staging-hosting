@@ -99,12 +99,134 @@ module UserColumnText = {
   }
 }
 
+let threeDotsSvg =
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path
+      fillRule="evenodd"
+      d="M12 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"
+    />
+  </svg>
+
+module MetamaskMenu = {
+  type doc
+  type event = {target: Dom.element}
+
+  @scope("document") @val
+  external addDocumentEventListner: (string, event => unit) => unit = "addEventListener"
+  @scope("document") @val
+  external removeDocumentEventListner: (string, event => unit) => unit = "removeEventListener"
+  @send
+  external contains: (Dom.element, Dom.element) => bool = "contains"
+
+  let addClickListener = addDocumentEventListner("mousedown")
+  let removeClickListener = removeDocumentEventListner("mousedown")
+
+  @react.component
+  let make = (~tokenAddress, ~tokenName) => {
+    let (show, setShow) = React.useState(_ => false)
+    let router = Next.Router.useRouter()
+
+    let initialShowPing = switch Js.Dict.get(router.query, `minted`) {
+    | None => false
+    | Some(addr) => addr == tokenAddress
+    }
+
+    let (showPing, setShowPing) = React.useState(_ => false)
+
+    React.useEffect1(_ => {
+      if initialShowPing {
+        setShowPing(_ => true)
+        let _ = Js.Global.setTimeout(_ => setShowPing(_ => false), 6000)
+        None
+      } else {
+        None
+      }
+    }, [initialShowPing])
+
+    let wrapper = React.useRef(Js.Nullable.null)
+    let dots = React.useRef(Js.Nullable.null)
+    React.useEffect1(_ => {
+      let handleMousedown = ({target}) => {
+        let _ =
+          wrapper.current
+          ->Js.Nullable.toOption
+          ->Option.mapWithDefault((), element => {
+            let _ =
+              dots.current
+              ->Js.Nullable.toOption
+              ->Option.mapWithDefault((), dotsElement => {
+                if !(element->contains(target)) && !(dotsElement->contains(target)) {
+                  setShow(_ => false)
+                } else {
+                  ()
+                }
+              })
+          })
+      }
+      addClickListener(handleMousedown)
+      Some(_ => removeClickListener(handleMousedown))
+    }, [wrapper])
+    if InjectedEthereum.isMetamask() {
+      <div className="relative">
+        <div
+          className="absolute top-1 w-4 h-4 cursor-pointer z-20"
+          onClick={_ => {
+            setShow(show => !show)
+            setShowPing(_ => false)
+          }}
+          ref={ReactDOM.Ref.domRef(dots)}>
+          {threeDotsSvg}
+        </div>
+        {if show {
+          <div
+            className="absolute bottom-full left-1 rounded-lg z-30 text-xs py-1 px-1 w-20 bg-white shadow-lg flex justify-center cursor-pointer"
+            ref={ReactDOM.Ref.domRef(wrapper)}>
+            <AddToMetamask tokenAddress tokenSymbol={tokenName} callback={_ => setShow(_ => false)}>
+              {"Add to "->React.string} <img src="/icons/metamask.svg" className="h-5 ml-1" />
+            </AddToMetamask>
+          </div>
+        } else {
+          React.null
+        }}
+        {if showPing {
+          <div
+            className={`absolute left-1 top-1 z-0 animate-ping inline-flex h-3 w-3 mr-4 rounded-full bg-green-500 opacity-90`}
+          />
+        } else {
+          React.null
+        }}
+      </div>
+    } else {
+      React.null
+    }
+  }
+}
+
 module UserMarketBox = {
   @react.component
-  let make = (~name, ~isLong, ~tokens, ~value, ~children) => {
+  let make = (
+    ~name,
+    ~isLong,
+    ~tokens,
+    ~value,
+    ~tokenAddress=CONSTANTS.zeroAddress,
+    ~metamaskMenu=false,
+    ~symbol="",
+    ~children,
+  ) => {
     <div
-      className=`flex w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>
-      <div className=`w-1/3 text-sm self-center`>
+      className=`flex w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative`>
+      {if metamaskMenu {
+        <div className="absolute left-1 top-2">
+          <MetamaskMenu
+            tokenAddress={tokenAddress->Ethers.Utils.ethAdrToStr}
+            tokenName={`${isLong ? "fu" : "fd"}${symbol}`}
+          />
+        </div>
+      } else {
+        React.null
+      }}
+      <div className=`pl-3 w-1/3 text-sm self-center`>
         {name->React.string}
         <br className=`mt-1` />
         {(isLong ? `Long↗️` : `Short↘️`)->React.string}

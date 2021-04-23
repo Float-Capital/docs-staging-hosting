@@ -152,6 +152,7 @@ module MintFormInput = {
           onBlur=onBlurAmount
           onChange=onChangeAmountInput
           placeholder={"Mint"}
+          optCurrency={Some(Config.paymentTokenName)}
           onMaxClick
         />
         {switch optErrorMessage {
@@ -207,6 +208,16 @@ module MintFormSignedIn = {
       contractActionToCallAfterApproval,
       setContractActionToCallAfterApproval,
     ) = React.useState(((), ()) => ())
+
+    let user = RootProvider.useCurrentUserExn()
+    let tokenAddress = isLong
+      ? market.syntheticLong.tokenAddress
+      : market.syntheticShort.tokenAddress
+    let tokenBalanceQuery = DataHooks.useSyntheticTokenBalanceOrZero(~user, ~tokenAddress)
+    let initialMint = switch tokenBalanceQuery {
+    | Response(balance) => balance->Ethers.BigNumber.eq(CONSTANTS.zeroBN)
+    | _ => false
+    }
 
     let (optDaiBalance, optDaiAmountApproved) = useBalanceAndApproved(
       ~erc20Address=Config.dai,
@@ -342,9 +353,16 @@ module MintFormSignedIn = {
         )
       | SignedAndSubmitted(_) =>
         toastDispatch(ToastProvider.Show(`Minting transaction pending`, "", ToastProvider.Info))
-      | Complete(_) =>
-        toastDispatch(ToastProvider.Show(`Mint transaction confirmed`, "", ToastProvider.Success))
-        router->Next.Router.push(userPage)
+      | Complete(_) => {
+          toastDispatch(ToastProvider.Show(`Mint transaction confirmed`, "", ToastProvider.Success))
+          let route = if initialMint && !form.input.isStaking {
+            `${userPage}?minted=${tokenAddress->Ethers.Utils.ethAdrToStr}`
+          } else {
+            userPage
+          }
+          router->Next.Router.push(route)
+        }
+
       | Failed(_) =>
         toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
       | Declined(reason) =>

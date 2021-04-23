@@ -43,15 +43,10 @@ module UsersActiveStakes = {
                   <div className="flex justify-between items-start w-full ">
                     <div className="flex justify-start items-center ">
                       <h3 className="text-xl"> {symbol->React.string} </h3>
-                      // <AddToMetamask
-                      //   tokenAddress={tokenAddress}
-                      //   tokenSymbol={(tokenType->Obj.magic == "Short" ? `↘️` : `↗️`) ++
-                      //   symbol->Js.String2.replaceByRe(%re("/[aeiou]/ig"), "")}
-                      // />
                     </div>
                     <a
                       className="text-xs hover:text-gray-500 hover:underline  ml-5"
-                      href={`https://testnet.bscscan.com/tx/${creationTxHash}`}>
+                      href={`${Config.blockExplorer}/tx/${creationTxHash}`}>
                       {`Last updated ${timeSinceStaking} ago`->React.string}
                     </a>
                   </div>
@@ -60,7 +55,7 @@ module UsersActiveStakes = {
                     <p className="text-primary ">
                       <a
                         target="_"
-                        href={`https://testnet.bscscan.com/token/${tokenAddress->ethAdrToStr}?a=${currentUser->ethAdrToStr}`}>
+                        href={`${Config.blockExplorer}/token/${tokenAddress->ethAdrToStr}?a=${currentUser->ethAdrToStr}`}>
                         <span className="text-bold text-4xl">
                           {amountFormatted->React.string}
                         </span>
@@ -68,10 +63,6 @@ module UsersActiveStakes = {
                       </a>
                     </p>
                     <div className="flex items-center">
-                      // <AddToMetamask
-                      //   tokenAddress={tokenAddress->Ethers.Utils.ethAdrToStr} tokenSymbol={"FLOAT"}
-                      // />
-                      // <ClaimFloat tokenAddresses=[tokenAddress] />
                       <ClaimFloatImmediatlyPerToken tokenAddress />
                     </div>
                   </div>

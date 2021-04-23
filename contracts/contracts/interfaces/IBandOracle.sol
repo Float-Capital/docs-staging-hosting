@@ -6,8 +6,8 @@ pragma abicoder v2;
 /* Standard Band oracle interface. Prices are queried by pair, i.e. what is
  * the price of the given base currency in units of the quote currency?
  *    see:
- *  https://testnet.bscscan.com/address/0xDA7a001b254CD22e46d3eAB04d937489c93174C3#code
- *  https://docs.binance.org/smart-chain/developer/band.html
+ *  https://kovan.etherscan.io/address/0xDA7a001b254CD22e46d3eAB04d937489c93174C3#code
+ *  https://docs.matic.network/docs/develop/oracles/bandstandarddataset/
  */
 interface IBandOracle {
     struct ReferenceData {

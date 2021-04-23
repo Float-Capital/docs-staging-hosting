@@ -13,6 +13,8 @@ var networkId = config.networkId;
 
 var networkName = config.networkName;
 
+var rpcEndopint = config.rpcEndopint;
+
 var paymentTokenName = config.paymentTokenName;
 
 var blockExplorer = config.blockExplorer;
@@ -20,6 +22,8 @@ var blockExplorer = config.blockExplorer;
 var blockExplorerName = config.blockExplorerName;
 
 var discordInviteLink = config.discordInviteLink;
+
+var web3PollingInterval = config.web3PollingInterval;
 
 var longShort = match.LongShort;
 
@@ -35,10 +39,12 @@ export {
   priceHistoryGraphEndpoint ,
   networkId ,
   networkName ,
+  rpcEndopint ,
   paymentTokenName ,
   blockExplorer ,
   blockExplorerName ,
   discordInviteLink ,
+  web3PollingInterval ,
   longShort ,
   staker ,
   dai ,

@@ -270,9 +270,9 @@ const logGasPrices = async (
   functionName,
   receipt,
   ethPriceUsd,
-  bnbPriceUsd,
+  maticPriceUsd,
   ethGasPriceGwei,
-  bnbGasPriceGwei
+  maticGasPriceGwei
 ) => {
   const ONE_GWEI = new BN("1000000000");
   const ONE_ETH = new BN("1000000000000000000");
@@ -293,17 +293,17 @@ const logGasPrices = async (
     ) / 100;
   console.log(`Cost on ETH Mainnet: $${ethCost}`);
 
-  console.log(`------Cost for BSC ------`);
-  console.log(`gas price gwei: ${bnbGasPriceGwei}`);
-  const totalCostBsc = new BN(gasUsed).mul(
-    new BN(bnbGasPriceGwei).mul(ONE_GWEI)
+  console.log(`------Cost for Matic/POLYGON ------`);
+  console.log(`gas price gwei: ${maticGasPriceGwei}`);
+  const totalCostMatic = new BN(gasUsed).mul(
+    new BN(maticGasPriceGwei).mul(ONE_GWEI)
   );
-  console.log(`BNB Price: $${bnbPriceUsd}`);
-  const bscCost =
+  console.log(`MATIC Price: $${maticPriceUsd}`);
+  const maticCost =
     Number(
-      totalCostBsc.mul(new BN(bnbPriceUsd)).mul(new BN(100)).div(ONE_ETH)
+      totalCostMatic.mul(new BN(maticPriceUsd)).mul(new BN(100)).div(ONE_ETH)
     ) / 100;
-  console.log(`Cost on BSC: $${bscCost}`);
+  console.log(`Cost on BSC: $${maticCost}`);
 };
 
 module.exports = {

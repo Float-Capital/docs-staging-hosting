@@ -26,10 +26,11 @@ external createWeb3Provider: Ethers.Providers.t => Ethers.Providers.t = "Web3Pro
 let getLibrary = provider => {
   let library = createWeb3Provider(provider)
 
-  let setPollingInterval: Ethers.Providers.t => Ethers.Providers.t = %raw(
-    "lib => {lib.pollingInterval = 8000; return lib; }"
+  let setPollingInterval: (Ethers.Providers.t, int) => Ethers.Providers.t = %raw(
+    "(lib, pollingInterval) => {lib.pollingInterval = pollingInterval; return lib; }"
   )
-  setPollingInterval(library)
+
+  setPollingInterval(library, Config.web3PollingInterval)
 }
 
 let initialState = {
@@ -158,16 +159,6 @@ let useChainId: unit => option<int> = () => {
 }
 let useChainIdExn = () => useChainId()->Option.getExn
 
-let useEtherscanUrl: unit => string = () => {
-  let networkId = useChainId()
-
-  switch networkId {
-  | Some(5) => "goerli.etherscan.io"
-  | Some(4) => "rinkeby.etherscan.io"
-  | Some(97) => "testnet.bscscan.com"
-  | _ => "etherscan.io"
-  }
-}
 let useDeactivateWeb3: (unit, unit) => unit = () => {
   let context = useWeb3React()
 

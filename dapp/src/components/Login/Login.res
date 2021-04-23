@@ -1,12 +1,30 @@
-type connectorObj = {
-  name: string,
-  connector: Web3Connectors.injectedType,
-  img: string,
-  connectionPhrase: string,
-}
+open Web3Connectors
 
-@module("./connectors")
-external connectors: array<connectorObj> = "default"
+let connectors = [
+  {
+    name: "MetaMask",
+    connector: injected,
+    img: "/img/wallet-icons/metamask.svg",
+    connectionPhrase: "Connect to your MetaMask Wallet",
+  },
+  {
+    name: "WalletConnect",
+    connector: WalletConnectConnector.make({
+      rpc: Js.Dict.fromArray([(Config.networkId->Int.toString, Config.rpcEndopint)]),
+      bridge: "https://bridge.walletconnect.org",
+      qrcode: true,
+      pollingInterval: Config.web3PollingInterval,
+    }),
+    connectionPhrase: "Connect via WalletConnect",
+    img: "/img/wallet-icons/walletConnect.svg",
+  },
+  {
+    name: "Torus",
+    connector: TorusConnector.make({chainId: 1}),
+    connectionPhrase: "Connect via Torus",
+    img: "/img/wallet-icons/torus.svg",
+  },
+]
 
 @react.component
 let make = () => {

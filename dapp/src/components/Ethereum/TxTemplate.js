@@ -3,8 +3,8 @@
 import * as CssJs from "bs-css-emotion/src/CssJs.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 import * as React from "react";
+import * as Config from "../../Config.js";
 import * as Loader from "../UI/Loader.js";
-import * as RootProvider from "../../libraries/RootProvider.js";
 
 var centerFlex = CssJs.style([
       CssJs.display("flex"),
@@ -15,7 +15,6 @@ function TxTemplate(Props) {
   var children = Props.children;
   var txState = Props.txState;
   var resetTxState = Props.resetTxState;
-  var txExplererUrl = RootProvider.useEtherscanUrl(undefined);
   if (typeof txState === "number") {
     if (txState === /* UnInitialised */0) {
       return children;
@@ -28,10 +27,10 @@ function TxTemplate(Props) {
   switch (txState.TAG | 0) {
     case /* SignedAndSubmitted */0 :
         return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Processing Transaction ", React.createElement(Loader.make, {})), React.createElement("p", undefined, React.createElement("a", {
-                            href: "https://" + txExplererUrl + "/tx/" + txState._0,
+                            href: Config.blockExplorer + "/tx/" + txState._0,
                             rel: "noopener noreferrer",
                             target: "_blank"
-                          }, "View the transaction on " + txExplererUrl)), React.createElement("div", {
+                          }, "View the transaction on " + Config.blockExplorerName)), React.createElement("div", {
                         className: "bg-white"
                       }, React.createElement(Loader.make, {})));
     case /* Declined */1 :
@@ -39,10 +38,10 @@ function TxTemplate(Props) {
     case /* Complete */2 :
         var txHash = txState._0.transactionHash;
         return React.createElement(React.Fragment, undefined, React.createElement("h1", undefined, "Transaction Complete ", React.createElement(Loader.make, {})), React.createElement("p", undefined, React.createElement("a", {
-                            href: "https://" + txExplererUrl + "/tx/" + txHash,
+                            href: "https://" + Config.blockExplorer + "/tx/" + txHash,
                             rel: "noopener noreferrer",
                             target: "_blank"
-                          }, "View the transaction on " + txExplererUrl)), resetTxState !== undefined ? React.createElement("button", {
+                          }, "View the transaction on " + Config.blockExplorerName)), resetTxState !== undefined ? React.createElement("button", {
                           onClick: (function (param) {
                               return Curry._1(resetTxState, undefined);
                             })

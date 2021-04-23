@@ -8,7 +8,9 @@ import * as Button from "../UI/Button.js";
 import * as Config from "../../Config.js";
 import * as Ethers from "../../ethereum/Ethers.js";
 import * as Ethers$1 from "ethers";
+import * as CONSTANTS from "../../CONSTANTS.js";
 import * as Contracts from "../../ethereum/Contracts.js";
+import * as DataHooks from "../../data/DataHooks.js";
 import * as Formality from "re-formality/src/Formality.js";
 import * as MiniLoader from "../UI/MiniLoader.js";
 import * as AmountInput from "../UI/AmountInput.js";
@@ -710,7 +712,8 @@ function MintForm$MintFormInput(Props) {
             disabled: disabled,
             onBlur: onBlurAmount,
             onChange: onChangeAmountInput,
-            onMaxClick: onMaxClick
+            onMaxClick: onMaxClick,
+            optCurrency: Config.paymentTokenName
           }), optErrorMessage !== undefined ? React.createElement("div", {
               className: "text-red-500 text-xs"
             }, optErrorMessage) : null, React.createElement("div", {
@@ -771,6 +774,11 @@ function MintForm$MintFormSignedIn(Props) {
       });
   var setContractActionToCallAfterApproval = match$2[1];
   var contractActionToCallAfterApproval = match$2[0];
+  var user = RootProvider.useCurrentUserExn(undefined);
+  var tokenAddress = isLong ? market.syntheticLong.tokenAddress : market.syntheticShort.tokenAddress;
+  var tokenBalanceQuery = DataHooks.useSyntheticTokenBalanceOrZero(user, tokenAddress);
+  var initialMint;
+  initialMint = typeof tokenBalanceQuery === "number" || tokenBalanceQuery.TAG === /* GraphError */0 ? false : tokenBalanceQuery._0.eq(CONSTANTS.zeroBN);
   var match$3 = useBalanceAndApproved(Config.dai, Config.longShort);
   var optDaiAmountApproved = match$3[1];
   var optDaiBalance = match$3[0];
@@ -971,7 +979,8 @@ function MintForm$MintFormSignedIn(Props) {
                         _2: /* Success */3,
                         [Symbol.for("name")]: "Show"
                       });
-                  router.push(userPage);
+                  var route = initialMint && !form.input.isStaking ? userPage + "?minted=" + Ethers.Utils.ethAdrToStr(tokenAddress) : userPage;
+                  router.push(route);
                   break;
               case /* Failed */3 :
                   Curry._1(toastDispatch, {
