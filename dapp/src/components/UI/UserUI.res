@@ -238,11 +238,9 @@ module UserMarketBox = {
         <span className=`text-xs`> {Js.String.concat(value, `~\$`)->React.string} </span>
       </div>
       <div className=`w-1/3 self-center`> {children} </div>
-      React.null
     </div>
   }
 }
-let thing = `~\$`
 
 module UserMarketStakeOrRedeem = {
   @react.component
