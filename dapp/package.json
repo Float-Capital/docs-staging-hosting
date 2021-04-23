@@ -23,9 +23,9 @@
     "next-transpile-modules": "^4.1.0",
     "nprogress": "^0.2.0",
     "prop-types": "^15.7.2",
+    "re-formality": "4.0.0-beta.7",
     "react": "^17.0.2",
     "react-dom": "^16.13.1",
-    "re-formality": "4.0.0-beta.7",
     "recharts": "^2.0.9",
     "request": "^2.88.0",
     "rescript-future": "^1.1.0",
@@ -48,7 +48,9 @@
     "update-schema2": "get-graphql-schema https://test.graph.float.capital/subgraphs/name/float-capital/float-capital2 -j > graphql_schema.json",
     "update-dbschema-local": "get-graphql-schema http://localhost:8080/v1/graphql -h 'x-hasura-admin-secret=testing' -j > graphql_schema_db.json",
     "update-price-history-schema": "get-graphql-schema https://api.thegraph.com/subgraphs/name/float-capital/testnet-price-history -j > graphql_schema_price_history.json",
-    "update-testnet-ui": "cd .. && node scripts/deployments.js > dapp/src/contractAddresses.json ; cd dapp && yarn update-schema ; yarn res:build"
+    "update-testnet-ui": "cd .. && node scripts/deployments.js > dapp/src/contractAddresses.json ; cd dapp && yarn update-schema ; yarn res:build",
+    "visual-integration-test": "start-server-and-test 'serve build -l 3000' http://localhost:3000 'cypress open'",
+    "integration-test": "start-server-and-test 'serve build -l 3000' http://localhost:3000 'cypress run'"
   },
   "devDependencies": {
     "@apollo/client": "^3.3.7",
@@ -63,6 +65,7 @@
     "reason-react": "^0.9.1",
     "rescript": "^9.1.1",
     "rescript-apollo-client": "^1.1.1",
+    "start-server-and-test": "^1.12.1",
     "tailwindcss": "^2.0.2",
     "yarn": "^1.22.10"
   }

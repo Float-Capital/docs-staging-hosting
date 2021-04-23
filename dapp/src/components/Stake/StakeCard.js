@@ -267,13 +267,8 @@ function StakeCard(Props) {
                                               className: "font-bold"
                                             }, "📈 Long"), " staked")), React.createElement("div", {
                                       className: "text-sm font-alphbeta tracking-wider py-1"
-<<<<<<< HEAD
-                                    }, "$" + FormatMoney.formatEther(undefined, longDollarValueStaked))), React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("h2", {
-                                          className: "text-xs mt-1 flex justify-center"
-=======
                                     }, "$${longDollarValueStaked->FormatMoney.formatEther}")), React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("h2", {
-                                          className: "text-xs mt-1"
->>>>>>> Everything compiles!
+                                          className: "text-xs mt-1 flex justify-center"
                                         }, React.createElement("span", {
                                               className: "font-bold pr-1"
                                             }, "TOTAL"), " Staked")), React.createElement("div", {
