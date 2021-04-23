@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as MiniLoader from "../UI/MiniLoader.js";
-import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as FormatMoney from "../UI/FormatMoney.js";
 import * as ContractHooks from "../Testing/Admin/ContractHooks.js";
 

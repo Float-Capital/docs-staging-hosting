@@ -3,10 +3,10 @@
 import * as Ethers from "../ethereum/Ethers.js";
 import * as Ethers$1 from "ethers";
 import * as Globals from "./Globals.js";
-import * as Js_json from "bs-platform/lib/es6/js_json.js";
+import * as Js_json from "rescript/lib/es6/js_json.js";
 import * as CONSTANTS from "../CONSTANTS.js";
-import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
-import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as Belt_Option from "rescript/lib/es6/belt_Option.js";
+import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import FromUnixTime from "date-fns/fromUnixTime";
 
 function jsonToBigInt(json) {

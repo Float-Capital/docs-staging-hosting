@@ -2,12 +2,12 @@
 
 import * as Css from "bs-css-emotion/src/Css.js";
 import * as CssJs from "bs-css-emotion/src/CssJs.js";
-import * as Curry from "bs-platform/lib/es6/curry.js";
+import * as Curry from "rescript/lib/es6/curry.js";
 import * as React from "react";
 import * as Button from "../components/UI/Button.js";
 import * as Globals from "../libraries/Globals.js";
 import Link from "next/link";
-import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Router from "next/router";
 import * as RootProvider from "../libraries/RootProvider.js";
 import * as DisplayAddress from "../components/UI/DisplayAddress.js";

@@ -6,14 +6,14 @@ import * as Config from "./Config.js";
 import * as Ethers from "./ethereum/Ethers.js";
 import * as Loader from "./components/UI/Loader.js";
 import * as UserUI from "./components/UI/UserUI.js";
-import * as Js_dict from "bs-platform/lib/es6/js_dict.js";
+import * as Js_dict from "rescript/lib/es6/js_dict.js";
 import * as Masonry from "./components/UI/Masonry.js";
 import * as CONSTANTS from "./CONSTANTS.js";
 import * as DataHooks from "./data/DataHooks.js";
 import Link from "next/link";
-import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as Belt_Array from "rescript/lib/es6/belt_Array.js";
 import * as MiniLoader from "./components/UI/MiniLoader.js";
-import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as FormatMoney from "./components/UI/FormatMoney.js";
 import * as Router from "next/router";
 import * as RootProvider from "./libraries/RootProvider.js";
@@ -24,43 +24,38 @@ function User$UserBalancesCard(Props) {
   var userId = Props.userId;
   var usersTokensQuery = DataHooks.useUsersBalances(userId);
   var tmp;
-  if (typeof usersTokensQuery === "number") {
-    tmp = React.createElement("div", {
+  tmp = typeof usersTokensQuery === "number" ? React.createElement("div", {
           className: "m-auto"
-        }, React.createElement(MiniLoader.make, {}));
-  } else if (usersTokensQuery.TAG === /* GraphError */0) {
-    tmp = usersTokensQuery._0;
-  } else {
-    var match = usersTokensQuery._0;
-    tmp = React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnTextCenter.make, {
-              children: React.createElement(UserUI.UserColumnText.make, {
-                    head: "💰 Synth value",
-                    body: "$" + FormatMoney.formatEther(undefined, match.totalBalance)
-                  })
-            }), React.createElement("br", undefined), Belt_Array.map(Belt_Array.keep(match.balances, (function (param) {
-                    return !param.tokenBalance.eq(CONSTANTS.zeroBN);
-                  })), (function (param) {
-                var isLong = param.isLong;
-                var name = param.name;
-                var addr = param.addr;
-                return React.createElement(UserUI.UserMarketBox.make, {
-                            name: name,
-                            isLong: isLong,
-                            tokens: FormatMoney.formatEther(undefined, param.tokenBalance),
-                            value: FormatMoney.formatEther(undefined, param.tokensValue),
-                            tokenAddress: addr,
-                            metamaskMenu: true,
-                            symbol: param.symbol,
-                            children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {
-                                  synthAddress: Ethers.Utils.ethAdrToLowerStr(addr),
-                                  isLong: isLong
-                                }),
-                            key: name + "-" + (
-                              isLong ? "long" : "short"
-                            )
-                          });
-              })));
-  }
+        }, React.createElement(MiniLoader.make, {})) : (
+      usersTokensQuery.TAG === /* GraphError */0 ? usersTokensQuery._0 : React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnTextCenter.make, {
+                  children: React.createElement(UserUI.UserColumnText.make, {
+                        head: "💰 Synth value",
+                        body: "$${totalBalance->FormatMoney.formatEther}"
+                      })
+                }), React.createElement("br", undefined), Belt_Array.map(Belt_Array.keep(usersTokensQuery._0.balances, (function (param) {
+                        return !param.tokenBalance.eq(CONSTANTS.zeroBN);
+                      })), (function (param) {
+                    var isLong = param.isLong;
+                    var name = param.name;
+                    var addr = param.addr;
+                    return React.createElement(UserUI.UserMarketBox.make, {
+                                name: name,
+                                isLong: isLong,
+                                tokens: FormatMoney.formatEther(undefined, param.tokenBalance),
+                                value: FormatMoney.formatEther(undefined, param.tokensValue),
+                                tokenAddress: addr,
+                                metamaskMenu: true,
+                                symbol: param.symbol,
+                                children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {
+                                      synthAddress: Ethers.Utils.ethAdrToLowerStr(addr),
+                                      isLong: isLong
+                                    }),
+                                key: name + "-" + (
+                                  isLong ? "long" : "short"
+                                )
+                              });
+                  })))
+    );
   return React.createElement(UserUI.UserColumnCard.make, {
               children: null
             }, React.createElement(UserUI.UserColumnHeader.make, {

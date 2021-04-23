@@ -5,11 +5,11 @@ import * as Ethers from "../../ethereum/Ethers.js";
 import * as CONSTANTS from "../../CONSTANTS.js";
 import * as DataHooks from "../../data/DataHooks.js";
 import * as StakeCard from "./StakeCard.js";
-import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
+import * as Belt_Array from "rescript/lib/es6/belt_Array.js";
 import * as MiniLoader from "../UI/MiniLoader.js";
-import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
+import * as Belt_Option from "rescript/lib/es6/belt_Option.js";
 import * as RootProvider from "../../libraries/RootProvider.js";
-import * as Belt_HashSetString from "bs-platform/lib/es6/belt_HashSetString.js";
+import * as Belt_HashSetString from "rescript/lib/es6/belt_HashSetString.js";
 
 function StakeList(Props) {
   var marketDetailsQuery = DataHooks.useGetMarkets(undefined);
@@ -20,20 +20,18 @@ function StakeList(Props) {
             return /* Loading */0;
           } else if (currentBalancesOrAdrZeroBalances.TAG === /* GraphError */0) {
             return {
-                    TAG: 0,
-                    _0: currentBalancesOrAdrZeroBalances._0,
-                    [Symbol.for("name")]: "GraphError"
+                    TAG: /* GraphError */0,
+                    _0: currentBalancesOrAdrZeroBalances._0
                   };
           } else {
             return {
-                    TAG: 1,
+                    TAG: /* Response */1,
                     _0: Belt_Array.reduce(currentBalancesOrAdrZeroBalances._0.balances, Belt_HashSetString.fromArray([]), (function (set, balance) {
                             if (balance.tokenBalance.gt(CONSTANTS.zeroBN)) {
                               Belt_HashSetString.add(set, Ethers.Utils.ethAdrToStr(balance.addr));
                             }
                             return set;
-                          })),
-                    [Symbol.for("name")]: "Response"
+                          }))
                   };
           }
         }));

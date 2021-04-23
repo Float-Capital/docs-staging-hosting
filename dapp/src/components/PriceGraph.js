@@ -2,20 +2,20 @@
 
 import * as Misc from "../libraries/Misc.js";
 import * as View from "../libraries/View.js";
-import * as Curry from "bs-platform/lib/es6/curry.js";
+import * as Curry from "rescript/lib/es6/curry.js";
 import * as React from "react";
 import * as Button from "./UI/Button.js";
 import * as Client from "../data/Client.js";
 import * as Ethers from "../ethereum/Ethers.js";
-import * as Js_int from "bs-platform/lib/es6/js_int.js";
-import * as Js_math from "bs-platform/lib/es6/js_math.js";
-import * as Caml_obj from "bs-platform/lib/es6/caml_obj.js";
+import * as Js_int from "rescript/lib/es6/js_int.js";
+import * as Js_math from "rescript/lib/es6/js_math.js";
+import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
 import * as Recharts from "recharts";
 import * as CONSTANTS from "../CONSTANTS.js";
-import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
-import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
-import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
-import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as Belt_Array from "rescript/lib/es6/belt_Array.js";
+import * as Belt_Float from "rescript/lib/es6/belt_Float.js";
+import * as Belt_Option from "rescript/lib/es6/belt_Option.js";
+import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as GqlConverters from "../libraries/GqlConverters.js";
 import Format from "date-fns/format";
 import * as BsRecharts__XAxis from "@ahrefs/bs-recharts/src/BsRecharts__XAxis.js";
@@ -164,17 +164,14 @@ function PriceGraph$LoadedGraph(Props) {
   ];
   var isMobile = View.useIsTailwindMobile(undefined);
   return React.createElement(Recharts.ResponsiveContainer, Curry._3(BsRecharts__ResponsiveContainer.makeProps(isMobile ? ({
-                            TAG: 0,
-                            _0: 200,
-                            [Symbol.for("name")]: "Px"
+                            TAG: /* Px */0,
+                            _0: 200
                           }) : ({
-                            TAG: 1,
-                            _0: 100,
-                            [Symbol.for("name")]: "Prc"
+                            TAG: /* Prc */1,
+                            _0: 100
                           }), {
-                        TAG: 1,
-                        _0: 100,
-                        [Symbol.for("name")]: "Prc"
+                        TAG: /* Prc */1,
+                        _0: 100
                       })(undefined, "w-full text-xs m-0 p-0", undefined, undefined, undefined), React.createElement(Recharts.LineChart, {
                       data: data,
                       margin: {
@@ -480,9 +477,8 @@ function PriceGraph(Props) {
       });
   var setOverlayMessageText = match$2[1];
   var match$3 = React.useState(function () {
-        return {
-                _0: timeMaketHasExisted,
-                [Symbol.for("name")]: "Max"
+        return /* Max */{
+                _0: timeMaketHasExisted
               };
       });
   var setGraphSetting = match$3[1];
@@ -564,9 +560,8 @@ function PriceGraph(Props) {
                           /* Month */2,
                           /* ThreeMonth */3,
                           /* Year */4,
-                          {
-                            _0: timeMaketHasExisted,
-                            [Symbol.for("name")]: "Max"
+                          /* Max */{
+                            _0: timeMaketHasExisted
                           }
                         ], (function (buttonSetting) {
                             var text = btnTextFromGraphSetting(buttonSetting);

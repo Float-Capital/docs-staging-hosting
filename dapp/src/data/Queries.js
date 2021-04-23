@@ -431,9 +431,9 @@ function serialize$6(value) {
   var value$2 = value.syntheticMarket;
   var syntheticMarket = serialize$4(value$2);
   var value$3 = value.tokenType;
-  var tokenType = typeof value$3 === "string" ? (
+  var tokenType = typeof value$3 === "object" ? value$3.VAL : (
       value$3 === "Long" ? "Long" : "Short"
-    ) : value$3.VAL;
+    );
   var value$4 = value.id;
   var value$5 = value.__typename;
   return {
@@ -583,9 +583,9 @@ function serialize$8(value) {
   var value$1 = value.tokenAddress;
   var value$2 = GqlConverters.Address.serialize(value$1);
   var value$3 = value.tokenType;
-  var tokenType = typeof value$3 === "string" ? (
+  var tokenType = typeof value$3 === "object" ? value$3.VAL : (
       value$3 === "Long" ? "Long" : "Short"
-    ) : value$3.VAL;
+    );
   var value$4 = value.latestPrice;
   var latestPrice = serialize$1(value$4);
   var value$5 = value.syntheticMarket;

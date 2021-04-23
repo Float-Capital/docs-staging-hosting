@@ -3,8 +3,8 @@
 import * as Ethers from "../ethereum/Ethers.js";
 import * as CONSTANTS from "../CONSTANTS.js";
 import * as StakeCard from "../components/Stake/StakeCard.js";
-import * as Belt_Array from "bs-platform/lib/es6/belt_Array.js";
-import * as Belt_SortArray from "bs-platform/lib/es6/belt_SortArray.js";
+import * as Belt_Array from "rescript/lib/es6/belt_Array.js";
+import * as Belt_SortArray from "rescript/lib/es6/belt_SortArray.js";
 
 function trendingStakes(syntheticMarkets, apy) {
   return Belt_Array.slice(Belt_SortArray.stableSortBy(Belt_Array.reduce(syntheticMarkets, [], (function (previous, param) {

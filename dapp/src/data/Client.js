@@ -3,7 +3,7 @@
 import * as React from "react";
 import * as Config from "../Config.js";
 import * as Ethers from "../ethereum/Ethers.js";
-import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as ApolloClient from "rescript-apollo-client/src/ApolloClient.js";
 import * as Client from "@apollo/client";
 import * as ReasonMLCommunity__ApolloClient from "rescript-apollo-client/src/ReasonMLCommunity__ApolloClient.js";

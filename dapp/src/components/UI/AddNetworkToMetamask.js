@@ -4,7 +4,7 @@ import * as Misc from "../../libraries/Misc.js";
 import * as React from "react";
 import * as Button from "./Button.js";
 import * as Config from "../../Config.js";
-import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as Caml_option from "rescript/lib/es6/caml_option.js";
 
 function AddNetworkToMetamask(Props) {
   var ethObj = window.ethereum;

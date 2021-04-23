@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import * as Globals from "../../../libraries/Globals.js";
-import * as Belt_Float from "bs-platform/lib/es6/belt_Float.js";
-import * as Belt_Option from "bs-platform/lib/es6/belt_Option.js";
+import * as Belt_Float from "rescript/lib/es6/belt_Float.js";
+import * as Belt_Option from "rescript/lib/es6/belt_Option.js";
 
 function MarketBar(Props) {
   var totalLockedLong = Props.totalLockedLong;

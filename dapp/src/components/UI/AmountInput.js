@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as Ethers from "../../ethereum/Ethers.js";
-import * as Caml_option from "bs-platform/lib/es6/caml_option.js";
+import * as Caml_option from "rescript/lib/es6/caml_option.js";
 
 function AmountInput(Props) {
   var placeholder = Props.placeholder;

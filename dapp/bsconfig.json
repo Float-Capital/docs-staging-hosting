@@ -5,25 +5,6 @@
     "react-jsx": 3
   },
   "refmt": 3,
-  "bs-dependencies": [
-    "@reasonml-community/graphql-ppx",
-    "bs-moment",
-    "bs-css",
-    "bs-css-emotion",
-    "@rescript/react",
-    "rescript-apollo-client",
-    "rescript-future",
-    "rescript-request",
-    "@ahrefs/bs-recharts",
-    "decco",
-    "@rescriptbr/reform",
-    "reschema"
-  ],
-  "ppx-flags": [
-    "@reasonml-community/graphql-ppx/ppx",
-    "decco/ppx",
-    "lenses-ppx/ppx"
-  ],
   "graphql": {
     "apolloMode": true,
     "extendMutation": "ApolloClient.GraphQL_PPX.ExtendMutation",
@@ -37,6 +18,22 @@
       "Bytes": "Address"
     }
   },
+  "bs-dependencies": [
+    "@reasonml-community/graphql-ppx",
+    "bs-moment",
+    "bs-css",
+    "bs-css-emotion",
+    "reason-react",
+    "rescript-apollo-client",
+    "rescript-future",
+    "rescript-request",
+    "@ahrefs/bs-recharts",
+    "decco"
+  ],
+  "ppx-flags": [
+    "@reasonml-community/graphql-ppx/ppx",
+    "decco/ppx"
+  ],
   "sources": [
     {
       "dir": "src",
@@ -53,7 +50,6 @@
   },
   "bsc-flags": [
     "-open Belt",
-    "-bs-super-errors",
     "-bs-g"
   ]
 }
