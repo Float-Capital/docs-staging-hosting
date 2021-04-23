@@ -16,8 +16,6 @@ type dateFormats = [
   | #MMM
 ]
 
-let poo = #PPPppp
-
 @module("date-fns/format") external format: (Js.Date.t, dateFormats) => string = "default"
 @module("date-fns/formatDistanceToNow")
 external formatDistanceToNow: Js.Date.t => string = "default"
