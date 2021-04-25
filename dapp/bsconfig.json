@@ -18,6 +18,9 @@
       "Bytes": "Address"
     }
   },
+  "pinned-dependencies": [
+    "cypress-tests"
+  ],
   "bs-dependencies": [
     "@reasonml-community/graphql-ppx",
     "bs-moment",
@@ -31,7 +34,8 @@
     "re-formality",
     "@glennsl/bs-jest",
     "bs-react-testing-library",
-    "decco"
+    "decco",
+    "bs-mocha"
   ],
   "ppx-flags": [
     "@reasonml-community/graphql-ppx/ppx",
@@ -41,6 +45,10 @@
   "sources": [
     {
       "dir": "src",
+      "subdirs": true
+    },
+    {
+      "dir": "cypress/integration",
       "subdirs": true
     }
   ],
