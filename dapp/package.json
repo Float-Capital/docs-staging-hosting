@@ -50,14 +50,17 @@
     "update-price-history-schema": "get-graphql-schema https://api.thegraph.com/subgraphs/name/float-capital/testnet-price-history -j > graphql_schema_price_history.json",
     "update-testnet-ui": "cd .. && node scripts/deployments.js > dapp/src/contractAddresses.json ; cd dapp && yarn update-schema ; yarn res:build",
     "visual-integration-test": "start-server-and-test 'dev' http://localhost:3000 'cypress open'",
-    "integration-test": "start-server-and-test 'dev' http://localhost:3000 'cypress run'"
+    "integration-test": "start-server-and-test 'dev' http://localhost:3000 'cypress run'",
+    "unit-test": "jest ./src"
   },
   "devDependencies": {
     "@apollo/client": "^3.3.7",
     "@ethersproject/experimental": "^5.1.2",
+    "@glennsl/bs-jest": "^0.7.0",
     "@reasonml-community/graphql-ppx": "1.0.2",
     "add": "^2.0.6",
     "autoprefixer": "^10.1.0",
+    "bs-react-testing-library": "^0.8.0",
     "cssnano": "^4.1.10",
     "cypress": "^7.1.0",
     "get-graphql-schema": "^2.1.2",

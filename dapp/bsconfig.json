@@ -29,6 +29,8 @@
     "rescript-request",
     "@ahrefs/bs-recharts",
     "re-formality",
+    "@glennsl/bs-jest",
+    "bs-react-testing-library",
     "decco"
   ],
   "ppx-flags": [
