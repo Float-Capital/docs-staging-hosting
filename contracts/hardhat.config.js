@@ -1,7 +1,14 @@
-require("@nomiclabs/hardhat-truffle5");
 require("solidity-coverage");
 require("hardhat-gas-reporter");
 require("hardhat-spdx-license-identifier");
+
+let isWaffleTest =
+  !!process.env.WAFFLE_TEST && process.env.WAFFLE_TEST.toUpperCase() == "TRUE";
+if (isWaffleTest) {
+  require("@nomiclabs/hardhat-waffle");
+} else {
+  require("@nomiclabs/hardhat-truffle5");
+}
 
 // This is a sample Buidler task. To learn how to create your own go to
 // https://buidler.dev/guides/create-task.html
@@ -27,6 +34,9 @@ module.exports = {
         runs: 200,
       },
     },
+  },
+  paths: {
+    tests: isWaffleTest ? "./test-waffle" : "./test",
   },
   gasReporter: {
     // Disabled by default for faster running of tests

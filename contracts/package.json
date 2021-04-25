@@ -7,6 +7,7 @@
     "compile": "hardhat compile",
     "truffle-compile": "truffle compile",
     "test": "hardhat test",
+    "test-waffle": "WAFFLE_TEST='true' hardhat test",
     "coverage": "hardhat coverage",
     "clean": "rm -rf build/contracts/* artifacts cache",
     "save-deployment": "/bin/bash -c 'mkdir -p ./buildsDeployed/deployed; \\cp ./build/contracts/{FloatCapital_v0,FloatToken,LongShort,Migrations,Staker,TokenFactory,Treasury_v0,Dai}.json ./buildsDeployed/deployed/'",
@@ -22,11 +23,14 @@
     "@openzeppelin/contracts": "^4.0.0",
     "@openzeppelin/contracts-upgradeable": "^4.0.0",
     "@openzeppelin/test-helpers": "^0.5.6",
+    "chai": "^4.3.4",
     "hardhat": "^2.0.9",
     "hardhat-gas-reporter": "^1.0.4",
     "solidity-coverage": "^0.7.14"
   },
   "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/truffle-upgrades": "^1.5.0",
     "@truffle/hdwallet-provider": "^1.2.1",
     "hardhat-spdx-license-identifier": "^2.0.3",
