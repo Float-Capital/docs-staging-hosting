@@ -58,4 +58,4 @@ jobs:
       - name: run contract tests
         id: run_contract_tests
         run: |
-          cd contracts && yarn test
+          cd contracts && yarn test && yarn test-waffle
