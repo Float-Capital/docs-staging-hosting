@@ -11,15 +11,22 @@ import {
   User,
   TokenApproval,
   UserCollateralTokenApproval,
+  LongShortContract,
 } from "../generated/schema";
-import { log, dataSource, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import {
+  log,
+  dataSource,
+  BigInt,
+  ethereum,
+  Address,
+} from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import {
   updateBalanceTransfer,
   updateBalanceFloatTransfer,
   updateCollatoralBalanceTransfer,
 } from "./utils/helperFunctions";
-import { GLOBAL_STATE_ID } from "./CONSTANTS";
+import { GLOBAL_STATE_ID, ONE, ZERO } from "./CONSTANTS";
 import { getOrCreateUser } from "./utils/globalStateManager";
 
 export function handleTransfer(event: TransferEvent): void {
@@ -123,7 +130,7 @@ function createApproval(
   let tokenApproval = new TokenApproval(id);
   tokenApproval.collateralToken = collateralToken.id;
   tokenApproval.user = user.id;
-  tokenApproval.approved = approved;
+  tokenApproval.approvedInnacurate = approved;
   tokenApproval.timestamp = event.block.timestamp;
   return tokenApproval as TokenApproval;
 }
@@ -145,10 +152,45 @@ function createOrUpdateUserCollateralApproval(
     user.save();
   }
   userCollateral.updateTimestamp = event.block.timestamp;
+  userCollateral.collateralToken = tokenApproval.collateralToken;
   userCollateral.currentApproval = tokenApproval.id;
   userCollateral.updateTimestamp = tokenApproval.timestamp;
 
   return userCollateral as UserCollateralTokenApproval;
+}
+
+export function decreaseOrCreateUserApprovals(
+  userAddress: Address,
+  amount: BigInt,
+  collateralToken: CollateralToken | null,
+  event: ethereum.Event
+): void {
+  let user = getOrCreateUser(userAddress, event);
+  let collateralApproval = UserCollateralTokenApproval.load(
+    user.id + "-" + collateralToken.id
+  );
+  let currentApproval: TokenApproval | null = null;
+  if (collateralApproval != null)
+    currentApproval = TokenApproval.load(collateralApproval.currentApproval);
+
+  let newApproval: TokenApproval;
+  if (currentApproval != null) {
+    newApproval = createApproval(
+      collateralToken,
+      user,
+      currentApproval.approvedInnacurate.minus(amount),
+      event
+    );
+  } else {
+    newApproval = createApproval(collateralToken, user, ZERO, event);
+  }
+  let updatedCollateral = createOrUpdateUserCollateralApproval(
+    newApproval,
+    user,
+    event
+  );
+  newApproval.save();
+  updatedCollateral.save();
 }
 
 export function handleApproval(event: Approval): void {
@@ -160,7 +202,9 @@ export function handleApproval(event: Approval): void {
   let tokenAddressString = event.address.toHex();
   let collateralToken = CollateralToken.load(tokenAddressString);
   if (collateralToken != null) {
-    if (globalState != null && spenderAddressString == globalState.longShort) {
+    if (globalState != null) {
+      let longShort = LongShortContract.load(globalState.longShort);
+      if (longShort.address.toHex() != spenderAddressString) return;
       let owner = event.params.owner;
       let ownerAddressString = owner.toHex();
       let value = event.params.value;
