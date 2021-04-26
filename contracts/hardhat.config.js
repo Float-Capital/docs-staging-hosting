@@ -46,7 +46,8 @@ module.exports = {
     coinmarketcap: "9aacee3e-7c04-4978-8f93-63198c0fbfef",
   },
   spdxLicenseIdentifier: {
-    overwrite: true,
-    runOnCompile: true,
+    // Set these to true if you ever want to change the licence on all of the contracts (by changing it in package.json)
+    overwrite: false,
+    runOnCompile: false,
   },
 };
