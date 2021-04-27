@@ -10,6 +10,7 @@ import {
   TokenPriceRefreshed,
   ValueLockedInSystem,
   FeesChanges,
+  OracleUpdated,
 } from "../generated/LongShort/LongShort";
 import {
   SyntheticMarket,
@@ -190,6 +191,7 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.syntheticShort = shortToken.id;
   syntheticMarket.marketIndex = marketIndex;
   syntheticMarket.oracleAddress = oracleAddress;
+  syntheticMarket.previousOracleAddresses = [];
   syntheticMarket.feeStructure = fees.id;
   syntheticMarket.kPeriod = ZERO;
   syntheticMarket.kMultiplier = ZERO;
@@ -261,6 +263,22 @@ export function handleSyntheticTokenCreated(
     [],
     []
   );
+}
+
+export function handleMarketOracleUpdated(event: OracleUpdated): void {
+  let marketIndex = event.params.marketIndex;
+  let oldOracleAddress = event.params.oldOracleAddress;
+  let newOracleAddress = event.params.newOracleAddress;
+
+  let syntheticMarket = SyntheticMarket.load(marketIndex.toString());
+  syntheticMarket.oracleAddress = newOracleAddress;
+
+  let previousOracles = syntheticMarket.previousOracleAddresses;
+  syntheticMarket.previousOracleAddresses = previousOracles.push(
+    oldOracleAddress
+  );
+
+  syntheticMarket.save();
 }
 
 export function handleFeesChanges(event: FeesChanges): void {

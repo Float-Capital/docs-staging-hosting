@@ -144,6 +144,7 @@ type SyntheticMarket @entity {
   symbol: String!
   marketIndex: BigInt!
   oracleAddress: Bytes!
+  previousOracleAddresses: [Bytes!]!
   syntheticLong: SyntheticToken!
   syntheticShort: SyntheticToken!
   latestSystemState: SystemState!

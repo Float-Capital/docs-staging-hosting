@@ -1,4 +1,7 @@
-import { SyntheticTokenCreated } from "../generated-price-history/LongShort/LongShort";
+import {
+  SyntheticTokenCreated,
+  OracleUpdated,
+} from "../generated-price-history/LongShort/LongShort";
 import { OracleManager } from "../generated-price-history/templates/OracleManager/OracleManager";
 import {
   Global,
@@ -33,6 +36,22 @@ export function createOracle(
   oracle.marketSymbol = marketSymbol;
   oracle.latestPrice = latestPrice;
   oracle.priceIntervals = [];
+
+  return oracle as Oracle;
+}
+
+export function updateOracle(
+  oldOracleAddress: Address,
+  newOracleAddress: Address
+): Oracle {
+  let prevOracle = Oracle.load(oldOracleAddress);
+  let oracle = new Oracle(newOracleAddress.toHex());
+  oracle.address = newOracleAddress;
+  oracle.marketIndex = prevOracle.marketIndex;
+  oracle.marketName = prevOracle.marketName;
+  oracle.marketSymbol = prevOracle.marketSymbol;
+  oracle.latestPrice = prevOracle.latestPrice;
+  oracle.priceIntervals = prevOracle.priceIntervals;
 
   return oracle as Oracle;
 }
@@ -146,6 +165,15 @@ export function handleSyntheticTokenCreated(
 
   state.oracles = state.oracles.concat([oracle.id]);
 
+  state.save();
+  oracle.save();
+}
+
+export function handleMarketOracleUpdated(event: OracleUpdated): void {
+  let oldOracleAddress = event.params.oldOracleAddress;
+  let newOracleAddress = event.params.newOracleAddress;
+  let oracle = updateOracle(oldOracleAddress, newOracleAddress);
+  state.oracles = state.oracles.concat([oracle.id]);
   state.save();
   oracle.save();
 }

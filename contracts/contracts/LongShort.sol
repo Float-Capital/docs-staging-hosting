@@ -146,7 +146,11 @@ contract LongShort is ILongShort, Initializable {
         uint256 badLiquidityExitFee
     );
 
-    event OracleUpdated(uint32 marketIndex, address oracle);
+    event OracleUpdated(
+        uint32 marketIndex,
+        address oldOracleAddress,
+        address newOracleAddress
+    );
 
     ////////////////////////////////////
     /////////// MODIFIERS //////////////
@@ -246,14 +250,19 @@ contract LongShort is ILongShort, Initializable {
     /**
      * Update oracle for a market
      */
-    function updateMarketOracle(uint32 marketIndex, address _oracleManager)
+    function updateMarketOracle(uint32 marketIndex, address _newOracleManager)
         external
         adminOnly
     {
         // If not a oracle contract this would break things.. Test's arn't validating this
-        // Ie require isOracle interface
-        oracleManagers[marketIndex] = IOracleManager(_oracleManager);
-        emit OracleUpdated(marketIndex, _oracleManager);
+        // Ie require isOracle interface - ERC165
+        address previousOracleManager = address(oracleManagers[marketIndex]);
+        oracleManagers[marketIndex] = IOracleManager(_newOracleManager);
+        emit OracleUpdated(
+            marketIndex,
+            previousOracleManager,
+            _newOracleManager
+        );
     }
 
     /**
