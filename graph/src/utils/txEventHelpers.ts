@@ -66,7 +66,8 @@ function txStateChangeHelper(
   eventName: string,
   eventParamArray: Array<string>,
   affectedUsers: Array<Bytes>,
-  affectedStakes: Array<string>
+  affectedStakes: Array<string>,
+  toFloatContracts: bool = true
 ): void {
   let txHash = event.transaction.hash;
 
@@ -77,20 +78,22 @@ function txStateChangeHelper(
     stateChange.affectedUsers = [];
     stateChange.affectedStakes = [];
 
-    // Order important here since getOrCreateUser loads and saves global state for a new user
-    let user = getOrCreateUser(event.transaction.from, event);
-    let globalState = GlobalState.load(GLOBAL_STATE_ID);
+    if (toFloatContracts) {
+      // Order important here since getOrCreateUser loads and saves global state for a new user
+      let user = getOrCreateUser(event.transaction.from, event);
+      let globalState = GlobalState.load(GLOBAL_STATE_ID);
 
-    user.totalGasUsed = user.totalGasUsed.plus(event.block.gasUsed);
-    user.numberOfTransactions = user.numberOfTransactions.plus(ONE);
+      user.totalGasUsed = user.totalGasUsed.plus(event.block.gasUsed);
+      user.numberOfTransactions = user.numberOfTransactions.plus(ONE);
 
-    globalState.totalTxs = globalState.totalTxs.plus(ONE);
-    globalState.totalGasUsed = globalState.totalGasUsed.plus(
-      event.block.gasUsed
-    );
+      globalState.totalTxs = globalState.totalTxs.plus(ONE);
+      globalState.totalGasUsed = globalState.totalGasUsed.plus(
+        event.block.gasUsed
+      );
 
-    globalState.save();
-    user.save();
+      globalState.save();
+      user.save();
+    }
   }
 
   let eventIndex: i32 = getEventIndex(txHash);
@@ -146,7 +149,8 @@ export function saveEventToStateChange(
   parameterNames: Array<string>,
   parameterTypes: Array<string>,
   affectedUsers: Array<Bytes>,
-  affectedStakes: Array<string>
+  affectedStakes: Array<string>,
+  toFloatContracts: bool = true
 ): void {
   let eventParamsArr: Array<string> = createEventParams(
     event.transaction.hash,
@@ -160,6 +164,7 @@ export function saveEventToStateChange(
     eventName,
     eventParamsArr,
     affectedUsers,
-    affectedStakes
+    affectedStakes,
+    toFloatContracts
   );
 }

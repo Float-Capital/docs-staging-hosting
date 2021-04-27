@@ -19,6 +19,7 @@ import {
   BigInt,
   ethereum,
   Address,
+  Bytes,
 } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import {
@@ -29,12 +30,37 @@ import {
 import { GLOBAL_STATE_ID, ONE, ZERO } from "./CONSTANTS";
 import { getOrCreateUser } from "./utils/globalStateManager";
 
+function saveTransferToStateChange(
+  event: TransferEvent,
+  paramValues: Array<string>,
+  affectedUsers: Array<Bytes>,
+  toFloatContracts: bool = true
+): void {
+  saveEventToStateChange(
+    event,
+    "Transfer",
+    paramValues,
+    ["from", "to", "amount"],
+    ["address", "address", "uint256"],
+    affectedUsers,
+    [],
+    toFloatContracts
+  );
+}
+
 export function handleTransfer(event: TransferEvent): void {
   let fromAddress = event.params.from;
   let fromAddressString = fromAddress.toHex();
   let toAddress = event.params.to;
   let toAddressString = toAddress.toHex();
   let amount = event.params.value;
+
+  let stateChangeParams: Array<string> = [
+    fromAddressString,
+    toAddressString,
+    amount.toString(),
+  ];
+  let bothUsers: Array<Bytes> = [fromAddress, toAddress];
 
   let context = dataSource.context();
   let tokenAddressString = context.getString("contractAddress");
@@ -43,6 +69,7 @@ export function handleTransfer(event: TransferEvent): void {
   if (isFloatToken) {
     updateBalanceFloatTransfer(fromAddress, amount, true, event);
     updateBalanceFloatTransfer(toAddress, amount, false, event);
+    saveTransferToStateChange(event, stateChangeParams, bothUsers);
   } else {
     let syntheticToken = SyntheticToken.load(tokenAddressString);
     let collateralToken = CollateralToken.load(tokenAddressString);
@@ -76,6 +103,7 @@ export function handleTransfer(event: TransferEvent): void {
         false,
         event
       );
+      saveTransferToStateChange(event, stateChangeParams, bothUsers);
     } else if (collateralToken != null) {
       let transactionHash = event.transaction.hash.toHex();
       let transfer = new CollateralTransfer(
@@ -87,6 +115,8 @@ export function handleTransfer(event: TransferEvent): void {
       transfer.token = collateralToken.id;
       transfer.save();
 
+      let affectedUsers = new Array<Bytes>(0);
+
       if (User.load(fromAddressString) != null) {
         updateCollatoralBalanceTransfer(
           tokenAddressString,
@@ -95,6 +125,7 @@ export function handleTransfer(event: TransferEvent): void {
           true,
           event
         );
+        affectedUsers.push(fromAddress);
       }
       if (User.load(toAddressString) != null) {
         updateCollatoralBalanceTransfer(
@@ -104,19 +135,18 @@ export function handleTransfer(event: TransferEvent): void {
           false,
           event
         );
+        affectedUsers.push(toAddress);
+      }
+      if (affectedUsers.length != 0) {
+        saveTransferToStateChange(
+          event,
+          stateChangeParams,
+          affectedUsers,
+          false
+        );
       }
     }
   }
-
-  saveEventToStateChange(
-    event,
-    "Transfer",
-    [fromAddressString, toAddressString, amount.toString()],
-    ["from", "to", "amount"],
-    ["address", "address", "uint256"],
-    [fromAddress, toAddress],
-    []
-  );
 }
 
 function createApproval(
@@ -229,7 +259,8 @@ export function handleApproval(event: Approval): void {
         ["owner", "spender", "value"],
         ["address", "address", "uint256"],
         [owner],
-        []
+        [],
+        false
       );
     }
   }
