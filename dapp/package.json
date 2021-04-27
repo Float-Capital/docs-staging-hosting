@@ -35,8 +35,7 @@
   "scripts": {
     "next:dev": "NEXT_PUBLIC_DEVMODE=true next",
     "debug": "NODE_OPTIONS='--inspect' next",
-    "build": "bsb -clean-world -make-world && next build",
-    "now-build": "bsb -clean-world -make-world && next build",
+    "now-build": "yarn res:build && next build",
     "next:export": "next export",
     "next:start": "next start -p $PORT",
     "res:build": "rescript build -with-deps",
