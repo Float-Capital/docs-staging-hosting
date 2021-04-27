@@ -302,7 +302,7 @@ function UserUI$UserMarketBox(Props) {
                       className: "text-xs"
                     }, "~$".concat(value))), React.createElement("div", {
                   className: "w-1/3 self-center"
-                }, children), null);
+                }, children));
 }
 
 var UserMarketBox = {
@@ -479,8 +479,6 @@ var UserFloatCard = {
   make: UserUI$UserFloatCard
 };
 
-var thing = "~$";
-
 exports.UserContainer = UserContainer;
 exports.UserBanner = UserBanner;
 exports.UserColumnContainer = UserColumnContainer;
@@ -494,7 +492,6 @@ exports.UserColumnText = UserColumnText;
 exports.threeDotsSvg = threeDotsSvg;
 exports.MetamaskMenu = MetamaskMenu;
 exports.UserMarketBox = UserMarketBox;
-exports.thing = thing;
 exports.UserMarketStakeOrRedeem = UserMarketStakeOrRedeem;
 exports.UserMarketUnstake = UserMarketUnstake;
 exports.UserStakesCard = UserStakesCard;
