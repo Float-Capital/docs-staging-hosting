@@ -48,8 +48,9 @@
     "update-dbschema-local": "get-graphql-schema http://localhost:8080/v1/graphql -h 'x-hasura-admin-secret=testing' -j > graphql_schema_db.json",
     "update-price-history-schema": "get-graphql-schema https://api.thegraph.com/subgraphs/name/float-capital/testnet-price-history -j > graphql_schema_price_history.json",
     "update-testnet-ui": "cd .. && node scripts/deployments.js > dapp/src/contractAddresses.json ; cd dapp && yarn update-schema ; yarn res:build",
-    "visual-integration-test": "start-server-and-test 'dev' http://localhost:3000 'cypress open'",
-    "integration-test": "start-server-and-test 'dev' http://localhost:3000 'cypress run'",
+    "visual-integration-test": "CYPRESS_UI_PORT=3088 start-server-and-test 'next start -p $CYPRESS_UI_PORT' http://localhost:3088 'cypress open'",
+    "visual-integration-test-dev": "start-server-and-test 'dev' http://localhost:3000 'cypress open'",
+    "integration-test": "CYPRESS_UI_PORT=3088 start-server-and-test 'next start -p $CYPRESS_UI_PORT' http://localhost:3088 'cypress run'",
     "unit-test": "jest ./src"
   },
   "devDependencies": {

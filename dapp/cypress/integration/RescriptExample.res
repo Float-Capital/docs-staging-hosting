@@ -6,7 +6,7 @@ open Mocha
 
 describe("Basic navigation demo", () => {
   before_each(() => {
-    Cy.visit("http://localhost:3000")
+    Cy.visit(CypressConfig.baseUrl)
   })
 
   it("Homepage should say 'start trading'", () => {
