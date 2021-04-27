@@ -8,6 +8,7 @@ var Ethers = require("../../ethereum/Ethers.js");
 var Ethers$1 = require("ethers");
 var Globals = require("../../libraries/Globals.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
+var Blockies = require("../../bindings/ethereum-blockies-base64/Blockies.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 var DataHooks = require("../../data/DataHooks.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
@@ -20,7 +21,6 @@ var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
 var AddToMetamask = require("./AddToMetamask.js");
 var InjectedEthereum = require("../../ethereum/InjectedEthereum.js");
-var EthereumBlockiesBase64 = require("ethereum-blockies-base64");
 
 function UserUI$UserContainer(Props) {
   var children = Props.children;
@@ -103,7 +103,7 @@ function UserUI$UserProfileHeader(Props) {
                   className: "w-24 h-24 rounded-full border-2 border-light-purple flex items-center justify-center"
                 }, React.createElement("img", {
                       className: "inline h-10 rounded",
-                      src: EthereumBlockiesBase64.makeBlockie(address)
+                      src: Blockies.makeBlockie(address)
                     })));
 }
 
