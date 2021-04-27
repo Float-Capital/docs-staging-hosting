@@ -6,7 +6,7 @@ let make = () => {
     {switch optBalance {
     | Some(balance) =>
       <div className="flex justify-between w-full">
-        <p> {`BUSD balance: `->React.string} </p>
+        <p> {`DAI balance: `->React.string} </p>
         <p> {`$${FormatMoney.formatEther(balance)}`->React.string} </p>
       </div>
     | None => <MiniLoader />

@@ -64,7 +64,7 @@ let make = (
     let beta = isLong ? longBeta : shortBeta
     <div className="text-sm text-center m-auto mb-4">
       <div className="text-2xl tracking-widest font-alphbeta my-3">
-        {`$${value}`->React.string}
+        {`\$${value}`->React.string}
       </div>
       <span className="font-bold"> {`Exposure `->React.string} </span>
       <Tooltip
