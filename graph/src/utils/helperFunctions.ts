@@ -94,9 +94,13 @@ export function updateCollatoralBalanceTransfer(
   balanceFromObject.timeLastUpdated = event.block.timestamp;
 
   if (send) {
-    balanceFromObject.balance = balanceFromObject.balance.minus(amount);
+    balanceFromObject.balanceInaccurate = balanceFromObject.balanceInaccurate.minus(
+      amount
+    );
   } else {
-    balanceFromObject.balance = balanceFromObject.balance.plus(amount);
+    balanceFromObject.balanceInaccurate = balanceFromObject.balanceInaccurate.plus(
+      amount
+    );
   }
 
   // Add to previouslyOwnedTokens if not already there

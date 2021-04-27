@@ -19,6 +19,7 @@ import {
   TokenFactory,
   LongShortContract,
   SyntheticToken,
+  CollateralToken,
   LatestPrice,
   Price,
 } from "../generated/schema";
@@ -36,6 +37,7 @@ import {
   createNewTokenDataSource,
   increaseUserMints,
 } from "./utils/helperFunctions";
+import { decreaseOrCreateUserApprovals } from "./tokenTransfers";
 import {
   ZERO,
   GLOBAL_STATE_ID,
@@ -200,6 +202,7 @@ export function handleSyntheticTokenCreated(
     collateralTokenAddress,
     syntheticMarket
   );
+  syntheticMarket.collateralToken = collateralToken.id;
 
   let globalState = GlobalState.load(GLOBAL_STATE_ID);
   globalState.latestMarketIndex = globalState.latestMarketIndex.plus(
@@ -315,6 +318,14 @@ export function handleLongMinted(event: LongMinted): void {
 
   increaseUserMints(userAddress, syntheticToken, tokensMinted, event);
 
+  let collateralToken = CollateralToken.load(market.collateralToken);
+  decreaseOrCreateUserApprovals(
+    userAddress,
+    event.params.depositAdded,
+    collateralToken,
+    event
+  );
+
   saveEventToStateChange(
     event,
     "LongMinted",
@@ -405,6 +416,14 @@ export function handleShortMinted(event: ShortMinted): void {
 
   let market = SyntheticMarket.load(marketIndex.toString());
   let syntheticToken = SyntheticToken.load(market.syntheticShort);
+
+  let collateralToken = CollateralToken.load(market.collateralToken);
+  decreaseOrCreateUserApprovals(
+    userAddress,
+    event.params.depositAdded,
+    collateralToken,
+    event
+  );
 
   increaseUserMints(userAddress, syntheticToken, tokensMinted, event);
 

@@ -148,6 +148,1119 @@
             }
           },
           {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "SyntheticMarket_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "SyntheticMarket_filter",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "linkedMarkets",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "SyntheticMarket",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "kind": "OBJECT",
+        "name": "CollateralToken",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "linkedMarkets",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "linkedMarkets_not",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "linkedMarkets_contains",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "linkedMarkets_not_contains",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          }
+        ],
+        "interfaces": null,
+        "kind": "INPUT_OBJECT",
+        "name": "CollateralToken_filter",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": [
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "id"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "linkedMarkets"
+          }
+        ],
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "kind": "ENUM",
+        "name": "CollateralToken_orderBy",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": null,
+        "fields": [
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "id",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "from",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "to",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "value",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "BigInt",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "token",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "CollateralToken",
+                "ofType": null
+              }
+            }
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "GenericTransfer",
+            "ofType": null
+          }
+        ],
+        "kind": "OBJECT",
+        "name": "CollateralTransfer",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_not_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_not_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_not_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_not_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_not_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_not_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "value",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "value_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "value_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "value_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "value_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "value_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "value_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "BigInt",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "value_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "BigInt",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "token",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "token_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "token_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "token_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "token_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "token_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "token_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "token_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "token_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "token_not_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "token_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "token_not_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "token_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "token_not_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          }
+        ],
+        "interfaces": null,
+        "kind": "INPUT_OBJECT",
+        "name": "CollateralTransfer_filter",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": [
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "id"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "from"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "to"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "value"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "token"
+          }
+        ],
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "kind": "ENUM",
+        "name": "CollateralTransfer_orderBy",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": null,
+        "fields": [
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "id",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            }
+          },
+          {
             "args": [],
             "deprecationReason": null,
             "description": null,
@@ -3361,6 +4474,642 @@
         "interfaces": null,
         "kind": "ENUM",
         "name": "FeeStructure_orderBy",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": null,
+        "fields": [
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "id",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "from",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "to",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "value",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "BigInt",
+                "ofType": null
+              }
+            }
+          }
+        ],
+        "inputFields": null,
+        "interfaces": null,
+        "kind": "INTERFACE",
+        "name": "GenericTransfer",
+        "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "Transfer",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "CollateralTransfer",
+            "ofType": null
+          }
+        ]
+      },
+      {
+        "description": null,
+        "enumValues": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_not_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_not_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "from_not_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_not_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_not_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "to_not_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "value",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "value_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "value_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "value_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "value_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "value_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "value_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "BigInt",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "value_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "BigInt",
+                  "ofType": null
+                }
+              }
+            }
+          }
+        ],
+        "interfaces": null,
+        "kind": "INPUT_OBJECT",
+        "name": "GenericTransfer_filter",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": [
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "id"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "from"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "to"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "value"
+          }
+        ],
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "kind": "ENUM",
+        "name": "GenericTransfer_orderBy",
         "possibleTypes": null
       },
       {
@@ -7637,6 +9386,128 @@
             "deprecationReason": null,
             "description": null,
             "isDeprecated": false,
+            "name": "collateralTransfer",
+            "type": {
+              "kind": "OBJECT",
+              "name": "CollateralTransfer",
+              "ofType": null
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "CollateralTransfer_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CollateralTransfer_filter",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "collateralTransfers",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "CollateralTransfer",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "id",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
             "name": "syntheticToken",
             "type": {
               "kind": "OBJECT",
@@ -7723,6 +9594,494 @@
                   "ofType": {
                     "kind": "OBJECT",
                     "name": "SyntheticToken",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "id",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "collateralToken",
+            "type": {
+              "kind": "OBJECT",
+              "name": "CollateralToken",
+              "ofType": null
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "CollateralToken_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CollateralToken_filter",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "collateralTokens",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "CollateralToken",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "id",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "tokenApproval",
+            "type": {
+              "kind": "OBJECT",
+              "name": "TokenApproval",
+              "ofType": null
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "TokenApproval_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "TokenApproval_filter",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "tokenApprovals",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "TokenApproval",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "id",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "userCollateralTokenApproval",
+            "type": {
+              "kind": "OBJECT",
+              "name": "UserCollateralTokenApproval",
+              "ofType": null
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "UserCollateralTokenApproval_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "UserCollateralTokenApproval_filter",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "userCollateralTokenApprovals",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "UserCollateralTokenApproval",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "id",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "userCollateralTokenBalance",
+            "type": {
+              "kind": "OBJECT",
+              "name": "UserCollateralTokenBalance",
+              "ofType": null
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "UserCollateralTokenBalance_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "UserCollateralTokenBalance_filter",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "userCollateralTokenBalances",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "UserCollateralTokenBalance",
                     "ofType": null
                   }
                 }
@@ -9309,6 +11668,128 @@
                   "ofType": {
                     "kind": "OBJECT",
                     "name": "GlobalState",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "id",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "genericTransfer",
+            "type": {
+              "kind": "INTERFACE",
+              "name": "GenericTransfer",
+              "ofType": null
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "GenericTransfer_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "GenericTransfer_filter",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "genericTransfers",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INTERFACE",
+                    "name": "GenericTransfer",
                     "ofType": null
                   }
                 }
@@ -13872,6 +16353,128 @@
             "deprecationReason": null,
             "description": null,
             "isDeprecated": false,
+            "name": "collateralTransfer",
+            "type": {
+              "kind": "OBJECT",
+              "name": "CollateralTransfer",
+              "ofType": null
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "CollateralTransfer_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CollateralTransfer_filter",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "collateralTransfers",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "CollateralTransfer",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "id",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
             "name": "syntheticToken",
             "type": {
               "kind": "OBJECT",
@@ -13958,6 +16561,494 @@
                   "ofType": {
                     "kind": "OBJECT",
                     "name": "SyntheticToken",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "id",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "collateralToken",
+            "type": {
+              "kind": "OBJECT",
+              "name": "CollateralToken",
+              "ofType": null
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "CollateralToken_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CollateralToken_filter",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "collateralTokens",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "CollateralToken",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "id",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "tokenApproval",
+            "type": {
+              "kind": "OBJECT",
+              "name": "TokenApproval",
+              "ofType": null
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "TokenApproval_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "TokenApproval_filter",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "tokenApprovals",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "TokenApproval",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "id",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "userCollateralTokenApproval",
+            "type": {
+              "kind": "OBJECT",
+              "name": "UserCollateralTokenApproval",
+              "ofType": null
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "UserCollateralTokenApproval_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "UserCollateralTokenApproval_filter",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "userCollateralTokenApprovals",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "UserCollateralTokenApproval",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "id",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "userCollateralTokenBalance",
+            "type": {
+              "kind": "OBJECT",
+              "name": "UserCollateralTokenBalance",
+              "ofType": null
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "UserCollateralTokenBalance_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "UserCollateralTokenBalance_filter",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "userCollateralTokenBalances",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "UserCollateralTokenBalance",
                     "ofType": null
                   }
                 }
@@ -15555,6 +18646,128 @@
               {
                 "defaultValue": null,
                 "description": null,
+                "name": "id",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "genericTransfer",
+            "type": {
+              "kind": "INTERFACE",
+              "name": "GenericTransfer",
+              "ofType": null
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "GenericTransfer_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "GenericTransfer_filter",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": "The block at which the query should be executed. Can either be an `{ number: Int }` containing the block number or a `{ hash: Bytes }` value containing a block hash. Defaults to the latest block when omitted.",
+                "name": "block",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Block_height",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "genericTransfers",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INTERFACE",
+                    "name": "GenericTransfer",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": null,
+                "description": null,
                 "name": "block",
                 "type": {
                   "kind": "INPUT_OBJECT",
@@ -15644,6 +18857,22 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "BigInt",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "collateralToken",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "CollateralToken",
                 "ofType": null
               }
             }
@@ -16182,6 +19411,162 @@
                   "ofType": null
                 }
               }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             }
           },
           {
@@ -17516,6 +20901,12 @@
             "description": null,
             "isDeprecated": false,
             "name": "blockNumberCreated"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "collateralToken"
           },
           {
             "deprecationReason": null,
@@ -20827,6 +24218,749 @@
             "deprecationReason": null,
             "description": null,
             "isDeprecated": false,
+            "name": "collateralToken",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "CollateralToken",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "user",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "User",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "approvedInnacurate",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "BigInt",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "timestamp",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "BigInt",
+                "ofType": null
+              }
+            }
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "kind": "OBJECT",
+        "name": "TokenApproval",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_not_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_not_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_not_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "approvedInnacurate",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "approvedInnacurate_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "approvedInnacurate_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "approvedInnacurate_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "approvedInnacurate_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "approvedInnacurate_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "approvedInnacurate_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "BigInt",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "approvedInnacurate_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "BigInt",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "timestamp",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "timestamp_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "timestamp_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "timestamp_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "timestamp_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "timestamp_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "timestamp_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "BigInt",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "timestamp_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "BigInt",
+                  "ofType": null
+                }
+              }
+            }
+          }
+        ],
+        "interfaces": null,
+        "kind": "INPUT_OBJECT",
+        "name": "TokenApproval_filter",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": [
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "id"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "collateralToken"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "user"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "approvedInnacurate"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "timestamp"
+          }
+        ],
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "kind": "ENUM",
+        "name": "TokenApproval_orderBy",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": null,
+        "fields": [
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "id",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
             "name": "address",
             "type": {
               "kind": "NON_NULL",
@@ -21160,7 +25294,13 @@
           }
         ],
         "inputFields": null,
-        "interfaces": [],
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "GenericTransfer",
+            "ofType": null
+          }
+        ],
         "kind": "OBJECT",
         "name": "Transfer",
         "possibleTypes": null
@@ -22246,6 +26386,81 @@
                 "name": "orderBy",
                 "type": {
                   "kind": "ENUM",
+                  "name": "UserCollateralTokenBalance_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "UserCollateralTokenBalance_filter",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "collatoralBalances",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "UserCollateralTokenBalance",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
                   "name": "UserSyntheticTokenMinted_orderBy",
                   "ofType": null
                 }
@@ -22292,12 +26507,1608 @@
                 }
               }
             }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "UserCollateralTokenApproval_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "UserCollateralTokenApproval_filter",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "collatoralTokenApprovals",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "UserCollateralTokenApproval",
+                    "ofType": null
+                  }
+                }
+              }
+            }
           }
         ],
         "inputFields": null,
         "interfaces": [],
         "kind": "OBJECT",
         "name": "User",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": null,
+        "fields": [
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "id",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [
+              {
+                "defaultValue": "0",
+                "description": null,
+                "name": "skip",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": "100",
+                "description": null,
+                "name": "first",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderBy",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "TokenApproval_orderBy",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "orderDirection",
+                "type": {
+                  "kind": "ENUM",
+                  "name": "OrderDirection",
+                  "ofType": null
+                }
+              },
+              {
+                "defaultValue": null,
+                "description": null,
+                "name": "where",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "TokenApproval_filter",
+                  "ofType": null
+                }
+              }
+            ],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "approvalsHistory",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "TokenApproval",
+                    "ofType": null
+                  }
+                }
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "updateTimestamp",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "BigInt",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "collateralToken",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "CollateralToken",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "currentApproval",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "TokenApproval",
+                "ofType": null
+              }
+            }
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "kind": "OBJECT",
+        "name": "UserCollateralTokenApproval",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "approvalsHistory",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "approvalsHistory_not",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "approvalsHistory_contains",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "approvalsHistory_not_contains",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "updateTimestamp",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "updateTimestamp_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "updateTimestamp_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "updateTimestamp_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "updateTimestamp_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "updateTimestamp_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "updateTimestamp_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "BigInt",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "updateTimestamp_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "BigInt",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "currentApproval",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "currentApproval_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "currentApproval_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "currentApproval_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "currentApproval_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "currentApproval_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "currentApproval_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "currentApproval_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "currentApproval_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "currentApproval_not_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "currentApproval_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "currentApproval_not_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "currentApproval_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "currentApproval_not_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          }
+        ],
+        "interfaces": null,
+        "kind": "INPUT_OBJECT",
+        "name": "UserCollateralTokenApproval_filter",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": [
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "id"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "approvalsHistory"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "updateTimestamp"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "collateralToken"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "currentApproval"
+          }
+        ],
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "kind": "ENUM",
+        "name": "UserCollateralTokenApproval_orderBy",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": null,
+        "fields": [
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "id",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "timeLastUpdated",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "BigInt",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "collateralToken",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "CollateralToken",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "user",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "User",
+                "ofType": null
+              }
+            }
+          },
+          {
+            "args": [],
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "balanceInaccurate",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "BigInt",
+                "ofType": null
+              }
+            }
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "kind": "OBJECT",
+        "name": "UserCollateralTokenBalance",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "id_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "timeLastUpdated",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "timeLastUpdated_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "timeLastUpdated_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "timeLastUpdated_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "timeLastUpdated_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "timeLastUpdated_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "timeLastUpdated_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "BigInt",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "timeLastUpdated_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "BigInt",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collateralToken_not_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_not_contains",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_not_starts_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "user_not_ends_with",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "balanceInaccurate",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "balanceInaccurate_not",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "balanceInaccurate_gt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "balanceInaccurate_lt",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "balanceInaccurate_gte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "balanceInaccurate_lte",
+            "type": {
+              "kind": "SCALAR",
+              "name": "BigInt",
+              "ofType": null
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "balanceInaccurate_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "BigInt",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "balanceInaccurate_not_in",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "BigInt",
+                  "ofType": null
+                }
+              }
+            }
+          }
+        ],
+        "interfaces": null,
+        "kind": "INPUT_OBJECT",
+        "name": "UserCollateralTokenBalance_filter",
+        "possibleTypes": null
+      },
+      {
+        "description": null,
+        "enumValues": [
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "id"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "timeLastUpdated"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "collateralToken"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "user"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "balanceInaccurate"
+          }
+        ],
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "kind": "ENUM",
+        "name": "UserCollateralTokenBalance_orderBy",
         "possibleTypes": null
       },
       {
@@ -24544,6 +30355,78 @@
           {
             "defaultValue": null,
             "description": null,
+            "name": "collatoralBalances",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collatoralBalances_not",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collatoralBalances_contains",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collatoralBalances_not_contains",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
             "name": "tokenMints",
             "type": {
               "kind": "LIST",
@@ -24599,6 +30482,78 @@
             "defaultValue": null,
             "description": null,
             "name": "tokenMints_not_contains",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collatoralTokenApprovals",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collatoralTokenApprovals_not",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collatoralTokenApprovals_contains",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          },
+          {
+            "defaultValue": null,
+            "description": null,
+            "name": "collatoralTokenApprovals_not_contains",
             "type": {
               "kind": "LIST",
               "name": null,
@@ -24686,7 +30641,19 @@
             "deprecationReason": null,
             "description": null,
             "isDeprecated": false,
+            "name": "collatoralBalances"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
             "name": "tokenMints"
+          },
+          {
+            "deprecationReason": null,
+            "description": null,
+            "isDeprecated": false,
+            "name": "collatoralTokenApprovals"
           }
         ],
         "fields": null,
