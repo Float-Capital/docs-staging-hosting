@@ -9,9 +9,9 @@
     "test": "hardhat test",
     "test-waffle": "WAFFLE_TEST='true' hardhat test",
     "coverage": "hardhat coverage",
-    "res:build": "bsb -make-world",
-    "res:clean": "bsb -clean-world",
-    "res:start": "bsb -make-world -w",
+    "res:build": "rescript build",
+    "res:clean": "rescript clean",
+    "res:start": "rescript build -w",
     "clean": "rm -rf build/contracts/* artifacts cache",
     "save-deployment": "/bin/bash -c 'mkdir -p ./buildsDeployed/deployed; \\cp ./build/contracts/{FloatCapital_v0,FloatToken,LongShort,Migrations,Staker,TokenFactory,Treasury_v0,Dai}.json ./buildsDeployed/deployed/'",
     "prepair-upgrade": "npm run clean; mkdir -p ./build/contracts; cp -r ./buildsDeployed/deployed/* ./build/contracts/; npm run truffle-compile",
@@ -39,7 +39,7 @@
     "@truffle/hdwallet-provider": "^1.2.1",
     "bs-mocha": "^1.0.0",
     "hardhat-spdx-license-identifier": "^2.0.3",
-    "rescript": "^9.1.1",
+    "rescript": "^9.1.2",
     "truffle": "^5.3.0",
     "truffle-plugin-verify": "^0.5.7"
   }

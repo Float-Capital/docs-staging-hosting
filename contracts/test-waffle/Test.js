@@ -3,35 +3,35 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var Helpers = require("./library/Helpers.js");
-var Async$negBsMocha = require("bs-mocha/src/Async.js");
-var Mocha$negBsMocha = require("bs-mocha/src/Mocha.js");
+var Async$BsMocha = require("bs-mocha/src/Async.js");
+var Mocha$BsMocha = require("bs-mocha/src/Mocha.js");
 
-Mocha$negBsMocha.describe("Float System")(undefined, undefined, undefined, (function (param) {
-        return Mocha$negBsMocha.describe("List.map")(undefined, undefined, undefined, (function (param) {
-                      Async$negBsMocha.before_each(undefined, undefined, undefined, undefined, (function (done) {
+Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (function (param) {
+        return Mocha$BsMocha.describe("List.map")(undefined, undefined, undefined, (function (param) {
+                      Async$BsMocha.before_each(undefined, undefined, undefined, undefined, (function (done) {
                               Helpers.inititialize(undefined).then(function (param) {
                                     return Curry._2(done, undefined, undefined);
                                   });
                               
                             }));
-                      return Mocha$negBsMocha.it("it worked")(undefined, undefined, undefined, (function (param) {
+                      return Mocha$BsMocha.it("it worked")(undefined, undefined, undefined, (function (param) {
                                     console.log("It worked, yay");
                                     
                                   }));
                     }));
       }));
 
-var it$p = Async$negBsMocha.it;
+var it$p = Async$BsMocha.it;
 
-var it_skip$p = Async$negBsMocha.it_skip;
+var it_skip$p = Async$BsMocha.it_skip;
 
-var before_each = Async$negBsMocha.before_each;
+var before_each = Async$BsMocha.before_each;
 
-var describe = Mocha$negBsMocha.describe;
+var describe = Mocha$BsMocha.describe;
 
-var it = Mocha$negBsMocha.it;
+var it = Mocha$BsMocha.it;
 
-var it_skip = Mocha$negBsMocha.it_skip;
+var it_skip = Mocha$BsMocha.it_skip;
 
 exports.it$p = it$p;
 exports.it_skip$p = it_skip$p;

@@ -53,7 +53,7 @@ jobs:
       - name: install node packages
         id: install_node_packages
         run: |
-          cd contracts && yarn
+          cd contracts && yarn && yarn res:build
 
       - name: run contract tests
         id: run_contract_tests
