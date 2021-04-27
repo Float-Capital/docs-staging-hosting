@@ -1,0 +1,25 @@
+{
+  "name": "float-contracts",
+  "namespace": false,
+  "bs-dependencies": [
+    "bs-mocha"
+  ],
+  "ppx-flags": [],
+  "sources": [
+    {
+      "dir": "test-waffle",
+      "subdirs": true
+    }
+  ],
+  "package-specs": {
+    "module": "commonjs",
+    "in-source": true
+  },
+  "suffix": ".js",
+  "warnings": {
+    "error": "+101+8"
+  },
+  "bsc-flags": [
+    "-open Belt"
+  ]
+}

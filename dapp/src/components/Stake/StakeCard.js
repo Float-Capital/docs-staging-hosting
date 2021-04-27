@@ -268,7 +268,7 @@ function StakeCard(Props) {
                                               className: "font-bold"
                                             }, "📈 Long"), " staked")), React.createElement("div", {
                                       className: "text-sm font-alphbeta tracking-wider py-1"
-                                    }, "$${longDollarValueStaked->FormatMoney.formatEther}")), React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("h2", {
+                                    }, "$" + FormatMoney.formatEther(undefined, longDollarValueStaked))), React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("h2", {
                                           className: "text-xs mt-1 flex justify-center"
                                         }, React.createElement("span", {
                                               className: "font-bold pr-1"
@@ -282,7 +282,7 @@ function StakeCard(Props) {
                                               className: "font-bold"
                                             }, "Short"), " staked 📉")), React.createElement("div", {
                                       className: "text-sm font-alphbeta tracking-wider py-1"
-                                    }, "$${shortDollarValueStaked->FormatMoney.formatEther}"))), liquidityRatio(undefined), React.createElement("div", {
+                                    }, "$" + FormatMoney.formatEther(undefined, shortDollarValueStaked)))), liquidityRatio(undefined), React.createElement("div", {
                               className: "md:block hidden w-full flex justify-around"
                             }, stakeButtons(undefined))), React.createElement(StakeCardSide.make, {
                           orderPostion: 3,

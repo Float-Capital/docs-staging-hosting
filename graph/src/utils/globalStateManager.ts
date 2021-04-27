@@ -249,7 +249,7 @@ export function getOrCreateCollatoralBalanceObject(
     }
     newBalance.collateralToken = token.id;
 
-    newBalance.balance = ZERO;
+    newBalance.balanceInaccurate = ZERO;
     newBalance.timeLastUpdated = ZERO;
 
     return newBalance;

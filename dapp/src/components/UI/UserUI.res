@@ -235,7 +235,7 @@ module UserMarketBox = {
         <span className=`text-sm`> {tokens->React.string} </span>
         <span className=`text-xs`> {`tkns`->React.string} </span>
         <br className=`mt-1` />
-        <span className=`text-xs`> {Js.String.concat(value, `~\$`)->React.string} </span>
+        <span className=`text-xs`> {Js.String.concat(value, `~$`)->React.string} </span>
       </div>
       <div className=`w-1/3 self-center`> {children} </div>
     </div>

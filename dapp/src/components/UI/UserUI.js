@@ -410,7 +410,7 @@ function UserUI$UserStakesCard(Props) {
                 }), React.createElement(UserUI$UserColumnTextCenter, {
                   children: React.createElement(UserUI$UserColumnText, {
                         head: "💰 Staked value",
-                        body: "$${totalValue.contents->FormatMoney.formatEther}"
+                        body: "$" + FormatMoney.formatEther(undefined, totalValue.contents)
                       })
                 }), React.createElement("br", undefined), stakeBoxes);
 }

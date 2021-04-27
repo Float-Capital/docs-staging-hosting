@@ -121,7 +121,7 @@ function MarketCard(Props) {
                                     className: "font-bold"
                                   }, "TOTAL"), " Liquidity"), React.createElement("div", {
                                 className: "text-3xl font-alphbeta tracking-wider py-1"
-                              }, "$${totalValueLocked->FormatMoney.formatEther}"), React.createElement("div", {
+                              }, "$" + FormatMoney.formatEther(undefined, totalValueLocked)), React.createElement("div", {
                                 className: "md:block hidden w-full"
                               }, liquidityRatio(undefined), Belt_Option.isNone(marketIndexOption) ? mintButtons(undefined) : null)), React.createElement("div", {
                             className: "order-3 w-1/2 md:w-1/4 flex-grow flex-wrap flex-col"
