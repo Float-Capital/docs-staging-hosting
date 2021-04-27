@@ -20,7 +20,7 @@ var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
 var AddToMetamask = require("./AddToMetamask.js");
 var InjectedEthereum = require("../../ethereum/InjectedEthereum.js");
-var EthereumBlockiesBase64 = require("ethereum-blockies-base64").default;
+var EthereumBlockiesBase64 = require("ethereum-blockies-base64");
 
 function UserUI$UserContainer(Props) {
   var children = Props.children;
@@ -103,7 +103,7 @@ function UserUI$UserProfileHeader(Props) {
                   className: "w-24 h-24 rounded-full border-2 border-light-purple flex items-center justify-center"
                 }, React.createElement("img", {
                       className: "inline h-10 rounded",
-                      src: EthereumBlockiesBase64(address)
+                      src: EthereumBlockiesBase64.makeBlockie(address)
                     })));
 }
 
