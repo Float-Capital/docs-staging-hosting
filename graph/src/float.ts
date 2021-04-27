@@ -23,7 +23,7 @@ import {
   LatestPrice,
   Price,
 } from "../generated/schema";
-import { BigInt, log } from "@graphprotocol/graph-ts";
+import { BigInt, log, Bytes } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import {
   getOrCreateLatestSystemState,
@@ -273,10 +273,11 @@ export function handleMarketOracleUpdated(event: OracleUpdated): void {
   let syntheticMarket = SyntheticMarket.load(marketIndex.toString());
   syntheticMarket.oracleAddress = newOracleAddress;
 
-  let previousOracles = syntheticMarket.previousOracleAddresses;
-  syntheticMarket.previousOracleAddresses = previousOracles.push(
-    oldOracleAddress
-  );
+  let previousOracles = syntheticMarket.previousOracleAddresses as Array<Bytes>;
+
+  previousOracles.push(oldOracleAddress!);
+
+  syntheticMarket.previousOracleAddresses = previousOracles;
 
   syntheticMarket.save();
 }

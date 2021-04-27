@@ -44,7 +44,7 @@ export function updateOracle(
   oldOracleAddress: Address,
   newOracleAddress: Address
 ): Oracle {
-  let prevOracle = Oracle.load(oldOracleAddress);
+  let prevOracle = Oracle.load(oldOracleAddress.toHexString());
   let oracle = new Oracle(newOracleAddress.toHex());
   oracle.address = newOracleAddress;
   oracle.marketIndex = prevOracle.marketIndex;
@@ -170,12 +170,17 @@ export function handleSyntheticTokenCreated(
 }
 
 export function handleMarketOracleUpdated(event: OracleUpdated): void {
+  let state = getOrCreateGlobalState();
   let oldOracleAddress = event.params.oldOracleAddress;
   let newOracleAddress = event.params.newOracleAddress;
   let oracle = updateOracle(oldOracleAddress, newOracleAddress);
-  state.oracles = state.oracles.concat([oracle.id]);
-  state.save();
   oracle.save();
+
+  let stateOracles = state.oracles;
+  stateOracles.push(oracle.id);
+  state.oracles = stateOracles;
+
+  state.save();
 }
 
 export function handleBlock(block: ethereum.Block): void {
