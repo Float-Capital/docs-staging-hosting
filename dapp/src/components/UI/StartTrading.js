@@ -13,6 +13,7 @@ function StartTrading(Props) {
                         className: "cursor-pointer hover:opacity-70 w-full flex justify-center"
                       }, React.createElement("img", {
                             className: "p-4",
+                            alt: "start-trading",
                             src: "/img/start-trading.png"
                           }))
                 }));
