@@ -49,7 +49,7 @@ contract("LongShort (admin)", (accounts) => {
   });
 
 
-  it("Success, only admin can update oracle", async () => {
+  it("shouldn't allow non admin to update the oracle", async () => {
 
     const newOracleAddress = zeroAddressStr
 
