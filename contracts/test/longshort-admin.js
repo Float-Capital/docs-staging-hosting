@@ -55,6 +55,9 @@ contract("LongShort (admin)", (accounts) => {
 
     await expectRevert(longShort.updateMarketOracle(marketIndex, newOracleAddress, {from: user1} ), "only admin");
 
+  })
+ 
+  it("should allow the admin to update the oracle correctly", async () => {
     await longShort.updateMarketOracle(marketIndex, newOracleAddress, {from: admin} ) 
     
     const contactAdmin = await longShort.admin.call();
