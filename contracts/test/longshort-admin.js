@@ -10,8 +10,8 @@ const {
 const { initialize, createSynthetic } = require("./helpers");
 
 contract("LongShort (admin)", (accounts) => {
-  let longShort;  
-  let marketIndex;  
+  let longShort;
+  let marketIndex;
 
   const syntheticName = "FTSE100";
   const syntheticSymbol = "FTSE";
@@ -43,32 +43,40 @@ contract("LongShort (admin)", (accounts) => {
       _baseExitFee,
       _badLiquidityExitFee
     );
-    
+
     marketIndex = synthResult.currentMarketIndex;
-
   });
-
 
   it("shouldn't allow non admin to update the oracle", async () => {
+    const newOracleAddress = zeroAddressStr;
 
-    const newOracleAddress = zeroAddressStr
-
-    await expectRevert(longShort.updateMarketOracle(marketIndex, newOracleAddress, {from: user1} ), "only admin");
-
-  })
- 
-  it("should allow the admin to update the oracle correctly", async () => {
-    await longShort.updateMarketOracle(marketIndex, newOracleAddress, {from: admin} ) 
-    
-    const contactAdmin = await longShort.admin.call();
-    
-    assert.equal(admin, contactAdmin, "is admin");
-
-    const updatedOracleAddress = await longShort.oracleManagers.call(marketIndex);
-
-    assert.equal(newOracleAddress, updatedOracleAddress, "Oracle has been updated")
-  
+    await expectRevert(
+      longShort.updateMarketOracle(marketIndex, newOracleAddress, {
+        from: user1,
+      }),
+      "only admin"
+    );
   });
 
+  it("should allow the admin to update the oracle correctly", async () => {
+    const newOracleAddress = zeroAddressStr;
 
+    await longShort.updateMarketOracle(marketIndex, newOracleAddress, {
+      from: admin,
+    });
+
+    const contractAdmin = await longShort.admin.call();
+
+    assert.equal(admin, contractAdmin, "is admin");
+
+    const updatedOracleAddress = await longShort.oracleManagers.call(
+      marketIndex
+    );
+
+    assert.equal(
+      newOracleAddress,
+      updatedOracleAddress,
+      "Oracle has been updated"
+    );
+  });
 });

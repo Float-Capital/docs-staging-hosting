@@ -2,7 +2,7 @@
   "name": "longshort-contracts",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT",
+  "license": "BUSL-1.1",
   "scripts": {
     "compile": "hardhat compile",
     "truffle-compile": "truffle compile",
