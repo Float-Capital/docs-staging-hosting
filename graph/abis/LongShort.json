@@ -140,6 +140,31 @@
       },
       {
         "indexed": false,
+        "internalType": "address",
+        "name": "oldOracleAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newOracleAddress",
+        "type": "address"
+      }
+    ],
+    "name": "OracleUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "oldPrice",
         "type": "uint256"
@@ -1233,6 +1258,24 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "internalType": "address",
+        "name": "_oracleManager",
+        "type": "address"
+      }
+    ],
+    "name": "updateMarketOracle",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

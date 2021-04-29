@@ -10,6 +10,7 @@ import {
   TokenPriceRefreshed,
   ValueLockedInSystem,
   FeesChanges,
+  OracleUpdated,
 } from "../generated/LongShort/LongShort";
 import {
   SyntheticMarket,
@@ -19,10 +20,11 @@ import {
   TokenFactory,
   LongShortContract,
   SyntheticToken,
+  CollateralToken,
   LatestPrice,
   Price,
 } from "../generated/schema";
-import { BigInt, log } from "@graphprotocol/graph-ts";
+import { BigInt, log, Bytes } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import {
   getOrCreateLatestSystemState,
@@ -36,6 +38,7 @@ import {
   createNewTokenDataSource,
   increaseUserMints,
 } from "./utils/helperFunctions";
+import { decreaseOrCreateUserApprovals } from "./tokenTransfers";
 import {
   ZERO,
   GLOBAL_STATE_ID,
@@ -190,6 +193,7 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.syntheticShort = shortToken.id;
   syntheticMarket.marketIndex = marketIndex;
   syntheticMarket.oracleAddress = oracleAddress;
+  syntheticMarket.previousOracleAddresses = [];
   syntheticMarket.feeStructure = fees.id;
   syntheticMarket.kPeriod = ZERO;
   syntheticMarket.kMultiplier = ZERO;
@@ -200,6 +204,7 @@ export function handleSyntheticTokenCreated(
     collateralTokenAddress,
     syntheticMarket
   );
+  syntheticMarket.collateralToken = collateralToken.id;
 
   let globalState = GlobalState.load(GLOBAL_STATE_ID);
   globalState.latestMarketIndex = globalState.latestMarketIndex.plus(
@@ -263,6 +268,23 @@ export function handleSyntheticTokenCreated(
   );
 }
 
+export function handleMarketOracleUpdated(event: OracleUpdated): void {
+  let marketIndex = event.params.marketIndex;
+  let oldOracleAddress = event.params.oldOracleAddress;
+  let newOracleAddress = event.params.newOracleAddress;
+
+  let syntheticMarket = SyntheticMarket.load(marketIndex.toString());
+  syntheticMarket.oracleAddress = newOracleAddress;
+
+  let previousOracles = syntheticMarket.previousOracleAddresses as Array<Bytes>;
+
+  previousOracles.push(oldOracleAddress!);
+
+  syntheticMarket.previousOracleAddresses = previousOracles;
+
+  syntheticMarket.save();
+}
+
 export function handleFeesChanges(event: FeesChanges): void {
   let marketIndex = event.params.marketIndex;
   let baseEntryFee = event.params.baseEntryFee;
@@ -314,6 +336,14 @@ export function handleLongMinted(event: LongMinted): void {
   let syntheticToken = SyntheticToken.load(market.syntheticLong);
 
   increaseUserMints(userAddress, syntheticToken, tokensMinted, event);
+
+  let collateralToken = CollateralToken.load(market.collateralToken);
+  decreaseOrCreateUserApprovals(
+    userAddress,
+    event.params.depositAdded,
+    collateralToken,
+    event
+  );
 
   saveEventToStateChange(
     event,
@@ -405,6 +435,14 @@ export function handleShortMinted(event: ShortMinted): void {
 
   let market = SyntheticMarket.load(marketIndex.toString());
   let syntheticToken = SyntheticToken.load(market.syntheticShort);
+
+  let collateralToken = CollateralToken.load(market.collateralToken);
+  decreaseOrCreateUserApprovals(
+    userAddress,
+    event.params.depositAdded,
+    collateralToken,
+    event
+  );
 
   increaseUserMints(userAddress, syntheticToken, tokensMinted, event);
 

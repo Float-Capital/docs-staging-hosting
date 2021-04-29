@@ -14,3 +14,8 @@ build
 
 # Secrets
 secretsManager.js
+
+# rescript
+.merlin
+.bsb.lock
+lib

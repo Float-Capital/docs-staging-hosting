@@ -184,7 +184,7 @@ fragment GlobalStateInfo on GlobalState {
 }
 `)
 
-// Used externally in StateUpdates.res, FloatManagement.res, UserUI.res
+// Used externally in FloatManagement.res, UserUI.res
 module UserQuery = %graphql(`
 query ($userId: String!) {
   user (id: $userId) {
@@ -212,7 +212,7 @@ query ($userId: String!) {
   }
 }`)
 
-// Used externally in: StateUpdates.res, StateChangeMonitor.res
+// Used externally in: StateChangeMonitor.res
 module StateChangePoll = %graphql(`
 query($userId: String!, $timestamp: BigInt!) {
   stateChanges (where: {timestamp_gt: $timestamp}) {

@@ -4,7 +4,7 @@ const {
 } = require("@openzeppelin/truffle-upgrades");
 
 const STAKER = "Staker";
-const SYNTHETIC_TOKEN = "Dai";
+const COLLATERAL_TOKEN = "Dai";
 const TREASURY = "Treasury_v0";
 const LONGSHORT = "LongShort";
 const FLOAT_TOKEN = "FloatToken";
@@ -14,7 +14,7 @@ const FLOAT_CAPITAL = "FloatCapital_v0";
 const Staker = artifacts.require(STAKER);
 const Treasury = artifacts.require(TREASURY);
 const LongShort = artifacts.require(LONGSHORT);
-const Dai = artifacts.require(SYNTHETIC_TOKEN);
+const Dai = artifacts.require(COLLATERAL_TOKEN);
 const FloatToken = artifacts.require(FLOAT_TOKEN);
 const TokenFactory = artifacts.require(TOKEN_FACTORY);
 const FloatCapital = artifacts.require(FLOAT_CAPITAL);

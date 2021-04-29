@@ -25,6 +25,7 @@ dataSources:
         - TokenPriceRefreshed
         - FeesChanges
         - ValueLockedInSystem
+        - OracleUpdated
       abis:
         - name: LongShort
           file: ./abis/LongShort.json
@@ -51,6 +52,8 @@ dataSources:
           handler: handleValueLockedInSystem
         - event: FeesChanges(uint32,uint256,uint256,uint256,uint256)
           handler: handleFeesChanges
+        - event: OracleUpdated(uint32,address,address)
+          handler: handleMarketOracleUpdated
       file: ./src/float.ts
 
   - kind: ethereum/contract

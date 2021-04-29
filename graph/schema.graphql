@@ -115,7 +115,7 @@ type TokenApproval @entity {
   id: ID! # userAddress-tokenAddress
   collateralToken: CollateralToken!
   user: User!
-  approved: BigInt!
+  approvedInnacurate: BigInt!
   timestamp: BigInt!
 }
 
@@ -132,7 +132,7 @@ type UserCollateralTokenBalance @entity {
   timeLastUpdated: BigInt!
   collateralToken: CollateralToken!
   user: User!
-  balance: BigInt!
+  balanceInaccurate: BigInt!
 }
 
 type SyntheticMarket @entity {
@@ -140,10 +140,12 @@ type SyntheticMarket @entity {
   timestampCreated: BigInt!
   txHash: Bytes!
   blockNumberCreated: BigInt!
+  collateralToken: CollateralToken!
   name: String!
   symbol: String!
   marketIndex: BigInt!
   oracleAddress: Bytes!
+  previousOracleAddresses: [Bytes!]!
   syntheticLong: SyntheticToken!
   syntheticShort: SyntheticToken!
   latestSystemState: SystemState!

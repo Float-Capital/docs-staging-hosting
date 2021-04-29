@@ -1,29 +1,10 @@
 {
-  "name": "rescript-nextjs-template",
+  "name": "float.capital",
   "namespace": false,
   "reason": {
     "react-jsx": 3
   },
   "refmt": 3,
-  "bs-dependencies": [
-    "@reasonml-community/graphql-ppx",
-    "bs-moment",
-    "bs-css",
-    "bs-css-emotion",
-    "reason-react",
-    "rescript-apollo-client",
-    "re-formality",
-    "re-classnames",
-    "rescript-future",
-    "rescript-request",
-    "@ahrefs/bs-recharts",
-    "decco"
-  ],
-  "ppx-flags": [
-    "@reasonml-community/graphql-ppx/ppx",
-    "re-formality/ppx",
-    "decco/ppx"
-  ],
   "graphql": {
     "apolloMode": true,
     "extendMutation": "ApolloClient.GraphQL_PPX.ExtendMutation",
@@ -37,14 +18,42 @@
       "Bytes": "Address"
     }
   },
+  "pinned-dependencies": [
+    "cypress-tests"
+  ],
+  "bs-dependencies": [
+    "@reasonml-community/graphql-ppx",
+    "bs-moment",
+    "bs-css",
+    "bs-css-emotion",
+    "reason-react",
+    "rescript-apollo-client",
+    "rescript-future",
+    "rescript-request",
+    "@ahrefs/bs-recharts",
+    "re-formality",
+    "@glennsl/bs-jest",
+    "bs-react-testing-library",
+    "decco",
+    "bs-mocha"
+  ],
+  "ppx-flags": [
+    "@reasonml-community/graphql-ppx/ppx",
+    "decco/ppx",
+    "re-formality/ppx"
+  ],
   "sources": [
     {
       "dir": "src",
       "subdirs": true
+    },
+    {
+      "dir": "cypress/integration",
+      "subdirs": true
     }
   ],
   "package-specs": {
-    "module": "es6",
+    "module": "commonjs",
     "in-source": true
   },
   "suffix": ".js",
@@ -53,12 +62,6 @@
   },
   "bsc-flags": [
     "-open Belt",
-    "-bs-super-errors",
     "-bs-g"
-  ],
-  "gentypeconfig": {
-    "language": "untyped",
-    "shims": [],
-    "module": "es6"
-  }
+  ]
 }
