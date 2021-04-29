@@ -10,6 +10,7 @@ import {
   TokenPriceRefreshed,
   ValueLockedInSystem,
   FeesChanges,
+  OracleUpdated,
 } from "../generated/LongShort/LongShort";
 import {
   SyntheticMarket,
@@ -23,7 +24,7 @@ import {
   LatestPrice,
   Price,
 } from "../generated/schema";
-import { BigInt, log } from "@graphprotocol/graph-ts";
+import { BigInt, log, Bytes } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import {
   getOrCreateLatestSystemState,
@@ -192,6 +193,7 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.syntheticShort = shortToken.id;
   syntheticMarket.marketIndex = marketIndex;
   syntheticMarket.oracleAddress = oracleAddress;
+  syntheticMarket.previousOracleAddresses = [];
   syntheticMarket.feeStructure = fees.id;
   syntheticMarket.kPeriod = ZERO;
   syntheticMarket.kMultiplier = ZERO;
@@ -264,6 +266,23 @@ export function handleSyntheticTokenCreated(
     [],
     []
   );
+}
+
+export function handleMarketOracleUpdated(event: OracleUpdated): void {
+  let marketIndex = event.params.marketIndex;
+  let oldOracleAddress = event.params.oldOracleAddress;
+  let newOracleAddress = event.params.newOracleAddress;
+
+  let syntheticMarket = SyntheticMarket.load(marketIndex.toString());
+  syntheticMarket.oracleAddress = newOracleAddress;
+
+  let previousOracles = syntheticMarket.previousOracleAddresses as Array<Bytes>;
+
+  previousOracles.push(oldOracleAddress!);
+
+  syntheticMarket.previousOracleAddresses = previousOracles;
+
+  syntheticMarket.save();
 }
 
 export function handleFeesChanges(event: FeesChanges): void {
