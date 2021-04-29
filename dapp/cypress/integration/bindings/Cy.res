@@ -36,6 +36,7 @@ module Element = {
 module RTF = {
   // Single elements
   @val @scope("cy") external findByAltText: string => Element.t = "findByAltText"
+  @val @scope("cy") external findByText: string => Element.t = "findByText"
   @val @scope("cy") external findByPlaceholderText: string => Element.t = "findByPlaceholderText"
   @val @scope("cy") external findByPlaceholderTextRe: Js.Re.t => Element.t = "findByPlaceholderText"
 

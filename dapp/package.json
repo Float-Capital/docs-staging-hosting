@@ -59,6 +59,7 @@
     "@glennsl/bs-jest": "^0.7.0",
     "@reasonml-community/graphql-ppx": "1.0.2",
     "@testing-library/cypress": "^7.0.6",
+    "@truffle/hdwallet-provider": "^1.3.0",
     "add": "^2.0.6",
     "autoprefixer": "^10.1.0",
     "bs-mocha": "^1.0.0",

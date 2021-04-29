@@ -8,6 +8,22 @@ var Mocha$BsMocha = require("bs-mocha/src/Mocha.js");
 import '@testing-library/cypress/add-commands'
 ;
 
+Mocha$BsMocha.describe("Basic navigation demo")(undefined, undefined, undefined, (function (param) {
+        Mocha$BsMocha.before_each(undefined)(undefined, undefined, undefined, (function (param) {
+                cy.visit(CypressConfig.baseUrl);
+                
+              }));
+        Mocha$BsMocha.it("Homepage should say 'start trading'")(undefined, undefined, undefined, (function (param) {
+                cy.findByAltText("start-trading");
+                
+              }));
+        return Mocha$BsMocha.it("Clicking the 'start-trading' button should go to the markets page")(undefined, undefined, undefined, (function (param) {
+                      cy.findByAltText("start-trading").click();
+                      cy.findAllByText("Liquidity");
+                      return (cy.location("pathname").should("eq", "/markets"));
+                    }));
+      }));
+
 Mocha$BsMocha.describe("Minting")(undefined, undefined, undefined, (function (param) {
         Mocha$BsMocha.before_each(undefined)(undefined, undefined, undefined, (function (param) {
                 cy.visit(CypressConfig.baseUrl + "/markets");
@@ -29,12 +45,7 @@ Mocha$BsMocha.describe("Minting")(undefined, undefined, undefined, (function (pa
                               name: Caml_option.some(/mint/i)
                             }).should("exist");
                       submitButton.click();
-                      ((cy.location().should((loc) => {
-      expect(loc.pathname).to.include('/wait here')
-
-      expect(loc.search).to.include("actionOption=long")
-      expect(loc.search).to.include("marketIndex=1")
-    })));
+                      cy.findByText("The transaction failed.").should("exist");
                       
                     }));
       }));

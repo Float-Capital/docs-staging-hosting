@@ -6,10 +6,16 @@
 // https://on.cypress.io/custom-commands
 // ***********************************************
 
+// BEWARE - there are dragons in this file!
+
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
 import { Eip1193Bridge } from "@ethersproject/experimental/lib/eip1193-bridge";
+// I wish I could use ethersjs exclusively, but that seems to be an issue, so using web3js for problematic functions
 import Web3 from "web3";
+import HDWalletProvider from "@truffle/hdwallet-provider";
+
+import { ethers } from "ethers";
 
 let TEST_PRIVATE_KEY = Cypress.env("INTEGRATION_TEST_PRIVATE_KEY");
 
@@ -102,6 +108,29 @@ class CustomizedBridge extends Eip1193Bridge {
     //   // }).gas;
     //   // delete newParams.from;
     // }
+    if (method === "eth_sendTransaction") {
+      // I'm at a loss here... Try this? https://github.com/ethers-io/ethers.js/blob/4898e7baacc4ed40d880b48e894b61118776dddb/packages/experimental/src.ts/eip1193-bridge.ts#L85
+      try {
+        if (isCallbackForm) {
+          this.web3Obj.eth.sendTransaction(
+            { ...params[0], from: (await this.web3Obj.eth.getAccounts())[0] },
+            callback
+          );
+          return;
+        } else {
+          return await this.web3Obj.eth.sendTransaction({
+            ...params[0],
+            from: (await this.web3Obj.eth.getAccounts())[0],
+          });
+        }
+      } catch (error) {
+        if (isCallbackForm) {
+          callback(error, null);
+        } else {
+          throw error;
+        }
+      }
+    }
     try {
       const result = await super.send(method, params);
       if (isCallbackForm) {
@@ -139,13 +168,19 @@ Cypress.Commands.overwrite("visit", (original, url, options) => {
         42
       );
       const signer = new Wallet(TEST_PRIVATE_KEY, provider);
-      const web3Object = new Web3();
       console.log("GOT THIS SIGNER...", signer);
 
-      const web3 = new Web3(providerUrl);
+      let web3jsProvider = new HDWalletProvider({
+        privateKeys: [TEST_PRIVATE_KEY],
+        providerOrUrl: providerUrl,
+      });
+      const web3 = new Web3(web3jsProvider);
+      web3.eth
+        .getAccounts()
+        .then((accounts) => console.log("using these accounts", accounts));
 
       win.ethereum = new CustomizedBridge(signer, provider, web3);
-      // win.ethereum = new Eip1193Bridge(signer, provider);
+      // win.ethereum = new ethers.providers.Web3Provider(web3jsProvider);
     },
   });
 });
