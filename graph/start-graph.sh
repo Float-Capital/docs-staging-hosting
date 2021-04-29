@@ -78,7 +78,7 @@ function start {
     echo "####### WAITING FOR DOCKERS #######"
     WAITING_TIME=0
     until $(curl --output /dev/null -X POST --silent --fail -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' $RPC_ENDPOINT); do
-        SLEEP_AMOUNT=3
+        SLEEP_AMOUNT=6
         sleep $SLEEP_AMOUNT
         WAITING_TIME=$(($WAITING_TIME+$SLEEP_AMOUNT))
         if [ "$WAITING_TIME" -gt "$TOTAL_WAITING_TIME" ];

@@ -15,6 +15,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - SyntheticTokenCreated
+        - OracleUpdated
       abis:
         - name: LongShort
           file: ./abis/LongShort.json
@@ -23,6 +24,8 @@ dataSources:
       eventHandlers:
         - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
           handler: handleSyntheticTokenCreated
+        - event: OracleUpdated(uint32,address,address)
+          handler: handleMarketOracleUpdated
       blockHandlers:
         - handler: handleBlock
       file: ./src/priceHistory.ts
