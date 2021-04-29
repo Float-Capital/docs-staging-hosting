@@ -1,7 +1,5 @@
 import "styles/main.css";
 
-import Head from "next/head";
-
 // Note:
 // Just renaming $$default to ResApp alone
 // doesn't help FastRefresh to detect the
@@ -41,9 +39,6 @@ const googleAnalyticsMeasurementId = "G-CP1WC8846P";
 // not work!
 const App = (props) => (
   <div>
-    <Head>
-      <link rel="shortcut icon" href="/favicons/favicon.ico" />
-    </Head>
     <ResApp {...props} />
   </div>
 );
