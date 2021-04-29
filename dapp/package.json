@@ -74,6 +74,7 @@
     "rescript-apollo-client": "^1.1.1",
     "start-server-and-test": "^1.12.1",
     "tailwindcss": "^2.0.2",
+    "web3": "^1.3.5",
     "yarn": "^1.22.10"
   }
 }

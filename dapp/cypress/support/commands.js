@@ -9,6 +9,7 @@
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
 import { Eip1193Bridge } from "@ethersproject/experimental/lib/eip1193-bridge";
+import Web3 from "web3";
 
 let TEST_PRIVATE_KEY = Cypress.env("INTEGRATION_TEST_PRIVATE_KEY");
 
@@ -25,13 +26,21 @@ export const TEST_ADDRESS_NEVER_USE = new Wallet(TEST_PRIVATE_KEY).address;
 
 const kovanChainIdHex = "0x2A";
 
+// There aren't a lot of docs on the `eip1193bridge` unfortunately: https://docs.ethers.io/v5/api/experimental/#experimental-eip1193bridge
+//    And here is the EIP spec: https://eips.ethereum.org/EIPS/eip-1193
 class CustomizedBridge extends Eip1193Bridge {
+  constructor(signer, wallet, web3Obj) {
+    // Constructor
+    super(signer, wallet);
+
+    this.web3Obj = web3Obj;
+  }
   async sendAsync(...args) {
-    console.debug("sendAsync called", ...args);
+    console.log("sendAsync called", ...args);
     return this.send(...args);
   }
   async send(...args) {
-    console.debug("send called", ...args);
+    console.log("send called", ...args);
     const isCallbackForm =
       typeof args[0] === "object" && typeof args[1] === "function";
     let callback;
@@ -48,6 +57,7 @@ class CustomizedBridge extends Eip1193Bridge {
     if (method === "eth_requestAccounts" || method === "eth_accounts") {
       if (isCallbackForm) {
         callback({ result: [TEST_ADDRESS_NEVER_USE] });
+        return;
       } else {
         return Promise.resolve([TEST_ADDRESS_NEVER_USE]);
       }
@@ -55,13 +65,45 @@ class CustomizedBridge extends Eip1193Bridge {
     if (method === "eth_chainId") {
       if (isCallbackForm) {
         callback(null, { result: kovanChainIdHex });
+        return;
       } else {
         return Promise.resolve(kovanChainIdHex);
       }
     }
+    // NOTE: there should be no need for this extra code or the use of web3js (rather than ethers).
+    //       This is here because without it the call for the users balance was not working - couldn't find any other fixes.
+    //       TODO: use ethersjs rather than web3js for this.
+    if (method === "eth_call") {
+      try {
+        if (isCallbackForm) {
+          this.web3Obj.eth.call(params[0], params[1], callback);
+          console.log("Yhere!");
+          return;
+        } else {
+          return await this.web3Obj.eth.call(params[0], params[1]);
+        }
+      } catch (error) {
+        if (isCallbackForm) {
+          callback(error, null);
+        } else {
+          throw error;
+        }
+      }
+    }
+    // if (method === "eth_sendTransaction") {
+    //   // NOTE: for some reason you need to rename "gas" to "gasPrice" to get this transaction to work.
+    //   const newParams = {
+    //     gasLimit: params[0].gas,
+    //     to: params[0].to,
+    //     data: params[0].data,
+    //   };
+    //   // delete Object.assign(newParams, params[0], {
+    //   //   gasLimit: params[0].gas,
+    //   // }).gas;
+    //   // delete newParams.from;
+    // }
     try {
       const result = await super.send(method, params);
-      console.debug("result received", method, params, result);
       if (isCallbackForm) {
         callback(null, { result });
       } else {
@@ -85,14 +127,24 @@ Cypress.Commands.overwrite("visit", (original, url, options) => {
       console.log("Calling the before load from options");
       options && options.onBeforeLoad && options.onBeforeLoad(win);
       win.localStorage.clear();
+
+      const providerUrl =
+        "https://eth-kovan.alchemyapi.io/v2/oxbTbIRuvEAetPHd7QHgaAW-ba-T_lNQ";
+      console.log(
+        "using this key",
+        "https://eth-kovan.alchemyapi.io/v2/oxbTbIRuvEAetPHd7QHgaAW-ba-T_lNQ"
+      );
       const provider = new JsonRpcProvider(
-        "https://kovan.infura.io/v3/4bf032f2d38a4ed6bb975b80d6340847",
+        providerUrl, // "https://kovan.infura.io/v3/4bf032f2d38a4ed6bb975b80d6340847",
         42
       );
       const signer = new Wallet(TEST_PRIVATE_KEY, provider);
+      const web3Object = new Web3();
       console.log("GOT THIS SIGNER...", signer);
 
-      win.ethereum = new CustomizedBridge(signer, provider);
+      const web3 = new Web3(providerUrl);
+
+      win.ethereum = new CustomizedBridge(signer, provider, web3);
       // win.ethereum = new Eip1193Bridge(signer, provider);
     },
   });
