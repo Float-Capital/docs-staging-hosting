@@ -6,6 +6,7 @@ var React = require("react");
 var Button = require("./Button.js");
 var Config = require("../../Config.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
+var InjectedEthereum = require("../../ethereum/InjectedEthereum.js");
 
 function AddNetworkToMetamask(Props) {
   var ethObj = window.ethereum;
@@ -19,14 +20,15 @@ function AddNetworkToMetamask(Props) {
                               ethObj$1.request({
                                     method: "wallet_addEthereumChain",
                                     params: [{
-                                        chainId: "0x2A",
-                                        chainName: "Kovan",
+                                        chainId: InjectedEthereum.chainIdIntToHex(Config.networkId),
+                                        chainName: Config.networkName,
                                         nativeCurrency: {
-                                          name: "Test Eth",
-                                          symbol: "ETH",
+                                          name: Config.networkCurrencyName,
+                                          symbol: Config.networkCurrencySymbol,
                                           decimals: 18
                                         },
-                                        blockExplorerUrls: ["https://kovan.etherscan.io/"]
+                                        rpcUrls: [Config.rpcEndopint],
+                                        blockExplorerUrls: [Config.blockExplorer]
                                       }]
                                   });
                               
@@ -38,7 +40,7 @@ function AddNetworkToMetamask(Props) {
                         className: "flex flex-row items-center"
                       }, React.createElement("div", {
                             className: "text-sm"
-                          }, "Add " + Config.networkName + " to metamask "), React.createElement("img", {
+                          }, "Switch metamask to " + Config.networkName), React.createElement("img", {
                             className: "h-6 ml-1",
                             src: "/icons/metamask.svg"
                           })))
