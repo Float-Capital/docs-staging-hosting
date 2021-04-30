@@ -21,6 +21,8 @@ var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
 var AddToMetamask = require("./AddToMetamask.js");
 var InjectedEthereum = require("../../ethereum/InjectedEthereum.js");
+var FromUnixTime = require("date-fns/fromUnixTime").default;
+var FormatDistanceToNow = require("date-fns/formatDistanceToNow").default;
 
 function UserUI$UserContainer(Props) {
   var children = Props.children;
@@ -346,6 +348,8 @@ function UserUI$UserMarketUnstake(Props) {
   var synthAddress = Props.synthAddress;
   var userId = Props.userId;
   var isLong = Props.isLong;
+  var whenStrOpt = Props.whenStr;
+  var whenStr = whenStrOpt !== undefined ? whenStrOpt : "";
   var synthAddressStr = Globals.ethAdrToLowerStr(synthAddress);
   var marketIdResponse = DataHooks.useTokenMarketId(synthAddressStr);
   var marketId = Belt_Option.getWithDefault(DataHooks.Util.graphResponseToOption(marketIdResponse), "1");
@@ -364,7 +368,7 @@ function UserUI$UserMarketUnstake(Props) {
               className: "flex flex-col"
             }, React.createElement("span", {
                   className: "text-xxs self-center"
-                }, React.createElement("i", undefined, "4 days ago")), isCurrentUser ? React.createElement(Button.Tiny.make, {
+                }, React.createElement("i", undefined, whenStr + " ago")), isCurrentUser ? React.createElement(Button.Tiny.make, {
                     onClick: unstake,
                     children: "unstake"
                   }) : null);
@@ -388,6 +392,7 @@ function UserUI$UserStakesCard(Props) {
         var tokens = FormatMoney.formatEther(undefined, stake.currentStake.amount);
         var isLong = syntheticToken.tokenType === "Long";
         var price = syntheticToken.latestPrice.price.price;
+        var whenStr = FormatDistanceToNow(FromUnixTime(stake.currentStake.timestamp.toNumber()));
         var value = stake.currentStake.amount.mul(price).div(CONSTANTS.tenToThe18);
         totalValue.contents = totalValue.contents.add(value);
         return React.createElement(UserUI$UserMarketBox, {
@@ -398,7 +403,8 @@ function UserUI$UserStakesCard(Props) {
                     children: React.createElement(UserUI$UserMarketUnstake, {
                           synthAddress: addr,
                           userId: userId,
-                          isLong: isLong
+                          isLong: isLong,
+                          whenStr: whenStr
                         }),
                     key: key
                   });
