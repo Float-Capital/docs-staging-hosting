@@ -159,12 +159,8 @@ Cypress.Commands.overwrite("visit", (original, url, options) => {
 
       const providerUrl =
         "https://eth-kovan.alchemyapi.io/v2/oxbTbIRuvEAetPHd7QHgaAW-ba-T_lNQ";
-      console.log(
-        "using this key",
-        "https://eth-kovan.alchemyapi.io/v2/oxbTbIRuvEAetPHd7QHgaAW-ba-T_lNQ"
-      );
       const provider = new JsonRpcProvider(
-        providerUrl, // "https://kovan.infura.io/v3/4bf032f2d38a4ed6bb975b80d6340847",
+        providerUrl,
         42
       );
       const signer = new Wallet(TEST_PRIVATE_KEY, provider);
