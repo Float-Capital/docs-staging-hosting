@@ -8,7 +8,7 @@ type reqParams = {
   chainId: string,
   chainName: string,
   nativeCurrency: nativeCurrency,
-  // rpcUrls: array<string>,
+  rpcUrls: array<string>,
   blockExplorerUrls: array<string>,
 }
 
@@ -29,14 +29,15 @@ let make = () => {
           method: "wallet_addEthereumChain",
           params: [
             {
-              chainId: "0x2A",
-              chainName: "Kovan",
+              chainId: Config.networkId->InjectedEthereum.chainIdIntToHex,
+              chainName: Config.networkName,
               nativeCurrency: {
-                name: "Test Eth",
-                symbol: "ETH",
+                name: Config.networkCurrencyName,
+                symbol: Config.networkCurrencySymbol,
                 decimals: 18,
               },
-              blockExplorerUrls: ["https://kovan.etherscan.io/"],
+              blockExplorerUrls: [Config.blockExplorer],
+              rpcUrls: [Config.rpcEndopint],
             },
           ],
         },
@@ -45,10 +46,15 @@ let make = () => {
 
   switch InjectedEthereum.ethObj {
   | Some(ethObj) =>
-    <Button.Element onClick={_event => addToMetamask(ethObj)}>
+    <Button.Element
+      onClick={_event => {
+        addToMetamask(ethObj)
+      }}>
       <div className="mx-auto">
         <div className="flex flex-row items-center">
-          <div className="text-sm"> {`Add ${Config.networkName} to metamask `->React.string} </div>
+          <div className="text-sm">
+            {`Switch metamask to ${Config.networkName}`->React.string}
+          </div>
           <img src="/icons/metamask.svg" className="h-6 ml-1" />
         </div>
       </div>
