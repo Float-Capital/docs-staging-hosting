@@ -32,7 +32,7 @@ let metamaskDefaultChainIdsToMetamaskName = chainId =>
   switch chainId {
   | 3 => "Ropsten Test Network"
   | 4 => "Rinkeby Test Network"
-  | 5 => "Goerli"
+  | 5 => "Goerli Test Network"
   | 42 => "Kovan Test Network"
   | _ => "Ethereum Mainnet"
   }
@@ -106,8 +106,10 @@ let make = () => {
                 <li>
                   {switch metamaskChainId {
                   | Some(chainId) if metamaskDefaultChainIds->Set.Int.has(chainId) =>
-                    `Click on ${metamaskDefaultChainIdsToMetamaskName(chainId)}`->React.string
-                  | _ => `Click on the network you're currently connected to.`->React.string
+                    `Click on the ${metamaskDefaultChainIdsToMetamaskName(
+                        chainId,
+                      )} dropdown`->React.string
+                  | _ => `Click on the dropdown for the network you're connected to.`->React.string
                   }}
                 </li>
                 <li> {`Select ${Config.networkName}`->React.string} </li>

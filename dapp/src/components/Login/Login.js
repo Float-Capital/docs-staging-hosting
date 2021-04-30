@@ -72,7 +72,7 @@ function metamaskDefaultChainIdsToMetamaskName(chainId) {
     case 4 :
         return "Rinkeby Test Network";
     case 5 :
-        return "Goerli";
+        return "Goerli Test Network";
     
   }
 }
@@ -133,8 +133,8 @@ function Login(Props) {
                               }, "FLOAT"), "first connect to " + Config.networkName), Belt_SetInt.has(metamaskDefaultChainIds, Config.networkId) ? React.createElement("div", undefined, React.createElement("ul", {
                                   className: "list-decimal pl-10"
                                 }, React.createElement("li", undefined, "Open MetaMask"), React.createElement("li", undefined, metamaskChainId !== undefined ? (
-                                        Belt_SetInt.has(metamaskDefaultChainIds, metamaskChainId) ? "Click on " + metamaskDefaultChainIdsToMetamaskName(metamaskChainId) : "Click on the network you're currently connected to."
-                                      ) : "Click on the network you're currently connected to."), React.createElement("li", undefined, "Select " + Config.networkName))) : React.createElement(AddNetworkToMetamask.make, {}))));
+                                        Belt_SetInt.has(metamaskDefaultChainIds, metamaskChainId) ? "Click on the " + metamaskDefaultChainIdsToMetamaskName(metamaskChainId) + " dropdown" : "Click on the dropdown for the network you're connected to."
+                                      ) : "Click on the dropdown for the network you're connected to."), React.createElement("li", undefined, "Select " + Config.networkName))) : React.createElement(AddNetworkToMetamask.make, {}))));
   }
 }
 
