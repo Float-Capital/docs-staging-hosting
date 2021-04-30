@@ -70,11 +70,31 @@ module UserTotalInvestedCard = {
       | Loading => <div className="m-auto"> <MiniLoader /> </div>
       | GraphError(string) => string->React.string
       | Response({totalBalance}) =>
-        <UserTotalInvested
-          totalInvested={totalBalance->Ethers.BigNumber.add(totalStakedValue.contents)}
+        <UserTotalValue
+          totalValueName=`Invested`
+          totalValue={totalBalance->Ethers.BigNumber.add(totalStakedValue.contents)}
         />
       }}
     </>
+  }
+}
+
+module UserTotalStakedCard = {
+  @react.component
+  let make = (~stakes) => {
+    let totalStakedValue = ref(CONSTANTS.zeroBN)
+
+    Array.forEach(stakes, (stake: Queries.CurrentStakeDetailed.t) => {
+      let syntheticToken = stake.currentStake.syntheticToken
+      let price = syntheticToken.latestPrice.price.price
+      let value =
+        stake.currentStake.amount
+        ->Ethers.BigNumber.mul(price)
+        ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
+      totalStakedValue := totalStakedValue.contents->Ethers.BigNumber.add(value)
+    })
+
+    <UserTotalValue totalValueName=`Staked` totalValue={totalStakedValue.contents} />
   }
 }
 
@@ -130,7 +150,10 @@ module User = {
           <UserTotalInvestedCard stakes={data.stakes} userId={data.user} />
           <UserBalancesCard userId={data.user} />
         </Divider>
-        <Divider> <UserStakesCard stakes={data.stakes} userId={data.user} /> </Divider>
+        <Divider>
+          <UserTotalStakedCard stakes={data.stakes} />
+          <UserStakesCard stakes={data.stakes} userId={data.user} />
+        </Divider>
       </Container>
     </UserContainer>
   }
