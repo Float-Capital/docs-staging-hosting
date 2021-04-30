@@ -33,6 +33,6 @@ contract Treasury_v0 is Initializable {
         admin = _admin;
     }
 
-    /** To be upgraded in future allowing goverenance of treasury 
+    /** To be upgraded in future allowing governance of treasury 
     and function to buy and burn FLOAT off open market using DEX */
 }

@@ -1,4 +1,7 @@
-import { SyntheticTokenCreated } from "../generated-price-history/LongShort/LongShort";
+import {
+  SyntheticTokenCreated,
+  OracleUpdated,
+} from "../generated-price-history/LongShort/LongShort";
 import { OracleManager } from "../generated-price-history/templates/OracleManager/OracleManager";
 import {
   Global,
@@ -32,7 +35,28 @@ export function createOracle(
   oracle.marketName = marketName;
   oracle.marketSymbol = marketSymbol;
   oracle.latestPrice = latestPrice;
+  oracle.active = true;
   oracle.priceIntervals = [];
+
+  return oracle as Oracle;
+}
+
+export function updateOracle(
+  oldOracleAddress: Address,
+  newOracleAddress: Address
+): Oracle {
+  let prevOracle = Oracle.load(oldOracleAddress.toHexString());
+  prevOracle.active = false;
+  prevOracle.save();
+
+  let oracle = new Oracle(newOracleAddress.toHex());
+  oracle.address = newOracleAddress;
+  oracle.marketIndex = prevOracle.marketIndex;
+  oracle.marketName = prevOracle.marketName;
+  oracle.marketSymbol = prevOracle.marketSymbol;
+  oracle.latestPrice = prevOracle.latestPrice;
+  oracle.active = true;
+  oracle.priceIntervals = prevOracle.priceIntervals;
 
   return oracle as Oracle;
 }
@@ -150,6 +174,20 @@ export function handleSyntheticTokenCreated(
   oracle.save();
 }
 
+export function handleMarketOracleUpdated(event: OracleUpdated): void {
+  let state = getOrCreateGlobalState();
+  let oldOracleAddress = event.params.oldOracleAddress;
+  let newOracleAddress = event.params.newOracleAddress;
+  let oracle = updateOracle(oldOracleAddress, newOracleAddress);
+  oracle.save();
+
+  let stateOracles = state.oracles;
+  stateOracles.push(oracle.id);
+  state.oracles = stateOracles;
+
+  state.save();
+}
+
 export function handleBlock(block: ethereum.Block): void {
   let state = getOrCreateGlobalState();
   let timestamp = block.timestamp;
@@ -161,63 +199,68 @@ export function handleBlock(block: ethereum.Block): void {
     if (oracle == null) {
       log.critical("Oracle with address {} is undefined", [currentOracleId]);
     }
-
-    let oraclePriceIntervals = oracle.priceIntervals;
-    for (let i = 0; i < oraclePriceIntervals.length; ++i) {
-      let currentPriceIntervalManagerId = oraclePriceIntervals[i];
-      let priceIntervalManager = PriceIntervalManager.load(
-        currentPriceIntervalManagerId
-      );
-      if (priceIntervalManager == null) {
-        log.critical(
-          "The PriceIntervalManager for oracle {} with id {} is undefined",
-          [currentOracleId, currentPriceIntervalManagerId]
+    if (oracle.active == true) {
+      let oraclePriceIntervals = oracle.priceIntervals;
+      for (let i = 0; i < oraclePriceIntervals.length; ++i) {
+        let currentPriceIntervalManagerId = oraclePriceIntervals[i];
+        let priceIntervalManager = PriceIntervalManager.load(
+          currentPriceIntervalManagerId
         );
-      }
-      let latestPriceInterval = PriceInterval.load(
-        priceIntervalManager.latestPriceInterval
-      );
-      if (latestPriceInterval == null) {
-        log.critical("The latest PriceInterval with id {} is undefined", [
-          priceIntervalManager.latestPriceInterval,
-        ]);
-      }
-
-      let currentOraclePrice = getLatestOraclePrice(oracle.address as Address);
-
-      oracle.latestPrice = currentOraclePrice;
-
-      // FIVE_MINUTES_IN_SECONDS;
-      let currentPriceIndex = timestamp.div(latestPriceInterval.intervalLength);
-      if (currentPriceIndex.equals(latestPriceInterval.intervalIndex)) {
-        let newNumberOfBlocksInInterval = latestPriceInterval.numberOfBlocksInInterval.plus(
-          ONE
+        if (priceIntervalManager == null) {
+          log.critical(
+            "The PriceIntervalManager for oracle {} with id {} is undefined",
+            [currentOracleId, currentPriceIntervalManagerId]
+          );
+        }
+        let latestPriceInterval = PriceInterval.load(
+          priceIntervalManager.latestPriceInterval
         );
-        latestPriceInterval.endPrice = currentOraclePrice;
-        latestPriceInterval.averagePrice = latestPriceInterval.averagePrice
-          .times(latestPriceInterval.numberOfBlocksInInterval)
-          .plus(currentOraclePrice)
-          .div(newNumberOfBlocksInInterval);
-        latestPriceInterval.numberOfBlocksInInterval = newNumberOfBlocksInInterval;
-        latestPriceInterval.intervalComplete = false;
+        if (latestPriceInterval == null) {
+          log.critical("The latest PriceInterval with id {} is undefined", [
+            priceIntervalManager.latestPriceInterval,
+          ]);
+        }
 
-        latestPriceInterval.save();
-      } else {
-        let nextIntervalPrice = createPriceInterval(
-          timestamp,
-          oracle.id,
-          priceIntervalManager.intervalLength,
-          currentOraclePrice
+        let currentOraclePrice = getLatestOraclePrice(
+          oracle.address as Address
         );
-        priceIntervalManager.prices = priceIntervalManager.prices.concat([
-          nextIntervalPrice.id,
-        ]);
-        priceIntervalManager.latestPriceInterval = nextIntervalPrice.id;
-        nextIntervalPrice.save();
-        priceIntervalManager.save();
-      }
 
-      oracle.save();
+        oracle.latestPrice = currentOraclePrice;
+
+        // FIVE_MINUTES_IN_SECONDS;
+        let currentPriceIndex = timestamp.div(
+          latestPriceInterval.intervalLength
+        );
+        if (currentPriceIndex.equals(latestPriceInterval.intervalIndex)) {
+          let newNumberOfBlocksInInterval = latestPriceInterval.numberOfBlocksInInterval.plus(
+            ONE
+          );
+          latestPriceInterval.endPrice = currentOraclePrice;
+          latestPriceInterval.averagePrice = latestPriceInterval.averagePrice
+            .times(latestPriceInterval.numberOfBlocksInInterval)
+            .plus(currentOraclePrice)
+            .div(newNumberOfBlocksInInterval);
+          latestPriceInterval.numberOfBlocksInInterval = newNumberOfBlocksInInterval;
+          latestPriceInterval.intervalComplete = false;
+
+          latestPriceInterval.save();
+        } else {
+          let nextIntervalPrice = createPriceInterval(
+            timestamp,
+            oracle.id,
+            priceIntervalManager.intervalLength,
+            currentOraclePrice
+          );
+          priceIntervalManager.prices = priceIntervalManager.prices.concat([
+            nextIntervalPrice.id,
+          ]);
+          priceIntervalManager.latestPriceInterval = nextIntervalPrice.id;
+          nextIntervalPrice.save();
+          priceIntervalManager.save();
+        }
+
+        oracle.save();
+      }
     }
   }
 }
