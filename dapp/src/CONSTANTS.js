@@ -9,11 +9,17 @@ var zeroAddress = Ethers.utils.getAddress(zeroAddressStr);
 
 var zeroBN = Ethers.BigNumber.from(0);
 
+var tenToThe5 = Ethers.BigNumber.from("100000");
+
 var tenToThe6 = Ethers.BigNumber.from("1000000");
 
 var tenToThe9 = Ethers.BigNumber.from("1000000000");
 
 var tenToThe18 = Ethers.BigNumber.from("1000000000000000000");
+
+var oneHundredThousandInWei = tenToThe18.mul(tenToThe5);
+
+var oneMillionInWei = tenToThe18.mul(tenToThe6);
 
 var tenToThe42 = tenToThe6.mul(tenToThe18).mul(tenToThe18);
 
@@ -42,9 +48,12 @@ var oneYearInSeconds = 31536000;
 exports.zeroAddressStr = zeroAddressStr;
 exports.zeroAddress = zeroAddress;
 exports.zeroBN = zeroBN;
+exports.tenToThe5 = tenToThe5;
 exports.tenToThe6 = tenToThe6;
 exports.tenToThe9 = tenToThe9;
 exports.tenToThe18 = tenToThe18;
+exports.oneHundredThousandInWei = oneHundredThousandInWei;
+exports.oneMillionInWei = oneMillionInWei;
 exports.tenToThe42 = tenToThe42;
 exports.oneHundredEth = oneHundredEth;
 exports.fiveMinutesInSeconds = fiveMinutesInSeconds;

@@ -48,6 +48,35 @@ module UserBalancesCard = {
     </UserColumnCard>
   }
 }
+module UserTotalInvestedCard = {
+  @react.component
+  let make = (~stakes, ~userId) => {
+    let usersTokensQuery = DataHooks.useUsersBalances(~userId)
+
+    let totalStakedValue = ref(CONSTANTS.zeroBN)
+
+    Array.forEach(stakes, (stake: Queries.CurrentStakeDetailed.t) => {
+      let syntheticToken = stake.currentStake.syntheticToken
+      let price = syntheticToken.latestPrice.price.price
+      let value =
+        stake.currentStake.amount
+        ->Ethers.BigNumber.mul(price)
+        ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
+      totalStakedValue := totalStakedValue.contents->Ethers.BigNumber.add(value)
+    })
+
+    <>
+      {switch usersTokensQuery {
+      | Loading => <div className="m-auto"> <MiniLoader /> </div>
+      | GraphError(string) => string->React.string
+      | Response({totalBalance}) =>
+        <UserTotalInvested
+          totalInvested={totalBalance->Ethers.BigNumber.add(totalStakedValue.contents)}
+        />
+      }}
+    </>
+  }
+}
 
 module UserProfileCard = {
   @react.component
@@ -97,7 +126,10 @@ module User = {
           <UserProfileCard userInfo={data.userInfo} />
           <UserFloatCard userId={data.user} stakes={data.stakes} />
         </Divider>
-        <Divider> <UserBalancesCard userId={data.user} /> </Divider>
+        <Divider>
+          <UserTotalInvestedCard stakes={data.stakes} userId={data.user} />
+          <UserBalancesCard userId={data.user} />
+        </Divider>
         <Divider> <UserStakesCard stakes={data.stakes} userId={data.user} /> </Divider>
       </Container>
     </UserContainer>

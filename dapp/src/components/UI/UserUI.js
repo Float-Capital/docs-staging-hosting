@@ -4,6 +4,7 @@
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Button = require("./Button.js");
+var Config = require("../../Config.js");
 var Ethers = require("../../ethereum/Ethers.js");
 var Ethers$1 = require("ethers");
 var Globals = require("../../libraries/Globals.js");
@@ -33,18 +34,29 @@ var UserContainer = {
   make: UserUI$UserContainer
 };
 
-function UserUI$UserBanner(Props) {
+function UserUI$UserTotalInvested(Props) {
+  var totalInvested = Props.totalInvested;
+  var isABaller = totalInvested.gte(CONSTANTS.oneHundredThousandInWei);
+  var isAWhale = totalInvested.gte(CONSTANTS.oneMillionInWei);
   return React.createElement("div", {
-              className: "p-5 mt-7 flex bg-white bg-opacity-75 rounded-lg shadow-lg"
-            }, React.createElement("span", {
-                  className: "text-sm"
-                }, "💲 BUSD Balance: $1234.todo"), React.createElement("span", {
-                  className: "text-sm ml-20"
-                }, "🏦 Total Value in Float: $1234.todo"));
+              className: "p-5 mb-5 flex items-center justify-between bg-white bg-opacity-75 rounded-lg shadow-lg"
+            }, React.createElement("div", {
+                  className: "flex flex-col"
+                }, React.createElement("span", {
+                      className: "text-lg font-bold leading-tight"
+                    }, "Total"), React.createElement("span", {
+                      className: "text-lg font-bold leading-tight"
+                    }, "Invested")), React.createElement("div", undefined, React.createElement("span", {
+                      className: (
+                        isABaller ? "text-xl" : "text-2xl"
+                      ) + " text-primary"
+                    }, FormatMoney.formatEther(isAWhale ? 0 : 2, totalInvested)), React.createElement("span", {
+                      className: "text-sm text-gray-400 ml-1"
+                    }, Config.paymentTokenName)));
 }
 
-var UserBanner = {
-  make: UserUI$UserBanner
+var UserTotalInvested = {
+  make: UserUI$UserTotalInvested
 };
 
 function UserUI$UserColumnContainer(Props) {
@@ -480,7 +492,7 @@ var UserFloatCard = {
 };
 
 exports.UserContainer = UserContainer;
-exports.UserBanner = UserBanner;
+exports.UserTotalInvested = UserTotalInvested;
 exports.UserColumnContainer = UserColumnContainer;
 exports.UserColumn = UserColumn;
 exports.UserColumnCard = UserColumnCard;

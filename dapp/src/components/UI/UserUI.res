@@ -7,14 +7,29 @@ module UserContainer = {
   }
 }
 
-module UserBanner = {
+module UserTotalInvested = {
   @react.component
-  let make = () => {
-    <div className=`p-5 mt-7 flex bg-white bg-opacity-75 rounded-lg shadow-lg`>
-      <span className=`text-sm`> {`💲 BUSD Balance: $1234.todo`->React.string} </span>
-      <span className=`text-sm ml-20`>
-        {`🏦 Total Value in Float: $1234.todo`->React.string}
-      </span>
+  let make = (~totalInvested) => {
+    let isABaller = totalInvested->Ethers.BigNumber.gte(CONSTANTS.oneHundredThousandInWei) // in the 100 000+ range
+    let isAWhale = totalInvested->Ethers.BigNumber.gte(CONSTANTS.oneMillionInWei) // in the 1 000 000+ range
+    let shouldBeSmallerText = isABaller
+    let shouldntHaveDecimals = isAWhale
+    <div
+      className=`p-5 mb-5 flex items-center justify-between bg-white bg-opacity-75 rounded-lg shadow-lg`>
+      <div className="flex flex-col">
+        <span className=`text-lg font-bold leading-tight`> {`Total`->React.string} </span>
+        <span className=`text-lg font-bold leading-tight`> {`Invested`->React.string} </span>
+      </div>
+      <div>
+        <span className={`${shouldBeSmallerText ? "text-xl" : "text-2xl"} text-primary`}>
+          {totalInvested
+          ->FormatMoney.formatEther(~digits={shouldntHaveDecimals ? 0 : 2})
+          ->React.string}
+        </span>
+        <span className=`text-sm text-gray-400 ml-1`>
+          {Config.paymentTokenName->React.string}
+        </span>
+      </div>
     </div>
   }
 }
