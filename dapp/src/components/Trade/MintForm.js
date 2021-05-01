@@ -566,7 +566,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                           
                         }),
                       children: buttonText,
-                      disabled: buttonDisabled
+                      disabled: true
                     }));
     }
     exit = 1;
@@ -585,7 +585,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                               
                             }),
                           children: buttonText,
-                          disabled: buttonDisabled
+                          disabled: true
                         }));
       case /* Declined */1 :
           return React.createElement(React.Fragment, undefined, Curry._1(resetFormButton, undefined));
@@ -608,7 +608,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                                   
                                 }),
                               children: buttonText,
-                              disabled: buttonDisabled
+                              disabled: true
                             }));
             }
             exit = 1;
@@ -648,7 +648,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                                 
                               }),
                             children: buttonText,
-                            disabled: buttonDisabled
+                            disabled: true
                           }));
           }
         }
@@ -666,7 +666,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                                   
                                 }),
                               children: buttonText,
-                              disabled: buttonDisabled
+                              disabled: true
                             }));
           case /* Declined */1 :
               return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
@@ -704,7 +704,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                             
                           }),
                         children: buttonText,
-                        disabled: buttonDisabled
+                        disabled: true
                       }));
     
   }

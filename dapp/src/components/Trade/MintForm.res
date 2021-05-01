@@ -59,7 +59,7 @@ module SubmitButtonAndTxTracker = {
             <p> {`Please approve your ${Config.paymentTokenName} token `->React.string} </p>
           </div>
         </Modal>
-        <Button disabled=buttonDisabled onClick={_ => ()}> {buttonText} </Button>
+        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
       </>
     | (ContractActions.SignedAndSubmitted(txHash), _) => <>
         <Modal id={2}>
@@ -69,7 +69,7 @@ module SubmitButtonAndTxTracker = {
             <ViewOnBlockExplorer txHash />
           </div>
         </Modal>
-        <Button disabled=buttonDisabled onClick={_ => ()}> {buttonText} </Button>
+        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
       </>
     | (ContractActions.Complete({transactionHash: _}), ContractActions.Created)
     | (ContractActions.Complete({transactionHash: _}), ContractActions.UnInitialised) => <>
@@ -78,7 +78,7 @@ module SubmitButtonAndTxTracker = {
             <p> {`Confirm transaction to mint ${tokenToMint}`->React.string} </p>
           </div>
         </Modal>
-        <Button disabled=buttonDisabled onClick={_ => ()}> {buttonText} </Button>
+        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
       </>
     | (ContractActions.Declined(_message), _) => <> {resetFormButton()} </>
     | (ContractActions.Failed(txHash), _) => <>
@@ -97,7 +97,7 @@ module SubmitButtonAndTxTracker = {
             <h1> {`Confirm the transaction to mint ${tokenToMint}`->React.string} </h1>
           </div>
         </Modal>
-        <Button disabled=buttonDisabled onClick={_ => ()}> {buttonText} </Button>
+        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
       </>
     | (
         ContractActions.Complete({transactionHash}),
@@ -112,7 +112,7 @@ module SubmitButtonAndTxTracker = {
             </h1>
           </div>
         </Modal>
-        <Button disabled=buttonDisabled onClick={_ => ()}> {buttonText} </Button>
+        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
       </>
     | (_, ContractActions.SignedAndSubmitted(txHash)) => <>
         <Modal id={7}>
@@ -122,7 +122,7 @@ module SubmitButtonAndTxTracker = {
             <ViewOnBlockExplorer txHash />
           </div>
         </Modal>
-        <Button disabled=buttonDisabled onClick={_ => ()}> {buttonText} </Button>
+        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
       </>
     | (_, ContractActions.Complete({transactionHash: _})) => <>
         <Modal id={8}>
