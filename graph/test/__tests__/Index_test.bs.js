@@ -3,6 +3,7 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var Queries = require("../Queries.bs.js");
+var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var StateChange = require("../StateChange.bs.js");
 var TestFramework = require("reason-test-framework/src/TestFramework.bs.js");
 
@@ -36,11 +37,37 @@ Curry._2(TestFramework.describe, "All Tests", (function (param) {
                         
                       }));
                 return Curry._2(testAsync, "should setup the correct initial data in the global state", (function (param) {
+                              var expectNotEqual = param.expectNotEqual;
                               var expectEqual = param.expectEqual;
+                              var expectTrue = param.expectTrue;
                               var callback = param.callback;
                               allStateChanges.contents.then(function (param) {
-                                    Curry._2(expectEqual, param.allV1Events.length, 1);
-                                    return Curry._1(callback, undefined);
+                                    var allV1Events = param.allV1Events;
+                                    Curry._2(expectEqual, allV1Events.length, 1);
+                                    var match = Belt_Array.getExn(allV1Events, 0);
+                                    var match$1 = match.data;
+                                    var tokenFactory = match$1.tokenFactory;
+                                    var staker = match$1.staker;
+                                    var admin = match$1.admin;
+                                    var timestamp = match.timestamp;
+                                    Queries.getGlobalStateAtBlock(match.blockNumber).then(function (result) {
+                                          if (result !== undefined) {
+                                            Curry._2(expectEqual, result.contractVersion.toString(), "1");
+                                            Curry._2(expectEqual, result.latestMarketIndex.toString(), "0");
+                                            Curry._2(expectEqual, result.totalFloatMinted.toString(), "0");
+                                            Curry._2(expectEqual, result.totalTxs.toString(), "1");
+                                            Curry._2(expectEqual, result.totalUsers.toString(), "1");
+                                            Curry._2(expectEqual, result.timestampLaunched.toString(), String(timestamp));
+                                            Curry._2(expectEqual, result.staker.address, staker);
+                                            Curry._2(expectEqual, result.tokenFactory.address, tokenFactory);
+                                            Curry._2(expectEqual, result.adminAddress, admin);
+                                            Curry._2(expectNotEqual, result.txHash, "");
+                                          } else {
+                                            Curry._1(expectTrue, false);
+                                          }
+                                          return Curry._1(callback, undefined);
+                                        });
+                                    
                                   });
                               
                             }));

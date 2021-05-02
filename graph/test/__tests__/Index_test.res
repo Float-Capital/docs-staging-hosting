@@ -23,12 +23,49 @@ describe("All Tests", ({beforeAll, testAsync}) => {
 
     testAsync("should setup the correct initial data in the global state", ({
       expectEqual,
+      expectNotEqual,
+      expectTrue,
       callback,
     }) => {
       let _ = allStateChanges.contents->JsPromise.map(({allV1Events}) => {
-        expectEqual(allV1Events->Belt.Array.length, 1)
+        expectEqual(allV1Events->Array.length, 1)
 
-        callback()
+        let {blockNumber, timestamp, data: {admin, staker, tokenFactory}} =
+          allV1Events->Array.getExn(0)
+
+        let _ = Queries.getGlobalStateAtBlock(~blockNumber)->JsPromise.map((
+          result: option<Queries.GetGlobalState.t_globalState>,
+        ) => {
+          switch result {
+          | Some({
+              contractVersion,
+              latestMarketIndex,
+              staker: {address: addressStaker},
+              tokenFactory: {address: addressTokenFactory},
+              adminAddress,
+              longShort: {id: _idLongShort}, // TODO: test that this is the same as the address that emitted this event
+              totalFloatMinted,
+              totalTxs,
+              totalGasUsed: _totalGasUsed,
+              totalUsers,
+              timestampLaunched,
+              txHash,
+            }) =>
+            expectEqual(contractVersion->BN.toString, "1")
+            expectEqual(latestMarketIndex->BN.toString, "0")
+            expectEqual(totalFloatMinted->BN.toString, "0")
+            expectEqual(totalTxs->BN.toString, "1") // Should the initializiation of the contract count as a transaction? Currently it is.
+            expectEqual(totalUsers->BN.toString, "1") // THIS IS A BUG - should be zero to start
+            // expectEqual(totalGasUsed->BN.toString, "0") // This is a BUG - counting the initialization txs gas as part of total gas used
+            expectEqual(timestampLaunched->BN.toString, timestamp->Int.toString)
+            expectEqual(addressStaker, staker)
+            expectEqual(addressTokenFactory, tokenFactory)
+            expectEqual(adminAddress, admin)
+            expectNotEqual(txHash, "")
+          | None => expectTrue(false)
+          }
+          callback()
+        })
       })
     })
   })

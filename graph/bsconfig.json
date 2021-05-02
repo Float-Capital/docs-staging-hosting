@@ -9,7 +9,8 @@
     "templateTagImport": "gql",
     "templateTagLocation": "@apollo/client",
     "custom-fields": {
-      "BigInt": "BigInt"
+      "BigInt": "BigInt",
+      "Bytes": "Address"
     }
   },
   "package-specs": [
