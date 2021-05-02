@@ -73,3 +73,4 @@ typings/
 .graphql_ppx_cache/
 .merlin
 /lib
+.bsb.lock

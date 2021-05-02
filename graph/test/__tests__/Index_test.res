@@ -14,14 +14,14 @@ describe("All Tests", ({beforeAll, testAsync}) => {
   })
 
   describe("V1 event", ({testAsync}) => {
-    testAsync("The V1 event should occur exactly ONCE", ({expectEqual, callback}) => {
+    testAsync("should occur exactly ONCE", ({expectEqual, callback}) => {
       let _ = allStateChanges.contents->JsPromise.map(({allV1Events}) => {
         expectEqual(allV1Events->Belt.Array.length, 1)
         callback()
       })
     })
 
-    testAsync("The V1 event should setup the correct initial data in the global state", ({
+    testAsync("should setup the correct initial data in the global state", ({
       expectEqual,
       callback,
     }) => {

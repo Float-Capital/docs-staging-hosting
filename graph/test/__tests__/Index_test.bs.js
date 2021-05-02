@@ -26,7 +26,7 @@ Curry._2(TestFramework.describe, "All Tests", (function (param) {
               }));
         Curry._2(TestFramework.describe, "V1 event", (function (param) {
                 var testAsync = param.testAsync;
-                Curry._2(testAsync, "The V1 event should occur exactly ONCE", (function (param) {
+                Curry._2(testAsync, "should occur exactly ONCE", (function (param) {
                         var expectEqual = param.expectEqual;
                         var callback = param.callback;
                         allStateChanges.contents.then(function (param) {
@@ -35,7 +35,7 @@ Curry._2(TestFramework.describe, "All Tests", (function (param) {
                             });
                         
                       }));
-                return Curry._2(testAsync, "The V1 event should setup the correct initial data in the global state", (function (param) {
+                return Curry._2(testAsync, "should setup the correct initial data in the global state", (function (param) {
                               var expectEqual = param.expectEqual;
                               var callback = param.callback;
                               allStateChanges.contents.then(function (param) {

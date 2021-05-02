@@ -16,89 +16,88 @@ type tokenPriceRefreshedData = {
   longTokenPrice: BN.t,
   shortTokenPrice: BN.t,
 }
+type feesLeviedData = {marketIndex: BN.t, totalFees: BN.t}
+type syntheticTokenCreatedData = {
+  marketIndex: BN.t,
+  longTokenAddress: address,
+  shortTokenAddress: address,
+  fundToken: address,
+  assetPrice: BN.t,
+  name: string,
+  symbol: string,
+  oracleAddress: address,
+}
+type priceUpdateData = {
+  marketIndex: BN.t,
+  oldPrice: BN.t,
+  newPrice: BN.t,
+  user: address,
+}
+type longMintedData = {
+  marketIndex: BN.t,
+  depositAdded: BN.t,
+  finalDepositAmount: BN.t,
+  tokensMinted: BN.t,
+  user: address,
+}
+type shortMintedData = {
+  marketIndex: BN.t,
+  depositAdded: BN.t,
+  finalDepositAmount: BN.t,
+  tokensMinted: BN.t,
+  user: address,
+}
+type longRedeemData = {
+  marketIndex: BN.t,
+  tokensRedeemed: BN.t,
+  valueOfRedemption: BN.t,
+  finalRedeemValue: BN.t,
+  user: address,
+}
+type shortRedeemData = {
+  marketIndex: BN.t,
+  tokensRedeemed: BN.t,
+  valueOfRedemption: BN.t,
+  finalRedeemValue: BN.t,
+  user: address,
+}
+type feesChangesData = {
+  marketIndex: BN.t,
+  baseEntryFee: BN.t,
+  badLiquidityEntryFee: BN.t,
+  baseExitFee: BN.t,
+  badLiquidityExitFee: BN.t,
+}
 type unclassifiedEvent = {
   name: string,
   data: Js.Dict.t<string>,
 }
-type feesLeviedData = {marketIndex: BN.t, totalFees: BN.t}
-type syntheticTokenCreatedData = {
-  marketIndex: BN.t,
-  longTokenAddress: BN.t,
-  shortTokenAddress: BN.t,
-  fundToken: BN.t,
-  assetPrice: BN.t,
-  name: BN.t,
-  symbol: BN.t,
-  oracleAddress: BN.t,
-}
+
 type stateChanges =
   | V1(v1Data)
   | ValueLockedInSystem(valueLockedInSystemData)
   | TokenPriceRefreshed(tokenPriceRefreshedData)
   | FeesLevied(feesLeviedData)
   | SyntheticTokenCreat(syntheticTokenCreatedData)
+  | SyntheticTokenCreated(syntheticTokenCreatedData)
+  | PriceUpdate(priceUpdateData)
+  | LongMinted(longMintedData)
+  | ShortMinted(shortMintedData)
+  | LongRedeem(longRedeemData)
+  | ShortRedeem(shortRedeemData)
+  | FeesChanges(feesChangesData)
   | Unclassified(unclassifiedEvent)
+  | StakeAdded
+  | StateAdded
+  | FloatMinted
+  | DeployV1
+  | Transfer
+  | Approval
 
-/*
-    event SyntheticTokenCreated(
-        uint32 marketIndex,
-        address longTokenAddress,
-        address shortTokenAddress,
-        address fundToken,
-        uint256 assetPrice,
-        string name,
-        string symbol,
-        address oracleAddress
-    );
+let getBnParam = (paramsObject, paramName) =>
+  paramsObject->Js.Dict.get(paramName)->Option.map(BN.new_)->Option.getExn
+let getStr = (paramsObject, paramName) => paramsObject->Js.Dict.get(paramName)->Option.getExn
 
-    event PriceUpdate(
-        uint32 marketIndex,
-        uint256 oldPrice,
-        uint256 newPrice,
-        address user
-    );
-
-    event LongMinted(
-        uint32 marketIndex,
-        uint256 depositAdded,
-        uint256 finalDepositAmount,
-        uint256 tokensMinted,
-        address user
-    );
-
-    event ShortMinted(
-        uint32 marketIndex,
-        uint256 depositAdded,
-        uint256 finalDepositAmount,
-        uint256 tokensMinted,
-        address user
-    );
-
-    event LongRedeem(
-        uint32 marketIndex,
-        uint256 tokensRedeemed,
-        uint256 valueOfRedemption,
-        uint256 finalRedeemValue,
-        address user
-    );
-
-    event ShortRedeem(
-        uint32 marketIndex,
-        uint256 tokensRedeemed,
-        uint256 valueOfRedemption,
-        uint256 finalRedeemValue,
-        address user
-    );
-
-    event FeesChanges(
-        uint32 marketIndex,
-        uint256 baseEntryFee,
-        uint256 badLiquidityEntryFee,
-        uint256 baseExitFee,
-        uint256 badLiquidityExitFee
-    );
-
-*/
 let getStateChange = (
   {eventName, params}: Queries.GetAllStateChanges.t_stateChanges_txEventParamList,
 ) => {
@@ -110,10 +109,83 @@ let getStateChange = (
   switch eventName {
   | "V1" =>
     V1({
-      admin: paramsObject->Js.Dict.get("admin")->Option.getExn,
-      staker: paramsObject->Js.Dict.get("staker")->Option.getExn,
-      tokenFactory: paramsObject->Js.Dict.get("tokenFactory")->Option.getExn,
+      admin: paramsObject->getStr("admin"),
+      staker: paramsObject->getStr("staker"),
+      tokenFactory: paramsObject->getStr("tokenFactory"),
     })
+  | "ValueLockedInSystem" =>
+    ValueLockedInSystem({
+      marketIndex: paramsObject->getBnParam("marketIndex"),
+      totalValueLockedInMarket: paramsObject->getBnParam("totalValueLockedInMarket"),
+      longValue: paramsObject->getBnParam("longValue"),
+      shortValue: paramsObject->getBnParam("shortValue"),
+    })
+  | "TokenPriceRefreshed" =>
+    TokenPriceRefreshed(
+      {
+        "TODO": "This isn't implemented",
+      }->Obj.magic,
+    )
+  | "FeesLevied" =>
+    FeesLevied(
+      {
+        "TODO": "This isn't implemented",
+      }->Obj.magic,
+    )
+  | "SyntheticTokenCreat" =>
+    SyntheticTokenCreat(
+      {
+        "TODO": "This isn't implemented",
+      }->Obj.magic,
+    )
+  | "SyntheticTokenCreated" =>
+    SyntheticTokenCreated(
+      {
+        "TODO": "This isn't implemented",
+      }->Obj.magic,
+    )
+  | "PriceUpdate" =>
+    PriceUpdate(
+      {
+        "TODO": "This isn't implemented",
+      }->Obj.magic,
+    )
+  | "LongMinted" =>
+    LongMinted(
+      {
+        "TODO": "This isn't implemented",
+      }->Obj.magic,
+    )
+  | "ShortMinted" =>
+    ShortMinted(
+      {
+        "TODO": "This isn't implemented",
+      }->Obj.magic,
+    )
+  | "LongRedeem" =>
+    LongRedeem(
+      {
+        "TODO": "This isn't implemented",
+      }->Obj.magic,
+    )
+  | "ShortRedeem" =>
+    ShortRedeem(
+      {
+        "TODO": "This isn't implemented",
+      }->Obj.magic,
+    )
+  | "FeesChanges" =>
+    FeesChanges(
+      {
+        "TODO": "This isn't implemented",
+      }->Obj.magic,
+    )
+  | "StakeAdded" => StakeAdded
+  | "Transfer" => Transfer
+  | "Approval" => Approval
+  | "StateAdded" => StateAdded
+  | "FloatMinted" => FloatMinted
+  | "DeployV1" => DeployV1
   | name => Unclassified({name: name, data: paramsObject})
   }
 }
@@ -164,7 +236,11 @@ let splitIntoEventGroups = allStateChanges => allStateChanges->Js.Promise.then_(
             {blockNumber: blockNumber, timestamp: timestamp, data: stakeData, txHash: txHash},
           ]),
         }
-      | _ => currentEventGroups
+      | Unclassified(event) => {
+          ...currentEventGroups,
+          allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents->Array.concat([event]),
+        }
+      | _TODO => currentEventGroups
       }
     )
     ->Js.Promise.resolve

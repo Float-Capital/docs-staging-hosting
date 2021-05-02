@@ -20,7 +20,8 @@
     "deploy-price-history-local-kovan": "graph deploy float-capital/float-oracle-prices --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.priceHistory.kovan.yaml",
     "update-testnet-graph": "yarn codegen ; cd .. && node ./scripts/graph.js ; cd graph && yarn deploy-testnet",
     "res:start": "rescript build -w",
-    "res:clean": "rescript clean"
+    "res:clean": "rescript clean",
+    "test": "jest test"
   },
   "devDependencies": {
     "@apollo/client": "^3.3.16",
