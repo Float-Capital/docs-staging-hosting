@@ -375,7 +375,7 @@ module UserFloatCard = {
                 <UserColumnText head=`Float accruing` body={floatAccrued} />
                 <span className="ml-1">
                   <Tooltip
-                    tip="This is our best estimate at the current time, the amount issued may differ due to changes in the market balance or price of the asset."
+                    tip="This is our best estimate at the current time, the amount issued may differ due to changes in market balance or price of assets."
                   />
                 </span>
               </div>

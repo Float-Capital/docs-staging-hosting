@@ -464,7 +464,7 @@ function UserUI$UserFloatCard(Props) {
                     }), React.createElement("span", {
                       className: "ml-1"
                     }, React.createElement(Tooltip.make, {
-                          tip: "This is our best estimate at the current time, the amount issued may differ due to changes in the market balance or price of the asset."
+                          tip: "This is our best estimate at the current time, the amount issued may differ due to changes in market balance or price of assets."
                         }))), React.createElement(UserUI$UserColumnText, {
                   head: "Float balance",
                   body: floatBalance
