@@ -303,6 +303,7 @@ module UserMarketUnstake = {
       <a
         href={`${Config.blockExplorer}/tx/${creationTxHash}`}
         target="_"
+        rel="noopener noreferrer"
         className="inline text-xxs self-center">
         <i> {`${whenStr} ago`->React.string} </i>
       </a>
