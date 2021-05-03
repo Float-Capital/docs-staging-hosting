@@ -4,18 +4,19 @@
 var Curry = require("rescript/lib/js/curry.js");
 var Queries = require("../Queries.bs.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
+var Converters = require("../stateChanges/Converters.bs.js");
 var StateChange = require("../stateChanges/StateChange.bs.js");
 var TestFramework = require("reason-test-framework/src/TestFramework.bs.js");
 
 function emptyPromise(param) {
   return new Promise((function (resolve, param) {
-                return resolve(StateChange.emptyEventGroups);
+                return resolve(Converters.emptyEventGroups);
               }));
 }
 
 var allStateChanges = {
   contents: new Promise((function (resolve, param) {
-          return resolve(StateChange.emptyEventGroups);
+          return resolve(Converters.emptyEventGroups);
         }))
 };
 

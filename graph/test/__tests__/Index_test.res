@@ -1,9 +1,9 @@
 open TestFramework
 
 let emptyPromise = () =>
-  Js.Promise.make((~resolve, ~reject as _) => resolve(. StateChange.emptyEventGroups))
+  Js.Promise.make((~resolve, ~reject as _) => resolve(. Converters.emptyEventGroups))
 
-let allStateChanges: ref<JsPromise.t<StateChange.eventGroup>> = ref(emptyPromise())
+let allStateChanges: ref<JsPromise.t<Converters.eventGroup>> = ref(emptyPromise())
 
 describe("All Tests", ({beforeAll, testAsync}) => {
   beforeAll(() => {

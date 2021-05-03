@@ -4,6 +4,7 @@
 var Decco = require("decco/src/Decco.bs.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Js_json = require("rescript/lib/js/js_json.js");
+var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Belt_Result = require("rescript/lib/js/belt_Result.js");
 var ConverterTypes = require("./ConverterTypes.bs.js");
@@ -1201,6 +1202,490 @@ function covertToStateChange(eventName, paramsObject) {
   }
 }
 
+var emptyEventGroups_allTransferEvents = [];
+
+var emptyEventGroups_allPriceUpdateEvents = [];
+
+var emptyEventGroups_allTokenPriceRefreshedEvents = [];
+
+var emptyEventGroups_allValueLockedInSystemEvents = [];
+
+var emptyEventGroups_allApprovalEvents = [];
+
+var emptyEventGroups_allShortMintedEvents = [];
+
+var emptyEventGroups_allStakeAddedEvents = [];
+
+var emptyEventGroups_allStateAddedEvents = [];
+
+var emptyEventGroups_allShortRedeemEvents = [];
+
+var emptyEventGroups_allLongMintedEvents = [];
+
+var emptyEventGroups_allLongRedeemEvents = [];
+
+var emptyEventGroups_allDeployV1Events = [];
+
+var emptyEventGroups_allFeesChangesEvents = [];
+
+var emptyEventGroups_allSyntheticTokenCreatedEvents = [];
+
+var emptyEventGroups_allFloatMintedEvents = [];
+
+var emptyEventGroups_allV1Events = [];
+
+var emptyEventGroups_allUnclassifiedEvents = [];
+
+var emptyEventGroups = {
+  allTransferEvents: emptyEventGroups_allTransferEvents,
+  allPriceUpdateEvents: emptyEventGroups_allPriceUpdateEvents,
+  allTokenPriceRefreshedEvents: emptyEventGroups_allTokenPriceRefreshedEvents,
+  allValueLockedInSystemEvents: emptyEventGroups_allValueLockedInSystemEvents,
+  allApprovalEvents: emptyEventGroups_allApprovalEvents,
+  allShortMintedEvents: emptyEventGroups_allShortMintedEvents,
+  allStakeAddedEvents: emptyEventGroups_allStakeAddedEvents,
+  allStateAddedEvents: emptyEventGroups_allStateAddedEvents,
+  allShortRedeemEvents: emptyEventGroups_allShortRedeemEvents,
+  allLongMintedEvents: emptyEventGroups_allLongMintedEvents,
+  allLongRedeemEvents: emptyEventGroups_allLongRedeemEvents,
+  allDeployV1Events: emptyEventGroups_allDeployV1Events,
+  allFeesChangesEvents: emptyEventGroups_allFeesChangesEvents,
+  allSyntheticTokenCreatedEvents: emptyEventGroups_allSyntheticTokenCreatedEvents,
+  allFloatMintedEvents: emptyEventGroups_allFloatMintedEvents,
+  allV1Events: emptyEventGroups_allV1Events,
+  allUnclassifiedEvents: emptyEventGroups_allUnclassifiedEvents
+};
+
+function addEventToCorrectGrouping(currentEventGroups, param) {
+  var data = param.data;
+  var txHash = param.txHash;
+  var timestamp = param.timestamp;
+  var blockNumber = param.blockNumber;
+  switch (data.TAG | 0) {
+    case /* Unclassified */0 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: Belt_Array.concat(currentEventGroups.allUnclassifiedEvents, [data._0])
+              };
+    case /* Transfer */1 :
+        return {
+                allTransferEvents: Belt_Array.concat(currentEventGroups.allTransferEvents, [{
+                        blockNumber: blockNumber,
+                        timestamp: timestamp,
+                        txHash: txHash,
+                        data: data._0
+                      }]),
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    case /* PriceUpdate */2 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: Belt_Array.concat(currentEventGroups.allPriceUpdateEvents, [{
+                        blockNumber: blockNumber,
+                        timestamp: timestamp,
+                        txHash: txHash,
+                        data: data._0
+                      }]),
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    case /* TokenPriceRefreshed */3 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: Belt_Array.concat(currentEventGroups.allTokenPriceRefreshedEvents, [{
+                        blockNumber: blockNumber,
+                        timestamp: timestamp,
+                        txHash: txHash,
+                        data: data._0
+                      }]),
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    case /* ValueLockedInSystem */4 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: Belt_Array.concat(currentEventGroups.allValueLockedInSystemEvents, [{
+                        blockNumber: blockNumber,
+                        timestamp: timestamp,
+                        txHash: txHash,
+                        data: data._0
+                      }]),
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    case /* Approval */5 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: Belt_Array.concat(currentEventGroups.allApprovalEvents, [{
+                        blockNumber: blockNumber,
+                        timestamp: timestamp,
+                        txHash: txHash,
+                        data: data._0
+                      }]),
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    case /* ShortMinted */6 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: Belt_Array.concat(currentEventGroups.allShortMintedEvents, [{
+                        blockNumber: blockNumber,
+                        timestamp: timestamp,
+                        txHash: txHash,
+                        data: data._0
+                      }]),
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    case /* StakeAdded */7 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: Belt_Array.concat(currentEventGroups.allStakeAddedEvents, [{
+                        blockNumber: blockNumber,
+                        timestamp: timestamp,
+                        txHash: txHash,
+                        data: data._0
+                      }]),
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    case /* StateAdded */8 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: Belt_Array.concat(currentEventGroups.allStateAddedEvents, [{
+                        blockNumber: blockNumber,
+                        timestamp: timestamp,
+                        txHash: txHash,
+                        data: data._0
+                      }]),
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    case /* ShortRedeem */9 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: Belt_Array.concat(currentEventGroups.allShortRedeemEvents, [{
+                        blockNumber: blockNumber,
+                        timestamp: timestamp,
+                        txHash: txHash,
+                        data: data._0
+                      }]),
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    case /* LongMinted */10 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: Belt_Array.concat(currentEventGroups.allLongMintedEvents, [{
+                        blockNumber: blockNumber,
+                        timestamp: timestamp,
+                        txHash: txHash,
+                        data: data._0
+                      }]),
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    case /* LongRedeem */11 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: Belt_Array.concat(currentEventGroups.allLongRedeemEvents, [{
+                        blockNumber: blockNumber,
+                        timestamp: timestamp,
+                        txHash: txHash,
+                        data: data._0
+                      }]),
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    case /* DeployV1 */12 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: Belt_Array.concat(currentEventGroups.allDeployV1Events, [{
+                        blockNumber: blockNumber,
+                        timestamp: timestamp,
+                        txHash: txHash,
+                        data: data._0
+                      }]),
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    case /* FeesChanges */13 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: Belt_Array.concat(currentEventGroups.allFeesChangesEvents, [{
+                        blockNumber: blockNumber,
+                        timestamp: timestamp,
+                        txHash: txHash,
+                        data: data._0
+                      }]),
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    case /* SyntheticTokenCreated */14 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: Belt_Array.concat(currentEventGroups.allSyntheticTokenCreatedEvents, [{
+                        blockNumber: blockNumber,
+                        timestamp: timestamp,
+                        txHash: txHash,
+                        data: data._0
+                      }]),
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    case /* FloatMinted */15 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: Belt_Array.concat(currentEventGroups.allFloatMintedEvents, [{
+                        blockNumber: blockNumber,
+                        timestamp: timestamp,
+                        txHash: txHash,
+                        data: data._0
+                      }]),
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    case /* V1 */16 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: Belt_Array.concat(currentEventGroups.allV1Events, [{
+                        blockNumber: blockNumber,
+                        timestamp: timestamp,
+                        txHash: txHash,
+                        data: data._0
+                      }]),
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    
+  }
+}
+
 exports.transferData_decode = transferData_decode;
 exports.priceUpdateData_decode = priceUpdateData_decode;
 exports.tokenPriceRefreshedData_decode = tokenPriceRefreshedData_decode;
@@ -1218,4 +1703,6 @@ exports.syntheticTokenCreatedData_decode = syntheticTokenCreatedData_decode;
 exports.floatMintedData_decode = floatMintedData_decode;
 exports.v1Data_decode = v1Data_decode;
 exports.covertToStateChange = covertToStateChange;
+exports.emptyEventGroups = emptyEventGroups;
+exports.addEventToCorrectGrouping = addEventToCorrectGrouping;
 /* ConverterTypes Not a pure module */

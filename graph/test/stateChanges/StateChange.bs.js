@@ -31,44 +31,67 @@ function getAllStateChangeEvents(allStateChangesRaw) {
             });
 }
 
-var emptyEventGroups_allV1Events = [];
-
-var emptyEventGroups_allUnclassifiedEvents = [];
-
-var emptyEventGroups = {
-  allV1Events: emptyEventGroups_allV1Events,
-  allUnclassifiedEvents: emptyEventGroups_allUnclassifiedEvents
-};
+function addEventToCorrectGrouping(currentEventGroups, param) {
+  var data = param.data;
+  switch (data.TAG | 0) {
+    case /* Unclassified */0 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: currentEventGroups.allV1Events,
+                allUnclassifiedEvents: Belt_Array.concat(currentEventGroups.allUnclassifiedEvents, [data._0])
+              };
+    case /* V1 */16 :
+        return {
+                allTransferEvents: currentEventGroups.allTransferEvents,
+                allPriceUpdateEvents: currentEventGroups.allPriceUpdateEvents,
+                allTokenPriceRefreshedEvents: currentEventGroups.allTokenPriceRefreshedEvents,
+                allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents,
+                allApprovalEvents: currentEventGroups.allApprovalEvents,
+                allShortMintedEvents: currentEventGroups.allShortMintedEvents,
+                allStakeAddedEvents: currentEventGroups.allStakeAddedEvents,
+                allStateAddedEvents: currentEventGroups.allStateAddedEvents,
+                allShortRedeemEvents: currentEventGroups.allShortRedeemEvents,
+                allLongMintedEvents: currentEventGroups.allLongMintedEvents,
+                allLongRedeemEvents: currentEventGroups.allLongRedeemEvents,
+                allDeployV1Events: currentEventGroups.allDeployV1Events,
+                allFeesChangesEvents: currentEventGroups.allFeesChangesEvents,
+                allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents,
+                allFloatMintedEvents: currentEventGroups.allFloatMintedEvents,
+                allV1Events: Belt_Array.concat(currentEventGroups.allV1Events, [{
+                        blockNumber: param.blockNumber,
+                        timestamp: param.timestamp,
+                        txHash: param.txHash,
+                        data: data._0
+                      }]),
+                allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
+              };
+    default:
+      return currentEventGroups;
+  }
+}
 
 function splitIntoEventGroups(allStateChanges) {
   return allStateChanges.then(function (stateChanges) {
-              return Promise.resolve(Belt_Array.reduce(stateChanges, emptyEventGroups, (function (currentEventGroups, param) {
-                                var data = param.data;
-                                switch (data.TAG | 0) {
-                                  case /* Unclassified */0 :
-                                      return {
-                                              allV1Events: currentEventGroups.allV1Events,
-                                              allUnclassifiedEvents: Belt_Array.concat(currentEventGroups.allUnclassifiedEvents, [data._0])
-                                            };
-                                  case /* V1 */16 :
-                                      return {
-                                              allV1Events: Belt_Array.concat(currentEventGroups.allV1Events, [{
-                                                      blockNumber: param.blockNumber,
-                                                      timestamp: param.timestamp,
-                                                      txHash: param.txHash,
-                                                      data: data._0
-                                                    }]),
-                                              allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
-                                            };
-                                  default:
-                                    return currentEventGroups;
-                                }
-                              })));
+              return Promise.resolve(Belt_Array.reduce(stateChanges, Converters.emptyEventGroups, addEventToCorrectGrouping));
             });
 }
 
 exports.getStateChange = getStateChange;
 exports.getAllStateChangeEvents = getAllStateChangeEvents;
-exports.emptyEventGroups = emptyEventGroups;
+exports.addEventToCorrectGrouping = addEventToCorrectGrouping;
 exports.splitIntoEventGroups = splitIntoEventGroups;
 /* Converters Not a pure module */
