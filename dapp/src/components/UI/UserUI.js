@@ -35,18 +35,29 @@ var UserContainer = {
   make: UserUI$UserContainer
 };
 
-function UserUI$UserBanner(Props) {
+function UserUI$UserTotalValue(Props) {
+  var totalValueNameSup = Props.totalValueNameSup;
+  var totalValueNameSub = Props.totalValueNameSub;
+  var totalValue = Props.totalValue;
+  var isABaller = totalValue.gte(CONSTANTS.oneHundredThousandInWei);
+  var isAWhale = totalValue.gte(CONSTANTS.oneMillionInWei);
   return React.createElement("div", {
-              className: "p-5 mt-7 flex bg-white bg-opacity-75 rounded-lg shadow-lg"
-            }, React.createElement("span", {
-                  className: "text-sm"
-                }, "💲 BUSD Balance: $1234.todo"), React.createElement("span", {
-                  className: "text-sm ml-20"
-                }, "🏦 Total Value in Float: $1234.todo"));
+              className: "p-5 mb-5 flex items-center justify-between bg-white bg-opacity-75 rounded-lg shadow-lg"
+            }, React.createElement("div", {
+                  className: "flex flex-col"
+                }, React.createElement("span", {
+                      className: "text-lg font-bold leading-tight"
+                    }, totalValueNameSup), React.createElement("span", {
+                      className: "text-lg font-bold leading-tight"
+                    }, totalValueNameSub)), React.createElement("div", undefined, React.createElement("span", {
+                      className: (
+                        isABaller ? "text-xl" : "text-2xl"
+                      ) + " text-primary"
+                    }, "$" + FormatMoney.formatEther(isAWhale ? 0 : 2, totalValue))));
 }
 
-var UserBanner = {
-  make: UserUI$UserBanner
+var UserTotalValue = {
+  make: UserUI$UserTotalValue
 };
 
 function UserUI$UserColumnContainer(Props) {
@@ -381,9 +392,6 @@ var UserMarketUnstake = {
 function UserUI$UserStakesCard(Props) {
   var stakes = Props.stakes;
   var userId = Props.userId;
-  var totalValue = {
-    contents: CONSTANTS.zeroBN
-  };
   var stakeBoxes = stakes.map(function (stake, i) {
         var key = "user-stakes-" + String(i);
         var syntheticToken = stake.currentStake.syntheticToken;
@@ -394,7 +402,6 @@ function UserUI$UserStakesCard(Props) {
         var price = syntheticToken.latestPrice.price.price;
         var whenStr = FormatDistanceToNow(FromUnixTime(stake.currentStake.timestamp.toNumber()));
         var value = stake.currentStake.amount.mul(price).div(CONSTANTS.tenToThe18);
-        totalValue.contents = totalValue.contents.add(value);
         return React.createElement(UserUI$UserMarketBox, {
                     name: name,
                     isLong: isLong,
@@ -413,12 +420,7 @@ function UserUI$UserStakesCard(Props) {
               children: null
             }, React.createElement(UserUI$UserColumnHeader, {
                   children: "Staked assets 🔐"
-                }), React.createElement(UserUI$UserColumnTextCenter, {
-                  children: React.createElement(UserUI$UserColumnText, {
-                        head: "💰 Staked value",
-                        body: "$" + FormatMoney.formatEther(undefined, totalValue.contents)
-                      })
-                }), React.createElement("br", undefined), stakeBoxes);
+                }), stakeBoxes);
 }
 
 var UserStakesCard = {
@@ -486,7 +488,7 @@ var UserFloatCard = {
 };
 
 exports.UserContainer = UserContainer;
-exports.UserBanner = UserBanner;
+exports.UserTotalValue = UserTotalValue;
 exports.UserColumnContainer = UserColumnContainer;
 exports.UserColumn = UserColumn;
 exports.UserColumnCard = UserColumnCard;

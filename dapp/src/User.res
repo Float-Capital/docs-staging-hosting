@@ -49,6 +49,55 @@ module UserBalancesCard = {
   }
 }
 
+let getUsersTotalStakeValue = (~stakes) => {
+  let totalStakedValue = ref(CONSTANTS.zeroBN)
+
+  Array.forEach(stakes, (stake: Queries.CurrentStakeDetailed.t) => {
+    let syntheticToken = stake.currentStake.syntheticToken
+    let price = syntheticToken.latestPrice.price.price
+    let value =
+      stake.currentStake.amount
+      ->Ethers.BigNumber.mul(price)
+      ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
+    totalStakedValue := totalStakedValue.contents->Ethers.BigNumber.add(value)
+  })
+
+  totalStakedValue
+}
+
+module UserTotalInvestedCard = {
+  @react.component
+  let make = (~stakes, ~userId) => {
+    let usersTokensQuery = DataHooks.useUsersBalances(~userId)
+
+    let totalStakedValue = getUsersTotalStakeValue(~stakes)
+
+    <>
+      {switch usersTokensQuery {
+      | Loading => <div className="m-auto"> <MiniLoader /> </div>
+      | GraphError(string) => string->React.string
+      | Response({totalBalance}) =>
+        <UserTotalValue
+          totalValueNameSup=`Portfolio`
+          totalValueNameSub=`Value`
+          totalValue={totalBalance->Ethers.BigNumber.add(totalStakedValue.contents)}
+        />
+      }}
+    </>
+  }
+}
+
+module UserTotalStakedCard = {
+  @react.component
+  let make = (~stakes) => {
+    let totalStakedValue = getUsersTotalStakeValue(~stakes)
+
+    <UserTotalValue
+      totalValueNameSup=`Staked` totalValueNameSub=`Value` totalValue={totalStakedValue.contents}
+    />
+  }
+}
+
 module UserProfileCard = {
   @react.component
   let make = (~userInfo) => {
@@ -97,8 +146,14 @@ module User = {
           <UserProfileCard userInfo={data.userInfo} />
           <UserFloatCard userId={data.user} stakes={data.stakes} />
         </Divider>
-        <Divider> <UserBalancesCard userId={data.user} /> </Divider>
-        <Divider> <UserStakesCard stakes={data.stakes} userId={data.user} /> </Divider>
+        <Divider>
+          <UserTotalInvestedCard stakes={data.stakes} userId={data.user} />
+          <UserBalancesCard userId={data.user} />
+        </Divider>
+        <Divider>
+          <UserTotalStakedCard stakes={data.stakes} />
+          <UserStakesCard stakes={data.stakes} userId={data.user} />
+        </Divider>
       </Container>
     </UserContainer>
   }

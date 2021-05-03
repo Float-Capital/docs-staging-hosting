@@ -7,14 +7,26 @@ module UserContainer = {
   }
 }
 
-module UserBanner = {
+module UserTotalValue = {
   @react.component
-  let make = () => {
-    <div className=`p-5 mt-7 flex bg-white bg-opacity-75 rounded-lg shadow-lg`>
-      <span className=`text-sm`> {`💲 BUSD Balance: $1234.todo`->React.string} </span>
-      <span className=`text-sm ml-20`>
-        {`🏦 Total Value in Float: $1234.todo`->React.string}
-      </span>
+  let make = (~totalValueNameSup, ~totalValueNameSub, ~totalValue) => {
+    let isABaller = totalValue->Ethers.BigNumber.gte(CONSTANTS.oneHundredThousandInWei) // in the 100 000+ range
+    let isAWhale = totalValue->Ethers.BigNumber.gte(CONSTANTS.oneMillionInWei) // in the 1 000 000+ range
+    let shouldBeSmallerText = isABaller
+    let shouldntHaveDecimals = isAWhale
+    <div
+      className=`p-5 mb-5 flex items-center justify-between bg-white bg-opacity-75 rounded-lg shadow-lg`>
+      <div className="flex flex-col">
+        <span className=`text-lg font-bold leading-tight`> {totalValueNameSup->React.string} </span>
+        <span className=`text-lg font-bold leading-tight`> {totalValueNameSub->React.string} </span>
+      </div>
+      <div>
+        <span className={`${shouldBeSmallerText ? "text-xl" : "text-2xl"} text-primary`}>
+          {`$${totalValue->FormatMoney.formatEther(
+              ~digits={shouldntHaveDecimals ? 0 : 2},
+            )}`->React.string}
+        </span>
+      </div>
     </div>
   }
 }
@@ -297,7 +309,6 @@ module UserMarketUnstake = {
 module UserStakesCard = {
   @react.component
   let make = (~stakes, ~userId) => {
-    let totalValue = ref(CONSTANTS.zeroBN)
     let stakeBoxes = Js.Array.mapi((stake: Queries.CurrentStakeDetailed.t, i) => {
       let key = `user-stakes-${Belt.Int.toString(i)}`
       let syntheticToken = stake.currentStake.syntheticToken
@@ -316,7 +327,6 @@ module UserStakesCard = {
         stake.currentStake.amount
         ->Ethers.BigNumber.mul(price)
         ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
-      totalValue := Ethers.BigNumber.add(totalValue.contents, value)
 
       <UserMarketBox key name isLong tokens value={value->FormatMoney.formatEther}>
         <UserMarketUnstake synthAddress={addr} userId isLong whenStr />
@@ -324,14 +334,7 @@ module UserStakesCard = {
     }, stakes)->React.array
 
     <UserColumnCard>
-      <UserColumnHeader> {`Staked assets 🔐`->React.string} </UserColumnHeader>
-      <UserColumnTextCenter>
-        <UserColumnText
-          head=`💰 Staked value` body={`$${totalValue.contents->FormatMoney.formatEther}`}
-        />
-      </UserColumnTextCenter>
-      <br />
-      {stakeBoxes}
+      <UserColumnHeader> {`Staked assets 🔐`->React.string} </UserColumnHeader> {stakeBoxes}
     </UserColumnCard>
   }
 }
