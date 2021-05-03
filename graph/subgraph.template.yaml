@@ -30,6 +30,7 @@ dataSources:
           file: ./abis/LongShort.json
       eventHandlers:
         - event: V1(address,address,address)
+
           handler: handleV1
         - event: FeesLevied(uint32,uint256)
           handler: handleFeesLevied
