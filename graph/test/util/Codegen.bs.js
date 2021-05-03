@@ -8,10 +8,18 @@ var Belt_Option = require("rescript/lib/js/belt_Option.js");
 
 var allStateChangesRaw = Queries.getAllStateChanges(undefined);
 
-var filePreRamble = "type address = string\n\ntype unclassifiedEvent = {\n  name: string,\n  data: Js.Dict.t<string>,\n}";
+var filePreRamble = "open ConverterTypes";
 
 var typesString = {
   contents: ""
+};
+
+var converterStringHead = "let covertToStateChange = (eventName, paramsObject) => {\n  // TODO: throw a (descriptive) error if the array of parameters is the wrong length (or make a separate test?)\n  // TODO: turn `eventName` into a polymorphic variant (create a decoder for it) (for undefined make it #unclassified(string)\n  switch eventName {";
+
+var converterStringTail = "  | name => Unclassified({name: name, data: paramsObject})\n  }\n}";
+
+var converterString = {
+  contents: converterStringHead
 };
 
 var variantTypeString = {
@@ -28,7 +36,7 @@ function paramTypeToRescriptType(paramType) {
         return "string";
     case "uint256" :
     case "uint32" :
-        return "BN.t";
+        return "bn";
     default:
       console.log("Please handle all types - " + paramType + " isn't handled by this script.");
       return "unkownType";
@@ -49,18 +57,22 @@ allStateChangesRaw.then(function (allStateChanges) {
                                     return acc + ("\n  " + param.paramName + ": " + paramTypeToRescriptType(param.paramType) + ",");
                                   }));
                             var eventDataTypeName = lowercaseFirstLetter(eventName) + "Data";
-                            typesString.contents = typesString.contents + ("\ntype " + eventDataTypeName + " = {" + recordFields + "\n}");
+                            typesString.contents = typesString.contents + ("\n@decco.decode\ntype " + eventDataTypeName + " = {" + recordFields + "\n}");
+                            converterString.contents = converterString.contents + ("\n  | \"" + eventName + "\" => " + eventName + "(paramsObject->Js.Json.object_->" + eventDataTypeName + "_decode->Result.getExn)");
                             variantTypeString.contents = variantTypeString.contents + ("\n  | " + eventName + "(" + eventDataTypeName + ")");
                             
                           }));
             }));
-      console.log(filePreRamble + "\n" + typesString.contents + "\n\n" + variantTypeString.contents);
+      console.log(filePreRamble + "\n" + typesString.contents + "\n\n" + variantTypeString.contents + "\n\n" + converterString.contents + "\n" + converterStringTail + "\n");
       
     });
 
 exports.allStateChangesRaw = allStateChangesRaw;
 exports.filePreRamble = filePreRamble;
 exports.typesString = typesString;
+exports.converterStringHead = converterStringHead;
+exports.converterStringTail = converterStringTail;
+exports.converterString = converterString;
 exports.variantTypeString = variantTypeString;
 exports.lowercaseFirstLetter = lowercaseFirstLetter;
 exports.paramTypeToRescriptType = paramTypeToRescriptType;
