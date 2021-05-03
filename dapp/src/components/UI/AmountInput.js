@@ -17,7 +17,7 @@ function AmountInput(Props) {
   var optBalance = optBalanceOpt !== undefined ? Caml_option.valFromOption(optBalanceOpt) : undefined;
   var optCurrency = optCurrencyOpt !== undefined ? Caml_option.valFromOption(optCurrencyOpt) : undefined;
   return React.createElement("div", {
-              className: "flex flex-row my-3"
+              className: "flex flex-row my-3 shadow-md"
             }, React.createElement("input", {
                   className: "py-2 font-normal text-grey-darkest w-full py-1 px-2 outline-none text-md text-gray-600",
                   id: "amount",
