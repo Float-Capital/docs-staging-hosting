@@ -269,7 +269,7 @@ module UserMarketStakeOrRedeem = {
 
 module UserMarketUnstake = {
   @react.component
-  let make = (~synthAddress, ~userId, ~isLong, ~whenStr="") => {
+  let make = (~synthAddress, ~userId, ~isLong, ~whenStr) => {
     let synthAddressStr = synthAddress->ethAdrToLowerStr
 
     let marketIdResponse = DataHooks.useTokenMarketId(~tokenId=synthAddressStr)
