@@ -144,7 +144,7 @@ function Navigation(Props) {
   return React.createElement(React.Fragment, undefined, React.createElement("nav", {
                   className: "p-2 h-12 flex justify-between items-center text-sm"
                 }, React.createElement(Link, {
-                      href: "/",
+                      href: "/markets",
                       children: React.createElement("a", {
                             className: "flex items-center"
                           }, React.createElement("span", {

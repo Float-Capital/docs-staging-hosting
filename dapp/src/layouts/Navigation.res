@@ -79,7 +79,7 @@ let make = () => {
 
   <>
     <nav className="p-2 h-12 flex justify-between items-center text-sm">
-      <Link href="/">
+      <Link href="/markets">
         <a className="flex items-center">
           <span className="text-xl text-green-800 ml-2 align-middle font-semibold">
             <div className="logo-container">
