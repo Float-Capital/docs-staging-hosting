@@ -371,7 +371,14 @@ module UserFloatCard = {
           <div
             className=`w-11/12 px-2 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>
             <UserColumnTextList>
-              <UserColumnText head=`Float accruing` body={floatAccrued} />
+              <div className="flex">
+                <UserColumnText head=`Float accruing` body={floatAccrued} />
+                <span className="ml-1">
+                  <Tooltip
+                    tip="This is our best estimate at the current time, the amount issued may differ due to changes in the market balance or price of the asset."
+                  />
+                </span>
+              </div>
               <UserColumnText head=`Float balance` body={floatBalance} />
               <UserColumnText head=`Float minted` body={floatMinted} />
             </UserColumnTextList>
