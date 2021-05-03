@@ -4,7 +4,6 @@
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Button = require("./Button.js");
-var Config = require("../../Config.js");
 var Ethers = require("../../ethereum/Ethers.js");
 var Ethers$1 = require("ethers");
 var Globals = require("../../libraries/Globals.js");
@@ -35,7 +34,8 @@ var UserContainer = {
 };
 
 function UserUI$UserTotalValue(Props) {
-  var totalValueName = Props.totalValueName;
+  var totalValueNameSup = Props.totalValueNameSup;
+  var totalValueNameSub = Props.totalValueNameSub;
   var totalValue = Props.totalValue;
   var isABaller = totalValue.gte(CONSTANTS.oneHundredThousandInWei);
   var isAWhale = totalValue.gte(CONSTANTS.oneMillionInWei);
@@ -45,15 +45,13 @@ function UserUI$UserTotalValue(Props) {
                   className: "flex flex-col"
                 }, React.createElement("span", {
                       className: "text-lg font-bold leading-tight"
-                    }, "Total"), React.createElement("span", {
+                    }, totalValueNameSup), React.createElement("span", {
                       className: "text-lg font-bold leading-tight"
-                    }, totalValueName)), React.createElement("div", undefined, React.createElement("span", {
+                    }, totalValueNameSub)), React.createElement("div", undefined, React.createElement("span", {
                       className: (
                         isABaller ? "text-xl" : "text-2xl"
                       ) + " text-primary"
-                    }, FormatMoney.formatEther(isAWhale ? 0 : 2, totalValue)), React.createElement("span", {
-                      className: "text-sm text-gray-400 ml-1"
-                    }, Config.paymentTokenName)));
+                    }, "$" + FormatMoney.formatEther(isAWhale ? 0 : 2, totalValue))));
 }
 
 var UserTotalValue = {

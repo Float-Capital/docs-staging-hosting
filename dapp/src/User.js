@@ -76,10 +76,7 @@ var UserBalancesCard = {
   make: User$UserBalancesCard
 };
 
-function User$UserTotalInvestedCard(Props) {
-  var stakes = Props.stakes;
-  var userId = Props.userId;
-  var usersTokensQuery = DataHooks.useUsersBalances(userId);
+function getUsersTotalStakeValue(stakes) {
   var totalStakedValue = {
     contents: CONSTANTS.zeroBN
   };
@@ -90,12 +87,21 @@ function User$UserTotalInvestedCard(Props) {
           totalStakedValue.contents = totalStakedValue.contents.add(value);
           
         }));
+  return totalStakedValue;
+}
+
+function User$UserTotalInvestedCard(Props) {
+  var stakes = Props.stakes;
+  var userId = Props.userId;
+  var usersTokensQuery = DataHooks.useUsersBalances(userId);
+  var totalStakedValue = getUsersTotalStakeValue(stakes);
   var tmp;
   tmp = typeof usersTokensQuery === "number" ? React.createElement("div", {
           className: "m-auto"
         }, React.createElement(MiniLoader.make, {})) : (
       usersTokensQuery.TAG === /* GraphError */0 ? usersTokensQuery._0 : React.createElement(UserUI.UserTotalValue.make, {
-              totalValueName: "Invested",
+              totalValueNameSup: "Portfolio",
+              totalValueNameSub: "Value",
               totalValue: usersTokensQuery._0.totalBalance.add(totalStakedValue.contents)
             })
     );
@@ -108,18 +114,10 @@ var UserTotalInvestedCard = {
 
 function User$UserTotalStakedCard(Props) {
   var stakes = Props.stakes;
-  var totalStakedValue = {
-    contents: CONSTANTS.zeroBN
-  };
-  Belt_Array.forEach(stakes, (function (stake) {
-          var syntheticToken = stake.currentStake.syntheticToken;
-          var price = syntheticToken.latestPrice.price.price;
-          var value = stake.currentStake.amount.mul(price).div(CONSTANTS.tenToThe18);
-          totalStakedValue.contents = totalStakedValue.contents.add(value);
-          
-        }));
+  var totalStakedValue = getUsersTotalStakeValue(stakes);
   return React.createElement(UserUI.UserTotalValue.make, {
-              totalValueName: "Staked",
+              totalValueNameSup: "Staked",
+              totalValueNameSub: "Value",
               totalValue: totalStakedValue.contents
             });
 }
@@ -259,6 +257,7 @@ function $$default(param) {
 }
 
 exports.UserBalancesCard = UserBalancesCard;
+exports.getUsersTotalStakeValue = getUsersTotalStakeValue;
 exports.UserTotalInvestedCard = UserTotalInvestedCard;
 exports.UserTotalStakedCard = UserTotalStakedCard;
 exports.UserProfileCard = UserProfileCard;

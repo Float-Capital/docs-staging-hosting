@@ -9,7 +9,7 @@ module UserContainer = {
 
 module UserTotalValue = {
   @react.component
-  let make = (~totalValueName, ~totalValue) => {
+  let make = (~totalValueNameSup, ~totalValueNameSub, ~totalValue) => {
     let isABaller = totalValue->Ethers.BigNumber.gte(CONSTANTS.oneHundredThousandInWei) // in the 100 000+ range
     let isAWhale = totalValue->Ethers.BigNumber.gte(CONSTANTS.oneMillionInWei) // in the 1 000 000+ range
     let shouldBeSmallerText = isABaller
@@ -17,17 +17,14 @@ module UserTotalValue = {
     <div
       className=`p-5 mb-5 flex items-center justify-between bg-white bg-opacity-75 rounded-lg shadow-lg`>
       <div className="flex flex-col">
-        <span className=`text-lg font-bold leading-tight`> {`Total`->React.string} </span>
-        <span className=`text-lg font-bold leading-tight`> {totalValueName->React.string} </span>
+        <span className=`text-lg font-bold leading-tight`> {totalValueNameSup->React.string} </span>
+        <span className=`text-lg font-bold leading-tight`> {totalValueNameSub->React.string} </span>
       </div>
       <div>
         <span className={`${shouldBeSmallerText ? "text-xl" : "text-2xl"} text-primary`}>
-          {totalValue
-          ->FormatMoney.formatEther(~digits={shouldntHaveDecimals ? 0 : 2})
-          ->React.string}
-        </span>
-        <span className=`text-sm text-gray-400 ml-1`>
-          {Config.paymentTokenName->React.string}
+          {`$${totalValue->FormatMoney.formatEther(
+              ~digits={shouldntHaveDecimals ? 0 : 2},
+            )}`->React.string}
         </span>
       </div>
     </div>

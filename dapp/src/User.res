@@ -48,22 +48,29 @@ module UserBalancesCard = {
     </UserColumnCard>
   }
 }
+
+let getUsersTotalStakeValue = (~stakes) => {
+  let totalStakedValue = ref(CONSTANTS.zeroBN)
+
+  Array.forEach(stakes, (stake: Queries.CurrentStakeDetailed.t) => {
+    let syntheticToken = stake.currentStake.syntheticToken
+    let price = syntheticToken.latestPrice.price.price
+    let value =
+      stake.currentStake.amount
+      ->Ethers.BigNumber.mul(price)
+      ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
+    totalStakedValue := totalStakedValue.contents->Ethers.BigNumber.add(value)
+  })
+
+  totalStakedValue
+}
+
 module UserTotalInvestedCard = {
   @react.component
   let make = (~stakes, ~userId) => {
     let usersTokensQuery = DataHooks.useUsersBalances(~userId)
 
-    let totalStakedValue = ref(CONSTANTS.zeroBN)
-
-    Array.forEach(stakes, (stake: Queries.CurrentStakeDetailed.t) => {
-      let syntheticToken = stake.currentStake.syntheticToken
-      let price = syntheticToken.latestPrice.price.price
-      let value =
-        stake.currentStake.amount
-        ->Ethers.BigNumber.mul(price)
-        ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
-      totalStakedValue := totalStakedValue.contents->Ethers.BigNumber.add(value)
-    })
+    let totalStakedValue = getUsersTotalStakeValue(~stakes)
 
     <>
       {switch usersTokensQuery {
@@ -71,7 +78,8 @@ module UserTotalInvestedCard = {
       | GraphError(string) => string->React.string
       | Response({totalBalance}) =>
         <UserTotalValue
-          totalValueName=`Invested`
+          totalValueNameSup=`Portfolio`
+          totalValueNameSub=`Value`
           totalValue={totalBalance->Ethers.BigNumber.add(totalStakedValue.contents)}
         />
       }}
@@ -82,19 +90,11 @@ module UserTotalInvestedCard = {
 module UserTotalStakedCard = {
   @react.component
   let make = (~stakes) => {
-    let totalStakedValue = ref(CONSTANTS.zeroBN)
+    let totalStakedValue = getUsersTotalStakeValue(~stakes)
 
-    Array.forEach(stakes, (stake: Queries.CurrentStakeDetailed.t) => {
-      let syntheticToken = stake.currentStake.syntheticToken
-      let price = syntheticToken.latestPrice.price.price
-      let value =
-        stake.currentStake.amount
-        ->Ethers.BigNumber.mul(price)
-        ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
-      totalStakedValue := totalStakedValue.contents->Ethers.BigNumber.add(value)
-    })
-
-    <UserTotalValue totalValueName=`Staked` totalValue={totalStakedValue.contents} />
+    <UserTotalValue
+      totalValueNameSup=`Staked` totalValueNameSub=`Value` totalValue={totalStakedValue.contents}
+    />
   }
 }
 
