@@ -4,18 +4,19 @@
 var Curry = require("rescript/lib/js/curry.js");
 var Queries = require("../Queries.bs.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var StateChange = require("../StateChange.bs.js");
+var Converters = require("../stateChanges/Converters.bs.js");
+var StateChange = require("../stateChanges/StateChange.bs.js");
 var TestFramework = require("reason-test-framework/src/TestFramework.bs.js");
 
 function emptyPromise(param) {
   return new Promise((function (resolve, param) {
-                return resolve(StateChange.emptyEventGroups);
+                return resolve(Converters.emptyEventGroups);
               }));
 }
 
 var allStateChanges = {
   contents: new Promise((function (resolve, param) {
-          return resolve(StateChange.emptyEventGroups);
+          return resolve(Converters.emptyEventGroups);
         }))
 };
 
@@ -46,8 +47,8 @@ Curry._2(TestFramework.describe, "All Tests", (function (param) {
                                     Curry._2(expectEqual, allV1Events.length, 1);
                                     var match = Belt_Array.getExn(allV1Events, 0);
                                     var match$1 = match.data;
-                                    var tokenFactory = match$1.tokenFactory;
                                     var staker = match$1.staker;
+                                    var tokenFactory = match$1.tokenFactory;
                                     var admin = match$1.admin;
                                     var timestamp = match.timestamp;
                                     Queries.getGlobalStateAtBlock(match.blockNumber).then(function (result) {

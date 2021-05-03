@@ -23,12 +23,12 @@
     "-open Belt"
   ],
   "ppx-flags": [
-    "@reasonml-community/graphql-ppx/ppx"
+    "@reasonml-community/graphql-ppx/ppx",
+    "decco/ppx"
   ],
   "reason": {
     "react-jsx": 3
   },
-  "refmt": 3,
   "sources": [
     {
       "dir": "test",
@@ -39,6 +39,7 @@
   "bs-dependencies": [
     "rescript-apollo-client",
     "@reasonml-community/graphql-ppx",
-    "reason-test-framework"
+    "reason-test-framework",
+    "decco"
   ]
 }

@@ -4,13 +4,13 @@
 var BnJs = require("bn.js");
 var Js_json = require("rescript/lib/js/js_json.js");
 
-function parse(json) {
+function jsonToBigInt(json) {
   var str = Js_json.decodeString(json);
   if (str !== undefined) {
     return new BnJs(str);
   } else {
     console.log("CRITICAL - should never happen!");
-    return new BnJs(0);
+    return new BnJs("0");
   }
 }
 
@@ -19,11 +19,11 @@ function serialize(bn) {
 }
 
 var $$BigInt = {
-  parse: parse,
+  parse: jsonToBigInt,
   serialize: serialize
 };
 
-function parse$1(json) {
+function parse(json) {
   var address = Js_json.decodeString(json);
   if (address !== undefined) {
     return address;
@@ -38,10 +38,11 @@ function serialize$1(bytesString) {
 }
 
 var Address = {
-  parse: parse$1,
+  parse: parse,
   serialize: serialize$1
 };
 
+exports.jsonToBigInt = jsonToBigInt;
 exports.$$BigInt = $$BigInt;
 exports.Address = Address;
 /* bn.js Not a pure module */
