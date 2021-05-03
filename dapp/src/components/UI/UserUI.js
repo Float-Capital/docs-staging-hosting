@@ -4,6 +4,7 @@
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Button = require("./Button.js");
+var Config = require("../../Config.js");
 var Ethers = require("../../ethereum/Ethers.js");
 var Ethers$1 = require("ethers");
 var Globals = require("../../libraries/Globals.js");
@@ -361,6 +362,7 @@ function UserUI$UserMarketUnstake(Props) {
   var userId = Props.userId;
   var isLong = Props.isLong;
   var whenStr = Props.whenStr;
+  var creationTxHash = Props.creationTxHash;
   var synthAddressStr = Globals.ethAdrToLowerStr(synthAddress);
   var marketIdResponse = DataHooks.useTokenMarketId(synthAddressStr);
   var marketId = Belt_Option.getWithDefault(DataHooks.Util.graphResponseToOption(marketIdResponse), "1");
@@ -377,8 +379,10 @@ function UserUI$UserMarketUnstake(Props) {
         }));
   return React.createElement("div", {
               className: "flex flex-col"
-            }, React.createElement("span", {
-                  className: "text-xxs self-center"
+            }, React.createElement("a", {
+                  className: "inline text-xxs self-center",
+                  href: Config.blockExplorer + "/tx/" + creationTxHash,
+                  target: "_"
                 }, React.createElement("i", undefined, whenStr + " ago")), isCurrentUser ? React.createElement(Button.Tiny.make, {
                     onClick: unstake,
                     children: "unstake"
@@ -402,6 +406,7 @@ function UserUI$UserStakesCard(Props) {
         var price = syntheticToken.latestPrice.price.price;
         var whenStr = FormatDistanceToNow(FromUnixTime(stake.currentStake.timestamp.toNumber()));
         var value = stake.currentStake.amount.mul(price).div(CONSTANTS.tenToThe18);
+        var creationTxHash = stake.currentStake.creationTxHash;
         return React.createElement(UserUI$UserMarketBox, {
                     name: name,
                     isLong: isLong,
@@ -411,7 +416,8 @@ function UserUI$UserStakesCard(Props) {
                           synthAddress: addr,
                           userId: userId,
                           isLong: isLong,
-                          whenStr: whenStr
+                          whenStr: whenStr,
+                          creationTxHash: creationTxHash
                         }),
                     key: key
                   });
