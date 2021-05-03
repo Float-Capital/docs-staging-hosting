@@ -269,7 +269,7 @@ module UserMarketStakeOrRedeem = {
 
 module UserMarketUnstake = {
   @react.component
-  let make = (~synthAddress, ~userId, ~isLong) => {
+  let make = (~synthAddress, ~userId, ~isLong, ~whenStr) => {
     let synthAddressStr = synthAddress->ethAdrToLowerStr
 
     let marketIdResponse = DataHooks.useTokenMarketId(~tokenId=synthAddressStr)
@@ -288,7 +288,7 @@ module UserMarketUnstake = {
       optLoggedInUser->Option.mapWithDefault(false, user => user->ethAdrToLowerStr == userId)
 
     <div className=`flex flex-col`>
-      <span className="text-xxs self-center"> <i> {`4 days ago`->React.string} </i> </span>
+      <span className="text-xxs self-center"> <i> {`${whenStr} ago`->React.string} </i> </span>
       {isCurrentUser ? <Button.Tiny onClick={unstake}> {`unstake`} </Button.Tiny> : React.null}
     </div>
   }
@@ -306,6 +306,12 @@ module UserStakesCard = {
       let tokens = stake.currentStake.amount->FormatMoney.formatEther
       let isLong = syntheticToken.tokenType->Obj.magic == "Long"
       let price = syntheticToken.latestPrice.price.price
+      let whenStr =
+        stake.currentStake.timestamp
+        ->Ethers.BigNumber.toNumber
+        ->Js.Int.toFloat
+        ->DateFns.fromUnixTime
+        ->DateFns.formatDistanceToNow
       let value =
         stake.currentStake.amount
         ->Ethers.BigNumber.mul(price)
@@ -313,7 +319,7 @@ module UserStakesCard = {
       totalValue := Ethers.BigNumber.add(totalValue.contents, value)
 
       <UserMarketBox key name isLong tokens value={value->FormatMoney.formatEther}>
-        <UserMarketUnstake synthAddress={addr} userId isLong />
+        <UserMarketUnstake synthAddress={addr} userId isLong whenStr />
       </UserMarketBox>
     }, stakes)->React.array
 
