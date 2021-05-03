@@ -23,101 +23,92 @@ function getStateChange(param) {
           paramsObject[param.paramName] = param.param;
           
         }));
+  var unimplementedPlaceholder = {
+    TODO: "This isn't implemented"
+  };
   switch (eventName) {
     case "Approval" :
-        return /* Approval */5;
+        return {
+                TAG: /* Approval */5,
+                _0: unimplementedPlaceholder
+              };
     case "DeployV1" :
-        return /* DeployV1 */3;
+        return {
+                TAG: /* DeployV1 */12,
+                _0: unimplementedPlaceholder
+              };
     case "FeesChanges" :
         return {
-                TAG: /* FeesChanges */11,
-                _0: {
-                  TODO: "This isn't implemented"
-                }
-              };
-    case "FeesLevied" :
-        return {
-                TAG: /* FeesLevied */3,
-                _0: {
-                  TODO: "This isn't implemented"
-                }
+                TAG: /* FeesChanges */13,
+                _0: unimplementedPlaceholder
               };
     case "FloatMinted" :
-        return /* FloatMinted */2;
+        return {
+                TAG: /* FloatMinted */15,
+                _0: unimplementedPlaceholder
+              };
     case "LongMinted" :
         return {
-                TAG: /* LongMinted */7,
-                _0: {
-                  TODO: "This isn't implemented"
-                }
+                TAG: /* LongMinted */10,
+                _0: unimplementedPlaceholder
               };
     case "LongRedeem" :
         return {
-                TAG: /* LongRedeem */9,
-                _0: {
-                  TODO: "This isn't implemented"
-                }
+                TAG: /* LongRedeem */11,
+                _0: unimplementedPlaceholder
               };
     case "PriceUpdate" :
         return {
-                TAG: /* PriceUpdate */6,
-                _0: {
-                  TODO: "This isn't implemented"
-                }
+                TAG: /* PriceUpdate */2,
+                _0: unimplementedPlaceholder
               };
     case "ShortMinted" :
         return {
-                TAG: /* ShortMinted */8,
-                _0: {
-                  TODO: "This isn't implemented"
-                }
+                TAG: /* ShortMinted */6,
+                _0: unimplementedPlaceholder
               };
     case "ShortRedeem" :
         return {
-                TAG: /* ShortRedeem */10,
-                _0: {
-                  TODO: "This isn't implemented"
-                }
+                TAG: /* ShortRedeem */9,
+                _0: unimplementedPlaceholder
               };
     case "StakeAdded" :
-        return /* StakeAdded */0;
-    case "StateAdded" :
-        return /* StateAdded */1;
-    case "SyntheticTokenCreat" :
         return {
-                TAG: /* SyntheticTokenCreat */4,
-                _0: {
-                  TODO: "This isn't implemented"
-                }
+                TAG: /* StakeAdded */7,
+                _0: unimplementedPlaceholder
+              };
+    case "StateAdded" :
+        return {
+                TAG: /* StateAdded */8,
+                _0: unimplementedPlaceholder
               };
     case "SyntheticTokenCreated" :
         return {
-                TAG: /* SyntheticTokenCreated */5,
-                _0: {
-                  TODO: "This isn't implemented"
-                }
+                TAG: /* SyntheticTokenCreated */14,
+                _0: unimplementedPlaceholder
               };
     case "TokenPriceRefreshed" :
         return {
-                TAG: /* TokenPriceRefreshed */2,
-                _0: {
-                  TODO: "This isn't implemented"
-                }
+                TAG: /* TokenPriceRefreshed */3,
+                _0: unimplementedPlaceholder
               };
     case "Transfer" :
-        return /* Transfer */4;
+        return {
+                TAG: /* Transfer */1,
+                _0: unimplementedPlaceholder
+              };
     case "V1" :
         return {
-                TAG: /* V1 */0,
+                TAG: /* V1 */16,
                 _0: {
                   admin: Belt_Option.getExn(Js_dict.get(paramsObject, "admin")),
-                  staker: Belt_Option.getExn(Js_dict.get(paramsObject, "staker")),
-                  tokenFactory: Belt_Option.getExn(Js_dict.get(paramsObject, "tokenFactory"))
+                  tokenFactory: Belt_Option.getExn(Js_dict.get(paramsObject, "tokenFactory")),
+                  staker: Belt_Option.getExn(Js_dict.get(paramsObject, "staker"))
                 }
               };
     case "ValueLockedInSystem" :
         return {
-                TAG: /* ValueLockedInSystem */1,
+                TAG: /* ValueLockedInSystem */4,
                 _0: {
                   marketIndex: getBnParam(paramsObject, "marketIndex"),
                   totalValueLockedInMarket: getBnParam(paramsObject, "totalValueLockedInMarket"),
@@ -127,7 +118,7 @@ function getStateChange(param) {
               };
     default:
       return {
-              TAG: /* Unclassified */12,
+              TAG: /* Unclassified */0,
               _0: {
                 name: eventName,
                 data: paramsObject
@@ -167,11 +158,13 @@ function splitIntoEventGroups(allStateChanges) {
   return allStateChanges.then(function (stateChanges) {
               return Promise.resolve(Belt_Array.reduce(stateChanges, emptyEventGroups, (function (currentEventGroups, param) {
                                 var data = param.data;
-                                if (typeof data === "number") {
-                                  return currentEventGroups;
-                                }
                                 switch (data.TAG | 0) {
-                                  case /* V1 */0 :
+                                  case /* Unclassified */0 :
+                                      return {
+                                              allV1Events: currentEventGroups.allV1Events,
+                                              allUnclassifiedEvents: Belt_Array.concat(currentEventGroups.allUnclassifiedEvents, [data._0])
+                                            };
+                                  case /* V1 */16 :
                                       return {
                                               allV1Events: Belt_Array.concat(currentEventGroups.allV1Events, [{
                                                       blockNumber: param.blockNumber,
@@ -180,11 +173,6 @@ function splitIntoEventGroups(allStateChanges) {
                                                       data: data._0
                                                     }]),
                                               allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents
-                                            };
-                                  case /* Unclassified */12 :
-                                      return {
-                                              allV1Events: currentEventGroups.allV1Events,
-                                              allUnclassifiedEvents: Belt_Array.concat(currentEventGroups.allUnclassifiedEvents, [data._0])
                                             };
                                   default:
                                     return currentEventGroups;

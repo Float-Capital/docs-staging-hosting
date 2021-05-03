@@ -1,9 +1,25 @@
 type address = string
 
-type v1Data = {
-  admin: address,
-  staker: address,
-  tokenFactory: address,
+type unclassifiedEvent = {
+  name: string,
+  data: Js.Dict.t<string>,
+}
+
+type transferData = {
+  from: address,
+  to: address,
+  amount: BN.t,
+}
+type priceUpdateData = {
+  marketIndex: BN.t,
+  newPrice: BN.t,
+  oldPrice: BN.t,
+  user: address,
+}
+type tokenPriceRefreshedData = {
+  marketIndex: BN.t,
+  longTokenPrice: BN.t,
+  shortTokenPrice: BN.t,
 }
 type valueLockedInSystemData = {
   marketIndex: BN.t,
@@ -11,36 +27,38 @@ type valueLockedInSystemData = {
   longValue: BN.t,
   shortValue: BN.t,
 }
-type tokenPriceRefreshedData = {
-  marketIndex: BN.t,
-  longTokenPrice: BN.t,
-  shortTokenPrice: BN.t,
+type approvalData = {
+  owner: address,
+  spender: address,
+  value: BN.t,
 }
-type feesLeviedData = {marketIndex: BN.t, totalFees: BN.t}
-type syntheticTokenCreatedData = {
-  marketIndex: BN.t,
-  longTokenAddress: address,
-  shortTokenAddress: address,
-  fundToken: address,
-  assetPrice: BN.t,
-  name: string,
-  symbol: string,
-  oracleAddress: address,
-}
-type priceUpdateData = {
-  marketIndex: BN.t,
-  oldPrice: BN.t,
-  newPrice: BN.t,
-  user: address,
-}
-type longMintedData = {
+type shortMintedData = {
   marketIndex: BN.t,
   depositAdded: BN.t,
   finalDepositAmount: BN.t,
   tokensMinted: BN.t,
   user: address,
 }
-type shortMintedData = {
+type stakeAddedData = {
+  user: address,
+  tokenAddress: address,
+  amount: BN.t,
+  lastMintIndex: BN.t,
+}
+type stateAddedData = {
+  tokenAddress: address,
+  stateIndex: BN.t,
+  timestamp: BN.t,
+  accumulative: BN.t,
+}
+type shortRedeemData = {
+  marketIndex: BN.t,
+  tokensRedeemed: BN.t,
+  valueOfRedemption: BN.t,
+  finalRedeem: BN.t,
+  user: address,
+}
+type longMintedData = {
   marketIndex: BN.t,
   depositAdded: BN.t,
   finalDepositAmount: BN.t,
@@ -51,16 +69,10 @@ type longRedeemData = {
   marketIndex: BN.t,
   tokensRedeemed: BN.t,
   valueOfRedemption: BN.t,
-  finalRedeemValue: BN.t,
+  finalRedeem: BN.t,
   user: address,
 }
-type shortRedeemData = {
-  marketIndex: BN.t,
-  tokensRedeemed: BN.t,
-  valueOfRedemption: BN.t,
-  finalRedeemValue: BN.t,
-  user: address,
-}
+type deployV1Data = {floatAddress: address}
 type feesChangesData = {
   marketIndex: BN.t,
   baseEntryFee: BN.t,
@@ -68,31 +80,45 @@ type feesChangesData = {
   baseExitFee: BN.t,
   badLiquidityExitFee: BN.t,
 }
-type unclassifiedEvent = {
+type syntheticTokenCreatedData = {
+  marketIndex: BN.t,
+  longTokenAddress: address,
+  shortTokenAddress: address,
+  assetPrice: BN.t,
   name: string,
-  data: Js.Dict.t<string>,
+  symbol: string,
+  oracleAddress: address,
+}
+type floatMintedData = {
+  user: address,
+  tokenAddress: address,
+  amount: BN.t,
+  lastMintIndex: BN.t,
+}
+type v1Data = {
+  admin: address,
+  tokenFactory: address,
+  staker: address,
 }
 
 type stateChanges =
-  | V1(v1Data)
-  | ValueLockedInSystem(valueLockedInSystemData)
-  | TokenPriceRefreshed(tokenPriceRefreshedData)
-  | FeesLevied(feesLeviedData)
-  | SyntheticTokenCreat(syntheticTokenCreatedData)
-  | SyntheticTokenCreated(syntheticTokenCreatedData)
-  | PriceUpdate(priceUpdateData)
-  | LongMinted(longMintedData)
-  | ShortMinted(shortMintedData)
-  | LongRedeem(longRedeemData)
-  | ShortRedeem(shortRedeemData)
-  | FeesChanges(feesChangesData)
   | Unclassified(unclassifiedEvent)
-  | StakeAdded
-  | StateAdded
-  | FloatMinted
-  | DeployV1
-  | Transfer
-  | Approval
+  | Transfer(transferData)
+  | PriceUpdate(priceUpdateData)
+  | TokenPriceRefreshed(tokenPriceRefreshedData)
+  | ValueLockedInSystem(valueLockedInSystemData)
+  | Approval(approvalData)
+  | ShortMinted(shortMintedData)
+  | StakeAdded(stakeAddedData)
+  | StateAdded(stateAddedData)
+  | ShortRedeem(shortRedeemData)
+  | LongMinted(longMintedData)
+  | LongRedeem(longRedeemData)
+  | DeployV1(deployV1Data)
+  | FeesChanges(feesChangesData)
+  | SyntheticTokenCreated(syntheticTokenCreatedData)
+  | FloatMinted(floatMintedData)
+  | V1(v1Data)
 
 let getBnParam = (paramsObject, paramName) =>
   paramsObject->Js.Dict.get(paramName)->Option.map(BN.new_)->Option.getExn
@@ -103,6 +129,10 @@ let getStateChange = (
 ) => {
   let paramsObject = Js.Dict.empty()
   params->Array.forEach(({param, paramName}) => paramsObject->Js.Dict.set(paramName, param))
+
+  let unimplementedPlaceholder = {
+    "TODO": "This isn't implemented",
+  }
 
   // TODO: throw a (descriptive) error if the array of parameters is the wrong length (or make a separate test?)
   // TODO: turn `eventName` into a polymorphic variant (create a decoder for it) (for undefined make it #unclassified(string)
@@ -120,72 +150,21 @@ let getStateChange = (
       longValue: paramsObject->getBnParam("longValue"),
       shortValue: paramsObject->getBnParam("shortValue"),
     })
-  | "TokenPriceRefreshed" =>
-    TokenPriceRefreshed(
-      {
-        "TODO": "This isn't implemented",
-      }->Obj.magic,
-    )
-  | "FeesLevied" =>
-    FeesLevied(
-      {
-        "TODO": "This isn't implemented",
-      }->Obj.magic,
-    )
-  | "SyntheticTokenCreat" =>
-    SyntheticTokenCreat(
-      {
-        "TODO": "This isn't implemented",
-      }->Obj.magic,
-    )
-  | "SyntheticTokenCreated" =>
-    SyntheticTokenCreated(
-      {
-        "TODO": "This isn't implemented",
-      }->Obj.magic,
-    )
-  | "PriceUpdate" =>
-    PriceUpdate(
-      {
-        "TODO": "This isn't implemented",
-      }->Obj.magic,
-    )
-  | "LongMinted" =>
-    LongMinted(
-      {
-        "TODO": "This isn't implemented",
-      }->Obj.magic,
-    )
-  | "ShortMinted" =>
-    ShortMinted(
-      {
-        "TODO": "This isn't implemented",
-      }->Obj.magic,
-    )
-  | "LongRedeem" =>
-    LongRedeem(
-      {
-        "TODO": "This isn't implemented",
-      }->Obj.magic,
-    )
-  | "ShortRedeem" =>
-    ShortRedeem(
-      {
-        "TODO": "This isn't implemented",
-      }->Obj.magic,
-    )
-  | "FeesChanges" =>
-    FeesChanges(
-      {
-        "TODO": "This isn't implemented",
-      }->Obj.magic,
-    )
-  | "StakeAdded" => StakeAdded
-  | "Transfer" => Transfer
-  | "Approval" => Approval
-  | "StateAdded" => StateAdded
-  | "FloatMinted" => FloatMinted
-  | "DeployV1" => DeployV1
+  | "TokenPriceRefreshed" => TokenPriceRefreshed(unimplementedPlaceholder->Obj.magic)
+  // | "FeesLevied" => FeesLevied(unimplementedPlaceholder->Obj.magic)
+  | "SyntheticTokenCreated" => SyntheticTokenCreated(unimplementedPlaceholder->Obj.magic)
+  | "PriceUpdate" => PriceUpdate(unimplementedPlaceholder->Obj.magic)
+  | "LongMinted" => LongMinted(unimplementedPlaceholder->Obj.magic)
+  | "ShortMinted" => ShortMinted(unimplementedPlaceholder->Obj.magic)
+  | "LongRedeem" => LongRedeem(unimplementedPlaceholder->Obj.magic)
+  | "ShortRedeem" => ShortRedeem(unimplementedPlaceholder->Obj.magic)
+  | "FeesChanges" => FeesChanges(unimplementedPlaceholder->Obj.magic)
+  | "StakeAdded" => StakeAdded(unimplementedPlaceholder->Obj.magic)
+  | "Transfer" => Transfer(unimplementedPlaceholder->Obj.magic)
+  | "Approval" => Approval(unimplementedPlaceholder->Obj.magic)
+  | "StateAdded" => StateAdded(unimplementedPlaceholder->Obj.magic)
+  | "FloatMinted" => FloatMinted(unimplementedPlaceholder->Obj.magic)
+  | "DeployV1" => DeployV1(unimplementedPlaceholder->Obj.magic)
   | name => Unclassified({name: name, data: paramsObject})
   }
 }

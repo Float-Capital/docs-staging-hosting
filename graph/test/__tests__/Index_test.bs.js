@@ -46,8 +46,8 @@ Curry._2(TestFramework.describe, "All Tests", (function (param) {
                                     Curry._2(expectEqual, allV1Events.length, 1);
                                     var match = Belt_Array.getExn(allV1Events, 0);
                                     var match$1 = match.data;
-                                    var tokenFactory = match$1.tokenFactory;
                                     var staker = match$1.staker;
+                                    var tokenFactory = match$1.tokenFactory;
                                     var admin = match$1.admin;
                                     var timestamp = match.timestamp;
                                     Queries.getGlobalStateAtBlock(match.blockNumber).then(function (result) {
