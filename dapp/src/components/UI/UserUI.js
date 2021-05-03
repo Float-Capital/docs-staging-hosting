@@ -9,6 +9,7 @@ var Ethers = require("../../ethereum/Ethers.js");
 var Ethers$1 = require("ethers");
 var Globals = require("../../libraries/Globals.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
+var Tooltip = require("./Tooltip.js");
 var Blockies = require("../../bindings/ethereum-blockies-base64/Blockies.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 var DataHooks = require("../../data/DataHooks.js");
@@ -461,10 +462,16 @@ function UserUI$UserFloatCard(Props) {
           className: "w-11/12 px-2 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow"
         }, React.createElement(UserUI$UserColumnTextList, {
               children: null
-            }, React.createElement(UserUI$UserColumnText, {
-                  head: "Float accruing",
-                  body: floatAccrued
-                }), React.createElement(UserUI$UserColumnText, {
+            }, React.createElement("div", {
+                  className: "flex"
+                }, React.createElement(UserUI$UserColumnText, {
+                      head: "Float accruing",
+                      body: floatAccrued
+                    }), React.createElement("span", {
+                      className: "ml-1"
+                    }, React.createElement(Tooltip.make, {
+                          tip: "This is our best estimate at the current time, the amount issued may differ due to changes in market balance or price of assets."
+                        }))), React.createElement(UserUI$UserColumnText, {
                   head: "Float balance",
                   body: floatBalance
                 }), React.createElement(UserUI$UserColumnText, {
