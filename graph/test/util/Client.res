@@ -8,13 +8,13 @@ external fetch: ApolloClient.Link.HttpLink.HttpOptions.Js_.t_fetch = "fetch"
 Dotenv.config()
 
 @val
-external optHasuraApiEndpoint: option<string> = "process.env.HASURA_API_ENDPOINT"
-let hasuraApiEndpoint =
-  optHasuraApiEndpoint->Option.getWithDefault(
+external optGraphApiEndpoint: option<string> = "process.env.GRAPH_API_ENDPOINT"
+let graphApiEndpoint =
+  optGraphApiEndpoint->Option.getWithDefault(
     "http://127.0.0.1:8000/subgraphs/name/float-capital/float-capital",
   )
 
-let httpLink = ApolloClient.Link.HttpLink.make(~uri=_ => hasuraApiEndpoint, ~fetch, ())
+let httpLink = ApolloClient.Link.HttpLink.make(~uri=_ => graphApiEndpoint, ~fetch, ())
 
 let instance = {
   open ApolloClient

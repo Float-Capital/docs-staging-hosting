@@ -13,10 +13,10 @@ var ApolloClient__Cache_InMemory_InMemoryCache = require("rescript-apollo-client
 
 Dotenv.config();
 
-var hasuraApiEndpoint = Belt_Option.getWithDefault(process.env.HASURA_API_ENDPOINT, "http://127.0.0.1:8000/subgraphs/name/float-capital/float-capital");
+var graphApiEndpoint = Belt_Option.getWithDefault(process.env.GRAPH_API_ENDPOINT, "http://127.0.0.1:8000/subgraphs/name/float-capital/float-capital");
 
 var httpLink = ApolloClient__Link_Http_HttpLink.make((function (param) {
-        return hasuraApiEndpoint;
+        return graphApiEndpoint;
       }), undefined, Caml_option.some(fetch), undefined, undefined, undefined, undefined, undefined);
 
 var instance = ApolloClient.make(undefined, undefined, undefined, Caml_option.some(httpLink), ApolloClient__Cache_InMemory_InMemoryCache.make(undefined, undefined, undefined, undefined, undefined, undefined), undefined, undefined, true, undefined, ApolloClient__Core_ApolloClient.DefaultOptions.make(ApolloClient__Core_ApolloClient.DefaultMutateOptions.make(undefined, undefined, true, /* All */2, undefined, undefined), ApolloClient__Core_ApolloClient.DefaultQueryOptions.make(/* NetworkOnly */2, /* All */2, undefined, undefined), ApolloClient__Core_ApolloClient.DefaultWatchQueryOptions.make(/* NetworkOnly */3, /* All */2, undefined, undefined), undefined), undefined, undefined, undefined, undefined, undefined, undefined, undefined);
@@ -24,7 +24,7 @@ var instance = ApolloClient.make(undefined, undefined, undefined, Caml_option.so
 var graphqlEndpoint = "localhost:4000";
 
 exports.graphqlEndpoint = graphqlEndpoint;
-exports.hasuraApiEndpoint = hasuraApiEndpoint;
+exports.graphApiEndpoint = graphApiEndpoint;
 exports.httpLink = httpLink;
 exports.instance = instance;
 /*  Not a pure module */
