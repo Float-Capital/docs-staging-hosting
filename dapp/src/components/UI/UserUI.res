@@ -281,7 +281,7 @@ module UserMarketStakeOrRedeem = {
 
 module UserMarketUnstake = {
   @react.component
-  let make = (~synthAddress, ~userId, ~isLong, ~whenStr) => {
+  let make = (~synthAddress, ~userId, ~isLong, ~whenStr, ~creationTxHash) => {
     let synthAddressStr = synthAddress->ethAdrToLowerStr
 
     let marketIdResponse = DataHooks.useTokenMarketId(~tokenId=synthAddressStr)
@@ -300,7 +300,13 @@ module UserMarketUnstake = {
       optLoggedInUser->Option.mapWithDefault(false, user => user->ethAdrToLowerStr == userId)
 
     <div className=`flex flex-col`>
-      <span className="text-xxs self-center"> <i> {`${whenStr} ago`->React.string} </i> </span>
+      <a
+        href={`${Config.blockExplorer}/tx/${creationTxHash}`}
+        target="_"
+        rel="noopener noreferrer"
+        className="inline text-xxs self-center hover:opacity-75">
+        <i> {`${whenStr} ago`->React.string} </i>
+      </a>
       {isCurrentUser ? <Button.Tiny onClick={unstake}> {`unstake`} </Button.Tiny> : React.null}
     </div>
   }
@@ -327,9 +333,10 @@ module UserStakesCard = {
         stake.currentStake.amount
         ->Ethers.BigNumber.mul(price)
         ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
+      let creationTxHash = stake.currentStake.creationTxHash
 
       <UserMarketBox key name isLong tokens value={value->FormatMoney.formatEther}>
-        <UserMarketUnstake synthAddress={addr} userId isLong whenStr />
+        <UserMarketUnstake synthAddress={addr} userId isLong whenStr creationTxHash />
       </UserMarketBox>
     }, stakes)->React.array
 
