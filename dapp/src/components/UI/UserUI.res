@@ -304,7 +304,7 @@ module UserMarketUnstake = {
         href={`${Config.blockExplorer}/tx/${creationTxHash}`}
         target="_"
         rel="noopener noreferrer"
-        className="inline text-xxs self-center">
+        className="inline text-xxs self-center hover:opacity-75">
         <i> {`${whenStr} ago`->React.string} </i>
       </a>
       {isCurrentUser ? <Button.Tiny onClick={unstake}> {`unstake`} </Button.Tiny> : React.null}
