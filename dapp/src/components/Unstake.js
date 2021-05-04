@@ -455,7 +455,6 @@ function Unstake$UnstakeTxStatusModal(Props) {
                   });
     case /* Failed */3 :
         var txHash = txStateUnstake._0;
-        console.log(txHash);
         return React.createElement(Modal.make, {
                     id: "unstake-4",
                     children: React.createElement("div", {

@@ -41,21 +41,18 @@ module UnstakeTxStatusModal = {
         </div>
       </Modal>
     | ContractActions.Declined(_message) => <> {resetFormButton()} </>
-    | ContractActions.Failed(txHash) => {
-        let _ = Js.log(txHash)
-        <Modal id={"unstake-4"}>
-          <div className="text-center m-3">
-            <p> {`The transaction failed.`->React.string} </p>
-            {if txHash != "" {
-              <ViewOnBlockExplorer txHash />
-            } else {
-              React.null
-            }}
-            <MessageUsOnDiscord />
-            {resetFormButton()}
-          </div>
-        </Modal>
-      }
+    | ContractActions.Failed(txHash) => <Modal id={"unstake-4"}>
+        <div className="text-center m-3">
+          <p> {`The transaction failed.`->React.string} </p>
+          {if txHash != "" {
+            <ViewOnBlockExplorer txHash />
+          } else {
+            React.null
+          }}
+          <MessageUsOnDiscord />
+          {resetFormButton()}
+        </div>
+      </Modal>
     | _ => React.null
     }
   }
