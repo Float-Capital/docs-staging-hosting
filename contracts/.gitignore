@@ -19,3 +19,6 @@ secretsManager.js
 .merlin
 .bsb.lock
 lib
+
+coverage.json
+
