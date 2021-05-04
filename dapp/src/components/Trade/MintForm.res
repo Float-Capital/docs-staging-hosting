@@ -176,17 +176,7 @@ module MintFormInput = {
   ) => {
     let formInput =
       <>
-        // <select
-        //   name="longshort"
-        //   className="trade-select"
-        //   onChange=onChangeSide
-        //   value={isLong ? "long" : "short"}
-        //   onBlur=onBlurSide
-        //   disabled>
-        //   <option value="long"> {`Long 🐮`->React.string} </option>
-        //   <option value="short"> {`Short 🐻`->React.string} </option>
-        // </select>
-        <LongOrShortSelect isLong selectPosition={val => onChangeSide(val)} onBlur=onBlurSide />
+        <LongOrShortSelect isLong selectPosition={val => onChangeSide(val)} disabled />
         <AmountInput
           value=valueAmountInput
           optBalance={optDaiBalance}

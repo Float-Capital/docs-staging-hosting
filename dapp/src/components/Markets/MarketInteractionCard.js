@@ -22,6 +22,7 @@ var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
+var LongOrShortSelect = require("../UI/LongOrShortSelect.js");
 
 function MarketInteractionCard$Tab(Props) {
   var selectedOpt = Props.selected;
@@ -240,28 +241,24 @@ function header(marketInfo) {
 function MarketInteractionCard$SelectOptions(Props) {
   var isLong = Props.isLong;
   var marketInfo = Props.marketInfo;
+  var disabledOpt = Props.disabled;
+  var disabled = disabledOpt !== undefined ? disabledOpt : false;
   var router = Router.useRouter();
   return Belt_Option.mapWithDefault(marketInfo, null, (function (marketInfo) {
-                var onChangeSide = function ($$event) {
-                  router.query["actionOption"] = $$event.target.value;
-                  router.query["token"] = isLong ? Ethers.Utils.ethAdrToLowerStr(marketInfo.longAddress) : Ethers.Utils.ethAdrToLowerStr(marketInfo.shortAddress);
-                  return Next.Router.pushObjShallow(router, {
-                              pathname: router.pathname,
-                              query: router.query
-                            });
-                };
                 return React.createElement("div", {
                             className: "px-6"
-                          }, React.createElement("select", {
-                                className: "trade-select",
-                                name: "longshort",
-                                value: isLong ? "long" : "short",
-                                onChange: onChangeSide
-                              }, React.createElement("option", {
-                                    value: "long"
-                                  }, "Long 🐮"), React.createElement("option", {
-                                    value: "short"
-                                  }, "Short 🐻")));
+                          }, React.createElement(LongOrShortSelect.make, {
+                                isLong: isLong,
+                                selectPosition: (function (val) {
+                                    router.query["actionOption"] = val;
+                                    router.query["token"] = isLong ? Ethers.Utils.ethAdrToLowerStr(marketInfo.longAddress) : Ethers.Utils.ethAdrToLowerStr(marketInfo.shortAddress);
+                                    return Next.Router.pushObjShallow(router, {
+                                                pathname: router.pathname,
+                                                query: router.query
+                                              });
+                                  }),
+                                disabled: disabled
+                              }));
               }));
 }
 

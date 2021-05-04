@@ -21,6 +21,7 @@ var RootProvider = require("../../libraries/RootProvider.js");
 var ContractHooks = require("../Testing/Admin/ContractHooks.js");
 var ToastProvider = require("../UI/ToastProvider.js");
 var ContractActions = require("../../ethereum/ContractActions.js");
+var LongOrShortSelect = require("../UI/LongOrShortSelect.js");
 var Formality__ReactUpdate = require("re-formality/src/Formality__ReactUpdate.js");
 
 var validators = {
@@ -446,17 +447,11 @@ function RedeemForm$RedeemFormInput(Props) {
               className: "",
               onSubmit: onSubmit,
               children: null
-            }, hasBothTokens ? React.createElement("select", {
-                    className: "trade-select",
-                    disabled: disabled,
-                    name: "longshort",
-                    value: isLong ? "long" : "short",
-                    onChange: onChangeSide
-                  }, React.createElement("option", {
-                        value: "long"
-                      }, "Long 🐮"), React.createElement("option", {
-                        value: "short"
-                      }, "Short 🐻")) : null, React.createElement(AmountInput.make, {
+            }, hasBothTokens ? React.createElement(LongOrShortSelect.make, {
+                    isLong: isLong,
+                    selectPosition: Curry.__1(onChangeSide),
+                    disabled: disabled
+                  }) : null, React.createElement(AmountInput.make, {
                   placeholder: "Redeem",
                   value: value,
                   optBalance: optBalance,
@@ -711,8 +706,8 @@ function RedeemForm$ConnectedRedeemForm(Props) {
                                         };
                                 }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
                   }),
-                onChangeSide: (function ($$event) {
-                    router.query["actionOption"] = $$event.target.value;
+                onChangeSide: (function (newPosition) {
+                    router.query["actionOption"] = newPosition;
                     router.query["token"] = isActuallyLong ? Ethers.Utils.ethAdrToLowerStr(market.syntheticLong.tokenAddress) : Ethers.Utils.ethAdrToLowerStr(market.syntheticShort.tokenAddress);
                     return Next.Router.pushObjShallow(router, {
                                 pathname: router.pathname,

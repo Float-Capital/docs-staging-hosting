@@ -33,15 +33,7 @@ module RedeemFormInput = {
     let tokenType = isLong ? "long" : "short"
     <Form className="" onSubmit>
       {hasBothTokens
-        ? <select
-            name="longshort"
-            className="trade-select"
-            onChange=onChangeSide
-            value={isLong ? "long" : "short"}
-            disabled>
-            <option value="long"> {`Long 🐮`->React.string} </option>
-            <option value="short"> {`Short 🐻`->React.string} </option>
-          </select>
+        ? <LongOrShortSelect isLong selectPosition={val => onChangeSide(val)} disabled />
         : React.null}
       <AmountInput value optBalance disabled onBlur onChange placeholder={"Redeem"} onMaxClick />
       <Button onClick={_ => onSubmit()}> {`Redeem ${tokenType} ${market.name}`} </Button>
@@ -256,8 +248,8 @@ module ConnectedRedeemForm = {
               | _ => "0"
               },
             )}
-          onChangeSide={event => {
-            router.query->Js.Dict.set("actionOption", (event->ReactEvent.Form.target)["value"])
+          onChangeSide={newPosition => {
+            router.query->Js.Dict.set("actionOption", newPosition)
             router.query->Js.Dict.set(
               "token",
               isActuallyLong

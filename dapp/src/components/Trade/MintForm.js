@@ -719,7 +719,6 @@ function MintForm$MintFormInput(Props) {
   var onSubmitOpt = Props.onSubmit;
   var onChangeSideOpt = Props.onChangeSide;
   var isLong = Props.isLong;
-  var onBlurSideOpt = Props.onBlurSide;
   var valueAmountInputOpt = Props.valueAmountInput;
   var optDaiBalanceOpt = Props.optDaiBalance;
   var onBlurAmountOpt = Props.onBlurAmount;
@@ -735,9 +734,6 @@ function MintForm$MintFormInput(Props) {
         
       });
   var onChangeSide = onChangeSideOpt !== undefined ? onChangeSideOpt : (function (param) {
-        
-      });
-  var onBlurSide = onBlurSideOpt !== undefined ? onBlurSideOpt : (function (param) {
         
       });
   var valueAmountInput = valueAmountInputOpt !== undefined ? valueAmountInputOpt : "";
@@ -766,7 +762,7 @@ function MintForm$MintFormInput(Props) {
   var formInput = React.createElement(React.Fragment, undefined, React.createElement(LongOrShortSelect.make, {
             isLong: isLong,
             selectPosition: Curry.__1(onChangeSide),
-            onBlur: onBlurSide
+            disabled: disabled
           }), React.createElement(AmountInput.make, {
             placeholder: "Mint",
             value: valueAmountInput,
