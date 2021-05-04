@@ -35,20 +35,6 @@ module StakeFormInput = {
     ~txStatusModals=React.null,
   ) =>
     <Form className="mx-auto max-w-3xl" onSubmit>
-      // <div className="px-8 pt-2">
-      //   <div className="-mb-px flex justify-between">
-      //     <div
-      //       className="no-underline text-teal-dark border-b-2 border-teal-dark tracking-wide font-bold py-3 mr-8"
-      //       href="#">
-      //       {`Stake ↗️`->React.string}
-      //     </div>
-      //     // <div
-      //     //   className="no-underline text-grey-dark border-b-2 border-transparent tracking-wide font-bold py-3"
-      //     //   href="#">
-      //     //   {`Unstake ↗️`->React.string}
-      //     // </div>
-      //   </div>
-      // </div>
       <AmountInput value optBalance disabled onBlur onChange placeholder={"Stake"} onMaxClick />
       <Button disabled=buttonDisabled onClick={_ => ()}>
         {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}

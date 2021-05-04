@@ -24,6 +24,7 @@ var RootProvider = require("../../libraries/RootProvider.js");
 var ContractHooks = require("../Testing/Admin/ContractHooks.js");
 var ToastProvider = require("../UI/ToastProvider.js");
 var ContractActions = require("../../ethereum/ContractActions.js");
+var LongOrShortSelect = require("../UI/LongOrShortSelect.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
 var Formality__ReactUpdate = require("re-formality/src/Formality__ReactUpdate.js");
@@ -719,7 +720,6 @@ function MintForm$MintFormInput(Props) {
   var onSubmitOpt = Props.onSubmit;
   var onChangeSideOpt = Props.onChangeSide;
   var isLong = Props.isLong;
-  var onBlurSideOpt = Props.onBlurSide;
   var valueAmountInputOpt = Props.valueAmountInput;
   var optDaiBalanceOpt = Props.optDaiBalance;
   var onBlurAmountOpt = Props.onBlurAmount;
@@ -735,9 +735,6 @@ function MintForm$MintFormInput(Props) {
         
       });
   var onChangeSide = onChangeSideOpt !== undefined ? onChangeSideOpt : (function (param) {
-        
-      });
-  var onBlurSide = onBlurSideOpt !== undefined ? onBlurSideOpt : (function (param) {
         
       });
   var valueAmountInput = valueAmountInputOpt !== undefined ? valueAmountInputOpt : "";
@@ -763,18 +760,11 @@ function MintForm$MintFormInput(Props) {
   var submitButton = submitButtonOpt !== undefined ? Caml_option.valFromOption(submitButtonOpt) : React.createElement(Button.make, {
           children: "Login & Mint"
         });
-  var formInput = React.createElement(React.Fragment, undefined, React.createElement("select", {
-            className: "trade-select",
-            disabled: disabled,
-            name: "longshort",
-            value: isLong ? "long" : "short",
-            onBlur: onBlurSide,
-            onChange: onChangeSide
-          }, React.createElement("option", {
-                value: "long"
-              }, "Long 🐮"), React.createElement("option", {
-                value: "short"
-              }, "Short 🐻")), React.createElement(AmountInput.make, {
+  var formInput = React.createElement(React.Fragment, undefined, React.createElement(LongOrShortSelect.make, {
+            isLong: isLong,
+            selectPosition: Curry.__1(onChangeSide),
+            disabled: disabled
+          }), React.createElement(AmountInput.make, {
             placeholder: "Mint",
             value: valueAmountInput,
             optBalance: optDaiBalance,
@@ -1066,8 +1056,8 @@ function MintForm$MintFormSignedIn(Props) {
         }), [txState]);
   return React.createElement(MintForm$MintFormInput, {
               onSubmit: form.submit,
-              onChangeSide: (function ($$event) {
-                  router.query["actionOption"] = $$event.target.value;
+              onChangeSide: (function (newPosition) {
+                  router.query["actionOption"] = newPosition;
                   router.query["token"] = isLong ? Ethers.Utils.ethAdrToLowerStr(market.syntheticLong.tokenAddress) : Ethers.Utils.ethAdrToLowerStr(market.syntheticShort.tokenAddress);
                   return Next.Router.pushObjShallow(router, {
                               pathname: router.pathname,

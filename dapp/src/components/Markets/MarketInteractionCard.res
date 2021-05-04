@@ -181,11 +181,11 @@ let header = (~marketInfo: DataHooks.graphResponse<marketInfo>) => {
 
 module SelectOptions = {
   @react.component
-  let make = (~isLong, ~marketInfo) => {
+  let make = (~isLong, ~marketInfo, ~disabled=false) => {
     let router = Next.Router.useRouter()
     marketInfo->Option.mapWithDefault(React.null, marketInfo => {
-      let onChangeSide = event => {
-        router.query->Js.Dict.set("actionOption", (event->ReactEvent.Form.target)["value"])
+      let onChangeSide = newPosition => {
+        router.query->Js.Dict.set("actionOption", newPosition)
         router.query->Js.Dict.set(
           "token",
           isLong
@@ -195,14 +195,7 @@ module SelectOptions = {
         router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
       }
       <div className="px-6">
-        <select
-          name="longshort"
-          className="trade-select"
-          onChange=onChangeSide
-          value={isLong ? "long" : "short"}>
-          <option value="long"> {`Long 🐮`->React.string} </option>
-          <option value="short"> {`Short 🐻`->React.string} </option>
-        </select>
+        <LongOrShortSelect isLong selectPosition={val => onChangeSide(val)} disabled />
       </div>
     })
   }

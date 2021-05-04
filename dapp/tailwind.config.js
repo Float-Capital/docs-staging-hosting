@@ -1,4 +1,5 @@
 const primaryColor = "#0d4184";
+const primaryLightColor = "#1151A6";
 module.exports = {
   purge: {
     // Specify the paths to all of the template files in your project
@@ -17,6 +18,7 @@ module.exports = {
       textColor: (theme) => ({
         ...theme("colors"),
         primary: primaryColor,
+        "primary-light": primaryLightColor,
       }),
       // // Doesn't include an opacity gradient, rather use direct css
       // backgroundImage: (theme) => ({
@@ -56,13 +58,16 @@ module.exports = {
     borderColor: (theme) => ({
       ...theme("colors"),
       DEFAULT: primaryColor,
+      "primary-light": primaryLightColor,
     }),
     backgroundColor: (theme) => ({
       ...theme("colors"),
       primary: primaryColor,
+      "primary-light": primaryLightColor,
     }),
     textColor: {
       primary: primaryColor,
+      "primary-light": primaryLightColor,
     },
     letterSpacing: {
       tighter: "-.05em",

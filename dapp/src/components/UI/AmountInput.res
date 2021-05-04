@@ -9,7 +9,7 @@ let make = (
   ~onMaxClick,
   ~optCurrency=None,
 ) =>
-  <div className="flex flex-row my-3">
+  <div className="flex flex-row my-3 shadow-md">
     <input
       id="amount"
       className="py-2 font-normal text-grey-darkest w-full py-1 px-2 outline-none text-md text-gray-600"
