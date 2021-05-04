@@ -630,7 +630,7 @@ contract Staker is IStaker, Initializable {
         _withdraw(tokenAddress, amount);
     }
 
-    function withdrawAll(address tokenAddress, uint256 amount) external {
+    function withdrawAll(address tokenAddress) external {
         _withdraw(tokenAddress, userAmountStaked[tokenAddress][msg.sender]);
     }
 }
