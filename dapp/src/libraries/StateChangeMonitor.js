@@ -58,102 +58,150 @@ function StateChangeMonitor(Props) {
                         if (stateChanges.length !== 0) {
                           Belt_Array.map(stateChanges, (function (param) {
                                   var timestamp = param.timestamp;
-                                  if (timestamp.gt(latestStateChangeTimestamp)) {
-                                    Curry._1(setLatestStateChangeTimestamp, (function (param) {
-                                            return timestamp;
-                                          }));
-                                    Belt_Array.map(param.affectedUsers, (function (param) {
-                                            var tokenBalances = param.tokenBalances;
-                                            var userInfo = param.basicUserInfo;
-                                            var id = userInfo.id;
-                                            var __typename = param.__typename;
-                                            Belt_Array.map(tokenBalances, (function (tokenBalance) {
-                                                    Curry._6(client.rescript_writeQuery, {
-                                                          query: Queries.UsersBalance.query,
-                                                          Raw: Queries.UsersBalance.Raw,
-                                                          parse: Queries.UsersBalance.parse,
-                                                          serialize: Queries.UsersBalance.serialize,
-                                                          serializeVariables: Queries.UsersBalance.serializeVariables
-                                                        }, undefined, {
-                                                          user: {
-                                                            __typename: __typename,
-                                                            tokenBalances: [tokenBalance]
-                                                          }
-                                                        }, undefined, undefined, {
-                                                          userId: id,
-                                                          tokenAdr: tokenBalance.syntheticToken.id
-                                                        });
-                                                    
-                                                  }));
-                                            Curry._6(client.rescript_writeQuery, {
-                                                  query: Queries.UserQuery.query,
-                                                  Raw: Queries.UserQuery.Raw,
-                                                  parse: Queries.UserQuery.parse,
-                                                  serialize: Queries.UserQuery.serialize,
-                                                  serializeVariables: Queries.UserQuery.serializeVariables
-                                                }, undefined, {
-                                                  user: userInfo
-                                                }, undefined, undefined, {
-                                                  userId: id
-                                                });
-                                            var balanceReadQuery = Curry._5(client.rescript_readQuery, {
-                                                  query: Queries.UsersBalances.query,
-                                                  Raw: Queries.UsersBalances.Raw,
-                                                  parse: Queries.UsersBalances.parse,
-                                                  serialize: Queries.UsersBalances.serialize,
-                                                  serializeVariables: Queries.UsersBalances.serializeVariables
-                                                }, undefined, undefined, undefined, {
-                                                  userId: id
-                                                });
-                                            if (balanceReadQuery !== undefined && balanceReadQuery.TAG === /* Ok */0) {
-                                              var match = balanceReadQuery._0.user;
-                                              if (match !== undefined) {
-                                                var containsBalanceItem = function (listOfBalances, param) {
-                                                  var comparisonId = param.id;
-                                                  return Belt_Array.getIndexBy(listOfBalances, (function (param) {
-                                                                return comparisonId === param.id;
-                                                              }));
-                                                };
-                                                var updatedTokenBalances = Belt_Array.reduce(tokenBalances, match.tokenBalances, (function (currentBalances, newBalance) {
-                                                        var index = containsBalanceItem(currentBalances, newBalance);
-                                                        if (index !== undefined) {
-                                                          Belt_Array.set(currentBalances, index, newBalance);
-                                                          return currentBalances;
-                                                        } else {
-                                                          return Belt_Array.concat(currentBalances, [newBalance]);
+                                  if (!timestamp.gt(latestStateChangeTimestamp)) {
+                                    return ;
+                                  }
+                                  Curry._1(setLatestStateChangeTimestamp, (function (param) {
+                                          return timestamp;
+                                        }));
+                                  Belt_Array.map(param.affectedUsers, (function (param) {
+                                          var tokenBalances = param.tokenBalances;
+                                          var userInfo = param.basicUserInfo;
+                                          var id = userInfo.id;
+                                          var __typename = param.__typename;
+                                          Belt_Array.map(tokenBalances, (function (tokenBalance) {
+                                                  Curry._6(client.rescript_writeQuery, {
+                                                        query: Queries.UsersBalance.query,
+                                                        Raw: Queries.UsersBalance.Raw,
+                                                        parse: Queries.UsersBalance.parse,
+                                                        serialize: Queries.UsersBalance.serialize,
+                                                        serializeVariables: Queries.UsersBalance.serializeVariables
+                                                      }, undefined, {
+                                                        user: {
+                                                          __typename: __typename,
+                                                          tokenBalances: [tokenBalance]
                                                         }
-                                                      }));
-                                                Curry._6(client.rescript_writeQuery, {
-                                                      query: Queries.UsersBalances.query,
-                                                      Raw: Queries.UsersBalances.Raw,
-                                                      parse: Queries.UsersBalances.parse,
-                                                      serialize: Queries.UsersBalances.serialize,
-                                                      serializeVariables: Queries.UsersBalances.serializeVariables
-                                                    }, undefined, {
-                                                      user: {
-                                                        __typename: match.__typename,
-                                                        tokenBalances: updatedTokenBalances
+                                                      }, undefined, undefined, {
+                                                        userId: id,
+                                                        tokenAdr: tokenBalance.syntheticToken.id
+                                                      });
+                                                  
+                                                }));
+                                          Curry._6(client.rescript_writeQuery, {
+                                                query: Queries.UserQuery.query,
+                                                Raw: Queries.UserQuery.Raw,
+                                                parse: Queries.UserQuery.parse,
+                                                serialize: Queries.UserQuery.serialize,
+                                                serializeVariables: Queries.UserQuery.serializeVariables
+                                              }, undefined, {
+                                                user: userInfo
+                                              }, undefined, undefined, {
+                                                userId: id
+                                              });
+                                          var balanceReadQuery = Curry._5(client.rescript_readQuery, {
+                                                query: Queries.UsersBalances.query,
+                                                Raw: Queries.UsersBalances.Raw,
+                                                parse: Queries.UsersBalances.parse,
+                                                serialize: Queries.UsersBalances.serialize,
+                                                serializeVariables: Queries.UsersBalances.serializeVariables
+                                              }, undefined, undefined, undefined, {
+                                                userId: id
+                                              });
+                                          if (balanceReadQuery !== undefined && balanceReadQuery.TAG === /* Ok */0) {
+                                            var match = balanceReadQuery._0.user;
+                                            if (match !== undefined) {
+                                              var containsBalanceItem = function (listOfBalances, param) {
+                                                var comparisonId = param.id;
+                                                return Belt_Array.getIndexBy(listOfBalances, (function (param) {
+                                                              return comparisonId === param.id;
+                                                            }));
+                                              };
+                                              var updatedTokenBalances = Belt_Array.reduce(tokenBalances, match.tokenBalances, (function (currentBalances, newBalance) {
+                                                      var index = containsBalanceItem(currentBalances, newBalance);
+                                                      if (index !== undefined) {
+                                                        Belt_Array.set(currentBalances, index, newBalance);
+                                                        return currentBalances;
+                                                      } else {
+                                                        return Belt_Array.concat(currentBalances, [newBalance]);
                                                       }
-                                                    }, undefined, undefined, {
-                                                      userId: id
-                                                    });
-                                                return ;
-                                              }
-                                              
+                                                    }));
+                                              Curry._6(client.rescript_writeQuery, {
+                                                    query: Queries.UsersBalances.query,
+                                                    Raw: Queries.UsersBalances.Raw,
+                                                    parse: Queries.UsersBalances.parse,
+                                                    serialize: Queries.UsersBalances.serialize,
+                                                    serializeVariables: Queries.UsersBalances.serializeVariables
+                                                  }, undefined, {
+                                                    user: {
+                                                      __typename: match.__typename,
+                                                      tokenBalances: updatedTokenBalances
+                                                    }
+                                                  }, undefined, undefined, {
+                                                    userId: id
+                                                  });
+                                              return ;
                                             }
-                                            Curry._6(client.rescript_query, {
-                                                  query: Queries.UsersBalances.query,
-                                                  Raw: Queries.UsersBalances.Raw,
-                                                  parse: Queries.UsersBalances.parse,
-                                                  serialize: Queries.UsersBalances.serialize,
-                                                  serializeVariables: Queries.UsersBalances.serializeVariables
-                                                }, undefined, undefined, undefined, undefined, {
-                                                  userId: id
-                                                });
                                             
+                                          }
+                                          Curry._6(client.rescript_query, {
+                                                query: Queries.UsersBalances.query,
+                                                Raw: Queries.UsersBalances.Raw,
+                                                parse: Queries.UsersBalances.parse,
+                                                serialize: Queries.UsersBalances.serialize,
+                                                serializeVariables: Queries.UsersBalances.serializeVariables
+                                              }, undefined, undefined, undefined, undefined, {
+                                                userId: id
+                                              });
+                                          
+                                        }));
+                                  var balanceReadQuery = Curry._5(client.rescript_readQuery, {
+                                        query: Queries.UsersStakes.query,
+                                        Raw: Queries.UsersStakes.Raw,
+                                        parse: Queries.UsersStakes.parse,
+                                        serialize: Queries.UsersStakes.serialize,
+                                        serializeVariables: Queries.UsersStakes.serializeVariables
+                                      }, undefined, undefined, undefined, {
+                                        userId: currentUser$1
+                                      });
+                                  if (balanceReadQuery !== undefined && balanceReadQuery.TAG === /* Ok */0) {
+                                    var currentStakes = balanceReadQuery._0.currentStakes;
+                                    var containsDetailedStakeItem = function (listOfStakes, param) {
+                                      var comparisonId = param.id;
+                                      return Belt_Array.getIndexBy(listOfStakes, (function (param) {
+                                                    return comparisonId === param.id;
+                                                  }));
+                                    };
+                                    Belt_Array.map(param.affectedStakes, (function (param) {
+                                            var currentStakeDetailed = param.currentStakeDetailed;
+                                            var _index = containsDetailedStakeItem(currentStakes, currentStakeDetailed);
+                                            if (_index !== undefined) {
+                                              return ;
+                                            } else {
+                                              Curry._6(client.rescript_writeQuery, {
+                                                    query: Queries.UsersStakes.query,
+                                                    Raw: Queries.UsersStakes.Raw,
+                                                    parse: Queries.UsersStakes.parse,
+                                                    serialize: Queries.UsersStakes.serialize,
+                                                    serializeVariables: Queries.UsersStakes.serializeVariables
+                                                  }, undefined, {
+                                                    currentStakes: Belt_Array.concat(currentStakes, [currentStakeDetailed])
+                                                  }, undefined, undefined, {
+                                                    userId: currentUser$1
+                                                  });
+                                              return ;
+                                            }
                                           }));
                                     return ;
                                   }
+                                  Curry._6(client.rescript_query, {
+                                        query: Queries.UsersStakes.query,
+                                        Raw: Queries.UsersStakes.Raw,
+                                        parse: Queries.UsersStakes.parse,
+                                        serialize: Queries.UsersStakes.serialize,
+                                        serializeVariables: Queries.UsersStakes.serializeVariables
+                                      }, undefined, undefined, undefined, undefined, {
+                                        userId: currentUser$1
+                                      });
                                   
                                 }));
                           return ;
