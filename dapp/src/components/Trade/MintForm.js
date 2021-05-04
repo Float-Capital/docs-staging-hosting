@@ -896,7 +896,7 @@ function MintForm$MintFormSignedIn(Props) {
                       return mintFunction;
                     }
                   }));
-            var arg = amount.mul(Ethers$1.BigNumber.from("2"));
+            var arg = amount.gt(CONSTANTS.oneHundredThousandInWei) ? amount : CONSTANTS.oneHundredThousandInWei;
             return Curry._2(contractExecutionHandlerApprove, (function (param) {
                           return Contracts.Erc20.make(Config.dai, param);
                         }), (function (param) {
