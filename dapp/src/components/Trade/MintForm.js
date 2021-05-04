@@ -1065,9 +1065,6 @@ function MintForm$MintFormSignedIn(Props) {
                             });
                 }),
               isLong: isLong,
-              onBlurSide: (function (param) {
-                  return Curry._1(form.blurIsStaking, undefined);
-                }),
               valueAmountInput: form.input.amount,
               optDaiBalance: optDaiBalance,
               onBlurAmount: (function (param) {

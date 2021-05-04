@@ -161,7 +161,6 @@ module MintFormInput = {
     ~onSubmit=_ => (),
     ~onChangeSide=_ => (),
     ~isLong,
-    ~onBlurSide=_ => (),
     ~valueAmountInput="",
     ~optDaiBalance=None,
     ~onBlurAmount=_ => (),
@@ -423,7 +422,6 @@ module MintFormSignedIn = {
         router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
       }}
       isLong={isLong}
-      onBlurSide={_ => form.blurIsStaking()}
       valueAmountInput=form.input.amount
       optDaiBalance
       onBlurAmount={_ => form.blurAmount()}
