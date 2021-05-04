@@ -64,6 +64,7 @@ module.exports = {
       ...theme("colors"),
       primary: primaryColor,
       "primary-light": primaryLightColor,
+      tertiary: "#fff3e6"
     }),
     textColor: {
       primary: primaryColor,

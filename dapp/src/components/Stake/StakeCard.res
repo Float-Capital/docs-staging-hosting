@@ -261,7 +261,7 @@ let make = (
     </button>
 
   <>
-    <div className="p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 my-5 shadow-lg">
+    <div className="p-1 mb-8 rounded-lg flex flex-col bg-tertiary bg-opacity-75 my-5 shadow-lg">
       <div className="flex justify-center w-full my-1">
         <h1 className="font-bold text-xl font-alphbeta">
           {marketName->React.string} <Tooltip tip={`This market tracks ${marketName}`} />
