@@ -36,17 +36,17 @@ function Modal(Props) {
                     className: "justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none",
                     onClick: closeModal
                   }, React.createElement("div", {
-                        className: "relative w-auto my-6 mx-auto max-w-3xl"
+                        className: "relative my-6 mx-auto max-w-3xl p-5 border-0 rounded-sm shadow-lg relative flex flex-col  bg-white outline-none focus:outline-none"
                       }, React.createElement("div", {
-                            className: "p-5 border-0 rounded-sm shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none",
+                            className: "",
                             onClick: (function (e) {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 
                               })
-                          }, closeButton, React.createElement("div", {
-                                className: "relative px-6 flex-auto"
-                              }, children)))), React.createElement("div", {
+                          }, closeButton), React.createElement("div", {
+                            className: "relative px-6 flex-auto"
+                          }, children))), React.createElement("div", {
                     className: "opacity-25 fixed inset-0 z-40 bg-black"
                   }));
   } else {
