@@ -7,10 +7,12 @@ var React = require("react");
 function Modal(Props) {
   var id = Props.id;
   var closeModalOpt = Props.closeModal;
+  var titleOpt = Props.title;
   var children = Props.children;
   var closeModal = closeModalOpt !== undefined ? closeModalOpt : (function (param) {
         
       });
+  var title = titleOpt !== undefined ? titleOpt : "";
   var match = React.useState(function () {
         return true;
       });
@@ -38,14 +40,17 @@ function Modal(Props) {
                   }, React.createElement("div", {
                         className: "relative my-6 mx-auto max-w-3xl p-5 border-0 rounded-sm shadow-lg relative flex flex-col  bg-white outline-none focus:outline-none"
                       }, React.createElement("div", {
-                            className: "",
                             onClick: (function (e) {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 
                               })
-                          }, closeButton), React.createElement("div", {
-                            className: "relative px-6 flex-auto"
+                          }, title !== "" ? React.createElement("div", {
+                                  className: "flex items-center justify-between p-2 border-b border-solid border-blueGray-200 rounded-t"
+                                }, React.createElement("h3", {
+                                      className: "text-xl mr-4"
+                                    }, title), closeButton) : closeButton), React.createElement("div", {
+                            className: "relative px-6 py-2 flex-auto mx-auto"
                           }, children))), React.createElement("div", {
                     className: "opacity-25 fixed inset-0 z-40 bg-black"
                   }));

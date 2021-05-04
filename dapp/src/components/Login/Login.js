@@ -21,7 +21,7 @@ var connectors = [
     name: "MetaMask",
     connector: Web3Connectors.injected,
     img: "/img/wallet-icons/metamask.svg",
-    connectionPhrase: "Connect to your MetaMask Wallet"
+    connectionPhrase: "Connect via MetaMask"
   },
   {
     name: "WalletConnect",

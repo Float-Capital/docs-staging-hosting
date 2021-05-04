@@ -5,7 +5,7 @@ let connectors = [
     name: "MetaMask",
     connector: injected,
     img: "/img/wallet-icons/metamask.svg",
-    connectionPhrase: "Connect to your MetaMask Wallet",
+    connectionPhrase: "Connect via MetaMask",
   },
   {
     name: "WalletConnect",
@@ -20,7 +20,10 @@ let connectors = [
   },
   {
     name: "Torus",
-    connector: TorusConnector.make({chainId: Config.networkId, initOptions: {showTorusButton: false}}),
+    connector: TorusConnector.make({
+      chainId: Config.networkId,
+      initOptions: {showTorusButton: false},
+    }),
     connectionPhrase: "Connect via Torus",
     img: "/img/wallet-icons/torus.svg",
   },

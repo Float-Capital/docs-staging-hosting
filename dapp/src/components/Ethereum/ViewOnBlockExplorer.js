@@ -6,12 +6,16 @@ var Config = require("../../Config.js");
 
 function ViewOnBlockExplorer(Props) {
   var txHash = Props.txHash;
-  return React.createElement("a", {
-              className: "hover:underline text-gray-600 text-sm",
-              href: Config.blockExplorer + "tx/" + txHash,
-              rel: "noopener noreferrer",
-              target: "_"
-            }, "view on " + Config.blockExplorerName);
+  if (txHash !== "") {
+    return React.createElement("a", {
+                className: "hover:underline text-gray-600 text-sm",
+                href: Config.blockExplorer + "tx/" + txHash,
+                rel: "noopener noreferrer",
+                target: "_"
+              }, "view on " + Config.blockExplorerName);
+  } else {
+    return null;
+  }
 }
 
 var make = ViewOnBlockExplorer;

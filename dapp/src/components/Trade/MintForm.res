@@ -56,6 +56,7 @@ module SubmitButtonAndTxTracker = {
     | (ContractActions.Created, _) => <>
         <Modal id={1}>
           <div className="text-center mx-3 my-6">
+            <EllipsesLoader />
             <p> {`Please approve your ${Config.paymentTokenName} token `->React.string} </p>
           </div>
         </Modal>
@@ -64,7 +65,7 @@ module SubmitButtonAndTxTracker = {
     | (ContractActions.SignedAndSubmitted(txHash), _) => <>
         <Modal id={2}>
           <div className="text-center m-3">
-            <MiniLoader />
+            <div className="m-2"> <MiniLoader /> </div>
             <p> {"Approval transaction pending... "->React.string} </p>
             <ViewOnBlockExplorer txHash />
           </div>
@@ -75,7 +76,7 @@ module SubmitButtonAndTxTracker = {
     | (ContractActions.Complete({transactionHash: _}), ContractActions.UnInitialised) => <>
         <Modal id={3}>
           <div className="text-center mx-3 my-6">
-            <p> {`Confirm transaction to mint ${tokenToMint}`->React.string} </p>
+            <EllipsesLoader /> <p> {`Confirm transaction to mint ${tokenToMint}`->React.string} </p>
           </div>
         </Modal>
         <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
@@ -94,6 +95,7 @@ module SubmitButtonAndTxTracker = {
     | (_, ContractActions.Created) => <>
         <Modal id={5}>
           <div className="text-center m-3">
+            <EllipsesLoader />
             <h1> {`Confirm the transaction to mint ${tokenToMint}`->React.string} </h1>
           </div>
         </Modal>
@@ -117,7 +119,7 @@ module SubmitButtonAndTxTracker = {
     | (_, ContractActions.SignedAndSubmitted(txHash)) => <>
         <Modal id={7}>
           <div className="text-center m-3">
-            <MiniLoader />
+            <div className="m-2"> <MiniLoader /> </div>
             <p> {"Minting transaction pending... "->React.string} </p>
             <ViewOnBlockExplorer txHash />
           </div>
@@ -127,7 +129,7 @@ module SubmitButtonAndTxTracker = {
     | (_, ContractActions.Complete({transactionHash: _})) => <>
         <Modal id={8}>
           <div className="text-center m-3">
-            <p> {`Transaction complete 🎉`->React.string} </p>
+            <Tick /> <p> {`Transaction complete 🎉`->React.string} </p>
           </div>
         </Modal>
       </>

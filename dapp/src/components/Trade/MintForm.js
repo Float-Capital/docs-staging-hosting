@@ -3,6 +3,7 @@
 
 var Form = require("../Form.js");
 var Next = require("../../bindings/Next.js");
+var Tick = require("../UI/Tick.js");
 var Curry = require("rescript/lib/js/curry.js");
 var Modal = require("../UI/Modal.js");
 var React = require("react");
@@ -23,6 +24,7 @@ var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
 var ContractHooks = require("../Testing/Admin/ContractHooks.js");
 var ToastProvider = require("../UI/ToastProvider.js");
+var EllipsesLoader = require("../UI/EllipsesLoader.js");
 var ContractActions = require("../../ethereum/ContractActions.js");
 var LongOrShortSelect = require("../UI/LongOrShortSelect.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
@@ -562,7 +564,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                       id: 1,
                       children: React.createElement("div", {
                             className: "text-center mx-3 my-6"
-                          }, React.createElement("p", undefined, "Please approve your " + Config.paymentTokenName + " token "))
+                          }, React.createElement(EllipsesLoader.make, {}), React.createElement("p", undefined, "Please approve your " + Config.paymentTokenName + " token "))
                     }), React.createElement(Button.make, {
                       onClick: (function (param) {
                           
@@ -579,7 +581,9 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                           id: 2,
                           children: React.createElement("div", {
                                 className: "text-center m-3"
-                              }, React.createElement(MiniLoader.make, {}), React.createElement("p", undefined, "Approval transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                              }, React.createElement("div", {
+                                    className: "m-2"
+                                  }, React.createElement(MiniLoader.make, {})), React.createElement("p", undefined, "Approval transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
                                     txHash: txStateApprove._0
                                   }))
                         }), React.createElement(Button.make, {
@@ -644,7 +648,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                             id: 5,
                             children: React.createElement("div", {
                                   className: "text-center m-3"
-                                }, React.createElement("h1", undefined, "Confirm the transaction to mint " + tokenToMint))
+                                }, React.createElement(EllipsesLoader.make, {}), React.createElement("h1", undefined, "Confirm the transaction to mint " + tokenToMint))
                           }), React.createElement(Button.make, {
                             onClick: (function (param) {
                                 
@@ -660,7 +664,9 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                               id: 7,
                               children: React.createElement("div", {
                                     className: "text-center m-3"
-                                  }, React.createElement(MiniLoader.make, {}), React.createElement("p", undefined, "Minting transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                                  }, React.createElement("div", {
+                                        className: "m-2"
+                                      }, React.createElement(MiniLoader.make, {})), React.createElement("p", undefined, "Minting transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
                                         txHash: txStateMint._0
                                       }))
                             }), React.createElement(Button.make, {
@@ -682,7 +688,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                               id: 8,
                               children: React.createElement("div", {
                                     className: "text-center m-3"
-                                  }, React.createElement("p", undefined, "Transaction complete 🎉"))
+                                  }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"))
                             }));
           case /* Failed */3 :
               return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
@@ -700,7 +706,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                         id: 3,
                         children: React.createElement("div", {
                               className: "text-center mx-3 my-6"
-                            }, React.createElement("p", undefined, "Confirm transaction to mint " + tokenToMint))
+                            }, React.createElement(EllipsesLoader.make, {}), React.createElement("p", undefined, "Confirm transaction to mint " + tokenToMint))
                       }), React.createElement(Button.make, {
                         onClick: (function (param) {
                             
