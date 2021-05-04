@@ -9,6 +9,7 @@ var Button = require("../UI/Button.js");
 var Config = require("../../Config.js");
 var Ethers = require("../../ethereum/Ethers.js");
 var Ethers$1 = require("ethers");
+var Globals = require("../../libraries/Globals.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 var Contracts = require("../../ethereum/Contracts.js");
 var DataHooks = require("../../data/DataHooks.js");
@@ -570,7 +571,7 @@ function RedeemForm$ConnectedRedeemForm(Props) {
             Curry._1(setContractActionToCallAfterApproval, (function (param) {
                     return redeemFunction;
                   }));
-            var arg = amount.mul(Ethers$1.BigNumber.from("2"));
+            var arg = Globals.amountForApproval(amount);
             return Curry._2(contractExecutionHandlerApprove, (function (param) {
                           return Contracts.Erc20.make(syntheticTokenAddress, param);
                         }), (function (param) {
