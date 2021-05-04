@@ -1,5 +1,6 @@
 const primaryColor = "#0d4184";
 const primaryLightColor = "#1151A6";
+const lightGold = "#fff3e6";
 module.exports = {
   purge: {
     // Specify the paths to all of the template files in your project
@@ -64,7 +65,7 @@ module.exports = {
       ...theme("colors"),
       primary: primaryColor,
       "primary-light": primaryLightColor,
-      tertiary: "#fff3e6"
+      "light-gold": lightGold,
     }),
     textColor: {
       primary: primaryColor,

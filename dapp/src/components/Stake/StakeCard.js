@@ -242,7 +242,7 @@ function StakeCard(Props) {
                 })) : null
     );
   return React.createElement(React.Fragment, undefined, React.createElement("div", {
-                  className: "p-1 mb-8 rounded-lg flex flex-col bg-tertiary bg-opacity-75 my-5 shadow-lg"
+                  className: "p-1 mb-8 rounded-lg flex flex-col bg-light-gold bg-opacity-75 my-5 shadow-lg"
                 }, React.createElement("div", {
                       className: "flex justify-center w-full my-1"
                     }, React.createElement("h1", {
