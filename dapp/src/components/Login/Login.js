@@ -40,7 +40,10 @@ var connectors = [
   {
     name: "Torus",
     connector: new TorusConnector.TorusConnector({
-          chainId: 1
+          chainId: Config.networkId,
+          initOptions: {
+            showTorusButton: false
+          }
         }),
     img: "/img/wallet-icons/torus.svg",
     connectionPhrase: "Connect via Torus"
