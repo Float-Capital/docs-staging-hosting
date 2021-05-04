@@ -29,6 +29,7 @@ module RedeemFormInput = {
     ~isLong=false,
     ~hasBothTokens=false,
     ~market: Queries.SyntheticMarketInfo.t,
+    ~submitButton=React.null,
   ) => {
     let tokenType = isLong ? "long" : "short"
     <Form className="" onSubmit>
@@ -36,7 +37,7 @@ module RedeemFormInput = {
         ? <LongOrShortSelect isLong selectPosition={val => onChangeSide(val)} disabled />
         : React.null}
       <AmountInput value optBalance disabled onBlur onChange placeholder={"Redeem"} onMaxClick />
-      <Button onClick={_ => onSubmit()}> {`Redeem ${tokenType} ${market.name}`} </Button>
+      {submitButton}
     </Form>
   }
 }
@@ -102,7 +103,7 @@ module ConnectedRedeemForm = {
       ~shortTokenBalance,
     )
 
-    let (contractExecutionHandler, txState, _setTxState) = ContractActions.useContractFunction(
+    let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
       ~signer,
     )
 
@@ -168,6 +169,43 @@ module ConnectedRedeemForm = {
     | None => `/`
     }
 
+    let resetFormButton = () =>
+      <Button
+        onClick={_ => {
+          form.reset()
+          setTxStateApprove(_ => ContractActions.UnInitialised)
+          setTxState(_ => ContractActions.UnInitialised)
+        }}>
+        {"Reset & Redeem Again"}
+      </Button>
+
+    let formAmount = switch form.amountResult {
+    | Some(Ok(amount)) => Some(amount)
+    | _ => None
+    }
+
+    // TODO: incorp - optAdditionalErrorMessage
+    let (optAdditionalErrorMessage, buttonText, buttonDisabled) = {
+      let position = isLong ? "long" : "short"
+      switch (formAmount, optTokenBalance, optTokenAmountApproved) {
+      | (Some(amount), Some(balance), Some(amountApproved)) =>
+        let needsToApprove = isGreaterThanApproval(~amount, ~amountApproved)
+        let greaterThanBalance = isGreaterThanBalance(~amount, ~balance)
+        switch greaterThanBalance {
+        | true => (Some("Amount is greater than your balance"), `Insufficient balance`, true)
+        | false => (
+            None,
+            switch needsToApprove {
+            | true => `Approve ${position} ${market.name} & Redeem `
+            | false => `Redeem ${position} ${market.name}`
+            },
+            !form.valid(),
+          )
+        }
+      | _ => (None, `Redeem ${position} ${market.name}`, true)
+      }
+    }
+
     // Execute the call after approval has completed
     React.useEffect1(() => {
       switch txStateApprove {
@@ -212,7 +250,8 @@ module ConnectedRedeemForm = {
         toastDispatch(ToastProvider.Show(`Redeem transaction pending`, "", ToastProvider.Info))
       | Complete(_) =>
         toastDispatch(ToastProvider.Show(`Redeem transaction confirmed`, "", ToastProvider.Success))
-        router->Next.Router.push(userPage)
+      // TODO: decide if this is desired behaviour
+      // router->Next.Router.push(userPage)
       | Failed(_) =>
         toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
       | Declined(reason) =>
@@ -261,6 +300,14 @@ module ConnectedRedeemForm = {
           market
           isLong={isActuallyLong}
           hasBothTokens
+          submitButton={<RedeemSubmitButtonAndTxStatusModal
+            buttonText
+            resetFormButton
+            redeemToken={`${isLong ? "long" : "short"} ${market.name}`}
+            txStateApprove
+            txStateRedeem=txState
+            buttonDisabled
+          />}
         />
       : <p> {"No tokens in this market to redeem"->React.string} </p>
     // TODO

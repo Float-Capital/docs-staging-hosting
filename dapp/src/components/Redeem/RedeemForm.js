@@ -24,6 +24,7 @@ var ToastProvider = require("../UI/ToastProvider.js");
 var ContractActions = require("../../ethereum/ContractActions.js");
 var LongOrShortSelect = require("../UI/LongOrShortSelect.js");
 var Formality__ReactUpdate = require("re-formality/src/Formality__ReactUpdate.js");
+var RedeemSubmitButtonAndTxStatusModal = require("../Trade/RedeemSubmitButtonAndTxStatusModal.js");
 
 var validators = {
   amount: {
@@ -422,7 +423,7 @@ function RedeemForm$RedeemFormInput(Props) {
   var onChangeSideOpt = Props.onChangeSide;
   var isLongOpt = Props.isLong;
   var hasBothTokensOpt = Props.hasBothTokens;
-  var market = Props.market;
+  var submitButtonOpt = Props.submitButton;
   var onSubmit = onSubmitOpt !== undefined ? onSubmitOpt : (function (param) {
         
       });
@@ -443,7 +444,7 @@ function RedeemForm$RedeemFormInput(Props) {
       });
   var isLong = isLongOpt !== undefined ? isLongOpt : false;
   var hasBothTokens = hasBothTokensOpt !== undefined ? hasBothTokensOpt : false;
-  var tokenType = isLong ? "long" : "short";
+  var submitButton = submitButtonOpt !== undefined ? Caml_option.valFromOption(submitButtonOpt) : null;
   return React.createElement(Form.make, {
               className: "",
               onSubmit: onSubmit,
@@ -460,12 +461,7 @@ function RedeemForm$RedeemFormInput(Props) {
                   onBlur: onBlur,
                   onChange: onChange,
                   onMaxClick: onMaxClick
-                }), React.createElement(Button.make, {
-                  onClick: (function (param) {
-                      return Curry._1(onSubmit, undefined);
-                    }),
-                  children: "Redeem " + tokenType + " " + market.name
-                }));
+                }), submitButton);
 }
 
 var RedeemFormInput = {
@@ -531,6 +527,7 @@ function RedeemForm$ConnectedRedeemForm(Props) {
   var syntheticTokenAddress = match[1];
   var isActuallyLong = match[0];
   var match$1 = ContractActions.useContractFunction(signer);
+  var setTxState = match$1[2];
   var txState = match$1[1];
   var contractExecutionHandler = match$1[0];
   var match$2 = ContractActions.useContractFunction(signer);
@@ -578,7 +575,53 @@ function RedeemForm$ConnectedRedeemForm(Props) {
         }));
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
-  var userPage = optCurrentUser !== undefined ? "/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser)) : "/";
+  if (optCurrentUser !== undefined) {
+    "/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser));
+  } else {
+    "/";
+  }
+  var resetFormButton = function (param) {
+    return React.createElement(Button.make, {
+                onClick: (function (param) {
+                    Curry._1(form.reset, undefined);
+                    Curry._1(setTxStateApprove, (function (param) {
+                            return /* UnInitialised */0;
+                          }));
+                    return Curry._1(setTxState, (function (param) {
+                                  return /* UnInitialised */0;
+                                }));
+                  }),
+                children: "Reset & Redeem Again"
+              });
+  };
+  var match$5 = form.amountResult;
+  var formAmount = match$5 !== undefined && match$5.TAG === /* Ok */0 ? Caml_option.some(match$5._0) : undefined;
+  var position = isLong ? "long" : "short";
+  var match$6;
+  var exit = 0;
+  if (formAmount !== undefined && optTokenBalance !== undefined && optTokenAmountApproved !== undefined) {
+    var amount = Caml_option.valFromOption(formAmount);
+    var needsToApprove = amount.gt(Caml_option.valFromOption(optTokenAmountApproved));
+    var greaterThanBalance = amount.gt(Caml_option.valFromOption(optTokenBalance));
+    match$6 = greaterThanBalance ? [
+        "Amount is greater than your balance",
+        "Insufficient balance",
+        true
+      ] : [
+        undefined,
+        needsToApprove ? "Approve " + position + " " + market.name + " & Redeem " : "Redeem " + position + " " + market.name,
+        !Curry._1(form.valid, undefined)
+      ];
+  } else {
+    exit = 1;
+  }
+  if (exit === 1) {
+    match$6 = [
+      undefined,
+      "Redeem " + position + " " + market.name,
+      true
+    ];
+  }
   React.useEffect((function () {
           if (typeof txStateApprove === "number") {
             if (txStateApprove !== /* UnInitialised */0) {
@@ -669,7 +712,6 @@ function RedeemForm$ConnectedRedeemForm(Props) {
                         _2: /* Success */3,
                         [Symbol.for("name")]: "Show"
                       });
-                  router.push(userPage);
                   break;
               case /* Failed */3 :
                   Curry._1(toastDispatch, {
@@ -717,7 +759,17 @@ function RedeemForm$ConnectedRedeemForm(Props) {
                   }),
                 isLong: isActuallyLong,
                 hasBothTokens: match[3],
-                market: market
+                market: market,
+                submitButton: React.createElement(RedeemSubmitButtonAndTxStatusModal.make, {
+                      txStateApprove: txStateApprove,
+                      txStateRedeem: txState,
+                      resetFormButton: resetFormButton,
+                      redeemToken: (
+                        isLong ? "long" : "short"
+                      ) + " " + market.name,
+                      buttonText: match$6[1],
+                      buttonDisabled: match$6[2]
+                    })
               });
   } else {
     return React.createElement("p", undefined, "No tokens in this market to redeem");
