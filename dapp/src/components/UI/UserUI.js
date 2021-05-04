@@ -380,8 +380,9 @@ function UserUI$UserMarketUnstake(Props) {
   return React.createElement("div", {
               className: "flex flex-col"
             }, React.createElement("a", {
-                  className: "inline text-xxs self-center",
+                  className: "inline text-xxs self-center hover:opacity-75",
                   href: Config.blockExplorer + "/tx/" + creationTxHash,
+                  rel: "noopener noreferrer",
                   target: "_"
                 }, React.createElement("i", undefined, whenStr + " ago")), isCurrentUser ? React.createElement(Button.Tiny.make, {
                     onClick: unstake,

@@ -20,7 +20,7 @@ let connectors = [
   },
   {
     name: "Torus",
-    connector: TorusConnector.make({chainId: 1}),
+    connector: TorusConnector.make({chainId: Config.networkId, initOptions: {showTorusButton: false}}),
     connectionPhrase: "Connect via Torus",
     img: "/img/wallet-icons/torus.svg",
   },
