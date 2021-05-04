@@ -11,3 +11,9 @@ let percentStr = (~n: Ethers.BigNumber.t, ~outOf: Ethers.BigNumber.t) =>
     ->Ethers.BigNumber.div(outOf)
     ->Ethers.Utils.formatEtherToPrecision(2)
   }
+let amountForApproval = amount =>
+  if amount->Ethers.BigNumber.gt(CONSTANTS.oneHundredThousandInWei) {
+    amount
+  } else {
+    CONSTANTS.oneHundredThousandInWei
+  }

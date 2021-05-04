@@ -270,7 +270,7 @@ module MintFormSignedIn = {
         contractExecutionHandlerApprove(
           ~makeContractInstance=Contracts.Erc20.make(~address=Config.dai),
           ~contractFunction=Contracts.Erc20.approve(
-            ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
+            ~amount=amount->Globals.amountForApproval,
             ~spender=Config.longShort,
           ),
         )

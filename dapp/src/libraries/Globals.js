@@ -22,8 +22,17 @@ function percentStr(n, outOf) {
   }
 }
 
+function amountForApproval(amount) {
+  if (amount.gt(CONSTANTS.oneHundredThousandInWei)) {
+    return amount;
+  } else {
+    return CONSTANTS.oneHundredThousandInWei;
+  }
+}
+
 exports.ethAdrToStr = ethAdrToStr;
 exports.ethAdrToLowerStr = ethAdrToLowerStr;
 exports.timestampToDuration = timestampToDuration;
 exports.percentStr = percentStr;
+exports.amountForApproval = amountForApproval;
 /* Ethers Not a pure module */

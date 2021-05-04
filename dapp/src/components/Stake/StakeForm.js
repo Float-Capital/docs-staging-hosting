@@ -9,6 +9,7 @@ var Button = require("../UI/Button.js");
 var Config = require("../../Config.js");
 var Ethers = require("../../ethereum/Ethers.js");
 var Ethers$1 = require("ethers");
+var Globals = require("../../libraries/Globals.js");
 var Queries = require("../../data/Queries.js");
 var Contracts = require("../../ethereum/Contracts.js");
 var DataHooks = require("../../data/DataHooks.js");
@@ -616,7 +617,7 @@ function StakeForm$ConnectedStakeForm(Props) {
                   return stakeAndEarnImmediatlyFunction;
                 }));
           var partial_arg = Ethers$1.utils.getAddress(tokenId);
-          var arg = amount.mul(Ethers$1.BigNumber.from("2"));
+          var arg = Globals.amountForApproval(amount);
           return Curry._2(contractExecutionHandlerApprove, (function (param) {
                         return Contracts.Erc20.make(partial_arg, param);
                       }), (function (param) {
