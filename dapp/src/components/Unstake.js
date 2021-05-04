@@ -4,6 +4,7 @@
 var Form = require("./Form.js");
 var Curry = require("rescript/lib/js/curry.js");
 var Login = require("./Login/Login.js");
+var Modal = require("./UI/Modal.js");
 var React = require("react");
 var Button = require("./UI/Button.js");
 var Config = require("../Config.js");
@@ -18,9 +19,13 @@ var MiniLoader = require("./UI/MiniLoader.js");
 var AmountInput = require("./UI/AmountInput.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
+var Router = require("next/router");
 var RootProvider = require("../libraries/RootProvider.js");
 var ContractHooks = require("./Testing/Admin/ContractHooks.js");
+var ToastProvider = require("./UI/ToastProvider.js");
 var ContractActions = require("../ethereum/ContractActions.js");
+var MessageUsOnDiscord = require("./Ethereum/MessageUsOnDiscord.js");
+var ViewOnBlockExplorer = require("./Ethereum/ViewOnBlockExplorer.js");
 var Formality__ReactUpdate = require("re-formality/src/Formality__ReactUpdate.js");
 
 var validators = {
@@ -414,6 +419,59 @@ function useBalanceAndApproved(erc20Address, spender) {
         ];
 }
 
+function Unstake$UnstakeTxStatusModal(Props) {
+  var txStateUnstake = Props.txStateUnstake;
+  var resetFormButton = Props.resetFormButton;
+  if (typeof txStateUnstake === "number") {
+    if (txStateUnstake === /* UnInitialised */0) {
+      return null;
+    } else {
+      return React.createElement(Modal.make, {
+                  id: "unstake-1",
+                  children: React.createElement("div", {
+                        className: "text-center m-3"
+                      }, React.createElement("p", undefined, "Confirm unstake transaction in your wallet "))
+                });
+    }
+  }
+  switch (txStateUnstake.TAG | 0) {
+    case /* SignedAndSubmitted */0 :
+        return React.createElement(Modal.make, {
+                    id: "unstake-2",
+                    children: React.createElement("div", {
+                          className: "text-center m-3"
+                        }, React.createElement(MiniLoader.make, {}), React.createElement("p", undefined, "Unstake transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                              txHash: txStateUnstake._0
+                            }))
+                  });
+    case /* Declined */1 :
+        return React.createElement(React.Fragment, undefined, Curry._1(resetFormButton, undefined));
+    case /* Complete */2 :
+        return React.createElement(Modal.make, {
+                    id: "unstake-3",
+                    children: React.createElement("div", {
+                          className: "text-center m-3"
+                        }, React.createElement("p", undefined, "Transaction complete 🎉"), Curry._1(resetFormButton, undefined))
+                  });
+    case /* Failed */3 :
+        var txHash = txStateUnstake._0;
+        console.log(txHash);
+        return React.createElement(Modal.make, {
+                    id: "unstake-4",
+                    children: React.createElement("div", {
+                          className: "text-center m-3"
+                        }, React.createElement("p", undefined, "The transaction failed."), txHash !== "" ? React.createElement(ViewOnBlockExplorer.make, {
+                                txHash: txHash
+                              }) : null, React.createElement(MessageUsOnDiscord.make, {}), Curry._1(resetFormButton, undefined))
+                  });
+    
+  }
+}
+
+var UnstakeTxStatusModal = {
+  make: Unstake$UnstakeTxStatusModal
+};
+
 function Unstake$StakeFormInput(Props) {
   var onSubmitOpt = Props.onSubmit;
   var valueOpt = Props.value;
@@ -423,6 +481,7 @@ function Unstake$StakeFormInput(Props) {
   var onBlurOpt = Props.onBlur;
   var onMaxClickOpt = Props.onMaxClick;
   var synthetic = Props.synthetic;
+  var txStateModalOpt = Props.txStateModal;
   var onSubmit = onSubmitOpt !== undefined ? onSubmitOpt : (function (param) {
         
       });
@@ -438,6 +497,7 @@ function Unstake$StakeFormInput(Props) {
   var onMaxClick = onMaxClickOpt !== undefined ? onMaxClickOpt : (function (param) {
         
       });
+  var txStateModal = txStateModalOpt !== undefined ? Caml_option.valFromOption(txStateModalOpt) : null;
   return React.createElement(Form.make, {
               className: "",
               onSubmit: onSubmit,
@@ -455,7 +515,7 @@ function Unstake$StakeFormInput(Props) {
                       return Curry._1(onSubmit, undefined);
                     }),
                   children: "Unstake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name
-                }));
+                }), txStateModal);
 }
 
 var StakeFormInput = {
@@ -467,6 +527,8 @@ function Unstake$ConnectedStakeForm(Props) {
   var signer = Props.signer;
   var synthetic = Props.synthetic;
   var match = ContractActions.useContractFunction(signer);
+  var setTxState = match[2];
+  var txState = match[1];
   var contractExecutionHandler = match[0];
   var user = RootProvider.useCurrentUserExn(undefined);
   var optTokenBalance = Belt_Option.flatMap(DataHooks.Util.graphResponseToOption(DataHooks.useStakesForUser(Ethers.Utils.ethAdrToLowerStr(user))), (function (a) {
@@ -487,6 +549,72 @@ function Unstake$ConnectedStakeForm(Props) {
                         return param.withdraw(arg, amount);
                       }));
         }));
+  var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
+  var router = Router.useRouter();
+  var optCurrentUser = RootProvider.useCurrentUser(undefined);
+  var userPage = optCurrentUser !== undefined ? "/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser)) : "/";
+  React.useEffect((function () {
+          if (typeof txState === "number") {
+            if (txState !== /* UnInitialised */0) {
+              Curry._1(toastDispatch, {
+                    _0: "Confirm the transaction to unstake",
+                    _1: "",
+                    _2: /* Info */2,
+                    [Symbol.for("name")]: "Show"
+                  });
+            }
+            
+          } else {
+            switch (txState.TAG | 0) {
+              case /* SignedAndSubmitted */0 :
+                  Curry._1(toastDispatch, {
+                        _0: "Unstake transaction pending",
+                        _1: "",
+                        _2: /* Info */2,
+                        [Symbol.for("name")]: "Show"
+                      });
+                  break;
+              case /* Declined */1 :
+                  Curry._1(toastDispatch, {
+                        _0: "The transaction was rejected by your wallet",
+                        _1: txState._0,
+                        _2: /* Warning */1,
+                        [Symbol.for("name")]: "Show"
+                      });
+                  break;
+              case /* Complete */2 :
+                  Curry._1(toastDispatch, {
+                        _0: "Unstake transaction confirmed",
+                        _1: "",
+                        _2: /* Success */3,
+                        [Symbol.for("name")]: "Show"
+                      });
+                  router.push(userPage);
+                  break;
+              case /* Failed */3 :
+                  Curry._1(toastDispatch, {
+                        _0: "The transaction failed",
+                        _1: "",
+                        _2: /* Error */0,
+                        [Symbol.for("name")]: "Show"
+                      });
+                  break;
+              
+            }
+          }
+          
+        }), [txState]);
+  var resetFormButton = function (param) {
+    return React.createElement(Button.make, {
+                onClick: (function (param) {
+                    Curry._1(form.reset, undefined);
+                    return Curry._1(setTxState, (function (param) {
+                                  return /* UnInitialised */0;
+                                }));
+                  }),
+                children: "Reset & Unstake Again"
+              });
+  };
   return React.createElement(Unstake$StakeFormInput, {
               onSubmit: form.submit,
               value: form.input.amount,
@@ -509,7 +637,11 @@ function Unstake$ConnectedStakeForm(Props) {
                                       };
                               }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
                 }),
-              synthetic: synthetic
+              synthetic: synthetic,
+              txStateModal: React.createElement(Unstake$UnstakeTxStatusModal, {
+                    txStateUnstake: txState,
+                    resetFormButton: resetFormButton
+                  })
             });
 }
 
@@ -584,6 +716,7 @@ var make = Unstake;
 
 exports.StakeForm = StakeForm;
 exports.useBalanceAndApproved = useBalanceAndApproved;
+exports.UnstakeTxStatusModal = UnstakeTxStatusModal;
 exports.StakeFormInput = StakeFormInput;
 exports.ConnectedStakeForm = ConnectedStakeForm;
 exports.make = make;
