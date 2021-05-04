@@ -26,7 +26,7 @@ module TorusConnector = {
   type initializationOptions = {showTorusButton: bool}
   type connectorOptions = {chainId: int, initOptions: initializationOptions}
   @module("@web3-react/torus-connector") @new
-  external make: (connectorOptions) => injectedType = "TorusConnector"
+  external make: connectorOptions => injectedType = "TorusConnector"
 }
 
 let injected = InjectedConnector.make({supportedChainIds: [Config.networkId]})
