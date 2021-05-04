@@ -954,7 +954,7 @@ contract LongShort is ILongShort, Initializable {
         internal
         refreshSystemState(marketIndex)
     {
-        // Burn tokens - will revert unless user gives permission.
+        // Only this contract has permission to call this function
         longTokens[marketIndex].synthRedeemBurn(msg.sender, tokensToRedeem);
 
         // Compute fees.
@@ -991,7 +991,7 @@ contract LongShort is ILongShort, Initializable {
         internal
         refreshSystemState(marketIndex)
     {
-        // Burn tokens - will revert unless user gives permission to contract.
+        // Only this contract has permission to call this function
         shortTokens[marketIndex].synthRedeemBurn(msg.sender, tokensToRedeem);
 
         // Compute fees.

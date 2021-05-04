@@ -69,7 +69,6 @@ function doneLoop {
 function start {
     # echo "####### CLEANUP #######"
     docker-compose down -v
-    rm ../contracts/.openzeppelin/dev-321.json
 
     echo "####### DOCKER-COMPOSE #######"
     docker-compose up 2>&1 > /dev/null &
