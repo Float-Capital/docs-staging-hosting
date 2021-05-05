@@ -530,7 +530,34 @@ contract LongShort is ILongShort, Initializable {
         shortValue[marketIndex] = shortValue[marketIndex] + shortAmount;
     }
 
-    // TODO fix with beta
+    function _calculateValueChangeForPriceMechanism(
+        uint32 marketIndex,
+        uint256 assetPriceGreater,
+        uint256 assetPriceLess,
+        uint256 greatestPossibleValueChange
+    ) internal view returns (uint256) {
+        uint256 valueChange = 0;
+
+        uint256 percentageChange =
+            ((assetPriceGreater - assetPriceLess) * TEN_TO_THE_18) /
+                assetPrice[marketIndex];
+        if (percentageChange >= TEN_TO_THE_18) {
+            // More than 100% price movement, system liquidation.
+            valueChange = greatestPossibleValueChange;
+        } else {
+            if (getShortBeta(marketIndex) == TEN_TO_THE_18) {
+                valueChange =
+                    (shortValue[marketIndex] * percentageChange) /
+                    TEN_TO_THE_18;
+            } else {
+                valueChange =
+                    (longValue[marketIndex] * percentageChange) /
+                    TEN_TO_THE_18;
+            }
+        }
+        return valueChange;
+    }
+
     function _priceChangeMechanism(uint32 marketIndex, uint256 newPrice)
         internal
     {
@@ -538,56 +565,26 @@ contract LongShort is ILongShort, Initializable {
         if (assetPrice[marketIndex] == newPrice) {
             return;
         }
-        // 100% -> 10**18
-        // 100% -> 1
-        uint256 percentageChange;
         uint256 valueChange = 0;
         // Long gains
         if (newPrice > assetPrice[marketIndex]) {
-            percentageChange =
-                ((newPrice - assetPrice[marketIndex]) * TEN_TO_THE_18) /
-                assetPrice[marketIndex];
-            if (percentageChange >= TEN_TO_THE_18) {
-                // More than 100% price movement, system liquidation.
-                longValue[marketIndex] =
-                    longValue[marketIndex] +
-                    shortValue[marketIndex];
-                shortValue[marketIndex] = 0;
-            } else {
-                if (getShortBeta(marketIndex) == TEN_TO_THE_18) {
-                    valueChange =
-                        (shortValue[marketIndex] * percentageChange) /
-                        TEN_TO_THE_18;
-                } else {
-                    valueChange =
-                        (longValue[marketIndex] * percentageChange) /
-                        TEN_TO_THE_18;
-                }
-                longValue[marketIndex] = longValue[marketIndex] + valueChange;
-                shortValue[marketIndex] = shortValue[marketIndex] - valueChange;
-            }
+            valueChange = _calculateValueChangeForPriceMechanism(
+                marketIndex,
+                newPrice,
+                assetPrice[marketIndex],
+                shortValue[marketIndex]
+            );
+            longValue[marketIndex] = longValue[marketIndex] + valueChange;
+            shortValue[marketIndex] = shortValue[marketIndex] - valueChange;
         } else {
-            percentageChange =
-                ((assetPrice[marketIndex] - newPrice) * TEN_TO_THE_18) /
-                assetPrice[marketIndex];
-            if (percentageChange >= TEN_TO_THE_18) {
-                shortValue[marketIndex] =
-                    shortValue[marketIndex] +
-                    longValue[marketIndex];
-                longValue[marketIndex] = 0;
-            } else {
-                if (getShortBeta(marketIndex) == TEN_TO_THE_18) {
-                    valueChange =
-                        (shortValue[marketIndex] * percentageChange) /
-                        TEN_TO_THE_18;
-                } else {
-                    valueChange =
-                        (longValue[marketIndex] * percentageChange) /
-                        TEN_TO_THE_18;
-                }
-                longValue[marketIndex] = longValue[marketIndex] - valueChange;
-                shortValue[marketIndex] = shortValue[marketIndex] + valueChange;
-            }
+            valueChange = _calculateValueChangeForPriceMechanism(
+                marketIndex,
+                assetPrice[marketIndex],
+                newPrice,
+                longValue[marketIndex]
+            );
+            longValue[marketIndex] = longValue[marketIndex] - valueChange;
+            shortValue[marketIndex] = shortValue[marketIndex] + valueChange;
         }
     }
 
