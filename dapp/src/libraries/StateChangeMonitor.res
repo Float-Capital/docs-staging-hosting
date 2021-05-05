@@ -113,7 +113,7 @@ let make = (~children) => {
               | Some(Ok({user: None}))
               | Some(Error(_))
               | None =>
-                // If the query hasn't been made, no-user is recorded, or there was an error with eth original request, then fetch the users balances
+                // If the query hasn't been made, no-user is recorded, or there was an error with the original request, then fetch the users balances
                 let _ = client.query(~query=module(Queries.UsersBalances), {userId: id})
               }
             })
@@ -144,7 +144,7 @@ let make = (~children) => {
               })
             | Some(Error(_))
             | None =>
-              // If the query hasn't been made, or there was an error with eth original request, then fetch the users balances
+              // If the query hasn't been made, or there was an error with the original request, then fetch the users stakes
               let _ = client.query(~query=module(Queries.UsersStakes), {userId: currentUser})
             }
           }
