@@ -24,7 +24,7 @@ var ToastProvider = require("../UI/ToastProvider.js");
 var ContractActions = require("../../ethereum/ContractActions.js");
 var LongOrShortSelect = require("../UI/LongOrShortSelect.js");
 var Formality__ReactUpdate = require("re-formality/src/Formality__ReactUpdate.js");
-var RedeemSubmitButtonAndTxStatusModal = require("../Trade/RedeemSubmitButtonAndTxStatusModal.js");
+var RedeemSubmitButtonAndTxStatusModal = require("./RedeemSubmitButtonAndTxStatusModal.js");
 
 var validators = {
   amount: {

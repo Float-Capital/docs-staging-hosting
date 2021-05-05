@@ -117,7 +117,6 @@ module ConnectedStakeForm = {
         toastDispatch(
           ToastProvider.Show(`Staking transaction confirmed`, "", ToastProvider.Success),
         )
-        router->Next.Router.push(userPage)
       | Failed(_) =>
         toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
       | Declined(reason) =>
