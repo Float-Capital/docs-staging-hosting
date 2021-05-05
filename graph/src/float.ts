@@ -529,7 +529,7 @@ function updateLatestTokenPrice(
       marketIndexId + "-" + suffixStr + "-" + timestamp.toString()
     );
     newPriceEntity.price = newPrice;
-    newPriceEntity.timeUpdated = newPrice;
+    newPriceEntity.timeUpdated = timestamp;
     newPriceEntity.token = prevPrice.token;
 
     newPriceEntity.save();
