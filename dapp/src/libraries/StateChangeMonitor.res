@@ -47,7 +47,7 @@ let make = (~children) => {
       switch queryResult {
       | Ok({data: {stateChanges: []}}) => ()
       | Ok({data: {stateChanges}}) =>
-        let _ = stateChanges->Array.map(({timestamp, affectedUsers}) => {
+        let _ = stateChanges->Array.map(({timestamp, affectedUsers, affectedStakes}) => {
           if timestamp->Ethers.BigNumber.gt(latestStateChangeTimestamp) {
             setLatestStateChangeTimestamp(_ => timestamp)
             // Update cache of values for all affected users
@@ -67,8 +67,8 @@ let make = (~children) => {
                 )
               })
 
-			  // NOTE: This is only necessary in the case that the `UserQuery` hasn't been made yet (for example if they haven't navigated to their profile
-			  //     - even in that case it isn't strictly needed, since when navigating to a page that needs this data the page will load it freshly anyway.
+              // NOTE: This is only necessary in the case that the `UserQuery` hasn't been made yet (for example if they haven't navigated to their profile
+              //     - even in that case it isn't strictly needed, since when navigating to a page that needs this data the page will load it freshly anyway.
               let _ = client.writeQuery(
                 ~query=module(Queries.UserQuery),
                 ~data={
@@ -110,10 +110,43 @@ let make = (~children) => {
                   },
                   {userId: id},
                 )
-              | _ =>
+              | Some(Ok({user: None}))
+              | Some(Error(_))
+              | None =>
+                // If the query hasn't been made, no-user is recorded, or there was an error with the original request, then fetch the users balances
                 let _ = client.query(~query=module(Queries.UsersBalances), {userId: id})
               }
             })
+
+            let balanceReadQuery = client.readQuery(
+              ~query=module(Queries.UsersStakes),
+              {userId: currentUser},
+            )
+            switch balanceReadQuery {
+            | Some(Ok({currentStakes})) =>
+              let containsDetailedStakeItem = (
+                listOfStakes: array<Queries.CurrentStakeDetailed.t>,
+                {id: comparisonId}: Queries.CurrentStakeDetailed.t,
+              ) => {
+                listOfStakes->Array.getIndexBy(({id}) => comparisonId == id)
+              }
+
+              let _ = affectedStakes->Array.map(({__typename, currentStakeDetailed}) => {
+                switch currentStakes->containsDetailedStakeItem(currentStakeDetailed) {
+                | Some(_index) => ()
+                | None =>
+                  let _ = client.writeQuery(
+                    ~query=module(Queries.UsersStakes),
+                    ~data={currentStakes: currentStakes->Array.concat([currentStakeDetailed])},
+                    {userId: currentUser},
+                  )
+                }
+              })
+            | Some(Error(_))
+            | None =>
+              // If the query hasn't been made, or there was an error with the original request, then fetch the users stakes
+              let _ = client.query(~query=module(Queries.UsersStakes), {userId: currentUser})
+            }
           }
         })
       | Error(_) => ()
