@@ -1,0 +1,113 @@
+/* Inspired by https://codepen.io/whereverpanda, tweaked for float */
+
+.tick {
+  display: block;
+  position: relative;
+  width: 84px;
+  height: 84px;
+  margin: 12px auto;
+  background: #ffffff;
+  border: 5px solid #0d4184;
+  border-radius: 50%;
+}
+.tick:before {
+  display: block;
+  position: absolute;
+  bottom: 36px;
+  left: 20px;
+  content: "";
+  width: 20px;
+  height: 5px;
+  background: #0d4184;
+  visibility: hidden;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+  -webkit-animation: shortTick 0.3s forwards ease;
+  -moz-animation: shortTick 0.3s forwards ease;
+  -o-animation: shortTick 0.3s forwards ease;
+  transform-origin: left top;
+  -webkit-animation-delay: 1s;
+  animation-delay: 1s;
+}
+.tick:after {
+  display: block;
+  position: absolute;
+  bottom: 25px;
+  left: 30px;
+  content: "";
+  width: 60px;
+  height: 5px;
+  background: #0d4184;
+  visibility: hidden;
+  -webkit-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  -webkit-animation: longTick 0.3s forwards ease;
+  -moz-animation: longTick 0.3s forwards ease;
+  -o-animation: longTick 0.3s forwards ease;
+  transform-origin: left top;
+  -webkit-animation-delay: 1.5s;
+  animation-delay: 1.5s;
+}
+
+@-webkit-keyframes shortTick {
+  0% {
+    width: 0px;
+    visibility: visible;
+  }
+  100% {
+    width: 20px;
+    visibility: visible;
+  }
+}
+@-moz-keyframes shortTick {
+  0% {
+    width: 0px;
+    visibility: visible;
+  }
+  100% {
+    width: 20px;
+    visibility: visible;
+  }
+}
+@-o-keyframes shortTick {
+  0% {
+    width: 0px;
+    visibility: visible;
+  }
+  100% {
+    width: 20px;
+    visibility: visible;
+  }
+}
+@-webkit-keyframes longTick {
+  0% {
+    width: 4px;
+    visibility: visible;
+  }
+  100% {
+    width: 32px;
+    visibility: visible;
+  }
+}
+@-moz-keyframes longTick {
+  0% {
+    width: 4px;
+    visibility: visible;
+  }
+  100% {
+    width: 32px;
+    visibility: visible;
+  }
+}
+@-o-keyframes longTick {
+  0% {
+    width: 4px;
+    visibility: visible;
+  }
+  100% {
+    width: 32px;
+    visibility: visible;
+  }
+}

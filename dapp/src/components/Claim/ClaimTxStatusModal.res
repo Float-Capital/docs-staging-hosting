@@ -4,20 +4,22 @@ let make = (~txState) => {
   | ContractActions.Created =>
     <Modal id={1}>
       <div className="text-center m-3">
-        <h1> {`Confirm the transaction to claim Float`->React.string} </h1>
+        <EllipsesLoader /> <h1> {`Confirm the transaction to claim Float`->React.string} </h1>
       </div>
     </Modal>
   | ContractActions.SignedAndSubmitted(txHash) =>
     <Modal id={2}>
       <div className="text-center m-3">
-        <MiniLoader />
+        <div className="m-2"> <MiniLoader /> </div>
         <p> {"Claiming transaction pending... "->React.string} </p>
         <ViewOnBlockExplorer txHash />
       </div>
     </Modal>
   | ContractActions.Complete({transactionHash: _}) =>
     <Modal id={3}>
-      <div className="text-center m-3"> <p> {`Transaction complete 🎉`->React.string} </p> </div>
+      <div className="text-center m-3">
+        <Tick /> <p> {`Transaction complete 🎉`->React.string} </p>
+      </div>
       {if InjectedEthereum.isMetamask() {
         <AddToMetamask
           tokenAddress={Config.config.contracts.floatToken->Ethers.Utils.ethAdrToStr}

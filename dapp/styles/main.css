@@ -2,6 +2,8 @@
 @tailwind components;
 
 @import "./_fonts.css";
+@import "./ellipsis-loader.css";
+@import "./tick-animation.css";
 
 body {
   /* It is possible to make this a utility (https://tailwindcss.com/docs/plugins#adding-utilities)

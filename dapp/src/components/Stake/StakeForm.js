@@ -495,9 +495,13 @@ function StakeForm$ConnectedStakeForm(Props) {
   var user = RootProvider.useCurrentUserExn(undefined);
   var optTokenBalance = DataHooks.Util.graphResponseToOption(DataHooks.useSyntheticTokenBalance(user, synthetic.tokenAddress));
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
-  var router = Router.useRouter();
+  Router.useRouter();
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
-  var userPage = optCurrentUser !== undefined ? "/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser)) : "/";
+  if (optCurrentUser !== undefined) {
+    "/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser));
+  } else {
+    "/";
+  }
   React.useEffect((function () {
           if (typeof txStateApprove === "number") {
             if (txStateApprove !== /* UnInitialised */0) {
@@ -588,7 +592,6 @@ function StakeForm$ConnectedStakeForm(Props) {
                         _2: /* Success */3,
                         [Symbol.for("name")]: "Show"
                       });
-                  router.push(userPage);
                   break;
               case /* Failed */3 :
                   Curry._1(toastDispatch, {
