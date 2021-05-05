@@ -27,10 +27,9 @@ contract("OracleManager (EthKiller)", (accounts) => {
     await bandOracle.setRate("EOS", "BUSD", one);
     await bandOracle.setRate("XRP", "BUSD", one);
 
-    ethKiller = await EthKiller.new({
+    ethKiller = await EthKiller.new(admin, bandOracle.address, {
       from: admin,
     });
-    await ethKiller.setup(admin, bandOracle.address, { from: admin });
   });
 
   let oracleTest = (params) => {

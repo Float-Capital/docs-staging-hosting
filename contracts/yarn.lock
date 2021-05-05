@@ -1809,10 +1809,10 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.0.0.tgz#11edb64933c43ab3eab2a84abe5e3ccf2981c4c7"
   integrity sha512-T5tO/KD++m+Ph74ppPPmNuhyrvNcsMDgQWt+pGshNJMsTf9UvmhBNyyOqVAL91UeuqDI0FHAbBV1+NnMg7ffFA==
 
-"@openzeppelin/contracts@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.0.0.tgz#54d1de30911635020c383cb73b160b698e7ae179"
-  integrity sha512-UcIJl/vUVjTr3H1yYXZi7Sr2PlXzBEHVUJKOUlVyzyy0FI8oQCCy0Wx+BuK/fojdnmLeMvUk4KUvhKUybP+C7Q==
+"@openzeppelin/contracts@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.1.0.tgz#baec89a7f5f73e3d8ea582a78f1980134b605375"
+  integrity sha512-TihZitscnaHNcZgXGj9zDLDyCqjziytB4tMCwXq0XimfWkAjBYyk5/pOsDbbwcavhlc79HhpTEpQcrMnPVa1mw==
 
 "@openzeppelin/fuzzy-solidity-import-parser@^0.1.2":
   version "0.1.2"

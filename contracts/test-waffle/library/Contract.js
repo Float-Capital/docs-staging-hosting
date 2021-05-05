@@ -10,6 +10,22 @@ function deployContract(contractName) {
             });
 }
 
+function deployContract1(contractName, firstParam) {
+  return ethers.getContractFactory(contractName).then(function (__x) {
+                return __x.deploy(firstParam);
+              }).then(function (prim) {
+              return prim.deployed();
+            });
+}
+
+function deployContract2(contractName, firstParam, secondParam) {
+  return ethers.getContractFactory(contractName).then(function (__x) {
+                return __x.deploy(firstParam, secondParam);
+              }).then(function (prim) {
+              return prim.deployed();
+            });
+}
+
 var contractName = "LongShort";
 
 function make(param) {
@@ -23,8 +39,8 @@ var LongShort = {
 
 var contractName$1 = "YieldManagerMock";
 
-function make$1(param) {
-  return deployContract(contractName$1);
+function make$1(admin) {
+  return deployContract1(contractName$1, admin);
 }
 
 var YieldManagerMock = {
@@ -67,8 +83,8 @@ var SyntheticToken = {
 
 var contractName$5 = "TokenFactory";
 
-function make$5(param) {
-  return deployContract(contractName$5);
+function make$5(admin, longShort) {
+  return deployContract2(contractName$5, admin, longShort);
 }
 
 var TokenFactory = {
@@ -121,6 +137,8 @@ var Treasury_v0 = {
 };
 
 exports.deployContract = deployContract;
+exports.deployContract1 = deployContract1;
+exports.deployContract2 = deployContract2;
 exports.LongShort = LongShort;
 exports.YieldManagerMock = YieldManagerMock;
 exports.OracleManagerMock = OracleManagerMock;

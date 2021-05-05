@@ -10,27 +10,26 @@ type coreContracts = {
 let inititialize = () => {
   let admin = "0x0000000000000000000000000000000000000000"
   open Contract
-  JsPromise.all6((
-    TokenFactory.make(),
+  JsPromise.all5((
     FloatCapital_v0.make(),
     Treasury_v0.make(),
     FloatToken.make(),
     Staker.make(),
     LongShort.make(),
-  ))->JsPromise.then(((tokenFactory, floatCapital, treasury, floatToken, staker, longShort)) => {
-    Js.log("got here at least")
-    JsPromise.all5((
-      floatToken->FloatToken.setup("Float token", "FLOAT TOKEN", staker.address),
-      treasury->Treasury_v0.setup(admin),
-      tokenFactory->TokenFactory.setup(admin, longShort.address),
-      longShort->LongShort.setup(admin, treasury.address, tokenFactory.address, staker.address),
-      staker->Staker.setup(admin, longShort.address, floatToken.address, floatCapital.address),
-    ))->JsPromise.map(_ => {
-      staker: staker,
-      longShort: longShort,
-      floatToken: floatToken,
-      tokenFactory: tokenFactory,
-      treasury: treasury,
+  ))->JsPromise.then(((floatCapital, treasury, floatToken, staker, longShort)) => {
+    TokenFactory.make(admin, longShort.address)->JsPromise.map(tokenFactory => {
+      JsPromise.all4((
+        floatToken->FloatToken.setup("Float token", "FLOAT TOKEN", staker.address),
+        treasury->Treasury_v0.setup(admin),
+        longShort->LongShort.setup(admin, treasury.address, tokenFactory.address, staker.address),
+        staker->Staker.setup(admin, longShort.address, floatToken.address, floatCapital.address),
+      ))->JsPromise.map(_ => {
+        staker: staker,
+        longShort: longShort,
+        floatToken: floatToken,
+        tokenFactory: tokenFactory,
+        treasury: treasury,
+      })
     })
   })
 }
