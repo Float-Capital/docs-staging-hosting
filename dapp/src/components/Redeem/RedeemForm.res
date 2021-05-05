@@ -28,10 +28,8 @@ module RedeemFormInput = {
     ~onChangeSide=_ => (),
     ~isLong=false,
     ~hasBothTokens=false,
-    ~market: Queries.SyntheticMarketInfo.t,
     ~submitButton=React.null,
   ) => {
-    let tokenType = isLong ? "long" : "short"
     <Form className="" onSubmit>
       {hasBothTokens
         ? <LongOrShortSelect isLong selectPosition={val => onChangeSide(val)} disabled />
@@ -185,7 +183,7 @@ module ConnectedRedeemForm = {
     }
 
     // TODO: incorp - optAdditionalErrorMessage
-    let (optAdditionalErrorMessage, buttonText, buttonDisabled) = {
+    let (_optAdditionalErrorMessage, buttonText, buttonDisabled) = {
       let position = isLong ? "long" : "short"
       switch (formAmount, optTokenBalance, optTokenAmountApproved) {
       | (Some(amount), Some(balance), Some(amountApproved)) =>
