@@ -759,7 +759,6 @@ function RedeemForm$ConnectedRedeemForm(Props) {
                   }),
                 isLong: isActuallyLong,
                 hasBothTokens: match[3],
-                market: market,
                 submitButton: React.createElement(RedeemSubmitButtonAndTxStatusModal.make, {
                       txStateApprove: txStateApprove,
                       txStateRedeem: txState,
@@ -799,8 +798,7 @@ function RedeemForm$1(Props) {
                   })
               }, React.createElement(RedeemForm$RedeemFormInput, {
                     isLong: isLong,
-                    hasBothTokens: false,
-                    market: market
+                    hasBothTokens: false
                   }));
   }
 }

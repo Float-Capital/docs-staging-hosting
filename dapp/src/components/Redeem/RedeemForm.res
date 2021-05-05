@@ -295,7 +295,6 @@ module ConnectedRedeemForm = {
             )
             router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
           }}
-          market
           isLong={isActuallyLong}
           hasBothTokens
           submitButton={<RedeemSubmitButtonAndTxStatusModal
@@ -308,7 +307,6 @@ module ConnectedRedeemForm = {
           />}
         />
       : <p> {"No tokens in this market to redeem"->React.string} </p>
-    // TODO
   }
 }
 
@@ -321,7 +319,7 @@ let make = (~market: Queries.SyntheticMarketInfo.t, ~isLong) => {
   | Some(signer) => <ConnectedRedeemForm signer market isLong />
   | None =>
     <div onClick={_ => router->Next.Router.push(`/login?nextPath=${router.asPath}`)}>
-      <RedeemFormInput market isLong hasBothTokens={false} />
+      <RedeemFormInput isLong hasBothTokens={false} />
     </div>
   }
 }
