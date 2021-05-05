@@ -52,6 +52,12 @@ module.exports = {
       gasPrice: 10000000000, // 10 gwe
       skipDryRun: true,
     },
+    mumbai: {
+      network_id: 80001,
+      provider: lazyCreateNetwork("https://rpc-mumbai.matic.today"),
+      gasPrice: 1000000000, // 1 gwei
+      skipDryRun: true,
+    },
     kovan: {
       network_id: 42,
       provider: lazyCreateNetwork(kovanProviderUrl),

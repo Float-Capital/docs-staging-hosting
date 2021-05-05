@@ -32,7 +32,7 @@ module.exports = async function (deployer, networkName, accounts) {
   }
 
   // We use actual bUSD for the BSC testnet instead of fake DAI.
-  if (networkName != "binanceTest" && networkName != "kovan") {
+  if (networkName != "binanceTest" && networkName != "mumbai") {
     await deployer.deploy(Dai, "dai token", "DAI");
   }
 
@@ -87,7 +87,7 @@ module.exports = async function (deployer, networkName, accounts) {
     }
   );
 
-  if (networkName == "kovan") {
+  if (networkName == "mumbai") {
     const adminInstance = await getAdminInstance();
     console.log(`To verify all these contracts run the following:
     
