@@ -29,7 +29,9 @@ module MarketsList = {
           }
         | None => <>
             {syntheticMarkets
-            ->Array.map(marketData => <MarketCard key={marketData.name} marketData />)
+            ->Array.map(marketData =>
+              <div className="mb-4"> <MarketCard key={marketData.name} marketData /> </div>
+            )
             ->React.array}
           </>
         }

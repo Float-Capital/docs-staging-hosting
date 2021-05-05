@@ -36,7 +36,7 @@ function MarketInteractionCard$Tab(Props) {
   var opacity = selected ? "bg-opacity-70" : "opacity-70";
   var margin = selected ? "pb-1.5" : "mb-0.5";
   return React.createElement("li", {
-              className: "mr-3 mb-0"
+              className: "mr-1 md:mr-2 mb-0"
             }, React.createElement("div", {
                   className: bg + "  " + opacity + "  " + margin + " cursor-pointer inline-block rounded-t-lg py-1 px-4",
                   onClick: onClick
@@ -455,7 +455,7 @@ function MarketInteractionCard(Props) {
     
   }
   return React.createElement("div", {
-              className: "flex-1 p-1 mb-2"
+              className: "flex-1"
             }, React.createElement("ul", {
                   className: "list-reset flex items-end"
                 }, Belt_Array.map(allTabs, (function (tab) {
