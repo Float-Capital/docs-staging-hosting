@@ -13,6 +13,7 @@ contract TokenFactory is Initializable {
 
     address public admin;
     address public floatContract;
+    uint256[45] private __globalParametersGap;
 
     bytes32 public constant DEFAULT_ADMIN_ROLE =
         keccak256("DEFAULT_ADMIN_ROLE");

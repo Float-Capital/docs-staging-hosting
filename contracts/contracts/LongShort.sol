@@ -38,10 +38,12 @@ contract LongShort is ILongShort, Initializable {
 
     // Staker for controlling governance token issuance.
     IStaker public staker;
+    uint256[45] private __globalStateGap;
 
     // Fixed-precision constants.
     uint256 public constant TEN_TO_THE_18 = 10**18;
     uint256 public constant feeUnitsOfPrecision = 10000;
+    uint256[45] private __constantsGap;
 
     // Market state.
     mapping(uint32 => uint256) public longValue;
@@ -55,10 +57,12 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => IERC20Upgradeable) public fundTokens;
     mapping(uint32 => IYieldManager) public yieldManagers;
     mapping(uint32 => IOracleManager) public oracleManagers;
+    uint256[45] private __marketStateGap;
 
     // Synthetic long/short tokens users can mint and redeem.
     mapping(uint32 => SyntheticToken) public longTokens;
     mapping(uint32 => SyntheticToken) public shortTokens;
+    uint256[45] private __marketSynthsGap;
 
     // Fees for minting/redeeming long/short tokens. Users are penalised
     // with extra fees for imbalancing the market.
