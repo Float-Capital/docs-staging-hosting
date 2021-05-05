@@ -50,7 +50,7 @@ const initialize = async (admin) => {
   const floatToken = await FloatToken.new({
     from: admin,
   });
-  await FloatToken.initialize("Float token", "FLOAT TOKEN", staker.address, {
+  await floatToken.initialize("Float token", "FLOAT TOKEN", staker.address, {
     from: admin,
   });
 
@@ -101,10 +101,6 @@ const createSynthetic = async (
     from: admin,
   });
 
-  const oracleManager = await OracleManager.new({
-    from: admin,
-  });
-
   const yieldManager = await YieldManager.new({
     from: admin,
   });
@@ -113,7 +109,7 @@ const createSynthetic = async (
     from: admin,
   });
 
-  await oracleManager.setup(admin, {
+  const oracleManager = await OracleManager.new(admin, {
     from: admin,
   });
 
