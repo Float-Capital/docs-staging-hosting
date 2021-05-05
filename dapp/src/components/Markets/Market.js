@@ -5,6 +5,7 @@ var React = require("react");
 var Link = require("next/link").default;
 var MarketCard = require("./MarketCard.js");
 var PriceGraph = require("../PriceGraph.js");
+var MarketInfoCard = require("./MarketInfoCard.js");
 var MarketInteractionCard = require("./MarketInteractionCard.js");
 
 function Market(Props) {
@@ -12,21 +13,27 @@ function Market(Props) {
   return React.createElement("div", undefined, React.createElement(Link, {
                   href: "/markets",
                   children: React.createElement("div", {
-                        className: "uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer my-2"
+                        className: "uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mb-4"
                       }, "◀", React.createElement("span", {
                             className: "text-xs"
                           }, " Back to markets"))
                 }), React.createElement("div", {
-                  className: "flex flex-col md:flex-row justify-center items-stretch"
-                }, React.createElement(MarketInteractionCard.make, {}), React.createElement("div", {
-                      className: "flex-1 w-full min-h-10 p-1 mb-2 ml-8 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
-                    }, React.createElement(PriceGraph.make, {
-                          marketName: marketData.name,
-                          oracleAddress: marketData.oracleAddress,
-                          timestampCreated: marketData.timestampCreated
-                        }))), React.createElement(MarketCard.make, {
-                  marketData: marketData
-                }));
+                  className: "grid grid-cols-1 md:grid-cols-3 gap-4"
+                }, React.createElement("div", {
+                      className: "flex flex-col md:flex-row justify-center items-stretch col-span-1 md:col-span-3"
+                    }, React.createElement(MarketInteractionCard.make, {}), React.createElement("div", {
+                          className: "flex-1 w-full min-h-10 p-1 mx:0 mt-4 md:mt-0 md:ml-4 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
+                        }, React.createElement(PriceGraph.make, {
+                              marketName: marketData.name,
+                              oracleAddress: marketData.oracleAddress,
+                              timestampCreated: marketData.timestampCreated
+                            }))), React.createElement(MarketInfoCard.make, {
+                      marketIndex: marketData.marketIndex.toNumber()
+                    }), React.createElement("div", {
+                      className: "w-full col-span-1 md:col-span-2"
+                    }, React.createElement(MarketCard.make, {
+                          marketData: marketData
+                        }))));
 }
 
 var make = Market;

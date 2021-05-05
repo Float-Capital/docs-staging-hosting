@@ -4,7 +4,7 @@ module Tab = {
     let bg = selected ? "bg-white" : "bg-gray-100"
     let opacity = selected ? "bg-opacity-70" : "opacity-70"
     let margin = !selected ? "mb-0.5" : "pb-1.5"
-    <li className="mr-3 mb-0">
+    <li className="mr-1 md:mr-2 mb-0">
       <div
         className={`${bg}  ${opacity}  ${margin} cursor-pointer inline-block rounded-t-lg py-1 px-4`}
         onClick>
@@ -295,7 +295,7 @@ let make = () => {
     ~user,
     ~marketInfo=marketInfo->DataHooks.Util.graphResponseToOption,
   )
-  <div className="flex-1 p-1 mb-2">
+  <div className="flex-1">
     <ul className="list-reset flex items-end">
       {allTabs
       ->Array.map(tab => {
