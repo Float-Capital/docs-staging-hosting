@@ -4,6 +4,7 @@ pragma solidity 0.8.3;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
 import "./TokenFactory.sol";
@@ -54,7 +55,7 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => uint256) public assetPrice;
     mapping(uint32 => uint256) public longTokenPrice;
     mapping(uint32 => uint256) public shortTokenPrice;
-    mapping(uint32 => IERC20Upgradeable) public fundTokens;
+    mapping(uint32 => IERC20) public fundTokens;
     mapping(uint32 => IYieldManager) public yieldManagers;
     mapping(uint32 => IOracleManager) public oracleManagers;
     uint256[45] private __marketStateGap;
@@ -188,7 +189,7 @@ contract LongShort is ILongShort, Initializable {
     ///// CONTRACT SET-UP //////////////
     ////////////////////////////////////
 
-    function setup(
+    function initialize(
         address _admin,
         address _treasury,
         address _tokenFactory,
@@ -303,7 +304,7 @@ contract LongShort is ILongShort, Initializable {
         // Initial market state.
         longTokenPrice[latestMarket] = TEN_TO_THE_18;
         shortTokenPrice[latestMarket] = TEN_TO_THE_18;
-        fundTokens[latestMarket] = IERC20Upgradeable(_fundToken);
+        fundTokens[latestMarket] = IERC20(_fundToken);
         yieldManagers[latestMarket] = IYieldManager(_yieldManager);
         oracleManagers[latestMarket] = IOracleManager(_oracleManager);
         assetPrice[latestMarket] = uint256(getLatestPrice(latestMarket));

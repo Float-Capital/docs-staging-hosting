@@ -27,7 +27,11 @@ const FloatCapital = artifacts.require(FLOAT_CAPITAL);
 const Treasury = artifacts.require(TREASURY);
 
 const initialize = async (admin) => {
-  const tokenFactory = await TokenFactory.new({
+  const longShort = await LongShort.new({
+    from: admin,
+  });
+
+  const tokenFactory = await TokenFactory.new(admin, longShort.address, {
     from: admin,
   });
 
@@ -39,19 +43,14 @@ const initialize = async (admin) => {
     from: admin,
   });
 
-  const floatToken = await FloatToken.new({
-    from: admin,
-  });
-
   const staker = await Staker.new({
     from: admin,
   });
 
-  const longShort = await LongShort.new({
+  const floatToken = await FloatToken.new({
     from: admin,
   });
-
-  await floatToken.setup("Float token", "FLOAT TOKEN", staker.address, {
+  await FloatToken.initialize("Float token", "FLOAT TOKEN", staker.address, {
     from: admin,
   });
 
@@ -59,11 +58,7 @@ const initialize = async (admin) => {
     from: admin,
   });
 
-  await tokenFactory.setup(admin, longShort.address, {
-    from: admin,
-  });
-
-  await longShort.setup(
+  await longShort.initialize(
     admin,
     treasury.address,
     tokenFactory.address,
