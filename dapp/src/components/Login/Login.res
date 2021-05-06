@@ -98,10 +98,10 @@ let make = () => {
           <p className="text-lg text-bf mb-8">
             {`To use `->React.string}
             <span className="font-alphbeta text-xl pr-1"> {"FLOAT"->React.string} </span>
-            {`first connect to ${Config.networkName}`->React.string}
+            {`, please connect to the ${Config.networkName}`->React.string}
           </p>
           {switch Config.networkId {
-          | chainId if !(metamaskDefaultChainIds->Set.Int.has(chainId)) => <AddNetworkToMetamask />
+          | chainId if !(metamaskDefaultChainIds->Set.Int.has(chainId)) => <div className="flex justify-center"><AddNetworkToMetamask /></div>
           | _ =>
             <div>
               <ul className="list-decimal pl-10">
