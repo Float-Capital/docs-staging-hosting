@@ -1,6 +1,18 @@
-module Mint = {
+module DetailsWrapper = {
   @react.component
-  let make = () => {
+  let make = (~market: Queries.SyntheticMarketInfo.t, ~children) =>   <div
+      className="p-5 rounded-lg max-w-xl mx-auto flex flex-col bg-white bg-opacity-70 shadow-lg">
+      <div className="flex justify-between mb-2 text-xl">
+      {`${market.name} (${market.symbol})`->React.string}
+    </div>
+          {children}
+          </div>
+}
+
+
+module Mint ={
+  @react.component
+  let make = (~withHeader) => {
     let router = Next.Router.useRouter()
     let markets = Queries.MarketDetails.use()
     let marketIndex = router.query->Js.Dict.get("marketIndex")->Option.getWithDefault("1")
@@ -14,8 +26,13 @@ module Mint = {
         let optFirstMarket =
           syntheticMarkets[marketIndex->Belt.Int.fromString->Option.getWithDefault(1) - 1]
         switch optFirstMarket {
-        | Some(firstMarket) =>
-          <MintForm market={firstMarket} isLong={actionOption == "short" ? false : true} />
+        | Some(firstMarket) => 
+        withHeader ?
+        <DetailsWrapper market=firstMarket>
+          <MintForm market={firstMarket} isLong={actionOption == "short" ? false : true} />  
+          </DetailsWrapper>
+          :
+          <MintForm market={firstMarket} isLong={actionOption == "short" ? false : true} />  
         | None => <p> {"No markets exist"->React.string} </p>
         }
       | {data: None, error: None, loading: false} =>
@@ -23,5 +40,6 @@ module Mint = {
       }}
     </section>
   }
-}
-let default = () => <Mint />
+  }
+
+let default = () => <Mint withHeader={true} />
