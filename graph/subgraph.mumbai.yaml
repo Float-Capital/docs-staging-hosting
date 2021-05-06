@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: LongShort
-    network: kovan
+    network: mumbai
     source:
-      address: "0xA1c26CB492e50647d9742975f0876ae77d57D03e"
+      address: "0x611873340921C662F21908Bcd2e522c819bE2E72"
       abi: LongShort
-      startBlock: 24240369
+      startBlock: 13493100
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -58,11 +58,11 @@ dataSources:
 
   - kind: ethereum/contract
     name: Staker
-    network: kovan
+    network: mumbai
     source:
-      address: "0xB90090cFA3842AE8b0B2cA0e4434776f702BF863"
+      address: "0xC3F7a1D9fC389bc0790b88A427118692050dA1c9"
       abi: Staker
-      startBlock: 24185634
+      startBlock: 13493100
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -87,14 +87,14 @@ dataSources:
           handler: handleStakeWithdrawn
         - event: FloatMinted(address,address,uint256,uint256)
           handler: handleFloatMinted
-        - event: KFactorParametersChanges(uint256,uint256,uint256)
+        - event: KFactorParametersChanges(uint32,uint256,uint256)
           handler: handleKFactorParametersChanges
       file: ./src/staker.ts
 
 templates:
   - kind: ethereum/contract
     name: erc20
-    network: kovan
+    network: mumbai
     source:
       abi: erc20
     mapping:

@@ -39,7 +39,8 @@ export function handleDeployV1(event: DeployV1): void {
     ["floatAddress"],
     ["address"],
     [],
-    []
+    [],
+    false
   );
 }
 
@@ -147,7 +148,8 @@ export function handleKFactorParametersChanges(
     ["marketIndex", "period", "multiplier"],
     ["uint256", "uint256", "uint256"],
     [],
-    []
+    [],
+    false
   );
 }
 

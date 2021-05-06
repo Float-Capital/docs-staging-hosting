@@ -12,7 +12,7 @@ import {
   UserCollateralTokenBalance,
 } from "../../generated/schema";
 import { BigInt, Bytes, log, ethereum, Address } from "@graphprotocol/graph-ts";
-import { ZERO, ONE, GLOBAL_STATE_ID, TEN_TO_THE_18 } from "../CONSTANTS";
+import { ZERO, ONE, GLOBAL_STATE_ID, TEN_TO_THE_18, ZERO_ADDRESS, ZERO_ADDRESS_BYTES } from "../CONSTANTS";
 import { createNewTokenDataSource } from "./helperFunctions";
 
 function createInitialTokenPrice(
@@ -159,6 +159,27 @@ export function getOrCreateStakerState(
   }
 
   return state as StakeState;
+}
+
+export function getOrCreateGlobalState(): GlobalState {
+  let globalState = GlobalState.load(GLOBAL_STATE_ID);
+  if (globalState == null) {
+    globalState = new GlobalState(GLOBAL_STATE_ID);
+      globalState.contractVersion = BigInt.fromI32(1);
+      globalState.latestMarketIndex = ZERO;
+      globalState.staker = ZERO_ADDRESS;
+      globalState.tokenFactory = ZERO_ADDRESS;
+      globalState.adminAddress = ZERO_ADDRESS_BYTES;
+      globalState.longShort = ZERO_ADDRESS;
+      globalState.totalFloatMinted = ZERO;
+      globalState.totalTxs = ZERO;
+      globalState.totalGasUsed = ZERO;
+      globalState.totalUsers = ZERO;
+      globalState.timestampLaunched = ZERO;
+      globalState.txHash = ZERO_ADDRESS_BYTES;
+  }
+
+  return globalState as GlobalState;
 }
 
 export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
