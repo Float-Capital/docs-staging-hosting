@@ -1,6 +1,6 @@
 {
   "graphEndpoint": "https://api.thegraph.com/subgraphs/name/float-capital/testnet-dev",
-  "priceHistoryGraphEndpoint": "https://api.thegraph.com/subgraphs/name/float-capital/testnet-price-history-dev",
+  "priceHistoryGraphEndpoint": "https://api.thegraph.com/subgraphs/id/QmdqNA1bsqXPDkUqLDCnVMMcryc2vgLXRo4hJ2Tu7wdFRn",
   "networkId": 80001,
   "networkName": "mumbai testnet",
   "networkCurrencyName": "Test MATIC",
