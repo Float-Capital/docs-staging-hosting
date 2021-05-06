@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: LongShort
-    network: kovan
+    network: mumbai
     source:
-      address: "0xA1c26CB492e50647d9742975f0876ae77d57D03e"
+      address: "0x611873340921C662F21908Bcd2e522c819bE2E72"
       abi: LongShort
-      startBlock: 24240369
+      startBlock: 13493100
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -33,7 +33,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: OracleManager
-    network: kovan
+    network: mumbai
     source:
       abi: OracleManager
     mapping:

@@ -33,6 +33,7 @@ import {
   createSyntheticTokenShort,
   createInitialSystemState,
   updateOrCreateCollateralToken,
+  getOrCreateGlobalState,
 } from "./utils/globalStateManager";
 import {
   createNewTokenDataSource,
@@ -74,17 +75,12 @@ export function handleV1(event: V1): void {
   staker.address = event.params.staker;
   staker.save();
 
-  let globalState = new GlobalState(GLOBAL_STATE_ID);
+  let globalState = getOrCreateGlobalState();
   globalState.contractVersion = BigInt.fromI32(1);
-  globalState.latestMarketIndex = ZERO;
   globalState.staker = staker.id;
   globalState.tokenFactory = tokenFactory.id;
   globalState.adminAddress = event.params.admin;
   globalState.longShort = longShort.id;
-  globalState.totalFloatMinted = ZERO;
-  globalState.totalTxs = ZERO;
-  globalState.totalGasUsed = ZERO;
-  globalState.totalUsers = ZERO;
   globalState.timestampLaunched = event.block.timestamp;
   globalState.txHash = event.transaction.hash;
   globalState.save();
