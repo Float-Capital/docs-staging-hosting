@@ -497,21 +497,8 @@ function tokenRedeemPosition(market, isLong, longTokenBalance, shortTokenBalance
         ];
 }
 
-function isGreaterThanApproval(amount, amountApproved) {
-  return amount.gt(amountApproved);
-}
-
 function isGreaterThanBalance(amount, balance) {
   return amount.gt(balance);
-}
-
-function useBalanceAndApproved(erc20Address, spender) {
-  var match = ContractHooks.useErc20BalanceRefresh(erc20Address);
-  var match$1 = ContractHooks.useERC20ApprovedRefresh(erc20Address, spender);
-  return [
-          match.data,
-          match$1.data
-        ];
 }
 
 function RedeemForm$ConnectedRedeemForm(Props) {
@@ -528,15 +515,9 @@ function RedeemForm$ConnectedRedeemForm(Props) {
   var setTxState = match$1[2];
   var txState = match$1[1];
   var contractExecutionHandler = match$1[0];
-  React.useState(function () {
-        return function (param) {
-          
-        };
-      });
   var marketIndex = market.marketIndex;
-  var match$2 = useBalanceAndApproved(match[1], Config.longShort);
-  var optTokenAmountApproved = match$2[1];
-  var optTokenBalance = match$2[0];
+  var match$2 = ContractHooks.useErc20BalanceRefresh(match[1]);
+  var optTokenBalance = match$2.data;
   var form = useForm({
         amount: ""
       }, (function (param, _form) {
@@ -566,17 +547,15 @@ function RedeemForm$ConnectedRedeemForm(Props) {
   var position = isLong ? "long" : "short";
   var match$4;
   var exit = 0;
-  if (formAmount !== undefined && optTokenBalance !== undefined && optTokenAmountApproved !== undefined) {
-    var amount = Caml_option.valFromOption(formAmount);
-    var needsToApprove = amount.gt(Caml_option.valFromOption(optTokenAmountApproved));
-    var greaterThanBalance = amount.gt(Caml_option.valFromOption(optTokenBalance));
+  if (formAmount !== undefined && optTokenBalance !== undefined) {
+    var greaterThanBalance = Caml_option.valFromOption(formAmount).gt(Caml_option.valFromOption(optTokenBalance));
     match$4 = greaterThanBalance ? [
         "Amount is greater than your balance",
         "Insufficient balance",
         true
       ] : [
         undefined,
-        needsToApprove ? "Approve " + position + " " + market.name + " & Redeem " : "Redeem " + position + " " + market.name,
+        "Redeem " + position + " " + market.name,
         !Curry._1(form.valid, undefined)
       ];
   } else {
@@ -721,9 +700,7 @@ exports.RedeemForm = RedeemForm;
 exports.useBalance = useBalance;
 exports.RedeemFormInput = RedeemFormInput;
 exports.tokenRedeemPosition = tokenRedeemPosition;
-exports.isGreaterThanApproval = isGreaterThanApproval;
 exports.isGreaterThanBalance = isGreaterThanBalance;
-exports.useBalanceAndApproved = useBalanceAndApproved;
 exports.ConnectedRedeemForm = ConnectedRedeemForm;
 exports.make = make;
 /* Form Not a pure module */
