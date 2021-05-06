@@ -133,11 +133,13 @@ function Login(Props) {
                             className: "text-lg text-bf mb-8"
                           }, "To use ", React.createElement("span", {
                                 className: "font-alphbeta text-xl pr-1"
-                              }, "FLOAT"), "first connect to " + Config.networkName), Belt_SetInt.has(metamaskDefaultChainIds, Config.networkId) ? React.createElement("div", undefined, React.createElement("ul", {
+                              }, "FLOAT"), ", please connect to the " + Config.networkName), Belt_SetInt.has(metamaskDefaultChainIds, Config.networkId) ? React.createElement("div", undefined, React.createElement("ul", {
                                   className: "list-decimal pl-10"
                                 }, React.createElement("li", undefined, "Open MetaMask"), React.createElement("li", undefined, metamaskChainId !== undefined ? (
                                         Belt_SetInt.has(metamaskDefaultChainIds, metamaskChainId) ? "Click on the " + metamaskDefaultChainIdsToMetamaskName(metamaskChainId) + " dropdown" : "Click on the dropdown for the network you're connected to."
-                                      ) : "Click on the dropdown for the network you're connected to."), React.createElement("li", undefined, "Select " + Config.networkName))) : React.createElement(AddNetworkToMetamask.make, {}))));
+                                      ) : "Click on the dropdown for the network you're connected to."), React.createElement("li", undefined, "Select " + Config.networkName))) : React.createElement("div", {
+                              className: "flex justify-center"
+                            }, React.createElement(AddNetworkToMetamask.make, {})))));
   }
 }
 

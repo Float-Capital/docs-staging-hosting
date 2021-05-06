@@ -104,7 +104,7 @@ A governance token can be thought of a bit like equity in a company. Governance 
 
 ### What Blockchain are you on?
 
-We are currently launched on the Kovan testnet. Float Capital will be launched on the Polygon (formerly Matic) network. Polygon is an EVM (Ethereum Virtual Machine) compatible blockchain.
+We are currently launched on the Mumbai testnet. Float Capital will be launched on the Polygon (formerly Matic) network. Polygon is an EVM (Ethereum Virtual Machine) compatible blockchain.
 
 ### Who is the team behind Float?
 
