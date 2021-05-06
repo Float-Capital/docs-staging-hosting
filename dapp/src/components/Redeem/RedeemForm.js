@@ -654,9 +654,6 @@ function RedeemForm$ConnectedRedeemForm(Props) {
                 submitButton: React.createElement(RedeemSubmitButtonAndTxStatusModal.make, {
                       txStateRedeem: txState,
                       resetFormButton: resetFormButton,
-                      redeemToken: (
-                        isLong ? "long" : "short"
-                      ) + " " + market.name,
                       buttonText: match$4[1],
                       buttonDisabled: match$4[2]
                     })

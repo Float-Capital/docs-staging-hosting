@@ -13,166 +13,45 @@ var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
 
 function RedeemSubmitButtonAndTxStatusModal(Props) {
-  var txStateApprove = Props.txStateApprove;
   var txStateRedeem = Props.txStateRedeem;
   var resetFormButton = Props.resetFormButton;
-  var redeemToken = Props.redeemToken;
   var buttonText = Props.buttonText;
   var buttonDisabled = Props.buttonDisabled;
-  var exit = 0;
-  if (txStateApprove !== undefined) {
-    if (typeof txStateApprove === "number") {
-      if (txStateApprove !== /* UnInitialised */0) {
-        return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                        id: 1,
-                        children: React.createElement("div", {
-                              className: "text-center mx-3 my-6"
-                            }, React.createElement(EllipsesLoader.make, {}), React.createElement("p", undefined, "Please approve your " + redeemToken + " token "))
-                      }), React.createElement(Button.make, {
-                        onClick: (function (param) {
-                            
-                          }),
-                        children: buttonText,
-                        disabled: true
-                      }));
-      }
-      exit = 1;
+  if (typeof txStateRedeem === "number") {
+    if (txStateRedeem === /* UnInitialised */0) {
+      return React.createElement(Button.make, {
+                  onClick: (function (param) {
+                      
+                    }),
+                  children: buttonText,
+                  disabled: buttonDisabled
+                });
     } else {
-      switch (txStateApprove.TAG | 0) {
-        case /* SignedAndSubmitted */0 :
-            return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                            id: 2,
-                            children: React.createElement("div", {
-                                  className: "text-center m-3"
-                                }, React.createElement("div", {
-                                      className: "m-2"
-                                    }, React.createElement(MiniLoader.make, {})), React.createElement("p", undefined, "Approval transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
-                                      txHash: txStateApprove._0
-                                    }))
-                          }), React.createElement(Button.make, {
-                            onClick: (function (param) {
-                                
-                              }),
-                            children: buttonText,
-                            disabled: true
-                          }));
-        case /* Declined */1 :
-            return React.createElement(React.Fragment, undefined, Curry._1(resetFormButton, undefined));
-        case /* Complete */2 :
-            if (typeof txStateRedeem === "number") {
-              exit = 2;
-            } else {
-              if (txStateRedeem.TAG === /* SignedAndSubmitted */0) {
-                return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                                id: 6,
-                                children: React.createElement("div", {
-                                      className: "text-center m-3"
-                                    }, React.createElement("p", undefined, "Approval confirmed 🎉"), React.createElement(ViewOnBlockExplorer.make, {
-                                          txHash: txStateApprove._0.transactionHash
-                                        }), React.createElement("h1", undefined, "Pending redeem " + Config.paymentTokenName + " transaction", React.createElement(ViewOnBlockExplorer.make, {
-                                              txHash: txStateRedeem._0
-                                            })))
-                              }), React.createElement(Button.make, {
-                                onClick: (function (param) {
-                                    
-                                  }),
-                                children: buttonText,
-                                disabled: true
-                              }));
-              }
-              exit = 1;
-            }
-            break;
-        case /* Failed */3 :
-            return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                            id: 4,
-                            children: React.createElement("div", {
-                                  className: "text-center m-3"
-                                }, React.createElement("p", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
-                                      txHash: txStateApprove._0
-                                    }), React.createElement(MessageUsOnDiscord.make, {}))
-                          }), Curry._1(resetFormButton, undefined));
-        
-      }
+      return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
+                      id: 5,
+                      children: React.createElement("div", {
+                            className: "text-center m-3"
+                          }, React.createElement(EllipsesLoader.make, {}), React.createElement("h1", undefined, "Confirm the transaction to redeem " + Config.paymentTokenName))
+                    }), React.createElement(Button.make, {
+                      onClick: (function (param) {
+                          
+                        }),
+                      children: buttonText,
+                      disabled: true
+                    }));
     }
-  } else {
-    exit = 1;
   }
-  switch (exit) {
-    case 1 :
-        if (typeof txStateRedeem === "number") {
-          if (txStateRedeem === /* UnInitialised */0) {
-            return React.createElement(Button.make, {
-                        onClick: (function (param) {
-                            
-                          }),
-                        children: buttonText,
-                        disabled: buttonDisabled
-                      });
-          } else {
-            return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                            id: 5,
-                            children: React.createElement("div", {
-                                  className: "text-center m-3"
-                                }, React.createElement(EllipsesLoader.make, {}), React.createElement("h1", undefined, "Confirm the transaction to redeem " + Config.paymentTokenName))
-                          }), React.createElement(Button.make, {
-                            onClick: (function (param) {
-                                
-                              }),
-                            children: buttonText,
-                            disabled: true
-                          }));
-          }
-        }
-        switch (txStateRedeem.TAG | 0) {
-          case /* SignedAndSubmitted */0 :
-              return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                              id: 7,
-                              children: React.createElement("div", {
-                                    className: "text-center m-3"
-                                  }, React.createElement("div", {
-                                        className: "m-2"
-                                      }, React.createElement(MiniLoader.make, {})), React.createElement("p", undefined, "Redeem transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
-                                        txHash: txStateRedeem._0
-                                      }))
-                            }), React.createElement(Button.make, {
-                              onClick: (function (param) {
-                                  
-                                }),
-                              children: buttonText,
-                              disabled: true
-                            }));
-          case /* Declined */1 :
-              return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                              id: 9,
-                              children: React.createElement("div", {
-                                    className: "text-center m-3"
-                                  }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {}))
-                            }), Curry._1(resetFormButton, undefined));
-          case /* Complete */2 :
-              return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                              id: 8,
-                              children: React.createElement("div", {
-                                    className: "text-center m-3"
-                                  }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"))
-                            }), Curry._1(resetFormButton, undefined));
-          case /* Failed */3 :
-              return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                              id: 10,
-                              children: React.createElement("div", {
-                                    className: "text-center m-3"
-                                  }, React.createElement("h1", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
-                                        txHash: txStateRedeem._0
-                                      }), React.createElement(MessageUsOnDiscord.make, {}))
-                            }), Curry._1(resetFormButton, undefined));
-          
-        }
-    case 2 :
+  switch (txStateRedeem.TAG | 0) {
+    case /* SignedAndSubmitted */0 :
         return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                        id: 3,
+                        id: 7,
                         children: React.createElement("div", {
-                              className: "text-center mx-3 my-6"
-                            }, React.createElement(EllipsesLoader.make, {}), React.createElement("p", undefined, "Confirm transaction to redeem " + Config.paymentTokenName))
+                              className: "text-center m-3"
+                            }, React.createElement("div", {
+                                  className: "m-2"
+                                }, React.createElement(MiniLoader.make, {})), React.createElement("p", undefined, "Redeem transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                                  txHash: txStateRedeem._0
+                                }))
                       }), React.createElement(Button.make, {
                         onClick: (function (param) {
                             
@@ -180,6 +59,29 @@ function RedeemSubmitButtonAndTxStatusModal(Props) {
                         children: buttonText,
                         disabled: true
                       }));
+    case /* Declined */1 :
+        return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
+                        id: 9,
+                        children: React.createElement("div", {
+                              className: "text-center m-3"
+                            }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {}))
+                      }), Curry._1(resetFormButton, undefined));
+    case /* Complete */2 :
+        return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
+                        id: 8,
+                        children: React.createElement("div", {
+                              className: "text-center m-3"
+                            }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"))
+                      }), Curry._1(resetFormButton, undefined));
+    case /* Failed */3 :
+        return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
+                        id: 10,
+                        children: React.createElement("div", {
+                              className: "text-center m-3"
+                            }, React.createElement("h1", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
+                                  txHash: txStateRedeem._0
+                                }), React.createElement(MessageUsOnDiscord.make, {}))
+                      }), Curry._1(resetFormButton, undefined));
     
   }
 }

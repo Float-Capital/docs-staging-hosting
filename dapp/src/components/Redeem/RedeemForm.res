@@ -207,11 +207,7 @@ module ConnectedRedeemForm = {
           isLong={isActuallyLong}
           hasBothTokens
           submitButton={<RedeemSubmitButtonAndTxStatusModal
-            buttonText
-            resetFormButton
-            redeemToken={`${isLong ? "long" : "short"} ${market.name}`}
-            txStateRedeem=txState
-            buttonDisabled
+            buttonText resetFormButton txStateRedeem=txState buttonDisabled
           />}
         />
       : <p> {"No tokens in this market to redeem"->React.string} </p>
