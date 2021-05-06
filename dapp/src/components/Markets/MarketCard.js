@@ -86,13 +86,13 @@ function MarketCard(Props) {
               }, React.createElement(Button.Small.make, {
                     onClick: (function ($$event) {
                         $$event.preventDefault();
-                        return Next.Router.pushShallow(router, "/markets?marketIndex=" + marketIndex.toString() + "&actionOption=long");
+                        return Next.Router.pushShallow(router, "/mint?marketIndex=" + marketIndex.toString() + "&actionOption=long");
                       }),
                     children: "Mint Long"
                   }), React.createElement(Button.Small.make, {
                     onClick: (function ($$event) {
                         $$event.preventDefault();
-                        return Next.Router.pushShallow(router, "/markets?marketIndex=" + marketIndex.toString() + "&actionOption=short");
+                        return Next.Router.pushShallow(router, "/mint?marketIndex=" + marketIndex.toString() + "&actionOption=short");
                       }),
                     children: "Mint Short"
                   }));
@@ -100,11 +100,11 @@ function MarketCard(Props) {
   return React.createElement(Link, {
               href: "/markets?marketIndex=" + marketIndex.toString(),
               children: React.createElement("div", {
-                    className: "p-1 rounded-lg flex flex-col bg-white bg-opacity-75 shadow-lg hover:shadow-xl h-full justify-center w-full"
+                    className: "p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-70 cursor-pointer shadow-lg hover:shadow-xl h-full justify-center w-full"
                   }, React.createElement("div", {
                         className: "flex justify-center w-full my-1"
                       }, React.createElement("h1", {
-                            className: "font-bold text-xl font-alphbeta cursor-pointer"
+                            className: "font-bold text-xl font-alphbeta cursor-pointer hover:underline"
                           }, marketName, React.createElement(Tooltip.make, {
                                 tip: "This market tracks " + marketName
                               }))), React.createElement("div", {

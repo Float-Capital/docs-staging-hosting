@@ -89,7 +89,7 @@ let make = (
         onClick={event => {
           ReactEvent.Mouse.preventDefault(event)
           router->Next.Router.pushShallow(
-            `/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=long`,
+            `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=long`,
           )
         }}>
         "Mint Long"
@@ -98,7 +98,7 @@ let make = (
         onClick={event => {
           ReactEvent.Mouse.preventDefault(event)
           router->Next.Router.pushShallow(
-            `/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=short`,
+            `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=short`,
           )
         }}>
         "Mint Short"
@@ -107,9 +107,9 @@ let make = (
 
   <Next.Link href={`/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
     <div
-      className="p-1 rounded-lg flex flex-col bg-white bg-opacity-75 shadow-lg hover:shadow-xl h-full justify-center w-full">
+      className="p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-70 cursor-pointer shadow-lg hover:shadow-xl h-full justify-center w-full">
       <div className="flex justify-center w-full my-1">
-        <h1 className="font-bold text-xl font-alphbeta cursor-pointer">
+        <h1 className="font-bold text-xl font-alphbeta cursor-pointer hover:underline">
           {marketName->React.string} <Tooltip tip={`This market tracks ${marketName}`} />
         </h1>
       </div>
