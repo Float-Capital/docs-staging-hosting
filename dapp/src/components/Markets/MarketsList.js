@@ -57,10 +57,12 @@ function MarketsList$MarketsList(Props) {
       }
     } else {
       tmp = React.createElement(React.Fragment, undefined, Belt_Array.map(syntheticMarkets, (function (marketData) {
-                  return React.createElement(MarketCard.make, {
-                              marketData: marketData,
-                              key: marketData.name
-                            });
+                  return React.createElement("div", {
+                              className: "mb-4"
+                            }, React.createElement(MarketCard.make, {
+                                  marketData: marketData,
+                                  key: marketData.name
+                                }));
                 })));
     }
   } else {

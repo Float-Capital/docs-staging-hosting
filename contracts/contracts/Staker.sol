@@ -33,6 +33,7 @@ contract Staker is IStaker, Initializable {
     //   token market index -> value
     mapping(uint256 => uint256) public kFactorPeriods; // seconds
     mapping(uint256 => uint256) public kFactorInitialMultipliers; // e18 scale
+    uint256[45] private __stakeParametersGap;
 
     ////////////////////////////////////
     //////// VARIABLES /////////////////
@@ -45,12 +46,14 @@ contract Staker is IStaker, Initializable {
     uint256 public initialTimestamp;
     LongShort public floatContract;
     FloatToken public floatToken;
+    uint256[45] private __globalParamsGap;
 
     // User state.
     //   token -> user -> value
     mapping(address => mapping(address => uint256)) public userAmountStaked;
     mapping(address => mapping(address => uint256))
         public userIndexOfLastClaimedReward;
+    uint256[45] private __userInfoGap;
 
     // Token state.
     mapping(address => bool) syntheticValid; // token -> is valid?
@@ -630,7 +633,7 @@ contract Staker is IStaker, Initializable {
         _withdraw(tokenAddress, amount);
     }
 
-    function withdrawAll(address tokenAddress, uint256 amount) external {
+    function withdrawAll(address tokenAddress) external {
         _withdraw(tokenAddress, userAmountStaked[tokenAddress][msg.sender]);
     }
 }

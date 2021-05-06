@@ -14,6 +14,10 @@ var networkId = config.networkId;
 
 var networkName = config.networkName;
 
+var networkCurrencyName = config.networkCurrencyName;
+
+var networkCurrencySymbol = config.networkCurrencySymbol;
+
 var rpcEndopint = config.rpcEndopint;
 
 var paymentTokenName = config.paymentTokenName;
@@ -39,6 +43,8 @@ exports.graphEndpoint = graphEndpoint;
 exports.priceHistoryGraphEndpoint = priceHistoryGraphEndpoint;
 exports.networkId = networkId;
 exports.networkName = networkName;
+exports.networkCurrencyName = networkCurrencyName;
+exports.networkCurrencySymbol = networkCurrencySymbol;
 exports.rpcEndopint = rpcEndopint;
 exports.paymentTokenName = paymentTokenName;
 exports.blockExplorer = blockExplorer;

@@ -10,18 +10,33 @@
     "build": "graph build",
     "build-price-history": "graph build subgraph.priceHistory.yaml",
     "deploy-mainnet": "graph deploy float-capital/float-capital --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
-    "deploy-testnet": "graph deploy float-capital/testnet --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ./subgraph.kovan.yaml",
-    "deploy-testnet-dev": "graph deploy float-capital/testnet-dev --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ./subgraph.kovan.yaml",
-    "deploy-price-history-testnet": "graph deploy float-capital/testnet-price-history --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ./subgraph.priceHistory.kovan.yaml",
-    "deploy-price-history-testnet-dev": "graph deploy float-capital/testnet-price-history-dev --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ./subgraph.priceHistory.kovan.yaml",
+    "deploy-testnet": "graph deploy float-capital/testnet --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ./subgraph.mumbai.yaml",
+    "deploy-testnet-dev": "graph deploy float-capital/testnet-dev --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ./subgraph.mumbai.yaml",
+    "deploy-price-history-testnet": "graph deploy float-capital/testnet-price-history --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ./subgraph.priceHistory.mumbai.yaml",
+    "deploy-price-history-testnet-dev": "graph deploy float-capital/testnet-price-history-dev --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ ./subgraph.priceHistory.mumbai.yaml",
     "deploy-local": "graph deploy float-capital/float-capital --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.ganache.yaml",
     "deploy-price-history-local": "graph deploy float-capital/float-oracle-prices --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.priceHistory.yaml",
-    "deploy-local-kovan": "graph deploy float-capital/float-capital --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.kovan.yaml",
-    "deploy-price-history-local-kovan": "graph deploy float-capital/float-oracle-prices --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.priceHistory.kovan.yaml",
-    "update-testnet-graph": "yarn codegen ; cd .. && node ./scripts/graph.js ; cd graph && yarn deploy-testnet"
+    "deploy-local-mumbai": "graph deploy float-capital/float-capital --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.mumbai.yaml",
+    "deploy-price-history-local-mumbai": "graph deploy float-capital/float-oracle-prices --ipfs http://localhost:5001 --node http://127.0.0.1:8020 ./subgraph.priceHistory.mumbai.yaml",
+    "update-testnet-graph": "yarn codegen ; cd .. && node ./scripts/graph.js ; cd graph && yarn deploy-testnet",
+    "res:start": "rescript build -w",
+    "res:clean": "rescript clean",
+    "test-codegen": "node ./test/util/Codegen.bs.js > ./test/stateChanges/Converters.res",
+    "test": "jest test"
   },
   "devDependencies": {
+    "@apollo/client": "^3.3.16",
     "@graphprotocol/graph-cli": "^0.20.0",
-    "@graphprotocol/graph-ts": "^0.20.0"
+    "@graphprotocol/graph-ts": "^0.20.0",
+    "@reasonml-community/graphql-ppx": "^1.2.0",
+    "decco": "^1.4.0",
+    "dotenv": "^8.2.0",
+    "isomorphic-fetch": "^3.0.0",
+    "jest": "^26.6.3",
+    "react": "^17.0.2",
+    "reason-react": "^0.9.1",
+    "reason-test-framework": "^0.3.2",
+    "rescript": "^9.1.2",
+    "rescript-apollo-client": "^1.1.2"
   }
 }

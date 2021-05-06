@@ -4,6 +4,7 @@ pragma solidity 0.8.3;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
 import "./TokenFactory.sol";
@@ -38,10 +39,12 @@ contract LongShort is ILongShort, Initializable {
 
     // Staker for controlling governance token issuance.
     IStaker public staker;
+    uint256[45] private __globalStateGap;
 
     // Fixed-precision constants.
     uint256 public constant TEN_TO_THE_18 = 10**18;
     uint256 public constant feeUnitsOfPrecision = 10000;
+    uint256[45] private __constantsGap;
 
     // Market state.
     mapping(uint32 => uint256) public longValue;
@@ -52,13 +55,15 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => uint256) public assetPrice;
     mapping(uint32 => uint256) public longTokenPrice;
     mapping(uint32 => uint256) public shortTokenPrice;
-    mapping(uint32 => IERC20Upgradeable) public fundTokens;
+    mapping(uint32 => IERC20) public fundTokens;
     mapping(uint32 => IYieldManager) public yieldManagers;
     mapping(uint32 => IOracleManager) public oracleManagers;
+    uint256[45] private __marketStateGap;
 
     // Synthetic long/short tokens users can mint and redeem.
     mapping(uint32 => SyntheticToken) public longTokens;
     mapping(uint32 => SyntheticToken) public shortTokens;
+    uint256[45] private __marketSynthsGap;
 
     // Fees for minting/redeeming long/short tokens. Users are penalised
     // with extra fees for imbalancing the market.
@@ -184,7 +189,7 @@ contract LongShort is ILongShort, Initializable {
     ///// CONTRACT SET-UP //////////////
     ////////////////////////////////////
 
-    function setup(
+    function initialize(
         address _admin,
         address _treasury,
         address _tokenFactory,
@@ -299,7 +304,7 @@ contract LongShort is ILongShort, Initializable {
         // Initial market state.
         longTokenPrice[latestMarket] = TEN_TO_THE_18;
         shortTokenPrice[latestMarket] = TEN_TO_THE_18;
-        fundTokens[latestMarket] = IERC20Upgradeable(_fundToken);
+        fundTokens[latestMarket] = IERC20(_fundToken);
         yieldManagers[latestMarket] = IYieldManager(_yieldManager);
         oracleManagers[latestMarket] = IOracleManager(_oracleManager);
         assetPrice[latestMarket] = uint256(getLatestPrice(latestMarket));
@@ -530,7 +535,34 @@ contract LongShort is ILongShort, Initializable {
         shortValue[marketIndex] = shortValue[marketIndex] + shortAmount;
     }
 
-    // TODO fix with beta
+    function _calculateValueChangeForPriceMechanism(
+        uint32 marketIndex,
+        uint256 assetPriceGreater,
+        uint256 assetPriceLess,
+        uint256 greatestPossibleValueChange
+    ) internal view returns (uint256) {
+        uint256 valueChange = 0;
+
+        uint256 percentageChange =
+            ((assetPriceGreater - assetPriceLess) * TEN_TO_THE_18) /
+                assetPrice[marketIndex];
+        if (percentageChange >= TEN_TO_THE_18) {
+            // More than 100% price movement, system liquidation.
+            valueChange = greatestPossibleValueChange;
+        } else {
+            if (getShortBeta(marketIndex) == TEN_TO_THE_18) {
+                valueChange =
+                    (shortValue[marketIndex] * percentageChange) /
+                    TEN_TO_THE_18;
+            } else {
+                valueChange =
+                    (longValue[marketIndex] * percentageChange) /
+                    TEN_TO_THE_18;
+            }
+        }
+        return valueChange;
+    }
+
     function _priceChangeMechanism(uint32 marketIndex, uint256 newPrice)
         internal
     {
@@ -538,56 +570,26 @@ contract LongShort is ILongShort, Initializable {
         if (assetPrice[marketIndex] == newPrice) {
             return;
         }
-        // 100% -> 10**18
-        // 100% -> 1
-        uint256 percentageChange;
         uint256 valueChange = 0;
         // Long gains
         if (newPrice > assetPrice[marketIndex]) {
-            percentageChange =
-                ((newPrice - assetPrice[marketIndex]) * TEN_TO_THE_18) /
-                assetPrice[marketIndex];
-            if (percentageChange >= TEN_TO_THE_18) {
-                // More than 100% price movement, system liquidation.
-                longValue[marketIndex] =
-                    longValue[marketIndex] +
-                    shortValue[marketIndex];
-                shortValue[marketIndex] = 0;
-            } else {
-                if (getShortBeta(marketIndex) == TEN_TO_THE_18) {
-                    valueChange =
-                        (shortValue[marketIndex] * percentageChange) /
-                        TEN_TO_THE_18;
-                } else {
-                    valueChange =
-                        (longValue[marketIndex] * percentageChange) /
-                        TEN_TO_THE_18;
-                }
-                longValue[marketIndex] = longValue[marketIndex] + valueChange;
-                shortValue[marketIndex] = shortValue[marketIndex] - valueChange;
-            }
+            valueChange = _calculateValueChangeForPriceMechanism(
+                marketIndex,
+                newPrice,
+                assetPrice[marketIndex],
+                shortValue[marketIndex]
+            );
+            longValue[marketIndex] = longValue[marketIndex] + valueChange;
+            shortValue[marketIndex] = shortValue[marketIndex] - valueChange;
         } else {
-            percentageChange =
-                ((assetPrice[marketIndex] - newPrice) * TEN_TO_THE_18) /
-                assetPrice[marketIndex];
-            if (percentageChange >= TEN_TO_THE_18) {
-                shortValue[marketIndex] =
-                    shortValue[marketIndex] +
-                    longValue[marketIndex];
-                longValue[marketIndex] = 0;
-            } else {
-                if (getShortBeta(marketIndex) == TEN_TO_THE_18) {
-                    valueChange =
-                        (shortValue[marketIndex] * percentageChange) /
-                        TEN_TO_THE_18;
-                } else {
-                    valueChange =
-                        (longValue[marketIndex] * percentageChange) /
-                        TEN_TO_THE_18;
-                }
-                longValue[marketIndex] = longValue[marketIndex] - valueChange;
-                shortValue[marketIndex] = shortValue[marketIndex] + valueChange;
-            }
+            valueChange = _calculateValueChangeForPriceMechanism(
+                marketIndex,
+                assetPrice[marketIndex],
+                newPrice,
+                longValue[marketIndex]
+            );
+            longValue[marketIndex] = longValue[marketIndex] - valueChange;
+            shortValue[marketIndex] = shortValue[marketIndex] + valueChange;
         }
     }
 
@@ -954,7 +956,7 @@ contract LongShort is ILongShort, Initializable {
         internal
         refreshSystemState(marketIndex)
     {
-        // Burn tokens - will revert unless user gives permission.
+        // Only this contract has permission to call this function
         longTokens[marketIndex].synthRedeemBurn(msg.sender, tokensToRedeem);
 
         // Compute fees.
@@ -991,7 +993,7 @@ contract LongShort is ILongShort, Initializable {
         internal
         refreshSystemState(marketIndex)
     {
-        // Burn tokens - will revert unless user gives permission to contract.
+        // Only this contract has permission to call this function
         shortTokens[marketIndex].synthRedeemBurn(msg.sender, tokensToRedeem);
 
         // Compute fees.

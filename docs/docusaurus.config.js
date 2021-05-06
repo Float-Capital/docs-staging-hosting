@@ -24,6 +24,7 @@ module.exports = {
       logo: {
         alt: "Float Capital Logo",
         src: "img/float-capital-logo-med.png",
+        href: "https://float.capital/markets",
       },
       items: [
         // {

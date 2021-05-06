@@ -9,10 +9,10 @@ const OracleManagerMock = artifacts.require("OracleManagerMock");
 const YieldManagerAave = artifacts.require("YieldManagerAave");
 const OracleManagerEthKiller = artifacts.require("OracleManagerEthKiller");
 
-const kovanDaiAddress = "0xff795577d9ac8bd7d90ee22b6c1703490b6512fd";
+const mumbaiDaiAddress = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
 
-const aavePoolAddressKovan = "0xE0fBa4Fc209b4948668006B2bE61711b7f465bAe";
-const kovanADai = "0xdcf0af9e59c002fa3aa091a46196b37530fd48a8";
+const aavePoolAddressMumbai = "0x9198F13B08E299d85E096929fA9781A1E3d5d827";
+const mumabiADai = "0x639cB7b21ee2161DF9c882483C9D55c90c20Ca3e";
 
 /* See docs:
  *  https://kovan.etherscan.io/address/0xDA7a001b254CD22e46d3eAB04d937489c93174C3#code
@@ -44,27 +44,25 @@ const deployTestMarket = async (
 
   // We mock out the oracle manager unless we're on BSC testnet.
   let oracleManager;
-  if (networkName == "kovan") {
-    oracleManager = await OracleManagerEthKiller.new();
-    await oracleManager.setup(admin, testnetBANDAddress);
+  if (networkName == "mumbai") {
+    oracleManager = await OracleManagerEthKiller.new(admin, testnetBANDAddress);
   } else {
-    oracleManager = await OracleManagerMock.new();
-    await oracleManager.setup(admin);
+    oracleManager = await OracleManagerMock.new(admin);
   }
 
   // We mock out the yield manager unless we're on BSC testnet.
   let yieldManager;
   let fundTokenAddress;
-  if (networkName == "kovan") {
+  if (networkName == "mumbai") {
     yieldManager = await YieldManagerAave.new();
-    fundTokenAddress = kovanDaiAddress;
+    fundTokenAddress = mumbaiDaiAddress;
 
     await yieldManager.setup(
       admin,
       longShortInstance.address,
-      kovanDaiAddress,
-      kovanADai,
-      aavePoolAddressKovan,
+      mumbaiDaiAddress,
+      mumabiADai,
+      aavePoolAddressMumbai,
       0
     );
   } else {
@@ -104,24 +102,24 @@ const deployTestMarket = async (
   );
 };
 
-const zeroPointTwoEth = new BN("200000000000000000");
-const zeroPointFiveEth = new BN("500000000000000000");
+const zeroPointZeroTwoEth = new BN("20000000000000000");
+const zeroPointZeroFiveEth = new BN("50000000000000000");
 const topupBalanceIfLow = async (from, to) => {
   const senderBalance = new BN(await web3.eth.getBalance(from));
-  if (zeroPointFiveEth.gt(senderBalance)) {
-    throw "The admin account doesn't have enough ETH - need at least 0.5 ETH! (top up to over 1 ETH to be safe)";
+  if (zeroPointZeroFiveEth.gt(senderBalance)) {
+    throw "The admin account doesn't have enough ETH - need at least 0.05 ETH! (top up to over 1 ETH to be safe)";
   }
   const recieverBalance = new BN(await web3.eth.getBalance(to));
-  if (zeroPointTwoEth.gt(recieverBalance)) {
+  if (zeroPointZeroTwoEth.gt(recieverBalance)) {
     await web3.eth.sendTransaction({
       from,
       to,
-      value: zeroPointTwoEth,
+      value: zeroPointZeroTwoEth,
     });
   }
 };
 
-module.exports = async function(deployer, network, accounts) {
+module.exports = async function (deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
@@ -136,22 +134,22 @@ module.exports = async function(deployer, network, accounts) {
 
   // We use fake DAI if we're not on BSC testnet.
   let token;
-  if (network == "kovan") {
-    token = await Dai.at(kovanDaiAddress);
+  if (network == "mumbai") {
+    token = await Dai.at(mumbaiDaiAddress);
   } else {
     token = await Dai.deployed();
   }
 
   const longShort = await LongShort.deployed();
   const staker = await Staker.deployed();
-  await deployTestMarket("FTSE100", "FTSE", longShort, token, admin, network);
-  await deployTestMarket("GOLD", "GOLD", longShort, token, admin, network);
-  await deployTestMarket("SP", "S&P500", longShort, token, admin, network);
+  await deployTestMarket("ETH killers", "ETHK", longShort, token, admin, network);
+  await deployTestMarket("Placeholder Market 1", "PM1", longShort, token, admin, network);
+  await deployTestMarket("Placeholder Market 2", "PM2", longShort, token, admin, network);
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
 
   let verifyString = "truffle run verify";
-  if (network == "kovan") {
+  if (network == "mumbai") {
     for (
       let marketIndex = 1;
       marketIndex <= currentMarketIndex;
@@ -168,7 +166,7 @@ module.exports = async function(deployer, network, accounts) {
 
     console.log(`To verify market specific contracts run the following:
     
-    \`${verifyString} --network kovan\``);
+    \`${verifyString} --network ${network}\``);
   }
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
     console.log(`Simulating transactions for marketIndex: ${marketIndex}`);
@@ -179,7 +177,7 @@ module.exports = async function(deployer, network, accounts) {
     let long = await SyntheticToken.at(longAddress);
     let short = await SyntheticToken.at(shortAddress);
 
-    if (network == "kovan") {
+    if (network == "mumbai") {
       await token.approve(longShort.address, largeApprove, {
         from: user1,
       });
@@ -190,7 +188,7 @@ module.exports = async function(deployer, network, accounts) {
       from: user1,
     });
 
-    if (network == "kovan") {
+    if (network == "mumbai") {
       await token.approve(longShort.address, largeApprove, {
         from: user2,
       });
@@ -201,7 +199,7 @@ module.exports = async function(deployer, network, accounts) {
       from: user2,
     });
 
-    if (network == "kovan") {
+    if (network == "mumbai") {
       await token.approve(longShort.address, largeApprove, {
         from: user3,
       });
@@ -216,8 +214,9 @@ module.exports = async function(deployer, network, accounts) {
     const onePointOne = new BN("1100000000000000000");
     const oracleManagerAddr = await longShort.oracleManagers.call(marketIndex);
     const oracleManager = await OracleManagerMock.at(oracleManagerAddr);
-    if (network == "kovan")
-      if (network != "kovan") await oracleManager.setPrice(onePointOne);
+
+    if (network != "mumbai") await oracleManager.setPrice(onePointOne);
+
     await longShort._updateSystemState(marketIndex);
 
     // Simulate user 2 redeeming half his tokens.
@@ -238,14 +237,14 @@ module.exports = async function(deployer, network, accounts) {
       from: user1,
     });
 
-    if (network != "kovan") {
+    if (network != "mumbai") {
       await mintAndApprove(token, tenMintAmount, user3, longShort.address);
     }
     await longShort.mintLongAndStake(marketIndex, new BN(tenMintAmount), {
       from: user3,
     });
 
-    if (network != "kovan") {
+    if (network != "mumbai") {
       await mintAndApprove(token, tenMintAmount, user3, longShort.address);
     }
     await longShort.mintShortAndStake(marketIndex, new BN(tenMintAmount), {
@@ -256,5 +255,5 @@ module.exports = async function(deployer, network, accounts) {
     await longShort._updateSystemState(marketIndex);
 
     await staker.claimFloat([longAddress, shortAddress], { from: user3 });
-  }  
+  }
 };

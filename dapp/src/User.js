@@ -76,6 +76,56 @@ var UserBalancesCard = {
   make: User$UserBalancesCard
 };
 
+function getUsersTotalStakeValue(stakes) {
+  var totalStakedValue = {
+    contents: CONSTANTS.zeroBN
+  };
+  Belt_Array.forEach(stakes, (function (stake) {
+          var syntheticToken = stake.currentStake.syntheticToken;
+          var price = syntheticToken.latestPrice.price.price;
+          var value = stake.currentStake.amount.mul(price).div(CONSTANTS.tenToThe18);
+          totalStakedValue.contents = totalStakedValue.contents.add(value);
+          
+        }));
+  return totalStakedValue;
+}
+
+function User$UserTotalInvestedCard(Props) {
+  var stakes = Props.stakes;
+  var userId = Props.userId;
+  var usersTokensQuery = DataHooks.useUsersBalances(userId);
+  var totalStakedValue = getUsersTotalStakeValue(stakes);
+  var tmp;
+  tmp = typeof usersTokensQuery === "number" ? React.createElement("div", {
+          className: "m-auto"
+        }, React.createElement(MiniLoader.make, {})) : (
+      usersTokensQuery.TAG === /* GraphError */0 ? usersTokensQuery._0 : React.createElement(UserUI.UserTotalValue.make, {
+              totalValueNameSup: "Portfolio",
+              totalValueNameSub: "Value",
+              totalValue: usersTokensQuery._0.totalBalance.add(totalStakedValue.contents)
+            })
+    );
+  return React.createElement(React.Fragment, undefined, tmp);
+}
+
+var UserTotalInvestedCard = {
+  make: User$UserTotalInvestedCard
+};
+
+function User$UserTotalStakedCard(Props) {
+  var stakes = Props.stakes;
+  var totalStakedValue = getUsersTotalStakeValue(stakes);
+  return React.createElement(UserUI.UserTotalValue.make, {
+              totalValueNameSup: "Staked",
+              totalValueNameSub: "Value",
+              totalValue: totalStakedValue.contents
+            });
+}
+
+var UserTotalStakedCard = {
+  make: User$UserTotalStakedCard
+};
+
 function User$UserProfileCard(Props) {
   var userInfo = Props.userInfo;
   var addressStr = DisplayAddress.ellipsifyMiddle(userInfo.id, 8, 3);
@@ -127,15 +177,20 @@ function onQuerySuccess(data) {
                             userId: data.user,
                             stakes: data.stakes
                           })), React.createElement(Masonry.Divider.make, {
-                        children: React.createElement(User$UserBalancesCard, {
-                              userId: data.user
-                            })
-                      }), React.createElement(Masonry.Divider.make, {
-                        children: React.createElement(UserUI.UserStakesCard.make, {
-                              stakes: data.stakes,
-                              userId: data.user
-                            })
-                      }))
+                        children: null
+                      }, React.createElement(User$UserTotalInvestedCard, {
+                            stakes: data.stakes,
+                            userId: data.user
+                          }), React.createElement(User$UserBalancesCard, {
+                            userId: data.user
+                          })), React.createElement(Masonry.Divider.make, {
+                        children: null
+                      }, React.createElement(User$UserTotalStakedCard, {
+                            stakes: data.stakes
+                          }), React.createElement(UserUI.UserStakesCard.make, {
+                            stakes: data.stakes,
+                            userId: data.user
+                          })))
             });
 }
 
@@ -202,6 +257,9 @@ function $$default(param) {
 }
 
 exports.UserBalancesCard = UserBalancesCard;
+exports.getUsersTotalStakeValue = getUsersTotalStakeValue;
+exports.UserTotalInvestedCard = UserTotalInvestedCard;
+exports.UserTotalStakedCard = UserTotalStakedCard;
 exports.UserProfileCard = UserProfileCard;
 exports.User = User;
 exports.$$default = $$default;

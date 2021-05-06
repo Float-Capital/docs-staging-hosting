@@ -6,33 +6,32 @@ var Contract = require("./Contract.js");
 function inititialize(param) {
   var admin = "0x0000000000000000000000000000000000000000";
   return Promise.all([
-                Contract.TokenFactory.make(undefined),
                 Contract.FloatCapital_v0.make(undefined),
                 Contract.Treasury_v0.make(undefined),
                 Contract.FloatToken.make(undefined),
                 Contract.Staker.make(undefined),
                 Contract.LongShort.make(undefined)
               ]).then(function (param) {
-              var longShort = param[5];
-              var staker = param[4];
-              var floatToken = param[3];
-              var treasury = param[2];
-              var tokenFactory = param[0];
-              console.log("got here at least");
-              return Promise.all([
-                            floatToken.setup("Float token", "FLOAT TOKEN", staker.address),
-                            treasury.initialize(admin),
-                            tokenFactory.setup(admin, longShort.address),
-                            longShort.setup(admin, treasury.address, tokenFactory.address, staker.address),
-                            staker.initialize(admin, longShort.address, floatToken.address, param[1].address)
-                          ]).then(function (param) {
-                          return {
-                                  tokenFactory: tokenFactory,
-                                  treasury: treasury,
-                                  floatToken: floatToken,
-                                  staker: staker,
-                                  longShort: longShort
-                                };
+              var longShort = param[4];
+              var staker = param[3];
+              var floatToken = param[2];
+              var treasury = param[1];
+              var floatCapital = param[0];
+              return Contract.TokenFactory.make(admin, longShort.address).then(function (tokenFactory) {
+                          return Promise.all([
+                                        floatToken["initialize(string,string,address)"]("Float token", "FLOAT TOKEN", staker.address),
+                                        treasury.initialize(admin),
+                                        longShort.initialize(admin, treasury.address, tokenFactory.address, staker.address),
+                                        staker.initialize(admin, longShort.address, floatToken.address, floatCapital.address)
+                                      ]).then(function (param) {
+                                      return {
+                                              tokenFactory: tokenFactory,
+                                              treasury: treasury,
+                                              floatToken: floatToken,
+                                              staker: staker,
+                                              longShort: longShort
+                                            };
+                                    });
                         });
             });
 }

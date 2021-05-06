@@ -11,6 +11,7 @@ build
 .openzeppelin/unknown-*.json
 !.openzeppelin/unknown-97.json
 !.openzeppelin/unknown-321.json
+!.openzeppelin/unknown-80001.json
 
 # Secrets
 secretsManager.js
@@ -19,3 +20,6 @@ secretsManager.js
 .merlin
 .bsb.lock
 lib
+
+coverage.json
+

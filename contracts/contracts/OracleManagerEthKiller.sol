@@ -3,13 +3,12 @@
 pragma solidity 0.8.3;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
 import "./interfaces/IBandOracle.sol";
 import "./interfaces/IOracleManager.sol";
 
-contract OracleManagerEthKiller is Initializable, IOracleManager {
+contract OracleManagerEthKiller is IOracleManager {
     address public admin; // This will likely be the Gnosis safe
 
     // Oracle price, changes by average of the underlying asset changes.
@@ -36,7 +35,7 @@ contract OracleManagerEthKiller is Initializable, IOracleManager {
     ///// CONTRACT SET-UP //////////////
     ////////////////////////////////////
 
-    function setup(address _admin, address _bandOracle) public initializer {
+    constructor(address _admin, address _bandOracle) {
         admin = _admin;
         oracle = IBandOracle(_bandOracle);
 

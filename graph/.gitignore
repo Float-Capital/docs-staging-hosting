@@ -68,3 +68,9 @@ typings/
 /ganache-data
 
 /build
+
+# *.bs.js
+.graphql_ppx_cache/
+.merlin
+/lib
+.bsb.lock

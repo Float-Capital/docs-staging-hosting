@@ -30,6 +30,7 @@ dataSources:
           file: ./abis/LongShort.json
       eventHandlers:
         - event: V1(address,address,address)
+
           handler: handleV1
         - event: FeesLevied(uint32,uint256)
           handler: handleFeesLevied
@@ -84,7 +85,7 @@ dataSources:
           handler: handleStakeWithdrawn
         - event: FloatMinted(address,address,uint256,uint256)
           handler: handleFloatMinted
-        - event: KFactorParametersChanges(uint256,uint256,uint256)
+        - event: KFactorParametersChanges(uint32,uint256,uint256)
           handler: handleKFactorParametersChanges
       file: ./src/staker.ts
 

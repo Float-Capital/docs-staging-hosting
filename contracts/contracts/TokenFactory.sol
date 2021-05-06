@@ -2,11 +2,9 @@
 
 pragma solidity 0.8.3;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-
 import "./SyntheticToken.sol";
 
-contract TokenFactory is Initializable {
+contract TokenFactory {
     ////////////////////////////////////
     /////////////// STATE //////////////
     ////////////////////////////////////
@@ -37,7 +35,7 @@ contract TokenFactory is Initializable {
     //////////// SET-UP ////////////////
     ////////////////////////////////////
 
-    function setup(address _admin, address _floatContract) public initializer {
+    constructor(address _admin, address _floatContract) {
         admin = _admin;
         floatContract = _floatContract;
     }
@@ -76,8 +74,7 @@ contract TokenFactory is Initializable {
         address staker
     ) external onlyFLOAT returns (SyntheticToken) {
         SyntheticToken tokenContract;
-        tokenContract = new SyntheticToken();
-        tokenContract.initialize(
+        tokenContract = new SyntheticToken(
             string(abi.encodePacked("FLOAT UP", syntheticName)),
             string(abi.encodePacked("fu", syntheticSymbol)),
             floatContract,
@@ -93,8 +90,7 @@ contract TokenFactory is Initializable {
         address staker
     ) external onlyFLOAT returns (SyntheticToken) {
         SyntheticToken tokenContract;
-        tokenContract = new SyntheticToken();
-        tokenContract.initialize(
+        tokenContract = new SyntheticToken(
             string(abi.encodePacked("FLOAT DOWN ", syntheticName)),
             string(abi.encodePacked("fd", syntheticSymbol)),
             floatContract,

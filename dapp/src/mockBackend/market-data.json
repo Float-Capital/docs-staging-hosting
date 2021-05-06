@@ -1,0 +1,14 @@
+[
+{    
+    "name": "EthKillers",
+    "description": "EthKillers is an index comprised of TRON, XRP and EOS. This market is an average of the prices of the tokens of the three protocols seen as alternatives to ethereum. The EthKillers market allows users to gain long or short exposure to an equally weighted basket containing TRON, XRP and EOS." 
+},
+{    
+    "name": "Placeholder Market 1",
+    "description": "This is a testnet market." 
+},
+{    
+    "name": "Placeholder Market 2",
+    "description": "This is a testnet market." 
+}
+]

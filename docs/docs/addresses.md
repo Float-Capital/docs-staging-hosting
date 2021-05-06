@@ -9,35 +9,37 @@ slug: /addresses
 
 ---
 
-## Kovan testnet
+## Mumbai testnet
 
 NOTE: these testnet addresses are frequently changing during development 👷‍♀️👷
 
-See our contract **[Deployer address](https://kovan.etherscan.io/address/0x473766AdEaAb0A9C68D47f49d110B4870680b703)** to keep abreast with the latest deployments.
+See our contract **[Deployer address](https://explorer-mumbai.maticvigil.com/address/0x97D247303960fC0FCA4fD703f3dAaf0ADdA07598/)** to keep abreast with the latest deployments.
 
 ### Contracts
 
 ```javascript
-Deployer: "0x473766AdEaAb0A9C68D47f49d110B4870680b703",
-FloatToken : "0x7fC0cC819332728DD3A78a63de7Ea250e344f199",
-LongShort: "0xA696f77436A4e631c96CA8b9fa2DCD1b250Eb1E3",
-Migrations: "0xec6282Ee87D2248649A2F6D0111C428d75945393",
-Staker: "0x9Fb0c1d09b02C975EF14CCE71174481a667CA193",
-TokenFactory: "0xa1AdE283A830CE4CA2ba4c45c611e9Ef23D77608",
-Dai: "0xff795577d9ac8bd7d90ee22b6c1703490b6512fd"
+Deployer: "0x97D247303960fC0FCA4fD703f3dAaf0ADdA07598",
+FloatToken : "0x4fEC167F70E9aD94F67E962B51F4c725BDeDB098",
+LongShort: "0x611873340921C662F21908Bcd2e522c819bE2E72",
+Migrations: "0xb4eaBc2786B81635BD20e8D83FB776524875166a",
+Staker: "0xC3F7a1D9fC389bc0790b88A427118692050dA1c9",
+TokenFactory: "0xC66E679B3E6666209A98C6D25854c19540A71cfD",
+Treasury_v0: "0xB9277eB056F014a8194889A5A421e03e74085559",
+Dai: "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F"
 ```
 
 ### Markets
 
 ```javascript
-FTSE Long = "0x56eae7fdca86d2d6ead412c2c1192d63353e871c",
-FTSE Short = "0xea11dfdf9690c1b3f0b543a6f2704ab1ffd5aeec",
-S&P500 Long = "0x3eb5e8abc9e0dae2aac739495a6651756aeb6b7e",
-S&P500 Short = "0x5cee01d9a14797afe20783a231a0bf944e0fb6d4",
-GOLD Long = "0x8b45b1849d84863c977750331670bf1c24ef188f",
-GOLD Short = "0xa56ae04ffcb5b04d016fe555e6274d434e753730",
+EthKillers Long = "0x46bf3286cd38B1cb53885Feb08ED61752946dDd8",
+EthKillers Short = "0xfF76E7090c7F4645dF52562DfE7CC9504A1Ab911",
+PM1 Long = "0xf1f7F7d9654F4A9d0C0c063cbE815A045F21C52C",
+PM1 Short = "0xC1e97E49106ad8C80cb5F3432F98d34c9278e9D0",
+PM2 Long = "0xDc24f4BD4F9dAC21aBd2e497479D18a87009Fad4",
+PM2 Short = "0x75e8EEFfCe2A345aa419bE87C0bA20f8Bc2A72cD",
 ```
 
 ## Polygon
 
 Our Polygon mainnet launch is pending further testing.
+Join our [discord](https://discord.gg/qesr2KZAhn) for the latest updates!

@@ -22,6 +22,7 @@ var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
+var LongOrShortSelect = require("../UI/LongOrShortSelect.js");
 
 function MarketInteractionCard$Tab(Props) {
   var selectedOpt = Props.selected;
@@ -35,7 +36,7 @@ function MarketInteractionCard$Tab(Props) {
   var opacity = selected ? "bg-opacity-70" : "opacity-70";
   var margin = selected ? "pb-1.5" : "mb-0.5";
   return React.createElement("li", {
-              className: "mr-3 mb-0"
+              className: "mr-1 md:mr-2 mb-0"
             }, React.createElement("div", {
                   className: bg + "  " + opacity + "  " + margin + " cursor-pointer inline-block rounded-t-lg py-1 px-4",
                   onClick: onClick
@@ -240,28 +241,24 @@ function header(marketInfo) {
 function MarketInteractionCard$SelectOptions(Props) {
   var isLong = Props.isLong;
   var marketInfo = Props.marketInfo;
+  var disabledOpt = Props.disabled;
+  var disabled = disabledOpt !== undefined ? disabledOpt : false;
   var router = Router.useRouter();
   return Belt_Option.mapWithDefault(marketInfo, null, (function (marketInfo) {
-                var onChangeSide = function ($$event) {
-                  router.query["actionOption"] = $$event.target.value;
-                  router.query["token"] = isLong ? Ethers.Utils.ethAdrToLowerStr(marketInfo.longAddress) : Ethers.Utils.ethAdrToLowerStr(marketInfo.shortAddress);
-                  return Next.Router.pushObjShallow(router, {
-                              pathname: router.pathname,
-                              query: router.query
-                            });
-                };
                 return React.createElement("div", {
                             className: "px-6"
-                          }, React.createElement("select", {
-                                className: "trade-select",
-                                name: "longshort",
-                                value: isLong ? "long" : "short",
-                                onChange: onChangeSide
-                              }, React.createElement("option", {
-                                    value: "long"
-                                  }, "Long 🐮"), React.createElement("option", {
-                                    value: "short"
-                                  }, "Short 🐻")));
+                          }, React.createElement(LongOrShortSelect.make, {
+                                isLong: isLong,
+                                selectPosition: (function (val) {
+                                    router.query["actionOption"] = val;
+                                    router.query["token"] = isLong ? Ethers.Utils.ethAdrToLowerStr(marketInfo.longAddress) : Ethers.Utils.ethAdrToLowerStr(marketInfo.shortAddress);
+                                    return Next.Router.pushObjShallow(router, {
+                                                pathname: router.pathname,
+                                                query: router.query
+                                              });
+                                  }),
+                                disabled: disabled
+                              }));
               }));
 }
 
@@ -458,7 +455,7 @@ function MarketInteractionCard(Props) {
     
   }
   return React.createElement("div", {
-              className: "flex-1 p-1 mb-2"
+              className: "flex-1"
             }, React.createElement("ul", {
                   className: "list-reset flex items-end"
                 }, Belt_Array.map(allTabs, (function (tab) {

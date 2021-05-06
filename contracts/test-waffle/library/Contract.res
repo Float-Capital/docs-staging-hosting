@@ -17,6 +17,14 @@ external getContractFactory: string => JsPromise.t<contractFactory> = "getContra
 let deployContract = contractName => {
   getContractFactory(contractName)->JsPromise.then(deploy)->JsPromise.then(deployed)
 }
+let deployContract1 = (contractName, firstParam) => {
+  getContractFactory(contractName)->JsPromise.then(deploy1(_, firstParam))->JsPromise.then(deployed)
+}
+let deployContract2 = (contractName, firstParam, secondParam) => {
+  getContractFactory(contractName)
+  ->JsPromise.then(deploy2(_, firstParam, secondParam))
+  ->JsPromise.then(deployed)
+}
 
 module LongShort = {
   type t = {address: ethAddr}
@@ -25,14 +33,14 @@ module LongShort = {
   let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
 
   @send
-  external setup: (t, ethAddr, ethAddr, ethAddr, ethAddr) => JsPromise.t<transaction> = "setup"
+  external setup: (t, ethAddr, ethAddr, ethAddr, ethAddr) => JsPromise.t<transaction> = "initialize"
 }
 
 module YieldManagerMock = {
   type t = {address: ethAddr}
   let contractName = "YieldManagerMock"
 
-  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
+  let make: ethAddr => JsPromise.t<t> = admin => deployContract1(contractName, admin)->Obj.magic
 }
 
 module OracleManagerMock = {
@@ -60,9 +68,8 @@ module TokenFactory = {
   type t = {address: ethAddr}
   let contractName = "TokenFactory"
 
-  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
-
-  @send external setup: (t, ethAddr, ethAddr) => JsPromise.t<transaction> = "setup"
+  let make: (ethAddr, ethAddr) => JsPromise.t<t> = (admin, longShort) =>
+    deployContract2(contractName, admin, longShort)->Obj.magic
 }
 
 module Staker = {
@@ -81,7 +88,9 @@ module FloatToken = {
 
   let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
 
-  @send external setup: (t, string, string, ethAddr) => JsPromise.t<transaction> = "setup"
+  @send
+  external setup: (t, string, string, ethAddr) => JsPromise.t<transaction> =
+    "initialize(string,string,address)"
 }
 
 module FloatCapital_v0 = {

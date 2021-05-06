@@ -53,62 +53,105 @@ module SubmitButtonAndTxTracker = {
     ~buttonDisabled,
   ) => {
     switch (txStateApprove, txStateMint) {
-    | (ContractActions.Created, _) =>
-      <div className="text-center mx-3 my-6">
-        <p> {`Please approve your ${Config.paymentTokenName} token `->React.string} </p>
-      </div>
-    | (ContractActions.SignedAndSubmitted(txHash), _) =>
-      <div className="text-center m-3">
-        <MiniLoader />
-        <p> {"Approval transaction pending... "->React.string} </p>
-        <ViewOnBlockExplorer txHash />
-      </div>
+    | (ContractActions.Created, _) => <>
+        <Modal id={1}>
+          <div className="text-center mx-3 my-6">
+            <EllipsesLoader />
+            <p> {`Please approve your ${Config.paymentTokenName} token `->React.string} </p>
+          </div>
+        </Modal>
+        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
+      </>
+    | (ContractActions.SignedAndSubmitted(txHash), _) => <>
+        <Modal id={2}>
+          <div className="text-center m-3">
+            <div className="m-2"> <MiniLoader /> </div>
+            <p> {"Approval transaction pending... "->React.string} </p>
+            <ViewOnBlockExplorer txHash />
+          </div>
+        </Modal>
+        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
+      </>
     | (ContractActions.Complete({transactionHash: _}), ContractActions.Created)
-    | (ContractActions.Complete({transactionHash: _}), ContractActions.UnInitialised) =>
-      <div className="text-center mx-3 my-6">
-        <p> {`Confirm transaction to mint ${tokenToMint}`->React.string} </p>
-      </div>
+    | (ContractActions.Complete({transactionHash: _}), ContractActions.UnInitialised) => <>
+        <Modal id={3}>
+          <div className="text-center mx-3 my-6">
+            <EllipsesLoader /> <p> {`Confirm transaction to mint ${tokenToMint}`->React.string} </p>
+          </div>
+        </Modal>
+        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
+      </>
     | (ContractActions.Declined(_message), _) => <> {resetFormButton()} </>
-    | (ContractActions.Failed(txHash), _) =>
-      <div className="text-center m-3">
-        <p> {`The transaction failed.`->React.string} </p>
-        <ViewOnBlockExplorer txHash />
-        <MessageUsOnDiscord />
+    | (ContractActions.Failed(txHash), _) => <>
+        <Modal id={4}>
+          <div className="text-center m-3">
+            <p> {`The transaction failed.`->React.string} </p>
+            <ViewOnBlockExplorer txHash />
+            <MessageUsOnDiscord />
+          </div>
+        </Modal>
         {resetFormButton()}
-      </div>
-    | (_, ContractActions.Created) =>
-      <div className="text-center m-3">
-        <h1> {`Confirm the transaction to mint ${tokenToMint}`->React.string} </h1>
-      </div>
-    | (ContractActions.Complete({transactionHash}), ContractActions.SignedAndSubmitted(txHash)) =>
-      <div className="text-center m-3">
-        <p> {`Approval confirmed 🎉`->React.string} </p>
-        <ViewOnBlockExplorer txHash={transactionHash} />
-        <h1> {`Pending minting ${tokenToMint}`->React.string} <ViewOnBlockExplorer txHash /> </h1>
-      </div>
-    | (_, ContractActions.SignedAndSubmitted(txHash)) =>
-      <div className="text-center m-3">
-        <MiniLoader />
-        <p> {"Minting transaction pending... "->React.string} </p>
-        <ViewOnBlockExplorer txHash />
-      </div>
-    | (_, ContractActions.Complete({transactionHash: _})) =>
-      <div className="text-center m-3">
-        <p> {`Transaction complete 🎉`->React.string} </p> {resetFormButton()}
-      </div>
-    | (_, ContractActions.Declined(_message)) =>
-      <div className="text-center m-3">
-        <p> {`The transaction was rejected by your wallet`->React.string} </p>
-        <MessageUsOnDiscord />
+      </>
+    | (_, ContractActions.Created) => <>
+        <Modal id={5}>
+          <div className="text-center m-3">
+            <EllipsesLoader />
+            <h1> {`Confirm the transaction to mint ${tokenToMint}`->React.string} </h1>
+          </div>
+        </Modal>
+        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
+      </>
+    | (
+        ContractActions.Complete({transactionHash}),
+        ContractActions.SignedAndSubmitted(txHash),
+      ) => <>
+        <Modal id={6}>
+          <div className="text-center m-3">
+            <p> {`Approval confirmed 🎉`->React.string} </p>
+            <ViewOnBlockExplorer txHash={transactionHash} />
+            <h1>
+              {`Pending minting ${tokenToMint}`->React.string} <ViewOnBlockExplorer txHash />
+            </h1>
+          </div>
+        </Modal>
+        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
+      </>
+    | (_, ContractActions.SignedAndSubmitted(txHash)) => <>
+        <Modal id={7}>
+          <div className="text-center m-3">
+            <div className="m-2"> <MiniLoader /> </div>
+            <p> {"Minting transaction pending... "->React.string} </p>
+            <ViewOnBlockExplorer txHash />
+          </div>
+        </Modal>
+        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
+      </>
+    | (_, ContractActions.Complete({transactionHash: _})) => <>
+        <Modal id={8}>
+          <div className="text-center m-3">
+            <Tick /> <p> {`Transaction complete 🎉`->React.string} </p>
+          </div>
+        </Modal>
+      </>
+    | (_, ContractActions.Declined(_message)) => <>
+        <Modal id={9}>
+          <div className="text-center m-3">
+            <p> {`The transaction was rejected by your wallet`->React.string} </p>
+            <MessageUsOnDiscord />
+          </div>
+        </Modal>
         {resetFormButton()}
-      </div>
-    | (_, ContractActions.Failed(txHash)) =>
-      <div className="text-center m-3">
-        <h1> {`The transaction failed.`->React.string} </h1>
-        <ViewOnBlockExplorer txHash />
-        <MessageUsOnDiscord />
+      </>
+    | (_, ContractActions.Failed(txHash)) => <>
+        <Modal id={10}>
+          <div className="text-center m-3">
+            <h1> {`The transaction failed.`->React.string} </h1>
+            <ViewOnBlockExplorer txHash />
+            <MessageUsOnDiscord />
+          </div>
+        </Modal>
         {resetFormButton()}
-      </div>
+      </>
     | _ => <Button disabled=buttonDisabled onClick={_ => ()}> {buttonText} </Button>
     }
   }
@@ -120,7 +163,6 @@ module MintFormInput = {
     ~onSubmit=_ => (),
     ~onChangeSide=_ => (),
     ~isLong,
-    ~onBlurSide=_ => (),
     ~valueAmountInput="",
     ~optDaiBalance=None,
     ~onBlurAmount=_ => (),
@@ -135,16 +177,7 @@ module MintFormInput = {
   ) => {
     let formInput =
       <>
-        <select
-          name="longshort"
-          className="trade-select"
-          onChange=onChangeSide
-          value={isLong ? "long" : "short"}
-          onBlur=onBlurSide
-          disabled>
-          <option value="long"> {`Long 🐮`->React.string} </option>
-          <option value="short"> {`Short 🐻`->React.string} </option>
-        </select>
+        <LongOrShortSelect isLong selectPosition={val => onChangeSide(val)} disabled />
         <AmountInput
           value=valueAmountInput
           optBalance={optDaiBalance}
@@ -229,7 +262,7 @@ module MintFormSignedIn = {
         contractExecutionHandlerApprove(
           ~makeContractInstance=Contracts.Erc20.make(~address=Config.dai),
           ~contractFunction=Contracts.Erc20.approve(
-            ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
+            ~amount=amount->Globals.amountForApproval,
             ~spender=Config.longShort,
           ),
         )
@@ -380,8 +413,8 @@ module MintFormSignedIn = {
 
     <MintFormInput
       onSubmit={form.submit}
-      onChangeSide={event => {
-        router.query->Js.Dict.set("actionOption", (event->ReactEvent.Form.target)["value"])
+      onChangeSide={newPosition => {
+        router.query->Js.Dict.set("actionOption", newPosition)
         router.query->Js.Dict.set(
           "token",
           isLong
@@ -391,7 +424,6 @@ module MintFormSignedIn = {
         router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
       }}
       isLong={isLong}
-      onBlurSide={_ => form.blurIsStaking()}
       valueAmountInput=form.input.amount
       optDaiBalance
       onBlurAmount={_ => form.blurAmount()}

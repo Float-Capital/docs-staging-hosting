@@ -6,9 +6,13 @@ var React = require("react");
 var Config = require("../../Config.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
+var Belt_Option = require("rescript/lib/js/belt_Option.js");
+var Belt_SetInt = require("rescript/lib/js/belt_SetInt.js");
 var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
 var Web3Connectors = require("../../bindings/web3-react/Web3Connectors.js");
+var InjectedEthereum = require("../../ethereum/InjectedEthereum.js");
+var AddNetworkToMetamask = require("../UI/AddNetworkToMetamask.js");
 var TorusConnector = require("@web3-react/torus-connector");
 var WalletconnectConnector = require("@web3-react/walletconnect-connector");
 
@@ -17,7 +21,7 @@ var connectors = [
     name: "MetaMask",
     connector: Web3Connectors.injected,
     img: "/img/wallet-icons/metamask.svg",
-    connectionPhrase: "Connect to your MetaMask Wallet"
+    connectionPhrase: "Connect via MetaMask"
   },
   {
     name: "WalletConnect",
@@ -36,12 +40,45 @@ var connectors = [
   {
     name: "Torus",
     connector: new TorusConnector.TorusConnector({
-          chainId: 1
+          chainId: Config.networkId,
+          initOptions: {
+            showTorusButton: false
+          }
         }),
     img: "/img/wallet-icons/torus.svg",
     connectionPhrase: "Connect via Torus"
   }
 ];
+
+var metamaskDefaultChainIds = Belt_SetInt.fromArray([
+      1,
+      3,
+      4,
+      5,
+      42
+    ]);
+
+function metamaskDefaultChainIdsToMetamaskName(chainId) {
+  if (chainId >= 6) {
+    if (chainId !== 42) {
+      return "Ethereum Mainnet";
+    } else {
+      return "Kovan Test Network";
+    }
+  }
+  if (chainId < 3) {
+    return "Ethereum Mainnet";
+  }
+  switch (chainId) {
+    case 3 :
+        return "Ropsten Test Network";
+    case 4 :
+        return "Rinkeby Test Network";
+    case 5 :
+        return "Goerli Test Network";
+    
+  }
+}
 
 function Login(Props) {
   var match = RootProvider.useActivateConnector(undefined);
@@ -49,6 +86,8 @@ function Login(Props) {
   var router = Router.useRouter();
   var nextPath = Js_dict.get(router.query, "nextPath");
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
+  var isMetamask = InjectedEthereum.useIsMetamask(undefined);
+  var metamaskChainId = InjectedEthereum.useMetamaskChainId(undefined);
   React.useEffect((function () {
           if (nextPath !== undefined && optCurrentUser !== undefined) {
             router.push(nextPath);
@@ -58,32 +97,50 @@ function Login(Props) {
         nextPath,
         optCurrentUser
       ]);
-  return React.createElement("div", undefined, React.createElement("p", {
-                  className: "mx-2 md:mx-0"
-                }, "Connect with one of the wallets below. "), React.createElement("p", {
-                  className: "text-xs"
-                }, "Please make sure to connect to " + Config.networkName + "."), React.createElement("div", {
-                  className: "grid grid-cols-1 md:grid-cols-3 gap-4 items-center my-5"
-                }, Belt_Array.mapWithIndex(connectors, (function (index, connector) {
-                        return React.createElement("div", {
-                                    key: String(index),
-                                    className: "mx-2 md:mx-0 p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 hover:bg-gray-200 active:bg-gray-300 rounded ",
-                                    onClick: (function (e) {
-                                        e.stopPropagation();
-                                        return Curry._1(activateConnector, connector.connector);
-                                      })
-                                  }, React.createElement("div", {
-                                        className: "w-10 h-10"
-                                      }, React.createElement("img", {
-                                            className: "w-full h-full",
-                                            alt: connector.name,
-                                            src: connector.img
-                                          })), React.createElement("div", {
-                                        className: "text-xl font-bold my-1"
-                                      }, connector.name), React.createElement("div", {
-                                        className: "text-base my-1 text-gray-400\t"
-                                      }, connector.connectionPhrase));
-                      }))));
+  if (!isMetamask || Belt_Option.getWithDefault(metamaskChainId, -1) === Config.networkId) {
+    return React.createElement("div", undefined, React.createElement("p", {
+                    className: "mx-2 md:mx-0"
+                  }, "Connect with one of the wallets below. "), isMetamask ? null : React.createElement("p", {
+                      className: "text-xs"
+                    }, "Please make sure to connect to " + Config.networkName + "."), React.createElement("div", {
+                    className: "grid grid-cols-1 md:grid-cols-3 gap-4 items-center my-5"
+                  }, Belt_Array.mapWithIndex(connectors, (function (index, connector) {
+                          return React.createElement("div", {
+                                      key: String(index),
+                                      className: "mx-2 md:mx-0 p-5 flex flex-col items-center justify-center bg-white bg-opacity-75 hover:bg-gray-200 active:bg-gray-300 rounded ",
+                                      onClick: (function (e) {
+                                          e.stopPropagation();
+                                          return Curry._1(activateConnector, connector.connector);
+                                        })
+                                    }, React.createElement("div", {
+                                          className: "w-10 h-10"
+                                        }, React.createElement("img", {
+                                              className: "w-full h-full",
+                                              alt: connector.name,
+                                              src: connector.img
+                                            })), React.createElement("div", {
+                                          className: "text-xl font-bold my-1"
+                                        }, connector.name), React.createElement("div", {
+                                          className: "text-base my-1 text-gray-400\t"
+                                        }, connector.connectionPhrase));
+                        }))));
+  } else {
+    return React.createElement("div", {
+                className: "w-full flex justify-center"
+              }, React.createElement("div", {
+                    className: "flex flex-col max-w-3xl bg-opacity-75 bg-white rounded-lg p-10"
+                  }, React.createElement("div", undefined, React.createElement("p", {
+                            className: "text-lg text-bf mb-8"
+                          }, "To use ", React.createElement("span", {
+                                className: "font-alphbeta text-xl pr-1"
+                              }, "FLOAT"), ", please connect to the " + Config.networkName), Belt_SetInt.has(metamaskDefaultChainIds, Config.networkId) ? React.createElement("div", undefined, React.createElement("ul", {
+                                  className: "list-decimal pl-10"
+                                }, React.createElement("li", undefined, "Open MetaMask"), React.createElement("li", undefined, metamaskChainId !== undefined ? (
+                                        Belt_SetInt.has(metamaskDefaultChainIds, metamaskChainId) ? "Click on the " + metamaskDefaultChainIdsToMetamaskName(metamaskChainId) + " dropdown" : "Click on the dropdown for the network you're connected to."
+                                      ) : "Click on the dropdown for the network you're connected to."), React.createElement("li", undefined, "Select " + Config.networkName))) : React.createElement("div", {
+                              className: "flex justify-center"
+                            }, React.createElement(AddNetworkToMetamask.make, {})))));
+  }
 }
 
 var make = Login;
@@ -91,6 +148,8 @@ var make = Login;
 var $$default = Login;
 
 exports.connectors = connectors;
+exports.metamaskDefaultChainIds = metamaskDefaultChainIds;
+exports.metamaskDefaultChainIdsToMetamaskName = metamaskDefaultChainIdsToMetamaskName;
 exports.make = make;
 exports.$$default = $$default;
 exports.default = $$default;

@@ -18,7 +18,7 @@ services:
       postgres_pass: let-me-in
       postgres_db: graph-node
       ipfs: "ipfs:5001"
-      ethereum: "kovan:https://kovan.poa.network"
+      ethereum: "mumbai:https://rpc-mumbai.matic.today"
       RUST_LOG: info
 
   ipfs:

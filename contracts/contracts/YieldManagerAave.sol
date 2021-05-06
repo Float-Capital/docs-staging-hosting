@@ -110,7 +110,7 @@ contract YieldManagerAave is IYieldManager, Initializable {
         token.transfer(longShort, amount);
     }
 
-    function getTotalHeld() public override returns (uint256 amount) {
+    function getTotalHeld() public view override returns (uint256 amount) {
         return aToken.balanceOf(address(this));
     }
 

@@ -16,6 +16,47 @@ let useBalanceAndApproved = (~erc20Address, ~spender) => {
   (optBalance, optAmountApproved)
 }
 
+module UnstakeTxStatusModal = {
+  @react.component
+  let make = (~txStateUnstake, ~resetFormButton) => {
+    switch txStateUnstake {
+    | ContractActions.Created =>
+      <Modal id={"unstake-1"}>
+        <div className="text-center m-3">
+          <p> {`Confirm unstake transaction in your wallet `->React.string} </p>
+        </div>
+      </Modal>
+    | ContractActions.SignedAndSubmitted(txHash) =>
+      <Modal id={"unstake-2"}>
+        <div className="text-center m-3">
+          <MiniLoader />
+          <p> {"Unstake transaction pending... "->React.string} </p>
+          <ViewOnBlockExplorer txHash />
+        </div>
+      </Modal>
+    | ContractActions.Complete({transactionHash: _}) =>
+      <Modal id={"unstake-3"}>
+        <div className="text-center m-3">
+          <p> {`Transaction complete 🎉`->React.string} </p> {resetFormButton()}
+        </div>
+      </Modal>
+    | ContractActions.Declined(_message) => <> {resetFormButton()} </>
+    | ContractActions.Failed(txHash) => <Modal id={"unstake-4"}>
+        <div className="text-center m-3">
+          <p> {`The transaction failed.`->React.string} </p>
+          {if txHash != "" {
+            <ViewOnBlockExplorer txHash />
+          } else {
+            React.null
+          }}
+          <MessageUsOnDiscord />
+          {resetFormButton()}
+        </div>
+      </Modal>
+    | _ => React.null
+    }
+  }
+}
 module StakeFormInput = {
   @react.component
   let make = (
@@ -27,6 +68,7 @@ module StakeFormInput = {
     ~onBlur=_ => (),
     ~onMaxClick=_ => (),
     ~synthetic: Queries.SyntheticTokenInfo.t,
+    ~txStateModal=React.null,
   ) =>
     <Form className="" onSubmit>
       // optBalance Todo
@@ -36,13 +78,14 @@ module StakeFormInput = {
       <Button onClick={_ => onSubmit()}>
         {`Unstake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
       </Button>
+      {txStateModal}
     </Form>
 }
 
 module ConnectedStakeForm = {
   @react.component
   let make = (~tokenId, ~signer, ~synthetic: Queries.SyntheticTokenInfo.t) => {
-    let (contractExecutionHandler, _txState, _setTxState) = ContractActions.useContractFunction(
+    let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
       ~signer,
     )
 
@@ -74,6 +117,52 @@ module ConnectedStakeForm = {
       stakeAndEarnImmediatlyFunction()
     })
 
+    let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
+    let router = Next.Router.useRouter()
+    let optCurrentUser = RootProvider.useCurrentUser()
+
+    let userPage = switch optCurrentUser {
+    | Some(address) => `/user/${address->Ethers.Utils.ethAdrToLowerStr}`
+    | None => `/`
+    }
+
+    React.useEffect1(() => {
+      switch txState {
+      | Created =>
+        toastDispatch(
+          ToastProvider.Show(`Confirm the transaction to unstake`, "", ToastProvider.Info),
+        )
+      | SignedAndSubmitted(_) =>
+        toastDispatch(ToastProvider.Show(`Unstake transaction pending`, "", ToastProvider.Info))
+      | Complete(_) =>
+        toastDispatch(
+          ToastProvider.Show(`Unstake transaction confirmed`, "", ToastProvider.Success),
+        )
+        router->Next.Router.push(userPage)
+      | Failed(_) =>
+        toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
+      | Declined(reason) =>
+        toastDispatch(
+          ToastProvider.Show(
+            `The transaction was rejected by your wallet`,
+            reason,
+            ToastProvider.Warning,
+          ),
+        )
+      | _ => ()
+      }
+      None
+    }, [txState])
+
+    let resetFormButton = () =>
+      <Button
+        onClick={_ => {
+          form.reset()
+          setTxState(_ => ContractActions.UnInitialised)
+        }}>
+        {"Reset & Unstake Again"}
+      </Button>
+
     <StakeFormInput
       onSubmit=form.submit
       value={form.input.amount}
@@ -94,6 +183,7 @@ module ConnectedStakeForm = {
           },
         )}
       synthetic
+      txStateModal={<UnstakeTxStatusModal resetFormButton txStateUnstake=txState />}
     />
   }
 }

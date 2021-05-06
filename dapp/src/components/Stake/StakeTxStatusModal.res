@@ -4,13 +4,13 @@ let make = (~txStateApprove, ~txStateStake, ~resetFormButton, ~tokenToStake) => 
   | (ContractActions.Created, _) =>
     <Modal id={"stake-approve-1"}>
       <div className="text-center m-3">
-        <p> {`Confirm approve transaction in your wallet `->React.string} </p>
+        <EllipsesLoader /> <p> {`Confirm approve transaction in your wallet `->React.string} </p>
       </div>
     </Modal>
   | (ContractActions.SignedAndSubmitted(txHash), _) =>
     <Modal id={"stake-approve-2"}>
       <div className="text-center m-3">
-        <MiniLoader />
+        <div className="m-2"> <MiniLoader /> </div>
         <p> {"Approval transaction pending... "->React.string} </p>
         <ViewOnBlockExplorer txHash />
       </div>
@@ -19,7 +19,7 @@ let make = (~txStateApprove, ~txStateStake, ~resetFormButton, ~tokenToStake) => 
   | (ContractActions.Complete({transactionHash: _}), ContractActions.UnInitialised) =>
     <Modal id={"stake-approve-3"}>
       <div className="text-center m-3">
-        <p> {`Confirm transaction to stake ${tokenToStake}`->React.string} </p>
+        <EllipsesLoader /> <p> {`Confirm transaction to stake ${tokenToStake}`->React.string} </p>
       </div>
     </Modal>
   | (ContractActions.Declined(_message), _) => <> {resetFormButton()} </>
@@ -35,6 +35,7 @@ let make = (~txStateApprove, ~txStateStake, ~resetFormButton, ~tokenToStake) => 
   | (_, ContractActions.Created) =>
     <Modal id={"stake-1"}>
       <div className="text-center m-3">
+        <EllipsesLoader />
         <h1> {`Confirm the transaction to stake ${tokenToStake}`->React.string} </h1>
       </div>
     </Modal>
@@ -59,17 +60,19 @@ let make = (~txStateApprove, ~txStateStake, ~resetFormButton, ~tokenToStake) => 
   | (_, ContractActions.SignedAndSubmitted(txHash)) =>
     <Modal id={"stake-3"}>
       <div className="text-center m-3">
-        <MiniLoader />
+        <div className="m-2"> <MiniLoader /> </div>
         <p> {"Staking transaction pending... "->React.string} </p>
         <ViewOnBlockExplorer txHash />
       </div>
     </Modal>
-  | (_, ContractActions.Complete({transactionHash: _})) =>
-    <Modal id={"stake-4"}>
-      <div className="text-center m-3">
-        <p> {`Transaction complete 🎉`->React.string} </p> {resetFormButton()}
-      </div>
-    </Modal>
+  | (_, ContractActions.Complete({transactionHash: _})) => <>
+      <Modal id={"stake-4"}>
+        <div className="text-center m-3">
+          <Tick /> <p> {`Transaction complete 🎉`->React.string} </p>
+        </div>
+        {resetFormButton()}
+      </Modal>
+    </>
   | (_, ContractActions.Declined(_message)) =>
     <Modal id={"stake-5"}>
       <div className="text-center m-3">

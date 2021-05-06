@@ -10,6 +10,7 @@ var APYProvider = require("./libraries/APYProvider.js");
 var Router = require("next/router");
 var RootProvider = require("./libraries/RootProvider.js");
 var ToastProvider = require("./components/UI/ToastProvider.js");
+var InjectedEthereum = require("./ethereum/InjectedEthereum.js");
 var StateChangeMonitor = require("./libraries/StateChangeMonitor.js");
 
 var PageComponent = {};
@@ -17,6 +18,7 @@ var PageComponent = {};
 function $$default(props) {
   Router.useRouter();
   var content = React.createElement(props.Component, props.pageProps);
+  InjectedEthereum.useReloadOnMetamaskChainChanged(undefined);
   return React.createElement(ToastProvider.make, {
               children: React.createElement(RootProvider.make, {
                     children: null

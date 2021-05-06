@@ -4,7 +4,7 @@ module Tab = {
     let bg = selected ? "bg-white" : "bg-gray-100"
     let opacity = selected ? "bg-opacity-70" : "opacity-70"
     let margin = !selected ? "mb-0.5" : "pb-1.5"
-    <li className="mr-3 mb-0">
+    <li className="mr-1 md:mr-2 mb-0">
       <div
         className={`${bg}  ${opacity}  ${margin} cursor-pointer inline-block rounded-t-lg py-1 px-4`}
         onClick>
@@ -181,11 +181,11 @@ let header = (~marketInfo: DataHooks.graphResponse<marketInfo>) => {
 
 module SelectOptions = {
   @react.component
-  let make = (~isLong, ~marketInfo) => {
+  let make = (~isLong, ~marketInfo, ~disabled=false) => {
     let router = Next.Router.useRouter()
     marketInfo->Option.mapWithDefault(React.null, marketInfo => {
-      let onChangeSide = event => {
-        router.query->Js.Dict.set("actionOption", (event->ReactEvent.Form.target)["value"])
+      let onChangeSide = newPosition => {
+        router.query->Js.Dict.set("actionOption", newPosition)
         router.query->Js.Dict.set(
           "token",
           isLong
@@ -195,14 +195,7 @@ module SelectOptions = {
         router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
       }
       <div className="px-6">
-        <select
-          name="longshort"
-          className="trade-select"
-          onChange=onChangeSide
-          value={isLong ? "long" : "short"}>
-          <option value="long"> {`Long 🐮`->React.string} </option>
-          <option value="short"> {`Short 🐻`->React.string} </option>
-        </select>
+        <LongOrShortSelect isLong selectPosition={val => onChangeSide(val)} disabled />
       </div>
     })
   }
@@ -302,7 +295,7 @@ let make = () => {
     ~user,
     ~marketInfo=marketInfo->DataHooks.Util.graphResponseToOption,
   )
-  <div className="flex-1 p-1 mb-2">
+  <div className="flex-1">
     <ul className="list-reset flex items-end">
       {allTabs
       ->Array.map(tab => {

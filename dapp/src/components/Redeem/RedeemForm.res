@@ -28,23 +28,14 @@ module RedeemFormInput = {
     ~onChangeSide=_ => (),
     ~isLong=false,
     ~hasBothTokens=false,
-    ~market: Queries.SyntheticMarketInfo.t,
+    ~submitButton=React.null,
   ) => {
-    let tokenType = isLong ? "long" : "short"
     <Form className="" onSubmit>
       {hasBothTokens
-        ? <select
-            name="longshort"
-            className="trade-select"
-            onChange=onChangeSide
-            value={isLong ? "long" : "short"}
-            disabled>
-            <option value="long"> {`Long 🐮`->React.string} </option>
-            <option value="short"> {`Short 🐻`->React.string} </option>
-          </select>
+        ? <LongOrShortSelect isLong selectPosition={val => onChangeSide(val)} disabled />
         : React.null}
       <AmountInput value optBalance disabled onBlur onChange placeholder={"Redeem"} onMaxClick />
-      <Button onClick={_ => onSubmit()}> {`Redeem ${tokenType} ${market.name}`} </Button>
+      {submitButton}
     </Form>
   }
 }
@@ -110,7 +101,7 @@ module ConnectedRedeemForm = {
       ~shortTokenBalance,
     )
 
-    let (contractExecutionHandler, txState, _setTxState) = ContractActions.useContractFunction(
+    let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
       ~signer,
     )
 
@@ -140,7 +131,7 @@ module ConnectedRedeemForm = {
         contractExecutionHandlerApprove(
           ~makeContractInstance=Contracts.Erc20.make(~address=syntheticTokenAddress),
           ~contractFunction=Contracts.Erc20.approve(
-            ~amount=amount->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("2")),
+            ~amount=amount->Globals.amountForApproval,
             ~spender=Config.longShort,
           ),
         )
@@ -170,10 +161,41 @@ module ConnectedRedeemForm = {
 
     let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
 
-    let optCurrentUser = RootProvider.useCurrentUser()
-    let userPage = switch optCurrentUser {
-    | Some(address) => `/user/${address->Ethers.Utils.ethAdrToLowerStr}`
-    | None => `/`
+    let resetFormButton = () =>
+      <Button
+        onClick={_ => {
+          form.reset()
+          setTxStateApprove(_ => ContractActions.UnInitialised)
+          setTxState(_ => ContractActions.UnInitialised)
+        }}>
+        {"Reset & Redeem Again"}
+      </Button>
+
+    let formAmount = switch form.amountResult {
+    | Some(Ok(amount)) => Some(amount)
+    | _ => None
+    }
+
+    // TODO: incorp - optAdditionalErrorMessage
+    let (_optAdditionalErrorMessage, buttonText, buttonDisabled) = {
+      let position = isLong ? "long" : "short"
+      switch (formAmount, optTokenBalance, optTokenAmountApproved) {
+      | (Some(amount), Some(balance), Some(amountApproved)) =>
+        let needsToApprove = isGreaterThanApproval(~amount, ~amountApproved)
+        let greaterThanBalance = isGreaterThanBalance(~amount, ~balance)
+        switch greaterThanBalance {
+        | true => (Some("Amount is greater than your balance"), `Insufficient balance`, true)
+        | false => (
+            None,
+            switch needsToApprove {
+            | true => `Approve ${position} ${market.name} & Redeem `
+            | false => `Redeem ${position} ${market.name}`
+            },
+            !form.valid(),
+          )
+        }
+      | _ => (None, `Redeem ${position} ${market.name}`, true)
+      }
     }
 
     // Execute the call after approval has completed
@@ -220,7 +242,8 @@ module ConnectedRedeemForm = {
         toastDispatch(ToastProvider.Show(`Redeem transaction pending`, "", ToastProvider.Info))
       | Complete(_) =>
         toastDispatch(ToastProvider.Show(`Redeem transaction confirmed`, "", ToastProvider.Success))
-        router->Next.Router.push(userPage)
+      // TODO: decide if this is desired behaviour
+      // router->Next.Router.push(userPage)
       | Failed(_) =>
         toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
       | Declined(reason) =>
@@ -256,8 +279,8 @@ module ConnectedRedeemForm = {
               | _ => "0"
               },
             )}
-          onChangeSide={event => {
-            router.query->Js.Dict.set("actionOption", (event->ReactEvent.Form.target)["value"])
+          onChangeSide={newPosition => {
+            router.query->Js.Dict.set("actionOption", newPosition)
             router.query->Js.Dict.set(
               "token",
               isActuallyLong
@@ -266,12 +289,18 @@ module ConnectedRedeemForm = {
             )
             router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
           }}
-          market
           isLong={isActuallyLong}
           hasBothTokens
+          submitButton={<RedeemSubmitButtonAndTxStatusModal
+            buttonText
+            resetFormButton
+            redeemToken={`${isLong ? "long" : "short"} ${market.name}`}
+            txStateApprove
+            txStateRedeem=txState
+            buttonDisabled
+          />}
         />
       : <p> {"No tokens in this market to redeem"->React.string} </p>
-    // TODO
   }
 }
 
@@ -284,7 +313,7 @@ let make = (~market: Queries.SyntheticMarketInfo.t, ~isLong) => {
   | Some(signer) => <ConnectedRedeemForm signer market isLong />
   | None =>
     <div onClick={_ => router->Next.Router.push(`/login?nextPath=${router.asPath}`)}>
-      <RedeemFormInput market isLong hasBothTokens={false} />
+      <RedeemFormInput isLong hasBothTokens={false} />
     </div>
   }
 }

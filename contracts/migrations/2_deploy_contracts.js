@@ -19,7 +19,7 @@ const FloatToken = artifacts.require(FLOAT_TOKEN);
 const TokenFactory = artifacts.require(TOKEN_FACTORY);
 const FloatCapital = artifacts.require(FLOAT_CAPITAL);
 
-module.exports = async function(deployer, networkName, accounts) {
+module.exports = async function (deployer, networkName, accounts) {
   if (networkName == "matic") {
     throw "Don't save or run this migration if on mainnet (remove when ready)";
   }
@@ -32,14 +32,10 @@ module.exports = async function(deployer, networkName, accounts) {
   }
 
   // We use actual bUSD for the BSC testnet instead of fake DAI.
-  if (networkName != "binanceTest" && networkName != "kovan") {
-    await deployer.deploy(Dai);
-    let dai = await Dai.deployed();
-    await dai.initialize("dai token", "DAI");
+  if (networkName != "binanceTest" && networkName != "mumbai") {
+    await deployer.deploy(Dai, "dai token", "DAI");
   }
 
-  await deployer.deploy(TokenFactory);
-  let tokenFactory = await TokenFactory.deployed();
 
   await deployer.deploy(FloatToken);
   let floatToken = await FloatToken.deployed();
@@ -61,18 +57,22 @@ module.exports = async function(deployer, networkName, accounts) {
 
   const longShort = await deployProxy(
     LongShort,
-    [admin, treasury.address, tokenFactory.address, staker.address],
     {
       deployer,
-      initializer: "setup",
+      initializer: false
     }
   );
+  await deployer.deploy(TokenFactory, admin, longShort.address, {
+    from: admin,
+  });
+  let tokenFactory = await TokenFactory.deployed();
 
-  await tokenFactory.setup(admin, longShort.address, {
+  await longShort.initialize(admin, treasury.address, tokenFactory.address, staker.address, {
     from: admin,
   });
 
-  await floatToken.setup("Float token", "FLOAT TOKEN", staker.address, {
+
+  await floatToken.initialize("Float token", "FLOAT TOKEN", staker.address, {
     from: admin,
   });
 
@@ -87,7 +87,7 @@ module.exports = async function(deployer, networkName, accounts) {
     }
   );
 
-  if (networkName == "kovan") {
+  if (networkName == "mumbai") {
     const adminInstance = await getAdminInstance();
     console.log(`To verify all these contracts run the following:
     
