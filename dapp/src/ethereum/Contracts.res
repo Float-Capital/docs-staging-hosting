@@ -165,3 +165,40 @@ module Erc20 = {
     ~spender: Ethers.ethAddress,
   ) => JsPromise.t<Ethers.BigNumber.t> = "allowance"
 }
+
+module Synth = {
+  type t = Ethers.Contract.t
+
+  let abi = [
+    "function approve(address spender, uint256 amount) @100000",
+    "function balanceOf(address owner) public view returns (uint256 balance)",
+    "function allowance(address owner, address spender) public view returns (uint256 remaining)",
+    "function stake(uint256 amount) external",
+    // "event Transfer(address indexed _from, address indexed _to, uint256 _value)",
+  ]->Ethers.makeAbi
+
+  let make = (~address, ~providerOrSigner): t =>
+    Ethers.Contract.make(address, abi, providerOrSigner)
+
+  @send
+  external approve: (
+    ~contract: t,
+    ~spender: Ethers.ethAddress,
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<Ethers.txSubmitted> = "approve"
+
+  @send
+  external balanceOf: (~contract: t, ~owner: Ethers.ethAddress) => JsPromise.t<Ethers.BigNumber.t> =
+    "balanceOf"
+
+  @send
+  external allowance: (
+    ~contract: t,
+    ~owner: Ethers.ethAddress,
+    ~spender: Ethers.ethAddress,
+  ) => JsPromise.t<Ethers.BigNumber.t> = "allowance"
+
+  @send
+  external stake: (~contract: t, ~amount: Ethers.BigNumber.t) => JsPromise.t<Ethers.txSubmitted> =
+    "stake"
+}
