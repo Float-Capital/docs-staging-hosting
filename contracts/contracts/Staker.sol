@@ -475,6 +475,34 @@ contract Staker is IStaker, Initializable {
     /////////// STAKING ////////////////
     ////////////////////////////////////
 
+    function _stakeAndEarnImmediately(
+        address staker,
+        address tokenAddress,
+        uint256 amount,
+        bool alreadyTransferred
+    ) internal {
+        //First update state.
+        floatContract._updateSystemState(marketIndexOfToken[tokenAddress]);
+
+        // Stake for user.
+        _stake(tokenAddress, amount, staker, alreadyTransferred);
+
+        userIndexOfLastClaimedReward[tokenAddress][
+            msg.sender
+        ] = latestRewardIndex[tokenAddress];
+
+        // Now we can set the users reward state to the just created state.
+        userIndexOfLastClaimedReward[tokenAddress][
+            msg.sender
+        ] = latestRewardIndex[tokenAddress];
+        emit StakeAdded(
+            msg.sender,
+            tokenAddress,
+            amount,
+            userIndexOfLastClaimedReward[tokenAddress][msg.sender]
+        );
+    }
+
     /*
     Staking function.
     User can stake (flexibly) and start earning float rewards.
@@ -486,7 +514,7 @@ contract Staker is IStaker, Initializable {
         override
         onlyValidSynthetic(msg.sender)
     {
-        _stake(msg.sender, amount, from, true);
+        _stakeAndEarnImmediately(from, msg.sender, amount, true);
     }
 
     /*
@@ -527,20 +555,7 @@ contract Staker is IStaker, Initializable {
         external
         onlyValidSynthetic(tokenAddress)
     {
-        //First update state.
-        floatContract._updateSystemState(marketIndexOfToken[tokenAddress]);
-
-        // Stake for user.
-        _stake(tokenAddress, amount, msg.sender, false);
-
-        userIndexOfLastClaimedReward[tokenAddress][
-            msg.sender
-        ] = latestRewardIndex[tokenAddress];
-
-        // Now we can set the users reward state to the just created state.
-        userIndexOfLastClaimedReward[tokenAddress][
-            msg.sender
-        ] = latestRewardIndex[tokenAddress];
+        _stakeAndEarnImmediately(msg.sender, tokenAddress, amount, false);
         emit StakeAdded(
             msg.sender,
             tokenAddress,
