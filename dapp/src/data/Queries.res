@@ -29,6 +29,7 @@ fragment LatestSynthPrice on LatestPrice {
 fragment LatestSystemStateBasic on SystemState {
   totalLockedLong
   totalLockedShort
+  syntheticPrice
 }
 
 # Used in:
@@ -47,34 +48,15 @@ fragment LatestSystemStateInfo on SystemState {
 }
 
 # Used in:
-#   Fragments: SyntheticTokenBasic
-fragment SyntheticMarketIdentifiers on SyntheticMarket {
-  id
-  name
-  symbol
-}
-
-# Used in:
 #   Fragments: SyntheticTokenInfo
 fragment SyntheticMarketBasic on SyntheticMarket {
   id
   name
   symbol
-  latestSystemState {
+  marketIndex
+  oracleAddress
+  latestSystemState{
     ...LatestSystemStateBasic
-  }
-}
-
-# Used in:
-#   Fragments: UserTokenBalance
-fragment SyntheticTokenBasic on SyntheticToken {
-  id
-  tokenType
-  syntheticMarket {
-    ...SyntheticMarketIdentifiers
-  }
-  latestPrice {
-    ...LatestSynthPrice
   }
 }
 
@@ -94,15 +76,16 @@ fragment SyntheticTokenStakeInfo on SyntheticToken {
 #   Queries: SyntheticToken, SyntheticTokens
 fragment SyntheticTokenInfo on SyntheticToken {
   id
+  tokenType
+  tokenSupply
   totalStaked
+  tokenAddress
   syntheticMarket {
     ...SyntheticMarketBasic
   }
   latestPrice {
     ...LatestSynthPrice
   }
-  tokenType
-  tokenAddress
 }
 
 
@@ -130,8 +113,9 @@ fragment SyntheticMarketInfo on SyntheticMarket {
 fragment UserTokenBalance on UserSyntheticTokenBalance {
   id
   tokenBalance
+  timeLastUpdated
   syntheticToken {
-    ...SyntheticTokenBasic
+    ...SyntheticTokenInfo
   }
 }
 
@@ -295,3 +279,23 @@ query {
   }
 }
 `)
+
+module TokenPrice = %graphql(`
+  query($tokenAddress: String!, $timestamp: Int!){
+    prices(where:{token:$tokenAddress, timeUpdated_lte: $timestamp}, orderBy: timeUpdated, orderDirection: desc, first:1){
+      id
+      price
+    }
+  }
+`)
+
+module PriceHistory = %graphql(`
+query ($intervalId: String!, $numDataPoints: Int!) @ppxConfig(schema: "graphql_schema_price_history.json") {
+  priceIntervalManager(id: $intervalId) {
+    id
+    prices(first: $numDataPoints, orderBy: intervalIndex, orderDirection:desc) {
+      startTimestamp @ppxCustom(module: "Date")
+      endPrice
+    }
+  }
+}`)

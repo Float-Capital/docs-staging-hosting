@@ -52,6 +52,7 @@ function User$UserBalancesCard(Props) {
                             tokenAddress: addr,
                             metamaskMenu: true,
                             symbol: param.symbol,
+                            metadata: param.metadata,
                             children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {
                                   synthAddress: Ethers.Utils.ethAdrToLowerStr(addr),
                                   isLong: isLong

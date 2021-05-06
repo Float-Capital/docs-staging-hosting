@@ -1,23 +1,10 @@
 open BsRecharts
-open GqlConverters
 let {ethAdrToLowerStr} = module(Ethers.Utils)
 
 type priceData = {
   date: Js.Date.t,
   price: float,
 }
-
-// This module isn't used anywhere else in the code. If it is in the future, hoist it up into the Queries module.
-module PriceHistory = %graphql(`
-query ($intervalId: String!, $numDataPoints: Int!) @ppxConfig(schema: "graphql_schema_price_history.json") {
-  priceIntervalManager(id: $intervalId) {
-    id
-    prices(first: $numDataPoints, orderBy: intervalIndex, orderDirection:desc) {
-      startTimestamp @ppxCustom(module: "Date")
-      endPrice
-    }
-  }
-}`)
 
 module LoadedGraph = {
   @react.component
@@ -140,7 +127,7 @@ type dataInfo = {
 
 @ocaml.doc(`Takes the raw prices returned from the graph and transforms them into the correct format for recharts to display, as well as getting the max+min y-values.`)
 let extractGraphPriceInfo = (
-  rawPriceData: array<PriceHistory.PriceHistory_inner.t_priceIntervalManager_prices>,
+  rawPriceData: array<Queries.PriceHistory.PriceHistory_inner.t_priceIntervalManager_prices>,
   graphZoomSetting,
 ) =>
   rawPriceData->Array.reduceReverse(
@@ -215,7 +202,7 @@ let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
 
   let (graphSetting, setGraphSetting) = React.useState(_ => Max(timeMaketHasExisted))
   let (intervalLength, numDataPoints) = graphSetting->zoomAndNumDataPointsFromGraphSetting
-  let priceHistory = PriceHistory.use(
+  let priceHistory = Queries.PriceHistory.use(
     ~context=Client.createContext(Client.PriceHistory),
     {
       intervalId: `${oracleAddress->ethAdrToLowerStr}-${intervalLength->Int.toString}`,
