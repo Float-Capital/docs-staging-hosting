@@ -574,12 +574,6 @@ function RedeemForm$ConnectedRedeemForm(Props) {
           }
         }));
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
-  var optCurrentUser = RootProvider.useCurrentUser(undefined);
-  if (optCurrentUser !== undefined) {
-    "/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser));
-  } else {
-    "/";
-  }
   var resetFormButton = function (param) {
     return React.createElement(Button.make, {
                 onClick: (function (param) {

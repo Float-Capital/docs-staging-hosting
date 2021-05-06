@@ -17,7 +17,6 @@ var Formality = require("re-formality/src/Formality.js");
 var MiniLoader = require("../UI/MiniLoader.js");
 var AmountInput = require("../UI/AmountInput.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
-var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
 var ContractHooks = require("../Testing/Admin/ContractHooks.js");
 var ToastProvider = require("../UI/ToastProvider.js");
@@ -495,13 +494,6 @@ function StakeForm$ConnectedStakeForm(Props) {
   var user = RootProvider.useCurrentUserExn(undefined);
   var optTokenBalance = DataHooks.Util.graphResponseToOption(DataHooks.useSyntheticTokenBalance(user, synthetic.tokenAddress));
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
-  Router.useRouter();
-  var optCurrentUser = RootProvider.useCurrentUser(undefined);
-  if (optCurrentUser !== undefined) {
-    "/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser));
-  } else {
-    "/";
-  }
   React.useEffect((function () {
           if (typeof txStateApprove === "number") {
             if (txStateApprove !== /* UnInitialised */0) {

@@ -68,12 +68,6 @@ module ConnectedStakeForm = {
       )->DataHooks.Util.graphResponseToOption
 
     let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
-    let router = Next.Router.useRouter()
-    let optCurrentUser = RootProvider.useCurrentUser()
-    let userPage = switch optCurrentUser {
-    | Some(address) => `/user/${address->Ethers.Utils.ethAdrToLowerStr}`
-    | None => `/`
-    }
 
     // Execute the call after approval has completed
     React.useEffect1(() => {

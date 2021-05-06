@@ -161,12 +161,6 @@ module ConnectedRedeemForm = {
 
     let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
 
-    let optCurrentUser = RootProvider.useCurrentUser()
-    let userPage = switch optCurrentUser {
-    | Some(address) => `/user/${address->Ethers.Utils.ethAdrToLowerStr}`
-    | None => `/`
-    }
-
     let resetFormButton = () =>
       <Button
         onClick={_ => {
