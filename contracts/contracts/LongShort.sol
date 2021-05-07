@@ -850,7 +850,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 tokensMinted =
             _mintLong(marketIndex, amount, msg.sender, address(staker));
 
-        staker.stakeTransferredTokens(
+        staker.stakeFromMint(
             address(longTokens[marketIndex]),
             tokensMinted,
             msg.sender
@@ -867,7 +867,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 tokensMinted =
             _mintShort(marketIndex, amount, msg.sender, address(staker));
 
-        staker.stakeTransferredTokens(
+        staker.stakeFromMint(
             address(shortTokens[marketIndex]),
             tokensMinted,
             msg.sender

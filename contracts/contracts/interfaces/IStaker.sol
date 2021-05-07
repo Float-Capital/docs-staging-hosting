@@ -20,11 +20,11 @@ abstract contract IStaker {
         uint256 shortValue
     ) external virtual;
 
-    function stakeTransferredTokens(
+    function stakeFromMint(
         address tokenAddress,
         uint256 amount,
         address user
     ) external virtual;
 
-    function stakeDirect(address from, uint256 amount) public virtual;
+    function stakeFromUser(address from, uint256 amount) public virtual;
 }
