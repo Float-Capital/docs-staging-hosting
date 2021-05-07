@@ -476,16 +476,16 @@ contract Staker is IStaker, Initializable {
     ////////////////////////////////////
 
     function _stakeAndEarnImmediately(
-        address staker,
         address tokenAddress,
         uint256 amount,
+        address user,
         bool alreadyTransferred
     ) internal {
         //First update state.
         floatContract._updateSystemState(marketIndexOfToken[tokenAddress]);
 
         // Stake for user.
-        _stake(tokenAddress, amount, staker, alreadyTransferred);
+        _stake(tokenAddress, amount, user, alreadyTransferred);
 
         userIndexOfLastClaimedReward[tokenAddress][
             msg.sender
@@ -514,7 +514,7 @@ contract Staker is IStaker, Initializable {
         override
         onlyValidSynthetic(msg.sender)
     {
-        _stakeAndEarnImmediately(from, msg.sender, amount, true);
+        _stakeAndEarnImmediately(msg.sender, amount, from, true);
     }
 
     /*
@@ -555,13 +555,7 @@ contract Staker is IStaker, Initializable {
         external
         onlyValidSynthetic(tokenAddress)
     {
-        _stakeAndEarnImmediately(msg.sender, tokenAddress, amount, false);
-        emit StakeAdded(
-            msg.sender,
-            tokenAddress,
-            amount,
-            userIndexOfLastClaimedReward[tokenAddress][msg.sender]
-        );
+        _stakeAndEarnImmediately(tokenAddress, amount, msg.sender, false);
     }
 
     /**
