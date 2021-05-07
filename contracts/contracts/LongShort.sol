@@ -524,31 +524,36 @@ contract LongShort is ILongShort, Initializable {
         shortValue[marketIndex] = shortValue[marketIndex] + shortAmount;
     }
 
+    function _minimum(
+        uint256 liquidityOfPositionA,
+        uint256 liquidityOfPositionB
+    ) internal view returns (uint256) {
+        if (liquidityOfPositionA < liquidityOfPositionB) {
+            return liquidityOfPositionA;
+        } else {
+            return liquidityOfPositionB;
+        }
+    }
+
     function _calculateValueChangeForPriceMechanism(
         uint32 marketIndex,
         uint256 assetPriceGreater,
         uint256 assetPriceLess,
-        uint256 greatestPossibleValueChange
+        uint256 baseValueExposure
     ) internal view returns (uint256) {
         uint256 valueChange = 0;
 
         uint256 percentageChange =
             ((assetPriceGreater - assetPriceLess) * TEN_TO_THE_18) /
                 assetPrice[marketIndex];
-        if (percentageChange >= TEN_TO_THE_18) {
+
+        valueChange = (baseValueExposure * percentageChange) / TEN_TO_THE_18;
+
+        if (valueChange > baseValueExposure) {
             // More than 100% price movement, system liquidation.
-            valueChange = greatestPossibleValueChange;
-        } else {
-            if (getShortBeta(marketIndex) == TEN_TO_THE_18) {
-                valueChange =
-                    (shortValue[marketIndex] * percentageChange) /
-                    TEN_TO_THE_18;
-            } else {
-                valueChange =
-                    (longValue[marketIndex] * percentageChange) /
-                    TEN_TO_THE_18;
-            }
+            valueChange = baseValueExposure;
         }
+
         return valueChange;
     }
 
@@ -559,14 +564,18 @@ contract LongShort is ILongShort, Initializable {
         if (assetPrice[marketIndex] == newPrice) {
             return;
         }
+
         uint256 valueChange = 0;
+        uint256 baseValueExposure =
+            _minimum(longValue[marketIndex], shortValue[marketIndex]);
+
         // Long gains
         if (newPrice > assetPrice[marketIndex]) {
             valueChange = _calculateValueChangeForPriceMechanism(
                 marketIndex,
                 newPrice,
                 assetPrice[marketIndex],
-                shortValue[marketIndex]
+                baseValueExposure
             );
             longValue[marketIndex] = longValue[marketIndex] + valueChange;
             shortValue[marketIndex] = shortValue[marketIndex] - valueChange;
@@ -575,7 +584,7 @@ contract LongShort is ILongShort, Initializable {
                 marketIndex,
                 assetPrice[marketIndex],
                 newPrice,
-                longValue[marketIndex]
+                baseValueExposure
             );
             longValue[marketIndex] = longValue[marketIndex] - valueChange;
             shortValue[marketIndex] = shortValue[marketIndex] + valueChange;
