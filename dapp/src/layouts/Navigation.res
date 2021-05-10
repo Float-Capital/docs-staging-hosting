@@ -98,7 +98,7 @@ let make = () => {
         <Link href="/dashboard">
           <a className="px-3 hover:bg-white"> {React.string("DASHBOARD")} </a>
         </Link>
-        <a className="px-3 hover:bg-white" target="_blank" href="https://docs.float.capital">
+        <a className="px-3 hover:bg-white mr-2" target="_blank" href="https://docs.float.capital">
           {React.string("DOCS")}
         </a>
         {

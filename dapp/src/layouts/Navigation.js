@@ -173,7 +173,7 @@ function Navigation(Props) {
                                 className: "px-3 hover:bg-white"
                               }, "DASHBOARD")
                         }), React.createElement("a", {
-                          className: "px-3 hover:bg-white",
+                          className: "px-3 hover:bg-white mr-2",
                           href: "https://docs.float.capital",
                           target: "_blank"
                         }, "DOCS"), tmp), React.createElement("div", {

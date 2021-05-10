@@ -42,23 +42,38 @@ let totalValueCard = (~totalValueLocked) =>
     className={"mb-2 md:mb-5 mx-3 p-5 md:mt-7 self-center text-center bg-white bg-opacity-75 rounded-lg shadow-lg"}>
     <span className="font-alphbeta text-xl"> {"Total Value"->React.string} </span>
     <span className="text-sm"> {` 🏦 in Float Protocol: `->React.string} </span>
-    <span className="text-green-700">
+    <span className="text-green-700 font-bold text-xl">
       {`$${totalValueLocked->FormatMoney.formatEther}`->React.string}
     </span>
   </div>
 
-let floatProtocolCard = (~liveSince, ~totalTxs, ~totalUsers, ~totalGasUsed, ~txHash) =>
+let floatProtocolCard = (
+  ~liveSince,
+  ~totalTxs,
+  ~totalUsers,
+  ~totalGasUsed,
+  ~txHash,
+  ~numberOfSynths,
+) => {
+  let dateObj = liveSince->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime
+
   <Card>
     <Header> {`Float Protocol 🏗️`->React.string} </Header>
     <DashboardUl
       list={[
         createDashboardLiProps(
-          ~prefix=`📅 Live since:`,
+          ~prefix=`🗓️ Live since:`,
           ~value={
-            let dateObj = liveSince->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime
-            `${dateObj->DateFns.format(#"do MMM ''yy")} (${dateObj->DateFns.formatDistanceToNow})`
+            dateObj->DateFns.format(#"do MMM ''yy")
           },
           ~link={`${Config.blockExplorer}/tx/${txHash}`},
+          (),
+        ),
+        createDashboardLiProps(
+          ~prefix=`📅 Days live:`,
+          ~value={
+            dateObj->DateFns.formatDistanceToNow
+          },
           (),
         ),
         createDashboardLiProps(
@@ -71,6 +86,7 @@ let floatProtocolCard = (~liveSince, ~totalTxs, ~totalUsers, ~totalGasUsed, ~txH
           ~value=totalUsers->Ethers.BigNumber.toString,
           (),
         ),
+        createDashboardLiProps(~prefix=`👷‍♀️ No. synths:`, ~value=numberOfSynths, ()),
         createDashboardLiProps(
           ~prefix=`⛽ Gas used:`,
           ~value=totalGasUsed->Ethers.BigNumber.toString->FormatMoney.formatInt,
@@ -79,23 +95,24 @@ let floatProtocolCard = (~liveSince, ~totalTxs, ~totalUsers, ~totalGasUsed, ~txH
       ]}
     />
   </Card>
+}
 
-let syntheticAssetsCard = (~totalSynthValue, ~numberOfSynths) =>
+let syntheticAssetsCard = (~totalSynthValue) =>
   <Card>
     <Header>
       {`Synthetic Assets`->React.string} <img className="inline h-5 ml-2" src="/img/coin.png" />
     </Header>
-    <DashboardUl
-      list=[
-        createDashboardLiProps(
-          ~prefix=`💰 Total synth value: `,
-          ~value=`$${totalSynthValue->FormatMoney.formatEther}`,
-          ~suffix=<Tooltip tip={"Redeemable value of synths in the open market"} />,
-          (),
-        ),
-        createDashboardLiProps(~prefix=`👷‍♀️ No. synths:`, ~value=numberOfSynths, ()),
-      ]
-    />
+    <div className="p-6 py-4 text-center">
+      <div>
+        <span className="text-sm mr-2"> {`💰 Total synth value`->React.string} </span>
+        <div className="text-green-700 text-xl ">
+          {`$${totalSynthValue->FormatMoney.formatEther}`->React.string}
+          <span className="text-black">
+            <Tooltip tip={"Redeemable value of synths in the open market"} />
+          </span>
+        </div>
+      </div>
+    </div>
     <Next.Link href="/markets">
       <div className="w-full pb-4 text-sm cursor-pointer hover:opacity-70 mx-auto">
         <div className="flex justify-center">
@@ -115,8 +132,8 @@ let floatTokenCard = (~totalFloatMinted) =>
       list={[
         createDashboardLiProps(~prefix=`😏 Float price:`, ~value="...", ()),
         createDashboardLiProps(
-          ~prefix=`🕶️ Float supply:`,
-          ~value=totalFloatMinted->Ethers.Utils.formatEtherToPrecision(2),
+          ~prefix=`🗳 Float supply:`,
+          ~value=totalFloatMinted->FormatMoney.formatEther, //Ethers.Utils.formatEtherToPrecision(2),
           ~suffix=<Tooltip tip="The number of Float tokens in circulation" />,
           (),
         ),
@@ -129,12 +146,12 @@ let stakingCard = (~totalValueStaked) =>
   <Card>
     <Header> {`Staking 🔥`->React.string} </Header>
     <div className="text-center mt-5">
-      <span className="text-sm mr-1"> {`💰 Total staked value: `->React.string} </span>
-      <span className="text-green-700">
+      <div className="text-sm"> {`💰 Total staked value `->React.string} </div>
+      <div className="text-green-700 text-xl ">
         {`$${totalValueStaked->FormatMoney.formatEther}`->React.string}
-      </span>
+      </div>
     </div>
-    <div className="text-left mt-4 pl-4 text-sm"> {`Trending`->React.string} </div>
+    <div className="text-left mt-4 pl-4 text-sm font-bold"> {`Trending`->React.string} </div>
     <div className="pt-2 pb-5"> <TrendingStakes /> </div>
   </Card>
 
@@ -177,11 +194,11 @@ let make = () => {
               ~totalUsers,
               ~totalGasUsed,
               ~txHash,
+              ~numberOfSynths,
             )}
           </Divider>
           <Divider>
-            {syntheticAssetsCard(~totalSynthValue, ~numberOfSynths)}
-            {floatTokenCard(~totalFloatMinted)}
+            {syntheticAssetsCard(~totalSynthValue)} {floatTokenCard(~totalFloatMinted)}
           </Divider>
           <Divider> {stakingCard(~totalValueStaked)} </Divider>
         </Container>
