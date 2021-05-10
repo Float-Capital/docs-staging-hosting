@@ -319,6 +319,7 @@ export function handleFloatMinted(event: FloatMinted): void {
     currentStake.user = user.id;
     currentStake.userAddress = user.address;
     currentStake.syntheticToken = syntheticToken.id;
+    currentStake.currentStake = "DOESN'T EXIST YET";
 
     user.currentStakes = user.currentStakes.concat([currentStake.id]);
   }
