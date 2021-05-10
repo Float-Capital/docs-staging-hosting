@@ -118,9 +118,9 @@ contract("LongShort (staking)", (accounts) => {
     assert.equal(zero, u3Float.toString());
   });
 
-  // it("case 1:  users can earn float with a delay from a long stake", async () => {
-  //   await basicFloatAccumulationTest(mintThenStake, longToken, 2);
-  // });
+  it.skip("case 1:  users can earn float with a delay from a long stake", async () => {
+    await basicFloatAccumulationTest(mintThenStake, longToken, 2);
+  });
 
   it("case 2:  users can earn float immediately from a long stake", async () => {
     await basicFloatAccumulationTest(mintThenStakeImmediately, longToken, 1);
@@ -130,9 +130,9 @@ contract("LongShort (staking)", (accounts) => {
     await basicFloatAccumulationTest(mintAndStake, longToken, 1);
   });
 
-  // it("case 1:  users can earn float with a delay from from a short stake", async () => {
-  //   await basicFloatAccumulationTest(mintThenStake, shortToken, 2);
-  // });
+  it.skip("case 1:  users can earn float with a delay from from a short stake", async () => {
+    await basicFloatAccumulationTest(mintThenStake, shortToken, 2);
+  });
 
   it("case 2:  users can earn float immediately from a short stake", async () => {
     await basicFloatAccumulationTest(mintThenStakeImmediately, shortToken, 1);
@@ -160,7 +160,7 @@ contract("LongShort (staking)", (accounts) => {
     );
   });
 
-  it("restaking credits you your float", async () => {
+  it.skip("restaking credits you your float", async () => {
     // Ensure markets aren't empty.
     await populateMarket();
 
@@ -205,15 +205,15 @@ contract("LongShort (staking)", (accounts) => {
     // Check that the credited float is what we expect.
     // NB NB NB This is failing, very slightly off.
     // Need to test the staking system wayy better
-    // assert.equal(
-    //   result.toString(),
-    //   expectedFloatPerSecond
-    //     .mul(new BN(now - before))
-    //     .mul(new BN(oneHundred))
-    //     .div(e42)
-    //     .toString(),
-    //   "correct amount earned"
-    // );
+    assert.equal(
+      result.toString(),
+      expectedFloatPerSecond
+        .mul(new BN(now - before))
+        .mul(new BN(oneHundred))
+        .div(e42)
+        .toString(),
+      "correct amount earned"
+    );
 
     // Restaking again immediately shouldn't credit the user again.
 
