@@ -94,7 +94,9 @@ let changeBallance: (
   ~token: Contract.t,
   ~to: Ethers.Wallet.t,
   ~amount: Ethers.BigNumber.t,
-) => JsPromise.t<unit> = %raw(`expect(transaction).to.changeTokenBalance(token, to, amount)`)
+) => JsPromise.t<
+  unit,
+> = %raw(`(transaction, token, to, amount) => expect(transaction).to.changeTokenBalance(token, to, amount)`)
 // TODO: implement changeBallanceMulti to test transactions that change the balance of multiple accounts
 // let changeBallanceMulti = %raw(`expect(transaction).to.changeTokenBalance(token, wallets, amounts)`)
 

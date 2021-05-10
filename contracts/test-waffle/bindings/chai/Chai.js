@@ -39,7 +39,7 @@ var expectRevertNoReason = ((transaction) => expect(transaction).to.be.reverted)
 
 var expectRevert = ((transaction, reason) => expect(transaction).to.be.revertedWith(reason));
 
-var changeBallance = (expect(transaction).to.changeTokenBalance(token, to, amount));
+var changeBallance = ((transaction, token, to, amount) => expect(transaction).to.changeTokenBalance(token, to, amount));
 
 var expectToBeAddress = ((address) => expect(address).to.be.properAddress);
 
