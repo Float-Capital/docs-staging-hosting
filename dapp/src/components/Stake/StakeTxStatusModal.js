@@ -6,8 +6,10 @@ var Curry = require("rescript/lib/js/curry.js");
 var Modal = require("../UI/Modal.js");
 var React = require("react");
 var MiniLoader = require("../UI/MiniLoader.js");
+var TweetButton = require("../UI/TweetButton.js");
 var EllipsesLoader = require("../UI/EllipsesLoader.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
+var ViewPositionButton = require("../UI/ViewPositionButton.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
 
 function StakeTxStatusModal(Props) {
@@ -51,7 +53,9 @@ function StakeTxStatusModal(Props) {
                         children: null
                       }, React.createElement("div", {
                             className: "text-center m-3"
-                          }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉")), Curry._1(resetFormButton, undefined)));
+                          }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement(TweetButton.make, {
+                                message: "Float like a butterfly, stake like a bee!🐝 I just staked to earn Float tokens @float_capital 🌊 "
+                              }), React.createElement(ViewPositionButton.make, {})), Curry._1(resetFormButton, undefined)));
     case /* Failed */3 :
         return React.createElement(Modal.make, {
                     id: "stake-6",

@@ -8,7 +8,7 @@
   "rpcEndopint": "https://rpc-mumbai.matic.today",
   "paymentTokenName": "DAI",
   "blockExplorer": "https://explorer-mumbai.maticvigil.com/",
-  "blockExplorerName": "matic exploer",
+  "blockExplorerName": "matic explorer",
   "discordInviteLink": "https://discord.gg/dqDwgrVYcU",
   "web3PollingInterval": 8000,
   "contracts": {

@@ -223,7 +223,8 @@ function Navigation(Props) {
                                 }, "DASHBOARD"), React.createElement("a", {
                                   className: "px-3 bg-black m-2",
                                   href: "https://docs.float.capital",
-                                  target: "_blank",
+                                  rel: "noopener noreferrer",
+                                  target: "_",
                                   onClick: (function (param) {
                                       return Curry._1(setIsOpen, (function (param) {
                                                     return false;
@@ -232,7 +233,8 @@ function Navigation(Props) {
                                 }, "DOCS"), React.createElement("a", {
                                   className: "px-3 hover:opacity-60 m-4",
                                   href: "https://github.com/float-capital/float-contracts",
-                                  target: "_blank",
+                                  rel: "noopener noreferrer",
+                                  target: "_",
                                   onClick: (function (param) {
                                       return Curry._1(setIsOpen, (function (param) {
                                                     return false;

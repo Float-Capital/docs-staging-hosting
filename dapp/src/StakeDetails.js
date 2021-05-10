@@ -49,6 +49,7 @@ function StakeDetails$UsersActiveStakes(Props) {
                                         className: "text-primary "
                                       }, React.createElement("a", {
                                             href: Config.blockExplorer + "/token/" + Globals.ethAdrToStr(tokenAddress) + "?a=" + Globals.ethAdrToStr(currentUser),
+                                            rel: "noopener noreferrer",
                                             target: "_"
                                           }, React.createElement("span", {
                                                 className: "text-bold text-4xl"

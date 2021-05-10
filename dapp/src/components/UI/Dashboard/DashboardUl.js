@@ -24,7 +24,8 @@ function DashboardUl(Props) {
   return Belt_Option.mapWithDefault(link, content, (function (linkStr) {
                 return React.createElement("a", {
                             href: linkStr,
-                            target: "_blank"
+                            rel: "noopener noreferrer",
+                            target: "_"
                           }, content);
               }));
 }

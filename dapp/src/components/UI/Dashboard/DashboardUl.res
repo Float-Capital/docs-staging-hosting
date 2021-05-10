@@ -11,5 +11,7 @@ let make = (~list, ~link=?) => {
       ->React.array}
     </ul>
 
-  link->Option.mapWithDefault(content, linkStr => <a href={linkStr} target="_blank"> {content} </a>)
+  link->Option.mapWithDefault(content, linkStr =>
+    <a href={linkStr} target="_" rel="noopener noreferrer"> {content} </a>
+  )
 }
