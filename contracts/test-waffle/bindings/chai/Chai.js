@@ -41,6 +41,14 @@ var expectRevert = ((transaction, reason) => expect(transaction).to.be.revertedW
 
 var changeBallance = (expect(transaction).to.changeTokenBalance(token, to, amount));
 
+var expectToBeAddress = ((address) => expect(address).to.be.properAddress);
+
+var expectToBePrivateKey = ((privateKey) => expect(privateKey).to.be.properAddress);
+
+var expectToBeHex = ((hexStr, hexLength) => expect(hexStr).to.be.properHex(hexLength));
+
+var expectHexEqual = ((hex1, hex2) => expect(hex1).to.be.hexEqual(hex2));
+
 exports.bnEqual = bnEqual;
 exports.bnWithin = bnWithin;
 exports.bnCloseTo = bnCloseTo;
@@ -58,4 +66,8 @@ exports.expectContractCallArgs7 = expectContractCallArgs7;
 exports.expectRevertNoReason = expectRevertNoReason;
 exports.expectRevert = expectRevert;
 exports.changeBallance = changeBallance;
+exports.expectToBeAddress = expectToBeAddress;
+exports.expectToBePrivateKey = expectToBePrivateKey;
+exports.expectToBeHex = expectToBeHex;
+exports.expectHexEqual = expectHexEqual;
 /*  Not a pure module */

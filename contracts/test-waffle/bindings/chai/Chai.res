@@ -95,3 +95,20 @@ let changeBallance: (
   ~to: Ethers.Wallet.t,
   ~amount: Ethers.BigNumber.t,
 ) => JsPromise.t<unit> = %raw(`expect(transaction).to.changeTokenBalance(token, to, amount)`)
+// TODO: implement changeBallanceMulti to test transactions that change the balance of multiple accounts
+// let changeBallanceMulti = %raw(`expect(transaction).to.changeTokenBalance(token, wallets, amounts)`)
+
+let expectToBeAddress: (
+  ~address: Ethers.ethAddress,
+) => JsPromise.t<unit> = %raw(`(address) => expect(address).to.be.properAddress`)
+let expectToBePrivateKey: (
+  ~privateKey: string,
+) => JsPromise.t<unit> = %raw(`(privateKey) => expect(privateKey).to.be.properAddress`)
+let expectToBeHex: (
+  ~hexStr: string,
+  ~length: int,
+) => JsPromise.t<unit> = %raw(`(hexStr, hexLength) => expect(hexStr).to.be.properHex(hexLength)`)
+let expectHexEqual: (
+  ~hex1: string,
+  ~hex2: string,
+) => JsPromise.t<unit> = %raw(`(hex1, hex2) => expect(hex1).to.be.hexEqual(hex2)`)
