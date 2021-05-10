@@ -216,6 +216,10 @@ module MetamaskMenu = {
 
 module UserMarketBox = {
   type direction = Up | Down
+
+  @send external getTime: (Js_date.t) => int = "getTime"
+
+  let getUnixTime = (date) => date->getTime/1000
   @react.component
   let make = (
     ~name,
@@ -253,7 +257,8 @@ module UserMarketBox = {
               let loading: DataHooks.graphResponse<Ethers.BigNumber.t> = Loading
               loading
             }
-          | Response({priceIntervalManager: Some({prices: [{endPrice}]})}) =>
+          | Response({priceIntervalManager: Some({prices: [{endPrice, startTimestamp}]})}) =>
+            if(startTimestamp->getTime->Ethers.BigNumber.fromInt->Ethers.BigNumber.gt(timestamp)){
             Response(
               MarketSimulation.simulateMarketPriceChange(
                 ~oldPrice=syntheticPrice,
@@ -264,12 +269,28 @@ module UserMarketBox = {
                 ~tokenSupply,
               ),
             )
+            }else{
+              Response(syntheticPrice)
+            }
+
           | Response(_) => GraphError(`Unspecifed graph error`)
           | GraphError(s) => GraphError(s)
           }
       )
 
     let bothPrices = DataHooks.liftGraphResponse2(initialTokenPriceResponse, finalPriceResponse)
+
+    // switch bothPrices {
+    // | Response((a, b)) => {
+    //     Js.log(name)
+    //     Js.log(isLong ? "LONG" : "SHORT")
+    //     if metamaskMenu {
+    //       Js.log("STAKE")
+    //     }
+    //     Js.log((a->Ethers.BigNumber.toString, b->Ethers.BigNumber.toString))
+    //   }
+    // | _ => ()
+    // }
 
     <div
       className=`flex w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative`>
@@ -298,12 +319,16 @@ module UserMarketBox = {
             | Down => Ethers.BigNumber.sub(oldPrice, newPrice)
             }
 
-            <div className={direction == Up ? "text-green-500" : "text-red-500"}>
-              {`${direction == Up ? "+" : "-"}${Globals.percentStr(
-                  ~n=diff,
-                  ~outOf=oldPrice,
-                )}%`->React.string}
-            </div>
+            if !(diff->Ethers.BigNumber.eq(CONSTANTS.zeroBN)) {
+              <div className={direction == Up ? "text-green-500" : "text-red-500"}>
+                {`${direction == Up ? "+" : "-"}${Globals.percentStr(
+                    ~n=diff,
+                    ~outOf=oldPrice,
+                  )}%`->React.string}
+              </div>
+            } else {
+              React.null
+            }
           }
         | Loading => <MiniLoader />
         | _ => ``->React.string
@@ -419,7 +444,8 @@ module UserStakesCard = {
         ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
       let creationTxHash = stake.currentStake.creationTxHash
 
-      <UserMarketBox key name isLong tokens value={value->FormatMoney.formatEther} metadata>
+      <UserMarketBox
+        key name isLong tokens tokenAddress={addr} value={value->FormatMoney.formatEther} metadata>
         <UserMarketUnstake synthAddress={addr} userId isLong whenStr creationTxHash />
       </UserMarketBox>
     }, stakes)->React.array

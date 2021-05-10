@@ -283,6 +283,10 @@ var MetamaskMenu = {
   make: UserUI$MetamaskMenu
 };
 
+function getUnixTime(date) {
+  return date.getTime() / 1000 | 0;
+}
+
 function UserUI$UserMarketBox(Props) {
   var name = Props.name;
   var isLong = Props.isLong;
@@ -293,10 +297,12 @@ function UserUI$UserMarketBox(Props) {
   var $staropt$star$2 = Props.symbol;
   var param = Props.metadata;
   var children = Props.children;
+  var syntheticPrice = param.syntheticPrice;
+  var timestamp = param.timeLastUpdated;
   var tokenAddress = $staropt$star !== undefined ? Caml_option.valFromOption($staropt$star) : CONSTANTS.zeroAddress;
   var metamaskMenu = $staropt$star$1 !== undefined ? $staropt$star$1 : false;
   var symbol = $staropt$star$2 !== undefined ? $staropt$star$2 : "";
-  var initialTokenPriceResponse = DataHooks.useTokenPriceAtTime(tokenAddress, param.timeLastUpdated);
+  var initialTokenPriceResponse = DataHooks.useTokenPriceAtTime(tokenAddress, timestamp);
   var priceHistoryQuery = Curry.app(Queries.PriceHistory.use, [
         undefined,
         Caml_option.some(Client.createContext(/* PriceHistory */1)),
@@ -338,11 +344,15 @@ function UserUI$UserMarketBox(Props) {
         };
       } else {
         var match$2 = match$1[0];
-        finalPriceResponse = {
-          TAG: 1,
-          _0: MarketSimulation.simulateMarketPriceChange(param.syntheticPrice, match$2.endPrice, param.totalLockedLong, param.totalLockedShort, param.tokenSupply, isLong),
-          [Symbol.for("name")]: "Response"
-        };
+        finalPriceResponse = Ethers$1.BigNumber.from(match$2.startTimestamp.getTime()).gt(timestamp) ? ({
+              TAG: 1,
+              _0: MarketSimulation.simulateMarketPriceChange(syntheticPrice, match$2.endPrice, param.totalLockedLong, param.totalLockedShort, param.tokenSupply, isLong),
+              [Symbol.for("name")]: "Response"
+            }) : ({
+              TAG: 1,
+              _0: syntheticPrice,
+              [Symbol.for("name")]: "Response"
+            });
       }
     } else {
       finalPriceResponse = {
@@ -364,11 +374,11 @@ function UserUI$UserMarketBox(Props) {
     var oldPrice = match$3[0];
     var direction = newPrice.gt(oldPrice) ? /* Up */0 : /* Down */1;
     var diff = direction ? oldPrice.sub(newPrice) : newPrice.sub(oldPrice);
-    tmp = React.createElement("div", {
-          className: direction === /* Up */0 ? "text-green-500" : "text-red-500"
-        }, (
-          direction === /* Up */0 ? "+" : "-"
-        ) + Globals.percentStr(diff, oldPrice) + "%");
+    tmp = diff.eq(CONSTANTS.zeroBN) ? null : React.createElement("div", {
+            className: direction === /* Up */0 ? "text-green-500" : "text-red-500"
+          }, (
+            direction === /* Up */0 ? "+" : "-"
+          ) + Globals.percentStr(diff, oldPrice) + "%");
   }
   return React.createElement("div", {
               className: "flex w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative"
@@ -399,6 +409,7 @@ function UserUI$UserMarketBox(Props) {
 }
 
 var UserMarketBox = {
+  getUnixTime: getUnixTime,
   make: UserUI$UserMarketBox
 };
 
@@ -509,6 +520,7 @@ function UserUI$UserStakesCard(Props) {
                     isLong: isLong,
                     tokens: tokens,
                     value: FormatMoney.formatEther(undefined, value),
+                    tokenAddress: addr,
                     metadata: metadata,
                     children: React.createElement(UserUI$UserMarketUnstake, {
                           synthAddress: addr,

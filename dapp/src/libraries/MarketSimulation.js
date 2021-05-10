@@ -9,9 +9,9 @@ function tokenPrice(totalLocked, tokenSupply) {
 
 function valueChange(totalLockedLong, totalLockedShort, percentageChange) {
   if (totalLockedShort.gte(totalLockedLong)) {
-    return totalLockedShort.mul(percentageChange).div(CONSTANTS.tenToThe18);
-  } else {
     return totalLockedLong.mul(percentageChange).div(CONSTANTS.tenToThe18);
+  } else {
+    return totalLockedShort.mul(percentageChange).div(CONSTANTS.tenToThe18);
   }
 }
 
@@ -53,7 +53,7 @@ function simulateMarketPriceChange(oldPrice, newPrice, totalLockedLong, totalLoc
   if (tokenIsLong) {
     return tokenPrice(totalLockedLong.sub(changeInValue$1), tokenSupply);
   } else {
-    return tokenPrice(totalLockedLong.add(changeInValue$1), tokenSupply);
+    return tokenPrice(totalLockedShort.add(changeInValue$1), tokenSupply);
   }
 }
 

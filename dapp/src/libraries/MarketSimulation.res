@@ -3,11 +3,11 @@ let tokenPrice = (~totalLocked, ~tokenSupply) =>
 
 let valueChange = (~totalLockedLong, ~totalLockedShort, ~percentageChange) => {
   if totalLockedShort->Ethers.BigNumber.gte(totalLockedLong) {
-    totalLockedShort
+    totalLockedLong
     ->Ethers.BigNumber.mul(percentageChange)
     ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
   } else {
-    totalLockedLong
+    totalLockedShort
     ->Ethers.BigNumber.mul(percentageChange)
     ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
   }
@@ -79,7 +79,7 @@ let simulateMarketPriceChange = (
           )
         } else {
           tokenPrice(
-            ~totalLocked=totalLockedLong->Ethers.BigNumber.add(changeInValue),
+            ~totalLocked=totalLockedShort->Ethers.BigNumber.add(changeInValue),
             ~tokenSupply,
           )
         }
