@@ -217,9 +217,9 @@ module MetamaskMenu = {
 module UserMarketBox = {
   type direction = Up | Down
 
-  @send external getTime: (Js_date.t) => int = "getTime"
+  @send external getTime: Js_date.t => int = "getTime"
 
-  let getUnixTime = (date) => date->getTime/1000
+  let getUnixTime = date => date->getTime / 1000
   @react.component
   let make = (
     ~name,
@@ -258,18 +258,18 @@ module UserMarketBox = {
               loading
             }
           | Response({priceIntervalManager: Some({prices: [{endPrice, startTimestamp}]})}) =>
-            if(startTimestamp->getTime->Ethers.BigNumber.fromInt->Ethers.BigNumber.gt(timestamp)){
-            Response(
-              MarketSimulation.simulateMarketPriceChange(
-                ~oldPrice=syntheticPrice,
-                ~newPrice=endPrice,
-                ~totalLockedLong,
-                ~totalLockedShort,
-                ~tokenIsLong=isLong,
-                ~tokenSupply,
-              ),
-            )
-            }else{
+            if startTimestamp->getTime->Ethers.BigNumber.fromInt->Ethers.BigNumber.gt(timestamp) {
+              Response(
+                MarketSimulation.simulateMarketPriceChange(
+                  ~oldPrice=syntheticPrice,
+                  ~newPrice=endPrice,
+                  ~totalLockedLong,
+                  ~totalLockedShort,
+                  ~tokenIsLong=isLong,
+                  ~tokenSupply,
+                ),
+              )
+            } else {
               Response(syntheticPrice)
             }
 
@@ -279,18 +279,6 @@ module UserMarketBox = {
       )
 
     let bothPrices = DataHooks.liftGraphResponse2(initialTokenPriceResponse, finalPriceResponse)
-
-    // switch bothPrices {
-    // | Response((a, b)) => {
-    //     Js.log(name)
-    //     Js.log(isLong ? "LONG" : "SHORT")
-    //     if metamaskMenu {
-    //       Js.log("STAKE")
-    //     }
-    //     Js.log((a->Ethers.BigNumber.toString, b->Ethers.BigNumber.toString))
-    //   }
-    // | _ => ()
-    // }
 
     <div
       className=`flex w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative`>
