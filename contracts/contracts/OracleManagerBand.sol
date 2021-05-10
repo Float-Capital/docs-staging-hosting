@@ -3,15 +3,13 @@
 pragma solidity 0.8.3;
 pragma abicoder v2;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-
 import "./interfaces/IOracleManager.sol";
 import "./interfaces/IBandOracle.sol";
 
 /*
  * Implementation of an OracleManager that fetches prices from a band oracle.
  */
-contract OracleManagerBand is IOracleManager, Initializable {
+contract OracleManagerBand is IOracleManager {
     // Admin addresses.
     address public admin;
 
@@ -33,12 +31,12 @@ contract OracleManagerBand is IOracleManager, Initializable {
     ///// CONTRACT SET-UP //////////////
     ////////////////////////////////////
 
-    function setup(
+    constructor(
         address _admin,
         address _bandOracle,
         string memory _base,
         string memory _quote
-    ) public initializer {
+    ) {
         admin = _admin;
         base = _base;
         quote = _quote;

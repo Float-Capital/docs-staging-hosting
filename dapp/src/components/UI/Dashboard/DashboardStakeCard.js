@@ -2,6 +2,7 @@
 'use strict';
 
 var React = require("react");
+var Link = require("next/link").default;
 
 function isHotAPY(apy) {
   return apy > 0.15;
@@ -18,17 +19,20 @@ function DashboardStakeCard(Props) {
   var isLong = Props.isLong;
   var $$yield = Props.yield;
   var rewards = Props.rewards;
-  return React.createElement("div", {
-              className: "mb-5 flex w-11/12 mx-auto border-2 border-light-purple rounded-lg z-10 shadow"
-            }, React.createElement("div", {
-                  className: "my-2 ml-5 text-sm"
-                }, marketName, React.createElement("br", {
-                      className: "mt-1"
-                    }), isLong ? "Long↗️" : "Short↘️"), React.createElement("div", {
-                  className: "text-center w-full my-2 text-sm"
-                }, "Yield: " + mapVal($$yield), React.createElement("br", {
-                      className: "mt-1"
-                    }), "Float rewards: " + mapVal(rewards)));
+  return React.createElement(Link, {
+              href: "/stake",
+              children: React.createElement("div", {
+                    className: "mb-5 flex w-11/12 mx-auto border-2 border-light-purple rounded-lg z-10 shadow cursor-pointer"
+                  }, React.createElement("div", {
+                        className: "my-2 ml-5 text-sm"
+                      }, marketName, React.createElement("br", {
+                            className: "mt-1"
+                          }), isLong ? "Long↗️" : "Short↘️"), React.createElement("div", {
+                        className: "text-center w-full my-2 text-sm"
+                      }, "Yield: " + mapVal($$yield), React.createElement("br", {
+                            className: "mt-1"
+                          }), "Float rewards: " + mapVal(rewards)))
+            });
 }
 
 var make = DashboardStakeCard;

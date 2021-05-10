@@ -58,7 +58,7 @@ function UserUI$UserTotalValue(Props) {
                       className: (
                         isABaller ? "text-xl" : "text-2xl"
                       ) + " text-primary"
-                    }, "$" + FormatMoney.formatEther(isAWhale ? 0 : 2, totalValue))));
+                    }, "$" + FormatMoney.formatEther(isAWhale ? 1 : 2, totalValue))));
 }
 
 var UserTotalValue = {
@@ -580,7 +580,7 @@ function UserUI$UserFloatCard(Props) {
                     }), React.createElement("span", {
                       className: "ml-1"
                     }, React.createElement(Tooltip.make, {
-                          tip: "This is our best estimate at the current time, the amount issued may differ due to changes in market balance or price of assets."
+                          tip: "This is an estimate at the current time, the amount issued may differ due to changes in market liquidity and asset prices."
                         }))), React.createElement(UserUI$UserColumnText, {
                   head: "Float balance",
                   body: floatBalance

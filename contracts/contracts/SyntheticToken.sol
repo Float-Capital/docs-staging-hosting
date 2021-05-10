@@ -2,20 +2,19 @@
 
 pragma solidity 0.8.3;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 import "./interfaces/IStaker.sol";
 
-contract SyntheticToken is ERC20PresetMinterPauserUpgradeable {
+contract SyntheticToken is ERC20PresetMinterPauser {
     address public longShortAddress;
     IStaker public staker;
 
-    function initialize(
+    constructor(
         string memory name,
         string memory symbol,
         address _longShortAddress,
         address stakerAddress
-    ) public initializer {
-        ERC20PresetMinterPauserUpgradeable.initialize(name, symbol);
+    ) ERC20PresetMinterPauser(name, symbol) {
         longShortAddress = _longShortAddress;
         staker = IStaker(stakerAddress);
     }
@@ -30,6 +29,6 @@ contract SyntheticToken is ERC20PresetMinterPauserUpgradeable {
         // NOTE: this is safe, this function will throw "ERC20: transfer amount exceeds balance" if amount exceeds users balance
         _transfer(msg.sender, address(staker), amount);
 
-        staker.stakeDirect(msg.sender, amount);
+        staker.stakeFromUser(msg.sender, amount);
     }
 }

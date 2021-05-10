@@ -11,7 +11,7 @@ slug: /api
 
 Float Capital uses [TheGraph](https://thegraph.com/), a GraphQL API, for querying data from our smart contracts.
 
-## [Kovan Subgraph](https://thegraph.com/explorer/subgraph/float-capital/testnet)
+## [Mumbai Subgraph](https://thegraph.com/explorer/subgraph/float-capital/testnet-dev)
 
 ## Polygon Subgraph (Coming soon)
 

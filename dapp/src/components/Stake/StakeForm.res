@@ -46,19 +46,9 @@ module StakeFormInput = {
 module ConnectedStakeForm = {
   @react.component
   let make = (~tokenId, ~signer, ~synthetic: Queries.SyntheticTokenInfo.t) => {
-    let (
-      contractActionToCallAfterApproval,
-      setContractActionToCallAfterApproval,
-    ) = React.useState(((), ()) => ())
-
     let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
       ~signer,
     )
-    let (
-      contractExecutionHandlerApprove,
-      txStateApprove,
-      setTxStateApprove,
-    ) = ContractActions.useContractFunction(~signer)
 
     let user = RootProvider.useCurrentUserExn()
     let optTokenBalance =
@@ -68,42 +58,6 @@ module ConnectedStakeForm = {
       )->DataHooks.Util.graphResponseToOption
 
     let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
-    let router = Next.Router.useRouter()
-    let optCurrentUser = RootProvider.useCurrentUser()
-    let userPage = switch optCurrentUser {
-    | Some(address) => `/user/${address->Ethers.Utils.ethAdrToLowerStr}`
-    | None => `/`
-    }
-
-    // Execute the call after approval has completed
-    React.useEffect1(() => {
-      switch txStateApprove {
-      | Created =>
-        toastDispatch(
-          ToastProvider.Show(`Approve transaction in your wallet`, "", ToastProvider.Info),
-        )
-      | Declined(reason) =>
-        toastDispatch(
-          ToastProvider.Show(
-            `The transaction was rejected by your wallet`,
-            reason,
-            ToastProvider.Error,
-          ),
-        )
-      | SignedAndSubmitted(_) =>
-        toastDispatch(ToastProvider.Show(`Approval transaction pending`, "", ToastProvider.Info))
-      | Complete(_) =>
-        contractActionToCallAfterApproval()
-        setTxStateApprove(_ => ContractActions.UnInitialised)
-        toastDispatch(
-          ToastProvider.Show(`Approve transaction confirmed`, "", ToastProvider.Success),
-        )
-      | Failed(_) =>
-        toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
-      | _ => ()
-      }
-      None
-    }, [txStateApprove])
 
     React.useEffect1(() => {
       switch txState {
@@ -133,27 +87,10 @@ module ConnectedStakeForm = {
     }, [txState])
 
     let form = StakeForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
-      let approveFunction = () =>
-        contractExecutionHandlerApprove(
-          ~makeContractInstance=Contracts.Erc20.make(
-            ~address=tokenId->Ethers.Utils.getAddressUnsafe,
-          ),
-          ~contractFunction=Contracts.Erc20.approve(
-            ~amount=amount->Globals.amountForApproval,
-            ~spender=Config.staker,
-          ),
-        )
-      let stakeAndEarnImmediatlyFunction = () =>
-        contractExecutionHandler(
-          ~makeContractInstance=Contracts.Staker.make(~address=Config.staker),
-          ~contractFunction=Contracts.Staker.stakeAndEarnImmediately(
-            ~tokenAddress=tokenId->Ethers.Utils.getAddressUnsafe,
-            ~amount,
-          ),
-        )
-
-      setContractActionToCallAfterApproval(_ => stakeAndEarnImmediatlyFunction)
-      approveFunction()
+      contractExecutionHandler(
+        ~makeContractInstance=Contracts.Synth.make(~address=tokenId->Ethers.Utils.getAddressUnsafe),
+        ~contractFunction=Contracts.Synth.stake(~amount),
+      )
     })
 
     let formAmount = switch form.amountResult {
@@ -180,7 +117,6 @@ module ConnectedStakeForm = {
       <Button
         onClick={_ => {
           form.reset()
-          setTxStateApprove(_ => ContractActions.UnInitialised)
           setTxState(_ => ContractActions.UnInitialised)
         }}>
         {"Reset & Stake Again"}
@@ -207,9 +143,7 @@ module ConnectedStakeForm = {
           },
         )}
       synthetic
-      txStatusModals={<StakeTxStatusModal
-        resetFormButton tokenToStake txStateApprove txStateStake=txState
-      />}
+      txStatusModals={<StakeTxStatusModal resetFormButton tokenToStake txStateStake=txState />}
     />
   }
 }

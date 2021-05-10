@@ -67,8 +67,25 @@ var Erc20 = {
   make: make$3
 };
 
+var abi$4 = Ethers.makeAbi([
+      "function approve(address spender, uint256 amount) @100000",
+      "function balanceOf(address owner) public view returns (uint256 balance)",
+      "function allowance(address owner, address spender) public view returns (uint256 remaining)",
+      "function stake(uint256 amount) external"
+    ]);
+
+function make$4(address, providerOrSigner) {
+  return Ethers.Contract.make(address, abi$4, providerOrSigner);
+}
+
+var Synth = {
+  abi: abi$4,
+  make: make$4
+};
+
 exports.TestErc20 = TestErc20;
 exports.LongShort = LongShort;
 exports.Staker = Staker;
 exports.Erc20 = Erc20;
+exports.Synth = Synth;
 /* abi Not a pure module */

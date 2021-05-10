@@ -2,14 +2,12 @@
 
 pragma solidity 0.8.3;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-
 import "../interfaces/IOracleManager.sol";
 
 /*
  * Mock implementation of an OracleManager with fixed, changeable prices.
  */
-contract OracleManagerMock is IOracleManager, Initializable {
+contract OracleManagerMock is IOracleManager {
     // Admin contract.
     address public admin;
 
@@ -29,7 +27,7 @@ contract OracleManagerMock is IOracleManager, Initializable {
     ///// CONTRACT SET-UP //////////////
     ////////////////////////////////////
 
-    function setup(address _admin) public initializer {
+    constructor(address _admin) {
         admin = _admin;
 
         // Default to a price of 1.

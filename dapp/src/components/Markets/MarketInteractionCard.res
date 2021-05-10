@@ -316,7 +316,8 @@ let make = () => {
       className="rounded-b-lg min-h-market-interaction-card rounded-r-lg flex flex-col bg-white bg-opacity-70 shadow-lg">
       {header(~marketInfo)}
       {switch selected {
-      | Mint => <Mint.Mint />
+      | Mint =>      
+      <Mint.Mint withHeader={false} />
       | Redeem => {
           let {determineDisplay} = module(UnstakeOrStakeInteractionWrapper)
           let display = determineDisplay(

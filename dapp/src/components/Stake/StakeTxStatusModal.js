@@ -5,135 +5,65 @@ var Tick = require("../UI/Tick.js");
 var Curry = require("rescript/lib/js/curry.js");
 var Modal = require("../UI/Modal.js");
 var React = require("react");
-var Config = require("../../Config.js");
 var MiniLoader = require("../UI/MiniLoader.js");
+var TweetButton = require("../UI/TweetButton.js");
 var EllipsesLoader = require("../UI/EllipsesLoader.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
+var ViewPositionButton = require("../UI/ViewPositionButton.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
 
 function StakeTxStatusModal(Props) {
-  var txStateApprove = Props.txStateApprove;
   var txStateStake = Props.txStateStake;
   var resetFormButton = Props.resetFormButton;
   var tokenToStake = Props.tokenToStake;
-  var exit = 0;
-  if (typeof txStateApprove === "number") {
-    if (txStateApprove !== /* UnInitialised */0) {
+  if (typeof txStateStake === "number") {
+    if (txStateStake === /* UnInitialised */0) {
+      return null;
+    } else {
       return React.createElement(Modal.make, {
-                  id: "stake-approve-1",
+                  id: "stake-1",
                   children: React.createElement("div", {
                         className: "text-center m-3"
-                      }, React.createElement(EllipsesLoader.make, {}), React.createElement("p", undefined, "Confirm approve transaction in your wallet "))
+                      }, React.createElement(EllipsesLoader.make, {}), React.createElement("h1", undefined, "Confirm the transaction to stake " + tokenToStake))
                 });
     }
-    exit = 1;
-  } else {
-    switch (txStateApprove.TAG | 0) {
-      case /* SignedAndSubmitted */0 :
-          return React.createElement(Modal.make, {
-                      id: "stake-approve-2",
-                      children: React.createElement("div", {
-                            className: "text-center m-3"
-                          }, React.createElement("div", {
-                                className: "m-2"
-                              }, React.createElement(MiniLoader.make, {})), React.createElement("p", undefined, "Approval transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
-                                txHash: txStateApprove._0
-                              }))
-                    });
-      case /* Declined */1 :
-          return React.createElement(React.Fragment, undefined, Curry._1(resetFormButton, undefined));
-      case /* Complete */2 :
-          if (typeof txStateStake === "number") {
-            exit = 2;
-          } else {
-            if (txStateStake.TAG === /* SignedAndSubmitted */0) {
-              return React.createElement(Modal.make, {
-                          id: "stake-2",
-                          children: React.createElement("div", {
-                                className: "text-center m-3"
-                              }, React.createElement("p", undefined, React.createElement("a", {
-                                        href: Config.blockExplorer + "tx/" + txStateApprove._0.transactionHash,
-                                        rel: "noopenner noreferer",
-                                        target: "_"
-                                      }, "Approval confirmed")), React.createElement("h1", undefined, React.createElement("a", {
-                                        href: Config.blockExplorer + "tx/" + txStateStake._0,
-                                        rel: "noopenner noreferer",
-                                        target: "_"
-                                      }, "Pending staking " + tokenToStake)))
-                        });
-            }
-            exit = 1;
-          }
-          break;
-      case /* Failed */3 :
-          return React.createElement(Modal.make, {
-                      id: "stake-approve-4",
-                      children: React.createElement("div", {
-                            className: "text-center m-3"
-                          }, React.createElement("p", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
-                                txHash: txStateApprove._0
-                              }), React.createElement(MessageUsOnDiscord.make, {}), Curry._1(resetFormButton, undefined))
-                    });
-      
-    }
   }
-  switch (exit) {
-    case 1 :
-        if (typeof txStateStake === "number") {
-          if (txStateStake === /* UnInitialised */0) {
-            return null;
-          } else {
-            return React.createElement(Modal.make, {
-                        id: "stake-1",
-                        children: React.createElement("div", {
-                              className: "text-center m-3"
-                            }, React.createElement(EllipsesLoader.make, {}), React.createElement("h1", undefined, "Confirm the transaction to stake " + tokenToStake))
-                      });
-          }
-        }
-        switch (txStateStake.TAG | 0) {
-          case /* SignedAndSubmitted */0 :
-              return React.createElement(Modal.make, {
-                          id: "stake-3",
-                          children: React.createElement("div", {
-                                className: "text-center m-3"
-                              }, React.createElement("div", {
-                                    className: "m-2"
-                                  }, React.createElement(MiniLoader.make, {})), React.createElement("p", undefined, "Staking transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
-                                    txHash: txStateStake._0
-                                  }))
-                        });
-          case /* Declined */1 :
-              return React.createElement(Modal.make, {
-                          id: "stake-5",
-                          children: React.createElement("div", {
-                                className: "text-center m-3"
-                              }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {}), Curry._1(resetFormButton, undefined))
-                        });
-          case /* Complete */2 :
-              return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                              id: "stake-4",
-                              children: null
-                            }, React.createElement("div", {
-                                  className: "text-center m-3"
-                                }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉")), Curry._1(resetFormButton, undefined)));
-          case /* Failed */3 :
-              return React.createElement(Modal.make, {
-                          id: "stake-6",
-                          children: React.createElement("div", {
-                                className: "text-center m-3"
-                              }, React.createElement("h1", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
-                                    txHash: txStateStake._0
-                                  }), React.createElement(MessageUsOnDiscord.make, {}), Curry._1(resetFormButton, undefined))
-                        });
-          
-        }
-    case 2 :
+  switch (txStateStake.TAG | 0) {
+    case /* SignedAndSubmitted */0 :
         return React.createElement(Modal.make, {
-                    id: "stake-approve-3",
+                    id: "stake-3",
                     children: React.createElement("div", {
                           className: "text-center m-3"
-                        }, React.createElement(EllipsesLoader.make, {}), React.createElement("p", undefined, "Confirm transaction to stake " + tokenToStake))
+                        }, React.createElement("div", {
+                              className: "m-2"
+                            }, React.createElement(MiniLoader.make, {})), React.createElement("p", undefined, "Staking transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                              txHash: txStateStake._0
+                            }))
+                  });
+    case /* Declined */1 :
+        return React.createElement(Modal.make, {
+                    id: "stake-5",
+                    children: React.createElement("div", {
+                          className: "text-center m-3"
+                        }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {}), Curry._1(resetFormButton, undefined))
+                  });
+    case /* Complete */2 :
+        return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
+                        id: "stake-4",
+                        children: null
+                      }, React.createElement("div", {
+                            className: "text-center m-3"
+                          }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement(TweetButton.make, {
+                                message: "Float like a butterfly, stake like a bee!🐝 I just staked to earn Float tokens @float_capital 🌊 "
+                              }), React.createElement(ViewPositionButton.make, {})), Curry._1(resetFormButton, undefined)));
+    case /* Failed */3 :
+        return React.createElement(Modal.make, {
+                    id: "stake-6",
+                    children: React.createElement("div", {
+                          className: "text-center m-3"
+                        }, React.createElement("h1", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
+                              txHash: txStateStake._0
+                            }), React.createElement(MessageUsOnDiscord.make, {}), Curry._1(resetFormButton, undefined))
                   });
     
   }

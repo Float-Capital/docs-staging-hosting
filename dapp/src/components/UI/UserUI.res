@@ -23,7 +23,7 @@ module UserTotalValue = {
       <div>
         <span className={`${shouldBeSmallerText ? "text-xl" : "text-2xl"} text-primary`}>
           {`$${totalValue->FormatMoney.formatEther(
-              ~digits={shouldntHaveDecimals ? 0 : 2},
+              ~digits={shouldntHaveDecimals ? 1 : 2},
             )}`->React.string}
         </span>
       </div>
@@ -492,7 +492,7 @@ module UserFloatCard = {
                 <UserColumnText head=`Float accruing` body={floatAccrued} />
                 <span className="ml-1">
                   <Tooltip
-                    tip="This is our best estimate at the current time, the amount issued may differ due to changes in market balance or price of assets."
+                    tip="This is an estimate at the current time, the amount issued may differ due to changes in market liquidity and asset prices."
                   />
                 </span>
               </div>

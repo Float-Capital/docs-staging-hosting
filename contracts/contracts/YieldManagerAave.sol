@@ -99,12 +99,9 @@ contract YieldManagerAave is IYieldManager, Initializable {
 
     function withdrawToken(uint256 amount) public override longShortOnly {
         // Redeem aToken for underlying asset tokens.
+        // This will fail if not enough liquidity is avaiable on aave.
         uint256 amountWithdrawn =
             lendingPool.withdraw(address(token), amount, address(this));
-
-        // TODO: if it only manages to do a partial withdraw this will revert. Make it partially work.
-        //       Not 100% sure this is how aave v2 works, need to read their code more carefully.
-        require(amountWithdrawn == amount);
 
         // Transfer tokens back to LongShort contract.
         token.transfer(longShort, amount);

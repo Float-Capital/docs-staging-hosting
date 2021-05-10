@@ -5,8 +5,8 @@ import {
   GlobalState,
 } from "../../generated/schema";
 import { Bytes, ethereum } from "@graphprotocol/graph-ts";
-import { ONE, ZERO_ADDRESS, GLOBAL_STATE_ID } from "../CONSTANTS";
-import { getOrCreateUser } from "./globalStateManager";
+import { ONE, ZERO_ADDRESS,  } from "../CONSTANTS";
+import { getOrCreateGlobalState, getOrCreateUser } from "./globalStateManager";
 
 function getEventIndex(txHash: Bytes): i32 {
   let stateChange = StateChange.load(txHash.toHex());
@@ -81,7 +81,7 @@ function txStateChangeHelper(
     if (toFloatContracts) {
       // Order important here since getOrCreateUser loads and saves global state for a new user
       let user = getOrCreateUser(event.transaction.from, event);
-      let globalState = GlobalState.load(GLOBAL_STATE_ID);
+      let globalState = getOrCreateGlobalState();
 
       user.totalGasUsed = user.totalGasUsed.plus(event.block.gasUsed);
       user.numberOfTransactions = user.numberOfTransactions.plus(ONE);

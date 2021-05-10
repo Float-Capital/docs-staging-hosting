@@ -6,10 +6,8 @@ var Curry = require("rescript/lib/js/curry.js");
 var Login = require("../Login/Login.js");
 var React = require("react");
 var Button = require("../UI/Button.js");
-var Config = require("../../Config.js");
 var Ethers = require("../../ethereum/Ethers.js");
 var Ethers$1 = require("ethers");
-var Globals = require("../../libraries/Globals.js");
 var Queries = require("../../data/Queries.js");
 var Contracts = require("../../ethereum/Contracts.js");
 var DataHooks = require("../../data/DataHooks.js");
@@ -17,7 +15,6 @@ var Formality = require("re-formality/src/Formality.js");
 var MiniLoader = require("../UI/MiniLoader.js");
 var AmountInput = require("../UI/AmountInput.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
-var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
 var ContractHooks = require("../Testing/Admin/ContractHooks.js");
 var ToastProvider = require("../UI/ToastProvider.js");
@@ -477,85 +474,13 @@ function StakeForm$ConnectedStakeForm(Props) {
   var tokenId = Props.tokenId;
   var signer = Props.signer;
   var synthetic = Props.synthetic;
-  var match = React.useState(function () {
-        return function (param) {
-          
-        };
-      });
-  var setContractActionToCallAfterApproval = match[1];
-  var contractActionToCallAfterApproval = match[0];
-  var match$1 = ContractActions.useContractFunction(signer);
-  var setTxState = match$1[2];
-  var txState = match$1[1];
-  var contractExecutionHandler = match$1[0];
-  var match$2 = ContractActions.useContractFunction(signer);
-  var setTxStateApprove = match$2[2];
-  var txStateApprove = match$2[1];
-  var contractExecutionHandlerApprove = match$2[0];
+  var match = ContractActions.useContractFunction(signer);
+  var setTxState = match[2];
+  var txState = match[1];
+  var contractExecutionHandler = match[0];
   var user = RootProvider.useCurrentUserExn(undefined);
   var optTokenBalance = DataHooks.Util.graphResponseToOption(DataHooks.useSyntheticTokenBalance(user, synthetic.tokenAddress));
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
-  Router.useRouter();
-  var optCurrentUser = RootProvider.useCurrentUser(undefined);
-  if (optCurrentUser !== undefined) {
-    "/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser));
-  } else {
-    "/";
-  }
-  React.useEffect((function () {
-          if (typeof txStateApprove === "number") {
-            if (txStateApprove !== /* UnInitialised */0) {
-              Curry._1(toastDispatch, {
-                    _0: "Approve transaction in your wallet",
-                    _1: "",
-                    _2: /* Info */2,
-                    [Symbol.for("name")]: "Show"
-                  });
-            }
-            
-          } else {
-            switch (txStateApprove.TAG | 0) {
-              case /* SignedAndSubmitted */0 :
-                  Curry._1(toastDispatch, {
-                        _0: "Approval transaction pending",
-                        _1: "",
-                        _2: /* Info */2,
-                        [Symbol.for("name")]: "Show"
-                      });
-                  break;
-              case /* Declined */1 :
-                  Curry._1(toastDispatch, {
-                        _0: "The transaction was rejected by your wallet",
-                        _1: txStateApprove._0,
-                        _2: /* Error */0,
-                        [Symbol.for("name")]: "Show"
-                      });
-                  break;
-              case /* Complete */2 :
-                  Curry._1(contractActionToCallAfterApproval, undefined);
-                  Curry._1(setTxStateApprove, (function (param) {
-                          return /* UnInitialised */0;
-                        }));
-                  Curry._1(toastDispatch, {
-                        _0: "Approve transaction confirmed",
-                        _1: "",
-                        _2: /* Success */3,
-                        [Symbol.for("name")]: "Show"
-                      });
-                  break;
-              case /* Failed */3 :
-                  Curry._1(toastDispatch, {
-                        _0: "The transaction failed",
-                        _1: "",
-                        _2: /* Error */0,
-                        [Symbol.for("name")]: "Show"
-                      });
-                  break;
-              
-            }
-          }
-          
-        }), [txStateApprove]);
   React.useEffect((function () {
           if (typeof txState === "number") {
             if (txState !== /* UnInitialised */0) {
@@ -608,27 +533,15 @@ function StakeForm$ConnectedStakeForm(Props) {
         }), [txState]);
   var form = useForm(initialInput, (function (param, _form) {
           var amount = param.amount;
-          var stakeAndEarnImmediatlyFunction = function (param) {
-            var arg = Ethers$1.utils.getAddress(tokenId);
-            return Curry._2(contractExecutionHandler, (function (param) {
-                          return Contracts.Staker.make(Config.staker, param);
-                        }), (function (param) {
-                          return param.stakeAndEarnImmediately(arg, amount);
-                        }));
-          };
-          Curry._1(setContractActionToCallAfterApproval, (function (param) {
-                  return stakeAndEarnImmediatlyFunction;
-                }));
           var partial_arg = Ethers$1.utils.getAddress(tokenId);
-          var arg = Globals.amountForApproval(amount);
-          return Curry._2(contractExecutionHandlerApprove, (function (param) {
-                        return Contracts.Erc20.make(partial_arg, param);
+          return Curry._2(contractExecutionHandler, (function (param) {
+                        return Contracts.Synth.make(partial_arg, param);
                       }), (function (param) {
-                        return param.approve(Config.staker, arg);
+                        return param.stake(amount);
                       }));
         }));
-  var match$3 = form.amountResult;
-  var formAmount = match$3 !== undefined && match$3.TAG === /* Ok */0 ? Caml_option.some(match$3._0) : undefined;
+  var match$1 = form.amountResult;
+  var formAmount = match$1 !== undefined && match$1.TAG === /* Ok */0 ? Caml_option.some(match$1._0) : undefined;
   var baseFormDisabled = form.submitting || !Curry._1(form.valid, undefined);
   var buttonDisabled;
   if (formAmount !== undefined && optTokenBalance !== undefined) {
@@ -642,9 +555,6 @@ function StakeForm$ConnectedStakeForm(Props) {
     return React.createElement(Button.make, {
                 onClick: (function (param) {
                     Curry._1(form.reset, undefined);
-                    Curry._1(setTxStateApprove, (function (param) {
-                            return /* UnInitialised */0;
-                          }));
                     return Curry._1(setTxState, (function (param) {
                                   return /* UnInitialised */0;
                                 }));
@@ -677,7 +587,6 @@ function StakeForm$ConnectedStakeForm(Props) {
                 }),
               synthetic: synthetic,
               txStatusModals: React.createElement(StakeTxStatusModal.make, {
-                    txStateApprove: txStateApprove,
                     txStateStake: txState,
                     resetFormButton: resetFormButton,
                     tokenToStake: tokenToStake

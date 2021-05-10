@@ -9,7 +9,6 @@ var Button = require("../UI/Button.js");
 var Config = require("../../Config.js");
 var Ethers = require("../../ethereum/Ethers.js");
 var Ethers$1 = require("ethers");
-var Globals = require("../../libraries/Globals.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 var Contracts = require("../../ethereum/Contracts.js");
 var DataHooks = require("../../data/DataHooks.js");
@@ -498,21 +497,8 @@ function tokenRedeemPosition(market, isLong, longTokenBalance, shortTokenBalance
         ];
 }
 
-function isGreaterThanApproval(amount, amountApproved) {
-  return amount.gt(amountApproved);
-}
-
 function isGreaterThanBalance(amount, balance) {
   return amount.gt(balance);
-}
-
-function useBalanceAndApproved(erc20Address, spender) {
-  var match = ContractHooks.useErc20BalanceRefresh(erc20Address);
-  var match$1 = ContractHooks.useERC20ApprovedRefresh(erc20Address, spender);
-  return [
-          match.data,
-          match$1.data
-        ];
 }
 
 function RedeemForm$ConnectedRedeemForm(Props) {
@@ -524,69 +510,31 @@ function RedeemForm$ConnectedRedeemForm(Props) {
   var longTokenBalance = Belt_Option.getWithDefault(DataHooks.Util.graphResponseToOption(DataHooks.useSyntheticTokenBalance(user, market.syntheticLong.tokenAddress)), Ethers$1.BigNumber.from("0"));
   var shortTokenBalance = Belt_Option.getWithDefault(DataHooks.Util.graphResponseToOption(DataHooks.useSyntheticTokenBalance(user, market.syntheticShort.tokenAddress)), Ethers$1.BigNumber.from("0"));
   var match = tokenRedeemPosition(market, isLong, longTokenBalance, shortTokenBalance);
-  var syntheticTokenAddress = match[1];
   var isActuallyLong = match[0];
   var match$1 = ContractActions.useContractFunction(signer);
   var setTxState = match$1[2];
   var txState = match$1[1];
   var contractExecutionHandler = match$1[0];
-  var match$2 = ContractActions.useContractFunction(signer);
-  var setTxStateApprove = match$2[2];
-  var txStateApprove = match$2[1];
-  var contractExecutionHandlerApprove = match$2[0];
-  var match$3 = React.useState(function () {
-        return function (param) {
-          
-        };
-      });
-  var setContractActionToCallAfterApproval = match$3[1];
-  var contractActionToCallAfterApproval = match$3[0];
   var marketIndex = market.marketIndex;
-  var match$4 = useBalanceAndApproved(syntheticTokenAddress, Config.longShort);
-  var optTokenAmountApproved = match$4[1];
-  var optTokenBalance = match$4[0];
+  var match$2 = ContractHooks.useErc20BalanceRefresh(match[1]);
+  var optTokenBalance = match$2.data;
   var form = useForm({
         amount: ""
       }, (function (param, _form) {
           var amount = param.amount;
-          var redeemFunction = function (param) {
-            return Curry._2(contractExecutionHandler, (function (param) {
-                          return Contracts.LongShort.make(Config.longShort, param);
-                        }), isActuallyLong ? (function (param) {
-                            return param.redeemLong(marketIndex, amount);
-                          }) : (function (param) {
-                            return param.redeemShort(marketIndex, amount);
-                          }));
-          };
-          var needsToApprove = amount.gt(Belt_Option.getWithDefault(optTokenAmountApproved, Ethers$1.BigNumber.from("0")));
-          if (needsToApprove) {
-            Curry._1(setContractActionToCallAfterApproval, (function (param) {
-                    return redeemFunction;
-                  }));
-            var arg = Globals.amountForApproval(amount);
-            return Curry._2(contractExecutionHandlerApprove, (function (param) {
-                          return Contracts.Erc20.make(syntheticTokenAddress, param);
-                        }), (function (param) {
-                          return param.approve(Config.longShort, arg);
+          return Curry._2(contractExecutionHandler, (function (param) {
+                        return Contracts.LongShort.make(Config.longShort, param);
+                      }), isActuallyLong ? (function (param) {
+                          return param.redeemLong(marketIndex, amount);
+                        }) : (function (param) {
+                          return param.redeemShort(marketIndex, amount);
                         }));
-          } else {
-            return redeemFunction(undefined);
-          }
         }));
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
-  var optCurrentUser = RootProvider.useCurrentUser(undefined);
-  if (optCurrentUser !== undefined) {
-    "/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser));
-  } else {
-    "/";
-  }
   var resetFormButton = function (param) {
     return React.createElement(Button.make, {
                 onClick: (function (param) {
                     Curry._1(form.reset, undefined);
-                    Curry._1(setTxStateApprove, (function (param) {
-                            return /* UnInitialised */0;
-                          }));
                     return Curry._1(setTxState, (function (param) {
                                   return /* UnInitialised */0;
                                 }));
@@ -594,88 +542,32 @@ function RedeemForm$ConnectedRedeemForm(Props) {
                 children: "Reset & Redeem Again"
               });
   };
-  var match$5 = form.amountResult;
-  var formAmount = match$5 !== undefined && match$5.TAG === /* Ok */0 ? Caml_option.some(match$5._0) : undefined;
+  var match$3 = form.amountResult;
+  var formAmount = match$3 !== undefined && match$3.TAG === /* Ok */0 ? Caml_option.some(match$3._0) : undefined;
   var position = isLong ? "long" : "short";
-  var match$6;
+  var match$4;
   var exit = 0;
-  if (formAmount !== undefined && optTokenBalance !== undefined && optTokenAmountApproved !== undefined) {
-    var amount = Caml_option.valFromOption(formAmount);
-    var needsToApprove = amount.gt(Caml_option.valFromOption(optTokenAmountApproved));
-    var greaterThanBalance = amount.gt(Caml_option.valFromOption(optTokenBalance));
-    match$6 = greaterThanBalance ? [
+  if (formAmount !== undefined && optTokenBalance !== undefined) {
+    var greaterThanBalance = Caml_option.valFromOption(formAmount).gt(Caml_option.valFromOption(optTokenBalance));
+    match$4 = greaterThanBalance ? [
         "Amount is greater than your balance",
         "Insufficient balance",
         true
       ] : [
         undefined,
-        needsToApprove ? "Approve " + position + " " + market.name + " & Redeem " : "Redeem " + position + " " + market.name,
+        "Redeem " + position + " " + market.name,
         !Curry._1(form.valid, undefined)
       ];
   } else {
     exit = 1;
   }
   if (exit === 1) {
-    match$6 = [
+    match$4 = [
       undefined,
       "Redeem " + position + " " + market.name,
       true
     ];
   }
-  React.useEffect((function () {
-          if (typeof txStateApprove === "number") {
-            if (txStateApprove !== /* UnInitialised */0) {
-              Curry._1(toastDispatch, {
-                    _0: "Please approve your " + Config.paymentTokenName + " token",
-                    _1: "",
-                    _2: /* Info */2,
-                    [Symbol.for("name")]: "Show"
-                  });
-            }
-            
-          } else {
-            switch (txStateApprove.TAG | 0) {
-              case /* SignedAndSubmitted */0 :
-                  Curry._1(toastDispatch, {
-                        _0: "Approval transaction processing",
-                        _1: "",
-                        _2: /* Info */2,
-                        [Symbol.for("name")]: "Show"
-                      });
-                  break;
-              case /* Declined */1 :
-                  Curry._1(toastDispatch, {
-                        _0: "The transaction was rejected by your wallet",
-                        _1: txStateApprove._0,
-                        _2: /* Error */0,
-                        [Symbol.for("name")]: "Show"
-                      });
-                  break;
-              case /* Complete */2 :
-                  Curry._1(contractActionToCallAfterApproval, undefined);
-                  Curry._1(setTxStateApprove, (function (param) {
-                          return /* UnInitialised */0;
-                        }));
-                  Curry._1(toastDispatch, {
-                        _0: "Approve transaction confirmed",
-                        _1: "",
-                        _2: /* Success */3,
-                        [Symbol.for("name")]: "Show"
-                      });
-                  break;
-              case /* Failed */3 :
-                  Curry._1(toastDispatch, {
-                        _0: "The transaction failed",
-                        _1: "",
-                        _2: /* Error */0,
-                        [Symbol.for("name")]: "Show"
-                      });
-                  break;
-              
-            }
-          }
-          
-        }), [txStateApprove]);
   React.useEffect((function () {
           if (typeof txState === "number") {
             if (txState !== /* UnInitialised */0) {
@@ -760,14 +652,10 @@ function RedeemForm$ConnectedRedeemForm(Props) {
                 isLong: isActuallyLong,
                 hasBothTokens: match[3],
                 submitButton: React.createElement(RedeemSubmitButtonAndTxStatusModal.make, {
-                      txStateApprove: txStateApprove,
                       txStateRedeem: txState,
                       resetFormButton: resetFormButton,
-                      redeemToken: (
-                        isLong ? "long" : "short"
-                      ) + " " + market.name,
-                      buttonText: match$6[1],
-                      buttonDisabled: match$6[2]
+                      buttonText: match$4[1],
+                      buttonDisabled: match$4[2]
                     })
               });
   } else {
@@ -809,9 +697,7 @@ exports.RedeemForm = RedeemForm;
 exports.useBalance = useBalance;
 exports.RedeemFormInput = RedeemFormInput;
 exports.tokenRedeemPosition = tokenRedeemPosition;
-exports.isGreaterThanApproval = isGreaterThanApproval;
 exports.isGreaterThanBalance = isGreaterThanBalance;
-exports.useBalanceAndApproved = useBalanceAndApproved;
 exports.ConnectedRedeemForm = ConnectedRedeemForm;
 exports.make = make;
 /* Form Not a pure module */

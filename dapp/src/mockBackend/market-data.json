@@ -1,18 +1,14 @@
 [
 {    
-    "name": "FTSE",
-    "description": "The FTSE 100 is an index composed of the 100 largest companies listed on the London Stock Exchange (LSE). These are often referred to as 'blue chip' companies, and the index is seen as a good indication of the performance of major companies listed in the UK." 
-},
-{    
-    "name": "GOLD",
-    "description": "Gold is a precious metal which is highly ductile and malleable. It is used for investment purposes across the globe. Due to the escalating prices of gold, it is at present being oversold in the bearish market. In times of high inflation, currency fluctuations, and geopolitical crisis, gold is considered to be the safest investment. The Gold market allows for onchain exposure to the price of gold" 
-},
-{    
-    "name": "S&P500",
-    "description": "The S&P 500 Index, or the Standard & Poor's 500 Index, is a market-capitalization-weighted index of the 500 largest U.S. publicly traded companies. The S&P is a float-weighted index, meaning company market capitalizations are adjusted by the number of shares available for public trading." 
-},
-{    
     "name": "EthKillers",
     "description": "EthKillers is an index comprised of TRON, XRP and EOS. This market is an average of the prices of the tokens of the three protocols seen as alternatives to ethereum. The EthKillers market allows users to gain long or short exposure to an equally weighted basket containing TRON, XRP and EOS." 
+},
+{    
+    "name": "Placeholder Market 1",
+    "description": "This is a testnet market." 
+},
+{    
+    "name": "Placeholder Market 2",
+    "description": "This is a testnet market." 
 }
 ]

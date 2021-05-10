@@ -1,3 +1,5 @@
+@@ocaml.warning("-20") // The ppx generates code with unused parameters
+
 open GqlConverters
 
 %graphql(`
