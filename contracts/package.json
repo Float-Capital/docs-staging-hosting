@@ -5,7 +5,7 @@
   "license": "BUSL-1.1",
   "scripts": {
     "compile": "hardhat compile",
-    "truffle-compile": "truffle compile",
+    "truffle-compile": "truffle compile --all",
     "test": "hardhat test",
     "test-waffle": "WAFFLE_TEST='true' hardhat test",
     "coverage": "hardhat coverage",
@@ -36,6 +36,7 @@
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/truffle-upgrades": "^1.5.0",
+    "@tenderly/hardhat-tenderly": "^1.0.12",
     "@truffle/hdwallet-provider": "^1.2.1",
     "bs-mocha": "^1.0.0",
     "hardhat-spdx-license-identifier": "^2.0.3",
