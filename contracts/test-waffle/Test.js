@@ -8,46 +8,29 @@ var Async$BsMocha = require("bs-mocha/src/Async.js");
 var Mocha$BsMocha = require("bs-mocha/src/Mocha.js");
 
 Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (function (param) {
-        Mocha$BsMocha.describe("Staking")(undefined, undefined, undefined, (function (param) {
-                var contracts = {
-                  contents: undefined
-                };
-                var accounts = {
-                  contents: undefined
-                };
-                Async$BsMocha.before(undefined, undefined, undefined, undefined, (function (done) {
-                        ethers.getSigners().then(function (loadedAccounts) {
-                              accounts.contents = loadedAccounts;
-                              return Curry._2(done, undefined, undefined);
-                            });
-                        
-                      }));
-                Async$BsMocha.before_each(undefined, undefined, undefined, undefined, (function (done) {
-                        Helpers.inititialize(undefined).then(function (deployedContracts) {
-                              contracts.contents = deployedContracts;
-                              return Curry._2(done, undefined, undefined);
-                            });
-                        
-                      }));
-                return Mocha$BsMocha.it("Two numbers are equal")(undefined, undefined, undefined, (function (param) {
-                              console.log("The loaded accounts", accounts.contents);
-                              Chai.bnEqual(ethers.BigNumber.from(1), ethers.BigNumber.from("1"));
-                              Chai.bnCloseTo(ethers.BigNumber.from(1), ethers.BigNumber.from("5"), 4);
-                              return Chai.bnWithin(ethers.BigNumber.from(1), ethers.BigNumber.from("0"), ethers.BigNumber.from(2));
-                            }));
-              }));
-        return Mocha$BsMocha.describe("DELETE ASAP - example tests")(undefined, undefined, undefined, (function (param) {
-                      Async$BsMocha.before_each(undefined, undefined, undefined, undefined, (function (done) {
-                              Helpers.inititialize(undefined).then(function (param) {
+        return Mocha$BsMocha.describe("Staking")(undefined, undefined, undefined, (function (param) {
+                      var contracts = {
+                        contents: undefined
+                      };
+                      var accounts = {
+                        contents: undefined
+                      };
+                      Async$BsMocha.before(undefined, undefined, undefined, undefined, (function (done) {
+                              ethers.getSigners().then(function (loadedAccounts) {
+                                    accounts.contents = loadedAccounts;
                                     return Curry._2(done, undefined, undefined);
                                   });
                               
                             }));
-                      Mocha$BsMocha.it("it worked")(undefined, undefined, undefined, (function (param) {
-                              console.log("It worked, yay");
+                      Async$BsMocha.before_each(undefined, undefined, undefined, undefined, (function (done) {
+                              Helpers.inititialize(accounts.contents[0]).then(function (deployedContracts) {
+                                    contracts.contents = deployedContracts;
+                                    return Curry._2(done, undefined, undefined);
+                                  });
                               
                             }));
                       return Mocha$BsMocha.it("Two numbers are equal")(undefined, undefined, undefined, (function (param) {
+                                    console.log("The loaded accounts", accounts.contents);
                                     Chai.bnEqual(ethers.BigNumber.from(1), ethers.BigNumber.from("1"));
                                     Chai.bnCloseTo(ethers.BigNumber.from(1), ethers.BigNumber.from("5"), 4);
                                     return Chai.bnWithin(ethers.BigNumber.from(1), ethers.BigNumber.from("0"), ethers.BigNumber.from(2));

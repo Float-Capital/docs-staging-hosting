@@ -15,7 +15,9 @@ describe("Float System", () => {
     })
 
     before_each(done => {
-      let _ = Helpers.inititialize()->JsPromise.map(deployedContracts => {
+      let _ = Helpers.inititialize(
+        ~admin=accounts.contents->Array.getUnsafe(0),
+      )->JsPromise.map(deployedContracts => {
         contracts := deployedContracts
         let _ = ()
         done()
@@ -24,21 +26,6 @@ describe("Float System", () => {
 
     it("Two numbers are equal", () => {
       Js.log2("The loaded accounts", accounts.contents)
-      Chai.bnEqual(Ethers.BigNumber.fromInt(1), Ethers.BigNumber.fromUnsafe("1"))
-      Chai.bnCloseTo(Ethers.BigNumber.fromInt(1), Ethers.BigNumber.fromUnsafe("5"), ~distance=4)
-      Chai.bnWithin(
-        Ethers.BigNumber.fromInt(1),
-        ~min=Ethers.BigNumber.fromUnsafe("0"),
-        ~max=Ethers.BigNumber.fromInt(2),
-      )
-    })
-  })
-  describe("DELETE ASAP - example tests", () => {
-    before_each(done => {
-      let _ = Helpers.inititialize()->JsPromise.map(_ => done())
-    })
-    it("it worked", () => Js.log("It worked, yay"))
-    it("Two numbers are equal", () => {
       Chai.bnEqual(Ethers.BigNumber.fromInt(1), Ethers.BigNumber.fromUnsafe("1"))
       Chai.bnCloseTo(Ethers.BigNumber.fromInt(1), Ethers.BigNumber.fromUnsafe("5"), ~distance=4)
       Chai.bnWithin(

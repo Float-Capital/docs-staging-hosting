@@ -26,6 +26,14 @@ function deployContract2(contractName, firstParam, secondParam) {
             });
 }
 
+function deployContract3(contractName, firstParam, secondParam, thirdParam) {
+  return ethers.getContractFactory(contractName).then(function (__x) {
+                return __x.deploy(firstParam, secondParam, thirdParam);
+              }).then(function (prim) {
+              return prim.deployed();
+            });
+}
+
 var contractName = "LongShort";
 
 function make(param) {
@@ -39,8 +47,8 @@ var LongShort = {
 
 var contractName$1 = "YieldManagerMock";
 
-function make$1(admin) {
-  return deployContract1(contractName$1, admin);
+function make$1(admin, longShortAddress, fundTokenAddress) {
+  return deployContract3(contractName$1, admin, longShortAddress, fundTokenAddress);
 }
 
 var YieldManagerMock = {
@@ -50,8 +58,8 @@ var YieldManagerMock = {
 
 var contractName$2 = "OracleManagerMock";
 
-function make$2(param) {
-  return deployContract(contractName$2);
+function make$2(admin) {
+  return deployContract1(contractName$2, admin);
 }
 
 var OracleManagerMock = {
@@ -114,31 +122,50 @@ var FloatToken = {
   make: make$7
 };
 
-var contractName$8 = "FloatCapital_v0";
+var contractName$8 = "ERC20PresetMinterPauser";
 
-function make$8(param) {
-  return deployContract(contractName$8);
+function make$8(name, symbol) {
+  return deployContract2(contractName$8, name, symbol);
 }
 
-var FloatCapital_v0 = {
+function grantMintRole(t, user) {
+  return t.MINTER_ROLE.call().then(function (minterRole) {
+              return t.grantRole(minterRole, user);
+            });
+}
+
+var PaymentToken = {
   contractName: contractName$8,
-  make: make$8
+  make: make$8,
+  grantMintRole: grantMintRole
 };
 
-var contractName$9 = "Treasury_v0";
+var contractName$9 = "FloatCapital_v0";
 
 function make$9(param) {
   return deployContract(contractName$9);
 }
 
-var Treasury_v0 = {
+var FloatCapital_v0 = {
   contractName: contractName$9,
   make: make$9
+};
+
+var contractName$10 = "Treasury_v0";
+
+function make$10(param) {
+  return deployContract(contractName$10);
+}
+
+var Treasury_v0 = {
+  contractName: contractName$10,
+  make: make$10
 };
 
 exports.deployContract = deployContract;
 exports.deployContract1 = deployContract1;
 exports.deployContract2 = deployContract2;
+exports.deployContract3 = deployContract3;
 exports.LongShort = LongShort;
 exports.YieldManagerMock = YieldManagerMock;
 exports.OracleManagerMock = OracleManagerMock;
@@ -147,6 +174,7 @@ exports.SyntheticToken = SyntheticToken;
 exports.TokenFactory = TokenFactory;
 exports.Staker = Staker;
 exports.FloatToken = FloatToken;
+exports.PaymentToken = PaymentToken;
 exports.FloatCapital_v0 = FloatCapital_v0;
 exports.Treasury_v0 = Treasury_v0;
 /* No side effect */

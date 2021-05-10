@@ -1,7 +1,7 @@
 type contractFactory
 type t
 
-type ethAddr = string // TODO: make this better
+type bytes32
 type transaction = unit // TODO: make this better
 
 @val @scope("ethers")
@@ -25,86 +25,134 @@ let deployContract2 = (contractName, firstParam, secondParam) => {
   ->JsPromise.then(deploy2(_, firstParam, secondParam))
   ->JsPromise.then(deployed)
 }
+let deployContract3 = (contractName, firstParam, secondParam, thirdParam) => {
+  getContractFactory(contractName)
+  ->JsPromise.then(deploy3(_, firstParam, secondParam, thirdParam))
+  ->JsPromise.then(deployed)
+}
 
 module LongShort = {
-  type t = {address: ethAddr}
+  type t = {address: Ethers.ethAddress}
   let contractName = "LongShort"
 
   let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
 
   @send
-  external setup: (t, ethAddr, ethAddr, ethAddr, ethAddr) => JsPromise.t<transaction> = "initialize"
+  external setup: (
+    t,
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+  ) => JsPromise.t<transaction> = "initialize"
+  @send
+  external newSyntheticMarket: (
+    t,
+    ~marketName: string,
+    ~marketSymbol: string,
+    ~paymentToken: Ethers.ethAddress,
+    ~oracleManager: Ethers.ethAddress,
+    ~yieldManager: Ethers.ethAddress,
+  ) => JsPromise.t<transaction> = "newSyntheticMarket"
 }
 
 module YieldManagerMock = {
-  type t = {address: ethAddr}
+  type t = {address: Ethers.ethAddress}
   let contractName = "YieldManagerMock"
 
-  let make: ethAddr => JsPromise.t<t> = admin => deployContract1(contractName, admin)->Obj.magic
+  let make: (Ethers.ethAddress, Ethers.ethAddress, Ethers.ethAddress) => JsPromise.t<t> = (
+    admin,
+    longShortAddress,
+    fundTokenAddress,
+  ) => deployContract3(contractName, admin, longShortAddress, fundTokenAddress)->Obj.magic
 }
 
 module OracleManagerMock = {
-  type t = {address: ethAddr}
+  type t = {address: Ethers.ethAddress}
   let contractName = "OracleManagerMock"
 
-  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
+  let make: Ethers.ethAddress => JsPromise.t<t> = admin =>
+    deployContract1(contractName, admin)->Obj.magic
 }
 
 module GenericErc20 = {
-  type t = {address: ethAddr}
+  type t = {address: Ethers.ethAddress}
   let contractName = "ERC20PresetMinterPauserUpgradeable"
 
   let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
 }
 
 module SyntheticToken = {
-  type t = {address: ethAddr}
+  type t = {address: Ethers.ethAddress}
   let contractName = "SyntheticToken"
 
   let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
 }
 
 module TokenFactory = {
-  type t = {address: ethAddr}
+  type t = {address: Ethers.ethAddress}
   let contractName = "TokenFactory"
 
-  let make: (ethAddr, ethAddr) => JsPromise.t<t> = (admin, longShort) =>
+  let make: (Ethers.ethAddress, Ethers.ethAddress) => JsPromise.t<t> = (admin, longShort) =>
     deployContract2(contractName, admin, longShort)->Obj.magic
 }
 
 module Staker = {
-  type t = {address: ethAddr}
+  type t = {address: Ethers.ethAddress}
   let contractName = "Staker"
 
   let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
 
   @send
-  external setup: (t, ethAddr, ethAddr, ethAddr, ethAddr) => JsPromise.t<transaction> = "initialize"
+  external setup: (
+    t,
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+  ) => JsPromise.t<transaction> = "initialize"
 }
 
 module FloatToken = {
-  type t = {address: ethAddr}
+  type t = {address: Ethers.ethAddress}
   let contractName = "FloatToken"
 
   let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
 
   @send
-  external setup: (t, string, string, ethAddr) => JsPromise.t<transaction> =
+  external setup: (t, string, string, Ethers.ethAddress) => JsPromise.t<transaction> =
     "initialize(string,string,address)"
 }
 
+module PaymentToken = {
+  type t = {address: Ethers.ethAddress}
+  let contractName = "ERC20PresetMinterPauser"
+
+  let make: (~name: string, ~symbol: string) => JsPromise.t<t> = (~name, ~symbol) =>
+    deployContract2(contractName, name, symbol)->Obj.magic
+
+  @send @scope(`MINTER_ROLE`)
+  external getMintRole: t => JsPromise.t<bytes32> = "call"
+  @send
+  external grantRole: (t, ~minterRole: bytes32, ~user: Ethers.ethAddress) => JsPromise.t<unit> =
+    "grantRole"
+
+  let grantMintRole = (t, ~user) =>
+    t->getMintRole->JsPromise.then(minterRole => t->grantRole(~minterRole, ~user))
+}
+
 module FloatCapital_v0 = {
-  type t = {address: ethAddr}
+  type t = {address: Ethers.ethAddress}
   let contractName = "FloatCapital_v0"
 
   let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
 }
 
 module Treasury_v0 = {
-  type t = {address: ethAddr}
+  type t = {address: Ethers.ethAddress}
   let contractName = "Treasury_v0"
 
   let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
 
-  @send external setup: (t, ethAddr) => JsPromise.t<transaction> = "initialize"
+  @send external setup: (t, Ethers.ethAddress) => JsPromise.t<transaction> = "initialize"
 }

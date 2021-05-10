@@ -3,56 +3,52 @@
 
 var Contract = require("./Contract.js");
 
-function inititialize(param) {
-  var admin = "0x0000000000000000000000000000000000000000";
+function createSyntheticMarket(admin, longShort, fundToken, marketName, marketSymbol) {
+  Promise.all([
+          Contract.OracleManagerMock.make(admin),
+          Contract.YieldManagerMock.make(admin, longShort.address, fundToken.address)
+        ]).then(function (param) {
+        var yieldManager = param[1];
+        Contract.PaymentToken.grantMintRole(fundToken, yieldManager.address);
+        return longShort.newSyntheticMarket(marketName, marketSymbol, fundToken.address, param[0].address, yieldManager.address);
+      });
+  
+}
+
+function inititialize(admin) {
   return Promise.all([
                 Contract.FloatCapital_v0.make(undefined),
                 Contract.Treasury_v0.make(undefined),
                 Contract.FloatToken.make(undefined),
                 Contract.Staker.make(undefined),
-                Contract.LongShort.make(undefined)
+                Contract.LongShort.make(undefined),
+                Contract.PaymentToken.make("Pay Token", "PT")
               ]).then(function (param) {
+              var paymentToken = param[5];
               var longShort = param[4];
               var staker = param[3];
               var floatToken = param[2];
               var treasury = param[1];
               var floatCapital = param[0];
-              console.log("Here...");
-              console.log({
-                    floatCapital: floatCapital
-                  });
-              console.log({
-                    treasury: treasury
-                  });
-              console.log({
-                    floatToken: floatToken
-                  });
-              console.log({
-                    staker: staker
-                  });
-              console.log({
-                    longShort: longShort
-                  });
-              return Contract.TokenFactory.make(admin, longShort.address).then(function (tokenFactory) {
+              return Contract.TokenFactory.make(admin.address, longShort.address).then(function (tokenFactory) {
                           return Promise.all([
                                         floatToken["initialize(string,string,address)"]("Float token", "FLOAT TOKEN", staker.address),
-                                        treasury.initialize(admin),
-                                        longShort.initialize(admin, treasury.address, tokenFactory.address, staker.address),
-                                        staker.initialize(admin, longShort.address, floatToken.address, floatCapital.address)
+                                        treasury.initialize(admin.address),
+                                        longShort.initialize(admin.address, treasury.address, tokenFactory.address, staker.address),
+                                        staker.initialize(admin.address, longShort.address, floatToken.address, floatCapital.address)
                                       ]).then(function (param) {
-                                      return Promise.resolve({
-                                                  tokenFactory: tokenFactory,
-                                                  treasury: treasury,
-                                                  floatToken: floatToken,
-                                                  staker: staker,
-                                                  longShort: longShort
-                                                });
+                                      createSyntheticMarket(admin.address, longShort, paymentToken, "Test Market 1", "TM1");
+                                      return {
+                                              tokenFactory: tokenFactory,
+                                              treasury: treasury,
+                                              floatToken: floatToken,
+                                              staker: staker,
+                                              longShort: longShort
+                                            };
                                     });
                         });
             });
 }
-
-var createSyntheticMarket;
 
 exports.createSyntheticMarket = createSyntheticMarket;
 exports.inititialize = inititialize;

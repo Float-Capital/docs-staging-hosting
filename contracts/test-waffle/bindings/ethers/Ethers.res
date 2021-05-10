@@ -78,7 +78,7 @@ type providerType
 @send
 external waitForTransaction: (providerType, string) => JsPromise.t<txResult> = "waitForTransaction"
 
-type walletType = {address: string, provider: providerType}
+type walletType = {address: ethAddress, provider: providerType}
 
 module Wallet = {
   type t = walletType
