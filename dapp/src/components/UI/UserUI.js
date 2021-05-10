@@ -344,7 +344,7 @@ function UserUI$UserMarketBox(Props) {
         };
       } else {
         var match$2 = match$1[0];
-        finalPriceResponse = Ethers$1.BigNumber.from(match$2.startTimestamp.getTime()).gt(timestamp) ? ({
+        finalPriceResponse = Ethers$1.BigNumber.from(match$2.startTimestamp.getTime() / 1000 | 0).gt(timestamp) ? ({
               TAG: 1,
               _0: MarketSimulation.simulateMarketPriceChange(syntheticPrice, match$2.endPrice, param.totalLockedLong, param.totalLockedShort, param.tokenSupply, isLong),
               [Symbol.for("name")]: "Response"

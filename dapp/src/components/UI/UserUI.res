@@ -257,8 +257,12 @@ module UserMarketBox = {
               let loading: DataHooks.graphResponse<Ethers.BigNumber.t> = Loading
               loading
             }
-          | Response({priceIntervalManager: Some({prices: [{endPrice, startTimestamp}]})}) =>
-            if startTimestamp->getTime->Ethers.BigNumber.fromInt->Ethers.BigNumber.gt(timestamp) {
+          | Response({
+              priceIntervalManager: Some({prices: [{endPrice, startTimestamp: priceQueryDate}]}),
+            }) =>
+            if (
+              priceQueryDate->getUnixTime->Ethers.BigNumber.fromInt->Ethers.BigNumber.gt(timestamp)
+            ) {
               Response(
                 MarketSimulation.simulateMarketPriceChange(
                   ~oldPrice=syntheticPrice,
