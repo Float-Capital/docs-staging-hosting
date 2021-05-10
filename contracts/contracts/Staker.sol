@@ -475,138 +475,65 @@ contract Staker is IStaker, Initializable {
     /////////// STAKING ////////////////
     ////////////////////////////////////
 
-    function _stakeAndEarnImmediately(
-        address tokenAddress,
-        uint256 amount,
-        address user,
-        bool alreadyTransferred
-    ) internal {
-        //First update state.
+    function _updateState(address tokenAddress) internal {
         floatContract._updateSystemState(marketIndexOfToken[tokenAddress]);
-
-        // Stake for user.
-        _stake(tokenAddress, amount, user, alreadyTransferred);
-
-        userIndexOfLastClaimedReward[tokenAddress][
-            msg.sender
-        ] = latestRewardIndex[tokenAddress];
-
-        // Now we can set the users reward state to the just created state.
-        userIndexOfLastClaimedReward[tokenAddress][
-            msg.sender
-        ] = latestRewardIndex[tokenAddress];
-        emit StakeAdded(
-            msg.sender,
-            tokenAddress,
-            amount,
-            userIndexOfLastClaimedReward[tokenAddress][msg.sender]
-        );
     }
 
     /*
-    Staking function.
-    User can stake (flexibly) and start earning float rewards.
-    Only approved float synthetic tokens can be staked.
-    Users can call this same function to "top-up" their stake.
-    */
-    function stakeDirect(address from, uint256 amount)
+     * A user with synthetic tokens stakes by calling stake on the token
+     * contract which calls this function. We need to first update the
+     * State of the system before staking to correctly calculate user rewards.
+     */
+    function stakeFromUser(address from, uint256 amount)
         public
         override
         onlyValidSynthetic(msg.sender)
     {
-        _stakeAndEarnImmediately(msg.sender, amount, from, true);
+        _updateState(msg.sender);
+        _stake(msg.sender, amount, from);
     }
 
     /*
-    Staking function.
-    User can stake (flexibly) and start earning float rewards.
-    Only approved float synthetic tokens can be staked.
-    Users can call this same function to "top-up" their stake.
-    */
-    function stake(address tokenAddress, uint256 amount)
-        public
-        onlyValidSynthetic(tokenAddress)
-    {
-        _stake(tokenAddress, amount, msg.sender, false);
-
-        // This currently disavatages people who top-up?
-        // Since they have capital locked that will skip a state of earning.
-        // This is very difficult for the top up case. Unless they create a state point,
-        // There is going to need to be some system compromise.
-        userIndexOfLastClaimedReward[tokenAddress][msg.sender] =
-            latestRewardIndex[tokenAddress] +
-            1;
-
-        emit StakeAdded(
-            msg.sender,
-            tokenAddress,
-            amount,
-            userIndexOfLastClaimedReward[tokenAddress][msg.sender]
-        );
-    }
-
-    /*
-    Staking function.
-    This is a more gas heavy staking function.
-    It ensures the user starts earning FLOAT immediately 
-    As opposed to from the next state point generated.
-    */
-    function stakeAndEarnImmediately(address tokenAddress, uint256 amount)
-        external
-        onlyValidSynthetic(tokenAddress)
-    {
-        _stakeAndEarnImmediately(tokenAddress, amount, msg.sender, false);
-    }
-
-    /**
-     * Stake tokens that have already been minted for the staker
+     * Called by the float contract when a user mints and immediately stakes
+     * Updating the state is not necessary since this would have just been done
+     * during the minting process
      */
-    function stakeTransferredTokens(
+    function stakeFromMint(
         address tokenAddress,
         uint256 amount,
         address user
     ) external override onlyFloat() onlyValidSynthetic(tokenAddress) {
-        _stake(tokenAddress, amount, user, true);
+        _stake(tokenAddress, amount, user);
+    }
 
-        // NOTE: system state is already updated on the float side - make sure this function is impossible to call otherwise
+    function _stake(
+        address tokenAddress,
+        uint256 amount,
+        address user
+    ) internal {
+        // If they already have staked and have rewards due, mint these.
+        if (
+            userAmountStaked[tokenAddress][user] > 0 &&
+            userIndexOfLastClaimedReward[tokenAddress][user] <
+            latestRewardIndex[tokenAddress]
+        ) {
+            mintAccumulatedFloat(tokenAddress, user);
+        }
+
+        userAmountStaked[tokenAddress][user] =
+            userAmountStaked[tokenAddress][user] +
+            amount;
+
         userIndexOfLastClaimedReward[tokenAddress][user] = latestRewardIndex[
             tokenAddress
         ];
+
         emit StakeAdded(
             user,
             tokenAddress,
             amount,
             userIndexOfLastClaimedReward[tokenAddress][user]
         );
-    }
-
-    function _stake(
-        address tokenAddress,
-        uint256 amount,
-        address user,
-        bool alreadyTransferred
-    ) internal {
-        if (!alreadyTransferred) {
-            ERC20PresetMinterPauserUpgradeable(tokenAddress).transferFrom(
-                user,
-                address(this),
-                amount
-            );
-        }
-
-        // If they already have staked, calculate and award them their float.
-        if (userAmountStaked[tokenAddress][user] > 0) {
-            if (
-                userIndexOfLastClaimedReward[tokenAddress][user] <
-                latestRewardIndex[tokenAddress]
-            ) {
-                mintAccumulatedFloat(tokenAddress, user);
-            }
-        }
-
-        userAmountStaked[tokenAddress][user] =
-            userAmountStaked[tokenAddress][user] +
-            amount;
     }
 
     ////////////////////////////////////
@@ -624,6 +551,7 @@ contract Staker is IStaker, Initializable {
         );
         // Note when withdrawing, they will only accumulate float tokens up until the last
         // state point that has been created. This is acceptable.
+        // Change this with state updates :D They withdraw right up until now.
         mintAccumulatedFloat(tokenAddress, msg.sender);
 
         userAmountStaked[tokenAddress][msg.sender] =

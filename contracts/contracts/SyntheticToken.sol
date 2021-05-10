@@ -29,6 +29,6 @@ contract SyntheticToken is ERC20PresetMinterPauser {
         // NOTE: this is safe, this function will throw "ERC20: transfer amount exceeds balance" if amount exceeds users balance
         _transfer(msg.sender, address(staker), amount);
 
-        staker.stakeDirect(msg.sender, amount);
+        staker.stakeFromUser(msg.sender, amount);
     }
 }

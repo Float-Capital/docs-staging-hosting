@@ -508,20 +508,22 @@ contract LongShort is ILongShort, Initializable {
                 totalValueLockedInYieldManager[marketIndex];
 
         // Market gets a bigger share if the market is more imbalanced.
-        (uint256 marketAmount, uint256 treasuryAmount) =
-            getTreasurySplit(marketIndex, amount);
+        if (amount > 0) {
+            (uint256 marketAmount, uint256 treasuryAmount) =
+                getTreasurySplit(marketIndex, amount);
 
-        // We keep the interest locked in the yield manager, but update our
-        // bookkeeping to logically simulate moving the funds around.
-        totalValueLockedInYieldManager[marketIndex] += amount;
-        totalValueLockedInMarket[marketIndex] += marketAmount;
-        totalValueReservedForTreasury[marketIndex] += treasuryAmount;
+            // We keep the interest locked in the yield manager, but update our
+            // bookkeeping to logically simulate moving the funds around.
+            totalValueLockedInYieldManager[marketIndex] += amount;
+            totalValueLockedInMarket[marketIndex] += marketAmount;
+            totalValueReservedForTreasury[marketIndex] += treasuryAmount;
 
-        // Splits mostly to the weaker position to incentivise balance.
-        (uint256 longAmount, uint256 shortAmount) =
-            getMarketSplit(marketIndex, marketAmount);
-        longValue[marketIndex] = longValue[marketIndex] + longAmount;
-        shortValue[marketIndex] = shortValue[marketIndex] + shortAmount;
+            // Splits mostly to the weaker position to incentivise balance.
+            (uint256 longAmount, uint256 shortAmount) =
+                getMarketSplit(marketIndex, marketAmount);
+            longValue[marketIndex] = longValue[marketIndex] + longAmount;
+            shortValue[marketIndex] = shortValue[marketIndex] + shortAmount;
+        }
     }
 
     function _minimum(
@@ -850,7 +852,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 tokensMinted =
             _mintLong(marketIndex, amount, msg.sender, address(staker));
 
-        staker.stakeTransferredTokens(
+        staker.stakeFromMint(
             address(longTokens[marketIndex]),
             tokensMinted,
             msg.sender
@@ -867,7 +869,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 tokensMinted =
             _mintShort(marketIndex, amount, msg.sender, address(staker));
 
-        staker.stakeTransferredTokens(
+        staker.stakeFromMint(
             address(shortTokens[marketIndex]),
             tokensMinted,
             msg.sender
