@@ -312,6 +312,17 @@ export function handleFloatMinted(event: FloatMinted): void {
   let currentStake = CurrentStake.load(
     tokenAddressString + "-" + userAddressString + "-currentStake"
   );
+  if (currentStake == null) {
+    currentStake = new CurrentStake(
+      tokenAddressString + "-" + userAddressString + "-currentStake"
+    );
+    currentStake.user = user.id;
+    currentStake.userAddress = user.address;
+    currentStake.syntheticToken = syntheticToken.id;
+    currentStake.currentStake = "DOESN'T EXIST YET";
+
+    user.currentStakes = user.currentStakes.concat([currentStake.id]);
+  }
   currentStake.lastMintState = state.id;
 
   let globalState = GlobalState.load(GLOBAL_STATE_ID);
