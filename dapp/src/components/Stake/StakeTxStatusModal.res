@@ -19,7 +19,12 @@ let make = (~txStateStake, ~resetFormButton, ~tokenToStake) => {
   | ContractActions.Complete({transactionHash: _}) => <>
       <Modal id={"stake-4"}>
         <div className="text-center m-3">
-          <Tick /> <p> {`Transaction complete 🎉`->React.string} </p>
+          <Tick />
+          <p> {`Transaction complete 🎉`->React.string} </p>
+          <TweetButton
+            message={`Float like a butterfly, stake like a bee!🐝 I just staked to earn Float tokens @float_capital 🌊 `}
+          />
+          <ViewPositionButton />
         </div>
         {resetFormButton()}
       </Modal>
