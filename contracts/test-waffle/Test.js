@@ -8,7 +8,35 @@ var Async$BsMocha = require("bs-mocha/src/Async.js");
 var Mocha$BsMocha = require("bs-mocha/src/Mocha.js");
 
 Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (function (param) {
-        return Mocha$BsMocha.describe("List.map")(undefined, undefined, undefined, (function (param) {
+        Mocha$BsMocha.describe("Staking")(undefined, undefined, undefined, (function (param) {
+                var contracts = {
+                  contents: undefined
+                };
+                var accounts = {
+                  contents: undefined
+                };
+                Async$BsMocha.before(undefined, undefined, undefined, undefined, (function (done) {
+                        ethers.getSigners().then(function (loadedAccounts) {
+                              accounts.contents = loadedAccounts;
+                              return Curry._2(done, undefined, undefined);
+                            });
+                        
+                      }));
+                Async$BsMocha.before_each(undefined, undefined, undefined, undefined, (function (done) {
+                        Helpers.inititialize(undefined).then(function (deployedContracts) {
+                              contracts.contents = deployedContracts;
+                              return Curry._2(done, undefined, undefined);
+                            });
+                        
+                      }));
+                return Mocha$BsMocha.it("Two numbers are equal")(undefined, undefined, undefined, (function (param) {
+                              console.log("The loaded accounts", accounts.contents);
+                              Chai.bnEqual(ethers.BigNumber.from(1), ethers.BigNumber.from("1"));
+                              Chai.bnCloseTo(ethers.BigNumber.from(1), ethers.BigNumber.from("5"), 4);
+                              return Chai.bnWithin(ethers.BigNumber.from(1), ethers.BigNumber.from("0"), ethers.BigNumber.from(2));
+                            }));
+              }));
+        return Mocha$BsMocha.describe("DELETE ASAP - example tests")(undefined, undefined, undefined, (function (param) {
                       Async$BsMocha.before_each(undefined, undefined, undefined, undefined, (function (done) {
                               Helpers.inititialize(undefined).then(function (param) {
                                     return Curry._2(done, undefined, undefined);
@@ -33,6 +61,8 @@ var it_skip$p = Async$BsMocha.it_skip;
 
 var before_each = Async$BsMocha.before_each;
 
+var before = Async$BsMocha.before;
+
 var describe = Mocha$BsMocha.describe;
 
 var it = Mocha$BsMocha.it;
@@ -42,6 +72,7 @@ var it_skip = Mocha$BsMocha.it_skip;
 exports.it$p = it$p;
 exports.it_skip$p = it_skip$p;
 exports.before_each = before_each;
+exports.before = before;
 exports.describe = describe;
 exports.it = it;
 exports.it_skip = it_skip;

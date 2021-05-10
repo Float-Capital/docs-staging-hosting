@@ -91,6 +91,9 @@ module Wallet = {
   external signMessage: (t, string) => JsPromise.t<rawSignature> = "signMessage"
 }
 
+@val @scope("ethers")
+external getSigners: unit => JsPromise.t<array<Wallet.t>> = "getSigners"
+
 module Providers = {
   type t = providerType
 
