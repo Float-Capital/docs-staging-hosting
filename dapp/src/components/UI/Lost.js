@@ -33,11 +33,13 @@ function Lost(Props) {
                   }, React.createElement("ul", undefined, React.createElement("li", undefined, React.createElement("a", {
                                 className: "text-sm block text-right hover:bg-white",
                                 href: "https://docs.float.capital",
+                                rel: "noopener noreferrer",
                                 target: "_blank"
                               }, "View our docs")), React.createElement("li", undefined, React.createElement("a", {
                                 className: "text-sm block text-right hover:bg-white",
                                 href: Config.discordInviteLink,
-                                target: "_blank"
+                                rel: "noopener noreferrer",
+                                target: "_"
                               }, "Join our discord")))));
   }
 }

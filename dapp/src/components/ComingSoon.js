@@ -10,6 +10,7 @@ function ComingSoon(Props) {
             }, "🏗 The protocol is under active development, join our ", React.createElement("a", {
                   className: "hover:bg-white hover:text-primary py-1 ",
                   href: Config.discordInviteLink,
+                  rel: "noopener noreferrer",
                   target: "_blank"
                 }, "discord"), " to get the latest updates  🏗");
 }

@@ -48,6 +48,8 @@ module SubmitButtonAndTxTracker = {
     ~txStateApprove,
     ~txStateMint,
     ~resetFormButton,
+    ~isLong,
+    ~marketName,
     ~tokenToMint,
     ~buttonText,
     ~buttonDisabled,
@@ -129,7 +131,18 @@ module SubmitButtonAndTxTracker = {
     | (_, ContractActions.Complete({transactionHash: _})) => <>
         <Modal id={8}>
           <div className="text-center m-3">
-            <Tick /> <p> {`Transaction complete 🎉`->React.string} </p>
+            <Tick />
+            <p> {`Transaction complete 🎉`->React.string} </p>
+            <TweetButton
+              message={`I just went ${isLong
+                  ? "long"
+                  : "short"} on ${marketName}! @float_capital 🌊 `}
+            />
+            <AddToMetaMaskButton
+              token={Config.config.contracts.floatToken}
+              tokenSymbol={`${isLong ? `↗️` : `↘️`}${marketName}`}
+            />
+            <ViewPositionButton />
           </div>
         </Modal>
       </>
@@ -242,16 +255,6 @@ module MintFormSignedIn = {
       setContractActionToCallAfterApproval,
     ) = React.useState(((), ()) => ())
 
-    let user = RootProvider.useCurrentUserExn()
-    let tokenAddress = isLong
-      ? market.syntheticLong.tokenAddress
-      : market.syntheticShort.tokenAddress
-    let tokenBalanceQuery = DataHooks.useSyntheticTokenBalanceOrZero(~user, ~tokenAddress)
-    let initialMint = switch tokenBalanceQuery {
-    | Response(balance) => balance->Ethers.BigNumber.eq(CONSTANTS.zeroBN)
-    | _ => false
-    }
-
     let (optDaiBalance, optDaiAmountApproved) = useBalanceAndApproved(
       ~erc20Address=Config.dai,
       ~spender=Config.longShort,
@@ -338,11 +341,6 @@ module MintFormSignedIn = {
 
     let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
     let router = Next.Router.useRouter()
-    let optCurrentUser = RootProvider.useCurrentUser()
-    let userPage = switch optCurrentUser {
-    | Some(address) => `/user/${address->Ethers.Utils.ethAdrToLowerStr}`
-    | None => `/`
-    }
 
     // Execute the call after approval has completed
     React.useEffect1(() => {
@@ -386,16 +384,8 @@ module MintFormSignedIn = {
         )
       | SignedAndSubmitted(_) =>
         toastDispatch(ToastProvider.Show(`Minting transaction pending`, "", ToastProvider.Info))
-      | Complete(_) => {
-          toastDispatch(ToastProvider.Show(`Mint transaction confirmed`, "", ToastProvider.Success))
-          let route = if initialMint && !form.input.isStaking {
-            `${userPage}?minted=${tokenAddress->Ethers.Utils.ethAdrToStr}`
-          } else {
-            userPage
-          }
-          router->Next.Router.push(route)
-        }
-
+      | Complete(_) =>
+        toastDispatch(ToastProvider.Show(`Mint transaction confirmed`, "", ToastProvider.Success))
       | Failed(_) =>
         toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
       | Declined(reason) =>
@@ -452,7 +442,14 @@ module MintFormSignedIn = {
         )}
       optErrorMessage=optAdditionalErrorMessage
       submitButton={<SubmitButtonAndTxTracker
-        buttonText resetFormButton tokenToMint txStateApprove txStateMint=txState buttonDisabled
+        buttonText
+        resetFormButton
+        tokenToMint
+        txStateApprove
+        txStateMint=txState
+        buttonDisabled
+        isLong
+        marketName={market.name}
       />}
     />
   }

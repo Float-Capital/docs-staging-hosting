@@ -55,6 +55,7 @@ module UsersActiveStakes = {
                     <p className="text-primary ">
                       <a
                         target="_"
+                        rel="noopener noreferrer"
                         href={`${Config.blockExplorer}/token/${tokenAddress->ethAdrToStr}?a=${currentUser->ethAdrToStr}`}>
                         <span className="text-bold text-4xl">
                           {amountFormatted->React.string}

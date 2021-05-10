@@ -5,12 +5,10 @@ var Tick = require("../UI/Tick.js");
 var Modal = require("../UI/Modal.js");
 var React = require("react");
 var Config = require("../../Config.js");
-var Ethers = require("../../ethereum/Ethers.js");
 var MiniLoader = require("../UI/MiniLoader.js");
-var AddToMetamask = require("../UI/AddToMetamask.js");
 var EllipsesLoader = require("../UI/EllipsesLoader.js");
-var InjectedEthereum = require("../../ethereum/InjectedEthereum.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
+var AddToMetaMaskButton = require("../UI/AddToMetaMaskButton.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
 
 function ClaimTxStatusModal(Props) {
@@ -52,16 +50,10 @@ function ClaimTxStatusModal(Props) {
                     children: null
                   }, React.createElement("div", {
                         className: "text-center m-3"
-                      }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉")), InjectedEthereum.isMetamask(undefined) ? React.createElement(AddToMetamask.make, {
-                          tokenAddress: Ethers.Utils.ethAdrToStr(Config.config.contracts.FloatToken),
-                          tokenSymbol: "FLOAT",
-                          children: React.createElement("button", {
-                                className: "w-36 h-12 text-sm shadow-md rounded-lg border-2 focus:outline-none border-gray-200 hover:bg-gray-200 flex justify-center items-center mx-auto"
-                              }, "Add FLOAT to", React.createElement("img", {
-                                    className: "h-5 ml-1",
-                                    src: "/icons/metamask.svg"
-                                  }))
-                        }) : null);
+                      }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉")), React.createElement(AddToMetaMaskButton.make, {
+                        token: Config.config.contracts.FloatToken,
+                        tokenSymbol: "FLOAT"
+                      }));
     case /* Failed */3 :
         return React.createElement(Modal.make, {
                     id: 5,

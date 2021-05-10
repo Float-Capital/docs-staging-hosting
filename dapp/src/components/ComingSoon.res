@@ -5,7 +5,8 @@ let make = () => {
     <a
       className="hover:bg-white hover:text-primary py-1 "
       href=Config.discordInviteLink
-      target="_blank">
+      target="_blank"
+      rel="noopener noreferrer">
       {`discord`->React.string}
     </a>
     {` to get the latest updates  🏗`->React.string}

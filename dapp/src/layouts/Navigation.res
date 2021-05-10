@@ -158,7 +158,8 @@ let make = () => {
                 setIsOpen(_ => false)
               }}
               className="px-3 bg-black m-2"
-              target="_blank"
+              target="_"
+              rel="noopener noreferrer"
               href="https://docs.float.capital">
               {React.string("DOCS")}
             </a>
@@ -167,7 +168,8 @@ let make = () => {
                 setIsOpen(_ => false)
               }}
               className="px-3 hover:opacity-60 m-4"
-              target="_blank"
+              target="_"
+              rel="noopener noreferrer"
               href="https://github.com/float-capital/float-contracts">
               <img src="/icons/github.svg" className="h-10" />
             </a>
