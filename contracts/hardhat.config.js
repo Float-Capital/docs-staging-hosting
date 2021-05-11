@@ -1,6 +1,7 @@
 require("solidity-coverage");
 require("hardhat-gas-reporter");
 require("hardhat-spdx-license-identifier");
+require("@tenderly/hardhat-tenderly"); // https://hardhat.org/plugins/tenderly-hardhat-tenderly.html
 
 let isWaffleTest =
   !!process.env.WAFFLE_TEST && process.env.WAFFLE_TEST.toUpperCase() == "TRUE";
@@ -34,6 +35,15 @@ module.exports = {
         runs: 200,
       },
     },
+  },
+  defaultNetwork: "mumbai",
+  networks: {
+    hardhat: {
+    },
+    mumbai: {
+      chainId: 80001,
+      url: "https://rpc-mumbai.maticvigil.com/v1",
+    }
   },
   paths: {
     tests: isWaffleTest ? "./test-waffle" : "./test",

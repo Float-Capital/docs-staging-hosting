@@ -12,22 +12,22 @@ var Config = require("../../Config.js");
 var Ethers = require("../../ethereum/Ethers.js");
 var Ethers$1 = require("ethers");
 var Globals = require("../../libraries/Globals.js");
-var CONSTANTS = require("../../CONSTANTS.js");
 var Contracts = require("../../ethereum/Contracts.js");
-var DataHooks = require("../../data/DataHooks.js");
 var Formality = require("re-formality/src/Formality.js");
 var MiniLoader = require("../UI/MiniLoader.js");
 var AmountInput = require("../UI/AmountInput.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
+var TweetButton = require("../UI/TweetButton.js");
 var Router = require("next/router");
-var RootProvider = require("../../libraries/RootProvider.js");
 var ContractHooks = require("../Testing/Admin/ContractHooks.js");
 var ToastProvider = require("../UI/ToastProvider.js");
 var EllipsesLoader = require("../UI/EllipsesLoader.js");
 var ContractActions = require("../../ethereum/ContractActions.js");
 var LongOrShortSelect = require("../UI/LongOrShortSelect.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
+var ViewPositionButton = require("../UI/ViewPositionButton.js");
+var AddToMetaMaskButton = require("../UI/AddToMetaMaskButton.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
 var Formality__ReactUpdate = require("re-formality/src/Formality__ReactUpdate.js");
 
@@ -554,6 +554,8 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
   var txStateApprove = Props.txStateApprove;
   var txStateMint = Props.txStateMint;
   var resetFormButton = Props.resetFormButton;
+  var isLong = Props.isLong;
+  var marketName = Props.marketName;
   var tokenToMint = Props.tokenToMint;
   var buttonText = Props.buttonText;
   var buttonDisabled = Props.buttonDisabled;
@@ -688,7 +690,16 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                               id: 8,
                               children: React.createElement("div", {
                                     className: "text-center m-3"
-                                  }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"))
+                                  }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement(TweetButton.make, {
+                                        message: "I just went " + (
+                                          isLong ? "long" : "short"
+                                        ) + " on " + marketName + "! @float_capital 🌊 "
+                                      }), React.createElement(AddToMetaMaskButton.make, {
+                                        token: Config.config.contracts.FloatToken,
+                                        tokenSymbol: (
+                                          isLong ? "↗️" : "↘️"
+                                        ) + marketName
+                                      }), React.createElement(ViewPositionButton.make, {}))
                             }));
           case /* Failed */3 :
               return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
@@ -839,11 +850,6 @@ function MintForm$MintFormSignedIn(Props) {
       });
   var setContractActionToCallAfterApproval = match$2[1];
   var contractActionToCallAfterApproval = match$2[0];
-  var user = RootProvider.useCurrentUserExn(undefined);
-  var tokenAddress = isLong ? market.syntheticLong.tokenAddress : market.syntheticShort.tokenAddress;
-  var tokenBalanceQuery = DataHooks.useSyntheticTokenBalanceOrZero(user, tokenAddress);
-  var initialMint;
-  initialMint = typeof tokenBalanceQuery === "number" || tokenBalanceQuery.TAG === /* GraphError */0 ? false : tokenBalanceQuery._0.eq(CONSTANTS.zeroBN);
   var match$3 = useBalanceAndApproved(Config.dai, Config.longShort);
   var optDaiAmountApproved = match$3[1];
   var optDaiBalance = match$3[0];
@@ -952,8 +958,6 @@ function MintForm$MintFormSignedIn(Props) {
   }
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
   var router = Router.useRouter();
-  var optCurrentUser = RootProvider.useCurrentUser(undefined);
-  var userPage = optCurrentUser !== undefined ? "/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser)) : "/";
   React.useEffect((function () {
           if (typeof txStateApprove === "number") {
             if (txStateApprove !== /* UnInitialised */0) {
@@ -1044,8 +1048,6 @@ function MintForm$MintFormSignedIn(Props) {
                         _2: /* Success */3,
                         [Symbol.for("name")]: "Show"
                       });
-                  var route = initialMint && !form.input.isStaking ? userPage + "?minted=" + Ethers.Utils.ethAdrToStr(tokenAddress) : userPage;
-                  router.push(route);
                   break;
               case /* Failed */3 :
                   Curry._1(toastDispatch, {
@@ -1110,6 +1112,8 @@ function MintForm$MintFormSignedIn(Props) {
                     txStateApprove: txStateApprove,
                     txStateMint: txState,
                     resetFormButton: resetFormButton,
+                    isLong: isLong,
+                    marketName: market.name,
                     tokenToMint: tokenToMint,
                     buttonText: match$5[1],
                     buttonDisabled: match$5[2]

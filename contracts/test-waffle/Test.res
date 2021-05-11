@@ -7,5 +7,14 @@ describe("Float System", () => {
       let _ = Helpers.inititialize()->JsPromise.map(_ => done())
     })
     it("it worked", () => Js.log("It worked, yay"))
+    it("Two numbers are equal", () => {
+      Chai.bnEqual(Ethers.BigNumber.fromInt(1), Ethers.BigNumber.fromUnsafe("1"))
+      Chai.bnCloseTo(Ethers.BigNumber.fromInt(1), Ethers.BigNumber.fromUnsafe("5"), ~distance=4)
+      Chai.bnWithin(
+        Ethers.BigNumber.fromInt(1),
+        ~min=Ethers.BigNumber.fromUnsafe("0"),
+        ~max=Ethers.BigNumber.fromInt(2),
+      )
+    })
   })
 })

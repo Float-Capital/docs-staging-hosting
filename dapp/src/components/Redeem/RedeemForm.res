@@ -64,17 +64,8 @@ let tokenRedeemPosition = (
   (isActuallyLong, syntheticTokenAddress, hasTokens, hasBothTokens)
 }
 
-let isGreaterThanApproval = (~amount, ~amountApproved) => {
-  amount->Ethers.BigNumber.gt(amountApproved)
-}
 let isGreaterThanBalance = (~amount, ~balance) => {
   amount->Ethers.BigNumber.gt(balance)
-}
-
-let useBalanceAndApproved = (~erc20Address, ~spender) => {
-  let {Swr.data: optBalance} = ContractHooks.useErc20BalanceRefresh(~erc20Address)
-  let {data: optAmountApproved} = ContractHooks.useERC20ApprovedRefresh(~erc20Address, ~spender)
-  (optBalance, optAmountApproved)
 }
 
 module ConnectedRedeemForm = {
@@ -105,58 +96,25 @@ module ConnectedRedeemForm = {
       ~signer,
     )
 
-    let (
-      contractExecutionHandlerApprove,
-      txStateApprove,
-      setTxStateApprove,
-    ) = ContractActions.useContractFunction(~signer)
-    let (
-      contractActionToCallAfterApproval,
-      setContractActionToCallAfterApproval,
-    ) = React.useState(((), ()) => ())
-
     let initialInput: RedeemForm.input = {
       amount: "",
     }
 
     let marketIndex = market.marketIndex
 
-    let (optTokenBalance, optTokenAmountApproved) = useBalanceAndApproved(
+    let {Swr.data: optTokenBalance} = ContractHooks.useErc20BalanceRefresh(
       ~erc20Address=syntheticTokenAddress,
-      ~spender=Config.longShort,
     )
 
     let form = RedeemForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
-      let approveFunction = () =>
-        contractExecutionHandlerApprove(
-          ~makeContractInstance=Contracts.Erc20.make(~address=syntheticTokenAddress),
-          ~contractFunction=Contracts.Erc20.approve(
-            ~amount=amount->Globals.amountForApproval,
-            ~spender=Config.longShort,
-          ),
-        )
-      let redeemFunction = () =>
-        contractExecutionHandler(
-          ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
-          ~contractFunction={
-            isActuallyLong
-              ? Contracts.LongShort.redeemLong(~marketIndex, ~tokensToRedeem=amount)
-              : Contracts.LongShort.redeemShort(~marketIndex, ~tokensToRedeem=amount)
-          },
-        )
-      let needsToApprove = isGreaterThanApproval(
-        ~amount,
-        ~amountApproved=optTokenAmountApproved->Option.getWithDefault(
-          Ethers.BigNumber.fromUnsafe("0"),
-        ),
+      contractExecutionHandler(
+        ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
+        ~contractFunction={
+          isActuallyLong
+            ? Contracts.LongShort.redeemLong(~marketIndex, ~tokensToRedeem=amount)
+            : Contracts.LongShort.redeemShort(~marketIndex, ~tokensToRedeem=amount)
+        },
       )
-
-      switch needsToApprove {
-      | true =>
-        setContractActionToCallAfterApproval(_ => redeemFunction)
-        approveFunction()
-      | false => redeemFunction()
-      }
     })
 
     let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
@@ -165,7 +123,6 @@ module ConnectedRedeemForm = {
       <Button
         onClick={_ => {
           form.reset()
-          setTxStateApprove(_ => ContractActions.UnInitialised)
           setTxState(_ => ContractActions.UnInitialised)
         }}>
         {"Reset & Redeem Again"}
@@ -179,58 +136,16 @@ module ConnectedRedeemForm = {
     // TODO: incorp - optAdditionalErrorMessage
     let (_optAdditionalErrorMessage, buttonText, buttonDisabled) = {
       let position = isLong ? "long" : "short"
-      switch (formAmount, optTokenBalance, optTokenAmountApproved) {
-      | (Some(amount), Some(balance), Some(amountApproved)) =>
-        let needsToApprove = isGreaterThanApproval(~amount, ~amountApproved)
+      switch (formAmount, optTokenBalance) {
+      | (Some(amount), Some(balance)) =>
         let greaterThanBalance = isGreaterThanBalance(~amount, ~balance)
         switch greaterThanBalance {
         | true => (Some("Amount is greater than your balance"), `Insufficient balance`, true)
-        | false => (
-            None,
-            switch needsToApprove {
-            | true => `Approve ${position} ${market.name} & Redeem `
-            | false => `Redeem ${position} ${market.name}`
-            },
-            !form.valid(),
-          )
+        | false => (None, `Redeem ${position} ${market.name}`, !form.valid())
         }
       | _ => (None, `Redeem ${position} ${market.name}`, true)
       }
     }
-
-    // Execute the call after approval has completed
-    React.useEffect1(() => {
-      switch txStateApprove {
-      | Created =>
-        toastDispatch(
-          ToastProvider.Show(
-            `Please approve your ${Config.paymentTokenName} token`,
-            "",
-            ToastProvider.Info,
-          ),
-        )
-      | Declined(reason) =>
-        toastDispatch(
-          ToastProvider.Show(
-            `The transaction was rejected by your wallet`,
-            reason,
-            ToastProvider.Error,
-          ),
-        )
-      | SignedAndSubmitted(_) =>
-        toastDispatch(ToastProvider.Show(`Approval transaction processing`, "", ToastProvider.Info))
-      | Complete(_) =>
-        contractActionToCallAfterApproval()
-        setTxStateApprove(_ => ContractActions.UnInitialised)
-        toastDispatch(
-          ToastProvider.Show(`Approve transaction confirmed`, "", ToastProvider.Success),
-        )
-      | Failed(_) =>
-        toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
-      | _ => ()
-      }
-      None
-    }, [txStateApprove])
 
     React.useEffect1(() => {
       switch txState {
@@ -292,12 +207,7 @@ module ConnectedRedeemForm = {
           isLong={isActuallyLong}
           hasBothTokens
           submitButton={<RedeemSubmitButtonAndTxStatusModal
-            buttonText
-            resetFormButton
-            redeemToken={`${isLong ? "long" : "short"} ${market.name}`}
-            txStateApprove
-            txStateRedeem=txState
-            buttonDisabled
+            buttonText resetFormButton txStateRedeem=txState buttonDisabled
           />}
         />
       : <p> {"No tokens in this market to redeem"->React.string} </p>

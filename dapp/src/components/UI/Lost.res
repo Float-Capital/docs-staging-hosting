@@ -18,6 +18,7 @@ let make = () => {
             <a
               className="text-sm block text-right hover:bg-white"
               target="_blank"
+              rel="noopener noreferrer"
               href="https://docs.float.capital">
               {"View our docs"->React.string}
             </a>
@@ -26,7 +27,8 @@ let make = () => {
             <a
               className="text-sm block text-right hover:bg-white"
               href=Config.discordInviteLink
-              target="_blank">
+              target="_"
+              rel="noopener noreferrer">
               {"Join our discord"->React.string}
             </a>
           </li>

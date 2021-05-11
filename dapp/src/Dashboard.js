@@ -4,7 +4,6 @@
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Config = require("./Config.js");
-var Ethers = require("./ethereum/Ethers.js");
 var Masonry = require("./components/UI/Masonry.js");
 var Queries = require("./data/Queries.js");
 var Tooltip = require("./components/UI/Tooltip.js");
@@ -86,11 +85,11 @@ function totalValueCard(totalValueLocked) {
                 }, "Total Value"), React.createElement("span", {
                   className: "text-sm"
                 }, " 🏦 in Float Protocol: "), React.createElement("span", {
-                  className: "text-green-700"
+                  className: "text-green-700 font-bold text-xl"
                 }, "$" + FormatMoney.formatEther(undefined, totalValueLocked)));
 }
 
-function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed, txHash) {
+function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed, txHash, numberOfSynths) {
   var dateObj = FromUnixTime(liveSince.toNumber());
   return React.createElement(Masonry.Card.make, {
               children: null
@@ -98,15 +97,17 @@ function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed, txHash
                   children: "Float Protocol 🏗️"
                 }), React.createElement(DashboardUl.make, {
                   list: [
-                    DashboardLi.Props.createDashboardLiProps(undefined, "📅 Live since:", Format(dateObj, "do MMM ''yy") + " (" + FormatDistanceToNow(dateObj) + ")", Config.blockExplorer + "/tx/" + txHash, undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "🗓️ Live since:", Format(dateObj, "do MMM ''yy"), Config.blockExplorer + "/tx/" + txHash, undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "📅 Days live:", FormatDistanceToNow(dateObj), undefined, undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "📈 No. txs:", totalTxs.toString(), undefined, undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "👯‍♀️ No. users:", totalUsers.toString(), undefined, undefined),
+                    DashboardLi.Props.createDashboardLiProps(undefined, "👷‍♀️ No. synths:", numberOfSynths, undefined, undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "⛽ Gas used:", FormatMoney.formatInt(totalGasUsed.toString()), undefined, undefined)
                   ]
                 }));
 }
 
-function syntheticAssetsCard(totalSynthValue, numberOfSynths) {
+function syntheticAssetsCard(totalSynthValue) {
   return React.createElement(Masonry.Card.make, {
               children: null
             }, React.createElement(Masonry.Header.make, {
@@ -114,14 +115,17 @@ function syntheticAssetsCard(totalSynthValue, numberOfSynths) {
                 }, "Synthetic Assets", React.createElement("img", {
                       className: "inline h-5 ml-2",
                       src: "/img/coin.png"
-                    })), React.createElement(DashboardUl.make, {
-                  list: [
-                    DashboardLi.Props.createDashboardLiProps(Caml_option.some(React.createElement(Tooltip.make, {
+                    })), React.createElement("div", {
+                  className: "p-6 py-4 text-center"
+                }, React.createElement("div", undefined, React.createElement("span", {
+                          className: "text-sm mr-2"
+                        }, "💰 Total synth value"), React.createElement("div", {
+                          className: "text-green-700 text-xl "
+                        }, "$" + FormatMoney.formatEther(undefined, totalSynthValue), React.createElement("span", {
+                              className: "text-black"
+                            }, React.createElement(Tooltip.make, {
                                   tip: "Redeemable value of synths in the open market"
-                                })), "💰 Total synth value: ", "$" + FormatMoney.formatEther(undefined, totalSynthValue), undefined, undefined),
-                    DashboardLi.Props.createDashboardLiProps(undefined, "👷‍♀️ No. synths:", numberOfSynths, undefined, undefined)
-                  ]
-                }), React.createElement(Link, {
+                                }))))), React.createElement(Link, {
                   href: "/markets",
                   children: React.createElement("div", {
                         className: "w-full pb-4 text-sm cursor-pointer hover:opacity-70 mx-auto"
@@ -145,7 +149,7 @@ function floatTokenCard(totalFloatMinted) {
                     DashboardLi.Props.createDashboardLiProps(undefined, "😏 Float price:", "...", undefined, undefined),
                     DashboardLi.Props.createDashboardLiProps(Caml_option.some(React.createElement(Tooltip.make, {
                                   tip: "The number of Float tokens in circulation"
-                                })), "🕶️ Float supply:", Ethers.Utils.formatEtherToPrecision(totalFloatMinted, 2), undefined, undefined),
+                                })), "🗳 Float supply:", FormatMoney.formatEther(undefined, totalFloatMinted), undefined, undefined),
                     DashboardLi.Props.createDashboardLiProps(undefined, "🧢 Market cap: ", "...", undefined, undefined)
                   ]
                 }));
@@ -158,12 +162,12 @@ function stakingCard(totalValueStaked) {
                   children: "Staking 🔥"
                 }), React.createElement("div", {
                   className: "text-center mt-5"
-                }, React.createElement("span", {
-                      className: "text-sm mr-1"
-                    }, "💰 Total staked value: "), React.createElement("span", {
-                      className: "text-green-700"
+                }, React.createElement("div", {
+                      className: "text-sm"
+                    }, "💰 Total staked value "), React.createElement("div", {
+                      className: "text-green-700 text-xl "
                     }, "$" + FormatMoney.formatEther(undefined, totalValueStaked))), React.createElement("div", {
-                  className: "text-left mt-4 pl-4 text-sm"
+                  className: "text-left mt-4 pl-4 text-sm font-bold"
                 }, "Trending"), React.createElement("div", {
                   className: "pt-2 pb-5"
                 }, React.createElement(Dashboard$TrendingStakes, {})));
@@ -229,10 +233,10 @@ function Dashboard(Props) {
             }, totalValueCard(totalValueLocked), React.createElement(Masonry.Container.make, {
                   children: null
                 }, React.createElement(Masonry.Divider.make, {
-                      children: floatProtocolCard(match$2.timestampLaunched, match$2.totalTxs, match$2.totalUsers, match$2.totalGasUsed, match$2.txHash)
+                      children: floatProtocolCard(match$2.timestampLaunched, match$2.totalTxs, match$2.totalUsers, match$2.totalGasUsed, match$2.txHash, numberOfSynths)
                     }), React.createElement(Masonry.Divider.make, {
                       children: null
-                    }, syntheticAssetsCard(totalSynthValue, numberOfSynths), floatTokenCard(match$2.totalFloatMinted)), React.createElement(Masonry.Divider.make, {
+                    }, syntheticAssetsCard(totalSynthValue), floatTokenCard(match$2.totalFloatMinted)), React.createElement(Masonry.Divider.make, {
                       children: stakingCard(totalValueStaked)
                     })));
       } else {

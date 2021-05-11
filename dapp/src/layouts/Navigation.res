@@ -98,29 +98,31 @@ let make = () => {
         <Link href="/dashboard">
           <a className="px-3 hover:bg-white"> {React.string("DASHBOARD")} </a>
         </Link>
-        <a className="px-3 hover:bg-white" target="_blank" href="https://docs.float.capital">
+        <a className="px-3 hover:bg-white mr-2" target="_blank" href="https://docs.float.capital">
           {React.string("DOCS")}
         </a>
-        <a
-          className="px-3 hover:opacity-60" target="_blank" href="https://github.com/Float-Capital">
-          <img src="/icons/github.svg" className="h-5" />
-        </a>
-        {switch optCurrentUser {
-        | Some(currentUser) =>
-          <Link href={`/user/${currentUser->ethAdrToStr}`}>
-            <p
-              className="px-3 bg-white hover:bg-black hover:text-gray-200 text-base cursor-pointer">
-              {` 👤 `->React.string} <DisplayAddress address={currentUser->ethAdrToStr} />
-            </p>
-          </Link>
-        | None =>
-          <Button.Small
-            onClick={_ => {
-              router->Next.Router.push(`/login?nextPath=${router.asPath}`)
-            }}>
-            "LOGIN"
-          </Button.Small>
-        }}
+        {
+          // <a
+          //   className="px-3 hover:opacity-60" target="_blank" href="https://github.com/Float-Capital">
+          //   <img src="/icons/github.svg" className="h-5" />
+          // </a>
+          switch optCurrentUser {
+          | Some(currentUser) =>
+            <Link href={`/user/${currentUser->ethAdrToStr}`}>
+              <p
+                className="px-3 bg-white hover:bg-black hover:text-gray-200 text-base cursor-pointer">
+                {` 👤 `->React.string} <DisplayAddress address={currentUser->ethAdrToStr} />
+              </p>
+            </Link>
+          | None =>
+            <Button.Small
+              onClick={_ => {
+                router->Next.Router.push(`/login?nextPath=${router.asPath}`)
+              }}>
+              "LOGIN"
+            </Button.Small>
+          }
+        }
       </div>
       <div className="flex w-2/3 text-base items-center justify-end visible md:hidden">
         <div
@@ -158,39 +160,43 @@ let make = () => {
                 setIsOpen(_ => false)
               }}
               className="px-3 bg-black m-2"
-              target="_blank"
+              target="_"
+              rel="noopener noreferrer"
               href="https://docs.float.capital">
               {React.string("DOCS")}
             </a>
-            <a
-              onClick={_ => {
-                setIsOpen(_ => false)
-              }}
-              className="px-3 hover:opacity-60 m-4"
-              target="_blank"
-              href="https://github.com/float-capital/float-contracts">
-              <img src="/icons/github.svg" className="h-10" />
-            </a>
-            {switch optCurrentUser {
-            | Some(currentUser) =>
-              <p
-                onClick={_ => {
-                  router->Next.Router.push(`/user/${currentUser->ethAdrToStr}`)
-                  setIsOpen(_ => false)
-                }}
-                className="px-3 bg-white text-black hover:bg-black hover:text-gray-200 text-base cursor-pointer text-3xl">
-                {` 👤 `->React.string} <DisplayAddress address={currentUser->ethAdrToStr} />
-              </p>
+            {
+              // <a
+              //   onClick={_ => {
+              //     setIsOpen(_ => false)
+              //   }}
+              //   className="px-3 hover:opacity-60 m-4"
+              //   target="_"
+              //   rel="noopener noreferrer"
+              //   href="https://github.com/float-capital/float-contracts">
+              //   <img src="/icons/github.svg" className="h-10" />
+              // </a>
+              switch optCurrentUser {
+              | Some(currentUser) =>
+                <p
+                  onClick={_ => {
+                    router->Next.Router.push(`/user/${currentUser->ethAdrToStr}`)
+                    setIsOpen(_ => false)
+                  }}
+                  className="px-3 bg-white text-black hover:bg-black hover:text-gray-200 text-base cursor-pointer text-3xl">
+                  {` 👤 `->React.string} <DisplayAddress address={currentUser->ethAdrToStr} />
+                </p>
 
-            | None =>
-              <Button.Small
-                onClick={_ => {
-                  router->Next.Router.push(`/login?nextPath=${router.asPath}`)
-                  setIsOpen(_ => false)
-                }}>
-                "LOGIN"
-              </Button.Small>
-            }}
+              | None =>
+                <Button.Small
+                  onClick={_ => {
+                    router->Next.Router.push(`/login?nextPath=${router.asPath}`)
+                    setIsOpen(_ => false)
+                  }}>
+                  "LOGIN"
+                </Button.Small>
+              }
+            }
           </div>
         </div>
       </div>

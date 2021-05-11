@@ -11,7 +11,7 @@ slug: /
 
 Welcome to Float Capital! 👋
 
-This is the official documentation for the Float Capital, a new novel protocol allowing users to easily and safely gain exposure to [synthetic assets](/docs/faqs#what-is-a-synthetic-asset) without over-collateralization. 💡<!-- TODO  add link to over-collateralization definition-->
+This is the official documentation for the Float Capital, a novel protocol allowing users to easily and safely gain exposure to [synthetic assets](/docs/faqs#what-is-a-synthetic-asset) without over-collateralization. 💡<!-- TODO  add link to over-collateralization definition-->
 
 **Visit [float.capital](https://float.capital) or join our [discord](https://discord.gg/qesr2KZAhn) to get involved** 📈
 
@@ -21,9 +21,9 @@ This is the official documentation for the Float Capital, a new novel protocol a
 
 In fancy terms, Float Capital is a peer-to-peer, yield-enhanced, floating synthetic asset exposure mechanism.
 
-Put simply, Float is the easiest and safest way for users to create synthetic assets. Users do not need to worry about over-collateralization, or suddenly getting liquidated.
+Put simply, Float is the easiest and safest way for users to buy synthetic assets. Users do not need to worry about over-collateralization, or suddenly getting liquidated.
 
-Float is a new novel protocol, creating an efficient synthetic asset marketplace, governed entirely by code, allowing anyone around the world to get involved. 🚀
+Float is a novel protocol, creating an efficient synthetic asset marketplace, governed entirely by code, allowing anyone around the world to get involved. 🚀
 
 ---
 

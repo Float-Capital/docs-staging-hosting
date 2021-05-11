@@ -363,17 +363,6 @@ contract LongShort is ILongShort, Initializable {
     }
 
     /**
-     * Returns the amount of funds that LongShort can directly transfer.
-     * Funds locked in the yield managers have to be withdrawn first.
-     */
-    function getLiquidFunds(uint32 marketIndex) public view returns (uint256) {
-        return
-            totalValueLockedInMarket[marketIndex] +
-            totalValueReservedForTreasury[marketIndex] -
-            totalValueLockedInYieldManager[marketIndex];
-    }
-
-    /**
      * Returns % of long position that is filled
      */
     function getLongBeta(uint32 marketIndex) public view returns (uint256) {
@@ -519,47 +508,54 @@ contract LongShort is ILongShort, Initializable {
                 totalValueLockedInYieldManager[marketIndex];
 
         // Market gets a bigger share if the market is more imbalanced.
-        (uint256 marketAmount, uint256 treasuryAmount) =
-            getTreasurySplit(marketIndex, amount);
+        if (amount > 0) {
+            (uint256 marketAmount, uint256 treasuryAmount) =
+                getTreasurySplit(marketIndex, amount);
 
-        // We keep the interest locked in the yield manager, but update our
-        // bookkeeping to logically simulate moving the funds around.
-        totalValueLockedInYieldManager[marketIndex] += amount;
-        totalValueLockedInMarket[marketIndex] += marketAmount;
-        totalValueReservedForTreasury[marketIndex] += treasuryAmount;
+            // We keep the interest locked in the yield manager, but update our
+            // bookkeeping to logically simulate moving the funds around.
+            totalValueLockedInYieldManager[marketIndex] += amount;
+            totalValueLockedInMarket[marketIndex] += marketAmount;
+            totalValueReservedForTreasury[marketIndex] += treasuryAmount;
 
-        // Splits mostly to the weaker position to incentivise balance.
-        (uint256 longAmount, uint256 shortAmount) =
-            getMarketSplit(marketIndex, marketAmount);
-        longValue[marketIndex] = longValue[marketIndex] + longAmount;
-        shortValue[marketIndex] = shortValue[marketIndex] + shortAmount;
+            // Splits mostly to the weaker position to incentivise balance.
+            (uint256 longAmount, uint256 shortAmount) =
+                getMarketSplit(marketIndex, marketAmount);
+            longValue[marketIndex] = longValue[marketIndex] + longAmount;
+            shortValue[marketIndex] = shortValue[marketIndex] + shortAmount;
+        }
+    }
+
+    function _minimum(
+        uint256 liquidityOfPositionA,
+        uint256 liquidityOfPositionB
+    ) internal view returns (uint256) {
+        if (liquidityOfPositionA < liquidityOfPositionB) {
+            return liquidityOfPositionA;
+        } else {
+            return liquidityOfPositionB;
+        }
     }
 
     function _calculateValueChangeForPriceMechanism(
         uint32 marketIndex,
         uint256 assetPriceGreater,
         uint256 assetPriceLess,
-        uint256 greatestPossibleValueChange
+        uint256 baseValueExposure
     ) internal view returns (uint256) {
         uint256 valueChange = 0;
 
         uint256 percentageChange =
             ((assetPriceGreater - assetPriceLess) * TEN_TO_THE_18) /
                 assetPrice[marketIndex];
-        if (percentageChange >= TEN_TO_THE_18) {
+
+        valueChange = (baseValueExposure * percentageChange) / TEN_TO_THE_18;
+
+        if (valueChange > baseValueExposure) {
             // More than 100% price movement, system liquidation.
-            valueChange = greatestPossibleValueChange;
-        } else {
-            if (getShortBeta(marketIndex) == TEN_TO_THE_18) {
-                valueChange =
-                    (shortValue[marketIndex] * percentageChange) /
-                    TEN_TO_THE_18;
-            } else {
-                valueChange =
-                    (longValue[marketIndex] * percentageChange) /
-                    TEN_TO_THE_18;
-            }
+            valueChange = baseValueExposure;
         }
+
         return valueChange;
     }
 
@@ -570,14 +566,18 @@ contract LongShort is ILongShort, Initializable {
         if (assetPrice[marketIndex] == newPrice) {
             return;
         }
+
         uint256 valueChange = 0;
+        uint256 baseValueExposure =
+            _minimum(longValue[marketIndex], shortValue[marketIndex]);
+
         // Long gains
         if (newPrice > assetPrice[marketIndex]) {
             valueChange = _calculateValueChangeForPriceMechanism(
                 marketIndex,
                 newPrice,
                 assetPrice[marketIndex],
-                shortValue[marketIndex]
+                baseValueExposure
             );
             longValue[marketIndex] = longValue[marketIndex] + valueChange;
             shortValue[marketIndex] = shortValue[marketIndex] - valueChange;
@@ -586,7 +586,7 @@ contract LongShort is ILongShort, Initializable {
                 marketIndex,
                 assetPrice[marketIndex],
                 newPrice,
-                longValue[marketIndex]
+                baseValueExposure
             );
             longValue[marketIndex] = longValue[marketIndex] - valueChange;
             shortValue[marketIndex] = shortValue[marketIndex] + valueChange;
@@ -673,10 +673,6 @@ contract LongShort is ILongShort, Initializable {
             totalValueLockedInMarket[marketIndex] +
             amount;
 
-        // Transfer funds to the yield managers.
-        // TODO: we could consider pooling funds in the LongShort contract and
-        // only transferring over some threshold to save on gas. Does kinda
-        // screw users periodically if they transfer right on the threshold.
         _transferToYieldManager(marketIndex, amount);
     }
 
@@ -686,14 +682,7 @@ contract LongShort is ILongShort, Initializable {
     function _withdrawFunds(uint32 marketIndex, uint256 amount) internal {
         require(totalValueLockedInMarket[marketIndex] >= amount);
 
-        // Withdraw requisite funds from the yield managers if necessary.
-        // TODO: we could consider withdrawing more funds than necessary into
-        // a pool, so users don't have to transfer on every call to safe gas.
-        // Again, kinda screws users now and again if they time calls badly.
-        uint256 liquid = getLiquidFunds(marketIndex);
-        if (liquid < amount) {
-            _transferFromYieldManager(marketIndex, amount - liquid);
-        }
+        _transferFromYieldManager(marketIndex, amount);
 
         // Transfer funds to the sender.
         fundTokens[marketIndex].transfer(msg.sender, amount);
@@ -735,6 +724,9 @@ contract LongShort is ILongShort, Initializable {
         internal
     {
         require(totalValueLockedInYieldManager[marketIndex] >= amount);
+
+        // NB there will be issues here if not enough liquidity exists to withdraw
+        // Boolean should be returned from yield manager and think how to approproately handle this
         yieldManagers[marketIndex].withdrawToken(amount);
 
         // Update market state.
@@ -860,7 +852,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 tokensMinted =
             _mintLong(marketIndex, amount, msg.sender, address(staker));
 
-        staker.stakeTransferredTokens(
+        staker.stakeFromMint(
             address(longTokens[marketIndex]),
             tokensMinted,
             msg.sender
@@ -877,7 +869,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 tokensMinted =
             _mintShort(marketIndex, amount, msg.sender, address(staker));
 
-        staker.stakeTransferredTokens(
+        staker.stakeFromMint(
             address(shortTokens[marketIndex]),
             tokensMinted,
             msg.sender
@@ -1067,14 +1059,10 @@ contract LongShort is ILongShort, Initializable {
             return;
         }
 
-        // We may have to withdraw requisite funds from the yield managers.
-        uint256 liquid = getLiquidFunds(marketIndex);
-        if (liquid < totalValueReservedForTreasury[marketIndex]) {
-            _transferFromYieldManager(
-                marketIndex,
-                totalValueReservedForTreasury[marketIndex] - liquid
-            );
-        }
+        _transferFromYieldManager(
+            marketIndex,
+            totalValueReservedForTreasury[marketIndex]
+        );
 
         // Transfer funds to the treasury.
         fundTokens[marketIndex].transfer(

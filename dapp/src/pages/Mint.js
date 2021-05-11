@@ -3,16 +3,31 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Loader = require("./components/UI/Loader.js");
+var Loader = require("../components/UI/Loader.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
-var Queries = require("./data/Queries.js");
+var Queries = require("../data/Queries.js");
 var Belt_Int = require("rescript/lib/js/belt_Int.js");
-var MintForm = require("./components/Trade/MintForm.js");
+var MintForm = require("../components/Trade/MintForm.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Router = require("next/router");
 
+function Mint$DetailsWrapper(Props) {
+  var market = Props.market;
+  var children = Props.children;
+  return React.createElement("div", {
+              className: "p-5 rounded-lg max-w-xl mx-auto flex flex-col bg-white bg-opacity-70 shadow-lg"
+            }, React.createElement("div", {
+                  className: "flex justify-between mb-2 text-xl"
+                }, market.name + " (" + market.symbol + ")"), children);
+}
+
+var DetailsWrapper = {
+  make: Mint$DetailsWrapper
+};
+
 function Mint$Mint(Props) {
+  var withHeader = Props.withHeader;
   var router = Router.useRouter();
   var markets = Curry.app(Queries.MarketDetails.use, [
         undefined,
@@ -40,10 +55,18 @@ function Mint$Mint(Props) {
     tmp = "Error loading data";
   } else if (match !== undefined) {
     var optFirstMarket = Belt_Array.get(match.syntheticMarkets, Belt_Option.getWithDefault(Belt_Int.fromString(marketIndex), 1) - 1 | 0);
-    tmp = optFirstMarket !== undefined ? React.createElement(MintForm.make, {
-            market: optFirstMarket,
-            isLong: actionOption !== "short"
-          }) : React.createElement("p", undefined, "No markets exist");
+    tmp = optFirstMarket !== undefined ? (
+        withHeader ? React.createElement(Mint$DetailsWrapper, {
+                market: optFirstMarket,
+                children: React.createElement(MintForm.make, {
+                      market: optFirstMarket,
+                      isLong: actionOption !== "short"
+                    })
+              }) : React.createElement(MintForm.make, {
+                market: optFirstMarket,
+                isLong: actionOption !== "short"
+              })
+      ) : React.createElement("p", undefined, "No markets exist");
   } else {
     tmp = "You might think this is impossible, but depending on the situation it might not be!";
   }
@@ -57,9 +80,12 @@ var Mint = {
 };
 
 function $$default(param) {
-  return React.createElement(Mint$Mint, {});
+  return React.createElement(Mint$Mint, {
+              withHeader: true
+            });
 }
 
+exports.DetailsWrapper = DetailsWrapper;
 exports.Mint = Mint;
 exports.$$default = $$default;
 exports.default = $$default;

@@ -20,13 +20,10 @@ function createInitialTokenPrice(
   tokenId: string,
   timestamp: BigInt
 ): Price {
-  let initialTokenPrice = Price.load("defaultTokenPrice");
-  if (initialTokenPrice == null) {
-    initialTokenPrice = new Price("defaultTokenPrice");
-    initialTokenPrice.price = TEN_TO_THE_18;
-    initialTokenPrice.token = tokenId;
-    initialTokenPrice.timeUpdated = timestamp;
-  }
+  let initialTokenPrice = new Price(id);
+  initialTokenPrice.price = TEN_TO_THE_18;
+  initialTokenPrice.token = tokenId;
+  initialTokenPrice.timeUpdated = timestamp;
 
   return initialTokenPrice as Price;
 }

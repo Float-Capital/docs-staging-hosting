@@ -90,15 +90,57 @@ module.exports = async function (deployer, networkName, accounts) {
   if (networkName == "mumbai") {
     const adminInstance = await getAdminInstance();
     console.log(`To verify all these contracts run the following:
-    
-    \`truffle run verify TokenFactory FloatToken Treasury_v0@${await adminInstance.getProxyImplementation(
+
+    \`yarn hardhat --network ${networkName} tenderly:verify TokenFactory=${(await TokenFactory.deployed()).address} FloatToken=${(await FloatToken.deployed()).address} Treasury_v0=${await adminInstance.getProxyImplementation(
       treasury.address
-    )} FloatCapital_v0@${await adminInstance.getProxyImplementation(
-      floatCapital.address
-    )} Staker@${await adminInstance.getProxyImplementation(
-      staker.address
-    )} LongShort@${await adminInstance.getProxyImplementation(
+    )} LongShort=${await adminInstance.getProxyImplementation(
       longShort.address
-    )} --network kovan\``);
+    )} FloatCapital_v0=${await adminInstance.getProxyImplementation(
+      floatCapital.address
+    )} Staker=${await adminInstance.getProxyImplementation(
+      staker.address
+    )}\``);
+
+    /**
+     * KEEP THESE FOR REFERENCE - shows how to verify contracts in tenderly automatically using ethers:
+     * 
+  const hardhat = require("hardhat")
+  const contracts = [
+    {
+      name: "TokenFactory",
+      address: (await TokenFactory.deployed()).address
+    },
+    {
+      name: "FloatToken",
+      address: (await FloatToken.deployed()).address
+    },
+    {
+      name: "Treasury_v0",
+      address: await adminInstance.getProxyImplementation(
+        (await Treasury.deployed()).address
+      )
+    },
+    {
+      name: "LongShort",
+      address: await adminInstance.getProxyImplementation(
+        (await LongShort.deployed()).address
+      )
+    },
+    {
+      name: "FloatCapital_v0",
+      address: await adminInstance.getProxyImplementation(
+        (await FloatCapital.deployed()).address
+      )
+    },
+    {
+      name: "Staker",
+      address: await adminInstance.getProxyImplementation(
+        (await Staker.deployed()).address
+      )
+    }
+  ]
+
+  await hardhat.tenderly.verify(...contracts)
+     */
   }
 };
