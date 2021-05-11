@@ -4,7 +4,7 @@ module StakeForm = %form(
 
   let validators = {
     amount: {
-      strategy: OnFirstBlur,
+      strategy: OnFirstSuccessOrFirstBlur,
       validate: ({amount}) => Form.Validators.etherNumberInput(amount),
     },
   }
@@ -41,7 +41,8 @@ module UnstakeTxStatusModal = {
         </div>
       </Modal>
     | ContractActions.Declined(_message) => <> {resetFormButton()} </>
-    | ContractActions.Failed(txHash) => <Modal id={"unstake-4"}>
+    | ContractActions.Failed(txHash) =>
+      <Modal id={"unstake-4"}>
         <div className="text-center m-3">
           <p> {`The transaction failed.`->React.string} </p>
           {if txHash != "" {
@@ -67,17 +68,16 @@ module StakeFormInput = {
     ~onChange=_ => (),
     ~onBlur=_ => (),
     ~onMaxClick=_ => (),
-    ~synthetic: Queries.SyntheticTokenInfo.t,
     ~txStateModal=React.null,
+    ~buttonDisabled=false,
+    ~buttonText,
   ) =>
     <Form className="" onSubmit>
       // optBalance Todo
       <AmountInput
         value optBalance={optBalance} disabled onBlur onChange placeholder={"Unstake"} onMaxClick
       />
-      <Button onClick={_ => onSubmit()}>
-        {`Unstake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
-      </Button>
+      <Button onClick={_ => onSubmit()} disabled={buttonDisabled}> {buttonText} </Button>
       {txStateModal}
     </Form>
 }
@@ -163,6 +163,26 @@ module ConnectedStakeForm = {
         {"Reset & Unstake Again"}
       </Button>
 
+    let formAmount = switch form.amountResult {
+    | Some(Ok(amount)) => Some(amount)
+    | _ => None
+    }
+
+    let (_optAdditionalErrorMessage, buttonText, buttonDisabled) = {
+      let defaultButtonText = `Unstake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`
+      switch (formAmount, optTokenBalance) {
+      | (Some(amount), Some(balance)) => {
+          let greaterThanBalance = amount->Ethers.BigNumber.gt(balance)
+          switch greaterThanBalance {
+          | true => (Some("Amount is greater than your balance"), `Insufficient balance`, true)
+          | false => (None, defaultButtonText, form.submitting || !form.valid())
+          }
+        }
+
+      | _ => (None, defaultButtonText, true)
+      }
+    }
+
     <StakeFormInput
       onSubmit=form.submit
       value={form.input.amount}
@@ -182,8 +202,9 @@ module ConnectedStakeForm = {
           | _ => "0"
           },
         )}
-      synthetic
       txStateModal={<UnstakeTxStatusModal resetFormButton txStateUnstake=txState />}
+      buttonDisabled
+      buttonText
     />
   }
 }
@@ -207,7 +228,10 @@ let make = (~tokenId) => {
       showLogin
         ? <Login />
         : <div onClick={_ => setShowLogin(_ => true)}>
-            <StakeFormInput disabled=true synthetic />
+            <StakeFormInput
+              disabled=true
+              buttonText={`Unstake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
+            />
           </div>
     }
   | {data: None, error: None, loading: false}
