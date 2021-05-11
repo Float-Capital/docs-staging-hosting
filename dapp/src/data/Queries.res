@@ -74,7 +74,7 @@ fragment SyntheticTokenStakeInfo on SyntheticToken {
 }
 
 # Used in:
-#   Fragments: SyntheticMarketInfo, StakeDetailed, CurrentStakesDetailed
+#   Fragments: SyntheticMarketInfo, StakeDetailed, CurrentStakesDetailed, UserTokenBalance
 #   Queries: SyntheticToken, SyntheticTokens
 fragment SyntheticTokenInfo on SyntheticToken {
   id
@@ -282,6 +282,7 @@ query {
 }
 `)
 
+// used externally in DataHooks.res (useTokenPriceAtTime)
 module TokenPrice = %graphql(`
   query($tokenAddress: String!, $timestamp: Int!){
     prices(where:{token:$tokenAddress, timeUpdated_lte: $timestamp}, orderBy: timeUpdated, orderDirection: desc, first:1){

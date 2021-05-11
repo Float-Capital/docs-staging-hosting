@@ -372,13 +372,52 @@ function UserUI$UserMarketBox(Props) {
     var match$3 = bothPrices._0;
     var newPrice = match$3[1];
     var oldPrice = match$3[0];
-    var direction = newPrice.gt(oldPrice) ? /* Up */0 : /* Down */1;
-    var diff = direction ? oldPrice.sub(newPrice) : newPrice.sub(oldPrice);
-    tmp = diff.eq(CONSTANTS.zeroBN) ? null : React.createElement("div", {
-            className: direction === /* Up */0 ? "text-green-500" : "text-red-500"
-          }, (
-            direction === /* Up */0 ? "+" : "-"
-          ) + Globals.percentStr(diff, oldPrice) + "%");
+    var priceDirection = newPrice.eq(oldPrice) ? /* Same */2 : (
+        newPrice.gt(oldPrice) ? /* Up */0 : /* Down */1
+      );
+    var diff;
+    switch (priceDirection) {
+      case /* Up */0 :
+          diff = newPrice.sub(oldPrice);
+          break;
+      case /* Down */1 :
+          diff = oldPrice.sub(newPrice);
+          break;
+      case /* Same */2 :
+          diff = CONSTANTS.zeroBN;
+          break;
+      
+    }
+    var initialPercentStr = Globals.percentStr(diff, oldPrice);
+    var initialPercentFloat = parseFloat(initialPercentStr);
+    var percentStr = initialPercentFloat.toFixed(2);
+    var percentFloat = parseFloat(percentStr);
+    var displayDirection = percentFloat === 0 ? /* Same */2 : priceDirection;
+    var match$4;
+    switch (displayDirection) {
+      case /* Up */0 :
+          match$4 = [
+            "+",
+            "text-green-500"
+          ];
+          break;
+      case /* Down */1 :
+          match$4 = [
+            "-",
+            "text-red-500"
+          ];
+          break;
+      case /* Same */2 :
+          match$4 = [
+            "",
+            "text-gray-400"
+          ];
+          break;
+      
+    }
+    tmp = React.createElement("div", {
+          className: match$4[1]
+        }, match$4[0] + " " + percentStr + "%");
   }
   return React.createElement("div", {
               className: "flex w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative"

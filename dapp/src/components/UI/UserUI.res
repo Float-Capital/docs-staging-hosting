@@ -215,11 +215,14 @@ module MetamaskMenu = {
 }
 
 module UserMarketBox = {
-  type direction = Up | Down
+  type direction = Up | Down | Same
 
   @send external getTime: Js_date.t => int = "getTime"
 
   let getUnixTime = date => date->getTime / 1000
+
+  @send external toFixed: (float, int) => string = "toFixed"
+
   @react.component
   let make = (
     ~name,
@@ -304,23 +307,37 @@ module UserMarketBox = {
       <div className=`w-1/3 text-sm mx-2 text-center self-center`>
         {switch bothPrices {
         | Response((oldPrice, newPrice)) => {
-            let direction = newPrice->Ethers.BigNumber.gt(oldPrice) ? Up : Down
+            let priceDirection = if newPrice->Ethers.BigNumber.eq(oldPrice) {
+              Same
+            } else if newPrice->Ethers.BigNumber.gt(oldPrice) {
+              Up
+            } else {
+              Down
+            }
 
-            let diff = switch direction {
+            let diff = switch priceDirection {
             | Up => Ethers.BigNumber.sub(newPrice, oldPrice)
             | Down => Ethers.BigNumber.sub(oldPrice, newPrice)
+            | Same => CONSTANTS.zeroBN
             }
 
-            if !(diff->Ethers.BigNumber.eq(CONSTANTS.zeroBN)) {
-              <div className={direction == Up ? "text-green-500" : "text-red-500"}>
-                {`${direction == Up ? "+" : "-"}${Globals.percentStr(
-                    ~n=diff,
-                    ~outOf=oldPrice,
-                  )}%`->React.string}
-              </div>
-            } else {
-              React.null
+            let initialPercentStr = Globals.percentStr(~n=diff, ~outOf=oldPrice)
+            let initialPercentFloat = initialPercentStr->Globals.parseFloat
+            let percentStr = initialPercentFloat->toFixed(2)
+            let percentFloat = percentStr->Globals.parseFloat
+
+            let displayDirection = switch percentFloat {
+            | f if f == 0. => Same
+            | _ => priceDirection
             }
+
+            let (symbol, textClassName) = switch displayDirection {
+            | Up => ("+", "text-green-500")
+            | Down => ("-", "text-red-500")
+            | Same => ("", "text-gray-400")
+            }
+
+            <div className=textClassName> {`${symbol} ${percentStr}%`->React.string} </div>
           }
         | Loading => <MiniLoader />
         | _ => ``->React.string
