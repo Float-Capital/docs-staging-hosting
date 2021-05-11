@@ -14,14 +14,6 @@ function timestampToDuration(timestamp) {
   return FormatDistanceToNow(FromUnixTime(timestamp.toNumber()));
 }
 
-function percentBN(n, outOf) {
-  if (outOf.eq(CONSTANTS.zeroBN)) {
-    return CONSTANTS.zeroBN;
-  } else {
-    return n.mul(CONSTANTS.oneHundredEth).div(outOf);
-  }
-}
-
 function percentStr(n, outOf) {
   if (outOf.eq(CONSTANTS.zeroBN)) {
     return "0.00";
@@ -41,7 +33,6 @@ function amountForApproval(amount) {
 exports.ethAdrToStr = ethAdrToStr;
 exports.ethAdrToLowerStr = ethAdrToLowerStr;
 exports.timestampToDuration = timestampToDuration;
-exports.percentBN = percentBN;
 exports.percentStr = percentStr;
 exports.amountForApproval = amountForApproval;
 /* Ethers Not a pure module */
