@@ -3,6 +3,9 @@ type markets = {
   paymentToken: PaymentToken.t,
   oracleManager: OracleManagerMock.t,
   yieldManager: YieldManagerMock.t,
+  longSynth: SyntheticToken.t,
+  shortSynth: SyntheticToken.t,
+  marketIndex: int,
 }
 type coreContracts = {
   // floatCapital_v0: Contract.FloatCapital_v0.t,
@@ -34,7 +37,9 @@ let mintAndStake = (
 
 @ocaml.doc(`Generates random number between 1000 and 0.0001 of a token (10^18 in BigNumber units)`)
 let randomTokenAmount = () =>
-  (Js.Math.random() *. 100000.)->Float.toString->Ethers.BigNumber.fromUnsafe
+  Js.Math.random_int(0, Js.Int.max)
+  ->Ethers.BigNumber.fromInt
+  ->Ethers.BigNumber.mul(Ethers.BigNumber.fromInt(100000))
 
 type mint =
   | Long(Ethers.BigNumber.t)
@@ -62,6 +67,7 @@ let createSyntheticMarket = (
     OracleManagerMock.make(admin),
     YieldManagerMock.make(admin, longShort.address, fundToken.address),
   ))->JsPromise.then(((oracleManager, yieldManager)) => {
+    Js.log("Got here at least")
     let _ignorePromise = fundToken->PaymentToken.grantMintRole(~user=yieldManager.address)
     longShort
     ->LongShort.newSyntheticMarket(
@@ -71,10 +77,23 @@ let createSyntheticMarket = (
       ~oracleManager=oracleManager.address,
       ~yieldManager=yieldManager.address,
     )
-    ->JsPromise.map(_ => {
-      paymentToken: fundToken,
-      oracleManager: oracleManager,
-      yieldManager: yieldManager,
+    ->JsPromise.then(_ => {
+      longShort
+      ->LongShort.latestMarket
+      ->JsPromise.then(nextMarketIndex => {
+        let marketIndex = nextMarketIndex - 1
+        JsPromise.all2((
+          longShort->LongShort.longSynth(~marketIndex),
+          longShort->LongShort.shortSynth(~marketIndex),
+        ))->JsPromise.map(((longSynth, shortSynth)) => {
+          paymentToken: fundToken,
+          oracleManager: oracleManager,
+          yieldManager: yieldManager,
+          longSynth: longSynth,
+          shortSynth: shortSynth,
+          marketIndex: marketIndex,
+        })
+      })
     })
   })
 }
@@ -116,6 +135,7 @@ let inititialize = (~admin: Ethers.Wallet.t) => {
         ),
       ))
       ->JsPromise.then(_ => {
+        Js.log("will create the markets now!!!")
         [payToken1, payToken1, payToken2, payToken1]
         ->Array.mapWithIndex((index, paymentToken) =>
           createSyntheticMarket(

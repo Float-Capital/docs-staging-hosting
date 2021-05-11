@@ -31,7 +31,6 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                               
                             }));
                       return Async$BsMocha.it("Two numbers are equal")(undefined, undefined, undefined, (function (done) {
-                                    console.log("The loaded accounts", accounts.contents);
                                     var match = contracts.contents;
                                     var longShort = match.longShort;
                                     var testUser = accounts.contents[1];

@@ -34,6 +34,10 @@ function deployContract3(contractName, firstParam, secondParam, thirdParam) {
             });
 }
 
+var SyntheticToken = {
+  contractName: "SyntheticToken"
+};
+
 var contractName = "LongShort";
 
 function make(param) {
@@ -78,54 +82,43 @@ var GenericErc20 = {
   make: make$3
 };
 
-var contractName$4 = "SyntheticToken";
+var contractName$4 = "TokenFactory";
 
-function make$4(param) {
-  return deployContract(contractName$4);
+function make$4(admin, longShort) {
+  return deployContract2(contractName$4, admin, longShort);
 }
 
-var SyntheticToken = {
+var TokenFactory = {
   contractName: contractName$4,
   make: make$4
 };
 
-var contractName$5 = "TokenFactory";
+var contractName$5 = "Staker";
 
-function make$5(admin, longShort) {
-  return deployContract2(contractName$5, admin, longShort);
+function make$5(param) {
+  return deployContract(contractName$5);
 }
 
-var TokenFactory = {
+var Staker = {
   contractName: contractName$5,
   make: make$5
 };
 
-var contractName$6 = "Staker";
+var contractName$6 = "FloatToken";
 
 function make$6(param) {
   return deployContract(contractName$6);
 }
 
-var Staker = {
+var FloatToken = {
   contractName: contractName$6,
   make: make$6
 };
 
-var contractName$7 = "FloatToken";
+var contractName$7 = "ERC20PresetMinterPauser";
 
-function make$7(param) {
-  return deployContract(contractName$7);
-}
-
-var FloatToken = {
-  contractName: contractName$7,
-  make: make$7
-};
-
-var contractName$8 = "ERC20PresetMinterPauser";
-
-function make$8(name, symbol) {
-  return deployContract2(contractName$8, name, symbol);
+function make$7(name, symbol) {
+  return deployContract2(contractName$7, name, symbol);
 }
 
 function grantMintRole(t, user) {
@@ -141,43 +134,43 @@ function mintAndApprove(t, user, amount, spender) {
 }
 
 var PaymentToken = {
-  contractName: contractName$8,
-  make: make$8,
+  contractName: contractName$7,
+  make: make$7,
   grantMintRole: grantMintRole,
   mintAndApprove: mintAndApprove
 };
 
-var contractName$9 = "FloatCapital_v0";
+var contractName$8 = "FloatCapital_v0";
+
+function make$8(param) {
+  return deployContract(contractName$8);
+}
+
+var FloatCapital_v0 = {
+  contractName: contractName$8,
+  make: make$8
+};
+
+var contractName$9 = "Treasury_v0";
 
 function make$9(param) {
   return deployContract(contractName$9);
 }
 
-var FloatCapital_v0 = {
+var Treasury_v0 = {
   contractName: contractName$9,
   make: make$9
-};
-
-var contractName$10 = "Treasury_v0";
-
-function make$10(param) {
-  return deployContract(contractName$10);
-}
-
-var Treasury_v0 = {
-  contractName: contractName$10,
-  make: make$10
 };
 
 exports.deployContract = deployContract;
 exports.deployContract1 = deployContract1;
 exports.deployContract2 = deployContract2;
 exports.deployContract3 = deployContract3;
+exports.SyntheticToken = SyntheticToken;
 exports.LongShort = LongShort;
 exports.YieldManagerMock = YieldManagerMock;
 exports.OracleManagerMock = OracleManagerMock;
 exports.GenericErc20 = GenericErc20;
-exports.SyntheticToken = SyntheticToken;
 exports.TokenFactory = TokenFactory;
 exports.Staker = Staker;
 exports.FloatToken = FloatToken;

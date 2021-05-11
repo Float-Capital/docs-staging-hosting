@@ -33,6 +33,14 @@ let deployContract3 = (contractName, firstParam, secondParam, thirdParam) => {
 
 @send external attach: ('contract, ~address: Ethers.ethAddress) => 'contract = "attach"
 
+module SyntheticToken = {
+  type t = {address: Ethers.ethAddress}
+  let contractName = "SyntheticToken"
+
+  @send
+  external setup: (t, string, string, Ethers.ethAddress) => JsPromise.t<transaction> = "stake"
+}
+
 module LongShort = {
   type t = {address: Ethers.ethAddress}
   let contractName = "LongShort"
@@ -58,7 +66,15 @@ module LongShort = {
   ) => JsPromise.t<transaction> = "newSyntheticMarket"
 
   @send @scope("fundTokens")
-  external fundTokenAddress: (t, ~marketName: string) => JsPromise.t<Ethers.ethAddress> = "call"
+  external fundTokenAddress: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "call"
+
+  @send @scope("longTokens")
+  external longSynth: (t, ~marketIndex: int) => JsPromise.t<SyntheticToken.t> = "call"
+  @send @scope("shortTokens")
+  external shortSynth: (t, ~marketIndex: int) => JsPromise.t<SyntheticToken.t> = "call"
+
+  @send @scope("latestMarket")
+  external latestMarket: t => JsPromise.t<int> = "call"
 
   @send
   external mintLongAndStake: (
@@ -100,13 +116,6 @@ module GenericErc20 = {
   let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
 }
 
-module SyntheticToken = {
-  type t = {address: Ethers.ethAddress}
-  let contractName = "SyntheticToken"
-
-  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
-}
-
 module TokenFactory = {
   type t = {address: Ethers.ethAddress}
   let contractName = "TokenFactory"
@@ -140,6 +149,8 @@ module FloatToken = {
   @send
   external setup: (t, string, string, Ethers.ethAddress) => JsPromise.t<transaction> =
     "initialize(string,string,address)"
+
+  // "claimFloatCustom"
 }
 
 module PaymentToken = {

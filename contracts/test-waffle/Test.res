@@ -25,7 +25,6 @@ describe("Float System", () => {
     })
 
     it'("Two numbers are equal", done => {
-      Js.log2("The loaded accounts", accounts.contents)
       let {longShort, markets} = contracts.contents
       let testUser = accounts.contents->Array.getUnsafe(1)
 
