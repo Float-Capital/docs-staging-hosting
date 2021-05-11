@@ -323,7 +323,9 @@ module UserMarketBox = {
 
             let initialPercentStr = Globals.percentStr(~n=diff, ~outOf=oldPrice)
             let initialPercentFloat = initialPercentStr->Globals.parseFloat
-            let percentStr = initialPercentFloat->toFixed(2)
+            let flooredPercentFloat =
+              Js_math.floor_float((initialPercentFloat +. epsilon_float) *. 100.) /. 100.
+            let percentStr = flooredPercentFloat->toFixed(2)
             let percentFloat = percentStr->Globals.parseFloat
 
             let displayDirection = switch percentFloat {

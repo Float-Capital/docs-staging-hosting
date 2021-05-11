@@ -18,6 +18,7 @@ var DataHooks = require("../../data/DataHooks.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var ClaimFloat = require("../Claim/ClaimFloat.js");
 var MiniLoader = require("./MiniLoader.js");
+var Pervasives = require("rescript/lib/js/pervasives.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var FormatMoney = require("./FormatMoney.js");
@@ -390,7 +391,8 @@ function UserUI$UserMarketBox(Props) {
     }
     var initialPercentStr = Globals.percentStr(diff, oldPrice);
     var initialPercentFloat = parseFloat(initialPercentStr);
-    var percentStr = initialPercentFloat.toFixed(2);
+    var flooredPercentFloat = Math.floor((initialPercentFloat + Pervasives.epsilon_float) * 100) / 100;
+    var percentStr = flooredPercentFloat.toFixed(2);
     var percentFloat = parseFloat(percentStr);
     var displayDirection = percentFloat === 0 ? /* Same */2 : priceDirection;
     var match$4;
