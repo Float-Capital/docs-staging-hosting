@@ -17,3 +17,5 @@ let amountForApproval = amount =>
   } else {
     CONSTANTS.oneHundredThousandInWei
   }
+
+@val external parseFloat: string => float = "parseFloat"

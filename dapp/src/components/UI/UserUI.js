@@ -4,11 +4,13 @@
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Button = require("./Button.js");
+var Client = require("../../data/Client.js");
 var Config = require("../../Config.js");
 var Ethers = require("../../ethereum/Ethers.js");
 var Ethers$1 = require("ethers");
 var Globals = require("../../libraries/Globals.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
+var Queries = require("../../data/Queries.js");
 var Tooltip = require("./Tooltip.js");
 var Blockies = require("../../bindings/ethereum-blockies-base64/Blockies.js");
 var CONSTANTS = require("../../CONSTANTS.js");
@@ -16,6 +18,7 @@ var DataHooks = require("../../data/DataHooks.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var ClaimFloat = require("../Claim/ClaimFloat.js");
 var MiniLoader = require("./MiniLoader.js");
+var Pervasives = require("rescript/lib/js/pervasives.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var FormatMoney = require("./FormatMoney.js");
@@ -23,6 +26,7 @@ var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
 var AddToMetamask = require("./AddToMetamask.js");
 var InjectedEthereum = require("../../ethereum/InjectedEthereum.js");
+var MarketSimulation = require("../../libraries/MarketSimulation.js");
 var FromUnixTime = require("date-fns/fromUnixTime").default;
 var FormatDistanceToNow = require("date-fns/formatDistanceToNow").default;
 
@@ -280,18 +284,143 @@ var MetamaskMenu = {
   make: UserUI$MetamaskMenu
 };
 
+function getUnixTime(date) {
+  return date.getTime() / 1000 | 0;
+}
+
 function UserUI$UserMarketBox(Props) {
   var name = Props.name;
   var isLong = Props.isLong;
   var tokens = Props.tokens;
   var value = Props.value;
-  var tokenAddressOpt = Props.tokenAddress;
-  var metamaskMenuOpt = Props.metamaskMenu;
-  var symbolOpt = Props.symbol;
+  var $staropt$star = Props.tokenAddress;
+  var $staropt$star$1 = Props.metamaskMenu;
+  var $staropt$star$2 = Props.symbol;
+  var param = Props.metadata;
   var children = Props.children;
-  var tokenAddress = tokenAddressOpt !== undefined ? Caml_option.valFromOption(tokenAddressOpt) : CONSTANTS.zeroAddress;
-  var metamaskMenu = metamaskMenuOpt !== undefined ? metamaskMenuOpt : false;
-  var symbol = symbolOpt !== undefined ? symbolOpt : "";
+  var syntheticPrice = param.syntheticPrice;
+  var timestamp = param.timeLastUpdated;
+  var tokenAddress = $staropt$star !== undefined ? Caml_option.valFromOption($staropt$star) : CONSTANTS.zeroAddress;
+  var metamaskMenu = $staropt$star$1 !== undefined ? $staropt$star$1 : false;
+  var symbol = $staropt$star$2 !== undefined ? $staropt$star$2 : "";
+  var initialTokenPriceResponse = DataHooks.useTokenPriceAtTime(tokenAddress, timestamp);
+  var priceHistoryQuery = Curry.app(Queries.PriceHistory.use, [
+        undefined,
+        Caml_option.some(Client.createContext(/* PriceHistory */1)),
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          intervalId: Globals.ethAdrToLowerStr(param.oracleAddress) + "-" + String(CONSTANTS.fiveMinutesInSeconds),
+          numDataPoints: 1
+        }
+      ]);
+  var response = DataHooks.Util.queryToResponse(priceHistoryQuery);
+  var finalPriceResponse;
+  if (typeof response === "number") {
+    finalPriceResponse = /* Loading */0;
+  } else if (response.TAG === /* GraphError */0) {
+    finalPriceResponse = {
+      TAG: 0,
+      _0: response._0,
+      [Symbol.for("name")]: "GraphError"
+    };
+  } else {
+    var match = response._0.priceIntervalManager;
+    if (match !== undefined) {
+      var match$1 = match.prices;
+      if (match$1.length !== 1) {
+        finalPriceResponse = {
+          TAG: 0,
+          _0: "Unspecifed graph error",
+          [Symbol.for("name")]: "GraphError"
+        };
+      } else {
+        var match$2 = match$1[0];
+        finalPriceResponse = Ethers$1.BigNumber.from(match$2.startTimestamp.getTime() / 1000 | 0).gt(timestamp) ? ({
+              TAG: 1,
+              _0: MarketSimulation.simulateMarketPriceChange(syntheticPrice, match$2.endPrice, param.totalLockedLong, param.totalLockedShort, param.tokenSupply, isLong),
+              [Symbol.for("name")]: "Response"
+            }) : ({
+              TAG: 1,
+              _0: syntheticPrice,
+              [Symbol.for("name")]: "Response"
+            });
+      }
+    } else {
+      finalPriceResponse = {
+        TAG: 0,
+        _0: "Unspecifed graph error",
+        [Symbol.for("name")]: "GraphError"
+      };
+    }
+  }
+  var bothPrices = DataHooks.liftGraphResponse2(initialTokenPriceResponse, finalPriceResponse);
+  var tmp;
+  if (typeof bothPrices === "number") {
+    tmp = React.createElement(MiniLoader.make, {});
+  } else if (bothPrices.TAG === /* GraphError */0) {
+    tmp = "";
+  } else {
+    var match$3 = bothPrices._0;
+    var newPrice = match$3[1];
+    var oldPrice = match$3[0];
+    var priceDirection = newPrice.eq(oldPrice) ? /* Same */2 : (
+        newPrice.gt(oldPrice) ? /* Up */0 : /* Down */1
+      );
+    var diff;
+    switch (priceDirection) {
+      case /* Up */0 :
+          diff = newPrice.sub(oldPrice);
+          break;
+      case /* Down */1 :
+          diff = oldPrice.sub(newPrice);
+          break;
+      case /* Same */2 :
+          diff = CONSTANTS.zeroBN;
+          break;
+      
+    }
+    var initialPercentStr = Globals.percentStr(diff, oldPrice);
+    var initialPercentFloat = parseFloat(initialPercentStr);
+    var flooredPercentFloat = Math.floor((initialPercentFloat + Pervasives.epsilon_float) * 100) / 100;
+    var percentStr = flooredPercentFloat.toFixed(2);
+    var percentFloat = parseFloat(percentStr);
+    var displayDirection = percentFloat === 0 ? /* Same */2 : priceDirection;
+    var match$4;
+    switch (displayDirection) {
+      case /* Up */0 :
+          match$4 = [
+            "+",
+            "text-green-500"
+          ];
+          break;
+      case /* Down */1 :
+          match$4 = [
+            "-",
+            "text-red-500"
+          ];
+          break;
+      case /* Same */2 :
+          match$4 = [
+            "",
+            "text-gray-400"
+          ];
+          break;
+      
+    }
+    tmp = React.createElement("div", {
+          className: match$4[1]
+        }, match$4[0] + " " + percentStr + "%");
+  }
   return React.createElement("div", {
               className: "flex w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative"
             }, metamaskMenu ? React.createElement("div", {
@@ -307,7 +436,7 @@ function UserUI$UserMarketBox(Props) {
                       className: "mt-1"
                     }), isLong ? "Long↗️" : "Short↘️"), React.createElement("div", {
                   className: "w-1/3 text-sm mx-2 text-center self-center"
-                }, React.createElement("span", {
+                }, tmp, React.createElement("span", {
                       className: "text-sm"
                     }, tokens), React.createElement("span", {
                       className: "text-xs"
@@ -321,6 +450,7 @@ function UserUI$UserMarketBox(Props) {
 }
 
 var UserMarketBox = {
+  getUnixTime: getUnixTime,
   make: UserUI$UserMarketBox
 };
 
@@ -405,6 +535,24 @@ function UserUI$UserStakesCard(Props) {
         var tokens = FormatMoney.formatEther(undefined, stake.currentStake.amount);
         var isLong = syntheticToken.tokenType === "Long";
         var price = syntheticToken.latestPrice.price.price;
+        var match = syntheticToken.syntheticMarket;
+        var match$1 = match.latestSystemState;
+        var metadata_timeLastUpdated = stake.currentStake.timestamp;
+        var metadata_oracleAddress = match.oracleAddress;
+        var metadata_marketIndex = match.marketIndex;
+        var metadata_tokenSupply = syntheticToken.tokenSupply;
+        var metadata_totalLockedLong = match$1.totalLockedLong;
+        var metadata_totalLockedShort = match$1.totalLockedShort;
+        var metadata_syntheticPrice = match$1.syntheticPrice;
+        var metadata = {
+          timeLastUpdated: metadata_timeLastUpdated,
+          oracleAddress: metadata_oracleAddress,
+          marketIndex: metadata_marketIndex,
+          tokenSupply: metadata_tokenSupply,
+          totalLockedLong: metadata_totalLockedLong,
+          totalLockedShort: metadata_totalLockedShort,
+          syntheticPrice: metadata_syntheticPrice
+        };
         var whenStr = FormatDistanceToNow(FromUnixTime(stake.currentStake.timestamp.toNumber()));
         var value = stake.currentStake.amount.mul(price).div(CONSTANTS.tenToThe18);
         var creationTxHash = stake.currentStake.creationTxHash;
@@ -413,6 +561,8 @@ function UserUI$UserStakesCard(Props) {
                     isLong: isLong,
                     tokens: tokens,
                     value: FormatMoney.formatEther(undefined, value),
+                    tokenAddress: addr,
+                    metadata: metadata,
                     children: React.createElement(UserUI$UserMarketUnstake, {
                           synthAddress: addr,
                           userId: userId,

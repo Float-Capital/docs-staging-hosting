@@ -5,7 +5,8 @@ var Misc = require("../libraries/Misc.js");
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Client = require("./Client.js");
-var Ethers = require("ethers");
+var Ethers = require("../ethereum/Ethers.js");
+var Ethers$1 = require("ethers");
 var Globals = require("../libraries/Globals.js");
 var Queries = require("./Queries.js");
 var CONSTANTS = require("../CONSTANTS.js");
@@ -275,19 +276,30 @@ function useUsersBalances(userId) {
         }, (function (param, param$1) {
             var match = param$1.syntheticToken;
             var match$1 = match.syntheticMarket;
+            var match$2 = match$1.latestSystemState;
             var tokenBalance = param$1.tokenBalance;
             var isLong = match.tokenType === "Long";
-            var newToken_addr = Ethers.utils.getAddress(match.id);
+            var newToken_addr = Ethers$1.utils.getAddress(match.id);
             var newToken_name = match$1.name;
             var newToken_symbol = match$1.symbol;
             var newToken_tokensValue = match.latestPrice.price.price.mul(tokenBalance).div(CONSTANTS.tenToThe18);
+            var newToken_metadata = {
+              timeLastUpdated: param$1.timeLastUpdated,
+              oracleAddress: match$1.oracleAddress,
+              marketIndex: match$1.marketIndex,
+              tokenSupply: match.tokenSupply,
+              totalLockedLong: match$2.totalLockedLong,
+              totalLockedShort: match$2.totalLockedShort,
+              syntheticPrice: match$2.syntheticPrice
+            };
             var newToken = {
               addr: newToken_addr,
               name: newToken_name,
               symbol: newToken_symbol,
               isLong: isLong,
               tokenBalance: tokenBalance,
-              tokensValue: newToken_tokensValue
+              tokensValue: newToken_tokensValue,
+              metadata: newToken_metadata
             };
             return {
                     totalBalance: param.totalBalance.add(newToken_tokensValue),
@@ -530,6 +542,55 @@ function useSyntheticTokenBalanceOrZero(user, tokenAddress) {
   }
 }
 
+function useTokenPriceAtTime(tokenAddress, timestamp) {
+  var query = Curry.app(Queries.TokenPrice.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          tokenAddress: Ethers.Utils.ethAdrToLowerStr(tokenAddress),
+          timestamp: timestamp.toNumber()
+        }
+      ]);
+  var match = query.data;
+  if (match !== undefined) {
+    var match$1 = match.prices;
+    if (match$1.length !== 1) {
+      return {
+              TAG: 0,
+              _0: "Couldn't find price with that timestamp.",
+              [Symbol.for("name")]: "GraphError"
+            };
+    }
+    var match$2 = match$1[0];
+    return {
+            TAG: 1,
+            _0: match$2.price,
+            [Symbol.for("name")]: "Response"
+          };
+  }
+  var match$3 = query.error;
+  if (match$3 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$3.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
 function graphResponseToOption(maybeData) {
   if (typeof maybeData === "number" || maybeData.TAG === /* GraphError */0) {
     return ;
@@ -650,6 +711,7 @@ exports.useFloatBalancesForUser = useFloatBalancesForUser;
 exports.useBasicUserInfo = useBasicUserInfo;
 exports.useSyntheticTokenBalance = useSyntheticTokenBalance;
 exports.useSyntheticTokenBalanceOrZero = useSyntheticTokenBalanceOrZero;
+exports.useTokenPriceAtTime = useTokenPriceAtTime;
 exports.Util = Util;
 exports.useTokenMarketId = useTokenMarketId;
 /* Misc Not a pure module */

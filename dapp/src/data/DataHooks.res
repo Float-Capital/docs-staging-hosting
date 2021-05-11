@@ -119,6 +119,16 @@ let useStakesForUser = (~userId) => {
   }
 }
 
+type synthBalanceMetadata = {
+  timeLastUpdated: Ethers.BigNumber.t,
+  oracleAddress: Ethers.ethAddress,
+  marketIndex: Ethers.BigNumber.t,
+  tokenSupply: Ethers.BigNumber.t,
+  totalLockedLong: Ethers.BigNumber.t,
+  totalLockedShort: Ethers.BigNumber.t,
+  syntheticPrice: Ethers.BigNumber.t,
+}
+
 type userSynthBalance = {
   addr: Ethers.ethAddress,
   name: string,
@@ -126,6 +136,7 @@ type userSynthBalance = {
   isLong: bool,
   tokenBalance: Ethers.BigNumber.t,
   tokensValue: Ethers.BigNumber.t,
+  metadata: synthBalanceMetadata,
 }
 
 type usersBalanceSummary = {
@@ -143,10 +154,18 @@ let useUsersBalances = (~userId) => {
       {totalBalance, balances},
       {
         tokenBalance,
+        timeLastUpdated,
         syntheticToken: {
           id,
           tokenType,
-          syntheticMarket: {name, symbol},
+          tokenSupply,
+          syntheticMarket: {
+            name,
+            symbol,
+            oracleAddress,
+            marketIndex,
+            latestSystemState: {totalLockedLong, totalLockedShort, syntheticPrice},
+          },
           latestPrice: {price: {price}},
         },
       },
@@ -161,6 +180,15 @@ let useUsersBalances = (~userId) => {
         tokensValue: price
         ->Ethers.BigNumber.mul(tokenBalance)
         ->Ethers.BigNumber.div(CONSTANTS.tenToThe18),
+        metadata: {
+          timeLastUpdated: timeLastUpdated,
+          marketIndex: marketIndex,
+          oracleAddress: oracleAddress,
+          tokenSupply: tokenSupply,
+          totalLockedLong: totalLockedLong,
+          totalLockedShort: totalLockedShort,
+          syntheticPrice: syntheticPrice,
+        },
       }
       {
         totalBalance: totalBalance->Ethers.BigNumber.add(newToken.tokensValue),
@@ -270,6 +298,20 @@ let useSyntheticTokenBalanceOrZero = (~user, ~tokenAddress) => {
   switch syntheticBalanceQuery {
   | {data: Some({user: Some({tokenBalances: [{tokenBalance}]})})} => Response(tokenBalance)
   | {data: Some(_)} => Response(CONSTANTS.zeroBN)
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
+  }
+}
+
+let useTokenPriceAtTime = (~tokenAddress, ~timestamp) => {
+  let query = Queries.TokenPrice.use({
+    tokenAddress: tokenAddress->Ethers.Utils.ethAdrToLowerStr,
+    timestamp: timestamp->Ethers.BigNumber.toNumber,
+  })
+
+  switch query {
+  | {data: Some({prices: [{price}]})} => Response(price)
+  | {data: Some(_)} => GraphError(`Couldn't find price with that timestamp.`)
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
   }
