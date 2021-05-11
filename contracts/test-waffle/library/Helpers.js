@@ -54,27 +54,34 @@ function createSyntheticMarket(admin, longShort, fundToken, marketName, marketSy
                 Contract.YieldManagerMock.make(admin, longShort.address, fundToken.address)
               ]).then(function (param) {
               var yieldManager = param[1];
-              var oracleManager = param[0];
-              console.log("Got here at least");
               Contract.PaymentToken.grantMintRole(fundToken, yieldManager.address);
-              return longShort.newSyntheticMarket(marketName, marketSymbol, fundToken.address, oracleManager.address, yieldManager.address).then(function (param) {
-                          return longShort.latestMarket.call().then(function (nextMarketIndex) {
-                                      var marketIndex = nextMarketIndex - 1 | 0;
-                                      return Promise.all([
-                                                    longShort.longTokens.call(marketIndex),
-                                                    longShort.shortTokens.call(marketIndex)
-                                                  ]).then(function (param) {
-                                                  return {
-                                                          paymentToken: fundToken,
-                                                          oracleManager: oracleManager,
-                                                          yieldManager: yieldManager,
-                                                          longSynth: param[0],
-                                                          shortSynth: param[1],
-                                                          marketIndex: marketIndex
-                                                        };
-                                                });
-                                    });
-                        });
+              return longShort.newSyntheticMarket(marketName, marketSymbol, fundToken.address, param[0].address, yieldManager.address);
+            });
+}
+
+function getAllMarkets(longShort) {
+  return longShort.latestMarket().then(function (nextMarketIndex) {
+              var marketIndex = nextMarketIndex - 1 | 0;
+              return Promise.all(Belt_Array.map(Belt_Array.range(1, marketIndex), (function (marketIndex) {
+                                return Promise.all([
+                                              longShort.longTokens(marketIndex).then(Contract.SyntheticToken.at),
+                                              longShort.shortTokens(marketIndex).then(Contract.SyntheticToken.at),
+                                              longShort.fundTokens(marketIndex).then(Contract.PaymentToken.at),
+                                              longShort.oracleManagers(marketIndex).then(Contract.OracleManagerMock.at),
+                                              longShort.yieldManagers(marketIndex).then(Contract.YieldManagerMock.at)
+                                            ]).then(function (param) {
+                                            var oracleManager = param[3];
+                                            console.log("oracleManager", oracleManager);
+                                            return {
+                                                    paymentToken: param[2],
+                                                    oracleManager: oracleManager,
+                                                    yieldManager: param[4],
+                                                    longSynth: param[0],
+                                                    shortSynth: param[1],
+                                                    marketIndex: marketIndex
+                                                  };
+                                          });
+                              })));
             });
 }
 
@@ -107,13 +114,15 @@ function inititialize(admin) {
                                         ]).then(function (param) {
                                         console.log("will create the markets now!!!");
                                         return Promise.all(Belt_Array.mapWithIndex([
-                                                        payToken1,
-                                                        payToken1,
-                                                        payToken2,
-                                                        payToken1
-                                                      ], (function (index, paymentToken) {
-                                                          return createSyntheticMarket(admin.address, longShort, paymentToken, "Test Market " + String(index), "TM" + String(index));
-                                                        })));
+                                                          payToken1,
+                                                          payToken1,
+                                                          payToken2,
+                                                          payToken1
+                                                        ], (function (index, paymentToken) {
+                                                            return createSyntheticMarket(admin.address, longShort, paymentToken, "Test Market " + String(index), "TM" + String(index));
+                                                          }))).then(function (param) {
+                                                    return getAllMarkets(longShort);
+                                                  });
                                       }).then(function (markets) {
                                       return {
                                               tokenFactory: tokenFactory,
@@ -132,5 +141,6 @@ exports.mintAndStake = mintAndStake;
 exports.randomTokenAmount = randomTokenAmount;
 exports.randomMintLongShort = randomMintLongShort;
 exports.createSyntheticMarket = createSyntheticMarket;
+exports.getAllMarkets = getAllMarkets;
 exports.inititialize = inititialize;
 /* No side effect */

@@ -67,34 +67,44 @@ let createSyntheticMarket = (
     OracleManagerMock.make(admin),
     YieldManagerMock.make(admin, longShort.address, fundToken.address),
   ))->JsPromise.then(((oracleManager, yieldManager)) => {
-    Js.log("Got here at least")
     let _ignorePromise = fundToken->PaymentToken.grantMintRole(~user=yieldManager.address)
-    longShort
-    ->LongShort.newSyntheticMarket(
+    longShort->LongShort.newSyntheticMarket(
       ~marketName,
       ~marketSymbol,
       ~paymentToken=fundToken.address,
       ~oracleManager=oracleManager.address,
       ~yieldManager=yieldManager.address,
     )
-    ->JsPromise.then(_ => {
-      longShort
-      ->LongShort.latestMarket
-      ->JsPromise.then(nextMarketIndex => {
-        let marketIndex = nextMarketIndex - 1
-        JsPromise.all2((
-          longShort->LongShort.longSynth(~marketIndex),
-          longShort->LongShort.shortSynth(~marketIndex),
-        ))->JsPromise.map(((longSynth, shortSynth)) => {
+  })
+}
+
+let getAllMarkets = longShort => {
+  longShort
+  ->LongShort.latestMarket
+  ->JsPromise.then(nextMarketIndex => {
+    let marketIndex = nextMarketIndex - 1
+
+    Belt.Array.range(1, marketIndex)
+    ->Array.map(marketIndex =>
+      JsPromise.all5((
+        longShort->LongShort.longSynth(~marketIndex)->JsPromise.then(SyntheticToken.at),
+        longShort->LongShort.shortSynth(~marketIndex)->JsPromise.then(SyntheticToken.at),
+        longShort->LongShort.fundTokens(~marketIndex)->JsPromise.then(PaymentToken.at),
+        longShort->LongShort.oracleManagers(~marketIndex)->JsPromise.then(OracleManagerMock.at),
+        longShort->LongShort.yieldManagers(~marketIndex)->JsPromise.then(YieldManagerMock.at),
+      ))->JsPromise.map(((longSynth, shortSynth, fundToken, oracleManager, yieldManager)) => {
+        Js.log2("oracleManager", oracleManager)
+        {
           paymentToken: fundToken,
           oracleManager: oracleManager,
           yieldManager: yieldManager,
           longSynth: longSynth,
           shortSynth: shortSynth,
           marketIndex: marketIndex,
-        })
+        }
       })
-    })
+    )
+    ->JsPromise.all
   })
 }
 
@@ -119,13 +129,13 @@ let inititialize = (~admin: Ethers.Wallet.t) => {
   )) => {
     TokenFactory.make(admin.address, longShort.address)->JsPromise.then(tokenFactory => {
       JsPromise.all4((
-        floatToken->FloatToken.setup("Float token", "FLOAT TOKEN", staker.address),
+        floatToken->FloatToken.setup("Float token", "FLOAT TOKEN", staker->Staker.address),
         treasury->Treasury_v0.setup(admin.address),
         longShort->LongShort.setup(
           admin.address,
           treasury.address,
           tokenFactory.address,
-          staker.address,
+          staker->Staker.address,
         ),
         staker->Staker.setup(
           admin.address,
@@ -137,7 +147,7 @@ let inititialize = (~admin: Ethers.Wallet.t) => {
       ->JsPromise.then(_ => {
         Js.log("will create the markets now!!!")
         [payToken1, payToken1, payToken2, payToken1]
-        ->Array.mapWithIndex((index, paymentToken) =>
+        ->Array.mapWithIndex((index, paymentToken) => {
           createSyntheticMarket(
             ~admin=admin.address,
             ~longShort,
@@ -145,8 +155,11 @@ let inititialize = (~admin: Ethers.Wallet.t) => {
             ~marketName=`Test Market ${index->Int.toString}`,
             ~marketSymbol=`TM${index->Int.toString}`,
           )
-        )
+        })
         ->JsPromise.all
+        ->JsPromise.then(_ => {
+          longShort->getAllMarkets
+        })
       })
       ->JsPromise.map(markets => {
         staker: staker,

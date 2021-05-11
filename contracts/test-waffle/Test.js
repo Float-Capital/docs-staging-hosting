@@ -4,6 +4,7 @@
 var Chai = require("./bindings/chai/Chai.js");
 var Curry = require("rescript/lib/js/curry.js");
 var Helpers = require("./library/Helpers.js");
+var Contract = require("./library/Contract.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Async$BsMocha = require("bs-mocha/src/Async.js");
 var Mocha$BsMocha = require("bs-mocha/src/Mocha.js");
@@ -33,35 +34,56 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                       return Async$BsMocha.it("Two numbers are equal")(undefined, undefined, undefined, (function (done) {
                                     var match = contracts.contents;
                                     var longShort = match.longShort;
+                                    var staker = match.staker;
                                     var testUser = accounts.contents[1];
-                                    Promise.all(Belt_Array.mapWithIndex(Belt_Array.map(match.markets, (function (param) {
+                                    var synthsUserHasStaked = {
+                                      contents: []
+                                    };
+                                    var marketsUserHasStakedIn = {
+                                      contents: []
+                                    };
+                                    Promise.all(Belt_Array.map(Belt_Array.map(match.markets, (function (market) {
                                                         return [
-                                                                param.paymentToken,
+                                                                market,
                                                                 Helpers.randomMintLongShort(undefined)
                                                               ];
-                                                      })), (function (marketIndex, param) {
+                                                      })), (function (param) {
                                                     var toMint = param[1];
-                                                    var paymentToken = param[0];
+                                                    var match = param[0];
+                                                    var marketIndex = match.marketIndex;
+                                                    var shortSynth = match.shortSynth;
+                                                    var paymentToken = match.paymentToken;
+                                                    console.log("Setting up stakes");
                                                     var mintStake = function (param) {
                                                       return function (param$1) {
                                                         return Helpers.mintAndStake(marketIndex, param, paymentToken, testUser, longShort, param$1);
                                                       };
                                                     };
+                                                    marketsUserHasStakedIn.contents = Belt_Array.concat(marketsUserHasStakedIn.contents, [marketIndex]);
                                                     switch (toMint.TAG | 0) {
                                                       case /* Long */0 :
+                                                          synthsUserHasStaked.contents = Belt_Array.concat(synthsUserHasStaked.contents, [match.longSynth]);
                                                           return mintStake(toMint._0)(true);
                                                       case /* Short */1 :
+                                                          synthsUserHasStaked.contents = Belt_Array.concat(synthsUserHasStaked.contents, [shortSynth]);
                                                           return mintStake(toMint._0)(false);
                                                       case /* Both */2 :
                                                           var shortAmount = toMint._1;
+                                                          synthsUserHasStaked.contents = Belt_Array.concat(synthsUserHasStaked.contents, [
+                                                                shortSynth,
+                                                                shortSynth
+                                                              ]);
                                                           return mintStake(toMint._0)(true).then(function (param) {
                                                                       return mintStake(shortAmount)(false);
                                                                     });
                                                       
                                                     }
                                                   }))).then(function (param) {
-                                            
+                                            console.log("Claiming float!");
+                                            console.log(marketsUserHasStakedIn.contents);
+                                            return Contract.Staker.claimFloatCustomUser(staker, testUser, synthsUserHasStaked.contents, marketsUserHasStakedIn.contents);
                                           }).then(function (param) {
+                                          console.log("got this far");
                                           Chai.bnEqual(ethers.BigNumber.from(1), ethers.BigNumber.from("1"));
                                           Chai.bnCloseTo(ethers.BigNumber.from(1), ethers.BigNumber.from("5"), 4);
                                           Chai.bnWithin(ethers.BigNumber.from(1), ethers.BigNumber.from("0"), ethers.BigNumber.from(2));

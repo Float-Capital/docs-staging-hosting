@@ -1,1 +1,13 @@
-@module("synchronized-promise") external await: JsPromise.t<'a> => 'a = "default"
+let await = %raw(`(asyncFunction) => {
+  let result = null;
+  let waiting = true;
+  asyncFunction().then((asyncResult) => {
+    result = asyncResult
+    waiting = false
+  })
+
+  while (waiting) {
+  }
+  return result
+}
+`)

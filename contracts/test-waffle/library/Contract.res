@@ -6,6 +6,9 @@ type transaction = unit // TODO: make this better
 
 @val @scope("ethers")
 external getContractFactory: string => JsPromise.t<contractFactory> = "getContractFactory"
+@send
+external attachAtAddress: (contractFactory, ~contractAddress: Ethers.ethAddress) => JsPromise.t<t> =
+  "attach"
 @send external deploy: contractFactory => JsPromise.t<t> = "deploy"
 @send external deploy1: (contractFactory, 'a) => JsPromise.t<t> = "deploy"
 @send external deploy2: (contractFactory, 'a, 'b) => JsPromise.t<t> = "deploy"
@@ -14,6 +17,9 @@ external getContractFactory: string => JsPromise.t<contractFactory> = "getContra
 
 @send external deployed: t => JsPromise.t<unit> = "deployed"
 
+let attachToContract = (contractName, ~contractAddress) => {
+  getContractFactory(contractName)->JsPromise.then(attachAtAddress(~contractAddress))
+}
 let deployContract = contractName => {
   getContractFactory(contractName)->JsPromise.then(deploy)->JsPromise.then(deployed)
 }
@@ -37,121 +43,14 @@ module SyntheticToken = {
   type t = {address: Ethers.ethAddress}
   let contractName = "SyntheticToken"
 
+  let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
+    attachToContract(contractName, ~contractAddress)->Obj.magic
+
   @send
   external setup: (t, string, string, Ethers.ethAddress) => JsPromise.t<transaction> = "stake"
 }
 
-module LongShort = {
-  type t = {address: Ethers.ethAddress}
-  let contractName = "LongShort"
-
-  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
-
-  @send
-  external setup: (
-    t,
-    Ethers.ethAddress,
-    Ethers.ethAddress,
-    Ethers.ethAddress,
-    Ethers.ethAddress,
-  ) => JsPromise.t<transaction> = "initialize"
-  @send
-  external newSyntheticMarket: (
-    t,
-    ~marketName: string,
-    ~marketSymbol: string,
-    ~paymentToken: Ethers.ethAddress,
-    ~oracleManager: Ethers.ethAddress,
-    ~yieldManager: Ethers.ethAddress,
-  ) => JsPromise.t<transaction> = "newSyntheticMarket"
-
-  @send @scope("fundTokens")
-  external fundTokenAddress: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "call"
-
-  @send @scope("longTokens")
-  external longSynth: (t, ~marketIndex: int) => JsPromise.t<SyntheticToken.t> = "call"
-  @send @scope("shortTokens")
-  external shortSynth: (t, ~marketIndex: int) => JsPromise.t<SyntheticToken.t> = "call"
-
-  @send @scope("latestMarket")
-  external latestMarket: t => JsPromise.t<int> = "call"
-
-  @send
-  external mintLongAndStake: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "mintLongAndStake"
-  @send
-  external mintShortAndStake: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "mintShortAndStake"
-}
-
-module YieldManagerMock = {
-  type t = {address: Ethers.ethAddress}
-  let contractName = "YieldManagerMock"
-
-  let make: (Ethers.ethAddress, Ethers.ethAddress, Ethers.ethAddress) => JsPromise.t<t> = (
-    admin,
-    longShortAddress,
-    fundTokenAddress,
-  ) => deployContract3(contractName, admin, longShortAddress, fundTokenAddress)->Obj.magic
-}
-
-module OracleManagerMock = {
-  type t = {address: Ethers.ethAddress}
-  let contractName = "OracleManagerMock"
-
-  let make: Ethers.ethAddress => JsPromise.t<t> = admin =>
-    deployContract1(contractName, admin)->Obj.magic
-}
-
-module GenericErc20 = {
-  type t = {address: Ethers.ethAddress}
-  let contractName = "ERC20PresetMinterPauserUpgradeable"
-
-  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
-}
-
-module TokenFactory = {
-  type t = {address: Ethers.ethAddress}
-  let contractName = "TokenFactory"
-
-  let make: (Ethers.ethAddress, Ethers.ethAddress) => JsPromise.t<t> = (admin, longShort) =>
-    deployContract2(contractName, admin, longShort)->Obj.magic
-}
-
-module Staker = {
-  type t = {address: Ethers.ethAddress}
-  let contractName = "Staker"
-
-  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
-
-  @send
-  external setup: (
-    t,
-    Ethers.ethAddress,
-    Ethers.ethAddress,
-    Ethers.ethAddress,
-    Ethers.ethAddress,
-  ) => JsPromise.t<transaction> = "initialize"
-}
-
-module FloatToken = {
-  type t = {address: Ethers.ethAddress}
-  let contractName = "FloatToken"
-
-  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
-
-  @send
-  external setup: (t, string, string, Ethers.ethAddress) => JsPromise.t<transaction> =
-    "initialize(string,string,address)"
-
-  // "claimFloatCustom"
-}
+type staker
 
 module PaymentToken = {
   type t = {address: Ethers.ethAddress}
@@ -159,6 +58,8 @@ module PaymentToken = {
 
   let make: (~name: string, ~symbol: string) => JsPromise.t<t> = (~name, ~symbol) =>
     deployContract2(contractName, name, symbol)->Obj.magic
+  let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
+    attachToContract(contractName, ~contractAddress)->Obj.magic
 
   @send @scope(`MINTER_ROLE`)
   external getMintRole: t => JsPromise.t<bytes32> = "call"
@@ -191,6 +92,153 @@ module PaymentToken = {
     })
 }
 
+module YieldManagerMock = {
+  type t = {address: Ethers.ethAddress}
+  let contractName = "YieldManagerMock"
+
+  let make: (Ethers.ethAddress, Ethers.ethAddress, Ethers.ethAddress) => JsPromise.t<t> = (
+    admin,
+    longShortAddress,
+    fundTokenAddress,
+  ) => deployContract3(contractName, admin, longShortAddress, fundTokenAddress)->Obj.magic
+  let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
+    attachToContract(contractName, ~contractAddress)->Obj.magic
+}
+
+module OracleManagerMock = {
+  type t = {address: Ethers.ethAddress}
+  let contractName = "OracleManagerMock"
+
+  let make: Ethers.ethAddress => JsPromise.t<t> = admin =>
+    deployContract1(contractName, admin)->Obj.magic
+  let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
+    attachToContract(contractName, ~contractAddress)->Obj.magic
+}
+
+module LongShort = {
+  type t = {address: Ethers.ethAddress}
+  let contractName = "LongShort"
+
+  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
+
+  @send
+  external setup: (
+    t,
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+  ) => JsPromise.t<transaction> = "initialize"
+  @send
+  external newSyntheticMarket: (
+    t,
+    ~marketName: string,
+    ~marketSymbol: string,
+    ~paymentToken: Ethers.ethAddress,
+    ~oracleManager: Ethers.ethAddress,
+    ~yieldManager: Ethers.ethAddress,
+  ) => JsPromise.t<transaction> = "newSyntheticMarket"
+
+  @send
+  external fundTokens: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "fundTokens"
+
+  @send
+  external longSynth: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "longTokens"
+  @send
+  external shortSynth: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "shortTokens"
+  @send
+  external yieldManagers: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "yieldManagers"
+  @send
+  external oracleManagers: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> =
+    "oracleManagers"
+  @send
+  external staker: t => JsPromise.t<Ethers.ethAddress> = "staker"
+
+  @send
+  external latestMarket: t => JsPromise.t<int> = "latestMarket"
+
+  @send
+  external mintLongAndStake: (
+    t,
+    ~marketIndex: int,
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "mintLongAndStake"
+  @send
+  external mintShortAndStake: (
+    t,
+    ~marketIndex: int,
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "mintShortAndStake"
+}
+
+module GenericErc20 = {
+  type t = {address: Ethers.ethAddress}
+  let contractName = "ERC20PresetMinterPauserUpgradeable"
+
+  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
+}
+
+module TokenFactory = {
+  type t = {address: Ethers.ethAddress}
+  let contractName = "TokenFactory"
+
+  let make: (Ethers.ethAddress, Ethers.ethAddress) => JsPromise.t<t> = (admin, longShort) =>
+    deployContract2(contractName, admin, longShort)->Obj.magic
+}
+
+module Staker = {
+  type t = staker
+  @get external address: t => Ethers.ethAddress = "address"
+  let contractName = "Staker"
+
+  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
+  let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
+    attachToContract(contractName, ~contractAddress)->Obj.magic
+
+  @send
+  external setup: (
+    t,
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+  ) => JsPromise.t<transaction> = "initialize"
+
+  @send
+  external claimFloatCustom: (
+    t,
+    ~syntheticTokens: array<Ethers.ethAddress>,
+    ~markets: array<int>,
+  ) => JsPromise.t<transaction> = "claimFloatCustom"
+  let claimFloatCustomUser = (
+    staker,
+    ~user: Ethers.Wallet.t,
+    ~syntheticTokens: array<SyntheticToken.t>,
+    ~markets: array<int>,
+  ) =>
+    staker
+    ->attach(~address=user.address)
+    ->claimFloatCustom(
+      ~syntheticTokens=syntheticTokens->Array.map(synth => synth.address),
+      ~markets,
+    )
+
+  @send
+  external marketIndexOfToken: (t, ~syntheticToken: SyntheticToken.t) => JsPromise.t<int> =
+    "marketIndexOfToken"
+}
+
+module FloatToken = {
+  type t = {address: Ethers.ethAddress}
+  let contractName = "FloatToken"
+
+  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
+
+  @send
+  external setup: (t, string, string, Ethers.ethAddress) => JsPromise.t<transaction> =
+    "initialize(string,string,address)"
+}
+
 module FloatCapital_v0 = {
   type t = {address: Ethers.ethAddress}
   let contractName = "FloatCapital_v0"
@@ -205,4 +253,14 @@ module Treasury_v0 = {
   let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
 
   @send external setup: (t, Ethers.ethAddress) => JsPromise.t<transaction> = "initialize"
+}
+
+module DataFetchers = {
+  let marketIndexOfSynth = (longShort: LongShort.t, ~syntheticToken: SyntheticToken.t): JsPromise.t<
+    int,
+  > =>
+    longShort
+    ->LongShort.staker
+    ->JsPromise.then(Staker.at)
+    ->JsPromise.then(Staker.marketIndexOfToken(~syntheticToken))
 }

@@ -25,35 +25,52 @@ describe("Float System", () => {
     })
 
     it'("Two numbers are equal", done => {
-      let {longShort, markets} = contracts.contents
+      let {longShort, markets, staker} = contracts.contents
       let testUser = accounts.contents->Array.getUnsafe(1)
+      let synthsUserHasStaked = ref([])
+      let marketsUserHasStakedIn = ref([])
 
       let _testPromise =
         markets
-        ->Array.map(({paymentToken}) => {
-          (paymentToken, Helpers.randomMintLongShort())
+        ->Array.map(market => {
+          (market, Helpers.randomMintLongShort())
         })
-        ->Array.mapWithIndex((marketIndex, (paymentToken, toMint)) => {
+        ->Array.map((({paymentToken, longSynth, shortSynth, marketIndex}, toMint)) => {
+          Js.log("Setting up stakes")
           let mintStake = Helpers.mintAndStake(
             ~marketIndex,
             ~token=paymentToken,
             ~user=testUser,
             ~longShort,
           )
+          marketsUserHasStakedIn := marketsUserHasStakedIn.contents->Array.concat([marketIndex])
           switch toMint {
-          | Long(amount) => mintStake(~isLong=true, ~amount)
-          | Short(amount) => mintStake(~isLong=false, ~amount)
+          | Long(amount) =>
+            synthsUserHasStaked := synthsUserHasStaked.contents->Array.concat([longSynth])
+            mintStake(~isLong=true, ~amount)
+          | Short(amount) =>
+            synthsUserHasStaked := synthsUserHasStaked.contents->Array.concat([shortSynth])
+            mintStake(~isLong=false, ~amount)
           | Both(longAmount, shortAmount) =>
+            synthsUserHasStaked :=
+              synthsUserHasStaked.contents->Array.concat([shortSynth, shortSynth])
             mintStake(~isLong=true, ~amount=longAmount)->JsPromise.then(_ =>
               mintStake(~isLong=false, ~amount=shortAmount)
             )
           }
         })
         ->JsPromise.all
-        ->JsPromise.map(_ => {
-          ()
+        ->JsPromise.then(_ => {
+          Js.log("Claiming float!")
+          Js.log(marketsUserHasStakedIn.contents)
+          staker->Contract.Staker.claimFloatCustomUser(
+            ~user=testUser,
+            ~syntheticTokens=synthsUserHasStaked.contents,
+            ~markets=marketsUserHasStakedIn.contents,
+          )
         })
         ->JsPromise.map(_ => {
+          Js.log("got this far")
           Chai.bnEqual(Ethers.BigNumber.fromInt(1), Ethers.BigNumber.fromUnsafe("1"))
           Chai.bnCloseTo(Ethers.BigNumber.fromInt(1), Ethers.BigNumber.fromUnsafe("5"), ~distance=4)
           Chai.bnWithin(
