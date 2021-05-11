@@ -119,7 +119,7 @@ const topupBalanceIfLow = async (from, to) => {
   }
 };
 
-module.exports = async function (deployer, network, accounts) {
+module.exports = async function(deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
@@ -142,9 +142,30 @@ module.exports = async function (deployer, network, accounts) {
 
   const longShort = await LongShort.deployed();
   const staker = await Staker.deployed();
-  await deployTestMarket("ETH killers", "ETHK", longShort, token, admin, network);
-  await deployTestMarket("Placeholder Market 1", "PM1", longShort, token, admin, network);
-  await deployTestMarket("Placeholder Market 2", "PM2", longShort, token, admin, network);
+  await deployTestMarket(
+    "ETH killers",
+    "ETHK",
+    longShort,
+    token,
+    admin,
+    network
+  );
+  await deployTestMarket(
+    "Placeholder Market 1",
+    "PM1",
+    longShort,
+    token,
+    admin,
+    network
+  );
+  await deployTestMarket(
+    "Placeholder Market 2",
+    "PM2",
+    longShort,
+    token,
+    admin,
+    network
+  );
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
 
@@ -254,6 +275,8 @@ module.exports = async function (deployer, network, accounts) {
     // update system state and mint and stake again mint float
     await longShort._updateSystemState(marketIndex);
 
-    await staker.claimFloat([longAddress, shortAddress], { from: user3 });
+    await staker.claimFloatCustom([longAddress, shortAddress], [], {
+      from: user3,
+    });
   }
 };

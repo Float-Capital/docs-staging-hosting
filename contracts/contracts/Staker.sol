@@ -425,8 +425,7 @@ contract Staker is IStaker, Initializable {
         }
     }
 
-    function claimFloat(address[] calldata tokenAddresses) public {
-        require(tokenAddresses.length <= 15); // Set some limit on loop length
+    function _claimFloat(address[] calldata tokenAddresses) internal {
         uint256 floatTotal = 0;
         for (uint256 i = 0; i < tokenAddresses.length; i++) {
             uint256 floatToMint =
@@ -453,22 +452,23 @@ contract Staker is IStaker, Initializable {
         }
     }
 
-    // TODO: check if there is any gas benefit to this function over `claimFloatCustom`
+    // TODO: deprecate in the future...
     function claimFloatImmediately(address[] calldata tokenAddresses) external {
         for (uint256 i = 0; i < tokenAddresses.length; i++) {
             floatContract._updateSystemState(
                 marketIndexOfToken[tokenAddresses[i]]
             );
         }
-        claimFloat(tokenAddresses);
+        _claimFloat(tokenAddresses);
     }
 
     function claimFloatCustom(
         address[] calldata tokenAddresses,
         uint32[] calldata marketIndexes
     ) external {
+        require(tokenAddresses.length <= 10); // Set some limit on loop length
         floatContract._updateSystemStateMulti(marketIndexes);
-        claimFloat(tokenAddresses);
+        _claimFloat(tokenAddresses);
     }
 
     ////////////////////////////////////
