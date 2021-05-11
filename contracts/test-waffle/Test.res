@@ -1,7 +1,6 @@
 let {it: it', it_skip: it_skip', before_each, before} = module(BsMocha.Async)
 let {describe, it, it_skip} = module(BsMocha.Mocha)
 
-// let stakeFor5Users
 describe("Float System", () => {
   describe("Staking", () => {
     let contracts: ref<Helpers.coreContracts> = ref(None->Obj.magic)
@@ -24,7 +23,7 @@ describe("Float System", () => {
       })
     })
 
-    it'("Two numbers are equal", done => {
+    it'("should update correct markets in the 'claimFloatCustom' function", done => {
       let {longShort, markets, staker} = contracts.contents
       let testUser = accounts.contents->Array.getUnsafe(1)
       let synthsUserHasStaked = ref([])
@@ -36,7 +35,6 @@ describe("Float System", () => {
           (market, Helpers.randomMintLongShort())
         })
         ->Array.map((({paymentToken, longSynth, shortSynth, marketIndex}, toMint)) => {
-          Js.log("Setting up stakes")
           let mintStake = Helpers.mintAndStake(
             ~marketIndex,
             ~token=paymentToken,
@@ -61,8 +59,6 @@ describe("Float System", () => {
         })
         ->JsPromise.all
         ->JsPromise.then(_ => {
-          Js.log("Claiming float!")
-          Js.log(marketsUserHasStakedIn.contents)
           staker->Contract.Staker.claimFloatCustomUser(
             ~user=testUser,
             ~syntheticTokens=synthsUserHasStaked.contents,
@@ -70,15 +66,20 @@ describe("Float System", () => {
           )
         })
         ->JsPromise.map(_ => {
-          Js.log("got this far")
-          Chai.bnEqual(Ethers.BigNumber.fromInt(1), Ethers.BigNumber.fromUnsafe("1"))
-          Chai.bnCloseTo(Ethers.BigNumber.fromInt(1), Ethers.BigNumber.fromUnsafe("5"), ~distance=4)
-          Chai.bnWithin(
-            Ethers.BigNumber.fromInt(1),
-            ~min=Ethers.BigNumber.fromUnsafe("0"),
-            ~max=Ethers.BigNumber.fromInt(2),
-          )
-          done()
+          synthsUserHasStaked.contents
+          ->Array.map(synth => {
+            JsPromise.all2((
+              staker->Contract.Staker.userIndexOfLastClaimedReward(
+                ~synthTokenAddr=synth.address,
+                ~user=testUser.address,
+              ),
+              staker->Contract.Staker.latestRewardIndex(~synthTokenAddr=synth.address),
+            ))->JsPromise.map(((userLastClaimed, latestRewardIndex)) =>
+              Chai.bnEqual(userLastClaimed, latestRewardIndex)
+            )
+          })
+          ->JsPromise.all
+          ->JsPromise.map(_ => done())
         })
     })
   })

@@ -93,7 +93,6 @@ let getAllMarkets = longShort => {
         longShort->LongShort.oracleManagers(~marketIndex)->JsPromise.then(OracleManagerMock.at),
         longShort->LongShort.yieldManagers(~marketIndex)->JsPromise.then(YieldManagerMock.at),
       ))->JsPromise.map(((longSynth, shortSynth, fundToken, oracleManager, yieldManager)) => {
-        Js.log2("oracleManager", oracleManager)
         {
           paymentToken: fundToken,
           oracleManager: oracleManager,
@@ -145,7 +144,6 @@ let inititialize = (~admin: Ethers.Wallet.t) => {
         ),
       ))
       ->JsPromise.then(_ => {
-        Js.log("will create the markets now!!!")
         [payToken1, payToken1, payToken2, payToken1]
         ->Array.mapWithIndex((index, paymentToken) => {
           createSyntheticMarket(

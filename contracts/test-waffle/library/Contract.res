@@ -226,6 +226,17 @@ module Staker = {
   @send
   external marketIndexOfToken: (t, ~syntheticToken: SyntheticToken.t) => JsPromise.t<int> =
     "marketIndexOfToken"
+  @send
+  external userIndexOfLastClaimedReward: (
+    t,
+    ~synthTokenAddr: Ethers.ethAddress,
+    ~user: Ethers.ethAddress,
+  ) => JsPromise.t<Ethers.BigNumber.t> = "userIndexOfLastClaimedReward"
+  @send
+  external latestRewardIndex: (
+    t,
+    ~synthTokenAddr: Ethers.ethAddress,
+  ) => JsPromise.t<Ethers.BigNumber.t> = "latestRewardIndex"
 }
 
 module FloatToken = {

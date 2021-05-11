@@ -31,7 +31,7 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                                   });
                               
                             }));
-                      return Async$BsMocha.it("Two numbers are equal")(undefined, undefined, undefined, (function (done) {
+                      return Async$BsMocha.it("should update correct markets in the 'claimFloatCustom' function")(undefined, undefined, undefined, (function (done) {
                                     var match = contracts.contents;
                                     var longShort = match.longShort;
                                     var staker = match.staker;
@@ -53,7 +53,6 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                                                     var marketIndex = match.marketIndex;
                                                     var shortSynth = match.shortSynth;
                                                     var paymentToken = match.paymentToken;
-                                                    console.log("Setting up stakes");
                                                     var mintStake = function (param) {
                                                       return function (param$1) {
                                                         return Helpers.mintAndStake(marketIndex, param, paymentToken, testUser, longShort, param$1);
@@ -79,15 +78,18 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                                                       
                                                     }
                                                   }))).then(function (param) {
-                                            console.log("Claiming float!");
-                                            console.log(marketsUserHasStakedIn.contents);
                                             return Contract.Staker.claimFloatCustomUser(staker, testUser, synthsUserHasStaked.contents, marketsUserHasStakedIn.contents);
                                           }).then(function (param) {
-                                          console.log("got this far");
-                                          Chai.bnEqual(ethers.BigNumber.from(1), ethers.BigNumber.from("1"));
-                                          Chai.bnCloseTo(ethers.BigNumber.from(1), ethers.BigNumber.from("5"), 4);
-                                          Chai.bnWithin(ethers.BigNumber.from(1), ethers.BigNumber.from("0"), ethers.BigNumber.from(2));
-                                          return Curry._2(done, undefined, undefined);
+                                          return Promise.all(Belt_Array.map(synthsUserHasStaked.contents, (function (synth) {
+                                                              return Promise.all([
+                                                                            staker.userIndexOfLastClaimedReward(synth.address, testUser.address),
+                                                                            staker.latestRewardIndex(synth.address)
+                                                                          ]).then(function (param) {
+                                                                          return Chai.bnEqual(param[0], param[1]);
+                                                                        });
+                                                            }))).then(function (param) {
+                                                      return Curry._2(done, undefined, undefined);
+                                                    });
                                         });
                                     
                                   }));

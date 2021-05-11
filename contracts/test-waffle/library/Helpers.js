@@ -70,11 +70,9 @@ function getAllMarkets(longShort) {
                                               longShort.oracleManagers(marketIndex).then(Contract.OracleManagerMock.at),
                                               longShort.yieldManagers(marketIndex).then(Contract.YieldManagerMock.at)
                                             ]).then(function (param) {
-                                            var oracleManager = param[3];
-                                            console.log("oracleManager", oracleManager);
                                             return {
                                                     paymentToken: param[2],
-                                                    oracleManager: oracleManager,
+                                                    oracleManager: param[3],
                                                     yieldManager: param[4],
                                                     longSynth: param[0],
                                                     shortSynth: param[1],
@@ -112,7 +110,6 @@ function inititialize(admin) {
                                           longShort.initialize(admin.address, treasury.address, tokenFactory.address, staker.address),
                                           staker.initialize(admin.address, longShort.address, floatToken.address, floatCapital.address)
                                         ]).then(function (param) {
-                                        console.log("will create the markets now!!!");
                                         return Promise.all(Belt_Array.mapWithIndex([
                                                           payToken1,
                                                           payToken1,
