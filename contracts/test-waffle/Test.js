@@ -4,25 +4,94 @@
 var Chai = require("./bindings/chai/Chai.js");
 var Curry = require("rescript/lib/js/curry.js");
 var Helpers = require("./library/Helpers.js");
+var Contract = require("./library/Contract.js");
+var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Async$BsMocha = require("bs-mocha/src/Async.js");
 var Mocha$BsMocha = require("bs-mocha/src/Mocha.js");
 
 Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (function (param) {
-        return Mocha$BsMocha.describe("List.map")(undefined, undefined, undefined, (function (param) {
-                      Async$BsMocha.before_each(undefined, undefined, undefined, undefined, (function (done) {
-                              Helpers.inititialize(undefined).then(function (param) {
+        return Mocha$BsMocha.describe("Staking")(undefined, undefined, undefined, (function (param) {
+                      var contracts = {
+                        contents: undefined
+                      };
+                      var accounts = {
+                        contents: undefined
+                      };
+                      Async$BsMocha.before(undefined, undefined, undefined, undefined, (function (done) {
+                              ethers.getSigners().then(function (loadedAccounts) {
+                                    accounts.contents = loadedAccounts;
                                     return Curry._2(done, undefined, undefined);
                                   });
                               
                             }));
-                      Mocha$BsMocha.it("it worked")(undefined, undefined, undefined, (function (param) {
-                              console.log("It worked, yay");
+                      Async$BsMocha.before_each(undefined, undefined, undefined, undefined, (function (done) {
+                              Helpers.inititialize(accounts.contents[0]).then(function (deployedContracts) {
+                                    contracts.contents = deployedContracts;
+                                    return Curry._2(done, undefined, undefined);
+                                  });
                               
                             }));
-                      return Mocha$BsMocha.it("Two numbers are equal")(undefined, undefined, undefined, (function (param) {
-                                    Chai.bnEqual(ethers.BigNumber.from(1), ethers.BigNumber.from("1"));
-                                    Chai.bnCloseTo(ethers.BigNumber.from(1), ethers.BigNumber.from("5"), 4);
-                                    return Chai.bnWithin(ethers.BigNumber.from(1), ethers.BigNumber.from("0"), ethers.BigNumber.from(2));
+                      return Async$BsMocha.it("should update correct markets in the 'claimFloatCustom' function")(undefined, undefined, undefined, (function (done) {
+                                    var match = contracts.contents;
+                                    var longShort = match.longShort;
+                                    var staker = match.staker;
+                                    var testUser = accounts.contents[1];
+                                    var synthsUserHasStaked = {
+                                      contents: []
+                                    };
+                                    var marketsUserHasStakedIn = {
+                                      contents: []
+                                    };
+                                    Promise.all(Belt_Array.map(Belt_Array.map(match.markets, (function (market) {
+                                                        return [
+                                                                market,
+                                                                Helpers.randomMintLongShort(undefined)
+                                                              ];
+                                                      })), (function (param) {
+                                                    var toMint = param[1];
+                                                    var match = param[0];
+                                                    var marketIndex = match.marketIndex;
+                                                    var shortSynth = match.shortSynth;
+                                                    var paymentToken = match.paymentToken;
+                                                    var mintStake = function (param) {
+                                                      return function (param$1) {
+                                                        return Helpers.mintAndStake(marketIndex, param, paymentToken, testUser, longShort, param$1);
+                                                      };
+                                                    };
+                                                    marketsUserHasStakedIn.contents = Belt_Array.concat(marketsUserHasStakedIn.contents, [marketIndex]);
+                                                    switch (toMint.TAG | 0) {
+                                                      case /* Long */0 :
+                                                          synthsUserHasStaked.contents = Belt_Array.concat(synthsUserHasStaked.contents, [match.longSynth]);
+                                                          return mintStake(toMint._0)(true);
+                                                      case /* Short */1 :
+                                                          synthsUserHasStaked.contents = Belt_Array.concat(synthsUserHasStaked.contents, [shortSynth]);
+                                                          return mintStake(toMint._0)(false);
+                                                      case /* Both */2 :
+                                                          var shortAmount = toMint._1;
+                                                          synthsUserHasStaked.contents = Belt_Array.concat(synthsUserHasStaked.contents, [
+                                                                shortSynth,
+                                                                shortSynth
+                                                              ]);
+                                                          return mintStake(toMint._0)(true).then(function (param) {
+                                                                      return mintStake(shortAmount)(false);
+                                                                    });
+                                                      
+                                                    }
+                                                  }))).then(function (param) {
+                                            return Contract.Staker.claimFloatCustomUser(staker, testUser, synthsUserHasStaked.contents, marketsUserHasStakedIn.contents);
+                                          }).then(function (param) {
+                                          return Promise.all(Belt_Array.map(synthsUserHasStaked.contents, (function (synth) {
+                                                              return Promise.all([
+                                                                            staker.userIndexOfLastClaimedReward(synth.address, testUser.address),
+                                                                            staker.latestRewardIndex(synth.address)
+                                                                          ]).then(function (param) {
+                                                                          return Chai.bnEqual(param[0], param[1]);
+                                                                        });
+                                                            }))).then(function (param) {
+                                                      return Curry._2(done, undefined, undefined);
+                                                    });
+                                        });
+                                    
                                   }));
                     }));
       }));
@@ -33,6 +102,8 @@ var it_skip$p = Async$BsMocha.it_skip;
 
 var before_each = Async$BsMocha.before_each;
 
+var before = Async$BsMocha.before;
+
 var describe = Mocha$BsMocha.describe;
 
 var it = Mocha$BsMocha.it;
@@ -42,6 +113,7 @@ var it_skip = Mocha$BsMocha.it_skip;
 exports.it$p = it$p;
 exports.it_skip$p = it_skip$p;
 exports.before_each = before_each;
+exports.before = before;
 exports.describe = describe;
 exports.it = it;
 exports.it_skip = it_skip;

@@ -2,8 +2,7 @@
 
 pragma solidity 0.8.3;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 
 import "../interfaces/IYieldManager.sol";
 
@@ -12,7 +11,7 @@ import "../interfaces/IYieldManager.sol";
  * configurable, deterministic token yields for testing. Note that the mock
  * needs to be able to mint the underlying token to simulate yield.
  */
-contract YieldManagerMock is IYieldManager, Initializable {
+contract YieldManagerMock is IYieldManager {
     // Admin contracts.
     address public admin;
     address public longShort;
@@ -21,7 +20,7 @@ contract YieldManagerMock is IYieldManager, Initializable {
     uint256 public constant yieldScale = 1e18;
 
     // Global state.
-    ERC20PresetMinterPauserUpgradeable public token;
+    ERC20PresetMinterPauser public token;
     uint256 public totalHeld;
     uint256 public yieldRate; // pcnt per sec
     uint256 public lastSettled; // secs after epoch
@@ -44,17 +43,17 @@ contract YieldManagerMock is IYieldManager, Initializable {
     ///// CONTRACT SET-UP //////////////
     ////////////////////////////////////
 
-    function setup(
+    constructor(
         address _admin,
         address _longShort,
         address _token
-    ) public initializer {
+    ) {
         // Admin contracts.
         admin = _admin;
         longShort = _longShort;
 
         // Global state.
-        token = ERC20PresetMinterPauserUpgradeable(_token);
+        token = ERC20PresetMinterPauser(_token);
         lastSettled = block.timestamp;
     }
 
