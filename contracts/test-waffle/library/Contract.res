@@ -31,6 +31,8 @@ let deployContract3 = (contractName, firstParam, secondParam, thirdParam) => {
   ->JsPromise.then(deployed)
 }
 
+@send external attach: ('contract, ~address: Ethers.ethAddress) => 'contract = "attach"
+
 module LongShort = {
   type t = {address: Ethers.ethAddress}
   let contractName = "LongShort"
@@ -54,6 +56,22 @@ module LongShort = {
     ~oracleManager: Ethers.ethAddress,
     ~yieldManager: Ethers.ethAddress,
   ) => JsPromise.t<transaction> = "newSyntheticMarket"
+
+  @send @scope("fundTokens")
+  external fundTokenAddress: (t, ~marketName: string) => JsPromise.t<Ethers.ethAddress> = "call"
+
+  @send
+  external mintLongAndStake: (
+    t,
+    ~marketIndex: int,
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "mintLongAndStake"
+  @send
+  external mintShortAndStake: (
+    t,
+    ~marketIndex: int,
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "mintShortAndStake"
 }
 
 module YieldManagerMock = {
@@ -139,6 +157,27 @@ module PaymentToken = {
 
   let grantMintRole = (t, ~user) =>
     t->getMintRole->JsPromise.then(minterRole => t->grantRole(~minterRole, ~user))
+
+  @send
+  external mint: (t, ~user: Ethers.ethAddress, ~amount: Ethers.BigNumber.t) => JsPromise.t<unit> =
+    "mint"
+  @send
+  external approve: (
+    t,
+    ~spender: Ethers.ethAddress,
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<unit> = "approve"
+  let mintAndApprove = (
+    t,
+    ~user: Ethers.ethAddress,
+    ~amount: Ethers.BigNumber.t,
+    ~spender: Ethers.ethAddress,
+  ) =>
+    t
+    ->mint(~amount, ~user)
+    ->JsPromise.then(_ => {
+      t->attach(~address=user)->approve(~amount, ~spender)
+    })
 }
 
 module FloatCapital_v0 = {

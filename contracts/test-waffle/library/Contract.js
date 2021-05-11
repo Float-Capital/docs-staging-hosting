@@ -134,10 +134,17 @@ function grantMintRole(t, user) {
             });
 }
 
+function mintAndApprove(t, user, amount, spender) {
+  return t.mint(user, amount).then(function (param) {
+              return t.attach(user).approve(spender, amount);
+            });
+}
+
 var PaymentToken = {
   contractName: contractName$8,
   make: make$8,
-  grantMintRole: grantMintRole
+  grantMintRole: grantMintRole,
+  mintAndApprove: mintAndApprove
 };
 
 var contractName$9 = "FloatCapital_v0";

@@ -4,6 +4,7 @@
 var Chai = require("./bindings/chai/Chai.js");
 var Curry = require("rescript/lib/js/curry.js");
 var Helpers = require("./library/Helpers.js");
+var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Async$BsMocha = require("bs-mocha/src/Async.js");
 var Mocha$BsMocha = require("bs-mocha/src/Mocha.js");
 
@@ -29,11 +30,45 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                                   });
                               
                             }));
-                      return Mocha$BsMocha.it("Two numbers are equal")(undefined, undefined, undefined, (function (param) {
+                      return Async$BsMocha.it("Two numbers are equal")(undefined, undefined, undefined, (function (done) {
                                     console.log("The loaded accounts", accounts.contents);
-                                    Chai.bnEqual(ethers.BigNumber.from(1), ethers.BigNumber.from("1"));
-                                    Chai.bnCloseTo(ethers.BigNumber.from(1), ethers.BigNumber.from("5"), 4);
-                                    return Chai.bnWithin(ethers.BigNumber.from(1), ethers.BigNumber.from("0"), ethers.BigNumber.from(2));
+                                    var match = contracts.contents;
+                                    var longShort = match.longShort;
+                                    var testUser = accounts.contents[1];
+                                    Promise.all(Belt_Array.mapWithIndex(Belt_Array.map(match.markets, (function (param) {
+                                                        return [
+                                                                param.paymentToken,
+                                                                Helpers.randomMintLongShort(undefined)
+                                                              ];
+                                                      })), (function (marketIndex, param) {
+                                                    var toMint = param[1];
+                                                    var paymentToken = param[0];
+                                                    var mintStake = function (param) {
+                                                      return function (param$1) {
+                                                        return Helpers.mintAndStake(marketIndex, param, paymentToken, testUser, longShort, param$1);
+                                                      };
+                                                    };
+                                                    switch (toMint.TAG | 0) {
+                                                      case /* Long */0 :
+                                                          return mintStake(toMint._0)(true);
+                                                      case /* Short */1 :
+                                                          return mintStake(toMint._0)(false);
+                                                      case /* Both */2 :
+                                                          var shortAmount = toMint._1;
+                                                          return mintStake(toMint._0)(true).then(function (param) {
+                                                                      return mintStake(shortAmount)(false);
+                                                                    });
+                                                      
+                                                    }
+                                                  }))).then(function (param) {
+                                            
+                                          }).then(function (param) {
+                                          Chai.bnEqual(ethers.BigNumber.from(1), ethers.BigNumber.from("1"));
+                                          Chai.bnCloseTo(ethers.BigNumber.from(1), ethers.BigNumber.from("5"), 4);
+                                          Chai.bnWithin(ethers.BigNumber.from(1), ethers.BigNumber.from("0"), ethers.BigNumber.from(2));
+                                          return Curry._2(done, undefined, undefined);
+                                        });
+                                    
                                   }));
                     }));
       }));
