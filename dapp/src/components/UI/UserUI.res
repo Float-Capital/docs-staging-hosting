@@ -193,9 +193,10 @@ module MetamaskMenu = {
           <div
             className="absolute bottom-full left-1 rounded-lg z-30 text-xs py-1 px-1 w-20 bg-white shadow-lg flex justify-center cursor-pointer"
             ref={ReactDOM.Ref.domRef(wrapper)}>
-            <AddToMetamask tokenAddress tokenSymbol={tokenName} callback={_ => setShow(_ => false)}>
+            <Metamask.AddToken
+              tokenAddress tokenSymbol={tokenName} callback={_ => setShow(_ => false)}>
               {"Add to "->React.string} <img src="/icons/metamask.svg" className="h-5 ml-1" />
-            </AddToMetamask>
+            </Metamask.AddToken>
           </div>
         } else {
           React.null

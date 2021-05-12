@@ -14,6 +14,7 @@ var Js_dict = require("rescript/lib/js/js_dict.js");
 var Queries = require("../../data/Queries.js");
 var Tooltip = require("./Tooltip.js");
 var Blockies = require("../../bindings/ethereum-blockies-base64/Blockies.js");
+var Metamask = require("./Base/Metamask.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 var DataHooks = require("../../data/DataHooks.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
@@ -24,7 +25,6 @@ var Caml_option = require("rescript/lib/js/caml_option.js");
 var FormatMoney = require("./FormatMoney.js");
 var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
-var AddToMetamask = require("./AddToMetamask.js");
 var InjectedEthereum = require("../../ethereum/InjectedEthereum.js");
 var MarketSimulation = require("../../libraries/MarketSimulation.js");
 var FromUnixTime = require("date-fns/fromUnixTime").default;
@@ -258,7 +258,7 @@ function UserUI$MetamaskMenu(Props) {
                   }, threeDotsSvg), match[0] ? React.createElement("div", {
                       ref: wrapper,
                       className: "absolute bottom-full left-1 rounded-lg z-30 text-xs py-1 px-1 w-20 bg-white shadow-lg flex justify-center cursor-pointer"
-                    }, React.createElement(AddToMetamask.make, {
+                    }, React.createElement(Metamask.AddToken.make, {
                           tokenAddress: tokenAddress,
                           tokenSymbol: tokenName,
                           callback: (function (param) {
