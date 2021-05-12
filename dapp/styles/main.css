@@ -102,7 +102,7 @@ body {
   @apply visible z-50;
 }
 
-/* Stop firefox from putting this stile on button when focused */
+/* Stop firefox from putting this style on button when focused */
 button::-moz-focus-inner {
   border: 0;
 }

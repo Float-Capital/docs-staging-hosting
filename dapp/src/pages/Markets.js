@@ -3,17 +3,17 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Loader = require("../UI/Base/Loader.js");
-var Market = require("./Market.js");
+var Loader = require("../components/UI/Base/Loader.js");
+var Market = require("../components/Markets/Market.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
-var Queries = require("../../data/Queries.js");
+var Queries = require("../data/Queries.js");
 var Belt_Int = require("rescript/lib/js/belt_Int.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var MarketCard = require("./MarketCard.js");
+var MarketCard = require("../components/Markets/MarketCard.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Router = require("next/router");
 
-function MarketsList$MarketsList(Props) {
+function Markets$MarketsList(Props) {
   var router = Router.useRouter();
   var marketIndexOption = Js_dict.get(router.query, "marketIndex");
   var marketDetailsQuery = Curry.app(Queries.MarketDetails.use, [
@@ -74,11 +74,11 @@ function MarketsList$MarketsList(Props) {
 }
 
 var MarketsList = {
-  make: MarketsList$MarketsList
+  make: Markets$MarketsList
 };
 
 function $$default(param) {
-  return React.createElement(MarketsList$MarketsList, {});
+  return React.createElement(Markets$MarketsList, {});
 }
 
 exports.MarketsList = MarketsList;
