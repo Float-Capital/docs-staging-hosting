@@ -33,7 +33,7 @@ var FormatDistanceToNow = require("date-fns/formatDistanceToNow").default;
 function UserUI$UserContainer(Props) {
   var children = Props.children;
   return React.createElement("div", {
-              className: "min-w-3/4 flex flex-col items-center"
+              className: "min-w-3/4 mx-auto max-w-7xl flex flex-col items-center"
             }, children);
 }
 

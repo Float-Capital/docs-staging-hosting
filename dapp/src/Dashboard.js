@@ -229,7 +229,7 @@ function Dashboard(Props) {
         var totalSynthValue = DashboardCalcs.getTotalSynthValue(totalValueLocked, totalValueStaked);
         var numberOfSynths = String((syntheticMarkets.length << 1));
         tmp = React.createElement("div", {
-              className: "min-w-3/4 max-w-full flex flex-col self-center items-center justify-start"
+              className: "w-full max-w-7xl flex flex-col self-center items-center justify-start"
             }, totalValueCard(totalValueLocked), React.createElement(Masonry.Container.make, {
                   children: null
                 }, React.createElement(Masonry.Divider.make, {
@@ -247,7 +247,7 @@ function Dashboard(Props) {
     tmp = marketDetailsQuery.data !== undefined ? "Query returned wrong number of results" : "Error getting data";
   }
   return React.createElement("div", {
-              className: "w-screen absolute flex flex-col left-0 top-0 mt-40 overflow-x-hidden"
+              className: "w-screen flex flex-col overflow-x-hidden"
             }, tmp);
 }
 

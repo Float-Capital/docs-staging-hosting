@@ -13,7 +13,7 @@ function MainLayout(Props) {
   return React.createElement("div", {
               className: "flex lg:justify-center min-h-screen"
             }, React.createElement("div", {
-                  className: "max-w-5xl w-full text-gray-900 font-base"
+                  className: "w-full text-gray-900 font-base"
                 }, React.createElement("div", {
                       className: "flex flex-col h-screen"
                     }, React.createElement(Navigation.make, {}), React.createElement("div", {

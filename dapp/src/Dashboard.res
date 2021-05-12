@@ -160,7 +160,7 @@ let make = () => {
   let globalStateQuery = Queries.GlobalState.use()
   let marketDetailsQuery = Queries.MarketDetails.use()
 
-  <div className="w-screen absolute flex flex-col left-0 top-0 mt-40 overflow-x-hidden">
+  <div className="w-screen flex flex-col overflow-x-hidden">
     {switch (globalStateQuery, marketDetailsQuery) {
     | ({loading: true}, _)
     | (_, {loading: true}) =>
@@ -184,7 +184,7 @@ let make = () => {
       let totalSynthValue = DashboardCalcs.getTotalSynthValue(~totalValueLocked, ~totalValueStaked)
       let numberOfSynths = (syntheticMarkets->Array.length * 2)->Int.toString
 
-      <div className="min-w-3/4 max-w-full flex flex-col self-center items-center justify-start">
+      <div className="w-full max-w-7xl flex flex-col self-center items-center justify-start">
         {totalValueCard(~totalValueLocked)}
         <Container>
           <Divider>

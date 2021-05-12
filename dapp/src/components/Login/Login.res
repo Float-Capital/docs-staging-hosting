@@ -60,7 +60,7 @@ let make = () => {
   }, (nextPath, optCurrentUser))
 
   if !isMetamask || metamaskChainId->Option.getWithDefault(-1) == Config.networkId {
-    <div>
+    <div className="max-w-5xl w-full mx-auto">
       <p className="mx-2 md:mx-0"> {"Connect with one of the wallets below. "->React.string} </p>
       {if !isMetamask {
         <p className="text-xs">
@@ -92,7 +92,7 @@ let make = () => {
       </div>
     </div>
   } else {
-    <div className="w-full flex justify-center">
+    <div className="mx-auto flex justify-center">
       <div className="flex flex-col max-w-3xl bg-opacity-75 bg-white rounded-lg p-10">
         <div>
           <p className="text-lg text-bf mb-8">
@@ -101,7 +101,8 @@ let make = () => {
             {`, please connect to the ${Config.networkName}`->React.string}
           </p>
           {switch Config.networkId {
-          | chainId if !(metamaskDefaultChainIds->Set.Int.has(chainId)) => <div className="flex justify-center"><AddNetworkToMetamask /></div>
+          | chainId if !(metamaskDefaultChainIds->Set.Int.has(chainId)) =>
+            <div className="flex justify-center"> <AddNetworkToMetamask /> </div>
           | _ =>
             <div>
               <ul className="list-decimal pl-10">
