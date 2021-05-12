@@ -251,7 +251,10 @@ let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
           <Button.Tiny
             key={text}
             disabled={minThreshodFromGraphSetting(buttonSetting) > timeMaketHasExisted}
-            active={graphSetting == buttonSetting}
+            active={switch (buttonSetting, graphSetting) {
+            | (Max(_), Max(_)) => true
+            | _ => buttonSetting == graphSetting
+            }}
             onClick={_ => {
               setGraphSetting(_ => buttonSetting)
             }}>

@@ -453,7 +453,7 @@ function PriceGraph(Props) {
                                           }),
                                         children: text,
                                         disabled: minThreshodFromGraphSetting(buttonSetting) > timeMaketHasExisted,
-                                        active: Caml_obj.caml_equal(graphSetting, buttonSetting),
+                                        active: typeof buttonSetting === "number" || typeof graphSetting === "number" ? Caml_obj.caml_equal(buttonSetting, graphSetting) : true,
                                         key: text
                                       });
                           })))));
