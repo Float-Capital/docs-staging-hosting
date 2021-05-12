@@ -3,7 +3,8 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Ethers = require("ethers");
+var Ethers = require("../ethereum/Ethers.js");
+var Ethers$1 = require("ethers");
 var Js_math = require("rescript/lib/js/js_math.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 
@@ -43,7 +44,7 @@ function useCurrentTime(updateInterval) {
 }
 
 function useCurrentTimeBN(updateInterval) {
-  return Ethers.BigNumber.from(useCurrentTime(updateInterval));
+  return Ethers$1.BigNumber.from(useCurrentTime(updateInterval));
 }
 
 var Time = {
@@ -52,7 +53,39 @@ var Time = {
   useCurrentTimeBN: useCurrentTimeBN
 };
 
+function format(__x) {
+  return __x.replace(/\d(?=(\d{3})+\.)/g, "$&,");
+}
+
+function formatInt(__x) {
+  return __x.replace(/\d(?=(\d{3})+$)/g, "$&,");
+}
+
+function formatFloat(digitsOpt, number) {
+  var digits = digitsOpt !== undefined ? digitsOpt : 2;
+  return format(number.toFixed(digits));
+}
+
+function toCentsFixedNoRounding(digitsOpt, floatString) {
+  var digits = digitsOpt !== undefined ? digitsOpt : 2;
+  return formatFloat(digits, Number(floatString));
+}
+
+function formatEther(digitsOpt, rawNumber) {
+  var digits = digitsOpt !== undefined ? digitsOpt : 2;
+  return toCentsFixedNoRounding(digits, Ethers.Utils.formatEther(rawNumber));
+}
+
+var NumberFormat = {
+  format: format,
+  formatInt: formatInt,
+  formatFloat: formatFloat,
+  toCentsFixedNoRounding: toCentsFixedNoRounding,
+  formatEther: formatEther
+};
+
 exports.optLocalstorage = optLocalstorage;
 exports.onlyExecuteClientSide = onlyExecuteClientSide;
 exports.Time = Time;
+exports.NumberFormat = NumberFormat;
 /* optLocalstorage Not a pure module */

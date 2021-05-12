@@ -3,7 +3,7 @@
 
 var React = require("react");
 var Ethers = require("../../ethereum/Ethers.js");
-var Loader = require("../UI/Loader.js");
+var Loader = require("../UI/Base/Loader.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 var DataHooks = require("../../data/DataHooks.js");
 var StakeCard = require("./StakeCard.js");

@@ -11,7 +11,7 @@ var Link = require("next/link").default;
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var RootProvider = require("../libraries/RootProvider.js");
-var DisplayAddress = require("../components/UI/DisplayAddress.js");
+var DisplayAddress = require("../components/UI/Base/DisplayAddress.js");
 
 function floatingMenuZoomStyle(shouldDisplay) {
   return CssJs.style([

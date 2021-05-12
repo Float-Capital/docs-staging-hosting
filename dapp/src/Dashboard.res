@@ -43,7 +43,7 @@ let totalValueCard = (~totalValueLocked) =>
     <span className="font-alphbeta text-xl"> {"Total Value"->React.string} </span>
     <span className="text-sm"> {` 🏦 in Float Protocol: `->React.string} </span>
     <span className="text-green-700 font-bold text-xl">
-      {`$${totalValueLocked->FormatMoney.formatEther}`->React.string}
+      {`$${totalValueLocked->Misc.NumberFormat.formatEther}`->React.string}
     </span>
   </div>
 
@@ -89,7 +89,7 @@ let floatProtocolCard = (
         createDashboardLiProps(~prefix=`👷‍♀️ No. synths:`, ~value=numberOfSynths, ()),
         createDashboardLiProps(
           ~prefix=`⛽ Gas used:`,
-          ~value=totalGasUsed->Ethers.BigNumber.toString->FormatMoney.formatInt,
+          ~value=totalGasUsed->Ethers.BigNumber.toString->Misc.NumberFormat.formatInt,
           (),
         ),
       ]}
@@ -106,7 +106,7 @@ let syntheticAssetsCard = (~totalSynthValue) =>
       <div>
         <span className="text-sm mr-2"> {`💰 Total synth value`->React.string} </span>
         <div className="text-green-700 text-xl ">
-          {`$${totalSynthValue->FormatMoney.formatEther}`->React.string}
+          {`$${totalSynthValue->Misc.NumberFormat.formatEther}`->React.string}
           <span className="text-black">
             <Tooltip tip={"Redeemable value of synths in the open market"} />
           </span>
@@ -133,7 +133,7 @@ let floatTokenCard = (~totalFloatMinted) =>
         createDashboardLiProps(~prefix=`😏 Float price:`, ~value="...", ()),
         createDashboardLiProps(
           ~prefix=`🗳 Float supply:`,
-          ~value=totalFloatMinted->FormatMoney.formatEther, //Ethers.Utils.formatEtherToPrecision(2),
+          ~value=totalFloatMinted->Misc.NumberFormat.formatEther, //Ethers.Utils.formatEtherToPrecision(2),
           ~suffix=<Tooltip tip="The number of Float tokens in circulation" />,
           (),
         ),
@@ -148,7 +148,7 @@ let stakingCard = (~totalValueStaked) =>
     <div className="text-center mt-5">
       <div className="text-sm"> {`💰 Total staked value `->React.string} </div>
       <div className="text-green-700 text-xl ">
-        {`$${totalValueStaked->FormatMoney.formatEther}`->React.string}
+        {`$${totalValueStaked->Misc.NumberFormat.formatEther}`->React.string}
       </div>
     </div>
     <div className="text-left mt-4 pl-4 text-sm font-bold"> {`Trending`->React.string} </div>

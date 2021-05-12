@@ -7,7 +7,7 @@ var Modal = require("../UI/Base/Modal.js");
 var React = require("react");
 var Button = require("../UI/Base/Button.js");
 var Config = require("../../Config.js");
-var Loader = require("../UI/Loader.js");
+var Loader = require("../UI/Base/Loader.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
 

@@ -22,7 +22,7 @@ module UserTotalValue = {
       </div>
       <div>
         <span className={`${shouldBeSmallerText ? "text-xl" : "text-2xl"} text-primary`}>
-          {`$${totalValue->FormatMoney.formatEther(
+          {`$${totalValue->Misc.NumberFormat.formatEther(
               ~digits={shouldntHaveDecimals ? 1 : 2},
             )}`->React.string}
         </span>
@@ -421,7 +421,7 @@ module UserStakesCard = {
       let syntheticToken = stake.currentStake.syntheticToken
       let addr = syntheticToken.id->Ethers.Utils.getAddressUnsafe
       let name = syntheticToken.syntheticMarket.symbol
-      let tokens = stake.currentStake.amount->FormatMoney.formatEther
+      let tokens = stake.currentStake.amount->Misc.NumberFormat.formatEther
       let isLong = syntheticToken.tokenType->Obj.magic == "Long"
       let price = syntheticToken.latestPrice.price.price
 
@@ -457,7 +457,13 @@ module UserStakesCard = {
       let creationTxHash = stake.currentStake.creationTxHash
 
       <UserMarketBox
-        key name isLong tokens tokenAddress={addr} value={value->FormatMoney.formatEther} metadata>
+        key
+        name
+        isLong
+        tokens
+        tokenAddress={addr}
+        value={value->Misc.NumberFormat.formatEther}
+        metadata>
         <UserMarketUnstake synthAddress={addr} userId isLong whenStr creationTxHash />
       </UserMarketBox>
     }, stakes)->React.array
@@ -492,10 +498,12 @@ module UserFloatCard = {
       | Loading => <Loader.Mini />
       | GraphError(msg) => msg->React.string
       | Response((floatBalances, (totalClaimable, totalPredicted))) => {
-          let floatBalance = floatBalances.floatBalance->FormatMoney.formatEther(~digits=6)
-          let floatMinted = floatBalances.floatMinted->FormatMoney.formatEther(~digits=6)
+          let floatBalance = floatBalances.floatBalance->Misc.NumberFormat.formatEther(~digits=6)
+          let floatMinted = floatBalances.floatMinted->Misc.NumberFormat.formatEther(~digits=6)
           let floatAccrued =
-            totalClaimable->Ethers.BigNumber.add(totalPredicted)->FormatMoney.formatEther(~digits=6)
+            totalClaimable
+            ->Ethers.BigNumber.add(totalPredicted)
+            ->Misc.NumberFormat.formatEther(~digits=6)
 
           <div
             className=`w-11/12 px-2 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>

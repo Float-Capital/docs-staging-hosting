@@ -23,7 +23,7 @@ module UserBalancesCard = {
       | Response({totalBalance, balances}) => <>
           <UserColumnTextCenter>
             <UserColumnText
-              head=`💰 Synth value` body={`$${totalBalance->FormatMoney.formatEther}`}
+              head=`💰 Synth value` body={`$${totalBalance->Misc.NumberFormat.formatEther}`}
             />
           </UserColumnTextCenter>
           <br />
@@ -37,8 +37,8 @@ module UserBalancesCard = {
               tokenAddress={addr}
               symbol
               metamaskMenu={true}
-              tokens={FormatMoney.formatEther(tokenBalance)}
-              value={FormatMoney.formatEther(tokensValue)}
+              tokens={Misc.NumberFormat.formatEther(tokenBalance)}
+              value={Misc.NumberFormat.formatEther(tokensValue)}
               metadata>
               <UserMarketStakeOrRedeem synthAddress={addr->Ethers.Utils.ethAdrToLowerStr} isLong />
             </UserMarketBox>
@@ -109,7 +109,7 @@ module UserProfileCard = {
     )
     let joinedStr = userInfo.joinedAt->DateFns.format(#"do MMM ''yy")
     let txStr = userInfo.transactionCount->Ethers.BigNumber.toString
-    let gasStr = userInfo.gasUsed->Ethers.BigNumber.toString->FormatMoney.formatInt
+    let gasStr = userInfo.gasUsed->Ethers.BigNumber.toString->Misc.NumberFormat.formatInt
 
     <UserColumnCard>
       <UserProfileHeader address={addressStr} />

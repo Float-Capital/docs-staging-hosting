@@ -9,7 +9,7 @@ let make = (~erc20Address) => {
 
   <>
     {switch optBalance {
-    | Some(balance) => <p> {FormatMoney.formatEther(balance)->React.string} </p>
+    | Some(balance) => <p> {Misc.NumberFormat.formatEther(balance)->React.string} </p>
     | None => <Loader.Mini />
     }}
   </>

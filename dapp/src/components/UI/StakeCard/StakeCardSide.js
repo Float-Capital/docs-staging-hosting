@@ -2,7 +2,7 @@
 'use strict';
 
 var React = require("react");
-var Loader = require("../Loader.js");
+var Loader = require("../Base/Loader.js");
 
 function isHotAPY(apy) {
   return apy > 0.15;
