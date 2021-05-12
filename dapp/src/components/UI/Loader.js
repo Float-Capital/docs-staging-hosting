@@ -16,6 +16,31 @@ var Overlay = {
   make: Loader$Overlay
 };
 
+function Loader$Mini(Props) {
+  return React.createElement("img", {
+              className: "w-6 mx-auto",
+              src: "/img/mini-loading.gif"
+            });
+}
+
+var Mini = {
+  make: Loader$Mini
+};
+
+function Loader$Ellipses(Props) {
+  return React.createElement("div", {
+              className: "relative"
+            }, React.createElement("div", {
+                  className: "ellipsis"
+                }, React.createElement("div", {
+                      className: "ellipsis-inner"
+                    })));
+}
+
+var Ellipses = {
+  make: Loader$Ellipses
+};
+
 function Loader(Props) {
   return React.createElement("div", {
               className: "screen-centered-container"
@@ -28,5 +53,7 @@ function Loader(Props) {
 var make = Loader;
 
 exports.Overlay = Overlay;
+exports.Mini = Mini;
+exports.Ellipses = Ellipses;
 exports.make = make;
 /* react Not a pure module */

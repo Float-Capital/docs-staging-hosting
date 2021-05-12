@@ -341,7 +341,7 @@ module UserMarketBox = {
 
             <div className=textClassName> {`${symbol} ${percentStr}%`->React.string} </div>
           }
-        | Loading => <MiniLoader />
+        | Loading => <Loader.Mini />
         | _ => ``->React.string
         }}
         <span className=`text-sm`> {tokens->React.string} </span>
@@ -488,7 +488,7 @@ module UserFloatCard = {
         </div>
       </UserColumnHeader>
       {switch DataHooks.liftGraphResponse2(floatBalances, claimableFloat) {
-      | Loading => <MiniLoader />
+      | Loading => <Loader.Mini />
       | GraphError(msg) => msg->React.string
       | Response((floatBalances, (totalClaimable, totalPredicted))) => {
           let floatBalance = floatBalances.floatBalance->FormatMoney.formatEther(~digits=6)

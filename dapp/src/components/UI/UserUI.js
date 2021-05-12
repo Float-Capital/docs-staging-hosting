@@ -7,6 +7,7 @@ var Button = require("./Button.js");
 var Client = require("../../data/Client.js");
 var Config = require("../../Config.js");
 var Ethers = require("../../ethereum/Ethers.js");
+var Loader = require("./Loader.js");
 var Ethers$1 = require("ethers");
 var Globals = require("../../libraries/Globals.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
@@ -17,7 +18,6 @@ var CONSTANTS = require("../../CONSTANTS.js");
 var DataHooks = require("../../data/DataHooks.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var ClaimFloat = require("../Claim/ClaimFloat.js");
-var MiniLoader = require("./MiniLoader.js");
 var Pervasives = require("rescript/lib/js/pervasives.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
@@ -366,7 +366,7 @@ function UserUI$UserMarketBox(Props) {
   var bothPrices = DataHooks.liftGraphResponse2(initialTokenPriceResponse, finalPriceResponse);
   var tmp;
   if (typeof bothPrices === "number") {
-    tmp = React.createElement(MiniLoader.make, {});
+    tmp = React.createElement(Loader.Mini.make, {});
   } else if (bothPrices.TAG === /* GraphError */0) {
     tmp = "";
   } else {
@@ -599,7 +599,7 @@ function UserUI$UserFloatCard(Props) {
   var msg = DataHooks.liftGraphResponse2(floatBalances, claimableFloat);
   var tmp;
   if (typeof msg === "number") {
-    tmp = React.createElement(MiniLoader.make, {});
+    tmp = React.createElement(Loader.Mini.make, {});
   } else if (msg.TAG === /* GraphError */0) {
     tmp = msg._0;
   } else {
