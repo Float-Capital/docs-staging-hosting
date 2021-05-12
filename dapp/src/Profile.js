@@ -50,8 +50,8 @@ function Profile$Profile(Props) {
                     }), tokens.loading ? React.createElement(MiniLoader.make, {}) : (
                     tokens.error !== undefined ? "There was an error loading the tokens" : (
                         match !== undefined ? Belt_Array.map(match.syntheticTokens, (function (param) {
-                                  var tokenType = param.tokenType;
                                   var symbol = param.syntheticMarket.name;
+                                  var tokenType = param.tokenType;
                                   var id = param.id;
                                   return React.createElement(Card.make, {
                                               children: React.createElement("div", {
