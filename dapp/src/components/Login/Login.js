@@ -98,7 +98,9 @@ function Login(Props) {
         optCurrentUser
       ]);
   if (!isMetamask || Belt_Option.getWithDefault(metamaskChainId, -1) === Config.networkId) {
-    return React.createElement("div", undefined, React.createElement("p", {
+    return React.createElement("div", {
+                className: "max-w-5xl w-full mx-auto"
+              }, React.createElement("p", {
                     className: "mx-2 md:mx-0"
                   }, "Connect with one of the wallets below. "), isMetamask ? null : React.createElement("p", {
                       className: "text-xs"
@@ -126,7 +128,7 @@ function Login(Props) {
                         }))));
   } else {
     return React.createElement("div", {
-                className: "w-full flex justify-center"
+                className: "mx-auto flex justify-center"
               }, React.createElement("div", {
                     className: "flex flex-col max-w-3xl bg-opacity-75 bg-white rounded-lg p-10"
                   }, React.createElement("div", undefined, React.createElement("p", {

@@ -3,7 +3,7 @@ open Globals
 module UserContainer = {
   @react.component
   let make = (~children) => {
-    <div className=`min-w-3/4 flex flex-col items-center`> {children} </div>
+    <div className=`min-w-3/4 mx-auto max-w-7xl flex flex-col items-center`> {children} </div>
   }
 }
 

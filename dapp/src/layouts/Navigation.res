@@ -78,7 +78,7 @@ let make = () => {
   let optCurrentUser = RootProvider.useCurrentUser()
 
   <>
-    <nav className="p-2 h-12 flex justify-between items-center text-sm">
+    <nav className="mx-auto w-full max-w-5xl p-2 h-12 flex justify-between items-center text-sm">
       <Link href="/markets">
         <a className="flex items-center">
           <span className="text-xl text-green-800 ml-2 align-middle font-semibold">
