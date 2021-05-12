@@ -4,7 +4,6 @@
 var Toast = require("./components/UI/Toast.js");
 var React = require("react");
 var Client = require("./data/Client.js");
-var ComingSoon = require("./components/ComingSoon.js");
 var MainLayout = require("./layouts/MainLayout.js");
 var APYProvider = require("./libraries/APYProvider.js");
 var Router = require("next/router");
@@ -24,12 +23,12 @@ function $$default(props) {
                     children: null
                   }, React.createElement(Client.make, {
                         children: React.createElement(APYProvider.make, {
-                              children: null
-                            }, React.createElement(ComingSoon.make, {}), React.createElement(StateChangeMonitor.make, {
-                                  children: React.createElement(MainLayout.make, {
-                                        children: content
-                                      })
-                                }))
+                              children: React.createElement(StateChangeMonitor.make, {
+                                    children: React.createElement(MainLayout.make, {
+                                          children: content
+                                        })
+                                  })
+                            })
                       }), React.createElement(Toast.make, {}))
             });
 }
