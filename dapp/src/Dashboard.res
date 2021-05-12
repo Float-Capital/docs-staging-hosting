@@ -10,7 +10,7 @@ module TrendingStakes = {
 
     {
       switch marketDetailsQuery {
-      | {loading: true} => <div className="m-auto"> <MiniLoader /> </div>
+      | {loading: true} => <div className="m-auto"> <Loader.Mini /> </div>
       | {error: Some(_error)} => "Error loading data"->React.string
       | {data: Some({syntheticMarkets})} =>
         switch apy {
@@ -28,7 +28,7 @@ module TrendingStakes = {
             )
             ->React.array
           }
-        | _ => <MiniLoader />
+        | _ => <Loader.Mini />
         }
       | {data: None, error: None, loading: false} =>
         "You might think this is impossible, but depending on the situation it might not be!"->React.string
@@ -164,7 +164,7 @@ let make = () => {
     {switch (globalStateQuery, marketDetailsQuery) {
     | ({loading: true}, _)
     | (_, {loading: true}) =>
-      <MiniLoader />
+      <Loader.Mini />
     | ({error: Some(_error)}, _)
     | (_, {error: Some(_error)}) =>
       "Error loading data"->React.string

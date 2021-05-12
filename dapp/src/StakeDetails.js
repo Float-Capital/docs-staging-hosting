@@ -4,9 +4,9 @@
 var Card = require("./components/UI/Card.js");
 var React = require("react");
 var Config = require("./Config.js");
+var Loader = require("./components/UI/Loader.js");
 var Globals = require("./libraries/Globals.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var MiniLoader = require("./components/UI/MiniLoader.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var FormatMoney = require("./components/UI/FormatMoney.js");
 var DataFetchers = require("./components/Data/DataFetchers.js");
@@ -61,7 +61,7 @@ function StakeDetails$UsersActiveStakes(Props) {
                   }
                 }))) : React.createElement("h2", undefined, "You have no active stakes.");
   } else {
-    tmp = activeStakes.error !== undefined ? "Error" : React.createElement(MiniLoader.make, {});
+    tmp = activeStakes.error !== undefined ? "Error" : React.createElement(Loader.Mini.make, {});
   }
   return React.createElement("div", {
               className: "flex flex-col"

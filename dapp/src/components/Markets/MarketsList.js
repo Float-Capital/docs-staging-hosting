@@ -3,13 +3,13 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
+var Loader = require("../UI/Loader.js");
 var Market = require("./Market.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Queries = require("../../data/Queries.js");
 var Belt_Int = require("rescript/lib/js/belt_Int.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var MarketCard = require("./MarketCard.js");
-var MiniLoader = require("../UI/MiniLoader.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Router = require("next/router");
 
@@ -37,7 +37,7 @@ function MarketsList$MarketsList(Props) {
   if (marketDetailsQuery.loading) {
     tmp = React.createElement("div", {
           className: "m-auto"
-        }, React.createElement(MiniLoader.make, {}));
+        }, React.createElement(Loader.Mini.make, {}));
   } else if (marketDetailsQuery.error !== undefined) {
     tmp = "Error loading data";
   } else if (match !== undefined) {

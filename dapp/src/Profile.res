@@ -18,7 +18,7 @@ module Profile = {
               <div className="w-full mr-3">
                 <Card> <DaiBalance /> </Card>
                 {switch tokens {
-                | {loading: true} => <MiniLoader />
+                | {loading: true} => <Loader.Mini />
                 | {error: Some(_error)} => "There was an error loading the tokens"->React.string
                 | {data: Some({syntheticTokens})} =>
                   syntheticTokens
@@ -27,7 +27,7 @@ module Profile = {
                       <div className="flex justify-between w-full">
                         <div className="flex items-center ">
                           <div className="mr-2">
-                            <AddToMetamask
+                            <Metamask.AddToken
                               tokenAddress={id}
                               tokenSymbol={(
                                 tokenType->Js.String2.make->Js.String.toLowerCase->isShort

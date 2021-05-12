@@ -5,6 +5,7 @@ var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Config = require("../../Config.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
+var Metamask = require("../UI/Base/Metamask.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Belt_SetInt = require("rescript/lib/js/belt_SetInt.js");
@@ -12,7 +13,6 @@ var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
 var Web3Connectors = require("../../bindings/web3-react/Web3Connectors.js");
 var InjectedEthereum = require("../../ethereum/InjectedEthereum.js");
-var AddNetworkToMetamask = require("../UI/AddNetworkToMetamask.js");
 var TorusConnector = require("@web3-react/torus-connector");
 var WalletconnectConnector = require("@web3-react/walletconnect-connector");
 
@@ -141,7 +141,7 @@ function Login(Props) {
                                         Belt_SetInt.has(metamaskDefaultChainIds, metamaskChainId) ? "Click on the " + metamaskDefaultChainIdsToMetamaskName(metamaskChainId) + " dropdown" : "Click on the dropdown for the network you're connected to."
                                       ) : "Click on the dropdown for the network you're connected to."), React.createElement("li", undefined, "Select " + Config.networkName))) : React.createElement("div", {
                               className: "flex justify-center"
-                            }, React.createElement(AddNetworkToMetamask.make, {})))));
+                            }, React.createElement(Metamask.AddOrSwitchNetwork.make, {})))));
   }
 }
 

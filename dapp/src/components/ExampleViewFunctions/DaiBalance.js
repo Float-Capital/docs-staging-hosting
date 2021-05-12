@@ -2,7 +2,7 @@
 'use strict';
 
 var React = require("react");
-var MiniLoader = require("../UI/MiniLoader.js");
+var Loader = require("../UI/Loader.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var FormatMoney = require("../UI/FormatMoney.js");
 var ContractHooks = require("../Testing/Admin/ContractHooks.js");
@@ -12,7 +12,7 @@ function DaiBalance(Props) {
   var optBalance = match.data;
   return React.createElement(React.Fragment, undefined, optBalance !== undefined ? React.createElement("div", {
                     className: "flex justify-between w-full"
-                  }, React.createElement("p", undefined, "DAI balance: "), React.createElement("p", undefined, "$" + FormatMoney.formatEther(undefined, Caml_option.valFromOption(optBalance)))) : React.createElement(MiniLoader.make, {}));
+                  }, React.createElement("p", undefined, "DAI balance: "), React.createElement("p", undefined, "$" + FormatMoney.formatEther(undefined, Caml_option.valFromOption(optBalance)))) : React.createElement(Loader.Mini.make, {}));
 }
 
 var make = DaiBalance;

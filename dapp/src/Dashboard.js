@@ -4,12 +4,12 @@
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Config = require("./Config.js");
+var Loader = require("./components/UI/Loader.js");
 var Masonry = require("./components/UI/Masonry.js");
 var Queries = require("./data/Queries.js");
 var Tooltip = require("./components/UI/Tooltip.js");
 var Link = require("next/link").default;
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var MiniLoader = require("./components/UI/MiniLoader.js");
 var APYProvider = require("./libraries/APYProvider.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var DashboardLi = require("./components/UI/Dashboard/DashboardLi.js");
@@ -43,7 +43,7 @@ function Dashboard$TrendingStakes(Props) {
   if (marketDetailsQuery.loading) {
     return React.createElement("div", {
                 className: "m-auto"
-              }, React.createElement(MiniLoader.make, {}));
+              }, React.createElement(Loader.Mini.make, {}));
   }
   if (marketDetailsQuery.error !== undefined) {
     return "Error loading data";
@@ -52,10 +52,10 @@ function Dashboard$TrendingStakes(Props) {
     return "You might think this is impossible, but depending on the situation it might not be!";
   }
   if (typeof apy === "number") {
-    return React.createElement(MiniLoader.make, {});
+    return React.createElement(Loader.Mini.make, {});
   }
   if (apy.TAG !== /* Loaded */0) {
-    return React.createElement(MiniLoader.make, {});
+    return React.createElement(Loader.Mini.make, {});
   }
   var trendingStakes = DashboardCalcs.trendingStakes(match.syntheticMarkets, apy._0);
   return Belt_Array.map(trendingStakes, (function (param) {
@@ -209,9 +209,9 @@ function Dashboard(Props) {
   var match = globalStateQuery.data;
   var tmp;
   if (globalStateQuery.loading) {
-    tmp = React.createElement(MiniLoader.make, {});
+    tmp = React.createElement(Loader.Mini.make, {});
   } else if (marketDetailsQuery.loading) {
-    tmp = React.createElement(MiniLoader.make, {});
+    tmp = React.createElement(Loader.Mini.make, {});
   } else if (marketDetailsQuery.error !== undefined || globalStateQuery.error !== undefined) {
     tmp = "Error loading data";
   } else if (match !== undefined) {

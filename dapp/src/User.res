@@ -18,7 +18,7 @@ module UserBalancesCard = {
         {`Synthetic assets`->React.string} <img className="inline h-5 ml-2" src="/img/coin.png" />
       </UserColumnHeader>
       {switch usersTokensQuery {
-      | Loading => <div className="m-auto"> <MiniLoader /> </div>
+      | Loading => <div className="m-auto"> <Loader.Mini /> </div>
       | GraphError(string) => string->React.string
       | Response({totalBalance, balances}) => <>
           <UserColumnTextCenter>
@@ -29,15 +29,7 @@ module UserBalancesCard = {
           <br />
           {balances
           ->Array.keep(({tokenBalance}) => !(tokenBalance->Ethers.BigNumber.eq(CONSTANTS.zeroBN)))
-          ->Array.map(({
-            addr,
-            name,
-            symbol,
-            isLong,
-            tokenBalance,
-            tokensValue,
-            metadata
-          }) =>
+          ->Array.map(({addr, name, symbol, isLong, tokenBalance, tokensValue, metadata}) =>
             <UserMarketBox
               key={`${name}-${isLong ? "long" : "short"}`}
               name
@@ -83,7 +75,7 @@ module UserTotalInvestedCard = {
 
     <>
       {switch usersTokensQuery {
-      | Loading => <div className="m-auto"> <MiniLoader /> </div>
+      | Loading => <div className="m-auto"> <Loader.Mini /> </div>
       | GraphError(string) => string->React.string
       | Response({totalBalance}) =>
         <UserTotalValue

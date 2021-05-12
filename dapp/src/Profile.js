@@ -5,17 +5,17 @@ var Card = require("./components/UI/Card.js");
 var Curry = require("rescript/lib/js/curry.js");
 var Login = require("./components/Login/Login.js");
 var React = require("react");
+var Loader = require("./components/UI/Loader.js");
 var Ethers = require("ethers");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Queries = require("./data/Queries.js");
+var Metamask = require("./components/UI/Base/Metamask.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var DaiBalance = require("./components/ExampleViewFunctions/DaiBalance.js");
-var MiniLoader = require("./components/UI/MiniLoader.js");
 var Router = require("next/router");
 var StakeDetails = require("./StakeDetails.js");
 var TokenBalance = require("./components/ExampleViewFunctions/TokenBalance.js");
 var AccessControl = require("./components/AccessControl.js");
-var AddToMetamask = require("./components/UI/AddToMetamask.js");
 
 function Profile$Profile(Props) {
   var router = Router.useRouter();
@@ -47,7 +47,7 @@ function Profile$Profile(Props) {
                   className: "w-full mr-3"
                 }, React.createElement(Card.make, {
                       children: React.createElement(DaiBalance.make, {})
-                    }), tokens.loading ? React.createElement(MiniLoader.make, {}) : (
+                    }), tokens.loading ? React.createElement(Loader.Mini.make, {}) : (
                     tokens.error !== undefined ? "There was an error loading the tokens" : (
                         match !== undefined ? Belt_Array.map(match.syntheticTokens, (function (param) {
                                   var symbol = param.syntheticMarket.name;
@@ -60,7 +60,7 @@ function Profile$Profile(Props) {
                                                         className: "flex items-center "
                                                       }, React.createElement("div", {
                                                             className: "mr-2"
-                                                          }, React.createElement(AddToMetamask.make, {
+                                                          }, React.createElement(Metamask.AddToken.make, {
                                                                 tokenAddress: id,
                                                                 tokenSymbol: (
                                                                   String(tokenType).toLowerCase() === "short" ? "↘️" : "↗️"

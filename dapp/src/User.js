@@ -2,7 +2,7 @@
 'use strict';
 
 var React = require("react");
-var Button = require("./components/UI/Button.js");
+var Button = require("./components/UI/Base/Button.js");
 var Config = require("./Config.js");
 var Ethers = require("./ethereum/Ethers.js");
 var Loader = require("./components/UI/Loader.js");
@@ -13,7 +13,6 @@ var CONSTANTS = require("./CONSTANTS.js");
 var DataHooks = require("./data/DataHooks.js");
 var Link = require("next/link").default;
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var MiniLoader = require("./components/UI/MiniLoader.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var FormatMoney = require("./components/UI/FormatMoney.js");
 var Router = require("next/router");
@@ -28,7 +27,7 @@ function User$UserBalancesCard(Props) {
   if (typeof usersTokensQuery === "number") {
     tmp = React.createElement("div", {
           className: "m-auto"
-        }, React.createElement(MiniLoader.make, {}));
+        }, React.createElement(Loader.Mini.make, {}));
   } else if (usersTokensQuery.TAG === /* GraphError */0) {
     tmp = usersTokensQuery._0;
   } else {
@@ -99,7 +98,7 @@ function User$UserTotalInvestedCard(Props) {
   var tmp;
   tmp = typeof usersTokensQuery === "number" ? React.createElement("div", {
           className: "m-auto"
-        }, React.createElement(MiniLoader.make, {})) : (
+        }, React.createElement(Loader.Mini.make, {})) : (
       usersTokensQuery.TAG === /* GraphError */0 ? usersTokensQuery._0 : React.createElement(UserUI.UserTotalValue.make, {
               totalValueNameSup: "Portfolio",
               totalValueNameSub: "Value",

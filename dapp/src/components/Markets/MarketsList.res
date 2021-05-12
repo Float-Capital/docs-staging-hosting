@@ -7,7 +7,7 @@ module MarketsList = {
 
     <div className="w-full max-w-5xl mx-auto px-2 md:px-0">
       {switch marketDetailsQuery {
-      | {loading: true} => <div className="m-auto"> <MiniLoader /> </div>
+      | {loading: true} => <div className="m-auto"> <Loader.Mini /> </div>
       | {error: Some(_error)} => "Error loading data"->React.string
       | {data: Some({syntheticMarkets})} =>
         switch marketIndexOption {

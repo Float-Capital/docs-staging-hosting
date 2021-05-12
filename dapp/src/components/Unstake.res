@@ -29,7 +29,7 @@ module UnstakeTxStatusModal = {
     | ContractActions.SignedAndSubmitted(txHash) =>
       <Modal id={"unstake-2"}>
         <div className="text-center m-3">
-          <MiniLoader />
+          <Loader.Mini />
           <p> {"Unstake transaction pending... "->React.string} </p>
           <ViewOnBlockExplorer txHash />
         </div>
@@ -220,7 +220,7 @@ let make = (~tokenId) => {
       Js.log("Unable to fetch token")
       <> {"Unable to fetch token"->React.string} </>
     }
-  | {loading: true} => <MiniLoader />
+  | {loading: true} => <Loader.Mini />
   | {data: Some({syntheticToken: Some(synthetic)})} =>
     switch optSigner {
     | Some(signer) => <ConnectedStakeForm signer tokenId synthetic />

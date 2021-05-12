@@ -3,7 +3,7 @@
 
 var Next = require("../../bindings/Next.js");
 var React = require("react");
-var Button = require("../UI/Button.js");
+var Button = require("../UI/Base/Button.js");
 var Globals = require("../../libraries/Globals.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Tooltip = require("../UI/Tooltip.js");

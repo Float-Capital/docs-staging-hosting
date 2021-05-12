@@ -72,7 +72,7 @@ module UsersActiveStakes = {
           ->React.array}
         </>
       | {error: Some(_)} => "Error"->React.string
-      | _ => <MiniLoader />
+      | _ => <Loader.Mini />
       }}
     </div>
   }

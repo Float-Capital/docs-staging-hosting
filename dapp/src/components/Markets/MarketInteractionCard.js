@@ -5,8 +5,9 @@ var Mint = require("../../pages/Mint.js");
 var Next = require("../../bindings/Next.js");
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Button = require("../UI/Button.js");
+var Button = require("../UI/Base/Button.js");
 var Ethers = require("../../ethereum/Ethers.js");
+var Loader = require("../UI/Loader.js");
 var Redeem = require("../Redeem/Redeem.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Queries = require("../../data/Queries.js");
@@ -17,7 +18,6 @@ var CONSTANTS = require("../../CONSTANTS.js");
 var DataHooks = require("../../data/DataHooks.js");
 var StakeForm = require("../Stake/StakeForm.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var MiniLoader = require("../UI/MiniLoader.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
@@ -355,7 +355,7 @@ function MarketInteractionCard$UnstakeOrStakeInteractionWrapper(Props) {
   var display = determineDisplay(user, userHasPositions, isLong, marketInfo);
   if (typeof display === "number") {
     if (display === /* Loading */0) {
-      return React.createElement(MiniLoader.make, {});
+      return React.createElement(Loader.Mini.make, {});
     } else {
       return $$default;
     }

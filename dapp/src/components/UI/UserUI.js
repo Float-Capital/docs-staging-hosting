@@ -3,7 +3,7 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Button = require("./Button.js");
+var Button = require("./Base/Button.js");
 var Client = require("../../data/Client.js");
 var Config = require("../../Config.js");
 var Ethers = require("../../ethereum/Ethers.js");
