@@ -29,7 +29,6 @@ let default = (props: props): React.element => {
     <RootProvider>
       <Client>
         <APYProvider>
-          <ComingSoon />
           <StateChangeMonitor>
             {switch router.route {
             | _ => <MainLayout> content </MainLayout>
