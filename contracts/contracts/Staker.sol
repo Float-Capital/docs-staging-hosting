@@ -11,14 +11,14 @@ import "./interfaces/IStaker.sol";
 
 /*
     ###### Purpose of contract ########
-    This smart contract allows users to securely stake fTokens
-    that represent their synthetic exposure.
+    This smart contract allows users to securely stake synthetic asset
+    tokens created through the float protocol.
 
     Staking sythentic tokens will ensure that the liquidity of the
     synthetic market is increased, and entitle users to FLOAT rewards.
 */
 
-/** @title Staker Contract (name is WIP) */
+/** @title Staker Contract */
 contract Staker is IStaker, Initializable {
     struct RewardState {
         uint256 timestamp;
@@ -372,8 +372,12 @@ contract Staker is IStaker, Initializable {
     }
 
     ////////////////////////////////////
-    // USER REWARD STATE FUNCTIONS ///
+    // USER REWARD STATE FUNCTIONS /////
     ////////////////////////////////////
+
+    function _updateState(address tokenAddress) internal {
+        floatContract._updateSystemState(marketIndexOfToken[tokenAddress]);
+    }
 
     function calculateAccumulatedFloat(address tokenAddress, address user)
         internal
@@ -455,9 +459,7 @@ contract Staker is IStaker, Initializable {
     // TODO: deprecate in the future...
     function claimFloatImmediately(address[] calldata tokenAddresses) external {
         for (uint256 i = 0; i < tokenAddresses.length; i++) {
-            floatContract._updateSystemState(
-                marketIndexOfToken[tokenAddresses[i]]
-            );
+            _updateState(tokenAddresses[i]);
         }
         _claimFloat(tokenAddresses);
     }
@@ -474,10 +476,6 @@ contract Staker is IStaker, Initializable {
     ////////////////////////////////////
     /////////// STAKING ////////////////
     ////////////////////////////////////
-
-    function _updateState(address tokenAddress) internal {
-        floatContract._updateSystemState(marketIndexOfToken[tokenAddress]);
-    }
 
     /*
      * A user with synthetic tokens stakes by calling stake on the token
@@ -549,9 +547,6 @@ contract Staker is IStaker, Initializable {
             userAmountStaked[tokenAddress][msg.sender] > 0,
             "nothing to withdraw"
         );
-        // Note when withdrawing, they will only accumulate float tokens up until the last
-        // state point that has been created. This is acceptable.
-        // Change this with state updates :D They withdraw right up until now.
         mintAccumulatedFloat(tokenAddress, msg.sender);
 
         userAmountStaked[tokenAddress][msg.sender] =
@@ -567,10 +562,12 @@ contract Staker is IStaker, Initializable {
     }
 
     function withdraw(address tokenAddress, uint256 amount) external {
+        _updateState(tokenAddress);
         _withdraw(tokenAddress, amount);
     }
 
     function withdrawAll(address tokenAddress) external {
+        _updateState(tokenAddress);
         _withdraw(tokenAddress, userAmountStaked[tokenAddress][msg.sender]);
     }
 }

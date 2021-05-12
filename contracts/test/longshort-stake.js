@@ -331,10 +331,10 @@ contract("LongShort (staking)", (accounts) => {
     // Wait a long time so user accumulates some float tokens.
     await time.increase(999);
 
-    // Trigger new state point.
-    await longShort._updateSystemState(marketIndex);
-
-    // Compute expected float per second as of now.
+    // Check how many float tokens the user has actually accumulated.
+    await staker.withdraw(token.address, new BN(oneHundred), {
+      from: user1,
+    });
     const now = await time.latest();
     let expectedFloatPerSecond = await calculateFloatPerSecond(
       longValue,
@@ -343,11 +343,6 @@ contract("LongShort (staking)", (accounts) => {
       token.address,
       token == longToken
     );
-
-    // Check how many float tokens the user has actually accumulated.
-    await staker.withdraw(token.address, new BN(oneHundred), {
-      from: user1,
-    });
     const result = await floatToken.balanceOf(user1);
 
     // Assert that the amount earned by the user matches the expected
