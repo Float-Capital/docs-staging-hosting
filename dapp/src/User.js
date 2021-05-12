@@ -44,13 +44,12 @@ function User$UserBalancesCard(Props) {
                 var isLong = param.isLong;
                 var name = param.name;
                 var addr = param.addr;
-                return React.createElement(UserUI.UserMarketBox.make, {
+                return React.createElement(UserUI.UserTokenBox.make, {
                             name: name,
                             isLong: isLong,
                             tokens: FormatMoney.formatEther(undefined, param.tokenBalance),
                             value: FormatMoney.formatEther(undefined, param.tokensValue),
                             tokenAddress: addr,
-                            metamaskMenu: true,
                             symbol: param.symbol,
                             metadata: param.metadata,
                             children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {

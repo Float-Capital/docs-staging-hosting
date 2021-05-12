@@ -359,3 +359,66 @@ let useTokenMarketId = (~tokenId) => {
   | _ => Loading
   }
 }
+
+@send external getTime: Js_date.t => int = "getTime"
+
+let getUnixTime = date => date->getTime / 1000
+
+@send external toFixed: (float, int) => string = "toFixed"
+
+@ocaml.doc(`Returns both the price of the synthetic asset timeLastUpdated, and a current estimate of its price`)
+let useSyntheticPrices = (
+  ~metadata as {
+    oracleAddress,
+    timeLastUpdated: timestamp,
+    tokenSupply,
+    totalLockedLong,
+    totalLockedShort,
+    syntheticPrice,
+  }: synthBalanceMetadata,
+  ~tokenAddress,
+  ~isLong,
+) => {
+  let initialTokenPriceResponse = useTokenPriceAtTime(~tokenAddress, ~timestamp)
+  let priceHistoryQuery = Queries.PriceHistory.use(
+    ~context=Client.createContext(Client.PriceHistory),
+    {
+      intervalId: `${oracleAddress->ethAdrToLowerStr}-${CONSTANTS.fiveMinutesInSeconds->Int.toString}`,
+      numDataPoints: 1,
+    },
+  )
+  let finalPriceResponse =
+    priceHistoryQuery
+    ->Util.queryToResponse
+    ->(
+      (response: graphResponse<Queries.PriceHistory.PriceHistory_inner.t>) =>
+        switch response {
+        | Loading => {
+            let loading: graphResponse<Ethers.BigNumber.t> = Loading
+            loading
+          }
+        | Response({
+            priceIntervalManager: Some({prices: [{endPrice, startTimestamp: priceQueryDate}]}),
+          }) =>
+          if priceQueryDate->getUnixTime->Ethers.BigNumber.fromInt->Ethers.BigNumber.gt(timestamp) {
+            Response(
+              MarketSimulation.simulateMarketPriceChange(
+                ~oldPrice=syntheticPrice,
+                ~newPrice=endPrice,
+                ~totalLockedLong,
+                ~totalLockedShort,
+                ~tokenIsLong=isLong,
+                ~tokenSupply,
+              ),
+            )
+          } else {
+            Response(syntheticPrice)
+          }
+
+        | Response(_) => GraphError(`Unspecifed graph error`)
+        | GraphError(s) => GraphError(s)
+        }
+    )
+
+  liftGraphResponse2(initialTokenPriceResponse, finalPriceResponse)
+}

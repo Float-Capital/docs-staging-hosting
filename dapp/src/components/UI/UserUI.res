@@ -214,13 +214,101 @@ module MetamaskMenu = {
   }
 }
 
-module UserMarketBox = {
-  type direction = Up | Down | Same
+type direction = Up | Down | Same
+@send external toFixed: (float, int) => string = "toFixed"
+let directionAndPercentageString = (oldPrice, newPrice) => {
+  let priceDirection = if newPrice->Ethers.BigNumber.eq(oldPrice) {
+    Same
+  } else if newPrice->Ethers.BigNumber.gt(oldPrice) {
+    Up
+  } else {
+    Down
+  }
 
-  @send external getTime: Js_date.t => int = "getTime"
+  let diff = switch priceDirection {
+  | Up => Ethers.BigNumber.sub(newPrice, oldPrice)
+  | Down => Ethers.BigNumber.sub(oldPrice, newPrice)
+  | Same => CONSTANTS.zeroBN
+  }
 
-  let getUnixTime = date => date->getTime / 1000
+  let initialPercentStr = Globals.percentStr(~n=diff, ~outOf=oldPrice)
+  let initialPercentFloat = initialPercentStr->Globals.parseFloat
+  let flooredPercentFloat =
+    Js_math.floor_float((initialPercentFloat +. epsilon_float) *. 100.) /. 100.
+  let percentStr = flooredPercentFloat->toFixed(2)
+  let percentFloat = percentStr->Globals.parseFloat
 
+  let displayDirection = switch percentFloat {
+  | f if f == 0. => Same
+  | _ => priceDirection
+  }
+
+  (displayDirection, percentStr)
+}
+module UserTokenBox = {
+  @react.component
+  let make = (
+    ~name,
+    ~isLong,
+    ~tokens,
+    ~value,
+    ~tokenAddress=CONSTANTS.zeroAddress,
+    ~symbol="",
+    ~metadata: DataHooks.synthBalanceMetadata,
+    ~children,
+  ) => {
+    let {timeLastUpdated: timestamp} = metadata
+
+    let bothPrices = DataHooks.useSyntheticPrices(~metadata, ~tokenAddress, ~isLong)
+
+    <div
+      className=`flex justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative`>
+      <div className="absolute left-1 top-2">
+        <MetamaskMenu
+          tokenAddress={tokenAddress->Ethers.Utils.ethAdrToStr}
+          tokenName={`${isLong ? "fu" : "fd"}${symbol}`}
+        />
+      </div>
+      <div className=`pl-3 text-sm self-center`>
+        {name->React.string}
+        <br className=`mt-1` />
+        {(isLong ? `Long↗️` : `Short↘️`)->React.string}
+      </div>
+      <div className=`text-sm text-center self-center`>
+        <span className=`text-sm`> {tokens->React.string} </span>
+        <span className=`text-xs`> {`tkns`->React.string} </span>
+        <br className=`mt-1` />
+        <span className=`text-xs`> {Js.String.concat(value, `~$`)->React.string} </span>
+      </div>
+      <div className=`flex items-center text-lg`>
+        <div>
+          <div className=`text-xs text-center text-gray-400`>
+            {timestamp->Globals.formatTimestamp->React.string}
+          </div>
+          {switch bothPrices {
+          | Response((oldPrice, newPrice)) => {
+              let (displayDirection, percentStr) = directionAndPercentageString(oldPrice, newPrice)
+
+              let (symbol, textClassName) = switch displayDirection {
+              | Up => ("", "text-green-500")
+              | Down => ("-", "text-red-500")
+              | Same => ("", "text-gray-400")
+              }
+              <div className={`${textClassName} text-center`}>
+                {`${symbol}${percentStr}%`->React.string}
+              </div>
+            }
+          | Loading => <MiniLoader />
+          | _ => ``->React.string
+          }}
+        </div>
+      </div>
+      <div className=`self-center`> {children} </div>
+    </div>
+  }
+}
+
+module UserStakeBox = {
   @send external toFixed: (float, int) => string = "toFixed"
 
   @react.component
@@ -230,126 +318,61 @@ module UserMarketBox = {
     ~tokens,
     ~value,
     ~tokenAddress=CONSTANTS.zeroAddress,
-    ~metamaskMenu=false,
-    ~symbol="",
-    ~metadata as {
-      oracleAddress,
-      timeLastUpdated: timestamp,
-      tokenSupply,
-      totalLockedLong,
-      totalLockedShort,
-      syntheticPrice,
-    }: DataHooks.synthBalanceMetadata,
+    ~metadata: DataHooks.synthBalanceMetadata,
+    ~userId,
     ~children,
   ) => {
-    let initialTokenPriceResponse = DataHooks.useTokenPriceAtTime(~tokenAddress, ~timestamp)
-    let priceHistoryQuery = Queries.PriceHistory.use(
-      ~context=Client.createContext(Client.PriceHistory),
-      {
-        intervalId: `${oracleAddress->ethAdrToLowerStr}-${CONSTANTS.fiveMinutesInSeconds->Int.toString}`,
-        numDataPoints: 1,
-      },
+    let bothPrices = DataHooks.useSyntheticPrices(~metadata, ~tokenAddress, ~isLong)
+    let claimableFloat = DataHooks.useTotalClaimableFloatForUser(
+      ~userId,
+      ~synthTokens=[tokenAddress->Ethers.Utils.ethAdrToLowerStr],
     )
-    let finalPriceResponse =
-      priceHistoryQuery
-      ->DataHooks.Util.queryToResponse
-      ->(
-        (response: DataHooks.graphResponse<Queries.PriceHistory.PriceHistory_inner.t>) =>
-          switch response {
-          | Loading => {
-              let loading: DataHooks.graphResponse<Ethers.BigNumber.t> = Loading
-              loading
-            }
-          | Response({
-              priceIntervalManager: Some({prices: [{endPrice, startTimestamp: priceQueryDate}]}),
-            }) =>
-            if (
-              priceQueryDate->getUnixTime->Ethers.BigNumber.fromInt->Ethers.BigNumber.gt(timestamp)
-            ) {
-              Response(
-                MarketSimulation.simulateMarketPriceChange(
-                  ~oldPrice=syntheticPrice,
-                  ~newPrice=endPrice,
-                  ~totalLockedLong,
-                  ~totalLockedShort,
-                  ~tokenIsLong=isLong,
-                  ~tokenSupply,
-                ),
-              )
-            } else {
-              Response(syntheticPrice)
-            }
-
-          | Response(_) => GraphError(`Unspecifed graph error`)
-          | GraphError(s) => GraphError(s)
-          }
-      )
-
-    let bothPrices = DataHooks.liftGraphResponse2(initialTokenPriceResponse, finalPriceResponse)
 
     <div
-      className=`flex w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative`>
-      {if metamaskMenu {
-        <div className="absolute left-1 top-2">
-          <MetamaskMenu
-            tokenAddress={tokenAddress->Ethers.Utils.ethAdrToStr}
-            tokenName={`${isLong ? "fu" : "fd"}${symbol}`}
-          />
-        </div>
-      } else {
-        React.null
-      }}
-      <div className=`pl-3 w-1/3 text-sm self-center`>
+      className=`flex justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative`>
+      <div className=`pl-3 text-sm self-center`>
         {name->React.string}
         <br className=`mt-1` />
         {(isLong ? `Long↗️` : `Short↘️`)->React.string}
       </div>
-      <div className=`w-1/3 text-sm mx-2 text-center self-center`>
-        {switch bothPrices {
-        | Response((oldPrice, newPrice)) => {
-            let priceDirection = if newPrice->Ethers.BigNumber.eq(oldPrice) {
-              Same
-            } else if newPrice->Ethers.BigNumber.gt(oldPrice) {
-              Up
-            } else {
-              Down
-            }
-
-            let diff = switch priceDirection {
-            | Up => Ethers.BigNumber.sub(newPrice, oldPrice)
-            | Down => Ethers.BigNumber.sub(oldPrice, newPrice)
-            | Same => CONSTANTS.zeroBN
-            }
-
-            let initialPercentStr = Globals.percentStr(~n=diff, ~outOf=oldPrice)
-            let initialPercentFloat = initialPercentStr->Globals.parseFloat
-            let flooredPercentFloat =
-              Js_math.floor_float((initialPercentFloat +. epsilon_float) *. 100.) /. 100.
-            let percentStr = flooredPercentFloat->toFixed(2)
-            let percentFloat = percentStr->Globals.parseFloat
-
-            let displayDirection = switch percentFloat {
-            | f if f == 0. => Same
-            | _ => priceDirection
-            }
-
-            let (symbol, textClassName) = switch displayDirection {
-            | Up => ("+", "text-green-500")
-            | Down => ("-", "text-red-500")
-            | Same => ("", "text-gray-400")
-            }
-
-            <div className=textClassName> {`${symbol} ${percentStr}%`->React.string} </div>
-          }
-        | Loading => <MiniLoader />
-        | _ => ``->React.string
-        }}
+      <div className=`text-sm text-center self-center`>
         <span className=`text-sm`> {tokens->React.string} </span>
         <span className=`text-xs`> {`tkns`->React.string} </span>
         <br className=`mt-1` />
         <span className=`text-xs`> {Js.String.concat(value, `~$`)->React.string} </span>
       </div>
-      <div className=`w-1/3 self-center`> {children} </div>
+      <div className=`flex items-center text-sm`>
+        <div>
+          {switch bothPrices {
+          | Response((oldPrice, newPrice)) => {
+              let (displayDirection, percentStr) = directionAndPercentageString(oldPrice, newPrice)
+
+              let (symbol, textClassName) = switch displayDirection {
+              | Up => ("+", "text-green-500")
+              | Down => ("-", "text-red-500")
+              | Same => ("", "text-gray-400")
+              }
+              <div className={`${textClassName} text-center`}>
+                {`${symbol}${percentStr}%`->React.string}
+              </div>
+            }
+          | Loading => <MiniLoader />
+          | _ => ``->React.string
+          }}
+          {switch claimableFloat {
+          | Response((totalClaimable, totalPredicted)) =>
+            <div className="text-xs flex flex-col items-center justify-center">
+              <div className="text-gray-500"> {`Float Accruing`->React.string} </div>
+              {totalClaimable
+              ->Ethers.BigNumber.add(totalPredicted)
+              ->FormatMoney.formatEther(~digits=6)
+              ->React.string}
+            </div>
+          | _ => <MiniLoader />
+          }}
+        </div>
+      </div>
+      <div className=`self-center`> {children} </div>
     </div>
   }
 }
@@ -419,7 +442,7 @@ module UserStakesCard = {
       let key = `user-stakes-${Belt.Int.toString(i)}`
       let syntheticToken = stake.currentStake.syntheticToken
       let addr = syntheticToken.id->Ethers.Utils.getAddressUnsafe
-      let name = syntheticToken.syntheticMarket.symbol
+      let name = syntheticToken.syntheticMarket.name
       let tokens = stake.currentStake.amount->FormatMoney.formatEther
       let isLong = syntheticToken.tokenType->Obj.magic == "Long"
       let price = syntheticToken.latestPrice.price.price
@@ -443,22 +466,24 @@ module UserStakesCard = {
         timeLastUpdated: stake.currentStake.timestamp,
       }
 
-      let whenStr =
-        stake.currentStake.timestamp
-        ->Ethers.BigNumber.toNumber
-        ->Js.Int.toFloat
-        ->DateFns.fromUnixTime
-        ->DateFns.formatDistanceToNow
+      let whenStr = stake.currentStake.timestamp->Globals.formatTimestamp
       let value =
         stake.currentStake.amount
         ->Ethers.BigNumber.mul(price)
         ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
       let creationTxHash = stake.currentStake.creationTxHash
 
-      <UserMarketBox
-        key name isLong tokens tokenAddress={addr} value={value->FormatMoney.formatEther} metadata>
+      <UserStakeBox
+        key
+        name
+        isLong
+        tokens
+        tokenAddress={addr}
+        value={value->FormatMoney.formatEther}
+        metadata
+        userId>
         <UserMarketUnstake synthAddress={addr} userId isLong whenStr creationTxHash />
-      </UserMarketBox>
+      </UserStakeBox>
     }, stakes)->React.array
 
     <UserColumnCard>

@@ -4,13 +4,11 @@
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Button = require("./Button.js");
-var Client = require("../../data/Client.js");
 var Config = require("../../Config.js");
 var Ethers = require("../../ethereum/Ethers.js");
 var Ethers$1 = require("ethers");
 var Globals = require("../../libraries/Globals.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
-var Queries = require("../../data/Queries.js");
 var Tooltip = require("./Tooltip.js");
 var Blockies = require("../../bindings/ethereum-blockies-base64/Blockies.js");
 var CONSTANTS = require("../../CONSTANTS.js");
@@ -26,9 +24,6 @@ var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
 var AddToMetamask = require("./AddToMetamask.js");
 var InjectedEthereum = require("../../ethereum/InjectedEthereum.js");
-var MarketSimulation = require("../../libraries/MarketSimulation.js");
-var FromUnixTime = require("date-fns/fromUnixTime").default;
-var FormatDistanceToNow = require("date-fns/formatDistanceToNow").default;
 
 function UserUI$UserContainer(Props) {
   var children = Props.children;
@@ -284,133 +279,71 @@ var MetamaskMenu = {
   make: UserUI$MetamaskMenu
 };
 
-function getUnixTime(date) {
-  return date.getTime() / 1000 | 0;
+function directionAndPercentageString(oldPrice, newPrice) {
+  var priceDirection = newPrice.eq(oldPrice) ? /* Same */2 : (
+      newPrice.gt(oldPrice) ? /* Up */0 : /* Down */1
+    );
+  var diff;
+  switch (priceDirection) {
+    case /* Up */0 :
+        diff = newPrice.sub(oldPrice);
+        break;
+    case /* Down */1 :
+        diff = oldPrice.sub(newPrice);
+        break;
+    case /* Same */2 :
+        diff = CONSTANTS.zeroBN;
+        break;
+    
+  }
+  var initialPercentStr = Globals.percentStr(diff, oldPrice);
+  var initialPercentFloat = parseFloat(initialPercentStr);
+  var flooredPercentFloat = Math.floor((initialPercentFloat + Pervasives.epsilon_float) * 100) / 100;
+  var percentStr = flooredPercentFloat.toFixed(2);
+  var percentFloat = parseFloat(percentStr);
+  var displayDirection = percentFloat === 0 ? /* Same */2 : priceDirection;
+  return [
+          displayDirection,
+          percentStr
+        ];
 }
 
-function UserUI$UserMarketBox(Props) {
+function UserUI$UserTokenBox(Props) {
   var name = Props.name;
   var isLong = Props.isLong;
   var tokens = Props.tokens;
   var value = Props.value;
-  var $staropt$star = Props.tokenAddress;
-  var $staropt$star$1 = Props.metamaskMenu;
-  var $staropt$star$2 = Props.symbol;
-  var param = Props.metadata;
+  var tokenAddressOpt = Props.tokenAddress;
+  var symbolOpt = Props.symbol;
+  var metadata = Props.metadata;
   var children = Props.children;
-  var syntheticPrice = param.syntheticPrice;
-  var timestamp = param.timeLastUpdated;
-  var tokenAddress = $staropt$star !== undefined ? Caml_option.valFromOption($staropt$star) : CONSTANTS.zeroAddress;
-  var metamaskMenu = $staropt$star$1 !== undefined ? $staropt$star$1 : false;
-  var symbol = $staropt$star$2 !== undefined ? $staropt$star$2 : "";
-  var initialTokenPriceResponse = DataHooks.useTokenPriceAtTime(tokenAddress, timestamp);
-  var priceHistoryQuery = Curry.app(Queries.PriceHistory.use, [
-        undefined,
-        Caml_option.some(Client.createContext(/* PriceHistory */1)),
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        {
-          intervalId: Globals.ethAdrToLowerStr(param.oracleAddress) + "-" + String(CONSTANTS.fiveMinutesInSeconds),
-          numDataPoints: 1
-        }
-      ]);
-  var response = DataHooks.Util.queryToResponse(priceHistoryQuery);
-  var finalPriceResponse;
-  if (typeof response === "number") {
-    finalPriceResponse = /* Loading */0;
-  } else if (response.TAG === /* GraphError */0) {
-    finalPriceResponse = {
-      TAG: 0,
-      _0: response._0,
-      [Symbol.for("name")]: "GraphError"
-    };
-  } else {
-    var match = response._0.priceIntervalManager;
-    if (match !== undefined) {
-      var match$1 = match.prices;
-      if (match$1.length !== 1) {
-        finalPriceResponse = {
-          TAG: 0,
-          _0: "Unspecifed graph error",
-          [Symbol.for("name")]: "GraphError"
-        };
-      } else {
-        var match$2 = match$1[0];
-        finalPriceResponse = Ethers$1.BigNumber.from(match$2.startTimestamp.getTime() / 1000 | 0).gt(timestamp) ? ({
-              TAG: 1,
-              _0: MarketSimulation.simulateMarketPriceChange(syntheticPrice, match$2.endPrice, param.totalLockedLong, param.totalLockedShort, param.tokenSupply, isLong),
-              [Symbol.for("name")]: "Response"
-            }) : ({
-              TAG: 1,
-              _0: syntheticPrice,
-              [Symbol.for("name")]: "Response"
-            });
-      }
-    } else {
-      finalPriceResponse = {
-        TAG: 0,
-        _0: "Unspecifed graph error",
-        [Symbol.for("name")]: "GraphError"
-      };
-    }
-  }
-  var bothPrices = DataHooks.liftGraphResponse2(initialTokenPriceResponse, finalPriceResponse);
+  var tokenAddress = tokenAddressOpt !== undefined ? Caml_option.valFromOption(tokenAddressOpt) : CONSTANTS.zeroAddress;
+  var symbol = symbolOpt !== undefined ? symbolOpt : "";
+  var bothPrices = DataHooks.useSyntheticPrices(metadata, tokenAddress, isLong);
   var tmp;
   if (typeof bothPrices === "number") {
     tmp = React.createElement(MiniLoader.make, {});
   } else if (bothPrices.TAG === /* GraphError */0) {
     tmp = "";
   } else {
-    var match$3 = bothPrices._0;
-    var newPrice = match$3[1];
-    var oldPrice = match$3[0];
-    var priceDirection = newPrice.eq(oldPrice) ? /* Same */2 : (
-        newPrice.gt(oldPrice) ? /* Up */0 : /* Down */1
-      );
-    var diff;
-    switch (priceDirection) {
+    var match = bothPrices._0;
+    var match$1 = directionAndPercentageString(match[0], match[1]);
+    var match$2;
+    switch (match$1[0]) {
       case /* Up */0 :
-          diff = newPrice.sub(oldPrice);
-          break;
-      case /* Down */1 :
-          diff = oldPrice.sub(newPrice);
-          break;
-      case /* Same */2 :
-          diff = CONSTANTS.zeroBN;
-          break;
-      
-    }
-    var initialPercentStr = Globals.percentStr(diff, oldPrice);
-    var initialPercentFloat = parseFloat(initialPercentStr);
-    var flooredPercentFloat = Math.floor((initialPercentFloat + Pervasives.epsilon_float) * 100) / 100;
-    var percentStr = flooredPercentFloat.toFixed(2);
-    var percentFloat = parseFloat(percentStr);
-    var displayDirection = percentFloat === 0 ? /* Same */2 : priceDirection;
-    var match$4;
-    switch (displayDirection) {
-      case /* Up */0 :
-          match$4 = [
-            "+",
+          match$2 = [
+            "",
             "text-green-500"
           ];
           break;
       case /* Down */1 :
-          match$4 = [
+          match$2 = [
             "-",
             "text-red-500"
           ];
           break;
       case /* Same */2 :
-          match$4 = [
+          match$2 = [
             "",
             "text-gray-400"
           ];
@@ -418,25 +351,25 @@ function UserUI$UserMarketBox(Props) {
       
     }
     tmp = React.createElement("div", {
-          className: match$4[1]
-        }, match$4[0] + " " + percentStr + "%");
+          className: match$2[1] + " text-center"
+        }, match$2[0] + match$1[1] + "%");
   }
   return React.createElement("div", {
-              className: "flex w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative"
-            }, metamaskMenu ? React.createElement("div", {
-                    className: "absolute left-1 top-2"
-                  }, React.createElement(UserUI$MetamaskMenu, {
-                        tokenAddress: Ethers.Utils.ethAdrToStr(tokenAddress),
-                        tokenName: (
-                          isLong ? "fu" : "fd"
-                        ) + symbol
-                      })) : null, React.createElement("div", {
-                  className: "pl-3 w-1/3 text-sm self-center"
+              className: "flex justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative"
+            }, React.createElement("div", {
+                  className: "absolute left-1 top-2"
+                }, React.createElement(UserUI$MetamaskMenu, {
+                      tokenAddress: Ethers.Utils.ethAdrToStr(tokenAddress),
+                      tokenName: (
+                        isLong ? "fu" : "fd"
+                      ) + symbol
+                    })), React.createElement("div", {
+                  className: "pl-3 text-sm self-center"
                 }, name, React.createElement("br", {
                       className: "mt-1"
                     }), isLong ? "Long↗️" : "Short↘️"), React.createElement("div", {
-                  className: "w-1/3 text-sm mx-2 text-center self-center"
-                }, tmp, React.createElement("span", {
+                  className: "text-sm text-center self-center"
+                }, React.createElement("span", {
                       className: "text-sm"
                     }, tokens), React.createElement("span", {
                       className: "text-xs"
@@ -445,13 +378,102 @@ function UserUI$UserMarketBox(Props) {
                     }), React.createElement("span", {
                       className: "text-xs"
                     }, "~$".concat(value))), React.createElement("div", {
-                  className: "w-1/3 self-center"
+                  className: "flex items-center text-lg"
+                }, React.createElement("div", undefined, React.createElement("div", {
+                          className: "text-xs text-center text-gray-400"
+                        }, Globals.formatTimestamp(metadata.timeLastUpdated)), tmp)), React.createElement("div", {
+                  className: "self-center"
                 }, children));
 }
 
-var UserMarketBox = {
-  getUnixTime: getUnixTime,
-  make: UserUI$UserMarketBox
+var UserTokenBox = {
+  make: UserUI$UserTokenBox
+};
+
+function UserUI$UserStakeBox(Props) {
+  var name = Props.name;
+  var isLong = Props.isLong;
+  var tokens = Props.tokens;
+  var value = Props.value;
+  var tokenAddressOpt = Props.tokenAddress;
+  var metadata = Props.metadata;
+  var userId = Props.userId;
+  var children = Props.children;
+  var tokenAddress = tokenAddressOpt !== undefined ? Caml_option.valFromOption(tokenAddressOpt) : CONSTANTS.zeroAddress;
+  var bothPrices = DataHooks.useSyntheticPrices(metadata, tokenAddress, isLong);
+  var claimableFloat = DataHooks.useTotalClaimableFloatForUser(userId, [Ethers.Utils.ethAdrToLowerStr(tokenAddress)]);
+  var tmp;
+  if (typeof bothPrices === "number") {
+    tmp = React.createElement(MiniLoader.make, {});
+  } else if (bothPrices.TAG === /* GraphError */0) {
+    tmp = "";
+  } else {
+    var match = bothPrices._0;
+    var match$1 = directionAndPercentageString(match[0], match[1]);
+    var match$2;
+    switch (match$1[0]) {
+      case /* Up */0 :
+          match$2 = [
+            "+",
+            "text-green-500"
+          ];
+          break;
+      case /* Down */1 :
+          match$2 = [
+            "-",
+            "text-red-500"
+          ];
+          break;
+      case /* Same */2 :
+          match$2 = [
+            "",
+            "text-gray-400"
+          ];
+          break;
+      
+    }
+    tmp = React.createElement("div", {
+          className: match$2[1] + " text-center"
+        }, match$2[0] + match$1[1] + "%");
+  }
+  var tmp$1;
+  if (typeof claimableFloat === "number") {
+    tmp$1 = React.createElement(MiniLoader.make, {});
+  } else if (claimableFloat.TAG === /* GraphError */0) {
+    tmp$1 = React.createElement(MiniLoader.make, {});
+  } else {
+    var match$3 = claimableFloat._0;
+    tmp$1 = React.createElement("div", {
+          className: "text-xs flex flex-col items-center justify-center"
+        }, React.createElement("div", {
+              className: "text-gray-500"
+            }, "Float Accruing"), FormatMoney.formatEther(6, match$3[0].add(match$3[1])));
+  }
+  return React.createElement("div", {
+              className: "flex justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative"
+            }, React.createElement("div", {
+                  className: "pl-3 text-sm self-center"
+                }, name, React.createElement("br", {
+                      className: "mt-1"
+                    }), isLong ? "Long↗️" : "Short↘️"), React.createElement("div", {
+                  className: "text-sm text-center self-center"
+                }, React.createElement("span", {
+                      className: "text-sm"
+                    }, tokens), React.createElement("span", {
+                      className: "text-xs"
+                    }, "tkns"), React.createElement("br", {
+                      className: "mt-1"
+                    }), React.createElement("span", {
+                      className: "text-xs"
+                    }, "~$".concat(value))), React.createElement("div", {
+                  className: "flex items-center text-sm"
+                }, React.createElement("div", undefined, tmp, tmp$1)), React.createElement("div", {
+                  className: "self-center"
+                }, children));
+}
+
+var UserStakeBox = {
+  make: UserUI$UserStakeBox
 };
 
 function UserUI$UserMarketStakeOrRedeem(Props) {
@@ -531,7 +553,7 @@ function UserUI$UserStakesCard(Props) {
         var key = "user-stakes-" + String(i);
         var syntheticToken = stake.currentStake.syntheticToken;
         var addr = Ethers$1.utils.getAddress(syntheticToken.id);
-        var name = syntheticToken.syntheticMarket.symbol;
+        var name = syntheticToken.syntheticMarket.name;
         var tokens = FormatMoney.formatEther(undefined, stake.currentStake.amount);
         var isLong = syntheticToken.tokenType === "Long";
         var price = syntheticToken.latestPrice.price.price;
@@ -553,16 +575,17 @@ function UserUI$UserStakesCard(Props) {
           totalLockedShort: metadata_totalLockedShort,
           syntheticPrice: metadata_syntheticPrice
         };
-        var whenStr = FormatDistanceToNow(FromUnixTime(stake.currentStake.timestamp.toNumber()));
+        var whenStr = Globals.formatTimestamp(stake.currentStake.timestamp);
         var value = stake.currentStake.amount.mul(price).div(CONSTANTS.tenToThe18);
         var creationTxHash = stake.currentStake.creationTxHash;
-        return React.createElement(UserUI$UserMarketBox, {
+        return React.createElement(UserUI$UserStakeBox, {
                     name: name,
                     isLong: isLong,
                     tokens: tokens,
                     value: FormatMoney.formatEther(undefined, value),
                     tokenAddress: addr,
                     metadata: metadata,
+                    userId: userId,
                     children: React.createElement(UserUI$UserMarketUnstake, {
                           synthAddress: addr,
                           userId: userId,
@@ -662,7 +685,9 @@ exports.UserColumnTextCenter = UserColumnTextCenter;
 exports.UserColumnText = UserColumnText;
 exports.threeDotsSvg = threeDotsSvg;
 exports.MetamaskMenu = MetamaskMenu;
-exports.UserMarketBox = UserMarketBox;
+exports.directionAndPercentageString = directionAndPercentageString;
+exports.UserTokenBox = UserTokenBox;
+exports.UserStakeBox = UserStakeBox;
 exports.UserMarketStakeOrRedeem = UserMarketStakeOrRedeem;
 exports.UserMarketUnstake = UserMarketUnstake;
 exports.UserStakesCard = UserStakesCard;
