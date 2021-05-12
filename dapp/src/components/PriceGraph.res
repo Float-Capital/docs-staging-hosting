@@ -111,11 +111,11 @@ let getMaxTimeIntervalAndAmount = timeMarketExists => {
 let zoomAndNumDataPointsFromGraphSetting = graphSetting =>
   switch graphSetting {
   | Max(timeMaketHasExisted) => timeMaketHasExisted->getMaxTimeIntervalAndAmount
-  | Day => (CONSTANTS.oneHourInSeconds, 24)
-  | Week => (CONSTANTS.halfDayInSeconds, 14)
-  | Month => (CONSTANTS.oneDayInSeconds, 30)
-  | ThreeMonth => (CONSTANTS.threeMonthsInSeconds, 30)
-  | Year => (CONSTANTS.twoWeeksInSeconds, 26)
+  | Day => (CONSTANTS.fiveMinutesInSeconds, 288 /* =24*12 */)
+  | Week => (CONSTANTS.oneHourInSeconds, 168 /* =7*24 */)
+  | Month => (CONSTANTS.halfDayInSeconds, 60 /* =30*2 */)
+  | ThreeMonth => (CONSTANTS.oneDayInSeconds, 90 /* =30*3 */)
+  | Year => (CONSTANTS.oneWeekInSeconds, 52)
   }
 
 type dataInfo = {
