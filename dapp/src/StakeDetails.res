@@ -24,7 +24,7 @@ module UsersActiveStakes = {
             },
           }) => {
             let amountFormatted = Misc.NumberFormat.formatEther(amount)
-            // let totalStakedFormatted = Misc.NumberFormat.Misc.NumberFormat(
+            // let totalStakedFormatted = Misc.NumberFormat.numberFormat(
             //   ~number=totalStaked
             //   ->Ethers.Utils.formatEther
             //   ->Float.fromString
