@@ -54,10 +54,10 @@ function Loader$Tiny(Props) {
                         return (current + 1 | 0) % 3;
                       }));
         }), 300);
-  var elipsisDot = function (display) {
+  var elipsisDot = function (hide) {
     return React.createElement("span", {
                 className: "opacity-" + (
-                  display ? "40" : "100"
+                  hide ? "10" : "100"
                 )
               }, ".");
   };

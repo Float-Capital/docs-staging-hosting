@@ -26,12 +26,12 @@ module Tiny = {
 
     Misc.Time.useInterval(() => setInlineLoaderState(current => mod(current + 1, 3)), ~delay=300)
 
-    let elipsisDot = (~display) =>
-      <span className={`opacity-${display ? "40" : "100"}`}> {`.`->React.string} </span>
+    let elipsisDot = (~hide) =>
+      <span className={`opacity-${hide ? "10" : "100"}`}> {`.`->React.string} </span>
     <>
-      {elipsisDot(~display=inlineLoaderState == 0)}
-      {elipsisDot(~display=inlineLoaderState == 1)}
-      {elipsisDot(~display=inlineLoaderState == 2)}
+      {elipsisDot(~hide=inlineLoaderState == 0)}
+      {elipsisDot(~hide=inlineLoaderState == 1)}
+      {elipsisDot(~hide=inlineLoaderState == 2)}
     </>
   }
 }
