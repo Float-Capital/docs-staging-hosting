@@ -308,17 +308,10 @@ function directionAndPercentageString(oldPrice, newPrice) {
         ];
 }
 
-function UserUI$UserTokenBox(Props) {
-  var name = Props.name;
-  var isLong = Props.isLong;
-  var tokens = Props.tokens;
-  var value = Props.value;
-  var tokenAddressOpt = Props.tokenAddress;
-  var symbolOpt = Props.symbol;
+function UserUI$UserPercentageGains(Props) {
   var metadata = Props.metadata;
-  var children = Props.children;
-  var tokenAddress = tokenAddressOpt !== undefined ? Caml_option.valFromOption(tokenAddressOpt) : CONSTANTS.zeroAddress;
-  var symbol = symbolOpt !== undefined ? symbolOpt : "";
+  var tokenAddress = Props.tokenAddress;
+  var isLong = Props.isLong;
   var bothPrices = DataHooks.useSyntheticPrices(metadata, tokenAddress, isLong);
   var tmp;
   if (typeof bothPrices === "number") {
@@ -351,9 +344,30 @@ function UserUI$UserTokenBox(Props) {
       
     }
     tmp = React.createElement("div", {
-          className: match$2[1] + " text-center"
+          className: match$2[1] + " text-center text-lg"
         }, match$2[0] + match$1[1] + "%");
   }
+  return React.createElement("div", {
+              className: "flex flex-col items-center justify-center"
+            }, tmp);
+}
+
+var UserPercentageGains = {
+  directionAndPercentageString: directionAndPercentageString,
+  make: UserUI$UserPercentageGains
+};
+
+function UserUI$UserTokenBox(Props) {
+  var name = Props.name;
+  var isLong = Props.isLong;
+  var tokens = Props.tokens;
+  var value = Props.value;
+  var tokenAddressOpt = Props.tokenAddress;
+  var symbolOpt = Props.symbol;
+  var metadata = Props.metadata;
+  var children = Props.children;
+  var tokenAddress = tokenAddressOpt !== undefined ? Caml_option.valFromOption(tokenAddressOpt) : CONSTANTS.zeroAddress;
+  var symbol = symbolOpt !== undefined ? symbolOpt : "";
   return React.createElement("div", {
               className: "flex justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative"
             }, React.createElement("div", {
@@ -378,16 +392,42 @@ function UserUI$UserTokenBox(Props) {
                     }), React.createElement("span", {
                       className: "text-xs"
                     }, "~$".concat(value))), React.createElement("div", {
-                  className: "flex items-center text-lg"
-                }, React.createElement("div", undefined, React.createElement("div", {
-                          className: "text-xs text-center text-gray-400"
-                        }, Globals.formatTimestamp(metadata.timeLastUpdated)), tmp)), React.createElement("div", {
+                  className: "flex flex-col items-center justify-center"
+                }, React.createElement("div", {
+                      className: "text-xs text-center text-gray-400"
+                    }, Globals.formatTimestamp(metadata.timeLastUpdated)), React.createElement(UserUI$UserPercentageGains, {
+                      metadata: metadata,
+                      tokenAddress: tokenAddress,
+                      isLong: isLong
+                    })), React.createElement("div", {
                   className: "self-center"
                 }, children));
 }
 
 var UserTokenBox = {
   make: UserUI$UserTokenBox
+};
+
+function UserUI$UserFloatEarnedFromStake(Props) {
+  var userId = Props.userId;
+  var tokenAddress = Props.tokenAddress;
+  var claimableFloat = DataHooks.useTotalClaimableFloatForUser(userId, [Ethers.Utils.ethAdrToLowerStr(tokenAddress)]);
+  if (typeof claimableFloat === "number") {
+    return React.createElement(MiniLoader.make, {});
+  }
+  if (claimableFloat.TAG === /* GraphError */0) {
+    return React.createElement(MiniLoader.make, {});
+  }
+  var match = claimableFloat._0;
+  return React.createElement("div", {
+              className: "text-xs flex flex-col items-center justify-center"
+            }, React.createElement("div", {
+                  className: "text-gray-500"
+                }, "Float Accruing"), "~" + FormatMoney.formatEther(6, match[0].add(match[1])));
+}
+
+var UserFloatEarnedFromStake = {
+  make: UserUI$UserFloatEarnedFromStake
 };
 
 function UserUI$UserStakeBox(Props) {
@@ -397,58 +437,9 @@ function UserUI$UserStakeBox(Props) {
   var value = Props.value;
   var tokenAddressOpt = Props.tokenAddress;
   var metadata = Props.metadata;
-  var userId = Props.userId;
+  var creationTxHash = Props.creationTxHash;
   var children = Props.children;
   var tokenAddress = tokenAddressOpt !== undefined ? Caml_option.valFromOption(tokenAddressOpt) : CONSTANTS.zeroAddress;
-  var bothPrices = DataHooks.useSyntheticPrices(metadata, tokenAddress, isLong);
-  var claimableFloat = DataHooks.useTotalClaimableFloatForUser(userId, [Ethers.Utils.ethAdrToLowerStr(tokenAddress)]);
-  var tmp;
-  if (typeof bothPrices === "number") {
-    tmp = React.createElement(MiniLoader.make, {});
-  } else if (bothPrices.TAG === /* GraphError */0) {
-    tmp = "";
-  } else {
-    var match = bothPrices._0;
-    var match$1 = directionAndPercentageString(match[0], match[1]);
-    var match$2;
-    switch (match$1[0]) {
-      case /* Up */0 :
-          match$2 = [
-            "+",
-            "text-green-500"
-          ];
-          break;
-      case /* Down */1 :
-          match$2 = [
-            "-",
-            "text-red-500"
-          ];
-          break;
-      case /* Same */2 :
-          match$2 = [
-            "",
-            "text-gray-400"
-          ];
-          break;
-      
-    }
-    tmp = React.createElement("div", {
-          className: match$2[1] + " text-center"
-        }, match$2[0] + match$1[1] + "%");
-  }
-  var tmp$1;
-  if (typeof claimableFloat === "number") {
-    tmp$1 = React.createElement(MiniLoader.make, {});
-  } else if (claimableFloat.TAG === /* GraphError */0) {
-    tmp$1 = React.createElement(MiniLoader.make, {});
-  } else {
-    var match$3 = claimableFloat._0;
-    tmp$1 = React.createElement("div", {
-          className: "text-xs flex flex-col items-center justify-center"
-        }, React.createElement("div", {
-              className: "text-gray-500"
-            }, "Float Accruing"), FormatMoney.formatEther(6, match$3[0].add(match$3[1])));
-  }
   return React.createElement("div", {
               className: "flex justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative"
             }, React.createElement("div", {
@@ -466,8 +457,17 @@ function UserUI$UserStakeBox(Props) {
                     }), React.createElement("span", {
                       className: "text-xs"
                     }, "~$".concat(value))), React.createElement("div", {
-                  className: "flex items-center text-sm"
-                }, React.createElement("div", undefined, tmp, tmp$1)), React.createElement("div", {
+                  className: "flex flex-col items-center justify-center"
+                }, React.createElement("a", {
+                      className: "text-xs text-center text-gray-400 hover:opacity-75",
+                      href: Config.blockExplorer + "/tx/" + creationTxHash,
+                      rel: "noopener noreferrer",
+                      target: "_"
+                    }, Globals.formatTimestamp(metadata.timeLastUpdated)), React.createElement(UserUI$UserPercentageGains, {
+                      metadata: metadata,
+                      tokenAddress: tokenAddress,
+                      isLong: isLong
+                    })), React.createElement("div", {
                   className: "self-center"
                 }, children));
 }
@@ -513,8 +513,6 @@ function UserUI$UserMarketUnstake(Props) {
   var synthAddress = Props.synthAddress;
   var userId = Props.userId;
   var isLong = Props.isLong;
-  var whenStr = Props.whenStr;
-  var creationTxHash = Props.creationTxHash;
   var synthAddressStr = Globals.ethAdrToLowerStr(synthAddress);
   var marketIdResponse = DataHooks.useTokenMarketId(synthAddressStr);
   var marketId = Belt_Option.getWithDefault(DataHooks.Util.graphResponseToOption(marketIdResponse), "1");
@@ -531,12 +529,7 @@ function UserUI$UserMarketUnstake(Props) {
         }));
   return React.createElement("div", {
               className: "flex flex-col"
-            }, React.createElement("a", {
-                  className: "inline text-xxs self-center hover:opacity-75",
-                  href: Config.blockExplorer + "/tx/" + creationTxHash,
-                  rel: "noopener noreferrer",
-                  target: "_"
-                }, React.createElement("i", undefined, whenStr + " ago")), isCurrentUser ? React.createElement(Button.Tiny.make, {
+            }, isCurrentUser ? React.createElement(Button.Tiny.make, {
                     onClick: unstake,
                     children: "unstake"
                   }) : null);
@@ -575,7 +568,6 @@ function UserUI$UserStakesCard(Props) {
           totalLockedShort: metadata_totalLockedShort,
           syntheticPrice: metadata_syntheticPrice
         };
-        var whenStr = Globals.formatTimestamp(stake.currentStake.timestamp);
         var value = stake.currentStake.amount.mul(price).div(CONSTANTS.tenToThe18);
         var creationTxHash = stake.currentStake.creationTxHash;
         return React.createElement(UserUI$UserStakeBox, {
@@ -585,16 +577,17 @@ function UserUI$UserStakesCard(Props) {
                     value: FormatMoney.formatEther(undefined, value),
                     tokenAddress: addr,
                     metadata: metadata,
-                    userId: userId,
-                    children: React.createElement(UserUI$UserMarketUnstake, {
-                          synthAddress: addr,
-                          userId: userId,
-                          isLong: isLong,
-                          whenStr: whenStr,
-                          creationTxHash: creationTxHash
-                        }),
+                    creationTxHash: creationTxHash,
+                    children: null,
                     key: key
-                  });
+                  }, React.createElement(UserUI$UserFloatEarnedFromStake, {
+                        userId: userId,
+                        tokenAddress: addr
+                      }), React.createElement(UserUI$UserMarketUnstake, {
+                        synthAddress: addr,
+                        userId: userId,
+                        isLong: isLong
+                      }));
       });
   return React.createElement(UserUI$UserColumnCard, {
               children: null
@@ -685,8 +678,9 @@ exports.UserColumnTextCenter = UserColumnTextCenter;
 exports.UserColumnText = UserColumnText;
 exports.threeDotsSvg = threeDotsSvg;
 exports.MetamaskMenu = MetamaskMenu;
-exports.directionAndPercentageString = directionAndPercentageString;
+exports.UserPercentageGains = UserPercentageGains;
 exports.UserTokenBox = UserTokenBox;
+exports.UserFloatEarnedFromStake = UserFloatEarnedFromStake;
 exports.UserStakeBox = UserStakeBox;
 exports.UserMarketStakeOrRedeem = UserMarketStakeOrRedeem;
 exports.UserMarketUnstake = UserMarketUnstake;
