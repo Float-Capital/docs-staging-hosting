@@ -18,4 +18,11 @@ let amountForApproval = amount =>
     CONSTANTS.oneHundredThousandInWei
   }
 
+let formatTimestamp = timestamp =>
+  timestamp
+  ->Ethers.BigNumber.toNumber
+  ->Js.Int.toFloat
+  ->DateFns.fromUnixTime
+  ->DateFns.formatDistanceToNow
+
 @val external parseFloat: string => float = "parseFloat"

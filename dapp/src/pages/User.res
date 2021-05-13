@@ -30,18 +30,17 @@ module UserBalancesCard = {
           {balances
           ->Array.keep(({tokenBalance}) => !(tokenBalance->Ethers.BigNumber.eq(CONSTANTS.zeroBN)))
           ->Array.map(({addr, name, symbol, isLong, tokenBalance, tokensValue, metadata}) =>
-            <UserMarketBox
+            <UserTokenBox
               key={`${name}-${isLong ? "long" : "short"}`}
               name
               isLong
               tokenAddress={addr}
               symbol
-              metamaskMenu={true}
               tokens={Misc.NumberFormat.formatEther(tokenBalance)}
               value={Misc.NumberFormat.formatEther(tokensValue)}
               metadata>
               <UserMarketStakeOrRedeem synthAddress={addr->Ethers.Utils.ethAdrToLowerStr} isLong />
-            </UserMarketBox>
+            </UserTokenBox>
           )
           ->React.array}
         </>

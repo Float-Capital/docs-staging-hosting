@@ -12,6 +12,7 @@ var Queries = require("./Queries.js");
 var CONSTANTS = require("../CONSTANTS.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
+var MarketSimulation = require("../libraries/MarketSimulation.js");
 var FromUnixTime = require("date-fns/fromUnixTime").default;
 
 function liftGraphResponse2(a, b) {
@@ -698,6 +699,76 @@ function useTokenMarketId(tokenId) {
   }
 }
 
+function getUnixTime(date) {
+  return date.getTime() / 1000 | 0;
+}
+
+function useSyntheticPrices(param, tokenAddress, isLong) {
+  var syntheticPrice = param.syntheticPrice;
+  var timestamp = param.timeLastUpdated;
+  var initialTokenPriceResponse = useTokenPriceAtTime(tokenAddress, timestamp);
+  var priceHistoryQuery = Curry.app(Queries.PriceHistory.use, [
+        undefined,
+        Caml_option.some(Client.createContext(/* PriceHistory */1)),
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          intervalId: Globals.ethAdrToLowerStr(param.oracleAddress) + "-" + String(CONSTANTS.fiveMinutesInSeconds),
+          numDataPoints: 1
+        }
+      ]);
+  var response = queryToResponse(priceHistoryQuery);
+  var finalPriceResponse;
+  if (typeof response === "number") {
+    finalPriceResponse = /* Loading */0;
+  } else if (response.TAG === /* GraphError */0) {
+    finalPriceResponse = {
+      TAG: 0,
+      _0: response._0,
+      [Symbol.for("name")]: "GraphError"
+    };
+  } else {
+    var match = response._0.priceIntervalManager;
+    if (match !== undefined) {
+      var match$1 = match.prices;
+      if (match$1.length !== 1) {
+        finalPriceResponse = {
+          TAG: 0,
+          _0: "Unspecifed graph error",
+          [Symbol.for("name")]: "GraphError"
+        };
+      } else {
+        var match$2 = match$1[0];
+        finalPriceResponse = Ethers$1.BigNumber.from(match$2.startTimestamp.getTime() / 1000 | 0).gt(timestamp) ? ({
+              TAG: 1,
+              _0: MarketSimulation.simulateMarketPriceChange(syntheticPrice, match$2.endPrice, param.totalLockedLong, param.totalLockedShort, param.tokenSupply, isLong),
+              [Symbol.for("name")]: "Response"
+            }) : ({
+              TAG: 1,
+              _0: syntheticPrice,
+              [Symbol.for("name")]: "Response"
+            });
+      }
+    } else {
+      finalPriceResponse = {
+        TAG: 0,
+        _0: "Unspecifed graph error",
+        [Symbol.for("name")]: "GraphError"
+      };
+    }
+  }
+  return liftGraphResponse2(initialTokenPriceResponse, finalPriceResponse);
+}
+
 var ethAdrToLowerStr = Globals.ethAdrToLowerStr;
 
 exports.liftGraphResponse2 = liftGraphResponse2;
@@ -714,4 +785,6 @@ exports.useSyntheticTokenBalanceOrZero = useSyntheticTokenBalanceOrZero;
 exports.useTokenPriceAtTime = useTokenPriceAtTime;
 exports.Util = Util;
 exports.useTokenMarketId = useTokenMarketId;
+exports.getUnixTime = getUnixTime;
+exports.useSyntheticPrices = useSyntheticPrices;
 /* Misc Not a pure module */
