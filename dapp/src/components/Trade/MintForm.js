@@ -3,31 +3,30 @@
 
 var Form = require("../Form.js");
 var Next = require("../../bindings/Next.js");
-var Tick = require("../UI/Tick.js");
+var Tick = require("../UI/Base/Tick.js");
 var Curry = require("rescript/lib/js/curry.js");
-var Modal = require("../UI/Modal.js");
+var Modal = require("../UI/Base/Modal.js");
 var React = require("react");
-var Button = require("../UI/Button.js");
+var Button = require("../UI/Base/Button.js");
 var Config = require("../../Config.js");
 var Ethers = require("../../ethereum/Ethers.js");
+var Loader = require("../UI/Base/Loader.js");
 var Ethers$1 = require("ethers");
 var Globals = require("../../libraries/Globals.js");
+var Metamask = require("../UI/Base/Metamask.js");
 var Contracts = require("../../ethereum/Contracts.js");
 var Formality = require("re-formality/src/Formality.js");
-var MiniLoader = require("../UI/MiniLoader.js");
-var AmountInput = require("../UI/AmountInput.js");
+var AmountInput = require("../UI/Base/AmountInput.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var TweetButton = require("../UI/TweetButton.js");
 var Router = require("next/router");
 var ContractHooks = require("../Testing/Admin/ContractHooks.js");
 var ToastProvider = require("../UI/ToastProvider.js");
-var EllipsesLoader = require("../UI/EllipsesLoader.js");
 var ContractActions = require("../../ethereum/ContractActions.js");
 var LongOrShortSelect = require("../UI/LongOrShortSelect.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
 var ViewPositionButton = require("../UI/ViewPositionButton.js");
-var AddToMetaMaskButton = require("../UI/AddToMetaMaskButton.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
 var Formality__ReactUpdate = require("re-formality/src/Formality__ReactUpdate.js");
 
@@ -566,7 +565,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                       id: 1,
                       children: React.createElement("div", {
                             className: "text-center mx-3 my-6"
-                          }, React.createElement(EllipsesLoader.make, {}), React.createElement("p", undefined, "Please approve your " + Config.paymentTokenName + " token "))
+                          }, React.createElement(Loader.Ellipses.make, {}), React.createElement("p", undefined, "Please approve your " + Config.paymentTokenName + " token "))
                     }), React.createElement(Button.make, {
                       onClick: (function (param) {
                           
@@ -585,7 +584,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                                 className: "text-center m-3"
                               }, React.createElement("div", {
                                     className: "m-2"
-                                  }, React.createElement(MiniLoader.make, {})), React.createElement("p", undefined, "Approval transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                                  }, React.createElement(Loader.Mini.make, {})), React.createElement("p", undefined, "Approval transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
                                     txHash: txStateApprove._0
                                   }))
                         }), React.createElement(Button.make, {
@@ -650,7 +649,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                             id: 5,
                             children: React.createElement("div", {
                                   className: "text-center m-3"
-                                }, React.createElement(EllipsesLoader.make, {}), React.createElement("h1", undefined, "Confirm the transaction to mint " + tokenToMint))
+                                }, React.createElement(Loader.Ellipses.make, {}), React.createElement("h1", undefined, "Confirm the transaction to mint " + tokenToMint))
                           }), React.createElement(Button.make, {
                             onClick: (function (param) {
                                 
@@ -668,7 +667,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                                     className: "text-center m-3"
                                   }, React.createElement("div", {
                                         className: "m-2"
-                                      }, React.createElement(MiniLoader.make, {})), React.createElement("p", undefined, "Minting transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                                      }, React.createElement(Loader.Mini.make, {})), React.createElement("p", undefined, "Minting transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
                                         txHash: txStateMint._0
                                       }))
                             }), React.createElement(Button.make, {
@@ -694,7 +693,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                                         message: "I just went " + (
                                           isLong ? "long" : "short"
                                         ) + " on " + marketName + "! @float_capital 🌊 "
-                                      }), React.createElement(AddToMetaMaskButton.make, {
+                                      }), React.createElement(Metamask.AddTokenButton.make, {
                                         token: Config.config.contracts.FloatToken,
                                         tokenSymbol: (
                                           isLong ? "↗️" : "↘️"
@@ -717,7 +716,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                         id: 3,
                         children: React.createElement("div", {
                               className: "text-center mx-3 my-6"
-                            }, React.createElement(EllipsesLoader.make, {}), React.createElement("p", undefined, "Confirm transaction to mint " + tokenToMint))
+                            }, React.createElement(Loader.Ellipses.make, {}), React.createElement("p", undefined, "Confirm transaction to mint " + tokenToMint))
                       }), React.createElement(Button.make, {
                         onClick: (function (param) {
                             

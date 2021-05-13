@@ -18,12 +18,12 @@ module UserBalancesCard = {
         {`Synthetic assets`->React.string} <img className="inline h-5 ml-2" src="/img/coin.png" />
       </UserColumnHeader>
       {switch usersTokensQuery {
-      | Loading => <div className="m-auto"> <MiniLoader /> </div>
+      | Loading => <div className="m-auto"> <Loader.Mini /> </div>
       | GraphError(string) => string->React.string
       | Response({totalBalance, balances}) => <>
           <UserColumnTextCenter>
             <UserColumnText
-              head=`💰 Synth value` body={`$${totalBalance->FormatMoney.formatEther}`}
+              head=`💰 Synth value` body={`$${totalBalance->Misc.NumberFormat.formatEther}`}
             />
           </UserColumnTextCenter>
           <br />
@@ -36,8 +36,8 @@ module UserBalancesCard = {
               isLong
               tokenAddress={addr}
               symbol
-              tokens={FormatMoney.formatEther(tokenBalance)}
-              value={FormatMoney.formatEther(tokensValue)}
+              tokens={Misc.NumberFormat.formatEther(tokenBalance)}
+              value={Misc.NumberFormat.formatEther(tokensValue)}
               metadata>
               <UserMarketStakeOrRedeem synthAddress={addr->Ethers.Utils.ethAdrToLowerStr} isLong />
             </UserTokenBox>
@@ -74,7 +74,7 @@ module UserTotalInvestedCard = {
 
     <>
       {switch usersTokensQuery {
-      | Loading => <div className="m-auto"> <MiniLoader /> </div>
+      | Loading => <div className="m-auto"> <Loader.Mini /> </div>
       | GraphError(string) => string->React.string
       | Response({totalBalance}) =>
         <UserTotalValue
@@ -108,7 +108,7 @@ module UserProfileCard = {
     )
     let joinedStr = userInfo.joinedAt->DateFns.format(#"do MMM ''yy")
     let txStr = userInfo.transactionCount->Ethers.BigNumber.toString
-    let gasStr = userInfo.gasUsed->Ethers.BigNumber.toString->FormatMoney.formatInt
+    let gasStr = userInfo.gasUsed->Ethers.BigNumber.toString->Misc.NumberFormat.formatInt
 
     <UserColumnCard>
       <UserProfileHeader address={addressStr} />
@@ -126,91 +126,89 @@ module UserProfileCard = {
   }
 }
 
-module User = {
-  @ocaml.doc(`Represents all the data required to render the user page.`)
-  type userData = {
-    user: string,
-    userInfo: DataHooks.basicUserInfo,
-    stakes: array<Queries.CurrentStakeDetailed.t>,
+@ocaml.doc(`Represents all the data required to render the user page.`)
+type userData = {
+  user: string,
+  userInfo: DataHooks.basicUserInfo,
+  stakes: array<Queries.CurrentStakeDetailed.t>,
+}
+
+let onQueryError = (msg: string) => {
+  <UserContainer> {`Error: ${msg}`->React.string} </UserContainer>
+}
+
+let onQuerySuccess = (data: userData) => {
+  <UserContainer>
+    // <UserBanner />
+    <Container>
+      <Divider>
+        <UserProfileCard userInfo={data.userInfo} />
+        <UserFloatCard userId={data.user} stakes={data.stakes} />
+      </Divider>
+      <Divider>
+        <UserTotalInvestedCard stakes={data.stakes} userId={data.user} />
+        <UserBalancesCard userId={data.user} />
+      </Divider>
+      <Divider>
+        <UserTotalStakedCard stakes={data.stakes} />
+        <UserStakesCard stakes={data.stakes} userId={data.user} />
+      </Divider>
+    </Container>
+  </UserContainer>
+}
+
+@react.component
+let make = () => {
+  let optCurrentUser = RootProvider.useCurrentUser()
+  let router = Next.Router.useRouter()
+  let user = switch Js.Dict.get(router.query, `user`) {
+  | None => `no user provided` // TODO: something more useful!
+  | Some(userStr) => userStr->Js.String.toLowerCase
   }
 
-  let onQueryError = (msg: string) => {
-    <UserContainer> {`Error: ${msg}`->React.string} </UserContainer>
-  }
+  let stakesQuery = useStakesForUser(~userId=user)
+  let userInfoQuery = useBasicUserInfo(~userId=user)
 
-  let onQuerySuccess = (data: userData) => {
-    <UserContainer>
-      // <UserBanner />
-      <Container>
-        <Divider>
-          <UserProfileCard userInfo={data.userInfo} />
-          <UserFloatCard userId={data.user} stakes={data.stakes} />
-        </Divider>
-        <Divider>
-          <UserTotalInvestedCard stakes={data.stakes} userId={data.user} />
-          <UserBalancesCard userId={data.user} />
-        </Divider>
-        <Divider>
-          <UserTotalStakedCard stakes={data.stakes} />
-          <UserStakesCard stakes={data.stakes} userId={data.user} />
-        </Divider>
-      </Container>
-    </UserContainer>
-  }
+  let notCurrentUserMessage = () =>
+    <UserColumnTextCenter>
+      <a
+        className="mt-4 hover:text-gray-600"
+        target="_"
+        rel="noopener noreferrer"
+        href={`${Config.blockExplorer}address/${user}`}>
+        <h1> {"This user has not interacted with float.capital yet"->React.string} </h1>
+      </a>
+    </UserColumnTextCenter>
 
-  @react.component
-  let make = () => {
-    let optCurrentUser = RootProvider.useCurrentUser()
-    let router = Next.Router.useRouter()
-    let user = switch Js.Dict.get(router.query, `user`) {
-    | None => `no user provided` // TODO: something more useful!
-    | Some(userStr) => userStr->Js.String.toLowerCase
-    }
-
-    let stakesQuery = useStakesForUser(~userId=user)
-    let userInfoQuery = useBasicUserInfo(~userId=user)
-
-    let notCurrentUserMessage = () =>
-      <UserColumnTextCenter>
-        <a
-          className="mt-4 hover:text-gray-600"
-          target="_"
-          rel="noopener noreferrer"
-          href={`${Config.blockExplorer}address/${user}`}>
-          <h1> {"This user has not interacted with float.capital yet"->React.string} </h1>
-        </a>
-      </UserColumnTextCenter>
-
-    switch liftGraphResponse2(stakesQuery, userInfoQuery) {
-    | Response((_stakes, NewUser)) => <>
-        <UserColumnCard>
-          <UserProfileHeader address={user} />
-          {switch optCurrentUser {
-          | Some(currentUser) =>
-            currentUser->Ethers.Utils.ethAdrToLowerStr == user
-              ? <>
-                  <UserColumnTextCenter>
-                    <p className="my-2">
-                      {`Mint a position to see data on your profile`->React.string}
-                    </p>
-                  </UserColumnTextCenter>
-                  <div className="w-40 mx-auto">
-                    <Next.Link href="/markets">
-                      <Button.Small> {`MARKETS`} </Button.Small>
-                    </Next.Link>
-                  </div>
-                </>
-              : notCurrentUserMessage()
-          | None => notCurrentUserMessage()
-          }}
-        </UserColumnCard>
-      </>
-    | Response((stakes, ExistingUser(userInfo))) =>
-      onQuerySuccess({user: user, stakes: stakes, userInfo: userInfo})
-    | GraphError(msg) => onQueryError(msg)
-    | Loading => <Loader />
-    }
+  switch liftGraphResponse2(stakesQuery, userInfoQuery) {
+  | Response((_stakes, NewUser)) => <>
+      <UserColumnCard>
+        <UserProfileHeader address={user} />
+        {switch optCurrentUser {
+        | Some(currentUser) =>
+          currentUser->Ethers.Utils.ethAdrToLowerStr == user
+            ? <>
+                <UserColumnTextCenter>
+                  <p className="my-2">
+                    {`Mint a position to see data on your profile`->React.string}
+                  </p>
+                </UserColumnTextCenter>
+                <div className="w-40 mx-auto">
+                  <Next.Link href="/markets">
+                    <Button.Small> {`MARKETS`} </Button.Small>
+                  </Next.Link>
+                </div>
+              </>
+            : notCurrentUserMessage()
+        | None => notCurrentUserMessage()
+        }}
+      </UserColumnCard>
+    </>
+  | Response((stakes, ExistingUser(userInfo))) =>
+    onQuerySuccess({user: user, stakes: stakes, userInfo: userInfo})
+  | GraphError(msg) => onQueryError(msg)
+  | Loading => <Loader />
   }
 }
 
-let default = () => <User />
+let default = make

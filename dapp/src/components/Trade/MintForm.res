@@ -58,7 +58,7 @@ module SubmitButtonAndTxTracker = {
     | (ContractActions.Created, _) => <>
         <Modal id={1}>
           <div className="text-center mx-3 my-6">
-            <EllipsesLoader />
+            <Loader.Ellipses />
             <p> {`Please approve your ${Config.paymentTokenName} token `->React.string} </p>
           </div>
         </Modal>
@@ -67,7 +67,7 @@ module SubmitButtonAndTxTracker = {
     | (ContractActions.SignedAndSubmitted(txHash), _) => <>
         <Modal id={2}>
           <div className="text-center m-3">
-            <div className="m-2"> <MiniLoader /> </div>
+            <div className="m-2"> <Loader.Mini /> </div>
             <p> {"Approval transaction pending... "->React.string} </p>
             <ViewOnBlockExplorer txHash />
           </div>
@@ -78,7 +78,8 @@ module SubmitButtonAndTxTracker = {
     | (ContractActions.Complete({transactionHash: _}), ContractActions.UnInitialised) => <>
         <Modal id={3}>
           <div className="text-center mx-3 my-6">
-            <EllipsesLoader /> <p> {`Confirm transaction to mint ${tokenToMint}`->React.string} </p>
+            <Loader.Ellipses />
+            <p> {`Confirm transaction to mint ${tokenToMint}`->React.string} </p>
           </div>
         </Modal>
         <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
@@ -97,7 +98,7 @@ module SubmitButtonAndTxTracker = {
     | (_, ContractActions.Created) => <>
         <Modal id={5}>
           <div className="text-center m-3">
-            <EllipsesLoader />
+            <Loader.Ellipses />
             <h1> {`Confirm the transaction to mint ${tokenToMint}`->React.string} </h1>
           </div>
         </Modal>
@@ -121,7 +122,7 @@ module SubmitButtonAndTxTracker = {
     | (_, ContractActions.SignedAndSubmitted(txHash)) => <>
         <Modal id={7}>
           <div className="text-center m-3">
-            <div className="m-2"> <MiniLoader /> </div>
+            <div className="m-2"> <Loader.Mini /> </div>
             <p> {"Minting transaction pending... "->React.string} </p>
             <ViewOnBlockExplorer txHash />
           </div>
@@ -138,7 +139,7 @@ module SubmitButtonAndTxTracker = {
                   ? "long"
                   : "short"} on ${marketName}! @float_capital 🌊 `}
             />
-            <AddToMetaMaskButton
+            <Metamask.AddTokenButton
               token={Config.config.contracts.floatToken}
               tokenSymbol={`${isLong ? `↗️` : `↘️`}${marketName}`}
             />

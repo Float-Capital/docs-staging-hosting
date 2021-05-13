@@ -3,7 +3,7 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var ToastProvider = require("./ToastProvider.js");
+var ToastProvider = require("../ToastProvider.js");
 
 function Toast(Props) {
   var toast = React.useContext(ToastProvider.ToastContext.context);

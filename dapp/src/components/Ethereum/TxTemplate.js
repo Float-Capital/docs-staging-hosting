@@ -5,7 +5,7 @@ var CssJs = require("bs-css-emotion/src/CssJs.js");
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Config = require("../../Config.js");
-var Loader = require("../UI/Loader.js");
+var Loader = require("../UI/Base/Loader.js");
 
 var centerFlex = CssJs.style([
       CssJs.display("flex"),

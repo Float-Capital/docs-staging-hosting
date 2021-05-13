@@ -5,13 +5,13 @@ var Css = require("bs-css-emotion/src/Css.js");
 var CssJs = require("bs-css-emotion/src/CssJs.js");
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Button = require("../components/UI/Button.js");
+var Button = require("../components/UI/Base/Button.js");
 var Globals = require("../libraries/Globals.js");
 var Link = require("next/link").default;
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var RootProvider = require("../libraries/RootProvider.js");
-var DisplayAddress = require("../components/UI/DisplayAddress.js");
+var DisplayAddress = require("../components/UI/Base/DisplayAddress.js");
 
 function floatingMenuZoomStyle(shouldDisplay) {
   return CssJs.style([

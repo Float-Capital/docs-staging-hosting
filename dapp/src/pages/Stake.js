@@ -2,21 +2,17 @@
 'use strict';
 
 var React = require("react");
-var StakeList = require("./components/Stake/StakeList.js");
+var StakeList = require("../components/Stake/StakeList.js");
 
-function Stake$Markets(Props) {
+function Stake(Props) {
   return React.createElement(StakeList.make, {});
 }
 
-var Markets = {
-  make: Stake$Markets
-};
+var make = Stake;
 
-function $$default(param) {
-  return React.createElement(Stake$Markets, {});
-}
+var $$default = Stake;
 
-exports.Markets = Markets;
+exports.make = make;
 exports.$$default = $$default;
 exports.default = $$default;
 exports.__esModule = true;

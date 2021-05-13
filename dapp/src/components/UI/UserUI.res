@@ -22,7 +22,7 @@ module UserTotalValue = {
       </div>
       <div>
         <span className={`${shouldBeSmallerText ? "text-xl" : "text-2xl"} text-primary`}>
-          {`$${totalValue->FormatMoney.formatEther(
+          {`$${totalValue->Misc.NumberFormat.formatEther(
               ~digits={shouldntHaveDecimals ? 1 : 2},
             )}`->React.string}
         </span>
@@ -193,9 +193,10 @@ module MetamaskMenu = {
           <div
             className="absolute bottom-full left-1 rounded-lg z-30 text-xs py-1 px-1 w-20 bg-white shadow-lg flex justify-center cursor-pointer"
             ref={ReactDOM.Ref.domRef(wrapper)}>
-            <AddToMetamask tokenAddress tokenSymbol={tokenName} callback={_ => setShow(_ => false)}>
+            <Metamask.AddToken
+              tokenAddress tokenSymbol={tokenName} callback={_ => setShow(_ => false)}>
               {"Add to "->React.string} <img src="/icons/metamask.svg" className="h-5 ml-1" />
-            </AddToMetamask>
+            </Metamask.AddToken>
           </div>
         } else {
           React.null
@@ -263,7 +264,7 @@ module UserPercentageGains = {
             {`${symbol}${percentStr}%`->React.string}
           </div>
         }
-      | Loading => <MiniLoader />
+      | Loading => <Loader.Mini />
       | _ => ``->React.string
       }}
     </div>
@@ -325,9 +326,9 @@ module UserFloatEarnedFromStake = {
         <div className="text-gray-500"> {`Float Accruing`->React.string} </div>
         {`~${totalClaimable
           ->Ethers.BigNumber.add(totalPredicted)
-          ->FormatMoney.formatEther(~digits=6)}`->React.string}
+          ->Misc.NumberFormat.formatEther(~digits=6)}`->React.string}
       </div>
-    | _ => <MiniLoader />
+    | _ => <Loader.Mini />
     }
   }
 }
@@ -431,8 +432,8 @@ module UserStakesCard = {
       let key = `user-stakes-${Belt.Int.toString(i)}`
       let syntheticToken = stake.currentStake.syntheticToken
       let addr = syntheticToken.id->Ethers.Utils.getAddressUnsafe
-      let name = syntheticToken.syntheticMarket.name
-      let tokens = stake.currentStake.amount->FormatMoney.formatEther
+      let name = syntheticToken.syntheticMarket.symbol
+      let tokens = stake.currentStake.amount->Misc.NumberFormat.formatEther
       let isLong = syntheticToken.tokenType->Obj.magic == "Long"
       let price = syntheticToken.latestPrice.price.price
 
@@ -467,7 +468,7 @@ module UserStakesCard = {
         isLong
         tokens
         tokenAddress={addr}
-        value={value->FormatMoney.formatEther}
+        value={value->Misc.NumberFormat.formatEther}
         metadata
         creationTxHash>
         <UserFloatEarnedFromStake tokenAddress={addr} userId />
@@ -502,13 +503,15 @@ module UserFloatCard = {
         </div>
       </UserColumnHeader>
       {switch DataHooks.liftGraphResponse2(floatBalances, claimableFloat) {
-      | Loading => <MiniLoader />
+      | Loading => <Loader.Mini />
       | GraphError(msg) => msg->React.string
       | Response((floatBalances, (totalClaimable, totalPredicted))) => {
-          let floatBalance = floatBalances.floatBalance->FormatMoney.formatEther(~digits=6)
-          let floatMinted = floatBalances.floatMinted->FormatMoney.formatEther(~digits=6)
+          let floatBalance = floatBalances.floatBalance->Misc.NumberFormat.formatEther(~digits=6)
+          let floatMinted = floatBalances.floatMinted->Misc.NumberFormat.formatEther(~digits=6)
           let floatAccrued =
-            totalClaimable->Ethers.BigNumber.add(totalPredicted)->FormatMoney.formatEther(~digits=6)
+            totalClaimable
+            ->Ethers.BigNumber.add(totalPredicted)
+            ->Misc.NumberFormat.formatEther(~digits=6)
 
           <div
             className=`w-11/12 px-2 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>
