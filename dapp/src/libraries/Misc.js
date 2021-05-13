@@ -47,10 +47,27 @@ function useCurrentTimeBN(updateInterval) {
   return Ethers$1.BigNumber.from(useCurrentTime(updateInterval));
 }
 
+function useInterval(callback, delay) {
+  var savedCallback = React.useRef(callback);
+  React.useEffect((function () {
+          savedCallback.current = callback;
+          
+        }), [callback]);
+  React.useEffect((function () {
+          var id = setInterval(savedCallback.current, delay);
+          return (function (param) {
+                    clearInterval(id);
+                    
+                  });
+        }), [delay]);
+  
+}
+
 var Time = {
   getCurrentTimestamp: getCurrentTimestamp,
   useCurrentTime: useCurrentTime,
-  useCurrentTimeBN: useCurrentTimeBN
+  useCurrentTimeBN: useCurrentTimeBN,
+  useInterval: useInterval
 };
 
 function format(__x) {

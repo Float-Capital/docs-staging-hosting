@@ -19,6 +19,23 @@ module Ellipses = {
     </div>
 }
 
+module Tiny = {
+  @react.component
+  let make = () => {
+    let (inlineLoaderState, setInlineLoaderState) = React.useState(_ => 0)
+
+    Misc.Time.useInterval(() => setInlineLoaderState(current => mod(current + 1, 3)), ~delay=300)
+
+    let elipsisDot = (~display) =>
+      <span className={`opacity-${display ? "40" : "100"}`}> {`.`->React.string} </span>
+    <>
+      {elipsisDot(~display=inlineLoaderState == 0)}
+      {elipsisDot(~display=inlineLoaderState == 1)}
+      {elipsisDot(~display=inlineLoaderState == 2)}
+    </>
+  }
+}
+
 @react.component
 let make = () =>
   <div className="screen-centered-container">
