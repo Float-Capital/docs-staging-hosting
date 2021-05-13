@@ -40,6 +40,7 @@
     "@openzeppelin/truffle-upgrades": "^1.5.0",
     "@tenderly/hardhat-tenderly": "^1.0.12",
     "@truffle/hdwallet-provider": "^1.2.1",
+    "bs-let": "^0.1.16",
     "bs-mocha": "^1.0.0",
     "ethereum-waffle": "^3.3.0",
     "hardhat-spdx-license-identifier": "^2.0.3",
