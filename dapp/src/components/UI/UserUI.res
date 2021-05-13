@@ -432,7 +432,7 @@ module UserStakesCard = {
       let key = `user-stakes-${Belt.Int.toString(i)}`
       let syntheticToken = stake.currentStake.syntheticToken
       let addr = syntheticToken.id->Ethers.Utils.getAddressUnsafe
-      let name = syntheticToken.syntheticMarket.symbol
+      let name = syntheticToken.syntheticMarket.name
       let tokens = stake.currentStake.amount->Misc.NumberFormat.formatEther
       let isLong = syntheticToken.tokenType->Obj.magic == "Long"
       let price = syntheticToken.latestPrice.price.price

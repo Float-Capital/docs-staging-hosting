@@ -546,7 +546,7 @@ function UserUI$UserStakesCard(Props) {
         var key = "user-stakes-" + String(i);
         var syntheticToken = stake.currentStake.syntheticToken;
         var addr = Ethers$1.utils.getAddress(syntheticToken.id);
-        var name = syntheticToken.syntheticMarket.symbol;
+        var name = syntheticToken.syntheticMarket.name;
         var tokens = Misc.NumberFormat.formatEther(undefined, stake.currentStake.amount);
         var isLong = syntheticToken.tokenType === "Long";
         var price = syntheticToken.latestPrice.price.price;
