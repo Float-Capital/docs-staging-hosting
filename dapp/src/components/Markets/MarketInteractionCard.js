@@ -395,7 +395,7 @@ function MarketInteractionCard(Props) {
   var tmp;
   switch (selected) {
     case /* Mint */0 :
-        tmp = React.createElement(Mint.Mint.make, {
+        tmp = React.createElement(Mint.make, {
               withHeader: false
             });
         break;
