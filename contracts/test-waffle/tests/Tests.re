@@ -1,14 +1,17 @@
 module Await = {
   let let_ = (prom, cb) => JsPromise.then_(prom, cb);
 }
-let test = (markets: array(Helpers.markets), accounts, contracts:Helpers.coreContracts) => {
+module AwaitM = {
+  let let_ = (prom, cb) => JsPromise.map(prom, cb);
+}
+let test = (markets: array(Helpers.markets), accounts, contracts:Helpers.coreContracts, done_) => {
   let testUser = accounts->Array.getUnsafe(1)
   let {longShort, markets, staker} = contracts
   let synthsUserHasStaked = ref([||])
   let marketsUserHasStakedIn = ref([||])
 
 
-  let%Await thing = markets
+  let%AwaitM thing = markets
   ->Array.map(({paymentToken, longSynth, shortSynth, marketIndex}) => {
     let mintStake = Helpers.mintAndStake(
       ~marketIndex,
@@ -33,28 +36,27 @@ let test = (markets: array(Helpers.markets), accounts, contracts:Helpers.coreCon
     }
   })->JsPromise.all;
   // let other = thing ++ "string"
-  ()->JsPromise.resolve;
   // ->JsPromise.then(_ => {
-  // staker->Contract.Staker.claimFloatCustomUser(
-  //   ~user=testUser,
-  //   ~syntheticTokens=synthsUserHasStaked.contents,
-  //   ~markets=marketsUserHasStakedIn.contents,
-  // )
+  let%AwaitM another = staker->Contract.Staker.claimFloatCustomUser(
+    ~user=testUser,
+    ~syntheticTokens=synthsUserHasStaked.contents,
+    ~markets=marketsUserHasStakedIn.contents,
+  )
   // })
   // ->JsPromise.map(_ => {
-  // synthsUserHasStaked.contents
-  // ->Array.map(synth => {
-  //   JsPromise.all2((
-  //     staker->Contract.Staker.userIndexOfLastClaimedReward(
-  //       ~synthTokenAddr=synth.address,
-  //       ~user=testUser.address,
-  //     ),
-  //     staker->Contract.Staker.latestRewardIndex(~synthTokenAddr=synth.address),
-  //   ))->JsPromise.map(((userLastClaimed, latestRewardIndex)) =>
-  //     Chai.bnEqual(userLastClaimed, latestRewardIndex)
-  //   )
-  // })
-  // ->JsPromise.all
-  // ->JsPromise.map(_ => done())
-  // })
+  let%AwaitM other = synthsUserHasStaked.contents
+  ->Array.map(synth => {
+    JsPromise.all2((
+      staker->Contract.Staker.userIndexOfLastClaimedReward(
+        ~synthTokenAddr=synth.address,
+        ~user=testUser.address,
+      ),
+      staker->Contract.Staker.latestRewardIndex(~synthTokenAddr=synth.address),
+    ))->JsPromise.map(((userLastClaimed, latestRewardIndex)) =>
+      Chai.bnEqual(userLastClaimed, latestRewardIndex)
+    )
+  })
+  ->JsPromise.all
+
+  done_()
 }
