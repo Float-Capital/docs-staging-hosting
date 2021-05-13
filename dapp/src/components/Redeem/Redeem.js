@@ -3,7 +3,7 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Loader = require("../UI/Loader.js");
+var Loader = require("../UI/Base/Loader.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Queries = require("../../data/Queries.js");
 var Belt_Int = require("rescript/lib/js/belt_Int.js");

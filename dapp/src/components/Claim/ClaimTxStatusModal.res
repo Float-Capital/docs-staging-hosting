@@ -4,13 +4,13 @@ let make = (~txState) => {
   | ContractActions.Created =>
     <Modal id={1}>
       <div className="text-center m-3">
-        <EllipsesLoader /> <h1> {`Confirm the transaction to claim Float`->React.string} </h1>
+        <Loader.Ellipses /> <h1> {`Confirm the transaction to claim Float`->React.string} </h1>
       </div>
     </Modal>
   | ContractActions.SignedAndSubmitted(txHash) =>
     <Modal id={2}>
       <div className="text-center m-3">
-        <div className="m-2"> <MiniLoader /> </div>
+        <div className="m-2"> <Loader.Mini /> </div>
         <p> {"Claiming transaction pending... "->React.string} </p>
         <ViewOnBlockExplorer txHash />
       </div>
@@ -20,7 +20,7 @@ let make = (~txState) => {
       <div className="text-center m-3">
         <Tick /> <p> {`Transaction complete 🎉`->React.string} </p>
       </div>
-      <AddToMetaMaskButton token={Config.config.contracts.floatToken} tokenSymbol={`FLOAT`} />
+      <Metamask.AddTokenButton token={Config.config.contracts.floatToken} tokenSymbol={`FLOAT`} />
     </Modal>
   | ContractActions.Declined(_message) =>
     <Modal id={4}>

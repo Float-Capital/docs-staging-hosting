@@ -38,7 +38,7 @@ let make = (~orderPostion, ~orderPostionMobile, ~marketName, ~isLong, ~apy, ~flo
       {switch apy {
       | Loaded(apyVal) =>
         <p className="text-lg  tracking-widest font-alphbeta"> {apyVal->mapAPY} </p>
-      | _ => <MiniLoader />
+      | _ => <Loader.Tiny />
       }}
     </div>
     <div className="text-sm my-1">

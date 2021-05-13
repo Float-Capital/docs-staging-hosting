@@ -3,11 +3,11 @@
 
 var React = require("react");
 var Ethers = require("../../ethereum/Ethers.js");
+var Loader = require("../UI/Base/Loader.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 var DataHooks = require("../../data/DataHooks.js");
 var StakeCard = require("./StakeCard.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var MiniLoader = require("../UI/MiniLoader.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var RootProvider = require("../../libraries/RootProvider.js");
 var Belt_HashSetString = require("rescript/lib/js/belt_HashSetString.js");
@@ -41,7 +41,7 @@ function StakeList(Props) {
   var tmp;
   tmp = typeof marketDetailsQuery === "number" ? React.createElement("div", {
           className: "m-auto"
-        }, React.createElement(MiniLoader.make, {})) : (
+        }, React.createElement(Loader.Mini.make, {})) : (
       marketDetailsQuery.TAG === /* GraphError */0 ? "Error: " + marketDetailsQuery._0 : React.createElement("div", undefined, Belt_Array.map(marketDetailsQuery._0, (function (syntheticMarket) {
                     return React.createElement(StakeCard.make, {
                                 syntheticMarket: syntheticMarket,

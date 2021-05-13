@@ -2,8 +2,8 @@
 'use strict';
 
 var React = require("react");
+var Loader = require("../Base/Loader.js");
 var CONSTANTS = require("../../../CONSTANTS.js");
-var MiniLoader = require("../MiniLoader.js");
 
 function isHotAPY(apy) {
   return apy > CONSTANTS.hotAPYThreshold;
@@ -23,10 +23,10 @@ function StakeCardSide(Props) {
   var apy = Props.apy;
   var floatApy = Props.floatApy;
   var tmp;
-  tmp = typeof apy === "number" ? React.createElement(MiniLoader.make, {}) : (
+  tmp = typeof apy === "number" ? React.createElement(Loader.Mini.make, {}) : (
       apy.TAG === /* Loaded */0 ? React.createElement("p", {
               className: "text-xl tracking-widest font-alphbeta"
-            }, mapVal(apy._0)) : React.createElement(MiniLoader.make, {})
+            }, mapVal(apy._0)) : React.createElement(Loader.Mini.make, {})
     );
   return React.createElement("div", {
               className: "order-" + String(orderPostionMobile) + " md:order-" + String(orderPostion) + " w-1/2 md:w-1/4 flex items-center flex grow flex-wrap flex-col"

@@ -2,9 +2,9 @@
 'use strict';
 
 var React = require("react");
-var Tooltip = require("../UI/Tooltip.js");
+var Loader = require("../UI/Base/Loader.js");
+var Tooltip = require("../UI/Base/Tooltip.js");
 var CONSTANTS = require("../../CONSTANTS.js");
-var MiniLoader = require("../UI/MiniLoader.js");
 
 function MarketStakeCardSide(Props) {
   var orderPostion = Props.orderPostion;
@@ -24,10 +24,10 @@ function MarketStakeCardSide(Props) {
           );
   };
   var tmp;
-  tmp = typeof apy === "number" ? React.createElement(MiniLoader.make, {}) : (
+  tmp = typeof apy === "number" ? React.createElement(Loader.Tiny.make, {}) : (
       apy.TAG === /* Loaded */0 ? React.createElement("p", {
               className: "text-lg  tracking-widest font-alphbeta"
-            }, mapAPY(apy._0)) : React.createElement(MiniLoader.make, {})
+            }, mapAPY(apy._0)) : React.createElement(Loader.Tiny.make, {})
     );
   return React.createElement("div", {
               className: textPosition + " order-" + String(orderPostionMobile) + " md:order-" + String(orderPostion) + " w-1/2 md:w-1/4 flex flex grow flex-wrap flex-col"

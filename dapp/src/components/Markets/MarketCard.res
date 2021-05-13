@@ -60,7 +60,7 @@ let make = (
     </div>
 
   let marketPositionValues = (~isLong) => {
-    let value = (isLong ? totalLockedLong : totalLockedShort)->FormatMoney.formatEther
+    let value = (isLong ? totalLockedLong : totalLockedShort)->Misc.NumberFormat.formatEther
     let beta = isLong ? longBeta : shortBeta
     <div className="text-sm text-center m-auto mb-4">
       <div className="text-2xl tracking-widest font-alphbeta my-3">
@@ -125,7 +125,7 @@ let make = (
             {" Liquidity"->React.string}
           </h2>
           <div className="text-3xl font-alphbeta tracking-wider py-1">
-            {`$${totalValueLocked->FormatMoney.formatEther}`->React.string}
+            {`$${totalValueLocked->Misc.NumberFormat.formatEther}`->React.string}
           </div>
           <div className="md:block hidden w-full">
             {liquidityRatio()} {Option.isNone(marketIndexOption) ? mintButtons() : React.null}

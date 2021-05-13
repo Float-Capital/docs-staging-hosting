@@ -5,7 +5,7 @@ var Misc = require("../libraries/Misc.js");
 var View = require("../libraries/View.js");
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Button = require("./UI/Button.js");
+var Button = require("./UI/Base/Button.js");
 var Client = require("../data/Client.js");
 var Ethers = require("../ethereum/Ethers.js");
 var Js_int = require("rescript/lib/js/js_int.js");
@@ -259,28 +259,28 @@ function zoomAndNumDataPointsFromGraphSetting(graphSetting) {
   switch (graphSetting) {
     case /* Day */0 :
         return [
-                CONSTANTS.oneHourInSeconds,
-                24
+                CONSTANTS.fiveMinutesInSeconds,
+                288
               ];
     case /* Week */1 :
         return [
-                CONSTANTS.halfDayInSeconds,
-                14
+                CONSTANTS.oneHourInSeconds,
+                168
               ];
     case /* Month */2 :
         return [
-                CONSTANTS.oneDayInSeconds,
-                30
+                CONSTANTS.halfDayInSeconds,
+                60
               ];
     case /* ThreeMonth */3 :
         return [
-                CONSTANTS.threeMonthsInSeconds,
-                30
+                CONSTANTS.oneDayInSeconds,
+                90
               ];
     case /* Year */4 :
         return [
-                CONSTANTS.twoWeeksInSeconds,
-                26
+                CONSTANTS.oneWeekInSeconds,
+                52
               ];
     
   }
@@ -453,7 +453,7 @@ function PriceGraph(Props) {
                                           }),
                                         children: text,
                                         disabled: minThreshodFromGraphSetting(buttonSetting) > timeMaketHasExisted,
-                                        active: Caml_obj.caml_equal(graphSetting, buttonSetting),
+                                        active: typeof buttonSetting === "number" || typeof graphSetting === "number" ? Caml_obj.caml_equal(buttonSetting, graphSetting) : true,
                                         key: text
                                       });
                           })))));

@@ -86,7 +86,7 @@ let make = (
               </h2>
             </div>
             <div className="text-xs font-alphbeta tracking-wider py-1 text-gray-600">
-              {`$${totalLockedLong->FormatMoney.formatEther}`->React.string}
+              {`$${totalLockedLong->Misc.NumberFormat.formatEther}`->React.string}
             </div>
           </div>
           <div>
@@ -98,7 +98,7 @@ let make = (
               </h2>
             </div>
             <div className="text-2xl font-alphbeta tracking-wider ">
-              {`$${totalValueLocked->FormatMoney.formatEther}`->React.string}
+              {`$${totalValueLocked->Misc.NumberFormat.formatEther}`->React.string}
             </div>
           </div>
           <div className="text-right">
@@ -110,7 +110,7 @@ let make = (
               </h2>
             </div>
             <div className="text-xs font-alphbeta tracking-wider py-1 text-gray-600">
-              {`$${totalLockedShort->FormatMoney.formatEther}`->React.string}
+              {`$${totalLockedShort->Misc.NumberFormat.formatEther}`->React.string}
             </div>
           </div>
         </div>

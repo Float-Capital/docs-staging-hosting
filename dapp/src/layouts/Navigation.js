@@ -5,13 +5,13 @@ var Css = require("bs-css-emotion/src/Css.js");
 var CssJs = require("bs-css-emotion/src/CssJs.js");
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Button = require("../components/UI/Button.js");
+var Button = require("../components/UI/Base/Button.js");
 var Globals = require("../libraries/Globals.js");
 var Link = require("next/link").default;
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var RootProvider = require("../libraries/RootProvider.js");
-var DisplayAddress = require("../components/UI/DisplayAddress.js");
+var DisplayAddress = require("../components/UI/Base/DisplayAddress.js");
 
 function floatingMenuZoomStyle(shouldDisplay) {
   return CssJs.style([
@@ -153,7 +153,7 @@ function Navigation(Props) {
                                     className: "logo-container"
                                   }, React.createElement("img", {
                                         className: "h-8 md:h-7 w-full md:w-auto",
-                                        src: "/img/float-capital-logo.png"
+                                        src: "/img/float-capital-logo-long.svg"
                                       }))))
                     }), React.createElement("div", {
                       className: "hidden md:flex w-2/3 text-base items-center justify-end"

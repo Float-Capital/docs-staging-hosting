@@ -3,17 +3,17 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Market = require("./Market.js");
+var Loader = require("../components/UI/Base/Loader.js");
+var Market = require("../components/Markets/Market.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
-var Queries = require("../../data/Queries.js");
+var Queries = require("../data/Queries.js");
 var Belt_Int = require("rescript/lib/js/belt_Int.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var MarketCard = require("./MarketCard.js");
-var MiniLoader = require("../UI/MiniLoader.js");
+var MarketCard = require("../components/Markets/MarketCard.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Router = require("next/router");
 
-function MarketsList$MarketsList(Props) {
+function Markets(Props) {
   var router = Router.useRouter();
   var marketIndexOption = Js_dict.get(router.query, "marketIndex");
   var marketDetailsQuery = Curry.app(Queries.MarketDetails.use, [
@@ -37,7 +37,7 @@ function MarketsList$MarketsList(Props) {
   if (marketDetailsQuery.loading) {
     tmp = React.createElement("div", {
           className: "m-auto"
-        }, React.createElement(MiniLoader.make, {}));
+        }, React.createElement(Loader.Mini.make, {}));
   } else if (marketDetailsQuery.error !== undefined) {
     tmp = "Error loading data";
   } else if (match !== undefined) {
@@ -73,15 +73,11 @@ function MarketsList$MarketsList(Props) {
             }, tmp);
 }
 
-var MarketsList = {
-  make: MarketsList$MarketsList
-};
+var make = Markets;
 
-function $$default(param) {
-  return React.createElement(MarketsList$MarketsList, {});
-}
+var $$default = Markets;
 
-exports.MarketsList = MarketsList;
+exports.make = make;
 exports.$$default = $$default;
 exports.default = $$default;
 exports.__esModule = true;

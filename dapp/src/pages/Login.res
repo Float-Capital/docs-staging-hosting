@@ -102,7 +102,7 @@ let make = () => {
           </p>
           {switch Config.networkId {
           | chainId if !(metamaskDefaultChainIds->Set.Int.has(chainId)) =>
-            <div className="flex justify-center"> <AddNetworkToMetamask /> </div>
+            <div className="flex justify-center"> <Metamask.AddOrSwitchNetwork /> </div>
           | _ =>
             <div>
               <ul className="list-decimal pl-10">
