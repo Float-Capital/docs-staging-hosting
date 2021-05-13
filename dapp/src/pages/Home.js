@@ -2,7 +2,7 @@
 'use strict';
 
 var React = require("react");
-var StartTrading = require("./components/UI/StartTrading.js");
+var StartTrading = require("../components/UI/StartTrading.js");
 
 function $$default(param) {
   return React.createElement(StartTrading.make, {});

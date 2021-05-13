@@ -1,4 +1,4 @@
-import Login from "src/components/Login/Login";
+import Login from "src/pages/Login";
 import HtmlHeader from "src/components/HtmlHeader.js";
 
 export default function LoginPage(props) {

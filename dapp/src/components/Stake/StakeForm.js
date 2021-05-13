@@ -3,7 +3,7 @@
 
 var Form = require("../Form.js");
 var Curry = require("rescript/lib/js/curry.js");
-var Login = require("../Login/Login.js");
+var Login = require("../../pages/Login.js");
 var React = require("react");
 var Button = require("../UI/Base/Button.js");
 var Ethers = require("../../ethereum/Ethers.js");

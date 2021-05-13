@@ -3,16 +3,16 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Config = require("../../Config.js");
+var Config = require("../Config.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
-var Metamask = require("../UI/Base/Metamask.js");
+var Metamask = require("../components/UI/Base/Metamask.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Belt_SetInt = require("rescript/lib/js/belt_SetInt.js");
 var Router = require("next/router");
-var RootProvider = require("../../libraries/RootProvider.js");
-var Web3Connectors = require("../../bindings/web3-react/Web3Connectors.js");
-var InjectedEthereum = require("../../ethereum/InjectedEthereum.js");
+var RootProvider = require("../libraries/RootProvider.js");
+var Web3Connectors = require("../bindings/web3-react/Web3Connectors.js");
+var InjectedEthereum = require("../ethereum/InjectedEthereum.js");
 var TorusConnector = require("@web3-react/torus-connector");
 var WalletconnectConnector = require("@web3-react/walletconnect-connector");
 

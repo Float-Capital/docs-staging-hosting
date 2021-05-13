@@ -2,7 +2,7 @@
 'use strict';
 
 var React = require("react");
-var StakeList = require("./components/Stake/StakeList.js");
+var StakeList = require("../components/Stake/StakeList.js");
 
 function Stake$Markets(Props) {
   return React.createElement(StakeList.make, {});
