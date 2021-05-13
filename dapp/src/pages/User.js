@@ -160,9 +160,11 @@ var UserProfileCard = {
 };
 
 function onQueryError(msg) {
-  return React.createElement(UserUI.UserContainer.make, {
-              children: "Error: " + msg
-            });
+  return React.createElement("div", {
+              className: "w-full max-w-5xl mx-auto"
+            }, React.createElement(UserUI.UserContainer.make, {
+                  children: "Error: " + msg
+                }));
 }
 
 function onQuerySuccess(data) {
@@ -227,7 +229,9 @@ function User(Props) {
                 stakes: match[0]
               });
   } else {
-    return React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnCard.make, {
+    return React.createElement("div", {
+                className: "w-full max-w-5xl mx-auto"
+              }, React.createElement(UserUI.UserColumnCard.make, {
                     children: null
                   }, React.createElement(UserUI.UserProfileHeader.make, {
                         address: user

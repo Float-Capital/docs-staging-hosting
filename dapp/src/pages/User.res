@@ -135,7 +135,9 @@ type userData = {
 }
 
 let onQueryError = (msg: string) => {
-  <UserContainer> {`Error: ${msg}`->React.string} </UserContainer>
+  <div className="w-full max-w-5xl mx-auto">
+    <UserContainer> {`Error: ${msg}`->React.string} </UserContainer>
+  </div>
 }
 
 let onQuerySuccess = (data: userData) => {
@@ -182,7 +184,8 @@ let make = () => {
     </UserColumnTextCenter>
 
   switch liftGraphResponse2(stakesQuery, userInfoQuery) {
-  | Response((_stakes, NewUser)) => <>
+  | Response((_stakes, NewUser)) =>
+    <div className="w-full max-w-5xl mx-auto">
       <UserColumnCard>
         <UserProfileHeader address={user} />
         {switch optCurrentUser {
@@ -204,7 +207,7 @@ let make = () => {
         | None => notCurrentUserMessage()
         }}
       </UserColumnCard>
-    </>
+    </div>
   | Response((stakes, ExistingUser(userInfo))) =>
     onQuerySuccess({user: user, stakes: stakes, userInfo: userInfo})
   | GraphError(msg) => onQueryError(msg)
