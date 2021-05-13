@@ -3,7 +3,7 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Loader = require("../components/UI/Loader.js");
+var Loader = require("../components/UI/Base/Loader.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Queries = require("../data/Queries.js");
 var Belt_Int = require("rescript/lib/js/belt_Int.js");
@@ -26,8 +26,9 @@ var DetailsWrapper = {
   make: Mint$DetailsWrapper
 };
 
-function Mint$Mint(Props) {
-  var withHeader = Props.withHeader;
+function Mint(Props) {
+  var withHeaderOpt = Props.withHeader;
+  var withHeader = withHeaderOpt !== undefined ? withHeaderOpt : true;
   var router = Router.useRouter();
   var markets = Curry.app(Queries.MarketDetails.use, [
         undefined,
@@ -75,18 +76,12 @@ function Mint$Mint(Props) {
             }, tmp);
 }
 
-var Mint = {
-  make: Mint$Mint
-};
+var make = Mint;
 
-function $$default(param) {
-  return React.createElement(Mint$Mint, {
-              withHeader: true
-            });
-}
+var $$default = Mint;
 
 exports.DetailsWrapper = DetailsWrapper;
-exports.Mint = Mint;
+exports.make = make;
 exports.$$default = $$default;
 exports.default = $$default;
 exports.__esModule = true;

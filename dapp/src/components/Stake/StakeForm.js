@@ -3,17 +3,17 @@
 
 var Form = require("../Form.js");
 var Curry = require("rescript/lib/js/curry.js");
-var Login = require("../Login/Login.js");
+var Login = require("../../pages/Login.js");
 var React = require("react");
-var Button = require("../UI/Button.js");
+var Button = require("../UI/Base/Button.js");
 var Ethers = require("../../ethereum/Ethers.js");
+var Loader = require("../UI/Base/Loader.js");
 var Ethers$1 = require("ethers");
 var Queries = require("../../data/Queries.js");
 var Contracts = require("../../ethereum/Contracts.js");
 var DataHooks = require("../../data/DataHooks.js");
 var Formality = require("re-formality/src/Formality.js");
-var MiniLoader = require("../UI/MiniLoader.js");
-var AmountInput = require("../UI/AmountInput.js");
+var AmountInput = require("../UI/Base/AmountInput.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var RootProvider = require("../../libraries/RootProvider.js");
 var ContractHooks = require("../Testing/Admin/ContractHooks.js");
@@ -629,7 +629,7 @@ function StakeForm$1(Props) {
     return React.createElement(React.Fragment, undefined, "Unable to fetch token");
   }
   if (token.loading) {
-    return React.createElement(MiniLoader.make, {});
+    return React.createElement(Loader.Mini.make, {});
   }
   if (match$1 === undefined) {
     return React.createElement(React.Fragment, undefined, "Could not find this market - please check the URL carefully.");

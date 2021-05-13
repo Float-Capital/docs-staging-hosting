@@ -2,7 +2,7 @@
 'use strict';
 
 var React = require("react");
-var Ethers = require("../../ethereum/Ethers.js");
+var Ethers = require("../../../ethereum/Ethers.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 
 function AmountInput(Props) {

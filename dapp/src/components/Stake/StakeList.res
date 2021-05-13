@@ -41,7 +41,7 @@ let make = () => {
         ->React.array}
       </div>
     | GraphError(msg) => `Error: ${msg}`->React.string
-    | Loading => <div className="m-auto"> <MiniLoader /> </div>
+    | Loading => <div className="m-auto"> <Loader.Mini /> </div>
     }}
   </div>
 }

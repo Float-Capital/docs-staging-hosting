@@ -286,7 +286,7 @@ let make = (
                 </h2>
               </div>
               <div className="text-sm font-alphbeta tracking-wider py-1">
-                {`$${longDollarValueStaked->FormatMoney.formatEther}`->React.string}
+                {`$${longDollarValueStaked->Misc.NumberFormat.formatEther}`->React.string}
               </div>
             </div>
             <div>
@@ -297,7 +297,7 @@ let make = (
                 </h2>
               </div>
               <div className="text-3xl font-alphbeta tracking-wider py-1">
-                {`$${totalDollarValueStake->FormatMoney.formatEther}`->React.string}
+                {`$${totalDollarValueStake->Misc.NumberFormat.formatEther}`->React.string}
               </div>
             </div>
             <div className="text-right">
@@ -308,7 +308,7 @@ let make = (
                 </h2>
               </div>
               <div className="text-sm font-alphbeta tracking-wider py-1">
-                {`$${shortDollarValueStaked->FormatMoney.formatEther}`->React.string}
+                {`$${shortDollarValueStaked->Misc.NumberFormat.formatEther}`->React.string}
               </div>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import Head from "next/head";
-import User from "src/User";
+import User from "src/pages/User";
 
 export default function UserPage(props) {
   return (

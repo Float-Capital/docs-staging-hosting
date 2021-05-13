@@ -3,20 +3,20 @@
 
 var Form = require("./Form.js");
 var Curry = require("rescript/lib/js/curry.js");
-var Login = require("./Login/Login.js");
-var Modal = require("./UI/Modal.js");
+var Login = require("../pages/Login.js");
+var Modal = require("./UI/Base/Modal.js");
 var React = require("react");
-var Button = require("./UI/Button.js");
+var Button = require("./UI/Base/Button.js");
 var Config = require("../Config.js");
 var Ethers = require("../ethereum/Ethers.js");
+var Loader = require("./UI/Base/Loader.js");
 var Ethers$1 = require("ethers");
 var Queries = require("../data/Queries.js");
 var Contracts = require("../ethereum/Contracts.js");
 var DataHooks = require("../data/DataHooks.js");
 var Formality = require("re-formality/src/Formality.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var MiniLoader = require("./UI/MiniLoader.js");
-var AmountInput = require("./UI/AmountInput.js");
+var AmountInput = require("./UI/Base/AmountInput.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
@@ -440,7 +440,7 @@ function Unstake$UnstakeTxStatusModal(Props) {
                     id: "unstake-2",
                     children: React.createElement("div", {
                           className: "text-center m-3"
-                        }, React.createElement(MiniLoader.make, {}), React.createElement("p", undefined, "Unstake transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                        }, React.createElement(Loader.Mini.make, {}), React.createElement("p", undefined, "Unstake transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
                               txHash: txStateUnstake._0
                             }))
                   });
@@ -705,7 +705,7 @@ function Unstake(Props) {
     return React.createElement(React.Fragment, undefined, "Unable to fetch token");
   }
   if (token.loading) {
-    return React.createElement(MiniLoader.make, {});
+    return React.createElement(Loader.Mini.make, {});
   }
   if (match$1 === undefined) {
     return React.createElement(React.Fragment, undefined, "Could not find this market - please check the URL carefully.");

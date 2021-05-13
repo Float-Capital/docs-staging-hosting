@@ -4,14 +4,14 @@ let make = (~txStateStake, ~resetFormButton, ~tokenToStake) => {
   | ContractActions.Created =>
     <Modal id={"stake-1"}>
       <div className="text-center m-3">
-        <EllipsesLoader />
+        <Loader.Ellipses />
         <h1> {`Confirm the transaction to stake ${tokenToStake}`->React.string} </h1>
       </div>
     </Modal>
   | ContractActions.SignedAndSubmitted(txHash) =>
     <Modal id={"stake-3"}>
       <div className="text-center m-3">
-        <div className="m-2"> <MiniLoader /> </div>
+        <div className="m-2"> <Loader.Mini /> </div>
         <p> {"Staking transaction pending... "->React.string} </p>
         <ViewOnBlockExplorer txHash />
       </div>

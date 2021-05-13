@@ -7,9 +7,9 @@ let make = () => {
     | Some(balance) =>
       <div className="flex justify-between w-full">
         <p> {`DAI balance: `->React.string} </p>
-        <p> {`$${FormatMoney.formatEther(balance)}`->React.string} </p>
+        <p> {`$${Misc.NumberFormat.formatEther(balance)}`->React.string} </p>
       </div>
-    | None => <MiniLoader />
+    | None => <Loader.Mini />
     }}
   </>
 }
