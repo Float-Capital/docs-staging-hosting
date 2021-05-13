@@ -231,22 +231,26 @@ function User(Props) {
   } else {
     return React.createElement("div", {
                 className: "w-full max-w-5xl mx-auto"
-              }, React.createElement(UserUI.UserColumnCard.make, {
-                    children: null
-                  }, React.createElement(UserUI.UserProfileHeader.make, {
-                        address: user
-                      }), optCurrentUser !== undefined && Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser)) === user ? React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnTextCenter.make, {
-                              children: React.createElement("p", {
-                                    className: "my-2"
-                                  }, "Mint a position to see data on your profile")
-                            }), React.createElement("div", {
-                              className: "w-40 mx-auto"
-                            }, React.createElement(Link, {
-                                  href: "/markets",
-                                  children: React.createElement(Button.Small.make, {
-                                        children: "MARKETS"
-                                      })
-                                }))) : notCurrentUserMessage(undefined)));
+              }, React.createElement("div", {
+                    className: "max-w-xl mx-auto"
+                  }, React.createElement(UserUI.UserColumnCard.make, {
+                        children: React.createElement("div", {
+                              className: "p-4"
+                            }, React.createElement(UserUI.UserProfileHeader.make, {
+                                  address: user
+                                }), optCurrentUser !== undefined && Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser)) === user ? React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnTextCenter.make, {
+                                        children: React.createElement("p", {
+                                              className: "my-2"
+                                            }, "Mint a position to see data on your profile")
+                                      }), React.createElement("div", {
+                                        className: "w-40 mx-auto"
+                                      }, React.createElement(Link, {
+                                            href: "/markets",
+                                            children: React.createElement(Button.Small.make, {
+                                                  children: "MARKETS"
+                                                })
+                                          }))) : notCurrentUserMessage(undefined))
+                      })));
   }
 }
 
