@@ -37,50 +37,6 @@ let mappedBasicCalc = (apy, longVal, shortVal, tokenType) =>
 let kperiodHardcode = Ethers.BigNumber.fromUnsafe("1664000") // ~20 days
 let kmultiplierHardcode = Ethers.BigNumber.fromUnsafe("5000000000000000000")
 
-let kCalc = (
-  kperiod: Ethers.BigNumber.t,
-  kmultiplier: Ethers.BigNumber.t,
-  initialTimestamp: Ethers.BigNumber.t,
-  currentTimestamp: Ethers.BigNumber.t,
-) => {
-  if currentTimestamp->Ethers.BigNumber.sub(initialTimestamp)->Ethers.BigNumber.lte(kperiod) {
-    kmultiplier->Ethers.BigNumber.sub(
-      kmultiplier
-      ->Ethers.BigNumber.sub(oneInWei)
-      ->Ethers.BigNumber.mul(currentTimestamp->Ethers.BigNumber.sub(initialTimestamp))
-      ->Ethers.BigNumber.div(kperiod),
-    )
-  } else {
-    oneInWei
-  }
-}
-
-let myfloatCalc = (
-  longVal: Ethers.BigNumber.t,
-  shortVal: Ethers.BigNumber.t,
-  kperiod: Ethers.BigNumber.t,
-  kmultiplier: Ethers.BigNumber.t,
-  initialTimestamp: Ethers.BigNumber.t,
-  currentTimestamp: Ethers.BigNumber.t,
-  tokenType,
-) => {
-  let total = longVal->Ethers.BigNumber.add(shortVal)
-  let k = kCalc(kperiod, kmultiplier, initialTimestamp, currentTimestamp)
-  switch tokenType {
-  | "long" =>
-    switch longVal->Ethers.Utils.formatEther->Js.Float.fromString {
-    | 0.0 => zero
-    | _ => k->Ethers.BigNumber.mul(shortVal)->Ethers.BigNumber.div(total)
-    }
-  | "short" =>
-    switch shortVal->Ethers.Utils.formatEther->Js.Float.fromString {
-    | 0.0 => zero
-    | _ => k->Ethers.BigNumber.mul(longVal)->Ethers.BigNumber.div(total)
-    }
-  | _ => oneHundred
-  }
-}
-
 type handleStakeButtonPress =
   | WaitingForInteraction
   | Loading
@@ -134,7 +90,7 @@ let make = (
     "short",
   )
 
-  let longFloatApy = myfloatCalc(
+  let longFloatApy = MarketCalculationHelpers.calculateFloatAPY(
     totalLockedLong,
     totalLockedShort,
     kperiodHardcode,
@@ -144,7 +100,7 @@ let make = (
     "long",
   )
 
-  let shortFloatApy = myfloatCalc(
+  let shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(
     totalLockedLong,
     totalLockedShort,
     kperiodHardcode,

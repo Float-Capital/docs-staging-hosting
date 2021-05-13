@@ -2,15 +2,16 @@
 'use strict';
 
 var React = require("react");
+var CONSTANTS = require("../../../CONSTANTS.js");
 var MiniLoader = require("../MiniLoader.js");
 
 function isHotAPY(apy) {
-  return apy > 0.15;
+  return apy > CONSTANTS.hotAPYThreshold;
 }
 
 function mapVal(apy) {
   return (apy * 100).toFixed(2) + "%" + (
-          apy > 0.15 ? "🔥" : ""
+          apy > CONSTANTS.hotAPYThreshold ? "🔥" : ""
         );
 }
 
