@@ -194,7 +194,7 @@ function onQuerySuccess(data) {
             });
 }
 
-function User$User(Props) {
+function User(Props) {
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
   var router = Router.useRouter();
   var userStr = Js_dict.get(router.query, "user");
@@ -246,22 +246,18 @@ function User$User(Props) {
   }
 }
 
-var User = {
-  onQueryError: onQueryError,
-  onQuerySuccess: onQuerySuccess,
-  make: User$User
-};
+var make = User;
 
-function $$default(param) {
-  return React.createElement(User$User, {});
-}
+var $$default = User;
 
 exports.UserBalancesCard = UserBalancesCard;
 exports.getUsersTotalStakeValue = getUsersTotalStakeValue;
 exports.UserTotalInvestedCard = UserTotalInvestedCard;
 exports.UserTotalStakedCard = UserTotalStakedCard;
 exports.UserProfileCard = UserProfileCard;
-exports.User = User;
+exports.onQueryError = onQueryError;
+exports.onQuerySuccess = onQuerySuccess;
+exports.make = make;
 exports.$$default = $$default;
 exports.default = $$default;
 exports.__esModule = true;

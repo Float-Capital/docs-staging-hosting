@@ -13,7 +13,7 @@ var MarketCard = require("../components/Markets/MarketCard.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Router = require("next/router");
 
-function Markets$MarketsList(Props) {
+function Markets(Props) {
   var router = Router.useRouter();
   var marketIndexOption = Js_dict.get(router.query, "marketIndex");
   var marketDetailsQuery = Curry.app(Queries.MarketDetails.use, [
@@ -73,15 +73,11 @@ function Markets$MarketsList(Props) {
             }, tmp);
 }
 
-var MarketsList = {
-  make: Markets$MarketsList
-};
+var make = Markets;
 
-function $$default(param) {
-  return React.createElement(Markets$MarketsList, {});
-}
+var $$default = Markets;
 
-exports.MarketsList = MarketsList;
+exports.make = make;
 exports.$$default = $$default;
 exports.default = $$default;
 exports.__esModule = true;
