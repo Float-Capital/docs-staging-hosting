@@ -325,7 +325,7 @@ function UserUI$UserPercentageGains(Props) {
     switch (match$1[0]) {
       case /* Up */0 :
           match$2 = [
-            "",
+            "+",
             "text-green-500"
           ];
           break;

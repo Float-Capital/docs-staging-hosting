@@ -256,7 +256,7 @@ module UserPercentageGains = {
           let (displayDirection, percentStr) = directionAndPercentageString(oldPrice, newPrice)
 
           let (symbol, textClassName) = switch displayDirection {
-          | Up => ("", "text-green-500")
+          | Up => ("+", "text-green-500")
           | Down => ("-", "text-red-500")
           | Same => ("", "text-gray-400")
           }
