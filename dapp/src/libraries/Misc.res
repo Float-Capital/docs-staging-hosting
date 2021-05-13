@@ -34,6 +34,23 @@ module Time = {
   Same as 'useCurrentTime' but returns result as a Ethers.BigNumber.t`)
   let useCurrentTimeBN = (~updateInterval) =>
     useCurrentTime(~updateInterval)->Ethers.BigNumber.fromInt
+
+  @ocaml.doc(`Runs a callback on an interval predictably`)
+  let useInterval = (callback: unit => unit, ~delay) => {
+    let savedCallback: React.ref<unit => unit> = React.useRef(callback)
+
+    // Remember the latest callback so that is persists between renders
+    React.useEffect1(() => {
+      savedCallback.current = callback
+      None
+    }, [callback])
+
+    // Set up the interval.
+    React.useEffect1(() => {
+      let id = Js.Global.setInterval(savedCallback.current, delay)
+      Some(() => Js.Global.clearInterval(id))
+    }, [delay])
+  }
 }
 
 module NumberFormat = {
