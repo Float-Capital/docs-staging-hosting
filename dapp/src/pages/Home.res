@@ -2,6 +2,8 @@ module Home = {
   @react.component
   let make = () => {
     let (hasVisitedEnoughTimes, setHasVisitedEnoughTimes) = React.useState(() => false)
+    let (isPartOfActiveSession, setIsPartOfActiveSession) = React.useState(() => false)
+    let (clickedTrading, setClickedTrading) = React.useState(() => false)
 
     React.useEffect1(() => {
       let key = "numberOfVisits"
@@ -13,13 +15,20 @@ module Home = {
       }
       setHasVisitedEnoughTimes(_ => numberOfVisits >= 3)
       Dom.Storage.setItem(key, numberOfVisits->Int.toString, localStorage)
+      let sessionStorage = Dom.Storage.sessionStorage
+      let sessionKey = "isActiveSession"
+      let optIsActiveSession = Dom.Storage.getItem(sessionKey, sessionStorage)
+      switch optIsActiveSession {
+      | Some(session) => setIsPartOfActiveSession(_ => session == "true")
+      | None => Dom.Storage.setItem(sessionKey, "true", sessionStorage)
+      }
       None
     }, [])
 
-    if hasVisitedEnoughTimes {
+    if hasVisitedEnoughTimes || isPartOfActiveSession || clickedTrading {
       <Markets />
     } else {
-      <StartTrading />
+      <StartTrading clickedTrading={setClickedTrading} />
     }
   }
 }

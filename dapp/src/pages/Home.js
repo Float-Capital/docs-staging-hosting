@@ -14,6 +14,13 @@ function Home$Home(Props) {
         return false;
       });
   var setHasVisitedEnoughTimes = match[1];
+  var match$1 = React.useState(function () {
+        return false;
+      });
+  var setIsPartOfActiveSession = match$1[1];
+  var match$2 = React.useState(function () {
+        return false;
+      });
   React.useEffect((function () {
           var key = "numberOfVisits";
           var localStorage$1 = localStorage;
@@ -23,12 +30,24 @@ function Home$Home(Props) {
                   return numberOfVisits >= 3;
                 }));
           Dom_storage.setItem(key, String(numberOfVisits), localStorage$1);
+          var sessionStorage$1 = sessionStorage;
+          var sessionKey = "isActiveSession";
+          var optIsActiveSession = Dom_storage.getItem(sessionKey, sessionStorage$1);
+          if (optIsActiveSession !== undefined) {
+            Curry._1(setIsPartOfActiveSession, (function (param) {
+                    return optIsActiveSession === "true";
+                  }));
+          } else {
+            Dom_storage.setItem(sessionKey, "true", sessionStorage$1);
+          }
           
         }), []);
-  if (match[0]) {
+  if (match[0] || match$1[0] || match$2[0]) {
     return React.createElement(Markets.make, {});
   } else {
-    return React.createElement(StartTrading.make, {});
+    return React.createElement(StartTrading.make, {
+                clickedTrading: match$2[1]
+              });
   }
 }
 

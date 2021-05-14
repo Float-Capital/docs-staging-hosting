@@ -194,9 +194,7 @@ let make = () => {
                   </p>
                 </UserColumnTextCenter>
                 <div className="w-40 mx-auto">
-                  <Next.Link href="/markets">
-                    <Button.Small> {`MARKETS`} </Button.Small>
-                  </Next.Link>
+                  <Next.Link href="/"> <Button.Small> {`MARKETS`} </Button.Small> </Next.Link>
                 </div>
               </>
             : notCurrentUserMessage()

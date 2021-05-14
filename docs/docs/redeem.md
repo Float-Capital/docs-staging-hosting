@@ -11,7 +11,7 @@ slug: /redeem
 
 ## Redeeming Float synthetic tokens 👽
 
-If you would like to exit your position in the market, and redeem your synthetic asset tokens for dai. You can either visit the [markets](https://float.capital/markets) page, or your profile page by clicking on your address in the top navigation. From the individual market page you can select the redeem tab and redeem your tokens for DAI.
+If you would like to exit your position in the market, and redeem your synthetic asset tokens for dai. You can either visit the [markets](https://float.capital/) page, or your profile page by clicking on your address in the top navigation. From the individual market page you can select the redeem tab and redeem your tokens for DAI.
 
 Redeeming your Float synthetic tokens involves burning these tokens for the proportional underlying collateral.
 

@@ -184,7 +184,7 @@ function StakeCard(Props) {
             var actionOption = stakeButtonPressState.actionOption;
             var marketIndex = stakeButtonPressState.marketIndex;
             var routeToMint = function (param) {
-              return JsPromise.$$catch(router.push("/markets?marketIndex=" + marketIndex + "&actionOption=" + actionOption + "&tab=mint").then(function (param) {
+              return JsPromise.$$catch(router.push("/?marketIndex=" + marketIndex + "&actionOption=" + actionOption + "&tab=mint").then(function (param) {
                               Curry._1(toastDispatch, {
                                     _0: "Mint some  " + marketName + " " + actionOption + " tokens to stake.",
                                     _1: "",

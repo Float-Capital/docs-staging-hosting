@@ -483,13 +483,13 @@ function UserUI$UserMarketStakeOrRedeem(Props) {
   var marketId = Belt_Option.getWithDefault(DataHooks.Util.graphResponseToOption(marketIdResponse), "1");
   var router = Router.useRouter();
   var stake = function (param) {
-    router.push("/markets?marketIndex=" + marketId + "&actionOption=" + (
+    router.push("/?marketIndex=" + marketId + "&actionOption=" + (
           isLong ? "long" : "short"
         ) + "&tab=stake");
     
   };
   var redeem = function (param) {
-    router.push("/markets?marketIndex=" + marketId + "&actionOption=" + (
+    router.push("/?marketIndex=" + marketId + "&actionOption=" + (
           isLong ? "long" : "short"
         ) + "&tab=redeem");
     
@@ -518,7 +518,7 @@ function UserUI$UserMarketUnstake(Props) {
   var marketId = Belt_Option.getWithDefault(DataHooks.Util.graphResponseToOption(marketIdResponse), "1");
   var router = Router.useRouter();
   var unstake = function (param) {
-    router.push("/markets?marketIndex=" + marketId + "&tab=unstake&actionOption=" + (
+    router.push("/?marketIndex=" + marketId + "&tab=unstake&actionOption=" + (
           isLong ? "long" : "short"
         ));
     
