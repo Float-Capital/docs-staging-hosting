@@ -92,7 +92,7 @@ let expectRevert: (
 let changeBallance: (
   ~transaction: unit => JsPromise.t<Contract.transaction>,
   ~token: Contract.t,
-  ~to: Ethers.Wallet.t,
+  ~to_: Ethers.Wallet.t,
   ~amount: Ethers.BigNumber.t,
 ) => JsPromise.t<
   unit,

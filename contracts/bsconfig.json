@@ -4,7 +4,9 @@
   "bs-dependencies": [
     "bs-mocha"
   ],
-  "ppx-flags": [],
+  "ppx-flags": [
+    "bs-let/ppx"
+  ],
   "sources": [
     {
       "dir": "test-waffle",
