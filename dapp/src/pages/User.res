@@ -134,7 +134,9 @@ type userData = {
 }
 
 let onQueryError = (msg: string) => {
-  <UserContainer> {`Error: ${msg}`->React.string} </UserContainer>
+  <div className="w-full max-w-5xl mx-auto">
+    <UserContainer> {`Error: ${msg}`->React.string} </UserContainer>
+  </div>
 }
 
 let onQuerySuccess = (data: userData) => {
@@ -181,29 +183,34 @@ let make = () => {
     </UserColumnTextCenter>
 
   switch liftGraphResponse2(stakesQuery, userInfoQuery) {
-  | Response((_stakes, NewUser)) => <>
-      <UserColumnCard>
-        <UserProfileHeader address={user} />
-        {switch optCurrentUser {
-        | Some(currentUser) =>
-          currentUser->Ethers.Utils.ethAdrToLowerStr == user
-            ? <>
-                <UserColumnTextCenter>
-                  <p className="my-2">
-                    {`Mint a position to see data on your profile`->React.string}
-                  </p>
-                </UserColumnTextCenter>
-                <div className="w-40 mx-auto">
-                  <Next.Link href="/markets">
-                    <Button.Small> {`MARKETS`} </Button.Small>
-                  </Next.Link>
-                </div>
-              </>
-            : notCurrentUserMessage()
-        | None => notCurrentUserMessage()
-        }}
-      </UserColumnCard>
-    </>
+  | Response((_stakes, NewUser)) =>
+    <div className="w-full max-w-5xl mx-auto">
+      <div className="max-w-xl mx-auto">
+        <UserColumnCard>
+          <div className="p-4">
+            <UserProfileHeader address={user} />
+            {switch optCurrentUser {
+            | Some(currentUser) =>
+              currentUser->Ethers.Utils.ethAdrToLowerStr == user
+                ? <>
+                    <UserColumnTextCenter>
+                      <p className="my-2">
+                        {`Mint a position to see data on your profile`->React.string}
+                      </p>
+                    </UserColumnTextCenter>
+                    <div className="w-40 mx-auto">
+                      <Next.Link href="/markets">
+                        <Button.Small> {`MARKETS`} </Button.Small>
+                      </Next.Link>
+                    </div>
+                  </>
+                : notCurrentUserMessage()
+            | None => notCurrentUserMessage()
+            }}
+          </div>
+        </UserColumnCard>
+      </div>
+    </div>
   | Response((stakes, ExistingUser(userInfo))) =>
     onQuerySuccess({user: user, stakes: stakes, userInfo: userInfo})
   | GraphError(msg) => onQueryError(msg)
