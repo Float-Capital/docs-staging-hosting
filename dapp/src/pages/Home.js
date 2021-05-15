@@ -6,7 +6,6 @@ var React = require("react");
 var Markets = require("./Markets.js");
 var Belt_Int = require("rescript/lib/js/belt_Int.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
-var Dom_storage = require("rescript/lib/js/dom_storage.js");
 var StartTrading = require("../components/UI/StartTrading.js");
 
 function Home$Home(Props) {
@@ -24,21 +23,24 @@ function Home$Home(Props) {
   React.useEffect((function () {
           var key = "numberOfVisits";
           var localStorage$1 = localStorage;
-          var optNumberOfVisits = Dom_storage.getItem(key, localStorage$1);
-          var numberOfVisits = optNumberOfVisits !== undefined ? Belt_Option.getWithDefault(Belt_Int.fromString(optNumberOfVisits), 0) + 1 | 0 : 0;
+          var optNumberOfVisits = localStorage$1.getItem(key);
+          var numberOfVisits = optNumberOfVisits !== null ? Belt_Option.getWithDefault(Belt_Int.fromString(optNumberOfVisits), 0) + 1 | 0 : 0;
           Curry._1(setHasVisitedEnoughTimes, (function (param) {
                   return numberOfVisits >= 3;
                 }));
-          Dom_storage.setItem(key, String(numberOfVisits), localStorage$1);
+          localStorage$1.setItem(key, String(numberOfVisits));
+          
+        }), []);
+  React.useEffect((function () {
+          var key = "isActiveSession";
           var sessionStorage$1 = sessionStorage;
-          var sessionKey = "isActiveSession";
-          var optIsActiveSession = Dom_storage.getItem(sessionKey, sessionStorage$1);
-          if (optIsActiveSession !== undefined) {
+          var optIsActiveSession = sessionStorage$1.getItem(key);
+          if (optIsActiveSession !== null) {
             Curry._1(setIsPartOfActiveSession, (function (param) {
                     return optIsActiveSession === "true";
                   }));
           } else {
-            Dom_storage.setItem(sessionKey, "true", sessionStorage$1);
+            sessionStorage$1.setItem(key, "true");
           }
           
         }), []);
