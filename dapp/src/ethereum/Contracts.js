@@ -83,7 +83,7 @@ var Synth = {
   make: make$4
 };
 
-var abi$5 = Ethers.makeAbi(["function mintMonies(address aaveDaiContract) @10000"]);
+var abi$5 = Ethers.makeAbi(["function mintMonies(address aaveDaiContract)"]);
 
 function make$5(address, providerOrSigner) {
   return Ethers.Contract.make(address, abi$5, providerOrSigner);

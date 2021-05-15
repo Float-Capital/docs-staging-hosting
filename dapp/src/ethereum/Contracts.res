@@ -205,7 +205,7 @@ module Synth = {
 
 module AaveFaucet = {
   type t = Ethers.Contract.t
-  let abi = ["function mintMonies(address aaveDaiContract) @10000"]->Ethers.makeAbi
+  let abi = ["function mintMonies(address aaveDaiContract)"]->Ethers.makeAbi
   let make = (~address, ~providerOrSigner): t =>
     Ethers.Contract.make(address, abi, providerOrSigner)
 
