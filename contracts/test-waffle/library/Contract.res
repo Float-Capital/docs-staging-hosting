@@ -169,6 +169,12 @@ module LongShort = {
     ~marketIndex: int,
     ~amount: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "mintShortAndStake"
+  @send
+  external updateMarketOracle: (
+    t,
+    ~marketIndex: int,
+    ~newOracleAddress: Ethers.ethAddress,
+  ) => JsPromise.t<transaction> = "updateMarketOracle"
 }
 
 module GenericErc20 = {
