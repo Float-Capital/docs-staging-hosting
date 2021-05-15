@@ -54,10 +54,7 @@ const deployTestMarket = async (
   let yieldManager;
   let fundTokenAddress;
   if (networkName == "mumbai") {
-    yieldManager = await YieldManagerAave.new();
-    fundTokenAddress = mumbaiDaiAddress;
-
-    await yieldManager.setup(
+    yieldManager = await YieldManagerAave.new(
       admin,
       longShortInstance.address,
       mumbaiDaiAddress,
@@ -65,15 +62,15 @@ const deployTestMarket = async (
       aavePoolAddressMumbai,
       0
     );
+    fundTokenAddress = mumbaiDaiAddress;
   } else {
-    yieldManager = await YieldManagerMock.new();
-    fundTokenAddress = fundTokenInstance.address;
-
-    await yieldManager.setup(
+    yieldManager = await YieldManagerMock.new(
       admin,
       longShortInstance.address,
       fundTokenInstance.address
     );
+
+    fundTokenAddress = fundTokenInstance.address;
 
     var mintRole = await fundTokenInstance.MINTER_ROLE.call();
     await fundTokenInstance.grantRole(mintRole, yieldManager.address);
@@ -169,7 +166,7 @@ module.exports = async function(deployer, network, accounts) {
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
 
-  let verifyString = `yarn hardhat --network ${networkName} tenderly:verify`;
+  let verifyString = `yarn hardhat --network ${network} tenderly:verify`;
   if (network == "mumbai") {
     for (
       let marketIndex = 1;

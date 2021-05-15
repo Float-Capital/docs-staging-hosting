@@ -29,24 +29,6 @@ let getAllStateChangeEvents = allStateChangesRaw =>
     ->Js.Promise.resolve
   }, _)
 
-let addEventToCorrectGrouping = (
-  currentEventGroups,
-  {ConverterTypes.blockNumber: blockNumber, timestamp, txHash, data},
-) => {
-  switch data {
-  | V1(stakeData) => {
-      ...currentEventGroups,
-      allV1Events: currentEventGroups.allV1Events->Array.concat([
-        {blockNumber: blockNumber, timestamp: timestamp, data: stakeData, txHash: txHash},
-      ]),
-    }
-  | Unclassified(event) => {
-      ...currentEventGroups,
-      allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents->Array.concat([event]),
-    }
-  | _TODO => currentEventGroups
-  }
-}
 let splitIntoEventGroups = allStateChanges =>
   allStateChanges->Js.Promise.then_(
     stateChanges =>

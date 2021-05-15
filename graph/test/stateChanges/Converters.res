@@ -3,10 +3,25 @@
 open ConverterTypes
 
 @decco.decode
-type transferData = {
-  from: address,
-  to: address,
+type stateAddedData = {
+  tokenAddress: address,
+  stateIndex: bn,
+  timestamp: bn,
+  accumulative: bn,
+}
+@decco.decode
+type valueLockedInSystemData = {
+  marketIndex: bn,
+  totalValueLockedInMarket: bn,
+  longValue: bn,
+  shortValue: bn,
+}
+@decco.decode
+type stakeAddedData = {
+  user: address,
+  tokenAddress: address,
   amount: bn,
+  lastMintIndex: bn,
 }
 @decco.decode
 type priceUpdateData = {
@@ -22,11 +37,10 @@ type tokenPriceRefreshedData = {
   shortTokenPrice: bn,
 }
 @decco.decode
-type valueLockedInSystemData = {
-  marketIndex: bn,
-  totalValueLockedInMarket: bn,
-  longValue: bn,
-  shortValue: bn,
+type transferData = {
+  from: address,
+  to: address,
+  amount: bn,
 }
 @decco.decode
 type approvalData = {
@@ -43,26 +57,18 @@ type shortMintedData = {
   user: address,
 }
 @decco.decode
-type stakeAddedData = {
-  user: address,
-  tokenAddress: address,
-  amount: bn,
-  lastMintIndex: bn,
-}
-@decco.decode
-type stateAddedData = {
-  tokenAddress: address,
-  stateIndex: bn,
-  timestamp: bn,
-  accumulative: bn,
-}
-@decco.decode
 type shortRedeemData = {
   marketIndex: bn,
   tokensRedeemed: bn,
   valueOfRedemption: bn,
   finalRedeem: bn,
   user: address,
+}
+@decco.decode
+type v1Data = {
+  admin: address,
+  tokenFactory: address,
+  staker: address,
 }
 @decco.decode
 type longMintedData = {
@@ -73,24 +79,26 @@ type longMintedData = {
   user: address,
 }
 @decco.decode
-type longRedeemData = {
-  marketIndex: bn,
-  tokensRedeemed: bn,
-  valueOfRedemption: bn,
-  finalRedeem: bn,
-  user: address,
-}
-@decco.decode
-type deployV1Data = {
-  floatAddress: address,
-}
-@decco.decode
 type feesChangesData = {
   marketIndex: bn,
   baseEntryFee: bn,
   badLiquidityEntryFee: bn,
   baseExitFee: bn,
   badLiquidityExitFee: bn,
+}
+@decco.decode
+type kFactorParametersChangesData = {
+  marketIndex: bn,
+  period: bn,
+  multiplier: bn,
+}
+@decco.decode
+type longRedeemData = {
+  marketIndex: bn,
+  tokensRedeemed: bn,
+  valueOfRedemption: bn,
+  finalRedeem: bn,
+  user: address,
 }
 @decco.decode
 type syntheticTokenCreatedData = {
@@ -101,6 +109,11 @@ type syntheticTokenCreatedData = {
   name: string,
   symbol: string,
   oracleAddress: address,
+  collateralAddress: address,
+}
+@decco.decode
+type deployV1Data = {
+  floatAddress: address,
 }
 @decco.decode
 type floatMintedData = {
@@ -109,91 +122,89 @@ type floatMintedData = {
   amount: bn,
   lastMintIndex: bn,
 }
-@decco.decode
-type v1Data = {
-  admin: address,
-  tokenFactory: address,
-  staker: address,
-}
 
 type stateChanges =
   | Unclassified(unclassifiedEvent)
-  | Transfer(transferData)
+  | StateAdded(stateAddedData)
+  | ValueLockedInSystem(valueLockedInSystemData)
+  | StakeAdded(stakeAddedData)
   | PriceUpdate(priceUpdateData)
   | TokenPriceRefreshed(tokenPriceRefreshedData)
-  | ValueLockedInSystem(valueLockedInSystemData)
+  | Transfer(transferData)
   | Approval(approvalData)
   | ShortMinted(shortMintedData)
-  | StakeAdded(stakeAddedData)
-  | StateAdded(stateAddedData)
   | ShortRedeem(shortRedeemData)
-  | LongMinted(longMintedData)
-  | LongRedeem(longRedeemData)
-  | DeployV1(deployV1Data)
-  | FeesChanges(feesChangesData)
-  | SyntheticTokenCreated(syntheticTokenCreatedData)
-  | FloatMinted(floatMintedData)
   | V1(v1Data)
+  | LongMinted(longMintedData)
+  | FeesChanges(feesChangesData)
+  | KFactorParametersChanges(kFactorParametersChangesData)
+  | LongRedeem(longRedeemData)
+  | SyntheticTokenCreated(syntheticTokenCreatedData)
+  | DeployV1(deployV1Data)
+  | FloatMinted(floatMintedData)
 
 let covertToStateChange = (eventName, paramsObject) => {
   // TODO: throw a (descriptive) error if the array of parameters are wrong somehow (or make a separate test?)
   switch eventName {
-  | "Transfer" => Transfer(paramsObject->Js.Json.object_->transferData_decode->Result.getExn)
+  | "StateAdded" => StateAdded(paramsObject->Js.Json.object_->stateAddedData_decode->Result.getExn)
+  | "ValueLockedInSystem" => ValueLockedInSystem(paramsObject->Js.Json.object_->valueLockedInSystemData_decode->Result.getExn)
+  | "StakeAdded" => StakeAdded(paramsObject->Js.Json.object_->stakeAddedData_decode->Result.getExn)
   | "PriceUpdate" => PriceUpdate(paramsObject->Js.Json.object_->priceUpdateData_decode->Result.getExn)
   | "TokenPriceRefreshed" => TokenPriceRefreshed(paramsObject->Js.Json.object_->tokenPriceRefreshedData_decode->Result.getExn)
-  | "ValueLockedInSystem" => ValueLockedInSystem(paramsObject->Js.Json.object_->valueLockedInSystemData_decode->Result.getExn)
+  | "Transfer" => Transfer(paramsObject->Js.Json.object_->transferData_decode->Result.getExn)
   | "Approval" => Approval(paramsObject->Js.Json.object_->approvalData_decode->Result.getExn)
   | "ShortMinted" => ShortMinted(paramsObject->Js.Json.object_->shortMintedData_decode->Result.getExn)
-  | "StakeAdded" => StakeAdded(paramsObject->Js.Json.object_->stakeAddedData_decode->Result.getExn)
-  | "StateAdded" => StateAdded(paramsObject->Js.Json.object_->stateAddedData_decode->Result.getExn)
   | "ShortRedeem" => ShortRedeem(paramsObject->Js.Json.object_->shortRedeemData_decode->Result.getExn)
-  | "LongMinted" => LongMinted(paramsObject->Js.Json.object_->longMintedData_decode->Result.getExn)
-  | "LongRedeem" => LongRedeem(paramsObject->Js.Json.object_->longRedeemData_decode->Result.getExn)
-  | "DeployV1" => DeployV1(paramsObject->Js.Json.object_->deployV1Data_decode->Result.getExn)
-  | "FeesChanges" => FeesChanges(paramsObject->Js.Json.object_->feesChangesData_decode->Result.getExn)
-  | "SyntheticTokenCreated" => SyntheticTokenCreated(paramsObject->Js.Json.object_->syntheticTokenCreatedData_decode->Result.getExn)
-  | "FloatMinted" => FloatMinted(paramsObject->Js.Json.object_->floatMintedData_decode->Result.getExn)
   | "V1" => V1(paramsObject->Js.Json.object_->v1Data_decode->Result.getExn)
+  | "LongMinted" => LongMinted(paramsObject->Js.Json.object_->longMintedData_decode->Result.getExn)
+  | "FeesChanges" => FeesChanges(paramsObject->Js.Json.object_->feesChangesData_decode->Result.getExn)
+  | "KFactorParametersChanges" => KFactorParametersChanges(paramsObject->Js.Json.object_->kFactorParametersChangesData_decode->Result.getExn)
+  | "LongRedeem" => LongRedeem(paramsObject->Js.Json.object_->longRedeemData_decode->Result.getExn)
+  | "SyntheticTokenCreated" => SyntheticTokenCreated(paramsObject->Js.Json.object_->syntheticTokenCreatedData_decode->Result.getExn)
+  | "DeployV1" => DeployV1(paramsObject->Js.Json.object_->deployV1Data_decode->Result.getExn)
+  | "FloatMinted" => FloatMinted(paramsObject->Js.Json.object_->floatMintedData_decode->Result.getExn)
   | name => Unclassified({name: name, data: paramsObject})
   }
 }
 
 type eventGroup = {
-  allTransferEvents: array<eventData<transferData>>,
+  allStateAddedEvents: array<eventData<stateAddedData>>,
+  allValueLockedInSystemEvents: array<eventData<valueLockedInSystemData>>,
+  allStakeAddedEvents: array<eventData<stakeAddedData>>,
   allPriceUpdateEvents: array<eventData<priceUpdateData>>,
   allTokenPriceRefreshedEvents: array<eventData<tokenPriceRefreshedData>>,
-  allValueLockedInSystemEvents: array<eventData<valueLockedInSystemData>>,
+  allTransferEvents: array<eventData<transferData>>,
   allApprovalEvents: array<eventData<approvalData>>,
   allShortMintedEvents: array<eventData<shortMintedData>>,
-  allStakeAddedEvents: array<eventData<stakeAddedData>>,
-  allStateAddedEvents: array<eventData<stateAddedData>>,
   allShortRedeemEvents: array<eventData<shortRedeemData>>,
-  allLongMintedEvents: array<eventData<longMintedData>>,
-  allLongRedeemEvents: array<eventData<longRedeemData>>,
-  allDeployV1Events: array<eventData<deployV1Data>>,
-  allFeesChangesEvents: array<eventData<feesChangesData>>,
-  allSyntheticTokenCreatedEvents: array<eventData<syntheticTokenCreatedData>>,
-  allFloatMintedEvents: array<eventData<floatMintedData>>,
   allV1Events: array<eventData<v1Data>>,
+  allLongMintedEvents: array<eventData<longMintedData>>,
+  allFeesChangesEvents: array<eventData<feesChangesData>>,
+  allKFactorParametersChangesEvents: array<eventData<kFactorParametersChangesData>>,
+  allLongRedeemEvents: array<eventData<longRedeemData>>,
+  allSyntheticTokenCreatedEvents: array<eventData<syntheticTokenCreatedData>>,
+  allDeployV1Events: array<eventData<deployV1Data>>,
+  allFloatMintedEvents: array<eventData<floatMintedData>>,
   allUnclassifiedEvents: array<ConverterTypes.unclassifiedEvent>,
 }
 let emptyEventGroups = {
-  allTransferEvents: [],
+  allStateAddedEvents: [],
+  allValueLockedInSystemEvents: [],
+  allStakeAddedEvents: [],
   allPriceUpdateEvents: [],
   allTokenPriceRefreshedEvents: [],
-  allValueLockedInSystemEvents: [],
+  allTransferEvents: [],
   allApprovalEvents: [],
   allShortMintedEvents: [],
-  allStakeAddedEvents: [],
-  allStateAddedEvents: [],
   allShortRedeemEvents: [],
-  allLongMintedEvents: [],
-  allLongRedeemEvents: [],
-  allDeployV1Events: [],
-  allFeesChangesEvents: [],
-  allSyntheticTokenCreatedEvents: [],
-  allFloatMintedEvents: [],
   allV1Events: [],
+  allLongMintedEvents: [],
+  allFeesChangesEvents: [],
+  allKFactorParametersChangesEvents: [],
+  allLongRedeemEvents: [],
+  allSyntheticTokenCreatedEvents: [],
+  allDeployV1Events: [],
+  allFloatMintedEvents: [],
   allUnclassifiedEvents: [],
 }
 
@@ -202,9 +213,21 @@ let addEventToCorrectGrouping = (
   {ConverterTypes.blockNumber: blockNumber, timestamp, txHash, data},
 ) => {
   switch data {
-  | Transfer(eventData) => {
+  | StateAdded(eventData) => {
       ...currentEventGroups,
-      allTransferEvents: currentEventGroups.allTransferEvents->Array.concat([
+      allStateAddedEvents: currentEventGroups.allStateAddedEvents->Array.concat([
+        {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
+      ]),
+    }
+  | ValueLockedInSystem(eventData) => {
+      ...currentEventGroups,
+      allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents->Array.concat([
+        {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
+      ]),
+    }
+  | StakeAdded(eventData) => {
+      ...currentEventGroups,
+      allStakeAddedEvents: currentEventGroups.allStakeAddedEvents->Array.concat([
         {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
       ]),
     }
@@ -220,9 +243,9 @@ let addEventToCorrectGrouping = (
         {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
       ]),
     }
-  | ValueLockedInSystem(eventData) => {
+  | Transfer(eventData) => {
       ...currentEventGroups,
-      allValueLockedInSystemEvents: currentEventGroups.allValueLockedInSystemEvents->Array.concat([
+      allTransferEvents: currentEventGroups.allTransferEvents->Array.concat([
         {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
       ]),
     }
@@ -238,21 +261,15 @@ let addEventToCorrectGrouping = (
         {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
       ]),
     }
-  | StakeAdded(eventData) => {
-      ...currentEventGroups,
-      allStakeAddedEvents: currentEventGroups.allStakeAddedEvents->Array.concat([
-        {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
-      ]),
-    }
-  | StateAdded(eventData) => {
-      ...currentEventGroups,
-      allStateAddedEvents: currentEventGroups.allStateAddedEvents->Array.concat([
-        {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
-      ]),
-    }
   | ShortRedeem(eventData) => {
       ...currentEventGroups,
       allShortRedeemEvents: currentEventGroups.allShortRedeemEvents->Array.concat([
+        {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
+      ]),
+    }
+  | V1(eventData) => {
+      ...currentEventGroups,
+      allV1Events: currentEventGroups.allV1Events->Array.concat([
         {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
       ]),
     }
@@ -262,21 +279,21 @@ let addEventToCorrectGrouping = (
         {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
       ]),
     }
-  | LongRedeem(eventData) => {
-      ...currentEventGroups,
-      allLongRedeemEvents: currentEventGroups.allLongRedeemEvents->Array.concat([
-        {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
-      ]),
-    }
-  | DeployV1(eventData) => {
-      ...currentEventGroups,
-      allDeployV1Events: currentEventGroups.allDeployV1Events->Array.concat([
-        {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
-      ]),
-    }
   | FeesChanges(eventData) => {
       ...currentEventGroups,
       allFeesChangesEvents: currentEventGroups.allFeesChangesEvents->Array.concat([
+        {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
+      ]),
+    }
+  | KFactorParametersChanges(eventData) => {
+      ...currentEventGroups,
+      allKFactorParametersChangesEvents: currentEventGroups.allKFactorParametersChangesEvents->Array.concat([
+        {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
+      ]),
+    }
+  | LongRedeem(eventData) => {
+      ...currentEventGroups,
+      allLongRedeemEvents: currentEventGroups.allLongRedeemEvents->Array.concat([
         {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
       ]),
     }
@@ -286,15 +303,15 @@ let addEventToCorrectGrouping = (
         {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
       ]),
     }
-  | FloatMinted(eventData) => {
+  | DeployV1(eventData) => {
       ...currentEventGroups,
-      allFloatMintedEvents: currentEventGroups.allFloatMintedEvents->Array.concat([
+      allDeployV1Events: currentEventGroups.allDeployV1Events->Array.concat([
         {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
       ]),
     }
-  | V1(eventData) => {
+  | FloatMinted(eventData) => {
       ...currentEventGroups,
-      allV1Events: currentEventGroups.allV1Events->Array.concat([
+      allFloatMintedEvents: currentEventGroups.allFloatMintedEvents->Array.concat([
         {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
       ]),
     }
