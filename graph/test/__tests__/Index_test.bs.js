@@ -77,12 +77,7 @@ Curry._2(TestFramework.describe, "All Tests", (function (param) {
                         var expectTrue = param.expectTrue;
                         var callback = param.callback;
                         allStateChanges.contents.then(function (param) {
-                              var allSyntheticTokenCreatedEvents = param.allSyntheticTokenCreatedEvents;
-                              console.log({
-                                    Length: allSyntheticTokenCreatedEvents.length,
-                                    "all 'allSyntheticTokenCreatedEvents' events": allSyntheticTokenCreatedEvents
-                                  });
-                              Curry._1(expectTrue, allSyntheticTokenCreatedEvents.length >= 1);
+                              Curry._1(expectTrue, param.allSyntheticTokenCreatedEvents.length >= 1);
                               return Curry._1(callback, undefined);
                             });
                         
@@ -105,44 +100,95 @@ Curry._2(TestFramework.describe, "All Tests", (function (param) {
                             });
                         
                       }));
-                return Curry._2(testAsync, "should create a SyntheticMarket with correct ID and initial data", (function (param) {
+                Curry._2(testAsync, "should create a SyntheticMarket with correct ID and initial data", (function (param) {
+                        var expectEqual = param.expectEqual;
+                        var expectTrue = param.expectTrue;
+                        var callback = param.callback;
+                        allStateChanges.contents.then(function (param) {
+                                return Promise.all(Belt_Array.map(param.allSyntheticTokenCreatedEvents, (function (param) {
+                                                  var match = param.data;
+                                                  var collateralAddress = match.collateralAddress;
+                                                  var oracleAddress = match.oracleAddress;
+                                                  var symbol = match.symbol;
+                                                  var name = match.name;
+                                                  var shortTokenAddress = match.shortTokenAddress;
+                                                  var longTokenAddress = match.longTokenAddress;
+                                                  var txHash = param.txHash;
+                                                  var timestamp = param.timestamp;
+                                                  var blockNumber = param.blockNumber;
+                                                  return Queries.getSyntheticMarketAtBlock(match.marketIndex.toString(), blockNumber).then(function (result) {
+                                                              if (result === undefined) {
+                                                                return Curry._1(expectTrue, false);
+                                                              }
+                                                              var marketIndex = result.marketIndex;
+                                                              Curry._2(expectEqual, result.id, marketIndex.toString());
+                                                              Curry._2(expectEqual, String(timestamp), result.timestampCreated.toString());
+                                                              Curry._2(expectEqual, txHash, result.txHash);
+                                                              Curry._2(expectEqual, String(blockNumber), result.blockNumberCreated.toString());
+                                                              Curry._2(expectEqual, name, result.name);
+                                                              Curry._2(expectEqual, symbol, result.symbol);
+                                                              Curry._2(expectEqual, oracleAddress, result.oracleAddress);
+                                                              Curry._2(expectEqual, result.kPeriod.toString(), "0");
+                                                              Curry._2(expectEqual, result.kMultiplier.toString(), "0");
+                                                              Curry._2(expectEqual, result.previousOracleAddresses, []);
+                                                              Curry._2(expectEqual, result.syntheticLong.id, longTokenAddress);
+                                                              Curry._2(expectEqual, result.syntheticShort.id, shortTokenAddress);
+                                                              Curry._2(expectEqual, result.latestSystemState.id, marketIndex.toString() + "-0");
+                                                              Curry._2(expectEqual, result.feeStructure.id, marketIndex.toString() + "-fees");
+                                                              return Curry._2(expectEqual, result.collateralToken.id, collateralAddress);
+                                                            });
+                                                })));
+                              }).then(function (param) {
+                              return Curry._1(callback, undefined);
+                            });
+                        
+                      }));
+                var testSyntheticToken = function (syntheticTokenQuery, tokenAddress, timestamp, marketIndex, isLong, expectEqual) {
+                  var priceHistory = syntheticTokenQuery.priceHistory;
+                  var match = syntheticTokenQuery.latestPrice;
+                  var tokenStrTypeUpper = isLong ? "Long" : "Short";
+                  var tokenStrTypeLower = isLong ? "long" : "short";
+                  Curry._2(expectEqual, tokenAddress, syntheticTokenQuery.tokenAddress);
+                  Curry._2(expectEqual, syntheticTokenQuery.syntheticMarket.id, marketIndex.toString());
+                  Curry._2(expectEqual, syntheticTokenQuery.tokenType, tokenStrTypeUpper);
+                  Curry._2(expectEqual, syntheticTokenQuery.floatMintedFromSpecificToken.toString(), "0");
+                  Curry._2(expectEqual, syntheticTokenQuery.latestStakerState.id, tokenAddress + "-0");
+                  Curry._2(expectEqual, match.id, "latestPrice-" + marketIndex.toString() + "-" + tokenStrTypeLower);
+                  Curry._2(expectEqual, match.price.id, marketIndex.toString() + "-" + tokenStrTypeLower + "-" + String(timestamp));
+                  var initialPriceId = priceHistory[0].id;
+                  Curry._2(expectEqual, initialPriceId, marketIndex.toString() + "-" + tokenStrTypeLower + "-" + String(timestamp));
+                  Curry._2(expectEqual, syntheticTokenQuery.tokenSupply.toString(), "0");
+                  Curry._2(expectEqual, syntheticTokenQuery.id, tokenAddress);
+                  return Curry._2(expectEqual, String(priceHistory.length), "1");
+                };
+                return Curry._2(testAsync, "should create SyntheticTokens with correct IDs and initial data", (function (param) {
                               var expectEqual = param.expectEqual;
                               var expectTrue = param.expectTrue;
                               var callback = param.callback;
                               allStateChanges.contents.then(function (param) {
                                       return Promise.all(Belt_Array.map(param.allSyntheticTokenCreatedEvents, (function (param) {
                                                         var match = param.data;
-                                                        var collateralAddress = match.collateralAddress;
-                                                        var oracleAddress = match.oracleAddress;
-                                                        var symbol = match.symbol;
-                                                        var name = match.name;
                                                         var shortTokenAddress = match.shortTokenAddress;
                                                         var longTokenAddress = match.longTokenAddress;
-                                                        var txHash = param.txHash;
+                                                        var marketIndex = match.marketIndex;
                                                         var timestamp = param.timestamp;
                                                         var blockNumber = param.blockNumber;
-                                                        return Queries.getSyntheticMarketAtBlock(match.marketIndex.toString(), blockNumber).then(function (result) {
-                                                                    if (result === undefined) {
-                                                                      return Curry._1(expectTrue, false);
-                                                                    }
-                                                                    var marketIndex = result.marketIndex;
-                                                                    Curry._2(expectEqual, result.id, marketIndex.toString());
-                                                                    Curry._2(expectEqual, String(timestamp), result.timestampCreated.toString());
-                                                                    Curry._2(expectEqual, txHash, result.txHash);
-                                                                    Curry._2(expectEqual, String(blockNumber), result.blockNumberCreated.toString());
-                                                                    Curry._2(expectEqual, name, result.name);
-                                                                    Curry._2(expectEqual, symbol, result.symbol);
-                                                                    Curry._2(expectEqual, oracleAddress, result.oracleAddress);
-                                                                    Curry._2(expectEqual, result.kPeriod.toString(), "0");
-                                                                    Curry._2(expectEqual, result.kMultiplier.toString(), "0");
-                                                                    Curry._2(expectEqual, result.previousOracleAddresses, []);
-                                                                    Curry._2(expectEqual, result.syntheticLong.id, longTokenAddress);
-                                                                    Curry._2(expectEqual, result.syntheticShort.id, shortTokenAddress);
-                                                                    Curry._2(expectEqual, result.latestSystemState.id, marketIndex.toString() + "-0");
-                                                                    Curry._2(expectEqual, result.feeStructure.id, marketIndex.toString() + "-fees");
-                                                                    Curry._2(expectEqual, result.collateralToken.id, collateralAddress);
-                                                                    
-                                                                  });
+                                                        return Promise.all([
+                                                                    Queries.getSyntheticTokenAtBlock(longTokenAddress, blockNumber).then(function (result) {
+                                                                          if (result !== undefined) {
+                                                                            return testSyntheticToken(result, longTokenAddress, timestamp, marketIndex, true, expectEqual);
+                                                                          } else {
+                                                                            return Curry._1(expectTrue, false);
+                                                                          }
+                                                                        }),
+                                                                    Queries.getSyntheticTokenAtBlock(shortTokenAddress, blockNumber).then(function (result) {
+                                                                          if (result !== undefined) {
+                                                                            return testSyntheticToken(result, shortTokenAddress, timestamp, marketIndex, false, expectEqual);
+                                                                          } else {
+                                                                            return Curry._1(expectTrue, false);
+                                                                          }
+                                                                        })
+                                                                  ]);
                                                       })));
                                     }).then(function (param) {
                                     return Curry._1(callback, undefined);

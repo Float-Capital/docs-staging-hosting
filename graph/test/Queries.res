@@ -196,6 +196,12 @@ module SyntheticMarket = %graphql(`query ($marketId: String!, $blockNumber: Int!
   }
 }`)
 
+module SyntheticToken = %graphql(`query ($tokenId: String!, $blockNumber: Int!) {
+  syntheticToken(id: $tokenId, block: {number: $blockNumber}) {
+    ...SyntheticTokenInfo
+  }
+}`)
+
 let getSyntheticMarketAtBlock = (~marketId, ~blockNumber) =>
   Client.instance.query(
     ~query=module(SyntheticMarket),
@@ -204,6 +210,19 @@ let getSyntheticMarketAtBlock = (~marketId, ~blockNumber) =>
     switch result {
     | Ok({ApolloQueryResult.data: {SyntheticMarket.syntheticMarket: Some(syntheticMarket)}}) =>
       Js.Promise.resolve(Some(syntheticMarket))
+    | Ok({ApolloQueryResult.data: _}) => Js.Promise.resolve(None)
+    | Error(error) => Js.Promise.reject(error->Obj.magic)
+    }
+  }, _)
+
+let getSyntheticTokenAtBlock = (~tokenId, ~blockNumber) =>
+  Client.instance.query(
+    ~query=module(SyntheticToken),
+    {blockNumber: blockNumber, tokenId: tokenId},
+  )->Js.Promise.then_(result => {
+    switch result {
+    | Ok({ApolloQueryResult.data: {SyntheticToken.syntheticToken: Some(syntheticToken)}}) =>
+      Js.Promise.resolve(Some(syntheticToken))
     | Ok({ApolloQueryResult.data: _}) => Js.Promise.resolve(None)
     | Error(error) => Js.Promise.reject(error->Obj.magic)
     }

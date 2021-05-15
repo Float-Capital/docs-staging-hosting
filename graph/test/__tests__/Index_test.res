@@ -71,10 +71,6 @@ describe("All Tests", ({beforeAll, testAsync}) => {
   describe("SyntheticTokenCreated event", ({testAsync}) => {
     testAsync("should occur more than ONCE (must test!)", ({expectTrue, callback}) => {
       let _ = allStateChanges.contents->JsPromise.map(({allSyntheticTokenCreatedEvents}) => {
-        Js.log({
-          "Length": allSyntheticTokenCreatedEvents->Belt.Array.length,
-          "all 'allSyntheticTokenCreatedEvents' events": allSyntheticTokenCreatedEvents,
-        })
         expectTrue(allSyntheticTokenCreatedEvents->Belt.Array.length >= 1)
         callback()
       })
@@ -164,12 +160,113 @@ describe("All Tests", ({beforeAll, testAsync}) => {
                   expectEqual(systemStateId, marketIndex->BN.toString ++ "-0")
                   expectEqual(feeStructureId, marketIndex->BN.toString ++ "-fees")
                   expectEqual(collateralTokenId, collateralAddress)
-                  ()
                 }
 
               | None => expectTrue(false)
               }
             })
+          })
+          ->JsPromise.all
+        })
+        ->JsPromise.map(_ => callback())
+    })
+
+    let testSyntheticToken = (
+      ~syntheticTokenQuery: Queries.SyntheticTokenInfo.t,
+      ~tokenAddress,
+      ~timestamp,
+      ~marketIndex,
+      ~isLong,
+      ~expectEqual: ('a, 'a) => unit,
+    ) => {
+      let {
+        id,
+        tokenAddress: graphTokenAddress,
+        syntheticMarket: {id: marketId},
+        tokenType,
+        tokenSupply,
+        floatMintedFromSpecificToken,
+        latestStakerState: {id: stakerStateId},
+        latestPrice: {id: latestPriceId, price: {id: priceId}},
+        priceHistory,
+      } = syntheticTokenQuery
+
+      let tokenStrTypeUpper = isLong ? "Long" : "Short"
+      let tokenStrTypeLower = isLong ? "long" : "short"
+
+      expectEqual(tokenAddress, graphTokenAddress)
+      expectEqual(marketId, marketIndex->BN.toString)
+      expectEqual(tokenType->Obj.magic, tokenStrTypeUpper)
+      expectEqual(floatMintedFromSpecificToken->BN.toString, "0")
+      expectEqual(stakerStateId, tokenAddress ++ "-0")
+      expectEqual(
+        latestPriceId,
+        "latestPrice-" ++ marketIndex->BN.toString ++ "-" ++ tokenStrTypeLower,
+      )
+      expectEqual(
+        priceId,
+        marketIndex->BN.toString ++ "-" ++ tokenStrTypeLower ++ "-" ++ timestamp->Int.toString,
+      )
+      let initialPriceId = (priceHistory->Array.getUnsafe(0)).id
+      expectEqual(
+        initialPriceId,
+        marketIndex->BN.toString ++ "-" ++ tokenStrTypeLower ++ "-" ++ timestamp->Int.toString,
+      )
+      expectEqual(tokenSupply->BN.toString, "0")
+      expectEqual(id, tokenAddress)
+      expectEqual(priceHistory->Array.length->Int.toString, "1")
+    }
+
+    testAsync("should create SyntheticTokens with correct IDs and initial data", ({
+      expectEqual,
+      expectTrue,
+      callback,
+    }) => {
+      let _ =
+        allStateChanges.contents
+        ->JsPromise.then(({allSyntheticTokenCreatedEvents}) => {
+          allSyntheticTokenCreatedEvents
+          ->Array.map(({
+            blockNumber,
+            timestamp,
+            data: {marketIndex, longTokenAddress, shortTokenAddress},
+          }) => {
+            [
+              Queries.getSyntheticTokenAtBlock(
+                ~blockNumber,
+                ~tokenId=longTokenAddress,
+              )->JsPromise.map(result => {
+                switch result {
+                | Some(syntheticToken) =>
+                  testSyntheticToken(
+                    ~syntheticTokenQuery=syntheticToken,
+                    ~tokenAddress=longTokenAddress,
+                    ~marketIndex,
+                    ~isLong=true,
+                    ~timestamp,
+                    ~expectEqual,
+                  )
+                | None => expectTrue(false)
+                }
+              }),
+              Queries.getSyntheticTokenAtBlock(
+                ~blockNumber,
+                ~tokenId=shortTokenAddress,
+              )->JsPromise.map(result => {
+                switch result {
+                | Some(syntheticToken) =>
+                  testSyntheticToken(
+                    ~syntheticTokenQuery=syntheticToken,
+                    ~tokenAddress=shortTokenAddress,
+                    ~marketIndex,
+                    ~isLong=false,
+                    ~timestamp,
+                    ~expectEqual,
+                  )
+                | None => expectTrue(false)
+                }
+              }),
+            ]->JsPromise.all
           })
           ->JsPromise.all
         })

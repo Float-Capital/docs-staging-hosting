@@ -1316,6 +1316,85 @@ var SyntheticMarket = {
   useLazyWithVariables: SyntheticMarket_useLazyWithVariables
 };
 
+var Raw$10 = {};
+
+var query$10 = ((frag_0) => require("@apollo/client").gql`
+  query ($tokenId: String!, $blockNumber: Int!)  {
+    syntheticToken(id: $tokenId, block: {number: $blockNumber})  {
+      ...SyntheticTokenInfo
+    }
+  }
+  ${frag_0}
+`)(query$2);
+
+function parse$10(value) {
+  var value$1 = value.syntheticToken;
+  return {
+          syntheticToken: !(value$1 == null) ? parse$2(value$1) : undefined
+        };
+}
+
+function serialize$10(value) {
+  var value$1 = value.syntheticToken;
+  var syntheticToken = value$1 !== undefined ? serialize$2(value$1) : null;
+  return {
+          syntheticToken: syntheticToken
+        };
+}
+
+function serializeVariables$3(inp) {
+  return {
+          tokenId: inp.tokenId,
+          blockNumber: inp.blockNumber
+        };
+}
+
+function makeVariables$3(tokenId, blockNumber, param) {
+  return {
+          tokenId: tokenId,
+          blockNumber: blockNumber
+        };
+}
+
+var SyntheticToken_inner = {
+  Raw: Raw$10,
+  query: query$10,
+  parse: parse$10,
+  serialize: serialize$10,
+  serializeVariables: serializeVariables$3,
+  makeVariables: makeVariables$3
+};
+
+var include$3 = ApolloClient__React_Hooks_UseQuery.Extend({
+      query: query$10,
+      Raw: Raw$10,
+      parse: parse$10,
+      serialize: serialize$10,
+      serializeVariables: serializeVariables$3
+    });
+
+var SyntheticToken_refetchQueryDescription = include$3.refetchQueryDescription;
+
+var SyntheticToken_use = include$3.use;
+
+var SyntheticToken_useLazy = include$3.useLazy;
+
+var SyntheticToken_useLazyWithVariables = include$3.useLazyWithVariables;
+
+var SyntheticToken = {
+  SyntheticToken_inner: SyntheticToken_inner,
+  Raw: Raw$10,
+  query: query$10,
+  parse: parse$10,
+  serialize: serialize$10,
+  serializeVariables: serializeVariables$3,
+  makeVariables: makeVariables$3,
+  refetchQueryDescription: SyntheticToken_refetchQueryDescription,
+  use: SyntheticToken_use,
+  useLazy: SyntheticToken_useLazy,
+  useLazyWithVariables: SyntheticToken_useLazyWithVariables
+};
+
 function getSyntheticMarketAtBlock(marketId, blockNumber) {
   var __x = Curry._6(Client.instance.rescript_query, {
         query: query$9,
@@ -1340,6 +1419,30 @@ function getSyntheticMarketAtBlock(marketId, blockNumber) {
             });
 }
 
+function getSyntheticTokenAtBlock(tokenId, blockNumber) {
+  var __x = Curry._6(Client.instance.rescript_query, {
+        query: query$10,
+        Raw: Raw$10,
+        parse: parse$10,
+        serialize: serialize$10,
+        serializeVariables: serializeVariables$3
+      }, undefined, undefined, undefined, undefined, {
+        tokenId: tokenId,
+        blockNumber: blockNumber
+      });
+  return __x.then(function (result) {
+              if (result.TAG !== /* Ok */0) {
+                return Promise.reject(result._0);
+              }
+              var syntheticToken = result._0.data.syntheticToken;
+              if (syntheticToken !== undefined) {
+                return Promise.resolve(syntheticToken);
+              } else {
+                return Promise.resolve(undefined);
+              }
+            });
+}
+
 var ApolloQueryResult;
 
 exports.ApolloQueryResult = ApolloQueryResult;
@@ -1355,5 +1458,7 @@ exports.getAllStateChanges = getAllStateChanges;
 exports.GetGlobalState = GetGlobalState;
 exports.getGlobalStateAtBlock = getGlobalStateAtBlock;
 exports.SyntheticMarket = SyntheticMarket;
+exports.SyntheticToken = SyntheticToken;
 exports.getSyntheticMarketAtBlock = getSyntheticMarketAtBlock;
+exports.getSyntheticTokenAtBlock = getSyntheticTokenAtBlock;
 /* query Not a pure module */

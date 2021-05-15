@@ -208,7 +208,7 @@ export function handleSyntheticTokenCreated(
   );
 
   let initialLongStakerState = getOrCreateStakerState(
-    shortToken.id,
+    longToken.id,
     ZERO,
     event
   );
