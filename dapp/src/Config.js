@@ -38,6 +38,8 @@ var dai = match.Dai;
 
 var floatToken = match.FloatToken;
 
+var aaveFaucet = match.AaveFaucet;
+
 exports.config = config;
 exports.graphEndpoint = graphEndpoint;
 exports.priceHistoryGraphEndpoint = priceHistoryGraphEndpoint;
@@ -55,4 +57,5 @@ exports.longShort = longShort;
 exports.staker = staker;
 exports.dai = dai;
 exports.floatToken = floatToken;
+exports.aaveFaucet = aaveFaucet;
 /* config Not a pure module */

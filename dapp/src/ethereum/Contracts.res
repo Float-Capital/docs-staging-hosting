@@ -202,3 +202,16 @@ module Synth = {
   external stake: (~contract: t, ~amount: Ethers.BigNumber.t) => JsPromise.t<Ethers.txSubmitted> =
     "stake"
 }
+
+module AaveFaucet = {
+  type t = Ethers.Contract.t
+  let abi = ["function mintMonies(address aaveDaiContract) @10000"]->Ethers.makeAbi
+  let make = (~address, ~providerOrSigner): t =>
+    Ethers.Contract.make(address, abi, providerOrSigner)
+
+  @send
+  external mintMonies: (
+    ~contract: t,
+    ~aaveDaiContract: Ethers.ethAddress,
+  ) => JsPromise.t<Ethers.txSubmitted> = "mintMonies"
+}

@@ -83,9 +83,21 @@ var Synth = {
   make: make$4
 };
 
+var abi$5 = Ethers.makeAbi(["function mintMonies(address aaveDaiContract) @10000"]);
+
+function make$5(address, providerOrSigner) {
+  return Ethers.Contract.make(address, abi$5, providerOrSigner);
+}
+
+var AaveFaucet = {
+  abi: abi$5,
+  make: make$5
+};
+
 exports.TestErc20 = TestErc20;
 exports.LongShort = LongShort;
 exports.Staker = Staker;
 exports.Erc20 = Erc20;
 exports.Synth = Synth;
+exports.AaveFaucet = AaveFaucet;
 /* abi Not a pure module */
