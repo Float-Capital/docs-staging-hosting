@@ -38,6 +38,12 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                                                   var marketsUserHasStakedIn = param[1];
                                                   var synthsUserHasStakedIn = param[0];
                                                   return LetOps.Await.let_(Helpers.increaseTime(50), (function (param) {
+                                                                console.log({
+                                                                      marketsUserHasStakedIn: marketsUserHasStakedIn,
+                                                                      synthsUserHasStakedIn: Belt_Array.map(synthsUserHasStakedIn, (function (synth) {
+                                                                              return synth.address;
+                                                                            }))
+                                                                    });
                                                                 return LetOps.Await.let_(Contract.Staker.claimFloatCustomUser(staker, testUser, synthsUserHasStakedIn, marketsUserHasStakedIn), (function (param) {
                                                                               return LetOps.Await.let_(Promise.all(Belt_Array.map(synthsUserHasStakedIn, (function (synth) {
                                                                                                     return Promise.all([

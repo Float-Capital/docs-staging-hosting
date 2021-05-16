@@ -44,14 +44,18 @@ let stakeRandomlyInMarkets =
         switch (Helpers.randomMintLongShort()) {
         | Long(amount) =>
           let%Await _ = mintStake(~isLong=true, ~amount);
+          Js.log({"amount": amount->Ethers.BigNumber.toString});
           synthsUserHasStakedIn->Array.concat([|longSynth|]);
         | Short(amount) =>
+          Js.log({"amount": amount->Ethers.BigNumber.toString});
           let%Await _ = mintStake(~isLong=false, ~amount);
           synthsUserHasStakedIn->Array.concat([|shortSynth|]);
         | Both(longAmount, shortAmount) =>
+          Js.log({"amount long": longAmount->Ethers.BigNumber.toString});
+          Js.log({"amount short": shortAmount->Ethers.BigNumber.toString});
           let%AwaitThen _ = mintStake(~isLong=true, ~amount=longAmount);
           let%Await _ = mintStake(~isLong=false, ~amount=shortAmount);
-          synthsUserHasStakedIn->Array.concat([|shortSynth, shortSynth|]);
+          synthsUserHasStakedIn->Array.concat([|shortSynth, longSynth|]);
         };
 
       (

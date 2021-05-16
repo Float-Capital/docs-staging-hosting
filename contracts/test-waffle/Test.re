@@ -34,6 +34,11 @@ describe("Float System", () => {
 
       let%Await _ = Helpers.increaseTime(50);
 
+      Js.log({
+        "marketsUserHasStakedIn": marketsUserHasStakedIn,
+        "synthsUserHasStakedIn":
+          synthsUserHasStakedIn->Array.map(synth => synth.address),
+      });
       let%Await _ =
         staker->Contract.Staker.claimFloatCustomUser(
           ~user=testUser,

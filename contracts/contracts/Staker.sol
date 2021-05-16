@@ -393,6 +393,22 @@ contract Staker is IStaker, Initializable {
             return 0;
         }
 
+        console.log(
+            "Latest:",
+            latestRewardIndex[tokenAddress],
+            " - user last claim index: ",
+            userIndexOfLastClaimedReward[tokenAddress][user]
+        );
+        console.log(
+            syntheticRewardParams[tokenAddress][latestRewardIndex[tokenAddress]]
+                .accumulativeFloatPerToken,
+            " - ",
+            syntheticRewardParams[tokenAddress][
+                userIndexOfLastClaimedReward[tokenAddress][user]
+            ]
+                .accumulativeFloatPerToken
+        );
+
         uint256 accumDelta =
             syntheticRewardParams[tokenAddress][latestRewardIndex[tokenAddress]]
                 .accumulativeFloatPerToken -
@@ -433,9 +449,9 @@ contract Staker is IStaker, Initializable {
         console.log("Claiming float!");
         uint256 floatTotal = 0;
         for (uint256 i = 0; i < tokenAddresses.length; i++) {
-            console.log(tokenAddresses[i]);
             uint256 floatToMint =
                 calculateAccumulatedFloat(tokenAddresses[i], msg.sender);
+            console.log(tokenAddresses[i], "float to mint", floatToMint);
 
             if (floatToMint > 0) {
                 // Set the user has claimed up until now.
