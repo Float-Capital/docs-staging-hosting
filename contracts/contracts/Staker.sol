@@ -430,13 +430,20 @@ contract Staker is IStaker, Initializable {
     }
 
     function _claimFloat(address[] calldata tokenAddresses) internal {
+        console.log("Claiming float!");
         uint256 floatTotal = 0;
         for (uint256 i = 0; i < tokenAddresses.length; i++) {
+            console.log(tokenAddresses[i]);
             uint256 floatToMint =
                 calculateAccumulatedFloat(tokenAddresses[i], msg.sender);
 
             if (floatToMint > 0) {
                 // Set the user has claimed up until now.
+                console.log(
+                    "There is float to mint",
+                    userIndexOfLastClaimedReward[tokenAddresses[i]][msg.sender],
+                    latestRewardIndex[tokenAddresses[i]]
+                );
                 userIndexOfLastClaimedReward[tokenAddresses[i]][
                     msg.sender
                 ] = latestRewardIndex[tokenAddresses[i]];

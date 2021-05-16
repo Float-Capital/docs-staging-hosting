@@ -28,7 +28,7 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                             }));
                       return Promise$BsMocha.it("shouldn't allow non admin to update the oracle")(undefined, undefined, undefined, (function (param) {
                                     var newOracleAddress = ethers.Wallet.createRandom().address;
-                                    return Chai.expectRevert(contracts.contents.longShort.attach(accounts.contents[5].address).updateMarketOracle(1, newOracleAddress), "only admin");
+                                    return Chai.expectRevert(contracts.contents.longShort.connect(accounts.contents[5]).updateMarketOracle(1, newOracleAddress), "only admin");
                                   }));
                     }));
       }));

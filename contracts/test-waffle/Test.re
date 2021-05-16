@@ -12,7 +12,7 @@ describe("Float System", () => {
   describe("Staking", () => {
     let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
     let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
-    ();
+
     before(() => {
       Ethers.getSigners()
       ->JsPromise.map(loadedAccounts => {accounts := loadedAccounts})
@@ -25,12 +25,14 @@ describe("Float System", () => {
       let {longShort, markets, staker} = contracts.contents;
       let testUser = accounts.contents->Array.getUnsafe(1);
 
-      let (synthsUserHasStakedIn, marketsUserHasStakedIn) =
+      let%Await (synthsUserHasStakedIn, marketsUserHasStakedIn) =
         HelperActions.stakeRandomlyInMarkets(
           ~marketsToStakeIn=markets,
           ~userToStakeWith=testUser,
           ~longShort,
         );
+
+      let%Await _ = Helpers.increaseTime(50);
 
       let%Await _ =
         staker->Contract.Staker.claimFloatCustomUser(
@@ -51,9 +53,13 @@ describe("Float System", () => {
                 ~synthTokenAddr=synth.address,
               ),
             ))
-            ->JsPromise.map(((userLastClaimed, latestRewardIndex)) =>
-                Chai.bnEqual(userLastClaimed, latestRewardIndex)
-              )
+            ->JsPromise.map(((userLastClaimed, latestRewardIndex)) => {
+                // These values should be equal but they are not - investigate
+                Chai.bnEqual(
+                  userLastClaimed,
+                  latestRewardIndex,
+                )
+              })
           })
         ->JsPromise.all;
       ();

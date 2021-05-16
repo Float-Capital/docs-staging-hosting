@@ -20,7 +20,7 @@ describe("Float System", () => {
       Chai.expectRevert(
         ~transaction=
           contracts^.longShort
-          ->Contract.attach(~address=(accounts^)->Array.getUnsafe(5).address)
+          ->Contract.connect(~address=(accounts^)->Array.getUnsafe(5))
           ->Contract.LongShort.updateMarketOracle(
               ~marketIndex=1,
               ~newOracleAddress,

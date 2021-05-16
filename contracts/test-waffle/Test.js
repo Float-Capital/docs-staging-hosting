@@ -34,18 +34,22 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                                     var match = contracts.contents;
                                     var staker = match.staker;
                                     var testUser = accounts.contents[1];
-                                    var match$1 = HelperActions.stakeRandomlyInMarkets(match.markets, testUser, match.longShort);
-                                    var synthsUserHasStakedIn = match$1[0];
-                                    return LetOps.Await.let_(Contract.Staker.claimFloatCustomUser(staker, testUser, synthsUserHasStakedIn, match$1[1]), (function (param) {
-                                                  return LetOps.Await.let_(Promise.all(Belt_Array.map(synthsUserHasStakedIn, (function (synth) {
-                                                                        return Promise.all([
-                                                                                      staker.userIndexOfLastClaimedReward(synth.address, testUser.address),
-                                                                                      staker.latestRewardIndex(synth.address)
-                                                                                    ]).then(function (param) {
-                                                                                    return Chai.bnEqual(param[0], param[1]);
-                                                                                  });
-                                                                      }))), (function (param) {
-                                                                
+                                    return LetOps.Await.let_(HelperActions.stakeRandomlyInMarkets(match.markets, testUser, match.longShort), (function (param) {
+                                                  var marketsUserHasStakedIn = param[1];
+                                                  var synthsUserHasStakedIn = param[0];
+                                                  return LetOps.Await.let_(Helpers.increaseTime(50), (function (param) {
+                                                                return LetOps.Await.let_(Contract.Staker.claimFloatCustomUser(staker, testUser, synthsUserHasStakedIn, marketsUserHasStakedIn), (function (param) {
+                                                                              return LetOps.Await.let_(Promise.all(Belt_Array.map(synthsUserHasStakedIn, (function (synth) {
+                                                                                                    return Promise.all([
+                                                                                                                  staker.userIndexOfLastClaimedReward(synth.address, testUser.address),
+                                                                                                                  staker.latestRewardIndex(synth.address)
+                                                                                                                ]).then(function (param) {
+                                                                                                                return Chai.bnEqual(param[0], param[1]);
+                                                                                                              });
+                                                                                                  }))), (function (param) {
+                                                                                            
+                                                                                          }));
+                                                                            }));
                                                               }));
                                                 }));
                                   }));

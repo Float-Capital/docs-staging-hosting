@@ -6,16 +6,6 @@ var Js_math = require("bs-platform/lib/js/js_math.js");
 var Contract = require("./Contract.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
 
-function mintAndStake(marketIndex, amount, token, user, longShort, isLong) {
-  Contract.PaymentToken.mintAndApprove(token, user.address, amount, longShort.address);
-  var contract = longShort.attach(user.address);
-  if (isLong) {
-    return contract.mintLongAndStake(marketIndex, amount);
-  } else {
-    return contract.mintShortAndStake(marketIndex, amount);
-  }
-}
-
 function randomTokenAmount(param) {
   return ethers.BigNumber.from(Js_math.random_int(0, Js_int.max)).mul(ethers.BigNumber.from(100000));
 }
@@ -55,14 +45,20 @@ function createSyntheticMarket(admin, longShort, fundToken, marketName, marketSy
               ]).then(function (param) {
               var yieldManager = param[1];
               Contract.PaymentToken.grantMintRole(fundToken, yieldManager.address);
-              return longShort.newSyntheticMarket(marketName, marketSymbol, fundToken.address, param[0].address, yieldManager.address);
+              return longShort.newSyntheticMarket(marketName, marketSymbol, fundToken.address, param[0].address, yieldManager.address).then(function (param) {
+                            return longShort.latestMarket();
+                          }).then(function (marketIndex) {
+                          return longShort.initializeMarket(marketIndex, 0, 50, 50, 50, ethers.BigNumber.from("1000000000000000000"), ethers.BigNumber.from(0));
+                        });
             });
 }
 
 function getAllMarkets(longShort) {
   return longShort.latestMarket().then(function (nextMarketIndex) {
-              var marketIndex = nextMarketIndex - 1 | 0;
-              return Promise.all(Belt_Array.map(Belt_Array.range(1, marketIndex), (function (marketIndex) {
+              console.log({
+                    "market index": nextMarketIndex
+                  });
+              return Promise.all(Belt_Array.map(Belt_Array.range(1, nextMarketIndex), (function (marketIndex) {
                                 return Promise.all([
                                               longShort.longTokens(marketIndex).then(Contract.SyntheticToken.at),
                                               longShort.shortTokens(marketIndex).then(Contract.SyntheticToken.at),
@@ -110,14 +106,16 @@ function inititialize(admin) {
                                           longShort.initialize(admin.address, treasury.address, tokenFactory.address, staker.address),
                                           staker.initialize(admin.address, longShort.address, floatToken.address, floatCapital.address)
                                         ]).then(function (param) {
-                                        return Promise.all(Belt_Array.mapWithIndex([
-                                                          payToken1,
-                                                          payToken1,
-                                                          payToken2,
-                                                          payToken1
-                                                        ], (function (index, paymentToken) {
-                                                            return createSyntheticMarket(admin.address, longShort, paymentToken, "Test Market " + String(index), "TM" + String(index));
-                                                          }))).then(function (param) {
+                                        return Belt_Array.reduceWithIndex([
+                                                      payToken1,
+                                                      payToken1,
+                                                      payToken2,
+                                                      payToken1
+                                                    ], Promise.resolve(undefined), (function (previousPromise, paymentToken, index) {
+                                                        return previousPromise.then(function (param) {
+                                                                    return createSyntheticMarket(admin.address, longShort, paymentToken, "Test Market " + String(index), "TM" + String(index));
+                                                                  });
+                                                      })).then(function (param) {
                                                     return getAllMarkets(longShort);
                                                   });
                                       }).then(function (markets) {
@@ -134,10 +132,12 @@ function inititialize(admin) {
             });
 }
 
-exports.mintAndStake = mintAndStake;
+var increaseTime = ((seconds) => ethers.provider.send("evm_increaseTime", [seconds]));
+
 exports.randomTokenAmount = randomTokenAmount;
 exports.randomMintLongShort = randomMintLongShort;
 exports.createSyntheticMarket = createSyntheticMarket;
 exports.getAllMarkets = getAllMarkets;
 exports.inititialize = inititialize;
+exports.increaseTime = increaseTime;
 /* No side effect */
