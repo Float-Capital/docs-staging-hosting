@@ -2,14 +2,18 @@
 
 pragma solidity 0.8.3;
 
-contract ILongShort {
+abstract contract ILongShort {
     function redeemLong(uint32 marketIndex, uint256 tokensToRedeem)
         external
-        virtual
-    {}
+        virtual;
 
     function redeemShort(uint32 marketIndex, uint256 tokensToRedeem)
         external
-        virtual
-    {}
+        virtual;
+
+    function _updateSystemState(uint32 marketIndex) external virtual;
+
+    function _updateSystemStateMulti(uint32[] calldata marketIndex)
+        external
+        virtual;
 }
