@@ -38,22 +38,37 @@ function stakeRandomlyInMarkets(marketsToStakeIn, userToStakeWith, longShort) {
                               var tmp;
                               switch (amount.TAG | 0) {
                                 case /* Long */0 :
-                                    tmp = LetOps.Await.let_(mintStake(amount._0)(true), (function (param) {
-                                            return Belt_Array.concat(synthsUserHasStakedIn, [longSynth]);
+                                    var amount$1 = amount._0;
+                                    tmp = LetOps.Await.let_(mintStake(amount$1)(true), (function (param) {
+                                            return Belt_Array.concat(synthsUserHasStakedIn, [{
+                                                          synth: longSynth,
+                                                          amount: amount$1
+                                                        }]);
                                           }));
                                     break;
                                 case /* Short */1 :
-                                    tmp = LetOps.Await.let_(mintStake(amount._0)(false), (function (param) {
-                                            return Belt_Array.concat(synthsUserHasStakedIn, [shortSynth]);
+                                    var amount$2 = amount._0;
+                                    tmp = LetOps.Await.let_(mintStake(amount$2)(false), (function (param) {
+                                            return Belt_Array.concat(synthsUserHasStakedIn, [{
+                                                          synth: shortSynth,
+                                                          amount: amount$2
+                                                        }]);
                                           }));
                                     break;
                                 case /* Both */2 :
                                     var shortAmount = amount._1;
-                                    tmp = LetOps.AwaitThen.let_(mintStake(amount._0)(true), (function (param) {
+                                    var longAmount = amount._0;
+                                    tmp = LetOps.AwaitThen.let_(mintStake(longAmount)(true), (function (param) {
                                             return LetOps.Await.let_(mintStake(shortAmount)(false), (function (param) {
                                                           return Belt_Array.concat(synthsUserHasStakedIn, [
-                                                                      shortSynth,
-                                                                      longSynth
+                                                                      {
+                                                                        synth: shortSynth,
+                                                                        amount: shortAmount
+                                                                      },
+                                                                      {
+                                                                        synth: longSynth,
+                                                                        amount: longAmount
+                                                                      }
                                                                     ]);
                                                         }));
                                           }));

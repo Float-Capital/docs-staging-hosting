@@ -41,11 +41,13 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                                                   var marketsUserHasStakedIn = param[1];
                                                   var synthsUserHasStakedIn = param[0];
                                                   return LetOps.Await.let_(Helpers.increaseTime(50), (function (param) {
-                                                                return LetOps.Await.let_(Contract.Staker.claimFloatCustomUser(staker, testUser, synthsUserHasStakedIn, marketsUserHasStakedIn), (function (param) {
-                                                                              return LetOps.Await.let_(Promise.all(Belt_Array.map(synthsUserHasStakedIn, (function (synth) {
+                                                                return LetOps.Await.let_(Contract.Staker.claimFloatCustomUser(staker, testUser, Belt_Array.map(synthsUserHasStakedIn, (function (stake) {
+                                                                                      return stake.synth;
+                                                                                    })), marketsUserHasStakedIn), (function (param) {
+                                                                              return LetOps.Await.let_(Promise.all(Belt_Array.map(synthsUserHasStakedIn, (function (stake) {
                                                                                                     return Promise.all([
-                                                                                                                  staker.userIndexOfLastClaimedReward(synth.address, testUser.address),
-                                                                                                                  staker.latestRewardIndex(synth.address)
+                                                                                                                  staker.userIndexOfLastClaimedReward(stake.synth.address, testUser.address),
+                                                                                                                  staker.latestRewardIndex(stake.synth.address)
                                                                                                                 ]).then(function (param) {
                                                                                                                 return Chai.bnEqual(param[0], param[1]);
                                                                                                               });

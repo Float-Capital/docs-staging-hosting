@@ -47,20 +47,21 @@ describe("Float System", () => {
       let%Await _ =
         staker->Contract.Staker.claimFloatCustomUser(
           ~user=testUser,
-          ~syntheticTokens=synthsUserHasStakedIn,
+          ~syntheticTokens=
+            synthsUserHasStakedIn->Array.map(stake => stake##synth),
           ~markets=marketsUserHasStakedIn,
         );
 
       let%Await _ =
         synthsUserHasStakedIn
-        ->Array.map(synth => {
+        ->Array.map(stake => {
             JsPromise.all2((
               staker->Contract.Staker.userIndexOfLastClaimedReward(
-                ~synthTokenAddr=synth.address,
+                ~synthTokenAddr=stake##synth.address,
                 ~user=testUser.address,
               ),
               staker->Contract.Staker.latestRewardIndex(
-                ~synthTokenAddr=synth.address,
+                ~synthTokenAddr=stake##synth.address,
               ),
             ))
             ->JsPromise.map(((userLastClaimed, latestRewardIndex)) => {
