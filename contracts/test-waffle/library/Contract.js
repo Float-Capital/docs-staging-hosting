@@ -204,8 +204,9 @@ var Treasury_v0 = {
 };
 
 function marketIndexOfSynth(longShort, syntheticToken) {
+  var arg = syntheticToken.address;
   return longShort.staker().then(at$4).then(function (param) {
-              return param.marketIndexOfToken(syntheticToken);
+              return param.marketIndexOfToken(arg);
             });
 }
 
