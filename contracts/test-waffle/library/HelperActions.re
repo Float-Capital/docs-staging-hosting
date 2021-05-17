@@ -44,15 +44,11 @@ let stakeRandomlyInMarkets =
         switch (Helpers.randomMintLongShort()) {
         | Long(amount) =>
           let%Await _ = mintStake(~isLong=true, ~amount);
-          Js.log({"amount": amount->Ethers.BigNumber.toString});
           synthsUserHasStakedIn->Array.concat([|longSynth|]);
         | Short(amount) =>
-          Js.log({"amount": amount->Ethers.BigNumber.toString});
           let%Await _ = mintStake(~isLong=false, ~amount);
           synthsUserHasStakedIn->Array.concat([|shortSynth|]);
         | Both(longAmount, shortAmount) =>
-          Js.log({"amount long": longAmount->Ethers.BigNumber.toString});
-          Js.log({"amount short": shortAmount->Ethers.BigNumber.toString});
           let%AwaitThen _ = mintStake(~isLong=true, ~amount=longAmount);
           let%Await _ = mintStake(~isLong=false, ~amount=shortAmount);
           synthsUserHasStakedIn->Array.concat([|shortSynth, longSynth|]);
@@ -62,5 +58,31 @@ let stakeRandomlyInMarkets =
         newSynthsUserHasStakedIn,
         marketsUserHasStakedIn->Array.concat([|marketIndex|]),
       );
+    },
+  );
+
+let stakeRandomlyInBothSidesOfMarket =
+    (
+      ~marketsToStakeIn: array(Helpers.markets),
+      ~userToStakeWith: Ethers.Wallet.t,
+      ~longShort: Contract.LongShort.t,
+    ) =>
+  marketsToStakeIn->Belt.Array.reduce(
+    JsPromise.resolve(),
+    (prevPromise, {paymentToken, marketIndex}) => {
+      let%AwaitThen _ = prevPromise;
+
+      let mintStake =
+        mintAndStake(
+          ~marketIndex,
+          ~token=paymentToken,
+          ~user=userToStakeWith,
+          ~longShort,
+        );
+      let%AwaitThen _ =
+        mintStake(~isLong=true, ~amount=Helpers.randomTokenAmount());
+      let%Await _ =
+        mintStake(~isLong=false, ~amount=Helpers.randomTokenAmount());
+      ();
     },
   );

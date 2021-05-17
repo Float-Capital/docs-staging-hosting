@@ -38,33 +38,18 @@ function stakeRandomlyInMarkets(marketsToStakeIn, userToStakeWith, longShort) {
                               var tmp;
                               switch (amount.TAG | 0) {
                                 case /* Long */0 :
-                                    var amount$1 = amount._0;
-                                    tmp = LetOps.Await.let_(mintStake(amount$1)(true), (function (param) {
-                                            console.log({
-                                                  amount: amount$1.toString()
-                                                });
+                                    tmp = LetOps.Await.let_(mintStake(amount._0)(true), (function (param) {
                                             return Belt_Array.concat(synthsUserHasStakedIn, [longSynth]);
                                           }));
                                     break;
                                 case /* Short */1 :
-                                    var amount$2 = amount._0;
-                                    console.log({
-                                          amount: amount$2.toString()
-                                        });
-                                    tmp = LetOps.Await.let_(mintStake(amount$2)(false), (function (param) {
+                                    tmp = LetOps.Await.let_(mintStake(amount._0)(false), (function (param) {
                                             return Belt_Array.concat(synthsUserHasStakedIn, [shortSynth]);
                                           }));
                                     break;
                                 case /* Both */2 :
                                     var shortAmount = amount._1;
-                                    var longAmount = amount._0;
-                                    console.log({
-                                          "amount long": longAmount.toString()
-                                        });
-                                    console.log({
-                                          "amount short": shortAmount.toString()
-                                        });
-                                    tmp = LetOps.AwaitThen.let_(mintStake(longAmount)(true), (function (param) {
+                                    tmp = LetOps.AwaitThen.let_(mintStake(amount._0)(true), (function (param) {
                                             return LetOps.Await.let_(mintStake(shortAmount)(false), (function (param) {
                                                           return Belt_Array.concat(synthsUserHasStakedIn, [
                                                                       shortSynth,
@@ -85,6 +70,26 @@ function stakeRandomlyInMarkets(marketsToStakeIn, userToStakeWith, longShort) {
               }));
 }
 
+function stakeRandomlyInBothSidesOfMarket(marketsToStakeIn, userToStakeWith, longShort) {
+  return Belt_Array.reduce(marketsToStakeIn, Promise.resolve(undefined), (function (prevPromise, param) {
+                var marketIndex = param.marketIndex;
+                var paymentToken = param.paymentToken;
+                return LetOps.AwaitThen.let_(prevPromise, (function (param) {
+                              var mintStake = function (param) {
+                                return function (param$1) {
+                                  return mintAndStake(marketIndex, param, paymentToken, userToStakeWith, longShort, param$1);
+                                };
+                              };
+                              return LetOps.AwaitThen.let_(mintStake(Helpers.randomTokenAmount(undefined))(true), (function (param) {
+                                            return LetOps.Await.let_(mintStake(Helpers.randomTokenAmount(undefined))(false), (function (param) {
+                                                          
+                                                        }));
+                                          }));
+                            }));
+              }));
+}
+
 exports.mintAndStake = mintAndStake;
 exports.stakeRandomlyInMarkets = stakeRandomlyInMarkets;
+exports.stakeRandomlyInBothSidesOfMarket = stakeRandomlyInBothSidesOfMarket;
 /* No side effect */

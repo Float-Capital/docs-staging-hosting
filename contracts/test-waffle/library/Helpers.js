@@ -55,9 +55,6 @@ function createSyntheticMarket(admin, longShort, fundToken, marketName, marketSy
 
 function getAllMarkets(longShort) {
   return longShort.latestMarket().then(function (nextMarketIndex) {
-              console.log({
-                    "market index": nextMarketIndex
-                  });
               return Promise.all(Belt_Array.map(Belt_Array.range(1, nextMarketIndex), (function (marketIndex) {
                                 return Promise.all([
                                               longShort.longTokens(marketIndex).then(Contract.SyntheticToken.at),

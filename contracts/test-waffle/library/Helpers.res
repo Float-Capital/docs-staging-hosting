@@ -78,7 +78,6 @@ let getAllMarkets = longShort => {
   ->LongShort.latestMarket
   ->JsPromise.then(nextMarketIndex => {
     let marketIndex = nextMarketIndex
-    Js.log({"market index": marketIndex})
 
     Belt.Array.range(1, marketIndex)
     ->Array.map(marketIndex =>
