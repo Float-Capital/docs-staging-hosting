@@ -2,6 +2,7 @@
 'use strict';
 
 var Chai = require("./bindings/chai/Chai.js");
+var LetOps = require("./library/LetOps.js");
 var Helpers = require("./library/Helpers.js");
 var Mocha$BsMocha = require("bs-mocha/src/Mocha.js");
 var Promise$BsMocha = require("bs-mocha/src/Promise.js");
@@ -15,20 +16,21 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                         contents: undefined
                       };
                       Promise$BsMocha.before(undefined)(undefined, undefined, undefined, (function (param) {
-                              return ethers.getSigners().then(function (loadedAccounts) {
-                                          accounts.contents = loadedAccounts;
-                                          
-                                        });
+                              return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
+                                            accounts.contents = loadedAccounts;
+                                            
+                                          }));
                             }));
                       Promise$BsMocha.before_each(undefined)(undefined, undefined, undefined, (function (param) {
-                              return Helpers.inititialize(accounts.contents[0]).then(function (deployedContracts) {
-                                          contracts.contents = deployedContracts;
-                                          
-                                        });
+                              return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0]), (function (deployedContracts) {
+                                            contracts.contents = deployedContracts;
+                                            
+                                          }));
                             }));
                       return Promise$BsMocha.it("shouldn't allow non admin to update the oracle")(undefined, undefined, undefined, (function (param) {
                                     var newOracleAddress = ethers.Wallet.createRandom().address;
-                                    return Chai.expectRevert(contracts.contents.longShort.connect(accounts.contents[5]).updateMarketOracle(1, newOracleAddress), "only admin");
+                                    var attackerAddress = accounts.contents[5];
+                                    return Chai.expectRevert(contracts.contents.longShort.connect(attackerAddress).updateMarketOracle(1, newOracleAddress), "only admin");
                                   }));
                     }));
       }));
