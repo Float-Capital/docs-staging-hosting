@@ -105,7 +105,7 @@ let make = (
       </Button.Small>
     </div>
 
-  <Next.Link href={`/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
+  <Next.Link href={`/?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
     <div
       className="p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-70 cursor-pointer shadow-lg hover:shadow-xl h-full justify-center w-full">
       <div className="flex justify-center w-full my-1">

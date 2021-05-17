@@ -98,7 +98,7 @@ function MarketCard(Props) {
                   }));
   };
   return React.createElement(Link, {
-              href: "/markets?marketIndex=" + marketIndex.toString(),
+              href: "/?marketIndex=" + marketIndex.toString(),
               children: React.createElement("div", {
                     className: "p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-70 cursor-pointer shadow-lg hover:shadow-xl h-full justify-center w-full"
                   }, React.createElement("div", {

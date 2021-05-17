@@ -211,7 +211,7 @@ let make = (
         let routeToMint = () =>
           router
           ->Next.Router.pushPromise(
-            `/markets?marketIndex=${marketIndex}&actionOption=${actionOption}&tab=mint`,
+            `/?marketIndex=${marketIndex}&actionOption=${actionOption}&tab=mint`,
           )
           ->JsPromise.then(_ => {
             let _ = toastDispatch(

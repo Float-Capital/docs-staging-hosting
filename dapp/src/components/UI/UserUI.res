@@ -385,11 +385,11 @@ module UserMarketStakeOrRedeem = {
     let router = Next.Router.useRouter()
     let stake = _ =>
       router->Next.Router.push(
-        `/markets?marketIndex=${marketId}&actionOption=${isLong ? "long" : "short"}&tab=stake`,
+        `/?marketIndex=${marketId}&actionOption=${isLong ? "long" : "short"}&tab=stake`,
       )
     let redeem = _ =>
       router->Next.Router.push(
-        `/markets?marketIndex=${marketId}&actionOption=${isLong ? "long" : "short"}&tab=redeem`,
+        `/?marketIndex=${marketId}&actionOption=${isLong ? "long" : "short"}&tab=redeem`,
       )
 
     <div className=`flex flex-col`>
@@ -412,7 +412,7 @@ module UserMarketUnstake = {
     let router = Next.Router.useRouter()
     let unstake = _ =>
       router->Next.Router.push(
-        `/markets?marketIndex=${marketId}&tab=unstake&actionOption=${isLong ? "long" : "short"}`,
+        `/?marketIndex=${marketId}&tab=unstake&actionOption=${isLong ? "long" : "short"}`,
       )
 
     let optLoggedInUser = RootProvider.useCurrentUser()

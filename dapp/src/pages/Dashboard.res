@@ -113,7 +113,7 @@ let syntheticAssetsCard = (~totalSynthValue) =>
         </div>
       </div>
     </div>
-    <Next.Link href="/markets">
+    <Next.Link href="/">
       <div className="w-full pb-4 text-sm cursor-pointer hover:opacity-70 mx-auto">
         <div className="flex justify-center">
           <div className="inline-block mx-auto">
