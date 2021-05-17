@@ -3,7 +3,6 @@
 pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
 import "./interfaces/IYieldManager.sol";
@@ -16,7 +15,7 @@ import "./interfaces/aave/ILendingPool.sol";
  * interest based on a lend/borrow liquidity ratio.
  *     see: https://docs.aave.com/portal/
  */
-contract YieldManagerAave is IYieldManager, Initializable {
+contract YieldManagerAave is IYieldManager {
     // Admin contracts.
     address public admin;
     address public longShort;
@@ -51,14 +50,14 @@ contract YieldManagerAave is IYieldManager, Initializable {
      * and corresponding venus aToken. We have to check whether it's BNB,
      * since BNB has a different interface to other ERC20 tokens in venus.io.
      */
-    function setup(
+    constructor(
         address _admin,
         address _longShort,
         address _token,
         address _aToken,
         address _lendingPool,
         uint16 _aaveReferalCode
-    ) public initializer {
+    ) {
         admin = _admin;
         longShort = _longShort;
 
