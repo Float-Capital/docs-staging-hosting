@@ -86,6 +86,9 @@ module Wallet = {
   @new @scope("ethers")
   external makePrivKeyWallet: (string, providerType) => t = "Wallet"
 
+  @val @scope(("ethers", "Wallet"))
+  external createRandom: unit => t = "createRandom"
+
   type rawSignature
   @send
   external signMessage: (t, string) => JsPromise.t<rawSignature> = "signMessage"

@@ -1,6 +1,6 @@
 module AwaitThen = {
-  let let_ = (prom, cb) => JsPromise.then_(prom, cb);
+  let let_ = JsPromise.then_;
 };
 module Await = {
-  let let_ = (prom, cb) => JsPromise.map(prom, cb);
+  let let_ = JsPromise.map;
 };

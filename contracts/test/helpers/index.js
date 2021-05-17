@@ -200,7 +200,7 @@ const feeCalculation = (
   feeUnitsOfPrecision = new BN(_feeUnitsOfPrecision);
 
   let fees;
-  //console.log("am i going off");
+
   // simple 0.5% fee
   if (isLongDeposit) {
     // Adding to heavy side
