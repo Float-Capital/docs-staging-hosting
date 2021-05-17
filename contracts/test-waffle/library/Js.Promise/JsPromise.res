@@ -7,6 +7,7 @@ external make: ((@uncurry (. 'a) => unit, (. 'e) => unit) => unit) => t<'a> = "P
 external resolve: 'a => t<'a> = "resolve"
 
 @send external then: (t<'a>, @uncurry ('a => t<'b>)) => t<'b> = "then"
+@send external then_: (t<'a>, @uncurry ('a => t<'b>)) => t<'b> = "then"
 
 @send external finally: (t<'a>, unit => unit) => t<'a> = "finally"
 

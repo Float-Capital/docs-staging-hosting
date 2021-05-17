@@ -112,6 +112,8 @@ Promise.resolve(5)
 ")
 @send
 external then: (t<'a>, @uncurry ('a => t<'b>)) => t<'b> = "then"
+@send
+external then_: (t<'a>, @uncurry ('a => t<'b>)) => t<'b> = "then"
 
 @ocaml.doc("
 [finally(promise, callback)] is used to execute a function that is called no matter if a promise

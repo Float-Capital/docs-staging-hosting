@@ -2,12 +2,13 @@
 'use strict';
 
 var Chai = require("./bindings/chai/Chai.js");
-var Curry = require("rescript/lib/js/curry.js");
+var LetOps = require("./library/LetOps.js");
 var Helpers = require("./library/Helpers.js");
 var Contract = require("./library/Contract.js");
-var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var Async$BsMocha = require("bs-mocha/src/Async.js");
+var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
+var HelperActions = require("./library/HelperActions.js");
 var Mocha$BsMocha = require("bs-mocha/src/Mocha.js");
+var Promise$BsMocha = require("bs-mocha/src/Promise.js");
 
 Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (function (param) {
         return Mocha$BsMocha.describe("Staking")(undefined, undefined, undefined, (function (param) {
@@ -17,92 +18,47 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                       var accounts = {
                         contents: undefined
                       };
-                      Async$BsMocha.before(undefined, undefined, undefined, undefined, (function (done) {
-                              ethers.getSigners().then(function (loadedAccounts) {
-                                    accounts.contents = loadedAccounts;
-                                    return Curry._2(done, undefined, undefined);
-                                  });
-                              
+                      Promise$BsMocha.before(undefined)(undefined, undefined, undefined, (function (param) {
+                              return ethers.getSigners().then(function (loadedAccounts) {
+                                          accounts.contents = loadedAccounts;
+                                          
+                                        });
                             }));
-                      Async$BsMocha.before_each(undefined, undefined, undefined, undefined, (function (done) {
-                              Helpers.inititialize(accounts.contents[0]).then(function (deployedContracts) {
-                                    contracts.contents = deployedContracts;
-                                    return Curry._2(done, undefined, undefined);
-                                  });
-                              
+                      Promise$BsMocha.before_each(undefined)(undefined, undefined, undefined, (function (param) {
+                              return Helpers.inititialize(accounts.contents[0]).then(function (deployedContracts) {
+                                          contracts.contents = deployedContracts;
+                                          
+                                        });
                             }));
-                      return Async$BsMocha.it("should update correct markets in the 'claimFloatCustom' function")(undefined, undefined, undefined, (function (done) {
+                      return Promise$BsMocha.it("should update correct markets in the 'claimFloatCustom' function")(undefined, undefined, undefined, (function (param) {
                                     var match = contracts.contents;
-                                    var longShort = match.longShort;
                                     var staker = match.staker;
                                     var testUser = accounts.contents[1];
-                                    var synthsUserHasStaked = {
-                                      contents: []
-                                    };
-                                    var marketsUserHasStakedIn = {
-                                      contents: []
-                                    };
-                                    Promise.all(Belt_Array.map(Belt_Array.map(match.markets, (function (market) {
-                                                        return [
-                                                                market,
-                                                                Helpers.randomMintLongShort(undefined)
-                                                              ];
-                                                      })), (function (param) {
-                                                    var toMint = param[1];
-                                                    var match = param[0];
-                                                    var marketIndex = match.marketIndex;
-                                                    var shortSynth = match.shortSynth;
-                                                    var paymentToken = match.paymentToken;
-                                                    var mintStake = function (param) {
-                                                      return function (param$1) {
-                                                        return Helpers.mintAndStake(marketIndex, param, paymentToken, testUser, longShort, param$1);
-                                                      };
-                                                    };
-                                                    marketsUserHasStakedIn.contents = Belt_Array.concat(marketsUserHasStakedIn.contents, [marketIndex]);
-                                                    switch (toMint.TAG | 0) {
-                                                      case /* Long */0 :
-                                                          synthsUserHasStaked.contents = Belt_Array.concat(synthsUserHasStaked.contents, [match.longSynth]);
-                                                          return mintStake(toMint._0)(true);
-                                                      case /* Short */1 :
-                                                          synthsUserHasStaked.contents = Belt_Array.concat(synthsUserHasStaked.contents, [shortSynth]);
-                                                          return mintStake(toMint._0)(false);
-                                                      case /* Both */2 :
-                                                          var shortAmount = toMint._1;
-                                                          synthsUserHasStaked.contents = Belt_Array.concat(synthsUserHasStaked.contents, [
-                                                                shortSynth,
-                                                                shortSynth
-                                                              ]);
-                                                          return mintStake(toMint._0)(true).then(function (param) {
-                                                                      return mintStake(shortAmount)(false);
-                                                                    });
-                                                      
-                                                    }
-                                                  }))).then(function (param) {
-                                            return Contract.Staker.claimFloatCustomUser(staker, testUser, synthsUserHasStaked.contents, marketsUserHasStakedIn.contents);
-                                          }).then(function (param) {
-                                          return Promise.all(Belt_Array.map(synthsUserHasStaked.contents, (function (synth) {
-                                                              return Promise.all([
-                                                                            staker.userIndexOfLastClaimedReward(synth.address, testUser.address),
-                                                                            staker.latestRewardIndex(synth.address)
-                                                                          ]).then(function (param) {
-                                                                          return Chai.bnEqual(param[0], param[1]);
-                                                                        });
-                                                            }))).then(function (param) {
-                                                      return Curry._2(done, undefined, undefined);
-                                                    });
-                                        });
-                                    
+                                    var match$1 = HelperActions.stakeRandomlyInMarkets(match.markets, testUser, match.longShort);
+                                    var synthsUserHasStakedIn = match$1[0];
+                                    return LetOps.Await.let_(Contract.Staker.claimFloatCustomUser(staker, testUser, synthsUserHasStakedIn, match$1[1]), (function (param) {
+                                                  return LetOps.Await.let_(Promise.all(Belt_Array.map(synthsUserHasStakedIn, (function (synth) {
+                                                                        return Promise.all([
+                                                                                      staker.userIndexOfLastClaimedReward(synth.address, testUser.address),
+                                                                                      staker.latestRewardIndex(synth.address)
+                                                                                    ]).then(function (param) {
+                                                                                    return Chai.bnEqual(param[0], param[1]);
+                                                                                  });
+                                                                      }))), (function (param) {
+                                                                
+                                                              }));
+                                                }));
                                   }));
                     }));
       }));
 
-var it$p = Async$BsMocha.it;
+var it$prime = Promise$BsMocha.it;
 
-var it_skip$p = Async$BsMocha.it_skip;
+var it_skip$prime = Promise$BsMocha.it_skip;
 
-var before_each = Async$BsMocha.before_each;
+var before_each = Promise$BsMocha.before_each;
 
-var before = Async$BsMocha.before;
+var before = Promise$BsMocha.before;
 
 var describe = Mocha$BsMocha.describe;
 
@@ -110,8 +66,8 @@ var it = Mocha$BsMocha.it;
 
 var it_skip = Mocha$BsMocha.it_skip;
 
-exports.it$p = it$p;
-exports.it_skip$p = it_skip$p;
+exports.it$prime = it$prime;
+exports.it_skip$prime = it_skip$prime;
 exports.before_each = before_each;
 exports.before = before;
 exports.describe = describe;

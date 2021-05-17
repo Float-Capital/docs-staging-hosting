@@ -159,9 +159,11 @@ var UserProfileCard = {
 };
 
 function onQueryError(msg) {
-  return React.createElement(UserUI.UserContainer.make, {
-              children: "Error: " + msg
-            });
+  return React.createElement("div", {
+              className: "w-full max-w-5xl mx-auto"
+            }, React.createElement(UserUI.UserContainer.make, {
+                  children: "Error: " + msg
+                }));
 }
 
 function onQuerySuccess(data) {
@@ -226,22 +228,28 @@ function User(Props) {
                 stakes: match[0]
               });
   } else {
-    return React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnCard.make, {
-                    children: null
-                  }, React.createElement(UserUI.UserProfileHeader.make, {
-                        address: user
-                      }), optCurrentUser !== undefined && Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser)) === user ? React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnTextCenter.make, {
-                              children: React.createElement("p", {
-                                    className: "my-2"
-                                  }, "Mint a position to see data on your profile")
-                            }), React.createElement("div", {
-                              className: "w-40 mx-auto"
-                            }, React.createElement(Link, {
-                                  href: "/",
-                                  children: React.createElement(Button.Small.make, {
-                                        children: "MARKETS"
-                                      })
-                                }))) : notCurrentUserMessage(undefined)));
+    return React.createElement("div", {
+                className: "w-full max-w-5xl mx-auto"
+              }, React.createElement("div", {
+                    className: "max-w-xl mx-auto"
+                  }, React.createElement(UserUI.UserColumnCard.make, {
+                        children: React.createElement("div", {
+                              className: "p-4"
+                            }, React.createElement(UserUI.UserProfileHeader.make, {
+                                  address: user
+                                }), optCurrentUser !== undefined && Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser)) === user ? React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnTextCenter.make, {
+                                        children: React.createElement("p", {
+                                              className: "my-2"
+                                            }, "Mint a position to see data on your profile")
+                                      }), React.createElement("div", {
+                                        className: "w-40 mx-auto"
+                                      }, React.createElement(Link, {
+                                            href: "/markets",
+                                            children: React.createElement(Button.Small.make, {
+                                                  children: "MARKETS"
+                                                })
+                                          }))) : notCurrentUserMessage(undefined))
+                      })));
   }
 }
 
