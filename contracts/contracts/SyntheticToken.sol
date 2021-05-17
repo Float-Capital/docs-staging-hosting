@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol"
 import "./interfaces/IStaker.sol";
 import "./interfaces/ISyntheticToken.sol";
 
-contract SyntheticToken is ERC20PresetMinterPauser, ISyntheticToken {
+contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
     address public longShortAddress;
     IStaker public staker;
 
@@ -36,6 +36,9 @@ contract SyntheticToken is ERC20PresetMinterPauser, ISyntheticToken {
         staker.stakeFromUser(msg.sender, amount);
     }
 
+    ////////////////////////////////////////////////////////////////////
+    ///////// FUNCTIONS INHERITED BY ERC20PresetMinterPauser ///////////
+    ////////////////////////////////////////////////////////////////////
     function mint(address to, uint256 amount)
         public
         override(ISyntheticToken, ERC20PresetMinterPauser)

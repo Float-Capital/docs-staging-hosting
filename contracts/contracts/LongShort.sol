@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
-import "./TokenFactory.sol";
+import "./interfaces/ITokenFactory.sol";
 import "./interfaces/ISyntheticToken.sol";
 import "./interfaces/IStaker.sol";
 import "./interfaces/ILongShort.sol";
@@ -35,7 +35,7 @@ contract LongShort is ILongShort, Initializable {
     address public treasury;
 
     // Factory for dynamically creating synthetic long/short tokens.
-    TokenFactory public tokenFactory;
+    ITokenFactory public tokenFactory;
 
     // Staker for controlling governance token issuance.
     IStaker public staker;
@@ -76,7 +76,12 @@ contract LongShort is ILongShort, Initializable {
     /////////// EVENTS /////////////////
     ////////////////////////////////////
 
-    event V1(address admin, address tokenFactory, address staker);
+    event V1(
+        address admin,
+        address treasury,
+        address tokenFactory,
+        address staker
+    );
 
     event ValueLockedInSystem(
         uint32 marketIndex,
@@ -192,15 +197,20 @@ contract LongShort is ILongShort, Initializable {
     function initialize(
         address _admin,
         address _treasury,
-        address _tokenFactory,
-        address _staker
+        ITokenFactory _tokenFactory,
+        IStaker _staker
     ) public initializer {
         admin = _admin;
         treasury = _treasury;
-        tokenFactory = TokenFactory(_tokenFactory);
-        staker = IStaker(_staker);
+        tokenFactory = _tokenFactory;
+        staker = _staker;
 
-        emit V1(_admin, _tokenFactory, _staker);
+        emit V1(
+            _admin,
+            address(treasury),
+            address(_tokenFactory),
+            address(_staker)
+        );
     }
 
     ////////////////////////////////////

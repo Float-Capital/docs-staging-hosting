@@ -5,8 +5,8 @@ pragma solidity 0.8.3;
 import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
 
+import "./interfaces/IFloatToken.sol";
 import "./interfaces/ILongShort.sol";
-import "./FloatToken.sol";
 import "./interfaces/IStaker.sol";
 
 /*
@@ -45,7 +45,7 @@ contract Staker is IStaker, Initializable {
     uint16 public floatPercentage;
     uint256 public initialTimestamp;
     ILongShort public longShortCoreContract;
-    FloatToken public floatToken;
+    IFloatToken public floatToken;
     uint256[45] private __globalParamsGap;
 
     // User state.
@@ -131,7 +131,7 @@ contract Staker is IStaker, Initializable {
         floatCapital = _floatCapital;
         initialTimestamp = block.timestamp;
         longShortCoreContract = ILongShort(_longShortCoreContract);
-        floatToken = FloatToken(_floatToken);
+        floatToken = IFloatToken(_floatToken);
         floatPercentage = 1500;
 
         emit DeployV1(_floatToken);
