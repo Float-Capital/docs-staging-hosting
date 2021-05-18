@@ -119,19 +119,19 @@ contract("LongShort (staking)", (accounts) => {
   });
 
   it.skip("case 1:  users can earn float with a delay from a long stake", async () => {
-    await basicFloatAccumulationTest(mintThenStake, longToken, 2);
+    await basicFloatAccumulationTest(mintThenStake, longToken, shortToken, 2);
   });
 
   it("case 2:  users can earn float immediately from a long mint", async () => {
-    await basicFloatAccumulationTest(mintAndStake, longToken, 1);
+    await basicFloatAccumulationTest(mintAndStake, longToken, shortToken, 1);
   });
 
   it.skip("case 1: users can earn float immediately with a delay from from a short stake", async () => {
-    await basicFloatAccumulationTest(mintThenStake, shortToken, 2);
+    await basicFloatAccumulationTest(mintThenStake, shortToken, longToken, 2);
   });
 
   it("case 2:  users can earn float immediately from a short mint", async () => {
-    await basicFloatAccumulationTest(mintAndStake, shortToken, 1);
+    await basicFloatAccumulationTest(mintAndStake, shortToken, longToken, 1);
   });
 
   it("staker admin can change", async () => {
@@ -175,18 +175,18 @@ contract("LongShort (staking)", (accounts) => {
       longValue,
       shortValue,
       longPrice,
+      shortPrice,
     } = await getFloatPerSecondParameters(longToken);
 
     // Wait a long time to accumulate some float.
     await time.increase(1000);
 
     // Compute expected float per second.
-    let expectedFloatPerSecond = await calculateFloatPerSecond(
+    let [expectedFloatPerSecondLong, expectedFloatPerSecondShort] = await calculateFloatPerSecond(
       longValue,
       shortValue,
-      longPrice,
-      longToken.address,
-      true // we staked long tokens
+      [longPrice, shortPrice],
+      [longToken.address, shortToken.address]
     );
 
     await longToken.stake(twentyFive, { from: user1 });
@@ -199,7 +199,7 @@ contract("LongShort (staking)", (accounts) => {
     // Need to test the staking system wayy better
     assert.equal(
       result.toString(),
-      expectedFloatPerSecond
+      expectedFloatPerSecondLong
         .mul(new BN(now - before))
         .mul(new BN(oneHundred))
         .div(e42)
@@ -300,7 +300,7 @@ contract("LongShort (staking)", (accounts) => {
     );
   });
 
-  const basicFloatAccumulationTest = async (fn, token, iterations) => {
+  const basicFloatAccumulationTest = async (fn, token, otherToken, iterations) => {
     // Ensure markets aren't empty.
     await populateMarket();
 
@@ -328,13 +328,15 @@ contract("LongShort (staking)", (accounts) => {
       from: user1,
     });
     const now = await time.latest();
-    let expectedFloatPerSecond = await calculateFloatPerSecond(
+
+    const isTestingLong = token.address === longToken.address;
+    let [expectedFloatPerSecondLong, expectedFloatPerSecondShort] = await calculateFloatPerSecond(
       longValue,
       shortValue,
-      token == longToken ? longPrice : shortPrice,
-      token.address,
-      token == longToken
+      [longPrice, shortPrice],
+      isTestingLong ? [token.address, otherToken.address] : [otherToken.address, token.address],
     );
+    const expectedFloatPerSecond = isTestingLong ? expectedFloatPerSecondLong : expectedFloatPerSecondShort;
     const result = await floatToken.balanceOf(user1);
 
     // Assert that the amount earned by the user matches the expected
