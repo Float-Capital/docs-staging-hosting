@@ -3,10 +3,7 @@
 module TestErc20 = {
   type t = Ethers.Contract.t
 
-  let abi = [
-    "function mint(address,uint256)",
-    // "event Transfer(address indexed from, address indexed to, uint amount)",
-  ]->Ethers.makeAbi
+  let abi = ["function mint(address,uint256)"]->Ethers.makeAbi
 
   let make = (~address, ~providerOrSigner): t =>
     Ethers.Contract.make(address, abi, providerOrSigner)
@@ -137,13 +134,13 @@ module Staker = {
 module Erc20 = {
   type t = Ethers.Contract.t
 
-  let abi = [
-    "function approve(address spender, uint256 amount) @100000",
-    "function balanceOf(address owner) public view returns (uint256 balance)",
-    "function allowance(address owner, address spender) public view returns (uint256 remaining)",
-    "function mint(uint256 value) public virtual returns (bool)",
-    // "event Transfer(address indexed _from, address indexed _to, uint256 _value)",
-  ]->Ethers.makeAbi
+  let abi =
+    [
+      "function approve(address spender, uint256 amount) @100000",
+      "function balanceOf(address owner) public view returns (uint256 balance)",
+      "function allowance(address owner, address spender) public view returns (uint256 remaining)",
+      "function mint(uint256 value) public virtual returns (bool)",
+    ]->Ethers.makeAbi
 
   let make = (~address, ~providerOrSigner): t =>
     Ethers.Contract.make(address, abi, providerOrSigner)
@@ -174,13 +171,13 @@ module Erc20 = {
 module Synth = {
   type t = Ethers.Contract.t
 
-  let abi = [
-    "function approve(address spender, uint256 amount) @100000",
-    "function balanceOf(address owner) public view returns (uint256 balance)",
-    "function allowance(address owner, address spender) public view returns (uint256 remaining)",
-    "function stake(uint256 amount) external",
-    // "event Transfer(address indexed _from, address indexed _to, uint256 _value)",
-  ]->Ethers.makeAbi
+  let abi =
+    [
+      "function approve(address spender, uint256 amount) @100000",
+      "function balanceOf(address owner) public view returns (uint256 balance)",
+      "function allowance(address owner, address spender) public view returns (uint256 remaining)",
+      "function stake(uint256 amount) external",
+    ]->Ethers.makeAbi
 
   let make = (~address, ~providerOrSigner): t =>
     Ethers.Contract.make(address, abi, providerOrSigner)

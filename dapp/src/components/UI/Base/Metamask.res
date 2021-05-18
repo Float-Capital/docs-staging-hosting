@@ -93,7 +93,7 @@ module AddToken = {
         address: tokenAddress,
         symbol: tokenSymbol->Js.String.slice(~from=0, ~to_=5), // A ticker symbol, up to 5 chars.
         decimals: "18",
-        image: None, // TODO: Add token image url symbol here
+        image: None,
       },
     },
   }
@@ -114,10 +114,7 @@ module AddToken = {
     switch InjectedEthereum.ethObj {
     | Some(ethObj) =>
       <div onClick={_event => addToMetamask(ethObj)} className="flex justify-start align-center">
-        {
-          //   <div className="text-sm"> {"Add token to "->React.string} </div>
-          children
-        }
+        {children}
       </div>
     | None => React.null
     }

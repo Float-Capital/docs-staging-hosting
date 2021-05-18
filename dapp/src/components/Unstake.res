@@ -73,7 +73,6 @@ module StakeFormInput = {
     ~buttonText,
   ) =>
     <Form className="" onSubmit>
-      // optBalance Todo
       <AmountInput
         value optBalance={optBalance} disabled onBlur onChange placeholder={"Unstake"} onMaxClick
       />

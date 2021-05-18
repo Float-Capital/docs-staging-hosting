@@ -1,5 +1,4 @@
 let useErc20Balance = (~erc20Address) => {
-  // TODO: convert these to not use optionals (the `Exn` versions)
   let optChainId = RootProvider.useChainId()
   let optUserId = RootProvider.useCurrentUser()
   let optProviderOrSigner = ContractActions.useProviderOrSigner()

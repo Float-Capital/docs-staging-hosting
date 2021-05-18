@@ -9,7 +9,6 @@ module DetailsWrapper = {
     </div>
 }
 
-// module Mint = {
 @react.component
 let make = (~withHeader=true) => {
   let router = Next.Router.useRouter()

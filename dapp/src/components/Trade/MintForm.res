@@ -335,8 +335,8 @@ module MintFormSignedIn = {
     let tokenToMint = isLong ? `long ${market.name}` : `short ${market.name}`
 
     let (optAdditionalErrorMessage, buttonText, buttonDisabled) = {
-      let stakingText = form.input.isStaking ? "Mint & Stake" : "Mint" // TODO: decide on this " & stake" : ""
-      let approveConnector = form.input.isStaking ? "," : " &" // TODO: decide on this " & stake" : ""
+      let stakingText = form.input.isStaking ? "Mint & Stake" : "Mint"
+      let approveConnector = form.input.isStaking ? "," : " &"
 
       let position = isLong ? "long" : "short"
       switch (formAmount, optDaiBalance, optDaiAmountApproved) {
