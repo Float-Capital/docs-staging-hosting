@@ -17,11 +17,13 @@ function MarketStakeCardSide(Props) {
   var tradeType = isLong ? "long" : "short";
   var textPosition = isLong ? "text-left" : "text-right";
   var mapAPY = function (apy) {
-    return (
-            apy > CONSTANTS.hotAPYThreshold && !isLong ? "🔥" : ""
-          ) + (apy * 100).toFixed(2) + "%" + (
-            apy > CONSTANTS.hotAPYThreshold && isLong ? "🔥" : ""
-          );
+    var maybeHotFlame = apy > CONSTANTS.hotAPYThreshold ? "🔥" : "";
+    var apyDisplay = (apy * 100).toFixed(2);
+    if (isLong) {
+      return apyDisplay + maybeHotFlame;
+    } else {
+      return maybeHotFlame + apyDisplay;
+    }
   };
   var tmp;
   tmp = typeof apy === "number" ? React.createElement(Loader.Tiny.make, {}) : (

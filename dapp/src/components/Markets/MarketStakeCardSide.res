@@ -8,11 +8,11 @@ let make = (~orderPostion, ~orderPostionMobile, ~marketName, ~isLong, ~apy, ~flo
   let isHotAPY = apy => apy > CONSTANTS.hotAPYThreshold
 
   let mapAPY = apy => {
-  	let maybeHotFlame = apy->isHotApy ? `🔥` : ""
-  	let apyDisplay = (apy *. 100.)->Js.Float.toFixedWithPrecision(~digits=2)
-  	
+    let maybeHotFlame = apy->isHotAPY ? `🔥` : ""
+    let apyDisplay = (apy *. 100.)->Js.Float.toFixedWithPrecision(~digits=2)
+
     isLong ? `${apyDisplay}${maybeHotFlame}` : `${maybeHotFlame}${apyDisplay}`
-   }
+  }
 
   <div
     className={`${textPosition} order-${orderPostionMobile->Int.toString} md:order-${orderPostion->Int.toString} w-1/2 md:w-1/4 flex flex grow flex-wrap flex-col`}>
@@ -27,7 +27,9 @@ let make = (~orderPostion, ~orderPostionMobile, ~marketName, ~isLong, ~apy, ~flo
         </span>
         {" FLOAT rewards"->React.string}
       </h3>
-      <p className="text-lg md:text-xl tracking-widest font-alphbeta"> {floatApy->mapAPY} </p>
+      <p className="text-lg md:text-xl tracking-widest font-alphbeta">
+        {floatApy->mapAPY->React.string}
+      </p>
     </div>
     <div className="flex flex-col justify-center pt-0 my-1">
       <h3 className="text-xxs">
@@ -38,7 +40,7 @@ let make = (~orderPostion, ~orderPostionMobile, ~marketName, ~isLong, ~apy, ~flo
       </h3>
       {switch apy {
       | Loaded(apyVal) =>
-        <p className="text-lg  tracking-widest font-alphbeta"> {apyVal->mapAPY} </p>
+        <p className="text-lg  tracking-widest font-alphbeta"> {apyVal->mapAPY->React.string} </p>
       | _ => <Loader.Tiny />
       }}
     </div>
