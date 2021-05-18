@@ -1,21 +1,5 @@
 // NOTE: since the type of all of these contracts is a generic `Ethers.Contract.t`, this code can runtime error if the wrong functions are called on the wrong contracts.
 
-module TestErc20 = {
-  type t = Ethers.Contract.t
-
-  let abi = ["function mint(address,uint256)"]->Ethers.makeAbi
-
-  let make = (~address, ~providerOrSigner): t =>
-    Ethers.Contract.make(address, abi, providerOrSigner)
-
-  @send
-  external mint: (
-    ~contract: t,
-    ~recipient: Ethers.ethAddress,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<Ethers.txSubmitted> = "mint"
-}
-
 module LongShort = {
   type t = Ethers.Contract.t
 
