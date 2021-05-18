@@ -623,11 +623,11 @@ contract LongShort is ILongShort, Initializable {
             shortValue[marketIndex]
         );
 
+        // turn this into an assert (markets will be seeded)
         if (longValue[marketIndex] == 0 && shortValue[marketIndex] == 0) {
             return;
         }
 
-        // TODO: Check why/if this is bad (casting to uint)
         // If a negative int is return this should fail.
         uint256 newPrice = uint256(getLatestPrice(marketIndex));
         emit PriceUpdate(

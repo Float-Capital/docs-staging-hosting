@@ -44,6 +44,22 @@ contract StakerInternalsExposed is Staker {
         return calculateAccumulatedFloat(token, user);
     }
 
+    function calculateNewCumulativeExternal(
+        uint256 longValue,
+        uint256 shortValue,
+        uint256 tokenPrice,
+        ISyntheticToken token, // either long or short token address
+        bool isLong // tells us which one
+    ) external returns (uint256) {
+        calculateNewCumulative(
+            longValue,
+            shortValue,
+            tokenPrice,
+            token,
+            isLong
+        );
+    }
+
     function mintAccumulatedFloatExternal(ISyntheticToken token, address user)
         external
     {

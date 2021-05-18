@@ -242,13 +242,15 @@ contract Staker is IStaker, Initializable {
                     (block.timestamp - initialTimestamp)) / kPeriod);
         }
 
+        uint256 totalLocked = (longValue + shortValue);
+
         // Float is scaled by the percentage of the total market value held in
         // the opposite position. This incentivises users to stake on the
         // weaker position.
         if (isLong) {
-            return ((k * shortValue) * tokenPrice) / (longValue + shortValue);
+            return ((k * shortValue) * tokenPrice) / totalLocked;
         } else {
-            return ((k * longValue) * tokenPrice) / (longValue + shortValue);
+            return ((k * longValue) * tokenPrice) / totalLocked;
         }
     }
 
