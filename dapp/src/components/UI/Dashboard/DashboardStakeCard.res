@@ -1,4 +1,4 @@
-let isHotAPY = apy => apy > 0.15
+let isHotAPY = apy => apy > CONSTANTS.hotAPYThreshold
 
 let mapVal = apy =>
   `${(apy *. 100.)->Js.Float.toFixedWithPrecision(~digits=2)}%${apy->isHotAPY ? `🔥` : ""}`

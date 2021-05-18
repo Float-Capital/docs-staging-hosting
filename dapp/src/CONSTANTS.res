@@ -24,3 +24,10 @@ let oneMonthInSeconds = 2628029
 /* Used as intervals for the price history chart */
 let threeMonthsInSeconds = 7884087
 let oneYearInSeconds = 31536000
+
+let hotAPYThreshold = 0.15
+
+// TODO: emit and pull these from graph. "kperiod, kInitialMultiplier."
+// For now going to hardcode them.
+let kperiodHardcode = Ethers.BigNumber.fromUnsafe("1664000") // ~20 days
+let kmultiplierHardcode = Ethers.BigNumber.fromUnsafe("5000000000000000000")
