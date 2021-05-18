@@ -107,7 +107,7 @@ module FaucetCard = {
             className="hover:bg-white underline"
             target="_blank"
             rel="noopener noreferrer">
-            {"Matic token"->React.string}
+            {"Matic token, get some from their faucet"->React.string}
           </a>
         </p>
       </div>
