@@ -17,24 +17,6 @@ type coreContracts = {
   markets: array<markets>,
 }
 
-let mintAndStake = (
-  ~marketIndex,
-  ~amount,
-  ~token,
-  ~user: Ethers.Wallet.t,
-  ~longShort: LongShort.t,
-  ~isLong: bool,
-) => {
-  let _ =
-    token->PaymentToken.mintAndApprove(~amount, ~user=user.address, ~spender=longShort.address)
-  let contract = longShort->attach(~address=user.address)
-  if isLong {
-    contract->LongShort.mintLongAndStake(~marketIndex, ~amount)
-  } else {
-    contract->LongShort.mintShortAndStake(~marketIndex, ~amount)
-  }
-}
-
 @ocaml.doc(`Generates random number between 1000 and 0.0001 of a token (10^18 in BigNumber units)`)
 let randomTokenAmount = () =>
   Js.Math.random_int(0, Js.Int.max)
@@ -68,13 +50,26 @@ let createSyntheticMarket = (
     YieldManagerMock.make(admin, longShort.address, fundToken.address),
   ))->JsPromise.then(((oracleManager, yieldManager)) => {
     let _ignorePromise = fundToken->PaymentToken.grantMintRole(~user=yieldManager.address)
-    longShort->LongShort.newSyntheticMarket(
+    longShort
+    ->LongShort.newSyntheticMarket(
       ~marketName,
       ~marketSymbol,
       ~paymentToken=fundToken.address,
       ~oracleManager=oracleManager.address,
       ~yieldManager=yieldManager.address,
     )
+    ->JsPromise.then(_ => longShort->LongShort.latestMarket)
+    ->JsPromise.then(marketIndex => {
+      longShort->LongShort.initializeMarket(
+        ~marketIndex,
+        ~baseEntryFee=0,
+        ~badLiquidityEntryFee=50,
+        ~baseExitFee=50,
+        ~badLiquidityExitFee=50,
+        ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("1000000000000000000"),
+        ~kPeriod=Ethers.BigNumber.fromInt(0),
+      )
+    })
   })
 }
 
@@ -82,7 +77,7 @@ let getAllMarkets = longShort => {
   longShort
   ->LongShort.latestMarket
   ->JsPromise.then(nextMarketIndex => {
-    let marketIndex = nextMarketIndex - 1
+    let marketIndex = nextMarketIndex
 
     Belt.Array.range(1, marketIndex)
     ->Array.map(marketIndex =>
@@ -145,16 +140,17 @@ let inititialize = (~admin: Ethers.Wallet.t) => {
       ))
       ->JsPromise.then(_ => {
         [payToken1, payToken1, payToken2, payToken1]
-        ->Array.mapWithIndex((index, paymentToken) => {
-          createSyntheticMarket(
-            ~admin=admin.address,
-            ~longShort,
-            ~fundToken=paymentToken,
-            ~marketName=`Test Market ${index->Int.toString}`,
-            ~marketSymbol=`TM${index->Int.toString}`,
+        ->Array.reduceWithIndex(JsPromise.resolve(), (previousPromise, paymentToken, index) => {
+          previousPromise->JsPromise.then(() =>
+            createSyntheticMarket(
+              ~admin=admin.address,
+              ~longShort,
+              ~fundToken=paymentToken,
+              ~marketName=`Test Market ${index->Int.toString}`,
+              ~marketSymbol=`TM${index->Int.toString}`,
+            )
           )
         })
-        ->JsPromise.all
         ->JsPromise.then(_ => {
           longShort->getAllMarkets
         })
@@ -170,3 +166,7 @@ let inititialize = (~admin: Ethers.Wallet.t) => {
     })
   })
 }
+
+let increaseTime: int => JsPromise.t<
+  unit,
+> = %raw(`(seconds) => ethers.provider.send("evm_increaseTime", [seconds])`)

@@ -1,7 +1,7 @@
 @react.component
 let make = (~marketData: Queries.SyntheticMarketInfo.t) => {
   <div>
-    <Next.Link href="/markets">
+    <Next.Link href="/">
       <div className="uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mb-4">
         {`◀`->React.string} <span className="text-xs"> {" Back to markets"->React.string} </span>
       </div>
@@ -20,7 +20,9 @@ let make = (~marketData: Queries.SyntheticMarketInfo.t) => {
         </div>
       </div>
       <MarketInfoCard marketIndex={marketData.marketIndex->Ethers.BigNumber.toNumber} />
-      <div className="w-full col-span-1 md:col-span-2"> <MarketCard marketData /> </div>
+      <div className="w-full col-span-1 md:col-span-2">
+        <MarketStakeCard key={marketData.name} syntheticMarket=marketData />
+      </div>
     </div>
   </div>
 }

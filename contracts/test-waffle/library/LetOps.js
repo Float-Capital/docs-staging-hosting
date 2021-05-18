@@ -3,16 +3,16 @@
 
 var Curry = require("bs-platform/lib/js/curry.js");
 
-function let_(prom, cb) {
-  return prom.then(Curry.__1(cb));
+function let_(prim, prim$1) {
+  return prim.then(Curry.__1(prim$1));
 }
 
 var AwaitThen = {
   let_: let_
 };
 
-function let_$1(prom, cb) {
-  return prom.then(Curry.__1(cb));
+function let_$1(prim, prim$1) {
+  return prim.then(Curry.__1(prim$1));
 }
 
 var Await = {

@@ -22,6 +22,7 @@ var Router = require("next/router");
 var StakeCardSide = require("../UI/StakeCard/StakeCardSide.js");
 var ToastProvider = require("../UI/ToastProvider.js");
 var Belt_HashSetString = require("rescript/lib/js/belt_HashSetString.js");
+var MarketCalculationHelpers = require("../../libraries/MarketCalculationHelpers.js");
 
 var zero = Ethers$1.BigNumber.from("0");
 
@@ -68,37 +69,6 @@ var kperiodHardcode = Ethers$1.BigNumber.from("1664000");
 
 var kmultiplierHardcode = Ethers$1.BigNumber.from("5000000000000000000");
 
-function kCalc(kperiod, kmultiplier, initialTimestamp, currentTimestamp) {
-  if (currentTimestamp.sub(initialTimestamp).lte(kperiod)) {
-    return kmultiplier.sub(kmultiplier.sub(oneInWei).mul(currentTimestamp.sub(initialTimestamp)).div(kperiod));
-  } else {
-    return oneInWei;
-  }
-}
-
-function myfloatCalc(longVal, shortVal, kperiod, kmultiplier, initialTimestamp, currentTimestamp, tokenType) {
-  var total = longVal.add(shortVal);
-  var k = kCalc(kperiod, kmultiplier, initialTimestamp, currentTimestamp);
-  switch (tokenType) {
-    case "long" :
-        var match = Number(Ethers.Utils.formatEther(longVal));
-        if (match !== 0.0) {
-          return k.mul(shortVal).div(total);
-        } else {
-          return zero;
-        }
-    case "short" :
-        var match$1 = Number(Ethers.Utils.formatEther(shortVal));
-        if (match$1 !== 0.0) {
-          return k.mul(longVal).div(total);
-        } else {
-          return zero;
-        }
-    default:
-      return oneHundred;
-  }
-}
-
 function StakeCard(Props) {
   var param = Props.syntheticMarket;
   var $staropt$star = Props.optUserBalanceAddressSet;
@@ -123,8 +93,8 @@ function StakeCard(Props) {
   var totalDollarValueStake = longDollarValueStaked.add(shortDollarValueStaked);
   var longApy = mappedBasicCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
   var shortApy = mappedBasicCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
-  var longFloatApy = myfloatCalc(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
-  var shortFloatApy = myfloatCalc(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
+  var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
+  var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
   var stakeOption = Js_dict.get(router.query, "tokenAddress");
   var stakeButtons = function (param) {
     return React.createElement("div", {
@@ -184,7 +154,7 @@ function StakeCard(Props) {
             var actionOption = stakeButtonPressState.actionOption;
             var marketIndex = stakeButtonPressState.marketIndex;
             var routeToMint = function (param) {
-              return JsPromise.$$catch(router.push("/markets?marketIndex=" + marketIndex + "&actionOption=" + actionOption + "&tab=mint").then(function (param) {
+              return JsPromise.$$catch(router.push("/?marketIndex=" + marketIndex + "&actionOption=" + actionOption + "&tab=mint").then(function (param) {
                               Curry._1(toastDispatch, {
                                     _0: "Mint some  " + marketName + " " + actionOption + " tokens to stake.",
                                     _1: "",
@@ -306,7 +276,5 @@ exports.basicApyCalc = basicApyCalc;
 exports.mappedBasicCalc = mappedBasicCalc;
 exports.kperiodHardcode = kperiodHardcode;
 exports.kmultiplierHardcode = kmultiplierHardcode;
-exports.kCalc = kCalc;
-exports.myfloatCalc = myfloatCalc;
 exports.make = make;
 /* zero Not a pure module */

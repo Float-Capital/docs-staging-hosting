@@ -69,8 +69,8 @@ function grantMintRole(t, user) {
 }
 
 function mintAndApprove(t, user, amount, spender) {
-  return t.mint(user, amount).then(function (param) {
-              return t.attach(user).approve(spender, amount);
+  return t.mint(user.address, amount).then(function (param) {
+              return t.connect(user).approve(spender, amount);
             });
 }
 
@@ -158,7 +158,7 @@ function at$4(contractAddress) {
 }
 
 function claimFloatCustomUser(staker, user, syntheticTokens, markets) {
-  return staker.attach(user.address).claimFloatCustom(Belt_Array.map(syntheticTokens, (function (synth) {
+  return staker.connect(user).claimFloatCustom(Belt_Array.map(syntheticTokens, (function (synth) {
                     return synth.address;
                   })), markets);
 }
@@ -204,8 +204,9 @@ var Treasury_v0 = {
 };
 
 function marketIndexOfSynth(longShort, syntheticToken) {
+  var arg = syntheticToken.address;
   return longShort.staker().then(at$4).then(function (param) {
-              return param.marketIndexOfToken(syntheticToken);
+              return param.marketIndexOfToken(arg);
             });
 }
 

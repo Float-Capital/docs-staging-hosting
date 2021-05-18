@@ -27,6 +27,10 @@ var oneHundredEth = Ethers.BigNumber.from("100000000000000000000");
 
 var oneThousandInWei = Ethers.BigNumber.from("1000000000000000000000");
 
+var kperiodHardcode = Ethers.BigNumber.from("1664000");
+
+var kmultiplierHardcode = Ethers.BigNumber.from("5000000000000000000");
+
 var fiveMinutesInSeconds = 300;
 
 var oneHourInSeconds = 3600;
@@ -46,6 +50,8 @@ var oneMonthInSeconds = 2628029;
 var threeMonthsInSeconds = 7884087;
 
 var oneYearInSeconds = 31536000;
+
+var hotAPYThreshold = 0.15;
 
 exports.zeroAddressStr = zeroAddressStr;
 exports.zeroAddress = zeroAddress;
@@ -69,4 +75,7 @@ exports.twoWeeksInSeconds = twoWeeksInSeconds;
 exports.oneMonthInSeconds = oneMonthInSeconds;
 exports.threeMonthsInSeconds = threeMonthsInSeconds;
 exports.oneYearInSeconds = oneYearInSeconds;
+exports.hotAPYThreshold = hotAPYThreshold;
+exports.kperiodHardcode = kperiodHardcode;
+exports.kmultiplierHardcode = kmultiplierHardcode;
 /* zeroAddress Not a pure module */

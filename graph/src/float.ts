@@ -208,7 +208,7 @@ export function handleSyntheticTokenCreated(
   );
 
   let initialLongStakerState = getOrCreateStakerState(
-    shortToken.id,
+    longToken.id,
     ZERO,
     event
   );
@@ -248,6 +248,7 @@ export function handleSyntheticTokenCreated(
       syntheticName,
       syntheticSymbol,
       oracleAddress.toHex(),
+      collateralTokenAddress.toHex()
     ],
     [
       "marketIndex",
@@ -257,8 +258,9 @@ export function handleSyntheticTokenCreated(
       "name",
       "symbol",
       "oracleAddress",
+      "collateralAddress"
     ],
-    ["uint256", "address", "address", "uint256", "string", "string", "address"],
+    ["uint256", "address", "address", "uint256", "string", "string", "address", "address"],
     [],
     []
   );

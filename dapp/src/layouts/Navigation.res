@@ -79,7 +79,7 @@ let make = () => {
 
   <>
     <nav className="mx-auto w-full max-w-5xl p-2 h-12 flex justify-between items-center text-sm">
-      <Link href="/markets">
+      <Link href="/">
         <a className="flex items-center">
           <span className="text-xl text-green-800 ml-2 align-middle font-semibold">
             <div className="logo-container">
@@ -89,9 +89,7 @@ let make = () => {
         </a>
       </Link>
       <div className="hidden md:flex w-2/3 text-base items-center justify-end">
-        <Link href="/markets">
-          <a className="px-3 hover:bg-white"> {React.string("MARKETS")} </a>
-        </Link>
+        <Link href="/"> <a className="px-3 hover:bg-white"> {React.string("MARKETS")} </a> </Link>
         <Link href="/stake">
           <a className="px-3 hover:bg-white"> {`STAKE🔥`->React.string} </a>
         </Link>
@@ -140,7 +138,7 @@ let make = () => {
           <div className="zoom-in-effect flex flex-col text-3xl text-white">
             <div
               onClick={_ => {
-                router->Next.Router.push(`/markets`)
+                router->Next.Router.push(`/`)
                 setIsOpen(_ => false)
               }}
               className="px-3 bg-black m-2">

@@ -220,8 +220,11 @@ module MintFormInput = {
               onChange=onChangeIsStaking
             />
             <label htmlFor="stake-checkbox" className="text-xs">
-              {`Stake ${isLong ? "long" : "short"} tokens`->React.string}
+              {`Stake ${isLong ? "long" : "short"} tokens `->React.string}
             </label>
+            <div className="ml-1">
+              <Tooltip tip="Stake your synthetic asset tokens to earn FLOAT tokens" />
+            </div>
           </div>
           <p className="text-xxs hover:text-gray-500">
             <a

@@ -13,6 +13,7 @@ var Ethers = require("../../ethereum/Ethers.js");
 var Loader = require("../UI/Base/Loader.js");
 var Ethers$1 = require("ethers");
 var Globals = require("../../libraries/Globals.js");
+var Tooltip = require("../UI/Base/Tooltip.js");
 var Metamask = require("../UI/Base/Metamask.js");
 var Contracts = require("../../ethereum/Contracts.js");
 var Formality = require("re-formality/src/Formality.js");
@@ -809,7 +810,11 @@ function MintForm$MintFormInput(Props) {
                     htmlFor: "stake-checkbox"
                   }, "Stake " + (
                     isLong ? "long" : "short"
-                  ) + " tokens")), React.createElement("p", {
+                  ) + " tokens "), React.createElement("div", {
+                    className: "ml-1"
+                  }, React.createElement(Tooltip.make, {
+                        tip: "Stake your synthetic asset tokens to earn FLOAT tokens"
+                      }))), React.createElement("p", {
                 className: "text-xxs hover:text-gray-500"
               }, React.createElement("a", {
                     href: "https://docs.float.capital/docs/stake",

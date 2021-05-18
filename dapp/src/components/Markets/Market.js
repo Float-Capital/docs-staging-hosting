@@ -3,15 +3,15 @@
 
 var React = require("react");
 var Link = require("next/link").default;
-var MarketCard = require("./MarketCard.js");
 var PriceGraph = require("../PriceGraph.js");
 var MarketInfoCard = require("./MarketInfoCard.js");
+var MarketStakeCard = require("./MarketStakeCard.js");
 var MarketInteractionCard = require("./MarketInteractionCard.js");
 
 function Market(Props) {
   var marketData = Props.marketData;
   return React.createElement("div", undefined, React.createElement(Link, {
-                  href: "/markets",
+                  href: "/",
                   children: React.createElement("div", {
                         className: "uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mb-4"
                       }, "◀", React.createElement("span", {
@@ -31,8 +31,9 @@ function Market(Props) {
                       marketIndex: marketData.marketIndex.toNumber()
                     }), React.createElement("div", {
                       className: "w-full col-span-1 md:col-span-2"
-                    }, React.createElement(MarketCard.make, {
-                          marketData: marketData
+                    }, React.createElement(MarketStakeCard.make, {
+                          syntheticMarket: marketData,
+                          key: marketData.name
                         }))));
 }
 

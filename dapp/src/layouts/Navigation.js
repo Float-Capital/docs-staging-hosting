@@ -145,7 +145,7 @@ function Navigation(Props) {
   return React.createElement(React.Fragment, undefined, React.createElement("nav", {
                   className: "mx-auto w-full max-w-5xl p-2 h-12 flex justify-between items-center text-sm"
                 }, React.createElement(Link, {
-                      href: "/markets",
+                      href: "/",
                       children: React.createElement("a", {
                             className: "flex items-center"
                           }, React.createElement("span", {
@@ -159,7 +159,7 @@ function Navigation(Props) {
                     }), React.createElement("div", {
                       className: "hidden md:flex w-2/3 text-base items-center justify-end"
                     }, React.createElement(Link, {
-                          href: "/markets",
+                          href: "/",
                           children: React.createElement("a", {
                                 className: "px-3 hover:bg-white"
                               }, "MARKETS")
@@ -198,7 +198,7 @@ function Navigation(Props) {
                             }, React.createElement("div", {
                                   className: "px-3 bg-black m-2",
                                   onClick: (function (param) {
-                                      router.push("/markets");
+                                      router.push("/");
                                       return Curry._1(setIsOpen, (function (param) {
                                                     return false;
                                                   }));

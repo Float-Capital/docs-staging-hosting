@@ -37,7 +37,7 @@ let deployContract3 = (contractName, firstParam, secondParam, thirdParam) => {
   ->JsPromise.then(deployed)
 }
 
-@send external attach: ('contract, ~address: Ethers.ethAddress) => 'contract = "attach"
+@send external connect: ('contract, ~address: Ethers.Wallet.t) => 'contract = "connect"
 
 module SyntheticToken = {
   type t = {address: Ethers.ethAddress}
@@ -81,14 +81,14 @@ module PaymentToken = {
   ) => JsPromise.t<unit> = "approve"
   let mintAndApprove = (
     t,
-    ~user: Ethers.ethAddress,
+    ~user: Ethers.Wallet.t,
     ~amount: Ethers.BigNumber.t,
     ~spender: Ethers.ethAddress,
   ) =>
     t
-    ->mint(~amount, ~user)
+    ->mint(~amount, ~user=user.address)
     ->JsPromise.then(_ => {
-      t->attach(~address=user)->approve(~amount, ~spender)
+      t->connect(~address=user)->approve(~amount, ~spender)
     })
 }
 
@@ -138,6 +138,17 @@ module LongShort = {
     ~oracleManager: Ethers.ethAddress,
     ~yieldManager: Ethers.ethAddress,
   ) => JsPromise.t<transaction> = "newSyntheticMarket"
+  @send
+  external initializeMarket: (
+    t,
+    ~marketIndex: int,
+    ~baseEntryFee: int,
+    ~badLiquidityEntryFee: int,
+    ~baseExitFee: int,
+    ~badLiquidityExitFee: int,
+    ~kInitialMultiplier: Ethers.BigNumber.t,
+    ~kPeriod: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "initializeMarket"
 
   @send
   external fundTokens: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "fundTokens"
@@ -169,6 +180,12 @@ module LongShort = {
     ~marketIndex: int,
     ~amount: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "mintShortAndStake"
+  @send
+  external updateMarketOracle: (
+    t,
+    ~marketIndex: int,
+    ~newOracleAddress: Ethers.ethAddress,
+  ) => JsPromise.t<transaction> = "updateMarketOracle"
 }
 
 module GenericErc20 = {
@@ -217,15 +234,23 @@ module Staker = {
     ~markets: array<int>,
   ) =>
     staker
-    ->attach(~address=user.address)
+    ->connect(~address=user)
     ->claimFloatCustom(
       ~syntheticTokens=syntheticTokens->Array.map(synth => synth.address),
       ~markets,
     )
 
   @send
-  external marketIndexOfToken: (t, ~syntheticToken: SyntheticToken.t) => JsPromise.t<int> =
+  external marketIndexOfToken: (t, ~syntheticToken: Ethers.ethAddress) => JsPromise.t<int> =
     "marketIndexOfToken"
+
+  @send
+  external userAmountStaked: (
+    t,
+    ~syntheticToken: Ethers.ethAddress,
+    ~user: Ethers.ethAddress,
+  ) => JsPromise.t<Ethers.BigNumber.t> = "userAmountStaked"
+
   @send
   external userIndexOfLastClaimedReward: (
     t,
@@ -273,5 +298,5 @@ module DataFetchers = {
     longShort
     ->LongShort.staker
     ->JsPromise.then(Staker.at)
-    ->JsPromise.then(Staker.marketIndexOfToken(~syntheticToken))
+    ->JsPromise.then(Staker.marketIndexOfToken(~syntheticToken=syntheticToken.address))
 }

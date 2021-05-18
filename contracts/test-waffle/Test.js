@@ -19,33 +19,42 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                         contents: undefined
                       };
                       Promise$BsMocha.before(undefined)(undefined, undefined, undefined, (function (param) {
-                              return ethers.getSigners().then(function (loadedAccounts) {
-                                          accounts.contents = loadedAccounts;
-                                          
-                                        });
+                              return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
+                                            accounts.contents = loadedAccounts;
+                                            
+                                          }));
                             }));
                       Promise$BsMocha.before_each(undefined)(undefined, undefined, undefined, (function (param) {
-                              return Helpers.inititialize(accounts.contents[0]).then(function (deployedContracts) {
-                                          contracts.contents = deployedContracts;
-                                          
-                                        });
+                              return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0]), (function (deployedContracts) {
+                                            contracts.contents = deployedContracts;
+                                            var setupUser = accounts.contents[2];
+                                            return LetOps.Await.let_(HelperActions.stakeRandomlyInBothSidesOfMarket(deployedContracts.markets, setupUser, deployedContracts.longShort), (function (param) {
+                                                          
+                                                        }));
+                                          }));
                             }));
                       return Promise$BsMocha.it("should update correct markets in the 'claimFloatCustom' function")(undefined, undefined, undefined, (function (param) {
                                     var match = contracts.contents;
                                     var staker = match.staker;
                                     var testUser = accounts.contents[1];
-                                    var match$1 = HelperActions.stakeRandomlyInMarkets(match.markets, testUser, match.longShort);
-                                    var synthsUserHasStakedIn = match$1[0];
-                                    return LetOps.Await.let_(Contract.Staker.claimFloatCustomUser(staker, testUser, synthsUserHasStakedIn, match$1[1]), (function (param) {
-                                                  return LetOps.Await.let_(Promise.all(Belt_Array.map(synthsUserHasStakedIn, (function (synth) {
-                                                                        return Promise.all([
-                                                                                      staker.userIndexOfLastClaimedReward(synth.address, testUser.address),
-                                                                                      staker.latestRewardIndex(synth.address)
-                                                                                    ]).then(function (param) {
-                                                                                    return Chai.bnEqual(param[0], param[1]);
-                                                                                  });
-                                                                      }))), (function (param) {
-                                                                
+                                    return LetOps.Await.let_(HelperActions.stakeRandomlyInMarkets(match.markets, testUser, match.longShort), (function (param) {
+                                                  var marketsUserHasStakedIn = param[1];
+                                                  var synthsUserHasStakedIn = param[0];
+                                                  return LetOps.Await.let_(Helpers.increaseTime(50), (function (param) {
+                                                                return LetOps.Await.let_(Contract.Staker.claimFloatCustomUser(staker, testUser, Belt_Array.map(synthsUserHasStakedIn, (function (stake) {
+                                                                                      return stake.synth;
+                                                                                    })), marketsUserHasStakedIn), (function (param) {
+                                                                              return LetOps.Await.let_(Promise.all(Belt_Array.map(synthsUserHasStakedIn, (function (stake) {
+                                                                                                    return Promise.all([
+                                                                                                                  staker.userIndexOfLastClaimedReward(stake.synth.address, testUser.address),
+                                                                                                                  staker.latestRewardIndex(stake.synth.address)
+                                                                                                                ]).then(function (param) {
+                                                                                                                return Chai.bnEqual(param[0], param[1]);
+                                                                                                              });
+                                                                                                  }))), (function (param) {
+                                                                                            
+                                                                                          }));
+                                                                            }));
                                                               }));
                                                 }));
                                   }));

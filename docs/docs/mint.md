@@ -13,7 +13,7 @@ slug: /mint
 
 Minting a token is how you can invest in a market. If you believe a market's price is going to go _up_ you can mint a long position in that market, inversely, if you believe a market's price is going to go _down_ then you would mint a short position in that market.
 
-For example, if you would like $1 000 long exposure to a certain synthetic asset, you would visit the [markets](https://float.capital/markets) page and select to either _mint long_ or _mint short_. Minting a long position would mint you $1 000 worth of long tokens, giving you long exposure to this synthetic asset.
+For example, if you would like $1 000 long exposure to a certain synthetic asset, you would visit the [markets](https://float.capital/) page and select to either _mint long_ or _mint short_. Minting a long position would mint you $1 000 worth of long tokens, giving you long exposure to this synthetic asset.
 
 Our synthetic markets currently accept DAI, allowing you to mint your synthetic position.
 
