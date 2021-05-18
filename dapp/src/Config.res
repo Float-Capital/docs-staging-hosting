@@ -2,7 +2,7 @@ type contractDetails = {
   @as("LongShort") longShort: Ethers.ethAddress,
   @as("Staker") staker: Ethers.ethAddress,
   @as("Dai") dai: Ethers.ethAddress,
-  @as("FloatToken") floatToken: Ethers.ethAddress,
+  @as("FloatToken") floatToken: Ethers.ethAddress
 }
 type configShape = {
   graphEndpoint: string,

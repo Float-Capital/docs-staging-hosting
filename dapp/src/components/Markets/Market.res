@@ -20,7 +20,9 @@ let make = (~marketData: Queries.SyntheticMarketInfo.t) => {
         </div>
       </div>
       <MarketInfoCard marketIndex={marketData.marketIndex->Ethers.BigNumber.toNumber} />
-      <div className="w-full col-span-1 md:col-span-2"> <MarketCard marketData /> </div>
+      <div className="w-full col-span-1 md:col-span-2">
+        <MarketStakeCard key={marketData.name} syntheticMarket=marketData />
+      </div>
     </div>
   </div>
 }

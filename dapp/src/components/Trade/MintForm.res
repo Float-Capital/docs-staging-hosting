@@ -189,6 +189,8 @@ module MintFormInput = {
     ~onChangeIsStaking=_ => (),
     ~submitButton=<Button> "Login & Mint" </Button>,
   ) => {
+    let router = Next.Router.useRouter()
+
     let formInput =
       <>
         <LongOrShortSelect isLong selectPosition={val => onChangeSide(val)} disabled />
@@ -239,6 +241,19 @@ module MintFormInput = {
       <Form className="h-full" onSubmit>
         <div className="relative"> {formInput} </div> {submitButton}
       </Form>
+      {if Config.networkId == 80001 {
+        <p
+          onClick={_ => {
+            router->Next.Router.push(`/faucet`)
+          }}
+          className="cursor-pointer text-xxs py-2">
+          {"Visit our "->React.string}
+          <a className="hover:bg-white underline"> {"faucet"->React.string} </a>
+          {" if you need more aave test DAI."->React.string}
+        </p>
+      } else {
+        React.null
+      }}
     </div>
   }
 }

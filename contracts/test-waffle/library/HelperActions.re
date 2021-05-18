@@ -44,14 +44,21 @@ let stakeRandomlyInMarkets =
         switch (Helpers.randomMintLongShort()) {
         | Long(amount) =>
           let%Await _ = mintStake(~isLong=true, ~amount);
-          synthsUserHasStakedIn->Array.concat([|longSynth|]);
+          synthsUserHasStakedIn->Array.concat([|
+            {"synth": longSynth, "amount": amount},
+          |]);
         | Short(amount) =>
           let%Await _ = mintStake(~isLong=false, ~amount);
-          synthsUserHasStakedIn->Array.concat([|shortSynth|]);
+          synthsUserHasStakedIn->Array.concat([|
+            {"synth": shortSynth, "amount": amount},
+          |]);
         | Both(longAmount, shortAmount) =>
           let%AwaitThen _ = mintStake(~isLong=true, ~amount=longAmount);
           let%Await _ = mintStake(~isLong=false, ~amount=shortAmount);
-          synthsUserHasStakedIn->Array.concat([|shortSynth, longSynth|]);
+          synthsUserHasStakedIn->Array.concat([|
+            {"synth": shortSynth, "amount": shortAmount},
+            {"synth": longSynth, "amount": longAmount},
+          |]);
         };
 
       (

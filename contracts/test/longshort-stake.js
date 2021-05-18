@@ -64,10 +64,10 @@ contract("LongShort (staking)", (accounts) => {
     );
   });
 
-  it("users can stake long tokens", async () => {
+  it("<IMPLEMENTED IN WAFFLE> users can stake long tokens", async () => {
     await mintThenStake(oneHundred, longToken, user1);
     await mintAndStake(oneHundred, longToken, user2);
-    await mintThenStakeImmediately(oneHundred, longToken, user3);
+    await mintThenStake(oneHundred, longToken, user3);
 
     const u1staked = await amountStaked(longToken, user1);
     const u2staked = await amountStaked(longToken, user2);
@@ -78,9 +78,9 @@ contract("LongShort (staking)", (accounts) => {
     assert.equal(new BN(oneHundred).toString(), u3staked.toString());
   });
 
-  it("users can stake short tokens", async () => {
+  it("<IMPLEMENTED IN WAFFLE> users can stake short tokens", async () => {
     await mintThenStake(oneHundred, shortToken, user1);
-    await mintThenStakeImmediately(oneHundred, shortToken, user2);
+    await mintThenStake(oneHundred, shortToken, user2);
     await mintAndStake(oneHundred, shortToken, user3);
 
     const u1staked = await amountStaked(shortToken, user1);
@@ -92,7 +92,7 @@ contract("LongShort (staking)", (accounts) => {
     assert.equal(new BN(oneHundred).toString(), u3staked.toString());
   });
 
-  it("users don't earn float immediately", async () => {
+  it("<WON'T RE-IMPLEMENT> users don't earn float immediately", async () => {
     await mintThenStake(oneHundred, longToken, user1);
     await staker.withdraw(longToken.address, new BN(oneHundred), {
       from: user1,
@@ -122,23 +122,15 @@ contract("LongShort (staking)", (accounts) => {
     await basicFloatAccumulationTest(mintThenStake, longToken, 2);
   });
 
-  it("case 2:  users can earn float immediately from a long stake", async () => {
-    await basicFloatAccumulationTest(mintThenStakeImmediately, longToken, 1);
-  });
-
-  it("case 3:  users can earn float immediately from a long mint", async () => {
+  it("case 2:  users can earn float immediately from a long mint", async () => {
     await basicFloatAccumulationTest(mintAndStake, longToken, 1);
   });
 
-  it.skip("case 1:  users can earn float with a delay from from a short stake", async () => {
+  it.skip("case 1: users can earn float immediately with a delay from from a short stake", async () => {
     await basicFloatAccumulationTest(mintThenStake, shortToken, 2);
   });
 
-  it("case 2:  users can earn float immediately from a short stake", async () => {
-    await basicFloatAccumulationTest(mintThenStakeImmediately, shortToken, 1);
-  });
-
-  it("case 3:  users can earn float immediately from a short mint", async () => {
+  it("case 2:  users can earn float immediately from a short mint", async () => {
     await basicFloatAccumulationTest(mintAndStake, shortToken, 1);
   });
 
@@ -225,7 +217,7 @@ contract("LongShort (staking)", (accounts) => {
     assert.equal(result.toString(), result2.toString(), "balance no equal");
   });
 
-  it("can stake directly from the synthetic token (without needing an approval)", async () => {
+  it("<No need to test again - implicitly tested> can stake directly from the synthetic token (without needing an approval)", async () => {
     await mintAndApprove(
       fundToken,
       new BN(oneHundredAndFifty),
@@ -397,17 +389,8 @@ contract("LongShort (staking)", (accounts) => {
     await mintAndApprove(fundToken, amount, user, longShort.address);
     conditionalMint(token, amount, user);
     await token.stake(amount, { from: user });
-    // await token.approve(staker.address, amount, { from: user });
-    // await staker.stake(token.address, amount, { from: user });
   };
 
-  const mintThenStakeImmediately = async (amount, token, user) => {
-    await mintAndApprove(fundToken, amount, user, longShort.address);
-    await conditionalMint(token, amount, user);
-    await token.stake(amount, { from: user });
-    // await token.approve(staker.address, amount, { from: user });
-    // await staker.stakeAndEarnImmediately(token.address, amount, { from: user });
-  };
 
   const mintAndStake = async (amount, token, user) => {
     await mintAndApprove(fundToken, new BN(amount), user, longShort.address);

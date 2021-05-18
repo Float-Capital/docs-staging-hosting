@@ -241,8 +241,16 @@ module Staker = {
     )
 
   @send
-  external marketIndexOfToken: (t, ~syntheticToken: SyntheticToken.t) => JsPromise.t<int> =
+  external marketIndexOfToken: (t, ~syntheticToken: Ethers.ethAddress) => JsPromise.t<int> =
     "marketIndexOfToken"
+
+  @send
+  external userAmountStaked: (
+    t,
+    ~syntheticToken: Ethers.ethAddress,
+    ~user: Ethers.ethAddress,
+  ) => JsPromise.t<Ethers.BigNumber.t> = "userAmountStaked"
+
   @send
   external userIndexOfLastClaimedReward: (
     t,
@@ -290,5 +298,5 @@ module DataFetchers = {
     longShort
     ->LongShort.staker
     ->JsPromise.then(Staker.at)
-    ->JsPromise.then(Staker.marketIndexOfToken(~syntheticToken))
+    ->JsPromise.then(Staker.marketIndexOfToken(~syntheticToken=syntheticToken.address))
 }

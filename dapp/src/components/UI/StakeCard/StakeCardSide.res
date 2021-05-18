@@ -1,6 +1,6 @@
 open APYProvider
 
-let isHotAPY = apy => apy > 0.15
+let isHotAPY = apy => apy > CONSTANTS.hotAPYThreshold
 
 let mapVal = apy =>
   `${(apy *. 100.)->Js.Float.toFixedWithPrecision(~digits=2)}%${apy->isHotAPY
@@ -33,13 +33,5 @@ let make = (~orderPostion, ~orderPostionMobile, ~marketName, ~isLong, ~apy, ~flo
       | _ => <Loader.Mini />
       }}
     </div>
-    // <div className="text-sm text-center m-auto">
-    //   <span className="font-bold"> {`Exposure`->React.string} </span>
-    //   <Tooltip
-    //     tip={`The impact ${marketName} price movements have on ${isLong ? "long" : "short"} value`}
-    //   />
-    //   <span className="font-bold"> {`: `->React.string} </span>
-    //   {`${beta}%`->React.string}
-    // </div>
   </div>
 }
