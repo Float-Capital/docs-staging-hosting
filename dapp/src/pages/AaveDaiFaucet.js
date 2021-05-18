@@ -146,7 +146,7 @@ function AaveDaiFaucet$FaucetCard(Props) {
                           href: "https://faucet.matic.network/",
                           rel: "noopener noreferrer",
                           target: "_blank"
-                        }, "Matic token"))), React.createElement("div", {
+                        }, "Matic token, get some from their faucet"))), React.createElement("div", {
                   className: "mx-auto max-w-sm"
                 }, React.createElement(Button.make, {
                       onClick: (function (param) {

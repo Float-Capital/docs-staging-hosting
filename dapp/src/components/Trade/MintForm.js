@@ -776,6 +776,7 @@ function MintForm$MintFormInput(Props) {
   var submitButton = submitButtonOpt !== undefined ? Caml_option.valFromOption(submitButtonOpt) : React.createElement(Button.make, {
           children: "Login & Mint"
         });
+  var router = Router.useRouter();
   var formInput = React.createElement(React.Fragment, undefined, React.createElement(LongOrShortSelect.make, {
             isLong: isLong,
             selectPosition: Curry.__1(onChangeSide),
@@ -823,7 +824,15 @@ function MintForm$MintFormInput(Props) {
                   children: null
                 }, React.createElement("div", {
                       className: "relative"
-                    }, formInput), submitButton));
+                    }, formInput), submitButton), Config.networkId === 80001 ? React.createElement("p", {
+                    className: "cursor-pointer text-xxs py-2",
+                    onClick: (function (param) {
+                        router.push("/faucet");
+                        
+                      })
+                  }, "Visit our ", React.createElement("a", {
+                        className: "hover:bg-white underline"
+                      }, "faucet"), " if you need more aave test DAI.") : null);
 }
 
 var MintFormInput = {
