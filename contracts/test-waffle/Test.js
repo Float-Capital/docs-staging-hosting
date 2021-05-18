@@ -2,36 +2,72 @@
 'use strict';
 
 var Chai = require("./bindings/chai/Chai.js");
-var Curry = require("rescript/lib/js/curry.js");
+var LetOps = require("./library/LetOps.js");
 var Helpers = require("./library/Helpers.js");
-var Async$BsMocha = require("bs-mocha/src/Async.js");
+var Contract = require("./library/Contract.js");
+var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
+var HelperActions = require("./library/HelperActions.js");
 var Mocha$BsMocha = require("bs-mocha/src/Mocha.js");
+var Promise$BsMocha = require("bs-mocha/src/Promise.js");
 
 Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (function (param) {
-        return Mocha$BsMocha.describe("List.map")(undefined, undefined, undefined, (function (param) {
-                      Async$BsMocha.before_each(undefined, undefined, undefined, undefined, (function (done) {
-                              Helpers.inititialize(undefined).then(function (param) {
-                                    return Curry._2(done, undefined, undefined);
-                                  });
-                              
+        return Mocha$BsMocha.describe("Staking")(undefined, undefined, undefined, (function (param) {
+                      var contracts = {
+                        contents: undefined
+                      };
+                      var accounts = {
+                        contents: undefined
+                      };
+                      Promise$BsMocha.before(undefined)(undefined, undefined, undefined, (function (param) {
+                              return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
+                                            accounts.contents = loadedAccounts;
+                                            
+                                          }));
                             }));
-                      Mocha$BsMocha.it("it worked")(undefined, undefined, undefined, (function (param) {
-                              console.log("It worked, yay");
-                              
+                      Promise$BsMocha.before_each(undefined)(undefined, undefined, undefined, (function (param) {
+                              return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0]), (function (deployedContracts) {
+                                            contracts.contents = deployedContracts;
+                                            var setupUser = accounts.contents[2];
+                                            return LetOps.Await.let_(HelperActions.stakeRandomlyInBothSidesOfMarket(deployedContracts.markets, setupUser, deployedContracts.longShort), (function (param) {
+                                                          
+                                                        }));
+                                          }));
                             }));
-                      return Mocha$BsMocha.it("Two numbers are equal")(undefined, undefined, undefined, (function (param) {
-                                    Chai.bnEqual(ethers.BigNumber.from(1), ethers.BigNumber.from("1"));
-                                    Chai.bnCloseTo(ethers.BigNumber.from(1), ethers.BigNumber.from("5"), 4);
-                                    return Chai.bnWithin(ethers.BigNumber.from(1), ethers.BigNumber.from("0"), ethers.BigNumber.from(2));
+                      return Promise$BsMocha.it("should update correct markets in the 'claimFloatCustom' function")(undefined, undefined, undefined, (function (param) {
+                                    var match = contracts.contents;
+                                    var staker = match.staker;
+                                    var testUser = accounts.contents[1];
+                                    return LetOps.Await.let_(HelperActions.stakeRandomlyInMarkets(match.markets, testUser, match.longShort), (function (param) {
+                                                  var marketsUserHasStakedIn = param[1];
+                                                  var synthsUserHasStakedIn = param[0];
+                                                  return LetOps.Await.let_(Helpers.increaseTime(50), (function (param) {
+                                                                return LetOps.Await.let_(Contract.Staker.claimFloatCustomUser(staker, testUser, Belt_Array.map(synthsUserHasStakedIn, (function (stake) {
+                                                                                      return stake.synth;
+                                                                                    })), marketsUserHasStakedIn), (function (param) {
+                                                                              return LetOps.Await.let_(Promise.all(Belt_Array.map(synthsUserHasStakedIn, (function (stake) {
+                                                                                                    return Promise.all([
+                                                                                                                  staker.userIndexOfLastClaimedReward(stake.synth.address, testUser.address),
+                                                                                                                  staker.latestRewardIndex(stake.synth.address)
+                                                                                                                ]).then(function (param) {
+                                                                                                                return Chai.bnEqual(param[0], param[1]);
+                                                                                                              });
+                                                                                                  }))), (function (param) {
+                                                                                            
+                                                                                          }));
+                                                                            }));
+                                                              }));
+                                                }));
                                   }));
                     }));
       }));
 
-var it$p = Async$BsMocha.it;
+var it$prime = Promise$BsMocha.it;
 
-var it_skip$p = Async$BsMocha.it_skip;
+var it_skip$prime = Promise$BsMocha.it_skip;
 
-var before_each = Async$BsMocha.before_each;
+var before_each = Promise$BsMocha.before_each;
+
+var before = Promise$BsMocha.before;
 
 var describe = Mocha$BsMocha.describe;
 
@@ -39,9 +75,10 @@ var it = Mocha$BsMocha.it;
 
 var it_skip = Mocha$BsMocha.it_skip;
 
-exports.it$p = it$p;
-exports.it_skip$p = it_skip$p;
+exports.it$prime = it$prime;
+exports.it_skip$prime = it_skip$prime;
 exports.before_each = before_each;
+exports.before = before;
 exports.describe = describe;
 exports.it = it;
 exports.it_skip = it_skip;

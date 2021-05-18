@@ -30,9 +30,14 @@ function amountForApproval(amount) {
   }
 }
 
+function formatTimestamp(timestamp) {
+  return FormatDistanceToNow(FromUnixTime(timestamp.toNumber()));
+}
+
 exports.ethAdrToStr = ethAdrToStr;
 exports.ethAdrToLowerStr = ethAdrToLowerStr;
 exports.timestampToDuration = timestampToDuration;
 exports.percentStr = percentStr;
 exports.amountForApproval = amountForApproval;
+exports.formatTimestamp = formatTimestamp;
 /* Ethers Not a pure module */

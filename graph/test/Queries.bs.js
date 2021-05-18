@@ -9,6 +9,792 @@ var ApolloClient__React_Hooks_UseQuery = require("rescript-apollo-client/src/@ap
 var Raw = {};
 
 var query = (require("@apollo/client").gql`
+  fragment StakerStateInfo on StakeState   {
+    __typename
+    id
+    blockNumber
+    creationTxHash
+    stateIndex
+    syntheticToken  {
+      __typename
+      id
+    }
+    timestamp
+    accumulativeFloatPerToken
+    floatRatePerTokenOverInterval
+    timeSinceLastUpdate
+  }
+`);
+
+function parse(value) {
+  var value$1 = value.syntheticToken;
+  return {
+          __typename: value.__typename,
+          id: value.id,
+          blockNumber: GqlConverters.$$BigInt.parse(value.blockNumber),
+          creationTxHash: GqlConverters.Address.parse(value.creationTxHash),
+          stateIndex: GqlConverters.$$BigInt.parse(value.stateIndex),
+          syntheticToken: {
+            __typename: value$1.__typename,
+            id: value$1.id
+          },
+          timestamp: GqlConverters.$$BigInt.parse(value.timestamp),
+          accumulativeFloatPerToken: GqlConverters.$$BigInt.parse(value.accumulativeFloatPerToken),
+          floatRatePerTokenOverInterval: GqlConverters.$$BigInt.parse(value.floatRatePerTokenOverInterval),
+          timeSinceLastUpdate: GqlConverters.$$BigInt.parse(value.timeSinceLastUpdate)
+        };
+}
+
+function serialize(value) {
+  var value$1 = value.timeSinceLastUpdate;
+  var value$2 = GqlConverters.$$BigInt.serialize(value$1);
+  var value$3 = value.floatRatePerTokenOverInterval;
+  var value$4 = GqlConverters.$$BigInt.serialize(value$3);
+  var value$5 = value.accumulativeFloatPerToken;
+  var value$6 = GqlConverters.$$BigInt.serialize(value$5);
+  var value$7 = value.timestamp;
+  var value$8 = GqlConverters.$$BigInt.serialize(value$7);
+  var value$9 = value.syntheticToken;
+  var value$10 = value$9.id;
+  var value$11 = value$9.__typename;
+  var syntheticToken = {
+    __typename: value$11,
+    id: value$10
+  };
+  var value$12 = value.stateIndex;
+  var value$13 = GqlConverters.$$BigInt.serialize(value$12);
+  var value$14 = value.creationTxHash;
+  var value$15 = GqlConverters.Address.serialize(value$14);
+  var value$16 = value.blockNumber;
+  var value$17 = GqlConverters.$$BigInt.serialize(value$16);
+  var value$18 = value.id;
+  var value$19 = value.__typename;
+  return {
+          __typename: value$19,
+          id: value$18,
+          blockNumber: value$17,
+          creationTxHash: value$15,
+          stateIndex: value$13,
+          syntheticToken: syntheticToken,
+          timestamp: value$8,
+          accumulativeFloatPerToken: value$6,
+          floatRatePerTokenOverInterval: value$4,
+          timeSinceLastUpdate: value$2
+        };
+}
+
+function verifyArgsAndParse(_StakerStateInfo, value) {
+  return parse(value);
+}
+
+function verifyName(param) {
+  
+}
+
+var StakerStateInfo = {
+  Raw: Raw,
+  query: query,
+  parse: parse,
+  serialize: serialize,
+  verifyArgsAndParse: verifyArgsAndParse,
+  verifyName: verifyName
+};
+
+var Raw$1 = {};
+
+var query$1 = (require("@apollo/client").gql`
+  fragment PriceInfo on Price   {
+    __typename
+    id
+    price
+    timeUpdated
+    token  {
+      __typename
+      id
+    }
+  }
+`);
+
+function parse$1(value) {
+  var value$1 = value.token;
+  return {
+          __typename: value.__typename,
+          id: value.id,
+          price: GqlConverters.$$BigInt.parse(value.price),
+          timeUpdated: GqlConverters.$$BigInt.parse(value.timeUpdated),
+          token: {
+            __typename: value$1.__typename,
+            id: value$1.id
+          }
+        };
+}
+
+function serialize$1(value) {
+  var value$1 = value.token;
+  var value$2 = value$1.id;
+  var value$3 = value$1.__typename;
+  var token = {
+    __typename: value$3,
+    id: value$2
+  };
+  var value$4 = value.timeUpdated;
+  var value$5 = GqlConverters.$$BigInt.serialize(value$4);
+  var value$6 = value.price;
+  var value$7 = GqlConverters.$$BigInt.serialize(value$6);
+  var value$8 = value.id;
+  var value$9 = value.__typename;
+  return {
+          __typename: value$9,
+          id: value$8,
+          price: value$7,
+          timeUpdated: value$5,
+          token: token
+        };
+}
+
+function verifyArgsAndParse$1(_PriceInfo, value) {
+  return parse$1(value);
+}
+
+function verifyName$1(param) {
+  
+}
+
+var PriceInfo = {
+  Raw: Raw$1,
+  query: query$1,
+  parse: parse$1,
+  serialize: serialize$1,
+  verifyArgsAndParse: verifyArgsAndParse$1,
+  verifyName: verifyName$1
+};
+
+var Raw$2 = {};
+
+var query$2 = (require("@apollo/client").gql`
+  fragment SyntheticTokenInfo on SyntheticToken   {
+    __typename
+    id
+    tokenAddress
+    syntheticMarket  {
+      __typename
+      id
+    }
+    tokenType
+    tokenSupply
+    floatMintedFromSpecificToken
+    latestStakerState  {
+      __typename
+      id
+    }
+    latestPrice  {
+      __typename
+      id
+      price  {
+        __typename
+        id
+      }
+    }
+    priceHistory  {
+      __typename
+      id
+    }
+  }
+`);
+
+function parse$2(value) {
+  var value$1 = value.syntheticMarket;
+  var value$2 = value.tokenType;
+  var tmp;
+  switch (value$2) {
+    case "Long" :
+        tmp = "Long";
+        break;
+    case "Short" :
+        tmp = "Short";
+        break;
+    default:
+      tmp = {
+        NAME: "FutureAddedValue",
+        VAL: value$2
+      };
+  }
+  var value$3 = value.latestStakerState;
+  var value$4 = value.latestPrice;
+  var value$5 = value$4.price;
+  var value$6 = value.priceHistory;
+  return {
+          __typename: value.__typename,
+          id: value.id,
+          tokenAddress: GqlConverters.Address.parse(value.tokenAddress),
+          syntheticMarket: {
+            __typename: value$1.__typename,
+            id: value$1.id
+          },
+          tokenType: tmp,
+          tokenSupply: GqlConverters.$$BigInt.parse(value.tokenSupply),
+          floatMintedFromSpecificToken: GqlConverters.$$BigInt.parse(value.floatMintedFromSpecificToken),
+          latestStakerState: {
+            __typename: value$3.__typename,
+            id: value$3.id
+          },
+          latestPrice: {
+            __typename: value$4.__typename,
+            id: value$4.id,
+            price: {
+              __typename: value$5.__typename,
+              id: value$5.id
+            }
+          },
+          priceHistory: value$6.map(function (value) {
+                return {
+                        __typename: value.__typename,
+                        id: value.id
+                      };
+              })
+        };
+}
+
+function serialize$2(value) {
+  var value$1 = value.priceHistory;
+  var priceHistory = value$1.map(function (value) {
+        var value$1 = value.id;
+        var value$2 = value.__typename;
+        return {
+                __typename: value$2,
+                id: value$1
+              };
+      });
+  var value$2 = value.latestPrice;
+  var value$3 = value$2.price;
+  var value$4 = value$3.id;
+  var value$5 = value$3.__typename;
+  var price = {
+    __typename: value$5,
+    id: value$4
+  };
+  var value$6 = value$2.id;
+  var value$7 = value$2.__typename;
+  var latestPrice = {
+    __typename: value$7,
+    id: value$6,
+    price: price
+  };
+  var value$8 = value.latestStakerState;
+  var value$9 = value$8.id;
+  var value$10 = value$8.__typename;
+  var latestStakerState = {
+    __typename: value$10,
+    id: value$9
+  };
+  var value$11 = value.floatMintedFromSpecificToken;
+  var value$12 = GqlConverters.$$BigInt.serialize(value$11);
+  var value$13 = value.tokenSupply;
+  var value$14 = GqlConverters.$$BigInt.serialize(value$13);
+  var value$15 = value.tokenType;
+  var tokenType = typeof value$15 === "object" ? value$15.VAL : (
+      value$15 === "Long" ? "Long" : "Short"
+    );
+  var value$16 = value.syntheticMarket;
+  var value$17 = value$16.id;
+  var value$18 = value$16.__typename;
+  var syntheticMarket = {
+    __typename: value$18,
+    id: value$17
+  };
+  var value$19 = value.tokenAddress;
+  var value$20 = GqlConverters.Address.serialize(value$19);
+  var value$21 = value.id;
+  var value$22 = value.__typename;
+  return {
+          __typename: value$22,
+          id: value$21,
+          tokenAddress: value$20,
+          syntheticMarket: syntheticMarket,
+          tokenType: tokenType,
+          tokenSupply: value$14,
+          floatMintedFromSpecificToken: value$12,
+          latestStakerState: latestStakerState,
+          latestPrice: latestPrice,
+          priceHistory: priceHistory
+        };
+}
+
+function verifyArgsAndParse$2(_SyntheticTokenInfo, value) {
+  return parse$2(value);
+}
+
+function verifyName$2(param) {
+  
+}
+
+var SyntheticTokenInfo = {
+  Raw: Raw$2,
+  query: query$2,
+  parse: parse$2,
+  serialize: serialize$2,
+  verifyArgsAndParse: verifyArgsAndParse$2,
+  verifyName: verifyName$2
+};
+
+var Raw$3 = {};
+
+var query$3 = (require("@apollo/client").gql`
+  fragment SystemStateInfo on SystemState   {
+    __typename
+    id
+    timestamp
+    txHash
+    blockNumber
+    marketIndex
+    syntheticPrice
+    longTokenPrice  {
+      __typename
+      id
+    }
+    shortTokenPrice  {
+      __typename
+      id
+    }
+    longToken  {
+      __typename
+      id
+    }
+    shortToken  {
+      __typename
+      id
+    }
+    totalLockedLong
+    totalLockedShort
+    totalValueLocked
+  }
+`);
+
+function parse$3(value) {
+  var value$1 = value.longTokenPrice;
+  var value$2 = value.shortTokenPrice;
+  var value$3 = value.longToken;
+  var value$4 = value.shortToken;
+  return {
+          __typename: value.__typename,
+          id: value.id,
+          timestamp: GqlConverters.$$BigInt.parse(value.timestamp),
+          txHash: GqlConverters.Address.parse(value.txHash),
+          blockNumber: GqlConverters.$$BigInt.parse(value.blockNumber),
+          marketIndex: GqlConverters.$$BigInt.parse(value.marketIndex),
+          syntheticPrice: GqlConverters.$$BigInt.parse(value.syntheticPrice),
+          longTokenPrice: {
+            __typename: value$1.__typename,
+            id: value$1.id
+          },
+          shortTokenPrice: {
+            __typename: value$2.__typename,
+            id: value$2.id
+          },
+          longToken: {
+            __typename: value$3.__typename,
+            id: value$3.id
+          },
+          shortToken: {
+            __typename: value$4.__typename,
+            id: value$4.id
+          },
+          totalLockedLong: GqlConverters.$$BigInt.parse(value.totalLockedLong),
+          totalLockedShort: GqlConverters.$$BigInt.parse(value.totalLockedShort),
+          totalValueLocked: GqlConverters.$$BigInt.parse(value.totalValueLocked)
+        };
+}
+
+function serialize$3(value) {
+  var value$1 = value.totalValueLocked;
+  var value$2 = GqlConverters.$$BigInt.serialize(value$1);
+  var value$3 = value.totalLockedShort;
+  var value$4 = GqlConverters.$$BigInt.serialize(value$3);
+  var value$5 = value.totalLockedLong;
+  var value$6 = GqlConverters.$$BigInt.serialize(value$5);
+  var value$7 = value.shortToken;
+  var value$8 = value$7.id;
+  var value$9 = value$7.__typename;
+  var shortToken = {
+    __typename: value$9,
+    id: value$8
+  };
+  var value$10 = value.longToken;
+  var value$11 = value$10.id;
+  var value$12 = value$10.__typename;
+  var longToken = {
+    __typename: value$12,
+    id: value$11
+  };
+  var value$13 = value.shortTokenPrice;
+  var value$14 = value$13.id;
+  var value$15 = value$13.__typename;
+  var shortTokenPrice = {
+    __typename: value$15,
+    id: value$14
+  };
+  var value$16 = value.longTokenPrice;
+  var value$17 = value$16.id;
+  var value$18 = value$16.__typename;
+  var longTokenPrice = {
+    __typename: value$18,
+    id: value$17
+  };
+  var value$19 = value.syntheticPrice;
+  var value$20 = GqlConverters.$$BigInt.serialize(value$19);
+  var value$21 = value.marketIndex;
+  var value$22 = GqlConverters.$$BigInt.serialize(value$21);
+  var value$23 = value.blockNumber;
+  var value$24 = GqlConverters.$$BigInt.serialize(value$23);
+  var value$25 = value.txHash;
+  var value$26 = GqlConverters.Address.serialize(value$25);
+  var value$27 = value.timestamp;
+  var value$28 = GqlConverters.$$BigInt.serialize(value$27);
+  var value$29 = value.id;
+  var value$30 = value.__typename;
+  return {
+          __typename: value$30,
+          id: value$29,
+          timestamp: value$28,
+          txHash: value$26,
+          blockNumber: value$24,
+          marketIndex: value$22,
+          syntheticPrice: value$20,
+          longTokenPrice: longTokenPrice,
+          shortTokenPrice: shortTokenPrice,
+          longToken: longToken,
+          shortToken: shortToken,
+          totalLockedLong: value$6,
+          totalLockedShort: value$4,
+          totalValueLocked: value$2
+        };
+}
+
+function verifyArgsAndParse$3(_SystemStateInfo, value) {
+  return parse$3(value);
+}
+
+function verifyName$3(param) {
+  
+}
+
+var SystemStateInfo = {
+  Raw: Raw$3,
+  query: query$3,
+  parse: parse$3,
+  serialize: serialize$3,
+  verifyArgsAndParse: verifyArgsAndParse$3,
+  verifyName: verifyName$3
+};
+
+var Raw$4 = {};
+
+var query$4 = (require("@apollo/client").gql`
+  fragment FeeStructureInfo on FeeStructure   {
+    __typename
+    id
+    baseEntryFee
+    badLiquidityEntryFee
+    baseExitFee
+    badLiquidityExitFee
+  }
+`);
+
+function parse$4(value) {
+  return {
+          __typename: value.__typename,
+          id: value.id,
+          baseEntryFee: GqlConverters.$$BigInt.parse(value.baseEntryFee),
+          badLiquidityEntryFee: GqlConverters.$$BigInt.parse(value.badLiquidityEntryFee),
+          baseExitFee: GqlConverters.$$BigInt.parse(value.baseExitFee),
+          badLiquidityExitFee: GqlConverters.$$BigInt.parse(value.badLiquidityExitFee)
+        };
+}
+
+function serialize$4(value) {
+  var value$1 = value.badLiquidityExitFee;
+  var value$2 = GqlConverters.$$BigInt.serialize(value$1);
+  var value$3 = value.baseExitFee;
+  var value$4 = GqlConverters.$$BigInt.serialize(value$3);
+  var value$5 = value.badLiquidityEntryFee;
+  var value$6 = GqlConverters.$$BigInt.serialize(value$5);
+  var value$7 = value.baseEntryFee;
+  var value$8 = GqlConverters.$$BigInt.serialize(value$7);
+  var value$9 = value.id;
+  var value$10 = value.__typename;
+  return {
+          __typename: value$10,
+          id: value$9,
+          baseEntryFee: value$8,
+          badLiquidityEntryFee: value$6,
+          baseExitFee: value$4,
+          badLiquidityExitFee: value$2
+        };
+}
+
+function verifyArgsAndParse$4(_FeeStructureInfo, value) {
+  return parse$4(value);
+}
+
+function verifyName$4(param) {
+  
+}
+
+var FeeStructureInfo = {
+  Raw: Raw$4,
+  query: query$4,
+  parse: parse$4,
+  serialize: serialize$4,
+  verifyArgsAndParse: verifyArgsAndParse$4,
+  verifyName: verifyName$4
+};
+
+var Raw$5 = {};
+
+var query$5 = (require("@apollo/client").gql`
+  fragment CollateralTokenInfo on CollateralToken   {
+    __typename
+    id
+    linkedMarkets  {
+      __typename
+      id
+    }
+  }
+`);
+
+function parse$5(value) {
+  var value$1 = value.linkedMarkets;
+  return {
+          __typename: value.__typename,
+          id: value.id,
+          linkedMarkets: value$1.map(function (value) {
+                return {
+                        __typename: value.__typename,
+                        id: value.id
+                      };
+              })
+        };
+}
+
+function serialize$5(value) {
+  var value$1 = value.linkedMarkets;
+  var linkedMarkets = value$1.map(function (value) {
+        var value$1 = value.id;
+        var value$2 = value.__typename;
+        return {
+                __typename: value$2,
+                id: value$1
+              };
+      });
+  var value$2 = value.id;
+  var value$3 = value.__typename;
+  return {
+          __typename: value$3,
+          id: value$2,
+          linkedMarkets: linkedMarkets
+        };
+}
+
+function verifyArgsAndParse$5(_CollateralTokenInfo, value) {
+  return parse$5(value);
+}
+
+function verifyName$5(param) {
+  
+}
+
+var CollateralTokenInfo = {
+  Raw: Raw$5,
+  query: query$5,
+  parse: parse$5,
+  serialize: serialize$5,
+  verifyArgsAndParse: verifyArgsAndParse$5,
+  verifyName: verifyName$5
+};
+
+var Raw$6 = {};
+
+var query$6 = (require("@apollo/client").gql`
+  fragment SyntheticMarketInfo on SyntheticMarket   {
+    __typename
+    id
+    timestampCreated
+    txHash
+    blockNumberCreated
+    collateralToken  {
+      __typename
+      id
+    }
+    name
+    symbol
+    marketIndex
+    oracleAddress
+    previousOracleAddresses
+    syntheticLong  {
+      __typename
+      id
+    }
+    syntheticShort  {
+      __typename
+      id
+    }
+    latestSystemState  {
+      __typename
+      id
+    }
+    feeStructure  {
+      __typename
+      id
+    }
+    kPeriod
+    kMultiplier
+  }
+`);
+
+function parse$6(value) {
+  var value$1 = value.collateralToken;
+  var value$2 = value.previousOracleAddresses;
+  var value$3 = value.syntheticLong;
+  var value$4 = value.syntheticShort;
+  var value$5 = value.latestSystemState;
+  var value$6 = value.feeStructure;
+  return {
+          __typename: value.__typename,
+          id: value.id,
+          timestampCreated: GqlConverters.$$BigInt.parse(value.timestampCreated),
+          txHash: GqlConverters.Address.parse(value.txHash),
+          blockNumberCreated: GqlConverters.$$BigInt.parse(value.blockNumberCreated),
+          collateralToken: {
+            __typename: value$1.__typename,
+            id: value$1.id
+          },
+          name: value.name,
+          symbol: value.symbol,
+          marketIndex: GqlConverters.$$BigInt.parse(value.marketIndex),
+          oracleAddress: GqlConverters.Address.parse(value.oracleAddress),
+          previousOracleAddresses: value$2.map(function (value) {
+                return GqlConverters.Address.parse(value);
+              }),
+          syntheticLong: {
+            __typename: value$3.__typename,
+            id: value$3.id
+          },
+          syntheticShort: {
+            __typename: value$4.__typename,
+            id: value$4.id
+          },
+          latestSystemState: {
+            __typename: value$5.__typename,
+            id: value$5.id
+          },
+          feeStructure: {
+            __typename: value$6.__typename,
+            id: value$6.id
+          },
+          kPeriod: GqlConverters.$$BigInt.parse(value.kPeriod),
+          kMultiplier: GqlConverters.$$BigInt.parse(value.kMultiplier)
+        };
+}
+
+function serialize$6(value) {
+  var value$1 = value.kMultiplier;
+  var value$2 = GqlConverters.$$BigInt.serialize(value$1);
+  var value$3 = value.kPeriod;
+  var value$4 = GqlConverters.$$BigInt.serialize(value$3);
+  var value$5 = value.feeStructure;
+  var value$6 = value$5.id;
+  var value$7 = value$5.__typename;
+  var feeStructure = {
+    __typename: value$7,
+    id: value$6
+  };
+  var value$8 = value.latestSystemState;
+  var value$9 = value$8.id;
+  var value$10 = value$8.__typename;
+  var latestSystemState = {
+    __typename: value$10,
+    id: value$9
+  };
+  var value$11 = value.syntheticShort;
+  var value$12 = value$11.id;
+  var value$13 = value$11.__typename;
+  var syntheticShort = {
+    __typename: value$13,
+    id: value$12
+  };
+  var value$14 = value.syntheticLong;
+  var value$15 = value$14.id;
+  var value$16 = value$14.__typename;
+  var syntheticLong = {
+    __typename: value$16,
+    id: value$15
+  };
+  var value$17 = value.previousOracleAddresses;
+  var previousOracleAddresses = value$17.map(function (value) {
+        return GqlConverters.Address.serialize(value);
+      });
+  var value$18 = value.oracleAddress;
+  var value$19 = GqlConverters.Address.serialize(value$18);
+  var value$20 = value.marketIndex;
+  var value$21 = GqlConverters.$$BigInt.serialize(value$20);
+  var value$22 = value.symbol;
+  var value$23 = value.name;
+  var value$24 = value.collateralToken;
+  var value$25 = value$24.id;
+  var value$26 = value$24.__typename;
+  var collateralToken = {
+    __typename: value$26,
+    id: value$25
+  };
+  var value$27 = value.blockNumberCreated;
+  var value$28 = GqlConverters.$$BigInt.serialize(value$27);
+  var value$29 = value.txHash;
+  var value$30 = GqlConverters.Address.serialize(value$29);
+  var value$31 = value.timestampCreated;
+  var value$32 = GqlConverters.$$BigInt.serialize(value$31);
+  var value$33 = value.id;
+  var value$34 = value.__typename;
+  return {
+          __typename: value$34,
+          id: value$33,
+          timestampCreated: value$32,
+          txHash: value$30,
+          blockNumberCreated: value$28,
+          collateralToken: collateralToken,
+          name: value$23,
+          symbol: value$22,
+          marketIndex: value$21,
+          oracleAddress: value$19,
+          previousOracleAddresses: previousOracleAddresses,
+          syntheticLong: syntheticLong,
+          syntheticShort: syntheticShort,
+          latestSystemState: latestSystemState,
+          feeStructure: feeStructure,
+          kPeriod: value$4,
+          kMultiplier: value$2
+        };
+}
+
+function verifyArgsAndParse$6(_SyntheticMarketInfo, value) {
+  return parse$6(value);
+}
+
+function verifyName$6(param) {
+  
+}
+
+var SyntheticMarketInfo = {
+  Raw: Raw$6,
+  query: query$6,
+  parse: parse$6,
+  serialize: serialize$6,
+  verifyArgsAndParse: verifyArgsAndParse$6,
+  verifyName: verifyName$6
+};
+
+var Raw$7 = {};
+
+var query$7 = (require("@apollo/client").gql`
   query   {
     stateChanges(first: 1000)  {
       __typename
@@ -38,7 +824,7 @@ var query = (require("@apollo/client").gql`
   }
 `);
 
-function parse(value) {
+function parse$7(value) {
   var value$1 = value.stateChanges;
   return {
           stateChanges: value$1.map(function (value) {
@@ -83,7 +869,7 @@ function parse(value) {
         };
 }
 
-function serialize(value) {
+function serialize$7(value) {
   var value$1 = value.stateChanges;
   var stateChanges = value$1.map(function (value) {
         var value$1 = value.affectedUsers;
@@ -164,20 +950,20 @@ function makeDefaultVariables(param) {
 }
 
 var GetAllStateChanges_inner = {
-  Raw: Raw,
-  query: query,
-  parse: parse,
-  serialize: serialize,
+  Raw: Raw$7,
+  query: query$7,
+  parse: parse$7,
+  serialize: serialize$7,
   serializeVariables: serializeVariables,
   makeVariables: makeVariables,
   makeDefaultVariables: makeDefaultVariables
 };
 
 var include = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query,
-      Raw: Raw,
-      parse: parse,
-      serialize: serialize,
+      query: query$7,
+      Raw: Raw$7,
+      parse: parse$7,
+      serialize: serialize$7,
       serializeVariables: serializeVariables
     });
 
@@ -191,10 +977,10 @@ var GetAllStateChanges_useLazyWithVariables = include.useLazyWithVariables;
 
 var GetAllStateChanges = {
   GetAllStateChanges_inner: GetAllStateChanges_inner,
-  Raw: Raw,
-  query: query,
-  parse: parse,
-  serialize: serialize,
+  Raw: Raw$7,
+  query: query$7,
+  parse: parse$7,
+  serialize: serialize$7,
   serializeVariables: serializeVariables,
   makeVariables: makeVariables,
   makeDefaultVariables: makeDefaultVariables,
@@ -206,10 +992,10 @@ var GetAllStateChanges = {
 
 function getAllStateChanges(param) {
   var __x = Curry._6(Client.instance.rescript_query, {
-        query: query,
-        Raw: Raw,
-        parse: parse,
-        serialize: serialize,
+        query: query$7,
+        Raw: Raw$7,
+        parse: parse$7,
+        serialize: serialize$7,
         serializeVariables: serializeVariables
       }, undefined, undefined, undefined, undefined, undefined);
   return __x.then(function (result) {
@@ -221,9 +1007,9 @@ function getAllStateChanges(param) {
             });
 }
 
-var Raw$1 = {};
+var Raw$8 = {};
 
-var query$1 = (require("@apollo/client").gql`
+var query$8 = (require("@apollo/client").gql`
   query ($blockNumber: Int!)  {
     globalState(id: "globalState", block: {number: $blockNumber})  {
       __typename
@@ -256,7 +1042,7 @@ var query$1 = (require("@apollo/client").gql`
   }
 `);
 
-function parse$1(value) {
+function parse$8(value) {
   var value$1 = value.globalState;
   var tmp;
   if (value$1 == null) {
@@ -299,7 +1085,7 @@ function parse$1(value) {
         };
 }
 
-function serialize$1(value) {
+function serialize$8(value) {
   var value$1 = value.globalState;
   var globalState;
   if (value$1 !== undefined) {
@@ -390,19 +1176,19 @@ function makeVariables$1(blockNumber, param) {
 }
 
 var GetGlobalState_inner = {
-  Raw: Raw$1,
-  query: query$1,
-  parse: parse$1,
-  serialize: serialize$1,
+  Raw: Raw$8,
+  query: query$8,
+  parse: parse$8,
+  serialize: serialize$8,
   serializeVariables: serializeVariables$1,
   makeVariables: makeVariables$1
 };
 
 var include$1 = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query$1,
-      Raw: Raw$1,
-      parse: parse$1,
-      serialize: serialize$1,
+      query: query$8,
+      Raw: Raw$8,
+      parse: parse$8,
+      serialize: serialize$8,
       serializeVariables: serializeVariables$1
     });
 
@@ -416,10 +1202,10 @@ var GetGlobalState_useLazyWithVariables = include$1.useLazyWithVariables;
 
 var GetGlobalState = {
   GetGlobalState_inner: GetGlobalState_inner,
-  Raw: Raw$1,
-  query: query$1,
-  parse: parse$1,
-  serialize: serialize$1,
+  Raw: Raw$8,
+  query: query$8,
+  parse: parse$8,
+  serialize: serialize$8,
   serializeVariables: serializeVariables$1,
   makeVariables: makeVariables$1,
   refetchQueryDescription: GetGlobalState_refetchQueryDescription,
@@ -430,10 +1216,10 @@ var GetGlobalState = {
 
 function getGlobalStateAtBlock(blockNumber) {
   var __x = Curry._6(Client.instance.rescript_query, {
-        query: query$1,
-        Raw: Raw$1,
-        parse: parse$1,
-        serialize: serialize$1,
+        query: query$8,
+        Raw: Raw$8,
+        parse: parse$8,
+        serialize: serialize$8,
         serializeVariables: serializeVariables$1
       }, undefined, undefined, undefined, undefined, {
         blockNumber: blockNumber
@@ -451,11 +1237,228 @@ function getGlobalStateAtBlock(blockNumber) {
             });
 }
 
+var Raw$9 = {};
+
+var query$9 = ((frag_0) => require("@apollo/client").gql`
+  query ($marketId: String!, $blockNumber: Int!)  {
+    syntheticMarket(id: $marketId, block: {number: $blockNumber})  {
+      ...SyntheticMarketInfo
+    }
+  }
+  ${frag_0}
+`)(query$6);
+
+function parse$9(value) {
+  var value$1 = value.syntheticMarket;
+  return {
+          syntheticMarket: !(value$1 == null) ? parse$6(value$1) : undefined
+        };
+}
+
+function serialize$9(value) {
+  var value$1 = value.syntheticMarket;
+  var syntheticMarket = value$1 !== undefined ? serialize$6(value$1) : null;
+  return {
+          syntheticMarket: syntheticMarket
+        };
+}
+
+function serializeVariables$2(inp) {
+  return {
+          marketId: inp.marketId,
+          blockNumber: inp.blockNumber
+        };
+}
+
+function makeVariables$2(marketId, blockNumber, param) {
+  return {
+          marketId: marketId,
+          blockNumber: blockNumber
+        };
+}
+
+var SyntheticMarket_inner = {
+  Raw: Raw$9,
+  query: query$9,
+  parse: parse$9,
+  serialize: serialize$9,
+  serializeVariables: serializeVariables$2,
+  makeVariables: makeVariables$2
+};
+
+var include$2 = ApolloClient__React_Hooks_UseQuery.Extend({
+      query: query$9,
+      Raw: Raw$9,
+      parse: parse$9,
+      serialize: serialize$9,
+      serializeVariables: serializeVariables$2
+    });
+
+var SyntheticMarket_refetchQueryDescription = include$2.refetchQueryDescription;
+
+var SyntheticMarket_use = include$2.use;
+
+var SyntheticMarket_useLazy = include$2.useLazy;
+
+var SyntheticMarket_useLazyWithVariables = include$2.useLazyWithVariables;
+
+var SyntheticMarket = {
+  SyntheticMarket_inner: SyntheticMarket_inner,
+  Raw: Raw$9,
+  query: query$9,
+  parse: parse$9,
+  serialize: serialize$9,
+  serializeVariables: serializeVariables$2,
+  makeVariables: makeVariables$2,
+  refetchQueryDescription: SyntheticMarket_refetchQueryDescription,
+  use: SyntheticMarket_use,
+  useLazy: SyntheticMarket_useLazy,
+  useLazyWithVariables: SyntheticMarket_useLazyWithVariables
+};
+
+var Raw$10 = {};
+
+var query$10 = ((frag_0) => require("@apollo/client").gql`
+  query ($tokenId: String!, $blockNumber: Int!)  {
+    syntheticToken(id: $tokenId, block: {number: $blockNumber})  {
+      ...SyntheticTokenInfo
+    }
+  }
+  ${frag_0}
+`)(query$2);
+
+function parse$10(value) {
+  var value$1 = value.syntheticToken;
+  return {
+          syntheticToken: !(value$1 == null) ? parse$2(value$1) : undefined
+        };
+}
+
+function serialize$10(value) {
+  var value$1 = value.syntheticToken;
+  var syntheticToken = value$1 !== undefined ? serialize$2(value$1) : null;
+  return {
+          syntheticToken: syntheticToken
+        };
+}
+
+function serializeVariables$3(inp) {
+  return {
+          tokenId: inp.tokenId,
+          blockNumber: inp.blockNumber
+        };
+}
+
+function makeVariables$3(tokenId, blockNumber, param) {
+  return {
+          tokenId: tokenId,
+          blockNumber: blockNumber
+        };
+}
+
+var SyntheticToken_inner = {
+  Raw: Raw$10,
+  query: query$10,
+  parse: parse$10,
+  serialize: serialize$10,
+  serializeVariables: serializeVariables$3,
+  makeVariables: makeVariables$3
+};
+
+var include$3 = ApolloClient__React_Hooks_UseQuery.Extend({
+      query: query$10,
+      Raw: Raw$10,
+      parse: parse$10,
+      serialize: serialize$10,
+      serializeVariables: serializeVariables$3
+    });
+
+var SyntheticToken_refetchQueryDescription = include$3.refetchQueryDescription;
+
+var SyntheticToken_use = include$3.use;
+
+var SyntheticToken_useLazy = include$3.useLazy;
+
+var SyntheticToken_useLazyWithVariables = include$3.useLazyWithVariables;
+
+var SyntheticToken = {
+  SyntheticToken_inner: SyntheticToken_inner,
+  Raw: Raw$10,
+  query: query$10,
+  parse: parse$10,
+  serialize: serialize$10,
+  serializeVariables: serializeVariables$3,
+  makeVariables: makeVariables$3,
+  refetchQueryDescription: SyntheticToken_refetchQueryDescription,
+  use: SyntheticToken_use,
+  useLazy: SyntheticToken_useLazy,
+  useLazyWithVariables: SyntheticToken_useLazyWithVariables
+};
+
+function getSyntheticMarketAtBlock(marketId, blockNumber) {
+  var __x = Curry._6(Client.instance.rescript_query, {
+        query: query$9,
+        Raw: Raw$9,
+        parse: parse$9,
+        serialize: serialize$9,
+        serializeVariables: serializeVariables$2
+      }, undefined, undefined, undefined, undefined, {
+        marketId: marketId,
+        blockNumber: blockNumber
+      });
+  return __x.then(function (result) {
+              if (result.TAG !== /* Ok */0) {
+                return Promise.reject(result._0);
+              }
+              var syntheticMarket = result._0.data.syntheticMarket;
+              if (syntheticMarket !== undefined) {
+                return Promise.resolve(syntheticMarket);
+              } else {
+                return Promise.resolve(undefined);
+              }
+            });
+}
+
+function getSyntheticTokenAtBlock(tokenId, blockNumber) {
+  var __x = Curry._6(Client.instance.rescript_query, {
+        query: query$10,
+        Raw: Raw$10,
+        parse: parse$10,
+        serialize: serialize$10,
+        serializeVariables: serializeVariables$3
+      }, undefined, undefined, undefined, undefined, {
+        tokenId: tokenId,
+        blockNumber: blockNumber
+      });
+  return __x.then(function (result) {
+              if (result.TAG !== /* Ok */0) {
+                return Promise.reject(result._0);
+              }
+              var syntheticToken = result._0.data.syntheticToken;
+              if (syntheticToken !== undefined) {
+                return Promise.resolve(syntheticToken);
+              } else {
+                return Promise.resolve(undefined);
+              }
+            });
+}
+
 var ApolloQueryResult;
 
 exports.ApolloQueryResult = ApolloQueryResult;
+exports.StakerStateInfo = StakerStateInfo;
+exports.PriceInfo = PriceInfo;
+exports.SyntheticTokenInfo = SyntheticTokenInfo;
+exports.SystemStateInfo = SystemStateInfo;
+exports.FeeStructureInfo = FeeStructureInfo;
+exports.CollateralTokenInfo = CollateralTokenInfo;
+exports.SyntheticMarketInfo = SyntheticMarketInfo;
 exports.GetAllStateChanges = GetAllStateChanges;
 exports.getAllStateChanges = getAllStateChanges;
 exports.GetGlobalState = GetGlobalState;
 exports.getGlobalStateAtBlock = getGlobalStateAtBlock;
+exports.SyntheticMarket = SyntheticMarket;
+exports.SyntheticToken = SyntheticToken;
+exports.getSyntheticMarketAtBlock = getSyntheticMarketAtBlock;
+exports.getSyntheticTokenAtBlock = getSyntheticTokenAtBlock;
 /* query Not a pure module */

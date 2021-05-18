@@ -4,7 +4,7 @@ let make = (~txStateRedeem, ~resetFormButton, ~buttonText, ~buttonDisabled) => {
   | ContractActions.Created => <>
       <Modal id={5}>
         <div className="text-center m-3">
-          <EllipsesLoader />
+          <Loader.Ellipses />
           <h1> {`Confirm the transaction to redeem ${Config.paymentTokenName}`->React.string} </h1>
         </div>
       </Modal>
@@ -14,7 +14,7 @@ let make = (~txStateRedeem, ~resetFormButton, ~buttonText, ~buttonDisabled) => {
   | ContractActions.SignedAndSubmitted(txHash) => <>
       <Modal id={7}>
         <div className="text-center m-3">
-          <div className="m-2"> <MiniLoader /> </div>
+          <div className="m-2"> <Loader.Mini /> </div>
           <p> {"Redeem transaction pending... "->React.string} </p>
           <ViewOnBlockExplorer txHash />
         </div>

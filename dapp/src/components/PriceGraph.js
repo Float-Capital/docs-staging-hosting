@@ -5,11 +5,12 @@ var Misc = require("../libraries/Misc.js");
 var View = require("../libraries/View.js");
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Button = require("./UI/Button.js");
+var Button = require("./UI/Base/Button.js");
 var Client = require("../data/Client.js");
 var Ethers = require("../ethereum/Ethers.js");
 var Js_int = require("rescript/lib/js/js_int.js");
 var Js_math = require("rescript/lib/js/js_math.js");
+var Queries = require("../data/Queries.js");
 var Caml_obj = require("rescript/lib/js/caml_obj.js");
 var Recharts = require("recharts");
 var CONSTANTS = require("../CONSTANTS.js");
@@ -17,141 +18,14 @@ var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Float = require("rescript/lib/js/belt_Float.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
-var GqlConverters = require("../libraries/GqlConverters.js");
 var Format = require("date-fns/format").default;
 var BsRecharts__XAxis = require("@ahrefs/bs-recharts/src/BsRecharts__XAxis.js");
 var BsRecharts__YAxis = require("@ahrefs/bs-recharts/src/BsRecharts__YAxis.js");
 var BsRecharts__Tooltip = require("@ahrefs/bs-recharts/src/BsRecharts__Tooltip.js");
 var FromUnixTime = require("date-fns/fromUnixTime").default;
 var BsRecharts__ResponsiveContainer = require("@ahrefs/bs-recharts/src/BsRecharts__ResponsiveContainer.js");
-var ApolloClient__React_Hooks_UseQuery = require("rescript-apollo-client/src/@apollo/client/react/hooks/ApolloClient__React_Hooks_UseQuery.js");
 
 var ethAdrToLowerStr = Ethers.Utils.ethAdrToLowerStr;
-
-var Raw = {};
-
-var query = (require("@apollo/client").gql`
-  query ($intervalId: String!, $numDataPoints: Int!)  {
-    priceIntervalManager(id: $intervalId)  {
-      __typename
-      id
-      prices(first: $numDataPoints, orderBy: intervalIndex, orderDirection: desc)  {
-        __typename
-        startTimestamp
-        endPrice
-      }
-    }
-  }
-`);
-
-function parse(value) {
-  var value$1 = value.priceIntervalManager;
-  var tmp;
-  if (value$1 == null) {
-    tmp = undefined;
-  } else {
-    var value$2 = value$1.prices;
-    tmp = {
-      __typename: value$1.__typename,
-      id: value$1.id,
-      prices: value$2.map(function (value) {
-            return {
-                    __typename: value.__typename,
-                    startTimestamp: GqlConverters.$$Date.parse(value.startTimestamp),
-                    endPrice: GqlConverters.$$BigInt.parse(value.endPrice)
-                  };
-          })
-    };
-  }
-  return {
-          priceIntervalManager: tmp
-        };
-}
-
-function serialize(value) {
-  var value$1 = value.priceIntervalManager;
-  var priceIntervalManager;
-  if (value$1 !== undefined) {
-    var value$2 = value$1.prices;
-    var prices = value$2.map(function (value) {
-          var value$1 = value.endPrice;
-          var value$2 = GqlConverters.$$BigInt.serialize(value$1);
-          var value$3 = value.startTimestamp;
-          var value$4 = GqlConverters.$$Date.serialize(value$3);
-          var value$5 = value.__typename;
-          return {
-                  __typename: value$5,
-                  startTimestamp: value$4,
-                  endPrice: value$2
-                };
-        });
-    var value$3 = value$1.id;
-    var value$4 = value$1.__typename;
-    priceIntervalManager = {
-      __typename: value$4,
-      id: value$3,
-      prices: prices
-    };
-  } else {
-    priceIntervalManager = null;
-  }
-  return {
-          priceIntervalManager: priceIntervalManager
-        };
-}
-
-function serializeVariables(inp) {
-  return {
-          intervalId: inp.intervalId,
-          numDataPoints: inp.numDataPoints
-        };
-}
-
-function makeVariables(intervalId, numDataPoints, param) {
-  return {
-          intervalId: intervalId,
-          numDataPoints: numDataPoints
-        };
-}
-
-var PriceHistory_inner = {
-  Raw: Raw,
-  query: query,
-  parse: parse,
-  serialize: serialize,
-  serializeVariables: serializeVariables,
-  makeVariables: makeVariables
-};
-
-var include = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query,
-      Raw: Raw,
-      parse: parse,
-      serialize: serialize,
-      serializeVariables: serializeVariables
-    });
-
-var use = include.use;
-
-var PriceHistory_refetchQueryDescription = include.refetchQueryDescription;
-
-var PriceHistory_useLazy = include.useLazy;
-
-var PriceHistory_useLazyWithVariables = include.useLazyWithVariables;
-
-var PriceHistory = {
-  PriceHistory_inner: PriceHistory_inner,
-  Raw: Raw,
-  query: query,
-  parse: parse,
-  serialize: serialize,
-  serializeVariables: serializeVariables,
-  makeVariables: makeVariables,
-  refetchQueryDescription: PriceHistory_refetchQueryDescription,
-  use: use,
-  useLazy: PriceHistory_useLazy,
-  useLazyWithVariables: PriceHistory_useLazyWithVariables
-};
 
 function PriceGraph$LoadedGraph(Props) {
   var data = Props.data;
@@ -385,28 +259,28 @@ function zoomAndNumDataPointsFromGraphSetting(graphSetting) {
   switch (graphSetting) {
     case /* Day */0 :
         return [
-                CONSTANTS.oneHourInSeconds,
-                24
+                CONSTANTS.fiveMinutesInSeconds,
+                288
               ];
     case /* Week */1 :
         return [
-                CONSTANTS.halfDayInSeconds,
-                14
+                CONSTANTS.oneHourInSeconds,
+                168
               ];
     case /* Month */2 :
         return [
-                CONSTANTS.oneDayInSeconds,
-                30
+                CONSTANTS.halfDayInSeconds,
+                60
               ];
     case /* ThreeMonth */3 :
         return [
-                CONSTANTS.threeMonthsInSeconds,
-                30
+                CONSTANTS.oneDayInSeconds,
+                90
               ];
     case /* Year */4 :
         return [
-                CONSTANTS.twoWeeksInSeconds,
-                26
+                CONSTANTS.oneWeekInSeconds,
+                52
               ];
     
   }
@@ -489,7 +363,7 @@ function PriceGraph(Props) {
   var setGraphSetting = match$3[1];
   var graphSetting = match$3[0];
   var match$4 = zoomAndNumDataPointsFromGraphSetting(graphSetting);
-  var priceHistory = Curry.app(use, [
+  var priceHistory = Curry.app(Queries.PriceHistory.use, [
         undefined,
         Caml_option.some(Client.createContext(/* PriceHistory */1)),
         undefined,
@@ -579,7 +453,7 @@ function PriceGraph(Props) {
                                           }),
                                         children: text,
                                         disabled: minThreshodFromGraphSetting(buttonSetting) > timeMaketHasExisted,
-                                        active: Caml_obj.caml_equal(graphSetting, buttonSetting),
+                                        active: typeof buttonSetting === "number" || typeof graphSetting === "number" ? Caml_obj.caml_equal(buttonSetting, graphSetting) : true,
                                         key: text
                                       });
                           })))));
@@ -588,7 +462,6 @@ function PriceGraph(Props) {
 var make = PriceGraph;
 
 exports.ethAdrToLowerStr = ethAdrToLowerStr;
-exports.PriceHistory = PriceHistory;
 exports.LoadedGraph = LoadedGraph;
 exports.minThreshodFromGraphSetting = minThreshodFromGraphSetting;
 exports.btnTextFromGraphSetting = btnTextFromGraphSetting;
@@ -599,4 +472,4 @@ exports.zoomAndNumDataPointsFromGraphSetting = zoomAndNumDataPointsFromGraphSett
 exports.extractGraphPriceInfo = extractGraphPriceInfo;
 exports.generateDummyData = generateDummyData;
 exports.make = make;
-/* query Not a pure module */
+/* Misc Not a pure module */

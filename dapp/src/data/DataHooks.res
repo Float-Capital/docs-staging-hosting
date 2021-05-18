@@ -119,6 +119,16 @@ let useStakesForUser = (~userId) => {
   }
 }
 
+type synthBalanceMetadata = {
+  timeLastUpdated: Ethers.BigNumber.t,
+  oracleAddress: Ethers.ethAddress,
+  marketIndex: Ethers.BigNumber.t,
+  tokenSupply: Ethers.BigNumber.t,
+  totalLockedLong: Ethers.BigNumber.t,
+  totalLockedShort: Ethers.BigNumber.t,
+  syntheticPrice: Ethers.BigNumber.t,
+}
+
 type userSynthBalance = {
   addr: Ethers.ethAddress,
   name: string,
@@ -126,6 +136,7 @@ type userSynthBalance = {
   isLong: bool,
   tokenBalance: Ethers.BigNumber.t,
   tokensValue: Ethers.BigNumber.t,
+  metadata: synthBalanceMetadata,
 }
 
 type usersBalanceSummary = {
@@ -143,10 +154,18 @@ let useUsersBalances = (~userId) => {
       {totalBalance, balances},
       {
         tokenBalance,
+        timeLastUpdated,
         syntheticToken: {
           id,
           tokenType,
-          syntheticMarket: {name, symbol},
+          tokenSupply,
+          syntheticMarket: {
+            name,
+            symbol,
+            oracleAddress,
+            marketIndex,
+            latestSystemState: {totalLockedLong, totalLockedShort, syntheticPrice},
+          },
           latestPrice: {price: {price}},
         },
       },
@@ -161,6 +180,15 @@ let useUsersBalances = (~userId) => {
         tokensValue: price
         ->Ethers.BigNumber.mul(tokenBalance)
         ->Ethers.BigNumber.div(CONSTANTS.tenToThe18),
+        metadata: {
+          timeLastUpdated: timeLastUpdated,
+          marketIndex: marketIndex,
+          oracleAddress: oracleAddress,
+          tokenSupply: tokenSupply,
+          totalLockedLong: totalLockedLong,
+          totalLockedShort: totalLockedShort,
+          syntheticPrice: syntheticPrice,
+        },
       }
       {
         totalBalance: totalBalance->Ethers.BigNumber.add(newToken.tokensValue),
@@ -275,6 +303,20 @@ let useSyntheticTokenBalanceOrZero = (~user, ~tokenAddress) => {
   }
 }
 
+let useTokenPriceAtTime = (~tokenAddress, ~timestamp) => {
+  let query = Queries.TokenPrice.use({
+    tokenAddress: tokenAddress->Ethers.Utils.ethAdrToLowerStr,
+    timestamp: timestamp->Ethers.BigNumber.toNumber,
+  })
+
+  switch query {
+  | {data: Some({prices: [{price}]})} => Response(price)
+  | {data: Some(_)} => GraphError(`Couldn't find price with that timestamp.`)
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
+  }
+}
+
 @ocaml.doc(`Utilities and helpers for react hooks that fetch data from graphql`)
 module Util = {
   @ocaml.doc(`Convert a graphResponse into an option`)
@@ -316,4 +358,67 @@ let useTokenMarketId = (~tokenId) => {
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
   }
+}
+
+@send external getTime: Js_date.t => int = "getTime"
+
+let getUnixTime = date => date->getTime / 1000
+
+@send external toFixed: (float, int) => string = "toFixed"
+
+@ocaml.doc(`Returns both the price of the synthetic asset timeLastUpdated, and a current estimate of its price`)
+let useSyntheticPrices = (
+  ~metadata as {
+    oracleAddress,
+    timeLastUpdated: timestamp,
+    tokenSupply,
+    totalLockedLong,
+    totalLockedShort,
+    syntheticPrice,
+  }: synthBalanceMetadata,
+  ~tokenAddress,
+  ~isLong,
+) => {
+  let initialTokenPriceResponse = useTokenPriceAtTime(~tokenAddress, ~timestamp)
+  let priceHistoryQuery = Queries.PriceHistory.use(
+    ~context=Client.createContext(Client.PriceHistory),
+    {
+      intervalId: `${oracleAddress->ethAdrToLowerStr}-${CONSTANTS.fiveMinutesInSeconds->Int.toString}`,
+      numDataPoints: 1,
+    },
+  )
+  let finalPriceResponse =
+    priceHistoryQuery
+    ->Util.queryToResponse
+    ->(
+      (response: graphResponse<Queries.PriceHistory.PriceHistory_inner.t>) =>
+        switch response {
+        | Loading => {
+            let loading: graphResponse<Ethers.BigNumber.t> = Loading
+            loading
+          }
+        | Response({
+            priceIntervalManager: Some({prices: [{endPrice, startTimestamp: priceQueryDate}]}),
+          }) =>
+          if priceQueryDate->getUnixTime->Ethers.BigNumber.fromInt->Ethers.BigNumber.gt(timestamp) {
+            Response(
+              MarketSimulation.simulateMarketPriceChange(
+                ~oldPrice=syntheticPrice,
+                ~newPrice=endPrice,
+                ~totalLockedLong,
+                ~totalLockedShort,
+                ~tokenIsLong=isLong,
+                ~tokenSupply,
+              ),
+            )
+          } else {
+            Response(syntheticPrice)
+          }
+
+        | Response(_) => GraphError(`Unspecifed graph error`)
+        | GraphError(s) => GraphError(s)
+        }
+    )
+
+  liftGraphResponse2(initialTokenPriceResponse, finalPriceResponse)
 }

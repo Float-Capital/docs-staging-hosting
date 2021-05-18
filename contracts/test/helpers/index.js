@@ -101,10 +101,6 @@ const createSynthetic = async (
     from: admin,
   });
 
-  const yieldManager = await YieldManager.new({
-    from: admin,
-  });
-
   await fundToken.initialize("fund token", "FND", {
     from: admin,
   });
@@ -113,7 +109,7 @@ const createSynthetic = async (
     from: admin,
   });
 
-  await yieldManager.setup(admin, longShort.address, fundToken.address, {
+  const yieldManager = await YieldManager.new(admin, longShort.address, fundToken.address, {
     from: admin,
   });
 
@@ -204,7 +200,7 @@ const feeCalculation = (
   feeUnitsOfPrecision = new BN(_feeUnitsOfPrecision);
 
   let fees;
-  //console.log("am i going off");
+
   // simple 0.5% fee
   if (isLongDeposit) {
     // Adding to heavy side

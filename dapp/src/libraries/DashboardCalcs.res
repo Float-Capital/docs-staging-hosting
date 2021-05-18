@@ -35,7 +35,7 @@ let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>, ~
       "short",
     )
 
-    let longFloatApy = StakeCard.myfloatCalc(
+    let longFloatApy = MarketCalculationHelpers.calculateFloatAPY(
       totalLockedLong,
       totalLockedShort,
       StakeCard.kperiodHardcode,
@@ -45,7 +45,7 @@ let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>, ~
       "long",
     )
 
-    let shortFloatApy = StakeCard.myfloatCalc(
+    let shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(
       totalLockedLong,
       totalLockedShort,
       StakeCard.kperiodHardcode,

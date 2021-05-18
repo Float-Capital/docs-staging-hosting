@@ -36,7 +36,6 @@ module.exports = {
       },
     },
   },
-  defaultNetwork: "mumbai",
   networks: {
     hardhat: {
     },

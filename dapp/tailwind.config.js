@@ -5,9 +5,7 @@ module.exports = {
   purge: {
     // Specify the paths to all of the template files in your project
     content: [
-      "./src/components/**/*.res",
-      "./src/layouts/**/*.res",
-      "./src/*.res",
+      "./src/**/*.res",
     ],
     options: {
       safelist: ["html", "body"],
@@ -30,6 +28,7 @@ module.exports = {
      so we added the Tailwind default values here for
      convenience */
     fontSize: {
+      xxxs: ".5rem",
       xxs: ".6rem",
       xs: ".75rem",
       sm: ".875rem",

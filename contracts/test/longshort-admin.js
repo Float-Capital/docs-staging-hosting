@@ -47,7 +47,7 @@ contract("LongShort (admin)", (accounts) => {
     marketIndex = synthResult.currentMarketIndex;
   });
 
-  it("shouldn't allow non admin to update the oracle", async () => {
+  it("<IMPLEMENTED IN WAFFLE> shouldn't allow non admin to update the oracle", async () => {
     const newOracleAddress = zeroAddressStr;
 
     await expectRevert(

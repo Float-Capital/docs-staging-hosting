@@ -1,4 +1,4 @@
-import Stake from "src/Stake";
+import Stake from "src/pages/Stake";
 import HtmlHeader from "src/components/HtmlHeader.js";
 
 export default function StakePage(props) {

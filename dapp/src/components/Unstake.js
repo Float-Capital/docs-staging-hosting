@@ -3,20 +3,20 @@
 
 var Form = require("./Form.js");
 var Curry = require("rescript/lib/js/curry.js");
-var Login = require("./Login/Login.js");
-var Modal = require("./UI/Modal.js");
+var Login = require("../pages/Login.js");
+var Modal = require("./UI/Base/Modal.js");
 var React = require("react");
-var Button = require("./UI/Button.js");
+var Button = require("./UI/Base/Button.js");
 var Config = require("../Config.js");
 var Ethers = require("../ethereum/Ethers.js");
+var Loader = require("./UI/Base/Loader.js");
 var Ethers$1 = require("ethers");
 var Queries = require("../data/Queries.js");
 var Contracts = require("../ethereum/Contracts.js");
 var DataHooks = require("../data/DataHooks.js");
 var Formality = require("re-formality/src/Formality.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var MiniLoader = require("./UI/MiniLoader.js");
-var AmountInput = require("./UI/AmountInput.js");
+var AmountInput = require("./UI/Base/AmountInput.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
@@ -30,7 +30,7 @@ var Formality__ReactUpdate = require("re-formality/src/Formality__ReactUpdate.js
 
 var validators = {
   amount: {
-    strategy: /* OnFirstBlur */0,
+    strategy: /* OnFirstSuccessOrFirstBlur */3,
     validate: (function (param) {
         return Form.Validators.etherNumberInput(param.amount);
       })
@@ -440,7 +440,7 @@ function Unstake$UnstakeTxStatusModal(Props) {
                     id: "unstake-2",
                     children: React.createElement("div", {
                           className: "text-center m-3"
-                        }, React.createElement(MiniLoader.make, {}), React.createElement("p", undefined, "Unstake transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                        }, React.createElement(Loader.Mini.make, {}), React.createElement("p", undefined, "Unstake transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
                               txHash: txStateUnstake._0
                             }))
                   });
@@ -479,8 +479,9 @@ function Unstake$StakeFormInput(Props) {
   var onChangeOpt = Props.onChange;
   var onBlurOpt = Props.onBlur;
   var onMaxClickOpt = Props.onMaxClick;
-  var synthetic = Props.synthetic;
   var txStateModalOpt = Props.txStateModal;
+  var buttonDisabledOpt = Props.buttonDisabled;
+  var buttonText = Props.buttonText;
   var onSubmit = onSubmitOpt !== undefined ? onSubmitOpt : (function (param) {
         
       });
@@ -497,6 +498,7 @@ function Unstake$StakeFormInput(Props) {
         
       });
   var txStateModal = txStateModalOpt !== undefined ? Caml_option.valFromOption(txStateModalOpt) : null;
+  var buttonDisabled = buttonDisabledOpt !== undefined ? buttonDisabledOpt : false;
   return React.createElement(Form.make, {
               className: "",
               onSubmit: onSubmit,
@@ -513,7 +515,8 @@ function Unstake$StakeFormInput(Props) {
                   onClick: (function (param) {
                       return Curry._1(onSubmit, undefined);
                     }),
-                  children: "Unstake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name
+                  children: buttonText,
+                  disabled: buttonDisabled
                 }), txStateModal);
 }
 
@@ -614,6 +617,28 @@ function Unstake$ConnectedStakeForm(Props) {
                 children: "Reset & Unstake Again"
               });
   };
+  var match$1 = form.amountResult;
+  var formAmount = match$1 !== undefined && match$1.TAG === /* Ok */0 ? Caml_option.some(match$1._0) : undefined;
+  var defaultButtonText = "Unstake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name;
+  var match$2;
+  if (formAmount !== undefined && optTokenBalance !== undefined) {
+    var greaterThanBalance = Caml_option.valFromOption(formAmount).gt(Caml_option.valFromOption(optTokenBalance));
+    match$2 = greaterThanBalance ? [
+        "Amount is greater than your balance",
+        "Insufficient balance",
+        true
+      ] : [
+        undefined,
+        defaultButtonText,
+        form.submitting || !Curry._1(form.valid, undefined)
+      ];
+  } else {
+    match$2 = [
+      undefined,
+      defaultButtonText,
+      true
+    ];
+  }
   return React.createElement(Unstake$StakeFormInput, {
               onSubmit: form.submit,
               value: form.input.amount,
@@ -636,11 +661,12 @@ function Unstake$ConnectedStakeForm(Props) {
                                       };
                               }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
                 }),
-              synthetic: synthetic,
               txStateModal: React.createElement(Unstake$UnstakeTxStatusModal, {
                     txStateUnstake: txState,
                     resetFormButton: resetFormButton
-                  })
+                  }),
+              buttonDisabled: match$2[2],
+              buttonText: match$2[1]
             });
 }
 
@@ -679,7 +705,7 @@ function Unstake(Props) {
     return React.createElement(React.Fragment, undefined, "Unable to fetch token");
   }
   if (token.loading) {
-    return React.createElement(MiniLoader.make, {});
+    return React.createElement(Loader.Mini.make, {});
   }
   if (match$1 === undefined) {
     return React.createElement(React.Fragment, undefined, "Could not find this market - please check the URL carefully.");
@@ -703,7 +729,7 @@ function Unstake(Props) {
                     })
                 }, React.createElement(Unstake$StakeFormInput, {
                       disabled: true,
-                      synthetic: synthetic
+                      buttonText: "Unstake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name
                     }));
     }
   } else {

@@ -78,7 +78,7 @@ type providerType
 @send
 external waitForTransaction: (providerType, string) => JsPromise.t<txResult> = "waitForTransaction"
 
-type walletType = {address: string, provider: providerType}
+type walletType = {address: ethAddress, provider: providerType}
 
 module Wallet = {
   type t = walletType
@@ -86,10 +86,16 @@ module Wallet = {
   @new @scope("ethers")
   external makePrivKeyWallet: (string, providerType) => t = "Wallet"
 
+  @val @scope(("ethers", "Wallet"))
+  external createRandom: unit => t = "createRandom"
+
   type rawSignature
   @send
   external signMessage: (t, string) => JsPromise.t<rawSignature> = "signMessage"
 }
+
+@val @scope("ethers")
+external getSigners: unit => JsPromise.t<array<Wallet.t>> = "getSigners"
 
 module Providers = {
   type t = providerType

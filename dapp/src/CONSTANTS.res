@@ -10,6 +10,7 @@ let oneHundredThousandInWei = tenToThe18->Ethers.BigNumber.mul(tenToThe5)
 let oneMillionInWei = tenToThe18->Ethers.BigNumber.mul(tenToThe6)
 let tenToThe42 = tenToThe6->Ethers.BigNumber.mul(tenToThe18)->Ethers.BigNumber.mul(tenToThe18)
 let oneHundredEth = Ethers.BigNumber.fromUnsafe("100000000000000000000") // 10 ^ 20
+let oneThousandInWei = Ethers.BigNumber.fromUnsafe("1000000000000000000000") // 10 ^ 21
 
 /* Used for time in the graph */
 let fiveMinutesInSeconds = 300
@@ -24,3 +25,10 @@ let oneMonthInSeconds = 2628029
 /* Used as intervals for the price history chart */
 let threeMonthsInSeconds = 7884087
 let oneYearInSeconds = 31536000
+
+let hotAPYThreshold = 0.15
+
+// TODO: emit and pull these from graph. "kperiod, kInitialMultiplier."
+// For now going to hardcode them.
+let kperiodHardcode = Ethers.BigNumber.fromUnsafe("1664000") // ~20 days
+let kmultiplierHardcode = Ethers.BigNumber.fromUnsafe("5000000000000000000")

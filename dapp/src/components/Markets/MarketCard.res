@@ -60,7 +60,7 @@ let make = (
     </div>
 
   let marketPositionValues = (~isLong) => {
-    let value = (isLong ? totalLockedLong : totalLockedShort)->FormatMoney.formatEther
+    let value = (isLong ? totalLockedLong : totalLockedShort)->Misc.NumberFormat.formatEther
     let beta = isLong ? longBeta : shortBeta
     <div className="text-sm text-center m-auto mb-4">
       <div className="text-2xl tracking-widest font-alphbeta my-3">
@@ -105,7 +105,7 @@ let make = (
       </Button.Small>
     </div>
 
-  <Next.Link href={`/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
+  <Next.Link href={`/?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
     <div
       className="p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-70 cursor-pointer shadow-lg hover:shadow-xl h-full justify-center w-full">
       <div className="flex justify-center w-full my-1">
@@ -125,7 +125,7 @@ let make = (
             {" Liquidity"->React.string}
           </h2>
           <div className="text-3xl font-alphbeta tracking-wider py-1">
-            {`$${totalValueLocked->FormatMoney.formatEther}`->React.string}
+            {`$${totalValueLocked->Misc.NumberFormat.formatEther}`->React.string}
           </div>
           <div className="md:block hidden w-full">
             {liquidityRatio()} {Option.isNone(marketIndexOption) ? mintButtons() : React.null}

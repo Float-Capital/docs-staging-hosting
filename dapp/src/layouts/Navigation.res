@@ -78,26 +78,31 @@ let make = () => {
   let optCurrentUser = RootProvider.useCurrentUser()
 
   <>
-    <nav className="p-2 h-12 flex justify-between items-center text-sm">
-      <Link href="/markets">
+    <nav className="mx-auto w-full max-w-5xl p-2 h-12 flex justify-between items-center text-sm">
+      <Link href="/">
         <a className="flex items-center">
           <span className="text-xl text-green-800 ml-2 align-middle font-semibold">
             <div className="logo-container">
-              <img src="/img/float-capital-logo.png" className="h-8 md:h-7 w-full md:w-auto" />
+              <img src="/img/float-capital-logo-long.svg" className="h-8 md:h-7 w-full md:w-auto" />
             </div>
           </span>
         </a>
       </Link>
       <div className="hidden md:flex w-2/3 text-base items-center justify-end">
-        <Link href="/markets">
-          <a className="px-3 hover:bg-white"> {React.string("MARKETS")} </a>
-        </Link>
+        <Link href="/"> <a className="px-3 hover:bg-white"> {React.string("MARKETS")} </a> </Link>
         <Link href="/stake">
           <a className="px-3 hover:bg-white"> {`STAKE🔥`->React.string} </a>
         </Link>
         <Link href="/dashboard">
           <a className="px-3 hover:bg-white"> {React.string("DASHBOARD")} </a>
         </Link>
+        {if Config.networkId == 80001 {
+          <Link href="/faucet">
+            <a className="px-3 hover:bg-white"> {React.string("FAUCET")} </a>
+          </Link>
+        } else {
+          React.null
+        }}
         <a className="px-3 hover:bg-white mr-2" target="_blank" href="https://docs.float.capital">
           {React.string("DOCS")}
         </a>
@@ -133,7 +138,7 @@ let make = () => {
           <div className="zoom-in-effect flex flex-col text-3xl text-white">
             <div
               onClick={_ => {
-                router->Next.Router.push(`/markets`)
+                router->Next.Router.push(`/`)
                 setIsOpen(_ => false)
               }}
               className="px-3 bg-black m-2">
@@ -155,6 +160,18 @@ let make = () => {
               className="px-3 bg-black m-2">
               {`DASHBOARD`->React.string}
             </div>
+            {if Config.networkId == 80001 {
+              <div
+                onClick={_ => {
+                  router->Next.Router.push(`/faucet`)
+                  setIsOpen(_ => false)
+                }}
+                className="px-3 bg-black m-2">
+                {`FAUCET`->React.string}
+              </div>
+            } else {
+              React.null
+            }}
             <a
               onClick={_ => {
                 setIsOpen(_ => false)

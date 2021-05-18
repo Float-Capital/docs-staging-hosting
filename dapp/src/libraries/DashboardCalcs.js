@@ -6,6 +6,7 @@ var CONSTANTS = require("../CONSTANTS.js");
 var StakeCard = require("../components/Stake/StakeCard.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_SortArray = require("rescript/lib/js/belt_SortArray.js");
+var MarketCalculationHelpers = require("./MarketCalculationHelpers.js");
 
 function trendingStakes(syntheticMarkets, apy) {
   return Belt_Array.slice(Belt_SortArray.stableSortBy(Belt_Array.reduce(syntheticMarkets, [], (function (previous, param) {
@@ -17,8 +18,8 @@ function trendingStakes(syntheticMarkets, apy) {
                         var marketName = param.name;
                         var longApy = StakeCard.basicApyCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
                         var shortApy = StakeCard.basicApyCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
-                        var longFloatApy = StakeCard.myfloatCalc(totalLockedLong, totalLockedShort, StakeCard.kperiodHardcode, StakeCard.kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
-                        var shortFloatApy = StakeCard.myfloatCalc(totalLockedLong, totalLockedShort, StakeCard.kperiodHardcode, StakeCard.kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
+                        var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, StakeCard.kperiodHardcode, StakeCard.kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
+                        var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, StakeCard.kperiodHardcode, StakeCard.kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
                         return Belt_Array.concat(previous, [
                                     {
                                       marketName: marketName,

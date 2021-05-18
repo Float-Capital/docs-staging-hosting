@@ -5,13 +5,14 @@ var Css = require("bs-css-emotion/src/Css.js");
 var CssJs = require("bs-css-emotion/src/CssJs.js");
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Button = require("../components/UI/Button.js");
+var Button = require("../components/UI/Base/Button.js");
+var Config = require("../Config.js");
 var Globals = require("../libraries/Globals.js");
 var Link = require("next/link").default;
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var RootProvider = require("../libraries/RootProvider.js");
-var DisplayAddress = require("../components/UI/DisplayAddress.js");
+var DisplayAddress = require("../components/UI/Base/DisplayAddress.js");
 
 function floatingMenuZoomStyle(shouldDisplay) {
   return CssJs.style([
@@ -142,9 +143,9 @@ function Navigation(Props) {
         });
   }
   return React.createElement(React.Fragment, undefined, React.createElement("nav", {
-                  className: "p-2 h-12 flex justify-between items-center text-sm"
+                  className: "mx-auto w-full max-w-5xl p-2 h-12 flex justify-between items-center text-sm"
                 }, React.createElement(Link, {
-                      href: "/markets",
+                      href: "/",
                       children: React.createElement("a", {
                             className: "flex items-center"
                           }, React.createElement("span", {
@@ -153,12 +154,12 @@ function Navigation(Props) {
                                     className: "logo-container"
                                   }, React.createElement("img", {
                                         className: "h-8 md:h-7 w-full md:w-auto",
-                                        src: "/img/float-capital-logo.png"
+                                        src: "/img/float-capital-logo-long.svg"
                                       }))))
                     }), React.createElement("div", {
                       className: "hidden md:flex w-2/3 text-base items-center justify-end"
                     }, React.createElement(Link, {
-                          href: "/markets",
+                          href: "/",
                           children: React.createElement("a", {
                                 className: "px-3 hover:bg-white"
                               }, "MARKETS")
@@ -172,7 +173,12 @@ function Navigation(Props) {
                           children: React.createElement("a", {
                                 className: "px-3 hover:bg-white"
                               }, "DASHBOARD")
-                        }), React.createElement("a", {
+                        }), Config.networkId === 80001 ? React.createElement(Link, {
+                            href: "/faucet",
+                            children: React.createElement("a", {
+                                  className: "px-3 hover:bg-white"
+                                }, "FAUCET")
+                          }) : null, React.createElement("a", {
                           className: "px-3 hover:bg-white mr-2",
                           href: "https://docs.float.capital",
                           target: "_blank"
@@ -192,7 +198,7 @@ function Navigation(Props) {
                             }, React.createElement("div", {
                                   className: "px-3 bg-black m-2",
                                   onClick: (function (param) {
-                                      router.push("/markets");
+                                      router.push("/");
                                       return Curry._1(setIsOpen, (function (param) {
                                                     return false;
                                                   }));
@@ -213,7 +219,15 @@ function Navigation(Props) {
                                                     return false;
                                                   }));
                                     })
-                                }, "DASHBOARD"), React.createElement("a", {
+                                }, "DASHBOARD"), Config.networkId === 80001 ? React.createElement("div", {
+                                    className: "px-3 bg-black m-2",
+                                    onClick: (function (param) {
+                                        router.push("/faucet");
+                                        return Curry._1(setIsOpen, (function (param) {
+                                                      return false;
+                                                    }));
+                                      })
+                                  }, "FAUCET") : null, React.createElement("a", {
                                   className: "px-3 bg-black m-2",
                                   href: "https://docs.float.capital",
                                   rel: "noopener noreferrer",

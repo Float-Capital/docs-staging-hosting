@@ -58,7 +58,7 @@ module SubmitButtonAndTxTracker = {
     | (ContractActions.Created, _) => <>
         <Modal id={1}>
           <div className="text-center mx-3 my-6">
-            <EllipsesLoader />
+            <Loader.Ellipses />
             <p> {`Please approve your ${Config.paymentTokenName} token `->React.string} </p>
           </div>
         </Modal>
@@ -67,7 +67,7 @@ module SubmitButtonAndTxTracker = {
     | (ContractActions.SignedAndSubmitted(txHash), _) => <>
         <Modal id={2}>
           <div className="text-center m-3">
-            <div className="m-2"> <MiniLoader /> </div>
+            <div className="m-2"> <Loader.Mini /> </div>
             <p> {"Approval transaction pending... "->React.string} </p>
             <ViewOnBlockExplorer txHash />
           </div>
@@ -78,7 +78,8 @@ module SubmitButtonAndTxTracker = {
     | (ContractActions.Complete({transactionHash: _}), ContractActions.UnInitialised) => <>
         <Modal id={3}>
           <div className="text-center mx-3 my-6">
-            <EllipsesLoader /> <p> {`Confirm transaction to mint ${tokenToMint}`->React.string} </p>
+            <Loader.Ellipses />
+            <p> {`Confirm transaction to mint ${tokenToMint}`->React.string} </p>
           </div>
         </Modal>
         <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
@@ -97,7 +98,7 @@ module SubmitButtonAndTxTracker = {
     | (_, ContractActions.Created) => <>
         <Modal id={5}>
           <div className="text-center m-3">
-            <EllipsesLoader />
+            <Loader.Ellipses />
             <h1> {`Confirm the transaction to mint ${tokenToMint}`->React.string} </h1>
           </div>
         </Modal>
@@ -121,7 +122,7 @@ module SubmitButtonAndTxTracker = {
     | (_, ContractActions.SignedAndSubmitted(txHash)) => <>
         <Modal id={7}>
           <div className="text-center m-3">
-            <div className="m-2"> <MiniLoader /> </div>
+            <div className="m-2"> <Loader.Mini /> </div>
             <p> {"Minting transaction pending... "->React.string} </p>
             <ViewOnBlockExplorer txHash />
           </div>
@@ -138,7 +139,7 @@ module SubmitButtonAndTxTracker = {
                   ? "long"
                   : "short"} on ${marketName}! @float_capital 🌊 `}
             />
-            <AddToMetaMaskButton
+            <Metamask.AddTokenButton
               token={Config.config.contracts.floatToken}
               tokenSymbol={`${isLong ? `↗️` : `↘️`}${marketName}`}
             />
@@ -188,6 +189,8 @@ module MintFormInput = {
     ~onChangeIsStaking=_ => (),
     ~submitButton=<Button> "Login & Mint" </Button>,
   ) => {
+    let router = Next.Router.useRouter()
+
     let formInput =
       <>
         <LongOrShortSelect isLong selectPosition={val => onChangeSide(val)} disabled />
@@ -217,8 +220,11 @@ module MintFormInput = {
               onChange=onChangeIsStaking
             />
             <label htmlFor="stake-checkbox" className="text-xs">
-              {`Stake ${isLong ? "long" : "short"} tokens`->React.string}
+              {`Stake ${isLong ? "long" : "short"} tokens `->React.string}
             </label>
+            <div className="ml-1">
+              <Tooltip tip="Stake your synthetic asset tokens to earn FLOAT tokens" />
+            </div>
           </div>
           <p className="text-xxs hover:text-gray-500">
             <a
@@ -235,6 +241,19 @@ module MintFormInput = {
       <Form className="h-full" onSubmit>
         <div className="relative"> {formInput} </div> {submitButton}
       </Form>
+      {if Config.networkId == 80001 {
+        <p
+          onClick={_ => {
+            router->Next.Router.push(`/faucet`)
+          }}
+          className="cursor-pointer text-xxs py-2">
+          {"Visit our "->React.string}
+          <a className="hover:bg-white underline"> {"faucet"->React.string} </a>
+          {" if you need more aave test DAI."->React.string}
+        </p>
+      } else {
+        React.null
+      }}
     </div>
   }
 }
