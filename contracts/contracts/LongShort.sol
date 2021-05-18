@@ -98,7 +98,7 @@ contract LongShort is ILongShort, Initializable {
 
     event FeesLevied(uint32 marketIndex, uint256 totalFees);
 
-    event ISyntheticTokenCreated(
+    event SyntheticTokenCreated(
         uint32 marketIndex,
         address longTokenAddress,
         address shortTokenAddress,
@@ -319,7 +319,7 @@ contract LongShort is ILongShort, Initializable {
         oracleManagers[latestMarket] = IOracleManager(_oracleManager);
         assetPrice[latestMarket] = uint256(getLatestPrice(latestMarket));
 
-        emit ISyntheticTokenCreated(
+        emit SyntheticTokenCreated(
             latestMarket,
             address(longTokens[latestMarket]),
             address(shortTokens[latestMarket]),
