@@ -4,13 +4,68 @@
 var Chai = require("./bindings/chai/Chai.js");
 var LetOps = require("./library/LetOps.js");
 var Helpers = require("./library/Helpers.js");
+var CONSTANTS = require("./CONSTANTS.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
 var HelperActions = require("./library/HelperActions.js");
 var Mocha$BsMocha = require("bs-mocha/src/Mocha.js");
 var Promise$BsMocha = require("bs-mocha/src/Promise.js");
 
+function add(prim, prim$1) {
+  return prim.add(prim$1);
+}
+
+function sub(prim, prim$1) {
+  return prim.sub(prim$1);
+}
+
+function bnFromInt(prim) {
+  return ethers.BigNumber.from(prim);
+}
+
+function mul(prim, prim$1) {
+  return prim.mul(prim$1);
+}
+
+function div(prim, prim$1) {
+  return prim.div(prim$1);
+}
+
 Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (function (param) {
-        return Mocha$BsMocha.describe("Staking")(undefined, undefined, undefined, (function (param) {
+        Mocha$BsMocha.describe("Staking")(undefined, undefined, undefined, (function (param) {
+                var contracts = {
+                  contents: undefined
+                };
+                var accounts = {
+                  contents: undefined
+                };
+                Promise$BsMocha.before(undefined)(undefined, undefined, undefined, (function (param) {
+                        return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
+                                      accounts.contents = loadedAccounts;
+                                      
+                                    }));
+                      }));
+                Promise$BsMocha.before_each(undefined)(undefined, undefined, undefined, (function (param) {
+                        return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
+                                      contracts.contents = deployedContracts;
+                                      
+                                    }));
+                      }));
+                return Promise$BsMocha.it("should correctly be able to stake their long/short tokens and view their staked amount immediately")(undefined, undefined, undefined, (function (param) {
+                              var match = contracts.contents;
+                              var staker = match.staker;
+                              var testUser = accounts.contents[1];
+                              return LetOps.Await.let_(HelperActions.stakeRandomlyInMarkets(match.markets, testUser, match.longShort), (function (param) {
+                                            return LetOps.Await.let_(Promise.all(Belt_Array.map(param[0], (function (stake) {
+                                                                  return LetOps.Await.let_(staker.userAmountStaked(stake.synth.address, testUser.address), (function (amountStaked) {
+                                                                                return Chai.bnEqual(undefined, amountStaked, stake.amount);
+                                                                              }));
+                                                                }))), (function (param) {
+                                                          
+                                                        }));
+                                          }));
+                            }));
+              }));
+        return Mocha$BsMocha.describe("Staking - internals exposed")(undefined, undefined, undefined, (function (param) {
                       var contracts = {
                         contents: undefined
                       };
@@ -24,22 +79,46 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                                           }));
                             }));
                       Promise$BsMocha.before_each(undefined)(undefined, undefined, undefined, (function (param) {
-                              return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0]), (function (deployedContracts) {
+                              return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
                                             contracts.contents = deployedContracts;
                                             
                                           }));
                             }));
-                      return Promise$BsMocha.it("should correctly be able to stake their long/short tokens and view their staked amount immediately")(undefined, undefined, undefined, (function (param) {
-                                    var match = contracts.contents;
-                                    var staker = match.staker;
-                                    var testUser = accounts.contents[1];
-                                    return LetOps.Await.let_(HelperActions.stakeRandomlyInMarkets(match.markets, testUser, match.longShort), (function (param) {
-                                                  return LetOps.Await.let_(Promise.all(Belt_Array.map(param[0], (function (stake) {
-                                                                        return LetOps.Await.let_(staker.userAmountStaked(stake.synth.address, testUser.address), (function (amountStaked) {
-                                                                                      return Chai.bnEqual(amountStaked, stake.amount);
-                                                                                    }));
-                                                                      }))), (function (param) {
-                                                                
+                      return Mocha$BsMocha.describe("calculateAccumulatedFloat")(undefined, undefined, undefined, (function (param) {
+                                    var token = ethers.Wallet.createRandom().address;
+                                    var user = ethers.Wallet.createRandom().address;
+                                    var accumulativeFloatPerTokenUser = Helpers.randomTokenAmount(undefined);
+                                    var accumulativeFloatPerTokenLatest = accumulativeFloatPerTokenUser.add(Helpers.randomTokenAmount(undefined));
+                                    var newUserAmountStaked = Helpers.randomTokenAmount(undefined);
+                                    Promise$BsMocha.it("[HAPPY] should correctly return the float tokens due for the user")(undefined, undefined, undefined, (function (param) {
+                                            var match = contracts.contents;
+                                            var staker = match.staker;
+                                            var usersLatestClaimedReward = Helpers.randomInteger(undefined);
+                                            var newLatestRewardIndex = usersLatestClaimedReward.add(Helpers.randomInteger(undefined));
+                                            return LetOps.AwaitThen.let_(staker.setFloatRewardCalcParams(token, newLatestRewardIndex, user, usersLatestClaimedReward, accumulativeFloatPerTokenLatest, accumulativeFloatPerTokenUser, newUserAmountStaked), (function (param) {
+                                                          return LetOps.Await.let_(staker.callStatic.calculateAccumulatedFloatExposed(token, user), (function (floatDue) {
+                                                                        var expectedFloatDue = accumulativeFloatPerTokenLatest.sub(accumulativeFloatPerTokenUser).mul(newUserAmountStaked).div(CONSTANTS.floatIssuanceFixedDecimal);
+                                                                        return Chai.bnEqual("calculated float due is incorrect", floatDue, expectedFloatDue);
+                                                                      }));
+                                                        }));
+                                          }));
+                                    Promise$BsMocha.it("should return zero if `usersLatestClaimedReward` is equal to `newLatestRewardIndex`")(undefined, undefined, undefined, (function (param) {
+                                            var match = contracts.contents;
+                                            var staker = match.staker;
+                                            var newLatestRewardIndex = Helpers.randomInteger(undefined);
+                                            return LetOps.AwaitThen.let_(staker.setFloatRewardCalcParams(token, newLatestRewardIndex, user, newLatestRewardIndex, accumulativeFloatPerTokenLatest, accumulativeFloatPerTokenUser, newUserAmountStaked), (function (param) {
+                                                          return LetOps.Await.let_(staker.callStatic.calculateAccumulatedFloatExposed(token, user), (function (floatDue) {
+                                                                        return Chai.bnEqual("calculated float due should be zero", floatDue, ethers.BigNumber.from(0));
+                                                                      }));
+                                                        }));
+                                          }));
+                                    return Promise$BsMocha.it("should throw (assert) if `usersLatestClaimedReward` is bigger than `newLatestRewardIndex`")(undefined, undefined, undefined, (function (param) {
+                                                  var match = contracts.contents;
+                                                  var staker = match.staker;
+                                                  var usersLatestClaimedReward = Helpers.randomInteger(undefined);
+                                                  var newLatestRewardIndex = usersLatestClaimedReward.sub(ethers.BigNumber.from(1));
+                                                  return LetOps.AwaitThen.let_(staker.setFloatRewardCalcParams(token, newLatestRewardIndex, user, usersLatestClaimedReward, accumulativeFloatPerTokenLatest, accumulativeFloatPerTokenUser, newUserAmountStaked), (function (param) {
+                                                                return Chai.expectRevertNoReason(staker.calculateAccumulatedFloatExposed(token, user));
                                                               }));
                                                 }));
                                   }));
@@ -64,6 +143,11 @@ exports.it$prime = it$prime;
 exports.it_skip$prime = it_skip$prime;
 exports.before_each = before_each;
 exports.before = before;
+exports.add = add;
+exports.sub = sub;
+exports.bnFromInt = bnFromInt;
+exports.mul = mul;
+exports.div = div;
 exports.describe = describe;
 exports.it = it;
 exports.it_skip = it_skip;

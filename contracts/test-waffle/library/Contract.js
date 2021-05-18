@@ -149,8 +149,14 @@ var TokenFactory = {
 
 var contractName$7 = "Staker";
 
+var contractNameExposed = "StakerInternalsExposed";
+
 function make$6(param) {
   return deployContract(contractName$7);
+}
+
+function makeExposed(param) {
+  return deployContract(contractNameExposed);
 }
 
 function at$4(contractAddress) {
@@ -163,11 +169,16 @@ function claimFloatCustomUser(staker, user, syntheticTokens, markets) {
                   })), markets);
 }
 
+var Exposed = {};
+
 var Staker = {
   contractName: contractName$7,
+  contractNameExposed: contractNameExposed,
   make: make$6,
+  makeExposed: makeExposed,
   at: at$4,
-  claimFloatCustomUser: claimFloatCustomUser
+  claimFloatCustomUser: claimFloatCustomUser,
+  Exposed: Exposed
 };
 
 var contractName$8 = "FloatToken";

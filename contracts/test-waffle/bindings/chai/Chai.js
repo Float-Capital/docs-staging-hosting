@@ -5,7 +5,7 @@
 const { expect } = require("chai");
 ;
 
-var bnEqual = ((number1, number2) => expect(number1).to.equal(number2));
+var bnEqual = ((message, number1, number2) => expect(number1, message).to.equal(number2));
 
 var bnWithin = ((number1, min, max) => expect(number1).to.be.within(min, max));
 

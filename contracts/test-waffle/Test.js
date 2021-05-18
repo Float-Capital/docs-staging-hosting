@@ -25,7 +25,7 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                                           }));
                             }));
                       Promise$BsMocha.before_each(undefined)(undefined, undefined, undefined, (function (param) {
-                              return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0]), (function (deployedContracts) {
+                              return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
                                             contracts.contents = deployedContracts;
                                             var setupUser = accounts.contents[2];
                                             return LetOps.Await.let_(HelperActions.stakeRandomlyInBothSidesOfMarket(deployedContracts.markets, setupUser, deployedContracts.longShort), (function (param) {
@@ -49,7 +49,7 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                                                                                                                   staker.userIndexOfLastClaimedReward(stake.synth.address, testUser.address),
                                                                                                                   staker.latestRewardIndex(stake.synth.address)
                                                                                                                 ]).then(function (param) {
-                                                                                                                return Chai.bnEqual(param[0], param[1]);
+                                                                                                                return Chai.bnEqual(undefined, param[0], param[1]);
                                                                                                               });
                                                                                                   }))), (function (param) {
                                                                                             

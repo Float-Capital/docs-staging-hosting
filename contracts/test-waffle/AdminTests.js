@@ -22,7 +22,7 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                                           }));
                             }));
                       Promise$BsMocha.before_each(undefined)(undefined, undefined, undefined, (function (param) {
-                              return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0]), (function (deployedContracts) {
+                              return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
                                             contracts.contents = deployedContracts;
                                             
                                           }));

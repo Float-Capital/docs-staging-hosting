@@ -31,6 +31,7 @@ contract Staker is IStaker, Initializable {
 
     // Controls the k-factor, a multiplier for incentivising early stakers.
     //   token market index -> value
+    uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
     mapping(uint256 => uint256) public kFactorPeriods; // seconds
     mapping(uint256 => uint256) public kFactorInitialMultipliers; // e18 scale
     uint256[45] private __stakeParametersGap;
@@ -387,14 +388,18 @@ contract Staker is IStaker, Initializable {
         view
         returns (uint256)
     {
-        // Don't let users accumulate float immediately after staking, before
-        // the next reward state is indexed.
+        // Don't do the calculation and return zero immediately if there is no change
         if (
-            userIndexOfLastClaimedReward[token][user] >=
+            userIndexOfLastClaimedReward[token][user] ==
             latestRewardIndex[token]
         ) {
             return 0;
         }
+
+        // Stake should always do a full system state update, so 'users last claimed index' should never be greater than the latest index
+        assert(
+            userIndexOfLastClaimedReward[token][user] < latestRewardIndex[token]
+        );
 
         uint256 accumDelta =
             syntheticRewardParams[token][latestRewardIndex[token]]
@@ -404,7 +409,9 @@ contract Staker is IStaker, Initializable {
                 ]
                     .accumulativeFloatPerToken;
 
-        return (accumDelta * userAmountStaked[token][user]) / 1e42;
+        return
+            (accumDelta * userAmountStaked[token][user]) /
+            FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
 
     function _mintFloat(address user, uint256 floatToMint) internal {

@@ -10,27 +10,51 @@ NOTE: This contract is for testing purposes only!
 */
 
 contract StakerInternalsExposed is Staker {
-    function calculateAccumulatedFloatExposed(
-        ISyntheticToken tokenAddress,
-        address user
-    ) external view returns (uint256) {
-        return calculateAccumulatedFloat(tokenAddress, user);
+    ///////////////////////////////////////////////
+    //////////// Test Helper Functions ////////////
+    ///////////////////////////////////////////////
+    function setFloatRewardCalcParams(
+        ISyntheticToken token,
+        uint256 newLatestRewardIndex,
+        address user,
+        uint256 usersLatestClaimedReward,
+        uint256 accumulativeFloatPerTokenLatest,
+        uint256 accumulativeFloatPerTokenUser,
+        uint256 newUserAmountStaked
+    ) public {
+        latestRewardIndex[token] = newLatestRewardIndex;
+        userIndexOfLastClaimedReward[token][user] = usersLatestClaimedReward;
+
+        syntheticRewardParams[token][newLatestRewardIndex]
+            .accumulativeFloatPerToken = accumulativeFloatPerTokenLatest;
+
+        syntheticRewardParams[token][usersLatestClaimedReward]
+            .accumulativeFloatPerToken = accumulativeFloatPerTokenUser;
+
+        userAmountStaked[token][user] = newUserAmountStaked;
     }
 
-    function mintAccumulatedFloatExternal(
-        ISyntheticToken tokenAddress,
+    ///////////////////////////////////////////
+    //////////// EXPOSED Functions ////////////
+    ///////////////////////////////////////////
+    function calculateAccumulatedFloatExposed(
+        ISyntheticToken token,
         address user
-    ) external {
-        mintAccumulatedFloat(tokenAddress, user);
+    ) external returns (uint256) {
+        return calculateAccumulatedFloat(token, user);
+    }
+
+    function mintAccumulatedFloatExternal(ISyntheticToken token, address user)
+        external
+    {
+        mintAccumulatedFloat(token, user);
     }
 
     function _mintFloatExternal(address user, uint256 floatToMint) external {
         _mintFloat(user, floatToMint);
     }
 
-    function _withdrawExternal(ISyntheticToken tokenAddress, uint256 amount)
-        external
-    {
-        _withdraw(tokenAddress, amount);
+    function _withdrawExternal(ISyntheticToken token, uint256 amount) external {
+        _withdraw(token, amount);
     }
 }
