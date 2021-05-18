@@ -78,7 +78,7 @@ function querySwitcherLink(user) {
 }
 
 function makeClient(user) {
-  return ApolloClient.make(undefined, undefined, undefined, Caml_option.some(querySwitcherLink(user)), ApolloClient__Cache_InMemory_InMemoryCache.make(undefined, undefined, undefined, undefined, undefined, undefined), undefined, undefined, true, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+  return ApolloClient.make(undefined, undefined, undefined, Caml_option.some(querySwitcherLink(user)), ApolloClient__Cache_InMemory_InMemoryCache.make(undefined, undefined, undefined, undefined, undefined, undefined), undefined, undefined, Config.apolloConnectToDevTools, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
 }
 
 var defaultClient = makeClient(undefined);

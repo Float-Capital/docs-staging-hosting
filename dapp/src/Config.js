@@ -30,6 +30,8 @@ var discordInviteLink = config.discordInviteLink;
 
 var web3PollingInterval = config.web3PollingInterval;
 
+var apolloConnectToDevTools = config.apolloConnectToDevTools;
+
 var longShort = match.LongShort;
 
 var staker = match.Staker;
@@ -51,6 +53,7 @@ exports.blockExplorer = blockExplorer;
 exports.blockExplorerName = blockExplorerName;
 exports.discordInviteLink = discordInviteLink;
 exports.web3PollingInterval = web3PollingInterval;
+exports.apolloConnectToDevTools = apolloConnectToDevTools;
 exports.longShort = longShort;
 exports.staker = staker;
 exports.dai = dai;
