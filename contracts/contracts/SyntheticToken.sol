@@ -4,8 +4,9 @@ pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 import "./interfaces/IStaker.sol";
+import "./interfaces/ISyntheticToken.sol";
 
-contract SyntheticToken is ERC20PresetMinterPauser {
+contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
     address public longShortAddress;
     IStaker public staker;
 
@@ -19,16 +20,29 @@ contract SyntheticToken is ERC20PresetMinterPauser {
         staker = IStaker(stakerAddress);
     }
 
-    function synthRedeemBurn(address account, uint256 amount) external {
+    function synthRedeemBurn(address account, uint256 amount)
+        external
+        override
+    {
         require(msg.sender == longShortAddress, "Only longSHORT contract");
 
         _burn(account, amount);
     }
 
-    function stake(uint256 amount) external {
+    function stake(uint256 amount) external override {
         // NOTE: this is safe, this function will throw "ERC20: transfer amount exceeds balance" if amount exceeds users balance
         _transfer(msg.sender, address(staker), amount);
 
         staker.stakeFromUser(msg.sender, amount);
+    }
+
+    ////////////////////////////////////////////////////////////////////
+    ///////// FUNCTIONS INHERITED BY ERC20PresetMinterPauser ///////////
+    ////////////////////////////////////////////////////////////////////
+    function mint(address to, uint256 amount)
+        public
+        override(ISyntheticToken, ERC20PresetMinterPauser)
+    {
+        ERC20PresetMinterPauser.mint(to, amount);
     }
 }

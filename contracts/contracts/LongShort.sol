@@ -7,8 +7,8 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
-import "./TokenFactory.sol";
-import "./SyntheticToken.sol";
+import "./interfaces/ITokenFactory.sol";
+import "./interfaces/ISyntheticToken.sol";
 import "./interfaces/IStaker.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/IYieldManager.sol";
@@ -35,7 +35,7 @@ contract LongShort is ILongShort, Initializable {
     address public treasury;
 
     // Factory for dynamically creating synthetic long/short tokens.
-    TokenFactory public tokenFactory;
+    ITokenFactory public tokenFactory;
 
     // Staker for controlling governance token issuance.
     IStaker public staker;
@@ -61,8 +61,8 @@ contract LongShort is ILongShort, Initializable {
     uint256[45] private __marketStateGap;
 
     // Synthetic long/short tokens users can mint and redeem.
-    mapping(uint32 => SyntheticToken) public longTokens;
-    mapping(uint32 => SyntheticToken) public shortTokens;
+    mapping(uint32 => ISyntheticToken) public longTokens;
+    mapping(uint32 => ISyntheticToken) public shortTokens;
     uint256[45] private __marketSynthsGap;
 
     // Fees for minting/redeeming long/short tokens. Users are penalised
@@ -76,7 +76,12 @@ contract LongShort is ILongShort, Initializable {
     /////////// EVENTS /////////////////
     ////////////////////////////////////
 
-    event V1(address admin, address tokenFactory, address staker);
+    event V1(
+        address admin,
+        address treasury,
+        address tokenFactory,
+        address staker
+    );
 
     event ValueLockedInSystem(
         uint32 marketIndex,
@@ -192,15 +197,20 @@ contract LongShort is ILongShort, Initializable {
     function initialize(
         address _admin,
         address _treasury,
-        address _tokenFactory,
-        address _staker
+        ITokenFactory _tokenFactory,
+        IStaker _staker
     ) public initializer {
         admin = _admin;
         treasury = _treasury;
-        tokenFactory = TokenFactory(_tokenFactory);
-        staker = IStaker(_staker);
+        tokenFactory = _tokenFactory;
+        staker = _staker;
 
-        emit V1(_admin, _tokenFactory, _staker);
+        emit V1(
+            _admin,
+            address(treasury),
+            address(_tokenFactory),
+            address(_staker)
+        );
     }
 
     ////////////////////////////////////
@@ -284,7 +294,7 @@ contract LongShort is ILongShort, Initializable {
         latestMarket++;
 
         // Create new synthetic long token.
-        longTokens[latestMarket] = SyntheticToken(
+        longTokens[latestMarket] = ISyntheticToken(
             tokenFactory.createTokenLong(
                 syntheticName,
                 syntheticSymbol,
@@ -293,7 +303,7 @@ contract LongShort is ILongShort, Initializable {
         );
 
         // Create new synthetic short token.
-        shortTokens[latestMarket] = SyntheticToken(
+        shortTokens[latestMarket] = ISyntheticToken(
             tokenFactory.createTokenShort(
                 syntheticName,
                 syntheticSymbol,
@@ -344,8 +354,8 @@ contract LongShort is ILongShort, Initializable {
         // Add new staker funds with fresh synthetic tokens.
         staker.addNewStakingFund(
             latestMarket,
-            address(longTokens[marketIndex]),
-            address(shortTokens[marketIndex]),
+            longTokens[marketIndex],
+            shortTokens[marketIndex],
             kInitialMultiplier,
             kPeriod
         );
@@ -605,8 +615,8 @@ contract LongShort is ILongShort, Initializable {
         // So reward rate can be calculated just in time by
         // staker without needing to be saved
         staker.addNewStateForFloatRewards(
-            address(longTokens[marketIndex]),
-            address(shortTokens[marketIndex]),
+            longTokens[marketIndex],
+            shortTokens[marketIndex],
             longTokenPrice[marketIndex],
             shortTokenPrice[marketIndex],
             longValue[marketIndex],
@@ -652,11 +662,14 @@ contract LongShort is ILongShort, Initializable {
         );
     }
 
-    function _updateSystemState(uint32 marketIndex) external {
+    function _updateSystemState(uint32 marketIndex) external override {
         _updateSystemStateInternal(marketIndex);
     }
 
-    function _updateSystemStateMulti(uint32[] calldata marketIndexes) external {
+    function _updateSystemStateMulti(uint32[] calldata marketIndexes)
+        external
+        override
+    {
         for (uint256 i = 0; i < marketIndexes.length; i++) {
             _updateSystemStateInternal(marketIndexes[i]);
         }
@@ -852,11 +865,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 tokensMinted =
             _mintLong(marketIndex, amount, msg.sender, address(staker));
 
-        staker.stakeFromMint(
-            address(longTokens[marketIndex]),
-            tokensMinted,
-            msg.sender
-        );
+        staker.stakeFromMint(longTokens[marketIndex], tokensMinted, msg.sender);
     }
 
     /**
@@ -870,7 +879,7 @@ contract LongShort is ILongShort, Initializable {
             _mintShort(marketIndex, amount, msg.sender, address(staker));
 
         staker.stakeFromMint(
-            address(shortTokens[marketIndex]),
+            shortTokens[marketIndex],
             tokensMinted,
             msg.sender
         );

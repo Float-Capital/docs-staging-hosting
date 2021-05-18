@@ -3,6 +3,7 @@
 pragma solidity 0.8.3;
 
 import "../Staker.sol";
+import "../interfaces/ISyntheticToken.sol";
 
 /*
 NOTE: This contract is for testing purposes only!
@@ -10,15 +11,16 @@ NOTE: This contract is for testing purposes only!
 
 contract StakerInternalsExposed is Staker {
     function calculateAccumulatedFloatExposed(
-        address tokenAddress,
+        ISyntheticToken tokenAddress,
         address user
     ) external view returns (uint256) {
         return calculateAccumulatedFloat(tokenAddress, user);
     }
 
-    function mintAccumulatedFloatExternal(address tokenAddress, address user)
-        external
-    {
+    function mintAccumulatedFloatExternal(
+        ISyntheticToken tokenAddress,
+        address user
+    ) external {
         mintAccumulatedFloat(tokenAddress, user);
     }
 
@@ -26,7 +28,9 @@ contract StakerInternalsExposed is Staker {
         _mintFloat(user, floatToMint);
     }
 
-    function _withdrawExternal(address tokenAddress, uint256 amount) external {
+    function _withdrawExternal(ISyntheticToken tokenAddress, uint256 amount)
+        external
+    {
         _withdraw(tokenAddress, amount);
     }
 }

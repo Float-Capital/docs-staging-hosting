@@ -9,6 +9,7 @@
     "test": "hardhat test",
     "test-waffle": "WAFFLE_TEST='true' hardhat test",
     "coverage": "hardhat coverage",
+    "coverage-waffle": "WAFFLE_TEST='true' hardhat coverage",
     "res:clean": "bsb -clean-world",
     "res:build": "bsb -make-world -clean-world",
     "res:watch": "bsb -make-world -w",
