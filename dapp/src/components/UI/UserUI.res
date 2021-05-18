@@ -66,19 +66,11 @@ module UserColumnHeader = {
 module UserProfileHeader = {
   @react.component
   let make = (~address: string) => {
-    // let name = `moose-code` // TODO: get from graph
-    // let level = Ethers.BigNumber.fromInt(1) // TODO: get from graph
-
     <div className="w-full flex flex-row justify-around">
       <div
         className="w-24 h-24 rounded-full border-2 border-light-purple flex items-center justify-center">
-        // <img className="inline h-10" src="/img/mario.png" />
         <img className="inline h-10 rounded" src={Blockies.makeBlockie(address)} />
       </div>
-      // <div className="flex flex-col text-center justify-center">
-      //   <div> {name->React.string} </div>
-      //   <div> {`Lvl. ${level->Ethers.BigNumber.toString}`->React.string} </div>
-      // </div>
     </div>
   }
 }
