@@ -2,8 +2,7 @@ type contractDetails = {
   @as("LongShort") longShort: Ethers.ethAddress,
   @as("Staker") staker: Ethers.ethAddress,
   @as("Dai") dai: Ethers.ethAddress,
-  @as("FloatToken") floatToken: Ethers.ethAddress,
-  @as("AaveFaucet") aaveFaucet: Ethers.ethAddress,
+  @as("FloatToken") floatToken: Ethers.ethAddress
 }
 type configShape = {
   graphEndpoint: string,
@@ -37,5 +36,5 @@ let {
   blockExplorerName,
   discordInviteLink,
   web3PollingInterval,
-  contracts: {longShort, staker, dai, floatToken, aaveFaucet},
+  contracts: {longShort, staker, dai, floatToken},
 } = config

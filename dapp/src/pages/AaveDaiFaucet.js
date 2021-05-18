@@ -3,12 +3,14 @@
 
 var Tick = require("../components/UI/Base/Tick.js");
 var Curry = require("rescript/lib/js/curry.js");
+var Login = require("./Login.js");
 var Modal = require("../components/UI/Base/Modal.js");
 var React = require("react");
 var Button = require("../components/UI/Base/Button.js");
 var Config = require("../Config.js");
 var Loader = require("../components/UI/Base/Loader.js");
 var Metamask = require("../components/UI/Base/Metamask.js");
+var CONSTANTS = require("../CONSTANTS.js");
 var Contracts = require("../ethereum/Contracts.js");
 var ToastProvider = require("../components/UI/ToastProvider.js");
 var ContractActions = require("../ethereum/ContractActions.js");
@@ -149,9 +151,9 @@ function AaveDaiFaucet$FaucetCard(Props) {
                 }, React.createElement(Button.make, {
                       onClick: (function (param) {
                           return Curry._2(contractExecutionHandler, (function (param) {
-                                        return Contracts.AaveFaucet.make(Config.aaveFaucet, param);
+                                        return Contracts.Erc20.make(Config.dai, param);
                                       }), (function (param) {
-                                        return param.mintMonies(Config.dai);
+                                        return param.mint(CONSTANTS.oneThousandInWei);
                                       }));
                         }),
                       children: "Mint testnet dai"
@@ -171,7 +173,7 @@ function AaveDaiFaucet(Props) {
                 signer: optSigner
               });
   } else {
-    return React.createElement(Loader.make, {});
+    return React.createElement(Login.make, {});
   }
 }
 

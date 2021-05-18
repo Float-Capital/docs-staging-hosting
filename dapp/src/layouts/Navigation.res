@@ -98,6 +98,13 @@ let make = () => {
         <Link href="/dashboard">
           <a className="px-3 hover:bg-white"> {React.string("DASHBOARD")} </a>
         </Link>
+        {if Config.networkId == 80001 {
+          <Link href="/faucet">
+            <a className="px-3 hover:bg-white"> {React.string("FAUCET")} </a>
+          </Link>
+        } else {
+          React.null
+        }}
         <a className="px-3 hover:bg-white mr-2" target="_blank" href="https://docs.float.capital">
           {React.string("DOCS")}
         </a>
@@ -154,6 +161,14 @@ let make = () => {
               }}
               className="px-3 bg-black m-2">
               {`DASHBOARD`->React.string}
+            </div>
+            <div
+              onClick={_ => {
+                router->Next.Router.push(`/faucet`)
+                setIsOpen(_ => false)
+              }}
+              className="px-3 bg-black m-2">
+              {`FAUCET`->React.string}
             </div>
             <a
               onClick={_ => {

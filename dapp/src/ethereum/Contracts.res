@@ -141,6 +141,7 @@ module Erc20 = {
     "function approve(address spender, uint256 amount) @100000",
     "function balanceOf(address owner) public view returns (uint256 balance)",
     "function allowance(address owner, address spender) public view returns (uint256 remaining)",
+    "function mint(uint256 value) public virtual returns (bool)",
     // "event Transfer(address indexed _from, address indexed _to, uint256 _value)",
   ]->Ethers.makeAbi
 
@@ -164,6 +165,10 @@ module Erc20 = {
     ~owner: Ethers.ethAddress,
     ~spender: Ethers.ethAddress,
   ) => JsPromise.t<Ethers.BigNumber.t> = "allowance"
+
+  @send
+  external mint: (~contract: t, ~amount: Ethers.BigNumber.t) => JsPromise.t<Ethers.txSubmitted> =
+    "mint"
 }
 
 module Synth = {
@@ -201,17 +206,4 @@ module Synth = {
   @send
   external stake: (~contract: t, ~amount: Ethers.BigNumber.t) => JsPromise.t<Ethers.txSubmitted> =
     "stake"
-}
-
-module AaveFaucet = {
-  type t = Ethers.Contract.t
-  let abi = ["function mintMonies(address aaveDaiContract)"]->Ethers.makeAbi
-  let make = (~address, ~providerOrSigner): t =>
-    Ethers.Contract.make(address, abi, providerOrSigner)
-
-  @send
-  external mintMonies: (
-    ~contract: t,
-    ~aaveDaiContract: Ethers.ethAddress,
-  ) => JsPromise.t<Ethers.txSubmitted> = "mintMonies"
 }

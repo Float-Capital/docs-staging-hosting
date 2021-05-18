@@ -92,8 +92,8 @@ module FaucetCard = {
 
     let mintMoniesCall = _ =>
       contractExecutionHandler(
-        ~makeContractInstance=Contracts.AaveFaucet.make(~address=Config.aaveFaucet),
-        ~contractFunction=Contracts.AaveFaucet.mintMonies(~aaveDaiContract=Config.dai),
+        ~makeContractInstance=Contracts.Erc20.make(~address=Config.dai),
+        ~contractFunction=Contracts.Erc20.mint(~amount=CONSTANTS.oneThousandInWei),
       )
 
     <section
@@ -124,7 +124,7 @@ let make = () => {
   let optSigner = ContractActions.useSigner()
   switch optSigner {
   | Some(signer) => <FaucetCard signer />
-  | None => <Loader />
+  | None => <Login />
   }
 }
 

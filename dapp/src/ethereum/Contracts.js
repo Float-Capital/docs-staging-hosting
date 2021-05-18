@@ -55,7 +55,8 @@ var Staker = {
 var abi$3 = Ethers.makeAbi([
       "function approve(address spender, uint256 amount) @100000",
       "function balanceOf(address owner) public view returns (uint256 balance)",
-      "function allowance(address owner, address spender) public view returns (uint256 remaining)"
+      "function allowance(address owner, address spender) public view returns (uint256 remaining)",
+      "function mint(uint256 value) public virtual returns (bool)"
     ]);
 
 function make$3(address, providerOrSigner) {
@@ -83,21 +84,9 @@ var Synth = {
   make: make$4
 };
 
-var abi$5 = Ethers.makeAbi(["function mintMonies(address aaveDaiContract)"]);
-
-function make$5(address, providerOrSigner) {
-  return Ethers.Contract.make(address, abi$5, providerOrSigner);
-}
-
-var AaveFaucet = {
-  abi: abi$5,
-  make: make$5
-};
-
 exports.TestErc20 = TestErc20;
 exports.LongShort = LongShort;
 exports.Staker = Staker;
 exports.Erc20 = Erc20;
 exports.Synth = Synth;
-exports.AaveFaucet = AaveFaucet;
 /* abi Not a pure module */

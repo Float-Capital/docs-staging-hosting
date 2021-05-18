@@ -6,6 +6,7 @@ var CssJs = require("bs-css-emotion/src/CssJs.js");
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Button = require("../components/UI/Base/Button.js");
+var Config = require("../Config.js");
 var Globals = require("../libraries/Globals.js");
 var Link = require("next/link").default;
 var Caml_option = require("rescript/lib/js/caml_option.js");
@@ -172,7 +173,12 @@ function Navigation(Props) {
                           children: React.createElement("a", {
                                 className: "px-3 hover:bg-white"
                               }, "DASHBOARD")
-                        }), React.createElement("a", {
+                        }), Config.networkId === 80001 ? React.createElement(Link, {
+                            href: "/faucet",
+                            children: React.createElement("a", {
+                                  className: "px-3 hover:bg-white"
+                                }, "FAUCET")
+                          }) : null, React.createElement("a", {
                           className: "px-3 hover:bg-white mr-2",
                           href: "https://docs.float.capital",
                           target: "_blank"
@@ -213,7 +219,15 @@ function Navigation(Props) {
                                                     return false;
                                                   }));
                                     })
-                                }, "DASHBOARD"), React.createElement("a", {
+                                }, "DASHBOARD"), React.createElement("div", {
+                                  className: "px-3 bg-black m-2",
+                                  onClick: (function (param) {
+                                      router.push("/faucet");
+                                      return Curry._1(setIsOpen, (function (param) {
+                                                    return false;
+                                                  }));
+                                    })
+                                }, "FAUCET"), React.createElement("a", {
                                   className: "px-3 bg-black m-2",
                                   href: "https://docs.float.capital",
                                   rel: "noopener noreferrer",
