@@ -219,15 +219,15 @@ function Navigation(Props) {
                                                     return false;
                                                   }));
                                     })
-                                }, "DASHBOARD"), React.createElement("div", {
-                                  className: "px-3 bg-black m-2",
-                                  onClick: (function (param) {
-                                      router.push("/faucet");
-                                      return Curry._1(setIsOpen, (function (param) {
-                                                    return false;
-                                                  }));
-                                    })
-                                }, "FAUCET"), React.createElement("a", {
+                                }, "DASHBOARD"), Config.networkId === 80001 ? React.createElement("div", {
+                                    className: "px-3 bg-black m-2",
+                                    onClick: (function (param) {
+                                        router.push("/faucet");
+                                        return Curry._1(setIsOpen, (function (param) {
+                                                      return false;
+                                                    }));
+                                      })
+                                  }, "FAUCET") : null, React.createElement("a", {
                                   className: "px-3 bg-black m-2",
                                   href: "https://docs.float.capital",
                                   rel: "noopener noreferrer",

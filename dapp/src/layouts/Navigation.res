@@ -162,14 +162,18 @@ let make = () => {
               className="px-3 bg-black m-2">
               {`DASHBOARD`->React.string}
             </div>
-            <div
-              onClick={_ => {
-                router->Next.Router.push(`/faucet`)
-                setIsOpen(_ => false)
-              }}
-              className="px-3 bg-black m-2">
-              {`FAUCET`->React.string}
-            </div>
+            {if Config.networkId == 80001 {
+              <div
+                onClick={_ => {
+                  router->Next.Router.push(`/faucet`)
+                  setIsOpen(_ => false)
+                }}
+                className="px-3 bg-black m-2">
+                {`FAUCET`->React.string}
+              </div>
+            } else {
+              React.null
+            }}
             <a
               onClick={_ => {
                 setIsOpen(_ => false)
