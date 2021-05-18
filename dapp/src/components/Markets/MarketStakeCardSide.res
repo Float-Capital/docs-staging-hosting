@@ -7,11 +7,12 @@ let make = (~orderPostion, ~orderPostionMobile, ~marketName, ~isLong, ~apy, ~flo
 
   let isHotAPY = apy => apy > CONSTANTS.hotAPYThreshold
 
-  let mapAPY = apy =>
-    `${apy->isHotAPY && !isLong ? `🔥` : ""}${(apy *. 100.)
-        ->Js.Float.toFixedWithPrecision(~digits=2)}%${apy->isHotAPY && isLong
-        ? `🔥`
-        : ""}`->React.string
+  let mapAPY = apy => {
+  	let maybeHotFlame = apy->isHotApy ? `🔥` : ""
+  	let apyDisplay = (apy *. 100.)->Js.Float.toFixedWithPrecision(~digits=2)
+  	
+    isLong ? `${apyDisplay}${maybeHotFlame}` : `${maybeHotFlame}${apyDisplay}`
+   }
 
   <div
     className={`${textPosition} order-${orderPostionMobile->Int.toString} md:order-${orderPostion->Int.toString} w-1/2 md:w-1/4 flex flex grow flex-wrap flex-col`}>
