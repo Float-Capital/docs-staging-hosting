@@ -2,7 +2,7 @@
 'use strict';
 
 var React = require("react");
-var Config = require("../Config.js");
+var Config = require("../config/Config.js");
 var Ethers = require("../ethereum/Ethers.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var ApolloClient = require("rescript-apollo-client/src/ApolloClient.js");

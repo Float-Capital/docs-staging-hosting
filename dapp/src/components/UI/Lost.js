@@ -3,7 +3,7 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Config = require("../../Config.js");
+var Config = require("../../config/Config.js");
 var Router = require("next/router");
 
 function Lost(Props) {

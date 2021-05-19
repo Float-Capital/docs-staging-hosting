@@ -4,7 +4,7 @@
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Button = require("../UI/Base/Button.js");
-var Config = require("../../Config.js");
+var Config = require("../../config/Config.js");
 var Contracts = require("../../ethereum/Contracts.js");
 var ContractActions = require("../../ethereum/ContractActions.js");
 

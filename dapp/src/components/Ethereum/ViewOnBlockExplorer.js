@@ -2,7 +2,7 @@
 'use strict';
 
 var React = require("react");
-var Config = require("../../Config.js");
+var Config = require("../../config/Config.js");
 
 function ViewOnBlockExplorer(Props) {
   var txHash = Props.txHash;
