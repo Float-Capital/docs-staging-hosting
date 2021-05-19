@@ -119,19 +119,19 @@ contract("LongShort (staking)", (accounts) => {
   });
 
   it.skip("case 1:  users can earn float with a delay from a long stake", async () => {
-    await basicFloatAccumulationTest(mintThenStake, longToken, shortToken, 2);
+    await basicFloatAccumulationTest(mintThenStake, longToken, 2);
   });
 
   it("case 2:  users can earn float immediately from a long mint", async () => {
-    await basicFloatAccumulationTest(mintAndStake, longToken, shortToken, 1);
+    await basicFloatAccumulationTest(mintAndStake, longToken, 1);
   });
 
   it.skip("case 1: users can earn float immediately with a delay from from a short stake", async () => {
-    await basicFloatAccumulationTest(mintThenStake, shortToken, longToken, 2);
+    await basicFloatAccumulationTest(mintThenStake, shortToken, 2);
   });
 
   it("case 2:  users can earn float immediately from a short mint", async () => {
-    await basicFloatAccumulationTest(mintAndStake, shortToken, longToken, 1);
+    await basicFloatAccumulationTest(mintAndStake, shortToken, 1);
   });
 
   it("staker admin can change", async () => {
@@ -186,7 +186,7 @@ contract("LongShort (staking)", (accounts) => {
       longValue,
       shortValue,
       [longPrice, shortPrice],
-      [longToken.address, shortToken.address]
+      marketIndex
     );
 
     await longToken.stake(twentyFive, { from: user1 });
@@ -300,7 +300,7 @@ contract("LongShort (staking)", (accounts) => {
     );
   });
 
-  const basicFloatAccumulationTest = async (fn, token, otherToken, iterations) => {
+  const basicFloatAccumulationTest = async (fn, token, iterations) => {
     // Ensure markets aren't empty.
     await populateMarket();
 
@@ -334,7 +334,7 @@ contract("LongShort (staking)", (accounts) => {
       longValue,
       shortValue,
       [longPrice, shortPrice],
-      isTestingLong ? [token.address, otherToken.address] : [otherToken.address, token.address],
+      marketIndex,
     );
     const expectedFloatPerSecond = isTestingLong ? expectedFloatPerSecondLong : expectedFloatPerSecondShort;
     const result = await floatToken.balanceOf(user1);
@@ -372,16 +372,13 @@ contract("LongShort (staking)", (accounts) => {
     longValue,
     shortValue,
     tokenPrice,
-    token,
-    isLong
+    marketIndex,
   ) => {
     return await staker.calculateFloatPerSecond.call(
       longValue,
       shortValue,
       tokenPrice,
-      token,
-      isLong
-    );
+      marketIndex);
   };
 
   const amountStaked = async (token, user) =>

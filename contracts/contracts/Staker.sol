@@ -202,6 +202,9 @@ contract Staker is IStaker, Initializable {
         syntheticRewardParams[marketIndex][0]
             .accumulativeFloatPerShortToken = 0;
 
+        syntheticTokens[marketIndex].longToken = longToken;
+        syntheticTokens[marketIndex].shortToken = shortToken;
+
         _changeKFactorParameters(marketIndex, kPeriod, kInitialMultiplier);
 
         emit StateAdded(address(longToken), 0, block.timestamp, 0);
@@ -255,6 +258,7 @@ contract Staker is IStaker, Initializable {
      * earns per second for every longshort token they've staked. The returned
      * value has a fixed decimal scale of 1e42 (!!!) for numerical stability.
      */
+    // TODO: should be an internal function
     function calculateFloatPerSecond(
         uint256 longValue,
         uint256 shortValue,
@@ -275,7 +279,6 @@ contract Staker is IStaker, Initializable {
         // Float is scaled by the percentage of the total market value held in
         // the opposite position. This incentivises users to stake on the
         // weaker position.
-
         return [
             ((k * shortValue) * tokenPrices[0]) / totalLocked,
             ((k * longValue) * tokenPrices[1]) / totalLocked
@@ -447,10 +450,7 @@ contract Staker is IStaker, Initializable {
                     ]
                         .accumulativeFloatPerLongToken;
             longFloatReward =
-                (accumDeltaLong *
-                    userAmountStaked[syntheticTokens[marketIndex].longToken][
-                        user
-                    ]) /
+                (accumDeltaLong * stakedLong) /
                 FLOAT_ISSUANCE_FIXED_DECIMAL;
         }
 
@@ -459,16 +459,13 @@ contract Staker is IStaker, Initializable {
                 syntheticRewardParams[marketIndex][
                     latestRewardIndex[marketIndex]
                 ]
-                    .accumulativeFloatPerLongToken -
+                    .accumulativeFloatPerShortToken -
                     syntheticRewardParams[marketIndex][
                         userIndexOfLastClaimedReward[marketIndex][user]
                     ]
-                        .accumulativeFloatPerLongToken;
+                        .accumulativeFloatPerShortToken;
             shortFloatReward =
-                (accumDeltaShort *
-                    userAmountStaked[syntheticTokens[marketIndex].longToken][
-                        user
-                    ]) /
+                (accumDeltaShort * stakedShort) /
                 FLOAT_ISSUANCE_FIXED_DECIMAL;
         }
 
