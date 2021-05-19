@@ -5,12 +5,6 @@ open Masonry
 module UserBalancesCard = {
   @react.component
   let make = (~userId) => {
-    /*
-    TODO:
-    * Use the nicer way to get token prices: https://github.com/float-capital/monorepo/issues/228
-    * calculate the correct estimated value
-    * get the total value of the users tokens
- */
     let usersTokensQuery = DataHooks.useUsersBalances(~userId)
 
     <UserColumnCard>
