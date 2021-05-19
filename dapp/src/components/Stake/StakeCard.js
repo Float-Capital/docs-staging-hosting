@@ -24,14 +24,8 @@ var ToastProvider = require("../UI/ToastProvider.js");
 var Belt_HashSetString = require("rescript/lib/js/belt_HashSetString.js");
 var MarketCalculationHelpers = require("../../libraries/MarketCalculationHelpers.js");
 
-var zero = Ethers$1.BigNumber.from("0");
-
-var oneHundred = Ethers$1.BigNumber.from("100000000000000000000");
-
-var oneInWei = Ethers$1.BigNumber.from("1000000000000000000");
-
 function calculateDollarValue(tokenPrice, amountStaked) {
-  return tokenPrice.mul(amountStaked).div(oneInWei);
+  return tokenPrice.mul(amountStaked).div(CONSTANTS.tenToThe18);
 }
 
 function basicApyCalc(collateralTokenApy, longVal, shortVal, tokenType) {
@@ -65,10 +59,6 @@ function mappedBasicCalc(apy, longVal, shortVal, tokenType) {
   }
 }
 
-var kperiodHardcode = Ethers$1.BigNumber.from("1664000");
-
-var kmultiplierHardcode = Ethers$1.BigNumber.from("5000000000000000000");
-
 function StakeCard(Props) {
   var param = Props.syntheticMarket;
   var $staropt$star = Props.optUserBalanceAddressSet;
@@ -93,8 +83,8 @@ function StakeCard(Props) {
   var totalDollarValueStake = longDollarValueStaked.add(shortDollarValueStaked);
   var longApy = mappedBasicCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
   var shortApy = mappedBasicCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
-  var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
-  var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, kperiodHardcode, kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
+  var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
+  var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
   var stakeOption = Js_dict.get(router.query, "tokenAddress");
   var stakeButtons = function (param) {
     return React.createElement("div", {
@@ -268,13 +258,8 @@ function StakeCard(Props) {
 
 var make = StakeCard;
 
-exports.zero = zero;
-exports.oneHundred = oneHundred;
-exports.oneInWei = oneInWei;
 exports.calculateDollarValue = calculateDollarValue;
 exports.basicApyCalc = basicApyCalc;
 exports.mappedBasicCalc = mappedBasicCalc;
-exports.kperiodHardcode = kperiodHardcode;
-exports.kmultiplierHardcode = kmultiplierHardcode;
 exports.make = make;
-/* zero Not a pure module */
+/* Misc Not a pure module */

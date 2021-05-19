@@ -1,13 +1,8 @@
 open Globals
 open APYProvider
 
-// Big numbers
-let zero = Ethers.BigNumber.fromUnsafe("0")
-let oneHundred = Ethers.BigNumber.fromUnsafe("100000000000000000000") // 10 ^ 20
-let oneInWei = Ethers.BigNumber.fromUnsafe("1000000000000000000") // 10 ^ 18
-
 let calculateDollarValue = (~tokenPrice: Ethers.BigNumber.t, ~amountStaked: Ethers.BigNumber.t) => {
-  tokenPrice->Ethers.BigNumber.mul(amountStaked)->Ethers.BigNumber.div(oneInWei)
+  tokenPrice->Ethers.BigNumber.mul(amountStaked)->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
 }
 
 let basicApyCalc = (collateralTokenApy: float, longVal: float, shortVal: float, tokenType) => {
@@ -31,11 +26,6 @@ let mappedBasicCalc = (apy, longVal, shortVal, tokenType) =>
   | Loaded(apyVal) => Loaded(basicApyCalc(apyVal, longVal, shortVal, tokenType))
   | a => a
   }
-
-// TODO: emit and pull these from graph. "kperiod, kInitialMultiplier."
-// For now going to hardcode them.
-let kperiodHardcode = Ethers.BigNumber.fromUnsafe("1664000") // ~20 days
-let kmultiplierHardcode = Ethers.BigNumber.fromUnsafe("5000000000000000000")
 
 type handleStakeButtonPress =
   | WaitingForInteraction
@@ -93,8 +83,8 @@ let make = (
   let longFloatApy = MarketCalculationHelpers.calculateFloatAPY(
     totalLockedLong,
     totalLockedShort,
-    kperiodHardcode,
-    kmultiplierHardcode,
+    CONSTANTS.kperiodHardcode,
+    CONSTANTS.kmultiplierHardcode,
     timestampCreated,
     currentTimestamp,
     "long",
@@ -103,8 +93,8 @@ let make = (
   let shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(
     totalLockedLong,
     totalLockedShort,
-    kperiodHardcode,
-    kmultiplierHardcode,
+    CONSTANTS.kperiodHardcode,
+    CONSTANTS.kmultiplierHardcode,
     timestampCreated,
     currentTimestamp,
     "short",

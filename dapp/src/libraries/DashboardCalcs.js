@@ -18,8 +18,8 @@ function trendingStakes(syntheticMarkets, apy) {
                         var marketName = param.name;
                         var longApy = StakeCard.basicApyCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
                         var shortApy = StakeCard.basicApyCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
-                        var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, StakeCard.kperiodHardcode, StakeCard.kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
-                        var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, StakeCard.kperiodHardcode, StakeCard.kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
+                        var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
+                        var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
                         return Belt_Array.concat(previous, [
                                     {
                                       marketName: marketName,

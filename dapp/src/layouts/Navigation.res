@@ -107,6 +107,7 @@ let make = () => {
           {React.string("DOCS")}
         </a>
         {
+          // Will uncomment this in prod so will leave for now TODO
           // <a
           //   className="px-3 hover:opacity-60" target="_blank" href="https://github.com/Float-Capital">
           //   <img src="/icons/github.svg" className="h-5" />
@@ -183,6 +184,7 @@ let make = () => {
               {React.string("DOCS")}
             </a>
             {
+              // TODO: Uncomment in prod
               // <a
               //   onClick={_ => {
               //     setIsOpen(_ => false)

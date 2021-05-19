@@ -133,7 +133,7 @@ let floatTokenCard = (~totalFloatMinted) =>
         createDashboardLiProps(~prefix=`😏 Float price:`, ~value="...", ()),
         createDashboardLiProps(
           ~prefix=`🗳 Float supply:`,
-          ~value=totalFloatMinted->Misc.NumberFormat.formatEther, //Ethers.Utils.formatEtherToPrecision(2),
+          ~value=totalFloatMinted->Misc.NumberFormat.formatEther,
           ~suffix=<Tooltip tip="The number of Float tokens in circulation" />,
           (),
         ),
