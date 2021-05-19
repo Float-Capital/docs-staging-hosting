@@ -450,7 +450,6 @@ function StakeForm$StakeFormInput(Props) {
               onSubmit: onSubmit,
               children: null
             }, React.createElement(AmountInput.make, {
-                  placeholder: "Stake",
                   value: value,
                   optBalance: optBalance,
                   disabled: disabled,

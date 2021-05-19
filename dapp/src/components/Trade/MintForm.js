@@ -783,7 +783,6 @@ function MintForm$MintFormInput(Props) {
             selectPosition: Curry.__1(onChangeSide),
             disabled: disabled
           }), React.createElement(AmountInput.make, {
-            placeholder: "Mint",
             value: valueAmountInput,
             optBalance: optDaiBalance,
             disabled: disabled,

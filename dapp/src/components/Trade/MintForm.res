@@ -200,7 +200,6 @@ module MintFormInput = {
           disabled
           onBlur=onBlurAmount
           onChange=onChangeAmountInput
-          placeholder={"Mint"}
           optCurrency={Some(Config.paymentTokenName)}
           onMaxClick
         />
@@ -361,7 +360,6 @@ module MintFormSignedIn = {
     let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
     let router = Next.Router.useRouter()
 
-    // Execute the call after approval has completed
     React.useEffect1(() => {
       switch txStateApprove {
       | Created =>
