@@ -12,7 +12,7 @@ NOTE: This contract is for testing purposes only!
 contract StakerInternalsExposed is Staker {
     function calculateAccumulatedFloatExposed(uint32 marketIndex, address user)
         external
-        returns (uint256 longFloatReward, uint256 shortFloatReward)
+        returns (uint256)
     {
         return calculateAccumulatedFloat(marketIndex, user);
     }

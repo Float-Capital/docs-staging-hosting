@@ -79,10 +79,11 @@ contract Staker is IStaker, Initializable {
     event DeployV1(address floatToken);
 
     event StateAdded(
-        address token,
+        uint32 marketIndex,
         uint256 stateIndex,
         uint256 timestamp,
-        uint256 accumulative
+        uint256 accumulativeLong,
+        uint256 accumulativeShort
     );
 
     event StakeAdded(
@@ -96,7 +97,7 @@ contract Staker is IStaker, Initializable {
 
     event FloatMinted(
         address user,
-        address token,
+        uint32 markets,
         uint256 amount,
         uint256 lastMintIndex
     );
@@ -207,8 +208,7 @@ contract Staker is IStaker, Initializable {
 
         _changeKFactorParameters(marketIndex, kPeriod, kInitialMultiplier);
 
-        emit StateAdded(address(longToken), 0, block.timestamp, 0);
-        emit StateAdded(address(shortToken), 0, block.timestamp, 0);
+        emit StateAdded(marketIndex, 0, block.timestamp, 0, 0);
     }
 
     ////////////////////////////////////
@@ -264,10 +264,14 @@ contract Staker is IStaker, Initializable {
         uint256 longPrice,
         uint256 shortPrice,
         uint32 marketIndex
-    ) public view returns (uint256[2] memory) {
+    )
+        public
+        view
+        returns (uint256 longFloatPerSecond, uint256 shortFloatPerSecond)
+    {
         // Edge-case: no float is issued in an empty market.
         if (longValue == 0 && shortValue == 0) {
-            return [uint256(0), uint256(0)];
+            return (0, 0);
         }
 
         // A float issuance multiplier that starts high and decreases linearly
@@ -279,10 +283,10 @@ contract Staker is IStaker, Initializable {
         // Float is scaled by the percentage of the total market value held in
         // the opposite position. This incentivises users to stake on the
         // weaker position.
-        return [
+        return (
             ((k * shortValue) * longPrice) / totalLocked,
             ((k * longValue) * shortPrice) / totalLocked
-        ];
+        );
     }
 
     /*
@@ -304,15 +308,19 @@ contract Staker is IStaker, Initializable {
      * cumulative 'r' value to avoid looping during issuance. Note that the
      * cumulative sum is kept in 1e42 scale (!!!) to avoid numerical issues.
      */
-    function calculateNewCumulative(
+    function calculateNewCumulativeRate(
         uint256 longValue,
         uint256 shortValue,
         uint256 longPrice,
         uint256 shortPrice,
         uint32 marketIndex
-    ) internal view returns (uint256[2] memory) {
+    )
+        internal
+        view
+        returns (uint256 longCumulativeRates, uint256 shortCumulativeRates)
+    {
         // Compute the current 'r' value for float issuance per second.
-        uint256[2] memory floatPerSecond =
+        (uint256 longFloatPerSecond, uint256 shortFloatPerSecond) =
             calculateFloatPerSecond(
                 longValue,
                 shortValue,
@@ -325,14 +333,14 @@ contract Staker is IStaker, Initializable {
         uint256 timeDelta = calculateTimeDelta(marketIndex);
 
         // // Compute new cumulative 'r' value total.
-        return [
+        return (
             syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
                 .accumulativeFloatPerLongToken +
-                (timeDelta * floatPerSecond[0]),
+                (timeDelta * longFloatPerSecond),
             syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
                 .accumulativeFloatPerShortToken +
-                (timeDelta * floatPerSecond[1])
-        ];
+                (timeDelta * shortFloatPerSecond)
+        );
     }
 
     /*
@@ -345,8 +353,8 @@ contract Staker is IStaker, Initializable {
         uint256 shortPrice,
         uint32 marketIndex
     ) internal {
-        uint256[2] memory newAccumulativeRates =
-            calculateNewCumulative(
+        (uint256 longAccumulativeRates, uint256 shortAccumulativeRates) =
+            calculateNewCumulativeRate(
                 longValue,
                 shortValue,
                 longPrice,
@@ -358,32 +366,25 @@ contract Staker is IStaker, Initializable {
 
         // Set cumulative 'r' value on new state point.
         syntheticRewardParams[marketIndex][newIndex]
-            .accumulativeFloatPerLongToken = newAccumulativeRates[0];
+            .accumulativeFloatPerLongToken = longAccumulativeRates;
         syntheticRewardParams[marketIndex][newIndex]
-            .accumulativeFloatPerShortToken = newAccumulativeRates[1];
+            .accumulativeFloatPerShortToken = shortAccumulativeRates;
 
-        // // Set timestamp on new state point.
+        // Set timestamp on new state point.
         syntheticRewardParams[marketIndex][newIndex].timestamp = block
             .timestamp;
         syntheticRewardParams[marketIndex][newIndex].timestamp = block
             .timestamp;
 
-        // // Update latest index to point to new state point.
+        // Update latest index to point to new state point.
         latestRewardIndex[marketIndex] = newIndex;
 
         emit StateAdded(
-            address(syntheticTokens[marketIndex].longToken),
+            marketIndex,
             newIndex,
             block.timestamp,
-            syntheticRewardParams[marketIndex][newIndex]
-                .accumulativeFloatPerLongToken
-        );
-        emit StateAdded(
-            address(syntheticTokens[marketIndex].shortToken),
-            newIndex,
-            block.timestamp,
-            syntheticRewardParams[marketIndex][newIndex]
-                .accumulativeFloatPerShortToken
+            longAccumulativeRates,
+            shortAccumulativeRates
         );
     }
 
@@ -424,14 +425,14 @@ contract Staker is IStaker, Initializable {
     function calculateAccumulatedFloat(uint32 marketIndex, address user)
         internal
         view
-        returns (uint256 longFloatReward, uint256 shortFloatReward)
+        returns (uint256 floatToMint)
     {
         // Don't do the calculation and return zero immediately if there is no change
         if (
             userIndexOfLastClaimedReward[marketIndex][user] ==
             latestRewardIndex[marketIndex]
         ) {
-            return (0, 0);
+            return 0;
         }
 
         // Stake should always do a full system state update, so 'users last claimed index' should never be greater than the latest index
@@ -455,7 +456,7 @@ contract Staker is IStaker, Initializable {
                         userIndexOfLastClaimedReward[marketIndex][user]
                     ]
                         .accumulativeFloatPerLongToken;
-            longFloatReward =
+            floatToMint +=
                 (accumDeltaLong * stakedLong) /
                 FLOAT_ISSUANCE_FIXED_DECIMAL;
         }
@@ -470,13 +471,13 @@ contract Staker is IStaker, Initializable {
                         userIndexOfLastClaimedReward[marketIndex][user]
                     ]
                         .accumulativeFloatPerShortToken;
-            shortFloatReward =
+            floatToMint +=
                 (accumDeltaShort * stakedShort) /
                 FLOAT_ISSUANCE_FIXED_DECIMAL;
         }
 
         // explicit return
-        return (longFloatReward, shortFloatReward);
+        return floatToMint;
     }
 
     function _mintFloat(address user, uint256 floatToMint) internal {
@@ -485,10 +486,7 @@ contract Staker is IStaker, Initializable {
     }
 
     function mintAccumulatedFloat(uint32 marketIndex, address user) internal {
-        // TODO: combine these
-        (uint256 floatToMintLong, uint256 floatToMintShort) =
-            calculateAccumulatedFloat(marketIndex, user);
-        uint256 floatToMint = floatToMintLong + floatToMintShort;
+        uint256 floatToMint = calculateAccumulatedFloat(marketIndex, user);
         if (floatToMint > 0) {
             // stops them setting this forward
             userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[
@@ -499,14 +497,8 @@ contract Staker is IStaker, Initializable {
 
             emit FloatMinted(
                 user,
-                address(syntheticTokens[marketIndex].longToken),
-                floatToMintLong,
-                latestRewardIndex[marketIndex]
-            );
-            emit FloatMinted(
-                user,
-                address(syntheticTokens[marketIndex].shortToken),
-                floatToMintShort,
+                marketIndex,
+                floatToMint,
                 latestRewardIndex[marketIndex]
             );
         }
@@ -515,10 +507,8 @@ contract Staker is IStaker, Initializable {
     function _claimFloat(uint32[] calldata marketIndex) internal {
         uint256 floatTotal = 0;
         for (uint256 i = 0; i < marketIndex.length; i++) {
-            (uint256 floatToMintLong, uint256 floatToMintShort) =
+            uint256 floatToMint =
                 calculateAccumulatedFloat(marketIndex[i], msg.sender);
-
-            uint256 floatToMint = floatToMintLong + floatToMintShort;
 
             if (floatToMint > 0) {
                 // Set the user has claimed up until now.
@@ -529,14 +519,8 @@ contract Staker is IStaker, Initializable {
 
                 emit FloatMinted(
                     msg.sender,
-                    address(syntheticTokens[marketIndex[i]].longToken),
-                    floatToMintLong,
-                    latestRewardIndex[marketIndex[i]]
-                );
-                emit FloatMinted(
-                    msg.sender,
-                    address(syntheticTokens[marketIndex[i]].shortToken),
-                    floatToMintShort,
+                    marketIndex[i],
+                    floatToMint,
                     latestRewardIndex[marketIndex[i]]
                 );
             }
