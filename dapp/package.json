@@ -33,7 +33,7 @@
     "swr": "^0.4.1"
   },
   "scripts": {
-    "next:dev": "NEXT_PUBLIC_DEVMODE=true CONFIG_FILE='./config/config-dev.json' next",
+    "next:dev": "NEXT_PUBLIC_DEVMODE=true CONFIG_FILE='./config-dev.json' next",
     "debug": "NODE_OPTIONS='--inspect' next",
     "now-build": "yarn res:build && next build",
     "next:export": "next export",
