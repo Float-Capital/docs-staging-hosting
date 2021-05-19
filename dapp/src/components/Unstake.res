@@ -73,9 +73,7 @@ module StakeFormInput = {
     ~buttonText,
   ) =>
     <Form className="" onSubmit>
-      <AmountInput
-        value optBalance={optBalance} disabled onBlur onChange placeholder={"Unstake"} onMaxClick
-      />
+      <AmountInput value optBalance={optBalance} disabled onBlur onChange onMaxClick />
       <Button onClick={_ => onSubmit()} disabled={buttonDisabled}> {buttonText} </Button>
       {txStateModal}
     </Form>

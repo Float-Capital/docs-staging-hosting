@@ -34,7 +34,7 @@ module RedeemFormInput = {
       {hasBothTokens
         ? <LongOrShortSelect isLong selectPosition={val => onChangeSide(val)} disabled />
         : React.null}
-      <AmountInput value optBalance disabled onBlur onChange placeholder={"Redeem"} onMaxClick />
+      <AmountInput value optBalance disabled onBlur onChange onMaxClick />
       {submitButton}
     </Form>
   }
