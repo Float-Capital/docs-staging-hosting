@@ -615,8 +615,7 @@ contract LongShort is ILongShort, Initializable {
         // So reward rate can be calculated just in time by
         // staker without needing to be saved
         staker.addNewStateForFloatRewards(
-            longTokens[marketIndex],
-            shortTokens[marketIndex],
+            marketIndex,
             longTokenPrice[marketIndex],
             shortTokenPrice[marketIndex],
             longValue[marketIndex],
@@ -626,6 +625,8 @@ contract LongShort is ILongShort, Initializable {
         if (longValue[marketIndex] == 0 && shortValue[marketIndex] == 0) {
             return;
         }
+        // TODO - should never happen - seed markets
+        // assert(longValue[marketIndex] != 0 && shortValue[marketIndex] != 0);
 
         // TODO: Check why/if this is bad (casting to uint)
         // If a negative int is return this should fail.
