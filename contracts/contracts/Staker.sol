@@ -233,7 +233,6 @@ contract Staker is IStaker, Initializable {
         return (period, multiplier);
     }
 
-    // TODO: make this market specific
     function getKValue(uint32 marketIndex) internal view returns (uint256) {
         // Parameters controlling the float issuance multiplier.
         (uint256 kPeriod, uint256 kInitialMultiplier) =
@@ -262,7 +261,8 @@ contract Staker is IStaker, Initializable {
     function calculateFloatPerSecond(
         uint256 longValue,
         uint256 shortValue,
-        uint256[2] memory tokenPrices, // price of the token
+        uint256 longPrice,
+        uint256 shortPrice,
         uint32 marketIndex
     ) public view returns (uint256[2] memory) {
         // Edge-case: no float is issued in an empty market.
@@ -280,8 +280,8 @@ contract Staker is IStaker, Initializable {
         // the opposite position. This incentivises users to stake on the
         // weaker position.
         return [
-            ((k * shortValue) * tokenPrices[0]) / totalLocked,
-            ((k * longValue) * tokenPrices[1]) / totalLocked
+            ((k * shortValue) * longPrice) / totalLocked,
+            ((k * longValue) * shortPrice) / totalLocked
         ];
     }
 
@@ -307,7 +307,8 @@ contract Staker is IStaker, Initializable {
     function calculateNewCumulative(
         uint256 longValue,
         uint256 shortValue,
-        uint256[2] memory tokenPrices,
+        uint256 longPrice,
+        uint256 shortPrice,
         uint32 marketIndex
     ) internal view returns (uint256[2] memory) {
         // Compute the current 'r' value for float issuance per second.
@@ -315,7 +316,8 @@ contract Staker is IStaker, Initializable {
             calculateFloatPerSecond(
                 longValue,
                 shortValue,
-                tokenPrices,
+                longPrice,
+                shortPrice,
                 marketIndex
             );
 
@@ -339,14 +341,16 @@ contract Staker is IStaker, Initializable {
     function setRewardObjects(
         uint256 longValue,
         uint256 shortValue,
-        uint256[2] memory tokenPrices,
+        uint256 longPrice,
+        uint256 shortPrice,
         uint32 marketIndex
     ) internal {
         uint256[2] memory newAccumulativeRates =
             calculateNewCumulative(
                 longValue,
                 shortValue,
-                tokenPrices,
+                longPrice,
+                shortPrice,
                 marketIndex
             );
 
@@ -398,10 +402,12 @@ contract Staker is IStaker, Initializable {
 
         // Time delta is fetched twice in below code, can pass through? Which is less gas?
         if (calculateTimeDelta(marketIndex) > 0) {
+            // TODO: for consistancy, all functions should follow same order
             setRewardObjects(
                 longValue,
                 shortValue,
-                [longPrice, shortPrice],
+                longPrice,
+                shortPrice,
                 marketIndex
             );
         }
