@@ -38,8 +38,8 @@ let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>, ~
     let longFloatApy = MarketCalculationHelpers.calculateFloatAPY(
       totalLockedLong,
       totalLockedShort,
-      StakeCard.kperiodHardcode,
-      StakeCard.kmultiplierHardcode,
+      CONSTANTS.kperiodHardcode,
+      CONSTANTS.kmultiplierHardcode,
       timestampCreated,
       currentTimestamp,
       "long",
@@ -48,8 +48,8 @@ let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>, ~
     let shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(
       totalLockedLong,
       totalLockedShort,
-      StakeCard.kperiodHardcode,
-      StakeCard.kmultiplierHardcode,
+      CONSTANTS.kperiodHardcode,
+      CONSTANTS.kmultiplierHardcode,
       timestampCreated,
       currentTimestamp,
       "short",

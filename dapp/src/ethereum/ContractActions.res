@@ -45,20 +45,10 @@ Get the signer for the current user and throw an exception if it doesn't exist
 let useSignerExn = () => useSigner()->Option.getExn
 
 type transactionState =
-  // | SignerUnavailable
   | UnInitialised
-  // | DaiPermit(BN.t)
-  // | SignMetaTx
   | Created
-  // | SubmittedMetaTx
   | SignedAndSubmitted(txHash)
-  // TODO: get the error message when it is declined.
-  //      4001 - means the transaction was declined by the signer
-  //      -32000 - means the transaction is always failing (exceeds gas allowance)
   | Declined(string)
-  // | DaiPermitDclined(string)
-  // | SignMetaTxDclined(string)
-  // | ServerError(string)
   | Complete(txResult)
   | Failed(string)
 

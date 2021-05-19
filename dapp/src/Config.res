@@ -2,7 +2,7 @@ type contractDetails = {
   @as("LongShort") longShort: Ethers.ethAddress,
   @as("Staker") staker: Ethers.ethAddress,
   @as("Dai") dai: Ethers.ethAddress,
-  @as("FloatToken") floatToken: Ethers.ethAddress
+  @as("FloatToken") floatToken: Ethers.ethAddress,
 }
 type configShape = {
   graphEndpoint: string,
@@ -17,6 +17,7 @@ type configShape = {
   blockExplorerName: string,
   discordInviteLink: string,
   web3PollingInterval: int,
+  apolloConnectToDevTools: bool,
   contracts: contractDetails,
 }
 let config: configShape = %raw(`require('config_file')`)
@@ -36,5 +37,6 @@ let {
   blockExplorerName,
   discordInviteLink,
   web3PollingInterval,
+  apolloConnectToDevTools,
   contracts: {longShort, staker, dai, floatToken},
 } = config

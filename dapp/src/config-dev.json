@@ -11,6 +11,7 @@
   "blockExplorerName": "matic explorer",
   "discordInviteLink": "https://discord.gg/dqDwgrVYcU",
   "web3PollingInterval": 8000,
+  "apolloConnectToDevTools": true,
   "contracts": {
     "FloatCapital_v0": "0x97D247303960fC0FCA4fD703f3dAaf0ADdA07598",
     "FloatToken": "0x4fEC167F70E9aD94F67E962B51F4c725BDeDB098",

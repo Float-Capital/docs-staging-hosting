@@ -1,7 +1,7 @@
 const bsconfig = require("./bsconfig.json");
 
+// Relative to src/Config - similarly with the `CONFIG_FILE` env variable.
 let defaultConfig = "./config.json";
-// ^relative to src/Config - similarly with the `CONFIG_FILE` env variable.
 
 const transpileModules = ["bs-platform"].concat(bsconfig["bs-dependencies"]);
 const withTM = require("next-transpile-modules")(transpileModules);

@@ -27,6 +27,15 @@ var oneHundredEth = Ethers.BigNumber.from("100000000000000000000");
 
 var oneThousandInWei = Ethers.BigNumber.from("1000000000000000000000");
 
+var PriceGraphLabels = {
+  max: "MAX",
+  day: "1D",
+  week: "1W",
+  month: "1M",
+  threeMonth: "3M",
+  year: "1Y"
+};
+
 var kperiodHardcode = Ethers.BigNumber.from("1664000");
 
 var kmultiplierHardcode = Ethers.BigNumber.from("5000000000000000000");
@@ -73,6 +82,7 @@ exports.threeDaysInSeconds = threeDaysInSeconds;
 exports.oneWeekInSeconds = oneWeekInSeconds;
 exports.twoWeeksInSeconds = twoWeeksInSeconds;
 exports.oneMonthInSeconds = oneMonthInSeconds;
+exports.PriceGraphLabels = PriceGraphLabels;
 exports.threeMonthsInSeconds = threeMonthsInSeconds;
 exports.oneYearInSeconds = oneYearInSeconds;
 exports.hotAPYThreshold = hotAPYThreshold;
