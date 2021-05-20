@@ -35,7 +35,7 @@ module StakeFormInput = {
     ~txStatusModals=React.null,
   ) =>
     <Form className="mx-auto max-w-3xl" onSubmit>
-      <AmountInput value optBalance disabled onBlur onChange placeholder={"Stake"} onMaxClick />
+      <AmountInput value optBalance disabled onBlur onChange onMaxClick />
       <Button disabled=buttonDisabled onClick={_ => ()}>
         {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
       </Button>

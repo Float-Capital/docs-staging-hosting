@@ -504,7 +504,6 @@ function Unstake$StakeFormInput(Props) {
               onSubmit: onSubmit,
               children: null
             }, React.createElement(AmountInput.make, {
-                  placeholder: "Unstake",
                   value: value,
                   optBalance: optBalance,
                   disabled: disabled,

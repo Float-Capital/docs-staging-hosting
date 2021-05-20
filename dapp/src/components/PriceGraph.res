@@ -46,13 +46,12 @@ let minThreshodFromGraphSetting = graphSetting =>
 
 let btnTextFromGraphSetting = graphSetting =>
   switch graphSetting {
-  // TODO: these values should be constants
-  | Max(_timeMaketHasExisted) => "MAX"
-  | Day => "1D"
-  | Week => "1W"
-  | Month => "1M"
-  | ThreeMonth => "3M"
-  | Year => "1Y"
+  | Max(_timeMaketHasExisted) => CONSTANTS.PriceGraphLabels.max
+  | Day => CONSTANTS.PriceGraphLabels.day
+  | Week => CONSTANTS.PriceGraphLabels.week
+  | Month => CONSTANTS.PriceGraphLabels.month
+  | ThreeMonth => CONSTANTS.PriceGraphLabels.threeMonth
+  | Year => CONSTANTS.PriceGraphLabels.year
   }
 
 let getMaxTimeDateFormatter = timeMarketExists => {
@@ -79,31 +78,11 @@ let dateFormattersFromGraphSetting = graphSetting =>
 
 let getMaxTimeIntervalAndAmount = timeMarketExists => {
   switch timeMarketExists {
-  | time if time < CONSTANTS.halfDayInSeconds => (
-      CONSTANTS.fiveMinutesInSeconds,
-      // timeMarketExists / CONSTANTS.fiveMinutesInSeconds + 1, // Max data points: 144
-      1000,
-    )
-  | time if time < CONSTANTS.oneWeekInSeconds => (
-      CONSTANTS.oneHourInSeconds,
-      // timeMarketExists / CONSTANTS.oneHourInSeconds + 1, // Min data points: 13; Max data points: 84
-      1000,
-    )
-  | time if time < CONSTANTS.twoWeeksInSeconds => (
-      CONSTANTS.halfDayInSeconds,
-      // timeMarketExists / CONSTANTS.halfDayInSeconds + 1, // Min data points: 13; Max data points: 84
-      1000,
-    )
-  | time if time < CONSTANTS.threeMonthsInSeconds => (
-      CONSTANTS.oneDayInSeconds,
-      // timeMarketExists / CONSTANTS.oneDayInSeconds + 1, // Min data points: 15; Max data points: 90
-      1000,
-    )
-  | time if time < CONSTANTS.oneYearInSeconds => (
-      CONSTANTS.oneWeekInSeconds,
-      // timeMarketExists / CONSTANTS.oneWeekInSeconds + 1, // Min data points: 13; Max data points: 56
-      1000,
-    )
+  | time if time < CONSTANTS.halfDayInSeconds => (CONSTANTS.fiveMinutesInSeconds, 1000)
+  | time if time < CONSTANTS.oneWeekInSeconds => (CONSTANTS.oneHourInSeconds, 1000)
+  | time if time < CONSTANTS.twoWeeksInSeconds => (CONSTANTS.halfDayInSeconds, 1000)
+  | time if time < CONSTANTS.threeMonthsInSeconds => (CONSTANTS.oneDayInSeconds, 1000)
+  | time if time < CONSTANTS.oneYearInSeconds => (CONSTANTS.oneWeekInSeconds, 1000)
   | _ => (CONSTANTS.twoWeeksInSeconds, 1000)
   }
 }
@@ -157,7 +136,6 @@ let extractGraphPriceInfo = (
 let generateDummyData = endTimestamp => {
   let oneDayInSecondsFloat = CONSTANTS.oneDayInSeconds->Float.fromInt
 
-  // TODO: when I'm not on an airplane, look in docs how to generate this array easily.
   let (result, _, _) = Array.makeUninitialized(60)->Array.reduce(
     (
       {dataArray: [], minYValue: 200., maxYValue: 100., dateFormat: #iii},

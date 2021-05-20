@@ -199,7 +199,7 @@ function User(Props) {
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
   var router = Router.useRouter();
   var userStr = Js_dict.get(router.query, "user");
-  var user = userStr !== undefined ? userStr.toLowerCase() : "no user provided";
+  var user = userStr !== undefined ? userStr.toLowerCase() : "No user provided";
   var stakesQuery = DataHooks.useStakesForUser(user);
   var userInfoQuery = DataHooks.useBasicUserInfo(user);
   var notCurrentUserMessage = function (param) {

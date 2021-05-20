@@ -22,13 +22,21 @@ let oneWeekInSeconds = 604800
 let twoWeeksInSeconds = 1209600
 let oneMonthInSeconds = 2628029
 
+/* price graph time periods */
+module PriceGraphLabels = {
+  let max = "MAX"
+  let day = "1D"
+  let week = "1W"
+  let month = "1M"
+  let threeMonth = "3M"
+  let year = "1Y"
+}
+
 /* Used as intervals for the price history chart */
 let threeMonthsInSeconds = 7884087
 let oneYearInSeconds = 31536000
 
 let hotAPYThreshold = 0.15
 
-// TODO: emit and pull these from graph. "kperiod, kInitialMultiplier."
-// For now going to hardcode them.
 let kperiodHardcode = Ethers.BigNumber.fromUnsafe("1664000") // ~20 days
 let kmultiplierHardcode = Ethers.BigNumber.fromUnsafe("5000000000000000000")

@@ -200,7 +200,6 @@ module MintFormInput = {
           disabled
           onBlur=onBlurAmount
           onChange=onChangeAmountInput
-          placeholder={"Mint"}
           optCurrency={Some(Config.paymentTokenName)}
           onMaxClick
         />
@@ -335,8 +334,8 @@ module MintFormSignedIn = {
     let tokenToMint = isLong ? `long ${market.name}` : `short ${market.name}`
 
     let (optAdditionalErrorMessage, buttonText, buttonDisabled) = {
-      let stakingText = form.input.isStaking ? "Mint & Stake" : "Mint" // TODO: decide on this " & stake" : ""
-      let approveConnector = form.input.isStaking ? "," : " &" // TODO: decide on this " & stake" : ""
+      let stakingText = form.input.isStaking ? "Mint & Stake" : "Mint"
+      let approveConnector = form.input.isStaking ? "," : " &"
 
       let position = isLong ? "long" : "short"
       switch (formAmount, optDaiBalance, optDaiAmountApproved) {
@@ -361,7 +360,6 @@ module MintFormSignedIn = {
     let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
     let router = Next.Router.useRouter()
 
-    // Execute the call after approval has completed
     React.useEffect1(() => {
       switch txStateApprove {
       | Created =>

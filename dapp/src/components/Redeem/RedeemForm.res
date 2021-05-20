@@ -34,7 +34,7 @@ module RedeemFormInput = {
       {hasBothTokens
         ? <LongOrShortSelect isLong selectPosition={val => onChangeSide(val)} disabled />
         : React.null}
-      <AmountInput value optBalance disabled onBlur onChange placeholder={"Redeem"} onMaxClick />
+      <AmountInput value optBalance disabled onBlur onChange onMaxClick />
       {submitButton}
     </Form>
   }
@@ -133,7 +133,6 @@ module ConnectedRedeemForm = {
     | _ => None
     }
 
-    // TODO: incorp - optAdditionalErrorMessage
     let (_optAdditionalErrorMessage, buttonText, buttonDisabled) = {
       let position = isLong ? "long" : "short"
       switch (formAmount, optTokenBalance) {
@@ -157,8 +156,6 @@ module ConnectedRedeemForm = {
         toastDispatch(ToastProvider.Show(`Redeem transaction pending`, "", ToastProvider.Info))
       | Complete(_) =>
         toastDispatch(ToastProvider.Show(`Redeem transaction confirmed`, "", ToastProvider.Success))
-      // TODO: decide if this is desired behaviour
-      // router->Next.Router.push(userPage)
       | Failed(_) =>
         toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
       | Declined(reason) =>

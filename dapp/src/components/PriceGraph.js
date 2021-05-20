@@ -171,19 +171,19 @@ function minThreshodFromGraphSetting(graphSetting) {
 
 function btnTextFromGraphSetting(graphSetting) {
   if (typeof graphSetting !== "number") {
-    return "MAX";
+    return CONSTANTS.PriceGraphLabels.max;
   }
   switch (graphSetting) {
     case /* Day */0 :
-        return "1D";
+        return CONSTANTS.PriceGraphLabels.day;
     case /* Week */1 :
-        return "1W";
+        return CONSTANTS.PriceGraphLabels.week;
     case /* Month */2 :
-        return "1M";
+        return CONSTANTS.PriceGraphLabels.month;
     case /* ThreeMonth */3 :
-        return "3M";
+        return CONSTANTS.PriceGraphLabels.threeMonth;
     case /* Year */4 :
-        return "1Y";
+        return CONSTANTS.PriceGraphLabels.year;
     
   }
 }

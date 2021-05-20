@@ -5,12 +5,6 @@ open Masonry
 module UserBalancesCard = {
   @react.component
   let make = (~userId) => {
-    /*
-    TODO:
-    * Use the nicer way to get token prices: https://github.com/float-capital/monorepo/issues/228
-    * calculate the correct estimated value
-    * get the total value of the users tokens
- */
     let usersTokensQuery = DataHooks.useUsersBalances(~userId)
 
     <UserColumnCard>
@@ -119,8 +113,6 @@ module UserProfileCard = {
           <UserColumnText head=`⛽ Gas used` body={gasStr} />
           <UserColumnText head=`🏃 No. txs` body={txStr} />
         </div>
-        // TODO: fetch from graph somehow
-        // <UserColumnText icon="/img/discord.png" head=`Discord` body=`✅` />
       </UserColumnTextList>
     </UserColumnCard>
   }
@@ -141,7 +133,6 @@ let onQueryError = (msg: string) => {
 
 let onQuerySuccess = (data: userData) => {
   <UserContainer>
-    // <UserBanner />
     <Container>
       <Divider>
         <UserProfileCard userInfo={data.userInfo} />
@@ -164,7 +155,7 @@ let make = () => {
   let optCurrentUser = RootProvider.useCurrentUser()
   let router = Next.Router.useRouter()
   let user = switch Js.Dict.get(router.query, `user`) {
-  | None => `no user provided` // TODO: something more useful!
+  | None => `No user provided`
   | Some(userStr) => userStr->Js.String.toLowerCase
   }
 
@@ -199,9 +190,7 @@ let make = () => {
                       </p>
                     </UserColumnTextCenter>
                     <div className="w-40 mx-auto">
-                      <Next.Link href="/">
-                        <Button.Small> {`MARKETS`} </Button.Small>
-                      </Next.Link>
+                      <Next.Link href="/"> <Button.Small> {`MARKETS`} </Button.Small> </Next.Link>
                     </div>
                   </>
                 : notCurrentUserMessage()

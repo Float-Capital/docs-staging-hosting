@@ -1,6 +1,5 @@
 @react.component
 let make = (
-  ~placeholder,
   ~value,
   ~optBalance=None,
   ~disabled,
@@ -14,7 +13,7 @@ let make = (
       id="amount"
       className="py-2 font-normal text-grey-darkest w-full py-1 px-2 outline-none text-md text-gray-600"
       type_="text"
-      placeholder={placeholder}
+      placeholder={"0.0"}
       value={value}
       disabled={disabled}
       onBlur={onBlur}

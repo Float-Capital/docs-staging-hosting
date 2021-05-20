@@ -6,7 +6,6 @@ var Ethers = require("../../../ethereum/Ethers.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 
 function AmountInput(Props) {
-  var placeholder = Props.placeholder;
   var value = Props.value;
   var optBalanceOpt = Props.optBalance;
   var disabled = Props.disabled;
@@ -22,7 +21,7 @@ function AmountInput(Props) {
                   className: "py-2 font-normal text-grey-darkest w-full py-1 px-2 outline-none text-md text-gray-600",
                   id: "amount",
                   disabled: disabled,
-                  placeholder: placeholder,
+                  placeholder: "0.0",
                   type: "text",
                   value: value,
                   onBlur: onBlur,

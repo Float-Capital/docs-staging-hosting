@@ -453,7 +453,6 @@ function RedeemForm$RedeemFormInput(Props) {
                     selectPosition: Curry.__1(onChangeSide),
                     disabled: disabled
                   }) : null, React.createElement(AmountInput.make, {
-                  placeholder: "Redeem",
                   value: value,
                   optBalance: optBalance,
                   disabled: disabled,
