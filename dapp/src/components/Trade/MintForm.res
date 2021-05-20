@@ -54,6 +54,18 @@ module SubmitButtonAndTxTracker = {
     ~buttonText,
     ~buttonDisabled,
   ) => {
+    let randomMintTweetMessage = (isLong, marketName) => {
+      let position = isLong ? "long" : "short"
+      let possibleTweetMessages = [
+        `Boom bam baby!💥 I just minted ${position} tokens on ${marketName}! @float_capital 🌊`,
+        `Look at me, look at me! I just went ${position} on ${marketName}! 🐬 @float_capital 🌊`,
+        `Cue Jaws music! 🦈 I just went ${position} on ${marketName}! @foat_capital 🌊`,
+      ]
+      possibleTweetMessages[
+        Js.Math.random_int(0, possibleTweetMessages->Array.length)
+      ]->Option.getWithDefault(``)
+    }
+
     switch (txStateApprove, txStateMint) {
     | (ContractActions.Created, _) => <>
         <Modal id={1}>
@@ -134,11 +146,7 @@ module SubmitButtonAndTxTracker = {
           <div className="text-center m-3">
             <Tick />
             <p> {`Transaction complete 🎉`->React.string} </p>
-            <TweetButton
-              message={`I just went ${isLong
-                  ? "long"
-                  : "short"} on ${marketName}! @float_capital 🌊 `}
-            />
+            <TweetButton message={randomMintTweetMessage(isLong, marketName)} />
             <Metamask.AddTokenButton
               token={Config.config.contracts.floatToken}
               tokenSymbol={`${isLong ? `↗️` : `↘️`}${marketName}`}
