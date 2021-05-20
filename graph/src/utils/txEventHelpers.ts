@@ -4,8 +4,8 @@ import {
   EventParams,
   GlobalState,
 } from "../../generated/schema";
-import { Bytes, ethereum } from "@graphprotocol/graph-ts";
-import { ONE, ZERO_ADDRESS,  } from "../CONSTANTS";
+import { Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { ONE, ZERO_ADDRESS } from "../CONSTANTS";
 import { getOrCreateGlobalState, getOrCreateUser } from "./globalStateManager";
 
 function getEventIndex(txHash: Bytes): i32 {
@@ -152,6 +152,12 @@ export function saveEventToStateChange(
   affectedStakes: Array<string>,
   toFloatContracts: bool = true
 ): void {
+  if (
+    parameterValues.length !== parameterNames.length ||
+    parameterNames.length !== parameterTypes.length
+  ) {
+    log.critical("The event parameters aren't the same length", []);
+  }
   let eventParamsArr: Array<string> = createEventParams(
     event.transaction.hash,
     parameterValues,

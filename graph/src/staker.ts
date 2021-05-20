@@ -71,10 +71,10 @@ export function handleStateAdded(event: StateAdded): void {
       marketIndexId + "-" + stateIndex.minus(ONE).toString()
     );
     if (prevState == null) {
-      log.critical("There is no previous state for market #{} at with index {}", [
-        marketIndexId,
-        stateIndex.minus(ONE).toString(),
-      ]);
+      log.critical(
+        "There is no previous state for market #{} at with index {}",
+        [marketIndexId, stateIndex.minus(ONE).toString()]
+      );
     }
     let timeElapsedSinceLastStateChange = state.timestamp.minus(
       prevState.timestamp
@@ -118,8 +118,14 @@ export function handleStateAdded(event: StateAdded): void {
       accumulativeLong.toString(),
       accumulativeShort.toString(),
     ],
-    ["marketIndex", "stateIndex", "timestamp", "accumulativeLong", "accumulativeShort"],
-    ["uint32", "uint256", "uint256", "uint256"],
+    [
+      "marketIndex",
+      "stateIndex",
+      "timestamp",
+      "accumulativeLong",
+      "accumulativeShort",
+    ],
+    ["uint32", "uint256", "uint256", "uint256", "uint256"],
     [],
     []
   );
@@ -167,15 +173,19 @@ export function handleStakeAdded(event: StakeAdded): void {
 
   let lastMintIndex = event.params.lastMintIndex;
 
-  // NOTE: This will create a new (empyt) StakerState if the user is not staking immediately
-  let state = getOrCreateStakerState(tokenAddressString, lastMintIndex, event);
-
-  let user = getOrCreateUser(userAddress, event);
-
   let syntheticToken = SyntheticToken.load(tokenAddressString);
   if (syntheticToken == null) {
     log.critical("Token should be defined", []);
   }
+
+  // NOTE: This will create a new (empyt) StakerState if the user is not staking immediately
+  let state = getOrCreateStakerState(
+    syntheticToken.syntheticMarket,
+    lastMintIndex,
+    event
+  );
+
+  let user = getOrCreateUser(userAddress, event);
 
   let stake = new Stake(txHash.toHex());
   stake.timestamp = timestamp;
@@ -197,6 +207,7 @@ export function handleStakeAdded(event: StakeAdded): void {
     currentStake.user = user.id;
     currentStake.userAddress = user.address;
     currentStake.syntheticToken = syntheticToken.id;
+    currentStake.syntheticMarket = syntheticToken.syntheticMarket;
 
     user.currentStakes = user.currentStakes.concat([currentStake.id]);
   } else {
@@ -296,9 +307,7 @@ export function handleFloatMinted(event: FloatMinted): void {
   let totalAmount = amountLong.plus(amountShort);
   let lastMintIndex = event.params.lastMintIndex;
 
-  let state = StakeState.load(
-    marketIndexId + "-" + lastMintIndex.toString()
-  );
+  let state = StakeState.load(marketIndexId + "-" + lastMintIndex.toString());
   if (state == null) {
     log.critical("state not defined yet in `handleFloatMinted`, tx hash {}", [
       event.transaction.hash.toHex(),
@@ -314,15 +323,18 @@ export function handleFloatMinted(event: FloatMinted): void {
   let syntheticLong = SyntheticToken.load(syntheticMarket.syntheticLong);
   syntheticLong.floatMintedFromSpecificToken = syntheticLong.floatMintedFromSpecificToken.plus(
     amountLong
-    );
-    syntheticLong.floatMintedFromSpecificToken = syntheticLong.floatMintedFromSpecificToken.plus(
-      amountShort
-      );
-      
-      let user = getOrCreateUser(userAddress, event);
-      syntheticMarket.totalFloatMinted = syntheticMarket.totalFloatMinted.plus(totalAmount);
-      user.totalMintedFloat = user.totalMintedFloat.plus(totalAmount);
-  
+  );
+  let syntheticShort = SyntheticToken.load(syntheticMarket.syntheticShort);
+  syntheticShort.floatMintedFromSpecificToken = syntheticShort.floatMintedFromSpecificToken.plus(
+    amountShort
+  );
+
+  let user = getOrCreateUser(userAddress, event);
+  syntheticMarket.totalFloatMinted = syntheticMarket.totalFloatMinted.plus(
+    totalAmount
+  );
+  user.totalMintedFloat = user.totalMintedFloat.plus(totalAmount);
+
   // TODO - create a helper function the 'getOrCreate's the CurrentStake
   let currentStakeLong = CurrentStake.load(
     syntheticMarket.syntheticLong + "-" + userAddressString + "-currentStake"
@@ -337,6 +349,7 @@ export function handleFloatMinted(event: FloatMinted): void {
     currentStakeLong.user = user.id;
     currentStakeLong.userAddress = user.address;
     currentStakeLong.syntheticToken = syntheticLong.id;
+    currentStakeShort.syntheticMarket = syntheticMarket.id;
     currentStakeLong.currentStake = "DOESN'T EXIST YET";
 
     user.currentStakes = user.currentStakes.concat([currentStakeLong.id]);
@@ -347,7 +360,8 @@ export function handleFloatMinted(event: FloatMinted): void {
     );
     currentStakeShort.user = user.id;
     currentStakeShort.userAddress = user.address;
-    currentStakeShort.syntheticToken = syntheticLong.id;
+    currentStakeShort.syntheticToken = syntheticShort.id;
+    currentStakeShort.syntheticMarket = syntheticMarket.id;
     currentStakeShort.currentStake = "DOESN'T EXIST YET";
 
     user.currentStakes = user.currentStakes.concat([currentStakeShort.id]);

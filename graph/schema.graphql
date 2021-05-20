@@ -191,6 +191,7 @@ type CurrentStake @entity {
   user: User!
   userAddress: Bytes!
   syntheticToken: SyntheticToken!
+  syntheticMarket: SyntheticMarket!
   currentStake: Stake!
   lastMintState: StakeState!
 }

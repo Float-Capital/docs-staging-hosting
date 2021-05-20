@@ -34,6 +34,7 @@ import {
   createInitialSystemState,
   updateOrCreateCollateralToken,
   getOrCreateGlobalState,
+  getStakerStateId,
 } from "./utils/globalStateManager";
 import {
   createNewTokenDataSource,
@@ -53,6 +54,8 @@ export function handleV1(event: V1): void {
 
   let admin = event.params.admin;
   let tokenFactoryParam = event.params.tokenFactory;
+  // TODO: do something with the treasury - not recorded at the moment!
+  let treasury = event.params.treasury;
   let tokenFactoryString = tokenFactoryParam.toHex();
   let stakerParam = event.params.staker;
   let stakerString = stakerParam.toHex();
@@ -88,9 +91,9 @@ export function handleV1(event: V1): void {
   saveEventToStateChange(
     event,
     "V1",
-    [admin.toHex(), tokenFactoryString, stakerString],
-    ["admin", "tokenFactory", "staker"],
-    ["address", "address", "address"],
+    [admin.toHex(), treasury.toHex(), tokenFactoryString, stakerString],
+    ["admin", "treasury", "tokenFactory", "staker"],
+    ["address", "address", "address", "address"],
     [],
     []
   );
@@ -193,6 +196,7 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.feeStructure = fees.id;
   syntheticMarket.kPeriod = ZERO;
   syntheticMarket.kMultiplier = ZERO;
+  syntheticMarket.totalFloatMinted = ZERO;
   initialState.systemState.syntheticPrice = initialAssetPrice; // change me
 
   // create new synthetic token object.
@@ -203,32 +207,36 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.collateralToken = collateralToken.id;
 
   let globalState = GlobalState.load(GLOBAL_STATE_ID);
+  if (globalState == null) {
+    log.critical("Global state is null in `handleSyntheticTokenCreated`", []);
+  }
   globalState.latestMarketIndex = globalState.latestMarketIndex.plus(
     BigInt.fromI32(1)
   );
 
+  // Makae sure the latest staker state has the correct ID even though the instance hasn't been created yet.
+  syntheticMarket.latestStakerState = getStakerStateId(marketIndexString, ZERO);
+
+  longToken.syntheticMarket = syntheticMarket.id;
+  longToken.latestPrice = initialState.latestTokenPriceLong.id;
+  longToken.priceHistory = [initialState.tokenPriceLong.id];
+
+  shortToken.syntheticMarket = syntheticMarket.id;
+  shortToken.latestPrice = initialState.latestTokenPriceShort.id;
+  shortToken.priceHistory = [initialState.tokenPriceShort.id];
+
+  syntheticMarket.save();
+  // This function uses the synthetic market internally, so can only be created once the synthetic market has been created.
   let initalLatestStakerState = getOrCreateStakerState(
     marketIndexString,
     ZERO,
     event
   );
-  syntheticMarket.latestStakerState = initalLatestStakerState.id;
-  
-  longToken.syntheticMarket = syntheticMarket.id;
-  longToken.latestPrice = initialState.latestTokenPriceLong.id;
-  longToken.priceHistory = [initialState.tokenPriceLong.id];
-  
-  
-  shortToken.syntheticMarket = syntheticMarket.id;
-  shortToken.latestPrice = initialState.latestTokenPriceShort.id;
-  shortToken.priceHistory = [initialState.tokenPriceShort.id];
-  
   collateralToken.save();
   initalLatestStakerState.save();
   longToken.save();
   shortToken.save();
   initialState.systemState.save();
-  syntheticMarket.save();
   fees.save();
   globalState.save();
 
@@ -243,7 +251,7 @@ export function handleSyntheticTokenCreated(
       syntheticName,
       syntheticSymbol,
       oracleAddress.toHex(),
-      collateralTokenAddress.toHex()
+      collateralTokenAddress.toHex(),
     ],
     [
       "marketIndex",
@@ -253,9 +261,18 @@ export function handleSyntheticTokenCreated(
       "name",
       "symbol",
       "oracleAddress",
-      "collateralAddress"
+      "collateralAddress",
     ],
-    ["uint256", "address", "address", "uint256", "string", "string", "address", "address"],
+    [
+      "uint256",
+      "address",
+      "address",
+      "uint256",
+      "string",
+      "string",
+      "address",
+      "address",
+    ],
     [],
     []
   );
