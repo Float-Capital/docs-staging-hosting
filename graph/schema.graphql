@@ -152,7 +152,7 @@ type SyntheticMarket @entity {
   feeStructure: FeeStructure!
   kPeriod: BigInt!
   kMultiplier: BigInt!
-  # TODO: add total amount minted
+  totalFloatMinted: BigInt!
 }
 
 type User @entity {

@@ -314,13 +314,14 @@ export function handleFloatMinted(event: FloatMinted): void {
   let syntheticLong = SyntheticToken.load(syntheticMarket.syntheticLong);
   syntheticLong.floatMintedFromSpecificToken = syntheticLong.floatMintedFromSpecificToken.plus(
     amountLong
-  );
-  syntheticLong.floatMintedFromSpecificToken = syntheticLong.floatMintedFromSpecificToken.plus(
-    amountShort
-  );
-
-  let user = getOrCreateUser(userAddress, event);
-  user.totalMintedFloat = user.totalMintedFloat.plus(totalAmount);
+    );
+    syntheticLong.floatMintedFromSpecificToken = syntheticLong.floatMintedFromSpecificToken.plus(
+      amountShort
+      );
+      
+      let user = getOrCreateUser(userAddress, event);
+      syntheticMarket.totalFloatMinted = syntheticMarket.totalFloatMinted.plus(totalAmount);
+      user.totalMintedFloat = user.totalMintedFloat.plus(totalAmount);
   
   // TODO - create a helper function the 'getOrCreate's the CurrentStake
   let currentStakeLong = CurrentStake.load(
