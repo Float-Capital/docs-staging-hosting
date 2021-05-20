@@ -6,6 +6,9 @@ var Curry = require("rescript/lib/js/curry.js");
 var Modal = require("../UI/Base/Modal.js");
 var React = require("react");
 var Loader = require("../UI/Base/Loader.js");
+var Js_math = require("rescript/lib/js/js_math.js");
+var Belt_Array = require("rescript/lib/js/belt_Array.js");
+var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var TweetButton = require("../UI/TweetButton.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
 var ViewPositionButton = require("../UI/ViewPositionButton.js");
@@ -15,6 +18,13 @@ function StakeTxStatusModal(Props) {
   var txStateStake = Props.txStateStake;
   var resetFormButton = Props.resetFormButton;
   var tokenToStake = Props.tokenToStake;
+  var tweetMessages = [
+    "Hey Siri, play “Celebrate” by Kool and The Gang 🥳, because I just staked my @float_capital synthetic assets to earn FLOAT tokens! 🌊",
+    "Stake that @float_capital! 🌊 I just staked my synthetic assets to earn FLOAT tokens! 🥳",
+    "Make it rain @float_capital! 💸 I just staked my synthetic assets to earn FLOAT tokens! 🥳",
+    "Stake that, all on the floor! Stake that, give me some more! 🎶 I just staked my synthetic assets to earn FLOAT tokens! @float_capital 🌊",
+    "Float like a butterfly, stake like a bee!🐝 I just staked to earn FLOAT tokens @float_capital 🌊"
+  ];
   if (typeof txStateStake === "number") {
     if (txStateStake === /* UnInitialised */0) {
       return null;
@@ -53,7 +63,7 @@ function StakeTxStatusModal(Props) {
                       }, React.createElement("div", {
                             className: "text-center m-3"
                           }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement(TweetButton.make, {
-                                message: "Float like a butterfly, stake like a bee!🐝 I just staked to earn Float tokens @float_capital 🌊 "
+                                message: Belt_Option.getWithDefault(Belt_Array.get(tweetMessages, Js_math.random_int(0, tweetMessages.length)), "")
                               }), React.createElement(ViewPositionButton.make, {})), Curry._1(resetFormButton, undefined)));
     case /* Failed */3 :
         return React.createElement(Modal.make, {
