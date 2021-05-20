@@ -97,8 +97,9 @@ contract Staker is IStaker, Initializable {
 
     event FloatMinted(
         address user,
-        uint32 markets,
-        uint256 amount,
+        uint32 marketIndex,
+        uint256 amountLong,
+        uint256 amountShort,
         uint256 lastMintIndex
     );
 
@@ -257,7 +258,7 @@ contract Staker is IStaker, Initializable {
      * earns per second for every longshort token they've staked. The returned
      * value has a fixed decimal scale of 1e42 (!!!) for numerical stability.
      */
-    // TODO: should be an internal function
+    // TODO: should be an internal function (only a javascript test using this function, )
     function calculateFloatPerSecond(
         uint256 longValue,
         uint256 shortValue,
@@ -425,14 +426,18 @@ contract Staker is IStaker, Initializable {
     function calculateAccumulatedFloat(uint32 marketIndex, address user)
         internal
         view
-        returns (uint256 floatToMint)
+        returns (
+            // NOTE: this returns the long and short reward separately for the sake of simplicity of the event and the graph. Would be more efficient to return as single value
+            uint256 longFloatReward,
+            uint256 shortFloatReward
+        )
     {
         // Don't do the calculation and return zero immediately if there is no change
         if (
             userIndexOfLastClaimedReward[marketIndex][user] ==
             latestRewardIndex[marketIndex]
         ) {
-            return 0;
+            return (0, 0);
         }
 
         // Stake should always do a full system state update, so 'users last claimed index' should never be greater than the latest index
@@ -456,7 +461,7 @@ contract Staker is IStaker, Initializable {
                         userIndexOfLastClaimedReward[marketIndex][user]
                     ]
                         .accumulativeFloatPerLongToken;
-            floatToMint +=
+            longFloatReward =
                 (accumDeltaLong * stakedLong) /
                 FLOAT_ISSUANCE_FIXED_DECIMAL;
         }
@@ -471,13 +476,13 @@ contract Staker is IStaker, Initializable {
                         userIndexOfLastClaimedReward[marketIndex][user]
                     ]
                         .accumulativeFloatPerShortToken;
-            floatToMint +=
+            shortFloatReward =
                 (accumDeltaShort * stakedShort) /
                 FLOAT_ISSUANCE_FIXED_DECIMAL;
         }
 
         // explicit return
-        return floatToMint;
+        return (longFloatReward, shortFloatReward);
     }
 
     function _mintFloat(address user, uint256 floatToMint) internal {
@@ -486,7 +491,11 @@ contract Staker is IStaker, Initializable {
     }
 
     function mintAccumulatedFloat(uint32 marketIndex, address user) internal {
-        uint256 floatToMint = calculateAccumulatedFloat(marketIndex, user);
+        // NOTE: Could merge these two values already inside the `calculateAccumulatedFloat` function, but that would make it harder for the graph
+        (uint256 floatToMintLong, uint256 floatToMintShort) =
+            calculateAccumulatedFloat(marketIndex, msg.sender);
+
+        uint256 floatToMint = floatToMintLong + floatToMintShort;
         if (floatToMint > 0) {
             // stops them setting this forward
             userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[
@@ -498,7 +507,8 @@ contract Staker is IStaker, Initializable {
             emit FloatMinted(
                 user,
                 marketIndex,
-                floatToMint,
+                floatToMintLong,
+                floatToMintShort,
                 latestRewardIndex[marketIndex]
             );
         }
@@ -507,8 +517,11 @@ contract Staker is IStaker, Initializable {
     function _claimFloat(uint32[] calldata marketIndex) internal {
         uint256 floatTotal = 0;
         for (uint256 i = 0; i < marketIndex.length; i++) {
-            uint256 floatToMint =
+            // NOTE: Could merge these two values already inside the `calculateAccumulatedFloat` function, but that would make it harder for the graph
+            (uint256 floatToMintLong, uint256 floatToMintShort) =
                 calculateAccumulatedFloat(marketIndex[i], msg.sender);
+
+            uint256 floatToMint = floatToMintLong + floatToMintShort;
 
             if (floatToMint > 0) {
                 // Set the user has claimed up until now.
@@ -520,7 +533,8 @@ contract Staker is IStaker, Initializable {
                 emit FloatMinted(
                     msg.sender,
                     marketIndex[i],
-                    floatToMint,
+                    floatToMintLong,
+                    floatToMintShort,
                     latestRewardIndex[marketIndex[i]]
                 );
             }

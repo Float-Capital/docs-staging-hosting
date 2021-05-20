@@ -207,28 +207,28 @@ export function handleSyntheticTokenCreated(
     BigInt.fromI32(1)
   );
 
-  let initialLongStakerState = getOrCreateStakerState(
-    longToken.id,
-    ZERO,
-    event
-  );
+  // let initialLongStakerState = getOrCreateStakerState(
+  //   longToken.id,
+  //   ZERO,
+  //   event
+  // );
   longToken.syntheticMarket = syntheticMarket.id;
   longToken.latestPrice = initialState.latestTokenPriceLong.id;
   longToken.priceHistory = [initialState.tokenPriceLong.id];
-  longToken.latestStakerState = initialLongStakerState.id;
+  // longToken.latestStakerState = initialLongStakerState.id;
 
-  let initialShortStakerState = getOrCreateStakerState(
-    shortToken.id,
-    ZERO,
-    event
-  );
+  // let initialShortStakerState = getOrCreateStakerState(
+  //   shortToken.id,
+  //   ZERO,
+  //   event
+  // );
   shortToken.syntheticMarket = syntheticMarket.id;
   shortToken.latestPrice = initialState.latestTokenPriceShort.id;
   shortToken.priceHistory = [initialState.tokenPriceShort.id];
-  shortToken.latestStakerState = initialShortStakerState.id;
+  // shortToken.latestStakerState = initialShortStakerState.id;
 
-  initialLongStakerState.save();
-  initialShortStakerState.save();
+  // initialLongStakerState.save();
+  // initialShortStakerState.save();
   collateralToken.save();
   longToken.save();
   shortToken.save();

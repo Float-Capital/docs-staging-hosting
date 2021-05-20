@@ -97,7 +97,6 @@ type SyntheticToken @entity {
   id: ID! # token address
   tokenAddress: Bytes!
   syntheticMarket: SyntheticMarket!
-  latestStakerState: StakeState!
   tokenType: TokenType!
   totalStaked: BigInt!
   tokenSupply: BigInt!
@@ -145,6 +144,7 @@ type SyntheticMarket @entity {
   symbol: String!
   marketIndex: BigInt!
   oracleAddress: Bytes!
+  latestStakerState: StakeState!
   previousOracleAddresses: [Bytes!]!
   syntheticLong: SyntheticToken!
   syntheticShort: SyntheticToken!
@@ -152,6 +152,7 @@ type SyntheticMarket @entity {
   feeStructure: FeeStructure!
   kPeriod: BigInt!
   kMultiplier: BigInt!
+  # TODO: add total amount minted
 }
 
 type User @entity {
@@ -210,10 +211,13 @@ type StakeState @entity {
   blockNumber: BigInt!
   creationTxHash: Bytes!
   stateIndex: BigInt! #
-  syntheticToken: SyntheticToken!
+  longToken: SyntheticToken!
+  shortToken: SyntheticToken!
   timestamp: BigInt!
-  accumulativeFloatPerToken: BigInt!
-  floatRatePerTokenOverInterval: BigInt!
+  accumulativeFloatPerTokenLong: BigInt!
+  accumulativeFloatPerTokenShort: BigInt!
+  floatRatePerTokenOverIntervalLong: BigInt!
+  floatRatePerTokenOverIntervalShort: BigInt!
   timeSinceLastUpdate: BigInt!
 }
 
