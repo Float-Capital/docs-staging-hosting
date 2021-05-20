@@ -2,7 +2,7 @@
 'use strict';
 
 var React = require("react");
-var Config = require("../Config.js");
+var Config = require("../config/Config.js");
 
 function ComingSoon(Props) {
   return React.createElement("div", {

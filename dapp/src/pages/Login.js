@@ -3,7 +3,7 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Config = require("../Config.js");
+var Config = require("../config/Config.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Metamask = require("../components/UI/Base/Metamask.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
