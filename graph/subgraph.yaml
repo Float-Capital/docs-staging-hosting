@@ -87,8 +87,8 @@ dataSources:
           handler: handleStakeWithdrawn
         - event: FloatMinted(address,uint32,uint256,uint256,uint256)
           handler: handleFloatMinted
-        - event: KFactorParametersChanges(uint32,uint256,uint256)
-          handler: handleKFactorParametersChanges
+        - event: MarketLaunchIncentiveParametersChanges(uint32,uint256,uint256)
+          handler: handleMarketLaunchIncentiveParametersChanges
       file: ./src/staker.ts
 
 templates:

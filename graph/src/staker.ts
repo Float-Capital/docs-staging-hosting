@@ -4,7 +4,7 @@ import {
   StakeAdded,
   StakeWithdrawn,
   FloatMinted,
-  KFactorParametersChanges,
+  MarketLaunchIncentiveParametersChanges,
 } from "../generated/Staker/Staker";
 import { erc20 } from "../generated/templates";
 import {
@@ -131,8 +131,8 @@ export function handleStateAdded(event: StateAdded): void {
   );
 }
 
-export function handleKFactorParametersChanges(
-  event: KFactorParametersChanges
+export function handleMarketLaunchIncentiveParametersChanges(
+  event: MarketLaunchIncentiveParametersChanges
 ): void {
   let marketIndex = event.params.marketIndex;
   let period = event.params.period;
@@ -150,7 +150,7 @@ export function handleKFactorParametersChanges(
 
   saveEventToStateChange(
     event,
-    "KFactorParametersChanges",
+    "MarketLaunchIncentiveParametersChanges",
     [marketIndex.toString(), period.toString(), multiplier.toString()],
     ["marketIndex", "period", "multiplier"],
     ["uint256", "uint256", "uint256"],
