@@ -54,7 +54,7 @@ contract("LongShort (staking)", (accounts) => {
     fundToken = synth.fundToken;
 
     // Set some random market parameters for the staker.
-    await staker.changeKFactorParameters(
+    await staker.changeMarketLaunchIncentiveParameters(
       marketIndex,
       60 * 60 * 24 * 30,
       new BN(five),
