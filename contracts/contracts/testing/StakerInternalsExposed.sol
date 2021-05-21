@@ -14,70 +14,57 @@ contract StakerInternalsExposed is Staker {
     //////////// Test Helper Functions ////////////
     ///////////////////////////////////////////////
     function setFloatRewardCalcParams(
-        ISyntheticToken token,
+        uint32 marketIndex,
+        ISyntheticToken longToken,
+        ISyntheticToken shortToken,
         uint256 newLatestRewardIndex,
         address user,
         uint256 usersLatestClaimedReward,
-        uint256 accumulativeFloatPerTokenLatest,
-        uint256 accumulativeFloatPerTokenUser,
-        uint256 newUserAmountStaked
+        uint256 accumulativeFloatPerTokenLatestLong,
+        uint256 accumulativeFloatPerTokenLatestShort,
+        uint256 accumulativeFloatPerTokenUserLong,
+        uint256 accumulativeFloatPerTokenUserShort,
+        uint256 newUserAmountStakedLong,
+        uint256 newUserAmountStakedShort
     ) public {
-        latestRewardIndex[token] = newLatestRewardIndex;
-        userIndexOfLastClaimedReward[token][user] = usersLatestClaimedReward;
+        latestRewardIndex[marketIndex] = newLatestRewardIndex;
+        userIndexOfLastClaimedReward[marketIndex][
+            user
+        ] = usersLatestClaimedReward;
+        syntheticTokens[marketIndex].longToken = longToken;
+        syntheticTokens[marketIndex].shortToken = shortToken;
 
-        syntheticRewardParams[token][newLatestRewardIndex]
-            .accumulativeFloatPerToken = accumulativeFloatPerTokenLatest;
+        syntheticRewardParams[marketIndex][newLatestRewardIndex]
+            .accumulativeFloatPerLongToken = accumulativeFloatPerTokenLatestLong;
 
-        syntheticRewardParams[token][usersLatestClaimedReward]
-            .accumulativeFloatPerToken = accumulativeFloatPerTokenUser;
+        syntheticRewardParams[marketIndex][usersLatestClaimedReward]
+            .accumulativeFloatPerLongToken = accumulativeFloatPerTokenUserLong;
 
-        userAmountStaked[token][user] = newUserAmountStaked;
+        syntheticRewardParams[marketIndex][newLatestRewardIndex]
+            .accumulativeFloatPerShortToken = accumulativeFloatPerTokenLatestShort;
+
+        syntheticRewardParams[marketIndex][usersLatestClaimedReward]
+            .accumulativeFloatPerShortToken = accumulativeFloatPerTokenUserShort;
+
+        userAmountStaked[longToken][user] = newUserAmountStakedLong;
+        userAmountStaked[shortToken][user] = newUserAmountStakedShort;
     }
 
     ///////////////////////////////////////////
     //////////// EXPOSED Functions ////////////
     ///////////////////////////////////////////
-    function calculateAccumulatedFloatExposed(
-        ISyntheticToken token,
-        address user
-    ) external returns (uint256) {
-        return calculateAccumulatedFloat(token, user);
+    function calculateAccumulatedFloatExposed(uint32 marketIndex, address user)
+        external
+        returns (uint256 longFloatReward, uint256 shortFloatReward)
+    {
+        return calculateAccumulatedFloat(marketIndex, user);
     }
 
-    function calculateNewCumulativeExternal(
-        uint256 longValue,
-        uint256 shortValue,
-        uint256 tokenPrice,
-        ISyntheticToken token, // either long or short token address
-        bool isLong // tells us which one
-    ) external returns (uint256) {
-        calculateNewCumulative(
-            longValue,
-            shortValue,
-            tokenPrice,
-            token,
-            isLong
-        );
-    }
-
-    function mintAccumulatedFloatExternal(ISyntheticToken token, address user)
+    function mintAccumulatedFloatExternal(uint32 marketIndex, address user)
         external
     {
-        mintAccumulatedFloat(token, user);
+        mintAccumulatedFloat(marketIndex, user);
     }
-
-    // function calculateAccumulatedFloatExposed(uint32 marketIndex, address user)
-    //     external
-    //     returns (uint256, uint256)
-    // {
-    //     return calculateAccumulatedFloat(marketIndex, user);
-    // }
-
-    // function mintAccumulatedFloatExternal(uint32 marketIndex, address user)
-    //     external
-    // {
-    //     mintAccumulatedFloat(marketIndex, user);
-    // }
 
     function _mintFloatExternal(address user, uint256 floatToMint) external {
         _mintFloat(user, floatToMint);

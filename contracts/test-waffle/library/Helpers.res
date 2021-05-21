@@ -124,13 +124,13 @@ let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
   )) => {
     TokenFactory.make(admin.address, longShort.address)->JsPromise.then(tokenFactory => {
       JsPromise.all4((
-        floatToken->FloatToken.setup("Float token", "FLOAT TOKEN", staker->Staker.address),
+        floatToken->FloatToken.setup("Float token", "FLOAT TOKEN", staker.address),
         treasury->Treasury_v0.setup(admin.address),
         longShort->LongShort.setup(
           admin.address,
           treasury.address,
           tokenFactory.address,
-          staker->Staker.address,
+          staker.address,
         ),
         staker->Staker.setup(
           admin.address,

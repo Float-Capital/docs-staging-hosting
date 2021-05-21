@@ -204,8 +204,8 @@ module TokenFactory = {
 }
 
 module Staker = {
-  type t = staker
-  @get external address: t => Ethers.ethAddress = "address"
+  type t = {address: Ethers.ethAddress}
+
   let contractName = "Staker"
   let contractNameExposed = "StakerInternalsExposed"
 
@@ -255,26 +255,34 @@ module Staker = {
     @send
     external setFloatRewardCalcParams: (
       t,
-      ~token: Ethers.ethAddress,
+      ~marketIndex: int,
+      ~longToken: Ethers.ethAddress,
+      ~shortToken: Ethers.ethAddress,
       ~newLatestRewardIndex: Ethers.BigNumber.t,
       ~user: Ethers.ethAddress,
       ~usersLatestClaimedReward: Ethers.BigNumber.t,
-      ~accumulativeFloatPerTokenLatest: Ethers.BigNumber.t,
-      ~accumulativeFloatPerTokenUser: Ethers.BigNumber.t,
-      ~newUserAmountStaked: Ethers.BigNumber.t,
+      ~accumulativeFloatPerTokenLatestLong: Ethers.BigNumber.t,
+      ~accumulativeFloatPerTokenLatestShort: Ethers.BigNumber.t,
+      ~accumulativeFloatPerTokenUserLong: Ethers.BigNumber.t,
+      ~accumulativeFloatPerTokenUserShort: Ethers.BigNumber.t,
+      ~newUserAmountStakedLong: Ethers.BigNumber.t,
+      ~newUserAmountStakedShort: Ethers.BigNumber.t,
     ) => JsPromise.t<transaction> = "setFloatRewardCalcParams"
 
     @send @scope("callStatic")
     external calculateAccumulatedFloatExposedCall: (
       t,
-      ~token: Ethers.ethAddress,
+      ~marketIndex: int,
       ~user: Ethers.ethAddress,
-    ) => JsPromise.t<Ethers.BigNumber.t> = "calculateAccumulatedFloatExposed"
+    ) => JsPromise.t<{
+      "longFloatReward": Ethers.BigNumber.t,
+      "shortFloatReward": Ethers.BigNumber.t,
+    }> = "calculateAccumulatedFloatExposed"
 
     @send
     external calculateAccumulatedFloatExposed: (
       t,
-      ~token: Ethers.ethAddress,
+      ~marketIndex: int,
       ~user: Ethers.ethAddress,
     ) => JsPromise.t<transaction> = "calculateAccumulatedFloatExposed"
   }
