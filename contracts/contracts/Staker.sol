@@ -37,8 +37,8 @@ contract Staker is IStaker, Initializable {
     // Controls the k-factor, a multiplier for incentivising early stakers.
     //   token market index -> value
     uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
-    mapping(uint256 => uint256) public kFactorPeriods; // seconds
-    mapping(uint256 => uint256) public kFactorInitialMultipliers; // e18 scale
+    mapping(uint256 => uint256) public marketLaunchIncentivePeriod; // seconds
+    mapping(uint256 => uint256) public marketLaunchIncentiveMultipliers; // e18 scale
     uint256[45] private __stakeParametersGap;
 
     ////////////////////////////////////
@@ -103,7 +103,7 @@ contract Staker is IStaker, Initializable {
         uint256 lastMintIndex
     );
 
-    event KFactorParametersChanges(
+    event MarketLaunchIncentiveParametersChanges(
         uint32 marketIndex,
         uint256 period,
         uint256 multiplier
@@ -161,28 +161,36 @@ contract Staker is IStaker, Initializable {
         floatPercentage = _newPercentage;
     }
 
-    function changeKFactorParameters(
+    function changeMarketLaunchIncentiveParameters(
         uint32 marketIndex,
         uint256 period,
         uint256 initialMultiplier
     ) external onlyAdmin {
-        _changeKFactorParameters(marketIndex, period, initialMultiplier);
+        _changeMarketLaunchIncentiveParameters(
+            marketIndex,
+            period,
+            initialMultiplier
+        );
     }
 
-    function _changeKFactorParameters(
+    function _changeMarketLaunchIncentiveParameters(
         uint32 marketIndex,
         uint256 period,
         uint256 initialMultiplier
     ) internal {
         require(
             initialMultiplier >= 1e18,
-            "Initial kFactorMultiplier must be >= 1e18"
+            "marketLaunchIncentiveMultiplier must be >= 1e18"
         );
 
-        kFactorPeriods[marketIndex] = period;
-        kFactorInitialMultipliers[marketIndex] = initialMultiplier;
+        marketLaunchIncentivePeriod[marketIndex] = period;
+        marketLaunchIncentiveMultipliers[marketIndex] = initialMultiplier;
 
-        emit KFactorParametersChanges(marketIndex, period, initialMultiplier);
+        emit MarketLaunchIncentiveParametersChanges(
+            marketIndex,
+            period,
+            initialMultiplier
+        );
     }
 
     ////////////////////////////////////
@@ -207,7 +215,11 @@ contract Staker is IStaker, Initializable {
         syntheticTokens[marketIndex].longToken = longToken;
         syntheticTokens[marketIndex].shortToken = shortToken;
 
-        _changeKFactorParameters(marketIndex, kPeriod, kInitialMultiplier);
+        _changeMarketLaunchIncentiveParameters(
+            marketIndex,
+            kPeriod,
+            kInitialMultiplier
+        );
 
         emit StateAdded(marketIndex, 0, block.timestamp, 0, 0);
     }
@@ -220,13 +232,13 @@ contract Staker is IStaker, Initializable {
      * Returns the K factor parameters for the given market with sensible
      * defaults if they haven't been set yet.
      */
-    function getKFactorParameters(uint32 marketIndex)
+    function getMarketLaunchIncentiveParameters(uint32 marketIndex)
         internal
         view
         returns (uint256, uint256)
     {
-        uint256 period = kFactorPeriods[marketIndex];
-        uint256 multiplier = kFactorInitialMultipliers[marketIndex];
+        uint256 period = marketLaunchIncentivePeriod[marketIndex];
+        uint256 multiplier = marketLaunchIncentiveMultipliers[marketIndex];
         if (multiplier == 0) {
             multiplier = 1e18; // multiplier of 1 by default
         }
@@ -237,7 +249,7 @@ contract Staker is IStaker, Initializable {
     function getKValue(uint32 marketIndex) internal view returns (uint256) {
         // Parameters controlling the float issuance multiplier.
         (uint256 kPeriod, uint256 kInitialMultiplier) =
-            getKFactorParameters(marketIndex);
+            getMarketLaunchIncentiveParameters(marketIndex);
 
         // Sanity check - under normal circumstances, the multipliers should
         // *never* be set to a value < 1e18, as there are guards against this.
@@ -374,8 +386,6 @@ contract Staker is IStaker, Initializable {
         // Set timestamp on new state point.
         syntheticRewardParams[marketIndex][newIndex].timestamp = block
             .timestamp;
-        syntheticRewardParams[marketIndex][newIndex].timestamp = block
-            .timestamp;
 
         // Update latest index to point to new state point.
         latestRewardIndex[marketIndex] = newIndex;
@@ -446,10 +456,11 @@ contract Staker is IStaker, Initializable {
                 latestRewardIndex[marketIndex]
         );
 
-        uint256 stakedLong =
-            userAmountStaked[syntheticTokens[marketIndex].longToken][user];
-        uint256 stakedShort =
-            userAmountStaked[syntheticTokens[marketIndex].shortToken][user];
+        ISyntheticToken longToken = syntheticTokens[marketIndex].longToken;
+        ISyntheticToken shortToken = syntheticTokens[marketIndex].shortToken;
+
+        uint256 stakedLong = userAmountStaked[longToken][user];
+        uint256 stakedShort = userAmountStaked[shortToken][user];
 
         if (stakedLong > 0) {
             uint256 accumDeltaLong =
@@ -590,7 +601,6 @@ contract Staker is IStaker, Initializable {
 
         // If they already have staked and have rewards due, mint these.
         if (
-            // userAmountStaked[token][user] > 0 &&
             userIndexOfLastClaimedReward[marketIndex][user] != 0 &&
             userIndexOfLastClaimedReward[marketIndex][user] <
             latestRewardIndex[marketIndex]

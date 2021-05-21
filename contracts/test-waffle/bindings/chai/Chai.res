@@ -6,9 +6,10 @@ const { expect } = require("chai");
 `)
 
 let bnEqual: (
+  ~message: string=?,
   Ethers.BigNumber.t,
   Ethers.BigNumber.t,
-) => unit = %raw(`(number1, number2) => expect(number1).to.equal(number2)`)
+) => unit = %raw(`(message, number1, number2) => expect(number1, message).to.equal(number2)`)
 
 let bnWithin: (
   Ethers.BigNumber.t,
