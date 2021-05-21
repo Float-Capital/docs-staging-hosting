@@ -20,7 +20,7 @@
     "update-testnet-contracts": "yarn prepair-upgrade; rm -f .openzeppelin/unknown-{97,1337}.json; truffle migrate --network binanceTest --reset; mv .openzeppelin/unknown-1337.json .openzeppelin/unknown-97.json; yarn save-deployment"
   },
   "dependencies": {
-    "@chainlink/contracts": "^0.0.8",
+    "@chainlink/contracts": "^0.1.7",
     "@nomiclabs/hardhat-truffle5": "^2.0.0",
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "@openzeppelin/cli": "^2.8.2",
