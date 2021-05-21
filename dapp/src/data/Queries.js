@@ -351,13 +351,15 @@ var SyntheticMarketBasic = {
 var Raw$5 = {};
 
 var query$5 = (require("@apollo/client").gql`
-  fragment SyntheticTokenStakeInfo on SyntheticToken   {
+  fragment MarketIStakeInfo on SyntheticMarket   {
     __typename
     id
     latestStakerState  {
       __typename
-      accumulativeFloatPerToken
-      floatRatePerTokenOverInterval
+      accumulativeFloatPerTokenLong
+      accumulativeFloatPerTokenShort
+      floatRatePerTokenOverIntervalLong
+      floatRatePerTokenOverIntervalShort
       timestamp
     }
   }
@@ -370,8 +372,10 @@ function parse$5(value) {
           id: value.id,
           latestStakerState: {
             __typename: value$1.__typename,
-            accumulativeFloatPerToken: GqlConverters.$$BigInt.parse(value$1.accumulativeFloatPerToken),
-            floatRatePerTokenOverInterval: GqlConverters.$$BigInt.parse(value$1.floatRatePerTokenOverInterval),
+            accumulativeFloatPerTokenLong: GqlConverters.$$BigInt.parse(value$1.accumulativeFloatPerTokenLong),
+            accumulativeFloatPerTokenShort: GqlConverters.$$BigInt.parse(value$1.accumulativeFloatPerTokenShort),
+            floatRatePerTokenOverIntervalLong: GqlConverters.$$BigInt.parse(value$1.floatRatePerTokenOverIntervalLong),
+            floatRatePerTokenOverIntervalShort: GqlConverters.$$BigInt.parse(value$1.floatRatePerTokenOverIntervalShort),
             timestamp: GqlConverters.$$BigInt.parse(value$1.timestamp)
           }
         };
@@ -381,27 +385,33 @@ function serialize$5(value) {
   var value$1 = value.latestStakerState;
   var value$2 = value$1.timestamp;
   var value$3 = GqlConverters.$$BigInt.serialize(value$2);
-  var value$4 = value$1.floatRatePerTokenOverInterval;
+  var value$4 = value$1.floatRatePerTokenOverIntervalShort;
   var value$5 = GqlConverters.$$BigInt.serialize(value$4);
-  var value$6 = value$1.accumulativeFloatPerToken;
+  var value$6 = value$1.floatRatePerTokenOverIntervalLong;
   var value$7 = GqlConverters.$$BigInt.serialize(value$6);
-  var value$8 = value$1.__typename;
+  var value$8 = value$1.accumulativeFloatPerTokenShort;
+  var value$9 = GqlConverters.$$BigInt.serialize(value$8);
+  var value$10 = value$1.accumulativeFloatPerTokenLong;
+  var value$11 = GqlConverters.$$BigInt.serialize(value$10);
+  var value$12 = value$1.__typename;
   var latestStakerState = {
-    __typename: value$8,
-    accumulativeFloatPerToken: value$7,
-    floatRatePerTokenOverInterval: value$5,
+    __typename: value$12,
+    accumulativeFloatPerTokenLong: value$11,
+    accumulativeFloatPerTokenShort: value$9,
+    floatRatePerTokenOverIntervalLong: value$7,
+    floatRatePerTokenOverIntervalShort: value$5,
     timestamp: value$3
   };
-  var value$9 = value.id;
-  var value$10 = value.__typename;
+  var value$13 = value.id;
+  var value$14 = value.__typename;
   return {
-          __typename: value$10,
-          id: value$9,
+          __typename: value$14,
+          id: value$13,
           latestStakerState: latestStakerState
         };
 }
 
-function verifyArgsAndParse$5(_SyntheticTokenStakeInfo, value) {
+function verifyArgsAndParse$5(_MarketIStakeInfo, value) {
   return parse$5(value);
 }
 
@@ -409,7 +419,7 @@ function verifyName$5(param) {
   
 }
 
-var SyntheticTokenStakeInfo = {
+var MarketIStakeInfo = {
   Raw: Raw$5,
   query: query$5,
   parse: parse$5,
@@ -663,44 +673,73 @@ var query$9 = ((frag_0) => require("@apollo/client").gql`
   fragment CurrentStakeHighLevel on CurrentStake   {
     __typename
     id
+    syntheticToken  {
+      __typename
+      id
+    }
     lastMintState  {
       __typename
       timestamp
-      accumulativeFloatPerToken
+      longToken  {
+        __typename
+        id
+      }
+      shortToken  {
+        __typename
+        id
+      }
+      accumulativeFloatPerTokenLong
+      accumulativeFloatPerTokenShort
     }
     currentStake  {
       __typename
       amount
     }
-    syntheticToken  {
-      ...SyntheticTokenStakeInfo
+    syntheticMarket  {
+      ...MarketIStakeInfo
     }
   }
   ${frag_0}
 `)(query$5);
 
 function parse$9(value) {
-  var value$1 = value.lastMintState;
-  var value$2 = value.currentStake;
+  var value$1 = value.syntheticToken;
+  var value$2 = value.lastMintState;
+  var value$3 = value$2.longToken;
+  var value$4 = value$2.shortToken;
+  var value$5 = value.currentStake;
   return {
           __typename: value.__typename,
           id: value.id,
-          lastMintState: {
+          syntheticToken: {
             __typename: value$1.__typename,
-            timestamp: GqlConverters.$$BigInt.parse(value$1.timestamp),
-            accumulativeFloatPerToken: GqlConverters.$$BigInt.parse(value$1.accumulativeFloatPerToken)
+            id: value$1.id
+          },
+          lastMintState: {
+            __typename: value$2.__typename,
+            timestamp: GqlConverters.$$BigInt.parse(value$2.timestamp),
+            longToken: {
+              __typename: value$3.__typename,
+              id: value$3.id
+            },
+            shortToken: {
+              __typename: value$4.__typename,
+              id: value$4.id
+            },
+            accumulativeFloatPerTokenLong: GqlConverters.$$BigInt.parse(value$2.accumulativeFloatPerTokenLong),
+            accumulativeFloatPerTokenShort: GqlConverters.$$BigInt.parse(value$2.accumulativeFloatPerTokenShort)
           },
           currentStake: {
-            __typename: value$2.__typename,
-            amount: GqlConverters.$$BigInt.parse(value$2.amount)
+            __typename: value$5.__typename,
+            amount: GqlConverters.$$BigInt.parse(value$5.amount)
           },
-          syntheticToken: parse$5(value.syntheticToken)
+          syntheticMarket: parse$5(value.syntheticMarket)
         };
 }
 
 function serialize$9(value) {
-  var value$1 = value.syntheticToken;
-  var syntheticToken = serialize$5(value$1);
+  var value$1 = value.syntheticMarket;
+  var syntheticMarket = serialize$5(value$1);
   var value$2 = value.currentStake;
   var value$3 = value$2.amount;
   var value$4 = GqlConverters.$$BigInt.serialize(value$3);
@@ -710,24 +749,51 @@ function serialize$9(value) {
     amount: value$4
   };
   var value$6 = value.lastMintState;
-  var value$7 = value$6.accumulativeFloatPerToken;
+  var value$7 = value$6.accumulativeFloatPerTokenShort;
   var value$8 = GqlConverters.$$BigInt.serialize(value$7);
-  var value$9 = value$6.timestamp;
+  var value$9 = value$6.accumulativeFloatPerTokenLong;
   var value$10 = GqlConverters.$$BigInt.serialize(value$9);
-  var value$11 = value$6.__typename;
-  var lastMintState = {
-    __typename: value$11,
-    timestamp: value$10,
-    accumulativeFloatPerToken: value$8
+  var value$11 = value$6.shortToken;
+  var value$12 = value$11.id;
+  var value$13 = value$11.__typename;
+  var shortToken = {
+    __typename: value$13,
+    id: value$12
   };
-  var value$12 = value.id;
-  var value$13 = value.__typename;
+  var value$14 = value$6.longToken;
+  var value$15 = value$14.id;
+  var value$16 = value$14.__typename;
+  var longToken = {
+    __typename: value$16,
+    id: value$15
+  };
+  var value$17 = value$6.timestamp;
+  var value$18 = GqlConverters.$$BigInt.serialize(value$17);
+  var value$19 = value$6.__typename;
+  var lastMintState = {
+    __typename: value$19,
+    timestamp: value$18,
+    longToken: longToken,
+    shortToken: shortToken,
+    accumulativeFloatPerTokenLong: value$10,
+    accumulativeFloatPerTokenShort: value$8
+  };
+  var value$20 = value.syntheticToken;
+  var value$21 = value$20.id;
+  var value$22 = value$20.__typename;
+  var syntheticToken = {
+    __typename: value$22,
+    id: value$21
+  };
+  var value$23 = value.id;
+  var value$24 = value.__typename;
   return {
-          __typename: value$13,
-          id: value$12,
+          __typename: value$24,
+          id: value$23,
+          syntheticToken: syntheticToken,
           lastMintState: lastMintState,
           currentStake: currentStake,
-          syntheticToken: syntheticToken
+          syntheticMarket: syntheticMarket
         };
 }
 
@@ -2163,7 +2229,7 @@ exports.LatestSynthPrice = LatestSynthPrice;
 exports.LatestSystemStateBasic = LatestSystemStateBasic;
 exports.LatestSystemStateInfo = LatestSystemStateInfo;
 exports.SyntheticMarketBasic = SyntheticMarketBasic;
-exports.SyntheticTokenStakeInfo = SyntheticTokenStakeInfo;
+exports.MarketIStakeInfo = MarketIStakeInfo;
 exports.SyntheticTokenInfo = SyntheticTokenInfo;
 exports.SyntheticMarketInfo = SyntheticMarketInfo;
 exports.UserTokenBalance = UserTokenBalance;

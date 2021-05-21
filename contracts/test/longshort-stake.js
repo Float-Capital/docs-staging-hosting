@@ -54,7 +54,7 @@ contract("LongShort (staking)", (accounts) => {
     fundToken = synth.fundToken;
 
     // Set some random market parameters for the staker.
-    await staker.changeKFactorParameters(
+    await staker.changeMarketLaunchIncentiveParameters(
       marketIndex,
       60 * 60 * 24 * 30,
       new BN(five),
@@ -182,11 +182,11 @@ contract("LongShort (staking)", (accounts) => {
     await time.increase(1000);
 
     // Compute expected float per second.
-    let [expectedFloatPerSecondLong, expectedFloatPerSecondShort] = await calculateFloatPerSecond(
+    let { longFloatPerSecond } = await calculateFloatPerSecond(
       longValue,
       shortValue,
-      [longPrice, shortPrice],
-      marketIndex
+      longPrice, shortPrice,
+      marketIndex,
     );
 
     await longToken.stake(twentyFive, { from: user1 });
@@ -199,7 +199,7 @@ contract("LongShort (staking)", (accounts) => {
     // Need to test the staking system wayy better
     assert.equal(
       result.toString(),
-      expectedFloatPerSecondLong
+      longFloatPerSecond
         .mul(new BN(now - before))
         .mul(new BN(oneHundred))
         .div(e42)
@@ -330,13 +330,15 @@ contract("LongShort (staking)", (accounts) => {
     const now = await time.latest();
 
     const isTestingLong = token.address === longToken.address;
-    let [expectedFloatPerSecondLong, expectedFloatPerSecondShort] = await calculateFloatPerSecond(
-      longValue,
-      shortValue,
-      [longPrice, shortPrice],
-      marketIndex,
-    );
-    const expectedFloatPerSecond = isTestingLong ? expectedFloatPerSecondLong : expectedFloatPerSecondShort;
+    let { longFloatPerSecond,
+      shortFloatPerSecond } = await calculateFloatPerSecond(
+        longValue,
+        shortValue,
+        longPrice, shortPrice,
+        marketIndex,
+      );
+
+    const expectedFloatPerSecond = isTestingLong ? longFloatPerSecond : shortFloatPerSecond;
     const result = await floatToken.balanceOf(user1);
 
     // Assert that the amount earned by the user matches the expected
@@ -371,13 +373,13 @@ contract("LongShort (staking)", (accounts) => {
   const calculateFloatPerSecond = async (
     longValue,
     shortValue,
-    tokenPrice,
+    longPrice, shortPrice,
     marketIndex,
   ) => {
     return await staker.calculateFloatPerSecond.call(
       longValue,
       shortValue,
-      tokenPrice,
+      longPrice, shortPrice,
       marketIndex);
   };
 

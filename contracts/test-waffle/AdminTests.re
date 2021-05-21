@@ -17,7 +17,10 @@ describe("Float System", () => {
 
     before_each(() => {
       let%Await deployedContracts =
-        Helpers.inititialize(~admin=accounts.contents->Array.getUnsafe(0));
+        Helpers.inititialize(
+          ~admin=accounts.contents->Array.getUnsafe(0),
+          ~exposeInternals=false,
+        );
       contracts := deployedContracts;
     });
 
