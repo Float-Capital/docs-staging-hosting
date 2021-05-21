@@ -1,11 +1,21 @@
 module DetailsWrapper = {
   @react.component
-  let make = (~market: Queries.SyntheticMarketInfo.t, ~children) =>
-    <div className="p-5 rounded-lg max-w-xl mx-auto flex flex-col bg-white bg-opacity-70 shadow-lg">
-      <div className="flex justify-between mb-2 text-xl">
-        {`${market.name} (${market.symbol})`->React.string}
+  let make = (~market: Queries.SyntheticMarketInfo.t, ~marketIndex,~actionOption, ~children) =>
+  <div className="max-w-xl mx-auto">
+    <Next.Link href="/">
+      <div className="uppercase text-xs text-gray-600 hover:text-gray-500 cursor-pointer mb-2">
+        {`◀`->React.string} <span className="text-xs"> {" Back to markets"->React.string} </span>
+      </div>
+    </Next.Link>
+    <div className="p-5 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg">
+      <div className="flex justify-between items-center mb-2">
+        <div className="text-xl">{`${market.name} (${market.symbol})`->React.string}</div>
+        <Next.Link href={`/?marketIndex=${marketIndex}&actionOption=${actionOption}`}>
+        <div className="text-xxs hover:underline cursor-pointer">{`view details`->React.string}</div>
+        </Next.Link>
       </div>
       {children}
+    </div>
     </div>
 }
 
@@ -25,8 +35,9 @@ let make = (~withHeader=true) => {
         syntheticMarkets[marketIndex->Belt.Int.fromString->Option.getWithDefault(1) - 1]
       switch optFirstMarket {
       | Some(firstMarket) =>
-        withHeader
-          ? <DetailsWrapper market=firstMarket>
+        withHeader        
+          ?         
+          <DetailsWrapper market=firstMarket marketIndex actionOption>
               <MintForm market={firstMarket} isLong={actionOption == "short" ? false : true} />
             </DetailsWrapper>
           : <MintForm market={firstMarket} isLong={actionOption == "short" ? false : true} />

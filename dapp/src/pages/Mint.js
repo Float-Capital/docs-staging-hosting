@@ -8,18 +8,37 @@ var Js_dict = require("rescript/lib/js/js_dict.js");
 var Queries = require("../data/Queries.js");
 var Belt_Int = require("rescript/lib/js/belt_Int.js");
 var MintForm = require("../components/Trade/MintForm.js");
+var Link = require("next/link").default;
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Router = require("next/router");
 
 function Mint$DetailsWrapper(Props) {
   var market = Props.market;
+  var marketIndex = Props.marketIndex;
+  var actionOption = Props.actionOption;
   var children = Props.children;
   return React.createElement("div", {
-              className: "p-5 rounded-lg max-w-xl mx-auto flex flex-col bg-white bg-opacity-70 shadow-lg"
-            }, React.createElement("div", {
-                  className: "flex justify-between mb-2 text-xl"
-                }, market.name + " (" + market.symbol + ")"), children);
+              className: "max-w-xl mx-auto"
+            }, React.createElement(Link, {
+                  href: "/",
+                  children: React.createElement("div", {
+                        className: "uppercase text-xs text-gray-600 hover:text-gray-500 cursor-pointer mb-2"
+                      }, "◀", React.createElement("span", {
+                            className: "text-xs"
+                          }, " Back to markets"))
+                }), React.createElement("div", {
+                  className: "p-5 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
+                }, React.createElement("div", {
+                      className: "flex justify-between items-center mb-2"
+                    }, React.createElement("div", {
+                          className: "text-xl"
+                        }, market.name + " (" + market.symbol + ")"), React.createElement(Link, {
+                          href: "/?marketIndex=" + marketIndex + "&actionOption=" + actionOption,
+                          children: React.createElement("div", {
+                                className: "text-xxs hover:underline cursor-pointer"
+                              }, "view details")
+                        })), children));
 }
 
 var DetailsWrapper = {
@@ -59,6 +78,8 @@ function Mint(Props) {
     tmp = optFirstMarket !== undefined ? (
         withHeader ? React.createElement(Mint$DetailsWrapper, {
                 market: optFirstMarket,
+                marketIndex: marketIndex,
+                actionOption: actionOption,
                 children: React.createElement(MintForm.make, {
                       market: optFirstMarket,
                       isLong: actionOption !== "short"
