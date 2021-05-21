@@ -64,11 +64,13 @@ fragment SyntheticMarketBasic on SyntheticMarket {
 
 # Used in:
 #   Fragments: CurrentStakeHighLevel
-fragment SyntheticTokenStakeInfo on SyntheticToken {
+fragment MarketIStakeInfo on SyntheticMarket {
   id
   latestStakerState {
-    accumulativeFloatPerToken
-    floatRatePerTokenOverInterval
+    accumulativeFloatPerTokenLong
+    accumulativeFloatPerTokenShort
+    floatRatePerTokenOverIntervalLong
+    floatRatePerTokenOverIntervalShort
     timestamp
   }
 }
@@ -126,15 +128,19 @@ fragment UserTokenBalance on UserSyntheticTokenBalance {
 #   Queries: StateChangePoll, UserFloatDetails
 fragment CurrentStakeHighLevel on CurrentStake {
   id
+  syntheticToken {id}
   lastMintState {
     timestamp
-    accumulativeFloatPerToken
+    longToken {id}
+    shortToken {id}
+    accumulativeFloatPerTokenLong
+    accumulativeFloatPerTokenShort
   }
   currentStake {
     amount
   }
-  syntheticToken {
-    ...SyntheticTokenStakeInfo
+  syntheticMarket {
+    ...MarketIStakeInfo
   }
 }
 

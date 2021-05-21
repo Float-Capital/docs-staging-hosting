@@ -175,18 +175,18 @@ contract("LongShort (staking)", (accounts) => {
       longValue,
       shortValue,
       longPrice,
+      shortPrice,
     } = await getFloatPerSecondParameters(longToken);
 
     // Wait a long time to accumulate some float.
     await time.increase(1000);
 
     // Compute expected float per second.
-    let expectedFloatPerSecond = await calculateFloatPerSecond(
+    let { longFloatPerSecond } = await calculateFloatPerSecond(
       longValue,
       shortValue,
-      longPrice,
-      longToken.address,
-      true // we staked long tokens
+      longPrice, shortPrice,
+      marketIndex,
     );
 
     await longToken.stake(twentyFive, { from: user1 });
@@ -199,7 +199,7 @@ contract("LongShort (staking)", (accounts) => {
     // Need to test the staking system wayy better
     assert.equal(
       result.toString(),
-      expectedFloatPerSecond
+      longFloatPerSecond
         .mul(new BN(now - before))
         .mul(new BN(oneHundred))
         .div(e42)
@@ -328,13 +328,17 @@ contract("LongShort (staking)", (accounts) => {
       from: user1,
     });
     const now = await time.latest();
-    let expectedFloatPerSecond = await calculateFloatPerSecond(
-      longValue,
-      shortValue,
-      token == longToken ? longPrice : shortPrice,
-      token.address,
-      token == longToken
-    );
+
+    const isTestingLong = token.address === longToken.address;
+    let { longFloatPerSecond,
+      shortFloatPerSecond } = await calculateFloatPerSecond(
+        longValue,
+        shortValue,
+        longPrice, shortPrice,
+        marketIndex,
+      );
+
+    const expectedFloatPerSecond = isTestingLong ? longFloatPerSecond : shortFloatPerSecond;
     const result = await floatToken.balanceOf(user1);
 
     // Assert that the amount earned by the user matches the expected
@@ -369,17 +373,14 @@ contract("LongShort (staking)", (accounts) => {
   const calculateFloatPerSecond = async (
     longValue,
     shortValue,
-    tokenPrice,
-    token,
-    isLong
+    longPrice, shortPrice,
+    marketIndex,
   ) => {
     return await staker.calculateFloatPerSecond.call(
       longValue,
       shortValue,
-      tokenPrice,
-      token,
-      isLong
-    );
+      longPrice, shortPrice,
+      marketIndex);
   };
 
   const amountStaked = async (token, user) =>

@@ -49,76 +49,83 @@ export function handleStateAdded(event: StateAdded): void {
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
 
-  let tokenAddress = event.params.tokenAddress;
-  let tokenAddressString = tokenAddress.toHex();
+  let marketIndex = event.params.marketIndex;
+  let marketIndexId = marketIndex.toString();
   let stateIndex = event.params.stateIndex;
-  let accumulativeFloatPerToken = event.params.accumulative;
+  let accumulativeLong = event.params.accumulativeLong;
+  let accumulativeShort = event.params.accumulativeShort;
   // don't necessarily need to emit this since we can get it from event.block
+  // TODO: remove the `timestamp` variable from the contracts
   let timestampOfState = event.params.timestamp;
 
-  let syntheticToken = SyntheticToken.load(tokenAddressString);
-  if (syntheticToken == null) {
-    log.critical("Token should be defined", []);
-  }
-
-  let state = getOrCreateStakerState(tokenAddressString, stateIndex, event);
+  let state = getOrCreateStakerState(marketIndexId, stateIndex, event);
   state.blockNumber = blockNumber;
   state.creationTxHash = txHash;
   state.stateIndex = stateIndex;
   state.timestamp = timestamp;
-  state.syntheticToken = syntheticToken.id;
-  state.accumulativeFloatPerToken = accumulativeFloatPerToken;
+  state.accumulativeFloatPerTokenLong = accumulativeLong;
+  state.accumulativeFloatPerTokenShort = accumulativeShort;
 
-  if (stateIndex.equals(ZERO)) {
-    // The first state - set floatRatePerTokenOverInterval to zero
-    state.floatRatePerTokenOverInterval = ZERO;
-    state.timeSinceLastUpdate = ZERO;
-  } else {
+  if (!stateIndex.equals(ZERO)) {
     let prevState = StakeState.load(
-      tokenAddressString + "-" + stateIndex.minus(ONE).toString()
+      marketIndexId + "-" + stateIndex.minus(ONE).toString()
     );
     if (prevState == null) {
-      log.critical("There is no previous state for token {} at address {}", [
-        stateIndex.minus(ONE).toString(),
-        tokenAddressString,
-      ]);
+      log.critical(
+        "There is no previous state for market #{} at with index {}",
+        [marketIndexId, stateIndex.minus(ONE).toString()]
+      );
     }
     let timeElapsedSinceLastStateChange = state.timestamp.minus(
       prevState.timestamp
     );
-    let changeInAccumulativeFloatPerSecond = state.accumulativeFloatPerToken.minus(
-      prevState.accumulativeFloatPerToken
+    let changeInAccumulativeFloatPerSecondLong = state.accumulativeFloatPerTokenLong.minus(
+      prevState.accumulativeFloatPerTokenLong
+    );
+    let changeInAccumulativeFloatPerSecondShort = state.accumulativeFloatPerTokenShort.minus(
+      prevState.accumulativeFloatPerTokenShort
     );
 
     state.timeSinceLastUpdate = timeElapsedSinceLastStateChange;
 
     if (
       // NOTE: This hapens if two staking state changes happen in the same block.
-      timeElapsedSinceLastStateChange.equals(changeInAccumulativeFloatPerSecond)
+      timeElapsedSinceLastStateChange.equals(ZERO)
     ) {
-      state.floatRatePerTokenOverInterval = ZERO;
+      state.floatRatePerTokenOverIntervalLong = ZERO;
+      state.floatRatePerTokenOverIntervalShort = ZERO;
     } else {
-      state.floatRatePerTokenOverInterval = changeInAccumulativeFloatPerSecond.div(
+      state.floatRatePerTokenOverIntervalLong = changeInAccumulativeFloatPerSecondLong.div(
+        timeElapsedSinceLastStateChange
+      );
+      state.floatRatePerTokenOverIntervalShort = changeInAccumulativeFloatPerSecondShort.div(
         timeElapsedSinceLastStateChange
       );
     }
   }
 
-  syntheticToken.latestStakerState = state.id;
-  syntheticToken.save();
+  // TODO: update the market!
+
   state.save();
 
   saveEventToStateChange(
     event,
     "StateAdded",
     [
-      tokenAddress.toHex(),
+      marketIndexId,
       stateIndex.toString(),
       timestamp.toString(),
-      accumulativeFloatPerToken.toString(),
+      accumulativeLong.toString(),
+      accumulativeShort.toString(),
     ],
-    ["tokenAddress", "stateIndex", "timestamp", "accumulative"],
-    ["address", "uint256", "uint256", "uint256"],
+    [
+      "marketIndex",
+      "stateIndex",
+      "timestamp",
+      "accumulativeLong",
+      "accumulativeShort",
+    ],
+    ["uint32", "uint256", "uint256", "uint256", "uint256"],
     [],
     []
   );
@@ -160,21 +167,25 @@ export function handleStakeAdded(event: StakeAdded): void {
 
   let userAddress = event.params.user;
   let userAddressString = userAddress.toHex();
-  let tokenAddress = event.params.tokenAddress;
+  let tokenAddress = event.params.token;
   let tokenAddressString = tokenAddress.toHex();
   let amount = event.params.amount;
 
   let lastMintIndex = event.params.lastMintIndex;
 
-  // NOTE: This will create a new (empyt) StakerState if the user is not staking immediately
-  let state = getOrCreateStakerState(tokenAddressString, lastMintIndex, event);
-
-  let user = getOrCreateUser(userAddress, event);
-
   let syntheticToken = SyntheticToken.load(tokenAddressString);
   if (syntheticToken == null) {
     log.critical("Token should be defined", []);
   }
+
+  // NOTE: This will create a new (empyt) StakerState if the user is not staking immediately
+  let state = getOrCreateStakerState(
+    syntheticToken.syntheticMarket,
+    lastMintIndex,
+    event
+  );
+
+  let user = getOrCreateUser(userAddress, event);
 
   let stake = new Stake(txHash.toHex());
   stake.timestamp = timestamp;
@@ -196,6 +207,7 @@ export function handleStakeAdded(event: StakeAdded): void {
     currentStake.user = user.id;
     currentStake.userAddress = user.address;
     currentStake.syntheticToken = syntheticToken.id;
+    currentStake.syntheticMarket = syntheticToken.syntheticMarket;
 
     user.currentStakes = user.currentStakes.concat([currentStake.id]);
   } else {
@@ -239,7 +251,7 @@ export function handleStakeWithdrawn(event: StakeWithdrawn): void {
 
   let userAddress = event.params.user;
   let userAddressString = userAddress.toHex();
-  let tokenAddress = event.params.tokenAddress;
+  let tokenAddress = event.params.token;
   let tokenAddressString = tokenAddress.toHex();
   let amount = event.params.amount;
 
@@ -288,49 +300,82 @@ export function handleStakeWithdrawn(event: StakeWithdrawn): void {
 export function handleFloatMinted(event: FloatMinted): void {
   let userAddress = event.params.user;
   let userAddressString = userAddress.toHex();
-  let tokenAddress = event.params.tokenAddress;
-  let tokenAddressString = tokenAddress.toHex();
-  let amount = event.params.amount;
+  let marketIndex = event.params.marketIndex;
+  let marketIndexId = marketIndex.toString();
+  let amountLong = event.params.amountLong;
+  let amountShort = event.params.amountShort;
+  let totalAmount = amountLong.plus(amountShort);
   let lastMintIndex = event.params.lastMintIndex;
 
-  let state = StakeState.load(
-    tokenAddressString + "-" + lastMintIndex.toString()
-  );
+  let state = StakeState.load(marketIndexId + "-" + lastMintIndex.toString());
   if (state == null) {
     log.critical("state not defined yet in `handleFloatMinted`, tx hash {}", [
       event.transaction.hash.toHex(),
     ]);
   }
-  let syntheticToken = SyntheticToken.load(tokenAddressString);
-  syntheticToken.floatMintedFromSpecificToken = syntheticToken.floatMintedFromSpecificToken.plus(
-    amount
+  let syntheticMarket = SyntheticMarket.load(marketIndexId);
+  if (syntheticMarket == null) {
+    log.critical(
+      "`handleFloatMinted` called without SyntheticMarket with id #{} being created.",
+      [marketIndexId]
+    );
+  }
+  let syntheticLong = SyntheticToken.load(syntheticMarket.syntheticLong);
+  syntheticLong.floatMintedFromSpecificToken = syntheticLong.floatMintedFromSpecificToken.plus(
+    amountLong
+  );
+  let syntheticShort = SyntheticToken.load(syntheticMarket.syntheticShort);
+  syntheticShort.floatMintedFromSpecificToken = syntheticShort.floatMintedFromSpecificToken.plus(
+    amountShort
   );
 
   let user = getOrCreateUser(userAddress, event);
-  user.totalMintedFloat = user.totalMintedFloat.plus(amount);
-
-  let currentStake = CurrentStake.load(
-    tokenAddressString + "-" + userAddressString + "-currentStake"
+  syntheticMarket.totalFloatMinted = syntheticMarket.totalFloatMinted.plus(
+    totalAmount
   );
-  if (currentStake == null) {
-    currentStake = new CurrentStake(
-      tokenAddressString + "-" + userAddressString + "-currentStake"
-    );
-    currentStake.user = user.id;
-    currentStake.userAddress = user.address;
-    currentStake.syntheticToken = syntheticToken.id;
-    currentStake.currentStake = "DOESN'T EXIST YET";
+  user.totalMintedFloat = user.totalMintedFloat.plus(totalAmount);
 
-    user.currentStakes = user.currentStakes.concat([currentStake.id]);
+  // TODO - create a helper function the 'getOrCreate's the CurrentStake
+  let currentStakeLong = CurrentStake.load(
+    syntheticMarket.syntheticLong + "-" + userAddressString + "-currentStake"
+  );
+  let currentStakeShort = CurrentStake.load(
+    syntheticMarket.syntheticShort + "-" + userAddressString + "-currentStake"
+  );
+  if (currentStakeLong == null) {
+    currentStakeLong = new CurrentStake(
+      syntheticMarket.syntheticLong + "-" + userAddressString + "-currentStake"
+    );
+    currentStakeLong.user = user.id;
+    currentStakeLong.userAddress = user.address;
+    currentStakeLong.syntheticToken = syntheticLong.id;
+    currentStakeShort.syntheticMarket = syntheticMarket.id;
+    currentStakeLong.currentStake = "DOESN'T EXIST YET";
+
+    user.currentStakes = user.currentStakes.concat([currentStakeLong.id]);
   }
-  currentStake.lastMintState = state.id;
+  if (currentStakeShort == null) {
+    currentStakeShort = new CurrentStake(
+      syntheticMarket.syntheticShort + "-" + userAddressString + "-currentStake"
+    );
+    currentStakeShort.user = user.id;
+    currentStakeShort.userAddress = user.address;
+    currentStakeShort.syntheticToken = syntheticShort.id;
+    currentStakeShort.syntheticMarket = syntheticMarket.id;
+    currentStakeShort.currentStake = "DOESN'T EXIST YET";
+
+    user.currentStakes = user.currentStakes.concat([currentStakeShort.id]);
+  }
+  currentStakeLong.lastMintState = state.id;
+  currentStakeShort.lastMintState = state.id;
 
   let globalState = GlobalState.load(GLOBAL_STATE_ID);
-  globalState.totalFloatMinted = globalState.totalFloatMinted.plus(amount);
+  globalState.totalFloatMinted = globalState.totalFloatMinted.plus(totalAmount);
 
-  syntheticToken.save();
+  syntheticLong.save();
   user.save();
-  currentStake.save();
+  currentStakeLong.save();
+  currentStakeShort.save();
   globalState.save();
 
   saveEventToStateChange(
@@ -338,13 +383,14 @@ export function handleFloatMinted(event: FloatMinted): void {
     "FloatMinted",
     [
       userAddressString,
-      tokenAddressString,
-      amount.toString(),
+      marketIndexId,
+      amountLong.toString(),
+      amountShort.toString(),
       lastMintIndex.toString(),
     ],
-    ["user", "tokenAddress", "amount", "lastMintIndex"],
-    ["address", "address", "uint256", "uint256"],
+    ["user", "marketIndex", "amountLong", "amountShort", "lastMintIndex"],
+    ["address", "uint32", "uint256", "uint256", "uint256"],
     [userAddress],
-    [currentStake.id]
+    [currentStakeLong.id, currentStakeShort.id]
   );
 }

@@ -66,6 +66,19 @@ contract StakerInternalsExposed is Staker {
         mintAccumulatedFloat(token, user);
     }
 
+    // function calculateAccumulatedFloatExposed(uint32 marketIndex, address user)
+    //     external
+    //     returns (uint256, uint256)
+    // {
+    //     return calculateAccumulatedFloat(marketIndex, user);
+    // }
+
+    // function mintAccumulatedFloatExternal(uint32 marketIndex, address user)
+    //     external
+    // {
+    //     mintAccumulatedFloat(marketIndex, user);
+    // }
+
     function _mintFloatExternal(address user, uint256 floatToMint) external {
         _mintFloat(user, floatToMint);
     }

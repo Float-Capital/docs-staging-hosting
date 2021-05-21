@@ -38,7 +38,7 @@ describe("Float System", () => {
       let {longShort, markets, staker} = contracts.contents;
       let testUser = accounts.contents->Array.getUnsafe(1);
 
-      let%Await (synthsUserHasStakedIn, marketsUserHasStakedIn) =
+      let%Await (_synthsUserHasStakedIn, marketsUserHasStakedIn) =
         HelperActions.stakeRandomlyInMarkets(
           ~marketsToStakeIn=markets,
           ~userToStakeWith=testUser,
@@ -50,22 +50,18 @@ describe("Float System", () => {
       let%Await _ =
         staker->Contract.Staker.claimFloatCustomUser(
           ~user=testUser,
-          ~syntheticTokens=
-            synthsUserHasStakedIn->Array.map(stake => stake##synth),
           ~markets=marketsUserHasStakedIn,
         );
 
       let%Await _ =
-        synthsUserHasStakedIn
-        ->Array.map(stake => {
+        marketsUserHasStakedIn
+        ->Array.map(market => {
             JsPromise.all2((
               staker->Contract.Staker.userIndexOfLastClaimedReward(
-                ~synthTokenAddr=stake##synth.address,
+                ~market,
                 ~user=testUser.address,
               ),
-              staker->Contract.Staker.latestRewardIndex(
-                ~synthTokenAddr=stake##synth.address,
-              ),
+              staker->Contract.Staker.latestRewardIndex(~market),
             ))
             ->JsPromise.map(((userLastClaimed, latestRewardIndex)) => {
                 Chai.bnEqual(userLastClaimed, latestRewardIndex)
