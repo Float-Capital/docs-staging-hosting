@@ -13,10 +13,12 @@ var Ethers = require("../../ethereum/Ethers.js");
 var Loader = require("../UI/Base/Loader.js");
 var Ethers$1 = require("ethers");
 var Globals = require("../../libraries/Globals.js");
+var Js_math = require("rescript/lib/js/js_math.js");
 var Tooltip = require("../UI/Base/Tooltip.js");
 var Metamask = require("../UI/Base/Metamask.js");
 var Contracts = require("../../ethereum/Contracts.js");
 var Formality = require("re-formality/src/Formality.js");
+var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var AmountInput = require("../UI/Base/AmountInput.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
@@ -559,6 +561,15 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
   var tokenToMint = Props.tokenToMint;
   var buttonText = Props.buttonText;
   var buttonDisabled = Props.buttonDisabled;
+  var randomMintTweetMessage = function (isLong, marketName) {
+    var position = isLong ? "long" : "short";
+    var possibleTweetMessages = [
+      "Boom bam baby!💥 I just minted " + position + " tokens on " + marketName + "! @float_capital 🌊",
+      "Look at me, look at me! I just went " + position + " on " + marketName + "! 🐬 @float_capital 🌊",
+      "Cue Jaws music! 🦈 I just went " + position + " on " + marketName + "! @foat_capital 🌊"
+    ];
+    return Belt_Option.getWithDefault(Belt_Array.get(possibleTweetMessages, Js_math.random_int(0, possibleTweetMessages.length)), "");
+  };
   var exit = 0;
   if (typeof txStateApprove === "number") {
     if (txStateApprove !== /* UnInitialised */0) {
@@ -691,9 +702,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                               children: React.createElement("div", {
                                     className: "text-center m-3"
                                   }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement(TweetButton.make, {
-                                        message: "I just went " + (
-                                          isLong ? "long" : "short"
-                                        ) + " on " + marketName + "! @float_capital 🌊 "
+                                        message: randomMintTweetMessage(isLong, marketName)
                                       }), React.createElement(Metamask.AddTokenButton.make, {
                                         token: Config.config.contracts.FloatToken,
                                         tokenSymbol: (

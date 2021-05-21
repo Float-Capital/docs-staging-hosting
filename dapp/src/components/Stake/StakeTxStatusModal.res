@@ -1,5 +1,18 @@
 @react.component
 let make = (~txStateStake, ~resetFormButton, ~tokenToStake) => {
+  let stakeTweetMessages = [
+    `Hey Siri, play “Celebrate” by Kool and The Gang 🥳, because I just staked my @float_capital synthetic assets to earn FLOAT tokens! 🌊`,
+    `Stake that @float_capital! 🌊 I just staked my synthetic assets to earn FLOAT tokens! 🥳`,
+    `Make it rain @float_capital! 💸 I just staked my synthetic assets to earn FLOAT tokens! 🥳`,
+    `Stake that, all on the floor! Stake that, give me some more! 🎶 I just staked my synthetic assets to earn FLOAT tokens! @float_capital 🌊`,
+    `Float like a butterfly, stake like a bee!🐝 I just staked to earn FLOAT tokens @float_capital 🌊`,
+  ]
+
+  let randomStakeTweetMessage =
+    stakeTweetMessages[
+      Js.Math.random_int(0, stakeTweetMessages->Array.length)
+    ]->Option.getWithDefault(``)
+
   switch txStateStake {
   | ContractActions.Created =>
     <Modal id={"stake-1"}>
@@ -21,9 +34,7 @@ let make = (~txStateStake, ~resetFormButton, ~tokenToStake) => {
         <div className="text-center m-3">
           <Tick />
           <p> {`Transaction complete 🎉`->React.string} </p>
-          <TweetButton
-            message={`Float like a butterfly, stake like a bee!🐝 I just staked to earn Float tokens @float_capital 🌊 `}
-          />
+          <TweetButton message={randomStakeTweetMessage} />
           <ViewPositionButton />
         </div>
         {resetFormButton()}
