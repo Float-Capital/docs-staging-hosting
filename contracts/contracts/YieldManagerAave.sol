@@ -19,6 +19,7 @@ contract YieldManagerAave is IYieldManager {
     // Admin contracts.
     address public admin;
     address public longShort;
+    address public treasury;
 
     // Global state.
     ERC20 public token; // underlying asset token
@@ -40,6 +41,11 @@ contract YieldManagerAave is IYieldManager {
         require(msg.sender == longShort, "Not longShort");
         _;
     }
+    
+    modifier treasuryOnly() {
+        require(msg.sender == treasury, "Not treasury");
+        _;
+    }
 
     ////////////////////////////////////
     ///// CONTRACT SET-UP //////////////
@@ -53,6 +59,7 @@ contract YieldManagerAave is IYieldManager {
     constructor(
         address _admin,
         address _longShort,
+        address _treasury,
         address _token,
         address _aToken,
         address _lendingPool,
@@ -60,6 +67,7 @@ contract YieldManagerAave is IYieldManager {
     ) {
         admin = _admin;
         longShort = _longShort;
+        treasury = _treasury;
 
         referralCode = _aaveReferalCode;
 
@@ -104,6 +112,13 @@ contract YieldManagerAave is IYieldManager {
 
         // Transfer tokens back to LongShort contract.
         token.transfer(longShort, amount);
+    }
+    
+    function withdrawErc20TokenToTreasury(address erc20Token) external treasuryOnly {
+        // Redeem other erc20 for underlying asset tokens.        
+        // Transfer tokens back to Treasury contract.
+        uint256 amount = IERC20Upgradeable(erc20Token).balanceOf(address(this));
+        IERC20Upgradeable(erc20Token).transfer(treasury, amount);
     }
 
     function getTotalHeld() public view override returns (uint256 amount) {

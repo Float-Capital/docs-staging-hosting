@@ -4,6 +4,7 @@ const Dai = artifacts.require("Dai");
 const LongShort = artifacts.require("LongShort");
 const Staker = artifacts.require("Staker");
 const SyntheticToken = artifacts.require("SyntheticToken");
+const Treasury = artifacts.require("Treasury_v0");
 const YieldManagerMock = artifacts.require("YieldManagerMock");
 const OracleManagerMock = artifacts.require("OracleManagerMock");
 const YieldManagerAave = artifacts.require("YieldManagerAave");
@@ -32,6 +33,7 @@ const deployTestMarket = async (
   syntheticSymbol,
   syntheticName,
   longShortInstance,
+  treasuryInstance,
   fundTokenInstance,
   admin,
   networkName
@@ -57,6 +59,7 @@ const deployTestMarket = async (
     yieldManager = await YieldManagerAave.new(
       admin,
       longShortInstance.address,
+      treasuryInstance.address,
       mumbaiDaiAddress,
       mumabiADai,
       aavePoolAddressMumbai,
@@ -138,11 +141,13 @@ module.exports = async function(deployer, network, accounts) {
   }
 
   const longShort = await LongShort.deployed();
+  const treasury = await Treasury.deployed();
   const staker = await Staker.deployed();
   await deployTestMarket(
     "ETH killers",
     "ETHK",
     longShort,
+    treasury,
     token,
     admin,
     network
@@ -151,6 +156,7 @@ module.exports = async function(deployer, network, accounts) {
     "Placeholder Market 1",
     "PM1",
     longShort,
+    treasury,
     token,
     admin,
     network
@@ -159,6 +165,7 @@ module.exports = async function(deployer, network, accounts) {
     "Placeholder Market 2",
     "PM2",
     longShort,
+    treasury,
     token,
     admin,
     network
