@@ -23,14 +23,20 @@
       },
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "tokenAddress",
-        "type": "address"
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "amount",
+        "name": "amountLong",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountShort",
         "type": "uint256"
       },
       {
@@ -80,7 +86,7 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "tokenAddress",
+        "name": "token",
         "type": "address"
       },
       {
@@ -111,7 +117,7 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "tokenAddress",
+        "name": "token",
         "type": "address"
       },
       {
@@ -129,9 +135,9 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "tokenAddress",
-        "type": "address"
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
       },
       {
         "indexed": false,
@@ -148,12 +154,97 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "accumulative",
+        "name": "accumulativeLong",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "accumulativeShort",
         "type": "uint256"
       }
     ],
     "name": "StateAdded",
     "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "FLOAT_ISSUANCE_FIXED_DECIMAL",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "internalType": "contract ISyntheticToken",
+        "name": "longToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract ISyntheticToken",
+        "name": "shortToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "kInitialMultiplier",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "kPeriod",
+        "type": "uint256"
+      }
+    ],
+    "name": "addNewStakingFund",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "longPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "shortPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "longValue",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "shortValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "addNewStateForFloatRewards",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -166,265 +257,50 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "floatCapital",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "floatContract",
-    "outputs": [
-      {
-        "internalType": "contract LongShort",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "floatPercentage",
-    "outputs": [
-      {
-        "internalType": "uint16",
-        "name": "",
-        "type": "uint16"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "floatToken",
-    "outputs": [
-      {
-        "internalType": "contract FloatToken",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "initialTimestamp",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "longValue",
         "type": "uint256"
-      }
-    ],
-    "name": "kFactorInitialMultipliers",
-    "outputs": [
+      },
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "shortValue",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
+      },
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "longPrice",
         "type": "uint256"
-      }
-    ],
-    "name": "kFactorPeriods",
-    "outputs": [
+      },
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "shortPrice",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "latestRewardIndex",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "marketIndexOfToken",
-    "outputs": [
+      },
       {
         "internalType": "uint32",
-        "name": "",
+        "name": "marketIndex",
         "type": "uint32"
       }
     ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "syntheticRewardParams",
+    "name": "calculateFloatPerSecond",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "timestamp",
+        "name": "longFloatPerSecond",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "accumulativeFloatPerToken",
+        "name": "shortFloatPerSecond",
         "type": "uint256"
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "userAmountStaked",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "userIndexOfLastClaimedReward",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_admin",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_floatContract",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_floatToken",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_floatCapital",
-        "type": "address"
-      }
-    ],
-    "name": "initialize",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -479,65 +355,58 @@
   {
     "inputs": [
       {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "address",
-        "name": "longTokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "shortTokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "kInitialMultiplier",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "kPeriod",
-        "type": "uint256"
+        "internalType": "uint32[]",
+        "name": "marketIndexes",
+        "type": "uint32[]"
       }
     ],
-    "name": "addNewStakingFund",
+    "name": "claimFloatCustom",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "longValue",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "shortValue",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenPrice",
-        "type": "uint256"
-      },
+    "inputs": [],
+    "name": "floatCapital",
+    "outputs": [
       {
         "internalType": "address",
-        "name": "token",
+        "name": "",
         "type": "address"
-      },
-      {
-        "internalType": "bool",
-        "name": "isLong",
-        "type": "bool"
       }
     ],
-    "name": "calculateFloatPerSecond",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "floatPercentage",
+    "outputs": [
+      {
+        "internalType": "uint16",
+        "name": "",
+        "type": "uint16"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "floatToken",
+    "outputs": [
+      {
+        "internalType": "contract IFloatToken",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "initialTimestamp",
     "outputs": [
       {
         "internalType": "uint256",
@@ -546,87 +415,144 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "address",
-        "name": "longToken",
+        "name": "_admin",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "shortToken",
+        "name": "_longShortCoreContract",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_floatToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_floatCapital",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "kFactorInitialMultipliers",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "kFactorPeriods",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "name": "latestRewardIndex",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "longShortCoreContract",
+    "outputs": [
+      {
+        "internalType": "contract ILongShort",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISyntheticToken",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "marketIndexOfToken",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISyntheticToken",
+        "name": "token",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "longPrice",
+        "name": "amount",
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "shortPrice",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "longValue",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "shortValue",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
       }
     ],
-    "name": "addNewStateForFloatRewards",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "tokenAddresses",
-        "type": "address[]"
-      }
-    ],
-    "name": "claimFloat",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "tokenAddresses",
-        "type": "address[]"
-      }
-    ],
-    "name": "claimFloatImmediately",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "tokenAddresses",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint32[]",
-        "name": "marketIndexes",
-        "type": "uint32[]"
-      }
-    ],
-    "name": "claimFloatCustom",
+    "name": "stakeFromMint",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -644,7 +570,7 @@
         "type": "uint256"
       }
     ],
-    "name": "stakeDirect",
+    "name": "stakeFromUser",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -652,67 +578,114 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "tokenAddress",
-        "type": "address"
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
       },
       {
         "internalType": "uint256",
-        "name": "amount",
+        "name": "",
         "type": "uint256"
       }
     ],
-    "name": "stake",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
+    "name": "syntheticRewardParams",
+    "outputs": [
       {
-        "internalType": "address",
-        "name": "tokenAddress",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "amount",
+        "name": "accumulativeFloatPerLongToken",
         "type": "uint256"
-      }
-    ],
-    "name": "stakeAndEarnImmediately",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "tokenAddress",
-        "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "amount",
+        "name": "accumulativeFloatPerShortToken",
         "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
       }
     ],
-    "name": "stakeTransferredTokens",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
       {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "name": "syntheticTokens",
+    "outputs": [
+      {
+        "internalType": "contract ISyntheticToken",
+        "name": "shortToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract ISyntheticToken",
+        "name": "longToken",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISyntheticToken",
+        "name": "",
+        "type": "address"
+      },
+      {
         "internalType": "address",
-        "name": "tokenAddress",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "userAmountStaked",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "userIndexOfLastClaimedReward",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISyntheticToken",
+        "name": "token",
         "type": "address"
       },
       {
@@ -729,8 +702,8 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "tokenAddress",
+        "internalType": "contract ISyntheticToken",
+        "name": "token",
         "type": "address"
       }
     ],
