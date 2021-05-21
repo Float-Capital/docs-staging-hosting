@@ -9,9 +9,7 @@ let make = (~txStateStake, ~resetFormButton, ~tokenToStake) => {
   ]
 
   let randomStakeTweetMessage =
-    stakeTweetMessages[
-      Js.Math.random_int(0, stakeTweetMessages->Array.length)
-    ]->Option.getWithDefault(``)
+    stakeTweetMessages->Array.getUnsafe(Js.Math.random_int(0, stakeTweetMessages->Array.length))
 
   switch txStateStake {
   | ContractActions.Created =>
