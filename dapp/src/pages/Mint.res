@@ -3,8 +3,8 @@ module DetailsWrapper = {
   let make = (~market: Queries.SyntheticMarketInfo.t, ~marketIndex,~actionOption, ~children) =>
   <div className="max-w-xl mx-auto">
     <Next.Link href="/">
-      <div className="uppercase text-xs text-gray-600 hover:text-gray-500 cursor-pointer mb-2">
-        {`◀`->React.string} <span className="text-xs"> {" Back to markets"->React.string} </span>
+      <div className="uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mb-2">
+        {`◀`->React.string} <span className="text-xxs"> {" Back to markets"->React.string} </span>
       </div>
     </Next.Link>
     <div className="p-5 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg">

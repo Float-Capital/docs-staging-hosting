@@ -23,9 +23,9 @@ function Mint$DetailsWrapper(Props) {
             }, React.createElement(Link, {
                   href: "/",
                   children: React.createElement("div", {
-                        className: "uppercase text-xs text-gray-600 hover:text-gray-500 cursor-pointer mb-2"
+                        className: "uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mb-2"
                       }, "◀", React.createElement("span", {
-                            className: "text-xs"
+                            className: "text-xxs"
                           }, " Back to markets"))
                 }), React.createElement("div", {
                   className: "p-5 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
