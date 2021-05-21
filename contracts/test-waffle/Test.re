@@ -17,7 +17,10 @@ describe("Float System", () => {
 
     before_each(() => {
       let%AwaitThen deployedContracts =
-        Helpers.inititialize(~admin=accounts.contents->Array.getUnsafe(0));
+        Helpers.inititialize(
+          ~admin=accounts.contents->Array.getUnsafe(0),
+          ~exposeInternals=false,
+        );
       contracts := deployedContracts;
       let setupUser = accounts.contents->Array.getUnsafe(2);
 
@@ -61,11 +64,7 @@ describe("Float System", () => {
               staker->Contract.Staker.latestRewardIndex(~market),
             ))
             ->JsPromise.map(((userLastClaimed, latestRewardIndex)) => {
-                // These values should be equal but they are not - investigate
-                Chai.bnEqual(
-                  userLastClaimed,
-                  latestRewardIndex,
-                )
+                Chai.bnEqual(userLastClaimed, latestRewardIndex)
               })
           })
         ->JsPromise.all;
