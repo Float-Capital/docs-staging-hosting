@@ -7,8 +7,6 @@ var Modal = require("../UI/Base/Modal.js");
 var React = require("react");
 var Loader = require("../UI/Base/Loader.js");
 var Js_math = require("rescript/lib/js/js_math.js");
-var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var TweetButton = require("../UI/TweetButton.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
 var ViewPositionButton = require("../UI/ViewPositionButton.js");
@@ -25,7 +23,7 @@ function StakeTxStatusModal(Props) {
     "Stake that, all on the floor! Stake that, give me some more! 🎶 I just staked my synthetic assets to earn FLOAT tokens! @float_capital 🌊",
     "Float like a butterfly, stake like a bee!🐝 I just staked to earn FLOAT tokens @float_capital 🌊"
   ];
-  var randomStakeTweetMessage = Belt_Option.getWithDefault(Belt_Array.get(stakeTweetMessages, Js_math.random_int(0, stakeTweetMessages.length)), "");
+  var randomStakeTweetMessage = stakeTweetMessages[Js_math.random_int(0, stakeTweetMessages.length)];
   if (typeof txStateStake === "number") {
     if (txStateStake === /* UnInitialised */0) {
       return null;

@@ -18,7 +18,6 @@ var Tooltip = require("../UI/Base/Tooltip.js");
 var Metamask = require("../UI/Base/Metamask.js");
 var Contracts = require("../../ethereum/Contracts.js");
 var Formality = require("re-formality/src/Formality.js");
-var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var AmountInput = require("../UI/Base/AmountInput.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
@@ -566,9 +565,9 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
     var possibleTweetMessages = [
       "Boom bam baby!💥 I just minted " + position + " tokens on " + marketName + "! @float_capital 🌊",
       "Look at me, look at me! I just went " + position + " on " + marketName + "! 🐬 @float_capital 🌊",
-      "Cue Jaws music! 🦈 I just went " + position + " on " + marketName + "! @foat_capital 🌊"
+      "Cue Jaws music! 🦈 I just went " + position + " on " + marketName + "! @float_capital 🌊"
     ];
-    return Belt_Option.getWithDefault(Belt_Array.get(possibleTweetMessages, Js_math.random_int(0, possibleTweetMessages.length)), "");
+    return possibleTweetMessages[Js_math.random_int(0, possibleTweetMessages.length)];
   };
   var exit = 0;
   if (typeof txStateApprove === "number") {

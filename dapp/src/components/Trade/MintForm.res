@@ -61,9 +61,9 @@ module SubmitButtonAndTxTracker = {
         `Look at me, look at me! I just went ${position} on ${marketName}! 🐬 @float_capital 🌊`,
         `Cue Jaws music! 🦈 I just went ${position} on ${marketName}! @float_capital 🌊`,
       ]
-      possibleTweetMessages[
-        Js.Math.random_int(0, possibleTweetMessages->Array.length)
-      ]->Option.getWithDefault(``)
+      possibleTweetMessages->Array.getUnsafe(
+        Js.Math.random_int(0, possibleTweetMessages->Array.length),
+      )
     }
 
     switch (txStateApprove, txStateMint) {
