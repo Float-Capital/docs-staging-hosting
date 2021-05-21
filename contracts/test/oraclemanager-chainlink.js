@@ -44,7 +44,7 @@ contract("OracleManager (ChainLink)", (accounts) => {
         "initial oracle price wrong"
       );
 
-      // Set the band oracle to our given rates.
+      // Set the chainlink oracle to our given rates.
       await aggregator.setPrice(aggregatorPriceToChangeTo);
 
       let newPrice = await oracle.updatePrice.call();
