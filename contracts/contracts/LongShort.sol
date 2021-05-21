@@ -53,8 +53,8 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => uint256) public totalValueLockedInYieldManager;
     mapping(uint32 => uint256) public totalValueReservedForTreasury;
     mapping(uint32 => uint256) public assetPrice;
-    mapping(uint32 => uint256) public longTokenPrice;
-    mapping(uint32 => uint256) public shortTokenPrice;
+    mapping(uint32 => uint256) public longTokenPrice; // NOTE: cannot deprecate this value and use the marketStateSnapshot values instead since these values change inbetween assetPrice updates (when yield is collected)
+    mapping(uint32 => uint256) public shortTokenPrice; // NOTE: cannot deprecate this value and use the marketStateSnapshot values instead since these values change inbetween assetPrice updates (when yield is collected)
     mapping(uint32 => IERC20) public fundTokens;
     mapping(uint32 => IYieldManager) public yieldManagers;
     mapping(uint32 => IOracleManager) public oracleManagers;
@@ -571,10 +571,11 @@ contract LongShort is ILongShort, Initializable {
 
     function _priceChangeMechanism(uint32 marketIndex, uint256 newPrice)
         internal
+        returns (bool didUpdate)
     {
         // If no new price update from oracle, proceed as normal
         if (assetPrice[marketIndex] == newPrice) {
-            return;
+            return false;
         }
 
         uint256 valueChange = 0;
@@ -601,6 +602,7 @@ contract LongShort is ILongShort, Initializable {
             longValue[marketIndex] = longValue[marketIndex] - valueChange;
             shortValue[marketIndex] = shortValue[marketIndex] + valueChange;
         }
+        return true;
     }
 
     /**
@@ -615,19 +617,20 @@ contract LongShort is ILongShort, Initializable {
         // So reward rate can be calculated just in time by
         // staker without needing to be saved
         staker.addNewStateForFloatRewards(
-            longTokens[marketIndex],
-            shortTokens[marketIndex],
+            marketIndex,
             longTokenPrice[marketIndex],
             shortTokenPrice[marketIndex],
             longValue[marketIndex],
             shortValue[marketIndex]
         );
 
+        // turn this into an assert (markets will be seeded)
         if (longValue[marketIndex] == 0 && shortValue[marketIndex] == 0) {
             return;
         }
+        // TODO - should never happen - seed markets
+        // assert(longValue[marketIndex] != 0 && shortValue[marketIndex] != 0);
 
-        // TODO: Check why/if this is bad (casting to uint)
         // If a negative int is return this should fail.
         uint256 newPrice = uint256(getLatestPrice(marketIndex));
         emit PriceUpdate(
@@ -637,16 +640,32 @@ contract LongShort is ILongShort, Initializable {
             msg.sender
         );
 
+        bool priceChanged = false;
         // Adjusts long and short values based on price movements.
         if (longValue[marketIndex] > 0 && shortValue[marketIndex] > 0) {
-            _priceChangeMechanism(marketIndex, newPrice);
+            // TODO: this should always be true due to market setup seed.
+            priceChanged = _priceChangeMechanism(marketIndex, newPrice);
         }
 
         // Distibute accrued yield manager interest.
         _yieldMechanism(marketIndex);
 
         _refreshTokensPrice(marketIndex);
-        assetPrice[marketIndex] = newPrice;
+
+        if (priceChanged) {
+            assetPrice[marketIndex] = newPrice;
+
+            // TODO: perform deposit of batched mints + mintAndStakes!
+
+            uint256 newLatestPriceStateIndex =
+                latestUpdateIndex[marketIndex] + 1;
+            latestUpdateIndex[marketIndex] = newLatestPriceStateIndex;
+
+            MarketStateSnapshotStruct storage stateStruct =
+                marketStateSnapshot[marketIndex][newLatestPriceStateIndex];
+            stateStruct.tokenPriceLong = longTokenPrice[marketIndex];
+            stateStruct.tokenPriceShort = shortTokenPrice[marketIndex];
+        }
 
         emit ValueLockedInSystem(
             marketIndex,
@@ -1082,4 +1101,50 @@ contract LongShort is ILongShort, Initializable {
         // Update global state.
         totalValueReservedForTreasury[marketIndex] = 0;
     }
+
+    ////// LAZY EXEC:
+    // Putting all code related to lazy execution below to keep it separate from the rest of the code (for now)
+
+    struct userLazyDeposit {
+        uint256 updateIndex;
+        uint256 mintLong;
+        uint256 mintShort;
+        uint256 mintAndStakeLong;
+        uint256 mintAndStakeShort;
+    }
+    struct MarketStateSnapshotStruct {
+        // QUESTION? possible to compress this into two uint128 values?
+        uint256 tokenPriceLong;
+        uint256 tokenPriceShort;
+    }
+
+    mapping(uint32 => uint256) latestUpdateIndex;
+    mapping(uint32 => mapping(uint256 => MarketStateSnapshotStruct)) marketStateSnapshot;
+    mapping(uint32 => uint256) batchedMintLong;
+    mapping(uint32 => uint256) batchedMinttShort;
+    mapping(uint32 => mapping(address => userLazyDeposit)) userLazyActions;
+
+    modifier executeOutstandingLazyDeposits(address user) {
+        _;
+    }
+
+    function mintLongLazy(uint32 marketIndex, uint256 amount) external {
+        // accept the users funds
+        // pre-deposit them into the market? (probably not an easy thing to do, don't gain that much doing so either just more expensive tx)
+        batchedMintLong[marketIndex] += amount;
+        userLazyActions[marketIndex][msg.sender].mintLong += amount;
+        userLazyActions[marketIndex][msg.sender].updateIndex =
+            latestUpdateIndex[marketIndex] +
+            1;
+    }
+
+    function mintShortLazy(uint32 marketIndex, uint256 amount) external {}
+
+    function mintLongAndStakeLazy(uint32 marketIndex, uint256 amount)
+        external
+    {}
+
+    function mintShortAndStakeLazy(uint32 marketIndex, uint256 amount)
+        external
+    {}
 }

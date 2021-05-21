@@ -25,7 +25,7 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                                           }));
                             }));
                       Promise$BsMocha.before_each(undefined)(undefined, undefined, undefined, (function (param) {
-                              return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0]), (function (deployedContracts) {
+                              return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
                                             contracts.contents = deployedContracts;
                                             var setupUser = accounts.contents[2];
                                             return LetOps.Await.let_(HelperActions.stakeRandomlyInBothSidesOfMarket(deployedContracts.markets, setupUser, deployedContracts.longShort), (function (param) {
@@ -39,17 +39,14 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                                     var testUser = accounts.contents[1];
                                     return LetOps.Await.let_(HelperActions.stakeRandomlyInMarkets(match.markets, testUser, match.longShort), (function (param) {
                                                   var marketsUserHasStakedIn = param[1];
-                                                  var synthsUserHasStakedIn = param[0];
                                                   return LetOps.Await.let_(Helpers.increaseTime(50), (function (param) {
-                                                                return LetOps.Await.let_(Contract.Staker.claimFloatCustomUser(staker, testUser, Belt_Array.map(synthsUserHasStakedIn, (function (stake) {
-                                                                                      return stake.synth;
-                                                                                    })), marketsUserHasStakedIn), (function (param) {
-                                                                              return LetOps.Await.let_(Promise.all(Belt_Array.map(synthsUserHasStakedIn, (function (stake) {
+                                                                return LetOps.Await.let_(Contract.Staker.claimFloatCustomUser(staker, testUser, marketsUserHasStakedIn), (function (param) {
+                                                                              return LetOps.Await.let_(Promise.all(Belt_Array.map(marketsUserHasStakedIn, (function (market) {
                                                                                                     return Promise.all([
-                                                                                                                  staker.userIndexOfLastClaimedReward(stake.synth.address, testUser.address),
-                                                                                                                  staker.latestRewardIndex(stake.synth.address)
+                                                                                                                  staker.userIndexOfLastClaimedReward(market, testUser.address),
+                                                                                                                  staker.latestRewardIndex(market)
                                                                                                                 ]).then(function (param) {
-                                                                                                                return Chai.bnEqual(param[0], param[1]);
+                                                                                                                return Chai.bnEqual(undefined, param[0], param[1]);
                                                                                                               });
                                                                                                   }))), (function (param) {
                                                                                             

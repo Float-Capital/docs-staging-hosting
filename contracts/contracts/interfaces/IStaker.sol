@@ -14,8 +14,7 @@ abstract contract IStaker {
     ) external virtual;
 
     function addNewStateForFloatRewards(
-        ISyntheticToken longTokenAddress,
-        ISyntheticToken shortTokenAddress,
+        uint32 marketIndex,
         uint256 longTokenPrice,
         uint256 shortTokenPrice,
         uint256 longValue,

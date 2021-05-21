@@ -169,9 +169,10 @@ function useTotalClaimableFloatForUser(userId, synthTokens) {
                   var match = curState._0;
                   var amount = stake.currentStake.amount;
                   var timestamp = stake.lastMintState.timestamp;
-                  var lastAccumulativeFloatPerToken = stake.lastMintState.accumulativeFloatPerToken;
-                  var accumulativeFloatPerToken = stake.syntheticToken.latestStakerState.accumulativeFloatPerToken;
-                  var floatRatePerTokenOverInterval = stake.syntheticToken.latestStakerState.floatRatePerTokenOverInterval;
+                  var isLong = stake.syntheticToken.id === stake.lastMintState.longToken.id;
+                  var lastAccumulativeFloatPerToken = isLong ? stake.lastMintState.accumulativeFloatPerTokenLong : stake.lastMintState.accumulativeFloatPerTokenShort;
+                  var accumulativeFloatPerToken = isLong ? stake.syntheticMarket.latestStakerState.accumulativeFloatPerTokenLong : stake.syntheticMarket.latestStakerState.accumulativeFloatPerTokenShort;
+                  var floatRatePerTokenOverInterval = isLong ? stake.syntheticMarket.latestStakerState.floatRatePerTokenOverIntervalLong : stake.syntheticMarket.latestStakerState.floatRatePerTokenOverIntervalShort;
                   var claimableFloat = accumulativeFloatPerToken.sub(lastAccumulativeFloatPerToken).mul(amount).div(CONSTANTS.tenToThe42).add(match[0]);
                   var predictedFloat = currentTimestamp.sub(timestamp).mul(floatRatePerTokenOverInterval).mul(amount).div(CONSTANTS.tenToThe42).add(match[1]);
                   return {
