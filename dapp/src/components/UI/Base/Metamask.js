@@ -7,10 +7,15 @@ var React = require("react");
 var Button = require("./Button.js");
 var Config = require("../../../Config.js");
 var Ethers = require("../../../ethereum/Ethers.js");
+var JsPromise = require("../../../libraries/Js.Promise/JsPromise.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var InjectedEthereum = require("../../../ethereum/InjectedEthereum.js");
 
 function Metamask$AddOrSwitchNetwork(Props) {
+  var onFailureCallbackOpt = Props.onFailureCallback;
+  var onFailureCallback = onFailureCallbackOpt !== undefined ? onFailureCallbackOpt : (function (param) {
+        
+      });
   var ethObj = window.ethereum;
   if (ethObj === undefined) {
     return null;
@@ -19,20 +24,23 @@ function Metamask$AddOrSwitchNetwork(Props) {
   return React.createElement(Button.$$Element.make, {
               onClick: (function (_event) {
                   return Misc.onlyExecuteClientSide(function (param) {
-                              ethObj$1.request({
-                                    method: "wallet_addEthereumChain",
-                                    params: [{
-                                        chainId: InjectedEthereum.chainIdIntToHex(Config.networkId),
-                                        chainName: Config.networkName,
-                                        nativeCurrency: {
-                                          name: Config.networkCurrencyName,
-                                          symbol: Config.networkCurrencySymbol,
-                                          decimals: 18
-                                        },
-                                        rpcUrls: [Config.rpcEndopint],
-                                        blockExplorerUrls: [Config.blockExplorer]
-                                      }]
-                                  });
+                              JsPromise.$$catch(ethObj$1.request({
+                                        method: "wallet_addEthereumChain",
+                                        params: [{
+                                            chainId: InjectedEthereum.chainIdIntToHex(Config.networkId),
+                                            chainName: Config.networkName,
+                                            nativeCurrency: {
+                                              name: Config.networkCurrencyName,
+                                              symbol: Config.networkCurrencySymbol,
+                                              decimals: 18
+                                            },
+                                            rpcUrls: [Config.rpcEndopint],
+                                            blockExplorerUrls: [Config.blockExplorer]
+                                          }]
+                                      }), (function (param) {
+                                      Curry._1(onFailureCallback, undefined);
+                                      return Promise.resolve(undefined);
+                                    }));
                               
                             });
                 }),

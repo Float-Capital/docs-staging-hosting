@@ -80,6 +80,28 @@ function metamaskDefaultChainIdsToMetamaskName(chainId) {
   }
 }
 
+function instructionForDropdown(metamaskChainId) {
+  if (metamaskChainId !== undefined) {
+    if (Belt_SetInt.has(metamaskDefaultChainIds, metamaskChainId)) {
+      return "Click on the " + metamaskDefaultChainIdsToMetamaskName(metamaskChainId) + " dropdown";
+    } else {
+      return "Click on the dropdown for the network you're connected to.";
+    }
+  } else {
+    return "Click on the dropdown for the network you're connected to.";
+  }
+}
+
+function addNetworkInstructions(param) {
+  return [
+          "Enter the following information:",
+          React.createElement("br", undefined),
+          React.createElement("div", {
+                className: "pl-8"
+              }, "Network name - " + Config.networkName, React.createElement("br", undefined), "New RPC Url - " + Config.rpcEndopint, React.createElement("br", undefined), "Chain Id - " + String(Config.networkId), React.createElement("br", undefined), "Currency Symbol - " + Config.networkCurrencySymbol, React.createElement("br", undefined), "Block Explorer URL - " + Config.blockExplorer)
+        ];
+}
+
 function Login(Props) {
   var match = RootProvider.useActivateConnector(undefined);
   var activateConnector = match[1];
@@ -88,6 +110,10 @@ function Login(Props) {
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
   var isMetamask = InjectedEthereum.useIsMetamask(undefined);
   var metamaskChainId = InjectedEthereum.useMetamaskChainId(undefined);
+  var match$1 = React.useState(function () {
+        return false;
+      });
+  var setMetamaskDoesntSupportSwitchNetworks = match$1[1];
   React.useEffect((function () {
           if (nextPath !== undefined && optCurrentUser !== undefined) {
             router.push(nextPath);
@@ -137,11 +163,32 @@ function Login(Props) {
                                 className: "font-alphbeta text-xl pr-1"
                               }, "FLOAT"), ", please connect to the " + Config.networkName), Belt_SetInt.has(metamaskDefaultChainIds, Config.networkId) ? React.createElement("div", undefined, React.createElement("ul", {
                                   className: "list-decimal pl-10"
-                                }, React.createElement("li", undefined, "Open MetaMask"), React.createElement("li", undefined, metamaskChainId !== undefined ? (
-                                        Belt_SetInt.has(metamaskDefaultChainIds, metamaskChainId) ? "Click on the " + metamaskDefaultChainIdsToMetamaskName(metamaskChainId) + " dropdown" : "Click on the dropdown for the network you're connected to."
-                                      ) : "Click on the dropdown for the network you're connected to."), React.createElement("li", undefined, "Select " + Config.networkName))) : React.createElement("div", {
-                              className: "flex justify-center"
-                            }, React.createElement(Metamask.AddOrSwitchNetwork.make, {})))));
+                                }, React.createElement("li", undefined, "Open MetaMask"), React.createElement("li", undefined, instructionForDropdown(metamaskChainId)), React.createElement("li", undefined, "Select " + Config.networkName))) : (
+                          match$1[0] ? React.createElement("div", {
+                                  className: "flex flex-col justify-center"
+                                }, React.createElement("p", {
+                                      className: "mb-2 -mt-5"
+                                    }, [
+                                      "Unfortunately your version of",
+                                      React.createElement("img", {
+                                            className: "h-5 mx-1 inline",
+                                            src: "/icons/metamask.svg"
+                                          }),
+                                      "doesn't support automatic switching of networks."
+                                    ]), React.createElement("p", {
+                                      className: "mb-2"
+                                    }, "To connect you'll have to switch to " + Config.networkName + " manually."), "To add " + Config.networkName + " to metamask:", React.createElement("ul", {
+                                      className: "list-disc pl-10"
+                                    }, React.createElement("li", undefined, "Open Metamask."), React.createElement("li", undefined, instructionForDropdown(metamaskChainId)), React.createElement("li", undefined, "Select Custom RPC"), React.createElement("li", undefined, addNetworkInstructions(undefined)), React.createElement("li", undefined, "Save the new network"))) : React.createElement("div", {
+                                  className: "flex justify-center"
+                                }, React.createElement(Metamask.AddOrSwitchNetwork.make, {
+                                      onFailureCallback: (function (param) {
+                                          return Curry._1(setMetamaskDoesntSupportSwitchNetworks, (function (param) {
+                                                        return true;
+                                                      }));
+                                        })
+                                    }))
+                        ))));
   }
 }
 
@@ -152,6 +199,8 @@ var $$default = Login;
 exports.connectors = connectors;
 exports.metamaskDefaultChainIds = metamaskDefaultChainIds;
 exports.metamaskDefaultChainIdsToMetamaskName = metamaskDefaultChainIdsToMetamaskName;
+exports.instructionForDropdown = instructionForDropdown;
+exports.addNetworkInstructions = addNetworkInstructions;
 exports.make = make;
 exports.$$default = $$default;
 exports.default = $$default;
