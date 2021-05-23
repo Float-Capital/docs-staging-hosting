@@ -95,13 +95,9 @@ function instructionForDropdown(metamaskChainId) {
 }
 
 function addNetworkInstructions(param) {
-  return [
-          "Enter the following information:",
-          React.createElement("br", undefined),
-          React.createElement("div", {
-                className: "pl-8"
-              }, "Network name - " + Config.networkName, React.createElement("br", undefined), "New RPC Url - " + Config.rpcEndopint, React.createElement("br", undefined), "Chain Id - " + String(Config.networkId), React.createElement("br", undefined), "Currency Symbol - " + Config.networkCurrencySymbol, React.createElement("br", undefined), "Block Explorer URL - " + Config.blockExplorer)
-        ];
+  return React.createElement(React.Fragment, undefined, "Enter the following information:", React.createElement("br", undefined), React.createElement("div", {
+                  className: "pl-8"
+                }, "Network name - " + Config.networkName, React.createElement("br", undefined), "New RPC Url - " + Config.rpcEndopint, React.createElement("br", undefined), "Chain Id - " + String(Config.networkId), React.createElement("br", undefined), "Currency Symbol - " + Config.networkCurrencySymbol, React.createElement("br", undefined), "Block Explorer URL - " + Config.blockExplorer));
 }
 
 function Login(Props) {
@@ -177,7 +173,13 @@ function Login(Props) {
                                 className: "font-alphbeta text-xl pr-1"
                               }, "FLOAT"), ", please connect to the " + Config.networkName), Belt_SetInt.has(metamaskDefaultChainIds, Config.networkId) ? React.createElement("div", undefined, React.createElement("ul", {
                                   className: "list-decimal pl-10"
-                                }, React.createElement("li", undefined, "Open MetaMask"), React.createElement("li", undefined, instructionForDropdown(metamaskChainId)), React.createElement("li", undefined, "Select " + Config.networkName))) : (
+                                }, React.createElement("li", {
+                                      key: "instructions-1"
+                                    }, "Open MetaMask"), React.createElement("li", {
+                                      key: "instructions-2"
+                                    }, instructionForDropdown(metamaskChainId)), React.createElement("li", {
+                                      key: "instructions-3"
+                                    }, "Select " + Config.networkName))) : (
                           match$1[0] ? React.createElement("div", {
                                   className: "flex flex-col justify-center"
                                 }, React.createElement("p", {
@@ -193,7 +195,17 @@ function Login(Props) {
                                       className: "mb-2"
                                     }, "To connect you'll have to switch to " + Config.networkName + " manually."), "To add " + Config.networkName + " to metamask:", React.createElement("ul", {
                                       className: "list-disc pl-10"
-                                    }, React.createElement("li", undefined, "Open Metamask."), React.createElement("li", undefined, instructionForDropdown(metamaskChainId)), React.createElement("li", undefined, "Select Custom RPC"), React.createElement("li", undefined, addNetworkInstructions(undefined)), React.createElement("li", undefined, "Save the new network"))) : React.createElement("div", {
+                                    }, React.createElement("li", {
+                                          key: "instructions-1"
+                                        }, "Open Metamask."), React.createElement("li", {
+                                          key: "instructions-2"
+                                        }, instructionForDropdown(metamaskChainId)), React.createElement("li", {
+                                          key: "instructions-3"
+                                        }, "Select Custom RPC"), React.createElement("li", {
+                                          key: "instructions-4"
+                                        }, addNetworkInstructions(undefined)), React.createElement("li", {
+                                          key: "instructions-5"
+                                        }, "Save the new network"))) : React.createElement("div", {
                                   className: "flex justify-center"
                                 }, React.createElement(Metamask.AddOrSwitchNetwork.make, {
                                       onFailureCallback: onFailureToSwitchNetworksCallback

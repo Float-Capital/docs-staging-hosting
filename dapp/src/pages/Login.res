@@ -49,9 +49,9 @@ let instructionForDropdown = (~metamaskChainId) => {
 }
 
 let addNetworkInstructions = () => {
-  [
-    {`Enter the following information:`->React.string},
-    <br />,
+  <>
+    {`Enter the following information:`->React.string}
+    <br />
     <div className="pl-8">
       {`Network name - ${Config.networkName}`->React.string}
       <br />
@@ -62,8 +62,8 @@ let addNetworkInstructions = () => {
       {`Currency Symbol - ${Config.networkCurrencySymbol}`->React.string}
       <br />
       {`Block Explorer URL - ${Config.blockExplorer}`->React.string}
-    </div>,
-  ]->React.array
+    </div>
+  </>
 }
 
 @react.component
@@ -163,20 +163,20 @@ let make = () => {
                 </p>
                 {`To add ${Config.networkName} to metamask:`->React.string}
                 <ul className="list-disc pl-10">
-                  <li> {`Open Metamask.`->React.string} </li>
-                  <li> {instructionForDropdown(~metamaskChainId)} </li>
-                  <li> {`Select Custom RPC`->React.string} </li>
-                  <li> {addNetworkInstructions()} </li>
-                  <li> {`Save the new network`->React.string} </li>
+                  <li key={"instructions-1"}> {`Open Metamask.`->React.string} </li>
+                  <li key={"instructions-2"}> {instructionForDropdown(~metamaskChainId)} </li>
+                  <li key={"instructions-3"}> {`Select Custom RPC`->React.string} </li>
+                  <li key={"instructions-4"}> {addNetworkInstructions()} </li>
+                  <li key={"instructions-5"}> {`Save the new network`->React.string} </li>
                 </ul>
               </div>
             }
           | _ =>
             <div>
               <ul className="list-decimal pl-10">
-                <li> {`Open MetaMask`->React.string} </li>
-                <li> {instructionForDropdown(~metamaskChainId)} </li>
-                <li> {`Select ${Config.networkName}`->React.string} </li>
+                <li key={"instructions-1"}> {`Open MetaMask`->React.string} </li>
+                <li key={"instructions-2"}> {instructionForDropdown(~metamaskChainId)} </li>
+                <li key={"instructions-3"}> {`Select ${Config.networkName}`->React.string} </li>
               </ul>
             </div>
           }}
