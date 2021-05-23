@@ -42,8 +42,8 @@ module AddOrSwitchNetwork = {
               },
             ],
           },
-        )->JsPromise.catch(_ => {
-          let _ = onFailureCallback()
+        )->JsPromise.catch(error => {
+          let _ = onFailureCallback(error)
           JsPromise.resolve()
         })
       })

@@ -82,6 +82,16 @@ let make = () => {
     setMetamaskDoesntSupportSwitchNetworks,
   ) = React.useState(_ => false)
 
+  let onFailureToSwitchNetworksCallback = error => {
+    let errorMessage = switch error->Js.Exn.asJsExn {
+    | Some(err) => err->Js.Exn.message->Option.mapWithDefault("", x => x)
+    | None => ""
+    }
+    if errorMessage->Js.String2.includes("The method 'wallet_addEthereumChain' does not exist") {
+      setMetamaskDoesntSupportSwitchNetworks(_ => true)
+    }
+  }
+
   React.useEffect2(() => {
     switch (nextPath, optCurrentUser) {
     | (Some(nextPath), Some(_currentUser)) => router->Next.Router.push(nextPath)
@@ -136,7 +146,7 @@ let make = () => {
             if !metamaskDoesntSupportSwitchNetworks {
               <div className="flex justify-center">
                 <Metamask.AddOrSwitchNetwork
-                  onFailureCallback={() => setMetamaskDoesntSupportSwitchNetworks(_ => true)}
+                  onFailureCallback={onFailureToSwitchNetworksCallback}
                 />
               </div>
             } else {

@@ -9,10 +9,12 @@ var Metamask = require("../components/UI/Base/Metamask.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Belt_SetInt = require("rescript/lib/js/belt_SetInt.js");
+var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var RootProvider = require("../libraries/RootProvider.js");
 var Web3Connectors = require("../bindings/web3-react/Web3Connectors.js");
 var InjectedEthereum = require("../ethereum/InjectedEthereum.js");
+var Caml_js_exceptions = require("rescript/lib/js/caml_js_exceptions.js");
 var TorusConnector = require("@web3-react/torus-connector");
 var WalletconnectConnector = require("@web3-react/walletconnect-connector");
 
@@ -114,6 +116,18 @@ function Login(Props) {
         return false;
       });
   var setMetamaskDoesntSupportSwitchNetworks = match$1[1];
+  var onFailureToSwitchNetworksCallback = function (error) {
+    var err = Caml_js_exceptions.caml_as_js_exn(error);
+    var errorMessage = err !== undefined ? Belt_Option.mapWithDefault(Caml_option.valFromOption(err).message, "", (function (x) {
+              return x;
+            })) : "";
+    if (errorMessage.includes("The method 'wallet_addEthereumChain' does not exist")) {
+      return Curry._1(setMetamaskDoesntSupportSwitchNetworks, (function (param) {
+                    return true;
+                  }));
+    }
+    
+  };
   React.useEffect((function () {
           if (nextPath !== undefined && optCurrentUser !== undefined) {
             router.push(nextPath);
@@ -182,11 +196,7 @@ function Login(Props) {
                                     }, React.createElement("li", undefined, "Open Metamask."), React.createElement("li", undefined, instructionForDropdown(metamaskChainId)), React.createElement("li", undefined, "Select Custom RPC"), React.createElement("li", undefined, addNetworkInstructions(undefined)), React.createElement("li", undefined, "Save the new network"))) : React.createElement("div", {
                                   className: "flex justify-center"
                                 }, React.createElement(Metamask.AddOrSwitchNetwork.make, {
-                                      onFailureCallback: (function (param) {
-                                          return Curry._1(setMetamaskDoesntSupportSwitchNetworks, (function (param) {
-                                                        return true;
-                                                      }));
-                                        })
+                                      onFailureCallback: onFailureToSwitchNetworksCallback
                                     }))
                         ))));
   }

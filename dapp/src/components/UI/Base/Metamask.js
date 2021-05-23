@@ -37,8 +37,8 @@ function Metamask$AddOrSwitchNetwork(Props) {
                                             rpcUrls: [Config.rpcEndopint],
                                             blockExplorerUrls: [Config.blockExplorer]
                                           }]
-                                      }), (function (param) {
-                                      Curry._1(onFailureCallback, undefined);
+                                      }), (function (error) {
+                                      Curry._1(onFailureCallback, error);
                                       return Promise.resolve(undefined);
                                     }));
                               
