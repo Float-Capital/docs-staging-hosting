@@ -5,8 +5,8 @@ pragma solidity 0.8.3;
 import "hardhat/console.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
-import "./interfaces/IBandOracle.sol";
-import "./interfaces/IOracleManager.sol";
+import "../interfaces/IBandOracle.sol";
+import "../interfaces/IOracleManager.sol";
 
 contract OracleManagerEthKiller is IOracleManager {
     address public admin; // This will likely be the Gnosis safe
