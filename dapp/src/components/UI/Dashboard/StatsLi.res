@@ -12,7 +12,7 @@ module Props = {
     link: option<string>,
   }
 
-  let createDashboardLiProps = (~suffix=React.null, ~prefix, ~value, ~link=?, ()) => {
+  let createStatsLiProps = (~suffix=React.null, ~prefix, ~value, ~link=?, ()) => {
     prefix: prefix,
     value: value,
     suffix: suffix,

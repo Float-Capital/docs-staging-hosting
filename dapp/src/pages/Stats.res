@@ -1,4 +1,4 @@
-open DashboardLi.Props
+open StatsLi.Props
 open Masonry
 
 module TrendingStakes = {
@@ -15,10 +15,10 @@ module TrendingStakes = {
       | {data: Some({syntheticMarkets})} =>
         switch apy {
         | Loaded(apyVal) => {
-            let trendingStakes = DashboardCalcs.trendingStakes(~syntheticMarkets, ~apy=apyVal)
+            let trendingStakes = StatsCalcs.trendingStakes(~syntheticMarkets, ~apy=apyVal)
             trendingStakes
             ->Array.map(({marketName, isLong, apy, floatApy}) =>
-              <DashboardStakeCard
+              <StatsStakeCard
                 marketName={marketName}
                 isLong={isLong}
                 yield={apy}
@@ -59,9 +59,9 @@ let floatProtocolCard = (
 
   <Card>
     <Header> {`Float Protocol 🏗️`->React.string} </Header>
-    <DashboardUl
+    <StatsUl
       list={[
-        createDashboardLiProps(
+        createStatsLiProps(
           ~prefix=`🗓️ Live since:`,
           ~value={
             dateObj->DateFns.format(#"do MMM ''yy")
@@ -69,25 +69,21 @@ let floatProtocolCard = (
           ~link={`${Config.blockExplorer}/tx/${txHash}`},
           (),
         ),
-        createDashboardLiProps(
+        createStatsLiProps(
           ~prefix=`📅 Days live:`,
           ~value={
             dateObj->DateFns.formatDistanceToNow
           },
           (),
         ),
-        createDashboardLiProps(
-          ~prefix=`📈 No. txs:`,
-          ~value=totalTxs->Ethers.BigNumber.toString,
-          (),
-        ),
-        createDashboardLiProps(
+        createStatsLiProps(~prefix=`📈 No. txs:`, ~value=totalTxs->Ethers.BigNumber.toString, ()),
+        createStatsLiProps(
           ~prefix=`👯‍♀️ No. users:`,
           ~value=totalUsers->Ethers.BigNumber.toString,
           (),
         ),
-        createDashboardLiProps(~prefix=`👷‍♀️ No. synths:`, ~value=numberOfSynths, ()),
-        createDashboardLiProps(
+        createStatsLiProps(~prefix=`👷‍♀️ No. synths:`, ~value=numberOfSynths, ()),
+        createStatsLiProps(
           ~prefix=`⛽ Gas used:`,
           ~value=totalGasUsed->Ethers.BigNumber.toString->Misc.NumberFormat.formatInt,
           (),
@@ -128,16 +124,16 @@ let syntheticAssetsCard = (~totalSynthValue) =>
 let floatTokenCard = (~totalFloatMinted) =>
   <Card>
     <Header> {`🌊🌊 Float Token 🌊🌊`->React.string} </Header>
-    <DashboardUl
+    <StatsUl
       list={[
-        createDashboardLiProps(~prefix=`😏 Float price:`, ~value="...", ()),
-        createDashboardLiProps(
+        createStatsLiProps(~prefix=`😏 Float price:`, ~value="...", ()),
+        createStatsLiProps(
           ~prefix=`🗳 Float supply:`,
           ~value=totalFloatMinted->Misc.NumberFormat.formatEther,
           ~suffix=<Tooltip tip="The number of Float tokens in circulation" />,
           (),
         ),
-        createDashboardLiProps(~prefix=`🧢 Market cap: `, ~value="...", ()),
+        createStatsLiProps(~prefix=`🧢 Market cap: `, ~value="...", ()),
       ]}
     />
   </Card>
@@ -178,10 +174,10 @@ let make = () => {
         },
         {data: Some({syntheticMarkets})},
       ) =>
-      let {totalValueLocked, totalValueStaked} = DashboardCalcs.getTotalValueLockedAndTotalStaked(
+      let {totalValueLocked, totalValueStaked} = StatsCalcs.getTotalValueLockedAndTotalStaked(
         syntheticMarkets,
       )
-      let totalSynthValue = DashboardCalcs.getTotalSynthValue(~totalValueLocked, ~totalValueStaked)
+      let totalSynthValue = StatsCalcs.getTotalSynthValue(~totalValueLocked, ~totalValueStaked)
       let numberOfSynths = (syntheticMarkets->Array.length * 2)->Int.toString
 
       <div className="w-full max-w-7xl flex flex-col self-center items-center justify-start">
