@@ -213,9 +213,11 @@ export function handleStakeAdded(event: StakeAdded): void {
   } else {
     // Note: Only add if still relevant and not withdrawn
     let oldStake = Stake.load(currentStake.currentStake);
-    if (!oldStake.withdrawn) {
-      stake.amount = stake.amount.plus(oldStake.amount);
-      oldStake.withdrawn = true;
+    if (oldStake != null) {
+      if (!oldStake.withdrawn) {
+        stake.amount = stake.amount.plus(oldStake.amount);
+        oldStake.withdrawn = true;
+      }
     }
   }
   currentStake.currentStake = stake.id;
