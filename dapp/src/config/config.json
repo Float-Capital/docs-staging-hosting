@@ -1,6 +1,6 @@
 {
   "graphEndpoint": "https://api.thegraph.com/subgraphs/name/float-capital/testnet",
-  "priceHistoryGraphEndpoint": "https://api.thegraph.com/subgraphs/id/QmdqNA1bsqXPDkUqLDCnVMMcryc2vgLXRo4hJ2Tu7wdFRn",
+  "priceHistoryGraphEndpoint": "https://api.thegraph.com/subgraphs/id/QmRUfxBrFhXE8gVCGZCyHSm6MDJaAGDg1G9TXpYD7rS1m4",
   "networkId": 80001,
   "networkName": "mumbai testnet",
   "networkCurrencyName": "Test MATIC",
@@ -12,7 +12,7 @@
   "discordInviteLink": "https://discord.gg/dqDwgrVYcU",
   "web3PollingInterval": 8000,
   "apolloConnectToDevTools": false,
-  "contracts": {    
+  "contracts": {
     "FloatCapital_v0": "0x5e8A5Fa90c549F50f2EA8534C0be41E27381d4a4",
     "FloatToken": "0xF51da568049fc655994a05102432a6B508421F8a",
     "LongShort": "0x5bCa9c0823e7F5fBDB856Ae6a410ACaf2ff81B8D",
