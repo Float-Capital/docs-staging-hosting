@@ -780,17 +780,22 @@ contract LongShort is ILongShort, Initializable {
             uint256 totalAmountShortMinted =
                 handleBatchedDepositShort(marketIndex);
 
-            // TODO: math inaccurate - need to divide by 10^18 or something. Basically this is almost right, but needs scrutiny!!
-            stateStruct.tokenPriceLongWithFees =
-                ((batchedLazyDeposit[marketIndex].mintLong +
-                    batchedLazyDeposit[marketIndex].mintAndStakeLong) *
-                    TEN_TO_THE_18) /
-                totalAmountLongMinted;
-            stateStruct.tokenPriceShortWithFees =
-                ((batchedLazyDeposit[marketIndex].mintShort +
-                    batchedLazyDeposit[marketIndex].mintAndStakeShort) *
-                    TEN_TO_THE_18) /
-                totalAmountShortMinted;
+            // TODO: might be inefficient doing it like this, maybe don't even run the `handleBatchedDepositLong` function if there is nothing to mint.
+            if (totalAmountLongMinted != 0) {
+                // TODO: math inaccurate - need to divide by 10^18 or something. Basically this is almost right, but needs scrutiny!!
+                stateStruct.tokenPriceLongWithFees =
+                    ((batchedLazyDeposit[marketIndex].mintLong +
+                        batchedLazyDeposit[marketIndex].mintAndStakeLong) *
+                        TEN_TO_THE_18) /
+                    totalAmountLongMinted;
+            }
+            if (totalAmountShortMinted != 0) {
+                stateStruct.tokenPriceShortWithFees =
+                    ((batchedLazyDeposit[marketIndex].mintShort +
+                        batchedLazyDeposit[marketIndex].mintAndStakeShort) *
+                        TEN_TO_THE_18) /
+                    totalAmountShortMinted;
+            }
         }
 
         emit ValueLockedInSystem(
