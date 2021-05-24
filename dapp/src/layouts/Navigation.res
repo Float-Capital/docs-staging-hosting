@@ -116,7 +116,7 @@ let make = () => {
           | Some(currentUser) =>
             <Link href={`/user/${currentUser->ethAdrToStr}`}>
               <p
-                className="flex flex-row items-center px-3 hover:bg-white  text-base cursor-pointer">
+                className="flex flex-row items-center px-3 bg-white hover:bg-black hover:text-white ml-1  text-base cursor-pointer">
                 {"PROFILE"->React.string}
                 <img
                   className="inline h-4 rounded ml-2"
