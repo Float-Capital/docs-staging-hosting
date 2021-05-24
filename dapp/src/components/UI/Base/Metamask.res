@@ -18,13 +18,13 @@ module AddOrSwitchNetwork = {
     params: array<reqParams>,
   }
 
-  @send external request: (InjectedEthereum.t, requestObj) => unit = "request"
+  @send external request: (InjectedEthereum.t, requestObj) => JsPromise.t<unit> = "request"
 
   @react.component
-  let make = () => {
+  let make = (~onFailureCallback=_ => ()) => {
     let addToMetamask = ethObj =>
       Misc.onlyExecuteClientSide(() => {
-        request(
+        let _ = request(
           ethObj,
           {
             method: "wallet_addEthereumChain",
@@ -42,7 +42,10 @@ module AddOrSwitchNetwork = {
               },
             ],
           },
-        )
+        )->JsPromise.catch(error => {
+          let _ = onFailureCallback(error)
+          JsPromise.resolve()
+        })
       })
 
     switch InjectedEthereum.ethObj {

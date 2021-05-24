@@ -40,6 +40,32 @@ let metamaskDefaultChainIdsToMetamaskName = chainId =>
   | _ => "Ethereum Mainnet"
   }
 
+let instructionForDropdown = (~metamaskChainId) => {
+  switch metamaskChainId {
+  | Some(chainId) if metamaskDefaultChainIds->Set.Int.has(chainId) =>
+    `Click on the ${metamaskDefaultChainIdsToMetamaskName(chainId)} dropdown`->React.string
+  | _ => `Click on the dropdown for the network you're connected to.`->React.string
+  }
+}
+
+let addNetworkInstructions = () => {
+  <>
+    {`Enter the following information:`->React.string}
+    <br />
+    <div className="pl-8">
+      {`Network name - ${Config.networkName}`->React.string}
+      <br />
+      {`New RPC Url - ${Config.rpcEndopint}`->React.string}
+      <br />
+      {`Chain Id - ${Config.networkId->Int.toString}`->React.string}
+      <br />
+      {`Currency Symbol - ${Config.networkCurrencySymbol}`->React.string}
+      <br />
+      {`Block Explorer URL - ${Config.blockExplorer}`->React.string}
+    </div>
+  </>
+}
+
 @react.component
 let make = () => {
   let (_connectionStatus, activateConnector) = RootProvider.useActivateConnector()
@@ -50,6 +76,21 @@ let make = () => {
 
   let isMetamask = InjectedEthereum.useIsMetamask()
   let metamaskChainId = InjectedEthereum.useMetamaskChainId()
+
+  let (
+    metamaskDoesntSupportSwitchNetworks,
+    setMetamaskDoesntSupportSwitchNetworks,
+  ) = React.useState(_ => false)
+
+  let onFailureToSwitchNetworksCallback = error => {
+    let errorMessage = switch error->Js.Exn.asJsExn {
+    | Some(err) => err->Js.Exn.message->Option.mapWithDefault("", x => x)
+    | None => ""
+    }
+    if errorMessage->Js.String2.includes("The method 'wallet_addEthereumChain' does not exist") {
+      setMetamaskDoesntSupportSwitchNetworks(_ => true)
+    }
+  }
 
   React.useEffect2(() => {
     switch (nextPath, optCurrentUser) {
@@ -102,21 +143,40 @@ let make = () => {
           </p>
           {switch Config.networkId {
           | chainId if !(metamaskDefaultChainIds->Set.Int.has(chainId)) =>
-            <div className="flex justify-center"> <Metamask.AddOrSwitchNetwork /> </div>
+            if !metamaskDoesntSupportSwitchNetworks {
+              <div className="flex justify-center">
+                <Metamask.AddOrSwitchNetwork
+                  onFailureCallback={onFailureToSwitchNetworksCallback}
+                />
+              </div>
+            } else {
+              <div className="flex flex-col justify-center">
+                <p className="mb-2 -mt-5">
+                  {[
+                    `Unfortunately your version of`->React.string,
+                    <img src="/icons/metamask.svg" className="h-5 mx-1 inline" />,
+                    `doesn't support automatic switching of networks.`->React.string,
+                  ]->React.array}
+                </p>
+                <p className="mb-2">
+                  {`To connect you'll have to switch to ${Config.networkName} manually.`->React.string}
+                </p>
+                {`To add ${Config.networkName} to metamask:`->React.string}
+                <ul className="list-disc pl-10">
+                  <li key={"instructions-1"}> {`Open Metamask.`->React.string} </li>
+                  <li key={"instructions-2"}> {instructionForDropdown(~metamaskChainId)} </li>
+                  <li key={"instructions-3"}> {`Select Custom RPC`->React.string} </li>
+                  <li key={"instructions-4"}> {addNetworkInstructions()} </li>
+                  <li key={"instructions-5"}> {`Save the new network`->React.string} </li>
+                </ul>
+              </div>
+            }
           | _ =>
             <div>
               <ul className="list-decimal pl-10">
-                <li> {`Open MetaMask`->React.string} </li>
-                <li>
-                  {switch metamaskChainId {
-                  | Some(chainId) if metamaskDefaultChainIds->Set.Int.has(chainId) =>
-                    `Click on the ${metamaskDefaultChainIdsToMetamaskName(
-                        chainId,
-                      )} dropdown`->React.string
-                  | _ => `Click on the dropdown for the network you're connected to.`->React.string
-                  }}
-                </li>
-                <li> {`Select ${Config.networkName}`->React.string} </li>
+                <li key={"instructions-1"}> {`Open MetaMask`->React.string} </li>
+                <li key={"instructions-2"}> {instructionForDropdown(~metamaskChainId)} </li>
+                <li key={"instructions-3"}> {`Select ${Config.networkName}`->React.string} </li>
               </ul>
             </div>
           }}
