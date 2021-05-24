@@ -616,45 +616,50 @@ contract LongShort is ILongShort, Initializable {
         uint256 totalAmountLong =
             currentMarketBatchedLazyDeposit.mintLong +
                 currentMarketBatchedLazyDeposit.mintAndStakeLong;
-        _depositFunds(marketIndex, totalAmountLong);
-        uint256 feesLong =
-            _getFeesForAction(marketIndex, totalAmountLong, true, true);
-        uint256 remainingLong = totalAmountLong - feesLong;
 
-        // Distribute fees across the market.
-        _feesMechanism(marketIndex, feesLong);
-        _refreshTokensPrice(marketIndex);
+        if (totalAmountLong > 0) {
+            _depositFunds(marketIndex, totalAmountLong);
+            uint256 feesLong =
+                _getFeesForAction(marketIndex, totalAmountLong, true, true);
+            uint256 remainingLong = totalAmountLong - feesLong;
 
-        // Mint long tokens with remaining value.
-        tokensLong =
-            (remainingLong * TEN_TO_THE_18) /
-            longTokenPrice[marketIndex];
-        // TODO: we must modify Synth ERC20 so that this addrdess (`address(this)`) shows a `balanceOf` of zero and the balance is correctly added to the users in the batch's `balanceOf`
-        longTokens[marketIndex].mint(address(this), tokensLong);
-        longValue[marketIndex] = longValue[marketIndex] + remainingLong;
+            // Distribute fees across the market.
+            _feesMechanism(marketIndex, feesLong);
+            _refreshTokensPrice(marketIndex);
 
-        uint256 feesLongStake =
-            _getFeesForAction(
-                marketIndex,
-                currentMarketBatchedLazyDeposit.mintAndStakeLong,
-                true,
-                true
-            );
-        uint256 tokensToStakeLong =
-            currentMarketBatchedLazyDeposit.mintAndStakeLong - feesLongStake;
+            // Mint long tokens with remaining value.
+            tokensLong =
+                (remainingLong * TEN_TO_THE_18) /
+                longTokenPrice[marketIndex];
+            // TODO: we must modify Synth ERC20 so that this addrdess (`address(this)`) shows a `balanceOf` of zero and the balance is correctly added to the users in the batch's `balanceOf`
+            longTokens[marketIndex].mint(address(this), tokensLong);
+            longValue[marketIndex] = longValue[marketIndex] + remainingLong;
+            if (currentMarketBatchedLazyDeposit.mintAndStakeLong > 0) {
+                uint256 feesLongStake =
+                    _getFeesForAction(
+                        marketIndex,
+                        currentMarketBatchedLazyDeposit.mintAndStakeLong,
+                        true,
+                        true
+                    );
+                uint256 tokensToStakeLong =
+                    currentMarketBatchedLazyDeposit.mintAndStakeLong -
+                        feesLongStake;
 
-        // TODO: we must modify staker so that the view function for the users stake shows them having the stake (and not the LongShort contract)
-        staker.stakeFromMint(
-            longTokens[marketIndex],
-            tokensToStakeLong,
-            address(this)
-        );
+                // TODO: we must modify staker so that the view function for the users stake shows them having the stake (and not the LongShort contract)
+                staker.stakeFromMintBatched(
+                    marketIndex,
+                    tokensToStakeLong,
+                    latestUpdateIndex[marketIndex],
+                    true
+                );
 
-        // reset all values
-        currentMarketBatchedLazyDeposit.mintLong = 0;
-        currentMarketBatchedLazyDeposit.mintAndStakeLong = 0;
-
-        // TODO: add events
+                // reset all values
+                currentMarketBatchedLazyDeposit.mintLong = 0;
+                currentMarketBatchedLazyDeposit.mintAndStakeLong = 0;
+            }
+            // TODO: add events
+        }
     }
 
     function handleBatchedDepositShort(uint32 marketIndex)
@@ -668,42 +673,47 @@ contract LongShort is ILongShort, Initializable {
         uint256 totalAmountShort =
             currentMarketBatchedLazyDeposit.mintShort +
                 currentMarketBatchedLazyDeposit.mintAndStakeShort;
-        _depositFunds(marketIndex, totalAmountShort);
-        uint256 feesShort =
-            _getFeesForAction(marketIndex, totalAmountShort, true, true);
-        uint256 remainingShort = totalAmountShort - feesShort;
+        if (totalAmountShort > 0) {
+            _depositFunds(marketIndex, totalAmountShort);
+            uint256 feesShort =
+                _getFeesForAction(marketIndex, totalAmountShort, true, true);
+            uint256 remainingShort = totalAmountShort - feesShort;
 
-        // Distribute fees across the market.
-        _feesMechanism(marketIndex, feesShort);
-        _refreshTokensPrice(marketIndex);
+            // Distribute fees across the market.
+            _feesMechanism(marketIndex, feesShort);
+            _refreshTokensPrice(marketIndex);
 
-        // Mint long tokens with remaining value.
-        tokensShort =
-            (remainingShort * TEN_TO_THE_18) /
-            longTokenPrice[marketIndex];
-        longTokens[marketIndex].mint(address(this), tokensShort);
-        longValue[marketIndex] = longValue[marketIndex] + remainingShort;
+            // Mint long tokens with remaining value.
+            tokensShort =
+                (remainingShort * TEN_TO_THE_18) /
+                longTokenPrice[marketIndex];
+            longTokens[marketIndex].mint(address(this), tokensShort);
+            longValue[marketIndex] = longValue[marketIndex] + remainingShort;
 
-        uint256 feesShortStake =
-            _getFeesForAction(
-                marketIndex,
-                currentMarketBatchedLazyDeposit.mintAndStakeShort,
-                true,
-                true
-            );
-        uint256 tokensToStakeShort =
-            currentMarketBatchedLazyDeposit.mintAndStakeShort - feesShortStake;
-        staker.stakeFromMint(
-            longTokens[marketIndex],
-            tokensToStakeShort,
-            address(this)
-        );
+            if (currentMarketBatchedLazyDeposit.mintAndStakeShort > 0) {
+                uint256 feesShortStake =
+                    _getFeesForAction(
+                        marketIndex,
+                        currentMarketBatchedLazyDeposit.mintAndStakeShort,
+                        true,
+                        true
+                    );
+                uint256 tokensToStakeShort =
+                    currentMarketBatchedLazyDeposit.mintAndStakeShort -
+                        feesShortStake;
+                staker.stakeFromMintBatched(
+                    marketIndex,
+                    tokensToStakeShort,
+                    latestUpdateIndex[marketIndex],
+                    false
+                );
 
-        // reset all values
-        currentMarketBatchedLazyDeposit.mintShort = 0;
-        currentMarketBatchedLazyDeposit.mintAndStakeShort = 0;
-
-        // TODO: add events
+                // reset all values
+                currentMarketBatchedLazyDeposit.mintShort = 0;
+                currentMarketBatchedLazyDeposit.mintAndStakeShort = 0;
+            }
+            // TODO: add events
+        }
     }
 
     /**
@@ -1275,12 +1285,19 @@ contract LongShort is ILongShort, Initializable {
                 );
                 currentUserDeposits.mintShort = 0;
             }
-            if (currentUserDeposits.mintAndStakeLong != 0) {
+            if (
+                currentUserDeposits.mintAndStakeLong != 0 ||
+                currentUserDeposits.mintAndStakeShort != 0
+            ) {
+                staker.transferBatchStakeToUser(
+                    currentUserDeposits.mintAndStakeLong,
+                    currentUserDeposits.mintAndStakeShort,
+                    marketIndex,
+                    currentUserDeposits.usersCurrentUpdateIndex,
+                    user
+                );
                 // TODO: do the accounting for the user
                 currentUserDeposits.mintAndStakeLong = 0;
-            }
-            if (currentUserDeposits.mintAndStakeShort != 0) {
-                // TODO: do the accounting for the user
                 currentUserDeposits.mintAndStakeShort = 0;
             }
         }
