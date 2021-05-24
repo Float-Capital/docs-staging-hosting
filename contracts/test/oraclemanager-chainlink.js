@@ -34,7 +34,7 @@ contract("OracleManager (ChainLink)", (accounts) => {
   }) => {
     return async () => {
       let aggregator = await AggregatorV3.new({ from: admin });
-      await aggregator.setup(admin, initialAggregatorPrice, aggregatorDecimals);
+      await aggregator.setup(admin, initialAggregatorPrice, 18);
       let oracle = await ChainlinkOracle.new(admin, aggregator.address);
 
       let initialPrice = await oracle.getLatestPrice.call();
@@ -59,7 +59,6 @@ contract("OracleManager (ChainLink)", (accounts) => {
   it(
     "if prices don't change, neither should the oracle",
     oracleTest({
-      aggregatorDecimals: 18,
       initialAggregatorPrice: one,
       initialOraclePrice: one,
       aggregatorPriceToChangeTo: one,
@@ -70,7 +69,6 @@ contract("OracleManager (ChainLink)", (accounts) => {
   it(
     "if aggregate price increases, so does oracle price",
     oracleTest({
-      aggregatorDecimals: 18,
       initialAggregatorPrice: one,
       initialOraclePrice: one,
       aggregatorPriceToChangeTo: two,
@@ -81,63 +79,10 @@ contract("OracleManager (ChainLink)", (accounts) => {
   it(
     "if aggregate price decreases, so does oracle price",
     oracleTest({
-      aggregatorDecimals: 18,
       initialAggregatorPrice: one,
       initialOraclePrice: one,
       aggregatorPriceToChangeTo: oneTenth,
       finalOraclePrice: oneTenth,
     })
   );
-
-  it("prices are normalized to 18 decimals (case less decimals)", async () => {
-    await oracleTest({
-      aggregatorDecimals: 8,
-      initialAggregatorPrice: tenToThe8,
-      initialOraclePrice: one,
-      aggregatorPriceToChangeTo: tenToThe8,
-      finalOraclePrice: one,
-    })();
-
-    await oracleTest({
-      aggregatorDecimals: 8,
-      initialAggregatorPrice: tenToThe8,
-      initialOraclePrice: one,
-      aggregatorPriceToChangeTo: twoTenToThe8,
-      finalOraclePrice: two,
-    })();
-
-    await oracleTest({
-      aggregatorDecimals: 8,
-      initialAggregatorPrice: tenToThe8,
-      initialOraclePrice: one,
-      aggregatorPriceToChangeTo: tenToThe8Over10,
-      finalOraclePrice: oneTenth,
-    })();
-  });
-
-  it("prices are normalized to 18 decimals (case more decimals)", async () => {
-    await oracleTest({
-      aggregatorDecimals: 20,
-      initialAggregatorPrice: tenToThe20,
-      initialOraclePrice: one,
-      aggregatorPriceToChangeTo: tenToThe20,
-      finalOraclePrice: one,
-    })();
-
-    await oracleTest({
-      aggregatorDecimals: 20,
-      initialAggregatorPrice: tenToThe20,
-      initialOraclePrice: one,
-      aggregatorPriceToChangeTo: twoTenToThe20,
-      finalOraclePrice: two,
-    })();
-
-    await oracleTest({
-      aggregatorDecimals: 20,
-      initialAggregatorPrice: tenToThe20,
-      initialOraclePrice: one,
-      aggregatorPriceToChangeTo: tenToThe20Over10,
-      finalOraclePrice: oneTenth,
-    })();
-  });
 });

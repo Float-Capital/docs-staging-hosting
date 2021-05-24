@@ -47,18 +47,7 @@ contract OracleManagerChainlink is IOracleManager {
     ////////////////////////////////////
     function _getLatestPrice() internal view returns (int256) {
         (, int256 price, , , ) = chainlinkOracle.latestRoundData();
-        return normalizeTo18Decimals(price);
-    }
-
-    function normalizeTo18Decimals(int256 price)
-        internal
-        view
-        returns (int256)
-    {
-        return
-            (oracleDecimals < 18)
-                ? price * int256((10**(18 - oracleDecimals)))
-                : price / int256((10**(oracleDecimals - 18)));
+        return price;
     }
 
     function getLatestPrice() external view override returns (int256) {
