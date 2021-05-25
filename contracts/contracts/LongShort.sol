@@ -1290,10 +1290,10 @@ contract LongShort is ILongShort, Initializable {
         uint256 tokenPriceShortWithFees;
     }
 
-    mapping(uint32 => uint256) latestUpdateIndex;
-    mapping(uint32 => mapping(uint256 => MarketStateSnapshotStruct)) marketStateSnapshot;
-    mapping(uint32 => BatchedLazyDeposit) batchedLazyDeposit;
-    mapping(uint32 => mapping(address => UserLazyDeposit)) userLazyActions;
+    mapping(uint32 => uint256) public latestUpdateIndex;
+    mapping(uint32 => mapping(uint256 => MarketStateSnapshotStruct)) public marketStateSnapshot;
+    mapping(uint32 => BatchedLazyDeposit) public batchedLazyDeposit;
+    mapping(uint32 => mapping(address => UserLazyDeposit)) public userLazyActions;
 
     function _executeOutstandingLazyDeposits(address user, uint32 marketIndex)
         internal
