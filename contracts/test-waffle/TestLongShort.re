@@ -39,5 +39,26 @@ describe("Float System", () => {
       // Check it reverts if oracle returns a negative value.
       ()
     });
+
+    describe("LongShort - internals exposed", () => {
+      let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
+      let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
+
+      before(() => {
+        let%Await loadedAccounts = Ethers.getSigners();
+        accounts := loadedAccounts;
+      });
+
+      before_each(() => {
+        let%Await deployedContracts =
+          Helpers.inititialize(
+            ~admin=accounts.contents->Array.getUnsafe(0),
+            ~exposeInternals=true,
+          );
+        contracts := deployedContracts;
+      });
+
+      LazyDeposit.testExposed(~contracts, ~accounts);
+    });
   })
 });

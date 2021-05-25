@@ -3,6 +3,7 @@
 
 var LetOps = require("./library/LetOps.js");
 var Helpers = require("./library/Helpers.js");
+var LazyDeposit = require("./tests/longshort/LazyDeposit.js");
 var HelperActions = require("./library/HelperActions.js");
 var Mocha$BsMocha = require("bs-mocha/src/Mocha.js");
 var Promise$BsMocha = require("bs-mocha/src/Promise.js");
@@ -30,8 +31,29 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                                                         }));
                                           }));
                             }));
-                      return Mocha$BsMocha.describe("_updateSystemState")(undefined, undefined, undefined, (function (param) {
-                                    
+                      Mocha$BsMocha.describe("_updateSystemState")(undefined, undefined, undefined, (function (param) {
+                              
+                            }));
+                      return Mocha$BsMocha.describe("LongShort - internals exposed")(undefined, undefined, undefined, (function (param) {
+                                    var contracts = {
+                                      contents: undefined
+                                    };
+                                    var accounts = {
+                                      contents: undefined
+                                    };
+                                    Promise$BsMocha.before(undefined)(undefined, undefined, undefined, (function (param) {
+                                            return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
+                                                          accounts.contents = loadedAccounts;
+                                                          
+                                                        }));
+                                          }));
+                                    Promise$BsMocha.before_each(undefined)(undefined, undefined, undefined, (function (param) {
+                                            return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
+                                                          contracts.contents = deployedContracts;
+                                                          
+                                                        }));
+                                          }));
+                                    return LazyDeposit.testExposed(contracts, accounts);
                                   }));
                     }));
       }));

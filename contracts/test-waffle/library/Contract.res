@@ -118,6 +118,8 @@ module OracleManagerMock = {
 module LongShort = {
   type t = {address: Ethers.ethAddress}
   let contractName = "LongShort"
+  let contractNameExposed = "LongShortInternalsExposed"
+  let makeExposed: unit => JsPromise.t<t> = () => deployContract(contractNameExposed)->Obj.magic
 
   let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
 
@@ -186,6 +188,108 @@ module LongShort = {
     ~marketIndex: int,
     ~newOracleAddress: Ethers.ethAddress,
   ) => JsPromise.t<transaction> = "updateMarketOracle"
+
+  module Exposed = {
+    @send
+    external refreshTokensPrice: (t, ~marketIndex: int) => JsPromise.t<transaction> =
+      "refreshTokensPrice"
+
+    @send
+    external feesMechanism: (
+      t,
+      ~marketIndex: int,
+      ~totalFees: Ethers.BigNumber.t,
+    ) => JsPromise.t<transaction> = "feesMechanism"
+
+    @send
+    external yieldMechanism: (t, ~marketIndex: int) => JsPromise.t<transaction> = "yieldMechanism"
+
+    @send
+    external minimum: (
+      t,
+      ~liquidityOfPositionA: Ethers.BigNumber.t,
+      ~liquidityOfPositionB: Ethers.BigNumber.t,
+    ) => JsPromise.t<Ethers.BigNumber.t> = "minimum"
+
+    @send
+    external calculateValueChangeForPriceMechanism: (
+      t,
+      ~marketIndex: int,
+      ~assetPriceGreater: Ethers.BigNumber.t,
+      ~assetPriceLess: Ethers.BigNumber.t,
+      ~baseValueExposure: Ethers.BigNumber.t,
+    ) => JsPromise.t<Ethers.BigNumber.t> = "calculateValueChangeForPriceMechanism"
+
+    @send
+    external depositFunds: (
+      t,
+      ~marketIndex: int,
+      ~amount: Ethers.BigNumber.t,
+    ) => JsPromise.t<transaction> = "depositFunds"
+
+    @send
+    external withdrawFunds: (
+      t,
+      ~marketIndex: int,
+      ~amount: Ethers.BigNumber.t,
+    ) => JsPromise.t<transaction> = "withdrawFunds"
+
+    @send
+    external transferToYieldManager: (
+      t,
+      ~marketIndex: int,
+      ~amount: Ethers.BigNumber.t,
+    ) => JsPromise.t<transaction> = "transferToYieldManager"
+
+    @send
+    external transferFromYieldManager: (
+      t,
+      ~marketIndex: int,
+      ~amount: Ethers.BigNumber.t,
+    ) => JsPromise.t<transaction> = "transferFromYieldManager"
+
+    @send
+    external getFeesForAmounts: (
+      t,
+      ~marketIndex: int,
+      ~baseAmount: Ethers.BigNumber.t,
+      ~penaltyAmount: Ethers.BigNumber.t,
+      ~isMint: bool,
+    ) => JsPromise.t<Ethers.BigNumber.t> = "getFeesForAmounts"
+
+    @send
+    external getFeesForAction: (
+      t,
+      ~marketIndex: int,
+      ~amount: Ethers.BigNumber.t,
+      ~isMint: bool,
+      ~isLong: bool,
+    ) => JsPromise.t<Ethers.BigNumber.t> = "getFeesForAction"
+
+    @send
+    external priceChangeMechanism: (
+      t,
+      ~marketIndex: int,
+      ~newPrice: Ethers.BigNumber.t,
+    ) => JsPromise.t<Ethers.BigNumber.t> = "priceChangeMechanism"
+
+    @send @scope("callStatic")
+    external calculateAccumulatedFloatExposedCall: (
+      t,
+      ~marketIndex: int,
+      ~user: Ethers.ethAddress,
+    ) => JsPromise.t<{
+      "longFloatReward": Ethers.BigNumber.t,
+      "shortFloatReward": Ethers.BigNumber.t,
+    }> = "calculateAccumulatedFloatExposed"
+
+    @send
+    external calculateAccumulatedFloatExposed: (
+      t,
+      ~marketIndex: int,
+      ~user: Ethers.ethAddress,
+    ) => JsPromise.t<transaction> = "calculateAccumulatedFloatExposed"
+  }
 }
 
 module GenericErc20 = {

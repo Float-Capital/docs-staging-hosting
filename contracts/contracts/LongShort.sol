@@ -124,12 +124,44 @@ contract LongShort is ILongShort, Initializable {
         address user
     );
 
+    event LazyLongMinted(
+        uint32 marketIndex,
+        uint256 depositAdded,
+        address user,
+        uint256 totalBatchedDepositAmount,
+        uint256 oracleUpdateIndex
+    );
+
+    event LazyLongStaked(
+        uint32 marketIndex,
+        uint256 depositAdded,
+        address user,
+        uint256 totalBatchedDepositAmount,
+        uint256 oracleUpdateIndex
+    );
+
     event ShortMinted(
         uint32 marketIndex,
         uint256 depositAdded,
         uint256 finalDepositAmount,
         uint256 tokensMinted,
         address user
+    );
+
+    event LazyShortMinted(
+        uint32 marketIndex,
+        uint256 depositAdded,
+        address user,
+        uint256 totalBatchedDepositAmount,
+        uint256 oracleUpdateIndex
+    );
+
+    event LazyShortStaked(
+        uint32 marketIndex,
+        uint256 depositAdded,
+        address user,
+        uint256 totalBatchedDepositAmount,
+        uint256 oracleUpdateIndex
     );
 
     event LongRedeem(
@@ -1263,14 +1295,16 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => BatchedLazyDeposit) batchedLazyDeposit;
     mapping(uint32 => mapping(address => UserLazyDeposit)) userLazyActions;
 
-    modifier executeOutstandingLazyDeposits(address user, uint32 marketIndex) {
+    function _executeOutstandingLazyDeposits(address user, uint32 marketIndex)
+        internal
+    {
         UserLazyDeposit storage currentUserDeposits =
             userLazyActions[marketIndex][msg.sender];
 
         if (
             currentUserDeposits.usersCurrentUpdateIndex <
             latestUpdateIndex[marketIndex] &&
-            currentUserDeposits.usersCurrentUpdateIndex != 0
+            currentUserDeposits.usersCurrentUpdateIndex != 0 // NOTE: this conditional isn't strictly necessary (all the users deposit amounts will be zero too)
         ) {
             if (currentUserDeposits.mintLong != 0) {
                 longTokens[marketIndex].transferFrom(
@@ -1305,13 +1339,22 @@ contract LongShort is ILongShort, Initializable {
                 currentUserDeposits.mintAndStakeLong = 0;
                 currentUserDeposits.mintAndStakeShort = 0;
             }
+
+            currentUserDeposits.usersCurrentUpdateIndex = 0;
         }
         // TODO: add events
+    }
+
+    modifier executeOutstandingLazyDeposits(address user, uint32 marketIndex) {
+        _executeOutstandingLazyDeposits(user, marketIndex);
 
         _;
     }
 
-    function mintLongLazy(uint32 marketIndex, uint256 amount) external {
+    function mintLongLazy(uint32 marketIndex, uint256 amount)
+        external
+        executeOutstandingLazyDeposits(msg.sender, marketIndex)
+    {
         // TODO: pre-deposit them into the market?
         //    - for now not doing that for simplicity, don't gain that much doing so either just more expensive tx (for very little yield)
         fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
@@ -1324,7 +1367,10 @@ contract LongShort is ILongShort, Initializable {
         // TODO: add events
     }
 
-    function mintShortLazy(uint32 marketIndex, uint256 amount) external {
+    function mintShortLazy(uint32 marketIndex, uint256 amount)
+        external
+        executeOutstandingLazyDeposits(msg.sender, marketIndex)
+    {
         fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
 
         batchedLazyDeposit[marketIndex].mintShort += amount;
@@ -1336,7 +1382,10 @@ contract LongShort is ILongShort, Initializable {
         // TODO: add events
     }
 
-    function mintLongAndStakeLazy(uint32 marketIndex, uint256 amount) external {
+    function mintLongAndStakeLazy(uint32 marketIndex, uint256 amount)
+        external
+        executeOutstandingLazyDeposits(msg.sender, marketIndex)
+    {
         fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
 
         batchedLazyDeposit[marketIndex].mintAndStakeLong += amount;
@@ -1350,6 +1399,7 @@ contract LongShort is ILongShort, Initializable {
 
     function mintShortAndStakeLazy(uint32 marketIndex, uint256 amount)
         external
+        executeOutstandingLazyDeposits(msg.sender, marketIndex)
     {
         fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
 

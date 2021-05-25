@@ -7,6 +7,25 @@ NOTE: This contract is for testing purposes only!
 */
 
 contract LongShortInternalsExposed is LongShort {
+    bool overRideExecuteOutstandingLazyDeposits;
+
+    function _executeOutstandingLazyDepositsMock(
+        address _user,
+        uint32 _marketIndex
+    ) internal {}
+
+    modifier executeOutstandingLazyDeposits(address user, uint32 marketIndex)
+        override {
+        if (overRideExecuteOutstandingLazyDeposits) {
+            // TODO: put a mock here?
+            _executeOutstandingLazyDepositsMock(user, marketIndex);
+        } else {
+            _executeOutstandingLazyDeposits(user, marketIndex);
+        }
+
+        _;
+    }
+
     function refreshTokensPrice(uint32 marketIndex) external {
         _refreshTokensPrice(marketIndex);
     }

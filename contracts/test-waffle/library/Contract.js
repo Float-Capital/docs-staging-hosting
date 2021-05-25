@@ -115,13 +115,24 @@ var OracleManagerMock = {
 
 var contractName$4 = "LongShort";
 
+var contractNameExposed = "LongShortInternalsExposed";
+
+function makeExposed(param) {
+  return deployContract(contractNameExposed);
+}
+
 function make$3(param) {
   return deployContract(contractName$4);
 }
 
+var Exposed = {};
+
 var LongShort = {
   contractName: contractName$4,
-  make: make$3
+  contractNameExposed: contractNameExposed,
+  makeExposed: makeExposed,
+  make: make$3,
+  Exposed: Exposed
 };
 
 var contractName$5 = "ERC20PresetMinterPauserUpgradeable";
@@ -148,14 +159,14 @@ var TokenFactory = {
 
 var contractName$7 = "Staker";
 
-var contractNameExposed = "StakerInternalsExposed";
+var contractNameExposed$1 = "StakerInternalsExposed";
 
 function make$6(param) {
   return deployContract(contractName$7);
 }
 
-function makeExposed(param) {
-  return deployContract(contractNameExposed);
+function makeExposed$1(param) {
+  return deployContract(contractNameExposed$1);
 }
 
 function at$4(contractAddress) {
@@ -166,16 +177,16 @@ function claimFloatCustomUser(staker, user, markets) {
   return staker.connect(user).claimFloatCustom(markets);
 }
 
-var Exposed = {};
+var Exposed$1 = {};
 
 var Staker = {
   contractName: contractName$7,
-  contractNameExposed: contractNameExposed,
+  contractNameExposed: contractNameExposed$1,
   make: make$6,
-  makeExposed: makeExposed,
+  makeExposed: makeExposed$1,
   at: at$4,
   claimFloatCustomUser: claimFloatCustomUser,
-  Exposed: Exposed
+  Exposed: Exposed$1
 };
 
 var contractName$8 = "FloatToken";
