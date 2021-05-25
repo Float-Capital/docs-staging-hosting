@@ -116,18 +116,22 @@ const topupBalanceIfLow = async (from, to) => {
   }
 };
 
-module.exports = async function (deployer, network, accounts) {
+module.exports = async function(deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
   const user3 = accounts[3];
 
+  const longShort = await LongShort.deployed();
+  const staker = await Staker.deployed();
   await topupBalanceIfLow(admin, user1);
   await topupBalanceIfLow(admin, user2);
   await topupBalanceIfLow(admin, user3);
 
   const tenMintAmount = "10000000000000000000";
   const largeApprove = "10000000000000000000000000000000";
+
+  console.log("1");
 
   // We use fake DAI if we're not on BSC testnet.
   let token;
@@ -137,8 +141,6 @@ module.exports = async function (deployer, network, accounts) {
     token = await Dai.deployed();
   }
 
-  const longShort = await LongShort.deployed();
-  const staker = await Staker.deployed();
   await deployTestMarket(
     "ETH killers",
     "ETHK",
@@ -147,25 +149,20 @@ module.exports = async function (deployer, network, accounts) {
     admin,
     network
   );
+  console.log("1.2");
   await deployTestMarket(
-    "Placeholder Market 1",
-    "PM1",
+    "ETH/BTC Dominance",
+    "EBD",
     longShort,
     token,
     admin,
     network
   );
-  await deployTestMarket(
-    "Placeholder Market 2",
-    "PM2",
-    longShort,
-    token,
-    admin,
-    network
-  );
+  console.log("1,.3");
+  await deployTestMarket("Gold", "GOLD", longShort, token, admin, network);
+  console.log("1,5");
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
-
   let verifyString = `yarn hardhat --network ${network} tenderly:verify`;
   if (network == "mumbai") {
     for (
@@ -186,6 +183,8 @@ module.exports = async function (deployer, network, accounts) {
     
     \`${verifyString}\``);
   }
+  console.log("2");
+
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
     console.log(`Simulating transactions for marketIndex: ${marketIndex}`);
 
@@ -236,7 +235,7 @@ module.exports = async function (deployer, network, accounts) {
     if (network != "mumbai") await oracleManager.setPrice(onePointOne);
 
     await longShort._updateSystemState(marketIndex);
-
+    console.log("3");
     // Simulate user 2 redeeming half his tokens.
     const halfTokensMinted = new BN(tenMintAmount).div(new BN(2));
     await short.increaseAllowance(longShort.address, halfTokensMinted, {
@@ -261,7 +260,7 @@ module.exports = async function (deployer, network, accounts) {
     await longShort.mintLongAndStake(marketIndex, new BN(tenMintAmount), {
       from: user3,
     });
-
+    console.log("4");
     if (network != "mumbai") {
       await mintAndApprove(token, tenMintAmount, user3, longShort.address);
     }
