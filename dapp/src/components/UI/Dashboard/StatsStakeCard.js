@@ -15,7 +15,7 @@ function mapVal(apy) {
         );
 }
 
-function DashboardStakeCard(Props) {
+function StatsStakeCard(Props) {
   var marketName = Props.marketName;
   var isLong = Props.isLong;
   var $$yield = Props.yield;
@@ -36,7 +36,7 @@ function DashboardStakeCard(Props) {
             });
 }
 
-var make = DashboardStakeCard;
+var make = StatsStakeCard;
 
 exports.isHotAPY = isHotAPY;
 exports.mapVal = mapVal;

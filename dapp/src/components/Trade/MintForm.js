@@ -566,7 +566,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
     var possibleTweetMessages = [
       "Boom bam baby!💥 I just minted " + position + " tokens on " + marketName + "! @float_capital 🌊",
       "Look at me, look at me! I just went " + position + " on " + marketName + "! 🐬 @float_capital 🌊",
-      "Cue Jaws music! 🦈 I just went " + position + " on " + marketName + "! @foat_capital 🌊"
+      "Cue Jaws music! 🦈 I just went " + position + " on " + marketName + "! @float_capital 🌊"
     ];
     return Belt_Option.getWithDefault(Belt_Array.get(possibleTweetMessages, Js_math.random_int(0, possibleTweetMessages.length)), "");
   };

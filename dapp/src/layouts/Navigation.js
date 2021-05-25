@@ -8,11 +8,11 @@ var React = require("react");
 var Button = require("../components/UI/Base/Button.js");
 var Config = require("../config/Config.js");
 var Globals = require("../libraries/Globals.js");
+var Blockies = require("../bindings/ethereum-blockies-base64/Blockies.js");
 var Link = require("next/link").default;
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var RootProvider = require("../libraries/RootProvider.js");
-var DisplayAddress = require("../components/UI/Base/DisplayAddress.js");
 
 function floatingMenuZoomStyle(shouldDisplay) {
   return CssJs.style([
@@ -103,9 +103,10 @@ function Navigation(Props) {
     tmp = React.createElement(Link, {
           href: "/user/" + Globals.ethAdrToStr(currentUser),
           children: React.createElement("p", {
-                className: "px-3 bg-white hover:bg-black hover:text-gray-200 text-base cursor-pointer"
-              }, " 👤 ", React.createElement(DisplayAddress.make, {
-                    address: Globals.ethAdrToStr(currentUser)
+                className: "flex flex-row items-center px-3 bg-white hover:bg-black hover:text-white ml-1  text-base cursor-pointer"
+              }, "PROFILE", React.createElement("img", {
+                    className: "inline h-4 rounded ml-2",
+                    src: Blockies.makeBlockie(Globals.ethAdrToStr(currentUser))
                   }))
         });
   } else {
@@ -121,16 +122,19 @@ function Navigation(Props) {
   if (optCurrentUser !== undefined) {
     var currentUser$1 = Caml_option.valFromOption(optCurrentUser);
     tmp$1 = React.createElement("p", {
-          className: "px-3 bg-white text-black hover:bg-black hover:text-gray-200 text-base cursor-pointer text-3xl",
+          className: "flex flex-row items-center px-3 bg-white text-black hover:bg-black hover:text-gray-200 \n                   cursor-pointer text-3xl",
           onClick: (function (param) {
               router.push("/user/" + Globals.ethAdrToStr(currentUser$1));
               return Curry._1(setIsOpen, (function (param) {
                             return false;
                           }));
             })
-        }, " 👤 ", React.createElement(DisplayAddress.make, {
-              address: Globals.ethAdrToStr(currentUser$1)
-            }));
+        }, React.createElement("img", {
+              className: "inline h-6 rounded mr-2",
+              src: Blockies.makeBlockie(Globals.ethAdrToStr(currentUser$1))
+            }), React.createElement("p", {
+              className: "flex flex-row items-center px-3 hover:bg-white  cursor-pointer"
+            }, "PROFILE"));
   } else {
     tmp$1 = React.createElement(Button.Small.make, {
           onClick: (function (param) {
@@ -166,20 +170,15 @@ function Navigation(Props) {
                         }), React.createElement(Link, {
                           href: "/stake",
                           children: React.createElement("a", {
-                                className: "px-3 hover:bg-white"
+                                className: "px-3 hover:bg-white ml-2"
                               }, "STAKE🔥")
                         }), React.createElement(Link, {
-                          href: "/dashboard",
+                          href: "/stats",
                           children: React.createElement("a", {
                                 className: "px-3 hover:bg-white"
-                              }, "DASHBOARD")
-                        }), Config.networkId === 80001 ? React.createElement(Link, {
-                            href: "/faucet",
-                            children: React.createElement("a", {
-                                  className: "px-3 hover:bg-white"
-                                }, "FAUCET")
-                          }) : null, React.createElement("a", {
-                          className: "px-3 hover:bg-white mr-2",
+                              }, "STATS")
+                        }), React.createElement("a", {
+                          className: "px-3 hover:bg-white",
                           href: "https://docs.float.capital",
                           target: "_blank"
                         }, "DOCS"), tmp), React.createElement("div", {
@@ -204,7 +203,7 @@ function Navigation(Props) {
                                                   }));
                                     })
                                 }, "MARKETS"), React.createElement("div", {
-                                  className: "px-3 bg-black m-2",
+                                  className: "px-3 bg-black ml-2",
                                   onClick: (function (param) {
                                       router.push("/stake");
                                       return Curry._1(setIsOpen, (function (param) {
@@ -214,12 +213,12 @@ function Navigation(Props) {
                                 }, "STAKE🔥"), React.createElement("div", {
                                   className: "px-3 bg-black m-2",
                                   onClick: (function (param) {
-                                      router.push("/dashboard");
+                                      router.push("/stats");
                                       return Curry._1(setIsOpen, (function (param) {
                                                     return false;
                                                   }));
                                     })
-                                }, "DASHBOARD"), Config.networkId === 80001 ? React.createElement("div", {
+                                }, "STATS"), Config.networkId === 80001 ? React.createElement("div", {
                                     className: "px-3 bg-black m-2",
                                     onClick: (function (param) {
                                         router.push("/faucet");
