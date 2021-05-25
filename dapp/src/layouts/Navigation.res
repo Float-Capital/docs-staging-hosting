@@ -96,13 +96,6 @@ let make = () => {
         <Link href="/stats">
           <a className="px-3 hover:bg-white"> {React.string("STATS")} </a>
         </Link>
-        // {if Config.networkId == 80001 {
-        //   <Link href="/faucet">
-        //     <a className="px-3 hover:bg-white"> {React.string("FAUCET")} </a>
-        //   </Link>
-        // } else {
-        //   React.null
-        // }}
         <a className="px-3 hover:bg-white" target="_blank" href="https://docs.float.capital">
           {React.string("DOCS")}
         </a>
