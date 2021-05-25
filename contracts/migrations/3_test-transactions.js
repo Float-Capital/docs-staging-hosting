@@ -124,12 +124,6 @@ module.exports = async function(deployer, network, accounts) {
 
   const longShort = await LongShort.deployed();
   const staker = await Staker.deployed();
-
-  console.log("longshort");
-  console.log(longShort.address);
-  console.log("staker");
-  console.log(staker.address);
-
   await topupBalanceIfLow(admin, user1);
   await topupBalanceIfLow(admin, user2);
   await topupBalanceIfLow(admin, user3);
