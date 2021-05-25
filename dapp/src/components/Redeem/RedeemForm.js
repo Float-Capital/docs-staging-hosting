@@ -407,10 +407,6 @@ var RedeemForm = {
   useForm: useForm
 };
 
-function useBalance(erc20Address) {
-  return ContractHooks.useErc20BalanceRefresh(erc20Address).data;
-}
-
 function RedeemForm$RedeemFormInput(Props) {
   var onSubmitOpt = Props.onSubmit;
   var valueOpt = Props.value;
@@ -693,7 +689,6 @@ function RedeemForm$1(Props) {
 var make = RedeemForm$1;
 
 exports.RedeemForm = RedeemForm;
-exports.useBalance = useBalance;
 exports.RedeemFormInput = RedeemFormInput;
 exports.tokenRedeemPosition = tokenRedeemPosition;
 exports.isGreaterThanBalance = isGreaterThanBalance;

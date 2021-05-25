@@ -164,7 +164,7 @@ function Navigation(Props) {
                                 className: "px-3 hover:bg-white"
                               }, "MARKETS")
                         }), React.createElement(Link, {
-                          href: "/stake",
+                          href: "/stake-markets",
                           children: React.createElement("a", {
                                 className: "px-3 hover:bg-white"
                               }, "STAKE🔥")
@@ -206,7 +206,7 @@ function Navigation(Props) {
                                 }, "MARKETS"), React.createElement("div", {
                                   className: "px-3 bg-black m-2",
                                   onClick: (function (param) {
-                                      router.push("/stake");
+                                      router.push("/stake-markets");
                                       return Curry._1(setIsOpen, (function (param) {
                                                     return false;
                                                   }));

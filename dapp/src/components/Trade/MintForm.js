@@ -27,8 +27,8 @@ var ContractHooks = require("../Testing/Admin/ContractHooks.js");
 var ToastProvider = require("../UI/ToastProvider.js");
 var ContractActions = require("../../ethereum/ContractActions.js");
 var LongOrShortSelect = require("../UI/LongOrShortSelect.js");
+var ViewProfileButton = require("../UI/ViewProfileButton.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
-var ViewPositionButton = require("../UI/ViewPositionButton.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
 var Formality__ReactUpdate = require("re-formality/src/Formality__ReactUpdate.js");
 
@@ -707,7 +707,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                                         tokenSymbol: (
                                           isLong ? "↗️" : "↘️"
                                         ) + marketName
-                                      }), React.createElement(ViewPositionButton.make, {}))
+                                      }), React.createElement(ViewProfileButton.make, {}))
                             }));
           case /* Failed */3 :
               return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {

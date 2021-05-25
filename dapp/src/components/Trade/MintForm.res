@@ -151,7 +151,7 @@ module SubmitButtonAndTxTracker = {
               token={Config.config.contracts.floatToken}
               tokenSymbol={`${isLong ? `↗️` : `↘️`}${marketName}`}
             />
-            <ViewPositionButton />
+            <ViewProfileButton />
           </div>
         </Modal>
       </>

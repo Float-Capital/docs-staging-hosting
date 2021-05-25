@@ -10,11 +10,6 @@ module RedeemForm = %form(
   }
 )
 
-let useBalance = (~erc20Address) => {
-  let {Swr.data: optBalance} = ContractHooks.useErc20BalanceRefresh(~erc20Address)
-  optBalance
-}
-
 module RedeemFormInput = {
   @react.component
   let make = (
