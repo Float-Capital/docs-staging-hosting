@@ -1345,7 +1345,8 @@ contract LongShort is ILongShort, Initializable {
         // TODO: add events
     }
 
-    modifier executeOutstandingLazyDeposits(address user, uint32 marketIndex) {
+    modifier executeOutstandingLazyDeposits(address user, uint32 marketIndex)
+        virtual {
         _executeOutstandingLazyDeposits(user, marketIndex);
 
         _;
@@ -1365,6 +1366,14 @@ contract LongShort is ILongShort, Initializable {
             latestUpdateIndex[marketIndex] +
             1;
         // TODO: add events
+
+        emit LazyLongMinted(
+            marketIndex,
+            amount,
+            msg.sender,
+            batchedLazyDeposit[marketIndex].mintLong,
+            latestUpdateIndex[marketIndex] + 1
+        );
     }
 
     function mintShortLazy(uint32 marketIndex, uint256 amount)

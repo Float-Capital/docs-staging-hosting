@@ -9,10 +9,23 @@ NOTE: This contract is for testing purposes only!
 contract LongShortInternalsExposed is LongShort {
     bool overRideExecuteOutstandingLazyDeposits;
 
+    event ExecuteOutstandingLazyDepositsMock(
+        address _user,
+        uint32 _marketIndex
+    );
+
+    function setUseExecuteOutstandingLAzyDepositsMock(bool shouldUseMock)
+        public
+    {
+        overRideExecuteOutstandingLazyDeposits = shouldUseMock;
+    }
+
     function _executeOutstandingLazyDepositsMock(
         address _user,
         uint32 _marketIndex
-    ) internal {}
+    ) internal {
+        emit ExecuteOutstandingLazyDepositsMock(_user, _marketIndex);
+    }
 
     modifier executeOutstandingLazyDeposits(address user, uint32 marketIndex)
         override {

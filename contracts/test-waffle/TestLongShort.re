@@ -1,8 +1,4 @@
-open BsMocha;
-let (it', it_skip', before_each, before) =
-  Promise.(it, it_skip, before_each, before);
-
-let (describe, it, it_skip) = Mocha.(describe, it, it_skip);
+open Globals;
 open LetOps;
 
 describe("Float System", () => {
@@ -10,12 +6,12 @@ describe("Float System", () => {
     let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
     let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
 
-    before(() => {
+    before'(() => {
       let%Await loadedAccounts = Ethers.getSigners();
       accounts := loadedAccounts;
     });
 
-    before_each(() => {
+    before_each'(() => {
       let%AwaitThen deployedContracts =
         Helpers.inititialize(
           ~admin=accounts.contents->Array.getUnsafe(0),
@@ -44,18 +40,30 @@ describe("Float System", () => {
       let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
       let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
 
-      before(() => {
+      before'(() => {
         let%Await loadedAccounts = Ethers.getSigners();
         accounts := loadedAccounts;
       });
 
-      before_each(() => {
-        let%Await deployedContracts =
+      before_each'(() => {
+        let%AwaitThen deployedContracts =
           Helpers.inititialize(
             ~admin=accounts.contents->Array.getUnsafe(0),
             ~exposeInternals=true,
           );
         contracts := deployedContracts;
+        let firstMarketPaymentToken =
+          deployedContracts.markets->Array.getUnsafe(1).paymentToken;
+
+        let testUser = accounts.contents->Array.getUnsafe(1);
+
+        let%Await _ =
+          firstMarketPaymentToken->Contract.PaymentToken.mintAndApprove(
+            ~user=testUser,
+            ~spender=deployedContracts.longShort.address,
+            ~amount=Ethers.BigNumber.fromUnsafe("10000000000000000000000"),
+          );
+        ();
       });
 
       LazyDeposit.testExposed(~contracts, ~accounts);

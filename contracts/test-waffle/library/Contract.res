@@ -151,6 +151,16 @@ module LongShort = {
     ~kInitialMultiplier: Ethers.BigNumber.t,
     ~kPeriod: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "initializeMarket"
+  
+  type batchedLazyDeposit = {
+    mintLong: Ethers.BigNumber.t,
+    mintShort: Ethers.BigNumber.t,
+    mintAndStakeLong: Ethers.BigNumber.t,
+    mintAntStakeShort: Ethers.BigNumber.t
+  }
+  
+  @send
+  external batchedLazyDeposit: (t, ~marketIndex: int) => JsPromise.t<batchedLazyDeposit> = "batchedLazyDeposit"
 
   @send
   external fundTokens: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "fundTokens"
@@ -171,6 +181,34 @@ module LongShort = {
   external latestMarket: t => JsPromise.t<int> = "latestMarket"
 
   @send
+  external mintLongLazy: (
+    t,
+    ~marketIndex: int,
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "mintLongLazy"
+
+  @send
+  external mintShortLazy: (
+    t,
+    ~marketIndex: int,
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "mintShortLazy"
+
+  @send
+  external mintLongAndStakeLazy: (
+    t,
+    ~marketIndex: int,
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "mintLongAndStakeLazy"
+
+  @send
+  external mintShortAndStakeLazy: (
+    t,
+    ~marketIndex: int,
+    ~amount: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "mintShortAndStakeLazy"
+
+  @send
   external mintLongAndStake: (
     t,
     ~marketIndex: int,
@@ -188,6 +226,15 @@ module LongShort = {
     ~marketIndex: int,
     ~newOracleAddress: Ethers.ethAddress,
   ) => JsPromise.t<transaction> = "updateMarketOracle"
+
+  type userLazyActionsStruct = {
+        usersCurrentUpdateIndex: Ethers.BigNumber.t,
+        mintLong: Ethers.BigNumber.t,
+        mintShort: Ethers.BigNumber.t,
+        mintAndStakeLong: Ethers.BigNumber.t,
+        mintAndStakeShort: Ethers.BigNumber.t,
+  }
+  @send external userLazyActions: (t, ~marketIndex: int, ~user:Ethers.ethAddress) => JsPromise.t<userLazyActionsStruct> = "useruserLazyActions"
 
   module Exposed = {
     @send
@@ -284,20 +331,22 @@ module LongShort = {
     }> = "calculateAccumulatedFloatExposed"
 
     @send
-    external calculateAccumulatedFloatExposed: (
+    external setUseExecuteOutstandingLAzyDepositsMock: (
       t,
-      ~marketIndex: int,
-      ~user: Ethers.ethAddress,
-    ) => JsPromise.t<transaction> = "calculateAccumulatedFloatExposed"
+      ~shouldUseMock: bool
+    ) => JsPromise.t<transaction> = "setUseExecuteOutstandingLAzyDepositsMock"
   }
 }
 
-module GenericErc20 = {
-  type t = {address: Ethers.ethAddress}
-  let contractName = "ERC20PresetMinterPauserUpgradeable"
+// module GenericErc20 = {
+//   type t = {address: Ethers.ethAddress}
+//   let contractName = "ERC20PresetMinterPauserUpgradeable"
 
-  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
-}
+//   let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
+
+//   @send
+//   external mint: (t, ~user: Ethers.Wallet.t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> = "mint"
+// }
 
 module TokenFactory = {
   type t = {address: Ethers.ethAddress}
