@@ -29,6 +29,11 @@ contract Staker is IStaker, Initializable {
         ISyntheticToken shortToken;
         ISyntheticToken longToken;
     }
+    struct BatchedStake {
+        uint256 amountLong;
+        uint256 amountShort;
+        uint256 creationRewardIndex;
+    }
 
     ////////////////////////////////////
     //////// CONSTANTS /////////////////
@@ -67,6 +72,7 @@ contract Staker is IStaker, Initializable {
     // market state.
     mapping(uint32 => mapping(address => uint256))
         public userIndexOfLastClaimedReward;
+    mapping(uint32 => mapping(uint256 => BatchedStake)) public batchedStake; // token -> index
     mapping(uint32 => SyntheticTokens) public syntheticTokens; // token -> index -> state
     mapping(uint32 => mapping(uint256 => RewardState))
         public syntheticRewardParams; // token -> index -> state
@@ -120,6 +126,15 @@ contract Staker is IStaker, Initializable {
 
     modifier onlyValidSynthetic(ISyntheticToken _synth) {
         require(marketIndexOfToken[_synth] != 0, "not valid synth");
+        _;
+    }
+
+    modifier onlyValidMarket(uint32 marketIndex) {
+        require(
+            address(syntheticTokens[marketIndex].longToken) != address(0),
+            "not valid market"
+        );
+        // require(latestRewardIndex[marketIndex] != 0, "not valid market");
         _;
     }
 
@@ -433,7 +448,13 @@ contract Staker is IStaker, Initializable {
         longShortCoreContract._updateSystemState(marketIndexOfToken[token]);
     }
 
-    function calculateAccumulatedFloat(uint32 marketIndex, address user)
+    function calculateAccumulatedFloatHelper(
+        uint32 marketIndex,
+        address user,
+        uint256 amountStakedLong,
+        uint256 amountStakedShort,
+        uint256 usersLastRewardIndex
+    )
         internal
         view
         returns (
@@ -443,10 +464,7 @@ contract Staker is IStaker, Initializable {
         )
     {
         // Don't do the calculation and return zero immediately if there is no change
-        if (
-            userIndexOfLastClaimedReward[marketIndex][user] ==
-            latestRewardIndex[marketIndex]
-        ) {
+        if (usersLastRewardIndex == latestRewardIndex[marketIndex]) {
             return (0, 0);
         }
 
@@ -459,10 +477,7 @@ contract Staker is IStaker, Initializable {
         ISyntheticToken longToken = syntheticTokens[marketIndex].longToken;
         ISyntheticToken shortToken = syntheticTokens[marketIndex].shortToken;
 
-        uint256 stakedLong = userAmountStaked[longToken][user];
-        uint256 stakedShort = userAmountStaked[shortToken][user];
-
-        if (stakedLong > 0) {
+        if (amountStakedLong > 0) {
             uint256 accumDeltaLong =
                 syntheticRewardParams[marketIndex][
                     latestRewardIndex[marketIndex]
@@ -473,11 +488,11 @@ contract Staker is IStaker, Initializable {
                     ]
                         .accumulativeFloatPerLongToken;
             longFloatReward =
-                (accumDeltaLong * stakedLong) /
+                (accumDeltaLong * amountStakedLong) /
                 FLOAT_ISSUANCE_FIXED_DECIMAL;
         }
 
-        if (stakedShort > 0) {
+        if (amountStakedShort > 0) {
             uint256 accumDeltaShort =
                 syntheticRewardParams[marketIndex][
                     latestRewardIndex[marketIndex]
@@ -488,12 +503,38 @@ contract Staker is IStaker, Initializable {
                     ]
                         .accumulativeFloatPerShortToken;
             shortFloatReward =
-                (accumDeltaShort * stakedShort) /
+                (accumDeltaShort * amountStakedShort) /
                 FLOAT_ISSUANCE_FIXED_DECIMAL;
         }
 
         // explicit return
         return (longFloatReward, shortFloatReward);
+    }
+
+    function calculateAccumulatedFloat(uint32 marketIndex, address user)
+        internal
+        view
+        returns (
+            // NOTE: this returns the long and short reward separately for the sake of simplicity of the event and the graph. Would be more efficient to return as single value
+            uint256 longFloatReward,
+            uint256 shortFloatReward
+        )
+    {
+        ISyntheticToken longToken = syntheticTokens[marketIndex].longToken;
+        ISyntheticToken shortToken = syntheticTokens[marketIndex].shortToken;
+
+        uint256 amountStakedLong = userAmountStaked[longToken][user];
+        uint256 amountStakedShort = userAmountStaked[shortToken][user];
+
+        // explicit return
+        return
+            calculateAccumulatedFloatHelper(
+                marketIndex,
+                user,
+                amountStakedLong,
+                amountStakedShort,
+                userIndexOfLastClaimedReward[marketIndex][user]
+            );
     }
 
     function _mintFloat(address user, uint256 floatToMint) internal {
@@ -592,6 +633,22 @@ contract Staker is IStaker, Initializable {
         _stake(token, amount, user);
     }
 
+    function stakeFromMintBatched(
+        uint32 marketIndex,
+        uint256 amount,
+        uint256 oracleUpdateIndex,
+        bool isLong
+    ) external override onlyFloat() onlyValidMarket(marketIndex) {
+        if (isLong) {
+            batchedStake[marketIndex][oracleUpdateIndex].amountLong = amount;
+        } else {
+            batchedStake[marketIndex][oracleUpdateIndex].amountShort = amount;
+        }
+        batchedStake[marketIndex][oracleUpdateIndex]
+            .creationRewardIndex = latestRewardIndex[marketIndex];
+        // TODO: add event
+    }
+
     function _stake(
         ISyntheticToken token,
         uint256 amount,
@@ -652,5 +709,47 @@ contract Staker is IStaker, Initializable {
     function withdrawAll(ISyntheticToken token) external {
         _updateState(token);
         _withdraw(token, userAmountStaked[token][msg.sender]);
+    }
+
+    function transferBatchStakeToUser(
+        uint256 amountLong,
+        uint256 amountShort,
+        uint32 marketIndex,
+        uint256 oracleUpdateIndex,
+        address user
+    ) external override onlyFloat {
+        mintAccumulatedFloat(marketIndex, msg.sender);
+
+        // mint float up until now
+        BatchedStake storage currentBatchedStake =
+            batchedStake[marketIndex][oracleUpdateIndex];
+
+        (uint256 floatToMintLong, uint256 floatToMintShort) =
+            calculateAccumulatedFloatHelper(
+                marketIndex,
+                user,
+                amountLong,
+                amountShort,
+                currentBatchedStake.creationRewardIndex
+            );
+
+        uint256 floatToMint = floatToMintLong + floatToMintShort;
+        if (floatToMint > 0) {
+            // stops them setting this forward
+            userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[
+                marketIndex
+            ];
+
+            _mintFloat(user, floatToMint);
+
+            // TODO: give this event a different name so graph knows it was batached stake that was minted.
+            emit FloatMinted(
+                user,
+                marketIndex,
+                floatToMintLong,
+                floatToMintShort,
+                latestRewardIndex[marketIndex]
+            );
+        }
     }
 }

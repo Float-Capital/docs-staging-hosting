@@ -2,26 +2,27 @@
 'use strict';
 
 var LetOps = require("./library/LetOps.js");
+var Globals = require("./library/Globals.js");
 var Helpers = require("./library/Helpers.js");
+var Contract = require("./library/Contract.js");
+var LazyDeposit = require("./tests/longshort/LazyDeposit.js");
 var HelperActions = require("./library/HelperActions.js");
-var Mocha$BsMocha = require("bs-mocha/src/Mocha.js");
-var Promise$BsMocha = require("bs-mocha/src/Promise.js");
 
-Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (function (param) {
-        return Mocha$BsMocha.describe("LongShort")(undefined, undefined, undefined, (function (param) {
+Globals.describe("Float System")(undefined, undefined, undefined, (function (param) {
+        return Globals.describe("LongShort")(undefined, undefined, undefined, (function (param) {
                       var contracts = {
                         contents: undefined
                       };
                       var accounts = {
                         contents: undefined
                       };
-                      Promise$BsMocha.before(undefined)(undefined, undefined, undefined, (function (param) {
+                      Globals.before$prime(undefined)(undefined, undefined, undefined, (function (param) {
                               return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
                                             accounts.contents = loadedAccounts;
                                             
                                           }));
                             }));
-                      Promise$BsMocha.before_each(undefined)(undefined, undefined, undefined, (function (param) {
+                      Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
                               return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
                                             contracts.contents = deployedContracts;
                                             var setupUser = accounts.contents[2];
@@ -30,31 +31,35 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                                                         }));
                                           }));
                             }));
-                      return Mocha$BsMocha.describe("_updateSystemState")(undefined, undefined, undefined, (function (param) {
-                                    
+                      Globals.describe("_updateSystemState")(undefined, undefined, undefined, (function (param) {
+                              
+                            }));
+                      return Globals.describe("LongShort - internals exposed")(undefined, undefined, undefined, (function (param) {
+                                    var contracts = {
+                                      contents: undefined
+                                    };
+                                    var accounts = {
+                                      contents: undefined
+                                    };
+                                    Globals.before$prime(undefined)(undefined, undefined, undefined, (function (param) {
+                                            return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
+                                                          accounts.contents = loadedAccounts;
+                                                          
+                                                        }));
+                                          }));
+                                    Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
+                                            return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
+                                                          contracts.contents = deployedContracts;
+                                                          var firstMarketPaymentToken = deployedContracts.markets[1].paymentToken;
+                                                          var testUser = accounts.contents[1];
+                                                          return LetOps.Await.let_(Contract.PaymentToken.mintAndApprove(firstMarketPaymentToken, testUser, ethers.BigNumber.from("10000000000000000000000"), deployedContracts.longShort.address), (function (param) {
+                                                                        
+                                                                      }));
+                                                        }));
+                                          }));
+                                    return LazyDeposit.testExposed(contracts, accounts);
                                   }));
                     }));
       }));
 
-var it$prime = Promise$BsMocha.it;
-
-var it_skip$prime = Promise$BsMocha.it_skip;
-
-var before_each = Promise$BsMocha.before_each;
-
-var before = Promise$BsMocha.before;
-
-var describe = Mocha$BsMocha.describe;
-
-var it = Mocha$BsMocha.it;
-
-var it_skip = Mocha$BsMocha.it_skip;
-
-exports.it$prime = it$prime;
-exports.it_skip$prime = it_skip$prime;
-exports.before_each = before_each;
-exports.before = before;
-exports.describe = describe;
-exports.it = it;
-exports.it_skip = it_skip;
 /*  Not a pure module */

@@ -40,46 +40,6 @@ let callEmitEvents: (
 @send
 external withArgs8: (eventCheck, 'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h) => JsPromise.t<unit> = "withArgs"
 
-let expectContractCall: (
-  ~functionName: string,
-  ~contract: Contract.t,
-) => unit = %raw(`(functionName, contract) => expect(functionName).to.be.calledOnContract(contract)`)
-
-type args // TODO: make this cleaner, more typesafe, and hide implementation detail...
-let expectContractCallArgsRaw: (
-  ~functionName: string,
-  ~contract: Contract.t,
-  args,
-) => unit = %raw(`(functionName, contract, args) => expect(functionName).to.be.calledOnContractWithArgs(contract, args)`)
-let expectContractCallArgs0 = (~functionName: string, ~contract: Contract.t) =>
-  expectContractCallArgsRaw(~functionName, ~contract, []->Obj.magic)
-let expectContractCallArgs1 = (~functionName: string, ~contract: Contract.t, ~args: array<'a>) =>
-  expectContractCallArgsRaw(~functionName, ~contract, args->Obj.magic)
-let expectContractCallArgs2 = (~functionName: string, ~contract: Contract.t, ~args: ('a, 'b)) =>
-  expectContractCallArgsRaw(~functionName, ~contract, args->Obj.magic)
-let expectContractCallArgs3 = (~functionName: string, ~contract: Contract.t, ~args: ('a, 'b, 'c)) =>
-  expectContractCallArgsRaw(~functionName, ~contract, args->Obj.magic)
-let expectContractCallArgs4 = (
-  ~functionName: string,
-  ~contract: Contract.t,
-  ~args: ('a, 'b, 'c, 'd),
-) => expectContractCallArgsRaw(~functionName, ~contract, args->Obj.magic)
-let expectContractCallArgs5 = (
-  ~functionName: string,
-  ~contract: Contract.t,
-  ~args: ('a, 'b, 'c, 'd, 'e),
-) => expectContractCallArgsRaw(~functionName, ~contract, args->Obj.magic)
-let expectContractCallArgs6 = (
-  ~functionName: string,
-  ~contract: Contract.t,
-  ~args: ('a, 'b, 'c, 'd, 'e, 'f),
-) => expectContractCallArgsRaw(~functionName, ~contract, args->Obj.magic)
-let expectContractCallArgs7 = (
-  ~functionName: string,
-  ~contract: Contract.t,
-  ~args: ('a, 'b, 'c, 'd, 'e, 'f, 'g),
-) => expectContractCallArgsRaw(~functionName, ~contract, args->Obj.magic)
-
 let expectRevertNoReason: (
   ~transaction: JsPromise.t<Contract.transaction>,
 ) => JsPromise.t<unit> = %raw(`(transaction) => expect(transaction).to.be.reverted`)
@@ -93,7 +53,7 @@ let expectRevert: (
 let changeBallance: (
   ~transaction: unit => JsPromise.t<Contract.transaction>,
   ~token: Contract.t,
-  ~to_: Ethers.Wallet.t,
+  ~to_: Ethers.ethAddress,
   ~amount: Ethers.BigNumber.t,
 ) => JsPromise.t<
   unit,
