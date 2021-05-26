@@ -170,7 +170,7 @@ function Navigation(Props) {
                         }), React.createElement(Link, {
                           href: "/stake-markets",
                           children: React.createElement("a", {
-                                className: "px-3 hover:bg-white ml-2"
+                                className: "px-3 hover:bg-white"
                               }, "STAKE🔥")
                         }), React.createElement(Link, {
                           href: "/stats",
