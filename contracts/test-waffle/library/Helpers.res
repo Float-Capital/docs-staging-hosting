@@ -17,11 +17,12 @@ type coreContracts = {
   markets: array<markets>,
 }
 
-@ocaml.doc(`Generates random number between 1000 and 0.0001 of a token (10^18 in BigNumber units)`)
+@ocaml.doc(`Generates random BigNumber between 1 and 2147483647 (max js int)`)
+let randomInteger = () => Js.Math.random_int(1, Js.Int.max)->Ethers.BigNumber.fromInt
+
+@ocaml.doc(`Generates random BigNumber between 0.00001 and 21474.83647 of a token (10^18 in BigNumber units)`)
 let randomTokenAmount = () =>
-  Js.Math.random_int(0, Js.Int.max)
-  ->Ethers.BigNumber.fromInt
-  ->Ethers.BigNumber.mul(Ethers.BigNumber.fromInt(100000))
+  randomInteger()->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("10000000000000"))
 
 type mint =
   | Long(Ethers.BigNumber.t)
@@ -102,13 +103,13 @@ let getAllMarkets = longShort => {
   })
 }
 
-let inititialize = (~admin: Ethers.Wallet.t) => {
+let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
   JsPromise.all6((
     FloatCapital_v0.make(),
     Treasury_v0.make(),
     FloatToken.make(),
-    Staker.make(),
-    LongShort.make(),
+    exposeInternals ? Staker.makeExposed() : Staker.make(),
+    exposeInternals ? LongShort.makeExposed() : LongShort.make(),
     JsPromise.all2((
       PaymentToken.make(~name="Pay Token 1", ~symbol="PT1"),
       PaymentToken.make(~name="Pay Token 2", ~symbol="PT2"),
@@ -123,13 +124,13 @@ let inititialize = (~admin: Ethers.Wallet.t) => {
   )) => {
     TokenFactory.make(admin.address, longShort.address)->JsPromise.then(tokenFactory => {
       JsPromise.all4((
-        floatToken->FloatToken.setup("Float token", "FLOAT TOKEN", staker->Staker.address),
+        floatToken->FloatToken.setup("Float token", "FLOAT TOKEN", staker.address),
         treasury->Treasury_v0.setup(admin.address),
         longShort->LongShort.setup(
           admin.address,
           treasury.address,
           tokenFactory.address,
-          staker->Staker.address,
+          staker.address,
         ),
         staker->Staker.setup(
           admin.address,

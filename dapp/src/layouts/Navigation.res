@@ -93,17 +93,10 @@ let make = () => {
         <Link href="/stake-markets">
           <a className="px-3 hover:bg-white"> {`STAKE🔥`->React.string} </a>
         </Link>
-        <Link href="/dashboard">
-          <a className="px-3 hover:bg-white"> {React.string("DASHBOARD")} </a>
+        <Link href="/stats">
+          <a className="px-3 hover:bg-white"> {React.string("STATS")} </a>
         </Link>
-        {if Config.networkId == 80001 {
-          <Link href="/faucet">
-            <a className="px-3 hover:bg-white"> {React.string("FAUCET")} </a>
-          </Link>
-        } else {
-          React.null
-        }}
-        <a className="px-3 hover:bg-white mr-2" target="_blank" href="https://docs.float.capital">
+        <a className="px-3 hover:bg-white" target="_blank" href="https://docs.float.capital">
           {React.string("DOCS")}
         </a>
         {
@@ -116,8 +109,12 @@ let make = () => {
           | Some(currentUser) =>
             <Link href={`/user/${currentUser->ethAdrToStr}`}>
               <p
-                className="px-3 bg-white hover:bg-black hover:text-gray-200 text-base cursor-pointer">
-                {` 👤 `->React.string} <DisplayAddress address={currentUser->ethAdrToStr} />
+                className="flex flex-row items-center px-3 bg-white hover:bg-black hover:text-white ml-1  text-base cursor-pointer">
+                {"PROFILE"->React.string}
+                <img
+                  className="inline h-4 rounded ml-2"
+                  src={Blockies.makeBlockie(currentUser->ethAdrToStr)}
+                />
               </p>
             </Link>
           | None =>
@@ -150,16 +147,16 @@ let make = () => {
                 router->Next.Router.push(`/stake-markets`)
                 setIsOpen(_ => false)
               }}
-              className="px-3 bg-black m-2">
+              className="px-3 bg-black ml-2">
               {`STAKE🔥`->React.string}
             </div>
             <div
               onClick={_ => {
-                router->Next.Router.push(`/dashboard`)
+                router->Next.Router.push(`/stats`)
                 setIsOpen(_ => false)
               }}
               className="px-3 bg-black m-2">
-              {`DASHBOARD`->React.string}
+              {`STATS`->React.string}
             </div>
             {if Config.networkId == 80001 {
               <div
@@ -202,8 +199,15 @@ let make = () => {
                     router->Next.Router.push(`/user/${currentUser->ethAdrToStr}`)
                     setIsOpen(_ => false)
                   }}
-                  className="px-3 bg-white text-black hover:bg-black hover:text-gray-200 text-base cursor-pointer text-3xl">
-                  {` 👤 `->React.string} <DisplayAddress address={currentUser->ethAdrToStr} />
+                  className="flex flex-row items-center px-3 bg-white text-black hover:bg-black hover:text-gray-200 
+                   cursor-pointer text-3xl">
+                  <img
+                    className="inline h-6 rounded mr-2"
+                    src={Blockies.makeBlockie(currentUser->ethAdrToStr)}
+                  />
+                  <p className="flex flex-row items-center px-3 hover:bg-white  cursor-pointer">
+                    {"PROFILE"->React.string}
+                  </p>
                 </p>
 
               | None =>

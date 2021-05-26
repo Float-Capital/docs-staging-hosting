@@ -5,7 +5,7 @@ var React = require("react");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 
-function DashboardLi$OptionallyIntoLink(Props) {
+function StatsLi$OptionallyIntoLink(Props) {
   var link = Props.link;
   var children = Props.children;
   return Belt_Option.mapWithDefault(link, children, (function (link) {
@@ -16,10 +16,10 @@ function DashboardLi$OptionallyIntoLink(Props) {
 }
 
 var OptionallyIntoLink = {
-  make: DashboardLi$OptionallyIntoLink
+  make: StatsLi$OptionallyIntoLink
 };
 
-function createDashboardLiProps(suffixOpt, prefix, value, link, param) {
+function createStatsLiProps(suffixOpt, prefix, value, link, param) {
   var suffix = suffixOpt !== undefined ? Caml_option.valFromOption(suffixOpt) : null;
   return {
           prefix: prefix,
@@ -30,17 +30,17 @@ function createDashboardLiProps(suffixOpt, prefix, value, link, param) {
 }
 
 var Props = {
-  createDashboardLiProps: createDashboardLiProps
+  createStatsLiProps: createStatsLiProps
 };
 
-function DashboardLi(Props) {
+function StatsLi(Props) {
   var prefix = Props.prefix;
   var value = Props.value;
   var first = Props.first;
   var suffix = Props.suffix;
   var linkOpt = Props.link;
   var link = linkOpt !== undefined ? Caml_option.valFromOption(linkOpt) : undefined;
-  return React.createElement(DashboardLi$OptionallyIntoLink, {
+  return React.createElement(StatsLi$OptionallyIntoLink, {
               link: link,
               children: React.createElement("li", {
                     className: first ? "" : "pt-2"
@@ -52,7 +52,7 @@ function DashboardLi(Props) {
             });
 }
 
-var make = DashboardLi;
+var make = StatsLi;
 
 exports.OptionallyIntoLink = OptionallyIntoLink;
 exports.Props = Props;
