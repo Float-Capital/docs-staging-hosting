@@ -7,7 +7,7 @@ let testExposed =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
   describe("lazyDeposits", () => {
-    it'("calls the executeOutstandingLazyDeposits modifier", () => {
+    it'("calls the executeOutstandingLazySettlements modifier", () => {
       // TODO: turn this into a re-usable template (just pass in the transaction that should emmit the event)
       //       test all other relevant 'functions
       let {longShort} = contracts.contents;
@@ -16,7 +16,7 @@ let testExposed =
       let testWallet = accounts.contents->Array.getUnsafe(1);
 
       let%Await _ =
-        longShort->Contract.LongShort.Exposed.setUseExecuteOutstandingLAzyDepositsMock(
+        longShort->Contract.LongShort.Exposed.setUseexecuteOutstandingLazySettlementsMock(
           ~shouldUseMock=true,
         );
 
@@ -26,7 +26,7 @@ let testExposed =
             longShort
             ->Contract.connect(~address=testWallet)
             ->Contract.LongShort.mintLongLazy(~marketIndex, ~amount),
-          ~eventName="ExecuteOutstandingLazyDepositsMock",
+          ~eventName="executeOutstandingLazySettlementsMock",
           ~contract=longShort->Obj.magic,
         )
         ->Chai.withArgs2((testWallet, marketIndex));

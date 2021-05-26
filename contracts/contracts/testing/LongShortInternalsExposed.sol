@@ -7,33 +7,33 @@ NOTE: This contract is for testing purposes only!
 */
 
 contract LongShortInternalsExposed is LongShort {
-    bool overRideExecuteOutstandingLazyDeposits;
+    bool overRideexecuteOutstandingLazySettlements;
 
-    event ExecuteOutstandingLazyDepositsMock(
+    event executeOutstandingLazySettlementsMock(
         address _user,
         uint32 _marketIndex
     );
 
-    function setUseExecuteOutstandingLAzyDepositsMock(bool shouldUseMock)
+    function setUseexecuteOutstandingLazySettlementsMock(bool shouldUseMock)
         public
     {
-        overRideExecuteOutstandingLazyDeposits = shouldUseMock;
+        overRideexecuteOutstandingLazySettlements = shouldUseMock;
     }
 
-    function _executeOutstandingLazyDepositsMock(
+    function _executeOutstandingLazySettlementsMock(
         address _user,
         uint32 _marketIndex
     ) internal {
-        emit ExecuteOutstandingLazyDepositsMock(_user, _marketIndex);
+        emit executeOutstandingLazySettlementsMock(_user, _marketIndex);
     }
 
-    modifier executeOutstandingLazyDeposits(address user, uint32 marketIndex)
+    modifier executeOutstandingLazySettlements(address user, uint32 marketIndex)
         override {
-        if (overRideExecuteOutstandingLazyDeposits) {
+        if (overRideexecuteOutstandingLazySettlements) {
             // TODO: put a mock here?
-            _executeOutstandingLazyDepositsMock(user, marketIndex);
+            _executeOutstandingLazySettlementsMock(user, marketIndex);
         } else {
-            _executeOutstandingLazyDeposits(user, marketIndex);
+            _executeOutstandingLazySettlements(user, marketIndex);
         }
 
         _;

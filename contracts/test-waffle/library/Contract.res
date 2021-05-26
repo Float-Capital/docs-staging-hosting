@@ -331,10 +331,10 @@ module LongShort = {
     }> = "calculateAccumulatedFloatExposed"
 
     @send
-    external setUseExecuteOutstandingLAzyDepositsMock: (
+    external setUseexecuteOutstandingLazySettlementsMock: (
       t,
       ~shouldUseMock: bool
-    ) => JsPromise.t<transaction> = "setUseExecuteOutstandingLAzyDepositsMock"
+    ) => JsPromise.t<transaction> = "setUseexecuteOutstandingLazySettlementsMock"
   }
 }
 

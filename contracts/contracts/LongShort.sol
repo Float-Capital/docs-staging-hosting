@@ -1295,7 +1295,7 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => BatchedLazyDeposit) public batchedLazyDeposit;
     mapping(uint32 => mapping(address => UserLazyDeposit)) public userLazyActions;
 
-    function _executeOutstandingLazyDeposits(address user, uint32 marketIndex)
+    function _executeOutstandingLazySettlements(address user, uint32 marketIndex)
         internal
     {
         UserLazyDeposit storage currentUserDeposits =
@@ -1345,16 +1345,16 @@ contract LongShort is ILongShort, Initializable {
         // TODO: add events
     }
 
-    modifier executeOutstandingLazyDeposits(address user, uint32 marketIndex)
+    modifier executeOutstandingLazySettlements(address user, uint32 marketIndex)
         virtual {
-        _executeOutstandingLazyDeposits(user, marketIndex);
+        _executeOutstandingLazySettlements(user, marketIndex);
 
         _;
     }
 
     function mintLongLazy(uint32 marketIndex, uint256 amount)
         external
-        executeOutstandingLazyDeposits(msg.sender, marketIndex)
+        executeOutstandingLazySettlements(msg.sender, marketIndex)
     {
         // TODO: pre-deposit them into the market?
         //    - for now not doing that for simplicity, don't gain that much doing so either just more expensive tx (for very little yield)
@@ -1378,7 +1378,7 @@ contract LongShort is ILongShort, Initializable {
 
     function mintShortLazy(uint32 marketIndex, uint256 amount)
         external
-        executeOutstandingLazyDeposits(msg.sender, marketIndex)
+        executeOutstandingLazySettlements(msg.sender, marketIndex)
     {
         fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
 
@@ -1393,7 +1393,7 @@ contract LongShort is ILongShort, Initializable {
 
     function mintLongAndStakeLazy(uint32 marketIndex, uint256 amount)
         external
-        executeOutstandingLazyDeposits(msg.sender, marketIndex)
+        executeOutstandingLazySettlements(msg.sender, marketIndex)
     {
         fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
 
@@ -1408,7 +1408,7 @@ contract LongShort is ILongShort, Initializable {
 
     function mintShortAndStakeLazy(uint32 marketIndex, uint256 amount)
         external
-        executeOutstandingLazyDeposits(msg.sender, marketIndex)
+        executeOutstandingLazySettlements(msg.sender, marketIndex)
     {
         fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
 

@@ -7,13 +7,13 @@ var Globals = require("../../library/Globals.js");
 
 function testExposed(contracts, accounts) {
   return Globals.describe("lazyDeposits")(undefined, undefined, undefined, (function (param) {
-                Globals.it$prime("calls the executeOutstandingLazyDeposits modifier")(undefined, undefined, undefined, (function (param) {
+                Globals.it$prime("calls the executeOutstandingLazySettlements modifier")(undefined, undefined, undefined, (function (param) {
                         var match = contracts.contents;
                         var longShort = match.longShort;
                         var amount = ethers.BigNumber.from(1);
                         var testWallet = accounts.contents[1];
-                        return LetOps.Await.let_(longShort.setUseExecuteOutstandingLAzyDepositsMock(true), (function (param) {
-                                      Chai.callEmitEvents(longShort.connect(testWallet).mintLongLazy(1, amount), longShort, "ExecuteOutstandingLazyDepositsMock");
+                        return LetOps.Await.let_(longShort.setUseexecuteOutstandingLazySettlementsMock(true), (function (param) {
+                                      Chai.callEmitEvents(longShort.connect(testWallet).mintLongLazy(1, amount), longShort, "executeOutstandingLazySettlementsMock");
                                       
                                     }));
                       }));
