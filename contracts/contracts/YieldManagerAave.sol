@@ -41,7 +41,7 @@ contract YieldManagerAave is IYieldManager {
         require(msg.sender == longShort, "Not longShort");
         _;
     }
-    
+
     modifier treasuryOnly() {
         require(msg.sender == treasury, "Not treasury");
         _;
@@ -107,17 +107,26 @@ contract YieldManagerAave is IYieldManager {
     function withdrawToken(uint256 amount) public override longShortOnly {
         // Redeem aToken for underlying asset tokens.
         // This will fail if not enough liquidity is avaiable on aave.
-        uint256 amountWithdrawn =
-            lendingPool.withdraw(address(token), amount, address(this));
+        lendingPool.withdraw(address(token), amount, address(this));
 
         // Transfer tokens back to LongShort contract.
         token.transfer(longShort, amount);
     }
-    
-    function withdrawErc20TokenToTreasury(address erc20Token) external treasuryOnly {
-        // Redeem other erc20 for underlying asset tokens.        
+
+    function withdrawErc20TokenToTreasury(address erc20Token)
+        external
+        override
+        treasuryOnly
+    {
+        // Redeem other erc20 tokens.
         // Transfer tokens back to Treasury contract.
+        require(
+            erc20Token != address(token),
+            "Cannot withdraw underlying collateral token to treasury"
+        );
+
         uint256 amount = IERC20Upgradeable(erc20Token).balanceOf(address(this));
+        // Transfer tokens to treasury
         IERC20Upgradeable(erc20Token).transfer(treasury, amount);
     }
 
