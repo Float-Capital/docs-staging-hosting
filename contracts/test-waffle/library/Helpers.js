@@ -86,7 +86,7 @@ function inititialize(admin, exposeInternals) {
                 Contract.Treasury_v0.make(undefined),
                 Contract.FloatToken.make(undefined),
                 exposeInternals ? Contract.Staker.makeExposed(undefined) : Contract.Staker.make(undefined),
-                Contract.LongShort.make(undefined),
+                exposeInternals ? Contract.LongShort.makeExposed(undefined) : Contract.LongShort.make(undefined),
                 Promise.all([
                       Contract.PaymentToken.make("Pay Token 1", "PT1"),
                       Contract.PaymentToken.make("Pay Token 2", "PT2")

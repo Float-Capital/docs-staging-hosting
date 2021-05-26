@@ -28,9 +28,9 @@ var it$prime = Promise$BsMocha.it;
 
 var it_skip$prime = Promise$BsMocha.it_skip;
 
-var before_each = Promise$BsMocha.before_each;
+var before_each$prime = Promise$BsMocha.before_each;
 
-var before = Promise$BsMocha.before;
+var before$prime = Promise$BsMocha.before;
 
 var describe = Mocha$BsMocha.describe;
 
@@ -38,10 +38,14 @@ var it = Mocha$BsMocha.it;
 
 var it_skip = Mocha$BsMocha.it_skip;
 
+var before = Mocha$BsMocha.before;
+
+var before_each = Mocha$BsMocha.before_each;
+
 exports.it$prime = it$prime;
 exports.it_skip$prime = it_skip$prime;
-exports.before_each = before_each;
-exports.before = before;
+exports.before_each$prime = before_each$prime;
+exports.before$prime = before$prime;
 exports.add = add;
 exports.sub = sub;
 exports.bnFromInt = bnFromInt;
@@ -50,4 +54,6 @@ exports.div = div;
 exports.describe = describe;
 exports.it = it;
 exports.it_skip = it_skip;
+exports.before = before;
+exports.before_each = before_each;
 /* No side effect */

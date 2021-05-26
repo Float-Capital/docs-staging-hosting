@@ -115,100 +115,100 @@ var OracleManagerMock = {
 
 var contractName$4 = "LongShort";
 
-function make$3(param) {
-  return deployContract(contractName$4);
-}
-
-var LongShort = {
-  contractName: contractName$4,
-  make: make$3
-};
-
-var contractName$5 = "ERC20PresetMinterPauserUpgradeable";
-
-function make$4(param) {
-  return deployContract(contractName$5);
-}
-
-var GenericErc20 = {
-  contractName: contractName$5,
-  make: make$4
-};
-
-var contractName$6 = "TokenFactory";
-
-function make$5(admin, longShort) {
-  return deployContract2(contractName$6, admin, longShort);
-}
-
-var TokenFactory = {
-  contractName: contractName$6,
-  make: make$5
-};
-
-var contractName$7 = "Staker";
-
-var contractNameExposed = "StakerInternalsExposed";
-
-function make$6(param) {
-  return deployContract(contractName$7);
-}
+var contractNameExposed = "LongShortInternalsExposed";
 
 function makeExposed(param) {
   return deployContract(contractNameExposed);
 }
 
+function make$3(param) {
+  return deployContract(contractName$4);
+}
+
+var Exposed = {};
+
+var LongShort = {
+  contractName: contractName$4,
+  contractNameExposed: contractNameExposed,
+  makeExposed: makeExposed,
+  make: make$3,
+  Exposed: Exposed
+};
+
+var contractName$5 = "TokenFactory";
+
+function make$4(admin, longShort) {
+  return deployContract2(contractName$5, admin, longShort);
+}
+
+var TokenFactory = {
+  contractName: contractName$5,
+  make: make$4
+};
+
+var contractName$6 = "Staker";
+
+var contractNameExposed$1 = "StakerInternalsExposed";
+
+function make$5(param) {
+  return deployContract(contractName$6);
+}
+
+function makeExposed$1(param) {
+  return deployContract(contractNameExposed$1);
+}
+
 function at$4(contractAddress) {
-  return attachToContract(contractName$7, contractAddress);
+  return attachToContract(contractName$6, contractAddress);
 }
 
 function claimFloatCustomUser(staker, user, markets) {
   return staker.connect(user).claimFloatCustom(markets);
 }
 
-var Exposed = {};
+var Exposed$1 = {};
 
 var Staker = {
-  contractName: contractName$7,
-  contractNameExposed: contractNameExposed,
-  make: make$6,
-  makeExposed: makeExposed,
+  contractName: contractName$6,
+  contractNameExposed: contractNameExposed$1,
+  make: make$5,
+  makeExposed: makeExposed$1,
   at: at$4,
   claimFloatCustomUser: claimFloatCustomUser,
-  Exposed: Exposed
+  Exposed: Exposed$1
 };
 
-var contractName$8 = "FloatToken";
+var contractName$7 = "FloatToken";
+
+function make$6(param) {
+  return deployContract(contractName$7);
+}
+
+var FloatToken = {
+  contractName: contractName$7,
+  make: make$6
+};
+
+var contractName$8 = "FloatCapital_v0";
 
 function make$7(param) {
   return deployContract(contractName$8);
 }
 
-var FloatToken = {
+var FloatCapital_v0 = {
   contractName: contractName$8,
   make: make$7
 };
 
-var contractName$9 = "FloatCapital_v0";
+var contractName$9 = "Treasury_v0";
 
 function make$8(param) {
   return deployContract(contractName$9);
 }
 
-var FloatCapital_v0 = {
+var Treasury_v0 = {
   contractName: contractName$9,
   make: make$8
-};
-
-var contractName$10 = "Treasury_v0";
-
-function make$9(param) {
-  return deployContract(contractName$10);
-}
-
-var Treasury_v0 = {
-  contractName: contractName$10,
-  make: make$9
 };
 
 function marketIndexOfSynth(longShort, syntheticToken) {
@@ -232,7 +232,6 @@ exports.PaymentToken = PaymentToken;
 exports.YieldManagerMock = YieldManagerMock;
 exports.OracleManagerMock = OracleManagerMock;
 exports.LongShort = LongShort;
-exports.GenericErc20 = GenericErc20;
 exports.TokenFactory = TokenFactory;
 exports.Staker = Staker;
 exports.FloatToken = FloatToken;
