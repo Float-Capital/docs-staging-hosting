@@ -8,20 +8,20 @@ var Config = require("../config/Config.js");
 var Loader = require("../components/UI/Base/Loader.js");
 var Masonry = require("../components/UI/Masonry.js");
 var Queries = require("../data/Queries.js");
+var StatsLi = require("../components/UI/Dashboard/StatsLi.js");
+var StatsUl = require("../components/UI/Dashboard/StatsUl.js");
 var Tooltip = require("../components/UI/Base/Tooltip.js");
 var Link = require("next/link").default;
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
+var StatsCalcs = require("../libraries/StatsCalcs.js");
 var APYProvider = require("../libraries/APYProvider.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
-var DashboardLi = require("../components/UI/Dashboard/DashboardLi.js");
-var DashboardUl = require("../components/UI/Dashboard/DashboardUl.js");
-var DashboardCalcs = require("../libraries/DashboardCalcs.js");
+var StatsStakeCard = require("../components/UI/Dashboard/StatsStakeCard.js");
 var Format = require("date-fns/format").default;
-var DashboardStakeCard = require("../components/UI/Dashboard/DashboardStakeCard.js");
 var FromUnixTime = require("date-fns/fromUnixTime").default;
 var FormatDistanceToNow = require("date-fns/formatDistanceToNow").default;
 
-function Dashboard$TrendingStakes(Props) {
+function Stats$TrendingStakes(Props) {
   var marketDetailsQuery = Curry.app(Queries.MarketDetails.use, [
         undefined,
         undefined,
@@ -57,11 +57,11 @@ function Dashboard$TrendingStakes(Props) {
   if (apy.TAG !== /* Loaded */0) {
     return React.createElement(Loader.Mini.make, {});
   }
-  var trendingStakes = DashboardCalcs.trendingStakes(match.syntheticMarkets, apy._0);
+  var trendingStakes = StatsCalcs.trendingStakes(match.syntheticMarkets, apy._0);
   return Belt_Array.map(trendingStakes, (function (param) {
                 var isLong = param.isLong;
                 var marketName = param.marketName;
-                return React.createElement(DashboardStakeCard.make, {
+                return React.createElement(StatsStakeCard.make, {
                             marketName: marketName,
                             isLong: isLong,
                             yield: param.apy,
@@ -74,7 +74,7 @@ function Dashboard$TrendingStakes(Props) {
 }
 
 var TrendingStakes = {
-  make: Dashboard$TrendingStakes
+  make: Stats$TrendingStakes
 };
 
 function totalValueCard(totalValueLocked) {
@@ -95,14 +95,14 @@ function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed, txHash
               children: null
             }, React.createElement(Masonry.Header.make, {
                   children: "Float Protocol 🏗️"
-                }), React.createElement(DashboardUl.make, {
+                }), React.createElement(StatsUl.make, {
                   list: [
-                    DashboardLi.Props.createDashboardLiProps(undefined, "🗓️ Live since:", Format(dateObj, "do MMM ''yy"), Config.blockExplorer + "/tx/" + txHash, undefined),
-                    DashboardLi.Props.createDashboardLiProps(undefined, "📅 Days live:", FormatDistanceToNow(dateObj), undefined, undefined),
-                    DashboardLi.Props.createDashboardLiProps(undefined, "📈 No. txs:", totalTxs.toString(), undefined, undefined),
-                    DashboardLi.Props.createDashboardLiProps(undefined, "👯‍♀️ No. users:", totalUsers.toString(), undefined, undefined),
-                    DashboardLi.Props.createDashboardLiProps(undefined, "👷‍♀️ No. synths:", numberOfSynths, undefined, undefined),
-                    DashboardLi.Props.createDashboardLiProps(undefined, "⛽ Gas used:", Misc.NumberFormat.formatInt(totalGasUsed.toString()), undefined, undefined)
+                    StatsLi.Props.createStatsLiProps(undefined, "🗓️ Live since:", Format(dateObj, "do MMM ''yy"), Config.blockExplorer + "/tx/" + txHash, undefined),
+                    StatsLi.Props.createStatsLiProps(undefined, "📅 Days live:", FormatDistanceToNow(dateObj), undefined, undefined),
+                    StatsLi.Props.createStatsLiProps(undefined, "📈 No. txs:", totalTxs.toString(), undefined, undefined),
+                    StatsLi.Props.createStatsLiProps(undefined, "👯‍♀️ No. users:", totalUsers.toString(), undefined, undefined),
+                    StatsLi.Props.createStatsLiProps(undefined, "👷‍♀️ No. synths:", numberOfSynths, undefined, undefined),
+                    StatsLi.Props.createStatsLiProps(undefined, "⛽ Gas used:", Misc.NumberFormat.formatInt(totalGasUsed.toString()), undefined, undefined)
                   ]
                 }));
 }
@@ -144,13 +144,13 @@ function floatTokenCard(totalFloatMinted) {
               children: null
             }, React.createElement(Masonry.Header.make, {
                   children: "🌊🌊 Float Token 🌊🌊"
-                }), React.createElement(DashboardUl.make, {
+                }), React.createElement(StatsUl.make, {
                   list: [
-                    DashboardLi.Props.createDashboardLiProps(undefined, "😏 Float price:", "...", undefined, undefined),
-                    DashboardLi.Props.createDashboardLiProps(Caml_option.some(React.createElement(Tooltip.make, {
+                    StatsLi.Props.createStatsLiProps(undefined, "😏 Float price:", "...", undefined, undefined),
+                    StatsLi.Props.createStatsLiProps(Caml_option.some(React.createElement(Tooltip.make, {
                                   tip: "The number of Float tokens in circulation"
                                 })), "🗳 Float supply:", Misc.NumberFormat.formatEther(undefined, totalFloatMinted), undefined, undefined),
-                    DashboardLi.Props.createDashboardLiProps(undefined, "🧢 Market cap: ", "...", undefined, undefined)
+                    StatsLi.Props.createStatsLiProps(undefined, "🧢 Market cap: ", "...", undefined, undefined)
                   ]
                 }));
 }
@@ -170,10 +170,10 @@ function stakingCard(totalValueStaked) {
                   className: "text-left mt-4 pl-4 text-sm font-bold"
                 }, "Trending"), React.createElement("div", {
                   className: "pt-2 pb-5"
-                }, React.createElement(Dashboard$TrendingStakes, {})));
+                }, React.createElement(Stats$TrendingStakes, {})));
 }
 
-function Dashboard(Props) {
+function Stats(Props) {
   var globalStateQuery = Curry.app(Queries.GlobalState.use, [
         undefined,
         undefined,
@@ -223,10 +223,10 @@ function Dashboard(Props) {
       var match$3 = marketDetailsQuery.data;
       if (match$3 !== undefined) {
         var syntheticMarkets = match$3.syntheticMarkets;
-        var match$4 = DashboardCalcs.getTotalValueLockedAndTotalStaked(syntheticMarkets);
+        var match$4 = StatsCalcs.getTotalValueLockedAndTotalStaked(syntheticMarkets);
         var totalValueStaked = match$4.totalValueStaked;
         var totalValueLocked = match$4.totalValueLocked;
-        var totalSynthValue = DashboardCalcs.getTotalSynthValue(totalValueLocked, totalValueStaked);
+        var totalSynthValue = StatsCalcs.getTotalSynthValue(totalValueLocked, totalValueStaked);
         var numberOfSynths = String((syntheticMarkets.length << 1));
         tmp = React.createElement("div", {
               className: "w-full max-w-7xl flex flex-col self-center items-center justify-start"
@@ -251,9 +251,9 @@ function Dashboard(Props) {
             }, tmp);
 }
 
-var make = Dashboard;
+var make = Stats;
 
-var $$default = Dashboard;
+var $$default = Stats;
 
 exports.TrendingStakes = TrendingStakes;
 exports.totalValueCard = totalValueCard;

@@ -14,8 +14,7 @@ abstract contract IStaker {
     ) external virtual;
 
     function addNewStateForFloatRewards(
-        ISyntheticToken longTokenAddress,
-        ISyntheticToken shortTokenAddress,
+        uint32 marketIndex,
         uint256 longTokenPrice,
         uint256 shortTokenPrice,
         uint256 longValue,
@@ -25,6 +24,21 @@ abstract contract IStaker {
     function stakeFromMint(
         ISyntheticToken tokenAddress,
         uint256 amount,
+        address user
+    ) external virtual;
+
+    function stakeFromMintBatched(
+        uint32 marketIndex,
+        uint256 amount,
+        uint256 oracleUpdateIndex,
+        bool isLong
+    ) external virtual;
+
+    function transferBatchStakeToUser(
+        uint256 amountLong,
+        uint256 amountShort,
+        uint32 marketIndex,
+        uint256 oracleUpdateIndex,
         address user
     ) external virtual;
 

@@ -3,31 +3,30 @@
 
 var Chai = require("./bindings/chai/Chai.js");
 var LetOps = require("./library/LetOps.js");
+var Globals = require("./library/Globals.js");
 var Helpers = require("./library/Helpers.js");
-var Mocha$BsMocha = require("bs-mocha/src/Mocha.js");
-var Promise$BsMocha = require("bs-mocha/src/Promise.js");
 
-Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (function (param) {
-        return Mocha$BsMocha.describe("Admin")(undefined, undefined, undefined, (function (param) {
+Globals.describe("Float System")(undefined, undefined, undefined, (function (param) {
+        return Globals.describe("Admin")(undefined, undefined, undefined, (function (param) {
                       var contracts = {
                         contents: undefined
                       };
                       var accounts = {
                         contents: undefined
                       };
-                      Promise$BsMocha.before(undefined)(undefined, undefined, undefined, (function (param) {
+                      Globals.before$prime(undefined)(undefined, undefined, undefined, (function (param) {
                               return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
                                             accounts.contents = loadedAccounts;
                                             
                                           }));
                             }));
-                      Promise$BsMocha.before_each(undefined)(undefined, undefined, undefined, (function (param) {
-                              return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0]), (function (deployedContracts) {
+                      Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
+                              return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
                                             contracts.contents = deployedContracts;
                                             
                                           }));
                             }));
-                      return Promise$BsMocha.it("shouldn't allow non admin to update the oracle")(undefined, undefined, undefined, (function (param) {
+                      return Globals.it$prime("shouldn't allow non admin to update the oracle")(undefined, undefined, undefined, (function (param) {
                                     var newOracleAddress = ethers.Wallet.createRandom().address;
                                     var attackerAddress = accounts.contents[5];
                                     return Chai.expectRevert(contracts.contents.longShort.connect(attackerAddress).updateMarketOracle(1, newOracleAddress), "only admin");
@@ -35,25 +34,4 @@ Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (functio
                     }));
       }));
 
-var it$prime = Promise$BsMocha.it;
-
-var it_skip$prime = Promise$BsMocha.it_skip;
-
-var before_each = Promise$BsMocha.before_each;
-
-var before = Promise$BsMocha.before;
-
-var describe = Mocha$BsMocha.describe;
-
-var it = Mocha$BsMocha.it;
-
-var it_skip = Mocha$BsMocha.it_skip;
-
-exports.it$prime = it$prime;
-exports.it_skip$prime = it_skip$prime;
-exports.before_each = before_each;
-exports.before = before;
-exports.describe = describe;
-exports.it = it;
-exports.it_skip = it_skip;
 /*  Not a pure module */

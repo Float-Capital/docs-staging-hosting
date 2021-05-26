@@ -3,68 +3,68 @@
 
 var Chai = require("./bindings/chai/Chai.js");
 var LetOps = require("./library/LetOps.js");
+var Globals = require("./library/Globals.js");
 var Helpers = require("./library/Helpers.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
 var HelperActions = require("./library/HelperActions.js");
-var Mocha$BsMocha = require("bs-mocha/src/Mocha.js");
-var Promise$BsMocha = require("bs-mocha/src/Promise.js");
+var CalculateAccumulatedFloat = require("./tests/stake/CalculateAccumulatedFloat.js");
 
-Mocha$BsMocha.describe("Float System")(undefined, undefined, undefined, (function (param) {
-        return Mocha$BsMocha.describe("Staking")(undefined, undefined, undefined, (function (param) {
+Globals.describe("Float System")(undefined, undefined, undefined, (function (param) {
+        Globals.describe("Staking")(undefined, undefined, undefined, (function (param) {
+                var contracts = {
+                  contents: undefined
+                };
+                var accounts = {
+                  contents: undefined
+                };
+                Globals.before$prime(undefined)(undefined, undefined, undefined, (function (param) {
+                        return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
+                                      accounts.contents = loadedAccounts;
+                                      
+                                    }));
+                      }));
+                Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
+                        return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
+                                      contracts.contents = deployedContracts;
+                                      
+                                    }));
+                      }));
+                return Globals.it$prime("should correctly be able to stake their long/short tokens and view their staked amount immediately")(undefined, undefined, undefined, (function (param) {
+                              var match = contracts.contents;
+                              var staker = match.staker;
+                              var testUser = accounts.contents[1];
+                              return LetOps.Await.let_(HelperActions.stakeRandomlyInMarkets(match.markets, testUser, match.longShort), (function (param) {
+                                            return LetOps.Await.let_(Promise.all(Belt_Array.map(param[0], (function (stake) {
+                                                                  return LetOps.Await.let_(staker.userAmountStaked(stake.synth.address, testUser.address), (function (amountStaked) {
+                                                                                return Chai.bnEqual(undefined, amountStaked, stake.amount);
+                                                                              }));
+                                                                }))), (function (param) {
+                                                          
+                                                        }));
+                                          }));
+                            }));
+              }));
+        return Globals.describe("Staking - internals exposed")(undefined, undefined, undefined, (function (param) {
                       var contracts = {
                         contents: undefined
                       };
                       var accounts = {
                         contents: undefined
                       };
-                      Promise$BsMocha.before(undefined)(undefined, undefined, undefined, (function (param) {
+                      Globals.before$prime(undefined)(undefined, undefined, undefined, (function (param) {
                               return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
                                             accounts.contents = loadedAccounts;
                                             
                                           }));
                             }));
-                      Promise$BsMocha.before_each(undefined)(undefined, undefined, undefined, (function (param) {
-                              return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0]), (function (deployedContracts) {
+                      Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
+                              return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
                                             contracts.contents = deployedContracts;
                                             
                                           }));
                             }));
-                      return Promise$BsMocha.it("should correctly be able to stake their long/short tokens and view their staked amount immediately")(undefined, undefined, undefined, (function (param) {
-                                    var match = contracts.contents;
-                                    var staker = match.staker;
-                                    var testUser = accounts.contents[1];
-                                    return LetOps.Await.let_(HelperActions.stakeRandomlyInMarkets(match.markets, testUser, match.longShort), (function (param) {
-                                                  return LetOps.Await.let_(Promise.all(Belt_Array.map(param[0], (function (stake) {
-                                                                        return LetOps.Await.let_(staker.userAmountStaked(stake.synth.address, testUser.address), (function (amountStaked) {
-                                                                                      return Chai.bnEqual(amountStaked, stake.amount);
-                                                                                    }));
-                                                                      }))), (function (param) {
-                                                                
-                                                              }));
-                                                }));
-                                  }));
+                      return CalculateAccumulatedFloat.test(contracts);
                     }));
       }));
 
-var it$prime = Promise$BsMocha.it;
-
-var it_skip$prime = Promise$BsMocha.it_skip;
-
-var before_each = Promise$BsMocha.before_each;
-
-var before = Promise$BsMocha.before;
-
-var describe = Mocha$BsMocha.describe;
-
-var it = Mocha$BsMocha.it;
-
-var it_skip = Mocha$BsMocha.it_skip;
-
-exports.it$prime = it$prime;
-exports.it_skip$prime = it_skip$prime;
-exports.before_each = before_each;
-exports.before = before;
-exports.describe = describe;
-exports.it = it;
-exports.it_skip = it_skip;
 /*  Not a pure module */

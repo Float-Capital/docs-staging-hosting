@@ -1,8 +1,4 @@
-open BsMocha;
-let (it', it_skip', before_each, before) =
-  Promise.(it, it_skip, before_each, before);
-
-let (describe, it, it_skip) = Mocha.(describe, it, it_skip);
+open Globals;
 open LetOps;
 
 describe("Float System", () => {
@@ -10,14 +6,17 @@ describe("Float System", () => {
     let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
     let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
 
-    before(() => {
+    before'(() => {
       let%Await loadedAccounts = Ethers.getSigners();
       accounts := loadedAccounts;
     });
 
-    before_each(() => {
+    before_each'(() => {
       let%AwaitThen deployedContracts =
-        Helpers.inititialize(~admin=accounts.contents->Array.getUnsafe(0));
+        Helpers.inititialize(
+          ~admin=accounts.contents->Array.getUnsafe(0),
+          ~exposeInternals=false,
+        );
       contracts := deployedContracts;
       let setupUser = accounts.contents->Array.getUnsafe(2);
 
@@ -35,7 +34,7 @@ describe("Float System", () => {
       let {longShort, markets, staker} = contracts.contents;
       let testUser = accounts.contents->Array.getUnsafe(1);
 
-      let%Await (synthsUserHasStakedIn, marketsUserHasStakedIn) =
+      let%Await (_synthsUserHasStakedIn, marketsUserHasStakedIn) =
         HelperActions.stakeRandomlyInMarkets(
           ~marketsToStakeIn=markets,
           ~userToStakeWith=testUser,
@@ -47,29 +46,21 @@ describe("Float System", () => {
       let%Await _ =
         staker->Contract.Staker.claimFloatCustomUser(
           ~user=testUser,
-          ~syntheticTokens=
-            synthsUserHasStakedIn->Array.map(stake => stake##synth),
           ~markets=marketsUserHasStakedIn,
         );
 
       let%Await _ =
-        synthsUserHasStakedIn
-        ->Array.map(stake => {
+        marketsUserHasStakedIn
+        ->Array.map(market => {
             JsPromise.all2((
               staker->Contract.Staker.userIndexOfLastClaimedReward(
-                ~synthTokenAddr=stake##synth.address,
+                ~market,
                 ~user=testUser.address,
               ),
-              staker->Contract.Staker.latestRewardIndex(
-                ~synthTokenAddr=stake##synth.address,
-              ),
+              staker->Contract.Staker.latestRewardIndex(~market),
             ))
             ->JsPromise.map(((userLastClaimed, latestRewardIndex)) => {
-                // These values should be equal but they are not - investigate
-                Chai.bnEqual(
-                  userLastClaimed,
-                  latestRewardIndex,
-                )
+                Chai.bnEqual(userLastClaimed, latestRewardIndex)
               })
           })
         ->JsPromise.all;
