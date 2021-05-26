@@ -27,5 +27,20 @@ abstract contract IStaker {
         address user
     ) external virtual;
 
+    function stakeFromMintBatched(
+        uint32 marketIndex,
+        uint256 amount,
+        uint256 oracleUpdateIndex,
+        bool isLong
+    ) external virtual;
+
+    function transferBatchStakeToUser(
+        uint256 amountLong,
+        uint256 amountShort,
+        uint32 marketIndex,
+        uint256 oracleUpdateIndex,
+        address user
+    ) external virtual;
+
     function stakeFromUser(address from, uint256 amount) public virtual;
 }

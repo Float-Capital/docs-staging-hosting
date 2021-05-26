@@ -109,7 +109,7 @@ let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
     Treasury_v0.make(),
     FloatToken.make(),
     exposeInternals ? Staker.makeExposed() : Staker.make(),
-    LongShort.make(),
+    exposeInternals ? LongShort.makeExposed() : LongShort.make(),
     JsPromise.all2((
       PaymentToken.make(~name="Pay Token 1", ~symbol="PT1"),
       PaymentToken.make(~name="Pay Token 2", ~symbol="PT2"),

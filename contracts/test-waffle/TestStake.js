@@ -17,13 +17,13 @@ Globals.describe("Float System")(undefined, undefined, undefined, (function (par
                 var accounts = {
                   contents: undefined
                 };
-                Globals.before(undefined)(undefined, undefined, undefined, (function (param) {
+                Globals.before$prime(undefined)(undefined, undefined, undefined, (function (param) {
                         return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
                                       accounts.contents = loadedAccounts;
                                       
                                     }));
                       }));
-                Globals.before_each(undefined)(undefined, undefined, undefined, (function (param) {
+                Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
                         return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
                                       contracts.contents = deployedContracts;
                                       
@@ -51,13 +51,13 @@ Globals.describe("Float System")(undefined, undefined, undefined, (function (par
                       var accounts = {
                         contents: undefined
                       };
-                      Globals.before(undefined)(undefined, undefined, undefined, (function (param) {
+                      Globals.before$prime(undefined)(undefined, undefined, undefined, (function (param) {
                               return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
                                             accounts.contents = loadedAccounts;
                                             
                                           }));
                             }));
-                      Globals.before_each(undefined)(undefined, undefined, undefined, (function (param) {
+                      Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
                               return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
                                             contracts.contents = deployedContracts;
                                             
