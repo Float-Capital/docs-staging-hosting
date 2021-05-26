@@ -28,12 +28,14 @@ contract OracleManagerFlippening_V0 is IOracleManager {
 
     uint256 public ethUnclesPerDay;
 
-    uint256 public ethUncleReward; // 18 decimals
-
     // Eth has a variable uncle reward:
     //       - https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1234.md,
-    // Source here says it's roughly 75% on average:
+    // Source here says it's roughly 75%:
     //       - https://docs.ethhub.io/ethereum-basics/monetary-policy/
+    // Might be worth also looking into just taking it as the mean of the possibilities
+    //         = sum from 1 to 7 of (8 - sumIndex) * blockReward / 8 / 7
+
+    uint256 public ethUncleReward; // 18 decimals
 
     uint256 public ethNephewReward; // 18 decimals. currently = blockReward / 32
 
@@ -102,11 +104,11 @@ contract OracleManagerFlippening_V0 is IOracleManager {
         admin = _admin;
     }
 
-    function pegEthSupply(uint256 supply) external adminOnly {
+    function changeEthSupply(uint256 supply) external adminOnly {
         ethSupply = supply;
     }
 
-    function pegBtcSupply(uint256 supply) external adminOnly {
+    function changeBtcSupply(uint256 supply) external adminOnly {
         btcSupply = supply;
     }
 

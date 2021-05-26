@@ -1,15 +1,15 @@
-const { BN, time } = require("@openzeppelin/test-helpers");
+const { BN, expectRevert, time } = require("@openzeppelin/test-helpers");
 const { assert } = require("chai");
 
 const AggregatorV3 = artifacts.require("AggregatorV3Mock");
 
 const Flippening = artifacts.require("OracleManagerFlippening_V0");
 
-let bn = (a) => new BN(a);
+const bn = (a) => new BN(a);
 
-let oneBN = bn(1);
-let zeroBN = bn(0);
-let twoBN = bn(2);
+const oneBN = bn(1);
+const zeroBN = bn(0);
+const twoBN = bn(2);
 
 const tenToThe18 = bn("1000000000000000000");
 const oneEth = tenToThe18;
@@ -18,14 +18,13 @@ const tenToThe8 = bn("100000000");
 const oneBTC = tenToThe8;
 const oneDollar = tenToThe8;
 
-let with18Decimals = (int) => bn(int).mul(tenToThe18);
-let with8Decimals = (int) => bn(int).mul(tenToThe8);
+const with18Decimals = (int) => bn(int).mul(tenToThe18);
+const with8Decimals = (int) => bn(int).mul(tenToThe8);
 
-let asBTC = with8Decimals;
-let asETH = with18Decimals;
+const asBTC = with8Decimals;
+const asETH = with18Decimals;
 
-let asDollars = with8Decimals;
-
+const asDollars = with8Decimals;
 contract("OracleManager (Flippening V0)", (accounts) => {
   // Test users.
   const admin = accounts[0];
@@ -39,6 +38,21 @@ contract("OracleManager (Flippening V0)", (accounts) => {
     let oracle = await AggregatorV3.new({ from: admin });
     await oracle.setup(admin, initialPrice, decimals);
     return oracle;
+  };
+
+  // openzeppelin time increase unreliably off by a second
+  // sometimes. hacky workaround.
+  let increaseTime = async (increase) => {
+    let t = await time.latest();
+    await time.increase(increase - 1);
+    let t2 = await time.latest();
+
+    if (bn(t2).toString() != t.add(bn(increase)).toString()) {
+      await time.increase(1);
+    }
+
+    let t3 = await time.latest();
+    assert.equal(bn(t3).toString(), t.add(bn(increase)).toString());
   };
 
   let setup = async ({
@@ -75,27 +89,9 @@ contract("OracleManager (Flippening V0)", (accounts) => {
     );
   };
 
-  let testDominanceDynamic = async ({
-    timeIncrease,
-    expectedEthSupply,
-    expectedBtcSupply,
-    ethPriceNew,
-    btcPriceNew,
-    expectedDominance,
-  }) => {
-    await btcOracle.setPrice(btcPriceNew);
-    await ethOracle.setPrice(ethPriceNew);
-
-    await time.increase(timeIncrease - time.duration.seconds(2)); // one second per tx
-
-    await flippening.updatePrice();
-
-    testEthSupplyStatic(expectedEthSupply);
-    testBtcSupplyStatic(expectedBtcSupply);
-
-    let price = await flippening.getLatesPrice.call();
-
-    assert.equal(price.toString(), expectedDominance.toString());
+  let testPropertyStatic = async (expectedVal, propertyCall) => {
+    let val = await propertyCall();
+    assert.equal(val.toString(), expectedVal.toString());
   };
 
   describe("dominance calc", () => {
@@ -108,9 +104,10 @@ contract("OracleManager (Flippening V0)", (accounts) => {
     }) => async () => {
       await setup({ btcSupply, ethSupply, btcPrice, ethPrice });
 
-      // initial dominance determined by set supply and oracle prices
-      let price = await flippening.getLatestPrice.call();
-      assert.equal(price.toString(), expectedDominance.toString());
+      await testPropertyStatic(
+        expectedDominance,
+        flippening.getLatestPrice.call
+      );
     };
 
     it(
@@ -169,15 +166,7 @@ contract("OracleManager (Flippening V0)", (accounts) => {
     );
   });
 
-  let testSupplyStatic = async (expectedSupply, supplyFuncCall) => {
-    let supply = await supplyFuncCall();
-    assert.equal(supply.toString(), expectedSupply.toString());
-  };
-
   describe("btc supply gain", () => {
-    let testBtcSupplyStatic = async (expectedSupply) =>
-      await testSupplyStatic(expectedSupply, flippening.btcSupply);
-
     let testBtcSupplyGain = ({
       btcBlocksPerDay,
       btcBlockReward,
@@ -185,9 +174,9 @@ contract("OracleManager (Flippening V0)", (accounts) => {
       expectedSupplyIncrease,
     }) => async () => {
       await setup({ btcBlocksPerDay, btcBlockReward, btcSupply: zeroBN });
-      await time.increase(timeIncrease - time.duration.seconds(1));
-      await flippening.updatePrice(); // each tx increments seconds by 1
-      await testBtcSupplyStatic(expectedSupplyIncrease);
+      await increaseTime(timeIncrease - time.duration.seconds(1)); // next tx increments seconds by 1
+      await flippening.updatePrice();
+      await testPropertyStatic(expectedSupplyIncrease, flippening.btcSupply);
     };
 
     describe("increases by blockReward * blocksPerDay per day", () => {
@@ -249,9 +238,6 @@ contract("OracleManager (Flippening V0)", (accounts) => {
   });
 
   describe("eth supply gain", () => {
-    let testEthSupplyStatic = async (expectedSupply) =>
-      await testSupplyStatic(expectedSupply, flippening.ethSupply);
-
     let testEthSupplyGain = ({
       ethBlocksPerDay,
       ethBlockReward,
@@ -269,15 +255,16 @@ contract("OracleManager (Flippening V0)", (accounts) => {
         ethUnclesPerDay,
         ethSupply: zeroBN,
       });
-      await time.increase(timeIncrease - time.duration.seconds(1));
+      await increaseTime(timeIncrease - time.duration.seconds(1));
       await flippening.updatePrice(); // each tx increments seconds by 1
-      await testEthSupplyStatic(expectedSupplyIncrease);
+      await testPropertyStatic(expectedSupplyIncrease, flippening.ethSupply);
     };
 
     describe("increases by blockReward * blocksPerDay + (uncleReward + nephewReward) * unclesPerDay per day", () => {
       let defaultUncleReward = oneEth.mul(bn(3)).div(bn(4)); // 0.75 ETH
       let halfUncleReward = defaultUncleReward.div(twoBN);
       let defaultNephewReward = oneEth.div(bn(32));
+      let halfNephewReward = defaultNephewReward.div(twoBN);
       let pointFiveEth = oneEth.div(twoBN);
       it(
         "sanity check",
@@ -340,7 +327,22 @@ contract("OracleManager (Flippening V0)", (accounts) => {
       );
 
       it(
-        "uncle reward decreases, supply change decreases",
+        "nephew reward decreases, supply change decreases",
+        testEthSupplyGain({
+          ethBlocksPerDay: oneBN,
+          ethUnclesPerDay: oneBN,
+          ethBlockReward: oneEth,
+          ethUncleReward: defaultUncleReward,
+          ethNephewReward: halfNephewReward, // 1/64 ETH,
+          timeIncrease: time.duration.days(1),
+          expectedSupplyIncrease: oneEth
+            .add(defaultUncleReward)
+            .add(halfNephewReward),
+        })
+      );
+
+      it(
+        "nephew reward decreases, supply change decreases",
         testEthSupplyGain({
           ethBlocksPerDay: oneBN,
           ethUnclesPerDay: oneBN,
@@ -353,18 +355,164 @@ contract("OracleManager (Flippening V0)", (accounts) => {
             .add(defaultNephewReward),
         })
       );
+    });
 
-      // TO DO: NEPHEW TEST + OTHER. FINAL INTEGRATION TEST WOULD BE NICE
+    describe("increases linearly over time", () => {
+      it(
+        "case less than a day",
+        testEthSupplyGain({
+          ethBlocksPerDay: oneBN,
+          ethUnclesPerDay: oneBN,
+          ethBlockReward: asETH(2),
+          ethUncleReward: oneEth,
+          ethNephewReward: oneEth,
+          timeIncrease: time.duration.hours(12),
+          expectedSupplyIncrease: asETH(2), // (2 + (1 + 1))./2
+        })
+      );
 
-      // it(
-      //   "blocks increase, supply increases",
-      //   testBtcSupplyGain({
-      //     btcBlocksPerDay: twoBN,
-      //     btcBlockReward: asBTC(2),
-      //     timeIncrease: time.duration.days(1),
-      //     expectedSupplyIncrease: asBTC(4),
-      //   })
-      // );
+      it(
+        "case more than a day",
+        testEthSupplyGain({
+          ethBlocksPerDay: oneBN,
+          ethUnclesPerDay: oneBN,
+          ethBlockReward: asETH(2),
+          ethUncleReward: oneEth,
+          ethNephewReward: oneEth,
+          timeIncrease: time.duration.hours(36),
+          expectedSupplyIncrease: asETH(6), // (2 + (1 + 1)) * 3 / 2
+        })
+      );
+    });
+  });
+
+  describe("integration", () => {
+    it("handles price changes and estimated supply increases over time", async () => {
+      await setup({
+        btcSupply: oneBTC,
+        ethSupply: oneEth,
+        btcBlocksPerDay: bn(5),
+        ethBlocksPerDay: oneBN,
+        ethUnclesPerDay: oneBN,
+        btcBlockReward: oneBTC,
+        ethBlockReward: oneEth,
+        ethUncleReward: oneEth.div(twoBN),
+        ethNephewReward: oneEth.div(twoBN),
+        ethPrice: oneDollar,
+        btcPrice: oneDollar,
+      });
+
+      await testPropertyStatic(
+        with18Decimals(50),
+        flippening.getLatestPrice.call
+      );
+
+      await increaseTime(time.duration.days(1) - time.duration.seconds(3)); // last seconds in next 3 txs
+
+      await ethOracle.setPrice(asDollars(2));
+      await btcOracle.setPrice(asDollars(1));
+      await flippening.updatePrice();
+
+      await testPropertyStatic(asETH(3), flippening.ethSupply);
+      await testPropertyStatic(asBTC(6), flippening.btcSupply);
+
+      await testPropertyStatic(
+        with18Decimals(50),
+        flippening.getLatestPrice.call
+      );
+    });
+  });
+
+  describe("admin funcs", () => {
+    beforeEach(async () => {
+      await setup({ btcPrice: oneBTC, ethPrice: oneEth });
+    });
+
+    let adminTest = async ({ adminCall, propertyCall, newValue }) => {
+      // all other params have a value of 1
+      await expectRevert.unspecified(adminCall(newValue, { from: user }));
+      await adminCall(newValue, { from: admin });
+      testPropertyStatic(newValue, propertyCall);
+    };
+
+    it("change admin", async () => {
+      await adminTest({
+        adminCall: flippening.changeAdmin,
+        propertyCall: flippening.admin,
+        newValue: user,
+      });
+    });
+
+    it("change ethSupply", async () => {
+      await adminTest({
+        adminCall: flippening.changeEthSupply,
+        propertyCall: flippening.ethSupply,
+        newValue: asETH(500),
+      });
+    });
+
+    it("change btcSupply", async () => {
+      await adminTest({
+        adminCall: flippening.changeBtcSupply,
+        propertyCall: flippening.btcSupply,
+        newValue: asBTC(300),
+      });
+    });
+
+    it("change btcBlocksPerDay", async () => {
+      await adminTest({
+        adminCall: flippening.changeBtcBlocksPerDay,
+        propertyCall: flippening.btcBlocksPerDay,
+        newValue: bn(20),
+      });
+    });
+
+    it("change ethBlocksPerDay", async () => {
+      await adminTest({
+        adminCall: flippening.changeEthBlocksPerDay,
+        propertyCall: flippening.ethBlocksPerDay,
+        newValue: bn(40),
+      });
+    });
+
+    it("change ethUnclesPerDay", async () => {
+      await adminTest({
+        adminCall: flippening.changeEthUnclesPerDay,
+        propertyCall: flippening.ethUnclesPerDay,
+        newValue: bn(30),
+      });
+    });
+
+    it("change btcBlockReward", async () => {
+      await adminTest({
+        adminCall: flippening.changeBtcBlockReward,
+        propertyCall: flippening.btcBlockReward,
+        newValue: asBTC(5),
+      });
+    });
+
+    it("change ethBlockReward", async () => {
+      await adminTest({
+        adminCall: flippening.changeEthBlockReward,
+        propertyCall: flippening.ethBlockReward,
+        newValue: asETH(4),
+      });
+    });
+
+    it("change ethUncleReward", async () => {
+      await adminTest({
+        adminCall: flippening.changeEthUncleReward,
+        propertyCall: flippening.ethUncleReward,
+        newValue: asETH(2),
+      });
+    });
+
+    it("change ethNephewReward", async () => {
+      await adminTest({
+        adminCall: flippening.changeEthNephewReward,
+        propertyCall: flippening.ethNephewReward,
+        newValue: asETH(3),
+      });
     });
   });
 });
