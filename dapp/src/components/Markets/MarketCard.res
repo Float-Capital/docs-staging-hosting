@@ -107,7 +107,7 @@ let make = (
 
   <Next.Link href={`/?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
     <div
-      className="p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-70 cursor-pointer shadow-lg hover:shadow-xl h-full justify-center w-full">
+      className="p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 cursor-pointer shadow-lg hover:shadow-xl h-full justify-center w-full">
       <div className="flex justify-center w-full my-1">
         <h1 className="font-bold text-xl font-alphbeta cursor-pointer hover:underline">
           {marketName->React.string} <Tooltip tip={`This market tracks ${marketName}`} />

@@ -6,9 +6,9 @@ dataSources:
     name: LongShort
     network: mumbai
     source:
-      address: "0x611873340921C662F21908Bcd2e522c819bE2E72"
+      address: "0x5bCa9c0823e7F5fBDB856Ae6a410ACaf2ff81B8D"
       abi: LongShort
-      startBlock: 13493100
+      startBlock: 14217187
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -30,7 +30,7 @@ dataSources:
         - name: LongShort
           file: ./abis/LongShort.json
       eventHandlers:
-        - event: V1(address,address,address)
+        - event: V1(address,address,address,address)
           handler: handleV1
         - event: FeesLevied(uint32,uint256)
           handler: handleFeesLevied
@@ -60,9 +60,9 @@ dataSources:
     name: Staker
     network: mumbai
     source:
-      address: "0xC3F7a1D9fC389bc0790b88A427118692050dA1c9"
+      address: "0x0c3F85F6E60B174A8A606F5e08fdBF63e213D11A"
       abi: Staker
-      startBlock: 13493100
+      startBlock: 14217166
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -79,16 +79,16 @@ dataSources:
       eventHandlers:
         - event: DeployV1(address)
           handler: handleDeployV1
-        - event: StateAdded(address,uint256,uint256,uint256)
+        - event: StateAdded(uint32,uint256,uint256,uint256,uint256)
           handler: handleStateAdded
         - event: StakeAdded(address,address,uint256,uint256)
           handler: handleStakeAdded
         - event: StakeWithdrawn(address,address,uint256)
           handler: handleStakeWithdrawn
-        - event: FloatMinted(address,address,uint256,uint256)
+        - event: FloatMinted(address,uint32,uint256,uint256,uint256)
           handler: handleFloatMinted
-        - event: KFactorParametersChanges(uint32,uint256,uint256)
-          handler: handleKFactorParametersChanges
+        - event: MarketLaunchIncentiveParametersChanges(uint32,uint256,uint256)
+          handler: handleMarketLaunchIncentiveParametersChanges
       file: ./src/staker.ts
 
 templates:

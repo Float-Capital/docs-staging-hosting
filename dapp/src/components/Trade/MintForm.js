@@ -560,6 +560,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
   var tokenToMint = Props.tokenToMint;
   var buttonText = Props.buttonText;
   var buttonDisabled = Props.buttonDisabled;
+  var isStaking = Props.isStaking;
   var randomMintTweetMessage = function (isLong, marketName) {
     var position = isLong ? "long" : "short";
     var possibleTweetMessages = [
@@ -702,12 +703,12 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                                     className: "text-center m-3"
                                   }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement(TweetButton.make, {
                                         message: randomMintTweetMessage(isLong, marketName)
-                                      }), React.createElement(Metamask.AddTokenButton.make, {
-                                        token: Config.config.contracts.FloatToken,
-                                        tokenSymbol: (
-                                          isLong ? "↗️" : "↘️"
-                                        ) + marketName
-                                      }), React.createElement(ViewPositionButton.make, {}))
+                                      }), isStaking ? null : React.createElement(Metamask.AddTokenButton.make, {
+                                          token: Config.config.contracts.FloatToken,
+                                          tokenSymbol: (
+                                            isLong ? "↗️" : "↘️"
+                                          ) + marketName
+                                        }), React.createElement(ViewPositionButton.make, {}))
                             }));
           case /* Failed */3 :
               return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
@@ -1136,7 +1137,8 @@ function MintForm$MintFormSignedIn(Props) {
                     marketName: market.name,
                     tokenToMint: tokenToMint,
                     buttonText: match$5[1],
-                    buttonDisabled: match$5[2]
+                    buttonDisabled: match$5[2],
+                    isStaking: form.input.isStaking
                   })
             });
 }

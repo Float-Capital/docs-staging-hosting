@@ -6,8 +6,12 @@ var Js_math = require("bs-platform/lib/js/js_math.js");
 var Contract = require("./Contract.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
 
+function randomInteger(param) {
+  return ethers.BigNumber.from(Js_math.random_int(1, Js_int.max));
+}
+
 function randomTokenAmount(param) {
-  return ethers.BigNumber.from(Js_math.random_int(0, Js_int.max)).mul(ethers.BigNumber.from(100000));
+  return ethers.BigNumber.from(Js_math.random_int(1, Js_int.max)).mul(ethers.BigNumber.from("10000000000000"));
 }
 
 function randomMintLongShort(param) {
@@ -76,13 +80,13 @@ function getAllMarkets(longShort) {
             });
 }
 
-function inititialize(admin) {
+function inititialize(admin, exposeInternals) {
   return Promise.all([
                 Contract.FloatCapital_v0.make(undefined),
                 Contract.Treasury_v0.make(undefined),
                 Contract.FloatToken.make(undefined),
-                Contract.Staker.make(undefined),
-                Contract.LongShort.make(undefined),
+                exposeInternals ? Contract.Staker.makeExposed(undefined) : Contract.Staker.make(undefined),
+                exposeInternals ? Contract.LongShort.makeExposed(undefined) : Contract.LongShort.make(undefined),
                 Promise.all([
                       Contract.PaymentToken.make("Pay Token 1", "PT1"),
                       Contract.PaymentToken.make("Pay Token 2", "PT2")
@@ -131,6 +135,7 @@ function inititialize(admin) {
 
 var increaseTime = ((seconds) => ethers.provider.send("evm_increaseTime", [seconds]));
 
+exports.randomInteger = randomInteger;
 exports.randomTokenAmount = randomTokenAmount;
 exports.randomMintLongShort = randomMintLongShort;
 exports.createSyntheticMarket = createSyntheticMarket;

@@ -53,6 +53,7 @@ module SubmitButtonAndTxTracker = {
     ~tokenToMint,
     ~buttonText,
     ~buttonDisabled,
+    ~isStaking,
   ) => {
     let randomMintTweetMessage = (isLong, marketName) => {
       let position = isLong ? "long" : "short"
@@ -147,10 +148,12 @@ module SubmitButtonAndTxTracker = {
             <Tick />
             <p> {`Transaction complete 🎉`->React.string} </p>
             <TweetButton message={randomMintTweetMessage(isLong, marketName)} />
-            <Metamask.AddTokenButton
-              token={Config.config.contracts.floatToken}
-              tokenSymbol={`${isLong ? `↗️` : `↘️`}${marketName}`}
-            />
+            {!isStaking
+              ? <Metamask.AddTokenButton
+                  token={Config.config.contracts.floatToken}
+                  tokenSymbol={`${isLong ? `↗️` : `↘️`}${marketName}`}
+                />
+              : React.null}
             <ViewPositionButton />
           </div>
         </Modal>
@@ -473,6 +476,7 @@ module MintFormSignedIn = {
         txStateApprove
         txStateMint=txState
         buttonDisabled
+        isStaking={form.input.isStaking}
         isLong
         marketName={market.name}
       />}
