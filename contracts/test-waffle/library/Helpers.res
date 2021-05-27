@@ -42,13 +42,14 @@ let randomMintLongShort = () => {
 let createSyntheticMarket = (
   ~admin,
   ~longShort: LongShort.t,
+  ~treasury: Treasury_v0.t,
   ~fundToken: PaymentToken.t,
   ~marketName,
   ~marketSymbol,
 ) => {
   JsPromise.all2((
     OracleManagerMock.make(admin),
-    YieldManagerMock.make(admin, longShort.address, fundToken.address),
+    YieldManagerMock.make(admin, longShort.address, treasury.address, fundToken.address),
   ))->JsPromise.then(((oracleManager, yieldManager)) => {
     let _ignorePromise = fundToken->PaymentToken.grantMintRole(~user=yieldManager.address)
     longShort
@@ -146,6 +147,7 @@ let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
             createSyntheticMarket(
               ~admin=admin.address,
               ~longShort,
+              ~treasury,
               ~fundToken=paymentToken,
               ~marketName=`Test Market ${index->Int.toString}`,
               ~marketSymbol=`TM${index->Int.toString}`,

@@ -14,6 +14,7 @@ external attachAtAddress: (contractFactory, ~contractAddress: Ethers.ethAddress)
 @send external deploy2: (contractFactory, 'a, 'b) => JsPromise.t<t> = "deploy"
 @send external deploy3: (contractFactory, 'a, 'b, 'c) => JsPromise.t<t> = "deploy"
 @send external deploy4: (contractFactory, 'a, 'b, 'c, 'd) => JsPromise.t<t> = "deploy"
+@send external deploy7: (contractFactory, 'a, 'b, 'c, 'd, 'e, 'f, 'g) => JsPromise.t<t> = "deploy"
 
 @send external deployed: t => JsPromise.t<unit> = "deployed"
 
@@ -34,6 +35,36 @@ let deployContract2 = (contractName, firstParam, secondParam) => {
 let deployContract3 = (contractName, firstParam, secondParam, thirdParam) => {
   getContractFactory(contractName)
   ->JsPromise.then(deploy3(_, firstParam, secondParam, thirdParam))
+  ->JsPromise.then(deployed)
+}
+let deployContract4 = (contractName, firstParam, secondParam, thirdParam, fourthParam) => {
+  getContractFactory(contractName)
+  ->JsPromise.then(deploy4(_, firstParam, secondParam, thirdParam, fourthParam))
+  ->JsPromise.then(deployed)
+}
+let deployContract7 = (
+  contractName,
+  firstParam,
+  secondParam,
+  thirdParam,
+  fourthParam,
+  fifthParam,
+  sixthParam,
+  seventhParam,
+) => {
+  getContractFactory(contractName)
+  ->JsPromise.then(
+    deploy7(
+      _,
+      firstParam,
+      secondParam,
+      thirdParam,
+      fourthParam,
+      fifthParam,
+      sixthParam,
+      seventhParam,
+    ),
+  )
   ->JsPromise.then(deployed)
 }
 
@@ -96,11 +127,19 @@ module YieldManagerMock = {
   type t = {address: Ethers.ethAddress}
   let contractName = "YieldManagerMock"
 
-  let make: (Ethers.ethAddress, Ethers.ethAddress, Ethers.ethAddress) => JsPromise.t<t> = (
-    admin,
-    longShortAddress,
-    fundTokenAddress,
-  ) => deployContract3(contractName, admin, longShortAddress, fundTokenAddress)->Obj.magic
+  let make: (
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+  ) => JsPromise.t<t> = (admin, longShortAddress, treasuryAddress, fundTokenAddress) =>
+    deployContract4(
+      contractName,
+      admin,
+      longShortAddress,
+      treasuryAddress,
+      fundTokenAddress,
+    )->Obj.magic
   let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
     attachToContract(contractName, ~contractAddress)->Obj.magic
 }
@@ -151,16 +190,17 @@ module LongShort = {
     ~kInitialMultiplier: Ethers.BigNumber.t,
     ~kPeriod: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "initializeMarket"
-  
+
   type batchedLazyDeposit = {
     mintLong: Ethers.BigNumber.t,
     mintShort: Ethers.BigNumber.t,
     mintAndStakeLong: Ethers.BigNumber.t,
-    mintAntStakeShort: Ethers.BigNumber.t
+    mintAntStakeShort: Ethers.BigNumber.t,
   }
-  
+
   @send
-  external batchedLazyDeposit: (t, ~marketIndex: int) => JsPromise.t<batchedLazyDeposit> = "batchedLazyDeposit"
+  external batchedLazyDeposit: (t, ~marketIndex: int) => JsPromise.t<batchedLazyDeposit> =
+    "batchedLazyDeposit"
 
   @send
   external fundTokens: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "fundTokens"
@@ -228,13 +268,18 @@ module LongShort = {
   ) => JsPromise.t<transaction> = "updateMarketOracle"
 
   type userLazyActionsStruct = {
-        usersCurrentUpdateIndex: Ethers.BigNumber.t,
-        mintLong: Ethers.BigNumber.t,
-        mintShort: Ethers.BigNumber.t,
-        mintAndStakeLong: Ethers.BigNumber.t,
-        mintAndStakeShort: Ethers.BigNumber.t,
+    usersCurrentUpdateIndex: Ethers.BigNumber.t,
+    mintLong: Ethers.BigNumber.t,
+    mintShort: Ethers.BigNumber.t,
+    mintAndStakeLong: Ethers.BigNumber.t,
+    mintAndStakeShort: Ethers.BigNumber.t,
   }
-  @send external userLazyActions: (t, ~marketIndex: int, ~user:Ethers.ethAddress) => JsPromise.t<userLazyActionsStruct> = "useruserLazyActions"
+  @send
+  external userLazyActions: (
+    t,
+    ~marketIndex: int,
+    ~user: Ethers.ethAddress,
+  ) => JsPromise.t<userLazyActionsStruct> = "useruserLazyActions"
 
   module Exposed = {
     @send
@@ -333,7 +378,7 @@ module LongShort = {
     @send
     external setUseexecuteOutstandingLazySettlementsMock: (
       t,
-      ~shouldUseMock: bool
+      ~shouldUseMock: bool,
     ) => JsPromise.t<transaction> = "setUseexecuteOutstandingLazySettlementsMock"
   }
 }

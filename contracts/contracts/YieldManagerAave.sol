@@ -19,6 +19,7 @@ contract YieldManagerAave is IYieldManager {
     // Admin contracts.
     address public admin;
     address public longShort;
+    address public treasury;
 
     // Global state.
     ERC20 public token; // underlying asset token
@@ -41,6 +42,11 @@ contract YieldManagerAave is IYieldManager {
         _;
     }
 
+    modifier treasuryOnly() {
+        require(msg.sender == treasury, "Not treasury");
+        _;
+    }
+
     ////////////////////////////////////
     ///// CONTRACT SET-UP //////////////
     ////////////////////////////////////
@@ -53,6 +59,7 @@ contract YieldManagerAave is IYieldManager {
     constructor(
         address _admin,
         address _longShort,
+        address _treasury,
         address _token,
         address _aToken,
         address _lendingPool,
@@ -60,6 +67,7 @@ contract YieldManagerAave is IYieldManager {
     ) {
         admin = _admin;
         longShort = _longShort;
+        treasury = _treasury;
 
         referralCode = _aaveReferalCode;
 
@@ -99,11 +107,27 @@ contract YieldManagerAave is IYieldManager {
     function withdrawToken(uint256 amount) public override longShortOnly {
         // Redeem aToken for underlying asset tokens.
         // This will fail if not enough liquidity is avaiable on aave.
-        uint256 amountWithdrawn =
-            lendingPool.withdraw(address(token), amount, address(this));
+        lendingPool.withdraw(address(token), amount, address(this));
 
         // Transfer tokens back to LongShort contract.
         token.transfer(longShort, amount);
+    }
+
+    function withdrawErc20TokenToTreasury(address erc20Token)
+        external
+        override
+        treasuryOnly
+    {
+        // Redeem other erc20 tokens.
+        // Transfer tokens back to Treasury contract.
+        require(
+            erc20Token != address(aToken),
+            "Cannot withdraw aToken to treasury"
+        );
+
+        uint256 amount = IERC20Upgradeable(erc20Token).balanceOf(address(this));
+        // Transfer tokens to treasury
+        IERC20Upgradeable(erc20Token).transfer(treasury, amount);
     }
 
     function getTotalHeld() public view override returns (uint256 amount) {
