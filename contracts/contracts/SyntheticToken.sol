@@ -59,6 +59,10 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         address recipient,
         uint256 amount
     ) internal override {
+        // TODO: this code is not in its final state. It should allow users to spend tokens before the lazy settlement (implementation belongs in longshort not here)
+        //       Case where next price update hasn't occurred
+        //            -- subcase 1: it is BELOW the safety threshold - keep exectution lazy and give the user the number of tokens they desire
+        //            -- subcase 2: it is ABOVE the safety threshold - do a full 'immediate' execution.
         longShort.executeOutstandingLazySettlementsSynth(
             sender,
             marketIndex,

@@ -687,9 +687,16 @@ contract LongShort is ILongShort, Initializable {
             longValue[marketIndex] = longValue[marketIndex] + tokensLong;
             if (currentMarketBatchedLazyDeposit.mintAndStakeLong > 0) {
                 // TODO: we must modify staker so that the view function for the users stake shows them having the stake (and not the LongShort contract)
+
+                // NOTE: no fees are calculated, but if they are desired in the future they can be added here.
+
+                uint256 amountToStake =
+                    (currentMarketBatchedLazyDeposit.mintAndStakeShort *
+                        TEN_TO_THE_18) / longTokenPrice[marketIndex];
+
                 staker.stakeFromMintBatched(
                     marketIndex,
-                    currentMarketBatchedLazyDeposit.mintAndStakeLong,
+                    amountToStake,
                     latestUpdateIndex[marketIndex],
                     true
                 );
