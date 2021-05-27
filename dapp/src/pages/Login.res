@@ -18,15 +18,15 @@ let connectors = [
     connectionPhrase: "Connect via WalletConnect",
     img: "/img/wallet-icons/walletConnect.svg",
   },
-  {
-    name: "Torus",
-    connector: TorusConnector.make({
-      chainId: Config.networkId,
-      initOptions: {showTorusButton: false},
-    }),
-    connectionPhrase: "Connect via Torus",
-    img: "/img/wallet-icons/torus.svg",
-  },
+  // {
+  //   name: "Torus",
+  //   connector: TorusConnector.make({
+  //     chainId: Config.networkId,
+  //     initOptions: {showTorusButton: false},
+  //   }),
+  //   connectionPhrase: "Connect via Torus",
+  //   img: "/img/wallet-icons/torus.svg",
+  // },
 ]
 
 let metamaskDefaultChainIds = Set.Int.fromArray([1, 3, 4, 5, 42])
@@ -110,7 +110,7 @@ let make = () => {
       } else {
         React.null
       }}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center my-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center my-5">
         {connectors
         ->Array.mapWithIndex((index, connector) =>
           <div
