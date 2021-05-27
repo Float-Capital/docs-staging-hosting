@@ -8,8 +8,8 @@ var React = require("react");
 var Loader = require("../UI/Base/Loader.js");
 var Js_math = require("rescript/lib/js/js_math.js");
 var TweetButton = require("../UI/TweetButton.js");
+var ViewProfileButton = require("../UI/ViewProfileButton.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
-var ViewPositionButton = require("../UI/ViewPositionButton.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
 
 function StakeTxStatusModal(Props) {
@@ -63,7 +63,7 @@ function StakeTxStatusModal(Props) {
                             className: "text-center m-3"
                           }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement(TweetButton.make, {
                                 message: randomStakeTweetMessage
-                              }), React.createElement(ViewPositionButton.make, {})), Curry._1(resetFormButton, undefined)));
+                              }), React.createElement(ViewProfileButton.make, {})), Curry._1(resetFormButton, undefined)));
     case /* Failed */3 :
         return React.createElement(Modal.make, {
                     id: "stake-6",

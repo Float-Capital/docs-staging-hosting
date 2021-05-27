@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.3;
 
-import "./interfaces/IOracleManager.sol";
+import "../interfaces/IOracleManager.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 /*

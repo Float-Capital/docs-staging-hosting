@@ -2,42 +2,13 @@
 'use strict';
 
 var React = require("react");
-var Ethers = require("../../ethereum/Ethers.js");
 var Loader = require("../UI/Base/Loader.js");
-var CONSTANTS = require("../../CONSTANTS.js");
 var DataHooks = require("../../data/DataHooks.js");
 var StakeCard = require("./StakeCard.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var Belt_Option = require("rescript/lib/js/belt_Option.js");
-var RootProvider = require("../../libraries/RootProvider.js");
-var Belt_HashSetString = require("rescript/lib/js/belt_HashSetString.js");
 
 function StakeList(Props) {
   var marketDetailsQuery = DataHooks.useGetMarkets(undefined);
-  var user = RootProvider.useCurrentUser(undefined);
-  var currentBalancesOrAdrZeroBalances = DataHooks.useUsersBalances(Ethers.Utils.ethAdrToLowerStr(Belt_Option.getWithDefault(user, CONSTANTS.zeroAddress)));
-  var optUserBalanceAddressSet = Belt_Option.mapWithDefault(user, undefined, (function (param) {
-          if (typeof currentBalancesOrAdrZeroBalances === "number") {
-            return /* Loading */0;
-          } else if (currentBalancesOrAdrZeroBalances.TAG === /* GraphError */0) {
-            return {
-                    TAG: 0,
-                    _0: currentBalancesOrAdrZeroBalances._0,
-                    [Symbol.for("name")]: "GraphError"
-                  };
-          } else {
-            return {
-                    TAG: 1,
-                    _0: Belt_Array.reduce(currentBalancesOrAdrZeroBalances._0.balances, Belt_HashSetString.fromArray([]), (function (set, balance) {
-                            if (balance.tokenBalance.gt(CONSTANTS.zeroBN)) {
-                              Belt_HashSetString.add(set, Ethers.Utils.ethAdrToStr(balance.addr));
-                            }
-                            return set;
-                          })),
-                    [Symbol.for("name")]: "Response"
-                  };
-          }
-        }));
   var tmp;
   tmp = typeof marketDetailsQuery === "number" ? React.createElement("div", {
           className: "m-auto"
@@ -45,7 +16,6 @@ function StakeList(Props) {
       marketDetailsQuery.TAG === /* GraphError */0 ? "Error: " + marketDetailsQuery._0 : React.createElement("div", undefined, Belt_Array.map(marketDetailsQuery._0, (function (syntheticMarket) {
                     return React.createElement(StakeCard.make, {
                                 syntheticMarket: syntheticMarket,
-                                optUserBalanceAddressSet: optUserBalanceAddressSet,
                                 key: syntheticMarket.name
                               });
                   })))

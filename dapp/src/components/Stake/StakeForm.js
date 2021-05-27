@@ -16,7 +16,6 @@ var Formality = require("re-formality/src/Formality.js");
 var AmountInput = require("../UI/Base/AmountInput.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var RootProvider = require("../../libraries/RootProvider.js");
-var ContractHooks = require("../Testing/Admin/ContractHooks.js");
 var ToastProvider = require("../UI/ToastProvider.js");
 var ContractActions = require("../../ethereum/ContractActions.js");
 var StakeTxStatusModal = require("./StakeTxStatusModal.js");
@@ -408,15 +407,6 @@ var initialInput = {
   amount: ""
 };
 
-function useBalanceAndApproved(erc20Address, spender) {
-  var match = ContractHooks.useErc20BalanceRefresh(erc20Address);
-  var match$1 = ContractHooks.useERC20ApprovedRefresh(erc20Address, spender);
-  return [
-          match.data,
-          match$1.data
-        ];
-}
-
 function StakeForm$StakeFormInput(Props) {
   var onSubmitOpt = Props.onSubmit;
   var valueOpt = Props.value;
@@ -446,7 +436,7 @@ function StakeForm$StakeFormInput(Props) {
       });
   var txStatusModals = txStatusModalsOpt !== undefined ? Caml_option.valFromOption(txStatusModalsOpt) : null;
   return React.createElement(Form.make, {
-              className: "mx-auto max-w-3xl",
+              className: "mx-auto w-full",
               onSubmit: onSubmit,
               children: null
             }, React.createElement(AmountInput.make, {
@@ -664,7 +654,6 @@ var make = StakeForm$1;
 
 exports.StakeForm = StakeForm;
 exports.initialInput = initialInput;
-exports.useBalanceAndApproved = useBalanceAndApproved;
 exports.StakeFormInput = StakeFormInput;
 exports.ConnectedStakeForm = ConnectedStakeForm;
 exports.make = make;

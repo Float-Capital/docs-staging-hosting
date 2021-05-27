@@ -217,6 +217,25 @@ contract LongShort is ILongShort, Initializable {
         _;
     }
 
+    modifier isCorrectSynth(
+        uint32 marketIndex,
+        bool isLong,
+        ISyntheticToken syntheticToken
+    ) {
+        if (isLong) {
+            require(
+                longTokens[marketIndex] == syntheticToken,
+                "Incorrect synthetic token"
+            );
+        } else {
+            require(
+                shortTokens[marketIndex] == syntheticToken,
+                "Incorrect synthetic token"
+            );
+        }
+        _;
+    }
+
     modifier refreshSystemState(uint32 marketIndex) {
         _updateSystemStateInternal(marketIndex);
         _;
@@ -330,7 +349,8 @@ contract LongShort is ILongShort, Initializable {
             tokenFactory.createTokenLong(
                 syntheticName,
                 syntheticSymbol,
-                address(staker)
+                staker,
+                latestMarket
             )
         );
 
@@ -339,7 +359,8 @@ contract LongShort is ILongShort, Initializable {
             tokenFactory.createTokenShort(
                 syntheticName,
                 syntheticSymbol,
-                address(staker)
+                staker,
+                latestMarket
             )
         );
 
@@ -637,7 +658,7 @@ contract LongShort is ILongShort, Initializable {
         return true;
     }
 
-    function handleBatchedDepositLong(uint32 marketIndex)
+    function handleBatchedDepositSettlementLong(uint32 marketIndex)
         internal
         returns (uint256 tokensLong)
     {
@@ -650,38 +671,32 @@ contract LongShort is ILongShort, Initializable {
                 currentMarketBatchedLazyDeposit.mintAndStakeLong;
 
         if (totalAmountLong > 0) {
-            _depositFunds(marketIndex, totalAmountLong);
-            uint256 feesLong =
-                _getFeesForAction(marketIndex, totalAmountLong, true, true);
-            uint256 remainingLong = totalAmountLong - feesLong;
+            _lockFundsInMarket(marketIndex, totalAmountLong);
+
+            // NOTE: no fees are calculated, but if they are desired in the future they can be added here.
 
             // Distribute fees across the market.
-            _feesMechanism(marketIndex, feesLong);
             _refreshTokensPrice(marketIndex);
 
             // Mint long tokens with remaining value.
             tokensLong =
-                (remainingLong * TEN_TO_THE_18) /
+                (totalAmountLong * TEN_TO_THE_18) /
                 longTokenPrice[marketIndex];
             // TODO: we must modify Synth ERC20 so that this addrdess (`address(this)`) shows a `balanceOf` of zero and the balance is correctly added to the users in the batch's `balanceOf`
             longTokens[marketIndex].mint(address(this), tokensLong);
-            longValue[marketIndex] = longValue[marketIndex] + remainingLong;
+            longValue[marketIndex] = longValue[marketIndex] + tokensLong;
             if (currentMarketBatchedLazyDeposit.mintAndStakeLong > 0) {
-                uint256 feesLongStake =
-                    _getFeesForAction(
-                        marketIndex,
-                        currentMarketBatchedLazyDeposit.mintAndStakeLong,
-                        true,
-                        true
-                    );
-                uint256 tokensToStakeLong =
-                    currentMarketBatchedLazyDeposit.mintAndStakeLong -
-                        feesLongStake;
-
                 // TODO: we must modify staker so that the view function for the users stake shows them having the stake (and not the LongShort contract)
+
+                // NOTE: no fees are calculated, but if they are desired in the future they can be added here.
+
+                uint256 amountToStake =
+                    (currentMarketBatchedLazyDeposit.mintAndStakeShort *
+                        TEN_TO_THE_18) / longTokenPrice[marketIndex];
+
                 staker.stakeFromMintBatched(
                     marketIndex,
-                    tokensToStakeLong,
+                    amountToStake,
                     latestUpdateIndex[marketIndex],
                     true
                 );
@@ -706,36 +721,29 @@ contract LongShort is ILongShort, Initializable {
             currentMarketBatchedLazyDeposit.mintShort +
                 currentMarketBatchedLazyDeposit.mintAndStakeShort;
         if (totalAmountShort > 0) {
-            _depositFunds(marketIndex, totalAmountShort);
-            uint256 feesShort =
-                _getFeesForAction(marketIndex, totalAmountShort, true, true);
-            uint256 remainingShort = totalAmountShort - feesShort;
+            _lockFundsInMarket(marketIndex, totalAmountShort);
+
+            // NOTE: no fees are calculated, but if they are desired in the future they can be added here.
 
             // Distribute fees across the market.
-            _feesMechanism(marketIndex, feesShort);
             _refreshTokensPrice(marketIndex);
 
             // Mint long tokens with remaining value.
             tokensShort =
-                (remainingShort * TEN_TO_THE_18) /
+                (totalAmountShort * TEN_TO_THE_18) /
                 longTokenPrice[marketIndex];
             longTokens[marketIndex].mint(address(this), tokensShort);
-            longValue[marketIndex] = longValue[marketIndex] + remainingShort;
+            longValue[marketIndex] = longValue[marketIndex] + tokensShort;
 
             if (currentMarketBatchedLazyDeposit.mintAndStakeShort > 0) {
-                uint256 feesShortStake =
-                    _getFeesForAction(
-                        marketIndex,
-                        currentMarketBatchedLazyDeposit.mintAndStakeShort,
-                        true,
-                        true
-                    );
-                uint256 tokensToStakeShort =
-                    currentMarketBatchedLazyDeposit.mintAndStakeShort -
-                        feesShortStake;
+                // NOTE: no fees are calculated, but if they are desired in the future they can be added here.
+
+                uint256 amountToStake =
+                    (currentMarketBatchedLazyDeposit.mintAndStakeShort *
+                        TEN_TO_THE_18) / longTokenPrice[marketIndex];
                 staker.stakeFromMintBatched(
                     marketIndex,
-                    tokensToStakeShort,
+                    amountToStake,
                     latestUpdateIndex[marketIndex],
                     false
                 );
@@ -804,30 +812,15 @@ contract LongShort is ILongShort, Initializable {
 
             MarketStateSnapshotStruct storage stateStruct =
                 marketStateSnapshot[marketIndex][newLatestPriceStateIndex];
+            // NOTE: we can't just merge these two values since the 'yield' has an effect on the token price inbetween oracle updates.
             stateStruct.tokenPriceLong = longTokenPrice[marketIndex];
             stateStruct.tokenPriceShort = shortTokenPrice[marketIndex];
 
+            // TODO: these return values aren't used, can remove
             uint256 totalAmountLongMinted =
-                handleBatchedDepositLong(marketIndex);
+                handleBatchedDepositSettlementLong(marketIndex);
             uint256 totalAmountShortMinted =
                 handleBatchedDepositShort(marketIndex);
-
-            // TODO: might be inefficient doing it like this, maybe don't even run the `handleBatchedDepositLong` function if there is nothing to mint.
-            if (totalAmountLongMinted != 0) {
-                // TODO: math inaccurate - need to divide by 10^18 or something. Basically this is almost right, but needs scrutiny!!
-                stateStruct.tokenPriceLongWithFees =
-                    ((batchedLazyDeposit[marketIndex].mintLong +
-                        batchedLazyDeposit[marketIndex].mintAndStakeLong) *
-                        TEN_TO_THE_18) /
-                    totalAmountLongMinted;
-            }
-            if (totalAmountShortMinted != 0) {
-                stateStruct.tokenPriceShortWithFees =
-                    ((batchedLazyDeposit[marketIndex].mintShort +
-                        batchedLazyDeposit[marketIndex].mintAndStakeShort) *
-                        TEN_TO_THE_18) /
-                    totalAmountShortMinted;
-            }
         }
 
         emit ValueLockedInSystem(
@@ -860,15 +853,19 @@ contract LongShort is ILongShort, Initializable {
     /*
      * Locks funds from the sender into the given market.
      */
-    function _depositFunds(uint32 marketIndex, uint256 amount) internal {
-        fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
-
+    function _lockFundsInMarket(uint32 marketIndex, uint256 amount) internal {
         // Update global value state.
         totalValueLockedInMarket[marketIndex] =
             totalValueLockedInMarket[marketIndex] +
             amount;
 
         _transferToYieldManager(marketIndex, amount);
+    }
+
+    function _depositFunds(uint32 marketIndex, uint256 amount) internal {
+        fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
+
+        _lockFundsInMarket(marketIndex, amount);
     }
 
     /*
@@ -970,6 +967,7 @@ contract LongShort is ILongShort, Initializable {
      * Calculates fees for the given mint/redeem amount. Users are penalised
      * with higher fees for imbalancing the market.
      */
+    // TODO: look at splitting this function into smaller functions rather than using boolean modifiers.
     function _getFeesForAction(
         uint32 marketIndex,
         uint256 amount, // 1e18
@@ -1284,20 +1282,99 @@ contract LongShort is ILongShort, Initializable {
     struct MarketStateSnapshotStruct {
         uint256 tokenPriceLong;
         uint256 tokenPriceShort;
-        // QUESTION? possible to compress this into two uint128 values?
-        // TODO: Optimise this - just putting this here to get things to work.
-        uint256 tokenPriceLongWithFees;
-        uint256 tokenPriceShortWithFees;
     }
 
     mapping(uint32 => uint256) public latestUpdateIndex;
-    mapping(uint32 => mapping(uint256 => MarketStateSnapshotStruct)) public marketStateSnapshot;
+    mapping(uint32 => mapping(uint256 => MarketStateSnapshotStruct))
+        public marketStateSnapshot;
     mapping(uint32 => BatchedLazyDeposit) public batchedLazyDeposit;
-    mapping(uint32 => mapping(address => UserLazyDeposit)) public userLazyActions;
+    mapping(uint32 => mapping(address => UserLazyDeposit))
+        public userLazyActions;
 
-    function _executeOutstandingLazySettlements(address user, uint32 marketIndex)
-        internal
+    function getUsersPendingBalance(
+        address user,
+        uint32 marketIndex,
+        bool isLong
+    )
+        external
+        view
+        override
+        doesMarketExist(marketIndex)
+        returns (uint256 pendingBalance)
     {
+        UserLazyDeposit storage currentUserDeposits =
+            userLazyActions[marketIndex][msg.sender];
+
+        if (
+            currentUserDeposits.usersCurrentUpdateIndex != 0 // NOTE: this conditional isn't strictly necessary (all the users deposit amounts will be zero too)
+        ) {
+            // No pending updates
+            return 0;
+        } else if (
+            currentUserDeposits.usersCurrentUpdateIndex ==
+            latestUpdateIndex[marketIndex]
+        ) {
+            // Update is still lazy but not past the next oracle update - display the amount the user would get if they executed immediately
+            if (isLong) {
+                uint256 fees =
+                    _getFeesForAction(
+                        marketIndex,
+                        currentUserDeposits.mintLong,
+                        true,
+                        true
+                    );
+                uint256 remaining = currentUserDeposits.mintLong - fees;
+
+                uint256 tokens =
+                    (remaining * TEN_TO_THE_18) / longTokenPrice[marketIndex];
+
+                return tokens;
+            } else {
+                uint256 fees =
+                    _getFeesForAction(
+                        marketIndex,
+                        currentUserDeposits.mintShort,
+                        true,
+                        false
+                    );
+                uint256 remaining = currentUserDeposits.mintShort - fees;
+
+                uint256 tokens =
+                    (remaining * TEN_TO_THE_18) / shortTokenPrice[marketIndex];
+
+                return tokens;
+            }
+        } else {
+            // Lazy period has passed, show the result of the lazy execution
+            assert(
+                currentUserDeposits.usersCurrentUpdateIndex <
+                    latestUpdateIndex[marketIndex]
+            );
+
+            MarketStateSnapshotStruct storage nextGlobalDepositsState =
+                marketStateSnapshot[marketIndex][
+                    latestUpdateIndex[marketIndex]
+                ];
+
+            if (isLong) {
+                uint256 tokensToMint =
+                    (currentUserDeposits.mintLong * TEN_TO_THE_18) /
+                        nextGlobalDepositsState.tokenPriceLong;
+                return tokensToMint;
+            } else {
+                uint256 tokensToMint =
+                    ((currentUserDeposits.mintShort * TEN_TO_THE_18) /
+                        nextGlobalDepositsState.tokenPriceShort);
+                return tokensToMint;
+            }
+        }
+    }
+
+    // TODO: modify this function (or make a different version) that takes in the desired useage and does either partial or full "early use"
+    function _executeOutstandingLazySettlements(
+        address user,
+        uint32 marketIndex
+    ) internal {
         UserLazyDeposit storage currentUserDeposits =
             userLazyActions[marketIndex][msg.sender];
 
@@ -1306,17 +1383,27 @@ contract LongShort is ILongShort, Initializable {
             latestUpdateIndex[marketIndex] &&
             currentUserDeposits.usersCurrentUpdateIndex != 0 // NOTE: this conditional isn't strictly necessary (all the users deposit amounts will be zero too)
         ) {
+            MarketStateSnapshotStruct storage nextGlobalDepositsState =
+                marketStateSnapshot[marketIndex][
+                    latestUpdateIndex[marketIndex]
+                ];
+
             if (currentUserDeposits.mintLong != 0) {
+                uint256 tokensToMint =
+                    ((currentUserDeposits.mintLong * TEN_TO_THE_18) /
+                        nextGlobalDepositsState.tokenPriceLong);
                 longTokens[marketIndex].transferFrom(
                     address(this),
                     msg.sender,
-                    currentUserDeposits.mintLong
+                    tokensToMint
                 );
 
                 currentUserDeposits.mintLong = 0;
             }
             if (currentUserDeposits.mintShort != 0) {
-                // currentUserDeposits.mintShort
+                uint256 tokensToMint =
+                    ((currentUserDeposits.mintShort * TEN_TO_THE_18) /
+                        nextGlobalDepositsState.tokenPriceShort);
                 shortTokens[marketIndex].transferFrom(
                     address(this),
                     msg.sender,
@@ -1328,13 +1415,20 @@ contract LongShort is ILongShort, Initializable {
                 currentUserDeposits.mintAndStakeLong != 0 ||
                 currentUserDeposits.mintAndStakeShort != 0
             ) {
+                uint256 tokensToStakeShort =
+                    ((currentUserDeposits.mintAndStakeShort * TEN_TO_THE_18) /
+                        nextGlobalDepositsState.tokenPriceShort);
+                uint256 tokensToStakeLong =
+                    ((currentUserDeposits.mintAndStakeLong * TEN_TO_THE_18) /
+                        nextGlobalDepositsState.tokenPriceLong);
                 staker.transferBatchStakeToUser(
-                    currentUserDeposits.mintAndStakeLong,
-                    currentUserDeposits.mintAndStakeShort,
+                    tokensToStakeLong,
+                    tokensToStakeShort,
                     marketIndex,
                     currentUserDeposits.usersCurrentUpdateIndex,
                     user
                 );
+
                 // TODO: do the accounting for the user
                 currentUserDeposits.mintAndStakeLong = 0;
                 currentUserDeposits.mintAndStakeShort = 0;
@@ -1343,6 +1437,19 @@ contract LongShort is ILongShort, Initializable {
             currentUserDeposits.usersCurrentUpdateIndex = 0;
         }
         // TODO: add events
+    }
+
+    function executeOutstandingLazySettlementsSynth(
+        address user,
+        uint32 marketIndex,
+        bool isLong
+    )
+        external
+        override
+        isCorrectSynth(marketIndex, isLong, ISyntheticToken(msg.sender))
+    {
+        // NOTE: this does all the "lazy" actions. This could be simplified to only do the relevant lazy action.
+        _executeOutstandingLazySettlements(user, marketIndex);
     }
 
     modifier executeOutstandingLazySettlements(address user, uint32 marketIndex)

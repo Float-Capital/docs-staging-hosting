@@ -7,7 +7,7 @@ var Link = require("next/link").default;
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var RootProvider = require("../../libraries/RootProvider.js");
 
-function ViewPositionButton(Props) {
+function ViewProfileButton(Props) {
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
   var userPage = optCurrentUser !== undefined ? "/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser)) : "/";
   return React.createElement(Link, {
@@ -16,11 +16,11 @@ function ViewPositionButton(Props) {
                     className: "w-44 h-12 text-sm my-2 shadow-md rounded-lg border-2 focus:outline-none border-gray-200 hover:bg-gray-200 flex justify-center items-center mx-auto"
                   }, React.createElement("span", {
                         className: "mx-2"
-                      }, "View position"))
+                      }, "View Profile"))
             });
 }
 
-var make = ViewPositionButton;
+var make = ViewProfileButton;
 
 exports.make = make;
 /* react Not a pure module */

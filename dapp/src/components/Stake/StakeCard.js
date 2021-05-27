@@ -2,26 +2,16 @@
 'use strict';
 
 var Misc = require("../../libraries/Misc.js");
-var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Button = require("../UI/Base/Button.js");
 var Ethers = require("../../ethereum/Ethers.js");
-var Loader = require("../UI/Base/Loader.js");
-var Ethers$1 = require("ethers");
-var Globals = require("../../libraries/Globals.js");
-var Js_dict = require("rescript/lib/js/js_dict.js");
 var Tooltip = require("../UI/Base/Tooltip.js");
 var CONSTANTS = require("../../CONSTANTS.js");
-var JsPromise = require("../../libraries/Js.Promise/JsPromise.js");
 var MarketBar = require("../UI/MarketCard/MarketBar.js");
-var StakeForm = require("./StakeForm.js");
+var Link = require("next/link").default;
 var APYProvider = require("../../libraries/APYProvider.js");
-var Belt_Option = require("rescript/lib/js/belt_Option.js");
-var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var StakeCardSide = require("../UI/StakeCard/StakeCardSide.js");
-var ToastProvider = require("../UI/ToastProvider.js");
-var Belt_HashSetString = require("rescript/lib/js/belt_HashSetString.js");
 var MarketCalculationHelpers = require("../../libraries/MarketCalculationHelpers.js");
 
 function calculateDollarValue(tokenPrice, amountStaked) {
@@ -61,7 +51,6 @@ function mappedBasicCalc(apy, longVal, shortVal, tokenType) {
 
 function StakeCard(Props) {
   var param = Props.syntheticMarket;
-  var $staropt$star = Props.optUserBalanceAddressSet;
   var match = param.latestSystemState;
   var totalValueLocked = match.totalValueLocked;
   var totalLockedShort = match.totalLockedShort;
@@ -74,9 +63,7 @@ function StakeCard(Props) {
   var timestampCreated = param.timestampCreated;
   var marketIndex = param.marketIndex;
   var marketName = param.name;
-  var optUserBalanceAddressSet = $staropt$star !== undefined ? Caml_option.valFromOption($staropt$star) : undefined;
   var router = Router.useRouter();
-  var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
   var apy = APYProvider.useAPY(undefined);
   var longDollarValueStaked = calculateDollarValue(match.longTokenPrice.price.price, match$2.totalStaked);
   var shortDollarValueStaked = calculateDollarValue(match.shortTokenPrice.price.price, match$1.totalStaked);
@@ -85,13 +72,13 @@ function StakeCard(Props) {
   var shortApy = mappedBasicCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
   var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
   var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
-  var stakeOption = Js_dict.get(router.query, "tokenAddress");
   var stakeButtons = function (param) {
     return React.createElement("div", {
                 className: "flex flex-wrap justify-evenly"
               }, React.createElement(Button.Small.make, {
-                    onClick: (function (param) {
-                        router.push("/stake?tokenAddress=" + Globals.ethAdrToLowerStr(longTokenAddress), undefined, {
+                    onClick: (function ($$event) {
+                        $$event.preventDefault();
+                        router.push("/stake?marketIndex=" + marketIndex.toString() + "&actionOption=long&tokenId=" + Ethers.Utils.ethAdrToLowerStr(longTokenAddress), undefined, {
                               shallow: true,
                               scroll: false
                             });
@@ -99,8 +86,9 @@ function StakeCard(Props) {
                       }),
                     children: "Stake Long"
                   }), React.createElement(Button.Small.make, {
-                    onClick: (function (param) {
-                        router.push("/stake?tokenAddress=" + Globals.ethAdrToLowerStr(shortTokenAddress), undefined, {
+                    onClick: (function ($$event) {
+                        $$event.preventDefault();
+                        router.push("/stake?marketIndex=" + marketIndex.toString() + "&actionOption=short&tokenId=" + Ethers.Utils.ethAdrToLowerStr(shortTokenAddress), undefined, {
                               shallow: true,
                               scroll: false
                             });
@@ -109,66 +97,6 @@ function StakeCard(Props) {
                     children: "Stake Short"
                   }));
   };
-  var stakeButtonPressState = Belt_Option.mapWithDefault(stakeOption, /* WaitingForInteraction */0, (function (tokenAddress) {
-          var longAdrLower = Globals.ethAdrToLowerStr(longTokenAddress);
-          var shortAdrLower = Globals.ethAdrToLowerStr(shortTokenAddress);
-          if (!(tokenAddress === longAdrLower || tokenAddress === shortAdrLower)) {
-            return /* WaitingForInteraction */0;
-          }
-          var redirect = function (param) {
-            return {
-                    TAG: 1,
-                    marketIndex: marketIndex.toString(),
-                    actionOption: tokenAddress === longAdrLower ? "long" : "short",
-                    [Symbol.for("name")]: "Redirect"
-                  };
-          };
-          if (optUserBalanceAddressSet !== undefined) {
-            if (typeof optUserBalanceAddressSet === "number") {
-              return /* Loading */1;
-            } else if (optUserBalanceAddressSet.TAG === /* GraphError */0 || !Belt_HashSetString.has(optUserBalanceAddressSet._0, Ethers.Utils.ethAdrToStr(Ethers$1.utils.getAddress(tokenAddress)))) {
-              return redirect(undefined);
-            } else {
-              return {
-                      TAG: 0,
-                      _0: tokenAddress,
-                      [Symbol.for("name")]: "Form"
-                    };
-            }
-          } else {
-            return redirect(undefined);
-          }
-        }));
-  React.useEffect((function () {
-          if (typeof stakeButtonPressState !== "number" && stakeButtonPressState.TAG === /* Redirect */1) {
-            var actionOption = stakeButtonPressState.actionOption;
-            var marketIndex = stakeButtonPressState.marketIndex;
-            var routeToMint = function (param) {
-              return JsPromise.$$catch(router.push("/?marketIndex=" + marketIndex + "&actionOption=" + actionOption + "&tab=mint").then(function (param) {
-                              Curry._1(toastDispatch, {
-                                    _0: "Mint some  " + marketName + " " + actionOption + " tokens to stake.",
-                                    _1: "",
-                                    _2: /* Info */2,
-                                    [Symbol.for("name")]: "Show"
-                                  });
-                              return Promise.resolve(undefined);
-                            }), (function (e) {
-                            console.log(e);
-                            return Promise.resolve(undefined);
-                          }));
-            };
-            JsPromise.$$catch(router.replace("/stake", undefined, {
-                        shallow: true,
-                        scroll: false
-                      }).then(function (param) {
-                      return Promise.resolve(routeToMint(undefined));
-                    }), (function (e) {
-                    console.log(e);
-                    return Promise.resolve(routeToMint(undefined));
-                  }));
-          }
-          
-        }), [stakeButtonPressState]);
   var liquidityRatio = function (param) {
     return React.createElement("div", {
                 className: "w-full"
@@ -177,83 +105,62 @@ function StakeCard(Props) {
                       totalValueLocked: totalValueLocked
                     }));
   };
-  var closeStakeFormButton = function (param) {
-    return React.createElement("button", {
-                className: "absolute left-full pl-4 text-3xl leading-none outline-none focus:outline-none",
-                onClick: (function (param) {
-                    router.push("/stake", undefined, {
-                          shallow: true,
-                          scroll: false
-                        });
-                    
-                  })
-              }, React.createElement("span", {
-                    className: "opacity-4 block outline-none focus:outline-none"
-                  }, "×"));
-  };
-  var tmp;
-  tmp = typeof stakeButtonPressState === "number" ? (
-      stakeButtonPressState === /* WaitingForInteraction */0 ? null : React.createElement(Loader.make, {})
-    ) : (
-      stakeButtonPressState.TAG === /* Form */0 ? React.createElement("div", {
-              className: "w-96 mx-auto relative"
-            }, closeStakeFormButton(undefined), React.createElement(StakeForm.make, {
-                  tokenId: stakeButtonPressState._0
-                })) : null
-    );
-  return React.createElement(React.Fragment, undefined, React.createElement("div", {
-                  className: "p-1 mb-8 rounded-lg flex flex-col bg-light-gold bg-opacity-75 my-5 shadow-lg"
-                }, React.createElement("div", {
-                      className: "flex justify-center w-full my-1"
-                    }, React.createElement("h1", {
-                          className: "font-bold text-xl font-alphbeta"
-                        }, marketName, React.createElement(Tooltip.make, {
-                              tip: "This market tracks " + marketName
-                            }))), React.createElement("div", {
-                      className: "flex flex-wrap justify-center w-full"
-                    }, React.createElement(StakeCardSide.make, {
-                          orderPostion: 1,
-                          orderPostionMobile: 2,
-                          marketName: marketName,
-                          isLong: true,
-                          apy: longApy,
-                          floatApy: Number(Ethers.Utils.formatEther(longFloatApy))
-                        }), React.createElement("div", {
-                          className: "w-full md:w-1/2 flex items-center flex-col order-1 md:order-2"
-                        }, React.createElement("div", {
-                              className: "flex flex-row items-center justify-between w-full "
-                            }, React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("h2", {
-                                          className: "text-xxs mt-1"
-                                        }, React.createElement("span", {
-                                              className: "font-bold"
-                                            }, "📈 Long"), " staked")), React.createElement("div", {
-                                      className: "text-sm font-alphbeta tracking-wider py-1"
-                                    }, "$" + Misc.NumberFormat.formatEther(undefined, longDollarValueStaked))), React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("h2", {
-                                          className: "text-xs mt-1 flex justify-center"
-                                        }, React.createElement("span", {
-                                              className: "font-bold pr-1"
-                                            }, "TOTAL"), " Staked")), React.createElement("div", {
-                                      className: "text-3xl font-alphbeta tracking-wider py-1"
-                                    }, "$" + Misc.NumberFormat.formatEther(undefined, totalDollarValueStake))), React.createElement("div", {
-                                  className: "text-right"
-                                }, React.createElement("div", undefined, React.createElement("h2", {
-                                          className: "text-xxs mt-1"
-                                        }, React.createElement("span", {
-                                              className: "font-bold"
-                                            }, "Short"), " staked 📉")), React.createElement("div", {
-                                      className: "text-sm font-alphbeta tracking-wider py-1"
-                                    }, "$" + Misc.NumberFormat.formatEther(undefined, shortDollarValueStaked)))), liquidityRatio(undefined), React.createElement("div", {
-                              className: "md:block hidden w-full flex justify-around"
-                            }, stakeButtons(undefined))), React.createElement(StakeCardSide.make, {
-                          orderPostion: 3,
-                          orderPostionMobile: 3,
-                          marketName: marketName,
-                          isLong: false,
-                          apy: shortApy,
-                          floatApy: Number(Ethers.Utils.formatEther(shortFloatApy))
-                        }), React.createElement("div", {
-                          className: "block md:hidden pt-5 order-4 w-full"
-                        }, stakeButtons(undefined))), tmp));
+  return React.createElement(Link, {
+              href: "/?marketIndex=" + marketIndex.toString() + "&tab=stake",
+              children: React.createElement("div", {
+                    className: "p-1 mb-8 rounded-lg flex flex-col bg-light-gold bg-opacity-75 hover:bg-opacity-60 cursor-pointer my-5 shadow-lg"
+                  }, React.createElement("div", {
+                        className: "flex justify-center w-full my-1"
+                      }, React.createElement("h1", {
+                            className: "font-bold text-xl font-alphbeta"
+                          }, marketName, React.createElement(Tooltip.make, {
+                                tip: "This market tracks " + marketName
+                              }))), React.createElement("div", {
+                        className: "flex flex-wrap justify-center w-full"
+                      }, React.createElement(StakeCardSide.make, {
+                            orderPostion: 1,
+                            orderPostionMobile: 2,
+                            marketName: marketName,
+                            isLong: true,
+                            apy: longApy,
+                            floatApy: Number(Ethers.Utils.formatEther(longFloatApy))
+                          }), React.createElement("div", {
+                            className: "w-full md:w-1/2 flex items-center flex-col order-1 md:order-2"
+                          }, React.createElement("div", {
+                                className: "flex flex-row items-center justify-between w-full "
+                              }, React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("h2", {
+                                            className: "text-xxs mt-1"
+                                          }, React.createElement("span", {
+                                                className: "font-bold"
+                                              }, "📈 Long"), " staked")), React.createElement("div", {
+                                        className: "text-sm font-alphbeta tracking-wider py-1"
+                                      }, "$" + Misc.NumberFormat.formatEther(undefined, longDollarValueStaked))), React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("h2", {
+                                            className: "text-xs mt-1 flex justify-center"
+                                          }, React.createElement("span", {
+                                                className: "font-bold pr-1"
+                                              }, "TOTAL"), " Staked")), React.createElement("div", {
+                                        className: "text-3xl font-alphbeta tracking-wider py-1"
+                                      }, "$" + Misc.NumberFormat.formatEther(undefined, totalDollarValueStake))), React.createElement("div", {
+                                    className: "text-right"
+                                  }, React.createElement("div", undefined, React.createElement("h2", {
+                                            className: "text-xxs mt-1"
+                                          }, React.createElement("span", {
+                                                className: "font-bold"
+                                              }, "Short"), " staked 📉")), React.createElement("div", {
+                                        className: "text-sm font-alphbeta tracking-wider py-1"
+                                      }, "$" + Misc.NumberFormat.formatEther(undefined, shortDollarValueStaked)))), liquidityRatio(undefined), React.createElement("div", {
+                                className: "md:block hidden w-full flex justify-around"
+                              }, stakeButtons(undefined))), React.createElement(StakeCardSide.make, {
+                            orderPostion: 3,
+                            orderPostionMobile: 3,
+                            marketName: marketName,
+                            isLong: false,
+                            apy: shortApy,
+                            floatApy: Number(Ethers.Utils.formatEther(shortFloatApy))
+                          }), React.createElement("div", {
+                            className: "block md:hidden pt-5 order-4 w-full"
+                          }, stakeButtons(undefined))))
+            });
 }
 
 var make = StakeCard;
