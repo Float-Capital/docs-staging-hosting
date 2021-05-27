@@ -16,4 +16,16 @@ abstract contract ILongShort {
     function _updateSystemStateMulti(uint32[] calldata marketIndex)
         external
         virtual;
+
+    function getUsersPendingBalance(
+        address user,
+        uint32 marketIndex,
+        bool isLong
+    ) external view virtual returns (uint256 pendingBalance);
+
+    function executeOutstandingLazySettlementsSynth(
+        address user,
+        uint32 marketIndex,
+        bool isLong
+    ) external virtual;
 }
