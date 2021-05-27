@@ -15,7 +15,7 @@ import "../interfaces/IOracleManager.sol";
 contract OracleManagerFlippening_V0 is IOracleManager {
     address public admin; // This will likely be the Gnosis safe
 
-    int256 public btcDominance;
+    int256 public ethDominance;
 
     uint256 public ethSupply; // 18 decimals
     uint256 public btcSupply; // 8 decimals
@@ -173,14 +173,13 @@ contract OracleManagerFlippening_V0 is IOracleManager {
         // ethSupply * ethPrice = 26 decimals
         // btcSupply * btcPrice = 16 decimals
 
-        uint256 _btcMarketCap26Decimals = uint256(_btcPrice) * btcSupply * 1e10;
         // 1e20 as 18 decimals but as %
-        btcDominance = int256(
-            (_btcMarketCap26Decimals * 1e20) /
-                ((uint256(_ethPrice) * ethSupply) + _btcMarketCap26Decimals)
+        ethDominance = int256(
+            (uint256(_ethPrice) * ethSupply * 1e20) /
+                (uint256(_btcPrice) * btcSupply * 1e10)
         );
 
-        return btcDominance;
+        return ethDominance;
     }
 
     function updatePrice() external override returns (int256) {
@@ -188,6 +187,6 @@ contract OracleManagerFlippening_V0 is IOracleManager {
     }
 
     function getLatestPrice() external view override returns (int256) {
-        return btcDominance;
+        return ethDominance;
     }
 }

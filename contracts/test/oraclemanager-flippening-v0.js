@@ -94,7 +94,7 @@ contract("OracleManager (Flippening V0)", (accounts) => {
     assert.equal(val.toString(), expectedVal.toString());
   };
 
-  describe("dominance calc", () => {
+  describe("dominance calc = (eth market cap) / (btc market cap)", () => {
     let testDominanceStatic = ({
       btcSupply,
       ethSupply,
@@ -111,57 +111,57 @@ contract("OracleManager (Flippening V0)", (accounts) => {
     };
 
     it(
-      "identical prices and supplies lead to 50% dominance ratio",
+      "identical prices and supplies lead to 100% eth dominance",
       testDominanceStatic({
         btcSupply: oneBTC,
         ethSupply: oneEth, // one ETH
         btcPrice: oneDollar, // $1
         ethPrice: oneDollar, // $1
-        expectedDominance: with18Decimals(50),
+        expectedDominance: with18Decimals(100),
       })
     );
 
     it(
-      "btc price increases btc dominance increases",
+      "btc price increases eth dominance decreases",
       testDominanceStatic({
         btcSupply: oneBTC,
         ethSupply: oneEth,
         btcPrice: asDollars(4),
         ethPrice: oneDollar,
-        expectedDominance: with18Decimals(80),
+        expectedDominance: with18Decimals(25),
       })
     );
 
     it(
-      "eth price increases btc dominance decreases",
+      "eth price increases eth dominance increases",
       testDominanceStatic({
         btcSupply: oneBTC,
         ethSupply: oneEth,
         btcPrice: oneDollar,
         ethPrice: asDollars(4),
-        expectedDominance: with18Decimals(20),
+        expectedDominance: with18Decimals(400),
       })
     );
 
     it(
-      "btc supply increases btc dominance increases",
+      "btc supply increases eth dominance decreases",
       testDominanceStatic({
         btcSupply: asBTC(4),
         ethSupply: oneEth,
         btcPrice: oneDollar,
         ethPrice: oneDollar,
-        expectedDominance: with18Decimals(80),
+        expectedDominance: with18Decimals(25),
       })
     );
 
     it(
-      "eth supply increases btc dominance decreases",
+      "eth supply increases eth dominance increases",
       testDominanceStatic({
         btcSupply: oneBTC,
         ethSupply: asETH(4),
         btcPrice: oneDollar,
         ethPrice: oneDollar,
-        expectedDominance: with18Decimals(20),
+        expectedDominance: with18Decimals(400),
       })
     );
   });
@@ -173,10 +173,13 @@ contract("OracleManager (Flippening V0)", (accounts) => {
       timeIncrease,
       expectedSupplyIncrease,
     }) => async () => {
-      await setup({ btcBlocksPerDay, btcBlockReward, btcSupply: zeroBN });
+      await setup({ btcBlocksPerDay, btcBlockReward, btcSupply: oneBN });
       await increaseTime(timeIncrease - time.duration.seconds(1)); // next tx increments seconds by 1
       await flippening.updatePrice();
-      await testPropertyStatic(expectedSupplyIncrease, flippening.btcSupply);
+      await testPropertyStatic(
+        expectedSupplyIncrease.add(oneBN),
+        flippening.btcSupply
+      );
     };
 
     describe("increases by blockReward * blocksPerDay per day", () => {
@@ -403,7 +406,7 @@ contract("OracleManager (Flippening V0)", (accounts) => {
       });
 
       await testPropertyStatic(
-        with18Decimals(50),
+        with18Decimals(100),
         flippening.getLatestPrice.call
       );
 
@@ -417,7 +420,7 @@ contract("OracleManager (Flippening V0)", (accounts) => {
       await testPropertyStatic(asBTC(6), flippening.btcSupply);
 
       await testPropertyStatic(
-        with18Decimals(50),
+        with18Decimals(100),
         flippening.getLatestPrice.call
       );
     });
