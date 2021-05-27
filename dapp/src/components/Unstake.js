@@ -21,7 +21,6 @@ var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var RootProvider = require("../libraries/RootProvider.js");
-var ContractHooks = require("./Testing/Admin/ContractHooks.js");
 var ToastProvider = require("./UI/ToastProvider.js");
 var ContractActions = require("../ethereum/ContractActions.js");
 var MessageUsOnDiscord = require("./Ethereum/MessageUsOnDiscord.js");
@@ -410,15 +409,6 @@ var StakeForm = {
   useForm: useForm
 };
 
-function useBalanceAndApproved(erc20Address, spender) {
-  var match = ContractHooks.useErc20BalanceRefresh(erc20Address);
-  var match$1 = ContractHooks.useERC20ApprovedRefresh(erc20Address, spender);
-  return [
-          match.data,
-          match$1.data
-        ];
-}
-
 function Unstake$UnstakeTxStatusModal(Props) {
   var txStateUnstake = Props.txStateUnstake;
   var resetFormButton = Props.resetFormButton;
@@ -739,7 +729,6 @@ function Unstake(Props) {
 var make = Unstake;
 
 exports.StakeForm = StakeForm;
-exports.useBalanceAndApproved = useBalanceAndApproved;
 exports.UnstakeTxStatusModal = UnstakeTxStatusModal;
 exports.StakeFormInput = StakeFormInput;
 exports.ConnectedStakeForm = ConnectedStakeForm;

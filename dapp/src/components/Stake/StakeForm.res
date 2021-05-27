@@ -14,12 +14,6 @@ let initialInput: StakeForm.input = {
   amount: "",
 }
 
-let useBalanceAndApproved = (~erc20Address, ~spender) => {
-  let {Swr.data: optBalance} = ContractHooks.useErc20BalanceRefresh(~erc20Address)
-  let {data: optAmountApproved} = ContractHooks.useERC20ApprovedRefresh(~erc20Address, ~spender)
-  (optBalance, optAmountApproved)
-}
-
 module StakeFormInput = {
   @react.component
   let make = (
@@ -34,7 +28,7 @@ module StakeFormInput = {
     ~synthetic: Queries.SyntheticTokenInfo.t,
     ~txStatusModals=React.null,
   ) =>
-    <Form className="mx-auto max-w-3xl" onSubmit>
+    <Form className="mx-auto w-full" onSubmit>
       <AmountInput value optBalance disabled onBlur onChange onMaxClick />
       <Button disabled=buttonDisabled onClick={_ => ()}>
         {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}

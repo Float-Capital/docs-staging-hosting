@@ -154,7 +154,7 @@ module SubmitButtonAndTxTracker = {
                   tokenSymbol={`${isLong ? `↗️` : `↘️`}${marketName}`}
                 />
               : React.null}
-            <ViewPositionButton />
+            <ViewProfileButton />
           </div>
         </Modal>
       </>
