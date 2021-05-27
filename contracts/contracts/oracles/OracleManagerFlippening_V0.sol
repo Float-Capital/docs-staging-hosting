@@ -8,7 +8,8 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "../interfaces/IOracleManager.sol";
 
 /**
-  Contract that estimates BTC / ETH dominance.
+  Contract that estimates ETH / BTC dominance,
+  expressed as (eth market cap) / (btc market cap)
   Estimates BTC & ETH supply. In the future
   look towards using oracles for it. 
 */

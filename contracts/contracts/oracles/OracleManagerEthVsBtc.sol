@@ -8,9 +8,7 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "../interfaces/IOracleManager.sol";
 
 /**
-  Contract that estimates BTC / ETH dominance.
-  Estimates BTC & ETH supply. In the future
-  look towards using oracles for it. 
+  Contract that gives price ration of ETH/BTC
 */
 contract OracleManagerEthVsBtc is IOracleManager {
     address public admin; // This will likely be the Gnosis safe
