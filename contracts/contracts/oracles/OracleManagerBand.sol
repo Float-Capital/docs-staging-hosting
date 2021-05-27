@@ -3,8 +3,8 @@
 pragma solidity 0.8.3;
 pragma abicoder v2;
 
-import "./interfaces/IOracleManager.sol";
-import "./interfaces/IBandOracle.sol";
+import "../interfaces/IOracleManager.sol";
+import "../interfaces/IBandOracle.sol";
 
 /*
  * Implementation of an OracleManager that fetches prices from a band oracle.
