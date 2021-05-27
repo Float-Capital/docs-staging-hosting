@@ -671,7 +671,7 @@ contract LongShort is ILongShort, Initializable {
                 currentMarketBatchedLazyDeposit.mintAndStakeLong;
 
         if (totalAmountLong > 0) {
-            _depositFunds(marketIndex, totalAmountLong);
+            _lockFundsInMarket(marketIndex, totalAmountLong);
 
             // NOTE: no fees are calculated, but if they are desired in the future they can be added here.
 
@@ -721,7 +721,7 @@ contract LongShort is ILongShort, Initializable {
             currentMarketBatchedLazyDeposit.mintShort +
                 currentMarketBatchedLazyDeposit.mintAndStakeShort;
         if (totalAmountShort > 0) {
-            _depositFunds(marketIndex, totalAmountShort);
+            _lockFundsInMarket(marketIndex, totalAmountShort);
 
             // NOTE: no fees are calculated, but if they are desired in the future they can be added here.
 
@@ -853,15 +853,19 @@ contract LongShort is ILongShort, Initializable {
     /*
      * Locks funds from the sender into the given market.
      */
-    function _depositFunds(uint32 marketIndex, uint256 amount) internal {
-        fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
-
+    function _lockFundsInMarket(uint32 marketIndex, uint256 amount) internal {
         // Update global value state.
         totalValueLockedInMarket[marketIndex] =
             totalValueLockedInMarket[marketIndex] +
             amount;
 
         _transferToYieldManager(marketIndex, amount);
+    }
+
+    function _depositFunds(uint32 marketIndex, uint256 amount) internal {
+        fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
+
+        _lockFundsInMarket(marketIndex, amount);
     }
 
     /*
