@@ -3,14 +3,16 @@
 pragma solidity 0.8.3;
 
 import "./SyntheticToken.sol";
+import "./interfaces/ILongShort.sol";
+import "./interfaces/ITokenFactory.sol";
 
-contract TokenFactory {
+contract TokenFactory is ITokenFactory {
     ////////////////////////////////////
     /////////////// STATE //////////////
     ////////////////////////////////////
 
     address public admin;
-    address public floatContract;
+    ILongShort public longShort;
 
     bytes32 public constant DEFAULT_ADMIN_ROLE =
         keccak256("DEFAULT_ADMIN_ROLE");
@@ -26,8 +28,8 @@ contract TokenFactory {
         _;
     }
 
-    modifier onlyFLOAT() {
-        require(msg.sender == floatContract);
+    modifier onlyLongShort() {
+        require(msg.sender == address(longShort));
         _;
     }
 
@@ -35,9 +37,9 @@ contract TokenFactory {
     //////////// SET-UP ////////////////
     ////////////////////////////////////
 
-    constructor(address _admin, address _floatContract) {
+    constructor(address _admin, ILongShort _longShort) {
         admin = _admin;
-        floatContract = _floatContract;
+        longShort = _longShort;
     }
 
     ////////////////////////////////////
@@ -48,8 +50,8 @@ contract TokenFactory {
         admin = _admin;
     }
 
-    function changeFloatAddress(address _floatContract) external adminOnly {
-        floatContract = _floatContract;
+    function changeFloatAddress(ILongShort _longShort) external adminOnly {
+        longShort = _longShort;
     }
 
     ////////////////////////////////////
@@ -58,9 +60,9 @@ contract TokenFactory {
 
     function setupPermissions(SyntheticToken tokenContract) internal {
         // Give minter roles
-        tokenContract.grantRole(DEFAULT_ADMIN_ROLE, floatContract);
-        tokenContract.grantRole(MINTER_ROLE, floatContract);
-        tokenContract.grantRole(PAUSER_ROLE, floatContract);
+        tokenContract.grantRole(DEFAULT_ADMIN_ROLE, address(longShort));
+        tokenContract.grantRole(MINTER_ROLE, address(longShort));
+        tokenContract.grantRole(PAUSER_ROLE, address(longShort));
 
         // Revoke roles
         tokenContract.revokeRole(DEFAULT_ADMIN_ROLE, address(this));
@@ -71,15 +73,18 @@ contract TokenFactory {
     function createTokenLong(
         string calldata syntheticName,
         string calldata syntheticSymbol,
-        address staker
-    ) external onlyFLOAT returns (SyntheticToken) {
-        SyntheticToken tokenContract;
-        tokenContract = new SyntheticToken(
-            string(abi.encodePacked("FLOAT UP", syntheticName)),
-            string(abi.encodePacked("fu", syntheticSymbol)),
-            floatContract,
-            staker
-        );
+        IStaker staker,
+        uint32 marketIndex
+    ) external override onlyLongShort returns (SyntheticToken) {
+        SyntheticToken tokenContract =
+            new SyntheticToken(
+                string(abi.encodePacked("FLOAT UP", syntheticName)),
+                string(abi.encodePacked("fu", syntheticSymbol)),
+                longShort,
+                staker,
+                marketIndex,
+                true
+            );
         setupPermissions(tokenContract);
         return tokenContract;
     }
@@ -87,15 +92,18 @@ contract TokenFactory {
     function createTokenShort(
         string calldata syntheticName,
         string calldata syntheticSymbol,
-        address staker
-    ) external onlyFLOAT returns (SyntheticToken) {
-        SyntheticToken tokenContract;
-        tokenContract = new SyntheticToken(
-            string(abi.encodePacked("FLOAT DOWN ", syntheticName)),
-            string(abi.encodePacked("fd", syntheticSymbol)),
-            floatContract,
-            staker
-        );
+        IStaker staker,
+        uint32 marketIndex
+    ) external override onlyLongShort returns (SyntheticToken) {
+        SyntheticToken tokenContract =
+            new SyntheticToken(
+                string(abi.encodePacked("FLOAT DOWN ", syntheticName)),
+                string(abi.encodePacked("fd", syntheticSymbol)),
+                longShort,
+                staker,
+                marketIndex,
+                false
+            );
 
         setupPermissions(tokenContract);
         return tokenContract;
