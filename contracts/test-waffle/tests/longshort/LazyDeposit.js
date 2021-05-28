@@ -4,13 +4,78 @@
 var Chai = require("../../bindings/chai/Chai.js");
 var LetOps = require("../../library/LetOps.js");
 var Globals = require("../../library/Globals.js");
+var Helpers = require("../../library/Helpers.js");
+var CONSTANTS = require("../../CONSTANTS.js");
+
+function testIntegration(contracts, accounts) {
+  return Globals.describe("mintLongLazy")(undefined, undefined, undefined, (function (param) {
+                return Globals.it$prime("should work as expected happy path")(undefined, undefined, undefined, (function (param) {
+                              var testUser = accounts.contents[8];
+                              var amountToLazyMint = Helpers.randomTokenAmount(undefined);
+                              var match = contracts.contents;
+                              var longShort = match.longShort;
+                              var match$1 = match.markets[0];
+                              var marketIndex = match$1.marketIndex;
+                              var longSynth = match$1.longSynth;
+                              var oracleManager = match$1.oracleManager;
+                              var paymentToken = match$1.paymentToken;
+                              return LetOps.AwaitThen.let_(longShort.longValue(marketIndex), (function (longValueBefore) {
+                                            return LetOps.AwaitThen.let_(longShort.shortValue(marketIndex), (function (shortValueBefore) {
+                                                          return LetOps.AwaitThen.let_(paymentToken.mint(testUser.address, amountToLazyMint), (function (param) {
+                                                                        return LetOps.AwaitThen.let_(paymentToken.connect(testUser).approve(longShort.address, amountToLazyMint), (function (param) {
+                                                                                      return LetOps.AwaitThen.let_(longShort.connect(testUser).mintLongLazy(marketIndex, amountToLazyMint), (function (param) {
+                                                                                                    return LetOps.AwaitThen.let_(oracleManager.getLatestPrice(), (function (previousPrice) {
+                                                                                                                  var nextPrice = Globals.div(Globals.mul(previousPrice, Globals.bnFromInt(12)), Globals.bnFromInt(10));
+                                                                                                                  return LetOps.AwaitThen.let_(oracleManager.setPrice(nextPrice), (function (param) {
+                                                                                                                                console.log("\n\n\n\n\nthis is the latest price");
+                                                                                                                                console.log({
+                                                                                                                                      "LongShort address": longShort.address
+                                                                                                                                    });
+                                                                                                                                console.log(testUser.address);
+                                                                                                                                return LetOps.AwaitThen.let_(longShort.userLazyActions(marketIndex, testUser.address), (function (userLazyActions) {
+                                                                                                                                              return LetOps.AwaitThen.let_(longSynth.balanceOf(testUser.address), (function (usersBalanceBeforeSettlement) {
+                                                                                                                                                            console.log({
+                                                                                                                                                                  usersBalanceBeforeSettlement: Globals.bnToString(usersBalanceBeforeSettlement),
+                                                                                                                                                                  index: Globals.bnToString(userLazyActions.usersCurrentUpdateIndex)
+                                                                                                                                                                });
+                                                                                                                                                            console.log("this is the latest price\n\n\n\n\n");
+                                                                                                                                                            return LetOps.AwaitThen.let_(longShort._updateSystemState(marketIndex), (function (param) {
+                                                                                                                                                                          console.log("\n\n\n\n\nthis is the latest price");
+                                                                                                                                                                          return LetOps.AwaitThen.let_(longSynth.balanceOf(testUser.address), (function (usersBalanceBeforeSettlement) {
+                                                                                                                                                                                        console.log({
+                                                                                                                                                                                              usersBalanceBeforeSettlement: usersBalanceBeforeSettlement
+                                                                                                                                                                                            });
+                                                                                                                                                                                        console.log("this is the latest price\n\n\n\n\n");
+                                                                                                                                                                                        return LetOps.AwaitThen.let_(longShort._executeOutstandingLazySettlements(testUser.address, marketIndex), (function (param) {
+                                                                                                                                                                                                      return LetOps.AwaitThen.let_(longSynth.balanceOf(testUser.address), (function (usersUpdatedBalance) {
+                                                                                                                                                                                                                    return LetOps.AwaitThen.let_(longShort.longTokenPrice(marketIndex), (function (longTokenPrice) {
+                                                                                                                                                                                                                                  var expectedNumberOfTokensToRecieve = Globals.div(Globals.mul(amountToLazyMint, CONSTANTS.tenToThe18), longTokenPrice);
+                                                                                                                                                                                                                                  Chai.bnEqual("balance is incorrect", expectedNumberOfTokensToRecieve, usersUpdatedBalance);
+                                                                                                                                                                                                                                  return Promise.resolve(undefined);
+                                                                                                                                                                                                                                }));
+                                                                                                                                                                                                                  }));
+                                                                                                                                                                                                    }));
+                                                                                                                                                                                      }));
+                                                                                                                                                                        }));
+                                                                                                                                                          }));
+                                                                                                                                            }));
+                                                                                                                              }));
+                                                                                                                }));
+                                                                                                  }));
+                                                                                    }));
+                                                                      }));
+                                                        }));
+                                          }));
+                            }));
+              }));
+}
 
 function testExposed(contracts, accounts) {
   return Globals.describe("lazyDeposits")(undefined, undefined, undefined, (function (param) {
                 Globals.it$prime("calls the executeOutstandingLazySettlements modifier")(undefined, undefined, undefined, (function (param) {
                         var match = contracts.contents;
                         var longShort = match.longShort;
-                        var amount = ethers.BigNumber.from(1);
+                        var amount = Globals.bnFromInt(1);
                         var testWallet = accounts.contents[1];
                         return LetOps.Await.let_(longShort.setUseexecuteOutstandingLazySettlementsMock(true), (function (param) {
                                       Chai.callEmitEvents(longShort.connect(testWallet).mintLongLazy(1, amount), longShort, "executeOutstandingLazySettlementsMock");
@@ -21,7 +86,7 @@ function testExposed(contracts, accounts) {
                               var mintLongLazyTxPromise = {
                                 contents: undefined
                               };
-                              var amount = ethers.BigNumber.from(1);
+                              var amount = Globals.bnFromInt(1);
                               Globals.before_each(undefined)(undefined, undefined, undefined, (function (param) {
                                       var match = contracts.contents;
                                       var testWallet = accounts.contents[1];
@@ -59,5 +124,6 @@ function testExposed(contracts, accounts) {
               }));
 }
 
+exports.testIntegration = testIntegration;
 exports.testExposed = testExposed;
 /* Chai Not a pure module */

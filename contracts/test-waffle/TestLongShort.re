@@ -9,9 +9,9 @@ describe("Float System", () => {
     before'(() => {
       let%Await loadedAccounts = Ethers.getSigners();
       accounts := loadedAccounts;
-    });
+      // });
 
-    before_each'(() => {
+      // before_each'(() => {
       let%AwaitThen deployedContracts =
         Helpers.inititialize(
           ~admin=accounts.contents->Array.getUnsafe(0),
@@ -20,7 +20,7 @@ describe("Float System", () => {
       contracts := deployedContracts;
       let setupUser = accounts.contents->Array.getUnsafe(2);
 
-      let%Await _ =
+      let%AwaitThen _ =
         HelperActions.stakeRandomlyInBothSidesOfMarket(
           ~marketsToStakeIn=deployedContracts.markets,
           ~userToStakeWith=setupUser,
@@ -28,6 +28,19 @@ describe("Float System", () => {
         );
 
       ();
+
+      let%AwaitThen longValueBefore =
+        deployedContracts.longShort
+        ->Contract.LongShort.longValue(~marketIndex=1);
+      let%Await shortValueBefore =
+        deployedContracts.longShort
+        ->Contract.LongShort.shortValue(~marketIndex=1);
+
+      Js.log("\n\n\n\n\n\n\ important value \n\n\n\n\n");
+      Js.log({
+        "Longvalue": longValueBefore->bnToString,
+        "shortValue": shortValueBefore->bnToString,
+      });
     });
 
     describe("_updateSystemState", () => {
@@ -35,6 +48,7 @@ describe("Float System", () => {
       // Check it reverts if oracle returns a negative value.
       ()
     });
+    LazyDeposit.testIntegration(~contracts, ~accounts);
 
     describe("LongShort - internals exposed", () => {
       let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
@@ -65,8 +79,7 @@ describe("Float System", () => {
           );
         ();
       });
-
-      LazyDeposit.testExposed(~contracts, ~accounts);
+      // LazyDeposit.testExposed(~contracts, ~accounts);
     });
   })
 });

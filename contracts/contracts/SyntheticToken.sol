@@ -2,6 +2,7 @@
 
 pragma solidity 0.8.3;
 
+import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 import "./interfaces/IStaker.sol";
 import "./interfaces/ILongShort.sol";
@@ -63,12 +64,15 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         //       Case where next price update hasn't occurred
         //            -- subcase 1: it is BELOW the safety threshold - keep exectution lazy and give the user the number of tokens they desire
         //            -- subcase 2: it is ABOVE the safety threshold - do a full 'immediate' execution.
-        longShort.executeOutstandingLazySettlementsSynth(
-            sender,
-            marketIndex,
-            isLong
-        );
-        super._transfer(sender, recipient, amount);
+        console.log("Transfer the assets...");
+        if (msg.sender != address(longShort)) {
+            longShort.executeOutstandingLazySettlementsSynth(
+                sender,
+                marketIndex,
+                isLong
+            );
+        }
+        ERC20._transfer(sender, recipient, amount);
     }
 
     /**
@@ -81,6 +85,7 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         override(ERC20, IERC20)
         returns (uint256)
     {
+        console.log("balance of called!!!");
         return
             longShort.getUsersPendingBalance(account, marketIndex, isLong) +
             ERC20.balanceOf(account);
