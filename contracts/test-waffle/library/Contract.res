@@ -48,6 +48,10 @@ module SyntheticToken = {
 
   @send
   external setup: (t, string, string, Ethers.ethAddress) => JsPromise.t<transaction> = "stake"
+
+  @send
+  external balanceOf: (t, ~account: Ethers.ethAddress) => JsPromise.t<Ethers.BigNumber.t> =
+    "balanceOf"
 }
 
 type staker
@@ -113,6 +117,11 @@ module OracleManagerMock = {
     deployContract1(contractName, admin)->Obj.magic
   let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
     attachToContract(contractName, ~contractAddress)->Obj.magic
+
+  @send
+  external setPrice: (t, ~newPrice: Ethers.BigNumber.t) => JsPromise.t<transaction> = "setPrice"
+  @send
+  external getLatestPrice: t => JsPromise.t<Ethers.BigNumber.t> = "getLatestPrice"
 }
 
 module LongShort = {
@@ -151,16 +160,17 @@ module LongShort = {
     ~kInitialMultiplier: Ethers.BigNumber.t,
     ~kPeriod: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "initializeMarket"
-  
+
   type batchedLazyDeposit = {
     mintLong: Ethers.BigNumber.t,
     mintShort: Ethers.BigNumber.t,
     mintAndStakeLong: Ethers.BigNumber.t,
-    mintAntStakeShort: Ethers.BigNumber.t
+    mintAntStakeShort: Ethers.BigNumber.t,
   }
-  
+
   @send
-  external batchedLazyDeposit: (t, ~marketIndex: int) => JsPromise.t<batchedLazyDeposit> = "batchedLazyDeposit"
+  external batchedLazyDeposit: (t, ~marketIndex: int) => JsPromise.t<batchedLazyDeposit> =
+    "batchedLazyDeposit"
 
   @send
   external fundTokens: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "fundTokens"
@@ -226,15 +236,35 @@ module LongShort = {
     ~marketIndex: int,
     ~newOracleAddress: Ethers.ethAddress,
   ) => JsPromise.t<transaction> = "updateMarketOracle"
+  @send
+  external _updateSystemState: (t, ~marketIndex: int) => JsPromise.t<transaction> =
+    "_updateSystemState"
+
+  @send
+  external longTokenPrice: (t, ~marketIndex: int) => JsPromise.t<Ethers.BigNumber.t> =
+    "longTokenPrice"
+  @send
+  external shortTokenPrice: (t, ~marketIndex: int) => JsPromise.t<Ethers.BigNumber.t> =
+    "shortTokenPrice"
+
+  @send
+  external longValue: (t, ~marketIndex: int) => JsPromise.t<Ethers.BigNumber.t> = "longValue"
+  @send
+  external shortValue: (t, ~marketIndex: int) => JsPromise.t<Ethers.BigNumber.t> = "shortValue"
 
   type userLazyActionsStruct = {
-        usersCurrentUpdateIndex: Ethers.BigNumber.t,
-        mintLong: Ethers.BigNumber.t,
-        mintShort: Ethers.BigNumber.t,
-        mintAndStakeLong: Ethers.BigNumber.t,
-        mintAndStakeShort: Ethers.BigNumber.t,
+    usersCurrentUpdateIndex: Ethers.BigNumber.t,
+    mintLong: Ethers.BigNumber.t,
+    mintShort: Ethers.BigNumber.t,
+    mintAndStakeLong: Ethers.BigNumber.t,
+    mintAndStakeShort: Ethers.BigNumber.t,
   }
-  @send external userLazyActions: (t, ~marketIndex: int, ~user:Ethers.ethAddress) => JsPromise.t<userLazyActionsStruct> = "useruserLazyActions"
+  @send
+  external userLazyActions: (
+    t,
+    ~marketIndex: int,
+    ~user: Ethers.ethAddress,
+  ) => JsPromise.t<userLazyActionsStruct> = "userLazyActions"
 
   module Exposed = {
     @send
@@ -333,8 +363,15 @@ module LongShort = {
     @send
     external setUseexecuteOutstandingLazySettlementsMock: (
       t,
-      ~shouldUseMock: bool
+      ~shouldUseMock: bool,
     ) => JsPromise.t<transaction> = "setUseexecuteOutstandingLazySettlementsMock"
+
+    @send
+    external _executeOutstandingLazySettlementsExposed: (
+      t,
+      ~user: Ethers.ethAddress,
+      ~marketIndex: int,
+    ) => JsPromise.t<transaction> = "_executeOutstandingLazySettlements" // "_executeOutstandingLazySettlementsExposed"
   }
 }
 

@@ -24,6 +24,10 @@ function div(prim, prim$1) {
   return prim.div(prim$1);
 }
 
+function bnToString(prim) {
+  return prim.toString();
+}
+
 var it$prime = Promise$BsMocha.it;
 
 var it_skip$prime = Promise$BsMocha.it_skip;
@@ -51,6 +55,7 @@ exports.sub = sub;
 exports.bnFromInt = bnFromInt;
 exports.mul = mul;
 exports.div = div;
+exports.bnToString = bnToString;
 exports.describe = describe;
 exports.it = it;
 exports.it_skip = it_skip;
