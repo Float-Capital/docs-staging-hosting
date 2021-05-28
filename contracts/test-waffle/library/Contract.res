@@ -14,6 +14,7 @@ external attachAtAddress: (contractFactory, ~contractAddress: Ethers.ethAddress)
 @send external deploy2: (contractFactory, 'a, 'b) => JsPromise.t<t> = "deploy"
 @send external deploy3: (contractFactory, 'a, 'b, 'c) => JsPromise.t<t> = "deploy"
 @send external deploy4: (contractFactory, 'a, 'b, 'c, 'd) => JsPromise.t<t> = "deploy"
+@send external deploy7: (contractFactory, 'a, 'b, 'c, 'd, 'e, 'f, 'g) => JsPromise.t<t> = "deploy"
 
 @send external deployed: t => JsPromise.t<unit> = "deployed"
 
@@ -34,6 +35,36 @@ let deployContract2 = (contractName, firstParam, secondParam) => {
 let deployContract3 = (contractName, firstParam, secondParam, thirdParam) => {
   getContractFactory(contractName)
   ->JsPromise.then(deploy3(_, firstParam, secondParam, thirdParam))
+  ->JsPromise.then(deployed)
+}
+let deployContract4 = (contractName, firstParam, secondParam, thirdParam, fourthParam) => {
+  getContractFactory(contractName)
+  ->JsPromise.then(deploy4(_, firstParam, secondParam, thirdParam, fourthParam))
+  ->JsPromise.then(deployed)
+}
+let deployContract7 = (
+  contractName,
+  firstParam,
+  secondParam,
+  thirdParam,
+  fourthParam,
+  fifthParam,
+  sixthParam,
+  seventhParam,
+) => {
+  getContractFactory(contractName)
+  ->JsPromise.then(
+    deploy7(
+      _,
+      firstParam,
+      secondParam,
+      thirdParam,
+      fourthParam,
+      fifthParam,
+      sixthParam,
+      seventhParam,
+    ),
+  )
   ->JsPromise.then(deployed)
 }
 
@@ -100,11 +131,19 @@ module YieldManagerMock = {
   type t = {address: Ethers.ethAddress}
   let contractName = "YieldManagerMock"
 
-  let make: (Ethers.ethAddress, Ethers.ethAddress, Ethers.ethAddress) => JsPromise.t<t> = (
-    admin,
-    longShortAddress,
-    fundTokenAddress,
-  ) => deployContract3(contractName, admin, longShortAddress, fundTokenAddress)->Obj.magic
+  let make: (
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+    Ethers.ethAddress,
+  ) => JsPromise.t<t> = (admin, longShortAddress, treasuryAddress, fundTokenAddress) =>
+    deployContract4(
+      contractName,
+      admin,
+      longShortAddress,
+      treasuryAddress,
+      fundTokenAddress,
+    )->Obj.magic
   let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
     attachToContract(contractName, ~contractAddress)->Obj.magic
 }

@@ -42,10 +42,10 @@ function randomMintLongShort(param) {
   }
 }
 
-function createSyntheticMarket(admin, longShort, fundToken, marketName, marketSymbol) {
+function createSyntheticMarket(admin, longShort, treasury, fundToken, marketName, marketSymbol) {
   return Promise.all([
                 Contract.OracleManagerMock.make(admin),
-                Contract.YieldManagerMock.make(admin, longShort.address, fundToken.address)
+                Contract.YieldManagerMock.make(admin, longShort.address, treasury.address, fundToken.address)
               ]).then(function (param) {
               var yieldManager = param[1];
               Contract.PaymentToken.grantMintRole(fundToken, yieldManager.address);
@@ -114,7 +114,7 @@ function inititialize(admin, exposeInternals) {
                                                       payToken1
                                                     ], Promise.resolve(undefined), (function (previousPromise, paymentToken, index) {
                                                         return previousPromise.then(function (param) {
-                                                                    return createSyntheticMarket(admin.address, longShort, paymentToken, "Test Market " + String(index), "TM" + String(index));
+                                                                    return createSyntheticMarket(admin.address, longShort, treasury, paymentToken, "Test Market " + String(index), "TM" + String(index));
                                                                   });
                                                       })).then(function (param) {
                                                     return getAllMarkets(longShort);

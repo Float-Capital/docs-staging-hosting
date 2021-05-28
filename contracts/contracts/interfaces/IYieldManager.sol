@@ -23,6 +23,11 @@ abstract contract IYieldManager {
     function withdrawToken(uint256 amount) public virtual;
 
     /*
+     *  Withdraw erc20 token to the treasury contract (WMATIC)
+     */
+    function withdrawErc20TokenToTreasury(address erc20Token) external virtual;
+
+    /*
      * Returns the total token value held by this yield manager.
      */
     function getTotalHeld() public virtual returns (uint256 amount);
