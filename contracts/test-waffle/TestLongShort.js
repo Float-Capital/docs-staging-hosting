@@ -16,23 +16,14 @@ Globals.describe("Float System")(undefined, undefined, undefined, (function (par
                       var accounts = {
                         contents: undefined
                       };
-                      Globals.before$prime(undefined)(undefined, undefined, undefined, (function (param) {
+                      Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
                               return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
                                             accounts.contents = loadedAccounts;
                                             return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
                                                           contracts.contents = deployedContracts;
                                                           var setupUser = accounts.contents[2];
-                                                          return LetOps.AwaitThen.let_(HelperActions.stakeRandomlyInBothSidesOfMarket(deployedContracts.markets, setupUser, deployedContracts.longShort), (function (param) {
-                                                                        return LetOps.AwaitThen.let_(deployedContracts.longShort.longValue(1), (function (longValueBefore) {
-                                                                                      return LetOps.Await.let_(deployedContracts.longShort.shortValue(1), (function (shortValueBefore) {
-                                                                                                    console.log("\n\n\n\n\n\n important value \n\n\n\n\n");
-                                                                                                    console.log({
-                                                                                                          Longvalue: Globals.bnToString(longValueBefore),
-                                                                                                          shortValue: Globals.bnToString(shortValueBefore)
-                                                                                                        });
-                                                                                                    
-                                                                                                  }));
-                                                                                    }));
+                                                          return LetOps.Await.let_(HelperActions.stakeRandomlyInBothSidesOfMarket(deployedContracts.markets, setupUser, deployedContracts.longShort), (function (param) {
+                                                                        
                                                                       }));
                                                         }));
                                           }));

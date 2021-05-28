@@ -658,10 +658,7 @@ contract LongShort is ILongShort, Initializable {
         return true;
     }
 
-    function handleBatchedDepositSettlementLong(uint32 marketIndex)
-        internal
-        returns (uint256 tokensLong)
-    {
+    function handleBatchedDepositSettlementLong(uint32 marketIndex) internal {
         // LongSide
         // Deposit funds and compute fees.
         BatchedLazyDeposit storage currentMarketBatchedLazyDeposit =
@@ -669,7 +666,6 @@ contract LongShort is ILongShort, Initializable {
         uint256 totalAmountLong =
             currentMarketBatchedLazyDeposit.mintLong +
                 currentMarketBatchedLazyDeposit.mintAndStakeLong;
-        console.log("balance of market", 5);
 
         if (totalAmountLong > 0) {
             _transferFundsToYieldManager(marketIndex, totalAmountLong);
@@ -680,26 +676,13 @@ contract LongShort is ILongShort, Initializable {
             _refreshTokensPrice(marketIndex);
 
             // Mint long tokens with remaining value.
-            tokensLong =
-                (totalAmountLong * TEN_TO_THE_18) /
-                longTokenPrice[marketIndex];
+            uint256 tokensLong =
+                (totalAmountLong * TEN_TO_THE_18) / longTokenPrice[marketIndex];
             // TODO: we must modify Synth ERC20 so that this addrdess (`address(this)`) shows a `balanceOf` of zero and the balance is correctly added to the users in the batch's `balanceOf`
             longTokens[marketIndex].mint(address(this), tokensLong);
-            console.log(
-                "balance long balance before",
-                longValue[marketIndex] + shortValue[marketIndex],
-                totalValueLockedInMarket[marketIndex],
-                longValue[marketIndex] + shortValue[marketIndex] ==
-                    totalValueLockedInMarket[marketIndex]
-            );
+
             longValue[marketIndex] = longValue[marketIndex] + totalAmountLong;
-            console.log(
-                "balance long balance after",
-                longValue[marketIndex] + shortValue[marketIndex],
-                totalValueLockedInMarket[marketIndex],
-                longValue[marketIndex] + shortValue[marketIndex] ==
-                    totalValueLockedInMarket[marketIndex]
-            );
+
             if (currentMarketBatchedLazyDeposit.mintAndStakeLong > 0) {
                 // TODO: we must modify staker so that the view function for the users stake shows them having the stake (and not the LongShort contract)
 
@@ -724,10 +707,7 @@ contract LongShort is ILongShort, Initializable {
         }
     }
 
-    function handleBatchedDepositShort(uint32 marketIndex)
-        internal
-        returns (uint256 tokensShort)
-    {
+    function handleBatchedDepositShort(uint32 marketIndex) internal {
         // ShortSide
         // Deposit funds and compute fees.
         BatchedLazyDeposit storage currentMarketBatchedLazyDeposit =
@@ -744,9 +724,9 @@ contract LongShort is ILongShort, Initializable {
             _refreshTokensPrice(marketIndex);
 
             // Mint long tokens with remaining value.
-            tokensShort =
+            uint256 tokensShort =
                 (totalAmountShort * TEN_TO_THE_18) /
-                longTokenPrice[marketIndex];
+                    longTokenPrice[marketIndex];
             longTokens[marketIndex].mint(address(this), tokensShort);
             longValue[marketIndex] = longValue[marketIndex] + totalAmountShort;
 
@@ -779,7 +759,6 @@ contract LongShort is ILongShort, Initializable {
         internal
         doesMarketExist(marketIndex)
     {
-        console.log("Update system state 1 for market index", marketIndex);
         // This is called right before any state change!
         // So reward rate can be calculated just in time by
         // staker without needing to be saved
@@ -792,15 +771,9 @@ contract LongShort is ILongShort, Initializable {
         );
 
         // turn this into an assert (markets will be seeded)
-        console.log(
-            "Market seed",
-            longValue[marketIndex],
-            shortValue[marketIndex]
-        );
         if (longValue[marketIndex] == 0 && shortValue[marketIndex] == 0) {
             return;
         }
-        console.log("Update system state 2");
         // TODO - should never happen - seed markets
         // assert(longValue[marketIndex] != 0 && shortValue[marketIndex] != 0);
 
@@ -820,39 +793,25 @@ contract LongShort is ILongShort, Initializable {
             priceChanged = _priceChangeMechanism(marketIndex, newPrice);
         }
 
-        console.log("Update system state 3");
         // Distibute accrued yield manager interest.
         _yieldMechanism(marketIndex);
 
         _refreshTokensPrice(marketIndex);
-        console.log("checking if price changed", priceChanged);
         if (priceChanged) {
-            console.log("price did changed");
             assetPrice[marketIndex] = newPrice;
-            console.log("1");
 
             uint256 newLatestPriceStateIndex =
                 latestUpdateIndex[marketIndex] + 1;
-            console.log("2");
             latestUpdateIndex[marketIndex] = newLatestPriceStateIndex;
-            console.log("3");
 
             MarketStateSnapshotStruct storage stateStruct =
                 marketStateSnapshot[marketIndex][newLatestPriceStateIndex];
-            console.log("4");
             // NOTE: we can't just merge these two values since the 'yield' has an effect on the token price inbetween oracle updates.
             stateStruct.tokenPriceLong = longTokenPrice[marketIndex];
-            console.log("5");
             stateStruct.tokenPriceShort = shortTokenPrice[marketIndex];
-            console.log("6");
 
-            // TODO: these return values aren't used, can remove
-            uint256 totalAmountLongMinted =
-                handleBatchedDepositSettlementLong(marketIndex);
-            console.log("7");
-            uint256 totalAmountShortMinted =
-                handleBatchedDepositShort(marketIndex);
-            console.log("8");
+            handleBatchedDepositSettlementLong(marketIndex);
+            handleBatchedDepositShort(marketIndex);
         }
 
         emit ValueLockedInSystem(
@@ -862,21 +821,14 @@ contract LongShort is ILongShort, Initializable {
             shortValue[marketIndex]
         );
 
-        console.log(
-            "balance",
-            longValue[marketIndex] + shortValue[marketIndex],
-            totalValueLockedInMarket[marketIndex]
-        );
         // Invariant: long/short values should never differ from total value.
         assert(
             longValue[marketIndex] + shortValue[marketIndex] ==
                 totalValueLockedInMarket[marketIndex]
         );
-        console.log("9");
     }
 
     function _updateSystemState(uint32 marketIndex) external override {
-        console.log("Running system update from outside", marketIndex);
         _updateSystemStateInternal(marketIndex);
     }
 
@@ -1131,16 +1083,6 @@ contract LongShort is ILongShort, Initializable {
 
         emit LongMinted(marketIndex, amount, remaining, tokens, user);
 
-        console.log("----------------- here ---------------");
-        console.log("----------------- here ---------------");
-        console.log(
-            longValue[marketIndex] + shortValue[marketIndex],
-            totalValueLockedInMarket[marketIndex]
-        );
-        console.log("----------------- here ---------------");
-        console.log("----------------- here ---------------");
-        console.log("----------------- here ---------------");
-
         emit ValueLockedInSystem(
             marketIndex,
             totalValueLockedInMarket[marketIndex],
@@ -1356,27 +1298,17 @@ contract LongShort is ILongShort, Initializable {
         returns (uint256 pendingBalance)
     {
         UserLazyDeposit storage currentUserDeposits =
-            userLazyActions[marketIndex][msg.sender];
+            userLazyActions[marketIndex][user];
 
-        console.log("longSHortAddress", address(this));
-        console.log("We are checking now", user);
-        console.log(
-            "We are checking now",
-            currentUserDeposits.usersCurrentUpdateIndex,
-            "market index",
-            marketIndex
-        );
         if (
-            currentUserDeposits.usersCurrentUpdateIndex != 0 // NOTE: this conditional isn't strictly necessary (all the users deposit amounts will be zero too)
+            currentUserDeposits.usersCurrentUpdateIndex == 0 // NOTE: this conditional isn't strictly necessary (all the users deposit amounts will be zero too)
         ) {
-            console.log("Nothing pending");
             // No pending updates
             return 0;
         } else if (
             currentUserDeposits.usersCurrentUpdateIndex ==
-            latestUpdateIndex[marketIndex]
+            latestUpdateIndex[marketIndex] + 1
         ) {
-            console.log("lazy pending next oracle");
             // Update is still lazy but not past the next oracle update - display the amount the user would get if they executed immediately
             if (isLong) {
                 uint256 fees =
@@ -1408,10 +1340,9 @@ contract LongShort is ILongShort, Initializable {
                 return tokens;
             }
         } else {
-            console.log("lazy done - showing what the user will get");
             // Lazy period has passed, show the result of the lazy execution
             assert(
-                currentUserDeposits.usersCurrentUpdateIndex <
+                currentUserDeposits.usersCurrentUpdateIndex <=
                     latestUpdateIndex[marketIndex]
             );
 
@@ -1443,50 +1374,27 @@ contract LongShort is ILongShort, Initializable {
         UserLazyDeposit storage currentUserDeposits =
             userLazyActions[marketIndex][user];
 
-        console.log("execute update", marketIndex, user);
-        console.log("!!!!!", currentUserDeposits.usersCurrentUpdateIndex);
-
-        console.log(
-            currentUserDeposits.usersCurrentUpdateIndex,
-            latestUpdateIndex[marketIndex]
-        );
-
-        console.log(marketIndex, user);
-
-        console.log(
-            batchedLazyDeposit[marketIndex].mintLong,
-            userLazyActions[marketIndex][user].mintLong,
-            userLazyActions[marketIndex][user].usersCurrentUpdateIndex
-        );
-
         if (
             currentUserDeposits.usersCurrentUpdateIndex <=
             latestUpdateIndex[marketIndex] &&
             currentUserDeposits.usersCurrentUpdateIndex != 0 // NOTE: this conditional isn't strictly necessary (all the users deposit amounts will be zero too)
         ) {
-            console.log("here correctly");
             MarketStateSnapshotStruct storage nextGlobalDepositsState =
                 marketStateSnapshot[marketIndex][
                     latestUpdateIndex[marketIndex]
                 ];
-            console.log("2");
 
             if (currentUserDeposits.mintLong != 0) {
-                console.log("3");
                 uint256 tokensToMint =
                     ((currentUserDeposits.mintLong * TEN_TO_THE_18) /
                         nextGlobalDepositsState.tokenPriceLong);
-                console.log("4");
                 uint256 balance =
                     longTokens[marketIndex].balanceOf(address(this));
-                console.log("The balance of", balance);
                 // longTokens[marketIndex].approve(, tokensToMint);
                 longTokens[marketIndex].transfer(user, tokensToMint);
-                console.log("5");
 
                 currentUserDeposits.mintLong = 0;
             }
-            console.log("6");
             if (currentUserDeposits.mintShort != 0) {
                 uint256 tokensToMint =
                     ((currentUserDeposits.mintShort * TEN_TO_THE_18) /
@@ -1520,10 +1428,8 @@ contract LongShort is ILongShort, Initializable {
                 currentUserDeposits.mintAndStakeLong = 0;
                 currentUserDeposits.mintAndStakeShort = 0;
             }
-            console.log("7");
             currentUserDeposits.usersCurrentUpdateIndex = 0;
         }
-        console.log("8");
         // TODO: add events
     }
 
@@ -1551,7 +1457,6 @@ contract LongShort is ILongShort, Initializable {
         external
         executeOutstandingLazySettlements(msg.sender, marketIndex)
     {
-        console.log("Executing mintLongLazy");
         // TODO: pre-deposit them into the market?
         //    - for now not doing that for simplicity, don't gain that much doing so either just more expensive tx (for very little yield)
         _depositFunds(marketIndex, amount);
@@ -1562,11 +1467,6 @@ contract LongShort is ILongShort, Initializable {
             latestUpdateIndex[marketIndex] +
             1;
 
-        console.log(
-            batchedLazyDeposit[marketIndex].mintLong,
-            userLazyActions[marketIndex][msg.sender].mintLong,
-            userLazyActions[marketIndex][msg.sender].usersCurrentUpdateIndex
-        );
         // TODO: add events
 
         emit LazyLongMinted(

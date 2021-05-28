@@ -85,7 +85,6 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         override(ERC20, IERC20)
         returns (uint256)
     {
-        console.log("balance of called!!!");
         return
             longShort.getUsersPendingBalance(account, marketIndex, isLong) +
             ERC20.balanceOf(account);

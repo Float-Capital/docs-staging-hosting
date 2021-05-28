@@ -8,7 +8,7 @@ let testIntegration =
     ) =>
   describe("mintLongLazy", () => {
     it'("should work as expected happy path", () => {
-      let admin = accounts.contents->Array.getUnsafe(0);
+      // let admin = accounts.contents->Array.getUnsafe(0);
       let testUser = accounts.contents->Array.getUnsafe(8);
       let amountToLazyMint = Helpers.randomTokenAmount();
 
@@ -26,8 +26,6 @@ let testIntegration =
 
       let%AwaitThen longValueBefore =
         longShort->Contract.LongShort.longValue(~marketIndex);
-      let%AwaitThen shortValueBefore =
-        longShort->Contract.LongShort.shortValue(~marketIndex);
 
       let%AwaitThen _ =
         paymentToken->Contract.PaymentToken.mint(
@@ -59,38 +57,29 @@ let testIntegration =
         ->mul(bnFromInt(12)) // 20% increase
         ->div(bnFromInt(10));
 
+      // let%AwaitThen userLazyActions =
+      //   longShort->Contract.LongShort.userLazyActions(
+      //     ~marketIndex,
+      //     ~user=testUser.address,
+      //   );
+
+      // let%AwaitThen usersBalanceBeforeOracleUpdate =
+      //   longSynth->Contract.SyntheticToken.balanceOf(
+      //     ~account=testUser.address,
+      //   );
+
       let%AwaitThen _ =
         oracleManager->Contract.OracleManagerMock.setPrice(
           ~newPrice=nextPrice,
         );
 
-      Js.log("\n\n\n\n\nthis is the latest price");
-      Js.log({"LongShort address": longShort.address});
-      Js.log(testUser.address);
-      let%AwaitThen userLazyActions =
-        longShort->Contract.LongShort.userLazyActions(
-          ~marketIndex,
-          ~user=testUser.address,
-        );
-      let%AwaitThen usersBalanceBeforeSettlement =
-        longSynth->Contract.SyntheticToken.balanceOf(
-          ~account=testUser.address,
-        );
-      Js.log({
-        "usersBalanceBeforeSettlement":
-          usersBalanceBeforeSettlement->bnToString,
-        "index": userLazyActions.usersCurrentUpdateIndex->bnToString,
-      });
-      Js.log("this is the latest price\n\n\n\n\n");
       let%AwaitThen _ =
         longShort->Contract.LongShort._updateSystemState(~marketIndex);
-      Js.log("\n\n\n\n\nthis is the latest price");
+
       let%AwaitThen usersBalanceBeforeSettlement =
         longSynth->Contract.SyntheticToken.balanceOf(
           ~account=testUser.address,
         );
-      Js.log({"usersBalanceBeforeSettlement": usersBalanceBeforeSettlement});
-      Js.log("this is the latest price\n\n\n\n\n");
 
       let%AwaitThen _ =
         longShort->Contract.LongShort.Exposed._executeOutstandingLazySettlementsExposed(
@@ -102,7 +91,14 @@ let testIntegration =
           ~account=testUser.address,
         );
 
-      let%AwaitThen longTokenPrice =
+      Chai.bnEqual(
+        ~message=
+          "Balance after price system update but before user settlement should be the same as after settlement",
+        usersBalanceBeforeSettlement,
+        usersUpdatedBalance,
+      );
+
+      let%Await longTokenPrice =
         longShort->Contract.LongShort.longTokenPrice(~marketIndex);
 
       let expectedNumberOfTokensToRecieve =
@@ -113,8 +109,6 @@ let testIntegration =
         expectedNumberOfTokensToRecieve,
         usersUpdatedBalance,
       );
-
-      JsPromise.resolve();
     })
   });
 
