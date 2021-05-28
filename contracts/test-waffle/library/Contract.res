@@ -79,6 +79,10 @@ module SyntheticToken = {
 
   @send
   external setup: (t, string, string, Ethers.ethAddress) => JsPromise.t<transaction> = "stake"
+
+  @send
+  external balanceOf: (t, ~account: Ethers.ethAddress) => JsPromise.t<Ethers.BigNumber.t> =
+    "balanceOf"
 }
 
 type staker
@@ -152,6 +156,11 @@ module OracleManagerMock = {
     deployContract1(contractName, admin)->Obj.magic
   let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
     attachToContract(contractName, ~contractAddress)->Obj.magic
+
+  @send
+  external setPrice: (t, ~newPrice: Ethers.BigNumber.t) => JsPromise.t<transaction> = "setPrice"
+  @send
+  external getLatestPrice: t => JsPromise.t<Ethers.BigNumber.t> = "getLatestPrice"
 }
 
 module LongShort = {
@@ -266,6 +275,21 @@ module LongShort = {
     ~marketIndex: int,
     ~newOracleAddress: Ethers.ethAddress,
   ) => JsPromise.t<transaction> = "updateMarketOracle"
+  @send
+  external _updateSystemState: (t, ~marketIndex: int) => JsPromise.t<transaction> =
+    "_updateSystemState"
+
+  @send
+  external longTokenPrice: (t, ~marketIndex: int) => JsPromise.t<Ethers.BigNumber.t> =
+    "longTokenPrice"
+  @send
+  external shortTokenPrice: (t, ~marketIndex: int) => JsPromise.t<Ethers.BigNumber.t> =
+    "shortTokenPrice"
+
+  @send
+  external longValue: (t, ~marketIndex: int) => JsPromise.t<Ethers.BigNumber.t> = "longValue"
+  @send
+  external shortValue: (t, ~marketIndex: int) => JsPromise.t<Ethers.BigNumber.t> = "shortValue"
 
   type userLazyActionsStruct = {
     usersCurrentUpdateIndex: Ethers.BigNumber.t,
@@ -279,7 +303,7 @@ module LongShort = {
     t,
     ~marketIndex: int,
     ~user: Ethers.ethAddress,
-  ) => JsPromise.t<userLazyActionsStruct> = "useruserLazyActions"
+  ) => JsPromise.t<userLazyActionsStruct> = "userLazyActions"
 
   module Exposed = {
     @send
@@ -380,6 +404,13 @@ module LongShort = {
       t,
       ~shouldUseMock: bool,
     ) => JsPromise.t<transaction> = "setUseexecuteOutstandingLazySettlementsMock"
+
+    @send
+    external _executeOutstandingLazySettlementsExposed: (
+      t,
+      ~user: Ethers.ethAddress,
+      ~marketIndex: int,
+    ) => JsPromise.t<transaction> = "_executeOutstandingLazySettlements" // "_executeOutstandingLazySettlementsExposed"
   }
 }
 

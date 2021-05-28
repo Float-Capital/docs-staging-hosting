@@ -16,24 +16,22 @@ Globals.describe("Float System")(undefined, undefined, undefined, (function (par
                       var accounts = {
                         contents: undefined
                       };
-                      Globals.before$prime(undefined)(undefined, undefined, undefined, (function (param) {
+                      Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
                               return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
                                             accounts.contents = loadedAccounts;
-                                            
-                                          }));
-                            }));
-                      Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
-                              return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
-                                            contracts.contents = deployedContracts;
-                                            var setupUser = accounts.contents[2];
-                                            return LetOps.Await.let_(HelperActions.stakeRandomlyInBothSidesOfMarket(deployedContracts.markets, setupUser, deployedContracts.longShort), (function (param) {
-                                                          
+                                            return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
+                                                          contracts.contents = deployedContracts;
+                                                          var setupUser = accounts.contents[2];
+                                                          return LetOps.Await.let_(HelperActions.stakeRandomlyInBothSidesOfMarket(deployedContracts.markets, setupUser, deployedContracts.longShort), (function (param) {
+                                                                        
+                                                                      }));
                                                         }));
                                           }));
                             }));
                       Globals.describe("_updateSystemState")(undefined, undefined, undefined, (function (param) {
                               
                             }));
+                      LazyDeposit.testIntegration(contracts, accounts);
                       return Globals.describe("LongShort - internals exposed")(undefined, undefined, undefined, (function (param) {
                                     var contracts = {
                                       contents: undefined
@@ -47,17 +45,16 @@ Globals.describe("Float System")(undefined, undefined, undefined, (function (par
                                                           
                                                         }));
                                           }));
-                                    Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
-                                            return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
-                                                          contracts.contents = deployedContracts;
-                                                          var firstMarketPaymentToken = deployedContracts.markets[1].paymentToken;
-                                                          var testUser = accounts.contents[1];
-                                                          return LetOps.Await.let_(Contract.PaymentToken.mintAndApprove(firstMarketPaymentToken, testUser, ethers.BigNumber.from("10000000000000000000000"), deployedContracts.longShort.address), (function (param) {
-                                                                        
-                                                                      }));
-                                                        }));
-                                          }));
-                                    return LazyDeposit.testExposed(contracts, accounts);
+                                    return Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
+                                                  return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
+                                                                contracts.contents = deployedContracts;
+                                                                var firstMarketPaymentToken = deployedContracts.markets[1].paymentToken;
+                                                                var testUser = accounts.contents[1];
+                                                                return LetOps.Await.let_(Contract.PaymentToken.mintAndApprove(firstMarketPaymentToken, testUser, ethers.BigNumber.from("10000000000000000000000"), deployedContracts.longShort.address), (function (param) {
+                                                                              
+                                                                            }));
+                                                              }));
+                                                }));
                                   }));
                     }));
       }));
