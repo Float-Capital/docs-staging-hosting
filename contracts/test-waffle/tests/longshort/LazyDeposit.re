@@ -29,26 +29,26 @@ let testIntegration =
         longShort->LongShort.longValue(marketIndex);
 
       let%AwaitThen _ =
-        paymentToken->Contract.PaymentToken.mint(
-          ~user=testUser.address,
+        paymentToken->ERC20PresetMinterPauser.mint(
+          ~_to=testUser.address,
           ~amount=amountToLazyMint,
         );
 
       let%AwaitThen _ =
         paymentToken
-        ->Contract.connect(~address=testUser)
-        ->Contract.PaymentToken.approve(
+        ->ContractHelpers.connect(~address=testUser)
+        ->ERC20PresetMinterPauser.approve(
             ~spender=longShort.address,
             ~amount=amountToLazyMint,
           );
 
       let%AwaitThen _ =
         longShort
-        ->Contract.connect(~address=testUser)
+        ->ContractHelpers.connect(~address=testUser)
         ->LongShort.mintLongLazy(~marketIndex, ~amount=amountToLazyMint);
 
       let%AwaitThen previousPrice =
-        oracleManager->Contract.OracleManagerMock.getLatestPrice;
+        oracleManager->OracleManagerMock.getLatestPrice;
 
       let nextPrice =
         previousPrice
@@ -67,26 +67,20 @@ let testIntegration =
       //   );
 
       let%AwaitThen _ =
-        oracleManager->Contract.OracleManagerMock.setPrice(
-          ~newPrice=nextPrice,
-        );
+        oracleManager->OracleManagerMock.setPrice(~newPrice=nextPrice);
 
       let%AwaitThen _ = longShort->LongShort._updateSystemState(~marketIndex);
 
       let%AwaitThen usersBalanceBeforeSettlement =
-        longSynth->Contract.SyntheticToken.balanceOf(
-          ~account=testUser.address,
-        );
+        longSynth->SyntheticToken.balanceOf(~account=testUser.address);
 
       // This triggers the _executeOutstandingLazySettlements function
       let%AwaitThen _ =
         longShort
-        ->Contract.connect(~address=testUser)
+        ->ContractHelpers.connect(~address=testUser)
         ->LongShort.mintLongLazy(~marketIndex, ~amount=bnFromInt(0));
       let%AwaitThen usersUpdatedBalance =
-        longSynth->Contract.SyntheticToken.balanceOf(
-          ~account=testUser.address,
-        );
+        longSynth->SyntheticToken.balanceOf(~account=testUser.address);
 
       Chai.bnEqual(
         ~message=
@@ -132,7 +126,7 @@ let testExposed =
         Chai.callEmitEvents(
           ~call=
             longShort
-            ->Contract.connect(~address=testWallet)
+            ->ContractHelpers.connect(~address=testWallet)
             ->LongShort.mintLongLazy(~marketIndex, ~amount),
           ~eventName="executeOutstandingLazySettlementsMock",
           ~contract=longShort->Obj.magic,
@@ -141,7 +135,8 @@ let testExposed =
       ();
     });
     describe("mintLongLazy", () => {
-      let mintLongLazyTxPromise: ref(JsPromise.t(Contract.transaction)) =
+      let mintLongLazyTxPromise:
+        ref(JsPromise.t(ContractHelpers.transaction)) =
         ref(None->Obj.magic);
       let marketIndex = 1;
       let amount = bnFromInt(1);
@@ -152,7 +147,7 @@ let testExposed =
 
         mintLongLazyTxPromise :=
           longShort
-          ->Contract.connect(~address=testWallet)
+          ->ContractHelpers.connect(~address=testWallet)
           ->LongShort.mintLongLazy(~marketIndex, ~amount);
       });
 

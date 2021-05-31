@@ -10,12 +10,12 @@ let mintAndStake =
       ~isLong: bool,
     ) => {
   let%Await _ =
-    token->Contract.PaymentToken.mintAndApprove(
+    token->Contract.PaymentTokenHelpers.mintAndApprove(
       ~amount,
       ~user,
       ~spender=longShort.address,
     );
-  let contract = longShort->Contract.connect(~address=user);
+  let contract = longShort->ContractHelpers.connect(~address=user);
   if (isLong) {
     contract->LongShort.mintLongAndStake(~marketIndex, ~amount);
   } else {
