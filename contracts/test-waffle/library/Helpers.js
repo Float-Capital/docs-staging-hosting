@@ -2,8 +2,10 @@
 'use strict';
 
 var Js_int = require("bs-platform/lib/js/js_int.js");
+var Staker = require("./contracts/Staker.js");
 var Js_math = require("bs-platform/lib/js/js_math.js");
 var Contract = require("./Contract.js");
+var LongShort = require("./contracts/LongShort.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
 
 function randomInteger(param) {
@@ -52,7 +54,7 @@ function createSyntheticMarket(admin, longShort, fundToken, marketName, marketSy
               return longShort.newSyntheticMarket(marketName, marketSymbol, fundToken.address, param[0].address, yieldManager.address).then(function (param) {
                             return longShort.latestMarket();
                           }).then(function (marketIndex) {
-                          return longShort.initializeMarket(marketIndex, 0, 50, 50, 50, ethers.BigNumber.from("1000000000000000000"), ethers.BigNumber.from(0));
+                          return longShort.initializeMarket(marketIndex, ethers.BigNumber.from(0), ethers.BigNumber.from(50), ethers.BigNumber.from(50), ethers.BigNumber.from(50), ethers.BigNumber.from("1000000000000000000"), ethers.BigNumber.from(0));
                         });
             });
 }
@@ -85,8 +87,8 @@ function inititialize(admin, exposeInternals) {
                 Contract.FloatCapital_v0.make(undefined),
                 Contract.Treasury_v0.make(undefined),
                 Contract.FloatToken.make(undefined),
-                exposeInternals ? Contract.Staker.makeExposed(undefined) : Contract.Staker.make(undefined),
-                exposeInternals ? Contract.LongShort.makeExposed(undefined) : Contract.LongShort.make(undefined),
+                exposeInternals ? Staker.Exposed.make(undefined) : Staker.make(undefined),
+                exposeInternals ? LongShort.Exposed.make(undefined) : LongShort.make(undefined),
                 Promise.all([
                       Contract.PaymentToken.make("Pay Token 1", "PT1"),
                       Contract.PaymentToken.make("Pay Token 2", "PT2")
@@ -102,7 +104,7 @@ function inititialize(admin, exposeInternals) {
               var floatCapital = param[0];
               return Contract.TokenFactory.make(admin.address, longShort.address).then(function (tokenFactory) {
                           return Promise.all([
-                                          floatToken["initialize(string,string,address)"]("Float token", "FLOAT TOKEN", staker.address),
+                                          floatToken.initialize3("Float token", "FLOAT TOKEN", staker.address),
                                           treasury.initialize(admin.address),
                                           longShort.initialize(admin.address, treasury.address, tokenFactory.address, staker.address),
                                           staker.initialize(admin.address, longShort.address, floatToken.address, floatCapital.address)

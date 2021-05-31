@@ -6,7 +6,7 @@ let mintAndStake =
       ~amount,
       ~token,
       ~user: Ethers.Wallet.t,
-      ~longShort: Contract.LongShort.t,
+      ~longShort: LongShort.t,
       ~isLong: bool,
     ) => {
   let%Await _ =
@@ -17,9 +17,9 @@ let mintAndStake =
     );
   let contract = longShort->Contract.connect(~address=user);
   if (isLong) {
-    contract->Contract.LongShort.mintLongAndStake(~marketIndex, ~amount);
+    contract->LongShort.mintLongAndStake(~marketIndex, ~amount);
   } else {
-    contract->Contract.LongShort.mintShortAndStake(~marketIndex, ~amount);
+    contract->LongShort.mintShortAndStake(~marketIndex, ~amount);
   };
 };
 
@@ -27,7 +27,7 @@ let stakeRandomlyInMarkets =
     (
       ~marketsToStakeIn: array(Helpers.markets),
       ~userToStakeWith: Ethers.Wallet.t,
-      ~longShort: Contract.LongShort.t,
+      ~longShort: LongShort.t,
     ) =>
   marketsToStakeIn->Belt.Array.reduce(
     JsPromise.resolve(([||], [||])),
@@ -72,7 +72,7 @@ let stakeRandomlyInBothSidesOfMarket =
     (
       ~marketsToStakeIn: array(Helpers.markets),
       ~userToStakeWith: Ethers.Wallet.t,
-      ~longShort: Contract.LongShort.t,
+      ~longShort: LongShort.t,
     ) =>
   marketsToStakeIn->Belt.Array.reduce(
     JsPromise.resolve(),

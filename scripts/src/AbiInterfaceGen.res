@@ -1,28 +1,59 @@
 let files = Node.Fs.readdirSync("../contracts/abis")
 
+let lowerCaseFirstLetter = %raw(`(someString) => someString.charAt(0).toLowerCase() + someString.slice(1)`)
+let removePrefixUnderscores = %raw(`(someString) => {
+  if (someString.charAt(0) == "_") {
+    return someString.slice(1)
+  } else {
+    return someString
+  }
+}`)
+
+let formatKeywords = keyword =>
+  switch keyword {
+  | "to" =>
+    Js.log("Fund a to!!!!!!")
+    Js.log("_" ++ keyword)
+    "_" ++ keyword
+  | _ => keyword->removePrefixUnderscores
+  }
 let getMmoduleName = fileName => fileName->Js.String2.split(".")->Array.getUnsafe(0)
 let getRescriptType = typeString =>
   switch typeString {
+  | #"uint32[]" => "array<int>"
+  | #uint8 => "int"
+  | #uint16 => "int"
   | #uint32 => "int"
-  | #uint256 => "bn"
+  | #uint256 => "Ethers.BigNumber.t"
+  | #int256 => "Ethers.BigNumber.t"
   | #string => "string"
-  | #address => "address"
+  | #address => "Ethers.ethAddress"
+  | #bytes4 => "bytes4"
+  | #bytes32 => "bytes32"
+  | #bool => "bool"
   | unknownType =>
     Js.log(`Please handle all types - ${unknownType->Obj.magic} isn't handled by this script.`)
     "unkownType"
   }
-let typeInputs = inputs => {
+type inputParamLayout = NamedTyped | NamedUntyped | UnnamedUntyped
+
+let typeInputs = (inputs, paramLayout: inputParamLayout) => {
   let paramsString = ref("")
-  let _ = inputs->Array.map(input => {
+  let _ = inputs->Array.mapWithIndex((index, input) => {
     let paramType = input["type"]
-    let paramName = input["name"]
+    let parameterIsNamed = input["name"] != ""
+    let paramName =
+      input["name"] == "" ? `param${index->Int.toString}` : input["name"]->formatKeywords
 
     let rescriptType = getRescriptType(paramType)
 
     paramsString :=
       paramsString.contents ++
-      `
-~${paramName}: ${rescriptType},`
+      switch paramLayout {
+      | NamedTyped => `${parameterIsNamed ? "~" ++ paramName ++ ":" : ""} ${rescriptType},`
+      | NamedUntyped => `${parameterIsNamed ? "~" : ""}${paramName},`
+      | UnnamedUntyped => `${paramName},`
+      }
   })
 
   paramsString.contents
@@ -32,10 +63,8 @@ let typeOutputs = (outputs, functionName) => {
   if outputs->Array.length > 1 {
     let _types = outputs->Array.mapWithIndex((index, output) => {
       let paramType = output["type"]
-      let paramName = output["name"]->Option.getWithDefault(`param${index->Int.toString}`)
-      if paramName == "" {
-        Js.log("name is zero")
-      }
+      let paramName =
+        output["name"] == "" ? `param${index->Int.toString}` : output["name"]->formatKeywords
 
       let rescriptType = getRescriptType(paramType)
 
@@ -46,74 +75,124 @@ ${paramName}: ${rescriptType},`
     })
     `type ${functionName}Return = {${paramsString.contents}
     }`
-  } else {
-    Js.log("IN THE ELSE!!!!!")
+  } else if outputs->Array.length == 1 {
     let rescriptType = getRescriptType((outputs->Array.getUnsafe(0))["type"])
-    `type ${functionName}Return = ${rescriptType}`
+    `type ${functionName->lowerCaseFirstLetter}Return = ${rescriptType}`
+  } else {
+    `type ${functionName->lowerCaseFirstLetter}Return`
   }
 }
 
-let moduleDictionary = Js.Dict.empty()
+let generateConstructor = constructorParams => {
+  let typeNamesFull = typeInputs(constructorParams, NamedTyped)
+  let typeNames = typeInputs(constructorParams, NamedUntyped)
+  let callParams = typeInputs(constructorParams, UnnamedUntyped)
+  `let make: (${typeNamesFull}) => JsPromise.t<t> = (${typeNames}) =>
+    deployContract${constructorParams
+    ->Array.length
+    ->Int.toString}(contractName, ${callParams})->Obj.magic`
+}
+
+let moduleDictionary: Js.Dict.t<(Js.Dict.t<string>, string)> = Js.Dict.empty()
 let _ = files->Array.map(abiFileName => {
   let abiFileContents = `../contracts/abis/${abiFileName}`->Node.Fs.readFileAsUtf8Sync
 
   let abiFileObject = abiFileContents->Js.Json.parseExn->Obj.magic // us some useful polymorphic magic 🙌
 
-  let moduleContents = ref(``)
+  let moduleContents = Js.Dict.empty()
+  let moduleConstructor = ref(
+    "let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic",
+  )
   let moduleName = getMmoduleName(abiFileName)
   let _processEachItemInAbi = abiFileObject->Array.map(abiItem => {
     let name = abiItem["name"]
     let itemType = abiItem["type"]
+    let inputs = abiItem["inputs"]
 
     switch itemType {
     | #event => Js.log(`we have an event - ${name}`)
     | #function =>
-      Js.log(`we have an FUNCTION - ${name}`)
-      let inputs = abiItem["inputs"]
       let outputs = abiItem["outputs"]
+      let hasReturnValues = outputs->Array.length > 0
       let stateMutability = abiItem["stateMutability"]
-      let typeNames = typeInputs(inputs)
+      let typeNames = typeInputs(inputs, NamedTyped)
+      let returnType = `${name}Return`->lowerCaseFirstLetter
+      let returnTypeDefinition = typeOutputs(outputs, name)
       switch stateMutability {
       | #view | #pure =>
-        let returnType = `${name}Return`
-        let returnTypeDefinition = typeOutputs(outputs, name)
-        moduleContents :=
-          moduleContents.contents ++
+        moduleContents->Js.Dict.set(
+          name,
           `
   ${returnTypeDefinition}
   @send
-  external userLazyActions: (
+  external ${name->lowerCaseFirstLetter}: (
     t,${typeNames}
   ) => JsPromise.t<${returnType}> = "${name}"
-`
+`,
+        )
       | _ =>
-        moduleContents :=
-          moduleContents.contents ++
+        Js.log({"name": name, "typeNames": typeNames})
+
+        let callVersion = hasReturnValues
+          ? `
+    ${returnTypeDefinition}
+    @send @scope("callStatic")
+    external ${name}Call: (
+      t,${typeNames}
+    ) => JsPromise.t<${returnType}> = "${name}"
+`
+          : ""
+        moduleContents->Js.Dict.set(
+          name,
           `
   @send
-  external userLazyActions: (
+  external ${name}: (
     t,${typeNames}
   ) => JsPromise.t<transaction> = "${name}"
-`
+${callVersion}`,
+        )
       }
-    | #constructor => Js.log(`We have a CONSTRUCTOR - `)
+    | #constructor => moduleConstructor := generateConstructor(inputs)
     | _ => Js.log2(`We have an unhandled type - ${name} ${itemType->Obj.magic}`, abiItem)
     }
   })
-  moduleDictionary->Js.Dict.set(moduleName, moduleContents.contents)
+  moduleDictionary->Js.Dict.set(moduleName, (moduleContents, moduleConstructor.contents))
 })
 
 let _writeFiles =
   moduleDictionary
   ->Js.Dict.entries
-  ->Array.map(((moduleName, contents)) => {
-    if !(moduleName->Js.String2.endsWith("Exposed")) {
+  ->Array.map(((moduleName, (functions, contractConstructor))) => {
+    if !(moduleName->Js.String2.endsWith("InternalsExposed")) {
+      let optExposedFunctions = moduleDictionary->Js.Dict.get(moduleName ++ "InternalsExposed")
+      let exposedFunctionBinding = switch optExposedFunctions {
+      | Some((functions, contractConstructor)) =>
+        `module Exposed = {
+          let contractName = "${moduleName}InternalsExposed"
+
+          ${contractConstructor}
+          ${functions->Js.Dict.values->Js.String.concatMany("")}
+        }`
+      | None => ""
+      }
+
       Node.Fs.writeFileAsUtf8Sync(
         `../contracts/test-waffle/library/contracts/${moduleName}.res`,
-        `module ${moduleName} = {
-` ++
-        contents ++ `
-}`,
+        `
+@@ocaml.warning("-32")
+open ContractHelpers
+type t = {address: Ethers.ethAddress}
+let contractName = "${moduleName}"
+
+let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
+  attachToContract(contractName, ~contractAddress)->Obj.magic
+
+${contractConstructor}
+
+${functions->Js.Dict.values->Js.String.concatMany("")}
+
+${exposedFunctionBinding}
+`,
       )
     }
   })

@@ -20,7 +20,7 @@ external attachAtAddress: (contractFactory, ~contractAddress: Ethers.ethAddress)
 let attachToContract = (contractName, ~contractAddress) => {
   getContractFactory(contractName)->JsPromise.then(attachAtAddress(~contractAddress))
 }
-let deployContract = contractName => {
+let deployContract0 = contractName => {
   getContractFactory(contractName)->JsPromise.then(deploy)->JsPromise.then(deployed)
 }
 let deployContract1 = (contractName, firstParam) => {
@@ -124,262 +124,262 @@ module OracleManagerMock = {
   external getLatestPrice: t => JsPromise.t<Ethers.BigNumber.t> = "getLatestPrice"
 }
 
-module LongShort = {
-  type t = {address: Ethers.ethAddress}
-  let contractName = "LongShort"
-  let contractNameExposed = "LongShortInternalsExposed"
-  let makeExposed: unit => JsPromise.t<t> = () => deployContract(contractNameExposed)->Obj.magic
+// module LongShort = {
+//   type t = {address: Ethers.ethAddress}
+//   let contractName = "LongShort"
+//   let contractNameExposed = "LongShortInternalsExposed"
+//   let makeExposed: unit => JsPromise.t<t> = () => deployContract0(contractNameExposed)->Obj.magic
 
-  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
+//   let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic
 
-  @send
-  external setup: (
-    t,
-    Ethers.ethAddress,
-    Ethers.ethAddress,
-    Ethers.ethAddress,
-    Ethers.ethAddress,
-  ) => JsPromise.t<transaction> = "initialize"
-  @send
-  external newSyntheticMarket: (
-    t,
-    ~marketName: string,
-    ~marketSymbol: string,
-    ~paymentToken: Ethers.ethAddress,
-    ~oracleManager: Ethers.ethAddress,
-    ~yieldManager: Ethers.ethAddress,
-  ) => JsPromise.t<transaction> = "newSyntheticMarket"
-  @send
-  external initializeMarket: (
-    t,
-    ~marketIndex: int,
-    ~baseEntryFee: int,
-    ~badLiquidityEntryFee: int,
-    ~baseExitFee: int,
-    ~badLiquidityExitFee: int,
-    ~kInitialMultiplier: Ethers.BigNumber.t,
-    ~kPeriod: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "initializeMarket"
+//   @send
+//   external setup: (
+//     t,
+//     Ethers.ethAddress,
+//     Ethers.ethAddress,
+//     Ethers.ethAddress,
+//     Ethers.ethAddress,
+//   ) => JsPromise.t<transaction> = "initialize"
+//   @send
+//   external newSyntheticMarket: (
+//     t,
+//     ~marketName: string,
+//     ~marketSymbol: string,
+//     ~paymentToken: Ethers.ethAddress,
+//     ~oracleManager: Ethers.ethAddress,
+//     ~yieldManager: Ethers.ethAddress,
+//   ) => JsPromise.t<transaction> = "newSyntheticMarket"
+//   @send
+//   external initializeMarket: (
+//     t,
+//     ~marketIndex: int,
+//     ~baseEntryFee: int,
+//     ~badLiquidityEntryFee: int,
+//     ~baseExitFee: int,
+//     ~badLiquidityExitFee: int,
+//     ~kInitialMultiplier: Ethers.BigNumber.t,
+//     ~kPeriod: Ethers.BigNumber.t,
+//   ) => JsPromise.t<transaction> = "initializeMarket"
 
-  type batchedLazyDeposit = {
-    mintLong: Ethers.BigNumber.t,
-    mintShort: Ethers.BigNumber.t,
-    mintAndStakeLong: Ethers.BigNumber.t,
-    mintAntStakeShort: Ethers.BigNumber.t,
-  }
+//   type batchedLazyDeposit = {
+//     mintLong: Ethers.BigNumber.t,
+//     mintShort: Ethers.BigNumber.t,
+//     mintAndStakeLong: Ethers.BigNumber.t,
+//     mintAntStakeShort: Ethers.BigNumber.t,
+//   }
 
-  @send
-  external batchedLazyDeposit: (t, ~marketIndex: int) => JsPromise.t<batchedLazyDeposit> =
-    "batchedLazyDeposit"
+//   @send
+//   external batchedLazyDeposit: (t, ~marketIndex: int) => JsPromise.t<batchedLazyDeposit> =
+//     "batchedLazyDeposit"
 
-  @send
-  external fundTokens: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "fundTokens"
+//   @send
+//   external fundTokens: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "fundTokens"
 
-  @send
-  external longSynth: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "longTokens"
-  @send
-  external shortSynth: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "shortTokens"
-  @send
-  external yieldManagers: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "yieldManagers"
-  @send
-  external oracleManagers: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> =
-    "oracleManagers"
-  @send
-  external staker: t => JsPromise.t<Ethers.ethAddress> = "staker"
+//   @send
+//   external longSynth: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "longTokens"
+//   @send
+//   external shortSynth: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "shortTokens"
+//   @send
+//   external yieldManagers: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> = "yieldManagers"
+//   @send
+//   external oracleManagers: (t, ~marketIndex: int) => JsPromise.t<Ethers.ethAddress> =
+//     "oracleManagers"
+//   @send
+//   external staker: t => JsPromise.t<Ethers.ethAddress> = "staker"
 
-  @send
-  external latestMarket: t => JsPromise.t<int> = "latestMarket"
+//   @send
+//   external latestMarket: t => JsPromise.t<int> = "latestMarket"
 
-  @send
-  external mintLongLazy: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "mintLongLazy"
+//   @send
+//   external mintLongLazy: (
+//     t,
+//     ~marketIndex: int,
+//     ~amount: Ethers.BigNumber.t,
+//   ) => JsPromise.t<transaction> = "mintLongLazy"
 
-  @send
-  external mintShortLazy: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "mintShortLazy"
+//   @send
+//   external mintShortLazy: (
+//     t,
+//     ~marketIndex: int,
+//     ~amount: Ethers.BigNumber.t,
+//   ) => JsPromise.t<transaction> = "mintShortLazy"
 
-  @send
-  external mintLongAndStakeLazy: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "mintLongAndStakeLazy"
+//   @send
+//   external mintLongAndStakeLazy: (
+//     t,
+//     ~marketIndex: int,
+//     ~amount: Ethers.BigNumber.t,
+//   ) => JsPromise.t<transaction> = "mintLongAndStakeLazy"
 
-  @send
-  external mintShortAndStakeLazy: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "mintShortAndStakeLazy"
+//   @send
+//   external mintShortAndStakeLazy: (
+//     t,
+//     ~marketIndex: int,
+//     ~amount: Ethers.BigNumber.t,
+//   ) => JsPromise.t<transaction> = "mintShortAndStakeLazy"
 
-  @send
-  external mintLongAndStake: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "mintLongAndStake"
-  @send
-  external mintShortAndStake: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "mintShortAndStake"
-  @send
-  external updateMarketOracle: (
-    t,
-    ~marketIndex: int,
-    ~newOracleAddress: Ethers.ethAddress,
-  ) => JsPromise.t<transaction> = "updateMarketOracle"
-  @send
-  external _updateSystemState: (t, ~marketIndex: int) => JsPromise.t<transaction> =
-    "_updateSystemState"
+//   @send
+//   external mintLongAndStake: (
+//     t,
+//     ~marketIndex: int,
+//     ~amount: Ethers.BigNumber.t,
+//   ) => JsPromise.t<transaction> = "mintLongAndStake"
+//   @send
+//   external mintShortAndStake: (
+//     t,
+//     ~marketIndex: int,
+//     ~amount: Ethers.BigNumber.t,
+//   ) => JsPromise.t<transaction> = "mintShortAndStake"
+//   @send
+//   external updateMarketOracle: (
+//     t,
+//     ~marketIndex: int,
+//     ~newOracleAddress: Ethers.ethAddress,
+//   ) => JsPromise.t<transaction> = "updateMarketOracle"
+//   @send
+//   external _updateSystemState: (t, ~marketIndex: int) => JsPromise.t<transaction> =
+//     "_updateSystemState"
 
-  @send
-  external longTokenPrice: (t, ~marketIndex: int) => JsPromise.t<Ethers.BigNumber.t> =
-    "longTokenPrice"
-  @send
-  external shortTokenPrice: (t, ~marketIndex: int) => JsPromise.t<Ethers.BigNumber.t> =
-    "shortTokenPrice"
+//   @send
+//   external longTokenPrice: (t, ~marketIndex: int) => JsPromise.t<Ethers.BigNumber.t> =
+//     "longTokenPrice"
+//   @send
+//   external shortTokenPrice: (t, ~marketIndex: int) => JsPromise.t<Ethers.BigNumber.t> =
+//     "shortTokenPrice"
 
-  @send
-  external longValue: (t, ~marketIndex: int) => JsPromise.t<Ethers.BigNumber.t> = "longValue"
-  @send
-  external shortValue: (t, ~marketIndex: int) => JsPromise.t<Ethers.BigNumber.t> = "shortValue"
+//   @send
+//   external longValue: (t, ~marketIndex: int) => JsPromise.t<Ethers.BigNumber.t> = "longValue"
+//   @send
+//   external shortValue: (t, ~marketIndex: int) => JsPromise.t<Ethers.BigNumber.t> = "shortValue"
 
-  type userLazyActionsStruct = {
-    usersCurrentUpdateIndex: Ethers.BigNumber.t,
-    mintLong: Ethers.BigNumber.t,
-    mintShort: Ethers.BigNumber.t,
-    mintAndStakeLong: Ethers.BigNumber.t,
-    mintAndStakeShort: Ethers.BigNumber.t,
-  }
-  @send
-  external userLazyActions: (
-    t,
-    ~marketIndex: int,
-    ~user: Ethers.ethAddress,
-  ) => JsPromise.t<userLazyActionsStruct> = "userLazyActions"
+//   type userLazyActionsStruct = {
+//     usersCurrentUpdateIndex: Ethers.BigNumber.t,
+//     mintLong: Ethers.BigNumber.t,
+//     mintShort: Ethers.BigNumber.t,
+//     mintAndStakeLong: Ethers.BigNumber.t,
+//     mintAndStakeShort: Ethers.BigNumber.t,
+//   }
+//   @send
+//   external userLazyActions: (
+//     t,
+//     ~marketIndex: int,
+//     ~user: Ethers.ethAddress,
+//   ) => JsPromise.t<userLazyActionsStruct> = "userLazyActions"
 
-  module Exposed = {
-    @send
-    external refreshTokensPrice: (t, ~marketIndex: int) => JsPromise.t<transaction> =
-      "refreshTokensPrice"
+//   module Exposed = {
+//     @send
+//     external refreshTokensPrice: (t, ~marketIndex: int) => JsPromise.t<transaction> =
+//       "refreshTokensPrice"
 
-    @send
-    external feesMechanism: (
-      t,
-      ~marketIndex: int,
-      ~totalFees: Ethers.BigNumber.t,
-    ) => JsPromise.t<transaction> = "feesMechanism"
+//     @send
+//     external feesMechanism: (
+//       t,
+//       ~marketIndex: int,
+//       ~totalFees: Ethers.BigNumber.t,
+//     ) => JsPromise.t<transaction> = "feesMechanism"
 
-    @send
-    external yieldMechanism: (t, ~marketIndex: int) => JsPromise.t<transaction> = "yieldMechanism"
+//     @send
+//     external yieldMechanism: (t, ~marketIndex: int) => JsPromise.t<transaction> = "yieldMechanism"
 
-    @send
-    external minimum: (
-      t,
-      ~liquidityOfPositionA: Ethers.BigNumber.t,
-      ~liquidityOfPositionB: Ethers.BigNumber.t,
-    ) => JsPromise.t<Ethers.BigNumber.t> = "minimum"
+//     @send
+//     external minimum: (
+//       t,
+//       ~liquidityOfPositionA: Ethers.BigNumber.t,
+//       ~liquidityOfPositionB: Ethers.BigNumber.t,
+//     ) => JsPromise.t<Ethers.BigNumber.t> = "minimum"
 
-    @send
-    external calculateValueChangeForPriceMechanism: (
-      t,
-      ~marketIndex: int,
-      ~assetPriceGreater: Ethers.BigNumber.t,
-      ~assetPriceLess: Ethers.BigNumber.t,
-      ~baseValueExposure: Ethers.BigNumber.t,
-    ) => JsPromise.t<Ethers.BigNumber.t> = "calculateValueChangeForPriceMechanism"
+//     @send
+//     external calculateValueChangeForPriceMechanism: (
+//       t,
+//       ~marketIndex: int,
+//       ~assetPriceGreater: Ethers.BigNumber.t,
+//       ~assetPriceLess: Ethers.BigNumber.t,
+//       ~baseValueExposure: Ethers.BigNumber.t,
+//     ) => JsPromise.t<Ethers.BigNumber.t> = "calculateValueChangeForPriceMechanism"
 
-    @send
-    external depositFunds: (
-      t,
-      ~marketIndex: int,
-      ~amount: Ethers.BigNumber.t,
-    ) => JsPromise.t<transaction> = "depositFunds"
+//     @send
+//     external depositFunds: (
+//       t,
+//       ~marketIndex: int,
+//       ~amount: Ethers.BigNumber.t,
+//     ) => JsPromise.t<transaction> = "depositFunds"
 
-    @send
-    external withdrawFunds: (
-      t,
-      ~marketIndex: int,
-      ~amount: Ethers.BigNumber.t,
-    ) => JsPromise.t<transaction> = "withdrawFunds"
+//     @send
+//     external withdrawFunds: (
+//       t,
+//       ~marketIndex: int,
+//       ~amount: Ethers.BigNumber.t,
+//     ) => JsPromise.t<transaction> = "withdrawFunds"
 
-    @send
-    external transferToYieldManager: (
-      t,
-      ~marketIndex: int,
-      ~amount: Ethers.BigNumber.t,
-    ) => JsPromise.t<transaction> = "transferToYieldManager"
+//     @send
+//     external transferToYieldManager: (
+//       t,
+//       ~marketIndex: int,
+//       ~amount: Ethers.BigNumber.t,
+//     ) => JsPromise.t<transaction> = "transferToYieldManager"
 
-    @send
-    external transferFromYieldManager: (
-      t,
-      ~marketIndex: int,
-      ~amount: Ethers.BigNumber.t,
-    ) => JsPromise.t<transaction> = "transferFromYieldManager"
+//     @send
+//     external transferFromYieldManager: (
+//       t,
+//       ~marketIndex: int,
+//       ~amount: Ethers.BigNumber.t,
+//     ) => JsPromise.t<transaction> = "transferFromYieldManager"
 
-    @send
-    external getFeesForAmounts: (
-      t,
-      ~marketIndex: int,
-      ~baseAmount: Ethers.BigNumber.t,
-      ~penaltyAmount: Ethers.BigNumber.t,
-      ~isMint: bool,
-    ) => JsPromise.t<Ethers.BigNumber.t> = "getFeesForAmounts"
+//     @send
+//     external getFeesForAmounts: (
+//       t,
+//       ~marketIndex: int,
+//       ~baseAmount: Ethers.BigNumber.t,
+//       ~penaltyAmount: Ethers.BigNumber.t,
+//       ~isMint: bool,
+//     ) => JsPromise.t<Ethers.BigNumber.t> = "getFeesForAmounts"
 
-    @send
-    external getFeesForAction: (
-      t,
-      ~marketIndex: int,
-      ~amount: Ethers.BigNumber.t,
-      ~isMint: bool,
-      ~isLong: bool,
-    ) => JsPromise.t<Ethers.BigNumber.t> = "getFeesForAction"
+//     @send
+//     external getFeesForAction: (
+//       t,
+//       ~marketIndex: int,
+//       ~amount: Ethers.BigNumber.t,
+//       ~isMint: bool,
+//       ~isLong: bool,
+//     ) => JsPromise.t<Ethers.BigNumber.t> = "getFeesForAction"
 
-    @send
-    external priceChangeMechanism: (
-      t,
-      ~marketIndex: int,
-      ~newPrice: Ethers.BigNumber.t,
-    ) => JsPromise.t<Ethers.BigNumber.t> = "priceChangeMechanism"
+//     @send
+//     external priceChangeMechanism: (
+//       t,
+//       ~marketIndex: int,
+//       ~newPrice: Ethers.BigNumber.t,
+//     ) => JsPromise.t<Ethers.BigNumber.t> = "priceChangeMechanism"
 
-    @send @scope("callStatic")
-    external calculateAccumulatedFloatExposedCall: (
-      t,
-      ~marketIndex: int,
-      ~user: Ethers.ethAddress,
-    ) => JsPromise.t<{
-      "longFloatReward": Ethers.BigNumber.t,
-      "shortFloatReward": Ethers.BigNumber.t,
-    }> = "calculateAccumulatedFloatExposed"
+//     @send @scope("callStatic")
+//     external calculateAccumulatedFloatExposedCall: (
+//       t,
+//       ~marketIndex: int,
+//       ~user: Ethers.ethAddress,
+//     ) => JsPromise.t<{
+//       "longFloatReward": Ethers.BigNumber.t,
+//       "shortFloatReward": Ethers.BigNumber.t,
+//     }> = "calculateAccumulatedFloatExposed"
 
-    @send
-    external setUseexecuteOutstandingLazySettlementsMock: (
-      t,
-      ~shouldUseMock: bool,
-    ) => JsPromise.t<transaction> = "setUseexecuteOutstandingLazySettlementsMock"
+//     @send
+//     external setUseexecuteOutstandingLazySettlementsMock: (
+//       t,
+//       ~shouldUseMock: bool,
+//     ) => JsPromise.t<transaction> = "setUseexecuteOutstandingLazySettlementsMock"
 
-    @send
-    external _executeOutstandingLazySettlementsExposed: (
-      t,
-      ~user: Ethers.ethAddress,
-      ~marketIndex: int,
-    ) => JsPromise.t<transaction> = "_executeOutstandingLazySettlements" // "_executeOutstandingLazySettlementsExposed"
-  }
-}
+//     @send
+//     external _executeOutstandingLazySettlementsExposed: (
+//       t,
+//       ~user: Ethers.ethAddress,
+//       ~marketIndex: int,
+//     ) => JsPromise.t<transaction> = "_executeOutstandingLazySettlements" // "_executeOutstandingLazySettlementsExposed"
+//   }
+// }
 
 // module GenericErc20 = {
 //   type t = {address: Ethers.ethAddress}
 //   let contractName = "ERC20PresetMinterPauserUpgradeable"
 
-//   let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
+//   let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic
 
 //   @send
 //   external mint: (t, ~user: Ethers.Wallet.t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> = "mint"
@@ -393,96 +393,96 @@ module TokenFactory = {
     deployContract2(contractName, admin, longShort)->Obj.magic
 }
 
-module Staker = {
-  type t = {address: Ethers.ethAddress}
+// module Staker = {
+//   type t = {address: Ethers.ethAddress}
 
-  let contractName = "Staker"
-  let contractNameExposed = "StakerInternalsExposed"
+//   let contractName = "Staker"
+//   let contractNameExposed = "StakerInternalsExposed"
 
-  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
-  let makeExposed: unit => JsPromise.t<t> = () => deployContract(contractNameExposed)->Obj.magic
-  let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
-    attachToContract(contractName, ~contractAddress)->Obj.magic
+//   let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic
+//   let makeExposed: unit => JsPromise.t<t> = () => deployContract0(contractNameExposed)->Obj.magic
+//   let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
+//     attachToContract(contractName, ~contractAddress)->Obj.magic
 
-  @send
-  external setup: (
-    t,
-    Ethers.ethAddress,
-    Ethers.ethAddress,
-    Ethers.ethAddress,
-    Ethers.ethAddress,
-  ) => JsPromise.t<transaction> = "initialize"
+//   @send
+//   external setup: (
+//     t,
+//     Ethers.ethAddress,
+//     Ethers.ethAddress,
+//     Ethers.ethAddress,
+//     Ethers.ethAddress,
+//   ) => JsPromise.t<transaction> = "initialize"
 
-  @send
-  external claimFloatCustom: (t, ~markets: array<int>) => JsPromise.t<transaction> =
-    "claimFloatCustom"
-  let claimFloatCustomUser = (staker, ~user: Ethers.Wallet.t, ~markets: array<int>) =>
-    staker->connect(~address=user)->claimFloatCustom(~markets)
+//   @send
+//   external claimFloatCustom: (t, ~markets: array<int>) => JsPromise.t<transaction> =
+//     "claimFloatCustom"
+//   let claimFloatCustomUser = (staker, ~user: Ethers.Wallet.t, ~markets: array<int>) =>
+//     staker->connect(~address=user)->claimFloatCustom(~markets)
 
-  @send
-  external marketIndexOfToken: (t, ~syntheticToken: Ethers.ethAddress) => JsPromise.t<int> =
-    "marketIndexOfToken"
+//   @send
+//   external marketIndexOfToken: (t, ~syntheticToken: Ethers.ethAddress) => JsPromise.t<int> =
+//     "marketIndexOfToken"
 
-  @send
-  external userAmountStaked: (
-    t,
-    ~syntheticToken: Ethers.ethAddress,
-    ~user: Ethers.ethAddress,
-  ) => JsPromise.t<Ethers.BigNumber.t> = "userAmountStaked"
+//   @send
+//   external userAmountStaked: (
+//     t,
+//     ~syntheticToken: Ethers.ethAddress,
+//     ~user: Ethers.ethAddress,
+//   ) => JsPromise.t<Ethers.BigNumber.t> = "userAmountStaked"
 
-  @send
-  external userIndexOfLastClaimedReward: (
-    t,
-    ~market: int,
-    ~user: Ethers.ethAddress,
-  ) => JsPromise.t<Ethers.BigNumber.t> = "userIndexOfLastClaimedReward"
+//   @send
+//   external userIndexOfLastClaimedReward: (
+//     t,
+//     ~market: int,
+//     ~user: Ethers.ethAddress,
+//   ) => JsPromise.t<Ethers.BigNumber.t> = "userIndexOfLastClaimedReward"
 
-  @send
-  external latestRewardIndex: (t, ~market: int) => JsPromise.t<Ethers.BigNumber.t> =
-    "latestRewardIndex"
+//   @send
+//   external latestRewardIndex: (t, ~market: int) => JsPromise.t<Ethers.BigNumber.t> =
+//     "latestRewardIndex"
 
-  module Exposed = {
-    @send
-    external setFloatRewardCalcParams: (
-      t,
-      ~marketIndex: int,
-      ~longToken: Ethers.ethAddress,
-      ~shortToken: Ethers.ethAddress,
-      ~newLatestRewardIndex: Ethers.BigNumber.t,
-      ~user: Ethers.ethAddress,
-      ~usersLatestClaimedReward: Ethers.BigNumber.t,
-      ~accumulativeFloatPerTokenLatestLong: Ethers.BigNumber.t,
-      ~accumulativeFloatPerTokenLatestShort: Ethers.BigNumber.t,
-      ~accumulativeFloatPerTokenUserLong: Ethers.BigNumber.t,
-      ~accumulativeFloatPerTokenUserShort: Ethers.BigNumber.t,
-      ~newUserAmountStakedLong: Ethers.BigNumber.t,
-      ~newUserAmountStakedShort: Ethers.BigNumber.t,
-    ) => JsPromise.t<transaction> = "setFloatRewardCalcParams"
+//   module Exposed = {
+//     @send
+//     external setFloatRewardCalcParams: (
+//       t,
+//       ~marketIndex: int,
+//       ~longToken: Ethers.ethAddress,
+//       ~shortToken: Ethers.ethAddress,
+//       ~newLatestRewardIndex: Ethers.BigNumber.t,
+//       ~user: Ethers.ethAddress,
+//       ~usersLatestClaimedReward: Ethers.BigNumber.t,
+//       ~accumulativeFloatPerTokenLatestLong: Ethers.BigNumber.t,
+//       ~accumulativeFloatPerTokenLatestShort: Ethers.BigNumber.t,
+//       ~accumulativeFloatPerTokenUserLong: Ethers.BigNumber.t,
+//       ~accumulativeFloatPerTokenUserShort: Ethers.BigNumber.t,
+//       ~newUserAmountStakedLong: Ethers.BigNumber.t,
+//       ~newUserAmountStakedShort: Ethers.BigNumber.t,
+//     ) => JsPromise.t<transaction> = "setFloatRewardCalcParams"
 
-    @send @scope("callStatic")
-    external calculateAccumulatedFloatExposedCall: (
-      t,
-      ~marketIndex: int,
-      ~user: Ethers.ethAddress,
-    ) => JsPromise.t<{
-      "longFloatReward": Ethers.BigNumber.t,
-      "shortFloatReward": Ethers.BigNumber.t,
-    }> = "calculateAccumulatedFloatExposed"
+//     @send @scope("callStatic")
+//     external calculateAccumulatedFloatExposedCall: (
+//       t,
+//       ~marketIndex: int,
+//       ~user: Ethers.ethAddress,
+//     ) => JsPromise.t<{
+//       "longFloatReward": Ethers.BigNumber.t,
+//       "shortFloatReward": Ethers.BigNumber.t,
+//     }> = "calculateAccumulatedFloatExposed"
 
-    @send
-    external calculateAccumulatedFloatExposed: (
-      t,
-      ~marketIndex: int,
-      ~user: Ethers.ethAddress,
-    ) => JsPromise.t<transaction> = "calculateAccumulatedFloatExposed"
-  }
-}
+//     @send
+//     external calculateAccumulatedFloatExposed: (
+//       t,
+//       ~marketIndex: int,
+//       ~user: Ethers.ethAddress,
+//     ) => JsPromise.t<transaction> = "calculateAccumulatedFloatExposed"
+//   }
+// }
 
 module FloatToken = {
   type t = {address: Ethers.ethAddress}
   let contractName = "FloatToken"
 
-  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
+  let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic
 
   @send
   external setup: (t, string, string, Ethers.ethAddress) => JsPromise.t<transaction> = "initialize3"
@@ -492,14 +492,14 @@ module FloatCapital_v0 = {
   type t = {address: Ethers.ethAddress}
   let contractName = "FloatCapital_v0"
 
-  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
+  let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic
 }
 
 module Treasury_v0 = {
   type t = {address: Ethers.ethAddress}
   let contractName = "Treasury_v0"
 
-  let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
+  let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic
 
   @send external setup: (t, Ethers.ethAddress) => JsPromise.t<transaction> = "initialize"
 }
@@ -511,5 +511,5 @@ module DataFetchers = {
     longShort
     ->LongShort.staker
     ->JsPromise.then(Staker.at)
-    ->JsPromise.then(Staker.marketIndexOfToken(~syntheticToken=syntheticToken.address))
+    ->JsPromise.then(Staker.marketIndexOfToken(_, syntheticToken.address))
 }

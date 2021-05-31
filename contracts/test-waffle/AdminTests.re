@@ -29,9 +29,9 @@ describe("Float System", () => {
         ~transaction=
           contracts.contents.longShort
           ->Contract.connect(~address=attackerAddress)
-          ->Contract.LongShort.updateMarketOracle(
+          ->LongShort.updateMarketOracle(
               ~marketIndex=1,
-              ~newOracleAddress,
+              ~newOracleManager=newOracleAddress,
             ),
         ~reason="only admin",
       );
