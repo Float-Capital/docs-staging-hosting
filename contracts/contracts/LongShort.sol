@@ -1660,7 +1660,7 @@ contract LongShort is ILongShort, Initializable {
                 ? newShortValueIgnoringFees - newLongValueIgnoringFees
                 : (shortValue[marketIndex] >= longValue[marketIndex] &&
                     newLongValueIgnoringFees > newShortValueIgnoringFees)
-                ? newShortValueIgnoringFees - newLongValueIgnoringFees
+                ? newLongValueIgnoringFees - newShortValueIgnoringFees
                 : 0;
 
         bool penaltyAmountForLong =
