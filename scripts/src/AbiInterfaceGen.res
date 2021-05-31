@@ -11,10 +11,7 @@ let removePrefixUnderscores = %raw(`(someString) => {
 
 let formatKeywords = keyword =>
   switch keyword {
-  | "to" =>
-    Js.log("Fund a to!!!!!!")
-    Js.log("_" ++ keyword)
-    "_" ++ keyword
+  | "to" => "_" ++ keyword
   | _ => keyword->removePrefixUnderscores
   }
 let getMmoduleName = fileName => fileName->Js.String2.split(".")->Array.getUnsafe(0)
@@ -131,8 +128,6 @@ let _ = files->Array.map(abiFileName => {
 `,
         )
       | _ =>
-        Js.log({"name": name, "typeNames": typeNames})
-
         let callVersion = hasReturnValues
           ? `
     ${returnTypeDefinition}

@@ -19,12 +19,11 @@ var removePrefixUnderscores = ((someString) => {
 });
 
 function formatKeywords(keyword) {
-  if (keyword !== "to") {
+  if (keyword === "to") {
+    return "_" + keyword;
+  } else {
     return removePrefixUnderscores(keyword);
   }
-  console.log("Fund a to!!!!!!");
-  console.log("_" + keyword);
-  return "_" + keyword;
 }
 
 function getMmoduleName(fileName) {
@@ -152,10 +151,6 @@ Belt_Array.map(files, (function (abiFileName) {
                   moduleContents[name] = "\n  " + returnTypeDefinition + "\n  @send\n  external " + lowerCaseFirstLetter(name) + ": (\n    t," + typeNames + "\n  ) => JsPromise.t<" + returnType + "> = \"" + name + "\"\n";
                   return ;
                 }
-                console.log({
-                      name: name,
-                      typeNames: typeNames
-                    });
                 var callVersion = hasReturnValues ? "\n    " + returnTypeDefinition + "\n    @send @scope(\"callStatic\")\n    external " + name + "Call: (\n      t," + typeNames + "\n    ) => JsPromise.t<" + returnType + "> = \"" + name + "\"\n" : "";
                 moduleContents[name] = "\n  @send\n  external " + name + ": (\n    t," + typeNames + "\n  ) => JsPromise.t<transaction> = \"" + name + "\"\n" + callVersion;
                 
