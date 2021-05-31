@@ -117,4 +117,11 @@ contract LongShortInternalsExposed is LongShort {
     {
         _priceChangeMechanism(marketIndex, newPrice);
     }
+
+    function _executeOutstandingLazySettlementsExposed(
+        address user,
+        uint32 marketIndex
+    ) external {
+        _executeOutstandingLazySettlements(user, marketIndex);
+    }
 }

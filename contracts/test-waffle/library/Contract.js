@@ -40,6 +40,22 @@ function deployContract3(contractName, firstParam, secondParam, thirdParam) {
             });
 }
 
+function deployContract4(contractName, firstParam, secondParam, thirdParam, fourthParam) {
+  return ethers.getContractFactory(contractName).then(function (__x) {
+                return __x.deploy(firstParam, secondParam, thirdParam, fourthParam);
+              }).then(function (prim) {
+              return prim.deployed();
+            });
+}
+
+function deployContract7(contractName, firstParam, secondParam, thirdParam, fourthParam, fifthParam, sixthParam, seventhParam) {
+  return ethers.getContractFactory(contractName).then(function (__x) {
+                return __x.deploy(firstParam, secondParam, thirdParam, fourthParam, fifthParam, sixthParam, seventhParam);
+              }).then(function (prim) {
+              return prim.deployed();
+            });
+}
+
 var contractName = "SyntheticToken";
 
 function at(contractAddress) {
@@ -83,8 +99,8 @@ var PaymentToken = {
 
 var contractName$2 = "YieldManagerMock";
 
-function make$1(admin, longShortAddress, fundTokenAddress) {
-  return deployContract3(contractName$2, admin, longShortAddress, fundTokenAddress);
+function make$1(admin, longShortAddress, treasuryAddress, fundTokenAddress) {
+  return deployContract4(contractName$2, admin, longShortAddress, treasuryAddress, fundTokenAddress);
 }
 
 function at$2(contractAddress) {
@@ -227,6 +243,8 @@ exports.deployContract = deployContract;
 exports.deployContract1 = deployContract1;
 exports.deployContract2 = deployContract2;
 exports.deployContract3 = deployContract3;
+exports.deployContract4 = deployContract4;
+exports.deployContract7 = deployContract7;
 exports.SyntheticToken = SyntheticToken;
 exports.PaymentToken = PaymentToken;
 exports.YieldManagerMock = YieldManagerMock;
