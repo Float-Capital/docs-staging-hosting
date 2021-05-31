@@ -485,8 +485,7 @@ module FloatToken = {
   let make: unit => JsPromise.t<t> = () => deployContract(contractName)->Obj.magic
 
   @send
-  external setup: (t, string, string, Ethers.ethAddress) => JsPromise.t<transaction> =
-    "initialize(string,string,address)"
+  external setup: (t, string, string, Ethers.ethAddress) => JsPromise.t<transaction> = "initialize3"
 }
 
 module FloatCapital_v0 = {
