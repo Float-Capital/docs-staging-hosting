@@ -1655,10 +1655,10 @@ contract LongShort is ILongShort, Initializable {
         // all users on the side that ends up causing an imbalance in the
         // batch.
         uint256 penaltyAmount =
-            (longValue[marketIndex] > shortValue[marketIndex] &&
+            (longValue[marketIndex] >= shortValue[marketIndex] &&
                 newShortValueIgnoringFees > newLongValueIgnoringFees)
                 ? newShortValueIgnoringFees - newLongValueIgnoringFees
-                : (shortValue[marketIndex] > longValue[marketIndex] &&
+                : (shortValue[marketIndex] >= longValue[marketIndex] &&
                     newLongValueIgnoringFees > newShortValueIgnoringFees)
                 ? newShortValueIgnoringFees - newLongValueIgnoringFees
                 : 0;
