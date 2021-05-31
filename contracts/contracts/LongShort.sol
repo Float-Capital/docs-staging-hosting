@@ -821,6 +821,8 @@ contract LongShort is ILongShort, Initializable {
                 handleBatchedDepositSettlementLong(marketIndex);
             uint256 totalAmountShortMinted =
                 handleBatchedDepositShort(marketIndex);
+
+            handleBatchedLazyRedeems(marketIndex);
         }
 
         emit ValueLockedInSystem(
@@ -871,13 +873,17 @@ contract LongShort is ILongShort, Initializable {
     /*
      * Returns locked funds from the market to the sender.
      */
-    function _withdrawFunds(uint32 marketIndex, uint256 amount) internal {
+    function _withdrawFunds(
+        uint32 marketIndex,
+        uint256 amount,
+        address user
+    ) internal {
         require(totalValueLockedInMarket[marketIndex] >= amount);
 
         _transferFromYieldManager(marketIndex, amount);
 
         // Transfer funds to the sender.
-        fundTokens[marketIndex].transfer(msg.sender, amount);
+        fundTokens[marketIndex].transfer(user, amount);
 
         // Update market state.
         totalValueLockedInMarket[marketIndex] =
@@ -1151,7 +1157,7 @@ contract LongShort is ILongShort, Initializable {
 
         // Withdraw funds with remaining amount.
         longValue[marketIndex] = longValue[marketIndex] - amount;
-        _withdrawFunds(marketIndex, remaining);
+        _withdrawFunds(marketIndex, remaining, msg.sender);
         _refreshTokensPrice(marketIndex);
 
         emit LongRedeem(
@@ -1188,7 +1194,7 @@ contract LongShort is ILongShort, Initializable {
 
         // Withdraw funds with remaining amount.
         shortValue[marketIndex] = shortValue[marketIndex] - amount;
-        _withdrawFunds(marketIndex, remaining);
+        _withdrawFunds(marketIndex, remaining, msg.sender);
         _refreshTokensPrice(marketIndex);
 
         emit ShortRedeem(
@@ -1526,5 +1532,177 @@ contract LongShort is ILongShort, Initializable {
             latestUpdateIndex[marketIndex] +
             1;
         // TODO: add events
+    }
+
+    struct UserLazyRedeem {
+        uint256 redeemLong;
+        uint256 redeemShort;
+        uint256 usersCurrentUpdateIndex;
+    }
+
+    struct BatchedLazyRedeem {
+        uint256 redeemLong;
+        uint256 redeemShort;
+        uint256 totalWithdrawnShort;
+        uint256 totalWithdrawnLong;
+    }
+
+    mapping(uint32 => mapping(address => UserLazyRedeem))
+        public userLazyRedeems;
+    mapping(uint32 => mapping(uint256 => BatchedLazyRedeem))
+        public batchedLazyRedeems;
+
+    function _executeOutstandingLazyRedeems(address user, uint32 marketIndex)
+        internal
+    {
+        UserLazyRedeem storage currentUserRedeems =
+            userLazyRedeems[marketIndex][msg.sender];
+
+        if (
+            currentUserRedeems.usersCurrentUpdateIndex != 0 &&
+            currentUserRedeems.usersCurrentUpdateIndex <=
+            latestUpdateIndex[marketIndex]
+        ) {
+            BatchedLazyRedeem storage batch =
+                batchedLazyRedeems[marketIndex][
+                    currentUserRedeems.usersCurrentUpdateIndex
+                ];
+            if (currentUserRedeems.redeemLong > 0) {
+                fundTokens[marketIndex].transfer(
+                    user,
+                    (batch.totalWithdrawnLong * currentUserRedeems.redeemLong) /
+                        batch.redeemLong
+                );
+                currentUserRedeems.redeemLong = 0;
+            }
+            if (currentUserRedeems.redeemShort > 0) {
+                fundTokens[marketIndex].transfer(
+                    user,
+                    (batch.totalWithdrawnShort *
+                        currentUserRedeems.redeemShort) / batch.redeemShort
+                );
+                currentUserRedeems.redeemShort = 0;
+            }
+            currentUserRedeems.usersCurrentUpdateIndex = 0;
+        }
+    }
+
+    modifier executeOutstandingLazyRedeems(address user, uint32 marketIndex) {
+        _executeOutstandingLazyRedeems(user, marketIndex);
+        _;
+    }
+
+    function redeemLongLazy(uint32 marketIndex, uint256 tokensToRedeem)
+        external
+        executeOutstandingLazyRedeems(msg.sender, marketIndex)
+    {
+        longTokens[marketIndex].transferFrom(
+            msg.sender,
+            address(this),
+            tokensToRedeem
+        );
+        uint256 nextUpdateIndex = latestUpdateIndex[marketIndex] + 1;
+
+        userLazyRedeems[marketIndex][msg.sender].redeemLong += tokensToRedeem;
+        userLazyRedeems[marketIndex][msg.sender]
+            .usersCurrentUpdateIndex = nextUpdateIndex;
+
+        batchedLazyRedeems[marketIndex][nextUpdateIndex]
+            .redeemLong += tokensToRedeem;
+    }
+
+    function redeemShortLazy(uint32 marketIndex, uint256 tokensToRedeem)
+        external
+        executeOutstandingLazyRedeems(msg.sender, marketIndex)
+    {
+        shortTokens[marketIndex].transferFrom(
+            msg.sender,
+            address(this),
+            tokensToRedeem
+        );
+        uint256 nextUpdateIndex = latestUpdateIndex[marketIndex] + 1;
+
+        userLazyRedeems[marketIndex][msg.sender].redeemShort += tokensToRedeem;
+        userLazyRedeems[marketIndex][msg.sender]
+            .usersCurrentUpdateIndex = nextUpdateIndex;
+
+        batchedLazyRedeems[marketIndex][nextUpdateIndex]
+            .redeemShort += tokensToRedeem;
+    }
+
+    function handleBatchedLazyRedeems(uint32 marketIndex) public {
+        BatchedLazyRedeem storage batch =
+            batchedLazyRedeems[marketIndex][latestUpdateIndex[marketIndex]];
+
+        if (batch.redeemLong > 0) {
+            longTokens[marketIndex].synthRedeemBurn(
+                address(this),
+                batch.redeemLong
+            );
+        }
+
+        if (batch.redeemShort > 0) {
+            shortTokens[marketIndex].synthRedeemBurn(
+                address(this),
+                batch.redeemLong
+            );
+        }
+        uint256 longAmountToRedeem =
+            (batch.redeemLong * longTokenPrice[marketIndex]) / TEN_TO_THE_18;
+
+        uint256 shortAmountToRedeem =
+            (batch.redeemShort * shortTokenPrice[marketIndex]) / TEN_TO_THE_18;
+
+        uint256 newLongValueIgnoringFees =
+            longValue[marketIndex] - longAmountToRedeem;
+        uint256 newShortValueIgnoringFees =
+            shortValue[marketIndex] - shortAmountToRedeem;
+
+        // penalty fee is shared equally between
+        // all users on the side that ends up causing an imbalance in the
+        // batch.
+        uint256 penaltyAmount =
+            (longValue[marketIndex] > shortValue[marketIndex] &&
+                newShortValueIgnoringFees > newLongValueIgnoringFees)
+                ? newShortValueIgnoringFees - newLongValueIgnoringFees
+                : (shortValue[marketIndex] > longValue[marketIndex] &&
+                    newLongValueIgnoringFees > newShortValueIgnoringFees)
+                ? newShortValueIgnoringFees - newLongValueIgnoringFees
+                : 0;
+
+        bool penaltyAmountForLong =
+            newShortValueIgnoringFees > newLongValueIgnoringFees;
+
+        uint256 totalFeesLong =
+            _getFeesForAmounts(
+                marketIndex,
+                longAmountToRedeem,
+                penaltyAmountForLong ? penaltyAmount : 0,
+                false
+            );
+
+        uint256 totalFeesShort =
+            _getFeesForAmounts(
+                marketIndex,
+                shortAmountToRedeem,
+                !penaltyAmountForLong ? penaltyAmount : 0,
+                false
+            );
+
+        batch.totalWithdrawnLong = longAmountToRedeem - totalFeesLong;
+        batch.totalWithdrawnShort = shortAmountToRedeem - totalFeesShort;
+
+        _feesMechanism(marketIndex, totalFeesLong + totalFeesShort);
+
+        longValue[marketIndex] -= longAmountToRedeem;
+        shortValue[marketIndex] -= shortAmountToRedeem;
+
+        _withdrawFunds(
+            marketIndex,
+            batch.totalWithdrawnLong + batch.totalWithdrawnShort,
+            address(this)
+        );
+
+        _refreshTokensPrice(marketIndex);
     }
 }

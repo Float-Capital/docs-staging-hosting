@@ -78,7 +78,7 @@ contract LongShortInternalsExposed is LongShort {
     }
 
     function withdrawFunds(uint32 marketIndex, uint256 amount) external {
-        _withdrawFunds(marketIndex, amount);
+        _withdrawFunds(marketIndex, amount, msg.sender);
     }
 
     function transferToYieldManager(uint32 marketIndex, uint256 amount)
