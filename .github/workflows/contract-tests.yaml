@@ -50,7 +50,15 @@ jobs:
         with:
           node-version: 14.16.0
 
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ./contracts/node_modules
+          key: modules-${{ hashFiles('contracts/yarn.lock') }}
+
       - name: install node packages
+        if: steps.cache.outputs.cache-hit != 'true'
         id: install_node_packages
         run: |
           cd contracts && yarn && yarn res:build
