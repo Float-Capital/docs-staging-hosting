@@ -16,6 +16,7 @@ contract("LongShort (price movements)", (accounts) => {
   let long;
   let short;
   let fund;
+  let treasury;
 
   const syntheticName = "FTSE100";
   const syntheticSymbol = "FTSE";
@@ -43,12 +44,14 @@ contract("LongShort (price movements)", (accounts) => {
   beforeEach(async () => {
     const result = await initialize(admin);
     longShort = result.longShort;
+    treasury = result.treasury;
 
     const synthResult = await createSynthetic(
       admin,
       longShort,
       syntheticName,
       syntheticSymbol,
+      treasury,
       _baseEntryFee,
       _badLiquidityEntryFee,
       _baseExitFee,

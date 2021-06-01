@@ -1,5 +1,4 @@
 const { BN } = require("@openzeppelin/test-helpers");
-const { initialize, mintAndApprove, createSynthetic } = require("./helpers");
 
 const EthKiller = artifacts.require("OracleManagerEthKiller");
 const BandOracle = artifacts.require("BandOracleMock");

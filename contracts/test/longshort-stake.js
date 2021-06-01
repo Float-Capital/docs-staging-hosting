@@ -31,17 +31,21 @@ contract("LongShort (staking)", (accounts) => {
   let marketIndex;
   let fundToken;
   let floatToken;
+  let treasury;
+
   beforeEach(async () => {
     const result = await initialize(admin);
     longShort = result.longShort;
     staker = result.staker;
     floatToken = result.floatToken;
+    treasury = result.treasury;
 
     const synth = await createSynthetic(
       admin,
       longShort,
       syntheticName,
       syntheticSymbol,
+      treasury,
       0, // no entry/exit fees
       0,
       0,

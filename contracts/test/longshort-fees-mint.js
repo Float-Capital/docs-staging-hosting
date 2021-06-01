@@ -26,9 +26,11 @@ contract("LongShort (minting fees)", (accounts) => {
   const e18 = new BN("1000000000000000000");
 
   let longShort;
+  let treasury;
   beforeEach(async () => {
     const result = await initialize(admin);
     longShort = result.longShort;
+    treasury = result.treasury;
   });
 
   // Generic test runner that checks whether the expected base and extra fee
@@ -57,6 +59,7 @@ contract("LongShort (minting fees)", (accounts) => {
         longShort,
         syntheticName,
         syntheticSymbol,
+        treasury,
         baseFee,
         penaltyFee,
         0, // redeem base fee

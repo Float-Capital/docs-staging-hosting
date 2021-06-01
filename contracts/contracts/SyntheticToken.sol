@@ -79,7 +79,6 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         //       Case where next price update hasn't occurred
         //            -- subcase 1: it is BELOW the safety threshold - keep exectution lazy and give the user the number of tokens they desire
         //            -- subcase 2: it is ABOVE the safety threshold - do a full 'immediate' execution.
-        console.log("Transfer the assets...");
         if (msg.sender != address(longShort)) {
             longShort.executeOutstandingLazySettlementsSynth(
                 sender,
