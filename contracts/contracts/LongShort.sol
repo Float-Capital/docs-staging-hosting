@@ -797,9 +797,8 @@ contract LongShort is ILongShort, Initializable {
         _yieldMechanism(marketIndex);
 
         _refreshTokensPrice(marketIndex);
+        assetPrice[marketIndex] = newPrice;
         if (priceChanged) {
-            assetPrice[marketIndex] = newPrice;
-
             uint256 newLatestPriceStateIndex =
                 latestUpdateIndex[marketIndex] + 1;
             latestUpdateIndex[marketIndex] = newLatestPriceStateIndex;

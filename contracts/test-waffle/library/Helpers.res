@@ -72,7 +72,7 @@ let createSyntheticMarket = (
       longShort->LongShort.initializeMarket(
         ~marketIndex,
         ~baseEntryFee=Ethers.BigNumber.fromInt(0),
-        ~badLiquidityEntryFee=Ethers.BigNumber.fromInt(50),
+        ~badLiquidityEntryFee=Ethers.BigNumber.fromInt(0),
         ~baseExitFee=Ethers.BigNumber.fromInt(50),
         ~badLiquidityExitFee=Ethers.BigNumber.fromInt(50),
         ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("1000000000000000000"),
