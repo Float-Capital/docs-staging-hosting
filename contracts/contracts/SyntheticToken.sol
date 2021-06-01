@@ -55,6 +55,21 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         ERC20PresetMinterPauser.mint(to, amount);
     }
 
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) public virtual override(ERC20, IERC20) returns (bool) {
+        if (
+            recipient == address(longShort) && msg.sender == address(longShort)
+        ) {
+            _transfer(sender, recipient, amount);
+            return true;
+        } else {
+            super.transferFrom(sender, recipient, amount);
+        }
+    }
+
     function _transfer(
         address sender,
         address recipient,
