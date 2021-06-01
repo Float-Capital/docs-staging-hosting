@@ -1,7 +1,7 @@
 @@ocaml.warning("-32")
 open ContractHelpers
 type t = {address: Ethers.ethAddress}
-let contractName = "ERC20PresetMinterPauser"
+let contractName = "ERC20Mock"
 
 let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
   attachToContract(contractName, ~contractAddress)->Obj.magic

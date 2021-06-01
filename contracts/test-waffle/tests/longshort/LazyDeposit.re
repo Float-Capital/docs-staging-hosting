@@ -29,7 +29,7 @@ let testIntegration =
         longShort->LongShort.longValue(marketIndex);
 
       let%AwaitThen _ =
-        paymentToken->ERC20PresetMinterPauser.mint(
+        paymentToken->ERC20Mock.mint(
           ~_to=testUser.address,
           ~amount=amountToLazyMint,
         );
@@ -37,7 +37,7 @@ let testIntegration =
       let%AwaitThen _ =
         paymentToken
         ->ContractHelpers.connect(~address=testUser)
-        ->ERC20PresetMinterPauser.approve(
+        ->ERC20Mock.approve(
             ~spender=longShort.address,
             ~amount=amountToLazyMint,
           );

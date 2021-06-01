@@ -146,7 +146,7 @@ let generateTestData =
       });
     },
   );
-let describeSkippable = Config.runValueSimulations ? describe_skip : describe;
+let describeSkippable = Config.runValueSimulations ? describe : describe_skip;
 describeSkippable("Float System", () => {
   let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
   let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);

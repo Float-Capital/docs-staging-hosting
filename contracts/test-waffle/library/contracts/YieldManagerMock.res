@@ -9,9 +9,10 @@ let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
 let make: (
   ~admin: Ethers.ethAddress,
   ~longShort: Ethers.ethAddress,
+  ~treasury: Ethers.ethAddress,
   ~token: Ethers.ethAddress,
-) => JsPromise.t<t> = (~admin, ~longShort, ~token) =>
-  deployContract3(contractName, admin, longShort, token)->Obj.magic
+) => JsPromise.t<t> = (~admin, ~longShort, ~treasury, ~token) =>
+  deployContract4(contractName, admin, longShort, treasury, token)->Obj.magic
 
 type adminReturn = Ethers.ethAddress
 @send
@@ -40,6 +41,10 @@ type longShortReturn = Ethers.ethAddress
 external longShort: t => JsPromise.t<longShortReturn> = "longShort"
 
 @send
+external mockHoldingAdditionalRewardYield: t => JsPromise.t<transaction> =
+  "mockHoldingAdditionalRewardYield"
+
+@send
 external setYieldRate: (t, ~yieldRate: Ethers.BigNumber.t) => JsPromise.t<transaction> =
   "setYieldRate"
 
@@ -54,9 +59,24 @@ type tokenReturn = Ethers.ethAddress
 @send
 external token: t => JsPromise.t<tokenReturn> = "token"
 
+type tokenOtherRewardERC20Return = Ethers.ethAddress
+@send
+external tokenOtherRewardERC20: t => JsPromise.t<tokenOtherRewardERC20Return> =
+  "tokenOtherRewardERC20"
+
 type totalHeldReturn = Ethers.BigNumber.t
 @send
 external totalHeld: t => JsPromise.t<totalHeldReturn> = "totalHeld"
+
+type treasuryReturn = Ethers.ethAddress
+@send
+external treasury: t => JsPromise.t<treasuryReturn> = "treasury"
+
+@send
+external withdrawErc20TokenToTreasury: (
+  t,
+  ~erc20Token: Ethers.ethAddress,
+) => JsPromise.t<transaction> = "withdrawErc20TokenToTreasury"
 
 @send
 external withdrawToken: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> =

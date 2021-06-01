@@ -33,7 +33,7 @@ let make = (~txStateStake, ~resetFormButton, ~tokenToStake) => {
           <Tick />
           <p> {`Transaction complete 🎉`->React.string} </p>
           <TweetButton message={randomStakeTweetMessage} />
-          <ViewPositionButton />
+          <ViewProfileButton />
         </div>
         {resetFormButton()}
       </Modal>

@@ -3,7 +3,7 @@
 
 var ContractHelpers = require("../ContractHelpers.js");
 
-var contractName = "ERC20PresetMinterPauser";
+var contractName = "ERC20Mock";
 
 function at(contractAddress) {
   return ContractHelpers.attachToContract(contractName, contractAddress);

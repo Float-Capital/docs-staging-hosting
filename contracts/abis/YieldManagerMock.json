@@ -13,6 +13,11 @@
       },
       {
         "internalType": "address",
+        "name": "_treasury",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "_token",
         "type": "address"
       }
@@ -99,6 +104,13 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "mockHoldingAdditionalRewardYield",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -146,6 +158,19 @@
   },
   {
     "inputs": [],
+    "name": "tokenOtherRewardERC20",
+    "outputs": [
+      {
+        "internalType": "contract ERC20PresetMinterPauser",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "totalHeld",
     "outputs": [
       {
@@ -155,6 +180,32 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "treasury",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "erc20Token",
+        "type": "address"
+      }
+    ],
+    "name": "withdrawErc20TokenToTreasury",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

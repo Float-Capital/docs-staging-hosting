@@ -9,15 +9,25 @@ let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
 let make: (
   ~admin: Ethers.ethAddress,
   ~longShort: Ethers.ethAddress,
+  ~treasury: Ethers.ethAddress,
   ~token: Ethers.ethAddress,
   ~aToken: Ethers.ethAddress,
   ~lendingPool: Ethers.ethAddress,
   ~aaveReferalCode: int,
-) => JsPromise.t<t> = (~admin, ~longShort, ~token, ~aToken, ~lendingPool, ~aaveReferalCode) =>
-  deployContract6(
+) => JsPromise.t<t> = (
+  ~admin,
+  ~longShort,
+  ~treasury,
+  ~token,
+  ~aToken,
+  ~lendingPool,
+  ~aaveReferalCode,
+) =>
+  deployContract7(
     contractName,
     admin,
     longShort,
+    treasury,
     token,
     aToken,
     lendingPool,
@@ -57,6 +67,16 @@ external longShort: t => JsPromise.t<longShortReturn> = "longShort"
 type tokenReturn = Ethers.ethAddress
 @send
 external token: t => JsPromise.t<tokenReturn> = "token"
+
+type treasuryReturn = Ethers.ethAddress
+@send
+external treasury: t => JsPromise.t<treasuryReturn> = "treasury"
+
+@send
+external withdrawErc20TokenToTreasury: (
+  t,
+  ~erc20Token: Ethers.ethAddress,
+) => JsPromise.t<transaction> = "withdrawErc20TokenToTreasury"
 
 @send
 external withdrawToken: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> =

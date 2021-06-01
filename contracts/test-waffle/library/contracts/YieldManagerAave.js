@@ -9,8 +9,8 @@ function at(contractAddress) {
   return ContractHelpers.attachToContract(contractName, contractAddress);
 }
 
-function make(admin, longShort, token, aToken, lendingPool, aaveReferalCode) {
-  return ContractHelpers.deployContract6(contractName, admin, longShort, token, aToken, lendingPool, aaveReferalCode);
+function make(admin, longShort, treasury, token, aToken, lendingPool, aaveReferalCode) {
+  return ContractHelpers.deployContract7(contractName, admin, longShort, treasury, token, aToken, lendingPool, aaveReferalCode);
 }
 
 exports.contractName = contractName;

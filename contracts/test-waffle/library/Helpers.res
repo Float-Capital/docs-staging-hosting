@@ -1,5 +1,5 @@
 type markets = {
-  paymentToken: ERC20PresetMinterPauser.t,
+  paymentToken: ERC20Mock.t,
   oracleManager: OracleManagerMock.t,
   yieldManager: YieldManagerMock.t,
   longSynth: SyntheticToken.t,
@@ -41,24 +41,27 @@ let randomMintLongShort = () => {
 let createSyntheticMarket = (
   ~admin,
   ~longShort: LongShort.t,
-  ~fundToken: ERC20PresetMinterPauser.t,
+  ~fundToken: ERC20Mock.t,
+  ~treasury,
   ~marketName,
   ~marketSymbol,
 ) => {
   JsPromise.all2((
     OracleManagerMock.make(~admin),
-    YieldManagerMock.make(~admin, ~longShort=longShort.address, ~token=fundToken.address),
+    YieldManagerMock.make(
+      ~admin,
+      ~longShort=longShort.address,
+      ~token=fundToken.address,
+      ~treasury,
+    ),
   ))->JsPromise.then(((oracleManager, yieldManager)) => {
     let _ignorePromise =
       fundToken
-      ->ERC20PresetMinterPauser.mINTER_ROLE
+      ->ERC20Mock.mINTER_ROLE
       ->JsPromise.map(minterRole =>
-        fundToken->ERC20PresetMinterPauser.grantRole(
-          ~role=minterRole,
-          ~account=yieldManager.address,
-        )
+        fundToken->ERC20Mock.grantRole(~role=minterRole, ~account=yieldManager.address)
       )
-    // fundToken->ERC20PresetMinterPauser.grantMintRole(~user=yieldManager.address)
+    // fundToken->ERC20Mock.grantMintRole(~user=yieldManager.address)
     longShort
     ->LongShort.newSyntheticMarket(
       ~syntheticName=marketName,
@@ -93,7 +96,7 @@ let getAllMarkets = longShort => {
       JsPromise.all5((
         longShort->LongShort.longTokens(marketIndex)->JsPromise.then(SyntheticToken.at),
         longShort->LongShort.shortTokens(marketIndex)->JsPromise.then(SyntheticToken.at),
-        longShort->LongShort.fundTokens(marketIndex)->JsPromise.then(ERC20PresetMinterPauser.at),
+        longShort->LongShort.fundTokens(marketIndex)->JsPromise.then(ERC20Mock.at),
         longShort->LongShort.oracleManagers(marketIndex)->JsPromise.then(OracleManagerMock.at),
         longShort->LongShort.yieldManagers(marketIndex)->JsPromise.then(YieldManagerMock.at),
       ))->JsPromise.map(((longSynth, shortSynth, fundToken, oracleManager, yieldManager)) => {
@@ -119,8 +122,8 @@ let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
     exposeInternals ? Staker.Exposed.make() : Staker.make(),
     exposeInternals ? LongShort.Exposed.make() : LongShort.make(),
     JsPromise.all2((
-      ERC20PresetMinterPauser.make(~name="Pay Token 1", ~symbol="PT1"),
-      ERC20PresetMinterPauser.make(~name="Pay Token 2", ~symbol="PT2"),
+      ERC20Mock.make(~name="Pay Token 1", ~symbol="PT1"),
+      ERC20Mock.make(~name="Pay Token 2", ~symbol="PT2"),
     )),
   ))->JsPromise.then(((
     floatCapital,
@@ -161,6 +164,7 @@ let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
             createSyntheticMarket(
               ~admin=admin.address,
               ~longShort,
+              ~treasury=treasury.address,
               ~fundToken=paymentToken,
               ~marketName=`Test Market ${index->Int.toString}`,
               ~marketSymbol=`TM${index->Int.toString}`,

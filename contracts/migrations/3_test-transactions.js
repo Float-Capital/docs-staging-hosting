@@ -2,8 +2,10 @@ const { BN } = require("@openzeppelin/test-helpers");
 
 const Dai = artifacts.require("Dai");
 const LongShort = artifacts.require("LongShort");
+const Treasury = artifacts.require("Treasury_v0");
 const Staker = artifacts.require("Staker");
 const SyntheticToken = artifacts.require("SyntheticToken");
+const Treasury = artifacts.require("Treasury_v0");
 const YieldManagerMock = artifacts.require("YieldManagerMock");
 const OracleManagerMock = artifacts.require("OracleManagerMock");
 const YieldManagerAave = artifacts.require("YieldManagerAave");
@@ -32,6 +34,7 @@ const deployTestMarket = async (
   syntheticSymbol,
   syntheticName,
   longShortInstance,
+  treasuryInstance,
   fundTokenInstance,
   admin,
   networkName
@@ -57,6 +60,7 @@ const deployTestMarket = async (
     yieldManager = await YieldManagerAave.new(
       admin,
       longShortInstance.address,
+      treasuryInstance.address,
       mumbaiDaiAddress,
       mumabiADai,
       aavePoolAddressMumbai,
@@ -123,7 +127,9 @@ module.exports = async function(deployer, network, accounts) {
   const user3 = accounts[3];
 
   const longShort = await LongShort.deployed();
+  const treasury = await Treasury.deployed();
   const staker = await Staker.deployed();
+
   await topupBalanceIfLow(admin, user1);
   await topupBalanceIfLow(admin, user2);
   await topupBalanceIfLow(admin, user3);
@@ -145,6 +151,7 @@ module.exports = async function(deployer, network, accounts) {
     "ETH killers",
     "ETHK",
     longShort,
+    treasury,
     token,
     admin,
     network
@@ -154,12 +161,21 @@ module.exports = async function(deployer, network, accounts) {
     "ETH/BTC Dominance",
     "EBD",
     longShort,
+    treasury,
     token,
     admin,
     network
   );
   console.log("1,.3");
-  await deployTestMarket("Gold", "GOLD", longShort, token, admin, network);
+  await deployTestMarket(
+    "Gold",
+    "GOLD",
+    longShort,
+    treasury,
+    token,
+    admin,
+    network
+  );
   console.log("1,5");
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();

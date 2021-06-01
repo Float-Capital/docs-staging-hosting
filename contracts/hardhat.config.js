@@ -67,7 +67,7 @@ module.exports = {
     path: './abis',
     clear: true,
     flat: true,
-    only: [':ERC20PresetMinterPauser$',
+    only: [':ERC20Mock$',
       ':YieldManagerMock$',
       ':LongShort',
       ':SyntheticToken',

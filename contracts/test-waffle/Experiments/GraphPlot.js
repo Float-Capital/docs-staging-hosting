@@ -123,7 +123,7 @@ function generateTestData(contracts, accounts, initialPrice, initialAmountShort,
               }));
 }
 
-var describeSkippable = Config.runValueSimulations ? Globals.describe_skip : Globals.describe;
+var describeSkippable = Config.runValueSimulations ? Globals.describe : Globals.describe_skip;
 
 describeSkippable("Float System")(undefined, undefined, undefined, (function (param) {
         var contracts = {

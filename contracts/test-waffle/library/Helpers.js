@@ -4,6 +4,7 @@
 var Js_int = require("bs-platform/lib/js/js_int.js");
 var Staker = require("./contracts/Staker.js");
 var Js_math = require("bs-platform/lib/js/js_math.js");
+var ERC20Mock = require("./contracts/ERC20Mock.js");
 var LongShort = require("./contracts/LongShort.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
 var FloatToken = require("./contracts/FloatToken.js");
@@ -13,7 +14,6 @@ var SyntheticToken = require("./contracts/SyntheticToken.js");
 var FloatCapital_v0 = require("./contracts/FloatCapital_v0.js");
 var YieldManagerMock = require("./contracts/YieldManagerMock.js");
 var OracleManagerMock = require("./contracts/OracleManagerMock.js");
-var ERC20PresetMinterPauser = require("./contracts/ERC20PresetMinterPauser.js");
 
 function randomInteger(param) {
   return ethers.BigNumber.from(Js_math.random_int(1, Js_int.max));
@@ -51,10 +51,10 @@ function randomMintLongShort(param) {
   }
 }
 
-function createSyntheticMarket(admin, longShort, fundToken, marketName, marketSymbol) {
+function createSyntheticMarket(admin, longShort, fundToken, treasury, marketName, marketSymbol) {
   return Promise.all([
                 OracleManagerMock.make(admin),
-                YieldManagerMock.make(admin, longShort.address, fundToken.address)
+                YieldManagerMock.make(admin, longShort.address, treasury, fundToken.address)
               ]).then(function (param) {
               var yieldManager = param[1];
               fundToken.MINTER_ROLE().then(function (minterRole) {
@@ -74,7 +74,7 @@ function getAllMarkets(longShort) {
                                 return Promise.all([
                                               longShort.longTokens(marketIndex).then(SyntheticToken.at),
                                               longShort.shortTokens(marketIndex).then(SyntheticToken.at),
-                                              longShort.fundTokens(marketIndex).then(ERC20PresetMinterPauser.at),
+                                              longShort.fundTokens(marketIndex).then(ERC20Mock.at),
                                               longShort.oracleManagers(marketIndex).then(OracleManagerMock.at),
                                               longShort.yieldManagers(marketIndex).then(YieldManagerMock.at)
                                             ]).then(function (param) {
@@ -99,8 +99,8 @@ function inititialize(admin, exposeInternals) {
                 exposeInternals ? Staker.Exposed.make(undefined) : Staker.make(undefined),
                 exposeInternals ? LongShort.Exposed.make(undefined) : LongShort.make(undefined),
                 Promise.all([
-                      ERC20PresetMinterPauser.make("Pay Token 1", "PT1"),
-                      ERC20PresetMinterPauser.make("Pay Token 2", "PT2")
+                      ERC20Mock.make("Pay Token 1", "PT1"),
+                      ERC20Mock.make("Pay Token 2", "PT2")
                     ])
               ]).then(function (param) {
               var match = param[5];
@@ -125,7 +125,7 @@ function inititialize(admin, exposeInternals) {
                                                       payToken1
                                                     ], Promise.resolve(undefined), (function (previousPromise, paymentToken, index) {
                                                         return previousPromise.then(function (param) {
-                                                                    return createSyntheticMarket(admin.address, longShort, paymentToken, "Test Market " + String(index), "TM" + String(index));
+                                                                    return createSyntheticMarket(admin.address, longShort, paymentToken, treasury.address, "Test Market " + String(index), "TM" + String(index));
                                                                   });
                                                       })).then(function (param) {
                                                     return getAllMarkets(longShort);

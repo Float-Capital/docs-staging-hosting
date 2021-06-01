@@ -15,12 +15,14 @@ contract YieldManagerMock is IYieldManager {
     // Admin contracts.
     address public admin;
     address public longShort;
+    address public treasury;
 
     // Fixed-precision scale for interest percentages.
     uint256 public constant yieldScale = 1e18;
 
     // Global state.
     ERC20PresetMinterPauser public token;
+    ERC20PresetMinterPauser public tokenOtherRewardERC20;
     uint256 public totalHeld;
     uint256 public yieldRate; // pcnt per sec
     uint256 public lastSettled; // secs after epoch
@@ -39,6 +41,11 @@ contract YieldManagerMock is IYieldManager {
         _;
     }
 
+    modifier treasuryOnly() {
+        require(msg.sender == treasury, "Not longShort");
+        _;
+    }
+
     ////////////////////////////////////
     ///// CONTRACT SET-UP //////////////
     ////////////////////////////////////
@@ -46,11 +53,13 @@ contract YieldManagerMock is IYieldManager {
     constructor(
         address _admin,
         address _longShort,
+        address _treasury,
         address _token
     ) {
         // Admin contracts.
         admin = _admin;
         longShort = _longShort;
+        treasury = _treasury;
 
         // Global state.
         token = ERC20PresetMinterPauser(_token);
@@ -85,6 +94,13 @@ contract YieldManagerMock is IYieldManager {
     }
 
     /**
+     * Adds the given yield to the token holdings.
+     */
+    function mockHoldingAdditionalRewardYield() public adminOnly {
+        tokenOtherRewardERC20.mint(address(this), yieldScale * 2);
+    }
+
+    /**
      * Sets the yield percentage per second for the given token.
      */
     function setYieldRate(uint256 _yieldRate) public adminOnly {
@@ -108,6 +124,19 @@ contract YieldManagerMock is IYieldManager {
         // Transfer tokens back to LongShort contract.
         token.transfer(longShort, amount);
         totalHeld = totalHeld - amount;
+    }
+
+    function withdrawErc20TokenToTreasury(address erc20Token)
+        external
+        override
+        treasuryOnly
+    {
+        // Redeem other erc20 tokens.
+        // Transfer tokens back to Treasury contract.
+        mockHoldingAdditionalRewardYield();
+        uint256 amount =
+            ERC20PresetMinterPauser(erc20Token).balanceOf(address(this));
+        ERC20PresetMinterPauser(erc20Token).transfer(treasury, amount);
     }
 
     function getTotalHeld() public override returns (uint256 amount) {

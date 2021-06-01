@@ -64,6 +64,14 @@ function deployContract6(contractName, firstParam, secondParam, thirdParam, four
             });
 }
 
+function deployContract7(contractName, firstParam, secondParam, thirdParam, fourthParam, fifthParam, sixthParam, seventhParam) {
+  return ethers.getContractFactory(contractName).then(function (__x) {
+                return __x.deploy(firstParam, secondParam, thirdParam, fourthParam, fifthParam, sixthParam, seventhParam);
+              }).then(function (prim) {
+              return prim.deployed();
+            });
+}
+
 exports.attachToContract = attachToContract;
 exports.deployContract0 = deployContract0;
 exports.deployContract1 = deployContract1;
@@ -72,4 +80,5 @@ exports.deployContract3 = deployContract3;
 exports.deployContract4 = deployContract4;
 exports.deployContract5 = deployContract5;
 exports.deployContract6 = deployContract6;
+exports.deployContract7 = deployContract7;
 /* No side effect */
