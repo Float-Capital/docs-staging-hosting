@@ -5,6 +5,7 @@ const LongShort = artifacts.require("LongShort");
 const Treasury = artifacts.require("Treasury_v0");
 const Staker = artifacts.require("Staker");
 const SyntheticToken = artifacts.require("SyntheticToken");
+const Treasury = artifacts.require("Treasury_v0");
 const YieldManagerMock = artifacts.require("YieldManagerMock");
 const OracleManagerMock = artifacts.require("OracleManagerMock");
 const YieldManagerAave = artifacts.require("YieldManagerAave");
