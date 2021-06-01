@@ -2,9 +2,18 @@
 'use strict';
 
 var Js_int = require("bs-platform/lib/js/js_int.js");
+var Staker = require("./contracts/Staker.js");
 var Js_math = require("bs-platform/lib/js/js_math.js");
-var Contract = require("./Contract.js");
+var ERC20Mock = require("./contracts/ERC20Mock.js");
+var LongShort = require("./contracts/LongShort.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
+var FloatToken = require("./contracts/FloatToken.js");
+var Treasury_v0 = require("./contracts/Treasury_v0.js");
+var TokenFactory = require("./contracts/TokenFactory.js");
+var SyntheticToken = require("./contracts/SyntheticToken.js");
+var FloatCapital_v0 = require("./contracts/FloatCapital_v0.js");
+var YieldManagerMock = require("./contracts/YieldManagerMock.js");
+var OracleManagerMock = require("./contracts/OracleManagerMock.js");
 
 function randomInteger(param) {
   return ethers.BigNumber.from(Js_math.random_int(1, Js_int.max));
@@ -42,17 +51,19 @@ function randomMintLongShort(param) {
   }
 }
 
-function createSyntheticMarket(admin, longShort, treasury, fundToken, marketName, marketSymbol) {
+function createSyntheticMarket(admin, longShort, fundToken, treasury, marketName, marketSymbol) {
   return Promise.all([
-                Contract.OracleManagerMock.make(admin),
-                Contract.YieldManagerMock.make(admin, longShort.address, treasury.address, fundToken.address)
+                OracleManagerMock.make(admin),
+                YieldManagerMock.make(admin, longShort.address, treasury, fundToken.address)
               ]).then(function (param) {
               var yieldManager = param[1];
-              Contract.PaymentToken.grantMintRole(fundToken, yieldManager.address);
+              fundToken.MINTER_ROLE().then(function (minterRole) {
+                    return fundToken.grantRole(minterRole, yieldManager.address);
+                  });
               return longShort.newSyntheticMarket(marketName, marketSymbol, fundToken.address, param[0].address, yieldManager.address).then(function (param) {
                             return longShort.latestMarket();
                           }).then(function (marketIndex) {
-                          return longShort.initializeMarket(marketIndex, 0, 50, 50, 50, ethers.BigNumber.from("1000000000000000000"), ethers.BigNumber.from(0));
+                          return longShort.initializeMarket(marketIndex, ethers.BigNumber.from(0), ethers.BigNumber.from(0), ethers.BigNumber.from(50), ethers.BigNumber.from(50), ethers.BigNumber.from("1000000000000000000"), ethers.BigNumber.from(0));
                         });
             });
 }
@@ -61,11 +72,11 @@ function getAllMarkets(longShort) {
   return longShort.latestMarket().then(function (nextMarketIndex) {
               return Promise.all(Belt_Array.map(Belt_Array.range(1, nextMarketIndex), (function (marketIndex) {
                                 return Promise.all([
-                                              longShort.longTokens(marketIndex).then(Contract.SyntheticToken.at),
-                                              longShort.shortTokens(marketIndex).then(Contract.SyntheticToken.at),
-                                              longShort.fundTokens(marketIndex).then(Contract.PaymentToken.at),
-                                              longShort.oracleManagers(marketIndex).then(Contract.OracleManagerMock.at),
-                                              longShort.yieldManagers(marketIndex).then(Contract.YieldManagerMock.at)
+                                              longShort.longTokens(marketIndex).then(SyntheticToken.at),
+                                              longShort.shortTokens(marketIndex).then(SyntheticToken.at),
+                                              longShort.fundTokens(marketIndex).then(ERC20Mock.at),
+                                              longShort.oracleManagers(marketIndex).then(OracleManagerMock.at),
+                                              longShort.yieldManagers(marketIndex).then(YieldManagerMock.at)
                                             ]).then(function (param) {
                                             return {
                                                     paymentToken: param[2],
@@ -82,14 +93,14 @@ function getAllMarkets(longShort) {
 
 function inititialize(admin, exposeInternals) {
   return Promise.all([
-                Contract.FloatCapital_v0.make(undefined),
-                Contract.Treasury_v0.make(undefined),
-                Contract.FloatToken.make(undefined),
-                exposeInternals ? Contract.Staker.makeExposed(undefined) : Contract.Staker.make(undefined),
-                exposeInternals ? Contract.LongShort.makeExposed(undefined) : Contract.LongShort.make(undefined),
+                FloatCapital_v0.make(undefined),
+                Treasury_v0.make(undefined),
+                FloatToken.make(undefined),
+                exposeInternals ? Staker.Exposed.make(undefined) : Staker.make(undefined),
+                exposeInternals ? LongShort.Exposed.make(undefined) : LongShort.make(undefined),
                 Promise.all([
-                      Contract.PaymentToken.make("Pay Token 1", "PT1"),
-                      Contract.PaymentToken.make("Pay Token 2", "PT2")
+                      ERC20Mock.make("Pay Token 1", "PT1"),
+                      ERC20Mock.make("Pay Token 2", "PT2")
                     ])
               ]).then(function (param) {
               var match = param[5];
@@ -100,9 +111,9 @@ function inititialize(admin, exposeInternals) {
               var floatToken = param[2];
               var treasury = param[1];
               var floatCapital = param[0];
-              return Contract.TokenFactory.make(admin.address, longShort.address).then(function (tokenFactory) {
+              return TokenFactory.make(admin.address, longShort.address).then(function (tokenFactory) {
                           return Promise.all([
-                                          floatToken["initialize(string,string,address)"]("Float token", "FLOAT TOKEN", staker.address),
+                                          floatToken.initialize3("Float token", "FLOAT TOKEN", staker.address),
                                           treasury.initialize(admin.address),
                                           longShort.initialize(admin.address, treasury.address, tokenFactory.address, staker.address),
                                           staker.initialize(admin.address, longShort.address, floatToken.address, floatCapital.address)
@@ -114,7 +125,7 @@ function inititialize(admin, exposeInternals) {
                                                       payToken1
                                                     ], Promise.resolve(undefined), (function (previousPromise, paymentToken, index) {
                                                         return previousPromise.then(function (param) {
-                                                                    return createSyntheticMarket(admin.address, longShort, treasury, paymentToken, "Test Market " + String(index), "TM" + String(index));
+                                                                    return createSyntheticMarket(admin.address, longShort, paymentToken, treasury.address, "Test Market " + String(index), "TM" + String(index));
                                                                   });
                                                       })).then(function (param) {
                                                     return getAllMarkets(longShort);

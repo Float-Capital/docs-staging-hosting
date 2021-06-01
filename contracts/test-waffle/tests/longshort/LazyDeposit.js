@@ -19,7 +19,7 @@ function testIntegration(contracts, accounts) {
                               var longSynth = match$1.longSynth;
                               var oracleManager = match$1.oracleManager;
                               var paymentToken = match$1.paymentToken;
-                              return LetOps.AwaitThen.let_(longShort.longValue(marketIndex), (function (longValueBefore) {
+                              return LetOps.AwaitThen.let_(longShort.longValue(marketIndex), (function (_longValueBefore) {
                                             return LetOps.AwaitThen.let_(paymentToken.mint(testUser.address, amountToLazyMint), (function (param) {
                                                           return LetOps.AwaitThen.let_(paymentToken.connect(testUser).approve(longShort.address, amountToLazyMint), (function (param) {
                                                                         return LetOps.AwaitThen.let_(longShort.connect(testUser).mintLongLazy(marketIndex, amountToLazyMint), (function (param) {
@@ -28,7 +28,7 @@ function testIntegration(contracts, accounts) {
                                                                                                     return LetOps.AwaitThen.let_(oracleManager.setPrice(nextPrice), (function (param) {
                                                                                                                   return LetOps.AwaitThen.let_(longShort._updateSystemState(marketIndex), (function (param) {
                                                                                                                                 return LetOps.AwaitThen.let_(longSynth.balanceOf(testUser.address), (function (usersBalanceBeforeSettlement) {
-                                                                                                                                              return LetOps.AwaitThen.let_(longShort._executeOutstandingLazySettlements(testUser.address, marketIndex), (function (param) {
+                                                                                                                                              return LetOps.AwaitThen.let_(longShort.connect(testUser).mintLongLazy(marketIndex, Globals.bnFromInt(0)), (function (param) {
                                                                                                                                                             return LetOps.AwaitThen.let_(longSynth.balanceOf(testUser.address), (function (usersUpdatedBalance) {
                                                                                                                                                                           Chai.bnEqual("Balance after price system update but before user settlement should be the same as after settlement", usersBalanceBeforeSettlement, usersUpdatedBalance);
                                                                                                                                                                           return LetOps.Await.let_(longShort.longTokenPrice(marketIndex), (function (longTokenPrice) {

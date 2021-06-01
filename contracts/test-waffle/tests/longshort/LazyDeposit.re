@@ -12,45 +12,43 @@ let testIntegration =
       let testUser = accounts.contents->Array.getUnsafe(8);
       let amountToLazyMint = Helpers.randomTokenAmount();
 
-      let {tokenFactory, treasury, floatToken, staker, longShort, markets} =
+      let {longShort, markets} =
+        // let {tokenFactory, treasury, floatToken, staker, longShort, markets} =
         contracts.contents;
       let {
         paymentToken,
         oracleManager,
-        yieldManager,
+        // yieldManager,
         longSynth,
-        shortSynth,
+        // shortSynth,
         marketIndex,
       } =
         markets->Array.getUnsafe(0);
 
-      let%AwaitThen longValueBefore =
-        longShort->Contract.LongShort.longValue(~marketIndex);
+      let%AwaitThen _longValueBefore =
+        longShort->LongShort.longValue(marketIndex);
 
       let%AwaitThen _ =
-        paymentToken->Contract.PaymentToken.mint(
-          ~user=testUser.address,
+        paymentToken->ERC20Mock.mint(
+          ~_to=testUser.address,
           ~amount=amountToLazyMint,
         );
 
       let%AwaitThen _ =
         paymentToken
-        ->Contract.connect(~address=testUser)
-        ->Contract.PaymentToken.approve(
+        ->ContractHelpers.connect(~address=testUser)
+        ->ERC20Mock.approve(
             ~spender=longShort.address,
             ~amount=amountToLazyMint,
           );
 
       let%AwaitThen _ =
         longShort
-        ->Contract.connect(~address=testUser)
-        ->Contract.LongShort.mintLongLazy(
-            ~marketIndex,
-            ~amount=amountToLazyMint,
-          );
+        ->ContractHelpers.connect(~address=testUser)
+        ->LongShort.mintLongLazy(~marketIndex, ~amount=amountToLazyMint);
 
       let%AwaitThen previousPrice =
-        oracleManager->Contract.OracleManagerMock.getLatestPrice;
+        oracleManager->OracleManagerMock.getLatestPrice;
 
       let nextPrice =
         previousPrice
@@ -69,27 +67,20 @@ let testIntegration =
       //   );
 
       let%AwaitThen _ =
-        oracleManager->Contract.OracleManagerMock.setPrice(
-          ~newPrice=nextPrice,
-        );
+        oracleManager->OracleManagerMock.setPrice(~newPrice=nextPrice);
 
-      let%AwaitThen _ =
-        longShort->Contract.LongShort._updateSystemState(~marketIndex);
+      let%AwaitThen _ = longShort->LongShort._updateSystemState(~marketIndex);
 
       let%AwaitThen usersBalanceBeforeSettlement =
-        longSynth->Contract.SyntheticToken.balanceOf(
-          ~account=testUser.address,
-        );
+        longSynth->SyntheticToken.balanceOf(~account=testUser.address);
 
+      // This triggers the _executeOutstandingLazySettlements function
       let%AwaitThen _ =
-        longShort->Contract.LongShort.Exposed._executeOutstandingLazySettlementsExposed(
-          ~user=testUser.address,
-          ~marketIndex,
-        );
+        longShort
+        ->ContractHelpers.connect(~address=testUser)
+        ->LongShort.mintLongLazy(~marketIndex, ~amount=bnFromInt(0));
       let%AwaitThen usersUpdatedBalance =
-        longSynth->Contract.SyntheticToken.balanceOf(
-          ~account=testUser.address,
-        );
+        longSynth->SyntheticToken.balanceOf(~account=testUser.address);
 
       Chai.bnEqual(
         ~message=
@@ -99,7 +90,7 @@ let testIntegration =
       );
 
       let%Await longTokenPrice =
-        longShort->Contract.LongShort.longTokenPrice(~marketIndex);
+        longShort->LongShort.longTokenPrice(marketIndex);
 
       let expectedNumberOfTokensToRecieve =
         amountToLazyMint->mul(CONSTANTS.tenToThe18)->div(longTokenPrice);
@@ -127,7 +118,7 @@ let testExposed =
       let testWallet = accounts.contents->Array.getUnsafe(1);
 
       let%Await _ =
-        longShort->Contract.LongShort.Exposed.setUseexecuteOutstandingLazySettlementsMock(
+        longShort->LongShort.Exposed.setUseexecuteOutstandingLazySettlementsMock(
           ~shouldUseMock=true,
         );
 
@@ -135,8 +126,8 @@ let testExposed =
         Chai.callEmitEvents(
           ~call=
             longShort
-            ->Contract.connect(~address=testWallet)
-            ->Contract.LongShort.mintLongLazy(~marketIndex, ~amount),
+            ->ContractHelpers.connect(~address=testWallet)
+            ->LongShort.mintLongLazy(~marketIndex, ~amount),
           ~eventName="executeOutstandingLazySettlementsMock",
           ~contract=longShort->Obj.magic,
         )
@@ -144,7 +135,8 @@ let testExposed =
       ();
     });
     describe("mintLongLazy", () => {
-      let mintLongLazyTxPromise: ref(JsPromise.t(Contract.transaction)) =
+      let mintLongLazyTxPromise:
+        ref(JsPromise.t(ContractHelpers.transaction)) =
         ref(None->Obj.magic);
       let marketIndex = 1;
       let amount = bnFromInt(1);
@@ -155,8 +147,8 @@ let testExposed =
 
         mintLongLazyTxPromise :=
           longShort
-          ->Contract.connect(~address=testWallet)
-          ->Contract.LongShort.mintLongLazy(~marketIndex, ~amount);
+          ->ContractHelpers.connect(~address=testWallet)
+          ->LongShort.mintLongLazy(~marketIndex, ~amount);
       });
 
       it'("should emit the correct event", () => {
@@ -193,7 +185,7 @@ let testExposed =
         let {longShort} = contracts.contents;
         let%AwaitThen _ = mintLongLazyTxPromise.contents;
         let%Await {mintLong} =
-          longShort->Contract.LongShort.batchedLazyDeposit(~marketIndex);
+          longShort->LongShort.batchedLazyDeposit(marketIndex);
 
         Chai.bnEqual(
           ~message="Incorrect batched lazy deposit mint long",

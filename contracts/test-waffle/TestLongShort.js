@@ -50,7 +50,7 @@ Globals.describe("Float System")(undefined, undefined, undefined, (function (par
                                                                 contracts.contents = deployedContracts;
                                                                 var firstMarketPaymentToken = deployedContracts.markets[1].paymentToken;
                                                                 var testUser = accounts.contents[1];
-                                                                return LetOps.Await.let_(Contract.PaymentToken.mintAndApprove(firstMarketPaymentToken, testUser, ethers.BigNumber.from("10000000000000000000000"), deployedContracts.longShort.address), (function (param) {
+                                                                return LetOps.Await.let_(Contract.PaymentTokenHelpers.mintAndApprove(firstMarketPaymentToken, testUser, ethers.BigNumber.from("10000000000000000000000"), deployedContracts.longShort.address), (function (param) {
                                                                               
                                                                             }));
                                                               }));

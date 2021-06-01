@@ -25,8 +25,8 @@ let bnCloseTo: (
 
 type eventCheck
 let callEmitEvents: (
-  ~call: JsPromise.t<Contract.transaction>,
-  ~contract: Contract.t,
+  ~call: JsPromise.t<ContractHelpers.transaction>,
+  ~contract: ContractHelpers.t,
   ~eventName: string,
 ) => eventCheck = %raw(`(call, contract, eventName) => expect(call).to.emit(contract, eventName)`)
 @send external withArgs0: eventCheck => JsPromise.t<unit> = "withArgs"
@@ -41,18 +41,18 @@ let callEmitEvents: (
 external withArgs8: (eventCheck, 'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h) => JsPromise.t<unit> = "withArgs"
 
 let expectRevertNoReason: (
-  ~transaction: JsPromise.t<Contract.transaction>,
+  ~transaction: JsPromise.t<ContractHelpers.transaction>,
 ) => JsPromise.t<unit> = %raw(`(transaction) => expect(transaction).to.be.reverted`)
 let expectRevert: (
-  ~transaction: JsPromise.t<Contract.transaction>,
+  ~transaction: JsPromise.t<ContractHelpers.transaction>,
   ~reason: string,
 ) => JsPromise.t<
   unit,
 > = %raw(`(transaction, reason) => expect(transaction).to.be.revertedWith(reason)`)
 
 let changeBallance: (
-  ~transaction: unit => JsPromise.t<Contract.transaction>,
-  ~token: Contract.t,
+  ~transaction: unit => JsPromise.t<ContractHelpers.transaction>,
+  ~token: ContractHelpers.t,
   ~to_: Ethers.ethAddress,
   ~amount: Ethers.BigNumber.t,
 ) => JsPromise.t<

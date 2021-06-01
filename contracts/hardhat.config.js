@@ -3,6 +3,7 @@ require("@tenderly/hardhat-tenderly"); // https://hardhat.org/plugins/tenderly-h
 
 let runCoverage = !process.env.DONT_RUN_REPORT_SUMMARY || process.env.DONT_RUN_REPORT_SUMMARY.toUpperCase() != "TRUE";
 if (runCoverage) {
+  require('hardhat-abi-exporter');
   require("hardhat-gas-reporter");
   require("solidity-coverage");
 }
@@ -62,4 +63,25 @@ module.exports = {
     overwrite: false,
     runOnCompile: false,
   },
+  abiExporter: {
+    path: './abis',
+    clear: true,
+    flat: true,
+    only: [':ERC20Mock$',
+      ':YieldManagerMock$',
+      ':LongShort',
+      ':SyntheticToken',
+      ':YieldManagerAave',
+      ':FloatCapital_v0',
+      ':Migrations',
+      ':TokenFactory',
+      ':FloatToken',
+      ':Staker',
+      ':Treasury_v0',
+      ':OracleManager$',
+      ':OracleManagerChainlink$',
+      ':OracleManagerMock$'
+    ],
+    spacing: 2
+  }
 };

@@ -59,7 +59,7 @@ describe("Float System", () => {
         let testUser = accounts.contents->Array.getUnsafe(1);
 
         let%Await _ =
-          firstMarketPaymentToken->Contract.PaymentToken.mintAndApprove(
+          firstMarketPaymentToken->Contract.PaymentTokenHelpers.mintAndApprove(
             ~user=testUser,
             ~spender=deployedContracts.longShort.address,
             ~amount=Ethers.BigNumber.fromUnsafe("10000000000000000000000"),

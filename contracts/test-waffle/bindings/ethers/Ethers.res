@@ -152,19 +152,19 @@ module Utils = {
     | #geher
     | #tether
   ]
-  @scope("ethers") @scope("utils") @val
+  @scope("ethers.utils") @val
   external parseUnitsUnsafe: (. string, ethUnit) => BigNumber.t = "parseUnits"
   let parseUnits = (~amount, ~unit) => Misc.unsafeToOption(() => parseUnitsUnsafe(. amount, unit))
 
   let parseEther = (~amount) => parseUnits(~amount, ~unit=#ether)
   let parseEtherUnsafe = (~amount) => parseUnitsUnsafe(. amount, #ether)
 
-  @scope("ethers") @scope("utils") @val
+  @scope("ethers.utils") @val
   external getAddressUnsafe: string => ethAddress = "getAddress"
   let getAddress: string => option<ethAddress> = addressString =>
     Misc.unsafeToOption(() => getAddressUnsafe(addressString))
 
-  @scope("ethers") @scope("utils") @val
+  @scope("ethers.utils") @val
   external formatUnits: (. BigNumber.t, ethUnit) => string = "formatUnits"
 
   let formatEther = formatUnits(. _, #ether)

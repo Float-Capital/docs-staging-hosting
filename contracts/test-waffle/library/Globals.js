@@ -28,6 +28,10 @@ function bnToString(prim) {
   return prim.toString();
 }
 
+function bnToInt(prim) {
+  return prim.toNumber();
+}
+
 var it$prime = Promise$BsMocha.it;
 
 var it_skip$prime = Promise$BsMocha.it_skip;
@@ -38,9 +42,11 @@ var before$prime = Promise$BsMocha.before;
 
 var describe = Mocha$BsMocha.describe;
 
-var it = Mocha$BsMocha.it;
+var it = Mocha$BsMocha.describe_skip;
 
-var it_skip = Mocha$BsMocha.it_skip;
+var it_skip = Mocha$BsMocha.it;
+
+var describe_skip = Mocha$BsMocha.it_skip;
 
 var before = Mocha$BsMocha.before;
 
@@ -56,9 +62,11 @@ exports.bnFromInt = bnFromInt;
 exports.mul = mul;
 exports.div = div;
 exports.bnToString = bnToString;
+exports.bnToInt = bnToInt;
 exports.describe = describe;
 exports.it = it;
 exports.it_skip = it_skip;
+exports.describe_skip = describe_skip;
 exports.before = before;
 exports.before_each = before_each;
 /* No side effect */
