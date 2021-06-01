@@ -6,6 +6,7 @@ const YieldManager = artifacts.require("YieldManagerMock");
 contract("YieldManagerMock (interface)", (accounts) => {
   let yieldManager;
   let token;
+  let treasury;
 
   // Constants for fake underlying token.
   const syntheticName = "FTSE100";
@@ -24,6 +25,7 @@ contract("YieldManagerMock (interface)", (accounts) => {
   beforeEach(async () => {
     const result = await initialize(admin);
     longShort = result.longShort;
+    treasury = result.treasury;
 
     // Create synthetic tokens for yield manager.
     const synthResult = await createSynthetic(
@@ -31,6 +33,7 @@ contract("YieldManagerMock (interface)", (accounts) => {
       longShort,
       syntheticName,
       syntheticSymbol,
+      treasury,
       0, // no fees for testing
       0,
       0,

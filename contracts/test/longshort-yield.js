@@ -5,6 +5,7 @@ const erc20 = artifacts.require("SyntheticToken");
 
 contract("LongShort (yield mechanism)", (accounts) => {
   let longShort;
+  let treasury;
 
   const syntheticName = "FTSE100";
   const syntheticSymbol = "FTSE";
@@ -25,6 +26,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
   beforeEach(async () => {
     var result = await initialize(admin);
     longShort = result.longShort;
+    treasury = result.treasury;
   });
 
   // Generic test runner that checks whether the expected base and extra fee
@@ -46,6 +48,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
         longShort,
         syntheticName,
         syntheticSymbol,
+        treasury,
         0, // no mint/redeem fees for testing yield
         0,
         0,

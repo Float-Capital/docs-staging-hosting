@@ -789,6 +789,45 @@
     "inputs": [
       {
         "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "batchedLazyRedeems",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "redeemLong",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "redeemShort",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalWithdrawnShort",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalWithdrawnLong",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
         "name": "marketIndex",
         "type": "uint32"
       },
@@ -1160,6 +1199,19 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      }
+    ],
+    "name": "handleBatchedLazyRedeems",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1658,6 +1710,24 @@
         "type": "uint256"
       }
     ],
+    "name": "redeemLongLazy",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokensToRedeem",
+        "type": "uint256"
+      }
+    ],
     "name": "redeemShort",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -1672,6 +1742,24 @@
       }
     ],
     "name": "redeemShortAll",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokensToRedeem",
+        "type": "uint256"
+      }
+    ],
+    "name": "redeemShortLazy",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1960,6 +2048,40 @@
       {
         "internalType": "uint256",
         "name": "mintAndStakeShort",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "userLazyRedeems",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "redeemLong",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "redeemShort",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "usersCurrentUpdateIndex",
         "type": "uint256"
       }
     ],

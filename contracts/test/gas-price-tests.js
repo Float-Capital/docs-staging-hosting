@@ -32,6 +32,7 @@ contract("LongShort (gas prices)", (accounts) => {
   let oracleManager;
   let marketIndex;
   let fund;
+  let treasury;
 
   const syntheticName = "FTSE100";
   const syntheticSymbol = "FTSE";
@@ -57,12 +58,13 @@ contract("LongShort (gas prices)", (accounts) => {
     const result = await initialize(admin);
     longShort = result.longShort;
     dai = result.dai;
+    treasury = result.treasury;
 
     const synthResult = await createSynthetic(
       admin,
       longShort,
       syntheticName,
-      syntheticSymbol,
+      syntheticSymbol, treasury,
       _baseEntryFee,
       _badLiquidityEntryFee,
       _baseExitFee,

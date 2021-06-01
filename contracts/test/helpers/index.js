@@ -92,6 +92,7 @@ const createSynthetic = async (
   longShort,
   syntheticName,
   syntheticSymbol,
+  treasury,
   _baseEntryFee,
   _badLiquidityEntryFee,
   _baseExitFee,
@@ -109,7 +110,7 @@ const createSynthetic = async (
     from: admin,
   });
 
-  const yieldManager = await YieldManager.new(admin, longShort.address, fundToken.address, {
+  const yieldManager = await YieldManager.new(admin, longShort.address, treasury.address, fundToken.address, {
     from: admin,
   });
 

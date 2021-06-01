@@ -38,6 +38,7 @@ contract("LongShort (treasury)", (accounts) => {
       longShort,
       "FTSE100",
       "FTSE100",
+      treasury,
       fees,
       fees,
       fees,
