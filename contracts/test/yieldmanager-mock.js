@@ -46,7 +46,7 @@ contract("YieldManagerMock (interface)", (accounts) => {
     await token.mint(user, oneHundred);
 
     // New yield manager with "longShort" proxied to user.
-    yieldManager = await YieldManager.new(admin, user, token.address, treasury.address, { from: admin });
+    yieldManager = await YieldManager.new(admin, user, treasury.address, token.address, { from: admin });
 
     // Mock yield manager needs to be able to mint tokens to simulate yield.
     var mintRole = await token.MINTER_ROLE.call();

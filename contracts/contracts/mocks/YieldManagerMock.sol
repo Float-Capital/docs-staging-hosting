@@ -79,7 +79,9 @@ contract YieldManagerMock is IYieldManager {
 
         lastSettled = block.timestamp;
         totalHeld = totalHeld + totalYield;
-        token.mint(address(this), totalYield);
+        if (totalYield > 0) {
+            token.mint(address(this), totalYield);
+        }
     }
 
     /**
