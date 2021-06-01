@@ -463,11 +463,6 @@
         "internalType": "string",
         "name": "symbol",
         "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "stakerAddress",
-        "type": "address"
       }
     ],
     "name": "initialize",
@@ -486,9 +481,14 @@
         "internalType": "string",
         "name": "symbol",
         "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "stakerAddress",
+        "type": "address"
       }
     ],
-    "name": "initialize",
+    "name": "initialize3",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

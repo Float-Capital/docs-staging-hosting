@@ -1,6 +1,5 @@
-open Contract
 type markets = {
-  paymentToken: PaymentToken.t,
+  paymentToken: ERC20PresetMinterPauser.t,
   oracleManager: OracleManagerMock.t,
   yieldManager: YieldManagerMock.t,
   longSynth: SyntheticToken.t,
@@ -42,20 +41,29 @@ let randomMintLongShort = () => {
 let createSyntheticMarket = (
   ~admin,
   ~longShort: LongShort.t,
-  ~fundToken: PaymentToken.t,
+  ~fundToken: ERC20PresetMinterPauser.t,
   ~marketName,
   ~marketSymbol,
 ) => {
   JsPromise.all2((
-    OracleManagerMock.make(admin),
-    YieldManagerMock.make(admin, longShort.address, fundToken.address),
+    OracleManagerMock.make(~admin),
+    YieldManagerMock.make(~admin, ~longShort=longShort.address, ~token=fundToken.address),
   ))->JsPromise.then(((oracleManager, yieldManager)) => {
-    let _ignorePromise = fundToken->PaymentToken.grantMintRole(~user=yieldManager.address)
+    let _ignorePromise =
+      fundToken
+      ->ERC20PresetMinterPauser.mINTER_ROLE
+      ->JsPromise.map(minterRole =>
+        fundToken->ERC20PresetMinterPauser.grantRole(
+          ~role=minterRole,
+          ~account=yieldManager.address,
+        )
+      )
+    // fundToken->ERC20PresetMinterPauser.grantMintRole(~user=yieldManager.address)
     longShort
     ->LongShort.newSyntheticMarket(
-      ~marketName,
-      ~marketSymbol,
-      ~paymentToken=fundToken.address,
+      ~syntheticName=marketName,
+      ~syntheticSymbol=marketSymbol,
+      ~fundToken=fundToken.address,
       ~oracleManager=oracleManager.address,
       ~yieldManager=yieldManager.address,
     )
@@ -63,10 +71,10 @@ let createSyntheticMarket = (
     ->JsPromise.then(marketIndex => {
       longShort->LongShort.initializeMarket(
         ~marketIndex,
-        ~baseEntryFee=0,
-        ~badLiquidityEntryFee=50,
-        ~baseExitFee=50,
-        ~badLiquidityExitFee=50,
+        ~baseEntryFee=Ethers.BigNumber.fromInt(0),
+        ~badLiquidityEntryFee=Ethers.BigNumber.fromInt(0),
+        ~baseExitFee=Ethers.BigNumber.fromInt(50),
+        ~badLiquidityExitFee=Ethers.BigNumber.fromInt(50),
         ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("1000000000000000000"),
         ~kPeriod=Ethers.BigNumber.fromInt(0),
       )
@@ -83,11 +91,11 @@ let getAllMarkets = longShort => {
     Belt.Array.range(1, marketIndex)
     ->Array.map(marketIndex =>
       JsPromise.all5((
-        longShort->LongShort.longSynth(~marketIndex)->JsPromise.then(SyntheticToken.at),
-        longShort->LongShort.shortSynth(~marketIndex)->JsPromise.then(SyntheticToken.at),
-        longShort->LongShort.fundTokens(~marketIndex)->JsPromise.then(PaymentToken.at),
-        longShort->LongShort.oracleManagers(~marketIndex)->JsPromise.then(OracleManagerMock.at),
-        longShort->LongShort.yieldManagers(~marketIndex)->JsPromise.then(YieldManagerMock.at),
+        longShort->LongShort.longTokens(marketIndex)->JsPromise.then(SyntheticToken.at),
+        longShort->LongShort.shortTokens(marketIndex)->JsPromise.then(SyntheticToken.at),
+        longShort->LongShort.fundTokens(marketIndex)->JsPromise.then(ERC20PresetMinterPauser.at),
+        longShort->LongShort.oracleManagers(marketIndex)->JsPromise.then(OracleManagerMock.at),
+        longShort->LongShort.yieldManagers(marketIndex)->JsPromise.then(YieldManagerMock.at),
       ))->JsPromise.map(((longSynth, shortSynth, fundToken, oracleManager, yieldManager)) => {
         {
           paymentToken: fundToken,
@@ -108,11 +116,11 @@ let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
     FloatCapital_v0.make(),
     Treasury_v0.make(),
     FloatToken.make(),
-    exposeInternals ? Staker.makeExposed() : Staker.make(),
-    exposeInternals ? LongShort.makeExposed() : LongShort.make(),
+    exposeInternals ? Staker.Exposed.make() : Staker.make(),
+    exposeInternals ? LongShort.Exposed.make() : LongShort.make(),
     JsPromise.all2((
-      PaymentToken.make(~name="Pay Token 1", ~symbol="PT1"),
-      PaymentToken.make(~name="Pay Token 2", ~symbol="PT2"),
+      ERC20PresetMinterPauser.make(~name="Pay Token 1", ~symbol="PT1"),
+      ERC20PresetMinterPauser.make(~name="Pay Token 2", ~symbol="PT2"),
     )),
   ))->JsPromise.then(((
     floatCapital,
@@ -122,21 +130,28 @@ let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
     longShort,
     (payToken1, payToken2),
   )) => {
-    TokenFactory.make(admin.address, longShort.address)->JsPromise.then(tokenFactory => {
+    TokenFactory.make(
+      ~admin=admin.address,
+      ~longShort=longShort.address,
+    )->JsPromise.then(tokenFactory => {
       JsPromise.all4((
-        floatToken->FloatToken.setup("Float token", "FLOAT TOKEN", staker.address),
-        treasury->Treasury_v0.setup(admin.address),
-        longShort->LongShort.setup(
-          admin.address,
-          treasury.address,
-          tokenFactory.address,
-          staker.address,
+        floatToken->FloatToken.initialize3(
+          ~name="Float token",
+          ~symbol="FLOAT TOKEN",
+          ~stakerAddress=staker.address,
         ),
-        staker->Staker.setup(
-          admin.address,
-          longShort.address,
-          floatToken.address,
-          floatCapital.address,
+        treasury->Treasury_v0.initialize(~admin=admin.address),
+        longShort->LongShort.initialize(
+          ~admin=admin.address,
+          ~treasury=treasury.address,
+          ~tokenFactory=tokenFactory.address,
+          ~staker=staker.address,
+        ),
+        staker->Staker.initialize(
+          ~admin=admin.address,
+          ~longShortCoreContract=longShort.address,
+          ~floatToken=floatToken.address,
+          ~floatCapital=floatCapital.address,
         ),
       ))
       ->JsPromise.then(_ => {
