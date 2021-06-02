@@ -19,7 +19,7 @@ function testIntegration(contracts, accounts) {
                               var longSynth = match$1.longSynth;
                               var oracleManager = match$1.oracleManager;
                               var paymentToken = match$1.paymentToken;
-                              return LetOps.AwaitThen.let_(longShort.longValue(marketIndex), (function (_longValueBefore) {
+                              return LetOps.AwaitThen.let_(longShort.syntheticTokenBackedValue(CONSTANTS.longTokenType, marketIndex), (function (_longValueBefore) {
                                             return LetOps.AwaitThen.let_(paymentToken.mint(testUser.address, amountToLazyMint), (function (param) {
                                                           return LetOps.AwaitThen.let_(paymentToken.connect(testUser).approve(longShort.address, amountToLazyMint), (function (param) {
                                                                         return LetOps.AwaitThen.let_(longShort.connect(testUser).mintLongLazy(marketIndex, amountToLazyMint), (function (param) {

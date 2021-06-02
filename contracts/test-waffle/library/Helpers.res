@@ -94,8 +94,12 @@ let getAllMarkets = longShort => {
     Belt.Array.range(1, marketIndex)
     ->Array.map(marketIndex =>
       JsPromise.all5((
-        longShort->LongShort.longTokens(marketIndex)->JsPromise.then(SyntheticToken.at),
-        longShort->LongShort.shortTokens(marketIndex)->JsPromise.then(SyntheticToken.at),
+        longShort
+        ->LongShort.syntheticTokens(CONSTANTS.longTokenType, marketIndex)
+        ->JsPromise.then(SyntheticToken.at),
+        longShort
+        ->LongShort.syntheticTokens(CONSTANTS.shortTokenType, marketIndex)
+        ->JsPromise.then(SyntheticToken.at),
         longShort->LongShort.fundTokens(marketIndex)->JsPromise.then(ERC20Mock.at),
         longShort->LongShort.oracleManagers(marketIndex)->JsPromise.then(OracleManagerMock.at),
         longShort->LongShort.yieldManagers(marketIndex)->JsPromise.then(YieldManagerMock.at),

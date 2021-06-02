@@ -571,7 +571,7 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@chainlink/contracts@0.1.7":
+"@chainlink/contracts@^0.1.7":
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/@chainlink/contracts/-/contracts-0.1.7.tgz#ff8e8f1fad5f0766d52ad515f83148f9d82cccad"
   integrity sha512-txVkGrwFYnyLUC/I5hTe7yZK7fjmB6YFULfBHqryRuREUmGd4bdpXfrcUUsZycmWibanp69QVyQBpsDrPhWsjw==
@@ -2597,26 +2597,6 @@
     crypto-js "^3.1.9-1"
     debug "^4.3.1"
 
-"@truffle/contract@4.3.8", "@truffle/contract@^4.3.8":
-  version "4.3.8"
-  resolved "https://registry.yarnpkg.com/@truffle/contract/-/contract-4.3.8.tgz#806c63d683be81e5fd09d54346b52d7bb3940b5b"
-  integrity sha512-pQjRVUQ9muV1zT/bzhCvyhQXLHQVZobhe/Dwt/sIoj5Alea0ueNPQTeLN6DmMWusNDSlY8fNM7mgXJ+izvdpxw==
-  dependencies:
-    "@truffle/blockchain-utils" "^0.0.26"
-    "@truffle/contract-schema" "^3.3.4"
-    "@truffle/debug-utils" "^5.0.10"
-    "@truffle/error" "^0.0.12"
-    "@truffle/interface-adapter" "^0.4.19"
-    bignumber.js "^7.2.1"
-    ethereum-ens "^0.8.0"
-    ethers "^4.0.32"
-    source-map-support "^0.5.19"
-    web3 "1.2.9"
-    web3-core-helpers "1.2.9"
-    web3-core-promievent "1.2.9"
-    web3-eth-abi "1.2.9"
-    web3-utils "1.2.9"
-
 "@truffle/contract@^4.0.35", "@truffle/contract@^4.2.12":
   version "4.3.12"
   resolved "https://registry.yarnpkg.com/@truffle/contract/-/contract-4.3.12.tgz#9c1fed962fae17a8fe1895c6e80314a00dc62cce"
@@ -2630,6 +2610,26 @@
     bignumber.js "^7.2.1"
     ethereum-ens "^0.8.0"
     ethers "^4.0.32"
+    web3 "1.2.9"
+    web3-core-helpers "1.2.9"
+    web3-core-promievent "1.2.9"
+    web3-eth-abi "1.2.9"
+    web3-utils "1.2.9"
+
+"@truffle/contract@^4.3.8":
+  version "4.3.8"
+  resolved "https://registry.yarnpkg.com/@truffle/contract/-/contract-4.3.8.tgz#806c63d683be81e5fd09d54346b52d7bb3940b5b"
+  integrity sha512-pQjRVUQ9muV1zT/bzhCvyhQXLHQVZobhe/Dwt/sIoj5Alea0ueNPQTeLN6DmMWusNDSlY8fNM7mgXJ+izvdpxw==
+  dependencies:
+    "@truffle/blockchain-utils" "^0.0.26"
+    "@truffle/contract-schema" "^3.3.4"
+    "@truffle/debug-utils" "^5.0.10"
+    "@truffle/error" "^0.0.12"
+    "@truffle/interface-adapter" "^0.4.19"
+    bignumber.js "^7.2.1"
+    ethereum-ens "^0.8.0"
+    ethers "^4.0.32"
+    source-map-support "^0.5.19"
     web3 "1.2.9"
     web3-core-helpers "1.2.9"
     web3-core-promievent "1.2.9"

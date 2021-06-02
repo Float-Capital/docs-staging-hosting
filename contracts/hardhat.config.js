@@ -42,6 +42,8 @@ module.exports = {
   },
   networks: {
     hardhat: {
+      blockGasLimit: 15450000, // Make it high enough that the 'internals exposed' contracts have enough gass to deploy
+      gas: 15450000 // Make it high enough that the 'internals exposed' contracts have enough gass to deploy
     },
     mumbai: {
       chainId: 80001,

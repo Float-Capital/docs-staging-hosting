@@ -119,7 +119,7 @@ contract("LongShort (initialisation)", (accounts) => {
       "Total value not correctly shown"
     );
 
-    const shortValueLocked = await longShort.shortValue.call(marketIndex);
+    const shortValueLocked = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
     assert.equal(
       shortValueLocked.toString(),
       defaultMintAmount,

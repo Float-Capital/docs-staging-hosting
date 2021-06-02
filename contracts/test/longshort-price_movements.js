@@ -78,8 +78,8 @@ contract("LongShort (price movements)", (accounts) => {
     });
 
     // 100 fund tokens
-    const longVal = await longShort.longValue.call(marketIndex); // $100
-    const shortVal = await longShort.shortValue.call(marketIndex); // $100
+    const longVal = await longShort.syntheticTokenBackedValue.call(0, marketIndex); // $100
+    const shortVal = await longShort.syntheticTokenBackedValue.call(1, marketIndex); // $100
     assert.equal(longVal.toString(), shortVal.toString(), "Price movement");
 
     let oraclePrice = await oracleManager.getLatestPrice.call();
@@ -88,8 +88,8 @@ contract("LongShort (price movements)", (accounts) => {
     );
 
     await longShort._updateSystemState(marketIndex);
-    const newLongVal = await longShort.longValue.call(marketIndex); // $110
-    const newShortVal = await longShort.shortValue.call(marketIndex); // $90
+    const newLongVal = await longShort.syntheticTokenBackedValue.call(0, marketIndex); // $110
+    const newShortVal = await longShort.syntheticTokenBackedValue.call(1, marketIndex); // $90
 
     // 110 fund tokens
     assert.equal(
@@ -123,8 +123,8 @@ contract("LongShort (price movements)", (accounts) => {
     );
 
     await longShort._updateSystemState(marketIndex);
-    const newLongVal = await longShort.longValue.call(marketIndex);
-    const newShortVal = await longShort.shortValue.call(marketIndex);
+    const newLongVal = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
+    const newShortVal = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
 
     // 90 fund tokens
     assert.equal(
@@ -158,8 +158,8 @@ contract("LongShort (price movements)", (accounts) => {
     );
 
     await longShort._updateSystemState(marketIndex);
-    const newLongVal = await longShort.longValue.call(marketIndex);
-    const newShortVal = await longShort.shortValue.call(marketIndex);
+    const newLongVal = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
+    const newShortVal = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
 
     // 99 fund tokens
     assert.equal(
@@ -193,8 +193,8 @@ contract("LongShort (price movements)", (accounts) => {
     );
 
     await longShort._updateSystemState(marketIndex);
-    const newLongVal = await longShort.longValue.call(marketIndex);
-    const newShortVal = await longShort.shortValue.call(marketIndex);
+    const newLongVal = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
+    const newShortVal = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
 
     // 81 fund
     assert.equal(
@@ -228,8 +228,8 @@ contract("LongShort (price movements)", (accounts) => {
     );
 
     await longShort._updateSystemState(marketIndex);
-    const newLongVal = await longShort.longValue.call(marketIndex);
-    const newShortVal = await longShort.shortValue.call(marketIndex);
+    const newLongVal = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
+    const newShortVal = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
 
     // 200 fund
     assert.equal(
@@ -273,8 +273,8 @@ contract("LongShort (price movements)", (accounts) => {
     );
 
     await longShort._updateSystemState(marketIndex);
-    const newLongVal = await longShort.longValue.call(marketIndex);
-    const newShortVal = await longShort.shortValue.call(marketIndex);
+    const newLongVal = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
+    const newShortVal = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
 
     // 0 fund
     assert.equal(newLongVal.toString(), "0", "Longvalue change not correct");
@@ -299,8 +299,8 @@ contract("LongShort (price movements)", (accounts) => {
     );
 
     await longShort._updateSystemState(marketIndex);
-    const newLongVal = await longShort.longValue.call(marketIndex);
-    const newShortVal = await longShort.shortValue.call(marketIndex);
+    const newLongVal = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
+    const newShortVal = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
 
     // 100 fund
     assert.equal(
@@ -342,8 +342,8 @@ contract("LongShort (price movements)", (accounts) => {
     );
 
     await longShort._updateSystemState(marketIndex);
-    const newLongVal = await longShort.longValue.call(marketIndex);
-    const newShortVal = await longShort.shortValue.call(marketIndex);
+    const newLongVal = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
+    const newShortVal = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
 
     // 0 fund
     assert.equal(newLongVal.toString(), "0", "Longvalue change not correct");

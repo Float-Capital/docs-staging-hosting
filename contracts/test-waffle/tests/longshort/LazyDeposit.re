@@ -26,7 +26,10 @@ let testIntegration =
         markets->Array.getUnsafe(0);
 
       let%AwaitThen _longValueBefore =
-        longShort->LongShort.longValue(marketIndex);
+        longShort->LongShort.syntheticTokenBackedValue(
+          CONSTANTS.longTokenType,
+          marketIndex,
+        );
 
       let%AwaitThen _ =
         paymentToken->ERC20Mock.mint(

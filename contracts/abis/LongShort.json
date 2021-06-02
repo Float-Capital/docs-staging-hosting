@@ -851,9 +851,9 @@
         "type": "uint32"
       },
       {
-        "internalType": "bool",
-        "name": "isLong",
-        "type": "bool"
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "syntheticTokenType",
+        "type": "uint8"
       },
       {
         "internalType": "uint256",
@@ -879,9 +879,9 @@
         "type": "uint32"
       },
       {
-        "internalType": "bool",
-        "name": "isLong",
-        "type": "bool"
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "syntheticTokenType",
+        "type": "uint8"
       }
     ],
     "name": "executeOutstandingLazySettlementsSynth",
@@ -1030,9 +1030,9 @@
         "type": "uint32"
       },
       {
-        "internalType": "bool",
-        "name": "isLong",
-        "type": "bool"
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "syntheticTokenType",
+        "type": "uint8"
       }
     ],
     "name": "getUsersPendingBalance",
@@ -1171,25 +1171,6 @@
       }
     ],
     "name": "longTokenPrice",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "name": "longValue",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1588,25 +1569,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "name": "shortValue",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "staker",
     "outputs": [
@@ -1622,9 +1584,33 @@
   {
     "inputs": [
       {
-        "internalType": "bool",
+        "internalType": "enum ILongShort.MarketSide",
         "name": "",
-        "type": "bool"
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "name": "syntheticTokenBackedValue",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
       },
       {
         "internalType": "uint32",

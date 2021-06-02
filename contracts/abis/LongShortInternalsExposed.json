@@ -584,24 +584,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "_executeOutstandingLazySettlementsExposed",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint32",
         "name": "marketIndex",
         "type": "uint32"
@@ -819,40 +801,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "assetPriceGreater",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "assetPriceLess",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "baseValueExposure",
-        "type": "uint256"
-      }
-    ],
-    "name": "calculateValueChangeForPriceMechanism",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "_admin",
         "type": "address"
@@ -912,24 +860,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "depositFunds",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "user",
         "type": "address"
@@ -940,9 +870,9 @@
         "type": "uint32"
       },
       {
-        "internalType": "bool",
-        "name": "isLong",
-        "type": "bool"
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "syntheticTokenType",
+        "type": "uint8"
       },
       {
         "internalType": "uint256",
@@ -968,9 +898,9 @@
         "type": "uint32"
       },
       {
-        "internalType": "bool",
-        "name": "isLong",
-        "type": "bool"
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "syntheticTokenType",
+        "type": "uint8"
       }
     ],
     "name": "executeOutstandingLazySettlementsSynth",
@@ -1023,74 +953,6 @@
         "internalType": "contract IERC20",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "isMint",
-        "type": "bool"
-      },
-      {
-        "internalType": "bool",
-        "name": "isLong",
-        "type": "bool"
-      }
-    ],
-    "name": "getFeesForAction",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "baseAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "penaltyAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "isMint",
-        "type": "bool"
-      }
-    ],
-    "name": "getFeesForAmounts",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -1205,9 +1067,9 @@
         "type": "uint32"
       },
       {
-        "internalType": "bool",
-        "name": "isLong",
-        "type": "bool"
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "syntheticTokenType",
+        "type": "uint8"
       }
     ],
     "name": "getUsersPendingBalance",
@@ -1346,25 +1208,6 @@
       }
     ],
     "name": "longTokenPrice",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "name": "longValue",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1678,30 +1521,6 @@
       },
       {
         "internalType": "uint256",
-        "name": "newPrice",
-        "type": "uint256"
-      }
-    ],
-    "name": "priceChangeMechanism",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "didUpdate",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
         "name": "tokensToRedeem",
         "type": "uint256"
       }
@@ -1837,25 +1656,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "name": "shortValue",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "staker",
     "outputs": [
@@ -1871,9 +1671,33 @@
   {
     "inputs": [
       {
-        "internalType": "bool",
+        "internalType": "enum ILongShort.MarketSide",
         "name": "",
-        "type": "bool"
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "name": "syntheticTokenBackedValue",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
       },
       {
         "internalType": "uint32",
@@ -1960,42 +1784,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "transferFromYieldManager",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "transferToYieldManager",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -2128,24 +1916,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "withdrawFunds",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

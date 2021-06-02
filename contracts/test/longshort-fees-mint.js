@@ -94,8 +94,8 @@ contract("LongShort (minting fees)", (accounts) => {
       }
 
       // Get locked value for initial mints (fees may have been taken):
-      const initialLongValue = await longShort.longValue.call(marketIndex);
-      const initialShortValue = await longShort.shortValue.call(marketIndex);
+      const initialLongValue = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
+      const initialShortValue = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
 
       // Work out expected fee.
       const expectedBaseFee = baseFee

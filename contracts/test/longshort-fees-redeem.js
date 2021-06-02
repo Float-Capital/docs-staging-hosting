@@ -101,7 +101,7 @@ contract("LongShort (redeeming fees)", (accounts) => {
       });
 
       // Check that value has been locked in long side correctly.
-      const longValueInContract = await longShort.longValue.call(marketIndex);
+      const longValueInContract = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
       const expectedLongValueInContract = new BN(mintLong);
       assert.equal(
         longValueInContract.toString(),
@@ -110,7 +110,7 @@ contract("LongShort (redeeming fees)", (accounts) => {
       );
 
       // Check that value has been locked in short side correctly.
-      const shortValueInContract = await longShort.shortValue.call(marketIndex);
+      const shortValueInContract = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
       const expectedShortValueInContract = new BN(mintShort);
       assert.equal(
         shortValueInContract.toString(),

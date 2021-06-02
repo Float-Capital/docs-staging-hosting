@@ -609,9 +609,9 @@
         "type": "uint256"
       },
       {
-        "internalType": "bool",
-        "name": "isLong",
-        "type": "bool"
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "syntheticTokenType",
+        "type": "uint8"
       }
     ],
     "name": "stakeFromMintBatched",

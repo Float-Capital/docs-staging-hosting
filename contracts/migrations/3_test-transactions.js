@@ -190,9 +190,9 @@ module.exports = async function (deployer, network, accounts) {
         marketIndex
       )} OracleManagerEthKiller=${await longShort.oracleManagers(
         marketIndex
-      )} SyntheticToken=${await longShort.longTokens(
+      )} SyntheticToken=${await LongShort.syntheticTokens(CONSTANTS.longTokenType,
         marketIndex
-      )} SyntheticToken=${await longShort.shortTokens(marketIndex)}`;
+      )} SyntheticToken=${await LongShort.syntheticTokens(CONSTANTS.shortTokenType, marketIndex)}`;
     }
 
     console.log(`To verify market specific contracts run the following:
@@ -204,8 +204,8 @@ module.exports = async function (deployer, network, accounts) {
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
     console.log(`Simulating transactions for marketIndex: ${marketIndex}`);
 
-    const longAddress = await longShort.syntheticTokens.call(true, marketIndex);
-    const shortAddress = await longShort.syntheticTokens.call(false, marketIndex);
+    const longAddress = await longShort.syntheticTokens.call(0, marketIndex);
+    const shortAddress = await longShort.syntheticTokens.call(1, marketIndex);
 
     let long = await SyntheticToken.at(longAddress);
     let short = await SyntheticToken.at(shortAddress);

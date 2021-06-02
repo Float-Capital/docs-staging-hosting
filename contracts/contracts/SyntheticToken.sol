@@ -13,7 +13,7 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
     IStaker public staker;
     // TODO: these values aren't set by the contructor/initializer
     uint32 public marketIndex;
-    bool public isLong;
+    ILongShort.MarketSide public syntheticTokenType;
 
     constructor(
         string memory name,
@@ -21,12 +21,12 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         ILongShort _longShort,
         IStaker _staker,
         uint32 _marketIndex,
-        bool _isLong
+        ILongShort.MarketSide _syntheticTokenType
     ) ERC20PresetMinterPauser(name, symbol) {
         longShort = _longShort;
         staker = _staker;
         marketIndex = _marketIndex;
-        isLong = _isLong;
+        syntheticTokenType = _syntheticTokenType;
     }
 
     function synthRedeemBurn(address account, uint256 amount)
@@ -88,7 +88,7 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
             longShort.executeOutstandingLazySettlementsPartialOrCurrentIfNeeded(
                 sender,
                 marketIndex,
-                isLong,
+                syntheticTokenType,
                 amountRequired
             );
         }
@@ -106,7 +106,10 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         returns (uint256)
     {
         return
-            longShort.getUsersPendingBalance(account, marketIndex, isLong) +
-            ERC20.balanceOf(account);
+            longShort.getUsersPendingBalance(
+                account,
+                marketIndex,
+                syntheticTokenType
+            ) + ERC20.balanceOf(account);
     }
 }
