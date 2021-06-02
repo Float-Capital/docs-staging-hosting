@@ -1022,6 +1022,9 @@ contract LongShort is ILongShort, Initializable {
         external
         refreshSystemState(marketIndex)
     {
+        // Deposit funds and compute fees.
+        _lockFundsInMarket(marketIndex, amount);
+
         _mintLong(marketIndex, amount, msg.sender, msg.sender);
     }
 
@@ -1032,6 +1035,9 @@ contract LongShort is ILongShort, Initializable {
         external
         refreshSystemState(marketIndex)
     {
+        // Deposit funds and compute fees.
+        _lockFundsInMarket(marketIndex, amount);
+
         _mintShort(marketIndex, amount, msg.sender, msg.sender);
     }
 
@@ -1042,6 +1048,9 @@ contract LongShort is ILongShort, Initializable {
         external
         refreshSystemState(marketIndex)
     {
+        // Deposit funds and compute fees.
+        _lockFundsInMarket(marketIndex, amount);
+
         uint256 tokensMinted =
             _mintLong(marketIndex, amount, msg.sender, address(staker));
 
@@ -1055,6 +1064,9 @@ contract LongShort is ILongShort, Initializable {
         external
         refreshSystemState(marketIndex)
     {
+        // Deposit funds and compute fees.
+        _lockFundsInMarket(marketIndex, amount);
+
         uint256 tokensMinted =
             _mintShort(marketIndex, amount, msg.sender, address(staker));
 
@@ -1071,8 +1083,6 @@ contract LongShort is ILongShort, Initializable {
         address user,
         address transferTo
     ) internal returns (uint256) {
-        // Deposit funds and compute fees.
-        _lockFundsInMarket(marketIndex, amount);
         uint256 fees = _getFeesForAction(marketIndex, amount, true, true);
         uint256 remaining = amount - fees;
 
@@ -1103,8 +1113,6 @@ contract LongShort is ILongShort, Initializable {
         address user,
         address transferTo
     ) internal returns (uint256) {
-        // Deposit funds and compute fees.
-        _lockFundsInMarket(marketIndex, amount);
         uint256 fees = _getFeesForAction(marketIndex, amount, true, false);
         uint256 remaining = amount - fees;
 
@@ -1519,6 +1527,46 @@ contract LongShort is ILongShort, Initializable {
 
             if (maxAvailableSynthLazily < minimumAmountRequired) {
                 // Convert to an instant mint
+                if (isLong) {
+                    _transferFundsToYieldManager(
+                        marketIndex,
+                        currentUserDeposits.mintLong
+                    );
+                    _mintLong(
+                        marketIndex,
+                        currentUserDeposits.mintLong,
+                        user,
+                        user
+                    );
+
+                    batchedLazyDeposit[marketIndex]
+                        .longEarlyClaimed -= currentUserDeposits
+                        .longEarlyClaimed;
+                    batchedLazyDeposit[marketIndex]
+                        .mintLong -= currentUserDeposits.mintLong;
+
+                    currentUserDeposits.mintLong = 0;
+                    currentUserDeposits.longEarlyClaimed = 0;
+                } else {
+                    _transferFundsToYieldManager(
+                        marketIndex,
+                        currentUserDeposits.mintShort
+                    );
+                    _mintShort(
+                        marketIndex,
+                        currentUserDeposits.mintShort,
+                        user,
+                        user
+                    );
+                    batchedLazyDeposit[marketIndex]
+                        .shortEarlyClaimed -= currentUserDeposits
+                        .shortEarlyClaimed;
+                    batchedLazyDeposit[marketIndex]
+                        .mintShort -= currentUserDeposits.mintShort;
+
+                    currentUserDeposits.mintShort = 0;
+                    currentUserDeposits.longEarlyClaimed = 0;
+                }
             } else {
                 // Credit the user `maxAvailableAmountLazily` they need and do all relevant accounting (might as well give them all of it, right?)
                 // TODO: this is common code that happens in multiple places - refactor!
@@ -1559,6 +1607,9 @@ contract LongShort is ILongShort, Initializable {
                     shortValue[marketIndex] =
                         shortValue[marketIndex] +
                         maxAvailableAmountLazily;
+
+                    currentUserDeposits
+                        .shortEarlyClaimed += maxAvailableAmountLazily;
                     batchedLazyDeposit[marketIndex]
                         .shortEarlyClaimed += maxAvailableAmountLazily;
                 }
