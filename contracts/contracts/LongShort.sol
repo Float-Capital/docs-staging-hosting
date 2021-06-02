@@ -1095,7 +1095,7 @@ contract LongShort is ILongShort, Initializable {
         // Deposit funds and compute fees.
         _lockFundsInMarket(marketIndex, amount);
 
-        _mintLong(marketIndex, amount, msg.sender, msg.sender);
+        _mint(marketIndex, amount, msg.sender, msg.sender, MarketSide.Long);
     }
 
     /**
@@ -1108,7 +1108,7 @@ contract LongShort is ILongShort, Initializable {
         // Deposit funds and compute fees.
         _lockFundsInMarket(marketIndex, amount);
 
-        _mintShort(marketIndex, amount, msg.sender, msg.sender);
+        _mint(marketIndex, amount, msg.sender, msg.sender, MarketSide.Short);
     }
 
     /**
@@ -1122,7 +1122,13 @@ contract LongShort is ILongShort, Initializable {
         _lockFundsInMarket(marketIndex, amount);
 
         uint256 tokensMinted =
-            _mintLong(marketIndex, amount, msg.sender, address(staker));
+            _mint(
+                marketIndex,
+                amount,
+                msg.sender,
+                address(staker),
+                MarketSide.Long
+            );
 
         staker.stakeFromMint(
             syntheticTokens[MarketSide.Long][marketIndex],
@@ -1142,7 +1148,13 @@ contract LongShort is ILongShort, Initializable {
         _lockFundsInMarket(marketIndex, amount);
 
         uint256 tokensMinted =
-            _mintShort(marketIndex, amount, msg.sender, address(staker));
+            _mint(
+                marketIndex,
+                amount,
+                msg.sender,
+                address(staker),
+                MarketSide.Short
+            );
 
         staker.stakeFromMint(
             syntheticTokens[MarketSide.Short][marketIndex],
@@ -1151,48 +1163,15 @@ contract LongShort is ILongShort, Initializable {
         );
     }
 
-    function _mintLong(
+    function _mint(
         uint32 marketIndex,
         uint256 amount,
         address user,
-        address transferTo
+        address transferTo,
+        MarketSide syntheticSide
     ) internal returns (uint256) {
         uint256 fees =
-            _getFeesForAction(marketIndex, amount, true, MarketSide.Long);
-        uint256 remaining = amount - fees;
-
-        // Distribute fees across the market.
-        _feesMechanism(marketIndex, fees);
-        _refreshTokensPrice(marketIndex);
-
-        // Mint long tokens with remaining value.
-        uint256 tokens =
-            (remaining * TEN_TO_THE_18) /
-                syntheticTokenPrice[MarketSide.Long][marketIndex];
-        syntheticTokens[MarketSide.Long][marketIndex].mint(transferTo, tokens);
-        syntheticTokenBackedValue[MarketSide.Long][marketIndex] =
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-            remaining;
-
-        emit LongMinted(marketIndex, amount, remaining, tokens, user);
-
-        emit ValueLockedInSystem(
-            marketIndex,
-            totalValueLockedInMarket[marketIndex],
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex],
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex]
-        );
-        return tokens;
-    }
-
-    function _mintShort(
-        uint32 marketIndex,
-        uint256 amount,
-        address user,
-        address transferTo
-    ) internal returns (uint256) {
-        uint256 fees =
-            _getFeesForAction(marketIndex, amount, true, MarketSide.Short);
+            _getFeesForAction(marketIndex, amount, true, syntheticSide);
         uint256 remaining = amount - fees;
 
         // Distribute fees across the market.
@@ -1202,13 +1181,18 @@ contract LongShort is ILongShort, Initializable {
         // Mint short tokens with remaining value.
         uint256 tokens =
             (remaining * TEN_TO_THE_18) /
-                syntheticTokenPrice[MarketSide.Short][marketIndex];
-        syntheticTokens[MarketSide.Short][marketIndex].mint(transferTo, tokens);
-        syntheticTokenBackedValue[MarketSide.Short][marketIndex] =
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] +
+                syntheticTokenPrice[syntheticSide][marketIndex];
+        syntheticTokens[syntheticSide][marketIndex].mint(transferTo, tokens);
+        syntheticTokenBackedValue[syntheticSide][marketIndex] =
+            syntheticTokenBackedValue[syntheticSide][marketIndex] +
             remaining;
 
-        emit ShortMinted(marketIndex, amount, remaining, tokens, user);
+        // TODO: combine these
+        if (syntheticSide == MarketSide.Long) {
+            emit ShortMinted(marketIndex, amount, remaining, tokens, user);
+        } else {
+            emit LongMinted(marketIndex, amount, remaining, tokens, user);
+        }
 
         emit ValueLockedInSystem(
             marketIndex,
@@ -1223,87 +1207,53 @@ contract LongShort is ILongShort, Initializable {
     /////////// REDEEM TOKENS //////////
     ////////////////////////////////////
 
-    function _redeemLong(uint32 marketIndex, uint256 tokensToRedeem)
-        internal
-        refreshSystemState(marketIndex)
-    {
+    function _redeem(
+        uint32 marketIndex,
+        uint256 tokensToRedeem,
+        MarketSide syntheticSide
+    ) internal refreshSystemState(marketIndex) {
         // Only this contract has permission to call this function
-        syntheticTokens[MarketSide.Long][marketIndex].synthRedeemBurn(
+        syntheticTokens[syntheticSide][marketIndex].synthRedeemBurn(
             msg.sender,
             tokensToRedeem
         );
 
         // Compute fees.
         uint256 amount =
-            (tokensToRedeem *
-                syntheticTokenPrice[MarketSide.Long][marketIndex]) /
+            (tokensToRedeem * syntheticTokenPrice[syntheticSide][marketIndex]) /
                 TEN_TO_THE_18;
         uint256 fees =
-            _getFeesForAction(marketIndex, amount, false, MarketSide.Long);
+            _getFeesForAction(marketIndex, amount, false, syntheticSide);
         uint256 remaining = amount - fees;
 
         // Distribute fees across the market.
         _feesMechanism(marketIndex, fees);
 
         // Withdraw funds with remaining amount.
-        syntheticTokenBackedValue[MarketSide.Long][marketIndex] =
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] -
+        syntheticTokenBackedValue[syntheticSide][marketIndex] =
+            syntheticTokenBackedValue[syntheticSide][marketIndex] -
             amount;
         _withdrawFunds(marketIndex, remaining, msg.sender);
         _refreshTokensPrice(marketIndex);
 
-        emit LongRedeem(
-            marketIndex,
-            tokensToRedeem,
-            amount,
-            remaining,
-            msg.sender
-        );
-
-        emit ValueLockedInSystem(
-            marketIndex,
-            totalValueLockedInMarket[marketIndex],
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex],
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex]
-        );
-    }
-
-    function _redeemShort(uint32 marketIndex, uint256 tokensToRedeem)
-        internal
-        refreshSystemState(marketIndex)
-    {
-        // Only this contract has permission to call this function
-        syntheticTokens[MarketSide.Short][marketIndex].synthRedeemBurn(
-            msg.sender,
-            tokensToRedeem
-        );
-
-        // Compute fees.
-        uint256 amount =
-            (tokensToRedeem *
-                syntheticTokenPrice[MarketSide.Short][marketIndex]) /
-                TEN_TO_THE_18;
-        uint256 fees =
-            _getFeesForAction(marketIndex, amount, false, MarketSide.Short);
-        uint256 remaining = amount - fees;
-
-        // Distribute fees across the market.
-        _feesMechanism(marketIndex, fees);
-
-        // Withdraw funds with remaining amount.
-        syntheticTokenBackedValue[MarketSide.Short][marketIndex] =
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] -
-            amount;
-        _withdrawFunds(marketIndex, remaining, msg.sender);
-        _refreshTokensPrice(marketIndex);
-
-        emit ShortRedeem(
-            marketIndex,
-            tokensToRedeem,
-            amount,
-            remaining,
-            msg.sender
-        );
+        // TODO: Combine these events
+        if (syntheticSide == MarketSide.Long) {
+            emit LongRedeem(
+                marketIndex,
+                tokensToRedeem,
+                amount,
+                remaining,
+                msg.sender
+            );
+        } else {
+            emit ShortRedeem(
+                marketIndex,
+                tokensToRedeem,
+                amount,
+                remaining,
+                msg.sender
+            );
+        }
 
         emit ValueLockedInSystem(
             marketIndex,
@@ -1317,20 +1267,20 @@ contract LongShort is ILongShort, Initializable {
         external
         override
     {
-        _redeemLong(marketIndex, tokensToRedeem);
+        _redeem(marketIndex, tokensToRedeem, MarketSide.Long);
     }
 
     function redeemLongAll(uint32 marketIndex) external {
         uint256 tokensToRedeem =
             syntheticTokens[MarketSide.Long][marketIndex].balanceOf(msg.sender);
-        _redeemLong(marketIndex, tokensToRedeem);
+        _redeem(marketIndex, tokensToRedeem, MarketSide.Long);
     }
 
     function redeemShort(uint32 marketIndex, uint256 tokensToRedeem)
         external
         override
     {
-        _redeemShort(marketIndex, tokensToRedeem);
+        _redeem(marketIndex, tokensToRedeem, MarketSide.Short);
     }
 
     function redeemShortAll(uint32 marketIndex) external {
@@ -1338,7 +1288,7 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokens[MarketSide.Short][marketIndex].balanceOf(
                 msg.sender
             );
-        _redeemShort(marketIndex, tokensToRedeem);
+        _redeem(marketIndex, tokensToRedeem, MarketSide.Short);
     }
 
     ////////////////////////////////////
@@ -1376,6 +1326,7 @@ contract LongShort is ILongShort, Initializable {
     ////// LAZY EXEC:
     // Putting all code related to lazy execution below to keep it separate from the rest of the code (for now)
 
+    // TODO: use the MarketSide enum for long/short values
     struct UserLazyDeposit {
         uint256 usersCurrentUpdateIndex;
         uint256 mintLong;
@@ -1645,11 +1596,12 @@ contract LongShort is ILongShort, Initializable {
                         marketIndex,
                         currentUserDeposits.mintLong
                     );
-                    _mintLong(
+                    _mint(
                         marketIndex,
                         currentUserDeposits.mintLong,
                         user,
-                        user
+                        user,
+                        MarketSide.Long
                     );
 
                     batchedLazyDeposit[marketIndex]
@@ -1665,11 +1617,12 @@ contract LongShort is ILongShort, Initializable {
                         marketIndex,
                         currentUserDeposits.mintShort
                     );
-                    _mintShort(
+                    _mint(
                         marketIndex,
                         currentUserDeposits.mintShort,
                         user,
-                        user
+                        user,
+                        MarketSide.Short
                     );
                     batchedLazyDeposit[marketIndex]
                         .shortEarlyClaimed -= currentUserDeposits
@@ -1853,21 +1806,18 @@ contract LongShort is ILongShort, Initializable {
     }
 
     struct UserLazyRedeem {
-        uint256 redeemLong;
-        uint256 redeemShort;
+        mapping(MarketSide => uint256) redemptions;
         uint256 usersCurrentUpdateIndex;
     }
 
     struct BatchedLazyRedeem {
-        uint256 redeemLong;
-        uint256 redeemShort;
-        uint256 totalWithdrawnShort;
-        uint256 totalWithdrawnLong;
+        uint256 redemptions;
+        uint256 totalWithdrawn;
     }
 
     mapping(uint32 => mapping(address => UserLazyRedeem))
         public userLazyRedeems;
-    mapping(uint32 => mapping(uint256 => BatchedLazyRedeem))
+    mapping(uint32 => mapping(uint256 => mapping(MarketSide => BatchedLazyRedeem)))
         public batchedLazyRedeems;
 
     function _executeOutstandingLazyRedeems(address user, uint32 marketIndex)
@@ -1881,25 +1831,31 @@ contract LongShort is ILongShort, Initializable {
             currentUserRedeems.usersCurrentUpdateIndex <=
             latestUpdateIndex[marketIndex]
         ) {
-            BatchedLazyRedeem storage batch =
+            BatchedLazyRedeem storage batchLong =
                 batchedLazyRedeems[marketIndex][
                     currentUserRedeems.usersCurrentUpdateIndex
-                ];
-            if (currentUserRedeems.redeemLong > 0) {
+                ][MarketSide.Long];
+            BatchedLazyRedeem storage batchShort =
+                batchedLazyRedeems[marketIndex][
+                    currentUserRedeems.usersCurrentUpdateIndex
+                ][MarketSide.Short];
+            if (currentUserRedeems.redemptions[MarketSide.Long] > 0) {
                 fundTokens[marketIndex].transfer(
                     user,
-                    (batch.totalWithdrawnLong * currentUserRedeems.redeemLong) /
-                        batch.redeemLong
+                    (batchLong.totalWithdrawn *
+                        currentUserRedeems.redemptions[MarketSide.Long]) /
+                        batchLong.redemptions
                 );
-                currentUserRedeems.redeemLong = 0;
+                currentUserRedeems.redemptions[MarketSide.Long] = 0;
             }
-            if (currentUserRedeems.redeemShort > 0) {
+            if (currentUserRedeems.redemptions[MarketSide.Short] > 0) {
                 fundTokens[marketIndex].transfer(
                     user,
-                    (batch.totalWithdrawnShort *
-                        currentUserRedeems.redeemShort) / batch.redeemShort
+                    (batchShort.totalWithdrawn *
+                        currentUserRedeems.redemptions[MarketSide.Short]) /
+                        batchShort.redemptions
                 );
-                currentUserRedeems.redeemShort = 0;
+                currentUserRedeems.redemptions[MarketSide.Short] = 0;
             }
             currentUserRedeems.usersCurrentUpdateIndex = 0;
         }
@@ -1921,12 +1877,14 @@ contract LongShort is ILongShort, Initializable {
         );
         uint256 nextUpdateIndex = latestUpdateIndex[marketIndex] + 1;
 
-        userLazyRedeems[marketIndex][msg.sender].redeemLong += tokensToRedeem;
+        userLazyRedeems[marketIndex][msg.sender].redemptions[
+            MarketSide.Long
+        ] += tokensToRedeem;
         userLazyRedeems[marketIndex][msg.sender]
             .usersCurrentUpdateIndex = nextUpdateIndex;
 
-        batchedLazyRedeems[marketIndex][nextUpdateIndex]
-            .redeemLong += tokensToRedeem;
+        batchedLazyRedeems[marketIndex][nextUpdateIndex][MarketSide.Long]
+            .redemptions += tokensToRedeem;
     }
 
     function redeemShortLazy(uint32 marketIndex, uint256 tokensToRedeem)
@@ -1940,38 +1898,46 @@ contract LongShort is ILongShort, Initializable {
         );
         uint256 nextUpdateIndex = latestUpdateIndex[marketIndex] + 1;
 
-        userLazyRedeems[marketIndex][msg.sender].redeemShort += tokensToRedeem;
+        userLazyRedeems[marketIndex][msg.sender].redemptions[
+            MarketSide.Short
+        ] += tokensToRedeem;
         userLazyRedeems[marketIndex][msg.sender]
             .usersCurrentUpdateIndex = nextUpdateIndex;
 
-        batchedLazyRedeems[marketIndex][nextUpdateIndex]
-            .redeemShort += tokensToRedeem;
+        batchedLazyRedeems[marketIndex][nextUpdateIndex][MarketSide.Short]
+            .redemptions += tokensToRedeem;
     }
 
     function handleBatchedLazyRedeems(uint32 marketIndex) public {
-        BatchedLazyRedeem storage batch =
-            batchedLazyRedeems[marketIndex][latestUpdateIndex[marketIndex]];
+        BatchedLazyRedeem storage batchLong =
+            batchedLazyRedeems[marketIndex][latestUpdateIndex[marketIndex]][
+                MarketSide.Long
+            ];
+        BatchedLazyRedeem storage batchShort =
+            batchedLazyRedeems[marketIndex][latestUpdateIndex[marketIndex]][
+                MarketSide.Short
+            ];
 
-        if (batch.redeemLong > 0) {
+        if (batchLong.redemptions > 0) {
             syntheticTokens[MarketSide.Long][marketIndex].synthRedeemBurn(
                 address(this),
-                batch.redeemLong
+                batchLong.redemptions
             );
         }
 
-        if (batch.redeemShort > 0) {
+        if (batchShort.redemptions > 0) {
             syntheticTokens[MarketSide.Short][marketIndex].synthRedeemBurn(
                 address(this),
-                batch.redeemLong
+                batchShort.redemptions
             );
         }
         uint256 longAmountToRedeem =
-            (batch.redeemLong *
+            (batchLong.redemptions *
                 syntheticTokenPrice[MarketSide.Long][marketIndex]) /
                 TEN_TO_THE_18;
 
         uint256 shortAmountToRedeem =
-            (batch.redeemShort *
+            (batchShort.redemptions *
                 syntheticTokenPrice[MarketSide.Short][marketIndex]) /
                 TEN_TO_THE_18;
 
@@ -2015,8 +1981,8 @@ contract LongShort is ILongShort, Initializable {
                 false
             );
 
-        batch.totalWithdrawnLong = longAmountToRedeem - totalFeesLong;
-        batch.totalWithdrawnShort = shortAmountToRedeem - totalFeesShort;
+        batchLong.totalWithdrawn = longAmountToRedeem - totalFeesLong;
+        batchShort.totalWithdrawn = shortAmountToRedeem - totalFeesShort;
 
         _feesMechanism(marketIndex, totalFeesLong + totalFeesShort);
 
@@ -2029,7 +1995,7 @@ contract LongShort is ILongShort, Initializable {
 
         _withdrawFunds(
             marketIndex,
-            batch.totalWithdrawnLong + batch.totalWithdrawnShort,
+            batchLong.totalWithdrawn + batchShort.totalWithdrawn,
             address(this)
         );
 

@@ -59,7 +59,7 @@ contract LongShortInternalsExposed is LongShort {
         _minimum(liquidityOfPositionA, liquidityOfPositionB);
     }
 
-    /*     function calculateValueChangeForPriceMechanism(
+    function calculateValueChangeForPriceMechanism(
         uint32 marketIndex,
         uint256 assetPriceGreater,
         uint256 assetPriceLess,
@@ -123,5 +123,5 @@ contract LongShortInternalsExposed is LongShort {
         uint32 marketIndex
     ) external {
         _executeOutstandingLazySettlements(user, marketIndex);
-    } */
+    }
 }
