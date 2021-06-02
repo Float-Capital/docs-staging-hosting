@@ -49,7 +49,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ./docs/node_modules
+          key: modules-${{ hashFiles('docs/yarn.lock') }}
+
       - name: install node packages
+        if: steps.cache.outputs.cache-hit != 'true'
         id: install_node_packages
         run: |
           cd docs && yarn
