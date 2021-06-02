@@ -120,7 +120,7 @@ const topupBalanceIfLow = async (from, to) => {
   }
 };
 
-module.exports = async function(deployer, network, accounts) {
+module.exports = async function (deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
@@ -204,8 +204,8 @@ module.exports = async function(deployer, network, accounts) {
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
     console.log(`Simulating transactions for marketIndex: ${marketIndex}`);
 
-    const longAddress = await longShort.longTokens.call(marketIndex);
-    const shortAddress = await longShort.shortTokens.call(marketIndex);
+    const longAddress = await longShort.syntheticTokens.call(true, marketIndex);
+    const shortAddress = await longShort.syntheticTokens.call(false, marketIndex);
 
     let long = await SyntheticToken.at(longAddress);
     let short = await SyntheticToken.at(shortAddress);

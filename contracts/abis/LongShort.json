@@ -1189,25 +1189,6 @@
         "type": "uint32"
       }
     ],
-    "name": "longTokens",
-    "outputs": [
-      {
-        "internalType": "contract ISyntheticToken",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
     "name": "longValue",
     "outputs": [
       {
@@ -1614,25 +1595,6 @@
         "type": "uint32"
       }
     ],
-    "name": "shortTokens",
-    "outputs": [
-      {
-        "internalType": "contract ISyntheticToken",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
     "name": "shortValue",
     "outputs": [
       {
@@ -1650,6 +1612,30 @@
     "outputs": [
       {
         "internalType": "contract IStaker",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "name": "syntheticTokens",
+    "outputs": [
+      {
+        "internalType": "contract ISyntheticToken",
         "name": "",
         "type": "address"
       }

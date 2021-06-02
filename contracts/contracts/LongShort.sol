@@ -60,8 +60,8 @@ contract LongShort is ILongShort, Initializable {
     uint256[45] private __marketStateGap;
 
     // Synthetic long/short tokens users can mint and redeem.
-    mapping(uint32 => ISyntheticToken) public longTokens;
-    mapping(uint32 => ISyntheticToken) public shortTokens;
+    mapping(bool => mapping(uint32 => ISyntheticToken)) public syntheticTokens;
+    // mapping(uint32 => ISyntheticToken) public shortTokens;
     uint256[45] private __marketSynthsGap;
 
     // Fees for minting/redeeming long/short tokens. Users are penalised
@@ -223,12 +223,12 @@ contract LongShort is ILongShort, Initializable {
     ) {
         if (isLong) {
             require(
-                longTokens[marketIndex] == syntheticToken,
+                syntheticTokens[true][marketIndex] == syntheticToken,
                 "Incorrect synthetic token"
             );
         } else {
             require(
-                shortTokens[marketIndex] == syntheticToken,
+                syntheticTokens[false][marketIndex] == syntheticToken,
                 "Incorrect synthetic token"
             );
         }
@@ -344,7 +344,7 @@ contract LongShort is ILongShort, Initializable {
         latestMarket++;
 
         // Create new synthetic long token.
-        longTokens[latestMarket] = ISyntheticToken(
+        syntheticTokens[true][latestMarket] = ISyntheticToken(
             tokenFactory.createTokenLong(
                 syntheticName,
                 syntheticSymbol,
@@ -354,7 +354,7 @@ contract LongShort is ILongShort, Initializable {
         );
 
         // Create new synthetic short token.
-        shortTokens[latestMarket] = ISyntheticToken(
+        syntheticTokens[false][latestMarket] = ISyntheticToken(
             tokenFactory.createTokenShort(
                 syntheticName,
                 syntheticSymbol,
@@ -373,8 +373,8 @@ contract LongShort is ILongShort, Initializable {
 
         emit SyntheticTokenCreated(
             latestMarket,
-            address(longTokens[latestMarket]),
-            address(shortTokens[latestMarket]),
+            address(syntheticTokens[true][latestMarket]),
+            address(syntheticTokens[false][latestMarket]),
             _fundToken,
             assetPrice[latestMarket],
             syntheticName,
@@ -406,8 +406,8 @@ contract LongShort is ILongShort, Initializable {
         // Add new staker funds with fresh synthetic tokens.
         staker.addNewStakingFund(
             latestMarket,
-            longTokens[marketIndex],
-            shortTokens[marketIndex],
+            syntheticTokens[true][marketIndex],
+            syntheticTokens[false][marketIndex],
             kInitialMultiplier,
             kPeriod
         );
@@ -519,14 +519,16 @@ contract LongShort is ILongShort, Initializable {
      * Adjusts the long/short token prices according to supply and value.
      */
     function _refreshTokensPrice(uint32 marketIndex) internal {
-        uint256 longTokenSupply = longTokens[marketIndex].totalSupply();
+        uint256 longTokenSupply =
+            syntheticTokens[true][marketIndex].totalSupply();
         if (longTokenSupply > 0) {
             longTokenPrice[marketIndex] =
                 (longValue[marketIndex] * TEN_TO_THE_18) /
                 longTokenSupply;
         }
 
-        uint256 shortTokenSupply = shortTokens[marketIndex].totalSupply();
+        uint256 shortTokenSupply =
+            syntheticTokens[false][marketIndex].totalSupply();
         if (shortTokenSupply > 0) {
             shortTokenPrice[marketIndex] =
                 (shortValue[marketIndex] * TEN_TO_THE_18) /
@@ -679,7 +681,7 @@ contract LongShort is ILongShort, Initializable {
             uint256 tokensLong =
                 (totalAmountLong * TEN_TO_THE_18) / longTokenPrice[marketIndex];
             // TODO: we must modify Synth ERC20 so that this addrdess (`address(this)`) shows a `balanceOf` of zero and the balance is correctly added to the users in the batch's `balanceOf`
-            longTokens[marketIndex].mint(address(this), tokensLong);
+            syntheticTokens[true][marketIndex].mint(address(this), tokensLong);
 
             longValue[marketIndex] = longValue[marketIndex] + totalAmountLong;
 
@@ -728,7 +730,7 @@ contract LongShort is ILongShort, Initializable {
             uint256 tokensShort =
                 (totalAmountShort * TEN_TO_THE_18) /
                     longTokenPrice[marketIndex];
-            longTokens[marketIndex].mint(address(this), tokensShort);
+            syntheticTokens[true][marketIndex].mint(address(this), tokensShort);
             longValue[marketIndex] = longValue[marketIndex] + totalAmountShort;
 
             if (currentMarketBatchedLazyDeposit.mintAndStakeShort > 0) {
@@ -1054,7 +1056,11 @@ contract LongShort is ILongShort, Initializable {
         uint256 tokensMinted =
             _mintLong(marketIndex, amount, msg.sender, address(staker));
 
-        staker.stakeFromMint(longTokens[marketIndex], tokensMinted, msg.sender);
+        staker.stakeFromMint(
+            syntheticTokens[true][marketIndex],
+            tokensMinted,
+            msg.sender
+        );
     }
 
     /**
@@ -1071,7 +1077,7 @@ contract LongShort is ILongShort, Initializable {
             _mintShort(marketIndex, amount, msg.sender, address(staker));
 
         staker.stakeFromMint(
-            shortTokens[marketIndex],
+            syntheticTokens[false][marketIndex],
             tokensMinted,
             msg.sender
         );
@@ -1093,7 +1099,7 @@ contract LongShort is ILongShort, Initializable {
         // Mint long tokens with remaining value.
         uint256 tokens =
             (remaining * TEN_TO_THE_18) / longTokenPrice[marketIndex];
-        longTokens[marketIndex].mint(transferTo, tokens);
+        syntheticTokens[true][marketIndex].mint(transferTo, tokens);
         longValue[marketIndex] = longValue[marketIndex] + remaining;
 
         emit LongMinted(marketIndex, amount, remaining, tokens, user);
@@ -1123,7 +1129,7 @@ contract LongShort is ILongShort, Initializable {
         // Mint short tokens with remaining value.
         uint256 tokens =
             (remaining * TEN_TO_THE_18) / shortTokenPrice[marketIndex];
-        shortTokens[marketIndex].mint(transferTo, tokens);
+        syntheticTokens[false][marketIndex].mint(transferTo, tokens);
         shortValue[marketIndex] = shortValue[marketIndex] + remaining;
 
         emit ShortMinted(marketIndex, amount, remaining, tokens, user);
@@ -1146,7 +1152,10 @@ contract LongShort is ILongShort, Initializable {
         refreshSystemState(marketIndex)
     {
         // Only this contract has permission to call this function
-        longTokens[marketIndex].synthRedeemBurn(msg.sender, tokensToRedeem);
+        syntheticTokens[true][marketIndex].synthRedeemBurn(
+            msg.sender,
+            tokensToRedeem
+        );
 
         // Compute fees.
         uint256 amount =
@@ -1183,7 +1192,10 @@ contract LongShort is ILongShort, Initializable {
         refreshSystemState(marketIndex)
     {
         // Only this contract has permission to call this function
-        shortTokens[marketIndex].synthRedeemBurn(msg.sender, tokensToRedeem);
+        syntheticTokens[false][marketIndex].synthRedeemBurn(
+            msg.sender,
+            tokensToRedeem
+        );
 
         // Compute fees.
         uint256 amount =
@@ -1223,7 +1235,8 @@ contract LongShort is ILongShort, Initializable {
     }
 
     function redeemLongAll(uint32 marketIndex) external {
-        uint256 tokensToRedeem = longTokens[marketIndex].balanceOf(msg.sender);
+        uint256 tokensToRedeem =
+            syntheticTokens[true][marketIndex].balanceOf(msg.sender);
         _redeemLong(marketIndex, tokensToRedeem);
     }
 
@@ -1235,7 +1248,8 @@ contract LongShort is ILongShort, Initializable {
     }
 
     function redeemShortAll(uint32 marketIndex) external {
-        uint256 tokensToRedeem = shortTokens[marketIndex].balanceOf(msg.sender);
+        uint256 tokensToRedeem =
+            syntheticTokens[false][marketIndex].balanceOf(msg.sender);
         _redeemShort(marketIndex, tokensToRedeem);
     }
 
@@ -1403,9 +1417,10 @@ contract LongShort is ILongShort, Initializable {
                 (((currentUserDeposits.mintLong -
                     currentUserDeposits.longEarlyClaimed) * TEN_TO_THE_18) /
                     nextGlobalDepositsState.tokenPriceLong);
-            uint256 balance = longTokens[marketIndex].balanceOf(address(this));
-            // longTokens[marketIndex].approve(, tokensToMint);
-            longTokens[marketIndex].transfer(user, tokensToMint);
+            uint256 balance =
+                syntheticTokens[true][marketIndex].balanceOf(address(this));
+            // syntheticTokens[true][marketIndex].approve(, tokensToMint);
+            syntheticTokens[true][marketIndex].transfer(user, tokensToMint);
 
             currentUserDeposits.mintLong = 0;
         }
@@ -1414,7 +1429,7 @@ contract LongShort is ILongShort, Initializable {
                 (((currentUserDeposits.mintShort -
                     currentUserDeposits.shortEarlyClaimed) * TEN_TO_THE_18) /
                     nextGlobalDepositsState.tokenPriceShort);
-            shortTokens[marketIndex].transfer(user, tokensToMint);
+            syntheticTokens[false][marketIndex].transfer(user, tokensToMint);
             currentUserDeposits.mintShort = 0;
         }
         if (
@@ -1578,7 +1593,7 @@ contract LongShort is ILongShort, Initializable {
                     // Distribute fees across the market.
                     _refreshTokensPrice(marketIndex); // NOTE - we refresh the token price BEFORE minting tokens for the user, not after
 
-                    longTokens[marketIndex].mint(
+                    syntheticTokens[true][marketIndex].mint(
                         address(this),
                         maxAvailableSynthLazily
                     );
@@ -1599,7 +1614,7 @@ contract LongShort is ILongShort, Initializable {
                     // Distribute fees across the market.
                     _refreshTokensPrice(marketIndex); // NOTE - we refresh the token price BEFORE minting tokens for the user, not after
 
-                    shortTokens[marketIndex].mint(
+                    syntheticTokens[false][marketIndex].mint(
                         address(this),
                         maxAvailableSynthLazily
                     );
@@ -1789,7 +1804,7 @@ contract LongShort is ILongShort, Initializable {
         external
         executeOutstandingLazyRedeems(msg.sender, marketIndex)
     {
-        longTokens[marketIndex].transferFrom(
+        syntheticTokens[true][marketIndex].transferFrom(
             msg.sender,
             address(this),
             tokensToRedeem
@@ -1808,7 +1823,7 @@ contract LongShort is ILongShort, Initializable {
         external
         executeOutstandingLazyRedeems(msg.sender, marketIndex)
     {
-        shortTokens[marketIndex].transferFrom(
+        syntheticTokens[false][marketIndex].transferFrom(
             msg.sender,
             address(this),
             tokensToRedeem
@@ -1828,14 +1843,14 @@ contract LongShort is ILongShort, Initializable {
             batchedLazyRedeems[marketIndex][latestUpdateIndex[marketIndex]];
 
         if (batch.redeemLong > 0) {
-            longTokens[marketIndex].synthRedeemBurn(
+            syntheticTokens[true][marketIndex].synthRedeemBurn(
                 address(this),
                 batch.redeemLong
             );
         }
 
         if (batch.redeemShort > 0) {
-            shortTokens[marketIndex].synthRedeemBurn(
+            syntheticTokens[false][marketIndex].synthRedeemBurn(
                 address(this),
                 batch.redeemLong
             );
