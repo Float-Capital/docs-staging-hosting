@@ -70,20 +70,26 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         }
     }
 
+    // NOTE: we could use `_beforeTokenTransfer` here rather
     function _transfer(
         address sender,
         address recipient,
         uint256 amount
     ) internal override {
+        uint256 sendersCurrentBalance = balanceOf(sender);
         // TODO: this code is not in its final state. It should allow users to spend tokens before the lazy settlement (implementation belongs in longshort not here)
         //       Case where next price update hasn't occurred
         //            -- subcase 1: it is BELOW the safety threshold - keep exectution lazy and give the user the number of tokens they desire
         //            -- subcase 2: it is ABOVE the safety threshold - do a full 'immediate' execution.
-        if (msg.sender != address(longShort)) {
-            longShort.executeOutstandingLazySettlementsSynth(
+        if (
+            msg.sender != address(longShort) && amount > sendersCurrentBalance
+        ) {
+            uint256 amountRequired = amount - sendersCurrentBalance;
+            longShort.executeOutstandingLazySettlementsPartialOrCurrentIfNeeded(
                 sender,
                 marketIndex,
-                isLong
+                isLong,
+                amountRequired
             );
         }
         ERC20._transfer(sender, recipient, amount);

@@ -28,4 +28,11 @@ abstract contract ILongShort {
         uint32 marketIndex,
         bool isLong
     ) external virtual;
+
+    function executeOutstandingLazySettlementsPartialOrCurrentIfNeeded(
+        address user,
+        uint32 marketIndex,
+        bool isLong,
+        uint256 minimumAmountRequired
+    ) external virtual;
 }

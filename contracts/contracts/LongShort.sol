@@ -664,7 +664,8 @@ contract LongShort is ILongShort, Initializable {
             batchedLazyDeposit[marketIndex];
         uint256 totalAmountLong =
             currentMarketBatchedLazyDeposit.mintLong +
-                currentMarketBatchedLazyDeposit.mintAndStakeLong;
+                currentMarketBatchedLazyDeposit.mintAndStakeLong -
+                currentMarketBatchedLazyDeposit.longEarlyClaimed;
 
         if (totalAmountLong > 0) {
             _transferFundsToYieldManager(marketIndex, totalAmountLong);
@@ -713,7 +714,8 @@ contract LongShort is ILongShort, Initializable {
             batchedLazyDeposit[marketIndex];
         uint256 totalAmountShort =
             currentMarketBatchedLazyDeposit.mintShort +
-                currentMarketBatchedLazyDeposit.mintAndStakeShort;
+                currentMarketBatchedLazyDeposit.mintAndStakeShort -
+                currentMarketBatchedLazyDeposit.shortEarlyClaimed;
         if (totalAmountShort > 0) {
             _transferFundsToYieldManager(marketIndex, totalAmountShort);
 
@@ -1267,13 +1269,17 @@ contract LongShort is ILongShort, Initializable {
     struct UserLazyDeposit {
         uint256 usersCurrentUpdateIndex;
         uint256 mintLong;
+        uint256 longEarlyClaimed;
         uint256 mintShort;
+        uint256 shortEarlyClaimed;
         uint256 mintAndStakeLong;
         uint256 mintAndStakeShort;
     }
     struct BatchedLazyDeposit {
         uint256 mintLong;
+        uint256 longEarlyClaimed;
         uint256 mintShort;
+        uint256 shortEarlyClaimed;
         uint256 mintAndStakeLong;
         uint256 mintAndStakeShort;
     }
@@ -1288,6 +1294,10 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => BatchedLazyDeposit) public batchedLazyDeposit;
     mapping(uint32 => mapping(address => UserLazyDeposit))
         public userLazyActions;
+
+    // Add getters and setters for these values
+    uint256 public percentageAvailableForEarlyExitNumerator = 80000;
+    uint256 public percentageAvailableForEarlyExitDenominator = 100000;
 
     function getUsersPendingBalance(
         address user,
@@ -1370,10 +1380,66 @@ contract LongShort is ILongShort, Initializable {
 
     // TODO: modify this function (or make a different version) that takes in the desired useage and does either partial or full "early use"
     // TODO: WARNING!! This function is re-entrancy vulnerable if the synthetic token has any execution hooks
+    function _executeOutstandingLazySettlementsAction(
+        address user,
+        uint32 marketIndex
+    ) internal {
+        UserLazyDeposit storage currentUserDeposits =
+            userLazyActions[marketIndex][user];
+
+        MarketStateSnapshotStruct storage nextGlobalDepositsState =
+            marketStateSnapshot[marketIndex][latestUpdateIndex[marketIndex]];
+
+        if (currentUserDeposits.mintLong != 0) {
+            uint256 tokensToMint =
+                (((currentUserDeposits.mintLong -
+                    currentUserDeposits.longEarlyClaimed) * TEN_TO_THE_18) /
+                    nextGlobalDepositsState.tokenPriceLong);
+            uint256 balance = longTokens[marketIndex].balanceOf(address(this));
+            // longTokens[marketIndex].approve(, tokensToMint);
+            longTokens[marketIndex].transfer(user, tokensToMint);
+
+            currentUserDeposits.mintLong = 0;
+        }
+        if (currentUserDeposits.mintShort != 0) {
+            uint256 tokensToMint =
+                (((currentUserDeposits.mintShort -
+                    currentUserDeposits.shortEarlyClaimed) * TEN_TO_THE_18) /
+                    nextGlobalDepositsState.tokenPriceShort);
+            shortTokens[marketIndex].transfer(user, tokensToMint);
+            currentUserDeposits.mintShort = 0;
+        }
+        if (
+            currentUserDeposits.mintAndStakeLong != 0 ||
+            currentUserDeposits.mintAndStakeShort != 0
+        ) {
+            uint256 tokensToStakeShort =
+                ((currentUserDeposits.mintAndStakeShort * TEN_TO_THE_18) /
+                    nextGlobalDepositsState.tokenPriceShort);
+            uint256 tokensToStakeLong =
+                ((currentUserDeposits.mintAndStakeLong * TEN_TO_THE_18) /
+                    nextGlobalDepositsState.tokenPriceLong);
+            staker.transferBatchStakeToUser(
+                tokensToStakeLong,
+                tokensToStakeShort,
+                marketIndex,
+                currentUserDeposits.usersCurrentUpdateIndex,
+                user
+            );
+
+            // TODO: do the accounting for the user
+            currentUserDeposits.mintAndStakeLong = 0;
+            currentUserDeposits.mintAndStakeShort = 0;
+        }
+        currentUserDeposits.usersCurrentUpdateIndex = 0;
+    }
+
+    // TODO: modify this function (or make a different version) that takes in the desired useage and does either partial or full "early use"
+    // TODO: WARNING!! This function is re-entrancy vulnerable if the synthetic token has any execution hooks
     function _executeOutstandingLazySettlements(
         address user,
         uint32 marketIndex // TODO: make this internal ?
-    ) public {
+    ) internal {
         UserLazyDeposit storage currentUserDeposits =
             userLazyActions[marketIndex][user];
 
@@ -1382,56 +1448,121 @@ contract LongShort is ILongShort, Initializable {
             latestUpdateIndex[marketIndex] &&
             currentUserDeposits.usersCurrentUpdateIndex != 0 // NOTE: this conditional isn't strictly necessary (all the users deposit amounts will be zero too)
         ) {
-            MarketStateSnapshotStruct storage nextGlobalDepositsState =
-                marketStateSnapshot[marketIndex][
-                    latestUpdateIndex[marketIndex]
-                ];
+            _executeOutstandingLazySettlementsAction(user, marketIndex);
+        }
+        // TODO: add events
+    }
 
-            if (currentUserDeposits.mintLong != 0) {
-                uint256 tokensToMint =
-                    ((currentUserDeposits.mintLong * TEN_TO_THE_18) /
-                        nextGlobalDepositsState.tokenPriceLong);
-                uint256 balance =
-                    longTokens[marketIndex].balanceOf(address(this));
-                // longTokens[marketIndex].approve(, tokensToMint);
-                longTokens[marketIndex].transfer(user, tokensToMint);
+    function _getMaxAvailableLazily(
+        address user,
+        uint32 marketIndex, // TODO: make this internal ?
+        bool isLong
+    )
+        internal
+        returns (
+            uint256 amountPaymentTokenLazyAvailableImmediately,
+            uint256 amountSynthTokenLazyAvailableImmediately
+        )
+    {
+        UserLazyDeposit storage currentUserDeposits =
+            userLazyActions[marketIndex][user];
 
-                currentUserDeposits.mintLong = 0;
-            }
-            if (currentUserDeposits.mintShort != 0) {
-                uint256 tokensToMint =
-                    ((currentUserDeposits.mintShort * TEN_TO_THE_18) /
-                        nextGlobalDepositsState.tokenPriceShort);
-                shortTokens[marketIndex].transferFrom(
-                    address(this),
-                    user,
-                    currentUserDeposits.mintShort
-                );
-                currentUserDeposits.mintShort = 0;
-            }
-            if (
-                currentUserDeposits.mintAndStakeLong != 0 ||
-                currentUserDeposits.mintAndStakeShort != 0
-            ) {
-                uint256 tokensToStakeShort =
-                    ((currentUserDeposits.mintAndStakeShort * TEN_TO_THE_18) /
-                        nextGlobalDepositsState.tokenPriceShort);
-                uint256 tokensToStakeLong =
-                    ((currentUserDeposits.mintAndStakeLong * TEN_TO_THE_18) /
-                        nextGlobalDepositsState.tokenPriceLong);
-                staker.transferBatchStakeToUser(
-                    tokensToStakeLong,
-                    tokensToStakeShort,
-                    marketIndex,
-                    currentUserDeposits.usersCurrentUpdateIndex,
-                    user
-                );
+        // this function shouldn't be called if the next price has already happened (it means a logical bug somewhere else in the code!)
+        assert(
+            currentUserDeposits.usersCurrentUpdateIndex <=
+                latestUpdateIndex[marketIndex]
+        );
 
-                // TODO: do the accounting for the user
-                currentUserDeposits.mintAndStakeLong = 0;
-                currentUserDeposits.mintAndStakeShort = 0;
+        if (isLong) {
+            amountPaymentTokenLazyAvailableImmediately =
+                ((currentUserDeposits.mintLong *
+                    percentageAvailableForEarlyExitNumerator) /
+                    percentageAvailableForEarlyExitDenominator) -
+                currentUserDeposits.longEarlyClaimed;
+
+            amountSynthTokenLazyAvailableImmediately =
+                (amountPaymentTokenLazyAvailableImmediately * TEN_TO_THE_18) /
+                longTokenPrice[marketIndex];
+        } else {
+            amountPaymentTokenLazyAvailableImmediately =
+                ((currentUserDeposits.mintShort *
+                    percentageAvailableForEarlyExitNumerator) /
+                    percentageAvailableForEarlyExitDenominator) -
+                currentUserDeposits.shortEarlyClaimed;
+
+            amountSynthTokenLazyAvailableImmediately =
+                (amountPaymentTokenLazyAvailableImmediately * TEN_TO_THE_18) /
+                shortTokenPrice[marketIndex];
+        }
+    }
+
+    function _executeOutstandingLazySettlementsPartialOrCurrentIfNeeded(
+        address user,
+        uint32 marketIndex, // TODO: make this internal ?
+        bool isLong,
+        uint256 minimumAmountRequired
+    ) internal {
+        UserLazyDeposit storage currentUserDeposits =
+            userLazyActions[marketIndex][user];
+
+        if (
+            currentUserDeposits.usersCurrentUpdateIndex <=
+            latestUpdateIndex[marketIndex] &&
+            currentUserDeposits.usersCurrentUpdateIndex != 0 // NOTE: this conditional isn't strictly necessary (all the users deposit amounts will be zero too)
+        ) {
+            _executeOutstandingLazySettlementsAction(user, marketIndex);
+        } else {
+            (
+                uint256 maxAvailableAmountLazily,
+                uint256 maxAvailableSynthLazily
+            ) = _getMaxAvailableLazily(user, marketIndex, isLong);
+
+            if (maxAvailableSynthLazily < minimumAmountRequired) {
+                // Convert to an instant mint
+            } else {
+                // Credit the user `maxAvailableAmountLazily` they need and do all relevant accounting (might as well give them all of it, right?)
+                // TODO: this is common code that happens in multiple places - refactor!
+                if (isLong) {
+                    _transferFundsToYieldManager(
+                        marketIndex,
+                        maxAvailableAmountLazily
+                    );
+                    // Distribute fees across the market.
+                    _refreshTokensPrice(marketIndex); // NOTE - we refresh the token price BEFORE minting tokens for the user, not after
+
+                    longTokens[marketIndex].mint(
+                        address(this),
+                        maxAvailableSynthLazily
+                    );
+
+                    longValue[marketIndex] =
+                        longValue[marketIndex] +
+                        maxAvailableAmountLazily;
+
+                    currentUserDeposits
+                        .longEarlyClaimed += maxAvailableAmountLazily;
+                    batchedLazyDeposit[marketIndex]
+                        .longEarlyClaimed += maxAvailableAmountLazily;
+                } else {
+                    _transferFundsToYieldManager(
+                        marketIndex,
+                        maxAvailableAmountLazily
+                    );
+                    // Distribute fees across the market.
+                    _refreshTokensPrice(marketIndex); // NOTE - we refresh the token price BEFORE minting tokens for the user, not after
+
+                    shortTokens[marketIndex].mint(
+                        address(this),
+                        maxAvailableSynthLazily
+                    );
+
+                    shortValue[marketIndex] =
+                        shortValue[marketIndex] +
+                        maxAvailableAmountLazily;
+                    batchedLazyDeposit[marketIndex]
+                        .shortEarlyClaimed += maxAvailableAmountLazily;
+                }
             }
-            currentUserDeposits.usersCurrentUpdateIndex = 0;
         }
         // TODO: add events
     }
@@ -1447,6 +1578,25 @@ contract LongShort is ILongShort, Initializable {
     {
         // NOTE: this does all the "lazy" actions. This could be simplified to only do the relevant lazy action.
         _executeOutstandingLazySettlements(user, marketIndex);
+    }
+
+    function executeOutstandingLazySettlementsPartialOrCurrentIfNeeded(
+        address user,
+        uint32 marketIndex, // TODO: make this internal ?
+        bool isLong,
+        uint256 minimumAmountRequired
+    )
+        external
+        override
+        isCorrectSynth(marketIndex, isLong, ISyntheticToken(msg.sender))
+    {
+        // NOTE: this does all the "lazy" actions. This could be simplified to only do the relevant lazy action.
+        _executeOutstandingLazySettlementsPartialOrCurrentIfNeeded(
+            user,
+            marketIndex,
+            isLong,
+            minimumAmountRequired
+        );
     }
 
     modifier executeOutstandingLazySettlements(address user, uint32 marketIndex)
