@@ -565,24 +565,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "_executeOutstandingLazySettlements",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint32",
         "name": "marketIndex",
         "type": "uint32"
@@ -731,7 +713,17 @@
       },
       {
         "internalType": "uint256",
+        "name": "longEarlyClaimed",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
         "name": "mintShort",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "shortEarlyClaimed",
         "type": "uint256"
       },
       {
@@ -842,6 +834,34 @@
       }
     ],
     "name": "changeTreasury",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "internalType": "bool",
+        "name": "isLong",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "minimumAmountRequired",
+        "type": "uint256"
+      }
+    ],
+    "name": "executeOutstandingLazySettlementsPartialOrCurrentIfNeeded",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1444,6 +1464,32 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "percentageAvailableForEarlyExitDenominator",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "percentageAvailableForEarlyExitNumerator",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint32",
@@ -1752,7 +1798,17 @@
       },
       {
         "internalType": "uint256",
+        "name": "longEarlyClaimed",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
         "name": "mintShort",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "shortEarlyClaimed",
         "type": "uint256"
       },
       {
