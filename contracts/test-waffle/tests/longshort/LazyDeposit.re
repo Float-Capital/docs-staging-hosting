@@ -93,7 +93,10 @@ let testIntegration =
       );
 
       let%Await longTokenPrice =
-        longShort->LongShort.longTokenPrice(marketIndex);
+        longShort->LongShort.syntheticTokenPrice(
+          CONSTANTS.longTokenType,
+          marketIndex,
+        );
 
       let expectedNumberOfTokensToRecieve =
         amountToLazyMint->mul(CONSTANTS.tenToThe18)->div(longTokenPrice);

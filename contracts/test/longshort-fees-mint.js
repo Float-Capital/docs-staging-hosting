@@ -126,11 +126,11 @@ contract("LongShort (minting fees)", (accounts) => {
       let totalFee;
       if (mintLong != 0) {
         let userBalance = await long.balanceOf(user1);
-        let tokenPrice = await longShort.longTokenPrice.call(marketIndex);
+        let tokenPrice = await longShort.syntheticTokenPrice.call(0, marketIndex);
         totalFee = new BN(mintLong).sub(userBalance.mul(tokenPrice).div(e18));
       } else {
         let userBalance = await short.balanceOf(user2);
-        let tokenPrice = await longShort.shortTokenPrice.call(marketIndex);
+        let tokenPrice = await longShort.syntheticTokenPrice.call(1, marketIndex);
         totalFee = new BN(mintShort).sub(userBalance.mul(tokenPrice).div(e18));
       }
 

@@ -52,8 +52,8 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => uint256) public totalValueLockedInYieldManager;
     mapping(uint32 => uint256) public totalValueReservedForTreasury;
     mapping(uint32 => uint256) public assetPrice;
-    mapping(uint32 => uint256) public longTokenPrice; // NOTE: cannot deprecate this value and use the marketStateSnapshot values instead since these values change inbetween assetPrice updates (when yield is collected)
-    mapping(uint32 => uint256) public shortTokenPrice; // NOTE: cannot deprecate this value and use the marketStateSnapshot values instead since these values change inbetween assetPrice updates (when yield is collected)
+    mapping(MarketSide => mapping(uint32 => uint256))
+        public syntheticTokenPrice; // NOTE: cannot deprecate this value and use the marketStateSnapshot values instead since these values change inbetween assetPrice updates (when yield is collected)
     mapping(uint32 => IERC20) public fundTokens;
     mapping(uint32 => IYieldManager) public yieldManagers;
     mapping(uint32 => IOracleManager) public oracleManagers;
@@ -365,8 +365,8 @@ contract LongShort is ILongShort, Initializable {
         );
 
         // Initial market state.
-        longTokenPrice[latestMarket] = TEN_TO_THE_18;
-        shortTokenPrice[latestMarket] = TEN_TO_THE_18;
+        syntheticTokenPrice[MarketSide.Long][latestMarket] = TEN_TO_THE_18;
+        syntheticTokenPrice[MarketSide.Short][latestMarket] = TEN_TO_THE_18;
         fundTokens[latestMarket] = IERC20(_fundToken);
         yieldManagers[latestMarket] = IYieldManager(_yieldManager);
         oracleManagers[latestMarket] = IOracleManager(_oracleManager);
@@ -542,7 +542,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 longTokenSupply =
             syntheticTokens[MarketSide.Long][marketIndex].totalSupply();
         if (longTokenSupply > 0) {
-            longTokenPrice[marketIndex] =
+            syntheticTokenPrice[MarketSide.Long][marketIndex] =
                 (syntheticTokenBackedValue[MarketSide.Long][marketIndex] *
                     TEN_TO_THE_18) /
                 longTokenSupply;
@@ -551,7 +551,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 shortTokenSupply =
             syntheticTokens[MarketSide.Short][marketIndex].totalSupply();
         if (shortTokenSupply > 0) {
-            shortTokenPrice[marketIndex] =
+            syntheticTokenPrice[MarketSide.Short][marketIndex] =
                 (syntheticTokenBackedValue[MarketSide.Short][marketIndex] *
                     TEN_TO_THE_18) /
                 shortTokenSupply;
@@ -559,8 +559,8 @@ contract LongShort is ILongShort, Initializable {
 
         emit TokenPriceRefreshed(
             marketIndex,
-            longTokenPrice[marketIndex],
-            shortTokenPrice[marketIndex]
+            syntheticTokenPrice[MarketSide.Long][marketIndex],
+            syntheticTokenPrice[MarketSide.Short][marketIndex]
         );
     }
 
@@ -720,7 +720,8 @@ contract LongShort is ILongShort, Initializable {
 
             // Mint long tokens with remaining value.
             uint256 tokensLong =
-                (totalAmountLong * TEN_TO_THE_18) / longTokenPrice[marketIndex];
+                (totalAmountLong * TEN_TO_THE_18) /
+                    syntheticTokenPrice[MarketSide.Long][marketIndex];
             // TODO: we must modify Synth ERC20 so that this addrdess (`address(this)`) shows a `balanceOf` of zero and the balance is correctly added to the users in the batch's `balanceOf`
             syntheticTokens[MarketSide.Long][marketIndex].mint(
                 address(this),
@@ -738,7 +739,8 @@ contract LongShort is ILongShort, Initializable {
 
                 uint256 amountToStake =
                     (currentMarketBatchedLazyDeposit.mintAndStakeShort *
-                        TEN_TO_THE_18) / longTokenPrice[marketIndex];
+                        TEN_TO_THE_18) /
+                        syntheticTokenPrice[MarketSide.Long][marketIndex];
 
                 staker.stakeFromMintBatched(
                     marketIndex,
@@ -775,7 +777,7 @@ contract LongShort is ILongShort, Initializable {
             // Mint long tokens with remaining value.
             uint256 tokensShort =
                 (totalAmountShort * TEN_TO_THE_18) /
-                    longTokenPrice[marketIndex];
+                    syntheticTokenPrice[MarketSide.Long][marketIndex];
             syntheticTokens[MarketSide.Long][marketIndex].mint(
                 address(this),
                 tokensShort
@@ -789,7 +791,8 @@ contract LongShort is ILongShort, Initializable {
 
                 uint256 amountToStake =
                     (currentMarketBatchedLazyDeposit.mintAndStakeShort *
-                        TEN_TO_THE_18) / longTokenPrice[marketIndex];
+                        TEN_TO_THE_18) /
+                        syntheticTokenPrice[MarketSide.Long][marketIndex];
                 staker.stakeFromMintBatched(
                     marketIndex,
                     amountToStake,
@@ -818,8 +821,8 @@ contract LongShort is ILongShort, Initializable {
         // staker without needing to be saved
         staker.addNewStateForFloatRewards(
             marketIndex,
-            longTokenPrice[marketIndex],
-            shortTokenPrice[marketIndex],
+            syntheticTokenPrice[MarketSide.Long][marketIndex],
+            syntheticTokenPrice[MarketSide.Short][marketIndex],
             syntheticTokenBackedValue[MarketSide.Long][marketIndex],
             syntheticTokenBackedValue[MarketSide.Short][marketIndex]
         );
@@ -866,8 +869,12 @@ contract LongShort is ILongShort, Initializable {
             MarketStateSnapshotStruct storage stateStruct =
                 marketStateSnapshot[marketIndex][newLatestPriceStateIndex];
             // NOTE: we can't just merge these two values since the 'yield' has an effect on the token price inbetween oracle updates.
-            stateStruct.tokenPriceLong = longTokenPrice[marketIndex];
-            stateStruct.tokenPriceShort = shortTokenPrice[marketIndex];
+            stateStruct.tokenPriceLong = syntheticTokenPrice[MarketSide.Long][
+                marketIndex
+            ];
+            stateStruct.tokenPriceShort = syntheticTokenPrice[MarketSide.Short][
+                marketIndex
+            ];
 
             handleBatchedDepositSettlementLong(marketIndex);
             handleBatchedDepositShort(marketIndex);
@@ -1160,7 +1167,8 @@ contract LongShort is ILongShort, Initializable {
 
         // Mint long tokens with remaining value.
         uint256 tokens =
-            (remaining * TEN_TO_THE_18) / longTokenPrice[marketIndex];
+            (remaining * TEN_TO_THE_18) /
+                syntheticTokenPrice[MarketSide.Long][marketIndex];
         syntheticTokens[MarketSide.Long][marketIndex].mint(transferTo, tokens);
         syntheticTokenBackedValue[MarketSide.Long][marketIndex] =
             syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
@@ -1193,7 +1201,8 @@ contract LongShort is ILongShort, Initializable {
 
         // Mint short tokens with remaining value.
         uint256 tokens =
-            (remaining * TEN_TO_THE_18) / shortTokenPrice[marketIndex];
+            (remaining * TEN_TO_THE_18) /
+                syntheticTokenPrice[MarketSide.Short][marketIndex];
         syntheticTokens[MarketSide.Short][marketIndex].mint(transferTo, tokens);
         syntheticTokenBackedValue[MarketSide.Short][marketIndex] =
             syntheticTokenBackedValue[MarketSide.Short][marketIndex] +
@@ -1226,7 +1235,9 @@ contract LongShort is ILongShort, Initializable {
 
         // Compute fees.
         uint256 amount =
-            (tokensToRedeem * longTokenPrice[marketIndex]) / TEN_TO_THE_18;
+            (tokensToRedeem *
+                syntheticTokenPrice[MarketSide.Long][marketIndex]) /
+                TEN_TO_THE_18;
         uint256 fees =
             _getFeesForAction(marketIndex, amount, false, MarketSide.Long);
         uint256 remaining = amount - fees;
@@ -1269,7 +1280,9 @@ contract LongShort is ILongShort, Initializable {
 
         // Compute fees.
         uint256 amount =
-            (tokensToRedeem * shortTokenPrice[marketIndex]) / TEN_TO_THE_18;
+            (tokensToRedeem *
+                syntheticTokenPrice[MarketSide.Short][marketIndex]) /
+                TEN_TO_THE_18;
         uint256 fees =
             _getFeesForAction(marketIndex, amount, false, MarketSide.Short);
         uint256 remaining = amount - fees;
@@ -1431,7 +1444,8 @@ contract LongShort is ILongShort, Initializable {
                 uint256 remaining = currentUserDeposits.mintLong - fees;
 
                 uint256 tokens =
-                    (remaining * TEN_TO_THE_18) / longTokenPrice[marketIndex];
+                    (remaining * TEN_TO_THE_18) /
+                        syntheticTokenPrice[MarketSide.Long][marketIndex];
 
                 return tokens;
             } else {
@@ -1445,7 +1459,8 @@ contract LongShort is ILongShort, Initializable {
                 uint256 remaining = currentUserDeposits.mintShort - fees;
 
                 uint256 tokens =
-                    (remaining * TEN_TO_THE_18) / shortTokenPrice[marketIndex];
+                    (remaining * TEN_TO_THE_18) /
+                        syntheticTokenPrice[MarketSide.Short][marketIndex];
 
                 return tokens;
             }
@@ -1588,7 +1603,7 @@ contract LongShort is ILongShort, Initializable {
 
             amountSynthTokenLazyAvailableImmediately =
                 (amountPaymentTokenLazyAvailableImmediately * TEN_TO_THE_18) /
-                longTokenPrice[marketIndex];
+                syntheticTokenPrice[MarketSide.Long][marketIndex];
         } else {
             amountPaymentTokenLazyAvailableImmediately =
                 ((currentUserDeposits.mintShort *
@@ -1598,7 +1613,7 @@ contract LongShort is ILongShort, Initializable {
 
             amountSynthTokenLazyAvailableImmediately =
                 (amountPaymentTokenLazyAvailableImmediately * TEN_TO_THE_18) /
-                shortTokenPrice[marketIndex];
+                syntheticTokenPrice[MarketSide.Short][marketIndex];
         }
     }
 
@@ -1951,10 +1966,14 @@ contract LongShort is ILongShort, Initializable {
             );
         }
         uint256 longAmountToRedeem =
-            (batch.redeemLong * longTokenPrice[marketIndex]) / TEN_TO_THE_18;
+            (batch.redeemLong *
+                syntheticTokenPrice[MarketSide.Long][marketIndex]) /
+                TEN_TO_THE_18;
 
         uint256 shortAmountToRedeem =
-            (batch.redeemShort * shortTokenPrice[marketIndex]) / TEN_TO_THE_18;
+            (batch.redeemShort *
+                syntheticTokenPrice[MarketSide.Short][marketIndex]) /
+                TEN_TO_THE_18;
 
         uint256 newLongValueIgnoringFees =
             syntheticTokenBackedValue[MarketSide.Long][marketIndex] -

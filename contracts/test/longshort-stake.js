@@ -362,8 +362,8 @@ contract("LongShort (staking)", (accounts) => {
   const getFloatPerSecondParameters = async () => {
     let longValue = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
     let shortValue = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
-    let longPrice = await longShort.longTokenPrice.call(marketIndex);
-    let shortPrice = await longShort.shortTokenPrice.call(marketIndex);
+    let longPrice = await longShort.syntheticTokenPrice.call(0, marketIndex);
+    let shortPrice = await longShort.syntheticTokenPrice.call(1, marketIndex);
 
     return {
       longValue,

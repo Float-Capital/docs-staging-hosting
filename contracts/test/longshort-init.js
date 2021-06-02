@@ -127,7 +127,7 @@ contract("LongShort (initialisation)", (accounts) => {
     );
 
     // Check token prices are reflected correctly...
-    const shortValueTokenPrice = await longShort.shortTokenPrice.call(
+    const shortValueTokenPrice = await longShort.syntheticTokenPrice.call(1,
       marketIndex
     );
     assert.equal(
@@ -151,7 +151,7 @@ contract("LongShort (initialisation)", (accounts) => {
     );
 
     // Check token prices are reflected correctly...
-    const longValueTokenPrice = await longShort.longTokenPrice.call(
+    const longValueTokenPrice = await longShort.syntheticTokenPrice.call(0,
       marketIndex
     );
     assert.equal(
