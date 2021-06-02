@@ -19,7 +19,7 @@ const FloatToken = artifacts.require(FLOAT_TOKEN);
 const TokenFactory = artifacts.require(TOKEN_FACTORY);
 const FloatCapital = artifacts.require(FLOAT_CAPITAL);
 
-module.exports = async function (deployer, networkName, accounts) {
+module.exports = async function(deployer, networkName, accounts) {
   if (networkName == "matic") {
     throw "Don't save or run this migration if on mainnet (remove when ready)";
   }
@@ -35,7 +35,6 @@ module.exports = async function (deployer, networkName, accounts) {
   if (networkName != "binanceTest" && networkName != "mumbai") {
     await deployer.deploy(Dai, "dai token", "DAI");
   }
-
 
   await deployer.deploy(FloatToken);
   let floatToken = await FloatToken.deployed();
@@ -55,22 +54,24 @@ module.exports = async function (deployer, networkName, accounts) {
     initializer: false /* This is dangerous since someone else could initialize the staker inbetween us. At least we will know if this happens and the migration will fail.*/,
   });
 
-  const longShort = await deployProxy(
-    LongShort,
-    {
-      deployer,
-      initializer: false
-    }
-  );
+  const longShort = await deployProxy(LongShort, {
+    deployer,
+    initializer: false,
+  });
   await deployer.deploy(TokenFactory, admin, longShort.address, {
     from: admin,
   });
   let tokenFactory = await TokenFactory.deployed();
 
-  await longShort.initialize(admin, treasury.address, tokenFactory.address, staker.address, {
-    from: admin,
-  });
-
+  await longShort.initialize(
+    admin,
+    treasury.address,
+    tokenFactory.address,
+    staker.address,
+    {
+      from: admin,
+    }
+  );
 
   await floatToken.initialize("Float token", "FLOAT TOKEN", staker.address, {
     from: admin,
@@ -87,19 +88,28 @@ module.exports = async function (deployer, networkName, accounts) {
     }
   );
 
+  console.log("******************************************");
+  console.log("******************************************");
+  console.log("longshort address: ", longShort.address);
+  console.log("staker address: ", staker.address);
+  console.log("******************************************");
+  console.log("******************************************");
+
   if (networkName == "mumbai") {
     const adminInstance = await getAdminInstance();
     console.log(`To verify all these contracts run the following:
 
-    \`yarn hardhat --network ${networkName} tenderly:verify TokenFactory=${(await TokenFactory.deployed()).address} FloatToken=${(await FloatToken.deployed()).address} Treasury_v0=${await adminInstance.getProxyImplementation(
+    \`yarn hardhat --network ${networkName} tenderly:verify TokenFactory=${
+      (await TokenFactory.deployed()).address
+    } FloatToken=${
+      (await FloatToken.deployed()).address
+    } Treasury_v0=${await adminInstance.getProxyImplementation(
       treasury.address
     )} LongShort=${await adminInstance.getProxyImplementation(
       longShort.address
     )} FloatCapital_v0=${await adminInstance.getProxyImplementation(
       floatCapital.address
-    )} Staker=${await adminInstance.getProxyImplementation(
-      staker.address
-    )}\``);
+    )} Staker=${await adminInstance.getProxyImplementation(staker.address)}\``);
 
     /**
      * KEEP THESE FOR REFERENCE - shows how to verify contracts in tenderly automatically using ethers:
