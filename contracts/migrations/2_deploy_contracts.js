@@ -88,13 +88,6 @@ module.exports = async function(deployer, networkName, accounts) {
     }
   );
 
-  console.log("******************************************");
-  console.log("******************************************");
-  console.log("longshort address: ", longShort.address);
-  console.log("staker address: ", staker.address);
-  console.log("******************************************");
-  console.log("******************************************");
-
   if (networkName == "mumbai") {
     const adminInstance = await getAdminInstance();
     console.log(`To verify all these contracts run the following:

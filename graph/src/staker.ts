@@ -45,8 +45,6 @@ export function handleDeployV1(event: DeployV1): void {
 }
 
 export function handleStateAdded(event: StateAdded): void {
-  log.warning("********************************************", []);
-
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
@@ -60,18 +58,25 @@ export function handleStateAdded(event: StateAdded): void {
   // TODO: remove the `timestamp` variable from the contracts
   let timestampOfState = event.params.timestamp;
 
-  let state = getOrCreateStakerState(marketIndexId, stateIndex, event);
+  let syntheticMarket = SyntheticMarket.load(marketIndexId);
+  if (syntheticMarket == null) {
+    log.critical(
+      "`handleStateAdded` called without SyntheticMarket with id #{} being created.",
+      [marketIndexId]
+    );
+  }
+
+  let state = getOrCreateStakerState(
+    syntheticMarket as SyntheticMarket,
+    stateIndex,
+    event
+  );
   state.blockNumber = blockNumber;
   state.creationTxHash = txHash;
   state.stateIndex = stateIndex;
   state.timestamp = timestamp;
   state.accumulativeFloatPerTokenLong = accumulativeLong;
   state.accumulativeFloatPerTokenShort = accumulativeShort;
-
-  log.warning(
-    "accumulativeFloatPerTokenLong: {}, accumulativeFloatPerTokenShort: {}",
-    [accumulativeLong.toString(), accumulativeShort.toString()]
-  );
 
   if (!stateIndex.equals(ZERO)) {
     let prevState = StakeState.load(
@@ -87,22 +92,13 @@ export function handleStateAdded(event: StateAdded): void {
       prevState.timestamp
     );
 
-    log.warning("timeElapsedSinceLastStateChange: {}", [
-      timeElapsedSinceLastStateChange.toString(),
-    ]);
-
     let changeInAccumulativeFloatPerSecondLong = state.accumulativeFloatPerTokenLong.minus(
       prevState.accumulativeFloatPerTokenLong
     );
-    log.warning("changeInAccumulativeFloatPerSecondLong: {}", [
-      changeInAccumulativeFloatPerSecondLong.toString(),
-    ]);
+
     let changeInAccumulativeFloatPerSecondShort = state.accumulativeFloatPerTokenShort.minus(
       prevState.accumulativeFloatPerTokenShort
     );
-    log.warning("changeInAccumulativeFloatPerSecondShort: {}", [
-      changeInAccumulativeFloatPerSecondShort.toString(),
-    ]);
 
     state.timeSinceLastUpdate = timeElapsedSinceLastStateChange;
 
@@ -120,32 +116,8 @@ export function handleStateAdded(event: StateAdded): void {
       state.floatRatePerTokenOverIntervalShort = changeInAccumulativeFloatPerSecondShort.div(
         timeElapsedSinceLastStateChange
       );
-      log.warning("state.floatRatePerTokenOverIntervalShort.toString(): {}", [
-        state.floatRatePerTokenOverIntervalShort.toString(),
-      ]);
-      if (state.floatRatePerTokenOverIntervalShort == ZERO) {
-        log.warning("********* stateid - zero: {}", [state.id]);
-        log.warning(
-          "********* stateid - zero changeInAccumulativeFloatPerSecondShort: {}",
-          [changeInAccumulativeFloatPerSecondShort.toString()]
-        );
-        log.warning(
-          "********* stateid - zero changeInAccumulativeFloatPerSecondLong: {}",
-          [changeInAccumulativeFloatPerSecondLong.toString()]
-        );
-        log.warning(
-          "********* stateid - zero timeElapsedSinceLastStateChange: {}",
-          [timeElapsedSinceLastStateChange.toString()]
-        );
-      } else {
-        log.warning("********* stateid - num: {}", [state.id]);
-      }
     }
   }
-
-  // TODO: update the market!
-
-  log.warning("state is saved", []);
 
   state.save();
 
@@ -219,9 +191,18 @@ export function handleStakeAdded(event: StakeAdded): void {
     log.critical("Token should be defined", []);
   }
 
+  let marketIndexId = syntheticToken.syntheticMarket;
+  let syntheticMarket = SyntheticMarket.load(marketIndexId);
+  if (syntheticMarket == null) {
+    log.critical(
+      "`handleStakeAdded` called without SyntheticMarket with id #{} being created.",
+      [marketIndexId]
+    );
+  }
+
   // NOTE: This will create a new (empyt) StakerState if the user is not staking immediately
   let state = getOrCreateStakerState(
-    syntheticToken.syntheticMarket,
+    syntheticMarket as SyntheticMarket,
     lastMintIndex,
     event
   );
