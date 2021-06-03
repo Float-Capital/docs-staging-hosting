@@ -190,13 +190,16 @@ let testExposed =
       it'("updates the mintLong value for the market", () => {
         let {longShort} = contracts.contents;
         let%AwaitThen _ = mintLongLazyTxPromise.contents;
-        let%Await {mintLong} =
-          longShort->LongShort.batchedLazyDeposit(marketIndex);
+        let%Await {mintAmount} =
+          longShort->LongShort.batchedLazyDeposit(
+            marketIndex,
+            CONSTANTS.longTokenType,
+          );
 
         Chai.bnEqual(
           ~message="Incorrect batched lazy deposit mint long",
           amount,
-          mintLong,
+          mintAmount,
         );
       });
       it'("updates the user's batched mint long amount", () =>

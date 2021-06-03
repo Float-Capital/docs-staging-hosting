@@ -47,15 +47,12 @@ type baseExitFeeReturn = Ethers.BigNumber.t
 external baseExitFee: (t, int) => JsPromise.t<baseExitFeeReturn> = "baseExitFee"
 
 type batchedLazyDepositReturn = {
-  mintLong: Ethers.BigNumber.t,
-  longEarlyClaimed: Ethers.BigNumber.t,
-  mintShort: Ethers.BigNumber.t,
-  shortEarlyClaimed: Ethers.BigNumber.t,
-  mintAndStakeLong: Ethers.BigNumber.t,
-  mintAndStakeShort: Ethers.BigNumber.t,
+  mintAmount: Ethers.BigNumber.t,
+  mintEarlyClaimed: Ethers.BigNumber.t,
+  mintAndStakeAmount: Ethers.BigNumber.t,
 }
 @send
-external batchedLazyDeposit: (t, int) => JsPromise.t<batchedLazyDepositReturn> =
+external batchedLazyDeposit: (t, int, int) => JsPromise.t<batchedLazyDepositReturn> =
   "batchedLazyDeposit"
 
 type batchedLazyRedeemsReturn = {
@@ -188,15 +185,13 @@ type marketExistsReturn = bool
 @send
 external marketExists: (t, int) => JsPromise.t<marketExistsReturn> = "marketExists"
 
-type marketStateSnapshotReturn = {
-  tokenPriceLong: Ethers.BigNumber.t,
-  tokenPriceShort: Ethers.BigNumber.t,
-}
+type marketStateSnapshotReturn = Ethers.BigNumber.t
 @send
 external marketStateSnapshot: (
   t,
   int,
   Ethers.BigNumber.t,
+  int,
 ) => JsPromise.t<marketStateSnapshotReturn> = "marketStateSnapshot"
 
 @send
@@ -368,15 +363,7 @@ external updateMarketOracle: (
   ~newOracleManager: Ethers.ethAddress,
 ) => JsPromise.t<transaction> = "updateMarketOracle"
 
-type userLazyActionsReturn = {
-  usersCurrentUpdateIndex: Ethers.BigNumber.t,
-  mintLong: Ethers.BigNumber.t,
-  longEarlyClaimed: Ethers.BigNumber.t,
-  mintShort: Ethers.BigNumber.t,
-  shortEarlyClaimed: Ethers.BigNumber.t,
-  mintAndStakeLong: Ethers.BigNumber.t,
-  mintAndStakeShort: Ethers.BigNumber.t,
-}
+type userLazyActionsReturn = Ethers.BigNumber.t
 @send
 external userLazyActions: (t, int, Ethers.ethAddress) => JsPromise.t<userLazyActionsReturn> =
   "userLazyActions"
@@ -441,15 +428,12 @@ module Exposed = {
   external baseExitFee: (t, int) => JsPromise.t<baseExitFeeReturn> = "baseExitFee"
 
   type batchedLazyDepositReturn = {
-    mintLong: Ethers.BigNumber.t,
-    longEarlyClaimed: Ethers.BigNumber.t,
-    mintShort: Ethers.BigNumber.t,
-    shortEarlyClaimed: Ethers.BigNumber.t,
-    mintAndStakeLong: Ethers.BigNumber.t,
-    mintAndStakeShort: Ethers.BigNumber.t,
+    mintAmount: Ethers.BigNumber.t,
+    mintEarlyClaimed: Ethers.BigNumber.t,
+    mintAndStakeAmount: Ethers.BigNumber.t,
   }
   @send
-  external batchedLazyDeposit: (t, int) => JsPromise.t<batchedLazyDepositReturn> =
+  external batchedLazyDeposit: (t, int, int) => JsPromise.t<batchedLazyDepositReturn> =
     "batchedLazyDeposit"
 
   type batchedLazyRedeemsReturn = {
@@ -627,15 +611,13 @@ module Exposed = {
   @send
   external marketExists: (t, int) => JsPromise.t<marketExistsReturn> = "marketExists"
 
-  type marketStateSnapshotReturn = {
-    tokenPriceLong: Ethers.BigNumber.t,
-    tokenPriceShort: Ethers.BigNumber.t,
-  }
+  type marketStateSnapshotReturn = Ethers.BigNumber.t
   @send
   external marketStateSnapshot: (
     t,
     int,
     Ethers.BigNumber.t,
+    int,
   ) => JsPromise.t<marketStateSnapshotReturn> = "marketStateSnapshot"
 
   type minimumReturn = Ethers.BigNumber.t
@@ -860,15 +842,7 @@ module Exposed = {
     ~newOracleManager: Ethers.ethAddress,
   ) => JsPromise.t<transaction> = "updateMarketOracle"
 
-  type userLazyActionsReturn = {
-    usersCurrentUpdateIndex: Ethers.BigNumber.t,
-    mintLong: Ethers.BigNumber.t,
-    longEarlyClaimed: Ethers.BigNumber.t,
-    mintShort: Ethers.BigNumber.t,
-    shortEarlyClaimed: Ethers.BigNumber.t,
-    mintAndStakeLong: Ethers.BigNumber.t,
-    mintAndStakeShort: Ethers.BigNumber.t,
-  }
+  type userLazyActionsReturn = Ethers.BigNumber.t
   @send
   external userLazyActions: (t, int, Ethers.ethAddress) => JsPromise.t<userLazyActionsReturn> =
     "userLazyActions"

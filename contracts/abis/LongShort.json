@@ -702,38 +702,28 @@
         "internalType": "uint32",
         "name": "",
         "type": "uint32"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
       }
     ],
     "name": "batchedLazyDeposit",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "mintLong",
+        "name": "mintAmount",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "longEarlyClaimed",
+        "name": "mintEarlyClaimed",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "mintShort",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "shortEarlyClaimed",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "mintAndStakeLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "mintAndStakeShort",
+        "name": "mintAndStakeAmount",
         "type": "uint256"
       }
     ],
@@ -1187,18 +1177,18 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
       }
     ],
     "name": "marketStateSnapshot",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "tokenPriceLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenPriceShort",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -1742,36 +1732,6 @@
       {
         "internalType": "uint256",
         "name": "usersCurrentUpdateIndex",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "mintLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "longEarlyClaimed",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "mintShort",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "shortEarlyClaimed",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "mintAndStakeLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "mintAndStakeShort",
         "type": "uint256"
       }
     ],
