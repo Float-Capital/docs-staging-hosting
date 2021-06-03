@@ -28,10 +28,10 @@ describe("Float System", () => {
       Chai.expectRevert(
         ~transaction=
           contracts.contents.longShort
-          ->Contract.connect(~address=attackerAddress)
-          ->Contract.LongShort.updateMarketOracle(
+          ->ContractHelpers.connect(~address=attackerAddress)
+          ->LongShort.updateMarketOracle(
               ~marketIndex=1,
-              ~newOracleAddress,
+              ~newOracleManager=newOracleAddress,
             ),
         ~reason="only admin",
       );

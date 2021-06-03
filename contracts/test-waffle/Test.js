@@ -5,7 +5,6 @@ var Chai = require("./bindings/chai/Chai.js");
 var LetOps = require("./library/LetOps.js");
 var Globals = require("./library/Globals.js");
 var Helpers = require("./library/Helpers.js");
-var Contract = require("./library/Contract.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
 var HelperActions = require("./library/HelperActions.js");
 
@@ -39,7 +38,7 @@ Globals.describe("Float System")(undefined, undefined, undefined, (function (par
                                     return LetOps.Await.let_(HelperActions.stakeRandomlyInMarkets(match.markets, testUser, match.longShort), (function (param) {
                                                   var marketsUserHasStakedIn = param[1];
                                                   return LetOps.Await.let_(Helpers.increaseTime(50), (function (param) {
-                                                                return LetOps.Await.let_(Contract.Staker.claimFloatCustomUser(staker, testUser, marketsUserHasStakedIn), (function (param) {
+                                                                return LetOps.Await.let_(staker.connect(testUser).claimFloatCustom(marketsUserHasStakedIn), (function (param) {
                                                                               return LetOps.Await.let_(Promise.all(Belt_Array.map(marketsUserHasStakedIn, (function (market) {
                                                                                                     return Promise.all([
                                                                                                                   staker.userIndexOfLastClaimedReward(market, testUser.address),

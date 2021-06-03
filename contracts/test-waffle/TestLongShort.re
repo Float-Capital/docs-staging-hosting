@@ -6,12 +6,12 @@ describe("Float System", () => {
     let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
     let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
 
-    before'(() => {
+    before_each'(() => {
       let%Await loadedAccounts = Ethers.getSigners();
       accounts := loadedAccounts;
-    });
+      // });
 
-    before_each'(() => {
+      // before_each'(() => {
       let%AwaitThen deployedContracts =
         Helpers.inititialize(
           ~admin=accounts.contents->Array.getUnsafe(0),
@@ -26,7 +26,6 @@ describe("Float System", () => {
           ~userToStakeWith=setupUser,
           ~longShort=deployedContracts.longShort,
         );
-
       ();
     });
 
@@ -35,6 +34,8 @@ describe("Float System", () => {
       // Check it reverts if oracle returns a negative value.
       ()
     });
+
+    LazyDeposit.testIntegration(~contracts, ~accounts);
 
     describe("LongShort - internals exposed", () => {
       let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
@@ -58,15 +59,14 @@ describe("Float System", () => {
         let testUser = accounts.contents->Array.getUnsafe(1);
 
         let%Await _ =
-          firstMarketPaymentToken->Contract.PaymentToken.mintAndApprove(
+          firstMarketPaymentToken->Contract.PaymentTokenHelpers.mintAndApprove(
             ~user=testUser,
             ~spender=deployedContracts.longShort.address,
             ~amount=Ethers.BigNumber.fromUnsafe("10000000000000000000000"),
           );
         ();
       });
-
-      LazyDeposit.testExposed(~contracts, ~accounts);
+      // LazyDeposit.testExposed(~contracts, ~accounts);
     });
   })
 });

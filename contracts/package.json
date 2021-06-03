@@ -18,7 +18,8 @@
     "save-deployment": "/bin/bash -c 'mkdir -p ./buildsDeployed/deployed; \\cp ./build/contracts/{FloatCapital_v0,FloatToken,LongShort,Migrations,Staker,TokenFactory,Treasury_v0,Dai}.json ./buildsDeployed/deployed/'",
     "prepair-upgrade": "npm run clean; mkdir -p ./build/contracts; cp -r ./buildsDeployed/deployed/* ./build/contracts/; npm run truffle-compile",
     "verify-contracts": "truffle run verify FloatToken LongShort@$LONGSHORT_IMPLEMENTATION Staker@$STAKER_IMPLEMENTATION FloatCapital_v0@$TREASURY_IMPLEMENTATIONTreasury_v0@$FLOAT_CAPITAL_IMPLEMENTATION FloatToken TokenFactory --network $NETWORK",
-    "update-testnet-contracts": "yarn prepair-upgrade; rm -f .openzeppelin/unknown-{97,1337}.json; truffle migrate --network binanceTest --reset; mv .openzeppelin/unknown-1337.json .openzeppelin/unknown-97.json; yarn save-deployment"
+    "update-testnet-contracts": "yarn prepair-upgrade; rm -f .openzeppelin/unknown-{97,1337}.json; truffle migrate --network binanceTest --reset; mv .openzeppelin/unknown-1337.json .openzeppelin/unknown-97.json; yarn save-deployment",
+    "generate-contract-interfaces": "yarn compile; node ../scripts/src/AbiInterfaceGen.bs.js; rescript format -all"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.1.7",
@@ -44,7 +45,9 @@
     "bs-let": "^0.1.16",
     "bs-mocha": "^1.0.0",
     "bs-platform": "^9.0.2",
+    "dotenv": "^10.0.0",
     "ethereum-waffle": "^3.3.0",
+    "hardhat-abi-exporter": "^2.2.1",
     "hardhat-spdx-license-identifier": "^2.0.3",
     "truffle": "^5.3.0",
     "truffle-plugin-verify": "^0.5.7"

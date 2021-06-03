@@ -3,6 +3,7 @@
 pragma solidity 0.8.3;
 
 import "./ISyntheticToken.sol";
+import "./ILongShort.sol";
 
 abstract contract IStaker {
     function addNewStakingFund(
@@ -31,7 +32,7 @@ abstract contract IStaker {
         uint32 marketIndex,
         uint256 amount,
         uint256 oracleUpdateIndex,
-        bool isLong
+        ILongShort.MarketSide syntheticTokenType
     ) external virtual;
 
     function transferBatchStakeToUser(

@@ -1,8 +1,12 @@
-require("solidity-coverage");
-require("hardhat-gas-reporter");
 require("hardhat-spdx-license-identifier");
 require("@tenderly/hardhat-tenderly"); // https://hardhat.org/plugins/tenderly-hardhat-tenderly.html
 
+let runCoverage = !process.env.DONT_RUN_REPORT_SUMMARY || process.env.DONT_RUN_REPORT_SUMMARY.toUpperCase() != "TRUE";
+if (runCoverage) {
+  require('hardhat-abi-exporter');
+  require("hardhat-gas-reporter");
+  require("solidity-coverage");
+}
 let isWaffleTest =
   !!process.env.WAFFLE_TEST && process.env.WAFFLE_TEST.toUpperCase() == "TRUE";
 if (isWaffleTest) {
@@ -38,6 +42,7 @@ module.exports = {
   },
   networks: {
     hardhat: {
+      allowUnlimitedContractSize: true
     },
     mumbai: {
       chainId: 80001,
@@ -59,4 +64,25 @@ module.exports = {
     overwrite: false,
     runOnCompile: false,
   },
+  abiExporter: {
+    path: './abis',
+    clear: true,
+    flat: true,
+    only: [':ERC20Mock$',
+      ':YieldManagerMock$',
+      ':LongShort',
+      ':SyntheticToken',
+      ':YieldManagerAave',
+      ':FloatCapital_v0',
+      ':Migrations',
+      ':TokenFactory',
+      ':FloatToken',
+      ':Staker',
+      ':Treasury_v0',
+      ':OracleManager$',
+      ':OracleManagerChainlink$',
+      ':OracleManagerMock$'
+    ],
+    spacing: 2
+  }
 };

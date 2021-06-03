@@ -5,6 +5,7 @@ const LongShort = artifacts.require("LongShort");
 const Treasury = artifacts.require("Treasury_v0");
 const Staker = artifacts.require("Staker");
 const SyntheticToken = artifacts.require("SyntheticToken");
+const Treasury = artifacts.require("Treasury_v0");
 const YieldManagerMock = artifacts.require("YieldManagerMock");
 const OracleManagerMock = artifacts.require("OracleManagerMock");
 const YieldManagerAave = artifacts.require("YieldManagerAave");
@@ -120,7 +121,7 @@ const topupBalanceIfLow = async (from, to) => {
   }
 };
 
-module.exports = async function(deployer, network, accounts) {
+module.exports = async function (deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
@@ -187,9 +188,9 @@ module.exports = async function(deployer, network, accounts) {
         marketIndex
       )} OracleManagerEthKiller=${await longShort.oracleManagers(
         marketIndex
-      )} SyntheticToken=${await longShort.longTokens(
+      )} SyntheticToken=${await LongShort.syntheticTokens(CONSTANTS.longTokenType,
         marketIndex
-      )} SyntheticToken=${await longShort.shortTokens(marketIndex)}`;
+      )} SyntheticToken=${await LongShort.syntheticTokens(CONSTANTS.shortTokenType, marketIndex)}`;
     }
 
     console.log(`To verify market specific contracts run the following:
@@ -200,8 +201,8 @@ module.exports = async function(deployer, network, accounts) {
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
     console.log(`Simulating transactions for marketIndex: ${marketIndex}`);
 
-    const longAddress = await longShort.longTokens.call(marketIndex);
-    const shortAddress = await longShort.shortTokens.call(marketIndex);
+    const longAddress = await longShort.syntheticTokens.call(0, marketIndex);
+    const shortAddress = await longShort.syntheticTokens.call(1, marketIndex);
 
     let long = await SyntheticToken.at(longAddress);
     let short = await SyntheticToken.at(shortAddress);

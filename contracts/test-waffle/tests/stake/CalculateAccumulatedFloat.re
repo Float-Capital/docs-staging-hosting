@@ -29,7 +29,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
         usersLatestClaimedReward->add(Helpers.randomInteger());
 
       let%AwaitThen _ =
-        staker->Contract.Staker.Exposed.setFloatRewardCalcParams(
+        staker->Staker.Exposed.setFloatRewardCalcParams(
           ~marketIndex,
           ~longToken,
           ~shortToken,
@@ -44,7 +44,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           ~newUserAmountStakedShort,
         );
       let%Await floatDue =
-        staker->Contract.Staker.Exposed.calculateAccumulatedFloatExposedCall(
+        staker->Staker.Exposed.calculateAccumulatedFloatExposedCall(
           ~marketIndex,
           ~user,
         );
@@ -56,7 +56,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
         ->div(CONSTANTS.floatIssuanceFixedDecimal);
 
       Chai.bnEqual(
-        floatDue##longFloatReward,
+        floatDue.longFloatReward,
         expectedFloatDueLong,
         ~message="calculated float due is incorrect",
       );
@@ -68,12 +68,12 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
         ->div(CONSTANTS.floatIssuanceFixedDecimal);
 
       Chai.bnEqual(
-        floatDue##longFloatReward,
+        floatDue.longFloatReward,
         expectedFloatDueLong,
         ~message="calculated float due is incorrect",
       );
       Chai.bnEqual(
-        floatDue##shortFloatReward,
+        floatDue.shortFloatReward,
         expectedFloatDueShort,
         ~message="calculated float due is incorrect",
       );
@@ -89,7 +89,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
         let usersLatestClaimedReward = newLatestRewardIndex;
 
         let%AwaitThen _ =
-          staker->Contract.Staker.Exposed.setFloatRewardCalcParams(
+          staker->Staker.Exposed.setFloatRewardCalcParams(
             ~marketIndex,
             ~longToken,
             ~shortToken,
@@ -104,18 +104,18 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             ~newUserAmountStakedShort,
           );
         let%Await floatDue =
-          staker->Contract.Staker.Exposed.calculateAccumulatedFloatExposedCall(
+          staker->Staker.Exposed.calculateAccumulatedFloatExposedCall(
             ~marketIndex,
             ~user,
           );
 
         Chai.bnEqual(
-          floatDue##longFloatReward,
+          floatDue.longFloatReward,
           bnFromInt(0),
           ~message="calculated float (long) due should be zero",
         );
         Chai.bnEqual(
-          floatDue##shortFloatReward,
+          floatDue.shortFloatReward,
           bnFromInt(0),
           ~message="calculated float (short) due should be zero",
         );
@@ -132,7 +132,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           usersLatestClaimedReward->sub(bnFromInt(1));
 
         let%AwaitThen _ =
-          staker->Contract.Staker.Exposed.setFloatRewardCalcParams(
+          staker->Staker.Exposed.setFloatRewardCalcParams(
             ~marketIndex,
             ~longToken,
             ~shortToken,
@@ -148,7 +148,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           );
         Chai.expectRevertNoReason(
           ~transaction=
-            staker->Contract.Staker.Exposed.calculateAccumulatedFloatExposed(
+            staker->Staker.Exposed.calculateAccumulatedFloatExposed(
               ~marketIndex,
               ~user,
             ),
@@ -166,7 +166,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
         usersLatestClaimedReward->add(Helpers.randomInteger());
 
       let%AwaitThen _ =
-        staker->Contract.Staker.Exposed.setFloatRewardCalcParams(
+        staker->Staker.Exposed.setFloatRewardCalcParams(
           ~marketIndex,
           ~longToken,
           ~shortToken,
@@ -181,17 +181,17 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           ~newUserAmountStakedShort=Ethers.BigNumber.fromInt(0),
         );
       let%Await floatDue =
-        staker->Contract.Staker.Exposed.calculateAccumulatedFloatExposedCall(
+        staker->Staker.Exposed.calculateAccumulatedFloatExposedCall(
           ~marketIndex,
           ~user,
         );
       Chai.bnEqual(
-        floatDue##longFloatReward,
+        floatDue.longFloatReward,
         bnFromInt(0),
         ~message="calculated float (long) due should be zero",
       );
       Chai.bnEqual(
-        floatDue##shortFloatReward,
+        floatDue.shortFloatReward,
         bnFromInt(0),
         ~message="calculated float (short) due should be zero",
       );

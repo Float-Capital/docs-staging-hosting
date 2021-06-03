@@ -79,7 +79,9 @@ contract YieldManagerMock is IYieldManager {
 
         lastSettled = block.timestamp;
         totalHeld = totalHeld + totalYield;
-        token.mint(address(this), totalYield);
+        if (totalYield > 0) {
+            token.mint(address(this), totalYield);
+        }
     }
 
     /**
@@ -133,11 +135,6 @@ contract YieldManagerMock is IYieldManager {
     {
         // Redeem other erc20 tokens.
         // Transfer tokens back to Treasury contract.
-        // require(
-        //     erc20Token != address(aToken),
-        //     "Cannot withdraw aToken to treasury"
-        // );
-
         mockHoldingAdditionalRewardYield();
         uint256 amount =
             ERC20PresetMinterPauser(erc20Token).balanceOf(address(this));

@@ -12,6 +12,7 @@ const { initialize, createSynthetic } = require("./helpers");
 contract("LongShort (admin)", (accounts) => {
   let longShort;
   let marketIndex;
+  let treasury;
 
   const syntheticName = "FTSE100";
   const syntheticSymbol = "FTSE";
@@ -32,12 +33,14 @@ contract("LongShort (admin)", (accounts) => {
     const result = await initialize(admin);
 
     longShort = result.longShort;
+    treasury = result.treasury;
 
     const synthResult = await createSynthetic(
       admin,
       longShort,
       syntheticName,
       syntheticSymbol,
+      treasury,
       _baseEntryFee,
       _badLiquidityEntryFee,
       _baseExitFee,

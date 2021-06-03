@@ -3,6 +3,7 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
+var Loader = require("../components/UI/Base/Loader.js");
 var Markets = require("./Markets.js");
 var Belt_Int = require("rescript/lib/js/belt_Int.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
@@ -20,6 +21,10 @@ function Home$Home(Props) {
   var match$2 = React.useState(function () {
         return false;
       });
+  var match$3 = React.useState(function () {
+        return /* Rendering */0;
+      });
+  var setState = match$3[1];
   React.useEffect((function () {
           var key = "numberOfVisits";
           var localStorage$1 = localStorage;
@@ -29,27 +34,31 @@ function Home$Home(Props) {
                   return numberOfVisits >= 3;
                 }));
           localStorage$1.setItem(key, String(numberOfVisits));
-          
-        }), []);
-  React.useEffect((function () {
-          var key = "isActiveSession";
+          var key$1 = "isActiveSession";
           var sessionStorage$1 = sessionStorage;
-          var optIsActiveSession = sessionStorage$1.getItem(key);
+          var optIsActiveSession = sessionStorage$1.getItem(key$1);
           if (optIsActiveSession !== null) {
             Curry._1(setIsPartOfActiveSession, (function (param) {
                     return optIsActiveSession === "true";
                   }));
           } else {
-            sessionStorage$1.setItem(key, "true");
+            sessionStorage$1.setItem(key$1, "true");
           }
+          Curry._1(setState, (function (param) {
+                  return /* Rendered */1;
+                }));
           
         }), []);
-  if (match[0] || match$1[0] || match$2[0]) {
-    return React.createElement(Markets.make, {});
+  if (match$3[0]) {
+    if (match[0] || match$1[0] || match$2[0]) {
+      return React.createElement(Markets.make, {});
+    } else {
+      return React.createElement(StartTrading.make, {
+                  clickedTrading: match$2[1]
+                });
+    }
   } else {
-    return React.createElement(StartTrading.make, {
-                clickedTrading: match$2[1]
-              });
+    return React.createElement(Loader.make, {});
   }
 }
 

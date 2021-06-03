@@ -43,7 +43,7 @@ let hamburgerSvg = () =>
     height="32px"
     id="Layer_1"
     version="1.1"
-    fill={"#" ++ "555555"}
+    fill={"#" ++ "ffffff"}
     width="32px">
     <path
       d="M4,10h24c1.104,0,2-0.896,2-2s-0.896-2-2-2H4C2.896,6,2,6.896,2,8S2.896,10,4,10z M28,14H4c-1.104,0-2,0.896-2,2  s0.896,2,2,2h24c1.104,0,2-0.896,2-2S29.104,14,28,14z M28,22H4c-1.104,0-2,0.896-2,2s0.896,2,2,2h24c1.104,0,2-0.896,2-2  S29.104,22,28,22z"
@@ -77,6 +77,10 @@ let make = () => {
   let router = Next.Router.useRouter()
   let optCurrentUser = RootProvider.useCurrentUser()
 
+  let activeHighlight = path => {
+    router.pathname == path ? "underline" : ""
+  }
+
   <>
     <nav className="mx-auto w-full max-w-5xl p-2 h-12 flex justify-between items-center text-sm">
       <Link href="/">
@@ -89,12 +93,21 @@ let make = () => {
         </a>
       </Link>
       <div className="hidden md:flex w-2/3 text-base items-center justify-end">
-        <Link href="/"> <a className="px-3 hover:bg-white"> {React.string("MARKETS")} </a> </Link>
+        <Link href="/">
+          <a className={`px-3 hover:bg-white ${"/"->activeHighlight}`}>
+            {React.string("MARKETS")}
+          </a>
+        </Link>
         <Link href="/stake-markets">
-          <a className="px-3 hover:bg-white"> {`STAKE🔥`->React.string} </a>
+          <a className={`px-3 hover:bg-white `}>
+            <span className={"/stake-markets"->activeHighlight}> {`STAKE`->React.string} </span>
+            {`🔥`->React.string}
+          </a>
         </Link>
         <Link href="/stats">
-          <a className="px-3 hover:bg-white"> {React.string("STATS")} </a>
+          <a className={`px-3 hover:bg-white ${"/stats"->activeHighlight}`}>
+            {React.string("STATS")}
+          </a>
         </Link>
         <a className="px-3 hover:bg-white" target="_blank" href="https://docs.float.capital">
           {React.string("DOCS")}
@@ -109,7 +122,7 @@ let make = () => {
           | Some(currentUser) =>
             <Link href={`/user/${currentUser->ethAdrToStr}`}>
               <p
-                className="flex flex-row items-center px-3 bg-white hover:bg-black hover:text-white ml-1  text-base cursor-pointer">
+                className={`flex flex-row items-center px-3 bg-white hover:bg-black hover:text-white ml-1  text-base cursor-pointer ${"/user/[user]"->activeHighlight}`}>
                 {"PROFILE"->React.string}
                 <img
                   className="inline h-4 rounded ml-2"
@@ -139,7 +152,7 @@ let make = () => {
                 router->Next.Router.push(`/`)
                 setIsOpen(_ => false)
               }}
-              className="px-3 bg-black m-2">
+              className={`px-3 bg-black m-2 ${"/"->activeHighlight}`}>
               {React.string("MARKETS")}
             </div>
             <div
@@ -147,29 +160,18 @@ let make = () => {
                 router->Next.Router.push(`/stake-markets`)
                 setIsOpen(_ => false)
               }}
-              className="px-3 bg-black ml-2">
-              {`STAKE🔥`->React.string}
+              className={`px-3 bg-black m-2`}>
+              <span className={"/stake-markets"->activeHighlight}> {`STAKE`->React.string} </span>
+              {`🔥`->React.string}
             </div>
             <div
               onClick={_ => {
                 router->Next.Router.push(`/stats`)
                 setIsOpen(_ => false)
               }}
-              className="px-3 bg-black m-2">
+              className={`px-3 bg-black m-2  ${"/stats"->activeHighlight}`}>
               {`STATS`->React.string}
             </div>
-            {if Config.networkId == 80001 {
-              <div
-                onClick={_ => {
-                  router->Next.Router.push(`/faucet`)
-                  setIsOpen(_ => false)
-                }}
-                className="px-3 bg-black m-2">
-                {`FAUCET`->React.string}
-              </div>
-            } else {
-              React.null
-            }}
             <a
               onClick={_ => {
                 setIsOpen(_ => false)
@@ -205,7 +207,8 @@ let make = () => {
                     className="inline h-6 rounded mr-2"
                     src={Blockies.makeBlockie(currentUser->ethAdrToStr)}
                   />
-                  <p className="flex flex-row items-center px-3 hover:bg-white  cursor-pointer">
+                  <p
+                    className={`flex flex-row items-center px-3 hover:bg-white  cursor-pointer ${"/user/[user]"->activeHighlight}`}>
                     {"PROFILE"->React.string}
                   </p>
                 </p>

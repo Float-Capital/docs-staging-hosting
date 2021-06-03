@@ -4,13 +4,57 @@
 var Chai = require("../../bindings/chai/Chai.js");
 var LetOps = require("../../library/LetOps.js");
 var Globals = require("../../library/Globals.js");
+var Helpers = require("../../library/Helpers.js");
+var CONSTANTS = require("../../CONSTANTS.js");
+
+function testIntegration(contracts, accounts) {
+  return Globals.describe("mintLongLazy")(undefined, undefined, undefined, (function (param) {
+                return Globals.it$prime("should work as expected happy path")(undefined, undefined, undefined, (function (param) {
+                              var testUser = accounts.contents[8];
+                              var amountToLazyMint = Helpers.randomTokenAmount(undefined);
+                              var match = contracts.contents;
+                              var longShort = match.longShort;
+                              var match$1 = match.markets[0];
+                              var marketIndex = match$1.marketIndex;
+                              var longSynth = match$1.longSynth;
+                              var oracleManager = match$1.oracleManager;
+                              var paymentToken = match$1.paymentToken;
+                              return LetOps.AwaitThen.let_(longShort.syntheticTokenBackedValue(CONSTANTS.longTokenType, marketIndex), (function (_longValueBefore) {
+                                            return LetOps.AwaitThen.let_(paymentToken.mint(testUser.address, amountToLazyMint), (function (param) {
+                                                          return LetOps.AwaitThen.let_(paymentToken.connect(testUser).approve(longShort.address, amountToLazyMint), (function (param) {
+                                                                        return LetOps.AwaitThen.let_(longShort.connect(testUser).mintLongLazy(marketIndex, amountToLazyMint), (function (param) {
+                                                                                      return LetOps.AwaitThen.let_(oracleManager.getLatestPrice(), (function (previousPrice) {
+                                                                                                    var nextPrice = Globals.div(Globals.mul(previousPrice, Globals.bnFromInt(12)), Globals.bnFromInt(10));
+                                                                                                    return LetOps.AwaitThen.let_(oracleManager.setPrice(nextPrice), (function (param) {
+                                                                                                                  return LetOps.AwaitThen.let_(longShort._updateSystemState(marketIndex), (function (param) {
+                                                                                                                                return LetOps.AwaitThen.let_(longSynth.balanceOf(testUser.address), (function (usersBalanceBeforeSettlement) {
+                                                                                                                                              return LetOps.AwaitThen.let_(longShort.connect(testUser).mintLongLazy(marketIndex, Globals.bnFromInt(0)), (function (param) {
+                                                                                                                                                            return LetOps.AwaitThen.let_(longSynth.balanceOf(testUser.address), (function (usersUpdatedBalance) {
+                                                                                                                                                                          Chai.bnEqual("Balance after price system update but before user settlement should be the same as after settlement", usersBalanceBeforeSettlement, usersUpdatedBalance);
+                                                                                                                                                                          return LetOps.Await.let_(longShort.syntheticTokenPrice(CONSTANTS.longTokenType, marketIndex), (function (longTokenPrice) {
+                                                                                                                                                                                        var expectedNumberOfTokensToRecieve = Globals.div(Globals.mul(amountToLazyMint, CONSTANTS.tenToThe18), longTokenPrice);
+                                                                                                                                                                                        return Chai.bnEqual("balance is incorrect", expectedNumberOfTokensToRecieve, usersUpdatedBalance);
+                                                                                                                                                                                      }));
+                                                                                                                                                                        }));
+                                                                                                                                                          }));
+                                                                                                                                            }));
+                                                                                                                              }));
+                                                                                                                }));
+                                                                                                  }));
+                                                                                    }));
+                                                                      }));
+                                                        }));
+                                          }));
+                            }));
+              }));
+}
 
 function testExposed(contracts, accounts) {
   return Globals.describe("lazyDeposits")(undefined, undefined, undefined, (function (param) {
                 Globals.it$prime("calls the executeOutstandingLazySettlements modifier")(undefined, undefined, undefined, (function (param) {
                         var match = contracts.contents;
                         var longShort = match.longShort;
-                        var amount = ethers.BigNumber.from(1);
+                        var amount = Globals.bnFromInt(1);
                         var testWallet = accounts.contents[1];
                         return LetOps.Await.let_(longShort.setUseexecuteOutstandingLazySettlementsMock(true), (function (param) {
                                       Chai.callEmitEvents(longShort.connect(testWallet).mintLongLazy(1, amount), longShort, "executeOutstandingLazySettlementsMock");
@@ -21,7 +65,7 @@ function testExposed(contracts, accounts) {
                               var mintLongLazyTxPromise = {
                                 contents: undefined
                               };
-                              var amount = ethers.BigNumber.from(1);
+                              var amount = Globals.bnFromInt(1);
                               Globals.before_each(undefined)(undefined, undefined, undefined, (function (param) {
                                       var match = contracts.contents;
                                       var testWallet = accounts.contents[1];
@@ -44,8 +88,8 @@ function testExposed(contracts, accounts) {
                                       var match = contracts.contents;
                                       var longShort = match.longShort;
                                       return LetOps.AwaitThen.let_(mintLongLazyTxPromise.contents, (function (param) {
-                                                    return LetOps.Await.let_(longShort.batchedLazyDeposit(1), (function (param) {
-                                                                  return Chai.bnEqual("Incorrect batched lazy deposit mint long", amount, param.mintLong);
+                                                    return LetOps.Await.let_(longShort.batchedLazyDeposit(1, CONSTANTS.longTokenType), (function (param) {
+                                                                  return Chai.bnEqual("Incorrect batched lazy deposit mint long", amount, param.mintAmount);
                                                                 }));
                                                   }));
                                     }));
@@ -59,5 +103,6 @@ function testExposed(contracts, accounts) {
               }));
 }
 
+exports.testIntegration = testIntegration;
 exports.testExposed = testExposed;
 /* Chai Not a pure module */
