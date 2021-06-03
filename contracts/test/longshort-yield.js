@@ -82,8 +82,8 @@ contract("LongShort (yield mechanism)", (accounts) => {
       }
 
       // Ensure locked market value matches the amounts minted.
-      const initialLongValue = await longShort.longValue.call(marketIndex);
-      const initialShortValue = await longShort.shortValue.call(marketIndex);
+      const initialLongValue = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
+      const initialShortValue = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
       assert.equal(
         new BN(initialMintLong).toString(),
         initialLongValue.toString(),
@@ -130,8 +130,8 @@ contract("LongShort (yield mechanism)", (accounts) => {
       await longShort._updateSystemState(marketIndex);
 
       // Get changes in long/short value and check they match expectations.
-      const longValue = await longShort.longValue.call(marketIndex);
-      const shortValue = await longShort.shortValue.call(marketIndex);
+      const longValue = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
+      const shortValue = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
       const treasuryValue = await longShort.totalValueReservedForTreasury.call(
         marketIndex
       );

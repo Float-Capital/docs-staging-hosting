@@ -637,9 +637,9 @@ contract Staker is IStaker, Initializable {
         uint32 marketIndex,
         uint256 amount,
         uint256 oracleUpdateIndex,
-        bool isLong
+        ILongShort.MarketSide syntheticTokenType
     ) external override onlyFloat() onlyValidMarket(marketIndex) {
-        if (isLong) {
+        if (syntheticTokenType == ILongShort.MarketSide.Long) {
             batchedStake[marketIndex][oracleUpdateIndex].amountLong = amount;
         } else {
             batchedStake[marketIndex][oracleUpdateIndex].amountShort = amount;

@@ -702,38 +702,28 @@
         "internalType": "uint32",
         "name": "",
         "type": "uint32"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
       }
     ],
     "name": "batchedLazyDeposit",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "mintLong",
+        "name": "mintAmount",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "longEarlyClaimed",
+        "name": "mintEarlyClaimed",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "mintShort",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "shortEarlyClaimed",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "mintAndStakeLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "mintAndStakeShort",
+        "name": "mintAndStakeAmount",
         "type": "uint256"
       }
     ],
@@ -751,28 +741,23 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
       }
     ],
     "name": "batchedLazyRedeems",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "redeemLong",
+        "name": "redemptions",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "redeemShort",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "totalWithdrawnShort",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "totalWithdrawnLong",
+        "name": "totalWithdrawn",
         "type": "uint256"
       }
     ],
@@ -851,9 +836,9 @@
         "type": "uint32"
       },
       {
-        "internalType": "bool",
-        "name": "isLong",
-        "type": "bool"
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "syntheticTokenType",
+        "type": "uint8"
       },
       {
         "internalType": "uint256",
@@ -879,9 +864,9 @@
         "type": "uint32"
       },
       {
-        "internalType": "bool",
-        "name": "isLong",
-        "type": "bool"
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "syntheticTokenType",
+        "type": "uint8"
       }
     ],
     "name": "executeOutstandingLazySettlementsSynth",
@@ -1030,9 +1015,9 @@
         "type": "uint32"
       },
       {
-        "internalType": "bool",
-        "name": "isLong",
-        "type": "bool"
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "syntheticTokenType",
+        "type": "uint8"
       }
     ],
     "name": "getUsersPendingBalance",
@@ -1170,63 +1155,6 @@
         "type": "uint32"
       }
     ],
-    "name": "longTokenPrice",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "name": "longTokens",
-    "outputs": [
-      {
-        "internalType": "contract ISyntheticToken",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "name": "longValue",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
     "name": "marketExists",
     "outputs": [
       {
@@ -1249,18 +1177,18 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
       }
     ],
     "name": "marketStateSnapshot",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "tokenPriceLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenPriceShort",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -1588,36 +1516,11 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "name": "shortTokenPrice",
+    "inputs": [],
+    "name": "staker",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "name": "shortTokens",
-    "outputs": [
-      {
-        "internalType": "contract ISyntheticToken",
+        "internalType": "contract IStaker",
         "name": "",
         "type": "address"
       }
@@ -1628,12 +1531,17 @@
   {
     "inputs": [
       {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
+      },
+      {
         "internalType": "uint32",
         "name": "",
         "type": "uint32"
       }
     ],
-    "name": "shortValue",
+    "name": "syntheticTokenBackedValue",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1645,11 +1553,46 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "staker",
+    "inputs": [
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "name": "syntheticTokenPrice",
     "outputs": [
       {
-        "internalType": "contract IStaker",
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "name": "syntheticTokens",
+    "outputs": [
+      {
+        "internalType": "contract ISyntheticToken",
         "name": "",
         "type": "address"
       }
@@ -1790,36 +1733,6 @@
         "internalType": "uint256",
         "name": "usersCurrentUpdateIndex",
         "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "mintLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "longEarlyClaimed",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "mintShort",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "shortEarlyClaimed",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "mintAndStakeLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "mintAndStakeShort",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -1840,16 +1753,6 @@
     ],
     "name": "userLazyRedeems",
     "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "redeemLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "redeemShort",
-        "type": "uint256"
-      },
       {
         "internalType": "uint256",
         "name": "usersCurrentUpdateIndex",

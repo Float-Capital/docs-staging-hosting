@@ -106,9 +106,9 @@ contract LongShortInternalsExposed is LongShort {
         uint32 marketIndex,
         uint256 amount, // 1e18
         bool isMint, // true for mint, false for redeem
-        bool isLong // true for long side, false for short side
+        ILongShort.MarketSide syntheticTokenType // true for long side, false for short side
     ) external view returns (uint256) {
-        _getFeesForAction(marketIndex, amount, isMint, isLong);
+        _getFeesForAction(marketIndex, amount, isMint, syntheticTokenType);
     }
 
     function priceChangeMechanism(uint32 marketIndex, uint256 newPrice)

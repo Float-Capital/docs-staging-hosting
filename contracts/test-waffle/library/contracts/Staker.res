@@ -146,7 +146,7 @@ external stakeFromMintBatched: (
   ~marketIndex: int,
   ~amount: Ethers.BigNumber.t,
   ~oracleUpdateIndex: Ethers.BigNumber.t,
-  ~isLong: bool,
+  ~syntheticTokenType: int,
 ) => JsPromise.t<transaction> = "stakeFromMintBatched"
 
 @send
@@ -410,7 +410,7 @@ module Exposed = {
     ~marketIndex: int,
     ~amount: Ethers.BigNumber.t,
     ~oracleUpdateIndex: Ethers.BigNumber.t,
-    ~isLong: bool,
+    ~syntheticTokenType: int,
   ) => JsPromise.t<transaction> = "stakeFromMintBatched"
 
   @send

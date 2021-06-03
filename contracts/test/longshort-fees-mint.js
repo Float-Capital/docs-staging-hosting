@@ -94,8 +94,8 @@ contract("LongShort (minting fees)", (accounts) => {
       }
 
       // Get locked value for initial mints (fees may have been taken):
-      const initialLongValue = await longShort.longValue.call(marketIndex);
-      const initialShortValue = await longShort.shortValue.call(marketIndex);
+      const initialLongValue = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
+      const initialShortValue = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
 
       // Work out expected fee.
       const expectedBaseFee = baseFee
@@ -126,11 +126,11 @@ contract("LongShort (minting fees)", (accounts) => {
       let totalFee;
       if (mintLong != 0) {
         let userBalance = await long.balanceOf(user1);
-        let tokenPrice = await longShort.longTokenPrice.call(marketIndex);
+        let tokenPrice = await longShort.syntheticTokenPrice.call(0, marketIndex);
         totalFee = new BN(mintLong).sub(userBalance.mul(tokenPrice).div(e18));
       } else {
         let userBalance = await short.balanceOf(user2);
-        let tokenPrice = await longShort.shortTokenPrice.call(marketIndex);
+        let tokenPrice = await longShort.syntheticTokenPrice.call(1, marketIndex);
         totalFee = new BN(mintShort).sub(userBalance.mul(tokenPrice).div(e18));
       }
 

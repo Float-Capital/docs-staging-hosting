@@ -42,6 +42,7 @@ module.exports = {
   },
   networks: {
     hardhat: {
+      allowUnlimitedContractSize: true
     },
     mumbai: {
       chainId: 80001,

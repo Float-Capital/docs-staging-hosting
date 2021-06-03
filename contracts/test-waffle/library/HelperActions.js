@@ -107,4 +107,4 @@ function stakeRandomlyInBothSidesOfMarket(marketsToStakeIn, userToStakeWith, lon
 exports.mintAndStake = mintAndStake;
 exports.stakeRandomlyInMarkets = stakeRandomlyInMarkets;
 exports.stakeRandomlyInBothSidesOfMarket = stakeRandomlyInBothSidesOfMarket;
-/* No side effect */
+/* Helpers Not a pure module */

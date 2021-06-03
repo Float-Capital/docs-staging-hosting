@@ -143,8 +143,8 @@ const createSynthetic = async (
     { from: admin }
   );
 
-  const longAddress = await longShort.longTokens.call(currentMarketIndex);
-  const shortAddress = await longShort.shortTokens.call(currentMarketIndex);
+  const longAddress = await longShort.syntheticTokens.call(0, currentMarketIndex);
+  const shortAddress = await longShort.syntheticTokens.call(1, currentMarketIndex);
   let longToken = await SyntheticToken.at(longAddress);
   let shortToken = await SyntheticToken.at(shortAddress);
 

@@ -360,10 +360,10 @@ contract("LongShort (staking)", (accounts) => {
   // Pulls market parameters from the LongShort contract so we can verify
   // that 'r' value calculations are correct.
   const getFloatPerSecondParameters = async () => {
-    let longValue = await longShort.longValue.call(marketIndex);
-    let shortValue = await longShort.shortValue.call(marketIndex);
-    let longPrice = await longShort.longTokenPrice.call(marketIndex);
-    let shortPrice = await longShort.shortTokenPrice.call(marketIndex);
+    let longValue = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
+    let shortValue = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
+    let longPrice = await longShort.syntheticTokenPrice.call(0, marketIndex);
+    let shortPrice = await longShort.syntheticTokenPrice.call(1, marketIndex);
 
     return {
       longValue,

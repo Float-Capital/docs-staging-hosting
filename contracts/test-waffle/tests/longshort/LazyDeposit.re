@@ -26,7 +26,10 @@ let testIntegration =
         markets->Array.getUnsafe(0);
 
       let%AwaitThen _longValueBefore =
-        longShort->LongShort.longValue(marketIndex);
+        longShort->LongShort.syntheticTokenBackedValue(
+          CONSTANTS.longTokenType,
+          marketIndex,
+        );
 
       let%AwaitThen _ =
         paymentToken->ERC20Mock.mint(
@@ -90,7 +93,10 @@ let testIntegration =
       );
 
       let%Await longTokenPrice =
-        longShort->LongShort.longTokenPrice(marketIndex);
+        longShort->LongShort.syntheticTokenPrice(
+          CONSTANTS.longTokenType,
+          marketIndex,
+        );
 
       let expectedNumberOfTokensToRecieve =
         amountToLazyMint->mul(CONSTANTS.tenToThe18)->div(longTokenPrice);
@@ -184,13 +190,16 @@ let testExposed =
       it'("updates the mintLong value for the market", () => {
         let {longShort} = contracts.contents;
         let%AwaitThen _ = mintLongLazyTxPromise.contents;
-        let%Await {mintLong} =
-          longShort->LongShort.batchedLazyDeposit(marketIndex);
+        let%Await {mintAmount} =
+          longShort->LongShort.batchedLazyDeposit(
+            marketIndex,
+            CONSTANTS.longTokenType,
+          );
 
         Chai.bnEqual(
           ~message="Incorrect batched lazy deposit mint long",
           amount,
-          mintLong,
+          mintAmount,
         );
       });
       it'("updates the user's batched mint long amount", () =>
