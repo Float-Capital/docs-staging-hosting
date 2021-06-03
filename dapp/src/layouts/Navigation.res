@@ -81,6 +81,10 @@ let make = () => {
     router.pathname == path ? "underline" : ""
   }
 
+  let clickedTradingDispatch = React.useContext(
+    StartTrading.ClickedTradingProvider.DispatchClickedTradingContext.context,
+  )
+
   <>
     <nav className="mx-auto w-full max-w-5xl p-2 h-12 flex justify-between items-center text-sm">
       <Link href="/">
@@ -93,11 +97,13 @@ let make = () => {
         </a>
       </Link>
       <div className="hidden md:flex w-2/3 text-base items-center justify-end">
-        <Link href="/">
-          <a className={`px-3 hover:bg-white ${"/"->activeHighlight}`}>
-            {React.string("MARKETS")}
-          </a>
-        </Link>
+        <span onClick={_ => clickedTradingDispatch(StartTrading.ClickedTradingProvider.Clicked)}>
+          <Link href="/">
+            <a className={`px-3 hover:bg-white ${"/"->activeHighlight}`}>
+              {React.string("MARKETS")}
+            </a>
+          </Link>
+        </span>
         <Link href="/stake-markets">
           <a className={`px-3 hover:bg-white `}>
             <span className={"/stake-markets"->activeHighlight}> {`STAKE`->React.string} </span>
