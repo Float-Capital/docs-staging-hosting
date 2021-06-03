@@ -7,7 +7,7 @@ var Contract = require("./Contract.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
 
 function mintAndStake(marketIndex, amount, token, user, longShort, isLong) {
-  return LetOps.Await.let_(Contract.PaymentToken.mintAndApprove(token, user, amount, longShort.address), (function (param) {
+  return LetOps.Await.let_(Contract.PaymentTokenHelpers.mintAndApprove(token, user, amount, longShort.address), (function (param) {
                 var contract = longShort.connect(user);
                 if (isLong) {
                   return contract.mintLongAndStake(marketIndex, amount);
@@ -107,4 +107,4 @@ function stakeRandomlyInBothSidesOfMarket(marketsToStakeIn, userToStakeWith, lon
 exports.mintAndStake = mintAndStake;
 exports.stakeRandomlyInMarkets = stakeRandomlyInMarkets;
 exports.stakeRandomlyInBothSidesOfMarket = stakeRandomlyInBothSidesOfMarket;
-/* No side effect */
+/* Helpers Not a pure module */

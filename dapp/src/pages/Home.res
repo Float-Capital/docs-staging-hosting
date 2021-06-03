@@ -1,9 +1,12 @@
 module Home = {
+  type state = Rendering | Rendered
+
   @react.component
   let make = () => {
-    let (hasVisitedEnoughTimes, setHasVisitedEnoughTimes) = React.useState(() => false)
-    let (isPartOfActiveSession, setIsPartOfActiveSession) = React.useState(() => false)
-    let (clickedTrading, setClickedTrading) = React.useState(() => false)
+    let (hasVisitedEnoughTimes, setHasVisitedEnoughTimes) = React.useState(_ => false)
+    let (isPartOfActiveSession, setIsPartOfActiveSession) = React.useState(_ => false)
+    let (clickedTrading, setClickedTrading) = React.useState(_ => false)
+    let (state, setState) = React.useState(_ => Rendering)
 
     // update local storage
     React.useEffect1(() => {
@@ -16,11 +19,8 @@ module Home = {
       }
       setHasVisitedEnoughTimes(_ => numberOfVisits >= 3)
       localStorage->Dom.Storage2.setItem(key, numberOfVisits->Int.toString)
-      None
-    }, [])
 
-    // update session storage
-    React.useEffect1(() => {
+      // update session storage
       let key = "isActiveSession"
       let sessionStorage = Dom.Storage2.sessionStorage
       let optIsActiveSession = sessionStorage->Dom.Storage2.getItem(key)
@@ -28,13 +28,19 @@ module Home = {
       | Some(session) => setIsPartOfActiveSession(_ => session == "true")
       | None => sessionStorage->Dom.Storage2.setItem(key, "true")
       }
+
+      setState(_ => Rendered)
       None
     }, [])
 
-    if hasVisitedEnoughTimes || isPartOfActiveSession || clickedTrading {
-      <Markets />
-    } else {
-      <StartTrading clickedTrading={setClickedTrading} />
+    switch state {
+    | Rendering => <Loader />
+    | Rendered =>
+      if hasVisitedEnoughTimes || isPartOfActiveSession || clickedTrading {
+        <Markets />
+      } else {
+        <StartTrading clickedTrading={setClickedTrading} />
+      }
     }
   }
 }

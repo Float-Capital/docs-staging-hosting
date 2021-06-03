@@ -44,20 +44,19 @@ describe("Float System", () => {
       let%Await _ = Helpers.increaseTime(50);
 
       let%Await _ =
-        staker->Contract.Staker.claimFloatCustomUser(
-          ~user=testUser,
-          ~markets=marketsUserHasStakedIn,
-        );
+        staker
+        ->ContractHelpers.connect(~address=testUser)
+        ->Staker.claimFloatCustom(~marketIndexes=marketsUserHasStakedIn);
 
       let%Await _ =
         marketsUserHasStakedIn
         ->Array.map(market => {
             JsPromise.all2((
-              staker->Contract.Staker.userIndexOfLastClaimedReward(
-                ~market,
-                ~user=testUser.address,
+              staker->Staker.userIndexOfLastClaimedReward(
+                market,
+                testUser.address,
               ),
-              staker->Contract.Staker.latestRewardIndex(~market),
+              staker->Staker.latestRewardIndex(market),
             ))
             ->JsPromise.map(((userLastClaimed, latestRewardIndex)) => {
                 Chai.bnEqual(userLastClaimed, latestRewardIndex)

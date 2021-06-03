@@ -24,17 +24,17 @@ describe("YieldManagerAave", () => {
           ERC20Mock.make(~name="TestADAI", ~symbol="ADAI");
         let%AwaitThen yieldManagerAave =
           YieldManagerAave.make(
-            admin.address,
-            longShortAddress,
-            treasury.address,
-            daiAddress,
-            fundTokenAddress,
-            lendingPoolAddress,
-            6543,
+            ~admin=admin.address,
+            ~longShort=longShortAddress,
+            ~treasury=treasury.address,
+            ~token=daiAddress,
+            ~aToken=fundTokenAddress,
+            ~lendingPool=lendingPoolAddress,
+            ~aaveReferalCode=6543,
           );
         let%Await _ =
           erc20Mock->ERC20Mock.mint(
-            ~user=yieldManagerAave.address,
+            ~_to=yieldManagerAave.address,
             ~amount=amountOfWMaticInYieldManager,
           );
         contracts :=
@@ -46,7 +46,7 @@ describe("YieldManagerAave", () => {
           let treasury = (accounts^)->Array.getUnsafe(1);
           let withdrawErc20TokenToTreasuryTxPromise =
             contracts.contents##yieldManagerAave
-            ->Contract.connect(~address=treasury)
+            ->ContractHelpers.connect(~address=treasury)
             ->YieldManagerAave.withdrawErc20TokenToTreasury(
                 ~erc20Token=contracts.contents##erc20Mock.address,
               );

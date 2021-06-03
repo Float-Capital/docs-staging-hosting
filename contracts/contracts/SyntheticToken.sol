@@ -2,6 +2,7 @@
 
 pragma solidity 0.8.3;
 
+import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 import "./interfaces/IStaker.sol";
 import "./interfaces/ILongShort.sol";
@@ -12,7 +13,7 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
     IStaker public staker;
     // TODO: these values aren't set by the contructor/initializer
     uint32 public marketIndex;
-    bool public isLong;
+    ILongShort.MarketSide public syntheticTokenType;
 
     constructor(
         string memory name,
@@ -20,12 +21,12 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         ILongShort _longShort,
         IStaker _staker,
         uint32 _marketIndex,
-        bool _isLong
+        ILongShort.MarketSide _syntheticTokenType
     ) ERC20PresetMinterPauser(name, symbol) {
         longShort = _longShort;
         staker = _staker;
         marketIndex = _marketIndex;
-        isLong = _isLong;
+        syntheticTokenType = _syntheticTokenType;
     }
 
     function synthRedeemBurn(address account, uint256 amount)
@@ -54,21 +55,44 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         ERC20PresetMinterPauser.mint(to, amount);
     }
 
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) public virtual override(ERC20, IERC20) returns (bool) {
+        if (
+            recipient == address(longShort) && msg.sender == address(longShort)
+        ) {
+            _transfer(sender, recipient, amount);
+            return true;
+        } else {
+            super.transferFrom(sender, recipient, amount);
+        }
+    }
+
+    // NOTE: we could use `_beforeTokenTransfer` here rather
     function _transfer(
         address sender,
         address recipient,
         uint256 amount
     ) internal override {
+        uint256 sendersCurrentBalance = balanceOf(sender);
         // TODO: this code is not in its final state. It should allow users to spend tokens before the lazy settlement (implementation belongs in longshort not here)
         //       Case where next price update hasn't occurred
         //            -- subcase 1: it is BELOW the safety threshold - keep exectution lazy and give the user the number of tokens they desire
         //            -- subcase 2: it is ABOVE the safety threshold - do a full 'immediate' execution.
-        longShort.executeOutstandingLazySettlementsSynth(
-            sender,
-            marketIndex,
-            isLong
-        );
-        super._transfer(sender, recipient, amount);
+        if (
+            msg.sender != address(longShort) && amount > sendersCurrentBalance
+        ) {
+            uint256 amountRequired = amount - sendersCurrentBalance;
+            longShort.executeOutstandingLazySettlementsPartialOrCurrentIfNeeded(
+                sender,
+                marketIndex,
+                syntheticTokenType,
+                amountRequired
+            );
+        }
+        ERC20._transfer(sender, recipient, amount);
     }
 
     /**
@@ -82,7 +106,10 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         returns (uint256)
     {
         return
-            longShort.getUsersPendingBalance(account, marketIndex, isLong) +
-            ERC20.balanceOf(account);
+            longShort.getUsersPendingBalance(
+                account,
+                marketIndex,
+                syntheticTokenType
+            ) + ERC20.balanceOf(account);
     }
 }

@@ -45,7 +45,7 @@ var Contract = {
 
 function parseUnits(amount, unit) {
   return unsafeToOption(function (param) {
-              return utils.parseUnits(amount, unit);
+              return ethers.utils.parseUnits(amount, unit);
             });
 }
 
@@ -54,22 +54,22 @@ function parseEther(amount) {
 }
 
 function parseEtherUnsafe(amount) {
-  return utils.parseUnits(amount, "ether");
+  return ethers.utils.parseUnits(amount, "ether");
 }
 
 function getAddress(addressString) {
   return unsafeToOption(function (param) {
-              return utils.getAddress(addressString);
+              return ethers.utils.getAddress(addressString);
             });
 }
 
 function formatEther(__x) {
-  return utils.formatUnits(__x, "ether");
+  return ethers.utils.formatUnits(__x, "ether");
 }
 
 function formatEtherToPrecision(number, digits) {
   var digitMultiplier = Math.pow(10.0, digits);
-  return String(Math.floor(Belt_Option.getExn(Belt_Float.fromString(utils.formatUnits(number, "ether"))) * digitMultiplier) / digitMultiplier);
+  return String(Math.floor(Belt_Option.getExn(Belt_Float.fromString(ethers.utils.formatUnits(number, "ether"))) * digitMultiplier) / digitMultiplier);
 }
 
 function ethAdrToStr(prim) {

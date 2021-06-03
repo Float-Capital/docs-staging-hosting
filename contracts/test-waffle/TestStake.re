@@ -37,9 +37,9 @@ describe("Float System", () => {
           synthsUserHasStakedIn
           ->Array.map(stake => {
               let%Await amountStaked =
-                staker->Contract.Staker.userAmountStaked(
-                  ~syntheticToken=stake##synth.address,
-                  ~user=testUser.address,
+                staker->Staker.userAmountStaked(
+                  stake##synth.address,
+                  testUser.address,
                 );
               Chai.bnEqual(amountStaked, stake##amount);
             })

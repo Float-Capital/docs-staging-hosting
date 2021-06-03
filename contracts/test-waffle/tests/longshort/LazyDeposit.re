@@ -1,6 +1,114 @@
 open Globals;
 open LetOps;
 
+let testIntegration =
+    (
+      ~contracts: ref(Helpers.coreContracts),
+      ~accounts: ref(array(Ethers.Wallet.t)),
+    ) =>
+  describe("mintLongLazy", () => {
+    it'("should work as expected happy path", () => {
+      // let admin = accounts.contents->Array.getUnsafe(0);
+      let testUser = accounts.contents->Array.getUnsafe(8);
+      let amountToLazyMint = Helpers.randomTokenAmount();
+
+      let {longShort, markets} =
+        // let {tokenFactory, treasury, floatToken, staker, longShort, markets} =
+        contracts.contents;
+      let {
+        paymentToken,
+        oracleManager,
+        // yieldManager,
+        longSynth,
+        // shortSynth,
+        marketIndex,
+      } =
+        markets->Array.getUnsafe(0);
+
+      let%AwaitThen _longValueBefore =
+        longShort->LongShort.syntheticTokenBackedValue(
+          CONSTANTS.longTokenType,
+          marketIndex,
+        );
+
+      let%AwaitThen _ =
+        paymentToken->ERC20Mock.mint(
+          ~_to=testUser.address,
+          ~amount=amountToLazyMint,
+        );
+
+      let%AwaitThen _ =
+        paymentToken
+        ->ContractHelpers.connect(~address=testUser)
+        ->ERC20Mock.approve(
+            ~spender=longShort.address,
+            ~amount=amountToLazyMint,
+          );
+
+      let%AwaitThen _ =
+        longShort
+        ->ContractHelpers.connect(~address=testUser)
+        ->LongShort.mintLongLazy(~marketIndex, ~amount=amountToLazyMint);
+
+      let%AwaitThen previousPrice =
+        oracleManager->OracleManagerMock.getLatestPrice;
+
+      let nextPrice =
+        previousPrice
+        ->mul(bnFromInt(12)) // 20% increase
+        ->div(bnFromInt(10));
+
+      // let%AwaitThen userLazyActions =
+      //   longShort->Contract.LongShort.userLazyActions(
+      //     ~marketIndex,
+      //     ~user=testUser.address,
+      //   );
+
+      // let%AwaitThen usersBalanceBeforeOracleUpdate =
+      //   longSynth->Contract.SyntheticToken.balanceOf(
+      //     ~account=testUser.address,
+      //   );
+
+      let%AwaitThen _ =
+        oracleManager->OracleManagerMock.setPrice(~newPrice=nextPrice);
+
+      let%AwaitThen _ = longShort->LongShort._updateSystemState(~marketIndex);
+
+      let%AwaitThen usersBalanceBeforeSettlement =
+        longSynth->SyntheticToken.balanceOf(~account=testUser.address);
+
+      // This triggers the _executeOutstandingLazySettlements function
+      let%AwaitThen _ =
+        longShort
+        ->ContractHelpers.connect(~address=testUser)
+        ->LongShort.mintLongLazy(~marketIndex, ~amount=bnFromInt(0));
+      let%AwaitThen usersUpdatedBalance =
+        longSynth->SyntheticToken.balanceOf(~account=testUser.address);
+
+      Chai.bnEqual(
+        ~message=
+          "Balance after price system update but before user settlement should be the same as after settlement",
+        usersBalanceBeforeSettlement,
+        usersUpdatedBalance,
+      );
+
+      let%Await longTokenPrice =
+        longShort->LongShort.syntheticTokenPrice(
+          CONSTANTS.longTokenType,
+          marketIndex,
+        );
+
+      let expectedNumberOfTokensToRecieve =
+        amountToLazyMint->mul(CONSTANTS.tenToThe18)->div(longTokenPrice);
+
+      Chai.bnEqual(
+        ~message="balance is incorrect",
+        expectedNumberOfTokensToRecieve,
+        usersUpdatedBalance,
+      );
+    })
+  });
+
 let testExposed =
     (
       ~contracts: ref(Helpers.coreContracts),
@@ -12,11 +120,11 @@ let testExposed =
       //       test all other relevant 'functions
       let {longShort} = contracts.contents;
       let marketIndex = 1;
-      let amount = Ethers.BigNumber.fromInt(1);
+      let amount = bnFromInt(1);
       let testWallet = accounts.contents->Array.getUnsafe(1);
 
       let%Await _ =
-        longShort->Contract.LongShort.Exposed.setUseexecuteOutstandingLazySettlementsMock(
+        longShort->LongShort.Exposed.setUseexecuteOutstandingLazySettlementsMock(
           ~shouldUseMock=true,
         );
 
@@ -24,8 +132,8 @@ let testExposed =
         Chai.callEmitEvents(
           ~call=
             longShort
-            ->Contract.connect(~address=testWallet)
-            ->Contract.LongShort.mintLongLazy(~marketIndex, ~amount),
+            ->ContractHelpers.connect(~address=testWallet)
+            ->LongShort.mintLongLazy(~marketIndex, ~amount),
           ~eventName="executeOutstandingLazySettlementsMock",
           ~contract=longShort->Obj.magic,
         )
@@ -33,10 +141,11 @@ let testExposed =
       ();
     });
     describe("mintLongLazy", () => {
-      let mintLongLazyTxPromise: ref(JsPromise.t(Contract.transaction)) =
+      let mintLongLazyTxPromise:
+        ref(JsPromise.t(ContractHelpers.transaction)) =
         ref(None->Obj.magic);
       let marketIndex = 1;
-      let amount = Ethers.BigNumber.fromInt(1);
+      let amount = bnFromInt(1);
 
       before_each(() => {
         let {longShort} = contracts.contents;
@@ -44,8 +153,8 @@ let testExposed =
 
         mintLongLazyTxPromise :=
           longShort
-          ->Contract.connect(~address=testWallet)
-          ->Contract.LongShort.mintLongLazy(~marketIndex, ~amount);
+          ->ContractHelpers.connect(~address=testWallet)
+          ->LongShort.mintLongLazy(~marketIndex, ~amount);
       });
 
       it'("should emit the correct event", () => {
@@ -81,13 +190,16 @@ let testExposed =
       it'("updates the mintLong value for the market", () => {
         let {longShort} = contracts.contents;
         let%AwaitThen _ = mintLongLazyTxPromise.contents;
-        let%Await {mintLong} =
-          longShort->Contract.LongShort.batchedLazyDeposit(~marketIndex);
+        let%Await {mintAmount} =
+          longShort->LongShort.batchedLazyDeposit(
+            marketIndex,
+            CONSTANTS.longTokenType,
+          );
 
         Chai.bnEqual(
           ~message="Incorrect batched lazy deposit mint long",
           amount,
-          mintLong,
+          mintAmount,
         );
       });
       it'("updates the user's batched mint long amount", () =>

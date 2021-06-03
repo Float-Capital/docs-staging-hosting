@@ -6,13 +6,15 @@ var Config = require("../config/Config.js");
 
 function ComingSoon(Props) {
   return React.createElement("div", {
-              className: "bg-primary text-center text-sm text-white p-1 mb-2 "
-            }, "🏗 The protocol is under active development, join our ", React.createElement("a", {
-                  className: "bg-white hover:bg-primary-light text-primary hover:text-white py-1 font-bold",
-                  href: Config.discordInviteLink,
-                  rel: "noopener noreferrer",
-                  target: "_blank"
-                }, "discord"), " to get the latest updates  🏗");
+              className: "bg-primary p-1 mb-2 "
+            }, React.createElement("div", {
+                  className: "text-center text-sm text-white mx-12"
+                }, "🏗 The protocol is under active development, join our ", React.createElement("a", {
+                      className: "bg-white hover:bg-primary-light text-primary hover:text-white py-1 font-bold",
+                      href: Config.discordInviteLink,
+                      rel: "noopener noreferrer",
+                      target: "_blank"
+                    }, "discord"), " to get the latest updates  🏗"));
 }
 
 var make = ComingSoon;

@@ -50,7 +50,7 @@ const initialize = async (admin) => {
   const floatToken = await FloatToken.new({
     from: admin,
   });
-  await floatToken.initialize("Float token", "FLOAT TOKEN", staker.address, {
+  await floatToken.initialize3("Float token", "FLOAT TOKEN", staker.address, {
     from: admin,
   });
 
@@ -92,6 +92,7 @@ const createSynthetic = async (
   longShort,
   syntheticName,
   syntheticSymbol,
+  treasury,
   _baseEntryFee,
   _badLiquidityEntryFee,
   _baseExitFee,
@@ -109,7 +110,7 @@ const createSynthetic = async (
     from: admin,
   });
 
-  const yieldManager = await YieldManager.new(admin, longShort.address, fundToken.address, {
+  const yieldManager = await YieldManager.new(admin, longShort.address, treasury.address, fundToken.address, {
     from: admin,
   });
 
@@ -142,8 +143,8 @@ const createSynthetic = async (
     { from: admin }
   );
 
-  const longAddress = await longShort.longTokens.call(currentMarketIndex);
-  const shortAddress = await longShort.shortTokens.call(currentMarketIndex);
+  const longAddress = await longShort.syntheticTokens.call(0, currentMarketIndex);
+  const shortAddress = await longShort.syntheticTokens.call(1, currentMarketIndex);
   let longToken = await SyntheticToken.at(longAddress);
   let shortToken = await SyntheticToken.at(shortAddress);
 

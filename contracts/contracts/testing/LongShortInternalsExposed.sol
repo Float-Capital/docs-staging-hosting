@@ -78,7 +78,7 @@ contract LongShortInternalsExposed is LongShort {
     }
 
     function withdrawFunds(uint32 marketIndex, uint256 amount) external {
-        _withdrawFunds(marketIndex, amount);
+        _withdrawFunds(marketIndex, amount, msg.sender);
     }
 
     function transferToYieldManager(uint32 marketIndex, uint256 amount)
@@ -106,9 +106,9 @@ contract LongShortInternalsExposed is LongShort {
         uint32 marketIndex,
         uint256 amount, // 1e18
         bool isMint, // true for mint, false for redeem
-        bool isLong // true for long side, false for short side
+        ILongShort.MarketSide syntheticTokenType // true for long side, false for short side
     ) external view returns (uint256) {
-        _getFeesForAction(marketIndex, amount, isMint, isLong);
+        _getFeesForAction(marketIndex, amount, isMint, syntheticTokenType);
     }
 
     function priceChangeMechanism(uint32 marketIndex, uint256 newPrice)
@@ -116,5 +116,12 @@ contract LongShortInternalsExposed is LongShort {
         returns (bool didUpdate)
     {
         _priceChangeMechanism(marketIndex, newPrice);
+    }
+
+    function _executeOutstandingLazySettlementsExposed(
+        address user,
+        uint32 marketIndex
+    ) external {
+        _executeOutstandingLazySettlements(user, marketIndex);
     }
 }
