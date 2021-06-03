@@ -570,6 +570,19 @@
   },
   {
     "inputs": [],
+    "name": "DEAD_ADDRESS",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "TEN_TO_THE_18",
     "outputs": [
       {
@@ -1282,6 +1295,11 @@
       {
         "internalType": "uint256",
         "name": "kPeriod",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "initialMarketSeed",
         "type": "uint256"
       }
     ],

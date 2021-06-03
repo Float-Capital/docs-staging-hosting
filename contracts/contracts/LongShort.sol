@@ -26,6 +26,8 @@ contract LongShort is ILongShort, Initializable {
     ////////////////////////////////////
 
     // Global state.
+    address public constant DEAD_ADDRESS =
+        0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
     address public admin; // This will likely be the Gnosis safe
     uint32 public latestMarket;
     mapping(uint32 => bool) public marketExists;
@@ -384,6 +386,48 @@ contract LongShort is ILongShort, Initializable {
         );
     }
 
+    function seedMarketInitially(uint256 initialMarketSeed, uint32 marketIndex)
+        internal
+    {
+        require(
+            // You require at least 10^17 of the underlying payment token to seed the market.
+            initialMarketSeed > 0.1 ether,
+            "Insufficient value to seed the market"
+        );
+
+        uint256 usersBalance = fundTokens[marketIndex].balanceOf(msg.sender);
+        fundTokens[marketIndex].transferFrom(
+            msg.sender,
+            address(this),
+            initialMarketSeed * 2
+        );
+
+        // Approve for own contract so that the `transferFrom` works as expected
+        fundTokens[marketIndex].approve(address(this), initialMarketSeed * 2);
+
+        // NOTE: it is critical that we use "this" to make this an external call so the msg.sender is the longShort contract
+        this.mintLong(marketIndex, initialMarketSeed);
+        this.mintShort(marketIndex, initialMarketSeed);
+
+        // NOTE: in theory this should always be `initialMarketSeed` - but in case the oracle moves etc prudent to rather fetch the exact number of tokens created
+        uint256 synthLongBalance =
+            syntheticTokens[MarketSide.Short][marketIndex].balanceOf(
+                address(this)
+            );
+        uint256 synthShortBalance =
+            syntheticTokens[MarketSide.Long][marketIndex].balanceOf(
+                address(this)
+            );
+        syntheticTokens[MarketSide.Short][marketIndex].transfer(
+            address(DEAD_ADDRESS),
+            synthLongBalance
+        );
+        syntheticTokens[MarketSide.Long][marketIndex].transfer(
+            address(DEAD_ADDRESS),
+            synthShortBalance
+        );
+    }
+
     function initializeMarket(
         uint32 marketIndex,
         uint256 _baseEntryFee,
@@ -391,9 +435,11 @@ contract LongShort is ILongShort, Initializable {
         uint256 _baseExitFee,
         uint256 _badLiquidityExitFee,
         uint256 kInitialMultiplier,
-        uint256 kPeriod
+        uint256 kPeriod,
+        uint256 initialMarketSeed
     ) external adminOnly {
         require(!marketExists[marketIndex] && marketIndex <= latestMarket);
+
         marketExists[marketIndex] = true;
 
         _changeFees(
@@ -412,6 +458,8 @@ contract LongShort is ILongShort, Initializable {
             kInitialMultiplier,
             kPeriod
         );
+
+        seedMarketInitially(initialMarketSeed, marketIndex);
     }
 
     ////////////////////////////////////

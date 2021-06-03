@@ -106,6 +106,9 @@ const createSynthetic = async (
     from: admin,
   });
 
+  await fundToken.mint(admin, "1000000000000000000", { from: admin });
+  await fundToken.approve(longShort.address, "1000000000000000000", { from: admin });
+
   const oracleManager = await OracleManager.new(admin, {
     from: admin,
   });
@@ -140,6 +143,7 @@ const createSynthetic = async (
     _badLiquidityExitFee,
     kInitialMultiplier,
     kPeriod,
+    "500000000000000000",
     { from: admin }
   );
 
