@@ -395,36 +395,38 @@ contract LongShort is ILongShort, Initializable {
             "Insufficient value to seed the market"
         );
 
-        uint256 usersBalance = fundTokens[marketIndex].balanceOf(msg.sender);
-        fundTokens[marketIndex].transferFrom(
-            msg.sender,
-            address(this),
-            initialMarketSeed * 2
+        _lockFundsInMarket(marketIndex, initialMarketSeed * 2);
+
+        syntheticTokens[MarketSide.Long][marketIndex].mint(
+            DEAD_ADDRESS,
+            initialMarketSeed
         );
-
-        // Approve for own contract so that the `transferFrom` works as expected
-        fundTokens[marketIndex].approve(address(this), initialMarketSeed * 2);
-
-        // NOTE: it is critical that we use "this" to make this an external call so the msg.sender is the longShort contract
-        this.mintLong(marketIndex, initialMarketSeed);
-        this.mintShort(marketIndex, initialMarketSeed);
-
-        // NOTE: in theory this should always be `initialMarketSeed` - but in case the oracle moves etc prudent to rather fetch the exact number of tokens created
-        uint256 synthLongBalance =
-            syntheticTokens[MarketSide.Short][marketIndex].balanceOf(
-                address(this)
-            );
-        uint256 synthShortBalance =
-            syntheticTokens[MarketSide.Long][marketIndex].balanceOf(
-                address(this)
-            );
-        syntheticTokens[MarketSide.Short][marketIndex].transfer(
-            address(DEAD_ADDRESS),
-            synthLongBalance
+        syntheticTokens[MarketSide.Short][marketIndex].mint(
+            DEAD_ADDRESS,
+            initialMarketSeed
         );
-        syntheticTokens[MarketSide.Long][marketIndex].transfer(
-            address(DEAD_ADDRESS),
-            synthShortBalance
+        syntheticTokenBackedValue[MarketSide.Long][
+            marketIndex
+        ] = initialMarketSeed;
+        syntheticTokenBackedValue[MarketSide.Short][
+            marketIndex
+        ] = initialMarketSeed;
+
+        totalValueLockedInMarket[marketIndex] = initialMarketSeed * 2;
+
+        emit ShortMinted(
+            marketIndex,
+            initialMarketSeed,
+            initialMarketSeed,
+            initialMarketSeed,
+            DEAD_ADDRESS
+        );
+        emit LongMinted(
+            marketIndex,
+            initialMarketSeed,
+            initialMarketSeed,
+            initialMarketSeed,
+            DEAD_ADDRESS
         );
     }
 
@@ -521,11 +523,6 @@ contract LongShort is ILongShort, Initializable {
         view
         returns (uint256 marketAmount, uint256 treasuryAmount)
     {
-        // Edge case: all goes to market when market is empty.
-        if (totalValueLockedInMarket[marketIndex] == 0) {
-            return (amount, 0);
-        }
-
         uint256 marketPcnt; // fixed-precision scale of 10000
         if (
             syntheticTokenBackedValue[MarketSide.Long][marketIndex] >
@@ -561,16 +558,6 @@ contract LongShort is ILongShort, Initializable {
         view
         returns (uint256 longAmount, uint256 shortAmount)
     {
-        // Edge case: equal split when market is empty.
-        if (
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] == 0 &&
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] == 0
-        ) {
-            longAmount = amount / 2;
-            shortAmount = amount - longAmount;
-            return (longAmount, shortAmount);
-        }
-
         // The percentage value that a position receives depends on the amount
         // of total market value taken up by the _opposite_ position.
         uint256 longPcnt =
@@ -826,15 +813,10 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokenBackedValue[MarketSide.Short][marketIndex]
         );
 
-        // turn this into an assert (markets will be seeded)
-        if (
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] == 0 &&
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] == 0
-        ) {
-            return;
-        }
-        // TODO - should never happen - seed markets
-        // assert(syntheticTokenBackedValue[MarketSide.Long][marketIndex] != 0 && syntheticTokenBackedValue[MarketSide.Short][marketIndex] != 0);
+        assert(
+            syntheticTokenBackedValue[MarketSide.Long][marketIndex] != 0 &&
+                syntheticTokenBackedValue[MarketSide.Short][marketIndex] != 0
+        );
 
         // If a negative int is return this should fail.
         uint256 newPrice = uint256(getLatestPrice(marketIndex));
@@ -1042,12 +1024,6 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokenBackedValue[MarketSide.Long][marketIndex];
         uint256 _shortValue =
             syntheticTokenBackedValue[MarketSide.Short][marketIndex];
-
-        // Edge-case: no penalties for minting in a 1-sided market.
-        // TODO: Is this what we want for new markets?
-        if (isMint && (_longValue == 0 || _shortValue == 0)) {
-            return _getFeesForAmounts(marketIndex, amount, 0, isMint);
-        }
 
         // Compute amount that can be spent before higher fees.
         uint256 feeGap = 0;
