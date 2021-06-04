@@ -411,22 +411,7 @@ contract LongShort is ILongShort, Initializable {
         syntheticTokenBackedValue[MarketSide.Short][
             marketIndex
         ] = initialMarketSeed;
-        /*
-        console.log("syntheticTokenBackedValue");
-        console.log(syntheticTokenBackedValue[MarketSide.Long][marketIndex]);
-        console.log(syntheticTokenBackedValue[MarketSide.Short][marketIndex]);
-        console.log("totalValueLockedInMarket");
-        console.log(totalValueLockedInMarket[marketIndex]);
-        console.log("totalValueLockedInYieldManager");
-        console.log(totalValueLockedInYieldManager[marketIndex]);
-        console.log("totalValueReservedForTreasury");
-        console.log(totalValueReservedForTreasury[marketIndex]);
-        console.log("assetPrice");
-        console.log(assetPrice[marketIndex]);
-        console.log("syntheticTokenPrice");
-        console.log(syntheticTokenPrice[MarketSide.Long][marketIndex]);
-        console.log(syntheticTokenPrice[MarketSide.Short][marketIndex]);
-        */
+
         emit ShortMinted(
             marketIndex,
             initialMarketSeed,
@@ -536,6 +521,8 @@ contract LongShort is ILongShort, Initializable {
         view
         returns (uint256 marketAmount, uint256 treasuryAmount)
     {
+        assert(totalValueLockedInMarket[marketIndex] != 0);
+
         uint256 marketPcnt; // fixed-precision scale of 10000
         if (
             syntheticTokenBackedValue[MarketSide.Long][marketIndex] >
@@ -571,6 +558,8 @@ contract LongShort is ILongShort, Initializable {
         view
         returns (uint256 longAmount, uint256 shortAmount)
     {
+        assert(totalValueLockedInMarket[marketIndex] != 0);
+
         // The percentage value that a position receives depends on the amount
         // of total market value taken up by the _opposite_ position.
         uint256 longPcnt =
