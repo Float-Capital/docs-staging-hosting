@@ -35,7 +35,7 @@ function MarketCard(Props) {
   var totalLockedShort = match.totalLockedShort;
   var totalLockedLong = match.totalLockedLong;
   var marketIndex = param.marketIndex;
-  var marketName = param.name;
+  var marketName = param.symbol;
   var router = Router.useRouter();
   var marketIndexOption = Js_dict.get(router.query, "marketIndex");
   var longBeta = calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, true);
