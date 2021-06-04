@@ -411,9 +411,22 @@ contract LongShort is ILongShort, Initializable {
         syntheticTokenBackedValue[MarketSide.Short][
             marketIndex
         ] = initialMarketSeed;
-
-        totalValueLockedInMarket[marketIndex] = initialMarketSeed * 2;
-
+        /*
+        console.log("syntheticTokenBackedValue");
+        console.log(syntheticTokenBackedValue[MarketSide.Long][marketIndex]);
+        console.log(syntheticTokenBackedValue[MarketSide.Short][marketIndex]);
+        console.log("totalValueLockedInMarket");
+        console.log(totalValueLockedInMarket[marketIndex]);
+        console.log("totalValueLockedInYieldManager");
+        console.log(totalValueLockedInYieldManager[marketIndex]);
+        console.log("totalValueReservedForTreasury");
+        console.log(totalValueReservedForTreasury[marketIndex]);
+        console.log("assetPrice");
+        console.log(assetPrice[marketIndex]);
+        console.log("syntheticTokenPrice");
+        console.log(syntheticTokenPrice[MarketSide.Long][marketIndex]);
+        console.log(syntheticTokenPrice[MarketSide.Short][marketIndex]);
+        */
         emit ShortMinted(
             marketIndex,
             initialMarketSeed,
@@ -944,6 +957,7 @@ contract LongShort is ILongShort, Initializable {
         yieldManagers[marketIndex].depositToken(amount);
 
         // Update market state.
+
         totalValueLockedInYieldManager[marketIndex] += amount;
 
         // Invariant: yield managers should never have more locked funds
