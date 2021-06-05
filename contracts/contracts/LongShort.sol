@@ -588,15 +588,10 @@ contract LongShort is ILongShort, Initializable {
         // Splits mostly to the weaker position to incentivise balance.
         (uint256 longAmount, uint256 shortAmount) =
             getMarketSplit(marketIndex, marketAmount);
-        // TODO STENT why not use += ?
-        // TODO this seems to simple. Don't you have to mint new tokens?
-        syntheticTokenBackedValue[MarketSide.Long][marketIndex] =
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-            longAmount;
+        // TODO STENT this seems to simple. Don't you have to mint new tokens?
+        syntheticTokenBackedValue[MarketSide.Long][marketIndex] += longAmount;
         // TODO STENT note that this now means the treasury must have the same currency value as all markets. For ever.
-        syntheticTokenBackedValue[MarketSide.Short][marketIndex] =
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] +
-            shortAmount;
+        syntheticTokenBackedValue[MarketSide.Short][marketIndex] += shortAmount;
 
         emit FeesLevied(marketIndex, totalFees);
     }
@@ -622,15 +617,10 @@ contract LongShort is ILongShort, Initializable {
             totalValueReservedForTreasury[marketIndex] += treasuryAmount;
 
             // Splits mostly to the weaker position to incentivise balance.
-            // TODO STENT use +=
             (uint256 longAmount, uint256 shortAmount) =
                 getMarketSplit(marketIndex, marketAmount);
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] =
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-                longAmount;
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] =
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex] +
-                shortAmount;
+            syntheticTokenBackedValue[MarketSide.Long][marketIndex] += longAmount;
+            syntheticTokenBackedValue[MarketSide.Short][marketIndex] += shortAmount;
         }
     }
 
@@ -709,14 +699,8 @@ contract LongShort is ILongShort, Initializable {
                 MarketSide.Long,
                 MarketSide.Short
             );
-
-            // TODO STENT use +=
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] =
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-                valueChange;
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] =
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex] -
-                valueChange;
+            syntheticTokenBackedValue[MarketSide.Long][marketIndex] += valueChange;
+            syntheticTokenBackedValue[MarketSide.Short][marketIndex] -= valueChange;
         } else {
             _calculateValueChangeForPriceMechanism(
                 marketIndex,
@@ -726,14 +710,8 @@ contract LongShort is ILongShort, Initializable {
                 MarketSide.Short,
                 MarketSide.Long
             );
-
-            // TODO STENT use -=
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] =
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex] -
-                valueChange;
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] =
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex] +
-                valueChange;
+            syntheticTokenBackedValue[MarketSide.Long][marketIndex] -= valueChange;
+            syntheticTokenBackedValue[MarketSide.Short][marketIndex] += valueChange;
         }
         return true;
     }
@@ -768,10 +746,7 @@ contract LongShort is ILongShort, Initializable {
                 numberOfTokens
             );
 
-            // TODO STENT use +=
-            syntheticTokenBackedValue[syntheticTokenType][marketIndex] =
-                syntheticTokenBackedValue[syntheticTokenType][marketIndex] +
-                totalAmount;
+            syntheticTokenBackedValue[syntheticTokenType][marketIndex] += totalAmount;
 
             if (currentMarketBatchedLazyDeposit.mintAndStakeAmount > 0) {
                 // NOTE: no fees are calculated, but if they are desired in the future they can be added here.
@@ -1176,10 +1151,7 @@ contract LongShort is ILongShort, Initializable {
             transferTo,
             tokens
         );
-        // TODO STENT use +=
-        syntheticTokenBackedValue[syntheticTokenType][marketIndex] =
-            syntheticTokenBackedValue[syntheticTokenType][marketIndex] +
-            remaining;
+        syntheticTokenBackedValue[syntheticTokenType][marketIndex] += remaining;
 
         // TODO: combine these
         // TODO STENT this seems the wrong way around
@@ -1226,10 +1198,7 @@ contract LongShort is ILongShort, Initializable {
         _feesMechanism(marketIndex, fees);
 
         // Withdraw funds with remaining amount.
-        // TODO STENT use -=
-        syntheticTokenBackedValue[syntheticTokenType][marketIndex] =
-            syntheticTokenBackedValue[syntheticTokenType][marketIndex] -
-            amount;
+        syntheticTokenBackedValue[syntheticTokenType][marketIndex] -= amount;
         _withdrawFunds(marketIndex, remaining, msg.sender);
         // TODO STENT CONCERN1
         _refreshTokenPrices(marketIndex);
