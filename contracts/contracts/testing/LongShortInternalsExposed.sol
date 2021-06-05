@@ -39,16 +39,16 @@ contract LongShortInternalsExposed is LongShort {
         _;
     }
 
-    function refreshTokensPrice(uint32 marketIndex) external {
-        _refreshTokensPrice(marketIndex);
+    function refreshTokenPrices(uint32 marketIndex) external {
+        _refreshTokenPrices(marketIndex);
     }
 
     function feesMechanism(uint32 marketIndex, uint256 totalFees) external {
         _feesMechanism(marketIndex, totalFees);
     }
 
-    function yieldMechanism(uint32 marketIndex) external {
-        _yieldMechanism(marketIndex);
+    function claimAndDistributeYield(uint32 marketIndex) external {
+        _claimAndDistributeYield(marketIndex);
     }
 
     function minimum(uint256 liquidityOfPositionA, uint256 liquidityOfPositionB)

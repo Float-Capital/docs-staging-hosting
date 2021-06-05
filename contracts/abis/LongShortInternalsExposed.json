@@ -912,6 +912,19 @@
         "internalType": "uint32",
         "name": "marketIndex",
         "type": "uint32"
+      }
+    ],
+    "name": "claimAndDistributeYield",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
       },
       {
         "internalType": "uint256",
@@ -1629,7 +1642,7 @@
         "type": "uint32"
       }
     ],
-    "name": "refreshTokensPrice",
+    "name": "refreshTokenPrices",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1965,19 +1978,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "yieldMechanism",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]

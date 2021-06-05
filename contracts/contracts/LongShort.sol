@@ -213,8 +213,7 @@ contract LongShort is ILongShort, Initializable {
         _;
     }
 
-    // TODO STENT change name to assertMartketExists
-    modifier doesMarketExist(uint32 marketIndex) {
+    modifier assertMarketExists(uint32 marketIndex) {
         require(marketExists[marketIndex], "market doesn't exist");
         _;
     }
@@ -547,8 +546,7 @@ contract LongShort is ILongShort, Initializable {
     /**
      * Adjusts the long/short token prices according to supply and value.
      */
-    // TODO STENT name change _refreshTokenPrices
-    function _refreshTokensPrice(uint32 marketIndex) internal {
+    function _refreshTokenPrices(uint32 marketIndex) internal {
         uint256 longTokenSupply =
             syntheticTokens[MarketSide.Long][marketIndex].totalSupply();
         if (longTokenSupply > 0) {
@@ -606,8 +604,7 @@ contract LongShort is ILongShort, Initializable {
     /**
      * Controls what happens with accrued yield manager interest.
      */
-    // TODO STENT name change extractAndDistributeYield
-    function _yieldMechanism(uint32 marketIndex) internal {
+    function _claimAndDistributeYield(uint32 marketIndex) internal {
         uint256 amount =
             yieldManagers[marketIndex].getTotalHeld() -
                 totalValueLockedInYieldManager[marketIndex];
@@ -687,8 +684,7 @@ contract LongShort is ILongShort, Initializable {
       L = L + E(k|A1-A2|/A1)/k
       L = L + E|A1-A2|/A1
     */
-    // TODO STENT adjustMarketBasedOnNewAssetPrice or reactToNewAssetPrice
-    function _priceChangeMechanism(uint32 marketIndex, uint256 newPrice)
+    function _adjustMarketBasedOnNewAssetPrice(uint32 marketIndex, uint256 newPrice)
         internal
         returns (bool didUpdate)
     {
@@ -760,7 +756,7 @@ contract LongShort is ILongShort, Initializable {
 
             // Distribute fees across the market.
             // TODO STENT CONCERN1
-            _refreshTokensPrice(marketIndex);
+            _refreshTokenPrices(marketIndex);
 
             // Mint long tokens with remaining value.
             uint256 numberOfTokens =
@@ -821,7 +817,7 @@ contract LongShort is ILongShort, Initializable {
      */
     function _updateSystemStateInternal(uint32 marketIndex)
         internal
-        doesMarketExist(marketIndex)
+        assertMarketExists(marketIndex)
     {
         // This is called right before any state change!
         // So reward rate can be calculated just in time by
@@ -841,6 +837,7 @@ contract LongShort is ILongShort, Initializable {
 
         // If a negative int is return this should fail.
         uint256 newPrice = uint256(oracleManagers[marketIndex].updatePrice());
+        // TODO STENT move this into the price function
         emit PriceUpdate(
             marketIndex,
             assetPrice[marketIndex],
@@ -854,10 +851,10 @@ contract LongShort is ILongShort, Initializable {
         priceChanged = _priceChangeMechanism(marketIndex, newPrice);
 
         // Distribute accrued yield manager interest.
-        _yieldMechanism(marketIndex);
+        _claimAndDistributeYield(marketIndex);
 
         // TODO STENT CONCERN1
-        _refreshTokensPrice(marketIndex);
+        _refreshTokenPrices(marketIndex);
         assetPrice[marketIndex] = newPrice;
         if (priceChanged) {
             snapshopPriceChangeForNextPriceExecution(marketIndex);
@@ -1169,7 +1166,7 @@ contract LongShort is ILongShort, Initializable {
         // Distribute fees across the market - (do this before minting tokens so that user doesn't get the fees)
         _feesMechanism(marketIndex, fees);
         // TODO STENT CONCERN1
-        _refreshTokensPrice(marketIndex);
+        _refreshTokenPrices(marketIndex);
 
         // Mint short tokens with remaining value.
         uint256 tokens =
@@ -1235,7 +1232,7 @@ contract LongShort is ILongShort, Initializable {
             amount;
         _withdrawFunds(marketIndex, remaining, msg.sender);
         // TODO STENT CONCERN1
-        _refreshTokensPrice(marketIndex);
+        _refreshTokenPrices(marketIndex);
 
         // TODO: Combine these events
         if (syntheticTokenType == MarketSide.Long) {
@@ -1358,7 +1355,7 @@ contract LongShort is ILongShort, Initializable {
         external
         view
         override
-        doesMarketExist(marketIndex)
+        assertMarketExists(marketIndex)
         returns (uint256 pendingBalance)
     {
         UserLazyDeposit storage currentUserDeposits =
@@ -1767,6 +1764,6 @@ contract LongShort is ILongShort, Initializable {
         );
 
         // TODO STENT CONCERN1
-        _refreshTokensPrice(marketIndex);
+        _refreshTokenPrices(marketIndex);
     }
 }
