@@ -581,7 +581,12 @@ contract LongShort is ILongShort, Initializable {
             getTreasurySplit(marketIndex, totalFees);
 
         // Do a logical transfer from market funds into treasury.
-        // TODO STENT seems like a bug, should be += marketAmount
+        // TODO STENT this is a bit confusion.
+        //   This function (_feesMechanism) assumes that the fees are already in totalValueLockedInMarket
+        //   but not in syntheticTokenBackedValue[MarketSide.Long][marketIndex] which is confusiong.
+        //   It is also a source of errors because if you do not add the fees to totalValueLockedInMarket
+        //   first AND then call this function in the same transaction then you will have
+        //   Long + Short != totalValueLockedInMarket
         totalValueLockedInMarket[marketIndex] -= treasuryAmount;
         totalValueReservedForTreasury[marketIndex] += treasuryAmount;
 
@@ -1154,11 +1159,10 @@ contract LongShort is ILongShort, Initializable {
         syntheticTokenBackedValue[syntheticTokenType][marketIndex] += remaining;
 
         // TODO: combine these
-        // TODO STENT this seems the wrong way around
         if (syntheticTokenType == MarketSide.Long) {
-            emit ShortMinted(marketIndex, amount, remaining, tokens, user);
-        } else {
             emit LongMinted(marketIndex, amount, remaining, tokens, user);
+        } else {
+            emit ShortMinted(marketIndex, amount, remaining, tokens, user);
         }
 
         emit ValueLockedInSystem(
