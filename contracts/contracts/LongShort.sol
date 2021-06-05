@@ -588,7 +588,7 @@ contract LongShort is ILongShort, Initializable {
         // Splits mostly to the weaker position to incentivise balance.
         (uint256 longAmount, uint256 shortAmount) =
             getMarketSplit(marketIndex, marketAmount);
-        // TODO STENT this seems to simple. Don't you have to mint new tokens?
+        // TODO STENT there seems 2 ways to do this. You can buy more tokens or add value to th market. Why do it this way? Is it because it is cheaper?
         syntheticTokenBackedValue[MarketSide.Long][marketIndex] += longAmount;
         // TODO STENT note that this now means the treasury must have the same currency value as all markets. For ever.
         syntheticTokenBackedValue[MarketSide.Short][marketIndex] += shortAmount;
@@ -905,7 +905,7 @@ contract LongShort is ILongShort, Initializable {
         fundTokens[marketIndex].transfer(user, amount);
 
         // Update market state.
-        // TODO STENT is this totalValueLockedInMarket variable even used? It's a pain to update it
+        // TODO STENT is this totalValueLockedInMarket variable even used properly? It's a pain to update it
         //     and a source of error in future updates
         totalValueLockedInMarket[marketIndex] =
             totalValueLockedInMarket[marketIndex] -
