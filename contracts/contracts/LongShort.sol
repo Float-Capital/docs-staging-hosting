@@ -593,9 +593,7 @@ contract LongShort is ILongShort, Initializable {
         // Splits mostly to the weaker position to incentivise balance.
         (uint256 longAmount, uint256 shortAmount) =
             getMarketSplit(marketIndex, marketAmount);
-        // TODO STENT there seems 2 ways to do this. You can buy more tokens or add value to th market. Why do it this way? Is it because it is cheaper?
         syntheticTokenBackedValue[MarketSide.Long][marketIndex] += longAmount;
-        // TODO STENT note that this now means the treasury must have the same currency value as all markets. For ever.
         syntheticTokenBackedValue[MarketSide.Short][marketIndex] += shortAmount;
 
         emit FeesLevied(marketIndex, totalFees);
@@ -616,7 +614,6 @@ contract LongShort is ILongShort, Initializable {
 
             // We keep the interest locked in the yield manager, but update our
             // bookkeeping to logically simulate moving the funds around.
-            // TODO STENT note that this means the currency that the yield manager produces has to match that of the treasury and all markets. For ever.
             totalValueLockedInYieldManager[marketIndex] += amount;
             totalValueLockedInMarket[marketIndex] += marketAmount;
             totalValueReservedForTreasury[marketIndex] += treasuryAmount;
@@ -936,7 +933,7 @@ contract LongShort is ILongShort, Initializable {
 
         // Invariant: yield managers should never have more locked funds
         // than the combined value of the market and dao funds.
-        // TODO STENT this check seems wierd. What happens if this fails? What is the recovery?
+        // TODO STENT this check seems wierd. What happens if this fails? What is the recovery? Should it be an assert
         require(
             totalValueLockedInYieldManager[marketIndex] <=
                 totalValueLockedInMarket[marketIndex] +
@@ -962,7 +959,7 @@ contract LongShort is ILongShort, Initializable {
 
         // Invariant: yield managers should never have more locked funds
         // than the combined value of the market and held treasury funds.
-        // TODO STENT this check seems wierd. What happens if this fails? What is the recovery?
+        // TODO STENT this check seems wierd. What happens if this fails? What is the recovery? Should it be an assert?
         require(
             totalValueLockedInYieldManager[marketIndex] <=
                 totalValueLockedInMarket[marketIndex] +
