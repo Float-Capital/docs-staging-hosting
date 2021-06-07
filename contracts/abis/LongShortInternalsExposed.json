@@ -768,11 +768,6 @@
       },
       {
         "internalType": "uint256",
-        "name": "mintEarlyClaimed",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
         "name": "mintAndStakeAmount",
         "type": "uint256"
       }
@@ -925,34 +920,6 @@
       }
     ],
     "name": "depositFunds",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "syntheticTokenType",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint256",
-        "name": "minimumAmountRequired",
-        "type": "uint256"
-      }
-    ],
-    "name": "executeOutstandingLazySettlementsPartialOrCurrentIfNeeded",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
