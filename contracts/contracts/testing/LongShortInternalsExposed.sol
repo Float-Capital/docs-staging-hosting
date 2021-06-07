@@ -63,13 +63,17 @@ contract LongShortInternalsExposed is LongShort {
         uint32 marketIndex,
         uint256 assetPriceGreater,
         uint256 assetPriceLess,
-        uint256 baseValueExposure
-    ) external view returns (uint256) {
+        uint256 baseValueExposure,
+        MarketSide winningSyntheticTokenType,
+        MarketSide losingSyntheticTokenType
+    ) external {
         _calculateValueChangeForPriceMechanism(
             marketIndex,
             assetPriceGreater,
             assetPriceLess,
-            baseValueExposure
+            baseValueExposure,
+            winningSyntheticTokenType,
+            losingSyntheticTokenType
         );
     }
 

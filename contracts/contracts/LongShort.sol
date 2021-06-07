@@ -672,8 +672,10 @@ contract LongShort is ILongShort, Initializable {
         uint32 marketIndex,
         uint256 assetPriceGreater,
         uint256 assetPriceLess,
-        uint256 baseValueExposure
-    ) internal view returns (uint256) {
+        uint256 baseValueExposure,
+        MarketSide winningSyntheticTokenType,
+        MarketSide losingSyntheticTokenType
+    ) internal {
         uint256 valueChange = 0;
 
         uint256 percentageChange =
@@ -687,7 +689,12 @@ contract LongShort is ILongShort, Initializable {
             valueChange = baseValueExposure;
         }
 
-        return valueChange;
+        syntheticTokenBackedValue[winningSyntheticTokenType][marketIndex] =
+            syntheticTokenBackedValue[winningSyntheticTokenType][marketIndex] +
+            valueChange;
+        syntheticTokenBackedValue[losingSyntheticTokenType][marketIndex] =
+            syntheticTokenBackedValue[losingSyntheticTokenType][marketIndex] -
+            valueChange;
     }
 
     function _priceChangeMechanism(uint32 marketIndex, uint256 newPrice)
@@ -699,7 +706,6 @@ contract LongShort is ILongShort, Initializable {
             return false;
         }
 
-        uint256 valueChange = 0;
         uint256 baseValueExposure =
             _minimum(
                 syntheticTokenBackedValue[MarketSide.Long][marketIndex],
@@ -708,31 +714,23 @@ contract LongShort is ILongShort, Initializable {
 
         // Long gains
         if (newPrice > assetPrice[marketIndex]) {
-            valueChange = _calculateValueChangeForPriceMechanism(
+            _calculateValueChangeForPriceMechanism(
                 marketIndex,
                 newPrice,
                 assetPrice[marketIndex],
-                baseValueExposure
+                baseValueExposure,
+                MarketSide.Long,
+                MarketSide.Short
             );
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] =
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-                valueChange;
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] =
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex] -
-                valueChange;
         } else {
-            valueChange = _calculateValueChangeForPriceMechanism(
+            _calculateValueChangeForPriceMechanism(
                 marketIndex,
                 assetPrice[marketIndex],
                 newPrice,
-                baseValueExposure
+                baseValueExposure,
+                MarketSide.Short,
+                MarketSide.Long
             );
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] =
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex] -
-                valueChange;
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] =
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex] +
-                valueChange;
         }
         return true;
     }
@@ -785,12 +783,13 @@ contract LongShort is ILongShort, Initializable {
                     marketIndex,
                     amountToStake,
                     latestUpdateIndex[marketIndex],
-                    MarketSide.Long
+                    syntheticTokenType
                 );
 
                 // reset all values
                 currentMarketBatchedLazyDeposit.mintAmount = 0;
                 currentMarketBatchedLazyDeposit.mintAndStakeAmount = 0;
+                currentMarketBatchedLazyDeposit.mintEarlyClaimed 0; // necessary to also reset this surely?
             }
             // TODO: add events
         }

@@ -835,17 +835,21 @@
         "internalType": "uint256",
         "name": "baseValueExposure",
         "type": "uint256"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "winningSyntheticTokenType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "losingSyntheticTokenType",
+        "type": "uint8"
       }
     ],
     "name": "calculateValueChangeForPriceMechanism",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
