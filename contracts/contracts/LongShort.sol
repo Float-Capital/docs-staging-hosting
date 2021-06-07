@@ -615,14 +615,15 @@ contract LongShort is ILongShort, Initializable {
         }
     }
 
-    function _minimum(
-        uint256 liquidityOfPositionA,
-        uint256 liquidityOfPositionB
-    ) internal view returns (uint256) {
-        if (liquidityOfPositionA < liquidityOfPositionB) {
-            return liquidityOfPositionA;
+    function _minimum(uint256 value1, uint256 value2)
+        internal
+        view
+        returns (uint256)
+    {
+        if (value1 < value2) {
+            return value1;
         } else {
-            return liquidityOfPositionB;
+            return value2;
         }
     }
 
