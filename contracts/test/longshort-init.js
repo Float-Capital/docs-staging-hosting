@@ -75,8 +75,13 @@ contract("LongShort (initialisation)", (accounts) => {
     const user1LongTokens = await long.balanceOf(user1);
     const user1FundTokens = await fund.balanceOf(user1);
 
+    console.log(
+      user1LongTokens.toString(),
+      defaultMintAmount.sub(defaultMintAmount.mul(entryFee).div(feeUnitsOfPrecision)).toString(),
+      "Correct tokens not minted on initialization"
+    );
     assert.equal(
-      user1LongTokens,
+      user1LongTokens.toString(),
       defaultMintAmount.sub(defaultMintAmount.mul(entryFee).div(feeUnitsOfPrecision)).toString(),
       "Correct tokens not minted on initialization"
     );

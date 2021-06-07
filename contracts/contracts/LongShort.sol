@@ -468,6 +468,18 @@ contract LongShort is ILongShort, Initializable {
     //////// HELPER FUNCTIONS //////////
     ////////////////////////////////////
 
+    function getOtherSynthType(MarketSide synthTokenType)
+        internal
+        view
+        returns (MarketSide)
+    {
+        if (synthTokenType == MarketSide.Long) {
+            return MarketSide.Short;
+        } else {
+            return MarketSide.Long;
+        }
+    }
+
     /**
      * Returns the amount of accrued value that should go to the market,
      * and the amount that should be locked into the treasury. To incentivise
@@ -728,8 +740,6 @@ contract LongShort is ILongShort, Initializable {
                 totalAmount;
 
             if (currentMarketBatchedLazyDeposit.mintAndStakeAmount > 0) {
-                // TODO: we must modify staker so that the view function for the users stake shows them having the stake (and not the LongShort contract)
-
                 // NOTE: no fees are calculated, but if they are desired in the future they can be added here.
 
                 uint256 amountToStake =
@@ -938,79 +948,84 @@ contract LongShort is ILongShort, Initializable {
         );
     }
 
-    /*
-     * Calculates fees for the given base amount and an additional penalty
-     * amount that extra fees are paid on. Users are penalised for imbalancing
-     * the market.
-     */
-    function _getFeesForAmounts(
-        uint32 marketIndex,
-        uint256 baseAmount, // e18
-        uint256 penaltyAmount, // e18
-        bool isMint // true for mint, false for redeem
-    ) internal view returns (uint256) {
-        uint256 baseRate = 0; // base fee pcnt paid for all actions
-        uint256 penaltyRate = 0; // penalty fee pcnt paid for imbalancing
-
-        if (isMint) {
-            baseRate = baseEntryFee[marketIndex];
-            penaltyRate = badLiquidityEntryFee[marketIndex];
-        } else {
-            baseRate = baseExitFee[marketIndex];
-            penaltyRate = badLiquidityExitFee[marketIndex];
-        }
-
-        uint256 baseFee = (baseAmount * baseRate) / feeUnitsOfPrecision;
-
-        uint256 penaltyFee =
-            (penaltyAmount * penaltyRate) / feeUnitsOfPrecision;
-
-        return baseFee + penaltyFee;
-    }
-
     /**
      * Calculates fees for the given mint/redeem amount. Users are penalised
      * with higher fees for imbalancing the market.
      */
-    // TODO: look at splitting this function into smaller functions rather than using boolean modifiers.
-    function _getFeesForAction(
+    function _getFeesGeneral(
+        uint32 marketIndex,
+        uint256 delta, // 1e18
+        MarketSide synthTokenGainingDominance,
+        MarketSide synthTokenLosingDominance,
+        uint256 baseFee,
+        uint256 penultyFees
+    ) internal view returns (uint256) {
+        uint256 baseFee = (delta * baseFee) / feeUnitsOfPrecision;
+
+        if (
+            syntheticTokenBackedValue[synthTokenGainingDominance][
+                marketIndex
+            ] >=
+            syntheticTokenBackedValue[synthTokenLosingDominance][marketIndex]
+        ) {
+            // All funds are causing imbalance
+            return baseFee + ((delta * penultyFees) / feeUnitsOfPrecision);
+        } else if (
+            syntheticTokenBackedValue[synthTokenGainingDominance][marketIndex] +
+                delta >
+            syntheticTokenBackedValue[synthTokenLosingDominance][marketIndex]
+        ) {
+            uint256 amountImbalancing =
+                delta -
+                    (syntheticTokenBackedValue[synthTokenLosingDominance][
+                        marketIndex
+                    ] -
+                        syntheticTokenBackedValue[synthTokenGainingDominance][
+                            marketIndex
+                        ]);
+            uint256 penaltyFee =
+                (amountImbalancing * penultyFees) / feeUnitsOfPrecision;
+
+            return baseFee + penaltyFee;
+        } else {
+            return baseFee;
+        }
+    }
+
+    function _getFeesForMint(
         uint32 marketIndex,
         uint256 amount, // 1e18
-        bool isMint, // true for mint, false for redeem
-        MarketSide syntheticTokenType // true for long side, false for short side
+        MarketSide syntheticTokenType
     ) internal view returns (uint256) {
-        uint256 _longValue =
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex];
-        uint256 _shortValue =
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex];
+        MarketSide otherSideSynthType = getOtherSynthType(syntheticTokenType);
 
-        // Compute amount that can be spent before higher fees.
-        uint256 feeGap = 0;
-        bool isLongMintOrShortRedeem =
-            isMint == (syntheticTokenType == MarketSide.Long);
-        if (isLongMintOrShortRedeem) {
-            if (_shortValue > _longValue) {
-                feeGap = _shortValue - _longValue;
-            }
-        } else {
-            if (_longValue > _shortValue) {
-                feeGap = _longValue - _shortValue;
-            }
-        }
+        return
+            _getFeesGeneral(
+                marketIndex,
+                amount,
+                syntheticTokenType,
+                otherSideSynthType,
+                baseEntryFee[marketIndex],
+                badLiquidityEntryFee[marketIndex]
+            );
+    }
 
-        if (feeGap >= amount) {
-            // Case 1: fee gap is big enough that user pays no penalty fees
-            return _getFeesForAmounts(marketIndex, amount, 0, isMint);
-        } else {
-            // Case 2: user pays penalty fees on the remained after fee gap
-            return
-                _getFeesForAmounts(
-                    marketIndex,
-                    amount,
-                    amount - feeGap,
-                    isMint
-                );
-        }
+    function _getFeesForRedeem(
+        uint32 marketIndex,
+        uint256 amount, // 1e18
+        MarketSide syntheticTokenType
+    ) internal view returns (uint256) {
+        MarketSide otherSideSynthType = getOtherSynthType(syntheticTokenType);
+
+        return
+            _getFeesGeneral(
+                marketIndex,
+                amount,
+                otherSideSynthType,
+                syntheticTokenType,
+                baseExitFee[marketIndex],
+                badLiquidityExitFee[marketIndex]
+            );
     }
 
     ////////////////////////////////////
@@ -1102,8 +1117,7 @@ contract LongShort is ILongShort, Initializable {
         address transferTo,
         MarketSide syntheticTokenType
     ) internal returns (uint256) {
-        uint256 fees =
-            _getFeesForAction(marketIndex, amount, true, syntheticTokenType);
+        uint256 fees = _getFeesForMint(marketIndex, amount, syntheticTokenType);
         uint256 remaining = amount - fees;
 
         // Distribute fees across the market - (do this before minting tokens so that user doesn't get the fees)
@@ -1159,7 +1173,7 @@ contract LongShort is ILongShort, Initializable {
                 syntheticTokenPrice[syntheticTokenType][marketIndex]) /
                 TEN_TO_THE_18;
         uint256 fees =
-            _getFeesForAction(marketIndex, amount, false, syntheticTokenType);
+            _getFeesForRedeem(marketIndex, amount, syntheticTokenType);
         uint256 remaining = amount - fees;
 
         // Distribute fees across the market.
@@ -1303,17 +1317,10 @@ contract LongShort is ILongShort, Initializable {
             latestUpdateIndex[marketIndex]
         ) {
             // Update is still lazy but not past the next oracle update - display the amount the user would get if they executed immediately
-            uint256 fees =
-                _getFeesForAction(
-                    marketIndex,
-                    currentUserDeposits.nextActionValues[syntheticTokenType]
-                        .mintAmount,
-                    true,
-                    syntheticTokenType
-                );
+            // NOTE: if we ever add fees for minting - we would add them here!
             uint256 remaining =
                 currentUserDeposits.nextActionValues[syntheticTokenType]
-                    .mintAmount - fees;
+                    .mintAmount;
 
             uint256 tokens =
                 (remaining * TEN_TO_THE_18) /
@@ -1660,45 +1667,41 @@ contract LongShort is ILongShort, Initializable {
                 syntheticTokenPrice[MarketSide.Short][marketIndex]) /
                 TEN_TO_THE_18;
 
-        uint256 newLongValueIgnoringFees =
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] -
-                longAmountToRedeem;
-        uint256 newShortValueIgnoringFees =
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] -
-                shortAmountToRedeem;
+        // uint256 newLongValueIgnoringFees =
+        //     syntheticTokenBackedValue[MarketSide.Long][marketIndex] -
+        //         longAmountToRedeem;
+        // uint256 newShortValueIgnoringFees =
+        //     syntheticTokenBackedValue[MarketSide.Short][marketIndex] -
+        //         shortAmountToRedeem;
+
+        uint256 totalFeesLong = 0;
+
+        uint256 totalFeesShort = 0;
 
         // penalty fee is shared equally between
         // all users on the side that ends up causing an imbalance in the
         // batch.
-        uint256 penaltyAmount =
-            (syntheticTokenBackedValue[MarketSide.Long][marketIndex] >=
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex] &&
-                newShortValueIgnoringFees > newLongValueIgnoringFees)
-                ? newShortValueIgnoringFees - newLongValueIgnoringFees
-                : (syntheticTokenBackedValue[MarketSide.Short][marketIndex] >=
-                    syntheticTokenBackedValue[MarketSide.Long][marketIndex] &&
-                    newLongValueIgnoringFees > newShortValueIgnoringFees)
-                ? newLongValueIgnoringFees - newShortValueIgnoringFees
-                : 0;
-
-        bool penaltyAmountForLong =
-            newShortValueIgnoringFees > newLongValueIgnoringFees;
-
-        uint256 totalFeesLong =
-            _getFeesForAmounts(
+        if (longAmountToRedeem > shortAmountToRedeem) {
+            uint256 delta = longAmountToRedeem - shortAmountToRedeem;
+            totalFeesLong = _getFeesGeneral(
                 marketIndex,
-                longAmountToRedeem,
-                penaltyAmountForLong ? penaltyAmount : 0,
-                false
+                delta,
+                MarketSide.Long,
+                MarketSide.Short,
+                0,
+                badLiquidityExitFee[marketIndex]
             );
-
-        uint256 totalFeesShort =
-            _getFeesForAmounts(
+        } else {
+            uint256 delta = shortAmountToRedeem - longAmountToRedeem;
+            totalFeesShort = _getFeesGeneral(
                 marketIndex,
-                shortAmountToRedeem,
-                !penaltyAmountForLong ? penaltyAmount : 0,
-                false
+                delta,
+                MarketSide.Short,
+                MarketSide.Long,
+                0,
+                badLiquidityExitFee[marketIndex]
             );
+        }
 
         batchLong.totalWithdrawn = longAmountToRedeem - totalFeesLong;
         batchShort.totalWithdrawn = shortAmountToRedeem - totalFeesShort;
