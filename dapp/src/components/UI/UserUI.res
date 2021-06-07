@@ -484,11 +484,11 @@ module UserFloatCard = {
       stake.currentStake.syntheticToken.syntheticMarket.id
     })
 
-    let uniqueMarketIndexes = Belt.Set.String.fromArray(synthTokensMarketIndexes)
+    let uniqueMarketIndexes = Set.String.fromArray(synthTokensMarketIndexes)
 
     let uniqueMarketIndexesBigInts =
       uniqueMarketIndexes
-      ->Belt.Set.String.toArray
+      ->Set.String.toArray
       ->Array.map(item => item->Int.fromString->Option.getWithDefault(0)->Ethers.BigNumber.fromInt)
 
     let floatBalances = DataHooks.useFloatBalancesForUser(~userId)
