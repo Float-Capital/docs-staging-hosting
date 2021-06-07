@@ -8,6 +8,10 @@ let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
 
 let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic
 
+type dEAD_ADDRESSReturn = Ethers.ethAddress
+@send
+external dEAD_ADDRESS: t => JsPromise.t<dEAD_ADDRESSReturn> = "DEAD_ADDRESS"
+
 type tEN_TO_THE_18Return = Ethers.BigNumber.t
 @send
 external tEN_TO_THE_18: t => JsPromise.t<tEN_TO_THE_18Return> = "TEN_TO_THE_18"
@@ -171,6 +175,7 @@ external initializeMarket: (
   ~badLiquidityExitFee: Ethers.BigNumber.t,
   ~kInitialMultiplier: Ethers.BigNumber.t,
   ~kPeriod: Ethers.BigNumber.t,
+  ~initialMarketSeed: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "initializeMarket"
 
 type latestMarketReturn = int
@@ -381,6 +386,10 @@ module Exposed = {
   let contractName = "LongShortInternalsExposed"
 
   let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic
+
+  type dEAD_ADDRESSReturn = Ethers.ethAddress
+  @send
+  external dEAD_ADDRESS: t => JsPromise.t<dEAD_ADDRESSReturn> = "DEAD_ADDRESS"
 
   type tEN_TO_THE_18Return = Ethers.BigNumber.t
   @send
@@ -597,6 +606,7 @@ module Exposed = {
     ~badLiquidityExitFee: Ethers.BigNumber.t,
     ~kInitialMultiplier: Ethers.BigNumber.t,
     ~kPeriod: Ethers.BigNumber.t,
+    ~initialMarketSeed: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "initializeMarket"
 
   type latestMarketReturn = int

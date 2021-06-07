@@ -96,7 +96,7 @@ contract("LongShort (staking)", (accounts) => {
     assert.equal(new BN(oneHundred).toString(), u3staked.toString());
   });
 
-  it("<WON'T RE-IMPLEMENT> users don't earn float immediately", async () => {
+  it.skip("<WON'T RE-IMPLEMENT> users don't earn float immediately", async () => {
     await mintThenStake(oneHundred, longToken, user1);
     await staker.withdraw(longToken.address, new BN(oneHundred), {
       from: user1,

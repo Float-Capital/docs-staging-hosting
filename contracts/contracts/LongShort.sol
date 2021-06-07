@@ -26,6 +26,8 @@ contract LongShort is ILongShort, Initializable {
     ////////////////////////////////////
 
     // Global state.
+    address public constant DEAD_ADDRESS =
+        0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
     address public admin; // This will likely be the Gnosis safe
     uint32 public latestMarket;
     mapping(uint32 => bool) public marketExists;
@@ -384,6 +386,48 @@ contract LongShort is ILongShort, Initializable {
         );
     }
 
+    function seedMarketInitially(uint256 initialMarketSeed, uint32 marketIndex)
+        internal
+    {
+        require(
+            // You require at least 10^17 of the underlying payment token to seed the market.
+            initialMarketSeed > 0.1 ether,
+            "Insufficient value to seed the market"
+        );
+
+        _lockFundsInMarket(marketIndex, initialMarketSeed * 2);
+
+        syntheticTokens[MarketSide.Long][marketIndex].mint(
+            DEAD_ADDRESS,
+            initialMarketSeed
+        );
+        syntheticTokens[MarketSide.Short][marketIndex].mint(
+            DEAD_ADDRESS,
+            initialMarketSeed
+        );
+        syntheticTokenBackedValue[MarketSide.Long][
+            marketIndex
+        ] = initialMarketSeed;
+        syntheticTokenBackedValue[MarketSide.Short][
+            marketIndex
+        ] = initialMarketSeed;
+
+        emit ShortMinted(
+            marketIndex,
+            initialMarketSeed,
+            initialMarketSeed,
+            initialMarketSeed,
+            DEAD_ADDRESS
+        );
+        emit LongMinted(
+            marketIndex,
+            initialMarketSeed,
+            initialMarketSeed,
+            initialMarketSeed,
+            DEAD_ADDRESS
+        );
+    }
+
     function initializeMarket(
         uint32 marketIndex,
         uint256 _baseEntryFee,
@@ -391,9 +435,11 @@ contract LongShort is ILongShort, Initializable {
         uint256 _baseExitFee,
         uint256 _badLiquidityExitFee,
         uint256 kInitialMultiplier,
-        uint256 kPeriod
+        uint256 kPeriod,
+        uint256 initialMarketSeed
     ) external adminOnly {
         require(!marketExists[marketIndex] && marketIndex <= latestMarket);
+
         marketExists[marketIndex] = true;
 
         _changeFees(
@@ -412,6 +458,8 @@ contract LongShort is ILongShort, Initializable {
             kInitialMultiplier,
             kPeriod
         );
+
+        seedMarketInitially(initialMarketSeed, marketIndex);
     }
 
     ////////////////////////////////////
@@ -473,10 +521,7 @@ contract LongShort is ILongShort, Initializable {
         view
         returns (uint256 marketAmount, uint256 treasuryAmount)
     {
-        // Edge case: all goes to market when market is empty.
-        if (totalValueLockedInMarket[marketIndex] == 0) {
-            return (amount, 0);
-        }
+        assert(totalValueLockedInMarket[marketIndex] != 0);
 
         uint256 marketPcnt; // fixed-precision scale of 10000
         if (
@@ -513,15 +558,7 @@ contract LongShort is ILongShort, Initializable {
         view
         returns (uint256 longAmount, uint256 shortAmount)
     {
-        // Edge case: equal split when market is empty.
-        if (
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] == 0 &&
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] == 0
-        ) {
-            longAmount = amount / 2;
-            shortAmount = amount - longAmount;
-            return (longAmount, shortAmount);
-        }
+        assert(totalValueLockedInMarket[marketIndex] != 0);
 
         // The percentage value that a position receives depends on the amount
         // of total market value taken up by the _opposite_ position.
@@ -778,15 +815,10 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokenBackedValue[MarketSide.Short][marketIndex]
         );
 
-        // turn this into an assert (markets will be seeded)
-        if (
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] == 0 &&
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] == 0
-        ) {
-            return;
-        }
-        // TODO - should never happen - seed markets
-        // assert(syntheticTokenBackedValue[MarketSide.Long][marketIndex] != 0 && syntheticTokenBackedValue[MarketSide.Short][marketIndex] != 0);
+        assert(
+            syntheticTokenBackedValue[MarketSide.Long][marketIndex] != 0 &&
+                syntheticTokenBackedValue[MarketSide.Short][marketIndex] != 0
+        );
 
         // If a negative int is return this should fail.
         uint256 newPrice = uint256(getLatestPrice(marketIndex));
@@ -914,6 +946,7 @@ contract LongShort is ILongShort, Initializable {
         yieldManagers[marketIndex].depositToken(amount);
 
         // Update market state.
+
         totalValueLockedInYieldManager[marketIndex] += amount;
 
         // Invariant: yield managers should never have more locked funds
@@ -994,12 +1027,6 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokenBackedValue[MarketSide.Long][marketIndex];
         uint256 _shortValue =
             syntheticTokenBackedValue[MarketSide.Short][marketIndex];
-
-        // Edge-case: no penalties for minting in a 1-sided market.
-        // TODO: Is this what we want for new markets?
-        if (isMint && (_longValue == 0 || _shortValue == 0)) {
-            return _getFeesForAmounts(marketIndex, amount, 0, isMint);
-        }
 
         // Compute amount that can be spent before higher fees.
         uint256 feeGap = 0;
@@ -1123,7 +1150,7 @@ contract LongShort is ILongShort, Initializable {
             _getFeesForAction(marketIndex, amount, true, syntheticTokenType);
         uint256 remaining = amount - fees;
 
-        // Distribute fees across the market.
+        // Distribute fees across the market - (do this before minting tokens so that user doesn't get the fees)
         _feesMechanism(marketIndex, fees);
         _refreshTokensPrice(marketIndex);
 

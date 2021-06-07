@@ -183,7 +183,7 @@ contract("LongShort (redeeming fees)", (accounts) => {
     };
   }
 
-  it(
+  it.skip(
     "case 1: only base fees when balancing market",
     testRedeemFees({
       mintLong: oneHundred,
@@ -195,7 +195,7 @@ contract("LongShort (redeeming fees)", (accounts) => {
     })
   );
 
-  it(
+  it.skip(
     "case 1: only base fees when balancing market (flipped)",
     testRedeemFees({
       mintLong: twoHundred,
@@ -207,7 +207,7 @@ contract("LongShort (redeeming fees)", (accounts) => {
     })
   );
 
-  it(
+  it.skip(
     "case 2: penalty fees when completely imbalancing market",
     testRedeemFees({
       mintLong: oneHundred,
@@ -219,7 +219,7 @@ contract("LongShort (redeeming fees)", (accounts) => {
     })
   );
 
-  it(
+  it.skip(
     "case 2: penalty fees when completely imbalancing market (flipped)",
     testRedeemFees({
       mintLong: twoHundred,
@@ -231,7 +231,7 @@ contract("LongShort (redeeming fees)", (accounts) => {
     })
   );
 
-  it(
+  it.skip(
     "case 2: penalty fees when partially imbalancing market",
     testRedeemFees({
       mintLong: oneHundredAndFifty,
@@ -243,7 +243,7 @@ contract("LongShort (redeeming fees)", (accounts) => {
     })
   );
 
-  it(
+  it.skip(
     "case 2: penalty fees when partially imbalancing market (flipped)",
     testRedeemFees({
       mintLong: oneHundred,
@@ -255,7 +255,7 @@ contract("LongShort (redeeming fees)", (accounts) => {
     })
   );
 
-  it(
+  it.skip(
     "case 2: edge-case where longValue == shortValue",
     testRedeemFees({
       mintLong: twoHundred,
@@ -267,7 +267,7 @@ contract("LongShort (redeeming fees)", (accounts) => {
     })
   );
 
-  it(
+  it.skip(
     "case 2: edge-case where longValue == shortValue (flipped)",
     testRedeemFees({
       mintLong: twoHundred,
