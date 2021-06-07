@@ -26,8 +26,6 @@ contract LongShort is ILongShort, Initializable {
     ////////////////////////////////////
 
     // Global state.
-    address public constant DEAD_ADDRESS =
-        0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
     address public admin; // This will likely be the Gnosis safe
     uint32 public latestMarket;
     mapping(uint32 => bool) public marketExists;
@@ -43,6 +41,8 @@ contract LongShort is ILongShort, Initializable {
     uint256[45] private __globalStateGap;
 
     // Fixed-precision constants.
+    address public constant DEAD_ADDRESS =
+        0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
     uint256 public constant TEN_TO_THE_18 = 1e18;
     uint256 public constant feeUnitsOfPrecision = 10000;
     uint256[45] private __constantsGap;
@@ -372,7 +372,9 @@ contract LongShort is ILongShort, Initializable {
         fundTokens[latestMarket] = IERC20(_fundToken);
         yieldManagers[latestMarket] = IYieldManager(_yieldManager);
         oracleManagers[latestMarket] = IOracleManager(_oracleManager);
-        assetPrice[latestMarket] = uint256(getLatestPrice(latestMarket));
+        assetPrice[latestMarket] = uint256(
+            oracleManagers[latestMarket].updatePrice()
+        );
 
         emit SyntheticTokenCreated(
             latestMarket,
@@ -465,50 +467,6 @@ contract LongShort is ILongShort, Initializable {
     ////////////////////////////////////
     //////// HELPER FUNCTIONS //////////
     ////////////////////////////////////
-
-    /**
-     * Returns the latest price
-     */
-    function getLatestPrice(uint32 marketIndex) internal returns (int256) {
-        return oracleManagers[marketIndex].updatePrice();
-    }
-
-    /**
-     * Returns % of long position that is filled
-     */
-    function getLongBeta(uint32 marketIndex) public view returns (uint256) {
-        // TODO account for contract start when these are both zero
-        // and an erronous beta of 1 reported.
-        if (
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] >=
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex]
-        ) {
-            return TEN_TO_THE_18;
-        } else {
-            return
-                (syntheticTokenBackedValue[MarketSide.Short][marketIndex] *
-                    TEN_TO_THE_18) /
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex];
-        }
-    }
-
-    /**
-     * Returns % of short position that is filled
-     * zero div error if both are zero
-     */
-    function getShortBeta(uint32 marketIndex) public view returns (uint256) {
-        if (
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] >=
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex]
-        ) {
-            return TEN_TO_THE_18;
-        } else {
-            return
-                (syntheticTokenBackedValue[MarketSide.Long][marketIndex] *
-                    TEN_TO_THE_18) /
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex];
-        }
-    }
 
     /**
      * Returns the amount of accrued value that should go to the market,
@@ -833,7 +791,7 @@ contract LongShort is ILongShort, Initializable {
         );
 
         // If a negative int is return this should fail.
-        uint256 newPrice = uint256(getLatestPrice(marketIndex));
+        uint256 newPrice = uint256(oracleManagers[marketIndex].updatePrice());
         emit PriceUpdate(
             marketIndex,
             assetPrice[marketIndex],

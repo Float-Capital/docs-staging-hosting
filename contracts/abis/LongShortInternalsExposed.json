@@ -1071,25 +1071,6 @@
         "internalType": "uint32",
         "name": "marketIndex",
         "type": "uint32"
-      }
-    ],
-    "name": "getLongBeta",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
       },
       {
         "internalType": "uint256",
@@ -1107,25 +1088,6 @@
       {
         "internalType": "uint256",
         "name": "shortAmount",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "getShortBeta",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
         "type": "uint256"
       }
     ],
