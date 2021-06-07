@@ -5,15 +5,13 @@ var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Button = require("../UI/Base/Button.js");
 var Config = require("../../config/Config.js");
-var Ethers = require("ethers");
 var Contracts = require("../../ethereum/Contracts.js");
-var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var ToastProvider = require("../UI/ToastProvider.js");
 var ContractActions = require("../../ethereum/ContractActions.js");
 var ClaimTxStatusModal = require("./ClaimTxStatusModal.js");
 
 function ClaimFloat(Props) {
-  var tokenAddresses = Props.tokenAddresses;
+  var marketIndexes = Props.marketIndexes;
   var signer = ContractActions.useSignerExn(undefined);
   var match = ContractActions.useContractFunction(signer);
   var txState = match[1];
@@ -71,13 +69,10 @@ function ClaimFloat(Props) {
         }), [txState]);
   return React.createElement(React.Fragment, undefined, React.createElement(Button.Tiny.make, {
                   onClick: (function (param) {
-                      var arg = Belt_Array.map(tokenAddresses, (function (prim) {
-                              return Ethers.utils.getAddress(prim);
-                            }));
                       return Curry._2(contractExecutionHandler, (function (param) {
                                     return Contracts.Staker.make(Config.staker, param);
                                   }), (function (param) {
-                                    return param.claimFloatImmediately(arg);
+                                    return param.claimFloatCustom(marketIndexes);
                                   }));
                     }),
                   children: "Claim Float"

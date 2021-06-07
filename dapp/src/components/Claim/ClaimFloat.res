@@ -1,5 +1,5 @@
 @react.component
-let make = (~tokenAddresses) => {
+let make = (~marketIndexes) => {
   let signer = ContractActions.useSignerExn()
 
   let (contractExecutionHandler, txState, _setTxState) = ContractActions.useContractFunction(
@@ -38,9 +38,7 @@ let make = (~tokenAddresses) => {
   let claimFloatCall = _ =>
     contractExecutionHandler(
       ~makeContractInstance=Contracts.Staker.make(~address=Config.staker),
-      ~contractFunction=Contracts.Staker.claimFloatImmediately(
-        ~tokenAddresses=tokenAddresses->Array.map(Ethers.Utils.getAddressUnsafe),
-      ),
+      ~contractFunction=Contracts.Staker.claimFloatCustom(~marketIndexes),
     )
 
   <>
