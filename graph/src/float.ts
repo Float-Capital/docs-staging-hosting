@@ -228,7 +228,7 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.save();
   // This function uses the synthetic market internally, so can only be created once the synthetic market has been created.
   let initalLatestStakerState = getOrCreateStakerState(
-    marketIndexString,
+    syntheticMarket,
     ZERO,
     event
   );

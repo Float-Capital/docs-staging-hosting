@@ -151,21 +151,14 @@ export function getStakerStateId(
 }
 
 export function getOrCreateStakerState(
-  marketIndexId: string,
+  syntheticMarket: SyntheticMarket,
   stateIndex: BigInt,
   event: ethereum.Event
 ): StakeState {
+  let marketIndexId = syntheticMarket.id;
   let stateId = getStakerStateId(marketIndexId, stateIndex);
   let state = StakeState.load(stateId);
   if (state == null) {
-    let syntheticMarket = SyntheticMarket.load(marketIndexId);
-    if (syntheticMarket == null) {
-      log.critical(
-        "`getOrCreateStakerState` called without SyntheticMarket with id #{} being created.",
-        [marketIndexId]
-      );
-    }
-
     state = new StakeState(stateId);
     state.blockNumber = event.block.number;
     state.creationTxHash = event.transaction.hash;
@@ -178,6 +171,9 @@ export function getOrCreateStakerState(
     state.floatRatePerTokenOverIntervalShort = ZERO;
     state.floatRatePerTokenOverIntervalLong = ZERO;
     state.timeSinceLastUpdate = ZERO;
+    // update latest staker state for market
+    syntheticMarket.latestStakerState = state.id;
+    syntheticMarket.save();
   }
 
   return state as StakeState;

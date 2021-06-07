@@ -256,7 +256,7 @@ module UserPercentageGains = {
             {`${symbol}${percentStr}%`->React.string}
           </div>
         }
-      | Loading => <Loader.Mini />
+      | Loading => <Loader.Tiny />
       | _ => ``->React.string
       }}
     </div>
@@ -318,9 +318,9 @@ module UserFloatEarnedFromStake = {
         <div className="text-gray-500"> {`Float Accruing`->React.string} </div>
         {`~${totalClaimable
           ->Ethers.BigNumber.add(totalPredicted)
-          ->Misc.NumberFormat.formatEther(~digits=6)}`->React.string}
+          ->Misc.NumberFormat.formatEther(~digits=5)}`->React.string}
       </div>
-    | _ => <Loader.Mini />
+    | _ => <Loader.Tiny />
     }
   }
 }
@@ -480,6 +480,16 @@ module UserFloatCard = {
     let synthTokens = stakes->Array.map((stake: Queries.CurrentStakeDetailed.t) => {
       stake.currentStake.syntheticToken.id
     })
+    let synthTokensMarketIndexes = stakes->Array.map((stake: Queries.CurrentStakeDetailed.t) => {
+      stake.currentStake.syntheticToken.syntheticMarket.id
+    })
+
+    let uniqueMarketIndexes = Set.String.fromArray(synthTokensMarketIndexes)
+
+    let uniqueMarketIndexesBigInts =
+      uniqueMarketIndexes
+      ->Set.String.toArray
+      ->Array.map(item => item->Int.fromString->Option.getWithDefault(0)->Ethers.BigNumber.fromInt)
 
     let floatBalances = DataHooks.useFloatBalancesForUser(~userId)
     let claimableFloat = DataHooks.useTotalClaimableFloatForUser(~userId, ~synthTokens)
@@ -522,7 +532,7 @@ module UserFloatCard = {
             {isCurrentUser
               ? <div className=`flex justify-around flex-row my-1`>
                   {`🌊`->React.string}
-                  <ClaimFloat tokenAddresses=synthTokens />
+                  <ClaimFloat marketIndexes=uniqueMarketIndexesBigInts />
                   {`🌊`->React.string}
                 </div>
               : React.null}
