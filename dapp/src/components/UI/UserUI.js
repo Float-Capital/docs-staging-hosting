@@ -317,7 +317,7 @@ function UserUI$UserPercentageGains(Props) {
   var bothPrices = DataHooks.useSyntheticPrices(metadata, tokenAddress, isLong);
   var tmp;
   if (typeof bothPrices === "number") {
-    tmp = React.createElement(Loader.Mini.make, {});
+    tmp = React.createElement(Loader.Tiny.make, {});
   } else if (bothPrices.TAG === /* GraphError */0) {
     tmp = "";
   } else {
@@ -415,17 +415,17 @@ function UserUI$UserFloatEarnedFromStake(Props) {
   var tokenAddress = Props.tokenAddress;
   var claimableFloat = DataHooks.useTotalClaimableFloatForUser(userId, [Ethers.Utils.ethAdrToLowerStr(tokenAddress)]);
   if (typeof claimableFloat === "number") {
-    return React.createElement(Loader.Mini.make, {});
+    return React.createElement(Loader.Tiny.make, {});
   }
   if (claimableFloat.TAG === /* GraphError */0) {
-    return React.createElement(Loader.Mini.make, {});
+    return React.createElement(Loader.Tiny.make, {});
   }
   var match = claimableFloat._0;
   return React.createElement("div", {
               className: "text-xs flex flex-col items-center justify-center"
             }, React.createElement("div", {
                   className: "text-gray-500"
-                }, "Float Accruing"), "~" + Misc.NumberFormat.formatEther(6, match[0].add(match[1])));
+                }, "Float Accruing"), "~" + Misc.NumberFormat.formatEther(5, match[0].add(match[1])));
 }
 
 var UserFloatEarnedFromStake = {

@@ -256,7 +256,7 @@ module UserPercentageGains = {
             {`${symbol}${percentStr}%`->React.string}
           </div>
         }
-      | Loading => <Loader.Mini />
+      | Loading => <Loader.Tiny />
       | _ => ``->React.string
       }}
     </div>
@@ -318,9 +318,9 @@ module UserFloatEarnedFromStake = {
         <div className="text-gray-500"> {`Float Accruing`->React.string} </div>
         {`~${totalClaimable
           ->Ethers.BigNumber.add(totalPredicted)
-          ->Misc.NumberFormat.formatEther(~digits=6)}`->React.string}
+          ->Misc.NumberFormat.formatEther(~digits=5)}`->React.string}
       </div>
-    | _ => <Loader.Mini />
+    | _ => <Loader.Tiny />
     }
   }
 }

@@ -22,11 +22,11 @@ module WalletConnectConnector = {
   @module("@web3-react/walletconnect-connector") @new
   external make: connectorOptions => injectedType = "WalletConnectConnector"
 }
-module TorusConnector = {
-  type initializationOptions = {showTorusButton: bool}
-  type connectorOptions = {chainId: int, initOptions: initializationOptions}
-  @module("@web3-react/torus-connector") @new
-  external make: connectorOptions => injectedType = "TorusConnector"
-}
+// module TorusConnector = {
+//   type initializationOptions = {showTorusButton: bool}
+//   type connectorOptions = {chainId: int, initOptions: initializationOptions}
+//   @module("@web3-react/torus-connector") @new
+//   external make: connectorOptions => injectedType = "TorusConnector"
+// }
 
 let injected = InjectedConnector.make({supportedChainIds: [Config.networkId]})
