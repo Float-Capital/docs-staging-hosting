@@ -1150,7 +1150,7 @@ contract LongShort is ILongShort, Initializable {
             _getFeesForAction(marketIndex, amount, true, syntheticTokenType);
         uint256 remaining = amount - fees;
 
-        // Distribute fees across the market.
+        // Distribute fees across the market - (do this before minting tokens so that user doesn't get the fees)
         _feesMechanism(marketIndex, fees);
         _refreshTokensPrice(marketIndex);
 
