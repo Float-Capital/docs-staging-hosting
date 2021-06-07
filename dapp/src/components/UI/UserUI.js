@@ -12,6 +12,7 @@ var Ethers$1 = require("ethers");
 var Globals = require("../../libraries/Globals.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Tooltip = require("./Base/Tooltip.js");
+var Belt_Int = require("rescript/lib/js/belt_Int.js");
 var Blockies = require("../../bindings/ethereum-blockies-base64/Blockies.js");
 var Metamask = require("./Base/Metamask.js");
 var CONSTANTS = require("../../CONSTANTS.js");
@@ -23,6 +24,7 @@ var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
+var Belt_SetString = require("rescript/lib/js/belt_SetString.js");
 var InjectedEthereum = require("../../ethereum/InjectedEthereum.js");
 
 function UserUI$UserContainer(Props) {
@@ -606,6 +608,13 @@ function UserUI$UserFloatCard(Props) {
   var synthTokens = Belt_Array.map(stakes, (function (stake) {
           return stake.currentStake.syntheticToken.id;
         }));
+  var synthTokensMarketIndexes = Belt_Array.map(stakes, (function (stake) {
+          return stake.currentStake.syntheticToken.syntheticMarket.id;
+        }));
+  var uniqueMarketIndexes = Belt_SetString.fromArray(synthTokensMarketIndexes);
+  var uniqueMarketIndexesBigInts = Belt_Array.map(Belt_SetString.toArray(uniqueMarketIndexes), (function (item) {
+          return Ethers$1.BigNumber.from(Belt_Option.getWithDefault(Belt_Int.fromString(item), 0));
+        }));
   var floatBalances = DataHooks.useFloatBalancesForUser(userId);
   var claimableFloat = DataHooks.useTotalClaimableFloatForUser(userId, synthTokens);
   var optLoggedInUser = RootProvider.useCurrentUser(undefined);
@@ -647,7 +656,7 @@ function UserUI$UserFloatCard(Props) {
                 })), isCurrentUser ? React.createElement("div", {
                 className: "flex justify-around flex-row my-1"
               }, "🌊", React.createElement(ClaimFloat.make, {
-                    tokenAddresses: synthTokens
+                    marketIndexes: uniqueMarketIndexesBigInts
                   }), "🌊") : null);
   }
   return React.createElement(UserUI$UserColumnCard, {
