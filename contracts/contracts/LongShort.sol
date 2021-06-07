@@ -789,7 +789,7 @@ contract LongShort is ILongShort, Initializable {
                 // reset all values
                 currentMarketBatchedLazyDeposit.mintAmount = 0;
                 currentMarketBatchedLazyDeposit.mintAndStakeAmount = 0;
-                currentMarketBatchedLazyDeposit.mintEarlyClaimed 0; // necessary to also reset this surely?
+                currentMarketBatchedLazyDeposit.mintEarlyClaimed = 0;
             }
             // TODO: add events
         }
@@ -1386,6 +1386,35 @@ contract LongShort is ILongShort, Initializable {
         }
     }
 
+    function _executeLazyMintsIfTheyExist(
+        uint32 marketIndex,
+        address user,
+        MarketSide syntheticTokenType,
+        UserLazyDeposit storage currentUserDeposits
+    ) internal {
+        if (
+            currentUserDeposits.nextActionValues[syntheticTokenType]
+                .mintAmount != 0
+        ) {
+            uint256 tokensToMint =
+                (((currentUserDeposits.nextActionValues[syntheticTokenType]
+                    .mintAmount -
+                    currentUserDeposits.nextActionValues[syntheticTokenType]
+                        .mintEarlyClaimed) * TEN_TO_THE_18) /
+                    marketStateSnapshot[marketIndex][
+                        latestUpdateIndex[marketIndex]
+                    ][syntheticTokenType]);
+
+            syntheticTokens[syntheticTokenType][marketIndex].transfer(
+                user,
+                tokensToMint
+            );
+
+            currentUserDeposits.nextActionValues[syntheticTokenType]
+                .mintAmount = 0;
+        }
+    }
+
     // TODO: modify this function (or make a different version) that takes in the desired useage and does either partial or full "early use"
     // TODO: WARNING!! This function is re-entrancy vulnerable if the synthetic token has any execution hooks
     function _executeOutstandingLazySettlementsAction(
@@ -1395,50 +1424,19 @@ contract LongShort is ILongShort, Initializable {
         UserLazyDeposit storage currentUserDeposits =
             userLazyActions[marketIndex][user];
 
-        if (
-            currentUserDeposits.nextActionValues[MarketSide.Long].mintAmount !=
-            0
-        ) {
-            uint256 tokensToMint =
-                (((currentUserDeposits.nextActionValues[MarketSide.Long]
-                    .mintAmount -
-                    currentUserDeposits.nextActionValues[MarketSide.Long]
-                        .mintEarlyClaimed) * TEN_TO_THE_18) /
-                    marketStateSnapshot[marketIndex][
-                        latestUpdateIndex[marketIndex]
-                    ][MarketSide.Long]);
-            uint256 balance =
-                syntheticTokens[MarketSide.Long][marketIndex].balanceOf(
-                    address(this)
-                );
-            // syntheticTokens[MarketSide.Long][marketIndex].approve(, tokensToMint);
-            syntheticTokens[MarketSide.Long][marketIndex].transfer(
-                user,
-                tokensToMint
-            );
+        _executeLazyMintsIfTheyExist(
+            marketIndex,
+            user,
+            MarketSide.Long,
+            currentUserDeposits
+        );
+        _executeLazyMintsIfTheyExist(
+            marketIndex,
+            user,
+            MarketSide.Short,
+            currentUserDeposits
+        );
 
-            currentUserDeposits.nextActionValues[MarketSide.Long]
-                .mintAmount = 0;
-        }
-        if (
-            currentUserDeposits.nextActionValues[MarketSide.Short].mintAmount !=
-            0
-        ) {
-            uint256 tokensToMint =
-                (((currentUserDeposits.nextActionValues[MarketSide.Short]
-                    .mintAmount -
-                    currentUserDeposits.nextActionValues[MarketSide.Short]
-                        .mintEarlyClaimed) * TEN_TO_THE_18) /
-                    marketStateSnapshot[marketIndex][
-                        latestUpdateIndex[marketIndex]
-                    ][MarketSide.Short]);
-            syntheticTokens[MarketSide.Short][marketIndex].transfer(
-                user,
-                tokensToMint
-            );
-            currentUserDeposits.nextActionValues[MarketSide.Short]
-                .mintAmount = 0;
-        }
         if (
             currentUserDeposits.nextActionValues[MarketSide.Long]
                 .mintAndStakeAmount !=
@@ -1515,29 +1513,16 @@ contract LongShort is ILongShort, Initializable {
                 latestUpdateIndex[marketIndex]
         );
 
-        if (syntheticTokenType == ILongShort.MarketSide.Long) {
-            amountPaymentTokenLazyAvailableImmediately =
-                ((currentUserDeposits.nextActionValues[MarketSide.Long]
-                    .mintAmount * percentageAvailableForEarlyExitNumerator) /
-                    percentageAvailableForEarlyExitDenominator) -
-                currentUserDeposits.nextActionValues[MarketSide.Long]
-                    .mintEarlyClaimed;
+        amountPaymentTokenLazyAvailableImmediately =
+            ((currentUserDeposits.nextActionValues[syntheticTokenType]
+                .mintAmount * percentageAvailableForEarlyExitNumerator) /
+                percentageAvailableForEarlyExitDenominator) -
+            currentUserDeposits.nextActionValues[syntheticTokenType]
+                .mintEarlyClaimed;
 
-            amountSynthTokenLazyAvailableImmediately =
-                (amountPaymentTokenLazyAvailableImmediately * TEN_TO_THE_18) /
-                syntheticTokenPrice[MarketSide.Long][marketIndex];
-        } else {
-            amountPaymentTokenLazyAvailableImmediately =
-                ((currentUserDeposits.nextActionValues[MarketSide.Short]
-                    .mintAmount * percentageAvailableForEarlyExitNumerator) /
-                    percentageAvailableForEarlyExitDenominator) -
-                currentUserDeposits.nextActionValues[MarketSide.Short]
-                    .mintEarlyClaimed;
-
-            amountSynthTokenLazyAvailableImmediately =
-                (amountPaymentTokenLazyAvailableImmediately * TEN_TO_THE_18) /
-                syntheticTokenPrice[MarketSide.Short][marketIndex];
-        }
+        amountSynthTokenLazyAvailableImmediately =
+            (amountPaymentTokenLazyAvailableImmediately * TEN_TO_THE_18) /
+            syntheticTokenPrice[syntheticTokenType][marketIndex];
     }
 
     function _executeOutstandingLazySettlementsPartialOrCurrentIfNeeded(
