@@ -35,7 +35,8 @@ describe("Float System", () => {
       ()
     });
 
-    LazyDeposit.testIntegration(~contracts, ~accounts);
+    // LazyDeposit.testIntegration(~contracts, ~accounts);
+    LazyRedeem.testIntegration(~contracts, ~accounts);
 
     describe("LongShort - internals exposed", () => {
       let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);

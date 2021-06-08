@@ -1,4 +1,5 @@
 open LetOps;
+open Contract;
 
 let mintAndStake =
     (
@@ -22,25 +23,6 @@ let mintAndStake =
     contract->LongShort.mintShortAndStake(~marketIndex, ~amount);
   };
 };
-
-type marketBalance = {
-  longValue: Ethers.BigNumber.t,
-  shortValue: Ethers.BigNumber.t,
-};
-let getMarketBalance = (longShort, ~marketIndex) => {
-  let%AwaitThen longValue =
-    longShort->LongShort.syntheticTokenBackedValue(
-      CONSTANTS.longTokenType,
-      marketIndex,
-    );
-  let%Await shortValue =
-    longShort->LongShort.syntheticTokenBackedValue(
-      CONSTANTS.shortTokenType,
-      marketIndex,
-    );
-  {longValue, shortValue};
-};
-
 type randomStakeInfo = {
   marketIndex: int,
   synth: SyntheticToken.t,
@@ -72,7 +54,7 @@ let stakeRandomlyInMarkets =
           longValue: valueLongBefore,
           shortValue: valueShortBefore,
         } =
-          longShort->getMarketBalance(~marketIndex);
+          longShort->LongShortHelpers.getMarketBalance(~marketIndex);
 
         let%Await newSynthsUserHasStakedIn =
           switch (Helpers.randomMintLongShort()) {
@@ -135,7 +117,7 @@ let stakeRandomlyInMarkets =
               longValue: valueLongBefore,
               shortValue: valueShortBefore,
             } =
-              longShort->getMarketBalance(~marketIndex);
+              longShort->LongShortHelpers.getMarketBalance(~marketIndex);
             let%AwaitThen _ = mintStake(~isLong=false, ~amount=shortAmount);
             let%Await shortTokenPrice =
               longShort->LongShort.syntheticTokenPrice(

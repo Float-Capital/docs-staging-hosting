@@ -1546,8 +1546,9 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => mapping(uint256 => mapping(MarketSide => BatchedLazyRedeem)))
         public batchedLazyRedeems;
 
+    // TODO: make this internal and integrate with the execute deposits code
     function _executeOutstandingLazyRedeems(address user, uint32 marketIndex)
-        internal
+        public
     {
         UserLazyRedeem storage currentUserRedeems =
             userLazyRedeems[marketIndex][msg.sender];
@@ -1634,7 +1635,7 @@ contract LongShort is ILongShort, Initializable {
             .redemptions += tokensToRedeem;
     }
 
-    function handleBatchedLazyRedeems(uint32 marketIndex) public {
+    function handleBatchedLazyRedeems(uint32 marketIndex) internal {
         BatchedLazyRedeem storage batchLong =
             batchedLazyRedeems[marketIndex][latestUpdateIndex[marketIndex]][
                 MarketSide.Long

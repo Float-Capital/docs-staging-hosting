@@ -17,6 +17,13 @@ type tEN_TO_THE_18Return = Ethers.BigNumber.t
 external tEN_TO_THE_18: t => JsPromise.t<tEN_TO_THE_18Return> = "TEN_TO_THE_18"
 
 @send
+external _executeOutstandingLazyRedeems: (
+  t,
+  ~user: Ethers.ethAddress,
+  ~marketIndex: int,
+) => JsPromise.t<transaction> = "_executeOutstandingLazyRedeems"
+
+@send
 external _updateSystemState: (t, ~marketIndex: int) => JsPromise.t<transaction> =
   "_updateSystemState"
 
@@ -133,10 +140,6 @@ external getUsersPendingBalance: (
   ~marketIndex: int,
   ~syntheticTokenType: int,
 ) => JsPromise.t<getUsersPendingBalanceReturn> = "getUsersPendingBalance"
-
-@send
-external handleBatchedLazyRedeems: (t, ~marketIndex: int) => JsPromise.t<transaction> =
-  "handleBatchedLazyRedeems"
 
 @send
 external initialize: (
@@ -378,6 +381,13 @@ module Exposed = {
   external tEN_TO_THE_18: t => JsPromise.t<tEN_TO_THE_18Return> = "TEN_TO_THE_18"
 
   @send
+  external _executeOutstandingLazyRedeems: (
+    t,
+    ~user: Ethers.ethAddress,
+    ~marketIndex: int,
+  ) => JsPromise.t<transaction> = "_executeOutstandingLazyRedeems"
+
+  @send
   external _executeOutstandingLazySettlementsExposed: (
     t,
     ~user: Ethers.ethAddress,
@@ -526,10 +536,6 @@ module Exposed = {
     ~marketIndex: int,
     ~syntheticTokenType: int,
   ) => JsPromise.t<getUsersPendingBalanceReturn> = "getUsersPendingBalance"
-
-  @send
-  external handleBatchedLazyRedeems: (t, ~marketIndex: int) => JsPromise.t<transaction> =
-    "handleBatchedLazyRedeems"
 
   @send
   external initialize: (

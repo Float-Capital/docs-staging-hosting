@@ -18,17 +18,6 @@ function mintAndStake(marketIndex, amount, token, user, longShort, isLong) {
               }));
 }
 
-function getMarketBalance(longShort, marketIndex) {
-  return LetOps.AwaitThen.let_(longShort.syntheticTokenBackedValue(CONSTANTS.longTokenType, marketIndex), (function (longValue) {
-                return LetOps.Await.let_(longShort.syntheticTokenBackedValue(CONSTANTS.shortTokenType, marketIndex), (function (shortValue) {
-                              return {
-                                      longValue: longValue,
-                                      shortValue: shortValue
-                                    };
-                            }));
-              }));
-}
-
 function stakeRandomlyInMarkets(marketsToStakeIn, userToStakeWith, longShort) {
   return Belt_Array.reduce([marketsToStakeIn[0]], Promise.resolve([
                   [],
@@ -46,7 +35,7 @@ function stakeRandomlyInMarkets(marketsToStakeIn, userToStakeWith, longShort) {
                                   return mintAndStake(marketIndex, param, paymentToken, userToStakeWith, longShort, param$1);
                                 };
                               };
-                              return LetOps.AwaitThen.let_(getMarketBalance(longShort, marketIndex), (function (param) {
+                              return LetOps.AwaitThen.let_(Contract.LongShortHelpers.getMarketBalance(longShort, marketIndex), (function (param) {
                                             var valueShortBefore = param.shortValue;
                                             var valueLongBefore = param.longValue;
                                             var amount = Helpers.randomMintLongShort(undefined);
@@ -95,7 +84,7 @@ function stakeRandomlyInMarkets(marketsToStakeIn, userToStakeWith, longShort) {
                                                                                 valueInEntrySide: valueLongBefore,
                                                                                 valueInOtherSide: valueShortBefore
                                                                               }]);
-                                                                        return LetOps.AwaitThen.let_(getMarketBalance(longShort, marketIndex), (function (param) {
+                                                                        return LetOps.AwaitThen.let_(Contract.LongShortHelpers.getMarketBalance(longShort, marketIndex), (function (param) {
                                                                                       var valueShortBefore = param.shortValue;
                                                                                       var valueLongBefore = param.longValue;
                                                                                       return LetOps.AwaitThen.let_(mintStake(shortAmount)(false), (function (param) {
@@ -147,7 +136,6 @@ function stakeRandomlyInBothSidesOfMarket(marketsToStakeIn, userToStakeWith, lon
 }
 
 exports.mintAndStake = mintAndStake;
-exports.getMarketBalance = getMarketBalance;
 exports.stakeRandomlyInMarkets = stakeRandomlyInMarkets;
 exports.stakeRandomlyInBothSidesOfMarket = stakeRandomlyInBothSidesOfMarket;
 /* Helpers Not a pure module */

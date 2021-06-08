@@ -47,7 +47,7 @@ describe("Float System", () => {
                 },
               ) => {
               let%AwaitThen amountOfFees =
-                longShort->Contract.LongShortHelpers.getFees(
+                longShort->Contract.LongShortHelpers.getFeesMint(
                   ~marketIndex,
                   ~amount,
                   ~valueInOtherSide,
