@@ -1667,13 +1667,6 @@ contract LongShort is ILongShort, Initializable {
                 syntheticTokenPrice[MarketSide.Short][marketIndex]) /
                 TEN_TO_THE_18;
 
-        // uint256 newLongValueIgnoringFees =
-        //     syntheticTokenBackedValue[MarketSide.Long][marketIndex] -
-        //         longAmountToRedeem;
-        // uint256 newShortValueIgnoringFees =
-        //     syntheticTokenBackedValue[MarketSide.Short][marketIndex] -
-        //         shortAmountToRedeem;
-
         uint256 totalFeesLong = 0;
 
         uint256 totalFeesShort = 0;
