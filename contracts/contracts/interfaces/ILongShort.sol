@@ -30,11 +30,4 @@ abstract contract ILongShort {
         uint32 marketIndex,
         MarketSide syntheticTokenType
     ) external virtual;
-
-    function executeOutstandingLazySettlementsPartialOrCurrentIfNeeded(
-        address user,
-        uint32 marketIndex,
-        MarketSide syntheticTokenType,
-        uint256 minimumAmountRequired
-    ) external virtual;
 }

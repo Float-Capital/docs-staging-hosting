@@ -84,12 +84,10 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         if (
             msg.sender != address(longShort) && amount > sendersCurrentBalance
         ) {
-            uint256 amountRequired = amount - sendersCurrentBalance;
-            longShort.executeOutstandingLazySettlementsPartialOrCurrentIfNeeded(
+            longShort.executeOutstandingLazySettlementsSynth(
                 sender,
                 marketIndex,
-                syntheticTokenType,
-                amountRequired
+                syntheticTokenType
             );
         }
         ERC20._transfer(sender, recipient, amount);
