@@ -3,12 +3,14 @@
 
 var Js_int = require("bs-platform/lib/js/js_int.js");
 var Staker = require("./contracts/Staker.js");
+var Globals = require("./Globals.js");
 var Js_math = require("bs-platform/lib/js/js_math.js");
 var CONSTANTS = require("../CONSTANTS.js");
 var ERC20Mock = require("./contracts/ERC20Mock.js");
 var LongShort = require("./contracts/LongShort.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
 var FloatToken = require("./contracts/FloatToken.js");
+var Caml_option = require("bs-platform/lib/js/caml_option.js");
 var Treasury_v0 = require("./contracts/Treasury_v0.js");
 var TokenFactory = require("./contracts/TokenFactory.js");
 var SyntheticToken = require("./contracts/SyntheticToken.js");
@@ -52,10 +54,14 @@ function randomMintLongShort(param) {
   }
 }
 
-function createSyntheticMarket(admin, longShort, fundToken, treasury, marketName, marketSymbol) {
+function createSyntheticMarket(admin, initialMarketSeedOpt, fundToken, treasury, marketName, marketSymbol, longShort) {
+  var initialMarketSeed = initialMarketSeedOpt !== undefined ? Caml_option.valFromOption(initialMarketSeedOpt) : Globals.bnFromString("500000000000000000");
   return Promise.all([
                 OracleManagerMock.make(admin),
-                YieldManagerMock.make(admin, longShort.address, treasury, fundToken.address)
+                YieldManagerMock.make(admin, longShort.address, treasury, fundToken.address),
+                fundToken.mint(admin, Globals.mul(initialMarketSeed, Globals.bnFromInt(100))).then(function (param) {
+                      return fundToken.approve(longShort.address, Globals.mul(initialMarketSeed, Globals.bnFromInt(100)));
+                    })
               ]).then(function (param) {
               var yieldManager = param[1];
               fundToken.MINTER_ROLE().then(function (minterRole) {
@@ -64,7 +70,7 @@ function createSyntheticMarket(admin, longShort, fundToken, treasury, marketName
               return longShort.newSyntheticMarket(marketName, marketSymbol, fundToken.address, param[0].address, yieldManager.address).then(function (param) {
                             return longShort.latestMarket();
                           }).then(function (marketIndex) {
-                          return longShort.initializeMarket(marketIndex, ethers.BigNumber.from(0), ethers.BigNumber.from(0), ethers.BigNumber.from(50), ethers.BigNumber.from(50), ethers.BigNumber.from("1000000000000000000"), ethers.BigNumber.from(0));
+                          return longShort.initializeMarket(marketIndex, ethers.BigNumber.from(0), ethers.BigNumber.from(0), ethers.BigNumber.from(50), ethers.BigNumber.from(50), ethers.BigNumber.from("1000000000000000000"), ethers.BigNumber.from(0), initialMarketSeed);
                         });
             });
 }
@@ -126,7 +132,7 @@ function inititialize(admin, exposeInternals) {
                                                       payToken1
                                                     ], Promise.resolve(undefined), (function (previousPromise, paymentToken, index) {
                                                         return previousPromise.then(function (param) {
-                                                                    return createSyntheticMarket(admin.address, longShort, paymentToken, treasury.address, "Test Market " + String(index), "TM" + String(index));
+                                                                    return createSyntheticMarket(admin.address, undefined, paymentToken, treasury.address, "Test Market " + String(index), "TM" + String(index), longShort);
                                                                   });
                                                       })).then(function (param) {
                                                     return getAllMarkets(longShort);

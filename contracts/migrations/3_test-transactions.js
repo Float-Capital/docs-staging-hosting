@@ -71,6 +71,7 @@ const deployTestMarket = async (
     yieldManager = await YieldManagerMock.new(
       admin,
       longShortInstance.address,
+      treasuryInstance.address,
       fundTokenInstance.address
     );
 
@@ -137,8 +138,6 @@ module.exports = async function (deployer, network, accounts) {
   const tenMintAmount = "10000000000000000000";
   const largeApprove = "10000000000000000000000000000000";
 
-  console.log("1");
-
   // We use fake DAI if we're not on BSC testnet.
   let token;
   if (network == "mumbai") {
@@ -156,7 +155,7 @@ module.exports = async function (deployer, network, accounts) {
     admin,
     network
   );
-  console.log("1.2");
+
   await deployTestMarket(
     "ETH/BTC Dominance",
     "EBD",
@@ -166,7 +165,7 @@ module.exports = async function (deployer, network, accounts) {
     admin,
     network
   );
-  console.log("1,.3");
+
   await deployTestMarket(
     "Gold",
     "GOLD",
@@ -176,7 +175,6 @@ module.exports = async function (deployer, network, accounts) {
     admin,
     network
   );
-  console.log("1,5");
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
   let verifyString = `yarn hardhat --network ${network} tenderly:verify`;
@@ -199,7 +197,6 @@ module.exports = async function (deployer, network, accounts) {
     
     \`${verifyString}\``);
   }
-  console.log("2");
 
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
     console.log(`Simulating transactions for marketIndex: ${marketIndex}`);
@@ -251,7 +248,7 @@ module.exports = async function (deployer, network, accounts) {
     if (network != "mumbai") await oracleManager.setPrice(onePointOne);
 
     await longShort._updateSystemState(marketIndex);
-    console.log("3");
+
     // Simulate user 2 redeeming half his tokens.
     const halfTokensMinted = new BN(tenMintAmount).div(new BN(2));
     await short.increaseAllowance(longShort.address, halfTokensMinted, {
@@ -276,7 +273,7 @@ module.exports = async function (deployer, network, accounts) {
     await longShort.mintLongAndStake(marketIndex, new BN(tenMintAmount), {
       from: user3,
     });
-    console.log("4");
+
     if (network != "mumbai") {
       await mintAndApprove(token, tenMintAmount, user3, longShort.address);
     }

@@ -143,64 +143,8 @@ contract("LongShort (minting fees)", (accounts) => {
     };
   }
 
-  it(
-    "case 1: no penalties when minting in new market",
-    testMintFees({
-      baseFee: 50,
-      penaltyFee: 50,
-      initialMintLong: 0,
-      initialMintShort: 0,
-      mintLong: oneHundred,
-      mintShort: 0,
-      expectedBaseFeeAmount: oneHundred,
-      expectedPenaltyFeeAmount: 0,
-    })
-  );
-
-  it(
-    "case 1: no penalties when minting in new market (flipped)",
-    testMintFees({
-      baseFee: 50,
-      penaltyFee: 50,
-      initialMintLong: 0,
-      initialMintShort: 0,
-      mintLong: 0,
-      mintShort: oneHundred,
-      expectedBaseFeeAmount: oneHundred,
-      expectedPenaltyFeeAmount: 0,
-    })
-  );
-
-  it(
-    "case 1: no penalties when minting in 1-sided market",
-    testMintFees({
-      baseFee: 0, // 0 else fees get split and it's no longer 1-sided
-      penaltyFee: 50,
-      initialMintLong: oneHundred,
-      initialMintShort: 0,
-      mintLong: oneHundred,
-      mintShort: 0,
-      expectedBaseFeeAmount: oneHundred,
-      expectedPenaltyFeeAmount: 0,
-    })
-  );
-
-  it(
-    "case 1: no penalties when minting in 1-sided market (flipped)",
-    testMintFees({
-      baseFee: 0, // 0 else fees get split and it's no longer 1-sided
-      penaltyFee: 50,
-      initialMintLong: 0,
-      initialMintShort: oneHundred,
-      mintLong: 0,
-      mintShort: oneHundred,
-      expectedBaseFeeAmount: oneHundred,
-      expectedPenaltyFeeAmount: 0,
-    })
-  );
-
-  it(
-    "case 2: penalty fees when completely imbalancing market",
+  it.skip(
+    "case 1: penalty fees when completely imbalancing market",
     testMintFees({
       baseFee: 0,
       penaltyFee: 50,
@@ -213,7 +157,7 @@ contract("LongShort (minting fees)", (accounts) => {
     })
   );
 
-  it(
+  it.skip(
     "case 2: penalty fees when completely imbalancing market (flipped)",
     testMintFees({
       baseFee: 0,
@@ -227,7 +171,7 @@ contract("LongShort (minting fees)", (accounts) => {
     })
   );
 
-  it(
+  it.skip(
     "case 2: penalty fees when partially imbalancing market",
     testMintFees({
       baseFee: 0,
@@ -241,7 +185,7 @@ contract("LongShort (minting fees)", (accounts) => {
     })
   );
 
-  it(
+  it.skip(
     "case 2: penalty fees when partially imbalancing market (flipped)",
     testMintFees({
       baseFee: 0,

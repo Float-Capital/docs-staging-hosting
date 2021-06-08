@@ -1,3 +1,4 @@
+open Globals
 type markets = {
   paymentToken: ERC20Mock.t,
   oracleManager: OracleManagerMock.t,
@@ -40,13 +41,14 @@ let randomMintLongShort = () => {
 
 let createSyntheticMarket = (
   ~admin,
-  ~longShort: LongShort.t,
+  ~initialMarketSeed=bnFromString("500000000000000000"),
   ~fundToken: ERC20Mock.t,
   ~treasury,
   ~marketName,
   ~marketSymbol,
+  longShort: LongShort.t,
 ) => {
-  JsPromise.all2((
+  JsPromise.all3((
     OracleManagerMock.make(~admin),
     YieldManagerMock.make(
       ~admin,
@@ -54,14 +56,21 @@ let createSyntheticMarket = (
       ~token=fundToken.address,
       ~treasury,
     ),
-  ))->JsPromise.then(((oracleManager, yieldManager)) => {
+    fundToken
+    ->ERC20Mock.mint(~_to=admin, ~amount=initialMarketSeed->mul(bnFromInt(100)))
+    ->JsPromise.then(_ =>
+      fundToken->ERC20Mock.approve(
+        ~spender=longShort.address,
+        ~amount=initialMarketSeed->mul(bnFromInt(100)),
+      )
+    ),
+  ))->JsPromise.then(((oracleManager, yieldManager, _)) => {
     let _ignorePromise =
       fundToken
       ->ERC20Mock.mINTER_ROLE
       ->JsPromise.map(minterRole =>
         fundToken->ERC20Mock.grantRole(~role=minterRole, ~account=yieldManager.address)
       )
-    // fundToken->ERC20Mock.grantMintRole(~user=yieldManager.address)
     longShort
     ->LongShort.newSyntheticMarket(
       ~syntheticName=marketName,
@@ -80,6 +89,7 @@ let createSyntheticMarket = (
         ~badLiquidityExitFee=Ethers.BigNumber.fromInt(50),
         ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("1000000000000000000"),
         ~kPeriod=Ethers.BigNumber.fromInt(0),
+        ~initialMarketSeed,
       )
     })
   })
@@ -165,9 +175,8 @@ let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
         [payToken1, payToken1, payToken2, payToken1]
         ->Array.reduceWithIndex(JsPromise.resolve(), (previousPromise, paymentToken, index) => {
           previousPromise->JsPromise.then(() =>
-            createSyntheticMarket(
+            longShort->createSyntheticMarket(
               ~admin=admin.address,
-              ~longShort,
               ~treasury=treasury.address,
               ~fundToken=paymentToken,
               ~marketName=`Test Market ${index->Int.toString}`,

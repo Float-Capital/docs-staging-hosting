@@ -8,6 +8,10 @@ let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
 
 let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic
 
+type dEAD_ADDRESSReturn = Ethers.ethAddress
+@send
+external dEAD_ADDRESS: t => JsPromise.t<dEAD_ADDRESSReturn> = "DEAD_ADDRESS"
+
 type tEN_TO_THE_18Return = Ethers.BigNumber.t
 @send
 external tEN_TO_THE_18: t => JsPromise.t<tEN_TO_THE_18Return> = "TEN_TO_THE_18"
@@ -48,7 +52,6 @@ external baseExitFee: (t, int) => JsPromise.t<baseExitFeeReturn> = "baseExitFee"
 
 type batchedLazyDepositReturn = {
   mintAmount: Ethers.BigNumber.t,
-  mintEarlyClaimed: Ethers.BigNumber.t,
   mintAndStakeAmount: Ethers.BigNumber.t,
 }
 @send
@@ -85,15 +88,6 @@ external changeTreasury: (t, ~treasury: Ethers.ethAddress) => JsPromise.t<transa
   "changeTreasury"
 
 @send
-external executeOutstandingLazySettlementsPartialOrCurrentIfNeeded: (
-  t,
-  ~user: Ethers.ethAddress,
-  ~marketIndex: int,
-  ~syntheticTokenType: int,
-  ~minimumAmountRequired: Ethers.BigNumber.t,
-) => JsPromise.t<transaction> = "executeOutstandingLazySettlementsPartialOrCurrentIfNeeded"
-
-@send
 external executeOutstandingLazySettlementsSynth: (
   t,
   ~user: Ethers.ethAddress,
@@ -109,10 +103,6 @@ type fundTokensReturn = Ethers.ethAddress
 @send
 external fundTokens: (t, int) => JsPromise.t<fundTokensReturn> = "fundTokens"
 
-type getLongBetaReturn = Ethers.BigNumber.t
-@send
-external getLongBeta: (t, ~marketIndex: int) => JsPromise.t<getLongBetaReturn> = "getLongBeta"
-
 type getMarketSplitReturn = {
   longAmount: Ethers.BigNumber.t,
   shortAmount: Ethers.BigNumber.t,
@@ -123,10 +113,6 @@ external getMarketSplit: (
   ~marketIndex: int,
   ~amount: Ethers.BigNumber.t,
 ) => JsPromise.t<getMarketSplitReturn> = "getMarketSplit"
-
-type getShortBetaReturn = Ethers.BigNumber.t
-@send
-external getShortBeta: (t, ~marketIndex: int) => JsPromise.t<getShortBetaReturn> = "getShortBeta"
 
 type getTreasurySplitReturn = {
   marketAmount: Ethers.BigNumber.t,
@@ -171,6 +157,7 @@ external initializeMarket: (
   ~badLiquidityExitFee: Ethers.BigNumber.t,
   ~kInitialMultiplier: Ethers.BigNumber.t,
   ~kPeriod: Ethers.BigNumber.t,
+  ~initialMarketSeed: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "initializeMarket"
 
 type latestMarketReturn = int
@@ -382,6 +369,10 @@ module Exposed = {
 
   let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic
 
+  type dEAD_ADDRESSReturn = Ethers.ethAddress
+  @send
+  external dEAD_ADDRESS: t => JsPromise.t<dEAD_ADDRESSReturn> = "DEAD_ADDRESS"
+
   type tEN_TO_THE_18Return = Ethers.BigNumber.t
   @send
   external tEN_TO_THE_18: t => JsPromise.t<tEN_TO_THE_18Return> = "TEN_TO_THE_18"
@@ -429,7 +420,6 @@ module Exposed = {
 
   type batchedLazyDepositReturn = {
     mintAmount: Ethers.BigNumber.t,
-    mintEarlyClaimed: Ethers.BigNumber.t,
     mintAndStakeAmount: Ethers.BigNumber.t,
   }
   @send
@@ -448,7 +438,6 @@ module Exposed = {
     int,
   ) => JsPromise.t<batchedLazyRedeemsReturn> = "batchedLazyRedeems"
 
-  type calculateValueChangeForPriceMechanismReturn = Ethers.BigNumber.t
   @send
   external calculateValueChangeForPriceMechanism: (
     t,
@@ -456,8 +445,9 @@ module Exposed = {
     ~assetPriceGreater: Ethers.BigNumber.t,
     ~assetPriceLess: Ethers.BigNumber.t,
     ~baseValueExposure: Ethers.BigNumber.t,
-  ) => JsPromise.t<calculateValueChangeForPriceMechanismReturn> =
-    "calculateValueChangeForPriceMechanism"
+    ~winningSyntheticTokenType: int,
+    ~losingSyntheticTokenType: int,
+  ) => JsPromise.t<transaction> = "calculateValueChangeForPriceMechanism"
 
   @send
   external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
@@ -484,15 +474,6 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "depositFunds"
 
   @send
-  external executeOutstandingLazySettlementsPartialOrCurrentIfNeeded: (
-    t,
-    ~user: Ethers.ethAddress,
-    ~marketIndex: int,
-    ~syntheticTokenType: int,
-    ~minimumAmountRequired: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "executeOutstandingLazySettlementsPartialOrCurrentIfNeeded"
-
-  @send
   external executeOutstandingLazySettlementsSynth: (
     t,
     ~user: Ethers.ethAddress,
@@ -515,30 +496,6 @@ module Exposed = {
   @send
   external fundTokens: (t, int) => JsPromise.t<fundTokensReturn> = "fundTokens"
 
-  type getFeesForActionReturn = Ethers.BigNumber.t
-  @send
-  external getFeesForAction: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-    ~isMint: bool,
-    ~syntheticTokenType: int,
-  ) => JsPromise.t<getFeesForActionReturn> = "getFeesForAction"
-
-  type getFeesForAmountsReturn = Ethers.BigNumber.t
-  @send
-  external getFeesForAmounts: (
-    t,
-    ~marketIndex: int,
-    ~baseAmount: Ethers.BigNumber.t,
-    ~penaltyAmount: Ethers.BigNumber.t,
-    ~isMint: bool,
-  ) => JsPromise.t<getFeesForAmountsReturn> = "getFeesForAmounts"
-
-  type getLongBetaReturn = Ethers.BigNumber.t
-  @send
-  external getLongBeta: (t, ~marketIndex: int) => JsPromise.t<getLongBetaReturn> = "getLongBeta"
-
   type getMarketSplitReturn = {
     longAmount: Ethers.BigNumber.t,
     shortAmount: Ethers.BigNumber.t,
@@ -549,10 +506,6 @@ module Exposed = {
     ~marketIndex: int,
     ~amount: Ethers.BigNumber.t,
   ) => JsPromise.t<getMarketSplitReturn> = "getMarketSplit"
-
-  type getShortBetaReturn = Ethers.BigNumber.t
-  @send
-  external getShortBeta: (t, ~marketIndex: int) => JsPromise.t<getShortBetaReturn> = "getShortBeta"
 
   type getTreasurySplitReturn = {
     marketAmount: Ethers.BigNumber.t,
@@ -597,6 +550,7 @@ module Exposed = {
     ~badLiquidityExitFee: Ethers.BigNumber.t,
     ~kInitialMultiplier: Ethers.BigNumber.t,
     ~kPeriod: Ethers.BigNumber.t,
+    ~initialMarketSeed: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "initializeMarket"
 
   type latestMarketReturn = int

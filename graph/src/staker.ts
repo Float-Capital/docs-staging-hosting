@@ -58,7 +58,19 @@ export function handleStateAdded(event: StateAdded): void {
   // TODO: remove the `timestamp` variable from the contracts
   let timestampOfState = event.params.timestamp;
 
-  let state = getOrCreateStakerState(marketIndexId, stateIndex, event);
+  let syntheticMarket = SyntheticMarket.load(marketIndexId);
+  if (syntheticMarket == null) {
+    log.critical(
+      "`handleStateAdded` called without SyntheticMarket with id #{} being created.",
+      [marketIndexId]
+    );
+  }
+
+  let state = getOrCreateStakerState(
+    syntheticMarket as SyntheticMarket,
+    stateIndex,
+    event
+  );
   state.blockNumber = blockNumber;
   state.creationTxHash = txHash;
   state.stateIndex = stateIndex;
@@ -79,9 +91,11 @@ export function handleStateAdded(event: StateAdded): void {
     let timeElapsedSinceLastStateChange = state.timestamp.minus(
       prevState.timestamp
     );
+
     let changeInAccumulativeFloatPerSecondLong = state.accumulativeFloatPerTokenLong.minus(
       prevState.accumulativeFloatPerTokenLong
     );
+
     let changeInAccumulativeFloatPerSecondShort = state.accumulativeFloatPerTokenShort.minus(
       prevState.accumulativeFloatPerTokenShort
     );
@@ -92,6 +106,7 @@ export function handleStateAdded(event: StateAdded): void {
       // NOTE: This hapens if two staking state changes happen in the same block.
       timeElapsedSinceLastStateChange.equals(ZERO)
     ) {
+      log.warning("state being set to zero! {}", [blockNumber.toString()]);
       state.floatRatePerTokenOverIntervalLong = ZERO;
       state.floatRatePerTokenOverIntervalShort = ZERO;
     } else {
@@ -103,8 +118,6 @@ export function handleStateAdded(event: StateAdded): void {
       );
     }
   }
-
-  // TODO: update the market!
 
   state.save();
 
@@ -178,9 +191,18 @@ export function handleStakeAdded(event: StakeAdded): void {
     log.critical("Token should be defined", []);
   }
 
+  let marketIndexId = syntheticToken.syntheticMarket;
+  let syntheticMarket = SyntheticMarket.load(marketIndexId);
+  if (syntheticMarket == null) {
+    log.critical(
+      "`handleStakeAdded` called without SyntheticMarket with id #{} being created.",
+      [marketIndexId]
+    );
+  }
+
   // NOTE: This will create a new (empyt) StakerState if the user is not staking immediately
   let state = getOrCreateStakerState(
-    syntheticToken.syntheticMarket,
+    syntheticMarket as SyntheticMarket,
     lastMintIndex,
     event
   );

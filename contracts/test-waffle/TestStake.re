@@ -35,13 +35,41 @@ describe("Float System", () => {
 
         let%Await _ =
           synthsUserHasStakedIn
-          ->Array.map(stake => {
+          ->Array.map(
+              (
+                {
+                  marketIndex,
+                  synth,
+                  amount,
+                  valueInOtherSide,
+                  valueInEntrySide,
+                  priceOfSynthForAction,
+                },
+              ) => {
+              let%AwaitThen amountOfFees =
+                longShort->Contract.LongShortHelpers.getFees(
+                  ~marketIndex,
+                  ~amount,
+                  ~valueInOtherSide,
+                  ~valueInEntrySide,
+                );
               let%Await amountStaked =
                 staker->Staker.userAmountStaked(
-                  stake##synth.address,
+                  synth.address,
                   testUser.address,
                 );
-              Chai.bnEqual(amountStaked, stake##amount);
+
+              let expectedStakeAmount =
+                amount
+                ->sub(amountOfFees)
+                ->mul(CONSTANTS.tenToThe18)
+                ->div(priceOfSynthForAction);
+
+              Chai.bnEqual(
+                ~message="amount staked is greater than expected",
+                amountStaked,
+                expectedStakeAmount,
+              );
             })
           ->JsPromise.all;
         ();

@@ -570,6 +570,19 @@
   },
   {
     "inputs": [],
+    "name": "DEAD_ADDRESS",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "TEN_TO_THE_18",
     "outputs": [
       {
@@ -755,11 +768,6 @@
       },
       {
         "internalType": "uint256",
-        "name": "mintEarlyClaimed",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
         "name": "mintAndStakeAmount",
         "type": "uint256"
       }
@@ -822,17 +830,21 @@
         "internalType": "uint256",
         "name": "baseValueExposure",
         "type": "uint256"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "winningSyntheticTokenType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "losingSyntheticTokenType",
+        "type": "uint8"
       }
     ],
     "name": "calculateValueChangeForPriceMechanism",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -928,34 +940,6 @@
         "internalType": "enum ILongShort.MarketSide",
         "name": "syntheticTokenType",
         "type": "uint8"
-      },
-      {
-        "internalType": "uint256",
-        "name": "minimumAmountRequired",
-        "type": "uint256"
-      }
-    ],
-    "name": "executeOutstandingLazySettlementsPartialOrCurrentIfNeeded",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "syntheticTokenType",
-        "type": "uint8"
       }
     ],
     "name": "executeOutstandingLazySettlementsSynth",
@@ -1024,93 +1008,6 @@
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "isMint",
-        "type": "bool"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "syntheticTokenType",
-        "type": "uint8"
-      }
-    ],
-    "name": "getFeesForAction",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "baseAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "penaltyAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "isMint",
-        "type": "bool"
-      }
-    ],
-    "name": "getFeesForAmounts",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "getLongBeta",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
       }
     ],
     "name": "getMarketSplit",
@@ -1123,25 +1020,6 @@
       {
         "internalType": "uint256",
         "name": "shortAmount",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "getShortBeta",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
         "type": "uint256"
       }
     ],
@@ -1282,6 +1160,11 @@
       {
         "internalType": "uint256",
         "name": "kPeriod",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "initialMarketSeed",
         "type": "uint256"
       }
     ],

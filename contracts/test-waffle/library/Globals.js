@@ -12,6 +12,10 @@ function sub(prim, prim$1) {
   return prim.sub(prim$1);
 }
 
+function bnFromString(prim) {
+  return ethers.BigNumber.from(prim);
+}
+
 function bnFromInt(prim) {
   return ethers.BigNumber.from(prim);
 }
@@ -30,6 +34,18 @@ function bnToString(prim) {
 
 function bnToInt(prim) {
   return prim.toNumber();
+}
+
+function bnGt(prim, prim$1) {
+  return prim.gt(prim$1);
+}
+
+function bnGte(prim, prim$1) {
+  return prim.gte(prim$1);
+}
+
+function bnLt(prim, prim$1) {
+  return prim.lt(prim$1);
 }
 
 var it$prime = Promise$BsMocha.it;
@@ -58,11 +74,15 @@ exports.before_each$prime = before_each$prime;
 exports.before$prime = before$prime;
 exports.add = add;
 exports.sub = sub;
+exports.bnFromString = bnFromString;
 exports.bnFromInt = bnFromInt;
 exports.mul = mul;
 exports.div = div;
 exports.bnToString = bnToString;
 exports.bnToInt = bnToInt;
+exports.bnGt = bnGt;
+exports.bnGte = bnGte;
+exports.bnLt = bnLt;
 exports.describe = describe;
 exports.it = it;
 exports.it_skip = it_skip;

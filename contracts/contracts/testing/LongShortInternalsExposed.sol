@@ -82,13 +82,17 @@ contract LongShortInternalsExposed is LongShortMockable {
         uint32 marketIndex,
         uint256 assetPriceGreater,
         uint256 assetPriceLess,
-        uint256 baseValueExposure
-    ) external view returns (uint256) {
+        uint256 baseValueExposure,
+        MarketSide winningSyntheticTokenType,
+        MarketSide losingSyntheticTokenType
+    ) external {
         _calculateValueChangeForPriceMechanism(
             marketIndex,
             assetPriceGreater,
             assetPriceLess,
-            baseValueExposure
+            baseValueExposure,
+            winningSyntheticTokenType,
+            losingSyntheticTokenType
         );
     }
 
@@ -110,24 +114,6 @@ contract LongShortInternalsExposed is LongShortMockable {
         external
     {
         _transferFromYieldManager(marketIndex, amount);
-    }
-
-    function getFeesForAmounts(
-        uint32 marketIndex,
-        uint256 baseAmount, // e18
-        uint256 penaltyAmount, // e18
-        bool isMint // true for mint, false for redeem
-    ) external view returns (uint256) {
-        _getFeesForAmounts(marketIndex, baseAmount, penaltyAmount, isMint);
-    }
-
-    function getFeesForAction(
-        uint32 marketIndex,
-        uint256 amount, // 1e18
-        bool isMint, // true for mint, false for redeem
-        ILongShort.MarketSide syntheticTokenType // true for long side, false for short side
-    ) external view returns (uint256) {
-        _getFeesForAction(marketIndex, amount, isMint, syntheticTokenType);
     }
 
     function priceChangeMechanism(uint32 marketIndex, uint256 newPrice)

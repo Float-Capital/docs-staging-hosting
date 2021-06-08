@@ -12,6 +12,7 @@ var Link = require("next/link").default;
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var RootProvider = require("../libraries/RootProvider.js");
+var StartTrading = require("../components/UI/StartTrading.js");
 
 function floatingMenuZoomStyle(shouldDisplay) {
   return CssJs.style([
@@ -103,6 +104,7 @@ function Navigation(Props) {
       return "";
     }
   };
+  var clickedTradingDispatch = React.useContext(StartTrading.ClickedTradingProvider.DispatchClickedTradingContext.context);
   var tmp;
   if (optCurrentUser !== undefined) {
     var currentUser = Caml_option.valFromOption(optCurrentUser);
@@ -168,12 +170,16 @@ function Navigation(Props) {
                                       }))))
                     }), React.createElement("div", {
                       className: "hidden md:flex w-2/3 text-base items-center justify-end"
-                    }, React.createElement(Link, {
-                          href: "/",
-                          children: React.createElement("a", {
-                                className: "px-3 hover:bg-white " + activeHighlight("/")
-                              }, "MARKETS")
-                        }), React.createElement(Link, {
+                    }, React.createElement("span", {
+                          onClick: (function (param) {
+                              return Curry._1(clickedTradingDispatch, /* Clicked */0);
+                            })
+                        }, React.createElement(Link, {
+                              href: "/",
+                              children: React.createElement("a", {
+                                    className: "px-3 hover:bg-white " + activeHighlight("/")
+                                  }, "MARKETS")
+                            })), React.createElement(Link, {
                           href: "/stake-markets",
                           children: React.createElement("a", {
                                 className: "px-3 hover:bg-white "
