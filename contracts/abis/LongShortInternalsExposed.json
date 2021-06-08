@@ -595,6 +595,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "TEN_TO_THE_18_SIGNED",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -635,6 +648,30 @@
     ],
     "name": "_updateSystemStateMulti",
     "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "internalType": "int256",
+        "name": "newAssetPrice",
+        "type": "int256"
+      }
+    ],
+    "name": "adjustMarketBasedOnNewAssetPrice",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "didUpdate",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -807,44 +844,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "assetPriceGreater",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "assetPriceLess",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "baseValueExposure",
-        "type": "uint256"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "winningSyntheticTokenType",
-        "type": "uint8"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "losingSyntheticTokenType",
-        "type": "uint8"
-      }
-    ],
-    "name": "calculateValueChangeForPriceMechanism",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1510,30 +1509,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "newPrice",
-        "type": "uint256"
-      }
-    ],
-    "name": "priceChangeMechanism",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "didUpdate",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

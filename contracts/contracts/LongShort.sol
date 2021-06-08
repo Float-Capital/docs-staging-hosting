@@ -44,6 +44,7 @@ contract LongShort is ILongShort, Initializable {
     address public constant DEAD_ADDRESS =
         0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
     uint256 public constant TEN_TO_THE_18 = 1e18;
+    int256 public constant TEN_TO_THE_18_SIGNED = 1e18;
     uint256 public constant feeUnitsOfPrecision = 10000;
     uint256[45] private __constantsGap;
 
@@ -626,95 +627,47 @@ contract LongShort is ILongShort, Initializable {
         }
     }
 
-    function _minimum(uint256 value1, uint256 value2)
-        internal
-        view
-        returns (uint256)
-    {
-        if (value1 < value2) {
-            return value1;
+    function _minimum(
+        uint256 A,
+        uint256 B
+    ) internal view returns (int256) {
+        if (A < B) {
+            return int256(A);
         } else {
-            return value2;
+            return int256(B);
         }
     }
 
-    function _calculateValueChangeForPriceMechanism(
-        uint32 marketIndex,
-        uint256 assetPriceGreater,
-        uint256 assetPriceLess,
-        uint256 baseValueExposure,
-        MarketSide winningSyntheticTokenType,
-        MarketSide losingSyntheticTokenType
-    ) internal {
-        uint256 valueChange = 0;
-
-        uint256 percentageChange =
-            ((assetPriceGreater - assetPriceLess) * TEN_TO_THE_18) /
-                assetPrice[marketIndex];
-
-        valueChange = (baseValueExposure * percentageChange) / TEN_TO_THE_18;
-
-        if (valueChange > baseValueExposure) {
-            // More than 100% price movement, system liquidation.
-            valueChange = baseValueExposure;
-        }
-
-        syntheticTokenBackedValue[winningSyntheticTokenType][marketIndex] =
-            syntheticTokenBackedValue[winningSyntheticTokenType][marketIndex] +
-            valueChange;
-        syntheticTokenBackedValue[losingSyntheticTokenType][marketIndex] =
-            syntheticTokenBackedValue[losingSyntheticTokenType][marketIndex] -
-            valueChange;
-    }
-
-    // TODO STENT rework to make simpler
-    /*
-      p = k|A1 - A2|/A1
-      V = Ep/k
-      L = L + V
-
-      L = L + E(k|A1-A2|/A1)/k
-      L = L + E|A1-A2|/A1
-    */
-    function _adjustMarketBasedOnNewAssetPrice(uint32 marketIndex, uint256 newPrice)
+    function _adjustMarketBasedOnNewAssetPrice(uint32 marketIndex, int256 newAssetPrice)
         internal
         returns (bool didUpdate)
     {
-        // If no new price update from oracle, proceed as normal
-        if (assetPrice[marketIndex] == newPrice) {
+        int256 oldAssetPrice = int256(assetPrice[marketIndex]);
+
+        if (oldAssetPrice == newAssetPrice) {
             return false;
         }
 
-        uint256 baseValueExposure =
+        int256 min =
             _minimum(
                 syntheticTokenBackedValue[MarketSide.Long][marketIndex],
                 syntheticTokenBackedValue[MarketSide.Short][marketIndex]
             );
 
-        // Long gains
-        if (newPrice > assetPrice[marketIndex]) {
-            _calculateValueChangeForPriceMechanism(
-                marketIndex,
-                newPrice,
-                assetPrice[marketIndex],
-                baseValueExposure,
-                MarketSide.Long,
-                MarketSide.Short
-            );
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] += valueChange;
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] -= valueChange;
+        int256 percentageChangeE18 =
+            ((newAssetPrice - oldAssetPrice) * TEN_TO_THE_18_SIGNED) /
+                oldAssetPrice;
+
+        int256 valueChange = percentageChangeE18 * min / TEN_TO_THE_18_SIGNED;
+
+        if (valueChange > 0) {
+            syntheticTokenBackedValue[MarketSide.Long][marketIndex] += uint256(valueChange);
+            syntheticTokenBackedValue[MarketSide.Short][marketIndex] -= uint256(valueChange);
         } else {
-            _calculateValueChangeForPriceMechanism(
-                marketIndex,
-                assetPrice[marketIndex],
-                newPrice,
-                baseValueExposure,
-                MarketSide.Short,
-                MarketSide.Long
-            );
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] -= valueChange;
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] += valueChange;
+            syntheticTokenBackedValue[MarketSide.Long][marketIndex] -= uint256(valueChange*-1);
+            syntheticTokenBackedValue[MarketSide.Short][marketIndex] += uint256(valueChange*-1);
         }
+
         return true;
     }
 
@@ -813,26 +766,26 @@ contract LongShort is ILongShort, Initializable {
         );
 
         // If a negative int is return this should fail.
-        uint256 newPrice = uint256(oracleManagers[marketIndex].updatePrice());
+        int256 newAssetPrice = oracleManagers[marketIndex].updatePrice();
+
         // TODO STENT move this into the price function
         emit PriceUpdate(
             marketIndex,
             assetPrice[marketIndex],
-            newPrice,
+            uint256(newAssetPrice),
             msg.sender
         );
 
         bool priceChanged = false;
         // Adjusts long and short values based on price movements.
-
-        priceChanged = _priceChangeMechanism(marketIndex, newPrice);
+        priceChanged = _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
 
         // Distribute accrued yield manager interest.
         _claimAndDistributeYield(marketIndex);
 
         // TODO STENT CONCERN1
         _refreshTokenPrices(marketIndex);
-        assetPrice[marketIndex] = newPrice;
+        assetPrice[marketIndex] = uint256(newAssetPrice);
         if (priceChanged) {
             snapshopPriceChangeForNextPriceExecution(marketIndex);
 

@@ -59,24 +59,6 @@ contract LongShortInternalsExposed is LongShort {
         _minimum(liquidityOfPositionA, liquidityOfPositionB);
     }
 
-    function calculateValueChangeForPriceMechanism(
-        uint32 marketIndex,
-        uint256 assetPriceGreater,
-        uint256 assetPriceLess,
-        uint256 baseValueExposure,
-        MarketSide winningSyntheticTokenType,
-        MarketSide losingSyntheticTokenType
-    ) external {
-        _calculateValueChangeForPriceMechanism(
-            marketIndex,
-            assetPriceGreater,
-            assetPriceLess,
-            baseValueExposure,
-            winningSyntheticTokenType,
-            losingSyntheticTokenType
-        );
-    }
-
     function depositFunds(uint32 marketIndex, uint256 amount) external {
         _depositFunds(marketIndex, amount);
     }
@@ -97,11 +79,11 @@ contract LongShortInternalsExposed is LongShort {
         _transferFromYieldManager(marketIndex, amount);
     }
 
-    function priceChangeMechanism(uint32 marketIndex, uint256 newPrice)
+    function adjustMarketBasedOnNewAssetPrice(uint32 marketIndex, int256 newAssetPrice)
         external
         returns (bool didUpdate)
     {
-        _priceChangeMechanism(marketIndex, newPrice);
+        _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
     }
 
     function _executeOutstandingLazySettlementsExposed(

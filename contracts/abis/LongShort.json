@@ -576,6 +576,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "TEN_TO_THE_18_SIGNED",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint32",

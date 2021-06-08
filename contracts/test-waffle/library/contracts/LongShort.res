@@ -16,6 +16,10 @@ type tEN_TO_THE_18Return = Ethers.BigNumber.t
 @send
 external tEN_TO_THE_18: t => JsPromise.t<tEN_TO_THE_18Return> = "TEN_TO_THE_18"
 
+type tEN_TO_THE_18_SIGNEDReturn = Ethers.BigNumber.t
+@send
+external tEN_TO_THE_18_SIGNED: t => JsPromise.t<tEN_TO_THE_18_SIGNEDReturn> = "TEN_TO_THE_18_SIGNED"
+
 @send
 external _updateSystemState: (t, ~marketIndex: int) => JsPromise.t<transaction> =
   "_updateSystemState"
@@ -377,6 +381,11 @@ module Exposed = {
   @send
   external tEN_TO_THE_18: t => JsPromise.t<tEN_TO_THE_18Return> = "TEN_TO_THE_18"
 
+  type tEN_TO_THE_18_SIGNEDReturn = Ethers.BigNumber.t
+  @send
+  external tEN_TO_THE_18_SIGNED: t => JsPromise.t<tEN_TO_THE_18_SIGNEDReturn> =
+    "TEN_TO_THE_18_SIGNED"
+
   @send
   external _executeOutstandingLazySettlementsExposed: (
     t,
@@ -391,6 +400,21 @@ module Exposed = {
   @send
   external _updateSystemStateMulti: (t, ~marketIndexes: array<int>) => JsPromise.t<transaction> =
     "_updateSystemStateMulti"
+
+  @send
+  external adjustMarketBasedOnNewAssetPrice: (
+    t,
+    ~marketIndex: int,
+    ~newAssetPrice: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "adjustMarketBasedOnNewAssetPrice"
+
+  type adjustMarketBasedOnNewAssetPriceReturn = bool
+  @send @scope("callStatic")
+  external adjustMarketBasedOnNewAssetPriceCall: (
+    t,
+    ~marketIndex: int,
+    ~newAssetPrice: Ethers.BigNumber.t,
+  ) => JsPromise.t<adjustMarketBasedOnNewAssetPriceReturn> = "adjustMarketBasedOnNewAssetPrice"
 
   type adminReturn = Ethers.ethAddress
   @send
@@ -438,6 +462,7 @@ module Exposed = {
     int,
   ) => JsPromise.t<batchedLazyRedeemsReturn> = "batchedLazyRedeems"
 
+<<<<<<< HEAD
   @send
   external calculateValueChangeForPriceMechanism: (
     t,
@@ -449,6 +474,8 @@ module Exposed = {
     ~losingSyntheticTokenType: int,
   ) => JsPromise.t<transaction> = "calculateValueChangeForPriceMechanism"
 
+=======
+>>>>>>> 320ded6 (Refactoring price change mechanism code in LongShort contract)
   @send
   external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
 
@@ -465,6 +492,10 @@ module Exposed = {
   @send
   external changeTreasury: (t, ~treasury: Ethers.ethAddress) => JsPromise.t<transaction> =
     "changeTreasury"
+
+  @send
+  external claimAndDistributeYield: (t, ~marketIndex: int) => JsPromise.t<transaction> =
+    "claimAndDistributeYield"
 
   @send
   external depositFunds: (
@@ -496,6 +527,29 @@ module Exposed = {
   @send
   external fundTokens: (t, int) => JsPromise.t<fundTokensReturn> = "fundTokens"
 
+<<<<<<< HEAD
+=======
+  type getFeesForActionReturn = Ethers.BigNumber.t
+  @send
+  external getFeesForAction: (
+    t,
+    ~marketIndex: int,
+    ~amount: Ethers.BigNumber.t,
+    ~isMint: bool,
+    ~syntheticTokenType: int,
+  ) => JsPromise.t<getFeesForActionReturn> = "getFeesForAction"
+
+  type getFeesForAmountsReturn = Ethers.BigNumber.t
+  @send
+  external getFeesForAmounts: (
+    t,
+    ~marketIndex: int,
+    ~baseAmount: Ethers.BigNumber.t,
+    ~penaltyAmount: Ethers.BigNumber.t,
+    ~isMint: bool,
+  ) => JsPromise.t<getFeesForAmountsReturn> = "getFeesForAmounts"
+
+>>>>>>> 320ded6 (Refactoring price change mechanism code in LongShort contract)
   type getMarketSplitReturn = {
     longAmount: Ethers.BigNumber.t,
     shortAmount: Ethers.BigNumber.t,
@@ -665,21 +719,6 @@ module Exposed = {
   > = "percentageAvailableForEarlyExitNumerator"
 
   @send
-  external priceChangeMechanism: (
-    t,
-    ~marketIndex: int,
-    ~newPrice: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "priceChangeMechanism"
-
-  type priceChangeMechanismReturn = bool
-  @send @scope("callStatic")
-  external priceChangeMechanismCall: (
-    t,
-    ~marketIndex: int,
-    ~newPrice: Ethers.BigNumber.t,
-  ) => JsPromise.t<priceChangeMechanismReturn> = "priceChangeMechanism"
-
-  @send
   external redeemLong: (
     t,
     ~marketIndex: int,
@@ -714,8 +753,8 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "redeemShortLazy"
 
   @send
-  external refreshTokensPrice: (t, ~marketIndex: int) => JsPromise.t<transaction> =
-    "refreshTokensPrice"
+  external refreshTokenPrices: (t, ~marketIndex: int) => JsPromise.t<transaction> =
+    "refreshTokenPrices"
 
   @send
   external setUseexecuteOutstandingLazySettlementsMock: (
@@ -816,7 +855,4 @@ module Exposed = {
   type yieldManagersReturn = Ethers.ethAddress
   @send
   external yieldManagers: (t, int) => JsPromise.t<yieldManagersReturn> = "yieldManagers"
-
-  @send
-  external yieldMechanism: (t, ~marketIndex: int) => JsPromise.t<transaction> = "yieldMechanism"
 }
