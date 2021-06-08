@@ -548,6 +548,8 @@ contract LongShort is ILongShort, Initializable {
     function _refreshTokensPrice(uint32 marketIndex) internal {
         uint256 longTokenSupply =
             syntheticTokens[MarketSide.Long][marketIndex].totalSupply();
+
+        // supply should never be zero and burn address will always own a small amount
         if (longTokenSupply > 0) {
             syntheticTokenPrice[MarketSide.Long][marketIndex] =
                 (syntheticTokenBackedValue[MarketSide.Long][marketIndex] *
@@ -571,6 +573,20 @@ contract LongShort is ILongShort, Initializable {
         );
     }
 
+    function _distributeMarketAmount(uint32 marketIndex, uint256 marketAmount)
+        internal
+    {
+        // Splits mostly to the weaker position to incentivise balance.
+        (uint256 longAmount, uint256 shortAmount) =
+            getMarketSplit(marketIndex, marketAmount);
+        syntheticTokenBackedValue[MarketSide.Long][marketIndex] =
+            syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
+            longAmount;
+        syntheticTokenBackedValue[MarketSide.Short][marketIndex] =
+            syntheticTokenBackedValue[MarketSide.Short][marketIndex] +
+            shortAmount;
+    }
+
     /**
      * Controls what happens with mint/redeem fees.
      */
@@ -583,16 +599,7 @@ contract LongShort is ILongShort, Initializable {
         totalValueLockedInMarket[marketIndex] -= treasuryAmount;
         totalValueReservedForTreasury[marketIndex] += treasuryAmount;
 
-        // Splits mostly to the weaker position to incentivise balance.
-        (uint256 longAmount, uint256 shortAmount) =
-            getMarketSplit(marketIndex, marketAmount);
-        syntheticTokenBackedValue[MarketSide.Long][marketIndex] =
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-            longAmount;
-        syntheticTokenBackedValue[MarketSide.Short][marketIndex] =
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] +
-            shortAmount;
-
+        _distributeMarketAmount(marketIndex, marketAmount);
         emit FeesLevied(marketIndex, totalFees);
     }
 
@@ -604,7 +611,6 @@ contract LongShort is ILongShort, Initializable {
             yieldManagers[marketIndex].getTotalHeld() -
                 totalValueLockedInYieldManager[marketIndex];
 
-        // Market gets a bigger share if the market is more imbalanced.
         if (amount > 0) {
             (uint256 marketAmount, uint256 treasuryAmount) =
                 getTreasurySplit(marketIndex, amount);
@@ -615,15 +621,7 @@ contract LongShort is ILongShort, Initializable {
             totalValueLockedInMarket[marketIndex] += marketAmount;
             totalValueReservedForTreasury[marketIndex] += treasuryAmount;
 
-            // Splits mostly to the weaker position to incentivise balance.
-            (uint256 longAmount, uint256 shortAmount) =
-                getMarketSplit(marketIndex, marketAmount);
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] =
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-                longAmount;
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] =
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex] +
-                shortAmount;
+            _distributeMarketAmount(marketIndex, marketAmount);
         }
     }
 
@@ -1217,6 +1215,7 @@ contract LongShort is ILongShort, Initializable {
         external
         override
     {
+        console.log("BEGIN REDEEM");
         _redeem(marketIndex, tokensToRedeem, MarketSide.Long);
     }
 
