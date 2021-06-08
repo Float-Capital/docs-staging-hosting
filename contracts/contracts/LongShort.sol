@@ -1215,7 +1215,6 @@ contract LongShort is ILongShort, Initializable {
         external
         override
     {
-        console.log("BEGIN REDEEM");
         _redeem(marketIndex, tokensToRedeem, MarketSide.Long);
     }
 
