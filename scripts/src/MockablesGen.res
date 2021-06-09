@@ -32,6 +32,8 @@ let convertASTTypeToSolType = typeDescriptionStr => {
   | t if t->Js.String2.startsWith("int") => typeDescriptionStr
   | t if t->Js.String2.startsWith("contract ") =>
     typeDescriptionStr->Js.String2.replaceByRe(%re("/contract\s+/g"), "")
+  | t if t->Js.String2.startsWith("enum") =>
+    typeDescriptionStr->Js.String2.replaceByRe(%re("/enum\s+/g"), "")
   | _ => {
       Js.log(typeDescriptionStr)
       raise(
@@ -93,7 +95,7 @@ let modifiers = nodeStatements => {
 
 let lineCommentsRe = %re("/\\/\\/[^\\n]*\\n/g")
 let blockCommentsRe = %re("/\\/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+\\//g")
-let getArtifact = %raw(`(fileNameWithoutExtension) => require("../../contracts/build/contracts/" + fileNameWithoutExtension + ".json")`)
+let getArtifact = %raw(`(fileNameWithoutExtension) => require("../../contracts/codegen/truffle/" + fileNameWithoutExtension + ".json")`)
 
 exception BadMatchingBlock
 let rec matchingBlockEndIndex = (str, startIndex, count) => {

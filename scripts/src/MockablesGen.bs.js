@@ -27,6 +27,9 @@ function convertASTTypeToSolType(typeDescriptionStr) {
       if (typeDescriptionStr.startsWith("contract ")) {
         return typeDescriptionStr.replace(/contract\s+/g, "");
       }
+      if (typeDescriptionStr.startsWith("enum")) {
+        return typeDescriptionStr.replace(/enum\s+/g, "");
+      }
       console.log(typeDescriptionStr);
       throw {
             RE_EXN_ID: ScriptDoesNotSupportReturnValues,
@@ -104,7 +107,7 @@ var lineCommentsRe = /\/\/[^\n]*\n/g;
 
 var blockCommentsRe = /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g;
 
-var getArtifact = ((fileNameWithoutExtension) => require("../../contracts/build/contracts/" + fileNameWithoutExtension + ".json"));
+var getArtifact = ((fileNameWithoutExtension) => require("../../contracts/codegen/truffle/" + fileNameWithoutExtension + ".json"));
 
 var BadMatchingBlock = /* @__PURE__ */Caml_exceptions.create("MockablesGen.BadMatchingBlock");
 

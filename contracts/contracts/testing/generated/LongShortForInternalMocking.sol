@@ -62,6 +62,10 @@ contract LongShortForInternalMocking is LongShort {
       return ();
     }
      
+    function seedMarketInitiallyMock(uint256 initialMarketSeed, uint32 marketIndex) public pure {
+      return ();
+    }
+     
     function initializeMarketMock(
         uint32 marketIndex,
         uint256 _baseEntryFee,
@@ -69,21 +73,14 @@ contract LongShortForInternalMocking is LongShort {
         uint256 _baseExitFee,
         uint256 _badLiquidityExitFee,
         uint256 kInitialMultiplier,
-        uint256 kPeriod
+        uint256 kPeriod,
+        uint256 initialMarketSeed
     ) public pure {
       return ();
     }
      
-    function getLatestPriceMock(uint32 marketIndex) public pure returns (int256 ){
-      return (abi.decode("",(int256)));
-    }
-     
-    function getLongBetaMock(uint32 marketIndex) public pure returns (uint256 ){
-      return (abi.decode("",(uint256)));
-    }
-     
-    function getShortBetaMock(uint32 marketIndex) public pure returns (uint256 ){
-      return (abi.decode("",(uint256)));
+    function getOtherSynthTypeMock(MarketSide synthTokenType) public pure returns (ILongShort.MarketSide ){
+      return (abi.decode("",(ILongShort.MarketSide)));
     }
      
     function getTreasurySplitMock(uint32 marketIndex, uint256 amount) public pure returns (uint256 marketAmount,uint256 treasuryAmount){
@@ -106,10 +103,7 @@ contract LongShortForInternalMocking is LongShort {
       return ();
     }
      
-    function _minimumMock(
-        uint256 liquidityOfPositionA,
-        uint256 liquidityOfPositionB
-    ) public pure returns (uint256 ){
+    function _minimumMock(uint256 value1, uint256 value2) public pure returns (uint256 ){
       return (abi.decode("",(uint256)));
     }
      
@@ -117,9 +111,11 @@ contract LongShortForInternalMocking is LongShort {
         uint32 marketIndex,
         uint256 assetPriceGreater,
         uint256 assetPriceLess,
-        uint256 baseValueExposure
-    ) public pure returns (uint256 ){
-      return (abi.decode("",(uint256)));
+        uint256 baseValueExposure,
+        MarketSide winningSyntheticTokenType,
+        MarketSide losingSyntheticTokenType
+    ) public pure {
+      return ();
     }
      
     function _priceChangeMechanismMock(uint32 marketIndex, uint256 newPrice) public pure returns (bool didUpdate){
@@ -130,6 +126,10 @@ contract LongShortForInternalMocking is LongShort {
         uint32 marketIndex,
         MarketSide syntheticTokenType
     ) public pure {
+      return ();
+    }
+     
+    function snapshopPriceChangeForNextPriceExecutionMock(uint32 marketIndex) public pure {
       return ();
     }
      
@@ -173,15 +173,27 @@ contract LongShortForInternalMocking is LongShort {
       return ();
     }
      
-    function _getFeesForAmountsMock(
+    function _getFeesGeneralMock(
         uint32 marketIndex,
-        uint256 baseAmount,         uint256 penaltyAmount,         bool isMint     ) public pure returns (uint256 ){
+        uint256 delta,         MarketSide synthTokenGainingDominance,
+        MarketSide synthTokenLosingDominance,
+        uint256 baseFee,
+        uint256 penultyFees
+    ) public pure returns (uint256 ){
       return (abi.decode("",(uint256)));
     }
      
-    function _getFeesForActionMock(
+    function _getFeesForMintMock(
         uint32 marketIndex,
-        uint256 amount,         bool isMint,         MarketSide syntheticTokenType     ) public pure returns (uint256 ){
+        uint256 amount,         MarketSide syntheticTokenType
+    ) public pure returns (uint256 ){
+      return (abi.decode("",(uint256)));
+    }
+     
+    function _getFeesForRedeemMock(
+        uint32 marketIndex,
+        uint256 amount,         MarketSide syntheticTokenType
+    ) public pure returns (uint256 ){
       return (abi.decode("",(uint256)));
     }
      
@@ -247,9 +259,19 @@ contract LongShortForInternalMocking is LongShort {
       return (abi.decode("",(uint256)));
     }
      
+    function _executeLazyMintsIfTheyExistMock(
+        uint32 marketIndex,
+        address user,
+        MarketSide syntheticTokenType,
+        UserLazyDeposit storage currentUserDeposits
+    ) public pure {
+      return ();
+    }
+     
     function _executeOutstandingLazySettlementsActionMock(
         address user,
-        uint32 marketIndex
+        uint32 marketIndex,
+        UserLazyDeposit storage currentUserDeposits
     ) public pure {
       return ();
     }
@@ -260,33 +282,10 @@ contract LongShortForInternalMocking is LongShort {
       return ();
     }
      
-    function _getMaxAvailableLazilyMock(
-        address user,
-        uint32 marketIndex,         MarketSide syntheticTokenType
-    ) public pure returns (uint256 amountPaymentTokenLazyAvailableImmediately,uint256 amountSynthTokenLazyAvailableImmediately){
-      return (abi.decode("",(uint256)),abi.decode("",(uint256)));
-    }
-     
-    function _executeOutstandingLazySettlementsPartialOrCurrentIfNeededMock(
-        address user,
-        uint32 marketIndex,         MarketSide syntheticTokenType,
-        uint256 minimumAmountRequired
-    ) public pure {
-      return ();
-    }
-     
     function executeOutstandingLazySettlementsSynthMock(
         address user,
         uint32 marketIndex,
         MarketSide syntheticTokenType
-    ) public pure {
-      return ();
-    }
-     
-    function executeOutstandingLazySettlementsPartialOrCurrentIfNeededMock(
-        address user,
-        uint32 marketIndex,         MarketSide syntheticTokenType,
-        uint256 minimumAmountRequired
     ) public pure {
       return ();
     }
