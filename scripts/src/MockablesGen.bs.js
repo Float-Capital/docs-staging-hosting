@@ -2,6 +2,7 @@
 'use strict';
 
 var Fs = require("fs");
+var Curry = require("rescript/lib/js/curry.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
@@ -11,13 +12,27 @@ var filesToMock = ["LongShort.sol"];
 
 var ScriptDoesNotSupportReturnValues = /* @__PURE__ */Caml_exceptions.create("MockablesGen.ScriptDoesNotSupportReturnValues");
 
+var defaultError = "This script currently only supports functions that return or receive as parameters uints, ints, bools, (nonpayable) addresses, contracts, structs, or strings\n          // NO ARRAYS OR MAPPINGS YET";
+
+function contains(str, subst) {
+  return str.indexOf(subst) !== -1;
+}
+
+function containsRe(str, re) {
+  return Belt_Option.isSome(Caml_option.null_to_opt(str.match(re)));
+}
+
 function convertASTTypeToSolType(typeDescriptionStr) {
   switch (typeDescriptionStr) {
     case "address" :
     case "bool" :
-    case "string" :
         return typeDescriptionStr;
+    case "string" :
+        return "string calldata ";
     default:
+      if (containsRe(typeDescriptionStr, /\[/g)) {
+        return typeDescriptionStr + " memory";
+      }
       if (typeDescriptionStr.startsWith("uint")) {
         return typeDescriptionStr;
       }
@@ -27,65 +42,53 @@ function convertASTTypeToSolType(typeDescriptionStr) {
       if (typeDescriptionStr.startsWith("contract ")) {
         return typeDescriptionStr.replace(/contract\s+/g, "");
       }
-      if (typeDescriptionStr.startsWith("enum")) {
+      if (typeDescriptionStr.startsWith("enum ")) {
         return typeDescriptionStr.replace(/enum\s+/g, "");
+      }
+      if (typeDescriptionStr.startsWith("struct ")) {
+        return typeDescriptionStr.replace(/struct\s+/g, "") + " memory ";
       }
       console.log(typeDescriptionStr);
       throw {
             RE_EXN_ID: ScriptDoesNotSupportReturnValues,
-            _1: "This script currently only supports functions that return uints, ints, bools, (nonpayable) addresses, contracts, or strings",
+            _1: defaultError,
             Error: new Error()
           };
   }
 }
 
-function convertSolTypeToReturnsType(type_) {
-  switch (type_) {
-    case "address" :
-    case "bool" :
-        return type_;
-    default:
-      if (type_.startsWith("uint")) {
-        return type_;
-      }
-      if (type_.startsWith("int")) {
-        return type_;
-      }
-      if (type_ === "string") {
-        return "string calldata";
-      }
-      console.log("WARNING: Treating type " + type_ + " as contract type");
-      return type_;
-  }
+function nodeToTypedIdentifier(node) {
+  return {
+          name: node.name,
+          type_: node.typeDescriptions.typeString,
+          storageLocation: node.storageLocation === "storage" ? /* Storage */0 : /* NotRelevant */1
+        };
 }
 
 function functions(nodeStatements) {
   return Belt_Array.map(Belt_Array.keep(nodeStatements, (function (x) {
-                    return x.nodeType === "FunctionDefinition";
+                    if (x.nodeType === "FunctionDefinition") {
+                      return x.name !== "";
+                    } else {
+                      return false;
+                    }
                   })), (function (x) {
                 return {
                         name: x.name,
-                        parameters: Belt_Array.map(x.parameters.parameters, (function (y) {
-                                return y.name;
-                              })),
-                        returnValues: Belt_Array.map(x.returnParameters.parameters, (function (y) {
-                                return {
-                                        name: y.name,
-                                        type_: convertASTTypeToSolType(y.typeDescriptions.typeString)
-                                      };
-                              }))
+                        parameters: Belt_Array.map(x.parameters.parameters, nodeToTypedIdentifier),
+                        returnValues: Belt_Array.map(x.returnParameters.parameters, nodeToTypedIdentifier)
                       };
               }));
 }
 
 function commafiy(strings) {
-  var parameterCalls = Belt_Array.reduce(strings, "", (function (acc, curr) {
+  var mockerParameterCalls = Belt_Array.reduce(strings, "", (function (acc, curr) {
           return acc + curr + ",";
         }));
-  if (parameterCalls.length !== 0) {
-    return parameterCalls.substring(0, parameterCalls.length - 1 | 0);
+  if (mockerParameterCalls.length !== 0) {
+    return mockerParameterCalls.substring(0, mockerParameterCalls.length - 1 | 0);
   } else {
-    return parameterCalls;
+    return mockerParameterCalls;
   }
 }
 
@@ -95,9 +98,7 @@ function modifiers(nodeStatements) {
                   })), (function (x) {
                 return {
                         name: x.name,
-                        parameters: Belt_Array.map(x.parameters.parameters, (function (y) {
-                                return y.name;
-                              })),
+                        parameters: Belt_Array.map(x.parameters.parameters, nodeToTypedIdentifier),
                         returnValues: []
                       };
               }));
@@ -148,7 +149,7 @@ function resolveImportLocationRecursive(_array, __import) {
   while(true) {
     var _import = __import;
     var array = _array;
-    if (_import.indexOf("/") === -1) {
+    if (!contains(_import, "/")) {
       return Belt_Array.reduce(array, "", (function (acc, curr) {
                     return acc + curr + "/";
                   })) + _import;
@@ -180,12 +181,30 @@ Belt_Array.forEach(filesToMock, (function (filePath) {
         var fileName = Belt_Array.getExn(filePathSplit, filePathSplit.length - 1 | 0);
         var fileNameSplit = fileName.split(".");
         var fileNameWithoutExtension = reduceStrArr(Belt_Array.slice(fileNameSplit, 0, fileNameSplit.length > 1 ? fileNameSplit.length - 1 | 0 : fileNameSplit.length));
+        var typeDefContainsFileName = new RegExp("\\s" + fileNameWithoutExtension + "\\.");
+        var actionOnFileNameTypeDefs = function (action, type_) {
+          if (containsRe(type_, typeDefContainsFileName)) {
+            return Curry._1(action, type_);
+          } else {
+            return type_;
+          }
+        };
+        var replaceFileNameTypeDefsWithMockableTypeDefs = function (param) {
+          return actionOnFileNameTypeDefs((function (type_) {
+                        return type_.replace(fileNameWithoutExtension + ".", fileNameWithoutExtension + "Mockable.");
+                      }), param);
+        };
+        var removeFileNameFromTypeDefs = function (param) {
+          return actionOnFileNameTypeDefs((function (type_) {
+                        return type_.replace(typeDefContainsFileName, " ");
+                      }), param);
+        };
         var sol = {
           contents: Fs.readFileSync("../contracts/contracts/" + filePath, "utf8")
         };
         var lineCommentsMatch = Belt_Option.map(Caml_option.null_to_opt(sol.contents.match(lineCommentsRe)), (function (i) {
                 return Belt_Array.keep(i, (function (x) {
-                              return x.indexOf("SPDX-License-Identifier") === -1;
+                              return !contains(x, "SPDX-License-Identifier");
                             }));
               }));
         Belt_Option.map(lineCommentsMatch, (function (l) {
@@ -203,57 +222,62 @@ Belt_Array.forEach(filesToMock, (function (filePath) {
           contents: ""
         };
         Belt_Array.forEach(functions(contractDefinition.nodes), (function (x) {
-                if (x.name === "") {
-                  var indexOfOldFunctionDec = sol.contents.indexOf("constructor");
-                  var indexOfOldFunctionDecParameterOpeningParenethesis = indexOfOldFunctionDec + 11 | 0;
-                  var indexOfOldFunctioNDecParameterClosingParenthesis = sol.contents.indexOf(")", indexOfOldFunctionDecParameterOpeningParenethesis);
-                  var functionDefParenthesis = sol.contents.substring(indexOfOldFunctionDecParameterOpeningParenethesis, indexOfOldFunctioNDecParameterClosingParenthesis + 1 | 0);
-                  var parameterCalls = commafiy(x.parameters);
-                  mockLogger.contents = mockLogger.contents + (" \n    constructor" + functionDefParenthesis + " " + fileNameWithoutExtension + "(" + parameterCalls + "){}\n    ");
-                  return ;
-                }
-                var indexOfOldFunctionDec$1 = sol.contents.indexOf("function " + x.name + "(");
-                var indexOfOldFunctionDecParameterOpeningParenethesis$1 = (indexOfOldFunctionDec$1 + x.name.length | 0) + 9 | 0;
-                var indexOfOldFunctioNDecParameterClosingParenthesis$1 = sol.contents.indexOf(")", indexOfOldFunctionDecParameterOpeningParenethesis$1);
-                var functionDefParenthesis$1 = sol.contents.substring(indexOfOldFunctionDecParameterOpeningParenethesis$1, indexOfOldFunctioNDecParameterClosingParenthesis$1 + 1 | 0);
-                var indexOfOldFunctionBodyStart = sol.contents.indexOf("{", indexOfOldFunctionDec$1);
+                var indexOfOldFunctionDec = sol.contents.indexOf("function " + x.name + "(");
+                var indexOfOldFunctionBodyStart = sol.contents.indexOf("{", indexOfOldFunctionDec);
                 var solPrefix = sol.contents.substring(0, indexOfOldFunctionBodyStart + 1 | 0);
                 var solSuffix = sol.contents.substring(indexOfOldFunctionBodyStart + 1 | 0);
-                var parameterCalls$1 = commafiy(x.parameters);
-                sol.contents = solPrefix + ("\n    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + x.name + "\"))){\n      return mocker." + x.name + "Mock(" + parameterCalls$1 + ");\n    }\n  ") + solSuffix;
+                var storageParameters = Belt_Array.keep(x.parameters, (function (x) {
+                        return x.storageLocation === /* Storage */0;
+                      }));
+                var mockerParameterCalls = commafiy(Belt_Array.map(x.parameters, (function (x) {
+                            if (x.storageLocation === /* Storage */0) {
+                              return x.name + "_temp1";
+                            } else {
+                              return x.name;
+                            }
+                          })));
+                var mockerArguments = commafiy(Belt_Array.map(x.parameters, (function (x) {
+                            return convertASTTypeToSolType(replaceFileNameTypeDefsWithMockableTypeDefs(x.type_));
+                          })));
+                sol.contents = solPrefix + ("\n    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + x.name + "\"))){\n      " + reduceStrArr(Belt_Array.map(storageParameters, (function (x) {
+                              return "\n          " + convertASTTypeToSolType(removeFileNameFromTypeDefs(x.type_)) + " " + x.name + "_temp1 = " + x.name + ";\n        ";
+                            }))) + "\n      return mocker." + x.name + "Mock(" + mockerParameterCalls + ");\n    }\n  ") + solSuffix;
                 var arr = x.returnValues;
-                mockLogger.contents = mockLogger.contents + (" \n    function " + x.name + "Mock" + functionDefParenthesis$1 + " public pure " + (
+                mockLogger.contents = mockLogger.contents + (" \n    function " + x.name + "Mock(" + mockerArguments + ") public pure " + (
                     arr.length !== 0 ? "returns (" + commafiy(Belt_Array.map(arr, (function (x) {
-                                  return convertSolTypeToReturnsType(x.type_) + " " + x.name;
+                                  return convertASTTypeToSolType(x.type_) + " " + x.name;
                                 }))) + ")" : ""
                   ) + "{\n      return (" + commafiy(Belt_Array.map(x.returnValues, (function (y) {
-                              return "abi.decode(\"\",(" + y.type_ + "))";
+                              return "abi.decode(\"\",(" + convertASTTypeToSolType(y.type_) + "))";
                             }))) + ");\n    }\n    ");
                 
               }));
         Belt_Array.forEach(modifiers(contractDefinition.nodes), (function (x) {
                 var indexOfOldFunctionDec = sol.contents.indexOf("modifier " + x.name);
-                var indexIfThere = (indexOfOldFunctionDec + x.name.length | 0) + 9 | 0;
-                var optIndexOfOldFunctionDecParameterOpeningParenethesis = sol.contents.charAt(indexIfThere) === "(" ? indexIfThere : undefined;
-                var optIndexOfOldFunctioNDecParameterClosingParenthesis = Belt_Option.map(optIndexOfOldFunctionDecParameterOpeningParenethesis, (function (x) {
-                        return sol.contents.indexOf(")", x);
-                      }));
-                var functionDefParenthesis = optIndexOfOldFunctionDecParameterOpeningParenethesis !== undefined && optIndexOfOldFunctioNDecParameterClosingParenthesis !== undefined ? sol.contents.substring(optIndexOfOldFunctionDecParameterOpeningParenethesis, optIndexOfOldFunctioNDecParameterClosingParenthesis + 1 | 0) : "()";
                 var indexOfOldFunctionBodyStart = sol.contents.indexOf("{", indexOfOldFunctionDec);
                 var indexOfOldFunctionBodyEnd = matchingBlockEndIndex(sol.contents, indexOfOldFunctionBodyStart + 1 | 0, 1);
                 var functionBody = sol.contents.substring(indexOfOldFunctionBodyStart + 1 | 0, indexOfOldFunctionBodyEnd);
+                var mockerArguments = commafiy(Belt_Array.map(x.parameters, (function (x) {
+                            return convertASTTypeToSolType(replaceFileNameTypeDefsWithMockableTypeDefs(x.type_));
+                          })));
                 var solPrefix = sol.contents.substring(0, indexOfOldFunctionBodyStart + 1 | 0);
                 var solSuffix = sol.contents.substring(indexOfOldFunctionBodyEnd);
-                var parameterCalls = commafiy(x.parameters);
-                sol.contents = solPrefix + ("\n    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + x.name + "\"))){\n      mocker." + x.name + "Mock(" + parameterCalls + ");\n      _;\n    } else {\n      " + functionBody + "\n    }\n  ") + solSuffix;
-                mockLogger.contents = mockLogger.contents + (" \n    function " + x.name + "Mock" + functionDefParenthesis + " public pure {\n      return; \n    }\n    ");
+                var mockerParameterCalls = commafiy(Belt_Array.map(x.parameters, (function (x) {
+                            if (x.storageLocation === /* Storage */0) {
+                              return x.name + "_temp1";
+                            } else {
+                              return x.name;
+                            }
+                          })));
+                sol.contents = solPrefix + ("\n    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + x.name + "\"))){\n      mocker." + x.name + "Mock(" + mockerParameterCalls + ");\n      _;\n    } else {\n      " + functionBody + "\n    }\n  ") + solSuffix;
+                mockLogger.contents = mockLogger.contents + (" \n    function " + x.name + "Mock(" + mockerArguments + ") public pure {\n      return; \n    }\n    ");
                 
               }));
         var importsInFile = sol.contents.match(importRe);
         var importsInFile$1 = importsInFile === null ? undefined : Caml_option.some(importsInFile);
         var importsInFileReplaced = Belt_Option.map(importsInFile$1, (function (i) {
                 return Belt_Array.map(i, (function (x) {
-                              if (x.indexOf("..") === -1 && x.indexOf("./") === -1) {
+                              if (!contains(x, "..") && !contains(x, "./")) {
                                 return x;
                               }
                               var impStatement = Belt_Array.getExn(Belt_Option.getExn(Caml_option.null_to_opt(x.match(quotesRe))), 0);
@@ -269,11 +293,11 @@ Belt_Array.forEach(filesToMock, (function (filePath) {
                               
                             }));
               }));
-        mockLogger.contents = "// SPDX-License-Identifier: BUSL-1.1 \n pragma solidity 0.8.3;\n" + ("import \"../../" + filePath + "\";\n") + Belt_Option.mapWithDefault(importsInFileReplaced, "", (function (i) {
+        mockLogger.contents = "// SPDX-License-Identifier: BUSL-1.1 \n pragma solidity 0.8.3;\n" + ("import \"./" + fileNameWithoutExtension + "Mockable.sol\";\n") + Belt_Option.mapWithDefault(importsInFileReplaced, "", (function (i) {
                 return reduceStrArr(Belt_Array.map(i, (function (z) {
                                   return z + "\n";
                                 })));
-              })) + ("contract " + fileNameWithoutExtension + "ForInternalMocking is " + fileNameWithoutExtension + " {") + mockLogger.contents + "}";
+              })) + ("contract " + fileNameWithoutExtension + "ForInternalMocking {") + mockLogger.contents + "}";
         var indexOfContractDef = sol.contents.indexOf("contract ");
         var indexOfContractBlock = sol.contents.indexOf("{", indexOfContractDef);
         var indexOfContractName = sol.contents.indexOf(fileNameWithoutExtension, indexOfContractDef);
@@ -289,8 +313,11 @@ Belt_Array.forEach(filesToMock, (function (filePath) {
 
 exports.filesToMock = filesToMock;
 exports.ScriptDoesNotSupportReturnValues = ScriptDoesNotSupportReturnValues;
+exports.defaultError = defaultError;
+exports.contains = contains;
+exports.containsRe = containsRe;
 exports.convertASTTypeToSolType = convertASTTypeToSolType;
-exports.convertSolTypeToReturnsType = convertSolTypeToReturnsType;
+exports.nodeToTypedIdentifier = nodeToTypedIdentifier;
 exports.functions = functions;
 exports.commafiy = commafiy;
 exports.modifiers = modifiers;

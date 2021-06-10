@@ -6,80 +6,81 @@
 
 // Script is still pretty rough, will refine it as needed.
 
+// It assumes a single contract definition in a file.
+
 // TO ADD A FILE TO THIS: add filepath relative to ../contracts/contracts here. e.g. mocks/YieldManagerMock.sol
+open Js.String2
+
 let filesToMock = ["LongShort.sol"]
 
-type modifierInvocation = {name: string}
+type storageLocation = Storage | NotRelevant
 
 type typedIdentifier = {
   name: string,
   type_: string,
+  storageLocation: storageLocation,
 }
 type functionType = {
   name: string,
-  parameters: array<string>,
+  parameters: array<typedIdentifier>,
   returnValues: array<typedIdentifier>,
 }
 
 exception ScriptDoesNotSupportReturnValues(string)
 
+let defaultError = "This script currently only supports functions that return or receive as parameters uints, ints, bools, (nonpayable) addresses, contracts, structs, or strings
+          // NO ARRAYS OR MAPPINGS YET"
+
+let contains = (str, subst) => !(str->indexOf(subst) == -1)
+
+let containsRe = (str, re) => {
+  str->match_(re)->Option.isSome
+}
+
 let convertASTTypeToSolType = typeDescriptionStr => {
   switch typeDescriptionStr {
   | "bool"
-  | "address"
-  | "string" => typeDescriptionStr
-  | t if t->Js.String2.startsWith("uint") => typeDescriptionStr
-  | t if t->Js.String2.startsWith("int") => typeDescriptionStr
-  | t if t->Js.String2.startsWith("contract ") =>
-    typeDescriptionStr->Js.String2.replaceByRe(%re("/contract\s+/g"), "")
-  | t if t->Js.String2.startsWith("enum") =>
-    typeDescriptionStr->Js.String2.replaceByRe(%re("/enum\s+/g"), "")
+  | "address" => typeDescriptionStr
+  | "string" => "string calldata "
+  | t if t->containsRe(%re("/\\[/g")) => t ++ " memory" // PARTIAL IMPLEMENTATION
+  | t if t->startsWith("uint") => typeDescriptionStr
+  | t if t->startsWith("int") => typeDescriptionStr
+  | t if t->startsWith("contract ") => typeDescriptionStr->replaceByRe(%re("/contract\s+/g"), "")
+  | t if t->startsWith("enum ") => t->replaceByRe(%re("/enum\s+/g"), "")
+
+  | t if t->startsWith("struct ") =>
+    typeDescriptionStr->replaceByRe(%re("/struct\s+/g"), "") ++ " memory "
   | _ => {
       Js.log(typeDescriptionStr)
-      raise(
-        ScriptDoesNotSupportReturnValues(
-          "This script currently only supports functions that return uints, ints, bools, (nonpayable) addresses, contracts, or strings",
-        ),
-      )
+      raise(ScriptDoesNotSupportReturnValues(defaultError))
     }
   }
 }
 
-let convertSolTypeToReturnsType = type_ => {
-  switch type_ {
-  | "bool"
-  | "address" => type_
-  | t if t->Js.String2.startsWith("uint") => type_
-  | t if t->Js.String2.startsWith("int") => type_
-  | "string" => "string calldata"
-  | _ => {
-      Js.log(`WARNING: Treating type ${type_} as contract type`)
-      type_
-    }
-  }
+let nodeToTypedIdentifier = node => {
+  name: node["name"],
+  type_: node["typeDescriptions"]["typeString"],
+  storageLocation: node["storageLocation"] == "storage" ? Storage : NotRelevant,
 }
 
 let functions = nodeStatements => {
   nodeStatements
-  ->Array.keep(x => x["nodeType"] == #FunctionDefinition) // ignore constructors
+  ->Array.keep(x => x["nodeType"] == #FunctionDefinition && !(x["name"] == "")) // ignore constructors
   ->Array.map(x => {
     name: x["name"],
-    parameters: x["parameters"]["parameters"]->Array.map(y => y["name"]),
-    returnValues: x["returnParameters"]["parameters"]->Array.map(y => {
-      name: y["name"],
-      type_: y["typeDescriptions"]["typeString"]->convertASTTypeToSolType,
-    }),
+    parameters: x["parameters"]["parameters"]->Array.map(y => y->nodeToTypedIdentifier),
+    returnValues: x["returnParameters"]["parameters"]->Array.map(y => y->nodeToTypedIdentifier),
   })
 }
 
 let commafiy = strings => {
-  let parameterCalls = strings->Array.reduce("", (acc, curr) => {
+  let mockerParameterCalls = strings->Array.reduce("", (acc, curr) => {
     acc ++ curr ++ ","
   })
-  if parameterCalls->String.length > 0 {
-    parameterCalls->Js.String2.substring(~from=0, ~to_=parameterCalls->String.length - 1)
+  if mockerParameterCalls->String.length > 0 {
+    mockerParameterCalls->substring(~from=0, ~to_=mockerParameterCalls->String.length - 1)
   } else {
-    parameterCalls
+    mockerParameterCalls
   }
 }
 
@@ -88,7 +89,7 @@ let modifiers = nodeStatements => {
   ->Array.keep(x => x["nodeType"] == #ModifierDefinition)
   ->Array.map(x => {
     name: x["name"],
-    parameters: x["parameters"]["parameters"]->Array.map(y => y["name"]),
+    parameters: x["parameters"]["parameters"]->Array.map(y => y->nodeToTypedIdentifier),
     returnValues: [],
   })
 }
@@ -99,7 +100,7 @@ let getArtifact = %raw(`(fileNameWithoutExtension) => require("../../contracts/c
 
 exception BadMatchingBlock
 let rec matchingBlockEndIndex = (str, startIndex, count) => {
-  let charr = str->Js.String2.charAt(startIndex)
+  let charr = str->charAt(startIndex)
   if charr == "}" && count == 1 {
     startIndex
   } else if charr == "}" && count > 1 {
@@ -118,20 +119,18 @@ let quotesRe = %re(`/"[\S\s]*"/`)
 
 let rec resolveImportLocationRecursive = (array, _import) => {
   switch _import {
-  | i if i->Js.String2.indexOf("/") === -1 =>
-    array->Array.reduce("", (acc, curr) => acc ++ curr ++ "/") ++ i
-  | i if i->Js.String2.startsWith("../") =>
+  | i if !(i->contains("/")) => array->Array.reduce("", (acc, curr) => acc ++ curr ++ "/") ++ i
+  | i if i->startsWith("../") =>
     resolveImportLocationRecursive(
       array->Array.reverse->Array.sliceToEnd(1)->Array.reverse,
-      i->Js.String2.substringToEnd(~from=3),
+      i->substringToEnd(~from=3),
     )
-  | i if i->Js.String2.startsWith("./") =>
-    resolveImportLocationRecursive(array, i->Js.String2.substringToEnd(~from=2))
+  | i if i->startsWith("./") => resolveImportLocationRecursive(array, i->substringToEnd(~from=2))
   | i => {
-      let firstSlashIndex = i->Js.String2.indexOf("/")
+      let firstSlashIndex = i->indexOf("/")
       resolveImportLocationRecursive(
-        array->Array.concat([i->Js.String2.substring(~from=0, ~to_=firstSlashIndex)]),
-        i->Js.String2.substringToEnd(~from=firstSlashIndex + 1),
+        array->Array.concat([i->substring(~from=0, ~to_=firstSlashIndex)]),
+        i->substringToEnd(~from=firstSlashIndex + 1),
       )
     }
   }
@@ -140,10 +139,10 @@ let rec resolveImportLocationRecursive = (array, _import) => {
 let reduceStrArr = arr => arr->Array.reduce("", (acc, curr) => acc ++ curr)
 
 filesToMock->Array.forEach(filePath => {
-  let filePathSplit = filePath->Js.String2.split("/")
+  let filePathSplit = filePath->split("/")
   let fileName = filePathSplit->Array.getExn(filePathSplit->Array.length - 1)
 
-  let fileNameSplit = fileName->Js.String2.split(".")
+  let fileNameSplit = fileName->split(".")
 
   let fileNameWithoutExtension =
     fileNameSplit
@@ -157,20 +156,34 @@ filesToMock->Array.forEach(filePath => {
     )
     ->reduceStrArr
 
+  let typeDefContainsFileName = `\\\s${fileNameWithoutExtension}\\\.`->Js.Re.fromString
+  let actionOnFileNameTypeDefs = (action, type_) =>
+    if type_->containsRe(typeDefContainsFileName) {
+      type_->action
+    } else {
+      type_
+    }
+
+  let replaceFileNameTypeDefsWithMockableTypeDefs = actionOnFileNameTypeDefs(type_ =>
+    type_->replace(`${fileNameWithoutExtension}.`, `${fileNameWithoutExtension}Mockable.`)
+  )
+  let removeFileNameFromTypeDefs = actionOnFileNameTypeDefs(type_ =>
+    type_->replaceByRe(typeDefContainsFileName, " ")
+  )
   let sol = ref(("../contracts/contracts/" ++ filePath)->Node.Fs.readFileAsUtf8Sync)
 
   let lineCommentsMatch =
     sol.contents
-    ->Js.String2.match_(lineCommentsRe)
-    ->Option.map(i => i->Array.keep(x => x->Js.String2.indexOf("SPDX-License-Identifier") == -1))
+    ->match_(lineCommentsRe)
+    ->Option.map(i => i->Array.keep(x => !(x->contains("SPDX-License-Identifier"))))
 
   let _ = lineCommentsMatch->Option.map(l =>
     l->Array.forEach(i => {
-      sol := sol.contents->Js.String2.replace(i, "")
+      sol := sol.contents->replace(i, "")
     })
   )
 
-  sol := sol.contents->Js.String2.replaceByRe(blockCommentsRe, "\n")
+  sol := sol.contents->replaceByRe(blockCommentsRe, "\n")
 
   let artifact = getArtifact(fileNameWithoutExtension)
 
@@ -181,127 +194,98 @@ filesToMock->Array.forEach(filePath => {
 
   let mockLogger = ref("")
 
-  let constructor = constructorNode => {
-    let indexOfOldFunctionDec = sol.contents->Js.String2.indexOf("constructor")
-
-    let indexOfOldFunctionDecParameterOpeningParenethesis =
-      indexOfOldFunctionDec + "constructor"->String.length
-
-    let indexOfOldFunctioNDecParameterClosingParenthesis =
-      sol.contents->Js.String2.indexOfFrom(")", indexOfOldFunctionDecParameterOpeningParenethesis)
-
-    let functionDefParenthesis =
-      sol.contents->Js.String2.substring(
-        ~from=indexOfOldFunctionDecParameterOpeningParenethesis,
-        ~to_=indexOfOldFunctioNDecParameterClosingParenthesis + 1,
-      )
-    let parameterCalls = constructorNode.parameters->commafiy
-    mockLogger :=
-      mockLogger.contents ++
-      ` 
-    constructor${functionDefParenthesis} ${fileNameWithoutExtension}(${parameterCalls}){}
-    `
-  }
-
   functions(contractDefinition["nodes"])->Array.forEach(x => {
-    if x.name == "" {
-      constructor(x)
-    } else {
-      let indexOfOldFunctionDec = sol.contents->Js.String2.indexOf("function " ++ x.name ++ "(")
+    let indexOfOldFunctionDec = sol.contents->indexOf("function " ++ x.name ++ "(")
 
-      let indexOfOldFunctionDecParameterOpeningParenethesis =
-        indexOfOldFunctionDec + x.name->String.length + "function "->String.length
+    let indexOfOldFunctionBodyStart = sol.contents->indexOfFrom("{", indexOfOldFunctionDec)
 
-      let indexOfOldFunctioNDecParameterClosingParenthesis =
-        sol.contents->Js.String2.indexOfFrom(")", indexOfOldFunctionDecParameterOpeningParenethesis)
+    let solPrefix = sol.contents->substring(~from=0, ~to_=indexOfOldFunctionBodyStart + 1)
 
-      let functionDefParenthesis =
-        sol.contents->Js.String2.substring(
-          ~from=indexOfOldFunctionDecParameterOpeningParenethesis,
-          ~to_=indexOfOldFunctioNDecParameterClosingParenthesis + 1,
-        )
-      let indexOfOldFunctionBodyStart =
-        sol.contents->Js.String2.indexOfFrom("{", indexOfOldFunctionDec)
+    let solSuffix = sol.contents->substringToEnd(~from=indexOfOldFunctionBodyStart + 1)
 
-      let solPrefix =
-        sol.contents->Js.String2.substring(~from=0, ~to_=indexOfOldFunctionBodyStart + 1)
+    let storageParameters = x.parameters->Array.keep(x => x.storageLocation == Storage)
 
-      let solSuffix = sol.contents->Js.String2.substringToEnd(~from=indexOfOldFunctionBodyStart + 1)
-      let parameterCalls = x.parameters->commafiy
+    let mockerParameterCalls =
+      x.parameters
+      ->Array.map(x => {
+        x.storageLocation == Storage ? x.name ++ "_temp1" : x.name
+      })
+      ->commafiy
 
-      sol :=
-        solPrefix ++
-        `
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("${x.name}"))){
-      return mocker.${x.name}Mock(${parameterCalls});
-    }
-  ` ++
-        solSuffix
-
-      mockLogger :=
-        mockLogger.contents ++
-        ` 
-    function ${x.name}Mock${functionDefParenthesis} public pure ${switch x.returnValues {
-          | arr if arr->Array.length > 0 =>
-            `returns (${arr
-              ->Array.map(x => x.type_->convertSolTypeToReturnsType ++ " " ++ x.name)
-              ->commafiy})`
-          | _ => ""
-          }}{
-      return (${x.returnValues->Array.map(y => "abi.decode(\"\",(" ++ y.type_ ++ "))")->commafiy});
-    }
-    `
-    }
-  })
-
-  modifiers(contractDefinition["nodes"])->Array.forEach(x => {
-    let indexOfOldFunctionDec = sol.contents->Js.String2.indexOf("modifier " ++ x.name)
-
-    let optIndexOfOldFunctionDecParameterOpeningParenethesis = {
-      let indexIfThere = indexOfOldFunctionDec + x.name->String.length + "modifier "->String.length
-      if sol.contents->Js.String2.charAt(indexIfThere) == "(" {
-        Some(indexIfThere)
-      } else {
-        None
-      }
-    }
-
-    let optIndexOfOldFunctioNDecParameterClosingParenthesis =
-      optIndexOfOldFunctionDecParameterOpeningParenethesis->Option.map(x =>
-        sol.contents->Js.String2.indexOfFrom(")", x)
+    let mockerArguments =
+      x.parameters
+      ->Array.map(x =>
+        x.type_->replaceFileNameTypeDefsWithMockableTypeDefs->convertASTTypeToSolType
       )
-
-    let functionDefParenthesis = switch (
-      optIndexOfOldFunctionDecParameterOpeningParenethesis,
-      optIndexOfOldFunctioNDecParameterClosingParenthesis,
-    ) {
-    | (Some(a), Some(b)) => sol.contents->Js.String2.substring(~from=a, ~to_=b + 1)
-    | _ => "()"
-    }
-
-    let indexOfOldFunctionBodyStart =
-      sol.contents->Js.String2.indexOfFrom("{", indexOfOldFunctionDec)
-
-    let indexOfOldFunctionBodyEnd =
-      sol.contents->matchingBlockEndIndex(indexOfOldFunctionBodyStart + 1, 1)
-
-    let functionBody =
-      sol.contents->Js.String2.substring(
-        ~from=indexOfOldFunctionBodyStart + 1,
-        ~to_=indexOfOldFunctionBodyEnd,
-      )
-
-    let solPrefix =
-      sol.contents->Js.String2.substring(~from=0, ~to_=indexOfOldFunctionBodyStart + 1)
-
-    let solSuffix = sol.contents->Js.String2.substringToEnd(~from=indexOfOldFunctionBodyEnd)
-    let parameterCalls = x.parameters->commafiy
+      ->commafiy
 
     sol :=
       solPrefix ++
       `
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("${x.name}"))){
-      mocker.${x.name}Mock(${parameterCalls});
+      ${storageParameters
+        ->Array.map(x =>
+          `
+          ${x.type_
+            ->removeFileNameFromTypeDefs
+            ->convertASTTypeToSolType} ${x.name}_temp1 = ${x.name};
+        `
+        )
+        ->reduceStrArr}
+      return mocker.${x.name}Mock(${mockerParameterCalls});
+    }
+  ` ++
+      solSuffix
+
+    mockLogger :=
+      mockLogger.contents ++
+      ` 
+    function ${x.name}Mock(${mockerArguments}) public pure ${switch x.returnValues {
+        | arr if arr->Array.length > 0 =>
+          `returns (${arr
+            ->Array.map(x => x.type_->convertASTTypeToSolType ++ " " ++ x.name)
+            ->commafiy})`
+        | _ => ""
+        }}{
+      return (${x.returnValues
+        ->Array.map(y => "abi.decode(\"\",(" ++ y.type_->convertASTTypeToSolType ++ "))")
+        ->commafiy});
+    }
+    `
+  })
+
+  modifiers(contractDefinition["nodes"])->Array.forEach(x => {
+    let indexOfOldFunctionDec = sol.contents->indexOf("modifier " ++ x.name)
+
+    let indexOfOldFunctionBodyStart = sol.contents->indexOfFrom("{", indexOfOldFunctionDec)
+
+    let indexOfOldFunctionBodyEnd =
+      sol.contents->matchingBlockEndIndex(indexOfOldFunctionBodyStart + 1, 1)
+
+    let functionBody =
+      sol.contents->substring(~from=indexOfOldFunctionBodyStart + 1, ~to_=indexOfOldFunctionBodyEnd)
+
+    let mockerArguments =
+      x.parameters
+      ->Array.map(x =>
+        x.type_->replaceFileNameTypeDefsWithMockableTypeDefs->convertASTTypeToSolType
+      )
+      ->commafiy
+
+    let solPrefix = sol.contents->substring(~from=0, ~to_=indexOfOldFunctionBodyStart + 1)
+
+    let solSuffix = sol.contents->substringToEnd(~from=indexOfOldFunctionBodyEnd)
+    let mockerParameterCalls =
+      x.parameters
+      ->Array.map(x => {
+        x.storageLocation == Storage ? x.name ++ "_temp1" : x.name
+      })
+      ->commafiy
+    sol :=
+      solPrefix ++
+      `
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("${x.name}"))){
+      mocker.${x.name}Mock(${mockerParameterCalls});
       _;
     } else {
       ${functionBody}
@@ -312,26 +296,25 @@ filesToMock->Array.forEach(filePath => {
     mockLogger :=
       mockLogger.contents ++
       ` 
-    function ${x.name}Mock${functionDefParenthesis} public pure {
+    function ${x.name}Mock(${mockerArguments}) public pure {
       return; 
     }
     `
   })
 
-  let importsInFile = sol.contents->Js.String2.match_(importRe)
+  let importsInFile = sol.contents->match_(importRe)
 
   let importsInFileReplaced = importsInFile->Option.map(i =>
     i->Array.map(x => {
-      if x->Js.String2.indexOf("..") == -1 && x->Js.String2.indexOf("./") == -1 {
+      if !(x->contains("..")) && !(x->contains("./")) {
         x
       } else {
-        let impStatement = x->Js.String2.match_(quotesRe)->Option.getExn->Array.getExn(0)
-        let impStatement =
-          impStatement->Js.String2.substring(~from=1, ~to_=impStatement->String.length)
-        let initialDirStructure = filePath->Js.String2.split("/")
+        let impStatement = x->match_(quotesRe)->Option.getExn->Array.getExn(0)
+        let impStatement = impStatement->substring(~from=1, ~to_=impStatement->String.length)
+        let initialDirStructure = filePath->split("/")
         let initialDirStructure =
           initialDirStructure->Array.slice(~offset=0, ~len=initialDirStructure->Array.length - 1)
-        x->Js.String2.replace(
+        x->replace(
           impStatement,
           "../../" ++ resolveImportLocationRecursive(initialDirStructure, impStatement),
         )
@@ -342,39 +325,34 @@ filesToMock->Array.forEach(filePath => {
   let _ = importsInFile->Option.map(i =>
     i->Array.forEachWithIndex((index, imp) => {
       sol :=
-        sol.contents->Js.String2.replace(
-          imp,
-          importsInFileReplaced->Option.getUnsafe->Array.getUnsafe(index),
-        )
+        sol.contents->replace(imp, importsInFileReplaced->Option.getUnsafe->Array.getUnsafe(index))
     })
   )
 
   mockLogger :=
     "// SPDX-License-Identifier: BUSL-1.1 \n pragma solidity 0.8.3;\n" ++
-    `import "../../${filePath}";
+    `import "./${fileNameWithoutExtension}Mockable.sol";
 ` ++
     importsInFileReplaced->Option.mapWithDefault("", i =>
       i->Array.map(z => z ++ "\n")->reduceStrArr
     ) ++
-    `contract ${fileNameWithoutExtension}ForInternalMocking is ${fileNameWithoutExtension} {` ++
+    `contract ${fileNameWithoutExtension}ForInternalMocking {` ++
     mockLogger.contents ++ `}`
 
-  let indexOfContractDef = sol.contents->Js.String2.indexOf("contract ")
+  let indexOfContractDef = sol.contents->indexOf("contract ")
 
-  let indexOfContractBlock = sol.contents->Js.String2.indexOfFrom("{", indexOfContractDef)
+  let indexOfContractBlock = sol.contents->indexOfFrom("{", indexOfContractDef)
 
-  let indexOfContractName =
-    sol.contents->Js.String2.indexOfFrom(fileNameWithoutExtension, indexOfContractDef)
+  let indexOfContractName = sol.contents->indexOfFrom(fileNameWithoutExtension, indexOfContractDef)
 
-  let prefix = sol.contents->Js.String2.substring(~from=0, ~to_=indexOfContractDef)
-  let intermediate1 =
-    sol.contents->Js.String2.substring(~from=indexOfContractDef, ~to_=indexOfContractName)
+  let prefix = sol.contents->substring(~from=0, ~to_=indexOfContractDef)
+  let intermediate1 = sol.contents->substring(~from=indexOfContractDef, ~to_=indexOfContractName)
   let intermediate2 =
-    sol.contents->Js.String2.substring(
+    sol.contents->substring(
       ~from=indexOfContractName + fileNameWithoutExtension->String.length,
       ~to_=indexOfContractBlock + 1,
     )
-  let suffix = sol.contents->Js.String2.substringToEnd(~from=indexOfContractBlock + 1)
+  let suffix = sol.contents->substringToEnd(~from=indexOfContractBlock + 1)
 
   sol :=
     prefix ++

@@ -1283,7 +1283,7 @@ contract LongShort is ILongShort, Initializable {
     }
     struct UserLazyDeposit {
         uint256 usersCurrentUpdateIndex;
-        mapping(MarketSide => NextActionValues) nextActionValues;
+        NextActionValues[2] nextActionValues;
     }
 
     mapping(uint32 => uint256) public latestUpdateIndex;
@@ -1319,7 +1319,7 @@ contract LongShort is ILongShort, Initializable {
             // Update is still lazy but not past the next oracle update - display the amount the user would get if they executed immediately
             // NOTE: if we ever add fees for minting - we would add them here!
             uint256 remaining =
-                currentUserDeposits.nextActionValues[syntheticTokenType]
+                currentUserDeposits.nextActionValues[uint8(syntheticTokenType)]
                     .mintAmount;
 
             uint256 tokens =
@@ -1339,12 +1339,14 @@ contract LongShort is ILongShort, Initializable {
         UserLazyDeposit storage currentUserDeposits
     ) internal {
         if (
-            currentUserDeposits.nextActionValues[syntheticTokenType]
+            currentUserDeposits.nextActionValues[uint8(syntheticTokenType)]
                 .mintAmount != 0
         ) {
             uint256 tokensToMint =
                 (((
-                    currentUserDeposits.nextActionValues[syntheticTokenType]
+                    currentUserDeposits.nextActionValues[
+                        uint8(syntheticTokenType)
+                    ]
                         .mintAmount
                 ) * TEN_TO_THE_18) /
                     marketStateSnapshot[marketIndex][
@@ -1356,7 +1358,7 @@ contract LongShort is ILongShort, Initializable {
                 tokensToMint
             );
 
-            currentUserDeposits.nextActionValues[syntheticTokenType]
+            currentUserDeposits.nextActionValues[uint8(syntheticTokenType)]
                 .mintAmount = 0;
         }
     }
@@ -1380,21 +1382,21 @@ contract LongShort is ILongShort, Initializable {
         );
 
         if (
-            currentUserDeposits.nextActionValues[MarketSide.Long]
+            currentUserDeposits.nextActionValues[uint8(MarketSide.Long)]
                 .mintAndStakeAmount !=
             0 ||
-            currentUserDeposits.nextActionValues[MarketSide.Short]
+            currentUserDeposits.nextActionValues[uint8(MarketSide.Short)]
                 .mintAndStakeAmount !=
             0
         ) {
             uint256 tokensToStakeShort =
-                ((currentUserDeposits.nextActionValues[MarketSide.Short]
+                ((currentUserDeposits.nextActionValues[uint8(MarketSide.Short)]
                     .mintAndStakeAmount * TEN_TO_THE_18) /
                     marketStateSnapshot[marketIndex][
                         latestUpdateIndex[marketIndex]
                     ][MarketSide.Short]);
             uint256 tokensToStakeLong =
-                ((currentUserDeposits.nextActionValues[MarketSide.Long]
+                ((currentUserDeposits.nextActionValues[uint8(MarketSide.Long)]
                     .mintAndStakeAmount * TEN_TO_THE_18) /
                     marketStateSnapshot[marketIndex][
                         latestUpdateIndex[marketIndex]
@@ -1408,9 +1410,9 @@ contract LongShort is ILongShort, Initializable {
             );
 
             // TODO: do the accounting for the user
-            currentUserDeposits.nextActionValues[MarketSide.Long]
+            currentUserDeposits.nextActionValues[uint8(MarketSide.Long)]
                 .mintAndStakeAmount = 0;
-            currentUserDeposits.nextActionValues[MarketSide.Short]
+            currentUserDeposits.nextActionValues[uint8(MarketSide.Short)]
                 .mintAndStakeAmount = 0;
         }
         currentUserDeposits.usersCurrentUpdateIndex = 0;
@@ -1475,7 +1477,7 @@ contract LongShort is ILongShort, Initializable {
         batchedLazyDeposit[marketIndex][syntheticTokenType]
             .mintAmount += amount;
         userLazyActions[marketIndex][msg.sender].nextActionValues[
-            syntheticTokenType
+            uint8(syntheticTokenType)
         ]
             .mintAmount += amount;
         userLazyActions[marketIndex][msg.sender].usersCurrentUpdateIndex =
@@ -1511,7 +1513,7 @@ contract LongShort is ILongShort, Initializable {
         batchedLazyDeposit[marketIndex][syntheticTokenType]
             .mintAndStakeAmount += amount;
         userLazyActions[marketIndex][msg.sender].nextActionValues[
-            MarketSide.Short
+            uint8(MarketSide.Short)
         ]
             .mintAndStakeAmount += amount;
 

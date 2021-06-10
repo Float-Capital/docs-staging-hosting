@@ -276,6 +276,7 @@ contract LongShortMockable is ILongShort, Initializable {
         IStaker _staker
     ) public initializer {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("initialize"))){
+      
       return mocker.initializeMock(_admin,_treasury,_tokenFactory,_staker);
     }
   
@@ -295,6 +296,7 @@ contract LongShortMockable is ILongShort, Initializable {
             
     function changeAdmin(address _admin) external adminOnly {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("changeAdmin"))){
+      
       return mocker.changeAdminMock(_admin);
     }
   
@@ -303,6 +305,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     function changeTreasury(address _treasury) external adminOnly {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("changeTreasury"))){
+      
       return mocker.changeTreasuryMock(_treasury);
     }
   
@@ -317,6 +320,7 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 _badLiquidityExitFee
     ) external adminOnly {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("changeFees"))){
+      
       return mocker.changeFeesMock(marketIndex,_baseEntryFee,_badLiquidityEntryFee,_baseExitFee,_badLiquidityExitFee);
     }
   
@@ -337,6 +341,7 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 _badLiquidityExitFee
     ) internal {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_changeFees"))){
+      
       return mocker._changeFeesMock(marketIndex,_baseEntryFee,_baseExitFee,_badLiquidityEntryFee,_badLiquidityExitFee);
     }
   
@@ -361,6 +366,7 @@ contract LongShortMockable is ILongShort, Initializable {
         adminOnly
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("updateMarketOracle"))){
+      
       return mocker.updateMarketOracleMock(marketIndex,_newOracleManager);
     }
   
@@ -383,6 +389,7 @@ contract LongShortMockable is ILongShort, Initializable {
         address _yieldManager
     ) external adminOnly {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("newSyntheticMarket"))){
+      
       return mocker.newSyntheticMarketMock(syntheticName,syntheticSymbol,_fundToken,_oracleManager,_yieldManager);
     }
   
@@ -431,6 +438,7 @@ contract LongShortMockable is ILongShort, Initializable {
         internal
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("seedMarketInitially"))){
+      
       return mocker.seedMarketInitiallyMock(initialMarketSeed,marketIndex);
     }
   
@@ -483,6 +491,7 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 initialMarketSeed
     ) external adminOnly {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("initializeMarket"))){
+      
       return mocker.initializeMarketMock(marketIndex,_baseEntryFee,_badLiquidityEntryFee,_baseExitFee,_badLiquidityExitFee,kInitialMultiplier,kPeriod,initialMarketSeed);
     }
   
@@ -516,6 +525,7 @@ contract LongShortMockable is ILongShort, Initializable {
         returns (MarketSide)
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getOtherSynthType"))){
+      
       return mocker.getOtherSynthTypeMock(synthTokenType);
     }
   
@@ -534,6 +544,7 @@ contract LongShortMockable is ILongShort, Initializable {
         returns (uint256 marketAmount, uint256 treasuryAmount)
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getTreasurySplit"))){
+      
       return mocker.getTreasurySplitMock(marketIndex,amount);
     }
   
@@ -571,6 +582,7 @@ contract LongShortMockable is ILongShort, Initializable {
         returns (uint256 longAmount, uint256 shortAmount)
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getMarketSplit"))){
+      
       return mocker.getMarketSplitMock(marketIndex,amount);
     }
   
@@ -590,6 +602,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     function _refreshTokensPrice(uint32 marketIndex) internal {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_refreshTokensPrice"))){
+      
       return mocker._refreshTokensPriceMock(marketIndex);
     }
   
@@ -622,6 +635,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     function _feesMechanism(uint32 marketIndex, uint256 totalFees) internal {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_feesMechanism"))){
+      
       return mocker._feesMechanismMock(marketIndex,totalFees);
     }
   
@@ -647,6 +661,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     function _yieldMechanism(uint32 marketIndex) internal {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_yieldMechanism"))){
+      
       return mocker._yieldMechanismMock(marketIndex);
     }
   
@@ -679,6 +694,7 @@ contract LongShortMockable is ILongShort, Initializable {
         returns (uint256)
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_minimum"))){
+      
       return mocker._minimumMock(value1,value2);
     }
   
@@ -698,6 +714,7 @@ contract LongShortMockable is ILongShort, Initializable {
         MarketSide losingSyntheticTokenType
     ) internal {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_calculateValueChangeForPriceMechanism"))){
+      
       return mocker._calculateValueChangeForPriceMechanismMock(marketIndex,assetPriceGreater,assetPriceLess,baseValueExposure,winningSyntheticTokenType,losingSyntheticTokenType);
     }
   
@@ -726,6 +743,7 @@ contract LongShortMockable is ILongShort, Initializable {
         returns (bool didUpdate)
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_priceChangeMechanism"))){
+      
       return mocker._priceChangeMechanismMock(marketIndex,newPrice);
     }
   
@@ -766,6 +784,7 @@ contract LongShortMockable is ILongShort, Initializable {
         MarketSide syntheticTokenType
     ) internal {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("handleBatchedDepositSettlement"))){
+      
       return mocker.handleBatchedDepositSettlementMock(marketIndex,syntheticTokenType);
     }
   
@@ -818,6 +837,7 @@ contract LongShortMockable is ILongShort, Initializable {
         internal
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("snapshopPriceChangeForNextPriceExecution"))){
+      
       return mocker.snapshopPriceChangeForNextPriceExecutionMock(marketIndex);
     }
   
@@ -839,6 +859,7 @@ contract LongShortMockable is ILongShort, Initializable {
         doesMarketExist(marketIndex)
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_updateSystemStateInternal"))){
+      
       return mocker._updateSystemStateInternalMock(marketIndex);
     }
   
@@ -895,6 +916,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     function _updateSystemState(uint32 marketIndex) external override {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_updateSystemState"))){
+      
       return mocker._updateSystemStateMock(marketIndex);
     }
   
@@ -906,6 +928,7 @@ contract LongShortMockable is ILongShort, Initializable {
         override
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_updateSystemStateMulti"))){
+      
       return mocker._updateSystemStateMultiMock(marketIndexes);
     }
   
@@ -920,6 +943,7 @@ contract LongShortMockable is ILongShort, Initializable {
         internal
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_transferFundsToYieldManager"))){
+      
       return mocker._transferFundsToYieldManagerMock(marketIndex,amount);
     }
   
@@ -931,6 +955,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     function _depositFunds(uint32 marketIndex, uint256 amount) internal {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_depositFunds"))){
+      
       return mocker._depositFundsMock(marketIndex,amount);
     }
   
@@ -939,6 +964,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     function _lockFundsInMarket(uint32 marketIndex, uint256 amount) internal {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_lockFundsInMarket"))){
+      
       return mocker._lockFundsInMarketMock(marketIndex,amount);
     }
   
@@ -954,6 +980,7 @@ contract LongShortMockable is ILongShort, Initializable {
         address user
     ) internal {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_withdrawFunds"))){
+      
       return mocker._withdrawFundsMock(marketIndex,amount,user);
     }
   
@@ -974,6 +1001,7 @@ contract LongShortMockable is ILongShort, Initializable {
         internal
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_transferToYieldManager"))){
+      
       return mocker._transferToYieldManagerMock(marketIndex,amount);
     }
   
@@ -999,6 +1027,7 @@ contract LongShortMockable is ILongShort, Initializable {
         internal
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_transferFromYieldManager"))){
+      
       return mocker._transferFromYieldManagerMock(marketIndex,amount);
     }
   
@@ -1025,6 +1054,7 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 penultyFees
     ) internal view returns (uint256) {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_getFeesGeneral"))){
+      
       return mocker._getFeesGeneralMock(marketIndex,delta,synthTokenGainingDominance,synthTokenLosingDominance,baseFee,penultyFees);
     }
   
@@ -1064,6 +1094,7 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 amount,         MarketSide syntheticTokenType
     ) internal view returns (uint256) {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_getFeesForMint"))){
+      
       return mocker._getFeesForMintMock(marketIndex,amount,syntheticTokenType);
     }
   
@@ -1085,6 +1116,7 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 amount,         MarketSide syntheticTokenType
     ) internal view returns (uint256) {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_getFeesForRedeem"))){
+      
       return mocker._getFeesForRedeemMock(marketIndex,amount,syntheticTokenType);
     }
   
@@ -1109,6 +1141,7 @@ contract LongShortMockable is ILongShort, Initializable {
         refreshSystemState(marketIndex)
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("mintLong"))){
+      
       return mocker.mintLongMock(marketIndex,amount);
     }
   
@@ -1124,6 +1157,7 @@ contract LongShortMockable is ILongShort, Initializable {
         refreshSystemState(marketIndex)
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("mintShort"))){
+      
       return mocker.mintShortMock(marketIndex,amount);
     }
   
@@ -1139,6 +1173,7 @@ contract LongShortMockable is ILongShort, Initializable {
         refreshSystemState(marketIndex)
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("mintLongAndStake"))){
+      
       return mocker.mintLongAndStakeMock(marketIndex,amount);
     }
   
@@ -1167,6 +1202,7 @@ contract LongShortMockable is ILongShort, Initializable {
         refreshSystemState(marketIndex)
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("mintShortAndStake"))){
+      
       return mocker.mintShortAndStakeMock(marketIndex,amount);
     }
   
@@ -1196,6 +1232,7 @@ contract LongShortMockable is ILongShort, Initializable {
         MarketSide syntheticTokenType
     ) internal returns (uint256) {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_mint"))){
+      
       return mocker._mintMock(marketIndex,amount,user,transferTo,syntheticTokenType);
     }
   
@@ -1238,6 +1275,7 @@ contract LongShortMockable is ILongShort, Initializable {
         MarketSide syntheticTokenType
     ) internal refreshSystemState(marketIndex) {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_redeem"))){
+      
       return mocker._redeemMock(marketIndex,tokensToRedeem,syntheticTokenType);
     }
   
@@ -1293,6 +1331,7 @@ contract LongShortMockable is ILongShort, Initializable {
         override
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("redeemLong"))){
+      
       return mocker.redeemLongMock(marketIndex,tokensToRedeem);
     }
   
@@ -1301,6 +1340,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     function redeemLongAll(uint32 marketIndex) external {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("redeemLongAll"))){
+      
       return mocker.redeemLongAllMock(marketIndex);
     }
   
@@ -1314,6 +1354,7 @@ contract LongShortMockable is ILongShort, Initializable {
         override
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("redeemShort"))){
+      
       return mocker.redeemShortMock(marketIndex,tokensToRedeem);
     }
   
@@ -1322,6 +1363,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     function redeemShortAll(uint32 marketIndex) external {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("redeemShortAll"))){
+      
       return mocker.redeemShortAllMock(marketIndex);
     }
   
@@ -1337,6 +1379,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     function transferTreasuryFunds(uint32 marketIndex) external treasuryOnly {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("transferTreasuryFunds"))){
+      
       return mocker.transferTreasuryFundsMock(marketIndex);
     }
   
@@ -1364,7 +1407,7 @@ contract LongShortMockable is ILongShort, Initializable {
     }
     struct UserLazyDeposit {
         uint256 usersCurrentUpdateIndex;
-        mapping(MarketSide => NextActionValues) nextActionValues;
+        NextActionValues[2] nextActionValues;
     }
 
     mapping(uint32 => uint256) public latestUpdateIndex;
@@ -1390,6 +1433,7 @@ contract LongShortMockable is ILongShort, Initializable {
         returns (uint256 pendingBalance)
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getUsersPendingBalance"))){
+      
       return mocker.getUsersPendingBalanceMock(user,marketIndex,syntheticTokenType);
     }
   
@@ -1401,7 +1445,7 @@ contract LongShortMockable is ILongShort, Initializable {
             latestUpdateIndex[marketIndex]
         ) {
                                     uint256 remaining =
-                currentUserDeposits.nextActionValues[syntheticTokenType]
+                currentUserDeposits.nextActionValues[uint8(syntheticTokenType)]
                     .mintAmount;
 
             uint256 tokens =
@@ -1421,16 +1465,21 @@ contract LongShortMockable is ILongShort, Initializable {
         UserLazyDeposit storage currentUserDeposits
     ) internal {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_executeLazyMintsIfTheyExist"))){
-      return mocker._executeLazyMintsIfTheyExistMock(marketIndex,user,syntheticTokenType,currentUserDeposits);
+      
+          UserLazyDeposit memory  currentUserDeposits_temp1 = currentUserDeposits;
+        
+      return mocker._executeLazyMintsIfTheyExistMock(marketIndex,user,syntheticTokenType,currentUserDeposits_temp1);
     }
   
         if (
-            currentUserDeposits.nextActionValues[syntheticTokenType]
+            currentUserDeposits.nextActionValues[uint8(syntheticTokenType)]
                 .mintAmount != 0
         ) {
             uint256 tokensToMint =
                 (((
-                    currentUserDeposits.nextActionValues[syntheticTokenType]
+                    currentUserDeposits.nextActionValues[
+                        uint8(syntheticTokenType)
+                    ]
                         .mintAmount
                 ) * TEN_TO_THE_18) /
                     marketStateSnapshot[marketIndex][
@@ -1442,7 +1491,7 @@ contract LongShortMockable is ILongShort, Initializable {
                 tokensToMint
             );
 
-            currentUserDeposits.nextActionValues[syntheticTokenType]
+            currentUserDeposits.nextActionValues[uint8(syntheticTokenType)]
                 .mintAmount = 0;
         }
     }
@@ -1453,7 +1502,10 @@ contract LongShortMockable is ILongShort, Initializable {
         UserLazyDeposit storage currentUserDeposits
     ) internal {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_executeOutstandingLazySettlementsAction"))){
-      return mocker._executeOutstandingLazySettlementsActionMock(user,marketIndex,currentUserDeposits);
+      
+          UserLazyDeposit memory  currentUserDeposits_temp1 = currentUserDeposits;
+        
+      return mocker._executeOutstandingLazySettlementsActionMock(user,marketIndex,currentUserDeposits_temp1);
     }
   
         _executeLazyMintsIfTheyExist(
@@ -1470,21 +1522,21 @@ contract LongShortMockable is ILongShort, Initializable {
         );
 
         if (
-            currentUserDeposits.nextActionValues[MarketSide.Long]
+            currentUserDeposits.nextActionValues[uint8(MarketSide.Long)]
                 .mintAndStakeAmount !=
             0 ||
-            currentUserDeposits.nextActionValues[MarketSide.Short]
+            currentUserDeposits.nextActionValues[uint8(MarketSide.Short)]
                 .mintAndStakeAmount !=
             0
         ) {
             uint256 tokensToStakeShort =
-                ((currentUserDeposits.nextActionValues[MarketSide.Short]
+                ((currentUserDeposits.nextActionValues[uint8(MarketSide.Short)]
                     .mintAndStakeAmount * TEN_TO_THE_18) /
                     marketStateSnapshot[marketIndex][
                         latestUpdateIndex[marketIndex]
                     ][MarketSide.Short]);
             uint256 tokensToStakeLong =
-                ((currentUserDeposits.nextActionValues[MarketSide.Long]
+                ((currentUserDeposits.nextActionValues[uint8(MarketSide.Long)]
                     .mintAndStakeAmount * TEN_TO_THE_18) /
                     marketStateSnapshot[marketIndex][
                         latestUpdateIndex[marketIndex]
@@ -1497,9 +1549,9 @@ contract LongShortMockable is ILongShort, Initializable {
                 user
             );
 
-                        currentUserDeposits.nextActionValues[MarketSide.Long]
+                        currentUserDeposits.nextActionValues[uint8(MarketSide.Long)]
                 .mintAndStakeAmount = 0;
-            currentUserDeposits.nextActionValues[MarketSide.Short]
+            currentUserDeposits.nextActionValues[uint8(MarketSide.Short)]
                 .mintAndStakeAmount = 0;
         }
         currentUserDeposits.usersCurrentUpdateIndex = 0;
@@ -1509,6 +1561,7 @@ contract LongShortMockable is ILongShort, Initializable {
         address user,
         uint32 marketIndex     ) internal {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_executeOutstandingLazySettlements"))){
+      
       return mocker._executeOutstandingLazySettlementsMock(user,marketIndex);
     }
   
@@ -1541,6 +1594,7 @@ contract LongShortMockable is ILongShort, Initializable {
         )
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("executeOutstandingLazySettlementsSynth"))){
+      
       return mocker.executeOutstandingLazySettlementsSynthMock(user,marketIndex,syntheticTokenType);
     }
   
@@ -1567,6 +1621,7 @@ contract LongShortMockable is ILongShort, Initializable {
         MarketSide syntheticTokenType
     ) internal executeOutstandingLazySettlements(msg.sender, marketIndex) {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_mintLazy"))){
+      
       return mocker._mintLazyMock(marketIndex,amount,syntheticTokenType);
     }
   
@@ -1575,7 +1630,7 @@ contract LongShortMockable is ILongShort, Initializable {
         batchedLazyDeposit[marketIndex][syntheticTokenType]
             .mintAmount += amount;
         userLazyActions[marketIndex][msg.sender].nextActionValues[
-            syntheticTokenType
+            uint8(syntheticTokenType)
         ]
             .mintAmount += amount;
         userLazyActions[marketIndex][msg.sender].usersCurrentUpdateIndex =
@@ -1585,6 +1640,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     function mintLongLazy(uint32 marketIndex, uint256 amount) external {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("mintLongLazy"))){
+      
       return mocker.mintLongLazyMock(marketIndex,amount);
     }
   
@@ -1601,6 +1657,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     function mintShortLazy(uint32 marketIndex, uint256 amount) external {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("mintShortLazy"))){
+      
       return mocker.mintShortLazyMock(marketIndex,amount);
     }
   
@@ -1613,6 +1670,7 @@ contract LongShortMockable is ILongShort, Initializable {
         MarketSide syntheticTokenType
     ) internal executeOutstandingLazySettlements(msg.sender, marketIndex) {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("mintAndStakeLazy"))){
+      
       return mocker.mintAndStakeLazyMock(marketIndex,amount,syntheticTokenType);
     }
   
@@ -1621,7 +1679,7 @@ contract LongShortMockable is ILongShort, Initializable {
         batchedLazyDeposit[marketIndex][syntheticTokenType]
             .mintAndStakeAmount += amount;
         userLazyActions[marketIndex][msg.sender].nextActionValues[
-            MarketSide.Short
+            uint8(MarketSide.Short)
         ]
             .mintAndStakeAmount += amount;
 
@@ -1632,6 +1690,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     function mintLongAndStakeLazy(uint32 marketIndex, uint256 amount) external {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("mintLongAndStakeLazy"))){
+      
       return mocker.mintLongAndStakeLazyMock(marketIndex,amount);
     }
   
@@ -1642,6 +1701,7 @@ contract LongShortMockable is ILongShort, Initializable {
         external
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("mintShortAndStakeLazy"))){
+      
       return mocker.mintShortAndStakeLazyMock(marketIndex,amount);
     }
   
@@ -1667,6 +1727,7 @@ contract LongShortMockable is ILongShort, Initializable {
         internal
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_executeOutstandingLazyRedeems"))){
+      
       return mocker._executeOutstandingLazyRedeemsMock(user,marketIndex);
     }
   
@@ -1725,6 +1786,7 @@ contract LongShortMockable is ILongShort, Initializable {
         executeOutstandingLazyRedeems(msg.sender, marketIndex)
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("redeemLongLazy"))){
+      
       return mocker.redeemLongLazyMock(marketIndex,tokensToRedeem);
     }
   
@@ -1750,6 +1812,7 @@ contract LongShortMockable is ILongShort, Initializable {
         executeOutstandingLazyRedeems(msg.sender, marketIndex)
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("redeemShortLazy"))){
+      
       return mocker.redeemShortLazyMock(marketIndex,tokensToRedeem);
     }
   
@@ -1772,6 +1835,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     function handleBatchedLazyRedeems(uint32 marketIndex) public {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("handleBatchedLazyRedeems"))){
+      
       return mocker.handleBatchedLazyRedeemsMock(marketIndex);
     }
   
