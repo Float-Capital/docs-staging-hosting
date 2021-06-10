@@ -30,6 +30,7 @@ module.exports = {
       lg: "1.125rem",
       xl: "1.25rem",
       "2xl": "1.5rem",
+      "2.5xl": "1.65rem",
       "3xl": "1.875rem",
       "4xl": "2.25rem",
       "5xl": "3rem",
@@ -38,6 +39,9 @@ module.exports = {
     minWidth: {
       "1/2": "50%",
       "3/4": "75%",
+      340: "340px",
+      400: "400px",
+      500: "500px",
     },
     minHeight: {
       "1/2": "50%",

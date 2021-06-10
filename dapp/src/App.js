@@ -16,9 +16,13 @@ var StateChangeMonitor = require("./libraries/StateChangeMonitor.js");
 var PageComponent = {};
 
 function $$default(props) {
-  Router.useRouter();
+  var router = Router.useRouter();
   var content = React.createElement(props.Component, props.pageProps);
   InjectedEthereum.useReloadOnMetamaskChainChanged(undefined);
+  var match = router.route;
+  var tmp = match === "/site" ? content : React.createElement(MainLayout.make, {
+          children: content
+        });
   return React.createElement(ToastProvider.make, {
               children: React.createElement(RootProvider.make, {
                     children: React.createElement(StartTrading.ClickedTradingProvider.make, {
@@ -26,9 +30,7 @@ function $$default(props) {
                         }, React.createElement(Client.make, {
                               children: React.createElement(APYProvider.make, {
                                     children: React.createElement(StateChangeMonitor.make, {
-                                          children: React.createElement(MainLayout.make, {
-                                                children: content
-                                              })
+                                          children: tmp
                                         })
                                   })
                             }), React.createElement(Toast.make, {}))

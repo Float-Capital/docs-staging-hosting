@@ -32,6 +32,7 @@ let default = (props: props): React.element => {
           <APYProvider>
             <StateChangeMonitor>
               {switch router.route {
+              | "/site" => content
               | _ => <MainLayout> content </MainLayout>
               }}
             </StateChangeMonitor>
