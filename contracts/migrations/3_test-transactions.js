@@ -1,11 +1,11 @@
 const { BN } = require("@openzeppelin/test-helpers");
+const ether = require("@openzeppelin/test-helpers/src/ether");
 
 const Dai = artifacts.require("Dai");
 const LongShort = artifacts.require("LongShort");
 const Treasury = artifacts.require("Treasury_v0");
 const Staker = artifacts.require("Staker");
 const SyntheticToken = artifacts.require("SyntheticToken");
-const Treasury = artifacts.require("Treasury_v0");
 const YieldManagerMock = artifacts.require("YieldManagerMock");
 const OracleManagerMock = artifacts.require("OracleManagerMock");
 const YieldManagerAave = artifacts.require("YieldManagerAave");
@@ -37,7 +37,8 @@ const deployTestMarket = async (
   treasuryInstance,
   fundTokenInstance,
   admin,
-  networkName
+  networkName,
+  token
 ) => {
   // Default mint/redeem fees.
   const _baseEntryFee = 0;
@@ -93,6 +94,13 @@ const deployTestMarket = async (
   const kInitialMultiplier = new BN("5000000000000000000"); // 5x
   let kPeriod = 864000; // 10 days
 
+  await mintAndApprove(
+    token,
+    new BN("2000000000000000000"),
+    admin,
+    longShortInstance.address
+  );
+
   await longShortInstance.initializeMarket(
     currentMarketIndex,
     _baseEntryFee,
@@ -100,7 +108,8 @@ const deployTestMarket = async (
     _badLiquidityEntryFee,
     _badLiquidityExitFee,
     kInitialMultiplier,
-    kPeriod
+    kPeriod,
+    new BN("1000000000000000000")
   );
 };
 
@@ -121,7 +130,7 @@ const topupBalanceIfLow = async (from, to) => {
   }
 };
 
-module.exports = async function (deployer, network, accounts) {
+module.exports = async function(deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
@@ -153,7 +162,8 @@ module.exports = async function (deployer, network, accounts) {
     treasury,
     token,
     admin,
-    network
+    network,
+    token
   );
 
   await deployTestMarket(
@@ -163,7 +173,8 @@ module.exports = async function (deployer, network, accounts) {
     treasury,
     token,
     admin,
-    network
+    network,
+    token
   );
 
   await deployTestMarket(
@@ -173,7 +184,8 @@ module.exports = async function (deployer, network, accounts) {
     treasury,
     token,
     admin,
-    network
+    network,
+    token
   );
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
@@ -188,9 +200,13 @@ module.exports = async function (deployer, network, accounts) {
         marketIndex
       )} OracleManagerEthKiller=${await longShort.oracleManagers(
         marketIndex
-      )} SyntheticToken=${await LongShort.syntheticTokens(CONSTANTS.longTokenType,
+      )} SyntheticToken=${await LongShort.syntheticTokens(
+        CONSTANTS.longTokenType,
         marketIndex
-      )} SyntheticToken=${await LongShort.syntheticTokens(CONSTANTS.shortTokenType, marketIndex)}`;
+      )} SyntheticToken=${await LongShort.syntheticTokens(
+        CONSTANTS.shortTokenType,
+        marketIndex
+      )}`;
     }
 
     console.log(`To verify market specific contracts run the following:
