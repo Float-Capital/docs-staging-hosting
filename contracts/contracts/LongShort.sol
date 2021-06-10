@@ -1551,7 +1551,7 @@ contract LongShort is ILongShort, Initializable {
         public
     {
         UserLazyRedeem storage currentUserRedeems =
-            userLazyRedeems[marketIndex][msg.sender];
+            userLazyRedeems[marketIndex][user];
 
         if (
             currentUserRedeems.usersCurrentUpdateIndex != 0 &&
@@ -1680,8 +1680,8 @@ contract LongShort is ILongShort, Initializable {
             totalFeesLong = _getFeesGeneral(
                 marketIndex,
                 delta,
-                MarketSide.Long,
                 MarketSide.Short,
+                MarketSide.Long,
                 0,
                 badLiquidityExitFee[marketIndex]
             );
@@ -1690,8 +1690,8 @@ contract LongShort is ILongShort, Initializable {
             totalFeesShort = _getFeesGeneral(
                 marketIndex,
                 delta,
-                MarketSide.Short,
                 MarketSide.Long,
+                MarketSide.Short,
                 0,
                 badLiquidityExitFee[marketIndex]
             );

@@ -43,6 +43,9 @@ let testIntegration =
         );
 
       let%AwaitThen _ =
+        paymentToken->ERC20Mock.setShouldMockTransfer(~value=false);
+
+      let%AwaitThen _ =
         paymentToken
         ->ContractHelpers.connect(~address=testUser)
         ->ERC20Mock.approve(
