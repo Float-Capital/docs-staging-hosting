@@ -92,6 +92,17 @@ let testIntegration =
       let%AwaitThen _ =
         oracleManager->OracleManagerMock.setPrice(~newPrice=nextPrice);
 
+      let {
+        totalLockedLong: newLongValueSansRedemptions,
+        totalLockedShort: newShortValueSansRedemptions,
+      } =
+        MarketSimulation.simulateMarketPriceChange(
+          ~oldPrice=previousPrice,
+          ~newPrice=nextPrice,
+          ~totalLockedLong=valueLongBefore,
+          ~totalLockedShort=valueShortBefore,
+        );
+
       let%AwaitThen _ = longShort->LongShort._updateSystemState(~marketIndex);
       let%AwaitThen latestUpdateIndex =
         longShort->LongShort.latestUpdateIndex(marketIndex);
@@ -106,8 +117,8 @@ let testIntegration =
         longShort->LongShortHelpers.getFeesRedeemLazy(
           ~marketIndex,
           ~amount=batchedRedemptionAmountWithoutFees,
-          ~valueInRemovalSide=valueLongBefore,
-          ~valueInOtherSide=valueShortBefore,
+          ~valueInRemovalSide=newLongValueSansRedemptions,
+          ~valueInOtherSide=newShortValueSansRedemptions,
         );
 
       let amountExpectedToBeRedeemed =
