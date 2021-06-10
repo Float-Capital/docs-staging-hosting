@@ -28,6 +28,8 @@ let test =
 
       let _ = LongShortSmocked.InternalMock.mockadminOnlyToReturn();
 
+      let _ = LongShortSmocked.InternalMock.mockseedMarketInitiallyToReturn();
+
       (longShortRef^)
       ->LongShort.Exposed.setAddNewStakingFundParams(
           ~marketIndex,
@@ -40,7 +42,7 @@ let test =
     };
 
     it'(
-      "calls all functions (staker.addNewStakingFund, _changeFees, adminOnly) and mutates state [marketExists] correctly",
+      "calls all functions (staker.addNewStakingFund, _changeFees, adminOnly, seedMarketInitially) and mutates state (marketExists) correctly",
       () => {
         let%Await _ =
           setup(~marketIndex=1, ~marketIndexValue=false, ~latestMarket=1);
@@ -55,6 +57,7 @@ let test =
               ~kPeriod=Ethers.BigNumber.fromUnsafe("4"),
               ~baseExitFee=Ethers.BigNumber.fromUnsafe("5"),
               ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
+              ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
             );
 
         let stakerCalls =
@@ -74,7 +77,6 @@ let test =
         let changeFeeCalls = LongShortSmocked.InternalMock._changeFeeCalls();
 
         Chai.recordEqualFlat(
-          ~expected=changeFeeCalls->Array.getExn(0),
           ~actual={
             marketIndex: 1,
             _baseEntryFee: Ethers.BigNumber.fromUnsafe("1"),
@@ -82,6 +84,18 @@ let test =
             _badLiquidityEntryFee: Ethers.BigNumber.fromUnsafe("2"),
             _badLiquidityExitFee: Ethers.BigNumber.fromUnsafe("3"),
           },
+          ~expected=changeFeeCalls->Array.getExn(0),
+        );
+
+        let seedMarketInitiallyCalls =
+          LongShortSmocked.InternalMock.seedMarketInitiallyCalls();
+
+        Chai.recordEqualFlat(
+          ~actual={
+            marketIndex: 1,
+            initialMarketSeed: Ethers.BigNumber.fromUnsafe("7"),
+          },
+          ~expected=seedMarketInitiallyCalls->Array.getExn(0),
         );
 
         // No arguments
@@ -112,6 +126,7 @@ let test =
                 ~kPeriod=Ethers.BigNumber.fromUnsafe("4"),
                 ~baseExitFee=Ethers.BigNumber.fromUnsafe("5"),
                 ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
+                ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
               ),
         );
       ();
@@ -134,6 +149,7 @@ let test =
                 ~kPeriod=Ethers.BigNumber.fromUnsafe("4"),
                 ~baseExitFee=Ethers.BigNumber.fromUnsafe("5"),
                 ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
+                ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
               ),
         );
       ();

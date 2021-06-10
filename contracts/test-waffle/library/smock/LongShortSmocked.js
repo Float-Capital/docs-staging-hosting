@@ -67,6 +67,15 @@ function mockadminOnlyToReturn(param) {
   
 }
 
+function mockseedMarketInitiallyToReturn(param) {
+  checkForExceptions("seedMarketInitially");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.seedMarketInitiallyMock.will.return()));
+          
+        }));
+  
+}
+
 function adminOnlyCalls(param) {
   checkForExceptions("adminOnly");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
@@ -90,6 +99,19 @@ function _changeFeeCalls(param) {
                   })));
 }
 
+function seedMarketInitiallyCalls(param) {
+  checkForExceptions("seedMarketInitially");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.seedMarketInitiallyMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          initialMarketSeed: param[0],
+                                          marketIndex: param[1]
+                                        };
+                                }));
+                  })));
+}
+
 var InternalMock = {
   mockContractName: "LongShortForInternalMocking",
   internalRef: internalRef,
@@ -101,8 +123,10 @@ var InternalMock = {
   checkForExceptions: checkForExceptions,
   mock_changeFeesToReturn: mock_changeFeesToReturn,
   mockadminOnlyToReturn: mockadminOnlyToReturn,
+  mockseedMarketInitiallyToReturn: mockseedMarketInitiallyToReturn,
   adminOnlyCalls: adminOnlyCalls,
-  _changeFeeCalls: _changeFeeCalls
+  _changeFeeCalls: _changeFeeCalls,
+  seedMarketInitiallyCalls: seedMarketInitiallyCalls
 };
 
 exports.InternalMock = InternalMock;

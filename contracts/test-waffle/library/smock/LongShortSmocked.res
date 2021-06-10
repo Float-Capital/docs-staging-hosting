@@ -51,6 +51,13 @@ module InternalMock = {
     })
   }
 
+  let mockseedMarketInitiallyToReturn = () => {
+    checkForExceptions(~functionName="seedMarketInitially")
+    let _ = internalRef.contents->Option.map(_r => {
+      let _ = %raw("_r.smocked.seedMarketInitiallyMock.will.return()")
+    })
+  }
+
   type adminOnlyCall
 
   let adminOnlyCalls: unit => array<adminOnlyCall> = () => {
@@ -89,6 +96,26 @@ module InternalMock = {
           _badLiquidityEntryFee: _badLiquidityEntryFee,
           _baseExitFee: _baseExitFee,
           _badLiquidityExitFee: _badLiquidityExitFee,
+        }
+      })
+    })
+    ->Option.getExn
+  }
+
+  type seedMarketInitiallyCall = {
+    initialMarketSeed: Ethers.BigNumber.t,
+    marketIndex: int,
+  }
+
+  let seedMarketInitiallyCalls: unit => array<seedMarketInitiallyCall> = () => {
+    checkForExceptions(~functionName="seedMarketInitially")
+    internalRef.contents
+    ->Option.map(_r => {
+      let array = %raw("_r.smocked.seedMarketInitiallyMock.calls")
+      array->Array.map(((initialMarketSeed, marketIndex)) => {
+        {
+          initialMarketSeed: initialMarketSeed,
+          marketIndex: marketIndex,
         }
       })
     })
