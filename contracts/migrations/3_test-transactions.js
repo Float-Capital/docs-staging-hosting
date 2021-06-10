@@ -31,8 +31,8 @@ const mintAndApprove = async (token, amount, user, approvedAddress) => {
 };
 
 const deployTestMarket = async (
-  syntheticSymbol,
   syntheticName,
+  syntheticSymbol,
   longShortInstance,
   treasuryInstance,
   fundTokenInstance,
@@ -155,8 +155,10 @@ module.exports = async function(deployer, network, accounts) {
     token = await Dai.deployed();
   }
 
+  await mintAndApprove(token, new BN("20000000000000000000"), user3, admin);
+
   await deployTestMarket(
-    "ETH killers",
+    "ETH Killers",
     "ETHK",
     longShort,
     treasury,
@@ -167,7 +169,7 @@ module.exports = async function(deployer, network, accounts) {
   );
 
   await deployTestMarket(
-    "ETH/BTC Dominance",
+    "The Flippening",
     "EBD",
     longShort,
     treasury,
