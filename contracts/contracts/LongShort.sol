@@ -446,8 +446,7 @@ contract LongShort is ILongShort, Initializable {
         require(!marketExists[marketIndex] && marketIndex <= latestMarket);
 
         marketExists[marketIndex] = true;
-        console.log("market index is ");
-        console.log(marketIndex);
+
         _changeFees(
             marketIndex,
             _baseEntryFee,
