@@ -51,7 +51,6 @@ contract LongShort is ILongShort, Initializable {
     // Market state.
     mapping(MarketSide => mapping(uint32 => uint256))
         public syntheticTokenBackedValue;
-    mapping(uint32 => uint256) public totalValueLockedInMarket;
     mapping(uint32 => uint256) public totalValueLockedInYieldManager;
     mapping(uint32 => uint256) public totalValueReservedForTreasury;
     mapping(uint32 => uint256) public assetPrice;
@@ -408,12 +407,9 @@ contract LongShort is ILongShort, Initializable {
             DEAD_ADDRESS,
             initialMarketSeed
         );
-        syntheticTokenBackedValue[MarketSide.Long][
-            marketIndex
-        ] = initialMarketSeed;
-        syntheticTokenBackedValue[MarketSide.Short][
-            marketIndex
-        ] = initialMarketSeed;
+
+        syntheticTokenBackedValue[MarketSide.Long][marketIndex] = initialMarketSeed;
+        syntheticTokenBackedValue[MarketSide.Short][marketIndex] = initialMarketSeed;
 
         emit ShortMinted(
             marketIndex,
@@ -492,9 +488,12 @@ contract LongShort is ILongShort, Initializable {
         view
         returns (uint256 marketAmount, uint256 treasuryAmount)
     {
-        assert(totalValueLockedInMarket[marketIndex] != 0);
-
         uint256 marketPcnt; // fixed-precision scale of 10000
+
+        uint256 totalValueLockedInMarket =
+            syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
+            syntheticTokenBackedValue[MarketSide.Short][marketIndex];
+
         if (
             syntheticTokenBackedValue[MarketSide.Long][marketIndex] >
             syntheticTokenBackedValue[MarketSide.Short][marketIndex]
@@ -503,13 +502,13 @@ contract LongShort is ILongShort, Initializable {
                 ((syntheticTokenBackedValue[MarketSide.Long][marketIndex] -
                     syntheticTokenBackedValue[MarketSide.Short][marketIndex]) *
                     10000) /
-                totalValueLockedInMarket[marketIndex];
+                totalValueLockedInMarket;
         } else {
             marketPcnt =
                 ((syntheticTokenBackedValue[MarketSide.Short][marketIndex] -
                     syntheticTokenBackedValue[MarketSide.Long][marketIndex]) *
                     10000) /
-                totalValueLockedInMarket[marketIndex];
+                totalValueLockedInMarket;
         }
 
         marketAmount = (marketPcnt * amount) / 10000;
@@ -529,13 +528,10 @@ contract LongShort is ILongShort, Initializable {
         view
         returns (uint256 longAmount, uint256 shortAmount)
     {
-        assert(totalValueLockedInMarket[marketIndex] != 0);
-
         // The percentage value that a position receives depends on the amount
         // of total market value taken up by the _opposite_ position.
         uint256 longPcnt =
             (syntheticTokenBackedValue[MarketSide.Short][marketIndex] * 10000) /
-            // TODO STENT inefficiency here. Just use totalValueLockedInMarket[marketIndex]
                 (syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
                     syntheticTokenBackedValue[MarketSide.Short][marketIndex]);
 
@@ -581,14 +577,6 @@ contract LongShort is ILongShort, Initializable {
         (uint256 marketAmount, uint256 treasuryAmount) =
             getTreasurySplit(marketIndex, totalFees);
 
-        // Do a logical transfer from market funds into treasury.
-        // TODO STENT this is a bit confusion.
-        //   This function (_feesMechanism) assumes that the fees are already in totalValueLockedInMarket
-        //   but not in syntheticTokenBackedValue[MarketSide.Long][marketIndex] which is confusiong.
-        //   It is also a source of errors because if you do not add the fees to totalValueLockedInMarket
-        //   first AND then call this function in the same transaction then you will have
-        //   Long + Short != totalValueLockedInMarket
-        totalValueLockedInMarket[marketIndex] -= treasuryAmount;
         totalValueReservedForTreasury[marketIndex] += treasuryAmount;
 
         // Splits mostly to the weaker position to incentivise balance.
@@ -616,7 +604,6 @@ contract LongShort is ILongShort, Initializable {
             // We keep the interest locked in the yield manager, but update our
             // bookkeeping to logically simulate moving the funds around.
             totalValueLockedInYieldManager[marketIndex] += amount;
-            totalValueLockedInMarket[marketIndex] += marketAmount;
             totalValueReservedForTreasury[marketIndex] += treasuryAmount;
 
             // Splits mostly to the weaker position to incentivise balance.
@@ -696,6 +683,7 @@ contract LongShort is ILongShort, Initializable {
                 (totalAmount * TEN_TO_THE_18) /
                     syntheticTokenPrice[syntheticTokenType][marketIndex];
 
+            // TODO STENT there are no token mint events emitted here, but there are on market initialization
             syntheticTokens[syntheticTokenType][marketIndex].mint(
                 address(this),
                 numberOfTokens
@@ -796,16 +784,9 @@ contract LongShort is ILongShort, Initializable {
 
         emit ValueLockedInSystem(
             marketIndex,
-            totalValueLockedInMarket[marketIndex],
+            syntheticTokenBackedValue[MarketSide.Long][marketIndex] + syntheticTokenBackedValue[MarketSide.Short][marketIndex],
             syntheticTokenBackedValue[MarketSide.Long][marketIndex],
             syntheticTokenBackedValue[MarketSide.Short][marketIndex]
-        );
-
-        // Invariant: long/short values should never differ from total value.
-        assert(
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex] ==
-                totalValueLockedInMarket[marketIndex]
         );
     }
 
@@ -825,13 +806,10 @@ contract LongShort is ILongShort, Initializable {
     /*
      * Locks funds from the sender into the given market.
      */
+    // TODO STENT function is just a redirect
     function _transferFundsToYieldManager(uint32 marketIndex, uint256 amount)
         internal
     {
-        // Update global value state.
-        totalValueLockedInMarket[marketIndex] =
-            totalValueLockedInMarket[marketIndex] +
-            amount;
         _transferToYieldManager(marketIndex, amount);
     }
 
@@ -852,19 +830,12 @@ contract LongShort is ILongShort, Initializable {
         uint256 amount,
         address user
     ) internal {
-        assert(totalValueLockedInMarket[marketIndex] >= amount);
+        assert(syntheticTokenBackedValue[MarketSide.Long][marketIndex] + syntheticTokenBackedValue[MarketSide.Short][marketIndex] >= amount);
 
         _transferFromYieldManager(marketIndex, amount);
 
         // Transfer funds to the sender.
         fundTokens[marketIndex].transfer(user, amount);
-
-        // Update market state.
-        // TODO STENT is this totalValueLockedInMarket variable even used properly? It's a pain to update it
-        //     and a source of error in future updates
-        totalValueLockedInMarket[marketIndex] =
-            totalValueLockedInMarket[marketIndex] -
-            amount;
     }
 
     /*
@@ -874,6 +845,12 @@ contract LongShort is ILongShort, Initializable {
     function _transferToYieldManager(uint32 marketIndex, uint256 amount)
         internal
     {
+        // TODO STENT note there are 2 approvals & 2 transfers here:
+        //     1. approve transfer from this contract to yield manager contract
+        //     2. transfer from this contract to yield manager contract
+        //     3. approve transfer from yield manager contract to lendingPool contract
+        //     4. transfer from yield mnager contract to lendingPool contract
+        // Surely we can mak this more efficient?
         fundTokens[marketIndex].approve(
             address(yieldManagers[marketIndex]),
             amount
@@ -881,17 +858,7 @@ contract LongShort is ILongShort, Initializable {
         yieldManagers[marketIndex].depositToken(amount);
 
         // Update market state.
-
         totalValueLockedInYieldManager[marketIndex] += amount;
-
-        // Invariant: yield managers should never have more locked funds
-        // than the combined value of the market and dao funds.
-        // TODO STENT this check seems wierd. What happens if this fails? What is the recovery? Should it be an assert
-        require(
-            totalValueLockedInYieldManager[marketIndex] <=
-                totalValueLockedInMarket[marketIndex] +
-                    totalValueReservedForTreasury[marketIndex]
-        );
     }
 
     /*
@@ -915,7 +882,8 @@ contract LongShort is ILongShort, Initializable {
         // TODO STENT this check seems wierd. What happens if this fails? What is the recovery? Should it be an assert?
         require(
             totalValueLockedInYieldManager[marketIndex] <=
-                totalValueLockedInMarket[marketIndex] +
+            syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
+                    syntheticTokenBackedValue[MarketSide.Short][marketIndex] +
                     totalValueReservedForTreasury[marketIndex]
         );
     }
@@ -1102,6 +1070,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 tokens =
             (remaining * TEN_TO_THE_18) /
                 syntheticTokenPrice[syntheticTokenType][marketIndex];
+
         syntheticTokens[syntheticTokenType][marketIndex].mint(
             transferTo,
             tokens
@@ -1117,7 +1086,7 @@ contract LongShort is ILongShort, Initializable {
 
         emit ValueLockedInSystem(
             marketIndex,
-            totalValueLockedInMarket[marketIndex],
+            syntheticTokenBackedValue[MarketSide.Long][marketIndex] + syntheticTokenBackedValue[MarketSide.Short][marketIndex],
             syntheticTokenBackedValue[MarketSide.Long][marketIndex],
             syntheticTokenBackedValue[MarketSide.Short][marketIndex]
         );
@@ -1144,16 +1113,19 @@ contract LongShort is ILongShort, Initializable {
             (tokensToRedeem *
                 syntheticTokenPrice[syntheticTokenType][marketIndex]) /
                 TEN_TO_THE_18;
+
         uint256 fees =
             _getFeesForRedeem(marketIndex, amount, syntheticTokenType);
+
         uint256 remaining = amount - fees;
 
         // Distribute fees across the market.
         _feesMechanism(marketIndex, fees);
 
         // Withdraw funds with remaining amount.
-        syntheticTokenBackedValue[syntheticTokenType][marketIndex] -= amount;
         _withdrawFunds(marketIndex, remaining, msg.sender);
+        syntheticTokenBackedValue[syntheticTokenType][marketIndex] -= amount;
+
         // TODO STENT CONCERN1
         _refreshTokenPrices(marketIndex);
 
@@ -1178,7 +1150,7 @@ contract LongShort is ILongShort, Initializable {
 
         emit ValueLockedInSystem(
             marketIndex,
-            totalValueLockedInMarket[marketIndex],
+            syntheticTokenBackedValue[MarketSide.Long][marketIndex] + syntheticTokenBackedValue[MarketSide.Short][marketIndex],
             syntheticTokenBackedValue[MarketSide.Long][marketIndex],
             syntheticTokenBackedValue[MarketSide.Short][marketIndex]
         );
