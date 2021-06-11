@@ -63,6 +63,10 @@ contract LongShortForInternalMocking {
       return ();
     }
      
+    function _distributeMarketAmountMock(uint32,uint256) public pure {
+      return ();
+    }
+     
     function _feesMechanismMock(uint32,uint256) public pure {
       return ();
     }
@@ -87,7 +91,7 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function snapshopPriceChangeForNextPriceExecutionMock(uint32) public pure {
+    function snapshotPriceChangeForNextPriceExecutionMock(uint32) public pure {
       return ();
     }
      

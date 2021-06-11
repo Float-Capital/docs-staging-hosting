@@ -96,6 +96,24 @@
         "type": "uint32"
       },
       {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "_distributeMarketAmountMock",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      },
+      {
         "internalType": "address",
         "name": "",
         "type": "address"
@@ -1347,7 +1365,7 @@
         "type": "uint32"
       }
     ],
-    "name": "snapshopPriceChangeForNextPriceExecutionMock",
+    "name": "snapshotPriceChangeForNextPriceExecutionMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
