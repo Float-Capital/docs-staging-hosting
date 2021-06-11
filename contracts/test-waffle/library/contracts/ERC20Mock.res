@@ -147,6 +147,10 @@ external renounceRole: (
 external revokeRole: (t, ~role: bytes32, ~account: Ethers.ethAddress) => JsPromise.t<transaction> =
   "revokeRole"
 
+@send
+external setShouldMockTransfer: (t, ~value: bool) => JsPromise.t<transaction> =
+  "setShouldMockTransfer"
+
 type supportsInterfaceReturn = bool
 @send
 external supportsInterface: (t, ~interfaceId: bytes4) => JsPromise.t<supportsInterfaceReturn> =
