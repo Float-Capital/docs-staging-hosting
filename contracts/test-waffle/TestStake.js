@@ -41,7 +41,7 @@ Globals.describe("Float System")(undefined, undefined, undefined, (function (par
                                                                   var priceOfSynthForAction = param.priceOfSynthForAction;
                                                                   var amount = param.amount;
                                                                   var synth = param.synth;
-                                                                  return LetOps.AwaitThen.let_(Contract.LongShortHelpers.getFees(longShort, param.marketIndex, amount, param.valueInEntrySide, param.valueInOtherSide), (function (amountOfFees) {
+                                                                  return LetOps.AwaitThen.let_(Contract.LongShortHelpers.getFeesMint(longShort, param.marketIndex, amount, param.valueInEntrySide, param.valueInOtherSide), (function (amountOfFees) {
                                                                                 return LetOps.Await.let_(staker.userAmountStaked(synth.address, testUser.address), (function (amountStaked) {
                                                                                               var expectedStakeAmount = Globals.div(Globals.mul(Globals.sub(amount, amountOfFees), CONSTANTS.tenToThe18), priceOfSynthForAction);
                                                                                               return Chai.bnEqual("amount staked is greater than expected", amountStaked, expectedStakeAmount);

@@ -5,6 +5,7 @@ var LetOps = require("./library/LetOps.js");
 var Globals = require("./library/Globals.js");
 var Helpers = require("./library/Helpers.js");
 var Contract = require("./library/Contract.js");
+var LazyRedeem = require("./tests/longshort/LazyRedeem.js");
 var LazyDeposit = require("./tests/longshort/LazyDeposit.js");
 var HelperActions = require("./library/HelperActions.js");
 
@@ -32,6 +33,7 @@ Globals.describe("Float System")(undefined, undefined, undefined, (function (par
                               
                             }));
                       LazyDeposit.testIntegration(contracts, accounts);
+                      LazyRedeem.testIntegration(contracts, accounts);
                       return Globals.describe("LongShort - internals exposed")(undefined, undefined, undefined, (function (param) {
                                     var contracts = {
                                       contents: undefined

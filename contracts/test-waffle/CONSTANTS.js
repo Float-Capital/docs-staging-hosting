@@ -6,12 +6,15 @@ var floatIssuanceFixedDecimal = ethers.BigNumber.from("1000000000000000000000000
 
 var tenToThe18 = ethers.BigNumber.from("1000000000000000000");
 
+var zeroBn = ethers.BigNumber.from(0);
+
 var longTokenType = 0;
 
 var shortTokenType = 1;
 
 exports.floatIssuanceFixedDecimal = floatIssuanceFixedDecimal;
 exports.tenToThe18 = tenToThe18;
+exports.zeroBn = zeroBn;
 exports.longTokenType = longTokenType;
 exports.shortTokenType = shortTokenType;
 /* floatIssuanceFixedDecimal Not a pure module */
