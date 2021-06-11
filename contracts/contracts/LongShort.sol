@@ -258,6 +258,9 @@ contract LongShort is ILongShort, Initializable {
         tokenFactory = _tokenFactory;
         staker = _staker;
 
+        percentageAvailableForEarlyExitNumerator = 80000;
+        percentageAvailableForEarlyExitDenominator = 100000;
+
         emit V1(
             _admin,
             address(treasury),
@@ -548,6 +551,8 @@ contract LongShort is ILongShort, Initializable {
     function _refreshTokensPrice(uint32 marketIndex) internal {
         uint256 longTokenSupply =
             syntheticTokens[MarketSide.Long][marketIndex].totalSupply();
+
+        // supply should never be zero and burn address will always own a small amount
         if (longTokenSupply > 0) {
             syntheticTokenPrice[MarketSide.Long][marketIndex] =
                 (syntheticTokenBackedValue[MarketSide.Long][marketIndex] *
@@ -571,6 +576,20 @@ contract LongShort is ILongShort, Initializable {
         );
     }
 
+    function _distributeMarketAmount(uint32 marketIndex, uint256 marketAmount)
+        internal
+    {
+        // Splits mostly to the weaker position to incentivise balance.
+        (uint256 longAmount, uint256 shortAmount) =
+            getMarketSplit(marketIndex, marketAmount);
+        syntheticTokenBackedValue[MarketSide.Long][marketIndex] =
+            syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
+            longAmount;
+        syntheticTokenBackedValue[MarketSide.Short][marketIndex] =
+            syntheticTokenBackedValue[MarketSide.Short][marketIndex] +
+            shortAmount;
+    }
+
     /**
      * Controls what happens with mint/redeem fees.
      */
@@ -583,16 +602,7 @@ contract LongShort is ILongShort, Initializable {
         totalValueLockedInMarket[marketIndex] -= treasuryAmount;
         totalValueReservedForTreasury[marketIndex] += treasuryAmount;
 
-        // Splits mostly to the weaker position to incentivise balance.
-        (uint256 longAmount, uint256 shortAmount) =
-            getMarketSplit(marketIndex, marketAmount);
-        syntheticTokenBackedValue[MarketSide.Long][marketIndex] =
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-            longAmount;
-        syntheticTokenBackedValue[MarketSide.Short][marketIndex] =
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] +
-            shortAmount;
-
+        _distributeMarketAmount(marketIndex, marketAmount);
         emit FeesLevied(marketIndex, totalFees);
     }
 
@@ -604,7 +614,6 @@ contract LongShort is ILongShort, Initializable {
             yieldManagers[marketIndex].getTotalHeld() -
                 totalValueLockedInYieldManager[marketIndex];
 
-        // Market gets a bigger share if the market is more imbalanced.
         if (amount > 0) {
             (uint256 marketAmount, uint256 treasuryAmount) =
                 getTreasurySplit(marketIndex, amount);
@@ -615,15 +624,7 @@ contract LongShort is ILongShort, Initializable {
             totalValueLockedInMarket[marketIndex] += marketAmount;
             totalValueReservedForTreasury[marketIndex] += treasuryAmount;
 
-            // Splits mostly to the weaker position to incentivise balance.
-            (uint256 longAmount, uint256 shortAmount) =
-                getMarketSplit(marketIndex, marketAmount);
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] =
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-                longAmount;
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] =
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex] +
-                shortAmount;
+            _distributeMarketAmount(marketIndex, marketAmount);
         }
     }
 
@@ -722,9 +723,6 @@ contract LongShort is ILongShort, Initializable {
 
             // NOTE: no fees are calculated, but if they are desired in the future they can be added here.
 
-            // Distribute fees across the market.
-            _refreshTokensPrice(marketIndex);
-
             // Mint long tokens with remaining value.
             uint256 numberOfTokens =
                 (totalAmount * TEN_TO_THE_18) /
@@ -738,6 +736,23 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokenBackedValue[syntheticTokenType][marketIndex] =
                 syntheticTokenBackedValue[syntheticTokenType][marketIndex] +
                 totalAmount;
+
+            //TODO: Can remove these sanity checks at some point
+            uint256 oldTokenLongPrice =
+                syntheticTokenPrice[MarketSide.Long][marketIndex];
+            uint256 oldTokenShortPrice =
+                syntheticTokenPrice[MarketSide.Short][marketIndex];
+
+            _refreshTokensPrice(marketIndex);
+
+            assert(
+                syntheticTokenPrice[MarketSide.Long][marketIndex] ==
+                    oldTokenLongPrice
+            );
+            assert(
+                syntheticTokenPrice[MarketSide.Short][marketIndex] ==
+                    oldTokenShortPrice
+            );
 
             if (currentMarketBatchedLazyDeposit.mintAndStakeAmount > 0) {
                 // NOTE: no fees are calculated, but if they are desired in the future they can be added here.
@@ -753,16 +768,15 @@ contract LongShort is ILongShort, Initializable {
                     latestUpdateIndex[marketIndex],
                     syntheticTokenType
                 );
-
-                // reset all values
-                currentMarketBatchedLazyDeposit.mintAmount = 0;
                 currentMarketBatchedLazyDeposit.mintAndStakeAmount = 0;
             }
+            // reset all values
+            currentMarketBatchedLazyDeposit.mintAmount = 0;
             // TODO: add events
         }
     }
 
-    function snapshopPriceChangeForNextPriceExecution(uint32 marketIndex)
+    function snapshotPriceChangeForNextPriceExecution(uint32 marketIndex)
         internal
     {
         uint256 newLatestPriceStateIndex = latestUpdateIndex[marketIndex] + 1;
@@ -801,6 +815,9 @@ contract LongShort is ILongShort, Initializable {
                 syntheticTokenBackedValue[MarketSide.Short][marketIndex] != 0
         );
 
+        // Distibute accrued yield first based on current liquidity before price update
+        _yieldMechanism(marketIndex);
+
         // If a negative int is return this should fail.
         uint256 newPrice = uint256(oracleManagers[marketIndex].updatePrice());
         emit PriceUpdate(
@@ -810,18 +827,13 @@ contract LongShort is ILongShort, Initializable {
             msg.sender
         );
 
-        bool priceChanged = false;
-        // Adjusts long and short values based on price movements.
-
-        priceChanged = _priceChangeMechanism(marketIndex, newPrice);
-
-        // Distibute accrued yield manager interest.
-        _yieldMechanism(marketIndex);
+        bool priceChanged = _priceChangeMechanism(marketIndex, newPrice);
+        assetPrice[marketIndex] = newPrice;
 
         _refreshTokensPrice(marketIndex);
-        assetPrice[marketIndex] = newPrice;
+
         if (priceChanged) {
-            snapshopPriceChangeForNextPriceExecution(marketIndex);
+            snapshotPriceChangeForNextPriceExecution(marketIndex);
 
             handleBatchedDepositSettlement(marketIndex, MarketSide.Long);
             handleBatchedDepositSettlement(marketIndex, MarketSide.Short);
@@ -958,7 +970,7 @@ contract LongShort is ILongShort, Initializable {
         MarketSide synthTokenGainingDominance,
         MarketSide synthTokenLosingDominance,
         uint256 baseFee,
-        uint256 penultyFees
+        uint256 penaltyFees
     ) internal view returns (uint256) {
         uint256 baseFee = (delta * baseFee) / feeUnitsOfPrecision;
 
@@ -969,7 +981,7 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokenBackedValue[synthTokenLosingDominance][marketIndex]
         ) {
             // All funds are causing imbalance
-            return baseFee + ((delta * penultyFees) / feeUnitsOfPrecision);
+            return baseFee + ((delta * penaltyFees) / feeUnitsOfPrecision);
         } else if (
             syntheticTokenBackedValue[synthTokenGainingDominance][marketIndex] +
                 delta >
@@ -984,7 +996,7 @@ contract LongShort is ILongShort, Initializable {
                             marketIndex
                         ]);
             uint256 penaltyFee =
-                (amountImbalancing * penultyFees) / feeUnitsOfPrecision;
+                (amountImbalancing * penaltyFees) / feeUnitsOfPrecision;
 
             return baseFee + penaltyFee;
         } else {
@@ -1295,8 +1307,8 @@ contract LongShort is ILongShort, Initializable {
         public userLazyActions;
 
     // Add setters for these values
-    uint256 public percentageAvailableForEarlyExitNumerator = 80000;
-    uint256 public percentageAvailableForEarlyExitDenominator = 100000;
+    uint256 public percentageAvailableForEarlyExitNumerator;
+    uint256 public percentageAvailableForEarlyExitDenominator;
 
     function getUsersPendingBalance(
         address user,

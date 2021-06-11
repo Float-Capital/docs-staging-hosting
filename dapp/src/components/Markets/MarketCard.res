@@ -24,7 +24,7 @@ let calculateBeta = (
 @react.component
 let make = (
   ~marketData as {
-    symbol: marketName, // TODO: next contract deployment switch name and symbol in deployment scripts
+    name: marketName,
     marketIndex,
     latestSystemState: {totalLockedLong, totalLockedShort, totalValueLocked},
   }: Queries.SyntheticMarketInfo.t,
