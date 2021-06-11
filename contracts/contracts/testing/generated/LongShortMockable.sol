@@ -195,6 +195,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     modifier adminOnly() {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("adminOnly"))){
+        
       mocker.adminOnlyMock();
       _;
     } else {
@@ -207,6 +208,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     modifier treasuryOnly() {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("treasuryOnly"))){
+        
       mocker.treasuryOnlyMock();
       _;
     } else {
@@ -219,6 +221,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     modifier doesMarketExist(uint32 marketIndex) {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("doesMarketExist"))){
+        
       mocker.doesMarketExistMock(marketIndex);
       _;
     } else {
@@ -235,6 +238,7 @@ contract LongShortMockable is ILongShort, Initializable {
         ISyntheticToken syntheticToken
     ) {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("isCorrectSynth"))){
+        
       mocker.isCorrectSynthMock(marketIndex,syntheticTokenType,syntheticToken);
       _;
     } else {
@@ -258,6 +262,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     modifier refreshSystemState(uint32 marketIndex) {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("refreshSystemState"))){
+        
       mocker.refreshSystemStateMock(marketIndex);
       _;
     } else {
@@ -1623,6 +1628,7 @@ contract LongShortMockable is ILongShort, Initializable {
     modifier executeOutstandingLazySettlements(address user, uint32 marketIndex)
         virtual {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("executeOutstandingLazySettlements"))){
+        
       mocker.executeOutstandingLazySettlementsMock(user,marketIndex);
       _;
     } else {
@@ -1790,6 +1796,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     modifier executeOutstandingLazyRedeems(address user, uint32 marketIndex) {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("executeOutstandingLazyRedeems"))){
+        
       mocker.executeOutstandingLazyRedeemsMock(user,marketIndex);
       _;
     } else {

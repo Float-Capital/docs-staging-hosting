@@ -260,6 +260,9 @@ Belt_Array.forEach(filesToMock, (function (filePath) {
                 var mockerArguments = commafiy(Belt_Array.map(x.parameters, (function (x) {
                             return convertASTTypeToSolType(replaceFileNameTypeDefsWithMockableTypeDefs(x.type_));
                           })));
+                var storageParameters = Belt_Array.keep(x.parameters, (function (x) {
+                        return x.storageLocation === /* Storage */0;
+                      }));
                 var solPrefix = sol.contents.substring(0, indexOfOldFunctionBodyStart + 1 | 0);
                 var solSuffix = sol.contents.substring(indexOfOldFunctionBodyEnd);
                 var mockerParameterCalls = commafiy(Belt_Array.map(x.parameters, (function (x) {
@@ -269,7 +272,9 @@ Belt_Array.forEach(filesToMock, (function (filePath) {
                               return x.name;
                             }
                           })));
-                sol.contents = solPrefix + ("\n    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + x.name + "\"))){\n      mocker." + x.name + "Mock(" + mockerParameterCalls + ");\n      _;\n    } else {\n      " + functionBody + "\n    }\n  ") + solSuffix;
+                sol.contents = solPrefix + ("\n    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + x.name + "\"))){\n        " + reduceStrArr(Belt_Array.map(storageParameters, (function (x) {
+                              return "\n          " + convertASTTypeToSolType(removeFileNameFromTypeDefs(x.type_)) + " " + x.name + "_temp1 = " + x.name + ";\n        ";
+                            }))) + "\n      mocker." + x.name + "Mock(" + mockerParameterCalls + ");\n      _;\n    } else {\n      " + functionBody + "\n    }\n  ") + solSuffix;
                 mockLogger.contents = mockLogger.contents + (" \n    function " + x.name + "Mock(" + mockerArguments + ") public pure {\n      return; \n    }\n    ");
                 
               }));

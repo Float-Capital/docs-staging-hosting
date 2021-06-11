@@ -272,6 +272,8 @@ filesToMock->Array.forEach(filePath => {
       )
       ->commafiy
 
+    let storageParameters = x.parameters->Array.keep(x => x.storageLocation == Storage)
+
     let solPrefix = sol.contents->substring(~from=0, ~to_=indexOfOldFunctionBodyStart + 1)
 
     let solSuffix = sol.contents->substringToEnd(~from=indexOfOldFunctionBodyEnd)
@@ -285,6 +287,15 @@ filesToMock->Array.forEach(filePath => {
       solPrefix ++
       `
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("${x.name}"))){
+        ${storageParameters
+        ->Array.map(x =>
+          `
+          ${x.type_
+            ->removeFileNameFromTypeDefs
+            ->convertASTTypeToSolType} ${x.name}_temp1 = ${x.name};
+        `
+        )
+        ->reduceStrArr}
       mocker.${x.name}Mock(${mockerParameterCalls});
       _;
     } else {
