@@ -42,7 +42,7 @@ let convertASTTypeToSolType = typeDescriptionStr => {
   | "bool"
   | "address" => typeDescriptionStr
   | "string" => "string calldata "
-  | t if t->containsRe(%re("/\\[/g")) => t ++ " memory" // PARTIAL IMPLEMENTATION
+  | t if t->containsRe(%re("/\\[/g")) => t ++ " memory" // PARTIAL IMPLEMENTATION FOR ARRAYS
   | t if t->startsWith("uint") => typeDescriptionStr
   | t if t->startsWith("int") => typeDescriptionStr
   | t if t->startsWith("contract ") => typeDescriptionStr->replaceByRe(%re("/contract\s+/g"), "")

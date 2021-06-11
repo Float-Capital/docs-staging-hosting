@@ -107,15 +107,23 @@ const createSynthetic = async (
   });
 
   await fundToken.mint(admin, "1000000000000000000", { from: admin });
-  await fundToken.approve(longShort.address, "1000000000000000000", { from: admin });
+  await fundToken.approve(longShort.address, "1000000000000000000", {
+    from: admin,
+  });
 
   const oracleManager = await OracleManager.new(admin, {
     from: admin,
   });
 
-  const yieldManager = await YieldManager.new(admin, longShort.address, treasury.address, fundToken.address, {
-    from: admin,
-  });
+  const yieldManager = await YieldManager.new(
+    admin,
+    longShort.address,
+    treasury.address,
+    fundToken.address,
+    {
+      from: admin,
+    }
+  );
 
   // Mock yield manager needs to be able to mint tokens to simulate yield.
   var mintRole = await fundToken.MINTER_ROLE.call();
@@ -138,8 +146,8 @@ const createSynthetic = async (
   await longShort.initializeMarket(
     currentMarketIndex,
     _baseEntryFee,
-    _baseExitFee,
     _badLiquidityEntryFee,
+    _baseExitFee,
     _badLiquidityExitFee,
     kInitialMultiplier,
     kPeriod,
@@ -147,8 +155,14 @@ const createSynthetic = async (
     { from: admin }
   );
 
-  const longAddress = await longShort.syntheticTokens.call(0, currentMarketIndex);
-  const shortAddress = await longShort.syntheticTokens.call(1, currentMarketIndex);
+  const longAddress = await longShort.syntheticTokens.call(
+    0,
+    currentMarketIndex
+  );
+  const shortAddress = await longShort.syntheticTokens.call(
+    1,
+    currentMarketIndex
+  );
   let longToken = await SyntheticToken.at(longAddress);
   let shortToken = await SyntheticToken.at(shortAddress);
 
@@ -233,7 +247,12 @@ const feeCalculation = (
     }
   }
   // If greater than minFeeThreshold
-  if (amount.add(longValue).add(shortValue).gte(minThreshold)) {
+  if (
+    amount
+      .add(longValue)
+      .add(shortValue)
+      .gte(minThreshold)
+  ) {
     const TEN_TO_THE_18 = "1" + "000000000000000000";
     let betaDiff = new BN(TEN_TO_THE_18).sub(thinBeta); // TODO: when previous beta != 1
 
@@ -281,7 +300,10 @@ const logGasPrices = async (
   console.log(`USD Price: $${ethPriceUsd}`);
   const ethCost =
     Number(
-      totalCostEth.mul(new BN(ethPriceUsd)).mul(new BN(100)).div(ONE_ETH)
+      totalCostEth
+        .mul(new BN(ethPriceUsd))
+        .mul(new BN(100))
+        .div(ONE_ETH)
     ) / 100;
   console.log(`Cost on ETH Mainnet: $${ethCost}`);
 
@@ -293,7 +315,10 @@ const logGasPrices = async (
   console.log(`MATIC Price: $${maticPriceUsd}`);
   const maticCost =
     Number(
-      totalCostMatic.mul(new BN(maticPriceUsd)).mul(new BN(100)).div(ONE_ETH)
+      totalCostMatic
+        .mul(new BN(maticPriceUsd))
+        .mul(new BN(100))
+        .div(ONE_ETH)
     ) / 100;
   console.log(`Cost on BSC: $${maticCost}`);
 };
