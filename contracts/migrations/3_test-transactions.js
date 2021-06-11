@@ -96,8 +96,8 @@ const deployTestMarket = async (
   await longShortInstance.initializeMarket(
     currentMarketIndex,
     _baseEntryFee,
-    _baseExitFee,
     _badLiquidityEntryFee,
+    _baseExitFee,
     _badLiquidityExitFee,
     kInitialMultiplier,
     kPeriod
