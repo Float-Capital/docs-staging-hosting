@@ -56,10 +56,10 @@ let mintAndStakeDirect =
       ~marketIndex,
       ~amount,
       ~token,
-      ~user: Ethers.Wallet.t,
-      ~longShort: LongShort.t,
-      ~oracleManagerMock: OracleManagerMock.t,
-      ~isLong: bool,
+      ~user,
+      ~longShort,
+      ~oracleManagerMock,
+      ~isLong,
     );
   let%AwaitThen availableToStakeAfter =
     synthToken->SyntheticToken.balanceOf(~account=user.address);

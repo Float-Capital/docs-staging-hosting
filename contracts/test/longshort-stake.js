@@ -221,7 +221,7 @@ contract("LongShort (staking)", (accounts) => {
     assert.equal(result.toString(), result2.toString(), "balance no equal");
   });
 
-  it("<No need to test again - implicitly tested> can stake directly from the synthetic token (without needing an approval)", async () => {
+  it.skip("<No need to test again - implicitly tested> can stake directly from the synthetic token (without needing an approval)", async () => {
     await mintAndApprove(
       fundToken,
       new BN(oneHundredAndFifty),
@@ -240,7 +240,7 @@ contract("LongShort (staking)", (accounts) => {
     assert.equal(amountStaked.toString(), oneHundred);
   });
 
-  it("cannot stake more than your balance from the synthetic token (without needing an approval)", async () => {
+  it.skip("cannot stake more than your balance from the synthetic token (without needing an approval)", async () => {
     await mintAndApprove(
       fundToken,
       new BN(oneHundredAndFifty),
@@ -256,7 +256,7 @@ contract("LongShort (staking)", (accounts) => {
     );
   });
 
-  it("float earned is a function of time staked", async () => {
+  it.skip("float earned is a function of time staked", async () => {
     // Ensure markets aren't empty.
     await populateMarket();
 

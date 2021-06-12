@@ -155,7 +155,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
     };
   }
 
-  it(
+  it.skip(
     "handles balanced market with zero APY",
     testMintFees({
       initialMintLong: oneHundred,
@@ -167,7 +167,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
     })
   );
 
-  it(
+  it.skip(
     "handles imbalanced market with zero APY",
     testMintFees({
       initialMintLong: oneHundred,
@@ -179,7 +179,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
     })
   );
 
-  it(
+  it.skip(
     "handles imbalanced market with zero APY (flipped)",
     testMintFees({
       initialMintLong: twoHundred,

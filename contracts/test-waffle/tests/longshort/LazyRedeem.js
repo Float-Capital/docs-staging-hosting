@@ -7,6 +7,7 @@ var Globals = require("../../library/Globals.js");
 var Helpers = require("../../library/Helpers.js");
 var Contract = require("../../library/Contract.js");
 var CONSTANTS = require("../../CONSTANTS.js");
+var HelperActions = require("../../library/HelperActions.js");
 var MarketSimulation = require("../../library/MarketSimulation.js");
 
 function testIntegration(contracts, accounts) {
@@ -26,7 +27,7 @@ function testIntegration(contracts, accounts) {
                                             return LetOps.AwaitThen.let_(paymentToken.mint(testUser.address, amountToLazyMint), (function (param) {
                                                           return LetOps.AwaitThen.let_(paymentToken.setShouldMockTransfer(false), (function (param) {
                                                                         return LetOps.AwaitThen.let_(paymentToken.connect(testUser).approve(longShort.address, amountToLazyMint), (function (param) {
-                                                                                      return LetOps.AwaitThen.let_(longShortUserConnected.mintLong(marketIndex, amountToLazyMint), (function (param) {
+                                                                                      return LetOps.AwaitThen.let_(HelperActions.mintDirect(marketIndex, amountToLazyMint, paymentToken, testUser, longShort, oracleManager, true), (function (param) {
                                                                                                     return LetOps.AwaitThen.let_(longSynth.balanceOf(testUser.address), (function (usersBalanceAvailableForRedeem) {
                                                                                                                   return LetOps.AwaitThen.let_(longShortUserConnected.redeemLongLazy(marketIndex, usersBalanceAvailableForRedeem), (function (param) {
                                                                                                                                 return LetOps.AwaitThen.let_(longSynth.balanceOf(testUser.address), (function (usersBalanceAfterLazyRedeem) {

@@ -54,10 +54,16 @@ let testIntegration =
           );
 
       let%AwaitThen _ =
-        longShortUserConnected->LongShort.mintLong(
+        HelperActions.mintDirect(
           ~marketIndex,
           ~amount=amountToLazyMint,
+          ~token=paymentToken,
+          ~user=testUser,
+          ~longShort,
+          ~oracleManagerMock=oracleManager,
+          ~isLong=true,
         );
+
       let%AwaitThen usersBalanceAvailableForRedeem =
         longSynth->SyntheticToken.balanceOf(~account=testUser.address);
       let%AwaitThen _ =

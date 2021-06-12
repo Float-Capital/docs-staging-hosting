@@ -186,22 +186,11 @@ external marketStateSnapshot: (
 ) => JsPromise.t<marketStateSnapshotReturn> = "marketStateSnapshot"
 
 @send
-external mintLong: (t, ~marketIndex: int, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> =
-  "mintLong"
-
-@send
 external mintLongLazy: (
   t,
   ~marketIndex: int,
   ~amount: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "mintLongLazy"
-
-@send
-external mintShort: (
-  t,
-  ~marketIndex: int,
-  ~amount: Ethers.BigNumber.t,
-) => JsPromise.t<transaction> = "mintShort"
 
 @send
 external mintShortLazy: (
@@ -567,25 +556,11 @@ module Exposed = {
   ) => JsPromise.t<minimumReturn> = "minimum"
 
   @send
-  external mintLong: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "mintLong"
-
-  @send
   external mintLongLazy: (
     t,
     ~marketIndex: int,
     ~amount: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "mintLongLazy"
-
-  @send
-  external mintShort: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "mintShort"
 
   @send
   external mintShortLazy: (
@@ -711,11 +686,11 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "transferFromYieldManager"
 
   @send
-  external transferToYieldManager: (
+  external transferFundsToYieldManager: (
     t,
     ~marketIndex: int,
     ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "transferToYieldManager"
+  ) => JsPromise.t<transaction> = "transferFundsToYieldManager"
 
   @send
   external transferTreasuryFunds: (t, ~marketIndex: int) => JsPromise.t<transaction> =
