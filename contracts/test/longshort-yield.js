@@ -1,5 +1,5 @@
 const { BN } = require("@openzeppelin/test-helpers");
-const { initialize, mintAndApprove, createSynthetic } = require("./helpers");
+const { initialize, mintAndApprove, createSynthetic, totalValueLockedInMarket } = require("./helpers");
 
 const erc20 = artifacts.require("SyntheticToken");
 
@@ -65,7 +65,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
       const yieldTokenAddress = await yieldManager.getHeldToken.call();
       const yieldToken = await erc20.at(yieldTokenAddress);
 
-      const totalValueBefore = await longShort.totalValueLockedInMarket.call(marketIndex);
+      const totalValueBefore = await totalValueLockedInMarket(longShort, marketIndex);
       const longValueBefore = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
       const shortValueBefore = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
 
@@ -100,9 +100,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
       );
 
       // Ensure value has been locked into the yield manager correctly.
-      const initialMarketValue = await longShort.totalValueLockedInMarket.call(
-        marketIndex
-      );
+      const initialMarketValue = await totalValueLockedInMarket(longShort, marketIndex);
       const initialYieldValue = await longShort.totalValueLockedInYieldManager.call(
         marketIndex
       );

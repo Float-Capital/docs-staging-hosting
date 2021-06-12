@@ -16,6 +16,10 @@ type tEN_TO_THE_18Return = Ethers.BigNumber.t
 @send
 external tEN_TO_THE_18: t => JsPromise.t<tEN_TO_THE_18Return> = "TEN_TO_THE_18"
 
+type tEN_TO_THE_18_SIGNEDReturn = Ethers.BigNumber.t
+@send
+external tEN_TO_THE_18_SIGNED: t => JsPromise.t<tEN_TO_THE_18_SIGNEDReturn> = "TEN_TO_THE_18_SIGNED"
+
 @send
 external _executeOutstandingLazyRedeems: (
   t,
@@ -319,11 +323,6 @@ type tokenFactoryReturn = Ethers.ethAddress
 @send
 external tokenFactory: t => JsPromise.t<tokenFactoryReturn> = "tokenFactory"
 
-type totalValueLockedInMarketReturn = Ethers.BigNumber.t
-@send
-external totalValueLockedInMarket: (t, int) => JsPromise.t<totalValueLockedInMarketReturn> =
-  "totalValueLockedInMarket"
-
 type totalValueLockedInYieldManagerReturn = Ethers.BigNumber.t
 @send
 external totalValueLockedInYieldManager: (
@@ -380,6 +379,11 @@ module Exposed = {
   @send
   external tEN_TO_THE_18: t => JsPromise.t<tEN_TO_THE_18Return> = "TEN_TO_THE_18"
 
+  type tEN_TO_THE_18_SIGNEDReturn = Ethers.BigNumber.t
+  @send
+  external tEN_TO_THE_18_SIGNED: t => JsPromise.t<tEN_TO_THE_18_SIGNEDReturn> =
+    "TEN_TO_THE_18_SIGNED"
+
   @send
   external _executeOutstandingLazyRedeems: (
     t,
@@ -401,6 +405,21 @@ module Exposed = {
   @send
   external _updateSystemStateMulti: (t, ~marketIndexes: array<int>) => JsPromise.t<transaction> =
     "_updateSystemStateMulti"
+
+  @send
+  external adjustMarketBasedOnNewAssetPrice: (
+    t,
+    ~marketIndex: int,
+    ~newAssetPrice: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "adjustMarketBasedOnNewAssetPrice"
+
+  type adjustMarketBasedOnNewAssetPriceReturn = bool
+  @send @scope("callStatic")
+  external adjustMarketBasedOnNewAssetPriceCall: (
+    t,
+    ~marketIndex: int,
+    ~newAssetPrice: Ethers.BigNumber.t,
+  ) => JsPromise.t<adjustMarketBasedOnNewAssetPriceReturn> = "adjustMarketBasedOnNewAssetPrice"
 
   type adminReturn = Ethers.ethAddress
   @send
@@ -449,17 +468,6 @@ module Exposed = {
   ) => JsPromise.t<batchedLazyRedeemsReturn> = "batchedLazyRedeems"
 
   @send
-  external calculateValueChangeForPriceMechanism: (
-    t,
-    ~marketIndex: int,
-    ~assetPriceGreater: Ethers.BigNumber.t,
-    ~assetPriceLess: Ethers.BigNumber.t,
-    ~baseValueExposure: Ethers.BigNumber.t,
-    ~winningSyntheticTokenType: int,
-    ~losingSyntheticTokenType: int,
-  ) => JsPromise.t<transaction> = "calculateValueChangeForPriceMechanism"
-
-  @send
   external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
 
   @send
@@ -475,6 +483,10 @@ module Exposed = {
   @send
   external changeTreasury: (t, ~treasury: Ethers.ethAddress) => JsPromise.t<transaction> =
     "changeTreasury"
+
+  @send
+  external claimAndDistributeYield: (t, ~marketIndex: int) => JsPromise.t<transaction> =
+    "claimAndDistributeYield"
 
   @send
   external depositFunds: (
@@ -671,21 +683,6 @@ module Exposed = {
   > = "percentageAvailableForEarlyExitNumerator"
 
   @send
-  external priceChangeMechanism: (
-    t,
-    ~marketIndex: int,
-    ~newPrice: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "priceChangeMechanism"
-
-  type priceChangeMechanismReturn = bool
-  @send @scope("callStatic")
-  external priceChangeMechanismCall: (
-    t,
-    ~marketIndex: int,
-    ~newPrice: Ethers.BigNumber.t,
-  ) => JsPromise.t<priceChangeMechanismReturn> = "priceChangeMechanism"
-
-  @send
   external redeemLong: (
     t,
     ~marketIndex: int,
@@ -720,8 +717,8 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "redeemShortLazy"
 
   @send
-  external refreshTokensPrice: (t, ~marketIndex: int) => JsPromise.t<transaction> =
-    "refreshTokensPrice"
+  external refreshTokenPrices: (t, ~marketIndex: int) => JsPromise.t<transaction> =
+    "refreshTokenPrices"
 
   @send
   external setUseexecuteOutstandingLazySettlementsMock: (
@@ -753,11 +750,6 @@ module Exposed = {
   type tokenFactoryReturn = Ethers.ethAddress
   @send
   external tokenFactory: t => JsPromise.t<tokenFactoryReturn> = "tokenFactory"
-
-  type totalValueLockedInMarketReturn = Ethers.BigNumber.t
-  @send
-  external totalValueLockedInMarket: (t, int) => JsPromise.t<totalValueLockedInMarketReturn> =
-    "totalValueLockedInMarket"
 
   type totalValueLockedInYieldManagerReturn = Ethers.BigNumber.t
   @send
@@ -822,7 +814,4 @@ module Exposed = {
   type yieldManagersReturn = Ethers.ethAddress
   @send
   external yieldManagers: (t, int) => JsPromise.t<yieldManagersReturn> = "yieldManagers"
-
-  @send
-  external yieldMechanism: (t, ~marketIndex: int) => JsPromise.t<transaction> = "yieldMechanism"
 }

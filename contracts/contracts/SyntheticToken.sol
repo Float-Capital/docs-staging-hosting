@@ -59,14 +59,15 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         address sender,
         address recipient,
         uint256 amount
-    ) public virtual override(ERC20, IERC20) returns (bool) {
+    ) public override(ERC20, IERC20) returns (bool) {
         if (
             recipient == address(longShort) && msg.sender == address(longShort)
         ) {
+            // TODO STENT so this means that the longShort contract is sending to itself? There is no function call like this in the LongShort contract
             _transfer(sender, recipient, amount);
             return true;
         } else {
-            super.transferFrom(sender, recipient, amount);
+            return super.transferFrom(sender, recipient, amount);
         }
     }
 

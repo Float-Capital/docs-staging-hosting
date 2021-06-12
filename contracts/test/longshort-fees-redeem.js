@@ -172,9 +172,7 @@ contract("LongShort (redeeming fees)", (accounts) => {
           .sub(new BN(redeemShort))
           .add(marketSplit);
       }
-      const actualLockedValue = await longShort.totalValueLockedInMarket.call(
-        marketIndex
-      );
+      const actualLockedValue = await totalValueLockedInMarket(longShort, marketIndex);
       assert.equal(
         actualLockedValue.toString(),
         expectedLockedValue.toString(),

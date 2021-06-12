@@ -39,16 +39,16 @@ contract LongShortInternalsExposed is LongShort {
         _;
     }
 
-    function refreshTokensPrice(uint32 marketIndex) external {
-        _refreshTokensPrice(marketIndex);
+    function refreshTokenPrices(uint32 marketIndex) external {
+        _refreshTokenPrices(marketIndex);
     }
 
     function feesMechanism(uint32 marketIndex, uint256 totalFees) external {
         _feesMechanism(marketIndex, totalFees);
     }
 
-    function yieldMechanism(uint32 marketIndex) external {
-        _yieldMechanism(marketIndex);
+    function claimAndDistributeYield(uint32 marketIndex) external {
+        _claimAndDistributeYield(marketIndex);
     }
 
     function minimum(uint256 liquidityOfPositionA, uint256 liquidityOfPositionB)
@@ -57,24 +57,6 @@ contract LongShortInternalsExposed is LongShort {
         returns (uint256)
     {
         _minimum(liquidityOfPositionA, liquidityOfPositionB);
-    }
-
-    function calculateValueChangeForPriceMechanism(
-        uint32 marketIndex,
-        uint256 assetPriceGreater,
-        uint256 assetPriceLess,
-        uint256 baseValueExposure,
-        MarketSide winningSyntheticTokenType,
-        MarketSide losingSyntheticTokenType
-    ) external {
-        _calculateValueChangeForPriceMechanism(
-            marketIndex,
-            assetPriceGreater,
-            assetPriceLess,
-            baseValueExposure,
-            winningSyntheticTokenType,
-            losingSyntheticTokenType
-        );
     }
 
     function depositFunds(uint32 marketIndex, uint256 amount) external {
@@ -97,11 +79,11 @@ contract LongShortInternalsExposed is LongShort {
         _transferFromYieldManager(marketIndex, amount);
     }
 
-    function priceChangeMechanism(uint32 marketIndex, uint256 newPrice)
+    function adjustMarketBasedOnNewAssetPrice(uint32 marketIndex, int256 newAssetPrice)
         external
         returns (bool didUpdate)
     {
-        _priceChangeMechanism(marketIndex, newPrice);
+        _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
     }
 
     function _executeOutstandingLazySettlementsExposed(

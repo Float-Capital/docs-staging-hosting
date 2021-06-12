@@ -7,7 +7,7 @@ const {
   time,
 } = require("@openzeppelin/test-helpers");
 
-const { initialize, mintAndApprove, createSynthetic } = require("./helpers");
+const { initialize, mintAndApprove, createSynthetic, totalValueLockedInMarket } = require("./helpers");
 
 contract("LongShort (price movements)", (accounts) => {
   let longShort;
@@ -87,8 +87,6 @@ contract("LongShort (price movements)", (accounts) => {
       oraclePrice.add(oraclePrice.mul(tenPercentMovement).div(e18))
     );
 
-    const longValueBefore = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
-    const shortValueBefore = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
     await longShort._updateSystemState(marketIndex);
     const newLongVal = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
     const newShortVal = await longShort.syntheticTokenBackedValue.call(1, marketIndex); // $90
@@ -96,14 +94,14 @@ contract("LongShort (price movements)", (accounts) => {
     // 110 fund tokens
     assert.equal(
       newLongVal.toString(),
-      longValueBefore.mul(e18.add(tenPercentMovement)).div(e18).toString(),
+      longVal.mul(e18.add(tenPercentMovement)).div(e18).toString(),
       "Longvalue change not correct"
     );
 
     // 90 fund tokens
     assert.equal(
       newShortVal.toString(),
-      shortValueBefore.mul(e18.sub(tenPercentMovement)).div(e18).toString(),
+      shortVal.mul(e18.sub(tenPercentMovement)).div(e18).toString(),
       "Short value change correct"
     );
   });
@@ -136,6 +134,8 @@ contract("LongShort (price movements)", (accounts) => {
       longValueBefore.mul(e18.sub(tenPercentMovement)).div(e18).toString(),
       "Longvalue change not correct"
     );
+
+      console.log("STENT 4");
 
     // 110 fund tokens
     assert.equal(
@@ -238,7 +238,7 @@ contract("LongShort (price movements)", (accounts) => {
     await oracleManager.setPrice(
       oraclePrice.add(oraclePrice.mul(hundredPercentMovement).div(e18))
     );
-    const totalLockedInMarket = await longShort.totalValueLockedInMarket(marketIndex);
+    const totalLockedInMarket = await totalValueLockedInMarket(longShort, marketIndex);
 
     await longShort._updateSystemState(marketIndex);
     const newLongVal = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
@@ -263,7 +263,7 @@ contract("LongShort (price movements)", (accounts) => {
       false
     );
 
-    const totalLockedInMarket = await longShort.totalValueLockedInMarket(marketIndex);
+    const totalLockedInMarket = await totalValueLockedInMarket(longShort, marketIndex);
 
     let oraclePrice = await oracleManager.getLatestPrice.call();
     await oracleManager.setPrice(
