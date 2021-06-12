@@ -226,31 +226,11 @@ external percentageAvailableForEarlyExitNumerator: t => JsPromise.t<
 > = "percentageAvailableForEarlyExitNumerator"
 
 @send
-external redeemLong: (
-  t,
-  ~marketIndex: int,
-  ~tokensToRedeem: Ethers.BigNumber.t,
-) => JsPromise.t<transaction> = "redeemLong"
-
-@send
-external redeemLongAll: (t, ~marketIndex: int) => JsPromise.t<transaction> = "redeemLongAll"
-
-@send
 external redeemLongLazy: (
   t,
   ~marketIndex: int,
   ~tokensToRedeem: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "redeemLongLazy"
-
-@send
-external redeemShort: (
-  t,
-  ~marketIndex: int,
-  ~tokensToRedeem: Ethers.BigNumber.t,
-) => JsPromise.t<transaction> = "redeemShort"
-
-@send
-external redeemShortAll: (t, ~marketIndex: int) => JsPromise.t<transaction> = "redeemShortAll"
 
 @send
 external redeemShortLazy: (
@@ -596,31 +576,11 @@ module Exposed = {
   > = "percentageAvailableForEarlyExitNumerator"
 
   @send
-  external redeemLong: (
-    t,
-    ~marketIndex: int,
-    ~tokensToRedeem: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "redeemLong"
-
-  @send
-  external redeemLongAll: (t, ~marketIndex: int) => JsPromise.t<transaction> = "redeemLongAll"
-
-  @send
   external redeemLongLazy: (
     t,
     ~marketIndex: int,
     ~tokensToRedeem: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "redeemLongLazy"
-
-  @send
-  external redeemShort: (
-    t,
-    ~marketIndex: int,
-    ~tokensToRedeem: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "redeemShort"
-
-  @send
-  external redeemShortAll: (t, ~marketIndex: int) => JsPromise.t<transaction> = "redeemShortAll"
 
   @send
   external redeemShortLazy: (
