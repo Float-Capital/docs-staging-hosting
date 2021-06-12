@@ -9,7 +9,7 @@ var bnEqual = ((message, number1, number2) => expect(number1, message).to.equal(
 
 var bnWithin = ((number1, min, max) => expect(number1).to.be.within(min, max));
 
-var bnCloseTo = ((number1, number2, distance) => expect(number1).to.be.closeTo(number2, distance));
+var bnCloseTo = ((message, distance, number1, number2) => expect(number1, message).to.be.closeTo(number2, distance));
 
 var callEmitEvents = ((call, contract, eventName) => expect(call).to.emit(contract, eventName));
 

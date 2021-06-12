@@ -157,14 +157,6 @@ contract LongShort is ILongShort, Initializable {
         uint256 oracleUpdateIndex
     );
 
-    event LazyShortStaked(
-        uint32 marketIndex,
-        uint256 depositAdded,
-        address user,
-        uint256 totalBatchedDepositAmount,
-        uint256 oracleUpdateIndex
-    );
-
     event LongRedeem(
         uint32 marketIndex,
         uint256 tokensRedeemed,
@@ -584,12 +576,8 @@ contract LongShort is ILongShort, Initializable {
         // Splits mostly to the weaker position to incentivise balance.
         (uint256 longAmount, uint256 shortAmount) =
             getMarketSplit(marketIndex, marketAmount);
-        syntheticTokenBackedValue[MarketSide.Long][marketIndex] =
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-            longAmount;
-        syntheticTokenBackedValue[MarketSide.Short][marketIndex] =
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] +
-            shortAmount;
+        syntheticTokenBackedValue[MarketSide.Long][marketIndex] += longAmount;
+        syntheticTokenBackedValue[MarketSide.Short][marketIndex] += shortAmount;
     }
 
     /**
@@ -682,16 +670,15 @@ contract LongShort is ILongShort, Initializable {
     ) internal {
         // Deposit funds and compute fees.
 
-        if (batchedLazyDeposit[marketIndex][syntheticTokenType] > 0) {
-            _transferFundsToYieldManager(
-                marketIndex,
-                batchedLazyDeposit[marketIndex][syntheticTokenType]
-            );
+        uint256 amountToBatchDeposit =
+            batchedLazyDeposit[marketIndex][syntheticTokenType];
+        if (amountToBatchDeposit > 0) {
+            batchedLazyDeposit[marketIndex][syntheticTokenType] = 0;
+            _transferFundsToYieldManager(marketIndex, amountToBatchDeposit);
 
             // Mint long tokens with remaining value.
             uint256 numberOfTokens =
-                (batchedLazyDeposit[marketIndex][syntheticTokenType] *
-                    TEN_TO_THE_18) /
+                (amountToBatchDeposit * TEN_TO_THE_18) /
                     syntheticTokenPrice[syntheticTokenType][marketIndex];
 
             // TODO STENT there are no token mint events emitted here, but there are on market initialization
@@ -702,7 +689,7 @@ contract LongShort is ILongShort, Initializable {
 
             syntheticTokenBackedValue[syntheticTokenType][
                 marketIndex
-            ] += batchedLazyDeposit[marketIndex][syntheticTokenType];
+            ] += amountToBatchDeposit;
 
             //TODO: Can remove these sanity checks at some point
             uint256 oldTokenLongPrice =
@@ -820,16 +807,6 @@ contract LongShort is ILongShort, Initializable {
         }
     }
 
-    /*
-     * Locks funds from the sender into the given market.
-     */
-    // TODO STENT function is just a redirect
-    function _transferFundsToYieldManager(uint32 marketIndex, uint256 amount)
-        internal
-    {
-        _transferToYieldManager(marketIndex, amount);
-    }
-
     function _depositFunds(uint32 marketIndex, uint256 amount) internal {
         fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
     }
@@ -863,7 +840,7 @@ contract LongShort is ILongShort, Initializable {
      * Transfers locked funds from LongShort into the yield manager.
      */
     // TODO STENT this is only called in one place, might as well move this code there
-    function _transferToYieldManager(uint32 marketIndex, uint256 amount)
+    function _transferFundsToYieldManager(uint32 marketIndex, uint256 amount)
         internal
     {
         // TODO STENT note there are 2 approvals & 2 transfers here:
@@ -1019,58 +996,6 @@ contract LongShort is ILongShort, Initializable {
         _lockFundsInMarket(marketIndex, amount);
 
         _mint(marketIndex, amount, msg.sender, msg.sender, MarketSide.Short);
-    }
-
-    /**
-     * Creates a long position and stakes it
-     */
-    function mintLongAndStake(uint32 marketIndex, uint256 amount)
-        external
-        refreshSystemState(marketIndex)
-    {
-        // Deposit funds and compute fees.
-        _lockFundsInMarket(marketIndex, amount);
-
-        uint256 tokensMinted =
-            _mint(
-                marketIndex,
-                amount,
-                msg.sender,
-                address(staker),
-                MarketSide.Long
-            );
-
-        staker.stakeFromMint(
-            syntheticTokens[MarketSide.Long][marketIndex],
-            tokensMinted,
-            msg.sender
-        );
-    }
-
-    /**
-     * Creates a short position and stakes it
-     */
-    function mintShortAndStake(uint32 marketIndex, uint256 amount)
-        external
-        refreshSystemState(marketIndex)
-    {
-        // Deposit funds and compute fees.
-        _lockFundsInMarket(marketIndex, amount);
-
-        uint256 tokensMinted =
-            _mint(
-                marketIndex,
-                amount,
-                msg.sender,
-                address(staker),
-                MarketSide.Short
-            );
-
-        staker.stakeFromMint(
-            syntheticTokens[MarketSide.Short][marketIndex],
-            tokensMinted,
-            msg.sender
-        );
     }
 
     function _mint(

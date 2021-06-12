@@ -68,7 +68,7 @@ contract("LongShort (staking)", (accounts) => {
     );
   });
 
-  it("<IMPLEMENTED IN WAFFLE> users can stake long tokens", async () => {
+  it.skip("<IMPLEMENTED IN WAFFLE> users can stake long tokens", async () => {
     await mintThenStake(oneHundred, longToken, user1);
     await mintAndStake(oneHundred, longToken, user2);
     await mintThenStake(oneHundred, longToken, user3);
@@ -82,7 +82,7 @@ contract("LongShort (staking)", (accounts) => {
     assert.equal(new BN(oneHundred).toString(), u3staked.toString());
   });
 
-  it("<IMPLEMENTED IN WAFFLE> users can stake short tokens", async () => {
+  it.skip("<IMPLEMENTED IN WAFFLE> users can stake short tokens", async () => {
     await mintThenStake(oneHundred, shortToken, user1);
     await mintThenStake(oneHundred, shortToken, user2);
     await mintAndStake(oneHundred, shortToken, user3);
@@ -126,7 +126,7 @@ contract("LongShort (staking)", (accounts) => {
     await basicFloatAccumulationTest(mintThenStake, longToken, 2);
   });
 
-  it("case 2:  users can earn float immediately from a long mint", async () => {
+  it.skip("case 2:  users can earn float immediately from a long mint", async () => {
     await basicFloatAccumulationTest(mintAndStake, longToken, 1);
   });
 
@@ -134,7 +134,7 @@ contract("LongShort (staking)", (accounts) => {
     await basicFloatAccumulationTest(mintThenStake, shortToken, 2);
   });
 
-  it("case 2:  users can earn float immediately from a short mint", async () => {
+  it.skip("case 2:  users can earn float immediately from a short mint", async () => {
     await basicFloatAccumulationTest(mintAndStake, shortToken, 1);
   });
 

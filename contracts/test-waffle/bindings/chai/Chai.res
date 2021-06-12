@@ -18,10 +18,11 @@ let bnWithin: (
 ) => unit = %raw(`(number1, min, max) => expect(number1).to.be.within(min, max)`)
 
 let bnCloseTo: (
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
+  ~message: string=?,
   ~distance: int,
-) => unit = %raw(`(number1, number2, distance) => expect(number1).to.be.closeTo(number2, distance)`)
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+) => unit = %raw(`(message, distance, number1, number2) => expect(number1, message).to.be.closeTo(number2, distance)`)
 
 type eventCheck
 let callEmitEvents: (

@@ -97,7 +97,7 @@ contract("LongShort (gas prices)", (accounts) => {
     );
   });
 
-  it("mint and stake", async () => {
+  it.skip("mint and stake", async () => {
     await mintAndApprove(fund, defaultMintAmount, user1, longShort.address);
     const receipt = await longShort.mintLongAndStake(
       marketIndex,

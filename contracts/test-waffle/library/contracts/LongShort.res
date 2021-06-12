@@ -190,13 +190,6 @@ external mintLong: (t, ~marketIndex: int, ~amount: Ethers.BigNumber.t) => JsProm
   "mintLong"
 
 @send
-external mintLongAndStake: (
-  t,
-  ~marketIndex: int,
-  ~amount: Ethers.BigNumber.t,
-) => JsPromise.t<transaction> = "mintLongAndStake"
-
-@send
 external mintLongLazy: (
   t,
   ~marketIndex: int,
@@ -209,13 +202,6 @@ external mintShort: (
   ~marketIndex: int,
   ~amount: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "mintShort"
-
-@send
-external mintShortAndStake: (
-  t,
-  ~marketIndex: int,
-  ~amount: Ethers.BigNumber.t,
-) => JsPromise.t<transaction> = "mintShortAndStake"
 
 @send
 external mintShortLazy: (
@@ -588,13 +574,6 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "mintLong"
 
   @send
-  external mintLongAndStake: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "mintLongAndStake"
-
-  @send
   external mintLongLazy: (
     t,
     ~marketIndex: int,
@@ -607,13 +586,6 @@ module Exposed = {
     ~marketIndex: int,
     ~amount: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "mintShort"
-
-  @send
-  external mintShortAndStake: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "mintShortAndStake"
 
   @send
   external mintShortLazy: (

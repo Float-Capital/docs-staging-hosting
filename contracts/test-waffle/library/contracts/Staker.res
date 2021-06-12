@@ -133,23 +133,6 @@ external marketLaunchIncentivePeriod: (
 ) => JsPromise.t<marketLaunchIncentivePeriodReturn> = "marketLaunchIncentivePeriod"
 
 @send
-external stakeFromMint: (
-  t,
-  ~token: Ethers.ethAddress,
-  ~amount: Ethers.BigNumber.t,
-  ~user: Ethers.ethAddress,
-) => JsPromise.t<transaction> = "stakeFromMint"
-
-@send
-external stakeFromMintBatched: (
-  t,
-  ~marketIndex: int,
-  ~amount: Ethers.BigNumber.t,
-  ~oracleUpdateIndex: Ethers.BigNumber.t,
-  ~syntheticTokenType: int,
-) => JsPromise.t<transaction> = "stakeFromMintBatched"
-
-@send
 external stakeFromUser: (
   t,
   ~from: Ethers.ethAddress,
@@ -174,16 +157,6 @@ type syntheticTokensReturn = {
 }
 @send
 external syntheticTokens: (t, int) => JsPromise.t<syntheticTokensReturn> = "syntheticTokens"
-
-@send
-external transferBatchStakeToUser: (
-  t,
-  ~amountLong: Ethers.BigNumber.t,
-  ~amountShort: Ethers.BigNumber.t,
-  ~marketIndex: int,
-  ~oracleUpdateIndex: Ethers.BigNumber.t,
-  ~user: Ethers.ethAddress,
-) => JsPromise.t<transaction> = "transferBatchStakeToUser"
 
 type userAmountStakedReturn = Ethers.BigNumber.t
 @send
@@ -397,23 +370,6 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "setFloatRewardCalcParams"
 
   @send
-  external stakeFromMint: (
-    t,
-    ~token: Ethers.ethAddress,
-    ~amount: Ethers.BigNumber.t,
-    ~user: Ethers.ethAddress,
-  ) => JsPromise.t<transaction> = "stakeFromMint"
-
-  @send
-  external stakeFromMintBatched: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-    ~oracleUpdateIndex: Ethers.BigNumber.t,
-    ~syntheticTokenType: int,
-  ) => JsPromise.t<transaction> = "stakeFromMintBatched"
-
-  @send
   external stakeFromUser: (
     t,
     ~from: Ethers.ethAddress,
@@ -438,16 +394,6 @@ module Exposed = {
   }
   @send
   external syntheticTokens: (t, int) => JsPromise.t<syntheticTokensReturn> = "syntheticTokens"
-
-  @send
-  external transferBatchStakeToUser: (
-    t,
-    ~amountLong: Ethers.BigNumber.t,
-    ~amountShort: Ethers.BigNumber.t,
-    ~marketIndex: int,
-    ~oracleUpdateIndex: Ethers.BigNumber.t,
-    ~user: Ethers.ethAddress,
-  ) => JsPromise.t<transaction> = "transferBatchStakeToUser"
 
   type userAmountStakedReturn = Ethers.BigNumber.t
   @send

@@ -27,20 +27,18 @@ var DataFetchers = {
 };
 
 function getFeesMint(longShort, marketIndex, amount, valueInEntrySide, valueInOtherSide) {
-  return LetOps.AwaitThen.let_(longShort.baseEntryFee(marketIndex), (function (baseEntryFee) {
-                return LetOps.AwaitThen.let_(longShort.badLiquidityEntryFee(marketIndex), (function (badLiquidityEntryFee) {
-                              return LetOps.Await.let_(longShort.feeUnitsOfPrecision(), (function (feeUnitsOfPrecision) {
-                                            var baseFee = Globals.div(Globals.mul(amount, baseEntryFee), feeUnitsOfPrecision);
-                                            if (Globals.bnGte(valueInEntrySide, valueInOtherSide)) {
-                                              return Globals.add(baseFee, Globals.div(Globals.mul(amount, badLiquidityEntryFee), feeUnitsOfPrecision));
-                                            }
-                                            if (!Globals.bnGt(Globals.add(valueInEntrySide, amount), valueInOtherSide)) {
-                                              return baseFee;
-                                            }
-                                            var amountImbalancing = Globals.sub(amount, Globals.sub(valueInOtherSide, valueInEntrySide));
-                                            var penaltyFee = Globals.div(Globals.mul(amountImbalancing, badLiquidityEntryFee), feeUnitsOfPrecision);
-                                            return Globals.add(baseFee, penaltyFee);
-                                          }));
+  return LetOps.AwaitThen.let_(longShort.badLiquidityEntryFee(marketIndex), (function (badLiquidityEntryFee) {
+                return LetOps.Await.let_(longShort.feeUnitsOfPrecision(), (function (feeUnitsOfPrecision) {
+                              var baseFee = Globals.bnFromInt(0);
+                              if (Globals.bnGte(valueInEntrySide, valueInOtherSide)) {
+                                return Globals.add(baseFee, Globals.div(Globals.mul(amount, badLiquidityEntryFee), feeUnitsOfPrecision));
+                              }
+                              if (!Globals.bnGt(Globals.add(valueInEntrySide, amount), valueInOtherSide)) {
+                                return baseFee;
+                              }
+                              var amountImbalancing = Globals.sub(amount, Globals.sub(valueInOtherSide, valueInEntrySide));
+                              var penaltyFee = Globals.div(Globals.mul(amountImbalancing, badLiquidityEntryFee), feeUnitsOfPrecision);
+                              return Globals.add(baseFee, penaltyFee);
                             }));
               }));
 }
@@ -87,7 +85,18 @@ var LongShortHelpers = {
   getBatchedRedemptionAmountWithoutFees: getBatchedRedemptionAmountWithoutFees
 };
 
+function getIsLong(synthToken) {
+  return LetOps.Await.let_(synthToken.syntheticTokenType(), (function (syntheticTokenType) {
+                return syntheticTokenType === CONSTANTS.longTokenType;
+              }));
+}
+
+var SyntheticTokenHelpers = {
+  getIsLong: getIsLong
+};
+
 exports.PaymentTokenHelpers = PaymentTokenHelpers;
 exports.DataFetchers = DataFetchers;
 exports.LongShortHelpers = LongShortHelpers;
+exports.SyntheticTokenHelpers = SyntheticTokenHelpers;
 /* CONSTANTS Not a pure module */

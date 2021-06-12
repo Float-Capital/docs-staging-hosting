@@ -30,14 +30,14 @@ module DataFetchers = {
 module LongShortHelpers = {
   let getFeesMint =
       (longShort, ~marketIndex, ~amount, ~valueInEntrySide, ~valueInOtherSide) => {
-    let%AwaitThen baseEntryFee =
-      longShort->LongShort.baseEntryFee(marketIndex);
+    // let%AwaitThen baseEntryFee =
+    //   longShort->LongShort.baseEntryFee(marketIndex);
     let%AwaitThen badLiquidityEntryFee =
       longShort->LongShort.badLiquidityEntryFee(marketIndex);
 
     let%Await feeUnitsOfPrecision = longShort->LongShort.feeUnitsOfPrecision;
 
-    let baseFee = amount->mul(baseEntryFee)->div(feeUnitsOfPrecision);
+    let baseFee = bnFromInt(0); //amount->mul(baseEntryFee)->div(feeUnitsOfPrecision);
     if (valueInEntrySide->bnGte(valueInOtherSide)) {
       // All funds are causing imbalance
       baseFee->add(
@@ -126,5 +126,13 @@ module LongShortHelpers = {
       ->div(CONSTANTS.tenToThe18);
 
     redemptionAmount;
+  };
+};
+
+module SyntheticTokenHelpers = {
+  let getIsLong = synthToken => {
+    let%Await syntheticTokenType =
+      synthToken->SyntheticToken.syntheticTokenType;
+    syntheticTokenType == CONSTANTS.longTokenType;
   };
 };
