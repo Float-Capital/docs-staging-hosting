@@ -320,11 +320,6 @@ type tokenFactoryReturn = Ethers.ethAddress
 @send
 external tokenFactory: t => JsPromise.t<tokenFactoryReturn> = "tokenFactory"
 
-type totalValueLockedInMarketReturn = Ethers.BigNumber.t
-@send
-external totalValueLockedInMarket: (t, int) => JsPromise.t<totalValueLockedInMarketReturn> =
-  "totalValueLockedInMarket"
-
 type totalValueLockedInYieldManagerReturn = Ethers.BigNumber.t
 @send
 external totalValueLockedInYieldManager: (
@@ -462,20 +457,6 @@ module Exposed = {
     int,
   ) => JsPromise.t<batchedLazyRedeemsReturn> = "batchedLazyRedeems"
 
-<<<<<<< HEAD
-  @send
-  external calculateValueChangeForPriceMechanism: (
-    t,
-    ~marketIndex: int,
-    ~assetPriceGreater: Ethers.BigNumber.t,
-    ~assetPriceLess: Ethers.BigNumber.t,
-    ~baseValueExposure: Ethers.BigNumber.t,
-    ~winningSyntheticTokenType: int,
-    ~losingSyntheticTokenType: int,
-  ) => JsPromise.t<transaction> = "calculateValueChangeForPriceMechanism"
-
-=======
->>>>>>> 320ded6 (Refactoring price change mechanism code in LongShort contract)
   @send
   external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
 
@@ -527,29 +508,6 @@ module Exposed = {
   @send
   external fundTokens: (t, int) => JsPromise.t<fundTokensReturn> = "fundTokens"
 
-<<<<<<< HEAD
-=======
-  type getFeesForActionReturn = Ethers.BigNumber.t
-  @send
-  external getFeesForAction: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-    ~isMint: bool,
-    ~syntheticTokenType: int,
-  ) => JsPromise.t<getFeesForActionReturn> = "getFeesForAction"
-
-  type getFeesForAmountsReturn = Ethers.BigNumber.t
-  @send
-  external getFeesForAmounts: (
-    t,
-    ~marketIndex: int,
-    ~baseAmount: Ethers.BigNumber.t,
-    ~penaltyAmount: Ethers.BigNumber.t,
-    ~isMint: bool,
-  ) => JsPromise.t<getFeesForAmountsReturn> = "getFeesForAmounts"
-
->>>>>>> 320ded6 (Refactoring price change mechanism code in LongShort contract)
   type getMarketSplitReturn = {
     longAmount: Ethers.BigNumber.t,
     shortAmount: Ethers.BigNumber.t,
@@ -786,11 +744,6 @@ module Exposed = {
   type tokenFactoryReturn = Ethers.ethAddress
   @send
   external tokenFactory: t => JsPromise.t<tokenFactoryReturn> = "tokenFactory"
-
-  type totalValueLockedInMarketReturn = Ethers.BigNumber.t
-  @send
-  external totalValueLockedInMarket: (t, int) => JsPromise.t<totalValueLockedInMarketReturn> =
-    "totalValueLockedInMarket"
 
   type totalValueLockedInYieldManagerReturn = Ethers.BigNumber.t
   @send
