@@ -184,11 +184,6 @@ contract LongShort is ILongShort, Initializable {
         _;
     }
 
-    // modifier refreshSystemState(uint32 marketIndex) {
-    //     _updateSystemStateInternal(marketIndex);
-    //     _;
-    // }
-
     ////////////////////////////////////
     ///// CONTRACT SET-UP //////////////
     ////////////////////////////////////
@@ -874,98 +869,6 @@ contract LongShort is ILongShort, Initializable {
             return baseFee;
         }
     }
-
-    // ////////////////////////////////////
-    // /////////// REDEEM TOKENS //////////
-    // ////////////////////////////////////
-
-    // function iredeem(
-    //     uint32 marketIndex,
-    //     uint256 tokensToRedeem,
-    //     MarketSide syntheticTokenType
-    // ) internal refreshSystemState(marketIndex) {
-    //     // Only this contract has permission to call this function
-    //     syntheticTokens[syntheticTokenType][marketIndex].synthRedeemBurn(
-    //         msg.sender,
-    //         tokensToRedeem
-    //     );
-
-    //     // Compute fees.
-    //     uint256 amount =
-    //         (tokensToRedeem *
-    //             syntheticTokenPrice[syntheticTokenType][marketIndex]) /
-    //             TEN_TO_THE_18;
-
-    //     uint256 fees =
-    //         _getFeesForRedeem(marketIndex, amount, syntheticTokenType);
-
-    //     uint256 remaining = amount - fees;
-
-    //     // Distribute fees across the market.
-    //     _feesMechanism(marketIndex, fees);
-
-    //     // Withdraw funds with remaining amount.
-    //     _withdrawFunds(marketIndex, remaining, msg.sender);
-    //     syntheticTokenBackedValue[syntheticTokenType][marketIndex] -= amount;
-
-    //     // TODO STENT CONCERN1
-    //     _refreshTokenPrices(marketIndex);
-
-    //     // TODO: Combine these events
-    //     if (syntheticTokenType == MarketSide.Long) {
-    //         emit LongRedeem(
-    //             marketIndex,
-    //             tokensToRedeem,
-    //             amount,
-    //             remaining,
-    //             msg.sender
-    //         );
-    //     } else {
-    //         emit ShortRedeem(
-    //             marketIndex,
-    //             tokensToRedeem,
-    //             amount,
-    //             remaining,
-    //             msg.sender
-    //         );
-    //     }
-
-    //     emit ValueLockedInSystem(
-    //         marketIndex,
-    //         syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-    //             syntheticTokenBackedValue[MarketSide.Short][marketIndex],
-    //         syntheticTokenBackedValue[MarketSide.Long][marketIndex],
-    //         syntheticTokenBackedValue[MarketSide.Short][marketIndex]
-    //     );
-    // }
-
-    // function redeemLong(uint32 marketIndex, uint256 tokensToRedeem)
-    //     external
-    //     override
-    // {
-    //     _redeem(marketIndex, tokensToRedeem, MarketSide.Long);
-    // }
-
-    // function redeemLongAll(uint32 marketIndex) external {
-    //     uint256 tokensToRedeem =
-    //         syntheticTokens[MarketSide.Long][marketIndex].balanceOf(msg.sender);
-    //     _redeem(marketIndex, tokensToRedeem, MarketSide.Long);
-    // }
-
-    // function redeemShort(uint32 marketIndex, uint256 tokensToRedeem)
-    //     external
-    //     override
-    // {
-    //     _redeem(marketIndex, tokensToRedeem, MarketSide.Short);
-    // }
-
-    // function redeemShortAll(uint32 marketIndex) external {
-    //     uint256 tokensToRedeem =
-    //         syntheticTokens[MarketSide.Short][marketIndex].balanceOf(
-    //             msg.sender
-    //         );
-    //     _redeem(marketIndex, tokensToRedeem, MarketSide.Short);
-    // }
 
     ////////////////////////////////////
     /////// TREASURY FUNCTIONS /////////
