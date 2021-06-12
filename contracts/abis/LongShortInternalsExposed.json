@@ -620,6 +620,24 @@
         "type": "uint32"
       }
     ],
+    "name": "_executeOutstandingLazyRedeems",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      }
+    ],
     "name": "_executeOutstandingLazySettlementsExposed",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -1094,19 +1112,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "handleBatchedLazyRedeems",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

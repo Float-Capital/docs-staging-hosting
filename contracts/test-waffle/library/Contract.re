@@ -28,7 +28,7 @@ module DataFetchers = {
 };
 
 module LongShortHelpers = {
-  let getFees =
+  let getFeesMint =
       (longShort, ~marketIndex, ~amount, ~valueInEntrySide, ~valueInOtherSide) => {
     let%AwaitThen baseEntryFee =
       longShort->LongShort.baseEntryFee(marketIndex);
@@ -55,5 +55,76 @@ module LongShortHelpers = {
     } else {
       baseFee;
     };
+  };
+  let getFeesRedeemLazy =
+      (
+        longShort,
+        ~marketIndex,
+        ~amount,
+        ~valueInRemovalSide,
+        ~valueInOtherSide,
+      ) => {
+    let%AwaitThen badLiquidityExitFee =
+      longShort->LongShort.badLiquidityExitFee(marketIndex);
+
+    let%Await feeUnitsOfPrecision = longShort->LongShort.feeUnitsOfPrecision;
+
+    let baseFee = CONSTANTS.zeroBn;
+    if (valueInOtherSide->bnGte(valueInRemovalSide)) {
+      // All funds are causing imbalance
+      baseFee->add(
+        amount->mul(badLiquidityExitFee)->div(feeUnitsOfPrecision),
+      );
+    } else if (valueInOtherSide->add(amount)->bnGt(valueInRemovalSide)) {
+      let amountImbalancing =
+        amount->sub(valueInRemovalSide->sub(valueInOtherSide));
+      let penaltyFee =
+        amountImbalancing
+        ->mul(badLiquidityExitFee)
+        ->div(feeUnitsOfPrecision);
+
+      baseFee->add(penaltyFee);
+    } else {
+      baseFee;
+    };
+  };
+  type marketBalance = {
+    longValue: Ethers.BigNumber.t,
+    shortValue: Ethers.BigNumber.t,
+  };
+  let getMarketBalance = (longShort, ~marketIndex) => {
+    let%AwaitThen longValue =
+      longShort->LongShort.syntheticTokenBackedValue(
+        CONSTANTS.longTokenType,
+        marketIndex,
+      );
+    let%Await shortValue =
+      longShort->LongShort.syntheticTokenBackedValue(
+        CONSTANTS.shortTokenType,
+        marketIndex,
+      );
+    {longValue, shortValue};
+  };
+
+  let getBatchedRedemptionAmountWithoutFees =
+      (longShort, ~marketIndex, ~updateIndex, ~marketSide) => {
+    let%AwaitThen batchedLazyRedeems =
+      longShort->LongShort.batchedLazyRedeems(
+        marketIndex,
+        updateIndex,
+        marketSide,
+      );
+    let%Await synthPriceAtUpdateIndex =
+      longShort->LongShort.marketStateSnapshot(
+        marketIndex,
+        updateIndex,
+        marketSide,
+      );
+    let redemptionAmount =
+      batchedLazyRedeems.redemptions
+      ->mul(synthPriceAtUpdateIndex)
+      ->div(CONSTANTS.tenToThe18);
+
+    redemptionAmount;
   };
 };
