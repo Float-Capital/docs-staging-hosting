@@ -61,10 +61,7 @@ type baseExitFeeReturn = Ethers.BigNumber.t
 @send
 external baseExitFee: (t, int) => JsPromise.t<baseExitFeeReturn> = "baseExitFee"
 
-type batchedLazyDepositReturn = {
-  mintAmount: Ethers.BigNumber.t,
-  mintAndStakeAmount: Ethers.BigNumber.t,
-}
+type batchedLazyDepositReturn = Ethers.BigNumber.t
 @send
 external batchedLazyDeposit: (t, int, int) => JsPromise.t<batchedLazyDepositReturn> =
   "batchedLazyDeposit"
@@ -200,13 +197,6 @@ external mintLongAndStake: (
 ) => JsPromise.t<transaction> = "mintLongAndStake"
 
 @send
-external mintLongAndStakeLazy: (
-  t,
-  ~marketIndex: int,
-  ~amount: Ethers.BigNumber.t,
-) => JsPromise.t<transaction> = "mintLongAndStakeLazy"
-
-@send
 external mintLongLazy: (
   t,
   ~marketIndex: int,
@@ -226,13 +216,6 @@ external mintShortAndStake: (
   ~marketIndex: int,
   ~amount: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "mintShortAndStake"
-
-@send
-external mintShortAndStakeLazy: (
-  t,
-  ~marketIndex: int,
-  ~amount: Ethers.BigNumber.t,
-) => JsPromise.t<transaction> = "mintShortAndStakeLazy"
 
 @send
 external mintShortLazy: (
@@ -447,10 +430,7 @@ module Exposed = {
   @send
   external baseExitFee: (t, int) => JsPromise.t<baseExitFeeReturn> = "baseExitFee"
 
-  type batchedLazyDepositReturn = {
-    mintAmount: Ethers.BigNumber.t,
-    mintAndStakeAmount: Ethers.BigNumber.t,
-  }
+  type batchedLazyDepositReturn = Ethers.BigNumber.t
   @send
   external batchedLazyDeposit: (t, int, int) => JsPromise.t<batchedLazyDepositReturn> =
     "batchedLazyDeposit"
@@ -615,13 +595,6 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "mintLongAndStake"
 
   @send
-  external mintLongAndStakeLazy: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "mintLongAndStakeLazy"
-
-  @send
   external mintLongLazy: (
     t,
     ~marketIndex: int,
@@ -641,13 +614,6 @@ module Exposed = {
     ~marketIndex: int,
     ~amount: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "mintShortAndStake"
-
-  @send
-  external mintShortAndStakeLazy: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "mintShortAndStakeLazy"
 
   @send
   external mintShortLazy: (

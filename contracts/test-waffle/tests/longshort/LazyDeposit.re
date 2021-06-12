@@ -190,7 +190,7 @@ let testExposed =
       it'("updates the mintLong value for the market", () => {
         let {longShort} = contracts.contents;
         let%AwaitThen _ = mintLongLazyTxPromise.contents;
-        let%Await {mintAmount} =
+        let%Await mintAmount =
           longShort->LongShort.batchedLazyDeposit(
             marketIndex,
             CONSTANTS.longTokenType,

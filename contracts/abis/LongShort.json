@@ -757,12 +757,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "mintAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "mintAndStakeAmount",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -1209,24 +1204,6 @@
         "type": "uint256"
       }
     ],
-    "name": "mintLongAndStakeLazy",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
     "name": "mintLongLazy",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -1264,24 +1241,6 @@
       }
     ],
     "name": "mintShortAndStake",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "mintShortAndStakeLazy",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
