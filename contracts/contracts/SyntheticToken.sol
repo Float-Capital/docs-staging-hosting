@@ -67,7 +67,7 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
             _transfer(sender, recipient, amount);
             return true;
         } else {
-            super.transferFrom(sender, recipient, amount);
+            return super.transferFrom(sender, recipient, amount);
         }
     }
 

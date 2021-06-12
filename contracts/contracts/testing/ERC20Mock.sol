@@ -26,7 +26,7 @@ contract ERC20Mock is ERC20PresetMinterPauser {
         if (shouldMockTransfer) {
             return true;
         } else {
-            super.transfer(recipient, amount);
+            return super.transfer(recipient, amount);
         }
     }
 }

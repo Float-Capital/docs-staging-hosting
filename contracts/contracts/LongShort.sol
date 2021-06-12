@@ -787,7 +787,7 @@ contract LongShort is ILongShort, Initializable {
         );
 
         // Distibute accrued yield first based on current liquidity before price update
-        _yieldMechanism(marketIndex);
+        _claimAndDistributeYield(marketIndex);
 
         // If a negative int is return this should fail.
         int256 newAssetPrice = oracleManagers[marketIndex].updatePrice();
@@ -940,10 +940,10 @@ contract LongShort is ILongShort, Initializable {
         uint256 delta, // 1e18
         MarketSide synthTokenGainingDominance,
         MarketSide synthTokenLosingDominance,
-        uint256 baseFee,
-        uint256 penaltyFees
+        uint256 baseFeePercent,
+        uint256 penultyFeePercent
     ) internal view returns (uint256) {
-        uint256 baseFee = (delta * baseFee) / feeUnitsOfPrecision;
+        uint256 baseFee = (delta * baseFeePercent) / feeUnitsOfPrecision;
 
         if (
             syntheticTokenBackedValue[synthTokenGainingDominance][
@@ -952,7 +952,8 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokenBackedValue[synthTokenLosingDominance][marketIndex]
         ) {
             // All funds are causing imbalance
-            return baseFee + ((delta * penaltyFees) / feeUnitsOfPrecision);
+            return
+                baseFee + ((delta * penultyFeePercent) / feeUnitsOfPrecision);
         } else if (
             syntheticTokenBackedValue[synthTokenGainingDominance][marketIndex] +
                 delta >
@@ -967,7 +968,7 @@ contract LongShort is ILongShort, Initializable {
                             marketIndex
                         ]);
             uint256 penaltyFee =
-                (amountImbalancing * penaltyFees) / feeUnitsOfPrecision;
+                (amountImbalancing * penultyFeePercent) / feeUnitsOfPrecision;
 
             return baseFee + penaltyFee;
         } else {
