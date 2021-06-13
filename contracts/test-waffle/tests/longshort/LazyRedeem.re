@@ -1,6 +1,5 @@
 open Globals;
 open LetOps;
-open Contract;
 
 let testIntegration =
     (
@@ -8,26 +7,16 @@ let testIntegration =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
   describe("lazyRedeem", () => {
-    it'("should work as expected happy path", () => {
-      // let admin = accounts.contents->Array.getUnsafe(0);
+    it'("[THIS TEST IS FLAKY] should work as expected happy path", () => {
       let testUser = accounts.contents->Array.getUnsafe(8);
       let amountToLazyMint = Helpers.randomTokenAmount();
 
-      let {longShort, markets} =
-        // let {tokenFactory, treasury, floatToken, staker, longShort, markets} =
-        contracts.contents;
+      let {longShort, markets} = contracts.contents;
 
       let longShortUserConnected =
         longShort->ContractHelpers.connect(~address=testUser);
 
-      let {
-        paymentToken,
-        oracleManager,
-        // yieldManager,
-        longSynth,
-        // shortSynth,
-        marketIndex,
-      } =
+      let {paymentToken, oracleManager, longSynth, marketIndex} =
         markets->Array.getUnsafe(0);
 
       let%AwaitThen _longValueBefore =
@@ -54,10 +43,16 @@ let testIntegration =
           );
 
       let%AwaitThen _ =
-        longShortUserConnected->LongShort.mintLong(
+        HelperActions.mintDirect(
           ~marketIndex,
           ~amount=amountToLazyMint,
+          ~token=paymentToken,
+          ~user=testUser,
+          ~longShort,
+          ~oracleManagerMock=oracleManager,
+          ~isLong=true,
         );
+
       let%AwaitThen usersBalanceAvailableForRedeem =
         longSynth->SyntheticToken.balanceOf(~account=testUser.address);
       let%AwaitThen _ =
@@ -78,9 +73,6 @@ let testIntegration =
       let%AwaitThen paymentTokenBalanceBeforeWithdrawal =
         paymentToken->ERC20Mock.balanceOf(~account=testUser.address);
 
-      let%AwaitThen {longValue: valueLongBefore, shortValue: valueShortBefore} =
-        longShort->LongShortHelpers.getMarketBalance(~marketIndex);
-
       let%AwaitThen previousPrice =
         oracleManager->OracleManagerMock.getLatestPrice;
 
@@ -92,40 +84,23 @@ let testIntegration =
       let%AwaitThen _ =
         oracleManager->OracleManagerMock.setPrice(~newPrice=nextPrice);
 
-      let {
-        totalLockedLong: newLongValueSansRedemptions,
-        totalLockedShort: newShortValueSansRedemptions,
-      } =
-        MarketSimulation.simulateMarketPriceChange(
-          ~oldPrice=previousPrice,
-          ~newPrice=nextPrice,
-          ~totalLockedLong=valueLongBefore,
-          ~totalLockedShort=valueShortBefore,
-        );
-
       let%AwaitThen _ = longShort->LongShort._updateSystemState(~marketIndex);
       let%AwaitThen latestUpdateIndex =
         longShort->LongShort.latestUpdateIndex(marketIndex);
-
-      let%AwaitThen batchedRedemptionAmountWithoutFees =
-        longShort->LongShortHelpers.getBatchedRedemptionAmountWithoutFees(
-          ~marketIndex,
-          ~updateIndex=latestUpdateIndex,
-          ~marketSide=CONSTANTS.longTokenType,
-        );
-      let%AwaitThen feesForRedeemLazy =
-        longShort->LongShortHelpers.getFeesRedeemLazy(
-          ~marketIndex,
-          ~amount=batchedRedemptionAmountWithoutFees,
-          ~valueInRemovalSide=newLongValueSansRedemptions,
-          ~valueInOtherSide=newShortValueSansRedemptions,
+      let%AwaitThen redemptionPriceWithFees =
+        longShort->LongShort.redeemPriceSnapshot(
+          marketIndex,
+          latestUpdateIndex,
+          CONSTANTS.longTokenType,
         );
 
       let amountExpectedToBeRedeemed =
-        batchedRedemptionAmountWithoutFees->sub(feesForRedeemLazy);
+        usersBalanceAvailableForRedeem
+        ->mul(redemptionPriceWithFees)
+        ->div(CONSTANTS.tenToThe18);
 
       let%AwaitThen _ =
-        longShort->LongShort._executeOutstandingLazyRedeems(
+        longShort->LongShort.executeOutstandingLazySettlementsUser(
           ~marketIndex,
           ~user=testUser.address,
         );

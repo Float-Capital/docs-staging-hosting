@@ -191,7 +191,7 @@ let testExposed =
         let {longShort} = contracts.contents;
         let%AwaitThen _ = mintLongLazyTxPromise.contents;
         let%Await mintAmount =
-          longShort->LongShort.batchedLazyDeposit(
+          longShort->LongShort.batchedLazyPaymentTokenToDeposit(
             marketIndex,
             CONSTANTS.longTokenType,
           );

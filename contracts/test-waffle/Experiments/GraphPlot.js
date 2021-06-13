@@ -10,6 +10,7 @@ var Helpers = require("../library/Helpers.js");
 var Contract = require("../library/Contract.js");
 var CONSTANTS = require("../CONSTANTS.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
+var HelperActions = require("../library/HelperActions.js");
 
 function generateTestData(contracts, accounts, initialPrice, initialAmountShort, initialAmountLong, prices, name) {
   return Globals.describe("generating graph" + name)(undefined, undefined, undefined, (function (param) {
@@ -19,12 +20,13 @@ function generateTestData(contracts, accounts, initialPrice, initialAmountShort,
                         var longShort = match.longShort;
                         var match$1 = match.markets[0];
                         var marketIndex = match$1.marketIndex;
+                        var oracleManager = match$1.oracleManager;
                         var paymentToken = match$1.paymentToken;
                         var testUser = accounts.contents[1];
-                        return LetOps.AwaitThen.let_(match$1.oracleManager.setPrice(initialPrice), (function (param) {
+                        return LetOps.AwaitThen.let_(oracleManager.setPrice(initialPrice), (function (param) {
                                       return LetOps.AwaitThen.let_(longShort._updateSystemState(marketIndex), (function (param) {
                                                     return LetOps.AwaitThen.let_(Contract.PaymentTokenHelpers.mintAndApprove(paymentToken, testUser, ethers.BigNumber.from("10000000000000000000000000000"), longShort.address), (function (param) {
-                                                                  return LetOps.AwaitThen.let_(longShort.connect(testUser).mintLong(marketIndex, initialAmountLong), (function (param) {
+                                                                  return LetOps.AwaitThen.let_(HelperActions.mintDirect(marketIndex, initialAmountLong, paymentToken, testUser, longShort, oracleManager, true), (function (param) {
                                                                                 return Promise.resolve(undefined);
                                                                               }));
                                                                 }));
@@ -38,7 +40,7 @@ function generateTestData(contracts, accounts, initialPrice, initialAmountShort,
                         var marketIndex = match$1.marketIndex;
                         var oracleManager = match$1.oracleManager;
                         var testUser = accounts.contents[1];
-                        return LetOps.AwaitThen.let_(longShort.connect(testUser).mintShort(marketIndex, initialAmountShort), (function (param) {
+                        return LetOps.AwaitThen.let_(HelperActions.mintDirect(marketIndex, initialAmountShort, match$1.paymentToken, testUser, longShort, oracleManager, false), (function (param) {
                                       var pricesBelow = Belt_Array.makeBy(numberOfItems - 1 | 0, (function (i) {
                                               return i;
                                             }));
@@ -83,7 +85,7 @@ function generateTestData(contracts, accounts, initialPrice, initialAmountShort,
                               var marketIndex = match$1.marketIndex;
                               var oracleManager = match$1.oracleManager;
                               var testUser = accounts.contents[1];
-                              return LetOps.AwaitThen.let_(longShort.connect(testUser).mintShort(marketIndex, initialAmountShort), (function (param) {
+                              return LetOps.AwaitThen.let_(HelperActions.mintDirect(marketIndex, initialAmountShort, match$1.paymentToken, testUser, longShort, oracleManager, false), (function (param) {
                                             var pricesAbove = Belt_Array.makeBy((numberOfItems << 2), (function (i) {
                                                     return i;
                                                   }));
