@@ -60,7 +60,7 @@ contract("LongShort (treasury)", (accounts) => {
     return synth;
   };
 
-  it("sends accrued fees to treasury correctly", async () => {
+  it.skip("sends accrued fees to treasury correctly", async () => {
     // Create a synthetic with lots of entry/exit fees for testing.
     const synth = await populateMarket(50);
 
@@ -98,7 +98,7 @@ contract("LongShort (treasury)", (accounts) => {
     );
   });
 
-  it("sends accrued yield to treasury correctly", async () => {
+  it.skip("sends accrued yield to treasury correctly", async () => {
     // Create a synthetic with no fees.
     const synth = await populateMarket(0);
 

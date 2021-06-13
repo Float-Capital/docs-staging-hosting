@@ -620,35 +620,6 @@ contract Staker is IStaker, Initializable {
         _stake(ISyntheticToken(msg.sender), amount, from);
     }
 
-    /*
-     * Called by the float contract when a user mints and immediately stakes
-     * Updating the state is not necessary since this would have just been done
-     * during the minting process
-     */
-    function stakeFromMint(
-        ISyntheticToken token,
-        uint256 amount,
-        address user
-    ) external override onlyFloat() onlyValidSynthetic(token) {
-        _stake(token, amount, user);
-    }
-
-    function stakeFromMintBatched(
-        uint32 marketIndex,
-        uint256 amount,
-        uint256 oracleUpdateIndex,
-        ILongShort.MarketSide syntheticTokenType
-    ) external override onlyFloat() onlyValidMarket(marketIndex) {
-        if (syntheticTokenType == ILongShort.MarketSide.Long) {
-            batchedStake[marketIndex][oracleUpdateIndex].amountLong = amount;
-        } else {
-            batchedStake[marketIndex][oracleUpdateIndex].amountShort = amount;
-        }
-        batchedStake[marketIndex][oracleUpdateIndex]
-            .creationRewardIndex = latestRewardIndex[marketIndex];
-        // TODO: add event
-    }
-
     function _stake(
         ISyntheticToken token,
         uint256 amount,
@@ -709,47 +680,5 @@ contract Staker is IStaker, Initializable {
     function withdrawAll(ISyntheticToken token) external {
         _updateState(token);
         _withdraw(token, userAmountStaked[token][msg.sender]);
-    }
-
-    function transferBatchStakeToUser(
-        uint256 amountLong,
-        uint256 amountShort,
-        uint32 marketIndex,
-        uint256 oracleUpdateIndex,
-        address user
-    ) external override onlyFloat {
-        mintAccumulatedFloat(marketIndex, msg.sender);
-
-        // mint float up until now
-        BatchedStake storage currentBatchedStake =
-            batchedStake[marketIndex][oracleUpdateIndex];
-
-        (uint256 floatToMintLong, uint256 floatToMintShort) =
-            calculateAccumulatedFloatHelper(
-                marketIndex,
-                user,
-                amountLong,
-                amountShort,
-                currentBatchedStake.creationRewardIndex
-            );
-
-        uint256 floatToMint = floatToMintLong + floatToMintShort;
-        if (floatToMint > 0) {
-            // stops them setting this forward
-            userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[
-                marketIndex
-            ];
-
-            _mintFloat(user, floatToMint);
-
-            // TODO: give this event a different name so graph knows it was batached stake that was minted.
-            emit FloatMinted(
-                user,
-                marketIndex,
-                floatToMintLong,
-                floatToMintShort,
-                latestRewardIndex[marketIndex]
-            );
-        }
     }
 }

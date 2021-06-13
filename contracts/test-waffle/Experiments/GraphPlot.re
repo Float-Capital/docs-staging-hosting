@@ -34,21 +34,34 @@ let generateTestData =
           );
 
         let%AwaitThen _ =
-          longShort
-          ->ContractHelpers.connect(~address=testUser)
-          ->LongShort.mintLong(~amount=initialAmountLong, ~marketIndex);
+          HelperActions.mintDirect(
+            ~marketIndex,
+            ~amount=initialAmountLong,
+            ~token=paymentToken,
+            ~user=testUser,
+            ~longShort,
+            ~oracleManagerMock=oracleManager,
+            ~isLong=true,
+          );
+
         ()->JsPromise.resolve;
       });
       it'("below", () => {
         let {longShort, markets} = contracts.contents;
-        let {oracleManager, marketIndex} = markets->Array.getUnsafe(0);
+        let {oracleManager, marketIndex, paymentToken} =
+          markets->Array.getUnsafe(0);
         let testUser = accounts.contents->Array.getUnsafe(1);
 
         let%AwaitThen _ =
-          longShort
-          ->ContractHelpers.connect(~address=testUser)
-          ->LongShort.mintShort(~amount=initialAmountShort, ~marketIndex);
-
+          HelperActions.mintDirect(
+            ~marketIndex,
+            ~amount=initialAmountShort,
+            ~token=paymentToken,
+            ~user=testUser,
+            ~longShort,
+            ~oracleManagerMock=oracleManager,
+            ~isLong=false,
+          );
         let pricesBelow = Belt.Array.makeBy(numberOfItems - 1, i => i);
 
         let%AwaitThen (_, resultsBelow) =
@@ -101,13 +114,20 @@ let generateTestData =
       });
       it'("above", () => {
         let {longShort, markets} = contracts.contents;
-        let {oracleManager, marketIndex} = markets->Array.getUnsafe(0);
+        let {oracleManager, marketIndex, paymentToken} =
+          markets->Array.getUnsafe(0);
         let testUser = accounts.contents->Array.getUnsafe(1);
 
         let%AwaitThen _ =
-          longShort
-          ->ContractHelpers.connect(~address=testUser)
-          ->LongShort.mintShort(~amount=initialAmountShort, ~marketIndex);
+          HelperActions.mintDirect(
+            ~marketIndex,
+            ~amount=initialAmountShort,
+            ~token=paymentToken,
+            ~user=testUser,
+            ~longShort,
+            ~oracleManagerMock=oracleManager,
+            ~isLong=false,
+          );
 
         let pricesAbove = Belt.Array.makeBy(numberOfItems * 4, i => i);
 

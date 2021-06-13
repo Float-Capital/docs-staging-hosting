@@ -1,5 +1,5 @@
 require("hardhat-spdx-license-identifier");
-require("@tenderly/hardhat-tenderly"); // https://hardhat.org/plugins/tenderly-hardhat-tenderly.html
+// require("@tenderly/hardhat-tenderly"); // https://hardhat.org/plugins/tenderly-hardhat-tenderly.html
 
 let runCoverage = !process.env.DONT_RUN_REPORT_SUMMARY || process.env.DONT_RUN_REPORT_SUMMARY.toUpperCase() != "TRUE";
 if (runCoverage) {
