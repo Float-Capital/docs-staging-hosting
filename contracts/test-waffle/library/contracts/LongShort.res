@@ -641,7 +641,9 @@ module Exposed = {
   external withdrawFunds: (
     t,
     ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
+    ~amountLong: Ethers.BigNumber.t,
+    ~amountShort: Ethers.BigNumber.t,
+    ~user: Ethers.ethAddress,
   ) => JsPromise.t<transaction> = "withdrawFunds"
 
   type yieldManagersReturn = Ethers.ethAddress

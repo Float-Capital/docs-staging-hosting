@@ -5,130 +5,43 @@ var Chai = require("../../bindings/chai/Chai.js");
 var LetOps = require("../../library/LetOps.js");
 var Globals = require("../../library/Globals.js");
 var Helpers = require("../../library/Helpers.js");
-var Contract = require("../../library/Contract.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 var HelperActions = require("../../library/HelperActions.js");
-var MarketSimulation = require("../../library/MarketSimulation.js");
 
 function testIntegration(contracts, accounts) {
   return Globals.describe("lazyRedeem")(undefined, undefined, undefined, (function (param) {
-                return Globals.it_only$prime("[THIS TEST IS FLAKY] should work as expected happy path")(undefined, undefined, undefined, (function (param) {
+                return Globals.it$prime("[THIS TEST IS FLAKY] should work as expected happy path")(undefined, undefined, undefined, (function (param) {
                               var testUser = accounts.contents[8];
                               var amountToLazyMint = Helpers.randomTokenAmount(undefined);
-                              console.log({
-                                    TEST: 1
-                                  });
                               var match = contracts.contents;
                               var longShort = match.longShort;
-                              console.log({
-                                    TEST: 2
-                                  });
                               var longShortUserConnected = longShort.connect(testUser);
-                              console.log({
-                                    TEST: 3
-                                  });
                               var match$1 = match.markets[0];
                               var marketIndex = match$1.marketIndex;
                               var longSynth = match$1.longSynth;
                               var oracleManager = match$1.oracleManager;
                               var paymentToken = match$1.paymentToken;
-                              console.log({
-                                    TEST: 4
-                                  });
                               return LetOps.AwaitThen.let_(longShort.syntheticTokenBackedValue(CONSTANTS.longTokenType, marketIndex), (function (_longValueBefore) {
-                                            console.log({
-                                                  TEST: 5
-                                                });
                                             return LetOps.AwaitThen.let_(paymentToken.mint(testUser.address, amountToLazyMint), (function (param) {
-                                                          console.log({
-                                                                TEST: 6
-                                                              });
                                                           return LetOps.AwaitThen.let_(paymentToken.setShouldMockTransfer(false), (function (param) {
-                                                                        console.log({
-                                                                              TEST: 7
-                                                                            });
                                                                         return LetOps.AwaitThen.let_(paymentToken.connect(testUser).approve(longShort.address, amountToLazyMint), (function (param) {
-                                                                                      console.log({
-                                                                                            TEST: 8
-                                                                                          });
                                                                                       return LetOps.AwaitThen.let_(HelperActions.mintDirect(marketIndex, amountToLazyMint, paymentToken, testUser, longShort, oracleManager, true), (function (param) {
-                                                                                                    console.log({
-                                                                                                          TEST: 9
-                                                                                                        });
                                                                                                     return LetOps.AwaitThen.let_(longSynth.balanceOf(testUser.address), (function (usersBalanceAvailableForRedeem) {
-                                                                                                                  console.log({
-                                                                                                                        TEST: 10
-                                                                                                                      });
                                                                                                                   return LetOps.AwaitThen.let_(longShortUserConnected.redeemLongLazy(marketIndex, usersBalanceAvailableForRedeem), (function (param) {
-                                                                                                                                console.log({
-                                                                                                                                      TEST: 11
-                                                                                                                                    });
                                                                                                                                 return LetOps.AwaitThen.let_(longSynth.balanceOf(testUser.address), (function (usersBalanceAfterLazyRedeem) {
-                                                                                                                                              console.log({
-                                                                                                                                                    TEST: 12
-                                                                                                                                                  });
                                                                                                                                               Chai.bnEqual("Balance after price system update but before user settlement should be the same as after settlement", usersBalanceAfterLazyRedeem, CONSTANTS.zeroBn);
-                                                                                                                                              console.log({
-                                                                                                                                                    TEST: 13
-                                                                                                                                                  });
                                                                                                                                               return LetOps.AwaitThen.let_(paymentToken.balanceOf(testUser.address), (function (paymentTokenBalanceBeforeWithdrawal) {
-                                                                                                                                                            console.log({
-                                                                                                                                                                  TEST: 14
-                                                                                                                                                                });
-                                                                                                                                                            return LetOps.AwaitThen.let_(Contract.LongShortHelpers.getMarketBalance(longShort, marketIndex), (function (param) {
-                                                                                                                                                                          var valueShortBefore = param.shortValue;
-                                                                                                                                                                          var valueLongBefore = param.longValue;
-                                                                                                                                                                          console.log({
-                                                                                                                                                                                TEST: 15
-                                                                                                                                                                              });
-                                                                                                                                                                          return LetOps.AwaitThen.let_(oracleManager.getLatestPrice(), (function (previousPrice) {
-                                                                                                                                                                                        var nextPrice = Globals.div(Globals.mul(previousPrice, Globals.bnFromInt(12)), Globals.bnFromInt(10));
-                                                                                                                                                                                        console.log({
-                                                                                                                                                                                              TEST: 15
-                                                                                                                                                                                            });
-                                                                                                                                                                                        return LetOps.AwaitThen.let_(oracleManager.setPrice(nextPrice), (function (param) {
-                                                                                                                                                                                                      console.log({
-                                                                                                                                                                                                            TEST: 16
-                                                                                                                                                                                                          });
-                                                                                                                                                                                                      var match = MarketSimulation.simulateMarketPriceChange(previousPrice, nextPrice, valueLongBefore, valueShortBefore);
-                                                                                                                                                                                                      var newShortValueSansRedemptions = match.totalLockedShort;
-                                                                                                                                                                                                      var newLongValueSansRedemptions = match.totalLockedLong;
-                                                                                                                                                                                                      console.log({
-                                                                                                                                                                                                            TEST: 17
-                                                                                                                                                                                                          });
-                                                                                                                                                                                                      return LetOps.AwaitThen.let_(longShort._updateSystemState(marketIndex), (function (param) {
-                                                                                                                                                                                                                    console.log({
-                                                                                                                                                                                                                          TEST: 18
-                                                                                                                                                                                                                        });
-                                                                                                                                                                                                                    return LetOps.AwaitThen.let_(longShort.latestUpdateIndex(marketIndex), (function (latestUpdateIndex) {
-                                                                                                                                                                                                                                  console.log({
-                                                                                                                                                                                                                                        TEST: 19
-                                                                                                                                                                                                                                      });
-                                                                                                                                                                                                                                  return LetOps.AwaitThen.let_(Contract.LongShortHelpers.getBatchedRedemptionAmountWithoutFees(longShort, marketIndex, latestUpdateIndex, CONSTANTS.longTokenType), (function (batchedRedemptionAmountWithoutFees) {
-                                                                                                                                                                                                                                                console.log({
-                                                                                                                                                                                                                                                      TEST: 20
-                                                                                                                                                                                                                                                    });
-                                                                                                                                                                                                                                                return LetOps.AwaitThen.let_(Contract.LongShortHelpers.getFeesRedeemLazy(longShort, marketIndex, batchedRedemptionAmountWithoutFees, newLongValueSansRedemptions, newShortValueSansRedemptions), (function (feesForRedeemLazy) {
-                                                                                                                                                                                                                                                              console.log({
-                                                                                                                                                                                                                                                                    TEST: 21
-                                                                                                                                                                                                                                                                  });
-                                                                                                                                                                                                                                                              var amountExpectedToBeRedeemed = Globals.sub(batchedRedemptionAmountWithoutFees, feesForRedeemLazy);
-                                                                                                                                                                                                                                                              return LetOps.AwaitThen.let_(longShort.executeOutstandingLazySettlementsUser(testUser.address, marketIndex), (function (param) {
-                                                                                                                                                                                                                                                                            console.log({
-                                                                                                                                                                                                                                                                                  TEST: 22
-                                                                                                                                                                                                                                                                                });
-                                                                                                                                                                                                                                                                            return LetOps.Await.let_(paymentToken.balanceOf(testUser.address), (function (paymentTokenBalanceAfterWithdrawal) {
-                                                                                                                                                                                                                                                                                          console.log({
-                                                                                                                                                                                                                                                                                                TEST: 23
-                                                                                                                                                                                                                                                                                              });
-                                                                                                                                                                                                                                                                                          var deltaBalanceChange = Globals.sub(paymentTokenBalanceAfterWithdrawal, paymentTokenBalanceBeforeWithdrawal);
-                                                                                                                                                                                                                                                                                          Chai.bnEqual("Balance of paymentToken didn't update correctly", deltaBalanceChange, amountExpectedToBeRedeemed);
-                                                                                                                                                                                                                                                                                          console.log({
-                                                                                                                                                                                                                                                                                                TEST: 24
-                                                                                                                                                                                                                                                                                              });
-                                                                                                                                                                                                                                                                                          
-                                                                                                                                                                                                                                                                                        }));
-                                                                                                                                                                                                                                                                          }));
+                                                                                                                                                            return LetOps.AwaitThen.let_(oracleManager.getLatestPrice(), (function (previousPrice) {
+                                                                                                                                                                          var nextPrice = Globals.div(Globals.mul(previousPrice, Globals.bnFromInt(12)), Globals.bnFromInt(10));
+                                                                                                                                                                          return LetOps.AwaitThen.let_(oracleManager.setPrice(nextPrice), (function (param) {
+                                                                                                                                                                                        return LetOps.AwaitThen.let_(longShort._updateSystemState(marketIndex), (function (param) {
+                                                                                                                                                                                                      return LetOps.AwaitThen.let_(longShort.latestUpdateIndex(marketIndex), (function (latestUpdateIndex) {
+                                                                                                                                                                                                                    return LetOps.AwaitThen.let_(longShort.redeemPriceSnapshot(marketIndex, latestUpdateIndex, CONSTANTS.longTokenType), (function (redemptionPriceWithFees) {
+                                                                                                                                                                                                                                  var amountExpectedToBeRedeemed = Globals.div(Globals.mul(usersBalanceAvailableForRedeem, redemptionPriceWithFees), CONSTANTS.tenToThe18);
+                                                                                                                                                                                                                                  return LetOps.AwaitThen.let_(longShort.executeOutstandingLazySettlementsUser(testUser.address, marketIndex), (function (param) {
+                                                                                                                                                                                                                                                return LetOps.Await.let_(paymentToken.balanceOf(testUser.address), (function (paymentTokenBalanceAfterWithdrawal) {
+                                                                                                                                                                                                                                                              var deltaBalanceChange = Globals.sub(paymentTokenBalanceAfterWithdrawal, paymentTokenBalanceBeforeWithdrawal);
+                                                                                                                                                                                                                                                              return Chai.bnEqual("Balance of paymentToken didn't update correctly", deltaBalanceChange, amountExpectedToBeRedeemed);
                                                                                                                                                                                                                                                             }));
                                                                                                                                                                                                                                               }));
                                                                                                                                                                                                                                 }));

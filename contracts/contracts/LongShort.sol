@@ -476,7 +476,7 @@ contract LongShort is ILongShort, Initializable {
         internal
         returns (uint256)
     {
-        return (amountSynth * TEN_TO_THE_18) / amountPaymentToken;
+        return (amountPaymentToken * TEN_TO_THE_18) / amountSynth;
     }
 
     function getAmountPaymentToken(uint256 amountSynth, uint256 price)
@@ -715,7 +715,6 @@ contract LongShort is ILongShort, Initializable {
         internal
         assertMarketExists(marketIndex)
     {
-        console.log("USS", 1);
         // This is called right before any state change!
         // So reward rate can be calculated just in time by
         // staker without needing to be saved
@@ -726,21 +725,17 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokenBackedValue[MarketSide.Long][marketIndex],
             syntheticTokenBackedValue[MarketSide.Short][marketIndex]
         );
-        console.log("USS", 2);
 
         assert(
             syntheticTokenBackedValue[MarketSide.Long][marketIndex] != 0 &&
                 syntheticTokenBackedValue[MarketSide.Short][marketIndex] != 0
         );
 
-        console.log("USS", 3);
         // Distibute accrued yield first based on current liquidity before price update
         _claimAndDistributeYield(marketIndex);
-        console.log("USS", 4);
 
         // If a negative int is return this should fail.
         int256 newAssetPrice = oracleManagers[marketIndex].updatePrice();
-        console.log("USS", 5);
 
         // TODO STENT move this into the price function
         emit PriceUpdate(
@@ -749,35 +744,24 @@ contract LongShort is ILongShort, Initializable {
             uint256(newAssetPrice),
             msg.sender
         );
-        console.log("USS", 6);
 
         // Adjusts long and short values based on price movements.
         bool priceChanged =
             _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
-        console.log("USS", 7);
 
         // Distribute accrued yield manager interest.
         _claimAndDistributeYield(marketIndex);
-        console.log("USS", 8);
 
         // TODO STENT CONCERN1
         _refreshTokenPrices(marketIndex);
-        console.log("USS", 9);
-        console.log("USS", 7);
         assetPrice[marketIndex] = uint256(newAssetPrice);
-        console.log("USS", 10);
 
         if (priceChanged) {
-            console.log("USS", 11);
             snapshotPriceChangeForNextPriceExecution(marketIndex);
 
-            console.log("USS", 12);
             handleBatchedDepositSettlement(marketIndex, MarketSide.Long);
-            console.log("USS", 13);
             handleBatchedDepositSettlement(marketIndex, MarketSide.Short);
-            console.log("USS", 14);
             handleBatchedLazyRedeems(marketIndex);
-            console.log("USS", 15);
         }
 
         emit ValueLockedInSystem(
@@ -787,7 +771,6 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokenBackedValue[MarketSide.Long][marketIndex],
             syntheticTokenBackedValue[MarketSide.Short][marketIndex]
         );
-        console.log("USS", 16);
     }
 
     function _updateSystemState(uint32 marketIndex) external override {
@@ -823,19 +806,7 @@ contract LongShort is ILongShort, Initializable {
         address user
     ) internal {
         uint256 totalAmount = amountLong + amountShort;
-        console.log("totalAmount", totalAmount);
-        console.log(
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex],
-            amountLong,
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex],
-            amountShort
-        );
-        console.log(
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] >=
-                amountLong,
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] >=
-                amountShort
-        );
+
         assert(
             syntheticTokenBackedValue[MarketSide.Long][marketIndex] >=
                 amountLong &&
@@ -1074,14 +1045,12 @@ contract LongShort is ILongShort, Initializable {
             MarketSide.Long,
             currentlyPendingUserActions
         );
-        console.log("Here");
         _executeOutstandingLazyRedeems(
             marketIndex,
             user,
             MarketSide.Short,
             currentlyPendingUserActions
         );
-        console.log("Done");
         currentlyPendingUserActions.usersCurrentUpdateIndex = 0;
     }
 
@@ -1166,33 +1135,19 @@ contract LongShort is ILongShort, Initializable {
         MarketSide syntheticTokenType,
         UserLazyActions storage currentlyPendingUserActions
     ) internal {
-        console.log("A");
         if (currentlyPendingUserActions.redemptions[syntheticTokenType] > 0) {
-            console.log(
-                "B",
-                currentlyPendingUserActions.usersCurrentUpdateIndex,
-                redeemPriceSnapshot[marketIndex][
-                    currentlyPendingUserActions.usersCurrentUpdateIndex
-                ][syntheticTokenType]
-            );
-
             uint256 amountToRedeem =
-                (currentlyPendingUserActions.redemptions[syntheticTokenType] *
-                    TEN_TO_THE_18) /
+                getAmountPaymentToken(
+                    currentlyPendingUserActions.redemptions[syntheticTokenType],
                     redeemPriceSnapshot[marketIndex][
                         currentlyPendingUserActions.usersCurrentUpdateIndex
-                    ][syntheticTokenType];
+                    ][syntheticTokenType]
+                );
 
-            console.log("C");
             uint256 balance = fundTokens[marketIndex].balanceOf(address(this));
-            console.log("C", balance, amountToRedeem);
-            console.log(balance);
-            console.log(amountToRedeem);
 
             fundTokens[marketIndex].transfer(user, amountToRedeem);
-            console.log("D");
             currentlyPendingUserActions.redemptions[syntheticTokenType] = 0;
-            console.log("E");
         }
     }
 
@@ -1246,17 +1201,15 @@ contract LongShort is ILongShort, Initializable {
 
     function _calculateBatchedLazyFees(
         uint32 marketIndex,
-        uint256 longAmountOfPaymentTokenToRedeem,
+        uint256 amountOfPaymentTokenToRedeem,
         uint256 shortAmountOfPaymentTokenToRedeem
     ) internal returns (uint256 totalFeesLong, uint256 totalFeesShort) {
         // penalty fee is shared equally between
         // all users on the side that ends up causing an imbalance in the
         // batch.
-        if (
-            longAmountOfPaymentTokenToRedeem > shortAmountOfPaymentTokenToRedeem
-        ) {
+        if (amountOfPaymentTokenToRedeem > shortAmountOfPaymentTokenToRedeem) {
             uint256 delta =
-                longAmountOfPaymentTokenToRedeem -
+                amountOfPaymentTokenToRedeem -
                     shortAmountOfPaymentTokenToRedeem;
             totalFeesLong = _getFeesGeneral(
                 marketIndex,
@@ -1269,7 +1222,7 @@ contract LongShort is ILongShort, Initializable {
         } else {
             uint256 delta =
                 shortAmountOfPaymentTokenToRedeem -
-                    longAmountOfPaymentTokenToRedeem;
+                    amountOfPaymentTokenToRedeem;
             totalFeesShort = _getFeesGeneral(
                 marketIndex,
                 delta,
@@ -1283,115 +1236,79 @@ contract LongShort is ILongShort, Initializable {
         _feesMechanism(marketIndex, totalFeesLong + totalFeesShort);
     }
 
+    function calculateRedeemPriceSnapshot(
+        uint32 marketIndex,
+        uint256 amountOfPaymentTokenToRedeem,
+        MarketSide syntheticTokenType
+    ) internal returns (uint256 batchLongTotalWithdrawnPaymentToken) {
+        if (amountOfPaymentTokenToRedeem > 0) {
+            redeemPriceSnapshot[marketIndex][latestUpdateIndex[marketIndex]][
+                syntheticTokenType
+            ] = getPrice(
+                batchedLazySynthToRedeem[marketIndex][syntheticTokenType],
+                amountOfPaymentTokenToRedeem
+            );
+
+            // NOTE: this is always slightly less than `amountOfPaymentTokenToRedeem` due to rounding errors
+            return
+                getAmountPaymentToken(
+                    batchedLazySynthToRedeem[marketIndex][syntheticTokenType],
+                    redeemPriceSnapshot[marketIndex][
+                        latestUpdateIndex[marketIndex]
+                    ][syntheticTokenType]
+                );
+        }
+    }
+
     function handleBatchedLazyRedeems(uint32 marketIndex) internal {
-        console.log("hblr", 1);
         uint256 batchedLazySynthToRedeemLong =
             batchedLazySynthToRedeem[marketIndex][MarketSide.Long];
-        console.log("hblr", 2);
         uint256 batchedLazySynthToRedeemShort =
             batchedLazySynthToRedeem[marketIndex][MarketSide.Short];
 
-        console.log("hblr", 3);
         _handleBatchedLazyRedeem(
             marketIndex,
             MarketSide.Long,
             batchedLazySynthToRedeemLong
         );
-        console.log("hblr", 4);
         _handleBatchedLazyRedeem(
             marketIndex,
             MarketSide.Short,
             batchedLazySynthToRedeemShort
         );
-        console.log("hblr", 5);
 
         uint256 longAmountOfPaymentTokenToRedeem =
-            (batchedLazySynthToRedeemLong *
-                syntheticTokenPrice[MarketSide.Long][marketIndex]) /
-                TEN_TO_THE_18;
+            getAmountPaymentToken(
+                batchedLazySynthToRedeemLong,
+                syntheticTokenPrice[MarketSide.Long][marketIndex]
+            );
 
-        console.log("hblr", 6);
         uint256 shortAmountOfPaymentTokenToRedeem =
-            (batchedLazySynthToRedeemShort *
-                syntheticTokenPrice[MarketSide.Short][marketIndex]) /
-                TEN_TO_THE_18;
+            getAmountPaymentToken(
+                batchedLazySynthToRedeemShort,
+                syntheticTokenPrice[MarketSide.Short][marketIndex]
+            );
 
-        console.log("hblr", 7);
         (uint256 totalFeesLong, uint256 totalFeesShort) =
             _calculateBatchedLazyFees(
                 marketIndex,
                 longAmountOfPaymentTokenToRedeem,
                 shortAmountOfPaymentTokenToRedeem
             );
-        console.log("hblr", 8);
 
-        uint256 batchLongTotalWithdrawnPaymentToken = 0;
-        uint256 batchShortTotalWithdrawnPaymentToken = 0;
-
-        console.log("hblr", 9);
-        if (longAmountOfPaymentTokenToRedeem > 0) {
-            console.log("hblr", 10);
-            redeemPriceSnapshot[marketIndex][latestUpdateIndex[marketIndex]][
-                MarketSide.Long
-            ] =
-                (batchedLazySynthToRedeemLong * TEN_TO_THE_18) /
-                (longAmountOfPaymentTokenToRedeem - totalFeesLong);
-            console.log(
-                latestUpdateIndex[marketIndex],
-                redeemPriceSnapshot[marketIndex][
-                    latestUpdateIndex[marketIndex]
-                ][MarketSide.Long]
-            );
-
-            batchLongTotalWithdrawnPaymentToken =
-                (batchedLazySynthToRedeem *
-                    redeemPriceSnapshot[marketIndex][
-                        latestUpdateIndex[marketIndex]
-                    ][MarketSide.Long]) /
-                TEN_TO_THE_18;
-            console.log("hblr", 11);
-            console.log(
-                "first",
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex],
-                longAmountOfPaymentTokenToRedeem,
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex] >
-                    longAmountOfPaymentTokenToRedeem
-            );
-            syntheticTokenBackedValue[MarketSide.Long][
-                marketIndex
-            ] -= longAmountOfPaymentTokenToRedeem;
-            console.log("hblr", 12);
-        }
-
-        console.log("hblr", 13);
-        if (shortAmountOfPaymentTokenToRedeem > 0) {
-            console.log("hblr", 14);
-            batchShortTotalWithdrawnPaymentToken =
-                shortAmountOfPaymentTokenToRedeem -
-                totalFeesShort;
-            console.log("hblr", 15);
-            redeemPriceSnapshot[marketIndex][latestUpdateIndex[marketIndex]][
+        uint256 batchShortTotalWithdrawnPaymentToken =
+            calculateRedeemPriceSnapshot(
+                marketIndex,
+                shortAmountOfPaymentTokenToRedeem - totalFeesShort,
                 MarketSide.Short
-            ] =
-                (batchedLazySynthToRedeemShort * TEN_TO_THE_18) /
-                (shortAmountOfPaymentTokenToRedeem - totalFeesShort);
+            );
 
-            console.log("hblr", 16);
-            console.log(
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex],
-                shortAmountOfPaymentTokenToRedeem,
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex] >
-                    shortAmountOfPaymentTokenToRedeem
+        uint256 batchLongTotalWithdrawnPaymentToken =
+            calculateRedeemPriceSnapshot(
+                marketIndex,
+                longAmountOfPaymentTokenToRedeem - totalFeesLong,
+                MarketSide.Long
             );
-            console.log(
-                "short",
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex],
-                shortAmountOfPaymentTokenToRedeem,
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex] >
-                    shortAmountOfPaymentTokenToRedeem
-            );
-        }
-        console.log("hblr", 17);
 
         _withdrawFunds(
             marketIndex,
@@ -1399,11 +1316,9 @@ contract LongShort is ILongShort, Initializable {
             batchShortTotalWithdrawnPaymentToken,
             address(this)
         );
-        console.log("hblr", 18);
 
         // TODO STENT CONCERN1
         _refreshTokenPrices(marketIndex);
-        console.log("hblr", 19);
 
         batchedLazySynthToRedeem[marketIndex][MarketSide.Long] = 0;
         batchedLazySynthToRedeem[marketIndex][MarketSide.Short] = 0;

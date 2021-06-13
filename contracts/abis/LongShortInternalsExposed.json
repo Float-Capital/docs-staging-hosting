@@ -1431,8 +1431,18 @@
       },
       {
         "internalType": "uint256",
-        "name": "amount",
+        "name": "amountLong",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountShort",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
       }
     ],
     "name": "withdrawFunds",
