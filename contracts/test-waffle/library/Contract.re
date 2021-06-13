@@ -109,19 +109,15 @@ module LongShortHelpers = {
   let getBatchedRedemptionAmountWithoutFees =
       (longShort, ~marketIndex, ~updateIndex, ~marketSide) => {
     let%AwaitThen batchedLazyRedeems =
-      longShort->LongShort.batchedLazyRedeems(
-        marketIndex,
-        updateIndex,
-        marketSide,
-      );
+      longShort->LongShort.batchedLazySynthToRedeem(marketIndex, marketSide);
     let%Await synthPriceAtUpdateIndex =
-      longShort->LongShort.marketStateSnapshot(
+      longShort->LongShort.mintPriceSnapshot(
         marketIndex,
         updateIndex,
         marketSide,
       );
     let redemptionAmount =
-      batchedLazyRedeems.redemptions
+      batchedLazyRedeems
       ->mul(synthPriceAtUpdateIndex)
       ->div(CONSTANTS.tenToThe18);
 

@@ -8,17 +8,21 @@ let testIntegration =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
   describe("lazyRedeem", () => {
-    it'("[THIS TEST IS FLAKY] should work as expected happy path", () => {
+    it_only'("[THIS TEST IS FLAKY] should work as expected happy path", () => {
       // let admin = accounts.contents->Array.getUnsafe(0);
       let testUser = accounts.contents->Array.getUnsafe(8);
       let amountToLazyMint = Helpers.randomTokenAmount();
+
+      Js.log({"TEST": 1});
 
       let {longShort, markets} =
         // let {tokenFactory, treasury, floatToken, staker, longShort, markets} =
         contracts.contents;
 
+      Js.log({"TEST": 2});
       let longShortUserConnected =
         longShort->ContractHelpers.connect(~address=testUser);
+      Js.log({"TEST": 3});
 
       let {
         paymentToken,
@@ -29,22 +33,26 @@ let testIntegration =
         marketIndex,
       } =
         markets->Array.getUnsafe(0);
+      Js.log({"TEST": 4});
 
       let%AwaitThen _longValueBefore =
         longShort->LongShort.syntheticTokenBackedValue(
           CONSTANTS.longTokenType,
           marketIndex,
         );
+      Js.log({"TEST": 5});
 
       let%AwaitThen _ =
         paymentToken->ERC20Mock.mint(
           ~_to=testUser.address,
           ~amount=amountToLazyMint,
         );
+      Js.log({"TEST": 6});
 
       let%AwaitThen _ =
         paymentToken->ERC20Mock.setShouldMockTransfer(~value=false);
 
+      Js.log({"TEST": 7});
       let%AwaitThen _ =
         paymentToken
         ->ContractHelpers.connect(~address=testUser)
@@ -52,6 +60,7 @@ let testIntegration =
             ~spender=longShort.address,
             ~amount=amountToLazyMint,
           );
+      Js.log({"TEST": 8});
 
       let%AwaitThen _ =
         HelperActions.mintDirect(
@@ -63,29 +72,36 @@ let testIntegration =
           ~oracleManagerMock=oracleManager,
           ~isLong=true,
         );
+      Js.log({"TEST": 9});
 
       let%AwaitThen usersBalanceAvailableForRedeem =
         longSynth->SyntheticToken.balanceOf(~account=testUser.address);
+      Js.log({"TEST": 10});
       let%AwaitThen _ =
         longShortUserConnected->LongShort.redeemLongLazy(
           ~marketIndex,
           ~tokensToRedeem=usersBalanceAvailableForRedeem,
         );
+      Js.log({"TEST": 11});
       let%AwaitThen usersBalanceAfterLazyRedeem =
         longSynth->SyntheticToken.balanceOf(~account=testUser.address);
 
+      Js.log({"TEST": 12});
       Chai.bnEqual(
         ~message=
           "Balance after price system update but before user settlement should be the same as after settlement",
         usersBalanceAfterLazyRedeem,
         CONSTANTS.zeroBn,
       );
+      Js.log({"TEST": 13});
 
       let%AwaitThen paymentTokenBalanceBeforeWithdrawal =
         paymentToken->ERC20Mock.balanceOf(~account=testUser.address);
+      Js.log({"TEST": 14});
 
       let%AwaitThen {longValue: valueLongBefore, shortValue: valueShortBefore} =
         longShort->LongShortHelpers.getMarketBalance(~marketIndex);
+      Js.log({"TEST": 15});
 
       let%AwaitThen previousPrice =
         oracleManager->OracleManagerMock.getLatestPrice;
@@ -95,9 +111,11 @@ let testIntegration =
         ->mul(bnFromInt(12)) // 20% increase
         ->div(bnFromInt(10));
 
+      Js.log({"TEST": 15});
       let%AwaitThen _ =
         oracleManager->OracleManagerMock.setPrice(~newPrice=nextPrice);
 
+      Js.log({"TEST": 16});
       let {
         totalLockedLong: newLongValueSansRedemptions,
         totalLockedShort: newShortValueSansRedemptions,
@@ -108,17 +126,21 @@ let testIntegration =
           ~totalLockedLong=valueLongBefore,
           ~totalLockedShort=valueShortBefore,
         );
+      Js.log({"TEST": 17});
 
       let%AwaitThen _ = longShort->LongShort._updateSystemState(~marketIndex);
+      Js.log({"TEST": 18});
       let%AwaitThen latestUpdateIndex =
         longShort->LongShort.latestUpdateIndex(marketIndex);
 
+      Js.log({"TEST": 19});
       let%AwaitThen batchedRedemptionAmountWithoutFees =
         longShort->LongShortHelpers.getBatchedRedemptionAmountWithoutFees(
           ~marketIndex,
           ~updateIndex=latestUpdateIndex,
           ~marketSide=CONSTANTS.longTokenType,
         );
+      Js.log({"TEST": 20});
       let%AwaitThen feesForRedeemLazy =
         longShort->LongShortHelpers.getFeesRedeemLazy(
           ~marketIndex,
@@ -126,6 +148,7 @@ let testIntegration =
           ~valueInRemovalSide=newLongValueSansRedemptions,
           ~valueInOtherSide=newShortValueSansRedemptions,
         );
+      Js.log({"TEST": 21});
 
       let amountExpectedToBeRedeemed =
         batchedRedemptionAmountWithoutFees->sub(feesForRedeemLazy);
@@ -136,9 +159,11 @@ let testIntegration =
           ~user=testUser.address,
         );
 
+      Js.log({"TEST": 22});
       let%Await paymentTokenBalanceAfterWithdrawal =
         paymentToken->ERC20Mock.balanceOf(~account=testUser.address);
 
+      Js.log({"TEST": 23});
       let deltaBalanceChange =
         paymentTokenBalanceAfterWithdrawal->sub(
           paymentTokenBalanceBeforeWithdrawal,
@@ -149,5 +174,6 @@ let testIntegration =
         deltaBalanceChange,
         amountExpectedToBeRedeemed,
       );
+      Js.log({"TEST": 24});
     })
   });

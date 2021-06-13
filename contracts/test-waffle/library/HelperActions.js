@@ -9,13 +9,34 @@ var CONSTANTS = require("../CONSTANTS.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
 
 function mintDirect(marketIndex, amount, token, user, longShort, oracleManagerMock, isLong) {
+  console.log({
+        SD: 1
+      });
   return LetOps.AwaitThen.let_(Contract.PaymentTokenHelpers.mintAndApprove(token, user, amount, longShort.address), (function (param) {
+                console.log({
+                      SD: 2
+                    });
                 var contract = longShort.connect(user);
+                console.log({
+                      SD: 3
+                    });
                 return LetOps.AwaitThen.let_(oracleManagerMock.getLatestPrice(), (function (currentOraclePrice) {
+                              console.log({
+                                    SD: 4
+                                  });
                               var tempOraclePrice = Globals.add(currentOraclePrice, Globals.bnFromInt(1));
                               oracleManagerMock.setPrice(tempOraclePrice);
+                              console.log({
+                                    SD: 5
+                                  });
                               return LetOps.AwaitThen.let_(contract._updateSystemState(marketIndex), (function (param) {
+                                            console.log({
+                                                  SD: 6
+                                                });
                                             return LetOps.AwaitThen.let_(isLong ? contract.mintLongLazy(marketIndex, amount) : contract.mintShortLazy(marketIndex, amount), (function (_mintLazy) {
+                                                          console.log({
+                                                                SD: 7
+                                                              });
                                                           oracleManagerMock.setPrice(currentOraclePrice);
                                                           return contract._updateSystemState(marketIndex);
                                                         }));
@@ -25,12 +46,30 @@ function mintDirect(marketIndex, amount, token, user, longShort, oracleManagerMo
 }
 
 function mintAndStakeDirect(marketIndex, amount, token, user, longShort, oracleManagerMock, synthToken) {
+  console.log({
+        MASD: 1
+      });
   return LetOps.AwaitThen.let_(Contract.SyntheticTokenHelpers.getIsLong(synthToken), (function (isLong) {
+                console.log({
+                      MASD: 2
+                    });
                 return LetOps.AwaitThen.let_(synthToken.balanceOf(user.address), (function (balanceBeforeMinting) {
+                              console.log({
+                                    MASD: 3
+                                  });
                               return LetOps.AwaitThen.let_(mintDirect(marketIndex, amount, token, user, longShort, oracleManagerMock, isLong), (function (_mintDirect) {
+                                            console.log({
+                                                  MASD: 4
+                                                });
                                             return LetOps.AwaitThen.let_(synthToken.balanceOf(user.address), (function (availableToStakeAfter) {
+                                                          console.log({
+                                                                MASD: 5
+                                                              });
                                                           var amountToStake = Globals.sub(availableToStakeAfter, balanceBeforeMinting);
                                                           var synthTokenConnected = synthToken.connect(user);
+                                                          console.log({
+                                                                MASD: 6
+                                                              });
                                                           return synthTokenConnected.stake(amountToStake);
                                                         }));
                                           }));
@@ -145,13 +184,25 @@ function stakeRandomlyInBothSidesOfMarket(marketsToStakeIn, userToStakeWith, lon
                 var oracleManager = param.oracleManager;
                 var paymentToken = param.paymentToken;
                 return LetOps.AwaitThen.let_(prevPromise, (function (param) {
+                              console.log({
+                                    SRIB: 1
+                                  });
                               var mintStake = function (param) {
                                 return function (param$1) {
                                   return mintAndStakeDirect(marketIndex, param, paymentToken, userToStakeWith, longShort, oracleManager, param$1);
                                 };
                               };
+                              console.log({
+                                    SRIB: 2
+                                  });
                               return LetOps.AwaitThen.let_(mintStake(Helpers.randomTokenAmount(undefined))(longSynth), (function (param) {
+                                            console.log({
+                                                  SRIB: 3
+                                                });
                                             return LetOps.Await.let_(mintStake(Helpers.randomTokenAmount(undefined))(shortSynth), (function (param) {
+                                                          console.log({
+                                                                SRIB: 4
+                                                              });
                                                           
                                                         }));
                                           }));

@@ -54,22 +54,18 @@ type baseExitFeeReturn = Ethers.BigNumber.t
 @send
 external baseExitFee: (t, int) => JsPromise.t<baseExitFeeReturn> = "baseExitFee"
 
-type batchedLazyDepositReturn = Ethers.BigNumber.t
+type batchedLazyPaymentTokenToDepositReturn = Ethers.BigNumber.t
 @send
-external batchedLazyDeposit: (t, int, int) => JsPromise.t<batchedLazyDepositReturn> =
-  "batchedLazyDeposit"
-
-type batchedLazyRedeemsReturn = {
-  redemptions: Ethers.BigNumber.t,
-  totalWithdrawn: Ethers.BigNumber.t,
-}
-@send
-external batchedLazyRedeems: (
+external batchedLazyPaymentTokenToDeposit: (
   t,
   int,
-  Ethers.BigNumber.t,
   int,
-) => JsPromise.t<batchedLazyRedeemsReturn> = "batchedLazyRedeems"
+) => JsPromise.t<batchedLazyPaymentTokenToDepositReturn> = "batchedLazyPaymentTokenToDeposit"
+
+type batchedLazySynthToRedeemReturn = Ethers.BigNumber.t
+@send
+external batchedLazySynthToRedeem: (t, int, int) => JsPromise.t<batchedLazySynthToRedeemReturn> =
+  "batchedLazySynthToRedeem"
 
 @send
 external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
@@ -168,21 +164,21 @@ type marketExistsReturn = bool
 @send
 external marketExists: (t, int) => JsPromise.t<marketExistsReturn> = "marketExists"
 
-type marketStateSnapshotReturn = Ethers.BigNumber.t
-@send
-external marketStateSnapshot: (
-  t,
-  int,
-  Ethers.BigNumber.t,
-  int,
-) => JsPromise.t<marketStateSnapshotReturn> = "marketStateSnapshot"
-
 @send
 external mintLongLazy: (
   t,
   ~marketIndex: int,
   ~amount: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "mintLongLazy"
+
+type mintPriceSnapshotReturn = Ethers.BigNumber.t
+@send
+external mintPriceSnapshot: (
+  t,
+  int,
+  Ethers.BigNumber.t,
+  int,
+) => JsPromise.t<mintPriceSnapshotReturn> = "mintPriceSnapshot"
 
 @send
 external mintShortLazy: (
@@ -211,6 +207,15 @@ external redeemLongLazy: (
   ~marketIndex: int,
   ~tokensToRedeem: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "redeemLongLazy"
+
+type redeemPriceSnapshotReturn = Ethers.BigNumber.t
+@send
+external redeemPriceSnapshot: (
+  t,
+  int,
+  Ethers.BigNumber.t,
+  int,
+) => JsPromise.t<redeemPriceSnapshotReturn> = "redeemPriceSnapshot"
 
 @send
 external redeemShortLazy: (
@@ -353,22 +358,18 @@ module Exposed = {
   @send
   external baseExitFee: (t, int) => JsPromise.t<baseExitFeeReturn> = "baseExitFee"
 
-  type batchedLazyDepositReturn = Ethers.BigNumber.t
+  type batchedLazyPaymentTokenToDepositReturn = Ethers.BigNumber.t
   @send
-  external batchedLazyDeposit: (t, int, int) => JsPromise.t<batchedLazyDepositReturn> =
-    "batchedLazyDeposit"
-
-  type batchedLazyRedeemsReturn = {
-    redemptions: Ethers.BigNumber.t,
-    totalWithdrawn: Ethers.BigNumber.t,
-  }
-  @send
-  external batchedLazyRedeems: (
+  external batchedLazyPaymentTokenToDeposit: (
     t,
     int,
-    Ethers.BigNumber.t,
     int,
-  ) => JsPromise.t<batchedLazyRedeemsReturn> = "batchedLazyRedeems"
+  ) => JsPromise.t<batchedLazyPaymentTokenToDepositReturn> = "batchedLazyPaymentTokenToDeposit"
+
+  type batchedLazySynthToRedeemReturn = Ethers.BigNumber.t
+  @send
+  external batchedLazySynthToRedeem: (t, int, int) => JsPromise.t<batchedLazySynthToRedeemReturn> =
+    "batchedLazySynthToRedeem"
 
   @send
   external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
@@ -485,15 +486,6 @@ module Exposed = {
   @send
   external marketExists: (t, int) => JsPromise.t<marketExistsReturn> = "marketExists"
 
-  type marketStateSnapshotReturn = Ethers.BigNumber.t
-  @send
-  external marketStateSnapshot: (
-    t,
-    int,
-    Ethers.BigNumber.t,
-    int,
-  ) => JsPromise.t<marketStateSnapshotReturn> = "marketStateSnapshot"
-
   type minimumReturn = Ethers.BigNumber.t
   @send
   external minimum: (
@@ -508,6 +500,15 @@ module Exposed = {
     ~marketIndex: int,
     ~amount: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "mintLongLazy"
+
+  type mintPriceSnapshotReturn = Ethers.BigNumber.t
+  @send
+  external mintPriceSnapshot: (
+    t,
+    int,
+    Ethers.BigNumber.t,
+    int,
+  ) => JsPromise.t<mintPriceSnapshotReturn> = "mintPriceSnapshot"
 
   @send
   external mintShortLazy: (
@@ -536,6 +537,15 @@ module Exposed = {
     ~marketIndex: int,
     ~tokensToRedeem: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "redeemLongLazy"
+
+  type redeemPriceSnapshotReturn = Ethers.BigNumber.t
+  @send
+  external redeemPriceSnapshot: (
+    t,
+    int,
+    Ethers.BigNumber.t,
+    int,
+  ) => JsPromise.t<redeemPriceSnapshotReturn> = "redeemPriceSnapshot"
 
   @send
   external redeemShortLazy: (

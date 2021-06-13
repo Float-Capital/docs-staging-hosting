@@ -20,12 +20,14 @@ describe("Float System", () => {
       contracts := deployedContracts;
       let setupUser = accounts.contents->Array.getUnsafe(2);
 
+      Js.log("Before");
       let%Await _ =
         HelperActions.stakeRandomlyInBothSidesOfMarket(
           ~marketsToStakeIn=deployedContracts.markets,
           ~userToStakeWith=setupUser,
           ~longShort=deployedContracts.longShort,
         );
+      Js.log("After");
       ();
     });
 

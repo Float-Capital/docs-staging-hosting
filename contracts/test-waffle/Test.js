@@ -26,7 +26,9 @@ Globals.describe("Float System")(undefined, undefined, undefined, (function (par
                               return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
                                             contracts.contents = deployedContracts;
                                             var setupUser = accounts.contents[2];
+                                            console.log("Before");
                                             return LetOps.Await.let_(HelperActions.stakeRandomlyInBothSidesOfMarket(deployedContracts.markets, setupUser, deployedContracts.longShort), (function (param) {
+                                                          console.log("After");
                                                           
                                                         }));
                                           }));

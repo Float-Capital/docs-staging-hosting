@@ -71,9 +71,9 @@ function getMarketBalance(longShort, marketIndex) {
 }
 
 function getBatchedRedemptionAmountWithoutFees(longShort, marketIndex, updateIndex, marketSide) {
-  return LetOps.AwaitThen.let_(longShort.batchedLazyRedeems(marketIndex, updateIndex, marketSide), (function (batchedLazyRedeems) {
-                return LetOps.Await.let_(longShort.marketStateSnapshot(marketIndex, updateIndex, marketSide), (function (synthPriceAtUpdateIndex) {
-                              return Globals.div(Globals.mul(batchedLazyRedeems.redemptions, synthPriceAtUpdateIndex), CONSTANTS.tenToThe18);
+  return LetOps.AwaitThen.let_(longShort.batchedLazySynthToRedeem(marketIndex, marketSide), (function (batchedLazyRedeems) {
+                return LetOps.Await.let_(longShort.mintPriceSnapshot(marketIndex, updateIndex, marketSide), (function (synthPriceAtUpdateIndex) {
+                              return Globals.div(Globals.mul(batchedLazyRedeems, synthPriceAtUpdateIndex), CONSTANTS.tenToThe18);
                             }));
               }));
 }
