@@ -31,12 +31,10 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
 
     modifier settleRemainingNextPriceExecutions(address user) {
         if (user != address(longShort)) {
-            longShort.executeOutstandingLazySettlementsSynth(
-                user,
-                marketIndex,
-                syntheticTokenType
-            );
+            longShort.executeOutstandingLazySettlementsUser(user, marketIndex);
         }
+        uint256 balance = ERC20.balanceOf(user);
+        uint256 balanceAll = balanceOf(user);
         _;
     }
 

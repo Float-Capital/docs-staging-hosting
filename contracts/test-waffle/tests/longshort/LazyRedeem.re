@@ -8,7 +8,7 @@ let testIntegration =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
   describe("lazyRedeem", () => {
-    it'("should work as expected happy path", () => {
+    it'("[THIS TEST IS FLAKY] should work as expected happy path", () => {
       // let admin = accounts.contents->Array.getUnsafe(0);
       let testUser = accounts.contents->Array.getUnsafe(8);
       let amountToLazyMint = Helpers.randomTokenAmount();
@@ -131,7 +131,7 @@ let testIntegration =
         batchedRedemptionAmountWithoutFees->sub(feesForRedeemLazy);
 
       let%AwaitThen _ =
-        longShort->LongShort._executeOutstandingLazyRedeems(
+        longShort->LongShort.executeOutstandingLazySettlementsUser(
           ~marketIndex,
           ~user=testUser.address,
         );

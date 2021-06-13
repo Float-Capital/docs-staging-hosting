@@ -21,13 +21,6 @@ type tEN_TO_THE_18_SIGNEDReturn = Ethers.BigNumber.t
 external tEN_TO_THE_18_SIGNED: t => JsPromise.t<tEN_TO_THE_18_SIGNEDReturn> = "TEN_TO_THE_18_SIGNED"
 
 @send
-external _executeOutstandingLazyRedeems: (
-  t,
-  ~user: Ethers.ethAddress,
-  ~marketIndex: int,
-) => JsPromise.t<transaction> = "_executeOutstandingLazyRedeems"
-
-@send
 external _updateSystemState: (t, ~marketIndex: int) => JsPromise.t<transaction> =
   "_updateSystemState"
 
@@ -96,12 +89,11 @@ external changeTreasury: (t, ~treasury: Ethers.ethAddress) => JsPromise.t<transa
   "changeTreasury"
 
 @send
-external executeOutstandingLazySettlementsSynth: (
+external executeOutstandingLazySettlementsUser: (
   t,
   ~user: Ethers.ethAddress,
   ~marketIndex: int,
-  ~syntheticTokenType: int,
-) => JsPromise.t<transaction> = "executeOutstandingLazySettlementsSynth"
+) => JsPromise.t<transaction> = "executeOutstandingLazySettlementsUser"
 
 type feeUnitsOfPrecisionReturn = Ethers.BigNumber.t
 @send
@@ -213,18 +205,6 @@ type oracleManagersReturn = Ethers.ethAddress
 @send
 external oracleManagers: (t, int) => JsPromise.t<oracleManagersReturn> = "oracleManagers"
 
-type percentageAvailableForEarlyExitDenominatorReturn = Ethers.BigNumber.t
-@send
-external percentageAvailableForEarlyExitDenominator: t => JsPromise.t<
-  percentageAvailableForEarlyExitDenominatorReturn,
-> = "percentageAvailableForEarlyExitDenominator"
-
-type percentageAvailableForEarlyExitNumeratorReturn = Ethers.BigNumber.t
-@send
-external percentageAvailableForEarlyExitNumerator: t => JsPromise.t<
-  percentageAvailableForEarlyExitNumeratorReturn,
-> = "percentageAvailableForEarlyExitNumerator"
-
 @send
 external redeemLongLazy: (
   t,
@@ -295,11 +275,6 @@ type userLazyActionsReturn = Ethers.BigNumber.t
 external userLazyActions: (t, int, Ethers.ethAddress) => JsPromise.t<userLazyActionsReturn> =
   "userLazyActions"
 
-type userLazyRedeemsReturn = Ethers.BigNumber.t
-@send
-external userLazyRedeems: (t, int, Ethers.ethAddress) => JsPromise.t<userLazyRedeemsReturn> =
-  "userLazyRedeems"
-
 type yieldManagersReturn = Ethers.ethAddress
 @send
 external yieldManagers: (t, int) => JsPromise.t<yieldManagersReturn> = "yieldManagers"
@@ -321,13 +296,6 @@ module Exposed = {
   @send
   external tEN_TO_THE_18_SIGNED: t => JsPromise.t<tEN_TO_THE_18_SIGNEDReturn> =
     "TEN_TO_THE_18_SIGNED"
-
-  @send
-  external _executeOutstandingLazyRedeems: (
-    t,
-    ~user: Ethers.ethAddress,
-    ~marketIndex: int,
-  ) => JsPromise.t<transaction> = "_executeOutstandingLazyRedeems"
 
   @send
   external _executeOutstandingLazySettlementsExposed: (
@@ -431,12 +399,11 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "depositFunds"
 
   @send
-  external executeOutstandingLazySettlementsSynth: (
+  external executeOutstandingLazySettlementsUser: (
     t,
     ~user: Ethers.ethAddress,
     ~marketIndex: int,
-    ~syntheticTokenType: int,
-  ) => JsPromise.t<transaction> = "executeOutstandingLazySettlementsSynth"
+  ) => JsPromise.t<transaction> = "executeOutstandingLazySettlementsUser"
 
   type feeUnitsOfPrecisionReturn = Ethers.BigNumber.t
   @send
@@ -563,18 +530,6 @@ module Exposed = {
   @send
   external oracleManagers: (t, int) => JsPromise.t<oracleManagersReturn> = "oracleManagers"
 
-  type percentageAvailableForEarlyExitDenominatorReturn = Ethers.BigNumber.t
-  @send
-  external percentageAvailableForEarlyExitDenominator: t => JsPromise.t<
-    percentageAvailableForEarlyExitDenominatorReturn,
-  > = "percentageAvailableForEarlyExitDenominator"
-
-  type percentageAvailableForEarlyExitNumeratorReturn = Ethers.BigNumber.t
-  @send
-  external percentageAvailableForEarlyExitNumerator: t => JsPromise.t<
-    percentageAvailableForEarlyExitNumeratorReturn,
-  > = "percentageAvailableForEarlyExitNumerator"
-
   @send
   external redeemLongLazy: (
     t,
@@ -671,11 +626,6 @@ module Exposed = {
   @send
   external userLazyActions: (t, int, Ethers.ethAddress) => JsPromise.t<userLazyActionsReturn> =
     "userLazyActions"
-
-  type userLazyRedeemsReturn = Ethers.BigNumber.t
-  @send
-  external userLazyRedeems: (t, int, Ethers.ethAddress) => JsPromise.t<userLazyRedeemsReturn> =
-    "userLazyRedeems"
 
   @send
   external withdrawFunds: (
