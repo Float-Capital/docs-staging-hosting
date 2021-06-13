@@ -1142,11 +1142,12 @@ contract LongShort is ILongShort, Initializable {
         _;
     }
 
-    function redeemLongLazy(uint32 marketIndex, uint256 tokensToRedeem)
-        external
-        executeOutstandingLazyRedeems(msg.sender, marketIndex)
-    {
-        syntheticTokens[MarketSide.Long][marketIndex].transferFrom(
+    function _redeemLazy(
+        uint32 marketIndex,
+        uint256 tokensToRedeem,
+        MarketSide syntheticTokenType
+    ) internal executeOutstandingLazyRedeems(msg.sender, marketIndex) {
+        syntheticTokens[syntheticTokenType][marketIndex].transferFrom(
             msg.sender,
             address(this),
             tokensToRedeem
@@ -1154,73 +1155,45 @@ contract LongShort is ILongShort, Initializable {
         uint256 nextUpdateIndex = latestUpdateIndex[marketIndex] + 1;
 
         userLazyRedeems[marketIndex][msg.sender].redemptions[
-            MarketSide.Long
+            syntheticTokenType
         ] += tokensToRedeem;
         userLazyRedeems[marketIndex][msg.sender]
             .usersCurrentUpdateIndex = nextUpdateIndex;
 
-        batchedLazyRedeems[marketIndex][nextUpdateIndex][MarketSide.Long]
+        batchedLazyRedeems[marketIndex][nextUpdateIndex][syntheticTokenType]
             .redemptions += tokensToRedeem;
+    }
+
+    function redeemLongLazy(uint32 marketIndex, uint256 tokensToRedeem)
+        external
+    {
+        _redeemLazy(marketIndex, tokensToRedeem, MarketSide.Long);
     }
 
     function redeemShortLazy(uint32 marketIndex, uint256 tokensToRedeem)
         external
-        executeOutstandingLazyRedeems(msg.sender, marketIndex)
     {
-        syntheticTokens[MarketSide.Short][marketIndex].transferFrom(
-            msg.sender,
-            address(this),
-            tokensToRedeem
-        );
-        uint256 nextUpdateIndex = latestUpdateIndex[marketIndex] + 1;
-
-        userLazyRedeems[marketIndex][msg.sender].redemptions[
-            MarketSide.Short
-        ] += tokensToRedeem;
-        userLazyRedeems[marketIndex][msg.sender]
-            .usersCurrentUpdateIndex = nextUpdateIndex;
-
-        batchedLazyRedeems[marketIndex][nextUpdateIndex][MarketSide.Short]
-            .redemptions += tokensToRedeem;
+        _redeemLazy(marketIndex, tokensToRedeem, MarketSide.Short);
     }
 
-    function handleBatchedLazyRedeems(uint32 marketIndex) internal {
-        BatchedLazyRedeem storage batchLong =
-            batchedLazyRedeems[marketIndex][latestUpdateIndex[marketIndex]][
-                MarketSide.Long
-            ];
-        BatchedLazyRedeem storage batchShort =
-            batchedLazyRedeems[marketIndex][latestUpdateIndex[marketIndex]][
-                MarketSide.Short
-            ];
-
-        if (batchLong.redemptions > 0) {
-            syntheticTokens[MarketSide.Long][marketIndex].synthRedeemBurn(
+    function _handleBatchedLazyRedeem(
+        uint32 marketIndex,
+        MarketSide syntheticTokenType,
+        uint256 amountSynthToRedeem
+    ) internal {
+        if (amountSynthToRedeem > 0) {
+            syntheticTokens[syntheticTokenType][marketIndex].synthRedeemBurn(
                 address(this),
-                batchLong.redemptions
+                amountSynthToRedeem
             );
         }
+    }
 
-        if (batchShort.redemptions > 0) {
-            syntheticTokens[MarketSide.Short][marketIndex].synthRedeemBurn(
-                address(this),
-                batchShort.redemptions
-            );
-        }
-        uint256 longAmountToRedeem =
-            (batchLong.redemptions *
-                syntheticTokenPrice[MarketSide.Long][marketIndex]) /
-                TEN_TO_THE_18;
-
-        uint256 shortAmountToRedeem =
-            (batchShort.redemptions *
-                syntheticTokenPrice[MarketSide.Short][marketIndex]) /
-                TEN_TO_THE_18;
-
-        uint256 totalFeesLong = 0;
-
-        uint256 totalFeesShort = 0;
-
+    function _calculateBatchedLazyFees(
+        uint32 marketIndex,
+        uint256 longAmountToRedeem,
+        uint256 shortAmountToRedeem
+    ) internal returns (uint256 totalFeesLong, uint256 totalFeesShort) {
         // penalty fee is shared equally between
         // all users on the side that ends up causing an imbalance in the
         // batch.
@@ -1246,10 +1219,49 @@ contract LongShort is ILongShort, Initializable {
             );
         }
 
+        _feesMechanism(marketIndex, totalFeesLong + totalFeesShort);
+    }
+
+    function handleBatchedLazyRedeems(uint32 marketIndex) internal {
+        BatchedLazyRedeem storage batchLong =
+            batchedLazyRedeems[marketIndex][latestUpdateIndex[marketIndex]][
+                MarketSide.Long
+            ];
+        BatchedLazyRedeem storage batchShort =
+            batchedLazyRedeems[marketIndex][latestUpdateIndex[marketIndex]][
+                MarketSide.Short
+            ];
+
+        _handleBatchedLazyRedeem(
+            marketIndex,
+            MarketSide.Long,
+            batchLong.redemptions
+        );
+        _handleBatchedLazyRedeem(
+            marketIndex,
+            MarketSide.Short,
+            batchShort.redemptions
+        );
+
+        uint256 longAmountToRedeem =
+            (batchLong.redemptions *
+                syntheticTokenPrice[MarketSide.Long][marketIndex]) /
+                TEN_TO_THE_18;
+
+        uint256 shortAmountToRedeem =
+            (batchShort.redemptions *
+                syntheticTokenPrice[MarketSide.Short][marketIndex]) /
+                TEN_TO_THE_18;
+
+        (uint256 totalFeesLong, uint256 totalFeesShort) =
+            _calculateBatchedLazyFees(
+                marketIndex,
+                longAmountToRedeem,
+                shortAmountToRedeem
+            );
+
         batchLong.totalWithdrawn = longAmountToRedeem - totalFeesLong;
         batchShort.totalWithdrawn = shortAmountToRedeem - totalFeesShort;
-
-        _feesMechanism(marketIndex, totalFeesLong + totalFeesShort);
 
         syntheticTokenBackedValue[MarketSide.Long][
             marketIndex
