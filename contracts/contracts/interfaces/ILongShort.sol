@@ -5,14 +5,6 @@ pragma solidity 0.8.3;
 abstract contract ILongShort {
     enum MarketSide {Long, Short}
 
-    function redeemLong(uint32 marketIndex, uint256 tokensToRedeem)
-        external
-        virtual;
-
-    function redeemShort(uint32 marketIndex, uint256 tokensToRedeem)
-        external
-        virtual;
-
     function _updateSystemState(uint32 marketIndex) external virtual;
 
     function _updateSystemStateMulti(uint32[] calldata marketIndex)
@@ -25,9 +17,8 @@ abstract contract ILongShort {
         MarketSide syntheticTokenType
     ) external view virtual returns (uint256 pendingBalance);
 
-    function executeOutstandingLazySettlementsSynth(
+    function executeOutstandingLazySettlementsUser(
         address user,
-        uint32 marketIndex,
-        MarketSide syntheticTokenType
+        uint32 marketIndex
     ) external virtual;
 }
