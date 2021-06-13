@@ -105,28 +105,6 @@ module LongShortHelpers = {
       );
     {longValue, shortValue};
   };
-
-  let getBatchedRedemptionAmountWithoutFees =
-      (longShort, ~marketIndex, ~updateIndex, ~marketSide) => {
-    let%AwaitThen batchedLazyRedeems =
-      longShort->LongShort.batchedLazyRedeems(
-        marketIndex,
-        updateIndex,
-        marketSide,
-      );
-    let%Await synthPriceAtUpdateIndex =
-      longShort->LongShort.marketStateSnapshot(
-        marketIndex,
-        updateIndex,
-        marketSide,
-      );
-    let redemptionAmount =
-      batchedLazyRedeems.redemptions
-      ->mul(synthPriceAtUpdateIndex)
-      ->div(CONSTANTS.tenToThe18);
-
-    redemptionAmount;
-  };
 };
 
 module SyntheticTokenHelpers = {

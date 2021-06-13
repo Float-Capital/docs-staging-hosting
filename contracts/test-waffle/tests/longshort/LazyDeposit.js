@@ -88,7 +88,7 @@ function testExposed(contracts, accounts) {
                                       var match = contracts.contents;
                                       var longShort = match.longShort;
                                       return LetOps.AwaitThen.let_(mintLongLazyTxPromise.contents, (function (param) {
-                                                    return LetOps.Await.let_(longShort.batchedLazyDeposit(1, CONSTANTS.longTokenType), (function (mintAmount) {
+                                                    return LetOps.Await.let_(longShort.batchedLazyPaymentTokenToDeposit(1, CONSTANTS.longTokenType), (function (mintAmount) {
                                                                   return Chai.bnEqual("Incorrect batched lazy deposit mint long", amount, mintAmount);
                                                                 }));
                                                   }));

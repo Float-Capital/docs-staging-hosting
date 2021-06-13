@@ -367,24 +367,6 @@
         "type": "uint32"
       }
     ],
-    "name": "_executeOutstandingLazyRedeems",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
     "name": "_executeOutstandingLazySettlementsExposed",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -561,7 +543,7 @@
         "type": "uint8"
       }
     ],
-    "name": "batchedLazyDeposit",
+    "name": "batchedLazyPaymentTokenToDeposit",
     "outputs": [
       {
         "internalType": "uint256",
@@ -580,26 +562,16 @@
         "type": "uint32"
       },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
         "internalType": "enum ILongShort.MarketSide",
         "name": "",
         "type": "uint8"
       }
     ],
-    "name": "batchedLazyRedeems",
+    "name": "batchedLazySynthToRedeem",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "redemptions",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "totalWithdrawn",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -707,14 +679,9 @@
         "internalType": "uint32",
         "name": "marketIndex",
         "type": "uint32"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "syntheticTokenType",
-        "type": "uint8"
       }
     ],
-    "name": "executeOutstandingLazySettlementsSynth",
+    "name": "executeOutstandingLazySettlementsUser",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -986,35 +953,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "name": "marketStateSnapshot",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
         "name": "liquidityOfPositionA",
         "type": "uint256"
@@ -1052,6 +990,35 @@
     "name": "mintLongLazy",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "name": "mintPriceSnapshot",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1125,32 +1092,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "percentageAvailableForEarlyExitDenominator",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "percentageAvailableForEarlyExitNumerator",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint32",
@@ -1166,6 +1107,35 @@
     "name": "redeemLongLazy",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "name": "redeemPriceSnapshot",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1456,37 +1426,23 @@
     "inputs": [
       {
         "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "userLazyRedeems",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "usersCurrentUpdateIndex",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
         "name": "marketIndex",
         "type": "uint32"
       },
       {
         "internalType": "uint256",
-        "name": "amount",
+        "name": "amountLong",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountShort",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
       }
     ],
     "name": "withdrawFunds",

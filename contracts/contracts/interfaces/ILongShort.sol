@@ -17,9 +17,8 @@ abstract contract ILongShort {
         MarketSide syntheticTokenType
     ) external view virtual returns (uint256 pendingBalance);
 
-    function executeOutstandingLazySettlementsSynth(
+    function executeOutstandingLazySettlementsUser(
         address user,
-        uint32 marketIndex,
-        MarketSide syntheticTokenType
+        uint32 marketIndex
     ) external virtual;
 }
