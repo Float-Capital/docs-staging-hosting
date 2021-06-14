@@ -74,12 +74,6 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => uint256) public badLiquidityExitFee;
     uint256[45] private __feeInfo;
 
-    struct UserLazyActions {
-        mapping(MarketSide => uint256) redemptions;
-        mapping(MarketSide => uint256) lazyDepositAmount;
-        uint256 usersCurrentUpdateIndex;
-    }
-
     mapping(uint32 => uint256) public latestUpdateIndex;
     // These two can be grouped together in a struct
     mapping(uint32 => mapping(uint256 => mapping(MarketSide => uint256)))
@@ -92,8 +86,12 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => mapping(MarketSide => uint256))
         public batchedLazySynthToRedeem;
 
-    mapping(uint32 => mapping(address => UserLazyActions))
-        public userLazyActions;
+    mapping(uint32 => mapping(address => mapping(MarketSide => uint256)))
+        public userLazyRedemptions;
+    mapping(uint32 => mapping(address => mapping(MarketSide => uint256)))
+        public userLazyDepositAmounts;
+    mapping(uint32 => mapping(address => uint256))
+        public userCurrentLazyUpdateIndex;
 
     ////////////////////////////////////
     /////////// EVENTS /////////////////
@@ -970,19 +968,14 @@ contract LongShort is ILongShort, Initializable {
         assertMarketExists(marketIndex)
         returns (uint256 pendingBalance)
     {
-        UserLazyActions storage currentlyPendingUserActions =
-            userLazyActions[marketIndex][user];
-
         if (
-            currentlyPendingUserActions.usersCurrentUpdateIndex <=
+            userCurrentLazyUpdateIndex[marketIndex][user] <=
             latestUpdateIndex[marketIndex]
         ) {
             // Update is still lazy but not past the next oracle update - display the amount the user would get if they executed immediately
             // NOTE: if we ever add fees for minting - we would add them here!
             uint256 amountPaymentTokenDeposited =
-                currentlyPendingUserActions.lazyDepositAmount[
-                    syntheticTokenType
-                ];
+                userLazyDepositAmounts[marketIndex][user][syntheticTokenType];
 
             uint256 tokens =
                 getAmountSynthToken(
@@ -999,21 +992,15 @@ contract LongShort is ILongShort, Initializable {
     function _executeLazyMintsIfTheyExist(
         uint32 marketIndex,
         address user,
-        MarketSide syntheticTokenType,
-        UserLazyActions storage currentlyPendingUserActions
+        MarketSide syntheticTokenType
     ) internal {
-        if (
-            currentlyPendingUserActions.lazyDepositAmount[syntheticTokenType] !=
-            0
-        ) {
+        uint256 currentDepositAmount =
+            userLazyDepositAmounts[marketIndex][user][syntheticTokenType];
+        if (currentDepositAmount != 0) {
             uint256 tokensToMint =
-                ((
-                    currentlyPendingUserActions.lazyDepositAmount[
-                        syntheticTokenType
-                    ]
-                ) * TEN_TO_THE_18) /
+                (currentDepositAmount * TEN_TO_THE_18) /
                     mintPriceSnapshot[marketIndex][
-                        latestUpdateIndex[marketIndex]
+                        userCurrentLazyUpdateIndex[marketIndex][user]
                     ][syntheticTokenType];
 
             syntheticTokens[syntheticTokenType][marketIndex].transfer(
@@ -1021,42 +1008,20 @@ contract LongShort is ILongShort, Initializable {
                 tokensToMint
             );
 
-            currentlyPendingUserActions.lazyDepositAmount[
-                syntheticTokenType
-            ] = 0;
+            userLazyDepositAmounts[marketIndex][user][syntheticTokenType] = 0;
         }
     }
 
     function _executeOutstandingLazySettlementsAction(
         address user,
-        uint32 marketIndex,
-        UserLazyActions storage currentlyPendingUserActions
+        uint32 marketIndex
     ) internal {
-        _executeLazyMintsIfTheyExist(
-            marketIndex,
-            user,
-            MarketSide.Long,
-            currentlyPendingUserActions
-        );
-        _executeLazyMintsIfTheyExist(
-            marketIndex,
-            user,
-            MarketSide.Short,
-            currentlyPendingUserActions
-        );
-        _executeOutstandingLazyRedeems(
-            marketIndex,
-            user,
-            MarketSide.Long,
-            currentlyPendingUserActions
-        );
-        _executeOutstandingLazyRedeems(
-            marketIndex,
-            user,
-            MarketSide.Short,
-            currentlyPendingUserActions
-        );
-        currentlyPendingUserActions.usersCurrentUpdateIndex = 0;
+        _executeLazyMintsIfTheyExist(marketIndex, user, MarketSide.Long);
+        _executeLazyMintsIfTheyExist(marketIndex, user, MarketSide.Short);
+        _executeOutstandingLazyRedeems(marketIndex, user, MarketSide.Long);
+        _executeOutstandingLazyRedeems(marketIndex, user, MarketSide.Short);
+
+        userCurrentLazyUpdateIndex[marketIndex][user] = 0;
     }
 
     // TODO: modify this function (or make a different version) that takes in the desired useage and does either partial or full "early use"
@@ -1065,19 +1030,13 @@ contract LongShort is ILongShort, Initializable {
         address user,
         uint32 marketIndex // TODO: make this internal ?
     ) internal {
-        UserLazyActions storage currentlyPendingUserActions =
-            userLazyActions[marketIndex][user];
-
+        uint256 currentUpdateIndex =
+            userCurrentLazyUpdateIndex[marketIndex][user];
         if (
-            currentlyPendingUserActions.usersCurrentUpdateIndex <=
-            latestUpdateIndex[marketIndex] &&
-            currentlyPendingUserActions.usersCurrentUpdateIndex != 0 // NOTE: this conditional isn't strictly necessary (all the users deposit amounts will be zero too)
+            currentUpdateIndex <= latestUpdateIndex[marketIndex] &&
+            currentUpdateIndex != 0 // NOTE: this conditional isn't strictly necessary (all the users deposit amounts will be zero too)
         ) {
-            _executeOutstandingLazySettlementsAction(
-                user,
-                marketIndex,
-                currentlyPendingUserActions
-            );
+            _executeOutstandingLazySettlementsAction(user, marketIndex);
         }
         // TODO: add events
     }
@@ -1109,10 +1068,10 @@ contract LongShort is ILongShort, Initializable {
         batchedLazyPaymentTokenToDeposit[marketIndex][
             syntheticTokenType
         ] += amount;
-        userLazyActions[marketIndex][msg.sender].lazyDepositAmount[
+        userLazyDepositAmounts[marketIndex][msg.sender][
             syntheticTokenType
         ] += amount;
-        userLazyActions[marketIndex][msg.sender].usersCurrentUpdateIndex =
+        userCurrentLazyUpdateIndex[marketIndex][msg.sender] =
             latestUpdateIndex[marketIndex] +
             1;
 
@@ -1137,22 +1096,23 @@ contract LongShort is ILongShort, Initializable {
     function _executeOutstandingLazyRedeems(
         uint32 marketIndex,
         address user,
-        MarketSide syntheticTokenType,
-        UserLazyActions storage currentlyPendingUserActions
+        MarketSide syntheticTokenType
     ) internal {
-        if (currentlyPendingUserActions.redemptions[syntheticTokenType] > 0) {
+        uint256 currentRedemptions =
+            userLazyRedemptions[marketIndex][user][syntheticTokenType];
+        if (currentRedemptions > 0) {
             uint256 amountToRedeem =
                 getAmountPaymentToken(
-                    currentlyPendingUserActions.redemptions[syntheticTokenType],
+                    currentRedemptions,
                     redeemPriceSnapshot[marketIndex][
-                        currentlyPendingUserActions.usersCurrentUpdateIndex
+                        userCurrentLazyUpdateIndex[marketIndex][user]
                     ][syntheticTokenType]
                 );
 
             uint256 balance = fundTokens[marketIndex].balanceOf(address(this));
 
             fundTokens[marketIndex].transfer(user, amountToRedeem);
-            currentlyPendingUserActions.redemptions[syntheticTokenType] = 0;
+            userLazyRedemptions[marketIndex][user][syntheticTokenType] = 0;
         }
     }
 
@@ -1168,11 +1128,10 @@ contract LongShort is ILongShort, Initializable {
         );
         uint256 nextUpdateIndex = latestUpdateIndex[marketIndex] + 1;
 
-        userLazyActions[marketIndex][msg.sender].redemptions[
+        userLazyRedemptions[marketIndex][msg.sender][
             syntheticTokenType
         ] += tokensToRedeem;
-        userLazyActions[marketIndex][msg.sender]
-            .usersCurrentUpdateIndex = nextUpdateIndex;
+        userCurrentLazyUpdateIndex[marketIndex][msg.sender] = nextUpdateIndex;
 
         batchedLazySynthToRedeem[marketIndex][
             syntheticTokenType
