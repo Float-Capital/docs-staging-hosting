@@ -752,9 +752,6 @@ contract LongShort is ILongShort, Initializable {
         bool priceChanged =
             _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
 
-        // Distribute accrued yield manager interest.
-        _claimAndDistributeYield(marketIndex);
-
         // TODO STENT CONCERN1
         _refreshTokenPrices(marketIndex);
         assetPrice[marketIndex] = uint256(newAssetPrice);
