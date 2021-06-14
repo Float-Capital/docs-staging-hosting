@@ -1,7 +1,7 @@
 import {
   Approval,
   Transfer as TransferEvent,
-} from "../generated/templates/erc20/erc20";
+} from "../generated-price-history/generated/templates/erc20/erc20";
 import {
   CollateralToken,
   CollateralTransfer,
@@ -12,7 +12,7 @@ import {
   TokenApproval,
   UserCollateralTokenApproval,
   LongShortContract,
-} from "../generated/schema";
+} from "../generated-price-history/generated/schema";
 import {
   log,
   dataSource,

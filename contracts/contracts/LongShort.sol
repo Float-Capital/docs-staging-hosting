@@ -147,7 +147,6 @@ contract LongShort is ILongShort, Initializable {
         MarketSide syntheticTokenType,
         uint256 depositAdded,
         address user,
-        uint256 totalBatchedDepositAmount,
         uint256 oracleUpdateIndex
     );
 
@@ -1123,7 +1122,7 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokenType,
             amount,
             msg.sender,
-            batchedLazyPaymentTokenToDeposit[marketIndex][MarketSide.Long],
+            // batchedLazyPaymentTokenToDeposit[marketIndex][MarketSide.Long],
             latestUpdateIndex[marketIndex] + 1
         );
     }

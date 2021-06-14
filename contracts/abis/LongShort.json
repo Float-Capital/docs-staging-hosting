@@ -85,12 +85,6 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "totalBatchedDepositAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
         "name": "oracleUpdateIndex",
         "type": "uint256"
       }

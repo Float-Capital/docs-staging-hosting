@@ -31,7 +31,7 @@ dataSources:
           handler: handleFeesChanges
         - event: FeesLevied(uint32,uint256)
           handler: handleFeesLevied
-        - event: LazyMinted(uint32,uint8,uint256,address,uint256,uint256)
+        - event: LazyMinted(uint32,uint8,uint256,address,uint256)
           handler: handleLazyMinted
         - event: OracleUpdated(uint32,address,address)
           handler: handleOracleUpdated

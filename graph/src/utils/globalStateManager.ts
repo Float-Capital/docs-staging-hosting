@@ -10,7 +10,9 @@ import {
   SyntheticMarket,
   CollateralToken,
   UserCollateralTokenBalance,
-} from "../../generated/schema";
+  BatchedNextPriceExec,
+  NextBatchedNextPriceExec,
+} from "../../generated-price-history/generated/schema";
 import { BigInt, Bytes, log, ethereum, Address } from "@graphprotocol/graph-ts";
 import {
   ZERO,
@@ -177,6 +179,45 @@ export function getOrCreateStakerState(
   }
 
   return state as StakeState;
+}
+
+export function getOrCreateBatchedNextPriceExec(
+  marketIndex: BigInt,
+  updateIndex: BigInt
+): BatchedNextPriceExec {
+  let marketIndexId = marketIndex.toString();
+  let updateIndexStr = updateIndex.toString();
+  let batchedNextPriceExecId =
+    "batched-" + marketIndexId + "-" + updateIndexStr;
+  let batchedNextPriceExec = BatchedNextPriceExec.load(batchedNextPriceExecId);
+  if (batchedNextPriceExec == null) {
+    batchedNextPriceExec = new BatchedNextPriceExec(batchedNextPriceExecId);
+
+    batchedNextPriceExec.updateIndex = updateIndex;
+    batchedNextPriceExec.amountPaymentTokenForDeposit = ZERO;
+    batchedNextPriceExec.amountSynthTokenForWithdrawal = ZERO;
+    batchedNextPriceExec.mintPriceSnapshot = ZERO;
+    batchedNextPriceExec.redeemPriceSnapshot = ZERO;
+    batchedNextPriceExec.executedTime = ZERO;
+    batchedNextPriceExec.save();
+
+    let nextBatchedNextPriceExecId = "nextBatch-" + marketIndexId;
+    let nextBatchedNextPriceExec = NextBatchedNextPriceExec.load(
+      nextBatchedNextPriceExecId
+    );
+    if (nextBatchedNextPriceExec == null) {
+      nextBatchedNextPriceExec = new NextBatchedNextPriceExec(
+        nextBatchedNextPriceExecId
+      );
+    }
+
+    nextBatchedNextPriceExec.nextBatch = batchedNextPriceExec.id;
+    nextBatchedNextPriceExec.currentUpdateIndex = updateIndex;
+
+    nextBatchedNextPriceExec.save();
+  }
+
+  return batchedNextPriceExec as BatchedNextPriceExec;
 }
 
 export function getOrCreateGlobalState(): GlobalState {

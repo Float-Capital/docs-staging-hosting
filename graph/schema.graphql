@@ -51,8 +51,9 @@ type BatchedNextPriceExec @entity {
   updateIndex: BigInt!
   amountPaymentTokenForDeposit: BigInt!
   amountSynthTokenForWithdrawal: BigInt!
-  mintPriceSnapshot: BigInt
-  redeemPriceSnapshot: BigInt
+  mintPriceSnapshot: BigInt!
+  redeemPriceSnapshot: BigInt!
+  executedTime: BigInt!
 }
 
 type UserNextPriceAction @entity {
@@ -62,7 +63,7 @@ type UserNextPriceAction @entity {
   amountSynthTokenForWithdrawal: BigInt!
   # Timestamp that this lazy action was settled
   # This will be zero if the user hasn't settled this yet
-  executedOn: BigInt!
+  executedTime: BigInt!
 }
 
 type SystemState @entity {

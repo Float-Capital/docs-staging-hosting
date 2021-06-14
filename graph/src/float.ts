@@ -8,7 +8,7 @@ import {
   FeesChanges,
   OracleUpdated,
   LazyMinted,
-} from "../generated/LongShort/LongShort";
+} from "../generated-price-history/generated/LongShort/LongShort";
 import {
   SyntheticMarket,
   FeeStructure,
@@ -20,7 +20,7 @@ import {
   CollateralToken,
   LatestPrice,
   Price,
-} from "../generated/schema";
+} from "../generated-price-history/generated/schema";
 import { BigInt, log, Bytes } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import {
@@ -32,6 +32,7 @@ import {
   updateOrCreateCollateralToken,
   getOrCreateGlobalState,
   getStakerStateId,
+  getOrCreateBatchedNextPriceExec,
 } from "./utils/globalStateManager";
 import {
   createNewTokenDataSource,
@@ -445,10 +446,18 @@ export function handleLazyMinted(event: LazyMinted): void {
   let depositAdded = event.params.depositAdded;
   let marketIndex = event.params.marketIndex;
   let oracleUpdateIndex = event.params.oracleUpdateIndex;
-  let totalBatchedDepositAmount = event.params.totalBatchedDepositAmount;
   let syntheticTokenTypeInt = event.params.syntheticTokenType;
   let syntheticTokenType = getMarketSideString(syntheticTokenTypeInt);
   let user = event.params.user;
+
+  let batchedNextPriceExec = getOrCreateBatchedNextPriceExec(
+    marketIndex,
+    oracleUpdateIndex
+  );
+
+  batchedNextPriceExec.amountPaymentTokenForDeposit = batchedNextPriceExec.amountPaymentTokenForDeposit.plus(
+    depositAdded
+  );
 
   saveEventToStateChange(
     event,
@@ -457,24 +466,15 @@ export function handleLazyMinted(event: LazyMinted): void {
       depositAdded,
       marketIndex,
       oracleUpdateIndex,
-      totalBatchedDepositAmount,
     ]).concat([syntheticTokenType, user.toHex()]),
     [
       "depositAdded",
       "marketIndex",
       "oracleUpdateIndex",
-      "totalBatchedDepositAmount",
       "syntheticTokenType",
       "user",
     ],
-    [
-      "uint256",
-      "uint256",
-      "uint256",
-      "Fix me Chris",
-      "Fix me Chris",
-      "fix me chris",
-    ],
+    ["uint256", "uint256", "uint256", "Fix me Chris", "fix me chris"],
     [],
     []
   );
