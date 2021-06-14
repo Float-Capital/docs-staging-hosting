@@ -474,6 +474,7 @@ contract LongShort is ILongShort, Initializable {
 
     function getPrice(uint256 amountSynth, uint256 amountPaymentToken)
         internal
+        pure
         returns (uint256)
     {
         return (amountPaymentToken * TEN_TO_THE_18) / amountSynth;
@@ -481,6 +482,7 @@ contract LongShort is ILongShort, Initializable {
 
     function getAmountPaymentToken(uint256 amountSynth, uint256 price)
         internal
+        pure
         returns (uint256)
     {
         return (amountSynth * price) / TEN_TO_THE_18;
@@ -488,6 +490,7 @@ contract LongShort is ILongShort, Initializable {
 
     function getAmountSynthToken(uint256 amountPaymentToken, uint256 price)
         internal
+        pure
         returns (uint256)
     {
         return (amountPaymentToken * TEN_TO_THE_18) / price;
