@@ -40,6 +40,31 @@ type LatestPrice @entity {
   price: Price!
 }
 
+type NextBatchedNextPriceExec @entity {
+  id: ID! # nextBatch-<marketIndex>
+  nextBatch: BatchedNextPriceExec!
+  currentUpdateIndex: BigInt!
+}
+
+type BatchedNextPriceExec @entity {
+  id: ID! # batched-<marketIndex>-<update-index>
+  updateIndex: BigInt!
+  amountPaymentTokenForDeposit: BigInt!
+  amountSynthTokenForWithdrawal: BigInt!
+  mintPriceSnapshot: BigInt
+  redeemPriceSnapshot: BigInt
+}
+
+type UserNextPriceAction @entity {
+  id: ID! # nextPrice-<userAddress>-<marketIndex>-<update-index>
+  updateIndex: BigInt!
+  amountPaymentTokenForDeposit: BigInt!
+  amountSynthTokenForWithdrawal: BigInt!
+  # Timestamp that this lazy action was settled
+  # This will be zero if the user hasn't settled this yet
+  executedOn: BigInt!
+}
+
 type SystemState @entity {
   id: ID! # marketIndex "-" callCounter
   timestamp: BigInt!
@@ -153,6 +178,8 @@ type SyntheticMarket @entity {
   kPeriod: BigInt!
   kMultiplier: BigInt!
   totalFloatMinted: BigInt!
+  nextPriceActions: [UserNextPriceAction!]!
+  settledNextPriceActions: [UserNextPriceAction!]!
 }
 
 type User @entity {

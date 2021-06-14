@@ -2,15 +2,12 @@ import {
   V1,
   FeesLevied,
   SyntheticTokenCreated,
-  LongMinted,
-  LongRedeem,
   PriceUpdate,
-  ShortMinted,
-  ShortRedeem,
   TokenPriceRefreshed,
   ValueLockedInSystem,
   FeesChanges,
   OracleUpdated,
+  LazyMinted,
 } from "../generated/LongShort/LongShort";
 import {
   SyntheticMarket,
@@ -334,7 +331,7 @@ export function handleFeesChanges(event: FeesChanges): void {
     []
   );
 }
-
+/* 
 export function handleLongMinted(event: LongMinted): void {
   let marketIndex = event.params.marketIndex;
   let depositAdded = event.params.depositAdded;
@@ -405,7 +402,7 @@ export function handleLongRedeem(event: LongRedeem): void {
     []
   );
 }
-
+ */
 export function handlePriceUpdate(event: PriceUpdate): void {
   let marketIndex = event.params.marketIndex;
   let marketIndexString = marketIndex.toString();
@@ -436,73 +433,49 @@ export function handlePriceUpdate(event: PriceUpdate): void {
   );
 }
 
-export function handleShortMinted(event: ShortMinted): void {
-  let marketIndex = event.params.marketIndex;
-  let depositAdded = event.params.depositAdded;
-  let finalDepositAmount = event.params.finalDepositAmount;
-  let tokensMinted = event.params.tokensMinted;
-  let userAddress = event.params.user;
-
-  let market = SyntheticMarket.load(marketIndex.toString());
-  let syntheticToken = SyntheticToken.load(market.syntheticShort);
-
-  let collateralToken = CollateralToken.load(market.collateralToken);
-  decreaseOrCreateUserApprovals(
-    userAddress,
-    event.params.depositAdded,
-    collateralToken,
-    event
-  );
-
-  increaseUserMints(userAddress, syntheticToken, tokensMinted, event);
-
-  saveEventToStateChange(
-    event,
-    "ShortMinted",
-    bigIntArrayToStringArray([
-      marketIndex,
-      depositAdded,
-      finalDepositAmount,
-      tokensMinted,
-    ]).concat([userAddress.toHex()]),
-    [
-      "marketIndex",
-      "depositAdded",
-      "finalDepositAmount",
-      "tokensMinted",
-      "user",
-    ],
-    ["uint256", "uint256", "uint256", "uint256", "address"],
-    [userAddress],
-    []
-  );
+function getMarketSideString(marketEnum: i32): string {
+  if (marketEnum == 0) {
+    return "LONG";
+  } else {
+    return "SHORT";
+  }
 }
 
-export function handleShortRedeem(event: ShortRedeem): void {
+export function handleLazyMinted(event: LazyMinted): void {
+  let depositAdded = event.params.depositAdded;
   let marketIndex = event.params.marketIndex;
-  let tokensRedeemed = event.params.tokensRedeemed;
-  let valueOfRedemption = event.params.valueOfRedemption;
-  let finalRedeemValue = event.params.finalRedeemValue;
+  let oracleUpdateIndex = event.params.oracleUpdateIndex;
+  let totalBatchedDepositAmount = event.params.totalBatchedDepositAmount;
+  let syntheticTokenTypeInt = event.params.syntheticTokenType;
+  let syntheticTokenType = getMarketSideString(syntheticTokenTypeInt);
   let user = event.params.user;
 
   saveEventToStateChange(
     event,
-    "ShortRedeem",
+    "LazyMinted",
     bigIntArrayToStringArray([
+      depositAdded,
       marketIndex,
-      tokensRedeemed,
-      valueOfRedemption,
-      finalRedeemValue,
-    ]).concat([user.toHex()]),
+      oracleUpdateIndex,
+      totalBatchedDepositAmount,
+    ]).concat([syntheticTokenType, user.toHex()]),
     [
+      "depositAdded",
       "marketIndex",
-      "tokensRedeemed",
-      "valueOfRedemption",
-      "finalRedeem",
+      "oracleUpdateIndex",
+      "totalBatchedDepositAmount",
+      "syntheticTokenType",
       "user",
     ],
-    ["uint256", "uint256", "uint256", "uint256", "address"],
-    [user],
+    [
+      "uint256",
+      "uint256",
+      "uint256",
+      "Fix me Chris",
+      "Fix me Chris",
+      "fix me chris",
+    ],
+    [],
     []
   );
 }

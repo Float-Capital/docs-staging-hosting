@@ -11,49 +11,40 @@ dataSources:
       startBlock: 0
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.2
       language: wasm/assemblyscript
       entities:
-        - V1
-        - FeesLevied
-        - SyntheticTokenCreated
-        - LongMinted
-        - LongRedeem
-        - PriceUpdate
-        - ShortMinted
-        - ShortRedeem
-        - TokenPriceRefreshed
         - FeesChanges
-        - ValueLockedInSystem
+        - FeesLevied
+        - LazyMinted
         - OracleUpdated
+        - PriceUpdate
+        - SyntheticTokenCreated
+        - TokenPriceRefreshed
+        - V1
+        - ValueLockedInSystem
       abis:
         - name: LongShort
           file: ./abis/LongShort.json
       eventHandlers:
-        - event: V1(address,address,address,address)
-          handler: handleV1
-        - event: FeesLevied(uint32,uint256)
-          handler: handleFeesLevied
-        - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
-          handler: handleSyntheticTokenCreated
-        - event: LongMinted(uint32,uint256,uint256,uint256,address)
-          handler: handleLongMinted
-        - event: LongRedeem(uint32,uint256,uint256,uint256,address)
-          handler: handleLongRedeem
-        - event: PriceUpdate(uint32,uint256,uint256,address)
-          handler: handlePriceUpdate
-        - event: ShortMinted(uint32,uint256,uint256,uint256,address)
-          handler: handleShortMinted
-        - event: ShortRedeem(uint32,uint256,uint256,uint256,address)
-          handler: handleShortRedeem
-        - event: TokenPriceRefreshed(uint32,uint256,uint256)
-          handler: handleTokenPriceRefreshed
-        - event: ValueLockedInSystem(uint32,uint256,uint256,uint256)
-          handler: handleValueLockedInSystem
         - event: FeesChanges(uint32,uint256,uint256,uint256,uint256)
           handler: handleFeesChanges
+        - event: FeesLevied(uint32,uint256)
+          handler: handleFeesLevied
+        - event: LazyMinted(uint32,uint8,uint256,address,uint256,uint256)
+          handler: handleLazyMinted
         - event: OracleUpdated(uint32,address,address)
-          handler: handleMarketOracleUpdated
+          handler: handleOracleUpdated
+        - event: PriceUpdate(uint32,uint256,uint256,address)
+          handler: handlePriceUpdate
+        - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
+          handler: handleSyntheticTokenCreated
+        - event: TokenPriceRefreshed(uint32,uint256,uint256)
+          handler: handleTokenPriceRefreshed
+        - event: V1(address,address,address,address)
+          handler: handleV1
+        - event: ValueLockedInSystem(uint32,uint256,uint256,uint256)
+          handler: handleValueLockedInSystem
       file: ./src/float.ts
 
   - kind: ethereum/contract

@@ -80,12 +80,14 @@ contract LongShort is ILongShort, Initializable {
         uint256 usersCurrentUpdateIndex;
     }
 
+    // The following 3 values update with every price update
     mapping(uint32 => uint256) public latestUpdateIndex;
     // These two can be grouped together in a struct
     mapping(uint32 => mapping(uint256 => mapping(MarketSide => uint256)))
         public mintPriceSnapshot;
     mapping(uint32 => mapping(uint256 => mapping(MarketSide => uint256)))
         public redeemPriceSnapshot;
+
     // These two can be grouped together in a struct
     mapping(uint32 => mapping(MarketSide => uint256))
         public batchedLazyPaymentTokenToDeposit;
