@@ -31,7 +31,7 @@ contract LongShort is ILongShort, Initializable {
         0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
     uint256 public constant TEN_TO_THE_18 = 1e18;
     int256 public constant TEN_TO_THE_18_SIGNED = 1e18;
-    uint256 public constant feeUnitsOfPrecision = 10000;
+    uint256 public constant TEN_TO_THE_5 = 10000;
     uint256[45] private __constantsGap;
 
     // Global state ////////////////////////////////////////////
@@ -47,9 +47,7 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => bool) public marketExists;
     mapping(uint32 => uint256) public assetPrice;
     mapping(uint32 => uint256) public marketUpdateIndex;
-
-    mapping(uint32 => uint256) public totalValueLockedInYieldManager;
-    mapping(uint32 => uint256) public totalValueReservedForTreasury;
+    mapping(uint32 => uint256) public totalFeesReservedForTreasury;
     mapping(uint32 => IERC20) public fundTokens;
     mapping(uint32 => IYieldManager) public yieldManagers;
     mapping(uint32 => IOracleManager) public oracleManagers;
@@ -477,6 +475,33 @@ contract LongShort is ILongShort, Initializable {
         }
     }
 
+    function getMarketPcntForTreasuryVsMarketSplit(uint32 marketIndex)
+        public
+        view
+        returns (uint256 marketPcntE5)
+    {
+        uint256 totalValueLockedInMarket =
+            syntheticTokenPoolValue[marketIndex][true] +
+                syntheticTokenPoolValue[marketIndex][false];
+
+        if (
+            syntheticTokenPoolValue[marketIndex][true] >
+            syntheticTokenPoolValue[marketIndex][false]
+        ) {
+            marketPcntE5 =
+                ((syntheticTokenPoolValue[marketIndex][true] -
+                    syntheticTokenPoolValue[marketIndex][false]) * TEN_TO_THE_5) /
+                totalValueLockedInMarket;
+        } else {
+            marketPcntE5 =
+                ((syntheticTokenPoolValue[marketIndex][false] -
+                    syntheticTokenPoolValue[marketIndex][true]) * TEN_TO_THE_5) /
+                totalValueLockedInMarket;
+        }
+
+        return marketPcntE5;
+    }
+
     /**
      * Returns the amount of accrued value that should go to the market,
      * and the amount that should be locked into the treasury. To incentivise
@@ -488,32 +513,22 @@ contract LongShort is ILongShort, Initializable {
         view
         returns (uint256 marketAmount, uint256 treasuryAmount)
     {
-        uint256 marketPcnt; // fixed-precision scale of 10000
+        uint256 marketPcntE5 = getMarketPcntForTreasuryVsMarketSplit(marketIndex);
 
-        uint256 totalValueLockedInMarket =
-            syntheticTokenPoolValue[marketIndex][true] +
-                syntheticTokenPoolValue[marketIndex][false];
-
-        if (
-            syntheticTokenPoolValue[marketIndex][true] >
-            syntheticTokenPoolValue[marketIndex][false]
-        ) {
-            marketPcnt =
-                ((syntheticTokenPoolValue[marketIndex][true] -
-                    syntheticTokenPoolValue[marketIndex][false]) * 10000) /
-                totalValueLockedInMarket;
-        } else {
-            marketPcnt =
-                ((syntheticTokenPoolValue[marketIndex][false] -
-                    syntheticTokenPoolValue[marketIndex][true]) * 10000) /
-                totalValueLockedInMarket;
-        }
-
-        marketAmount = (marketPcnt * amount) / 10000;
+        marketAmount = (marketPcntE5 * amount) / TEN_TO_THE_5;
         treasuryAmount = amount - marketAmount;
-        require(amount == marketAmount + treasuryAmount);
 
         return (marketAmount, treasuryAmount);
+    }
+
+    function getLongPcntForLongVsShortSplit(uint32 marketIndex)
+        public
+        view
+        returns (uint256 longPcntE5)
+    {
+        return (syntheticTokenPoolValue[marketIndex][false] * TEN_TO_THE_5) /
+               (syntheticTokenPoolValue[marketIndex][true] +
+                syntheticTokenPoolValue[marketIndex][false]);
     }
 
     /**
@@ -526,15 +541,11 @@ contract LongShort is ILongShort, Initializable {
         view
         returns (uint256 longAmount, uint256 shortAmount)
     {
-        // The percentage value that a position receives depends on the amount
-        // of total market value taken up by the _opposite_ position.
-        uint256 longPcnt =
-            (syntheticTokenPoolValue[marketIndex][false] * 10000) /
-                (syntheticTokenPoolValue[marketIndex][true] +
-                    syntheticTokenPoolValue[marketIndex][false]);
+        uint256 longPcntE5 = getLongPcntForLongVsShortSplit(marketIndex);
 
-        longAmount = (amount * longPcnt) / 10000;
+        longAmount = (amount * longPcntE5) / TEN_TO_THE_5;
         shortAmount = amount - longAmount;
+
         return (longAmount, shortAmount);
     }
 
@@ -551,7 +562,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 baseFeePercent,
         uint256 penaltyFeePercent
     ) public view returns (uint256) {
-        uint256 baseFee = (delta * baseFeePercent) / feeUnitsOfPrecision;
+        uint256 baseFee = (delta * baseFeePercent) / TEN_TO_THE_5;
 
         if (
             syntheticTokenPoolValue[marketIndex][
@@ -563,7 +574,7 @@ contract LongShort is ILongShort, Initializable {
         ) {
             // All funds are causing imbalance
             return
-                baseFee + ((delta * penaltyFeePercent) / feeUnitsOfPrecision);
+                baseFee + ((delta * penaltyFeePercent) / TEN_TO_THE_5);
         } else if (
             syntheticTokenPoolValue[marketIndex][
                 synthTokenGainingDominanceIsLong
@@ -582,7 +593,7 @@ contract LongShort is ILongShort, Initializable {
                             synthTokenGainingDominanceIsLong
                         ]);
             uint256 penaltyFee =
-                (amountImbalancing * penaltyFeePercent) / feeUnitsOfPrecision;
+                (amountImbalancing * penaltyFeePercent) / TEN_TO_THE_5;
 
             return baseFee + penaltyFee;
         } else {
@@ -639,19 +650,12 @@ contract LongShort is ILongShort, Initializable {
      * Controls what happens with accrued yield manager interest.
      */
     function _claimAndDistributeYield(uint32 marketIndex) internal {
-        uint256 amount =
-            yieldManagers[marketIndex].getTotalHeld() -
-                totalValueLockedInYieldManager[marketIndex];
+        uint256 marketPcntE5 = getMarketPcntForTreasuryVsMarketSplit(marketIndex);
 
-        if (amount > 0) {
-            (uint256 marketAmount, uint256 treasuryAmount) =
-                getTreasurySplit(marketIndex, amount);
+        uint256 marketAmount = yieldManagers[marketIndex]
+            .claimYieldAndGetMarketAmount(marketPcntE5);
 
-            // We keep the interest locked in the yield manager, but update our
-            // bookkeeping to logically simulate moving the funds around.
-            totalValueLockedInYieldManager[marketIndex] += amount;
-            totalValueReservedForTreasury[marketIndex] += treasuryAmount;
-
+        if (marketAmount > 0) {
             _distributeMarketAmount(marketIndex, marketAmount);
         }
     }
@@ -740,6 +744,9 @@ contract LongShort is ILongShort, Initializable {
             return;
         }
 
+        // TODO STENT this function calls the getMarketSplit & getTreasurySplit functions.
+        //      These functions may be called again in the same transaction so might be worth
+        //      trying to optimize for that situation by storing or passing around values.
         _claimAndDistributeYield(marketIndex);
         _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
         _refreshTokenPrices(marketIndex);
@@ -850,7 +857,6 @@ contract LongShort is ILongShort, Initializable {
     /*
      * Transfers locked funds from LongShort into the yield manager.
      */
-    // TODO STENT this is only called in one place, might as well move this code there
     function _transferFundsToYieldManager(uint32 marketIndex, uint256 amount)
         internal
     {
@@ -859,15 +865,12 @@ contract LongShort is ILongShort, Initializable {
         //     2. transfer from this contract to yield manager contract
         //     3. approve transfer from yield manager contract to lendingPool contract
         //     4. transfer from yield mnager contract to lendingPool contract
-        // Surely we can mak this more efficient?
+        // Surely we can make this more efficient?
         fundTokens[marketIndex].approve(
             address(yieldManagers[marketIndex]),
             amount
         );
         yieldManagers[marketIndex].depositToken(amount);
-
-        // Update market state.
-        totalValueLockedInYieldManager[marketIndex] += amount;
     }
 
     /*
@@ -876,24 +879,18 @@ contract LongShort is ILongShort, Initializable {
     function _transferFromYieldManager(uint32 marketIndex, uint256 amount)
         internal
     {
-        require(totalValueLockedInYieldManager[marketIndex] >= amount);
-
         // NB there will be issues here if not enough liquidity exists to withdraw
         // Boolean should be returned from yield manager and think how to appropriately handle this
         yieldManagers[marketIndex].withdrawToken(amount);
-
-        // Update market state.
-        // TODO STENT why is this amount stored in this cotract? Seems like it should be stored inyield manager contract
-        totalValueLockedInYieldManager[marketIndex] -= amount;
 
         // Invariant: yield managers should never have more locked funds
         // than the combined value of the market and held treasury funds.
         // TODO STENT this check seems wierd. What happens if this fails? What is the recovery? Should it be an assert?
         require(
-            totalValueLockedInYieldManager[marketIndex] <=
+            yieldManagers[marketIndex].getTotalValueRealized() <=
                 syntheticTokenPoolValue[marketIndex][true] +
                     syntheticTokenPoolValue[marketIndex][false] +
-                    totalValueReservedForTreasury[marketIndex]
+                    totalFeesReservedForTreasury[marketIndex]
         );
     }
 
@@ -904,22 +901,25 @@ contract LongShort is ILongShort, Initializable {
      *
      * NOTE: doesn't affect markets, so no state refresh necessary
      */
-    function transferTreasuryFunds(uint32 marketIndex) external treasuryOnly {
-        uint256 totalForTreasury = totalValueReservedForTreasury[marketIndex];
+    function transferTreasuryFunds(uint32 marketIndex) external {
+        uint256 totalValueReservedForTreasury =
+            totalFeesReservedForTreasury[marketIndex] +
+            yieldManagers[marketIndex].getTotalReservedForTreasury();
 
-        // Update global state.
-        totalValueReservedForTreasury[marketIndex] = 0;
-
-        // Edge-case: no funds to transfer.
-        if (totalForTreasury == 0) {
+        if (totalValueReservedForTreasury == 0) {
             return;
         }
 
-        // TODO STENT why is this called? totalForTreasury gets value from fees and interest from the yield manager. Why are we then removing that value from the yiled manager?
-        _transferFromYieldManager(marketIndex, totalForTreasury);
+        if (totalFeesReservedForTreasury[marketIndex] > 0) {
+            totalFeesReservedForTreasury[marketIndex] = 0;
+        }
+
+        if (yieldManagers[marketIndex].getTotalReservedForTreasury() > 0) {
+            yieldManagers[marketIndex].withdrawTreasuryFunds();
+        }
 
         // Transfer funds to the treasury.
-        fundTokens[marketIndex].transfer(treasury, totalForTreasury);
+        fundTokens[marketIndex].transfer(treasury, totalValueReservedForTreasury);
     }
 
     /*╔═════════════════════════════════╗
