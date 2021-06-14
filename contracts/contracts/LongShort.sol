@@ -486,6 +486,7 @@ contract LongShort is ILongShort, Initializable {
 
     function getAmountSynthToken(uint256 amountPaymentToken, uint256 price)
         internal
+        pure
         returns (uint256)
     {
         return (amountPaymentToken * TEN_TO_THE_18) / price;
@@ -971,12 +972,14 @@ contract LongShort is ILongShort, Initializable {
         ) {
             // Update is still lazy but not past the next oracle update - display the amount the user would get if they executed immediately
             // NOTE: if we ever add fees for minting - we would add them here!
-            uint256 remaining =
+            uint256 amountPaymentTokenDeposited =
                 userLazyDepositAmounts[marketIndex][user][syntheticTokenType];
 
             uint256 tokens =
-                (remaining * TEN_TO_THE_18) /
-                    syntheticTokenPrice[syntheticTokenType][marketIndex];
+                getAmountSynthToken(
+                    amountPaymentTokenDeposited,
+                    syntheticTokenPrice[syntheticTokenType][marketIndex]
+                );
 
             return tokens;
         } else {
