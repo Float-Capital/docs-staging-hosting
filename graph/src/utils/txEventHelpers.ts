@@ -3,7 +3,7 @@ import {
   EventParam,
   EventParams,
   GlobalState,
-} from "../../generated-price-history/generated/schema";
+} from "../../generated/schema";
 import { Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import { ONE, ZERO_ADDRESS } from "../CONSTANTS";
 import { getOrCreateGlobalState, getOrCreateUser } from "./globalStateManager";

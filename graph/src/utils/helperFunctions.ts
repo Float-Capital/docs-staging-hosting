@@ -1,4 +1,4 @@
-import { erc20 } from "../../generated-price-history/generated/templates";
+import { erc20 } from "../../generated/templates";
 import {
   BigInt,
   Address,
@@ -16,7 +16,7 @@ import {
 import {
   SyntheticToken,
   UserSyntheticTokenMinted,
-} from "../../generated-price-history/generated/schema";
+} from "../../generated/schema";
 
 export function createNewTokenDataSource(address: Address): void {
   let context = new DataSourceContext();

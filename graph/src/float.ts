@@ -8,7 +8,7 @@ import {
   FeesChanges,
   OracleUpdated,
   LazyMinted,
-} from "../generated-price-history/generated/LongShort/LongShort";
+} from "../generated/LongShort/LongShort";
 import {
   SyntheticMarket,
   FeeStructure,
@@ -20,7 +20,7 @@ import {
   CollateralToken,
   LatestPrice,
   Price,
-} from "../generated-price-history/generated/schema";
+} from "../generated/schema";
 import { BigInt, log, Bytes } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import {
@@ -33,6 +33,7 @@ import {
   getOrCreateGlobalState,
   getStakerStateId,
   getOrCreateBatchedNextPriceExec,
+  getOrUserNextPriceAction,
 } from "./utils/globalStateManager";
 import {
   createNewTokenDataSource,
@@ -195,6 +196,8 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.kPeriod = ZERO;
   syntheticMarket.kMultiplier = ZERO;
   syntheticMarket.totalFloatMinted = ZERO;
+  syntheticMarket.nextPriceActions = [];
+  syntheticMarket.settledNextPriceActions = [];
   initialState.systemState.syntheticPrice = initialAssetPrice; // change me
 
   // create new synthetic token object.
@@ -445,6 +448,7 @@ function getMarketSideString(marketEnum: i32): string {
 export function handleLazyMinted(event: LazyMinted): void {
   let depositAdded = event.params.depositAdded;
   let marketIndex = event.params.marketIndex;
+  let marketIndexId = marketIndex.toString();
   let oracleUpdateIndex = event.params.oracleUpdateIndex;
   let syntheticTokenTypeInt = event.params.syntheticTokenType;
   let syntheticTokenType = getMarketSideString(syntheticTokenTypeInt);
@@ -454,10 +458,30 @@ export function handleLazyMinted(event: LazyMinted): void {
     marketIndex,
     oracleUpdateIndex
   );
+  let syntheticMarket = SyntheticMarket.load(marketIndexId);
+  if (syntheticMarket == null) {
+    log.critical(
+      "`getOrCreateLatestSystemState` called without SyntheticMarket with id #{} being created.",
+      [marketIndexId]
+    );
+  }
+
+  let userNextPriceAction = getOrUserNextPriceAction(
+    user,
+    syntheticMarket as SyntheticMarket,
+    oracleUpdateIndex
+  );
+
+  userNextPriceAction.amountPaymentTokenForDeposit = userNextPriceAction.amountPaymentTokenForDeposit.plus(
+    depositAdded
+  );
 
   batchedNextPriceExec.amountPaymentTokenForDeposit = batchedNextPriceExec.amountPaymentTokenForDeposit.plus(
     depositAdded
   );
+
+  userNextPriceAction.save();
+  batchedNextPriceExec.save();
 
   saveEventToStateChange(
     event,

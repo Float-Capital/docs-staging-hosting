@@ -49,21 +49,30 @@ type NextBatchedNextPriceExec @entity {
 type BatchedNextPriceExec @entity {
   id: ID! # batched-<marketIndex>-<update-index>
   updateIndex: BigInt!
+  marketIndex: BigInt!
   amountPaymentTokenForDeposit: BigInt!
   amountSynthTokenForWithdrawal: BigInt!
   mintPriceSnapshot: BigInt!
   redeemPriceSnapshot: BigInt!
-  executedTime: BigInt!
+  executedTimestamp: BigInt!
 }
+
+# type AllUserNextPriceActionsInBatch @entity {
+#   id: ID! # nextPrice-<marketIndex>-<update-index>
+#   updateIndex: BigInt!
+#   allUserActionsInBatch: [UserNextPriceAction!]!
+# }
 
 type UserNextPriceAction @entity {
   id: ID! # nextPrice-<userAddress>-<marketIndex>-<update-index>
   updateIndex: BigInt!
+  marketIndex: BigInt!
+  user: User!
   amountPaymentTokenForDeposit: BigInt!
   amountSynthTokenForWithdrawal: BigInt!
   # Timestamp that this lazy action was settled
   # This will be zero if the user hasn't settled this yet
-  executedTime: BigInt!
+  executedTimestamp: BigInt!
 }
 
 type SystemState @entity {
@@ -197,6 +206,8 @@ type User @entity {
   collatoralBalances: [UserCollateralTokenBalance!]!
   tokenMints: [UserSyntheticTokenMinted!]!
   collatoralTokenApprovals: [UserCollateralTokenApproval!]!
+  # pendingPriceAction: UserNextPriceAction!
+  # settledNextPriceActions: [UserNextPriceAction!]!
 }
 
 type UserSyntheticTokenBalance @entity {

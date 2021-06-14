@@ -12,7 +12,8 @@ import {
   UserCollateralTokenBalance,
   BatchedNextPriceExec,
   NextBatchedNextPriceExec,
-} from "../../generated-price-history/generated/schema";
+  UserNextPriceAction,
+} from "../../generated/schema";
 import { BigInt, Bytes, log, ethereum, Address } from "@graphprotocol/graph-ts";
 import {
   ZERO,
@@ -194,11 +195,12 @@ export function getOrCreateBatchedNextPriceExec(
     batchedNextPriceExec = new BatchedNextPriceExec(batchedNextPriceExecId);
 
     batchedNextPriceExec.updateIndex = updateIndex;
+    batchedNextPriceExec.marketIndex = marketIndex;
     batchedNextPriceExec.amountPaymentTokenForDeposit = ZERO;
     batchedNextPriceExec.amountSynthTokenForWithdrawal = ZERO;
     batchedNextPriceExec.mintPriceSnapshot = ZERO;
     batchedNextPriceExec.redeemPriceSnapshot = ZERO;
-    batchedNextPriceExec.executedTime = ZERO;
+    batchedNextPriceExec.executedTimestamp = ZERO;
     batchedNextPriceExec.save();
 
     let nextBatchedNextPriceExecId = "nextBatch-" + marketIndexId;
@@ -264,6 +266,41 @@ export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
   }
 
   return user as User;
+}
+
+export function getOrUserNextPriceAction(
+  userAddress: Bytes,
+  syntheticMarket: SyntheticMarket,
+  updateIndex: BigInt
+): UserNextPriceAction {
+  let userNextPriceActionId =
+    "nextPrice-" +
+    userAddress.toHex() +
+    "-" +
+    syntheticMarket.marketIndex.toString() +
+    "-" +
+    updateIndex.toString();
+  let userNextPriceAction = UserNextPriceAction.load(userNextPriceActionId);
+
+  if (userNextPriceAction == null) {
+    userNextPriceAction = new UserNextPriceAction(userNextPriceActionId);
+
+    userNextPriceAction.updateIndex = updateIndex;
+    userNextPriceAction.marketIndex = syntheticMarket.marketIndex;
+    userNextPriceAction.user = userAddress.toHex();
+    userNextPriceAction.amountPaymentTokenForDeposit = ZERO;
+    userNextPriceAction.amountSynthTokenForWithdrawal = ZERO;
+    userNextPriceAction.executedTimestamp = ZERO;
+
+    userNextPriceAction.save();
+
+    syntheticMarket.nextPriceActions = syntheticMarket.nextPriceActions.concat([
+      userNextPriceAction.id,
+    ]);
+    syntheticMarket.save();
+  }
+
+  return userNextPriceAction as UserNextPriceAction;
 }
 
 export function getOrCreateBalanceObject(
