@@ -14,7 +14,7 @@ contract LongShortInternalsExposed is LongShortMockable {
         uint32 _marketIndex
     );
 
-    function setAddNewStakingFundParams(
+    function setInitializeMarketParams(
         uint32 marketIndex,
         bool marketIndexValue,
         uint32 _latestMarket,

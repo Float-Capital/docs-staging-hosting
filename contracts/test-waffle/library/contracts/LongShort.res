@@ -580,7 +580,11 @@ module Exposed = {
     "refreshTokenPrices"
 
   @send
-  external setAddNewStakingFundParams: (
+  external setFunctionToNotMock: (t, ~functionToNotMock: string) => JsPromise.t<transaction> =
+    "setFunctionToNotMock"
+
+  @send
+  external setInitializeMarketParams: (
     t,
     ~marketIndex: int,
     ~marketIndexValue: bool,
@@ -588,11 +592,7 @@ module Exposed = {
     ~staker: Ethers.ethAddress,
     ~longAddress: Ethers.ethAddress,
     ~shortAddress: Ethers.ethAddress,
-  ) => JsPromise.t<transaction> = "setAddNewStakingFundParams"
-
-  @send
-  external setFunctionToNotMock: (t, ~functionToNotMock: string) => JsPromise.t<transaction> =
-    "setFunctionToNotMock"
+  ) => JsPromise.t<transaction> = "setInitializeMarketParams"
 
   @send
   external setMocker: (t, ~mocker: Ethers.ethAddress) => JsPromise.t<transaction> = "setMocker"

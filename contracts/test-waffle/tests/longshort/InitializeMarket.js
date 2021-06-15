@@ -29,7 +29,7 @@ function test(contracts, accounts) {
                                                             LongShortSmocked.InternalMock.mock_changeFeesToReturn(undefined);
                                                             LongShortSmocked.InternalMock.mockadminOnlyToReturn(undefined);
                                                             LongShortSmocked.InternalMock.mockseedMarketInitiallyToReturn(undefined);
-                                                            return longShortRef.contents.setAddNewStakingFundParams(marketIndex, marketIndexValue, latestMarket, stakerSmockedRef.contents.address, sampleAddress, sampleAddress);
+                                                            return longShortRef.contents.setInitializeMarketParams(marketIndex, marketIndexValue, latestMarket, stakerSmockedRef.contents.address, sampleAddress, sampleAddress);
                                                           }));
                                             }));
                               }));

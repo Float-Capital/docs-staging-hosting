@@ -31,7 +31,7 @@ let test =
       let _ = LongShortSmocked.InternalMock.mockseedMarketInitiallyToReturn();
 
       (longShortRef^)
-      ->LongShort.Exposed.setAddNewStakingFundParams(
+      ->LongShort.Exposed.setInitializeMarketParams(
           ~marketIndex,
           ~marketIndexValue,
           ~latestMarket,

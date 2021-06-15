@@ -1271,6 +1271,19 @@
   {
     "inputs": [
       {
+        "internalType": "string",
+        "name": "_functionToNotMock",
+        "type": "string"
+      }
+    ],
+    "name": "setFunctionToNotMock",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint32",
         "name": "marketIndex",
         "type": "uint32"
@@ -1301,20 +1314,7 @@
         "type": "address"
       }
     ],
-    "name": "setAddNewStakingFundParams",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_functionToNotMock",
-        "type": "string"
-      }
-    ],
-    "name": "setFunctionToNotMock",
+    "name": "setInitializeMarketParams",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
