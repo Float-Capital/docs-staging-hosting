@@ -29,6 +29,15 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         syntheticTokenType = _syntheticTokenType;
     }
 
+    modifier settleRemainingNextPriceExecutions(address user) {
+        if (user != address(longShort)) {
+            longShort.executeOutstandingLazySettlementsUser(user, marketIndex);
+        }
+        uint256 balance = ERC20.balanceOf(user);
+        uint256 balanceAll = balanceOf(user);
+        _;
+    }
+
     function synthRedeemBurn(address account, uint256 amount)
         external
         override
@@ -38,7 +47,11 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         _burn(account, amount);
     }
 
-    function stake(uint256 amount) external override {
+    function stake(uint256 amount)
+        external
+        override
+        settleRemainingNextPriceExecutions(msg.sender)
+    {
         // NOTE: this is safe, this function will throw "ERC20: transfer amount exceeds balance" if amount exceeds users balance
         _transfer(msg.sender, address(staker), amount);
 
@@ -59,7 +72,12 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         address sender,
         address recipient,
         uint256 amount
-    ) public override(ERC20, IERC20) returns (bool) {
+    )
+        public
+        override(ERC20, IERC20)
+        settleRemainingNextPriceExecutions(sender)
+        returns (bool)
+    {
         if (
             recipient == address(longShort) && msg.sender == address(longShort)
         ) {
@@ -77,20 +95,6 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         address recipient,
         uint256 amount
     ) internal override {
-        uint256 sendersCurrentBalance = balanceOf(sender);
-        // TODO: this code is not in its final state. It should allow users to spend tokens before the lazy settlement (implementation belongs in longshort not here)
-        //       Case where next price update hasn't occurred
-        //            -- subcase 1: it is BELOW the safety threshold - keep exectution lazy and give the user the number of tokens they desire
-        //            -- subcase 2: it is ABOVE the safety threshold - do a full 'immediate' execution.
-        if (
-            msg.sender != address(longShort) && amount > sendersCurrentBalance
-        ) {
-            longShort.executeOutstandingLazySettlementsSynth(
-                sender,
-                marketIndex,
-                syntheticTokenType
-            );
-        }
         ERC20._transfer(sender, recipient, amount);
     }
 

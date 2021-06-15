@@ -30,14 +30,14 @@ module DataFetchers = {
 module LongShortHelpers = {
   let getFeesMint =
       (longShort, ~marketIndex, ~amount, ~valueInEntrySide, ~valueInOtherSide) => {
-    let%AwaitThen baseEntryFee =
-      longShort->LongShort.baseEntryFee(marketIndex);
+    // let%AwaitThen baseEntryFee =
+    //   longShort->LongShort.baseEntryFee(marketIndex);
     let%AwaitThen badLiquidityEntryFee =
       longShort->LongShort.badLiquidityEntryFee(marketIndex);
 
     let%Await feeUnitsOfPrecision = longShort->LongShort.feeUnitsOfPrecision;
 
-    let baseFee = amount->mul(baseEntryFee)->div(feeUnitsOfPrecision);
+    let baseFee = bnFromInt(0); //amount->mul(baseEntryFee)->div(feeUnitsOfPrecision);
     if (valueInEntrySide->bnGte(valueInOtherSide)) {
       // All funds are causing imbalance
       baseFee->add(
@@ -105,26 +105,12 @@ module LongShortHelpers = {
       );
     {longValue, shortValue};
   };
+};
 
-  let getBatchedRedemptionAmountWithoutFees =
-      (longShort, ~marketIndex, ~updateIndex, ~marketSide) => {
-    let%AwaitThen batchedLazyRedeems =
-      longShort->LongShort.batchedLazyRedeems(
-        marketIndex,
-        updateIndex,
-        marketSide,
-      );
-    let%Await synthPriceAtUpdateIndex =
-      longShort->LongShort.marketStateSnapshot(
-        marketIndex,
-        updateIndex,
-        marketSide,
-      );
-    let redemptionAmount =
-      batchedLazyRedeems.redemptions
-      ->mul(synthPriceAtUpdateIndex)
-      ->div(CONSTANTS.tenToThe18);
-
-    redemptionAmount;
+module SyntheticTokenHelpers = {
+  let getIsLong = synthToken => {
+    let%Await syntheticTokenType =
+      synthToken->SyntheticToken.syntheticTokenType;
+    syntheticTokenType == CONSTANTS.longTokenType;
   };
 };

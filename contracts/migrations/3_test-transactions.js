@@ -1,4 +1,5 @@
 const { BN } = require("@openzeppelin/test-helpers");
+const { current } = require("@openzeppelin/test-helpers/src/balance");
 const ether = require("@openzeppelin/test-helpers/src/ether");
 
 const Dai = artifacts.require("Dai");
@@ -111,7 +112,35 @@ const deployTestMarket = async (
     kPeriod,
     new BN("1000000000000000000")
   );
-};
+}
+
+const mintShortLazyWithSystemUpdate = async (amount, marketIndex, paymentToken, longShort, user, oracleManager) => {
+  await mintAndApprove(paymentToken, amount, user, longShort.address);
+
+  await longShort.mintShortLazy(marketIndex, new BN(amount), {
+    from: user,
+  });
+
+  const currentPrice = await oracleManager.getLatestPrice();
+  const nextPrice = currentPrice.mul(new BN(101)).div(new BN(100));
+  await oracleManager.setPrice(nextPrice);
+
+  await longShort._updateSystemState(marketIndex);
+}
+
+const mintLongLazyWithSystemUpdate = async (amount, marketIndex, paymentToken, longShort, user, oracleManager) => {
+  await mintAndApprove(paymentToken, amount, user, longShort.address);
+
+  await longShort.mintLongLazy(marketIndex, new BN(amount), {
+    from: user,
+  });
+
+  const currentPrice = await oracleManager.getLatestPrice();
+  const nextPrice = currentPrice.mul(new BN(101)).div(new BN(100));
+  await oracleManager.setPrice(nextPrice);
+
+  await longShort._updateSystemState(marketIndex);
+}
 
 const zeroPointZeroTwoEth = new BN("20000000000000000");
 const zeroPointZeroFiveEth = new BN("50000000000000000");
@@ -130,7 +159,7 @@ const topupBalanceIfLow = async (from, to) => {
   }
 };
 
-module.exports = async function(deployer, network, accounts) {
+module.exports = async function (deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
@@ -217,6 +246,8 @@ module.exports = async function(deployer, network, accounts) {
   }
 
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
+    if (network == "mumbai") return
+
     console.log(`Simulating transactions for marketIndex: ${marketIndex}`);
 
     const longAddress = await longShort.syntheticTokens.call(0, marketIndex);
@@ -225,48 +256,23 @@ module.exports = async function(deployer, network, accounts) {
     let long = await SyntheticToken.at(longAddress);
     let short = await SyntheticToken.at(shortAddress);
 
-    if (network == "mumbai") {
-      await token.approve(longShort.address, largeApprove, {
-        from: user1,
-      });
-    } else {
-      await mintAndApprove(token, tenMintAmount, user1, longShort.address);
-    }
-    await longShort.mintLong(marketIndex, new BN(tenMintAmount), {
-      from: user1,
-    });
-
-    if (network == "mumbai") {
-      await token.approve(longShort.address, largeApprove, {
-        from: user2,
-      });
-    } else {
-      await mintAndApprove(token, tenMintAmount, user2, longShort.address);
-    }
-    await longShort.mintShort(marketIndex, new BN(tenMintAmount), {
-      from: user2,
-    });
-
-    if (network == "mumbai") {
-      await token.approve(longShort.address, largeApprove, {
-        from: user3,
-      });
-    } else {
-      await mintAndApprove(token, tenMintAmount, user3, longShort.address);
-    }
-    await longShort.mintShort(marketIndex, new BN(tenMintAmount), {
-      from: user3,
-    });
-
-    // Increase mock oracle price from 1 (default) to 1.1.
-    const onePointOne = new BN("1100000000000000000");
     const oracleManagerAddr = await longShort.oracleManagers.call(marketIndex);
     const oracleManager = await OracleManagerMock.at(oracleManagerAddr);
 
+    await mintLongLazyWithSystemUpdate(tenMintAmount, marketIndex, token, longShort, user1, oracleManager)
+    await mintLongLazyWithSystemUpdate(tenMintAmount, marketIndex, token, longShort, user2, oracleManager)
+    await mintLongLazyWithSystemUpdate(tenMintAmount, marketIndex, token, longShort, user3, oracleManager)
+
+    const halfTokensMinted = new BN(tenMintAmount).div(new BN(2));
+    await mintShortLazyWithSystemUpdate(halfTokensMinted, marketIndex, token, longShort, user1, oracleManager)
+    await mintShortLazyWithSystemUpdate(halfTokensMinted, marketIndex, token, longShort, user2, oracleManager)
+    await mintShortLazyWithSystemUpdate(halfTokensMinted, marketIndex, token, longShort, user3, oracleManager)
+
+    /* // Increase mock oracle price from 1 (default) to 1.1.
     if (network != "mumbai") await oracleManager.setPrice(onePointOne);
-
+ 
     await longShort._updateSystemState(marketIndex);
-
+ 
     // Simulate user 2 redeeming half his tokens.
     const halfTokensMinted = new BN(tenMintAmount).div(new BN(2));
     await short.increaseAllowance(longShort.address, halfTokensMinted, {
@@ -275,7 +281,7 @@ module.exports = async function(deployer, network, accounts) {
     await longShort.redeemShort(marketIndex, halfTokensMinted, {
       from: user2,
     });
-
+ 
     // Simulate user 1 redeeming a third of his tokens.
     const thirdTokensMinted = new BN(tenMintAmount).div(new BN(3));
     await long.increaseAllowance(longShort.address, thirdTokensMinted, {
@@ -284,26 +290,26 @@ module.exports = async function(deployer, network, accounts) {
     await longShort.redeemLong(marketIndex, thirdTokensMinted, {
       from: user1,
     });
-
+ 
     if (network != "mumbai") {
       await mintAndApprove(token, tenMintAmount, user3, longShort.address);
     }
     await longShort.mintLongAndStake(marketIndex, new BN(tenMintAmount), {
       from: user3,
     });
-
+ 
     if (network != "mumbai") {
       await mintAndApprove(token, tenMintAmount, user3, longShort.address);
     }
     await longShort.mintShortAndStake(marketIndex, new BN(tenMintAmount), {
       from: user3,
     });
-
+ 
     // update system state and mint and stake again mint float
     await longShort._updateSystemState(marketIndex);
-
+ 
     await staker.claimFloatCustom([marketIndex], {
       from: user3,
-    });
+    }); */
   }
 };

@@ -40,6 +40,65 @@ type LatestPrice @entity {
   price: Price!
 }
 
+type NextBatchedNextPriceExec @entity {
+  id: ID! # nextBatch-<marketIndex>
+  nextBatch: BatchedNextPriceExec!
+  currentUpdateIndex: BigInt!
+}
+
+type BatchedNextPriceExec @entity {
+  id: ID! # batched-<marketIndex>-<update-index>
+  updateIndex: BigInt!
+  marketIndex: BigInt!
+  amountPaymentTokenForDepositLong: BigInt!
+  amountPaymentTokenForDepositShort: BigInt!
+  amountSynthTokenForWithdrawalLong: BigInt!
+  amountSynthTokenForWithdrawalShort: BigInt!
+  mintPriceSnapshot: BigInt!
+  redeemPriceSnapshot: BigInt!
+  executedTimestamp: BigInt!
+  linkedUserNextPriceActions: [UserNextPriceAction!]!
+}
+
+# type AllUserNextPriceActionsInBatch @entity {
+#   id: ID! # nextPrice-<marketIndex>-<update-index>
+#   updateIndex: BigInt!
+#   allUserActionsInBatch: [UserNextPriceAction!]!
+# }
+
+enum NextPriceAction {
+  Mint
+  Withdraw
+}
+type UserNextPriceActionComponent @entity {
+  id: ID! # actionComponent-<userAddress>-<marketIndex>-<update-index>-<type>-<index-of-type> // the index-of-type is for the case that multiple actions of the same type occur
+  actionType: NextPriceAction!
+  marketSide: MarketSide!
+  amount: BigInt!
+  user: User!
+  updateIndex: BigInt!
+  marketIndex: BigInt!
+  timestamp: BigInt!
+  userAggregateAction: UserNextPriceAction!
+  associatedBatch: BatchedNextPriceExec!
+}
+
+type UserNextPriceAction @entity {
+  id: ID! # nextPrice-<userAddress>-<marketIndex>-<update-index>
+  updateIndex: BigInt!
+  marketIndex: BigInt!
+  user: User!
+  amountPaymentTokenForDepositLong: BigInt!
+  amountPaymentTokenForDepositShort: BigInt!
+  amountSynthTokenForWithdrawalLong: BigInt!
+  amountSynthTokenForWithdrawalShort: BigInt!
+  nextPriceActionComponents: [UserNextPriceActionComponent!]!
+  # These timestamps will be zero if the user action hasn't been confirmed/settled yet
+  confirmedTimestamp: BigInt! # the timestamp the batched settlement occured
+  settledTimestamp: BigInt! # timestamp the settlement happened on the blockchain for the user
+  associatedBatch: BatchedNextPriceExec!
+}
+
 type SystemState @entity {
   id: ID! # marketIndex "-" callCounter
   timestamp: BigInt!
@@ -88,7 +147,7 @@ type CollateralTransfer implements GenericTransfer @entity {
   token: CollateralToken!
 }
 
-enum TokenType {
+enum MarketSide {
   Long
   Short
 }
@@ -97,7 +156,7 @@ type SyntheticToken @entity {
   id: ID! # token address
   tokenAddress: Bytes!
   syntheticMarket: SyntheticMarket!
-  tokenType: TokenType!
+  tokenType: MarketSide!
   totalStaked: BigInt!
   tokenSupply: BigInt!
   floatMintedFromSpecificToken: BigInt!
@@ -153,6 +212,8 @@ type SyntheticMarket @entity {
   kPeriod: BigInt!
   kMultiplier: BigInt!
   totalFloatMinted: BigInt!
+  nextPriceActions: [UserNextPriceAction!]!
+  settledNextPriceActions: [UserNextPriceAction!]!
 }
 
 type User @entity {
@@ -169,6 +230,9 @@ type User @entity {
   collatoralBalances: [UserCollateralTokenBalance!]!
   tokenMints: [UserSyntheticTokenMinted!]!
   collatoralTokenApprovals: [UserCollateralTokenApproval!]!
+  pendingNextPriceActions: [UserNextPriceAction!]!
+  confirmedNextPriceActions: [UserNextPriceAction!]!
+  settledNextPriceActions: [UserNextPriceAction!]!
 }
 
 type UserSyntheticTokenBalance @entity {

@@ -26,7 +26,6 @@ describe("Float System", () => {
           ~userToStakeWith=setupUser,
           ~longShort=deployedContracts.longShort,
         );
-
       ();
     });
 

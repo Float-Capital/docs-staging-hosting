@@ -10,6 +10,9 @@ import {
   SyntheticMarket,
   CollateralToken,
   UserCollateralTokenBalance,
+  BatchedNextPriceExec,
+  NextBatchedNextPriceExec,
+  UserNextPriceAction,
 } from "../../generated/schema";
 import { BigInt, Bytes, log, ethereum, Address } from "@graphprotocol/graph-ts";
 import {
@@ -19,6 +22,8 @@ import {
   TEN_TO_THE_18,
   ZERO_ADDRESS,
   ZERO_ADDRESS_BYTES,
+  MARKET_SIDE_LONG,
+  MARKET_SIDE_SHORT,
 } from "../CONSTANTS";
 import { createNewTokenDataSource } from "./helperFunctions";
 
@@ -216,6 +221,9 @@ export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
     user.collatoralBalances = [];
     user.tokenMints = [];
     user.stateChangesAffectingUser = [];
+    user.pendingNextPriceActions = [];
+    user.confirmedNextPriceActions = [];
+    user.settledNextPriceActions = [];
 
     let globalState = GlobalState.load(GLOBAL_STATE_ID);
     globalState.totalUsers = globalState.totalUsers.plus(ONE);
@@ -223,6 +231,28 @@ export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
   }
 
   return user as User;
+}
+export function getUser(address: Bytes): User {
+  let user = User.load(address.toHex());
+  if (user == null) {
+    log.critical(
+      "ERROR: user with address {} doesn't exist, rather use `getOrCreateUser` function",
+      [address.toHex()]
+    );
+  }
+
+  return user as User;
+}
+export function getSyntheticMarket(marketIndex: BigInt): SyntheticMarket {
+  let syntheticMarket = SyntheticMarket.load(marketIndex.toString());
+  if (syntheticMarket == null) {
+    log.critical(
+      "`getOrCreateLatestSystemState` called without SyntheticMarket with id #{} being created.",
+      [marketIndex.toString()]
+    );
+  }
+
+  return syntheticMarket as SyntheticMarket;
 }
 
 export function getOrCreateBalanceObject(
@@ -333,13 +363,13 @@ export function createSyntheticToken(tokenAddress: Bytes): SyntheticToken {
 
 export function createSyntheticTokenLong(tokenAddress: Bytes): SyntheticToken {
   let syntheticToken = createSyntheticToken(tokenAddress);
-  syntheticToken.tokenType = "Long";
+  syntheticToken.tokenType = MARKET_SIDE_LONG;
 
   return syntheticToken as SyntheticToken;
 }
 export function createSyntheticTokenShort(tokenAddress: Bytes): SyntheticToken {
   let syntheticToken = createSyntheticToken(tokenAddress);
-  syntheticToken.tokenType = "Short";
+  syntheticToken.tokenType = MARKET_SIDE_SHORT;
 
   return syntheticToken as SyntheticToken;
 }

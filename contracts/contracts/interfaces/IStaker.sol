@@ -22,26 +22,5 @@ abstract contract IStaker {
         uint256 shortValue
     ) external virtual;
 
-    function stakeFromMint(
-        ISyntheticToken tokenAddress,
-        uint256 amount,
-        address user
-    ) external virtual;
-
-    function stakeFromMintBatched(
-        uint32 marketIndex,
-        uint256 amount,
-        uint256 oracleUpdateIndex,
-        ILongShort.MarketSide syntheticTokenType
-    ) external virtual;
-
-    function transferBatchStakeToUser(
-        uint256 amountLong,
-        uint256 amountShort,
-        uint32 marketIndex,
-        uint256 oracleUpdateIndex,
-        address user
-    ) external virtual;
-
     function stakeFromUser(address from, uint256 amount) public virtual;
 }

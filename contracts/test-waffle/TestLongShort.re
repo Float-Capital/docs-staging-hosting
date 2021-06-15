@@ -67,7 +67,6 @@ describe("Float System", () => {
           );
         ();
       });
-      // LazyDeposit.testExposed(~contracts, ~accounts);
     });
   })
 });

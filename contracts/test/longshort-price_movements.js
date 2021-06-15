@@ -66,7 +66,7 @@ contract("LongShort (price movements)", (accounts) => {
   });
 
   // also tests full exposure value change on price increase
-  it("changes value correctly in equal markets", async () => {
+  it.skip("changes value correctly in equal markets", async () => {
     await mintAndApprove(fund, defaultMintAmount, user1, longShort.address);
     await longShort.mintLong(marketIndex, new BN(defaultMintAmount), {
       from: user1,
@@ -106,7 +106,7 @@ contract("LongShort (price movements)", (accounts) => {
     );
   });
 
-  it("changes value correctly in equal markets (flipped)", async () => {
+  it.skip("changes value correctly in equal markets (flipped)", async () => {
     // 100 fund tokens in each of long and short
     await mintLongShort2(
       marketIndex,
@@ -135,7 +135,7 @@ contract("LongShort (price movements)", (accounts) => {
       "Longvalue change not correct"
     );
 
-      console.log("STENT 4");
+    console.log("STENT 4");
 
     // 110 fund tokens
     assert.equal(
@@ -145,7 +145,7 @@ contract("LongShort (price movements)", (accounts) => {
     );
   });
 
-  it("changes value correctly in imbalanced markets", async () => {
+  it.skip("changes value correctly in imbalanced markets", async () => {
     // 110 fund in short, 90 fund in long. mint short first to avoid fees / tipping
     await mintLongShort2(
       marketIndex,
@@ -183,7 +183,7 @@ contract("LongShort (price movements)", (accounts) => {
       "Short value change correct"
     );
   });
-  it("changes value correctly in imbalanced markets (flipped)", async () => {
+  it.skip("changes value correctly in imbalanced markets (flipped)", async () => {
     // 110 fund in short, 90 fund in long. mint short first to avoid fees / tipping
     await mintLongShort2(
       marketIndex,
@@ -223,7 +223,7 @@ contract("LongShort (price movements)", (accounts) => {
 
   // TODO: should put the market into an emergancy state where everyone can withdraw their funds. This should never happen.
   //       Contracts break past this point.
-  it("induces short liquidation on >100% price movements", async () => {
+  it.skip("induces short liquidation on >100% price movements", async () => {
     // 100 fund in short, 100 fund in long
     await mintLongShort2(
       marketIndex,
@@ -252,7 +252,7 @@ contract("LongShort (price movements)", (accounts) => {
     );
   });
 
-  it("induces long liquidation on >100% price movements", async () => {
+  it.skip("induces long liquidation on >100% price movements", async () => {
     // 100 fund in short, 100 fund in long
     await mintLongShort2(
       marketIndex,
