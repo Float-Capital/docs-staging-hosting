@@ -22,6 +22,8 @@ import {
   TEN_TO_THE_18,
   ZERO_ADDRESS,
   ZERO_ADDRESS_BYTES,
+  MARKET_SIDE_LONG,
+  MARKET_SIDE_SHORT,
 } from "../CONSTANTS";
 import { createNewTokenDataSource } from "./helperFunctions";
 
@@ -339,13 +341,13 @@ export function createSyntheticToken(tokenAddress: Bytes): SyntheticToken {
 
 export function createSyntheticTokenLong(tokenAddress: Bytes): SyntheticToken {
   let syntheticToken = createSyntheticToken(tokenAddress);
-  syntheticToken.tokenType = "Long";
+  syntheticToken.tokenType = MARKET_SIDE_LONG;
 
   return syntheticToken as SyntheticToken;
 }
 export function createSyntheticTokenShort(tokenAddress: Bytes): SyntheticToken {
   let syntheticToken = createSyntheticToken(tokenAddress);
-  syntheticToken.tokenType = "Short";
+  syntheticToken.tokenType = MARKET_SIDE_SHORT;
 
   return syntheticToken as SyntheticToken;
 }

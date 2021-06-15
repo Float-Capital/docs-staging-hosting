@@ -75,6 +75,9 @@ type UserNextPriceActionComponent @entity {
   actionType: NextPriceAction!
   marketSide: MarketSide!
   amount: BigInt!
+  user: User!
+  updateIndex: BigInt!
+  marketIndex: BigInt!
   timestamp: BigInt!
   userAggregateAction: UserNextPriceAction!
   associatedBatch: BatchedNextPriceExec!

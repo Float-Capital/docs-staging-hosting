@@ -45,10 +45,14 @@ import {
   STAKER_ID,
   TOKEN_FACTORY_ID,
   LONG_SHORT_ID,
+  MARKET_SIDE_SHORT,
+  MARKET_SIDE_LONG,
+  ACTION_MINT,
 } from "./CONSTANTS";
 import {
   createOrUpdateUserNextPriceAction,
-  getOrCreateBatchedNextPriceExec,
+  createUserNextPriceActionComponent,
+  createOrUpdateBatchedNextPriceExec,
 } from "./utils/nextPrice";
 
 export function handleV1(event: V1): void {
@@ -442,9 +446,9 @@ export function handlePriceUpdate(event: PriceUpdate): void {
 
 function getMarketSideString(marketEnum: i32): string {
   if (marketEnum == 0) {
-    return "LONG";
+    return MARKET_SIDE_LONG;
   } else {
-    return "SHORT";
+    return MARKET_SIDE_SHORT;
   }
 }
 
@@ -457,10 +461,6 @@ export function handleLazyMinted(event: LazyMinted): void {
   let syntheticTokenType = getMarketSideString(syntheticTokenTypeInt);
   let userAddress = event.params.user;
 
-  let batchedNextPriceExec = getOrCreateBatchedNextPriceExec(
-    marketIndex,
-    oracleUpdateIndex
-  );
   let user = getOrCreateUser(userAddress, event);
   let syntheticMarket = SyntheticMarket.load(marketIndexId);
   if (syntheticMarket == null) {
@@ -469,21 +469,32 @@ export function handleLazyMinted(event: LazyMinted): void {
       [marketIndexId]
     );
   }
+  let userNextPriceActionComponent = createUserNextPriceActionComponent(
+    user,
+    syntheticMarket as SyntheticMarket,
+    oracleUpdateIndex,
+    depositAdded,
+    ACTION_MINT,
+    syntheticTokenType,
+    event
+  );
 
+  let batchedNextPriceExec = createOrUpdateBatchedNextPriceExec(
+    userNextPriceActionComponent
+  );
   let userNextPriceAction = createOrUpdateUserNextPriceAction(
     user,
     syntheticMarket as SyntheticMarket,
     oracleUpdateIndex,
-    batchedNextPriceExec
+    batchedNextPriceExec,
+    depositAdded
   );
 
-  // batchedNextPriceExec.linkedUserNextPriceActions = batchedNextPriceExec.linkedUserNextPriceActions.concat(
-  //   [userNextPriceAction.id]
-  // );
-
-  // userNextPriceAction.amountPaymentTokenForDeposit = userNextPriceAction.amountPaymentTokenForDeposit.plus(
-  //   depositAdded
-  // );
+  if (syntheticTokenType == MARKET_SIDE_LONG) {
+    userNextPriceAction.amountPaymentTokenForDepositLong = userNextPriceAction.amountPaymentTokenForDepositLong.plus(
+      depositAdded
+    );
+  }
 
   userNextPriceAction.save();
   batchedNextPriceExec.save();
