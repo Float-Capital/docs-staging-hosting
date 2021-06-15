@@ -515,7 +515,7 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
 }
 
 export function handleNextPriceRedeem(event: NextPriceRedeem): void {
-  let depositAdded = event.params.depositAdded;
+  let depositAdded = event.params.synthRedeemed;
   let marketIndex = event.params.marketIndex;
   let oracleUpdateIndex = event.params.oracleUpdateIndex;
   let syntheticTokenTypeInt = event.params.syntheticTokenType;
@@ -549,14 +549,14 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
 
   saveEventToStateChange(
     event,
-    "NextPriceDeposit",
+    "NextPriceRedeem",
     bigIntArrayToStringArray([
       depositAdded,
       marketIndex,
       oracleUpdateIndex,
     ]).concat([syntheticTokenType, user.id]),
     [
-      "depositAdded",
+      "synthRedeemed",
       "marketIndex",
       "oracleUpdateIndex",
       "syntheticTokenType",
