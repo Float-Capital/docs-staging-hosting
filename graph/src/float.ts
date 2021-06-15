@@ -7,7 +7,7 @@ import {
   ValueLockedInSystem,
   FeesChanges,
   OracleUpdated,
-  LazyMinted,
+  NextPriceDeposit,
 } from "../generated/LongShort/LongShort";
 import {
   SyntheticMarket,
@@ -20,6 +20,7 @@ import {
   CollateralToken,
   LatestPrice,
   Price,
+  User,
 } from "../generated/schema";
 import { BigInt, log, Bytes } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
@@ -50,6 +51,7 @@ import {
   MARKET_SIDE_SHORT,
   MARKET_SIDE_LONG,
   ACTION_MINT,
+  ACTION_REDEEM,
 } from "./CONSTANTS";
 import {
   createOrUpdateUserNextPriceAction,
@@ -454,7 +456,7 @@ function getMarketSideString(marketEnum: i32): string {
   }
 }
 
-export function handleLazyMinted(event: LazyMinted): void {
+export function handleNextPriceDeposit(event: NextPriceDeposit): void {
   let depositAdded = event.params.depositAdded;
   let marketIndex = event.params.marketIndex;
   let oracleUpdateIndex = event.params.oracleUpdateIndex;
@@ -467,7 +469,7 @@ export function handleLazyMinted(event: LazyMinted): void {
 
   let userNextPriceActionComponent = createUserNextPriceActionComponent(
     user,
-    syntheticMarket as SyntheticMarket,
+    syntheticMarket,
     oracleUpdateIndex,
     depositAdded,
     ACTION_MINT,
@@ -480,7 +482,8 @@ export function handleLazyMinted(event: LazyMinted): void {
   );
   let userNextPriceAction = createOrUpdateUserNextPriceAction(
     userNextPriceActionComponent,
-    syntheticMarket as SyntheticMarket
+    syntheticMarket,
+    user
   );
 
   userNextPriceAction.save();
@@ -488,7 +491,61 @@ export function handleLazyMinted(event: LazyMinted): void {
 
   saveEventToStateChange(
     event,
-    "LazyMinted",
+    "NextPriceDeposit",
+    bigIntArrayToStringArray([
+      depositAdded,
+      marketIndex,
+      oracleUpdateIndex,
+    ]).concat([syntheticTokenType, user.id]),
+    [
+      "depositAdded",
+      "marketIndex",
+      "oracleUpdateIndex",
+      "syntheticTokenType",
+      "user",
+    ],
+    ["uint256", "uint256", "uint256", "Fix me Chris", "fix me chris"],
+    [userAddress],
+    []
+  );
+}
+
+export function handleNextPriceRedeem(event: NextPriceRedeem): void {
+  let depositAdded = event.params.depositAdded;
+  let marketIndex = event.params.marketIndex;
+  let oracleUpdateIndex = event.params.oracleUpdateIndex;
+  let syntheticTokenTypeInt = event.params.syntheticTokenType;
+  let syntheticTokenType = getMarketSideString(syntheticTokenTypeInt);
+  let userAddress = event.params.user;
+
+  let user = getUser(userAddress);
+  let syntheticMarket = getSyntheticMarket(marketIndex);
+
+  let userNextPriceActionComponent = createUserNextPriceActionComponent(
+    user,
+    syntheticMarket,
+    oracleUpdateIndex,
+    depositAdded,
+    ACTION_REDEEM,
+    syntheticTokenType,
+    event
+  );
+
+  let batchedNextPriceExec = createOrUpdateBatchedNextPriceExec(
+    userNextPriceActionComponent
+  );
+  let userNextPriceAction = createOrUpdateUserNextPriceAction(
+    userNextPriceActionComponent,
+    syntheticMarket,
+    user
+  );
+
+  userNextPriceAction.save();
+  batchedNextPriceExec.save();
+
+  saveEventToStateChange(
+    event,
+    "NextPriceDeposit",
     bigIntArrayToStringArray([
       depositAdded,
       marketIndex,
