@@ -22,6 +22,8 @@ import {
   TEN_TO_THE_18,
   ZERO_ADDRESS,
   ZERO_ADDRESS_BYTES,
+  MARKET_SIDE_LONG,
+  MARKET_SIDE_SHORT,
 } from "../CONSTANTS";
 import { createNewTokenDataSource } from "./helperFunctions";
 
@@ -182,46 +184,6 @@ export function getOrCreateStakerState(
   return state as StakeState;
 }
 
-export function getOrCreateBatchedNextPriceExec(
-  marketIndex: BigInt,
-  updateIndex: BigInt
-): BatchedNextPriceExec {
-  let marketIndexId = marketIndex.toString();
-  let updateIndexStr = updateIndex.toString();
-  let batchedNextPriceExecId =
-    "batched-" + marketIndexId + "-" + updateIndexStr;
-  let batchedNextPriceExec = BatchedNextPriceExec.load(batchedNextPriceExecId);
-  if (batchedNextPriceExec == null) {
-    batchedNextPriceExec = new BatchedNextPriceExec(batchedNextPriceExecId);
-
-    batchedNextPriceExec.updateIndex = updateIndex;
-    batchedNextPriceExec.marketIndex = marketIndex;
-    batchedNextPriceExec.amountPaymentTokenForDeposit = ZERO;
-    batchedNextPriceExec.amountSynthTokenForWithdrawal = ZERO;
-    batchedNextPriceExec.mintPriceSnapshot = ZERO;
-    batchedNextPriceExec.redeemPriceSnapshot = ZERO;
-    batchedNextPriceExec.executedTimestamp = ZERO;
-    batchedNextPriceExec.save();
-
-    let nextBatchedNextPriceExecId = "nextBatch-" + marketIndexId;
-    let nextBatchedNextPriceExec = NextBatchedNextPriceExec.load(
-      nextBatchedNextPriceExecId
-    );
-    if (nextBatchedNextPriceExec == null) {
-      nextBatchedNextPriceExec = new NextBatchedNextPriceExec(
-        nextBatchedNextPriceExecId
-      );
-    }
-
-    nextBatchedNextPriceExec.nextBatch = batchedNextPriceExec.id;
-    nextBatchedNextPriceExec.currentUpdateIndex = updateIndex;
-
-    nextBatchedNextPriceExec.save();
-  }
-
-  return batchedNextPriceExec as BatchedNextPriceExec;
-}
-
 export function getOrCreateGlobalState(): GlobalState {
   let globalState = GlobalState.load(GLOBAL_STATE_ID);
   if (globalState == null) {
@@ -259,6 +221,9 @@ export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
     user.collatoralBalances = [];
     user.tokenMints = [];
     user.stateChangesAffectingUser = [];
+    user.pendingNextPriceActions = [];
+    user.confirmedNextPriceActions = [];
+    user.settledNextPriceActions = [];
 
     let globalState = GlobalState.load(GLOBAL_STATE_ID);
     globalState.totalUsers = globalState.totalUsers.plus(ONE);
@@ -267,40 +232,27 @@ export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
 
   return user as User;
 }
-
-export function getOrUserNextPriceAction(
-  userAddress: Bytes,
-  syntheticMarket: SyntheticMarket,
-  updateIndex: BigInt
-): UserNextPriceAction {
-  let userNextPriceActionId =
-    "nextPrice-" +
-    userAddress.toHex() +
-    "-" +
-    syntheticMarket.marketIndex.toString() +
-    "-" +
-    updateIndex.toString();
-  let userNextPriceAction = UserNextPriceAction.load(userNextPriceActionId);
-
-  if (userNextPriceAction == null) {
-    userNextPriceAction = new UserNextPriceAction(userNextPriceActionId);
-
-    userNextPriceAction.updateIndex = updateIndex;
-    userNextPriceAction.marketIndex = syntheticMarket.marketIndex;
-    userNextPriceAction.user = userAddress.toHex();
-    userNextPriceAction.amountPaymentTokenForDeposit = ZERO;
-    userNextPriceAction.amountSynthTokenForWithdrawal = ZERO;
-    userNextPriceAction.executedTimestamp = ZERO;
-
-    userNextPriceAction.save();
-
-    syntheticMarket.nextPriceActions = syntheticMarket.nextPriceActions.concat([
-      userNextPriceAction.id,
-    ]);
-    syntheticMarket.save();
+export function getUser(address: Bytes): User {
+  let user = User.load(address.toHex());
+  if (user == null) {
+    log.critical(
+      "ERROR: user with address {} doesn't exist, rather use `getOrCreateUser` function",
+      [address.toHex()]
+    );
   }
 
-  return userNextPriceAction as UserNextPriceAction;
+  return user as User;
+}
+export function getSyntheticMarket(marketIndex: BigInt): SyntheticMarket {
+  let syntheticMarket = SyntheticMarket.load(marketIndex.toString());
+  if (syntheticMarket == null) {
+    log.critical(
+      "`getOrCreateLatestSystemState` called without SyntheticMarket with id #{} being created.",
+      [marketIndex.toString()]
+    );
+  }
+
+  return syntheticMarket as SyntheticMarket;
 }
 
 export function getOrCreateBalanceObject(
@@ -411,13 +363,13 @@ export function createSyntheticToken(tokenAddress: Bytes): SyntheticToken {
 
 export function createSyntheticTokenLong(tokenAddress: Bytes): SyntheticToken {
   let syntheticToken = createSyntheticToken(tokenAddress);
-  syntheticToken.tokenType = "Long";
+  syntheticToken.tokenType = MARKET_SIDE_LONG;
 
   return syntheticToken as SyntheticToken;
 }
 export function createSyntheticTokenShort(tokenAddress: Bytes): SyntheticToken {
   let syntheticToken = createSyntheticToken(tokenAddress);
-  syntheticToken.tokenType = "Short";
+  syntheticToken.tokenType = MARKET_SIDE_SHORT;
 
   return syntheticToken as SyntheticToken;
 }
