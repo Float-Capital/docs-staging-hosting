@@ -45,7 +45,7 @@
   {
     "anonymous": false,
     "inputs": [],
-    "name": "ExecuteNextPriceSettlementnsUser",
+    "name": "ExecuteNextPriceSettlementsUser",
     "type": "event"
   },
   {

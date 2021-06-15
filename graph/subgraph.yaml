@@ -14,9 +14,13 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
+        - BatchedActionsSettled
+        - ExecuteNextPriceSettlementsUser
         - FeesChanges
         - FeesLevied
-        - LazyMinted
+        - NewMarketLaunchedAndSeeded
+        - NextPriceDeposit
+        - NextPriceRedeem
         - OracleUpdated
         - PriceUpdate
         - SyntheticTokenCreated
@@ -27,12 +31,20 @@ dataSources:
         - name: LongShort
           file: ./abis/LongShort.json
       eventHandlers:
+        - event: BatchedActionsSettled(uint32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleBatchedActionsSettled
+        - event: ExecuteNextPriceSettlementsUser()
+          handler: handleExecuteNextPriceSettlementsUser
         - event: FeesChanges(uint32,uint256,uint256,uint256,uint256)
           handler: handleFeesChanges
         - event: FeesLevied(uint32,uint256)
           handler: handleFeesLevied
-        - event: LazyMinted(uint32,uint8,uint256,address,uint256)
-          handler: handleLazyMinted
+        - event: NewMarketLaunchedAndSeeded(uint32,uint256)
+          handler: handleNewMarketLaunchedAndSeeded
+        - event: NextPriceDeposit(uint32,uint8,uint256,address,uint256)
+          handler: handleNextPriceDeposit
+        - event: NextPriceRedeem(uint32,uint8,uint256,address,uint256)
+          handler: handleNextPriceRedeem
         - event: OracleUpdated(uint32,address,address)
           handler: handleOracleUpdated
         - event: PriceUpdate(uint32,uint256,uint256,address)
