@@ -323,6 +323,15 @@ const logGasPrices = async (
   console.log(`Cost on BSC: $${maticCost}`);
 };
 
+const totalValueLockedInMarket = async (
+    longShort,
+    marketIndex,
+) => {
+    const longValue = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
+    const shortValue = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
+    return (new BN(longValue)).add(new BN(shortValue));
+};
+
 module.exports = {
   initialize,
   mintAndApprove,
@@ -333,4 +342,5 @@ module.exports = {
   feeCalculation,
   createSynthetic,
   logGasPrices,
+  totalValueLockedInMarket,
 };

@@ -11,6 +11,55 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "updateIndex",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "mintPriceSnapshotLong",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "mintPriceSnapshotShort",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "redeemPriceSnapshotLong",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "redeemPriceSnapshotShort",
+        "type": "uint256"
+      }
+    ],
+    "name": "BatchedActionsSettled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "ExecuteLazySettlementnsUser",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "baseEntryFee",
         "type": "uint256"
       },
@@ -67,6 +116,31 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "initialSeed",
+        "type": "uint256"
+      }
+    ],
+    "name": "NewMarketLaunchedAndSeeded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "syntheticTokenType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "depositAdded",
         "type": "uint256"
       },
@@ -75,12 +149,6 @@
         "internalType": "address",
         "name": "user",
         "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "totalBatchedDepositAmount",
-        "type": "uint256"
       },
       {
         "indexed": false,
@@ -89,7 +157,7 @@
         "type": "uint256"
       }
     ],
-    "name": "LazyLongMinted",
+    "name": "NextPriceDeposit",
     "type": "event"
   },
   {
@@ -103,8 +171,14 @@
       },
       {
         "indexed": false,
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "syntheticTokenType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
-        "name": "depositAdded",
+        "name": "synthRedeemed",
         "type": "uint256"
       },
       {
@@ -112,12 +186,6 @@
         "internalType": "address",
         "name": "user",
         "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "totalBatchedDepositAmount",
-        "type": "uint256"
       },
       {
         "indexed": false,
@@ -126,155 +194,7 @@
         "type": "uint256"
       }
     ],
-    "name": "LazyLongStaked",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "depositAdded",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "totalBatchedDepositAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "oracleUpdateIndex",
-        "type": "uint256"
-      }
-    ],
-    "name": "LazyShortMinted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "depositAdded",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "totalBatchedDepositAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "oracleUpdateIndex",
-        "type": "uint256"
-      }
-    ],
-    "name": "LazyShortStaked",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "depositAdded",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "finalDepositAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "tokensMinted",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      }
-    ],
-    "name": "LongMinted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "tokensRedeemed",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "valueOfRedemption",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "finalRedeemValue",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      }
-    ],
-    "name": "LongRedeem",
+    "name": "NextPriceRedeem",
     "type": "event"
   },
   {
@@ -331,80 +251,6 @@
       }
     ],
     "name": "PriceUpdate",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "depositAdded",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "finalDepositAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "tokensMinted",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      }
-    ],
-    "name": "ShortMinted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "tokensRedeemed",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "valueOfRedemption",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "finalRedeemValue",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      }
-    ],
-    "name": "ShortRedeem",
     "type": "event"
   },
   {
@@ -595,6 +441,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "TEN_TO_THE_18_SIGNED",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -635,6 +494,30 @@
     ],
     "name": "_updateSystemStateMulti",
     "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "internalType": "int256",
+        "name": "newAssetPrice",
+        "type": "int256"
+      }
+    ],
+    "name": "adjustMarketBasedOnNewAssetPrice",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "didUpdate",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -759,16 +642,11 @@
         "type": "uint8"
       }
     ],
-    "name": "batchedLazyDeposit",
+    "name": "batchedLazyPaymentTokenToDeposit",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "mintAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "mintAndStakeAmount",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -783,68 +661,20 @@
         "type": "uint32"
       },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
         "internalType": "enum ILongShort.MarketSide",
         "name": "",
         "type": "uint8"
       }
     ],
-    "name": "batchedLazyRedeems",
+    "name": "batchedLazySynthToRedeem",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "redemptions",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "totalWithdrawn",
+        "name": "",
         "type": "uint256"
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "assetPriceGreater",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "assetPriceLess",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "baseValueExposure",
-        "type": "uint256"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "winningSyntheticTokenType",
-        "type": "uint8"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "losingSyntheticTokenType",
-        "type": "uint8"
-      }
-    ],
-    "name": "calculateValueChangeForPriceMechanism",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -912,6 +742,19 @@
         "internalType": "uint32",
         "name": "marketIndex",
         "type": "uint32"
+      }
+    ],
+    "name": "claimAndDistributeYield",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
       },
       {
         "internalType": "uint256",
@@ -935,14 +778,9 @@
         "internalType": "uint32",
         "name": "marketIndex",
         "type": "uint32"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "syntheticTokenType",
-        "type": "uint8"
       }
     ],
-    "name": "executeOutstandingLazySettlementsSynth",
+    "name": "executeOutstandingLazySettlementsUser",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1087,19 +925,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "handleBatchedLazyRedeems",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "_admin",
         "type": "address"
@@ -1227,35 +1052,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "name": "marketStateSnapshot",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
         "name": "liquidityOfPositionA",
         "type": "uint256"
@@ -1290,60 +1086,6 @@
         "type": "uint256"
       }
     ],
-    "name": "mintLong",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "mintLongAndStake",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "mintLongAndStakeLazy",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
     "name": "mintLongLazy",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -1353,54 +1095,29 @@
     "inputs": [
       {
         "internalType": "uint32",
-        "name": "marketIndex",
+        "name": "",
         "type": "uint32"
       },
       {
         "internalType": "uint256",
-        "name": "amount",
+        "name": "",
         "type": "uint256"
-      }
-    ],
-    "name": "mintShort",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
       },
       {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "name": "mintPriceSnapshot",
+    "outputs": [
+      {
         "internalType": "uint256",
-        "name": "amount",
+        "name": "",
         "type": "uint256"
       }
     ],
-    "name": "mintShortAndStake",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "mintShortAndStakeLazy",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1474,87 +1191,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "percentageAvailableForEarlyExitDenominator",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "percentageAvailableForEarlyExitNumerator",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "newPrice",
-        "type": "uint256"
-      }
-    ],
-    "name": "priceChangeMechanism",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "didUpdate",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokensToRedeem",
-        "type": "uint256"
-      }
-    ],
-    "name": "redeemLong",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "redeemLongAll",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint32",
@@ -1576,31 +1212,29 @@
     "inputs": [
       {
         "internalType": "uint32",
-        "name": "marketIndex",
+        "name": "",
         "type": "uint32"
       },
       {
         "internalType": "uint256",
-        "name": "tokensToRedeem",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "name": "redeemPriceSnapshot",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
         "type": "uint256"
       }
     ],
-    "name": "redeemShort",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "redeemShortAll",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1629,7 +1263,7 @@
         "type": "uint32"
       }
     ],
-    "name": "refreshTokensPrice",
+    "name": "refreshTokenPrices",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1817,25 +1451,6 @@
         "type": "uint32"
       }
     ],
-    "name": "totalValueLockedInMarket",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
     "name": "totalValueLockedInYieldManager",
     "outputs": [
       {
@@ -1897,7 +1512,7 @@
         "type": "uint256"
       }
     ],
-    "name": "transferToYieldManager",
+    "name": "transferFundsToYieldManager",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1959,11 +1574,11 @@
         "type": "address"
       }
     ],
-    "name": "userLazyActions",
+    "name": "userCurrentLazyUpdateIndex",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "usersCurrentUpdateIndex",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -1981,13 +1596,47 @@
         "internalType": "address",
         "name": "",
         "type": "address"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
       }
     ],
-    "name": "userLazyRedeems",
+    "name": "userLazyDepositAmounts",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "usersCurrentUpdateIndex",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "name": "userLazyRedemptions",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -2003,8 +1652,18 @@
       },
       {
         "internalType": "uint256",
-        "name": "amount",
+        "name": "amountLong",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountShort",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
       }
     ],
     "name": "withdrawFunds",
@@ -2029,19 +1688,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "yieldMechanism",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]

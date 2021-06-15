@@ -58,16 +58,16 @@ contract LongShortInternalsExposed is LongShortMockable {
         _;
     }
 
-    function refreshTokensPrice(uint32 marketIndex) external {
-        _refreshTokensPrice(marketIndex);
+    function refreshTokenPrices(uint32 marketIndex) external {
+        _refreshTokenPrices(marketIndex);
     }
 
     function feesMechanism(uint32 marketIndex, uint256 totalFees) external {
         _feesMechanism(marketIndex, totalFees);
     }
 
-    function yieldMechanism(uint32 marketIndex) external {
-        _yieldMechanism(marketIndex);
+    function claimAndDistributeYield(uint32 marketIndex) external {
+        _claimAndDistributeYield(marketIndex);
     }
 
     function minimum(uint256 liquidityOfPositionA, uint256 liquidityOfPositionB)
@@ -78,36 +78,23 @@ contract LongShortInternalsExposed is LongShortMockable {
         _minimum(liquidityOfPositionA, liquidityOfPositionB);
     }
 
-    function calculateValueChangeForPriceMechanism(
-        uint32 marketIndex,
-        uint256 assetPriceGreater,
-        uint256 assetPriceLess,
-        uint256 baseValueExposure,
-        MarketSide winningSyntheticTokenType,
-        MarketSide losingSyntheticTokenType
-    ) external {
-        _calculateValueChangeForPriceMechanism(
-            marketIndex,
-            assetPriceGreater,
-            assetPriceLess,
-            baseValueExposure,
-            winningSyntheticTokenType,
-            losingSyntheticTokenType
-        );
-    }
-
     function depositFunds(uint32 marketIndex, uint256 amount) external {
         _depositFunds(marketIndex, amount);
     }
 
-    function withdrawFunds(uint32 marketIndex, uint256 amount) external {
-        _withdrawFunds(marketIndex, amount, msg.sender);
+    function withdrawFunds(
+        uint32 marketIndex,
+        uint256 amountLong,
+        uint256 amountShort,
+        address user
+    ) external {
+        _withdrawFunds(marketIndex, amountLong, amountShort, msg.sender);
     }
 
-    function transferToYieldManager(uint32 marketIndex, uint256 amount)
+    function transferFundsToYieldManager(uint32 marketIndex, uint256 amount)
         external
     {
-        _transferToYieldManager(marketIndex, amount);
+        _transferFundsToYieldManager(marketIndex, amount);
     }
 
     function transferFromYieldManager(uint32 marketIndex, uint256 amount)
@@ -116,11 +103,11 @@ contract LongShortInternalsExposed is LongShortMockable {
         _transferFromYieldManager(marketIndex, amount);
     }
 
-    function priceChangeMechanism(uint32 marketIndex, uint256 newPrice)
-        external
-        returns (bool didUpdate)
-    {
-        _priceChangeMechanism(marketIndex, newPrice);
+    function adjustMarketBasedOnNewAssetPrice(
+        uint32 marketIndex,
+        int256 newAssetPrice
+    ) external returns (bool didUpdate) {
+        _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
     }
 
     function _executeOutstandingLazySettlementsExposed(

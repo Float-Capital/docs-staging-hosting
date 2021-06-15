@@ -722,57 +722,6 @@
   {
     "inputs": [
       {
-        "internalType": "contract ISyntheticToken",
-        "name": "token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      }
-    ],
-    "name": "stakeFromMint",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "oracleUpdateIndex",
-        "type": "uint256"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "syntheticTokenType",
-        "type": "uint8"
-      }
-    ],
-    "name": "stakeFromMintBatched",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "from",
         "type": "address"
@@ -844,39 +793,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "amountLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amountShort",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "oracleUpdateIndex",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      }
-    ],
-    "name": "transferBatchStakeToUser",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

@@ -1,44 +1,72 @@
 open LetOps;
+open Contract;
+open Globals;
 
-let mintAndStake =
+let mintDirect =
     (
       ~marketIndex,
       ~amount,
       ~token,
       ~user: Ethers.Wallet.t,
       ~longShort: LongShort.t,
+      ~oracleManagerMock: OracleManagerMock.t,
       ~isLong: bool,
     ) => {
-  let%Await _ =
+  let%AwaitThen _ =
     token->Contract.PaymentTokenHelpers.mintAndApprove(
       ~amount,
       ~user,
       ~spender=longShort.address,
     );
   let contract = longShort->ContractHelpers.connect(~address=user);
-  if (isLong) {
-    contract->LongShort.mintLongAndStake(~marketIndex, ~amount);
-  } else {
-    contract->LongShort.mintShortAndStake(~marketIndex, ~amount);
-  };
-};
-
-type marketBalance = {
-  longValue: Ethers.BigNumber.t,
-  shortValue: Ethers.BigNumber.t,
-};
-let getMarketBalance = (longShort, ~marketIndex) => {
-  let%AwaitThen longValue =
-    longShort->LongShort.syntheticTokenBackedValue(
-      CONSTANTS.longTokenType,
-      marketIndex,
+  let%AwaitThen currentOraclePrice =
+    oracleManagerMock->OracleManagerMock.getLatestPrice;
+  let tempOraclePrice = currentOraclePrice->add(bnFromInt(1));
+  let _ =
+    oracleManagerMock->OracleManagerMock.setPrice(~newPrice=tempOraclePrice);
+  let%AwaitThen _ = contract->LongShort._updateSystemState(~marketIndex);
+  let%AwaitThen _mintLazy =
+    if (isLong) {
+      contract->LongShort.mintLongLazy(~marketIndex, ~amount);
+    } else {
+      contract->LongShort.mintShortLazy(~marketIndex, ~amount);
+    };
+  // NOTE: this code changes the oracle price then resets it back to the original value which should the same value (for the sake of simplicity in the tests)
+  let _ =
+    oracleManagerMock->OracleManagerMock.setPrice(
+      ~newPrice=currentOraclePrice,
     );
-  let%Await shortValue =
-    longShort->LongShort.syntheticTokenBackedValue(
-      CONSTANTS.shortTokenType,
-      marketIndex,
+  contract->LongShort._updateSystemState(~marketIndex);
+};
+let mintAndStakeDirect =
+    (
+      ~marketIndex,
+      ~amount,
+      ~token,
+      ~user: Ethers.Wallet.t,
+      ~longShort: LongShort.t,
+      ~oracleManagerMock: OracleManagerMock.t,
+      ~synthToken: SyntheticToken.t,
+    ) => {
+  let%AwaitThen isLong = synthToken->Contract.SyntheticTokenHelpers.getIsLong;
+  let%AwaitThen balanceBeforeMinting =
+    synthToken->SyntheticToken.balanceOf(~account=user.address);
+  let%AwaitThen _mintDirect =
+    mintDirect(
+      ~marketIndex,
+      ~amount,
+      ~token,
+      ~user,
+      ~longShort,
+      ~oracleManagerMock,
+      ~isLong,
     );
-  {longValue, shortValue};
+  let%AwaitThen availableToStakeAfter =
+    synthToken->SyntheticToken.balanceOf(~account=user.address);
+  let amountToStake = availableToStakeAfter->sub(balanceBeforeMinting);
+  let synthTokenConnected =
+    synthToken->ContractHelpers.connect(~address=user);
+  synthTokenConnected->SyntheticToken.stake(~amount=amountToStake);
 };
 
 type randomStakeInfo = {
@@ -58,26 +86,30 @@ let stakeRandomlyInMarkets =
   [|marketsToStakeIn->Array.getUnsafe(0)|]
   ->Belt.Array.reduce(
       JsPromise.resolve(([||], [||])),
-      (currentValues, {paymentToken, longSynth, shortSynth, marketIndex}) => {
+      (
+        currentValues,
+        {paymentToken, longSynth, shortSynth, marketIndex, oracleManager},
+      ) => {
         let%AwaitThen (synthsUserHasStakedIn, marketsUserHasStakedIn) = currentValues;
         let mintStake =
-          mintAndStake(
+          mintAndStakeDirect(
             ~marketIndex,
             ~token=paymentToken,
             ~user=userToStakeWith,
             ~longShort,
+            ~oracleManagerMock=oracleManager,
           );
 
         let%AwaitThen {
           longValue: valueLongBefore,
           shortValue: valueShortBefore,
         } =
-          longShort->getMarketBalance(~marketIndex);
+          longShort->LongShortHelpers.getMarketBalance(~marketIndex);
 
         let%Await newSynthsUserHasStakedIn =
           switch (Helpers.randomMintLongShort()) {
           | Long(amount) =>
-            let%AwaitThen _ = mintStake(~isLong=true, ~amount);
+            let%AwaitThen _ = mintStake(~synthToken=longSynth, ~amount);
             let%Await longTokenPrice =
               longShort->LongShort.syntheticTokenPrice(
                 CONSTANTS.longTokenType,
@@ -95,14 +127,12 @@ let stakeRandomlyInMarkets =
               },
             |]);
           | Short(amount) =>
-            let%AwaitThen _ = mintStake(~isLong=false, ~amount);
-
+            let%AwaitThen _ = mintStake(~synthToken=shortSynth, ~amount);
             let%Await shortTokenPrice =
               longShort->LongShort.syntheticTokenPrice(
                 CONSTANTS.shortTokenType,
                 marketIndex,
               );
-
             synthsUserHasStakedIn->Array.concat([|
               {
                 marketIndex,
@@ -114,7 +144,8 @@ let stakeRandomlyInMarkets =
               },
             |]);
           | Both(longAmount, shortAmount) =>
-            let%AwaitThen _ = mintStake(~isLong=true, ~amount=longAmount);
+            let%AwaitThen _ =
+              mintStake(~synthToken=longSynth, ~amount=longAmount);
             let%AwaitThen longTokenPrice =
               longShort->LongShort.syntheticTokenPrice(
                 CONSTANTS.longTokenType,
@@ -135,8 +166,9 @@ let stakeRandomlyInMarkets =
               longValue: valueLongBefore,
               shortValue: valueShortBefore,
             } =
-              longShort->getMarketBalance(~marketIndex);
-            let%AwaitThen _ = mintStake(~isLong=false, ~amount=shortAmount);
+              longShort->LongShortHelpers.getMarketBalance(~marketIndex);
+            let%AwaitThen _ =
+              mintStake(~synthToken=shortSynth, ~amount=shortAmount);
             let%Await shortTokenPrice =
               longShort->LongShort.syntheticTokenPrice(
                 CONSTANTS.shortTokenType,
@@ -169,20 +201,27 @@ let stakeRandomlyInBothSidesOfMarket =
     ) =>
   marketsToStakeIn->Belt.Array.reduce(
     JsPromise.resolve(),
-    (prevPromise, {paymentToken, marketIndex}) => {
+    (
+      prevPromise,
+      {paymentToken, marketIndex, longSynth, shortSynth, oracleManager},
+    ) => {
       let%AwaitThen _ = prevPromise;
 
       let mintStake =
-        mintAndStake(
+        mintAndStakeDirect(
           ~marketIndex,
           ~token=paymentToken,
           ~user=userToStakeWith,
           ~longShort,
+          ~oracleManagerMock=oracleManager,
         );
       let%AwaitThen _ =
-        mintStake(~isLong=true, ~amount=Helpers.randomTokenAmount());
+        mintStake(~synthToken=longSynth, ~amount=Helpers.randomTokenAmount());
       let%Await _ =
-        mintStake(~isLong=false, ~amount=Helpers.randomTokenAmount());
+        mintStake(
+          ~synthToken=shortSynth,
+          ~amount=Helpers.randomTokenAmount(),
+        );
       ();
     },
   );

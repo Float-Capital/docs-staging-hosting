@@ -8,8 +8,6 @@ var abi = Ethers.makeAbi([
       "function mintShort(uint32 marketIndex,uint256 amount) @770000",
       "function redeemLong(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
       "function redeemShort(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
-      "function mintLongAndStake(uint32 marketIndex, uint256 amount) @1000000",
-      "function mintShortAndStake(uint32 marketIndex, uint256 amount) @1000000",
       "function _updateSystemState()",
       "function longValue(uint32 marketIndex) public view returns (uint256)",
       "function shortValue(uint32 marketIndex) public view returns (uint256)"

@@ -11,12 +11,22 @@ contract ERC20Mock is ERC20PresetMinterPauser {
 
     event TransferCalled(address sender, address recipient, uint256 amount);
 
+    bool shouldMockTransfer = true;
+
+    function setShouldMockTransfer(bool _value) public {
+        shouldMockTransfer = _value;
+    }
+
     function transfer(address recipient, uint256 amount)
         public
         override
         returns (bool)
     {
         emit TransferCalled(_msgSender(), recipient, amount);
-        return true;
+        if (shouldMockTransfer) {
+            return true;
+        } else {
+            return super.transfer(recipient, amount);
+        }
     }
 }

@@ -14,7 +14,6 @@ var Loader = require("../UI/Base/Loader.js");
 var Ethers$1 = require("ethers");
 var Globals = require("../../libraries/Globals.js");
 var Js_math = require("rescript/lib/js/js_math.js");
-var Tooltip = require("../UI/Base/Tooltip.js");
 var Metamask = require("../UI/Base/Metamask.js");
 var Contracts = require("../../ethereum/Contracts.js");
 var Formality = require("re-formality/src/Formality.js");
@@ -32,47 +31,43 @@ var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
 var Formality__ReactUpdate = require("re-formality/src/Formality__ReactUpdate.js");
 
-var validators_amount = {
-  strategy: /* OnFirstSuccessOrFirstBlur */3,
-  validate: (function (param) {
-      var amount = param.amount;
-      var amountRegex = /^[+]?\d+(\.\d+)?$/;
-      if (amount === "") {
-        return {
-                TAG: 1,
-                _0: "Amount is required",
-                [Symbol.for("name")]: "Error"
-              };
-      } else if (amountRegex.test(amount)) {
-        return Belt_Option.mapWithDefault(Ethers.Utils.parseEther(amount), {
-                    TAG: 1,
-                    _0: "Couldn't parse Ether value",
-                    [Symbol.for("name")]: "Error"
-                  }, (function (etherValue) {
-                      return {
-                              TAG: 0,
-                              _0: etherValue,
-                              [Symbol.for("name")]: "Ok"
-                            };
-                    }));
-      } else {
-        return {
-                TAG: 1,
-                _0: "Incorrect number format - please use '.' for floating points.",
-                [Symbol.for("name")]: "Error"
-              };
-      }
-    })
-};
-
 var validators = {
-  isStaking: undefined,
-  amount: validators_amount
+  amount: {
+    strategy: /* OnFirstSuccessOrFirstBlur */3,
+    validate: (function (param) {
+        var amount = param.amount;
+        var amountRegex = /^[+]?\d+(\.\d+)?$/;
+        if (amount === "") {
+          return {
+                  TAG: 1,
+                  _0: "Amount is required",
+                  [Symbol.for("name")]: "Error"
+                };
+        } else if (amountRegex.test(amount)) {
+          return Belt_Option.mapWithDefault(Ethers.Utils.parseEther(amount), {
+                      TAG: 1,
+                      _0: "Couldn't parse Ether value",
+                      [Symbol.for("name")]: "Error"
+                    }, (function (etherValue) {
+                        return {
+                                TAG: 0,
+                                _0: etherValue,
+                                [Symbol.for("name")]: "Ok"
+                              };
+                      }));
+        } else {
+          return {
+                  TAG: 1,
+                  _0: "Incorrect number format - please use '.' for floating points.",
+                  [Symbol.for("name")]: "Error"
+                };
+        }
+      })
+  }
 };
 
 function initialFieldsStatuses(_input) {
   return {
-          isStaking: /* Pristine */0,
           amount: /* Pristine */0
         };
 }
@@ -81,7 +76,6 @@ function initialState(input) {
   return {
           input: input,
           fieldsStatuses: {
-            isStaking: /* Pristine */0,
             amount: /* Pristine */0
           },
           collectionsStatuses: undefined,
@@ -91,61 +85,38 @@ function initialState(input) {
 }
 
 function validateForm(input, validators, fieldsStatuses) {
-  var match_0 = {
-    TAG: 0,
-    _0: input.isStaking,
-    [Symbol.for("name")]: "Ok"
-  };
   var match = fieldsStatuses.amount;
-  var match_0$1 = match ? match._0 : Curry._1(validators.amount.validate, input);
-  var isStakingResult = match_0;
-  var isStakingResult$1;
-  if (isStakingResult.TAG === /* Ok */0) {
-    var amountResult = match_0$1;
-    if (amountResult.TAG === /* Ok */0) {
-      return {
-              TAG: 0,
-              output: {
-                amount: amountResult._0,
-                isStaking: isStakingResult._0
-              },
-              fieldsStatuses: {
-                isStaking: {
-                  _0: isStakingResult,
-                  _1: /* Hidden */1,
-                  [Symbol.for("name")]: "Dirty"
-                },
-                amount: {
-                  _0: amountResult,
-                  _1: /* Shown */0,
-                  [Symbol.for("name")]: "Dirty"
-                }
-              },
-              collectionsStatuses: undefined,
-              [Symbol.for("name")]: "Valid"
-            };
-    }
-    isStakingResult$1 = isStakingResult;
-  } else {
-    isStakingResult$1 = isStakingResult;
-  }
-  return {
-          TAG: 1,
-          fieldsStatuses: {
-            isStaking: {
-              _0: isStakingResult$1,
-              _1: /* Hidden */1,
-              [Symbol.for("name")]: "Dirty"
+  var match$1 = match ? match._0 : Curry._1(validators.amount.validate, input);
+  if (match$1.TAG === /* Ok */0) {
+    return {
+            TAG: 0,
+            output: {
+              amount: match$1._0
             },
-            amount: {
-              _0: match_0$1,
-              _1: /* Shown */0,
-              [Symbol.for("name")]: "Dirty"
-            }
-          },
-          collectionsStatuses: undefined,
-          [Symbol.for("name")]: "Invalid"
-        };
+            fieldsStatuses: {
+              amount: {
+                _0: match$1,
+                _1: /* Shown */0,
+                [Symbol.for("name")]: "Dirty"
+              }
+            },
+            collectionsStatuses: undefined,
+            [Symbol.for("name")]: "Valid"
+          };
+  } else {
+    return {
+            TAG: 1,
+            fieldsStatuses: {
+              amount: {
+                _0: match$1,
+                _1: /* Shown */0,
+                [Symbol.for("name")]: "Dirty"
+              }
+            },
+            collectionsStatuses: undefined,
+            [Symbol.for("name")]: "Invalid"
+          };
+  }
 }
 
 function useForm(initialInput, onSubmit) {
@@ -155,12 +126,10 @@ function useForm(initialInput, onSubmit) {
   var match = Formality__ReactUpdate.useReducer(memoizedInitialState, (function (state, action) {
           if (typeof action === "number") {
             switch (action) {
-              case /* BlurIsStakingField */0 :
-                  var result = Formality.validateFieldOnBlurWithoutValidator(state.input.isStaking, state.fieldsStatuses.isStaking, (function (status) {
-                          var init = state.fieldsStatuses;
+              case /* BlurAmountField */0 :
+                  var result = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.amount, validators.amount, (function (status) {
                           return {
-                                  isStaking: status,
-                                  amount: init.amount
+                                  amount: status
                                 };
                         }));
                   if (result !== undefined) {
@@ -178,30 +147,7 @@ function useForm(initialInput, onSubmit) {
                   } else {
                     return /* NoUpdate */0;
                   }
-              case /* BlurAmountField */1 :
-                  var result$1 = Formality.validateFieldOnBlurWithValidator(state.input, state.fieldsStatuses.amount, validators_amount, (function (status) {
-                          var init = state.fieldsStatuses;
-                          return {
-                                  isStaking: init.isStaking,
-                                  amount: status
-                                };
-                        }));
-                  if (result$1 !== undefined) {
-                    return {
-                            TAG: 0,
-                            _0: {
-                              input: state.input,
-                              fieldsStatuses: result$1,
-                              collectionsStatuses: state.collectionsStatuses,
-                              formStatus: state.formStatus,
-                              submissionStatus: state.submissionStatus
-                            },
-                            [Symbol.for("name")]: "Update"
-                          };
-                  } else {
-                    return /* NoUpdate */0;
-                  }
-              case /* Submit */2 :
+              case /* Submit */1 :
                   var match = state.formStatus;
                   if (typeof match !== "number" && match.TAG === /* Submitting */0) {
                     return /* NoUpdate */0;
@@ -242,30 +188,30 @@ function useForm(initialInput, onSubmit) {
                               return Curry._2(onSubmit, output, {
                                           notifyOnSuccess: (function (input) {
                                               return Curry._1(dispatch, {
-                                                          TAG: 2,
+                                                          TAG: 1,
                                                           _0: input,
                                                           [Symbol.for("name")]: "SetSubmittedStatus"
                                                         });
                                             }),
                                           notifyOnFailure: (function (error) {
                                               return Curry._1(dispatch, {
-                                                          TAG: 3,
+                                                          TAG: 2,
                                                           _0: error,
                                                           [Symbol.for("name")]: "SetSubmissionFailedStatus"
                                                         });
                                             }),
                                           reset: (function (param) {
-                                              return Curry._1(dispatch, /* Reset */5);
+                                              return Curry._1(dispatch, /* Reset */4);
                                             }),
                                           dismissSubmissionResult: (function (param) {
-                                              return Curry._1(dispatch, /* DismissSubmissionResult */4);
+                                              return Curry._1(dispatch, /* DismissSubmissionResult */3);
                                             })
                                         });
                             }),
                           [Symbol.for("name")]: "UpdateWithSideEffects"
                         };
                   break;
-              case /* DismissSubmissionError */3 :
+              case /* DismissSubmissionError */2 :
                   var match$2 = state.formStatus;
                   if (typeof match$2 === "number" || match$2.TAG !== /* SubmissionFailed */1) {
                     return /* NoUpdate */0;
@@ -282,7 +228,7 @@ function useForm(initialInput, onSubmit) {
                             [Symbol.for("name")]: "Update"
                           };
                   }
-              case /* DismissSubmissionResult */4 :
+              case /* DismissSubmissionResult */3 :
                   var match$3 = state.formStatus;
                   if (typeof match$3 === "number") {
                     if (match$3 === /* Editing */0) {
@@ -303,7 +249,7 @@ function useForm(initialInput, onSubmit) {
                           },
                           [Symbol.for("name")]: "Update"
                         };
-              case /* Reset */5 :
+              case /* Reset */4 :
                   return {
                           TAG: 0,
                           _0: initialState(initialInput),
@@ -313,35 +259,14 @@ function useForm(initialInput, onSubmit) {
             }
           } else {
             switch (action.TAG | 0) {
-              case /* UpdateIsStakingField */0 :
+              case /* UpdateAmountField */0 :
                   var nextInput = Curry._1(action._0, state.input);
                   return {
                           TAG: 0,
                           _0: {
                             input: nextInput,
-                            fieldsStatuses: Formality.validateFieldOnChangeWithoutValidator(nextInput.isStaking, (function (status) {
-                                    var init = state.fieldsStatuses;
+                            fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput, state.fieldsStatuses.amount, state.submissionStatus, validators.amount, (function (status) {
                                     return {
-                                            isStaking: status,
-                                            amount: init.amount
-                                          };
-                                  })),
-                            collectionsStatuses: state.collectionsStatuses,
-                            formStatus: state.formStatus,
-                            submissionStatus: state.submissionStatus
-                          },
-                          [Symbol.for("name")]: "Update"
-                        };
-              case /* UpdateAmountField */1 :
-                  var nextInput$1 = Curry._1(action._0, state.input);
-                  return {
-                          TAG: 0,
-                          _0: {
-                            input: nextInput$1,
-                            fieldsStatuses: Formality.validateFieldOnChangeWithValidator(nextInput$1, state.fieldsStatuses.amount, state.submissionStatus, validators_amount, (function (status) {
-                                    var init = state.fieldsStatuses;
-                                    return {
-                                            isStaking: init.isStaking,
                                             amount: status
                                           };
                                   })),
@@ -351,7 +276,7 @@ function useForm(initialInput, onSubmit) {
                           },
                           [Symbol.for("name")]: "Update"
                         };
-              case /* SetSubmittedStatus */2 :
+              case /* SetSubmittedStatus */1 :
                   var input = action._0;
                   if (input !== undefined) {
                     return {
@@ -359,7 +284,6 @@ function useForm(initialInput, onSubmit) {
                             _0: {
                               input: input,
                               fieldsStatuses: {
-                                isStaking: /* Pristine */0,
                                 amount: /* Pristine */0
                               },
                               collectionsStatuses: state.collectionsStatuses,
@@ -374,7 +298,6 @@ function useForm(initialInput, onSubmit) {
                             _0: {
                               input: state.input,
                               fieldsStatuses: {
-                                isStaking: /* Pristine */0,
                                 amount: /* Pristine */0
                               },
                               collectionsStatuses: state.collectionsStatuses,
@@ -384,7 +307,7 @@ function useForm(initialInput, onSubmit) {
                             [Symbol.for("name")]: "Update"
                           };
                   }
-              case /* SetSubmissionFailedStatus */3 :
+              case /* SetSubmissionFailedStatus */2 :
                   return {
                           TAG: 0,
                           _0: {
@@ -400,7 +323,7 @@ function useForm(initialInput, onSubmit) {
                           },
                           [Symbol.for("name")]: "Update"
                         };
-              case /* MapSubmissionError */4 :
+              case /* MapSubmissionError */3 :
                   var map = action._0;
                   var error$1 = state.formStatus;
                   if (typeof error$1 === "number") {
@@ -453,37 +376,24 @@ function useForm(initialInput, onSubmit) {
   var tmp;
   tmp = typeof match$1 === "number" || match$1.TAG !== /* Submitting */0 ? false : true;
   return {
-          updateIsStaking: (function (nextInputFn, nextValue) {
-              return Curry._1(dispatch, {
-                          TAG: 0,
-                          _0: (function (__x) {
-                              return Curry._2(nextInputFn, __x, nextValue);
-                            }),
-                          [Symbol.for("name")]: "UpdateIsStakingField"
-                        });
-            }),
           updateAmount: (function (nextInputFn, nextValue) {
               return Curry._1(dispatch, {
-                          TAG: 1,
+                          TAG: 0,
                           _0: (function (__x) {
                               return Curry._2(nextInputFn, __x, nextValue);
                             }),
                           [Symbol.for("name")]: "UpdateAmountField"
                         });
             }),
-          blurIsStaking: (function (param) {
-              return Curry._1(dispatch, /* BlurIsStakingField */0);
-            }),
           blurAmount: (function (param) {
-              return Curry._1(dispatch, /* BlurAmountField */1);
+              return Curry._1(dispatch, /* BlurAmountField */0);
             }),
-          isStakingResult: Formality.exposeFieldResult(state.fieldsStatuses.isStaking),
           amountResult: Formality.exposeFieldResult(state.fieldsStatuses.amount),
           input: state.input,
           status: state.formStatus,
           dirty: (function (param) {
               var match = state.fieldsStatuses;
-              if (match.isStaking || match.amount) {
+              if (match.amount) {
                 return true;
               } else {
                 return false;
@@ -499,23 +409,23 @@ function useForm(initialInput, onSubmit) {
             }),
           submitting: tmp,
           submit: (function (param) {
-              return Curry._1(dispatch, /* Submit */2);
+              return Curry._1(dispatch, /* Submit */1);
             }),
           dismissSubmissionError: (function (param) {
-              return Curry._1(dispatch, /* DismissSubmissionError */3);
+              return Curry._1(dispatch, /* DismissSubmissionError */2);
             }),
           dismissSubmissionResult: (function (param) {
-              return Curry._1(dispatch, /* DismissSubmissionResult */4);
+              return Curry._1(dispatch, /* DismissSubmissionResult */3);
             }),
           mapSubmissionError: (function (map) {
               return Curry._1(dispatch, {
-                          TAG: 4,
+                          TAG: 3,
                           _0: map,
                           [Symbol.for("name")]: "MapSubmissionError"
                         });
             }),
           reset: (function (param) {
-              return Curry._1(dispatch, /* Reset */5);
+              return Curry._1(dispatch, /* Reset */4);
             })
         };
 }
@@ -530,8 +440,7 @@ var MintForm = {
 };
 
 var initialInput = {
-  amount: "",
-  isStaking: true
+  amount: ""
 };
 
 function useBalanceAndApproved(erc20Address, spender) {
@@ -560,7 +469,6 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
   var tokenToMint = Props.tokenToMint;
   var buttonText = Props.buttonText;
   var buttonDisabled = Props.buttonDisabled;
-  var isStaking = Props.isStaking;
   var randomMintTweetMessage = function (isLong, marketName) {
     var position = isLong ? "long" : "short";
     var possibleTweetMessages = [
@@ -703,12 +611,12 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                                     className: "text-center m-3"
                                   }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement(TweetButton.make, {
                                         message: randomMintTweetMessage(isLong, marketName)
-                                      }), isStaking ? null : React.createElement(Metamask.AddTokenButton.make, {
-                                          token: Config.config.contracts.FloatToken,
-                                          tokenSymbol: (
-                                            isLong ? "↗️" : "↘️"
-                                          ) + marketName
-                                        }), React.createElement(ViewProfileButton.make, {}))
+                                      }), React.createElement(Metamask.AddTokenButton.make, {
+                                        token: Config.config.contracts.FloatToken,
+                                        tokenSymbol: (
+                                          isLong ? "↗️" : "↘️"
+                                        ) + marketName
+                                      }), React.createElement(ViewProfileButton.make, {}))
                             }));
           case /* Failed */3 :
               return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
@@ -752,10 +660,7 @@ function MintForm$MintFormInput(Props) {
   var onChangeAmountInputOpt = Props.onChangeAmountInput;
   var onMaxClickOpt = Props.onMaxClick;
   var optErrorMessageOpt = Props.optErrorMessage;
-  var isStakingOpt = Props.isStaking;
   var disabledOpt = Props.disabled;
-  var onBlurIsStakingOpt = Props.onBlurIsStaking;
-  var onChangeIsStakingOpt = Props.onChangeIsStaking;
   var submitButtonOpt = Props.submitButton;
   var onSubmit = onSubmitOpt !== undefined ? onSubmitOpt : (function (param) {
         
@@ -775,14 +680,7 @@ function MintForm$MintFormInput(Props) {
         
       });
   var optErrorMessage = optErrorMessageOpt !== undefined ? Caml_option.valFromOption(optErrorMessageOpt) : undefined;
-  var isStaking = isStakingOpt !== undefined ? isStakingOpt : true;
   var disabled = disabledOpt !== undefined ? disabledOpt : false;
-  var onBlurIsStaking = onBlurIsStakingOpt !== undefined ? onBlurIsStakingOpt : (function (param) {
-        
-      });
-  var onChangeIsStaking = onChangeIsStakingOpt !== undefined ? onChangeIsStakingOpt : (function (param) {
-        
-      });
   var submitButton = submitButtonOpt !== undefined ? Caml_option.valFromOption(submitButtonOpt) : React.createElement(Button.make, {
           children: "Login & Mint"
         });
@@ -801,34 +699,7 @@ function MintForm$MintFormInput(Props) {
             optCurrency: Config.paymentTokenName
           }), optErrorMessage !== undefined ? React.createElement("div", {
               className: "text-red-500 text-xs"
-            }, optErrorMessage) : null, React.createElement("div", {
-            className: "flex justify-between items-center"
-          }, React.createElement("div", {
-                className: "flex items-center"
-              }, React.createElement("input", {
-                    className: "mr-2",
-                    id: "stake-checkbox",
-                    checked: isStaking,
-                    disabled: disabled,
-                    type: "checkbox",
-                    onBlur: onBlurIsStaking,
-                    onChange: onChangeIsStaking
-                  }), React.createElement("label", {
-                    className: "text-xs",
-                    htmlFor: "stake-checkbox"
-                  }, "Stake " + (
-                    isLong ? "long" : "short"
-                  ) + " tokens "), React.createElement("div", {
-                    className: "ml-1"
-                  }, React.createElement(Tooltip.make, {
-                        tip: "Stake your synthetic asset tokens to earn FLOAT tokens"
-                      }))), React.createElement("p", {
-                className: "text-xxs hover:text-gray-500"
-              }, React.createElement("a", {
-                    href: "https://docs.float.capital/docs/stake",
-                    rel: "noopenner noreferrer",
-                    target: "_blank"
-                  }, "Learn more about staking"))));
+            }, optErrorMessage) : null);
   return React.createElement("div", {
               className: "screen-centered-container h-full "
             }, React.createElement(Form.make, {
@@ -875,7 +746,6 @@ function MintForm$MintFormSignedIn(Props) {
   var optDaiAmountApproved = match$3[1];
   var optDaiBalance = match$3[0];
   var form = useForm(initialInput, (function (param, _form) {
-          var isStaking = param.isStaking;
           var amount = param.amount;
           var mintFunction = function (param) {
             var tmp;
@@ -894,31 +764,10 @@ function MintForm$MintFormSignedIn(Props) {
                           return Contracts.LongShort.make(Config.longShort, param);
                         }), tmp);
           };
-          var mintAndStakeFunction = function (param) {
-            var tmp;
-            if (isLong) {
-              var arg = market.marketIndex;
-              tmp = (function (param) {
-                  return param.mintLongAndStake(arg, amount);
-                });
-            } else {
-              var arg$1 = market.marketIndex;
-              tmp = (function (param) {
-                  return param.mintShortAndStake(arg$1, amount);
-                });
-            }
-            return Curry._2(contractExecutionHandler, (function (param) {
-                          return Contracts.LongShort.make(Config.longShort, param);
-                        }), tmp);
-          };
           var needsToApprove = amount.gt(Belt_Option.getWithDefault(optDaiAmountApproved, Ethers$1.BigNumber.from("0")));
           if (needsToApprove) {
             Curry._1(setContractActionToCallAfterApproval, (function (param) {
-                    if (isStaking) {
-                      return mintAndStakeFunction;
-                    } else {
-                      return mintFunction;
-                    }
+                    return mintFunction;
                   }));
             var arg = Globals.amountForApproval(amount);
             return Curry._2(contractExecutionHandlerApprove, (function (param) {
@@ -926,8 +775,6 @@ function MintForm$MintFormSignedIn(Props) {
                         }), (function (param) {
                           return param.approve(Config.longShort, arg);
                         }));
-          } else if (isStaking) {
-            return mintAndStakeFunction(undefined);
           } else {
             return mintFunction(undefined);
           }
@@ -949,8 +796,6 @@ function MintForm$MintFormSignedIn(Props) {
               });
   };
   var tokenToMint = isLong ? "long " + market.name : "short " + market.name;
-  var stakingText = form.input.isStaking ? "Mint & Stake" : "Mint";
-  var approveConnector = form.input.isStaking ? "," : " &";
   var position = isLong ? "long" : "short";
   var match$5;
   var exit = 0;
@@ -964,7 +809,7 @@ function MintForm$MintFormSignedIn(Props) {
         true
       ] : [
         undefined,
-        needsToApprove ? "Approve" + approveConnector + " " + stakingText + " " + position + " position" : stakingText + " " + position + " position",
+        needsToApprove ? "Approve & mint " + position + " position" : "Mint " + position + " position",
         !Curry._1(form.valid, undefined)
       ];
   } else {
@@ -973,7 +818,7 @@ function MintForm$MintFormSignedIn(Props) {
   if (exit === 1) {
     match$5 = [
       undefined,
-      stakingText + " " + position + " position",
+      "Mint " + position + " position",
       true
     ];
   }
@@ -1100,35 +945,21 @@ function MintForm$MintFormSignedIn(Props) {
                   return Curry._1(form.blurAmount, undefined);
                 }),
               onChangeAmountInput: (function ($$event) {
-                  return Curry._2(form.updateAmount, (function (input, amount) {
+                  return Curry._2(form.updateAmount, (function (param, amount) {
                                 return {
-                                        amount: amount,
-                                        isStaking: input.isStaking
+                                        amount: amount
                                       };
                               }), $$event.target.value);
                 }),
               onMaxClick: (function (param) {
-                  return Curry._2(form.updateAmount, (function (input, amount) {
+                  return Curry._2(form.updateAmount, (function (param, amount) {
                                 return {
-                                        amount: amount,
-                                        isStaking: input.isStaking
+                                        amount: amount
                                       };
                               }), optDaiBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optDaiBalance)) : "0");
                 }),
               optErrorMessage: match$5[0],
-              isStaking: form.input.isStaking,
               disabled: form.submitting,
-              onBlurIsStaking: (function (param) {
-                  return Curry._1(form.blurIsStaking, undefined);
-                }),
-              onChangeIsStaking: (function ($$event) {
-                  return Curry._2(form.updateIsStaking, (function (input, value) {
-                                return {
-                                        amount: input.amount,
-                                        isStaking: value
-                                      };
-                              }), $$event.target.checked);
-                }),
               submitButton: React.createElement(MintForm$SubmitButtonAndTxTracker, {
                     txStateApprove: txStateApprove,
                     txStateMint: txState,
@@ -1137,8 +968,7 @@ function MintForm$MintFormSignedIn(Props) {
                     marketName: market.name,
                     tokenToMint: tokenToMint,
                     buttonText: match$5[1],
-                    buttonDisabled: match$5[2],
-                    isStaking: form.input.isStaking
+                    buttonDisabled: match$5[2]
                   })
             });
 }

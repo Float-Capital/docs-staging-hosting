@@ -1,6 +1,6 @@
 open BsMocha;
-let (it', it_skip', before_each', before') =
-  Promise.(it, it_skip, before_each, before);
+let (it', it_only', it_skip', before_each', before') =
+  Promise.(it, it_only, it_skip, before_each, before);
 
 let (
   add,

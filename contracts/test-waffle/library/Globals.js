@@ -50,6 +50,8 @@ function bnLt(prim, prim$1) {
 
 var it$prime = Promise$BsMocha.it;
 
+var it_only$prime = Promise$BsMocha.it_only;
+
 var it_skip$prime = Promise$BsMocha.it_skip;
 
 var before_each$prime = Promise$BsMocha.before_each;
@@ -69,6 +71,7 @@ var before = Mocha$BsMocha.before;
 var before_each = Mocha$BsMocha.before_each;
 
 exports.it$prime = it$prime;
+exports.it_only$prime = it_only$prime;
 exports.it_skip$prime = it_skip$prime;
 exports.before_each$prime = before_each$prime;
 exports.before$prime = before$prime;
