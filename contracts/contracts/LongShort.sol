@@ -227,6 +227,13 @@ contract LongShort is ILongShort, Initializable {
         _;
     }
 
+    modifier executeOutstandingLazySettlements(address user, uint32 marketIndex)
+        virtual {
+        _executeOutstandingLazySettlements(user, marketIndex);
+
+        _;
+    }
+
     ////////////////////////////////////
     ///// CONTRACT SET-UP //////////////
     ////////////////////////////////////
@@ -669,10 +676,9 @@ contract LongShort is ILongShort, Initializable {
         uint32 marketIndex,
         MarketSide syntheticTokenType
     ) internal {
-        // Deposit funds and compute fees.
-
         uint256 amountToBatchDeposit =
             batchedLazyPaymentTokenToDeposit[marketIndex][syntheticTokenType];
+
         if (amountToBatchDeposit > 0) {
             batchedLazyPaymentTokenToDeposit[marketIndex][
                 syntheticTokenType
@@ -974,29 +980,22 @@ contract LongShort is ILongShort, Initializable {
      * NOTE: doesn't affect markets, so no state refresh necessary
      */
     function transferTreasuryFunds(uint32 marketIndex) external treasuryOnly {
-        // Edge-case: no funds to transfer.
-        if (totalValueReservedForTreasury[marketIndex] == 0) {
-            return;
-        }
-
-        // TODO STENT why is this called? totalValueReservedForTreasury gets value from fees and interest from the yield manager. Why are we then removing that value from the yiled manager?
-        _transferFromYieldManager(
-            marketIndex,
-            totalValueReservedForTreasury[marketIndex]
-        );
-
-        // Transfer funds to the treasury.
-        fundTokens[marketIndex].transfer(
-            treasury,
-            totalValueReservedForTreasury[marketIndex]
-        );
+        uint256 totalForTreasury = totalValueReservedForTreasury[marketIndex];
 
         // Update global state.
         totalValueReservedForTreasury[marketIndex] = 0;
-    }
 
-    ////// LAZY EXEC:
-    // Putting all code related to lazy execution below to keep it separate from the rest of the code (for now)
+        // Edge-case: no funds to transfer.
+        if (totalForTreasury == 0) {
+            return;
+        }
+
+        // TODO STENT why is this called? totalForTreasury gets value from fees and interest from the yield manager. Why are we then removing that value from the yiled manager?
+        _transferFromYieldManager(marketIndex, totalForTreasury);
+
+        // Transfer funds to the treasury.
+        fundTokens[marketIndex].transfer(treasury, totalForTreasury);
+    }
 
     function getUsersPendingBalance(
         address user,
@@ -1037,7 +1036,7 @@ contract LongShort is ILongShort, Initializable {
     ) internal {
         uint256 currentDepositAmount =
             userLazyDepositAmounts[marketIndex][user][syntheticTokenType];
-        if (currentDepositAmount != 0) {
+        if (currentDepositAmount > 0) {
             uint256 tokensToMint =
                 (currentDepositAmount * TEN_TO_THE_18) /
                     mintPriceSnapshot[marketIndex][
@@ -1089,13 +1088,6 @@ contract LongShort is ILongShort, Initializable {
     ) external override {
         // NOTE: this does all the "lazy" actions. This could be simplified to only do the relevant lazy action.
         _executeOutstandingLazySettlements(user, marketIndex);
-    }
-
-    modifier executeOutstandingLazySettlements(address user, uint32 marketIndex)
-        virtual {
-        _executeOutstandingLazySettlements(user, marketIndex);
-
-        _;
     }
 
     function _mintLazy(
