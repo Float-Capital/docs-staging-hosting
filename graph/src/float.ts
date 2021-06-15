@@ -33,6 +33,8 @@ import {
   getOrCreateGlobalState,
   getStakerStateId,
   getOrCreateUser,
+  getUser,
+  getSyntheticMarket,
 } from "./utils/globalStateManager";
 import {
   createNewTokenDataSource,
@@ -455,20 +457,14 @@ function getMarketSideString(marketEnum: i32): string {
 export function handleLazyMinted(event: LazyMinted): void {
   let depositAdded = event.params.depositAdded;
   let marketIndex = event.params.marketIndex;
-  let marketIndexId = marketIndex.toString();
   let oracleUpdateIndex = event.params.oracleUpdateIndex;
   let syntheticTokenTypeInt = event.params.syntheticTokenType;
   let syntheticTokenType = getMarketSideString(syntheticTokenTypeInt);
   let userAddress = event.params.user;
 
-  let user = getOrCreateUser(userAddress, event);
-  let syntheticMarket = SyntheticMarket.load(marketIndexId);
-  if (syntheticMarket == null) {
-    log.critical(
-      "`getOrCreateLatestSystemState` called without SyntheticMarket with id #{} being created.",
-      [marketIndexId]
-    );
-  }
+  let user = getUser(userAddress);
+  let syntheticMarket = getSyntheticMarket(marketIndex);
+
   let userNextPriceActionComponent = createUserNextPriceActionComponent(
     user,
     syntheticMarket as SyntheticMarket,
@@ -483,18 +479,9 @@ export function handleLazyMinted(event: LazyMinted): void {
     userNextPriceActionComponent
   );
   let userNextPriceAction = createOrUpdateUserNextPriceAction(
-    user,
-    syntheticMarket as SyntheticMarket,
-    oracleUpdateIndex,
-    batchedNextPriceExec,
-    depositAdded
+    userNextPriceActionComponent,
+    syntheticMarket as SyntheticMarket
   );
-
-  if (syntheticTokenType == MARKET_SIDE_LONG) {
-    userNextPriceAction.amountPaymentTokenForDepositLong = userNextPriceAction.amountPaymentTokenForDepositLong.plus(
-      depositAdded
-    );
-  }
 
   userNextPriceAction.save();
   batchedNextPriceExec.save();

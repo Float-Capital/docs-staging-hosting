@@ -232,6 +232,28 @@ export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
 
   return user as User;
 }
+export function getUser(address: Bytes): User {
+  let user = User.load(address.toHex());
+  if (user == null) {
+    log.critical(
+      "ERROR: user with address {} doesn't exist, rather use `getOrCreateUser` function",
+      [address.toHex()]
+    );
+  }
+
+  return user as User;
+}
+export function getSyntheticMarket(marketIndex: BigInt): SyntheticMarket {
+  let syntheticMarket = SyntheticMarket.load(marketIndex.toString());
+  if (syntheticMarket == null) {
+    log.critical(
+      "`getOrCreateLatestSystemState` called without SyntheticMarket with id #{} being created.",
+      [marketIndex.toString()]
+    );
+  }
+
+  return syntheticMarket as SyntheticMarket;
+}
 
 export function getOrCreateBalanceObject(
   tokenAddressString: string,

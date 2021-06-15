@@ -8,6 +8,7 @@ import {
 } from "../../../generated/schema";
 import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { ACTION_MINT, MARKET_SIDE_LONG, ZERO } from "../../CONSTANTS";
+import { getUser } from "../globalStateManager";
 
 function generateUserNextPriceActionId(
   userAddress: Bytes,
@@ -191,20 +192,22 @@ export function createUserNextPriceActionComponent(
   return userNextPriceActionComponent as UserNextPriceActionComponent;
 }
 
-// type UserNextPriceActionComponent @entity {
-//   id: ID! # actionComponent-<userAddress>-<marketIndex>-<update-index>-<type>-<index-of-type> // the index-of-type is for the case that multiple actions of the same type occur
-// }
-
 export function createOrUpdateUserNextPriceAction(
-  user: User,
-  syntheticMarket: SyntheticMarket,
-  updateIndex: BigInt,
-  associatedBatch: BatchedNextPriceExec,
-  amount: BigInt
+  userNextPriceActionComponent: UserNextPriceActionComponent,
+  syntheticMarket: SyntheticMarket
 ): UserNextPriceAction {
+  let userAddress = Address.fromString(userNextPriceActionComponent.user);
+  let user = getUser(userAddress);
+  let marketIndex = userNextPriceActionComponent.marketIndex;
+  let updateIndex = userNextPriceActionComponent.updateIndex;
+  let associatedBatch = userNextPriceActionComponent.associatedBatch;
+  let syntheticTokenType = userNextPriceActionComponent.marketSide;
+  let actionType = userNextPriceActionComponent.actionType;
+  let amount = userNextPriceActionComponent.amount;
+
   let userNextPriceActionId = generateUserNextPriceActionId(
-    user.address,
-    syntheticMarket.marketIndex,
+    userAddress,
+    marketIndex,
     updateIndex
   );
   let userNextPriceAction = UserNextPriceAction.load(userNextPriceActionId);
@@ -213,14 +216,14 @@ export function createOrUpdateUserNextPriceAction(
     userNextPriceAction = new UserNextPriceAction(userNextPriceActionId);
 
     userNextPriceAction.updateIndex = updateIndex;
-    userNextPriceAction.marketIndex = syntheticMarket.marketIndex;
+    userNextPriceAction.marketIndex = marketIndex;
     userNextPriceAction.user = user.id;
     userNextPriceAction.amountPaymentTokenForDepositLong = ZERO;
     userNextPriceAction.amountPaymentTokenForDepositShort = ZERO;
     userNextPriceAction.amountSynthTokenForWithdrawalLong = ZERO;
     userNextPriceAction.amountSynthTokenForWithdrawalShort = ZERO;
     userNextPriceAction.confirmedTimestamp = ZERO;
-    userNextPriceAction.associatedBatch = associatedBatch.id;
+    userNextPriceAction.associatedBatch = associatedBatch;
     userNextPriceAction.settledTimestamp = ZERO;
     userNextPriceAction.nextPriceActionComponents = [];
 
@@ -234,7 +237,30 @@ export function createOrUpdateUserNextPriceAction(
     user.pendingNextPriceActions = user.pendingNextPriceActions.concat([
       userNextPriceAction.id,
     ]);
+
     user.save();
+  }
+
+  if (actionType == ACTION_MINT) {
+    if (syntheticTokenType == MARKET_SIDE_LONG) {
+      userNextPriceAction.amountPaymentTokenForDepositLong = userNextPriceAction.amountPaymentTokenForDepositLong.plus(
+        amount
+      );
+    } else {
+      userNextPriceAction.amountPaymentTokenForDepositShort = userNextPriceAction.amountPaymentTokenForDepositShort.plus(
+        amount
+      );
+    }
+  } else {
+    if (syntheticTokenType == MARKET_SIDE_LONG) {
+      userNextPriceAction.amountSynthTokenForWithdrawalLong = userNextPriceAction.amountSynthTokenForWithdrawalLong.plus(
+        amount
+      );
+    } else {
+      userNextPriceAction.amountSynthTokenForWithdrawalLong = userNextPriceAction.amountSynthTokenForWithdrawalLong.plus(
+        amount
+      );
+    }
   }
 
   return userNextPriceAction as UserNextPriceAction;
