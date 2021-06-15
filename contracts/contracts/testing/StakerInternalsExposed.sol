@@ -2,14 +2,14 @@
 
 pragma solidity 0.8.3;
 
-import "../Staker.sol";
+import "./generated/StakerMockable.sol";
 import "../interfaces/ISyntheticToken.sol";
 
 /*
 NOTE: This contract is for testing purposes only!
 */
 
-contract StakerInternalsExposed is Staker {
+contract StakerInternalsExposed is StakerMockable {
     ///////////////////////////////////////////////
     //////////// Test Helper Functions ////////////
     ///////////////////////////////////////////////
@@ -48,6 +48,24 @@ contract StakerInternalsExposed is Staker {
 
         userAmountStaked[longToken][user] = newUserAmountStakedLong;
         userAmountStaked[shortToken][user] = newUserAmountStakedShort;
+    }
+
+    function setAddNewStakingFundParams(
+        uint32 marketIndex,
+        ISyntheticToken longToken,
+        ISyntheticToken shortToken,
+        ISyntheticToken mockAddress
+    ) public {
+        marketIndexOfToken[longToken] = marketIndex;
+        marketIndexOfToken[shortToken] = marketIndex;
+
+        syntheticRewardParams[marketIndex][0].timestamp = 0; // don't test with 0
+        syntheticRewardParams[marketIndex][0].accumulativeFloatPerLongToken = 1;
+        syntheticRewardParams[marketIndex][0]
+            .accumulativeFloatPerShortToken = 1;
+
+        syntheticTokens[marketIndex].longToken = mockAddress;
+        syntheticTokens[marketIndex].shortToken = mockAddress;
     }
 
     ///////////////////////////////////////////

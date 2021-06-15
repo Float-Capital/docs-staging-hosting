@@ -183,42 +183,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "floatToMint",
-        "type": "uint256"
-      }
-    ],
-    "name": "_mintFloatExternal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract ISyntheticToken",
-        "name": "token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "_withdrawExternal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint32",
         "name": "marketIndex",
         "type": "uint32"
@@ -327,35 +291,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      }
-    ],
-    "name": "calculateAccumulatedFloatExposed",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "longFloatReward",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "shortFloatReward",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -631,120 +566,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      }
-    ],
-    "name": "mintAccumulatedFloatExternal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "contract ISyntheticToken",
-        "name": "longToken",
-        "type": "address"
-      },
-      {
-        "internalType": "contract ISyntheticToken",
-        "name": "shortToken",
-        "type": "address"
-      },
-      {
-        "internalType": "contract ISyntheticToken",
-        "name": "mockAddress",
-        "type": "address"
-      }
-    ],
-    "name": "setAddNewStakingFundParams",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "contract ISyntheticToken",
-        "name": "longToken",
-        "type": "address"
-      },
-      {
-        "internalType": "contract ISyntheticToken",
-        "name": "shortToken",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "newLatestRewardIndex",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "usersLatestClaimedReward",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "accumulativeFloatPerTokenLatestLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "accumulativeFloatPerTokenLatestShort",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "accumulativeFloatPerTokenUserLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "accumulativeFloatPerTokenUserShort",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "newUserAmountStakedLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "newUserAmountStakedShort",
-        "type": "uint256"
-      }
-    ],
-    "name": "setFloatRewardCalcParams",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

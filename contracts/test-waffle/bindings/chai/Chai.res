@@ -11,7 +11,16 @@ let bnEqual: (
   Ethers.BigNumber.t,
 ) => unit = %raw(`(message, number1, number2) => expect(number1, message).to.equal(number2)`)
 
-let recordEqualFlat: (~expected: 'a, ~actual: 'a) => unit = (~expected, ~actual) => {
+let recordEqualFlatLabeled: (~expected: 'a, ~actual: 'a) => unit = (~expected, ~actual) => {
+  let a = %raw("(expected, actual) => {
+    for(const key of Object.keys(actual)){
+      expect(actual[key]).equal(expected[key])
+    }
+  }")
+  a(expected, actual)
+}
+
+let recordEqualFlat: ('a, 'a) => unit = (expected, actual) => {
   let a = %raw("(expected, actual) => {
     for(const key of Object.keys(actual)){
       expect(actual[key]).equal(expected[key])

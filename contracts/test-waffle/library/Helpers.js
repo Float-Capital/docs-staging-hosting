@@ -153,6 +153,8 @@ function inititialize(admin, exposeInternals) {
 
 var increaseTime = ((seconds) => ethers.provider.send("evm_increaseTime", [seconds]));
 
+var getBlock = (() => ethers.provider.getBlock());
+
 exports.randomInteger = randomInteger;
 exports.randomTokenAmount = randomTokenAmount;
 exports.randomMintLongShort = randomMintLongShort;
@@ -160,4 +162,5 @@ exports.createSyntheticMarket = createSyntheticMarket;
 exports.getAllMarkets = getAllMarkets;
 exports.inititialize = inititialize;
 exports.increaseTime = increaseTime;
+exports.getBlock = getBlock;
 /* CONSTANTS Not a pure module */

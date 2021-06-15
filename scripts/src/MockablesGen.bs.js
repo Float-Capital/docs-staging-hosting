@@ -8,7 +8,10 @@ var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Caml_exceptions = require("rescript/lib/js/caml_exceptions.js");
 
-var filesToMock = ["LongShort.sol"];
+var filesToMock = [
+  "LongShort.sol",
+  "Staker.sol"
+];
 
 var ScriptDoesNotSupportReturnValues = /* @__PURE__ */Caml_exceptions.create("MockablesGen.ScriptDoesNotSupportReturnValues");
 

@@ -86,15 +86,31 @@ describe("Float System", () => {
       accounts := loadedAccounts;
     });
 
-    before_each'(() => {
-      let%Await deployedContracts =
-        Helpers.inititialize(
-          ~admin=accounts.contents->Array.getUnsafe(0),
-          ~exposeInternals=true,
-        );
-      contracts := deployedContracts;
+    // MULTI TRANSACTION TESTS
+    describe("", () => {
+      before_each'(() => {
+        let%Await deployedContracts =
+          Helpers.inititialize(
+            ~admin=accounts.contents->Array.getUnsafe(0),
+            ~exposeInternals=true,
+          );
+        contracts := deployedContracts;
+      });
+
+      CalculateAccumulatedFloat.test(~contracts);
     });
 
-    CalculateAccumulatedFloat.test(~contracts);
+    // SINGLE TRANSACTION TESTS
+    describe("", () => {
+      before'(() => {
+        let%Await deployedContracts =
+          Helpers.inititialize(
+            ~admin=accounts.contents->Array.getUnsafe(0),
+            ~exposeInternals=true,
+          );
+        contracts := deployedContracts;
+      });
+      AddNewStakingFund.test(~contracts);
+    });
   });
 });

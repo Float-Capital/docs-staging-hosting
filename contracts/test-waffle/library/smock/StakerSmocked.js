@@ -2,6 +2,10 @@
 'use strict';
 
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
+var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
+var Caml_exceptions = require("bs-platform/lib/js/caml_exceptions.js");
+var ContractHelpers = require("../ContractHelpers.js");
+var Smock = require("@eth-optimism/smock");
 
 var mockaddNewStakingFundToReturn = (t => t.smocked.addNewStakingFund.will.return());
 
@@ -17,14 +21,111 @@ function addNewStakingFundCalls(smocked) {
               }));
 }
 
-function getTest(tas) {
-  return tas.smocked.addNewStakingFund.calls;
+var mockContractName = "StakerForInternalMocking";
+
+var internalRef = {
+  contents: undefined
+};
+
+var functionToNotMock = {
+  contents: ""
+};
+
+function setup(staker) {
+  return ContractHelpers.deployContract0(mockContractName).then(function (a) {
+                return Smock.smockit(a);
+              }).then(function (b) {
+              internalRef.contents = b;
+              return staker.setMocker(b.address);
+            });
 }
+
+function setupFunctionForUnitTesting(staker, functionName) {
+  functionToNotMock.contents = functionName;
+  return staker.setFunctionToNotMock(functionName);
+}
+
+var MockingAFunctionThatYouShouldntBe = /* @__PURE__ */Caml_exceptions.create("StakerSmocked.InternalMock.MockingAFunctionThatYouShouldntBe");
+
+var HaventSetupInternalMockingForLongShort = /* @__PURE__ */Caml_exceptions.create("StakerSmocked.InternalMock.HaventSetupInternalMockingForLongShort");
+
+function checkForExceptions(functionName) {
+  if (functionToNotMock.contents === functionName) {
+    throw {
+          RE_EXN_ID: MockingAFunctionThatYouShouldntBe,
+          Error: new Error()
+        };
+  }
+  if (internalRef.contents !== undefined) {
+    return ;
+  }
+  throw {
+        RE_EXN_ID: HaventSetupInternalMockingForLongShort,
+        Error: new Error()
+      };
+}
+
+function mock_changeMarketLaunchIncentiveParametersToReturn(param) {
+  checkForExceptions("_changeMarketLaunchIncentiveParameters");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked._changeMarketLaunchIncentiveParametersMock.will.return()));
+          
+        }));
+  
+}
+
+function mockonlyFloatToReturn(param) {
+  checkForExceptions("onlyFloat");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.onlyFloatMock.will.return()));
+          
+        }));
+  
+}
+
+function onlyFloatCalls(param) {
+  checkForExceptions("onlyFloat");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.onlyFloatMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  
+                                }));
+                  })));
+}
+
+function _changeMarketLaunchIncentiveParametersCalls(param) {
+  checkForExceptions("_changeMarketLaunchIncentiveParameters");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked._changeMarketLaunchIncentiveParametersMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          period: param[1],
+                                          initialMultiplier: param[2]
+                                        };
+                                }));
+                  })));
+}
+
+var InternalMock = {
+  mockContractName: mockContractName,
+  internalRef: internalRef,
+  functionToNotMock: functionToNotMock,
+  setup: setup,
+  setupFunctionForUnitTesting: setupFunctionForUnitTesting,
+  MockingAFunctionThatYouShouldntBe: MockingAFunctionThatYouShouldntBe,
+  HaventSetupInternalMockingForLongShort: HaventSetupInternalMockingForLongShort,
+  checkForExceptions: checkForExceptions,
+  mock_changeMarketLaunchIncentiveParametersToReturn: mock_changeMarketLaunchIncentiveParametersToReturn,
+  mockonlyFloatToReturn: mockonlyFloatToReturn,
+  onlyFloatCalls: onlyFloatCalls,
+  _changeMarketLaunchIncentiveParametersCalls: _changeMarketLaunchIncentiveParametersCalls
+};
 
 var uninitializedValue;
 
 exports.uninitializedValue = uninitializedValue;
 exports.mockaddNewStakingFundToReturn = mockaddNewStakingFundToReturn;
 exports.addNewStakingFundCalls = addNewStakingFundCalls;
-exports.getTest = getTest;
-/* No side effect */
+exports.InternalMock = InternalMock;
+/* @eth-optimism/smock Not a pure module */

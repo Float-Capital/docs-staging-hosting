@@ -353,6 +353,15 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "mintAccumulatedFloatExternal"
 
   @send
+  external setAddNewStakingFundParams: (
+    t,
+    ~marketIndex: int,
+    ~longToken: Ethers.ethAddress,
+    ~shortToken: Ethers.ethAddress,
+    ~mockAddress: Ethers.ethAddress,
+  ) => JsPromise.t<transaction> = "setAddNewStakingFundParams"
+
+  @send
   external setFloatRewardCalcParams: (
     t,
     ~marketIndex: int,
@@ -368,6 +377,13 @@ module Exposed = {
     ~newUserAmountStakedLong: Ethers.BigNumber.t,
     ~newUserAmountStakedShort: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "setFloatRewardCalcParams"
+
+  @send
+  external setFunctionToNotMock: (t, ~functionToNotMock: string) => JsPromise.t<transaction> =
+    "setFunctionToNotMock"
+
+  @send
+  external setMocker: (t, ~mocker: Ethers.ethAddress) => JsPromise.t<transaction> = "setMocker"
 
   @send
   external stakeFromUser: (

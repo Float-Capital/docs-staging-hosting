@@ -9,6 +9,7 @@ var Contract = require("./library/Contract.js");
 var CONSTANTS = require("./CONSTANTS.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
 var HelperActions = require("./library/HelperActions.js");
+var AddNewStakingFund = require("./tests/stake/AddNewStakingFund.js");
 var CalculateAccumulatedFloat = require("./tests/stake/CalculateAccumulatedFloat.js");
 
 Globals.describe("Float System")(undefined, undefined, undefined, (function (param) {
@@ -66,13 +67,24 @@ Globals.describe("Float System")(undefined, undefined, undefined, (function (par
                                             
                                           }));
                             }));
-                      Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
-                              return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
-                                            contracts.contents = deployedContracts;
-                                            
-                                          }));
+                      Globals.describe("")(undefined, undefined, undefined, (function (param) {
+                              Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
+                                      return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
+                                                    contracts.contents = deployedContracts;
+                                                    
+                                                  }));
+                                    }));
+                              return CalculateAccumulatedFloat.test(contracts);
                             }));
-                      return CalculateAccumulatedFloat.test(contracts);
+                      return Globals.describe("")(undefined, undefined, undefined, (function (param) {
+                                    Globals.before$prime(undefined)(undefined, undefined, undefined, (function (param) {
+                                            return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
+                                                          contracts.contents = deployedContracts;
+                                                          
+                                                        }));
+                                          }));
+                                    return AddNewStakingFund.test(contracts);
+                                  }));
                     }));
       }));
 
