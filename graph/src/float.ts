@@ -8,6 +8,10 @@ import {
   FeesChanges,
   OracleUpdated,
   NextPriceDeposit,
+  NewMarketLaunchedAndSeeded,
+  NextPriceRedeem,
+  BatchedActionsSettled,
+  ExecuteNextPriceSettlementnsUser,
 } from "../generated/LongShort/LongShort";
 import {
   SyntheticMarket,
@@ -562,6 +566,25 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
     [userAddress],
     []
   );
+}
+
+export function handleNewMarketLaunchedAndSeeded(
+  event: NewMarketLaunchedAndSeeded
+): void {
+  // TODO - need to include the market seed initially
+  // @chris please fill in the saveEventToStateChange for this function
+}
+export function handleBatchedActionsSettled(
+  event: BatchedActionsSettled
+): void {
+  // TODO
+  // @chris please fill in the saveEventToStateChange for this function
+}
+export function handleExecuteNextPriceSettlementnsUser(
+  event: ExecuteNextPriceSettlementnsUser
+): void {
+  // TODO
+  // @chris please fill in the saveEventToStateChange for this function
 }
 
 function updateLatestTokenPrice(
