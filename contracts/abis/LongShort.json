@@ -11,6 +11,55 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "updateIndex",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "mintPriceSnapshotLong",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "mintPriceSnapshotShort",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "redeemPriceSnapshotLong",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "redeemPriceSnapshotShort",
+        "type": "uint256"
+      }
+    ],
+    "name": "BatchedActionsSettled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "ExecuteLazySettlementnsUser",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "baseEntryFee",
         "type": "uint256"
       },
@@ -66,6 +115,25 @@
       },
       {
         "indexed": false,
+        "internalType": "uint256",
+        "name": "initialSeed",
+        "type": "uint256"
+      }
+    ],
+    "name": "NewMarketLaunchedAndSeeded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
         "internalType": "enum ILongShort.MarketSide",
         "name": "syntheticTokenType",
         "type": "uint8"
@@ -89,7 +157,44 @@
         "type": "uint256"
       }
     ],
-    "name": "LazyMinted",
+    "name": "NextPriceDeposit",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "syntheticTokenType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "synthRedeemed",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "oracleUpdateIndex",
+        "type": "uint256"
+      }
+    ],
+    "name": "NextPriceRedeem",
     "type": "event"
   },
   {
