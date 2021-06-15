@@ -6,6 +6,9 @@ artifacts
 # Truffle
 build
 
+# Test codegen
+codegen
+
 # Openzeppelin
 .openzeppelin/.session
 .openzeppelin/unknown-*.json

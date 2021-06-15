@@ -1,18 +1,37 @@
 pragma solidity 0.8.3;
 
-import "../LongShort.sol";
+import "./generated/LongShortMockable.sol";
 
 /*
 NOTE: This contract is for testing purposes only!
 */
 
-contract LongShortInternalsExposed is LongShort {
+contract LongShortInternalsExposed is LongShortMockable {
     bool overRideexecuteOutstandingLazySettlements;
 
     event executeOutstandingLazySettlementsMock(
         address _user,
         uint32 _marketIndex
     );
+
+    function setInitializeMarketParams(
+        uint32 marketIndex,
+        bool marketIndexValue,
+        uint32 _latestMarket,
+        address _staker,
+        address longAddress,
+        address shortAddress
+    ) public {
+        latestMarket = _latestMarket;
+        marketExists[marketIndex] = marketIndexValue;
+        staker = IStaker(_staker);
+        syntheticTokens[MarketSide.Long][marketIndex] = ISyntheticToken(
+            longAddress
+        );
+        syntheticTokens[MarketSide.Short][marketIndex] = ISyntheticToken(
+            shortAddress
+        );
+    }
 
     function setUseexecuteOutstandingLazySettlementsMock(bool shouldUseMock)
         public

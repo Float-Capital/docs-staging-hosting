@@ -396,25 +396,6 @@
     "type": "event"
   },
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_user",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint32",
-        "name": "_marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "executeOutstandingLazySettlementsMock",
-    "type": "event"
-  },
-  {
     "inputs": [],
     "name": "DEAD_ADDRESS",
     "outputs": [
@@ -456,24 +437,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "_executeOutstandingLazySettlementsExposed",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint32",
         "name": "marketIndex",
         "type": "uint32"
@@ -494,30 +457,6 @@
     ],
     "name": "_updateSystemStateMulti",
     "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "int256",
-        "name": "newAssetPrice",
-        "type": "int256"
-      }
-    ],
-    "name": "adjustMarketBasedOnNewAssetPrice",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "didUpdate",
-        "type": "bool"
-      }
-    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -739,37 +678,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "claimAndDistributeYield",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "depositFunds",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "user",
         "type": "address"
@@ -796,24 +704,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "totalFees",
-        "type": "uint256"
-      }
-    ],
-    "name": "feesMechanism",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1052,30 +942,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "liquidityOfPositionA",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "liquidityOfPositionB",
-        "type": "uint256"
-      }
-    ],
-    "name": "minimum",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint32",
         "name": "marketIndex",
         "type": "uint32"
@@ -1258,19 +1124,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "refreshTokenPrices",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "string",
         "name": "_functionToNotMock",
         "type": "string"
@@ -1284,63 +1137,12 @@
   {
     "inputs": [
       {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "bool",
-        "name": "marketIndexValue",
-        "type": "bool"
-      },
-      {
-        "internalType": "uint32",
-        "name": "_latestMarket",
-        "type": "uint32"
-      },
-      {
-        "internalType": "address",
-        "name": "_staker",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "longAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "shortAddress",
-        "type": "address"
-      }
-    ],
-    "name": "setInitializeMarketParams",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "contract LongShortForInternalMocking",
         "name": "_mocker",
         "type": "address"
       }
     ],
     "name": "setMocker",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bool",
-        "name": "shouldUseMock",
-        "type": "bool"
-      }
-    ],
-    "name": "setUseexecuteOutstandingLazySettlementsMock",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1487,42 +1289,6 @@
         "internalType": "uint32",
         "name": "marketIndex",
         "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "transferFromYieldManager",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "transferFundsToYieldManager",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
       }
     ],
     "name": "transferTreasuryFunds",
@@ -1641,34 +1407,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amountLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amountShort",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      }
-    ],
-    "name": "withdrawFunds",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

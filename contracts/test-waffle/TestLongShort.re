@@ -37,36 +37,37 @@ describe("Float System", () => {
 
     LazyDeposit.testIntegration(~contracts, ~accounts);
     LazyRedeem.testIntegration(~contracts, ~accounts);
+  });
 
-    describe("LongShort - internals exposed", () => {
-      let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
-      let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
+  describe("LongShort - internals exposed", () => {
+    let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
+    let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
 
-      before'(() => {
-        let%Await loadedAccounts = Ethers.getSigners();
-        accounts := loadedAccounts;
-      });
-
-      before_each'(() => {
-        let%AwaitThen deployedContracts =
-          Helpers.inititialize(
-            ~admin=accounts.contents->Array.getUnsafe(0),
-            ~exposeInternals=true,
-          );
-        contracts := deployedContracts;
-        let firstMarketPaymentToken =
-          deployedContracts.markets->Array.getUnsafe(1).paymentToken;
-
-        let testUser = accounts.contents->Array.getUnsafe(1);
-
-        let%Await _ =
-          firstMarketPaymentToken->Contract.PaymentTokenHelpers.mintAndApprove(
-            ~user=testUser,
-            ~spender=deployedContracts.longShort.address,
-            ~amount=Ethers.BigNumber.fromUnsafe("10000000000000000000000"),
-          );
-        ();
-      });
+    before'(() => {
+      let%Await loadedAccounts = Ethers.getSigners();
+      accounts := loadedAccounts;
     });
-  })
+
+    before_each'(() => {
+      let%AwaitThen deployedContracts =
+        Helpers.inititialize(
+          ~admin=accounts.contents->Array.getUnsafe(0),
+          ~exposeInternals=true,
+        );
+      contracts := deployedContracts;
+      let firstMarketPaymentToken =
+        deployedContracts.markets->Array.getUnsafe(1).paymentToken;
+
+      let testUser = accounts.contents->Array.getUnsafe(1);
+
+      let%Await _ =
+        firstMarketPaymentToken->Contract.PaymentTokenHelpers.mintAndApprove(
+          ~user=testUser,
+          ~spender=deployedContracts.longShort.address,
+          ~amount=Ethers.BigNumber.fromUnsafe("10000000000000000000000"),
+        );
+      ();
+    });
+    InitializeMarket.test(~contracts, ~accounts);
+  });
 });

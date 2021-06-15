@@ -7,6 +7,19 @@ const { expect } = require("chai");
 
 var bnEqual = ((message, number1, number2) => expect(number1, message).to.equal(number2));
 
+function recordEqualFlat(expected, actual) {
+  var a = ((expected, actual) => {
+    for(const key of Object.keys(actual)){
+      expect(actual[key]).equal(expected[key])
+    }
+  });
+  return a(expected, actual);
+}
+
+var intEqual = ((message, number1, number2) => expect(number1, message).to.equal(number2));
+
+var boolEqual = ((message, number1, number2) => expect(number1, message).to.equal(number2));
+
 var bnWithin = ((number1, min, max) => expect(number1).to.be.within(min, max));
 
 var bnCloseTo = ((message, distance, number1, number2) => expect(number1, message).to.be.closeTo(number2, distance));
@@ -28,6 +41,9 @@ var expectToBeHex = ((hexStr, hexLength) => expect(hexStr).to.be.properHex(hexLe
 var expectHexEqual = ((hex1, hex2) => expect(hex1).to.be.hexEqual(hex2));
 
 exports.bnEqual = bnEqual;
+exports.recordEqualFlat = recordEqualFlat;
+exports.intEqual = intEqual;
+exports.boolEqual = boolEqual;
 exports.bnWithin = bnWithin;
 exports.bnCloseTo = bnCloseTo;
 exports.callEmitEvents = callEmitEvents;
