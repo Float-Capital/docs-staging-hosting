@@ -60,7 +60,6 @@ describe("Float System", () => {
 
       let testUser = accounts.contents->Array.getUnsafe(1);
 
-<<<<<<< HEAD
       let%Await _ =
         firstMarketPaymentToken->Contract.PaymentTokenHelpers.mintAndApprove(
           ~user=testUser,
@@ -68,18 +67,7 @@ describe("Float System", () => {
           ~amount=Ethers.BigNumber.fromUnsafe("10000000000000000000000"),
         );
       ();
-=======
-        let%Await _ =
-          firstMarketPaymentToken->Contract.PaymentTokenHelpers.mintAndApprove(
-            ~user=testUser,
-            ~spender=deployedContracts.longShort.address,
-            ~amount=Ethers.BigNumber.fromUnsafe("10000000000000000000000"),
-          );
-        ();
-      });
->>>>>>> dev
     });
-    // LazyDeposit.testExposed(~contracts, ~accounts);
     InitializeMarket.test(~contracts, ~accounts);
   });
 });

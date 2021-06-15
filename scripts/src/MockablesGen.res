@@ -172,6 +172,8 @@ filesToMock->Array.forEach(filePath => {
   )
   let sol = ref(("../contracts/contracts/" ++ filePath)->Node.Fs.readFileAsUtf8Sync)
 
+  sol := sol.contents->replaceByRe(%re("/\s+pure\s+/g"), " view ");
+
   let lineCommentsMatch =
     sol.contents
     ->match_(lineCommentsRe)

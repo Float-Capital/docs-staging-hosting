@@ -202,6 +202,7 @@ Belt_Array.forEach(filesToMock, (function (filePath) {
         var sol = {
           contents: Fs.readFileSync("../contracts/contracts/" + filePath, "utf8")
         };
+        sol.contents = sol.contents.replace(/\s+pure\s+/g, " view ");
         var lineCommentsMatch = Belt_Option.map(Caml_option.null_to_opt(sol.contents.match(lineCommentsRe)), (function (i) {
                 return Belt_Array.keep(i, (function (x) {
                               return !contains(x, "SPDX-License-Identifier");

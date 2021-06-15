@@ -7,33 +7,53 @@
         "type": "uint32"
       },
       {
-        "internalType": "uint256",
+        "internalType": "int256",
         "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "",
-        "type": "uint8"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "",
-        "type": "uint8"
+        "type": "int256"
       }
     ],
-    "name": "_calculateValueChangeForPriceMechanismMock",
-    "outputs": [],
+    "name": "_adjustMarketBasedOnNewAssetPriceMock",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "didUpdate",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "_calculateBatchedLazyFeesMock",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "totalFeesLong",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalFeesShort",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "pure",
     "type": "function"
   },
@@ -66,6 +86,19 @@
       }
     ],
     "name": "_changeFeesMock",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "name": "_claimAndDistributeYieldMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -122,35 +155,6 @@
         "internalType": "enum ILongShort.MarketSide",
         "name": "",
         "type": "uint8"
-      },
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "usersCurrentUpdateIndex",
-            "type": "uint256"
-          },
-          {
-            "components": [
-              {
-                "internalType": "uint256",
-                "name": "mintAmount",
-                "type": "uint256"
-              },
-              {
-                "internalType": "uint256",
-                "name": "mintAndStakeAmount",
-                "type": "uint256"
-              }
-            ],
-            "internalType": "struct LongShortMockable.NextActionValues[2]",
-            "name": "nextActionValues",
-            "type": "tuple[2]"
-          }
-        ],
-        "internalType": "struct LongShortMockable.UserLazyDeposit",
-        "name": "",
-        "type": "tuple"
       }
     ],
     "name": "_executeLazyMintsIfTheyExistMock",
@@ -161,14 +165,19 @@
   {
     "inputs": [
       {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      },
+      {
         "internalType": "address",
         "name": "",
         "type": "address"
       },
       {
-        "internalType": "uint32",
+        "internalType": "enum ILongShort.MarketSide",
         "name": "",
-        "type": "uint32"
+        "type": "uint8"
       }
     ],
     "name": "_executeOutstandingLazyRedeemsMock",
@@ -187,35 +196,6 @@
         "internalType": "uint32",
         "name": "",
         "type": "uint32"
-      },
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "usersCurrentUpdateIndex",
-            "type": "uint256"
-          },
-          {
-            "components": [
-              {
-                "internalType": "uint256",
-                "name": "mintAmount",
-                "type": "uint256"
-              },
-              {
-                "internalType": "uint256",
-                "name": "mintAndStakeAmount",
-                "type": "uint256"
-              }
-            ],
-            "internalType": "struct LongShortMockable.NextActionValues[2]",
-            "name": "nextActionValues",
-            "type": "tuple[2]"
-          }
-        ],
-        "internalType": "struct LongShortMockable.UserLazyDeposit",
-        "name": "",
-        "type": "tuple"
       }
     ],
     "name": "_executeOutstandingLazySettlementsActionMock",
@@ -275,64 +255,6 @@
         "internalType": "enum ILongShort.MarketSide",
         "name": "",
         "type": "uint8"
-      }
-    ],
-    "name": "_getFeesForMintMock",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "name": "_getFeesForRedeemMock",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "",
-        "type": "uint8"
       },
       {
         "internalType": "enum ILongShort.MarketSide",
@@ -358,6 +280,29 @@
         "type": "uint256"
       }
     ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "_handleBatchedLazyRedeemMock",
+    "outputs": [],
     "stateMutability": "pure",
     "type": "function"
   },
@@ -395,9 +340,9 @@
     "name": "_minimumMock",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "int256",
         "name": "",
-        "type": "uint256"
+        "type": "int256"
       }
     ],
     "stateMutability": "pure",
@@ -439,75 +384,12 @@
         "type": "uint256"
       },
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
         "internalType": "enum ILongShort.MarketSide",
         "name": "",
         "type": "uint8"
       }
     ],
-    "name": "_mintMock",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "_priceChangeMechanismMock",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "didUpdate",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "name": "_redeemMock",
+    "name": "_redeemLazyMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -520,7 +402,7 @@
         "type": "uint32"
       }
     ],
-    "name": "_refreshTokensPriceMock",
+    "name": "_refreshTokenPricesMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -557,24 +439,6 @@
       }
     ],
     "name": "_transferFundsToYieldManagerMock",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "_transferToYieldManagerMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -631,12 +495,24 @@
         "type": "uint256"
       },
       {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
         "internalType": "address",
         "name": "",
         "type": "address"
       }
     ],
     "name": "_withdrawFundsMock",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "adminOnlyMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -649,15 +525,37 @@
         "type": "uint32"
       }
     ],
-    "name": "_yieldMechanismMock",
+    "name": "assertMarketExistsMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "adminOnlyMock",
-    "outputs": [],
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "name": "calculateRedeemPriceSnapshotMock",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "batchLongTotalWithdrawnPaymentToken",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "pure",
     "type": "function"
   },
@@ -723,37 +621,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "name": "doesMarketExistMock",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "name": "executeOutstandingLazyRedeemsMock",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "",
         "type": "address"
@@ -780,15 +647,58 @@
         "internalType": "uint32",
         "name": "",
         "type": "uint32"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "",
-        "type": "uint8"
       }
     ],
-    "name": "executeOutstandingLazySettlementsSynthMock",
+    "name": "executeOutstandingLazySettlementsUserMock",
     "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "getAmountPaymentTokenMock",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "getAmountSynthTokenMock",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "pure",
     "type": "function"
   },
@@ -835,6 +745,30 @@
         "internalType": "enum ILongShort.MarketSide",
         "name": "",
         "type": "uint8"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "getPriceMock",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "pure",
@@ -1039,65 +973,6 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "name": "mintAndStakeLazyMock",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "mintLongAndStakeLazyMock",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "mintLongAndStakeMock",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "name": "mintLongLazyMock",
@@ -1118,79 +993,7 @@
         "type": "uint256"
       }
     ],
-    "name": "mintLongMock",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "mintShortAndStakeLazyMock",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "mintShortAndStakeMock",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
     "name": "mintShortLazyMock",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "mintShortMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -1234,19 +1037,6 @@
         "internalType": "uint32",
         "name": "",
         "type": "uint32"
-      }
-    ],
-    "name": "redeemLongAllMock",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
       },
       {
         "internalType": "uint256",
@@ -1272,69 +1062,7 @@
         "type": "uint256"
       }
     ],
-    "name": "redeemLongMock",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "name": "redeemShortAllMock",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
     "name": "redeemShortLazyMock",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "redeemShortMock",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "name": "refreshSystemStateMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -1363,6 +1091,11 @@
         "internalType": "uint32",
         "name": "",
         "type": "uint32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "name": "snapshotPriceChangeForNextPriceExecutionMock",

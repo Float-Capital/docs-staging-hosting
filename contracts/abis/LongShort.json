@@ -45,7 +45,7 @@
   {
     "anonymous": false,
     "inputs": [],
-    "name": "ExecuteLazySettlementnsUser",
+    "name": "ExecuteNextPriceSettlementnsUser",
     "type": "event"
   },
   {

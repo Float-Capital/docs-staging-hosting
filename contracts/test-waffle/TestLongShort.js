@@ -33,7 +33,8 @@ Globals.describe("Float System")(undefined, undefined, undefined, (function (par
                 Globals.describe("_updateSystemState")(undefined, undefined, undefined, (function (param) {
                         
                       }));
-                return LazyDeposit.testIntegration(contracts, accounts);
+                LazyDeposit.testIntegration(contracts, accounts);
+                return LazyRedeem.testIntegration(contracts, accounts);
               }));
         return Globals.describe("LongShort - internals exposed")(undefined, undefined, undefined, (function (param) {
                       var contracts = {
@@ -54,21 +55,6 @@ Globals.describe("Float System")(undefined, undefined, undefined, (function (par
                                             var firstMarketPaymentToken = deployedContracts.markets[1].paymentToken;
                                             var testUser = accounts.contents[1];
                                             return LetOps.Await.let_(Contract.PaymentTokenHelpers.mintAndApprove(firstMarketPaymentToken, testUser, ethers.BigNumber.from("10000000000000000000000"), deployedContracts.longShort.address), (function (param) {
-                      Globals.describe("_updateSystemState")(undefined, undefined, undefined, (function (param) {
-                              
-                            }));
-                      LazyDeposit.testIntegration(contracts, accounts);
-                      LazyRedeem.testIntegration(contracts, accounts);
-                      return Globals.describe("LongShort - internals exposed")(undefined, undefined, undefined, (function (param) {
-                                    var contracts = {
-                                      contents: undefined
-                                    };
-                                    var accounts = {
-                                      contents: undefined
-                                    };
-                                    Globals.before$prime(undefined)(undefined, undefined, undefined, (function (param) {
-                                            return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
-                                                          accounts.contents = loadedAccounts;
                                                           
                                                         }));
                                           }));
