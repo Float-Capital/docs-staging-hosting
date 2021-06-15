@@ -9,8 +9,6 @@ module LongShort = {
       "function mintShort(uint32 marketIndex,uint256 amount) @770000",
       "function redeemLong(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
       "function redeemShort(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
-      "function mintLongAndStake(uint32 marketIndex, uint256 amount) @1000000",
-      "function mintShortAndStake(uint32 marketIndex, uint256 amount) @1000000",
       "function _updateSystemState()",
       "function longValue(uint32 marketIndex) public view returns (uint256)",
       "function shortValue(uint32 marketIndex) public view returns (uint256)",
@@ -43,18 +41,6 @@ module LongShort = {
     ~marketIndex: Ethers.BigNumber.t,
     ~tokensToRedeem: Ethers.BigNumber.t,
   ) => JsPromise.t<Ethers.txSubmitted> = "redeemShort"
-  @send
-  external mintShortAndStake: (
-    ~contract: t,
-    ~marketIndex: Ethers.BigNumber.t,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<Ethers.txSubmitted> = "mintShortAndStake"
-  @send
-  external mintLongAndStake: (
-    ~contract: t,
-    ~marketIndex: Ethers.BigNumber.t,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<Ethers.txSubmitted> = "mintLongAndStake"
   @send
   external _updateSystemState: (~contract: t) => JsPromise.t<Ethers.txSubmitted> =
     "_updateSystemState"
