@@ -15,7 +15,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - BatchedActionsSettled
-        - ExecuteNextPriceSettlementnsUser
+        - ExecuteNextPriceSettlementsUser
         - FeesChanges
         - FeesLevied
         - NewMarketLaunchedAndSeeded
@@ -33,8 +33,8 @@ dataSources:
       eventHandlers:
         - event: BatchedActionsSettled(uint32,uint256,uint256,uint256,uint256,uint256)
           handler: handleBatchedActionsSettled
-        - event: ExecuteNextPriceSettlementnsUser()
-          handler: handleExecuteNextPriceSettlementnsUser
+        - event: ExecuteNextPriceSettlementsUser()
+          handler: handleExecuteNextPriceSettlementsUser
         - event: FeesChanges(uint32,uint256,uint256,uint256,uint256)
           handler: handleFeesChanges
         - event: FeesLevied(uint32,uint256)

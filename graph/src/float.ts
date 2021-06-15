@@ -11,7 +11,7 @@ import {
   NewMarketLaunchedAndSeeded,
   NextPriceRedeem,
   BatchedActionsSettled,
-  ExecuteNextPriceSettlementnsUser,
+  ExecuteNextPriceSettlementsUser,
 } from "../generated/LongShort/LongShort";
 import {
   SyntheticMarket,
@@ -580,8 +580,8 @@ export function handleBatchedActionsSettled(
   // TODO
   // @chris please fill in the saveEventToStateChange for this function
 }
-export function handleExecuteNextPriceSettlementnsUser(
-  event: ExecuteNextPriceSettlementnsUser
+export function handleExecuteNextPriceSettlementsUser(
+  event: ExecuteNextPriceSettlementsUser
 ): void {
   // TODO
   // @chris please fill in the saveEventToStateChange for this function
