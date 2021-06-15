@@ -142,7 +142,24 @@ contract LongShort is ILongShort, Initializable {
         address user
     );
 
-    event LazyMinted(
+    event NextPriceRedeem(
+        uint32 marketIndex,
+        MarketSide syntheticTokenType,
+        uint256 synthRedeemed,
+        address user,
+        uint256 oracleUpdateIndex
+    );
+
+    event BatchedActionsSettled(
+        uint32 marketIndex,
+        uint256 updateIndex,
+        uint256 mintPriceSnapshotLong,
+        uint256 mintPriceSnapshotShort,
+        uint256 redeemPriceSnapshotLong,
+        uint256 redeemPriceSnapshotShort
+    );
+
+    event NextPriceDeposit(
         uint32 marketIndex,
         MarketSide syntheticTokenType,
         uint256 depositAdded,
@@ -163,6 +180,11 @@ contract LongShort is ILongShort, Initializable {
         address oldOracleAddress,
         address newOracleAddress
     );
+
+    event NewMarketLaunchedAndSeeded(uint32 marketIndex, uint256 initialSeed);
+
+    // QUESTION: are there any parameters that the graph should know about this?
+    event ExecuteLazySettlementnsUser();
 
     ////////////////////////////////////
     /////////// MODIFIERS //////////////
@@ -379,7 +401,7 @@ contract LongShort is ILongShort, Initializable {
             marketIndex
         ] = initialMarketSeed;
 
-        // TODO: add suitable event here! (something about initializing the market)
+        emit NewMarketLaunchedAndSeeded(marketIndex, initialMarketSeed);
     }
 
     function initializeMarket(
@@ -696,12 +718,10 @@ contract LongShort is ILongShort, Initializable {
         }
     }
 
-    function snapshotPriceChangeForNextPriceExecution(uint32 marketIndex)
-        internal
-    {
-        uint256 newLatestPriceStateIndex = latestUpdateIndex[marketIndex] + 1;
-        latestUpdateIndex[marketIndex] = newLatestPriceStateIndex;
-
+    function snapshotPriceChangeForNextPriceExecution(
+        uint32 marketIndex,
+        uint256 newLatestPriceStateIndex
+    ) internal {
         // NOTE: we can't just merge these two values since the 'yield' has an effect on the token price inbetween oracle updates.
         mintPriceSnapshot[marketIndex][newLatestPriceStateIndex][
             MarketSide.Long
@@ -761,11 +781,34 @@ contract LongShort is ILongShort, Initializable {
         assetPrice[marketIndex] = uint256(newAssetPrice);
 
         if (priceChanged) {
-            snapshotPriceChangeForNextPriceExecution(marketIndex);
+            uint256 newLatestPriceStateIndex =
+                latestUpdateIndex[marketIndex] + 1;
+            latestUpdateIndex[marketIndex] = newLatestPriceStateIndex;
+            snapshotPriceChangeForNextPriceExecution(
+                marketIndex,
+                newLatestPriceStateIndex
+            );
 
             handleBatchedDepositSettlement(marketIndex, MarketSide.Long);
             handleBatchedDepositSettlement(marketIndex, MarketSide.Short);
             handleBatchedLazyRedeems(marketIndex);
+
+            emit BatchedActionsSettled(
+                marketIndex,
+                newLatestPriceStateIndex,
+                mintPriceSnapshot[marketIndex][newLatestPriceStateIndex][
+                    MarketSide.Long
+                ],
+                mintPriceSnapshot[marketIndex][newLatestPriceStateIndex][
+                    MarketSide.Short
+                ],
+                redeemPriceSnapshot[marketIndex][newLatestPriceStateIndex][
+                    MarketSide.Long
+                ],
+                redeemPriceSnapshot[marketIndex][newLatestPriceStateIndex][
+                    MarketSide.Short
+                ]
+            );
         }
 
         emit ValueLockedInSystem(
@@ -1079,8 +1122,9 @@ contract LongShort is ILongShort, Initializable {
                 marketIndex,
                 currentlyPendingUserActions
             );
+
+            emit ExecuteLazySettlementnsUser();
         }
-        // TODO: add events
     }
 
     function executeOutstandingLazySettlementsUser(
@@ -1117,12 +1161,11 @@ contract LongShort is ILongShort, Initializable {
             latestUpdateIndex[marketIndex] +
             1;
 
-        emit LazyMinted(
+        emit NextPriceDeposit(
             marketIndex,
             syntheticTokenType,
             amount,
             msg.sender,
-            // batchedLazyPaymentTokenToDeposit[marketIndex][MarketSide.Long],
             latestUpdateIndex[marketIndex] + 1
         );
     }
@@ -1178,6 +1221,14 @@ contract LongShort is ILongShort, Initializable {
         batchedLazySynthToRedeem[marketIndex][
             syntheticTokenType
         ] += tokensToRedeem;
+
+        emit NextPriceRedeem(
+            marketIndex,
+            syntheticTokenType,
+            tokensToRedeem,
+            msg.sender,
+            latestUpdateIndex[marketIndex] + 1
+        );
     }
 
     function redeemLongLazy(uint32 marketIndex, uint256 tokensToRedeem)
