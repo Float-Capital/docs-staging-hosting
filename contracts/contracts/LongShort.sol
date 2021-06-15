@@ -17,8 +17,8 @@ import "./interfaces/IOracleManager.sol";
  * @dev {LongShort} contract:
  **** visit https://float.capital *****
  *  - Ability for users to create synthetic long and short positions on value movements
- *  - Value movements could be derived from tradional or alternative asset classes, derivates, binary outcomes, etc...
- *  - Incentive mechansim providing fees to liquidity makers (users on both sides of order book)
+ *  - Value movements could be derived from traditional or alternative asset classes, derivatives, binary outcomes, etc...
+ *  - Incentive mechanism providing fees to liquidity makers (users on both sides of order book)
  */
 contract LongShort is ILongShort, Initializable {
     ////////////////////////////////////
