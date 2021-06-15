@@ -508,7 +508,7 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
       "syntheticTokenType",
       "user",
     ],
-    ["uint256", "uint256", "uint256", "Fix me Chris", "fix me chris"],
+    ["uint256", "uint256", "uint256", "MarketSide", "address"],
     [userAddress],
     []
   );
@@ -562,7 +562,7 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
       "syntheticTokenType",
       "user",
     ],
-    ["uint256", "uint256", "uint256", "Fix me Chris", "fix me chris"],
+    ["uint256", "uint256", "uint256", "MarketSide", "address"],
     [userAddress],
     []
   );
