@@ -153,22 +153,25 @@ export function createUserNextPriceActionComponent(
 ): UserNextPriceActionComponent {
   let actionIndex = 0;
   let hasntFoundUnititializedIndex = true;
-  let userNextPriceActionComponent: UserNextPriceActionComponent | null;
+  let userNextPriceActionComponentId = "";
   // The user can have multiple NextPriceActions, even within the same block or of the same type (long/shrt) - this increments the index until it finds an empty one.
   //        Unbounded here, but the impracticality (and blockchain limitations) of the user creating many thousands of actions means this code is ok.
   while (hasntFoundUnititializedIndex) {
-    let userNextPriceActionComponentId = generateUserNextPriceActionComponentId(
+    userNextPriceActionComponentId = generateUserNextPriceActionComponentId(
       user.address,
       syntheticMarket.marketIndex,
       updateIndex,
       actionType,
       actionIndex
     );
-    userNextPriceActionComponent = UserNextPriceActionComponent.load(
+    let tempUserNextPriceActionComponent = UserNextPriceActionComponent.load(
       userNextPriceActionComponentId
     );
-    hasntFoundUnititializedIndex = userNextPriceActionComponent != null;
+    hasntFoundUnititializedIndex = tempUserNextPriceActionComponent != null;
   }
+  let userNextPriceActionComponent = new UserNextPriceActionComponent(
+    userNextPriceActionComponentId
+  );
 
   userNextPriceActionComponent.actionType = actionType;
   userNextPriceActionComponent.marketSide = syntheticTokenType;
@@ -194,10 +197,10 @@ export function createUserNextPriceActionComponent(
 
 export function createOrUpdateUserNextPriceAction(
   userNextPriceActionComponent: UserNextPriceActionComponent,
-  syntheticMarket: SyntheticMarket
+  syntheticMarket: SyntheticMarket,
+  user: User
 ): UserNextPriceAction {
-  let userAddress = Address.fromString(userNextPriceActionComponent.user);
-  let user = getUser(userAddress);
+  let userAddress = user.address;
   let marketIndex = userNextPriceActionComponent.marketIndex;
   let updateIndex = userNextPriceActionComponent.updateIndex;
   let associatedBatch = userNextPriceActionComponent.associatedBatch;
