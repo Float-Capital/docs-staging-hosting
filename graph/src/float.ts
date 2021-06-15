@@ -32,8 +32,7 @@ import {
   updateOrCreateCollateralToken,
   getOrCreateGlobalState,
   getStakerStateId,
-  getOrCreateBatchedNextPriceExec,
-  getOrUserNextPriceAction,
+  getOrCreateUser,
 } from "./utils/globalStateManager";
 import {
   createNewTokenDataSource,
@@ -47,6 +46,10 @@ import {
   TOKEN_FACTORY_ID,
   LONG_SHORT_ID,
 } from "./CONSTANTS";
+import {
+  createOrUpdateUserNextPriceAction,
+  getOrCreateBatchedNextPriceExec,
+} from "./utils/nextPrice";
 
 export function handleV1(event: V1): void {
   // event V1(address admin, address tokenFactory, address staker);
@@ -452,12 +455,13 @@ export function handleLazyMinted(event: LazyMinted): void {
   let oracleUpdateIndex = event.params.oracleUpdateIndex;
   let syntheticTokenTypeInt = event.params.syntheticTokenType;
   let syntheticTokenType = getMarketSideString(syntheticTokenTypeInt);
-  let user = event.params.user;
+  let userAddress = event.params.user;
 
   let batchedNextPriceExec = getOrCreateBatchedNextPriceExec(
     marketIndex,
     oracleUpdateIndex
   );
+  let user = getOrCreateUser(userAddress, event);
   let syntheticMarket = SyntheticMarket.load(marketIndexId);
   if (syntheticMarket == null) {
     log.critical(
@@ -466,19 +470,20 @@ export function handleLazyMinted(event: LazyMinted): void {
     );
   }
 
-  let userNextPriceAction = getOrUserNextPriceAction(
+  let userNextPriceAction = createOrUpdateUserNextPriceAction(
     user,
     syntheticMarket as SyntheticMarket,
-    oracleUpdateIndex
+    oracleUpdateIndex,
+    batchedNextPriceExec
   );
 
-  userNextPriceAction.amountPaymentTokenForDeposit = userNextPriceAction.amountPaymentTokenForDeposit.plus(
-    depositAdded
-  );
+  // batchedNextPriceExec.linkedUserNextPriceActions = batchedNextPriceExec.linkedUserNextPriceActions.concat(
+  //   [userNextPriceAction.id]
+  // );
 
-  batchedNextPriceExec.amountPaymentTokenForDeposit = batchedNextPriceExec.amountPaymentTokenForDeposit.plus(
-    depositAdded
-  );
+  // userNextPriceAction.amountPaymentTokenForDeposit = userNextPriceAction.amountPaymentTokenForDeposit.plus(
+  //   depositAdded
+  // );
 
   userNextPriceAction.save();
   batchedNextPriceExec.save();
@@ -490,7 +495,7 @@ export function handleLazyMinted(event: LazyMinted): void {
       depositAdded,
       marketIndex,
       oracleUpdateIndex,
-    ]).concat([syntheticTokenType, user.toHex()]),
+    ]).concat([syntheticTokenType, user.id]),
     [
       "depositAdded",
       "marketIndex",
@@ -499,7 +504,7 @@ export function handleLazyMinted(event: LazyMinted): void {
       "user",
     ],
     ["uint256", "uint256", "uint256", "Fix me Chris", "fix me chris"],
-    [],
+    [userAddress],
     []
   );
 }
