@@ -275,10 +275,31 @@ external updateMarketOracle: (
   ~newOracleManager: Ethers.ethAddress,
 ) => JsPromise.t<transaction> = "updateMarketOracle"
 
-type userLazyActionsReturn = Ethers.BigNumber.t
+type userCurrentLazyUpdateIndexReturn = Ethers.BigNumber.t
 @send
-external userLazyActions: (t, int, Ethers.ethAddress) => JsPromise.t<userLazyActionsReturn> =
-  "userLazyActions"
+external userCurrentLazyUpdateIndex: (
+  t,
+  int,
+  Ethers.ethAddress,
+) => JsPromise.t<userCurrentLazyUpdateIndexReturn> = "userCurrentLazyUpdateIndex"
+
+type userLazyDepositAmountsReturn = Ethers.BigNumber.t
+@send
+external userLazyDepositAmounts: (
+  t,
+  int,
+  Ethers.ethAddress,
+  int,
+) => JsPromise.t<userLazyDepositAmountsReturn> = "userLazyDepositAmounts"
+
+type userLazyRedemptionsReturn = Ethers.BigNumber.t
+@send
+external userLazyRedemptions: (
+  t,
+  int,
+  Ethers.ethAddress,
+  int,
+) => JsPromise.t<userLazyRedemptionsReturn> = "userLazyRedemptions"
 
 type yieldManagersReturn = Ethers.ethAddress
 @send
@@ -632,10 +653,31 @@ module Exposed = {
     ~newOracleManager: Ethers.ethAddress,
   ) => JsPromise.t<transaction> = "updateMarketOracle"
 
-  type userLazyActionsReturn = Ethers.BigNumber.t
+  type userCurrentLazyUpdateIndexReturn = Ethers.BigNumber.t
   @send
-  external userLazyActions: (t, int, Ethers.ethAddress) => JsPromise.t<userLazyActionsReturn> =
-    "userLazyActions"
+  external userCurrentLazyUpdateIndex: (
+    t,
+    int,
+    Ethers.ethAddress,
+  ) => JsPromise.t<userCurrentLazyUpdateIndexReturn> = "userCurrentLazyUpdateIndex"
+
+  type userLazyDepositAmountsReturn = Ethers.BigNumber.t
+  @send
+  external userLazyDepositAmounts: (
+    t,
+    int,
+    Ethers.ethAddress,
+    int,
+  ) => JsPromise.t<userLazyDepositAmountsReturn> = "userLazyDepositAmounts"
+
+  type userLazyRedemptionsReturn = Ethers.BigNumber.t
+  @send
+  external userLazyRedemptions: (
+    t,
+    int,
+    Ethers.ethAddress,
+    int,
+  ) => JsPromise.t<userLazyRedemptionsReturn> = "userLazyRedemptions"
 
   @send
   external withdrawFunds: (
