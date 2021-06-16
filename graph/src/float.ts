@@ -61,6 +61,7 @@ import {
   createOrUpdateUserNextPriceAction,
   createUserNextPriceActionComponent,
   createOrUpdateBatchedNextPriceExec,
+  generateBatchedNextPriceExecId,
 } from "./utils/nextPrice";
 
 export function handleV1(event: V1): void {
@@ -574,9 +575,62 @@ export function handleNewMarketLaunchedAndSeeded(
   // TODO - need to include the market seed initially
   // @chris please fill in the saveEventToStateChange for this function
 }
+
+export function removeFromArrayAtIndex(
+  array: Array<string>,
+  index: i32
+): Array<string> {
+  if (array.length > index && index > -1) {
+    return array.slice(0, index).concat(array.slice(index + 1, array.length));
+  } else {
+    return array;
+  }
+}
+
 export function handleBatchedActionsSettled(
   event: BatchedActionsSettled
 ): void {
+  /*
+        uint32 marketIndex,
+        uint256 updateIndex,
+        uint256 mintPriceSnapshotLong,
+        uint256 mintPriceSnapshotShort,
+        uint256 redeemPriceSnapshotLong,
+        uint256 redeemPriceSnapshotShort
+  */
+  let marketIndex = event.params.marketIndex;
+  let updateIndex = event.params.updateIndex;
+  let mintPriceSnapshotLong = event.params.mintPriceSnapshotLong;
+  let mintPriceSnapshotShort = event.params.mintPriceSnapshotShort;
+  let redeemPriceSnapshotLong = event.params.redeemPriceSnapshotLong;
+  let redeemPriceSnapshotShort = event.params.redeemPriceSnapshotShort;
+
+  let executedTimestamp = event.block.timestamp;
+
+  let batchedNextPriceExec = getBatchedNextPriceExec(marketIndex, updateIndex);
+
+  batchedNextPriceExec.mintPriceSnapshot = mintPriceSnapshotLong;
+  batchedNextPriceExec.redeemPriceSnapshot = batchedNextPriceExec;
+  batchedNextPriceExec.executedTimestamp = executedTimestamp;
+  batchedNextPriceExec.linkedUserNextPriceActions = batchedNextPriceExec;
+
+  let numberOfUsersInBatch =
+    batchedNextPriceExec.linkedUserNextPriceActions.length;
+
+  for (let i = 0; i < numberOfUsersInBatch; i++) {
+    let userNextPriceActionId = batchedNextPriceExec.linkedUserNextPriceAction;
+
+    let userNextPriceAction = getUserNextPriceAction(userNextPriceActionId);
+    
+    let user = getUser(userNextPriceAction.user);
+
+    user.pendingNextPriceActions = removeFromArrayAtIndex(indexOf(userNextPriceActionId))
+
+    linkedUserNextPriceAction[i];
+    user.confirmedNextPriceActions = ;
+
+    // user.
+  }
   // TODO
   // @chris please fill in the saveEventToStateChange for this function
 }

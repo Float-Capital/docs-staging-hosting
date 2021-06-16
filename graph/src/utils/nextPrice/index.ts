@@ -78,8 +78,10 @@ export function createOrUpdateBatchedNextPriceExec(
     batchedNextPriceExec.amountPaymentTokenForDepositShort = ZERO;
     batchedNextPriceExec.amountSynthTokenForWithdrawalLong = ZERO;
     batchedNextPriceExec.amountSynthTokenForWithdrawalShort = ZERO;
-    batchedNextPriceExec.mintPriceSnapshot = ZERO;
-    batchedNextPriceExec.redeemPriceSnapshot = ZERO;
+    batchedNextPriceExec.mintPriceSnapshotLong = ZERO;
+    batchedNextPriceExec.mintPriceSnapshotShort = ZERO;
+    batchedNextPriceExec.redeemPriceSnapshotLong = ZERO;
+    batchedNextPriceExec.redeemPriceSnapshotShort = ZERO;
     batchedNextPriceExec.executedTimestamp = ZERO;
     batchedNextPriceExec.linkedUserNextPriceActions = [];
     batchedNextPriceExec.save();
@@ -140,6 +142,37 @@ export function createOrUpdateBatchedNextPriceExec(
   }
 
   return batchedNextPriceExec as BatchedNextPriceExec;
+}
+export function getBatchedNextPriceExec(
+  marketIndex: BigInt,
+  updateIndex: BigInt
+): BatchedNextPriceExec {
+  let batchedNextPriceExecId = generateBatchedNextPriceExecId(
+    marketIndex,
+    updateIndex
+  );
+  let batchedNextPriceExec = BatchedNextPriceExec.load(batchedNextPriceExecId);
+  if (batchedNextPriceExec == null) {
+    log.warning(
+      "error: BatchedNextPriceExec doesn't exist, make sure `createOrUpdateBatchedNextPriceExec` has already been executed. entityId: {}",
+      [batchedNextPriceExecId]
+    );
+  }
+
+  return batchedNextPriceExec as BatchedNextPriceExec;
+}
+export function getUserNextPriceActionById(
+  userNextPriceActionId: string
+): UserNextPriceAction {
+  let userNextPriceAction = UserNextPriceAction.load(userNextPriceActionId);
+  if (userNextPriceAction == null) {
+    log.warning(
+      "error: UserNextPriceAction doesn't exist, make sure `createOrUpdateUserNextPriceAction` has already been executed. entityId: {}",
+      [userNextPriceActionId]
+    );
+  }
+
+  return userNextPriceAction as UserNextPriceAction;
 }
 
 export function createUserNextPriceActionComponent(
