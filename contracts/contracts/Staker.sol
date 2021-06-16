@@ -285,15 +285,14 @@ contract Staker is IStaker, Initializable {
      * earns per second for every longshort token they've staked. The returned
      * value has a fixed decimal scale of 1e42 (!!!) for numerical stability.
      */
-    // TODO: should be an internal function (only a javascript test using this function, )
     function calculateFloatPerSecond(
-        uint256 longValue,
-        uint256 shortValue,
+        uint32 marketIndex,
         uint256 longPrice,
         uint256 shortPrice,
-        uint32 marketIndex
+        uint256 longValue,
+        uint256 shortValue
     )
-        public
+        internal
         view
         returns (uint256 longFloatPerSecond, uint256 shortFloatPerSecond)
     {
@@ -337,11 +336,11 @@ contract Staker is IStaker, Initializable {
      * cumulative sum is kept in 1e42 scale (!!!) to avoid numerical issues.
      */
     function calculateNewCumulativeRate(
-        uint256 longValue,
-        uint256 shortValue,
+        uint32 marketIndex,
         uint256 longPrice,
         uint256 shortPrice,
-        uint32 marketIndex
+        uint256 longValue,
+        uint256 shortValue
     )
         internal
         view
@@ -350,11 +349,11 @@ contract Staker is IStaker, Initializable {
         // Compute the current 'r' value for float issuance per second.
         (uint256 longFloatPerSecond, uint256 shortFloatPerSecond) =
             calculateFloatPerSecond(
-                longValue,
-                shortValue,
+                marketIndex,
                 longPrice,
                 shortPrice,
-                marketIndex
+                longValue,
+                shortValue
             );
 
         // Compute time since last state point for the given token.
@@ -375,19 +374,19 @@ contract Staker is IStaker, Initializable {
      * Creates a new state point for the given token and updates indexes.
      */
     function setRewardObjects(
-        uint256 longValue,
-        uint256 shortValue,
+        uint32 marketIndex,
         uint256 longPrice,
         uint256 shortPrice,
-        uint32 marketIndex
+        uint256 longValue,
+        uint256 shortValue
     ) internal {
         (uint256 longAccumulativeRates, uint256 shortAccumulativeRates) =
             calculateNewCumulativeRate(
-                longValue,
-                shortValue,
+                marketIndex,
                 longPrice,
                 shortPrice,
-                marketIndex
+                longValue,
+                shortValue
             );
 
         uint256 newIndex = latestRewardIndex[marketIndex] + 1;
@@ -429,13 +428,12 @@ contract Staker is IStaker, Initializable {
 
         // Time delta is fetched twice in below code, can pass through? Which is less gas?
         if (calculateTimeDelta(marketIndex) > 0) {
-            // TODO: for consistancy, all functions should follow same order
             setRewardObjects(
-                longValue,
-                shortValue,
+                marketIndex,
                 longPrice,
                 shortPrice,
-                marketIndex
+                longValue,
+                shortValue
             );
         }
     }
