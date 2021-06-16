@@ -17,17 +17,17 @@ external _adjustMarketBasedOnNewAssetPriceMock: (
 ) => JsPromise.t<_adjustMarketBasedOnNewAssetPriceMockReturn> =
   "_adjustMarketBasedOnNewAssetPriceMock"
 
-type _calculateBatchedLazyFeesMockReturn = {
+type _calculateBatchedNextPriceFeesMockReturn = {
   totalFeesLong: Ethers.BigNumber.t,
   totalFeesShort: Ethers.BigNumber.t,
 }
 @send
-external _calculateBatchedLazyFeesMock: (
+external _calculateBatchedNextPriceFeesMock: (
   t,
   int,
   Ethers.BigNumber.t,
   Ethers.BigNumber.t,
-) => JsPromise.t<_calculateBatchedLazyFeesMockReturn> = "_calculateBatchedLazyFeesMock"
+) => JsPromise.t<_calculateBatchedNextPriceFeesMockReturn> = "_calculateBatchedNextPriceFeesMock"
 
 type _changeFeesMockReturn
 @send
@@ -58,41 +58,43 @@ external _distributeMarketAmountMock: (
   Ethers.BigNumber.t,
 ) => JsPromise.t<_distributeMarketAmountMockReturn> = "_distributeMarketAmountMock"
 
-type _executeLazyMintsIfTheyExistMockReturn
+type _executeNextPriceMintsIfTheyExistMockReturn
 @send
-external _executeLazyMintsIfTheyExistMock: (
+external _executeNextPriceMintsIfTheyExistMock: (
   t,
   int,
   Ethers.ethAddress,
   int,
-) => JsPromise.t<_executeLazyMintsIfTheyExistMockReturn> = "_executeLazyMintsIfTheyExistMock"
+) => JsPromise.t<_executeNextPriceMintsIfTheyExistMockReturn> =
+  "_executeNextPriceMintsIfTheyExistMock"
 
-type _executeOutstandingLazyRedeemsMockReturn
+type _executeOutstandingNextPriceRedeemsMockReturn
 @send
-external _executeOutstandingLazyRedeemsMock: (
+external _executeOutstandingNextPriceRedeemsMock: (
   t,
   int,
   Ethers.ethAddress,
   int,
-) => JsPromise.t<_executeOutstandingLazyRedeemsMockReturn> = "_executeOutstandingLazyRedeemsMock"
+) => JsPromise.t<_executeOutstandingNextPriceRedeemsMockReturn> =
+  "_executeOutstandingNextPriceRedeemsMock"
 
-type _executeOutstandingLazySettlementsActionMockReturn
+type _executeOutstandingNextPriceSettlementsActionMockReturn
 @send
-external _executeOutstandingLazySettlementsActionMock: (
+external _executeOutstandingNextPriceSettlementsActionMock: (
   t,
   Ethers.ethAddress,
   int,
-) => JsPromise.t<_executeOutstandingLazySettlementsActionMockReturn> =
-  "_executeOutstandingLazySettlementsActionMock"
+) => JsPromise.t<_executeOutstandingNextPriceSettlementsActionMockReturn> =
+  "_executeOutstandingNextPriceSettlementsActionMock"
 
-type _executeOutstandingLazySettlementsMockReturn
+type _executeOutstandingNextPriceSettlementsMockReturn
 @send
-external _executeOutstandingLazySettlementsMock: (
+external _executeOutstandingNextPriceSettlementsMock: (
   t,
   Ethers.ethAddress,
   int,
-) => JsPromise.t<_executeOutstandingLazySettlementsMockReturn> =
-  "_executeOutstandingLazySettlementsMock"
+) => JsPromise.t<_executeOutstandingNextPriceSettlementsMockReturn> =
+  "_executeOutstandingNextPriceSettlementsMock"
 
 type _feesMechanismMockReturn
 @send
@@ -111,14 +113,14 @@ external _getFeesGeneralMock: (
   Ethers.BigNumber.t,
 ) => JsPromise.t<_getFeesGeneralMockReturn> = "_getFeesGeneralMock"
 
-type _handleBatchedLazyRedeemMockReturn
+type _handleBatchedNextPriceRedeemMockReturn
 @send
-external _handleBatchedLazyRedeemMock: (
+external _handleBatchedNextPriceRedeemMock: (
   t,
   int,
   int,
   Ethers.BigNumber.t,
-) => JsPromise.t<_handleBatchedLazyRedeemMockReturn> = "_handleBatchedLazyRedeemMock"
+) => JsPromise.t<_handleBatchedNextPriceRedeemMockReturn> = "_handleBatchedNextPriceRedeemMock"
 
 type _lockFundsInMarketMockReturn
 @send
@@ -136,15 +138,23 @@ external _minimumMock: (
   Ethers.BigNumber.t,
 ) => JsPromise.t<_minimumMockReturn> = "_minimumMock"
 
-type _mintLazyMockReturn
+type _mintNextPriceMockReturn
 @send
-external _mintLazyMock: (t, int, Ethers.BigNumber.t, int) => JsPromise.t<_mintLazyMockReturn> =
-  "_mintLazyMock"
+external _mintNextPriceMock: (
+  t,
+  int,
+  Ethers.BigNumber.t,
+  int,
+) => JsPromise.t<_mintNextPriceMockReturn> = "_mintNextPriceMock"
 
-type _redeemLazyMockReturn
+type _redeemNextPriceMockReturn
 @send
-external _redeemLazyMock: (t, int, Ethers.BigNumber.t, int) => JsPromise.t<_redeemLazyMockReturn> =
-  "_redeemLazyMock"
+external _redeemNextPriceMock: (
+  t,
+  int,
+  Ethers.BigNumber.t,
+  int,
+) => JsPromise.t<_redeemNextPriceMockReturn> = "_redeemNextPriceMock"
 
 type _refreshTokenPricesMockReturn
 @send
@@ -235,23 +245,23 @@ type changeTreasuryMockReturn
 external changeTreasuryMock: (t, Ethers.ethAddress) => JsPromise.t<changeTreasuryMockReturn> =
   "changeTreasuryMock"
 
-type executeOutstandingLazySettlementsMockReturn
+type executeOutstandingNextPriceSettlementsMockReturn
 @send
-external executeOutstandingLazySettlementsMock: (
+external executeOutstandingNextPriceSettlementsMock: (
   t,
   Ethers.ethAddress,
   int,
-) => JsPromise.t<executeOutstandingLazySettlementsMockReturn> =
-  "executeOutstandingLazySettlementsMock"
+) => JsPromise.t<executeOutstandingNextPriceSettlementsMockReturn> =
+  "executeOutstandingNextPriceSettlementsMock"
 
-type executeOutstandingLazySettlementsUserMockReturn
+type executeOutstandingNextPriceSettlementsUserMockReturn
 @send
-external executeOutstandingLazySettlementsUserMock: (
+external executeOutstandingNextPriceSettlementsUserMock: (
   t,
   Ethers.ethAddress,
   int,
-) => JsPromise.t<executeOutstandingLazySettlementsUserMockReturn> =
-  "executeOutstandingLazySettlementsUserMock"
+) => JsPromise.t<executeOutstandingNextPriceSettlementsUserMockReturn> =
+  "executeOutstandingNextPriceSettlementsUserMock"
 
 type getAmountPaymentTokenMockReturn = Ethers.BigNumber.t
 @send
@@ -318,10 +328,12 @@ external handleBatchedDepositSettlementMock: (
   int,
 ) => JsPromise.t<handleBatchedDepositSettlementMockReturn> = "handleBatchedDepositSettlementMock"
 
-type handleBatchedLazyRedeemsMockReturn
+type handleBatchedNextPriceRedeemsMockReturn
 @send
-external handleBatchedLazyRedeemsMock: (t, int) => JsPromise.t<handleBatchedLazyRedeemsMockReturn> =
-  "handleBatchedLazyRedeemsMock"
+external handleBatchedNextPriceRedeemsMock: (
+  t,
+  int,
+) => JsPromise.t<handleBatchedNextPriceRedeemsMockReturn> = "handleBatchedNextPriceRedeemsMock"
 
 type initializeMarketMockReturn
 @send
@@ -356,15 +368,21 @@ external isCorrectSynthMock: (
   Ethers.ethAddress,
 ) => JsPromise.t<isCorrectSynthMockReturn> = "isCorrectSynthMock"
 
-type mintLongLazyMockReturn
+type mintLongNextPriceMockReturn
 @send
-external mintLongLazyMock: (t, int, Ethers.BigNumber.t) => JsPromise.t<mintLongLazyMockReturn> =
-  "mintLongLazyMock"
+external mintLongNextPriceMock: (
+  t,
+  int,
+  Ethers.BigNumber.t,
+) => JsPromise.t<mintLongNextPriceMockReturn> = "mintLongNextPriceMock"
 
-type mintShortLazyMockReturn
+type mintShortNextPriceMockReturn
 @send
-external mintShortLazyMock: (t, int, Ethers.BigNumber.t) => JsPromise.t<mintShortLazyMockReturn> =
-  "mintShortLazyMock"
+external mintShortNextPriceMock: (
+  t,
+  int,
+  Ethers.BigNumber.t,
+) => JsPromise.t<mintShortNextPriceMockReturn> = "mintShortNextPriceMock"
 
 type newSyntheticMarketMockReturn
 @send
@@ -377,18 +395,21 @@ external newSyntheticMarketMock: (
   Ethers.ethAddress,
 ) => JsPromise.t<newSyntheticMarketMockReturn> = "newSyntheticMarketMock"
 
-type redeemLongLazyMockReturn
+type redeemLongNextPriceMockReturn
 @send
-external redeemLongLazyMock: (t, int, Ethers.BigNumber.t) => JsPromise.t<redeemLongLazyMockReturn> =
-  "redeemLongLazyMock"
-
-type redeemShortLazyMockReturn
-@send
-external redeemShortLazyMock: (
+external redeemLongNextPriceMock: (
   t,
   int,
   Ethers.BigNumber.t,
-) => JsPromise.t<redeemShortLazyMockReturn> = "redeemShortLazyMock"
+) => JsPromise.t<redeemLongNextPriceMockReturn> = "redeemLongNextPriceMock"
+
+type redeemShortNextPriceMockReturn
+@send
+external redeemShortNextPriceMock: (
+  t,
+  int,
+  Ethers.BigNumber.t,
+) => JsPromise.t<redeemShortNextPriceMockReturn> = "redeemShortNextPriceMock"
 
 type seedMarketInitiallyMockReturn
 @send
