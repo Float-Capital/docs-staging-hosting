@@ -66,6 +66,7 @@ import {
   createOrUpdateBatchedNextPriceExec,
   getBatchedNextPriceExec,
   getUserNextPriceActionById,
+  getUsersCurrentNextPriceAction,
 } from "./utils/nextPrice";
 
 export function handleV1(event: V1): void {
@@ -427,15 +428,20 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
   userNextPriceAction.save();
   batchedNextPriceExec.save();
 
-  /*
-// TODO: integrate this function into `handleNextPriceDeposit`
-decreaseOrCreateUserApprovals(
-  userAddress,
-  event.params.depositAdded,
-  collateralToken,
-  event
-);
-*/
+  let collateralToken = CollateralToken.load(syntheticMarket.collateralToken);
+  if (collateralToken == null) {
+    log.critical(
+      "collateralToken is undefined when it shouldn't be, entity id: {}",
+      [syntheticMarket.collateralToken]
+    );
+  }
+
+  decreaseOrCreateUserApprovals(
+    userAddress,
+    event.params.depositAdded,
+    collateralToken,
+    event
+  );
 
   saveEventToStateChange(
     event,
@@ -609,9 +615,34 @@ export function handleBatchedActionsSettled(
   // TODO
   // @chris please fill in the saveEventToStateChange for this function
 }
+
 export function handleExecuteNextPriceSettlementsUser(
   event: ExecuteNextPriceSettlementsUser
 ): void {
+  let marketIndex = event.params.marketIndex;
+  let userAddress = event.params.user;
+
+  let userNextPriceAction = getUsersCurrentNextPriceAction(
+    userAddress,
+    marketIndex
+  );
+
+  userNextPriceAction.settledTimestamp = event.block.timestamp;
+  userNextPriceAction.save();
+
+  let user = getUser(userAddress);
+
+  user.confirmedNextPriceActions = removeFromArrayAtIndex(
+    user.confirmedNextPriceActions,
+    user.confirmedNextPriceActions.indexOf(userNextPriceAction.id)
+  );
+
+  user.settledNextPriceActions = user.settledNextPriceActions.concat([
+    userNextPriceAction.id,
+  ]);
+
+  user.save();
+
   // TODO
   // @chris please fill in the saveEventToStateChange for this function
 }

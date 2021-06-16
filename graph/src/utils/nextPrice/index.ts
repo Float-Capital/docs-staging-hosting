@@ -5,6 +5,7 @@ import {
   User,
   UserNextPriceAction,
   UserNextPriceActionComponent,
+  UsersCurrentNextPriceAction,
 } from "../../../generated/schema";
 import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import { ACTION_MINT, MARKET_SIDE_LONG, ZERO } from "../../CONSTANTS";
@@ -32,6 +33,34 @@ function generateBatchedNextPriceExecId(
 }
 function getNetxBatchedNextPriceExecId(marketIndex: BigInt): string {
   return "nextBatch-" + marketIndex.toString();
+}
+function getUsersCurrentNextPriceActionId(
+  userAddress: Bytes,
+  marketIndex: BigInt
+): string {
+  return (
+    "userCurrentAction-" + marketIndex.toString() + "-" + userAddress.toHex()
+  );
+}
+
+export function getUsersCurrentNextPriceAction(
+  userAddress: Bytes,
+  marketIndex: BigInt
+): UserNextPriceAction {
+  let usersCurrentNextPriceActionId = getUsersCurrentNextPriceActionId(
+    userAddress,
+    marketIndex
+  );
+  let usersCurrentNextPriceAction = UsersCurrentNextPriceAction.load(
+    usersCurrentNextPriceActionId
+  );
+  if (usersCurrentNextPriceAction == null) {
+    log.critical("The UsersCurrentNextPriceAction is undefined with id {}", [
+      usersCurrentNextPriceActionId,
+    ]);
+  }
+
+  return getUserNextPriceActionById(usersCurrentNextPriceAction.currentAction);
 }
 
 function generateUserNextPriceActionComponentId(
@@ -86,7 +115,7 @@ export function createOrUpdateBatchedNextPriceExec(
     batchedNextPriceExec.linkedUserNextPriceActions = [];
     batchedNextPriceExec.save();
 
-    // TODO: move this externally to its own getter (avoid race conditions)
+    // TODO: move this externally to its own getter (avoid even a remote change of race conditions)
     let nextBatchedNextPriceExecId = getNetxBatchedNextPriceExecId(marketIndex);
     let nextBatchedNextPriceExec = NextBatchedNextPriceExec.load(
       nextBatchedNextPriceExecId
@@ -143,6 +172,7 @@ export function createOrUpdateBatchedNextPriceExec(
 
   return batchedNextPriceExec as BatchedNextPriceExec;
 }
+
 export function getBatchedNextPriceExec(
   marketIndex: BigInt,
   updateIndex: BigInt
@@ -161,6 +191,7 @@ export function getBatchedNextPriceExec(
 
   return batchedNextPriceExec as BatchedNextPriceExec;
 }
+
 export function getUserNextPriceActionById(
   userNextPriceActionId: string
 ): UserNextPriceAction {
@@ -273,6 +304,24 @@ export function createOrUpdateUserNextPriceAction(
     user.pendingNextPriceActions = user.pendingNextPriceActions.concat([
       userNextPriceAction.id,
     ]);
+
+    // TODO: move this externally to its own getter (avoid even a remote change of race conditions)
+    let usersCurrentNextPriceActionId = getUsersCurrentNextPriceActionId(
+      userAddress,
+      marketIndex
+    );
+    let usersCurrentNextPriceAction = UsersCurrentNextPriceAction.load(
+      usersCurrentNextPriceActionId
+    );
+    if (usersCurrentNextPriceAction == null) {
+      usersCurrentNextPriceAction = new UsersCurrentNextPriceAction(
+        usersCurrentNextPriceActionId
+      );
+    }
+    usersCurrentNextPriceAction.currentAction = userNextPriceAction.id;
+    usersCurrentNextPriceAction.currentUpdateIndex = updateIndex;
+
+    usersCurrentNextPriceAction.save();
 
     user.save();
   }
