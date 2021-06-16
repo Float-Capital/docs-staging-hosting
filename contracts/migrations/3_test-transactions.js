@@ -114,10 +114,10 @@ const deployTestMarket = async (
   );
 }
 
-const mintShortLazyWithSystemUpdate = async (amount, marketIndex, paymentToken, longShort, user, oracleManager) => {
+const mintShortNextPriceWithSystemUpdate = async (amount, marketIndex, paymentToken, longShort, user, oracleManager) => {
   await mintAndApprove(paymentToken, amount, user, longShort.address);
 
-  await longShort.mintShortLazy(marketIndex, new BN(amount), {
+  await longShort.mintShortNextPrice(marketIndex, new BN(amount), {
     from: user,
   });
 
@@ -128,10 +128,10 @@ const mintShortLazyWithSystemUpdate = async (amount, marketIndex, paymentToken, 
   await longShort._updateSystemState(marketIndex);
 }
 
-const mintLongLazyWithSystemUpdate = async (amount, marketIndex, paymentToken, longShort, user, oracleManager) => {
+const mintLongNextPriceWithSystemUpdate = async (amount, marketIndex, paymentToken, longShort, user, oracleManager) => {
   await mintAndApprove(paymentToken, amount, user, longShort.address);
 
-  await longShort.mintLongLazy(marketIndex, new BN(amount), {
+  await longShort.mintLongNextPrice(marketIndex, new BN(amount), {
     from: user,
   });
 
@@ -259,14 +259,14 @@ module.exports = async function (deployer, network, accounts) {
     const oracleManagerAddr = await longShort.oracleManagers.call(marketIndex);
     const oracleManager = await OracleManagerMock.at(oracleManagerAddr);
 
-    await mintLongLazyWithSystemUpdate(tenMintAmount, marketIndex, token, longShort, user1, oracleManager)
-    await mintLongLazyWithSystemUpdate(tenMintAmount, marketIndex, token, longShort, user2, oracleManager)
-    await mintLongLazyWithSystemUpdate(tenMintAmount, marketIndex, token, longShort, user3, oracleManager)
+    await mintLongNextPriceWithSystemUpdate(tenMintAmount, marketIndex, token, longShort, user1, oracleManager)
+    await mintLongNextPriceWithSystemUpdate(tenMintAmount, marketIndex, token, longShort, user2, oracleManager)
+    await mintLongNextPriceWithSystemUpdate(tenMintAmount, marketIndex, token, longShort, user3, oracleManager)
 
     const halfTokensMinted = new BN(tenMintAmount).div(new BN(2));
-    await mintShortLazyWithSystemUpdate(halfTokensMinted, marketIndex, token, longShort, user1, oracleManager)
-    await mintShortLazyWithSystemUpdate(halfTokensMinted, marketIndex, token, longShort, user2, oracleManager)
-    await mintShortLazyWithSystemUpdate(halfTokensMinted, marketIndex, token, longShort, user3, oracleManager)
+    await mintShortNextPriceWithSystemUpdate(halfTokensMinted, marketIndex, token, longShort, user1, oracleManager)
+    await mintShortNextPriceWithSystemUpdate(halfTokensMinted, marketIndex, token, longShort, user2, oracleManager)
+    await mintShortNextPriceWithSystemUpdate(halfTokensMinted, marketIndex, token, longShort, user3, oracleManager)
 
     /* // Increase mock oracle price from 1 (default) to 1.1.
     if (network != "mumbai") await oracleManager.setPrice(onePointOne);

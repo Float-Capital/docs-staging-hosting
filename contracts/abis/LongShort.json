@@ -594,7 +594,7 @@
         "type": "uint8"
       }
     ],
-    "name": "batchedLazyPaymentTokenToDeposit",
+    "name": "batchedNextPricePaymentTokenToDeposit",
     "outputs": [
       {
         "internalType": "uint256",
@@ -618,7 +618,7 @@
         "type": "uint8"
       }
     ],
-    "name": "batchedLazySynthToRedeem",
+    "name": "batchedNextPriceSynthToRedeem",
     "outputs": [
       {
         "internalType": "uint256",
@@ -701,7 +701,7 @@
         "type": "uint32"
       }
     ],
-    "name": "executeOutstandingLazySettlementsUser",
+    "name": "executeOutstandingNextPriceSettlementsUser",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -965,7 +965,7 @@
         "type": "uint256"
       }
     ],
-    "name": "mintLongLazy",
+    "name": "mintLongNextPrice",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1012,7 +1012,7 @@
         "type": "uint256"
       }
     ],
-    "name": "mintShortLazy",
+    "name": "mintShortNextPrice",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1082,7 +1082,7 @@
         "type": "uint256"
       }
     ],
-    "name": "redeemLongLazy",
+    "name": "redeemLongNextPrice",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1129,7 +1129,7 @@
         "type": "uint256"
       }
     ],
-    "name": "redeemShortLazy",
+    "name": "redeemShortNextPrice",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1327,7 +1327,7 @@
         "type": "address"
       }
     ],
-    "name": "userCurrentLazyUpdateIndex",
+    "name": "userCurrentNextPriceUpdateIndex",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1356,7 +1356,7 @@
         "type": "uint8"
       }
     ],
-    "name": "userLazyDepositAmounts",
+    "name": "userNextPriceDepositAmounts",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1385,7 +1385,7 @@
         "type": "uint8"
       }
     ],
-    "name": "userLazyRedemptions",
+    "name": "userNextPriceRedemptions",
     "outputs": [
       {
         "internalType": "uint256",

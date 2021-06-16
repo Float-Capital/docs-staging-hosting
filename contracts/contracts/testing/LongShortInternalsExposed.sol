@@ -7,9 +7,9 @@ NOTE: This contract is for testing purposes only!
 */
 
 contract LongShortInternalsExposed is LongShortMockable {
-    bool overRideexecuteOutstandingLazySettlements;
+    bool overRideexecuteOutstandingNextPriceSettlements;
 
-    event executeOutstandingLazySettlementsMock(
+    event executeOutstandingNextPriceSettlementsMock(
         address _user,
         uint32 _marketIndex
     );
@@ -33,26 +33,28 @@ contract LongShortInternalsExposed is LongShortMockable {
         );
     }
 
-    function setUseexecuteOutstandingLazySettlementsMock(bool shouldUseMock)
-        public
-    {
-        overRideexecuteOutstandingLazySettlements = shouldUseMock;
+    function setUseexecuteOutstandingNextPriceSettlementsMock(
+        bool shouldUseMock
+    ) public {
+        overRideexecuteOutstandingNextPriceSettlements = shouldUseMock;
     }
 
-    function _executeOutstandingLazySettlementsMock(
+    function _executeOutstandingNextPriceSettlementsMock(
         address _user,
         uint32 _marketIndex
     ) internal {
-        emit executeOutstandingLazySettlementsMock(_user, _marketIndex);
+        emit executeOutstandingNextPriceSettlementsMock(_user, _marketIndex);
     }
 
-    modifier executeOutstandingLazySettlements(address user, uint32 marketIndex)
-        override {
-        if (overRideexecuteOutstandingLazySettlements) {
+    modifier executeOutstandingNextPriceSettlements(
+        address user,
+        uint32 marketIndex
+    ) override {
+        if (overRideexecuteOutstandingNextPriceSettlements) {
             // TODO: put a mock here?
-            _executeOutstandingLazySettlementsMock(user, marketIndex);
+            _executeOutstandingNextPriceSettlementsMock(user, marketIndex);
         } else {
-            _executeOutstandingLazySettlements(user, marketIndex);
+            _executeOutstandingNextPriceSettlements(user, marketIndex);
         }
 
         _;
@@ -110,10 +112,10 @@ contract LongShortInternalsExposed is LongShortMockable {
         _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
     }
 
-    function _executeOutstandingLazySettlementsExposed(
+    function _executeOutstandingNextPriceSettlementsExposed(
         address user,
         uint32 marketIndex
     ) external {
-        _executeOutstandingLazySettlements(user, marketIndex);
+        _executeOutstandingNextPriceSettlements(user, marketIndex);
     }
 }

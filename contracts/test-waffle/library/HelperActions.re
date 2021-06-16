@@ -25,11 +25,11 @@ let mintDirect =
   let _ =
     oracleManagerMock->OracleManagerMock.setPrice(~newPrice=tempOraclePrice);
   let%AwaitThen _ = contract->LongShort._updateSystemState(~marketIndex);
-  let%AwaitThen _mintLazy =
+  let%AwaitThen _mintNextPrice =
     if (isLong) {
-      contract->LongShort.mintLongLazy(~marketIndex, ~amount);
+      contract->LongShort.mintLongNextPrice(~marketIndex, ~amount);
     } else {
-      contract->LongShort.mintShortLazy(~marketIndex, ~amount);
+      contract->LongShort.mintShortNextPrice(~marketIndex, ~amount);
     };
   // NOTE: this code changes the oracle price then resets it back to the original value which should the same value (for the sake of simplicity in the tests)
   let _ =
