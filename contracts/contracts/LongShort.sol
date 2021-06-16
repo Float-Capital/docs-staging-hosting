@@ -235,6 +235,12 @@ contract LongShort is ILongShort, Initializable {
         _;
     }
 
+    modifier updateSystemStateMarket(uint32 marketIndex) {
+        _updateSystemStateInternal(marketIndex);
+
+        _;
+    }
+
     ////////////////////////////////////
     ///// CONTRACT SET-UP //////////////
     ////////////////////////////////////
@@ -759,34 +765,35 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokenBackedValue[MarketSide.Short][marketIndex]
         );
 
-        assert(
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] != 0 &&
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex] != 0
-        );
-
-        // Distibute accrued yield first based on current liquidity before price update
-        _claimAndDistributeYield(marketIndex);
-
         // If a negative int is return this should fail.
         int256 newAssetPrice = oracleManagers[marketIndex].updatePrice();
-
-        // TODO STENT move this into the price function
-        emit PriceUpdate(
-            marketIndex,
-            assetPrice[marketIndex],
-            uint256(newAssetPrice),
-            msg.sender
-        );
 
         // Adjusts long and short values based on price movements.
         bool priceChanged =
             _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
 
-        // TODO STENT CONCERN1
-        _refreshTokenPrices(marketIndex);
-        assetPrice[marketIndex] = uint256(newAssetPrice);
-
         if (priceChanged) {
+            assert(
+                syntheticTokenBackedValue[MarketSide.Long][marketIndex] != 0 &&
+                    syntheticTokenBackedValue[MarketSide.Short][marketIndex] !=
+                    0
+            );
+
+            // Distibute accrued yield first based on current liquidity before price update
+            _claimAndDistributeYield(marketIndex);
+
+            // TODO STENT move this into the price function
+            emit PriceUpdate(
+                marketIndex,
+                assetPrice[marketIndex],
+                uint256(newAssetPrice),
+                msg.sender
+            );
+
+            // TODO STENT CONCERN1
+            _refreshTokenPrices(marketIndex);
+            assetPrice[marketIndex] = uint256(newAssetPrice);
+
             uint256 newLatestPriceStateIndex =
                 latestUpdateIndex[marketIndex] + 1;
             latestUpdateIndex[marketIndex] = newLatestPriceStateIndex;
@@ -815,15 +822,15 @@ contract LongShort is ILongShort, Initializable {
                     MarketSide.Short
                 ]
             );
-        }
 
-        emit ValueLockedInSystem(
-            marketIndex,
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex],
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex],
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex]
-        );
+            emit ValueLockedInSystem(
+                marketIndex,
+                syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
+                    syntheticTokenBackedValue[MarketSide.Short][marketIndex],
+                syntheticTokenBackedValue[MarketSide.Long][marketIndex],
+                syntheticTokenBackedValue[MarketSide.Short][marketIndex]
+            );
+        }
     }
 
     function _updateSystemState(uint32 marketIndex) external override {
@@ -1109,7 +1116,11 @@ contract LongShort is ILongShort, Initializable {
         uint32 marketIndex,
         uint256 amount,
         MarketSide syntheticTokenType
-    ) internal executeOutstandingNextPriceSettlements(msg.sender, marketIndex) {
+    )
+        internal
+        updateSystemStateMarket(marketIndex)
+        executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
+    {
         // TODO: pre-deposit them into YieldManager?
         //    - for now not doing that for simplicity, don't gain that much doing so either just more expensive tx (for very little yield)
         _depositFunds(marketIndex, amount);
@@ -1168,7 +1179,11 @@ contract LongShort is ILongShort, Initializable {
         uint32 marketIndex,
         uint256 tokensToRedeem,
         MarketSide syntheticTokenType
-    ) internal executeOutstandingNextPriceSettlements(msg.sender, marketIndex) {
+    )
+        internal
+        updateSystemStateMarket(marketIndex)
+        executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
+    {
         syntheticTokens[syntheticTokenType][marketIndex].transferFrom(
             msg.sender,
             address(this),
