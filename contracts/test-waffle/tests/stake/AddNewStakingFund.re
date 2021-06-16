@@ -1,16 +1,19 @@
 open Globals;
 open LetOps;
+open StakerHelpers;
 
-let randomAddress = () => Ethers.Wallet.createRandom().address;
-
-let test = (~contracts: ref(Helpers.coreContracts)) => {
+let test =
+    (
+      ~contracts: ref(Helpers.coreContracts),
+      ~accounts: ref(array(Ethers.Wallet.t)),
+    ) => {
   describe("addNewStakingFund", () => {
     let stakerRef: ref(Staker.t) = ref(""->Obj.magic);
 
     let marketIndex = 1;
-    let sampleLongAddress = randomAddress();
-    let sampleShortAddress = randomAddress();
-    let sampleMockAddress = randomAddress();
+    let sampleLongAddress = Helpers.randomAddress();
+    let sampleShortAddress = Helpers.randomAddress();
+    let sampleMockAddress = Helpers.randomAddress();
     let kInitialMultiplier = Helpers.randomInteger();
     let kPeriod = Helpers.randomInteger();
 
@@ -20,17 +23,14 @@ let test = (~contracts: ref(Helpers.coreContracts)) => {
       ref(()->JsPromise.resolve->Obj.magic);
 
     before_once'(() => {
-      let {staker} = contracts^;
-      stakerRef := staker;
-      let%AwaitThen _ = (stakerRef^)->StakerSmocked.InternalMock.setup;
-      let%AwaitThen _ =
-        (stakerRef^)
-        ->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
-            ~functionName="addNewStakingFund",
-          );
-      let _ =
-        StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn();
-      let _ = StakerSmocked.InternalMock.mockonlyFloatToReturn();
+      let%Await _ =
+        stakerRef->deployAndSetupStakerToUnitTest(
+          ~functionName="addNewStakingFund",
+          ~contracts,
+          ~accounts,
+        );
+      StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn();
+      StakerSmocked.InternalMock.mockonlyFloatToReturn();
       let%AwaitThen _ =
         (stakerRef^)
         ->Staker.Exposed.setAddNewStakingFundParams(
@@ -63,8 +63,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) => {
     });
 
     it''(
-      "calls \_changeMarketLaunchIncentiveParameters with correct arguments",
-      () => {
+      "calls _changeMarketLaunchIncentiveParameters with correct arguments", () => {
       StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCalls()
       ->Array.getUnsafe(0)
       ->Chai.recordEqualFlat({
@@ -94,7 +93,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) => {
       });
     });
 
-    it'("mutates marketIndexOfToken", () => {
+    it'("mutates marketIndexOfTokens", () => {
       let%AwaitThen longMarketIndex =
         (stakerRef^)->Staker.marketIndexOfToken(sampleLongAddress);
       let%Await shortMarketIndex =

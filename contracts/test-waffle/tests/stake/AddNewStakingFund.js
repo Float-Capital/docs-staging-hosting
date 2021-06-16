@@ -6,20 +6,17 @@ var LetOps = require("../../library/LetOps.js");
 var Globals = require("../../library/Globals.js");
 var Helpers = require("../../library/Helpers.js");
 var CONSTANTS = require("../../CONSTANTS.js");
+var StakerHelpers = require("./StakerHelpers.js");
 var StakerSmocked = require("../../library/smock/StakerSmocked.js");
 
-function randomAddress(param) {
-  return ethers.Wallet.createRandom().address;
-}
-
-function test(contracts) {
+function test(contracts, accounts) {
   return Globals.describe("addNewStakingFund")(undefined, undefined, undefined, (function (param) {
                 var stakerRef = {
                   contents: ""
                 };
-                var sampleLongAddress = ethers.Wallet.createRandom().address;
-                var sampleShortAddress = ethers.Wallet.createRandom().address;
-                var sampleMockAddress = ethers.Wallet.createRandom().address;
+                var sampleLongAddress = Helpers.randomAddress(undefined);
+                var sampleShortAddress = Helpers.randomAddress(undefined);
+                var sampleMockAddress = Helpers.randomAddress(undefined);
                 var kInitialMultiplier = Helpers.randomInteger(undefined);
                 var kPeriod = Helpers.randomInteger(undefined);
                 var timestampRef = {
@@ -29,20 +26,16 @@ function test(contracts) {
                   contents: Promise.resolve(undefined)
                 };
                 Globals.before_once$prime(function (param) {
-                      var match = contracts.contents;
-                      stakerRef.contents = match.staker;
-                      return LetOps.AwaitThen.let_(StakerSmocked.InternalMock.setup(stakerRef.contents), (function (param) {
-                                    return LetOps.AwaitThen.let_(StakerSmocked.InternalMock.setupFunctionForUnitTesting(stakerRef.contents, "addNewStakingFund"), (function (param) {
-                                                  StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn(undefined);
-                                                  StakerSmocked.InternalMock.mockonlyFloatToReturn(undefined);
-                                                  return LetOps.AwaitThen.let_(stakerRef.contents.setAddNewStakingFundParams(1, sampleLongAddress, sampleShortAddress, sampleMockAddress), (function (param) {
-                                                                return LetOps.AwaitThen.let_(Helpers.getBlock(undefined), (function (param) {
-                                                                              timestampRef.contents = param.timestamp;
-                                                                              var promise = stakerRef.contents.addNewStakingFund(1, sampleLongAddress, sampleShortAddress, kInitialMultiplier, kPeriod);
-                                                                              promiseRef.contents = promise;
-                                                                              return LetOps.Await.let_(promise, (function (param) {
-                                                                                            
-                                                                                          }));
+                      return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "addNewStakingFund", contracts, accounts), (function (param) {
+                                    StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn(undefined);
+                                    StakerSmocked.InternalMock.mockonlyFloatToReturn(undefined);
+                                    return LetOps.AwaitThen.let_(stakerRef.contents.setAddNewStakingFundParams(1, sampleLongAddress, sampleShortAddress, sampleMockAddress), (function (param) {
+                                                  return LetOps.AwaitThen.let_(Helpers.getBlock(undefined), (function (param) {
+                                                                timestampRef.contents = param.timestamp;
+                                                                var promise = stakerRef.contents.addNewStakingFund(1, sampleLongAddress, sampleShortAddress, kInitialMultiplier, kPeriod);
+                                                                promiseRef.contents = promise;
+                                                                return LetOps.Await.let_(promise, (function (param) {
+                                                                              
                                                                             }));
                                                               }));
                                                 }));
@@ -51,7 +44,7 @@ function test(contracts) {
                 Globals.it$prime$prime("calls the onlyFloatModifier", (function (param) {
                         return Chai.intEqual(undefined, StakerSmocked.InternalMock.onlyFloatCalls(undefined).length, 1);
                       }));
-                Globals.it$prime$prime("calls \\_changeMarketLaunchIncentiveParameters with correct arguments", (function (param) {
+                Globals.it$prime$prime("calls _changeMarketLaunchIncentiveParameters with correct arguments", (function (param) {
                         return Chai.recordEqualFlat(StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCalls(undefined)[0], {
                                     marketIndex: 1,
                                     period: kPeriod,
@@ -75,7 +68,7 @@ function test(contracts) {
                                                 });
                                     }));
                       }));
-                Globals.it$prime("mutates marketIndexOfToken")(undefined, undefined, undefined, (function (param) {
+                Globals.it$prime("mutates marketIndexOfTokens")(undefined, undefined, undefined, (function (param) {
                         return LetOps.AwaitThen.let_(stakerRef.contents.marketIndexOfToken(sampleLongAddress), (function (longMarketIndex) {
                                       return LetOps.Await.let_(stakerRef.contents.marketIndexOfToken(sampleShortAddress), (function (shortMarketIndex) {
                                                     Chai.intEqual(undefined, 1, longMarketIndex);
@@ -89,6 +82,5 @@ function test(contracts) {
               }));
 }
 
-exports.randomAddress = randomAddress;
 exports.test = test;
 /* Chai Not a pure module */

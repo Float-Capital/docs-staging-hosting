@@ -58,21 +58,35 @@ module InternalMock = {
     })
   }
 
-  let setupFunctionForUnitTesting = (staker, ~functionName) => {
+  let setFunctionForUnitTesting = (staker, ~functionName) => {
     functionToNotMock := functionName
     staker->Staker.Exposed.setFunctionToNotMock(~functionToNotMock=functionName)
   }
 
+  let setupFunctionForUnitTesting = (staker, ~functionName) => {
+    ContractHelpers.deployContract0(mockContractName)
+    ->JsPromise.then(a => {
+      smock(a)
+    })
+    ->JsPromise.then(b => {
+      internalRef := Some(b)
+      [
+        staker->Staker.Exposed.setMocker(~mocker=(b->Obj.magic).address),
+        staker->Staker.Exposed.setFunctionToNotMock(~functionToNotMock=functionName),
+      ]->JsPromise.all
+    })
+  }
+
   exception MockingAFunctionThatYouShouldntBe
 
-  exception HaventSetupInternalMockingForLongShort
+  exception HaventSetupInternalMockingForStaking
 
   let checkForExceptions = (~functionName) => {
     if functionToNotMock.contents == functionName {
       raise(MockingAFunctionThatYouShouldntBe)
     }
     if internalRef.contents == None {
-      raise(HaventSetupInternalMockingForLongShort)
+      raise(HaventSetupInternalMockingForStaking)
     }
   }
 
@@ -80,6 +94,18 @@ module InternalMock = {
     checkForExceptions(~functionName="_changeMarketLaunchIncentiveParameters")
     let _ = internalRef.contents->Option.map(_r => {
       let _ = %raw("_r.smocked._changeMarketLaunchIncentiveParametersMock.will.return()")
+    })
+  }
+
+  let mockgetMarketLaunchIncentiveParametersToReturn = (
+    ~_period: Ethers.BigNumber.t,
+    ~_multiplier: Ethers.BigNumber.t,
+  ) => {
+    checkForExceptions(~functionName="getMarketLaunchIncentiveParameters")
+    let _ = internalRef.contents->Option.map(_r => {
+      let _ = %raw(
+        "_r.smocked.getMarketLaunchIncentiveParametersMock.will.return.with([_period, _multiplier])"
+      )
     })
   }
 
@@ -97,7 +123,26 @@ module InternalMock = {
     internalRef.contents
     ->Option.map(_r => {
       let array = %raw("_r.smocked.onlyFloatMock.calls")
-      array->Array.map((_) => ()->Obj.magic)
+      array->Array.map(_ => ()->Obj.magic)
+    })
+    ->Option.getExn
+  }
+
+  let mockonlyAdminToReturn = () => {
+    checkForExceptions(~functionName="onlyAdmin")
+    let _ = internalRef.contents->Option.map(_r => {
+      let _ = %raw("_r.smocked.onlyAdminMock.will.return()")
+    })
+  }
+
+  type onlyAdminCall
+
+  let onlyAdminCalls: unit => array<onlyAdminCall> = () => {
+    checkForExceptions(~functionName="admin")
+    internalRef.contents
+    ->Option.map(_r => {
+      let array = %raw("_r.smocked.onlyAdminMock.calls")
+      array->Array.map(_ => ()->Obj.magic)
     })
     ->Option.getExn
   }
@@ -120,6 +165,25 @@ module InternalMock = {
           marketIndex: marketIndex,
           period: period,
           initialMultiplier: initialMultiplier,
+        }
+      })
+    })
+    ->Option.getExn
+  }
+
+  type getMarketLaunchIncentiveParametersCall = {marketIndex: int}
+
+  let getMarketLaunchIncentiveParametersCalls: unit => array<
+    getMarketLaunchIncentiveParametersCall,
+  > = () => {
+    checkForExceptions(~functionName="getMarketLaunchIncentiveParameters")
+    internalRef.contents
+    ->Option.map(_r => {
+      let array = %raw("_r.smocked.getMarketLaunchIncentiveParametersMock.calls")
+      array->Array.map(m => {
+        let marketIndex = m->Array.getExn(0)
+        {
+          marketIndex: marketIndex,
         }
       })
     })

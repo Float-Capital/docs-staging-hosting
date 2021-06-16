@@ -40,14 +40,26 @@ function setup(staker) {
             });
 }
 
-function setupFunctionForUnitTesting(staker, functionName) {
+function setFunctionForUnitTesting(staker, functionName) {
   functionToNotMock.contents = functionName;
   return staker.setFunctionToNotMock(functionName);
 }
 
+function setupFunctionForUnitTesting(staker, functionName) {
+  return ContractHelpers.deployContract0(mockContractName).then(function (a) {
+                return Smock.smockit(a);
+              }).then(function (b) {
+              internalRef.contents = b;
+              return Promise.all([
+                          staker.setMocker(b.address),
+                          staker.setFunctionToNotMock(functionName)
+                        ]);
+            });
+}
+
 var MockingAFunctionThatYouShouldntBe = /* @__PURE__ */Caml_exceptions.create("StakerSmocked.InternalMock.MockingAFunctionThatYouShouldntBe");
 
-var HaventSetupInternalMockingForLongShort = /* @__PURE__ */Caml_exceptions.create("StakerSmocked.InternalMock.HaventSetupInternalMockingForLongShort");
+var HaventSetupInternalMockingForStaking = /* @__PURE__ */Caml_exceptions.create("StakerSmocked.InternalMock.HaventSetupInternalMockingForStaking");
 
 function checkForExceptions(functionName) {
   if (functionToNotMock.contents === functionName) {
@@ -60,7 +72,7 @@ function checkForExceptions(functionName) {
     return ;
   }
   throw {
-        RE_EXN_ID: HaventSetupInternalMockingForLongShort,
+        RE_EXN_ID: HaventSetupInternalMockingForStaking,
         Error: new Error()
       };
 }
@@ -69,6 +81,15 @@ function mock_changeMarketLaunchIncentiveParametersToReturn(param) {
   checkForExceptions("_changeMarketLaunchIncentiveParameters");
   Belt_Option.map(internalRef.contents, (function (_r) {
           ((_r.smocked._changeMarketLaunchIncentiveParametersMock.will.return()));
+          
+        }));
+  
+}
+
+function mockgetMarketLaunchIncentiveParametersToReturn(_period, _multiplier) {
+  checkForExceptions("getMarketLaunchIncentiveParameters");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.getMarketLaunchIncentiveParametersMock.will.return.with([_period, _multiplier])));
           
         }));
   
@@ -93,6 +114,25 @@ function onlyFloatCalls(param) {
                   })));
 }
 
+function mockonlyAdminToReturn(param) {
+  checkForExceptions("onlyAdmin");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.onlyAdminMock.will.return()));
+          
+        }));
+  
+}
+
+function onlyAdminCalls(param) {
+  checkForExceptions("admin");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.onlyAdminMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  
+                                }));
+                  })));
+}
+
 function _changeMarketLaunchIncentiveParametersCalls(param) {
   checkForExceptions("_changeMarketLaunchIncentiveParameters");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
@@ -107,19 +147,37 @@ function _changeMarketLaunchIncentiveParametersCalls(param) {
                   })));
 }
 
+function getMarketLaunchIncentiveParametersCalls(param) {
+  checkForExceptions("getMarketLaunchIncentiveParameters");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.getMarketLaunchIncentiveParametersMock.calls;
+                    return Belt_Array.map(array, (function (m) {
+                                  var marketIndex = Belt_Array.getExn(m, 0);
+                                  return {
+                                          marketIndex: marketIndex
+                                        };
+                                }));
+                  })));
+}
+
 var InternalMock = {
   mockContractName: mockContractName,
   internalRef: internalRef,
   functionToNotMock: functionToNotMock,
   setup: setup,
+  setFunctionForUnitTesting: setFunctionForUnitTesting,
   setupFunctionForUnitTesting: setupFunctionForUnitTesting,
   MockingAFunctionThatYouShouldntBe: MockingAFunctionThatYouShouldntBe,
-  HaventSetupInternalMockingForLongShort: HaventSetupInternalMockingForLongShort,
+  HaventSetupInternalMockingForStaking: HaventSetupInternalMockingForStaking,
   checkForExceptions: checkForExceptions,
   mock_changeMarketLaunchIncentiveParametersToReturn: mock_changeMarketLaunchIncentiveParametersToReturn,
+  mockgetMarketLaunchIncentiveParametersToReturn: mockgetMarketLaunchIncentiveParametersToReturn,
   mockonlyFloatToReturn: mockonlyFloatToReturn,
   onlyFloatCalls: onlyFloatCalls,
-  _changeMarketLaunchIncentiveParametersCalls: _changeMarketLaunchIncentiveParametersCalls
+  mockonlyAdminToReturn: mockonlyAdminToReturn,
+  onlyAdminCalls: onlyAdminCalls,
+  _changeMarketLaunchIncentiveParametersCalls: _changeMarketLaunchIncentiveParametersCalls,
+  getMarketLaunchIncentiveParametersCalls: getMarketLaunchIncentiveParametersCalls
 };
 
 var uninitializedValue;

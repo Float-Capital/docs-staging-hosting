@@ -91,10 +91,6 @@ type floatTokenReturn = Ethers.ethAddress
 @send
 external floatToken: t => JsPromise.t<floatTokenReturn> = "floatToken"
 
-type initialTimestampReturn = Ethers.BigNumber.t
-@send
-external initialTimestamp: t => JsPromise.t<initialTimestampReturn> = "initialTimestamp"
-
 @send
 external initialize: (
   t,
@@ -122,15 +118,13 @@ type marketLaunchIncentiveMultipliersReturn = Ethers.BigNumber.t
 @send
 external marketLaunchIncentiveMultipliers: (
   t,
-  Ethers.BigNumber.t,
+  int,
 ) => JsPromise.t<marketLaunchIncentiveMultipliersReturn> = "marketLaunchIncentiveMultipliers"
 
 type marketLaunchIncentivePeriodReturn = Ethers.BigNumber.t
 @send
-external marketLaunchIncentivePeriod: (
-  t,
-  Ethers.BigNumber.t,
-) => JsPromise.t<marketLaunchIncentivePeriodReturn> = "marketLaunchIncentivePeriod"
+external marketLaunchIncentivePeriod: (t, int) => JsPromise.t<marketLaunchIncentivePeriodReturn> =
+  "marketLaunchIncentivePeriod"
 
 @send
 external setFunctionToNotMock: (t, ~functionToNotMock: string) => JsPromise.t<transaction> =

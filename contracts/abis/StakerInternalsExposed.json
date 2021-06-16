@@ -183,6 +183,29 @@
   {
     "inputs": [
       {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "period",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "initialMultiplier",
+        "type": "uint256"
+      }
+    ],
+    "name": "_changeMarketLaunchIncentiveParametersExternal",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "user",
         "type": "address"
@@ -504,9 +527,39 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "initialTimestamp",
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      }
+    ],
+    "name": "getKValueExternal",
     "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      }
+    ],
+    "name": "getMarketLaunchIncentiveParametersExternal",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
       {
         "internalType": "uint256",
         "name": "",
@@ -598,9 +651,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint32",
         "name": "",
-        "type": "uint256"
+        "type": "uint32"
       }
     ],
     "name": "marketLaunchIncentiveMultipliers",
@@ -617,9 +670,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint32",
         "name": "",
-        "type": "uint256"
+        "type": "uint32"
       }
     ],
     "name": "marketLaunchIncentivePeriod",
@@ -756,6 +809,47 @@
       }
     ],
     "name": "setFunctionToNotMock",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "setGetKValueParams",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "period",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "multiplier",
+        "type": "uint256"
+      }
+    ],
+    "name": "setGetMarketLaunchIncentiveParametersParams",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -48,13 +48,12 @@ contract StakerMockable is IStaker, Initializable {
 
             
             uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
-    mapping(uint256 => uint256) public marketLaunchIncentivePeriod;     mapping(uint256 => uint256) public marketLaunchIncentiveMultipliers;     uint256[45] private __stakeParametersGap;
+    mapping(uint32 => uint256) public marketLaunchIncentivePeriod;     mapping(uint32 => uint256) public marketLaunchIncentiveMultipliers;     uint256[45] private __stakeParametersGap;
 
             
         address public admin;
     address public floatCapital;
     uint16 public floatPercentage;
-    uint256 public initialTimestamp;
     ILongShort public longShortCoreContract;
     IFloatToken public floatToken;
     uint256[45] private __globalParamsGap;
@@ -173,7 +172,6 @@ contract StakerMockable is IStaker, Initializable {
   
         admin = _admin;
         floatCapital = _floatCapital;
-        initialTimestamp = block.timestamp;
         longShortCoreContract = ILongShort(_longShortCoreContract);
         floatToken = IFloatToken(_floatToken);
         floatPercentage = 1500;
@@ -307,6 +305,9 @@ contract StakerMockable is IStaker, Initializable {
             getMarketLaunchIncentiveParameters(marketIndex);
 
                         assert(kInitialMultiplier >= 1e18);
+
+        uint256 initialTimestamp =
+            syntheticRewardParams[marketIndex][0].timestamp;
 
         if (block.timestamp - initialTimestamp <= kPeriod) {
             return
