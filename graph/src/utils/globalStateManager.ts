@@ -254,6 +254,16 @@ export function getSyntheticMarket(marketIndex: BigInt): SyntheticMarket {
 
   return syntheticMarket as SyntheticMarket;
 }
+export function getSyntheticTokenById(
+  syntheticTokenId: string
+): SyntheticToken {
+  let syntheticTokenLong = SyntheticToken.load(syntheticTokenId);
+  if (syntheticTokenLong == null) {
+    log.critical("Synthetic Token with id {} is undefined.", []);
+  }
+
+  return syntheticTokenLong as SyntheticToken;
+}
 
 export function getOrCreateBalanceObject(
   tokenAddressString: string,

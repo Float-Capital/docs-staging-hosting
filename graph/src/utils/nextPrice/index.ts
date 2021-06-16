@@ -6,7 +6,7 @@ import {
   UserNextPriceAction,
   UserNextPriceActionComponent,
 } from "../../../generated/schema";
-import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import { ACTION_MINT, MARKET_SIDE_LONG, ZERO } from "../../CONSTANTS";
 import { getUser } from "../globalStateManager";
 

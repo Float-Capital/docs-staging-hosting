@@ -25,8 +25,9 @@ import {
   LatestPrice,
   Price,
   User,
+  UserNextPriceAction,
 } from "../generated/schema";
-import { BigInt, log, Bytes } from "@graphprotocol/graph-ts";
+import { BigInt, log, Bytes, Address } from "@graphprotocol/graph-ts";
 import { saveEventToStateChange } from "./utils/txEventHelpers";
 import {
   getOrCreateLatestSystemState,
@@ -40,6 +41,7 @@ import {
   getOrCreateUser,
   getUser,
   getSyntheticMarket,
+  getSyntheticTokenById,
 } from "./utils/globalStateManager";
 import {
   createNewTokenDataSource,
@@ -56,12 +58,14 @@ import {
   MARKET_SIDE_LONG,
   ACTION_MINT,
   ACTION_REDEEM,
+  TEN_TO_THE_18,
 } from "./CONSTANTS";
 import {
   createOrUpdateUserNextPriceAction,
   createUserNextPriceActionComponent,
   createOrUpdateBatchedNextPriceExec,
-  generateBatchedNextPriceExecId,
+  getBatchedNextPriceExec,
+  getUserNextPriceActionById,
 } from "./utils/nextPrice";
 
 export function handleV1(event: V1): void {
@@ -351,78 +355,7 @@ export function handleFeesChanges(event: FeesChanges): void {
     []
   );
 }
-/* 
-export function handleLongMinted(event: LongMinted): void {
-  let marketIndex = event.params.marketIndex;
-  let depositAdded = event.params.depositAdded;
-  let finalDepositAmount = event.params.finalDepositAmount;
-  let tokensMinted = event.params.tokensMinted;
-  let userAddress = event.params.user;
 
-  let market = SyntheticMarket.load(marketIndex.toString());
-  let syntheticToken = SyntheticToken.load(market.syntheticLong);
-
-  increaseUserMints(userAddress, syntheticToken, tokensMinted, event);
-
-  let collateralToken = CollateralToken.load(market.collateralToken);
-  decreaseOrCreateUserApprovals(
-    userAddress,
-    event.params.depositAdded,
-    collateralToken,
-    event
-  );
-
-  saveEventToStateChange(
-    event,
-    "LongMinted",
-    bigIntArrayToStringArray([
-      marketIndex,
-      depositAdded,
-      finalDepositAmount,
-      tokensMinted,
-    ]).concat([userAddress.toHex()]),
-    [
-      "marketIndex",
-      "depositAdded",
-      "finalDepositAmount",
-      "tokensMinted",
-      "user",
-    ],
-    ["uint256", "uint256", "uint256", "uint256", "address"],
-    [userAddress],
-    []
-  );
-}
-
-export function handleLongRedeem(event: LongRedeem): void {
-  let marketIndex = event.params.marketIndex;
-  let tokensRedeemed = event.params.tokensRedeemed;
-  let valueOfRedemption = event.params.valueOfRedemption;
-  let finalRedeemValue = event.params.finalRedeemValue;
-  let user = event.params.user;
-
-  saveEventToStateChange(
-    event,
-    "LongRedeem",
-    bigIntArrayToStringArray([
-      marketIndex,
-      tokensRedeemed,
-      valueOfRedemption,
-      finalRedeemValue,
-    ]).concat([user.toHex()]),
-    [
-      "marketIndex",
-      "tokensRedeemed",
-      "valueOfRedemption",
-      "finalRedeem",
-      "user",
-    ],
-    ["uint256", "uint256", "uint256", "uint256", "address"],
-    [user],
-    []
-  );
-}
- */
 export function handlePriceUpdate(event: PriceUpdate): void {
   let marketIndex = event.params.marketIndex;
   let marketIndexString = marketIndex.toString();
@@ -493,6 +426,16 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
 
   userNextPriceAction.save();
   batchedNextPriceExec.save();
+
+  /*
+// TODO: integrate this function into `handleNextPriceDeposit`
+decreaseOrCreateUserApprovals(
+  userAddress,
+  event.params.depositAdded,
+  collateralToken,
+  event
+);
+*/
 
   saveEventToStateChange(
     event,
@@ -590,14 +533,6 @@ export function removeFromArrayAtIndex(
 export function handleBatchedActionsSettled(
   event: BatchedActionsSettled
 ): void {
-  /*
-        uint32 marketIndex,
-        uint256 updateIndex,
-        uint256 mintPriceSnapshotLong,
-        uint256 mintPriceSnapshotShort,
-        uint256 redeemPriceSnapshotLong,
-        uint256 redeemPriceSnapshotShort
-  */
   let marketIndex = event.params.marketIndex;
   let updateIndex = event.params.updateIndex;
   let mintPriceSnapshotLong = event.params.mintPriceSnapshotLong;
@@ -607,30 +542,70 @@ export function handleBatchedActionsSettled(
 
   let executedTimestamp = event.block.timestamp;
 
+  let syntheticMarket = getSyntheticMarket(marketIndex);
+  let longTokenId = syntheticMarket.syntheticLong;
+  let shortTokenId = syntheticMarket.syntheticShort;
+
+  let syntheticTokenLong = getSyntheticTokenById(longTokenId);
+  let syntheticTokenShort = getSyntheticTokenById(shortTokenId);
+
   let batchedNextPriceExec = getBatchedNextPriceExec(marketIndex, updateIndex);
 
-  batchedNextPriceExec.mintPriceSnapshot = mintPriceSnapshotLong;
-  batchedNextPriceExec.redeemPriceSnapshot = batchedNextPriceExec;
+  batchedNextPriceExec.mintPriceSnapshotLong = mintPriceSnapshotLong;
+  batchedNextPriceExec.mintPriceSnapshotShort = mintPriceSnapshotShort;
+  batchedNextPriceExec.redeemPriceSnapshotLong = redeemPriceSnapshotLong;
+  batchedNextPriceExec.redeemPriceSnapshotShort = redeemPriceSnapshotShort;
   batchedNextPriceExec.executedTimestamp = executedTimestamp;
-  batchedNextPriceExec.linkedUserNextPriceActions = batchedNextPriceExec;
 
-  let numberOfUsersInBatch =
-    batchedNextPriceExec.linkedUserNextPriceActions.length;
+  let linkedUserNextPriceActions =
+    batchedNextPriceExec.linkedUserNextPriceActions;
+  let numberOfUsersInBatch = linkedUserNextPriceActions.length;
 
-  for (let i = 0; i < numberOfUsersInBatch; i++) {
-    let userNextPriceActionId = batchedNextPriceExec.linkedUserNextPriceAction;
+  for (let i = 0; i < numberOfUsersInBatch; ++i) {
+    let userNextPriceActionId: string = linkedUserNextPriceActions[i];
 
-    let userNextPriceAction = getUserNextPriceAction(userNextPriceActionId);
-    
-    let user = getUser(userNextPriceAction.user);
+    let userNextPriceAction = getUserNextPriceActionById(userNextPriceActionId);
+    userNextPriceAction.confirmedTimestamp = event.block.timestamp;
+    userNextPriceAction.save();
 
-    user.pendingNextPriceActions = removeFromArrayAtIndex(indexOf(userNextPriceActionId))
+    let userAddress = Address.fromString(userNextPriceAction.user);
+    let user = getUser(userAddress);
 
-    linkedUserNextPriceAction[i];
-    user.confirmedNextPriceActions = ;
+    user.pendingNextPriceActions = removeFromArrayAtIndex(
+      user.pendingNextPriceActions,
+      user.pendingNextPriceActions.indexOf(userNextPriceActionId)
+    );
 
-    // user.
+    user.confirmedNextPriceActions = user.confirmedNextPriceActions.concat([
+      userNextPriceActionId,
+    ]);
+
+    let tokensMintedLong = userNextPriceAction.amountPaymentTokenForDepositLong
+      .times(TEN_TO_THE_18)
+      .div(mintPriceSnapshotLong);
+    let tokensMintedShort = userNextPriceAction.amountPaymentTokenForDepositShort
+      .times(TEN_TO_THE_18)
+      .div(mintPriceSnapshotShort);
+
+    increaseUserMints(user, syntheticTokenLong, tokensMintedLong);
+    increaseUserMints(user, syntheticTokenShort, tokensMintedShort);
+
+    let paymentTokensToRedeemLong = userNextPriceAction.amountSynthTokenForWithdrawalLong
+      .times(redeemPriceSnapshotLong)
+      .div(TEN_TO_THE_18);
+    let paymentTokensToRedeemShort = userNextPriceAction.amountSynthTokenForWithdrawalShort
+      .times(redeemPriceSnapshotShort)
+      .div(TEN_TO_THE_18);
+    // TODO: read the below warning
+    log.warning(
+      "TODO: WARNING: we are not handling the redeems yet! Think through",
+      []
+    );
+
+    user.save();
   }
+
+  batchedNextPriceExec.save();
   // TODO
   // @chris please fill in the saveEventToStateChange for this function
 }
