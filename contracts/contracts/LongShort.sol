@@ -557,19 +557,19 @@ contract LongShort is ILongShort, Initializable {
 
         // supply should never be zero and burn address will always own a small amount
         if (longTokenSupply > 0) {
-            syntheticTokenPrice[MarketSide.Long][marketIndex] =
-                (syntheticTokenBackedValue[MarketSide.Long][marketIndex] *
-                    TEN_TO_THE_18) /
-                longTokenSupply;
+            syntheticTokenPrice[MarketSide.Long][marketIndex] = getPrice(
+                longTokenSupply,
+                syntheticTokenBackedValue[MarketSide.Long][marketIndex]
+            );
         }
 
         uint256 shortTokenSupply =
             syntheticTokens[MarketSide.Short][marketIndex].totalSupply();
         if (shortTokenSupply > 0) {
-            syntheticTokenPrice[MarketSide.Short][marketIndex] =
-                (syntheticTokenBackedValue[MarketSide.Short][marketIndex] *
-                    TEN_TO_THE_18) /
-                shortTokenSupply;
+            syntheticTokenPrice[MarketSide.Short][marketIndex] = getPrice(
+                shortTokenSupply,
+                syntheticTokenBackedValue[MarketSide.Short][marketIndex]
+            );
         }
 
         emit TokenPriceRefreshed(
@@ -691,8 +691,10 @@ contract LongShort is ILongShort, Initializable {
 
             // Mint long tokens with remaining value.
             uint256 numberOfTokens =
-                (amountToBatchDeposit * TEN_TO_THE_18) /
-                    syntheticTokenPrice[syntheticTokenType][marketIndex];
+                getAmountSynthToken(
+                    amountToBatchDeposit,
+                    syntheticTokenPrice[syntheticTokenType][marketIndex]
+                );
 
             // TODO STENT there are no token mint events emitted here, but there are on market initialization
             syntheticTokens[syntheticTokenType][marketIndex].mint(
@@ -1044,10 +1046,12 @@ contract LongShort is ILongShort, Initializable {
             userNextPriceDepositAmounts[marketIndex][user][syntheticTokenType];
         if (currentDepositAmount > 0) {
             uint256 tokensToMint =
-                (currentDepositAmount * TEN_TO_THE_18) /
+                getAmountSynthToken(
+                    currentDepositAmount,
                     mintPriceSnapshot[marketIndex][
                         userCurrentNextPriceUpdateIndex[marketIndex][user]
-                    ][syntheticTokenType];
+                    ][syntheticTokenType]
+                );
 
             syntheticTokens[syntheticTokenType][marketIndex].transfer(
                 user,
