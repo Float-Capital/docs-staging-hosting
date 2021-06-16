@@ -85,6 +85,12 @@ type UserNextPriceActionComponent @entity {
   associatedBatch: BatchedNextPriceExec!
 }
 
+type UsersCurrentNextPriceAction @entity {
+  id: ID! # userCurrentAction-<marketIndex>-<userAddress>
+  currentAction: UserNextPriceAction!
+  currentUpdateIndex: BigInt!
+}
+
 type UserNextPriceAction @entity {
   id: ID! # nextPrice-<userAddress>-<marketIndex>-<update-index>
   updateIndex: BigInt!

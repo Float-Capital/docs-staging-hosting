@@ -181,8 +181,7 @@ contract LongShort is ILongShort, Initializable {
 
     event NewMarketLaunchedAndSeeded(uint32 marketIndex, uint256 initialSeed);
 
-    // QUESTION: are there any parameters that the graph should know about this?
-    event ExecuteNextPriceSettlementsUser();
+    event ExecuteNextPriceSettlementsUser(address user, uint32 marketIndex);
 
     ////////////////////////////////////
     /////////// MODIFIERS //////////////
@@ -1094,7 +1093,7 @@ contract LongShort is ILongShort, Initializable {
         ) {
             _executeOutstandingNextPriceSettlementsAction(user, marketIndex);
 
-            emit ExecuteNextPriceSettlementsUser();
+            emit ExecuteNextPriceSettlementsUser(user, marketIndex);
         }
     }
 
