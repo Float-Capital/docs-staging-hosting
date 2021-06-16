@@ -44,7 +44,20 @@
   },
   {
     "anonymous": false,
-    "inputs": [],
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      }
+    ],
     "name": "ExecuteNextPriceSettlementsUser",
     "type": "event"
   },
@@ -411,7 +424,7 @@
         "type": "uint32"
       }
     ],
-    "name": "executeOutstandingLazySettlementsMock",
+    "name": "executeOutstandingNextPriceSettlementsMock",
     "type": "event"
   },
   {
@@ -466,7 +479,7 @@
         "type": "uint32"
       }
     ],
-    "name": "_executeOutstandingLazySettlementsExposed",
+    "name": "_executeOutstandingNextPriceSettlementsExposed",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -642,7 +655,7 @@
         "type": "uint8"
       }
     ],
-    "name": "batchedLazyPaymentTokenToDeposit",
+    "name": "batchedNextPricePaymentTokenToDeposit",
     "outputs": [
       {
         "internalType": "uint256",
@@ -666,7 +679,7 @@
         "type": "uint8"
       }
     ],
-    "name": "batchedLazySynthToRedeem",
+    "name": "batchedNextPriceSynthToRedeem",
     "outputs": [
       {
         "internalType": "uint256",
@@ -780,7 +793,7 @@
         "type": "uint32"
       }
     ],
-    "name": "executeOutstandingLazySettlementsUser",
+    "name": "executeOutstandingNextPriceSettlementsUser",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1086,7 +1099,7 @@
         "type": "uint256"
       }
     ],
-    "name": "mintLongLazy",
+    "name": "mintLongNextPrice",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1133,7 +1146,7 @@
         "type": "uint256"
       }
     ],
-    "name": "mintShortLazy",
+    "name": "mintShortNextPrice",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1203,7 +1216,7 @@
         "type": "uint256"
       }
     ],
-    "name": "redeemLongLazy",
+    "name": "redeemLongNextPrice",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1250,7 +1263,7 @@
         "type": "uint256"
       }
     ],
-    "name": "redeemShortLazy",
+    "name": "redeemShortNextPrice",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1340,7 +1353,7 @@
         "type": "bool"
       }
     ],
-    "name": "setUseexecuteOutstandingLazySettlementsMock",
+    "name": "setUseexecuteOutstandingNextPriceSettlementsMock",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1574,7 +1587,7 @@
         "type": "address"
       }
     ],
-    "name": "userCurrentLazyUpdateIndex",
+    "name": "userCurrentNextPriceUpdateIndex",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1603,7 +1616,7 @@
         "type": "uint8"
       }
     ],
-    "name": "userLazyDepositAmounts",
+    "name": "userNextPriceDepositAmounts",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1632,7 +1645,7 @@
         "type": "uint8"
       }
     ],
-    "name": "userLazyRedemptions",
+    "name": "userNextPriceRedemptions",
     "outputs": [
       {
         "internalType": "uint256",

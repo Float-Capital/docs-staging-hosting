@@ -33,7 +33,7 @@ dataSources:
       eventHandlers:
         - event: BatchedActionsSettled(uint32,uint256,uint256,uint256,uint256,uint256)
           handler: handleBatchedActionsSettled
-        - event: ExecuteNextPriceSettlementsUser()
+        - event: ExecuteNextPriceSettlementsUser(address,uint32)
           handler: handleExecuteNextPriceSettlementsUser
         - event: FeesChanges(uint32,uint256,uint256,uint256,uint256)
           handler: handleFeesChanges

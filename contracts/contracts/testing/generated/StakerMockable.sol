@@ -321,20 +321,20 @@ contract StakerMockable is IStaker, Initializable {
 
     
 
-        function calculateFloatPerSecond(
-        uint256 longValue,
-        uint256 shortValue,
+    function calculateFloatPerSecond(
+        uint32 marketIndex,
         uint256 longPrice,
         uint256 shortPrice,
-        uint32 marketIndex
+        uint256 longValue,
+        uint256 shortValue
     )
-        public
+        internal
         view
         returns (uint256 longFloatPerSecond, uint256 shortFloatPerSecond)
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("calculateFloatPerSecond"))){
       
-      return mocker.calculateFloatPerSecondMock(longValue,shortValue,longPrice,shortPrice,marketIndex);
+      return mocker.calculateFloatPerSecondMock(marketIndex,longPrice,shortPrice,longValue,shortValue);
     }
   
                 if (longValue == 0 && shortValue == 0) {
@@ -372,11 +372,11 @@ contract StakerMockable is IStaker, Initializable {
     
 
     function calculateNewCumulativeRate(
-        uint256 longValue,
-        uint256 shortValue,
+        uint32 marketIndex,
         uint256 longPrice,
         uint256 shortPrice,
-        uint32 marketIndex
+        uint256 longValue,
+        uint256 shortValue
     )
         internal
         view
@@ -384,16 +384,16 @@ contract StakerMockable is IStaker, Initializable {
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("calculateNewCumulativeRate"))){
       
-      return mocker.calculateNewCumulativeRateMock(longValue,shortValue,longPrice,shortPrice,marketIndex);
+      return mocker.calculateNewCumulativeRateMock(marketIndex,longPrice,shortPrice,longValue,shortValue);
     }
   
                 (uint256 longFloatPerSecond, uint256 shortFloatPerSecond) =
             calculateFloatPerSecond(
-                longValue,
-                shortValue,
+                marketIndex,
                 longPrice,
                 shortPrice,
-                marketIndex
+                longValue,
+                shortValue
             );
 
                 uint256 timeDelta = calculateTimeDelta(marketIndex);
@@ -411,24 +411,24 @@ contract StakerMockable is IStaker, Initializable {
     
 
     function setRewardObjects(
-        uint256 longValue,
-        uint256 shortValue,
+        uint32 marketIndex,
         uint256 longPrice,
         uint256 shortPrice,
-        uint32 marketIndex
+        uint256 longValue,
+        uint256 shortValue
     ) internal {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("setRewardObjects"))){
       
-      return mocker.setRewardObjectsMock(longValue,shortValue,longPrice,shortPrice,marketIndex);
+      return mocker.setRewardObjectsMock(marketIndex,longPrice,shortPrice,longValue,shortValue);
     }
   
         (uint256 longAccumulativeRates, uint256 shortAccumulativeRates) =
             calculateNewCumulativeRate(
-                longValue,
-                shortValue,
+                marketIndex,
                 longPrice,
                 shortPrice,
-                marketIndex
+                longValue,
+                shortValue
             );
 
         uint256 newIndex = latestRewardIndex[marketIndex] + 1;
@@ -468,12 +468,12 @@ contract StakerMockable is IStaker, Initializable {
   
         
                 if (calculateTimeDelta(marketIndex) > 0) {
-                        setRewardObjects(
-                longValue,
-                shortValue,
+            setRewardObjects(
+                marketIndex,
                 longPrice,
                 shortPrice,
-                marketIndex
+                longValue,
+                shortValue
             );
         }
     }

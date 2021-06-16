@@ -147,55 +147,55 @@ contract LongShortForInternalMocking {
       return (abi.decode("",(uint256)));
     }
      
-    function _executeLazyMintsIfTheyExistMock(uint32,address,ILongShort.MarketSide) public pure {
+    function _executeNextPriceMintsIfTheyExistMock(uint32,address,ILongShort.MarketSide) public pure {
       return ();
     }
      
-    function _executeOutstandingLazySettlementsActionMock(address,uint32) public pure {
+    function _executeOutstandingNextPriceSettlementsActionMock(address,uint32) public pure {
       return ();
     }
      
-    function _executeOutstandingLazySettlementsMock(address,uint32) public pure {
+    function _executeOutstandingNextPriceSettlementsMock(address,uint32) public pure {
       return ();
     }
      
-    function executeOutstandingLazySettlementsUserMock(address,uint32) public pure {
+    function executeOutstandingNextPriceSettlementsUserMock(address,uint32) public pure {
       return ();
     }
      
-    function _mintLazyMock(uint32,uint256,ILongShort.MarketSide) public pure {
+    function _mintNextPriceMock(uint32,uint256,ILongShort.MarketSide) public pure {
       return ();
     }
      
-    function mintLongLazyMock(uint32,uint256) public pure {
+    function mintLongNextPriceMock(uint32,uint256) public pure {
       return ();
     }
      
-    function mintShortLazyMock(uint32,uint256) public pure {
+    function mintShortNextPriceMock(uint32,uint256) public pure {
       return ();
     }
      
-    function _executeOutstandingLazyRedeemsMock(uint32,address,ILongShort.MarketSide) public pure {
+    function _executeOutstandingNextPriceRedeemsMock(uint32,address,ILongShort.MarketSide) public pure {
       return ();
     }
      
-    function _redeemLazyMock(uint32,uint256,ILongShort.MarketSide) public pure {
+    function _redeemNextPriceMock(uint32,uint256,ILongShort.MarketSide) public pure {
       return ();
     }
      
-    function redeemLongLazyMock(uint32,uint256) public pure {
+    function redeemLongNextPriceMock(uint32,uint256) public pure {
       return ();
     }
      
-    function redeemShortLazyMock(uint32,uint256) public pure {
+    function redeemShortNextPriceMock(uint32,uint256) public pure {
       return ();
     }
      
-    function _handleBatchedLazyRedeemMock(uint32,ILongShort.MarketSide,uint256) public pure {
+    function _handleBatchedNextPriceRedeemMock(uint32,ILongShort.MarketSide,uint256) public pure {
       return ();
     }
      
-    function _calculateBatchedLazyFeesMock(uint32,uint256,uint256) public pure returns (uint256 totalFeesLong,uint256 totalFeesShort){
+    function _calculateBatchedNextPriceFeesMock(uint32,uint256,uint256) public pure returns (uint256 totalFeesLong,uint256 totalFeesShort){
       return (abi.decode("",(uint256)),abi.decode("",(uint256)));
     }
      
@@ -203,7 +203,7 @@ contract LongShortForInternalMocking {
       return (abi.decode("",(uint256)));
     }
      
-    function handleBatchedLazyRedeemsMock(uint32) public pure {
+    function handleBatchedNextPriceRedeemsMock(uint32) public pure {
       return ();
     }
      
@@ -223,7 +223,11 @@ contract LongShortForInternalMocking {
       return; 
     }
      
-    function executeOutstandingLazySettlementsMock(address,uint32) public pure {
+    function executeOutstandingNextPriceSettlementsMock(address,uint32) public pure {
+      return; 
+    }
+     
+    function updateSystemStateMarketMock(uint32) public pure {
       return; 
     }
     }

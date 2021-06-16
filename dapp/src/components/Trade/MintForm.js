@@ -752,12 +752,12 @@ function MintForm$MintFormSignedIn(Props) {
             if (isLong) {
               var arg = market.marketIndex;
               tmp = (function (param) {
-                  return param.mintLong(arg, amount);
+                  return param.mintLongNextPrice(arg, amount);
                 });
             } else {
               var arg$1 = market.marketIndex;
               tmp = (function (param) {
-                  return param.mintShort(arg$1, amount);
+                  return param.mintShortNextPrice(arg$1, amount);
                 });
             }
             return Curry._2(contractExecutionHandler, (function (param) {

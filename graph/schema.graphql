@@ -54,8 +54,10 @@ type BatchedNextPriceExec @entity {
   amountPaymentTokenForDepositShort: BigInt!
   amountSynthTokenForWithdrawalLong: BigInt!
   amountSynthTokenForWithdrawalShort: BigInt!
-  mintPriceSnapshot: BigInt!
-  redeemPriceSnapshot: BigInt!
+  mintPriceSnapshotLong: BigInt!
+  mintPriceSnapshotShort: BigInt!
+  redeemPriceSnapshotLong: BigInt!
+  redeemPriceSnapshotShort: BigInt!
   executedTimestamp: BigInt!
   linkedUserNextPriceActions: [UserNextPriceAction!]!
 }
@@ -81,6 +83,12 @@ type UserNextPriceActionComponent @entity {
   timestamp: BigInt!
   userAggregateAction: UserNextPriceAction!
   associatedBatch: BatchedNextPriceExec!
+}
+
+type UsersCurrentNextPriceAction @entity {
+  id: ID! # userCurrentAction-<marketIndex>-<userAddress>
+  currentAction: UserNextPriceAction!
+  currentUpdateIndex: BigInt!
 }
 
 type UserNextPriceAction @entity {

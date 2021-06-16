@@ -520,9 +520,9 @@ function RedeemForm$ConnectedRedeemForm(Props) {
           return Curry._2(contractExecutionHandler, (function (param) {
                         return Contracts.LongShort.make(Config.longShort, param);
                       }), isActuallyLong ? (function (param) {
-                          return param.redeemLong(marketIndex, amount);
+                          return param.redeemLongNextPrice(marketIndex, amount);
                         }) : (function (param) {
-                          return param.redeemShort(marketIndex, amount);
+                          return param.redeemShortNextPrice(marketIndex, amount);
                         }));
         }));
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);

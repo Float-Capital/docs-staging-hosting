@@ -41,7 +41,7 @@
         "type": "uint256"
       }
     ],
-    "name": "_calculateBatchedLazyFeesMock",
+    "name": "_calculateBatchedNextPriceFeesMock",
     "outputs": [
       {
         "internalType": "uint256",
@@ -157,7 +157,7 @@
         "type": "uint8"
       }
     ],
-    "name": "_executeLazyMintsIfTheyExistMock",
+    "name": "_executeNextPriceMintsIfTheyExistMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -180,7 +180,7 @@
         "type": "uint8"
       }
     ],
-    "name": "_executeOutstandingLazyRedeemsMock",
+    "name": "_executeOutstandingNextPriceRedeemsMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -198,7 +198,7 @@
         "type": "uint32"
       }
     ],
-    "name": "_executeOutstandingLazySettlementsActionMock",
+    "name": "_executeOutstandingNextPriceSettlementsActionMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -216,7 +216,7 @@
         "type": "uint32"
       }
     ],
-    "name": "_executeOutstandingLazySettlementsMock",
+    "name": "_executeOutstandingNextPriceSettlementsMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -301,7 +301,7 @@
         "type": "uint256"
       }
     ],
-    "name": "_handleBatchedLazyRedeemMock",
+    "name": "_handleBatchedNextPriceRedeemMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -366,7 +366,7 @@
         "type": "uint8"
       }
     ],
-    "name": "_mintLazyMock",
+    "name": "_mintNextPriceMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -389,7 +389,7 @@
         "type": "uint8"
       }
     ],
-    "name": "_redeemLazyMock",
+    "name": "_redeemNextPriceMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -631,7 +631,7 @@
         "type": "uint32"
       }
     ],
-    "name": "executeOutstandingLazySettlementsMock",
+    "name": "executeOutstandingNextPriceSettlementsMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -649,7 +649,7 @@
         "type": "uint32"
       }
     ],
-    "name": "executeOutstandingLazySettlementsUserMock",
+    "name": "executeOutstandingNextPriceSettlementsUserMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -858,7 +858,7 @@
         "type": "uint32"
       }
     ],
-    "name": "handleBatchedLazyRedeemsMock",
+    "name": "handleBatchedNextPriceRedeemsMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -975,7 +975,7 @@
         "type": "uint256"
       }
     ],
-    "name": "mintLongLazyMock",
+    "name": "mintLongNextPriceMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -993,7 +993,7 @@
         "type": "uint256"
       }
     ],
-    "name": "mintShortLazyMock",
+    "name": "mintShortNextPriceMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -1044,7 +1044,7 @@
         "type": "uint256"
       }
     ],
-    "name": "redeemLongLazyMock",
+    "name": "redeemLongNextPriceMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -1062,7 +1062,7 @@
         "type": "uint256"
       }
     ],
-    "name": "redeemShortLazyMock",
+    "name": "redeemShortNextPriceMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -1137,6 +1137,19 @@
       }
     ],
     "name": "updateMarketOracleMock",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "name": "updateSystemStateMarketMock",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"

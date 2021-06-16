@@ -106,8 +106,8 @@ module ConnectedRedeemForm = {
         ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
         ~contractFunction={
           isActuallyLong
-            ? Contracts.LongShort.redeemLong(~marketIndex, ~tokensToRedeem=amount)
-            : Contracts.LongShort.redeemShort(~marketIndex, ~tokensToRedeem=amount)
+            ? Contracts.LongShort.redeemLongNextPrice(~marketIndex, ~tokensToRedeem=amount)
+            : Contracts.LongShort.redeemShortNextPrice(~marketIndex, ~tokensToRedeem=amount)
         },
       )
     })

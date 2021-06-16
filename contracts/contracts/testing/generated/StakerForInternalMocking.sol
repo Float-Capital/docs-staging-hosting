@@ -39,7 +39,7 @@ contract StakerForInternalMocking {
       return (abi.decode("",(uint256)));
     }
      
-    function calculateFloatPerSecondMock(uint256,uint256,uint256,uint256,uint32) public pure returns (uint256 longFloatPerSecond,uint256 shortFloatPerSecond){
+    function calculateFloatPerSecondMock(uint32,uint256,uint256,uint256,uint256) public pure returns (uint256 longFloatPerSecond,uint256 shortFloatPerSecond){
       return (abi.decode("",(uint256)),abi.decode("",(uint256)));
     }
      
@@ -47,11 +47,11 @@ contract StakerForInternalMocking {
       return (abi.decode("",(uint256)));
     }
      
-    function calculateNewCumulativeRateMock(uint256,uint256,uint256,uint256,uint32) public pure returns (uint256 longCumulativeRates,uint256 shortCumulativeRates){
+    function calculateNewCumulativeRateMock(uint32,uint256,uint256,uint256,uint256) public pure returns (uint256 longCumulativeRates,uint256 shortCumulativeRates){
       return (abi.decode("",(uint256)),abi.decode("",(uint256)));
     }
      
-    function setRewardObjectsMock(uint256,uint256,uint256,uint256,uint32) public pure {
+    function setRewardObjectsMock(uint32,uint256,uint256,uint256,uint256) public pure {
       return ();
     }
      

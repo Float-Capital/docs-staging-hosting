@@ -267,8 +267,8 @@ module MintFormSignedIn = {
         contractExecutionHandler(
           ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
           ~contractFunction=isLong
-            ? Contracts.LongShort.mintLong(~marketIndex=market.marketIndex, ~amount)
-            : Contracts.LongShort.mintShort(~marketIndex=market.marketIndex, ~amount),
+            ? Contracts.LongShort.mintLongNextPrice(~marketIndex=market.marketIndex, ~amount)
+            : Contracts.LongShort.mintShortNextPrice(~marketIndex=market.marketIndex, ~amount),
         )
       let needsToApprove = isGreaterThanApproval(
         ~amount,

@@ -15,6 +15,7 @@ import {
 } from "./globalStateManager";
 import {
   SyntheticToken,
+  User,
   UserSyntheticTokenMinted,
 } from "../../generated/schema";
 
@@ -131,19 +132,18 @@ export function updateBalanceFloatTransfer(
 }
 
 export function increaseUserMints(
-  userAddress: Address,
-  syntheticToken: SyntheticToken | null,
-  tokensMinted: BigInt, // user sending or receiving
-  event: ethereum.Event
+  user: User,
+  syntheticToken: SyntheticToken,
+  tokensMinted: BigInt // user sending or receiving
 ): void {
   //load user
-  let user = getOrCreateUser(userAddress, event);
   let userAddressString = user.address.toHex();
   let tokenAddressString = syntheticToken.tokenAddress.toHex();
 
   let minted = UserSyntheticTokenMinted.load(
     tokenAddressString + "-" + userAddressString + "-minted"
   );
+
   if (minted == null) {
     minted = new UserSyntheticTokenMinted(
       tokenAddressString + "-" + userAddressString + "-minted"

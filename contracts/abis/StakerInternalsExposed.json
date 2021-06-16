@@ -384,50 +384,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "longValue",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "shortValue",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "longPrice",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "shortPrice",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "calculateFloatPerSecond",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "longFloatPerSecond",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "shortFloatPerSecond",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "_admin",
         "type": "address"

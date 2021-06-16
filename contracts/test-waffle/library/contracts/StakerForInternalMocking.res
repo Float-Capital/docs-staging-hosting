@@ -106,11 +106,11 @@ type calculateFloatPerSecondMockReturn = {
 @send
 external calculateFloatPerSecondMock: (
   t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
   int,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
 ) => JsPromise.t<calculateFloatPerSecondMockReturn> = "calculateFloatPerSecondMock"
 
 type calculateNewCumulativeRateMockReturn = {
@@ -120,11 +120,11 @@ type calculateNewCumulativeRateMockReturn = {
 @send
 external calculateNewCumulativeRateMock: (
   t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
   int,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
 ) => JsPromise.t<calculateNewCumulativeRateMockReturn> = "calculateNewCumulativeRateMock"
 
 type calculateTimeDeltaMockReturn = Ethers.BigNumber.t
@@ -214,11 +214,11 @@ type setRewardObjectsMockReturn
 @send
 external setRewardObjectsMock: (
   t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
   int,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
 ) => JsPromise.t<setRewardObjectsMockReturn> = "setRewardObjectsMock"
 
 type stakeFromUserMockReturn

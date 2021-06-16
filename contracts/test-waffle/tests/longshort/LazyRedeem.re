@@ -9,7 +9,7 @@ let testIntegration =
   describe("lazyRedeem", () => {
     it'("[THIS TEST IS FLAKY] should work as expected happy path", () => {
       let testUser = accounts.contents->Array.getUnsafe(8);
-      let amountToLazyMint = Helpers.randomTokenAmount();
+      let amountToNextPriceMint = Helpers.randomTokenAmount();
 
       let {longShort, markets} = contracts.contents;
 
@@ -28,7 +28,7 @@ let testIntegration =
       let%AwaitThen _ =
         paymentToken->ERC20Mock.mint(
           ~_to=testUser.address,
-          ~amount=amountToLazyMint,
+          ~amount=amountToNextPriceMint,
         );
 
       let%AwaitThen _ =
@@ -39,13 +39,13 @@ let testIntegration =
         ->ContractHelpers.connect(~address=testUser)
         ->ERC20Mock.approve(
             ~spender=longShort.address,
-            ~amount=amountToLazyMint,
+            ~amount=amountToNextPriceMint,
           );
 
       let%AwaitThen _ =
         HelperActions.mintDirect(
           ~marketIndex,
-          ~amount=amountToLazyMint,
+          ~amount=amountToNextPriceMint,
           ~token=paymentToken,
           ~user=testUser,
           ~longShort,
@@ -56,17 +56,17 @@ let testIntegration =
       let%AwaitThen usersBalanceAvailableForRedeem =
         longSynth->SyntheticToken.balanceOf(~account=testUser.address);
       let%AwaitThen _ =
-        longShortUserConnected->LongShort.redeemLongLazy(
+        longShortUserConnected->LongShort.redeemLongNextPrice(
           ~marketIndex,
           ~tokensToRedeem=usersBalanceAvailableForRedeem,
         );
-      let%AwaitThen usersBalanceAfterLazyRedeem =
+      let%AwaitThen usersBalanceAfterNextPriceRedeem =
         longSynth->SyntheticToken.balanceOf(~account=testUser.address);
 
       Chai.bnEqual(
         ~message=
           "Balance after price system update but before user settlement should be the same as after settlement",
-        usersBalanceAfterLazyRedeem,
+        usersBalanceAfterNextPriceRedeem,
         CONSTANTS.zeroBn,
       );
 
@@ -100,7 +100,7 @@ let testIntegration =
         ->div(CONSTANTS.tenToThe18);
 
       let%AwaitThen _ =
-        longShort->LongShort.executeOutstandingLazySettlementsUser(
+        longShort->LongShort.executeOutstandingNextPriceSettlementsUser(
           ~marketIndex,
           ~user=testUser.address,
         );
