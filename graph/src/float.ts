@@ -236,7 +236,7 @@ export function handleSyntheticTokenCreated(
     BigInt.fromI32(1)
   );
 
-  // Makae sure the latest staker state has the correct ID even though the instance hasn't been created yet.
+  // Make sure the latest staker state has the correct ID even though the instance hasn't been created yet.
   syntheticMarket.latestStakerState = getStakerStateId(marketIndexString, ZERO);
 
   longToken.syntheticMarket = syntheticMarket.id;
@@ -522,7 +522,20 @@ export function handleNewMarketLaunchedAndSeeded(
   event: NewMarketLaunchedAndSeeded
 ): void {
   // TODO - need to include the market seed initially
+  let marketIndex = event.params.marketIndex;
+
+
   // @chris please fill in the saveEventToStateChange for this function
+  saveEventToStateChange(
+    event,
+    "NewMarketLaunchedAndSeeded",
+    [marketIndex.toString()],
+    ["marketIndex"],
+    ["uint32"],
+    [],
+    []
+  );
+  
 }
 
 export function removeFromArrayAtIndex(
@@ -612,8 +625,25 @@ export function handleBatchedActionsSettled(
   }
 
   batchedNextPriceExec.save();
-  // TODO
-  // @chris please fill in the saveEventToStateChange for this function
+  saveEventToStateChange(
+    event,
+    "BatchedActionsSettled",
+    bigIntArrayToStringArray([
+      marketIndex,
+      updateIndex,
+      mintPriceSnapshotLong,
+      mintPriceSnapshotShort,
+    ]),
+    [
+      "marketIndex",
+      "updateIndex",
+      "mintPriceSnapshotLong",
+      "mintPriceSnapshotShort",
+    ],
+    ["uint32", "uint256", "uint256", "uint256"],
+    [],
+    []
+  );
 }
 
 export function handleExecuteNextPriceSettlementsUser(
@@ -643,8 +673,15 @@ export function handleExecuteNextPriceSettlementsUser(
 
   user.save();
 
-  // TODO
-  // @chris please fill in the saveEventToStateChange for this function
+  saveEventToStateChange(
+    event,
+    "ExecuteNextPriceSettlementsUser",
+    [marketIndex.toString(), user.id],
+    ["marketIndex", "userAddress"],
+    ["uint256", "address"],
+    [userAddress],
+    []
+  );
 }
 
 function updateLatestTokenPrice(
