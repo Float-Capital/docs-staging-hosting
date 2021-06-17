@@ -867,6 +867,10 @@ contract LongShort is ILongShort, Initializable {
     ) internal {
         uint256 totalAmount = amountLong + amountShort;
 
+        if (totalAmount == 0) {
+            return;
+        }
+
         assert(
             syntheticTokenBackedValue[MarketSide.Long][marketIndex] >=
                 amountLong &&
