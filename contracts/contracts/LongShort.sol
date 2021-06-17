@@ -682,7 +682,7 @@ contract LongShort is ILongShort, Initializable {
     function handleBatchedDepositSettlement(
         uint32 marketIndex,
         MarketSide syntheticTokenType
-    ) internal {
+    ) internal returns (bool wasABatchedSettlement) {
         uint256 amountToBatchDeposit =
             batchedNextPricePaymentTokenToDeposit[marketIndex][
                 syntheticTokenType
@@ -730,6 +730,7 @@ contract LongShort is ILongShort, Initializable {
                 syntheticTokenPrice[MarketSide.Short][marketIndex] ==
                     oldTokenShortPrice
             );
+            wasABatchedSettlement = true;
         }
     }
 
@@ -802,34 +803,38 @@ contract LongShort is ILongShort, Initializable {
                 newLatestPriceStateIndex
             );
 
-            handleBatchedDepositSettlement(marketIndex, MarketSide.Long);
-            handleBatchedDepositSettlement(marketIndex, MarketSide.Short);
-            handleBatchedNextPriceRedeems(marketIndex);
+            if (
+                handleBatchedDepositSettlement(marketIndex, MarketSide.Long) ||
+                handleBatchedDepositSettlement(marketIndex, MarketSide.Short) ||
+                handleBatchedNextPriceRedeems(marketIndex)
+            ) {
+                emit BatchedActionsSettled(
+                    marketIndex,
+                    newLatestPriceStateIndex,
+                    mintPriceSnapshot[marketIndex][newLatestPriceStateIndex][
+                        MarketSide.Long
+                    ],
+                    mintPriceSnapshot[marketIndex][newLatestPriceStateIndex][
+                        MarketSide.Short
+                    ],
+                    redeemPriceSnapshot[marketIndex][newLatestPriceStateIndex][
+                        MarketSide.Long
+                    ],
+                    redeemPriceSnapshot[marketIndex][newLatestPriceStateIndex][
+                        MarketSide.Short
+                    ]
+                );
 
-            emit BatchedActionsSettled(
-                marketIndex,
-                newLatestPriceStateIndex,
-                mintPriceSnapshot[marketIndex][newLatestPriceStateIndex][
-                    MarketSide.Long
-                ],
-                mintPriceSnapshot[marketIndex][newLatestPriceStateIndex][
-                    MarketSide.Short
-                ],
-                redeemPriceSnapshot[marketIndex][newLatestPriceStateIndex][
-                    MarketSide.Long
-                ],
-                redeemPriceSnapshot[marketIndex][newLatestPriceStateIndex][
-                    MarketSide.Short
-                ]
-            );
-
-            emit ValueLockedInSystem(
-                marketIndex,
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-                    syntheticTokenBackedValue[MarketSide.Short][marketIndex],
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex],
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex]
-            );
+                emit ValueLockedInSystem(
+                    marketIndex,
+                    syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
+                        syntheticTokenBackedValue[MarketSide.Short][
+                            marketIndex
+                        ],
+                    syntheticTokenBackedValue[MarketSide.Long][marketIndex],
+                    syntheticTokenBackedValue[MarketSide.Short][marketIndex]
+                );
+            }
         }
     }
 
@@ -1231,12 +1236,13 @@ contract LongShort is ILongShort, Initializable {
         uint32 marketIndex,
         MarketSide syntheticTokenType,
         uint256 amountSynthToRedeem
-    ) internal {
+    ) internal returns (bool wasABatchedSettlement) {
         if (amountSynthToRedeem > 0) {
             syntheticTokens[syntheticTokenType][marketIndex].synthRedeemBurn(
                 address(this),
                 amountSynthToRedeem
             );
+            wasABatchedSettlement = true;
         }
     }
 
@@ -1303,22 +1309,27 @@ contract LongShort is ILongShort, Initializable {
         }
     }
 
-    function handleBatchedNextPriceRedeems(uint32 marketIndex) internal {
+    function handleBatchedNextPriceRedeems(uint32 marketIndex)
+        internal
+        returns (bool wasABatchedSettlement)
+    {
         uint256 batchedNextPriceSynthToRedeemLong =
             batchedNextPriceSynthToRedeem[marketIndex][MarketSide.Long];
         uint256 batchedNextPriceSynthToRedeemShort =
             batchedNextPriceSynthToRedeem[marketIndex][MarketSide.Short];
 
-        _handleBatchedNextPriceRedeem(
-            marketIndex,
-            MarketSide.Long,
-            batchedNextPriceSynthToRedeemLong
-        );
-        _handleBatchedNextPriceRedeem(
-            marketIndex,
-            MarketSide.Short,
-            batchedNextPriceSynthToRedeemShort
-        );
+        bool longBatchExisted =
+            _handleBatchedNextPriceRedeem(
+                marketIndex,
+                MarketSide.Long,
+                batchedNextPriceSynthToRedeemLong
+            );
+        bool shortBatchExisted =
+            _handleBatchedNextPriceRedeem(
+                marketIndex,
+                MarketSide.Short,
+                batchedNextPriceSynthToRedeemShort
+            );
 
         uint256 longAmountOfPaymentTokenToRedeem =
             getAmountPaymentToken(
@@ -1365,5 +1376,6 @@ contract LongShort is ILongShort, Initializable {
 
         batchedNextPriceSynthToRedeem[marketIndex][MarketSide.Long] = 0;
         batchedNextPriceSynthToRedeem[marketIndex][MarketSide.Short] = 0;
+        wasABatchedSettlement = longBatchExisted || longBatchExisted;
     }
 }
