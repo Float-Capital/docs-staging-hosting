@@ -105,10 +105,10 @@ let getAllMarkets = longShort => {
     ->Array.map(marketIndex =>
       JsPromise.all5((
         longShort
-        ->LongShort.syntheticTokens(CONSTANTS.longTokenType, marketIndex)
+        ->LongShort.syntheticTokens(marketIndex, CONSTANTS.longTokenType)
         ->JsPromise.then(SyntheticToken.at),
         longShort
-        ->LongShort.syntheticTokens(CONSTANTS.shortTokenType, marketIndex)
+        ->LongShort.syntheticTokens(marketIndex, CONSTANTS.shortTokenType)
         ->JsPromise.then(SyntheticToken.at),
         longShort->LongShort.fundTokens(marketIndex)->JsPromise.then(ERC20Mock.at),
         longShort->LongShort.oracleManagers(marketIndex)->JsPromise.then(OracleManagerMock.at),

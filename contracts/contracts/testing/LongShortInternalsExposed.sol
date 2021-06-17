@@ -25,10 +25,10 @@ contract LongShortInternalsExposed is LongShortMockable {
         latestMarket = _latestMarket;
         marketExists[marketIndex] = marketIndexValue;
         staker = IStaker(_staker);
-        syntheticTokens[MarketSide.Long][marketIndex] = ISyntheticToken(
+        syntheticTokens[marketIndex][MarketSide.Long] = ISyntheticToken(
             longAddress
         );
-        syntheticTokens[MarketSide.Short][marketIndex] = ISyntheticToken(
+        syntheticTokens[marketIndex][MarketSide.Short] = ISyntheticToken(
             shortAddress
         );
     }

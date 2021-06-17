@@ -1140,5 +1140,18 @@
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "name": "updateSystemStateMarketMock",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
   }
 ]
