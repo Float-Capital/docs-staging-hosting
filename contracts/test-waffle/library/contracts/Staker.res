@@ -46,20 +46,6 @@ type batchedStakeReturn = {
 external batchedStake: (t, int, Ethers.BigNumber.t) => JsPromise.t<batchedStakeReturn> =
   "batchedStake"
 
-type calculateFloatPerSecondReturn = {
-  longFloatPerSecond: Ethers.BigNumber.t,
-  shortFloatPerSecond: Ethers.BigNumber.t,
-}
-@send
-external calculateFloatPerSecond: (
-  t,
-  ~longValue: Ethers.BigNumber.t,
-  ~shortValue: Ethers.BigNumber.t,
-  ~longPrice: Ethers.BigNumber.t,
-  ~shortPrice: Ethers.BigNumber.t,
-  ~marketIndex: int,
-) => JsPromise.t<calculateFloatPerSecondReturn> = "calculateFloatPerSecond"
-
 @send
 external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
 
@@ -258,20 +244,6 @@ module Exposed = {
     ~marketIndex: int,
     ~user: Ethers.ethAddress,
   ) => JsPromise.t<calculateAccumulatedFloatExposedReturn> = "calculateAccumulatedFloatExposed"
-
-  type calculateFloatPerSecondReturn = {
-    longFloatPerSecond: Ethers.BigNumber.t,
-    shortFloatPerSecond: Ethers.BigNumber.t,
-  }
-  @send
-  external calculateFloatPerSecond: (
-    t,
-    ~longValue: Ethers.BigNumber.t,
-    ~shortValue: Ethers.BigNumber.t,
-    ~longPrice: Ethers.BigNumber.t,
-    ~shortPrice: Ethers.BigNumber.t,
-    ~marketIndex: int,
-  ) => JsPromise.t<calculateFloatPerSecondReturn> = "calculateFloatPerSecond"
 
   @send
   external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"

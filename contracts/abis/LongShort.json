@@ -594,7 +594,7 @@
         "type": "uint8"
       }
     ],
-    "name": "batchedNextPricePaymentTokenToDeposit",
+    "name": "batchedNextPriceDepositAmount",
     "outputs": [
       {
         "internalType": "uint256",
@@ -618,7 +618,7 @@
         "type": "uint8"
       }
     ],
-    "name": "batchedNextPriceSynthToRedeem",
+    "name": "batchedNextPriceSynthRedeemAmount",
     "outputs": [
       {
         "internalType": "uint256",
@@ -922,12 +922,12 @@
         "type": "uint32"
       }
     ],
-    "name": "latestUpdateIndex",
+    "name": "marketExists",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "bool",
         "name": "",
-        "type": "uint256"
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -941,12 +941,12 @@
         "type": "uint32"
       }
     ],
-    "name": "marketExists",
+    "name": "marketUpdateIndex",
     "outputs": [
       {
-        "internalType": "bool",
+        "internalType": "uint256",
         "name": "",
-        "type": "bool"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -978,14 +978,14 @@
         "type": "uint32"
       },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
         "internalType": "enum ILongShort.MarketSide",
         "name": "",
         "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "name": "mintPriceSnapshot",
@@ -1095,14 +1095,14 @@
         "type": "uint32"
       },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
         "internalType": "enum ILongShort.MarketSide",
         "name": "",
         "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "name": "redeemPriceSnapshot",
@@ -1150,17 +1150,17 @@
   {
     "inputs": [
       {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "",
-        "type": "uint8"
-      },
-      {
         "internalType": "uint32",
         "name": "",
         "type": "uint32"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
       }
     ],
-    "name": "syntheticTokenBackedValue",
+    "name": "syntheticTokenPoolValue",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1174,14 +1174,14 @@
   {
     "inputs": [
       {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "",
-        "type": "uint8"
-      },
-      {
         "internalType": "uint32",
         "name": "",
         "type": "uint32"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
       }
     ],
     "name": "syntheticTokenPrice",
@@ -1198,14 +1198,14 @@
   {
     "inputs": [
       {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "",
-        "type": "uint8"
-      },
-      {
         "internalType": "uint32",
         "name": "",
         "type": "uint32"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
       }
     ],
     "name": "syntheticTokens",
@@ -1346,17 +1346,17 @@
         "type": "uint32"
       },
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
         "internalType": "enum ILongShort.MarketSide",
         "name": "",
         "type": "uint8"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
-    "name": "userNextPriceDepositAmounts",
+    "name": "userNextPriceDepositAmount",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1375,17 +1375,17 @@
         "type": "uint32"
       },
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
         "internalType": "enum ILongShort.MarketSide",
         "name": "",
         "type": "uint8"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
-    "name": "userNextPriceRedemptions",
+    "name": "userNextPriceRedemptionAmount",
     "outputs": [
       {
         "internalType": "uint256",
