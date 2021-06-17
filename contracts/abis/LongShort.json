@@ -1150,14 +1150,14 @@
   {
     "inputs": [
       {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "",
-        "type": "uint8"
-      },
-      {
         "internalType": "uint32",
         "name": "",
         "type": "uint32"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
       }
     ],
     "name": "syntheticTokenBackedValue",
@@ -1174,14 +1174,14 @@
   {
     "inputs": [
       {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "",
-        "type": "uint8"
-      },
-      {
         "internalType": "uint32",
         "name": "",
         "type": "uint32"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
       }
     ],
     "name": "syntheticTokenPrice",
@@ -1198,14 +1198,14 @@
   {
     "inputs": [
       {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "",
-        "type": "uint8"
-      },
-      {
         "internalType": "uint32",
         "name": "",
         "type": "uint32"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
       }
     ],
     "name": "syntheticTokens",
