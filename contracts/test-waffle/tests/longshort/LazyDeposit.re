@@ -26,9 +26,9 @@ let testIntegration =
         markets->Array.getUnsafe(0);
 
       let%AwaitThen _longValueBefore =
-        longShort->LongShort.syntheticTokenBackedValue(
-          CONSTANTS.longTokenType,
+        longShort->LongShort.syntheticTokenPoolValue(
           marketIndex,
+          CONSTANTS.longTokenType,
         );
 
       let%AwaitThen _ =
@@ -97,8 +97,8 @@ let testIntegration =
 
       let%Await longTokenPrice =
         longShort->LongShort.syntheticTokenPrice(
-          CONSTANTS.longTokenType,
           marketIndex,
+          CONSTANTS.longTokenType,
         );
 
       let expectedNumberOfTokensToRecieve =
@@ -196,7 +196,7 @@ let testExposed =
         let {longShort} = contracts.contents;
         let%AwaitThen _ = mintLongNextPriceTxPromise.contents;
         let%Await mintAmount =
-          longShort->LongShort.batchedNextPricePaymentTokenToDeposit(
+          longShort->LongShort.batchedNextPriceDepositAmount(
             marketIndex,
             CONSTANTS.longTokenType,
           );

@@ -20,9 +20,9 @@ let testIntegration =
         markets->Array.getUnsafe(0);
 
       let%AwaitThen _longValueBefore =
-        longShort->LongShort.syntheticTokenBackedValue(
-          CONSTANTS.longTokenType,
+        longShort->LongShort.syntheticTokenPoolValue(
           marketIndex,
+          CONSTANTS.longTokenType,
         );
 
       let%AwaitThen _ =
@@ -86,12 +86,12 @@ let testIntegration =
 
       let%AwaitThen _ = longShort->LongShort._updateSystemState(~marketIndex);
       let%AwaitThen latestUpdateIndex =
-        longShort->LongShort.latestUpdateIndex(marketIndex);
+        longShort->LongShort.marketUpdateIndex(marketIndex);
       let%AwaitThen redemptionPriceWithFees =
         longShort->LongShort.redeemPriceSnapshot(
           marketIndex,
-          latestUpdateIndex,
           CONSTANTS.longTokenType,
+          latestUpdateIndex,
         );
 
       let amountExpectedToBeRedeemed =

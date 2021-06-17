@@ -444,3 +444,8 @@ external updateMarketOracleMock: (
   int,
   Ethers.ethAddress,
 ) => JsPromise.t<updateMarketOracleMockReturn> = "updateMarketOracleMock"
+
+type updateSystemStateMarketMockReturn
+@send
+external updateSystemStateMarketMock: (t, int) => JsPromise.t<updateSystemStateMarketMockReturn> =
+  "updateSystemStateMarketMock"

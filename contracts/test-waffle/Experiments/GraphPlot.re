@@ -76,14 +76,14 @@ let generateTestData =
               let%AwaitThen _ =
                 longShort->LongShort._updateSystemState(~marketIndex);
               let%AwaitThen shortValue =
-                longShort->LongShort.syntheticTokenBackedValue(
-                  CONSTANTS.shortTokenType,
+                longShort->LongShort.syntheticTokenPoolValue(
                   marketIndex,
+                  CONSTANTS.shortTokenType,
                 );
               let%AwaitThen longValue =
-                longShort->LongShort.syntheticTokenBackedValue(
-                  CONSTANTS.longTokenType,
+                longShort->LongShort.syntheticTokenPoolValue(
                   marketIndex,
+                  CONSTANTS.longTokenType,
                 );
 
               (
@@ -142,14 +142,14 @@ let generateTestData =
               let%AwaitThen _ =
                 longShort->LongShort._updateSystemState(~marketIndex);
               let%AwaitThen shortValue =
-                longShort->LongShort.syntheticTokenBackedValue(
-                  CONSTANTS.shortTokenType,
+                longShort->LongShort.syntheticTokenPoolValue(
                   marketIndex,
+                  CONSTANTS.shortTokenType,
                 );
               let%AwaitThen longValue =
-                longShort->LongShort.syntheticTokenBackedValue(
-                  CONSTANTS.longTokenType,
+                longShort->LongShort.syntheticTokenPoolValue(
                   marketIndex,
+                  CONSTANTS.longTokenType,
                 );
 
               (
