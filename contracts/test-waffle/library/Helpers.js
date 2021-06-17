@@ -84,8 +84,8 @@ function getAllMarkets(longShort) {
   return longShort.latestMarket().then(function (nextMarketIndex) {
               return Promise.all(Belt_Array.map(Belt_Array.range(1, nextMarketIndex), (function (marketIndex) {
                                 return Promise.all([
-                                              longShort.syntheticTokens(CONSTANTS.longTokenType, marketIndex).then(SyntheticToken.at),
-                                              longShort.syntheticTokens(CONSTANTS.shortTokenType, marketIndex).then(SyntheticToken.at),
+                                              longShort.syntheticTokens(marketIndex, CONSTANTS.longTokenType).then(SyntheticToken.at),
+                                              longShort.syntheticTokens(marketIndex, CONSTANTS.shortTokenType).then(SyntheticToken.at),
                                               longShort.fundTokens(marketIndex).then(ERC20Mock.at),
                                               longShort.oracleManagers(marketIndex).then(OracleManagerMock.at),
                                               longShort.yieldManagers(marketIndex).then(YieldManagerMock.at)

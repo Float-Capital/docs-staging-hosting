@@ -19,7 +19,7 @@ function testIntegration(contracts, accounts) {
                               var longSynth = match$1.longSynth;
                               var oracleManager = match$1.oracleManager;
                               var paymentToken = match$1.paymentToken;
-                              return LetOps.AwaitThen.let_(longShort.syntheticTokenBackedValue(CONSTANTS.longTokenType, marketIndex), (function (_longValueBefore) {
+                              return LetOps.AwaitThen.let_(longShort.syntheticTokenPoolValue(marketIndex, CONSTANTS.longTokenType), (function (_longValueBefore) {
                                             return LetOps.AwaitThen.let_(paymentToken.mint(testUser.address, amountToNextPriceMint), (function (param) {
                                                           return LetOps.AwaitThen.let_(paymentToken.connect(testUser).approve(longShort.address, amountToNextPriceMint), (function (param) {
                                                                         return LetOps.AwaitThen.let_(longShort.connect(testUser).mintLongNextPrice(marketIndex, amountToNextPriceMint), (function (param) {
@@ -31,7 +31,7 @@ function testIntegration(contracts, accounts) {
                                                                                                                                               return LetOps.AwaitThen.let_(longShort.connect(testUser).mintLongNextPrice(marketIndex, Globals.bnFromInt(0)), (function (param) {
                                                                                                                                                             return LetOps.AwaitThen.let_(longSynth.balanceOf(testUser.address), (function (usersUpdatedBalance) {
                                                                                                                                                                           Chai.bnEqual("Balance after price system update but before user settlement should be the same as after settlement", usersBalanceBeforeSettlement, usersUpdatedBalance);
-                                                                                                                                                                          return LetOps.Await.let_(longShort.syntheticTokenPrice(CONSTANTS.longTokenType, marketIndex), (function (longTokenPrice) {
+                                                                                                                                                                          return LetOps.Await.let_(longShort.syntheticTokenPrice(marketIndex, CONSTANTS.longTokenType), (function (longTokenPrice) {
                                                                                                                                                                                         var expectedNumberOfTokensToRecieve = Globals.div(Globals.mul(amountToNextPriceMint, CONSTANTS.tenToThe18), longTokenPrice);
                                                                                                                                                                                         return Chai.bnEqual("balance is incorrect", expectedNumberOfTokensToRecieve, usersUpdatedBalance);
                                                                                                                                                                                       }));
@@ -88,7 +88,7 @@ function testExposed(contracts, accounts) {
                                       var match = contracts.contents;
                                       var longShort = match.longShort;
                                       return LetOps.AwaitThen.let_(mintLongNextPriceTxPromise.contents, (function (param) {
-                                                    return LetOps.Await.let_(longShort.batchedNextPricePaymentTokenToDeposit(1, CONSTANTS.longTokenType), (function (mintAmount) {
+                                                    return LetOps.Await.let_(longShort.batchedNextPriceDepositAmount(1, CONSTANTS.longTokenType), (function (mintAmount) {
                                                                   return Chai.bnEqual("Incorrect batched lazy deposit mint long", amount, mintAmount);
                                                                 }));
                                                   }));

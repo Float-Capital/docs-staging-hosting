@@ -51,10 +51,6 @@ contract LongShortForInternalMocking {
       return (abi.decode("",(ILongShort.MarketSide)));
     }
      
-    function getTreasurySplitMock(uint32,uint256) public pure returns (uint256 marketAmount,uint256 treasuryAmount){
-      return (abi.decode("",(uint256)),abi.decode("",(uint256)));
-    }
-     
     function getPriceMock(uint256,uint256) public pure returns (uint256 ){
       return (abi.decode("",(uint256)));
     }
@@ -67,8 +63,20 @@ contract LongShortForInternalMocking {
       return (abi.decode("",(uint256)));
     }
      
+    function getUsersPendingBalanceMock(address,uint32,ILongShort.MarketSide) public pure returns (uint256 pendingBalance){
+      return (abi.decode("",(uint256)));
+    }
+     
+    function getTreasurySplitMock(uint32,uint256) public pure returns (uint256 marketAmount,uint256 treasuryAmount){
+      return (abi.decode("",(uint256)),abi.decode("",(uint256)));
+    }
+     
     function getMarketSplitMock(uint32,uint256) public pure returns (uint256 longAmount,uint256 shortAmount){
       return (abi.decode("",(uint256)),abi.decode("",(uint256)));
+    }
+     
+    function _minimumMock(uint256,uint256) public pure returns (int256 ){
+      return (abi.decode("",(int256)));
     }
      
     function _refreshTokenPricesMock(uint32) public pure {
@@ -85,10 +93,6 @@ contract LongShortForInternalMocking {
      
     function _claimAndDistributeYieldMock(uint32) public pure {
       return ();
-    }
-     
-    function _minimumMock(uint256,uint256) public pure returns (int256 ){
-      return (abi.decode("",(int256)));
     }
      
     function _adjustMarketBasedOnNewAssetPriceMock(uint32,int256) public pure returns (bool didUpdate){
@@ -135,15 +139,11 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function _getFeesGeneralMock(uint32,uint256,ILongShort.MarketSide,ILongShort.MarketSide,uint256,uint256) public pure returns (uint256 ){
-      return (abi.decode("",(uint256)));
-    }
-     
     function transferTreasuryFundsMock(uint32) public pure {
       return ();
     }
      
-    function getUsersPendingBalanceMock(address,uint32,ILongShort.MarketSide) public pure returns (uint256 pendingBalance){
+    function _getFeesGeneralMock(uint32,uint256,ILongShort.MarketSide,ILongShort.MarketSide,uint256,uint256) public pure returns (uint256 ){
       return (abi.decode("",(uint256)));
     }
      

@@ -16,6 +16,7 @@ import "../../interfaces/IOracleManager.sol";
 
 
 
+
 import "./LongShortForInternalMocking.sol";
 contract LongShortMockable is ILongShort, Initializable {
   LongShortForInternalMocking mocker;
@@ -32,16 +33,8 @@ contract LongShortMockable is ILongShort, Initializable {
   }
 
 
-            
-        address public admin;     uint32 public latestMarket;
-    mapping(uint32 => bool) public marketExists;
+    
 
-        address public treasury;
-
-        ITokenFactory public tokenFactory;
-
-        IStaker public staker;
-    uint256[45] private __globalStateGap;
 
         address public constant DEAD_ADDRESS =
         0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
@@ -50,46 +43,57 @@ contract LongShortMockable is ILongShort, Initializable {
     uint256 public constant feeUnitsOfPrecision = 10000;
     uint256[45] private __constantsGap;
 
-        mapping(MarketSide => mapping(uint32 => uint256))
-        public syntheticTokenBackedValue;
+        address public admin;
+    address public treasury;
+    uint32 public latestMarket;
+
+    IStaker public staker;
+    ITokenFactory public tokenFactory;
+    uint256[45] private __globalStateGap;
+
+        mapping(uint32 => bool) public marketExists;
+    mapping(uint32 => uint256) public assetPrice;
+    mapping(uint32 => uint256) public marketUpdateIndex;
+
     mapping(uint32 => uint256) public totalValueLockedInYieldManager;
     mapping(uint32 => uint256) public totalValueReservedForTreasury;
-    mapping(uint32 => uint256) public assetPrice;
-    mapping(MarketSide => mapping(uint32 => uint256))
-        public syntheticTokenPrice;     mapping(uint32 => IERC20) public fundTokens;
+    mapping(uint32 => IERC20) public fundTokens;
     mapping(uint32 => IYieldManager) public yieldManagers;
     mapping(uint32 => IOracleManager) public oracleManagers;
-    uint256[45] private __marketStateGap;
 
-        mapping(MarketSide => mapping(uint32 => ISyntheticToken))
-        public syntheticTokens;
-    uint256[45] private __marketSynthsGap;
-
-            mapping(uint32 => uint256) public baseEntryFee;
+    mapping(uint32 => uint256) public baseEntryFee;
     mapping(uint32 => uint256) public badLiquidityEntryFee;
     mapping(uint32 => uint256) public baseExitFee;
     mapping(uint32 => uint256) public badLiquidityExitFee;
-    uint256[45] private __feeInfo;
 
-        mapping(uint32 => uint256) public latestUpdateIndex;
-        mapping(uint32 => mapping(uint256 => mapping(MarketSide => uint256)))
+        mapping(uint32 => mapping(MarketSide => ISyntheticToken))
+        public syntheticTokens;
+    mapping(uint32 => mapping(MarketSide => uint256))
+        public syntheticTokenPoolValue;
+    mapping(uint32 => mapping(MarketSide => uint256))
+        public syntheticTokenPrice;
+
+    mapping(uint32 => mapping(MarketSide => mapping(uint256 => uint256)))
         public mintPriceSnapshot;
-    mapping(uint32 => mapping(uint256 => mapping(MarketSide => uint256)))
+    mapping(uint32 => mapping(MarketSide => mapping(uint256 => uint256)))
         public redeemPriceSnapshot;
 
-        mapping(uint32 => mapping(MarketSide => uint256))
-        public batchedNextPricePaymentTokenToDeposit;
     mapping(uint32 => mapping(MarketSide => uint256))
-        public batchedNextPriceSynthToRedeem;
+        public batchedNextPriceDepositAmount;
+    mapping(uint32 => mapping(MarketSide => uint256))
+        public batchedNextPriceSynthRedeemAmount;
 
-    mapping(uint32 => mapping(address => mapping(MarketSide => uint256)))
-        public userNextPriceRedemptions;
-    mapping(uint32 => mapping(address => mapping(MarketSide => uint256)))
-        public userNextPriceDepositAmounts;
-    mapping(uint32 => mapping(address => uint256))
+        mapping(uint32 => mapping(address => uint256))
         public userCurrentNextPriceUpdateIndex;
 
-            
+    mapping(uint32 => mapping(MarketSide => mapping(address => uint256)))
+        public userNextPriceDepositAmount;
+    mapping(uint32 => mapping(MarketSide => mapping(address => uint256)))
+        public userNextPriceRedemptionAmount;
+
+    
+
+
     event V1(
         address admin,
         address treasury,
@@ -173,7 +177,9 @@ contract LongShortMockable is ILongShort, Initializable {
 
     event ExecuteNextPriceSettlementsUser(address user, uint32 marketIndex);
 
-            
+    
+
+
     
 
 
@@ -229,12 +235,12 @@ contract LongShortMockable is ILongShort, Initializable {
       
         if (syntheticTokenType == ILongShort.MarketSide.Long) {
             require(
-                syntheticTokens[MarketSide.Long][marketIndex] == syntheticToken,
+                syntheticTokens[marketIndex][MarketSide.Long] == syntheticToken,
                 "Incorrect synthetic token"
             );
         } else {
             require(
-                syntheticTokens[MarketSide.Short][marketIndex] ==
+                syntheticTokens[marketIndex][MarketSide.Short] ==
                     syntheticToken,
                 "Incorrect synthetic token"
             );
@@ -275,7 +281,9 @@ contract LongShortMockable is ILongShort, Initializable {
     }
   }
 
-            
+    
+
+
     function initialize(
         address _admin,
         address _treasury,
@@ -300,7 +308,9 @@ contract LongShortMockable is ILongShort, Initializable {
         );
     }
 
-            
+    
+
+
     function changeAdmin(address _admin) external adminOnly {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("changeAdmin"))){
       
@@ -388,6 +398,9 @@ contract LongShortMockable is ILongShort, Initializable {
 
     
 
+
+    
+
     function newSyntheticMarket(
         string calldata syntheticName,
         string calldata syntheticSymbol,
@@ -402,7 +415,7 @@ contract LongShortMockable is ILongShort, Initializable {
   
         latestMarket++;
 
-                syntheticTokens[MarketSide.Long][latestMarket] = ISyntheticToken(
+                syntheticTokens[latestMarket][MarketSide.Long] = ISyntheticToken(
             tokenFactory.createTokenLong(
                 syntheticName,
                 syntheticSymbol,
@@ -411,7 +424,7 @@ contract LongShortMockable is ILongShort, Initializable {
             )
         );
 
-                syntheticTokens[MarketSide.Short][latestMarket] = ISyntheticToken(
+                syntheticTokens[latestMarket][MarketSide.Short] = ISyntheticToken(
             tokenFactory.createTokenShort(
                 syntheticName,
                 syntheticSymbol,
@@ -420,8 +433,8 @@ contract LongShortMockable is ILongShort, Initializable {
             )
         );
 
-                syntheticTokenPrice[MarketSide.Long][latestMarket] = TEN_TO_THE_18;
-        syntheticTokenPrice[MarketSide.Short][latestMarket] = TEN_TO_THE_18;
+                syntheticTokenPrice[latestMarket][MarketSide.Long] = TEN_TO_THE_18;
+        syntheticTokenPrice[latestMarket][MarketSide.Short] = TEN_TO_THE_18;
         fundTokens[latestMarket] = IERC20(_fundToken);
         yieldManagers[latestMarket] = IYieldManager(_yieldManager);
         oracleManagers[latestMarket] = IOracleManager(_oracleManager);
@@ -431,8 +444,8 @@ contract LongShortMockable is ILongShort, Initializable {
 
         emit SyntheticTokenCreated(
             latestMarket,
-            address(syntheticTokens[MarketSide.Long][latestMarket]),
-            address(syntheticTokens[MarketSide.Short][latestMarket]),
+            address(syntheticTokens[latestMarket][MarketSide.Long]),
+            address(syntheticTokens[latestMarket][MarketSide.Short]),
             _fundToken,
             assetPrice[latestMarket],
             syntheticName,
@@ -456,20 +469,20 @@ contract LongShortMockable is ILongShort, Initializable {
 
         _lockFundsInMarket(marketIndex, initialMarketSeed * 2);
 
-        syntheticTokens[MarketSide.Long][marketIndex].mint(
+        syntheticTokens[latestMarket][MarketSide.Long].mint(
             DEAD_ADDRESS,
             initialMarketSeed
         );
-        syntheticTokens[MarketSide.Short][marketIndex].mint(
+        syntheticTokens[latestMarket][MarketSide.Short].mint(
             DEAD_ADDRESS,
             initialMarketSeed
         );
 
-        syntheticTokenBackedValue[MarketSide.Long][
-            marketIndex
+        syntheticTokenPoolValue[marketIndex][
+            MarketSide.Long
         ] = initialMarketSeed;
-        syntheticTokenBackedValue[MarketSide.Short][
-            marketIndex
+        syntheticTokenPoolValue[marketIndex][
+            MarketSide.Short
         ] = initialMarketSeed;
 
         emit NewMarketLaunchedAndSeeded(marketIndex, initialMarketSeed);
@@ -504,8 +517,8 @@ contract LongShortMockable is ILongShort, Initializable {
 
                 staker.addNewStakingFund(
             latestMarket,
-            syntheticTokens[MarketSide.Long][marketIndex],
-            syntheticTokens[MarketSide.Short][marketIndex],
+            syntheticTokens[latestMarket][MarketSide.Long],
+            syntheticTokens[latestMarket][MarketSide.Short],
             kInitialMultiplier,
             kPeriod
         );
@@ -513,7 +526,9 @@ contract LongShortMockable is ILongShort, Initializable {
         seedMarketInitially(initialMarketSeed, marketIndex);
     }
 
-            
+    
+
+
     function getOtherSynthType(MarketSide synthTokenType)
         internal
         view
@@ -529,47 +544,6 @@ contract LongShortMockable is ILongShort, Initializable {
         } else {
             return MarketSide.Long;
         }
-    }
-
-    
-
-    function getTreasurySplit(uint32 marketIndex, uint256 amount)
-        public
-        view
-        returns (uint256 marketAmount, uint256 treasuryAmount)
-    {
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getTreasurySplit"))){
-      
-      return mocker.getTreasurySplitMock(marketIndex,amount);
-    }
-  
-        uint256 marketPcnt; 
-        uint256 totalValueLockedInMarket =
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex];
-
-        if (
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] >
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex]
-        ) {
-            marketPcnt =
-                ((syntheticTokenBackedValue[MarketSide.Long][marketIndex] -
-                    syntheticTokenBackedValue[MarketSide.Short][marketIndex]) *
-                    10000) /
-                totalValueLockedInMarket;
-        } else {
-            marketPcnt =
-                ((syntheticTokenBackedValue[MarketSide.Short][marketIndex] -
-                    syntheticTokenBackedValue[MarketSide.Long][marketIndex]) *
-                    10000) /
-                totalValueLockedInMarket;
-        }
-
-        marketAmount = (marketPcnt * amount) / 10000;
-        treasuryAmount = amount - marketAmount;
-        require(amount == marketAmount + treasuryAmount);
-
-        return (marketAmount, treasuryAmount);
     }
 
     function getPrice(uint256 amountSynth, uint256 amountPaymentToken)
@@ -605,6 +579,84 @@ contract LongShortMockable is ILongShort, Initializable {
         return (amountPaymentToken * TEN_TO_THE_18) / price;
     }
 
+    function getUsersPendingBalance(
+        address user,
+        uint32 marketIndex,
+        MarketSide syntheticTokenType
+    )
+        external
+        view
+        override
+        assertMarketExists(marketIndex)
+        returns (uint256 pendingBalance)
+    {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getUsersPendingBalance"))){
+      
+      return mocker.getUsersPendingBalanceMock(user,marketIndex,syntheticTokenType);
+    }
+  
+        if (
+            userCurrentNextPriceUpdateIndex[marketIndex][user] <=
+            marketUpdateIndex[marketIndex]
+        ) {
+                                    uint256 amountPaymentTokenDeposited =
+                userNextPriceDepositAmount[marketIndex][syntheticTokenType][
+                    user
+                ];
+
+            uint256 tokens =
+                getAmountSynthToken(
+                    amountPaymentTokenDeposited,
+                    syntheticTokenPrice[marketIndex][syntheticTokenType]
+                );
+
+            return tokens;
+        } else {
+            return 0;
+        }
+    }
+
+    
+
+    function getTreasurySplit(uint32 marketIndex, uint256 amount)
+        public
+        view
+        returns (uint256 marketAmount, uint256 treasuryAmount)
+    {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getTreasurySplit"))){
+      
+      return mocker.getTreasurySplitMock(marketIndex,amount);
+    }
+  
+        uint256 marketPcnt; 
+        uint256 totalValueLockedInMarket =
+            syntheticTokenPoolValue[marketIndex][MarketSide.Long] +
+                syntheticTokenPoolValue[marketIndex][MarketSide.Short];
+
+        if (
+            syntheticTokenPoolValue[marketIndex][MarketSide.Long] >
+            syntheticTokenPoolValue[marketIndex][MarketSide.Short]
+        ) {
+            marketPcnt =
+                ((syntheticTokenPoolValue[marketIndex][MarketSide.Long] -
+                    syntheticTokenPoolValue[marketIndex][MarketSide.Short]) *
+                    10000) /
+                totalValueLockedInMarket;
+        } else {
+            marketPcnt =
+                ((syntheticTokenPoolValue[marketIndex][MarketSide.Short] -
+                    syntheticTokenPoolValue[marketIndex][MarketSide.Long]) *
+                    10000) /
+                totalValueLockedInMarket;
+        }
+
+        marketAmount = (marketPcnt * amount) / 10000;
+        treasuryAmount = amount - marketAmount;
+        require(amount == marketAmount + treasuryAmount);
+
+        return (marketAmount, treasuryAmount);
+    }
+
     
 
     function getMarketSplit(uint32 marketIndex, uint256 amount)
@@ -618,13 +670,29 @@ contract LongShortMockable is ILongShort, Initializable {
     }
   
                         uint256 longPcnt =
-            (syntheticTokenBackedValue[MarketSide.Short][marketIndex] * 10000) /
-                (syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-                    syntheticTokenBackedValue[MarketSide.Short][marketIndex]);
+            (syntheticTokenPoolValue[marketIndex][MarketSide.Short] * 10000) /
+                (syntheticTokenPoolValue[marketIndex][MarketSide.Long] +
+                    syntheticTokenPoolValue[marketIndex][MarketSide.Short]);
 
         longAmount = (amount * longPcnt) / 10000;
         shortAmount = amount - longAmount;
         return (longAmount, shortAmount);
+    }
+
+    
+
+
+    function _minimum(uint256 A, uint256 B) internal view returns (int256) {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_minimum"))){
+      
+      return mocker._minimumMock(A,B);
+    }
+  
+        if (A < B) {
+            return int256(A);
+        } else {
+            return int256(B);
+        }
     }
 
     
@@ -636,28 +704,28 @@ contract LongShortMockable is ILongShort, Initializable {
     }
   
         uint256 longTokenSupply =
-            syntheticTokens[MarketSide.Long][marketIndex].totalSupply();
+            syntheticTokens[marketIndex][MarketSide.Long].totalSupply();
 
                 if (longTokenSupply > 0) {
-            syntheticTokenPrice[MarketSide.Long][marketIndex] = getPrice(
+            syntheticTokenPrice[marketIndex][MarketSide.Long] = getPrice(
                 longTokenSupply,
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex]
+                syntheticTokenPoolValue[marketIndex][MarketSide.Long]
             );
         }
 
         uint256 shortTokenSupply =
-            syntheticTokens[MarketSide.Short][marketIndex].totalSupply();
+            syntheticTokens[marketIndex][MarketSide.Short].totalSupply();
         if (shortTokenSupply > 0) {
-            syntheticTokenPrice[MarketSide.Short][marketIndex] = getPrice(
+            syntheticTokenPrice[marketIndex][MarketSide.Short] = getPrice(
                 shortTokenSupply,
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex]
+                syntheticTokenPoolValue[marketIndex][MarketSide.Short]
             );
         }
 
         emit TokenPriceRefreshed(
             marketIndex,
-            syntheticTokenPrice[MarketSide.Long][marketIndex],
-            syntheticTokenPrice[MarketSide.Short][marketIndex]
+            syntheticTokenPrice[marketIndex][MarketSide.Long],
+            syntheticTokenPrice[marketIndex][MarketSide.Short]
         );
     }
 
@@ -671,8 +739,8 @@ contract LongShortMockable is ILongShort, Initializable {
   
                 (uint256 longAmount, uint256 shortAmount) =
             getMarketSplit(marketIndex, marketAmount);
-        syntheticTokenBackedValue[MarketSide.Long][marketIndex] += longAmount;
-        syntheticTokenBackedValue[MarketSide.Short][marketIndex] += shortAmount;
+        syntheticTokenPoolValue[marketIndex][MarketSide.Long] += longAmount;
+        syntheticTokenPoolValue[marketIndex][MarketSide.Short] += shortAmount;
     }
 
     
@@ -715,19 +783,6 @@ contract LongShortMockable is ILongShort, Initializable {
         }
     }
 
-    function _minimum(uint256 A, uint256 B) internal view returns (int256) {
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_minimum"))){
-      
-      return mocker._minimumMock(A,B);
-    }
-  
-        if (A < B) {
-            return int256(A);
-        } else {
-            return int256(B);
-        }
-    }
-
     function _adjustMarketBasedOnNewAssetPrice(
         uint32 marketIndex,
         int256 newAssetPrice
@@ -745,8 +800,8 @@ contract LongShortMockable is ILongShort, Initializable {
 
         int256 min =
             _minimum(
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex],
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex]
+                syntheticTokenPoolValue[marketIndex][MarketSide.Long],
+                syntheticTokenPoolValue[marketIndex][MarketSide.Short]
             );
 
         int256 percentageChangeE18 =
@@ -756,17 +811,17 @@ contract LongShortMockable is ILongShort, Initializable {
         int256 valueChange = (percentageChangeE18 * min) / TEN_TO_THE_18_SIGNED;
 
         if (valueChange > 0) {
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] += uint256(
+            syntheticTokenPoolValue[marketIndex][MarketSide.Long] += uint256(
                 valueChange
             );
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] -= uint256(
+            syntheticTokenPoolValue[marketIndex][MarketSide.Short] -= uint256(
                 valueChange
             );
         } else {
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] -= uint256(
+            syntheticTokenPoolValue[marketIndex][MarketSide.Long] -= uint256(
                 valueChange * -1
             );
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] += uint256(
+            syntheticTokenPoolValue[marketIndex][MarketSide.Short] += uint256(
                 valueChange * -1
             );
         }
@@ -784,44 +839,40 @@ contract LongShortMockable is ILongShort, Initializable {
     }
   
         uint256 amountToBatchDeposit =
-            batchedNextPricePaymentTokenToDeposit[marketIndex][
-                syntheticTokenType
-            ];
+            batchedNextPriceDepositAmount[marketIndex][syntheticTokenType];
 
         if (amountToBatchDeposit > 0) {
-            batchedNextPricePaymentTokenToDeposit[marketIndex][
-                syntheticTokenType
-            ] = 0;
+            batchedNextPriceDepositAmount[marketIndex][syntheticTokenType] = 0;
             _transferFundsToYieldManager(marketIndex, amountToBatchDeposit);
 
                         uint256 numberOfTokens =
                 getAmountSynthToken(
                     amountToBatchDeposit,
-                    syntheticTokenPrice[syntheticTokenType][marketIndex]
+                    syntheticTokenPrice[marketIndex][syntheticTokenType]
                 );
 
-                        syntheticTokens[syntheticTokenType][marketIndex].mint(
+                        syntheticTokens[marketIndex][syntheticTokenType].mint(
                 address(this),
                 numberOfTokens
             );
 
-            syntheticTokenBackedValue[syntheticTokenType][
-                marketIndex
+            syntheticTokenPoolValue[marketIndex][
+                syntheticTokenType
             ] += amountToBatchDeposit;
 
                         uint256 oldTokenLongPrice =
-                syntheticTokenPrice[MarketSide.Long][marketIndex];
+                syntheticTokenPrice[marketIndex][MarketSide.Long];
             uint256 oldTokenShortPrice =
-                syntheticTokenPrice[MarketSide.Short][marketIndex];
+                syntheticTokenPrice[marketIndex][MarketSide.Short];
 
                                                 _refreshTokenPrices(marketIndex);
 
             assert(
-                syntheticTokenPrice[MarketSide.Long][marketIndex] ==
+                syntheticTokenPrice[marketIndex][MarketSide.Long] ==
                     oldTokenLongPrice
             );
             assert(
-                syntheticTokenPrice[MarketSide.Short][marketIndex] ==
+                syntheticTokenPrice[marketIndex][MarketSide.Short] ==
                     oldTokenShortPrice
             );
         }
@@ -836,13 +887,16 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker.snapshotPriceChangeForNextPriceExecutionMock(marketIndex,newLatestPriceStateIndex);
     }
   
-                mintPriceSnapshot[marketIndex][newLatestPriceStateIndex][
-            MarketSide.Long
-        ] = syntheticTokenPrice[MarketSide.Long][marketIndex];
-        mintPriceSnapshot[marketIndex][newLatestPriceStateIndex][
-            MarketSide.Short
-        ] = syntheticTokenPrice[MarketSide.Short][marketIndex];
+                mintPriceSnapshot[marketIndex][MarketSide.Long][
+            newLatestPriceStateIndex
+        ] = syntheticTokenPrice[marketIndex][MarketSide.Long];
+        mintPriceSnapshot[marketIndex][MarketSide.Short][
+            newLatestPriceStateIndex
+        ] = syntheticTokenPrice[marketIndex][MarketSide.Short];
     }
+
+    
+
 
     
 
@@ -857,10 +911,10 @@ contract LongShortMockable is ILongShort, Initializable {
   
                                 staker.addNewStateForFloatRewards(
             marketIndex,
-            syntheticTokenPrice[MarketSide.Long][marketIndex],
-            syntheticTokenPrice[MarketSide.Short][marketIndex],
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex],
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex]
+            syntheticTokenPrice[marketIndex][MarketSide.Long],
+            syntheticTokenPrice[marketIndex][MarketSide.Short],
+            syntheticTokenPoolValue[marketIndex][MarketSide.Long],
+            syntheticTokenPoolValue[marketIndex][MarketSide.Short]
         );
 
                 int256 newAssetPrice = oracleManagers[marketIndex].updatePrice();
@@ -870,9 +924,8 @@ contract LongShortMockable is ILongShort, Initializable {
 
         if (priceChanged) {
             assert(
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex] != 0 &&
-                    syntheticTokenBackedValue[MarketSide.Short][marketIndex] !=
-                    0
+                syntheticTokenPoolValue[marketIndex][MarketSide.Long] != 0 &&
+                    syntheticTokenPoolValue[marketIndex][MarketSide.Short] != 0
             );
 
                         _claimAndDistributeYield(marketIndex);
@@ -888,8 +941,8 @@ contract LongShortMockable is ILongShort, Initializable {
             assetPrice[marketIndex] = uint256(newAssetPrice);
 
             uint256 newLatestPriceStateIndex =
-                latestUpdateIndex[marketIndex] + 1;
-            latestUpdateIndex[marketIndex] = newLatestPriceStateIndex;
+                marketUpdateIndex[marketIndex] + 1;
+            marketUpdateIndex[marketIndex] = newLatestPriceStateIndex;
             snapshotPriceChangeForNextPriceExecution(
                 marketIndex,
                 newLatestPriceStateIndex
@@ -902,26 +955,26 @@ contract LongShortMockable is ILongShort, Initializable {
             emit BatchedActionsSettled(
                 marketIndex,
                 newLatestPriceStateIndex,
-                mintPriceSnapshot[marketIndex][newLatestPriceStateIndex][
-                    MarketSide.Long
+                mintPriceSnapshot[marketIndex][MarketSide.Long][
+                    newLatestPriceStateIndex
                 ],
-                mintPriceSnapshot[marketIndex][newLatestPriceStateIndex][
-                    MarketSide.Short
+                mintPriceSnapshot[marketIndex][MarketSide.Short][
+                    newLatestPriceStateIndex
                 ],
-                redeemPriceSnapshot[marketIndex][newLatestPriceStateIndex][
-                    MarketSide.Long
+                redeemPriceSnapshot[marketIndex][MarketSide.Long][
+                    newLatestPriceStateIndex
                 ],
-                redeemPriceSnapshot[marketIndex][newLatestPriceStateIndex][
-                    MarketSide.Short
+                redeemPriceSnapshot[marketIndex][MarketSide.Short][
+                    newLatestPriceStateIndex
                 ]
             );
 
             emit ValueLockedInSystem(
                 marketIndex,
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-                    syntheticTokenBackedValue[MarketSide.Short][marketIndex],
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex],
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex]
+                syntheticTokenPoolValue[marketIndex][MarketSide.Long] +
+                    syntheticTokenPoolValue[marketIndex][MarketSide.Short],
+                syntheticTokenPoolValue[marketIndex][MarketSide.Long],
+                syntheticTokenPoolValue[marketIndex][MarketSide.Short]
             );
         }
     }
@@ -948,6 +1001,9 @@ contract LongShortMockable is ILongShort, Initializable {
             _updateSystemStateInternal(marketIndexes[i]);
         }
     }
+
+    
+
 
     function _depositFunds(uint32 marketIndex, uint256 amount) internal {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_depositFunds"))){
@@ -984,9 +1040,9 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 totalAmount = amountLong + amountShort;
 
         assert(
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] >=
+            syntheticTokenPoolValue[marketIndex][MarketSide.Long] >=
                 amountLong &&
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex] >=
+                syntheticTokenPoolValue[marketIndex][MarketSide.Short] >=
                 amountShort
         );
 
@@ -994,9 +1050,12 @@ contract LongShortMockable is ILongShort, Initializable {
 
                 fundTokens[marketIndex].transfer(user, totalAmount);
 
-        syntheticTokenBackedValue[MarketSide.Long][marketIndex] -= amountLong;
-        syntheticTokenBackedValue[MarketSide.Short][marketIndex] -= amountShort;
+        syntheticTokenPoolValue[marketIndex][MarketSide.Long] -= amountLong;
+        syntheticTokenPoolValue[marketIndex][MarketSide.Short] -= amountShort;
     }
+
+    
+
 
     
 
@@ -1035,59 +1094,12 @@ contract LongShortMockable is ILongShort, Initializable {
 
                                 require(
             totalValueLockedInYieldManager[marketIndex] <=
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-                    syntheticTokenBackedValue[MarketSide.Short][marketIndex] +
+                syntheticTokenPoolValue[marketIndex][MarketSide.Long] +
+                    syntheticTokenPoolValue[marketIndex][MarketSide.Short] +
                     totalValueReservedForTreasury[marketIndex]
         );
     }
 
-    
-
-            function _getFeesGeneral(
-        uint32 marketIndex,
-        uint256 delta,         MarketSide synthTokenGainingDominance,
-        MarketSide synthTokenLosingDominance,
-        uint256 baseFeePercent,
-        uint256 penultyFeePercent
-    ) internal view returns (uint256) {
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_getFeesGeneral"))){
-      
-      return mocker._getFeesGeneralMock(marketIndex,delta,synthTokenGainingDominance,synthTokenLosingDominance,baseFeePercent,penultyFeePercent);
-    }
-  
-        uint256 baseFee = (delta * baseFeePercent) / feeUnitsOfPrecision;
-
-        if (
-            syntheticTokenBackedValue[synthTokenGainingDominance][
-                marketIndex
-            ] >=
-            syntheticTokenBackedValue[synthTokenLosingDominance][marketIndex]
-        ) {
-                        return
-                baseFee + ((delta * penultyFeePercent) / feeUnitsOfPrecision);
-        } else if (
-            syntheticTokenBackedValue[synthTokenGainingDominance][marketIndex] +
-                delta >
-            syntheticTokenBackedValue[synthTokenLosingDominance][marketIndex]
-        ) {
-            uint256 amountImbalancing =
-                delta -
-                    (syntheticTokenBackedValue[synthTokenLosingDominance][
-                        marketIndex
-                    ] -
-                        syntheticTokenBackedValue[synthTokenGainingDominance][
-                            marketIndex
-                        ]);
-            uint256 penaltyFee =
-                (amountImbalancing * penultyFeePercent) / feeUnitsOfPrecision;
-
-            return baseFee + penaltyFee;
-        } else {
-            return baseFee;
-        }
-    }
-
-            
     
 
     function transferTreasuryFunds(uint32 marketIndex) external treasuryOnly {
@@ -1109,42 +1121,52 @@ contract LongShortMockable is ILongShort, Initializable {
                 fundTokens[marketIndex].transfer(treasury, totalForTreasury);
     }
 
-    function getUsersPendingBalance(
-        address user,
+    
+
+            function _getFeesGeneral(
         uint32 marketIndex,
-        MarketSide syntheticTokenType
-    )
-        external
-        view
-        override
-        assertMarketExists(marketIndex)
-        returns (uint256 pendingBalance)
-    {
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getUsersPendingBalance"))){
+        uint256 delta,         MarketSide synthTokenGainingDominance,
+        MarketSide synthTokenLosingDominance,
+        uint256 baseFeePercent,
+        uint256 penaltyFeePercent
+    ) internal view returns (uint256) {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_getFeesGeneral"))){
       
-      return mocker.getUsersPendingBalanceMock(user,marketIndex,syntheticTokenType);
+      return mocker._getFeesGeneralMock(marketIndex,delta,synthTokenGainingDominance,synthTokenLosingDominance,baseFeePercent,penaltyFeePercent);
     }
   
+        uint256 baseFee = (delta * baseFeePercent) / feeUnitsOfPrecision;
+
         if (
-            userCurrentNextPriceUpdateIndex[marketIndex][user] <=
-            latestUpdateIndex[marketIndex]
+            syntheticTokenPoolValue[marketIndex][synthTokenGainingDominance] >=
+            syntheticTokenPoolValue[marketIndex][synthTokenLosingDominance]
         ) {
-                                    uint256 amountPaymentTokenDeposited =
-                userNextPriceDepositAmounts[marketIndex][user][
-                    syntheticTokenType
-                ];
+                        return
+                baseFee + ((delta * penaltyFeePercent) / feeUnitsOfPrecision);
+        } else if (
+            syntheticTokenPoolValue[marketIndex][synthTokenGainingDominance] +
+                delta >
+            syntheticTokenPoolValue[marketIndex][synthTokenLosingDominance]
+        ) {
+            uint256 amountImbalancing =
+                delta -
+                    (syntheticTokenPoolValue[marketIndex][
+                        synthTokenLosingDominance
+                    ] -
+                        syntheticTokenPoolValue[marketIndex][
+                            synthTokenGainingDominance
+                        ]);
+            uint256 penaltyFee =
+                (amountImbalancing * penaltyFeePercent) / feeUnitsOfPrecision;
 
-            uint256 tokens =
-                getAmountSynthToken(
-                    amountPaymentTokenDeposited,
-                    syntheticTokenPrice[syntheticTokenType][marketIndex]
-                );
-
-            return tokens;
+            return baseFee + penaltyFee;
         } else {
-            return 0;
+            return baseFee;
         }
     }
+
+    
+
 
     function _executeNextPriceMintsIfTheyExist(
         uint32 marketIndex,
@@ -1157,23 +1179,23 @@ contract LongShortMockable is ILongShort, Initializable {
     }
   
         uint256 currentDepositAmount =
-            userNextPriceDepositAmounts[marketIndex][user][syntheticTokenType];
+            userNextPriceDepositAmount[marketIndex][syntheticTokenType][user];
         if (currentDepositAmount > 0) {
             uint256 tokensToMint =
                 getAmountSynthToken(
                     currentDepositAmount,
-                    mintPriceSnapshot[marketIndex][
+                    mintPriceSnapshot[marketIndex][syntheticTokenType][
                         userCurrentNextPriceUpdateIndex[marketIndex][user]
-                    ][syntheticTokenType]
+                    ]
                 );
 
-            syntheticTokens[syntheticTokenType][marketIndex].transfer(
+            syntheticTokens[marketIndex][syntheticTokenType].transfer(
                 user,
                 tokensToMint
             );
 
-            userNextPriceDepositAmounts[marketIndex][user][
-                syntheticTokenType
+            userNextPriceDepositAmount[marketIndex][syntheticTokenType][
+                user
             ] = 0;
         }
     }
@@ -1210,7 +1232,7 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 currentUpdateIndex =
             userCurrentNextPriceUpdateIndex[marketIndex][user];
         if (
-            currentUpdateIndex <= latestUpdateIndex[marketIndex] &&
+            currentUpdateIndex <= marketUpdateIndex[marketIndex] &&
             currentUpdateIndex != 0         ) {
             _executeOutstandingNextPriceSettlementsAction(user, marketIndex);
 
@@ -1230,6 +1252,9 @@ contract LongShortMockable is ILongShort, Initializable {
                 _executeOutstandingNextPriceSettlements(user, marketIndex);
     }
 
+    
+
+
     function _mintNextPrice(
         uint32 marketIndex,
         uint256 amount,
@@ -1246,14 +1271,14 @@ contract LongShortMockable is ILongShort, Initializable {
   
                         _depositFunds(marketIndex, amount);
 
-        batchedNextPricePaymentTokenToDeposit[marketIndex][
+        batchedNextPriceDepositAmount[marketIndex][
             syntheticTokenType
         ] += amount;
-        userNextPriceDepositAmounts[marketIndex][msg.sender][
-            syntheticTokenType
+        userNextPriceDepositAmount[marketIndex][syntheticTokenType][
+            msg.sender
         ] += amount;
         userCurrentNextPriceUpdateIndex[marketIndex][msg.sender] =
-            latestUpdateIndex[marketIndex] +
+            marketUpdateIndex[marketIndex] +
             1;
 
         emit NextPriceDeposit(
@@ -1261,7 +1286,7 @@ contract LongShortMockable is ILongShort, Initializable {
             syntheticTokenType,
             amount,
             msg.sender,
-            latestUpdateIndex[marketIndex] + 1
+            marketUpdateIndex[marketIndex] + 1
         );
     }
 
@@ -1283,6 +1308,9 @@ contract LongShortMockable is ILongShort, Initializable {
         _mintNextPrice(marketIndex, amount, MarketSide.Short);
     }
 
+    
+
+
     function _executeOutstandingNextPriceRedeems(
         uint32 marketIndex,
         address user,
@@ -1294,20 +1322,24 @@ contract LongShortMockable is ILongShort, Initializable {
     }
   
         uint256 currentRedemptions =
-            userNextPriceRedemptions[marketIndex][user][syntheticTokenType];
+            userNextPriceRedemptionAmount[marketIndex][syntheticTokenType][
+                user
+            ];
         if (currentRedemptions > 0) {
             uint256 amountToRedeem =
                 getAmountPaymentToken(
                     currentRedemptions,
-                    redeemPriceSnapshot[marketIndex][
+                    redeemPriceSnapshot[marketIndex][syntheticTokenType][
                         userCurrentNextPriceUpdateIndex[marketIndex][user]
-                    ][syntheticTokenType]
+                    ]
                 );
 
             uint256 balance = fundTokens[marketIndex].balanceOf(address(this));
 
             fundTokens[marketIndex].transfer(user, amountToRedeem);
-            userNextPriceRedemptions[marketIndex][user][syntheticTokenType] = 0;
+            userNextPriceRedemptionAmount[marketIndex][syntheticTokenType][
+                user
+            ] = 0;
         }
     }
 
@@ -1325,21 +1357,21 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._redeemNextPriceMock(marketIndex,tokensToRedeem,syntheticTokenType);
     }
   
-        syntheticTokens[syntheticTokenType][marketIndex].transferFrom(
+        syntheticTokens[marketIndex][syntheticTokenType].transferFrom(
             msg.sender,
             address(this),
             tokensToRedeem
         );
-        uint256 nextUpdateIndex = latestUpdateIndex[marketIndex] + 1;
+        uint256 nextUpdateIndex = marketUpdateIndex[marketIndex] + 1;
 
-        userNextPriceRedemptions[marketIndex][msg.sender][
-            syntheticTokenType
+        userNextPriceRedemptionAmount[marketIndex][syntheticTokenType][
+            msg.sender
         ] += tokensToRedeem;
         userCurrentNextPriceUpdateIndex[marketIndex][
             msg.sender
         ] = nextUpdateIndex;
 
-        batchedNextPriceSynthToRedeem[marketIndex][
+        batchedNextPriceSynthRedeemAmount[marketIndex][
             syntheticTokenType
         ] += tokensToRedeem;
 
@@ -1348,7 +1380,7 @@ contract LongShortMockable is ILongShort, Initializable {
             syntheticTokenType,
             tokensToRedeem,
             msg.sender,
-            latestUpdateIndex[marketIndex] + 1
+            marketUpdateIndex[marketIndex] + 1
         );
     }
 
@@ -1385,7 +1417,7 @@ contract LongShortMockable is ILongShort, Initializable {
     }
   
         if (amountSynthToRedeem > 0) {
-            syntheticTokens[syntheticTokenType][marketIndex].synthRedeemBurn(
+            syntheticTokens[marketIndex][syntheticTokenType].synthRedeemBurn(
                 address(this),
                 amountSynthToRedeem
             );
@@ -1442,21 +1474,23 @@ contract LongShortMockable is ILongShort, Initializable {
     }
   
         if (amountOfPaymentTokenToRedeem > 0) {
-            redeemPriceSnapshot[marketIndex][latestUpdateIndex[marketIndex]][
-                syntheticTokenType
+            redeemPriceSnapshot[marketIndex][syntheticTokenType][
+                marketUpdateIndex[marketIndex]
             ] = getPrice(
-                batchedNextPriceSynthToRedeem[marketIndex][syntheticTokenType],
+                batchedNextPriceSynthRedeemAmount[marketIndex][
+                    syntheticTokenType
+                ],
                 amountOfPaymentTokenToRedeem
             );
 
                         return
                 getAmountPaymentToken(
-                    batchedNextPriceSynthToRedeem[marketIndex][
+                    batchedNextPriceSynthRedeemAmount[marketIndex][
                         syntheticTokenType
                     ],
-                    redeemPriceSnapshot[marketIndex][
-                        latestUpdateIndex[marketIndex]
-                    ][syntheticTokenType]
+                    redeemPriceSnapshot[marketIndex][syntheticTokenType][
+                        marketUpdateIndex[marketIndex]
+                    ]
                 );
         }
     }
@@ -1468,9 +1502,9 @@ contract LongShortMockable is ILongShort, Initializable {
     }
   
         uint256 batchedNextPriceSynthToRedeemLong =
-            batchedNextPriceSynthToRedeem[marketIndex][MarketSide.Long];
+            batchedNextPriceSynthRedeemAmount[marketIndex][MarketSide.Long];
         uint256 batchedNextPriceSynthToRedeemShort =
-            batchedNextPriceSynthToRedeem[marketIndex][MarketSide.Short];
+            batchedNextPriceSynthRedeemAmount[marketIndex][MarketSide.Short];
 
         _handleBatchedNextPriceRedeem(
             marketIndex,
@@ -1486,13 +1520,13 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 longAmountOfPaymentTokenToRedeem =
             getAmountPaymentToken(
                 batchedNextPriceSynthToRedeemLong,
-                syntheticTokenPrice[MarketSide.Long][marketIndex]
+                syntheticTokenPrice[marketIndex][MarketSide.Long]
             );
 
         uint256 shortAmountOfPaymentTokenToRedeem =
             getAmountPaymentToken(
                 batchedNextPriceSynthToRedeemShort,
-                syntheticTokenPrice[MarketSide.Short][marketIndex]
+                syntheticTokenPrice[marketIndex][MarketSide.Short]
             );
 
         (uint256 totalFeesLong, uint256 totalFeesShort) =
@@ -1525,7 +1559,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
                 _refreshTokenPrices(marketIndex);
 
-        batchedNextPriceSynthToRedeem[marketIndex][MarketSide.Long] = 0;
-        batchedNextPriceSynthToRedeem[marketIndex][MarketSide.Short] = 0;
+        batchedNextPriceSynthRedeemAmount[marketIndex][MarketSide.Long] = 0;
+        batchedNextPriceSynthRedeemAmount[marketIndex][MarketSide.Short] = 0;
     }
 }
