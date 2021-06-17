@@ -5,21 +5,32 @@ pragma solidity 0.8.3;
 import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
 
-import "./interfaces/IFloatToken.sol";
-import "./interfaces/ILongShort.sol";
-import "./interfaces/IStaker.sol";
+import "../../interfaces/IFloatToken.sol";
+import "../../interfaces/ILongShort.sol";
+import "../../interfaces/IStaker.sol";
 
-/*
-    ###### Purpose of contract ########
-    This smart contract allows users to securely stake synthetic asset
-    tokens created through the float protocol.
 
-    Staking sythentic tokens will ensure that the liquidity of the
-    synthetic market is increased, and entitle users to FLOAT rewards.
-*/
 
-/** @title Staker Contract */
-contract Staker is IStaker, Initializable {
+
+
+
+
+import "./StakerForInternalMocking.sol";
+contract StakerMockable is IStaker, Initializable {
+  StakerForInternalMocking mocker;
+  bool shouldUseMock;
+  string functionToNotMock;
+
+  function setMocker(StakerForInternalMocking _mocker) external {
+    mocker = _mocker;
+    shouldUseMock = true;
+  }
+
+  function setFunctionToNotMock(string calldata _functionToNotMock) external {
+    functionToNotMock = _functionToNotMock;
+  }
+
+
     struct RewardState {
         uint256 timestamp;
         uint256 accumulativeFloatPerLongToken;
@@ -35,52 +46,29 @@ contract Staker is IStaker, Initializable {
         uint256 creationRewardIndex;
     }
 
-    ////////////////////////////////////
-    //////// CONSTANTS /////////////////
-    ////////////////////////////////////
+            
+            uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
+    mapping(uint32 => uint256) public marketLaunchIncentivePeriod;     mapping(uint32 => uint256) public marketLaunchIncentiveMultipliers;     uint256[45] private __stakeParametersGap;
 
-    // Controls the k-factor, a multiplier for incentivising early stakers.
-    //   token market index -> value
-    uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
-    mapping(uint32 => uint256) public marketLaunchIncentivePeriod; // seconds
-    mapping(uint32 => uint256) public marketLaunchIncentiveMultipliers; // e18 scale
-    uint256[45] private __stakeParametersGap;
-
-    ////////////////////////////////////
-    //////// VARIABLES /////////////////
-    ////////////////////////////////////
-
-    // Global state.
-    address public admin;
+            
+        address public admin;
     address public floatCapital;
     uint16 public floatPercentage;
     ILongShort public longShortCoreContract;
     IFloatToken public floatToken;
     uint256[45] private __globalParamsGap;
 
-    // User state.
-    //   token -> user -> value
-    mapping(ISyntheticToken => mapping(address => uint256))
+            mapping(ISyntheticToken => mapping(address => uint256))
         public userAmountStaked;
     uint256[45] private __userInfoGap;
 
-    // Token state.
-    mapping(ISyntheticToken => uint32) public marketIndexOfToken; // token -> market index
-    uint256[45] private __tokenInfoGap;
+        mapping(ISyntheticToken => uint32) public marketIndexOfToken;     uint256[45] private __tokenInfoGap;
 
-    // market state.
-    mapping(uint32 => mapping(address => uint256))
+        mapping(uint32 => mapping(address => uint256))
         public userIndexOfLastClaimedReward;
-    mapping(uint32 => mapping(uint256 => BatchedStake)) public batchedStake; // token -> index
-    mapping(uint32 => SyntheticTokens) public syntheticTokens; // token -> index -> state
-    mapping(uint32 => mapping(uint256 => RewardState))
-        public syntheticRewardParams; // token -> index -> state
-    mapping(uint32 => uint256) public latestRewardIndex; // token -> index
-
-    ////////////////////////////////////
-    /////////// EVENTS /////////////////
-    ////////////////////////////////////
-
+    mapping(uint32 => mapping(uint256 => BatchedStake)) public batchedStake;     mapping(uint32 => SyntheticTokens) public syntheticTokens;     mapping(uint32 => mapping(uint256 => RewardState))
+        public syntheticRewardParams;     mapping(uint32 => uint256) public latestRewardIndex; 
+            
     event DeployV1(address floatToken);
 
     event StateAdded(
@@ -114,44 +102,74 @@ contract Staker is IStaker, Initializable {
         uint256 multiplier
     );
 
-    ////////////////////////////////////
-    /////////// MODIFIERS //////////////
-    ////////////////////////////////////
-
+            
     modifier onlyAdmin() {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("onlyAdmin"))){
+        
+      mocker.onlyAdminMock();
+      _;
+    } else {
+      
         require(msg.sender == admin, "not admin");
         _;
+    
     }
+  }
 
     modifier onlyValidSynthetic(ISyntheticToken _synth) {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("onlyValidSynthetic"))){
+        
+      mocker.onlyValidSyntheticMock(_synth);
+      _;
+    } else {
+      
         require(marketIndexOfToken[_synth] != 0, "not valid synth");
         _;
+    
     }
+  }
 
     modifier onlyValidMarket(uint32 marketIndex) {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("onlyValidMarket"))){
+        
+      mocker.onlyValidMarketMock(marketIndex);
+      _;
+    } else {
+      
         require(
             address(syntheticTokens[marketIndex].longToken) != address(0),
             "not valid market"
         );
-        // require(latestRewardIndex[marketIndex] != 0, "not valid market");
-        _;
+                _;
+    
     }
+  }
 
     modifier onlyFloat() {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("onlyFloat"))){
+        
+      mocker.onlyFloatMock();
+      _;
+    } else {
+      
         require(msg.sender == address(longShortCoreContract));
         _;
+    
     }
+  }
 
-    ////////////////////////////////////
-    ///// CONTRACT SET-UP //////////////
-    ////////////////////////////////////
-
+            
     function initialize(
         address _admin,
         address _longShortCoreContract,
         address _floatToken,
         address _floatCapital
     ) public initializer {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("initialize"))){
+      
+      return mocker.initializeMock(_admin,_longShortCoreContract,_floatToken,_floatCapital);
+    }
+  
         admin = _admin;
         floatCapital = _floatCapital;
         longShortCoreContract = ILongShort(_longShortCoreContract);
@@ -161,15 +179,22 @@ contract Staker is IStaker, Initializable {
         emit DeployV1(_floatToken);
     }
 
-    ////////////////////////////////////
-    /// MULTISIG ADMIN FUNCTIONS ///////
-    ////////////////////////////////////
-
+            
     function changeAdmin(address _admin) external onlyAdmin {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("changeAdmin"))){
+      
+      return mocker.changeAdminMock(_admin);
+    }
+  
         admin = _admin;
     }
 
     function changeFloatPercentage(uint16 _newPercentage) external onlyAdmin {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("changeFloatPercentage"))){
+      
+      return mocker.changeFloatPercentageMock(_newPercentage);
+    }
+  
         require(_newPercentage <= 10000);
         floatPercentage = _newPercentage;
     }
@@ -179,6 +204,11 @@ contract Staker is IStaker, Initializable {
         uint256 period,
         uint256 initialMultiplier
     ) external onlyAdmin {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("changeMarketLaunchIncentiveParameters"))){
+      
+      return mocker.changeMarketLaunchIncentiveParametersMock(marketIndex,period,initialMultiplier);
+    }
+  
         _changeMarketLaunchIncentiveParameters(
             marketIndex,
             period,
@@ -191,6 +221,11 @@ contract Staker is IStaker, Initializable {
         uint256 period,
         uint256 initialMultiplier
     ) internal {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_changeMarketLaunchIncentiveParameters"))){
+      
+      return mocker._changeMarketLaunchIncentiveParametersMock(marketIndex,period,initialMultiplier);
+    }
+  
         require(
             initialMultiplier >= 1e18,
             "marketLaunchIncentiveMultiplier must be >= 1e18"
@@ -206,10 +241,7 @@ contract Staker is IStaker, Initializable {
         );
     }
 
-    ////////////////////////////////////
-    /////////// STAKING SETUP //////////
-    ////////////////////////////////////
-
+            
     function addNewStakingFund(
         uint32 marketIndex,
         ISyntheticToken longToken,
@@ -217,6 +249,11 @@ contract Staker is IStaker, Initializable {
         uint256 kInitialMultiplier,
         uint256 kPeriod
     ) external override onlyFloat {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("addNewStakingFund"))){
+      
+      return mocker.addNewStakingFundMock(marketIndex,longToken,shortToken,kInitialMultiplier,kPeriod);
+    }
+  
         marketIndexOfToken[longToken] = marketIndex;
         marketIndexOfToken[shortToken] = marketIndex;
 
@@ -237,36 +274,37 @@ contract Staker is IStaker, Initializable {
         emit StateAdded(marketIndex, 0, block.timestamp, 0, 0);
     }
 
-    ////////////////////////////////////
-    // GLOBAL REWARD STATE FUNCTIONS ///
-    ////////////////////////////////////
+            
+    
 
-    /*
-     * Returns the K factor parameters for the given market with sensible
-     * defaults if they haven't been set yet.
-     */
     function getMarketLaunchIncentiveParameters(uint32 marketIndex)
         internal
         view
         returns (uint256, uint256)
     {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getMarketLaunchIncentiveParameters"))){
+      
+      return mocker.getMarketLaunchIncentiveParametersMock(marketIndex);
+    }
+  
         uint256 period = marketLaunchIncentivePeriod[marketIndex];
         uint256 multiplier = marketLaunchIncentiveMultipliers[marketIndex];
         if (multiplier == 0) {
-            multiplier = 1e18; // multiplier of 1 by default
-        }
+            multiplier = 1e18;         }
 
         return (period, multiplier);
     }
 
     function getKValue(uint32 marketIndex) internal view returns (uint256) {
-        // Parameters controlling the float issuance multiplier.
-        (uint256 kPeriod, uint256 kInitialMultiplier) =
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getKValue"))){
+      
+      return mocker.getKValueMock(marketIndex);
+    }
+  
+                (uint256 kPeriod, uint256 kInitialMultiplier) =
             getMarketLaunchIncentiveParameters(marketIndex);
 
-        // Sanity check - under normal circumstances, the multipliers should
-        // *never* be set to a value < 1e18, as there are guards against this.
-        assert(kInitialMultiplier >= 1e18);
+                        assert(kInitialMultiplier >= 1e18);
 
         uint256 initialTimestamp =
             syntheticRewardParams[marketIndex][0].timestamp;
@@ -281,11 +319,8 @@ contract Staker is IStaker, Initializable {
         }
     }
 
-    /*
-     * Computes the current 'r' value, i.e. the number of float tokens a user
-     * earns per second for every longshort token they've staked. The returned
-     * value has a fixed decimal scale of 1e42 (!!!) for numerical stability.
-     */
+    
+
     function calculateFloatPerSecond(
         uint32 marketIndex,
         uint256 longPrice,
@@ -297,45 +332,45 @@ contract Staker is IStaker, Initializable {
         view
         returns (uint256 longFloatPerSecond, uint256 shortFloatPerSecond)
     {
-        // Edge-case: no float is issued in an empty market.
-        if (longValue == 0 && shortValue == 0) {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("calculateFloatPerSecond"))){
+      
+      return mocker.calculateFloatPerSecondMock(marketIndex,longPrice,shortPrice,longValue,shortValue);
+    }
+  
+                if (longValue == 0 && shortValue == 0) {
             return (0, 0);
         }
 
-        // A float issuance multiplier that starts high and decreases linearly
-        // over time to a value of 1. This incentivises users to stake early.
-        uint256 k = getKValue(marketIndex);
+                        uint256 k = getKValue(marketIndex);
 
         uint256 totalLocked = (longValue + shortValue);
 
-        // Float is scaled by the percentage of the total market value held in
-        // the opposite position. This incentivises users to stake on the
-        // weaker position.
-        return (
+                                return (
             ((k * shortValue) * longPrice) / totalLocked,
             ((k * longValue) * shortPrice) / totalLocked
         );
     }
 
-    /*
-     * Computes the time since last state point for the given token in seconds.
-     */
+    
+
     function calculateTimeDelta(uint32 marketIndex)
         internal
         view
         returns (uint256)
     {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("calculateTimeDelta"))){
+      
+      return mocker.calculateTimeDeltaMock(marketIndex);
+    }
+  
         return
             block.timestamp -
             syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
                 .timestamp;
     }
 
-    /*
-     * Computes new cumulative sum of 'r' value since last state point. We use
-     * cumulative 'r' value to avoid looping during issuance. Note that the
-     * cumulative sum is kept in 1e42 scale (!!!) to avoid numerical issues.
-     */
+    
+
     function calculateNewCumulativeRate(
         uint32 marketIndex,
         uint256 longPrice,
@@ -347,8 +382,12 @@ contract Staker is IStaker, Initializable {
         view
         returns (uint256 longCumulativeRates, uint256 shortCumulativeRates)
     {
-        // Compute the current 'r' value for float issuance per second.
-        (uint256 longFloatPerSecond, uint256 shortFloatPerSecond) =
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("calculateNewCumulativeRate"))){
+      
+      return mocker.calculateNewCumulativeRateMock(marketIndex,longPrice,shortPrice,longValue,shortValue);
+    }
+  
+                (uint256 longFloatPerSecond, uint256 shortFloatPerSecond) =
             calculateFloatPerSecond(
                 marketIndex,
                 longPrice,
@@ -357,11 +396,9 @@ contract Staker is IStaker, Initializable {
                 shortValue
             );
 
-        // Compute time since last state point for the given token.
-        uint256 timeDelta = calculateTimeDelta(marketIndex);
+                uint256 timeDelta = calculateTimeDelta(marketIndex);
 
-        // // Compute new cumulative 'r' value total.
-        return (
+                return (
             syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
                 .accumulativeFloatPerLongToken +
                 (timeDelta * longFloatPerSecond),
@@ -371,9 +408,8 @@ contract Staker is IStaker, Initializable {
         );
     }
 
-    /*
-     * Creates a new state point for the given token and updates indexes.
-     */
+    
+
     function setRewardObjects(
         uint32 marketIndex,
         uint256 longPrice,
@@ -381,6 +417,11 @@ contract Staker is IStaker, Initializable {
         uint256 longValue,
         uint256 shortValue
     ) internal {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("setRewardObjects"))){
+      
+      return mocker.setRewardObjectsMock(marketIndex,longPrice,shortPrice,longValue,shortValue);
+    }
+  
         (uint256 longAccumulativeRates, uint256 shortAccumulativeRates) =
             calculateNewCumulativeRate(
                 marketIndex,
@@ -392,18 +433,15 @@ contract Staker is IStaker, Initializable {
 
         uint256 newIndex = latestRewardIndex[marketIndex] + 1;
 
-        // Set cumulative 'r' value on new state point.
-        syntheticRewardParams[marketIndex][newIndex]
+                syntheticRewardParams[marketIndex][newIndex]
             .accumulativeFloatPerLongToken = longAccumulativeRates;
         syntheticRewardParams[marketIndex][newIndex]
             .accumulativeFloatPerShortToken = shortAccumulativeRates;
 
-        // Set timestamp on new state point.
-        syntheticRewardParams[marketIndex][newIndex].timestamp = block
+                syntheticRewardParams[marketIndex][newIndex].timestamp = block
             .timestamp;
 
-        // Update latest index to point to new state point.
-        latestRewardIndex[marketIndex] = newIndex;
+                latestRewardIndex[marketIndex] = newIndex;
 
         emit StateAdded(
             marketIndex,
@@ -414,10 +452,8 @@ contract Staker is IStaker, Initializable {
         );
     }
 
-    /*
-     * Adds new state points for the given long/short tokens. Called by the
-     * ILongShort contract whenever there is a state change for a market.
-     */
+    
+
     function addNewStateForFloatRewards(
         uint32 marketIndex,
         uint256 longPrice,
@@ -425,10 +461,13 @@ contract Staker is IStaker, Initializable {
         uint256 longValue,
         uint256 shortValue
     ) external override onlyFloat {
-        // Only add a new state point if some time has passed.
-
-        // Time delta is fetched twice in below code, can pass through? Which is less gas?
-        if (calculateTimeDelta(marketIndex) > 0) {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("addNewStateForFloatRewards"))){
+      
+      return mocker.addNewStateForFloatRewardsMock(marketIndex,longPrice,shortPrice,longValue,shortValue);
+    }
+  
+        
+                if (calculateTimeDelta(marketIndex) > 0) {
             setRewardObjects(
                 marketIndex,
                 longPrice,
@@ -439,11 +478,13 @@ contract Staker is IStaker, Initializable {
         }
     }
 
-    ////////////////////////////////////
-    // USER REWARD STATE FUNCTIONS /////
-    ////////////////////////////////////
-
+            
     function _updateState(ISyntheticToken token) internal {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_updateState"))){
+      
+      return mocker._updateStateMock(token);
+    }
+  
         longShortCoreContract._updateSystemState(marketIndexOfToken[token]);
     }
 
@@ -457,18 +498,20 @@ contract Staker is IStaker, Initializable {
         internal
         view
         returns (
-            // NOTE: this returns the long and short reward separately for the sake of simplicity of the event and the graph. Would be more efficient to return as single value
-            uint256 longFloatReward,
+                        uint256 longFloatReward,
             uint256 shortFloatReward
         )
     {
-        // Don't do the calculation and return zero immediately if there is no change
-        if (usersLastRewardIndex == latestRewardIndex[marketIndex]) {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("calculateAccumulatedFloatHelper"))){
+      
+      return mocker.calculateAccumulatedFloatHelperMock(marketIndex,user,amountStakedLong,amountStakedShort,usersLastRewardIndex);
+    }
+  
+                if (usersLastRewardIndex == latestRewardIndex[marketIndex]) {
             return (0, 0);
         }
 
-        // Stake should always do a full system state update, so 'users last claimed index' should never be greater than the latest index
-        assert(
+                assert(
             userIndexOfLastClaimedReward[marketIndex][user] <
                 latestRewardIndex[marketIndex]
         );
@@ -506,27 +549,29 @@ contract Staker is IStaker, Initializable {
                 FLOAT_ISSUANCE_FIXED_DECIMAL;
         }
 
-        // explicit return
-        return (longFloatReward, shortFloatReward);
+                return (longFloatReward, shortFloatReward);
     }
 
     function calculateAccumulatedFloat(uint32 marketIndex, address user)
         internal
         view
         returns (
-            // NOTE: this returns the long and short reward separately for the sake of simplicity of the event and the graph. Would be more efficient to return as single value
-            uint256 longFloatReward,
+                        uint256 longFloatReward,
             uint256 shortFloatReward
         )
     {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("calculateAccumulatedFloat"))){
+      
+      return mocker.calculateAccumulatedFloatMock(marketIndex,user);
+    }
+  
         ISyntheticToken longToken = syntheticTokens[marketIndex].longToken;
         ISyntheticToken shortToken = syntheticTokens[marketIndex].shortToken;
 
         uint256 amountStakedLong = userAmountStaked[longToken][user];
         uint256 amountStakedShort = userAmountStaked[shortToken][user];
 
-        // explicit return
-        return
+                return
             calculateAccumulatedFloatHelper(
                 marketIndex,
                 user,
@@ -537,19 +582,27 @@ contract Staker is IStaker, Initializable {
     }
 
     function _mintFloat(address user, uint256 floatToMint) internal {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_mintFloat"))){
+      
+      return mocker._mintFloatMock(user,floatToMint);
+    }
+  
         floatToken.mint(user, floatToMint);
         floatToken.mint(floatCapital, (floatToMint * floatPercentage) / 10000);
     }
 
     function mintAccumulatedFloat(uint32 marketIndex, address user) internal {
-        // NOTE: Could merge these two values already inside the `calculateAccumulatedFloat` function, but that would make it harder for the graph
-        (uint256 floatToMintLong, uint256 floatToMintShort) =
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("mintAccumulatedFloat"))){
+      
+      return mocker.mintAccumulatedFloatMock(marketIndex,user);
+    }
+  
+                (uint256 floatToMintLong, uint256 floatToMintShort) =
             calculateAccumulatedFloat(marketIndex, msg.sender);
 
         uint256 floatToMint = floatToMintLong + floatToMintShort;
         if (floatToMint > 0) {
-            // stops them setting this forward
-            userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[
+                        userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[
                 marketIndex
             ];
 
@@ -566,17 +619,20 @@ contract Staker is IStaker, Initializable {
     }
 
     function _claimFloat(uint32[] calldata marketIndex) internal {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_claimFloat"))){
+      
+      return mocker._claimFloatMock(marketIndex);
+    }
+  
         uint256 floatTotal = 0;
         for (uint256 i = 0; i < marketIndex.length; i++) {
-            // NOTE: Could merge these two values already inside the `calculateAccumulatedFloat` function, but that would make it harder for the graph
-            (uint256 floatToMintLong, uint256 floatToMintShort) =
+                        (uint256 floatToMintLong, uint256 floatToMintShort) =
                 calculateAccumulatedFloat(marketIndex[i], msg.sender);
 
             uint256 floatToMint = floatToMintLong + floatToMintShort;
 
             if (floatToMint > 0) {
-                // Set the user has claimed up until now.
-                userIndexOfLastClaimedReward[marketIndex[i]][
+                                userIndexOfLastClaimedReward[marketIndex[i]][
                     msg.sender
                 ] = latestRewardIndex[marketIndex[i]];
                 floatTotal += floatToMint;
@@ -596,25 +652,28 @@ contract Staker is IStaker, Initializable {
     }
 
     function claimFloatCustom(uint32[] calldata marketIndexes) external {
-        require(marketIndexes.length <= 50); // Set some (arbitrary) limit on loop length
-        longShortCoreContract._updateSystemStateMulti(marketIndexes);
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("claimFloatCustom"))){
+      
+      return mocker.claimFloatCustomMock(marketIndexes);
+    }
+  
+        require(marketIndexes.length <= 50);         longShortCoreContract._updateSystemStateMulti(marketIndexes);
         _claimFloat(marketIndexes);
     }
 
-    ////////////////////////////////////
-    /////////// STAKING ////////////////
-    ////////////////////////////////////
+            
+    
 
-    /*
-     * A user with synthetic tokens stakes by calling stake on the token
-     * contract which calls this function. We need to first update the
-     * State of the system before staking to correctly calculate user rewards.
-     */
     function stakeFromUser(address from, uint256 amount)
         public
         override
         onlyValidSynthetic(ISyntheticToken(msg.sender))
     {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("stakeFromUser"))){
+      
+      return mocker.stakeFromUserMock(from,amount);
+    }
+  
         _updateState(ISyntheticToken(msg.sender));
         _stake(ISyntheticToken(msg.sender), amount, from);
     }
@@ -624,10 +683,14 @@ contract Staker is IStaker, Initializable {
         uint256 amount,
         address user
     ) internal {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_stake"))){
+      
+      return mocker._stakeMock(token,amount,user);
+    }
+  
         uint32 marketIndex = marketIndexOfToken[token];
 
-        // If they already have staked and have rewards due, mint these.
-        if (
+                if (
             userIndexOfLastClaimedReward[marketIndex][user] != 0 &&
             userIndexOfLastClaimedReward[marketIndex][user] <
             latestRewardIndex[marketIndex]
@@ -649,15 +712,15 @@ contract Staker is IStaker, Initializable {
         );
     }
 
-    ////////////////////////////////////
-    /////// WITHDRAW n MINT ////////////
-    ////////////////////////////////////
+            
+    
 
-    /*
-    Withdraw function.
-    Mint user any outstanding float before
-    */
     function _withdraw(ISyntheticToken token, uint256 amount) internal {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_withdraw"))){
+      
+      return mocker._withdrawMock(token,amount);
+    }
+  
         uint32 marketIndex = marketIndexOfToken[token];
         require(userAmountStaked[token][msg.sender] > 0, "nothing to withdraw");
         mintAccumulatedFloat(marketIndex, msg.sender);
@@ -672,11 +735,21 @@ contract Staker is IStaker, Initializable {
     }
 
     function withdraw(ISyntheticToken token, uint256 amount) external {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("withdraw"))){
+      
+      return mocker.withdrawMock(token,amount);
+    }
+  
         _updateState(token);
         _withdraw(token, amount);
     }
 
     function withdrawAll(ISyntheticToken token) external {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("withdrawAll"))){
+      
+      return mocker.withdrawAllMock(token);
+    }
+  
         _updateState(token);
         _withdraw(token, userAmountStaked[token][msg.sender]);
     }

@@ -94,14 +94,14 @@ module LongShortHelpers = {
   };
   let getMarketBalance = (longShort, ~marketIndex) => {
     let%AwaitThen longValue =
-      longShort->LongShort.syntheticTokenBackedValue(
-        CONSTANTS.longTokenType,
+      longShort->LongShort.syntheticTokenPoolValue(
         marketIndex,
+        CONSTANTS.longTokenType,
       );
     let%Await shortValue =
-      longShort->LongShort.syntheticTokenBackedValue(
-        CONSTANTS.shortTokenType,
+      longShort->LongShort.syntheticTokenPoolValue(
         marketIndex,
+        CONSTANTS.shortTokenType,
       );
     {longValue, shortValue};
   };

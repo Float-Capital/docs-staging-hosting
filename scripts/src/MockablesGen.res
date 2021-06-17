@@ -11,7 +11,7 @@
 // TO ADD A FILE TO THIS: add filepath relative to ../contracts/contracts here. e.g. mocks/YieldManagerMock.sol
 open Js.String2
 
-let filesToMock = ["LongShort.sol"]
+let filesToMock = ["LongShort.sol", "Staker.sol"]
 
 type storageLocation = Storage | NotRelevant
 

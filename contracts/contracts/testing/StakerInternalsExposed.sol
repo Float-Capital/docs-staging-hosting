@@ -2,14 +2,15 @@
 
 pragma solidity 0.8.3;
 
-import "../Staker.sol";
+import "./generated/StakerMockable.sol";
 import "../interfaces/ISyntheticToken.sol";
+import "hardhat/console.sol";
 
 /*
 NOTE: This contract is for testing purposes only!
 */
 
-contract StakerInternalsExposed is Staker {
+contract StakerInternalsExposed is StakerMockable {
     ///////////////////////////////////////////////
     //////////// Test Helper Functions ////////////
     ///////////////////////////////////////////////
@@ -50,6 +51,39 @@ contract StakerInternalsExposed is Staker {
         userAmountStaked[shortToken][user] = newUserAmountStakedShort;
     }
 
+    function setAddNewStakingFundParams(
+        uint32 marketIndex,
+        ISyntheticToken longToken,
+        ISyntheticToken shortToken,
+        ISyntheticToken mockAddress
+    ) public {
+        marketIndexOfToken[longToken] = marketIndex;
+        marketIndexOfToken[shortToken] = marketIndex;
+
+        syntheticRewardParams[marketIndex][0].timestamp = 0; // don't test with 0
+        syntheticRewardParams[marketIndex][0].accumulativeFloatPerLongToken = 1;
+        syntheticRewardParams[marketIndex][0]
+            .accumulativeFloatPerShortToken = 1;
+
+        syntheticTokens[marketIndex].longToken = mockAddress;
+        syntheticTokens[marketIndex].shortToken = mockAddress;
+    }
+
+    function setGetMarketLaunchIncentiveParametersParams(
+        uint32 marketIndex,
+        uint256 period,
+        uint256 multiplier
+    ) external {
+        marketLaunchIncentivePeriod[marketIndex] = period;
+        marketLaunchIncentiveMultipliers[marketIndex] = multiplier;
+    }
+
+    function setGetKValueParams(uint32 marketIndex, uint256 timestamp)
+        external
+    {
+        syntheticRewardParams[marketIndex][0].timestamp = timestamp;
+    }
+
     ///////////////////////////////////////////
     //////////// EXPOSED Functions ////////////
     ///////////////////////////////////////////
@@ -72,5 +106,33 @@ contract StakerInternalsExposed is Staker {
 
     function _withdrawExternal(ISyntheticToken token, uint256 amount) external {
         _withdraw(token, amount);
+    }
+
+    function _changeMarketLaunchIncentiveParametersExternal(
+        uint32 marketIndex,
+        uint256 period,
+        uint256 initialMultiplier
+    ) external {
+        _changeMarketLaunchIncentiveParameters(
+            marketIndex,
+            period,
+            initialMultiplier
+        );
+    }
+
+    function getMarketLaunchIncentiveParametersExternal(uint32 marketIndex)
+        external
+        view
+        returns (uint256, uint256)
+    {
+        return getMarketLaunchIncentiveParameters(marketIndex);
+    }
+
+    function getKValueExternal(uint32 marketIndex)
+        external
+        view
+        returns (uint256)
+    {
+        return getKValue(marketIndex);
     }
 }

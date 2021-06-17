@@ -7,6 +7,15 @@ const { expect } = require("chai");
 
 var bnEqual = ((message, number1, number2) => expect(number1, message).to.equal(number2));
 
+function recordEqualFlatLabeled(expected, actual) {
+  var a = ((expected, actual) => {
+    for(const key of Object.keys(actual)){
+      expect(actual[key]).equal(expected[key])
+    }
+  });
+  return a(expected, actual);
+}
+
 function recordEqualFlat(expected, actual) {
   var a = ((expected, actual) => {
     for(const key of Object.keys(actual)){
@@ -41,6 +50,7 @@ var expectToBeHex = ((hexStr, hexLength) => expect(hexStr).to.be.properHex(hexLe
 var expectHexEqual = ((hex1, hex2) => expect(hex1).to.be.hexEqual(hex2));
 
 exports.bnEqual = bnEqual;
+exports.recordEqualFlatLabeled = recordEqualFlatLabeled;
 exports.recordEqualFlat = recordEqualFlat;
 exports.intEqual = intEqual;
 exports.boolEqual = boolEqual;

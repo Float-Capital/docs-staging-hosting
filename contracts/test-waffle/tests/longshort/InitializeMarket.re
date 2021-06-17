@@ -63,7 +63,7 @@ let test =
         let stakerCalls =
           (stakerSmockedRef^)->StakerSmocked.addNewStakingFundCalls;
 
-        Chai.recordEqualFlat(
+        Chai.recordEqualFlatLabeled(
           ~expected=stakerCalls->Array.getExn(0),
           ~actual={
             kInitialMultiplier: Ethers.BigNumber.fromUnsafe("6"),
@@ -76,7 +76,7 @@ let test =
 
         let changeFeeCalls = LongShortSmocked.InternalMock._changeFeeCalls();
 
-        Chai.recordEqualFlat(
+        Chai.recordEqualFlatLabeled(
           ~actual={
             marketIndex: 1,
             _baseEntryFee: Ethers.BigNumber.fromUnsafe("1"),
@@ -90,7 +90,7 @@ let test =
         let seedMarketInitiallyCalls =
           LongShortSmocked.InternalMock.seedMarketInitiallyCalls();
 
-        Chai.recordEqualFlat(
+        Chai.recordEqualFlatLabeled(
           ~actual={
             marketIndex: 1,
             initialMarketSeed: Ethers.BigNumber.fromUnsafe("7"),
