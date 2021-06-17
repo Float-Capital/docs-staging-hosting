@@ -39,6 +39,8 @@ let randomMintLongShort = () => {
   }
 }
 
+let randomAddress = () => Ethers.Wallet.createRandom().address
+
 let createSyntheticMarket = (
   ~admin,
   ~initialMarketSeed=bnFromString("500000000000000000"),
@@ -203,3 +205,12 @@ let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
 let increaseTime: int => JsPromise.t<
   unit,
 > = %raw(`(seconds) => ethers.provider.send("evm_increaseTime", [seconds])`)
+
+type block = {timestamp: int}
+let getBlock: unit => JsPromise.t<block> = %raw(`() => ethers.provider.getBlock()`)
+
+let getRandomTimestampInPast = () => {
+  getBlock()->JsPromise.then(({timestamp}) => {
+    (timestamp - Js.Math.random_int(200, 630720000))->Ethers.BigNumber.fromInt->JsPromise.resolve
+  })
+}

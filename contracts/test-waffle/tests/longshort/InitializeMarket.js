@@ -38,7 +38,7 @@ function test(contracts, accounts) {
                         return LetOps.Await.let_(setup(1, false, 1), (function (param) {
                                       return LetOps.Await.let_(longShortRef.contents.connect(accounts.contents[0]).initializeMarket(1, ethers.BigNumber.from("1"), ethers.BigNumber.from("2"), ethers.BigNumber.from("5"), ethers.BigNumber.from("3"), ethers.BigNumber.from("6"), ethers.BigNumber.from("4"), ethers.BigNumber.from("7")), (function (param) {
                                                     var stakerCalls = StakerSmocked.addNewStakingFundCalls(stakerSmockedRef.contents);
-                                                    Chai.recordEqualFlat(Belt_Array.getExn(stakerCalls, 0), {
+                                                    Chai.recordEqualFlatLabeled(Belt_Array.getExn(stakerCalls, 0), {
                                                           marketIndex: 1,
                                                           longToken: sampleAddress,
                                                           shortToken: sampleAddress,
@@ -46,7 +46,7 @@ function test(contracts, accounts) {
                                                           kPeriod: ethers.BigNumber.from("4")
                                                         });
                                                     var changeFeeCalls = LongShortSmocked.InternalMock._changeFeeCalls(undefined);
-                                                    Chai.recordEqualFlat(Belt_Array.getExn(changeFeeCalls, 0), {
+                                                    Chai.recordEqualFlatLabeled(Belt_Array.getExn(changeFeeCalls, 0), {
                                                           marketIndex: 1,
                                                           _baseEntryFee: ethers.BigNumber.from("1"),
                                                           _badLiquidityEntryFee: ethers.BigNumber.from("2"),
@@ -54,7 +54,7 @@ function test(contracts, accounts) {
                                                           _badLiquidityExitFee: ethers.BigNumber.from("3")
                                                         });
                                                     var seedMarketInitiallyCalls = LongShortSmocked.InternalMock.seedMarketInitiallyCalls(undefined);
-                                                    Chai.recordEqualFlat(Belt_Array.getExn(seedMarketInitiallyCalls, 0), {
+                                                    Chai.recordEqualFlatLabeled(Belt_Array.getExn(seedMarketInitiallyCalls, 0), {
                                                           initialMarketSeed: ethers.BigNumber.from("7"),
                                                           marketIndex: 1
                                                         });

@@ -1,6 +1,21 @@
 open BsMocha;
+open LetOps;
 let (it', it_only', it_skip', before_each', before') =
   Promise.(it, it_only, it_skip, before_each, before);
+
+let it'' = (str, fn) => it'(str, () => {fn()->JsPromise.resolve});
+
+let before_once' = fn => {
+  let ranRef = ref(false);
+  before_each'(() =>
+    if (ranRef^) {
+      ()->JsPromise.resolve;
+    } else {
+      let%Await _ = fn();
+      ranRef := true;
+    }
+  );
+};
 
 let (
   add,

@@ -77,10 +77,6 @@ type floatTokenReturn = Ethers.ethAddress
 @send
 external floatToken: t => JsPromise.t<floatTokenReturn> = "floatToken"
 
-type initialTimestampReturn = Ethers.BigNumber.t
-@send
-external initialTimestamp: t => JsPromise.t<initialTimestampReturn> = "initialTimestamp"
-
 @send
 external initialize: (
   t,
@@ -108,15 +104,13 @@ type marketLaunchIncentiveMultipliersReturn = Ethers.BigNumber.t
 @send
 external marketLaunchIncentiveMultipliers: (
   t,
-  Ethers.BigNumber.t,
+  int,
 ) => JsPromise.t<marketLaunchIncentiveMultipliersReturn> = "marketLaunchIncentiveMultipliers"
 
 type marketLaunchIncentivePeriodReturn = Ethers.BigNumber.t
 @send
-external marketLaunchIncentivePeriod: (
-  t,
-  Ethers.BigNumber.t,
-) => JsPromise.t<marketLaunchIncentivePeriodReturn> = "marketLaunchIncentivePeriod"
+external marketLaunchIncentivePeriod: (t, int) => JsPromise.t<marketLaunchIncentivePeriodReturn> =
+  "marketLaunchIncentivePeriod"
 
 @send
 external stakeFromUser: (
@@ -179,6 +173,14 @@ module Exposed = {
   @send
   external fLOAT_ISSUANCE_FIXED_DECIMAL: t => JsPromise.t<fLOAT_ISSUANCE_FIXED_DECIMALReturn> =
     "FLOAT_ISSUANCE_FIXED_DECIMAL"
+
+  @send
+  external _changeMarketLaunchIncentiveParametersExternal: (
+    t,
+    ~marketIndex: int,
+    ~period: Ethers.BigNumber.t,
+    ~initialMultiplier: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "_changeMarketLaunchIncentiveParametersExternal"
 
   @send
   external _mintFloatExternal: (
@@ -276,9 +278,21 @@ module Exposed = {
   @send
   external floatToken: t => JsPromise.t<floatTokenReturn> = "floatToken"
 
-  type initialTimestampReturn = Ethers.BigNumber.t
+  type getKValueExternalReturn = Ethers.BigNumber.t
   @send
-  external initialTimestamp: t => JsPromise.t<initialTimestampReturn> = "initialTimestamp"
+  external getKValueExternal: (t, ~marketIndex: int) => JsPromise.t<getKValueExternalReturn> =
+    "getKValueExternal"
+
+  type getMarketLaunchIncentiveParametersExternalReturn = {
+    param0: Ethers.BigNumber.t,
+    param1: Ethers.BigNumber.t,
+  }
+  @send
+  external getMarketLaunchIncentiveParametersExternal: (
+    t,
+    ~marketIndex: int,
+  ) => JsPromise.t<getMarketLaunchIncentiveParametersExternalReturn> =
+    "getMarketLaunchIncentiveParametersExternal"
 
   @send
   external initialize: (
@@ -307,15 +321,13 @@ module Exposed = {
   @send
   external marketLaunchIncentiveMultipliers: (
     t,
-    Ethers.BigNumber.t,
+    int,
   ) => JsPromise.t<marketLaunchIncentiveMultipliersReturn> = "marketLaunchIncentiveMultipliers"
 
   type marketLaunchIncentivePeriodReturn = Ethers.BigNumber.t
   @send
-  external marketLaunchIncentivePeriod: (
-    t,
-    Ethers.BigNumber.t,
-  ) => JsPromise.t<marketLaunchIncentivePeriodReturn> = "marketLaunchIncentivePeriod"
+  external marketLaunchIncentivePeriod: (t, int) => JsPromise.t<marketLaunchIncentivePeriodReturn> =
+    "marketLaunchIncentivePeriod"
 
   @send
   external mintAccumulatedFloatExternal: (
@@ -323,6 +335,15 @@ module Exposed = {
     ~marketIndex: int,
     ~user: Ethers.ethAddress,
   ) => JsPromise.t<transaction> = "mintAccumulatedFloatExternal"
+
+  @send
+  external setAddNewStakingFundParams: (
+    t,
+    ~marketIndex: int,
+    ~longToken: Ethers.ethAddress,
+    ~shortToken: Ethers.ethAddress,
+    ~mockAddress: Ethers.ethAddress,
+  ) => JsPromise.t<transaction> = "setAddNewStakingFundParams"
 
   @send
   external setFloatRewardCalcParams: (
@@ -340,6 +361,28 @@ module Exposed = {
     ~newUserAmountStakedLong: Ethers.BigNumber.t,
     ~newUserAmountStakedShort: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "setFloatRewardCalcParams"
+
+  @send
+  external setFunctionToNotMock: (t, ~functionToNotMock: string) => JsPromise.t<transaction> =
+    "setFunctionToNotMock"
+
+  @send
+  external setGetKValueParams: (
+    t,
+    ~marketIndex: int,
+    ~timestamp: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "setGetKValueParams"
+
+  @send
+  external setGetMarketLaunchIncentiveParametersParams: (
+    t,
+    ~marketIndex: int,
+    ~period: Ethers.BigNumber.t,
+    ~multiplier: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "setGetMarketLaunchIncentiveParametersParams"
+
+  @send
+  external setMocker: (t, ~mocker: Ethers.ethAddress) => JsPromise.t<transaction> = "setMocker"
 
   @send
   external stakeFromUser: (

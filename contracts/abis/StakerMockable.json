@@ -188,65 +188,6 @@
         "type": "uint32"
       },
       {
-        "internalType": "uint256",
-        "name": "period",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "initialMultiplier",
-        "type": "uint256"
-      }
-    ],
-    "name": "_changeMarketLaunchIncentiveParametersExternal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "floatToMint",
-        "type": "uint256"
-      }
-    ],
-    "name": "_mintFloatExternal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract ISyntheticToken",
-        "name": "token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "_withdrawExternal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
         "internalType": "contract ISyntheticToken",
         "name": "longToken",
         "type": "address"
@@ -355,35 +296,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      }
-    ],
-    "name": "calculateAccumulatedFloatExposed",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "longFloatReward",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "shortFloatReward",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "_admin",
         "type": "address"
@@ -477,49 +389,6 @@
         "internalType": "contract IFloatToken",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "getKValueExternal",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      }
-    ],
-    "name": "getMarketLaunchIncentiveParametersExternal",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -645,167 +514,12 @@
   {
     "inputs": [
       {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      }
-    ],
-    "name": "mintAccumulatedFloatExternal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "contract ISyntheticToken",
-        "name": "longToken",
-        "type": "address"
-      },
-      {
-        "internalType": "contract ISyntheticToken",
-        "name": "shortToken",
-        "type": "address"
-      },
-      {
-        "internalType": "contract ISyntheticToken",
-        "name": "mockAddress",
-        "type": "address"
-      }
-    ],
-    "name": "setAddNewStakingFundParams",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "contract ISyntheticToken",
-        "name": "longToken",
-        "type": "address"
-      },
-      {
-        "internalType": "contract ISyntheticToken",
-        "name": "shortToken",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "newLatestRewardIndex",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "usersLatestClaimedReward",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "accumulativeFloatPerTokenLatestLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "accumulativeFloatPerTokenLatestShort",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "accumulativeFloatPerTokenUserLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "accumulativeFloatPerTokenUserShort",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "newUserAmountStakedLong",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "newUserAmountStakedShort",
-        "type": "uint256"
-      }
-    ],
-    "name": "setFloatRewardCalcParams",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "string",
         "name": "_functionToNotMock",
         "type": "string"
       }
     ],
     "name": "setFunctionToNotMock",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "timestamp",
-        "type": "uint256"
-      }
-    ],
-    "name": "setGetKValueParams",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "marketIndex",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "period",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "multiplier",
-        "type": "uint256"
-      }
-    ],
-    "name": "setGetMarketLaunchIncentiveParametersParams",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

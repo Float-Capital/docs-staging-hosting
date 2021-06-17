@@ -86,15 +86,25 @@ describe("Float System", () => {
       accounts := loadedAccounts;
     });
 
-    before_each'(() => {
-      let%Await deployedContracts =
-        Helpers.inititialize(
-          ~admin=accounts.contents->Array.getUnsafe(0),
-          ~exposeInternals=true,
-        );
-      contracts := deployedContracts;
+    // ONE DEPLOYMENT PER TEST
+    describe("", () => {
+      before_each'(() => {
+        let%Await deployedContracts =
+          Helpers.inititialize(
+            ~admin=accounts.contents->Array.getUnsafe(0),
+            ~exposeInternals=true,
+          );
+        contracts := deployedContracts;
+      });
+      CalculateAccumulatedFloat.test(~contracts);
+      GetMarketLaunchIncentiveParameters.test(~contracts);
     });
 
-    CalculateAccumulatedFloat.test(~contracts);
+    // TESTS THAT MAY TEST MULTIPLE THINGS PER DEPLOYMENT
+    describe("", () => {
+      ChangeMarketLaunchIncentiveParameters.test(~contracts, ~accounts);
+      AddNewStakingFund.test(~contracts, ~accounts);
+      GetKValue.test(~contracts, ~accounts);
+    });
   });
 });
