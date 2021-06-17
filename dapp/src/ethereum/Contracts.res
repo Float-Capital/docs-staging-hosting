@@ -5,11 +5,11 @@ module LongShort = {
 
   let abi =
     [
-      "function mintLongNextPrice(uint32 marketIndex,uint256 amount) @770000",
-      "function mintShortNextPrice(uint32 marketIndex,uint256 amount) @770000",
+      "function mintLongNextPrice(uint32 marketIndex,uint256 amount) @1170000",
+      "function mintShortNextPrice(uint32 marketIndex,uint256 amount) @1170000",
       "function redeemLongNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
       "function redeemShortNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
-      "function _updateSystemState()"
+      "function _updateSystemState()",
     ]->Ethers.makeAbi
 
   let make = (~address, ~providerOrSigner): t =>

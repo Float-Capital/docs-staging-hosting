@@ -41,6 +41,7 @@ const deployTestMarket = async (
   networkName,
   token
 ) => {
+  console.log("Deploying test Market", syntheticName, syntheticSymbol);
   // Default mint/redeem fees.
   const _baseEntryFee = 0;
   const _badLiquidityEntryFee = 50;
@@ -95,12 +96,14 @@ const deployTestMarket = async (
   const kInitialMultiplier = new BN("5000000000000000000"); // 5x
   let kPeriod = 864000; // 10 days
 
-  await mintAndApprove(
-    token,
-    new BN("2000000000000000000"),
-    admin,
-    longShortInstance.address
-  );
+  if (networkName != "mumbai") {
+    await mintAndApprove(
+      token,
+      new BN("2000000000000000000"),
+      admin,
+      longShortInstance.address
+    );
+  }
 
   await longShortInstance.initializeMarket(
     currentMarketIndex,
@@ -114,8 +117,14 @@ const deployTestMarket = async (
   );
 }
 
-const mintShortNextPriceWithSystemUpdate = async (amount, marketIndex, paymentToken, longShort, user, oracleManager) => {
-  await mintAndApprove(paymentToken, amount, user, longShort.address);
+const mintShortNextPriceWithSystemUpdate = async (amount, marketIndex, paymentToken, longShort, user, oracleManager, network) => {
+  if (network == "mumbai") {
+    await paymentToken.approve(longShort.address, amount, {
+      from: user,
+    });
+  } else {
+    await mintAndApprove(paymentToken, amount, user, longShort.address);
+  }
 
   await longShort.mintShortNextPrice(marketIndex, new BN(amount), {
     from: user,
@@ -128,16 +137,26 @@ const mintShortNextPriceWithSystemUpdate = async (amount, marketIndex, paymentTo
   await longShort._updateSystemState(marketIndex);
 }
 
-const mintLongNextPriceWithSystemUpdate = async (amount, marketIndex, paymentToken, longShort, user, oracleManager) => {
-  await mintAndApprove(paymentToken, amount, user, longShort.address);
+const mintLongNextPriceWithSystemUpdate = async (amount, marketIndex, paymentToken, longShort, user, oracleManager, network) => {
+  if (network == "mumbai") {
+    await paymentToken.approve(longShort.address, amount, {
+      from: user,
+    });
+  } else {
+    await mintAndApprove(paymentToken, amount, user, longShort.address);
+  }
+
+  console.log("1")
 
   await longShort.mintLongNextPrice(marketIndex, new BN(amount), {
     from: user,
   });
 
-  const currentPrice = await oracleManager.getLatestPrice();
-  const nextPrice = currentPrice.mul(new BN(101)).div(new BN(100));
-  await oracleManager.setPrice(nextPrice);
+  if (network != "mumbai") {
+    const currentPrice = await oracleManager.getLatestPrice();
+    const nextPrice = currentPrice.mul(new BN(101)).div(new BN(100));
+    await oracleManager.setPrice(nextPrice);
+  }
 
   await longShort._updateSystemState(marketIndex);
 }
@@ -177,76 +196,90 @@ module.exports = async function (deployer, network, accounts) {
   const largeApprove = "10000000000000000000000000000000";
 
   // We use fake DAI if we're not on BSC testnet.
+  // let token;
+  // if (network == "mumbai") {
+  //   token = await Dai.at(mumbaiDaiAddress);
+  // } else {
+  //   token = await Dai.deployed();
+  // }
   let token;
-  if (network == "mumbai") {
-    token = await Dai.at(mumbaiDaiAddress);
-  } else {
-    token = await Dai.deployed();
-  }
+  // if (network == "mumbai") {
+  token = await Dai.at(mumbaiDaiAddress);
+  //   await token.approve(longShort.address, new BN("200000000000000000000"), {
+  //     from: admin,
+  //   });
+  // } else {
+  //   token = await Dai.deployed();
+  //   await mintAndApprove(token, new BN("20000000000000000000"), user3, admin);
+  // }
 
-  await mintAndApprove(token, new BN("20000000000000000000"), user3, admin);
+  // console.log("topping up balance")
+  // await topupBalanceIfLow(admin, user1);
+  // await topupBalanceIfLow(admin, user2);
+  // await topupBalanceIfLow(admin, user3);
+  // console.log("balance topped up :)")
 
-  await deployTestMarket(
-    "ETH Killers",
-    "ETHK",
-    longShort,
-    treasury,
-    token,
-    admin,
-    network,
-    token
-  );
+  // await deployTestMarket(
+  //   "ETH Killers",
+  //   "ETHK",
+  //   longShort,
+  //   treasury,
+  //   token,
+  //   admin,
+  //   network,
+  //   token
+  // );
 
-  await deployTestMarket(
-    "The Flippening",
-    "EBD",
-    longShort,
-    treasury,
-    token,
-    admin,
-    network,
-    token
-  );
+  // await deployTestMarket(
+  //   "The Flippening",
+  //   "EBD",
+  //   longShort,
+  //   treasury,
+  //   token,
+  //   admin,
+  //   network,
+  //   token
+  // );
 
-  await deployTestMarket(
-    "Gold",
-    "GOLD",
-    longShort,
-    treasury,
-    token,
-    admin,
-    network,
-    token
-  );
+  // await deployTestMarket(
+  //   "Gold",
+  //   "GOLD",
+  //   longShort,
+  //   treasury,
+  //   token,
+  //   admin,
+  //   network,
+  //   token
+  // );
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
-  let verifyString = `yarn hardhat --network ${network} tenderly:verify`;
-  if (network == "mumbai") {
-    for (
-      let marketIndex = 1;
-      marketIndex <= currentMarketIndex;
-      ++marketIndex
-    ) {
-      verifyString += ` YieldManagerAave=${await longShort.yieldManagers(
-        marketIndex
-      )} OracleManagerEthKiller=${await longShort.oracleManagers(
-        marketIndex
-      )} SyntheticToken=${await LongShort.syntheticTokens(
-        CONSTANTS.longTokenType,
-        marketIndex
-      )} SyntheticToken=${await LongShort.syntheticTokens(
-        CONSTANTS.shortTokenType,
-        marketIndex
-      )}`;
-    }
+  // let verifyString = `yarn hardhat --network ${network} tenderly:verify`;
+  // if (network == "mumbai") {
+  //   for (
+  //     let marketIndex = 1;
+  //     marketIndex <= currentMarketIndex;
+  //     ++marketIndex
+  //   ) {
+  //     verifyString += ` YieldManagerAave=${await longShort.yieldManagers(
+  //       marketIndex
+  //     )} OracleManagerEthKiller=${await longShort.oracleManagers(
+  //       marketIndex
+  //     )} SyntheticToken=${await LongShort.syntheticTokens(
+  //       0,
+  //       marketIndex
+  //     )} SyntheticToken=${await LongShort.syntheticTokens(
+  //       1,
+  //       marketIndex
+  //     )}`;
+  //   }
 
-    console.log(`To verify market specific contracts run the following:
-    
-    \`${verifyString}\``);
-  }
+  //   console.log(`To verify market specific contracts run the following:
+
+  //   \`${verifyString}\``);
+  // }
 
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
-    if (network == "mumbai") return
+    // if (network == "mumbai") return
 
     console.log(`Simulating transactions for marketIndex: ${marketIndex}`);
 
@@ -259,20 +292,24 @@ module.exports = async function (deployer, network, accounts) {
     const oracleManagerAddr = await longShort.oracleManagers.call(marketIndex);
     const oracleManager = await OracleManagerMock.at(oracleManagerAddr);
 
-    await mintLongNextPriceWithSystemUpdate(tenMintAmount, marketIndex, token, longShort, user1, oracleManager)
-    await mintLongNextPriceWithSystemUpdate(tenMintAmount, marketIndex, token, longShort, user2, oracleManager)
-    await mintLongNextPriceWithSystemUpdate(tenMintAmount, marketIndex, token, longShort, user3, oracleManager)
+    console.log("Running update system state")
+    await longShort._updateSystemState(marketIndex);
+
+    console.log("Here")
+    await mintLongNextPriceWithSystemUpdate(tenMintAmount, marketIndex, token, longShort, user1, oracleManager, network)
+    await mintLongNextPriceWithSystemUpdate(tenMintAmount, marketIndex, token, longShort, user2, oracleManager, network)
+    await mintLongNextPriceWithSystemUpdate(tenMintAmount, marketIndex, token, longShort, user3, oracleManager, network)
 
     const halfTokensMinted = new BN(tenMintAmount).div(new BN(2));
-    await mintShortNextPriceWithSystemUpdate(halfTokensMinted, marketIndex, token, longShort, user1, oracleManager)
-    await mintShortNextPriceWithSystemUpdate(halfTokensMinted, marketIndex, token, longShort, user2, oracleManager)
-    await mintShortNextPriceWithSystemUpdate(halfTokensMinted, marketIndex, token, longShort, user3, oracleManager)
+    await mintShortNextPriceWithSystemUpdate(halfTokensMinted, marketIndex, token, longShort, user1, oracleManager, network)
+    await mintShortNextPriceWithSystemUpdate(halfTokensMinted, marketIndex, token, longShort, user2, oracleManager, network)
+    await mintShortNextPriceWithSystemUpdate(halfTokensMinted, marketIndex, token, longShort, user3, oracleManager, network)
 
     /* // Increase mock oracle price from 1 (default) to 1.1.
     if (network != "mumbai") await oracleManager.setPrice(onePointOne);
- 
+   
     await longShort._updateSystemState(marketIndex);
- 
+   
     // Simulate user 2 redeeming half his tokens.
     const halfTokensMinted = new BN(tenMintAmount).div(new BN(2));
     await short.increaseAllowance(longShort.address, halfTokensMinted, {
@@ -281,7 +318,7 @@ module.exports = async function (deployer, network, accounts) {
     await longShort.redeemShort(marketIndex, halfTokensMinted, {
       from: user2,
     });
- 
+   
     // Simulate user 1 redeeming a third of his tokens.
     const thirdTokensMinted = new BN(tenMintAmount).div(new BN(3));
     await long.increaseAllowance(longShort.address, thirdTokensMinted, {
@@ -290,24 +327,24 @@ module.exports = async function (deployer, network, accounts) {
     await longShort.redeemLong(marketIndex, thirdTokensMinted, {
       from: user1,
     });
- 
+   
     if (network != "mumbai") {
       await mintAndApprove(token, tenMintAmount, user3, longShort.address);
     }
     await longShort.mintLongAndStake(marketIndex, new BN(tenMintAmount), {
       from: user3,
     });
- 
+   
     if (network != "mumbai") {
       await mintAndApprove(token, tenMintAmount, user3, longShort.address);
     }
     await longShort.mintShortAndStake(marketIndex, new BN(tenMintAmount), {
       from: user3,
     });
- 
+   
     // update system state and mint and stake again mint float
     await longShort._updateSystemState(marketIndex);
- 
+   
     await staker.claimFloatCustom([marketIndex], {
       from: user3,
     }); */

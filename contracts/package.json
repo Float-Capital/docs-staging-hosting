@@ -20,7 +20,7 @@
     "verify-contracts": "truffle run verify FloatToken LongShort@$LONGSHORT_IMPLEMENTATION Staker@$STAKER_IMPLEMENTATION FloatCapital_v0@$TREASURY_IMPLEMENTATIONTreasury_v0@$FLOAT_CAPITAL_IMPLEMENTATION FloatToken TokenFactory --network $NETWORK",
     "update-testnet-contracts": "yarn prepair-upgrade; rm -f .openzeppelin/unknown-{97,1337}.json; truffle migrate --network binanceTest --reset; mv .openzeppelin/unknown-1337.json .openzeppelin/unknown-97.json; yarn save-deployment",
     "generate-contract-interfaces": "yarn compile; node ../scripts/src/AbiInterfaceGen.bs.js; rescript format -all",
-    "generate-test-contracts":  "mkdir -p codegen; cp -r contracts codegen; rm -rf codegen/contracts/testing; yarn truffle compile --contracts_directory codegen --contracts_build_directory codegen/truffle; node ../scripts/src/MockablesGen.bs.js;"
+    "generate-test-contracts": "mkdir -p codegen; cp -r contracts codegen; rm -rf codegen/contracts/testing; yarn truffle compile --contracts_directory codegen --contracts_build_directory codegen/truffle; node ../scripts/src/MockablesGen.bs.js;"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.1.7",
@@ -32,6 +32,7 @@
     "@openzeppelin/contracts": "^4.1.0",
     "@openzeppelin/contracts-upgradeable": "^4.0.0",
     "@openzeppelin/test-helpers": "^0.5.6",
+    "@truffle/hdwallet-provider": "^1.4.0",
     "chai": "^4.3.4",
     "ethers": "^5.1.4",
     "hardhat": "^2.2.1",
@@ -44,7 +45,6 @@
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/truffle-upgrades": "^1.5.0",
     "@tenderly/hardhat-tenderly": "^1.0.12",
-    "@truffle/hdwallet-provider": "^1.2.1",
     "bs-let": "^0.1.16",
     "bs-mocha": "^1.0.0",
     "bs-platform": "^9.0.2",

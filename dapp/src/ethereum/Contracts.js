@@ -4,8 +4,8 @@
 var Ethers = require("./Ethers.js");
 
 var abi = Ethers.makeAbi([
-      "function mintLongNextPrice(uint32 marketIndex,uint256 amount) @770000",
-      "function mintShortNextPrice(uint32 marketIndex,uint256 amount) @770000",
+      "function mintLongNextPrice(uint32 marketIndex,uint256 amount) @1170000",
+      "function mintShortNextPrice(uint32 marketIndex,uint256 amount) @1170000",
       "function redeemLongNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
       "function redeemShortNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
       "function _updateSystemState()"

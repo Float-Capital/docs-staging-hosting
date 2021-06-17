@@ -232,6 +232,7 @@ export function createUserNextPriceActionComponent(
       userNextPriceActionComponentId
     );
     hasntFoundUnititializedIndex = tempUserNextPriceActionComponent != null;
+    ++actionIndex;
   }
   let userNextPriceActionComponent = new UserNextPriceActionComponent(
     userNextPriceActionComponentId
