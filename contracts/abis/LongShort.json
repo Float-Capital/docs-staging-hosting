@@ -978,14 +978,14 @@
         "type": "uint32"
       },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
         "internalType": "enum ILongShort.MarketSide",
         "name": "",
         "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "name": "mintPriceSnapshot",
@@ -1095,14 +1095,14 @@
         "type": "uint32"
       },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
         "internalType": "enum ILongShort.MarketSide",
         "name": "",
         "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "name": "redeemPriceSnapshot",
