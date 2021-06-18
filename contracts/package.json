@@ -45,7 +45,6 @@
     "@openzeppelin/truffle-upgrades": "^1.5.0",
     "@tenderly/hardhat-tenderly": "^1.0.12",
     "bs-let": "^0.1.16",
-    "bs-mocha": "^1.0.0",
     "bs-platform": "^9.0.2",
     "dotenv": "^10.0.0",
     "ethereum-waffle": "^3.3.0",
