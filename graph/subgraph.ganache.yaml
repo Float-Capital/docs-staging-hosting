@@ -41,9 +41,9 @@ dataSources:
           handler: handleFeesLevied
         - event: NewMarketLaunchedAndSeeded(uint32,uint256)
           handler: handleNewMarketLaunchedAndSeeded
-        - event: NextPriceDeposit(uint32,uint8,uint256,address,uint256)
+        - event: NextPriceDeposit(uint32,bool,uint256,address,uint256)
           handler: handleNextPriceDeposit
-        - event: NextPriceRedeem(uint32,uint8,uint256,address,uint256)
+        - event: NextPriceRedeem(uint32,bool,uint256,address,uint256)
           handler: handleNextPriceRedeem
         - event: OracleUpdated(uint32,address,address)
           handler: handleOracleUpdated
@@ -82,16 +82,16 @@ dataSources:
       eventHandlers:
         - event: DeployV1(address)
           handler: handleDeployV1
-        - event: StateAdded(uint32,uint256,uint256,uint256,uint256)
-          handler: handleStateAdded
-        - event: StakeAdded(address,address,uint256,uint256)
-          handler: handleStakeAdded
-        - event: StakeWithdrawn(address,address,uint256)
-          handler: handleStakeWithdrawn
         - event: FloatMinted(address,uint32,uint256,uint256,uint256)
           handler: handleFloatMinted
         - event: MarketLaunchIncentiveParametersChanges(uint32,uint256,uint256)
           handler: handleMarketLaunchIncentiveParametersChanges
+        - event: StakeAdded(address,address,uint256,uint256)
+          handler: handleStakeAdded
+        - event: StakeWithdrawn(address,address,uint256)
+          handler: handleStakeWithdrawn
+        - event: StateAdded(uint32,uint256,uint256,uint256,uint256)
+          handler: handleStateAdded
       file: ./src/staker.ts
 
 templates:

@@ -388,20 +388,11 @@ export function handlePriceUpdate(event: PriceUpdate): void {
   );
 }
 
-function getMarketSideString(marketEnum: i32): string {
-  if (marketEnum == 0) {
-    return MARKET_SIDE_LONG;
-  } else {
-    return MARKET_SIDE_SHORT;
-  }
-}
-
 export function handleNextPriceDeposit(event: NextPriceDeposit): void {
   let depositAdded = event.params.depositAdded;
   let marketIndex = event.params.marketIndex;
   let oracleUpdateIndex = event.params.oracleUpdateIndex;
-  let syntheticTokenTypeInt = event.params.syntheticTokenType;
-  let syntheticTokenType = getMarketSideString(syntheticTokenTypeInt);
+  let isLong = event.params.isLong;
   let userAddress = event.params.user;
 
   let user = getUser(userAddress);
@@ -413,7 +404,7 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
     oracleUpdateIndex,
     depositAdded,
     ACTION_MINT,
-    syntheticTokenType,
+    isLong,
     event
   );
 
@@ -451,15 +442,9 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
       depositAdded,
       marketIndex,
       oracleUpdateIndex,
-    ]).concat([syntheticTokenType, user.id]),
-    [
-      "depositAdded",
-      "marketIndex",
-      "oracleUpdateIndex",
-      "syntheticTokenType",
-      "user",
-    ],
-    ["uint256", "uint32", "uint256", "MarketSide", "address"],
+    ]).concat([isLong ? "true" : "false", user.id]),
+    ["depositAdded", "marketIndex", "oracleUpdateIndex", "isLong", "user"],
+    ["uint256", "uint32", "uint256", "bool", "address"],
     [userAddress],
     []
   );
@@ -469,8 +454,7 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
   let depositAdded = event.params.synthRedeemed;
   let marketIndex = event.params.marketIndex;
   let oracleUpdateIndex = event.params.oracleUpdateIndex;
-  let syntheticTokenTypeInt = event.params.syntheticTokenType;
-  let syntheticTokenType = getMarketSideString(syntheticTokenTypeInt);
+  let isLong = event.params.isLong;
   let userAddress = event.params.user;
 
   let user = getUser(userAddress);
@@ -482,7 +466,7 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
     oracleUpdateIndex,
     depositAdded,
     ACTION_REDEEM,
-    syntheticTokenType,
+    isLong,
     event
   );
 
@@ -505,15 +489,9 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
       depositAdded,
       marketIndex,
       oracleUpdateIndex,
-    ]).concat([syntheticTokenType, user.id]),
-    [
-      "synthRedeemed",
-      "marketIndex",
-      "oracleUpdateIndex",
-      "syntheticTokenType",
-      "user",
-    ],
-    ["uint256", "uint32", "uint256", "MarketSide", "address"],
+    ]).concat([isLong ? "true" : "false", user.id]),
+    ["synthRedeemed", "marketIndex", "oracleUpdateIndex", "isLong", "user"],
+    ["uint256", "uint32", "uint256", "bool", "address"],
     [userAddress],
     []
   );

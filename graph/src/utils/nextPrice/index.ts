@@ -89,7 +89,7 @@ export function createOrUpdateBatchedNextPriceExec(
   let marketIndex = userNextPriceActionComponent.marketIndex;
   let updateIndex = userNextPriceActionComponent.updateIndex;
   let userAddress = Address.fromString(userNextPriceActionComponent.user);
-  let syntheticTokenType = userNextPriceActionComponent.marketSide;
+  let isLong = userNextPriceActionComponent.marketSide;
   let actionType = userNextPriceActionComponent.actionType;
   let amount = userNextPriceActionComponent.amount;
 
@@ -149,7 +149,7 @@ export function createOrUpdateBatchedNextPriceExec(
   }
 
   if (actionType == ACTION_MINT) {
-    if (syntheticTokenType == MARKET_SIDE_LONG) {
+    if (isLong == MARKET_SIDE_LONG) {
       batchedNextPriceExec.amountPaymentTokenForDepositLong = batchedNextPriceExec.amountPaymentTokenForDepositLong.plus(
         amount
       );
@@ -159,7 +159,7 @@ export function createOrUpdateBatchedNextPriceExec(
       );
     }
   } else {
-    if (syntheticTokenType == MARKET_SIDE_LONG) {
+    if (isLong == MARKET_SIDE_LONG) {
       batchedNextPriceExec.amountSynthTokenForWithdrawalLong = batchedNextPriceExec.amountSynthTokenForWithdrawalLong.plus(
         amount
       );
@@ -224,7 +224,7 @@ export function createUserNextPriceActionComponent(
   updateIndex: BigInt,
   amount: BigInt,
   actionType: string,
-  syntheticTokenType: string,
+  isLong: bool,
   event: ethereum.Event
 ): UserNextPriceActionComponent {
   let actionIndex = 0;
@@ -251,7 +251,7 @@ export function createUserNextPriceActionComponent(
   );
 
   userNextPriceActionComponent.actionType = actionType;
-  userNextPriceActionComponent.marketSide = syntheticTokenType;
+  userNextPriceActionComponent.marketSide = isLong ? "Long" : "Short";
   userNextPriceActionComponent.amount = amount;
   userNextPriceActionComponent.timestamp = event.block.timestamp;
   userNextPriceActionComponent.user = user.id;
@@ -281,7 +281,7 @@ export function createOrUpdateUserNextPriceAction(
   let marketIndex = userNextPriceActionComponent.marketIndex;
   let updateIndex = userNextPriceActionComponent.updateIndex;
   let associatedBatch = userNextPriceActionComponent.associatedBatch;
-  let syntheticTokenType = userNextPriceActionComponent.marketSide;
+  let isLong = userNextPriceActionComponent.marketSide;
   let actionType = userNextPriceActionComponent.actionType;
   let amount = userNextPriceActionComponent.amount;
 
@@ -340,7 +340,7 @@ export function createOrUpdateUserNextPriceAction(
   }
 
   if (actionType == ACTION_MINT) {
-    if (syntheticTokenType == MARKET_SIDE_LONG) {
+    if (isLong == MARKET_SIDE_LONG) {
       userNextPriceAction.amountPaymentTokenForDepositLong = userNextPriceAction.amountPaymentTokenForDepositLong.plus(
         amount
       );
@@ -350,7 +350,7 @@ export function createOrUpdateUserNextPriceAction(
       );
     }
   } else {
-    if (syntheticTokenType == MARKET_SIDE_LONG) {
+    if (isLong == MARKET_SIDE_LONG) {
       userNextPriceAction.amountSynthTokenForWithdrawalLong = userNextPriceAction.amountSynthTokenForWithdrawalLong.plus(
         amount
       );
