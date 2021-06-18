@@ -553,14 +553,6 @@ contract LongShort is ILongShort, Initializable {
       ║       HELPER FUNCTIONS          ║
       ╚═════════════════════════════════╝*/
 
-    function _minimum(uint256 A, uint256 B) internal view returns (int256) {
-        if (A < B) {
-            return int256(A);
-        } else {
-            return int256(B);
-        }
-    }
-
     /**
      * Adjusts the long/short token prices according to supply and value.
      */
@@ -648,17 +640,22 @@ contract LongShort is ILongShort, Initializable {
             return false;
         }
 
-        int256 min =
-            _minimum(
-                syntheticTokenPoolValue[marketIndex][MarketSide.Long],
-                syntheticTokenPoolValue[marketIndex][MarketSide.Short]
-            );
+        uint256 min;
+        if (
+            syntheticTokenPoolValue[marketIndex][MarketSide.Long] <
+            syntheticTokenPoolValue[marketIndex][MarketSide.Short]
+        ) {
+            min = syntheticTokenPoolValue[marketIndex][MarketSide.Long];
+        } else {
+            min = syntheticTokenPoolValue[marketIndex][MarketSide.Short];
+        }
 
         int256 percentageChangeE18 =
             ((newAssetPrice - oldAssetPrice) * TEN_TO_THE_18_SIGNED) /
                 oldAssetPrice;
 
-        int256 valueChange = (percentageChangeE18 * min) / TEN_TO_THE_18_SIGNED;
+        int256 valueChange =
+            (percentageChangeE18 * int256(min)) / TEN_TO_THE_18_SIGNED;
 
         if (valueChange > 0) {
             syntheticTokenPoolValue[marketIndex][MarketSide.Long] += uint256(
@@ -766,6 +763,9 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokenPoolValue[marketIndex][MarketSide.Short]
         );
 
+        // Distibute accrued yield first based on current liquidity before price update
+        _claimAndDistributeYield(marketIndex);
+
         // If a negative int is return this should fail.
         int256 newAssetPrice = oracleManagers[marketIndex].updatePrice();
 
@@ -778,9 +778,6 @@ contract LongShort is ILongShort, Initializable {
                 syntheticTokenPoolValue[marketIndex][MarketSide.Long] != 0 &&
                     syntheticTokenPoolValue[marketIndex][MarketSide.Short] != 0
             );
-
-            // Distibute accrued yield first based on current liquidity before price update
-            _claimAndDistributeYield(marketIndex);
 
             // TODO STENT move this into the price function
             emit PriceUpdate(
