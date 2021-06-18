@@ -5085,11 +5085,6 @@ bs-let@^0.1.16:
   resolved "https://registry.yarnpkg.com/bs-let/-/bs-let-0.1.16.tgz#63cd449ed02c75f87eceb248d45963937afdd4ed"
   integrity sha512-pdbSNe/QRpqgqS72dYDlkZ7kqMHc5aJkLgipLS8BFMRx+hQqkOo0JOpxWZQeDj1T677e302xgmV+Mid5gvmnBg==
 
-bs-platform@^9.0.2:
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/bs-platform/-/bs-platform-9.0.2.tgz#a6eac70eb8924a322556dacaccbfbc9b2a0d3a37"
-  integrity sha512-Ye9JqJ4Oa7mcjjoOVRYI8Uc2Cf8N7jQLWDcdUplY7996d/YErSR7WitmV7XnSwr4EvdrbwjEsg1NxNjUQv3ChA==
-
 bs58@^4.0.0, bs58@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/bs58/-/bs58-4.0.1.tgz#be161e76c354f6f788ae4071f63f34e8c4f0a42a"
@@ -14091,6 +14086,11 @@ require-main-filename@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/require-main-filename/-/require-main-filename-2.0.0.tgz#d0b329ecc7cc0f61649f62215be69af54aa8989b"
   integrity sha512-NKN5kMDylKuldxYLSUfrbo5Tuzh4hd+2E8NPPX02mZtn1VuREQToYe/ZdlJy+J3uCpfaiGF05e7B8W0iXbQHmg==
+
+rescript@^9.1.4:
+  version "9.1.4"
+  resolved "https://registry.yarnpkg.com/rescript/-/rescript-9.1.4.tgz#1eb126f98d6c16942c0bf0df67c050198e580515"
+  integrity sha512-aXANK4IqecJzdnDpJUsU6pxMViCR5ogAxzuqS0mOr8TloMnzAjJFu63fjD6LCkWrKAhlMkFFzQvVQYaAaVkFXw==
 
 reselect-tree@^1.3.4:
   version "1.3.4"

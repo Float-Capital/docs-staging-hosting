@@ -34,13 +34,13 @@ let test =
       ();
     });
 
-    it''("calls the onlyAdminModifier", () => {
+    it'("calls the onlyAdminModifier", () => {
       StakerSmocked.InternalMock.onlyAdminCalls()
       ->Array.length
       ->Chai.intEqual(1)
     });
 
-    it''(
+    it'(
       "calls _changeMarketLaunchIncentiveParameters with correct arguments", () => {
       StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCalls()
       ->Array.getUnsafe(0)
@@ -81,21 +81,21 @@ let test =
         ();
       });
 
-      it'("mutates marketLaunchIncentivePeriod", () => {
+      it("mutates marketLaunchIncentivePeriod", () => {
         let%Await setPeriod =
           (stakerRef^)->Staker.marketLaunchIncentivePeriod(marketIndex);
 
         period->Chai.bnEqual(setPeriod);
       });
 
-      it'("mutates marketLaunchIncentiveMultiplier", () => {
+      it("mutates marketLaunchIncentiveMultiplier", () => {
         let%Await setMultiplier =
           (stakerRef^)->Staker.marketLaunchIncentiveMultipliers(marketIndex);
 
         initialMultiplierFine->Chai.bnEqual(setMultiplier);
       });
 
-      it'("emits MarketLaunchIncentiveParametersChanges event", () => {
+      it("emits MarketLaunchIncentiveParametersChanges event", () => {
         Chai.callEmitEvents(
           ~call=promise^,
           ~contract=(stakerRef^)->Obj.magic,
@@ -107,7 +107,7 @@ let test =
 
     describe("failing transaction", () => {
       before_once'(() => setup(~initialMultiplier=initialMultiplierNotFine));
-      it'("reverts if initialMultiplier < 1e18", () => {
+      it("reverts if initialMultiplier < 1e18", () => {
         let%Await _ =
           Chai.expectRevert(
             ~transaction=promise^,

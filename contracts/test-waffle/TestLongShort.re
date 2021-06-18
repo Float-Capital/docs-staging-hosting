@@ -6,12 +6,12 @@ describe("Float System", () => {
     let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
     let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
 
-    before_each'(() => {
+    before_each(() => {
       let%Await loadedAccounts = Ethers.getSigners();
       accounts := loadedAccounts;
       // });
 
-      // before_each'(() => {
+      // before_each(() => {
       let%AwaitThen deployedContracts =
         Helpers.inititialize(
           ~admin=accounts.contents->Array.getUnsafe(0),
@@ -43,12 +43,12 @@ describe("Float System", () => {
     let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
     let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
 
-    before'(() => {
+    before(() => {
       let%Await loadedAccounts = Ethers.getSigners();
       accounts := loadedAccounts;
     });
 
-    before_each'(() => {
+    before_each(() => {
       let%AwaitThen deployedContracts =
         Helpers.inititialize(
           ~admin=accounts.contents->Array.getUnsafe(0),

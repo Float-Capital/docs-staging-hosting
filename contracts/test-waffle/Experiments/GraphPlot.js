@@ -2,6 +2,7 @@
 'use strict';
 
 var Fs = require("fs");
+var Curry = require("rescript/lib/js/curry.js");
 var Config = require("../library/Config.js");
 var Ethers = require("../bindings/ethers/Ethers.js");
 var LetOps = require("../library/LetOps.js");
@@ -9,13 +10,13 @@ var Globals = require("../library/Globals.js");
 var Helpers = require("../library/Helpers.js");
 var Contract = require("../library/Contract.js");
 var CONSTANTS = require("../CONSTANTS.js");
-var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
+var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var HelperActions = require("../library/HelperActions.js");
 
 function generateTestData(contracts, accounts, initialPrice, initialAmountShort, initialAmountLong, prices, name) {
-  describe("generating graph" + name, (function (param) {
+  describe("generating graph" + name, (function () {
           var numberOfItems = Globals.bnToInt(Globals.div(initialPrice, CONSTANTS.tenToThe18));
-          beforeEach(function (param) {
+          beforeEach(function () {
                 var match = contracts.contents;
                 var longShort = match.longShort;
                 var match$1 = match.markets[0];
@@ -33,7 +34,7 @@ function generateTestData(contracts, accounts, initialPrice, initialAmountShort,
                                           }));
                             }));
               });
-          it("below", (function (param) {
+          it("below", (function () {
                   var match = contracts.contents;
                   var longShort = match.longShort;
                   var match$1 = match.markets[0];
@@ -78,7 +79,7 @@ function generateTestData(contracts, accounts, initialPrice, initialAmountShort,
                                             }));
                               }));
                 }));
-          it("above", (function (param) {
+          it("above", (function () {
                   var match = contracts.contents;
                   var longShort = match.longShort;
                   var match$1 = match.markets[0];
@@ -127,11 +128,15 @@ function generateTestData(contracts, accounts, initialPrice, initialAmountShort,
   
 }
 
-var describeSkippable = Config.runValueSimulations ? (function (prim, prim$1) {
-      describe(prim, prim$1);
+var describeSkippable = Config.runValueSimulations ? (function (prim0, prim1) {
+      describe(prim0, (function () {
+              return Curry._1(prim1, undefined);
+            }));
       
-    }) : (function (prim, prim$1) {
-      describe.skip(prim, prim$1);
+    }) : (function (prim0, prim1) {
+      describe.skip(prim0, (function () {
+              return Curry._1(prim1, undefined);
+            }));
       
     });
 
@@ -142,13 +147,13 @@ describeSkippable("Float System", (function (param) {
         var accounts = {
           contents: undefined
         };
-        before(function (param) {
+        before(function () {
               return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
                             accounts.contents = loadedAccounts;
                             
                           }));
             });
-        beforeEach(function (param) {
+        beforeEach(function () {
               return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
                             contracts.contents = deployedContracts;
                             

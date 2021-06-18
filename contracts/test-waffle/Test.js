@@ -4,24 +4,24 @@
 var Chai = require("./bindings/chai/Chai.js");
 var LetOps = require("./library/LetOps.js");
 var Helpers = require("./library/Helpers.js");
-var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
+var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var HelperActions = require("./library/HelperActions.js");
 
-describe("Float System", (function (param) {
-        describe("Staking", (function (param) {
+describe("Float System", (function () {
+        describe("Staking", (function () {
                 var contracts = {
                   contents: undefined
                 };
                 var accounts = {
                   contents: undefined
                 };
-                before(function (param) {
+                before(function () {
                       return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
                                     accounts.contents = loadedAccounts;
                                     
                                   }));
                     });
-                beforeEach(function (param) {
+                beforeEach(function () {
                       return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
                                     contracts.contents = deployedContracts;
                                     var setupUser = accounts.contents[2];
@@ -30,7 +30,7 @@ describe("Float System", (function (param) {
                                                 }));
                                   }));
                     });
-                it("should update correct markets in the 'claimFloatCustom' function", (function (param) {
+                it("should update correct markets in the 'claimFloatCustom' function", (function () {
                         var match = contracts.contents;
                         var staker = match.staker;
                         var testUser = accounts.contents[1];

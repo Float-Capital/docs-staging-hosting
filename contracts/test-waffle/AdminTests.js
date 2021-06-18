@@ -5,27 +5,27 @@ var Chai = require("./bindings/chai/Chai.js");
 var LetOps = require("./library/LetOps.js");
 var Helpers = require("./library/Helpers.js");
 
-describe("Float System", (function (param) {
-        describe("Admin", (function (param) {
+describe("Float System", (function () {
+        describe("Admin", (function () {
                 var contracts = {
                   contents: undefined
                 };
                 var accounts = {
                   contents: undefined
                 };
-                before(function (param) {
+                before(function () {
                       return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
                                     accounts.contents = loadedAccounts;
                                     
                                   }));
                     });
-                beforeEach(function (param) {
+                beforeEach(function () {
                       return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
                                     contracts.contents = deployedContracts;
                                     
                                   }));
                     });
-                it("shouldn't allow non admin to update the oracle", (function (param) {
+                it("shouldn't allow non admin to update the oracle", (function () {
                         var newOracleAddress = ethers.Wallet.createRandom().address;
                         var attackerAddress = accounts.contents[5];
                         return Chai.expectRevert(contracts.contents.longShort.connect(attackerAddress).updateMarketOracle(1, newOracleAddress), "only admin");

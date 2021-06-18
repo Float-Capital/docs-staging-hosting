@@ -10,7 +10,7 @@ var StakerHelpers = require("./StakerHelpers.js");
 var StakerSmocked = require("../../library/smock/StakerSmocked.js");
 
 function test(contracts, accounts) {
-  describe("addNewStakingFund", (function (param) {
+  describe("addNewStakingFund", (function () {
           var stakerRef = {
             contents: ""
           };
@@ -25,7 +25,7 @@ function test(contracts, accounts) {
           var promiseRef = {
             contents: Promise.resolve(undefined)
           };
-          Globals.before_once$prime(function (param) {
+          Globals.before_once$p(function (param) {
                 return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "addNewStakingFund", contracts, accounts), (function (param) {
                               StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn(undefined);
                               StakerSmocked.InternalMock.mockonlyFloatToReturn(undefined);
@@ -41,17 +41,17 @@ function test(contracts, accounts) {
                                           }));
                             }));
               });
-          Globals.it$prime$prime("calls the onlyFloatModifier", (function (param) {
+          Globals.it$p("calls the onlyFloatModifier", (function (param) {
                   return Chai.intEqual(undefined, StakerSmocked.InternalMock.onlyFloatCalls(undefined).length, 1);
                 }));
-          Globals.it$prime$prime("calls _changeMarketLaunchIncentiveParameters with correct arguments", (function (param) {
+          Globals.it$p("calls _changeMarketLaunchIncentiveParameters with correct arguments", (function (param) {
                   return Chai.recordEqualFlat(StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCalls(undefined)[0], {
                               marketIndex: 1,
                               period: kPeriod,
                               initialMultiplier: kInitialMultiplier
                             });
                 }));
-          it("mutates syntheticRewardParams", (function (param) {
+          it("mutates syntheticRewardParams", (function () {
                   return LetOps.Await.let_(stakerRef.contents.syntheticRewardParams(1, CONSTANTS.zeroBn), (function (params) {
                                 return Chai.recordEqualFlat(params, {
                                             timestamp: ethers.BigNumber.from(timestampRef.contents + 1 | 0),
@@ -60,7 +60,7 @@ function test(contracts, accounts) {
                                           });
                               }));
                 }));
-          it("mutates syntheticTokens", (function (param) {
+          it("mutates syntheticTokens", (function () {
                   return LetOps.Await.let_(stakerRef.contents.syntheticTokens(1), (function (tokens) {
                                 return Chai.recordEqualFlat(tokens, {
                                             shortToken: sampleShortAddress,
@@ -68,7 +68,7 @@ function test(contracts, accounts) {
                                           });
                               }));
                 }));
-          it("mutates marketIndexOfTokens", (function (param) {
+          it("mutates marketIndexOfTokens", (function () {
                   return LetOps.AwaitThen.let_(stakerRef.contents.marketIndexOfToken(sampleLongAddress), (function (longMarketIndex) {
                                 return LetOps.Await.let_(stakerRef.contents.marketIndexOfToken(sampleShortAddress), (function (shortMarketIndex) {
                                               Chai.intEqual(undefined, 1, longMarketIndex);
@@ -76,7 +76,7 @@ function test(contracts, accounts) {
                                             }));
                               }));
                 }));
-          it("emits StateAddedEvent", (function (param) {
+          it("emits StateAddedEvent", (function () {
                   return Chai.callEmitEvents(promiseRef.contents, stakerRef.contents, "StateAdded").withArgs(1, CONSTANTS.zeroBn, ethers.BigNumber.from(timestampRef.contents + 1 | 0), CONSTANTS.zeroBn, CONSTANTS.zeroBn);
                 }));
           

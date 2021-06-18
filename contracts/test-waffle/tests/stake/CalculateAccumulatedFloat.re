@@ -20,7 +20,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
       accumulativeFloatPerTokenUserShort->add(Helpers.randomTokenAmount());
     let newUserAmountStakedShort = Helpers.randomTokenAmount();
 
-    it'(
+    it(
       "[HAPPY] should correctly return the float tokens due for the user", () => {
       let {staker} = contracts.contents;
 
@@ -80,7 +80,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
       );
     });
 
-    it'(
+    it(
       "should return zero if `usersLatestClaimedReward` is equal to `newLatestRewardIndex`",
       () => {
         let {staker} = contracts.contents;
@@ -123,7 +123,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
       },
     );
 
-    it'(
+    it(
       "should throw (assert) if `usersLatestClaimedReward` is bigger than `newLatestRewardIndex`",
       () => {
         let {staker} = contracts.contents;
@@ -157,7 +157,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
       },
     );
 
-    it'(
+    it(
       "If the user has zero tokens staked they should get zero float tokens",
       () => {
       let {staker} = contracts.contents;

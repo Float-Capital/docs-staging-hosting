@@ -9,15 +9,15 @@ var LazyDeposit = require("./tests/longshort/LazyDeposit.js");
 var HelperActions = require("./library/HelperActions.js");
 var InitializeMarket = require("./tests/longshort/InitializeMarket.js");
 
-describe("Float System", (function (param) {
-        describe("LongShort", (function (param) {
+describe("Float System", (function () {
+        describe("LongShort", (function () {
                 var contracts = {
                   contents: undefined
                 };
                 var accounts = {
                   contents: undefined
                 };
-                beforeEach(function (param) {
+                beforeEach(function () {
                       return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
                                     accounts.contents = loadedAccounts;
                                     return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
@@ -29,26 +29,26 @@ describe("Float System", (function (param) {
                                                 }));
                                   }));
                     });
-                describe("_updateSystemState", (function (param) {
+                describe("_updateSystemState", (function () {
                         
                       }));
                 LazyDeposit.testIntegration(contracts, accounts);
                 return LazyRedeem.testIntegration(contracts, accounts);
               }));
-        describe("LongShort - internals exposed", (function (param) {
+        describe("LongShort - internals exposed", (function () {
                 var contracts = {
                   contents: undefined
                 };
                 var accounts = {
                   contents: undefined
                 };
-                before(function (param) {
+                before(function () {
                       return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
                                     accounts.contents = loadedAccounts;
                                     
                                   }));
                     });
-                beforeEach(function (param) {
+                beforeEach(function () {
                       return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
                                     contracts.contents = deployedContracts;
                                     var firstMarketPaymentToken = deployedContracts.markets[1].paymentToken;

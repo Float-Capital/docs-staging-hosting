@@ -7,9 +7,9 @@ var Helpers = require("../../library/Helpers.js");
 var ERC20Mock = require("../../library/contracts/ERC20Mock.js");
 var YieldManagerAave = require("../../library/contracts/YieldManagerAave.js");
 
-describe("YieldManagerAave", (function (param) {
-        describe("WithdrawTokens", (function (param) {
-                describe("WithdrawWmaticToTreasury mocks", (function (param) {
+describe("YieldManagerAave", (function () {
+        describe("WithdrawTokens", (function () {
+                describe("WithdrawWmaticToTreasury mocks", (function () {
                         var accounts = {
                           contents: undefined
                         };
@@ -17,7 +17,7 @@ describe("YieldManagerAave", (function (param) {
                           contents: undefined
                         };
                         var amountOfWMaticInYieldManager = Helpers.randomTokenAmount(undefined);
-                        beforeEach(function (param) {
+                        beforeEach(function () {
                               return LetOps.AwaitThen.let_(ethers.getSigners(), (function (loadedAccounts) {
                                             accounts.contents = loadedAccounts;
                                             var admin = loadedAccounts[0];
@@ -39,18 +39,18 @@ describe("YieldManagerAave", (function (param) {
                                                         }));
                                           }));
                             });
-                        it("allows treasury to call 'transfer' function on any erc20 to transfer it to the treasury", (function (param) {
+                        it("allows treasury to call 'transfer' function on any erc20 to transfer it to the treasury", (function () {
                                 var treasury = accounts.contents[1];
                                 var withdrawErc20TokenToTreasuryTxPromise = contracts.contents.yieldManagerAave.connect(treasury).withdrawErc20TokenToTreasury(contracts.contents.erc20Mock.address);
                                 return Chai.callEmitEvents(withdrawErc20TokenToTreasuryTxPromise, contracts.contents.erc20Mock, "TransferCalled").withArgs(contracts.contents.yieldManagerAave.address, treasury.address, amountOfWMaticInYieldManager);
                               }));
-                        it("Should withdraw WMATIC to the treasury", (function (param) {
+                        it("Should withdraw WMATIC to the treasury", (function () {
                                 return Promise.resolve(undefined);
                               }));
-                        it("should revert if not called by treasury", (function (param) {
+                        it("should revert if not called by treasury", (function () {
                                 return Promise.resolve(undefined);
                               }));
-                        it("should revert if trying to withdraw aToken", (function (param) {
+                        it("should revert if trying to withdraw aToken", (function () {
                                 return Promise.resolve(undefined);
                               }));
                         

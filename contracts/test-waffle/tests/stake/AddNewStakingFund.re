@@ -57,13 +57,13 @@ let test =
       ();
     });
 
-    it''("calls the onlyFloatModifier", () => {
+    it'("calls the onlyFloatModifier", () => {
       StakerSmocked.InternalMock.onlyFloatCalls()
       ->Array.length
       ->Chai.intEqual(1)
     });
 
-    it''(
+    it'(
       "calls _changeMarketLaunchIncentiveParameters with correct arguments", () => {
       StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCalls()
       ->Array.getUnsafe(0)
@@ -74,7 +74,7 @@ let test =
         })
     });
 
-    it'("mutates syntheticRewardParams", () => {
+    it("mutates syntheticRewardParams", () => {
       let%Await params =
         (stakerRef^)->Staker.syntheticRewardParams(1, CONSTANTS.zeroBn);
 
@@ -85,7 +85,7 @@ let test =
       });
     });
 
-    it'("mutates syntheticTokens", () => {
+    it("mutates syntheticTokens", () => {
       let%Await tokens = (stakerRef^)->Staker.syntheticTokens(1);
 
       tokens->Chai.recordEqualFlat({
@@ -94,7 +94,7 @@ let test =
       });
     });
 
-    it'("mutates marketIndexOfTokens", () => {
+    it("mutates marketIndexOfTokens", () => {
       let%AwaitThen longMarketIndex =
         (stakerRef^)->Staker.marketIndexOfToken(sampleLongAddress);
       let%Await shortMarketIndex =
@@ -104,7 +104,7 @@ let test =
       Chai.intEqual(marketIndex, shortMarketIndex);
     });
 
-    it'("emits StateAddedEvent", () => {
+    it("emits StateAddedEvent", () => {
       Chai.callEmitEvents(
         ~call=promiseRef^,
         ~contract=(stakerRef^)->Obj.magic,

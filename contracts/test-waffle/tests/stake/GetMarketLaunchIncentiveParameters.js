@@ -5,14 +5,14 @@ var Chai = require("../../bindings/chai/Chai.js");
 var LetOps = require("../../library/LetOps.js");
 var Helpers = require("../../library/Helpers.js");
 var CONSTANTS = require("../../CONSTANTS.js");
-var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
+var Belt_Array = require("rescript/lib/js/belt_Array.js");
 
 function test(contracts) {
   var stakerRef = {
     contents: ""
   };
-  describe("getMarketLaunchParameters", (function (param) {
-          beforeEach(function (param) {
+  describe("getMarketLaunchParameters", (function () {
+          beforeEach(function () {
                 var match = contracts.contents;
                 stakerRef.contents = match.staker;
                 return Promise.resolve(undefined);
@@ -29,11 +29,11 @@ function test(contracts) {
                                       }));
                         }));
           };
-          it("returns kPeriod and kInitialMultiplier correctly for a market once set", (function (param) {
-                  return test(initialMultiplier, initialPeriod, initialMultiplier, initialPeriod, param);
+          it("returns kPeriod and kInitialMultiplier correctly for a market once set", (function () {
+                  return test(initialMultiplier, initialPeriod, initialMultiplier, initialPeriod, undefined);
                 }));
-          it("if kInitialMultiplier is zero then returns 1e18 as multiplier", (function (param) {
-                  return test(CONSTANTS.zeroBn, initialPeriod, CONSTANTS.tenToThe18, initialPeriod, param);
+          it("if kInitialMultiplier is zero then returns 1e18 as multiplier", (function () {
+                  return test(CONSTANTS.zeroBn, initialPeriod, CONSTANTS.tenToThe18, initialPeriod, undefined);
                 }));
           
         }));

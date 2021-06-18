@@ -1,11 +1,11 @@
 open LetOps;
 open Mocha;
 
-let it'' = (str, fn) => it'(str, () => {fn()->JsPromise.resolve});
+let it' = (str, fn) => it(str, () => {fn()->JsPromise.resolve});
 
 let before_once' = fn => {
   let ranRef = ref(false);
-  before_each'(() =>
+  before_each(() =>
     if (ranRef^) {
       ()->JsPromise.resolve;
     } else {

@@ -8,7 +8,7 @@ let testIntegration =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
   describe("lazyRedeem", () => {
-    it'("[THIS TEST IS FLAKY] should work as expected happy path", () => {
+    it("[THIS TEST IS FLAKY] should work as expected happy path", () => {
       let testUser = accounts.contents->Array.getUnsafe(8);
       let amountToNextPriceMint = Helpers.randomTokenAmount();
 

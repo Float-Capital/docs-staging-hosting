@@ -3,13 +3,13 @@
 
 var Chai = require("../../bindings/chai/Chai.js");
 var LetOps = require("../../library/LetOps.js");
-var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
+var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var StakerSmocked = require("../../library/smock/StakerSmocked.js");
 var LongShortSmocked = require("../../library/smock/LongShortSmocked.js");
 var Smock = require("@eth-optimism/smock");
 
 function test(contracts, accounts) {
-  describe("initializeMarket", (function (param) {
+  describe("initializeMarket", (function () {
           var stakerSmockedRef = {
             contents: undefined
           };
@@ -33,7 +33,7 @@ function test(contracts, accounts) {
                                       }));
                         }));
           };
-          it("calls all functions (staker.addNewStakingFund, _changeFees, adminOnly, seedMarketInitially) and mutates state (marketExists) correctly", (function (param) {
+          it("calls all functions (staker.addNewStakingFund, _changeFees, adminOnly, seedMarketInitially) and mutates state (marketExists) correctly", (function () {
                   return LetOps.Await.let_(setup(1, false, 1), (function (param) {
                                 return LetOps.Await.let_(longShortRef.contents.connect(accounts.contents[0]).initializeMarket(1, ethers.BigNumber.from("1"), ethers.BigNumber.from("2"), ethers.BigNumber.from("5"), ethers.BigNumber.from("3"), ethers.BigNumber.from("6"), ethers.BigNumber.from("4"), ethers.BigNumber.from("7")), (function (param) {
                                               var stakerCalls = StakerSmocked.addNewStakingFundCalls(stakerSmockedRef.contents);
@@ -65,14 +65,14 @@ function test(contracts, accounts) {
                                             }));
                               }));
                 }));
-          it("reverts if market exists", (function (param) {
+          it("reverts if market exists", (function () {
                   return LetOps.Await.let_(setup(1, true, 1), (function (param) {
                                 return LetOps.Await.let_(Chai.expectRevertNoReason(longShortRef.contents.connect(accounts.contents[0]).initializeMarket(1, ethers.BigNumber.from("1"), ethers.BigNumber.from("2"), ethers.BigNumber.from("5"), ethers.BigNumber.from("3"), ethers.BigNumber.from("6"), ethers.BigNumber.from("4"), ethers.BigNumber.from("7"))), (function (param) {
                                               
                                             }));
                               }));
                 }));
-          it("reverts if market index is greater than latest market index", (function (param) {
+          it("reverts if market index is greater than latest market index", (function () {
                   return LetOps.Await.let_(setup(2, false, 1), (function (param) {
                                 return LetOps.Await.let_(Chai.expectRevertNoReason(longShortRef.contents.connect(accounts.contents[0]).initializeMarket(1, ethers.BigNumber.from("1"), ethers.BigNumber.from("2"), ethers.BigNumber.from("5"), ethers.BigNumber.from("3"), ethers.BigNumber.from("6"), ethers.BigNumber.from("4"), ethers.BigNumber.from("7"))), (function (param) {
                                               

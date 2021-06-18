@@ -9,8 +9,8 @@ var CONSTANTS = require("../../CONSTANTS.js");
 var HelperActions = require("../../library/HelperActions.js");
 
 function testIntegration(contracts, accounts) {
-  describe("lazyRedeem", (function (param) {
-          it("[THIS TEST IS FLAKY] should work as expected happy path", (function (param) {
+  describe("lazyRedeem", (function () {
+          it("[THIS TEST IS FLAKY] should work as expected happy path", (function () {
                   var testUser = accounts.contents[8];
                   var amountToNextPriceMint = Helpers.randomTokenAmount(undefined);
                   var match = contracts.contents;

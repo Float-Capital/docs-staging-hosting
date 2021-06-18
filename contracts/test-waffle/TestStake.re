@@ -7,12 +7,12 @@ describe("Float System", () => {
     let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
     let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
 
-    before'(() => {
+    before(() => {
       let%Await loadedAccounts = Ethers.getSigners();
       accounts := loadedAccounts;
     });
 
-    before_each'(() => {
+    before_each(() => {
       let%Await deployedContracts =
         Helpers.inititialize(
           ~admin=accounts.contents->Array.getUnsafe(0),
@@ -21,7 +21,7 @@ describe("Float System", () => {
       contracts := deployedContracts;
     });
 
-    it_skip'(
+    it_skip(
       "[BROKEN TEST] - should correctly be able to stake their long/short tokens and view their staked amount immediately",
       () => {
         let {longShort, markets, staker} = contracts.contents;
@@ -82,14 +82,14 @@ describe("Float System", () => {
     let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
     let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
 
-    before'(() => {
+    before(() => {
       let%Await loadedAccounts = Ethers.getSigners();
       accounts := loadedAccounts;
     });
 
     // ONE DEPLOYMENT PER TEST
     describe("", () => {
-      before_each'(() => {
+      before_each(() => {
         let%Await deployedContracts =
           Helpers.inititialize(
             ~admin=accounts.contents->Array.getUnsafe(0),

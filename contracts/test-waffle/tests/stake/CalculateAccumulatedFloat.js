@@ -5,11 +5,11 @@ var Chai = require("../../bindings/chai/Chai.js");
 var LetOps = require("../../library/LetOps.js");
 var Globals = require("../../library/Globals.js");
 var Helpers = require("../../library/Helpers.js");
-var Js_math = require("bs-platform/lib/js/js_math.js");
+var Js_math = require("rescript/lib/js/js_math.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 
 function test(contracts) {
-  describe("calculateAccumulatedFloat", (function (param) {
+  describe("calculateAccumulatedFloat", (function () {
           var marketIndex = Js_math.random_int(1, 100000);
           var longToken = ethers.Wallet.createRandom().address;
           var shortToken = ethers.Wallet.createRandom().address;
@@ -20,7 +20,7 @@ function test(contracts) {
           var accumulativeFloatPerTokenUserShort = Helpers.randomTokenAmount(undefined);
           var accumulativeFloatPerTokenLatestShort = Globals.add(accumulativeFloatPerTokenUserShort, Helpers.randomTokenAmount(undefined));
           var newUserAmountStakedShort = Helpers.randomTokenAmount(undefined);
-          it("[HAPPY] should correctly return the float tokens due for the user", (function (param) {
+          it("[HAPPY] should correctly return the float tokens due for the user", (function () {
                   var match = contracts.contents;
                   var staker = match.staker;
                   var usersLatestClaimedReward = Helpers.randomInteger(undefined);
@@ -35,7 +35,7 @@ function test(contracts) {
                                             }));
                               }));
                 }));
-          it("should return zero if `usersLatestClaimedReward` is equal to `newLatestRewardIndex`", (function (param) {
+          it("should return zero if `usersLatestClaimedReward` is equal to `newLatestRewardIndex`", (function () {
                   var match = contracts.contents;
                   var staker = match.staker;
                   var newLatestRewardIndex = Helpers.randomInteger(undefined);
@@ -46,7 +46,7 @@ function test(contracts) {
                                             }));
                               }));
                 }));
-          it("should throw (assert) if `usersLatestClaimedReward` is bigger than `newLatestRewardIndex`", (function (param) {
+          it("should throw (assert) if `usersLatestClaimedReward` is bigger than `newLatestRewardIndex`", (function () {
                   var match = contracts.contents;
                   var staker = match.staker;
                   var usersLatestClaimedReward = Helpers.randomInteger(undefined);
@@ -55,7 +55,7 @@ function test(contracts) {
                                 return Chai.expectRevertNoReason(staker.calculateAccumulatedFloatExposed(marketIndex, user));
                               }));
                 }));
-          it("If the user has zero tokens staked they should get zero float tokens", (function (param) {
+          it("If the user has zero tokens staked they should get zero float tokens", (function () {
                   var match = contracts.contents;
                   var staker = match.staker;
                   var usersLatestClaimedReward = Helpers.randomInteger(undefined);

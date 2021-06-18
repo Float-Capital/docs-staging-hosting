@@ -8,34 +8,34 @@ var Helpers = require("./library/Helpers.js");
 var Contract = require("./library/Contract.js");
 var CONSTANTS = require("./CONSTANTS.js");
 var GetKValue = require("./tests/stake/GetKValue.js");
-var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
+var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var HelperActions = require("./library/HelperActions.js");
 var AddNewStakingFund = require("./tests/stake/AddNewStakingFund.js");
 var CalculateAccumulatedFloat = require("./tests/stake/CalculateAccumulatedFloat.js");
 var GetMarketLaunchIncentiveParameters = require("./tests/stake/GetMarketLaunchIncentiveParameters.js");
 var ChangeMarketLaunchIncentiveParameters = require("./tests/stake/ChangeMarketLaunchIncentiveParameters.js");
 
-describe("Float System", (function (param) {
-        describe("Staking", (function (param) {
+describe("Float System", (function () {
+        describe("Staking", (function () {
                 var contracts = {
                   contents: undefined
                 };
                 var accounts = {
                   contents: undefined
                 };
-                before(function (param) {
+                before(function () {
                       return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
                                     accounts.contents = loadedAccounts;
                                     
                                   }));
                     });
-                beforeEach(function (param) {
+                beforeEach(function () {
                       return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
                                     contracts.contents = deployedContracts;
                                     
                                   }));
                     });
-                it.skip("[BROKEN TEST] - should correctly be able to stake their long/short tokens and view their staked amount immediately", (function (param) {
+                it.skip("[BROKEN TEST] - should correctly be able to stake their long/short tokens and view their staked amount immediately", (function () {
                         var match = contracts.contents;
                         var longShort = match.longShort;
                         var staker = match.staker;
@@ -58,21 +58,21 @@ describe("Float System", (function (param) {
                       }));
                 
               }));
-        describe("Staking - internals exposed", (function (param) {
+        describe("Staking - internals exposed", (function () {
                 var contracts = {
                   contents: undefined
                 };
                 var accounts = {
                   contents: undefined
                 };
-                before(function (param) {
+                before(function () {
                       return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
                                     accounts.contents = loadedAccounts;
                                     
                                   }));
                     });
-                describe("", (function (param) {
-                        beforeEach(function (param) {
+                describe("", (function () {
+                        beforeEach(function () {
                               return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
                                             contracts.contents = deployedContracts;
                                             
@@ -81,7 +81,7 @@ describe("Float System", (function (param) {
                         CalculateAccumulatedFloat.test(contracts);
                         return GetMarketLaunchIncentiveParameters.test(contracts);
                       }));
-                describe("", (function (param) {
+                describe("", (function () {
                         ChangeMarketLaunchIncentiveParameters.test(contracts, accounts);
                         AddNewStakingFund.test(contracts, accounts);
                         return GetKValue.test(contracts, accounts);

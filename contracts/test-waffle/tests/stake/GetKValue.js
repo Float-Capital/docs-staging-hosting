@@ -6,7 +6,7 @@ var LetOps = require("../../library/LetOps.js");
 var Globals = require("../../library/Globals.js");
 var Helpers = require("../../library/Helpers.js");
 var CONSTANTS = require("../../CONSTANTS.js");
-var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
+var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var StakerHelpers = require("./StakerHelpers.js");
 var StakerSmocked = require("../../library/smock/StakerSmocked.js");
 
@@ -18,7 +18,7 @@ function test(contracts, accounts) {
     contents: undefined
   };
   var multiplier = Helpers.randomInteger(undefined).add(CONSTANTS.tenToThe18);
-  describe("getKValue", (function (param) {
+  describe("getKValue", (function () {
           var diffRef = {
             contents: CONSTANTS.zeroBn
           };
@@ -42,28 +42,28 @@ function test(contracts, accounts) {
                                       }));
                         }));
           };
-          it("returns  kInitialMultiplier -\n                (((kInitialMultiplier - 1e18) *\n                    (block.timestamp - initialTimestamp)) / kPeriod) if kPeriod isn't over", (function (param) {
+          it("returns  kInitialMultiplier -\n                (((kInitialMultiplier - 1e18) *\n                    (block.timestamp - initialTimestamp)) / kPeriod) if kPeriod isn't over", (function () {
                   return LetOps.AwaitThen.let_(setup(multiplier, false), (function (param) {
                                 return LetOps.Await.let_(prom.contents, (function (returnVal) {
                                               return Chai.bnEqual(undefined, returnVal, multiplier.sub(diffRef.contents.mul(multiplier.sub(CONSTANTS.tenToThe18)).div(periodRef.contents)));
                                             }));
                               }));
                 }));
-          it("reverts if kInitialMultiplier less than 1e18", (function (param) {
+          it("reverts if kInitialMultiplier less than 1e18", (function () {
                   return LetOps.Await.let_(setup(CONSTANTS.oneBn, true), (function (param) {
                                 return Chai.expectRevertNoReason(prom.contents);
                               }));
                 }));
-          describe("", (function (param) {
-                  Globals.before_once$prime(function (param) {
+          describe("", (function () {
+                  Globals.before_once$p(function (param) {
                         return setup(multiplier, true);
                       });
-                  it("returns 1e18 if more seconds have passed than the kPeriod since the staking fund for the market was added", (function (param) {
+                  it("returns 1e18 if more seconds have passed than the kPeriod since the staking fund for the market was added", (function () {
                           return LetOps.Await.let_(prom.contents, (function (returnVal) {
                                         return Chai.bnEqual(undefined, returnVal, CONSTANTS.tenToThe18);
                                       }));
                         }));
-                  return Globals.it$prime$prime("calls getMarketLaunchIncentiveParameters with correct arguments", (function (param) {
+                  return Globals.it$p("calls getMarketLaunchIncentiveParameters with correct arguments", (function (param) {
                                 return Chai.recordEqualFlat(Belt_Array.getExn(StakerSmocked.InternalMock.getMarketLaunchIncentiveParametersCalls(undefined), 0), {
                                             marketIndex: 2
                                           });

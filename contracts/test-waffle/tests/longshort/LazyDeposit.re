@@ -8,7 +8,7 @@ let testIntegration =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
   describe("mintLongNextPrice", () => {
-    it'("should work as expected happy path", () => {
+    it("should work as expected happy path", () => {
       // let admin = accounts.contents->Array.getUnsafe(0);
       let testUser = accounts.contents->Array.getUnsafe(8);
       let amountToNextPriceMint = Helpers.randomTokenAmount();
@@ -121,7 +121,7 @@ let testExposed =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
   describe("lazyDeposits", () => {
-    it'("calls the executeOutstandingNextPriceSettlements modifier", () => {
+    it("calls the executeOutstandingNextPriceSettlements modifier", () => {
       // TODO: turn this into a re-usable template (just pass in the transaction that should emmit the event)
       //       test all other relevant 'functions
       let {longShort} = contracts.contents;
@@ -163,7 +163,7 @@ let testExposed =
           ->LongShort.mintLongNextPrice(~marketIndex, ~amount);
       });
 
-      it'("should emit the correct event", () => {
+      it("should emit the correct event", () => {
         let {longShort} = contracts.contents;
         let testWallet = accounts.contents->Array.getUnsafe(1);
 
@@ -182,7 +182,7 @@ let testExposed =
          userNextPriceActions[marketIndex][msg.sender].usersCurrentUpdateIndex =
              latestUpdateIndex[marketIndex] +
        */
-      it'("transfer all the payment tokens to the LongShort contract", () => {
+      it("transfer all the payment tokens to the LongShort contract", () => {
         let {longShort, markets} = contracts.contents;
         let paymentToken = markets->Array.getUnsafe(1).paymentToken;
 
@@ -193,7 +193,7 @@ let testExposed =
           ~amount,
         );
       });
-      it'("updates the mintLong value for the market", () => {
+      it("updates the mintLong value for the market", () => {
         let {longShort} = contracts.contents;
         let%AwaitThen _ = mintLongNextPriceTxPromise.contents;
         let%Await mintAmount =
@@ -208,10 +208,10 @@ let testExposed =
           mintAmount,
         );
       });
-      it'("updates the user's batched mint long amount", () =>
+      it("updates the user's batched mint long amount", () =>
         JsPromise.resolve()
       );
-      it'("updates the user's oracle index for lazy minting", () =>
+      it("updates the user's oracle index for lazy minting", () =>
         JsPromise.resolve()
       );
     });

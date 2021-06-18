@@ -8,8 +8,8 @@ var Helpers = require("../../library/Helpers.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 
 function testIntegration(contracts, accounts) {
-  describe("mintLongNextPrice", (function (param) {
-          it("should work as expected happy path", (function (param) {
+  describe("mintLongNextPrice", (function () {
+          it("should work as expected happy path", (function () {
                   var testUser = accounts.contents[8];
                   var amountToNextPriceMint = Helpers.randomTokenAmount(undefined);
                   var match = contracts.contents;
@@ -52,8 +52,8 @@ function testIntegration(contracts, accounts) {
 }
 
 function testExposed(contracts, accounts) {
-  describe("lazyDeposits", (function (param) {
-          it("calls the executeOutstandingNextPriceSettlements modifier", (function (param) {
+  describe("lazyDeposits", (function () {
+          it("calls the executeOutstandingNextPriceSettlements modifier", (function () {
                   var match = contracts.contents;
                   var longShort = match.longShort;
                   var amount = Globals.bnFromInt(1);
@@ -63,30 +63,30 @@ function testExposed(contracts, accounts) {
                                 
                               }));
                 }));
-          describe("mintLongNextPrice", (function (param) {
+          describe("mintLongNextPrice", (function () {
                   var mintLongNextPriceTxPromise = {
                     contents: undefined
                   };
                   var amount = Globals.bnFromInt(1);
-                  beforeEach(function (param) {
+                  beforeEach(function () {
                         var match = contracts.contents;
                         var testWallet = accounts.contents[1];
                         mintLongNextPriceTxPromise.contents = match.longShort.connect(testWallet).mintLongNextPrice(1, amount);
                         
                       });
-                  it("should emit the correct event", (function (param) {
+                  it("should emit the correct event", (function () {
                           var match = contracts.contents;
                           var testWallet = accounts.contents[1];
                           return Chai.callEmitEvents(mintLongNextPriceTxPromise.contents, match.longShort, "NextPriceLongMinted").withArgs(1, amount, testWallet.address, amount, 1);
                         }));
-                  it("transfer all the payment tokens to the LongShort contract", (function (param) {
+                  it("transfer all the payment tokens to the LongShort contract", (function () {
                           var match = contracts.contents;
                           var paymentToken = match.markets[1].paymentToken;
                           return Chai.changeBallance((function (param) {
                                         return mintLongNextPriceTxPromise.contents;
                                       }), paymentToken, match.longShort, amount);
                         }));
-                  it("updates the mintLong value for the market", (function (param) {
+                  it("updates the mintLong value for the market", (function () {
                           var match = contracts.contents;
                           var longShort = match.longShort;
                           return LetOps.AwaitThen.let_(mintLongNextPriceTxPromise.contents, (function (param) {
@@ -95,10 +95,10 @@ function testExposed(contracts, accounts) {
                                                     }));
                                       }));
                         }));
-                  it("updates the user's batched mint long amount", (function (param) {
+                  it("updates the user's batched mint long amount", (function () {
                           return Promise.resolve(undefined);
                         }));
-                  it("updates the user's oracle index for lazy minting", (function (param) {
+                  it("updates the user's oracle index for lazy minting", (function () {
                           return Promise.resolve(undefined);
                         }));
                   
