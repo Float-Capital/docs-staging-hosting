@@ -12,17 +12,9 @@ let make: (
   ~longShort: Ethers.ethAddress,
   ~staker: Ethers.ethAddress,
   ~marketIndex: int,
-  ~syntheticTokenType: int,
-) => JsPromise.t<t> = (~name, ~symbol, ~longShort, ~staker, ~marketIndex, ~syntheticTokenType) =>
-  deployContract6(
-    contractName,
-    name,
-    symbol,
-    longShort,
-    staker,
-    marketIndex,
-    syntheticTokenType,
-  )->Obj.magic
+  ~isLong: bool,
+) => JsPromise.t<t> = (~name, ~symbol, ~longShort, ~staker, ~marketIndex, ~isLong) =>
+  deployContract6(contractName, name, symbol, longShort, staker, marketIndex, isLong)->Obj.magic
 
 type dEFAULT_ADMIN_ROLEReturn = bytes32
 @send
@@ -133,6 +125,10 @@ external increaseAllowanceCall: (
   ~addedValue: Ethers.BigNumber.t,
 ) => JsPromise.t<increaseAllowanceReturn> = "increaseAllowance"
 
+type isLongReturn = bool
+@send
+external isLong: t => JsPromise.t<isLongReturn> = "isLong"
+
 type longShortReturn = Ethers.ethAddress
 @send
 external longShort: t => JsPromise.t<longShortReturn> = "longShort"
@@ -192,10 +188,6 @@ external synthRedeemBurn: (
   ~account: Ethers.ethAddress,
   ~amount: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "synthRedeemBurn"
-
-type syntheticTokenTypeReturn = int
-@send
-external syntheticTokenType: t => JsPromise.t<syntheticTokenTypeReturn> = "syntheticTokenType"
 
 type totalSupplyReturn = Ethers.BigNumber.t
 @send

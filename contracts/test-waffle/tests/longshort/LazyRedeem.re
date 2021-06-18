@@ -23,7 +23,7 @@ let testIntegration =
       let%AwaitThen _longValueBefore =
         longShort->LongShort.syntheticTokenPoolValue(
           marketIndex,
-          CONSTANTS.longTokenType,
+          true/*long*/,
         );
 
       let%AwaitThen _ =
@@ -91,7 +91,7 @@ let testIntegration =
       let%AwaitThen redemptionPriceWithFees =
         longShort->LongShort.redeemPriceSnapshot(
           marketIndex,
-          CONSTANTS.longTokenType,
+          true/*long*/,
           latestUpdateIndex,
         );
 

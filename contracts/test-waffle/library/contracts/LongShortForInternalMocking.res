@@ -64,7 +64,7 @@ external _executeNextPriceMintsIfTheyExistMock: (
   t,
   int,
   Ethers.ethAddress,
-  int,
+  bool,
 ) => JsPromise.t<_executeNextPriceMintsIfTheyExistMockReturn> =
   "_executeNextPriceMintsIfTheyExistMock"
 
@@ -74,7 +74,7 @@ external _executeOutstandingNextPriceRedeemsMock: (
   t,
   int,
   Ethers.ethAddress,
-  int,
+  bool,
 ) => JsPromise.t<_executeOutstandingNextPriceRedeemsMockReturn> =
   "_executeOutstandingNextPriceRedeemsMock"
 
@@ -107,8 +107,8 @@ external _getFeesGeneralMock: (
   t,
   int,
   Ethers.BigNumber.t,
-  int,
-  int,
+  bool,
+  bool,
   Ethers.BigNumber.t,
   Ethers.BigNumber.t,
 ) => JsPromise.t<_getFeesGeneralMockReturn> = "_getFeesGeneralMock"
@@ -118,7 +118,7 @@ type _handleBatchedNextPriceRedeemMockReturn
 external _handleBatchedNextPriceRedeemMock: (
   t,
   int,
-  int,
+  bool,
   Ethers.BigNumber.t,
 ) => JsPromise.t<_handleBatchedNextPriceRedeemMockReturn> = "_handleBatchedNextPriceRedeemMock"
 
@@ -144,7 +144,7 @@ external _mintNextPriceMock: (
   t,
   int,
   Ethers.BigNumber.t,
-  int,
+  bool,
 ) => JsPromise.t<_mintNextPriceMockReturn> = "_mintNextPriceMock"
 
 type _redeemNextPriceMockReturn
@@ -153,7 +153,7 @@ external _redeemNextPriceMock: (
   t,
   int,
   Ethers.BigNumber.t,
-  int,
+  bool,
 ) => JsPromise.t<_redeemNextPriceMockReturn> = "_redeemNextPriceMock"
 
 type _refreshTokenPricesMockReturn
@@ -221,7 +221,7 @@ external calculateRedeemPriceSnapshotMock: (
   t,
   int,
   Ethers.BigNumber.t,
-  int,
+  bool,
 ) => JsPromise.t<calculateRedeemPriceSnapshotMockReturn> = "calculateRedeemPriceSnapshotMock"
 
 type changeAdminMockReturn
@@ -287,9 +287,9 @@ type getMarketSplitMockReturn = {
 external getMarketSplitMock: (t, int, Ethers.BigNumber.t) => JsPromise.t<getMarketSplitMockReturn> =
   "getMarketSplitMock"
 
-type getOtherSynthTypeMockReturn = int
+type getOtherSynthTypeMockReturn = bool
 @send
-external getOtherSynthTypeMock: (t, int) => JsPromise.t<getOtherSynthTypeMockReturn> =
+external getOtherSynthTypeMock: (t, bool) => JsPromise.t<getOtherSynthTypeMockReturn> =
   "getOtherSynthTypeMock"
 
 type getPriceMockReturn = Ethers.BigNumber.t
@@ -317,7 +317,7 @@ external getUsersPendingBalanceMock: (
   t,
   Ethers.ethAddress,
   int,
-  int,
+  bool,
 ) => JsPromise.t<getUsersPendingBalanceMockReturn> = "getUsersPendingBalanceMock"
 
 type handleBatchedDepositSettlementMockReturn
@@ -325,7 +325,7 @@ type handleBatchedDepositSettlementMockReturn
 external handleBatchedDepositSettlementMock: (
   t,
   int,
-  int,
+  bool,
 ) => JsPromise.t<handleBatchedDepositSettlementMockReturn> = "handleBatchedDepositSettlementMock"
 
 type handleBatchedNextPriceRedeemsMockReturn
@@ -364,7 +364,7 @@ type isCorrectSynthMockReturn
 external isCorrectSynthMock: (
   t,
   int,
-  int,
+  bool,
   Ethers.ethAddress,
 ) => JsPromise.t<isCorrectSynthMockReturn> = "isCorrectSynthMock"
 

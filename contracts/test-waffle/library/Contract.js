@@ -60,8 +60,8 @@ function getFeesRedeemLazy(longShort, marketIndex, amount, valueInRemovalSide, v
 }
 
 function getMarketBalance(longShort, marketIndex) {
-  return LetOps.AwaitThen.let_(longShort.syntheticTokenPoolValue(marketIndex, CONSTANTS.longTokenType), (function (longValue) {
-                return LetOps.Await.let_(longShort.syntheticTokenPoolValue(marketIndex, CONSTANTS.shortTokenType), (function (shortValue) {
+  return LetOps.AwaitThen.let_(longShort.syntheticTokenPoolValue(marketIndex, true), (function (longValue) {
+                return LetOps.Await.let_(longShort.syntheticTokenPoolValue(marketIndex, false), (function (shortValue) {
                               return {
                                       longValue: longValue,
                                       shortValue: shortValue
@@ -77,8 +77,8 @@ var LongShortHelpers = {
 };
 
 function getIsLong(synthToken) {
-  return LetOps.Await.let_(synthToken.syntheticTokenType(), (function (syntheticTokenType) {
-                return syntheticTokenType === CONSTANTS.longTokenType;
+  return LetOps.Await.let_(synthToken.isLong(), (function (isLong) {
+                return isLong === true;
               }));
 }
 
