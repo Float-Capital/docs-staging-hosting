@@ -197,32 +197,11 @@ contract LongShort is ILongShort, Initializable {
         _;
     }
 
-    modifier isCorrectSynth(
-        uint32 marketIndex,
-        MarketSide syntheticTokenType,
-        ISyntheticToken syntheticToken
-    ) {
-        if (syntheticTokenType == ILongShort.MarketSide.Long) {
-            require(
-                syntheticTokens[marketIndex][MarketSide.Long] == syntheticToken,
-                "Incorrect synthetic token"
-            );
-        } else {
-            require(
-                syntheticTokens[marketIndex][MarketSide.Short] ==
-                    syntheticToken,
-                "Incorrect synthetic token"
-            );
-        }
-        _;
-    }
-
     modifier executeOutstandingNextPriceSettlements(
         address user,
         uint32 marketIndex
     ) virtual {
         _executeOutstandingNextPriceSettlements(user, marketIndex);
-
         _;
     }
 
@@ -448,18 +427,6 @@ contract LongShort is ILongShort, Initializable {
     /*╔═════════════════════════════════╗
       ║       GETTER FUNCTIONS          ║
       ╚═════════════════════════════════╝*/
-
-    function getOtherSynthType(MarketSide synthTokenType)
-        internal
-        view
-        returns (MarketSide)
-    {
-        if (synthTokenType == MarketSide.Long) {
-            return MarketSide.Short;
-        } else {
-            return MarketSide.Long;
-        }
-    }
 
     function getPrice(uint256 amountSynth, uint256 amountPaymentToken)
         internal
@@ -1051,6 +1018,102 @@ contract LongShort is ILongShort, Initializable {
     }
 
     /*╔═════════════════════════════════╗
+      ║       MINT POSITION             ║
+      ╚═════════════════════════════════╝*/
+
+    function _mintNextPrice(
+        uint32 marketIndex,
+        uint256 amount,
+        MarketSide syntheticTokenType
+    )
+        internal
+        updateSystemStateMarket(marketIndex)
+        executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
+    {
+        // TODO: pre-deposit them into YieldManager?
+        //    - for now not doing that for simplicity, don't gain that much doing so either just more expensive tx (for very little yield)
+        _depositFunds(marketIndex, amount);
+
+        batchedNextPriceDepositAmount[marketIndex][
+            syntheticTokenType
+        ] += amount;
+        userNextPriceDepositAmount[marketIndex][syntheticTokenType][
+            msg.sender
+        ] += amount;
+        userCurrentNextPriceUpdateIndex[marketIndex][msg.sender] =
+            marketUpdateIndex[marketIndex] +
+            1;
+
+        emit NextPriceDeposit(
+            marketIndex,
+            syntheticTokenType,
+            amount,
+            msg.sender,
+            marketUpdateIndex[marketIndex] + 1
+        );
+    }
+
+    function mintLongNextPrice(uint32 marketIndex, uint256 amount) external {
+        _mintNextPrice(marketIndex, amount, MarketSide.Long);
+    }
+
+    function mintShortNextPrice(uint32 marketIndex, uint256 amount) external {
+        _mintNextPrice(marketIndex, amount, MarketSide.Short);
+    }
+
+    /*╔═════════════════════════════════╗
+      ║       REDEEM POSITION           ║
+      ╚═════════════════════════════════╝*/
+
+    function _redeemNextPrice(
+        uint32 marketIndex,
+        uint256 tokensToRedeem,
+        MarketSide syntheticTokenType
+    )
+        internal
+        updateSystemStateMarket(marketIndex)
+        executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
+    {
+        syntheticTokens[marketIndex][syntheticTokenType].transferFrom(
+            msg.sender,
+            address(this),
+            tokensToRedeem
+        );
+        uint256 nextUpdateIndex = marketUpdateIndex[marketIndex] + 1;
+
+        userNextPriceRedemptionAmount[marketIndex][syntheticTokenType][
+            msg.sender
+        ] += tokensToRedeem;
+        userCurrentNextPriceUpdateIndex[marketIndex][
+            msg.sender
+        ] = nextUpdateIndex;
+
+        batchedNextPriceSynthRedeemAmount[marketIndex][
+            syntheticTokenType
+        ] += tokensToRedeem;
+
+        emit NextPriceRedeem(
+            marketIndex,
+            syntheticTokenType,
+            tokensToRedeem,
+            msg.sender,
+            marketUpdateIndex[marketIndex] + 1
+        );
+    }
+
+    function redeemLongNextPrice(uint32 marketIndex, uint256 tokensToRedeem)
+        external
+    {
+        _redeemNextPrice(marketIndex, tokensToRedeem, MarketSide.Long);
+    }
+
+    function redeemShortNextPrice(uint32 marketIndex, uint256 tokensToRedeem)
+        external
+    {
+        _redeemNextPrice(marketIndex, tokensToRedeem, MarketSide.Short);
+    }
+
+    /*╔═════════════════════════════════╗
       ║   NEXT PRICE EXECUTION LOGIC    ║
       ╚═════════════════════════════════╝*/
 
@@ -1123,54 +1186,6 @@ contract LongShort is ILongShort, Initializable {
         _executeOutstandingNextPriceSettlements(user, marketIndex);
     }
 
-    /*╔═════════════════════════════════╗
-      ║       MINT POSITION             ║
-      ╚═════════════════════════════════╝*/
-
-    function _mintNextPrice(
-        uint32 marketIndex,
-        uint256 amount,
-        MarketSide syntheticTokenType
-    )
-        internal
-        updateSystemStateMarket(marketIndex)
-        executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
-    {
-        // TODO: pre-deposit them into YieldManager?
-        //    - for now not doing that for simplicity, don't gain that much doing so either just more expensive tx (for very little yield)
-        _depositFunds(marketIndex, amount);
-
-        batchedNextPriceDepositAmount[marketIndex][
-            syntheticTokenType
-        ] += amount;
-        userNextPriceDepositAmount[marketIndex][syntheticTokenType][
-            msg.sender
-        ] += amount;
-        userCurrentNextPriceUpdateIndex[marketIndex][msg.sender] =
-            marketUpdateIndex[marketIndex] +
-            1;
-
-        emit NextPriceDeposit(
-            marketIndex,
-            syntheticTokenType,
-            amount,
-            msg.sender,
-            marketUpdateIndex[marketIndex] + 1
-        );
-    }
-
-    function mintLongNextPrice(uint32 marketIndex, uint256 amount) external {
-        _mintNextPrice(marketIndex, amount, MarketSide.Long);
-    }
-
-    function mintShortNextPrice(uint32 marketIndex, uint256 amount) external {
-        _mintNextPrice(marketIndex, amount, MarketSide.Short);
-    }
-
-    /*╔═════════════════════════════════╗
-      ║       REDEEM POSITION           ║
-      ╚═════════════════════════════════╝*/
-
     function _executeOutstandingNextPriceRedeems(
         uint32 marketIndex,
         address user,
@@ -1196,54 +1211,6 @@ contract LongShort is ILongShort, Initializable {
                 user
             ] = 0;
         }
-    }
-
-    function _redeemNextPrice(
-        uint32 marketIndex,
-        uint256 tokensToRedeem,
-        MarketSide syntheticTokenType
-    )
-        internal
-        updateSystemStateMarket(marketIndex)
-        executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
-    {
-        syntheticTokens[marketIndex][syntheticTokenType].transferFrom(
-            msg.sender,
-            address(this),
-            tokensToRedeem
-        );
-        uint256 nextUpdateIndex = marketUpdateIndex[marketIndex] + 1;
-
-        userNextPriceRedemptionAmount[marketIndex][syntheticTokenType][
-            msg.sender
-        ] += tokensToRedeem;
-        userCurrentNextPriceUpdateIndex[marketIndex][
-            msg.sender
-        ] = nextUpdateIndex;
-
-        batchedNextPriceSynthRedeemAmount[marketIndex][
-            syntheticTokenType
-        ] += tokensToRedeem;
-
-        emit NextPriceRedeem(
-            marketIndex,
-            syntheticTokenType,
-            tokensToRedeem,
-            msg.sender,
-            marketUpdateIndex[marketIndex] + 1
-        );
-    }
-
-    function redeemLongNextPrice(uint32 marketIndex, uint256 tokensToRedeem)
-        external
-    {
-        _redeemNextPrice(marketIndex, tokensToRedeem, MarketSide.Long);
-    }
-
-    function redeemShortNextPrice(uint32 marketIndex, uint256 tokensToRedeem)
-        external
-    {
-        _redeemNextPrice(marketIndex, tokensToRedeem, MarketSide.Short);
     }
 
     function _handleBatchedNextPriceRedeem(
