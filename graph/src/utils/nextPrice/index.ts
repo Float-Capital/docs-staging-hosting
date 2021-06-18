@@ -191,6 +191,18 @@ export function getBatchedNextPriceExec(
 
   return batchedNextPriceExec as BatchedNextPriceExec;
 }
+export function doesBatchExist(
+  marketIndex: BigInt,
+  updateIndex: BigInt
+): boolean {
+  let batchedNextPriceExecId = generateBatchedNextPriceExecId(
+    marketIndex,
+    updateIndex
+  );
+  let batchedNextPriceExec = BatchedNextPriceExec.load(batchedNextPriceExecId);
+
+  return batchedNextPriceExec != null;
+}
 
 export function getUserNextPriceActionById(
   userNextPriceActionId: string
