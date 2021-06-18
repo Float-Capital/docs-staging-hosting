@@ -951,8 +951,6 @@ contract LongShort is ILongShort, Initializable {
         updateSystemStateMarket(marketIndex)
         executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
     {
-        // TODO: pre-deposit them into YieldManager?
-        //    - for now not doing that for simplicity, don't gain that much doing so either just more expensive tx (for very little yield)
         _depositFunds(marketIndex, amount);
 
         batchedNextPriceDepositAmount[marketIndex][
@@ -1035,7 +1033,109 @@ contract LongShort is ILongShort, Initializable {
     }
 
     /*╔═════════════════════════════════╗
-      ║   NEXT PRICE EXECUTION LOGIC    ║
+      ║       NEXT PRICE SETTLEMENTS    ║
+      ╚═════════════════════════════════╝*/
+
+    function _executeNextPriceMintsIfTheyExist(
+        uint32 marketIndex,
+        address user,
+        MarketSide syntheticTokenType
+    ) internal {
+        uint256 currentDepositAmount =
+            userNextPriceDepositAmount[marketIndex][syntheticTokenType][user];
+        if (currentDepositAmount > 0) {
+            uint256 tokensToTransferToUser =
+                _getAmountSynthToken(
+                    currentDepositAmount,
+                    mintPriceSnapshot[marketIndex][syntheticTokenType][
+                        userCurrentNextPriceUpdateIndex[marketIndex][user]
+                    ]
+                );
+
+            syntheticTokens[marketIndex][syntheticTokenType].transfer(
+                user,
+                tokensToTransferToUser
+            );
+
+            userNextPriceDepositAmount[marketIndex][syntheticTokenType][
+                user
+            ] = 0;
+        }
+    }
+
+    function _executeOutstandingNextPriceRedeems(
+        uint32 marketIndex,
+        address user,
+        MarketSide syntheticTokenType
+    ) internal {
+        uint256 currentRedemptions =
+            userNextPriceRedemptionAmount[marketIndex][syntheticTokenType][
+                user
+            ];
+        if (currentRedemptions > 0) {
+            uint256 amountToRedeem =
+                _getAmountPaymentToken(
+                    currentRedemptions,
+                    redeemPriceSnapshot[marketIndex][syntheticTokenType][
+                        userCurrentNextPriceUpdateIndex[marketIndex][user]
+                    ]
+                );
+
+            fundTokens[marketIndex].transfer(user, amountToRedeem);
+            userNextPriceRedemptionAmount[marketIndex][syntheticTokenType][
+                user
+            ] = 0;
+        }
+    }
+
+    // TODO: WARNING!! This function is re-entrancy vulnerable if the synthetic token has any execution hooks
+    function _executeOutstandingNextPriceSettlements(
+        address user,
+        uint32 marketIndex
+    ) internal {
+        uint256 currentUpdateIndex =
+            userCurrentNextPriceUpdateIndex[marketIndex][user];
+        if (
+            currentUpdateIndex != 0 &&
+            currentUpdateIndex <= marketUpdateIndex[marketIndex]
+        ) {
+            _executeNextPriceMintsIfTheyExist(
+                marketIndex,
+                user,
+                MarketSide.Long
+            );
+            _executeNextPriceMintsIfTheyExist(
+                marketIndex,
+                user,
+                MarketSide.Short
+            );
+            _executeOutstandingNextPriceRedeems(
+                marketIndex,
+                user,
+                MarketSide.Long
+            );
+            _executeOutstandingNextPriceRedeems(
+                marketIndex,
+                user,
+                MarketSide.Short
+            );
+
+            userCurrentNextPriceUpdateIndex[marketIndex][user] = 0;
+
+            emit ExecuteNextPriceSettlementsUser(user, marketIndex);
+        }
+    }
+
+    function executeOutstandingNextPriceSettlementsUser(
+        address user,
+        uint32 marketIndex
+    ) external override {
+        // NOTE: this does all the "nextPrice" actions. This could be simplified to only do the relevant nextPrice action.
+        _executeOutstandingNextPriceSettlements(user, marketIndex);
+    }
+
+    /*╔═════════════════════════════════╗
+      ║       NEXT PRICE ORDERS         ║
       ╚═════════════════════════════════╝*/
 
     function _handleBatchedDepositSettlement(
@@ -1049,7 +1149,6 @@ contract LongShort is ILongShort, Initializable {
             batchedNextPriceDepositAmount[marketIndex][syntheticTokenType] = 0;
             _transferFundsToYieldManager(marketIndex, amountToBatchDeposit);
 
-            // Mint long tokens with remaining value.
             uint256 numberOfTokens =
                 _getAmountSynthToken(
                     amountToBatchDeposit,
@@ -1072,9 +1171,6 @@ contract LongShort is ILongShort, Initializable {
             uint256 oldTokenShortPrice =
                 syntheticTokenPrice[marketIndex][MarketSide.Short];
 
-            // NOTE: no fees are calculated, but if they are desired in the future they can be added here.
-            // Distribute fees across the market.
-            // TODO STENT CONCERN1
             _refreshTokenPrices(marketIndex);
 
             assert(
@@ -1086,102 +1182,6 @@ contract LongShort is ILongShort, Initializable {
                     oldTokenShortPrice
             );
             wasABatchedSettlement = true;
-        }
-    }
-
-    function _executeNextPriceMintsIfTheyExist(
-        uint32 marketIndex,
-        address user,
-        MarketSide syntheticTokenType
-    ) internal {
-        uint256 currentDepositAmount =
-            userNextPriceDepositAmount[marketIndex][syntheticTokenType][user];
-        if (currentDepositAmount > 0) {
-            uint256 tokensToMint =
-                _getAmountSynthToken(
-                    currentDepositAmount,
-                    mintPriceSnapshot[marketIndex][syntheticTokenType][
-                        userCurrentNextPriceUpdateIndex[marketIndex][user]
-                    ]
-                );
-
-            syntheticTokens[marketIndex][syntheticTokenType].transfer(
-                user,
-                tokensToMint
-            );
-
-            userNextPriceDepositAmount[marketIndex][syntheticTokenType][
-                user
-            ] = 0;
-        }
-    }
-
-    function _executeOutstandingNextPriceSettlementsAction(
-        address user,
-        uint32 marketIndex
-    ) internal {
-        _executeNextPriceMintsIfTheyExist(marketIndex, user, MarketSide.Long);
-        _executeNextPriceMintsIfTheyExist(marketIndex, user, MarketSide.Short);
-        _executeOutstandingNextPriceRedeems(marketIndex, user, MarketSide.Long);
-        _executeOutstandingNextPriceRedeems(
-            marketIndex,
-            user,
-            MarketSide.Short
-        );
-
-        userCurrentNextPriceUpdateIndex[marketIndex][user] = 0;
-    }
-
-    // TODO: modify this function (or make a different version) that takes in the desired useage and does either partial or full "early use"
-    // TODO: WARNING!! This function is re-entrancy vulnerable if the synthetic token has any execution hooks
-    function _executeOutstandingNextPriceSettlements(
-        address user,
-        uint32 marketIndex // TODO: make this internal ?
-    ) internal {
-        uint256 currentUpdateIndex =
-            userCurrentNextPriceUpdateIndex[marketIndex][user];
-        if (
-            currentUpdateIndex <= marketUpdateIndex[marketIndex] &&
-            currentUpdateIndex != 0 // NOTE: this conditional isn't strictly necessary (all the users deposit amounts will be zero too)
-        ) {
-            _executeOutstandingNextPriceSettlementsAction(user, marketIndex);
-
-            emit ExecuteNextPriceSettlementsUser(user, marketIndex);
-        }
-    }
-
-    function executeOutstandingNextPriceSettlementsUser(
-        address user,
-        uint32 marketIndex
-    ) external override {
-        // NOTE: this does all the "nextPrice" actions. This could be simplified to only do the relevant nextPrice action.
-        _executeOutstandingNextPriceSettlements(user, marketIndex);
-    }
-
-    function _executeOutstandingNextPriceRedeems(
-        uint32 marketIndex,
-        address user,
-        MarketSide syntheticTokenType
-    ) internal {
-        uint256 currentRedemptions =
-            userNextPriceRedemptionAmount[marketIndex][syntheticTokenType][
-                user
-            ];
-        if (currentRedemptions > 0) {
-            uint256 amountToRedeem =
-                _getAmountPaymentToken(
-                    currentRedemptions,
-                    redeemPriceSnapshot[marketIndex][syntheticTokenType][
-                        userCurrentNextPriceUpdateIndex[marketIndex][user]
-                    ]
-                );
-
-            uint256 balance = fundTokens[marketIndex].balanceOf(address(this));
-
-            fundTokens[marketIndex].transfer(user, amountToRedeem);
-            userNextPriceRedemptionAmount[marketIndex][syntheticTokenType][
-                user
-            ] = 0;
         }
     }
 
@@ -1336,6 +1336,6 @@ contract LongShort is ILongShort, Initializable {
 
         batchedNextPriceSynthRedeemAmount[marketIndex][MarketSide.Long] = 0;
         batchedNextPriceSynthRedeemAmount[marketIndex][MarketSide.Short] = 0;
-        wasABatchedSettlement = longBatchExisted || longBatchExisted;
+        wasABatchedSettlement = longBatchExisted || shortBatchExisted;
     }
 }
