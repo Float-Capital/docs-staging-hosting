@@ -747,6 +747,50 @@
       },
       {
         "internalType": "uint256",
+        "name": "delta",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "synthTokenGainingDominance",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "synthTokenLosingDominance",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "baseFeePercent",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "penaltyFeePercent",
+        "type": "uint256"
+      }
+    ],
+    "name": "getFeesGeneral",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "marketIndex",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
       }

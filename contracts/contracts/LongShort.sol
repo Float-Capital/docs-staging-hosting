@@ -549,6 +549,51 @@ contract LongShort is ILongShort, Initializable {
         return (longAmount, shortAmount);
     }
 
+    /**
+     * Calculates fees for the given mint/redeem amount. Users are penalised
+     * with higher fees for imbalancing the market.
+     */
+    // TODO STENT look at this again
+    // TODO: this function was written with immediate price in mind, rework this function to suit latest code
+    function getFeesGeneral(
+        uint32 marketIndex,
+        uint256 delta, // 1e18
+        MarketSide synthTokenGainingDominance,
+        MarketSide synthTokenLosingDominance,
+        uint256 baseFeePercent,
+        uint256 penaltyFeePercent
+    ) public view returns (uint256) {
+        uint256 baseFee = (delta * baseFeePercent) / feeUnitsOfPrecision;
+
+        if (
+            syntheticTokenPoolValue[marketIndex][synthTokenGainingDominance] >=
+            syntheticTokenPoolValue[marketIndex][synthTokenLosingDominance]
+        ) {
+            // All funds are causing imbalance
+            return
+                baseFee + ((delta * penaltyFeePercent) / feeUnitsOfPrecision);
+        } else if (
+            syntheticTokenPoolValue[marketIndex][synthTokenGainingDominance] +
+                delta >
+            syntheticTokenPoolValue[marketIndex][synthTokenLosingDominance]
+        ) {
+            uint256 amountImbalancing =
+                delta -
+                    (syntheticTokenPoolValue[marketIndex][
+                        synthTokenLosingDominance
+                    ] -
+                        syntheticTokenPoolValue[marketIndex][
+                            synthTokenGainingDominance
+                        ]);
+            uint256 penaltyFee =
+                (amountImbalancing * penaltyFeePercent) / feeUnitsOfPrecision;
+
+            return baseFee + penaltyFee;
+        } else {
+            return baseFee;
+        }
+    }
+
     /*╔═════════════════════════════════╗
       ║       HELPER FUNCTIONS          ║
       ╚═════════════════════════════════╝*/
@@ -592,21 +637,6 @@ contract LongShort is ILongShort, Initializable {
             getMarketSplit(marketIndex, marketAmount);
         syntheticTokenPoolValue[marketIndex][MarketSide.Long] += longAmount;
         syntheticTokenPoolValue[marketIndex][MarketSide.Short] += shortAmount;
-    }
-
-    /**
-     * Controls what happens with mint/redeem fees.
-     */
-    // NOTE: only used in `handleBatchedNextPriceRedeems`
-    function _feesMechanism(uint32 marketIndex, uint256 totalFees) internal {
-        // Market gets a bigger share if the market is more imbalanced.
-        (uint256 marketAmount, uint256 treasuryAmount) =
-            getTreasurySplit(marketIndex, totalFees);
-
-        totalValueReservedForTreasury[marketIndex] += treasuryAmount;
-
-        _distributeMarketAmount(marketIndex, marketAmount);
-        emit FeesLevied(marketIndex, totalFees);
     }
 
     /**
@@ -674,57 +704,6 @@ contract LongShort is ILongShort, Initializable {
         }
 
         return true;
-    }
-
-    function handleBatchedDepositSettlement(
-        uint32 marketIndex,
-        MarketSide syntheticTokenType
-    ) internal returns (bool wasABatchedSettlement) {
-        uint256 amountToBatchDeposit =
-            batchedNextPriceDepositAmount[marketIndex][syntheticTokenType];
-
-        if (amountToBatchDeposit > 0) {
-            batchedNextPriceDepositAmount[marketIndex][syntheticTokenType] = 0;
-            _transferFundsToYieldManager(marketIndex, amountToBatchDeposit);
-
-            // Mint long tokens with remaining value.
-            uint256 numberOfTokens =
-                getAmountSynthToken(
-                    amountToBatchDeposit,
-                    syntheticTokenPrice[marketIndex][syntheticTokenType]
-                );
-
-            // TODO STENT there are no token mint events emitted here, but there are on market initialization
-            syntheticTokens[marketIndex][syntheticTokenType].mint(
-                address(this),
-                numberOfTokens
-            );
-
-            syntheticTokenPoolValue[marketIndex][
-                syntheticTokenType
-            ] += amountToBatchDeposit;
-
-            //TODO: Can remove these sanity checks at some point
-            uint256 oldTokenLongPrice =
-                syntheticTokenPrice[marketIndex][MarketSide.Long];
-            uint256 oldTokenShortPrice =
-                syntheticTokenPrice[marketIndex][MarketSide.Short];
-
-            // NOTE: no fees are calculated, but if they are desired in the future they can be added here.
-            // Distribute fees across the market.
-            // TODO STENT CONCERN1
-            _refreshTokenPrices(marketIndex);
-
-            assert(
-                syntheticTokenPrice[marketIndex][MarketSide.Long] ==
-                    oldTokenLongPrice
-            );
-            assert(
-                syntheticTokenPrice[marketIndex][MarketSide.Short] ==
-                    oldTokenShortPrice
-            );
-            wasABatchedSettlement = true;
-        }
     }
 
     function snapshotPriceChangeForNextPriceExecution(
@@ -969,51 +948,6 @@ contract LongShort is ILongShort, Initializable {
         fundTokens[marketIndex].transfer(treasury, totalForTreasury);
     }
 
-    /**
-     * Calculates fees for the given mint/redeem amount. Users are penalised
-     * with higher fees for imbalancing the market.
-     */
-    // TODO STENT look at this again
-    // TODO: this function was written with immediate price in mind, rework this function to suit latest code
-    function _getFeesGeneral(
-        uint32 marketIndex,
-        uint256 delta, // 1e18
-        MarketSide synthTokenGainingDominance,
-        MarketSide synthTokenLosingDominance,
-        uint256 baseFeePercent,
-        uint256 penaltyFeePercent
-    ) internal view returns (uint256) {
-        uint256 baseFee = (delta * baseFeePercent) / feeUnitsOfPrecision;
-
-        if (
-            syntheticTokenPoolValue[marketIndex][synthTokenGainingDominance] >=
-            syntheticTokenPoolValue[marketIndex][synthTokenLosingDominance]
-        ) {
-            // All funds are causing imbalance
-            return
-                baseFee + ((delta * penaltyFeePercent) / feeUnitsOfPrecision);
-        } else if (
-            syntheticTokenPoolValue[marketIndex][synthTokenGainingDominance] +
-                delta >
-            syntheticTokenPoolValue[marketIndex][synthTokenLosingDominance]
-        ) {
-            uint256 amountImbalancing =
-                delta -
-                    (syntheticTokenPoolValue[marketIndex][
-                        synthTokenLosingDominance
-                    ] -
-                        syntheticTokenPoolValue[marketIndex][
-                            synthTokenGainingDominance
-                        ]);
-            uint256 penaltyFee =
-                (amountImbalancing * penaltyFeePercent) / feeUnitsOfPrecision;
-
-            return baseFee + penaltyFee;
-        } else {
-            return baseFee;
-        }
-    }
-
     /*╔═════════════════════════════════╗
       ║       MINT POSITION             ║
       ╚═════════════════════════════════╝*/
@@ -1113,6 +1047,57 @@ contract LongShort is ILongShort, Initializable {
     /*╔═════════════════════════════════╗
       ║   NEXT PRICE EXECUTION LOGIC    ║
       ╚═════════════════════════════════╝*/
+
+    function handleBatchedDepositSettlement(
+        uint32 marketIndex,
+        MarketSide syntheticTokenType
+    ) internal returns (bool wasABatchedSettlement) {
+        uint256 amountToBatchDeposit =
+            batchedNextPriceDepositAmount[marketIndex][syntheticTokenType];
+
+        if (amountToBatchDeposit > 0) {
+            batchedNextPriceDepositAmount[marketIndex][syntheticTokenType] = 0;
+            _transferFundsToYieldManager(marketIndex, amountToBatchDeposit);
+
+            // Mint long tokens with remaining value.
+            uint256 numberOfTokens =
+                getAmountSynthToken(
+                    amountToBatchDeposit,
+                    syntheticTokenPrice[marketIndex][syntheticTokenType]
+                );
+
+            // TODO STENT there are no token mint events emitted here, but there are on market initialization
+            syntheticTokens[marketIndex][syntheticTokenType].mint(
+                address(this),
+                numberOfTokens
+            );
+
+            syntheticTokenPoolValue[marketIndex][
+                syntheticTokenType
+            ] += amountToBatchDeposit;
+
+            //TODO: Can remove these sanity checks at some point
+            uint256 oldTokenLongPrice =
+                syntheticTokenPrice[marketIndex][MarketSide.Long];
+            uint256 oldTokenShortPrice =
+                syntheticTokenPrice[marketIndex][MarketSide.Short];
+
+            // NOTE: no fees are calculated, but if they are desired in the future they can be added here.
+            // Distribute fees across the market.
+            // TODO STENT CONCERN1
+            _refreshTokenPrices(marketIndex);
+
+            assert(
+                syntheticTokenPrice[marketIndex][MarketSide.Long] ==
+                    oldTokenLongPrice
+            );
+            assert(
+                syntheticTokenPrice[marketIndex][MarketSide.Short] ==
+                    oldTokenShortPrice
+            );
+            wasABatchedSettlement = true;
+        }
+    }
 
     function _executeNextPriceMintsIfTheyExist(
         uint32 marketIndex,
@@ -1236,7 +1221,7 @@ contract LongShort is ILongShort, Initializable {
             uint256 delta =
                 amountOfPaymentTokenToRedeem -
                     shortAmountOfPaymentTokenToRedeem;
-            totalFeesLong = _getFeesGeneral(
+            totalFeesLong = getFeesGeneral(
                 marketIndex,
                 delta,
                 MarketSide.Short,
@@ -1248,7 +1233,7 @@ contract LongShort is ILongShort, Initializable {
             uint256 delta =
                 shortAmountOfPaymentTokenToRedeem -
                     amountOfPaymentTokenToRedeem;
-            totalFeesShort = _getFeesGeneral(
+            totalFeesShort = getFeesGeneral(
                 marketIndex,
                 delta,
                 MarketSide.Long,
@@ -1258,7 +1243,15 @@ contract LongShort is ILongShort, Initializable {
             );
         }
 
-        _feesMechanism(marketIndex, totalFeesLong + totalFeesShort);
+        // fees logic
+        uint256 totalFees = totalFeesLong + totalFeesShort;
+        (uint256 marketAmount, uint256 treasuryAmount) =
+            getTreasurySplit(marketIndex, totalFees);
+
+        totalValueReservedForTreasury[marketIndex] += treasuryAmount;
+
+        _distributeMarketAmount(marketIndex, marketAmount);
+        emit FeesLevied(marketIndex, totalFees);
     }
 
     function calculateRedeemPriceSnapshot(
