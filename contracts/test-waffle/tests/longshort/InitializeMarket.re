@@ -1,5 +1,5 @@
-open Globals;
 open LetOps;
+open Mocha;
 
 let test =
     (

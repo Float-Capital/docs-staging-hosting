@@ -1,7 +1,5 @@
-open BsMocha;
 open LetOps;
-let (it', it_only', it_skip', before_each', before') =
-  Promise.(it, it_only, it_skip, before_each, before);
+open Mocha;
 
 let it'' = (str, fn) => it'(str, () => {fn()->JsPromise.resolve});
 
@@ -43,5 +41,3 @@ let (
     gte,
     lt,
   );
-let (describe, it, it_skip, describe_skip, before, before_each) =
-  Mocha.(describe, describe_skip, it, it_skip, before, before_each);

@@ -1,5 +1,6 @@
 open Globals;
 open LetOps;
+open Mocha;
 
 let test = (~contracts: ref(Helpers.coreContracts)) =>
   describe("calculateAccumulatedFloat", () => {

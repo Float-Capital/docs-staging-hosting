@@ -14,7 +14,7 @@ function test(contracts, accounts) {
     contents: ""
   };
   var period = Helpers.randomInteger(undefined);
-  Globals.describe("changeMarketLaunchIncentiveParameters (external)")(undefined, undefined, undefined, (function (param) {
+  describe("changeMarketLaunchIncentiveParameters (external)", (function (param) {
           var initialMultiplier = Helpers.randomInteger(undefined);
           Globals.before_once$prime(function (param) {
                 return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "changeMarketLaunchIncentiveParameters", contracts, accounts), (function (param) {
@@ -36,52 +36,56 @@ function test(contracts, accounts) {
                                   });
                       }));
         }));
-  return Globals.describe("_changeMarketLaunchIncentiveParameters (internal)")(undefined, undefined, undefined, (function (param) {
-                var initialMultiplierFine = Helpers.randomInteger(undefined).mul(CONSTANTS.tenToThe18);
-                var promise = {
-                  contents: undefined
-                };
-                var setup = function (initialMultiplier) {
-                  return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
-                                stakerRef.contents = deployedContracts.staker;
-                                var prom = stakerRef.contents._changeMarketLaunchIncentiveParametersExternal(2, period, initialMultiplier);
-                                promise.contents = prom;
-                                
-                              }));
-                };
-                Globals.describe("passing transaction")(undefined, undefined, undefined, (function (param) {
-                        Globals.before_once$prime(function (param) {
-                              return LetOps.Await.let_(setup(initialMultiplierFine), (function (param) {
-                                            return LetOps.Await.let_(promise.contents, (function (param) {
-                                                          
-                                                        }));
-                                          }));
-                            });
-                        Globals.it$prime("mutates marketLaunchIncentivePeriod")(undefined, undefined, undefined, (function (param) {
-                                return LetOps.Await.let_(stakerRef.contents.marketLaunchIncentivePeriod(2), (function (setPeriod) {
-                                              return Chai.bnEqual(undefined, period, setPeriod);
-                                            }));
-                              }));
-                        Globals.it$prime("mutates marketLaunchIncentiveMultiplier")(undefined, undefined, undefined, (function (param) {
-                                return LetOps.Await.let_(stakerRef.contents.marketLaunchIncentiveMultipliers(2), (function (setMultiplier) {
-                                              return Chai.bnEqual(undefined, initialMultiplierFine, setMultiplier);
-                                            }));
-                              }));
-                        return Globals.it$prime("emits MarketLaunchIncentiveParametersChanges event")(undefined, undefined, undefined, (function (param) {
-                                      return Chai.callEmitEvents(promise.contents, stakerRef.contents, "MarketLaunchIncentiveParametersChanges").withArgs(2, period, initialMultiplierFine);
+  describe("_changeMarketLaunchIncentiveParameters (internal)", (function (param) {
+          var initialMultiplierFine = Helpers.randomInteger(undefined).mul(CONSTANTS.tenToThe18);
+          var promise = {
+            contents: undefined
+          };
+          var setup = function (initialMultiplier) {
+            return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
+                          stakerRef.contents = deployedContracts.staker;
+                          var prom = stakerRef.contents._changeMarketLaunchIncentiveParametersExternal(2, period, initialMultiplier);
+                          promise.contents = prom;
+                          
+                        }));
+          };
+          describe("passing transaction", (function (param) {
+                  Globals.before_once$prime(function (param) {
+                        return LetOps.Await.let_(setup(initialMultiplierFine), (function (param) {
+                                      return LetOps.Await.let_(promise.contents, (function (param) {
+                                                    
+                                                  }));
                                     }));
-                      }));
-                return Globals.describe("failing transaction")(undefined, undefined, undefined, (function (param) {
-                              Globals.before_once$prime(function (param) {
-                                    return setup(CONSTANTS.oneBn);
-                                  });
-                              return Globals.it$prime("reverts if initialMultiplier < 1e18")(undefined, undefined, undefined, (function (param) {
-                                            return LetOps.Await.let_(Chai.expectRevert(promise.contents, "marketLaunchIncentiveMultiplier must be >= 1e18"), (function (param) {
-                                                          
-                                                        }));
-                                          }));
-                            }));
-              }));
+                      });
+                  it("mutates marketLaunchIncentivePeriod", (function (param) {
+                          return LetOps.Await.let_(stakerRef.contents.marketLaunchIncentivePeriod(2), (function (setPeriod) {
+                                        return Chai.bnEqual(undefined, period, setPeriod);
+                                      }));
+                        }));
+                  it("mutates marketLaunchIncentiveMultiplier", (function (param) {
+                          return LetOps.Await.let_(stakerRef.contents.marketLaunchIncentiveMultipliers(2), (function (setMultiplier) {
+                                        return Chai.bnEqual(undefined, initialMultiplierFine, setMultiplier);
+                                      }));
+                        }));
+                  it("emits MarketLaunchIncentiveParametersChanges event", (function (param) {
+                          return Chai.callEmitEvents(promise.contents, stakerRef.contents, "MarketLaunchIncentiveParametersChanges").withArgs(2, period, initialMultiplierFine);
+                        }));
+                  
+                }));
+          describe("failing transaction", (function (param) {
+                  Globals.before_once$prime(function (param) {
+                        return setup(CONSTANTS.oneBn);
+                      });
+                  it("reverts if initialMultiplier < 1e18", (function (param) {
+                          return LetOps.Await.let_(Chai.expectRevert(promise.contents, "marketLaunchIncentiveMultiplier must be >= 1e18"), (function (param) {
+                                        
+                                      }));
+                        }));
+                  
+                }));
+          
+        }));
+  
 }
 
 exports.test = test;

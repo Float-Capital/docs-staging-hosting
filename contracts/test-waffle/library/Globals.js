@@ -3,29 +3,29 @@
 
 var Curry = require("bs-platform/lib/js/curry.js");
 var LetOps = require("./LetOps.js");
-var Mocha$BsMocha = require("bs-mocha/src/Mocha.js");
-var Promise$BsMocha = require("bs-mocha/src/Promise.js");
 
 function it$prime$prime(str, fn) {
-  return Promise$BsMocha.it(str)(undefined, undefined, undefined, (function (param) {
-                return Promise.resolve(Curry._1(fn, undefined));
-              }));
+  it(str, (function (param) {
+          return Promise.resolve(Curry._1(fn, undefined));
+        }));
+  
 }
 
 function before_once$prime(fn) {
   var ranRef = {
     contents: false
   };
-  return Promise$BsMocha.before_each(undefined)(undefined, undefined, undefined, (function (param) {
-                if (ranRef.contents) {
-                  return Promise.resolve(undefined);
-                } else {
-                  return LetOps.Await.let_(Curry._1(fn, undefined), (function (param) {
-                                ranRef.contents = true;
-                                
-                              }));
-                }
-              }));
+  beforeEach(function (param) {
+        if (ranRef.contents) {
+          return Promise.resolve(undefined);
+        } else {
+          return LetOps.Await.let_(Curry._1(fn, undefined), (function (param) {
+                        ranRef.contents = true;
+                        
+                      }));
+        }
+      });
+  
 }
 
 function add(prim, prim$1) {
@@ -72,33 +72,6 @@ function bnLt(prim, prim$1) {
   return prim.lt(prim$1);
 }
 
-var it$prime = Promise$BsMocha.it;
-
-var it_only$prime = Promise$BsMocha.it_only;
-
-var it_skip$prime = Promise$BsMocha.it_skip;
-
-var before_each$prime = Promise$BsMocha.before_each;
-
-var before$prime = Promise$BsMocha.before;
-
-var describe = Mocha$BsMocha.describe;
-
-var it = Mocha$BsMocha.describe_skip;
-
-var it_skip = Mocha$BsMocha.it;
-
-var describe_skip = Mocha$BsMocha.it_skip;
-
-var before = Mocha$BsMocha.before;
-
-var before_each = Mocha$BsMocha.before_each;
-
-exports.it$prime = it$prime;
-exports.it_only$prime = it_only$prime;
-exports.it_skip$prime = it_skip$prime;
-exports.before_each$prime = before_each$prime;
-exports.before$prime = before$prime;
 exports.it$prime$prime = it$prime$prime;
 exports.before_once$prime = before_once$prime;
 exports.add = add;
@@ -112,10 +85,4 @@ exports.bnToInt = bnToInt;
 exports.bnGt = bnGt;
 exports.bnGte = bnGte;
 exports.bnLt = bnLt;
-exports.describe = describe;
-exports.it = it;
-exports.it_skip = it_skip;
-exports.describe_skip = describe_skip;
-exports.before = before;
-exports.before_each = before_each;
 /* No side effect */

@@ -15,77 +15,80 @@ var CalculateAccumulatedFloat = require("./tests/stake/CalculateAccumulatedFloat
 var GetMarketLaunchIncentiveParameters = require("./tests/stake/GetMarketLaunchIncentiveParameters.js");
 var ChangeMarketLaunchIncentiveParameters = require("./tests/stake/ChangeMarketLaunchIncentiveParameters.js");
 
-Globals.describe("Float System")(undefined, undefined, undefined, (function (param) {
-        Globals.describe("Staking")(undefined, undefined, undefined, (function (param) {
+describe("Float System", (function (param) {
+        describe("Staking", (function (param) {
                 var contracts = {
                   contents: undefined
                 };
                 var accounts = {
                   contents: undefined
                 };
-                Globals.before$prime(undefined)(undefined, undefined, undefined, (function (param) {
-                        return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
-                                      accounts.contents = loadedAccounts;
-                                      
-                                    }));
-                      }));
-                Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
-                        return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
-                                      contracts.contents = deployedContracts;
-                                      
-                                    }));
-                      }));
-                return Globals.it_skip$prime("[BROKEN TEST] - should correctly be able to stake their long/short tokens and view their staked amount immediately")(undefined, undefined, undefined, (function (param) {
-                              var match = contracts.contents;
-                              var longShort = match.longShort;
-                              var staker = match.staker;
-                              var testUser = accounts.contents[1];
-                              return LetOps.Await.let_(HelperActions.stakeRandomlyInMarkets(match.markets, testUser, longShort), (function (param) {
-                                            return LetOps.Await.let_(Promise.all(Belt_Array.map(param[0], (function (param) {
-                                                                  var priceOfSynthForAction = param.priceOfSynthForAction;
-                                                                  var amount = param.amount;
-                                                                  var synth = param.synth;
-                                                                  return LetOps.AwaitThen.let_(Contract.LongShortHelpers.getFeesMint(longShort, param.marketIndex, amount, param.valueInEntrySide, param.valueInOtherSide), (function (amountOfFees) {
-                                                                                return LetOps.Await.let_(staker.userAmountStaked(synth.address, testUser.address), (function (amountStaked) {
-                                                                                              var expectedStakeAmount = Globals.div(Globals.mul(Globals.sub(amount, amountOfFees), CONSTANTS.tenToThe18), priceOfSynthForAction);
-                                                                                              return Chai.bnEqual("amount staked is greater than expected", amountStaked, expectedStakeAmount);
-                                                                                            }));
-                                                                              }));
-                                                                }))), (function (param) {
-                                                          
-                                                        }));
-                                          }));
-                            }));
-              }));
-        return Globals.describe("Staking - internals exposed")(undefined, undefined, undefined, (function (param) {
-                      var contracts = {
-                        contents: undefined
-                      };
-                      var accounts = {
-                        contents: undefined
-                      };
-                      Globals.before$prime(undefined)(undefined, undefined, undefined, (function (param) {
-                              return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
-                                            accounts.contents = loadedAccounts;
-                                            
-                                          }));
-                            }));
-                      Globals.describe("")(undefined, undefined, undefined, (function (param) {
-                              Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
-                                      return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
-                                                    contracts.contents = deployedContracts;
+                before(function (param) {
+                      return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
+                                    accounts.contents = loadedAccounts;
+                                    
+                                  }));
+                    });
+                beforeEach(function (param) {
+                      return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
+                                    contracts.contents = deployedContracts;
+                                    
+                                  }));
+                    });
+                it.skip("[BROKEN TEST] - should correctly be able to stake their long/short tokens and view their staked amount immediately", (function (param) {
+                        var match = contracts.contents;
+                        var longShort = match.longShort;
+                        var staker = match.staker;
+                        var testUser = accounts.contents[1];
+                        return LetOps.Await.let_(HelperActions.stakeRandomlyInMarkets(match.markets, testUser, longShort), (function (param) {
+                                      return LetOps.Await.let_(Promise.all(Belt_Array.map(param[0], (function (param) {
+                                                            var priceOfSynthForAction = param.priceOfSynthForAction;
+                                                            var amount = param.amount;
+                                                            var synth = param.synth;
+                                                            return LetOps.AwaitThen.let_(Contract.LongShortHelpers.getFeesMint(longShort, param.marketIndex, amount, param.valueInEntrySide, param.valueInOtherSide), (function (amountOfFees) {
+                                                                          return LetOps.Await.let_(staker.userAmountStaked(synth.address, testUser.address), (function (amountStaked) {
+                                                                                        var expectedStakeAmount = Globals.div(Globals.mul(Globals.sub(amount, amountOfFees), CONSTANTS.tenToThe18), priceOfSynthForAction);
+                                                                                        return Chai.bnEqual("amount staked is greater than expected", amountStaked, expectedStakeAmount);
+                                                                                      }));
+                                                                        }));
+                                                          }))), (function (param) {
                                                     
                                                   }));
                                     }));
-                              CalculateAccumulatedFloat.test(contracts);
-                              return GetMarketLaunchIncentiveParameters.test(contracts);
-                            }));
-                      return Globals.describe("")(undefined, undefined, undefined, (function (param) {
-                                    ChangeMarketLaunchIncentiveParameters.test(contracts, accounts);
-                                    AddNewStakingFund.test(contracts, accounts);
-                                    return GetKValue.test(contracts, accounts);
+                      }));
+                
+              }));
+        describe("Staking - internals exposed", (function (param) {
+                var contracts = {
+                  contents: undefined
+                };
+                var accounts = {
+                  contents: undefined
+                };
+                before(function (param) {
+                      return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
+                                    accounts.contents = loadedAccounts;
+                                    
                                   }));
-                    }));
+                    });
+                describe("", (function (param) {
+                        beforeEach(function (param) {
+                              return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
+                                            contracts.contents = deployedContracts;
+                                            
+                                          }));
+                            });
+                        CalculateAccumulatedFloat.test(contracts);
+                        return GetMarketLaunchIncentiveParameters.test(contracts);
+                      }));
+                describe("", (function (param) {
+                        ChangeMarketLaunchIncentiveParameters.test(contracts, accounts);
+                        AddNewStakingFund.test(contracts, accounts);
+                        return GetKValue.test(contracts, accounts);
+                      }));
+                
+              }));
+        
       }));
 
 /*  Not a pure module */

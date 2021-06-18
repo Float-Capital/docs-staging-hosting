@@ -3,7 +3,6 @@
 
 var Chai = require("../../bindings/chai/Chai.js");
 var LetOps = require("../../library/LetOps.js");
-var Globals = require("../../library/Globals.js");
 var Helpers = require("../../library/Helpers.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
@@ -12,31 +11,33 @@ function test(contracts) {
   var stakerRef = {
     contents: ""
   };
-  return Globals.describe("getMarketLaunchParameters")(undefined, undefined, undefined, (function (param) {
-                Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
-                        var match = contracts.contents;
-                        stakerRef.contents = match.staker;
-                        return Promise.resolve(undefined);
-                      }));
-                var initialMultiplier = Helpers.randomInteger(undefined).add(CONSTANTS.oneBn);
-                var initialPeriod = Helpers.randomInteger(undefined);
-                var test = function (initialMultiplier, initialPeriod, expectedMultiplier, expectedPeriod, param) {
-                  return LetOps.AwaitThen.let_(stakerRef.contents.setGetMarketLaunchIncentiveParametersParams(5, initialPeriod, initialMultiplier), (function (param) {
-                                return LetOps.Await.let_(stakerRef.contents.getMarketLaunchIncentiveParametersExternal(5), (function (result) {
-                                              var period = Belt_Array.getExn(result, 0);
-                                              var multiplier = Belt_Array.getExn(result, 1);
-                                              Chai.bnEqual(undefined, period, expectedPeriod);
-                                              return Chai.bnEqual(undefined, multiplier, expectedMultiplier);
-                                            }));
-                              }));
-                };
-                Globals.it$prime("returns kPeriod and kInitialMultiplier correctly for a market once set")(undefined, undefined, undefined, (function (param) {
-                        return test(initialMultiplier, initialPeriod, initialMultiplier, initialPeriod, param);
-                      }));
-                return Globals.it$prime("if kInitialMultiplier is zero then returns 1e18 as multiplier")(undefined, undefined, undefined, (function (param) {
-                              return test(CONSTANTS.zeroBn, initialPeriod, CONSTANTS.tenToThe18, initialPeriod, param);
-                            }));
-              }));
+  describe("getMarketLaunchParameters", (function (param) {
+          beforeEach(function (param) {
+                var match = contracts.contents;
+                stakerRef.contents = match.staker;
+                return Promise.resolve(undefined);
+              });
+          var initialMultiplier = Helpers.randomInteger(undefined).add(CONSTANTS.oneBn);
+          var initialPeriod = Helpers.randomInteger(undefined);
+          var test = function (initialMultiplier, initialPeriod, expectedMultiplier, expectedPeriod, param) {
+            return LetOps.AwaitThen.let_(stakerRef.contents.setGetMarketLaunchIncentiveParametersParams(5, initialPeriod, initialMultiplier), (function (param) {
+                          return LetOps.Await.let_(stakerRef.contents.getMarketLaunchIncentiveParametersExternal(5), (function (result) {
+                                        var period = Belt_Array.getExn(result, 0);
+                                        var multiplier = Belt_Array.getExn(result, 1);
+                                        Chai.bnEqual(undefined, period, expectedPeriod);
+                                        return Chai.bnEqual(undefined, multiplier, expectedMultiplier);
+                                      }));
+                        }));
+          };
+          it("returns kPeriod and kInitialMultiplier correctly for a market once set", (function (param) {
+                  return test(initialMultiplier, initialPeriod, initialMultiplier, initialPeriod, param);
+                }));
+          it("if kInitialMultiplier is zero then returns 1e18 as multiplier", (function (param) {
+                  return test(CONSTANTS.zeroBn, initialPeriod, CONSTANTS.tenToThe18, initialPeriod, param);
+                }));
+          
+        }));
+  
 }
 
 exports.test = test;

@@ -1,5 +1,5 @@
-open Globals;
 open LetOps;
+open Mocha;
 
 let test = (~contracts: ref(Helpers.coreContracts)) => {
   let stakerRef: ref(Staker.t) = ref(""->Obj.magic);

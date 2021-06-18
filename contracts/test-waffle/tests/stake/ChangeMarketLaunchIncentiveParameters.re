@@ -1,6 +1,7 @@
 open Globals;
 open LetOps;
 open StakerHelpers;
+open Mocha;
 
 let test =
     (
