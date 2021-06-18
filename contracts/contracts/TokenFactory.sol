@@ -83,7 +83,7 @@ contract TokenFactory is ITokenFactory {
                 longShort,
                 staker,
                 marketIndex,
-                ILongShort.MarketSide.Long
+                true /*long*/
             );
         setupPermissions(tokenContract);
         return tokenContract;
@@ -102,7 +102,7 @@ contract TokenFactory is ITokenFactory {
                 longShort,
                 staker,
                 marketIndex,
-                ILongShort.MarketSide.Short
+                false /*short*/
             );
 
         setupPermissions(tokenContract);

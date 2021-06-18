@@ -96,12 +96,12 @@ module LongShortHelpers = {
     let%AwaitThen longValue =
       longShort->LongShort.syntheticTokenPoolValue(
         marketIndex,
-        CONSTANTS.longTokenType,
+        true/*long*/,
       );
     let%Await shortValue =
       longShort->LongShort.syntheticTokenPoolValue(
         marketIndex,
-        CONSTANTS.shortTokenType,
+        false/*short*/,
       );
     {longValue, shortValue};
   };
@@ -109,8 +109,8 @@ module LongShortHelpers = {
 
 module SyntheticTokenHelpers = {
   let getIsLong = synthToken => {
-    let%Await syntheticTokenType =
-      synthToken->SyntheticToken.syntheticTokenType;
-    syntheticTokenType == CONSTANTS.longTokenType;
+    let%Await isLong =
+      synthToken->SyntheticToken.isLong;
+    isLong == true/*long*/;
   };
 };

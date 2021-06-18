@@ -54,8 +54,8 @@ function generateTestData(contracts, accounts, initialPrice, initialAmountShort,
                                                                 var newPrice = Globals.sub(param[0], CONSTANTS.tenToThe18);
                                                                 return LetOps.AwaitThen.let_(oracleManager.setPrice(newPrice), (function (param) {
                                                                               return LetOps.AwaitThen.let_(longShort._updateSystemState(marketIndex), (function (param) {
-                                                                                            return LetOps.AwaitThen.let_(longShort.syntheticTokenPoolValue(marketIndex, CONSTANTS.shortTokenType), (function (shortValue) {
-                                                                                                          return LetOps.AwaitThen.let_(longShort.syntheticTokenPoolValue(marketIndex, CONSTANTS.longTokenType), (function (longValue) {
+                                                                                            return LetOps.AwaitThen.let_(longShort.syntheticTokenPoolValue(marketIndex, false), (function (shortValue) {
+                                                                                                          return LetOps.AwaitThen.let_(longShort.syntheticTokenPoolValue(marketIndex, true), (function (longValue) {
                                                                                                                         return Promise.resolve([
                                                                                                                                     newPrice,
                                                                                                                                     Belt_Array.concat([[
@@ -99,8 +99,8 @@ function generateTestData(contracts, accounts, initialPrice, initialAmountShort,
                                                                 var newPrice = Globals.add(param[0], CONSTANTS.tenToThe18);
                                                                 return LetOps.AwaitThen.let_(oracleManager.setPrice(newPrice), (function (param) {
                                                                               return LetOps.AwaitThen.let_(longShort._updateSystemState(marketIndex), (function (param) {
-                                                                                            return LetOps.AwaitThen.let_(longShort.syntheticTokenPoolValue(marketIndex, CONSTANTS.shortTokenType), (function (shortValue) {
-                                                                                                          return LetOps.AwaitThen.let_(longShort.syntheticTokenPoolValue(marketIndex, CONSTANTS.longTokenType), (function (longValue) {
+                                                                                            return LetOps.AwaitThen.let_(longShort.syntheticTokenPoolValue(marketIndex, false), (function (shortValue) {
+                                                                                                          return LetOps.AwaitThen.let_(longShort.syntheticTokenPoolValue(marketIndex, true), (function (longValue) {
                                                                                                                         return Promise.resolve([
                                                                                                                                     newPrice,
                                                                                                                                     Belt_Array.concat(results, [[

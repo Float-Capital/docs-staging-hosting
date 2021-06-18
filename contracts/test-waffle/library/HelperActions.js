@@ -5,7 +5,6 @@ var LetOps = require("./LetOps.js");
 var Globals = require("./Globals.js");
 var Helpers = require("./Helpers.js");
 var Contract = require("./Contract.js");
-var CONSTANTS = require("../CONSTANTS.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 
 function mintDirect(marketIndex, amount, token, user, longShort, oracleManagerMock, isLong) {
@@ -65,7 +64,7 @@ function stakeRandomlyInMarkets(marketsToStakeIn, userToStakeWith, longShort) {
                                               case /* Long */0 :
                                                   var amount$1 = amount._0;
                                                   tmp = LetOps.AwaitThen.let_(mintStake(amount$1)(longSynth), (function (param) {
-                                                          return LetOps.Await.let_(longShort.syntheticTokenPrice(marketIndex, CONSTANTS.longTokenType), (function (longTokenPrice) {
+                                                          return LetOps.Await.let_(longShort.syntheticTokenPrice(marketIndex, true), (function (longTokenPrice) {
                                                                         return Belt_Array.concat(synthsUserHasStakedIn, [{
                                                                                       marketIndex: marketIndex,
                                                                                       synth: longSynth,
@@ -80,7 +79,7 @@ function stakeRandomlyInMarkets(marketsToStakeIn, userToStakeWith, longShort) {
                                               case /* Short */1 :
                                                   var amount$2 = amount._0;
                                                   tmp = LetOps.AwaitThen.let_(mintStake(amount$2)(shortSynth), (function (param) {
-                                                          return LetOps.Await.let_(longShort.syntheticTokenPrice(marketIndex, CONSTANTS.shortTokenType), (function (shortTokenPrice) {
+                                                          return LetOps.Await.let_(longShort.syntheticTokenPrice(marketIndex, false), (function (shortTokenPrice) {
                                                                         return Belt_Array.concat(synthsUserHasStakedIn, [{
                                                                                       marketIndex: marketIndex,
                                                                                       synth: shortSynth,
@@ -96,7 +95,7 @@ function stakeRandomlyInMarkets(marketsToStakeIn, userToStakeWith, longShort) {
                                                   var shortAmount = amount._1;
                                                   var longAmount = amount._0;
                                                   tmp = LetOps.AwaitThen.let_(mintStake(longAmount)(longSynth), (function (param) {
-                                                          return LetOps.AwaitThen.let_(longShort.syntheticTokenPrice(marketIndex, CONSTANTS.longTokenType), (function (longTokenPrice) {
+                                                          return LetOps.AwaitThen.let_(longShort.syntheticTokenPrice(marketIndex, true), (function (longTokenPrice) {
                                                                         var newSynthsUserHasStakedIn = Belt_Array.concat(synthsUserHasStakedIn, [{
                                                                                 marketIndex: marketIndex,
                                                                                 synth: longSynth,
@@ -109,7 +108,7 @@ function stakeRandomlyInMarkets(marketsToStakeIn, userToStakeWith, longShort) {
                                                                                       var valueShortBefore = param.shortValue;
                                                                                       var valueLongBefore = param.longValue;
                                                                                       return LetOps.AwaitThen.let_(mintStake(shortAmount)(shortSynth), (function (param) {
-                                                                                                    return LetOps.Await.let_(longShort.syntheticTokenPrice(marketIndex, CONSTANTS.shortTokenType), (function (shortTokenPrice) {
+                                                                                                    return LetOps.Await.let_(longShort.syntheticTokenPrice(marketIndex, false), (function (shortTokenPrice) {
                                                                                                                   return Belt_Array.concat(newSynthsUserHasStakedIn, [{
                                                                                                                                 marketIndex: marketIndex,
                                                                                                                                 synth: shortSynth,
@@ -163,4 +162,4 @@ exports.mintDirect = mintDirect;
 exports.mintAndStakeDirect = mintAndStakeDirect;
 exports.stakeRandomlyInMarkets = stakeRandomlyInMarkets;
 exports.stakeRandomlyInBothSidesOfMarket = stakeRandomlyInBothSidesOfMarket;
-/* Helpers Not a pure module */
+/* Contract Not a pure module */
