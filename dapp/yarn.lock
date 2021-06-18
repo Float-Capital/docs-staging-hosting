@@ -1185,10 +1185,10 @@
     enc-utils "^3.0.0"
     randombytes "^2.1.0"
 
-"@reasonml-community/graphql-ppx@1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@reasonml-community/graphql-ppx/-/graphql-ppx-1.0.2.tgz#5641413a8873d412dc6a0b00a1fe273323406fb8"
-  integrity sha512-A4KURw/hpGWvW6Dkmg8LpF3GlWZ1FCyP3MhHLUlmViboZ51bRSnO0lU4hK8TE6x5/B2Uik59YACJZX47VqWmOw==
+"@reasonml-community/graphql-ppx@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@reasonml-community/graphql-ppx/-/graphql-ppx-1.2.0.tgz#5a51021dd43c3a090da34d2dfa22b2257fdb9049"
+  integrity sha512-CKTzl/DZNT0QgpKjpi0Fij2R4r9c/oT+M8mEWYnNidaLDcFX7ZfcvmJA4ZhPYXRD6AGUO3cS1zQOJZSuJHKogQ==
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.1"
