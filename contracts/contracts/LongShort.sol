@@ -663,12 +663,8 @@ contract LongShort is ILongShort, Initializable {
     function _adjustMarketBasedOnNewAssetPrice(
         uint32 marketIndex,
         int256 newAssetPrice
-    ) internal returns (bool didUpdate) {
+    ) internal {
         int256 oldAssetPrice = int256(assetPrice[marketIndex]);
-
-        if (oldAssetPrice == newAssetPrice) {
-            return false;
-        }
 
         uint256 min;
         if (
@@ -703,14 +699,18 @@ contract LongShort is ILongShort, Initializable {
             );
         }
 
-        return true;
+        emit PriceUpdate(
+            marketIndex,
+            assetPrice[marketIndex],
+            uint256(newAssetPrice),
+            msg.sender
+        );
     }
 
     function _snapshotPriceChangeForNextPriceExecution(
         uint32 marketIndex,
         uint256 newLatestPriceStateIndex
     ) internal {
-        // NOTE: we can't just merge these two values since the 'yield' has an effect on the token price inbetween oracle updates.
         mintPriceSnapshot[marketIndex][MarketSide.Long][
             newLatestPriceStateIndex
         ] = syntheticTokenPrice[marketIndex][MarketSide.Long];
@@ -742,76 +742,63 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokenPoolValue[marketIndex][MarketSide.Short]
         );
 
-        // Distibute accrued yield first based on current liquidity before price update
-        _claimAndDistributeYield(marketIndex);
-
         // If a negative int is return this should fail.
         int256 newAssetPrice = oracleManagers[marketIndex].updatePrice();
+        int256 oldAssetPrice = int256(assetPrice[marketIndex]);
 
-        // Adjusts long and short values based on price movements.
-        bool priceChanged =
-            _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
-
-        if (priceChanged) {
-            assert(
-                syntheticTokenPoolValue[marketIndex][MarketSide.Long] != 0 &&
-                    syntheticTokenPoolValue[marketIndex][MarketSide.Short] != 0
-            );
-
-            // TODO STENT move this into the price function
-            emit PriceUpdate(
-                marketIndex,
-                assetPrice[marketIndex],
-                uint256(newAssetPrice),
-                msg.sender
-            );
-
-            // TODO STENT CONCERN1
-            _refreshTokenPrices(marketIndex);
-            assetPrice[marketIndex] = uint256(newAssetPrice);
-
-            uint256 newLatestPriceStateIndex =
-                marketUpdateIndex[marketIndex] + 1;
-            marketUpdateIndex[marketIndex] = newLatestPriceStateIndex;
-            _snapshotPriceChangeForNextPriceExecution(
-                marketIndex,
-                newLatestPriceStateIndex
-            );
-
-            if (
-                _handleBatchedDepositSettlement(marketIndex, MarketSide.Long) ||
-                _handleBatchedDepositSettlement(
-                    marketIndex,
-                    MarketSide.Short
-                ) ||
-                _handleBatchedNextPriceRedeems(marketIndex)
-            ) {
-                emit BatchedActionsSettled(
-                    marketIndex,
-                    newLatestPriceStateIndex,
-                    mintPriceSnapshot[marketIndex][MarketSide.Long][
-                        newLatestPriceStateIndex
-                    ],
-                    mintPriceSnapshot[marketIndex][MarketSide.Short][
-                        newLatestPriceStateIndex
-                    ],
-                    redeemPriceSnapshot[marketIndex][MarketSide.Long][
-                        newLatestPriceStateIndex
-                    ],
-                    redeemPriceSnapshot[marketIndex][MarketSide.Short][
-                        newLatestPriceStateIndex
-                    ]
-                );
-
-                emit ValueLockedInSystem(
-                    marketIndex,
-                    syntheticTokenPoolValue[marketIndex][MarketSide.Long] +
-                        syntheticTokenPoolValue[marketIndex][MarketSide.Short],
-                    syntheticTokenPoolValue[marketIndex][MarketSide.Long],
-                    syntheticTokenPoolValue[marketIndex][MarketSide.Short]
-                );
-            }
+        if (oldAssetPrice == newAssetPrice) {
+            return;
         }
+
+        _claimAndDistributeYield(marketIndex);
+
+        _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
+
+        assert(
+            syntheticTokenPoolValue[marketIndex][MarketSide.Long] != 0 &&
+                syntheticTokenPoolValue[marketIndex][MarketSide.Short] != 0
+        );
+
+        _refreshTokenPrices(marketIndex);
+        assetPrice[marketIndex] = uint256(newAssetPrice);
+
+        uint256 newLatestPriceStateIndex = marketUpdateIndex[marketIndex] + 1;
+        marketUpdateIndex[marketIndex] = newLatestPriceStateIndex;
+        _snapshotPriceChangeForNextPriceExecution(
+            marketIndex,
+            newLatestPriceStateIndex
+        );
+
+        if (
+            _handleBatchedDepositSettlement(marketIndex, MarketSide.Long) ||
+            _handleBatchedDepositSettlement(marketIndex, MarketSide.Short) ||
+            _handleBatchedNextPriceRedeems(marketIndex)
+        ) {
+            emit BatchedActionsSettled(
+                marketIndex,
+                newLatestPriceStateIndex,
+                mintPriceSnapshot[marketIndex][MarketSide.Long][
+                    newLatestPriceStateIndex
+                ],
+                mintPriceSnapshot[marketIndex][MarketSide.Short][
+                    newLatestPriceStateIndex
+                ],
+                redeemPriceSnapshot[marketIndex][MarketSide.Long][
+                    newLatestPriceStateIndex
+                ],
+                redeemPriceSnapshot[marketIndex][MarketSide.Short][
+                    newLatestPriceStateIndex
+                ]
+            );
+        }
+
+        emit ValueLockedInSystem(
+            marketIndex,
+            syntheticTokenPoolValue[marketIndex][MarketSide.Long] +
+                syntheticTokenPoolValue[marketIndex][MarketSide.Short],
+            syntheticTokenPoolValue[marketIndex][MarketSide.Long],
+            syntheticTokenPoolValue[marketIndex][MarketSide.Short]
+        );
     }
 
     function _updateSystemState(uint32 marketIndex) external override {
