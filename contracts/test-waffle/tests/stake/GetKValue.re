@@ -1,6 +1,7 @@
 open Globals;
 open LetOps;
 open StakerHelpers;
+open Mocha;
 
 let test =
     (
@@ -61,7 +62,7 @@ let test =
       prom := (stakerRef^)->Staker.Exposed.getKValueExternal(~marketIndex);
     };
 
-    it'(
+    it(
       "returns  kInitialMultiplier -
                 (((kInitialMultiplier - 1e18) *
                     (block.timestamp - initialTimestamp)) / kPeriod) if kPeriod isn't over",
@@ -80,7 +81,7 @@ let test =
       },
     );
 
-    it'("reverts if kInitialMultiplier less than 1e18", () => {
+    it("reverts if kInitialMultiplier less than 1e18", () => {
       let%Await _ =
         setup(~multiplier=CONSTANTS.oneBn, ~periodShouldBeOver=true);
       Chai.expectRevertNoReason(~transaction=(prom^)->Obj.magic);
@@ -89,7 +90,7 @@ let test =
       // TESTING TWO THINGS
       before_once'(() => {setup(~multiplier, ~periodShouldBeOver=true)});
 
-      it'(
+      it(
         "returns 1e18 if more seconds have passed than the kPeriod since the staking fund for the market was added",
         () => {
           let%Await returnVal = prom^;
@@ -97,7 +98,7 @@ let test =
         },
       );
 
-      it''(
+      it'(
         "calls getMarketLaunchIncentiveParameters with correct arguments", () => {
         StakerSmocked.InternalMock.getMarketLaunchIncentiveParametersCalls()
         ->Array.getExn(0)

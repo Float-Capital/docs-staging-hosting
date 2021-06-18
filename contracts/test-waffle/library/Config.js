@@ -2,7 +2,7 @@
 'use strict';
 
 var Dotenv = require("dotenv");
-var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
+var Belt_Option = require("rescript/lib/js/belt_Option.js");
 
 Dotenv.config();
 

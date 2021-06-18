@@ -5,69 +5,71 @@ var Chai = require("../../bindings/chai/Chai.js");
 var LetOps = require("../../library/LetOps.js");
 var Globals = require("../../library/Globals.js");
 var Helpers = require("../../library/Helpers.js");
-var Js_math = require("bs-platform/lib/js/js_math.js");
+var Js_math = require("rescript/lib/js/js_math.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 
 function test(contracts) {
-  return Globals.describe("calculateAccumulatedFloat")(undefined, undefined, undefined, (function (param) {
-                var marketIndex = Js_math.random_int(1, 100000);
-                var longToken = ethers.Wallet.createRandom().address;
-                var shortToken = ethers.Wallet.createRandom().address;
-                var user = ethers.Wallet.createRandom().address;
-                var accumulativeFloatPerTokenUserLong = Helpers.randomTokenAmount(undefined);
-                var accumulativeFloatPerTokenLatestLong = Globals.add(accumulativeFloatPerTokenUserLong, Helpers.randomTokenAmount(undefined));
-                var newUserAmountStakedLong = Helpers.randomTokenAmount(undefined);
-                var accumulativeFloatPerTokenUserShort = Helpers.randomTokenAmount(undefined);
-                var accumulativeFloatPerTokenLatestShort = Globals.add(accumulativeFloatPerTokenUserShort, Helpers.randomTokenAmount(undefined));
-                var newUserAmountStakedShort = Helpers.randomTokenAmount(undefined);
-                Globals.it$prime("[HAPPY] should correctly return the float tokens due for the user")(undefined, undefined, undefined, (function (param) {
-                        var match = contracts.contents;
-                        var staker = match.staker;
-                        var usersLatestClaimedReward = Helpers.randomInteger(undefined);
-                        var newLatestRewardIndex = Globals.add(usersLatestClaimedReward, Helpers.randomInteger(undefined));
-                        return LetOps.AwaitThen.let_(staker.setFloatRewardCalcParams(marketIndex, longToken, shortToken, newLatestRewardIndex, user, usersLatestClaimedReward, accumulativeFloatPerTokenLatestLong, accumulativeFloatPerTokenLatestShort, accumulativeFloatPerTokenUserLong, accumulativeFloatPerTokenUserShort, newUserAmountStakedLong, newUserAmountStakedShort), (function (param) {
-                                      return LetOps.Await.let_(staker.callStatic.calculateAccumulatedFloatExposed(marketIndex, user), (function (floatDue) {
-                                                    var expectedFloatDueLong = Globals.div(Globals.mul(Globals.sub(accumulativeFloatPerTokenLatestLong, accumulativeFloatPerTokenUserLong), newUserAmountStakedLong), CONSTANTS.floatIssuanceFixedDecimal);
-                                                    Chai.bnEqual("calculated float due is incorrect", floatDue.longFloatReward, expectedFloatDueLong);
-                                                    var expectedFloatDueShort = Globals.div(Globals.mul(Globals.sub(accumulativeFloatPerTokenLatestShort, accumulativeFloatPerTokenUserShort), newUserAmountStakedShort), CONSTANTS.floatIssuanceFixedDecimal);
-                                                    Chai.bnEqual("calculated float due is incorrect", floatDue.longFloatReward, expectedFloatDueLong);
-                                                    return Chai.bnEqual("calculated float due is incorrect", floatDue.shortFloatReward, expectedFloatDueShort);
-                                                  }));
-                                    }));
-                      }));
-                Globals.it$prime("should return zero if `usersLatestClaimedReward` is equal to `newLatestRewardIndex`")(undefined, undefined, undefined, (function (param) {
-                        var match = contracts.contents;
-                        var staker = match.staker;
-                        var newLatestRewardIndex = Helpers.randomInteger(undefined);
-                        return LetOps.AwaitThen.let_(staker.setFloatRewardCalcParams(marketIndex, longToken, shortToken, newLatestRewardIndex, user, newLatestRewardIndex, accumulativeFloatPerTokenLatestLong, accumulativeFloatPerTokenLatestShort, accumulativeFloatPerTokenUserLong, accumulativeFloatPerTokenUserShort, newUserAmountStakedLong, newUserAmountStakedShort), (function (param) {
-                                      return LetOps.Await.let_(staker.callStatic.calculateAccumulatedFloatExposed(marketIndex, user), (function (floatDue) {
-                                                    Chai.bnEqual("calculated float (long) due should be zero", floatDue.longFloatReward, Globals.bnFromInt(0));
-                                                    return Chai.bnEqual("calculated float (short) due should be zero", floatDue.shortFloatReward, Globals.bnFromInt(0));
-                                                  }));
-                                    }));
-                      }));
-                Globals.it$prime("should throw (assert) if `usersLatestClaimedReward` is bigger than `newLatestRewardIndex`")(undefined, undefined, undefined, (function (param) {
-                        var match = contracts.contents;
-                        var staker = match.staker;
-                        var usersLatestClaimedReward = Helpers.randomInteger(undefined);
-                        var newLatestRewardIndex = Globals.sub(usersLatestClaimedReward, Globals.bnFromInt(1));
-                        return LetOps.AwaitThen.let_(staker.setFloatRewardCalcParams(marketIndex, longToken, shortToken, newLatestRewardIndex, user, usersLatestClaimedReward, accumulativeFloatPerTokenLatestLong, accumulativeFloatPerTokenLatestShort, accumulativeFloatPerTokenUserLong, accumulativeFloatPerTokenUserShort, newUserAmountStakedLong, newUserAmountStakedShort), (function (param) {
-                                      return Chai.expectRevertNoReason(staker.calculateAccumulatedFloatExposed(marketIndex, user));
-                                    }));
-                      }));
-                return Globals.it$prime("If the user has zero tokens staked they should get zero float tokens")(undefined, undefined, undefined, (function (param) {
-                              var match = contracts.contents;
-                              var staker = match.staker;
-                              var usersLatestClaimedReward = Helpers.randomInteger(undefined);
-                              var newLatestRewardIndex = Globals.add(usersLatestClaimedReward, Helpers.randomInteger(undefined));
-                              return LetOps.AwaitThen.let_(staker.setFloatRewardCalcParams(marketIndex, longToken, shortToken, newLatestRewardIndex, user, usersLatestClaimedReward, accumulativeFloatPerTokenLatestLong, accumulativeFloatPerTokenLatestShort, accumulativeFloatPerTokenUserLong, accumulativeFloatPerTokenUserShort, ethers.BigNumber.from(0), ethers.BigNumber.from(0)), (function (param) {
-                                            return LetOps.Await.let_(staker.callStatic.calculateAccumulatedFloatExposed(marketIndex, user), (function (floatDue) {
-                                                          Chai.bnEqual("calculated float (long) due should be zero", floatDue.longFloatReward, Globals.bnFromInt(0));
-                                                          return Chai.bnEqual("calculated float (short) due should be zero", floatDue.shortFloatReward, Globals.bnFromInt(0));
-                                                        }));
-                                          }));
-                            }));
-              }));
+  describe("calculateAccumulatedFloat", (function () {
+          var marketIndex = Js_math.random_int(1, 100000);
+          var longToken = ethers.Wallet.createRandom().address;
+          var shortToken = ethers.Wallet.createRandom().address;
+          var user = ethers.Wallet.createRandom().address;
+          var accumulativeFloatPerTokenUserLong = Helpers.randomTokenAmount(undefined);
+          var accumulativeFloatPerTokenLatestLong = Globals.add(accumulativeFloatPerTokenUserLong, Helpers.randomTokenAmount(undefined));
+          var newUserAmountStakedLong = Helpers.randomTokenAmount(undefined);
+          var accumulativeFloatPerTokenUserShort = Helpers.randomTokenAmount(undefined);
+          var accumulativeFloatPerTokenLatestShort = Globals.add(accumulativeFloatPerTokenUserShort, Helpers.randomTokenAmount(undefined));
+          var newUserAmountStakedShort = Helpers.randomTokenAmount(undefined);
+          it("[HAPPY] should correctly return the float tokens due for the user", (function () {
+                  var match = contracts.contents;
+                  var staker = match.staker;
+                  var usersLatestClaimedReward = Helpers.randomInteger(undefined);
+                  var newLatestRewardIndex = Globals.add(usersLatestClaimedReward, Helpers.randomInteger(undefined));
+                  return LetOps.AwaitThen.let_(staker.setFloatRewardCalcParams(marketIndex, longToken, shortToken, newLatestRewardIndex, user, usersLatestClaimedReward, accumulativeFloatPerTokenLatestLong, accumulativeFloatPerTokenLatestShort, accumulativeFloatPerTokenUserLong, accumulativeFloatPerTokenUserShort, newUserAmountStakedLong, newUserAmountStakedShort), (function (param) {
+                                return LetOps.Await.let_(staker.callStatic.calculateAccumulatedFloatExposed(marketIndex, user), (function (floatDue) {
+                                              var expectedFloatDueLong = Globals.div(Globals.mul(Globals.sub(accumulativeFloatPerTokenLatestLong, accumulativeFloatPerTokenUserLong), newUserAmountStakedLong), CONSTANTS.floatIssuanceFixedDecimal);
+                                              Chai.bnEqual("calculated float due is incorrect", floatDue.longFloatReward, expectedFloatDueLong);
+                                              var expectedFloatDueShort = Globals.div(Globals.mul(Globals.sub(accumulativeFloatPerTokenLatestShort, accumulativeFloatPerTokenUserShort), newUserAmountStakedShort), CONSTANTS.floatIssuanceFixedDecimal);
+                                              Chai.bnEqual("calculated float due is incorrect", floatDue.longFloatReward, expectedFloatDueLong);
+                                              return Chai.bnEqual("calculated float due is incorrect", floatDue.shortFloatReward, expectedFloatDueShort);
+                                            }));
+                              }));
+                }));
+          it("should return zero if `usersLatestClaimedReward` is equal to `newLatestRewardIndex`", (function () {
+                  var match = contracts.contents;
+                  var staker = match.staker;
+                  var newLatestRewardIndex = Helpers.randomInteger(undefined);
+                  return LetOps.AwaitThen.let_(staker.setFloatRewardCalcParams(marketIndex, longToken, shortToken, newLatestRewardIndex, user, newLatestRewardIndex, accumulativeFloatPerTokenLatestLong, accumulativeFloatPerTokenLatestShort, accumulativeFloatPerTokenUserLong, accumulativeFloatPerTokenUserShort, newUserAmountStakedLong, newUserAmountStakedShort), (function (param) {
+                                return LetOps.Await.let_(staker.callStatic.calculateAccumulatedFloatExposed(marketIndex, user), (function (floatDue) {
+                                              Chai.bnEqual("calculated float (long) due should be zero", floatDue.longFloatReward, Globals.bnFromInt(0));
+                                              return Chai.bnEqual("calculated float (short) due should be zero", floatDue.shortFloatReward, Globals.bnFromInt(0));
+                                            }));
+                              }));
+                }));
+          it("should throw (assert) if `usersLatestClaimedReward` is bigger than `newLatestRewardIndex`", (function () {
+                  var match = contracts.contents;
+                  var staker = match.staker;
+                  var usersLatestClaimedReward = Helpers.randomInteger(undefined);
+                  var newLatestRewardIndex = Globals.sub(usersLatestClaimedReward, Globals.bnFromInt(1));
+                  return LetOps.AwaitThen.let_(staker.setFloatRewardCalcParams(marketIndex, longToken, shortToken, newLatestRewardIndex, user, usersLatestClaimedReward, accumulativeFloatPerTokenLatestLong, accumulativeFloatPerTokenLatestShort, accumulativeFloatPerTokenUserLong, accumulativeFloatPerTokenUserShort, newUserAmountStakedLong, newUserAmountStakedShort), (function (param) {
+                                return Chai.expectRevertNoReason(staker.calculateAccumulatedFloatExposed(marketIndex, user));
+                              }));
+                }));
+          it("If the user has zero tokens staked they should get zero float tokens", (function () {
+                  var match = contracts.contents;
+                  var staker = match.staker;
+                  var usersLatestClaimedReward = Helpers.randomInteger(undefined);
+                  var newLatestRewardIndex = Globals.add(usersLatestClaimedReward, Helpers.randomInteger(undefined));
+                  return LetOps.AwaitThen.let_(staker.setFloatRewardCalcParams(marketIndex, longToken, shortToken, newLatestRewardIndex, user, usersLatestClaimedReward, accumulativeFloatPerTokenLatestLong, accumulativeFloatPerTokenLatestShort, accumulativeFloatPerTokenUserLong, accumulativeFloatPerTokenUserShort, ethers.BigNumber.from(0), ethers.BigNumber.from(0)), (function (param) {
+                                return LetOps.Await.let_(staker.callStatic.calculateAccumulatedFloatExposed(marketIndex, user), (function (floatDue) {
+                                              Chai.bnEqual("calculated float (long) due should be zero", floatDue.longFloatReward, Globals.bnFromInt(0));
+                                              return Chai.bnEqual("calculated float (short) due should be zero", floatDue.shortFloatReward, Globals.bnFromInt(0));
+                                            }));
+                              }));
+                }));
+          
+        }));
+  
 }
 
 exports.test = test;

@@ -1,5 +1,7 @@
 open Globals;
 open LetOps;
+open Mocha;
+
 let generateTestData =
     (
       ~contracts: ref(Helpers.coreContracts),
@@ -14,7 +16,7 @@ let generateTestData =
     "generating graph" ++ name,
     () => {
       let numberOfItems = initialPrice->div(CONSTANTS.tenToThe18)->bnToInt;
-      before_each'(() => {
+      before_each(() => {
         let {longShort, markets} = contracts.contents;
         let {oracleManager, paymentToken, marketIndex} =
           markets->Array.getUnsafe(0);
@@ -46,7 +48,7 @@ let generateTestData =
 
         ()->JsPromise.resolve;
       });
-      it'("below", () => {
+      it("below", () => {
         let {longShort, markets} = contracts.contents;
         let {oracleManager, marketIndex, paymentToken} =
           markets->Array.getUnsafe(0);
@@ -112,7 +114,7 @@ let generateTestData =
             |]);
         ()->JsPromise.resolve;
       });
-      it'("above", () => {
+      it("above", () => {
         let {longShort, markets} = contracts.contents;
         let {oracleManager, marketIndex, paymentToken} =
           markets->Array.getUnsafe(0);
@@ -183,12 +185,12 @@ describeSkippable("Float System", () => {
   let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
   let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
 
-  before'(() => {
+  before(() => {
     let%Await loadedAccounts = Ethers.getSigners();
     accounts := loadedAccounts;
   });
 
-  before_each'(() => {
+  before_each(() => {
     let%Await deployedContracts =
       Helpers.inititialize(
         ~admin=accounts.contents->Array.getUnsafe(0),

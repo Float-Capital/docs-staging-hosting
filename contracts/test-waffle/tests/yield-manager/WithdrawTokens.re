@@ -1,5 +1,5 @@
-open Globals;
 open LetOps;
+open Mocha;
 
 describe("YieldManagerAave", () => {
   describe("WithdrawTokens", () => {
@@ -8,7 +8,7 @@ describe("YieldManagerAave", () => {
       let contracts = ref(None->Obj.magic);
       let amountOfWMaticInYieldManager = Helpers.randomTokenAmount();
 
-      before_each'(() => {
+      before_each(() => {
         let%AwaitThen loadedAccounts = Ethers.getSigners();
         accounts := loadedAccounts;
 
@@ -40,7 +40,7 @@ describe("YieldManagerAave", () => {
         contracts :=
           {"erc20Mock": erc20Mock, "yieldManagerAave": yieldManagerAave};
       });
-      it'(
+      it(
         "allows treasury to call 'transfer' function on any erc20 to transfer it to the treasury",
         () => {
           let treasury = (accounts^)->Array.getUnsafe(1);
@@ -62,13 +62,13 @@ describe("YieldManagerAave", () => {
             );
         },
       );
-      it'("Should withdraw WMATIC to the treasury", () => {
+      it("Should withdraw WMATIC to the treasury", () => {
         JsPromise.resolve()
       });
-      it'("should revert if not called by treasury", () => {
+      it("should revert if not called by treasury", () => {
         JsPromise.resolve()
       });
-      it'("should revert if trying to withdraw aToken", () =>
+      it("should revert if trying to withdraw aToken", () =>
         JsPromise.resolve()
       );
     })

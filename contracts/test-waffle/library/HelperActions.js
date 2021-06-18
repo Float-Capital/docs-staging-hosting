@@ -6,7 +6,7 @@ var Globals = require("./Globals.js");
 var Helpers = require("./Helpers.js");
 var Contract = require("./Contract.js");
 var CONSTANTS = require("../CONSTANTS.js");
-var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
+var Belt_Array = require("rescript/lib/js/belt_Array.js");
 
 function mintDirect(marketIndex, amount, token, user, longShort, oracleManagerMock, isLong) {
   return LetOps.AwaitThen.let_(Contract.PaymentTokenHelpers.mintAndApprove(token, user, amount, longShort.address), (function (param) {

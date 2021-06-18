@@ -1,10 +1,10 @@
-open Globals;
 open LetOps;
+open Mocha;
 
 let test = (~contracts: ref(Helpers.coreContracts)) => {
   let stakerRef: ref(Staker.t) = ref(""->Obj.magic);
   describe("getMarketLaunchParameters", () => {
-    before_each'(() => {
+    before_each(() => {
       let {staker} = contracts^;
       stakerRef := staker;
       ()->JsPromise.resolve;
@@ -42,7 +42,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) => {
       multiplier->Chai.bnEqual(expectedMultiplier);
     };
 
-    it'(
+    it(
       "returns kPeriod and kInitialMultiplier correctly for a market once set",
       test(
         ~initialMultiplier,
@@ -52,7 +52,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) => {
       ),
     );
 
-    it'(
+    it(
       "if kInitialMultiplier is zero then returns 1e18 as multiplier",
       test(
         ~initialMultiplier=CONSTANTS.zeroBn,

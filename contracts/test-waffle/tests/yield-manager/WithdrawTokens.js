@@ -3,59 +3,61 @@
 
 var Chai = require("../../bindings/chai/Chai.js");
 var LetOps = require("../../library/LetOps.js");
-var Globals = require("../../library/Globals.js");
 var Helpers = require("../../library/Helpers.js");
 var ERC20Mock = require("../../library/contracts/ERC20Mock.js");
 var YieldManagerAave = require("../../library/contracts/YieldManagerAave.js");
 
-Globals.describe("YieldManagerAave")(undefined, undefined, undefined, (function (param) {
-        return Globals.describe("WithdrawTokens")(undefined, undefined, undefined, (function (param) {
-                      return Globals.describe("WithdrawWmaticToTreasury mocks")(undefined, undefined, undefined, (function (param) {
-                                    var accounts = {
-                                      contents: undefined
-                                    };
-                                    var contracts = {
-                                      contents: undefined
-                                    };
-                                    var amountOfWMaticInYieldManager = Helpers.randomTokenAmount(undefined);
-                                    Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
-                                            return LetOps.AwaitThen.let_(ethers.getSigners(), (function (loadedAccounts) {
-                                                          accounts.contents = loadedAccounts;
-                                                          var admin = loadedAccounts[0];
-                                                          var treasury = loadedAccounts[1];
-                                                          var daiAddress = ethers.Wallet.createRandom().address;
-                                                          var longShortAddress = ethers.Wallet.createRandom().address;
-                                                          var lendingPoolAddress = ethers.Wallet.createRandom().address;
-                                                          var fundTokenAddress = ethers.Wallet.createRandom().address;
-                                                          return LetOps.AwaitThen.let_(ERC20Mock.make("TestADAI", "ADAI"), (function (erc20Mock) {
-                                                                        return LetOps.AwaitThen.let_(YieldManagerAave.make(admin.address, longShortAddress, treasury.address, daiAddress, fundTokenAddress, lendingPoolAddress, 6543), (function (yieldManagerAave) {
-                                                                                      return LetOps.Await.let_(erc20Mock.mint(yieldManagerAave.address, amountOfWMaticInYieldManager), (function (param) {
-                                                                                                    contracts.contents = {
-                                                                                                      erc20Mock: erc20Mock,
-                                                                                                      yieldManagerAave: yieldManagerAave
-                                                                                                    };
-                                                                                                    
-                                                                                                  }));
+describe("YieldManagerAave", (function () {
+        describe("WithdrawTokens", (function () {
+                describe("WithdrawWmaticToTreasury mocks", (function () {
+                        var accounts = {
+                          contents: undefined
+                        };
+                        var contracts = {
+                          contents: undefined
+                        };
+                        var amountOfWMaticInYieldManager = Helpers.randomTokenAmount(undefined);
+                        beforeEach(function () {
+                              return LetOps.AwaitThen.let_(ethers.getSigners(), (function (loadedAccounts) {
+                                            accounts.contents = loadedAccounts;
+                                            var admin = loadedAccounts[0];
+                                            var treasury = loadedAccounts[1];
+                                            var daiAddress = ethers.Wallet.createRandom().address;
+                                            var longShortAddress = ethers.Wallet.createRandom().address;
+                                            var lendingPoolAddress = ethers.Wallet.createRandom().address;
+                                            var fundTokenAddress = ethers.Wallet.createRandom().address;
+                                            return LetOps.AwaitThen.let_(ERC20Mock.make("TestADAI", "ADAI"), (function (erc20Mock) {
+                                                          return LetOps.AwaitThen.let_(YieldManagerAave.make(admin.address, longShortAddress, treasury.address, daiAddress, fundTokenAddress, lendingPoolAddress, 6543), (function (yieldManagerAave) {
+                                                                        return LetOps.Await.let_(erc20Mock.mint(yieldManagerAave.address, amountOfWMaticInYieldManager), (function (param) {
+                                                                                      contracts.contents = {
+                                                                                        erc20Mock: erc20Mock,
+                                                                                        yieldManagerAave: yieldManagerAave
+                                                                                      };
+                                                                                      
                                                                                     }));
                                                                       }));
                                                         }));
                                           }));
-                                    Globals.it$prime("allows treasury to call 'transfer' function on any erc20 to transfer it to the treasury")(undefined, undefined, undefined, (function (param) {
-                                            var treasury = accounts.contents[1];
-                                            var withdrawErc20TokenToTreasuryTxPromise = contracts.contents.yieldManagerAave.connect(treasury).withdrawErc20TokenToTreasury(contracts.contents.erc20Mock.address);
-                                            return Chai.callEmitEvents(withdrawErc20TokenToTreasuryTxPromise, contracts.contents.erc20Mock, "TransferCalled").withArgs(contracts.contents.yieldManagerAave.address, treasury.address, amountOfWMaticInYieldManager);
-                                          }));
-                                    Globals.it$prime("Should withdraw WMATIC to the treasury")(undefined, undefined, undefined, (function (param) {
-                                            return Promise.resolve(undefined);
-                                          }));
-                                    Globals.it$prime("should revert if not called by treasury")(undefined, undefined, undefined, (function (param) {
-                                            return Promise.resolve(undefined);
-                                          }));
-                                    return Globals.it$prime("should revert if trying to withdraw aToken")(undefined, undefined, undefined, (function (param) {
-                                                  return Promise.resolve(undefined);
-                                                }));
-                                  }));
-                    }));
+                            });
+                        it("allows treasury to call 'transfer' function on any erc20 to transfer it to the treasury", (function () {
+                                var treasury = accounts.contents[1];
+                                var withdrawErc20TokenToTreasuryTxPromise = contracts.contents.yieldManagerAave.connect(treasury).withdrawErc20TokenToTreasury(contracts.contents.erc20Mock.address);
+                                return Chai.callEmitEvents(withdrawErc20TokenToTreasuryTxPromise, contracts.contents.erc20Mock, "TransferCalled").withArgs(contracts.contents.yieldManagerAave.address, treasury.address, amountOfWMaticInYieldManager);
+                              }));
+                        it("Should withdraw WMATIC to the treasury", (function () {
+                                return Promise.resolve(undefined);
+                              }));
+                        it("should revert if not called by treasury", (function () {
+                                return Promise.resolve(undefined);
+                              }));
+                        it("should revert if trying to withdraw aToken", (function () {
+                                return Promise.resolve(undefined);
+                              }));
+                        
+                      }));
+                
+              }));
+        
       }));
 
 /*  Not a pure module */
