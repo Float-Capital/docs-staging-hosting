@@ -594,7 +594,7 @@
         "type": "uint8"
       }
     ],
-    "name": "batchedNextPriceDepositAmount",
+    "name": "batchedAmountOfSynthTokensToRedeem",
     "outputs": [
       {
         "internalType": "uint256",
@@ -618,7 +618,7 @@
         "type": "uint8"
       }
     ],
-    "name": "batchedNextPriceSynthRedeemAmount",
+    "name": "batchedAmountOfTokensToDeposit",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1018,35 +1018,6 @@
     "inputs": [
       {
         "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      },
-      {
-        "internalType": "enum ILongShort.MarketSide",
-        "name": "",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "mintPriceSnapshot",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint32",
         "name": "marketIndex",
         "type": "uint32"
       },
@@ -1229,6 +1200,35 @@
       }
     ],
     "name": "syntheticTokenPrice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      },
+      {
+        "internalType": "enum ILongShort.MarketSide",
+        "name": "",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "syntheticTokenPriceSnapshot",
     "outputs": [
       {
         "internalType": "uint256",
