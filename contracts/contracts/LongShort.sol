@@ -814,11 +814,11 @@ contract LongShort is ILongShort, Initializable {
         }
     }
 
-    function updateSystemState(uint32 marketIndex) external override {
+    function _updateSystemState(uint32 marketIndex) external override {
         _updateSystemStateInternal(marketIndex);
     }
 
-    function updateSystemStateMulti(uint32[] calldata marketIndexes)
+    function _updateSystemStateMulti(uint32[] calldata marketIndexes)
         external
         override
     {
@@ -1051,7 +1051,7 @@ contract LongShort is ILongShort, Initializable {
       ║   NEXT PRICE EXECUTION LOGIC    ║
       ╚═════════════════════════════════╝*/
 
-    function __handleBatchedDepositSettlement(
+    function _handleBatchedDepositSettlement(
         uint32 marketIndex,
         MarketSide syntheticTokenType
     ) internal returns (bool wasABatchedSettlement) {
@@ -1284,7 +1284,7 @@ contract LongShort is ILongShort, Initializable {
         }
     }
 
-    function __handleBatchedNextPriceRedeems(uint32 marketIndex)
+    function _handleBatchedNextPriceRedeems(uint32 marketIndex)
         internal
         returns (bool wasABatchedSettlement)
     {
