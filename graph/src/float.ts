@@ -67,6 +67,7 @@ import {
   getBatchedNextPriceExec,
   getUserNextPriceActionById,
   getUsersCurrentNextPriceAction,
+  doesBatchExist,
 } from "./utils/nextPrice";
 
 export function handleV1(event: V1): void {
@@ -154,7 +155,7 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
       shortValue,
     ]),
     ["marketIndex", "totalValueLockedInMarket", "longValue", "shortValue"],
-    ["uint256", "uint256", "uint256", "uint256"],
+    ["uint32", "uint256", "uint256", "uint256"],
     [],
     []
   );
@@ -351,7 +352,7 @@ export function handleFeesChanges(event: FeesChanges): void {
       "baseExitFee",
       "badLiquidityExitFee",
     ],
-    ["uint256", "uint256", "uint256", "uint256", "uint256"],
+    ["uint32", "uint256", "uint256", "uint256", "uint256"],
     [],
     []
   );
@@ -381,26 +382,17 @@ export function handlePriceUpdate(event: PriceUpdate): void {
       user.toHex(),
     ]),
     ["marketIndex", "newPrice", "oldPrice", "user"],
-    ["uint256", "uint256", "uint256", "address"],
+    ["uint32", "uint256", "uint256", "address"],
     [user],
     []
   );
-}
-
-function getMarketSideString(marketEnum: i32): string {
-  if (marketEnum == 0) {
-    return MARKET_SIDE_LONG;
-  } else {
-    return MARKET_SIDE_SHORT;
-  }
 }
 
 export function handleNextPriceDeposit(event: NextPriceDeposit): void {
   let depositAdded = event.params.depositAdded;
   let marketIndex = event.params.marketIndex;
   let oracleUpdateIndex = event.params.oracleUpdateIndex;
-  let syntheticTokenTypeInt = event.params.syntheticTokenType;
-  let syntheticTokenType = getMarketSideString(syntheticTokenTypeInt);
+  let isLong = event.params.isLong;
   let userAddress = event.params.user;
 
   let user = getUser(userAddress);
@@ -412,7 +404,7 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
     oracleUpdateIndex,
     depositAdded,
     ACTION_MINT,
-    syntheticTokenType,
+    isLong,
     event
   );
 
@@ -450,15 +442,9 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
       depositAdded,
       marketIndex,
       oracleUpdateIndex,
-    ]).concat([syntheticTokenType, user.id]),
-    [
-      "depositAdded",
-      "marketIndex",
-      "oracleUpdateIndex",
-      "syntheticTokenType",
-      "user",
-    ],
-    ["uint256", "uint32", "uint256", "MarketSide", "address"],
+    ]).concat([isLong ? "true" : "false", user.id]),
+    ["depositAdded", "marketIndex", "oracleUpdateIndex", "isLong", "user"],
+    ["uint256", "uint32", "uint256", "bool", "address"],
     [userAddress],
     []
   );
@@ -468,8 +454,7 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
   let depositAdded = event.params.synthRedeemed;
   let marketIndex = event.params.marketIndex;
   let oracleUpdateIndex = event.params.oracleUpdateIndex;
-  let syntheticTokenTypeInt = event.params.syntheticTokenType;
-  let syntheticTokenType = getMarketSideString(syntheticTokenTypeInt);
+  let isLong = event.params.isLong;
   let userAddress = event.params.user;
 
   let user = getUser(userAddress);
@@ -481,7 +466,7 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
     oracleUpdateIndex,
     depositAdded,
     ACTION_REDEEM,
-    syntheticTokenType,
+    isLong,
     event
   );
 
@@ -504,15 +489,9 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
       depositAdded,
       marketIndex,
       oracleUpdateIndex,
-    ]).concat([syntheticTokenType, user.id]),
-    [
-      "synthRedeemed",
-      "marketIndex",
-      "oracleUpdateIndex",
-      "syntheticTokenType",
-      "user",
-    ],
-    ["uint256", "uint32", "uint256", "MarketSide", "address"],
+    ]).concat([isLong ? "true" : "false", user.id]),
+    ["synthRedeemed", "marketIndex", "oracleUpdateIndex", "isLong", "user"],
+    ["uint256", "uint32", "uint256", "bool", "address"],
     [userAddress],
     []
   );
@@ -522,20 +501,28 @@ export function handleNewMarketLaunchedAndSeeded(
   event: NewMarketLaunchedAndSeeded
 ): void {
   // TODO - need to include the market seed initially
+  // @JasoonS you'll need to explain what's needed / complete this 
   let marketIndex = event.params.marketIndex;
+  let initialSeed = event.params.initialSeed;
 
-
-  // @chris please fill in the saveEventToStateChange for this function
   saveEventToStateChange(
     event,
     "NewMarketLaunchedAndSeeded",
-    [marketIndex.toString()],
-    ["marketIndex"],
-    ["uint32"],
+    [
+      marketIndex.toString(),
+      initialSeed.toHex(),
+    ],
+    [
+      "marketIndex",
+      "initialMarketSeed",
+    ],
+    [
+      "uint32",
+      "uint256",
+    ],
     [],
     []
   );
-  
 }
 
 export function removeFromArrayAtIndex(
@@ -559,72 +546,81 @@ export function handleBatchedActionsSettled(
   let redeemPriceSnapshotLong = event.params.redeemPriceSnapshotLong;
   let redeemPriceSnapshotShort = event.params.redeemPriceSnapshotShort;
 
-  let executedTimestamp = event.block.timestamp;
+  let batchExists = doesBatchExist(marketIndex, updateIndex);
+  if (batchExists) {
+    let executedTimestamp = event.block.timestamp;
 
-  let syntheticMarket = getSyntheticMarket(marketIndex);
-  let longTokenId = syntheticMarket.syntheticLong;
-  let shortTokenId = syntheticMarket.syntheticShort;
+    let syntheticMarket = getSyntheticMarket(marketIndex);
+    let longTokenId = syntheticMarket.syntheticLong;
+    let shortTokenId = syntheticMarket.syntheticShort;
 
-  let syntheticTokenLong = getSyntheticTokenById(longTokenId);
-  let syntheticTokenShort = getSyntheticTokenById(shortTokenId);
+    let syntheticTokenLong = getSyntheticTokenById(longTokenId);
+    let syntheticTokenShort = getSyntheticTokenById(shortTokenId);
 
-  let batchedNextPriceExec = getBatchedNextPriceExec(marketIndex, updateIndex);
-
-  batchedNextPriceExec.mintPriceSnapshotLong = mintPriceSnapshotLong;
-  batchedNextPriceExec.mintPriceSnapshotShort = mintPriceSnapshotShort;
-  batchedNextPriceExec.redeemPriceSnapshotLong = redeemPriceSnapshotLong;
-  batchedNextPriceExec.redeemPriceSnapshotShort = redeemPriceSnapshotShort;
-  batchedNextPriceExec.executedTimestamp = executedTimestamp;
-
-  let linkedUserNextPriceActions =
-    batchedNextPriceExec.linkedUserNextPriceActions;
-  let numberOfUsersInBatch = linkedUserNextPriceActions.length;
-
-  for (let i = 0; i < numberOfUsersInBatch; ++i) {
-    let userNextPriceActionId: string = linkedUserNextPriceActions[i];
-
-    let userNextPriceAction = getUserNextPriceActionById(userNextPriceActionId);
-    userNextPriceAction.confirmedTimestamp = event.block.timestamp;
-    userNextPriceAction.save();
-
-    let userAddress = Address.fromString(userNextPriceAction.user);
-    let user = getUser(userAddress);
-
-    user.pendingNextPriceActions = removeFromArrayAtIndex(
-      user.pendingNextPriceActions,
-      user.pendingNextPriceActions.indexOf(userNextPriceActionId)
+    let batchedNextPriceExec = getBatchedNextPriceExec(
+      marketIndex,
+      updateIndex
     );
 
-    user.confirmedNextPriceActions = user.confirmedNextPriceActions.concat([
-      userNextPriceActionId,
-    ]);
+    batchedNextPriceExec.mintPriceSnapshotLong = mintPriceSnapshotLong;
+    batchedNextPriceExec.mintPriceSnapshotShort = mintPriceSnapshotShort;
+    batchedNextPriceExec.redeemPriceSnapshotLong = redeemPriceSnapshotLong;
+    batchedNextPriceExec.redeemPriceSnapshotShort = redeemPriceSnapshotShort;
+    batchedNextPriceExec.executedTimestamp = executedTimestamp;
 
-    let tokensMintedLong = userNextPriceAction.amountPaymentTokenForDepositLong
-      .times(TEN_TO_THE_18)
-      .div(mintPriceSnapshotLong);
-    let tokensMintedShort = userNextPriceAction.amountPaymentTokenForDepositShort
-      .times(TEN_TO_THE_18)
-      .div(mintPriceSnapshotShort);
+    let linkedUserNextPriceActions =
+      batchedNextPriceExec.linkedUserNextPriceActions;
+    let numberOfUsersInBatch = linkedUserNextPriceActions.length;
 
-    increaseUserMints(user, syntheticTokenLong, tokensMintedLong);
-    increaseUserMints(user, syntheticTokenShort, tokensMintedShort);
+    for (let i = 0; i < numberOfUsersInBatch; ++i) {
+      let userNextPriceActionId: string = linkedUserNextPriceActions[i];
 
-    let paymentTokensToRedeemLong = userNextPriceAction.amountSynthTokenForWithdrawalLong
-      .times(redeemPriceSnapshotLong)
-      .div(TEN_TO_THE_18);
-    let paymentTokensToRedeemShort = userNextPriceAction.amountSynthTokenForWithdrawalShort
-      .times(redeemPriceSnapshotShort)
-      .div(TEN_TO_THE_18);
-    // TODO: read the below warning
-    log.warning(
-      "TODO: WARNING: we are not handling the redeems yet! Think through",
-      []
-    );
+      let userNextPriceAction = getUserNextPriceActionById(
+        userNextPriceActionId
+      );
+      userNextPriceAction.confirmedTimestamp = event.block.timestamp;
+      userNextPriceAction.save();
 
-    user.save();
+      let userAddress = Address.fromString(userNextPriceAction.user);
+      let user = getUser(userAddress);
+
+      user.pendingNextPriceActions = removeFromArrayAtIndex(
+        user.pendingNextPriceActions,
+        user.pendingNextPriceActions.indexOf(userNextPriceActionId)
+      );
+
+      user.confirmedNextPriceActions = user.confirmedNextPriceActions.concat([
+        userNextPriceActionId,
+      ]);
+
+      let tokensMintedLong = userNextPriceAction.amountPaymentTokenForDepositLong
+        .times(TEN_TO_THE_18)
+        .div(mintPriceSnapshotLong);
+      let tokensMintedShort = userNextPriceAction.amountPaymentTokenForDepositShort
+        .times(TEN_TO_THE_18)
+        .div(mintPriceSnapshotShort);
+
+      increaseUserMints(user, syntheticTokenLong, tokensMintedLong);
+      increaseUserMints(user, syntheticTokenShort, tokensMintedShort);
+
+      let paymentTokensToRedeemLong = userNextPriceAction.amountSynthTokenForWithdrawalLong
+        .times(redeemPriceSnapshotLong)
+        .div(TEN_TO_THE_18);
+      let paymentTokensToRedeemShort = userNextPriceAction.amountSynthTokenForWithdrawalShort
+        .times(redeemPriceSnapshotShort)
+        .div(TEN_TO_THE_18);
+      // TODO: read the below warning
+      log.warning(
+        "TODO: WARNING: we are not handling the redeems yet! Think through",
+        []
+      );
+
+      user.save();
+    }
+
+    batchedNextPriceExec.save();
   }
 
-  batchedNextPriceExec.save();
   saveEventToStateChange(
     event,
     "BatchedActionsSettled",
@@ -632,14 +628,9 @@ export function handleBatchedActionsSettled(
       marketIndex,
       updateIndex,
       mintPriceSnapshotLong,
-      mintPriceSnapshotShort,
+      mintPriceSnapshotShort
     ]),
-    [
-      "marketIndex",
-      "updateIndex",
-      "mintPriceSnapshotLong",
-      "mintPriceSnapshotShort",
-    ],
+    ["marketIndex", "updateIndex", "mintPriceSnapshotLong", "mintPriceSnapshotShort"],
     ["uint32", "uint256", "uint256", "uint256"],
     [],
     []
@@ -676,9 +667,12 @@ export function handleExecuteNextPriceSettlementsUser(
   saveEventToStateChange(
     event,
     "ExecuteNextPriceSettlementsUser",
-    [marketIndex.toString(), user.id],
+    [
+      marketIndex.toString(),
+      userAddress.toHex(),
+    ],
     ["marketIndex", "userAddress"],
-    ["uint256", "address"],
+    ["uint32", "address"],
     [userAddress],
     []
   );
@@ -757,7 +751,7 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
     "TokenPriceRefreshed",
     bigIntArrayToStringArray([marketIndex, longTokenPrice, shortTokenPrice]),
     ["marketIndex", "longTokenPrice", "shortTokenPrice"],
-    ["uint256", "uint256", "uint256"],
+    ["uint32", "uint256", "uint256"],
     [],
     []
   );
