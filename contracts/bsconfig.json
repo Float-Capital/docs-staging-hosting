@@ -1,9 +1,7 @@
 {
   "name": "float-contracts",
   "namespace": false,
-  "bs-dependencies": [
-    "bs-mocha"
-  ],
+  "bs-dependencies": [],
   "ppx-flags": [
     "bs-let/ppx"
   ],

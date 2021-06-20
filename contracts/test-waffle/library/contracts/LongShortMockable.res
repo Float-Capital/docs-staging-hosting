@@ -54,22 +54,21 @@ type baseExitFeeReturn = Ethers.BigNumber.t
 @send
 external baseExitFee: (t, int) => JsPromise.t<baseExitFeeReturn> = "baseExitFee"
 
-type batchedNextPricePaymentTokenToDepositReturn = Ethers.BigNumber.t
+type batchedNextPriceDepositAmountReturn = Ethers.BigNumber.t
 @send
-external batchedNextPricePaymentTokenToDeposit: (
+external batchedNextPriceDepositAmount: (
   t,
   int,
-  int,
-) => JsPromise.t<batchedNextPricePaymentTokenToDepositReturn> =
-  "batchedNextPricePaymentTokenToDeposit"
+  bool,
+) => JsPromise.t<batchedNextPriceDepositAmountReturn> = "batchedNextPriceDepositAmount"
 
-type batchedNextPriceSynthToRedeemReturn = Ethers.BigNumber.t
+type batchedNextPriceSynthRedeemAmountReturn = Ethers.BigNumber.t
 @send
-external batchedNextPriceSynthToRedeem: (
+external batchedNextPriceSynthRedeemAmount: (
   t,
   int,
-  int,
-) => JsPromise.t<batchedNextPriceSynthToRedeemReturn> = "batchedNextPriceSynthToRedeem"
+  bool,
+) => JsPromise.t<batchedNextPriceSynthRedeemAmountReturn> = "batchedNextPriceSynthRedeemAmount"
 
 @send
 external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
@@ -131,7 +130,7 @@ external getUsersPendingBalance: (
   t,
   ~user: Ethers.ethAddress,
   ~marketIndex: int,
-  ~syntheticTokenType: int,
+  ~isLong: bool,
 ) => JsPromise.t<getUsersPendingBalanceReturn> = "getUsersPendingBalance"
 
 @send
@@ -160,13 +159,13 @@ type latestMarketReturn = int
 @send
 external latestMarket: t => JsPromise.t<latestMarketReturn> = "latestMarket"
 
-type latestUpdateIndexReturn = Ethers.BigNumber.t
-@send
-external latestUpdateIndex: (t, int) => JsPromise.t<latestUpdateIndexReturn> = "latestUpdateIndex"
-
 type marketExistsReturn = bool
 @send
 external marketExists: (t, int) => JsPromise.t<marketExistsReturn> = "marketExists"
+
+type marketUpdateIndexReturn = Ethers.BigNumber.t
+@send
+external marketUpdateIndex: (t, int) => JsPromise.t<marketUpdateIndexReturn> = "marketUpdateIndex"
 
 @send
 external mintLongNextPrice: (
@@ -180,8 +179,8 @@ type mintPriceSnapshotReturn = Ethers.BigNumber.t
 external mintPriceSnapshot: (
   t,
   int,
+  bool,
   Ethers.BigNumber.t,
-  int,
 ) => JsPromise.t<mintPriceSnapshotReturn> = "mintPriceSnapshot"
 
 @send
@@ -217,8 +216,8 @@ type redeemPriceSnapshotReturn = Ethers.BigNumber.t
 external redeemPriceSnapshot: (
   t,
   int,
+  bool,
   Ethers.BigNumber.t,
-  int,
 ) => JsPromise.t<redeemPriceSnapshotReturn> = "redeemPriceSnapshot"
 
 @send
@@ -239,19 +238,19 @@ type stakerReturn = Ethers.ethAddress
 @send
 external staker: t => JsPromise.t<stakerReturn> = "staker"
 
-type syntheticTokenBackedValueReturn = Ethers.BigNumber.t
+type syntheticTokenPoolValueReturn = Ethers.BigNumber.t
 @send
-external syntheticTokenBackedValue: (t, int, int) => JsPromise.t<syntheticTokenBackedValueReturn> =
-  "syntheticTokenBackedValue"
+external syntheticTokenPoolValue: (t, int, bool) => JsPromise.t<syntheticTokenPoolValueReturn> =
+  "syntheticTokenPoolValue"
 
 type syntheticTokenPriceReturn = Ethers.BigNumber.t
 @send
-external syntheticTokenPrice: (t, int, int) => JsPromise.t<syntheticTokenPriceReturn> =
+external syntheticTokenPrice: (t, int, bool) => JsPromise.t<syntheticTokenPriceReturn> =
   "syntheticTokenPrice"
 
 type syntheticTokensReturn = Ethers.ethAddress
 @send
-external syntheticTokens: (t, int, int) => JsPromise.t<syntheticTokensReturn> = "syntheticTokens"
+external syntheticTokens: (t, int, bool) => JsPromise.t<syntheticTokensReturn> = "syntheticTokens"
 
 type tokenFactoryReturn = Ethers.ethAddress
 @send
@@ -294,23 +293,23 @@ external userCurrentNextPriceUpdateIndex: (
   Ethers.ethAddress,
 ) => JsPromise.t<userCurrentNextPriceUpdateIndexReturn> = "userCurrentNextPriceUpdateIndex"
 
-type userNextPriceDepositAmountsReturn = Ethers.BigNumber.t
+type userNextPriceDepositAmountReturn = Ethers.BigNumber.t
 @send
-external userNextPriceDepositAmounts: (
+external userNextPriceDepositAmount: (
   t,
   int,
+  bool,
   Ethers.ethAddress,
-  int,
-) => JsPromise.t<userNextPriceDepositAmountsReturn> = "userNextPriceDepositAmounts"
+) => JsPromise.t<userNextPriceDepositAmountReturn> = "userNextPriceDepositAmount"
 
-type userNextPriceRedemptionsReturn = Ethers.BigNumber.t
+type userNextPriceRedemptionAmountReturn = Ethers.BigNumber.t
 @send
-external userNextPriceRedemptions: (
+external userNextPriceRedemptionAmount: (
   t,
   int,
+  bool,
   Ethers.ethAddress,
-  int,
-) => JsPromise.t<userNextPriceRedemptionsReturn> = "userNextPriceRedemptions"
+) => JsPromise.t<userNextPriceRedemptionAmountReturn> = "userNextPriceRedemptionAmount"
 
 type yieldManagersReturn = Ethers.ethAddress
 @send

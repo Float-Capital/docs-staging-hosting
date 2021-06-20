@@ -156,12 +156,12 @@ const createSynthetic = async (
   );
 
   const longAddress = await longShort.syntheticTokens.call(
-    0,
-    currentMarketIndex
+    currentMarketIndex,
+    0
   );
   const shortAddress = await longShort.syntheticTokens.call(
-    1,
-    currentMarketIndex
+    currentMarketIndex,
+    1
   );
   let longToken = await SyntheticToken.at(longAddress);
   let shortToken = await SyntheticToken.at(shortAddress);
@@ -323,13 +323,16 @@ const logGasPrices = async (
   console.log(`Cost on BSC: $${maticCost}`);
 };
 
-const totalValueLockedInMarket = async (
-    longShort,
-    marketIndex,
-) => {
-    const longValue = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
-    const shortValue = await longShort.syntheticTokenBackedValue.call(1, marketIndex);
-    return (new BN(longValue)).add(new BN(shortValue));
+const totalValueLockedInMarket = async (longShort, marketIndex) => {
+  const longValue = await longShort.syntheticTokenBackedValue.call(
+    0,
+    marketIndex
+  );
+  const shortValue = await longShort.syntheticTokenBackedValue.call(
+    1,
+    marketIndex
+  );
+  return new BN(longValue).add(new BN(shortValue));
 };
 
 module.exports = {

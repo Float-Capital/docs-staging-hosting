@@ -3,8 +3,6 @@
 pragma solidity 0.8.3;
 
 abstract contract ILongShort {
-    enum MarketSide {Long, Short}
-
     function _updateSystemState(uint32 marketIndex) external virtual;
 
     function _updateSystemStateMulti(uint32[] calldata marketIndex)
@@ -14,7 +12,7 @@ abstract contract ILongShort {
     function getUsersPendingBalance(
         address user,
         uint32 marketIndex,
-        MarketSide syntheticTokenType
+        bool isLong
     ) external view virtual returns (uint256 pendingBalance);
 
     function executeOutstandingNextPriceSettlementsUser(

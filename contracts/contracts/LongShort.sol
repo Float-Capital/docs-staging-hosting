@@ -20,27 +20,13 @@ import "./interfaces/IOracleManager.sol";
  *  - Value movements could be derived from tradional or alternative asset classes, derivates, binary outcomes, etc...
  *  - Incentive mechansim providing fees to liquidity makers (users on both sides of order book)
  */
+
 contract LongShort is ILongShort, Initializable {
-    ////////////////////////////////////
-    //////// VARIABLES /////////////////
-    ////////////////////////////////////
+    /*╔═════════════════════════════════╗
+      ║             VARIABLES           ║
+      ╚═════════════════════════════════╝*/
 
-    // Global state.
-    address public admin; // This will likely be the Gnosis safe
-    uint32 public latestMarket;
-    mapping(uint32 => bool) public marketExists;
-
-    // Treasury contract that accrued fees and yield are sent to.
-    address public treasury;
-
-    // Factory for dynamically creating synthetic long/short tokens.
-    ITokenFactory public tokenFactory;
-
-    // Staker for controlling governance token issuance.
-    IStaker public staker;
-    uint256[45] private __globalStateGap;
-
-    // Fixed-precision constants.
+    // Fixed-precision constants ////////////////////////////////
     address public constant DEAD_ADDRESS =
         0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
     uint256 public constant TEN_TO_THE_18 = 1e18;
@@ -48,56 +34,58 @@ contract LongShort is ILongShort, Initializable {
     uint256 public constant feeUnitsOfPrecision = 10000;
     uint256[45] private __constantsGap;
 
-    // Market state.
-    mapping(MarketSide => mapping(uint32 => uint256))
-        public syntheticTokenBackedValue;
+    // Global state ////////////////////////////////////////////
+    address public admin;
+    address public treasury;
+    uint32 public latestMarket;
+
+    IStaker public staker;
+    ITokenFactory public tokenFactory;
+    uint256[45] private __globalStateGap;
+
+    // Market specific /////////////////////////////////////////
+    mapping(uint32 => bool) public marketExists;
+    mapping(uint32 => uint256) public assetPrice;
+    mapping(uint32 => uint256) public marketUpdateIndex;
+
     mapping(uint32 => uint256) public totalValueLockedInYieldManager;
     mapping(uint32 => uint256) public totalValueReservedForTreasury;
-    mapping(uint32 => uint256) public assetPrice;
-    mapping(MarketSide => mapping(uint32 => uint256))
-        public syntheticTokenPrice; // NOTE: cannot deprecate this value and use the mintPriceSnapshot values instead since these values change inbetween assetPrice updates (when yield is collected)
     mapping(uint32 => IERC20) public fundTokens;
     mapping(uint32 => IYieldManager) public yieldManagers;
     mapping(uint32 => IOracleManager) public oracleManagers;
-    uint256[45] private __marketStateGap;
 
-    // Synthetic long/short tokens users can mint and redeem.
-    mapping(MarketSide => mapping(uint32 => ISyntheticToken))
-        public syntheticTokens;
-    uint256[45] private __marketSynthsGap;
-
-    // Fees for minting/redeeming long/short tokens. Users are penalised
-    // with extra fees for imbalancing the market.
     mapping(uint32 => uint256) public baseEntryFee;
     mapping(uint32 => uint256) public badLiquidityEntryFee;
     mapping(uint32 => uint256) public baseExitFee;
     mapping(uint32 => uint256) public badLiquidityExitFee;
-    uint256[45] private __feeInfo;
 
-    // The following 3 values update with every price update
-    mapping(uint32 => uint256) public latestUpdateIndex;
-    // These two can be grouped together in a struct
-    mapping(uint32 => mapping(uint256 => mapping(MarketSide => uint256)))
-        public mintPriceSnapshot;
-    mapping(uint32 => mapping(uint256 => mapping(MarketSide => uint256)))
+    // Market + position (long/short) specific /////////////////
+    mapping(uint32 => mapping(bool => ISyntheticToken)) public syntheticTokens;
+    mapping(uint32 => mapping(bool => uint256)) public syntheticTokenPoolValue;
+    mapping(uint32 => mapping(bool => uint256)) public syntheticTokenPrice;
+
+    mapping(uint32 => mapping(bool => mapping(uint256 => uint256)))
+        public syntheticTokenPriceSnapshot;
+    mapping(uint32 => mapping(bool => mapping(uint256 => uint256)))
         public redeemPriceSnapshot;
 
-    // These two can be grouped together in a struct
-    mapping(uint32 => mapping(MarketSide => uint256))
-        public batchedNextPricePaymentTokenToDeposit;
-    mapping(uint32 => mapping(MarketSide => uint256))
-        public batchedNextPriceSynthToRedeem;
+    mapping(uint32 => mapping(bool => uint256))
+        public batchedAmountOfTokensToDeposit;
+    mapping(uint32 => mapping(bool => uint256))
+        public batchedAmountOfSynthTokensToRedeem;
 
-    mapping(uint32 => mapping(address => mapping(MarketSide => uint256)))
-        public userNextPriceRedemptions;
-    mapping(uint32 => mapping(address => mapping(MarketSide => uint256)))
-        public userNextPriceDepositAmounts;
+    // User specific ///////////////////////////////////////////
     mapping(uint32 => mapping(address => uint256))
         public userCurrentNextPriceUpdateIndex;
 
-    ////////////////////////////////////
-    /////////// EVENTS /////////////////
-    ////////////////////////////////////
+    mapping(uint32 => mapping(bool => mapping(address => uint256)))
+        public userNextPriceDepositAmount;
+    mapping(uint32 => mapping(bool => mapping(address => uint256)))
+        public userNextPriceRedemptionAmount;
+
+    /*╔═════════════════════════════════╗
+      ║             EVENTS              ║
+      ╚═════════════════════════════════╝*/
 
     event V1(
         address admin,
@@ -142,7 +130,7 @@ contract LongShort is ILongShort, Initializable {
 
     event NextPriceRedeem(
         uint32 marketIndex,
-        MarketSide syntheticTokenType,
+        bool isLong,
         uint256 synthRedeemed,
         address user,
         uint256 oracleUpdateIndex
@@ -159,7 +147,7 @@ contract LongShort is ILongShort, Initializable {
 
     event NextPriceDeposit(
         uint32 marketIndex,
-        MarketSide syntheticTokenType,
+        bool isLong,
         uint256 depositAdded,
         address user,
         uint256 oracleUpdateIndex
@@ -183,9 +171,9 @@ contract LongShort is ILongShort, Initializable {
 
     event ExecuteNextPriceSettlementsUser(address user, uint32 marketIndex);
 
-    ////////////////////////////////////
-    /////////// MODIFIERS //////////////
-    ////////////////////////////////////
+    /*╔═════════════════════════════════╗
+      ║             MODIFIERS           ║
+      ╚═════════════════════════════════╝*/
 
     /**
      * Necessary to update system state before any contract actions (deposits / withdraws)
@@ -206,32 +194,11 @@ contract LongShort is ILongShort, Initializable {
         _;
     }
 
-    modifier isCorrectSynth(
-        uint32 marketIndex,
-        MarketSide syntheticTokenType,
-        ISyntheticToken syntheticToken
-    ) {
-        if (syntheticTokenType == ILongShort.MarketSide.Long) {
-            require(
-                syntheticTokens[MarketSide.Long][marketIndex] == syntheticToken,
-                "Incorrect synthetic token"
-            );
-        } else {
-            require(
-                syntheticTokens[MarketSide.Short][marketIndex] ==
-                    syntheticToken,
-                "Incorrect synthetic token"
-            );
-        }
-        _;
-    }
-
     modifier executeOutstandingNextPriceSettlements(
         address user,
         uint32 marketIndex
     ) virtual {
         _executeOutstandingNextPriceSettlements(user, marketIndex);
-
         _;
     }
 
@@ -241,9 +208,9 @@ contract LongShort is ILongShort, Initializable {
         _;
     }
 
-    ////////////////////////////////////
-    ///// CONTRACT SET-UP //////////////
-    ////////////////////////////////////
+    /*╔═════════════════════════════════╗
+      ║       CONTRACT SET-UP           ║
+      ╚═════════════════════════════════╝*/
 
     function initialize(
         address _admin,
@@ -264,9 +231,9 @@ contract LongShort is ILongShort, Initializable {
         );
     }
 
-    ////////////////////////////////////
-    /// MULTISIG ADMIN FUNCTIONS ///////
-    ////////////////////////////////////
+    /*╔═════════════════════════════════╗
+      ║       MULTI-SIG ADMIN           ║
+      ╚═════════════════════════════════╝*/
 
     function changeAdmin(address _admin) external adminOnly {
         admin = _admin;
@@ -331,6 +298,10 @@ contract LongShort is ILongShort, Initializable {
         );
     }
 
+    /*╔═════════════════════════════════╗
+      ║       MARKET CREATION           ║
+      ╚═════════════════════════════════╝*/
+
     /**
      * Creates an entirely new long/short market tracking an underlying
      * oracle price. Make sure the synthetic names/symbols are unique.
@@ -345,7 +316,9 @@ contract LongShort is ILongShort, Initializable {
         latestMarket++;
 
         // Create new synthetic long token.
-        syntheticTokens[MarketSide.Long][latestMarket] = ISyntheticToken(
+        syntheticTokens[latestMarket][
+            true /*long*/
+        ] = ISyntheticToken(
             tokenFactory.createTokenLong(
                 syntheticName,
                 syntheticSymbol,
@@ -355,7 +328,9 @@ contract LongShort is ILongShort, Initializable {
         );
 
         // Create new synthetic short token.
-        syntheticTokens[MarketSide.Short][latestMarket] = ISyntheticToken(
+        syntheticTokens[latestMarket][
+            false /*short*/
+        ] = ISyntheticToken(
             tokenFactory.createTokenShort(
                 syntheticName,
                 syntheticSymbol,
@@ -365,8 +340,12 @@ contract LongShort is ILongShort, Initializable {
         );
 
         // Initial market state.
-        syntheticTokenPrice[MarketSide.Long][latestMarket] = TEN_TO_THE_18;
-        syntheticTokenPrice[MarketSide.Short][latestMarket] = TEN_TO_THE_18;
+        syntheticTokenPrice[latestMarket][
+            true /*long*/
+        ] = TEN_TO_THE_18;
+        syntheticTokenPrice[latestMarket][
+            false /*short*/
+        ] = TEN_TO_THE_18;
         fundTokens[latestMarket] = IERC20(_fundToken);
         yieldManagers[latestMarket] = IYieldManager(_yieldManager);
         oracleManagers[latestMarket] = IOracleManager(_oracleManager);
@@ -376,8 +355,16 @@ contract LongShort is ILongShort, Initializable {
 
         emit SyntheticTokenCreated(
             latestMarket,
-            address(syntheticTokens[MarketSide.Long][latestMarket]),
-            address(syntheticTokens[MarketSide.Short][latestMarket]),
+            address(
+                syntheticTokens[latestMarket][
+                    true /*long*/
+                ]
+            ),
+            address(
+                syntheticTokens[latestMarket][
+                    false /*short*/
+                ]
+            ),
             _fundToken,
             assetPrice[latestMarket],
             syntheticName,
@@ -386,7 +373,7 @@ contract LongShort is ILongShort, Initializable {
         );
     }
 
-    function seedMarketInitially(uint256 initialMarketSeed, uint32 marketIndex)
+    function _seedMarketInitially(uint256 initialMarketSeed, uint32 marketIndex)
         internal
     {
         require(
@@ -397,20 +384,20 @@ contract LongShort is ILongShort, Initializable {
 
         _lockFundsInMarket(marketIndex, initialMarketSeed * 2);
 
-        syntheticTokens[MarketSide.Long][marketIndex].mint(
-            DEAD_ADDRESS,
-            initialMarketSeed
-        );
-        syntheticTokens[MarketSide.Short][marketIndex].mint(
-            DEAD_ADDRESS,
-            initialMarketSeed
-        );
+        syntheticTokens[latestMarket][
+            true /*long*/
+        ]
+            .mint(DEAD_ADDRESS, initialMarketSeed);
+        syntheticTokens[latestMarket][
+            false /*short*/
+        ]
+            .mint(DEAD_ADDRESS, initialMarketSeed);
 
-        syntheticTokenBackedValue[MarketSide.Long][
-            marketIndex
+        syntheticTokenPoolValue[marketIndex][
+            true /*long*/
         ] = initialMarketSeed;
-        syntheticTokenBackedValue[MarketSide.Short][
-            marketIndex
+        syntheticTokenPoolValue[marketIndex][
+            false /*short*/
         ] = initialMarketSeed;
 
         emit NewMarketLaunchedAndSeeded(marketIndex, initialMarketSeed);
@@ -441,28 +428,76 @@ contract LongShort is ILongShort, Initializable {
         // Add new staker funds with fresh synthetic tokens.
         staker.addNewStakingFund(
             latestMarket,
-            syntheticTokens[MarketSide.Long][marketIndex],
-            syntheticTokens[MarketSide.Short][marketIndex],
+            syntheticTokens[latestMarket][
+                true /*long*/
+            ],
+            syntheticTokens[latestMarket][
+                false /*short*/
+            ],
             kInitialMultiplier,
             kPeriod
         );
 
-        seedMarketInitially(initialMarketSeed, marketIndex);
+        _seedMarketInitially(initialMarketSeed, marketIndex);
     }
 
-    ////////////////////////////////////
-    //////// HELPER FUNCTIONS //////////
-    ////////////////////////////////////
+    /*╔═════════════════════════════════╗
+      ║       GETTER FUNCTIONS          ║
+      ╚═════════════════════════════════╝*/
 
-    function getOtherSynthType(MarketSide synthTokenType)
+    function _getPrice(uint256 amountSynth, uint256 amountPaymentToken)
         internal
-        view
-        returns (MarketSide)
+        pure
+        returns (uint256)
     {
-        if (synthTokenType == MarketSide.Long) {
-            return MarketSide.Short;
+        return (amountPaymentToken * TEN_TO_THE_18) / amountSynth;
+    }
+
+    function _getAmountPaymentToken(uint256 amountSynth, uint256 price)
+        internal
+        pure
+        returns (uint256)
+    {
+        return (amountSynth * price) / TEN_TO_THE_18;
+    }
+
+    function _getAmountSynthToken(uint256 amountPaymentToken, uint256 price)
+        internal
+        pure
+        returns (uint256)
+    {
+        return (amountPaymentToken * TEN_TO_THE_18) / price;
+    }
+
+    function getUsersPendingBalance(
+        address user,
+        uint32 marketIndex,
+        bool isLong
+    )
+        external
+        view
+        override
+        assertMarketExists(marketIndex)
+        returns (uint256 pendingBalance)
+    {
+        if (
+            userCurrentNextPriceUpdateIndex[marketIndex][user] != 0 &&
+            userCurrentNextPriceUpdateIndex[marketIndex][user] <=
+            marketUpdateIndex[marketIndex]
+        ) {
+            // Update is still nextPrice but not past the next oracle update - display the amount the user would get if they executed immediately
+            uint256 amountPaymentTokenDeposited =
+                userNextPriceDepositAmount[marketIndex][isLong][user];
+
+            uint256 tokens =
+                _getAmountSynthToken(
+                    amountPaymentTokenDeposited,
+                    syntheticTokenPrice[marketIndex][isLong]
+                );
+
+            return tokens;
         } else {
-            return MarketSide.Long;
+            return 0;
         }
     }
 
@@ -480,23 +515,37 @@ contract LongShort is ILongShort, Initializable {
         uint256 marketPcnt; // fixed-precision scale of 10000
 
         uint256 totalValueLockedInMarket =
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex];
+            syntheticTokenPoolValue[marketIndex][
+                true /*long*/
+            ] +
+                syntheticTokenPoolValue[marketIndex][
+                    false /*short*/
+                ];
 
         if (
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] >
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex]
+            syntheticTokenPoolValue[marketIndex][
+                true /*long*/
+            ] >
+            syntheticTokenPoolValue[marketIndex][
+                false /*short*/
+            ]
         ) {
             marketPcnt =
-                ((syntheticTokenBackedValue[MarketSide.Long][marketIndex] -
-                    syntheticTokenBackedValue[MarketSide.Short][marketIndex]) *
-                    10000) /
+                ((syntheticTokenPoolValue[marketIndex][
+                    true /*long*/
+                ] -
+                    syntheticTokenPoolValue[marketIndex][
+                        false /*short*/
+                    ]) * 10000) /
                 totalValueLockedInMarket;
         } else {
             marketPcnt =
-                ((syntheticTokenBackedValue[MarketSide.Short][marketIndex] -
-                    syntheticTokenBackedValue[MarketSide.Long][marketIndex]) *
-                    10000) /
+                ((syntheticTokenPoolValue[marketIndex][
+                    false /*short*/
+                ] -
+                    syntheticTokenPoolValue[marketIndex][
+                        true /*long*/
+                    ]) * 10000) /
                 totalValueLockedInMarket;
         }
 
@@ -505,30 +554,6 @@ contract LongShort is ILongShort, Initializable {
         require(amount == marketAmount + treasuryAmount);
 
         return (marketAmount, treasuryAmount);
-    }
-
-    function getPrice(uint256 amountSynth, uint256 amountPaymentToken)
-        internal
-        pure
-        returns (uint256)
-    {
-        return (amountPaymentToken * TEN_TO_THE_18) / amountSynth;
-    }
-
-    function getAmountPaymentToken(uint256 amountSynth, uint256 price)
-        internal
-        pure
-        returns (uint256)
-    {
-        return (amountSynth * price) / TEN_TO_THE_18;
-    }
-
-    function getAmountSynthToken(uint256 amountPaymentToken, uint256 price)
-        internal
-        pure
-        returns (uint256)
-    {
-        return (amountPaymentToken * TEN_TO_THE_18) / price;
     }
 
     /**
@@ -544,9 +569,15 @@ contract LongShort is ILongShort, Initializable {
         // The percentage value that a position receives depends on the amount
         // of total market value taken up by the _opposite_ position.
         uint256 longPcnt =
-            (syntheticTokenBackedValue[MarketSide.Short][marketIndex] * 10000) /
-                (syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-                    syntheticTokenBackedValue[MarketSide.Short][marketIndex]);
+            (syntheticTokenPoolValue[marketIndex][
+                false /*short*/
+            ] * 10000) /
+                (syntheticTokenPoolValue[marketIndex][
+                    true /*long*/
+                ] +
+                    syntheticTokenPoolValue[marketIndex][
+                        false /*short*/
+                    ]);
 
         longAmount = (amount * longPcnt) / 10000;
         shortAmount = amount - longAmount;
@@ -554,33 +585,107 @@ contract LongShort is ILongShort, Initializable {
     }
 
     /**
+     * Calculates fees for the given mint/redeem amount. Users are penalised
+     * with higher fees for imbalancing the market.
+     */
+    // TODO STENT look at this again
+    // TODO: this function was written with immediate price in mind, rework this function to suit latest code
+    function getFeesGeneral(
+        uint32 marketIndex,
+        uint256 delta, // 1e18
+        bool synthTokenGainingDominanceIsLong,
+        uint256 baseFeePercent,
+        uint256 penaltyFeePercent
+    ) public view returns (uint256) {
+        uint256 baseFee = (delta * baseFeePercent) / feeUnitsOfPrecision;
+
+        if (
+            syntheticTokenPoolValue[marketIndex][
+                synthTokenGainingDominanceIsLong
+            ] >=
+            syntheticTokenPoolValue[marketIndex][
+                !synthTokenGainingDominanceIsLong
+            ]
+        ) {
+            // All funds are causing imbalance
+            return
+                baseFee + ((delta * penaltyFeePercent) / feeUnitsOfPrecision);
+        } else if (
+            syntheticTokenPoolValue[marketIndex][
+                synthTokenGainingDominanceIsLong
+            ] +
+                delta >
+            syntheticTokenPoolValue[marketIndex][
+                !synthTokenGainingDominanceIsLong
+            ]
+        ) {
+            uint256 amountImbalancing =
+                delta -
+                    (syntheticTokenPoolValue[marketIndex][
+                        !synthTokenGainingDominanceIsLong
+                    ] -
+                        syntheticTokenPoolValue[marketIndex][
+                            synthTokenGainingDominanceIsLong
+                        ]);
+            uint256 penaltyFee =
+                (amountImbalancing * penaltyFeePercent) / feeUnitsOfPrecision;
+
+            return baseFee + penaltyFee;
+        } else {
+            return baseFee;
+        }
+    }
+
+    /*╔═════════════════════════════════╗
+      ║       HELPER FUNCTIONS          ║
+      ╚═════════════════════════════════╝*/
+
+    /**
      * Adjusts the long/short token prices according to supply and value.
      */
     function _refreshTokenPrices(uint32 marketIndex) internal {
         uint256 longTokenSupply =
-            syntheticTokens[MarketSide.Long][marketIndex].totalSupply();
+            syntheticTokens[marketIndex][
+                true /*long*/
+            ]
+                .totalSupply();
 
         // supply should never be zero and burn address will always own a small amount
         if (longTokenSupply > 0) {
-            syntheticTokenPrice[MarketSide.Long][marketIndex] = getPrice(
+            syntheticTokenPrice[marketIndex][
+                true /*long*/
+            ] = _getPrice(
                 longTokenSupply,
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex]
+                syntheticTokenPoolValue[marketIndex][
+                    true /*long*/
+                ]
             );
         }
 
         uint256 shortTokenSupply =
-            syntheticTokens[MarketSide.Short][marketIndex].totalSupply();
+            syntheticTokens[marketIndex][
+                false /*short*/
+            ]
+                .totalSupply();
         if (shortTokenSupply > 0) {
-            syntheticTokenPrice[MarketSide.Short][marketIndex] = getPrice(
+            syntheticTokenPrice[marketIndex][
+                false /*short*/
+            ] = _getPrice(
                 shortTokenSupply,
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex]
+                syntheticTokenPoolValue[marketIndex][
+                    false /*short*/
+                ]
             );
         }
 
         emit TokenPriceRefreshed(
             marketIndex,
-            syntheticTokenPrice[MarketSide.Long][marketIndex],
-            syntheticTokenPrice[MarketSide.Short][marketIndex]
+            syntheticTokenPrice[marketIndex][
+                true /*long*/
+            ],
+            syntheticTokenPrice[marketIndex][
+                false /*short*/
+            ]
         );
     }
 
@@ -590,23 +695,12 @@ contract LongShort is ILongShort, Initializable {
         // Splits mostly to the weaker position to incentivise balance.
         (uint256 longAmount, uint256 shortAmount) =
             getMarketSplit(marketIndex, marketAmount);
-        syntheticTokenBackedValue[MarketSide.Long][marketIndex] += longAmount;
-        syntheticTokenBackedValue[MarketSide.Short][marketIndex] += shortAmount;
-    }
-
-    /**
-     * Controls what happens with mint/redeem fees.
-     */
-    // NOTE: only used in `handleBatchedNextPriceRedeems`
-    function _feesMechanism(uint32 marketIndex, uint256 totalFees) internal {
-        // Market gets a bigger share if the market is more imbalanced.
-        (uint256 marketAmount, uint256 treasuryAmount) =
-            getTreasurySplit(marketIndex, totalFees);
-
-        totalValueReservedForTreasury[marketIndex] += treasuryAmount;
-
-        _distributeMarketAmount(marketIndex, marketAmount);
-        emit FeesLevied(marketIndex, totalFees);
+        syntheticTokenPoolValue[marketIndex][
+            true /*long*/
+        ] += longAmount;
+        syntheticTokenPoolValue[marketIndex][
+            false /*short*/
+        ] += shortAmount;
     }
 
     /**
@@ -630,121 +724,80 @@ contract LongShort is ILongShort, Initializable {
         }
     }
 
-    function _minimum(uint256 A, uint256 B) internal view returns (int256) {
-        if (A < B) {
-            return int256(A);
-        } else {
-            return int256(B);
-        }
-    }
-
     function _adjustMarketBasedOnNewAssetPrice(
         uint32 marketIndex,
         int256 newAssetPrice
-    ) internal returns (bool didUpdate) {
+    ) internal {
         int256 oldAssetPrice = int256(assetPrice[marketIndex]);
 
-        if (oldAssetPrice == newAssetPrice) {
-            return false;
+        uint256 min;
+        if (
+            syntheticTokenPoolValue[marketIndex][
+                true /*long*/
+            ] <
+            syntheticTokenPoolValue[marketIndex][
+                false /*short*/
+            ]
+        ) {
+            min = syntheticTokenPoolValue[marketIndex][
+                true /*long*/
+            ];
+        } else {
+            min = syntheticTokenPoolValue[marketIndex][
+                false /*short*/
+            ];
         }
-
-        int256 min =
-            _minimum(
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex],
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex]
-            );
 
         int256 percentageChangeE18 =
             ((newAssetPrice - oldAssetPrice) * TEN_TO_THE_18_SIGNED) /
                 oldAssetPrice;
 
-        int256 valueChange = (percentageChangeE18 * min) / TEN_TO_THE_18_SIGNED;
+        int256 valueChange =
+            (percentageChangeE18 * int256(min)) / TEN_TO_THE_18_SIGNED;
 
         if (valueChange > 0) {
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] += uint256(
-                valueChange
-            );
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] -= uint256(
-                valueChange
-            );
+            syntheticTokenPoolValue[marketIndex][
+                true /*long*/
+            ] += uint256(valueChange);
+            syntheticTokenPoolValue[marketIndex][
+                false /*short*/
+            ] -= uint256(valueChange);
         } else {
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] -= uint256(
-                valueChange * -1
-            );
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex] += uint256(
-                valueChange * -1
-            );
+            syntheticTokenPoolValue[marketIndex][
+                true /*long*/
+            ] -= uint256(valueChange * -1);
+            syntheticTokenPoolValue[marketIndex][
+                false /*short*/
+            ] += uint256(valueChange * -1);
         }
 
-        return true;
+        emit PriceUpdate(
+            marketIndex,
+            assetPrice[marketIndex],
+            uint256(newAssetPrice),
+            msg.sender
+        );
     }
 
-    function handleBatchedDepositSettlement(
-        uint32 marketIndex,
-        MarketSide syntheticTokenType
-    ) internal {
-        uint256 amountToBatchDeposit =
-            batchedNextPricePaymentTokenToDeposit[marketIndex][
-                syntheticTokenType
-            ];
-
-        if (amountToBatchDeposit > 0) {
-            batchedNextPricePaymentTokenToDeposit[marketIndex][
-                syntheticTokenType
-            ] = 0;
-            _transferFundsToYieldManager(marketIndex, amountToBatchDeposit);
-
-            // Mint long tokens with remaining value.
-            uint256 numberOfTokens =
-                getAmountSynthToken(
-                    amountToBatchDeposit,
-                    syntheticTokenPrice[syntheticTokenType][marketIndex]
-                );
-
-            // TODO STENT there are no token mint events emitted here, but there are on market initialization
-            syntheticTokens[syntheticTokenType][marketIndex].mint(
-                address(this),
-                numberOfTokens
-            );
-
-            syntheticTokenBackedValue[syntheticTokenType][
-                marketIndex
-            ] += amountToBatchDeposit;
-
-            //TODO: Can remove these sanity checks at some point
-            uint256 oldTokenLongPrice =
-                syntheticTokenPrice[MarketSide.Long][marketIndex];
-            uint256 oldTokenShortPrice =
-                syntheticTokenPrice[MarketSide.Short][marketIndex];
-
-            // NOTE: no fees are calculated, but if they are desired in the future they can be added here.
-            // Distribute fees across the market.
-            // TODO STENT CONCERN1
-            _refreshTokenPrices(marketIndex);
-
-            assert(
-                syntheticTokenPrice[MarketSide.Long][marketIndex] ==
-                    oldTokenLongPrice
-            );
-            assert(
-                syntheticTokenPrice[MarketSide.Short][marketIndex] ==
-                    oldTokenShortPrice
-            );
-        }
-    }
-
-    function snapshotPriceChangeForNextPriceExecution(
+    function _saveSyntheticTokenPriceSnapshots(
         uint32 marketIndex,
         uint256 newLatestPriceStateIndex
     ) internal {
-        // NOTE: we can't just merge these two values since the 'yield' has an effect on the token price inbetween oracle updates.
-        mintPriceSnapshot[marketIndex][newLatestPriceStateIndex][
-            MarketSide.Long
-        ] = syntheticTokenPrice[MarketSide.Long][marketIndex];
-        mintPriceSnapshot[marketIndex][newLatestPriceStateIndex][
-            MarketSide.Short
-        ] = syntheticTokenPrice[MarketSide.Short][marketIndex];
+        syntheticTokenPriceSnapshot[marketIndex][
+            true /*long*/
+        ][newLatestPriceStateIndex] = syntheticTokenPrice[marketIndex][
+            true /*long*/
+        ];
+        syntheticTokenPriceSnapshot[marketIndex][
+            false /*short*/
+        ][newLatestPriceStateIndex] = syntheticTokenPrice[marketIndex][
+            false /*short*/
+        ];
     }
+
+    /*╔═════════════════════════════════╗
+      ║     UPDATING SYSTEM STATE       ║
+      ╚═════════════════════════════════╝*/
 
     /**
      * Updates the value of the long and short sides within the system
@@ -759,78 +812,97 @@ contract LongShort is ILongShort, Initializable {
         // staker without needing to be saved
         staker.addNewStateForFloatRewards(
             marketIndex,
-            syntheticTokenPrice[MarketSide.Long][marketIndex],
-            syntheticTokenPrice[MarketSide.Short][marketIndex],
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex],
-            syntheticTokenBackedValue[MarketSide.Short][marketIndex]
+            syntheticTokenPrice[marketIndex][
+                true /*long*/
+            ],
+            syntheticTokenPrice[marketIndex][
+                false /*short*/
+            ],
+            syntheticTokenPoolValue[marketIndex][
+                true /*long*/
+            ],
+            syntheticTokenPoolValue[marketIndex][
+                false /*short*/
+            ]
         );
 
         // If a negative int is return this should fail.
         int256 newAssetPrice = oracleManagers[marketIndex].updatePrice();
+        int256 oldAssetPrice = int256(assetPrice[marketIndex]);
 
-        // Adjusts long and short values based on price movements.
-        bool priceChanged =
-            _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
+        if (oldAssetPrice == newAssetPrice) {
+            return;
+        }
 
-        if (priceChanged) {
-            assert(
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex] != 0 &&
-                    syntheticTokenBackedValue[MarketSide.Short][marketIndex] !=
-                    0
-            );
+        _claimAndDistributeYield(marketIndex);
 
-            // Distibute accrued yield first based on current liquidity before price update
-            _claimAndDistributeYield(marketIndex);
+        _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
 
-            // TODO STENT move this into the price function
-            emit PriceUpdate(
+        assert(
+            syntheticTokenPoolValue[marketIndex][
+                true /*long*/
+            ] !=
+                0 &&
+                syntheticTokenPoolValue[marketIndex][
+                    false /*short*/
+                ] !=
+                0
+        );
+
+        _refreshTokenPrices(marketIndex);
+        assetPrice[marketIndex] = uint256(newAssetPrice);
+
+        uint256 newLatestPriceStateIndex = marketUpdateIndex[marketIndex] + 1;
+        marketUpdateIndex[marketIndex] = newLatestPriceStateIndex;
+        _saveSyntheticTokenPriceSnapshots(
+            marketIndex,
+            newLatestPriceStateIndex
+        );
+
+        if (
+            _handleBatchedDepositSettlement(
                 marketIndex,
-                assetPrice[marketIndex],
-                uint256(newAssetPrice),
-                msg.sender
-            );
-
-            // TODO STENT CONCERN1
-            _refreshTokenPrices(marketIndex);
-            assetPrice[marketIndex] = uint256(newAssetPrice);
-
-            uint256 newLatestPriceStateIndex =
-                latestUpdateIndex[marketIndex] + 1;
-            latestUpdateIndex[marketIndex] = newLatestPriceStateIndex;
-            snapshotPriceChangeForNextPriceExecution(
+                true /*long*/
+            ) ||
+            _handleBatchedDepositSettlement(
                 marketIndex,
-                newLatestPriceStateIndex
-            );
-
-            handleBatchedDepositSettlement(marketIndex, MarketSide.Long);
-            handleBatchedDepositSettlement(marketIndex, MarketSide.Short);
-            handleBatchedNextPriceRedeems(marketIndex);
-
+                false /*short*/
+            ) ||
+            _handleBatchedNextPriceRedeems(marketIndex)
+        ) {
             emit BatchedActionsSettled(
                 marketIndex,
                 newLatestPriceStateIndex,
-                mintPriceSnapshot[marketIndex][newLatestPriceStateIndex][
-                    MarketSide.Long
-                ],
-                mintPriceSnapshot[marketIndex][newLatestPriceStateIndex][
-                    MarketSide.Short
-                ],
-                redeemPriceSnapshot[marketIndex][newLatestPriceStateIndex][
-                    MarketSide.Long
-                ],
-                redeemPriceSnapshot[marketIndex][newLatestPriceStateIndex][
-                    MarketSide.Short
-                ]
-            );
-
-            emit ValueLockedInSystem(
-                marketIndex,
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-                    syntheticTokenBackedValue[MarketSide.Short][marketIndex],
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex],
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex]
+                syntheticTokenPriceSnapshot[marketIndex][
+                    true /*long*/
+                ][newLatestPriceStateIndex],
+                syntheticTokenPriceSnapshot[marketIndex][
+                    false /*short*/
+                ][newLatestPriceStateIndex],
+                redeemPriceSnapshot[marketIndex][
+                    true /*long*/
+                ][newLatestPriceStateIndex],
+                redeemPriceSnapshot[marketIndex][
+                    false /*short*/
+                ][newLatestPriceStateIndex]
             );
         }
+
+        emit ValueLockedInSystem(
+            marketIndex,
+            syntheticTokenPoolValue[marketIndex][
+                true /*long*/
+            ] +
+                syntheticTokenPoolValue[marketIndex][
+                    false /*short*/
+                ],
+            syntheticTokenPoolValue[marketIndex][
+                true /*long*/
+            ],
+            syntheticTokenPoolValue[marketIndex][
+                false /*short*/
+            ]
+        );
     }
 
     function _updateSystemState(uint32 marketIndex) external override {
@@ -845,6 +917,10 @@ contract LongShort is ILongShort, Initializable {
             _updateSystemStateInternal(marketIndexes[i]);
         }
     }
+
+    /*╔═════════════════════════════════╗
+      ║       DEPOSIT + WITHDRAWL       ║
+      ╚═════════════════════════════════╝*/
 
     function _depositFunds(uint32 marketIndex, uint256 amount) internal {
         fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
@@ -867,10 +943,18 @@ contract LongShort is ILongShort, Initializable {
     ) internal {
         uint256 totalAmount = amountLong + amountShort;
 
+        if (totalAmount == 0) {
+            return;
+        }
+
         assert(
-            syntheticTokenBackedValue[MarketSide.Long][marketIndex] >=
+            syntheticTokenPoolValue[marketIndex][
+                true /*long*/
+            ] >=
                 amountLong &&
-                syntheticTokenBackedValue[MarketSide.Short][marketIndex] >=
+                syntheticTokenPoolValue[marketIndex][
+                    false /*short*/
+                ] >=
                 amountShort
         );
 
@@ -879,9 +963,17 @@ contract LongShort is ILongShort, Initializable {
         // Transfer funds to the sender.
         fundTokens[marketIndex].transfer(user, totalAmount);
 
-        syntheticTokenBackedValue[MarketSide.Long][marketIndex] -= amountLong;
-        syntheticTokenBackedValue[MarketSide.Short][marketIndex] -= amountShort;
+        syntheticTokenPoolValue[marketIndex][
+            true /*long*/
+        ] -= amountLong;
+        syntheticTokenPoolValue[marketIndex][
+            false /*short*/
+        ] -= amountShort;
     }
+
+    /*╔═════════════════════════════════╗
+      ║      TRESURY + YIELD MANAGER    ║
+      ╚═════════════════════════════════╝*/
 
     /*
      * Transfers locked funds from LongShort into the yield manager.
@@ -927,62 +1019,15 @@ contract LongShort is ILongShort, Initializable {
         // TODO STENT this check seems wierd. What happens if this fails? What is the recovery? Should it be an assert?
         require(
             totalValueLockedInYieldManager[marketIndex] <=
-                syntheticTokenBackedValue[MarketSide.Long][marketIndex] +
-                    syntheticTokenBackedValue[MarketSide.Short][marketIndex] +
+                syntheticTokenPoolValue[marketIndex][
+                    true /*long*/
+                ] +
+                    syntheticTokenPoolValue[marketIndex][
+                        false /*short*/
+                    ] +
                     totalValueReservedForTreasury[marketIndex]
         );
     }
-
-    /**
-     * Calculates fees for the given mint/redeem amount. Users are penalised
-     * with higher fees for imbalancing the market.
-     */
-    // TODO STENT look at this again
-    // TODO: this function was written with immediate price in mind, rework this function to suit latest code
-    function _getFeesGeneral(
-        uint32 marketIndex,
-        uint256 delta, // 1e18
-        MarketSide synthTokenGainingDominance,
-        MarketSide synthTokenLosingDominance,
-        uint256 baseFeePercent,
-        uint256 penultyFeePercent
-    ) internal view returns (uint256) {
-        uint256 baseFee = (delta * baseFeePercent) / feeUnitsOfPrecision;
-
-        if (
-            syntheticTokenBackedValue[synthTokenGainingDominance][
-                marketIndex
-            ] >=
-            syntheticTokenBackedValue[synthTokenLosingDominance][marketIndex]
-        ) {
-            // All funds are causing imbalance
-            return
-                baseFee + ((delta * penultyFeePercent) / feeUnitsOfPrecision);
-        } else if (
-            syntheticTokenBackedValue[synthTokenGainingDominance][marketIndex] +
-                delta >
-            syntheticTokenBackedValue[synthTokenLosingDominance][marketIndex]
-        ) {
-            uint256 amountImbalancing =
-                delta -
-                    (syntheticTokenBackedValue[synthTokenLosingDominance][
-                        marketIndex
-                    ] -
-                        syntheticTokenBackedValue[synthTokenGainingDominance][
-                            marketIndex
-                        ]);
-            uint256 penaltyFee =
-                (amountImbalancing * penultyFeePercent) / feeUnitsOfPrecision;
-
-            return baseFee + penaltyFee;
-        } else {
-            return baseFee;
-        }
-    }
-
-    ////////////////////////////////////
-    /////// TREASURY FUNCTIONS /////////
-    ////////////////////////////////////
 
     /*
      * Transfers the reserved treasury funds to the treasury contract. This is
@@ -1009,96 +1054,194 @@ contract LongShort is ILongShort, Initializable {
         fundTokens[marketIndex].transfer(treasury, totalForTreasury);
     }
 
-    function getUsersPendingBalance(
-        address user,
+    /*╔═════════════════════════════════╗
+      ║       MINT POSITION             ║
+      ╚═════════════════════════════════╝*/
+
+    function _mintNextPrice(
         uint32 marketIndex,
-        MarketSide syntheticTokenType
+        uint256 amount,
+        bool isLong
     )
-        external
-        view
-        override
-        assertMarketExists(marketIndex)
-        returns (uint256 pendingBalance)
+        internal
+        updateSystemStateMarket(marketIndex)
+        executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
     {
-        if (
-            userCurrentNextPriceUpdateIndex[marketIndex][user] <=
-            latestUpdateIndex[marketIndex]
-        ) {
-            // Update is still nextPrice but not past the next oracle update - display the amount the user would get if they executed immediately
-            // NOTE: if we ever add fees for minting - we would add them here!
-            uint256 amountPaymentTokenDeposited =
-                userNextPriceDepositAmounts[marketIndex][user][
-                    syntheticTokenType
-                ];
+        _depositFunds(marketIndex, amount);
 
-            uint256 tokens =
-                getAmountSynthToken(
-                    amountPaymentTokenDeposited,
-                    syntheticTokenPrice[syntheticTokenType][marketIndex]
-                );
+        batchedAmountOfTokensToDeposit[marketIndex][isLong] += amount;
+        userNextPriceDepositAmount[marketIndex][isLong][msg.sender] += amount;
+        userCurrentNextPriceUpdateIndex[marketIndex][msg.sender] =
+            marketUpdateIndex[marketIndex] +
+            1;
 
-            return tokens;
-        } else {
-            return 0;
-        }
+        emit NextPriceDeposit(
+            marketIndex,
+            isLong,
+            amount,
+            msg.sender,
+            marketUpdateIndex[marketIndex] + 1
+        );
     }
+
+    function mintLongNextPrice(uint32 marketIndex, uint256 amount) external {
+        _mintNextPrice(
+            marketIndex,
+            amount,
+            true /*long*/
+        );
+    }
+
+    function mintShortNextPrice(uint32 marketIndex, uint256 amount) external {
+        _mintNextPrice(
+            marketIndex,
+            amount,
+            false /*short*/
+        );
+    }
+
+    /*╔═════════════════════════════════╗
+      ║       REDEEM POSITION           ║
+      ╚═════════════════════════════════╝*/
+
+    function _redeemNextPrice(
+        uint32 marketIndex,
+        uint256 tokensToRedeem,
+        bool isLong
+    )
+        internal
+        updateSystemStateMarket(marketIndex)
+        executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
+    {
+        syntheticTokens[marketIndex][isLong].transferFrom(
+            msg.sender,
+            address(this),
+            tokensToRedeem
+        );
+
+        userNextPriceRedemptionAmount[marketIndex][isLong][
+            msg.sender
+        ] += tokensToRedeem;
+        userCurrentNextPriceUpdateIndex[marketIndex][msg.sender] =
+            marketUpdateIndex[marketIndex] +
+            1;
+
+        batchedAmountOfSynthTokensToRedeem[marketIndex][
+            isLong
+        ] += tokensToRedeem;
+
+        emit NextPriceRedeem(
+            marketIndex,
+            isLong,
+            tokensToRedeem,
+            msg.sender,
+            marketUpdateIndex[marketIndex] + 1
+        );
+    }
+
+    function redeemLongNextPrice(uint32 marketIndex, uint256 tokensToRedeem)
+        external
+    {
+        _redeemNextPrice(
+            marketIndex,
+            tokensToRedeem,
+            true /*long*/
+        );
+    }
+
+    function redeemShortNextPrice(uint32 marketIndex, uint256 tokensToRedeem)
+        external
+    {
+        _redeemNextPrice(
+            marketIndex,
+            tokensToRedeem,
+            false /*short*/
+        );
+    }
+
+    /*╔═════════════════════════════════╗
+      ║       NEXT PRICE SETTLEMENTS    ║
+      ╚═════════════════════════════════╝*/
 
     function _executeNextPriceMintsIfTheyExist(
         uint32 marketIndex,
         address user,
-        MarketSide syntheticTokenType
+        bool isLong
     ) internal {
         uint256 currentDepositAmount =
-            userNextPriceDepositAmounts[marketIndex][user][syntheticTokenType];
+            userNextPriceDepositAmount[marketIndex][isLong][user];
         if (currentDepositAmount > 0) {
-            uint256 tokensToMint =
-                getAmountSynthToken(
+            uint256 tokensToTransferToUser =
+                _getAmountSynthToken(
                     currentDepositAmount,
-                    mintPriceSnapshot[marketIndex][
+                    syntheticTokenPriceSnapshot[marketIndex][isLong][
                         userCurrentNextPriceUpdateIndex[marketIndex][user]
-                    ][syntheticTokenType]
+                    ]
                 );
 
-            syntheticTokens[syntheticTokenType][marketIndex].transfer(
+            syntheticTokens[marketIndex][isLong].transfer(
                 user,
-                tokensToMint
+                tokensToTransferToUser
             );
 
-            userNextPriceDepositAmounts[marketIndex][user][
-                syntheticTokenType
-            ] = 0;
+            userNextPriceDepositAmount[marketIndex][isLong][user] = 0;
         }
     }
 
-    function _executeOutstandingNextPriceSettlementsAction(
+    function _executeOutstandingNextPriceRedeems(
+        uint32 marketIndex,
         address user,
-        uint32 marketIndex
+        bool isLong
     ) internal {
-        _executeNextPriceMintsIfTheyExist(marketIndex, user, MarketSide.Long);
-        _executeNextPriceMintsIfTheyExist(marketIndex, user, MarketSide.Short);
-        _executeOutstandingNextPriceRedeems(marketIndex, user, MarketSide.Long);
-        _executeOutstandingNextPriceRedeems(
-            marketIndex,
-            user,
-            MarketSide.Short
-        );
+        uint256 currentRedemptions =
+            userNextPriceRedemptionAmount[marketIndex][isLong][user];
+        if (currentRedemptions > 0) {
+            uint256 amountToRedeem =
+                _getAmountPaymentToken(
+                    currentRedemptions,
+                    redeemPriceSnapshot[marketIndex][isLong][
+                        userCurrentNextPriceUpdateIndex[marketIndex][user]
+                    ]
+                );
 
-        userCurrentNextPriceUpdateIndex[marketIndex][user] = 0;
+            fundTokens[marketIndex].transfer(user, amountToRedeem);
+            userNextPriceRedemptionAmount[marketIndex][isLong][user] = 0;
+        }
     }
 
-    // TODO: modify this function (or make a different version) that takes in the desired useage and does either partial or full "early use"
     // TODO: WARNING!! This function is re-entrancy vulnerable if the synthetic token has any execution hooks
     function _executeOutstandingNextPriceSettlements(
         address user,
-        uint32 marketIndex // TODO: make this internal ?
+        uint32 marketIndex
     ) internal {
         uint256 currentUpdateIndex =
             userCurrentNextPriceUpdateIndex[marketIndex][user];
         if (
-            currentUpdateIndex <= latestUpdateIndex[marketIndex] &&
-            currentUpdateIndex != 0 // NOTE: this conditional isn't strictly necessary (all the users deposit amounts will be zero too)
+            currentUpdateIndex != 0 &&
+            currentUpdateIndex <= marketUpdateIndex[marketIndex]
         ) {
-            _executeOutstandingNextPriceSettlementsAction(user, marketIndex);
+            _executeNextPriceMintsIfTheyExist(
+                marketIndex,
+                user,
+                true /*long*/
+            );
+            _executeNextPriceMintsIfTheyExist(
+                marketIndex,
+                user,
+                false /*short*/
+            );
+            _executeOutstandingNextPriceRedeems(
+                marketIndex,
+                user,
+                true /*long*/
+            );
+            _executeOutstandingNextPriceRedeems(
+                marketIndex,
+                user,
+                false /*short*/
+            );
+
+            userCurrentNextPriceUpdateIndex[marketIndex][user] = 0;
 
             emit ExecuteNextPriceSettlementsUser(user, marketIndex);
         }
@@ -1112,131 +1255,86 @@ contract LongShort is ILongShort, Initializable {
         _executeOutstandingNextPriceSettlements(user, marketIndex);
     }
 
-    function _mintNextPrice(
-        uint32 marketIndex,
-        uint256 amount,
-        MarketSide syntheticTokenType
-    )
+    /*╔═════════════════════════════════╗
+      ║       NEXT PRICE ORDERS         ║
+      ╚═════════════════════════════════╝*/
+
+    function _handleBatchedDepositSettlement(uint32 marketIndex, bool isLong)
         internal
-        updateSystemStateMarket(marketIndex)
-        executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
+        returns (bool wasABatchedSettlement)
     {
-        // TODO: pre-deposit them into YieldManager?
-        //    - for now not doing that for simplicity, don't gain that much doing so either just more expensive tx (for very little yield)
-        _depositFunds(marketIndex, amount);
+        uint256 amountToBatchDeposit =
+            batchedAmountOfTokensToDeposit[marketIndex][isLong];
 
-        batchedNextPricePaymentTokenToDeposit[marketIndex][
-            syntheticTokenType
-        ] += amount;
-        userNextPriceDepositAmounts[marketIndex][msg.sender][
-            syntheticTokenType
-        ] += amount;
-        userCurrentNextPriceUpdateIndex[marketIndex][msg.sender] =
-            latestUpdateIndex[marketIndex] +
-            1;
+        if (amountToBatchDeposit > 0) {
+            batchedAmountOfTokensToDeposit[marketIndex][isLong] = 0;
+            _transferFundsToYieldManager(marketIndex, amountToBatchDeposit);
 
-        emit NextPriceDeposit(
-            marketIndex,
-            syntheticTokenType,
-            amount,
-            msg.sender,
-            latestUpdateIndex[marketIndex] + 1
-        );
-    }
-
-    function mintLongNextPrice(uint32 marketIndex, uint256 amount) external {
-        _mintNextPrice(marketIndex, amount, MarketSide.Long);
-    }
-
-    function mintShortNextPrice(uint32 marketIndex, uint256 amount) external {
-        _mintNextPrice(marketIndex, amount, MarketSide.Short);
-    }
-
-    function _executeOutstandingNextPriceRedeems(
-        uint32 marketIndex,
-        address user,
-        MarketSide syntheticTokenType
-    ) internal {
-        uint256 currentRedemptions =
-            userNextPriceRedemptions[marketIndex][user][syntheticTokenType];
-        if (currentRedemptions > 0) {
-            uint256 amountToRedeem =
-                getAmountPaymentToken(
-                    currentRedemptions,
-                    redeemPriceSnapshot[marketIndex][
-                        userCurrentNextPriceUpdateIndex[marketIndex][user]
-                    ][syntheticTokenType]
+            uint256 numberOfTokens =
+                _getAmountSynthToken(
+                    amountToBatchDeposit,
+                    syntheticTokenPrice[marketIndex][isLong]
                 );
 
-            uint256 balance = fundTokens[marketIndex].balanceOf(address(this));
-
-            fundTokens[marketIndex].transfer(user, amountToRedeem);
-            userNextPriceRedemptions[marketIndex][user][syntheticTokenType] = 0;
-        }
-    }
-
-    function _redeemNextPrice(
-        uint32 marketIndex,
-        uint256 tokensToRedeem,
-        MarketSide syntheticTokenType
-    )
-        internal
-        updateSystemStateMarket(marketIndex)
-        executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
-    {
-        syntheticTokens[syntheticTokenType][marketIndex].transferFrom(
-            msg.sender,
-            address(this),
-            tokensToRedeem
-        );
-        uint256 nextUpdateIndex = latestUpdateIndex[marketIndex] + 1;
-
-        userNextPriceRedemptions[marketIndex][msg.sender][
-            syntheticTokenType
-        ] += tokensToRedeem;
-        userCurrentNextPriceUpdateIndex[marketIndex][
-            msg.sender
-        ] = nextUpdateIndex;
-
-        batchedNextPriceSynthToRedeem[marketIndex][
-            syntheticTokenType
-        ] += tokensToRedeem;
-
-        emit NextPriceRedeem(
-            marketIndex,
-            syntheticTokenType,
-            tokensToRedeem,
-            msg.sender,
-            latestUpdateIndex[marketIndex] + 1
-        );
-    }
-
-    function redeemLongNextPrice(uint32 marketIndex, uint256 tokensToRedeem)
-        external
-    {
-        _redeemNextPrice(marketIndex, tokensToRedeem, MarketSide.Long);
-    }
-
-    function redeemShortNextPrice(uint32 marketIndex, uint256 tokensToRedeem)
-        external
-    {
-        _redeemNextPrice(marketIndex, tokensToRedeem, MarketSide.Short);
-    }
-
-    function _handleBatchedNextPriceRedeem(
-        uint32 marketIndex,
-        MarketSide syntheticTokenType,
-        uint256 amountSynthToRedeem
-    ) internal {
-        if (amountSynthToRedeem > 0) {
-            syntheticTokens[syntheticTokenType][marketIndex].synthRedeemBurn(
+            // TODO STENT there are no token mint events emitted here, but there are on market initialization
+            syntheticTokens[marketIndex][isLong].mint(
                 address(this),
-                amountSynthToRedeem
+                numberOfTokens
             );
+
+            syntheticTokenPoolValue[marketIndex][
+                isLong
+            ] += amountToBatchDeposit;
+
+            //TODO: Can remove these sanity checks at some point
+            uint256 oldTokenLongPrice =
+                syntheticTokenPrice[marketIndex][
+                    true /*long*/
+                ];
+            uint256 oldTokenShortPrice =
+                syntheticTokenPrice[marketIndex][
+                    false /*short*/
+                ];
+
+            _refreshTokenPrices(marketIndex);
+
+            assert(
+                syntheticTokenPrice[marketIndex][
+                    true /*long*/
+                ] == oldTokenLongPrice
+            );
+            assert(
+                syntheticTokenPrice[marketIndex][
+                    false /*short*/
+                ] == oldTokenShortPrice
+            );
+            wasABatchedSettlement = true;
         }
     }
 
-    function _calculateBatchedNextPriceFees(
+    function _burnSynthTokensForRedemption(
+        uint32 marketIndex,
+        uint256 amountSynthToRedeemLong,
+        uint256 amountSynthToRedeemShort
+    ) internal returns (bool wasABatchedSettlement) {
+        if (amountSynthToRedeemLong > 0) {
+            syntheticTokens[marketIndex][
+                true /*long*/
+            ]
+                .synthRedeemBurn(address(this), amountSynthToRedeemLong);
+            wasABatchedSettlement = true;
+        }
+
+        if (amountSynthToRedeemShort > 0) {
+            syntheticTokens[marketIndex][
+                false /*short*/
+            ]
+                .synthRedeemBurn(address(this), amountSynthToRedeemShort);
+            wasABatchedSettlement = true;
+        }
+    }
+
+    function _applyBatchedNextPriceFees(
         uint32 marketIndex,
         uint256 amountOfPaymentTokenToRedeem,
         uint256 shortAmountOfPaymentTokenToRedeem
@@ -1248,11 +1346,10 @@ contract LongShort is ILongShort, Initializable {
             uint256 delta =
                 amountOfPaymentTokenToRedeem -
                     shortAmountOfPaymentTokenToRedeem;
-            totalFeesLong = _getFeesGeneral(
+            totalFeesLong = getFeesGeneral(
                 marketIndex,
                 delta,
-                MarketSide.Short,
-                MarketSide.Long,
+                false, /*short*/
                 0,
                 badLiquidityExitFee[marketIndex]
             );
@@ -1260,93 +1357,101 @@ contract LongShort is ILongShort, Initializable {
             uint256 delta =
                 shortAmountOfPaymentTokenToRedeem -
                     amountOfPaymentTokenToRedeem;
-            totalFeesShort = _getFeesGeneral(
+            totalFeesShort = getFeesGeneral(
                 marketIndex,
                 delta,
-                MarketSide.Long,
-                MarketSide.Short,
+                true, /*long*/
                 0,
                 badLiquidityExitFee[marketIndex]
             );
         }
 
-        _feesMechanism(marketIndex, totalFeesLong + totalFeesShort);
+        uint256 totalFees = totalFeesLong + totalFeesShort;
+        (uint256 marketAmount, uint256 treasuryAmount) =
+            getTreasurySplit(marketIndex, totalFees);
+
+        totalValueReservedForTreasury[marketIndex] += treasuryAmount;
+
+        _distributeMarketAmount(marketIndex, marketAmount);
+        emit FeesLevied(marketIndex, totalFees);
     }
 
-    function calculateRedeemPriceSnapshot(
+    function _calculateRedeemPriceSnapshot(
         uint32 marketIndex,
         uint256 amountOfPaymentTokenToRedeem,
-        MarketSide syntheticTokenType
+        bool isLong
     ) internal returns (uint256 batchLongTotalWithdrawnPaymentToken) {
         if (amountOfPaymentTokenToRedeem > 0) {
-            redeemPriceSnapshot[marketIndex][latestUpdateIndex[marketIndex]][
-                syntheticTokenType
-            ] = getPrice(
-                batchedNextPriceSynthToRedeem[marketIndex][syntheticTokenType],
+            redeemPriceSnapshot[marketIndex][isLong][
+                marketUpdateIndex[marketIndex]
+            ] = _getPrice(
+                batchedAmountOfSynthTokensToRedeem[marketIndex][isLong],
                 amountOfPaymentTokenToRedeem
             );
 
             // NOTE: this is always slightly less than `amountOfPaymentTokenToRedeem` due to rounding errors
             return
-                getAmountPaymentToken(
-                    batchedNextPriceSynthToRedeem[marketIndex][
-                        syntheticTokenType
-                    ],
-                    redeemPriceSnapshot[marketIndex][
-                        latestUpdateIndex[marketIndex]
-                    ][syntheticTokenType]
+                _getAmountPaymentToken(
+                    batchedAmountOfSynthTokensToRedeem[marketIndex][isLong],
+                    redeemPriceSnapshot[marketIndex][isLong][
+                        marketUpdateIndex[marketIndex]
+                    ]
                 );
         }
     }
 
-    function handleBatchedNextPriceRedeems(uint32 marketIndex) internal {
-        uint256 batchedNextPriceSynthToRedeemLong =
-            batchedNextPriceSynthToRedeem[marketIndex][MarketSide.Long];
-        uint256 batchedNextPriceSynthToRedeemShort =
-            batchedNextPriceSynthToRedeem[marketIndex][MarketSide.Short];
+    function _handleBatchedNextPriceRedeems(uint32 marketIndex)
+        internal
+        returns (bool wasABatchedSettlement)
+    {
+        uint256 batchedAmountOfSynthTokensToRedeemLong =
+            batchedAmountOfSynthTokensToRedeem[marketIndex][
+                true /*long*/
+            ];
+        uint256 batchedAmountOfSynthTokensToRedeemShort =
+            batchedAmountOfSynthTokensToRedeem[marketIndex][
+                false /*short*/
+            ];
 
-        _handleBatchedNextPriceRedeem(
+        wasABatchedSettlement = _burnSynthTokensForRedemption(
             marketIndex,
-            MarketSide.Long,
-            batchedNextPriceSynthToRedeemLong
-        );
-        _handleBatchedNextPriceRedeem(
-            marketIndex,
-            MarketSide.Short,
-            batchedNextPriceSynthToRedeemShort
+            batchedAmountOfSynthTokensToRedeemLong,
+            batchedAmountOfSynthTokensToRedeemShort
         );
 
         uint256 longAmountOfPaymentTokenToRedeem =
-            getAmountPaymentToken(
-                batchedNextPriceSynthToRedeemLong,
-                syntheticTokenPrice[MarketSide.Long][marketIndex]
+            _getAmountPaymentToken(
+                batchedAmountOfSynthTokensToRedeemLong,
+                syntheticTokenPrice[marketIndex][
+                    true /*long*/
+                ]
             );
-
         uint256 shortAmountOfPaymentTokenToRedeem =
-            getAmountPaymentToken(
-                batchedNextPriceSynthToRedeemShort,
-                syntheticTokenPrice[MarketSide.Short][marketIndex]
+            _getAmountPaymentToken(
+                batchedAmountOfSynthTokensToRedeemShort,
+                syntheticTokenPrice[marketIndex][
+                    false /*short*/
+                ]
             );
 
         (uint256 totalFeesLong, uint256 totalFeesShort) =
-            _calculateBatchedNextPriceFees(
+            _applyBatchedNextPriceFees(
                 marketIndex,
                 longAmountOfPaymentTokenToRedeem,
                 shortAmountOfPaymentTokenToRedeem
             );
 
         uint256 batchShortTotalWithdrawnPaymentToken =
-            calculateRedeemPriceSnapshot(
+            _calculateRedeemPriceSnapshot(
                 marketIndex,
                 shortAmountOfPaymentTokenToRedeem - totalFeesShort,
-                MarketSide.Short
+                false /*short*/
             );
-
         uint256 batchLongTotalWithdrawnPaymentToken =
-            calculateRedeemPriceSnapshot(
+            _calculateRedeemPriceSnapshot(
                 marketIndex,
                 longAmountOfPaymentTokenToRedeem - totalFeesLong,
-                MarketSide.Long
+                true /*long*/
             );
 
         _withdrawFunds(
@@ -1356,10 +1461,13 @@ contract LongShort is ILongShort, Initializable {
             address(this)
         );
 
-        // TODO STENT CONCERN1
         _refreshTokenPrices(marketIndex);
 
-        batchedNextPriceSynthToRedeem[marketIndex][MarketSide.Long] = 0;
-        batchedNextPriceSynthToRedeem[marketIndex][MarketSide.Short] = 0;
+        batchedAmountOfSynthTokensToRedeem[marketIndex][
+            true /*long*/
+        ] = 0;
+        batchedAmountOfSynthTokensToRedeem[marketIndex][
+            false /*short*/
+        ] = 0;
     }
 }

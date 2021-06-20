@@ -42,8 +42,8 @@ contract Staker is IStaker, Initializable {
     // Controls the k-factor, a multiplier for incentivising early stakers.
     //   token market index -> value
     uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
-    mapping(uint256 => uint256) public marketLaunchIncentivePeriod; // seconds
-    mapping(uint256 => uint256) public marketLaunchIncentiveMultipliers; // e18 scale
+    mapping(uint32 => uint256) public marketLaunchIncentivePeriod; // seconds
+    mapping(uint32 => uint256) public marketLaunchIncentiveMultipliers; // e18 scale
     uint256[45] private __stakeParametersGap;
 
     ////////////////////////////////////
@@ -54,7 +54,6 @@ contract Staker is IStaker, Initializable {
     address public admin;
     address public floatCapital;
     uint16 public floatPercentage;
-    uint256 public initialTimestamp;
     ILongShort public longShortCoreContract;
     IFloatToken public floatToken;
     uint256[45] private __globalParamsGap;
@@ -155,7 +154,6 @@ contract Staker is IStaker, Initializable {
     ) public initializer {
         admin = _admin;
         floatCapital = _floatCapital;
-        initialTimestamp = block.timestamp;
         longShortCoreContract = ILongShort(_longShortCoreContract);
         floatToken = IFloatToken(_floatToken);
         floatPercentage = 1500;
@@ -269,6 +267,9 @@ contract Staker is IStaker, Initializable {
         // Sanity check - under normal circumstances, the multipliers should
         // *never* be set to a value < 1e18, as there are guards against this.
         assert(kInitialMultiplier >= 1e18);
+
+        uint256 initialTimestamp =
+            syntheticRewardParams[marketIndex][0].timestamp;
 
         if (block.timestamp - initialTimestamp <= kPeriod) {
             return

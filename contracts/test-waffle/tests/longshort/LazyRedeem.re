@@ -1,5 +1,6 @@
 open Globals;
 open LetOps;
+open Mocha;
 
 let testIntegration =
     (
@@ -7,7 +8,7 @@ let testIntegration =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
   describe("lazyRedeem", () => {
-    it'("[THIS TEST IS FLAKY] should work as expected happy path", () => {
+    it("[THIS TEST IS FLAKY] should work as expected happy path", () => {
       let testUser = accounts.contents->Array.getUnsafe(8);
       let amountToNextPriceMint = Helpers.randomTokenAmount();
 
@@ -20,9 +21,9 @@ let testIntegration =
         markets->Array.getUnsafe(0);
 
       let%AwaitThen _longValueBefore =
-        longShort->LongShort.syntheticTokenBackedValue(
-          CONSTANTS.longTokenType,
+        longShort->LongShort.syntheticTokenPoolValue(
           marketIndex,
+          true/*long*/,
         );
 
       let%AwaitThen _ =
@@ -86,12 +87,12 @@ let testIntegration =
 
       let%AwaitThen _ = longShort->LongShort._updateSystemState(~marketIndex);
       let%AwaitThen latestUpdateIndex =
-        longShort->LongShort.latestUpdateIndex(marketIndex);
+        longShort->LongShort.marketUpdateIndex(marketIndex);
       let%AwaitThen redemptionPriceWithFees =
         longShort->LongShort.redeemPriceSnapshot(
           marketIndex,
+          true/*long*/,
           latestUpdateIndex,
-          CONSTANTS.longTokenType,
         );
 
       let amountExpectedToBeRedeemed =

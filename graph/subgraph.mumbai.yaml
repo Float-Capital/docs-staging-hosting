@@ -6,12 +6,12 @@ dataSources:
     name: LongShort
     network: mumbai
     source:
-      address: "0x5bCa9c0823e7F5fBDB856Ae6a410ACaf2ff81B8D"
+      address: "0x3Fe666e021714eaF51e061D8efFCc6fA4b390DC0"
       abi: LongShort
-      startBlock: 14217187
+      startBlock: 15176498
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.2
+      apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
         - BatchedActionsSettled
@@ -41,9 +41,9 @@ dataSources:
           handler: handleFeesLevied
         - event: NewMarketLaunchedAndSeeded(uint32,uint256)
           handler: handleNewMarketLaunchedAndSeeded
-        - event: NextPriceDeposit(uint32,uint8,uint256,address,uint256)
+        - event: NextPriceDeposit(uint32,bool,uint256,address,uint256)
           handler: handleNextPriceDeposit
-        - event: NextPriceRedeem(uint32,uint8,uint256,address,uint256)
+        - event: NextPriceRedeem(uint32,bool,uint256,address,uint256)
           handler: handleNextPriceRedeem
         - event: OracleUpdated(uint32,address,address)
           handler: handleOracleUpdated
@@ -63,9 +63,9 @@ dataSources:
     name: Staker
     network: mumbai
     source:
-      address: "0x0c3F85F6E60B174A8A606F5e08fdBF63e213D11A"
+      address: "0xb3349B93b44D805a4199c75397c3C328ce21167b"
       abi: Staker
-      startBlock: 14217166
+      startBlock: 15176483
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -82,16 +82,16 @@ dataSources:
       eventHandlers:
         - event: DeployV1(address)
           handler: handleDeployV1
-        - event: StateAdded(uint32,uint256,uint256,uint256,uint256)
-          handler: handleStateAdded
-        - event: StakeAdded(address,address,uint256,uint256)
-          handler: handleStakeAdded
-        - event: StakeWithdrawn(address,address,uint256)
-          handler: handleStakeWithdrawn
         - event: FloatMinted(address,uint32,uint256,uint256,uint256)
           handler: handleFloatMinted
         - event: MarketLaunchIncentiveParametersChanges(uint32,uint256,uint256)
           handler: handleMarketLaunchIncentiveParametersChanges
+        - event: StakeAdded(address,address,uint256,uint256)
+          handler: handleStakeAdded
+        - event: StakeWithdrawn(address,address,uint256)
+          handler: handleStakeWithdrawn
+        - event: StateAdded(uint32,uint256,uint256,uint256,uint256)
+          handler: handleStateAdded
       file: ./src/staker.ts
 
 templates:

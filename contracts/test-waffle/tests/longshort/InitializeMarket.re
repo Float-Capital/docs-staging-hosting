@@ -1,5 +1,5 @@
-open Globals;
 open LetOps;
+open Mocha;
 
 let test =
     (
@@ -41,7 +41,7 @@ let test =
         );
     };
 
-    it'(
+    it(
       "calls all functions (staker.addNewStakingFund, _changeFees, adminOnly, seedMarketInitially) and mutates state (marketExists) correctly",
       () => {
         let%Await _ =
@@ -63,7 +63,7 @@ let test =
         let stakerCalls =
           (stakerSmockedRef^)->StakerSmocked.addNewStakingFundCalls;
 
-        Chai.recordEqualFlat(
+        Chai.recordEqualFlatLabeled(
           ~expected=stakerCalls->Array.getExn(0),
           ~actual={
             kInitialMultiplier: Ethers.BigNumber.fromUnsafe("6"),
@@ -76,7 +76,7 @@ let test =
 
         let changeFeeCalls = LongShortSmocked.InternalMock._changeFeeCalls();
 
-        Chai.recordEqualFlat(
+        Chai.recordEqualFlatLabeled(
           ~actual={
             marketIndex: 1,
             _baseEntryFee: Ethers.BigNumber.fromUnsafe("1"),
@@ -90,7 +90,7 @@ let test =
         let seedMarketInitiallyCalls =
           LongShortSmocked.InternalMock.seedMarketInitiallyCalls();
 
-        Chai.recordEqualFlat(
+        Chai.recordEqualFlatLabeled(
           ~actual={
             marketIndex: 1,
             initialMarketSeed: Ethers.BigNumber.fromUnsafe("7"),
@@ -108,7 +108,7 @@ let test =
         Chai.boolEqual(isMarket, true);
       },
     );
-    it'("reverts if market exists", () => {
+    it("reverts if market exists", () => {
       let%Await _ =
         setup(~marketIndex=1, ~marketIndexValue=true, ~latestMarket=1);
       let%Await _ =
@@ -131,7 +131,7 @@ let test =
         );
       ();
     });
-    it'("reverts if market index is greater than latest market index", () => {
+    it("reverts if market index is greater than latest market index", () => {
       let%Await _ =
         setup(~marketIndex=2, ~marketIndexValue=false, ~latestMarket=1);
       let%Await _ =

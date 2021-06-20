@@ -3,57 +3,58 @@
 
 var Chai = require("./bindings/chai/Chai.js");
 var LetOps = require("./library/LetOps.js");
-var Globals = require("./library/Globals.js");
 var Helpers = require("./library/Helpers.js");
-var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
+var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var HelperActions = require("./library/HelperActions.js");
 
-Globals.describe("Float System")(undefined, undefined, undefined, (function (param) {
-        return Globals.describe("Staking")(undefined, undefined, undefined, (function (param) {
-                      var contracts = {
-                        contents: undefined
-                      };
-                      var accounts = {
-                        contents: undefined
-                      };
-                      Globals.before$prime(undefined)(undefined, undefined, undefined, (function (param) {
-                              return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
-                                            accounts.contents = loadedAccounts;
-                                            
-                                          }));
-                            }));
-                      Globals.before_each$prime(undefined)(undefined, undefined, undefined, (function (param) {
-                              return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
-                                            contracts.contents = deployedContracts;
-                                            var setupUser = accounts.contents[2];
-                                            return LetOps.Await.let_(HelperActions.stakeRandomlyInBothSidesOfMarket(deployedContracts.markets, setupUser, deployedContracts.longShort), (function (param) {
-                                                          
-                                                        }));
-                                          }));
-                            }));
-                      return Globals.it$prime("should update correct markets in the 'claimFloatCustom' function")(undefined, undefined, undefined, (function (param) {
-                                    var match = contracts.contents;
-                                    var staker = match.staker;
-                                    var testUser = accounts.contents[1];
-                                    return LetOps.Await.let_(HelperActions.stakeRandomlyInMarkets(match.markets, testUser, match.longShort), (function (param) {
-                                                  var marketsUserHasStakedIn = param[1];
-                                                  return LetOps.Await.let_(Helpers.increaseTime(50), (function (param) {
-                                                                return LetOps.Await.let_(staker.connect(testUser).claimFloatCustom(marketsUserHasStakedIn), (function (param) {
-                                                                              return LetOps.Await.let_(Promise.all(Belt_Array.map(marketsUserHasStakedIn, (function (market) {
-                                                                                                    return Promise.all([
-                                                                                                                  staker.userIndexOfLastClaimedReward(market, testUser.address),
-                                                                                                                  staker.latestRewardIndex(market)
-                                                                                                                ]).then(function (param) {
-                                                                                                                return Chai.bnEqual(undefined, param[0], param[1]);
-                                                                                                              });
-                                                                                                  }))), (function (param) {
-                                                                                            
-                                                                                          }));
-                                                                            }));
-                                                              }));
+describe("Float System", (function () {
+        describe("Staking", (function () {
+                var contracts = {
+                  contents: undefined
+                };
+                var accounts = {
+                  contents: undefined
+                };
+                before(function () {
+                      return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
+                                    accounts.contents = loadedAccounts;
+                                    
+                                  }));
+                    });
+                beforeEach(function () {
+                      return LetOps.AwaitThen.let_(Helpers.inititialize(accounts.contents[0], false), (function (deployedContracts) {
+                                    contracts.contents = deployedContracts;
+                                    var setupUser = accounts.contents[2];
+                                    return LetOps.Await.let_(HelperActions.stakeRandomlyInBothSidesOfMarket(deployedContracts.markets, setupUser, deployedContracts.longShort), (function (param) {
+                                                  
                                                 }));
                                   }));
-                    }));
+                    });
+                it("should update correct markets in the 'claimFloatCustom' function", (function () {
+                        var match = contracts.contents;
+                        var staker = match.staker;
+                        var testUser = accounts.contents[1];
+                        return LetOps.Await.let_(HelperActions.stakeRandomlyInMarkets(match.markets, testUser, match.longShort), (function (param) {
+                                      var marketsUserHasStakedIn = param[1];
+                                      return LetOps.Await.let_(Helpers.increaseTime(50), (function (param) {
+                                                    return LetOps.Await.let_(staker.connect(testUser).claimFloatCustom(marketsUserHasStakedIn), (function (param) {
+                                                                  return LetOps.Await.let_(Promise.all(Belt_Array.map(marketsUserHasStakedIn, (function (market) {
+                                                                                        return Promise.all([
+                                                                                                      staker.userIndexOfLastClaimedReward(market, testUser.address),
+                                                                                                      staker.latestRewardIndex(market)
+                                                                                                    ]).then(function (param) {
+                                                                                                    return Chai.bnEqual(undefined, param[0], param[1]);
+                                                                                                  });
+                                                                                      }))), (function (param) {
+                                                                                
+                                                                              }));
+                                                                }));
+                                                  }));
+                                    }));
+                      }));
+                
+              }));
+        
       }));
 
 /*  Not a pure module */
