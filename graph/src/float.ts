@@ -501,7 +501,6 @@ export function handleNewMarketLaunchedAndSeeded(
   event: NewMarketLaunchedAndSeeded
 ): void {
   // TODO - need to include the market seed initially
-  // @JasoonS you'll need to explain what's needed / complete this 
   let marketIndex = event.params.marketIndex;
   let initialSeed = event.params.initialSeed;
 
