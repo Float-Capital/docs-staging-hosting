@@ -155,7 +155,7 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
       shortValue,
     ]),
     ["marketIndex", "totalValueLockedInMarket", "longValue", "shortValue"],
-    ["uint256", "uint256", "uint256", "uint256"],
+    ["uint32", "uint256", "uint256", "uint256"],
     [],
     []
   );
@@ -237,7 +237,7 @@ export function handleSyntheticTokenCreated(
     BigInt.fromI32(1)
   );
 
-  // Makae sure the latest staker state has the correct ID even though the instance hasn't been created yet.
+  // Make sure the latest staker state has the correct ID even though the instance hasn't been created yet.
   syntheticMarket.latestStakerState = getStakerStateId(marketIndexString, ZERO);
 
   longToken.syntheticMarket = syntheticMarket.id;
@@ -352,7 +352,7 @@ export function handleFeesChanges(event: FeesChanges): void {
       "baseExitFee",
       "badLiquidityExitFee",
     ],
-    ["uint256", "uint256", "uint256", "uint256", "uint256"],
+    ["uint32", "uint256", "uint256", "uint256", "uint256"],
     [],
     []
   );
@@ -382,7 +382,7 @@ export function handlePriceUpdate(event: PriceUpdate): void {
       user.toHex(),
     ]),
     ["marketIndex", "newPrice", "oldPrice", "user"],
-    ["uint256", "uint256", "uint256", "address"],
+    ["uint32", "uint256", "uint256", "address"],
     [user],
     []
   );
@@ -501,7 +501,27 @@ export function handleNewMarketLaunchedAndSeeded(
   event: NewMarketLaunchedAndSeeded
 ): void {
   // TODO - need to include the market seed initially
-  // @chris please fill in the saveEventToStateChange for this function
+  let marketIndex = event.params.marketIndex;
+  let initialSeed = event.params.initialSeed;
+
+  saveEventToStateChange(
+    event,
+    "NewMarketLaunchedAndSeeded",
+    [
+      marketIndex.toString(),
+      initialSeed.toHex(),
+    ],
+    [
+      "marketIndex",
+      "initialMarketSeed",
+    ],
+    [
+      "uint32",
+      "uint256",
+    ],
+    [],
+    []
+  );
 }
 
 export function removeFromArrayAtIndex(
@@ -599,8 +619,21 @@ export function handleBatchedActionsSettled(
 
     batchedNextPriceExec.save();
   }
-  // TODO
-  // @chris please fill in the saveEventToStateChange for this function
+
+  saveEventToStateChange(
+    event,
+    "BatchedActionsSettled",
+    bigIntArrayToStringArray([
+      marketIndex,
+      updateIndex,
+      mintPriceSnapshotLong,
+      mintPriceSnapshotShort
+    ]),
+    ["marketIndex", "updateIndex", "mintPriceSnapshotLong", "mintPriceSnapshotShort"],
+    ["uint32", "uint256", "uint256", "uint256"],
+    [],
+    []
+  );
 }
 
 export function handleExecuteNextPriceSettlementsUser(
@@ -630,8 +663,18 @@ export function handleExecuteNextPriceSettlementsUser(
 
   user.save();
 
-  // TODO
-  // @chris please fill in the saveEventToStateChange for this function
+  saveEventToStateChange(
+    event,
+    "ExecuteNextPriceSettlementsUser",
+    [
+      marketIndex.toString(),
+      userAddress.toHex(),
+    ],
+    ["marketIndex", "userAddress"],
+    ["uint32", "address"],
+    [userAddress],
+    []
+  );
 }
 
 function updateLatestTokenPrice(
@@ -707,7 +750,7 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
     "TokenPriceRefreshed",
     bigIntArrayToStringArray([marketIndex, longTokenPrice, shortTokenPrice]),
     ["marketIndex", "longTokenPrice", "shortTokenPrice"],
-    ["uint256", "uint256", "uint256"],
+    ["uint32", "uint256", "uint256"],
     [],
     []
   );
