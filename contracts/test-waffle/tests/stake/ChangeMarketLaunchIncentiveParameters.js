@@ -19,7 +19,7 @@ function test(contracts, accounts) {
           Globals.before_once$p(function (param) {
                 return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "changeMarketLaunchIncentiveParameters", contracts, accounts), (function (param) {
                               StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn(undefined);
-                              StakerSmocked.InternalMock.mockonlyAdminToReturn(undefined);
+                              StakerSmocked.InternalMock.mockOnlyAdminToReturn(undefined);
                               return LetOps.Await.let_(stakerRef.contents.changeMarketLaunchIncentiveParameters(2, period, initialMultiplier), (function (param) {
                                             
                                           }));

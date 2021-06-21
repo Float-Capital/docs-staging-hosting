@@ -28,7 +28,7 @@ function test(contracts, accounts) {
           Globals.before_once$p(function (param) {
                 return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "addNewStakingFund", contracts, accounts), (function (param) {
                               StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn(undefined);
-                              StakerSmocked.InternalMock.mockonlyFloatToReturn(undefined);
+                              StakerSmocked.InternalMock.mockOnlyFloatToReturn(undefined);
                               return LetOps.AwaitThen.let_(stakerRef.contents.setAddNewStakingFundParams(1, sampleLongAddress, sampleShortAddress, sampleMockAddress), (function (param) {
                                             return LetOps.AwaitThen.let_(Helpers.getBlock(undefined), (function (param) {
                                                           timestampRef.contents = param.timestamp;

@@ -832,7 +832,7 @@ contract LongShortMockable is ILongShort, Initializable {
     function handleBatchedDepositSettlement(
         uint32 marketIndex,
         MarketSide syntheticTokenType
-    ) internal {
+    ) internal returns (bool wasABatchedSettlement) {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("handleBatchedDepositSettlement"))){
       
       return mocker.handleBatchedDepositSettlementMock(marketIndex,syntheticTokenType);
@@ -875,6 +875,7 @@ contract LongShortMockable is ILongShort, Initializable {
                 syntheticTokenPrice[marketIndex][MarketSide.Short] ==
                     oldTokenShortPrice
             );
+            wasABatchedSettlement = true;
         }
     }
 
@@ -948,34 +949,36 @@ contract LongShortMockable is ILongShort, Initializable {
                 newLatestPriceStateIndex
             );
 
-            handleBatchedDepositSettlement(marketIndex, MarketSide.Long);
-            handleBatchedDepositSettlement(marketIndex, MarketSide.Short);
-            handleBatchedNextPriceRedeems(marketIndex);
+            if (
+                handleBatchedDepositSettlement(marketIndex, MarketSide.Long) ||
+                handleBatchedDepositSettlement(marketIndex, MarketSide.Short) ||
+                handleBatchedNextPriceRedeems(marketIndex)
+            ) {
+                emit BatchedActionsSettled(
+                    marketIndex,
+                    newLatestPriceStateIndex,
+                    mintPriceSnapshot[marketIndex][MarketSide.Long][
+                        newLatestPriceStateIndex
+                    ],
+                    mintPriceSnapshot[marketIndex][MarketSide.Short][
+                        newLatestPriceStateIndex
+                    ],
+                    redeemPriceSnapshot[marketIndex][MarketSide.Long][
+                        newLatestPriceStateIndex
+                    ],
+                    redeemPriceSnapshot[marketIndex][MarketSide.Short][
+                        newLatestPriceStateIndex
+                    ]
+                );
 
-            emit BatchedActionsSettled(
-                marketIndex,
-                newLatestPriceStateIndex,
-                mintPriceSnapshot[marketIndex][MarketSide.Long][
-                    newLatestPriceStateIndex
-                ],
-                mintPriceSnapshot[marketIndex][MarketSide.Short][
-                    newLatestPriceStateIndex
-                ],
-                redeemPriceSnapshot[marketIndex][MarketSide.Long][
-                    newLatestPriceStateIndex
-                ],
-                redeemPriceSnapshot[marketIndex][MarketSide.Short][
-                    newLatestPriceStateIndex
-                ]
-            );
-
-            emit ValueLockedInSystem(
-                marketIndex,
-                syntheticTokenPoolValue[marketIndex][MarketSide.Long] +
-                    syntheticTokenPoolValue[marketIndex][MarketSide.Short],
-                syntheticTokenPoolValue[marketIndex][MarketSide.Long],
-                syntheticTokenPoolValue[marketIndex][MarketSide.Short]
-            );
+                emit ValueLockedInSystem(
+                    marketIndex,
+                    syntheticTokenPoolValue[marketIndex][MarketSide.Long] +
+                        syntheticTokenPoolValue[marketIndex][MarketSide.Short],
+                    syntheticTokenPoolValue[marketIndex][MarketSide.Long],
+                    syntheticTokenPoolValue[marketIndex][MarketSide.Short]
+                );
+            }
         }
     }
 
@@ -1038,6 +1041,10 @@ contract LongShortMockable is ILongShort, Initializable {
     }
   
         uint256 totalAmount = amountLong + amountShort;
+
+        if (totalAmount == 0) {
+            return;
+        }
 
         assert(
             syntheticTokenPoolValue[marketIndex][MarketSide.Long] >=
@@ -1410,7 +1417,7 @@ contract LongShortMockable is ILongShort, Initializable {
         uint32 marketIndex,
         MarketSide syntheticTokenType,
         uint256 amountSynthToRedeem
-    ) internal {
+    ) internal returns (bool wasABatchedSettlement) {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_handleBatchedNextPriceRedeem"))){
       
       return mocker._handleBatchedNextPriceRedeemMock(marketIndex,syntheticTokenType,amountSynthToRedeem);
@@ -1421,6 +1428,7 @@ contract LongShortMockable is ILongShort, Initializable {
                 address(this),
                 amountSynthToRedeem
             );
+            wasABatchedSettlement = true;
         }
     }
 
@@ -1495,7 +1503,10 @@ contract LongShortMockable is ILongShort, Initializable {
         }
     }
 
-    function handleBatchedNextPriceRedeems(uint32 marketIndex) internal {
+    function handleBatchedNextPriceRedeems(uint32 marketIndex)
+        internal
+        returns (bool wasABatchedSettlement)
+    {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("handleBatchedNextPriceRedeems"))){
       
       return mocker.handleBatchedNextPriceRedeemsMock(marketIndex);
@@ -1506,16 +1517,18 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 batchedNextPriceSynthToRedeemShort =
             batchedNextPriceSynthRedeemAmount[marketIndex][MarketSide.Short];
 
-        _handleBatchedNextPriceRedeem(
-            marketIndex,
-            MarketSide.Long,
-            batchedNextPriceSynthToRedeemLong
-        );
-        _handleBatchedNextPriceRedeem(
-            marketIndex,
-            MarketSide.Short,
-            batchedNextPriceSynthToRedeemShort
-        );
+        bool longBatchExisted =
+            _handleBatchedNextPriceRedeem(
+                marketIndex,
+                MarketSide.Long,
+                batchedNextPriceSynthToRedeemLong
+            );
+        bool shortBatchExisted =
+            _handleBatchedNextPriceRedeem(
+                marketIndex,
+                MarketSide.Short,
+                batchedNextPriceSynthToRedeemShort
+            );
 
         uint256 longAmountOfPaymentTokenToRedeem =
             getAmountPaymentToken(
@@ -1561,5 +1574,6 @@ contract LongShortMockable is ILongShort, Initializable {
 
         batchedNextPriceSynthRedeemAmount[marketIndex][MarketSide.Long] = 0;
         batchedNextPriceSynthRedeemAmount[marketIndex][MarketSide.Short] = 0;
+        wasABatchedSettlement = longBatchExisted || longBatchExisted;
     }
 }

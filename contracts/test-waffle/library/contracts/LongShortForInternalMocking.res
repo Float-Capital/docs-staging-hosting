@@ -113,7 +113,7 @@ external _getFeesGeneralMock: (
   Ethers.BigNumber.t,
 ) => JsPromise.t<_getFeesGeneralMockReturn> = "_getFeesGeneralMock"
 
-type _handleBatchedNextPriceRedeemMockReturn
+type _handleBatchedNextPriceRedeemMockReturn = bool
 @send
 external _handleBatchedNextPriceRedeemMock: (
   t,
@@ -320,7 +320,7 @@ external getUsersPendingBalanceMock: (
   int,
 ) => JsPromise.t<getUsersPendingBalanceMockReturn> = "getUsersPendingBalanceMock"
 
-type handleBatchedDepositSettlementMockReturn
+type handleBatchedDepositSettlementMockReturn = bool
 @send
 external handleBatchedDepositSettlementMock: (
   t,
@@ -328,7 +328,7 @@ external handleBatchedDepositSettlementMock: (
   int,
 ) => JsPromise.t<handleBatchedDepositSettlementMockReturn> = "handleBatchedDepositSettlementMock"
 
-type handleBatchedNextPriceRedeemsMockReturn
+type handleBatchedNextPriceRedeemsMockReturn = bool
 @send
 external handleBatchedNextPriceRedeemsMock: (
   t,

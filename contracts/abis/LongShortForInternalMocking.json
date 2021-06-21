@@ -302,7 +302,13 @@
       }
     ],
     "name": "_handleBatchedNextPriceRedeemMock",
-    "outputs": [],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "wasABatchedSettlement",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "pure",
     "type": "function"
   },
@@ -846,7 +852,13 @@
       }
     ],
     "name": "handleBatchedDepositSettlementMock",
-    "outputs": [],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "wasABatchedSettlement",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "pure",
     "type": "function"
   },
@@ -859,7 +871,13 @@
       }
     ],
     "name": "handleBatchedNextPriceRedeemsMock",
-    "outputs": [],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "wasABatchedSettlement",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "pure",
     "type": "function"
   },
