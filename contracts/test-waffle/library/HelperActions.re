@@ -113,7 +113,7 @@ let stakeRandomlyInMarkets =
             let%Await longTokenPrice =
               longShort->LongShort.syntheticTokenPrice(
                 marketIndex,
-                CONSTANTS.longTokenType,
+                true/*long*/,
               );
 
             synthsUserHasStakedIn->Array.concat([|
@@ -131,7 +131,7 @@ let stakeRandomlyInMarkets =
             let%Await shortTokenPrice =
               longShort->LongShort.syntheticTokenPrice(
                 marketIndex,
-                CONSTANTS.shortTokenType,
+                false/*short*/,
               );
             synthsUserHasStakedIn->Array.concat([|
               {
@@ -149,7 +149,7 @@ let stakeRandomlyInMarkets =
             let%AwaitThen longTokenPrice =
               longShort->LongShort.syntheticTokenPrice(
                 marketIndex,
-                CONSTANTS.longTokenType,
+                true/*long*/,
               );
             let newSynthsUserHasStakedIn =
               synthsUserHasStakedIn->Array.concat([|
@@ -172,7 +172,7 @@ let stakeRandomlyInMarkets =
             let%Await shortTokenPrice =
               longShort->LongShort.syntheticTokenPrice(
                 marketIndex,
-                CONSTANTS.shortTokenType,
+                false/*short*/,
               );
             newSynthsUserHasStakedIn->Array.concat([|
               {

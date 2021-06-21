@@ -25,12 +25,12 @@ contract LongShortInternalsExposed is LongShortMockable {
         latestMarket = _latestMarket;
         marketExists[marketIndex] = marketIndexValue;
         staker = IStaker(_staker);
-        syntheticTokens[marketIndex][MarketSide.Long] = ISyntheticToken(
-            longAddress
-        );
-        syntheticTokens[marketIndex][MarketSide.Short] = ISyntheticToken(
-            shortAddress
-        );
+        syntheticTokens[marketIndex][
+            true /*short*/
+        ] = ISyntheticToken(longAddress);
+        syntheticTokens[marketIndex][
+            false /*short*/
+        ] = ISyntheticToken(shortAddress);
     }
 
     function setUseexecuteOutstandingNextPriceSettlementsMock(
@@ -64,20 +64,8 @@ contract LongShortInternalsExposed is LongShortMockable {
         _refreshTokenPrices(marketIndex);
     }
 
-    function feesMechanism(uint32 marketIndex, uint256 totalFees) external {
-        _feesMechanism(marketIndex, totalFees);
-    }
-
     function claimAndDistributeYield(uint32 marketIndex) external {
         _claimAndDistributeYield(marketIndex);
-    }
-
-    function minimum(uint256 liquidityOfPositionA, uint256 liquidityOfPositionB)
-        external
-        view
-        returns (uint256)
-    {
-        _minimum(liquidityOfPositionA, liquidityOfPositionB);
     }
 
     function depositFunds(uint32 marketIndex, uint256 amount) external {

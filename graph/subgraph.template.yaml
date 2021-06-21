@@ -77,16 +77,16 @@ dataSources:
       eventHandlers:
         - event: DeployV1(address)
           handler: handleDeployV1
-        - event: StateAdded(uint32,uint256,uint256,uint256,uint256)
-          handler: handleStateAdded
-        - event: StakeAdded(address,address,uint256,uint256)
-          handler: handleStakeAdded
-        - event: StakeWithdrawn(address,address,uint256)
-          handler: handleStakeWithdrawn
         - event: FloatMinted(address,uint32,uint256,uint256,uint256)
           handler: handleFloatMinted
         - event: MarketLaunchIncentiveParametersChanges(uint32,uint256,uint256)
           handler: handleMarketLaunchIncentiveParametersChanges
+        - event: StakeAdded(address,address,uint256,uint256)
+          handler: handleStakeAdded
+        - event: StakeWithdrawn(address,address,uint256)
+          handler: handleStakeWithdrawn
+        - event: StateAdded(uint32,uint256,uint256,uint256,uint256)
+          handler: handleStateAdded
       file: ./src/staker.ts
 
 templates:

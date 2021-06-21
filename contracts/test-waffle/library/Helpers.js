@@ -6,7 +6,6 @@ var Js_int = require("rescript/lib/js/js_int.js");
 var Staker = require("./contracts/Staker.js");
 var Globals = require("./Globals.js");
 var Js_math = require("rescript/lib/js/js_math.js");
-var CONSTANTS = require("../CONSTANTS.js");
 var ERC20Mock = require("./contracts/ERC20Mock.js");
 var LongShort = require("./contracts/LongShort.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
@@ -84,8 +83,8 @@ function getAllMarkets(longShort) {
   return longShort.latestMarket().then(function (nextMarketIndex) {
               return Promise.all(Belt_Array.map(Belt_Array.range(1, nextMarketIndex), (function (marketIndex) {
                                 return Promise.all([
-                                              longShort.syntheticTokens(marketIndex, CONSTANTS.longTokenType).then(SyntheticToken.at),
-                                              longShort.syntheticTokens(marketIndex, CONSTANTS.shortTokenType).then(SyntheticToken.at),
+                                              longShort.syntheticTokens(marketIndex, true).then(SyntheticToken.at),
+                                              longShort.syntheticTokens(marketIndex, false).then(SyntheticToken.at),
                                               longShort.fundTokens(marketIndex).then(ERC20Mock.at),
                                               longShort.oracleManagers(marketIndex).then(OracleManagerMock.at),
                                               longShort.yieldManagers(marketIndex).then(YieldManagerMock.at)
@@ -176,4 +175,4 @@ exports.inititialize = inititialize;
 exports.increaseTime = increaseTime;
 exports.getBlock = getBlock;
 exports.getRandomTimestampInPast = getRandomTimestampInPast;
-/* CONSTANTS Not a pure module */
+/* No side effect */

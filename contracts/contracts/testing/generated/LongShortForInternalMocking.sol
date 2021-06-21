@@ -39,7 +39,7 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function seedMarketInitiallyMock(uint256,uint32) public pure {
+    function _seedMarketInitiallyMock(uint256,uint32) public pure {
       return ();
     }
      
@@ -47,23 +47,19 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function getOtherSynthTypeMock(ILongShort.MarketSide) public pure returns (ILongShort.MarketSide ){
-      return (abi.decode("",(ILongShort.MarketSide)));
-    }
-     
-    function getPriceMock(uint256,uint256) public pure returns (uint256 ){
+    function _getPriceMock(uint256,uint256) public pure returns (uint256 ){
       return (abi.decode("",(uint256)));
     }
      
-    function getAmountPaymentTokenMock(uint256,uint256) public pure returns (uint256 ){
+    function _getAmountPaymentTokenMock(uint256,uint256) public pure returns (uint256 ){
       return (abi.decode("",(uint256)));
     }
      
-    function getAmountSynthTokenMock(uint256,uint256) public pure returns (uint256 ){
+    function _getAmountSynthTokenMock(uint256,uint256) public pure returns (uint256 ){
       return (abi.decode("",(uint256)));
     }
      
-    function getUsersPendingBalanceMock(address,uint32,ILongShort.MarketSide) public pure returns (uint256 pendingBalance){
+    function getUsersPendingBalanceMock(address,uint32,bool) public pure returns (uint256 pendingBalance){
       return (abi.decode("",(uint256)));
     }
      
@@ -75,8 +71,8 @@ contract LongShortForInternalMocking {
       return (abi.decode("",(uint256)),abi.decode("",(uint256)));
     }
      
-    function _minimumMock(uint256,uint256) public pure returns (int256 ){
-      return (abi.decode("",(int256)));
+    function getFeesGeneralMock(uint32,uint256,bool,uint256,uint256) public pure returns (uint256 ){
+      return (abi.decode("",(uint256)));
     }
      
     function _refreshTokenPricesMock(uint32) public pure {
@@ -87,23 +83,15 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function _feesMechanismMock(uint32,uint256) public pure {
-      return ();
-    }
-     
     function _claimAndDistributeYieldMock(uint32) public pure {
       return ();
     }
      
-    function _adjustMarketBasedOnNewAssetPriceMock(uint32,int256) public pure returns (bool didUpdate){
-      return (abi.decode("",(bool)));
+    function _adjustMarketBasedOnNewAssetPriceMock(uint32,int256) public pure {
+      return ();
     }
      
-    function handleBatchedDepositSettlementMock(uint32,ILongShort.MarketSide) public pure returns (bool wasABatchedSettlement){
-      return (abi.decode("",(bool)));
-    }
-     
-    function snapshotPriceChangeForNextPriceExecutionMock(uint32,uint256) public pure {
+    function _saveSyntheticTokenPriceSnapshotsMock(uint32,uint256) public pure {
       return ();
     }
      
@@ -131,6 +119,10 @@ contract LongShortForInternalMocking {
       return ();
     }
      
+    function _burnSynthTokensForRedemptionMock(uint32,uint256,uint256) public pure returns (bool wasABatchedSettlement){
+      return (abi.decode("",(bool)));
+    }
+     
     function _transferFundsToYieldManagerMock(uint32,uint256) public pure {
       return ();
     }
@@ -143,27 +135,7 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function _getFeesGeneralMock(uint32,uint256,ILongShort.MarketSide,ILongShort.MarketSide,uint256,uint256) public pure returns (uint256 ){
-      return (abi.decode("",(uint256)));
-    }
-     
-    function _executeNextPriceMintsIfTheyExistMock(uint32,address,ILongShort.MarketSide) public pure {
-      return ();
-    }
-     
-    function _executeOutstandingNextPriceSettlementsActionMock(address,uint32) public pure {
-      return ();
-    }
-     
-    function _executeOutstandingNextPriceSettlementsMock(address,uint32) public pure {
-      return ();
-    }
-     
-    function executeOutstandingNextPriceSettlementsUserMock(address,uint32) public pure {
-      return ();
-    }
-     
-    function _mintNextPriceMock(uint32,uint256,ILongShort.MarketSide) public pure {
+    function _mintNextPriceMock(uint32,uint256,bool) public pure {
       return ();
     }
      
@@ -175,11 +147,7 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function _executeOutstandingNextPriceRedeemsMock(uint32,address,ILongShort.MarketSide) public pure {
-      return ();
-    }
-     
-    function _redeemNextPriceMock(uint32,uint256,ILongShort.MarketSide) public pure {
+    function _redeemNextPriceMock(uint32,uint256,bool) public pure {
       return ();
     }
      
@@ -191,19 +159,31 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function _handleBatchedNextPriceRedeemMock(uint32,ILongShort.MarketSide,uint256) public pure returns (bool wasABatchedSettlement){
+    function _executeNextPriceMintsIfTheyExistMock(uint32,address,bool) public pure {
+      return ();
+    }
+     
+    function _executeOutstandingNextPriceRedeemsMock(uint32,address,bool) public pure {
+      return ();
+    }
+     
+    function _executeOutstandingNextPriceSettlementsMock(address,uint32) public pure {
+      return ();
+    }
+     
+    function executeOutstandingNextPriceSettlementsUserMock(address,uint32) public pure {
+      return ();
+    }
+     
+    function _performOustandingSettlementsMock(uint32,uint256) public pure {
+      return ();
+    }
+     
+    function _handleBatchedDepositSettlementMock(uint32,bool) public pure returns (bool wasABatchedSettlement){
       return (abi.decode("",(bool)));
     }
      
-    function _calculateBatchedNextPriceFeesMock(uint32,uint256,uint256) public pure returns (uint256 totalFeesLong,uint256 totalFeesShort){
-      return (abi.decode("",(uint256)),abi.decode("",(uint256)));
-    }
-     
-    function calculateRedeemPriceSnapshotMock(uint32,uint256,ILongShort.MarketSide) public pure returns (uint256 batchLongTotalWithdrawnPaymentToken){
-      return (abi.decode("",(uint256)));
-    }
-     
-    function handleBatchedNextPriceRedeemsMock(uint32) public pure returns (bool wasABatchedSettlement){
+    function _handleBatchedRedeemSettlementMock(uint32) public pure returns (bool wasABatchedSettlement){
       return (abi.decode("",(bool)));
     }
      
@@ -216,10 +196,6 @@ contract LongShortForInternalMocking {
     }
      
     function assertMarketExistsMock(uint32) public pure {
-      return; 
-    }
-     
-    function isCorrectSynthMock(uint32,ILongShort.MarketSide,ISyntheticToken) public pure {
       return; 
     }
      

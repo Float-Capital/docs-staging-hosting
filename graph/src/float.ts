@@ -155,7 +155,7 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
       shortValue,
     ]),
     ["marketIndex", "totalValueLockedInMarket", "longValue", "shortValue"],
-    ["uint256", "uint256", "uint256", "uint256"],
+    ["uint32", "uint256", "uint256", "uint256"],
     [],
     []
   );
@@ -237,7 +237,7 @@ export function handleSyntheticTokenCreated(
     BigInt.fromI32(1)
   );
 
-  // Makae sure the latest staker state has the correct ID even though the instance hasn't been created yet.
+  // Make sure the latest staker state has the correct ID even though the instance hasn't been created yet.
   syntheticMarket.latestStakerState = getStakerStateId(marketIndexString, ZERO);
 
   longToken.syntheticMarket = syntheticMarket.id;
@@ -352,7 +352,7 @@ export function handleFeesChanges(event: FeesChanges): void {
       "baseExitFee",
       "badLiquidityExitFee",
     ],
-    ["uint256", "uint256", "uint256", "uint256", "uint256"],
+    ["uint32", "uint256", "uint256", "uint256", "uint256"],
     [],
     []
   );
@@ -382,26 +382,17 @@ export function handlePriceUpdate(event: PriceUpdate): void {
       user.toHex(),
     ]),
     ["marketIndex", "newPrice", "oldPrice", "user"],
-    ["uint256", "uint256", "uint256", "address"],
+    ["uint32", "uint256", "uint256", "address"],
     [user],
     []
   );
-}
-
-function getMarketSideString(marketEnum: i32): string {
-  if (marketEnum == 0) {
-    return MARKET_SIDE_LONG;
-  } else {
-    return MARKET_SIDE_SHORT;
-  }
 }
 
 export function handleNextPriceDeposit(event: NextPriceDeposit): void {
   let depositAdded = event.params.depositAdded;
   let marketIndex = event.params.marketIndex;
   let oracleUpdateIndex = event.params.oracleUpdateIndex;
-  let syntheticTokenTypeInt = event.params.syntheticTokenType;
-  let syntheticTokenType = getMarketSideString(syntheticTokenTypeInt);
+  let isLong = event.params.isLong;
   let userAddress = event.params.user;
 
   let user = getUser(userAddress);
@@ -413,7 +404,7 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
     oracleUpdateIndex,
     depositAdded,
     ACTION_MINT,
-    syntheticTokenType,
+    isLong,
     event
   );
 
@@ -451,15 +442,9 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
       depositAdded,
       marketIndex,
       oracleUpdateIndex,
-    ]).concat([syntheticTokenType, user.id]),
-    [
-      "depositAdded",
-      "marketIndex",
-      "oracleUpdateIndex",
-      "syntheticTokenType",
-      "user",
-    ],
-    ["uint256", "uint32", "uint256", "MarketSide", "address"],
+    ]).concat([isLong ? "true" : "false", user.id]),
+    ["depositAdded", "marketIndex", "oracleUpdateIndex", "isLong", "user"],
+    ["uint256", "uint32", "uint256", "bool", "address"],
     [userAddress],
     []
   );
@@ -469,8 +454,7 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
   let depositAdded = event.params.synthRedeemed;
   let marketIndex = event.params.marketIndex;
   let oracleUpdateIndex = event.params.oracleUpdateIndex;
-  let syntheticTokenTypeInt = event.params.syntheticTokenType;
-  let syntheticTokenType = getMarketSideString(syntheticTokenTypeInt);
+  let isLong = event.params.isLong;
   let userAddress = event.params.user;
 
   let user = getUser(userAddress);
@@ -482,7 +466,7 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
     oracleUpdateIndex,
     depositAdded,
     ACTION_REDEEM,
-    syntheticTokenType,
+    isLong,
     event
   );
 
@@ -505,15 +489,9 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
       depositAdded,
       marketIndex,
       oracleUpdateIndex,
-    ]).concat([syntheticTokenType, user.id]),
-    [
-      "synthRedeemed",
-      "marketIndex",
-      "oracleUpdateIndex",
-      "syntheticTokenType",
-      "user",
-    ],
-    ["uint256", "uint32", "uint256", "MarketSide", "address"],
+    ]).concat([isLong ? "true" : "false", user.id]),
+    ["synthRedeemed", "marketIndex", "oracleUpdateIndex", "isLong", "user"],
+    ["uint256", "uint32", "uint256", "bool", "address"],
     [userAddress],
     []
   );
@@ -523,7 +501,27 @@ export function handleNewMarketLaunchedAndSeeded(
   event: NewMarketLaunchedAndSeeded
 ): void {
   // TODO - need to include the market seed initially
-  // @chris please fill in the saveEventToStateChange for this function
+  let marketIndex = event.params.marketIndex;
+  let initialSeed = event.params.initialSeed;
+
+  saveEventToStateChange(
+    event,
+    "NewMarketLaunchedAndSeeded",
+    [
+      marketIndex.toString(),
+      initialSeed.toHex(),
+    ],
+    [
+      "marketIndex",
+      "initialMarketSeed",
+    ],
+    [
+      "uint32",
+      "uint256",
+    ],
+    [],
+    []
+  );
 }
 
 export function removeFromArrayAtIndex(
@@ -621,8 +619,21 @@ export function handleBatchedActionsSettled(
 
     batchedNextPriceExec.save();
   }
-  // TODO
-  // @chris please fill in the saveEventToStateChange for this function
+
+  saveEventToStateChange(
+    event,
+    "BatchedActionsSettled",
+    bigIntArrayToStringArray([
+      marketIndex,
+      updateIndex,
+      mintPriceSnapshotLong,
+      mintPriceSnapshotShort
+    ]),
+    ["marketIndex", "updateIndex", "mintPriceSnapshotLong", "mintPriceSnapshotShort"],
+    ["uint32", "uint256", "uint256", "uint256"],
+    [],
+    []
+  );
 }
 
 export function handleExecuteNextPriceSettlementsUser(
@@ -652,8 +663,18 @@ export function handleExecuteNextPriceSettlementsUser(
 
   user.save();
 
-  // TODO
-  // @chris please fill in the saveEventToStateChange for this function
+  saveEventToStateChange(
+    event,
+    "ExecuteNextPriceSettlementsUser",
+    [
+      marketIndex.toString(),
+      userAddress.toHex(),
+    ],
+    ["marketIndex", "userAddress"],
+    ["uint32", "address"],
+    [userAddress],
+    []
+  );
 }
 
 function updateLatestTokenPrice(
@@ -729,7 +750,7 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
     "TokenPriceRefreshed",
     bigIntArrayToStringArray([marketIndex, longTokenPrice, shortTokenPrice]),
     ["marketIndex", "longTokenPrice", "shortTokenPrice"],
-    ["uint256", "uint256", "uint256"],
+    ["uint32", "uint256", "uint256"],
     [],
     []
   );

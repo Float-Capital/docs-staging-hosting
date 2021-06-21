@@ -27,7 +27,7 @@ function test(contracts, accounts) {
                                         return LetOps.Await.let_(LongShortSmocked.InternalMock.setupFunctionForUnitTesting(longShortRef.contents, "initializeMarket"), (function (param) {
                                                       LongShortSmocked.InternalMock.mock_changeFeesToReturn(undefined);
                                                       LongShortSmocked.InternalMock.mockAdminOnlyToReturn(undefined);
-                                                      LongShortSmocked.InternalMock.mockSeedMarketInitiallyToReturn(undefined);
+                                                      LongShortSmocked.InternalMock.mock_seedMarketInitiallyToReturn(undefined);
                                                       return longShortRef.contents.setInitializeMarketParams(marketIndex, marketIndexValue, latestMarket, stakerSmockedRef.contents.address, sampleAddress, sampleAddress);
                                                     }));
                                       }));
@@ -52,7 +52,7 @@ function test(contracts, accounts) {
                                                     badLiquidityEntryFee: ethers.BigNumber.from("2"),
                                                     badLiquidityExitFee: ethers.BigNumber.from("3")
                                                   });
-                                              var seedMarketInitiallyCalls = LongShortSmocked.InternalMock.seedMarketInitiallyCalls(undefined);
+                                              var seedMarketInitiallyCalls = LongShortSmocked.InternalMock._seedMarketInitiallyCalls(undefined);
                                               Chai.recordEqualFlatLabeled(Belt_Array.getExn(seedMarketInitiallyCalls, 0), {
                                                     initialMarketSeed: ethers.BigNumber.from("7"),
                                                     marketIndex: 1

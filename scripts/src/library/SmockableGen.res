@@ -1,6 +1,7 @@
 let {startsWith} = module(Js.String2)
-let {lowerCaseFirstLetter, formatKeywords} = module(AbiInterfaceGen)
-let {reduceStrArr, contains, containsRe, commafiy} = module(Globals)
+let {reduceStrArr, contains, containsRe, commafiy, lowerCaseFirstLetter, formatKeywords} = module(
+  Globals
+)
 
 let uppercaseFirstLetter = %raw(`(someString) => someString.charAt(0).toUpperCase() + someString.slice(1)`)
 

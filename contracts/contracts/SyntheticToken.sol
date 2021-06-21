@@ -13,7 +13,7 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
     IStaker public staker;
     // TODO: these values aren't set by the contructor/initializer
     uint32 public marketIndex;
-    ILongShort.MarketSide public syntheticTokenType;
+    bool public isLong;
 
     constructor(
         string memory name,
@@ -21,12 +21,12 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         ILongShort _longShort,
         IStaker _staker,
         uint32 _marketIndex,
-        ILongShort.MarketSide _syntheticTokenType
+        bool _isLong
     ) ERC20PresetMinterPauser(name, symbol) {
         longShort = _longShort;
         staker = _staker;
         marketIndex = _marketIndex;
-        syntheticTokenType = _syntheticTokenType;
+        isLong = _isLong;
     }
 
     modifier settleRemainingNextPriceExecutions(address user) {
@@ -112,10 +112,7 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         returns (uint256)
     {
         return
-            longShort.getUsersPendingBalance(
-                account,
-                marketIndex,
-                syntheticTokenType
-            ) + ERC20.balanceOf(account);
+            longShort.getUsersPendingBalance(account, marketIndex, isLong) +
+            ERC20.balanceOf(account);
     }
 }

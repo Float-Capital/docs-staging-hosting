@@ -1,5 +1,21 @@
 let {indexOf, match_, substring} = module(Js.String2)
 
+let removePrefixUnderscores = %raw(`(someString) => {
+  if (someString.charAt(0) == "_") {
+    return someString.slice(1)
+  } else {
+    return someString
+  }
+}`)
+
+let formatKeywords = keyword =>
+  switch keyword {
+  | "to" => "_" ++ keyword
+  | _ => keyword->removePrefixUnderscores
+  }
+
+let lowerCaseFirstLetter = %raw(`(someString) => someString.charAt(0).toLowerCase() + someString.slice(1)`)
+
 let reduceStrArr = arr => arr->Array.reduce("", (acc, curr) => acc ++ curr)
 
 let contains = (str, subst) => !(str->indexOf(subst) == -1)

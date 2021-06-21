@@ -29,7 +29,7 @@ let testIntegration =
       let%AwaitThen _longValueBefore =
         longShort->LongShort.syntheticTokenPoolValue(
           marketIndex,
-          CONSTANTS.longTokenType,
+          true/*long*/,
         );
 
       let%AwaitThen _ =
@@ -99,7 +99,7 @@ let testIntegration =
       let%Await longTokenPrice =
         longShort->LongShort.syntheticTokenPrice(
           marketIndex,
-          CONSTANTS.longTokenType,
+          true/*long*/,
         );
 
       let expectedNumberOfTokensToRecieve =
@@ -197,9 +197,9 @@ let testExposed =
         let {longShort} = contracts.contents;
         let%AwaitThen _ = mintLongNextPriceTxPromise.contents;
         let%Await mintAmount =
-          longShort->LongShort.batchedNextPriceDepositAmount(
+          longShort->LongShort.batchedAmountOfTokensToDeposit(
             marketIndex,
-            CONSTANTS.longTokenType,
+            true/*long*/,
           );
 
         Chai.bnEqual(

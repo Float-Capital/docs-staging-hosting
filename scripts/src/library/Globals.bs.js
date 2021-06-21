@@ -17,6 +17,24 @@ function substring(prim0, prim1, prim2) {
   return prim0.substring(prim1, prim2);
 }
 
+var removePrefixUnderscores = ((someString) => {
+  if (someString.charAt(0) == "_") {
+    return someString.slice(1)
+  } else {
+    return someString
+  }
+});
+
+function formatKeywords(keyword) {
+  if (keyword === "to") {
+    return "_" + keyword;
+  } else {
+    return removePrefixUnderscores(keyword);
+  }
+}
+
+var lowerCaseFirstLetter = ((someString) => someString.charAt(0).toLowerCase() + someString.slice(1));
+
 function reduceStrArr(arr) {
   return Belt_Array.reduce(arr, "", (function (acc, curr) {
                 return acc + curr;
@@ -45,6 +63,9 @@ function commafiy(strings) {
 exports.indexOf = indexOf;
 exports.match_ = match_;
 exports.substring = substring;
+exports.removePrefixUnderscores = removePrefixUnderscores;
+exports.formatKeywords = formatKeywords;
+exports.lowerCaseFirstLetter = lowerCaseFirstLetter;
 exports.reduceStrArr = reduceStrArr;
 exports.contains = contains;
 exports.containsRe = containsRe;

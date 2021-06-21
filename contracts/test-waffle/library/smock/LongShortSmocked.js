@@ -137,7 +137,7 @@ function getUsersPendingBalanceCalls(_r) {
                 return {
                         user: param[0],
                         marketIndex: param[1],
-                        syntheticTokenType: param[2]
+                        isLong: param[2]
                       };
               }));
 }
@@ -168,6 +168,24 @@ function getMarketSplitCalls(_r) {
                 return {
                         marketIndex: param[0],
                         amount: param[1]
+                      };
+              }));
+}
+
+function mockGetFeesGeneralToReturn(_r, _param0) {
+  ((_r.smocked.getFeesGeneral.will.return.with([_param0])));
+  
+}
+
+function getFeesGeneralCalls(_r) {
+  var array = _r.smocked.getFeesGeneral.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        marketIndex: param[0],
+                        delta: param[1],
+                        synthTokenGainingDominanceIsLong: param[2],
+                        baseFeePercent: param[3],
+                        penaltyFeePercent: param[4]
                       };
               }));
 }
@@ -213,21 +231,6 @@ function transferTreasuryFundsCalls(_r) {
                 var marketIndex = _m[0];
                 return {
                         marketIndex: marketIndex
-                      };
-              }));
-}
-
-function mockExecuteOutstandingNextPriceSettlementsUserToReturn(_r) {
-  ((_r.smocked.executeOutstandingNextPriceSettlementsUser.will.return()));
-  
-}
-
-function executeOutstandingNextPriceSettlementsUserCalls(_r) {
-  var array = _r.smocked.executeOutstandingNextPriceSettlementsUser.calls;
-  return Belt_Array.map(array, (function (param) {
-                return {
-                        user: param[0],
-                        marketIndex: param[1]
                       };
               }));
 }
@@ -288,6 +291,21 @@ function redeemShortNextPriceCalls(_r) {
                 return {
                         marketIndex: param[0],
                         tokensToRedeem: param[1]
+                      };
+              }));
+}
+
+function mockExecuteOutstandingNextPriceSettlementsUserToReturn(_r) {
+  ((_r.smocked.executeOutstandingNextPriceSettlementsUser.will.return()));
+  
+}
+
+function executeOutstandingNextPriceSettlementsUserCalls(_r) {
+  var array = _r.smocked.executeOutstandingNextPriceSettlementsUser.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        user: param[0],
+                        marketIndex: param[1]
                       };
               }));
 }
@@ -513,19 +531,19 @@ function newSyntheticMarketCalls$1(param) {
                   })));
 }
 
-function mockSeedMarketInitiallyToReturn(param) {
-  checkForExceptions("seedMarketInitially");
+function mock_seedMarketInitiallyToReturn(param) {
+  checkForExceptions("_seedMarketInitially");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.seedMarketInitiallyMock.will.return()));
+          ((_r.smocked._seedMarketInitiallyMock.will.return()));
           
         }));
   
 }
 
-function seedMarketInitiallyCalls(param) {
-  checkForExceptions("seedMarketInitially");
+function _seedMarketInitiallyCalls(param) {
+  checkForExceptions("_seedMarketInitially");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.seedMarketInitiallyMock.calls;
+                    var array = _r.smocked._seedMarketInitiallyMock.calls;
                     return Belt_Array.map(array, (function (param) {
                                   return {
                                           initialMarketSeed: param[0],
@@ -563,41 +581,19 @@ function initializeMarketCalls$1(param) {
                   })));
 }
 
-function mockGetOtherSynthTypeToReturn(_param0) {
-  checkForExceptions("getOtherSynthType");
+function mock_getPriceToReturn(_param0) {
+  checkForExceptions("_getPrice");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.getOtherSynthTypeMock.will.return.with([_param0])));
+          ((_r.smocked._getPriceMock.will.return.with([_param0])));
           
         }));
   
 }
 
-function getOtherSynthTypeCalls(param) {
-  checkForExceptions("getOtherSynthType");
+function _getPriceCalls(param) {
+  checkForExceptions("_getPrice");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.getOtherSynthTypeMock.calls;
-                    return Belt_Array.map(array, (function (_m) {
-                                  var synthTokenType = _m[0];
-                                  return {
-                                          synthTokenType: synthTokenType
-                                        };
-                                }));
-                  })));
-}
-
-function mockGetPriceToReturn(_param0) {
-  checkForExceptions("getPrice");
-  Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.getPriceMock.will.return.with([_param0])));
-          
-        }));
-  
-}
-
-function getPriceCalls(param) {
-  checkForExceptions("getPrice");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.getPriceMock.calls;
+                    var array = _r.smocked._getPriceMock.calls;
                     return Belt_Array.map(array, (function (param) {
                                   return {
                                           amountSynth: param[0],
@@ -607,19 +603,19 @@ function getPriceCalls(param) {
                   })));
 }
 
-function mockGetAmountPaymentTokenToReturn(_param0) {
-  checkForExceptions("getAmountPaymentToken");
+function mock_getAmountPaymentTokenToReturn(_param0) {
+  checkForExceptions("_getAmountPaymentToken");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.getAmountPaymentTokenMock.will.return.with([_param0])));
+          ((_r.smocked._getAmountPaymentTokenMock.will.return.with([_param0])));
           
         }));
   
 }
 
-function getAmountPaymentTokenCalls(param) {
-  checkForExceptions("getAmountPaymentToken");
+function _getAmountPaymentTokenCalls(param) {
+  checkForExceptions("_getAmountPaymentToken");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.getAmountPaymentTokenMock.calls;
+                    var array = _r.smocked._getAmountPaymentTokenMock.calls;
                     return Belt_Array.map(array, (function (param) {
                                   return {
                                           amountSynth: param[0],
@@ -629,19 +625,19 @@ function getAmountPaymentTokenCalls(param) {
                   })));
 }
 
-function mockGetAmountSynthTokenToReturn(_param0) {
-  checkForExceptions("getAmountSynthToken");
+function mock_getAmountSynthTokenToReturn(_param0) {
+  checkForExceptions("_getAmountSynthToken");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.getAmountSynthTokenMock.will.return.with([_param0])));
+          ((_r.smocked._getAmountSynthTokenMock.will.return.with([_param0])));
           
         }));
   
 }
 
-function getAmountSynthTokenCalls(param) {
-  checkForExceptions("getAmountSynthToken");
+function _getAmountSynthTokenCalls(param) {
+  checkForExceptions("_getAmountSynthToken");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.getAmountSynthTokenMock.calls;
+                    var array = _r.smocked._getAmountSynthTokenMock.calls;
                     return Belt_Array.map(array, (function (param) {
                                   return {
                                           amountPaymentToken: param[0],
@@ -668,7 +664,7 @@ function getUsersPendingBalanceCalls$1(param) {
                                   return {
                                           user: param[0],
                                           marketIndex: param[1],
-                                          syntheticTokenType: param[2]
+                                          isLong: param[2]
                                         };
                                 }));
                   })));
@@ -718,23 +714,26 @@ function getMarketSplitCalls$1(param) {
                   })));
 }
 
-function mock_minimumToReturn(_param0) {
-  checkForExceptions("_minimum");
+function mockGetFeesGeneralToReturn$1(_param0) {
+  checkForExceptions("getFeesGeneral");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._minimumMock.will.return.with([_param0])));
+          ((_r.smocked.getFeesGeneralMock.will.return.with([_param0])));
           
         }));
   
 }
 
-function _minimumCalls(param) {
-  checkForExceptions("_minimum");
+function getFeesGeneralCalls$1(param) {
+  checkForExceptions("getFeesGeneral");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._minimumMock.calls;
+                    var array = _r.smocked.getFeesGeneralMock.calls;
                     return Belt_Array.map(array, (function (param) {
                                   return {
-                                          a: param[0],
-                                          b: param[1]
+                                          marketIndex: param[0],
+                                          delta: param[1],
+                                          synthTokenGainingDominanceIsLong: param[2],
+                                          baseFeePercent: param[3],
+                                          penaltyFeePercent: param[4]
                                         };
                                 }));
                   })));
@@ -784,28 +783,6 @@ function _distributeMarketAmountCalls(param) {
                   })));
 }
 
-function mock_feesMechanismToReturn(param) {
-  checkForExceptions("_feesMechanism");
-  Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._feesMechanismMock.will.return()));
-          
-        }));
-  
-}
-
-function _feesMechanismCalls(param) {
-  checkForExceptions("_feesMechanism");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._feesMechanismMock.calls;
-                    return Belt_Array.map(array, (function (param) {
-                                  return {
-                                          marketIndex: param[0],
-                                          totalFees: param[1]
-                                        };
-                                }));
-                  })));
-}
-
 function mock_claimAndDistributeYieldToReturn(param) {
   checkForExceptions("_claimAndDistributeYield");
   Belt_Option.map(internalRef.contents, (function (_r) {
@@ -828,10 +805,10 @@ function _claimAndDistributeYieldCalls(param) {
                   })));
 }
 
-function mock_adjustMarketBasedOnNewAssetPriceToReturn(_param0) {
+function mock_adjustMarketBasedOnNewAssetPriceToReturn(param) {
   checkForExceptions("_adjustMarketBasedOnNewAssetPrice");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._adjustMarketBasedOnNewAssetPriceMock.will.return.with([_param0])));
+          ((_r.smocked._adjustMarketBasedOnNewAssetPriceMock.will.return()));
           
         }));
   
@@ -850,41 +827,19 @@ function _adjustMarketBasedOnNewAssetPriceCalls(param) {
                   })));
 }
 
-function mockHandleBatchedDepositSettlementToReturn(_param0) {
-  checkForExceptions("handleBatchedDepositSettlement");
+function mock_saveSyntheticTokenPriceSnapshotsToReturn(param) {
+  checkForExceptions("_saveSyntheticTokenPriceSnapshots");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.handleBatchedDepositSettlementMock.will.return.with([_param0])));
+          ((_r.smocked._saveSyntheticTokenPriceSnapshotsMock.will.return()));
           
         }));
   
 }
 
-function handleBatchedDepositSettlementCalls(param) {
-  checkForExceptions("handleBatchedDepositSettlement");
+function _saveSyntheticTokenPriceSnapshotsCalls(param) {
+  checkForExceptions("_saveSyntheticTokenPriceSnapshots");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.handleBatchedDepositSettlementMock.calls;
-                    return Belt_Array.map(array, (function (param) {
-                                  return {
-                                          marketIndex: param[0],
-                                          syntheticTokenType: param[1]
-                                        };
-                                }));
-                  })));
-}
-
-function mockSnapshotPriceChangeForNextPriceExecutionToReturn(param) {
-  checkForExceptions("snapshotPriceChangeForNextPriceExecution");
-  Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.snapshotPriceChangeForNextPriceExecutionMock.will.return()));
-          
-        }));
-  
-}
-
-function snapshotPriceChangeForNextPriceExecutionCalls(param) {
-  checkForExceptions("snapshotPriceChangeForNextPriceExecution");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.snapshotPriceChangeForNextPriceExecutionMock.calls;
+                    var array = _r.smocked._saveSyntheticTokenPriceSnapshotsMock.calls;
                     return Belt_Array.map(array, (function (param) {
                                   return {
                                           marketIndex: param[0],
@@ -1028,6 +983,29 @@ function _withdrawFundsCalls(param) {
                   })));
 }
 
+function mock_burnSynthTokensForRedemptionToReturn(_param0) {
+  checkForExceptions("_burnSynthTokensForRedemption");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked._burnSynthTokensForRedemptionMock.will.return.with([_param0])));
+          
+        }));
+  
+}
+
+function _burnSynthTokensForRedemptionCalls(param) {
+  checkForExceptions("_burnSynthTokensForRedemption");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked._burnSynthTokensForRedemptionMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          amountSynthToRedeemLong: param[1],
+                                          amountSynthToRedeemShort: param[2]
+                                        };
+                                }));
+                  })));
+}
+
 function mock_transferFundsToYieldManagerToReturn(param) {
   checkForExceptions("_transferFundsToYieldManager");
   Belt_Option.map(internalRef.contents, (function (_r) {
@@ -1094,121 +1072,6 @@ function transferTreasuryFundsCalls$1(param) {
                   })));
 }
 
-function mock_getFeesGeneralToReturn(_param0) {
-  checkForExceptions("_getFeesGeneral");
-  Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._getFeesGeneralMock.will.return.with([_param0])));
-          
-        }));
-  
-}
-
-function _getFeesGeneralCalls(param) {
-  checkForExceptions("_getFeesGeneral");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._getFeesGeneralMock.calls;
-                    return Belt_Array.map(array, (function (param) {
-                                  return {
-                                          marketIndex: param[0],
-                                          delta: param[1],
-                                          synthTokenGainingDominance: param[2],
-                                          synthTokenLosingDominance: param[3],
-                                          baseFeePercent: param[4],
-                                          penaltyFeePercent: param[5]
-                                        };
-                                }));
-                  })));
-}
-
-function mock_executeNextPriceMintsIfTheyExistToReturn(param) {
-  checkForExceptions("_executeNextPriceMintsIfTheyExist");
-  Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._executeNextPriceMintsIfTheyExistMock.will.return()));
-          
-        }));
-  
-}
-
-function _executeNextPriceMintsIfTheyExistCalls(param) {
-  checkForExceptions("_executeNextPriceMintsIfTheyExist");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._executeNextPriceMintsIfTheyExistMock.calls;
-                    return Belt_Array.map(array, (function (param) {
-                                  return {
-                                          marketIndex: param[0],
-                                          user: param[1],
-                                          syntheticTokenType: param[2]
-                                        };
-                                }));
-                  })));
-}
-
-function mock_executeOutstandingNextPriceSettlementsActionToReturn(param) {
-  checkForExceptions("_executeOutstandingNextPriceSettlementsAction");
-  Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._executeOutstandingNextPriceSettlementsActionMock.will.return()));
-          
-        }));
-  
-}
-
-function _executeOutstandingNextPriceSettlementsActionCalls(param) {
-  checkForExceptions("_executeOutstandingNextPriceSettlementsAction");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._executeOutstandingNextPriceSettlementsActionMock.calls;
-                    return Belt_Array.map(array, (function (param) {
-                                  return {
-                                          user: param[0],
-                                          marketIndex: param[1]
-                                        };
-                                }));
-                  })));
-}
-
-function mock_executeOutstandingNextPriceSettlementsToReturn(param) {
-  checkForExceptions("_executeOutstandingNextPriceSettlements");
-  Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._executeOutstandingNextPriceSettlementsMock.will.return()));
-          
-        }));
-  
-}
-
-function _executeOutstandingNextPriceSettlementsCalls(param) {
-  checkForExceptions("_executeOutstandingNextPriceSettlements");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._executeOutstandingNextPriceSettlementsMock.calls;
-                    return Belt_Array.map(array, (function (param) {
-                                  return {
-                                          user: param[0],
-                                          marketIndex: param[1]
-                                        };
-                                }));
-                  })));
-}
-
-function mockExecuteOutstandingNextPriceSettlementsUserToReturn$1(param) {
-  checkForExceptions("executeOutstandingNextPriceSettlementsUser");
-  Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.executeOutstandingNextPriceSettlementsUserMock.will.return()));
-          
-        }));
-  
-}
-
-function executeOutstandingNextPriceSettlementsUserCalls$1(param) {
-  checkForExceptions("executeOutstandingNextPriceSettlementsUser");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.executeOutstandingNextPriceSettlementsUserMock.calls;
-                    return Belt_Array.map(array, (function (param) {
-                                  return {
-                                          user: param[0],
-                                          marketIndex: param[1]
-                                        };
-                                }));
-                  })));
-}
-
 function mock_mintNextPriceToReturn(param) {
   checkForExceptions("_mintNextPrice");
   Belt_Option.map(internalRef.contents, (function (_r) {
@@ -1226,7 +1089,7 @@ function _mintNextPriceCalls(param) {
                                   return {
                                           marketIndex: param[0],
                                           amount: param[1],
-                                          syntheticTokenType: param[2]
+                                          isLong: param[2]
                                         };
                                 }));
                   })));
@@ -1276,29 +1139,6 @@ function mintShortNextPriceCalls$1(param) {
                   })));
 }
 
-function mock_executeOutstandingNextPriceRedeemsToReturn(param) {
-  checkForExceptions("_executeOutstandingNextPriceRedeems");
-  Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._executeOutstandingNextPriceRedeemsMock.will.return()));
-          
-        }));
-  
-}
-
-function _executeOutstandingNextPriceRedeemsCalls(param) {
-  checkForExceptions("_executeOutstandingNextPriceRedeems");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._executeOutstandingNextPriceRedeemsMock.calls;
-                    return Belt_Array.map(array, (function (param) {
-                                  return {
-                                          marketIndex: param[0],
-                                          user: param[1],
-                                          syntheticTokenType: param[2]
-                                        };
-                                }));
-                  })));
-}
-
 function mock_redeemNextPriceToReturn(param) {
   checkForExceptions("_redeemNextPrice");
   Belt_Option.map(internalRef.contents, (function (_r) {
@@ -1316,7 +1156,7 @@ function _redeemNextPriceCalls(param) {
                                   return {
                                           marketIndex: param[0],
                                           tokensToRedeem: param[1],
-                                          syntheticTokenType: param[2]
+                                          isLong: param[2]
                                         };
                                 }));
                   })));
@@ -1366,88 +1206,153 @@ function redeemShortNextPriceCalls$1(param) {
                   })));
 }
 
-function mock_handleBatchedNextPriceRedeemToReturn(_param0) {
-  checkForExceptions("_handleBatchedNextPriceRedeem");
+function mock_executeNextPriceMintsIfTheyExistToReturn(param) {
+  checkForExceptions("_executeNextPriceMintsIfTheyExist");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._handleBatchedNextPriceRedeemMock.will.return.with([_param0])));
+          ((_r.smocked._executeNextPriceMintsIfTheyExistMock.will.return()));
           
         }));
   
 }
 
-function _handleBatchedNextPriceRedeemCalls(param) {
-  checkForExceptions("_handleBatchedNextPriceRedeem");
+function _executeNextPriceMintsIfTheyExistCalls(param) {
+  checkForExceptions("_executeNextPriceMintsIfTheyExist");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._handleBatchedNextPriceRedeemMock.calls;
+                    var array = _r.smocked._executeNextPriceMintsIfTheyExistMock.calls;
                     return Belt_Array.map(array, (function (param) {
                                   return {
                                           marketIndex: param[0],
-                                          syntheticTokenType: param[1],
-                                          amountSynthToRedeem: param[2]
+                                          user: param[1],
+                                          isLong: param[2]
                                         };
                                 }));
                   })));
 }
 
-function mock_calculateBatchedNextPriceFeesToReturn(_param0, _param1) {
-  checkForExceptions("_calculateBatchedNextPriceFees");
+function mock_executeOutstandingNextPriceRedeemsToReturn(param) {
+  checkForExceptions("_executeOutstandingNextPriceRedeems");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._calculateBatchedNextPriceFeesMock.will.return.with([_param0,_param1])));
+          ((_r.smocked._executeOutstandingNextPriceRedeemsMock.will.return()));
           
         }));
   
 }
 
-function _calculateBatchedNextPriceFeesCalls(param) {
-  checkForExceptions("_calculateBatchedNextPriceFees");
+function _executeOutstandingNextPriceRedeemsCalls(param) {
+  checkForExceptions("_executeOutstandingNextPriceRedeems");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._calculateBatchedNextPriceFeesMock.calls;
+                    var array = _r.smocked._executeOutstandingNextPriceRedeemsMock.calls;
                     return Belt_Array.map(array, (function (param) {
                                   return {
                                           marketIndex: param[0],
-                                          amountOfPaymentTokenToRedeem: param[1],
-                                          shortAmountOfPaymentTokenToRedeem: param[2]
+                                          user: param[1],
+                                          isLong: param[2]
                                         };
                                 }));
                   })));
 }
 
-function mockCalculateRedeemPriceSnapshotToReturn(_param0) {
-  checkForExceptions("calculateRedeemPriceSnapshot");
+function mock_executeOutstandingNextPriceSettlementsToReturn(param) {
+  checkForExceptions("_executeOutstandingNextPriceSettlements");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.calculateRedeemPriceSnapshotMock.will.return.with([_param0])));
+          ((_r.smocked._executeOutstandingNextPriceSettlementsMock.will.return()));
           
         }));
   
 }
 
-function calculateRedeemPriceSnapshotCalls(param) {
-  checkForExceptions("calculateRedeemPriceSnapshot");
+function _executeOutstandingNextPriceSettlementsCalls(param) {
+  checkForExceptions("_executeOutstandingNextPriceSettlements");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.calculateRedeemPriceSnapshotMock.calls;
+                    var array = _r.smocked._executeOutstandingNextPriceSettlementsMock.calls;
                     return Belt_Array.map(array, (function (param) {
                                   return {
-                                          marketIndex: param[0],
-                                          amountOfPaymentTokenToRedeem: param[1],
-                                          syntheticTokenType: param[2]
+                                          user: param[0],
+                                          marketIndex: param[1]
                                         };
                                 }));
                   })));
 }
 
-function mockHandleBatchedNextPriceRedeemsToReturn(_param0) {
-  checkForExceptions("handleBatchedNextPriceRedeems");
+function mockExecuteOutstandingNextPriceSettlementsUserToReturn$1(param) {
+  checkForExceptions("executeOutstandingNextPriceSettlementsUser");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.handleBatchedNextPriceRedeemsMock.will.return.with([_param0])));
+          ((_r.smocked.executeOutstandingNextPriceSettlementsUserMock.will.return()));
           
         }));
   
 }
 
-function handleBatchedNextPriceRedeemsCalls(param) {
-  checkForExceptions("handleBatchedNextPriceRedeems");
+function executeOutstandingNextPriceSettlementsUserCalls$1(param) {
+  checkForExceptions("executeOutstandingNextPriceSettlementsUser");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.handleBatchedNextPriceRedeemsMock.calls;
+                    var array = _r.smocked.executeOutstandingNextPriceSettlementsUserMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          user: param[0],
+                                          marketIndex: param[1]
+                                        };
+                                }));
+                  })));
+}
+
+function mock_performOustandingSettlementsToReturn(param) {
+  checkForExceptions("_performOustandingSettlements");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked._performOustandingSettlementsMock.will.return()));
+          
+        }));
+  
+}
+
+function _performOustandingSettlementsCalls(param) {
+  checkForExceptions("_performOustandingSettlements");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked._performOustandingSettlementsMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          newLatestPriceStateIndex: param[1]
+                                        };
+                                }));
+                  })));
+}
+
+function mock_handleBatchedDepositSettlementToReturn(_param0) {
+  checkForExceptions("_handleBatchedDepositSettlement");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked._handleBatchedDepositSettlementMock.will.return.with([_param0])));
+          
+        }));
+  
+}
+
+function _handleBatchedDepositSettlementCalls(param) {
+  checkForExceptions("_handleBatchedDepositSettlement");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked._handleBatchedDepositSettlementMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          isLong: param[1]
+                                        };
+                                }));
+                  })));
+}
+
+function mock_handleBatchedRedeemSettlementToReturn(_param0) {
+  checkForExceptions("_handleBatchedRedeemSettlement");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked._handleBatchedRedeemSettlementMock.will.return.with([_param0])));
+          
+        }));
+  
+}
+
+function _handleBatchedRedeemSettlementCalls(param) {
+  checkForExceptions("_handleBatchedRedeemSettlement");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked._handleBatchedRedeemSettlementMock.calls;
                     return Belt_Array.map(array, (function (_m) {
                                   var marketIndex = _m[0];
                                   return {
@@ -1512,29 +1417,6 @@ function assertMarketExistsCalls(param) {
                                   var marketIndex = _m[0];
                                   return {
                                           marketIndex: marketIndex
-                                        };
-                                }));
-                  })));
-}
-
-function mockIsCorrectSynthToReturn(param) {
-  checkForExceptions("isCorrectSynth");
-  Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.isCorrectSynthMock.will.return()));
-          
-        }));
-  
-}
-
-function isCorrectSynthCalls(param) {
-  checkForExceptions("isCorrectSynth");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.isCorrectSynthMock.calls;
-                    return Belt_Array.map(array, (function (param) {
-                                  return {
-                                          marketIndex: param[0],
-                                          syntheticTokenType: param[1],
-                                          syntheticToken: param[2]
                                         };
                                 }));
                   })));
@@ -1608,40 +1490,34 @@ var InternalMock = {
   updateMarketOracleCalls: updateMarketOracleCalls$1,
   mockNewSyntheticMarketToReturn: mockNewSyntheticMarketToReturn$1,
   newSyntheticMarketCalls: newSyntheticMarketCalls$1,
-  mockSeedMarketInitiallyToReturn: mockSeedMarketInitiallyToReturn,
-  seedMarketInitiallyCalls: seedMarketInitiallyCalls,
+  mock_seedMarketInitiallyToReturn: mock_seedMarketInitiallyToReturn,
+  _seedMarketInitiallyCalls: _seedMarketInitiallyCalls,
   mockInitializeMarketToReturn: mockInitializeMarketToReturn$1,
   initializeMarketCalls: initializeMarketCalls$1,
-  mockGetOtherSynthTypeToReturn: mockGetOtherSynthTypeToReturn,
-  getOtherSynthTypeCalls: getOtherSynthTypeCalls,
-  mockGetPriceToReturn: mockGetPriceToReturn,
-  getPriceCalls: getPriceCalls,
-  mockGetAmountPaymentTokenToReturn: mockGetAmountPaymentTokenToReturn,
-  getAmountPaymentTokenCalls: getAmountPaymentTokenCalls,
-  mockGetAmountSynthTokenToReturn: mockGetAmountSynthTokenToReturn,
-  getAmountSynthTokenCalls: getAmountSynthTokenCalls,
+  mock_getPriceToReturn: mock_getPriceToReturn,
+  _getPriceCalls: _getPriceCalls,
+  mock_getAmountPaymentTokenToReturn: mock_getAmountPaymentTokenToReturn,
+  _getAmountPaymentTokenCalls: _getAmountPaymentTokenCalls,
+  mock_getAmountSynthTokenToReturn: mock_getAmountSynthTokenToReturn,
+  _getAmountSynthTokenCalls: _getAmountSynthTokenCalls,
   mockGetUsersPendingBalanceToReturn: mockGetUsersPendingBalanceToReturn$1,
   getUsersPendingBalanceCalls: getUsersPendingBalanceCalls$1,
   mockGetTreasurySplitToReturn: mockGetTreasurySplitToReturn$1,
   getTreasurySplitCalls: getTreasurySplitCalls$1,
   mockGetMarketSplitToReturn: mockGetMarketSplitToReturn$1,
   getMarketSplitCalls: getMarketSplitCalls$1,
-  mock_minimumToReturn: mock_minimumToReturn,
-  _minimumCalls: _minimumCalls,
+  mockGetFeesGeneralToReturn: mockGetFeesGeneralToReturn$1,
+  getFeesGeneralCalls: getFeesGeneralCalls$1,
   mock_refreshTokenPricesToReturn: mock_refreshTokenPricesToReturn,
   _refreshTokenPricesCalls: _refreshTokenPricesCalls,
   mock_distributeMarketAmountToReturn: mock_distributeMarketAmountToReturn,
   _distributeMarketAmountCalls: _distributeMarketAmountCalls,
-  mock_feesMechanismToReturn: mock_feesMechanismToReturn,
-  _feesMechanismCalls: _feesMechanismCalls,
   mock_claimAndDistributeYieldToReturn: mock_claimAndDistributeYieldToReturn,
   _claimAndDistributeYieldCalls: _claimAndDistributeYieldCalls,
   mock_adjustMarketBasedOnNewAssetPriceToReturn: mock_adjustMarketBasedOnNewAssetPriceToReturn,
   _adjustMarketBasedOnNewAssetPriceCalls: _adjustMarketBasedOnNewAssetPriceCalls,
-  mockHandleBatchedDepositSettlementToReturn: mockHandleBatchedDepositSettlementToReturn,
-  handleBatchedDepositSettlementCalls: handleBatchedDepositSettlementCalls,
-  mockSnapshotPriceChangeForNextPriceExecutionToReturn: mockSnapshotPriceChangeForNextPriceExecutionToReturn,
-  snapshotPriceChangeForNextPriceExecutionCalls: snapshotPriceChangeForNextPriceExecutionCalls,
+  mock_saveSyntheticTokenPriceSnapshotsToReturn: mock_saveSyntheticTokenPriceSnapshotsToReturn,
+  _saveSyntheticTokenPriceSnapshotsCalls: _saveSyntheticTokenPriceSnapshotsCalls,
   mock_updateSystemStateInternalToReturn: mock_updateSystemStateInternalToReturn,
   _updateSystemStateInternalCalls: _updateSystemStateInternalCalls,
   mock_updateSystemStateToReturn: mock_updateSystemStateToReturn$1,
@@ -1654,52 +1530,46 @@ var InternalMock = {
   _lockFundsInMarketCalls: _lockFundsInMarketCalls,
   mock_withdrawFundsToReturn: mock_withdrawFundsToReturn,
   _withdrawFundsCalls: _withdrawFundsCalls,
+  mock_burnSynthTokensForRedemptionToReturn: mock_burnSynthTokensForRedemptionToReturn,
+  _burnSynthTokensForRedemptionCalls: _burnSynthTokensForRedemptionCalls,
   mock_transferFundsToYieldManagerToReturn: mock_transferFundsToYieldManagerToReturn,
   _transferFundsToYieldManagerCalls: _transferFundsToYieldManagerCalls,
   mock_transferFromYieldManagerToReturn: mock_transferFromYieldManagerToReturn,
   _transferFromYieldManagerCalls: _transferFromYieldManagerCalls,
   mockTransferTreasuryFundsToReturn: mockTransferTreasuryFundsToReturn$1,
   transferTreasuryFundsCalls: transferTreasuryFundsCalls$1,
-  mock_getFeesGeneralToReturn: mock_getFeesGeneralToReturn,
-  _getFeesGeneralCalls: _getFeesGeneralCalls,
-  mock_executeNextPriceMintsIfTheyExistToReturn: mock_executeNextPriceMintsIfTheyExistToReturn,
-  _executeNextPriceMintsIfTheyExistCalls: _executeNextPriceMintsIfTheyExistCalls,
-  mock_executeOutstandingNextPriceSettlementsActionToReturn: mock_executeOutstandingNextPriceSettlementsActionToReturn,
-  _executeOutstandingNextPriceSettlementsActionCalls: _executeOutstandingNextPriceSettlementsActionCalls,
-  mock_executeOutstandingNextPriceSettlementsToReturn: mock_executeOutstandingNextPriceSettlementsToReturn,
-  _executeOutstandingNextPriceSettlementsCalls: _executeOutstandingNextPriceSettlementsCalls,
-  mockExecuteOutstandingNextPriceSettlementsUserToReturn: mockExecuteOutstandingNextPriceSettlementsUserToReturn$1,
-  executeOutstandingNextPriceSettlementsUserCalls: executeOutstandingNextPriceSettlementsUserCalls$1,
   mock_mintNextPriceToReturn: mock_mintNextPriceToReturn,
   _mintNextPriceCalls: _mintNextPriceCalls,
   mockMintLongNextPriceToReturn: mockMintLongNextPriceToReturn$1,
   mintLongNextPriceCalls: mintLongNextPriceCalls$1,
   mockMintShortNextPriceToReturn: mockMintShortNextPriceToReturn$1,
   mintShortNextPriceCalls: mintShortNextPriceCalls$1,
-  mock_executeOutstandingNextPriceRedeemsToReturn: mock_executeOutstandingNextPriceRedeemsToReturn,
-  _executeOutstandingNextPriceRedeemsCalls: _executeOutstandingNextPriceRedeemsCalls,
   mock_redeemNextPriceToReturn: mock_redeemNextPriceToReturn,
   _redeemNextPriceCalls: _redeemNextPriceCalls,
   mockRedeemLongNextPriceToReturn: mockRedeemLongNextPriceToReturn$1,
   redeemLongNextPriceCalls: redeemLongNextPriceCalls$1,
   mockRedeemShortNextPriceToReturn: mockRedeemShortNextPriceToReturn$1,
   redeemShortNextPriceCalls: redeemShortNextPriceCalls$1,
-  mock_handleBatchedNextPriceRedeemToReturn: mock_handleBatchedNextPriceRedeemToReturn,
-  _handleBatchedNextPriceRedeemCalls: _handleBatchedNextPriceRedeemCalls,
-  mock_calculateBatchedNextPriceFeesToReturn: mock_calculateBatchedNextPriceFeesToReturn,
-  _calculateBatchedNextPriceFeesCalls: _calculateBatchedNextPriceFeesCalls,
-  mockCalculateRedeemPriceSnapshotToReturn: mockCalculateRedeemPriceSnapshotToReturn,
-  calculateRedeemPriceSnapshotCalls: calculateRedeemPriceSnapshotCalls,
-  mockHandleBatchedNextPriceRedeemsToReturn: mockHandleBatchedNextPriceRedeemsToReturn,
-  handleBatchedNextPriceRedeemsCalls: handleBatchedNextPriceRedeemsCalls,
+  mock_executeNextPriceMintsIfTheyExistToReturn: mock_executeNextPriceMintsIfTheyExistToReturn,
+  _executeNextPriceMintsIfTheyExistCalls: _executeNextPriceMintsIfTheyExistCalls,
+  mock_executeOutstandingNextPriceRedeemsToReturn: mock_executeOutstandingNextPriceRedeemsToReturn,
+  _executeOutstandingNextPriceRedeemsCalls: _executeOutstandingNextPriceRedeemsCalls,
+  mock_executeOutstandingNextPriceSettlementsToReturn: mock_executeOutstandingNextPriceSettlementsToReturn,
+  _executeOutstandingNextPriceSettlementsCalls: _executeOutstandingNextPriceSettlementsCalls,
+  mockExecuteOutstandingNextPriceSettlementsUserToReturn: mockExecuteOutstandingNextPriceSettlementsUserToReturn$1,
+  executeOutstandingNextPriceSettlementsUserCalls: executeOutstandingNextPriceSettlementsUserCalls$1,
+  mock_performOustandingSettlementsToReturn: mock_performOustandingSettlementsToReturn,
+  _performOustandingSettlementsCalls: _performOustandingSettlementsCalls,
+  mock_handleBatchedDepositSettlementToReturn: mock_handleBatchedDepositSettlementToReturn,
+  _handleBatchedDepositSettlementCalls: _handleBatchedDepositSettlementCalls,
+  mock_handleBatchedRedeemSettlementToReturn: mock_handleBatchedRedeemSettlementToReturn,
+  _handleBatchedRedeemSettlementCalls: _handleBatchedRedeemSettlementCalls,
   mockAdminOnlyToReturn: mockAdminOnlyToReturn,
   adminOnlyCalls: adminOnlyCalls,
   mockTreasuryOnlyToReturn: mockTreasuryOnlyToReturn,
   treasuryOnlyCalls: treasuryOnlyCalls,
   mockAssertMarketExistsToReturn: mockAssertMarketExistsToReturn,
   assertMarketExistsCalls: assertMarketExistsCalls,
-  mockIsCorrectSynthToReturn: mockIsCorrectSynthToReturn,
-  isCorrectSynthCalls: isCorrectSynthCalls,
   mockExecuteOutstandingNextPriceSettlementsToReturn: mockExecuteOutstandingNextPriceSettlementsToReturn,
   executeOutstandingNextPriceSettlementsCalls: executeOutstandingNextPriceSettlementsCalls,
   mockUpdateSystemStateMarketToReturn: mockUpdateSystemStateMarketToReturn,
@@ -1729,14 +1599,14 @@ exports.mockGetTreasurySplitToReturn = mockGetTreasurySplitToReturn;
 exports.getTreasurySplitCalls = getTreasurySplitCalls;
 exports.mockGetMarketSplitToReturn = mockGetMarketSplitToReturn;
 exports.getMarketSplitCalls = getMarketSplitCalls;
+exports.mockGetFeesGeneralToReturn = mockGetFeesGeneralToReturn;
+exports.getFeesGeneralCalls = getFeesGeneralCalls;
 exports.mock_updateSystemStateToReturn = mock_updateSystemStateToReturn;
 exports._updateSystemStateCalls = _updateSystemStateCalls;
 exports.mock_updateSystemStateMultiToReturn = mock_updateSystemStateMultiToReturn;
 exports._updateSystemStateMultiCalls = _updateSystemStateMultiCalls;
 exports.mockTransferTreasuryFundsToReturn = mockTransferTreasuryFundsToReturn;
 exports.transferTreasuryFundsCalls = transferTreasuryFundsCalls;
-exports.mockExecuteOutstandingNextPriceSettlementsUserToReturn = mockExecuteOutstandingNextPriceSettlementsUserToReturn;
-exports.executeOutstandingNextPriceSettlementsUserCalls = executeOutstandingNextPriceSettlementsUserCalls;
 exports.mockMintLongNextPriceToReturn = mockMintLongNextPriceToReturn;
 exports.mintLongNextPriceCalls = mintLongNextPriceCalls;
 exports.mockMintShortNextPriceToReturn = mockMintShortNextPriceToReturn;
@@ -1745,5 +1615,7 @@ exports.mockRedeemLongNextPriceToReturn = mockRedeemLongNextPriceToReturn;
 exports.redeemLongNextPriceCalls = redeemLongNextPriceCalls;
 exports.mockRedeemShortNextPriceToReturn = mockRedeemShortNextPriceToReturn;
 exports.redeemShortNextPriceCalls = redeemShortNextPriceCalls;
+exports.mockExecuteOutstandingNextPriceSettlementsUserToReturn = mockExecuteOutstandingNextPriceSettlementsUserToReturn;
+exports.executeOutstandingNextPriceSettlementsUserCalls = executeOutstandingNextPriceSettlementsUserCalls;
 exports.InternalMock = InternalMock;
 /* @eth-optimism/smock Not a pure module */

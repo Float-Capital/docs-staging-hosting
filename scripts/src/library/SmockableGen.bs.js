@@ -3,7 +3,6 @@
 
 var Globals = require("./Globals.bs.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var AbiInterfaceGen = require("../AbiInterfaceGen.bs.js");
 
 function startsWith(prim0, prim1) {
   return prim0.startsWith(prim1);
@@ -50,7 +49,7 @@ function defaultParamName(index) {
 
 function paramName(index, name) {
   if (name !== "") {
-    return AbiInterfaceGen.lowerCaseFirstLetter(AbiInterfaceGen.formatKeywords(name));
+    return Globals.lowerCaseFirstLetter(Globals.formatKeywords(name));
   } else {
     return "param" + String(index);
   }
@@ -63,11 +62,11 @@ function parametersToRecordType(fnType, recordName) {
 }
 
 function callTypeName(name) {
-  return AbiInterfaceGen.lowerCaseFirstLetter(name) + "Call";
+  return Globals.lowerCaseFirstLetter(name) + "Call";
 }
 
 function paramTypeForCalls(def) {
-  var typeName = AbiInterfaceGen.lowerCaseFirstLetter(def.name) + "Call";
+  var typeName = Globals.lowerCaseFirstLetter(def.name) + "Call";
   if (def.parameters.length === 0) {
     return "type " + typeName;
   } else {
@@ -98,8 +97,8 @@ function getRescriptParamsForCalls(params) {
 
 function getCallsHelper(fnType) {
   return [
-          AbiInterfaceGen.lowerCaseFirstLetter(fnType.name) + "Call",
-          AbiInterfaceGen.lowerCaseFirstLetter(fnType.name) + "Calls"
+          Globals.lowerCaseFirstLetter(fnType.name) + "Call",
+          Globals.lowerCaseFirstLetter(fnType.name) + "Calls"
         ];
 }
 
@@ -184,10 +183,6 @@ function entireModule(contractName, allFunctions, publicFunctions) {
   return externalModule(publicFunctions, contractName) + "\n\n" + internalModule(allFunctions, contractName);
 }
 
-var lowerCaseFirstLetter = AbiInterfaceGen.lowerCaseFirstLetter;
-
-var formatKeywords = AbiInterfaceGen.formatKeywords;
-
 var reduceStrArr = Globals.reduceStrArr;
 
 var contains = Globals.contains;
@@ -196,13 +191,17 @@ var containsRe = Globals.containsRe;
 
 var commafiy = Globals.commafiy;
 
+var lowerCaseFirstLetter = Globals.lowerCaseFirstLetter;
+
+var formatKeywords = Globals.formatKeywords;
+
 exports.startsWith = startsWith;
-exports.lowerCaseFirstLetter = lowerCaseFirstLetter;
-exports.formatKeywords = formatKeywords;
 exports.reduceStrArr = reduceStrArr;
 exports.contains = contains;
 exports.containsRe = containsRe;
 exports.commafiy = commafiy;
+exports.lowerCaseFirstLetter = lowerCaseFirstLetter;
+exports.formatKeywords = formatKeywords;
 exports.uppercaseFirstLetter = uppercaseFirstLetter;
 exports.solASTTypeToRescriptType = solASTTypeToRescriptType;
 exports.defaultParamName = defaultParamName;
@@ -225,4 +224,4 @@ exports.getMockToReturnExternal = getMockToReturnExternal;
 exports.internalModule = internalModule;
 exports.externalModule = externalModule;
 exports.entireModule = entireModule;
-/* AbiInterfaceGen Not a pure module */
+/* No side effect */

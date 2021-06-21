@@ -28,7 +28,7 @@ let test =
 
       let _ = LongShortSmocked.InternalMock.mockAdminOnlyToReturn();
 
-      let _ = LongShortSmocked.InternalMock.mockSeedMarketInitiallyToReturn();
+      let _ = LongShortSmocked.InternalMock.mock_seedMarketInitiallyToReturn();
 
       (longShortRef^)
       ->LongShort.Exposed.setInitializeMarketParams(
@@ -88,7 +88,7 @@ let test =
         );
 
         let seedMarketInitiallyCalls =
-          LongShortSmocked.InternalMock.seedMarketInitiallyCalls();
+          LongShortSmocked.InternalMock._seedMarketInitiallyCalls();
 
         Chai.recordEqualFlatLabeled(
           ~actual={
