@@ -23,9 +23,6 @@ function ProgressBar(Props) {
           setInterval((function (param) {
                   if (Caml_int32.div(Math.imul(countup.contents, 100), secondsUntilExecution) < 100) {
                     countup.contents = countup.contents + 1 | 0;
-                    console.log(String(countup.contents));
-                    console.log(String(secondsUntilExecution));
-                    console.log(String(Caml_int32.div(Math.imul(countup.contents, 100), secondsUntilExecution)));
                     return Curry._1(setCountupPercentage, (function (param) {
                                   return Caml_int32.div(Math.imul(countup.contents, 100), secondsUntilExecution);
                                 }));

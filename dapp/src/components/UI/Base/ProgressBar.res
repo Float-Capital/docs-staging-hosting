@@ -9,9 +9,6 @@ let make = (~txConfirmedTimestamp=0, ~nextPriceUpdateTimestamp=100) => {
     let _ticker = Js.Global.setInterval(() => {
       if countup.contents * 100 / secondsUntilExecution < 100 {
         countup := countup.contents + 1
-        Js.log(countup.contents->string_of_int)
-        Js.log(secondsUntilExecution->string_of_int)
-        Js.log((countup.contents * 100 / secondsUntilExecution)->string_of_int)
         setCountupPercentage(_ => countup.contents * 100 / secondsUntilExecution)
       }
     }, 1000)
