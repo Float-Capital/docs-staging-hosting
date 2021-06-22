@@ -553,7 +553,6 @@ contract LongShort is ILongShort, Initializable {
      * Calculates fees for the given mint/redeem amount. Users are penalised
      * with higher fees for imbalancing the market.
      */
-    // TODO STENT look at this again
     // TODO: this function was written with immediate price in mind, rework this function to suit latest code
     function getFeesGeneral(
         uint32 marketIndex,
@@ -720,8 +719,7 @@ contract LongShort is ILongShort, Initializable {
       ╚═════════════════════════════════╝*/
 
     /**
-     * Updates the value of the long and short sides within the system
-     * Note this is public. Anyone can call this function.
+     * Updates the value of the long and short sides within the system.
      */
     function _updateSystemStateInternal(uint32 marketIndex)
         internal
@@ -744,9 +742,6 @@ contract LongShort is ILongShort, Initializable {
             return;
         }
 
-        // TODO STENT this function calls the getMarketSplit & getTreasurySplit functions.
-        //      These functions may be called again in the same transaction so might be worth
-        //      trying to optimize for that situation by storing or passing around values.
         _claimAndDistributeYield(marketIndex);
         _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
         _refreshTokenPrices(marketIndex);
@@ -890,7 +885,8 @@ contract LongShort is ILongShort, Initializable {
             yieldManagers[marketIndex].getTotalValueRealized() <=
                 syntheticTokenPoolValue[marketIndex][true] +
                     syntheticTokenPoolValue[marketIndex][false] +
-                    totalFeesReservedForTreasury[marketIndex]
+                    totalFeesReservedForTreasury[marketIndex] +
+                    yieldManagers[marketIndex].getTotalReservedForTreasury()
         );
     }
 
