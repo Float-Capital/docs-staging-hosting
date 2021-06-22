@@ -11,6 +11,13 @@ module UserBalancesCard = {
       <UserColumnHeader>
         {`Synthetic assets`->React.string} <img className="inline h-5 ml-2" src="/img/coin.png" />
       </UserColumnHeader>
+      <UserPendingBox
+        name="hardcoded"
+        isLong=true
+        daiSpend=1000
+        txConfirmedTimestamp=100
+        nextPriceUpdateTimestamp=110
+      />
       {switch usersTokensQuery {
       | Loading => <div className="m-auto"> <Loader.Mini /> </div>
       | GraphError(string) => string->React.string

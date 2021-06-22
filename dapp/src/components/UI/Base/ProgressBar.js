@@ -5,26 +5,36 @@ var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Tooltip = require("./Tooltip.js");
 var Caml_int32 = require("rescript/lib/js/caml_int32.js");
+var FormatDuration = require("date-fns/formatDuration").default;
+var IntervalToDuration = require("date-fns/intervalToDuration").default;
 
 function ProgressBar(Props) {
   var txConfirmedTimestampOpt = Props.txConfirmedTimestamp;
   var nextPriceUpdateTimestampOpt = Props.nextPriceUpdateTimestamp;
   var txConfirmedTimestamp = txConfirmedTimestampOpt !== undefined ? txConfirmedTimestampOpt : 0;
   var nextPriceUpdateTimestamp = nextPriceUpdateTimestampOpt !== undefined ? nextPriceUpdateTimestampOpt : 100;
-  var secondsUntilExecution = nextPriceUpdateTimestamp - txConfirmedTimestamp | 0;
+  var totalSecondsUntilExecution = nextPriceUpdateTimestamp - txConfirmedTimestamp | 0;
   var match = React.useState(function () {
         return 0;
       });
   var setCountupPercentage = match[1];
+  var countupPercentage = match[0];
+  var match$1 = React.useState(function () {
+        return 0;
+      });
+  var setSecondsUntilExecution = match$1[1];
   React.useEffect((function () {
           var countup = {
             contents: 0
           };
           setInterval((function (param) {
-                  if (Caml_int32.div(Math.imul(countup.contents, 100), secondsUntilExecution) < 100) {
+                  if (Caml_int32.div(Math.imul(countup.contents, 100), totalSecondsUntilExecution) < 100) {
                     countup.contents = countup.contents + 1 | 0;
+                    Curry._1(setSecondsUntilExecution, (function (param) {
+                            return totalSecondsUntilExecution - countup.contents | 0;
+                          }));
                     return Curry._1(setCountupPercentage, (function (param) {
-                                  return Caml_int32.div(Math.imul(countup.contents, 100), secondsUntilExecution);
+                                  return Caml_int32.div(Math.imul(countup.contents, 100), totalSecondsUntilExecution);
                                 }));
                   }
                   
@@ -38,15 +48,34 @@ function ProgressBar(Props) {
                 }, "Please wait while your transaction is processed", React.createElement(Tooltip.make, {
                       tip: "The transaction will execute on the next oracle price update"
                     })), React.createElement("div", {
-                  className: "relative pt-1"
+                  className: "w-2/3 mx-auto " + (
+                    countupPercentage < 100 ? "mt-7" : "mt-5"
+                  )
                 }, React.createElement("div", {
-                      className: "overflow-hidden h-2 mb-4 text-xs flex rounded bg-indigo-200"
-                    }, React.createElement("div", {
-                          className: "w-10 shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center animated-color-progress-bar",
-                          style: {
-                            width: String(match[0]) + "%"
-                          }
-                        }))));
+                      className: "relative pt-1"
+                    }, countupPercentage < 100 ? React.createElement("div", {
+                            className: "text-center bg-pink text-xxxs max-w-76 leading-none bg-black opacity-60 text-white py-1 rounded-sm",
+                            style: {
+                              left: "calc(" + String(countupPercentage) + "% - 38px)",
+                              position: "absolute",
+                              top: "-22px"
+                            }
+                          }, "eta: " + FormatDuration(IntervalToDuration({
+                                    start: new Date(0),
+                                    end: new Date(Math.imul(match$1[0], 1000))
+                                  }), {
+                                format: [
+                                  "minutes",
+                                  "seconds"
+                                ]
+                              })) : null, React.createElement("div", {
+                          className: "overflow-hidden h-2 mb-4 text-xs flex rounded bg-indigo-200"
+                        }, React.createElement("div", {
+                              className: "w-10 shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center animated-color-progress-bar",
+                              style: {
+                                width: String(countupPercentage) + "%"
+                              }
+                            })))));
 }
 
 var make = ProgressBar;

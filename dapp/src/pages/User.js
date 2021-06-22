@@ -68,7 +68,13 @@ function User$UserBalancesCard(Props) {
                 }, "Synthetic assets", React.createElement("img", {
                       className: "inline h-5 ml-2",
                       src: "/img/coin.png"
-                    })), tmp);
+                    })), React.createElement(UserUI.UserPendingBox.make, {
+                  name: "hardcoded",
+                  isLong: true,
+                  daiSpend: 1000,
+                  txConfirmedTimestamp: 100,
+                  nextPriceUpdateTimestamp: 110
+                }), tmp);
 }
 
 var UserBalancesCard = {

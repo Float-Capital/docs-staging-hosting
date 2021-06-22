@@ -22,6 +22,7 @@ var ClaimFloat = require("../Claim/ClaimFloat.js");
 var Pervasives = require("rescript/lib/js/pervasives.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
+var ProgressBar = require("./Base/ProgressBar.js");
 var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
 var Belt_SetString = require("rescript/lib/js/belt_SetString.js");
@@ -410,6 +411,32 @@ var UserTokenBox = {
   make: UserUI$UserTokenBox
 };
 
+function UserUI$UserPendingBox(Props) {
+  var name = Props.name;
+  var isLong = Props.isLong;
+  var daiSpend = Props.daiSpend;
+  var txConfirmedTimestamp = Props.txConfirmedTimestamp;
+  var nextPriceUpdateTimestamp = Props.nextPriceUpdateTimestamp;
+  return React.createElement("div", {
+              className: "flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative"
+            }, React.createElement("div", {
+                  className: "flex flex-row justify-between"
+                }, React.createElement("div", {
+                      className: " text-sm self-center"
+                    }, name), React.createElement("div", {
+                      className: " text-sm self-center"
+                    }, isLong ? "Long" : "Short"), React.createElement("div", {
+                      className: " text-sm self-center"
+                    }, String(daiSpend))), React.createElement(ProgressBar.make, {
+                  txConfirmedTimestamp: txConfirmedTimestamp,
+                  nextPriceUpdateTimestamp: nextPriceUpdateTimestamp
+                }));
+}
+
+var UserPendingBox = {
+  make: UserUI$UserPendingBox
+};
+
 function UserUI$UserFloatEarnedFromStake(Props) {
   var userId = Props.userId;
   var tokenAddress = Props.tokenAddress;
@@ -689,6 +716,7 @@ exports.threeDotsSvg = threeDotsSvg;
 exports.MetamaskMenu = MetamaskMenu;
 exports.UserPercentageGains = UserPercentageGains;
 exports.UserTokenBox = UserTokenBox;
+exports.UserPendingBox = UserPendingBox;
 exports.UserFloatEarnedFromStake = UserFloatEarnedFromStake;
 exports.UserStakeBox = UserStakeBox;
 exports.UserMarketStakeOrRedeem = UserMarketStakeOrRedeem;
