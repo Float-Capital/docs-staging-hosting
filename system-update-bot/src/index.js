@@ -6,7 +6,7 @@ const longShortContractAddress = "0x3Fe666e021714eaF51e061D8efFCc6fA4b390DC0";
 const longShortAbi = [
   "function getMarketSplit(uint32 marketIndex, uint256 amount) view returns (uint256 longAmount, uint256 shortAmount) @100000",
   "function _updateSystemState(uint32 marketIndex) external @400000", //TODO: Optimise the gas here
-  "function _updateSystemStateMulti(uint32[] calldata marketIndexes) external @50000", // TODO: remove _ in latest version of contracts
+  "function _updateSystemStateMulti(uint32[] calldata marketIndexes) external @900000", // TODO: remove _ in latest version of contracts
 ];
 
 let abi = cron.schedule("*/15 * * * * *", async () => {
