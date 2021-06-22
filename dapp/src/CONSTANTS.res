@@ -40,3 +40,8 @@ let hotAPYThreshold = 0.15
 
 let kperiodHardcode = Ethers.BigNumber.fromUnsafe("1664000") // ~20 days
 let kmultiplierHardcode = Ethers.BigNumber.fromUnsafe("5000000000000000000")
+
+/* Currencies */
+type displayToken = {name: string, iconUrl: string}
+
+let daiDisplayToken: displayToken = {name: "DAI", iconUrl: "/icons/dai.svg"}

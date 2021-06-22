@@ -20,9 +20,9 @@ let make = (
       onChange={onChange}
     />
     {switch optCurrency {
-    | Some(currency) =>
-      <span className="flex items-center bg-white pr-3 text-md text-gray-300">
-        {currency->React.string}
+    | Some(currency: CONSTANTS.displayToken) =>
+      <span className="flex items-center bg-white pr-3 text-md text-gray-300 min-w-56">
+        <img src={currency.iconUrl} className="h-5 pr-1" /> {currency.name->React.string}
       </span>
     | _ => React.null
     }}
