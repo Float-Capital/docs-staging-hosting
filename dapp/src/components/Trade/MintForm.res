@@ -203,7 +203,7 @@ module MintFormInput = {
           disabled
           onBlur=onBlurAmount
           onChange=onChangeAmountInput
-          optCurrency={Some(Config.paymentTokenName)}
+          optCurrency={Some(CONSTANTS.daiDisplayToken)}
           onMaxClick
         />
         {switch optErrorMessage {
