@@ -142,6 +142,21 @@ function getUsersPendingBalanceCalls(_r) {
               }));
 }
 
+function mockGetMarketPcntForTreasuryVsMarketSplitToReturn(_r, _param0) {
+  ((_r.smocked.getMarketPcntForTreasuryVsMarketSplit.will.return.with([_param0])));
+  
+}
+
+function getMarketPcntForTreasuryVsMarketSplitCalls(_r) {
+  var array = _r.smocked.getMarketPcntForTreasuryVsMarketSplit.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var marketIndex = _m[0];
+                return {
+                        marketIndex: marketIndex
+                      };
+              }));
+}
+
 function mockGetTreasurySplitToReturn(_r, _param0, _param1) {
   ((_r.smocked.getTreasurySplit.will.return.with([_param0,_param1])));
   
@@ -153,6 +168,21 @@ function getTreasurySplitCalls(_r) {
                 return {
                         marketIndex: param[0],
                         amount: param[1]
+                      };
+              }));
+}
+
+function mockGetLongPcntForLongVsShortSplitToReturn(_r, _param0) {
+  ((_r.smocked.getLongPcntForLongVsShortSplit.will.return.with([_param0])));
+  
+}
+
+function getLongPcntForLongVsShortSplitCalls(_r) {
+  var array = _r.smocked.getLongPcntForLongVsShortSplit.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var marketIndex = _m[0];
+                return {
+                        marketIndex: marketIndex
                       };
               }));
 }
@@ -670,6 +700,28 @@ function getUsersPendingBalanceCalls$1(param) {
                   })));
 }
 
+function mockGetMarketPcntForTreasuryVsMarketSplitToReturn$1(_param0) {
+  checkForExceptions("getMarketPcntForTreasuryVsMarketSplit");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.getMarketPcntForTreasuryVsMarketSplitMock.will.return.with([_param0])));
+          
+        }));
+  
+}
+
+function getMarketPcntForTreasuryVsMarketSplitCalls$1(param) {
+  checkForExceptions("getMarketPcntForTreasuryVsMarketSplit");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.getMarketPcntForTreasuryVsMarketSplitMock.calls;
+                    return Belt_Array.map(array, (function (_m) {
+                                  var marketIndex = _m[0];
+                                  return {
+                                          marketIndex: marketIndex
+                                        };
+                                }));
+                  })));
+}
+
 function mockGetTreasurySplitToReturn$1(_param0, _param1) {
   checkForExceptions("getTreasurySplit");
   Belt_Option.map(internalRef.contents, (function (_r) {
@@ -687,6 +739,28 @@ function getTreasurySplitCalls$1(param) {
                                   return {
                                           marketIndex: param[0],
                                           amount: param[1]
+                                        };
+                                }));
+                  })));
+}
+
+function mockGetLongPcntForLongVsShortSplitToReturn$1(_param0) {
+  checkForExceptions("getLongPcntForLongVsShortSplit");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.getLongPcntForLongVsShortSplitMock.will.return.with([_param0])));
+          
+        }));
+  
+}
+
+function getLongPcntForLongVsShortSplitCalls$1(param) {
+  checkForExceptions("getLongPcntForLongVsShortSplit");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.getLongPcntForLongVsShortSplitMock.calls;
+                    return Belt_Array.map(array, (function (_m) {
+                                  var marketIndex = _m[0];
+                                  return {
+                                          marketIndex: marketIndex
                                         };
                                 }));
                   })));
@@ -1502,8 +1576,12 @@ var InternalMock = {
   _getAmountSynthTokenCalls: _getAmountSynthTokenCalls,
   mockGetUsersPendingBalanceToReturn: mockGetUsersPendingBalanceToReturn$1,
   getUsersPendingBalanceCalls: getUsersPendingBalanceCalls$1,
+  mockGetMarketPcntForTreasuryVsMarketSplitToReturn: mockGetMarketPcntForTreasuryVsMarketSplitToReturn$1,
+  getMarketPcntForTreasuryVsMarketSplitCalls: getMarketPcntForTreasuryVsMarketSplitCalls$1,
   mockGetTreasurySplitToReturn: mockGetTreasurySplitToReturn$1,
   getTreasurySplitCalls: getTreasurySplitCalls$1,
+  mockGetLongPcntForLongVsShortSplitToReturn: mockGetLongPcntForLongVsShortSplitToReturn$1,
+  getLongPcntForLongVsShortSplitCalls: getLongPcntForLongVsShortSplitCalls$1,
   mockGetMarketSplitToReturn: mockGetMarketSplitToReturn$1,
   getMarketSplitCalls: getMarketSplitCalls$1,
   mockGetFeesGeneralToReturn: mockGetFeesGeneralToReturn$1,
@@ -1595,8 +1673,12 @@ exports.mockInitializeMarketToReturn = mockInitializeMarketToReturn;
 exports.initializeMarketCalls = initializeMarketCalls;
 exports.mockGetUsersPendingBalanceToReturn = mockGetUsersPendingBalanceToReturn;
 exports.getUsersPendingBalanceCalls = getUsersPendingBalanceCalls;
+exports.mockGetMarketPcntForTreasuryVsMarketSplitToReturn = mockGetMarketPcntForTreasuryVsMarketSplitToReturn;
+exports.getMarketPcntForTreasuryVsMarketSplitCalls = getMarketPcntForTreasuryVsMarketSplitCalls;
 exports.mockGetTreasurySplitToReturn = mockGetTreasurySplitToReturn;
 exports.getTreasurySplitCalls = getTreasurySplitCalls;
+exports.mockGetLongPcntForLongVsShortSplitToReturn = mockGetLongPcntForLongVsShortSplitToReturn;
+exports.getLongPcntForLongVsShortSplitCalls = getLongPcntForLongVsShortSplitCalls;
 exports.mockGetMarketSplitToReturn = mockGetMarketSplitToReturn;
 exports.getMarketSplitCalls = getMarketSplitCalls;
 exports.mockGetFeesGeneralToReturn = mockGetFeesGeneralToReturn;
