@@ -11,7 +11,10 @@ var GetKValue = require("./tests/stake/GetKValue.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var HelperActions = require("./library/HelperActions.js");
 var AddNewStakingFund = require("./tests/stake/AddNewStakingFund.js");
+var CalculateTimeDelta = require("./tests/stake/CalculateTimeDelta.js");
+var CalculateFloatPerSecond = require("./tests/stake/CalculateFloatPerSecond.js");
 var CalculateAccumulatedFloat = require("./tests/stake/CalculateAccumulatedFloat.js");
+var CalculateNewCumulativeRate = require("./tests/stake/CalculateNewCumulativeRate.js");
 var GetMarketLaunchIncentiveParameters = require("./tests/stake/GetMarketLaunchIncentiveParameters.js");
 var ChangeMarketLaunchIncentiveParameters = require("./tests/stake/ChangeMarketLaunchIncentiveParameters.js");
 
@@ -79,12 +82,15 @@ describe("Float System", (function () {
                                           }));
                             });
                         CalculateAccumulatedFloat.test(contracts);
-                        return GetMarketLaunchIncentiveParameters.test(contracts);
+                        GetMarketLaunchIncentiveParameters.test(contracts);
+                        return CalculateTimeDelta.test(contracts);
                       }));
                 describe("", (function () {
                         ChangeMarketLaunchIncentiveParameters.test(contracts, accounts);
                         AddNewStakingFund.test(contracts, accounts);
-                        return GetKValue.test(contracts, accounts);
+                        GetKValue.test(contracts, accounts);
+                        CalculateFloatPerSecond.test(contracts, accounts);
+                        return CalculateNewCumulativeRate.test(contracts, accounts);
                       }));
                 
               }));

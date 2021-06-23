@@ -84,6 +84,30 @@ contract StakerInternalsExposed is StakerMockable {
         syntheticRewardParams[marketIndex][0].timestamp = timestamp;
     }
 
+    function setCalculateTimeDeltaParams(
+        uint32 marketIndex,
+        uint256 latestRewardIndexForMarket,
+        uint256 timestamp
+    ) external {
+        latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
+        syntheticRewardParams[marketIndex][latestRewardIndexForMarket]
+            .timestamp = timestamp;
+    }
+
+    function setCalculateNewCumulativeRateParams(
+        uint32 marketIndex,
+        uint256 latestRewardIndexForMarket,
+        uint256 accumFloatLong,
+        uint256 accumFloatShort
+    ) external {
+        latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
+        syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
+            .accumulativeFloatPerLongToken = accumFloatLong;
+
+        syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
+            .accumulativeFloatPerShortToken = accumFloatShort;
+    }
+
     ///////////////////////////////////////////
     //////////// EXPOSED Functions ////////////
     ///////////////////////////////////////////
@@ -92,6 +116,27 @@ contract StakerInternalsExposed is StakerMockable {
         returns (uint256 longFloatReward, uint256 shortFloatReward)
     {
         return calculateAccumulatedFloat(marketIndex, user);
+    }
+
+    function calculateFloatPerSecondExposed(
+        uint32 marketIndex,
+        uint256 longPrice,
+        uint256 shortPrice,
+        uint256 longValue,
+        uint256 shortValue
+    )
+        external
+        view
+        returns (uint256 longFloatPerSecond, uint256 shortFloatPerSecond)
+    {
+        return
+            calculateFloatPerSecond(
+                marketIndex,
+                longPrice,
+                shortPrice,
+                longValue,
+                shortValue
+            );
     }
 
     function mintAccumulatedFloatExternal(uint32 marketIndex, address user)
@@ -126,6 +171,35 @@ contract StakerInternalsExposed is StakerMockable {
         returns (uint256, uint256)
     {
         return getMarketLaunchIncentiveParameters(marketIndex);
+    }
+
+    function calculateTimeDeltaExposed(uint32 marketIndex)
+        external
+        view
+        returns (uint256)
+    {
+        return calculateTimeDelta(marketIndex);
+    }
+
+    function calculateNewCumulativeRateExposed(
+        uint32 marketIndex,
+        uint256 longPrice,
+        uint256 shortPrice,
+        uint256 longValue,
+        uint256 shortValue
+    )
+        external
+        view
+        returns (uint256 longCumulativeRates, uint256 shortCumulativeRates)
+    {
+        return
+            calculateNewCumulativeRate(
+                marketIndex,
+                longPrice,
+                shortPrice,
+                longValue,
+                shortValue
+            );
     }
 
     function getKValueExternal(uint32 marketIndex)

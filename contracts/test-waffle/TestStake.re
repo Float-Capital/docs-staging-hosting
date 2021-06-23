@@ -99,6 +99,7 @@ describe("Float System", () => {
       });
       CalculateAccumulatedFloat.test(~contracts);
       GetMarketLaunchIncentiveParameters.test(~contracts);
+      CalculateTimeDelta.test(~contracts);
     });
 
     // TESTS THAT MAY TEST MULTIPLE THINGS PER DEPLOYMENT
@@ -106,6 +107,8 @@ describe("Float System", () => {
       ChangeMarketLaunchIncentiveParameters.test(~contracts, ~accounts);
       AddNewStakingFund.test(~contracts, ~accounts);
       GetKValue.test(~contracts, ~accounts);
+      CalculateFloatPerSecond.test(~contracts, ~accounts);
+      CalculateNewCumulativeRate.test(~contracts, ~accounts);
     });
   });
 });
