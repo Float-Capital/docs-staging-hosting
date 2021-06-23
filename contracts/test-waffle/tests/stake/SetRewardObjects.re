@@ -99,7 +99,6 @@ let test =
       });
     });
     it("emits StateAddedEvent", () => {
-      Js.log((timestampRef^)->Ethers.BigNumber.toString);
       Chai.callEmitEvents(
         ~call=promiseRef^,
         ~contract=(stakerRef^)->Obj.magic,
@@ -111,7 +110,7 @@ let test =
           timestampRef^,
           longAccum,
           shortAccum,
-        );
+        )
     });
   });
 };

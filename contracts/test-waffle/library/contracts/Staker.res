@@ -190,6 +190,10 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "_mintFloatExternal"
 
   @send
+  external _updateStateExternal: (t, ~token: Ethers.ethAddress) => JsPromise.t<transaction> =
+    "_updateStateExternal"
+
+  @send
   external _withdrawExternal: (
     t,
     ~token: Ethers.ethAddress,
@@ -452,6 +456,14 @@ module Exposed = {
     ~marketIndex: int,
     ~latestRewardIndexForMarket: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "setSetRewardObjectsParams"
+
+  @send
+  external set_updateStateParams: (
+    t,
+    ~longShort: Ethers.ethAddress,
+    ~token: Ethers.ethAddress,
+    ~tokenMarketIndex: int,
+  ) => JsPromise.t<transaction> = "set_updateStateParams"
 
   @send
   external stakeFromUser: (

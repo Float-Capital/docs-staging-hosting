@@ -115,6 +115,15 @@ contract StakerInternalsExposed is StakerMockable {
         latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
     }
 
+    function set_updateStateParams(
+        ILongShort longShort,
+        ISyntheticToken token,
+        uint32 tokenMarketIndex
+    ) public {
+        longShortCoreContract = longShort;
+        marketIndexOfToken[token] = tokenMarketIndex;
+    }
+
     ///////////////////////////////////////////
     //////////// EXPOSED Functions ////////////
     ///////////////////////////////////////////
@@ -231,5 +240,9 @@ contract StakerInternalsExposed is StakerMockable {
             longValue,
             shortValue
         );
+    }
+
+    function _updateStateExternal(ISyntheticToken token) external {
+        _updateState(token);
     }
 }
