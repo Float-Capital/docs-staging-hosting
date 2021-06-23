@@ -13,36 +13,18 @@ open Js.String2
 
 let filesToMock = ["LongShort.sol", "Staker.sol"]
 
-type storageLocation = Storage | NotRelevant
-
-type typedIdentifier = {
-  name: string,
-  type_: string,
-  storageLocation: storageLocation,
-}
-type functionType = {
-  name: string,
-  parameters: array<typedIdentifier>,
-  returnValues: array<typedIdentifier>,
-}
-
 exception ScriptDoesNotSupportReturnValues(string)
 
-let defaultError = "This script currently only supports functions that return or receive as parameters uints, ints, bools, (nonpayable) addresses, contracts, structs, or strings
-          // NO ARRAYS OR MAPPINGS YET"
-
-let contains = (str, subst) => !(str->indexOf(subst) == -1)
-
-let containsRe = (str, re) => {
-  str->match_(re)->Option.isSome
-}
+let defaultError = "This script currently only supports functions that return or receive as parameters uints, ints, bools, (nonpayable) addresses, contracts, structs, arrays or strings
+          // NO MAPPINGS"
+let {contains, containsRe, commafiy} = module(Globals)
 
 let convertASTTypeToSolType = typeDescriptionStr => {
   switch typeDescriptionStr {
   | "bool"
   | "address" => typeDescriptionStr
   | "string" => "string calldata "
-  | t if t->containsRe(%re("/\\[/g")) => t ++ " memory" // PARTIAL IMPLEMENTATION FOR ARRAYS
+  | t if t->Globals.containsRe(%re("/\\[/g")) => t ++ " memory" // PARTIAL IMPLEMENTATION FOR ARRAYS
   | t if t->startsWith("uint") => typeDescriptionStr
   | t if t->startsWith("int") => typeDescriptionStr
   | t if t->startsWith("contract ") => typeDescriptionStr->replaceByRe(%re("/contract\s+/g"), "")
@@ -57,7 +39,7 @@ let convertASTTypeToSolType = typeDescriptionStr => {
   }
 }
 
-let nodeToTypedIdentifier = node => {
+let nodeToTypedIdentifier: 'a => Globals.typedIdentifier = node => {
   name: node["name"],
   type_: node["typeDescriptions"]["typeString"],
   storageLocation: node["storageLocation"] == "storage" ? Storage : NotRelevant,
@@ -67,30 +49,27 @@ let functions = nodeStatements => {
   nodeStatements
   ->Array.keep(x => x["nodeType"] == #FunctionDefinition && !(x["name"] == "")) // ignore constructors
   ->Array.map(x => {
-    name: x["name"],
-    parameters: x["parameters"]["parameters"]->Array.map(y => y->nodeToTypedIdentifier),
-    returnValues: x["returnParameters"]["parameters"]->Array.map(y => y->nodeToTypedIdentifier),
+    let r: Globals.functionType = {
+      name: x["name"],
+      parameters: x["parameters"]["parameters"]->Array.map(y => y->nodeToTypedIdentifier),
+      returnValues: x["returnParameters"]["parameters"]->Array.map(y => y->nodeToTypedIdentifier),
+      visibility: x["visibility"] == "public" || x["visibility"] == "external" ? Public : Private,
+    }
+    r
   })
-}
-
-let commafiy = strings => {
-  let mockerParameterCalls = strings->Array.reduce("", (acc, curr) => {
-    acc ++ curr ++ ","
-  })
-  if mockerParameterCalls->String.length > 0 {
-    mockerParameterCalls->substring(~from=0, ~to_=mockerParameterCalls->String.length - 1)
-  } else {
-    mockerParameterCalls
-  }
 }
 
 let modifiers = nodeStatements => {
   nodeStatements
   ->Array.keep(x => x["nodeType"] == #ModifierDefinition)
   ->Array.map(x => {
-    name: x["name"],
-    parameters: x["parameters"]["parameters"]->Array.map(y => y->nodeToTypedIdentifier),
-    returnValues: [],
+    let r: Globals.functionType = {
+      name: x["name"],
+      parameters: x["parameters"]["parameters"]->Array.map(y => y->nodeToTypedIdentifier),
+      returnValues: [],
+      visibility: x["visibility"] == "public" || x["visibility"] == "external" ? Public : Private,
+    }
+    r
   })
 }
 
@@ -172,7 +151,7 @@ filesToMock->Array.forEach(filePath => {
   )
   let sol = ref(("../contracts/contracts/" ++ filePath)->Node.Fs.readFileAsUtf8Sync)
 
-  sol := sol.contents->replaceByRe(%re("/\s+pure\s+/g"), " view ");
+  sol := sol.contents->replaceByRe(%re("/\s+pure\s+/g"), " view ")
 
   let lineCommentsMatch =
     sol.contents
@@ -400,5 +379,18 @@ filesToMock->Array.forEach(filePath => {
   Node.Fs.writeFileAsUtf8Sync(
     `../contracts/contracts/testing/generated/${fileNameWithoutExtension}ForInternalMocking.sol`,
     mockLogger.contents,
+  )
+
+  Node.Fs.writeFileAsUtf8Sync(
+    `../contracts/test-waffle/library/smock/${fileNameWithoutExtension}Smocked.res`,
+    SmockableGen.entireModule(
+      ~allFunctions=functions(contractDefinition["nodes"])->Array.concat(
+        modifiers(contractDefinition["nodes"]),
+      ),
+      ~publicFunctions=functions(contractDefinition["nodes"])->Array.keep(x =>
+        x.visibility == Public
+      ),
+      ~contractName=fileNameWithoutExtension,
+    ),
   )
 })

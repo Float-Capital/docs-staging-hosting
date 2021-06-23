@@ -31,7 +31,7 @@ let test =
           ~accounts,
         );
       StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn();
-      StakerSmocked.InternalMock.mockonlyFloatToReturn();
+      StakerSmocked.InternalMock.mockOnlyFloatToReturn();
       let%AwaitThen _ =
         (stakerRef^)
         ->Staker.Exposed.setAddNewStakingFundParams(

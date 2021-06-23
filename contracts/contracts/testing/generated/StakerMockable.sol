@@ -174,7 +174,7 @@ contract StakerMockable is IStaker, Initializable {
         floatCapital = _floatCapital;
         longShortCoreContract = ILongShort(_longShortCoreContract);
         floatToken = IFloatToken(_floatToken);
-        floatPercentage = 1500;
+        floatPercentage = 2500;
 
         emit DeployV1(_floatToken);
     }

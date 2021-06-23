@@ -16,7 +16,7 @@ let test =
       let {longShort} = contracts^;
       longShortRef := longShort;
       let%Await smocked = StakerSmocked.make(contracts^.staker);
-      let _ = smocked->StakerSmocked.mockaddNewStakingFundToReturn;
+      let _ = smocked->StakerSmocked.mockAddNewStakingFundToReturn;
       stakerSmockedRef := smocked;
       let%Await _ = (longShortRef^)->LongShortSmocked.InternalMock.setup;
       let%Await _ =
@@ -26,9 +26,9 @@ let test =
           );
       let _ = LongShortSmocked.InternalMock.mock_changeFeesToReturn();
 
-      let _ = LongShortSmocked.InternalMock.mockadminOnlyToReturn();
+      let _ = LongShortSmocked.InternalMock.mockAdminOnlyToReturn();
 
-      let _ = LongShortSmocked.InternalMock.mockseedMarketInitiallyToReturn();
+      let _ = LongShortSmocked.InternalMock.mock_seedMarketInitiallyToReturn();
 
       (longShortRef^)
       ->LongShort.Exposed.setInitializeMarketParams(
@@ -74,21 +74,21 @@ let test =
           },
         );
 
-        let changeFeeCalls = LongShortSmocked.InternalMock._changeFeeCalls();
+        let changeFeeCalls = LongShortSmocked.InternalMock._changeFeesCalls();
 
         Chai.recordEqualFlatLabeled(
           ~actual={
             marketIndex: 1,
-            _baseEntryFee: Ethers.BigNumber.fromUnsafe("1"),
-            _baseExitFee: Ethers.BigNumber.fromUnsafe("5"),
-            _badLiquidityEntryFee: Ethers.BigNumber.fromUnsafe("2"),
-            _badLiquidityExitFee: Ethers.BigNumber.fromUnsafe("3"),
+            baseEntryFee: Ethers.BigNumber.fromUnsafe("1"),
+            baseExitFee: Ethers.BigNumber.fromUnsafe("5"),
+            badLiquidityEntryFee: Ethers.BigNumber.fromUnsafe("2"),
+            badLiquidityExitFee: Ethers.BigNumber.fromUnsafe("3"),
           },
           ~expected=changeFeeCalls->Array.getExn(0),
         );
 
         let seedMarketInitiallyCalls =
-          LongShortSmocked.InternalMock.seedMarketInitiallyCalls();
+          LongShortSmocked.InternalMock._seedMarketInitiallyCalls();
 
         Chai.recordEqualFlatLabeled(
           ~actual={

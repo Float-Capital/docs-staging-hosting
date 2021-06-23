@@ -3,9 +3,11 @@
 
 var Fs = require("fs");
 var Curry = require("rescript/lib/js/curry.js");
+var Globals = require("./library/Globals.bs.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
+var SmockableGen = require("./library/SmockableGen.bs.js");
 var Caml_exceptions = require("rescript/lib/js/caml_exceptions.js");
 
 var filesToMock = [
@@ -15,15 +17,7 @@ var filesToMock = [
 
 var ScriptDoesNotSupportReturnValues = /* @__PURE__ */Caml_exceptions.create("MockablesGen.ScriptDoesNotSupportReturnValues");
 
-var defaultError = "This script currently only supports functions that return or receive as parameters uints, ints, bools, (nonpayable) addresses, contracts, structs, or strings\n          // NO ARRAYS OR MAPPINGS YET";
-
-function contains(str, subst) {
-  return str.indexOf(subst) !== -1;
-}
-
-function containsRe(str, re) {
-  return Belt_Option.isSome(Caml_option.null_to_opt(str.match(re)));
-}
+var defaultError = "This script currently only supports functions that return or receive as parameters uints, ints, bools, (nonpayable) addresses, contracts, structs, arrays or strings\n          // NO MAPPINGS";
 
 function convertASTTypeToSolType(typeDescriptionStr) {
   switch (typeDescriptionStr) {
@@ -33,7 +27,7 @@ function convertASTTypeToSolType(typeDescriptionStr) {
     case "string" :
         return "string calldata ";
     default:
-      if (containsRe(typeDescriptionStr, /\[/g)) {
+      if (Globals.containsRe(typeDescriptionStr, /\[/g)) {
         return typeDescriptionStr + " memory";
       }
       if (typeDescriptionStr.startsWith("uint")) {
@@ -79,20 +73,10 @@ function functions(nodeStatements) {
                 return {
                         name: x.name,
                         parameters: Belt_Array.map(x.parameters.parameters, nodeToTypedIdentifier),
-                        returnValues: Belt_Array.map(x.returnParameters.parameters, nodeToTypedIdentifier)
+                        returnValues: Belt_Array.map(x.returnParameters.parameters, nodeToTypedIdentifier),
+                        visibility: x.visibility === "public" || x.visibility === "external" ? /* Public */0 : /* Private */1
                       };
               }));
-}
-
-function commafiy(strings) {
-  var mockerParameterCalls = Belt_Array.reduce(strings, "", (function (acc, curr) {
-          return acc + curr + ",";
-        }));
-  if (mockerParameterCalls.length !== 0) {
-    return mockerParameterCalls.substring(0, mockerParameterCalls.length - 1 | 0);
-  } else {
-    return mockerParameterCalls;
-  }
 }
 
 function modifiers(nodeStatements) {
@@ -102,7 +86,8 @@ function modifiers(nodeStatements) {
                 return {
                         name: x.name,
                         parameters: Belt_Array.map(x.parameters.parameters, nodeToTypedIdentifier),
-                        returnValues: []
+                        returnValues: [],
+                        visibility: x.visibility === "public" || x.visibility === "external" ? /* Public */0 : /* Private */1
                       };
               }));
 }
@@ -152,7 +137,7 @@ function resolveImportLocationRecursive(_array, __import) {
   while(true) {
     var _import = __import;
     var array = _array;
-    if (!contains(_import, "/")) {
+    if (!Globals.contains(_import, "/")) {
       return Belt_Array.reduce(array, "", (function (acc, curr) {
                     return acc + curr + "/";
                   })) + _import;
@@ -186,7 +171,7 @@ Belt_Array.forEach(filesToMock, (function (filePath) {
         var fileNameWithoutExtension = reduceStrArr(Belt_Array.slice(fileNameSplit, 0, fileNameSplit.length > 1 ? fileNameSplit.length - 1 | 0 : fileNameSplit.length));
         var typeDefContainsFileName = new RegExp("\\s" + fileNameWithoutExtension + "\\.");
         var actionOnFileNameTypeDefs = function (action, type_) {
-          if (containsRe(type_, typeDefContainsFileName)) {
+          if (Globals.containsRe(type_, typeDefContainsFileName)) {
             return Curry._1(action, type_);
           } else {
             return type_;
@@ -208,7 +193,7 @@ Belt_Array.forEach(filesToMock, (function (filePath) {
         sol.contents = sol.contents.replace(/\s+pure\s+/g, " view ");
         var lineCommentsMatch = Belt_Option.map(Caml_option.null_to_opt(sol.contents.match(lineCommentsRe)), (function (i) {
                 return Belt_Array.keep(i, (function (x) {
-                              return !contains(x, "SPDX-License-Identifier");
+                              return !Globals.contains(x, "SPDX-License-Identifier");
                             }));
               }));
         Belt_Option.map(lineCommentsMatch, (function (l) {
@@ -233,14 +218,14 @@ Belt_Array.forEach(filesToMock, (function (filePath) {
                 var storageParameters = Belt_Array.keep(x.parameters, (function (x) {
                         return x.storageLocation === /* Storage */0;
                       }));
-                var mockerParameterCalls = commafiy(Belt_Array.map(x.parameters, (function (x) {
+                var mockerParameterCalls = Globals.commafiy(Belt_Array.map(x.parameters, (function (x) {
                             if (x.storageLocation === /* Storage */0) {
                               return x.name + "_temp1";
                             } else {
                               return x.name;
                             }
                           })));
-                var mockerArguments = commafiy(Belt_Array.map(x.parameters, (function (x) {
+                var mockerArguments = Globals.commafiy(Belt_Array.map(x.parameters, (function (x) {
                             return convertASTTypeToSolType(replaceFileNameTypeDefsWithMockableTypeDefs(x.type_));
                           })));
                 sol.contents = solPrefix + ("\n    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + x.name + "\"))){\n      " + reduceStrArr(Belt_Array.map(storageParameters, (function (x) {
@@ -248,10 +233,10 @@ Belt_Array.forEach(filesToMock, (function (filePath) {
                             }))) + "\n      return mocker." + x.name + "Mock(" + mockerParameterCalls + ");\n    }\n  ") + solSuffix;
                 var arr = x.returnValues;
                 mockLogger.contents = mockLogger.contents + (" \n    function " + x.name + "Mock(" + mockerArguments + ") public pure " + (
-                    arr.length !== 0 ? "returns (" + commafiy(Belt_Array.map(arr, (function (x) {
+                    arr.length !== 0 ? "returns (" + Globals.commafiy(Belt_Array.map(arr, (function (x) {
                                   return convertASTTypeToSolType(x.type_) + " " + x.name;
                                 }))) + ")" : ""
-                  ) + "{\n      return (" + commafiy(Belt_Array.map(x.returnValues, (function (y) {
+                  ) + "{\n      return (" + Globals.commafiy(Belt_Array.map(x.returnValues, (function (y) {
                               return "abi.decode(\"\",(" + convertASTTypeToSolType(y.type_) + "))";
                             }))) + ");\n    }\n    ");
                 
@@ -261,7 +246,7 @@ Belt_Array.forEach(filesToMock, (function (filePath) {
                 var indexOfOldFunctionBodyStart = sol.contents.indexOf("{", indexOfOldFunctionDec);
                 var indexOfOldFunctionBodyEnd = matchingBlockEndIndex(sol.contents, indexOfOldFunctionBodyStart + 1 | 0, 1);
                 var functionBody = sol.contents.substring(indexOfOldFunctionBodyStart + 1 | 0, indexOfOldFunctionBodyEnd);
-                var mockerArguments = commafiy(Belt_Array.map(x.parameters, (function (x) {
+                var mockerArguments = Globals.commafiy(Belt_Array.map(x.parameters, (function (x) {
                             return convertASTTypeToSolType(replaceFileNameTypeDefsWithMockableTypeDefs(x.type_));
                           })));
                 var storageParameters = Belt_Array.keep(x.parameters, (function (x) {
@@ -269,7 +254,7 @@ Belt_Array.forEach(filesToMock, (function (filePath) {
                       }));
                 var solPrefix = sol.contents.substring(0, indexOfOldFunctionBodyStart + 1 | 0);
                 var solSuffix = sol.contents.substring(indexOfOldFunctionBodyEnd);
-                var mockerParameterCalls = commafiy(Belt_Array.map(x.parameters, (function (x) {
+                var mockerParameterCalls = Globals.commafiy(Belt_Array.map(x.parameters, (function (x) {
                             if (x.storageLocation === /* Storage */0) {
                               return x.name + "_temp1";
                             } else {
@@ -286,7 +271,7 @@ Belt_Array.forEach(filesToMock, (function (filePath) {
         var importsInFile$1 = importsInFile === null ? undefined : Caml_option.some(importsInFile);
         var importsInFileReplaced = Belt_Option.map(importsInFile$1, (function (i) {
                 return Belt_Array.map(i, (function (x) {
-                              if (!contains(x, "..") && !contains(x, "./")) {
+                              if (!Globals.contains(x, "..") && !Globals.contains(x, "./")) {
                                 return x;
                               }
                               var impStatement = Belt_Array.getExn(Belt_Option.getExn(Caml_option.null_to_opt(x.match(quotesRe))), 0);
@@ -317,18 +302,27 @@ Belt_Array.forEach(filesToMock, (function (filePath) {
         sol.contents = prefix + "\n" + ("import \"./" + fileNameWithoutExtension + "ForInternalMocking.sol\";") + "\n" + intermediate1 + fileNameWithoutExtension + "Mockable" + intermediate2 + ("\n  " + fileNameWithoutExtension + "ForInternalMocking mocker;\n  bool shouldUseMock;\n  string functionToNotMock;\n\n  function setMocker(" + fileNameWithoutExtension + "ForInternalMocking _mocker) external {\n    mocker = _mocker;\n    shouldUseMock = true;\n  }\n\n  function setFunctionToNotMock(string calldata _functionToNotMock) external {\n    functionToNotMock = _functionToNotMock;\n  }\n\n") + suffix;
         Fs.writeFileSync("../contracts/contracts/testing/generated/" + fileNameWithoutExtension + "Mockable.sol", sol.contents, "utf8");
         Fs.writeFileSync("../contracts/contracts/testing/generated/" + fileNameWithoutExtension + "ForInternalMocking.sol", mockLogger.contents, "utf8");
+        Fs.writeFileSync("../contracts/test-waffle/library/smock/" + fileNameWithoutExtension + "Smocked.res", SmockableGen.entireModule(fileNameWithoutExtension, Belt_Array.concat(functions(contractDefinition.nodes), modifiers(contractDefinition.nodes)), Belt_Array.keep(functions(contractDefinition.nodes), (function (x) {
+                        return x.visibility === /* Public */0;
+                      }))), "utf8");
         
       }));
+
+var contains = Globals.contains;
+
+var containsRe = Globals.containsRe;
+
+var commafiy = Globals.commafiy;
 
 exports.filesToMock = filesToMock;
 exports.ScriptDoesNotSupportReturnValues = ScriptDoesNotSupportReturnValues;
 exports.defaultError = defaultError;
 exports.contains = contains;
 exports.containsRe = containsRe;
+exports.commafiy = commafiy;
 exports.convertASTTypeToSolType = convertASTTypeToSolType;
 exports.nodeToTypedIdentifier = nodeToTypedIdentifier;
 exports.functions = functions;
-exports.commafiy = commafiy;
 exports.modifiers = modifiers;
 exports.lineCommentsRe = lineCommentsRe;
 exports.blockCommentsRe = blockCommentsRe;

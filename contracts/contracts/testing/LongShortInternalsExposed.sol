@@ -64,20 +64,8 @@ contract LongShortInternalsExposed is LongShortMockable {
         _refreshTokenPrices(marketIndex);
     }
 
-    function feesMechanism(uint32 marketIndex, uint256 totalFees) external {
-        _feesMechanism(marketIndex, totalFees);
-    }
-
     function claimAndDistributeYield(uint32 marketIndex) external {
         _claimAndDistributeYield(marketIndex);
-    }
-
-    function minimum(uint256 liquidityOfPositionA, uint256 liquidityOfPositionB)
-        external
-        view
-        returns (uint256)
-    {
-        _minimum(liquidityOfPositionA, liquidityOfPositionB);
     }
 
     function depositFunds(uint32 marketIndex, uint256 amount) external {
