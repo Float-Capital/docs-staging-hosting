@@ -437,6 +437,23 @@ module Exposed = {
   external setMocker: (t, ~mocker: Ethers.ethAddress) => JsPromise.t<transaction> = "setMocker"
 
   @send
+  external setRewardObjectsExternal: (
+    t,
+    ~marketIndex: int,
+    ~longPrice: Ethers.BigNumber.t,
+    ~shortPrice: Ethers.BigNumber.t,
+    ~longValue: Ethers.BigNumber.t,
+    ~shortValue: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "setRewardObjectsExternal"
+
+  @send
+  external setSetRewardObjectsParams: (
+    t,
+    ~marketIndex: int,
+    ~latestRewardIndexForMarket: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "setSetRewardObjectsParams"
+
+  @send
   external stakeFromUser: (
     t,
     ~from: Ethers.ethAddress,

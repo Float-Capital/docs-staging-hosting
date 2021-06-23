@@ -10,6 +10,7 @@ var CONSTANTS = require("./CONSTANTS.js");
 var GetKValue = require("./tests/stake/GetKValue.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var HelperActions = require("./library/HelperActions.js");
+var SetRewardObjects = require("./tests/stake/SetRewardObjects.js");
 var AddNewStakingFund = require("./tests/stake/AddNewStakingFund.js");
 var CalculateTimeDelta = require("./tests/stake/CalculateTimeDelta.js");
 var CalculateFloatPerSecond = require("./tests/stake/CalculateFloatPerSecond.js");
@@ -90,7 +91,8 @@ describe("Float System", (function () {
                         AddNewStakingFund.test(contracts, accounts);
                         GetKValue.test(contracts, accounts);
                         CalculateFloatPerSecond.test(contracts, accounts);
-                        return CalculateNewCumulativeRate.test(contracts, accounts);
+                        CalculateNewCumulativeRate.test(contracts, accounts);
+                        return SetRewardObjects.test(contracts, accounts);
                       }));
                 
               }));
