@@ -15,6 +15,7 @@ var Ethers$1 = require("ethers");
 var Globals = require("../../libraries/Globals.js");
 var Js_math = require("rescript/lib/js/js_math.js");
 var Metamask = require("../UI/Base/Metamask.js");
+var CONSTANTS = require("../../CONSTANTS.js");
 var Contracts = require("../../ethereum/Contracts.js");
 var Formality = require("re-formality/src/Formality.js");
 var AmountInput = require("../UI/Base/AmountInput.js");
@@ -696,7 +697,7 @@ function MintForm$MintFormInput(Props) {
             onBlur: onBlurAmount,
             onChange: onChangeAmountInput,
             onMaxClick: onMaxClick,
-            optCurrency: Config.paymentTokenName
+            optCurrency: CONSTANTS.daiDisplayToken
           }), optErrorMessage !== undefined ? React.createElement("div", {
               className: "text-red-500 text-xs"
             }, optErrorMessage) : null);

@@ -27,6 +27,9 @@ contract YieldManagerAave is IYieldManager {
     ILendingPool public lendingPool;
 
     uint16 referralCode;
+    uint256 public totalValueRealized;
+    uint256 public totalReservedForTreasury;
+    uint256 public constant TEN_TO_THE_5 = 10000;
 
     ////////////////////////////////////
     /////////// MODIFIERS //////////////
@@ -71,6 +74,9 @@ contract YieldManagerAave is IYieldManager {
 
         referralCode = _aaveReferalCode;
 
+        totalValueRealized = 0;
+        totalReservedForTreasury = 0;
+
         token = ERC20(_token);
         aToken = IERC20Upgradeable(_aToken);
         lendingPool = ILendingPool(_lendingPool);
@@ -102,17 +108,24 @@ contract YieldManagerAave is IYieldManager {
             address(this),
             referralCode
         );
+
+        totalValueRealized += amount;
     }
 
     function withdrawToken(uint256 amount) public override longShortOnly {
+        require(totalValueRealized >= amount);
+
         // Redeem aToken for underlying asset tokens.
         // This will fail if not enough liquidity is avaiable on aave.
         lendingPool.withdraw(address(token), amount, address(this));
 
         // Transfer tokens back to LongShort contract.
         token.transfer(longShort, amount);
+
+        totalValueRealized -= amount;
     }
 
+    // TODO STENT what is this for? It's not called anywhere
     function withdrawErc20TokenToTreasury(address erc20Token)
         external
         override
@@ -130,6 +143,65 @@ contract YieldManagerAave is IYieldManager {
         IERC20Upgradeable(erc20Token).transfer(treasury, amount);
     }
 
+    /*
+     * Returns the total amount of collateral that was provided, plus
+     * the amount of yield that has been generated AND realized
+     * through the claimYieldAndGetMarketAmount function.
+     */
+    // TODO STENT not unit tested
+    function getTotalValueRealized() public override view
+        returns (uint256 totalValueRealized) {
+        return totalValueRealized;
+    }
+
+    /*
+     * Returns the total amount of yield that is owed to the treasury.
+     */
+    // TODO STENT not unit tested
+    function getTotalReservedForTreasury() public override view
+        returns (uint256 totalValueReservedForTreasury) {
+        return totalReservedForTreasury;
+    }
+
+    /*
+     * Calculate the amount of yield that has yet to be claimed,
+     * note how much is reserved for the treasury and return how
+     * much is reserved for the market. The yield is split between
+     * the market and the treasury so treasuryPcnt = 1 - marketPcnt.
+     */
+    // TODO STENT not unit tested
+    function claimYieldAndGetMarketAmount(uint256 marketPcntE5)
+        public override longShortOnly returns (uint256) {
+
+        uint256 unrealizedYield = getTotalHeld() - totalValueRealized;
+
+        if (unrealizedYield == 0) {
+            return 0;
+        }
+
+        uint256 treasuryPcntE5 = TEN_TO_THE_5 - marketPcntE5;
+
+        totalReservedForTreasury += unrealizedYield * treasuryPcntE5 / TEN_TO_THE_5;
+        totalValueRealized += unrealizedYield;
+
+        return unrealizedYield - totalReservedForTreasury;
+    }
+
+    /*
+     * Transfer tokens owed to the treasury to the treasury.
+     */
+    // TODO STENT not unit tested
+    function withdrawTreasuryFunds() external override longShortOnly {
+        // Redeem aToken for underlying asset tokens.
+        // This will fail if not enough liquidity is avaiable on aave.
+        lendingPool.withdraw(address(token), totalReservedForTreasury, address(this));
+
+        token.transfer(treasury, totalReservedForTreasury);
+
+        totalValueRealized -= totalReservedForTreasury;
+        totalReservedForTreasury = 0;
+    }
+
     function getTotalHeld() public view override returns (uint256 amount) {
         return aToken.balanceOf(address(this));
     }
@@ -137,4 +209,5 @@ contract YieldManagerAave is IYieldManager {
     function getHeldToken() public view override returns (address _token) {
         return address(token);
     }
+
 }
