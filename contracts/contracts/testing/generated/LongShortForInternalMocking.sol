@@ -63,8 +63,16 @@ contract LongShortForInternalMocking {
       return (abi.decode("",(uint256)));
     }
      
+    function getMarketPcntForTreasuryVsMarketSplitMock(uint32) public pure returns (uint256 marketPcntE5){
+      return (abi.decode("",(uint256)));
+    }
+     
     function getTreasurySplitMock(uint32,uint256) public pure returns (uint256 marketAmount,uint256 treasuryAmount){
       return (abi.decode("",(uint256)),abi.decode("",(uint256)));
+    }
+     
+    function getLongPcntForLongVsShortSplitMock(uint32) public pure returns (uint256 longPcntE5){
+      return (abi.decode("",(uint256)));
     }
      
     function getMarketSplitMock(uint32,uint256) public pure returns (uint256 longAmount,uint256 shortAmount){

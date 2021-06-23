@@ -40,7 +40,7 @@ contract LongShortMockable is ILongShort, Initializable {
         0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
     uint256 public constant TEN_TO_THE_18 = 1e18;
     int256 public constant TEN_TO_THE_18_SIGNED = 1e18;
-    uint256 public constant feeUnitsOfPrecision = 10000;
+    uint256 public constant TEN_TO_THE_5 = 10000;
     uint256[45] private __constantsGap;
 
         address public admin;
@@ -54,9 +54,7 @@ contract LongShortMockable is ILongShort, Initializable {
         mapping(uint32 => bool) public marketExists;
     mapping(uint32 => uint256) public assetPrice;
     mapping(uint32 => uint256) public marketUpdateIndex;
-
-    mapping(uint32 => uint256) public totalValueLockedInYieldManager;
-    mapping(uint32 => uint256) public totalValueReservedForTreasury;
+    mapping(uint32 => uint256) public totalFeesReservedForTreasury;
     mapping(uint32 => IERC20) public fundTokens;
     mapping(uint32 => IYieldManager) public yieldManagers;
     mapping(uint32 => IOracleManager) public oracleManagers;
@@ -563,6 +561,38 @@ contract LongShortMockable is ILongShort, Initializable {
         }
     }
 
+    function getMarketPcntForTreasuryVsMarketSplit(uint32 marketIndex)
+        public
+        view
+        returns (uint256 marketPcntE5)
+    {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getMarketPcntForTreasuryVsMarketSplit"))){
+      
+      return mocker.getMarketPcntForTreasuryVsMarketSplitMock(marketIndex);
+    }
+  
+        uint256 totalValueLockedInMarket =
+            syntheticTokenPoolValue[marketIndex][true] +
+                syntheticTokenPoolValue[marketIndex][false];
+
+        if (
+            syntheticTokenPoolValue[marketIndex][true] >
+            syntheticTokenPoolValue[marketIndex][false]
+        ) {
+            marketPcntE5 =
+                ((syntheticTokenPoolValue[marketIndex][true] -
+                    syntheticTokenPoolValue[marketIndex][false]) * TEN_TO_THE_5) /
+                totalValueLockedInMarket;
+        } else {
+            marketPcntE5 =
+                ((syntheticTokenPoolValue[marketIndex][false] -
+                    syntheticTokenPoolValue[marketIndex][true]) * TEN_TO_THE_5) /
+                totalValueLockedInMarket;
+        }
+
+        return marketPcntE5;
+    }
+
     
 
     function getTreasurySplit(uint32 marketIndex, uint256 amount)
@@ -575,31 +605,27 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker.getTreasurySplitMock(marketIndex,amount);
     }
   
-        uint256 marketPcnt; 
-        uint256 totalValueLockedInMarket =
-            syntheticTokenPoolValue[marketIndex][true] +
-                syntheticTokenPoolValue[marketIndex][false];
+        uint256 marketPcntE5 = getMarketPcntForTreasuryVsMarketSplit(marketIndex);
 
-        if (
-            syntheticTokenPoolValue[marketIndex][true] >
-            syntheticTokenPoolValue[marketIndex][false]
-        ) {
-            marketPcnt =
-                ((syntheticTokenPoolValue[marketIndex][true] -
-                    syntheticTokenPoolValue[marketIndex][false]) * 10000) /
-                totalValueLockedInMarket;
-        } else {
-            marketPcnt =
-                ((syntheticTokenPoolValue[marketIndex][false] -
-                    syntheticTokenPoolValue[marketIndex][true]) * 10000) /
-                totalValueLockedInMarket;
-        }
-
-        marketAmount = (marketPcnt * amount) / 10000;
+        marketAmount = (marketPcntE5 * amount) / TEN_TO_THE_5;
         treasuryAmount = amount - marketAmount;
-        require(amount == marketAmount + treasuryAmount);
 
         return (marketAmount, treasuryAmount);
+    }
+
+    function getLongPcntForLongVsShortSplit(uint32 marketIndex)
+        public
+        view
+        returns (uint256 longPcntE5)
+    {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getLongPcntForLongVsShortSplit"))){
+      
+      return mocker.getLongPcntForLongVsShortSplitMock(marketIndex);
+    }
+  
+        return (syntheticTokenPoolValue[marketIndex][false] * TEN_TO_THE_5) /
+               (syntheticTokenPoolValue[marketIndex][true] +
+                syntheticTokenPoolValue[marketIndex][false]);
     }
 
     
@@ -614,13 +640,11 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker.getMarketSplitMock(marketIndex,amount);
     }
   
-                        uint256 longPcnt =
-            (syntheticTokenPoolValue[marketIndex][false] * 10000) /
-                (syntheticTokenPoolValue[marketIndex][true] +
-                    syntheticTokenPoolValue[marketIndex][false]);
+        uint256 longPcntE5 = getLongPcntForLongVsShortSplit(marketIndex);
 
-        longAmount = (amount * longPcnt) / 10000;
+        longAmount = (amount * longPcntE5) / TEN_TO_THE_5;
         shortAmount = amount - longAmount;
+
         return (longAmount, shortAmount);
     }
 
@@ -637,7 +661,7 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker.getFeesGeneralMock(marketIndex,delta,synthTokenGainingDominanceIsLong,baseFeePercent,penaltyFeePercent);
     }
   
-        uint256 baseFee = (delta * baseFeePercent) / feeUnitsOfPrecision;
+        uint256 baseFee = (delta * baseFeePercent) / TEN_TO_THE_5;
 
         if (
             syntheticTokenPoolValue[marketIndex][
@@ -648,7 +672,7 @@ contract LongShortMockable is ILongShort, Initializable {
             ]
         ) {
                         return
-                baseFee + ((delta * penaltyFeePercent) / feeUnitsOfPrecision);
+                baseFee + ((delta * penaltyFeePercent) / TEN_TO_THE_5);
         } else if (
             syntheticTokenPoolValue[marketIndex][
                 synthTokenGainingDominanceIsLong
@@ -667,7 +691,7 @@ contract LongShortMockable is ILongShort, Initializable {
                             synthTokenGainingDominanceIsLong
                         ]);
             uint256 penaltyFee =
-                (amountImbalancing * penaltyFeePercent) / feeUnitsOfPrecision;
+                (amountImbalancing * penaltyFeePercent) / TEN_TO_THE_5;
 
             return baseFee + penaltyFee;
         } else {
@@ -734,17 +758,12 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._claimAndDistributeYieldMock(marketIndex);
     }
   
-        uint256 amount =
-            yieldManagers[marketIndex].getTotalHeld() -
-                totalValueLockedInYieldManager[marketIndex];
+        uint256 marketPcntE5 = getMarketPcntForTreasuryVsMarketSplit(marketIndex);
 
-        if (amount > 0) {
-            (uint256 marketAmount, uint256 treasuryAmount) =
-                getTreasurySplit(marketIndex, amount);
+        uint256 marketAmount = yieldManagers[marketIndex]
+            .claimYieldAndGetMarketAmount(marketPcntE5);
 
-                                    totalValueLockedInYieldManager[marketIndex] += amount;
-            totalValueReservedForTreasury[marketIndex] += treasuryAmount;
-
+        if (marketAmount > 0) {
             _distributeMarketAmount(marketIndex, marketAmount);
         }
     }
@@ -843,7 +862,7 @@ contract LongShortMockable is ILongShort, Initializable {
             return;
         }
 
-        _claimAndDistributeYield(marketIndex);
+                                _claimAndDistributeYield(marketIndex);
         _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
         _refreshTokenPrices(marketIndex);
 
@@ -977,7 +996,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
     
 
-        function _transferFundsToYieldManager(uint32 marketIndex, uint256 amount)
+    function _transferFundsToYieldManager(uint32 marketIndex, uint256 amount)
         internal
     {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_transferFundsToYieldManager"))){
@@ -990,8 +1009,6 @@ contract LongShortMockable is ILongShort, Initializable {
             amount
         );
         yieldManagers[marketIndex].depositToken(amount);
-
-                totalValueLockedInYieldManager[marketIndex] += amount;
     }
 
     
@@ -1004,39 +1021,41 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._transferFromYieldManagerMock(marketIndex,amount);
     }
   
-        require(totalValueLockedInYieldManager[marketIndex] >= amount);
-
                         yieldManagers[marketIndex].withdrawToken(amount);
 
-                        totalValueLockedInYieldManager[marketIndex] -= amount;
-
                                 require(
-            totalValueLockedInYieldManager[marketIndex] <=
+            yieldManagers[marketIndex].getTotalValueRealized() <=
                 syntheticTokenPoolValue[marketIndex][true] +
                     syntheticTokenPoolValue[marketIndex][false] +
-                    totalValueReservedForTreasury[marketIndex]
+                    totalFeesReservedForTreasury[marketIndex]
         );
     }
 
     
 
-    function transferTreasuryFunds(uint32 marketIndex) external treasuryOnly {
+    function transferTreasuryFunds(uint32 marketIndex) external {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("transferTreasuryFunds"))){
       
       return mocker.transferTreasuryFundsMock(marketIndex);
     }
   
-        uint256 totalForTreasury = totalValueReservedForTreasury[marketIndex];
+        uint256 totalValueReservedForTreasury =
+            totalFeesReservedForTreasury[marketIndex] +
+            yieldManagers[marketIndex].getTotalReservedForTreasury();
 
-                totalValueReservedForTreasury[marketIndex] = 0;
-
-                if (totalForTreasury == 0) {
+        if (totalValueReservedForTreasury == 0) {
             return;
         }
 
-                _transferFromYieldManager(marketIndex, totalForTreasury);
+        if (totalFeesReservedForTreasury[marketIndex] > 0) {
+            totalFeesReservedForTreasury[marketIndex] = 0;
+        }
 
-                fundTokens[marketIndex].transfer(treasury, totalForTreasury);
+        if (yieldManagers[marketIndex].getTotalReservedForTreasury() > 0) {
+            yieldManagers[marketIndex].withdrawTreasuryFunds();
+        }
+
+                fundTokens[marketIndex].transfer(treasury, totalValueReservedForTreasury);
     }
 
     

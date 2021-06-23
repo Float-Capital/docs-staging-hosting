@@ -197,6 +197,28 @@ let getUsersPendingBalanceCalls: t => array<getUsersPendingBalanceCall> = _r => 
   })
 }
 
+let mockGetMarketPcntForTreasuryVsMarketSplitToReturn: (t, Ethers.BigNumber.t) => unit = (
+  _r,
+  _param0,
+) => {
+  let _ = %raw("_r.smocked.getMarketPcntForTreasuryVsMarketSplit.will.return.with([_param0])")
+}
+
+type getMarketPcntForTreasuryVsMarketSplitCall = {marketIndex: int}
+
+let getMarketPcntForTreasuryVsMarketSplitCalls: t => array<
+  getMarketPcntForTreasuryVsMarketSplitCall,
+> = _r => {
+  let array = %raw("_r.smocked.getMarketPcntForTreasuryVsMarketSplit.calls")
+  array->Array.map(_m => {
+    let marketIndex = _m->Array.getUnsafe(0)
+
+    {
+      marketIndex: marketIndex,
+    }
+  })
+}
+
 let mockGetTreasurySplitToReturn: (t, Ethers.BigNumber.t, Ethers.BigNumber.t) => unit = (
   _r,
   _param0,
@@ -216,6 +238,23 @@ let getTreasurySplitCalls: t => array<getTreasurySplitCall> = _r => {
     {
       marketIndex: marketIndex,
       amount: amount,
+    }
+  })
+}
+
+let mockGetLongPcntForLongVsShortSplitToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.getLongPcntForLongVsShortSplit.will.return.with([_param0])")
+}
+
+type getLongPcntForLongVsShortSplitCall = {marketIndex: int}
+
+let getLongPcntForLongVsShortSplitCalls: t => array<getLongPcntForLongVsShortSplitCall> = _r => {
+  let array = %raw("_r.smocked.getLongPcntForLongVsShortSplit.calls")
+  array->Array.map(_m => {
+    let marketIndex = _m->Array.getUnsafe(0)
+
+    {
+      marketIndex: marketIndex,
     }
   })
 }
@@ -885,6 +924,35 @@ module InternalMock = {
     ->Option.getExn
   }
 
+  let mockGetMarketPcntForTreasuryVsMarketSplitToReturn: Ethers.BigNumber.t => unit = _param0 => {
+    checkForExceptions(~functionName="getMarketPcntForTreasuryVsMarketSplit")
+    let _ = internalRef.contents->Option.map(_r => {
+      let _ = %raw(
+        "_r.smocked.getMarketPcntForTreasuryVsMarketSplitMock.will.return.with([_param0])"
+      )
+    })
+  }
+
+  type getMarketPcntForTreasuryVsMarketSplitCall = {marketIndex: int}
+
+  let getMarketPcntForTreasuryVsMarketSplitCalls: unit => array<
+    getMarketPcntForTreasuryVsMarketSplitCall,
+  > = () => {
+    checkForExceptions(~functionName="getMarketPcntForTreasuryVsMarketSplit")
+    internalRef.contents
+    ->Option.map(_r => {
+      let array = %raw("_r.smocked.getMarketPcntForTreasuryVsMarketSplitMock.calls")
+      array->Array.map(_m => {
+        let marketIndex = _m->Array.getUnsafe(0)
+
+        {
+          marketIndex: marketIndex,
+        }
+      })
+    })
+    ->Option.getExn
+  }
+
   let mockGetTreasurySplitToReturn: (Ethers.BigNumber.t, Ethers.BigNumber.t) => unit = (
     _param0,
     _param1,
@@ -909,6 +977,33 @@ module InternalMock = {
         {
           marketIndex: marketIndex,
           amount: amount,
+        }
+      })
+    })
+    ->Option.getExn
+  }
+
+  let mockGetLongPcntForLongVsShortSplitToReturn: Ethers.BigNumber.t => unit = _param0 => {
+    checkForExceptions(~functionName="getLongPcntForLongVsShortSplit")
+    let _ = internalRef.contents->Option.map(_r => {
+      let _ = %raw("_r.smocked.getLongPcntForLongVsShortSplitMock.will.return.with([_param0])")
+    })
+  }
+
+  type getLongPcntForLongVsShortSplitCall = {marketIndex: int}
+
+  let getLongPcntForLongVsShortSplitCalls: unit => array<
+    getLongPcntForLongVsShortSplitCall,
+  > = () => {
+    checkForExceptions(~functionName="getLongPcntForLongVsShortSplit")
+    internalRef.contents
+    ->Option.map(_r => {
+      let array = %raw("_r.smocked.getLongPcntForLongVsShortSplitMock.calls")
+      array->Array.map(_m => {
+        let marketIndex = _m->Array.getUnsafe(0)
+
+        {
+          marketIndex: marketIndex,
         }
       })
     })
