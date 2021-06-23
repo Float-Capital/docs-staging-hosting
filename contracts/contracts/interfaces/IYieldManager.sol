@@ -28,6 +28,34 @@ abstract contract IYieldManager {
     function withdrawErc20TokenToTreasury(address erc20Token) external virtual;
 
     /*
+     * Returns the total amount of collateral that was provided, plus
+     * the amount of yield that has been generated AND realized
+     * through the claimYieldAndGetMarketAmount function.
+     */
+    function getTotalValueRealized() public virtual view
+        returns (uint256 totalValueRealized);
+
+    /*
+     * Returns the total amount of yield that is owed to the treasury.
+     */
+    function getTotalReservedForTreasury() public virtual view
+        returns (uint256 totalValueReservedForTreasury);
+
+    /*
+     * Calculate the amount of yield that has yet to be claimed,
+     * note how much is reserved for the treasury and return how
+     * much is reserved for the market. The yield is split between
+     * the market and the treasury so treasuryPcnt = 1 - marketPcnt.
+     */
+    function claimYieldAndGetMarketAmount(uint256 marketPcntE5) public virtual
+        returns (uint256 marketAmount);
+
+    /*
+     * Transfer tokens owed to the treasury to the treasury.
+     */
+    function withdrawTreasuryFunds() external virtual;
+
+    /*
      * Returns the total token value held by this yield manager.
      */
     function getTotalHeld() public virtual returns (uint256 amount);

@@ -141,6 +141,29 @@ contract YieldManagerMock is IYieldManager {
         ERC20PresetMinterPauser(erc20Token).transfer(treasury, amount);
     }
 
+    // TODO STENT need to change this and unit test it
+    function getTotalValueRealized() public override view
+        returns (uint256 totalValyeRealized) {
+        return 0;
+    }
+
+    // TODO STENT need to change this and unit test it
+    function getTotalReservedForTreasury() public override view
+        returns (uint256 totalValueReservedForTreasury) {
+        return 0;
+    }
+
+    // TODO STENT need to change this and unit test it
+    function claimYieldAndGetMarketAmount(uint256 marketPcntE5)
+        public override longShortOnly returns (uint256) {
+        return 0;
+    }
+
+    // TODO STENT need to change this and unit test it
+    function withdrawTreasuryFunds() external override longShortOnly {
+
+    }
+
     function getTotalHeld() public override returns (uint256 amount) {
         settle();
 
