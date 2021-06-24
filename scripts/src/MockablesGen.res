@@ -11,13 +11,28 @@
 // TO ADD A FILE TO THIS: add filepath relative to ../contracts/contracts here. e.g. mocks/YieldManagerMock.sol
 open Js.String2
 
-let filesToMock = ["LongShort.sol", "Staker.sol"]
+let filesToMockInternally = ["LongShort.sol", "Staker.sol"]
 
 exception ScriptDoesNotSupportReturnValues(string)
 
 let defaultError = "This script currently only supports functions that return or receive as parameters uints, ints, bools, (nonpayable) addresses, contracts, structs, arrays or strings
           // NO MAPPINGS"
 let {contains, containsRe, commafiy} = module(Globals)
+
+let abisToMockExternally = [
+  "ERC20Mock",
+  "YieldManagerMock",
+  "LongShort",
+  "SyntheticToken",
+  "YieldManagerAave",
+  "FloatCapital_v0",
+  "TokenFactory",
+  "FloatToken",
+  "Staker",
+  "Treasury_v0",
+  "OracleManagerChainlink",
+  "OracleManagerMock",
+]
 
 let convertASTTypeToSolType = typeDescriptionStr => {
   switch typeDescriptionStr {
@@ -77,6 +92,8 @@ let lineCommentsRe = %re("/\\/\\/[^\\n]*\\n/g")
 let blockCommentsRe = %re("/\\/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+\\//g")
 let getArtifact = %raw(`(fileNameWithoutExtension) => require("../../contracts/codegen/truffle/" + fileNameWithoutExtension + ".json")`)
 
+let getAbi = %raw(`(fileNameWithoutExtension) => require("../../contracts/abis/" + fileNameWithoutExtension + ".json")`)
+
 exception BadMatchingBlock
 let rec matchingBlockEndIndex = (str, startIndex, count) => {
   let charr = str->charAt(startIndex)
@@ -117,7 +134,41 @@ let rec resolveImportLocationRecursive = (array, _import) => {
 
 let reduceStrArr = arr => arr->Array.reduce("", (acc, curr) => acc ++ curr)
 
-filesToMock->Array.forEach(filePath => {
+let parseAbiTypes = types =>
+  types->Array.map(i => {
+    let r: Globals.typedIdentifier = {
+      storageLocation: NotRelevant,
+      type_: i["internalType"],
+      name: i["name"],
+    }
+    r
+  })
+
+let parseAbi = abi =>
+  abi
+  ->Array.keep(n => n["type"] == "function")
+  ->Array.map(n => {
+    let r: Globals.functionType = {
+      name: n["name"],
+      visibility: Public,
+      parameters: n["inputs"]->parseAbiTypes,
+      returnValues: n["outputs"]->parseAbiTypes,
+    }
+    r
+  })
+
+let bindingsDict: HashMap.String.t<string> = HashMap.String.make(~hintSize=10)
+
+abisToMockExternally->Array.forEach(contractName => {
+  let abi = contractName->getAbi
+  let functions = abi->parseAbi
+  bindingsDict->HashMap.String.set(
+    contractName,
+    SmockableGen.externalModule(functions, ~contractName),
+  )
+})
+
+filesToMockInternally->Array.forEach(filePath => {
   let filePathSplit = filePath->split("/")
   let fileName = filePathSplit->Array.getExn(filePathSplit->Array.length - 1)
 
@@ -381,16 +432,21 @@ filesToMock->Array.forEach(filePath => {
     mockLogger.contents,
   )
 
-  Node.Fs.writeFileAsUtf8Sync(
-    `../contracts/test-waffle/library/smock/${fileNameWithoutExtension}Smocked.res`,
-    SmockableGen.entireModule(
-      ~allFunctions=functions(contractDefinition["nodes"])->Array.concat(
-        modifiers(contractDefinition["nodes"]),
-      ),
-      ~publicFunctions=functions(contractDefinition["nodes"])->Array.keep(x =>
-        x.visibility == Public
-      ),
-      ~contractName=fileNameWithoutExtension,
-    ),
+  let existingModuleDef =
+    abisToMockExternally->Array.some(x => x == fileNameWithoutExtension)
+      ? bindingsDict->HashMap.String.get(fileNameWithoutExtension)->Option.getExn
+      : ""
+
+  bindingsDict->HashMap.String.set(
+    fileNameWithoutExtension,
+    existingModuleDef ++
+    "\n\n" ++
+    functions(contractDefinition["nodes"])
+    ->Array.concat(modifiers(contractDefinition["nodes"]))
+    ->SmockableGen.internalModule(~contractName=fileNameWithoutExtension),
   )
+})
+
+bindingsDict->HashMap.String.forEach((key, val) => {
+  Node.Fs.writeFileAsUtf8Sync(`../contracts/test-waffle/library/smock/${key}Smocked.res`, val)
 })
