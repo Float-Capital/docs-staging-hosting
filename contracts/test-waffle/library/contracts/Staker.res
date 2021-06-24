@@ -458,6 +458,13 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "setSetRewardObjectsParams"
 
   @send
+  external set_mintFloatParams: (
+    t,
+    ~floatToken: Ethers.ethAddress,
+    ~floatPercentage: int,
+  ) => JsPromise.t<transaction> = "set_mintFloatParams"
+
+  @send
   external set_updateStateParams: (
     t,
     ~longShort: Ethers.ethAddress,

@@ -8,6 +8,7 @@ var Helpers = require("./library/Helpers.js");
 var Contract = require("./library/Contract.js");
 var CONSTANTS = require("./CONSTANTS.js");
 var GetKValue = require("./tests/stake/GetKValue.js");
+var MintFloat = require("./tests/stake/MintFloat.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var UpdateState = require("./tests/stake/UpdateState.js");
 var HelperActions = require("./library/HelperActions.js");
@@ -96,7 +97,8 @@ describe("Float System", (function () {
                         CalculateNewCumulativeRate.test(contracts, accounts);
                         SetRewardObjects.test(contracts, accounts);
                         AddNewStateForFloatRewards.test(contracts, accounts);
-                        return UpdateState.test(contracts, accounts);
+                        UpdateState.test(contracts, accounts);
+                        return MintFloat.test(contracts, accounts);
                       }));
                 
               }));

@@ -124,6 +124,14 @@ contract StakerInternalsExposed is StakerMockable {
         marketIndexOfToken[token] = tokenMarketIndex;
     }
 
+    function set_mintFloatParams(
+        IFloatToken _floatToken,
+        uint16 _floatPercentage
+    ) public {
+        floatToken = _floatToken;
+        floatPercentage = _floatPercentage;
+    }
+
     ///////////////////////////////////////////
     //////////// EXPOSED Functions ////////////
     ///////////////////////////////////////////
