@@ -111,9 +111,9 @@ let stakeRandomlyInMarkets =
           | Long(amount) =>
             let%AwaitThen _ = mintStake(~synthToken=longSynth, ~amount);
             let%Await longTokenPrice =
-              longShort->LongShort.syntheticTokenPrice(
-                marketIndex,
-                true/*long*/,
+              longShort->LongShortHelpers.getSyntheticTokenPrice(
+                ~marketIndex=marketIndex,
+                ~isLong=true,
               );
 
             synthsUserHasStakedIn->Array.concat([|
@@ -129,9 +129,9 @@ let stakeRandomlyInMarkets =
           | Short(amount) =>
             let%AwaitThen _ = mintStake(~synthToken=shortSynth, ~amount);
             let%Await shortTokenPrice =
-              longShort->LongShort.syntheticTokenPrice(
-                marketIndex,
-                false/*short*/,
+              longShort->LongShortHelpers.getSyntheticTokenPrice(
+                ~marketIndex=marketIndex,
+                ~isLong=false,
               );
             synthsUserHasStakedIn->Array.concat([|
               {
@@ -147,9 +147,9 @@ let stakeRandomlyInMarkets =
             let%AwaitThen _ =
               mintStake(~synthToken=longSynth, ~amount=longAmount);
             let%AwaitThen longTokenPrice =
-              longShort->LongShort.syntheticTokenPrice(
-                marketIndex,
-                true/*long*/,
+              longShort->LongShortHelpers.getSyntheticTokenPrice(
+                ~marketIndex=marketIndex,
+                ~isLong=true,
               );
             let newSynthsUserHasStakedIn =
               synthsUserHasStakedIn->Array.concat([|
@@ -170,9 +170,9 @@ let stakeRandomlyInMarkets =
             let%AwaitThen _ =
               mintStake(~synthToken=shortSynth, ~amount=shortAmount);
             let%Await shortTokenPrice =
-              longShort->LongShort.syntheticTokenPrice(
-                marketIndex,
-                false/*short*/,
+              longShort->LongShortHelpers.getSyntheticTokenPrice(
+                ~marketIndex=marketIndex,
+                ~isLong=false,
               );
             newSynthsUserHasStakedIn->Array.concat([|
               {

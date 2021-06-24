@@ -97,9 +97,9 @@ let testIntegration =
       );
 
       let%Await longTokenPrice =
-        longShort->LongShort.syntheticTokenPrice(
-          marketIndex,
-          true/*long*/,
+        longShort->Contract.LongShortHelpers.getSyntheticTokenPrice(
+          ~marketIndex=marketIndex,
+          ~isLong=true,
         );
 
       let expectedNumberOfTokensToRecieve =

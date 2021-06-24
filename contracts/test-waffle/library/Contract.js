@@ -5,6 +5,7 @@ var LetOps = require("./LetOps.js");
 var Staker = require("./contracts/Staker.js");
 var Globals = require("./Globals.js");
 var CONSTANTS = require("../CONSTANTS.js");
+var ContractHelpers = require("./ContractHelpers.js");
 
 function mintAndApprove(t, user, amount, spender) {
   return t.mint(user.address, amount).then(function (param) {
@@ -70,10 +71,23 @@ function getMarketBalance(longShort, marketIndex) {
               }));
 }
 
+function getSyntheticTokenPrice(longShort, marketIndex, isLong) {
+  return LetOps.AwaitThen.let_(longShort.syntheticTokens(marketIndex, isLong), (function (syntheticTokenAddress) {
+                return LetOps.AwaitThen.let_(ContractHelpers.attachToContract("SyntheticToken", syntheticTokenAddress), (function (synthContract) {
+                              return LetOps.AwaitThen.let_(synthContract.totalSupply(), (function (totalSupply) {
+                                            return LetOps.Await.let_(longShort.syntheticTokenPoolValue(marketIndex, isLong), (function (syntheticTokenPoolValue) {
+                                                          return Globals.div(Globals.mul(syntheticTokenPoolValue, CONSTANTS.tenToThe18), totalSupply);
+                                                        }));
+                                          }));
+                            }));
+              }));
+}
+
 var LongShortHelpers = {
   getFeesMint: getFeesMint,
   getFeesRedeemLazy: getFeesRedeemLazy,
-  getMarketBalance: getMarketBalance
+  getMarketBalance: getMarketBalance,
+  getSyntheticTokenPrice: getSyntheticTokenPrice
 };
 
 function getIsLong(synthToken) {

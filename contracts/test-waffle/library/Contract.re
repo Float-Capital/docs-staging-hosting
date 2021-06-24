@@ -105,6 +105,30 @@ module LongShortHelpers = {
       );
     {longValue, shortValue};
   };
+  let getSyntheticTokenPrice = 
+    (
+      longShort,
+      ~marketIndex,
+      ~isLong,
+    ) => {
+      let%AwaitThen syntheticTokenAddress = longShort->LongShort.syntheticTokens(marketIndex, isLong);
+      let%AwaitThen synthContract =
+        ContractHelpers.attachToContract(
+          "SyntheticToken",
+          ~contractAddress=syntheticTokenAddress,
+        );
+      let%AwaitThen totalSupply = synthContract->Obj.magic->SyntheticToken.totalSupply;
+
+      let%Await syntheticTokenPoolValue = 
+         longShort->LongShort.syntheticTokenPoolValue(marketIndex, isLong);
+
+      let syntheticTokenPrice = 
+         syntheticTokenPoolValue
+         ->mul(CONSTANTS.tenToThe18)
+         ->div(totalSupply);
+
+      syntheticTokenPrice;
+    };
 };
 
 module SyntheticTokenHelpers = {
