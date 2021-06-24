@@ -7,16 +7,161 @@ var Caml_exceptions = require("rescript/lib/js/caml_exceptions.js");
 var ContractHelpers = require("../ContractHelpers.js");
 var Smock = require("@eth-optimism/smock");
 
-var mockaddNewStakingFundToReturn = (t => t.smocked.addNewStakingFund.will.return());
+function mockInitializeToReturn(_r) {
+  ((_r.smocked.initialize.will.return()));
+  
+}
 
-function addNewStakingFundCalls(smocked) {
-  return Belt_Array.map(smocked.smocked.addNewStakingFund.calls, (function (param) {
+function initializeCalls(_r) {
+  var array = _r.smocked.initialize.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        admin: param[0],
+                        longShortCoreContract: param[1],
+                        floatToken: param[2],
+                        floatCapital: param[3]
+                      };
+              }));
+}
+
+function mockChangeAdminToReturn(_r) {
+  ((_r.smocked.changeAdmin.will.return()));
+  
+}
+
+function changeAdminCalls(_r) {
+  var array = _r.smocked.changeAdmin.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var admin = _m[0];
+                return {
+                        admin: admin
+                      };
+              }));
+}
+
+function mockChangeFloatPercentageToReturn(_r) {
+  ((_r.smocked.changeFloatPercentage.will.return()));
+  
+}
+
+function changeFloatPercentageCalls(_r) {
+  var array = _r.smocked.changeFloatPercentage.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var newPercentage = _m[0];
+                return {
+                        newPercentage: newPercentage
+                      };
+              }));
+}
+
+function mockChangeMarketLaunchIncentiveParametersToReturn(_r) {
+  ((_r.smocked.changeMarketLaunchIncentiveParameters.will.return()));
+  
+}
+
+function changeMarketLaunchIncentiveParametersCalls(_r) {
+  var array = _r.smocked.changeMarketLaunchIncentiveParameters.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        marketIndex: param[0],
+                        period: param[1],
+                        initialMultiplier: param[2]
+                      };
+              }));
+}
+
+function mockAddNewStakingFundToReturn(_r) {
+  ((_r.smocked.addNewStakingFund.will.return()));
+  
+}
+
+function addNewStakingFundCalls(_r) {
+  var array = _r.smocked.addNewStakingFund.calls;
+  return Belt_Array.map(array, (function (param) {
                 return {
                         marketIndex: param[0],
                         longToken: param[1],
                         shortToken: param[2],
                         kInitialMultiplier: param[3],
                         kPeriod: param[4]
+                      };
+              }));
+}
+
+function mockAddNewStateForFloatRewardsToReturn(_r) {
+  ((_r.smocked.addNewStateForFloatRewards.will.return()));
+  
+}
+
+function addNewStateForFloatRewardsCalls(_r) {
+  var array = _r.smocked.addNewStateForFloatRewards.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        marketIndex: param[0],
+                        longPrice: param[1],
+                        shortPrice: param[2],
+                        longValue: param[3],
+                        shortValue: param[4]
+                      };
+              }));
+}
+
+function mockClaimFloatCustomToReturn(_r) {
+  ((_r.smocked.claimFloatCustom.will.return()));
+  
+}
+
+function claimFloatCustomCalls(_r) {
+  var array = _r.smocked.claimFloatCustom.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var marketIndexes = _m[0];
+                return {
+                        marketIndexes: marketIndexes
+                      };
+              }));
+}
+
+function mockStakeFromUserToReturn(_r) {
+  ((_r.smocked.stakeFromUser.will.return()));
+  
+}
+
+function stakeFromUserCalls(_r) {
+  var array = _r.smocked.stakeFromUser.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        from: param[0],
+                        amount: param[1]
+                      };
+              }));
+}
+
+function mockWithdrawToReturn(_r) {
+  ((_r.smocked.withdraw.will.return()));
+  
+}
+
+function withdrawCalls(_r) {
+  var array = _r.smocked.withdraw.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        token: param[0],
+                        amount: param[1]
+                      };
+              }));
+}
+
+function mockWithdrawAllToReturn(_r) {
+  ((_r.smocked.withdrawAll.will.return()));
+  
+}
+
+function withdrawAllCalls(_r) {
+  var array = _r.smocked.withdrawAll.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var token = _m[0];
+                return {
+                        token: token
                       };
               }));
 }
@@ -31,35 +176,35 @@ var functionToNotMock = {
   contents: ""
 };
 
-function setup(staker) {
+function setup(contract) {
   return ContractHelpers.deployContract0(mockContractName).then(function (a) {
                 return Smock.smockit(a);
               }).then(function (b) {
               internalRef.contents = b;
-              return staker.setMocker(b.address);
+              return contract.setMocker(b.address);
             });
 }
 
-function setFunctionForUnitTesting(staker, functionName) {
+function setFunctionForUnitTesting(contract, functionName) {
   functionToNotMock.contents = functionName;
-  return staker.setFunctionToNotMock(functionName);
+  return contract.setFunctionToNotMock(functionName);
 }
 
-function setupFunctionForUnitTesting(staker, functionName) {
+function setupFunctionForUnitTesting(contract, functionName) {
   return ContractHelpers.deployContract0(mockContractName).then(function (a) {
                 return Smock.smockit(a);
               }).then(function (b) {
               internalRef.contents = b;
               return Promise.all([
-                          staker.setMocker(b.address),
-                          staker.setFunctionToNotMock(functionName)
+                          contract.setMocker(b.address),
+                          contract.setFunctionToNotMock(functionName)
                         ]);
             });
 }
 
 var MockingAFunctionThatYouShouldntBe = /* @__PURE__ */Caml_exceptions.create("StakerSmocked.InternalMock.MockingAFunctionThatYouShouldntBe");
 
-var HaventSetupInternalMockingForStaking = /* @__PURE__ */Caml_exceptions.create("StakerSmocked.InternalMock.HaventSetupInternalMockingForStaking");
+var HaventSetupInternalMockingForStaker = /* @__PURE__ */Caml_exceptions.create("StakerSmocked.InternalMock.HaventSetupInternalMockingForStaker");
 
 function checkForExceptions(functionName) {
   if (functionToNotMock.contents === functionName) {
@@ -72,9 +217,100 @@ function checkForExceptions(functionName) {
     return ;
   }
   throw {
-        RE_EXN_ID: HaventSetupInternalMockingForStaking,
+        RE_EXN_ID: HaventSetupInternalMockingForStaker,
         Error: new Error()
       };
+}
+
+function mockInitializeToReturn$1(param) {
+  checkForExceptions("initialize");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.initializeMock.will.return()));
+          
+        }));
+  
+}
+
+function initializeCalls$1(param) {
+  checkForExceptions("initialize");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.initializeMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          admin: param[0],
+                                          longShortCoreContract: param[1],
+                                          floatToken: param[2],
+                                          floatCapital: param[3]
+                                        };
+                                }));
+                  })));
+}
+
+function mockChangeAdminToReturn$1(param) {
+  checkForExceptions("changeAdmin");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.changeAdminMock.will.return()));
+          
+        }));
+  
+}
+
+function changeAdminCalls$1(param) {
+  checkForExceptions("changeAdmin");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.changeAdminMock.calls;
+                    return Belt_Array.map(array, (function (_m) {
+                                  var admin = _m[0];
+                                  return {
+                                          admin: admin
+                                        };
+                                }));
+                  })));
+}
+
+function mockChangeFloatPercentageToReturn$1(param) {
+  checkForExceptions("changeFloatPercentage");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.changeFloatPercentageMock.will.return()));
+          
+        }));
+  
+}
+
+function changeFloatPercentageCalls$1(param) {
+  checkForExceptions("changeFloatPercentage");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.changeFloatPercentageMock.calls;
+                    return Belt_Array.map(array, (function (_m) {
+                                  var newPercentage = _m[0];
+                                  return {
+                                          newPercentage: newPercentage
+                                        };
+                                }));
+                  })));
+}
+
+function mockChangeMarketLaunchIncentiveParametersToReturn$1(param) {
+  checkForExceptions("changeMarketLaunchIncentiveParameters");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.changeMarketLaunchIncentiveParametersMock.will.return()));
+          
+        }));
+  
+}
+
+function changeMarketLaunchIncentiveParametersCalls$1(param) {
+  checkForExceptions("changeMarketLaunchIncentiveParameters");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.changeMarketLaunchIncentiveParametersMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          period: param[1],
+                                          initialMultiplier: param[2]
+                                        };
+                                }));
+                  })));
 }
 
 function mock_changeMarketLaunchIncentiveParametersToReturn(param) {
@@ -86,16 +322,543 @@ function mock_changeMarketLaunchIncentiveParametersToReturn(param) {
   
 }
 
-function mockgetMarketLaunchIncentiveParametersToReturn(_period, _multiplier) {
-  checkForExceptions("getMarketLaunchIncentiveParameters");
+function _changeMarketLaunchIncentiveParametersCalls(param) {
+  checkForExceptions("_changeMarketLaunchIncentiveParameters");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked._changeMarketLaunchIncentiveParametersMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          period: param[1],
+                                          initialMultiplier: param[2]
+                                        };
+                                }));
+                  })));
+}
+
+function mockAddNewStakingFundToReturn$1(param) {
+  checkForExceptions("addNewStakingFund");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.getMarketLaunchIncentiveParametersMock.will.return.with([_period, _multiplier])));
+          ((_r.smocked.addNewStakingFundMock.will.return()));
           
         }));
   
 }
 
-function mockonlyFloatToReturn(param) {
+function addNewStakingFundCalls$1(param) {
+  checkForExceptions("addNewStakingFund");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.addNewStakingFundMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          longToken: param[1],
+                                          shortToken: param[2],
+                                          kInitialMultiplier: param[3],
+                                          kPeriod: param[4]
+                                        };
+                                }));
+                  })));
+}
+
+function mockGetMarketLaunchIncentiveParametersToReturn(_param0, _param1) {
+  checkForExceptions("getMarketLaunchIncentiveParameters");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.getMarketLaunchIncentiveParametersMock.will.return.with([_param0,_param1])));
+          
+        }));
+  
+}
+
+function getMarketLaunchIncentiveParametersCalls(param) {
+  checkForExceptions("getMarketLaunchIncentiveParameters");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.getMarketLaunchIncentiveParametersMock.calls;
+                    return Belt_Array.map(array, (function (_m) {
+                                  var marketIndex = _m[0];
+                                  return {
+                                          marketIndex: marketIndex
+                                        };
+                                }));
+                  })));
+}
+
+function mockGetKValueToReturn(_param0) {
+  checkForExceptions("getKValue");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.getKValueMock.will.return.with([_param0])));
+          
+        }));
+  
+}
+
+function getKValueCalls(param) {
+  checkForExceptions("getKValue");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.getKValueMock.calls;
+                    return Belt_Array.map(array, (function (_m) {
+                                  var marketIndex = _m[0];
+                                  return {
+                                          marketIndex: marketIndex
+                                        };
+                                }));
+                  })));
+}
+
+function mockCalculateFloatPerSecondToReturn(_param0, _param1) {
+  checkForExceptions("calculateFloatPerSecond");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.calculateFloatPerSecondMock.will.return.with([_param0,_param1])));
+          
+        }));
+  
+}
+
+function calculateFloatPerSecondCalls(param) {
+  checkForExceptions("calculateFloatPerSecond");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.calculateFloatPerSecondMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          longPrice: param[1],
+                                          shortPrice: param[2],
+                                          longValue: param[3],
+                                          shortValue: param[4]
+                                        };
+                                }));
+                  })));
+}
+
+function mockCalculateTimeDeltaToReturn(_param0) {
+  checkForExceptions("calculateTimeDelta");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.calculateTimeDeltaMock.will.return.with([_param0])));
+          
+        }));
+  
+}
+
+function calculateTimeDeltaCalls(param) {
+  checkForExceptions("calculateTimeDelta");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.calculateTimeDeltaMock.calls;
+                    return Belt_Array.map(array, (function (_m) {
+                                  var marketIndex = _m[0];
+                                  return {
+                                          marketIndex: marketIndex
+                                        };
+                                }));
+                  })));
+}
+
+function mockCalculateNewCumulativeRateToReturn(_param0, _param1) {
+  checkForExceptions("calculateNewCumulativeRate");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.calculateNewCumulativeRateMock.will.return.with([_param0,_param1])));
+          
+        }));
+  
+}
+
+function calculateNewCumulativeRateCalls(param) {
+  checkForExceptions("calculateNewCumulativeRate");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.calculateNewCumulativeRateMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          longPrice: param[1],
+                                          shortPrice: param[2],
+                                          longValue: param[3],
+                                          shortValue: param[4]
+                                        };
+                                }));
+                  })));
+}
+
+function mockSetRewardObjectsToReturn(param) {
+  checkForExceptions("setRewardObjects");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.setRewardObjectsMock.will.return()));
+          
+        }));
+  
+}
+
+function setRewardObjectsCalls(param) {
+  checkForExceptions("setRewardObjects");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.setRewardObjectsMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          longPrice: param[1],
+                                          shortPrice: param[2],
+                                          longValue: param[3],
+                                          shortValue: param[4]
+                                        };
+                                }));
+                  })));
+}
+
+function mockAddNewStateForFloatRewardsToReturn$1(param) {
+  checkForExceptions("addNewStateForFloatRewards");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.addNewStateForFloatRewardsMock.will.return()));
+          
+        }));
+  
+}
+
+function addNewStateForFloatRewardsCalls$1(param) {
+  checkForExceptions("addNewStateForFloatRewards");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.addNewStateForFloatRewardsMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          longPrice: param[1],
+                                          shortPrice: param[2],
+                                          longValue: param[3],
+                                          shortValue: param[4]
+                                        };
+                                }));
+                  })));
+}
+
+function mock_updateStateToReturn(param) {
+  checkForExceptions("_updateState");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked._updateStateMock.will.return()));
+          
+        }));
+  
+}
+
+function _updateStateCalls(param) {
+  checkForExceptions("_updateState");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked._updateStateMock.calls;
+                    return Belt_Array.map(array, (function (_m) {
+                                  var token = _m[0];
+                                  return {
+                                          token: token
+                                        };
+                                }));
+                  })));
+}
+
+function mockCalculateAccumulatedFloatHelperToReturn(_param0, _param1) {
+  checkForExceptions("calculateAccumulatedFloatHelper");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.calculateAccumulatedFloatHelperMock.will.return.with([_param0,_param1])));
+          
+        }));
+  
+}
+
+function calculateAccumulatedFloatHelperCalls(param) {
+  checkForExceptions("calculateAccumulatedFloatHelper");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.calculateAccumulatedFloatHelperMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          user: param[1],
+                                          amountStakedLong: param[2],
+                                          amountStakedShort: param[3],
+                                          usersLastRewardIndex: param[4]
+                                        };
+                                }));
+                  })));
+}
+
+function mockCalculateAccumulatedFloatToReturn(_param0, _param1) {
+  checkForExceptions("calculateAccumulatedFloat");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.calculateAccumulatedFloatMock.will.return.with([_param0,_param1])));
+          
+        }));
+  
+}
+
+function calculateAccumulatedFloatCalls(param) {
+  checkForExceptions("calculateAccumulatedFloat");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.calculateAccumulatedFloatMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          user: param[1]
+                                        };
+                                }));
+                  })));
+}
+
+function mock_mintFloatToReturn(param) {
+  checkForExceptions("_mintFloat");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked._mintFloatMock.will.return()));
+          
+        }));
+  
+}
+
+function _mintFloatCalls(param) {
+  checkForExceptions("_mintFloat");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked._mintFloatMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          user: param[0],
+                                          floatToMint: param[1]
+                                        };
+                                }));
+                  })));
+}
+
+function mockMintAccumulatedFloatToReturn(param) {
+  checkForExceptions("mintAccumulatedFloat");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.mintAccumulatedFloatMock.will.return()));
+          
+        }));
+  
+}
+
+function mintAccumulatedFloatCalls(param) {
+  checkForExceptions("mintAccumulatedFloat");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.mintAccumulatedFloatMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          user: param[1]
+                                        };
+                                }));
+                  })));
+}
+
+function mock_claimFloatToReturn(param) {
+  checkForExceptions("_claimFloat");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked._claimFloatMock.will.return()));
+          
+        }));
+  
+}
+
+function _claimFloatCalls(param) {
+  checkForExceptions("_claimFloat");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked._claimFloatMock.calls;
+                    return Belt_Array.map(array, (function (_m) {
+                                  var marketIndex = _m[0];
+                                  return {
+                                          marketIndex: marketIndex
+                                        };
+                                }));
+                  })));
+}
+
+function mockClaimFloatCustomToReturn$1(param) {
+  checkForExceptions("claimFloatCustom");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.claimFloatCustomMock.will.return()));
+          
+        }));
+  
+}
+
+function claimFloatCustomCalls$1(param) {
+  checkForExceptions("claimFloatCustom");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.claimFloatCustomMock.calls;
+                    return Belt_Array.map(array, (function (_m) {
+                                  var marketIndexes = _m[0];
+                                  return {
+                                          marketIndexes: marketIndexes
+                                        };
+                                }));
+                  })));
+}
+
+function mockStakeFromUserToReturn$1(param) {
+  checkForExceptions("stakeFromUser");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.stakeFromUserMock.will.return()));
+          
+        }));
+  
+}
+
+function stakeFromUserCalls$1(param) {
+  checkForExceptions("stakeFromUser");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.stakeFromUserMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          from: param[0],
+                                          amount: param[1]
+                                        };
+                                }));
+                  })));
+}
+
+function mock_stakeToReturn(param) {
+  checkForExceptions("_stake");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked._stakeMock.will.return()));
+          
+        }));
+  
+}
+
+function _stakeCalls(param) {
+  checkForExceptions("_stake");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked._stakeMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          token: param[0],
+                                          amount: param[1],
+                                          user: param[2]
+                                        };
+                                }));
+                  })));
+}
+
+function mock_withdrawToReturn(param) {
+  checkForExceptions("_withdraw");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked._withdrawMock.will.return()));
+          
+        }));
+  
+}
+
+function _withdrawCalls(param) {
+  checkForExceptions("_withdraw");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked._withdrawMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          token: param[0],
+                                          amount: param[1]
+                                        };
+                                }));
+                  })));
+}
+
+function mockWithdrawToReturn$1(param) {
+  checkForExceptions("withdraw");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.withdrawMock.will.return()));
+          
+        }));
+  
+}
+
+function withdrawCalls$1(param) {
+  checkForExceptions("withdraw");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.withdrawMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          token: param[0],
+                                          amount: param[1]
+                                        };
+                                }));
+                  })));
+}
+
+function mockWithdrawAllToReturn$1(param) {
+  checkForExceptions("withdrawAll");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.withdrawAllMock.will.return()));
+          
+        }));
+  
+}
+
+function withdrawAllCalls$1(param) {
+  checkForExceptions("withdrawAll");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.withdrawAllMock.calls;
+                    return Belt_Array.map(array, (function (_m) {
+                                  var token = _m[0];
+                                  return {
+                                          token: token
+                                        };
+                                }));
+                  })));
+}
+
+function mockOnlyAdminToReturn(param) {
+  checkForExceptions("onlyAdmin");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.onlyAdminMock.will.return()));
+          
+        }));
+  
+}
+
+function onlyAdminCalls(param) {
+  checkForExceptions("onlyAdmin");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.onlyAdminMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  
+                                }));
+                  })));
+}
+
+function mockOnlyValidSyntheticToReturn(param) {
+  checkForExceptions("onlyValidSynthetic");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.onlyValidSyntheticMock.will.return()));
+          
+        }));
+  
+}
+
+function onlyValidSyntheticCalls(param) {
+  checkForExceptions("onlyValidSynthetic");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.onlyValidSyntheticMock.calls;
+                    return Belt_Array.map(array, (function (_m) {
+                                  var synth = _m[0];
+                                  return {
+                                          synth: synth
+                                        };
+                                }));
+                  })));
+}
+
+function mockOnlyValidMarketToReturn(param) {
+  checkForExceptions("onlyValidMarket");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.onlyValidMarketMock.will.return()));
+          
+        }));
+  
+}
+
+function onlyValidMarketCalls(param) {
+  checkForExceptions("onlyValidMarket");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.onlyValidMarketMock.calls;
+                    return Belt_Array.map(array, (function (_m) {
+                                  var marketIndex = _m[0];
+                                  return {
+                                          marketIndex: marketIndex
+                                        };
+                                }));
+                  })));
+}
+
+function mockOnlyFloatToReturn(param) {
   checkForExceptions("onlyFloat");
   Belt_Option.map(internalRef.contents, (function (_r) {
           ((_r.smocked.onlyFloatMock.will.return()));
@@ -114,52 +877,6 @@ function onlyFloatCalls(param) {
                   })));
 }
 
-function mockonlyAdminToReturn(param) {
-  checkForExceptions("onlyAdmin");
-  Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.onlyAdminMock.will.return()));
-          
-        }));
-  
-}
-
-function onlyAdminCalls(param) {
-  checkForExceptions("admin");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.onlyAdminMock.calls;
-                    return Belt_Array.map(array, (function (param) {
-                                  
-                                }));
-                  })));
-}
-
-function _changeMarketLaunchIncentiveParametersCalls(param) {
-  checkForExceptions("_changeMarketLaunchIncentiveParameters");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._changeMarketLaunchIncentiveParametersMock.calls;
-                    return Belt_Array.map(array, (function (param) {
-                                  return {
-                                          marketIndex: param[0],
-                                          period: param[1],
-                                          initialMultiplier: param[2]
-                                        };
-                                }));
-                  })));
-}
-
-function getMarketLaunchIncentiveParametersCalls(param) {
-  checkForExceptions("getMarketLaunchIncentiveParameters");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.getMarketLaunchIncentiveParametersMock.calls;
-                    return Belt_Array.map(array, (function (m) {
-                                  var marketIndex = Belt_Array.getExn(m, 0);
-                                  return {
-                                          marketIndex: marketIndex
-                                        };
-                                }));
-                  })));
-}
-
 var InternalMock = {
   mockContractName: mockContractName,
   internalRef: internalRef,
@@ -168,22 +885,90 @@ var InternalMock = {
   setFunctionForUnitTesting: setFunctionForUnitTesting,
   setupFunctionForUnitTesting: setupFunctionForUnitTesting,
   MockingAFunctionThatYouShouldntBe: MockingAFunctionThatYouShouldntBe,
-  HaventSetupInternalMockingForStaking: HaventSetupInternalMockingForStaking,
+  HaventSetupInternalMockingForStaker: HaventSetupInternalMockingForStaker,
   checkForExceptions: checkForExceptions,
+  mockInitializeToReturn: mockInitializeToReturn$1,
+  initializeCalls: initializeCalls$1,
+  mockChangeAdminToReturn: mockChangeAdminToReturn$1,
+  changeAdminCalls: changeAdminCalls$1,
+  mockChangeFloatPercentageToReturn: mockChangeFloatPercentageToReturn$1,
+  changeFloatPercentageCalls: changeFloatPercentageCalls$1,
+  mockChangeMarketLaunchIncentiveParametersToReturn: mockChangeMarketLaunchIncentiveParametersToReturn$1,
+  changeMarketLaunchIncentiveParametersCalls: changeMarketLaunchIncentiveParametersCalls$1,
   mock_changeMarketLaunchIncentiveParametersToReturn: mock_changeMarketLaunchIncentiveParametersToReturn,
-  mockgetMarketLaunchIncentiveParametersToReturn: mockgetMarketLaunchIncentiveParametersToReturn,
-  mockonlyFloatToReturn: mockonlyFloatToReturn,
-  onlyFloatCalls: onlyFloatCalls,
-  mockonlyAdminToReturn: mockonlyAdminToReturn,
-  onlyAdminCalls: onlyAdminCalls,
   _changeMarketLaunchIncentiveParametersCalls: _changeMarketLaunchIncentiveParametersCalls,
-  getMarketLaunchIncentiveParametersCalls: getMarketLaunchIncentiveParametersCalls
+  mockAddNewStakingFundToReturn: mockAddNewStakingFundToReturn$1,
+  addNewStakingFundCalls: addNewStakingFundCalls$1,
+  mockGetMarketLaunchIncentiveParametersToReturn: mockGetMarketLaunchIncentiveParametersToReturn,
+  getMarketLaunchIncentiveParametersCalls: getMarketLaunchIncentiveParametersCalls,
+  mockGetKValueToReturn: mockGetKValueToReturn,
+  getKValueCalls: getKValueCalls,
+  mockCalculateFloatPerSecondToReturn: mockCalculateFloatPerSecondToReturn,
+  calculateFloatPerSecondCalls: calculateFloatPerSecondCalls,
+  mockCalculateTimeDeltaToReturn: mockCalculateTimeDeltaToReturn,
+  calculateTimeDeltaCalls: calculateTimeDeltaCalls,
+  mockCalculateNewCumulativeRateToReturn: mockCalculateNewCumulativeRateToReturn,
+  calculateNewCumulativeRateCalls: calculateNewCumulativeRateCalls,
+  mockSetRewardObjectsToReturn: mockSetRewardObjectsToReturn,
+  setRewardObjectsCalls: setRewardObjectsCalls,
+  mockAddNewStateForFloatRewardsToReturn: mockAddNewStateForFloatRewardsToReturn$1,
+  addNewStateForFloatRewardsCalls: addNewStateForFloatRewardsCalls$1,
+  mock_updateStateToReturn: mock_updateStateToReturn,
+  _updateStateCalls: _updateStateCalls,
+  mockCalculateAccumulatedFloatHelperToReturn: mockCalculateAccumulatedFloatHelperToReturn,
+  calculateAccumulatedFloatHelperCalls: calculateAccumulatedFloatHelperCalls,
+  mockCalculateAccumulatedFloatToReturn: mockCalculateAccumulatedFloatToReturn,
+  calculateAccumulatedFloatCalls: calculateAccumulatedFloatCalls,
+  mock_mintFloatToReturn: mock_mintFloatToReturn,
+  _mintFloatCalls: _mintFloatCalls,
+  mockMintAccumulatedFloatToReturn: mockMintAccumulatedFloatToReturn,
+  mintAccumulatedFloatCalls: mintAccumulatedFloatCalls,
+  mock_claimFloatToReturn: mock_claimFloatToReturn,
+  _claimFloatCalls: _claimFloatCalls,
+  mockClaimFloatCustomToReturn: mockClaimFloatCustomToReturn$1,
+  claimFloatCustomCalls: claimFloatCustomCalls$1,
+  mockStakeFromUserToReturn: mockStakeFromUserToReturn$1,
+  stakeFromUserCalls: stakeFromUserCalls$1,
+  mock_stakeToReturn: mock_stakeToReturn,
+  _stakeCalls: _stakeCalls,
+  mock_withdrawToReturn: mock_withdrawToReturn,
+  _withdrawCalls: _withdrawCalls,
+  mockWithdrawToReturn: mockWithdrawToReturn$1,
+  withdrawCalls: withdrawCalls$1,
+  mockWithdrawAllToReturn: mockWithdrawAllToReturn$1,
+  withdrawAllCalls: withdrawAllCalls$1,
+  mockOnlyAdminToReturn: mockOnlyAdminToReturn,
+  onlyAdminCalls: onlyAdminCalls,
+  mockOnlyValidSyntheticToReturn: mockOnlyValidSyntheticToReturn,
+  onlyValidSyntheticCalls: onlyValidSyntheticCalls,
+  mockOnlyValidMarketToReturn: mockOnlyValidMarketToReturn,
+  onlyValidMarketCalls: onlyValidMarketCalls,
+  mockOnlyFloatToReturn: mockOnlyFloatToReturn,
+  onlyFloatCalls: onlyFloatCalls
 };
 
 var uninitializedValue;
 
 exports.uninitializedValue = uninitializedValue;
-exports.mockaddNewStakingFundToReturn = mockaddNewStakingFundToReturn;
+exports.mockInitializeToReturn = mockInitializeToReturn;
+exports.initializeCalls = initializeCalls;
+exports.mockChangeAdminToReturn = mockChangeAdminToReturn;
+exports.changeAdminCalls = changeAdminCalls;
+exports.mockChangeFloatPercentageToReturn = mockChangeFloatPercentageToReturn;
+exports.changeFloatPercentageCalls = changeFloatPercentageCalls;
+exports.mockChangeMarketLaunchIncentiveParametersToReturn = mockChangeMarketLaunchIncentiveParametersToReturn;
+exports.changeMarketLaunchIncentiveParametersCalls = changeMarketLaunchIncentiveParametersCalls;
+exports.mockAddNewStakingFundToReturn = mockAddNewStakingFundToReturn;
 exports.addNewStakingFundCalls = addNewStakingFundCalls;
+exports.mockAddNewStateForFloatRewardsToReturn = mockAddNewStateForFloatRewardsToReturn;
+exports.addNewStateForFloatRewardsCalls = addNewStateForFloatRewardsCalls;
+exports.mockClaimFloatCustomToReturn = mockClaimFloatCustomToReturn;
+exports.claimFloatCustomCalls = claimFloatCustomCalls;
+exports.mockStakeFromUserToReturn = mockStakeFromUserToReturn;
+exports.stakeFromUserCalls = stakeFromUserCalls;
+exports.mockWithdrawToReturn = mockWithdrawToReturn;
+exports.withdrawCalls = withdrawCalls;
+exports.mockWithdrawAllToReturn = mockWithdrawAllToReturn;
+exports.withdrawAllCalls = withdrawAllCalls;
 exports.InternalMock = InternalMock;
 /* @eth-optimism/smock Not a pure module */

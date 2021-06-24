@@ -22,7 +22,7 @@ let test =
           ~accounts,
         );
       StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn();
-      StakerSmocked.InternalMock.mockonlyAdminToReturn();
+      StakerSmocked.InternalMock.mockOnlyAdminToReturn();
 
       let%Await _ =
         (stakerRef^)

@@ -34,7 +34,7 @@ function test(contracts, accounts) {
                                                       var period = periodShouldBeOver ? diff.sub(ethers.BigNumber.from(20)) : diff.add(ethers.BigNumber.from(20));
                                                       periodRef.contents = period;
                                                       return LetOps.Await.let_(stakerRef.contents.setGetKValueParams(2, pastTimestamp), (function (param) {
-                                                                    StakerSmocked.InternalMock.mockgetMarketLaunchIncentiveParametersToReturn(period, multiplier);
+                                                                    StakerSmocked.InternalMock.mockGetMarketLaunchIncentiveParametersToReturn(period, multiplier);
                                                                     prom.contents = stakerRef.contents.getKValueExternal(2);
                                                                     
                                                                   }));

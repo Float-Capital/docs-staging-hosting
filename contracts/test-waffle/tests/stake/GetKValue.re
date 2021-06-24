@@ -54,9 +54,9 @@ let test =
             ~marketIndex,
             ~timestamp=pastTimestamp,
           );
-      StakerSmocked.InternalMock.mockgetMarketLaunchIncentiveParametersToReturn(
-        ~_period=period,
-        ~_multiplier=multiplier,
+      StakerSmocked.InternalMock.mockGetMarketLaunchIncentiveParametersToReturn(
+        period,
+        multiplier,
       );
 
       prom := (stakerRef^)->Staker.Exposed.getKValueExternal(~marketIndex);
