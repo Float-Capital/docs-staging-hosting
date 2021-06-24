@@ -59,7 +59,7 @@ const runUpdateSystemStateMulti = async () => {
 const sleep = (timeMs) => new Promise((res, rej) => setTimeout(res, timeMs))
 const runUpdateSystemStateMultiContinuous = async () => {
   await runUpdateSystemStateMulti()
-  await sleep(1000)
+  await sleep(15000)
 
   // recursive call
   runUpdateSystemStateMultiContinuous()
