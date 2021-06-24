@@ -20,7 +20,7 @@ dataSources:
         - name: LongShort
           file: ./abis/LongShort.json
         - name: OracleManager
-          file: ./abis/OracleManager.json
+          file: ./abis/OracleManagerChainlink.json
       eventHandlers:
         - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
           handler: handleSyntheticTokenCreated
@@ -41,7 +41,7 @@ templates:
       apiVersion: 0.0.4
       abis:
         - name: OracleManager
-          file: ./abis/OracleManager.json
+          file: ./abis/OracleManagerChainlink.json
       language: wasm/assemblyscript
       entities: []
       eventHandlers: []
