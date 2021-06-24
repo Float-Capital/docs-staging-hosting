@@ -74,7 +74,7 @@ let make = (~name, ~isLong, ~daiSpend, ~marketIndex) => {
     contractExecutionHandler(
       ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
       ~contractFunction=Contracts.LongShort.executeOutstandingNextPriceSettlementsUser(
-        ~user={optCurrentUser->Option.getWithDefault(CONSTANTS.zeroAddress)}, // TODO: change arb logic
+        ~user={optCurrentUser->Option.getWithDefault(CONSTANTS.zeroAddress)},
         ~marketIndex,
       ),
     )

@@ -9,7 +9,7 @@ module LongShort = {
       "function mintShortNextPrice(uint32 marketIndex,uint256 amount) @1170000",
       "function redeemLongNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
       "function redeemShortNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
-      "function executeOutstandingNextPriceSettlementsUser(address user,uint32 marketIndex) @100000", // TODO: optimise for gas
+      "function executeOutstandingNextPriceSettlementsUser(address user,uint32 marketIndex) @130000",
       "function _updateSystemState()",
     ]->Ethers.makeAbi
 

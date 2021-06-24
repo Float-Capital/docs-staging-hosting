@@ -27,10 +27,10 @@ function useRerender(param) {
   var match = React.useState(function () {
         return 0;
       });
-  var setValue = match[1];
+  var setV = match[1];
   return function (param) {
-    return Curry._1(setValue, (function (value) {
-                  return value + 1 | 0;
+    return Curry._1(setV, (function (v) {
+                  return v + 1 | 0;
                 }));
   };
 }

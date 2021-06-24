@@ -3,10 +3,9 @@ open DataHooks
 open Masonry
 
 module UserBalancesCard = {
-  //create your forceUpdate hook
   let useRerender = () => {
-    let (_value, setValue) = React.useState(_ => 0) // integer state
-    () => setValue(value => value + 1) // update the state to force render
+    let (_v, setV) = React.useState(_ => 0)
+    () => setV(v => v + 1)
   }
 
   @react.component
