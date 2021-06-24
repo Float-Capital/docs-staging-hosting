@@ -12,6 +12,7 @@ var IntervalToDuration = require("date-fns/intervalToDuration").default;
 function ProgressBar(Props) {
   var txConfirmedTimestampOpt = Props.txConfirmedTimestamp;
   var nextPriceUpdateTimestampOpt = Props.nextPriceUpdateTimestamp;
+  var rerenderCallback = Props.rerenderCallback;
   var txConfirmedTimestamp = txConfirmedTimestampOpt !== undefined ? txConfirmedTimestampOpt : 0;
   var nextPriceUpdateTimestamp = nextPriceUpdateTimestampOpt !== undefined ? nextPriceUpdateTimestampOpt : 100;
   var totalSecondsUntilExecution = nextPriceUpdateTimestamp - txConfirmedTimestamp | 0;
@@ -34,9 +35,12 @@ function ProgressBar(Props) {
                     Curry._1(setSecondsUntilExecution, (function (param) {
                             return totalSecondsUntilExecution - countup.contents | 0;
                           }));
-                    return Curry._1(setCountupPercentage, (function (param) {
-                                  return Caml_int32.div(Math.imul(countup.contents, 100), totalSecondsUntilExecution);
-                                }));
+                    Curry._1(setCountupPercentage, (function (param) {
+                            return Caml_int32.div(Math.imul(countup.contents, 100), totalSecondsUntilExecution);
+                          }));
+                  }
+                  if (Caml_int32.div(Math.imul(countup.contents, 100), totalSecondsUntilExecution) < 100 && Caml_int32.div(Math.imul(countup.contents, 100), totalSecondsUntilExecution) % 10 === 0) {
+                    return Curry._1(rerenderCallback, undefined);
                   }
                   
                 }), 1000);

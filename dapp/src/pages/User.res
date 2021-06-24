@@ -3,11 +3,19 @@ open DataHooks
 open Masonry
 
 module UserBalancesCard = {
+  //create your forceUpdate hook
+  let useRerender = () => {
+    let (_value, setValue) = React.useState(_ => 0) // integer state
+    () => setValue(value => value + 1) // update the state to force render
+  }
+
   @react.component
   let make = (~userId) => {
     let usersTokensQuery = DataHooks.useUsersBalances(~userId)
     let usersPendingMintsQuery = DataHooks.useUsersPendingMints(~userId)
+    let usersConfirmedMintsQuery = DataHooks.useUsersConfirmedMints(~userId)
 
+    let rerender = useRerender()
     let oracleHeartbeatForMarket = 300 // 5min // TODO
     // let lastOracleTimestamp = (Js.Date.now() /. 1000.)->int_of_float // TODO
 
@@ -15,6 +23,27 @@ module UserBalancesCard = {
       <UserColumnHeader>
         {`Synthetic assets`->React.string} <img className="inline h-5 ml-2" src="/img/coin.png" />
       </UserColumnHeader>
+      {switch usersConfirmedMintsQuery {
+      | Loading => <div className="m-auto"> <Loader.Mini /> </div>
+      | GraphError(string) => string->React.string
+      | Response(confirmedMint) => <>
+          {confirmedMint->Array.length > 0
+            ? <UserColumnTextCenter>
+                <UserColumnText head=`✅ Confirmed synths` body={``} /> <br />
+              </UserColumnTextCenter>
+            : React.null}
+          {confirmedMint
+          ->Array.map(({marketIndex, isLong, amount}) =>
+            <UserSynthConfirmedBox
+              name={(marketIndex->Ethers.BigNumber.toNumber->Backend.getMarketInfoUnsafe).name}
+              isLong
+              daiSpend=amount
+              marketIndex
+            />
+          )
+          ->React.array}
+        </>
+      }}
       {switch usersPendingMintsQuery {
       | Loading => <div className="m-auto"> <Loader.Mini /> </div>
       | GraphError(string) => string->React.string
@@ -33,6 +62,7 @@ module UserBalancesCard = {
               txConfirmedTimestamp={confirmedTimestamp->Ethers.BigNumber.toNumber}
               nextPriceUpdateTimestamp={confirmedTimestamp->Ethers.BigNumber.toNumber +
                 oracleHeartbeatForMarket} // TODO: pull approx oracle next timestamp
+              rerenderCallback=rerender
             />
           )
           ->React.array}

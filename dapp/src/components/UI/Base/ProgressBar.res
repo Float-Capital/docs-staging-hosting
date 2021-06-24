@@ -1,5 +1,5 @@
 @react.component
-let make = (~txConfirmedTimestamp=0, ~nextPriceUpdateTimestamp=100) => {
+let make = (~txConfirmedTimestamp=0, ~nextPriceUpdateTimestamp=100, ~rerenderCallback) => {
   let totalSecondsUntilExecution = nextPriceUpdateTimestamp - txConfirmedTimestamp
 
   let (countupPercentage, setCountupPercentage) = React.useState(_ => 0)
@@ -12,6 +12,12 @@ let make = (~txConfirmedTimestamp=0, ~nextPriceUpdateTimestamp=100) => {
         countup := countup.contents + 1
         setSecondsUntilExecution(_ => totalSecondsUntilExecution - countup.contents)
         setCountupPercentage(_ => countup.contents * 100 / totalSecondsUntilExecution)
+      }
+      if (
+        countup.contents * 100 / totalSecondsUntilExecution < 100 &&
+          mod(countup.contents * 100 / totalSecondsUntilExecution, 10) == 0
+      ) {
+        rerenderCallback()
       }
     }, 1000)
 

@@ -417,6 +417,7 @@ function UserUI$UserPendingBox(Props) {
   var daiSpend = Props.daiSpend;
   var txConfirmedTimestamp = Props.txConfirmedTimestamp;
   var nextPriceUpdateTimestamp = Props.nextPriceUpdateTimestamp;
+  var rerenderCallback = Props.rerenderCallback;
   return React.createElement("div", {
               className: "flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative"
             }, React.createElement("div", {
@@ -432,7 +433,8 @@ function UserUI$UserPendingBox(Props) {
                           src: CONSTANTS.daiDisplayToken.iconUrl
                         }), Ethers.Utils.formatEther(daiSpend))), React.createElement(ProgressBar.make, {
                   txConfirmedTimestamp: txConfirmedTimestamp,
-                  nextPriceUpdateTimestamp: nextPriceUpdateTimestamp
+                  nextPriceUpdateTimestamp: nextPriceUpdateTimestamp,
+                  rerenderCallback: rerenderCallback
                 }));
 }
 

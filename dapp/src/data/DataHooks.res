@@ -248,17 +248,68 @@ let useUsersPendingMints = (~userId) => {
       })
 
     Response(result)
-  | {data: Some({user: None})} => {
-      Js.log("here")
-      Response([
+  | {data: Some({user: None})} =>
+    Response([
+      {
+        isLong: false,
+        amount: CONSTANTS.zeroBN,
+        marketIndex: CONSTANTS.zeroBN,
+        confirmedTimestamp: CONSTANTS.zeroBN,
+      },
+    ])
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
+  }
+}
+
+type userConfirmedButNotYetSettledMints = {
+  isLong: bool,
+  amount: Ethers.BigNumber.t,
+  marketIndex: Ethers.BigNumber.t,
+}
+
+@ocaml.doc(`Returns a sumary of the users synthetic tokens`)
+let useUsersConfirmedMints = (~userId) => {
+  let usersConfirmedMintsQuery = Queries.UsersConfirmedMints.use(
+    {userId: userId},
+    ~fetchPolicy=NetworkOnly,
+  )
+  switch usersConfirmedMintsQuery {
+  | {data: Some({user: Some({confirmedNextPriceActions})})} =>
+    let result: array<userConfirmedButNotYetSettledMints> =
+      confirmedNextPriceActions
+      ->Array.keep(confirmedNextPriceAction =>
+        confirmedNextPriceAction.amountPaymentTokenForDepositShort->Ethers.BigNumber.gt(
+          CONSTANTS.zeroBN,
+        ) ||
+          confirmedNextPriceAction.amountPaymentTokenForDepositLong->Ethers.BigNumber.gt(
+            CONSTANTS.zeroBN,
+          )
+      )
+      ->Array.map(confirmedNextPriceAction => {
+        let isLong =
+          confirmedNextPriceAction.amountPaymentTokenForDepositLong->Ethers.BigNumber.gt(
+            CONSTANTS.zeroBN,
+          )
+
         {
-          isLong: false,
-          amount: CONSTANTS.zeroBN,
-          marketIndex: CONSTANTS.zeroBN,
-          confirmedTimestamp: CONSTANTS.zeroBN,
-        },
-      ])
-    }
+          isLong: isLong,
+          amount: isLong
+            ? confirmedNextPriceAction.amountPaymentTokenForDepositLong
+            : confirmedNextPriceAction.amountPaymentTokenForDepositShort,
+          marketIndex: confirmedNextPriceAction.marketIndex,
+        }
+      })
+
+    Response(result)
+  | {data: Some({user: None})} =>
+    Response([
+      {
+        isLong: false,
+        amount: CONSTANTS.zeroBN,
+        marketIndex: CONSTANTS.zeroBN,
+      },
+    ])
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
   }

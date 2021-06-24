@@ -124,6 +124,15 @@ fragment UserTokenBalance on UserSyntheticTokenBalance {
 }
 
 # Used in:
+#   Queries: useUsersConfirmedMints
+fragment UserConfirmedMints on UserNextPriceAction {
+  id    
+  marketIndex
+  amountPaymentTokenForDepositLong
+  amountPaymentTokenForDepositShort  
+}
+
+# Used in:
 #   Queries: useUsersPendingMints
 fragment UserPendingMints on UserNextPriceAction {
   id    
@@ -214,12 +223,22 @@ query ($userId: String!) {
   }
 }`)
 
-// Used externally in: useUsersBalances (datahook), User.res, StakeList.res
+// Used externally in: useUsersPendingMints (datahook), User.res
 module UsersPendingMints = %graphql(`
 query ($userId: String!) {
   user (id: $userId) {
-    pendingNextPriceActions { # Maybe we can filter to only get balances greater than 0? Probably not worth it.
+    pendingNextPriceActions { 
       ...UserPendingMints
+    }
+  }
+}`)
+
+// Used externally in: useUsersConfirmedMints (datahook), User.res
+module UsersConfirmedMints = %graphql(`
+query ($userId: String!) {
+  user (id: $userId) {
+    confirmedNextPriceActions { 
+      ...UserConfirmedMints
     }
   }
 }`)

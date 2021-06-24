@@ -306,7 +306,14 @@ module UserTokenBox = {
 }
 module UserPendingBox = {
   @react.component
-  let make = (~name, ~isLong, ~daiSpend, ~txConfirmedTimestamp, ~nextPriceUpdateTimestamp) => {
+  let make = (
+    ~name,
+    ~isLong,
+    ~daiSpend,
+    ~txConfirmedTimestamp,
+    ~nextPriceUpdateTimestamp,
+    ~rerenderCallback,
+  ) => {
     <div
       className=`flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative`>
       <div className="flex flex-row justify-between">
@@ -317,7 +324,7 @@ module UserPendingBox = {
           {daiSpend->Ethers.Utils.formatEther->React.string}
         </div>
       </div>
-      <ProgressBar txConfirmedTimestamp nextPriceUpdateTimestamp />
+      <ProgressBar txConfirmedTimestamp nextPriceUpdateTimestamp rerenderCallback />
     </div>
   }
 }
