@@ -8,6 +8,7 @@ var Config = require("../config/Config.js");
 var Ethers = require("../ethereum/Ethers.js");
 var Loader = require("../components/UI/Base/Loader.js");
 var UserUI = require("../components/UI/UserUI.js");
+var Backend = require("../mockBackend/Backend.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Masonry = require("../components/UI/Masonry.js");
 var CONSTANTS = require("../CONSTANTS.js");
@@ -23,21 +24,47 @@ var Format = require("date-fns/format").default;
 function User$UserBalancesCard(Props) {
   var userId = Props.userId;
   var usersTokensQuery = DataHooks.useUsersBalances(userId);
+  var usersPendingMintsQuery = DataHooks.useUsersPendingMints(userId);
   var tmp;
-  if (typeof usersTokensQuery === "number") {
+  if (typeof usersPendingMintsQuery === "number") {
     tmp = React.createElement("div", {
           className: "m-auto"
         }, React.createElement(Loader.Mini.make, {}));
+  } else if (usersPendingMintsQuery.TAG === /* GraphError */0) {
+    tmp = usersPendingMintsQuery._0;
+  } else {
+    var pendingMint = usersPendingMintsQuery._0;
+    tmp = React.createElement(React.Fragment, undefined, pendingMint.length !== 0 ? React.createElement(UserUI.UserColumnTextCenter.make, {
+                children: null
+              }, React.createElement(UserUI.UserColumnText.make, {
+                    head: "⏳ Pending synths",
+                    body: ""
+                  }), React.createElement("br", undefined)) : null, Belt_Array.map(pendingMint, (function (param) {
+                var confirmedTimestamp = param.confirmedTimestamp;
+                return React.createElement(UserUI.UserPendingBox.make, {
+                            name: Backend.getMarketInfoUnsafe(param.marketIndex.toNumber()).name,
+                            isLong: param.isLong,
+                            daiSpend: param.amount,
+                            txConfirmedTimestamp: confirmedTimestamp.toNumber(),
+                            nextPriceUpdateTimestamp: confirmedTimestamp.toNumber() + 300 | 0
+                          });
+              })));
+  }
+  var tmp$1;
+  if (typeof usersTokensQuery === "number") {
+    tmp$1 = React.createElement("div", {
+          className: "m-auto"
+        }, React.createElement(Loader.Mini.make, {}));
   } else if (usersTokensQuery.TAG === /* GraphError */0) {
-    tmp = usersTokensQuery._0;
+    tmp$1 = usersTokensQuery._0;
   } else {
     var match = usersTokensQuery._0;
-    tmp = React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnTextCenter.make, {
+    tmp$1 = React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnTextCenter.make, {
               children: React.createElement(UserUI.UserColumnText.make, {
                     head: "💰 Synth value",
                     body: "$" + Misc.NumberFormat.formatEther(undefined, match.totalBalance)
                   })
-            }), React.createElement("br", undefined), Belt_Array.map(Belt_Array.keep(match.balances, (function (param) {
+            }), Belt_Array.map(Belt_Array.keep(match.balances, (function (param) {
                     return !param.tokenBalance.eq(CONSTANTS.zeroBN);
                   })), (function (param) {
                 var isLong = param.isLong;
@@ -68,13 +95,7 @@ function User$UserBalancesCard(Props) {
                 }, "Synthetic assets", React.createElement("img", {
                       className: "inline h-5 ml-2",
                       src: "/img/coin.png"
-                    })), React.createElement(UserUI.UserPendingBox.make, {
-                  name: "hardcoded",
-                  isLong: true,
-                  daiSpend: 1000,
-                  txConfirmedTimestamp: 100,
-                  nextPriceUpdateTimestamp: 110
-                }), tmp);
+                    })), tmp, tmp$1);
 }
 
 var UserBalancesCard = {

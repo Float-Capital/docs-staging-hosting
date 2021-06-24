@@ -381,7 +381,7 @@ function UserUI$UserTokenBox(Props) {
                         isLong ? "fu" : "fd"
                       ) + symbol
                     })), React.createElement("div", {
-                  className: "pl-3 text-sm self-center"
+                  className: "pl-3 text-xs self-center"
                 }, name, React.createElement("br", {
                       className: "mt-1"
                     }), isLong ? "Long↗️" : "Short↘️"), React.createElement("div", {
@@ -426,8 +426,11 @@ function UserUI$UserPendingBox(Props) {
                     }, name), React.createElement("div", {
                       className: " text-sm self-center"
                     }, isLong ? "Long" : "Short"), React.createElement("div", {
-                      className: " text-sm self-center"
-                    }, String(daiSpend))), React.createElement(ProgressBar.make, {
+                      className: "flex  text-sm self-center"
+                    }, React.createElement("img", {
+                          className: "h-5 pr-1",
+                          src: CONSTANTS.daiDisplayToken.iconUrl
+                        }), Ethers.Utils.formatEther(daiSpend))), React.createElement(ProgressBar.make, {
                   txConfirmedTimestamp: txConfirmedTimestamp,
                   nextPriceUpdateTimestamp: nextPriceUpdateTimestamp
                 }));

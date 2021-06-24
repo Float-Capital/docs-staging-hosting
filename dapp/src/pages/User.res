@@ -6,18 +6,38 @@ module UserBalancesCard = {
   @react.component
   let make = (~userId) => {
     let usersTokensQuery = DataHooks.useUsersBalances(~userId)
+    let usersPendingMintsQuery = DataHooks.useUsersPendingMints(~userId)
+
+    let oracleHeartbeatForMarket = 300 // 5min // TODO
+    // let lastOracleTimestamp = (Js.Date.now() /. 1000.)->int_of_float // TODO
 
     <UserColumnCard>
       <UserColumnHeader>
         {`Synthetic assets`->React.string} <img className="inline h-5 ml-2" src="/img/coin.png" />
       </UserColumnHeader>
-      <UserPendingBox
-        name="hardcoded"
-        isLong=true
-        daiSpend=1000
-        txConfirmedTimestamp=100
-        nextPriceUpdateTimestamp=110
-      />
+      {switch usersPendingMintsQuery {
+      | Loading => <div className="m-auto"> <Loader.Mini /> </div>
+      | GraphError(string) => string->React.string
+      | Response(pendingMint) => <>
+          {pendingMint->Array.length > 0
+            ? <UserColumnTextCenter>
+                <UserColumnText head=`⏳ Pending synths` body={``} /> <br />
+              </UserColumnTextCenter>
+            : React.null}
+          {pendingMint
+          ->Array.map(({marketIndex, isLong, amount, confirmedTimestamp}) =>
+            <UserPendingBox
+              name={(marketIndex->Ethers.BigNumber.toNumber->Backend.getMarketInfoUnsafe).name}
+              isLong
+              daiSpend=amount
+              txConfirmedTimestamp={confirmedTimestamp->Ethers.BigNumber.toNumber}
+              nextPriceUpdateTimestamp={confirmedTimestamp->Ethers.BigNumber.toNumber +
+                oracleHeartbeatForMarket} // TODO: pull approx oracle next timestamp
+            />
+          )
+          ->React.array}
+        </>
+      }}
       {switch usersTokensQuery {
       | Loading => <div className="m-auto"> <Loader.Mini /> </div>
       | GraphError(string) => string->React.string
@@ -27,7 +47,6 @@ module UserBalancesCard = {
               head=`💰 Synth value` body={`$${totalBalance->Misc.NumberFormat.formatEther}`}
             />
           </UserColumnTextCenter>
-          <br />
           {balances
           ->Array.keep(({tokenBalance}) => !(tokenBalance->Ethers.BigNumber.eq(CONSTANTS.zeroBN)))
           ->Array.map(({addr, name, symbol, isLong, tokenBalance, tokensValue, metadata}) =>

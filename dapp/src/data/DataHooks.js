@@ -326,6 +326,74 @@ function useUsersBalances(userId) {
   }
 }
 
+function useUsersPendingMints(userId) {
+  var usersPendingMintsQuery = Curry.app(Queries.UsersPendingMints.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: userId
+        }
+      ]);
+  var match = usersPendingMintsQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.user;
+    if (match$1 !== undefined) {
+      var result = Belt_Array.map(Belt_Array.keep(match$1.pendingNextPriceActions, (function (pendingNextPriceAction) {
+                  if (pendingNextPriceAction.amountPaymentTokenForDepositShort.gt(CONSTANTS.zeroBN)) {
+                    return true;
+                  } else {
+                    return pendingNextPriceAction.amountPaymentTokenForDepositLong.gt(CONSTANTS.zeroBN);
+                  }
+                })), (function (pendingNextPriceAction) {
+              var isLong = pendingNextPriceAction.amountPaymentTokenForDepositLong.gt(CONSTANTS.zeroBN);
+              return {
+                      isLong: isLong,
+                      amount: isLong ? pendingNextPriceAction.amountPaymentTokenForDepositLong : pendingNextPriceAction.amountPaymentTokenForDepositShort,
+                      marketIndex: pendingNextPriceAction.marketIndex,
+                      confirmedTimestamp: pendingNextPriceAction.confirmedTimestamp
+                    };
+            }));
+      return {
+              TAG: 1,
+              _0: result,
+              [Symbol.for("name")]: "Response"
+            };
+    }
+    console.log("here");
+    return {
+            TAG: 1,
+            _0: [{
+                isLong: false,
+                amount: CONSTANTS.zeroBN,
+                marketIndex: CONSTANTS.zeroBN,
+                confirmedTimestamp: CONSTANTS.zeroBN
+              }],
+            [Symbol.for("name")]: "Response"
+          };
+  }
+  var match$2 = usersPendingMintsQuery.error;
+  if (match$2 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
 function useFloatBalancesForUser(userId) {
   var usersStateQuery = Curry.app(Queries.UserQuery.use, [
         undefined,
@@ -779,6 +847,7 @@ exports.useTotalClaimableFloatForUser = useTotalClaimableFloatForUser;
 exports.useClaimableFloatForUser = useClaimableFloatForUser;
 exports.useStakesForUser = useStakesForUser;
 exports.useUsersBalances = useUsersBalances;
+exports.useUsersPendingMints = useUsersPendingMints;
 exports.useFloatBalancesForUser = useFloatBalancesForUser;
 exports.useBasicUserInfo = useBasicUserInfo;
 exports.useSyntheticTokenBalance = useSyntheticTokenBalance;

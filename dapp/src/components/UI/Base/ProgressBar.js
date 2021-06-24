@@ -3,6 +3,7 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
+var Loader = require("./Loader.js");
 var Tooltip = require("./Tooltip.js");
 var Caml_int32 = require("rescript/lib/js/caml_int32.js");
 var FormatDuration = require("date-fns/formatDuration").default;
@@ -41,26 +42,27 @@ function ProgressBar(Props) {
                 }), 1000);
           
         }), [nextPriceUpdateTimestamp]);
-  return React.createElement("div", {
-              className: "relative pt-1"
-            }, React.createElement("div", {
-                  className: "text-xxs text-center"
-                }, "Please wait while your transaction is processed", React.createElement(Tooltip.make, {
-                      tip: "The transaction will execute on the next oracle price update"
-                    })), React.createElement("div", {
-                  className: "w-2/3 mx-auto " + (
-                    countupPercentage < 100 ? "mt-7" : "mt-5"
-                  )
-                }, React.createElement("div", {
-                      className: "relative pt-1"
-                    }, countupPercentage < 100 ? React.createElement("div", {
-                            className: "text-center bg-pink text-xxxs max-w-76 leading-none bg-black opacity-60 text-white py-1 rounded-sm",
+  if (countupPercentage < 100) {
+    return React.createElement("div", {
+                className: "relative pt-1"
+              }, React.createElement("div", {
+                    className: "text-xxs text-center"
+                  }, "Please wait while your transaction is processed", React.createElement(Tooltip.make, {
+                        tip: "The transaction will execute on the next oracle price update"
+                      })), React.createElement("div", {
+                    className: "w-2/3 mx-auto " + (
+                      countupPercentage < 100 ? "mt-7" : "mt-5"
+                    )
+                  }, React.createElement("div", {
+                        className: "relative pt-1"
+                      }, React.createElement("div", {
+                            className: "text-center bg-pink text-xxxs leading-none bg-black opacity-60 text-white py-1 rounded-sm",
                             style: {
                               left: "calc(" + String(countupPercentage) + "% - 38px)",
                               position: "absolute",
                               top: "-22px"
                             }
-                          }, "eta: " + FormatDuration(IntervalToDuration({
+                          }, "eta: < " + FormatDuration(IntervalToDuration({
                                     start: new Date(0),
                                     end: new Date(Math.imul(match$1[0], 1000))
                                   }), {
@@ -68,14 +70,19 @@ function ProgressBar(Props) {
                                   "minutes",
                                   "seconds"
                                 ]
-                              })) : null, React.createElement("div", {
-                          className: "overflow-hidden h-2 mb-4 text-xs flex rounded bg-indigo-200"
-                        }, React.createElement("div", {
-                              className: "w-10 shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center animated-color-progress-bar",
-                              style: {
-                                width: String(countupPercentage) + "%"
-                              }
-                            })))));
+                              })), React.createElement("div", {
+                            className: "overflow-hidden h-2 mb-4 text-xs flex rounded bg-indigo-200"
+                          }, React.createElement("div", {
+                                className: "w-10 shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center animated-color-progress-bar",
+                                style: {
+                                  width: String(countupPercentage) + "%"
+                                }
+                              })))));
+  } else {
+    return React.createElement("div", {
+                className: "mx-auto"
+              }, React.createElement(Loader.Tiny.make, {}));
+  }
 }
 
 var make = ProgressBar;

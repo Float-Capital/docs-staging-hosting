@@ -283,7 +283,7 @@ module UserTokenBox = {
           tokenName={`${isLong ? "fu" : "fd"}${symbol}`}
         />
       </div>
-      <div className=`pl-3 text-sm self-center`>
+      <div className=`pl-3 text-xs self-center`>
         {name->React.string}
         <br className=`mt-1` />
         {(isLong ? `Long↗️` : `Short↘️`)->React.string}
@@ -312,7 +312,10 @@ module UserPendingBox = {
       <div className="flex flex-row justify-between">
         <div className=` text-sm self-center`> {name->React.string} </div>
         <div className=` text-sm self-center`> {(isLong ? "Long" : "Short")->React.string} </div>
-        <div className=` text-sm self-center`> {daiSpend->string_of_int->React.string} </div>
+        <div className=`flex  text-sm self-center`>
+          <img src={CONSTANTS.daiDisplayToken.iconUrl} className="h-5 pr-1" />
+          {daiSpend->Ethers.Utils.formatEther->React.string}
+        </div>
       </div>
       <ProgressBar txConfirmedTimestamp nextPriceUpdateTimestamp />
     </div>

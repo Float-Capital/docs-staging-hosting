@@ -70,9 +70,15 @@ let useTotalClaimableFloatForUser = (~userId, ~synthTokens) => {
             let amount = stake.currentStake.amount
             let timestamp = stake.lastMintState.timestamp
             let isLong = stake.syntheticToken.id == stake.lastMintState.longToken.id
-            let lastAccumulativeFloatPerToken = isLong ? stake.lastMintState.accumulativeFloatPerTokenLong : stake.lastMintState.accumulativeFloatPerTokenShort
-            let accumulativeFloatPerToken = isLong ? stake.syntheticMarket.latestStakerState.accumulativeFloatPerTokenLong : stake.syntheticMarket.latestStakerState.accumulativeFloatPerTokenShort
-            let floatRatePerTokenOverInterval = isLong ? stake.syntheticMarket.latestStakerState.floatRatePerTokenOverIntervalLong : stake.syntheticMarket.latestStakerState.floatRatePerTokenOverIntervalShort
+            let lastAccumulativeFloatPerToken = isLong
+              ? stake.lastMintState.accumulativeFloatPerTokenLong
+              : stake.lastMintState.accumulativeFloatPerTokenShort
+            let accumulativeFloatPerToken = isLong
+              ? stake.syntheticMarket.latestStakerState.accumulativeFloatPerTokenLong
+              : stake.syntheticMarket.latestStakerState.accumulativeFloatPerTokenShort
+            let floatRatePerTokenOverInterval = isLong
+              ? stake.syntheticMarket.latestStakerState.floatRatePerTokenOverIntervalLong
+              : stake.syntheticMarket.latestStakerState.floatRatePerTokenOverIntervalShort
 
             // The amount of float the user is owed up to the last staker state.
             // Note that accumulativeFloatPerToken is in e42 scale (see Staker.sol).
@@ -198,6 +204,61 @@ let useUsersBalances = (~userId) => {
     })
     Response(result)
   | {data: Some({user: None})} => Response({totalBalance: CONSTANTS.zeroBN, balances: []})
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
+  }
+}
+
+type userPendingMint = {
+  isLong: bool,
+  amount: Ethers.BigNumber.t,
+  marketIndex: Ethers.BigNumber.t,
+  confirmedTimestamp: Ethers.BigNumber.t,
+}
+
+@ocaml.doc(`Returns a sumary of the users synthetic tokens`)
+let useUsersPendingMints = (~userId) => {
+  let usersPendingMintsQuery = Queries.UsersPendingMints.use({userId: userId})
+  switch usersPendingMintsQuery {
+  | {data: Some({user: Some({pendingNextPriceActions})})} =>
+    let result: array<userPendingMint> =
+      pendingNextPriceActions
+      ->Array.keep(pendingNextPriceAction =>
+        pendingNextPriceAction.amountPaymentTokenForDepositShort->Ethers.BigNumber.gt(
+          CONSTANTS.zeroBN,
+        ) ||
+          pendingNextPriceAction.amountPaymentTokenForDepositLong->Ethers.BigNumber.gt(
+            CONSTANTS.zeroBN,
+          )
+      )
+      ->Array.map(pendingNextPriceAction => {
+        let isLong =
+          pendingNextPriceAction.amountPaymentTokenForDepositLong->Ethers.BigNumber.gt(
+            CONSTANTS.zeroBN,
+          )
+
+        {
+          isLong: isLong,
+          amount: isLong
+            ? pendingNextPriceAction.amountPaymentTokenForDepositLong
+            : pendingNextPriceAction.amountPaymentTokenForDepositShort,
+          marketIndex: pendingNextPriceAction.marketIndex,
+          confirmedTimestamp: pendingNextPriceAction.confirmedTimestamp,
+        }
+      })
+
+    Response(result)
+  | {data: Some({user: None})} => {
+      Js.log("here")
+      Response([
+        {
+          isLong: false,
+          amount: CONSTANTS.zeroBN,
+          marketIndex: CONSTANTS.zeroBN,
+          confirmedTimestamp: CONSTANTS.zeroBN,
+        },
+      ])
+    }
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
   }
