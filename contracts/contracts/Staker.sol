@@ -544,7 +544,7 @@ contract Staker is IStaker, Initializable {
     function mintAccumulatedFloat(uint32 marketIndex, address user) internal {
         // NOTE: Could merge these two values already inside the `calculateAccumulatedFloat` function, but that would make it harder for the graph
         (uint256 floatToMintLong, uint256 floatToMintShort) =
-            calculateAccumulatedFloat(marketIndex, msg.sender);
+            calculateAccumulatedFloat(marketIndex, user);
 
         uint256 floatToMint = floatToMintLong + floatToMintShort;
         if (floatToMint > 0) {

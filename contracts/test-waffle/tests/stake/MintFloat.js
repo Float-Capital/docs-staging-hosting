@@ -25,8 +25,6 @@ function test(contracts, accounts) {
           var user = Helpers.randomAddress(undefined);
           var floatToMint = Helpers.randomTokenAmount(undefined);
           var floatPercentage = Helpers.randomJsInteger(undefined) / 65536 | 0;
-          console.log(floatPercentage);
-          console.log(floatPercentage / 10000 | 0);
           Globals.before_once$p(function (param) {
                 return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "_mintFloat", contracts, accounts), (function (param) {
                               var staker = stakerRef.contents;

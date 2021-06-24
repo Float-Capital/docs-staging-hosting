@@ -15,6 +15,7 @@ var HelperActions = require("./library/HelperActions.js");
 var SetRewardObjects = require("./tests/stake/SetRewardObjects.js");
 var AddNewStakingFund = require("./tests/stake/AddNewStakingFund.js");
 var CalculateTimeDelta = require("./tests/stake/CalculateTimeDelta.js");
+var MintAccumulatedFloat = require("./tests/stake/MintAccumulatedFloat.js");
 var CalculateFloatPerSecond = require("./tests/stake/CalculateFloatPerSecond.js");
 var CalculateAccumulatedFloat = require("./tests/stake/CalculateAccumulatedFloat.js");
 var AddNewStateForFloatRewards = require("./tests/stake/AddNewStateForFloatRewards.js");
@@ -98,7 +99,8 @@ describe("Float System", (function () {
                         SetRewardObjects.test(contracts, accounts);
                         AddNewStateForFloatRewards.test(contracts, accounts);
                         UpdateState.test(contracts, accounts);
-                        return MintFloat.test(contracts, accounts);
+                        MintFloat.test(contracts, accounts);
+                        return MintAccumulatedFloat.test(contracts, accounts);
                       }));
                 
               }));

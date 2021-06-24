@@ -132,6 +132,13 @@ contract StakerInternalsExposed is StakerMockable {
         floatPercentage = _floatPercentage;
     }
 
+    function setMintAccumulatedFloatParams(
+        uint32 marketIndex,
+        uint256 latestRewardIndexForMarket
+    ) public {
+        latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
+    }
+
     ///////////////////////////////////////////
     //////////// EXPOSED Functions ////////////
     ///////////////////////////////////////////

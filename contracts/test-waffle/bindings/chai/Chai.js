@@ -35,6 +35,10 @@ var bnCloseTo = ((message, distance, number1, number2) => expect(number1, messag
 
 var callEmitEvents = ((call, contract, eventName) => expect(call).to.emit(contract, eventName));
 
+function expectToNotEmit(_eventCheck) {
+  return ((_eventCheck) => eventCheck.should.Throw());
+}
+
 var expectRevertNoReason = ((transaction) => expect(transaction).to.be.reverted);
 
 var expectRevert = ((transaction, reason) => expect(transaction).to.be.revertedWith(reason));
@@ -57,6 +61,7 @@ exports.boolEqual = boolEqual;
 exports.bnWithin = bnWithin;
 exports.bnCloseTo = bnCloseTo;
 exports.callEmitEvents = callEmitEvents;
+exports.expectToNotEmit = expectToNotEmit;
 exports.expectRevertNoReason = expectRevertNoReason;
 exports.expectRevert = expectRevert;
 exports.changeBallance = changeBallance;

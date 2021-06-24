@@ -438,6 +438,13 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "setGetMarketLaunchIncentiveParametersParams"
 
   @send
+  external setMintAccumulatedFloatParams: (
+    t,
+    ~marketIndex: int,
+    ~latestRewardIndexForMarket: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "setMintAccumulatedFloatParams"
+
+  @send
   external setMocker: (t, ~mocker: Ethers.ethAddress) => JsPromise.t<transaction> = "setMocker"
 
   @send

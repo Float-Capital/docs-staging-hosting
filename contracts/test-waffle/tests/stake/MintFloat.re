@@ -22,9 +22,6 @@ let test =
 
     let floatPercentage = Helpers.randomJsInteger() / 65536; // divide by 2^16 to keep in range of uint16 I think?
 
-    Js.log(floatPercentage);
-
-    Js.log(floatPercentage / 10000);
     before_once'(() => {
       let%Await _ =
         stakerRef->deployAndSetupStakerToUnitTest(
