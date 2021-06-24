@@ -3,9 +3,8 @@ module ClaimSynthTokensTxStatusModals = {
   let make = (~txState: ContractActions.transactionState) => {
     let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
 
-    React.useEffect1(() => {
-      switch txState {
-      | Created =>
+    switch txState {
+    | Created => {
         toastDispatch(
           ToastProvider.Show(
             `Confirm claim synth transaction in your wallet`,
@@ -13,28 +12,52 @@ module ClaimSynthTokensTxStatusModals = {
             ToastProvider.Info,
           ),
         )
-      | SignedAndSubmitted(_) =>
-        toastDispatch(ToastProvider.Show(`claim synth transaction pending`, "", ToastProvider.Info))
-      | Declined(reason) =>
-        toastDispatch(
-          ToastProvider.Show(
-            `The transaction was rejected by your wallet`,
-            reason,
-            ToastProvider.Error,
-          ),
-        )
-      | Complete(_) =>
-        toastDispatch(
-          ToastProvider.Show(`Claim synth transaction confirmed 🎉`, "", ToastProvider.Success),
-        )
-      | Failed(_) =>
-        toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
-      | _ => ()
+        <Modal id={"synth-1"}>
+          <div className="text-center m-3">
+            <Loader.Ellipses />
+            <h1> {`Confirm the transaction to claim your synth tokens`->React.string} </h1>
+          </div>
+        </Modal>
       }
-      None
-    }, [txState])
-
-    <> </>
+    | SignedAndSubmitted(txHash) => {
+        toastDispatch(ToastProvider.Show(`claim synth transaction pending`, "", ToastProvider.Info))
+        <Modal id={"synth-2"}>
+          <div className="text-center m-3">
+            <div className="m-2"> <Loader.Mini /> </div>
+            <p> {"Synth claim transaction pending... "->React.string} </p>
+            <ViewOnBlockExplorer txHash />
+          </div>
+        </Modal>
+      }
+    | Declined(reason) =>
+      toastDispatch(
+        ToastProvider.Show(
+          `The transaction was rejected by your wallet`,
+          reason,
+          ToastProvider.Error,
+        ),
+      )
+      React.null
+    | Complete(_) =>
+      toastDispatch(
+        ToastProvider.Show(`Claim synth transaction confirmed 🎉`, "", ToastProvider.Success),
+      )
+      <Modal id={"synth-3"}>
+        <div className="text-center m-3">
+          <Tick /> <p> {`Transaction complete 🎉`->React.string} </p>
+        </div>
+      </Modal>
+    | Failed(txHash) =>
+      toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
+      <Modal id={"stake-6"}>
+        <div className="text-center m-3">
+          <h1> {`The transaction failed.`->React.string} </h1>
+          <ViewOnBlockExplorer txHash />
+          <MessageUsOnDiscord />
+        </div>
+      </Modal>
+    | _ => React.null
+    }
   }
 }
 
