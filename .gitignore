@@ -126,3 +126,6 @@ settings.json
 /reference
 
 /docs/static/CNAME
+
+# Secrets
+secretsManager.js
