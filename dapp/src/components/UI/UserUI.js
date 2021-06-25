@@ -416,8 +416,16 @@ function UserUI$UserPendingBox(Props) {
   var isLong = Props.isLong;
   var daiSpend = Props.daiSpend;
   var txConfirmedTimestamp = Props.txConfirmedTimestamp;
-  var nextPriceUpdateTimestamp = Props.nextPriceUpdateTimestamp;
+  var marketIndex = Props.marketIndex;
   var rerenderCallback = Props.rerenderCallback;
+  var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toNumber());
+  if (typeof lastOracleTimestamp === "number") {
+    return React.createElement(Loader.Tiny.make, {});
+  }
+  if (lastOracleTimestamp.TAG === /* GraphError */0) {
+    return React.createElement("p", undefined, lastOracleTimestamp._0);
+  }
+  var lastOracleUpdateTimestamp = lastOracleTimestamp._0;
   return React.createElement("div", {
               className: "flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative"
             }, React.createElement("div", {
@@ -431,9 +439,9 @@ function UserUI$UserPendingBox(Props) {
                     }, React.createElement("img", {
                           className: "h-5 pr-1",
                           src: CONSTANTS.daiDisplayToken.iconUrl
-                        }), Ethers.Utils.formatEther(daiSpend))), React.createElement(ProgressBar.make, {
+                        }), Ethers.Utils.formatEther(daiSpend))), React.createElement("p", undefined, lastOracleUpdateTimestamp.toString()), React.createElement(ProgressBar.make, {
                   txConfirmedTimestamp: txConfirmedTimestamp,
-                  nextPriceUpdateTimestamp: nextPriceUpdateTimestamp,
+                  nextPriceUpdateTimestamp: lastOracleUpdateTimestamp.toNumber() + 1200 | 0,
                   rerenderCallback: rerenderCallback
                 }));
 }

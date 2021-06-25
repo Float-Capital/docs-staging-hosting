@@ -80,13 +80,13 @@ function User$UserBalancesCard(Props) {
                     head: "⏳ Pending synths",
                     body: ""
                   }), React.createElement("br", undefined)) : null, Belt_Array.map(pendingMint, (function (param) {
-                var confirmedTimestamp = param.confirmedTimestamp;
+                var marketIndex = param.marketIndex;
                 return React.createElement(UserUI.UserPendingBox.make, {
-                            name: Backend.getMarketInfoUnsafe(param.marketIndex.toNumber()).name,
+                            name: Backend.getMarketInfoUnsafe(marketIndex.toNumber()).name,
                             isLong: param.isLong,
                             daiSpend: param.amount,
-                            txConfirmedTimestamp: confirmedTimestamp.toNumber(),
-                            nextPriceUpdateTimestamp: confirmedTimestamp.toNumber() + 300 | 0,
+                            txConfirmedTimestamp: param.confirmedTimestamp.toNumber(),
+                            marketIndex: marketIndex,
                             rerenderCallback: rerender
                           });
               })));

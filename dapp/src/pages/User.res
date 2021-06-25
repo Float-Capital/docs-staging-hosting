@@ -15,8 +15,6 @@ module UserBalancesCard = {
     let usersConfirmedMintsQuery = DataHooks.useUsersConfirmedMints(~userId)
 
     let rerender = useRerender()
-    let oracleHeartbeatForMarket = 300 // 5min // TODO
-    // let lastOracleTimestamp = (Js.Date.now() /. 1000.)->int_of_float // TODO
 
     <UserColumnCard>
       <UserColumnHeader>
@@ -58,9 +56,8 @@ module UserBalancesCard = {
               name={(marketIndex->Ethers.BigNumber.toNumber->Backend.getMarketInfoUnsafe).name}
               isLong
               daiSpend=amount
+              marketIndex
               txConfirmedTimestamp={confirmedTimestamp->Ethers.BigNumber.toNumber}
-              nextPriceUpdateTimestamp={confirmedTimestamp->Ethers.BigNumber.toNumber +
-                oracleHeartbeatForMarket} // TODO: pull approx oracle next timestamp
               rerenderCallback=rerender
             />
           )

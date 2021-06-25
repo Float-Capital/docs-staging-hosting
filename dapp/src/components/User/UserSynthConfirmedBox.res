@@ -78,6 +78,7 @@ let make = (~name, ~isLong, ~daiSpend, ~marketIndex) => {
         ~marketIndex,
       ),
     )
+
   <div
     className=`flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative`>
     <div className="flex flex-row justify-between">

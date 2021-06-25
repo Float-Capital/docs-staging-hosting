@@ -902,6 +902,45 @@ function useSyntheticPrices(param, tokenAddress, isLong) {
   return liftGraphResponse2(initialTokenPriceResponse, finalPriceResponse);
 }
 
+function useOracleLastUpdate(marketIndex) {
+  var oracleLastUpdateQuery = Curry.app(Queries.OraclesLastUpdate.use, [
+        undefined,
+        Caml_option.some(Client.createContext(/* PriceHistory */1)),
+        undefined,
+        undefined,
+        /* NetworkOnly */3,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          marketIndex: marketIndex
+        }
+      ]);
+  var match = oracleLastUpdateQuery.data;
+  if (match !== undefined) {
+    return {
+            TAG: 1,
+            _0: match.oracles[0].lastUpdatedTimestamp,
+            [Symbol.for("name")]: "Response"
+          };
+  }
+  var match$1 = oracleLastUpdateQuery.error;
+  if (match$1 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$1.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
 var ethAdrToLowerStr = Globals.ethAdrToLowerStr;
 
 exports.liftGraphResponse2 = liftGraphResponse2;
@@ -922,4 +961,5 @@ exports.Util = Util;
 exports.useTokenMarketId = useTokenMarketId;
 exports.getUnixTime = getUnixTime;
 exports.useSyntheticPrices = useSyntheticPrices;
+exports.useOracleLastUpdate = useOracleLastUpdate;
 /* Misc Not a pure module */

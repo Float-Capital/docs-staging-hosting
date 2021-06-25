@@ -2545,6 +2545,100 @@ var PriceHistory = {
   useLazyWithVariables: PriceHistory_useLazyWithVariables
 };
 
+var Raw$29 = {};
+
+var query$29 = (require("@apollo/client").gql`
+  query ($marketIndex: Int!)  {
+    oracles(where: {marketIndex: $marketIndex})  {
+      __typename
+      id
+      lastUpdatedTimestamp
+    }
+  }
+`);
+
+function parse$29(value) {
+  var value$1 = value.oracles;
+  return {
+          oracles: value$1.map(function (value) {
+                return {
+                        __typename: value.__typename,
+                        id: value.id,
+                        lastUpdatedTimestamp: GqlConverters.$$BigInt.parse(value.lastUpdatedTimestamp)
+                      };
+              })
+        };
+}
+
+function serialize$29(value) {
+  var value$1 = value.oracles;
+  var oracles = value$1.map(function (value) {
+        var value$1 = value.lastUpdatedTimestamp;
+        var value$2 = GqlConverters.$$BigInt.serialize(value$1);
+        var value$3 = value.id;
+        var value$4 = value.__typename;
+        return {
+                __typename: value$4,
+                id: value$3,
+                lastUpdatedTimestamp: value$2
+              };
+      });
+  return {
+          oracles: oracles
+        };
+}
+
+function serializeVariables$15(inp) {
+  return {
+          marketIndex: inp.marketIndex
+        };
+}
+
+function makeVariables$15(marketIndex, param) {
+  return {
+          marketIndex: marketIndex
+        };
+}
+
+var OraclesLastUpdate_inner = {
+  Raw: Raw$29,
+  query: query$29,
+  parse: parse$29,
+  serialize: serialize$29,
+  serializeVariables: serializeVariables$15,
+  makeVariables: makeVariables$15
+};
+
+var include$15 = ApolloClient__React_Hooks_UseQuery.Extend({
+      query: query$29,
+      Raw: Raw$29,
+      parse: parse$29,
+      serialize: serialize$29,
+      serializeVariables: serializeVariables$15
+    });
+
+var OraclesLastUpdate_refetchQueryDescription = include$15.refetchQueryDescription;
+
+var OraclesLastUpdate_use = include$15.use;
+
+var OraclesLastUpdate_useLazy = include$15.useLazy;
+
+var OraclesLastUpdate_useLazyWithVariables = include$15.useLazyWithVariables;
+
+var OraclesLastUpdate = {
+  OraclesLastUpdate_inner: OraclesLastUpdate_inner,
+  Raw: Raw$29,
+  query: query$29,
+  parse: parse$29,
+  serialize: serialize$29,
+  serializeVariables: serializeVariables$15,
+  makeVariables: makeVariables$15,
+  refetchQueryDescription: OraclesLastUpdate_refetchQueryDescription,
+  use: OraclesLastUpdate_use,
+  useLazy: OraclesLastUpdate_useLazy,
+  useLazyWithVariables: OraclesLastUpdate_useLazyWithVariables
+};
+
 exports.BasicUserInfo = BasicUserInfo;
 exports.LatestSynthPrice = LatestSynthPrice;
 exports.LatestSystemStateBasic = LatestSystemStateBasic;
@@ -2574,4 +2668,5 @@ exports.TokenMarketId = TokenMarketId;
 exports.GlobalState = GlobalState;
 exports.TokenPrice = TokenPrice;
 exports.PriceHistory = PriceHistory;
+exports.OraclesLastUpdate = OraclesLastUpdate;
 /* query Not a pure module */
