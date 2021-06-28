@@ -3,7 +3,6 @@ import {
   FeesLevied,
   SyntheticTokenCreated,
   PriceUpdate,
-  TokenPriceRefreshed,
   ValueLockedInSystem,
   FeesChanges,
   OracleUpdated,
@@ -507,18 +506,9 @@ export function handleNewMarketLaunchedAndSeeded(
   saveEventToStateChange(
     event,
     "NewMarketLaunchedAndSeeded",
-    [
-      marketIndex.toString(),
-      initialSeed.toHex(),
-    ],
-    [
-      "marketIndex",
-      "initialMarketSeed",
-    ],
-    [
-      "uint32",
-      "uint256",
-    ],
+    [marketIndex.toString(), initialSeed.toHex()],
+    ["marketIndex", "initialMarketSeed"],
+    ["uint32", "uint256"],
     [],
     []
   );
@@ -627,9 +617,14 @@ export function handleBatchedActionsSettled(
       marketIndex,
       updateIndex,
       mintPriceSnapshotLong,
-      mintPriceSnapshotShort
+      mintPriceSnapshotShort,
     ]),
-    ["marketIndex", "updateIndex", "mintPriceSnapshotLong", "mintPriceSnapshotShort"],
+    [
+      "marketIndex",
+      "updateIndex",
+      "mintPriceSnapshotLong",
+      "mintPriceSnapshotShort",
+    ],
     ["uint32", "uint256", "uint256", "uint256"],
     [],
     []
@@ -666,10 +661,7 @@ export function handleExecuteNextPriceSettlementsUser(
   saveEventToStateChange(
     event,
     "ExecuteNextPriceSettlementsUser",
-    [
-      marketIndex.toString(),
-      userAddress.toHex(),
-    ],
+    [marketIndex.toString(), userAddress.toHex()],
     ["marketIndex", "userAddress"],
     ["uint32", "address"],
     [userAddress],
@@ -726,6 +718,9 @@ function updateLatestTokenPrice(
     syntheticToken.priceHistory.push(newPriceEntity.id);
   }
 }
+
+/*
+// TODO: include this in the update system state code
 export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
   let marketIndex = event.params.marketIndex;
   let marketIndexString = marketIndex.toString();
@@ -754,7 +749,7 @@ export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
     [],
     []
   );
-}
+} */
 
 // currently all params are BigInts -> in future may have to modify to support e.g. Addresses
 function bigIntArrayToStringArray(bigIntArr: BigInt[]): string[] {
