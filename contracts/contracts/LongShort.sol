@@ -90,11 +90,13 @@ contract LongShort is ILongShort, Initializable {
     );
 
     // TODO: make sure this is emmited for batched actions too!
-    event ValueLockedInSystem(
+    event SystemStateUpdated(
         uint32 marketIndex,
-        uint256 totalValueLockedInMarket,
+        uint256 updateIndex,
         uint256 longValue,
-        uint256 shortValue
+        uint256 shortValue,
+        uint256 longPrice,
+        uint256 shortPrice
     );
 
     event FeesLevied(uint32 marketIndex, uint256 totalFees);
@@ -123,15 +125,6 @@ contract LongShort is ILongShort, Initializable {
         uint256 synthRedeemed,
         address user,
         uint256 oracleUpdateIndex
-    );
-
-    event BatchedActionsSettled(
-        uint32 marketIndex,
-        uint256 updateIndex,
-        uint256 mintPriceSnapshotLong,
-        uint256 mintPriceSnapshotShort,
-        uint256 redeemPriceSnapshotLong,
-        uint256 redeemPriceSnapshotShort
     );
 
     event NextPriceDeposit(
@@ -747,12 +740,13 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokenPriceShort
         );
 
-        emit ValueLockedInSystem(
+        emit SystemStateUpdated(
             marketIndex,
-            syntheticTokenPoolValue[marketIndex][true] +
-                syntheticTokenPoolValue[marketIndex][false],
+            marketUpdateIndex[marketIndex],
             syntheticTokenPoolValue[marketIndex][true],
-            syntheticTokenPoolValue[marketIndex][false]
+            syntheticTokenPoolValue[marketIndex][false],
+            syntheticTokenPriceLong,
+            syntheticTokenPriceShort
         );
     }
 
@@ -816,13 +810,12 @@ contract LongShort is ILongShort, Initializable {
         uint32 marketIndex,
         uint256 amountSynthToRedeemLong,
         uint256 amountSynthToRedeemShort
-    ) internal returns (bool wasABatchedSettlement) {
+    ) internal {
         if (amountSynthToRedeemLong > 0) {
             syntheticTokens[marketIndex][true].synthRedeemBurn(
                 address(this),
                 amountSynthToRedeemLong
             );
-            wasABatchedSettlement = true;
         }
 
         if (amountSynthToRedeemShort > 0) {
@@ -830,7 +823,6 @@ contract LongShort is ILongShort, Initializable {
                 address(this),
                 amountSynthToRedeemShort
             );
-            wasABatchedSettlement = true;
         }
     }
 
@@ -1101,48 +1093,28 @@ contract LongShort is ILongShort, Initializable {
         //         shortAmountOfPaymentTokenToRedeem
         //     );
 
-        bool settlementOccured = _handleBatchedDepositSettlement(
+        _handleBatchedDepositSettlement(
             marketIndex,
             true,
             syntheticTokenPriceLong
-        ) ||
-            _handleBatchedDepositSettlement(
-                marketIndex,
-                false,
-                syntheticTokenPriceShort
-            ) ||
-            _handleBatchedRedeemSettlement(
-                marketIndex,
-                syntheticTokenPriceLong,
-                syntheticTokenPriceShort
-            );
-
-        if (settlementOccured) {
-            // remove redudant info from this event
-            emit BatchedActionsSettled(
-                marketIndex,
-                newLatestPriceStateIndex,
-                syntheticTokenPriceSnapshot[marketIndex][true][
-                    newLatestPriceStateIndex
-                ],
-                syntheticTokenPriceSnapshot[marketIndex][false][
-                    newLatestPriceStateIndex
-                ],
-                syntheticTokenPriceSnapshot[marketIndex][true][
-                    newLatestPriceStateIndex
-                ],
-                syntheticTokenPriceSnapshot[marketIndex][false][
-                    newLatestPriceStateIndex
-                ]
-            );
-        }
+        );
+        _handleBatchedDepositSettlement(
+            marketIndex,
+            false,
+            syntheticTokenPriceShort
+        );
+        _handleBatchedRedeemSettlement(
+            marketIndex,
+            syntheticTokenPriceLong,
+            syntheticTokenPriceShort
+        );
     }
 
     function _handleBatchedDepositSettlement(
         uint32 marketIndex,
         bool isLong,
         uint256 syntheticTokenPrice
-    ) internal returns (bool wasABatchedSettlement) {
+    ) internal {
         uint256 amountToBatchDeposit = batchedAmountOfTokensToDeposit[
             marketIndex
         ][isLong];
@@ -1165,8 +1137,6 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokenPoolValue[marketIndex][
                 isLong
             ] += amountToBatchDeposit;
-
-            wasABatchedSettlement = true;
         }
     }
 
@@ -1174,8 +1144,8 @@ contract LongShort is ILongShort, Initializable {
         uint32 marketIndex,
         uint256 syntheticTokenPriceLong,
         uint256 syntheticTokenPriceShort
-    ) internal returns (bool wasABatchedSettlement) {
-        wasABatchedSettlement = _burnSynthTokensForRedemption(
+    ) internal {
+        _burnSynthTokensForRedemption(
             marketIndex,
             batchedAmountOfSynthTokensToRedeem[marketIndex][true],
             batchedAmountOfSynthTokensToRedeem[marketIndex][false]

@@ -60,10 +60,6 @@ contract LongShortInternalsExposed is LongShortMockable {
         _;
     }
 
-    function refreshTokenPrices(uint32 marketIndex) external {
-        _refreshTokenPrices(marketIndex);
-    }
-
     function claimAndDistributeYield(uint32 marketIndex) external {
         _claimAndDistributeYield(marketIndex);
     }
