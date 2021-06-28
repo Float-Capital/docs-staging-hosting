@@ -70,6 +70,9 @@ let callEmitEvents: (
 @send
 external withArgs8: (eventCheck, 'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h) => JsPromise.t<unit> = "withArgs"
 
+let expectToNotEmit: eventCheck => unit = _eventCheck =>
+  %raw(`(_eventCheck) => eventCheck.should.Throw()`)
+
 let expectRevertNoReason: (
   ~transaction: JsPromise.t<ContractHelpers.transaction>,
 ) => JsPromise.t<unit> = %raw(`(transaction) => expect(transaction).to.be.reverted`)

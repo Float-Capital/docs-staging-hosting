@@ -227,6 +227,7 @@ function inititialize(admin, exposeInternals) {
                                                   });
                                       }).then(function (markets) {
                                       return {
+                                              floatCapital_v0: floatCapital,
                                               tokenFactory: tokenFactory,
                                               treasury: treasury,
                                               floatToken: floatToken,
