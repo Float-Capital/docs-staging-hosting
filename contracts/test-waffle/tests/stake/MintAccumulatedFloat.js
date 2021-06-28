@@ -28,7 +28,7 @@ function test(contracts, accounts) {
             return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "mintAccumulatedFloat", contracts, accounts), (function (param) {
                           StakerSmocked.InternalMock.mockCalculateAccumulatedFloatToReturn(floatToMintLong, floatToMintShort);
                           StakerSmocked.InternalMock.mock_mintFloatToReturn(undefined);
-                          return LetOps.AwaitThen.let_(stakerRef.contents.setMintAccumulatedFloatParams(marketIndex, latestRewardIndexForMarket), (function (param) {
+                          return LetOps.AwaitThen.let_(stakerRef.contents.setMintAccumulatedFloatAndClaimFloatParams(marketIndex, latestRewardIndexForMarket), (function (param) {
                                         promiseRef.contents = stakerRef.contents.mintAccumulatedFloatExternal(marketIndex, user);
                                         return LetOps.Await.let_(promiseRef.contents, (function (param) {
                                                       return promiseRef.contents;

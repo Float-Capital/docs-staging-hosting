@@ -114,6 +114,7 @@ describe("Float System", () => {
       UpdateState.test(~contracts, ~accounts);
       MintFloat.test(~contracts, ~accounts);
       MintAccumulatedFloat.test(~contracts, ~accounts);
+      ClaimFloat.test(~contracts, ~accounts);
     });
   });
 });
