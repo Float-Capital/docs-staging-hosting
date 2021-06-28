@@ -9,8 +9,9 @@ var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var SmockableGen = require("./library/SmockableGen.bs.js");
 var Caml_exceptions = require("rescript/lib/js/caml_exceptions.js");
+var Belt_HashMapString = require("rescript/lib/js/belt_HashMapString.js");
 
-var filesToMock = [
+var filesToMockInternally = [
   "LongShort.sol",
   "Staker.sol"
 ];
@@ -18,6 +19,21 @@ var filesToMock = [
 var ScriptDoesNotSupportReturnValues = /* @__PURE__ */Caml_exceptions.create("MockablesGen.ScriptDoesNotSupportReturnValues");
 
 var defaultError = "This script currently only supports functions that return or receive as parameters uints, ints, bools, (nonpayable) addresses, contracts, structs, arrays or strings\n          // NO MAPPINGS";
+
+var abisToMockExternally = [
+  "ERC20Mock",
+  "YieldManagerMock",
+  "LongShort",
+  "SyntheticToken",
+  "YieldManagerAave",
+  "FloatCapital_v0",
+  "TokenFactory",
+  "FloatToken",
+  "Staker",
+  "Treasury_v0",
+  "OracleManagerChainlink",
+  "OracleManagerMock"
+];
 
 function convertASTTypeToSolType(typeDescriptionStr) {
   switch (typeDescriptionStr) {
@@ -98,6 +114,8 @@ var blockCommentsRe = /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g;
 
 var getArtifact = ((fileNameWithoutExtension) => require("../../contracts/codegen/truffle/" + fileNameWithoutExtension + ".json"));
 
+var getAbi = ((fileNameWithoutExtension) => require("../../contracts/abis/" + fileNameWithoutExtension + ".json"));
+
 var BadMatchingBlock = /* @__PURE__ */Caml_exceptions.create("MockablesGen.BadMatchingBlock");
 
 function matchingBlockEndIndex(str, _startIndex, _count) {
@@ -164,7 +182,38 @@ function reduceStrArr(arr) {
               }));
 }
 
-Belt_Array.forEach(filesToMock, (function (filePath) {
+function parseAbiTypes(types) {
+  return Belt_Array.map(types, (function (i) {
+                return {
+                        name: i.name,
+                        type_: i.internalType,
+                        storageLocation: /* NotRelevant */1
+                      };
+              }));
+}
+
+function parseAbi(abi) {
+  return Belt_Array.map(Belt_Array.keep(abi, (function (n) {
+                    return n.type === "function";
+                  })), (function (n) {
+                return {
+                        name: n.name,
+                        parameters: parseAbiTypes(n.inputs),
+                        returnValues: parseAbiTypes(n.outputs),
+                        visibility: /* Public */0
+                      };
+              }));
+}
+
+var bindingsDict = Belt_HashMapString.make(10);
+
+Belt_Array.forEach(abisToMockExternally, (function (contractName) {
+        var abi = getAbi(contractName);
+        var functions = parseAbi(abi);
+        return Belt_HashMapString.set(bindingsDict, contractName, SmockableGen.externalModule(functions, contractName));
+      }));
+
+Belt_Array.forEach(filesToMockInternally, (function (filePath) {
         var filePathSplit = filePath.split("/");
         var fileName = Belt_Array.getExn(filePathSplit, filePathSplit.length - 1 | 0);
         var fileNameSplit = fileName.split(".");
@@ -302,9 +351,14 @@ Belt_Array.forEach(filesToMock, (function (filePath) {
         sol.contents = prefix + "\n" + ("import \"./" + fileNameWithoutExtension + "ForInternalMocking.sol\";") + "\n" + intermediate1 + fileNameWithoutExtension + "Mockable" + intermediate2 + ("\n  " + fileNameWithoutExtension + "ForInternalMocking mocker;\n  bool shouldUseMock;\n  string functionToNotMock;\n\n  function setMocker(" + fileNameWithoutExtension + "ForInternalMocking _mocker) external {\n    mocker = _mocker;\n    shouldUseMock = true;\n  }\n\n  function setFunctionToNotMock(string calldata _functionToNotMock) external {\n    functionToNotMock = _functionToNotMock;\n  }\n\n") + suffix;
         Fs.writeFileSync("../contracts/contracts/testing/generated/" + fileNameWithoutExtension + "Mockable.sol", sol.contents, "utf8");
         Fs.writeFileSync("../contracts/contracts/testing/generated/" + fileNameWithoutExtension + "ForInternalMocking.sol", mockLogger.contents, "utf8");
-        Fs.writeFileSync("../contracts/test-waffle/library/smock/" + fileNameWithoutExtension + "Smocked.res", SmockableGen.entireModule(fileNameWithoutExtension, Belt_Array.concat(functions(contractDefinition.nodes), modifiers(contractDefinition.nodes)), Belt_Array.keep(functions(contractDefinition.nodes), (function (x) {
-                        return x.visibility === /* Public */0;
-                      }))), "utf8");
+        var existingModuleDef = Belt_Array.some(abisToMockExternally, (function (x) {
+                return x === fileNameWithoutExtension;
+              })) ? Belt_Option.getExn(Belt_HashMapString.get(bindingsDict, fileNameWithoutExtension)) : "";
+        return Belt_HashMapString.set(bindingsDict, fileNameWithoutExtension, existingModuleDef + "\n\n" + SmockableGen.internalModule(Belt_Array.concat(functions(contractDefinition.nodes), modifiers(contractDefinition.nodes)), fileNameWithoutExtension));
+      }));
+
+Belt_HashMapString.forEach(bindingsDict, (function (key, val) {
+        Fs.writeFileSync("../contracts/test-waffle/library/smock/" + key + "Smocked.res", val, "utf8");
         
       }));
 
@@ -314,12 +368,13 @@ var containsRe = Globals.containsRe;
 
 var commafiy = Globals.commafiy;
 
-exports.filesToMock = filesToMock;
+exports.filesToMockInternally = filesToMockInternally;
 exports.ScriptDoesNotSupportReturnValues = ScriptDoesNotSupportReturnValues;
 exports.defaultError = defaultError;
 exports.contains = contains;
 exports.containsRe = containsRe;
 exports.commafiy = commafiy;
+exports.abisToMockExternally = abisToMockExternally;
 exports.convertASTTypeToSolType = convertASTTypeToSolType;
 exports.nodeToTypedIdentifier = nodeToTypedIdentifier;
 exports.functions = functions;
@@ -327,10 +382,14 @@ exports.modifiers = modifiers;
 exports.lineCommentsRe = lineCommentsRe;
 exports.blockCommentsRe = blockCommentsRe;
 exports.getArtifact = getArtifact;
+exports.getAbi = getAbi;
 exports.BadMatchingBlock = BadMatchingBlock;
 exports.matchingBlockEndIndex = matchingBlockEndIndex;
 exports.importRe = importRe;
 exports.quotesRe = quotesRe;
 exports.resolveImportLocationRecursive = resolveImportLocationRecursive;
 exports.reduceStrArr = reduceStrArr;
-/*  Not a pure module */
+exports.parseAbiTypes = parseAbiTypes;
+exports.parseAbi = parseAbi;
+exports.bindingsDict = bindingsDict;
+/* bindingsDict Not a pure module */

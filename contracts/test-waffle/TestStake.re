@@ -109,6 +109,11 @@ describe("Float System", () => {
       GetKValue.test(~contracts, ~accounts);
       CalculateFloatPerSecond.test(~contracts, ~accounts);
       CalculateNewCumulativeRate.test(~contracts, ~accounts);
+      SetRewardObjects.test(~contracts, ~accounts);
+      AddNewStateForFloatRewards.test(~contracts, ~accounts);
+      UpdateState.test(~contracts, ~accounts);
+      MintFloat.test(~contracts, ~accounts);
+      MintAccumulatedFloat.test(~contracts, ~accounts);
     });
   });
 });

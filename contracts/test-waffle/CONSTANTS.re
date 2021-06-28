@@ -6,3 +6,6 @@ let oneBn = Ethers.BigNumber.fromInt(1);
 let twoBn = Ethers.BigNumber.fromInt(2);
 let longTokenType = 0;
 let shortTokenType = 1;
+
+let zeroAddressStr = "0x0000000000000000000000000000000000000000";
+let zeroAddress = Ethers.Utils.getAddressUnsafe(zeroAddressStr);

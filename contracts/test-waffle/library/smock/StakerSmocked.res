@@ -4,25 +4,102 @@ type t = {address: Ethers.ethAddress}
 
 let uninitializedValue: t = None->Obj.magic
 
-let mockInitializeToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.initialize.will.return()")
+let mockFLOAT_ISSUANCE_FIXED_DECIMALToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.FLOAT_ISSUANCE_FIXED_DECIMAL.will.return.with([_param0])")
 }
 
-type initializeCall = {
-  admin: Ethers.ethAddress,
-  longShortCoreContract: Ethers.ethAddress,
-  floatToken: Ethers.ethAddress,
-  floatCapital: Ethers.ethAddress,
+type fLOAT_ISSUANCE_FIXED_DECIMALCall
+
+let fLOAT_ISSUANCE_FIXED_DECIMALCalls: t => array<fLOAT_ISSUANCE_FIXED_DECIMALCall> = _r => {
+  let array = %raw("_r.smocked.FLOAT_ISSUANCE_FIXED_DECIMAL.calls")
+  array->Array.map(() => {
+    ()->Obj.magic
+  })
 }
 
-let initializeCalls: t => array<initializeCall> = _r => {
-  let array = %raw("_r.smocked.initialize.calls")
-  array->Array.map(((admin, longShortCoreContract, floatToken, floatCapital)) => {
+let mockAddNewStakingFundToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.addNewStakingFund.will.return()")
+}
+
+type addNewStakingFundCall = {
+  marketIndex: int,
+  longToken: Ethers.ethAddress,
+  shortToken: Ethers.ethAddress,
+  kInitialMultiplier: Ethers.BigNumber.t,
+  kPeriod: Ethers.BigNumber.t,
+}
+
+let addNewStakingFundCalls: t => array<addNewStakingFundCall> = _r => {
+  let array = %raw("_r.smocked.addNewStakingFund.calls")
+  array->Array.map(((marketIndex, longToken, shortToken, kInitialMultiplier, kPeriod)) => {
     {
-      admin: admin,
-      longShortCoreContract: longShortCoreContract,
-      floatToken: floatToken,
-      floatCapital: floatCapital,
+      marketIndex: marketIndex,
+      longToken: longToken,
+      shortToken: shortToken,
+      kInitialMultiplier: kInitialMultiplier,
+      kPeriod: kPeriod,
+    }
+  })
+}
+
+let mockAddNewStateForFloatRewardsToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.addNewStateForFloatRewards.will.return()")
+}
+
+type addNewStateForFloatRewardsCall = {
+  marketIndex: int,
+  longPrice: Ethers.BigNumber.t,
+  shortPrice: Ethers.BigNumber.t,
+  longValue: Ethers.BigNumber.t,
+  shortValue: Ethers.BigNumber.t,
+}
+
+let addNewStateForFloatRewardsCalls: t => array<addNewStateForFloatRewardsCall> = _r => {
+  let array = %raw("_r.smocked.addNewStateForFloatRewards.calls")
+  array->Array.map(((marketIndex, longPrice, shortPrice, longValue, shortValue)) => {
+    {
+      marketIndex: marketIndex,
+      longPrice: longPrice,
+      shortPrice: shortPrice,
+      longValue: longValue,
+      shortValue: shortValue,
+    }
+  })
+}
+
+let mockAdminToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.admin.will.return.with([_param0])")
+}
+
+type adminCall
+
+let adminCalls: t => array<adminCall> = _r => {
+  let array = %raw("_r.smocked.admin.calls")
+  array->Array.map(() => {
+    ()->Obj.magic
+  })
+}
+
+let mockBatchedStakeToReturn: (
+  t,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+) => unit = (_r, _param0, _param1, _param2) => {
+  let _ = %raw("_r.smocked.batchedStake.will.return.with([_param0,_param1,_param2])")
+}
+
+type batchedStakeCall = {
+  param0: int,
+  param1: Ethers.BigNumber.t,
+}
+
+let batchedStakeCalls: t => array<batchedStakeCall> = _r => {
+  let array = %raw("_r.smocked.batchedStake.calls")
+  array->Array.map(((param0, param1)) => {
+    {
+      param0: param0,
+      param1: param1,
     }
   })
 }
@@ -84,56 +161,6 @@ let changeMarketLaunchIncentiveParametersCalls: t => array<
   })
 }
 
-let mockAddNewStakingFundToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.addNewStakingFund.will.return()")
-}
-
-type addNewStakingFundCall = {
-  marketIndex: int,
-  longToken: Ethers.ethAddress,
-  shortToken: Ethers.ethAddress,
-  kInitialMultiplier: Ethers.BigNumber.t,
-  kPeriod: Ethers.BigNumber.t,
-}
-
-let addNewStakingFundCalls: t => array<addNewStakingFundCall> = _r => {
-  let array = %raw("_r.smocked.addNewStakingFund.calls")
-  array->Array.map(((marketIndex, longToken, shortToken, kInitialMultiplier, kPeriod)) => {
-    {
-      marketIndex: marketIndex,
-      longToken: longToken,
-      shortToken: shortToken,
-      kInitialMultiplier: kInitialMultiplier,
-      kPeriod: kPeriod,
-    }
-  })
-}
-
-let mockAddNewStateForFloatRewardsToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.addNewStateForFloatRewards.will.return()")
-}
-
-type addNewStateForFloatRewardsCall = {
-  marketIndex: int,
-  longPrice: Ethers.BigNumber.t,
-  shortPrice: Ethers.BigNumber.t,
-  longValue: Ethers.BigNumber.t,
-  shortValue: Ethers.BigNumber.t,
-}
-
-let addNewStateForFloatRewardsCalls: t => array<addNewStateForFloatRewardsCall> = _r => {
-  let array = %raw("_r.smocked.addNewStateForFloatRewards.calls")
-  array->Array.map(((marketIndex, longPrice, shortPrice, longValue, shortValue)) => {
-    {
-      marketIndex: marketIndex,
-      longPrice: longPrice,
-      shortPrice: shortPrice,
-      longValue: longValue,
-      shortValue: shortValue,
-    }
-  })
-}
-
 let mockClaimFloatCustomToReturn: t => unit = _r => {
   let _ = %raw("_r.smocked.claimFloatCustom.will.return()")
 }
@@ -147,6 +174,154 @@ let claimFloatCustomCalls: t => array<claimFloatCustomCall> = _r => {
 
     {
       marketIndexes: marketIndexes,
+    }
+  })
+}
+
+let mockFloatCapitalToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.floatCapital.will.return.with([_param0])")
+}
+
+type floatCapitalCall
+
+let floatCapitalCalls: t => array<floatCapitalCall> = _r => {
+  let array = %raw("_r.smocked.floatCapital.calls")
+  array->Array.map(() => {
+    ()->Obj.magic
+  })
+}
+
+let mockFloatPercentageToReturn: (t, int) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.floatPercentage.will.return.with([_param0])")
+}
+
+type floatPercentageCall
+
+let floatPercentageCalls: t => array<floatPercentageCall> = _r => {
+  let array = %raw("_r.smocked.floatPercentage.calls")
+  array->Array.map(() => {
+    ()->Obj.magic
+  })
+}
+
+let mockFloatTokenToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.floatToken.will.return.with([_param0])")
+}
+
+type floatTokenCall
+
+let floatTokenCalls: t => array<floatTokenCall> = _r => {
+  let array = %raw("_r.smocked.floatToken.calls")
+  array->Array.map(() => {
+    ()->Obj.magic
+  })
+}
+
+let mockInitializeToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.initialize.will.return()")
+}
+
+type initializeCall = {
+  admin: Ethers.ethAddress,
+  longShortCoreContract: Ethers.ethAddress,
+  floatToken: Ethers.ethAddress,
+  floatCapital: Ethers.ethAddress,
+}
+
+let initializeCalls: t => array<initializeCall> = _r => {
+  let array = %raw("_r.smocked.initialize.calls")
+  array->Array.map(((admin, longShortCoreContract, floatToken, floatCapital)) => {
+    {
+      admin: admin,
+      longShortCoreContract: longShortCoreContract,
+      floatToken: floatToken,
+      floatCapital: floatCapital,
+    }
+  })
+}
+
+let mockLatestRewardIndexToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.latestRewardIndex.will.return.with([_param0])")
+}
+
+type latestRewardIndexCall = {param0: int}
+
+let latestRewardIndexCalls: t => array<latestRewardIndexCall> = _r => {
+  let array = %raw("_r.smocked.latestRewardIndex.calls")
+  array->Array.map(_m => {
+    let param0 = _m->Array.getUnsafe(0)
+
+    {
+      param0: param0,
+    }
+  })
+}
+
+let mockLongShortCoreContractToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.longShortCoreContract.will.return.with([_param0])")
+}
+
+type longShortCoreContractCall
+
+let longShortCoreContractCalls: t => array<longShortCoreContractCall> = _r => {
+  let array = %raw("_r.smocked.longShortCoreContract.calls")
+  array->Array.map(() => {
+    ()->Obj.magic
+  })
+}
+
+let mockMarketIndexOfTokenToReturn: (t, int) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.marketIndexOfToken.will.return.with([_param0])")
+}
+
+type marketIndexOfTokenCall = {param0: Ethers.ethAddress}
+
+let marketIndexOfTokenCalls: t => array<marketIndexOfTokenCall> = _r => {
+  let array = %raw("_r.smocked.marketIndexOfToken.calls")
+  array->Array.map(_m => {
+    let param0 = _m->Array.getUnsafe(0)
+
+    {
+      param0: param0,
+    }
+  })
+}
+
+let mockMarketLaunchIncentiveMultipliersToReturn: (t, Ethers.BigNumber.t) => unit = (
+  _r,
+  _param0,
+) => {
+  let _ = %raw("_r.smocked.marketLaunchIncentiveMultipliers.will.return.with([_param0])")
+}
+
+type marketLaunchIncentiveMultipliersCall = {param0: int}
+
+let marketLaunchIncentiveMultipliersCalls: t => array<
+  marketLaunchIncentiveMultipliersCall,
+> = _r => {
+  let array = %raw("_r.smocked.marketLaunchIncentiveMultipliers.calls")
+  array->Array.map(_m => {
+    let param0 = _m->Array.getUnsafe(0)
+
+    {
+      param0: param0,
+    }
+  })
+}
+
+let mockMarketLaunchIncentivePeriodToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.marketLaunchIncentivePeriod.will.return.with([_param0])")
+}
+
+type marketLaunchIncentivePeriodCall = {param0: int}
+
+let marketLaunchIncentivePeriodCalls: t => array<marketLaunchIncentivePeriodCall> = _r => {
+  let array = %raw("_r.smocked.marketLaunchIncentivePeriod.calls")
+  array->Array.map(_m => {
+    let param0 = _m->Array.getUnsafe(0)
+
+    {
+      param0: param0,
     }
   })
 }
@@ -166,6 +341,89 @@ let stakeFromUserCalls: t => array<stakeFromUserCall> = _r => {
     {
       from: from,
       amount: amount,
+    }
+  })
+}
+
+let mockSyntheticRewardParamsToReturn: (
+  t,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+) => unit = (_r, _param0, _param1, _param2) => {
+  let _ = %raw("_r.smocked.syntheticRewardParams.will.return.with([_param0,_param1,_param2])")
+}
+
+type syntheticRewardParamsCall = {
+  param0: int,
+  param1: Ethers.BigNumber.t,
+}
+
+let syntheticRewardParamsCalls: t => array<syntheticRewardParamsCall> = _r => {
+  let array = %raw("_r.smocked.syntheticRewardParams.calls")
+  array->Array.map(((param0, param1)) => {
+    {
+      param0: param0,
+      param1: param1,
+    }
+  })
+}
+
+let mockSyntheticTokensToReturn: (t, Ethers.ethAddress, Ethers.ethAddress) => unit = (
+  _r,
+  _param0,
+  _param1,
+) => {
+  let _ = %raw("_r.smocked.syntheticTokens.will.return.with([_param0,_param1])")
+}
+
+type syntheticTokensCall = {param0: int}
+
+let syntheticTokensCalls: t => array<syntheticTokensCall> = _r => {
+  let array = %raw("_r.smocked.syntheticTokens.calls")
+  array->Array.map(_m => {
+    let param0 = _m->Array.getUnsafe(0)
+
+    {
+      param0: param0,
+    }
+  })
+}
+
+let mockUserAmountStakedToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.userAmountStaked.will.return.with([_param0])")
+}
+
+type userAmountStakedCall = {
+  param0: Ethers.ethAddress,
+  param1: Ethers.ethAddress,
+}
+
+let userAmountStakedCalls: t => array<userAmountStakedCall> = _r => {
+  let array = %raw("_r.smocked.userAmountStaked.calls")
+  array->Array.map(((param0, param1)) => {
+    {
+      param0: param0,
+      param1: param1,
+    }
+  })
+}
+
+let mockUserIndexOfLastClaimedRewardToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.userIndexOfLastClaimedReward.will.return.with([_param0])")
+}
+
+type userIndexOfLastClaimedRewardCall = {
+  param0: int,
+  param1: Ethers.ethAddress,
+}
+
+let userIndexOfLastClaimedRewardCalls: t => array<userIndexOfLastClaimedRewardCall> = _r => {
+  let array = %raw("_r.smocked.userIndexOfLastClaimedReward.calls")
+  array->Array.map(((param0, param1)) => {
+    {
+      param0: param0,
+      param1: param1,
     }
   })
 }

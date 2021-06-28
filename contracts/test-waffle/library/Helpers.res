@@ -8,7 +8,7 @@ type markets = {
   marketIndex: int,
 }
 type coreContracts = {
-  // floatCapital_v0: Contract.FloatCapital_v0.t,
+  floatCapital_v0: FloatCapital_v0.t,
   tokenFactory: TokenFactory.t,
   treasury: Treasury_v0.t,
   floatToken: FloatToken.t,
@@ -210,6 +210,7 @@ let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
         tokenFactory: tokenFactory,
         treasury: treasury,
         markets: markets,
+        floatCapital_v0: floatCapital,
       })
     })
   })
