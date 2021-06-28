@@ -61,7 +61,6 @@ let querySwitcherLink = (~user) =>
         | _ => false
         }
 
-        Js.log2("isPriceHistory", isPriceHistory)
         isPriceHistory
       },
       ~whenTrue=httpLink(~uri=Config.priceHistoryGraphEndpoint),

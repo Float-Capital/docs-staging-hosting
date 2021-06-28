@@ -549,6 +549,25 @@ function redeemShortNextPriceCalls(_r) {
 
 function mockStakerToReturn(_r, _param0) {
   ((_r.smocked.staker.will.return.with([_param0])));
+}
+
+function mockGetMarketPcntForTreasuryVsMarketSplitToReturn(_r, _param0) {
+  ((_r.smocked.getMarketPcntForTreasuryVsMarketSplit.will.return.with([_param0])));
+  
+}
+
+function getMarketPcntForTreasuryVsMarketSplitCalls(_r) {
+  var array = _r.smocked.getMarketPcntForTreasuryVsMarketSplit.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var marketIndex = _m[0];
+                return {
+                        marketIndex: marketIndex
+                      };
+              }));
+}
+
+function mockGetTreasurySplitToReturn(_r, _param0, _param1) {
+  ((_r.smocked.getTreasurySplit.will.return.with([_param0,_param1])));
   
 }
 
@@ -561,7 +580,6 @@ function stakerCalls(_r) {
 
 function mockSyntheticTokenPoolValueToReturn(_r, _param0) {
   ((_r.smocked.syntheticTokenPoolValue.will.return.with([_param0])));
-  
 }
 
 function syntheticTokenPoolValueCalls(_r) {
@@ -576,6 +594,25 @@ function syntheticTokenPoolValueCalls(_r) {
 
 function mockSyntheticTokenPriceToReturn(_r, _param0) {
   ((_r.smocked.syntheticTokenPrice.will.return.with([_param0])));
+}
+
+function mockGetLongPcntForLongVsShortSplitToReturn(_r, _param0) {
+  ((_r.smocked.getLongPcntForLongVsShortSplit.will.return.with([_param0])));
+  
+}
+
+function getLongPcntForLongVsShortSplitCalls(_r) {
+  var array = _r.smocked.getLongPcntForLongVsShortSplit.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var marketIndex = _m[0];
+                return {
+                        marketIndex: marketIndex
+                      };
+              }));
+}
+
+function mockGetMarketSplitToReturn(_r, _param0, _param1) {
+  ((_r.smocked.getMarketSplit.will.return.with([_param0,_param1])));
   
 }
 
@@ -2106,6 +2143,22 @@ exports.mockExecuteOutstandingNextPriceSettlementsUserToReturn = mockExecuteOuts
 exports.executeOutstandingNextPriceSettlementsUserCalls = executeOutstandingNextPriceSettlementsUserCalls;
 exports.mockFundTokensToReturn = mockFundTokensToReturn;
 exports.fundTokensCalls = fundTokensCalls;
+exports.mockUpdateMarketOracleToReturn = mockUpdateMarketOracleToReturn;
+exports.updateMarketOracleCalls = updateMarketOracleCalls;
+exports.mockNewSyntheticMarketToReturn = mockNewSyntheticMarketToReturn;
+exports.newSyntheticMarketCalls = newSyntheticMarketCalls;
+exports.mockInitializeMarketToReturn = mockInitializeMarketToReturn;
+exports.initializeMarketCalls = initializeMarketCalls;
+exports.mockGetUsersPendingBalanceToReturn = mockGetUsersPendingBalanceToReturn;
+exports.getUsersPendingBalanceCalls = getUsersPendingBalanceCalls;
+exports.mockGetMarketPcntForTreasuryVsMarketSplitToReturn = mockGetMarketPcntForTreasuryVsMarketSplitToReturn;
+exports.getMarketPcntForTreasuryVsMarketSplitCalls = getMarketPcntForTreasuryVsMarketSplitCalls;
+exports.mockGetTreasurySplitToReturn = mockGetTreasurySplitToReturn;
+exports.getTreasurySplitCalls = getTreasurySplitCalls;
+exports.mockGetLongPcntForLongVsShortSplitToReturn = mockGetLongPcntForLongVsShortSplitToReturn;
+exports.getLongPcntForLongVsShortSplitCalls = getLongPcntForLongVsShortSplitCalls;
+exports.mockGetMarketSplitToReturn = mockGetMarketSplitToReturn;
+exports.getMarketSplitCalls = getMarketSplitCalls;
 exports.mockGetFeesGeneralToReturn = mockGetFeesGeneralToReturn;
 exports.getFeesGeneralCalls = getFeesGeneralCalls;
 exports.mockGetLongPcntForLongVsShortSplitToReturn = mockGetLongPcntForLongVsShortSplitToReturn;

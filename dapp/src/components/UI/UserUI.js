@@ -22,6 +22,7 @@ var ClaimFloat = require("../Claim/ClaimFloat.js");
 var Pervasives = require("rescript/lib/js/pervasives.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
+var ProgressBar = require("./Base/ProgressBar.js");
 var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
 var Belt_SetString = require("rescript/lib/js/belt_SetString.js");
@@ -380,7 +381,7 @@ function UserUI$UserTokenBox(Props) {
                         isLong ? "fu" : "fd"
                       ) + symbol
                     })), React.createElement("div", {
-                  className: "pl-3 text-sm self-center"
+                  className: "pl-3 text-xs self-center"
                 }, name, React.createElement("br", {
                       className: "mt-1"
                     }), isLong ? "Long↗️" : "Short↘️"), React.createElement("div", {
@@ -408,6 +409,45 @@ function UserUI$UserTokenBox(Props) {
 
 var UserTokenBox = {
   make: UserUI$UserTokenBox
+};
+
+function UserUI$UserPendingBox(Props) {
+  var name = Props.name;
+  var isLong = Props.isLong;
+  var daiSpend = Props.daiSpend;
+  var txConfirmedTimestamp = Props.txConfirmedTimestamp;
+  var marketIndex = Props.marketIndex;
+  var rerenderCallback = Props.rerenderCallback;
+  var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toNumber());
+  if (typeof lastOracleTimestamp === "number") {
+    return React.createElement(Loader.Tiny.make, {});
+  }
+  if (lastOracleTimestamp.TAG === /* GraphError */0) {
+    return React.createElement("p", undefined, lastOracleTimestamp._0);
+  }
+  var lastOracleUpdateTimestamp = lastOracleTimestamp._0;
+  return React.createElement("div", {
+              className: "flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative"
+            }, React.createElement("div", {
+                  className: "flex flex-row justify-between"
+                }, React.createElement("div", {
+                      className: " text-sm self-center"
+                    }, name), React.createElement("div", {
+                      className: " text-sm self-center"
+                    }, isLong ? "Long" : "Short"), React.createElement("div", {
+                      className: "flex  text-sm self-center"
+                    }, React.createElement("img", {
+                          className: "h-5 pr-1",
+                          src: CONSTANTS.daiDisplayToken.iconUrl
+                        }), Ethers.Utils.formatEther(daiSpend))), React.createElement("p", undefined, lastOracleUpdateTimestamp.toString()), React.createElement(ProgressBar.make, {
+                  txConfirmedTimestamp: txConfirmedTimestamp,
+                  nextPriceUpdateTimestamp: lastOracleUpdateTimestamp.toNumber() + 1200 | 0,
+                  rerenderCallback: rerenderCallback
+                }));
+}
+
+var UserPendingBox = {
+  make: UserUI$UserPendingBox
 };
 
 function UserUI$UserFloatEarnedFromStake(Props) {
@@ -689,6 +729,7 @@ exports.threeDotsSvg = threeDotsSvg;
 exports.MetamaskMenu = MetamaskMenu;
 exports.UserPercentageGains = UserPercentageGains;
 exports.UserTokenBox = UserTokenBox;
+exports.UserPendingBox = UserPendingBox;
 exports.UserFloatEarnedFromStake = UserFloatEarnedFromStake;
 exports.UserStakeBox = UserStakeBox;
 exports.UserMarketStakeOrRedeem = UserMarketStakeOrRedeem;
