@@ -6,6 +6,6 @@ type marketInfo = {
 let marketsInfoData: array<marketInfo> = %raw(`require('./market-data.json')`)
 
 let getMarketInfoUnsafe = index =>
-  marketsInfoData[index]->Option.getWithDefault({name: "", description: ""})
+  marketsInfoData[index - 1]->Option.getWithDefault({name: "", description: ""})
 
 // NOTE: no validation happens on the marketsInfoData. IT IS NOT TYPE SAFE.

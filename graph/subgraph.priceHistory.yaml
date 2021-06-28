@@ -6,7 +6,7 @@ dataSources:
     name: LongShort
     network: ganache
     source:
-      address: "0xa9e638f77Eea6036D05F00d0AC55169357De114E"
+      address: "0x690d863d8Ea03BF4bFaa2DD869Da1c81d9894b6e"
       abi: LongShort
       startBlock: 0
     mapping:
@@ -20,7 +20,7 @@ dataSources:
         - name: LongShort
           file: ./abis/LongShort.json
         - name: OracleManager
-          file: ./abis/OracleManager.json
+          file: ./abis/OracleManagerChainlink.json
       eventHandlers:
         - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
           handler: handleSyntheticTokenCreated
@@ -41,7 +41,7 @@ templates:
       apiVersion: 0.0.4
       abis:
         - name: OracleManager
-          file: ./abis/OracleManager.json
+          file: ./abis/OracleManagerChainlink.json
       language: wasm/assemblyscript
       entities: []
       eventHandlers: []

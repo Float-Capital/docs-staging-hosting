@@ -283,7 +283,7 @@ module UserTokenBox = {
           tokenName={`${isLong ? "fu" : "fd"}${symbol}`}
         />
       </div>
-      <div className=`pl-3 text-sm self-center`>
+      <div className=`pl-3 text-xs self-center`>
         {name->React.string}
         <br className=`mt-1` />
         {(isLong ? `Long↗️` : `Short↘️`)->React.string}
@@ -302,6 +302,47 @@ module UserTokenBox = {
       </div>
       <div className=`self-center`> {children} </div>
     </div>
+  }
+}
+module UserPendingBox = {
+  @react.component
+  let make = (
+    ~name,
+    ~isLong,
+    ~daiSpend,
+    ~txConfirmedTimestamp,
+    ~marketIndex,
+    ~rerenderCallback,
+  ) => {
+    let lastOracleTimestamp = DataHooks.useOracleLastUpdate(
+      ~marketIndex=marketIndex->Ethers.BigNumber.toNumber,
+    )
+
+    let oracleHeartbeatForMarket = 1200 //TODO
+
+    switch lastOracleTimestamp {
+    | Response(lastOracleUpdateTimestamp) =>
+      <div
+        className=`flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative`>
+        <div className="flex flex-row justify-between">
+          <div className=` text-sm self-center`> {name->React.string} </div>
+          <div className=` text-sm self-center`> {(isLong ? "Long" : "Short")->React.string} </div>
+          <div className=`flex  text-sm self-center`>
+            <img src={CONSTANTS.daiDisplayToken.iconUrl} className="h-5 pr-1" />
+            {daiSpend->Ethers.Utils.formatEther->React.string}
+          </div>
+        </div>
+        <p> {lastOracleUpdateTimestamp->Ethers.BigNumber.toString->React.string} </p>
+        <ProgressBar
+          txConfirmedTimestamp
+          nextPriceUpdateTimestamp={lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber +
+            oracleHeartbeatForMarket}
+          rerenderCallback
+        />
+      </div>
+    | GraphError(error) => <p> {error->React.string} </p>
+    | Loading => <Loader.Tiny />
+    }
   }
 }
 

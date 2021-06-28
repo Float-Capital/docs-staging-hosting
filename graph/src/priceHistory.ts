@@ -27,7 +27,8 @@ export function createOracle(
   marketIndex: BigInt,
   marketName: string,
   marketSymbol: string,
-  latestPrice: BigInt
+  latestPrice: BigInt,
+  blockTimestamp: BigInt
 ): Oracle {
   let oracle = new Oracle(oracleAddress.toHex());
   oracle.address = oracleAddress;
@@ -35,6 +36,7 @@ export function createOracle(
   oracle.marketName = marketName;
   oracle.marketSymbol = marketSymbol;
   oracle.latestPrice = latestPrice;
+  oracle.lastUpdatedTimestamp = blockTimestamp;
   oracle.active = true;
   oracle.priceIntervals = [];
 
@@ -55,6 +57,7 @@ export function updateOracle(
   oracle.marketName = prevOracle.marketName;
   oracle.marketSymbol = prevOracle.marketSymbol;
   oracle.latestPrice = prevOracle.latestPrice;
+  oracle.lastUpdatedTimestamp = prevOracle.lastUpdatedTimestamp;
   oracle.active = true;
   oracle.priceIntervals = prevOracle.priceIntervals;
 
@@ -140,7 +143,8 @@ export function handleSyntheticTokenCreated(
     marketIndex,
     marketName,
     marketSymbol,
-    currentOraclePrice
+    currentOraclePrice,
+    timestamp
   );
 
   for (let i = 0; i < PRICE_HISTORY_INTERVALS.length; ++i) {
@@ -225,6 +229,11 @@ export function handleBlock(block: ethereum.Block): void {
           oracle.address as Address
         );
 
+        if (oracle.latestPrice != null) {
+          if (oracle.latestPrice != currentOraclePrice) {
+            oracle.lastUpdatedTimestamp = timestamp;
+          }
+        }
         oracle.latestPrice = currentOraclePrice;
 
         // FIVE_MINUTES_IN_SECONDS;

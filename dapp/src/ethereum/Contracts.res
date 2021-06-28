@@ -9,6 +9,7 @@ module LongShort = {
       "function mintShortNextPrice(uint32 marketIndex,uint256 amount) @1170000",
       "function redeemLongNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
       "function redeemShortNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
+      "function executeOutstandingNextPriceSettlementsUser(address user,uint32 marketIndex) @130000",
       "function _updateSystemState()",
     ]->Ethers.makeAbi
 
@@ -39,6 +40,12 @@ module LongShort = {
     ~marketIndex: Ethers.BigNumber.t,
     ~tokensToRedeem: Ethers.BigNumber.t,
   ) => JsPromise.t<Ethers.txSubmitted> = "redeemShortNextPrice"
+  @send
+  external executeOutstandingNextPriceSettlementsUser: (
+    ~contract: t,
+    ~user: Ethers.ethAddress,
+    ~marketIndex: Ethers.BigNumber.t,
+  ) => JsPromise.t<Ethers.txSubmitted> = "executeOutstandingNextPriceSettlementsUser"
   @send
   external _updateSystemState: (~contract: t) => JsPromise.t<Ethers.txSubmitted> =
     "_updateSystemState"
