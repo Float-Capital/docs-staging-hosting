@@ -35,7 +35,7 @@ module LongShortHelpers = {
     let%AwaitThen badLiquidityEntryFee =
       longShort->LongShort.badLiquidityEntryFee(marketIndex);
 
-    let%Await feeUnitsOfPrecision = longShort->LongShort.feeUnitsOfPrecision;
+    let%Await feeUnitsOfPrecision = longShort->LongShort.tEN_TO_THE_5;
 
     let baseFee = bnFromInt(0); //amount->mul(baseEntryFee)->div(feeUnitsOfPrecision);
     if (valueInEntrySide->bnGte(valueInOtherSide)) {
@@ -67,7 +67,7 @@ module LongShortHelpers = {
     let%AwaitThen badLiquidityExitFee =
       longShort->LongShort.badLiquidityExitFee(marketIndex);
 
-    let%Await feeUnitsOfPrecision = longShort->LongShort.feeUnitsOfPrecision;
+    let%Await feeUnitsOfPrecision = longShort->LongShort.tEN_TO_THE_5;
 
     let baseFee = CONSTANTS.zeroBn;
     if (valueInOtherSide->bnGte(valueInRemovalSide)) {

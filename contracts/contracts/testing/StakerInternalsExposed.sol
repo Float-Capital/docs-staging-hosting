@@ -36,16 +36,16 @@ contract StakerInternalsExposed is StakerMockable {
         syntheticTokens[marketIndex].shortToken = shortToken;
 
         syntheticRewardParams[marketIndex][newLatestRewardIndex]
-            .accumulativeFloatPerLongToken = accumulativeFloatPerTokenLatestLong;
+        .accumulativeFloatPerLongToken = accumulativeFloatPerTokenLatestLong;
 
         syntheticRewardParams[marketIndex][usersLatestClaimedReward]
-            .accumulativeFloatPerLongToken = accumulativeFloatPerTokenUserLong;
+        .accumulativeFloatPerLongToken = accumulativeFloatPerTokenUserLong;
 
         syntheticRewardParams[marketIndex][newLatestRewardIndex]
-            .accumulativeFloatPerShortToken = accumulativeFloatPerTokenLatestShort;
+        .accumulativeFloatPerShortToken = accumulativeFloatPerTokenLatestShort;
 
         syntheticRewardParams[marketIndex][usersLatestClaimedReward]
-            .accumulativeFloatPerShortToken = accumulativeFloatPerTokenUserShort;
+        .accumulativeFloatPerShortToken = accumulativeFloatPerTokenUserShort;
 
         userAmountStaked[longToken][user] = newUserAmountStakedLong;
         userAmountStaked[shortToken][user] = newUserAmountStakedShort;
@@ -63,7 +63,7 @@ contract StakerInternalsExposed is StakerMockable {
         syntheticRewardParams[marketIndex][0].timestamp = 0; // don't test with 0
         syntheticRewardParams[marketIndex][0].accumulativeFloatPerLongToken = 1;
         syntheticRewardParams[marketIndex][0]
-            .accumulativeFloatPerShortToken = 1;
+        .accumulativeFloatPerShortToken = 1;
 
         syntheticTokens[marketIndex].longToken = mockAddress;
         syntheticTokens[marketIndex].shortToken = mockAddress;
@@ -84,6 +84,61 @@ contract StakerInternalsExposed is StakerMockable {
         syntheticRewardParams[marketIndex][0].timestamp = timestamp;
     }
 
+    function setCalculateTimeDeltaParams(
+        uint32 marketIndex,
+        uint256 latestRewardIndexForMarket,
+        uint256 timestamp
+    ) external {
+        latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
+        syntheticRewardParams[marketIndex][latestRewardIndexForMarket]
+        .timestamp = timestamp;
+    }
+
+    function setCalculateNewCumulativeRateParams(
+        uint32 marketIndex,
+        uint256 latestRewardIndexForMarket,
+        uint256 accumFloatLong,
+        uint256 accumFloatShort
+    ) external {
+        latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
+        syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
+        .accumulativeFloatPerLongToken = accumFloatLong;
+
+        syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
+        .accumulativeFloatPerShortToken = accumFloatShort;
+    }
+
+    function setSetRewardObjectsParams(
+        uint32 marketIndex,
+        uint256 latestRewardIndexForMarket
+    ) external {
+        latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
+    }
+
+    function set_updateStateParams(
+        ILongShort longShort,
+        ISyntheticToken token,
+        uint32 tokenMarketIndex
+    ) public {
+        longShortCoreContract = longShort;
+        marketIndexOfToken[token] = tokenMarketIndex;
+    }
+
+    function set_mintFloatParams(
+        IFloatToken _floatToken,
+        uint16 _floatPercentage
+    ) public {
+        floatToken = _floatToken;
+        floatPercentage = _floatPercentage;
+    }
+
+    function setMintAccumulatedFloatParams(
+        uint32 marketIndex,
+        uint256 latestRewardIndexForMarket
+    ) public {
+        latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
+    }
+
     ///////////////////////////////////////////
     //////////// EXPOSED Functions ////////////
     ///////////////////////////////////////////
@@ -92,6 +147,27 @@ contract StakerInternalsExposed is StakerMockable {
         returns (uint256 longFloatReward, uint256 shortFloatReward)
     {
         return calculateAccumulatedFloat(marketIndex, user);
+    }
+
+    function calculateFloatPerSecondExposed(
+        uint32 marketIndex,
+        uint256 longPrice,
+        uint256 shortPrice,
+        uint256 longValue,
+        uint256 shortValue
+    )
+        external
+        view
+        returns (uint256 longFloatPerSecond, uint256 shortFloatPerSecond)
+    {
+        return
+            calculateFloatPerSecond(
+                marketIndex,
+                longPrice,
+                shortPrice,
+                longValue,
+                shortValue
+            );
     }
 
     function mintAccumulatedFloatExternal(uint32 marketIndex, address user)
@@ -128,11 +204,60 @@ contract StakerInternalsExposed is StakerMockable {
         return getMarketLaunchIncentiveParameters(marketIndex);
     }
 
+    function calculateTimeDeltaExposed(uint32 marketIndex)
+        external
+        view
+        returns (uint256)
+    {
+        return calculateTimeDelta(marketIndex);
+    }
+
+    function calculateNewCumulativeRateExposed(
+        uint32 marketIndex,
+        uint256 longPrice,
+        uint256 shortPrice,
+        uint256 longValue,
+        uint256 shortValue
+    )
+        external
+        view
+        returns (uint256 longCumulativeRates, uint256 shortCumulativeRates)
+    {
+        return
+            calculateNewCumulativeRate(
+                marketIndex,
+                longPrice,
+                shortPrice,
+                longValue,
+                shortValue
+            );
+    }
+
     function getKValueExternal(uint32 marketIndex)
         external
         view
         returns (uint256)
     {
         return getKValue(marketIndex);
+    }
+
+    function setRewardObjectsExternal(
+        uint32 marketIndex,
+        uint256 longPrice,
+        uint256 shortPrice,
+        uint256 longValue,
+        uint256 shortValue
+    ) external {
+        setRewardObjects(
+            marketIndex,
+            longPrice,
+            shortPrice,
+            longValue,
+            shortValue
+        );
+    }
+
+    function _updateStateExternal(ISyntheticToken token) external {
+        _updateState(token);
     }
 }

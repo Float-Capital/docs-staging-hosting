@@ -8,10 +8,18 @@ var Helpers = require("./library/Helpers.js");
 var Contract = require("./library/Contract.js");
 var CONSTANTS = require("./CONSTANTS.js");
 var GetKValue = require("./tests/stake/GetKValue.js");
+var MintFloat = require("./tests/stake/MintFloat.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
+var UpdateState = require("./tests/stake/UpdateState.js");
 var HelperActions = require("./library/HelperActions.js");
+var SetRewardObjects = require("./tests/stake/SetRewardObjects.js");
 var AddNewStakingFund = require("./tests/stake/AddNewStakingFund.js");
+var CalculateTimeDelta = require("./tests/stake/CalculateTimeDelta.js");
+var MintAccumulatedFloat = require("./tests/stake/MintAccumulatedFloat.js");
+var CalculateFloatPerSecond = require("./tests/stake/CalculateFloatPerSecond.js");
 var CalculateAccumulatedFloat = require("./tests/stake/CalculateAccumulatedFloat.js");
+var AddNewStateForFloatRewards = require("./tests/stake/AddNewStateForFloatRewards.js");
+var CalculateNewCumulativeRate = require("./tests/stake/CalculateNewCumulativeRate.js");
 var GetMarketLaunchIncentiveParameters = require("./tests/stake/GetMarketLaunchIncentiveParameters.js");
 var ChangeMarketLaunchIncentiveParameters = require("./tests/stake/ChangeMarketLaunchIncentiveParameters.js");
 
@@ -79,12 +87,20 @@ describe("Float System", (function () {
                                           }));
                             });
                         CalculateAccumulatedFloat.test(contracts);
-                        return GetMarketLaunchIncentiveParameters.test(contracts);
+                        GetMarketLaunchIncentiveParameters.test(contracts);
+                        return CalculateTimeDelta.test(contracts);
                       }));
                 describe("", (function () {
                         ChangeMarketLaunchIncentiveParameters.test(contracts, accounts);
                         AddNewStakingFund.test(contracts, accounts);
-                        return GetKValue.test(contracts, accounts);
+                        GetKValue.test(contracts, accounts);
+                        CalculateFloatPerSecond.test(contracts, accounts);
+                        CalculateNewCumulativeRate.test(contracts, accounts);
+                        SetRewardObjects.test(contracts, accounts);
+                        AddNewStateForFloatRewards.test(contracts, accounts);
+                        UpdateState.test(contracts, accounts);
+                        MintFloat.test(contracts, accounts);
+                        return MintAccumulatedFloat.test(contracts, accounts);
                       }));
                 
               }));

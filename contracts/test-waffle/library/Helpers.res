@@ -8,7 +8,7 @@ type markets = {
   marketIndex: int,
 }
 type coreContracts = {
-  // floatCapital_v0: Contract.FloatCapital_v0.t,
+  floatCapital_v0: FloatCapital_v0.t,
   tokenFactory: TokenFactory.t,
   treasury: Treasury_v0.t,
   floatToken: FloatToken.t,
@@ -17,8 +17,21 @@ type coreContracts = {
   markets: array<markets>,
 }
 
+module Tuple = {
+  let make2 = fn => (fn(), fn())
+  let make3 = fn => (fn(), fn(), fn())
+  let make4 = fn => (fn(), fn(), fn(), fn())
+  let make5 = fn => (fn(), fn(), fn(), fn(), fn())
+  let make6 = fn => (fn(), fn(), fn(), fn(), fn(), fn())
+  let make7 = fn => (fn(), fn(), fn(), fn(), fn(), fn(), fn())
+  let make8 = fn => (fn(), fn(), fn(), fn(), fn(), fn(), fn(), fn())
+}
+
 @ocaml.doc(`Generates random BigNumber between 1 and 2147483647 (max js int)`)
 let randomInteger = () => Js.Math.random_int(1, Js.Int.max)->Ethers.BigNumber.fromInt
+
+@ocaml.doc(`Generates a random JS integer between 0 and 2147483647 (max js int)`)
+let randomJsInteger = () => Js.Math.random_int(0, Js.Int.max)
 
 @ocaml.doc(`Generates random BigNumber between 0.00001 and 21474.83647 of a token (10^18 in BigNumber units)`)
 let randomTokenAmount = () =>
@@ -197,6 +210,7 @@ let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
         tokenFactory: tokenFactory,
         treasury: treasury,
         markets: markets,
+        floatCapital_v0: floatCapital,
       })
     })
   })

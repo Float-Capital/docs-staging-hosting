@@ -18,8 +18,92 @@ var FloatCapital_v0 = require("./contracts/FloatCapital_v0.js");
 var YieldManagerMock = require("./contracts/YieldManagerMock.js");
 var OracleManagerMock = require("./contracts/OracleManagerMock.js");
 
+function make2(fn) {
+  return [
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined)
+        ];
+}
+
+function make3(fn) {
+  return [
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined)
+        ];
+}
+
+function make4(fn) {
+  return [
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined)
+        ];
+}
+
+function make5(fn) {
+  return [
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined)
+        ];
+}
+
+function make6(fn) {
+  return [
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined)
+        ];
+}
+
+function make7(fn) {
+  return [
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined)
+        ];
+}
+
+function make8(fn) {
+  return [
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined),
+          Curry._1(fn, undefined)
+        ];
+}
+
+var Tuple = {
+  make2: make2,
+  make3: make3,
+  make4: make4,
+  make5: make5,
+  make6: make6,
+  make7: make7,
+  make8: make8
+};
+
 function randomInteger(param) {
   return ethers.BigNumber.from(Js_math.random_int(1, Js_int.max));
+}
+
+function randomJsInteger(param) {
+  return Js_math.random_int(0, Js_int.max);
 }
 
 function randomTokenAmount(param) {
@@ -143,6 +227,7 @@ function inititialize(admin, exposeInternals) {
                                                   });
                                       }).then(function (markets) {
                                       return {
+                                              floatCapital_v0: floatCapital,
                                               tokenFactory: tokenFactory,
                                               treasury: treasury,
                                               floatToken: floatToken,
@@ -165,7 +250,9 @@ function getRandomTimestampInPast(param) {
             });
 }
 
+exports.Tuple = Tuple;
 exports.randomInteger = randomInteger;
+exports.randomJsInteger = randomJsInteger;
 exports.randomTokenAmount = randomTokenAmount;
 exports.randomMintLongShort = randomMintLongShort;
 exports.randomAddress = randomAddress;

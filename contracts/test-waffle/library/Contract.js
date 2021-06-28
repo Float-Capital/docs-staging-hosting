@@ -28,7 +28,7 @@ var DataFetchers = {
 
 function getFeesMint(longShort, marketIndex, amount, valueInEntrySide, valueInOtherSide) {
   return LetOps.AwaitThen.let_(longShort.badLiquidityEntryFee(marketIndex), (function (badLiquidityEntryFee) {
-                return LetOps.Await.let_(longShort.feeUnitsOfPrecision(), (function (feeUnitsOfPrecision) {
+                return LetOps.Await.let_(longShort.TEN_TO_THE_5(), (function (feeUnitsOfPrecision) {
                               var baseFee = Globals.bnFromInt(0);
                               if (Globals.bnGte(valueInEntrySide, valueInOtherSide)) {
                                 return Globals.add(baseFee, Globals.div(Globals.mul(amount, badLiquidityEntryFee), feeUnitsOfPrecision));
@@ -45,7 +45,7 @@ function getFeesMint(longShort, marketIndex, amount, valueInEntrySide, valueInOt
 
 function getFeesRedeemLazy(longShort, marketIndex, amount, valueInRemovalSide, valueInOtherSide) {
   return LetOps.AwaitThen.let_(longShort.badLiquidityExitFee(marketIndex), (function (badLiquidityExitFee) {
-                return LetOps.Await.let_(longShort.feeUnitsOfPrecision(), (function (feeUnitsOfPrecision) {
+                return LetOps.Await.let_(longShort.TEN_TO_THE_5(), (function (feeUnitsOfPrecision) {
                               if (Globals.bnGte(valueInOtherSide, valueInRemovalSide)) {
                                 return Globals.add(CONSTANTS.zeroBn, Globals.div(Globals.mul(amount, badLiquidityExitFee), feeUnitsOfPrecision));
                               }
