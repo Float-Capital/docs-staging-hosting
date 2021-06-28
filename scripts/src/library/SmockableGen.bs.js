@@ -14,6 +14,8 @@ function solASTTypeToRescriptType(typeDescrStr) {
   switch (typeDescrStr) {
     case "bool" :
         return "bool";
+    case "bytes32" :
+    case "bytes4" :
     case "string" :
         return "string";
     case "uint16[]" :

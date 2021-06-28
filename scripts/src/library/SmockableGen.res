@@ -15,6 +15,8 @@ let solASTTypeToRescriptType = typeDescrStr =>
   switch typeDescrStr {
   | "bool" => "bool"
   | "string" => "string"
+  | "bytes32" => "string"
+  | "bytes4" => "string"
   | "int8"
   | "int16"
   | "int32"
