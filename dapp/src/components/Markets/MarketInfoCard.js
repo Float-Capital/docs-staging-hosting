@@ -6,7 +6,7 @@ var Backend = require("../../mockBackend/Backend.js");
 
 function MarketInfoCard(Props) {
   var marketIndex = Props.marketIndex;
-  var marketInfo = Backend.getMarketInfoUnsafe(marketIndex - 1 | 0);
+  var marketInfo = Backend.getMarketInfoUnsafe(marketIndex);
   return React.createElement("div", {
               className: "flex-1 w-full h-full min-h-10 max-h-60 rounded-lg flex flex-col        overflow-y-scroll bg-white bg-opacity-70 shadow-lg"
             }, React.createElement("div", {

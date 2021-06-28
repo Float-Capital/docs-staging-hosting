@@ -113,7 +113,7 @@ fragment SyntheticMarketInfo on SyntheticMarket {
 }
 
 # Used in:
-#   Queries: UsersBalance, UserBalances
+#   Queries: UsersBalance, UsersBalances
 fragment UserTokenBalance on UserSyntheticTokenBalance {
   id
   tokenBalance
@@ -121,6 +121,25 @@ fragment UserTokenBalance on UserSyntheticTokenBalance {
   syntheticToken {
     ...SyntheticTokenInfo
   }
+}
+
+# Used in:
+#   Queries: useUsersConfirmedMints
+fragment UserConfirmedMints on UserNextPriceAction {
+  id    
+  marketIndex
+  amountPaymentTokenForDepositLong
+  amountPaymentTokenForDepositShort  
+}
+
+# Used in:
+#   Queries: useUsersPendingMints
+fragment UserPendingMints on UserNextPriceAction {
+  id    
+  marketIndex
+  amountPaymentTokenForDepositLong
+  amountPaymentTokenForDepositShort
+  confirmedTimestamp
 }
 
 # TODO: Break this up into smaller fragments, find more overlap between 'CurrentStakeDetailed' and 'CurrentStakeHighLevel'
@@ -200,6 +219,26 @@ query ($userId: String!) {
   user (id: $userId) {
     tokenBalances { # Maybe we can filter to only get balances greater than 0? Probably not worth it.
       ...UserTokenBalance
+    }
+  }
+}`)
+
+// Used externally in: useUsersPendingMints (datahook), User.res
+module UsersPendingMints = %graphql(`
+query ($userId: String!) {
+  user (id: $userId) {
+    pendingNextPriceActions { 
+      ...UserPendingMints
+    }
+  }
+}`)
+
+// Used externally in: useUsersConfirmedMints (datahook), User.res
+module UsersConfirmedMints = %graphql(`
+query ($userId: String!) {
+  user (id: $userId) {
+    confirmedNextPriceActions { 
+      ...UserConfirmedMints
     }
   }
 }`)
@@ -306,5 +345,13 @@ query ($intervalId: String!, $numDataPoints: Int!) @ppxConfig(schema: "graphql_s
       startTimestamp @ppxCustom(module: "Date")
       endPrice
     }
+  }
+}`)
+
+module OraclesLastUpdate = %graphql(`
+query ($marketIndex: Int!) @ppxConfig(schema: "graphql_schema_price_history.json") {  
+  oracles (where: {marketIndex: $marketIndex}){
+    id
+		lastUpdatedTimestamp
   }
 }`)

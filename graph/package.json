@@ -7,6 +7,7 @@
     "create-price-history-local": "graph create float-capital/float-oracle-prices --node http://127.0.0.1:8020",
     "codegen": "graph codegen",
     "codegen-price-history": "graph codegen -o generated-price-history subgraph.priceHistory.yaml",
+    "codegen-price-history-mumbai": "graph codegen -o generated-price-history subgraph.priceHistory.mumbai.yaml",
     "build": "graph build",
     "build-price-history": "graph build subgraph.priceHistory.yaml",
     "deploy-mainnet": "graph deploy float-capital/float-capital --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",

@@ -326,6 +326,138 @@ function useUsersBalances(userId) {
   }
 }
 
+function useUsersPendingMints(userId) {
+  var usersPendingMintsQuery = Curry.app(Queries.UsersPendingMints.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: userId
+        }
+      ]);
+  var match = usersPendingMintsQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.user;
+    if (match$1 === undefined) {
+      return {
+              TAG: 1,
+              _0: [{
+                  isLong: false,
+                  amount: CONSTANTS.zeroBN,
+                  marketIndex: CONSTANTS.zeroBN,
+                  confirmedTimestamp: CONSTANTS.zeroBN
+                }],
+              [Symbol.for("name")]: "Response"
+            };
+    }
+    var result = Belt_Array.map(Belt_Array.keep(match$1.pendingNextPriceActions, (function (pendingNextPriceAction) {
+                if (pendingNextPriceAction.amountPaymentTokenForDepositShort.gt(CONSTANTS.zeroBN)) {
+                  return true;
+                } else {
+                  return pendingNextPriceAction.amountPaymentTokenForDepositLong.gt(CONSTANTS.zeroBN);
+                }
+              })), (function (pendingNextPriceAction) {
+            var isLong = pendingNextPriceAction.amountPaymentTokenForDepositLong.gt(CONSTANTS.zeroBN);
+            return {
+                    isLong: isLong,
+                    amount: isLong ? pendingNextPriceAction.amountPaymentTokenForDepositLong : pendingNextPriceAction.amountPaymentTokenForDepositShort,
+                    marketIndex: pendingNextPriceAction.marketIndex,
+                    confirmedTimestamp: pendingNextPriceAction.confirmedTimestamp
+                  };
+          }));
+    return {
+            TAG: 1,
+            _0: result,
+            [Symbol.for("name")]: "Response"
+          };
+  }
+  var match$2 = usersPendingMintsQuery.error;
+  if (match$2 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
+function useUsersConfirmedMints(userId) {
+  var usersConfirmedMintsQuery = Curry.app(Queries.UsersConfirmedMints.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        /* NetworkOnly */3,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: userId
+        }
+      ]);
+  var match = usersConfirmedMintsQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.user;
+    if (match$1 === undefined) {
+      return {
+              TAG: 1,
+              _0: [{
+                  isLong: false,
+                  amount: CONSTANTS.zeroBN,
+                  marketIndex: CONSTANTS.zeroBN
+                }],
+              [Symbol.for("name")]: "Response"
+            };
+    }
+    var result = Belt_Array.map(Belt_Array.keep(match$1.confirmedNextPriceActions, (function (confirmedNextPriceAction) {
+                if (confirmedNextPriceAction.amountPaymentTokenForDepositShort.gt(CONSTANTS.zeroBN)) {
+                  return true;
+                } else {
+                  return confirmedNextPriceAction.amountPaymentTokenForDepositLong.gt(CONSTANTS.zeroBN);
+                }
+              })), (function (confirmedNextPriceAction) {
+            var isLong = confirmedNextPriceAction.amountPaymentTokenForDepositLong.gt(CONSTANTS.zeroBN);
+            return {
+                    isLong: isLong,
+                    amount: isLong ? confirmedNextPriceAction.amountPaymentTokenForDepositLong : confirmedNextPriceAction.amountPaymentTokenForDepositShort,
+                    marketIndex: confirmedNextPriceAction.marketIndex
+                  };
+          }));
+    return {
+            TAG: 1,
+            _0: result,
+            [Symbol.for("name")]: "Response"
+          };
+  }
+  var match$2 = usersConfirmedMintsQuery.error;
+  if (match$2 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
 function useFloatBalancesForUser(userId) {
   var usersStateQuery = Curry.app(Queries.UserQuery.use, [
         undefined,
@@ -770,6 +902,45 @@ function useSyntheticPrices(param, tokenAddress, isLong) {
   return liftGraphResponse2(initialTokenPriceResponse, finalPriceResponse);
 }
 
+function useOracleLastUpdate(marketIndex) {
+  var oracleLastUpdateQuery = Curry.app(Queries.OraclesLastUpdate.use, [
+        undefined,
+        Caml_option.some(Client.createContext(/* PriceHistory */1)),
+        undefined,
+        undefined,
+        /* NetworkOnly */3,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          marketIndex: marketIndex
+        }
+      ]);
+  var match = oracleLastUpdateQuery.data;
+  if (match !== undefined) {
+    return {
+            TAG: 1,
+            _0: match.oracles[0].lastUpdatedTimestamp,
+            [Symbol.for("name")]: "Response"
+          };
+  }
+  var match$1 = oracleLastUpdateQuery.error;
+  if (match$1 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$1.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
 var ethAdrToLowerStr = Globals.ethAdrToLowerStr;
 
 exports.liftGraphResponse2 = liftGraphResponse2;
@@ -779,6 +950,8 @@ exports.useTotalClaimableFloatForUser = useTotalClaimableFloatForUser;
 exports.useClaimableFloatForUser = useClaimableFloatForUser;
 exports.useStakesForUser = useStakesForUser;
 exports.useUsersBalances = useUsersBalances;
+exports.useUsersPendingMints = useUsersPendingMints;
+exports.useUsersConfirmedMints = useUsersConfirmedMints;
 exports.useFloatBalancesForUser = useFloatBalancesForUser;
 exports.useBasicUserInfo = useBasicUserInfo;
 exports.useSyntheticTokenBalance = useSyntheticTokenBalance;
@@ -788,4 +961,5 @@ exports.Util = Util;
 exports.useTokenMarketId = useTokenMarketId;
 exports.getUnixTime = getUnixTime;
 exports.useSyntheticPrices = useSyntheticPrices;
+exports.useOracleLastUpdate = useOracleLastUpdate;
 /* Misc Not a pure module */
