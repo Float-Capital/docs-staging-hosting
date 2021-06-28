@@ -20,4 +20,24 @@ type dateFormats = [
 @module("date-fns/formatDistanceToNow")
 external formatDistanceToNow: Js.Date.t => string = "default"
 
+type durationTimeFormat = {
+  years: int,
+  months: int,
+  weeks: int,
+  days: int,
+  hours: int,
+  minutes: int,
+  seconds: int,
+}
+
+type durationFormatOutput = {format: array<string>}
+
+@module("date-fns/formatDuration")
+external formatDuration: (durationTimeFormat, durationFormatOutput) => string = "default"
+
+type interval = {start: Js_date.t, end: Js_date.t}
+
+@module("date-fns/intervalToDuration")
+external intervalToDuration: interval => durationTimeFormat = "default"
+
 @module("date-fns/fromUnixTime") external fromUnixTime: float => Js.Date.t = "default"

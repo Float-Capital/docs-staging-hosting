@@ -598,7 +598,7 @@ contract StakerMockable is IStaker, Initializable {
     }
   
                 (uint256 floatToMintLong, uint256 floatToMintShort) =
-            calculateAccumulatedFloat(marketIndex, msg.sender);
+            calculateAccumulatedFloat(marketIndex, user);
 
         uint256 floatToMint = floatToMintLong + floatToMintShort;
         if (floatToMint > 0) {

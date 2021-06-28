@@ -5,6 +5,7 @@ var Chai = require("../../bindings/chai/Chai.js");
 var LetOps = require("../../library/LetOps.js");
 var Globals = require("../../library/Globals.js");
 var Helpers = require("../../library/Helpers.js");
+var Contract = require("../../library/Contract.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 
 function testIntegration(contracts, accounts) {
@@ -31,7 +32,7 @@ function testIntegration(contracts, accounts) {
                                                                                                                                   return LetOps.AwaitThen.let_(longShort.connect(testUser).mintLongNextPrice(marketIndex, Globals.bnFromInt(0)), (function (param) {
                                                                                                                                                 return LetOps.AwaitThen.let_(longSynth.balanceOf(testUser.address), (function (usersUpdatedBalance) {
                                                                                                                                                               Chai.bnEqual("Balance after price system update but before user settlement should be the same as after settlement", usersBalanceBeforeSettlement, usersUpdatedBalance);
-                                                                                                                                                              return LetOps.Await.let_(longShort.syntheticTokenPrice(marketIndex, true), (function (longTokenPrice) {
+                                                                                                                                                              return LetOps.Await.let_(Contract.LongShortHelpers.getSyntheticTokenPrice(longShort, marketIndex, true), (function (longTokenPrice) {
                                                                                                                                                                             var expectedNumberOfTokensToRecieve = Globals.div(Globals.mul(amountToNextPriceMint, CONSTANTS.tenToThe18), longTokenPrice);
                                                                                                                                                                             return Chai.bnEqual("balance is incorrect", expectedNumberOfTokensToRecieve, usersUpdatedBalance);
                                                                                                                                                                           }));

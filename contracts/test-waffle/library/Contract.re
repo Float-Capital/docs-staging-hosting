@@ -35,7 +35,7 @@ module LongShortHelpers = {
     let%AwaitThen badLiquidityEntryFee =
       longShort->LongShort.badLiquidityEntryFee(marketIndex);
 
-    let%Await feeUnitsOfPrecision = longShort->LongShort.feeUnitsOfPrecision;
+    let%Await feeUnitsOfPrecision = longShort->LongShort.tEN_TO_THE_5;
 
     let baseFee = bnFromInt(0); //amount->mul(baseEntryFee)->div(feeUnitsOfPrecision);
     if (valueInEntrySide->bnGte(valueInOtherSide)) {
@@ -67,7 +67,7 @@ module LongShortHelpers = {
     let%AwaitThen badLiquidityExitFee =
       longShort->LongShort.badLiquidityExitFee(marketIndex);
 
-    let%Await feeUnitsOfPrecision = longShort->LongShort.feeUnitsOfPrecision;
+    let%Await feeUnitsOfPrecision = longShort->LongShort.tEN_TO_THE_5;
 
     let baseFee = CONSTANTS.zeroBn;
     if (valueInOtherSide->bnGte(valueInRemovalSide)) {
@@ -105,6 +105,30 @@ module LongShortHelpers = {
       );
     {longValue, shortValue};
   };
+  let getSyntheticTokenPrice = 
+    (
+      longShort,
+      ~marketIndex,
+      ~isLong,
+    ) => {
+      let%AwaitThen syntheticTokenAddress = longShort->LongShort.syntheticTokens(marketIndex, isLong);
+      let%AwaitThen synthContract =
+        ContractHelpers.attachToContract(
+          "SyntheticToken",
+          ~contractAddress=syntheticTokenAddress,
+        );
+      let%AwaitThen totalSupply = synthContract->Obj.magic->SyntheticToken.totalSupply;
+
+      let%Await syntheticTokenPoolValue = 
+         longShort->LongShort.syntheticTokenPoolValue(marketIndex, isLong);
+
+      let syntheticTokenPrice = 
+         syntheticTokenPoolValue
+         ->mul(CONSTANTS.tenToThe18)
+         ->div(totalSupply);
+
+      syntheticTokenPrice;
+    };
 };
 
 module SyntheticTokenHelpers = {
