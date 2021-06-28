@@ -6,6 +6,7 @@
     "create-local": "graph create float-capital/float-capital --node http://127.0.0.1:8020",
     "create-price-history-local": "graph create float-capital/float-oracle-prices --node http://127.0.0.1:8020",
     "codegen": "graph codegen",
+    "graph-command": "graph",
     "codegen-price-history": "graph codegen -o generated-price-history subgraph.priceHistory.yaml",
     "codegen-price-history-mumbai": "graph codegen -o generated-price-history subgraph.priceHistory.mumbai.yaml",
     "build": "graph build",
@@ -26,10 +27,13 @@
     "test-codegen": "node ./test/util/Codegen.bs.js > ./test/stateChanges/Converters.res",
     "test": "jest test"
   },
-  "devDependencies": {
-    "@apollo/client": "^3.3.16",
+  "dependencies": {
     "@graphprotocol/graph-cli": "^0.20.0",
     "@graphprotocol/graph-ts": "^0.20.0",
+    "semver": "^7.3.5"
+  },
+  "devDependencies": {
+    "@apollo/client": "^3.3.16",
     "@reasonml-community/graphql-ppx": "^1.2.0",
     "decco": "^1.4.0",
     "dotenv": "^8.2.0",

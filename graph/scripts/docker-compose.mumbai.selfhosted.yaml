@@ -1,0 +1,49 @@
+version: "3"
+services:
+  graph-node:
+    image: graphprotocol/graph-node:v0.22.0
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    depends_on:
+      - ipfs
+      - postgres
+    environment:
+      postgres_host: postgres
+      postgres_port: 5432
+      postgres_user: graph-node
+      postgres_pass: let-me-in
+      postgres_db: graph-node
+      ipfs: "ipfs:5001"
+      ethereum: "mumbai:https://rpc-mumbai.matic.today"
+      RUST_LOG: info
+
+  ipfs:
+    image: ipfs/go-ipfs:v0.4.23
+    volumes:
+      - ipfs-data:/data/ipfs
+
+  postgres:
+    image: postgres
+    command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
+    environment:
+      POSTGRES_USER: graph-node
+      POSTGRES_PASSWORD: let-me-in
+      POSTGRES_DB: graph-node
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  graph-deployer:
+    build:
+      context: ../
+      dockerfile: ./scripts/Dockerfile.graph.deployer
+    container_name: graph-deployer
+    depends_on:
+      - graph-node
+      - ipfs
+      - postgres
+
+volumes:
+  ganache-data:
+  ipfs-data:
+  postgres-data:

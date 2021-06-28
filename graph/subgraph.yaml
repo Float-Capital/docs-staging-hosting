@@ -24,7 +24,6 @@ dataSources:
         - OracleUpdated
         - PriceUpdate
         - SyntheticTokenCreated
-        - TokenPriceRefreshed
         - V1
         - ValueLockedInSystem
       abis:
@@ -51,8 +50,6 @@ dataSources:
           handler: handlePriceUpdate
         - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
           handler: handleSyntheticTokenCreated
-        - event: TokenPriceRefreshed(uint32,uint256,uint256)
-          handler: handleTokenPriceRefreshed
         - event: V1(address,address,address,address)
           handler: handleV1
         - event: ValueLockedInSystem(uint32,uint256,uint256,uint256)

@@ -46,8 +46,7 @@ dataSources:
           handler: handleShortMinted
         - event: ShortRedeem(uint32,uint256,uint256,uint256,address)
           handler: handleShortRedeem
-        - event: TokenPriceRefreshed(uint32,uint256,uint256)
-          handler: handleTokenPriceRefreshed
+
         - event: ValueLockedInSystem(uint32,uint256,uint256,uint256)
           handler: handleValueLockedInSystem
         - event: FeesChanges(uint32,uint256,uint256,uint256,uint256)
