@@ -9,6 +9,9 @@ cd ../graph/scripts
 docker-compose -f docker-compose.mumbai.selfhosted.yaml up --force-recreate --build -d
 docker image prune -f
 
+# Give it time start everything...
+sleep 60
+
 docker exec -ti graph-deployer sh -c "yarn graph-command create float-capital/float-capital --node http://graph-node:8020"
 docker exec -ti graph-deployer sh -c "yarn graph-command create float-capital/float-oracle-prices --node http://graph-node:8020"
 
