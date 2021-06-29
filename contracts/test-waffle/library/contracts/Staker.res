@@ -194,6 +194,14 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "_mintFloatExternal"
 
   @send
+  external _stakeExternal: (
+    t,
+    ~token: Ethers.ethAddress,
+    ~amount: Ethers.BigNumber.t,
+    ~user: Ethers.ethAddress,
+  ) => JsPromise.t<transaction> = "_stakeExternal"
+
+  @send
   external _updateStateExternal: (t, ~token: Ethers.ethAddress) => JsPromise.t<transaction> =
     "_updateStateExternal"
 
@@ -406,6 +414,12 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "setCalculateTimeDeltaParams"
 
   @send
+  external setClaimFloatCustomParams: (
+    t,
+    ~longshort: Ethers.ethAddress,
+  ) => JsPromise.t<transaction> = "setClaimFloatCustomParams"
+
+  @send
   external setFloatRewardCalcParams: (
     t,
     ~marketIndex: int,
@@ -474,6 +488,17 @@ module Exposed = {
     ~floatToken: Ethers.ethAddress,
     ~floatPercentage: int,
   ) => JsPromise.t<transaction> = "set_mintFloatParams"
+
+  @send
+  external set_stakeParams: (
+    t,
+    ~user: Ethers.ethAddress,
+    ~marketIndex: int,
+    ~latestRewardIndex: Ethers.BigNumber.t,
+    ~token: Ethers.ethAddress,
+    ~userAmountStaked: Ethers.BigNumber.t,
+    ~userLastRewardIndex: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "set_stakeParams"
 
   @send
   external set_updateStateParams: (

@@ -14,7 +14,7 @@ let bnEqual: (
 let recordEqualFlatLabeled: (~expected: 'a, ~actual: 'a) => unit = (~expected, ~actual) => {
   let a = %raw("(expected, actual) => {
     for(const key of Object.keys(actual)){
-      expect(actual[key]).equal(expected[key])
+      expect(actual[key]).to.equal(expected[key])
     }
   }")
   a(expected, actual)
@@ -23,7 +23,16 @@ let recordEqualFlatLabeled: (~expected: 'a, ~actual: 'a) => unit = (~expected, ~
 let recordEqualFlat: ('a, 'a) => unit = (expected, actual) => {
   let a = %raw("(expected, actual) => {
     for(const key of Object.keys(actual)){
-      expect(actual[key]).equal(expected[key])
+      expect(actual[key]).to.equal(expected[key])
+    }
+  }")
+  a(expected, actual)
+}
+
+let recordEqualDeep: ('a, 'a) => unit = (expected, actual) => {
+  let a = %raw("(expected, actual) => {
+    for(const key of Object.keys(actual)){
+      expect(actual[key]).to.deep.equal(expected[key])
     }
   }")
   a(expected, actual)
