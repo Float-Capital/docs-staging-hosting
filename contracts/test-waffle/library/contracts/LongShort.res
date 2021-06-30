@@ -244,11 +244,6 @@ type syntheticTokenPoolValueReturn = Ethers.BigNumber.t
 external syntheticTokenPoolValue: (t, int, bool) => JsPromise.t<syntheticTokenPoolValueReturn> =
   "syntheticTokenPoolValue"
 
-type syntheticTokenPriceReturn = Ethers.BigNumber.t
-@send
-external syntheticTokenPrice: (t, int, bool) => JsPromise.t<syntheticTokenPriceReturn> =
-  "syntheticTokenPrice"
-
 type syntheticTokenPriceSnapshotReturn = Ethers.BigNumber.t
 @send
 external syntheticTokenPriceSnapshot: (

@@ -14,7 +14,6 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - BatchedActionsSettled
         - ExecuteNextPriceSettlementsUser
         - FeesChanges
         - FeesLevied
@@ -24,14 +23,12 @@ dataSources:
         - OracleUpdated
         - PriceUpdate
         - SyntheticTokenCreated
+        - SystemStateUpdated
         - V1
-        - ValueLockedInSystem
       abis:
         - name: LongShort
           file: ./abis/LongShort.json
       eventHandlers:
-        - event: BatchedActionsSettled(uint32,uint256,uint256,uint256,uint256,uint256)
-          handler: handleBatchedActionsSettled
         - event: ExecuteNextPriceSettlementsUser(address,uint32)
           handler: handleExecuteNextPriceSettlementsUser
         - event: FeesChanges(uint32,uint256,uint256,uint256,uint256)
@@ -50,10 +47,10 @@ dataSources:
           handler: handlePriceUpdate
         - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
           handler: handleSyntheticTokenCreated
+        - event: SystemStateUpdated(uint32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleSystemStateUpdated
         - event: V1(address,address,address,address)
           handler: handleV1
-        - event: ValueLockedInSystem(uint32,uint256,uint256,uint256)
-          handler: handleValueLockedInSystem
       file: ./src/float.ts
 
   - kind: ethereum/contract

@@ -47,7 +47,7 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function _getPriceMock(uint256,uint256) public pure returns (uint256 ){
+    function _getSyntheticTokenPriceMock(uint32,bool) public pure returns (uint256 syntheticTokenPrice){
       return (abi.decode("",(uint256)));
     }
      
@@ -83,10 +83,6 @@ contract LongShortForInternalMocking {
       return (abi.decode("",(uint256)));
     }
      
-    function _refreshTokenPricesMock(uint32) public pure {
-      return ();
-    }
-     
     function _distributeMarketAmountMock(uint32,uint256) public pure {
       return ();
     }
@@ -99,7 +95,7 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function _saveSyntheticTokenPriceSnapshotsMock(uint32,uint256) public pure {
+    function _saveSyntheticTokenPriceSnapshotsMock(uint32,uint256,uint256,uint256) public pure {
       return ();
     }
      
@@ -127,8 +123,8 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function _burnSynthTokensForRedemptionMock(uint32,uint256,uint256) public pure returns (bool wasABatchedSettlement){
-      return (abi.decode("",(bool)));
+    function _burnSynthTokensForRedemptionMock(uint32,uint256,uint256) public pure {
+      return ();
     }
      
     function _transferFundsToYieldManagerMock(uint32,uint256) public pure {
@@ -183,16 +179,16 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function _performOustandingSettlementsMock(uint32,uint256) public pure {
+    function _performOustandingSettlementsMock(uint32,uint256,uint256,uint256) public pure {
       return ();
     }
      
-    function _handleBatchedDepositSettlementMock(uint32,bool) public pure returns (bool wasABatchedSettlement){
-      return (abi.decode("",(bool)));
+    function _handleBatchedDepositSettlementMock(uint32,bool,uint256) public pure {
+      return ();
     }
      
-    function _handleBatchedRedeemSettlementMock(uint32) public pure returns (bool wasABatchedSettlement){
-      return (abi.decode("",(bool)));
+    function _handleBatchedRedeemSettlementMock(uint32,uint256,uint256) public pure {
+      return ();
     }
      
     function adminOnlyMock() public pure {
