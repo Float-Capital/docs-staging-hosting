@@ -90,9 +90,9 @@ external executeOutstandingNextPriceSettlementsUser: (
   ~marketIndex: int,
 ) => JsPromise.t<transaction> = "executeOutstandingNextPriceSettlementsUser"
 
-type fundTokensReturn = Ethers.ethAddress
+type paymentTokensReturn = Ethers.ethAddress
 @send
-external fundTokens: (t, int) => JsPromise.t<fundTokensReturn> = "fundTokens"
+external paymentTokens: (t, int) => JsPromise.t<paymentTokensReturn> = "paymentTokens"
 
 type getLongPcntForLongVsShortSplitReturn = Ethers.BigNumber.t
 @send
@@ -138,7 +138,8 @@ external getUsersConfirmedButNotSettledBalance: (
   ~user: Ethers.ethAddress,
   ~marketIndex: int,
   ~isLong: bool,
-) => JsPromise.t<getUsersConfirmedButNotSettledBalanceReturn> = "getUsersConfirmedButNotSettledBalance"
+) => JsPromise.t<getUsersConfirmedButNotSettledBalanceReturn> =
+  "getUsersConfirmedButNotSettledBalance"
 
 @send
 external initialize: (
@@ -193,7 +194,7 @@ external newSyntheticMarket: (
   t,
   ~syntheticName: string,
   ~syntheticSymbol: string,
-  ~fundToken: Ethers.ethAddress,
+  ~paymentToken: Ethers.ethAddress,
   ~oracleManager: Ethers.ethAddress,
   ~yieldManager: Ethers.ethAddress,
 ) => JsPromise.t<transaction> = "newSyntheticMarket"
@@ -411,9 +412,9 @@ module Exposed = {
     ~marketIndex: int,
   ) => JsPromise.t<transaction> = "executeOutstandingNextPriceSettlementsUser"
 
-  type fundTokensReturn = Ethers.ethAddress
+  type paymentTokensReturn = Ethers.ethAddress
   @send
-  external fundTokens: (t, int) => JsPromise.t<fundTokensReturn> = "fundTokens"
+  external paymentTokens: (t, int) => JsPromise.t<paymentTokensReturn> = "paymentTokens"
 
   type getLongPcntForLongVsShortSplitReturn = Ethers.BigNumber.t
   @send
@@ -459,7 +460,8 @@ module Exposed = {
     ~user: Ethers.ethAddress,
     ~marketIndex: int,
     ~isLong: bool,
-  ) => JsPromise.t<getUsersConfirmedButNotSettledBalanceReturn> = "getUsersConfirmedButNotSettledBalance"
+  ) => JsPromise.t<getUsersConfirmedButNotSettledBalanceReturn> =
+    "getUsersConfirmedButNotSettledBalance"
 
   @send
   external initialize: (
@@ -514,7 +516,7 @@ module Exposed = {
     t,
     ~syntheticName: string,
     ~syntheticSymbol: string,
-    ~fundToken: Ethers.ethAddress,
+    ~paymentToken: Ethers.ethAddress,
     ~oracleManager: Ethers.ethAddress,
     ~yieldManager: Ethers.ethAddress,
   ) => JsPromise.t<transaction> = "newSyntheticMarket"

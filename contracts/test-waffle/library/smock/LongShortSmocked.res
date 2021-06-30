@@ -197,23 +197,6 @@ let batchedAmountOfTokensToDepositCalls: t => array<batchedAmountOfTokensToDepos
   })
 }
 
-let mockFundTokensToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.fundTokens.will.return.with([_param0])")
-}
-
-type fundTokensCall = {param0: int}
-
-let fundTokensCalls: t => array<fundTokensCall> = _r => {
-  let array = %raw("_r.smocked.fundTokens.calls")
-  array->Array.map(_m => {
-    let param0 = _m->Array.getUnsafe(0)
-
-    {
-      param0: param0,
-    }
-  })
-}
-
 let mockLatestMarketToReturn: (t, int) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.latestMarket.will.return.with([_param0])")
 }
@@ -269,6 +252,23 @@ type oracleManagersCall = {param0: int}
 
 let oracleManagersCalls: t => array<oracleManagersCall> = _r => {
   let array = %raw("_r.smocked.oracleManagers.calls")
+  array->Array.map(_m => {
+    let param0 = _m->Array.getUnsafe(0)
+
+    {
+      param0: param0,
+    }
+  })
+}
+
+let mockPaymentTokensToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.paymentTokens.will.return.with([_param0])")
+}
+
+type paymentTokensCall = {param0: int}
+
+let paymentTokensCalls: t => array<paymentTokensCall> = _r => {
+  let array = %raw("_r.smocked.paymentTokens.calls")
   array->Array.map(_m => {
     let param0 = _m->Array.getUnsafe(0)
 
@@ -571,18 +571,24 @@ let mockNewSyntheticMarketToReturn: t => unit = _r => {
 type newSyntheticMarketCall = {
   syntheticName: string,
   syntheticSymbol: string,
-  fundToken: Ethers.ethAddress,
+  paymentToken: Ethers.ethAddress,
   oracleManager: Ethers.ethAddress,
   yieldManager: Ethers.ethAddress,
 }
 
 let newSyntheticMarketCalls: t => array<newSyntheticMarketCall> = _r => {
   let array = %raw("_r.smocked.newSyntheticMarket.calls")
-  array->Array.map(((syntheticName, syntheticSymbol, fundToken, oracleManager, yieldManager)) => {
+  array->Array.map(((
+    syntheticName,
+    syntheticSymbol,
+    paymentToken,
+    oracleManager,
+    yieldManager,
+  )) => {
     {
       syntheticName: syntheticName,
       syntheticSymbol: syntheticSymbol,
-      fundToken: fundToken,
+      paymentToken: paymentToken,
       oracleManager: oracleManager,
       yieldManager: yieldManager,
     }
@@ -629,7 +635,10 @@ let initializeMarketCalls: t => array<initializeMarketCall> = _r => {
   })
 }
 
-let mockGetUsersPendingBalanceToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+let mockGetUsersConfirmedButNotSettledBalanceToReturn: (t, Ethers.BigNumber.t) => unit = (
+  _r,
+  _param0,
+) => {
   let _ = %raw("_r.smocked.getUsersConfirmedButNotSettledBalance.will.return.with([_param0])")
 }
 
@@ -639,7 +648,9 @@ type getUsersConfirmedButNotSettledBalanceCall = {
   isLong: bool,
 }
 
-let getUsersConfirmedButNotSettledBalanceCalls: t => array<getUsersConfirmedButNotSettledBalanceCall> = _r => {
+let getUsersConfirmedButNotSettledBalanceCalls: t => array<
+  getUsersConfirmedButNotSettledBalanceCall,
+> = _r => {
   let array = %raw("_r.smocked.getUsersConfirmedButNotSettledBalance.calls")
   array->Array.map(((user, marketIndex, isLong)) => {
     {
@@ -1115,7 +1126,7 @@ module InternalMock = {
   type newSyntheticMarketCall = {
     syntheticName: string,
     syntheticSymbol: string,
-    fundToken: Ethers.ethAddress,
+    paymentToken: Ethers.ethAddress,
     oracleManager: Ethers.ethAddress,
     yieldManager: Ethers.ethAddress,
   }
@@ -1128,14 +1139,14 @@ module InternalMock = {
       array->Array.map(((
         syntheticName,
         syntheticSymbol,
-        fundToken,
+        paymentToken,
         oracleManager,
         yieldManager,
       )) => {
         {
           syntheticName: syntheticName,
           syntheticSymbol: syntheticSymbol,
-          fundToken: fundToken,
+          paymentToken: paymentToken,
           oracleManager: oracleManager,
           yieldManager: yieldManager,
         }
@@ -1300,10 +1311,12 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mockGetUsersPendingBalanceToReturn: Ethers.BigNumber.t => unit = _param0 => {
+  let mockGetUsersConfirmedButNotSettledBalanceToReturn: Ethers.BigNumber.t => unit = _param0 => {
     checkForExceptions(~functionName="getUsersConfirmedButNotSettledBalance")
     let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked.getUsersConfirmedButNotSettledBalanceMock.will.return.with([_param0])")
+      let _ = %raw(
+        "_r.smocked.getUsersConfirmedButNotSettledBalanceMock.will.return.with([_param0])"
+      )
     })
   }
 
@@ -1313,7 +1326,9 @@ module InternalMock = {
     isLong: bool,
   }
 
-  let getUsersConfirmedButNotSettledBalanceCalls: unit => array<getUsersConfirmedButNotSettledBalanceCall> = () => {
+  let getUsersConfirmedButNotSettledBalanceCalls: unit => array<
+    getUsersConfirmedButNotSettledBalanceCall,
+  > = () => {
     checkForExceptions(~functionName="getUsersConfirmedButNotSettledBalance")
     internalRef.contents
     ->Option.map(_r => {

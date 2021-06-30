@@ -47,7 +47,7 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => bool) public marketExists;
     mapping(uint32 => uint256) public assetPrice;
     mapping(uint32 => uint256) public marketUpdateIndex;
-    mapping(uint32 => IERC20) public fundTokens;
+    mapping(uint32 => IERC20) public paymentTokens;
     mapping(uint32 => IYieldManager) public yieldManagers;
     mapping(uint32 => IOracleManager) public oracleManagers;
 
@@ -104,7 +104,7 @@ contract LongShort is ILongShort, Initializable {
         uint32 marketIndex,
         address longTokenAddress,
         address shortTokenAddress,
-        address fundToken,
+        address paymentToken,
         uint256 assetPrice,
         string name,
         string symbol,
@@ -302,7 +302,7 @@ contract LongShort is ILongShort, Initializable {
     function newSyntheticMarket(
         string calldata syntheticName,
         string calldata syntheticSymbol,
-        address _fundToken,
+        address _paymentToken,
         address _oracleManager,
         address _yieldManager
     ) external adminOnly {
@@ -329,7 +329,7 @@ contract LongShort is ILongShort, Initializable {
         );
 
         // Initial market state.
-        fundTokens[latestMarket] = IERC20(_fundToken);
+        paymentTokens[latestMarket] = IERC20(_paymentToken);
         yieldManagers[latestMarket] = IYieldManager(_yieldManager);
         oracleManagers[latestMarket] = IOracleManager(_oracleManager);
         assetPrice[latestMarket] = uint256(
@@ -340,7 +340,7 @@ contract LongShort is ILongShort, Initializable {
             latestMarket,
             address(syntheticTokens[latestMarket][true]),
             address(syntheticTokens[latestMarket][false]),
-            _fundToken,
+            _paymentToken,
             assetPrice[latestMarket],
             syntheticName,
             syntheticSymbol,
@@ -745,7 +745,7 @@ contract LongShort is ILongShort, Initializable {
       ╚════════════════════════════════╝*/
 
     function _depositFunds(uint32 marketIndex, uint256 amount) internal {
-        fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
+        paymentTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
     }
 
     // NOTE: Only used in seeding the market.
@@ -778,7 +778,7 @@ contract LongShort is ILongShort, Initializable {
         _transferFromYieldManager(marketIndex, totalAmount);
 
         // Transfer funds to the sender.
-        fundTokens[marketIndex].transfer(user, totalAmount);
+        paymentTokens[marketIndex].transfer(user, totalAmount);
 
         syntheticTokenPoolValue[marketIndex][true] -= amountLong;
         syntheticTokenPoolValue[marketIndex][false] -= amountShort;
@@ -820,11 +820,11 @@ contract LongShort is ILongShort, Initializable {
         //     3. approve transfer from yield manager contract to lendingPool contract
         //     4. transfer from yield mnager contract to lendingPool contract
         // Surely we can make this more efficient?
-        fundTokens[marketIndex].approve(
+        paymentTokens[marketIndex].approve(
             address(yieldManagers[marketIndex]),
             amount
         );
-        yieldManagers[marketIndex].depositToken(amount);
+        yieldManagers[marketIndex].depositPaymentToken(amount);
     }
 
     /*
@@ -835,7 +835,7 @@ contract LongShort is ILongShort, Initializable {
     {
         // NB there will be issues here if not enough liquidity exists to withdraw
         // Boolean should be returned from yield manager and think how to appropriately handle this
-        yieldManagers[marketIndex].withdrawToken(amount);
+        yieldManagers[marketIndex].withdrawPaymentToken(amount);
     }
 
     /*╔═══════════════════════════╗
@@ -977,7 +977,7 @@ contract LongShort is ILongShort, Initializable {
                     userCurrentNextPriceUpdateIndex[marketIndex][user]
                 ]
             );
-            fundTokens[marketIndex].transfer(user, amountToRedeem);
+            paymentTokens[marketIndex].transfer(user, amountToRedeem);
             emit ExecuteNextPriceRedeemSettlementUser(
                 user,
                 marketIndex,

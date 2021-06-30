@@ -172,21 +172,6 @@ function batchedAmountOfTokensToDepositCalls(_r) {
               }));
 }
 
-function mockFundTokensToReturn(_r, _param0) {
-  ((_r.smocked.fundTokens.will.return.with([_param0])));
-  
-}
-
-function fundTokensCalls(_r) {
-  var array = _r.smocked.fundTokens.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var param0 = _m[0];
-                return {
-                        param0: param0
-                      };
-              }));
-}
-
 function mockLatestMarketToReturn(_r, _param0) {
   ((_r.smocked.latestMarket.will.return.with([_param0])));
   
@@ -236,6 +221,21 @@ function mockOracleManagersToReturn(_r, _param0) {
 
 function oracleManagersCalls(_r) {
   var array = _r.smocked.oracleManagers.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var param0 = _m[0];
+                return {
+                        param0: param0
+                      };
+              }));
+}
+
+function mockPaymentTokensToReturn(_r, _param0) {
+  ((_r.smocked.paymentTokens.will.return.with([_param0])));
+  
+}
+
+function paymentTokensCalls(_r) {
+  var array = _r.smocked.paymentTokens.calls;
   return Belt_Array.map(array, (function (_m) {
                 var param0 = _m[0];
                 return {
@@ -479,7 +479,7 @@ function newSyntheticMarketCalls(_r) {
                 return {
                         syntheticName: param[0],
                         syntheticSymbol: param[1],
-                        fundToken: param[2],
+                        paymentToken: param[2],
                         oracleManager: param[3],
                         yieldManager: param[4]
                       };
@@ -507,7 +507,7 @@ function initializeMarketCalls(_r) {
               }));
 }
 
-function mockGetUsersPendingBalanceToReturn(_r, _param0) {
+function mockGetUsersConfirmedButNotSettledBalanceToReturn(_r, _param0) {
   ((_r.smocked.getUsersConfirmedButNotSettledBalance.will.return.with([_param0])));
   
 }
@@ -901,7 +901,7 @@ function newSyntheticMarketCalls$1(param) {
                                   return {
                                           syntheticName: param[0],
                                           syntheticSymbol: param[1],
-                                          fundToken: param[2],
+                                          paymentToken: param[2],
                                           oracleManager: param[3],
                                           yieldManager: param[4]
                                         };
@@ -1025,7 +1025,7 @@ function _getAmountSynthTokenCalls(param) {
                   })));
 }
 
-function mockGetUsersPendingBalanceToReturn$1(_param0) {
+function mockGetUsersConfirmedButNotSettledBalanceToReturn$1(_param0) {
   checkForExceptions("getUsersConfirmedButNotSettledBalance");
   Belt_Option.map(internalRef.contents, (function (_r) {
           ((_r.smocked.getUsersConfirmedButNotSettledBalanceMock.will.return.with([_param0])));
@@ -1859,7 +1859,7 @@ var InternalMock = {
   _getAmountPaymentTokenCalls: _getAmountPaymentTokenCalls,
   mock_getAmountSynthTokenToReturn: mock_getAmountSynthTokenToReturn,
   _getAmountSynthTokenCalls: _getAmountSynthTokenCalls,
-  mockGetUsersPendingBalanceToReturn: mockGetUsersPendingBalanceToReturn$1,
+  mockGetUsersConfirmedButNotSettledBalanceToReturn: mockGetUsersConfirmedButNotSettledBalanceToReturn$1,
   getUsersConfirmedButNotSettledBalanceCalls: getUsersConfirmedButNotSettledBalanceCalls$1,
   mockGetMarketPcntForTreasuryVsMarketSplitToReturn: mockGetMarketPcntForTreasuryVsMarketSplitToReturn$1,
   getMarketPcntForTreasuryVsMarketSplitCalls: getMarketPcntForTreasuryVsMarketSplitCalls$1,
@@ -1960,8 +1960,6 @@ exports.mockBatchedAmountOfSynthTokensToRedeemToReturn = mockBatchedAmountOfSynt
 exports.batchedAmountOfSynthTokensToRedeemCalls = batchedAmountOfSynthTokensToRedeemCalls;
 exports.mockBatchedAmountOfTokensToDepositToReturn = mockBatchedAmountOfTokensToDepositToReturn;
 exports.batchedAmountOfTokensToDepositCalls = batchedAmountOfTokensToDepositCalls;
-exports.mockFundTokensToReturn = mockFundTokensToReturn;
-exports.fundTokensCalls = fundTokensCalls;
 exports.mockLatestMarketToReturn = mockLatestMarketToReturn;
 exports.latestMarketCalls = latestMarketCalls;
 exports.mockMarketExistsToReturn = mockMarketExistsToReturn;
@@ -1970,6 +1968,8 @@ exports.mockMarketUpdateIndexToReturn = mockMarketUpdateIndexToReturn;
 exports.marketUpdateIndexCalls = marketUpdateIndexCalls;
 exports.mockOracleManagersToReturn = mockOracleManagersToReturn;
 exports.oracleManagersCalls = oracleManagersCalls;
+exports.mockPaymentTokensToReturn = mockPaymentTokensToReturn;
+exports.paymentTokensCalls = paymentTokensCalls;
 exports.mockStakerToReturn = mockStakerToReturn;
 exports.stakerCalls = stakerCalls;
 exports.mockSyntheticTokenPoolValueToReturn = mockSyntheticTokenPoolValueToReturn;
@@ -2004,7 +2004,7 @@ exports.mockNewSyntheticMarketToReturn = mockNewSyntheticMarketToReturn;
 exports.newSyntheticMarketCalls = newSyntheticMarketCalls;
 exports.mockInitializeMarketToReturn = mockInitializeMarketToReturn;
 exports.initializeMarketCalls = initializeMarketCalls;
-exports.mockGetUsersPendingBalanceToReturn = mockGetUsersPendingBalanceToReturn;
+exports.mockGetUsersConfirmedButNotSettledBalanceToReturn = mockGetUsersConfirmedButNotSettledBalanceToReturn;
 exports.getUsersConfirmedButNotSettledBalanceCalls = getUsersConfirmedButNotSettledBalanceCalls;
 exports.mockGetMarketPcntForTreasuryVsMarketSplitToReturn = mockGetMarketPcntForTreasuryVsMarketSplitToReturn;
 exports.getMarketPcntForTreasuryVsMarketSplitCalls = getMarketPcntForTreasuryVsMarketSplitCalls;

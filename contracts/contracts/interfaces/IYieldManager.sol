@@ -13,7 +13,7 @@ abstract contract IYieldManager {
     /*
      * Deposits the given amount of tokens into this yield manager.
      */
-    function depositToken(uint256 amount) public virtual;
+    function depositPaymentToken(uint256 amount) public virtual;
 
     /*
      * Withdraws the given amount of tokens from this yield manager.
@@ -22,7 +22,7 @@ abstract contract IYieldManager {
      *   underlying yield tokens if the protocol we use doesn't have
      *   enough liquidity.
      */
-    function withdrawToken(uint256 amount) public virtual;
+    function withdrawPaymentToken(uint256 amount) public virtual;
 
     /*
      *  Withdraw erc20 token to the treasury contract (WMATIC)

@@ -112,7 +112,7 @@ contract YieldManagerMock is IYieldManager {
         yieldRate = _yieldRate;
     }
 
-    function depositToken(uint256 amount) public override longShortOnly {
+    function depositPaymentToken(uint256 amount) public override longShortOnly {
         // Ensure token state is current.
         settle();
 
@@ -121,7 +121,7 @@ contract YieldManagerMock is IYieldManager {
         totalHeld = totalHeld + amount;
     }
 
-    function withdrawToken(uint256 amount) public override longShortOnly {
+    function withdrawPaymentToken(uint256 amount) public override longShortOnly {
         // Ensure token state is current.
         settle();
         require(amount <= totalHeld);
