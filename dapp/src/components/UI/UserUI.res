@@ -298,7 +298,7 @@ module UserTokenBox = {
         <div className=`text-xs text-center text-gray-400`>
           {timestamp->Globals.formatTimestamp->React.string}
         </div>
-        <UserPercentageGains isLong tokenAddress metadata />
+        // <UserPercentageGains isLong tokenAddress metadata /> // TODO: temp remove while innacurate
       </div>
       <div className=`self-center`> {children} </div>
     </div>
@@ -322,6 +322,8 @@ module UserPendingBox = {
 
     switch lastOracleTimestamp {
     | Response(lastOracleUpdateTimestamp) =>
+      Js.log("lastOracleTimestamp")
+      Js.log(lastOracleUpdateTimestamp->Ethers.BigNumber.toString)
       <div
         className=`flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative`>
         <div className="flex flex-row justify-between">
@@ -373,7 +375,7 @@ module UserStakeBox = {
     ~isLong,
     ~tokens,
     ~value,
-    ~tokenAddress=CONSTANTS.zeroAddress,
+    ~_tokenAddress=CONSTANTS.zeroAddress,
     ~metadata: DataHooks.synthBalanceMetadata,
     ~creationTxHash,
     ~children,
@@ -400,7 +402,7 @@ module UserStakeBox = {
           className="text-xs text-center text-gray-400 hover:opacity-75">
           {timestamp->Globals.formatTimestamp->React.string}
         </a>
-        <UserPercentageGains tokenAddress metadata isLong />
+        // <UserPercentageGains tokenAddress metadata isLong />   // TODO: temp remove while innacurate
       </div>
       <div className=`self-center`> {children} </div>
     </div>
@@ -500,7 +502,7 @@ module UserStakesCard = {
         name
         isLong
         tokens
-        tokenAddress={addr}
+        // tokenAddress={addr}
         value={value->Misc.NumberFormat.formatEther}
         metadata
         creationTxHash>

@@ -398,11 +398,7 @@ function UserUI$UserTokenBox(Props) {
                   className: "flex flex-col items-center justify-center"
                 }, React.createElement("div", {
                       className: "text-xs text-center text-gray-400"
-                    }, Globals.formatTimestamp(metadata.timeLastUpdated)), React.createElement(UserUI$UserPercentageGains, {
-                      metadata: metadata,
-                      tokenAddress: tokenAddress,
-                      isLong: isLong
-                    })), React.createElement("div", {
+                    }, Globals.formatTimestamp(metadata.timeLastUpdated))), React.createElement("div", {
                   className: "self-center"
                 }, children));
 }
@@ -426,6 +422,8 @@ function UserUI$UserPendingBox(Props) {
     return React.createElement("p", undefined, lastOracleTimestamp._0);
   }
   var lastOracleUpdateTimestamp = lastOracleTimestamp._0;
+  console.log("lastOracleTimestamp");
+  console.log(lastOracleUpdateTimestamp.toString());
   return React.createElement("div", {
               className: "flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative"
             }, React.createElement("div", {
@@ -477,11 +475,9 @@ function UserUI$UserStakeBox(Props) {
   var isLong = Props.isLong;
   var tokens = Props.tokens;
   var value = Props.value;
-  var tokenAddressOpt = Props.tokenAddress;
   var metadata = Props.metadata;
   var creationTxHash = Props.creationTxHash;
   var children = Props.children;
-  var tokenAddress = tokenAddressOpt !== undefined ? Caml_option.valFromOption(tokenAddressOpt) : CONSTANTS.zeroAddress;
   return React.createElement("div", {
               className: "flex justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative"
             }, React.createElement("div", {
@@ -505,11 +501,7 @@ function UserUI$UserStakeBox(Props) {
                       href: Config.blockExplorer + "/tx/" + creationTxHash,
                       rel: "noopener noreferrer",
                       target: "_"
-                    }, Globals.formatTimestamp(metadata.timeLastUpdated)), React.createElement(UserUI$UserPercentageGains, {
-                      metadata: metadata,
-                      tokenAddress: tokenAddress,
-                      isLong: isLong
-                    })), React.createElement("div", {
+                    }, Globals.formatTimestamp(metadata.timeLastUpdated))), React.createElement("div", {
                   className: "self-center"
                 }, children));
 }
@@ -617,7 +609,6 @@ function UserUI$UserStakesCard(Props) {
                     isLong: isLong,
                     tokens: tokens,
                     value: Misc.NumberFormat.formatEther(undefined, value),
-                    tokenAddress: addr,
                     metadata: metadata,
                     creationTxHash: creationTxHash,
                     children: null,
