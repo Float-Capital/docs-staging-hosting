@@ -24,5 +24,3 @@ RUN yarn codegen
 RUN yarn codegen-price-history
 
 CMD sleep 100000000
-# RUN npm install --global @graphprotocol/graph-cli@0.20.0
-
