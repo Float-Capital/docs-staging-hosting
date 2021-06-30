@@ -1,10 +1,5 @@
-import {
-  StateChange,
-  EventParam,
-  EventParams,
-  GlobalState,
-} from "../../generated/schema";
-import { Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { StateChange, EventParam, EventParams } from "../../generated/schema";
+import { BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import { ONE, ZERO_ADDRESS } from "../CONSTANTS";
 import { getOrCreateGlobalState, getOrCreateUser } from "./globalStateManager";
 
@@ -173,4 +168,12 @@ export function saveEventToStateChange(
     affectedStakes,
     toFloatContracts
   );
+}
+
+export function bigIntArrayToStringArray(bigIntArr: BigInt[]): string[] {
+  let returnArr = new Array<string>(bigIntArr.length);
+  for (let i = 0; i < bigIntArr.length; i++) {
+    returnArr[i] = bigIntArr[i].toString();
+  }
+  return returnArr;
 }
