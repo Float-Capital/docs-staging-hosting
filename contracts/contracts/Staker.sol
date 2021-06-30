@@ -677,7 +677,10 @@ contract Staker is IStaker, Initializable {
             userAmountStaked[token][msg.sender] -
             amount;
 
-        token.transfer(msg.sender, amount);
+        // TODO: this is just a hardcoded amount of fees, nothing is happening with the fees at the moment.
+        uint256 amountFees = (amount * 50) / 10000;
+
+        token.transfer(msg.sender, amount - amountFees);
 
         emit StakeWithdrawn(msg.sender, address(token), amount);
     }
