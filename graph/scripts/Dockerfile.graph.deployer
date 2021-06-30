@@ -1,0 +1,26 @@
+FROM node:12.16.3-alpine3.9
+
+WORKDIR /app
+
+RUN apk update
+RUN apk upgrade
+RUN apk add git
+RUN apk add python
+RUN apk add pkgconfig libsecret-dev
+# RUN apk add pkg-config
+# python make g++ bash
+
+ADD ./package.json /app/package.json
+ADD ./yarn.lock /app/yarn.lock
+
+RUN yarn install --prod
+
+ADD . /app
+
+# Since abis cannot be symlinks!
+RUN rm -rf /app/abis && cp -r /app/abis-copy /app/abis
+
+RUN yarn codegen
+RUN yarn codegen-price-history
+
+CMD sleep 100000000
