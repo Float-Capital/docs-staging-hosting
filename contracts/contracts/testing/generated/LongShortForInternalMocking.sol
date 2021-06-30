@@ -79,10 +79,6 @@ contract LongShortForInternalMocking {
       return (abi.decode("",(uint256)),abi.decode("",(uint256)));
     }
      
-    function getFeesGeneralMock(uint32,uint256,bool,uint256,uint256) public pure returns (uint256 ){
-      return (abi.decode("",(uint256)));
-    }
-     
     function _distributeMarketAmountMock(uint32,uint256) public pure {
       return ();
     }

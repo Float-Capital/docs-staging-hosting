@@ -334,37 +334,6 @@ let fundTokensCalls: t => array<fundTokensCall> = _r => {
   })
 }
 
-let mockGetFeesGeneralToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.getFeesGeneral.will.return.with([_param0])")
-}
-
-type getFeesGeneralCall = {
-  marketIndex: int,
-  delta: Ethers.BigNumber.t,
-  synthTokenGainingDominanceIsLong: bool,
-  baseFeePercent: Ethers.BigNumber.t,
-  penaltyFeePercent: Ethers.BigNumber.t,
-}
-
-let getFeesGeneralCalls: t => array<getFeesGeneralCall> = _r => {
-  let array = %raw("_r.smocked.getFeesGeneral.calls")
-  array->Array.map(((
-    marketIndex,
-    delta,
-    synthTokenGainingDominanceIsLong,
-    baseFeePercent,
-    penaltyFeePercent,
-  )) => {
-    {
-      marketIndex: marketIndex,
-      delta: delta,
-      synthTokenGainingDominanceIsLong: synthTokenGainingDominanceIsLong,
-      baseFeePercent: baseFeePercent,
-      penaltyFeePercent: penaltyFeePercent,
-    }
-  })
-}
-
 let mockGetLongPcntForLongVsShortSplitToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.getLongPcntForLongVsShortSplit.will.return.with([_param0])")
 }
@@ -1504,45 +1473,6 @@ module InternalMock = {
         {
           marketIndex: marketIndex,
           amount: amount,
-        }
-      })
-    })
-    ->Option.getExn
-  }
-
-  let mockGetFeesGeneralToReturn: Ethers.BigNumber.t => unit = _param0 => {
-    checkForExceptions(~functionName="getFeesGeneral")
-    let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked.getFeesGeneralMock.will.return.with([_param0])")
-    })
-  }
-
-  type getFeesGeneralCall = {
-    marketIndex: int,
-    delta: Ethers.BigNumber.t,
-    synthTokenGainingDominanceIsLong: bool,
-    baseFeePercent: Ethers.BigNumber.t,
-    penaltyFeePercent: Ethers.BigNumber.t,
-  }
-
-  let getFeesGeneralCalls: unit => array<getFeesGeneralCall> = () => {
-    checkForExceptions(~functionName="getFeesGeneral")
-    internalRef.contents
-    ->Option.map(_r => {
-      let array = %raw("_r.smocked.getFeesGeneralMock.calls")
-      array->Array.map(((
-        marketIndex,
-        delta,
-        synthTokenGainingDominanceIsLong,
-        baseFeePercent,
-        penaltyFeePercent,
-      )) => {
-        {
-          marketIndex: marketIndex,
-          delta: delta,
-          synthTokenGainingDominanceIsLong: synthTokenGainingDominanceIsLong,
-          baseFeePercent: baseFeePercent,
-          penaltyFeePercent: penaltyFeePercent,
         }
       })
     })

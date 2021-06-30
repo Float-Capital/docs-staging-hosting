@@ -260,7 +260,7 @@ contract StakerMockable is IStaker, Initializable {
         syntheticRewardParams[marketIndex][0].timestamp = block.timestamp;
         syntheticRewardParams[marketIndex][0].accumulativeFloatPerLongToken = 0;
         syntheticRewardParams[marketIndex][0]
-            .accumulativeFloatPerShortToken = 0;
+        .accumulativeFloatPerShortToken = 0;
 
         syntheticTokens[marketIndex].longToken = longToken;
         syntheticTokens[marketIndex].shortToken = shortToken;
@@ -301,13 +301,15 @@ contract StakerMockable is IStaker, Initializable {
       return mocker.getKValueMock(marketIndex);
     }
   
-                (uint256 kPeriod, uint256 kInitialMultiplier) =
-            getMarketLaunchIncentiveParameters(marketIndex);
+                (
+            uint256 kPeriod,
+            uint256 kInitialMultiplier
+        ) = getMarketLaunchIncentiveParameters(marketIndex);
 
                         assert(kInitialMultiplier >= 1e18);
 
-        uint256 initialTimestamp =
-            syntheticRewardParams[marketIndex][0].timestamp;
+        uint256 initialTimestamp = syntheticRewardParams[marketIndex][0]
+        .timestamp;
 
         if (block.timestamp - initialTimestamp <= kPeriod) {
             return
@@ -366,7 +368,7 @@ contract StakerMockable is IStaker, Initializable {
         return
             block.timestamp -
             syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
-                .timestamp;
+            .timestamp;
     }
 
     
@@ -387,24 +389,24 @@ contract StakerMockable is IStaker, Initializable {
       return mocker.calculateNewCumulativeRateMock(marketIndex,longPrice,shortPrice,longValue,shortValue);
     }
   
-                (uint256 longFloatPerSecond, uint256 shortFloatPerSecond) =
-            calculateFloatPerSecond(
-                marketIndex,
-                longPrice,
-                shortPrice,
-                longValue,
-                shortValue
-            );
+                (
+            uint256 longFloatPerSecond,
+            uint256 shortFloatPerSecond
+        ) = calculateFloatPerSecond(
+            marketIndex,
+            longPrice,
+            shortPrice,
+            longValue,
+            shortValue
+        );
 
                 uint256 timeDelta = calculateTimeDelta(marketIndex);
 
                 return (
             syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
-                .accumulativeFloatPerLongToken +
-                (timeDelta * longFloatPerSecond),
+            .accumulativeFloatPerLongToken + (timeDelta * longFloatPerSecond),
             syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
-                .accumulativeFloatPerShortToken +
-                (timeDelta * shortFloatPerSecond)
+            .accumulativeFloatPerShortToken + (timeDelta * shortFloatPerSecond)
         );
     }
 
@@ -422,24 +424,26 @@ contract StakerMockable is IStaker, Initializable {
       return mocker.setRewardObjectsMock(marketIndex,longPrice,shortPrice,longValue,shortValue);
     }
   
-        (uint256 longAccumulativeRates, uint256 shortAccumulativeRates) =
-            calculateNewCumulativeRate(
-                marketIndex,
-                longPrice,
-                shortPrice,
-                longValue,
-                shortValue
-            );
+        (
+            uint256 longAccumulativeRates,
+            uint256 shortAccumulativeRates
+        ) = calculateNewCumulativeRate(
+            marketIndex,
+            longPrice,
+            shortPrice,
+            longValue,
+            shortValue
+        );
 
         uint256 newIndex = latestRewardIndex[marketIndex] + 1;
 
                 syntheticRewardParams[marketIndex][newIndex]
-            .accumulativeFloatPerLongToken = longAccumulativeRates;
+        .accumulativeFloatPerLongToken = longAccumulativeRates;
         syntheticRewardParams[marketIndex][newIndex]
-            .accumulativeFloatPerShortToken = shortAccumulativeRates;
+        .accumulativeFloatPerShortToken = shortAccumulativeRates;
 
                 syntheticRewardParams[marketIndex][newIndex].timestamp = block
-            .timestamp;
+        .timestamp;
 
                 latestRewardIndex[marketIndex] = newIndex;
 
@@ -520,30 +524,28 @@ contract StakerMockable is IStaker, Initializable {
         ISyntheticToken shortToken = syntheticTokens[marketIndex].shortToken;
 
         if (amountStakedLong > 0) {
-            uint256 accumDeltaLong =
+            uint256 accumDeltaLong = syntheticRewardParams[marketIndex][
+                latestRewardIndex[marketIndex]
+            ]
+            .accumulativeFloatPerLongToken -
                 syntheticRewardParams[marketIndex][
-                    latestRewardIndex[marketIndex]
+                    userIndexOfLastClaimedReward[marketIndex][user]
                 ]
-                    .accumulativeFloatPerLongToken -
-                    syntheticRewardParams[marketIndex][
-                        userIndexOfLastClaimedReward[marketIndex][user]
-                    ]
-                        .accumulativeFloatPerLongToken;
+                .accumulativeFloatPerLongToken;
             longFloatReward =
                 (accumDeltaLong * amountStakedLong) /
                 FLOAT_ISSUANCE_FIXED_DECIMAL;
         }
 
         if (amountStakedShort > 0) {
-            uint256 accumDeltaShort =
+            uint256 accumDeltaShort = syntheticRewardParams[marketIndex][
+                latestRewardIndex[marketIndex]
+            ]
+            .accumulativeFloatPerShortToken -
                 syntheticRewardParams[marketIndex][
-                    latestRewardIndex[marketIndex]
+                    userIndexOfLastClaimedReward[marketIndex][user]
                 ]
-                    .accumulativeFloatPerShortToken -
-                    syntheticRewardParams[marketIndex][
-                        userIndexOfLastClaimedReward[marketIndex][user]
-                    ]
-                        .accumulativeFloatPerShortToken;
+                .accumulativeFloatPerShortToken;
             shortFloatReward =
                 (accumDeltaShort * amountStakedShort) /
                 FLOAT_ISSUANCE_FIXED_DECIMAL;
@@ -597,8 +599,10 @@ contract StakerMockable is IStaker, Initializable {
       return mocker.mintAccumulatedFloatMock(marketIndex,user);
     }
   
-                (uint256 floatToMintLong, uint256 floatToMintShort) =
-            calculateAccumulatedFloat(marketIndex, user);
+                (
+            uint256 floatToMintLong,
+            uint256 floatToMintShort
+        ) = calculateAccumulatedFloat(marketIndex, msg.sender);
 
         uint256 floatToMint = floatToMintLong + floatToMintShort;
         if (floatToMint > 0) {
@@ -618,31 +622,33 @@ contract StakerMockable is IStaker, Initializable {
         }
     }
 
-    function _claimFloat(uint32[] calldata marketIndex) internal {
+    function _claimFloat(uint32[] calldata marketIndexes) internal {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_claimFloat"))){
       
-      return mocker._claimFloatMock(marketIndex);
+      return mocker._claimFloatMock(marketIndexes);
     }
   
         uint256 floatTotal = 0;
-        for (uint256 i = 0; i < marketIndex.length; i++) {
-                        (uint256 floatToMintLong, uint256 floatToMintShort) =
-                calculateAccumulatedFloat(marketIndex[i], msg.sender);
+        for (uint256 i = 0; i < marketIndexes.length; i++) {
+                        (
+                uint256 floatToMintLong,
+                uint256 floatToMintShort
+            ) = calculateAccumulatedFloat(marketIndexes[i], msg.sender);
 
             uint256 floatToMint = floatToMintLong + floatToMintShort;
 
             if (floatToMint > 0) {
-                                userIndexOfLastClaimedReward[marketIndex[i]][
+                                userIndexOfLastClaimedReward[marketIndexes[i]][
                     msg.sender
-                ] = latestRewardIndex[marketIndex[i]];
+                ] = latestRewardIndex[marketIndexes[i]];
                 floatTotal += floatToMint;
 
                 emit FloatMinted(
                     msg.sender,
-                    marketIndex[i],
+                    marketIndexes[i],
                     floatToMintLong,
                     floatToMintShort,
-                    latestRewardIndex[marketIndex[i]]
+                    latestRewardIndex[marketIndexes[i]]
                 );
             }
         }

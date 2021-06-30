@@ -36,7 +36,7 @@ var bnCloseTo = ((message, distance, number1, number2) => expect(number1, messag
 var callEmitEvents = ((call, contract, eventName) => expect(call).to.emit(contract, eventName));
 
 function expectToNotEmit(_eventCheck) {
-  return ((_eventCheck) => eventCheck.should.Throw());
+  return (_eventCheck.then(() => assert.fail('An event was emitted when it should not have been')).catch(() => {}));
 }
 
 var expectRevertNoReason = ((transaction) => expect(transaction).to.be.reverted);

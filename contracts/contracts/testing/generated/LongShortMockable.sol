@@ -645,55 +645,6 @@ contract LongShortMockable is ILongShort, Initializable {
 
     
 
-        function getFeesGeneral(
-        uint32 marketIndex,
-        uint256 delta,         bool synthTokenGainingDominanceIsLong,
-        uint256 baseFeePercent,
-        uint256 penaltyFeePercent
-    ) public view returns (uint256) {
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getFeesGeneral"))){
-      
-      return mocker.getFeesGeneralMock(marketIndex,delta,synthTokenGainingDominanceIsLong,baseFeePercent,penaltyFeePercent);
-    }
-  
-        uint256 baseFee = (delta * baseFeePercent) / TEN_TO_THE_5;
-
-        if (
-            syntheticTokenPoolValue[marketIndex][
-                synthTokenGainingDominanceIsLong
-            ] >=
-            syntheticTokenPoolValue[marketIndex][
-                !synthTokenGainingDominanceIsLong
-            ]
-        ) {
-                        return baseFee + ((delta * penaltyFeePercent) / TEN_TO_THE_5);
-        } else if (
-            syntheticTokenPoolValue[marketIndex][
-                synthTokenGainingDominanceIsLong
-            ] +
-                delta >
-            syntheticTokenPoolValue[marketIndex][
-                !synthTokenGainingDominanceIsLong
-            ]
-        ) {
-            uint256 amountImbalancing = delta -
-                (syntheticTokenPoolValue[marketIndex][
-                    !synthTokenGainingDominanceIsLong
-                ] -
-                    syntheticTokenPoolValue[marketIndex][
-                        synthTokenGainingDominanceIsLong
-                    ]);
-            uint256 penaltyFee = (amountImbalancing * penaltyFeePercent) /
-                TEN_TO_THE_5;
-
-            return baseFee + penaltyFee;
-        } else {
-            return baseFee;
-        }
-    }
-
-    
-
 
     function _distributeMarketAmount(uint32 marketIndex, uint256 marketAmount)
         internal
@@ -1174,6 +1125,7 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 currentDepositAmount = userNextPriceDepositAmount[marketIndex][
             isLong
         ][user];
+        userNextPriceDepositAmount[marketIndex][isLong][user] = 0;
         if (currentDepositAmount > 0) {
             uint256 tokensToTransferToUser = _getAmountSynthToken(
                 currentDepositAmount,
@@ -1181,13 +1133,10 @@ contract LongShortMockable is ILongShort, Initializable {
                     userCurrentNextPriceUpdateIndex[marketIndex][user]
                 ]
             );
-
             syntheticTokens[marketIndex][isLong].transfer(
                 user,
                 tokensToTransferToUser
             );
-
-            userNextPriceDepositAmount[marketIndex][isLong][user] = 0;
         }
     }
 
@@ -1204,6 +1153,7 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 currentRedemptions = userNextPriceRedemptionAmount[marketIndex][
             isLong
         ][user];
+        userNextPriceRedemptionAmount[marketIndex][isLong][user] = 0;
         if (currentRedemptions > 0) {
             uint256 amountToRedeem = _getAmountPaymentToken(
                 currentRedemptions,
@@ -1211,13 +1161,11 @@ contract LongShortMockable is ILongShort, Initializable {
                     userCurrentNextPriceUpdateIndex[marketIndex][user]
                 ]
             );
-
             fundTokens[marketIndex].transfer(user, amountToRedeem);
-            userNextPriceRedemptionAmount[marketIndex][isLong][user] = 0;
         }
     }
 
-        function _executeOutstandingNextPriceSettlements(
+    function _executeOutstandingNextPriceSettlements(
         address user,
         uint32 marketIndex
     ) internal {
@@ -1253,7 +1201,7 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker.executeOutstandingNextPriceSettlementsUserMock(user,marketIndex);
     }
   
-                _executeOutstandingNextPriceSettlements(user, marketIndex);
+        _executeOutstandingNextPriceSettlements(user, marketIndex);
     }
 
     
@@ -1270,8 +1218,6 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._performOustandingSettlementsMock(marketIndex,newLatestPriceStateIndex,syntheticTokenPriceLong,syntheticTokenPriceShort);
     }
   
-                        
-                                                
         _handleBatchedDepositSettlement(
             marketIndex,
             true,
@@ -1358,8 +1304,4 @@ contract LongShortMockable is ILongShort, Initializable {
             address(this)
         );
     }
-
-                                                                                                                            
-            
-    
-            }
+}

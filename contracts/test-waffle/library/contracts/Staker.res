@@ -183,6 +183,10 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "_changeMarketLaunchIncentiveParametersExternal"
 
   @send
+  external _claimFloatExternal: (t, ~marketIndex: array<int>) => JsPromise.t<transaction> =
+    "_claimFloatExternal"
+
+  @send
   external _mintFloatExternal: (
     t,
     ~user: Ethers.ethAddress,
@@ -438,11 +442,11 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "setGetMarketLaunchIncentiveParametersParams"
 
   @send
-  external setMintAccumulatedFloatParams: (
+  external setMintAccumulatedFloatAndClaimFloatParams: (
     t,
     ~marketIndex: int,
     ~latestRewardIndexForMarket: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "setMintAccumulatedFloatParams"
+  ) => JsPromise.t<transaction> = "setMintAccumulatedFloatAndClaimFloatParams"
 
   @send
   external setMocker: (t, ~mocker: Ethers.ethAddress) => JsPromise.t<transaction> = "setMocker"
