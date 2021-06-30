@@ -194,7 +194,7 @@ const topupBalanceIfLow = async (from, to) => {
   }
 };
 
-module.exports = async function(deployer, network, accounts) {
+module.exports = async function (deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
@@ -211,14 +211,6 @@ module.exports = async function(deployer, network, accounts) {
   const tenMintAmount = "10000000000000000000";
   const largeApprove = "10000000000000000000000000000000";
 
-  // We use fake DAI if we're not on mumbai testnet.
-  // let token;
-  // if (network == "mumbai") {
-  //   token = await Dai.at(mumbaiDaiAddress);
-  // } else {
-  //   token = await Dai.deployed();
-  // }
-
   if (network == "mumbai") {
     token = await Dai.at(mumbaiDaiAddress);
     await token.approve(longShort.address, new BN("200000000000000000000"), {
@@ -229,70 +221,66 @@ module.exports = async function(deployer, network, accounts) {
     await mintAndApprove(token, new BN("20000000000000000000"), user3, admin);
   }
 
-  console.log("topping up balance");
-  await topupBalanceIfLow(admin, user1);
-  await topupBalanceIfLow(admin, user2);
-  await topupBalanceIfLow(admin, user3);
-  console.log("balance topped up :)");
+  // console.log("topping up balance");
+  // await topupBalanceIfLow(admin, user1);
+  // await topupBalanceIfLow(admin, user2);
+  // await topupBalanceIfLow(admin, user3);
+  // console.log("balance topped up :)");
 
-  await deployTestMarket(
-    "ETH Killers",
-    "ETHK",
-    longShort,
-    treasury,
-    token,
-    admin,
-    network,
-    token
-  );
+  // await deployTestMarket(
+  //   "ETH Killers",
+  //   "ETHK",
+  //   longShort,
+  //   treasury,
+  //   token,
+  //   admin,
+  //   network,
+  //   token
+  // );
 
-  await deployTestMarket(
-    "The Flippening",
-    "EBD",
-    longShort,
-    treasury,
-    token,
-    admin,
-    network,
-    token
-  );
+  // await deployTestMarket(
+  //   "The Flippening",
+  //   "EBD",
+  //   longShort,
+  //   treasury,
+  //   token,
+  //   admin,
+  //   network,
+  //   token
+  // );
 
-  await deployTestMarket(
-    "Gold",
-    "GOLD",
-    longShort,
-    treasury,
-    token,
-    admin,
-    network,
-    token
-  );
+  // await deployTestMarket(
+  //   "Gold",
+  //   "GOLD",
+  //   longShort,
+  //   treasury,
+  //   token,
+  //   admin,
+  //   network,
+  //   token
+  // );
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
-  // let verifyString = `yarn hardhat --network ${network} tenderly:verify`;
-  // if (network == "mumbai") {
-  //   for (
-  //     let marketIndex = 1;
-  //     marketIndex <= currentMarketIndex;
-  //     ++marketIndex
-  //   ) {
-  //     verifyString += ` YieldManagerAave=${await longShort.yieldManagers(
-  //       marketIndex
-  //     )} OracleManagerEthKiller=${await longShort.oracleManagers(
-  //       marketIndex
-  //     )} SyntheticToken=${await LongShort.syntheticTokens(
-  //       0,
-  //       marketIndex
-  //     )} SyntheticToken=${await LongShort.syntheticTokens(
-  //       1,
-  //       marketIndex
-  //     )}`;
-  //   }
+  let verifyString = "truffle run verify";
+  if (network == "mumbai") {
+    for (
+      let marketIndex = 1;
+      marketIndex <= currentMarketIndex;
+      ++marketIndex
+    ) {
+      verifyString += ` YieldManagerAave@${await longShort.yieldManagers(
+        marketIndex
+      )} OracleManagerEthKiller@${await longShort.oracleManagers(
+        marketIndex
+      )} SyntheticToken@${await longShort.syntheticTokens(
+        marketIndex, true
+      )} SyntheticToken@${await longShort.syntheticTokens(marketIndex, false)}`;
+    }
 
-  //   console.log(`To verify market specific contracts run the following:
-
-  //   \`${verifyString}\``);
-  // }
+    console.log(`To verify market specific contracts run the following:
+    
+    \`${verifyString} --network ${network}\``);
+  }
 
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
     // if (network == "mumbai") return

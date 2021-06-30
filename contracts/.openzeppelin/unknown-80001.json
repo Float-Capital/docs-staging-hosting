@@ -1,5 +1,31 @@
 {
-  "manifestVersion": "3.1",
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0x0AadE3EEBaCcc03Ab3067266547c3DD00F24cEa3",
+    "txHash": "0x0a7d6ca245fdd6c1e25948a3f0053b89580034f60bb334a7cc11b3ba8606d467"
+  },
+  "proxies": [
+    {
+      "address": "0xfb83637B4Eda56A503aa42646316a9F8ADb04168",
+      "txHash": "0x458c61ddf03886e93580fef539a391d56ac8d30e202d9981e2094716eba0178c",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xFc2A0cf0D2656b71bdE820542E1cc0B445Cf7544",
+      "txHash": "0x7d18976055ebcebaed69848ffb819ffd6c11484672e5c54a89102744428445a4",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x124c3656522D4E39De5af98d8972696216C9bB96",
+      "txHash": "0x51e23113a405eec7832fda00867f26dc654eecee20049a6dbb01d41683a1276a",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xE6F3bFC71E2A007aFc32b185CaD5526b40Ee0e15",
+      "txHash": "0xc3ad45984b58b86e6fea5c8e8c255275675fdc0beaa9106e0e8542c3aeaafaea",
+      "kind": "transparent"
+    }
+  ],
   "impls": {
     "bceeed5d9f703bac0383cf9afcd57f0891b5bb1359e392c65b5a2dbb5194574f": {
       "address": "0x98997eB8fc10fB512c6F1B080A3F5c0825622819",
@@ -579,10 +605,499 @@
           }
         }
       }
+    },
+    "05d31d9a3c9da821e39f556e45f9257f5974400d2ba723911baa217e7655b1f7": {
+      "address": "0x51422CA75655681815ff429dd7695fe96181aba0",
+      "txHash": "0xe869ae5a0a5301fcb90e539d643aa7c890362ab4b6d3801c4a2d2cb5731a4f62",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:23"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:28"
+          },
+          {
+            "contract": "Staker",
+            "label": "marketLaunchIncentivePeriod",
+            "type": "t_mapping(t_uint32,t_uint256)",
+            "src": "Staker.sol:45"
+          },
+          {
+            "contract": "Staker",
+            "label": "marketLaunchIncentiveMultipliers",
+            "type": "t_mapping(t_uint32,t_uint256)",
+            "src": "Staker.sol:46"
+          },
+          {
+            "contract": "Staker",
+            "label": "__stakeParametersGap",
+            "type": "t_array(t_uint256)45_storage",
+            "src": "Staker.sol:47"
+          },
+          {
+            "contract": "Staker",
+            "label": "admin",
+            "type": "t_address",
+            "src": "Staker.sol:54"
+          },
+          {
+            "contract": "Staker",
+            "label": "floatCapital",
+            "type": "t_address",
+            "src": "Staker.sol:55"
+          },
+          {
+            "contract": "Staker",
+            "label": "floatPercentage",
+            "type": "t_uint16",
+            "src": "Staker.sol:56"
+          },
+          {
+            "contract": "Staker",
+            "label": "longShortCoreContract",
+            "type": "t_contract(ILongShort)4997",
+            "src": "Staker.sol:57"
+          },
+          {
+            "contract": "Staker",
+            "label": "floatToken",
+            "type": "t_contract(IFloatToken)4965",
+            "src": "Staker.sol:58"
+          },
+          {
+            "contract": "Staker",
+            "label": "__globalParamsGap",
+            "type": "t_array(t_uint256)45_storage",
+            "src": "Staker.sol:59"
+          },
+          {
+            "contract": "Staker",
+            "label": "userAmountStaked",
+            "type": "t_mapping(t_contract(ISyntheticToken)5075,t_mapping(t_address,t_uint256))",
+            "src": "Staker.sol:63"
+          },
+          {
+            "contract": "Staker",
+            "label": "__userInfoGap",
+            "type": "t_array(t_uint256)45_storage",
+            "src": "Staker.sol:65"
+          },
+          {
+            "contract": "Staker",
+            "label": "marketIndexOfToken",
+            "type": "t_mapping(t_contract(ISyntheticToken)5075,t_uint32)",
+            "src": "Staker.sol:68"
+          },
+          {
+            "contract": "Staker",
+            "label": "__tokenInfoGap",
+            "type": "t_array(t_uint256)45_storage",
+            "src": "Staker.sol:69"
+          },
+          {
+            "contract": "Staker",
+            "label": "userIndexOfLastClaimedReward",
+            "type": "t_mapping(t_uint32,t_mapping(t_address,t_uint256))",
+            "src": "Staker.sol:72"
+          },
+          {
+            "contract": "Staker",
+            "label": "batchedStake",
+            "type": "t_mapping(t_uint32,t_mapping(t_uint256,t_struct(BatchedStake)2550_storage))",
+            "src": "Staker.sol:74"
+          },
+          {
+            "contract": "Staker",
+            "label": "syntheticTokens",
+            "type": "t_mapping(t_uint32,t_struct(SyntheticTokens)2543_storage)",
+            "src": "Staker.sol:75"
+          },
+          {
+            "contract": "Staker",
+            "label": "syntheticRewardParams",
+            "type": "t_mapping(t_uint32,t_mapping(t_uint256,t_struct(RewardState)2536_storage))",
+            "src": "Staker.sol:76"
+          },
+          {
+            "contract": "Staker",
+            "label": "latestRewardIndex",
+            "type": "t_mapping(t_uint32,t_uint256)",
+            "src": "Staker.sol:78"
+          }
+        ],
+        "types": {
+          "t_mapping(t_uint32,t_uint256)": {
+            "label": "mapping(uint32 => uint256)"
+          },
+          "t_uint32": {
+            "label": "uint32"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_array(t_uint256)45_storage": {
+            "label": "uint256[45]"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_uint16": {
+            "label": "uint16"
+          },
+          "t_contract(ILongShort)4997": {
+            "label": "contract ILongShort"
+          },
+          "t_contract(IFloatToken)4965": {
+            "label": "contract IFloatToken"
+          },
+          "t_mapping(t_contract(ISyntheticToken)5075,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(contract ISyntheticToken => mapping(address => uint256))"
+          },
+          "t_contract(ISyntheticToken)5075": {
+            "label": "contract ISyntheticToken"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_mapping(t_contract(ISyntheticToken)5075,t_uint32)": {
+            "label": "mapping(contract ISyntheticToken => uint32)"
+          },
+          "t_mapping(t_uint32,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(uint32 => mapping(address => uint256))"
+          },
+          "t_mapping(t_uint32,t_mapping(t_uint256,t_struct(BatchedStake)2550_storage))": {
+            "label": "mapping(uint32 => mapping(uint256 => struct Staker.BatchedStake))"
+          },
+          "t_mapping(t_uint256,t_struct(BatchedStake)2550_storage)": {
+            "label": "mapping(uint256 => struct Staker.BatchedStake)"
+          },
+          "t_struct(BatchedStake)2550_storage": {
+            "label": "struct Staker.BatchedStake",
+            "members": [
+              {
+                "label": "amountLong",
+                "type": "t_uint256"
+              },
+              {
+                "label": "amountShort",
+                "type": "t_uint256"
+              },
+              {
+                "label": "creationRewardIndex",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_mapping(t_uint32,t_struct(SyntheticTokens)2543_storage)": {
+            "label": "mapping(uint32 => struct Staker.SyntheticTokens)"
+          },
+          "t_struct(SyntheticTokens)2543_storage": {
+            "label": "struct Staker.SyntheticTokens",
+            "members": [
+              {
+                "label": "shortToken",
+                "type": "t_contract(ISyntheticToken)5075"
+              },
+              {
+                "label": "longToken",
+                "type": "t_contract(ISyntheticToken)5075"
+              }
+            ]
+          },
+          "t_mapping(t_uint32,t_mapping(t_uint256,t_struct(RewardState)2536_storage))": {
+            "label": "mapping(uint32 => mapping(uint256 => struct Staker.RewardState))"
+          },
+          "t_mapping(t_uint256,t_struct(RewardState)2536_storage)": {
+            "label": "mapping(uint256 => struct Staker.RewardState)"
+          },
+          "t_struct(RewardState)2536_storage": {
+            "label": "struct Staker.RewardState",
+            "members": [
+              {
+                "label": "timestamp",
+                "type": "t_uint256"
+              },
+              {
+                "label": "accumulativeFloatPerLongToken",
+                "type": "t_uint256"
+              },
+              {
+                "label": "accumulativeFloatPerShortToken",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "f7dc2ccb47951c59313cd22f35f81b9b9fce4b2e34d29b75bad8f70a88de3302": {
+      "address": "0xB66f520ABC8A764dd0656bbd32576280c151f128",
+      "txHash": "0xe6c7fc7e505a15edab46ea5edf7afc16f0777a06f9b2808ee20faadd5632980a",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:23"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:28"
+          },
+          {
+            "contract": "LongShort",
+            "label": "__constantsGap",
+            "type": "t_array(t_uint256)45_storage",
+            "src": "LongShort.sol:39"
+          },
+          {
+            "contract": "LongShort",
+            "label": "admin",
+            "type": "t_address",
+            "src": "LongShort.sol:43"
+          },
+          {
+            "contract": "LongShort",
+            "label": "treasury",
+            "type": "t_address",
+            "src": "LongShort.sol:44"
+          },
+          {
+            "contract": "LongShort",
+            "label": "latestMarket",
+            "type": "t_uint32",
+            "src": "LongShort.sol:44"
+          },
+          {
+            "contract": "LongShort",
+            "label": "staker",
+            "type": "t_contract(IStaker)5050",
+            "src": "LongShort.sol:46"
+          },
+          {
+            "contract": "LongShort",
+            "label": "tokenFactory",
+            "type": "t_contract(ITokenFactory)5110",
+            "src": "LongShort.sol:46"
+          },
+          {
+            "contract": "LongShort",
+            "label": "__globalStateGap",
+            "type": "t_array(t_uint256)45_storage",
+            "src": "LongShort.sol:47"
+          },
+          {
+            "contract": "LongShort",
+            "label": "marketExists",
+            "type": "t_mapping(t_uint32,t_bool)",
+            "src": "LongShort.sol:49"
+          },
+          {
+            "contract": "LongShort",
+            "label": "assetPrice",
+            "type": "t_mapping(t_uint32,t_uint256)",
+            "src": "LongShort.sol:50"
+          },
+          {
+            "contract": "LongShort",
+            "label": "marketUpdateIndex",
+            "type": "t_mapping(t_uint32,t_uint256)",
+            "src": "LongShort.sol:51"
+          },
+          {
+            "contract": "LongShort",
+            "label": "totalFeesReservedForTreasury",
+            "type": "t_mapping(t_uint32,t_uint256)",
+            "src": "LongShort.sol:52"
+          },
+          {
+            "contract": "LongShort",
+            "label": "fundTokens",
+            "type": "t_mapping(t_uint32,t_contract(IERC20)19543)",
+            "src": "LongShort.sol:53"
+          },
+          {
+            "contract": "LongShort",
+            "label": "yieldManagers",
+            "type": "t_mapping(t_uint32,t_contract(IYieldManager)5158)",
+            "src": "LongShort.sol:55"
+          },
+          {
+            "contract": "LongShort",
+            "label": "oracleManagers",
+            "type": "t_mapping(t_uint32,t_contract(IOracleManager)5010)",
+            "src": "LongShort.sol:56"
+          },
+          {
+            "contract": "LongShort",
+            "label": "baseEntryFee",
+            "type": "t_mapping(t_uint32,t_uint256)",
+            "src": "LongShort.sol:57"
+          },
+          {
+            "contract": "LongShort",
+            "label": "badLiquidityEntryFee",
+            "type": "t_mapping(t_uint32,t_uint256)",
+            "src": "LongShort.sol:58"
+          },
+          {
+            "contract": "LongShort",
+            "label": "baseExitFee",
+            "type": "t_mapping(t_uint32,t_uint256)",
+            "src": "LongShort.sol:60"
+          },
+          {
+            "contract": "LongShort",
+            "label": "badLiquidityExitFee",
+            "type": "t_mapping(t_uint32,t_uint256)",
+            "src": "LongShort.sol:61"
+          },
+          {
+            "contract": "LongShort",
+            "label": "syntheticTokens",
+            "type": "t_mapping(t_uint32,t_mapping(t_bool,t_contract(ISyntheticToken)5075))",
+            "src": "LongShort.sol:62"
+          },
+          {
+            "contract": "LongShort",
+            "label": "syntheticTokenPoolValue",
+            "type": "t_mapping(t_uint32,t_mapping(t_bool,t_uint256))",
+            "src": "LongShort.sol:64"
+          },
+          {
+            "contract": "LongShort",
+            "label": "syntheticTokenPriceSnapshot",
+            "type": "t_mapping(t_uint32,t_mapping(t_bool,t_mapping(t_uint256,t_uint256)))",
+            "src": "LongShort.sol:67"
+          },
+          {
+            "contract": "LongShort",
+            "label": "batchedAmountOfTokensToDeposit",
+            "type": "t_mapping(t_uint32,t_mapping(t_bool,t_uint256))",
+            "src": "LongShort.sol:69"
+          },
+          {
+            "contract": "LongShort",
+            "label": "batchedAmountOfSynthTokensToRedeem",
+            "type": "t_mapping(t_uint32,t_mapping(t_bool,t_uint256))",
+            "src": "LongShort.sol:72"
+          },
+          {
+            "contract": "LongShort",
+            "label": "userCurrentNextPriceUpdateIndex",
+            "type": "t_mapping(t_uint32,t_mapping(t_address,t_uint256))",
+            "src": "LongShort.sol:76"
+          },
+          {
+            "contract": "LongShort",
+            "label": "userNextPriceDepositAmount",
+            "type": "t_mapping(t_uint32,t_mapping(t_bool,t_mapping(t_address,t_uint256)))",
+            "src": "LongShort.sol:78"
+          },
+          {
+            "contract": "LongShort",
+            "label": "userNextPriceRedemptionAmount",
+            "type": "t_mapping(t_uint32,t_mapping(t_bool,t_mapping(t_address,t_uint256)))",
+            "src": "LongShort.sol:81"
+          }
+        ],
+        "types": {
+          "t_array(t_uint256)45_storage": {
+            "label": "uint256[45]"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_uint32": {
+            "label": "uint32"
+          },
+          "t_contract(IStaker)5050": {
+            "label": "contract IStaker"
+          },
+          "t_contract(ITokenFactory)5110": {
+            "label": "contract ITokenFactory"
+          },
+          "t_mapping(t_uint32,t_bool)": {
+            "label": "mapping(uint32 => bool)"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_mapping(t_uint32,t_uint256)": {
+            "label": "mapping(uint32 => uint256)"
+          },
+          "t_mapping(t_uint32,t_contract(IERC20)19543)": {
+            "label": "mapping(uint32 => contract IERC20)"
+          },
+          "t_contract(IERC20)19543": {
+            "label": "contract IERC20"
+          },
+          "t_mapping(t_uint32,t_contract(IYieldManager)5158)": {
+            "label": "mapping(uint32 => contract IYieldManager)"
+          },
+          "t_contract(IYieldManager)5158": {
+            "label": "contract IYieldManager"
+          },
+          "t_mapping(t_uint32,t_contract(IOracleManager)5010)": {
+            "label": "mapping(uint32 => contract IOracleManager)"
+          },
+          "t_contract(IOracleManager)5010": {
+            "label": "contract IOracleManager"
+          },
+          "t_mapping(t_uint32,t_mapping(t_bool,t_contract(ISyntheticToken)5075))": {
+            "label": "mapping(uint32 => mapping(bool => contract ISyntheticToken))"
+          },
+          "t_mapping(t_bool,t_contract(ISyntheticToken)5075)": {
+            "label": "mapping(bool => contract ISyntheticToken)"
+          },
+          "t_contract(ISyntheticToken)5075": {
+            "label": "contract ISyntheticToken"
+          },
+          "t_mapping(t_uint32,t_mapping(t_bool,t_uint256))": {
+            "label": "mapping(uint32 => mapping(bool => uint256))"
+          },
+          "t_mapping(t_bool,t_uint256)": {
+            "label": "mapping(bool => uint256)"
+          },
+          "t_mapping(t_uint32,t_mapping(t_bool,t_mapping(t_uint256,t_uint256)))": {
+            "label": "mapping(uint32 => mapping(bool => mapping(uint256 => uint256)))"
+          },
+          "t_mapping(t_bool,t_mapping(t_uint256,t_uint256))": {
+            "label": "mapping(bool => mapping(uint256 => uint256))"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_mapping(t_uint32,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(uint32 => mapping(address => uint256))"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_mapping(t_uint32,t_mapping(t_bool,t_mapping(t_address,t_uint256)))": {
+            "label": "mapping(uint32 => mapping(bool => mapping(address => uint256)))"
+          },
+          "t_mapping(t_bool,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(bool => mapping(address => uint256))"
+          }
+        }
+      }
     }
-  },
-  "admin": {
-    "address": "0x0AadE3EEBaCcc03Ab3067266547c3DD00F24cEa3",
-    "txHash": "0x0a7d6ca245fdd6c1e25948a3f0053b89580034f60bb334a7cc11b3ba8606d467"
   }
 }

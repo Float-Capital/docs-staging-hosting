@@ -13,13 +13,13 @@
   "web3PollingInterval": 8000,
   "apolloConnectToDevTools": true,
   "contracts": {
-    "FloatCapital_v0": "0x27Ce339868C91a339f3151144fe5Cda543682665",
-    "FloatToken": "0x20C47B5C209197ecDf71b137d79d502C2E6dccA5",
-    "LongShort": "0x3Fe666e021714eaF51e061D8efFCc6fA4b390DC0",
-    "Migrations": "0x6371C726b545954AEc5571CB3544142527D39CA0",
-    "Staker": "0xb3349B93b44D805a4199c75397c3C328ce21167b",
-    "TokenFactory": "0x1aA97e5cE92C133073aCb11f794BD1D7fe6d4690",
-    "Treasury_v0": "0x5131B61672C70453D0cbDe2f57bc0c6dbF21cE3b",
+    "FloatCapital_v0": "0xFc2A0cf0D2656b71bdE820542E1cc0B445Cf7544",
+    "FloatToken": "0xfe26c18E7f2e695939d49C2fcaCfb3827C480B94",
+    "LongShort": "0xE6F3bFC71E2A007aFc32b185CaD5526b40Ee0e15",
+    "Migrations": "0xC4216ed8c3aeDFAee4cE1D4bDfB449526FFde88f",
+    "Staker": "0x124c3656522D4E39De5af98d8972696216C9bB96",
+    "TokenFactory": "0xe5Db99b3E5AEf1227827Fe3E9572B877106f6D89",
+    "Treasury_v0": "0xfb83637B4Eda56A503aa42646316a9F8ADb04168",
     "Dai": "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F"
   }
 }

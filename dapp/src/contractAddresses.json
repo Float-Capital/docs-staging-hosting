@@ -1,0 +1,11 @@
+{
+  "80001": {
+    "FloatCapital_v0": "0xFc2A0cf0D2656b71bdE820542E1cc0B445Cf7544",
+    "FloatToken": "0xfe26c18E7f2e695939d49C2fcaCfb3827C480B94",
+    "LongShort": "0xE6F3bFC71E2A007aFc32b185CaD5526b40Ee0e15",
+    "Migrations": "0xC4216ed8c3aeDFAee4cE1D4bDfB449526FFde88f",
+    "Staker": "0x124c3656522D4E39De5af98d8972696216C9bB96",
+    "TokenFactory": "0xe5Db99b3E5AEf1227827Fe3E9572B877106f6D89",
+    "Treasury_v0": "0xfb83637B4Eda56A503aa42646316a9F8ADb04168"
+  }
+}
