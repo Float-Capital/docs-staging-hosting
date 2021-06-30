@@ -13,7 +13,7 @@ slug: /addresses
 
 NOTE: these testnet addresses are frequently changing during development 👷‍♀️👷
 
-<!-- See our contract **[Deployer address](https://explorer-mumbai.maticvigil.com/address/0x97D247303960fC0FCA4fD703f3dAaf0ADdA07598/)** to keep abreast with the latest deployments. -->
+<!-- See our contract **[Deployer address](https://mumbai.polygonscan.com/address/0x97D247303960fC0FCA4fD703f3dAaf0ADdA07598/)** to keep abreast with the latest deployments. -->
 
 ### Contracts
 
