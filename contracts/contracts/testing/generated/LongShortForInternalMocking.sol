@@ -123,8 +123,8 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function _burnSynthTokensForRedemptionMock(uint32,uint256,uint256) public pure returns (bool wasABatchedSettlement){
-      return (abi.decode("",(bool)));
+    function _burnSynthTokensForRedemptionMock(uint32,uint256,uint256) public pure {
+      return ();
     }
      
     function _transferFundsToYieldManagerMock(uint32,uint256) public pure {
@@ -182,7 +182,7 @@ contract LongShortForInternalMocking {
     function _performOustandingSettlementsMock(uint32,uint256,uint256,uint256) public pure {
       return ();
     }
-     
+
     function _handleBatchedDepositSettlementMock(uint32,bool,uint256) public pure returns (bool wasABatchedSettlement){
       return (abi.decode("",(bool)));
     }

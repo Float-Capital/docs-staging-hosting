@@ -1828,10 +1828,10 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mock_burnSynthTokensForRedemptionToReturn: bool => unit = _param0 => {
+  let mock_burnSynthTokensForRedemptionToReturn: unit => unit = () => {
     checkForExceptions(~functionName="_burnSynthTokensForRedemption")
     let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked._burnSynthTokensForRedemptionMock.will.return.with([_param0])")
+      let _ = %raw("_r.smocked._burnSynthTokensForRedemptionMock.will.return()")
     })
   }
 
@@ -2258,10 +2258,10 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mock_handleBatchedDepositSettlementToReturn: bool => unit = _param0 => {
+  let mock_handleBatchedDepositSettlementToReturn: unit => unit = () => {
     checkForExceptions(~functionName="_handleBatchedDepositSettlement")
     let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked._handleBatchedDepositSettlementMock.will.return.with([_param0])")
+      let _ = %raw("_r.smocked._handleBatchedDepositSettlementMock.will.return()")
     })
   }
 
@@ -2289,10 +2289,10 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mock_handleBatchedRedeemSettlementToReturn: bool => unit = _param0 => {
+  let mock_handleBatchedRedeemSettlementToReturn: unit => unit = () => {
     checkForExceptions(~functionName="_handleBatchedRedeemSettlement")
     let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked._handleBatchedRedeemSettlementMock.will.return.with([_param0])")
+      let _ = %raw("_r.smocked._handleBatchedRedeemSettlementMock.will.return()")
     })
   }
 
