@@ -89,7 +89,7 @@ dataSources:
         - event: StakeWithdrawn(address,address,uint256)
           handler: handleStakeWithdrawn
         - event: StateAdded(uint32,uint256,uint256,uint256)
-          handler: handleStateAddedd
+          handler: handleStateAdded
       file: ./src/staker.ts
 
 templates:

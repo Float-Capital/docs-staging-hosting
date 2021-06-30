@@ -893,7 +893,7 @@
     "absolutePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/Treasury_v0.sol",
     "exportedSymbols": {
       "Initializable": [
-        16391
+        16424
       ],
       "Treasury_v0": [
         4520
@@ -920,7 +920,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 4521,
-        "sourceUnit": 16392,
+        "sourceUnit": 16425,
         "src": "62:75:7",
         "symbolAliases": [],
         "unitAlias": ""
@@ -933,7 +933,7 @@
               "id": 4479,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 16391,
+              "referencedDeclaration": 16424,
               "src": "195:13:7"
             },
             "id": 4480,
@@ -942,7 +942,7 @@
           }
         ],
         "contractDependencies": [
-          16391
+          16424
         ],
         "contractKind": "contract",
         "documentation": {
@@ -955,7 +955,7 @@
         "id": 4520,
         "linearizedBaseContracts": [
           4520,
-          16391
+          16424
         ],
         "name": "Treasury_v0",
         "nameLocation": "180:11:7",
@@ -1200,7 +1200,7 @@
                   "id": 4498,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 16390,
+                  "referencedDeclaration": 16423,
                   "src": "629:11:7"
                 },
                 "nodeType": "ModifierInvocation",
@@ -1394,7 +1394,7 @@
     "absolutePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/Treasury_v0.sol",
     "exportedSymbols": {
       "Initializable": [
-        16391
+        16424
       ],
       "Treasury_v0": [
         4520
@@ -1421,7 +1421,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 4521,
-        "sourceUnit": 16392,
+        "sourceUnit": 16425,
         "src": "62:75:7",
         "symbolAliases": [],
         "unitAlias": ""
@@ -1434,7 +1434,7 @@
               "id": 4479,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 16391,
+              "referencedDeclaration": 16424,
               "src": "195:13:7"
             },
             "id": 4480,
@@ -1443,7 +1443,7 @@
           }
         ],
         "contractDependencies": [
-          16391
+          16424
         ],
         "contractKind": "contract",
         "documentation": {
@@ -1456,7 +1456,7 @@
         "id": 4520,
         "linearizedBaseContracts": [
           4520,
-          16391
+          16424
         ],
         "name": "Treasury_v0",
         "nameLocation": "180:11:7",
@@ -1701,7 +1701,7 @@
                   "id": 4498,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 16390,
+                  "referencedDeclaration": 16423,
                   "src": "629:11:7"
                 },
                 "nodeType": "ModifierInvocation",
@@ -1899,11 +1899,12 @@
     "80001": {
       "events": {},
       "links": {},
-      "address": "0xfb83637B4Eda56A503aa42646316a9F8ADb04168"
+      "address": "0x9999D1a082d136d9Ad8B545cC98977950F79f269",
+      "transactionHash": "0x0c13c5d707d501792d97104616ab65b3904e7ddbd96dcd490bd8fb46fb66a74e"
     }
   },
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-06-30T11:52:13.990Z",
+  "updatedAt": "2021-06-30T19:01:45.817Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

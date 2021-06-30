@@ -149,8 +149,12 @@ contract YieldManagerAave is IYieldManager {
      * through the claimYieldAndGetMarketAmount function.
      */
     // TODO STENT not unit tested
-    function getTotalValueRealized() public override view
-        returns (uint256 totalValueRealized) {
+    function getTotalValueRealized()
+        public
+        view
+        override
+        returns (uint256 totalValueRealized)
+    {
         return totalValueRealized;
     }
 
@@ -158,8 +162,12 @@ contract YieldManagerAave is IYieldManager {
      * Returns the total amount of yield that is owed to the treasury.
      */
     // TODO STENT not unit tested
-    function getTotalReservedForTreasury() public override view
-        returns (uint256 totalValueReservedForTreasury) {
+    function getTotalReservedForTreasury()
+        public
+        view
+        override
+        returns (uint256 totalValueReservedForTreasury)
+    {
         return totalReservedForTreasury;
     }
 
@@ -171,9 +179,13 @@ contract YieldManagerAave is IYieldManager {
      */
     // TODO STENT not unit tested
     function claimYieldAndGetMarketAmount(uint256 marketPcntE5)
-        public override longShortOnly returns (uint256) {
-
-        uint256 unrealizedYield = getTotalHeld() - totalValueRealized;
+        public
+        override
+        longShortOnly
+        returns (uint256)
+    {
+        uint256 totalHeld = getTotalHeld();
+        uint256 unrealizedYield = totalHeld - totalValueRealized;
 
         if (unrealizedYield == 0) {
             return 0;
@@ -181,7 +193,9 @@ contract YieldManagerAave is IYieldManager {
 
         uint256 treasuryPcntE5 = TEN_TO_THE_5 - marketPcntE5;
 
-        totalReservedForTreasury += unrealizedYield * treasuryPcntE5 / TEN_TO_THE_5;
+        totalReservedForTreasury +=
+            (unrealizedYield * treasuryPcntE5) /
+            TEN_TO_THE_5;
         totalValueRealized += unrealizedYield;
 
         return unrealizedYield - totalReservedForTreasury;
@@ -194,7 +208,11 @@ contract YieldManagerAave is IYieldManager {
     function withdrawTreasuryFunds() external override longShortOnly {
         // Redeem aToken for underlying asset tokens.
         // This will fail if not enough liquidity is avaiable on aave.
-        lendingPool.withdraw(address(token), totalReservedForTreasury, address(this));
+        lendingPool.withdraw(
+            address(token),
+            totalReservedForTreasury,
+            address(this)
+        );
 
         token.transfer(treasury, totalReservedForTreasury);
 
@@ -203,11 +221,24 @@ contract YieldManagerAave is IYieldManager {
     }
 
     function getTotalHeld() public view override returns (uint256 amount) {
-        return aToken.balanceOf(address(this));
+        try aToken.balanceOf(address(this)) returns (uint256 totalHeld) {
+            return totalHeld;
+        } catch Error(
+            string memory /*reason*/
+        ) {
+            return 0;
+        } catch Panic(
+            uint256 /*errorCode*/
+        ) {
+            return 0;
+        } catch (
+            bytes memory /*lowLevelData*/
+        ) {
+            return 0;
+        }
     }
 
     function getHeldToken() public view override returns (address _token) {
         return address(token);
     }
-
 }

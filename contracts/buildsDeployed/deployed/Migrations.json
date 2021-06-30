@@ -2009,12 +2009,12 @@
     "80001": {
       "events": {},
       "links": {},
-      "address": "0xC4216ed8c3aeDFAee4cE1D4bDfB449526FFde88f",
-      "transactionHash": "0x4e1c74f3d6f4a55b09520a267ce00a29f63f9415aa7bdaf3e7367ed7e82ead12"
+      "address": "0xFFa0944Ab2DF5BD00269cE495A388d22A37F93f1",
+      "transactionHash": "0xed41b5a224c5d90bcc087a503e12f1d1a42d85c8809edc645425242d3f7c3aac"
     }
   },
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-06-30T11:52:14.084Z",
+  "updatedAt": "2021-06-30T19:01:45.899Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

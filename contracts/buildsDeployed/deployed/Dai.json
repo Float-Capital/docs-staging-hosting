@@ -179,7 +179,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -192,7 +193,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -205,7 +207,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -229,7 +232,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -272,7 +276,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -316,7 +321,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -359,7 +365,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -383,7 +390,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -402,7 +410,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -444,7 +453,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -499,7 +509,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -519,7 +530,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -574,7 +586,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -587,7 +600,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -600,7 +614,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -11062,63 +11077,63 @@
     "absolutePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/mocks/Dai.sol",
     "exportedSymbols": {
       "AccessControl": [
-        18676
+        18709
       ],
       "AccessControlEnumerable": [
-        18866
+        18899
       ],
       "Context": [
-        19825
+        19858
       ],
       "Dai": [
-        6098
+        6131
       ],
       "ERC165": [
-        20052
+        20085
       ],
       "ERC20": [
-        19465
+        19498
       ],
       "ERC20Burnable": [
-        19604
+        19637
       ],
       "ERC20Pausable": [
-        19641
+        19674
       ],
       "ERC20PresetMinterPauser": [
-        19802
+        19835
       ],
       "EnumerableSet": [
-        20577
+        20610
       ],
       "IAccessControl": [
-        18352
+        18385
       ],
       "IAccessControlEnumerable": [
-        18698
+        18731
       ],
       "IERC165": [
-        20064
+        20097
       ],
       "IERC20": [
-        19543
+        19576
       ],
       "IERC20Metadata": [
-        19666
+        19699
       ],
       "Pausable": [
-        18958
+        18991
       ],
       "Strings": [
-        20028
+        20061
       ]
     },
-    "id": 6099,
+    "id": 6132,
     "license": "BUSL-1.1",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 6082,
+        "id": 6115,
         "literals": [
           "solidity",
           "0.8",
@@ -11130,11 +11145,11 @@
       {
         "absolutePath": "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol",
         "file": "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol",
-        "id": 6083,
+        "id": 6116,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 6099,
-        "sourceUnit": 19803,
+        "scope": 6132,
+        "sourceUnit": 19836,
         "src": "62:81:22",
         "symbolAliases": [],
         "unitAlias": ""
@@ -11144,52 +11159,52 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 6084,
+              "id": 6117,
               "name": "ERC20PresetMinterPauser",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 19802,
+              "referencedDeclaration": 19835,
               "src": "222:23:22"
             },
-            "id": 6085,
+            "id": 6118,
             "nodeType": "InheritanceSpecifier",
             "src": "222:23:22"
           }
         ],
         "contractDependencies": [
-          18352,
-          18676,
-          18698,
-          18866,
-          18958,
-          19465,
-          19543,
-          19604,
-          19641,
-          19666,
-          19802,
-          19825,
-          20052,
-          20064
+          18385,
+          18709,
+          18731,
+          18899,
+          18991,
+          19498,
+          19576,
+          19637,
+          19674,
+          19699,
+          19835,
+          19858,
+          20085,
+          20097
         ],
         "contractKind": "contract",
         "fullyImplemented": true,
-        "id": 6098,
+        "id": 6131,
         "linearizedBaseContracts": [
-          6098,
-          19802,
-          19641,
-          18958,
-          19604,
-          19465,
-          19666,
-          19543,
-          18866,
-          18676,
-          20052,
-          20064,
-          18352,
-          19825,
-          18698
+          6131,
+          19835,
+          19674,
+          18991,
+          19637,
+          19498,
+          19699,
+          19576,
+          18899,
+          18709,
+          20085,
+          20097,
+          18385,
+          19858,
+          18731
         ],
         "name": "Dai",
         "nameLocation": "215:3:22",
@@ -11197,23 +11212,23 @@
         "nodes": [
           {
             "body": {
-              "id": 6096,
+              "id": 6129,
               "nodeType": "Block",
               "src": "356:2:22",
               "statements": []
             },
-            "id": 6097,
+            "id": 6130,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [
               {
                 "arguments": [
                   {
-                    "id": 6092,
+                    "id": 6125,
                     "name": "name",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 6087,
+                    "referencedDeclaration": 6120,
                     "src": "338:4:22",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_memory_ptr",
@@ -11221,11 +11236,11 @@
                     }
                   },
                   {
-                    "id": 6093,
+                    "id": 6126,
                     "name": "symbol",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 6089,
+                    "referencedDeclaration": 6122,
                     "src": "344:6:22",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_memory_ptr",
@@ -11233,12 +11248,12 @@
                     }
                   }
                 ],
-                "id": 6094,
+                "id": 6127,
                 "modifierName": {
-                  "id": 6091,
+                  "id": 6124,
                   "name": "ERC20PresetMinterPauser",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 19802,
+                  "referencedDeclaration": 19835,
                   "src": "314:23:22"
                 },
                 "nodeType": "ModifierInvocation",
@@ -11249,17 +11264,17 @@
             "nameLocation": "-1:-1:-1",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 6090,
+              "id": 6123,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 6087,
+                  "id": 6120,
                   "mutability": "mutable",
                   "name": "name",
                   "nameLocation": "278:4:22",
                   "nodeType": "VariableDeclaration",
-                  "scope": 6097,
+                  "scope": 6130,
                   "src": "264:18:22",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -11268,7 +11283,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 6086,
+                    "id": 6119,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "264:6:22",
@@ -11281,12 +11296,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 6089,
+                  "id": 6122,
                   "mutability": "mutable",
                   "name": "symbol",
                   "nameLocation": "298:6:22",
                   "nodeType": "VariableDeclaration",
-                  "scope": 6097,
+                  "scope": 6130,
                   "src": "284:20:22",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -11295,7 +11310,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 6088,
+                    "id": 6121,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "284:6:22",
@@ -11310,19 +11325,19 @@
               "src": "263:42:22"
             },
             "returnParameters": {
-              "id": 6095,
+              "id": 6128,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "356:0:22"
             },
-            "scope": 6098,
+            "scope": 6131,
             "src": "252:106:22",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 6099,
+        "scope": 6132,
         "src": "206:154:22"
       }
     ],
@@ -11332,63 +11347,63 @@
     "absolutePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/mocks/Dai.sol",
     "exportedSymbols": {
       "AccessControl": [
-        18676
+        18709
       ],
       "AccessControlEnumerable": [
-        18866
+        18899
       ],
       "Context": [
-        19825
+        19858
       ],
       "Dai": [
-        6098
+        6131
       ],
       "ERC165": [
-        20052
+        20085
       ],
       "ERC20": [
-        19465
+        19498
       ],
       "ERC20Burnable": [
-        19604
+        19637
       ],
       "ERC20Pausable": [
-        19641
+        19674
       ],
       "ERC20PresetMinterPauser": [
-        19802
+        19835
       ],
       "EnumerableSet": [
-        20577
+        20610
       ],
       "IAccessControl": [
-        18352
+        18385
       ],
       "IAccessControlEnumerable": [
-        18698
+        18731
       ],
       "IERC165": [
-        20064
+        20097
       ],
       "IERC20": [
-        19543
+        19576
       ],
       "IERC20Metadata": [
-        19666
+        19699
       ],
       "Pausable": [
-        18958
+        18991
       ],
       "Strings": [
-        20028
+        20061
       ]
     },
-    "id": 6099,
+    "id": 6132,
     "license": "BUSL-1.1",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 6082,
+        "id": 6115,
         "literals": [
           "solidity",
           "0.8",
@@ -11400,11 +11415,11 @@
       {
         "absolutePath": "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol",
         "file": "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol",
-        "id": 6083,
+        "id": 6116,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 6099,
-        "sourceUnit": 19803,
+        "scope": 6132,
+        "sourceUnit": 19836,
         "src": "62:81:22",
         "symbolAliases": [],
         "unitAlias": ""
@@ -11414,52 +11429,52 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 6084,
+              "id": 6117,
               "name": "ERC20PresetMinterPauser",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 19802,
+              "referencedDeclaration": 19835,
               "src": "222:23:22"
             },
-            "id": 6085,
+            "id": 6118,
             "nodeType": "InheritanceSpecifier",
             "src": "222:23:22"
           }
         ],
         "contractDependencies": [
-          18352,
-          18676,
-          18698,
-          18866,
-          18958,
-          19465,
-          19543,
-          19604,
-          19641,
-          19666,
-          19802,
-          19825,
-          20052,
-          20064
+          18385,
+          18709,
+          18731,
+          18899,
+          18991,
+          19498,
+          19576,
+          19637,
+          19674,
+          19699,
+          19835,
+          19858,
+          20085,
+          20097
         ],
         "contractKind": "contract",
         "fullyImplemented": true,
-        "id": 6098,
+        "id": 6131,
         "linearizedBaseContracts": [
-          6098,
-          19802,
-          19641,
-          18958,
-          19604,
-          19465,
-          19666,
-          19543,
-          18866,
-          18676,
-          20052,
-          20064,
-          18352,
-          19825,
-          18698
+          6131,
+          19835,
+          19674,
+          18991,
+          19637,
+          19498,
+          19699,
+          19576,
+          18899,
+          18709,
+          20085,
+          20097,
+          18385,
+          19858,
+          18731
         ],
         "name": "Dai",
         "nameLocation": "215:3:22",
@@ -11467,23 +11482,23 @@
         "nodes": [
           {
             "body": {
-              "id": 6096,
+              "id": 6129,
               "nodeType": "Block",
               "src": "356:2:22",
               "statements": []
             },
-            "id": 6097,
+            "id": 6130,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [
               {
                 "arguments": [
                   {
-                    "id": 6092,
+                    "id": 6125,
                     "name": "name",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 6087,
+                    "referencedDeclaration": 6120,
                     "src": "338:4:22",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_memory_ptr",
@@ -11491,11 +11506,11 @@
                     }
                   },
                   {
-                    "id": 6093,
+                    "id": 6126,
                     "name": "symbol",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 6089,
+                    "referencedDeclaration": 6122,
                     "src": "344:6:22",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_memory_ptr",
@@ -11503,12 +11518,12 @@
                     }
                   }
                 ],
-                "id": 6094,
+                "id": 6127,
                 "modifierName": {
-                  "id": 6091,
+                  "id": 6124,
                   "name": "ERC20PresetMinterPauser",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 19802,
+                  "referencedDeclaration": 19835,
                   "src": "314:23:22"
                 },
                 "nodeType": "ModifierInvocation",
@@ -11519,17 +11534,17 @@
             "nameLocation": "-1:-1:-1",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 6090,
+              "id": 6123,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 6087,
+                  "id": 6120,
                   "mutability": "mutable",
                   "name": "name",
                   "nameLocation": "278:4:22",
                   "nodeType": "VariableDeclaration",
-                  "scope": 6097,
+                  "scope": 6130,
                   "src": "264:18:22",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -11538,7 +11553,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 6086,
+                    "id": 6119,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "264:6:22",
@@ -11551,12 +11566,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 6089,
+                  "id": 6122,
                   "mutability": "mutable",
                   "name": "symbol",
                   "nameLocation": "298:6:22",
                   "nodeType": "VariableDeclaration",
-                  "scope": 6097,
+                  "scope": 6130,
                   "src": "284:20:22",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -11565,7 +11580,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 6088,
+                    "id": 6121,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "284:6:22",
@@ -11580,19 +11595,19 @@
               "src": "263:42:22"
             },
             "returnParameters": {
-              "id": 6095,
+              "id": 6128,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "356:0:22"
             },
-            "scope": 6098,
+            "scope": 6131,
             "src": "252:106:22",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 6099,
+        "scope": 6132,
         "src": "206:154:22"
       }
     ],
@@ -11604,7 +11619,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-06-30T11:52:14.058Z",
+  "updatedAt": "2021-06-30T19:01:45.722Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

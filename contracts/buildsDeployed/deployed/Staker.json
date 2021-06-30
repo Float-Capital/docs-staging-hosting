@@ -2645,7 +2645,7 @@
                 }
               ]
             },
-            "name": "abi_decode_tuple_t_contract$_ISyntheticToken_$5075",
+            "name": "abi_decode_tuple_t_contract$_ISyntheticToken_$5108",
             "nodeType": "YulFunctionDefinition",
             "parameters": [
               {
@@ -2898,7 +2898,7 @@
                 }
               ]
             },
-            "name": "abi_decode_tuple_t_contract$_ISyntheticToken_$5075t_address",
+            "name": "abi_decode_tuple_t_contract$_ISyntheticToken_$5108t_address",
             "nodeType": "YulFunctionDefinition",
             "parameters": [
               {
@@ -3120,7 +3120,7 @@
                 }
               ]
             },
-            "name": "abi_decode_tuple_t_contract$_ISyntheticToken_$5075t_uint256",
+            "name": "abi_decode_tuple_t_contract$_ISyntheticToken_$5108t_uint256",
             "nodeType": "YulFunctionDefinition",
             "parameters": [
               {
@@ -4106,7 +4106,7 @@
                 }
               ]
             },
-            "name": "abi_decode_tuple_t_uint32t_contract$_ISyntheticToken_$5075t_contract$_ISyntheticToken_$5075t_uint256t_uint256",
+            "name": "abi_decode_tuple_t_uint32t_contract$_ISyntheticToken_$5108t_contract$_ISyntheticToken_$5108t_uint256t_uint256",
             "nodeType": "YulFunctionDefinition",
             "parameters": [
               {
@@ -6775,7 +6775,7 @@
                 }
               ]
             },
-            "name": "abi_encode_tuple_t_contract$_IFloatToken_$4965__to_t_address__fromStack_reversed",
+            "name": "abi_encode_tuple_t_contract$_IFloatToken_$4998__to_t_address__fromStack_reversed",
             "nodeType": "YulFunctionDefinition",
             "parameters": [
               {
@@ -6921,7 +6921,7 @@
                 }
               ]
             },
-            "name": "abi_encode_tuple_t_contract$_ILongShort_$4997__to_t_address__fromStack_reversed",
+            "name": "abi_encode_tuple_t_contract$_ILongShort_$5030__to_t_address__fromStack_reversed",
             "nodeType": "YulFunctionDefinition",
             "parameters": [
               {
@@ -7143,7 +7143,7 @@
                 }
               ]
             },
-            "name": "abi_encode_tuple_t_contract$_ISyntheticToken_$5075_t_contract$_ISyntheticToken_$5075__to_t_address_t_address__fromStack_reversed",
+            "name": "abi_encode_tuple_t_contract$_ISyntheticToken_$5108_t_contract$_ISyntheticToken_$5108__to_t_address_t_address__fromStack_reversed",
             "nodeType": "YulFunctionDefinition",
             "parameters": [
               {
@@ -10519,7 +10519,7 @@
           }
         ]
       },
-      "contents": "{\n    { }\n    function abi_decode_uint32(offset) -> value\n    {\n        value := calldataload(offset)\n        if iszero(eq(value, and(value, 0xffffffff))) { revert(0, 0) }\n    }\n    function abi_decode_tuple_t_address(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(value0, value0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function abi_decode_tuple_t_addresst_addresst_addresst_address(headStart, dataEnd) -> value0, value1, value2, value3\n    {\n        if slt(sub(dataEnd, headStart), 128) { revert(value1, value1) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        let value_1 := calldataload(add(headStart, 32))\n        validator_revert_address(value_1)\n        value1 := value_1\n        let value_2 := calldataload(add(headStart, 64))\n        validator_revert_address(value_2)\n        value2 := value_2\n        let value_3 := calldataload(add(headStart, 96))\n        validator_revert_address(value_3)\n        value3 := value_3\n    }\n    function abi_decode_tuple_t_addresst_uint256(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(value0, value0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        value1 := calldataload(add(headStart, 32))\n    }\n    function abi_decode_tuple_t_array$_t_uint32_$dyn_calldata_ptr(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(value0, value0) }\n        let offset := calldataload(headStart)\n        let _1 := 0xffffffffffffffff\n        if gt(offset, _1) { revert(value0, value0) }\n        let _2 := add(headStart, offset)\n        if iszero(slt(add(_2, 0x1f), dataEnd)) { revert(value0, value0) }\n        let length := calldataload(_2)\n        if gt(length, _1) { revert(value0, value0) }\n        if gt(add(add(_2, shl(5, length)), 32), dataEnd) { revert(value0, value0) }\n        value0 := add(_2, 32)\n        value1 := length\n    }\n    function abi_decode_tuple_t_bool_fromMemory(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(value0, value0) }\n        let value := mload(headStart)\n        if iszero(eq(value, iszero(iszero(value)))) { revert(value0, value0) }\n        value0 := value\n    }\n    function abi_decode_tuple_t_contract$_ISyntheticToken_$5075(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(value0, value0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function abi_decode_tuple_t_contract$_ISyntheticToken_$5075t_address(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(value0, value0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        let value_1 := calldataload(add(headStart, 32))\n        validator_revert_address(value_1)\n        value1 := value_1\n    }\n    function abi_decode_tuple_t_contract$_ISyntheticToken_$5075t_uint256(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(value0, value0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        value1 := calldataload(add(headStart, 32))\n    }\n    function abi_decode_tuple_t_uint16(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(value0, value0) }\n        let value := calldataload(headStart)\n        if iszero(eq(value, and(value, 0xffff))) { revert(value0, value0) }\n        value0 := value\n    }\n    function abi_decode_tuple_t_uint32(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(value0, value0) }\n        value0 := abi_decode_uint32(headStart)\n    }\n    function abi_decode_tuple_t_uint32t_address(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(value0, value0) }\n        value0 := abi_decode_uint32(headStart)\n        let value := calldataload(add(headStart, 32))\n        validator_revert_address(value)\n        value1 := value\n    }\n    function abi_decode_tuple_t_uint32t_contract$_ISyntheticToken_$5075t_contract$_ISyntheticToken_$5075t_uint256t_uint256(headStart, dataEnd) -> value0, value1, value2, value3, value4\n    {\n        if slt(sub(dataEnd, headStart), 160) { revert(value4, value4) }\n        value0 := abi_decode_uint32(headStart)\n        let value := calldataload(add(headStart, 32))\n        validator_revert_address(value)\n        value1 := value\n        let value_1 := calldataload(add(headStart, 64))\n        validator_revert_address(value_1)\n        value2 := value_1\n        value3 := calldataload(add(headStart, 96))\n        value4 := calldataload(add(headStart, 128))\n    }\n    function abi_decode_tuple_t_uint32t_uint256(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(value0, value0) }\n        value0 := abi_decode_uint32(headStart)\n        value1 := calldataload(add(headStart, 32))\n    }\n    function abi_decode_tuple_t_uint32t_uint256t_uint256(headStart, dataEnd) -> value0, value1, value2\n    {\n        if slt(sub(dataEnd, headStart), 96) { revert(value0, value0) }\n        value0 := abi_decode_uint32(headStart)\n        value1 := calldataload(add(headStart, 32))\n        value2 := calldataload(add(headStart, 64))\n    }\n    function abi_decode_tuple_t_uint32t_uint256t_uint256t_uint256t_uint256(headStart, dataEnd) -> value0, value1, value2, value3, value4\n    {\n        if slt(sub(dataEnd, headStart), 160) { revert(value2, value2) }\n        value0 := abi_decode_uint32(headStart)\n        value1 := calldataload(add(headStart, 32))\n        value2 := calldataload(add(headStart, 64))\n        value3 := calldataload(add(headStart, 96))\n        value4 := calldataload(add(headStart, 128))\n    }\n    function abi_encode_tuple_t_address__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_address_t_address_t_uint256__to_t_address_t_address_t_uint256__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 96)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n        mstore(add(headStart, 64), value2)\n    }\n    function abi_encode_tuple_t_address_t_address_t_uint256_t_uint256__to_t_address_t_address_t_uint256_t_uint256__fromStack_reversed(headStart, value3, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 128)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n        mstore(add(headStart, 64), value2)\n        mstore(add(headStart, 96), value3)\n    }\n    function abi_encode_tuple_t_address_t_uint256__to_t_address_t_uint256__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n        mstore(add(headStart, 32), value1)\n    }\n    function abi_encode_tuple_t_address_t_uint32_t_uint256_t_uint256_t_uint256__to_t_address_t_uint32_t_uint256_t_uint256_t_uint256__fromStack_reversed(headStart, value4, value3, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 160)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n        mstore(add(headStart, 32), and(value1, 0xffffffff))\n        mstore(add(headStart, 64), value2)\n        mstore(add(headStart, 96), value3)\n        mstore(add(headStart, 128), value4)\n    }\n    function abi_encode_tuple_t_array$_t_uint32_$dyn_calldata_ptr__to_t_array$_t_uint32_$dyn_memory_ptr__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        let _1 := 32\n        let tail_1 := add(headStart, _1)\n        mstore(headStart, _1)\n        let pos := tail_1\n        mstore(tail_1, value1)\n        pos := add(headStart, 64)\n        let srcPtr := value0\n        let i := tail\n        for { } lt(i, value1) { i := add(i, 1) }\n        {\n            mstore(pos, and(abi_decode_uint32(srcPtr), 0xffffffff))\n            pos := add(pos, _1)\n            srcPtr := add(srcPtr, _1)\n        }\n        tail := pos\n    }\n    function abi_encode_tuple_t_contract$_IFloatToken_$4965__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_contract$_ILongShort_$4997__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_contract$_ISyntheticToken_$5075_t_contract$_ISyntheticToken_$5075__to_t_address_t_address__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n    }\n    function abi_encode_tuple_t_stringliteral_68bb781205ac8241962170e96d6a01047f560e82b505de8585e1fd429fc87d4b__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 47)\n        mstore(add(headStart, 64), \"marketLaunchIncentiveMultiplier \")\n        mstore(add(headStart, 96), \"must be >= 1e18\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_stringliteral_7a2a4e26842155ea933fe6eb6e3137eb5a296dcdf55721c552be7b4c3cc23759__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 46)\n        mstore(add(headStart, 64), \"Initializable: contract is alrea\")\n        mstore(add(headStart, 96), \"dy initialized\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_stringliteral_82b68ff3c1c44d3c42f87a8a0b4619f58e1e5eb77cfc0f8240d7596af7ec9276__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 15)\n        mstore(add(headStart, 64), \"not valid synth\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_d015b7d7782ab5f33f0b2a3f3ec5207107594fb24ec0023388f87a16a3862dc0__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 19)\n        mstore(add(headStart, 64), \"nothing to withdraw\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_e28d3d4b0238f59994407ce2f3c10c2c3f25706d9d645a83b44428559d9ee283__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 9)\n        mstore(add(headStart, 64), \"not admin\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_uint16__to_t_uint16__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, 0xffff))\n    }\n    function abi_encode_tuple_t_uint256__to_t_uint256__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, value0)\n    }\n    function abi_encode_tuple_t_uint256_t_uint256_t_uint256__to_t_uint256_t_uint256_t_uint256__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 96)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), value2)\n    }\n    function abi_encode_tuple_t_uint32__to_t_uint32__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, 0xffffffff))\n    }\n    function abi_encode_tuple_t_uint32_t_rational_0_by_1_t_rational_0_by_1_t_rational_0_by_1__to_t_uint32_t_uint256_t_uint256_t_uint256__fromStack_reversed(headStart, value3, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 128)\n        mstore(headStart, and(value0, 0xffffffff))\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), value2)\n        mstore(add(headStart, 96), value3)\n    }\n    function abi_encode_tuple_t_uint32_t_rational_50_by_1__to_t_uint32_t_uint256__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, and(value0, 0xffffffff))\n        mstore(add(headStart, 32), value1)\n    }\n    function abi_encode_tuple_t_uint32_t_uint256_t_uint256__to_t_uint32_t_uint256_t_uint256__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 96)\n        mstore(headStart, and(value0, 0xffffffff))\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), value2)\n    }\n    function abi_encode_tuple_t_uint32_t_uint256_t_uint256_t_uint256__to_t_uint32_t_uint256_t_uint256_t_uint256__fromStack_reversed(headStart, value3, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 128)\n        mstore(headStart, and(value0, 0xffffffff))\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), value2)\n        mstore(add(headStart, 96), value3)\n    }\n    function checked_add_t_uint256(x, y) -> sum\n    {\n        if gt(x, not(y)) { panic_error_0x11() }\n        sum := add(x, y)\n    }\n    function checked_div_t_uint256(x, y) -> r\n    {\n        if iszero(y)\n        {\n            mstore(r, shl(224, 0x4e487b71))\n            mstore(4, 0x12)\n            revert(r, 0x24)\n        }\n        r := div(x, y)\n    }\n    function checked_mul_t_uint256(x, y) -> product\n    {\n        if and(iszero(iszero(x)), gt(y, div(not(0), x))) { panic_error_0x11() }\n        product := mul(x, y)\n    }\n    function checked_sub_t_uint256(x, y) -> diff\n    {\n        if lt(x, y) { panic_error_0x11() }\n        diff := sub(x, y)\n    }\n    function increment_t_uint256(value) -> ret\n    {\n        if eq(value, not(0)) { panic_error_0x11() }\n        ret := add(value, 1)\n    }\n    function panic_error_0x11()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x11)\n        revert(0, 0x24)\n    }\n    function validator_revert_address(value)\n    {\n        if iszero(eq(value, and(value, sub(shl(160, 1), 1)))) { revert(0, 0) }\n    }\n}",
+      "contents": "{\n    { }\n    function abi_decode_uint32(offset) -> value\n    {\n        value := calldataload(offset)\n        if iszero(eq(value, and(value, 0xffffffff))) { revert(0, 0) }\n    }\n    function abi_decode_tuple_t_address(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(value0, value0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function abi_decode_tuple_t_addresst_addresst_addresst_address(headStart, dataEnd) -> value0, value1, value2, value3\n    {\n        if slt(sub(dataEnd, headStart), 128) { revert(value1, value1) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        let value_1 := calldataload(add(headStart, 32))\n        validator_revert_address(value_1)\n        value1 := value_1\n        let value_2 := calldataload(add(headStart, 64))\n        validator_revert_address(value_2)\n        value2 := value_2\n        let value_3 := calldataload(add(headStart, 96))\n        validator_revert_address(value_3)\n        value3 := value_3\n    }\n    function abi_decode_tuple_t_addresst_uint256(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(value0, value0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        value1 := calldataload(add(headStart, 32))\n    }\n    function abi_decode_tuple_t_array$_t_uint32_$dyn_calldata_ptr(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(value0, value0) }\n        let offset := calldataload(headStart)\n        let _1 := 0xffffffffffffffff\n        if gt(offset, _1) { revert(value0, value0) }\n        let _2 := add(headStart, offset)\n        if iszero(slt(add(_2, 0x1f), dataEnd)) { revert(value0, value0) }\n        let length := calldataload(_2)\n        if gt(length, _1) { revert(value0, value0) }\n        if gt(add(add(_2, shl(5, length)), 32), dataEnd) { revert(value0, value0) }\n        value0 := add(_2, 32)\n        value1 := length\n    }\n    function abi_decode_tuple_t_bool_fromMemory(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(value0, value0) }\n        let value := mload(headStart)\n        if iszero(eq(value, iszero(iszero(value)))) { revert(value0, value0) }\n        value0 := value\n    }\n    function abi_decode_tuple_t_contract$_ISyntheticToken_$5108(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(value0, value0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function abi_decode_tuple_t_contract$_ISyntheticToken_$5108t_address(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(value0, value0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        let value_1 := calldataload(add(headStart, 32))\n        validator_revert_address(value_1)\n        value1 := value_1\n    }\n    function abi_decode_tuple_t_contract$_ISyntheticToken_$5108t_uint256(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(value0, value0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        value1 := calldataload(add(headStart, 32))\n    }\n    function abi_decode_tuple_t_uint16(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(value0, value0) }\n        let value := calldataload(headStart)\n        if iszero(eq(value, and(value, 0xffff))) { revert(value0, value0) }\n        value0 := value\n    }\n    function abi_decode_tuple_t_uint32(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(value0, value0) }\n        value0 := abi_decode_uint32(headStart)\n    }\n    function abi_decode_tuple_t_uint32t_address(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(value0, value0) }\n        value0 := abi_decode_uint32(headStart)\n        let value := calldataload(add(headStart, 32))\n        validator_revert_address(value)\n        value1 := value\n    }\n    function abi_decode_tuple_t_uint32t_contract$_ISyntheticToken_$5108t_contract$_ISyntheticToken_$5108t_uint256t_uint256(headStart, dataEnd) -> value0, value1, value2, value3, value4\n    {\n        if slt(sub(dataEnd, headStart), 160) { revert(value4, value4) }\n        value0 := abi_decode_uint32(headStart)\n        let value := calldataload(add(headStart, 32))\n        validator_revert_address(value)\n        value1 := value\n        let value_1 := calldataload(add(headStart, 64))\n        validator_revert_address(value_1)\n        value2 := value_1\n        value3 := calldataload(add(headStart, 96))\n        value4 := calldataload(add(headStart, 128))\n    }\n    function abi_decode_tuple_t_uint32t_uint256(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(value0, value0) }\n        value0 := abi_decode_uint32(headStart)\n        value1 := calldataload(add(headStart, 32))\n    }\n    function abi_decode_tuple_t_uint32t_uint256t_uint256(headStart, dataEnd) -> value0, value1, value2\n    {\n        if slt(sub(dataEnd, headStart), 96) { revert(value0, value0) }\n        value0 := abi_decode_uint32(headStart)\n        value1 := calldataload(add(headStart, 32))\n        value2 := calldataload(add(headStart, 64))\n    }\n    function abi_decode_tuple_t_uint32t_uint256t_uint256t_uint256t_uint256(headStart, dataEnd) -> value0, value1, value2, value3, value4\n    {\n        if slt(sub(dataEnd, headStart), 160) { revert(value2, value2) }\n        value0 := abi_decode_uint32(headStart)\n        value1 := calldataload(add(headStart, 32))\n        value2 := calldataload(add(headStart, 64))\n        value3 := calldataload(add(headStart, 96))\n        value4 := calldataload(add(headStart, 128))\n    }\n    function abi_encode_tuple_t_address__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_address_t_address_t_uint256__to_t_address_t_address_t_uint256__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 96)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n        mstore(add(headStart, 64), value2)\n    }\n    function abi_encode_tuple_t_address_t_address_t_uint256_t_uint256__to_t_address_t_address_t_uint256_t_uint256__fromStack_reversed(headStart, value3, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 128)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n        mstore(add(headStart, 64), value2)\n        mstore(add(headStart, 96), value3)\n    }\n    function abi_encode_tuple_t_address_t_uint256__to_t_address_t_uint256__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n        mstore(add(headStart, 32), value1)\n    }\n    function abi_encode_tuple_t_address_t_uint32_t_uint256_t_uint256_t_uint256__to_t_address_t_uint32_t_uint256_t_uint256_t_uint256__fromStack_reversed(headStart, value4, value3, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 160)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n        mstore(add(headStart, 32), and(value1, 0xffffffff))\n        mstore(add(headStart, 64), value2)\n        mstore(add(headStart, 96), value3)\n        mstore(add(headStart, 128), value4)\n    }\n    function abi_encode_tuple_t_array$_t_uint32_$dyn_calldata_ptr__to_t_array$_t_uint32_$dyn_memory_ptr__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        let _1 := 32\n        let tail_1 := add(headStart, _1)\n        mstore(headStart, _1)\n        let pos := tail_1\n        mstore(tail_1, value1)\n        pos := add(headStart, 64)\n        let srcPtr := value0\n        let i := tail\n        for { } lt(i, value1) { i := add(i, 1) }\n        {\n            mstore(pos, and(abi_decode_uint32(srcPtr), 0xffffffff))\n            pos := add(pos, _1)\n            srcPtr := add(srcPtr, _1)\n        }\n        tail := pos\n    }\n    function abi_encode_tuple_t_contract$_IFloatToken_$4998__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_contract$_ILongShort_$5030__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_contract$_ISyntheticToken_$5108_t_contract$_ISyntheticToken_$5108__to_t_address_t_address__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n    }\n    function abi_encode_tuple_t_stringliteral_68bb781205ac8241962170e96d6a01047f560e82b505de8585e1fd429fc87d4b__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 47)\n        mstore(add(headStart, 64), \"marketLaunchIncentiveMultiplier \")\n        mstore(add(headStart, 96), \"must be >= 1e18\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_stringliteral_7a2a4e26842155ea933fe6eb6e3137eb5a296dcdf55721c552be7b4c3cc23759__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 46)\n        mstore(add(headStart, 64), \"Initializable: contract is alrea\")\n        mstore(add(headStart, 96), \"dy initialized\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_stringliteral_82b68ff3c1c44d3c42f87a8a0b4619f58e1e5eb77cfc0f8240d7596af7ec9276__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 15)\n        mstore(add(headStart, 64), \"not valid synth\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_d015b7d7782ab5f33f0b2a3f3ec5207107594fb24ec0023388f87a16a3862dc0__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 19)\n        mstore(add(headStart, 64), \"nothing to withdraw\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_e28d3d4b0238f59994407ce2f3c10c2c3f25706d9d645a83b44428559d9ee283__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 9)\n        mstore(add(headStart, 64), \"not admin\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_uint16__to_t_uint16__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, 0xffff))\n    }\n    function abi_encode_tuple_t_uint256__to_t_uint256__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, value0)\n    }\n    function abi_encode_tuple_t_uint256_t_uint256_t_uint256__to_t_uint256_t_uint256_t_uint256__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 96)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), value2)\n    }\n    function abi_encode_tuple_t_uint32__to_t_uint32__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, 0xffffffff))\n    }\n    function abi_encode_tuple_t_uint32_t_rational_0_by_1_t_rational_0_by_1_t_rational_0_by_1__to_t_uint32_t_uint256_t_uint256_t_uint256__fromStack_reversed(headStart, value3, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 128)\n        mstore(headStart, and(value0, 0xffffffff))\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), value2)\n        mstore(add(headStart, 96), value3)\n    }\n    function abi_encode_tuple_t_uint32_t_rational_50_by_1__to_t_uint32_t_uint256__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, and(value0, 0xffffffff))\n        mstore(add(headStart, 32), value1)\n    }\n    function abi_encode_tuple_t_uint32_t_uint256_t_uint256__to_t_uint32_t_uint256_t_uint256__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 96)\n        mstore(headStart, and(value0, 0xffffffff))\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), value2)\n    }\n    function abi_encode_tuple_t_uint32_t_uint256_t_uint256_t_uint256__to_t_uint32_t_uint256_t_uint256_t_uint256__fromStack_reversed(headStart, value3, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 128)\n        mstore(headStart, and(value0, 0xffffffff))\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), value2)\n        mstore(add(headStart, 96), value3)\n    }\n    function checked_add_t_uint256(x, y) -> sum\n    {\n        if gt(x, not(y)) { panic_error_0x11() }\n        sum := add(x, y)\n    }\n    function checked_div_t_uint256(x, y) -> r\n    {\n        if iszero(y)\n        {\n            mstore(r, shl(224, 0x4e487b71))\n            mstore(4, 0x12)\n            revert(r, 0x24)\n        }\n        r := div(x, y)\n    }\n    function checked_mul_t_uint256(x, y) -> product\n    {\n        if and(iszero(iszero(x)), gt(y, div(not(0), x))) { panic_error_0x11() }\n        product := mul(x, y)\n    }\n    function checked_sub_t_uint256(x, y) -> diff\n    {\n        if lt(x, y) { panic_error_0x11() }\n        diff := sub(x, y)\n    }\n    function increment_t_uint256(value) -> ret\n    {\n        if eq(value, not(0)) { panic_error_0x11() }\n        ret := add(value, 1)\n    }\n    function panic_error_0x11()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x11)\n        revert(0, 0x24)\n    }\n    function validator_revert_address(value)\n    {\n        if iszero(eq(value, and(value, sub(shl(160, 1), 1)))) { revert(0, 0) }\n    }\n}",
       "id": 71,
       "language": "Yul",
       "name": "#utility.yul"
@@ -10533,76 +10533,76 @@
     "absolutePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/Staker.sol",
     "exportedSymbols": {
       "AccessControlEnumerableUpgradeable": [
-        15949
+        15982
       ],
       "AccessControlUpgradeable": [
-        16345
+        16378
       ],
       "ContextUpgradeable": [
-        17534
+        17567
       ],
       "ERC165Upgradeable": [
-        17783
+        17816
       ],
       "ERC20BurnableUpgradeable": [
-        17202
+        17235
       ],
       "ERC20PausableUpgradeable": [
-        17267
+        17300
       ],
       "ERC20PresetMinterPauserUpgradeable": [
-        17489
+        17522
       ],
       "ERC20Upgradeable": [
-        17038
+        17071
       ],
       "EnumerableSetUpgradeable": [
-        18308
+        18341
       ],
       "IAccessControlEnumerableUpgradeable": [
-        15751
+        15784
       ],
       "IAccessControlUpgradeable": [
-        15994
+        16027
       ],
       "IERC165Upgradeable": [
-        17795
+        17828
       ],
       "IERC20": [
-        19543
+        19576
       ],
       "IERC20MetadataUpgradeable": [
-        17292
+        17325
       ],
       "IERC20Upgradeable": [
-        17116
+        17149
       ],
       "IFloatToken": [
-        4965
+        4998
       ],
       "ILongShort": [
-        4997
+        5030
       ],
       "IStaker": [
-        5050
+        5083
       ],
       "ISyntheticToken": [
-        5075
+        5108
       ],
       "Initializable": [
-        16391
+        16424
       ],
       "PausableUpgradeable": [
-        16504
+        16537
       ],
       "Staker": [
         3946
       ],
       "StringsUpgradeable": [
-        17737
+        17770
       ],
       "console": [
-        28641
+        28674
       ]
     },
     "id": 3947,
@@ -10626,7 +10626,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3947,
-        "sourceUnit": 28642,
+        "sourceUnit": 28675,
         "src": "62:29:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -10638,7 +10638,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3947,
-        "sourceUnit": 17490,
+        "sourceUnit": 17523,
         "src": "92:104:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -10650,7 +10650,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3947,
-        "sourceUnit": 4966,
+        "sourceUnit": 4999,
         "src": "198:38:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -10662,7 +10662,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3947,
-        "sourceUnit": 4998,
+        "sourceUnit": 5031,
         "src": "237:37:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -10674,7 +10674,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3947,
-        "sourceUnit": 5051,
+        "sourceUnit": 5084,
         "src": "275:34:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -10687,7 +10687,7 @@
               "id": 2526,
               "name": "IStaker",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 5050,
+              "referencedDeclaration": 5083,
               "src": "664:7:4"
             },
             "id": 2527,
@@ -10699,7 +10699,7 @@
               "id": 2528,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 16391,
+              "referencedDeclaration": 16424,
               "src": "673:13:4"
             },
             "id": 2529,
@@ -10708,8 +10708,8 @@
           }
         ],
         "contractDependencies": [
-          5050,
-          16391
+          5083,
+          16424
         ],
         "contractKind": "contract",
         "documentation": {
@@ -10722,8 +10722,8 @@
         "id": 3946,
         "linearizedBaseContracts": [
           3946,
-          16391,
-          5050
+          16424,
+          5083
         ],
         "name": "Staker",
         "nameLocation": "654:6:4",
@@ -10838,7 +10838,7 @@
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                  "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                   "typeString": "contract ISyntheticToken"
                 },
                 "typeName": {
@@ -10848,13 +10848,13 @@
                     "id": 2537,
                     "name": "ISyntheticToken",
                     "nodeType": "IdentifierPath",
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "879:15:4"
                   },
-                  "referencedDeclaration": 5075,
+                  "referencedDeclaration": 5108,
                   "src": "879:15:4",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   }
                 },
@@ -10872,7 +10872,7 @@
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                  "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                   "typeString": "contract ISyntheticToken"
                 },
                 "typeName": {
@@ -10882,13 +10882,13 @@
                     "id": 2540,
                     "name": "ISyntheticToken",
                     "nodeType": "IdentifierPath",
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "915:15:4"
                   },
-                  "referencedDeclaration": 5075,
+                  "referencedDeclaration": 5108,
                   "src": "915:15:4",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   }
                 },
@@ -11284,7 +11284,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_ILongShort_$4997",
+              "typeIdentifier": "t_contract$_ILongShort_$5030",
               "typeString": "contract ILongShort"
             },
             "typeName": {
@@ -11294,13 +11294,13 @@
                 "id": 2572,
                 "name": "ILongShort",
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 4997,
+                "referencedDeclaration": 5030,
                 "src": "1830:10:4"
               },
-              "referencedDeclaration": 4997,
+              "referencedDeclaration": 5030,
               "src": "1830:10:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_ILongShort_$4997",
+                "typeIdentifier": "t_contract$_ILongShort_$5030",
                 "typeString": "contract ILongShort"
               }
             },
@@ -11319,7 +11319,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_IFloatToken_$4965",
+              "typeIdentifier": "t_contract$_IFloatToken_$4998",
               "typeString": "contract IFloatToken"
             },
             "typeName": {
@@ -11329,13 +11329,13 @@
                 "id": 2575,
                 "name": "IFloatToken",
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 4965,
+                "referencedDeclaration": 4998,
                 "src": "1875:11:4"
               },
-              "referencedDeclaration": 4965,
+              "referencedDeclaration": 4998,
               "src": "1875:11:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IFloatToken_$4965",
+                "typeIdentifier": "t_contract$_IFloatToken_$4998",
                 "typeString": "contract IFloatToken"
               }
             },
@@ -11406,7 +11406,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
               "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
             },
             "typeName": {
@@ -11418,20 +11418,20 @@
                   "id": 2582,
                   "name": "ISyntheticToken",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 5075,
+                  "referencedDeclaration": 5108,
                   "src": "2013:15:4"
                 },
-                "referencedDeclaration": 5075,
+                "referencedDeclaration": 5108,
                 "src": "2013:15:4",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                  "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                   "typeString": "contract ISyntheticToken"
                 }
               },
               "nodeType": "Mapping",
               "src": "2005:55:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                 "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
               },
               "valueType": {
@@ -11531,7 +11531,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_uint32_$",
+              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_uint32_$",
               "typeString": "mapping(contract ISyntheticToken => uint32)"
             },
             "typeName": {
@@ -11543,20 +11543,20 @@
                   "id": 2593,
                   "name": "ISyntheticToken",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 5075,
+                  "referencedDeclaration": 5108,
                   "src": "2166:15:4"
                 },
-                "referencedDeclaration": 5075,
+                "referencedDeclaration": 5108,
                 "src": "2166:15:4",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                  "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                   "typeString": "contract ISyntheticToken"
                 }
               },
               "nodeType": "Mapping",
               "src": "2158:34:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_uint32_$",
+                "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_uint32_$",
                 "typeString": "mapping(contract ISyntheticToken => uint32)"
               },
               "valueType": {
@@ -12839,7 +12839,7 @@
                             "referencedDeclaration": 2597,
                             "src": "3983:18:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_uint32_$",
+                              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_uint32_$",
                               "typeString": "mapping(contract ISyntheticToken => uint32)"
                             }
                           },
@@ -12852,7 +12852,7 @@
                             "referencedDeclaration": 2703,
                             "src": "4002:6:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                              "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                               "typeString": "contract ISyntheticToken"
                             }
                           },
@@ -12979,7 +12979,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   },
                   "typeName": {
@@ -12989,13 +12989,13 @@
                       "id": 2701,
                       "name": "ISyntheticToken",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "3941:15:4"
                     },
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "3941:15:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -13077,7 +13077,7 @@
                               "referencedDeclaration": 2542,
                               "src": "4142:38:4",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                                "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                                 "typeString": "contract ISyntheticToken"
                               }
                             }
@@ -13085,7 +13085,7 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                                "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                                 "typeString": "contract ISyntheticToken"
                               }
                             ],
@@ -13358,7 +13358,7 @@
                               "referencedDeclaration": 2574,
                               "src": "4399:21:4",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_ILongShort_$4997",
+                                "typeIdentifier": "t_contract$_ILongShort_$5030",
                                 "typeString": "contract ILongShort"
                               }
                             }
@@ -13366,7 +13366,7 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_contract$_ILongShort_$4997",
+                                "typeIdentifier": "t_contract$_ILongShort_$5030",
                                 "typeString": "contract ILongShort"
                               }
                             ],
@@ -13579,7 +13579,7 @@
                       "referencedDeclaration": 2574,
                       "src": "4811:21:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ILongShort_$4997",
+                        "typeIdentifier": "t_contract$_ILongShort_$5030",
                         "typeString": "contract ILongShort"
                       }
                     },
@@ -13611,10 +13611,10 @@
                         "name": "ILongShort",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 4997,
+                        "referencedDeclaration": 5030,
                         "src": "4835:10:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_ILongShort_$4997_$",
+                          "typeIdentifier": "t_type$_t_contract$_ILongShort_$5030_$",
                           "typeString": "type(contract ILongShort)"
                         }
                       },
@@ -13629,13 +13629,13 @@
                       "src": "4835:34:4",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ILongShort_$4997",
+                        "typeIdentifier": "t_contract$_ILongShort_$5030",
                         "typeString": "contract ILongShort"
                       }
                     },
                     "src": "4811:58:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ILongShort_$4997",
+                      "typeIdentifier": "t_contract$_ILongShort_$5030",
                       "typeString": "contract ILongShort"
                     }
                   },
@@ -13658,7 +13658,7 @@
                       "referencedDeclaration": 2577,
                       "src": "4879:10:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IFloatToken_$4965",
+                        "typeIdentifier": "t_contract$_IFloatToken_$4998",
                         "typeString": "contract IFloatToken"
                       }
                     },
@@ -13690,10 +13690,10 @@
                         "name": "IFloatToken",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 4965,
+                        "referencedDeclaration": 4998,
                         "src": "4892:11:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_IFloatToken_$4965_$",
+                          "typeIdentifier": "t_type$_t_contract$_IFloatToken_$4998_$",
                           "typeString": "type(contract IFloatToken)"
                         }
                       },
@@ -13708,13 +13708,13 @@
                       "src": "4892:24:4",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IFloatToken_$4965",
+                        "typeIdentifier": "t_contract$_IFloatToken_$4998",
                         "typeString": "contract IFloatToken"
                       }
                     },
                     "src": "4879:37:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IFloatToken_$4965",
+                      "typeIdentifier": "t_contract$_IFloatToken_$4998",
                       "typeString": "contract IFloatToken"
                     }
                   },
@@ -13836,7 +13836,7 @@
                   "id": 2762,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 16390,
+                  "referencedDeclaration": 16423,
                   "src": "4727:11:4"
                 },
                 "nodeType": "ModifierInvocation",
@@ -14975,7 +14975,7 @@
           },
           {
             "baseFunctions": [
-              5029
+              5062
             ],
             "body": {
               "id": 2968,
@@ -14998,7 +14998,7 @@
                         "referencedDeclaration": 2597,
                         "src": "6613:18:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_uint32_$",
+                          "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_uint32_$",
                           "typeString": "mapping(contract ISyntheticToken => uint32)"
                         }
                       },
@@ -15011,7 +15011,7 @@
                         "referencedDeclaration": 2883,
                         "src": "6632:9:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -15066,7 +15066,7 @@
                         "referencedDeclaration": 2597,
                         "src": "6666:18:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_uint32_$",
+                          "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_uint32_$",
                           "typeString": "mapping(contract ISyntheticToken => uint32)"
                         }
                       },
@@ -15079,7 +15079,7 @@
                         "referencedDeclaration": 2886,
                         "src": "6685:10:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -15531,7 +15531,7 @@
                       "referencedDeclaration": 2542,
                       "src": "6969:38:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       }
                     },
@@ -15545,13 +15545,13 @@
                       "referencedDeclaration": 2883,
                       "src": "7010:9:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       }
                     },
                     "src": "6969:50:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -15614,7 +15614,7 @@
                       "referencedDeclaration": 2539,
                       "src": "7029:39:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       }
                     },
@@ -15628,13 +15628,13 @@
                       "referencedDeclaration": 2886,
                       "src": "7071:10:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       }
                     },
                     "src": "7029:52:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -15986,7 +15986,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   },
                   "typeName": {
@@ -15996,13 +15996,13 @@
                       "id": 2881,
                       "name": "ISyntheticToken",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "6446:15:4"
                     },
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "6446:15:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -16020,7 +16020,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   },
                   "typeName": {
@@ -16030,13 +16030,13 @@
                       "id": 2884,
                       "name": "ISyntheticToken",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "6481:15:4"
                     },
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "6481:15:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -20248,7 +20248,7 @@
           },
           {
             "baseFunctions": [
-              5042
+              5075
             ],
             "body": {
               "id": 3317,
@@ -20668,7 +20668,7 @@
                           "referencedDeclaration": 2597,
                           "src": "14347:18:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_uint32_$",
+                            "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_uint32_$",
                             "typeString": "mapping(contract ISyntheticToken => uint32)"
                           }
                         },
@@ -20681,7 +20681,7 @@
                           "referencedDeclaration": 3321,
                           "src": "14366:5:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                            "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                             "typeString": "contract ISyntheticToken"
                           }
                         },
@@ -20712,7 +20712,7 @@
                         "referencedDeclaration": 2574,
                         "src": "14306:21:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ILongShort_$4997",
+                          "typeIdentifier": "t_contract$_ILongShort_$5030",
                           "typeString": "contract ILongShort"
                         }
                       },
@@ -20723,7 +20723,7 @@
                       "lValueRequested": false,
                       "memberName": "_updateSystemState",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 4972,
+                      "referencedDeclaration": 5005,
                       "src": "14306:40:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_uint32_$returns$__$",
@@ -20774,7 +20774,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   },
                   "typeName": {
@@ -20784,13 +20784,13 @@
                       "id": 3319,
                       "name": "ISyntheticToken",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "14264:15:4"
                     },
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "14264:15:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -21125,7 +21125,7 @@
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       },
                       "typeName": {
@@ -21135,13 +21135,13 @@
                           "id": 3373,
                           "name": "ISyntheticToken",
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 5075,
+                          "referencedDeclaration": 5108,
                           "src": "15381:15:4"
                         },
-                        "referencedDeclaration": 5075,
+                        "referencedDeclaration": 5108,
                         "src": "15381:15:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -21197,7 +21197,7 @@
                     "referencedDeclaration": 2542,
                     "src": "15409:38:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -21221,7 +21221,7 @@
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       },
                       "typeName": {
@@ -21231,13 +21231,13 @@
                           "id": 3381,
                           "name": "ISyntheticToken",
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 5075,
+                          "referencedDeclaration": 5108,
                           "src": "15457:15:4"
                         },
-                        "referencedDeclaration": 5075,
+                        "referencedDeclaration": 5108,
                         "src": "15457:15:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -21293,7 +21293,7 @@
                     "referencedDeclaration": 2539,
                     "src": "15486:39:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -22510,7 +22510,7 @@
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       },
                       "typeName": {
@@ -22520,13 +22520,13 @@
                           "id": 3477,
                           "name": "ISyntheticToken",
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 5075,
+                          "referencedDeclaration": 5108,
                           "src": "17100:15:4"
                         },
-                        "referencedDeclaration": 5075,
+                        "referencedDeclaration": 5108,
                         "src": "17100:15:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -22582,7 +22582,7 @@
                     "referencedDeclaration": 2542,
                     "src": "17128:38:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -22606,7 +22606,7 @@
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       },
                       "typeName": {
@@ -22616,13 +22616,13 @@
                           "id": 3485,
                           "name": "ISyntheticToken",
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 5075,
+                          "referencedDeclaration": 5108,
                           "src": "17176:15:4"
                         },
-                        "referencedDeclaration": 5075,
+                        "referencedDeclaration": 5108,
                         "src": "17176:15:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -22678,7 +22678,7 @@
                     "referencedDeclaration": 2539,
                     "src": "17205:39:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -22729,7 +22729,7 @@
                         "referencedDeclaration": 2588,
                         "src": "17282:16:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                          "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                           "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
                         }
                       },
@@ -22742,7 +22742,7 @@
                         "referencedDeclaration": 3479,
                         "src": "17299:9:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -22828,7 +22828,7 @@
                         "referencedDeclaration": 2588,
                         "src": "17353:16:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                          "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                           "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
                         }
                       },
@@ -22841,7 +22841,7 @@
                         "referencedDeclaration": 3487,
                         "src": "17370:10:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -23242,7 +23242,7 @@
                         "referencedDeclaration": 2577,
                         "src": "17761:10:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IFloatToken_$4965",
+                          "typeIdentifier": "t_contract$_IFloatToken_$4998",
                           "typeString": "contract IFloatToken"
                         }
                       },
@@ -23253,7 +23253,7 @@
                       "lValueRequested": false,
                       "memberName": "mint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 4964,
+                      "referencedDeclaration": 4997,
                       "src": "17761:15:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -23406,7 +23406,7 @@
                         "referencedDeclaration": 2577,
                         "src": "17805:10:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IFloatToken_$4965",
+                          "typeIdentifier": "t_contract$_IFloatToken_$4998",
                           "typeString": "contract IFloatToken"
                         }
                       },
@@ -23417,7 +23417,7 @@
                       "lValueRequested": false,
                       "memberName": "mint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 4964,
+                      "referencedDeclaration": 4997,
                       "src": "17805:15:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -25504,7 +25504,7 @@
                         "referencedDeclaration": 2574,
                         "src": "20181:21:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ILongShort_$4997",
+                          "typeIdentifier": "t_contract$_ILongShort_$5030",
                           "typeString": "contract ILongShort"
                         }
                       },
@@ -25515,7 +25515,7 @@
                       "lValueRequested": false,
                       "memberName": "_updateSystemStateMulti",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 4978,
+                      "referencedDeclaration": 5011,
                       "src": "20181:45:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_array$_t_uint32_$dyn_memory_ptr_$returns$__$",
@@ -25661,7 +25661,7 @@
           },
           {
             "baseFunctions": [
-              5049
+              5082
             ],
             "body": {
               "id": 3748,
@@ -25711,10 +25711,10 @@
                           "name": "ISyntheticToken",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 5075,
+                          "referencedDeclaration": 5108,
                           "src": "20820:15:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_ISyntheticToken_$5075_$",
+                            "typeIdentifier": "t_type$_t_contract$_ISyntheticToken_$5108_$",
                             "typeString": "type(contract ISyntheticToken)"
                           }
                         },
@@ -25729,7 +25729,7 @@
                         "src": "20820:27:4",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       }
@@ -25737,7 +25737,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       ],
@@ -25748,7 +25748,7 @@
                       "referencedDeclaration": 3333,
                       "src": "20807:12:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5075_$returns$__$",
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5108_$returns$__$",
                         "typeString": "function (contract ISyntheticToken)"
                       }
                     },
@@ -25814,10 +25814,10 @@
                           "name": "ISyntheticToken",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 5075,
+                          "referencedDeclaration": 5108,
                           "src": "20865:15:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_ISyntheticToken_$5075_$",
+                            "typeIdentifier": "t_type$_t_contract$_ISyntheticToken_$5108_$",
                             "typeString": "type(contract ISyntheticToken)"
                           }
                         },
@@ -25832,7 +25832,7 @@
                         "src": "20865:27:4",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -25864,7 +25864,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         },
                         {
@@ -25883,7 +25883,7 @@
                       "referencedDeclaration": 3828,
                       "src": "20858:6:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5075_$_t_uint256_$_t_address_$returns$__$",
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5108_$_t_uint256_$_t_address_$returns$__$",
                         "typeString": "function (contract ISyntheticToken,uint256,address)"
                       }
                     },
@@ -25955,10 +25955,10 @@
                       "name": "ISyntheticToken",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "20764:15:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_type$_t_contract$_ISyntheticToken_$5075_$",
+                        "typeIdentifier": "t_type$_t_contract$_ISyntheticToken_$5108_$",
                         "typeString": "type(contract ISyntheticToken)"
                       }
                     },
@@ -25973,7 +25973,7 @@
                     "src": "20764:27:4",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   }
@@ -26123,7 +26123,7 @@
                       "referencedDeclaration": 2597,
                       "src": "21059:18:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_uint32_$",
+                        "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_uint32_$",
                         "typeString": "mapping(contract ISyntheticToken => uint32)"
                       }
                     },
@@ -26136,7 +26136,7 @@
                       "referencedDeclaration": 3752,
                       "src": "21078:5:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       }
                     },
@@ -26483,7 +26483,7 @@
                           "referencedDeclaration": 2588,
                           "src": "21430:16:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                            "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                             "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
                           }
                         },
@@ -26496,7 +26496,7 @@
                           "referencedDeclaration": 3752,
                           "src": "21447:5:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                            "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                             "typeString": "contract ISyntheticToken"
                           }
                         },
@@ -26557,7 +26557,7 @@
                             "referencedDeclaration": 2588,
                             "src": "21462:16:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                               "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
                             }
                           },
@@ -26570,7 +26570,7 @@
                             "referencedDeclaration": 3752,
                             "src": "21479:5:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                              "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                               "typeString": "contract ISyntheticToken"
                             }
                           },
@@ -26782,7 +26782,7 @@
                             "referencedDeclaration": 3752,
                             "src": "21679:5:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                              "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                               "typeString": "contract ISyntheticToken"
                             }
                           }
@@ -26790,7 +26790,7 @@
                         "expression": {
                           "argumentTypes": [
                             {
-                              "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                              "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                               "typeString": "contract ISyntheticToken"
                             }
                           ],
@@ -26977,7 +26977,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   },
                   "typeName": {
@@ -26987,13 +26987,13 @@
                       "id": 3750,
                       "name": "ISyntheticToken",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "20945:15:4"
                     },
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "20945:15:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -27118,7 +27118,7 @@
                       "referencedDeclaration": 2597,
                       "src": "22091:18:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_uint32_$",
+                        "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_uint32_$",
                         "typeString": "mapping(contract ISyntheticToken => uint32)"
                       }
                     },
@@ -27131,7 +27131,7 @@
                       "referencedDeclaration": 3831,
                       "src": "22110:5:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       }
                     },
@@ -27172,7 +27172,7 @@
                               "referencedDeclaration": 2588,
                               "src": "22134:16:4",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                                "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                                 "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
                               }
                             },
@@ -27185,7 +27185,7 @@
                               "referencedDeclaration": 3831,
                               "src": "22151:5:4",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                                "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                                 "typeString": "contract ISyntheticToken"
                               }
                             },
@@ -27423,7 +27423,7 @@
                           "referencedDeclaration": 2588,
                           "src": "22263:16:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                            "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                             "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
                           }
                         },
@@ -27436,7 +27436,7 @@
                           "referencedDeclaration": 3831,
                           "src": "22280:5:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                            "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                             "typeString": "contract ISyntheticToken"
                           }
                         },
@@ -27511,7 +27511,7 @@
                             "referencedDeclaration": 2588,
                             "src": "22313:16:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                               "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
                             }
                           },
@@ -27524,7 +27524,7 @@
                             "referencedDeclaration": 3831,
                             "src": "22330:5:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                              "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                               "typeString": "contract ISyntheticToken"
                             }
                           },
@@ -27831,7 +27831,7 @@
                         "referencedDeclaration": 3831,
                         "src": "22541:5:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -27842,7 +27842,7 @@
                       "lValueRequested": false,
                       "memberName": "transfer",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 19492,
+                      "referencedDeclaration": 19525,
                       "src": "22541:14:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$_t_bool_$",
@@ -27907,7 +27907,7 @@
                             "referencedDeclaration": 3831,
                             "src": "22639:5:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                              "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                               "typeString": "contract ISyntheticToken"
                             }
                           }
@@ -27915,7 +27915,7 @@
                         "expression": {
                           "argumentTypes": [
                             {
-                              "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                              "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                               "typeString": "contract ISyntheticToken"
                             }
                           ],
@@ -28036,7 +28036,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   },
                   "typeName": {
@@ -28046,13 +28046,13 @@
                       "id": 3829,
                       "name": "ISyntheticToken",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "22012:15:4"
                     },
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "22012:15:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -28117,7 +28117,7 @@
                         "referencedDeclaration": 3909,
                         "src": "22756:5:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       }
@@ -28125,7 +28125,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       ],
@@ -28136,7 +28136,7 @@
                       "referencedDeclaration": 3333,
                       "src": "22743:12:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5075_$returns$__$",
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5108_$returns$__$",
                         "typeString": "function (contract ISyntheticToken)"
                       }
                     },
@@ -28170,7 +28170,7 @@
                         "referencedDeclaration": 3909,
                         "src": "22782:5:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -28190,7 +28190,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         },
                         {
@@ -28205,7 +28205,7 @@
                       "referencedDeclaration": 3906,
                       "src": "22772:9:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5075_$_t_uint256_$returns$__$",
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5108_$_t_uint256_$returns$__$",
                         "typeString": "function (contract ISyntheticToken,uint256)"
                       }
                     },
@@ -28254,7 +28254,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   },
                   "typeName": {
@@ -28264,13 +28264,13 @@
                       "id": 3907,
                       "name": "ISyntheticToken",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "22685:15:4"
                     },
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "22685:15:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -28335,7 +28335,7 @@
                         "referencedDeclaration": 3927,
                         "src": "22885:5:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       }
@@ -28343,7 +28343,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       ],
@@ -28354,7 +28354,7 @@
                       "referencedDeclaration": 3333,
                       "src": "22872:12:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5075_$returns$__$",
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5108_$returns$__$",
                         "typeString": "function (contract ISyntheticToken)"
                       }
                     },
@@ -28388,7 +28388,7 @@
                         "referencedDeclaration": 3927,
                         "src": "22911:5:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -28402,7 +28402,7 @@
                             "referencedDeclaration": 2588,
                             "src": "22918:16:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                               "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
                             }
                           },
@@ -28415,7 +28415,7 @@
                             "referencedDeclaration": 3927,
                             "src": "22935:5:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                              "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                               "typeString": "contract ISyntheticToken"
                             }
                           },
@@ -28472,7 +28472,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         },
                         {
@@ -28487,7 +28487,7 @@
                       "referencedDeclaration": 3906,
                       "src": "22901:9:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5075_$_t_uint256_$returns$__$",
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5108_$_t_uint256_$returns$__$",
                         "typeString": "function (contract ISyntheticToken,uint256)"
                       }
                     },
@@ -28536,7 +28536,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   },
                   "typeName": {
@@ -28546,13 +28546,13 @@
                       "id": 3925,
                       "name": "ISyntheticToken",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "22830:15:4"
                     },
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "22830:15:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -28584,76 +28584,76 @@
     "absolutePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/Staker.sol",
     "exportedSymbols": {
       "AccessControlEnumerableUpgradeable": [
-        15949
+        15982
       ],
       "AccessControlUpgradeable": [
-        16345
+        16378
       ],
       "ContextUpgradeable": [
-        17534
+        17567
       ],
       "ERC165Upgradeable": [
-        17783
+        17816
       ],
       "ERC20BurnableUpgradeable": [
-        17202
+        17235
       ],
       "ERC20PausableUpgradeable": [
-        17267
+        17300
       ],
       "ERC20PresetMinterPauserUpgradeable": [
-        17489
+        17522
       ],
       "ERC20Upgradeable": [
-        17038
+        17071
       ],
       "EnumerableSetUpgradeable": [
-        18308
+        18341
       ],
       "IAccessControlEnumerableUpgradeable": [
-        15751
+        15784
       ],
       "IAccessControlUpgradeable": [
-        15994
+        16027
       ],
       "IERC165Upgradeable": [
-        17795
+        17828
       ],
       "IERC20": [
-        19543
+        19576
       ],
       "IERC20MetadataUpgradeable": [
-        17292
+        17325
       ],
       "IERC20Upgradeable": [
-        17116
+        17149
       ],
       "IFloatToken": [
-        4965
+        4998
       ],
       "ILongShort": [
-        4997
+        5030
       ],
       "IStaker": [
-        5050
+        5083
       ],
       "ISyntheticToken": [
-        5075
+        5108
       ],
       "Initializable": [
-        16391
+        16424
       ],
       "PausableUpgradeable": [
-        16504
+        16537
       ],
       "Staker": [
         3946
       ],
       "StringsUpgradeable": [
-        17737
+        17770
       ],
       "console": [
-        28641
+        28674
       ]
     },
     "id": 3947,
@@ -28677,7 +28677,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3947,
-        "sourceUnit": 28642,
+        "sourceUnit": 28675,
         "src": "62:29:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -28689,7 +28689,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3947,
-        "sourceUnit": 17490,
+        "sourceUnit": 17523,
         "src": "92:104:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -28701,7 +28701,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3947,
-        "sourceUnit": 4966,
+        "sourceUnit": 4999,
         "src": "198:38:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -28713,7 +28713,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3947,
-        "sourceUnit": 4998,
+        "sourceUnit": 5031,
         "src": "237:37:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -28725,7 +28725,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3947,
-        "sourceUnit": 5051,
+        "sourceUnit": 5084,
         "src": "275:34:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -28738,7 +28738,7 @@
               "id": 2526,
               "name": "IStaker",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 5050,
+              "referencedDeclaration": 5083,
               "src": "664:7:4"
             },
             "id": 2527,
@@ -28750,7 +28750,7 @@
               "id": 2528,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 16391,
+              "referencedDeclaration": 16424,
               "src": "673:13:4"
             },
             "id": 2529,
@@ -28759,8 +28759,8 @@
           }
         ],
         "contractDependencies": [
-          5050,
-          16391
+          5083,
+          16424
         ],
         "contractKind": "contract",
         "documentation": {
@@ -28773,8 +28773,8 @@
         "id": 3946,
         "linearizedBaseContracts": [
           3946,
-          16391,
-          5050
+          16424,
+          5083
         ],
         "name": "Staker",
         "nameLocation": "654:6:4",
@@ -28889,7 +28889,7 @@
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                  "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                   "typeString": "contract ISyntheticToken"
                 },
                 "typeName": {
@@ -28899,13 +28899,13 @@
                     "id": 2537,
                     "name": "ISyntheticToken",
                     "nodeType": "IdentifierPath",
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "879:15:4"
                   },
-                  "referencedDeclaration": 5075,
+                  "referencedDeclaration": 5108,
                   "src": "879:15:4",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   }
                 },
@@ -28923,7 +28923,7 @@
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                  "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                   "typeString": "contract ISyntheticToken"
                 },
                 "typeName": {
@@ -28933,13 +28933,13 @@
                     "id": 2540,
                     "name": "ISyntheticToken",
                     "nodeType": "IdentifierPath",
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "915:15:4"
                   },
-                  "referencedDeclaration": 5075,
+                  "referencedDeclaration": 5108,
                   "src": "915:15:4",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   }
                 },
@@ -29335,7 +29335,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_ILongShort_$4997",
+              "typeIdentifier": "t_contract$_ILongShort_$5030",
               "typeString": "contract ILongShort"
             },
             "typeName": {
@@ -29345,13 +29345,13 @@
                 "id": 2572,
                 "name": "ILongShort",
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 4997,
+                "referencedDeclaration": 5030,
                 "src": "1830:10:4"
               },
-              "referencedDeclaration": 4997,
+              "referencedDeclaration": 5030,
               "src": "1830:10:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_ILongShort_$4997",
+                "typeIdentifier": "t_contract$_ILongShort_$5030",
                 "typeString": "contract ILongShort"
               }
             },
@@ -29370,7 +29370,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_IFloatToken_$4965",
+              "typeIdentifier": "t_contract$_IFloatToken_$4998",
               "typeString": "contract IFloatToken"
             },
             "typeName": {
@@ -29380,13 +29380,13 @@
                 "id": 2575,
                 "name": "IFloatToken",
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 4965,
+                "referencedDeclaration": 4998,
                 "src": "1875:11:4"
               },
-              "referencedDeclaration": 4965,
+              "referencedDeclaration": 4998,
               "src": "1875:11:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IFloatToken_$4965",
+                "typeIdentifier": "t_contract$_IFloatToken_$4998",
                 "typeString": "contract IFloatToken"
               }
             },
@@ -29457,7 +29457,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
               "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
             },
             "typeName": {
@@ -29469,20 +29469,20 @@
                   "id": 2582,
                   "name": "ISyntheticToken",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 5075,
+                  "referencedDeclaration": 5108,
                   "src": "2013:15:4"
                 },
-                "referencedDeclaration": 5075,
+                "referencedDeclaration": 5108,
                 "src": "2013:15:4",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                  "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                   "typeString": "contract ISyntheticToken"
                 }
               },
               "nodeType": "Mapping",
               "src": "2005:55:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                 "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
               },
               "valueType": {
@@ -29582,7 +29582,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_uint32_$",
+              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_uint32_$",
               "typeString": "mapping(contract ISyntheticToken => uint32)"
             },
             "typeName": {
@@ -29594,20 +29594,20 @@
                   "id": 2593,
                   "name": "ISyntheticToken",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 5075,
+                  "referencedDeclaration": 5108,
                   "src": "2166:15:4"
                 },
-                "referencedDeclaration": 5075,
+                "referencedDeclaration": 5108,
                 "src": "2166:15:4",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                  "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                   "typeString": "contract ISyntheticToken"
                 }
               },
               "nodeType": "Mapping",
               "src": "2158:34:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_uint32_$",
+                "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_uint32_$",
                 "typeString": "mapping(contract ISyntheticToken => uint32)"
               },
               "valueType": {
@@ -30890,7 +30890,7 @@
                             "referencedDeclaration": 2597,
                             "src": "3983:18:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_uint32_$",
+                              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_uint32_$",
                               "typeString": "mapping(contract ISyntheticToken => uint32)"
                             }
                           },
@@ -30903,7 +30903,7 @@
                             "referencedDeclaration": 2703,
                             "src": "4002:6:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                              "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                               "typeString": "contract ISyntheticToken"
                             }
                           },
@@ -31030,7 +31030,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   },
                   "typeName": {
@@ -31040,13 +31040,13 @@
                       "id": 2701,
                       "name": "ISyntheticToken",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "3941:15:4"
                     },
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "3941:15:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -31128,7 +31128,7 @@
                               "referencedDeclaration": 2542,
                               "src": "4142:38:4",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                                "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                                 "typeString": "contract ISyntheticToken"
                               }
                             }
@@ -31136,7 +31136,7 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                                "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                                 "typeString": "contract ISyntheticToken"
                               }
                             ],
@@ -31409,7 +31409,7 @@
                               "referencedDeclaration": 2574,
                               "src": "4399:21:4",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_ILongShort_$4997",
+                                "typeIdentifier": "t_contract$_ILongShort_$5030",
                                 "typeString": "contract ILongShort"
                               }
                             }
@@ -31417,7 +31417,7 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_contract$_ILongShort_$4997",
+                                "typeIdentifier": "t_contract$_ILongShort_$5030",
                                 "typeString": "contract ILongShort"
                               }
                             ],
@@ -31630,7 +31630,7 @@
                       "referencedDeclaration": 2574,
                       "src": "4811:21:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ILongShort_$4997",
+                        "typeIdentifier": "t_contract$_ILongShort_$5030",
                         "typeString": "contract ILongShort"
                       }
                     },
@@ -31662,10 +31662,10 @@
                         "name": "ILongShort",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 4997,
+                        "referencedDeclaration": 5030,
                         "src": "4835:10:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_ILongShort_$4997_$",
+                          "typeIdentifier": "t_type$_t_contract$_ILongShort_$5030_$",
                           "typeString": "type(contract ILongShort)"
                         }
                       },
@@ -31680,13 +31680,13 @@
                       "src": "4835:34:4",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ILongShort_$4997",
+                        "typeIdentifier": "t_contract$_ILongShort_$5030",
                         "typeString": "contract ILongShort"
                       }
                     },
                     "src": "4811:58:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ILongShort_$4997",
+                      "typeIdentifier": "t_contract$_ILongShort_$5030",
                       "typeString": "contract ILongShort"
                     }
                   },
@@ -31709,7 +31709,7 @@
                       "referencedDeclaration": 2577,
                       "src": "4879:10:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IFloatToken_$4965",
+                        "typeIdentifier": "t_contract$_IFloatToken_$4998",
                         "typeString": "contract IFloatToken"
                       }
                     },
@@ -31741,10 +31741,10 @@
                         "name": "IFloatToken",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 4965,
+                        "referencedDeclaration": 4998,
                         "src": "4892:11:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_IFloatToken_$4965_$",
+                          "typeIdentifier": "t_type$_t_contract$_IFloatToken_$4998_$",
                           "typeString": "type(contract IFloatToken)"
                         }
                       },
@@ -31759,13 +31759,13 @@
                       "src": "4892:24:4",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IFloatToken_$4965",
+                        "typeIdentifier": "t_contract$_IFloatToken_$4998",
                         "typeString": "contract IFloatToken"
                       }
                     },
                     "src": "4879:37:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IFloatToken_$4965",
+                      "typeIdentifier": "t_contract$_IFloatToken_$4998",
                       "typeString": "contract IFloatToken"
                     }
                   },
@@ -31887,7 +31887,7 @@
                   "id": 2762,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 16390,
+                  "referencedDeclaration": 16423,
                   "src": "4727:11:4"
                 },
                 "nodeType": "ModifierInvocation",
@@ -33026,7 +33026,7 @@
           },
           {
             "baseFunctions": [
-              5029
+              5062
             ],
             "body": {
               "id": 2968,
@@ -33049,7 +33049,7 @@
                         "referencedDeclaration": 2597,
                         "src": "6613:18:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_uint32_$",
+                          "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_uint32_$",
                           "typeString": "mapping(contract ISyntheticToken => uint32)"
                         }
                       },
@@ -33062,7 +33062,7 @@
                         "referencedDeclaration": 2883,
                         "src": "6632:9:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -33117,7 +33117,7 @@
                         "referencedDeclaration": 2597,
                         "src": "6666:18:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_uint32_$",
+                          "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_uint32_$",
                           "typeString": "mapping(contract ISyntheticToken => uint32)"
                         }
                       },
@@ -33130,7 +33130,7 @@
                         "referencedDeclaration": 2886,
                         "src": "6685:10:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -33582,7 +33582,7 @@
                       "referencedDeclaration": 2542,
                       "src": "6969:38:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       }
                     },
@@ -33596,13 +33596,13 @@
                       "referencedDeclaration": 2883,
                       "src": "7010:9:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       }
                     },
                     "src": "6969:50:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -33665,7 +33665,7 @@
                       "referencedDeclaration": 2539,
                       "src": "7029:39:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       }
                     },
@@ -33679,13 +33679,13 @@
                       "referencedDeclaration": 2886,
                       "src": "7071:10:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       }
                     },
                     "src": "7029:52:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -34037,7 +34037,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   },
                   "typeName": {
@@ -34047,13 +34047,13 @@
                       "id": 2881,
                       "name": "ISyntheticToken",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "6446:15:4"
                     },
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "6446:15:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -34071,7 +34071,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   },
                   "typeName": {
@@ -34081,13 +34081,13 @@
                       "id": 2884,
                       "name": "ISyntheticToken",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "6481:15:4"
                     },
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "6481:15:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -38299,7 +38299,7 @@
           },
           {
             "baseFunctions": [
-              5042
+              5075
             ],
             "body": {
               "id": 3317,
@@ -38719,7 +38719,7 @@
                           "referencedDeclaration": 2597,
                           "src": "14347:18:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_uint32_$",
+                            "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_uint32_$",
                             "typeString": "mapping(contract ISyntheticToken => uint32)"
                           }
                         },
@@ -38732,7 +38732,7 @@
                           "referencedDeclaration": 3321,
                           "src": "14366:5:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                            "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                             "typeString": "contract ISyntheticToken"
                           }
                         },
@@ -38763,7 +38763,7 @@
                         "referencedDeclaration": 2574,
                         "src": "14306:21:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ILongShort_$4997",
+                          "typeIdentifier": "t_contract$_ILongShort_$5030",
                           "typeString": "contract ILongShort"
                         }
                       },
@@ -38774,7 +38774,7 @@
                       "lValueRequested": false,
                       "memberName": "_updateSystemState",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 4972,
+                      "referencedDeclaration": 5005,
                       "src": "14306:40:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_uint32_$returns$__$",
@@ -38825,7 +38825,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   },
                   "typeName": {
@@ -38835,13 +38835,13 @@
                       "id": 3319,
                       "name": "ISyntheticToken",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "14264:15:4"
                     },
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "14264:15:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -39176,7 +39176,7 @@
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       },
                       "typeName": {
@@ -39186,13 +39186,13 @@
                           "id": 3373,
                           "name": "ISyntheticToken",
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 5075,
+                          "referencedDeclaration": 5108,
                           "src": "15381:15:4"
                         },
-                        "referencedDeclaration": 5075,
+                        "referencedDeclaration": 5108,
                         "src": "15381:15:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -39248,7 +39248,7 @@
                     "referencedDeclaration": 2542,
                     "src": "15409:38:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -39272,7 +39272,7 @@
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       },
                       "typeName": {
@@ -39282,13 +39282,13 @@
                           "id": 3381,
                           "name": "ISyntheticToken",
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 5075,
+                          "referencedDeclaration": 5108,
                           "src": "15457:15:4"
                         },
-                        "referencedDeclaration": 5075,
+                        "referencedDeclaration": 5108,
                         "src": "15457:15:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -39344,7 +39344,7 @@
                     "referencedDeclaration": 2539,
                     "src": "15486:39:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -40561,7 +40561,7 @@
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       },
                       "typeName": {
@@ -40571,13 +40571,13 @@
                           "id": 3477,
                           "name": "ISyntheticToken",
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 5075,
+                          "referencedDeclaration": 5108,
                           "src": "17100:15:4"
                         },
-                        "referencedDeclaration": 5075,
+                        "referencedDeclaration": 5108,
                         "src": "17100:15:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -40633,7 +40633,7 @@
                     "referencedDeclaration": 2542,
                     "src": "17128:38:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -40657,7 +40657,7 @@
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       },
                       "typeName": {
@@ -40667,13 +40667,13 @@
                           "id": 3485,
                           "name": "ISyntheticToken",
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 5075,
+                          "referencedDeclaration": 5108,
                           "src": "17176:15:4"
                         },
-                        "referencedDeclaration": 5075,
+                        "referencedDeclaration": 5108,
                         "src": "17176:15:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -40729,7 +40729,7 @@
                     "referencedDeclaration": 2539,
                     "src": "17205:39:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -40780,7 +40780,7 @@
                         "referencedDeclaration": 2588,
                         "src": "17282:16:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                          "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                           "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
                         }
                       },
@@ -40793,7 +40793,7 @@
                         "referencedDeclaration": 3479,
                         "src": "17299:9:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -40879,7 +40879,7 @@
                         "referencedDeclaration": 2588,
                         "src": "17353:16:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                          "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                           "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
                         }
                       },
@@ -40892,7 +40892,7 @@
                         "referencedDeclaration": 3487,
                         "src": "17370:10:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -41293,7 +41293,7 @@
                         "referencedDeclaration": 2577,
                         "src": "17761:10:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IFloatToken_$4965",
+                          "typeIdentifier": "t_contract$_IFloatToken_$4998",
                           "typeString": "contract IFloatToken"
                         }
                       },
@@ -41304,7 +41304,7 @@
                       "lValueRequested": false,
                       "memberName": "mint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 4964,
+                      "referencedDeclaration": 4997,
                       "src": "17761:15:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -41457,7 +41457,7 @@
                         "referencedDeclaration": 2577,
                         "src": "17805:10:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IFloatToken_$4965",
+                          "typeIdentifier": "t_contract$_IFloatToken_$4998",
                           "typeString": "contract IFloatToken"
                         }
                       },
@@ -41468,7 +41468,7 @@
                       "lValueRequested": false,
                       "memberName": "mint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 4964,
+                      "referencedDeclaration": 4997,
                       "src": "17805:15:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -43555,7 +43555,7 @@
                         "referencedDeclaration": 2574,
                         "src": "20181:21:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ILongShort_$4997",
+                          "typeIdentifier": "t_contract$_ILongShort_$5030",
                           "typeString": "contract ILongShort"
                         }
                       },
@@ -43566,7 +43566,7 @@
                       "lValueRequested": false,
                       "memberName": "_updateSystemStateMulti",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 4978,
+                      "referencedDeclaration": 5011,
                       "src": "20181:45:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_array$_t_uint32_$dyn_memory_ptr_$returns$__$",
@@ -43712,7 +43712,7 @@
           },
           {
             "baseFunctions": [
-              5049
+              5082
             ],
             "body": {
               "id": 3748,
@@ -43762,10 +43762,10 @@
                           "name": "ISyntheticToken",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 5075,
+                          "referencedDeclaration": 5108,
                           "src": "20820:15:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_ISyntheticToken_$5075_$",
+                            "typeIdentifier": "t_type$_t_contract$_ISyntheticToken_$5108_$",
                             "typeString": "type(contract ISyntheticToken)"
                           }
                         },
@@ -43780,7 +43780,7 @@
                         "src": "20820:27:4",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       }
@@ -43788,7 +43788,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       ],
@@ -43799,7 +43799,7 @@
                       "referencedDeclaration": 3333,
                       "src": "20807:12:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5075_$returns$__$",
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5108_$returns$__$",
                         "typeString": "function (contract ISyntheticToken)"
                       }
                     },
@@ -43865,10 +43865,10 @@
                           "name": "ISyntheticToken",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 5075,
+                          "referencedDeclaration": 5108,
                           "src": "20865:15:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_ISyntheticToken_$5075_$",
+                            "typeIdentifier": "t_type$_t_contract$_ISyntheticToken_$5108_$",
                             "typeString": "type(contract ISyntheticToken)"
                           }
                         },
@@ -43883,7 +43883,7 @@
                         "src": "20865:27:4",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -43915,7 +43915,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         },
                         {
@@ -43934,7 +43934,7 @@
                       "referencedDeclaration": 3828,
                       "src": "20858:6:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5075_$_t_uint256_$_t_address_$returns$__$",
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5108_$_t_uint256_$_t_address_$returns$__$",
                         "typeString": "function (contract ISyntheticToken,uint256,address)"
                       }
                     },
@@ -44006,10 +44006,10 @@
                       "name": "ISyntheticToken",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "20764:15:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_type$_t_contract$_ISyntheticToken_$5075_$",
+                        "typeIdentifier": "t_type$_t_contract$_ISyntheticToken_$5108_$",
                         "typeString": "type(contract ISyntheticToken)"
                       }
                     },
@@ -44024,7 +44024,7 @@
                     "src": "20764:27:4",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   }
@@ -44174,7 +44174,7 @@
                       "referencedDeclaration": 2597,
                       "src": "21059:18:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_uint32_$",
+                        "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_uint32_$",
                         "typeString": "mapping(contract ISyntheticToken => uint32)"
                       }
                     },
@@ -44187,7 +44187,7 @@
                       "referencedDeclaration": 3752,
                       "src": "21078:5:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       }
                     },
@@ -44534,7 +44534,7 @@
                           "referencedDeclaration": 2588,
                           "src": "21430:16:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                            "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                             "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
                           }
                         },
@@ -44547,7 +44547,7 @@
                           "referencedDeclaration": 3752,
                           "src": "21447:5:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                            "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                             "typeString": "contract ISyntheticToken"
                           }
                         },
@@ -44608,7 +44608,7 @@
                             "referencedDeclaration": 2588,
                             "src": "21462:16:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                               "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
                             }
                           },
@@ -44621,7 +44621,7 @@
                             "referencedDeclaration": 3752,
                             "src": "21479:5:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                              "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                               "typeString": "contract ISyntheticToken"
                             }
                           },
@@ -44833,7 +44833,7 @@
                             "referencedDeclaration": 3752,
                             "src": "21679:5:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                              "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                               "typeString": "contract ISyntheticToken"
                             }
                           }
@@ -44841,7 +44841,7 @@
                         "expression": {
                           "argumentTypes": [
                             {
-                              "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                              "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                               "typeString": "contract ISyntheticToken"
                             }
                           ],
@@ -45028,7 +45028,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   },
                   "typeName": {
@@ -45038,13 +45038,13 @@
                       "id": 3750,
                       "name": "ISyntheticToken",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "20945:15:4"
                     },
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "20945:15:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -45169,7 +45169,7 @@
                       "referencedDeclaration": 2597,
                       "src": "22091:18:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_uint32_$",
+                        "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_uint32_$",
                         "typeString": "mapping(contract ISyntheticToken => uint32)"
                       }
                     },
@@ -45182,7 +45182,7 @@
                       "referencedDeclaration": 3831,
                       "src": "22110:5:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                        "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                         "typeString": "contract ISyntheticToken"
                       }
                     },
@@ -45223,7 +45223,7 @@
                               "referencedDeclaration": 2588,
                               "src": "22134:16:4",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                                "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                                 "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
                               }
                             },
@@ -45236,7 +45236,7 @@
                               "referencedDeclaration": 3831,
                               "src": "22151:5:4",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                                "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                                 "typeString": "contract ISyntheticToken"
                               }
                             },
@@ -45474,7 +45474,7 @@
                           "referencedDeclaration": 2588,
                           "src": "22263:16:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                            "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                             "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
                           }
                         },
@@ -45487,7 +45487,7 @@
                           "referencedDeclaration": 3831,
                           "src": "22280:5:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                            "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                             "typeString": "contract ISyntheticToken"
                           }
                         },
@@ -45562,7 +45562,7 @@
                             "referencedDeclaration": 2588,
                             "src": "22313:16:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                               "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
                             }
                           },
@@ -45575,7 +45575,7 @@
                             "referencedDeclaration": 3831,
                             "src": "22330:5:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                              "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                               "typeString": "contract ISyntheticToken"
                             }
                           },
@@ -45882,7 +45882,7 @@
                         "referencedDeclaration": 3831,
                         "src": "22541:5:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -45893,7 +45893,7 @@
                       "lValueRequested": false,
                       "memberName": "transfer",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 19492,
+                      "referencedDeclaration": 19525,
                       "src": "22541:14:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$_t_bool_$",
@@ -45958,7 +45958,7 @@
                             "referencedDeclaration": 3831,
                             "src": "22639:5:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                              "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                               "typeString": "contract ISyntheticToken"
                             }
                           }
@@ -45966,7 +45966,7 @@
                         "expression": {
                           "argumentTypes": [
                             {
-                              "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                              "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                               "typeString": "contract ISyntheticToken"
                             }
                           ],
@@ -46087,7 +46087,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   },
                   "typeName": {
@@ -46097,13 +46097,13 @@
                       "id": 3829,
                       "name": "ISyntheticToken",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "22012:15:4"
                     },
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "22012:15:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -46168,7 +46168,7 @@
                         "referencedDeclaration": 3909,
                         "src": "22756:5:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       }
@@ -46176,7 +46176,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       ],
@@ -46187,7 +46187,7 @@
                       "referencedDeclaration": 3333,
                       "src": "22743:12:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5075_$returns$__$",
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5108_$returns$__$",
                         "typeString": "function (contract ISyntheticToken)"
                       }
                     },
@@ -46221,7 +46221,7 @@
                         "referencedDeclaration": 3909,
                         "src": "22782:5:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -46241,7 +46241,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         },
                         {
@@ -46256,7 +46256,7 @@
                       "referencedDeclaration": 3906,
                       "src": "22772:9:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5075_$_t_uint256_$returns$__$",
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5108_$_t_uint256_$returns$__$",
                         "typeString": "function (contract ISyntheticToken,uint256)"
                       }
                     },
@@ -46305,7 +46305,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   },
                   "typeName": {
@@ -46315,13 +46315,13 @@
                       "id": 3907,
                       "name": "ISyntheticToken",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "22685:15:4"
                     },
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "22685:15:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -46386,7 +46386,7 @@
                         "referencedDeclaration": 3927,
                         "src": "22885:5:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       }
@@ -46394,7 +46394,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       ],
@@ -46405,7 +46405,7 @@
                       "referencedDeclaration": 3333,
                       "src": "22872:12:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5075_$returns$__$",
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5108_$returns$__$",
                         "typeString": "function (contract ISyntheticToken)"
                       }
                     },
@@ -46439,7 +46439,7 @@
                         "referencedDeclaration": 3927,
                         "src": "22911:5:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         }
                       },
@@ -46453,7 +46453,7 @@
                             "referencedDeclaration": 2588,
                             "src": "22918:16:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5075_$_t_mapping$_t_address_$_t_uint256_$_$",
+                              "typeIdentifier": "t_mapping$_t_contract$_ISyntheticToken_$5108_$_t_mapping$_t_address_$_t_uint256_$_$",
                               "typeString": "mapping(contract ISyntheticToken => mapping(address => uint256))"
                             }
                           },
@@ -46466,7 +46466,7 @@
                             "referencedDeclaration": 3927,
                             "src": "22935:5:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                              "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                               "typeString": "contract ISyntheticToken"
                             }
                           },
@@ -46523,7 +46523,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                          "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                           "typeString": "contract ISyntheticToken"
                         },
                         {
@@ -46538,7 +46538,7 @@
                       "referencedDeclaration": 3906,
                       "src": "22901:9:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5075_$_t_uint256_$returns$__$",
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_ISyntheticToken_$5108_$_t_uint256_$returns$__$",
                         "typeString": "function (contract ISyntheticToken,uint256)"
                       }
                     },
@@ -46587,7 +46587,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                    "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                     "typeString": "contract ISyntheticToken"
                   },
                   "typeName": {
@@ -46597,13 +46597,13 @@
                       "id": 3925,
                       "name": "ISyntheticToken",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5075,
+                      "referencedDeclaration": 5108,
                       "src": "22830:15:4"
                     },
-                    "referencedDeclaration": 5075,
+                    "referencedDeclaration": 5108,
                     "src": "22830:15:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ISyntheticToken_$5075",
+                      "typeIdentifier": "t_contract$_ISyntheticToken_$5108",
                       "typeString": "contract ISyntheticToken"
                     }
                   },
@@ -46821,12 +46821,12 @@
         }
       },
       "links": {},
-      "address": "0x124c3656522D4E39De5af98d8972696216C9bB96",
-      "transactionHash": "0xe869ae5a0a5301fcb90e539d643aa7c890362ab4b6d3801c4a2d2cb5731a4f62"
+      "address": "0x8046bD40C9925F78a2b2Ea8D6422EF6049035382",
+      "transactionHash": "0xe76cb3e5d5b2558a05f47bb8a67e80ffbbc2d495d33e11b0d56670577003fe08"
     }
   },
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-06-30T11:52:13.970Z",
+  "updatedAt": "2021-06-30T19:01:45.833Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
