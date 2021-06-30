@@ -31,4 +31,4 @@ docker logs graph_graph-node_1 -f --tail 100
 ## Self Hosted graph
 
 Checkout the graph code you want to run.
-Go in the `scripts` folder, and run `./updateSelfHostedGraph. sh`.
+Go in the `scripts` folder, and run `./updateSelfHostedGraph.sh`.
