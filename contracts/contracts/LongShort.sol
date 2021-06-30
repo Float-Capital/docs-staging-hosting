@@ -543,55 +543,6 @@ contract LongShort is ILongShort, Initializable {
         return (longAmount, shortAmount);
     }
 
-    /**
-     * Calculates fees for the given mint/redeem amount. Users are penalised
-     * with higher fees for imbalancing the market.
-     */
-    // TODO: this function was written with immediate price in mind, rework this function to suit latest code
-    function getFeesGeneral(
-        uint32 marketIndex,
-        uint256 delta, // 1e18
-        bool synthTokenGainingDominanceIsLong,
-        uint256 baseFeePercent,
-        uint256 penaltyFeePercent
-    ) public view returns (uint256) {
-        uint256 baseFee = (delta * baseFeePercent) / TEN_TO_THE_5;
-
-        if (
-            syntheticTokenPoolValue[marketIndex][
-                synthTokenGainingDominanceIsLong
-            ] >=
-            syntheticTokenPoolValue[marketIndex][
-                !synthTokenGainingDominanceIsLong
-            ]
-        ) {
-            // All funds are causing imbalance
-            return baseFee + ((delta * penaltyFeePercent) / TEN_TO_THE_5);
-        } else if (
-            syntheticTokenPoolValue[marketIndex][
-                synthTokenGainingDominanceIsLong
-            ] +
-                delta >
-            syntheticTokenPoolValue[marketIndex][
-                !synthTokenGainingDominanceIsLong
-            ]
-        ) {
-            uint256 amountImbalancing = delta -
-                (syntheticTokenPoolValue[marketIndex][
-                    !synthTokenGainingDominanceIsLong
-                ] -
-                    syntheticTokenPoolValue[marketIndex][
-                        synthTokenGainingDominanceIsLong
-                    ]);
-            uint256 penaltyFee = (amountImbalancing * penaltyFeePercent) /
-                TEN_TO_THE_5;
-
-            return baseFee + penaltyFee;
-        } else {
-            return baseFee;
-        }
-    }
-
     /*╔══════════════════════════════╗
       ║       HELPER FUNCTIONS       ║
       ╚══════════════════════════════╝*/
@@ -1003,6 +954,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 currentDepositAmount = userNextPriceDepositAmount[marketIndex][
             isLong
         ][user];
+        userNextPriceDepositAmount[marketIndex][isLong][user] = 0;
         if (currentDepositAmount > 0) {
             uint256 tokensToTransferToUser = _getAmountSynthToken(
                 currentDepositAmount,
@@ -1010,13 +962,10 @@ contract LongShort is ILongShort, Initializable {
                     userCurrentNextPriceUpdateIndex[marketIndex][user]
                 ]
             );
-
             syntheticTokens[marketIndex][isLong].transfer(
                 user,
                 tokensToTransferToUser
             );
-
-            userNextPriceDepositAmount[marketIndex][isLong][user] = 0;
         }
     }
 
@@ -1028,6 +977,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 currentRedemptions = userNextPriceRedemptionAmount[marketIndex][
             isLong
         ][user];
+        userNextPriceRedemptionAmount[marketIndex][isLong][user] = 0;
         if (currentRedemptions > 0) {
             uint256 amountToRedeem = _getAmountPaymentToken(
                 currentRedemptions,
@@ -1035,13 +985,10 @@ contract LongShort is ILongShort, Initializable {
                     userCurrentNextPriceUpdateIndex[marketIndex][user]
                 ]
             );
-
             fundTokens[marketIndex].transfer(user, amountToRedeem);
-            userNextPriceRedemptionAmount[marketIndex][isLong][user] = 0;
         }
     }
 
-    // TODO: WARNING!! This function is re-entrancy vulnerable if the synthetic token has any execution hooks
     function _executeOutstandingNextPriceSettlements(
         address user,
         uint32 marketIndex
@@ -1068,7 +1015,6 @@ contract LongShort is ILongShort, Initializable {
         address user,
         uint32 marketIndex
     ) external override {
-        // NOTE: this does all the "nextPrice" actions. This could be simplified to only do the relevant nextPrice action.
         _executeOutstandingNextPriceSettlements(user, marketIndex);
     }
 
@@ -1082,17 +1028,6 @@ contract LongShort is ILongShort, Initializable {
         uint256 syntheticTokenPriceLong,
         uint256 syntheticTokenPriceShort
     ) internal {
-        // calculate and apply aggregate fees here before settlements.
-        // NB If both inflows and outflows and aggregated, weird attacks can happen..
-        // I.e. user spots large flow and gets in this bundle to invoke fees etc
-
-        // (uint256 totalFeesLong, uint256 totalFeesShort) =
-        //     _applyBatchedNextPriceFees(
-        //         marketIndex,
-        //         longAmountOfPaymentTokenToRedeem,
-        //         shortAmountOfPaymentTokenToRedeem
-        //     );
-
         _handleBatchedDepositSettlement(
             marketIndex,
             true,
@@ -1170,46 +1105,4 @@ contract LongShort is ILongShort, Initializable {
             address(this)
         );
     }
-
-    // function _applyBatchedNextPriceFees(
-    //     uint32 marketIndex,
-    //     uint256 amountOfPaymentTokenToRedeem,
-    //     uint256 shortAmountOfPaymentTokenToRedeem
-    // ) internal returns (uint256 totalFeesLong, uint256 totalFeesShort) {
-    //     // penalty fee is shared equally between
-    //     // all users on the side that ends up causing an imbalance in the
-    //     // batch.
-    //     if (amountOfPaymentTokenToRedeem > shortAmountOfPaymentTokenToRedeem) {
-    //         uint256 delta =
-    //             amountOfPaymentTokenToRedeem -
-    //                 shortAmountOfPaymentTokenToRedeem;
-    //         totalFeesLong = getFeesGeneral(
-    //             marketIndex,
-    //             delta,
-    //             false, /*short*/
-    //             0,
-    //             badLiquidityExitFee[marketIndex]
-    //         );
-    //     } else {
-    //         uint256 delta =
-    //             shortAmountOfPaymentTokenToRedeem -
-    //                 amountOfPaymentTokenToRedeem;
-    //         totalFeesShort = getFeesGeneral(
-    //             marketIndex,
-    //             delta,
-    //             true, /*long*/
-    //             0,
-    //             badLiquidityExitFee[marketIndex]
-    //         );
-    //     }
-
-    //     uint256 totalFees = totalFeesLong + totalFeesShort;
-    //     (uint256 marketAmount, uint256 treasuryAmount) =
-    //         getTreasurySplit(marketIndex, totalFees);
-
-    //     totalValueReservedForTreasury[marketIndex] += treasuryAmount;
-
-    //     _distributeMarketAmount(marketIndex, marketAmount);
-    //     emit FeesLevied(marketIndex, totalFees);
-    // }
 }
