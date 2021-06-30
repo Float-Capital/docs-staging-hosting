@@ -283,8 +283,6 @@ module.exports = async function (deployer, network, accounts) {
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
-    // if (network == "mumbai") return
-
     console.log(`Simulating transactions for marketIndex: ${marketIndex}`);
 
     const longAddress = await longShort.syntheticTokens.call(marketIndex, true);
