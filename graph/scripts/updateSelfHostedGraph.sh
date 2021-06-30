@@ -2,7 +2,7 @@ cd ../../contracts
 yarn
 yarn compile
 
-cp -r abis ../graph/abis-copy
+cp -r abis/* ../graph/abis-copy
 
 cd ../graph/scripts
 
