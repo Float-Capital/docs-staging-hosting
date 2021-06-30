@@ -22,11 +22,12 @@ import {
   CollateralToken,
   LatestPrice,
   Price,
-  User,
-  UserNextPriceAction,
 } from "../generated/schema";
 import { BigInt, log, Bytes, Address } from "@graphprotocol/graph-ts";
-import { saveEventToStateChange } from "./utils/txEventHelpers";
+import {
+  bigIntArrayToStringArray,
+  saveEventToStateChange,
+} from "./utils/txEventHelpers";
 import {
   getOrCreateLatestSystemState,
   getOrCreateStakerState,
@@ -36,7 +37,6 @@ import {
   updateOrCreateCollateralToken,
   getOrCreateGlobalState,
   getStakerStateId,
-  getOrCreateUser,
   getUser,
   getSyntheticMarket,
   getSyntheticTokenById,
@@ -710,13 +710,4 @@ function updateLatestTokenPrice(
     }
     syntheticToken.priceHistory.push(newPriceEntity.id);
   }
-}
-
-// currently all params are BigInts -> in future may have to modify to support e.g. Addresses
-function bigIntArrayToStringArray(bigIntArr: BigInt[]): string[] {
-  let returnArr = new Array<string>(bigIntArr.length);
-  for (let i = 0; i < bigIntArr.length; i++) {
-    returnArr[i] = bigIntArr[i].toString();
-  }
-  return returnArr;
 }
