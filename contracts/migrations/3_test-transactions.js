@@ -221,46 +221,45 @@ module.exports = async function (deployer, network, accounts) {
     await mintAndApprove(token, new BN("20000000000000000000"), user3, admin);
   }
 
-  // console.log("topping up balance");
-  // await topupBalanceIfLow(admin, user1);
-  // await topupBalanceIfLow(admin, user2);
-  // await topupBalanceIfLow(admin, user3);
-  // console.log("balance topped up :)");
+  console.log("topping up balance");
+  await topupBalanceIfLow(admin, user1);
+  await topupBalanceIfLow(admin, user2);
+  await topupBalanceIfLow(admin, user3);
+  console.log("balance topped up :)");
 
-  // await deployTestMarket(
-  //   "ETH Killers",
-  //   "ETHK",
-  //   longShort,
-  //   treasury,
-  //   token,
-  //   admin,
-  //   network,
-  //   token
-  // );
+  await deployTestMarket(
+    "ETH Killers",
+    "ETHK",
+    longShort,
+    treasury,
+    token,
+    admin,
+    network,
+    token
+  );
 
-  // await deployTestMarket(
-  //   "The Flippening",
-  //   "EBD",
-  //   longShort,
-  //   treasury,
-  //   token,
-  //   admin,
-  //   network,
-  //   token
-  // );
+  await deployTestMarket(
+    "The Flippening",
+    "EBD",
+    longShort,
+    treasury,
+    token,
+    admin,
+    network,
+    token
+  );
 
-  // await deployTestMarket(
-  //   "Gold",
-  //   "GOLD",
-  //   longShort,
-  //   treasury,
-  //   token,
-  //   admin,
-  //   network,
-  //   token
-  // );
+  await deployTestMarket(
+    "Gold",
+    "GOLD",
+    longShort,
+    treasury,
+    token,
+    admin,
+    network,
+    token
+  );
 
-  const currentMarketIndex = (await longShort.latestMarket()).toNumber();
   let verifyString = "truffle run verify";
   if (network == "mumbai") {
     for (
@@ -282,6 +281,7 @@ module.exports = async function (deployer, network, accounts) {
     \`${verifyString} --network ${network}\``);
   }
 
+  const currentMarketIndex = (await longShort.latestMarket()).toNumber();
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
     // if (network == "mumbai") return
 

@@ -1,11 +1,11 @@
 var secretsManager = require("../secretsManager.js");
 var ethers = require("ethers");
 
-const longShortContractAddress = "0x3Fe666e021714eaF51e061D8efFCc6fA4b390DC0";
+const longShortContractAddress = "0xBa2d98e8161519bd374473c7F3375AEEEc35D360";
 const longShortAbi = [
   "function getMarketSplit(uint32 marketIndex, uint256 amount) view returns (uint256 longAmount, uint256 shortAmount) @100000",
   "function _updateSystemState(uint32 marketIndex) external @400000", //TODO: Optimise the gas here
-  "function _updateSystemStateMulti(uint32[] calldata marketIndexes) external @1800000", // TODO: remove _ in latest version of contracts
+  "function _updateSystemStateMulti(uint32[] calldata marketIndexes) external @2800000", // TODO: remove _ in latest version of contracts
 ];
 
 let provider;
