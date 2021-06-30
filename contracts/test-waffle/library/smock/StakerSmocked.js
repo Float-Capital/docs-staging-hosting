@@ -861,9 +861,9 @@ function _claimFloatCalls(param) {
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
                     var array = _r.smocked._claimFloatMock.calls;
                     return Belt_Array.map(array, (function (_m) {
-                                  var marketIndex = _m[0];
+                                  var marketIndexes = _m[0];
                                   return {
-                                          marketIndex: marketIndex
+                                          marketIndexes: marketIndexes
                                         };
                                 }));
                   })));
