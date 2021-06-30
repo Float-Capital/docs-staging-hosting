@@ -602,7 +602,7 @@ contract StakerMockable is IStaker, Initializable {
                 (
             uint256 floatToMintLong,
             uint256 floatToMintShort
-        ) = calculateAccumulatedFloat(marketIndex, msg.sender);
+        ) = calculateAccumulatedFloat(marketIndex, user);
 
         uint256 floatToMint = floatToMintLong + floatToMintShort;
         if (floatToMint > 0) {
@@ -735,7 +735,9 @@ contract StakerMockable is IStaker, Initializable {
             userAmountStaked[token][msg.sender] -
             amount;
 
-        token.transfer(msg.sender, amount);
+                uint256 amountFees = (amount * 50) / 10000;
+
+        token.transfer(msg.sender, amount - amountFees);
 
         emit StakeWithdrawn(msg.sender, address(token), amount);
     }
