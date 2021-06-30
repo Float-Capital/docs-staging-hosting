@@ -1075,7 +1075,7 @@ module InternalMock = {
     })
   }
 
-  type _claimFloatCall = {marketIndex: array<int>}
+  type _claimFloatCall = {marketIndexes: array<int>}
 
   let _claimFloatCalls: unit => array<_claimFloatCall> = () => {
     checkForExceptions(~functionName="_claimFloat")
@@ -1083,10 +1083,10 @@ module InternalMock = {
     ->Option.map(_r => {
       let array = %raw("_r.smocked._claimFloatMock.calls")
       array->Array.map(_m => {
-        let marketIndex = _m->Array.getUnsafe(0)
+        let marketIndexes = _m->Array.getUnsafe(0)
 
         {
-          marketIndex: marketIndex,
+          marketIndexes: marketIndexes,
         }
       })
     })

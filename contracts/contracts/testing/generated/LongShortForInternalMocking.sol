@@ -79,10 +79,6 @@ contract LongShortForInternalMocking {
       return (abi.decode("",(uint256)),abi.decode("",(uint256)));
     }
      
-    function getFeesGeneralMock(uint32,uint256,bool,uint256,uint256) public pure returns (uint256 ){
-      return (abi.decode("",(uint256)));
-    }
-     
     function _distributeMarketAmountMock(uint32,uint256) public pure {
       return ();
     }
@@ -182,13 +178,13 @@ contract LongShortForInternalMocking {
     function _performOustandingSettlementsMock(uint32,uint256,uint256,uint256) public pure {
       return ();
     }
-
-    function _handleBatchedDepositSettlementMock(uint32,bool,uint256) public pure returns (bool wasABatchedSettlement){
-      return (abi.decode("",(bool)));
+     
+    function _handleBatchedDepositSettlementMock(uint32,bool,uint256) public pure {
+      return ();
     }
      
-    function _handleBatchedRedeemSettlementMock(uint32,uint256,uint256) public pure returns (bool wasABatchedSettlement){
-      return (abi.decode("",(bool)));
+    function _handleBatchedRedeemSettlementMock(uint32,uint256,uint256) public pure {
+      return ();
     }
      
     function adminOnlyMock() public pure {
