@@ -2,6 +2,7 @@
 'use strict';
 
 var Chai = require("./bindings/chai/Chai.js");
+var Stake = require("./tests/stake/Stake.js");
 var LetOps = require("./library/LetOps.js");
 var Globals = require("./library/Globals.js");
 var Helpers = require("./library/Helpers.js");
@@ -10,8 +11,11 @@ var CONSTANTS = require("./CONSTANTS.js");
 var GetKValue = require("./tests/stake/GetKValue.js");
 var MintFloat = require("./tests/stake/MintFloat.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
+var ClaimFloat = require("./tests/stake/ClaimFloat.js");
 var UpdateState = require("./tests/stake/UpdateState.js");
 var HelperActions = require("./library/HelperActions.js");
+var StakeFromUser = require("./tests/stake/StakeFromUser.js");
+var ClaimFloatCustom = require("./tests/stake/ClaimFloatCustom.js");
 var SetRewardObjects = require("./tests/stake/SetRewardObjects.js");
 var AddNewStakingFund = require("./tests/stake/AddNewStakingFund.js");
 var CalculateTimeDelta = require("./tests/stake/CalculateTimeDelta.js");
@@ -100,7 +104,11 @@ describe("Float System", (function () {
                         AddNewStateForFloatRewards.test(contracts, accounts);
                         UpdateState.test(contracts, accounts);
                         MintFloat.test(contracts, accounts);
-                        return MintAccumulatedFloat.test(contracts, accounts);
+                        MintAccumulatedFloat.test(contracts, accounts);
+                        ClaimFloat.test(contracts, accounts);
+                        ClaimFloatCustom.test(contracts, accounts);
+                        StakeFromUser.test(contracts, accounts);
+                        return Stake.test(contracts, accounts);
                       }));
                 
               }));

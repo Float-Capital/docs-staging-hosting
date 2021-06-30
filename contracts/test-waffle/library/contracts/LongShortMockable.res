@@ -102,17 +102,6 @@ type fundTokensReturn = Ethers.ethAddress
 @send
 external fundTokens: (t, int) => JsPromise.t<fundTokensReturn> = "fundTokens"
 
-type getFeesGeneralReturn = Ethers.BigNumber.t
-@send
-external getFeesGeneral: (
-  t,
-  ~marketIndex: int,
-  ~delta: Ethers.BigNumber.t,
-  ~synthTokenGainingDominanceIsLong: bool,
-  ~baseFeePercent: Ethers.BigNumber.t,
-  ~penaltyFeePercent: Ethers.BigNumber.t,
-) => JsPromise.t<getFeesGeneralReturn> = "getFeesGeneral"
-
 type getLongPcntForLongVsShortSplitReturn = Ethers.BigNumber.t
 @send
 external getLongPcntForLongVsShortSplit: (
@@ -250,11 +239,6 @@ type syntheticTokenPoolValueReturn = Ethers.BigNumber.t
 @send
 external syntheticTokenPoolValue: (t, int, bool) => JsPromise.t<syntheticTokenPoolValueReturn> =
   "syntheticTokenPoolValue"
-
-type syntheticTokenPriceReturn = Ethers.BigNumber.t
-@send
-external syntheticTokenPrice: (t, int, bool) => JsPromise.t<syntheticTokenPriceReturn> =
-  "syntheticTokenPrice"
 
 type syntheticTokenPriceSnapshotReturn = Ethers.BigNumber.t
 @send

@@ -334,37 +334,6 @@ let fundTokensCalls: t => array<fundTokensCall> = _r => {
   })
 }
 
-let mockGetFeesGeneralToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.getFeesGeneral.will.return.with([_param0])")
-}
-
-type getFeesGeneralCall = {
-  marketIndex: int,
-  delta: Ethers.BigNumber.t,
-  synthTokenGainingDominanceIsLong: bool,
-  baseFeePercent: Ethers.BigNumber.t,
-  penaltyFeePercent: Ethers.BigNumber.t,
-}
-
-let getFeesGeneralCalls: t => array<getFeesGeneralCall> = _r => {
-  let array = %raw("_r.smocked.getFeesGeneral.calls")
-  array->Array.map(((
-    marketIndex,
-    delta,
-    synthTokenGainingDominanceIsLong,
-    baseFeePercent,
-    penaltyFeePercent,
-  )) => {
-    {
-      marketIndex: marketIndex,
-      delta: delta,
-      synthTokenGainingDominanceIsLong: synthTokenGainingDominanceIsLong,
-      baseFeePercent: baseFeePercent,
-      penaltyFeePercent: penaltyFeePercent,
-    }
-  })
-}
-
 let mockGetLongPcntForLongVsShortSplitToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.getLongPcntForLongVsShortSplit.will.return.with([_param0])")
 }
@@ -723,25 +692,6 @@ type syntheticTokenPoolValueCall = {
 
 let syntheticTokenPoolValueCalls: t => array<syntheticTokenPoolValueCall> = _r => {
   let array = %raw("_r.smocked.syntheticTokenPoolValue.calls")
-  array->Array.map(((param0, param1)) => {
-    {
-      param0: param0,
-      param1: param1,
-    }
-  })
-}
-
-let mockSyntheticTokenPriceToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.syntheticTokenPrice.will.return.with([_param0])")
-}
-
-type syntheticTokenPriceCall = {
-  param0: int,
-  param1: bool,
-}
-
-let syntheticTokenPriceCalls: t => array<syntheticTokenPriceCall> = _r => {
-  let array = %raw("_r.smocked.syntheticTokenPrice.calls")
   array->Array.map(((param0, param1)) => {
     {
       param0: param0,
@@ -1303,27 +1253,27 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mock_getPriceToReturn: Ethers.BigNumber.t => unit = _param0 => {
-    checkForExceptions(~functionName="_getPrice")
+  let mock_getSyntheticTokenPriceToReturn: Ethers.BigNumber.t => unit = _param0 => {
+    checkForExceptions(~functionName="_getSyntheticTokenPrice")
     let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked._getPriceMock.will.return.with([_param0])")
+      let _ = %raw("_r.smocked._getSyntheticTokenPriceMock.will.return.with([_param0])")
     })
   }
 
-  type _getPriceCall = {
-    amountSynth: Ethers.BigNumber.t,
-    amountPaymentToken: Ethers.BigNumber.t,
+  type _getSyntheticTokenPriceCall = {
+    marketIndex: int,
+    isLong: bool,
   }
 
-  let _getPriceCalls: unit => array<_getPriceCall> = () => {
-    checkForExceptions(~functionName="_getPrice")
+  let _getSyntheticTokenPriceCalls: unit => array<_getSyntheticTokenPriceCall> = () => {
+    checkForExceptions(~functionName="_getSyntheticTokenPrice")
     internalRef.contents
     ->Option.map(_r => {
-      let array = %raw("_r.smocked._getPriceMock.calls")
-      array->Array.map(((amountSynth, amountPaymentToken)) => {
+      let array = %raw("_r.smocked._getSyntheticTokenPriceMock.calls")
+      array->Array.map(((marketIndex, isLong)) => {
         {
-          amountSynth: amountSynth,
-          amountPaymentToken: amountPaymentToken,
+          marketIndex: marketIndex,
+          isLong: isLong,
         }
       })
     })
@@ -1529,70 +1479,6 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mockGetFeesGeneralToReturn: Ethers.BigNumber.t => unit = _param0 => {
-    checkForExceptions(~functionName="getFeesGeneral")
-    let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked.getFeesGeneralMock.will.return.with([_param0])")
-    })
-  }
-
-  type getFeesGeneralCall = {
-    marketIndex: int,
-    delta: Ethers.BigNumber.t,
-    synthTokenGainingDominanceIsLong: bool,
-    baseFeePercent: Ethers.BigNumber.t,
-    penaltyFeePercent: Ethers.BigNumber.t,
-  }
-
-  let getFeesGeneralCalls: unit => array<getFeesGeneralCall> = () => {
-    checkForExceptions(~functionName="getFeesGeneral")
-    internalRef.contents
-    ->Option.map(_r => {
-      let array = %raw("_r.smocked.getFeesGeneralMock.calls")
-      array->Array.map(((
-        marketIndex,
-        delta,
-        synthTokenGainingDominanceIsLong,
-        baseFeePercent,
-        penaltyFeePercent,
-      )) => {
-        {
-          marketIndex: marketIndex,
-          delta: delta,
-          synthTokenGainingDominanceIsLong: synthTokenGainingDominanceIsLong,
-          baseFeePercent: baseFeePercent,
-          penaltyFeePercent: penaltyFeePercent,
-        }
-      })
-    })
-    ->Option.getExn
-  }
-
-  let mock_refreshTokenPricesToReturn: unit => unit = () => {
-    checkForExceptions(~functionName="_refreshTokenPrices")
-    let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked._refreshTokenPricesMock.will.return()")
-    })
-  }
-
-  type _refreshTokenPricesCall = {marketIndex: int}
-
-  let _refreshTokenPricesCalls: unit => array<_refreshTokenPricesCall> = () => {
-    checkForExceptions(~functionName="_refreshTokenPrices")
-    internalRef.contents
-    ->Option.map(_r => {
-      let array = %raw("_r.smocked._refreshTokenPricesMock.calls")
-      array->Array.map(_m => {
-        let marketIndex = _m->Array.getUnsafe(0)
-
-        {
-          marketIndex: marketIndex,
-        }
-      })
-    })
-    ->Option.getExn
-  }
-
   let mock_distributeMarketAmountToReturn: unit => unit = () => {
     checkForExceptions(~functionName="_distributeMarketAmount")
     let _ = internalRef.contents->Option.map(_r => {
@@ -1684,6 +1570,8 @@ module InternalMock = {
   type _saveSyntheticTokenPriceSnapshotsCall = {
     marketIndex: int,
     newLatestPriceStateIndex: Ethers.BigNumber.t,
+    syntheticTokenPriceLong: Ethers.BigNumber.t,
+    syntheticTokenPriceShort: Ethers.BigNumber.t,
   }
 
   let _saveSyntheticTokenPriceSnapshotsCalls: unit => array<
@@ -1693,10 +1581,17 @@ module InternalMock = {
     internalRef.contents
     ->Option.map(_r => {
       let array = %raw("_r.smocked._saveSyntheticTokenPriceSnapshotsMock.calls")
-      array->Array.map(((marketIndex, newLatestPriceStateIndex)) => {
+      array->Array.map(((
+        marketIndex,
+        newLatestPriceStateIndex,
+        syntheticTokenPriceLong,
+        syntheticTokenPriceShort,
+      )) => {
         {
           marketIndex: marketIndex,
           newLatestPriceStateIndex: newLatestPriceStateIndex,
+          syntheticTokenPriceLong: syntheticTokenPriceLong,
+          syntheticTokenPriceShort: syntheticTokenPriceShort,
         }
       })
     })
@@ -1863,10 +1758,10 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mock_burnSynthTokensForRedemptionToReturn: bool => unit = _param0 => {
+  let mock_burnSynthTokensForRedemptionToReturn: unit => unit = () => {
     checkForExceptions(~functionName="_burnSynthTokensForRedemption")
     let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked._burnSynthTokensForRedemptionMock.will.return.with([_param0])")
+      let _ = %raw("_r.smocked._burnSynthTokensForRedemptionMock.will.return()")
     })
   }
 
@@ -2267,6 +2162,8 @@ module InternalMock = {
   type _performOustandingSettlementsCall = {
     marketIndex: int,
     newLatestPriceStateIndex: Ethers.BigNumber.t,
+    syntheticTokenPriceLong: Ethers.BigNumber.t,
+    syntheticTokenPriceShort: Ethers.BigNumber.t,
   }
 
   let _performOustandingSettlementsCalls: unit => array<_performOustandingSettlementsCall> = () => {
@@ -2274,26 +2171,34 @@ module InternalMock = {
     internalRef.contents
     ->Option.map(_r => {
       let array = %raw("_r.smocked._performOustandingSettlementsMock.calls")
-      array->Array.map(((marketIndex, newLatestPriceStateIndex)) => {
+      array->Array.map(((
+        marketIndex,
+        newLatestPriceStateIndex,
+        syntheticTokenPriceLong,
+        syntheticTokenPriceShort,
+      )) => {
         {
           marketIndex: marketIndex,
           newLatestPriceStateIndex: newLatestPriceStateIndex,
+          syntheticTokenPriceLong: syntheticTokenPriceLong,
+          syntheticTokenPriceShort: syntheticTokenPriceShort,
         }
       })
     })
     ->Option.getExn
   }
 
-  let mock_handleBatchedDepositSettlementToReturn: bool => unit = _param0 => {
+  let mock_handleBatchedDepositSettlementToReturn: unit => unit = () => {
     checkForExceptions(~functionName="_handleBatchedDepositSettlement")
     let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked._handleBatchedDepositSettlementMock.will.return.with([_param0])")
+      let _ = %raw("_r.smocked._handleBatchedDepositSettlementMock.will.return()")
     })
   }
 
   type _handleBatchedDepositSettlementCall = {
     marketIndex: int,
     isLong: bool,
+    syntheticTokenPrice: Ethers.BigNumber.t,
   }
 
   let _handleBatchedDepositSettlementCalls: unit => array<
@@ -2303,24 +2208,29 @@ module InternalMock = {
     internalRef.contents
     ->Option.map(_r => {
       let array = %raw("_r.smocked._handleBatchedDepositSettlementMock.calls")
-      array->Array.map(((marketIndex, isLong)) => {
+      array->Array.map(((marketIndex, isLong, syntheticTokenPrice)) => {
         {
           marketIndex: marketIndex,
           isLong: isLong,
+          syntheticTokenPrice: syntheticTokenPrice,
         }
       })
     })
     ->Option.getExn
   }
 
-  let mock_handleBatchedRedeemSettlementToReturn: bool => unit = _param0 => {
+  let mock_handleBatchedRedeemSettlementToReturn: unit => unit = () => {
     checkForExceptions(~functionName="_handleBatchedRedeemSettlement")
     let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked._handleBatchedRedeemSettlementMock.will.return.with([_param0])")
+      let _ = %raw("_r.smocked._handleBatchedRedeemSettlementMock.will.return()")
     })
   }
 
-  type _handleBatchedRedeemSettlementCall = {marketIndex: int}
+  type _handleBatchedRedeemSettlementCall = {
+    marketIndex: int,
+    syntheticTokenPriceLong: Ethers.BigNumber.t,
+    syntheticTokenPriceShort: Ethers.BigNumber.t,
+  }
 
   let _handleBatchedRedeemSettlementCalls: unit => array<
     _handleBatchedRedeemSettlementCall,
@@ -2329,11 +2239,11 @@ module InternalMock = {
     internalRef.contents
     ->Option.map(_r => {
       let array = %raw("_r.smocked._handleBatchedRedeemSettlementMock.calls")
-      array->Array.map(_m => {
-        let marketIndex = _m->Array.getUnsafe(0)
-
+      array->Array.map(((marketIndex, syntheticTokenPriceLong, syntheticTokenPriceShort)) => {
         {
           marketIndex: marketIndex,
+          syntheticTokenPriceLong: syntheticTokenPriceLong,
+          syntheticTokenPriceShort: syntheticTokenPriceShort,
         }
       })
     })

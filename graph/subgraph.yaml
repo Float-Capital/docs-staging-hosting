@@ -14,7 +14,6 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - BatchedActionsSettled
         - ExecuteNextPriceSettlementsUser
         - FeesChanges
         - FeesLevied
@@ -24,15 +23,12 @@ dataSources:
         - OracleUpdated
         - PriceUpdate
         - SyntheticTokenCreated
-        - TokenPriceRefreshed
+        - SystemStateUpdated
         - V1
-        - ValueLockedInSystem
       abis:
         - name: LongShort
           file: ./abis/LongShort.json
       eventHandlers:
-        - event: BatchedActionsSettled(uint32,uint256,uint256,uint256,uint256,uint256)
-          handler: handleBatchedActionsSettled
         - event: ExecuteNextPriceSettlementsUser(address,uint32)
           handler: handleExecuteNextPriceSettlementsUser
         - event: FeesChanges(uint32,uint256,uint256,uint256,uint256)
@@ -51,12 +47,10 @@ dataSources:
           handler: handlePriceUpdate
         - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
           handler: handleSyntheticTokenCreated
-        - event: TokenPriceRefreshed(uint32,uint256,uint256)
-          handler: handleTokenPriceRefreshed
+        - event: SystemStateUpdated(uint32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleSystemStateUpdated
         - event: V1(address,address,address,address)
           handler: handleV1
-        - event: ValueLockedInSystem(uint32,uint256,uint256,uint256)
-          handler: handleValueLockedInSystem
       file: ./src/float.ts
 
   - kind: ethereum/contract
@@ -71,11 +65,13 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - DeployV0
-        - StateAdded
-        - StakeWithdrawn
+        - DeployV1
         - FloatMinted
-        - FloatAccumulated
+        - MarketAddedToStaker
+        - MarketLaunchIncentiveParametersChanges
+        - StakeAdded
+        - StakeWithdrawn
+        - StateAdded
       abis:
         - name: Staker
           file: ./abis/Staker.json
@@ -84,14 +80,16 @@ dataSources:
           handler: handleDeployV1
         - event: FloatMinted(address,uint32,uint256,uint256,uint256)
           handler: handleFloatMinted
+        - event: MarketAddedToStaker(uint32,uint256)
+          handler: handleMarketAddedToStaker
         - event: MarketLaunchIncentiveParametersChanges(uint32,uint256,uint256)
           handler: handleMarketLaunchIncentiveParametersChanges
         - event: StakeAdded(address,address,uint256,uint256)
           handler: handleStakeAdded
         - event: StakeWithdrawn(address,address,uint256)
           handler: handleStakeWithdrawn
-        - event: StateAdded(uint32,uint256,uint256,uint256,uint256)
-          handler: handleStateAdded
+        - event: StateAdded(uint32,uint256,uint256,uint256)
+          handler: handleStateAddedd
       file: ./src/staker.ts
 
 templates:

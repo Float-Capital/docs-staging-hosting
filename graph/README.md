@@ -27,3 +27,8 @@ docker logs graph_graph-node_1 -f --tail 100
 ### Local testing requires local graph node
 
 - [Guide to setting up a local node](https://thegraph.com/docs/quick-start#2.-run-a-local-graph-node)
+
+## Self Hosted graph
+
+Checkout the graph code you want to run.
+Go in the `scripts` folder, and run `./updateSelfHostedGraph.sh`.

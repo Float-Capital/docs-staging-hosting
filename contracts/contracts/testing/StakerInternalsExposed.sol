@@ -132,11 +132,29 @@ contract StakerInternalsExposed is StakerMockable {
         floatPercentage = _floatPercentage;
     }
 
-    function setMintAccumulatedFloatParams(
+    function setMintAccumulatedFloatAndClaimFloatParams(
         uint32 marketIndex,
         uint256 latestRewardIndexForMarket
     ) public {
         latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
+    }
+
+    function setClaimFloatCustomParams(address longshort) external {
+        longShortCoreContract = ILongShort(longshort);
+    }
+
+    function set_stakeParams(
+        address user,
+        uint32 marketIndex,
+        uint256 _latestRewardIndex,
+        ISyntheticToken token,
+        uint256 _userAmountStaked,
+        uint256 userLastRewardIndex
+    ) external {
+        marketIndexOfToken[token] = marketIndex;
+        latestRewardIndex[marketIndex] = _latestRewardIndex;
+        userAmountStaked[token][user] = _userAmountStaked;
+        userIndexOfLastClaimedReward[marketIndex][user] = userLastRewardIndex;
     }
 
     ///////////////////////////////////////////
@@ -259,5 +277,17 @@ contract StakerInternalsExposed is StakerMockable {
 
     function _updateStateExternal(ISyntheticToken token) external {
         _updateState(token);
+    }
+
+    function _claimFloatExternal(uint32[] calldata marketIndex) external {
+        _claimFloat(marketIndex);
+    }
+
+    function _stakeExternal(
+        ISyntheticToken token,
+        uint256 amount,
+        address user
+    ) external {
+        _stake(token, amount, user);
     }
 }

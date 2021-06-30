@@ -38,7 +38,7 @@ let test =
 
       let%AwaitThen _ =
         (stakerRef^)
-        ->Staker.Exposed.setMintAccumulatedFloatParams(
+        ->Staker.Exposed.setMintAccumulatedFloatAndClaimFloatParams(
             ~marketIndex,
             ~latestRewardIndexForMarket,
           );
@@ -128,14 +128,14 @@ let test =
         lastClaimed->Chai.bnEqual(CONSTANTS.zeroBn); // bit hacky but won't have been set yet
       });
 
-      it("doesn't emit FloatMinted event", () =>
+      it("doesn't emit FloatMinted event", () => {
         Chai.callEmitEvents(
           ~call=promiseRef^,
           ~contract=(stakerRef^)->Obj.magic,
           ~eventName="FloatMinted",
         )
         ->Chai.expectToNotEmit
-      );
+      });
     });
   });
 };

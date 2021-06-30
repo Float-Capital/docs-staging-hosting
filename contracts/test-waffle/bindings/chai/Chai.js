@@ -10,7 +10,7 @@ var bnEqual = ((message, number1, number2) => expect(number1, message).to.equal(
 function recordEqualFlatLabeled(expected, actual) {
   var a = ((expected, actual) => {
     for(const key of Object.keys(actual)){
-      expect(actual[key]).equal(expected[key])
+      expect(actual[key]).to.equal(expected[key])
     }
   });
   return a(expected, actual);
@@ -19,7 +19,16 @@ function recordEqualFlatLabeled(expected, actual) {
 function recordEqualFlat(expected, actual) {
   var a = ((expected, actual) => {
     for(const key of Object.keys(actual)){
-      expect(actual[key]).equal(expected[key])
+      expect(actual[key]).to.equal(expected[key])
+    }
+  });
+  return a(expected, actual);
+}
+
+function recordEqualDeep(expected, actual) {
+  var a = ((expected, actual) => {
+    for(const key of Object.keys(actual)){
+      expect(actual[key]).to.deep.equal(expected[key])
     }
   });
   return a(expected, actual);
@@ -36,7 +45,7 @@ var bnCloseTo = ((message, distance, number1, number2) => expect(number1, messag
 var callEmitEvents = ((call, contract, eventName) => expect(call).to.emit(contract, eventName));
 
 function expectToNotEmit(_eventCheck) {
-  return ((_eventCheck) => eventCheck.should.Throw());
+  return (_eventCheck.then(() => assert.fail('An event was emitted when it should not have been')).catch(() => {}));
 }
 
 var expectRevertNoReason = ((transaction) => expect(transaction).to.be.reverted);
@@ -56,6 +65,7 @@ var expectHexEqual = ((hex1, hex2) => expect(hex1).to.be.hexEqual(hex2));
 exports.bnEqual = bnEqual;
 exports.recordEqualFlatLabeled = recordEqualFlatLabeled;
 exports.recordEqualFlat = recordEqualFlat;
+exports.recordEqualDeep = recordEqualDeep;
 exports.intEqual = intEqual;
 exports.boolEqual = boolEqual;
 exports.bnWithin = bnWithin;
