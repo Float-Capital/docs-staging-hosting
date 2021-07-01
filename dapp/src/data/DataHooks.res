@@ -134,6 +134,7 @@ type synthBalanceMetadata = {
   totalLockedLong: Ethers.BigNumber.t,
   totalLockedShort: Ethers.BigNumber.t,
   syntheticPrice: Ethers.BigNumber.t,
+  syntheticPriceLastUpdated: Ethers.BigNumber.t,
 }
 
 type userSynthBalance = {
@@ -173,7 +174,7 @@ let useUsersBalances = (~userId) => {
             marketIndex,
             latestSystemState: {totalLockedLong, totalLockedShort},
           },
-          latestPrice: {price: {price}},
+          latestPrice: {price: {price, timeUpdated: synthPriceUpdated}},
         },
       },
     ) => {
@@ -195,6 +196,7 @@ let useUsersBalances = (~userId) => {
           totalLockedLong: totalLockedLong,
           totalLockedShort: totalLockedShort,
           syntheticPrice: price,
+          syntheticPriceLastUpdated: synthPriceUpdated,
         },
       }
       {
@@ -488,6 +490,7 @@ let useSyntheticPrices = (
     totalLockedLong,
     totalLockedShort,
     syntheticPrice,
+    syntheticPriceLastUpdated,
   }: synthBalanceMetadata,
   ~tokenAddress,
   ~isLong,
@@ -514,7 +517,12 @@ let useSyntheticPrices = (
               latestPriceInterval: {endPrice, startTimestamp: priceQueryDate},
             }),
           }) =>
-          if priceQueryDate->getUnixTime->Ethers.BigNumber.fromInt->Ethers.BigNumber.gt(timestamp) {
+          if (
+            priceQueryDate
+            ->getUnixTime
+            ->Ethers.BigNumber.fromInt
+            ->Ethers.BigNumber.gt(syntheticPriceLastUpdated)
+          ) {
             Response(
               MarketSimulation.simulateMarketPriceChange(
                 ~oldPrice=syntheticPrice,

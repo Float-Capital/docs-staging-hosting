@@ -470,6 +470,8 @@ module UserStakesCard = {
       let isLong = syntheticToken.tokenType->Obj.magic == "Long"
       let price = syntheticToken.latestPrice.price.price
 
+      let synthLastUpdated = syntheticToken.latestPrice.price.timeUpdated
+
       let {
         tokenSupply,
         syntheticMarket: {
@@ -487,6 +489,7 @@ module UserStakesCard = {
         totalLockedShort: totalLockedShort,
         syntheticPrice: price,
         timeLastUpdated: stake.currentStake.timestamp,
+        syntheticPriceLastUpdated: synthLastUpdated,
       }
 
       let value =

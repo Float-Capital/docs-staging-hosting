@@ -277,23 +277,25 @@ function useUsersBalances(userId) {
           balances: []
         }, (function (param, param$1) {
             var match = param$1.syntheticToken;
-            var price = match.latestPrice.price.price;
-            var match$1 = match.syntheticMarket;
-            var match$2 = match$1.latestSystemState;
+            var match$1 = match.latestPrice.price;
+            var price = match$1.price;
+            var match$2 = match.syntheticMarket;
+            var match$3 = match$2.latestSystemState;
             var tokenBalance = param$1.tokenBalance;
             var isLong = match.tokenType === "Long";
             var newToken_addr = Ethers$1.utils.getAddress(match.id);
-            var newToken_name = match$1.name;
-            var newToken_symbol = match$1.symbol;
+            var newToken_name = match$2.name;
+            var newToken_symbol = match$2.symbol;
             var newToken_tokensValue = price.mul(tokenBalance).div(CONSTANTS.tenToThe18);
             var newToken_metadata = {
               timeLastUpdated: param$1.timeLastUpdated,
-              oracleAddress: match$1.oracleAddress,
-              marketIndex: match$1.marketIndex,
+              oracleAddress: match$2.oracleAddress,
+              marketIndex: match$2.marketIndex,
               tokenSupply: match.tokenSupply,
-              totalLockedLong: match$2.totalLockedLong,
-              totalLockedShort: match$2.totalLockedShort,
-              syntheticPrice: price
+              totalLockedLong: match$3.totalLockedLong,
+              totalLockedShort: match$3.totalLockedShort,
+              syntheticPrice: price,
+              syntheticPriceLastUpdated: match$1.timeUpdated
             };
             var newToken = {
               addr: newToken_addr,
@@ -839,8 +841,7 @@ function getUnixTime(date) {
 
 function useSyntheticPrices(param, tokenAddress, isLong) {
   var syntheticPrice = param.syntheticPrice;
-  var timestamp = param.timeLastUpdated;
-  var initialTokenPriceResponse = useTokenPriceAtTime(tokenAddress, timestamp);
+  var initialTokenPriceResponse = useTokenPriceAtTime(tokenAddress, param.timeLastUpdated);
   var priceHistoryQuery = Curry.app(Queries.LatestPrice.use, [
         undefined,
         Caml_option.some(Client.createContext(/* PriceHistory */1)),
@@ -873,7 +874,7 @@ function useSyntheticPrices(param, tokenAddress, isLong) {
     var match = response._0.priceIntervalManager;
     if (match !== undefined) {
       var match$1 = match.latestPriceInterval;
-      finalPriceResponse = Ethers$1.BigNumber.from(match$1.startTimestamp.getTime() / 1000 | 0).gt(timestamp) ? ({
+      finalPriceResponse = Ethers$1.BigNumber.from(match$1.startTimestamp.getTime() / 1000 | 0).gt(param.syntheticPriceLastUpdated) ? ({
             TAG: 1,
             _0: MarketSimulation.simulateMarketPriceChange(syntheticPrice, match$1.endPrice, param.totalLockedLong, param.totalLockedShort, param.tokenSupply, isLong),
             [Symbol.for("name")]: "Response"

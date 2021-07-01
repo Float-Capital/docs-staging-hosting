@@ -592,6 +592,7 @@ function UserUI$UserStakesCard(Props) {
         var tokens = Misc.NumberFormat.formatEther(undefined, stake.currentStake.amount);
         var isLong = syntheticToken.tokenType === "Long";
         var price = syntheticToken.latestPrice.price.price;
+        var synthLastUpdated = syntheticToken.latestPrice.price.timeUpdated;
         var match = syntheticToken.syntheticMarket;
         var match$1 = match.latestSystemState;
         var metadata_timeLastUpdated = stake.currentStake.timestamp;
@@ -607,7 +608,8 @@ function UserUI$UserStakesCard(Props) {
           tokenSupply: metadata_tokenSupply,
           totalLockedLong: metadata_totalLockedLong,
           totalLockedShort: metadata_totalLockedShort,
-          syntheticPrice: price
+          syntheticPrice: price,
+          syntheticPriceLastUpdated: synthLastUpdated
         };
         var value = stake.currentStake.amount.mul(price).div(CONSTANTS.tenToThe18);
         var creationTxHash = stake.currentStake.creationTxHash;

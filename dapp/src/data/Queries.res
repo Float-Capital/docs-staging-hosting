@@ -23,6 +23,7 @@ fragment LatestSynthPrice on LatestPrice {
   id
   price {
     price
+    timeUpdated
   }
 }
 

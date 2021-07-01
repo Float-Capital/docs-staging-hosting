@@ -103,6 +103,7 @@ var query$1 = (require("@apollo/client").gql`
     price  {
       __typename
       price
+      timeUpdated
     }
   }
 `);
@@ -114,25 +115,29 @@ function parse$1(value) {
           id: value.id,
           price: {
             __typename: value$1.__typename,
-            price: GqlConverters.$$BigInt.parse(value$1.price)
+            price: GqlConverters.$$BigInt.parse(value$1.price),
+            timeUpdated: GqlConverters.$$BigInt.parse(value$1.timeUpdated)
           }
         };
 }
 
 function serialize$1(value) {
   var value$1 = value.price;
-  var value$2 = value$1.price;
+  var value$2 = value$1.timeUpdated;
   var value$3 = GqlConverters.$$BigInt.serialize(value$2);
-  var value$4 = value$1.__typename;
+  var value$4 = value$1.price;
+  var value$5 = GqlConverters.$$BigInt.serialize(value$4);
+  var value$6 = value$1.__typename;
   var price = {
-    __typename: value$4,
-    price: value$3
+    __typename: value$6,
+    price: value$5,
+    timeUpdated: value$3
   };
-  var value$5 = value.id;
-  var value$6 = value.__typename;
+  var value$7 = value.id;
+  var value$8 = value.__typename;
   return {
-          __typename: value$6,
-          id: value$5,
+          __typename: value$8,
+          id: value$7,
           price: price
         };
 }
