@@ -140,13 +140,13 @@ contract YieldManagerAave is IYieldManager {
      */
     // TODO STENT not unit tested
     function claimYieldAndGetMarketAmount(
-        uint256 totalValueRealized,
+        uint256 totalValueRealizedForMarket,
         uint256 marketPcntE5
     ) public override longShortOnly returns (uint256) {
         uint256 totalHeld = aToken.balanceOf(address(this));
 
         uint256 unrealizedYield = totalHeld -
-            totalValueRealized -
+            totalValueRealizedForMarket -
             totalReservedForTreasury;
 
         if (unrealizedYield == 0) {

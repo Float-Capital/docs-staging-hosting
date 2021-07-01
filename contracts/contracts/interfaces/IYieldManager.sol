@@ -36,7 +36,7 @@ abstract contract IYieldManager {
      * the market and the treasury so treasuryPcnt = 1 - marketPcnt.
      */
     function claimYieldAndGetMarketAmount(
-        uint256 totalValueRealized,
+        uint256 totalValueRealizedForMarket,
         uint256 marketPcntE5
     ) public virtual returns (uint256 marketAmount);
 

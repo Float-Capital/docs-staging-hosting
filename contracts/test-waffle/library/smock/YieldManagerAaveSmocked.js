@@ -63,7 +63,7 @@ function claimYieldAndGetMarketAmountCalls(_r) {
   var array = _r.smocked.claimYieldAndGetMarketAmount.calls;
   return Belt_Array.map(array, (function (param) {
                 return {
-                        totalValueRealized: param[0],
+                        totalValueRealizedForMarket: param[0],
                         marketPcntE5: param[1]
                       };
               }));

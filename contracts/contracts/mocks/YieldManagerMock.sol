@@ -147,7 +147,7 @@ contract YieldManagerMock is IYieldManager {
 
     // TODO STENT need to change this and unit test it
     function claimYieldAndGetMarketAmount(
-        uint256 totalValueRealized,
+        uint256 totalValueRealizedForMarket,
         uint256 marketPcntE5
     ) public override longShortOnly returns (uint256) {
         return 0;

@@ -65,15 +65,15 @@ let mockClaimYieldAndGetMarketAmountToReturn: (t, Ethers.BigNumber.t) => unit = 
 }
 
 type claimYieldAndGetMarketAmountCall = {
-  totalValueRealized: Ethers.BigNumber.t,
+  totalValueRealizedForMarket: Ethers.BigNumber.t,
   marketPcntE5: Ethers.BigNumber.t,
 }
 
 let claimYieldAndGetMarketAmountCalls: t => array<claimYieldAndGetMarketAmountCall> = _r => {
   let array = %raw("_r.smocked.claimYieldAndGetMarketAmount.calls")
-  array->Array.map(((totalValueRealized, marketPcntE5)) => {
+  array->Array.map(((totalValueRealizedForMarket, marketPcntE5)) => {
     {
-      totalValueRealized: totalValueRealized,
+      totalValueRealizedForMarket: totalValueRealizedForMarket,
       marketPcntE5: marketPcntE5,
     }
   })
