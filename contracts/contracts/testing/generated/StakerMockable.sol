@@ -495,7 +495,7 @@ contract StakerMockable is IStaker, Initializable {
       return mocker._updateStateMock(token);
     }
   
-        longShortCoreContract._updateSystemState(marketIndexOfToken[token]);
+        longShortCoreContract.updateSystemState(marketIndexOfToken[token]);
     }
 
     function calculateAccumulatedFloatHelper(
@@ -669,7 +669,7 @@ contract StakerMockable is IStaker, Initializable {
       return mocker.claimFloatCustomMock(marketIndexes);
     }
   
-        require(marketIndexes.length <= 50);         longShortCoreContract._updateSystemStateMulti(marketIndexes);
+        require(marketIndexes.length <= 50);         longShortCoreContract.updateSystemStateMulti(marketIndexes);
         _claimFloat(marketIndexes);
     }
 

@@ -69,21 +69,6 @@ function approveCalls(_r) {
               }));
 }
 
-function mockBalanceOfToReturn(_r, _param0) {
-  ((_r.smocked.balanceOf.will.return.with([_param0])));
-  
-}
-
-function balanceOfCalls(_r) {
-  var array = _r.smocked.balanceOf.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var account = _m[0];
-                return {
-                        account: account
-                      };
-              }));
-}
-
 function mockBurnToReturn(_r) {
   ((_r.smocked.burn.will.return()));
   
@@ -267,21 +252,6 @@ function marketIndexCalls(_r) {
               }));
 }
 
-function mockMintToReturn(_r) {
-  ((_r.smocked.mint.will.return()));
-  
-}
-
-function mintCalls(_r) {
-  var array = _r.smocked.mint.calls;
-  return Belt_Array.map(array, (function (param) {
-                return {
-                        _to: param[0],
-                        amount: param[1]
-                      };
-              }));
-}
-
 function mockNameToReturn(_r, _param0) {
   ((_r.smocked.name.will.return.with([_param0])));
   
@@ -348,21 +318,6 @@ function revokeRoleCalls(_r) {
               }));
 }
 
-function mockStakeToReturn(_r) {
-  ((_r.smocked.stake.will.return()));
-  
-}
-
-function stakeCalls(_r) {
-  var array = _r.smocked.stake.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var amount = _m[0];
-                return {
-                        amount: amount
-                      };
-              }));
-}
-
 function mockStakerToReturn(_r, _param0) {
   ((_r.smocked.staker.will.return.with([_param0])));
   
@@ -402,21 +357,6 @@ function symbolCalls(_r) {
               }));
 }
 
-function mockSynthRedeemBurnToReturn(_r) {
-  ((_r.smocked.synthRedeemBurn.will.return()));
-  
-}
-
-function synthRedeemBurnCalls(_r) {
-  var array = _r.smocked.synthRedeemBurn.calls;
-  return Belt_Array.map(array, (function (param) {
-                return {
-                        account: param[0],
-                        amount: param[1]
-                      };
-              }));
-}
-
 function mockTotalSupplyToReturn(_r, _param0) {
   ((_r.smocked.totalSupply.will.return.with([_param0])));
   
@@ -444,6 +384,63 @@ function transferCalls(_r) {
               }));
 }
 
+function mockUnpauseToReturn(_r) {
+  ((_r.smocked.unpause.will.return()));
+  
+}
+
+function unpauseCalls(_r) {
+  var array = _r.smocked.unpause.calls;
+  return Belt_Array.map(array, (function (param) {
+                
+              }));
+}
+
+function mockSynthRedeemBurnToReturn(_r) {
+  ((_r.smocked.synthRedeemBurn.will.return()));
+  
+}
+
+function synthRedeemBurnCalls(_r) {
+  var array = _r.smocked.synthRedeemBurn.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        account: param[0],
+                        amount: param[1]
+                      };
+              }));
+}
+
+function mockStakeToReturn(_r) {
+  ((_r.smocked.stake.will.return()));
+  
+}
+
+function stakeCalls(_r) {
+  var array = _r.smocked.stake.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var amount = _m[0];
+                return {
+                        amount: amount
+                      };
+              }));
+}
+
+function mockMintToReturn(_r) {
+  ((_r.smocked.mint.will.return()));
+  
+}
+
+function mintCalls(_r) {
+  var array = _r.smocked.mint.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        _to: param[0],
+                        amount: param[1]
+                      };
+              }));
+}
+
 function mockTransferFromToReturn(_r, _param0) {
   ((_r.smocked.transferFrom.will.return.with([_param0])));
   
@@ -460,15 +457,18 @@ function transferFromCalls(_r) {
               }));
 }
 
-function mockUnpauseToReturn(_r) {
-  ((_r.smocked.unpause.will.return()));
+function mockBalanceOfToReturn(_r, _param0) {
+  ((_r.smocked.balanceOf.will.return.with([_param0])));
   
 }
 
-function unpauseCalls(_r) {
-  var array = _r.smocked.unpause.calls;
-  return Belt_Array.map(array, (function (param) {
-                
+function balanceOfCalls(_r) {
+  var array = _r.smocked.balanceOf.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var account = _m[0];
+                return {
+                        account: account
+                      };
               }));
 }
 
@@ -485,8 +485,6 @@ exports.mockAllowanceToReturn = mockAllowanceToReturn;
 exports.allowanceCalls = allowanceCalls;
 exports.mockApproveToReturn = mockApproveToReturn;
 exports.approveCalls = approveCalls;
-exports.mockBalanceOfToReturn = mockBalanceOfToReturn;
-exports.balanceOfCalls = balanceOfCalls;
 exports.mockBurnToReturn = mockBurnToReturn;
 exports.burnCalls = burnCalls;
 exports.mockBurnFromToReturn = mockBurnFromToReturn;
@@ -513,8 +511,6 @@ exports.mockLongShortToReturn = mockLongShortToReturn;
 exports.longShortCalls = longShortCalls;
 exports.mockMarketIndexToReturn = mockMarketIndexToReturn;
 exports.marketIndexCalls = marketIndexCalls;
-exports.mockMintToReturn = mockMintToReturn;
-exports.mintCalls = mintCalls;
 exports.mockNameToReturn = mockNameToReturn;
 exports.nameCalls = nameCalls;
 exports.mockPauseToReturn = mockPauseToReturn;
@@ -525,22 +521,26 @@ exports.mockRenounceRoleToReturn = mockRenounceRoleToReturn;
 exports.renounceRoleCalls = renounceRoleCalls;
 exports.mockRevokeRoleToReturn = mockRevokeRoleToReturn;
 exports.revokeRoleCalls = revokeRoleCalls;
-exports.mockStakeToReturn = mockStakeToReturn;
-exports.stakeCalls = stakeCalls;
 exports.mockStakerToReturn = mockStakerToReturn;
 exports.stakerCalls = stakerCalls;
 exports.mockSupportsInterfaceToReturn = mockSupportsInterfaceToReturn;
 exports.supportsInterfaceCalls = supportsInterfaceCalls;
 exports.mockSymbolToReturn = mockSymbolToReturn;
 exports.symbolCalls = symbolCalls;
-exports.mockSynthRedeemBurnToReturn = mockSynthRedeemBurnToReturn;
-exports.synthRedeemBurnCalls = synthRedeemBurnCalls;
 exports.mockTotalSupplyToReturn = mockTotalSupplyToReturn;
 exports.totalSupplyCalls = totalSupplyCalls;
 exports.mockTransferToReturn = mockTransferToReturn;
 exports.transferCalls = transferCalls;
-exports.mockTransferFromToReturn = mockTransferFromToReturn;
-exports.transferFromCalls = transferFromCalls;
 exports.mockUnpauseToReturn = mockUnpauseToReturn;
 exports.unpauseCalls = unpauseCalls;
+exports.mockSynthRedeemBurnToReturn = mockSynthRedeemBurnToReturn;
+exports.synthRedeemBurnCalls = synthRedeemBurnCalls;
+exports.mockStakeToReturn = mockStakeToReturn;
+exports.stakeCalls = stakeCalls;
+exports.mockMintToReturn = mockMintToReturn;
+exports.mintCalls = mintCalls;
+exports.mockTransferFromToReturn = mockTransferFromToReturn;
+exports.transferFromCalls = transferFromCalls;
+exports.mockBalanceOfToReturn = mockBalanceOfToReturn;
+exports.balanceOfCalls = balanceOfCalls;
 /* No side effect */

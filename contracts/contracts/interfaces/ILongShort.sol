@@ -3,13 +3,13 @@
 pragma solidity 0.8.3;
 
 abstract contract ILongShort {
-    function _updateSystemState(uint32 marketIndex) external virtual;
+    function updateSystemState(uint32 marketIndex) external virtual;
 
-    function _updateSystemStateMulti(uint32[] calldata marketIndex)
+    function updateSystemStateMulti(uint32[] calldata marketIndex)
         external
         virtual;
 
-    function getUsersPendingBalance(
+    function getUsersConfirmedButNotSettledBalance(
         address user,
         uint32 marketIndex,
         bool isLong

@@ -51,6 +51,18 @@ function adminCalls(_r) {
               }));
 }
 
+function mockLongShortToReturn(_r, _param0) {
+  ((_r.smocked.longShort.will.return.with([_param0])));
+  
+}
+
+function longShortCalls(_r) {
+  var array = _r.smocked.longShort.calls;
+  return Belt_Array.map(array, (function (param) {
+                
+              }));
+}
+
 function mockChangeAdminToReturn(_r) {
   ((_r.smocked.changeAdmin.will.return()));
   
@@ -115,18 +127,6 @@ function createTokenShortCalls(_r) {
               }));
 }
 
-function mockLongShortToReturn(_r, _param0) {
-  ((_r.smocked.longShort.will.return.with([_param0])));
-  
-}
-
-function longShortCalls(_r) {
-  var array = _r.smocked.longShort.calls;
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
 var uninitializedValue;
 
 exports.uninitializedValue = uninitializedValue;
@@ -138,6 +138,8 @@ exports.mockPAUSER_ROLEToReturn = mockPAUSER_ROLEToReturn;
 exports.pAUSER_ROLECalls = pAUSER_ROLECalls;
 exports.mockAdminToReturn = mockAdminToReturn;
 exports.adminCalls = adminCalls;
+exports.mockLongShortToReturn = mockLongShortToReturn;
+exports.longShortCalls = longShortCalls;
 exports.mockChangeAdminToReturn = mockChangeAdminToReturn;
 exports.changeAdminCalls = changeAdminCalls;
 exports.mockChangeFloatAddressToReturn = mockChangeFloatAddressToReturn;
@@ -146,6 +148,4 @@ exports.mockCreateTokenLongToReturn = mockCreateTokenLongToReturn;
 exports.createTokenLongCalls = createTokenLongCalls;
 exports.mockCreateTokenShortToReturn = mockCreateTokenShortToReturn;
 exports.createTokenShortCalls = createTokenShortCalls;
-exports.mockLongShortToReturn = mockLongShortToReturn;
-exports.longShortCalls = longShortCalls;
 /* No side effect */

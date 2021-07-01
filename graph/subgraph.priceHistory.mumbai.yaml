@@ -6,9 +6,9 @@ dataSources:
     name: LongShort
     network: mumbai
     source:
-      address: "0xF7e152aF98bd12733538Cc77DD78247A3974Da44"
+      address: "0x2Ad2f96bc061Fbb9A8BDbA6cc50Ef2386F316E87"
       abi: LongShort
-      startBlock: 15797178
+      startBlock: 15798654
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

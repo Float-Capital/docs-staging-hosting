@@ -24,14 +24,6 @@ type tEN_TO_THE_5Return = Ethers.BigNumber.t
 @send
 external tEN_TO_THE_5: t => JsPromise.t<tEN_TO_THE_5Return> = "TEN_TO_THE_5"
 
-@send
-external _updateSystemState: (t, ~marketIndex: int) => JsPromise.t<transaction> =
-  "_updateSystemState"
-
-@send
-external _updateSystemStateMulti: (t, ~marketIndexes: array<int>) => JsPromise.t<transaction> =
-  "_updateSystemStateMulti"
-
 type adminReturn = Ethers.ethAddress
 @send
 external admin: t => JsPromise.t<adminReturn> = "admin"
@@ -139,14 +131,14 @@ external getTreasurySplit: (
   ~amount: Ethers.BigNumber.t,
 ) => JsPromise.t<getTreasurySplitReturn> = "getTreasurySplit"
 
-type getUsersPendingBalanceReturn = Ethers.BigNumber.t
+type getUsersConfirmedButNotSettledBalanceReturn = Ethers.BigNumber.t
 @send
-external getUsersPendingBalance: (
+external getUsersConfirmedButNotSettledBalance: (
   t,
   ~user: Ethers.ethAddress,
   ~marketIndex: int,
   ~isLong: bool,
-) => JsPromise.t<getUsersPendingBalanceReturn> = "getUsersPendingBalance"
+) => JsPromise.t<getUsersConfirmedButNotSettledBalanceReturn> = "getUsersConfirmedButNotSettledBalance"
 
 @send
 external initialize: (
@@ -261,6 +253,13 @@ external updateMarketOracle: (
   ~newOracleManager: Ethers.ethAddress,
 ) => JsPromise.t<transaction> = "updateMarketOracle"
 
+@send
+external updateSystemState: (t, ~marketIndex: int) => JsPromise.t<transaction> = "updateSystemState"
+
+@send
+external updateSystemStateMulti: (t, ~marketIndexes: array<int>) => JsPromise.t<transaction> =
+  "updateSystemStateMulti"
+
 type userCurrentNextPriceUpdateIndexReturn = Ethers.BigNumber.t
 @send
 external userCurrentNextPriceUpdateIndex: (
@@ -319,14 +318,6 @@ module Exposed = {
     ~user: Ethers.ethAddress,
     ~marketIndex: int,
   ) => JsPromise.t<transaction> = "_executeOutstandingNextPriceSettlementsExposed"
-
-  @send
-  external _updateSystemState: (t, ~marketIndex: int) => JsPromise.t<transaction> =
-    "_updateSystemState"
-
-  @send
-  external _updateSystemStateMulti: (t, ~marketIndexes: array<int>) => JsPromise.t<transaction> =
-    "_updateSystemStateMulti"
 
   @send
   external adjustMarketBasedOnNewAssetPrice: (
@@ -461,14 +452,14 @@ module Exposed = {
     ~amount: Ethers.BigNumber.t,
   ) => JsPromise.t<getTreasurySplitReturn> = "getTreasurySplit"
 
-  type getUsersPendingBalanceReturn = Ethers.BigNumber.t
+  type getUsersConfirmedButNotSettledBalanceReturn = Ethers.BigNumber.t
   @send
-  external getUsersPendingBalance: (
+  external getUsersConfirmedButNotSettledBalance: (
     t,
     ~user: Ethers.ethAddress,
     ~marketIndex: int,
     ~isLong: bool,
-  ) => JsPromise.t<getUsersPendingBalanceReturn> = "getUsersPendingBalance"
+  ) => JsPromise.t<getUsersConfirmedButNotSettledBalanceReturn> = "getUsersConfirmedButNotSettledBalance"
 
   @send
   external initialize: (
@@ -613,6 +604,14 @@ module Exposed = {
     ~marketIndex: int,
     ~newOracleManager: Ethers.ethAddress,
   ) => JsPromise.t<transaction> = "updateMarketOracle"
+
+  @send
+  external updateSystemState: (t, ~marketIndex: int) => JsPromise.t<transaction> =
+    "updateSystemState"
+
+  @send
+  external updateSystemStateMulti: (t, ~marketIndexes: array<int>) => JsPromise.t<transaction> =
+    "updateSystemStateMulti"
 
   type userCurrentNextPriceUpdateIndexReturn = Ethers.BigNumber.t
   @send

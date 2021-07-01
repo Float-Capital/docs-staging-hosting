@@ -144,7 +144,7 @@ const mintShortNextPriceWithSystemUpdate = async (
     await oracleManager.setPrice(nextPrice);
   }
 
-  await longShort._updateSystemState(marketIndex);
+  await longShort.updateSystemState(marketIndex);
 };
 
 const mintLongNextPriceWithSystemUpdate = async (
@@ -176,7 +176,7 @@ const mintLongNextPriceWithSystemUpdate = async (
     await oracleManager.setPrice(nextPrice);
   }
 
-  await longShort._updateSystemState(marketIndex);
+  await longShort.updateSystemState(marketIndex);
 };
 
 const zeroPointZeroTwoEth = new BN("20000000000000000");
@@ -206,61 +206,61 @@ module.exports = async function (deployer, network, accounts) {
   const treasury = await Treasury.deployed();
   const staker = await Staker.deployed();
 
-  // await topupBalanceIfLow(admin, user1);
-  // await topupBalanceIfLow(admin, user2);
-  // await topupBalanceIfLow(admin, user3);
+  await topupBalanceIfLow(admin, user1);
+  await topupBalanceIfLow(admin, user2);
+  await topupBalanceIfLow(admin, user3);
 
   const tenMintAmount = "10000000000000000000";
   const largeApprove = "10000000000000000000000000000000";
 
   if (network == "mumbai") {
     token = await Dai.at(mumbaiDaiAddress);
-    // await token.approve(longShort.address, new BN("200000000000000000000"), {
-    //   from: admin,
-    // });
+    await token.approve(longShort.address, new BN("200000000000000000000"), {
+      from: admin,
+    });
   } else {
     token = await Dai.deployed();
     await mintAndApprove(token, new BN("20000000000000000000"), user3, admin);
   }
 
-  // console.log("topping up balance");
-  // await topupBalanceIfLow(admin, user1);
-  // await topupBalanceIfLow(admin, user2);
-  // await topupBalanceIfLow(admin, user3);
-  // console.log("balance topped up :)");
+  console.log("topping up balance");
+  await topupBalanceIfLow(admin, user1);
+  await topupBalanceIfLow(admin, user2);
+  await topupBalanceIfLow(admin, user3);
+  console.log("balance topped up :)");
 
-  // await deployTestMarket(
-  //   "ETH Killers",
-  //   "ETHK",
-  //   longShort,
-  //   treasury,
-  //   token,
-  //   admin,
-  //   network,
-  //   token
-  // );
+  await deployTestMarket(
+    "ETH Killers",
+    "ETHK",
+    longShort,
+    treasury,
+    token,
+    admin,
+    network,
+    token
+  );
 
-  // await deployTestMarket(
-  //   "The Flippening",
-  //   "EBD",
-  //   longShort,
-  //   treasury,
-  //   token,
-  //   admin,
-  //   network,
-  //   token
-  // );
+  await deployTestMarket(
+    "The Flippening",
+    "EBD",
+    longShort,
+    treasury,
+    token,
+    admin,
+    network,
+    token
+  );
 
-  // await deployTestMarket(
-  //   "Gold",
-  //   "GOLD",
-  //   longShort,
-  //   treasury,
-  //   token,
-  //   admin,
-  //   network,
-  //   token
-  // );
+  await deployTestMarket(
+    "Gold",
+    "GOLD",
+    longShort,
+    treasury,
+    token,
+    admin,
+    network,
+    token
+  );
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
 
@@ -301,7 +301,7 @@ module.exports = async function (deployer, network, accounts) {
     const oracleManager = await OracleManagerMock.at(oracleManagerAddr);
 
     console.log("Running update system state");
-    await longShort._updateSystemState(marketIndex);
+    await longShort.updateSystemState(marketIndex);
 
     console.log("Here");
     await mintLongNextPriceWithSystemUpdate(
@@ -365,7 +365,7 @@ module.exports = async function (deployer, network, accounts) {
     if (network != "mumbai")
       await oracleManager.setPrice(new BN("1100000000000000000"));
 
-    await longShort._updateSystemState(marketIndex);
+    await longShort.updateSystemState(marketIndex);
 
     // Simulate user 2 redeeming half his tokens.
     // const halfTokensMinted = new BN(tenMintAmount).div(new BN(2));
@@ -400,7 +400,7 @@ module.exports = async function (deployer, network, accounts) {
     // });
 
     // // update system state and mint and stake again mint float
-    // await longShort._updateSystemState(marketIndex);
+    // await longShort.updateSystemState(marketIndex);
 
     // await staker.claimFloatCustom([marketIndex], {
     //   from: user3,

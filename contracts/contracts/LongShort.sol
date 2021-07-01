@@ -438,7 +438,7 @@ contract LongShort is ILongShort, Initializable {
         return (amountPaymentToken * TEN_TO_THE_18) / price;
     }
 
-    function getUsersPendingBalance(
+    function getUsersConfirmedButNotSettledBalance(
         address user,
         uint32 marketIndex,
         bool isLong
@@ -719,11 +719,11 @@ contract LongShort is ILongShort, Initializable {
         );
     }
 
-    function _updateSystemState(uint32 marketIndex) external override {
+    function updateSystemState(uint32 marketIndex) external override {
         _updateSystemStateInternal(marketIndex);
     }
 
-    function _updateSystemStateMulti(uint32[] calldata marketIndexes)
+    function updateSystemStateMulti(uint32[] calldata marketIndexes)
         external
         override
     {

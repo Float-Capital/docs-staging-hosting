@@ -35,7 +35,7 @@ let test =
 
       longShortSmockedRef := longShortSmocked;
 
-      longShortSmocked->LongShortSmocked.mock_updateSystemStateMultiToReturn;
+      longShortSmocked->LongShortSmocked.mockUpdateSystemStateMultiToReturn;
 
       StakerSmocked.InternalMock.mock_claimFloatToReturn();
 
@@ -63,7 +63,7 @@ let test =
 
       it("calls LongShort.updateSystemStateMulti for the markets", () => {
         (longShortSmockedRef^)
-        ->LongShortSmocked._updateSystemStateMultiCalls
+        ->LongShortSmocked.updateSystemStateMultiCalls
         ->Array.getExn(0)
         ->Chai.recordEqualDeep({marketIndexes: marketIndices})
       });

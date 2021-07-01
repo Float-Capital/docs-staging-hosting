@@ -11646,61 +11646,61 @@
     "absolutePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/FloatToken.sol",
     "exportedSymbols": {
       "AccessControlEnumerableUpgradeable": [
-        15645
+        15713
       ],
       "AccessControlUpgradeable": [
-        16041
+        16109
       ],
       "ContextUpgradeable": [
-        17230
+        17298
       ],
       "ERC165Upgradeable": [
-        17479
+        17547
       ],
       "ERC20BurnableUpgradeable": [
-        16898
+        16966
       ],
       "ERC20PausableUpgradeable": [
-        16963
+        17031
       ],
       "ERC20PresetMinterPauserUpgradeable": [
-        17185
+        17253
       ],
       "ERC20Upgradeable": [
-        16734
+        16802
       ],
       "EnumerableSetUpgradeable": [
-        18004
+        18072
       ],
       "FloatToken": [
         122
       ],
       "IAccessControlEnumerableUpgradeable": [
-        15447
+        15515
       ],
       "IAccessControlUpgradeable": [
-        15690
+        15758
       ],
       "IERC165Upgradeable": [
-        17491
+        17559
       ],
       "IERC20MetadataUpgradeable": [
-        16988
+        17056
       ],
       "IERC20Upgradeable": [
-        16812
+        16880
       ],
       "IFloatToken": [
-        4828
+        4862
       ],
       "Initializable": [
-        16087
+        16155
       ],
       "PausableUpgradeable": [
-        16200
+        16268
       ],
       "StringsUpgradeable": [
-        17433
+        17501
       ]
     },
     "id": 123,
@@ -11724,7 +11724,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 123,
-        "sourceUnit": 17186,
+        "sourceUnit": 17254,
         "src": "440:104:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -11736,7 +11736,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 123,
-        "sourceUnit": 4829,
+        "sourceUnit": 4863,
         "src": "546:38:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -11749,7 +11749,7 @@
               "id": 50,
               "name": "IFloatToken",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 4828,
+              "referencedDeclaration": 4862,
               "src": "609:11:1"
             },
             "id": 51,
@@ -11761,7 +11761,7 @@
               "id": 52,
               "name": "ERC20PresetMinterPauserUpgradeable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 17185,
+              "referencedDeclaration": 17253,
               "src": "622:34:1"
             },
             "id": 53,
@@ -11770,44 +11770,44 @@
           }
         ],
         "contractDependencies": [
-          4828,
-          15447,
-          15645,
-          15690,
-          16041,
-          16087,
-          16200,
-          16734,
-          16812,
-          16898,
-          16963,
-          16988,
-          17185,
-          17230,
-          17479,
-          17491
+          4862,
+          15515,
+          15713,
+          15758,
+          16109,
+          16155,
+          16268,
+          16802,
+          16880,
+          16966,
+          17031,
+          17056,
+          17253,
+          17298,
+          17547,
+          17559
         ],
         "contractKind": "contract",
         "fullyImplemented": true,
         "id": 122,
         "linearizedBaseContracts": [
           122,
-          17185,
-          16963,
-          16200,
-          16898,
-          16734,
-          16988,
-          4828,
-          16812,
-          15645,
-          16041,
-          17479,
-          17491,
-          15690,
-          17230,
-          15447,
-          16087
+          17253,
+          17031,
+          16268,
+          16966,
+          16802,
+          17056,
+          4862,
+          16880,
+          15713,
+          16109,
+          17547,
+          17559,
+          15758,
+          17298,
+          15515,
+          16155
         ],
         "name": "FloatToken",
         "nameLocation": "595:10:1",
@@ -11862,7 +11862,7 @@
                       "name": "initialize",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 17022,
+                      "referencedDeclaration": 17090,
                       "src": "812:10:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$__$",
@@ -11896,7 +11896,7 @@
                         "name": "DEFAULT_ADMIN_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 15735,
+                        "referencedDeclaration": 15803,
                         "src": "858:18:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -11931,9 +11931,9 @@
                       "name": "_setupRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        15640
+                        15708
                       ],
-                      "referencedDeclaration": 15640,
+                      "referencedDeclaration": 15708,
                       "src": "847:10:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -11967,7 +11967,7 @@
                         "name": "MINTER_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 17027,
+                        "referencedDeclaration": 17095,
                         "src": "913:11:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -12002,9 +12002,9 @@
                       "name": "_setupRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        15640
+                        15708
                       ],
-                      "referencedDeclaration": 15640,
+                      "referencedDeclaration": 15708,
                       "src": "902:10:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -12038,7 +12038,7 @@
                         "name": "PAUSER_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 17032,
+                        "referencedDeclaration": 17100,
                         "src": "961:11:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -12073,9 +12073,9 @@
                       "name": "_setupRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        15640
+                        15708
                       ],
-                      "referencedDeclaration": 15640,
+                      "referencedDeclaration": 15708,
                       "src": "950:10:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -12109,7 +12109,7 @@
                         "name": "DEFAULT_ADMIN_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 15735,
+                        "referencedDeclaration": 15803,
                         "src": "1012:18:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -12158,9 +12158,9 @@
                       "name": "renounceRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        15616
+                        15684
                       ],
-                      "referencedDeclaration": 15616,
+                      "referencedDeclaration": 15684,
                       "src": "999:12:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -12194,7 +12194,7 @@
                         "name": "MINTER_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 17027,
+                        "referencedDeclaration": 17095,
                         "src": "1066:11:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -12243,9 +12243,9 @@
                       "name": "renounceRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        15616
+                        15684
                       ],
-                      "referencedDeclaration": 15616,
+                      "referencedDeclaration": 15684,
                       "src": "1053:12:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -12279,7 +12279,7 @@
                         "name": "PAUSER_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 17032,
+                        "referencedDeclaration": 17100,
                         "src": "1113:11:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -12328,9 +12328,9 @@
                       "name": "renounceRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        15616
+                        15684
                       ],
-                      "referencedDeclaration": 15616,
+                      "referencedDeclaration": 15684,
                       "src": "1100:12:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -12370,7 +12370,7 @@
                   "id": 61,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 16086,
+                  "referencedDeclaration": 16154,
                   "src": "790:11:1"
                 },
                 "nodeType": "ModifierInvocation",
@@ -12483,8 +12483,8 @@
           },
           {
             "baseFunctions": [
-              4827,
-              17125
+              4861,
+              17193
             ],
             "body": {
               "id": 120,
@@ -12535,10 +12535,10 @@
                         "name": "ERC20PresetMinterPauserUpgradeable",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 17185,
+                        "referencedDeclaration": 17253,
                         "src": "1539:34:1",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_ERC20PresetMinterPauserUpgradeable_$17185_$",
+                          "typeIdentifier": "t_type$_t_contract$_ERC20PresetMinterPauserUpgradeable_$17253_$",
                           "typeString": "type(contract ERC20PresetMinterPauserUpgradeable)"
                         }
                       },
@@ -12549,7 +12549,7 @@
                       "lValueRequested": false,
                       "memberName": "mint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 17125,
+                      "referencedDeclaration": 17193,
                       "src": "1539:39:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -12593,14 +12593,14 @@
                   "id": 109,
                   "name": "IFloatToken",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 4828,
+                  "referencedDeclaration": 4862,
                   "src": "1476:11:1"
                 },
                 {
                   "id": 110,
                   "name": "ERC20PresetMinterPauserUpgradeable",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 17185,
+                  "referencedDeclaration": 17253,
                   "src": "1489:34:1"
                 }
               ],
@@ -12691,61 +12691,61 @@
     "absolutePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/FloatToken.sol",
     "exportedSymbols": {
       "AccessControlEnumerableUpgradeable": [
-        15645
+        15713
       ],
       "AccessControlUpgradeable": [
-        16041
+        16109
       ],
       "ContextUpgradeable": [
-        17230
+        17298
       ],
       "ERC165Upgradeable": [
-        17479
+        17547
       ],
       "ERC20BurnableUpgradeable": [
-        16898
+        16966
       ],
       "ERC20PausableUpgradeable": [
-        16963
+        17031
       ],
       "ERC20PresetMinterPauserUpgradeable": [
-        17185
+        17253
       ],
       "ERC20Upgradeable": [
-        16734
+        16802
       ],
       "EnumerableSetUpgradeable": [
-        18004
+        18072
       ],
       "FloatToken": [
         122
       ],
       "IAccessControlEnumerableUpgradeable": [
-        15447
+        15515
       ],
       "IAccessControlUpgradeable": [
-        15690
+        15758
       ],
       "IERC165Upgradeable": [
-        17491
+        17559
       ],
       "IERC20MetadataUpgradeable": [
-        16988
+        17056
       ],
       "IERC20Upgradeable": [
-        16812
+        16880
       ],
       "IFloatToken": [
-        4828
+        4862
       ],
       "Initializable": [
-        16087
+        16155
       ],
       "PausableUpgradeable": [
-        16200
+        16268
       ],
       "StringsUpgradeable": [
-        17433
+        17501
       ]
     },
     "id": 123,
@@ -12769,7 +12769,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 123,
-        "sourceUnit": 17186,
+        "sourceUnit": 17254,
         "src": "440:104:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -12781,7 +12781,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 123,
-        "sourceUnit": 4829,
+        "sourceUnit": 4863,
         "src": "546:38:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -12794,7 +12794,7 @@
               "id": 50,
               "name": "IFloatToken",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 4828,
+              "referencedDeclaration": 4862,
               "src": "609:11:1"
             },
             "id": 51,
@@ -12806,7 +12806,7 @@
               "id": 52,
               "name": "ERC20PresetMinterPauserUpgradeable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 17185,
+              "referencedDeclaration": 17253,
               "src": "622:34:1"
             },
             "id": 53,
@@ -12815,44 +12815,44 @@
           }
         ],
         "contractDependencies": [
-          4828,
-          15447,
-          15645,
-          15690,
-          16041,
-          16087,
-          16200,
-          16734,
-          16812,
-          16898,
-          16963,
-          16988,
-          17185,
-          17230,
-          17479,
-          17491
+          4862,
+          15515,
+          15713,
+          15758,
+          16109,
+          16155,
+          16268,
+          16802,
+          16880,
+          16966,
+          17031,
+          17056,
+          17253,
+          17298,
+          17547,
+          17559
         ],
         "contractKind": "contract",
         "fullyImplemented": true,
         "id": 122,
         "linearizedBaseContracts": [
           122,
-          17185,
-          16963,
-          16200,
-          16898,
-          16734,
-          16988,
-          4828,
-          16812,
-          15645,
-          16041,
-          17479,
-          17491,
-          15690,
-          17230,
-          15447,
-          16087
+          17253,
+          17031,
+          16268,
+          16966,
+          16802,
+          17056,
+          4862,
+          16880,
+          15713,
+          16109,
+          17547,
+          17559,
+          15758,
+          17298,
+          15515,
+          16155
         ],
         "name": "FloatToken",
         "nameLocation": "595:10:1",
@@ -12907,7 +12907,7 @@
                       "name": "initialize",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 17022,
+                      "referencedDeclaration": 17090,
                       "src": "812:10:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$__$",
@@ -12941,7 +12941,7 @@
                         "name": "DEFAULT_ADMIN_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 15735,
+                        "referencedDeclaration": 15803,
                         "src": "858:18:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -12976,9 +12976,9 @@
                       "name": "_setupRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        15640
+                        15708
                       ],
-                      "referencedDeclaration": 15640,
+                      "referencedDeclaration": 15708,
                       "src": "847:10:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -13012,7 +13012,7 @@
                         "name": "MINTER_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 17027,
+                        "referencedDeclaration": 17095,
                         "src": "913:11:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -13047,9 +13047,9 @@
                       "name": "_setupRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        15640
+                        15708
                       ],
-                      "referencedDeclaration": 15640,
+                      "referencedDeclaration": 15708,
                       "src": "902:10:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -13083,7 +13083,7 @@
                         "name": "PAUSER_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 17032,
+                        "referencedDeclaration": 17100,
                         "src": "961:11:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -13118,9 +13118,9 @@
                       "name": "_setupRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        15640
+                        15708
                       ],
-                      "referencedDeclaration": 15640,
+                      "referencedDeclaration": 15708,
                       "src": "950:10:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -13154,7 +13154,7 @@
                         "name": "DEFAULT_ADMIN_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 15735,
+                        "referencedDeclaration": 15803,
                         "src": "1012:18:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -13203,9 +13203,9 @@
                       "name": "renounceRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        15616
+                        15684
                       ],
-                      "referencedDeclaration": 15616,
+                      "referencedDeclaration": 15684,
                       "src": "999:12:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -13239,7 +13239,7 @@
                         "name": "MINTER_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 17027,
+                        "referencedDeclaration": 17095,
                         "src": "1066:11:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -13288,9 +13288,9 @@
                       "name": "renounceRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        15616
+                        15684
                       ],
-                      "referencedDeclaration": 15616,
+                      "referencedDeclaration": 15684,
                       "src": "1053:12:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -13324,7 +13324,7 @@
                         "name": "PAUSER_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 17032,
+                        "referencedDeclaration": 17100,
                         "src": "1113:11:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -13373,9 +13373,9 @@
                       "name": "renounceRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        15616
+                        15684
                       ],
-                      "referencedDeclaration": 15616,
+                      "referencedDeclaration": 15684,
                       "src": "1100:12:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -13415,7 +13415,7 @@
                   "id": 61,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 16086,
+                  "referencedDeclaration": 16154,
                   "src": "790:11:1"
                 },
                 "nodeType": "ModifierInvocation",
@@ -13528,8 +13528,8 @@
           },
           {
             "baseFunctions": [
-              4827,
-              17125
+              4861,
+              17193
             ],
             "body": {
               "id": 120,
@@ -13580,10 +13580,10 @@
                         "name": "ERC20PresetMinterPauserUpgradeable",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 17185,
+                        "referencedDeclaration": 17253,
                         "src": "1539:34:1",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_ERC20PresetMinterPauserUpgradeable_$17185_$",
+                          "typeIdentifier": "t_type$_t_contract$_ERC20PresetMinterPauserUpgradeable_$17253_$",
                           "typeString": "type(contract ERC20PresetMinterPauserUpgradeable)"
                         }
                       },
@@ -13594,7 +13594,7 @@
                       "lValueRequested": false,
                       "memberName": "mint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 17125,
+                      "referencedDeclaration": 17193,
                       "src": "1539:39:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -13638,14 +13638,14 @@
                   "id": 109,
                   "name": "IFloatToken",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 4828,
+                  "referencedDeclaration": 4862,
                   "src": "1476:11:1"
                 },
                 {
                   "id": 110,
                   "name": "ERC20PresetMinterPauserUpgradeable",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 17185,
+                  "referencedDeclaration": 17253,
                   "src": "1489:34:1"
                 }
               ],
@@ -13892,12 +13892,12 @@
         }
       },
       "links": {},
-      "address": "0x27D508fA1B4d39816FE7bEe35cD4eE55313d568C",
-      "transactionHash": "0xd8d77fa8332814932e5f320986e7dd75c694788bb143a1b26e3cd7484bc915a1"
+      "address": "0x19fef342141dcC979cABe50e047F8DBFF34620C2",
+      "transactionHash": "0xe2f435d25d69288ba760b36ed9f3d6b8a5a325eec4ad82810cd3dfc31accf293"
     }
   },
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-07-01T14:26:59.334Z",
+  "updatedAt": "2021-07-01T15:21:55.731Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

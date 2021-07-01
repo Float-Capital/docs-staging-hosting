@@ -17,14 +17,14 @@ let adminCalls: t => array<adminCall> = _r => {
   })
 }
 
-let mockChangeAdminToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.changeAdmin.will.return()")
+let mockInitializeToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.initialize.will.return()")
 }
 
-type changeAdminCall = {admin: Ethers.ethAddress}
+type initializeCall = {admin: Ethers.ethAddress}
 
-let changeAdminCalls: t => array<changeAdminCall> = _r => {
-  let array = %raw("_r.smocked.changeAdmin.calls")
+let initializeCalls: t => array<initializeCall> = _r => {
+  let array = %raw("_r.smocked.initialize.calls")
   array->Array.map(_m => {
     let admin = _m->Array.getUnsafe(0)
 
@@ -34,14 +34,14 @@ let changeAdminCalls: t => array<changeAdminCall> = _r => {
   })
 }
 
-let mockInitializeToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.initialize.will.return()")
+let mockChangeAdminToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.changeAdmin.will.return()")
 }
 
-type initializeCall = {admin: Ethers.ethAddress}
+type changeAdminCall = {admin: Ethers.ethAddress}
 
-let initializeCalls: t => array<initializeCall> = _r => {
-  let array = %raw("_r.smocked.initialize.calls")
+let changeAdminCalls: t => array<changeAdminCall> = _r => {
+  let array = %raw("_r.smocked.changeAdmin.calls")
   array->Array.map(_m => {
     let admin = _m->Array.getUnsafe(0)
 
