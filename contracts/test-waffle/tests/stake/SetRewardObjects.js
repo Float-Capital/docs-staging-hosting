@@ -69,7 +69,7 @@ function test(contracts, accounts) {
                               }));
                 }));
           it("emits StateAddedEvent", (function () {
-                  return Chai.callEmitEvents(promiseRef.contents, stakerRef.contents, "StateAdded").withArgs(marketIndex, mutatedIndex, timestampRef.contents, longAccum, shortAccum);
+                  return Chai.callEmitEvents(promiseRef.contents, stakerRef.contents, "StateAdded").withArgs(marketIndex, mutatedIndex, longAccum, shortAccum);
                 }));
           
         }));

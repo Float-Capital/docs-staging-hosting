@@ -71,7 +71,7 @@ let test =
       it("calls _claimFloat with the correct arguments", () => {
         StakerSmocked.InternalMock._claimFloatCalls()
         ->Array.getExn(0)
-        ->Chai.recordEqualDeep({marketIndex: marketIndices})
+        ->Chai.recordEqualDeep({marketIndexes: marketIndices})
       });
     });
 

@@ -104,10 +104,9 @@ let test =
         ~contract=(stakerRef^)->Obj.magic,
         ~eventName="StateAdded",
       )
-      ->Chai.withArgs5(
+      ->Chai.withArgs4(
           marketIndex,
           mutatedIndex,
-          timestampRef^,
           longAccum,
           shortAccum,
         )
