@@ -151,8 +151,20 @@ contract LongShort is ILongShort, Initializable {
 
     event NewMarketLaunchedAndSeeded(uint32 marketIndex, uint256 initialSeed);
 
-    event ExecuteNextPriceSettlementsUser(address user, uint32 marketIndex);
+    event ExecuteNextPriceMintSettlementUser(
+        address user,
+        uint32 marketIndex,
+        bool isLong,
+        uint256 amount
+    );
+    event ExecuteNextPriceRedeemSettlementUser(
+        address user,
+        uint32 marketIndex,
+        bool isLong,
+        uint256 amount
+    );
 
+    event ExecuteNextPriceSettlementsUser(address user, uint32 marketIndex);
     /*╔═════════════════════════════╗
       ║          MODIFIERS          ║
       ╚═════════════════════════════╝*/
@@ -966,6 +978,13 @@ contract LongShort is ILongShort, Initializable {
                 user,
                 tokensToTransferToUser
             );
+
+            emit ExecuteNextPriceMintSettlementUser(
+                user,
+                marketIndex,
+                isLong,
+                tokensToTransferToUser
+            );
         }
     }
 
@@ -986,6 +1005,12 @@ contract LongShort is ILongShort, Initializable {
                 ]
             );
             fundTokens[marketIndex].transfer(user, amountToRedeem);
+            emit ExecuteNextPriceRedeemSettlementUser(
+                user,
+                marketIndex,
+                isLong,
+                amountToRedeem
+            );
         }
     }
 
