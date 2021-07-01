@@ -599,36 +599,6 @@ function tokenFactoryCalls(_r) {
               }));
 }
 
-function mockTotalFeesReservedForTreasuryToReturn(_r, _param0) {
-  ((_r.smocked.totalFeesReservedForTreasury.will.return.with([_param0])));
-  
-}
-
-function totalFeesReservedForTreasuryCalls(_r) {
-  var array = _r.smocked.totalFeesReservedForTreasury.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var param0 = _m[0];
-                return {
-                        param0: param0
-                      };
-              }));
-}
-
-function mockTransferTreasuryFundsToReturn(_r) {
-  ((_r.smocked.transferTreasuryFunds.will.return()));
-  
-}
-
-function transferTreasuryFundsCalls(_r) {
-  var array = _r.smocked.transferTreasuryFunds.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var marketIndex = _m[0];
-                return {
-                        marketIndex: marketIndex
-                      };
-              }));
-}
-
 function mockTreasuryToReturn(_r, _param0) {
   ((_r.smocked.treasury.will.return.with([_param0])));
   
@@ -1457,28 +1427,6 @@ function _transferFromYieldManagerCalls(param) {
                   })));
 }
 
-function mockTransferTreasuryFundsToReturn$1(param) {
-  checkForExceptions("transferTreasuryFunds");
-  Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.transferTreasuryFundsMock.will.return()));
-          
-        }));
-  
-}
-
-function transferTreasuryFundsCalls$1(param) {
-  checkForExceptions("transferTreasuryFunds");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.transferTreasuryFundsMock.calls;
-                    return Belt_Array.map(array, (function (_m) {
-                                  var marketIndex = _m[0];
-                                  return {
-                                          marketIndex: marketIndex
-                                        };
-                                }));
-                  })));
-}
-
 function mock_mintNextPriceToReturn(param) {
   checkForExceptions("_mintNextPrice");
   Belt_Option.map(internalRef.contents, (function (_r) {
@@ -1947,8 +1895,6 @@ var InternalMock = {
   _transferFundsToYieldManagerCalls: _transferFundsToYieldManagerCalls,
   mock_transferFromYieldManagerToReturn: mock_transferFromYieldManagerToReturn,
   _transferFromYieldManagerCalls: _transferFromYieldManagerCalls,
-  mockTransferTreasuryFundsToReturn: mockTransferTreasuryFundsToReturn$1,
-  transferTreasuryFundsCalls: transferTreasuryFundsCalls$1,
   mock_mintNextPriceToReturn: mock_mintNextPriceToReturn,
   _mintNextPriceCalls: _mintNextPriceCalls,
   mockMintLongNextPriceToReturn: mockMintLongNextPriceToReturn$1,
@@ -2070,10 +2016,6 @@ exports.mockSyntheticTokensToReturn = mockSyntheticTokensToReturn;
 exports.syntheticTokensCalls = syntheticTokensCalls;
 exports.mockTokenFactoryToReturn = mockTokenFactoryToReturn;
 exports.tokenFactoryCalls = tokenFactoryCalls;
-exports.mockTotalFeesReservedForTreasuryToReturn = mockTotalFeesReservedForTreasuryToReturn;
-exports.totalFeesReservedForTreasuryCalls = totalFeesReservedForTreasuryCalls;
-exports.mockTransferTreasuryFundsToReturn = mockTransferTreasuryFundsToReturn;
-exports.transferTreasuryFundsCalls = transferTreasuryFundsCalls;
 exports.mockTreasuryToReturn = mockTreasuryToReturn;
 exports.treasuryCalls = treasuryCalls;
 exports.mockUpdateMarketOracleToReturn = mockUpdateMarketOracleToReturn;

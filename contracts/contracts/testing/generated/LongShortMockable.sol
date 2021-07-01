@@ -54,7 +54,6 @@ contract LongShortMockable is ILongShort, Initializable {
         mapping(uint32 => bool) public marketExists;
     mapping(uint32 => uint256) public assetPrice;
     mapping(uint32 => uint256) public marketUpdateIndex;
-    mapping(uint32 => uint256) public totalFeesReservedForTreasury;
     mapping(uint32 => IERC20) public fundTokens;
     mapping(uint32 => IYieldManager) public yieldManagers;
     mapping(uint32 => IOracleManager) public oracleManagers;
@@ -954,41 +953,9 @@ contract LongShortMockable is ILongShort, Initializable {
                         yieldManagers[marketIndex].withdrawToken(amount);
 
                                 require(
-            yieldManagers[marketIndex].getTotalValueRealized() <=
+            yieldManagers[marketIndex].totalValueRealized() <=
                 syntheticTokenPoolValue[marketIndex][true] +
-                    syntheticTokenPoolValue[marketIndex][false] +
-                    totalFeesReservedForTreasury[marketIndex] +
-                    yieldManagers[marketIndex].getTotalReservedForTreasury()
-        );
-    }
-
-    
-
-    function transferTreasuryFunds(uint32 marketIndex) external {
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("transferTreasuryFunds"))){
-      
-      return mocker.transferTreasuryFundsMock(marketIndex);
-    }
-  
-        uint256 totalValueReservedForTreasury = totalFeesReservedForTreasury[
-            marketIndex
-        ] + yieldManagers[marketIndex].getTotalReservedForTreasury();
-
-        if (totalValueReservedForTreasury == 0) {
-            return;
-        }
-
-        if (totalFeesReservedForTreasury[marketIndex] > 0) {
-            totalFeesReservedForTreasury[marketIndex] = 0;
-        }
-
-        if (yieldManagers[marketIndex].getTotalReservedForTreasury() > 0) {
-            yieldManagers[marketIndex].withdrawTreasuryFunds();
-        }
-
-                fundTokens[marketIndex].transfer(
-            treasury,
-            totalValueReservedForTreasury
+                    syntheticTokenPoolValue[marketIndex][false]
         );
     }
 

@@ -94,58 +94,6 @@ let depositTokenCalls: t => array<depositTokenCall> = _r => {
   })
 }
 
-let mockGetHeldTokenToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.getHeldToken.will.return.with([_param0])")
-}
-
-type getHeldTokenCall
-
-let getHeldTokenCalls: t => array<getHeldTokenCall> = _r => {
-  let array = %raw("_r.smocked.getHeldToken.calls")
-  array->Array.map(() => {
-    ()->Obj.magic
-  })
-}
-
-let mockGetTotalHeldToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.getTotalHeld.will.return.with([_param0])")
-}
-
-type getTotalHeldCall
-
-let getTotalHeldCalls: t => array<getTotalHeldCall> = _r => {
-  let array = %raw("_r.smocked.getTotalHeld.calls")
-  array->Array.map(() => {
-    ()->Obj.magic
-  })
-}
-
-let mockGetTotalReservedForTreasuryToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.getTotalReservedForTreasury.will.return.with([_param0])")
-}
-
-type getTotalReservedForTreasuryCall
-
-let getTotalReservedForTreasuryCalls: t => array<getTotalReservedForTreasuryCall> = _r => {
-  let array = %raw("_r.smocked.getTotalReservedForTreasury.calls")
-  array->Array.map(() => {
-    ()->Obj.magic
-  })
-}
-
-let mockGetTotalValueRealizedToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.getTotalValueRealized.will.return.with([_param0])")
-}
-
-type getTotalValueRealizedCall
-
-let getTotalValueRealizedCalls: t => array<getTotalValueRealizedCall> = _r => {
-  let array = %raw("_r.smocked.getTotalValueRealized.calls")
-  array->Array.map(() => {
-    ()->Obj.magic
-  })
-}
-
 let mockLendingPoolToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.lendingPool.will.return.with([_param0])")
 }
@@ -180,19 +128,6 @@ type tokenCall
 
 let tokenCalls: t => array<tokenCall> = _r => {
   let array = %raw("_r.smocked.token.calls")
-  array->Array.map(() => {
-    ()->Obj.magic
-  })
-}
-
-let mockTotalReservedForTreasuryToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.totalReservedForTreasury.will.return.with([_param0])")
-}
-
-type totalReservedForTreasuryCall
-
-let totalReservedForTreasuryCalls: t => array<totalReservedForTreasuryCall> = _r => {
-  let array = %raw("_r.smocked.totalReservedForTreasury.calls")
   array->Array.map(() => {
     ()->Obj.magic
   })
@@ -255,18 +190,5 @@ let withdrawTokenCalls: t => array<withdrawTokenCall> = _r => {
     {
       amount: amount,
     }
-  })
-}
-
-let mockWithdrawTreasuryFundsToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.withdrawTreasuryFunds.will.return()")
-}
-
-type withdrawTreasuryFundsCall
-
-let withdrawTreasuryFundsCalls: t => array<withdrawTreasuryFundsCall> = _r => {
-  let array = %raw("_r.smocked.withdrawTreasuryFunds.calls")
-  array->Array.map(() => {
-    ()->Obj.magic
   })
 }

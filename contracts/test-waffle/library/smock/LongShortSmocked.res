@@ -753,40 +753,6 @@ let tokenFactoryCalls: t => array<tokenFactoryCall> = _r => {
   })
 }
 
-let mockTotalFeesReservedForTreasuryToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.totalFeesReservedForTreasury.will.return.with([_param0])")
-}
-
-type totalFeesReservedForTreasuryCall = {param0: int}
-
-let totalFeesReservedForTreasuryCalls: t => array<totalFeesReservedForTreasuryCall> = _r => {
-  let array = %raw("_r.smocked.totalFeesReservedForTreasury.calls")
-  array->Array.map(_m => {
-    let param0 = _m->Array.getUnsafe(0)
-
-    {
-      param0: param0,
-    }
-  })
-}
-
-let mockTransferTreasuryFundsToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.transferTreasuryFunds.will.return()")
-}
-
-type transferTreasuryFundsCall = {marketIndex: int}
-
-let transferTreasuryFundsCalls: t => array<transferTreasuryFundsCall> = _r => {
-  let array = %raw("_r.smocked.transferTreasuryFunds.calls")
-  array->Array.map(_m => {
-    let marketIndex = _m->Array.getUnsafe(0)
-
-    {
-      marketIndex: marketIndex,
-    }
-  })
-}
-
 let mockTreasuryToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.treasury.will.return.with([_param0])")
 }
@@ -1835,31 +1801,6 @@ module InternalMock = {
         {
           marketIndex: marketIndex,
           amount: amount,
-        }
-      })
-    })
-    ->Option.getExn
-  }
-
-  let mockTransferTreasuryFundsToReturn: unit => unit = () => {
-    checkForExceptions(~functionName="transferTreasuryFunds")
-    let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked.transferTreasuryFundsMock.will.return()")
-    })
-  }
-
-  type transferTreasuryFundsCall = {marketIndex: int}
-
-  let transferTreasuryFundsCalls: unit => array<transferTreasuryFundsCall> = () => {
-    checkForExceptions(~functionName="transferTreasuryFunds")
-    internalRef.contents
-    ->Option.map(_r => {
-      let array = %raw("_r.smocked.transferTreasuryFundsMock.calls")
-      array->Array.map(_m => {
-        let marketIndex = _m->Array.getUnsafe(0)
-
-        {
-          marketIndex: marketIndex,
         }
       })
     })

@@ -257,15 +257,6 @@ type tokenFactoryReturn = Ethers.ethAddress
 @send
 external tokenFactory: t => JsPromise.t<tokenFactoryReturn> = "tokenFactory"
 
-type totalFeesReservedForTreasuryReturn = Ethers.BigNumber.t
-@send
-external totalFeesReservedForTreasury: (t, int) => JsPromise.t<totalFeesReservedForTreasuryReturn> =
-  "totalFeesReservedForTreasury"
-
-@send
-external transferTreasuryFunds: (t, ~marketIndex: int) => JsPromise.t<transaction> =
-  "transferTreasuryFunds"
-
 type treasuryReturn = Ethers.ethAddress
 @send
 external treasury: t => JsPromise.t<treasuryReturn> = "treasury"

@@ -131,10 +131,6 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function transferTreasuryFundsMock(uint32) public pure {
-      return ();
-    }
-     
     function _mintNextPriceMock(uint32,uint256,bool) public pure {
       return ();
     }
