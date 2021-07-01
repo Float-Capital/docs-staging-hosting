@@ -8,6 +8,8 @@ pragma solidity 0.8.3;
  * different markets may share an underlying fund token.
  */
 abstract contract IYieldManager {
+    function totalReservedForTreasury() external virtual returns (uint256);
+
     /*
      * Deposits the given amount of tokens into this yield manager.
      */
@@ -37,4 +39,9 @@ abstract contract IYieldManager {
         uint256 totalValueRealized,
         uint256 marketPcntE5
     ) public virtual returns (uint256 marketAmount);
+
+    /*
+     * Transfer tokens owed to the treasury to the treasury.
+     */
+    function withdrawTreasuryFunds() external virtual;
 }

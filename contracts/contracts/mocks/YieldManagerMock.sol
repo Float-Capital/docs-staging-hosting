@@ -23,6 +23,8 @@ contract YieldManagerMock is IYieldManager {
     // Global state.
     ERC20PresetMinterPauser public token;
     ERC20PresetMinterPauser public tokenOtherRewardERC20;
+
+    uint256 public override totalReservedForTreasury;
     uint256 public totalHeld;
 
     uint256 public yieldRate; // pcnt per sec
@@ -150,4 +152,7 @@ contract YieldManagerMock is IYieldManager {
     ) public override longShortOnly returns (uint256) {
         return 0;
     }
+
+    // TODO STENT need to change this and unit test it
+    function withdrawTreasuryFunds() external override longShortOnly {}
 }

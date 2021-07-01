@@ -72,6 +72,11 @@ type totalHeldReturn = Ethers.BigNumber.t
 @send
 external totalHeld: t => JsPromise.t<totalHeldReturn> = "totalHeld"
 
+type totalReservedForTreasuryReturn = Ethers.BigNumber.t
+@send
+external totalReservedForTreasury: t => JsPromise.t<totalReservedForTreasuryReturn> =
+  "totalReservedForTreasury"
+
 type treasuryReturn = Ethers.ethAddress
 @send
 external treasury: t => JsPromise.t<treasuryReturn> = "treasury"
@@ -85,6 +90,9 @@ external withdrawErc20TokenToTreasury: (
 @send
 external withdrawToken: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> =
   "withdrawToken"
+
+@send
+external withdrawTreasuryFunds: t => JsPromise.t<transaction> = "withdrawTreasuryFunds"
 
 type yieldRateReturn = Ethers.BigNumber.t
 @send

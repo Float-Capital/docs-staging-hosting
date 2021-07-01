@@ -159,6 +159,18 @@ function totalHeldCalls(_r) {
               }));
 }
 
+function mockTotalReservedForTreasuryToReturn(_r, _param0) {
+  ((_r.smocked.totalReservedForTreasury.will.return.with([_param0])));
+  
+}
+
+function totalReservedForTreasuryCalls(_r) {
+  var array = _r.smocked.totalReservedForTreasury.calls;
+  return Belt_Array.map(array, (function (param) {
+                
+              }));
+}
+
 function mockTreasuryToReturn(_r, _param0) {
   ((_r.smocked.treasury.will.return.with([_param0])));
   
@@ -198,6 +210,18 @@ function withdrawTokenCalls(_r) {
                 return {
                         amount: amount
                       };
+              }));
+}
+
+function mockWithdrawTreasuryFundsToReturn(_r) {
+  ((_r.smocked.withdrawTreasuryFunds.will.return()));
+  
+}
+
+function withdrawTreasuryFundsCalls(_r) {
+  var array = _r.smocked.withdrawTreasuryFunds.calls;
+  return Belt_Array.map(array, (function (param) {
+                
               }));
 }
 
@@ -252,12 +276,16 @@ exports.mockTokenOtherRewardERC20ToReturn = mockTokenOtherRewardERC20ToReturn;
 exports.tokenOtherRewardERC20Calls = tokenOtherRewardERC20Calls;
 exports.mockTotalHeldToReturn = mockTotalHeldToReturn;
 exports.totalHeldCalls = totalHeldCalls;
+exports.mockTotalReservedForTreasuryToReturn = mockTotalReservedForTreasuryToReturn;
+exports.totalReservedForTreasuryCalls = totalReservedForTreasuryCalls;
 exports.mockTreasuryToReturn = mockTreasuryToReturn;
 exports.treasuryCalls = treasuryCalls;
 exports.mockWithdrawErc20TokenToTreasuryToReturn = mockWithdrawErc20TokenToTreasuryToReturn;
 exports.withdrawErc20TokenToTreasuryCalls = withdrawErc20TokenToTreasuryCalls;
 exports.mockWithdrawTokenToReturn = mockWithdrawTokenToReturn;
 exports.withdrawTokenCalls = withdrawTokenCalls;
+exports.mockWithdrawTreasuryFundsToReturn = mockWithdrawTreasuryFundsToReturn;
+exports.withdrawTreasuryFundsCalls = withdrawTreasuryFundsCalls;
 exports.mockYieldRateToReturn = mockYieldRateToReturn;
 exports.yieldRateCalls = yieldRateCalls;
 exports.mockYieldScaleToReturn = mockYieldScaleToReturn;
