@@ -600,7 +600,6 @@ function UserUI$UserStakesCard(Props) {
         var metadata_tokenSupply = syntheticToken.tokenSupply;
         var metadata_totalLockedLong = match$1.totalLockedLong;
         var metadata_totalLockedShort = match$1.totalLockedShort;
-        var metadata_syntheticPrice = match$1.syntheticPrice;
         var metadata = {
           timeLastUpdated: metadata_timeLastUpdated,
           oracleAddress: metadata_oracleAddress,
@@ -608,7 +607,7 @@ function UserUI$UserStakesCard(Props) {
           tokenSupply: metadata_tokenSupply,
           totalLockedLong: metadata_totalLockedLong,
           totalLockedShort: metadata_totalLockedShort,
-          syntheticPrice: metadata_syntheticPrice
+          syntheticPrice: price
         };
         var value = stake.currentStake.amount.mul(price).div(CONSTANTS.tenToThe18);
         var creationTxHash = stake.currentStake.creationTxHash;

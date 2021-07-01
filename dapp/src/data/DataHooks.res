@@ -171,7 +171,7 @@ let useUsersBalances = (~userId) => {
             symbol,
             oracleAddress,
             marketIndex,
-            latestSystemState: {totalLockedLong, totalLockedShort, syntheticPrice},
+            latestSystemState: {totalLockedLong, totalLockedShort},
           },
           latestPrice: {price: {price}},
         },
@@ -194,7 +194,7 @@ let useUsersBalances = (~userId) => {
           tokenSupply: tokenSupply,
           totalLockedLong: totalLockedLong,
           totalLockedShort: totalLockedShort,
-          syntheticPrice: syntheticPrice,
+          syntheticPrice: price,
         },
       }
       {
@@ -493,25 +493,26 @@ let useSyntheticPrices = (
   ~isLong,
 ) => {
   let initialTokenPriceResponse = useTokenPriceAtTime(~tokenAddress, ~timestamp)
-  let priceHistoryQuery = Queries.PriceHistory.use(
+  let priceHistoryQuery = Queries.LatestPrice.use(
     ~context=Client.createContext(Client.PriceHistory),
     {
       intervalId: `${oracleAddress->ethAdrToLowerStr}-${CONSTANTS.fiveMinutesInSeconds->Int.toString}`,
-      numDataPoints: 1,
     },
   )
   let finalPriceResponse =
     priceHistoryQuery
     ->Util.queryToResponse
     ->(
-      (response: graphResponse<Queries.PriceHistory.PriceHistory_inner.t>) =>
+      (response: graphResponse<Queries.LatestPrice.LatestPrice_inner.t>) =>
         switch response {
         | Loading => {
             let loading: graphResponse<Ethers.BigNumber.t> = Loading
             loading
           }
         | Response({
-            priceIntervalManager: Some({prices: [{endPrice, startTimestamp: priceQueryDate}]}),
+            priceIntervalManager: Some({
+              latestPriceInterval: {endPrice, startTimestamp: priceQueryDate},
+            }),
           }) =>
           if priceQueryDate->getUnixTime->Ethers.BigNumber.fromInt->Ethers.BigNumber.gt(timestamp) {
             Response(
