@@ -138,9 +138,11 @@ const mintShortNextPriceWithSystemUpdate = async (
     from: user,
   });
 
-  const currentPrice = await oracleManager.getLatestPrice();
-  const nextPrice = currentPrice.mul(new BN(101)).div(new BN(100));
-  await oracleManager.setPrice(nextPrice);
+  if (network != "mumbai") {
+    const currentPrice = await oracleManager.getLatestPrice();
+    const nextPrice = currentPrice.mul(new BN(101)).div(new BN(100));
+    await oracleManager.setPrice(nextPrice);
+  }
 
   await longShort._updateSystemState(marketIndex);
 };
@@ -204,61 +206,63 @@ module.exports = async function (deployer, network, accounts) {
   const treasury = await Treasury.deployed();
   const staker = await Staker.deployed();
 
-  await topupBalanceIfLow(admin, user1);
-  await topupBalanceIfLow(admin, user2);
-  await topupBalanceIfLow(admin, user3);
+  // await topupBalanceIfLow(admin, user1);
+  // await topupBalanceIfLow(admin, user2);
+  // await topupBalanceIfLow(admin, user3);
 
   const tenMintAmount = "10000000000000000000";
   const largeApprove = "10000000000000000000000000000000";
 
   if (network == "mumbai") {
     token = await Dai.at(mumbaiDaiAddress);
-    await token.approve(longShort.address, new BN("200000000000000000000"), {
-      from: admin,
-    });
+    // await token.approve(longShort.address, new BN("200000000000000000000"), {
+    //   from: admin,
+    // });
   } else {
     token = await Dai.deployed();
     await mintAndApprove(token, new BN("20000000000000000000"), user3, admin);
   }
 
-  console.log("topping up balance");
-  await topupBalanceIfLow(admin, user1);
-  await topupBalanceIfLow(admin, user2);
-  await topupBalanceIfLow(admin, user3);
-  console.log("balance topped up :)");
+  // console.log("topping up balance");
+  // await topupBalanceIfLow(admin, user1);
+  // await topupBalanceIfLow(admin, user2);
+  // await topupBalanceIfLow(admin, user3);
+  // console.log("balance topped up :)");
 
-  await deployTestMarket(
-    "ETH Killers",
-    "ETHK",
-    longShort,
-    treasury,
-    token,
-    admin,
-    network,
-    token
-  );
+  // await deployTestMarket(
+  //   "ETH Killers",
+  //   "ETHK",
+  //   longShort,
+  //   treasury,
+  //   token,
+  //   admin,
+  //   network,
+  //   token
+  // );
 
-  await deployTestMarket(
-    "The Flippening",
-    "EBD",
-    longShort,
-    treasury,
-    token,
-    admin,
-    network,
-    token
-  );
+  // await deployTestMarket(
+  //   "The Flippening",
+  //   "EBD",
+  //   longShort,
+  //   treasury,
+  //   token,
+  //   admin,
+  //   network,
+  //   token
+  // );
 
-  await deployTestMarket(
-    "Gold",
-    "GOLD",
-    longShort,
-    treasury,
-    token,
-    admin,
-    network,
-    token
-  );
+  // await deployTestMarket(
+  //   "Gold",
+  //   "GOLD",
+  //   longShort,
+  //   treasury,
+  //   token,
+  //   admin,
+  //   network,
+  //   token
+  // );
+
+  const currentMarketIndex = (await longShort.latestMarket()).toNumber();
 
   let verifyString = "truffle run verify";
   if (network == "mumbai") {
@@ -281,7 +285,6 @@ module.exports = async function (deployer, network, accounts) {
     \`${verifyString} --network ${network}\``);
   }
 
-  const currentMarketIndex = (await longShort.latestMarket()).toNumber();
   for (let marketIndex = 1; marketIndex <= currentMarketIndex; ++marketIndex) {
     console.log(`Simulating transactions for marketIndex: ${marketIndex}`);
 

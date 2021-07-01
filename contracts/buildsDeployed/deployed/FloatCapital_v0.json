@@ -896,7 +896,7 @@
         45
       ],
       "Initializable": [
-        16424
+        16087
       ]
     },
     "id": 46,
@@ -920,7 +920,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 46,
-        "sourceUnit": 16425,
+        "sourceUnit": 16088,
         "src": "62:75:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -933,7 +933,7 @@
               "id": 4,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 16424,
+              "referencedDeclaration": 16087,
               "src": "204:13:0"
             },
             "id": 5,
@@ -942,7 +942,7 @@
           }
         ],
         "contractDependencies": [
-          16424
+          16087
         ],
         "contractKind": "contract",
         "documentation": {
@@ -955,7 +955,7 @@
         "id": 45,
         "linearizedBaseContracts": [
           45,
-          16424
+          16087
         ],
         "name": "FloatCapital_v0",
         "nameLocation": "185:15:0",
@@ -1200,7 +1200,7 @@
                   "id": 23,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 16423,
+                  "referencedDeclaration": 16086,
                   "src": "638:11:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -1397,7 +1397,7 @@
         45
       ],
       "Initializable": [
-        16424
+        16087
       ]
     },
     "id": 46,
@@ -1421,7 +1421,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 46,
-        "sourceUnit": 16425,
+        "sourceUnit": 16088,
         "src": "62:75:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -1434,7 +1434,7 @@
               "id": 4,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 16424,
+              "referencedDeclaration": 16087,
               "src": "204:13:0"
             },
             "id": 5,
@@ -1443,7 +1443,7 @@
           }
         ],
         "contractDependencies": [
-          16424
+          16087
         ],
         "contractKind": "contract",
         "documentation": {
@@ -1456,7 +1456,7 @@
         "id": 45,
         "linearizedBaseContracts": [
           45,
-          16424
+          16087
         ],
         "name": "FloatCapital_v0",
         "nameLocation": "185:15:0",
@@ -1701,7 +1701,7 @@
                   "id": 23,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 16423,
+                  "referencedDeclaration": 16086,
                   "src": "638:11:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -1899,11 +1899,11 @@
     "80001": {
       "events": {},
       "links": {},
-      "address": "0xA9247A12840529cCC14bcEf313070d063Af1c3B6"
+      "address": "0x0506B685c961759852aFfb3AC434ffBc52D25802"
     }
   },
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-06-30T19:01:22.346Z",
+  "updatedAt": "2021-07-01T14:26:59.347Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
