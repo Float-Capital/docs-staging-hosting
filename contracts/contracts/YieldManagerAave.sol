@@ -27,7 +27,7 @@ contract YieldManagerAave is IYieldManager {
     ILendingPool public lendingPool;
 
     uint16 referralCode;
-    uint256 public override totalValueRealized;
+    uint256 public override totalReservedForTreasury;
     uint256 public constant TEN_TO_THE_5 = 10000;
 
     ////////////////////////////////////
@@ -73,8 +73,6 @@ contract YieldManagerAave is IYieldManager {
 
         referralCode = _aaveReferalCode;
 
-        totalValueRealized = 0;
-
         token = ERC20(_token);
         aToken = IERC20Upgradeable(_aToken);
         lendingPool = ILendingPool(_lendingPool);
@@ -106,24 +104,17 @@ contract YieldManagerAave is IYieldManager {
             address(this),
             referralCode
         );
-
-        totalValueRealized += amount;
     }
 
     function withdrawToken(uint256 amount) public override longShortOnly {
-        require(totalValueRealized >= amount);
-
         // Redeem aToken for underlying asset tokens.
         // This will fail if not enough liquidity is avaiable on aave.
         lendingPool.withdraw(address(token), amount, address(this));
 
         // Transfer tokens back to LongShort contract.
         token.transfer(longShort, amount);
-
-        totalValueRealized -= amount;
     }
 
-    // TODO STENT what is this for? It's not called anywhere
     function withdrawErc20TokenToTreasury(address erc20Token)
         external
         override
@@ -148,31 +139,46 @@ contract YieldManagerAave is IYieldManager {
      * the market and the treasury so treasuryPcnt = 1 - marketPcnt.
      */
     // TODO STENT not unit tested
-    function claimYieldAndGetMarketAmount(uint256 marketPcntE5)
-        public
-        override
-        longShortOnly
-        returns (uint256)
-    {
+    function claimYieldAndGetMarketAmount(
+        uint256 totalValueRealizedForMarket,
+        uint256 marketPcntE5
+    ) public override longShortOnly returns (uint256) {
         uint256 totalHeld = aToken.balanceOf(address(this));
-        uint256 unrealizedYield = totalHeld - totalValueRealized;
+
+        uint256 unrealizedYield = totalHeld -
+            totalValueRealizedForMarket -
+            totalReservedForTreasury;
 
         if (unrealizedYield == 0) {
             return 0;
         }
-
-        uint256 treasuryPcntE5 = TEN_TO_THE_5 - marketPcntE5;
 
         uint256 amountForMarketIncetives = (unrealizedYield * marketPcntE5) /
             TEN_TO_THE_5;
 
         uint256 amountForTreasury = unrealizedYield - amountForMarketIncetives;
 
-        if (amountForTreasury > 0) {
-            // NOTE: it is more innefficient sending the amount for the treasury each time, but it is more predictable at least.
-            aToken.transfer(treasury, amountForTreasury);
-        }
+        totalReservedForTreasury += amountForTreasury;
 
         return amountForMarketIncetives;
+    }
+
+    /*
+     * Transfer tokens owed to the treasury to the treasury.
+     */
+    // TODO STENT not unit tested
+    function withdrawTreasuryFunds() external override {
+        // Redeem aToken for underlying asset tokens.
+        // This will fail if not enough liquidity is avaiable on aave.
+        lendingPool.withdraw(
+            address(token),
+            // NOTE: treasury doesn't earn interest on this - but the update function is called extremely frequently, so this isn't an issue.
+            totalReservedForTreasury,
+            address(this)
+        );
+
+        token.transfer(treasury, totalReservedForTreasury);
+
+        totalReservedForTreasury = 0;
     }
 }

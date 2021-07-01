@@ -21,6 +21,7 @@ external admin: t => JsPromise.t<adminReturn> = "admin"
 @send
 external claimYieldAndGetMarketAmount: (
   t,
+  ~totalValueRealizedForMarket: Ethers.BigNumber.t,
   ~marketPcntE5: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "claimYieldAndGetMarketAmount"
 
@@ -28,6 +29,7 @@ type claimYieldAndGetMarketAmountReturn = Ethers.BigNumber.t
 @send @scope("callStatic")
 external claimYieldAndGetMarketAmountCall: (
   t,
+  ~totalValueRealizedForMarket: Ethers.BigNumber.t,
   ~marketPcntE5: Ethers.BigNumber.t,
 ) => JsPromise.t<claimYieldAndGetMarketAmountReturn> = "claimYieldAndGetMarketAmount"
 
@@ -70,9 +72,10 @@ type totalHeldReturn = Ethers.BigNumber.t
 @send
 external totalHeld: t => JsPromise.t<totalHeldReturn> = "totalHeld"
 
-type totalValueRealizedReturn = Ethers.BigNumber.t
+type totalReservedForTreasuryReturn = Ethers.BigNumber.t
 @send
-external totalValueRealized: t => JsPromise.t<totalValueRealizedReturn> = "totalValueRealized"
+external totalReservedForTreasury: t => JsPromise.t<totalReservedForTreasuryReturn> =
+  "totalReservedForTreasury"
 
 type treasuryReturn = Ethers.ethAddress
 @send
@@ -87,6 +90,9 @@ external withdrawErc20TokenToTreasury: (
 @send
 external withdrawToken: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> =
   "withdrawToken"
+
+@send
+external withdrawTreasuryFunds: t => JsPromise.t<transaction> = "withdrawTreasuryFunds"
 
 type yieldRateReturn = Ethers.BigNumber.t
 @send

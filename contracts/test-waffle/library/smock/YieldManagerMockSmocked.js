@@ -22,10 +22,10 @@ function mockClaimYieldAndGetMarketAmountToReturn(_r, _param0) {
 
 function claimYieldAndGetMarketAmountCalls(_r) {
   var array = _r.smocked.claimYieldAndGetMarketAmount.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var marketPcntE5 = _m[0];
+  return Belt_Array.map(array, (function (param) {
                 return {
-                        marketPcntE5: marketPcntE5
+                        totalValueRealizedForMarket: param[0],
+                        marketPcntE5: param[1]
                       };
               }));
 }
@@ -159,13 +159,13 @@ function totalHeldCalls(_r) {
               }));
 }
 
-function mockTotalValueRealizedToReturn(_r, _param0) {
-  ((_r.smocked.totalValueRealized.will.return.with([_param0])));
+function mockTotalReservedForTreasuryToReturn(_r, _param0) {
+  ((_r.smocked.totalReservedForTreasury.will.return.with([_param0])));
   
 }
 
-function totalValueRealizedCalls(_r) {
-  var array = _r.smocked.totalValueRealized.calls;
+function totalReservedForTreasuryCalls(_r) {
+  var array = _r.smocked.totalReservedForTreasury.calls;
   return Belt_Array.map(array, (function (param) {
                 
               }));
@@ -210,6 +210,18 @@ function withdrawTokenCalls(_r) {
                 return {
                         amount: amount
                       };
+              }));
+}
+
+function mockWithdrawTreasuryFundsToReturn(_r) {
+  ((_r.smocked.withdrawTreasuryFunds.will.return()));
+  
+}
+
+function withdrawTreasuryFundsCalls(_r) {
+  var array = _r.smocked.withdrawTreasuryFunds.calls;
+  return Belt_Array.map(array, (function (param) {
+                
               }));
 }
 
@@ -264,14 +276,16 @@ exports.mockTokenOtherRewardERC20ToReturn = mockTokenOtherRewardERC20ToReturn;
 exports.tokenOtherRewardERC20Calls = tokenOtherRewardERC20Calls;
 exports.mockTotalHeldToReturn = mockTotalHeldToReturn;
 exports.totalHeldCalls = totalHeldCalls;
-exports.mockTotalValueRealizedToReturn = mockTotalValueRealizedToReturn;
-exports.totalValueRealizedCalls = totalValueRealizedCalls;
+exports.mockTotalReservedForTreasuryToReturn = mockTotalReservedForTreasuryToReturn;
+exports.totalReservedForTreasuryCalls = totalReservedForTreasuryCalls;
 exports.mockTreasuryToReturn = mockTreasuryToReturn;
 exports.treasuryCalls = treasuryCalls;
 exports.mockWithdrawErc20TokenToTreasuryToReturn = mockWithdrawErc20TokenToTreasuryToReturn;
 exports.withdrawErc20TokenToTreasuryCalls = withdrawErc20TokenToTreasuryCalls;
 exports.mockWithdrawTokenToReturn = mockWithdrawTokenToReturn;
 exports.withdrawTokenCalls = withdrawTokenCalls;
+exports.mockWithdrawTreasuryFundsToReturn = mockWithdrawTreasuryFundsToReturn;
+exports.withdrawTreasuryFundsCalls = withdrawTreasuryFundsCalls;
 exports.mockYieldRateToReturn = mockYieldRateToReturn;
 exports.yieldRateCalls = yieldRateCalls;
 exports.mockYieldScaleToReturn = mockYieldScaleToReturn;
