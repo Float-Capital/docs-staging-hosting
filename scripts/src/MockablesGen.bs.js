@@ -114,7 +114,9 @@ var blockCommentsRe = /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g;
 
 var getArtifact = ((fileNameWithoutExtension) => require("../../contracts/codegen/truffle/" + fileNameWithoutExtension + ".json"));
 
-var getAbi = ((fileNameWithoutExtension) => require("../../contracts/abis/" + fileNameWithoutExtension + ".json"));
+function getAbi(fileNameWithoutExtension) {
+  return getArtifact(fileNameWithoutExtension).abi;
+}
 
 var BadMatchingBlock = /* @__PURE__ */Caml_exceptions.create("MockablesGen.BadMatchingBlock");
 
@@ -208,7 +210,7 @@ function parseAbi(abi) {
 var bindingsDict = Belt_HashMapString.make(10);
 
 Belt_Array.forEach(abisToMockExternally, (function (contractName) {
-        var abi = getAbi(contractName);
+        var abi = getArtifact(contractName).abi;
         var functions = parseAbi(abi);
         return Belt_HashMapString.set(bindingsDict, contractName, SmockableGen.externalModule(functions, contractName));
       }));
