@@ -673,11 +673,15 @@ contract LongShortMockable is ILongShort, Initializable {
             marketIndex
         );
 
-        uint256 totalValueRealised = syntheticTokenPoolValue[marketIndex][
-            true
-        ] + syntheticTokenPoolValue[marketIndex][false];
+        uint256 totalValueRealizedForMarket = syntheticTokenPoolValue[
+            marketIndex
+        ][true] + syntheticTokenPoolValue[marketIndex][false];
+
         uint256 marketAmount = yieldManagers[marketIndex]
-        .claimYieldAndGetMarketAmount(totalValueRealised, marketPcntE5);
+        .claimYieldAndGetMarketAmount(
+            totalValueRealizedForMarket,
+            marketPcntE5
+        );
 
         if (marketAmount > 0) {
             _distributeMarketAmount(marketIndex, marketAmount);

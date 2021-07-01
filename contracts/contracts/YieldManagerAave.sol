@@ -168,17 +168,16 @@ contract YieldManagerAave is IYieldManager {
      */
     // TODO STENT not unit tested
     function withdrawTreasuryFunds() external override {
+        uint256 amountToWithdrawForTreasury = totalReservedForTreasury;
+        totalReservedForTreasury = 0;
+
         // Redeem aToken for underlying asset tokens.
         // This will fail if not enough liquidity is avaiable on aave.
         lendingPool.withdraw(
             address(token),
-            // NOTE: treasury doesn't earn interest on this - but the update function is called extremely frequently, so this isn't an issue.
-            totalReservedForTreasury,
+            amountToWithdrawForTreasury,
             address(this)
         );
-
-        token.transfer(treasury, totalReservedForTreasury);
-
-        totalReservedForTreasury = 0;
+        token.transfer(treasury, amountToWithdrawForTreasury);
     }
 }
