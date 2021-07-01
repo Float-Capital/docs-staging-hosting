@@ -8,8 +8,6 @@ pragma solidity 0.8.3;
  * different markets may share an underlying fund token.
  */
 abstract contract IYieldManager {
-    function totalValueRealized() external virtual returns (uint256);
-
     /*
      * Deposits the given amount of tokens into this yield manager.
      */
@@ -35,8 +33,8 @@ abstract contract IYieldManager {
      * much is reserved for the market. The yield is split between
      * the market and the treasury so treasuryPcnt = 1 - marketPcnt.
      */
-    function claimYieldAndGetMarketAmount(uint256 marketPcntE5)
-        public
-        virtual
-        returns (uint256 marketAmount);
+    function claimYieldAndGetMarketAmount(
+        uint256 totalValueRealized,
+        uint256 marketPcntE5
+    ) public virtual returns (uint256 marketAmount);
 }

@@ -673,8 +673,11 @@ contract LongShortMockable is ILongShort, Initializable {
             marketIndex
         );
 
+        uint256 totalValueRealised = syntheticTokenPoolValue[marketIndex][
+            true
+        ] + syntheticTokenPoolValue[marketIndex][false];
         uint256 marketAmount = yieldManagers[marketIndex]
-        .claimYieldAndGetMarketAmount(marketPcntE5);
+        .claimYieldAndGetMarketAmount(totalValueRealised, marketPcntE5);
 
         if (marketAmount > 0) {
             _distributeMarketAmount(marketIndex, marketAmount);
@@ -951,12 +954,6 @@ contract LongShortMockable is ILongShort, Initializable {
     }
   
                         yieldManagers[marketIndex].withdrawToken(amount);
-
-                                require(
-            yieldManagers[marketIndex].totalValueRealized() <=
-                syntheticTokenPoolValue[marketIndex][true] +
-                    syntheticTokenPoolValue[marketIndex][false]
-        );
     }
 
     

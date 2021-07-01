@@ -52,6 +52,7 @@ external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction>
 @send
 external claimYieldAndGetMarketAmount: (
   t,
+  ~totalValueRealized: Ethers.BigNumber.t,
   ~marketPcntE5: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "claimYieldAndGetMarketAmount"
 
@@ -59,6 +60,7 @@ type claimYieldAndGetMarketAmountReturn = Ethers.BigNumber.t
 @send @scope("callStatic")
 external claimYieldAndGetMarketAmountCall: (
   t,
+  ~totalValueRealized: Ethers.BigNumber.t,
   ~marketPcntE5: Ethers.BigNumber.t,
 ) => JsPromise.t<claimYieldAndGetMarketAmountReturn> = "claimYieldAndGetMarketAmount"
 
@@ -76,10 +78,6 @@ external longShort: t => JsPromise.t<longShortReturn> = "longShort"
 type tokenReturn = Ethers.ethAddress
 @send
 external token: t => JsPromise.t<tokenReturn> = "token"
-
-type totalValueRealizedReturn = Ethers.BigNumber.t
-@send
-external totalValueRealized: t => JsPromise.t<totalValueRealizedReturn> = "totalValueRealized"
 
 type treasuryReturn = Ethers.ethAddress
 @send

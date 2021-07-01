@@ -566,8 +566,11 @@ contract LongShort is ILongShort, Initializable {
             marketIndex
         );
 
+        uint256 totalValueRealised = syntheticTokenPoolValue[marketIndex][
+            true
+        ] + syntheticTokenPoolValue[marketIndex][false];
         uint256 marketAmount = yieldManagers[marketIndex]
-        .claimYieldAndGetMarketAmount(marketPcntE5);
+        .claimYieldAndGetMarketAmount(totalValueRealised, marketPcntE5);
 
         if (marketAmount > 0) {
             _distributeMarketAmount(marketIndex, marketAmount);
@@ -808,15 +811,6 @@ contract LongShort is ILongShort, Initializable {
         // NB there will be issues here if not enough liquidity exists to withdraw
         // Boolean should be returned from yield manager and think how to appropriately handle this
         yieldManagers[marketIndex].withdrawToken(amount);
-
-        // Invariant: yield managers should never have more locked funds
-        // than the combined value of the market and held treasury funds.
-        // TODO STENT this check seems wierd. What happens if this fails? What is the recovery? Should it be an assert?
-        require(
-            yieldManagers[marketIndex].totalValueRealized() <=
-                syntheticTokenPoolValue[marketIndex][true] +
-                    syntheticTokenPoolValue[marketIndex][false]
-        );
     }
 
     /*╔═══════════════════════════╗

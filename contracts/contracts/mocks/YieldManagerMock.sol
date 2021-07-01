@@ -24,7 +24,6 @@ contract YieldManagerMock is IYieldManager {
     ERC20PresetMinterPauser public token;
     ERC20PresetMinterPauser public tokenOtherRewardERC20;
     uint256 public totalHeld;
-    uint256 public override totalValueRealized; // NOTE: This value isn't used in the mock at all!
 
     uint256 public yieldRate; // pcnt per sec
     uint256 public lastSettled; // secs after epoch
@@ -145,12 +144,10 @@ contract YieldManagerMock is IYieldManager {
     }
 
     // TODO STENT need to change this and unit test it
-    function claimYieldAndGetMarketAmount(uint256 marketPcntE5)
-        public
-        override
-        longShortOnly
-        returns (uint256)
-    {
+    function claimYieldAndGetMarketAmount(
+        uint256 totalValueRealized,
+        uint256 marketPcntE5
+    ) public override longShortOnly returns (uint256) {
         return 0;
     }
 }
