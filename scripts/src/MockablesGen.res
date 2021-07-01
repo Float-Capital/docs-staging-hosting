@@ -92,7 +92,7 @@ let lineCommentsRe = %re("/\\/\\/[^\\n]*\\n/g")
 let blockCommentsRe = %re("/\\/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+\\//g")
 let getArtifact = %raw(`(fileNameWithoutExtension) => require("../../contracts/codegen/truffle/" + fileNameWithoutExtension + ".json")`)
 
-let getAbi = %raw(`(fileNameWithoutExtension) => require("../../contracts/abis/" + fileNameWithoutExtension + ".json")`)
+let getAbi = fileNameWithoutExtension => getArtifact(fileNameWithoutExtension)["abi"]
 
 exception BadMatchingBlock
 let rec matchingBlockEndIndex = (str, startIndex, count) => {
