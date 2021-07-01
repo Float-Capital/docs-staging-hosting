@@ -77,7 +77,7 @@ function test(contracts, accounts) {
                               }));
                 }));
           it("emits StateAddedEvent", (function () {
-                  return Chai.callEmitEvents(promiseRef.contents, stakerRef.contents, "StateAdded").withArgs(1, CONSTANTS.zeroBn, ethers.BigNumber.from(timestampRef.contents + 1 | 0), CONSTANTS.zeroBn, CONSTANTS.zeroBn);
+                  return Chai.callEmitEvents(promiseRef.contents, stakerRef.contents, "StateAdded").withArgs(1, CONSTANTS.zeroBn, CONSTANTS.zeroBn, CONSTANTS.zeroBn);
                 }));
           
         }));

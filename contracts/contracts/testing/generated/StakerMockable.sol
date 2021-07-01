@@ -71,10 +71,11 @@ contract StakerMockable is IStaker, Initializable {
             
     event DeployV1(address floatToken);
 
+    event MarketAddedToStaker(uint32 marketIndex, uint256 exitFeeBasisPoints);
+
     event StateAdded(
         uint32 marketIndex,
         uint256 stateIndex,
-        uint256 timestamp,
         uint256 accumulativeLong,
         uint256 accumulativeShort
     );
@@ -271,7 +272,13 @@ contract StakerMockable is IStaker, Initializable {
             kInitialMultiplier
         );
 
-        emit StateAdded(marketIndex, 0, block.timestamp, 0, 0);
+        emit MarketAddedToStaker(
+            marketIndex,
+            50 
+
+        );
+
+        emit StateAdded(marketIndex, 0, 0, 0);
     }
 
             
@@ -450,7 +457,6 @@ contract StakerMockable is IStaker, Initializable {
         emit StateAdded(
             marketIndex,
             newIndex,
-            block.timestamp,
             longAccumulativeRates,
             shortAccumulativeRates
         );

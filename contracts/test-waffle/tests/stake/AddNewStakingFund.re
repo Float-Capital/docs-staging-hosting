@@ -110,10 +110,9 @@ let test =
         ~contract=(stakerRef^)->Obj.magic,
         ~eventName="StateAdded",
       )
-      ->Chai.withArgs5(
+      ->Chai.withArgs4(
           marketIndex,
           CONSTANTS.zeroBn,
-          Ethers.BigNumber.fromInt(timestampRef^ + 1),
           CONSTANTS.zeroBn,
           CONSTANTS.zeroBn,
         )

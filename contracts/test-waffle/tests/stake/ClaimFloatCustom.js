@@ -59,7 +59,7 @@ function test(contracts, accounts) {
                         }));
                   it("calls _claimFloat with the correct arguments", (function () {
                           return Chai.recordEqualDeep(Belt_Array.getExn(StakerSmocked.InternalMock._claimFloatCalls(undefined), 0), {
-                                      marketIndex: marketIndices
+                                      marketIndexes: marketIndices
                                     });
                         }));
                   
