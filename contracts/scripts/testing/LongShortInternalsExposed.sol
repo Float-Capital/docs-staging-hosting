@@ -83,11 +83,11 @@ contract LongShortInternalsExposed is LongShortMockable {
         _transferFundsToYieldManager(marketIndex, amount);
     }
 
-    // function transferFromYieldManager(uint32 marketIndex, uint256 amount)
-    //     external
-    // {
-    //     _transferFromYieldManager(marketIndex, amount);
-    // }
+    function transferFromYieldManager(uint32 marketIndex, uint256 amount)
+        external
+    {
+        _transferFromYieldManager(marketIndex, amount);
+    }
 
     function adjustMarketBasedOnNewAssetPrice(
         uint32 marketIndex,

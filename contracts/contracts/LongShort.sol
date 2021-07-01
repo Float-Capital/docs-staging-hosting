@@ -47,7 +47,6 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => bool) public marketExists;
     mapping(uint32 => uint256) public assetPrice;
     mapping(uint32 => uint256) public marketUpdateIndex;
-    mapping(uint32 => uint256) public totalFeesReservedForTreasury;
     mapping(uint32 => IERC20) public fundTokens;
     mapping(uint32 => IYieldManager) public yieldManagers;
     mapping(uint32 => IOracleManager) public oracleManagers;
@@ -814,42 +813,9 @@ contract LongShort is ILongShort, Initializable {
         // than the combined value of the market and held treasury funds.
         // TODO STENT this check seems wierd. What happens if this fails? What is the recovery? Should it be an assert?
         require(
-            yieldManagers[marketIndex].getTotalValueRealized() <=
+            yieldManagers[marketIndex].totalValueRealized() <=
                 syntheticTokenPoolValue[marketIndex][true] +
-                    syntheticTokenPoolValue[marketIndex][false] +
-                    totalFeesReservedForTreasury[marketIndex] +
-                    yieldManagers[marketIndex].getTotalReservedForTreasury()
-        );
-    }
-
-    /*
-     * Transfers the reserved treasury funds to the treasury contract. This is
-     * done async to avoid putting transfer gas costs on users every time they o
-     * pay fees or accrue yield.
-     *
-     * NOTE: doesn't affect markets, so no state refresh necessary
-     */
-    function transferTreasuryFunds(uint32 marketIndex) external {
-        uint256 totalValueReservedForTreasury = totalFeesReservedForTreasury[
-            marketIndex
-        ] + yieldManagers[marketIndex].getTotalReservedForTreasury();
-
-        if (totalValueReservedForTreasury == 0) {
-            return;
-        }
-
-        if (totalFeesReservedForTreasury[marketIndex] > 0) {
-            totalFeesReservedForTreasury[marketIndex] = 0;
-        }
-
-        if (yieldManagers[marketIndex].getTotalReservedForTreasury() > 0) {
-            yieldManagers[marketIndex].withdrawTreasuryFunds();
-        }
-
-        // Transfer funds to the treasury.
-        fundTokens[marketIndex].transfer(
-            treasury,
-            totalValueReservedForTreasury
+                    syntheticTokenPoolValue[marketIndex][false]
         );
     }
 

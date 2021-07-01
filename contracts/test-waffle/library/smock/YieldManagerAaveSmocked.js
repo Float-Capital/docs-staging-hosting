@@ -84,54 +84,6 @@ function depositTokenCalls(_r) {
               }));
 }
 
-function mockGetHeldTokenToReturn(_r, _param0) {
-  ((_r.smocked.getHeldToken.will.return.with([_param0])));
-  
-}
-
-function getHeldTokenCalls(_r) {
-  var array = _r.smocked.getHeldToken.calls;
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
-function mockGetTotalHeldToReturn(_r, _param0) {
-  ((_r.smocked.getTotalHeld.will.return.with([_param0])));
-  
-}
-
-function getTotalHeldCalls(_r) {
-  var array = _r.smocked.getTotalHeld.calls;
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
-function mockGetTotalReservedForTreasuryToReturn(_r, _param0) {
-  ((_r.smocked.getTotalReservedForTreasury.will.return.with([_param0])));
-  
-}
-
-function getTotalReservedForTreasuryCalls(_r) {
-  var array = _r.smocked.getTotalReservedForTreasury.calls;
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
-function mockGetTotalValueRealizedToReturn(_r, _param0) {
-  ((_r.smocked.getTotalValueRealized.will.return.with([_param0])));
-  
-}
-
-function getTotalValueRealizedCalls(_r) {
-  var array = _r.smocked.getTotalValueRealized.calls;
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
 function mockLendingPoolToReturn(_r, _param0) {
   ((_r.smocked.lendingPool.will.return.with([_param0])));
   
@@ -163,18 +115,6 @@ function mockTokenToReturn(_r, _param0) {
 
 function tokenCalls(_r) {
   var array = _r.smocked.token.calls;
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
-function mockTotalReservedForTreasuryToReturn(_r, _param0) {
-  ((_r.smocked.totalReservedForTreasury.will.return.with([_param0])));
-  
-}
-
-function totalReservedForTreasuryCalls(_r) {
-  var array = _r.smocked.totalReservedForTreasury.calls;
   return Belt_Array.map(array, (function (param) {
                 
               }));
@@ -234,18 +174,6 @@ function withdrawTokenCalls(_r) {
               }));
 }
 
-function mockWithdrawTreasuryFundsToReturn(_r) {
-  ((_r.smocked.withdrawTreasuryFunds.will.return()));
-  
-}
-
-function withdrawTreasuryFundsCalls(_r) {
-  var array = _r.smocked.withdrawTreasuryFunds.calls;
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
 var uninitializedValue;
 
 exports.uninitializedValue = uninitializedValue;
@@ -261,22 +189,12 @@ exports.mockClaimYieldAndGetMarketAmountToReturn = mockClaimYieldAndGetMarketAmo
 exports.claimYieldAndGetMarketAmountCalls = claimYieldAndGetMarketAmountCalls;
 exports.mockDepositTokenToReturn = mockDepositTokenToReturn;
 exports.depositTokenCalls = depositTokenCalls;
-exports.mockGetHeldTokenToReturn = mockGetHeldTokenToReturn;
-exports.getHeldTokenCalls = getHeldTokenCalls;
-exports.mockGetTotalHeldToReturn = mockGetTotalHeldToReturn;
-exports.getTotalHeldCalls = getTotalHeldCalls;
-exports.mockGetTotalReservedForTreasuryToReturn = mockGetTotalReservedForTreasuryToReturn;
-exports.getTotalReservedForTreasuryCalls = getTotalReservedForTreasuryCalls;
-exports.mockGetTotalValueRealizedToReturn = mockGetTotalValueRealizedToReturn;
-exports.getTotalValueRealizedCalls = getTotalValueRealizedCalls;
 exports.mockLendingPoolToReturn = mockLendingPoolToReturn;
 exports.lendingPoolCalls = lendingPoolCalls;
 exports.mockLongShortToReturn = mockLongShortToReturn;
 exports.longShortCalls = longShortCalls;
 exports.mockTokenToReturn = mockTokenToReturn;
 exports.tokenCalls = tokenCalls;
-exports.mockTotalReservedForTreasuryToReturn = mockTotalReservedForTreasuryToReturn;
-exports.totalReservedForTreasuryCalls = totalReservedForTreasuryCalls;
 exports.mockTotalValueRealizedToReturn = mockTotalValueRealizedToReturn;
 exports.totalValueRealizedCalls = totalValueRealizedCalls;
 exports.mockTreasuryToReturn = mockTreasuryToReturn;
@@ -285,6 +203,4 @@ exports.mockWithdrawErc20TokenToTreasuryToReturn = mockWithdrawErc20TokenToTreas
 exports.withdrawErc20TokenToTreasuryCalls = withdrawErc20TokenToTreasuryCalls;
 exports.mockWithdrawTokenToReturn = mockWithdrawTokenToReturn;
 exports.withdrawTokenCalls = withdrawTokenCalls;
-exports.mockWithdrawTreasuryFundsToReturn = mockWithdrawTreasuryFundsToReturn;
-exports.withdrawTreasuryFundsCalls = withdrawTreasuryFundsCalls;
 /* No side effect */

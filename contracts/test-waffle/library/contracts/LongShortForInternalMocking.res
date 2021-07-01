@@ -384,11 +384,6 @@ external redeemShortNextPriceMock: (
   Ethers.BigNumber.t,
 ) => JsPromise.t<redeemShortNextPriceMockReturn> = "redeemShortNextPriceMock"
 
-type transferTreasuryFundsMockReturn
-@send
-external transferTreasuryFundsMock: (t, int) => JsPromise.t<transferTreasuryFundsMockReturn> =
-  "transferTreasuryFundsMock"
-
 type treasuryOnlyMockReturn
 @send
 external treasuryOnlyMock: t => JsPromise.t<treasuryOnlyMockReturn> = "treasuryOnlyMock"
