@@ -407,8 +407,8 @@ contract LongShort is ILongShort, Initializable {
         returns (uint256 syntheticTokenPrice)
     {
         syntheticTokenPrice =
-            (syntheticTokenPoolValue[marketIndex][true] * TEN_TO_THE_18) /
-            syntheticTokens[marketIndex][true].totalSupply();
+            (syntheticTokenPoolValue[marketIndex][isLong] * TEN_TO_THE_18) /
+            syntheticTokens[marketIndex][isLong].totalSupply();
     }
 
     function _getAmountPaymentToken(uint256 amountSynth, uint256 price)
@@ -731,6 +731,7 @@ contract LongShort is ILongShort, Initializable {
     /*
      * Returns locked funds from the market to the sender.
      */
+    // TODO STENT only called in 1 place: _handleBatchedRedeemSettlement
     function _withdrawFunds(
         uint32 marketIndex,
         uint256 amountLong,
@@ -954,8 +955,8 @@ contract LongShort is ILongShort, Initializable {
         uint256 currentDepositAmount = userNextPriceDepositAmount[marketIndex][
             isLong
         ][user];
-        userNextPriceDepositAmount[marketIndex][isLong][user] = 0;
         if (currentDepositAmount > 0) {
+            userNextPriceDepositAmount[marketIndex][isLong][user] = 0;
             uint256 tokensToTransferToUser = _getAmountSynthToken(
                 currentDepositAmount,
                 syntheticTokenPriceSnapshot[marketIndex][isLong][
@@ -977,8 +978,8 @@ contract LongShort is ILongShort, Initializable {
         uint256 currentRedemptions = userNextPriceRedemptionAmount[marketIndex][
             isLong
         ][user];
-        userNextPriceRedemptionAmount[marketIndex][isLong][user] = 0;
         if (currentRedemptions > 0) {
+            userNextPriceRedemptionAmount[marketIndex][isLong][user] = 0;
             uint256 amountToRedeem = _getAmountPaymentToken(
                 currentRedemptions,
                 syntheticTokenPriceSnapshot[marketIndex][isLong][
