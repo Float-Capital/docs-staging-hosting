@@ -126,86 +126,13 @@ let useStakesForUser = (~userId) => {
   }
 }
 
-type synthBalanceMetadata = {
-  timeLastUpdated: Ethers.BigNumber.t,
-  oracleAddress: Ethers.ethAddress,
-  marketIndex: Ethers.BigNumber.t,
-  tokenSupply: Ethers.BigNumber.t,
-  totalLockedLong: Ethers.BigNumber.t,
-  totalLockedShort: Ethers.BigNumber.t,
-  syntheticPrice: Ethers.BigNumber.t,
-  syntheticPriceLastUpdated: Ethers.BigNumber.t,
-}
-
-type userSynthBalance = {
-  addr: Ethers.ethAddress,
-  name: string,
-  symbol: string,
-  isLong: bool,
-  tokenBalance: Ethers.BigNumber.t,
-  tokensValue: Ethers.BigNumber.t,
-  metadata: synthBalanceMetadata,
-}
-
-type usersBalanceSummary = {
-  totalBalance: Ethers.BigNumber.t,
-  balances: array<userSynthBalance>,
-}
-
 @ocaml.doc(`Returns a sumary of the users synthetic tokens`)
 let useUsersBalances = (~userId) => {
   let usersTokensQuery = Queries.UsersBalances.use({userId: userId})
 
   switch usersTokensQuery {
-  | {data: Some({user: Some({tokenBalances})})} =>
-    let result = tokenBalances->Array.reduce({totalBalance: CONSTANTS.zeroBN, balances: []}, (
-      {totalBalance, balances},
-      {
-        tokenBalance,
-        timeLastUpdated,
-        syntheticToken: {
-          id,
-          tokenType,
-          tokenSupply,
-          syntheticMarket: {
-            name,
-            symbol,
-            oracleAddress,
-            marketIndex,
-            latestSystemState: {totalLockedLong, totalLockedShort},
-          },
-          latestPrice: {price: {price, timeUpdated: synthPriceUpdated}},
-        },
-      },
-    ) => {
-      let isLong = tokenType == #Long
-      let newToken = {
-        addr: id->Ethers.Utils.getAddressUnsafe,
-        name: name,
-        isLong: isLong,
-        tokenBalance: tokenBalance,
-        symbol: symbol,
-        tokensValue: price
-        ->Ethers.BigNumber.mul(tokenBalance)
-        ->Ethers.BigNumber.div(CONSTANTS.tenToThe18),
-        metadata: {
-          timeLastUpdated: timeLastUpdated,
-          marketIndex: marketIndex,
-          oracleAddress: oracleAddress,
-          tokenSupply: tokenSupply,
-          totalLockedLong: totalLockedLong,
-          totalLockedShort: totalLockedShort,
-          syntheticPrice: price,
-          syntheticPriceLastUpdated: synthPriceUpdated,
-        },
-      }
-      {
-        totalBalance: totalBalance->Ethers.BigNumber.add(newToken.tokensValue),
-        balances: balances->Array.concat([newToken]),
-      }
-    })
-    Response(result)
-  | {data: Some({user: None})} => Response({totalBalance: CONSTANTS.zeroBN, balances: []})
+  | {data: Some({user: Some({tokenBalances})})} => Response(tokenBalances)
+  | {data: Some({user: None})} => Response([])
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
   }
@@ -483,15 +410,13 @@ let getUnixTime = date => date->getTime / 1000
 
 @ocaml.doc(`Returns both the price of the synthetic asset timeLastUpdated, and a current estimate of its price`)
 let useSyntheticPrices = (
-  ~metadata as {
-    oracleAddress,
-    timeLastUpdated: timestamp,
-    tokenSupply,
-    totalLockedLong,
-    totalLockedShort,
-    syntheticPrice,
-    syntheticPriceLastUpdated,
-  }: synthBalanceMetadata,
+  ~oracleAddress,
+  ~timeLastUpdated as timestamp,
+  ~tokenSupply,
+  ~totalLockedLong,
+  ~totalLockedShort,
+  ~syntheticPrice,
+  ~syntheticPriceLastUpdated,
   ~tokenAddress,
   ~isLong,
 ) => {
