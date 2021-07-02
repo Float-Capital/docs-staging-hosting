@@ -507,7 +507,7 @@ function initializeMarketCalls(_r) {
               }));
 }
 
-function mockGetUsersPendingBalanceToReturn(_r, _param0) {
+function mockGetUsersConfirmedButNotSettledBalanceToReturn(_r, _param0) {
   ((_r.smocked.getUsersConfirmedButNotSettledBalance.will.return.with([_param0])));
   
 }
@@ -1025,7 +1025,7 @@ function _getAmountSynthTokenCalls(param) {
                   })));
 }
 
-function mockGetUsersPendingBalanceToReturn$1(_param0) {
+function mockGetUsersConfirmedButNotSettledBalanceToReturn$1(_param0) {
   checkForExceptions("getUsersConfirmedButNotSettledBalance");
   Belt_Option.map(internalRef.contents, (function (_r) {
           ((_r.smocked.getUsersConfirmedButNotSettledBalanceMock.will.return.with([_param0])));
@@ -1859,7 +1859,7 @@ var InternalMock = {
   _getAmountPaymentTokenCalls: _getAmountPaymentTokenCalls,
   mock_getAmountSynthTokenToReturn: mock_getAmountSynthTokenToReturn,
   _getAmountSynthTokenCalls: _getAmountSynthTokenCalls,
-  mockGetUsersPendingBalanceToReturn: mockGetUsersPendingBalanceToReturn$1,
+  mockGetUsersConfirmedButNotSettledBalanceToReturn: mockGetUsersConfirmedButNotSettledBalanceToReturn$1,
   getUsersConfirmedButNotSettledBalanceCalls: getUsersConfirmedButNotSettledBalanceCalls$1,
   mockGetMarketPcntForTreasuryVsMarketSplitToReturn: mockGetMarketPcntForTreasuryVsMarketSplitToReturn$1,
   getMarketPcntForTreasuryVsMarketSplitCalls: getMarketPcntForTreasuryVsMarketSplitCalls$1,
@@ -2004,7 +2004,7 @@ exports.mockNewSyntheticMarketToReturn = mockNewSyntheticMarketToReturn;
 exports.newSyntheticMarketCalls = newSyntheticMarketCalls;
 exports.mockInitializeMarketToReturn = mockInitializeMarketToReturn;
 exports.initializeMarketCalls = initializeMarketCalls;
-exports.mockGetUsersPendingBalanceToReturn = mockGetUsersPendingBalanceToReturn;
+exports.mockGetUsersConfirmedButNotSettledBalanceToReturn = mockGetUsersConfirmedButNotSettledBalanceToReturn;
 exports.getUsersConfirmedButNotSettledBalanceCalls = getUsersConfirmedButNotSettledBalanceCalls;
 exports.mockGetMarketPcntForTreasuryVsMarketSplitToReturn = mockGetMarketPcntForTreasuryVsMarketSplitToReturn;
 exports.getMarketPcntForTreasuryVsMarketSplitCalls = getMarketPcntForTreasuryVsMarketSplitCalls;

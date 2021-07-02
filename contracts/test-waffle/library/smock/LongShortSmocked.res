@@ -629,7 +629,10 @@ let initializeMarketCalls: t => array<initializeMarketCall> = _r => {
   })
 }
 
-let mockGetUsersPendingBalanceToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+let mockGetUsersConfirmedButNotSettledBalanceToReturn: (t, Ethers.BigNumber.t) => unit = (
+  _r,
+  _param0,
+) => {
   let _ = %raw("_r.smocked.getUsersConfirmedButNotSettledBalance.will.return.with([_param0])")
 }
 
@@ -639,7 +642,9 @@ type getUsersConfirmedButNotSettledBalanceCall = {
   isLong: bool,
 }
 
-let getUsersConfirmedButNotSettledBalanceCalls: t => array<getUsersConfirmedButNotSettledBalanceCall> = _r => {
+let getUsersConfirmedButNotSettledBalanceCalls: t => array<
+  getUsersConfirmedButNotSettledBalanceCall,
+> = _r => {
   let array = %raw("_r.smocked.getUsersConfirmedButNotSettledBalance.calls")
   array->Array.map(((user, marketIndex, isLong)) => {
     {
@@ -1300,10 +1305,12 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mockGetUsersPendingBalanceToReturn: Ethers.BigNumber.t => unit = _param0 => {
+  let mockGetUsersConfirmedButNotSettledBalanceToReturn: Ethers.BigNumber.t => unit = _param0 => {
     checkForExceptions(~functionName="getUsersConfirmedButNotSettledBalance")
     let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked.getUsersConfirmedButNotSettledBalanceMock.will.return.with([_param0])")
+      let _ = %raw(
+        "_r.smocked.getUsersConfirmedButNotSettledBalanceMock.will.return.with([_param0])"
+      )
     })
   }
 
@@ -1313,7 +1320,9 @@ module InternalMock = {
     isLong: bool,
   }
 
-  let getUsersConfirmedButNotSettledBalanceCalls: unit => array<getUsersConfirmedButNotSettledBalanceCall> = () => {
+  let getUsersConfirmedButNotSettledBalanceCalls: unit => array<
+    getUsersConfirmedButNotSettledBalanceCall,
+  > = () => {
     checkForExceptions(~functionName="getUsersConfirmedButNotSettledBalance")
     internalRef.contents
     ->Option.map(_r => {
