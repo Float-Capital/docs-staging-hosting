@@ -117,23 +117,4 @@ contract("YieldManagerMock (interface)", (accounts) => {
       "Yield manager held wrong token value after settlement."
     );
   });
-
-  it("getTotalHeld should agree with actual holdings", async () => {
-    var getTotalHeld = await yieldManager.getTotalHeld.call();
-    var totalHeld = await yieldManager.totalHeld.call();
-    assert.equal(
-      getTotalHeld.toString(),
-      totalHeld.toString(),
-      "getTotalHeld doesn't agree with actual holdings"
-    );
-  });
-
-  it("getHeldToken should agree with actual underlying token", async () => {
-    var getHeldToken = await yieldManager.getHeldToken.call();
-    assert.equal(
-      getHeldToken,
-      token.address,
-      "getHeldToken doesn't return correct token address"
-    );
-  });
 });

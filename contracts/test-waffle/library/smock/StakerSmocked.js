@@ -19,42 +19,6 @@ function fLOAT_ISSUANCE_FIXED_DECIMALCalls(_r) {
               }));
 }
 
-function mockAddNewStakingFundToReturn(_r) {
-  ((_r.smocked.addNewStakingFund.will.return()));
-  
-}
-
-function addNewStakingFundCalls(_r) {
-  var array = _r.smocked.addNewStakingFund.calls;
-  return Belt_Array.map(array, (function (param) {
-                return {
-                        marketIndex: param[0],
-                        longToken: param[1],
-                        shortToken: param[2],
-                        kInitialMultiplier: param[3],
-                        kPeriod: param[4]
-                      };
-              }));
-}
-
-function mockAddNewStateForFloatRewardsToReturn(_r) {
-  ((_r.smocked.addNewStateForFloatRewards.will.return()));
-  
-}
-
-function addNewStateForFloatRewardsCalls(_r) {
-  var array = _r.smocked.addNewStateForFloatRewards.calls;
-  return Belt_Array.map(array, (function (param) {
-                return {
-                        marketIndex: param[0],
-                        longPrice: param[1],
-                        shortPrice: param[2],
-                        longValue: param[3],
-                        shortValue: param[4]
-                      };
-              }));
-}
-
 function mockAdminToReturn(_r, _param0) {
   ((_r.smocked.admin.will.return.with([_param0])));
   
@@ -78,67 +42,6 @@ function batchedStakeCalls(_r) {
                 return {
                         param0: param[0],
                         param1: param[1]
-                      };
-              }));
-}
-
-function mockChangeAdminToReturn(_r) {
-  ((_r.smocked.changeAdmin.will.return()));
-  
-}
-
-function changeAdminCalls(_r) {
-  var array = _r.smocked.changeAdmin.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var admin = _m[0];
-                return {
-                        admin: admin
-                      };
-              }));
-}
-
-function mockChangeFloatPercentageToReturn(_r) {
-  ((_r.smocked.changeFloatPercentage.will.return()));
-  
-}
-
-function changeFloatPercentageCalls(_r) {
-  var array = _r.smocked.changeFloatPercentage.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var newPercentage = _m[0];
-                return {
-                        newPercentage: newPercentage
-                      };
-              }));
-}
-
-function mockChangeMarketLaunchIncentiveParametersToReturn(_r) {
-  ((_r.smocked.changeMarketLaunchIncentiveParameters.will.return()));
-  
-}
-
-function changeMarketLaunchIncentiveParametersCalls(_r) {
-  var array = _r.smocked.changeMarketLaunchIncentiveParameters.calls;
-  return Belt_Array.map(array, (function (param) {
-                return {
-                        marketIndex: param[0],
-                        period: param[1],
-                        initialMultiplier: param[2]
-                      };
-              }));
-}
-
-function mockClaimFloatCustomToReturn(_r) {
-  ((_r.smocked.claimFloatCustom.will.return()));
-  
-}
-
-function claimFloatCustomCalls(_r) {
-  var array = _r.smocked.claimFloatCustom.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var marketIndexes = _m[0];
-                return {
-                        marketIndexes: marketIndexes
                       };
               }));
 }
@@ -176,23 +79,6 @@ function floatTokenCalls(_r) {
   var array = _r.smocked.floatToken.calls;
   return Belt_Array.map(array, (function (param) {
                 
-              }));
-}
-
-function mockInitializeToReturn(_r) {
-  ((_r.smocked.initialize.will.return()));
-  
-}
-
-function initializeCalls(_r) {
-  var array = _r.smocked.initialize.calls;
-  return Belt_Array.map(array, (function (param) {
-                return {
-                        admin: param[0],
-                        longShortCoreContract: param[1],
-                        floatToken: param[2],
-                        floatCapital: param[3]
-                      };
               }));
 }
 
@@ -268,21 +154,6 @@ function marketLaunchIncentivePeriodCalls(_r) {
               }));
 }
 
-function mockStakeFromUserToReturn(_r) {
-  ((_r.smocked.stakeFromUser.will.return()));
-  
-}
-
-function stakeFromUserCalls(_r) {
-  var array = _r.smocked.stakeFromUser.calls;
-  return Belt_Array.map(array, (function (param) {
-                return {
-                        from: param[0],
-                        amount: param[1]
-                      };
-              }));
-}
-
 function mockSyntheticRewardParamsToReturn(_r, _param0, _param1, _param2) {
   ((_r.smocked.syntheticRewardParams.will.return.with([_param0,_param1,_param2])));
   
@@ -339,6 +210,135 @@ function userIndexOfLastClaimedRewardCalls(_r) {
                 return {
                         param0: param[0],
                         param1: param[1]
+                      };
+              }));
+}
+
+function mockInitializeToReturn(_r) {
+  ((_r.smocked.initialize.will.return()));
+  
+}
+
+function initializeCalls(_r) {
+  var array = _r.smocked.initialize.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        admin: param[0],
+                        longShortCoreContract: param[1],
+                        floatToken: param[2],
+                        floatCapital: param[3]
+                      };
+              }));
+}
+
+function mockChangeAdminToReturn(_r) {
+  ((_r.smocked.changeAdmin.will.return()));
+  
+}
+
+function changeAdminCalls(_r) {
+  var array = _r.smocked.changeAdmin.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var admin = _m[0];
+                return {
+                        admin: admin
+                      };
+              }));
+}
+
+function mockChangeFloatPercentageToReturn(_r) {
+  ((_r.smocked.changeFloatPercentage.will.return()));
+  
+}
+
+function changeFloatPercentageCalls(_r) {
+  var array = _r.smocked.changeFloatPercentage.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var newPercentage = _m[0];
+                return {
+                        newPercentage: newPercentage
+                      };
+              }));
+}
+
+function mockChangeMarketLaunchIncentiveParametersToReturn(_r) {
+  ((_r.smocked.changeMarketLaunchIncentiveParameters.will.return()));
+  
+}
+
+function changeMarketLaunchIncentiveParametersCalls(_r) {
+  var array = _r.smocked.changeMarketLaunchIncentiveParameters.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        marketIndex: param[0],
+                        period: param[1],
+                        initialMultiplier: param[2]
+                      };
+              }));
+}
+
+function mockAddNewStakingFundToReturn(_r) {
+  ((_r.smocked.addNewStakingFund.will.return()));
+  
+}
+
+function addNewStakingFundCalls(_r) {
+  var array = _r.smocked.addNewStakingFund.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        marketIndex: param[0],
+                        longToken: param[1],
+                        shortToken: param[2],
+                        kInitialMultiplier: param[3],
+                        kPeriod: param[4]
+                      };
+              }));
+}
+
+function mockAddNewStateForFloatRewardsToReturn(_r) {
+  ((_r.smocked.addNewStateForFloatRewards.will.return()));
+  
+}
+
+function addNewStateForFloatRewardsCalls(_r) {
+  var array = _r.smocked.addNewStateForFloatRewards.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        marketIndex: param[0],
+                        longPrice: param[1],
+                        shortPrice: param[2],
+                        longValue: param[3],
+                        shortValue: param[4]
+                      };
+              }));
+}
+
+function mockClaimFloatCustomToReturn(_r) {
+  ((_r.smocked.claimFloatCustom.will.return()));
+  
+}
+
+function claimFloatCustomCalls(_r) {
+  var array = _r.smocked.claimFloatCustom.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var marketIndexes = _m[0];
+                return {
+                        marketIndexes: marketIndexes
+                      };
+              }));
+}
+
+function mockStakeFromUserToReturn(_r) {
+  ((_r.smocked.stakeFromUser.will.return()));
+  
+}
+
+function stakeFromUserCalls(_r) {
+  var array = _r.smocked.stakeFromUser.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        from: param[0],
+                        amount: param[1]
                       };
               }));
 }
@@ -1159,30 +1159,16 @@ var uninitializedValue;
 exports.uninitializedValue = uninitializedValue;
 exports.mockFLOAT_ISSUANCE_FIXED_DECIMALToReturn = mockFLOAT_ISSUANCE_FIXED_DECIMALToReturn;
 exports.fLOAT_ISSUANCE_FIXED_DECIMALCalls = fLOAT_ISSUANCE_FIXED_DECIMALCalls;
-exports.mockAddNewStakingFundToReturn = mockAddNewStakingFundToReturn;
-exports.addNewStakingFundCalls = addNewStakingFundCalls;
-exports.mockAddNewStateForFloatRewardsToReturn = mockAddNewStateForFloatRewardsToReturn;
-exports.addNewStateForFloatRewardsCalls = addNewStateForFloatRewardsCalls;
 exports.mockAdminToReturn = mockAdminToReturn;
 exports.adminCalls = adminCalls;
 exports.mockBatchedStakeToReturn = mockBatchedStakeToReturn;
 exports.batchedStakeCalls = batchedStakeCalls;
-exports.mockChangeAdminToReturn = mockChangeAdminToReturn;
-exports.changeAdminCalls = changeAdminCalls;
-exports.mockChangeFloatPercentageToReturn = mockChangeFloatPercentageToReturn;
-exports.changeFloatPercentageCalls = changeFloatPercentageCalls;
-exports.mockChangeMarketLaunchIncentiveParametersToReturn = mockChangeMarketLaunchIncentiveParametersToReturn;
-exports.changeMarketLaunchIncentiveParametersCalls = changeMarketLaunchIncentiveParametersCalls;
-exports.mockClaimFloatCustomToReturn = mockClaimFloatCustomToReturn;
-exports.claimFloatCustomCalls = claimFloatCustomCalls;
 exports.mockFloatCapitalToReturn = mockFloatCapitalToReturn;
 exports.floatCapitalCalls = floatCapitalCalls;
 exports.mockFloatPercentageToReturn = mockFloatPercentageToReturn;
 exports.floatPercentageCalls = floatPercentageCalls;
 exports.mockFloatTokenToReturn = mockFloatTokenToReturn;
 exports.floatTokenCalls = floatTokenCalls;
-exports.mockInitializeToReturn = mockInitializeToReturn;
-exports.initializeCalls = initializeCalls;
 exports.mockLatestRewardIndexToReturn = mockLatestRewardIndexToReturn;
 exports.latestRewardIndexCalls = latestRewardIndexCalls;
 exports.mockLongShortCoreContractToReturn = mockLongShortCoreContractToReturn;
@@ -1193,8 +1179,6 @@ exports.mockMarketLaunchIncentiveMultipliersToReturn = mockMarketLaunchIncentive
 exports.marketLaunchIncentiveMultipliersCalls = marketLaunchIncentiveMultipliersCalls;
 exports.mockMarketLaunchIncentivePeriodToReturn = mockMarketLaunchIncentivePeriodToReturn;
 exports.marketLaunchIncentivePeriodCalls = marketLaunchIncentivePeriodCalls;
-exports.mockStakeFromUserToReturn = mockStakeFromUserToReturn;
-exports.stakeFromUserCalls = stakeFromUserCalls;
 exports.mockSyntheticRewardParamsToReturn = mockSyntheticRewardParamsToReturn;
 exports.syntheticRewardParamsCalls = syntheticRewardParamsCalls;
 exports.mockSyntheticTokensToReturn = mockSyntheticTokensToReturn;
@@ -1203,6 +1187,22 @@ exports.mockUserAmountStakedToReturn = mockUserAmountStakedToReturn;
 exports.userAmountStakedCalls = userAmountStakedCalls;
 exports.mockUserIndexOfLastClaimedRewardToReturn = mockUserIndexOfLastClaimedRewardToReturn;
 exports.userIndexOfLastClaimedRewardCalls = userIndexOfLastClaimedRewardCalls;
+exports.mockInitializeToReturn = mockInitializeToReturn;
+exports.initializeCalls = initializeCalls;
+exports.mockChangeAdminToReturn = mockChangeAdminToReturn;
+exports.changeAdminCalls = changeAdminCalls;
+exports.mockChangeFloatPercentageToReturn = mockChangeFloatPercentageToReturn;
+exports.changeFloatPercentageCalls = changeFloatPercentageCalls;
+exports.mockChangeMarketLaunchIncentiveParametersToReturn = mockChangeMarketLaunchIncentiveParametersToReturn;
+exports.changeMarketLaunchIncentiveParametersCalls = changeMarketLaunchIncentiveParametersCalls;
+exports.mockAddNewStakingFundToReturn = mockAddNewStakingFundToReturn;
+exports.addNewStakingFundCalls = addNewStakingFundCalls;
+exports.mockAddNewStateForFloatRewardsToReturn = mockAddNewStateForFloatRewardsToReturn;
+exports.addNewStateForFloatRewardsCalls = addNewStateForFloatRewardsCalls;
+exports.mockClaimFloatCustomToReturn = mockClaimFloatCustomToReturn;
+exports.claimFloatCustomCalls = claimFloatCustomCalls;
+exports.mockStakeFromUserToReturn = mockStakeFromUserToReturn;
+exports.stakeFromUserCalls = stakeFromUserCalls;
 exports.mockWithdrawToReturn = mockWithdrawToReturn;
 exports.withdrawCalls = withdrawCalls;
 exports.mockWithdrawAllToReturn = mockWithdrawAllToReturn;

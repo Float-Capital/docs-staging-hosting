@@ -13,19 +13,19 @@ slug: /addresses
 
 NOTE: these testnet addresses are frequently changing during development 👷‍♀️👷
 
-<!-- See our contract **[Deployer address](https://explorer-mumbai.maticvigil.com/address/0x97D247303960fC0FCA4fD703f3dAaf0ADdA07598/)** to keep abreast with the latest deployments. -->
+<!-- See our contract **[Deployer address](https://mumbai.polygonscan.com/address/0x97D247303960fC0FCA4fD703f3dAaf0ADdA07598/)** to keep abreast with the latest deployments. -->
 
 ### Contracts
 
 ```javascript
 // Deployer: "0x97D247303960fC0FCA4fD703f3dAaf0ADdA07598",
-FloatCapital_v0: "0x27Ce339868C91a339f3151144fe5Cda543682665",
-FloatToken: "0x20C47B5C209197ecDf71b137d79d502C2E6dccA5",
-LongShort: "0x3Fe666e021714eaF51e061D8efFCc6fA4b390DC0",
-Migrations: "0x6371C726b545954AEc5571CB3544142527D39CA0",
-Staker: "0xb3349B93b44D805a4199c75397c3C328ce21167b",
-TokenFactory: "0x1aA97e5cE92C133073aCb11f794BD1D7fe6d4690",
-Treasury_v0: "0x5131B61672C70453D0cbDe2f57bc0c6dbF21cE3b"
+FloatCapital_v0: "0x044442964722D64F74cE23fD2dd673aA640dd826",
+FloatToken: "0x19fef342141dcC979cABe50e047F8DBFF34620C2",
+LongShort: "0x2Ad2f96bc061Fbb9A8BDbA6cc50Ef2386F316E87",
+Migrations: "0x7230cAA8dE12658521b396Cb451f888fDBf91d64",
+Staker: "0x1EFc923e8667d5ABf6AB722C5AA2711C08d4BbB2",
+TokenFactory: "0x54eAE8a1CBB1613d3453E2ee6338ECd6910459f2",
+Treasury_v0: "0xe75c7A634Ce9135f4F5826569E19af4Fdc6b065f",
 Dai: "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F"
 ```
 

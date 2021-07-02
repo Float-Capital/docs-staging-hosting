@@ -19,7 +19,7 @@ const FloatToken = artifacts.require(FLOAT_TOKEN);
 const TokenFactory = artifacts.require(TOKEN_FACTORY);
 const FloatCapital = artifacts.require(FLOAT_CAPITAL);
 
-module.exports = async function(deployer, networkName, accounts) {
+module.exports = async function (deployer, networkName, accounts) {
   if (networkName == "matic") {
     throw "Don't save or run this migration if on mainnet (remove when ready)";
   }
@@ -90,19 +90,18 @@ module.exports = async function(deployer, networkName, accounts) {
 
   if (networkName == "mumbai") {
     const adminInstance = await getAdminInstance();
-    console.log(`To verify all these contracts run the following:
 
-    \`yarn hardhat --network ${networkName} tenderly:verify TokenFactory=${
-      (await TokenFactory.deployed()).address
-    } FloatToken=${
-      (await FloatToken.deployed()).address
-    } Treasury_v0=${await adminInstance.getProxyImplementation(
+    console.log(`To verify all these contracts run the following:
+    
+    \`truffle run verify TokenFactory FloatToken Treasury_v0@${await adminInstance.getProxyImplementation(
       treasury.address
-    )} LongShort=${await adminInstance.getProxyImplementation(
-      longShort.address
-    )} FloatCapital_v0=${await adminInstance.getProxyImplementation(
+    )} FloatCapital_v0@${await adminInstance.getProxyImplementation(
       floatCapital.address
-    )} Staker=${await adminInstance.getProxyImplementation(staker.address)}\``);
+    )} Staker@${await adminInstance.getProxyImplementation(
+      staker.address
+    )} LongShort@${await adminInstance.getProxyImplementation(
+      longShort.address
+    )} --network mumbai\``);
 
     /**
      * KEEP THESE FOR REFERENCE - shows how to verify contracts in tenderly automatically using ethers:
@@ -142,7 +141,7 @@ module.exports = async function(deployer, networkName, accounts) {
       )
     }
   ]
-
+ 
   await hardhat.tenderly.verify(...contracts)
      */
   }

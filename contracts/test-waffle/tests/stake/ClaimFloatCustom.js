@@ -33,7 +33,7 @@ function test(contracts, accounts) {
             return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "claimFloatCustom", contracts, accounts), (function (param) {
                           return LetOps.AwaitThen.let_(Smock.smockit(contracts.contents.longShort), (function (longShortSmocked) {
                                         longShortSmockedRef.contents = longShortSmocked;
-                                        LongShortSmocked.mock_updateSystemStateMultiToReturn(longShortSmocked);
+                                        LongShortSmocked.mockUpdateSystemStateMultiToReturn(longShortSmocked);
                                         StakerSmocked.InternalMock.mock_claimFloatToReturn(undefined);
                                         return LetOps.AwaitThen.let_(stakerRef.contents.setClaimFloatCustomParams(longShortSmockedRef.contents.address), (function (param) {
                                                       var promise = stakerRef.contents.claimFloatCustom(marketIndices);
@@ -53,13 +53,13 @@ function test(contracts, accounts) {
                         return setup(marketIndices, true);
                       });
                   it("calls LongShort.updateSystemStateMulti for the markets", (function () {
-                          return Chai.recordEqualDeep(Belt_Array.getExn(LongShortSmocked._updateSystemStateMultiCalls(longShortSmockedRef.contents), 0), {
+                          return Chai.recordEqualDeep(Belt_Array.getExn(LongShortSmocked.updateSystemStateMultiCalls(longShortSmockedRef.contents), 0), {
                                       marketIndexes: marketIndices
                                     });
                         }));
                   it("calls _claimFloat with the correct arguments", (function () {
                           return Chai.recordEqualDeep(Belt_Array.getExn(StakerSmocked.InternalMock._claimFloatCalls(undefined), 0), {
-                                      marketIndex: marketIndices
+                                      marketIndexes: marketIndices
                                     });
                         }));
                   

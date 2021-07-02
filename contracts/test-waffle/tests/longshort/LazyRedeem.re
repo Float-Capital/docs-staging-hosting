@@ -85,7 +85,7 @@ let testIntegration =
       let%AwaitThen _ =
         oracleManager->OracleManagerMock.setPrice(~newPrice=nextPrice);
 
-      let%AwaitThen _ = longShort->LongShort._updateSystemState(~marketIndex);
+      let%AwaitThen _ = longShort->LongShort.updateSystemState(~marketIndex);
       let%AwaitThen latestUpdateIndex =
         longShort->LongShort.marketUpdateIndex(marketIndex);
       let%AwaitThen redemptionPriceWithFees =

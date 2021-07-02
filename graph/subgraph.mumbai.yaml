@@ -6,9 +6,9 @@ dataSources:
     name: LongShort
     network: mumbai
     source:
-      address: "0x3Fe666e021714eaF51e061D8efFCc6fA4b390DC0"
+      address: "0x2Ad2f96bc061Fbb9A8BDbA6cc50Ef2386F316E87"
       abi: LongShort
-      startBlock: 15176498
+      startBlock: 15798654
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -57,9 +57,9 @@ dataSources:
     name: Staker
     network: mumbai
     source:
-      address: "0xb3349B93b44D805a4199c75397c3C328ce21167b"
+      address: "0x8046bD40C9925F78a2b2Ea8D6422EF6049035382"
       abi: Staker
-      startBlock: 15176483
+      startBlock: 15798654
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -89,7 +89,7 @@ dataSources:
         - event: StakeWithdrawn(address,address,uint256)
           handler: handleStakeWithdrawn
         - event: StateAdded(uint32,uint256,uint256,uint256)
-          handler: handleStateAddedd
+          handler: handleStateAdded
       file: ./src/staker.ts
 
 templates:

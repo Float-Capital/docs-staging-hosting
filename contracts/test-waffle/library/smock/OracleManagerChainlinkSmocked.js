@@ -27,6 +27,18 @@ function chainlinkOracleCalls(_r) {
               }));
 }
 
+function mockOracleDecimalsToReturn(_r, _param0) {
+  ((_r.smocked.oracleDecimals.will.return.with([_param0])));
+  
+}
+
+function oracleDecimalsCalls(_r) {
+  var array = _r.smocked.oracleDecimals.calls;
+  return Belt_Array.map(array, (function (param) {
+                
+              }));
+}
+
 function mockChangeAdminToReturn(_r) {
   ((_r.smocked.changeAdmin.will.return()));
   
@@ -54,18 +66,6 @@ function getLatestPriceCalls(_r) {
               }));
 }
 
-function mockOracleDecimalsToReturn(_r, _param0) {
-  ((_r.smocked.oracleDecimals.will.return.with([_param0])));
-  
-}
-
-function oracleDecimalsCalls(_r) {
-  var array = _r.smocked.oracleDecimals.calls;
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
 function mockUpdatePriceToReturn(_r, _param0) {
   ((_r.smocked.updatePrice.will.return.with([_param0])));
   
@@ -85,12 +85,12 @@ exports.mockAdminToReturn = mockAdminToReturn;
 exports.adminCalls = adminCalls;
 exports.mockChainlinkOracleToReturn = mockChainlinkOracleToReturn;
 exports.chainlinkOracleCalls = chainlinkOracleCalls;
+exports.mockOracleDecimalsToReturn = mockOracleDecimalsToReturn;
+exports.oracleDecimalsCalls = oracleDecimalsCalls;
 exports.mockChangeAdminToReturn = mockChangeAdminToReturn;
 exports.changeAdminCalls = changeAdminCalls;
 exports.mockGetLatestPriceToReturn = mockGetLatestPriceToReturn;
 exports.getLatestPriceCalls = getLatestPriceCalls;
-exports.mockOracleDecimalsToReturn = mockOracleDecimalsToReturn;
-exports.oracleDecimalsCalls = oracleDecimalsCalls;
 exports.mockUpdatePriceToReturn = mockUpdatePriceToReturn;
 exports.updatePriceCalls = updatePriceCalls;
 /* No side effect */

@@ -25,7 +25,7 @@ let generateTestData =
           oracleManager->OracleManagerMock.setPrice(~newPrice=initialPrice);
 
         let%AwaitThen _ =
-          longShort->LongShort._updateSystemState(~marketIndex);
+          longShort->LongShort.updateSystemState(~marketIndex);
 
         let%AwaitThen _ =
           paymentToken->Contract.PaymentTokenHelpers.mintAndApprove(
@@ -76,7 +76,7 @@ let generateTestData =
                 oracleManager->OracleManagerMock.setPrice(~newPrice);
 
               let%AwaitThen _ =
-                longShort->LongShort._updateSystemState(~marketIndex);
+                longShort->LongShort.updateSystemState(~marketIndex);
               let%AwaitThen shortValue =
                 longShort->LongShort.syntheticTokenPoolValue(
                   marketIndex,
@@ -142,7 +142,7 @@ let generateTestData =
               let%AwaitThen _ =
                 oracleManager->OracleManagerMock.setPrice(~newPrice);
               let%AwaitThen _ =
-                longShort->LongShort._updateSystemState(~marketIndex);
+                longShort->LongShort.updateSystemState(~marketIndex);
               let%AwaitThen shortValue =
                 longShort->LongShort.syntheticTokenPoolValue(
                   marketIndex,

@@ -56,6 +56,19 @@ let adminCalls: t => array<adminCall> = _r => {
   })
 }
 
+let mockLongShortToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.longShort.will.return.with([_param0])")
+}
+
+type longShortCall
+
+let longShortCalls: t => array<longShortCall> = _r => {
+  let array = %raw("_r.smocked.longShort.calls")
+  array->Array.map(() => {
+    ()->Obj.magic
+  })
+}
+
 let mockChangeAdminToReturn: t => unit = _r => {
   let _ = %raw("_r.smocked.changeAdmin.will.return()")
 }
@@ -133,18 +146,5 @@ let createTokenShortCalls: t => array<createTokenShortCall> = _r => {
       staker: staker,
       marketIndex: marketIndex,
     }
-  })
-}
-
-let mockLongShortToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.longShort.will.return.with([_param0])")
-}
-
-type longShortCall
-
-let longShortCalls: t => array<longShortCall> = _r => {
-  let array = %raw("_r.smocked.longShort.calls")
-  array->Array.map(() => {
-    ()->Obj.magic
   })
 }

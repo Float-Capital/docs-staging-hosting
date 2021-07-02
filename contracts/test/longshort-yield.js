@@ -129,7 +129,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
       await yieldManager.settleWithYield(yieldAmount, {
         from: admin,
       });
-      await longShort._updateSystemState(marketIndex);
+      await longShort.updateSystemState(marketIndex);
 
       // Get changes in long/short value and check they match expectations.
       const longValue = await longShort.syntheticTokenBackedValue.call(0, marketIndex);
