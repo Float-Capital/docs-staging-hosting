@@ -29,18 +29,6 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         isLong = _isLong;
     }
 
-    modifier settleRemainingNextPriceExecutions(address user) {
-        if (user != address(longShort)) {
-            longShort.executeOutstandingNextPriceSettlementsUser(
-                user,
-                marketIndex
-            );
-        }
-        uint256 balance = ERC20.balanceOf(user);
-        uint256 balanceAll = balanceOf(user);
-        _;
-    }
-
     function synthRedeemBurn(address account, uint256 amount)
         external
         override
@@ -50,11 +38,7 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         _burn(account, amount);
     }
 
-    function stake(uint256 amount)
-        external
-        override
-        settleRemainingNextPriceExecutions(msg.sender)
-    {
+    function stake(uint256 amount) external override {
         // NOTE: this is safe, this function will throw "ERC20: transfer amount exceeds balance" if amount exceeds users balance
         _transfer(msg.sender, address(staker), amount);
 
@@ -75,12 +59,7 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         address sender,
         address recipient,
         uint256 amount
-    )
-        public
-        override(ERC20, IERC20)
-        settleRemainingNextPriceExecutions(sender)
-        returns (bool)
-    {
+    ) public override(ERC20, IERC20) returns (bool) {
         if (
             recipient == address(longShort) && msg.sender == address(longShort)
         ) {
@@ -92,13 +71,19 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         }
     }
 
-    // NOTE: we could use `_beforeTokenTransfer` here rather
-    function _transfer(
+    function _beforeTokenTransfer(
         address sender,
         address recipient,
         uint256 amount
     ) internal override {
-        ERC20._transfer(sender, recipient, amount);
+        if (sender != address(longShort)) {
+            longShort.executeOutstandingNextPriceSettlementsUser(
+                sender,
+                marketIndex
+            );
+        }
+        uint256 balance = ERC20.balanceOf(sender);
+        uint256 balanceAll = balanceOf(sender);
     }
 
     /**
