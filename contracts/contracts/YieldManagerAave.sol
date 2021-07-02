@@ -76,6 +76,9 @@ contract YieldManagerAave is IYieldManager {
         token = ERC20(_token);
         aToken = IERC20Upgradeable(_aToken);
         lendingPool = ILendingPool(_lendingPool);
+
+        // Approve tokens for aave lending pool maximally.
+        token.approve(address(lendingPool), type(uint256).max);
     }
 
     ////////////////////////////////////
@@ -93,9 +96,6 @@ contract YieldManagerAave is IYieldManager {
     function depositToken(uint256 amount) public override longShortOnly {
         // Transfer tokens to manager contract.
         token.transferFrom(longShort, address(this), amount);
-
-        // Transfer tokens to aToken contract to mint aTokens.
-        token.approve(address(lendingPool), amount);
 
         // Deposit the desired amount of tokens into the aave pool
         lendingPool.deposit(
