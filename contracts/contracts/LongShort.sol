@@ -438,6 +438,14 @@ contract LongShort is ILongShort, Initializable {
         return (amountPaymentToken * TEN_TO_THE_18) / price;
     }
 
+    /*
+    2 possible states for next price actions:
+        - "Pending" - means the next price update hasn't happened or been enacted on by the updateSystemState function.
+        - "Confirmed" - means the next price has been updated by the updateSystemState function. There is still outstanding (lazy) computation that needs to be executed per user in the batch.
+        - "Settled" - there is no more computation left for the user.
+        - "Non-existant" - user has no next price actions.
+    This function returns a calculated value only in the case of 'confirmed' next price actions. It should return zero for all other types of next price actions.
+    */
     function getUsersConfirmedButNotSettledBalance(
         address user,
         uint32 marketIndex,

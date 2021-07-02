@@ -176,8 +176,7 @@ contract YieldManagerAave is IYieldManager {
         lendingPool.withdraw(
             address(token),
             amountToWithdrawForTreasury,
-            address(this)
+            treasury
         );
-        token.transfer(treasury, amountToWithdrawForTreasury);
     }
 }
