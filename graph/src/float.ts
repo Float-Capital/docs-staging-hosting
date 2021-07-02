@@ -219,23 +219,23 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
       increaseUserMints(user, syntheticTokenLong, tokensMintedLong);
       increaseUserMints(user, syntheticTokenShort, tokensMintedShort);
 
-      let hasMint = tokensMintedLong.gt(ZERO) || tokensMintedShort.gt(ZERO);
-      if (hasMint) {
-        updateBalanceTransfer(
-          longTokenId,
-          userAddress,
-          tokensMintedLong,
-          false,
-          event
-        );
-        updateBalanceTransfer(
-          shortTokenId,
-          userAddress,
-          tokensMintedShort,
-          false,
-          event
-        );
-      }
+      // let hasMint = tokensMintedLong.gt(ZERO) || tokensMintedShort.gt(ZERO);
+      // if (hasMint) {
+      //   updateBalanceTransfer(
+      //     longTokenId,
+      //     userAddress,
+      //     tokensMintedLong,
+      //     false,
+      //     event
+      //   );
+      //   updateBalanceTransfer(
+      //     shortTokenId,
+      //     userAddress,
+      //     tokensMintedShort,
+      //     false,
+      //     event
+      //   );
+      // }
 
       // TODO: add fees when they are implemented!
       let paymentTokensToRedeemLong = userNextPriceAction.amountSynthTokenForWithdrawalLong
@@ -719,14 +719,14 @@ export function handleExecuteNextPriceMintSettlementUser(
   let amount = event.params.amount;
 
   // reverse double counting of tokenBalances from synth token TransferEvent
-  let synthToken = getSyntheticTokenByMarketIdAndTokenType(marketIndex, isLong);
-  updateBalanceTransfer(
-    synthToken.id,
-    userAddress,
-    amount,
-    true, // equivalent to minus
-    event
-  );
+  // let synthToken = getSyntheticTokenByMarketIdAndTokenType(marketIndex, isLong);
+  // updateBalanceTransfer(
+  //   synthToken.id,
+  //   userAddress,
+  //   amount,
+  //   true, // equivalent to minus
+  //   event
+  // );
 
   saveEventToStateChange(
     event,
