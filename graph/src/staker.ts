@@ -147,7 +147,7 @@ export function handleStateAdded(event: StateAdded): void {
       accumulativeShort.toString(),
     ],
     ["marketIndex", "stateIndex", "accumulativeLong", "accumulativeShort"],
-    ["uint32", "uint256", "uint256", "uint256", "uint256"],
+    ["uint32", "uint256", "uint256", "uint256"],
     [],
     []
   );

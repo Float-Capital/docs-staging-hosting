@@ -103,6 +103,7 @@ var query$1 = (require("@apollo/client").gql`
     price  {
       __typename
       price
+      timeUpdated
     }
   }
 `);
@@ -114,25 +115,29 @@ function parse$1(value) {
           id: value.id,
           price: {
             __typename: value$1.__typename,
-            price: GqlConverters.$$BigInt.parse(value$1.price)
+            price: GqlConverters.$$BigInt.parse(value$1.price),
+            timeUpdated: GqlConverters.$$BigInt.parse(value$1.timeUpdated)
           }
         };
 }
 
 function serialize$1(value) {
   var value$1 = value.price;
-  var value$2 = value$1.price;
+  var value$2 = value$1.timeUpdated;
   var value$3 = GqlConverters.$$BigInt.serialize(value$2);
-  var value$4 = value$1.__typename;
+  var value$4 = value$1.price;
+  var value$5 = GqlConverters.$$BigInt.serialize(value$4);
+  var value$6 = value$1.__typename;
   var price = {
-    __typename: value$4,
-    price: value$3
+    __typename: value$6,
+    price: value$5,
+    timeUpdated: value$3
   };
-  var value$5 = value.id;
-  var value$6 = value.__typename;
+  var value$7 = value.id;
+  var value$8 = value.__typename;
   return {
-          __typename: value$6,
-          id: value$5,
+          __typename: value$8,
+          id: value$7,
           price: price
         };
 }
@@ -2548,6 +2553,121 @@ var PriceHistory = {
 var Raw$29 = {};
 
 var query$29 = (require("@apollo/client").gql`
+  query ($intervalId: String!)  {
+    priceIntervalManager(id: $intervalId)  {
+      __typename
+      latestPriceInterval  {
+        __typename
+        startTimestamp
+        endPrice
+      }
+    }
+  }
+`);
+
+function parse$29(value) {
+  var value$1 = value.priceIntervalManager;
+  var tmp;
+  if (value$1 == null) {
+    tmp = undefined;
+  } else {
+    var value$2 = value$1.latestPriceInterval;
+    tmp = {
+      __typename: value$1.__typename,
+      latestPriceInterval: {
+        __typename: value$2.__typename,
+        startTimestamp: GqlConverters.$$Date.parse(value$2.startTimestamp),
+        endPrice: GqlConverters.$$BigInt.parse(value$2.endPrice)
+      }
+    };
+  }
+  return {
+          priceIntervalManager: tmp
+        };
+}
+
+function serialize$29(value) {
+  var value$1 = value.priceIntervalManager;
+  var priceIntervalManager;
+  if (value$1 !== undefined) {
+    var value$2 = value$1.latestPriceInterval;
+    var value$3 = value$2.endPrice;
+    var value$4 = GqlConverters.$$BigInt.serialize(value$3);
+    var value$5 = value$2.startTimestamp;
+    var value$6 = GqlConverters.$$Date.serialize(value$5);
+    var value$7 = value$2.__typename;
+    var latestPriceInterval = {
+      __typename: value$7,
+      startTimestamp: value$6,
+      endPrice: value$4
+    };
+    var value$8 = value$1.__typename;
+    priceIntervalManager = {
+      __typename: value$8,
+      latestPriceInterval: latestPriceInterval
+    };
+  } else {
+    priceIntervalManager = null;
+  }
+  return {
+          priceIntervalManager: priceIntervalManager
+        };
+}
+
+function serializeVariables$15(inp) {
+  return {
+          intervalId: inp.intervalId
+        };
+}
+
+function makeVariables$15(intervalId, param) {
+  return {
+          intervalId: intervalId
+        };
+}
+
+var LatestPrice_inner = {
+  Raw: Raw$29,
+  query: query$29,
+  parse: parse$29,
+  serialize: serialize$29,
+  serializeVariables: serializeVariables$15,
+  makeVariables: makeVariables$15
+};
+
+var include$15 = ApolloClient__React_Hooks_UseQuery.Extend({
+      query: query$29,
+      Raw: Raw$29,
+      parse: parse$29,
+      serialize: serialize$29,
+      serializeVariables: serializeVariables$15
+    });
+
+var LatestPrice_refetchQueryDescription = include$15.refetchQueryDescription;
+
+var LatestPrice_use = include$15.use;
+
+var LatestPrice_useLazy = include$15.useLazy;
+
+var LatestPrice_useLazyWithVariables = include$15.useLazyWithVariables;
+
+var LatestPrice = {
+  LatestPrice_inner: LatestPrice_inner,
+  Raw: Raw$29,
+  query: query$29,
+  parse: parse$29,
+  serialize: serialize$29,
+  serializeVariables: serializeVariables$15,
+  makeVariables: makeVariables$15,
+  refetchQueryDescription: LatestPrice_refetchQueryDescription,
+  use: LatestPrice_use,
+  useLazy: LatestPrice_useLazy,
+  useLazyWithVariables: LatestPrice_useLazyWithVariables
+};
+
+var Raw$30 = {};
+
+var query$30 = (require("@apollo/client").gql`
   query ($marketIndex: Int!)  {
     oracles(where: {marketIndex: $marketIndex})  {
       __typename
@@ -2557,7 +2677,7 @@ var query$29 = (require("@apollo/client").gql`
   }
 `);
 
-function parse$29(value) {
+function parse$30(value) {
   var value$1 = value.oracles;
   return {
           oracles: value$1.map(function (value) {
@@ -2570,7 +2690,7 @@ function parse$29(value) {
         };
 }
 
-function serialize$29(value) {
+function serialize$30(value) {
   var value$1 = value.oracles;
   var oracles = value$1.map(function (value) {
         var value$1 = value.lastUpdatedTimestamp;
@@ -2588,51 +2708,51 @@ function serialize$29(value) {
         };
 }
 
-function serializeVariables$15(inp) {
+function serializeVariables$16(inp) {
   return {
           marketIndex: inp.marketIndex
         };
 }
 
-function makeVariables$15(marketIndex, param) {
+function makeVariables$16(marketIndex, param) {
   return {
           marketIndex: marketIndex
         };
 }
 
 var OraclesLastUpdate_inner = {
-  Raw: Raw$29,
-  query: query$29,
-  parse: parse$29,
-  serialize: serialize$29,
-  serializeVariables: serializeVariables$15,
-  makeVariables: makeVariables$15
+  Raw: Raw$30,
+  query: query$30,
+  parse: parse$30,
+  serialize: serialize$30,
+  serializeVariables: serializeVariables$16,
+  makeVariables: makeVariables$16
 };
 
-var include$15 = ApolloClient__React_Hooks_UseQuery.Extend({
-      query: query$29,
-      Raw: Raw$29,
-      parse: parse$29,
-      serialize: serialize$29,
-      serializeVariables: serializeVariables$15
+var include$16 = ApolloClient__React_Hooks_UseQuery.Extend({
+      query: query$30,
+      Raw: Raw$30,
+      parse: parse$30,
+      serialize: serialize$30,
+      serializeVariables: serializeVariables$16
     });
 
-var OraclesLastUpdate_refetchQueryDescription = include$15.refetchQueryDescription;
+var OraclesLastUpdate_refetchQueryDescription = include$16.refetchQueryDescription;
 
-var OraclesLastUpdate_use = include$15.use;
+var OraclesLastUpdate_use = include$16.use;
 
-var OraclesLastUpdate_useLazy = include$15.useLazy;
+var OraclesLastUpdate_useLazy = include$16.useLazy;
 
-var OraclesLastUpdate_useLazyWithVariables = include$15.useLazyWithVariables;
+var OraclesLastUpdate_useLazyWithVariables = include$16.useLazyWithVariables;
 
 var OraclesLastUpdate = {
   OraclesLastUpdate_inner: OraclesLastUpdate_inner,
-  Raw: Raw$29,
-  query: query$29,
-  parse: parse$29,
-  serialize: serialize$29,
-  serializeVariables: serializeVariables$15,
-  makeVariables: makeVariables$15,
+  Raw: Raw$30,
+  query: query$30,
+  parse: parse$30,
+  serialize: serialize$30,
+  serializeVariables: serializeVariables$16,
+  makeVariables: makeVariables$16,
   refetchQueryDescription: OraclesLastUpdate_refetchQueryDescription,
   use: OraclesLastUpdate_use,
   useLazy: OraclesLastUpdate_useLazy,
@@ -2668,5 +2788,6 @@ exports.TokenMarketId = TokenMarketId;
 exports.GlobalState = GlobalState;
 exports.TokenPrice = TokenPrice;
 exports.PriceHistory = PriceHistory;
+exports.LatestPrice = LatestPrice;
 exports.OraclesLastUpdate = OraclesLastUpdate;
 /* query Not a pure module */

@@ -15,21 +15,6 @@ function adminCalls(_r) {
               }));
 }
 
-function mockChangeAdminToReturn(_r) {
-  ((_r.smocked.changeAdmin.will.return()));
-  
-}
-
-function changeAdminCalls(_r) {
-  var array = _r.smocked.changeAdmin.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var admin = _m[0];
-                return {
-                        admin: admin
-                      };
-              }));
-}
-
 function mockInitializeToReturn(_r) {
   ((_r.smocked.initialize.will.return()));
   
@@ -45,13 +30,28 @@ function initializeCalls(_r) {
               }));
 }
 
+function mockChangeAdminToReturn(_r) {
+  ((_r.smocked.changeAdmin.will.return()));
+  
+}
+
+function changeAdminCalls(_r) {
+  var array = _r.smocked.changeAdmin.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var admin = _m[0];
+                return {
+                        admin: admin
+                      };
+              }));
+}
+
 var uninitializedValue;
 
 exports.uninitializedValue = uninitializedValue;
 exports.mockAdminToReturn = mockAdminToReturn;
 exports.adminCalls = adminCalls;
-exports.mockChangeAdminToReturn = mockChangeAdminToReturn;
-exports.changeAdminCalls = changeAdminCalls;
 exports.mockInitializeToReturn = mockInitializeToReturn;
 exports.initializeCalls = initializeCalls;
+exports.mockChangeAdminToReturn = mockChangeAdminToReturn;
+exports.changeAdminCalls = changeAdminCalls;
 /* No side effect */

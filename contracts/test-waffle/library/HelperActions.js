@@ -13,10 +13,10 @@ function mintDirect(marketIndex, amount, token, user, longShort, oracleManagerMo
                 return LetOps.AwaitThen.let_(oracleManagerMock.getLatestPrice(), (function (currentOraclePrice) {
                               var tempOraclePrice = Globals.add(currentOraclePrice, Globals.bnFromInt(1));
                               oracleManagerMock.setPrice(tempOraclePrice);
-                              return LetOps.AwaitThen.let_(contract._updateSystemState(marketIndex), (function (param) {
+                              return LetOps.AwaitThen.let_(contract.updateSystemState(marketIndex), (function (param) {
                                             return LetOps.AwaitThen.let_(isLong ? contract.mintLongNextPrice(marketIndex, amount) : contract.mintShortNextPrice(marketIndex, amount), (function (_mintNextPrice) {
                                                           oracleManagerMock.setPrice(currentOraclePrice);
-                                                          return contract._updateSystemState(marketIndex);
+                                                          return contract.updateSystemState(marketIndex);
                                                         }));
                                           }));
                             }));

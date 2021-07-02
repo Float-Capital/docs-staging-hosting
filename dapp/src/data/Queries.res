@@ -23,6 +23,7 @@ fragment LatestSynthPrice on LatestPrice {
   id
   price {
     price
+    timeUpdated
   }
 }
 
@@ -348,6 +349,15 @@ query ($intervalId: String!, $numDataPoints: Int!) @ppxConfig(schema: "graphql_s
   }
 }`)
 
+module LatestPrice = %graphql(`
+query ($intervalId: String!) @ppxConfig(schema: "graphql_schema_price_history.json") {
+  priceIntervalManager(id: $intervalId) {
+    latestPriceInterval{
+      startTimestamp @ppxCustom(module: "Date")
+      endPrice
+    }
+  }
+}`)
 module OraclesLastUpdate = %graphql(`
 query ($marketIndex: Int!) @ppxConfig(schema: "graphql_schema_price_history.json") {  
   oracles (where: {marketIndex: $marketIndex}){

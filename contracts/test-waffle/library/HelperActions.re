@@ -24,7 +24,7 @@ let mintDirect =
   let tempOraclePrice = currentOraclePrice->add(bnFromInt(1));
   let _ =
     oracleManagerMock->OracleManagerMock.setPrice(~newPrice=tempOraclePrice);
-  let%AwaitThen _ = contract->LongShort._updateSystemState(~marketIndex);
+  let%AwaitThen _ = contract->LongShort.updateSystemState(~marketIndex);
   let%AwaitThen _mintNextPrice =
     if (isLong) {
       contract->LongShort.mintLongNextPrice(~marketIndex, ~amount);
@@ -36,7 +36,7 @@ let mintDirect =
     oracleManagerMock->OracleManagerMock.setPrice(
       ~newPrice=currentOraclePrice,
     );
-  contract->LongShort._updateSystemState(~marketIndex);
+  contract->LongShort.updateSystemState(~marketIndex);
 };
 let mintAndStakeDirect =
     (

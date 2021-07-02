@@ -295,46 +295,6 @@ let initializeCalls: t => array<initializeCall> = _r => {
   })
 }
 
-let mockInitialize3ToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.initialize3.will.return()")
-}
-
-type initialize3Call = {
-  name: string,
-  symbol: string,
-  stakerAddress: Ethers.ethAddress,
-}
-
-let initialize3Calls: t => array<initialize3Call> = _r => {
-  let array = %raw("_r.smocked.initialize3.calls")
-  array->Array.map(((name, symbol, stakerAddress)) => {
-    {
-      name: name,
-      symbol: symbol,
-      stakerAddress: stakerAddress,
-    }
-  })
-}
-
-let mockMintToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.mint.will.return()")
-}
-
-type mintCall = {
-  _to: Ethers.ethAddress,
-  amount: Ethers.BigNumber.t,
-}
-
-let mintCalls: t => array<mintCall> = _r => {
-  let array = %raw("_r.smocked.mint.calls")
-  array->Array.map(((_to, amount)) => {
-    {
-      _to: _to,
-      amount: amount,
-    }
-  })
-}
-
 let mockNameToReturn: (t, string) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.name.will.return.with([_param0])")
 }
@@ -505,5 +465,45 @@ let unpauseCalls: t => array<unpauseCall> = _r => {
   let array = %raw("_r.smocked.unpause.calls")
   array->Array.map(() => {
     ()->Obj.magic
+  })
+}
+
+let mockInitialize3ToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.initialize3.will.return()")
+}
+
+type initialize3Call = {
+  name: string,
+  symbol: string,
+  stakerAddress: Ethers.ethAddress,
+}
+
+let initialize3Calls: t => array<initialize3Call> = _r => {
+  let array = %raw("_r.smocked.initialize3.calls")
+  array->Array.map(((name, symbol, stakerAddress)) => {
+    {
+      name: name,
+      symbol: symbol,
+      stakerAddress: stakerAddress,
+    }
+  })
+}
+
+let mockMintToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.mint.will.return()")
+}
+
+type mintCall = {
+  _to: Ethers.ethAddress,
+  amount: Ethers.BigNumber.t,
+}
+
+let mintCalls: t => array<mintCall> = _r => {
+  let array = %raw("_r.smocked.mint.calls")
+  array->Array.map(((_to, amount)) => {
+    {
+      _to: _to,
+      amount: amount,
+    }
   })
 }

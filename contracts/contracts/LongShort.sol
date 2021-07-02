@@ -47,7 +47,6 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => bool) public marketExists;
     mapping(uint32 => uint256) public assetPrice;
     mapping(uint32 => uint256) public marketUpdateIndex;
-    mapping(uint32 => uint256) public totalFeesReservedForTreasury;
     mapping(uint32 => IERC20) public fundTokens;
     mapping(uint32 => IYieldManager) public yieldManagers;
     mapping(uint32 => IOracleManager) public oracleManagers;
@@ -419,8 +418,8 @@ contract LongShort is ILongShort, Initializable {
         returns (uint256 syntheticTokenPrice)
     {
         syntheticTokenPrice =
-            (syntheticTokenPoolValue[marketIndex][true] * TEN_TO_THE_18) /
-            syntheticTokens[marketIndex][true].totalSupply();
+            (syntheticTokenPoolValue[marketIndex][isLong] * TEN_TO_THE_18) /
+            syntheticTokens[marketIndex][isLong].totalSupply();
     }
 
     function _getAmountPaymentToken(uint256 amountSynth, uint256 price)
@@ -439,7 +438,15 @@ contract LongShort is ILongShort, Initializable {
         return (amountPaymentToken * TEN_TO_THE_18) / price;
     }
 
-    function getUsersPendingBalance(
+    /*
+    2 possible states for next price actions:
+        - "Pending" - means the next price update hasn't happened or been enacted on by the updateSystemState function.
+        - "Confirmed" - means the next price has been updated by the updateSystemState function. There is still outstanding (lazy) computation that needs to be executed per user in the batch.
+        - "Settled" - there is no more computation left for the user.
+        - "Non-existant" - user has no next price actions.
+    This function returns a calculated value only in the case of 'confirmed' next price actions. It should return zero for all other types of next price actions.
+    */
+    function getUsersConfirmedButNotSettledBalance(
         address user,
         uint32 marketIndex,
         bool isLong
@@ -579,8 +586,15 @@ contract LongShort is ILongShort, Initializable {
             marketIndex
         );
 
+        uint256 totalValueRealizedForMarket = syntheticTokenPoolValue[
+            marketIndex
+        ][true] + syntheticTokenPoolValue[marketIndex][false];
+
         uint256 marketAmount = yieldManagers[marketIndex]
-        .claimYieldAndGetMarketAmount(marketPcntE5);
+        .claimYieldAndGetMarketAmount(
+            totalValueRealizedForMarket,
+            marketPcntE5
+        );
 
         if (marketAmount > 0) {
             _distributeMarketAmount(marketIndex, marketAmount);
@@ -713,11 +727,11 @@ contract LongShort is ILongShort, Initializable {
         );
     }
 
-    function _updateSystemState(uint32 marketIndex) external override {
+    function updateSystemState(uint32 marketIndex) external override {
         _updateSystemStateInternal(marketIndex);
     }
 
-    function _updateSystemStateMulti(uint32[] calldata marketIndexes)
+    function updateSystemStateMulti(uint32[] calldata marketIndexes)
         external
         override
     {
@@ -743,6 +757,7 @@ contract LongShort is ILongShort, Initializable {
     /*
      * Returns locked funds from the market to the sender.
      */
+    // TODO STENT only called in 1 place: _handleBatchedRedeemSettlement
     function _withdrawFunds(
         uint32 marketIndex,
         uint256 amountLong,
@@ -821,48 +836,6 @@ contract LongShort is ILongShort, Initializable {
         // NB there will be issues here if not enough liquidity exists to withdraw
         // Boolean should be returned from yield manager and think how to appropriately handle this
         yieldManagers[marketIndex].withdrawToken(amount);
-
-        // Invariant: yield managers should never have more locked funds
-        // than the combined value of the market and held treasury funds.
-        // TODO STENT this check seems wierd. What happens if this fails? What is the recovery? Should it be an assert?
-        require(
-            yieldManagers[marketIndex].getTotalValueRealized() <=
-                syntheticTokenPoolValue[marketIndex][true] +
-                    syntheticTokenPoolValue[marketIndex][false] +
-                    totalFeesReservedForTreasury[marketIndex] +
-                    yieldManagers[marketIndex].getTotalReservedForTreasury()
-        );
-    }
-
-    /*
-     * Transfers the reserved treasury funds to the treasury contract. This is
-     * done async to avoid putting transfer gas costs on users every time they o
-     * pay fees or accrue yield.
-     *
-     * NOTE: doesn't affect markets, so no state refresh necessary
-     */
-    function transferTreasuryFunds(uint32 marketIndex) external {
-        uint256 totalValueReservedForTreasury = totalFeesReservedForTreasury[
-            marketIndex
-        ] + yieldManagers[marketIndex].getTotalReservedForTreasury();
-
-        if (totalValueReservedForTreasury == 0) {
-            return;
-        }
-
-        if (totalFeesReservedForTreasury[marketIndex] > 0) {
-            totalFeesReservedForTreasury[marketIndex] = 0;
-        }
-
-        if (yieldManagers[marketIndex].getTotalReservedForTreasury() > 0) {
-            yieldManagers[marketIndex].withdrawTreasuryFunds();
-        }
-
-        // Transfer funds to the treasury.
-        fundTokens[marketIndex].transfer(
-            treasury,
-            totalValueReservedForTreasury
-        );
     }
 
     /*╔═══════════════════════════╗
@@ -966,8 +939,8 @@ contract LongShort is ILongShort, Initializable {
         uint256 currentDepositAmount = userNextPriceDepositAmount[marketIndex][
             isLong
         ][user];
-        userNextPriceDepositAmount[marketIndex][isLong][user] = 0;
         if (currentDepositAmount > 0) {
+            userNextPriceDepositAmount[marketIndex][isLong][user] = 0;
             uint256 tokensToTransferToUser = _getAmountSynthToken(
                 currentDepositAmount,
                 syntheticTokenPriceSnapshot[marketIndex][isLong][
@@ -996,8 +969,8 @@ contract LongShort is ILongShort, Initializable {
         uint256 currentRedemptions = userNextPriceRedemptionAmount[marketIndex][
             isLong
         ][user];
-        userNextPriceRedemptionAmount[marketIndex][isLong][user] = 0;
         if (currentRedemptions > 0) {
+            userNextPriceRedemptionAmount[marketIndex][isLong][user] = 0;
             uint256 amountToRedeem = _getAmountPaymentToken(
                 currentRedemptions,
                 syntheticTokenPriceSnapshot[marketIndex][isLong][

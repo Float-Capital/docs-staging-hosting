@@ -312,21 +312,6 @@ function revokeRoleCalls(_r) {
               }));
 }
 
-function mockSetShouldMockTransferToReturn(_r) {
-  ((_r.smocked.setShouldMockTransfer.will.return()));
-  
-}
-
-function setShouldMockTransferCalls(_r) {
-  var array = _r.smocked.setShouldMockTransfer.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var value = _m[0];
-                return {
-                        value: value
-                      };
-              }));
-}
-
 function mockSupportsInterfaceToReturn(_r, _param0) {
   ((_r.smocked.supportsInterface.will.return.with([_param0])));
   
@@ -366,21 +351,6 @@ function totalSupplyCalls(_r) {
               }));
 }
 
-function mockTransferToReturn(_r, _param0) {
-  ((_r.smocked.transfer.will.return.with([_param0])));
-  
-}
-
-function transferCalls(_r) {
-  var array = _r.smocked.transfer.calls;
-  return Belt_Array.map(array, (function (param) {
-                return {
-                        recipient: param[0],
-                        amount: param[1]
-                      };
-              }));
-}
-
 function mockTransferFromToReturn(_r, _param0) {
   ((_r.smocked.transferFrom.will.return.with([_param0])));
   
@@ -406,6 +376,36 @@ function unpauseCalls(_r) {
   var array = _r.smocked.unpause.calls;
   return Belt_Array.map(array, (function (param) {
                 
+              }));
+}
+
+function mockSetShouldMockTransferToReturn(_r) {
+  ((_r.smocked.setShouldMockTransfer.will.return()));
+  
+}
+
+function setShouldMockTransferCalls(_r) {
+  var array = _r.smocked.setShouldMockTransfer.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var value = _m[0];
+                return {
+                        value: value
+                      };
+              }));
+}
+
+function mockTransferToReturn(_r, _param0) {
+  ((_r.smocked.transfer.will.return.with([_param0])));
+  
+}
+
+function transferCalls(_r) {
+  var array = _r.smocked.transfer.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        recipient: param[0],
+                        amount: param[1]
+                      };
               }));
 }
 
@@ -456,18 +456,18 @@ exports.mockRenounceRoleToReturn = mockRenounceRoleToReturn;
 exports.renounceRoleCalls = renounceRoleCalls;
 exports.mockRevokeRoleToReturn = mockRevokeRoleToReturn;
 exports.revokeRoleCalls = revokeRoleCalls;
-exports.mockSetShouldMockTransferToReturn = mockSetShouldMockTransferToReturn;
-exports.setShouldMockTransferCalls = setShouldMockTransferCalls;
 exports.mockSupportsInterfaceToReturn = mockSupportsInterfaceToReturn;
 exports.supportsInterfaceCalls = supportsInterfaceCalls;
 exports.mockSymbolToReturn = mockSymbolToReturn;
 exports.symbolCalls = symbolCalls;
 exports.mockTotalSupplyToReturn = mockTotalSupplyToReturn;
 exports.totalSupplyCalls = totalSupplyCalls;
-exports.mockTransferToReturn = mockTransferToReturn;
-exports.transferCalls = transferCalls;
 exports.mockTransferFromToReturn = mockTransferFromToReturn;
 exports.transferFromCalls = transferFromCalls;
 exports.mockUnpauseToReturn = mockUnpauseToReturn;
 exports.unpauseCalls = unpauseCalls;
+exports.mockSetShouldMockTransferToReturn = mockSetShouldMockTransferToReturn;
+exports.setShouldMockTransferCalls = setShouldMockTransferCalls;
+exports.mockTransferToReturn = mockTransferToReturn;
+exports.transferCalls = transferCalls;
 /* No side effect */

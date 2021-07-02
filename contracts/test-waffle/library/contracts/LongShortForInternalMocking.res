@@ -204,18 +204,6 @@ external _updateSystemStateInternalMock: (
   int,
 ) => JsPromise.t<_updateSystemStateInternalMockReturn> = "_updateSystemStateInternalMock"
 
-type _updateSystemStateMockReturn
-@send
-external _updateSystemStateMock: (t, int) => JsPromise.t<_updateSystemStateMockReturn> =
-  "_updateSystemStateMock"
-
-type _updateSystemStateMultiMockReturn
-@send
-external _updateSystemStateMultiMock: (
-  t,
-  array<int>,
-) => JsPromise.t<_updateSystemStateMultiMockReturn> = "_updateSystemStateMultiMock"
-
 type _withdrawFundsMockReturn
 @send
 external _withdrawFundsMock: (
@@ -308,14 +296,14 @@ external getTreasurySplitMock: (
   Ethers.BigNumber.t,
 ) => JsPromise.t<getTreasurySplitMockReturn> = "getTreasurySplitMock"
 
-type getUsersPendingBalanceMockReturn = Ethers.BigNumber.t
+type getUsersConfirmedButNotSettledBalanceMockReturn = Ethers.BigNumber.t
 @send
-external getUsersPendingBalanceMock: (
+external getUsersConfirmedButNotSettledBalanceMock: (
   t,
   Ethers.ethAddress,
   int,
   bool,
-) => JsPromise.t<getUsersPendingBalanceMockReturn> = "getUsersPendingBalanceMock"
+) => JsPromise.t<getUsersConfirmedButNotSettledBalanceMockReturn> = "getUsersConfirmedButNotSettledBalanceMock"
 
 type initializeMarketMockReturn
 @send
@@ -384,11 +372,6 @@ external redeemShortNextPriceMock: (
   Ethers.BigNumber.t,
 ) => JsPromise.t<redeemShortNextPriceMockReturn> = "redeemShortNextPriceMock"
 
-type transferTreasuryFundsMockReturn
-@send
-external transferTreasuryFundsMock: (t, int) => JsPromise.t<transferTreasuryFundsMockReturn> =
-  "transferTreasuryFundsMock"
-
 type treasuryOnlyMockReturn
 @send
 external treasuryOnlyMock: t => JsPromise.t<treasuryOnlyMockReturn> = "treasuryOnlyMock"
@@ -405,3 +388,15 @@ type updateSystemStateMarketMockReturn
 @send
 external updateSystemStateMarketMock: (t, int) => JsPromise.t<updateSystemStateMarketMockReturn> =
   "updateSystemStateMarketMock"
+
+type updateSystemStateMockReturn
+@send
+external updateSystemStateMock: (t, int) => JsPromise.t<updateSystemStateMockReturn> =
+  "updateSystemStateMock"
+
+type updateSystemStateMultiMockReturn
+@send
+external updateSystemStateMultiMock: (
+  t,
+  array<int>,
+) => JsPromise.t<updateSystemStateMultiMockReturn> = "updateSystemStateMultiMock"

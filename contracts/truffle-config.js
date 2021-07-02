@@ -35,6 +35,7 @@ const lazyCreateNetwork = (rpcUrl) => {
   return new Proxy({}, providerProxyHandler(rpcUrl, provider));
 };
 
+console.log({ etherscanApiKey })
 module.exports = {
   plugins: ["solidity-coverage", "truffle-plugin-verify"],
   networks: {

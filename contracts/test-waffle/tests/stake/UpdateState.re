@@ -29,7 +29,7 @@ let test =
 
       longShortSmockedRef := longShortSmocked;
 
-      longShortSmocked->LongShortSmocked.mock_updateSystemStateToReturn;
+      longShortSmocked->LongShortSmocked.mockUpdateSystemStateToReturn;
 
       let%AwaitThen _ =
         (stakerRef^)
@@ -45,7 +45,7 @@ let test =
 
     it'("calls longShort updateState with the market index of the token", () => {
       (longShortSmockedRef^)
-      ->LongShortSmocked._updateSystemStateCalls
+      ->LongShortSmocked.updateSystemStateCalls
       ->Array.getExn(0)
       ->Chai.recordEqualFlat({marketIndex: marketIndex})
     });

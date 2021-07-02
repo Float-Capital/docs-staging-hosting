@@ -1,11 +1,11 @@
 var secretsManager = require("../secretsManager.js");
 var ethers = require("ethers");
 
-const longShortContractAddress = "0x3Fe666e021714eaF51e061D8efFCc6fA4b390DC0";
+const longShortContractAddress = "0x2Ad2f96bc061Fbb9A8BDbA6cc50Ef2386F316E87";
 const longShortAbi = [
   "function getMarketSplit(uint32 marketIndex, uint256 amount) view returns (uint256 longAmount, uint256 shortAmount) @100000",
-  "function _updateSystemState(uint32 marketIndex) external @400000", //TODO: Optimise the gas here
-  "function _updateSystemStateMulti(uint32[] calldata marketIndexes) external @1800000", // TODO: remove _ in latest version of contracts
+  "function updateSystemState(uint32 marketIndex) external @400000", //TODO: Optimise the gas here
+  "function updateSystemStateMulti(uint32[] calldata marketIndexes) external @2800000", // TODO: remove _ in latest version of contracts
 ];
 
 let provider;
@@ -43,7 +43,7 @@ const runUpdateSystemStateMulti = async () => {
   );
 
   try {
-    let update = await contract.functions._updateSystemStateMulti(
+    let update = await contract.functions.updateSystemStateMulti(
       [1, 2, 3],
       defaultOptions
     );

@@ -112,7 +112,10 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         returns (uint256)
     {
         return
-            longShort.getUsersPendingBalance(account, marketIndex, isLong) +
-            ERC20.balanceOf(account);
+            longShort.getUsersConfirmedButNotSettledBalance(
+                account,
+                marketIndex,
+                isLong
+            ) + ERC20.balanceOf(account);
     }
 }
