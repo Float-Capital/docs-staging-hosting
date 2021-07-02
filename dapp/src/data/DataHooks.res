@@ -134,6 +134,7 @@ type synthBalanceMetadata = {
   totalLockedLong: Ethers.BigNumber.t,
   totalLockedShort: Ethers.BigNumber.t,
   syntheticPrice: Ethers.BigNumber.t,
+  syntheticPriceLastUpdated: Ethers.BigNumber.t,
 }
 
 type userSynthBalance = {
@@ -171,9 +172,9 @@ let useUsersBalances = (~userId) => {
             symbol,
             oracleAddress,
             marketIndex,
-            latestSystemState: {totalLockedLong, totalLockedShort, syntheticPrice},
+            latestSystemState: {totalLockedLong, totalLockedShort},
           },
-          latestPrice: {price: {price}},
+          latestPrice: {price: {price, timeUpdated: synthPriceUpdated}},
         },
       },
     ) => {
@@ -194,7 +195,8 @@ let useUsersBalances = (~userId) => {
           tokenSupply: tokenSupply,
           totalLockedLong: totalLockedLong,
           totalLockedShort: totalLockedShort,
-          syntheticPrice: syntheticPrice,
+          syntheticPrice: price,
+          syntheticPriceLastUpdated: synthPriceUpdated,
         },
       }
       {
@@ -488,32 +490,39 @@ let useSyntheticPrices = (
     totalLockedLong,
     totalLockedShort,
     syntheticPrice,
+    syntheticPriceLastUpdated,
   }: synthBalanceMetadata,
   ~tokenAddress,
   ~isLong,
 ) => {
   let initialTokenPriceResponse = useTokenPriceAtTime(~tokenAddress, ~timestamp)
-  let priceHistoryQuery = Queries.PriceHistory.use(
+  let priceHistoryQuery = Queries.LatestPrice.use(
     ~context=Client.createContext(Client.PriceHistory),
     {
       intervalId: `${oracleAddress->ethAdrToLowerStr}-${CONSTANTS.fiveMinutesInSeconds->Int.toString}`,
-      numDataPoints: 1,
     },
   )
   let finalPriceResponse =
     priceHistoryQuery
     ->Util.queryToResponse
     ->(
-      (response: graphResponse<Queries.PriceHistory.PriceHistory_inner.t>) =>
+      (response: graphResponse<Queries.LatestPrice.LatestPrice_inner.t>) =>
         switch response {
         | Loading => {
             let loading: graphResponse<Ethers.BigNumber.t> = Loading
             loading
           }
         | Response({
-            priceIntervalManager: Some({prices: [{endPrice, startTimestamp: priceQueryDate}]}),
+            priceIntervalManager: Some({
+              latestPriceInterval: {endPrice, startTimestamp: priceQueryDate},
+            }),
           }) =>
-          if priceQueryDate->getUnixTime->Ethers.BigNumber.fromInt->Ethers.BigNumber.gt(timestamp) {
+          if (
+            priceQueryDate
+            ->getUnixTime
+            ->Ethers.BigNumber.fromInt
+            ->Ethers.BigNumber.gt(syntheticPriceLastUpdated)
+          ) {
             Response(
               MarketSimulation.simulateMarketPriceChange(
                 ~oldPrice=syntheticPrice,
