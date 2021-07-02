@@ -286,8 +286,6 @@ let make = () => {
   let (selected, setSelected) = React.useState(_ => selectedTab->strToTab)
   let actionOption = router.query->Js.Dict.get("actionOption")->Option.getWithDefault("short")
   let longSelected = actionOption->Js.String.toLowerCase == "long"
-  Js.log("actionOption->Js.String.toLowerCase")
-  Js.log(actionOption->Js.String.toLowerCase)
   let marketInfo = useMarketInfo()
   let userHasBalances = useUserHasBalances(
     ~user,
