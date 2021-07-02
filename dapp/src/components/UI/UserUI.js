@@ -28,6 +28,30 @@ var RootProvider = require("../../libraries/RootProvider.js");
 var Belt_SetString = require("rescript/lib/js/belt_SetString.js");
 var InjectedEthereum = require("../../ethereum/InjectedEthereum.js");
 
+function add(prim0, prim1) {
+  return prim0.add(prim1);
+}
+
+function mul(prim0, prim1) {
+  return prim0.mul(prim1);
+}
+
+function div(prim0, prim1) {
+  return prim0.div(prim1);
+}
+
+function toNumber(prim) {
+  return prim.toNumber();
+}
+
+function eq(prim0, prim1) {
+  return prim0.eq(prim1);
+}
+
+function toString(prim) {
+  return prim.toString();
+}
+
 function UserUI$UserContainer(Props) {
   var children = Props.children;
   return React.createElement("div", {
@@ -312,10 +336,16 @@ function directionAndPercentageString(oldPrice, newPrice) {
 }
 
 function UserUI$UserPercentageGains(Props) {
-  var metadata = Props.metadata;
+  var oracleAddress = Props.oracleAddress;
+  var timeLastUpdated = Props.timeLastUpdated;
+  var tokenSupply = Props.tokenSupply;
+  var totalLockedLong = Props.totalLockedLong;
+  var totalLockedShort = Props.totalLockedShort;
+  var syntheticPrice = Props.syntheticPrice;
+  var syntheticPriceLastUpdated = Props.syntheticPriceLastUpdated;
   var tokenAddress = Props.tokenAddress;
   var isLong = Props.isLong;
-  var bothPrices = DataHooks.useSyntheticPrices(metadata, tokenAddress, isLong);
+  var bothPrices = DataHooks.useSyntheticPrices(oracleAddress, timeLastUpdated, tokenSupply, totalLockedLong, totalLockedShort, syntheticPrice, syntheticPriceLastUpdated, tokenAddress, isLong);
   var tmp;
   if (typeof bothPrices === "number") {
     tmp = React.createElement(Loader.Tiny.make, {});
@@ -361,16 +391,20 @@ var UserPercentageGains = {
 };
 
 function UserUI$UserTokenBox(Props) {
-  var name = Props.name;
-  var isLong = Props.isLong;
-  var tokens = Props.tokens;
-  var value = Props.value;
-  var tokenAddressOpt = Props.tokenAddress;
-  var symbolOpt = Props.symbol;
-  var metadata = Props.metadata;
+  var userBalanceData = Props.userBalanceData;
   var children = Props.children;
-  var tokenAddress = tokenAddressOpt !== undefined ? Caml_option.valFromOption(tokenAddressOpt) : CONSTANTS.zeroAddress;
-  var symbol = symbolOpt !== undefined ? symbolOpt : "";
+  var match = userBalanceData.syntheticToken;
+  var match$1 = match.latestPrice.price;
+  var price = match$1.price;
+  var match$2 = match.syntheticMarket;
+  var match$3 = match$2.latestSystemState;
+  var timeLastUpdated = userBalanceData.timeLastUpdated;
+  var tokenBalance = userBalanceData.tokenBalance;
+  var tokenAddress = Ethers$1.utils.getAddress(match.id);
+  var isLong = match.tokenType === "Long";
+  var tokens = Misc.NumberFormat.formatEther(undefined, tokenBalance);
+  var tokensValue = price.mul(tokenBalance).div(CONSTANTS.tenToThe18);
+  var value = Misc.NumberFormat.formatEther(undefined, tokensValue);
   return React.createElement("div", {
               className: "flex justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative"
             }, React.createElement("div", {
@@ -379,10 +413,10 @@ function UserUI$UserTokenBox(Props) {
                       tokenAddress: Ethers.Utils.ethAdrToStr(tokenAddress),
                       tokenName: (
                         isLong ? "fu" : "fd"
-                      ) + symbol
+                      ) + match$2.symbol
                     })), React.createElement("div", {
                   className: "pl-3 text-xs self-center"
-                }, name, React.createElement("br", {
+                }, match$2.name, React.createElement("br", {
                       className: "mt-1"
                     }), isLong ? "Long↗️" : "Short↘️"), React.createElement("div", {
                   className: "text-sm text-center self-center"
@@ -398,8 +432,14 @@ function UserUI$UserTokenBox(Props) {
                   className: "flex flex-col items-center justify-center"
                 }, React.createElement("div", {
                       className: "text-xs text-center text-gray-400"
-                    }, Globals.formatTimestamp(metadata.timeLastUpdated)), React.createElement(UserUI$UserPercentageGains, {
-                      metadata: metadata,
+                    }, Globals.formatTimestamp(timeLastUpdated)), React.createElement(UserUI$UserPercentageGains, {
+                      oracleAddress: match$2.oracleAddress,
+                      timeLastUpdated: timeLastUpdated,
+                      tokenSupply: match.tokenSupply,
+                      totalLockedLong: match$3.totalLockedLong,
+                      totalLockedShort: match$3.totalLockedShort,
+                      syntheticPrice: price,
+                      syntheticPriceLastUpdated: match$1.timeUpdated,
                       tokenAddress: tokenAddress,
                       isLong: isLong
                     })), React.createElement("div", {
@@ -473,15 +513,19 @@ var UserFloatEarnedFromStake = {
 };
 
 function UserUI$UserStakeBox(Props) {
-  var name = Props.name;
-  var isLong = Props.isLong;
-  var tokens = Props.tokens;
-  var value = Props.value;
-  var tokenAddressOpt = Props.tokenAddress;
-  var metadata = Props.metadata;
-  var creationTxHash = Props.creationTxHash;
+  var stake = Props.stake;
   var children = Props.children;
-  var tokenAddress = tokenAddressOpt !== undefined ? Caml_option.valFromOption(tokenAddressOpt) : CONSTANTS.zeroAddress;
+  var syntheticToken = stake.currentStake.syntheticToken;
+  var tokenAddress = Ethers$1.utils.getAddress(syntheticToken.id);
+  var name = syntheticToken.syntheticMarket.name;
+  var tokens = Misc.NumberFormat.formatEther(undefined, stake.currentStake.amount);
+  var isLong = syntheticToken.tokenType === "Long";
+  var price = syntheticToken.latestPrice.price.price;
+  var synthLastUpdated = syntheticToken.latestPrice.price.timeUpdated;
+  var match = syntheticToken.syntheticMarket;
+  var match$1 = match.latestSystemState;
+  var value = Misc.NumberFormat.formatEther(undefined, stake.currentStake.amount.mul(price).div(CONSTANTS.tenToThe18));
+  var creationTxHash = stake.currentStake.creationTxHash;
   return React.createElement("div", {
               className: "flex justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative"
             }, React.createElement("div", {
@@ -505,8 +549,14 @@ function UserUI$UserStakeBox(Props) {
                       href: Config.blockExplorer + "/tx/" + creationTxHash,
                       rel: "noopener noreferrer",
                       target: "_"
-                    }, Globals.formatTimestamp(metadata.timeLastUpdated)), React.createElement(UserUI$UserPercentageGains, {
-                      metadata: metadata,
+                    }, Globals.formatTimestamp(stake.currentStake.timestamp)), React.createElement(UserUI$UserPercentageGains, {
+                      oracleAddress: match.oracleAddress,
+                      timeLastUpdated: stake.currentStake.timestamp,
+                      tokenSupply: syntheticToken.tokenSupply,
+                      totalLockedLong: match$1.totalLockedLong,
+                      totalLockedShort: match$1.totalLockedShort,
+                      syntheticPrice: price,
+                      syntheticPriceLastUpdated: synthLastUpdated,
                       tokenAddress: tokenAddress,
                       isLong: isLong
                     })), React.createElement("div", {
@@ -519,21 +569,17 @@ var UserStakeBox = {
 };
 
 function UserUI$UserMarketStakeOrRedeem(Props) {
-  var synthAddress = Props.synthAddress;
-  var isLong = Props.isLong;
-  var marketIdResponse = DataHooks.useTokenMarketId(synthAddress);
+  var synthId = Props.synthId;
+  var syntheticSide = Props.syntheticSide;
+  var marketIdResponse = DataHooks.useTokenMarketId(synthId);
   var marketId = Belt_Option.getWithDefault(DataHooks.Util.graphResponseToOption(marketIdResponse), "1");
   var router = Router.useRouter();
   var stake = function (param) {
-    router.push("/?marketIndex=" + marketId + "&actionOption=" + (
-          isLong ? "long" : "short"
-        ) + "&tab=stake");
+    router.push("/?marketIndex=" + marketId + "&actionOption=" + syntheticSide + "&tab=stake");
     
   };
   var redeem = function (param) {
-    router.push("/?marketIndex=" + marketId + "&actionOption=" + (
-          isLong ? "long" : "short"
-        ) + "&tab=redeem");
+    router.push("/?marketIndex=" + marketId + "&actionOption=" + syntheticSide + "&tab=redeem");
     
   };
   return React.createElement("div", {
@@ -588,39 +634,9 @@ function UserUI$UserStakesCard(Props) {
         var key = "user-stakes-" + String(i);
         var syntheticToken = stake.currentStake.syntheticToken;
         var addr = Ethers$1.utils.getAddress(syntheticToken.id);
-        var name = syntheticToken.syntheticMarket.name;
-        var tokens = Misc.NumberFormat.formatEther(undefined, stake.currentStake.amount);
         var isLong = syntheticToken.tokenType === "Long";
-        var price = syntheticToken.latestPrice.price.price;
-        var synthLastUpdated = syntheticToken.latestPrice.price.timeUpdated;
-        var match = syntheticToken.syntheticMarket;
-        var match$1 = match.latestSystemState;
-        var metadata_timeLastUpdated = stake.currentStake.timestamp;
-        var metadata_oracleAddress = match.oracleAddress;
-        var metadata_marketIndex = match.marketIndex;
-        var metadata_tokenSupply = syntheticToken.tokenSupply;
-        var metadata_totalLockedLong = match$1.totalLockedLong;
-        var metadata_totalLockedShort = match$1.totalLockedShort;
-        var metadata = {
-          timeLastUpdated: metadata_timeLastUpdated,
-          oracleAddress: metadata_oracleAddress,
-          marketIndex: metadata_marketIndex,
-          tokenSupply: metadata_tokenSupply,
-          totalLockedLong: metadata_totalLockedLong,
-          totalLockedShort: metadata_totalLockedShort,
-          syntheticPrice: price,
-          syntheticPriceLastUpdated: synthLastUpdated
-        };
-        var value = stake.currentStake.amount.mul(price).div(CONSTANTS.tenToThe18);
-        var creationTxHash = stake.currentStake.creationTxHash;
         return React.createElement(UserUI$UserStakeBox, {
-                    name: name,
-                    isLong: isLong,
-                    tokens: tokens,
-                    value: Misc.NumberFormat.formatEther(undefined, value),
-                    tokenAddress: addr,
-                    metadata: metadata,
-                    creationTxHash: creationTxHash,
+                    stake: stake,
                     children: null,
                     key: key
                   }, React.createElement(UserUI$UserFloatEarnedFromStake, {
@@ -716,6 +732,12 @@ var UserFloatCard = {
   make: UserUI$UserFloatCard
 };
 
+exports.add = add;
+exports.mul = mul;
+exports.div = div;
+exports.toNumber = toNumber;
+exports.eq = eq;
+exports.toString = toString;
 exports.UserContainer = UserContainer;
 exports.UserTotalValue = UserTotalValue;
 exports.UserColumnContainer = UserColumnContainer;
