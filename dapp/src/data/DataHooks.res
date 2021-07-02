@@ -418,6 +418,7 @@ let useSyntheticPrices = (
   ~syntheticPrice,
   ~syntheticPriceLastUpdated,
   ~tokenAddress,
+  ~oldAssetPrice,
   ~isLong,
 ) => {
   let initialTokenPriceResponse = useTokenPriceAtTime(~tokenAddress, ~timestamp)
@@ -441,27 +442,28 @@ let useSyntheticPrices = (
             priceIntervalManager: Some({
               latestPriceInterval: {endPrice, startTimestamp: priceQueryDate},
             }),
-          }) =>
-          if (
-            priceQueryDate
-            ->getUnixTime
-            ->Ethers.BigNumber.fromInt
-            ->Ethers.BigNumber.gt(syntheticPriceLastUpdated)
-          ) {
-            Response(
-              MarketSimulation.simulateMarketPriceChange(
-                ~oldPrice=syntheticPrice,
-                ~newPrice=endPrice,
-                ~totalLockedLong,
-                ~totalLockedShort,
-                ~tokenIsLong=isLong,
-                ~tokenSupply,
-              ),
-            )
-          } else {
-            Response(syntheticPrice)
-          }
+          }) => {
+            let priceQueryTime = priceQueryDate->getUnixTime->Ethers.BigNumber.fromInt
 
+            if (
+              priceQueryTime->Ethers.BigNumber.gt(syntheticPriceLastUpdated) &&
+              !(oldAssetPrice->Ethers.BigNumber.eq(endPrice)) &&
+              priceQueryTime->Ethers.BigNumber.gt(timestamp)
+            ) {
+              Response(
+                MarketSimulation.simulateMarketPriceChange(
+                  ~oldPrice=oldAssetPrice,
+                  ~newPrice=endPrice,
+                  ~totalLockedLong,
+                  ~totalLockedShort,
+                  ~tokenIsLong=isLong,
+                  ~tokenSupply,
+                ),
+              )
+            } else {
+              Response(syntheticPrice)
+            }
+          }
         | Response(_) => GraphError(`Unspecifed graph error`)
         | GraphError(s) => GraphError(s)
         }

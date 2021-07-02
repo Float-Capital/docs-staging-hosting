@@ -389,8 +389,6 @@ function MarketInteractionCard(Props) {
   var selected = match[0];
   var actionOption = Belt_Option.getWithDefault(Js_dict.get(router.query, "actionOption"), "short");
   var longSelected = actionOption.toLowerCase() === "long";
-  console.log("actionOption->Js.String.toLowerCase");
-  console.log(actionOption.toLowerCase());
   var marketInfo = useMarketInfo(undefined);
   var userHasBalances = useUserHasBalances(user, DataHooks.Util.graphResponseToOption(marketInfo));
   var userHasStakes = useUserHasStakes(user, DataHooks.Util.graphResponseToOption(marketInfo));
