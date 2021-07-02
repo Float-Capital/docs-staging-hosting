@@ -2,6 +2,7 @@ import { StateChange, EventParam, EventParams } from "../../generated/schema";
 import { BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import { ONE, ZERO_ADDRESS } from "../CONSTANTS";
 import { getOrCreateGlobalState, getOrCreateUser } from "./globalStateManager";
+import { EVENT_LOGGING } from "../config";
 
 function getEventIndex(txHash: Bytes): i32 {
   let stateChange = StateChange.load(txHash.toHex());
@@ -147,6 +148,18 @@ export function saveEventToStateChange(
   affectedStakes: Array<string>,
   toFloatContracts: bool = true
 ): void {
+  if (EVENT_LOGGING) {
+    log.warning(
+      "\nEvent Name: {} \n  Params:\n    {}\n  ParamTypes\n    {}\n  ParamValues\n    {}\n\n",
+      [
+        eventName,
+        parameterNames.join(),
+        parameterTypes.join(),
+        parameterValues.join(),
+      ]
+    );
+  }
+
   if (
     parameterValues.length !== parameterNames.length ||
     parameterNames.length !== parameterTypes.length
