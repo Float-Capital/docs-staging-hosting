@@ -27,7 +27,7 @@ function testIntegration(contracts, accounts) {
                                                                           return LetOps.AwaitThen.let_(oracleManager.getLatestPrice(), (function (previousPrice) {
                                                                                         var nextPrice = Globals.div(Globals.mul(previousPrice, Globals.bnFromInt(12)), Globals.bnFromInt(10));
                                                                                         return LetOps.AwaitThen.let_(oracleManager.setPrice(nextPrice), (function (param) {
-                                                                                                      return LetOps.AwaitThen.let_(longShort._updateSystemState(marketIndex), (function (param) {
+                                                                                                      return LetOps.AwaitThen.let_(longShort.updateSystemState(marketIndex), (function (param) {
                                                                                                                     return LetOps.AwaitThen.let_(longSynth.balanceOf(testUser.address), (function (usersBalanceBeforeSettlement) {
                                                                                                                                   return LetOps.AwaitThen.let_(longShort.connect(testUser).mintLongNextPrice(marketIndex, Globals.bnFromInt(0)), (function (param) {
                                                                                                                                                 return LetOps.AwaitThen.let_(longSynth.balanceOf(testUser.address), (function (usersUpdatedBalance) {

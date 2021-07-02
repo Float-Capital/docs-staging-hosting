@@ -275,7 +275,7 @@ contract("LongShort (staking)", (accounts) => {
 
     // Wait a long time to accumulate some float.
     await time.increase(1000);
-    await longShort._updateSystemState(marketIndex);
+    await longShort.updateSystemState(marketIndex);
 
     // Withdraw stake and earn accumulated float tokens.
     await staker.withdraw(longToken.address, new BN(oneHundred), {
@@ -287,7 +287,7 @@ contract("LongShort (staking)", (accounts) => {
 
     // Wait even longer to accumulate more float.
     await time.increase(2000);
-    await longShort._updateSystemState(marketIndex);
+    await longShort.updateSystemState(marketIndex);
 
     // Withdraw stake and earn accumulated float tokens.
     await staker.withdraw(longToken.address, new BN(oneHundred), {
@@ -312,7 +312,7 @@ contract("LongShort (staking)", (accounts) => {
     await fn(oneHundred, token, user1);
     for (let i = 0; i < iterations - 1; i++) {
       await time.increase(1);
-      await longShort._updateSystemState(marketIndex);
+      await longShort.updateSystemState(marketIndex);
     }
 
     // Get float parameters at current time for expected float calculation.

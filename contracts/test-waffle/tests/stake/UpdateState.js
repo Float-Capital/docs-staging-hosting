@@ -24,7 +24,7 @@ function test(contracts, accounts) {
                 return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "_updateState", contracts, accounts), (function (param) {
                               return LetOps.AwaitThen.let_(Smock.smockit(contracts.contents.longShort), (function (longShortSmocked) {
                                             longShortSmockedRef.contents = longShortSmocked;
-                                            LongShortSmocked.mock_updateSystemStateToReturn(longShortSmocked);
+                                            LongShortSmocked.mockUpdateSystemStateToReturn(longShortSmocked);
                                             return LetOps.AwaitThen.let_(stakerRef.contents.set_updateStateParams(longShortSmocked.address, syntheticAddress, marketIndex), (function (param) {
                                                           return stakerRef.contents._updateStateExternal(syntheticAddress);
                                                         }));
@@ -32,7 +32,7 @@ function test(contracts, accounts) {
                             }));
               });
           return Globals.it$p("calls longShort updateState with the market index of the token", (function (param) {
-                        return Chai.recordEqualFlat(Belt_Array.getExn(LongShortSmocked._updateSystemStateCalls(longShortSmockedRef.contents), 0), {
+                        return Chai.recordEqualFlat(Belt_Array.getExn(LongShortSmocked.updateSystemStateCalls(longShortSmockedRef.contents), 0), {
                                     marketIndex: marketIndex
                                   });
                       }));

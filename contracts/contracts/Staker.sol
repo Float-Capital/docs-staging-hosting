@@ -453,7 +453,7 @@ contract Staker is IStaker, Initializable {
     ////////////////////////////////////
 
     function _updateState(ISyntheticToken token) internal {
-        longShortCoreContract._updateSystemState(marketIndexOfToken[token]);
+        longShortCoreContract.updateSystemState(marketIndexOfToken[token]);
     }
 
     function calculateAccumulatedFloatHelper(
@@ -608,7 +608,7 @@ contract Staker is IStaker, Initializable {
 
     function claimFloatCustom(uint32[] calldata marketIndexes) external {
         require(marketIndexes.length <= 50); // Set some (arbitrary) limit on loop length
-        longShortCoreContract._updateSystemStateMulti(marketIndexes);
+        longShortCoreContract.updateSystemStateMulti(marketIndexes);
         _claimFloat(marketIndexes);
     }
 

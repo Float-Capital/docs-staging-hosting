@@ -15,18 +15,6 @@ function adminCalls(_r) {
               }));
 }
 
-function mockGetLatestPriceToReturn(_r, _param0) {
-  ((_r.smocked.getLatestPrice.will.return.with([_param0])));
-  
-}
-
-function getLatestPriceCalls(_r) {
-  var array = _r.smocked.getLatestPrice.calls;
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
 function mockSetPriceToReturn(_r) {
   ((_r.smocked.setPrice.will.return()));
   
@@ -54,15 +42,27 @@ function updatePriceCalls(_r) {
               }));
 }
 
+function mockGetLatestPriceToReturn(_r, _param0) {
+  ((_r.smocked.getLatestPrice.will.return.with([_param0])));
+  
+}
+
+function getLatestPriceCalls(_r) {
+  var array = _r.smocked.getLatestPrice.calls;
+  return Belt_Array.map(array, (function (param) {
+                
+              }));
+}
+
 var uninitializedValue;
 
 exports.uninitializedValue = uninitializedValue;
 exports.mockAdminToReturn = mockAdminToReturn;
 exports.adminCalls = adminCalls;
-exports.mockGetLatestPriceToReturn = mockGetLatestPriceToReturn;
-exports.getLatestPriceCalls = getLatestPriceCalls;
 exports.mockSetPriceToReturn = mockSetPriceToReturn;
 exports.setPriceCalls = setPriceCalls;
 exports.mockUpdatePriceToReturn = mockUpdatePriceToReturn;
 exports.updatePriceCalls = updatePriceCalls;
+exports.mockGetLatestPriceToReturn = mockGetLatestPriceToReturn;
+exports.getLatestPriceCalls = getLatestPriceCalls;
 /* No side effect */

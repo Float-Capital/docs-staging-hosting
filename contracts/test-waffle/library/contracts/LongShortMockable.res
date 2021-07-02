@@ -24,14 +24,6 @@ type tEN_TO_THE_5Return = Ethers.BigNumber.t
 @send
 external tEN_TO_THE_5: t => JsPromise.t<tEN_TO_THE_5Return> = "TEN_TO_THE_5"
 
-@send
-external _updateSystemState: (t, ~marketIndex: int) => JsPromise.t<transaction> =
-  "_updateSystemState"
-
-@send
-external _updateSystemStateMulti: (t, ~marketIndexes: array<int>) => JsPromise.t<transaction> =
-  "_updateSystemStateMulti"
-
 type adminReturn = Ethers.ethAddress
 @send
 external admin: t => JsPromise.t<adminReturn> = "admin"
@@ -139,14 +131,14 @@ external getTreasurySplit: (
   ~amount: Ethers.BigNumber.t,
 ) => JsPromise.t<getTreasurySplitReturn> = "getTreasurySplit"
 
-type getUsersPendingBalanceReturn = Ethers.BigNumber.t
+type getUsersConfirmedButNotSettledBalanceReturn = Ethers.BigNumber.t
 @send
-external getUsersPendingBalance: (
+external getUsersConfirmedButNotSettledBalance: (
   t,
   ~user: Ethers.ethAddress,
   ~marketIndex: int,
   ~isLong: bool,
-) => JsPromise.t<getUsersPendingBalanceReturn> = "getUsersPendingBalance"
+) => JsPromise.t<getUsersConfirmedButNotSettledBalanceReturn> = "getUsersConfirmedButNotSettledBalance"
 
 @send
 external initialize: (
@@ -257,15 +249,6 @@ type tokenFactoryReturn = Ethers.ethAddress
 @send
 external tokenFactory: t => JsPromise.t<tokenFactoryReturn> = "tokenFactory"
 
-type totalFeesReservedForTreasuryReturn = Ethers.BigNumber.t
-@send
-external totalFeesReservedForTreasury: (t, int) => JsPromise.t<totalFeesReservedForTreasuryReturn> =
-  "totalFeesReservedForTreasury"
-
-@send
-external transferTreasuryFunds: (t, ~marketIndex: int) => JsPromise.t<transaction> =
-  "transferTreasuryFunds"
-
 type treasuryReturn = Ethers.ethAddress
 @send
 external treasury: t => JsPromise.t<treasuryReturn> = "treasury"
@@ -276,6 +259,13 @@ external updateMarketOracle: (
   ~marketIndex: int,
   ~newOracleManager: Ethers.ethAddress,
 ) => JsPromise.t<transaction> = "updateMarketOracle"
+
+@send
+external updateSystemState: (t, ~marketIndex: int) => JsPromise.t<transaction> = "updateSystemState"
+
+@send
+external updateSystemStateMulti: (t, ~marketIndexes: array<int>) => JsPromise.t<transaction> =
+  "updateSystemStateMulti"
 
 type userCurrentNextPriceUpdateIndexReturn = Ethers.BigNumber.t
 @send

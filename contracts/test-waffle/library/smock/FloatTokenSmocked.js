@@ -246,37 +246,6 @@ function initializeCalls(_r) {
               }));
 }
 
-function mockInitialize3ToReturn(_r) {
-  ((_r.smocked.initialize3.will.return()));
-  
-}
-
-function initialize3Calls(_r) {
-  var array = (_r.smocked.initialize3.calls);
-  return Belt_Array.map(array, (function (param) {
-                return {
-                        name: param[0],
-                        symbol: param[1],
-                        stakerAddress: param[2]
-                      };
-              }));
-}
-
-function mockMintToReturn(_r) {
-  ((_r.smocked.mint.will.return()));
-  
-}
-
-function mintCalls(_r) {
-  var array = _r.smocked.mint.calls;
-  return Belt_Array.map(array, (function (param) {
-                return {
-                        _to: param[0],
-                        amount: param[1]
-                      };
-              }));
-}
-
 function mockNameToReturn(_r, _param0) {
   ((_r.smocked.name.will.return.with([_param0])));
   
@@ -425,6 +394,37 @@ function unpauseCalls(_r) {
               }));
 }
 
+function mockInitialize3ToReturn(_r) {
+  ((_r.smocked.initialize3.will.return()));
+  
+}
+
+function initialize3Calls(_r) {
+  var array = (_r.smocked.initialize3.calls);
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        name: param[0],
+                        symbol: param[1],
+                        stakerAddress: param[2]
+                      };
+              }));
+}
+
+function mockMintToReturn(_r) {
+  ((_r.smocked.mint.will.return()));
+  
+}
+
+function mintCalls(_r) {
+  var array = _r.smocked.mint.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        _to: param[0],
+                        amount: param[1]
+                      };
+              }));
+}
+
 var uninitializedValue;
 
 exports.uninitializedValue = uninitializedValue;
@@ -462,10 +462,6 @@ exports.mockIncreaseAllowanceToReturn = mockIncreaseAllowanceToReturn;
 exports.increaseAllowanceCalls = increaseAllowanceCalls;
 exports.mockInitializeToReturn = mockInitializeToReturn;
 exports.initializeCalls = initializeCalls;
-exports.mockInitialize3ToReturn = mockInitialize3ToReturn;
-exports.initialize3Calls = initialize3Calls;
-exports.mockMintToReturn = mockMintToReturn;
-exports.mintCalls = mintCalls;
 exports.mockNameToReturn = mockNameToReturn;
 exports.nameCalls = nameCalls;
 exports.mockPauseToReturn = mockPauseToReturn;
@@ -488,4 +484,8 @@ exports.mockTransferFromToReturn = mockTransferFromToReturn;
 exports.transferFromCalls = transferFromCalls;
 exports.mockUnpauseToReturn = mockUnpauseToReturn;
 exports.unpauseCalls = unpauseCalls;
+exports.mockInitialize3ToReturn = mockInitialize3ToReturn;
+exports.initialize3Calls = initialize3Calls;
+exports.mockMintToReturn = mockMintToReturn;
+exports.mintCalls = mintCalls;
 /* No side effect */

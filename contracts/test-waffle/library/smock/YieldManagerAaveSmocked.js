@@ -39,99 +39,6 @@ function adminCalls(_r) {
               }));
 }
 
-function mockChangeAdminToReturn(_r) {
-  ((_r.smocked.changeAdmin.will.return()));
-  
-}
-
-function changeAdminCalls(_r) {
-  var array = _r.smocked.changeAdmin.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var admin = _m[0];
-                return {
-                        admin: admin
-                      };
-              }));
-}
-
-function mockClaimYieldAndGetMarketAmountToReturn(_r, _param0) {
-  ((_r.smocked.claimYieldAndGetMarketAmount.will.return.with([_param0])));
-  
-}
-
-function claimYieldAndGetMarketAmountCalls(_r) {
-  var array = _r.smocked.claimYieldAndGetMarketAmount.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var marketPcntE5 = _m[0];
-                return {
-                        marketPcntE5: marketPcntE5
-                      };
-              }));
-}
-
-function mockDepositTokenToReturn(_r) {
-  ((_r.smocked.depositToken.will.return()));
-  
-}
-
-function depositTokenCalls(_r) {
-  var array = _r.smocked.depositToken.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var amount = _m[0];
-                return {
-                        amount: amount
-                      };
-              }));
-}
-
-function mockGetHeldTokenToReturn(_r, _param0) {
-  ((_r.smocked.getHeldToken.will.return.with([_param0])));
-  
-}
-
-function getHeldTokenCalls(_r) {
-  var array = _r.smocked.getHeldToken.calls;
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
-function mockGetTotalHeldToReturn(_r, _param0) {
-  ((_r.smocked.getTotalHeld.will.return.with([_param0])));
-  
-}
-
-function getTotalHeldCalls(_r) {
-  var array = _r.smocked.getTotalHeld.calls;
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
-function mockGetTotalReservedForTreasuryToReturn(_r, _param0) {
-  ((_r.smocked.getTotalReservedForTreasury.will.return.with([_param0])));
-  
-}
-
-function getTotalReservedForTreasuryCalls(_r) {
-  var array = _r.smocked.getTotalReservedForTreasury.calls;
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
-function mockGetTotalValueRealizedToReturn(_r, _param0) {
-  ((_r.smocked.getTotalValueRealized.will.return.with([_param0])));
-  
-}
-
-function getTotalValueRealizedCalls(_r) {
-  var array = _r.smocked.getTotalValueRealized.calls;
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
 function mockLendingPoolToReturn(_r, _param0) {
   ((_r.smocked.lendingPool.will.return.with([_param0])));
   
@@ -180,18 +87,6 @@ function totalReservedForTreasuryCalls(_r) {
               }));
 }
 
-function mockTotalValueRealizedToReturn(_r, _param0) {
-  ((_r.smocked.totalValueRealized.will.return.with([_param0])));
-  
-}
-
-function totalValueRealizedCalls(_r) {
-  var array = _r.smocked.totalValueRealized.calls;
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
 function mockTreasuryToReturn(_r, _param0) {
   ((_r.smocked.treasury.will.return.with([_param0])));
   
@@ -201,6 +96,51 @@ function treasuryCalls(_r) {
   var array = _r.smocked.treasury.calls;
   return Belt_Array.map(array, (function (param) {
                 
+              }));
+}
+
+function mockChangeAdminToReturn(_r) {
+  ((_r.smocked.changeAdmin.will.return()));
+  
+}
+
+function changeAdminCalls(_r) {
+  var array = _r.smocked.changeAdmin.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var admin = _m[0];
+                return {
+                        admin: admin
+                      };
+              }));
+}
+
+function mockDepositTokenToReturn(_r) {
+  ((_r.smocked.depositToken.will.return()));
+  
+}
+
+function depositTokenCalls(_r) {
+  var array = _r.smocked.depositToken.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var amount = _m[0];
+                return {
+                        amount: amount
+                      };
+              }));
+}
+
+function mockWithdrawTokenToReturn(_r) {
+  ((_r.smocked.withdrawToken.will.return()));
+  
+}
+
+function withdrawTokenCalls(_r) {
+  var array = _r.smocked.withdrawToken.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var amount = _m[0];
+                return {
+                        amount: amount
+                      };
               }));
 }
 
@@ -219,17 +159,17 @@ function withdrawErc20TokenToTreasuryCalls(_r) {
               }));
 }
 
-function mockWithdrawTokenToReturn(_r) {
-  ((_r.smocked.withdrawToken.will.return()));
+function mockClaimYieldAndGetMarketAmountToReturn(_r, _param0) {
+  ((_r.smocked.claimYieldAndGetMarketAmount.will.return.with([_param0])));
   
 }
 
-function withdrawTokenCalls(_r) {
-  var array = _r.smocked.withdrawToken.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var amount = _m[0];
+function claimYieldAndGetMarketAmountCalls(_r) {
+  var array = _r.smocked.claimYieldAndGetMarketAmount.calls;
+  return Belt_Array.map(array, (function (param) {
                 return {
-                        amount: amount
+                        totalValueRealizedForMarket: param[0],
+                        marketPcntE5: param[1]
                       };
               }));
 }
@@ -255,20 +195,6 @@ exports.mockATokenToReturn = mockATokenToReturn;
 exports.aTokenCalls = aTokenCalls;
 exports.mockAdminToReturn = mockAdminToReturn;
 exports.adminCalls = adminCalls;
-exports.mockChangeAdminToReturn = mockChangeAdminToReturn;
-exports.changeAdminCalls = changeAdminCalls;
-exports.mockClaimYieldAndGetMarketAmountToReturn = mockClaimYieldAndGetMarketAmountToReturn;
-exports.claimYieldAndGetMarketAmountCalls = claimYieldAndGetMarketAmountCalls;
-exports.mockDepositTokenToReturn = mockDepositTokenToReturn;
-exports.depositTokenCalls = depositTokenCalls;
-exports.mockGetHeldTokenToReturn = mockGetHeldTokenToReturn;
-exports.getHeldTokenCalls = getHeldTokenCalls;
-exports.mockGetTotalHeldToReturn = mockGetTotalHeldToReturn;
-exports.getTotalHeldCalls = getTotalHeldCalls;
-exports.mockGetTotalReservedForTreasuryToReturn = mockGetTotalReservedForTreasuryToReturn;
-exports.getTotalReservedForTreasuryCalls = getTotalReservedForTreasuryCalls;
-exports.mockGetTotalValueRealizedToReturn = mockGetTotalValueRealizedToReturn;
-exports.getTotalValueRealizedCalls = getTotalValueRealizedCalls;
 exports.mockLendingPoolToReturn = mockLendingPoolToReturn;
 exports.lendingPoolCalls = lendingPoolCalls;
 exports.mockLongShortToReturn = mockLongShortToReturn;
@@ -277,14 +203,18 @@ exports.mockTokenToReturn = mockTokenToReturn;
 exports.tokenCalls = tokenCalls;
 exports.mockTotalReservedForTreasuryToReturn = mockTotalReservedForTreasuryToReturn;
 exports.totalReservedForTreasuryCalls = totalReservedForTreasuryCalls;
-exports.mockTotalValueRealizedToReturn = mockTotalValueRealizedToReturn;
-exports.totalValueRealizedCalls = totalValueRealizedCalls;
 exports.mockTreasuryToReturn = mockTreasuryToReturn;
 exports.treasuryCalls = treasuryCalls;
-exports.mockWithdrawErc20TokenToTreasuryToReturn = mockWithdrawErc20TokenToTreasuryToReturn;
-exports.withdrawErc20TokenToTreasuryCalls = withdrawErc20TokenToTreasuryCalls;
+exports.mockChangeAdminToReturn = mockChangeAdminToReturn;
+exports.changeAdminCalls = changeAdminCalls;
+exports.mockDepositTokenToReturn = mockDepositTokenToReturn;
+exports.depositTokenCalls = depositTokenCalls;
 exports.mockWithdrawTokenToReturn = mockWithdrawTokenToReturn;
 exports.withdrawTokenCalls = withdrawTokenCalls;
+exports.mockWithdrawErc20TokenToTreasuryToReturn = mockWithdrawErc20TokenToTreasuryToReturn;
+exports.withdrawErc20TokenToTreasuryCalls = withdrawErc20TokenToTreasuryCalls;
+exports.mockClaimYieldAndGetMarketAmountToReturn = mockClaimYieldAndGetMarketAmountToReturn;
+exports.claimYieldAndGetMarketAmountCalls = claimYieldAndGetMarketAmountCalls;
 exports.mockWithdrawTreasuryFundsToReturn = mockWithdrawTreasuryFundsToReturn;
 exports.withdrawTreasuryFundsCalls = withdrawTreasuryFundsCalls;
 /* No side effect */

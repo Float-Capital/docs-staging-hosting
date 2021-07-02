@@ -76,7 +76,7 @@ let testIntegration =
       let%AwaitThen _ =
         oracleManager->OracleManagerMock.setPrice(~newPrice=nextPrice);
 
-      let%AwaitThen _ = longShort->LongShort._updateSystemState(~marketIndex);
+      let%AwaitThen _ = longShort->LongShort.updateSystemState(~marketIndex);
 
       let%AwaitThen usersBalanceBeforeSettlement =
         longSynth->SyntheticToken.balanceOf(~account=testUser.address);
