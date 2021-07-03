@@ -1,8 +1,6 @@
 open LetOps;
 open Mocha;
 
-let it' = (str, fn) => it(str, () => {fn()->JsPromise.resolve});
-
 let before_once' = fn => {
   let ranRef = ref(false);
   before_each(() =>
@@ -41,3 +39,7 @@ let (
     gte,
     lt,
   );
+
+let describeIntegration = Config.dontRunIntegrationTests ? describe_skip : describe;
+
+let describeUnit = Config.dontRunUnitTests ? describe_skip : describe;

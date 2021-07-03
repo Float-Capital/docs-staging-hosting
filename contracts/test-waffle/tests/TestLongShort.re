@@ -1,8 +1,9 @@
 open LetOps;
+open Globals;
 open Mocha;
 
 describe("Float System", () => {
-  describe("LongShort", () => {
+  describeIntegration("LongShort", () => {
     let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
     let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
 
@@ -39,7 +40,7 @@ describe("Float System", () => {
     LazyRedeem.testIntegration(~contracts, ~accounts);
   });
 
-  describe("LongShort - internals exposed", () => {
+  describeUnit("LongShort - internals exposed", () => {
     let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
     let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
 

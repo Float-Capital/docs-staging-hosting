@@ -63,11 +63,12 @@ function test(contracts, accounts) {
                                         return Chai.bnEqual(undefined, returnVal, CONSTANTS.tenToThe18);
                                       }));
                         }));
-                  return Globals.it$p("calls getMarketLaunchIncentiveParameters with correct arguments", (function (param) {
-                                return Chai.recordEqualFlat(Belt_Array.getExn(StakerSmocked.InternalMock.getMarketLaunchIncentiveParametersCalls(undefined), 0), {
-                                            marketIndex: 2
-                                          });
-                              }));
+                  it("calls getMarketLaunchIncentiveParameters with correct arguments", (function () {
+                          return Chai.recordEqualFlat(Belt_Array.getExn(StakerSmocked.InternalMock.getMarketLaunchIncentiveParametersCalls(undefined), 0), {
+                                      marketIndex: 2
+                                    });
+                        }));
+                  
                 }));
           
         }));

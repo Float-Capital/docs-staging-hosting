@@ -41,10 +41,10 @@ function test(contracts, accounts) {
                                           }));
                             }));
               });
-          Globals.it$p("calls the onlyFloatModifier", (function (param) {
+          it("calls the onlyFloatModifier", (function () {
                   return Chai.intEqual(undefined, StakerSmocked.InternalMock.onlyFloatCalls(undefined).length, 1);
                 }));
-          Globals.it$p("calls _changeMarketLaunchIncentiveParameters with correct arguments", (function (param) {
+          it("calls _changeMarketLaunchIncentiveParameters with correct arguments", (function () {
                   return Chai.recordEqualFlat(StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCalls(undefined)[0], {
                               marketIndex: 1,
                               period: kPeriod,

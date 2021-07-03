@@ -104,4 +104,4 @@ exports.PaymentTokenHelpers = PaymentTokenHelpers;
 exports.DataFetchers = DataFetchers;
 exports.LongShortHelpers = LongShortHelpers;
 exports.SyntheticTokenHelpers = SyntheticTokenHelpers;
-/* CONSTANTS Not a pure module */
+/* Globals Not a pure module */

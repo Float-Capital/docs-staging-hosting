@@ -262,4 +262,4 @@ exports.inititialize = inititialize;
 exports.increaseTime = increaseTime;
 exports.getBlock = getBlock;
 exports.getRandomTimestampInPast = getRandomTimestampInPast;
-/* No side effect */
+/* Globals Not a pure module */

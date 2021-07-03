@@ -2,14 +2,8 @@
 'use strict';
 
 var Curry = require("rescript/lib/js/curry.js");
+var Config = require("./Config.js");
 var LetOps = require("./LetOps.js");
-
-function it$p(str, fn) {
-  it(str, (function () {
-          return Promise.resolve(Curry._1(fn, undefined));
-        }));
-  
-}
 
 function before_once$p(fn) {
   var ranRef = {
@@ -72,7 +66,30 @@ function bnLt(prim0, prim1) {
   return prim0.lt(prim1);
 }
 
-exports.it$p = it$p;
+var describeIntegration = Config.dontRunIntegrationTests ? (function (prim0, prim1) {
+      describe.skip(prim0, (function () {
+              return Curry._1(prim1, undefined);
+            }));
+      
+    }) : (function (prim0, prim1) {
+      describe(prim0, (function () {
+              return Curry._1(prim1, undefined);
+            }));
+      
+    });
+
+var describeUnit = Config.dontRunUnitTests ? (function (prim0, prim1) {
+      describe.skip(prim0, (function () {
+              return Curry._1(prim1, undefined);
+            }));
+      
+    }) : (function (prim0, prim1) {
+      describe(prim0, (function () {
+              return Curry._1(prim1, undefined);
+            }));
+      
+    });
+
 exports.before_once$p = before_once$p;
 exports.add = add;
 exports.sub = sub;
@@ -85,4 +102,6 @@ exports.bnToInt = bnToInt;
 exports.bnGt = bnGt;
 exports.bnGte = bnGte;
 exports.bnLt = bnLt;
-/* No side effect */
+exports.describeIntegration = describeIntegration;
+exports.describeUnit = describeUnit;
+/* Config Not a pure module */

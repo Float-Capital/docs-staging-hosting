@@ -26,4 +26,9 @@ lib
 
 coverage.json
 
+coverage-truffle
+coverage-all
+coverage-unit
+coverage-integration
+
 abis

@@ -98,7 +98,7 @@ let test =
         },
       );
 
-      it'(
+      it(
         "calls getMarketLaunchIncentiveParameters with correct arguments", () => {
         StakerSmocked.InternalMock.getMarketLaunchIncentiveParametersCalls()
         ->Array.getExn(0)

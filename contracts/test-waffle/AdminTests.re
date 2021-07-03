@@ -1,7 +1,8 @@
 open LetOps;
 open Mocha;
+open Globals;
 
-describe("Float System", () => {
+describeUnit("Float System", () => {
   describe("Admin", () => {
     let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
     let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);

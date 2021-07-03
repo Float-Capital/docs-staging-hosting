@@ -3,9 +3,10 @@
 
 var Chai = require("./bindings/chai/Chai.js");
 var LetOps = require("./library/LetOps.js");
+var Globals = require("./library/Globals.js");
 var Helpers = require("./library/Helpers.js");
 
-describe("Float System", (function () {
+Globals.describeUnit("Float System", (function (param) {
         describe("Admin", (function () {
                 var contracts = {
                   contents: undefined
