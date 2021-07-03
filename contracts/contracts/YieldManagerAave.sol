@@ -16,7 +16,6 @@ import "./interfaces/aave/ILendingPool.sol";
  *     see: https://docs.aave.com/portal/
  */
 contract YieldManagerAave is IYieldManager {
-
     /*╔═════════════════════════════╗
       ║          VARIABLES          ║
       ╚═════════════════════════════╝*/
@@ -85,6 +84,9 @@ contract YieldManagerAave is IYieldManager {
         paymentToken = ERC20(_paymentToken);
         aToken = IERC20Upgradeable(_aToken);
         lendingPool = ILendingPool(_lendingPool);
+
+        // Approve tokens for aave lending pool maximally.
+        token.approve(address(lendingPool), type(uint256).max);
     }
 
     /*╔═════════════════════════════╗
@@ -103,9 +105,6 @@ contract YieldManagerAave is IYieldManager {
         // Transfer tokens to manager contract.
         paymentToken.transferFrom(longShort, address(this), amount);
 
-        // Transfer payment tokens to aToken contract to mint aTokens.
-        paymentToken.approve(address(lendingPool), amount);
-
         // Deposit the desired amount of tokens into the aave pool
         lendingPool.deposit(
             address(paymentToken),
@@ -115,7 +114,11 @@ contract YieldManagerAave is IYieldManager {
         );
     }
 
-    function withdrawPaymentToken(uint256 amount) public override longShortOnly {
+    function withdrawPaymentToken(uint256 amount)
+        public
+        override
+        longShortOnly
+    {
         // Redeem aToken for payment tokens.
         // This will fail if not enough liquidity is avaiable on aave.
         lendingPool.withdraw(address(paymentToken), amount, address(this));

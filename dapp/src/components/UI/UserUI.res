@@ -252,6 +252,7 @@ module UserPercentageGains = {
     ~syntheticPriceLastUpdated,
     ~tokenAddress,
     ~isLong,
+    ~oldAssetPrice,
   ) => {
     let bothPrices = DataHooks.useSyntheticPrices(
       ~oracleAddress,
@@ -263,6 +264,7 @@ module UserPercentageGains = {
       ~syntheticPriceLastUpdated,
       ~tokenAddress,
       ~isLong,
+      ~oldAssetPrice,
     )
     <div className=`flex flex-col items-center justify-center`>
       {switch bothPrices {
@@ -298,7 +300,7 @@ module UserTokenBox = {
           name,
           symbol,
           oracleAddress,
-          latestSystemState: {totalLockedLong, totalLockedShort},
+          latestSystemState: {totalLockedLong, totalLockedShort, syntheticPrice: oldAssetPrice},
         },
         latestPrice: {price: {price, timeUpdated: synthPriceUpdated}},
       },
@@ -344,6 +346,7 @@ module UserTokenBox = {
           syntheticPriceLastUpdated=synthPriceUpdated
           tokenAddress
           isLong
+          oldAssetPrice
         />
       </div>
       <div className=`self-center`> {children} </div>
@@ -426,7 +429,10 @@ module UserStakeBox = {
 
     let {
       tokenSupply,
-      syntheticMarket: {oracleAddress, latestSystemState: {totalLockedLong, totalLockedShort}},
+      syntheticMarket: {
+        oracleAddress,
+        latestSystemState: {totalLockedLong, totalLockedShort, syntheticPrice: oldAssetPrice},
+      },
     } = syntheticToken
 
     let value =
@@ -467,6 +473,7 @@ module UserStakeBox = {
           syntheticPrice=price
           syntheticPriceLastUpdated=synthLastUpdated
           isLong
+          oldAssetPrice
         />
       </div>
       <div className=`self-center`> {children} </div>

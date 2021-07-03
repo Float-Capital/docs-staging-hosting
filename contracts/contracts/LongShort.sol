@@ -336,6 +336,9 @@ contract LongShort is ILongShort, Initializable {
             oracleManagers[latestMarket].updatePrice()
         );
 
+        // Approve tokens for aave lending pool maximally.
+        paymentTokens[latestMarket].approve(_yieldManager, type(uint256).max);
+
         emit SyntheticTokenCreated(
             latestMarket,
             address(syntheticTokens[latestMarket][true]),
@@ -745,7 +748,11 @@ contract LongShort is ILongShort, Initializable {
       ╚════════════════════════════════╝*/
 
     function _depositFunds(uint32 marketIndex, uint256 amount) internal {
-        paymentTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
+        paymentTokens[marketIndex].transferFrom(
+            msg.sender,
+            address(this),
+            amount
+        );
     }
 
     // NOTE: Only used in seeding the market.
@@ -820,11 +827,7 @@ contract LongShort is ILongShort, Initializable {
         //     3. approve transfer from yield manager contract to lendingPool contract
         //     4. transfer from yield mnager contract to lendingPool contract
         // Surely we can make this more efficient?
-        paymentTokens[marketIndex].approve(
-            address(yieldManagers[marketIndex]),
-            amount
-        );
-        yieldManagers[marketIndex].depositPaymentToken(amount);
+        yieldManagers[marketIndex].depositToken(amount);
     }
 
     /*
