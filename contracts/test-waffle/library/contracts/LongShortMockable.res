@@ -90,10 +90,6 @@ external executeOutstandingNextPriceSettlementsUser: (
   ~marketIndex: int,
 ) => JsPromise.t<transaction> = "executeOutstandingNextPriceSettlementsUser"
 
-type fundTokensReturn = Ethers.ethAddress
-@send
-external fundTokens: (t, int) => JsPromise.t<fundTokensReturn> = "fundTokens"
-
 type getLongPcntForLongVsShortSplitReturn = Ethers.BigNumber.t
 @send
 external getLongPcntForLongVsShortSplit: (
@@ -194,7 +190,7 @@ external newSyntheticMarket: (
   t,
   ~syntheticName: string,
   ~syntheticSymbol: string,
-  ~fundToken: Ethers.ethAddress,
+  ~paymentToken: Ethers.ethAddress,
   ~oracleManager: Ethers.ethAddress,
   ~yieldManager: Ethers.ethAddress,
 ) => JsPromise.t<transaction> = "newSyntheticMarket"
@@ -202,6 +198,10 @@ external newSyntheticMarket: (
 type oracleManagersReturn = Ethers.ethAddress
 @send
 external oracleManagers: (t, int) => JsPromise.t<oracleManagersReturn> = "oracleManagers"
+
+type paymentTokensReturn = Ethers.ethAddress
+@send
+external paymentTokens: (t, int) => JsPromise.t<paymentTokensReturn> = "paymentTokens"
 
 @send
 external redeemLongNextPrice: (

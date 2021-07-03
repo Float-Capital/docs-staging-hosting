@@ -177,13 +177,13 @@ function setYieldRateCalls(_r) {
               }));
 }
 
-function mockDepositTokenToReturn(_r) {
-  ((_r.smocked.depositToken.will.return()));
+function mockDepositPaymentTokenToReturn(_r) {
+  ((_r.smocked.depositPaymentToken.will.return()));
   
 }
 
-function depositTokenCalls(_r) {
-  var array = _r.smocked.depositToken.calls;
+function depositPaymentTokenCalls(_r) {
+  var array = _r.smocked.depositPaymentToken.calls;
   return Belt_Array.map(array, (function (_m) {
                 var amount = _m[0];
                 return {
@@ -192,13 +192,13 @@ function depositTokenCalls(_r) {
               }));
 }
 
-function mockWithdrawTokenToReturn(_r) {
-  ((_r.smocked.withdrawToken.will.return()));
+function mockWithdrawPaymentTokenToReturn(_r) {
+  ((_r.smocked.withdrawPaymentToken.will.return()));
   
 }
 
-function withdrawTokenCalls(_r) {
-  var array = _r.smocked.withdrawToken.calls;
+function withdrawPaymentTokenCalls(_r) {
+  var array = _r.smocked.withdrawPaymentToken.calls;
   return Belt_Array.map(array, (function (_m) {
                 var amount = _m[0];
                 return {
@@ -280,10 +280,10 @@ exports.mockMockHoldingAdditionalRewardYieldToReturn = mockMockHoldingAdditional
 exports.mockHoldingAdditionalRewardYieldCalls = mockHoldingAdditionalRewardYieldCalls;
 exports.mockSetYieldRateToReturn = mockSetYieldRateToReturn;
 exports.setYieldRateCalls = setYieldRateCalls;
-exports.mockDepositTokenToReturn = mockDepositTokenToReturn;
-exports.depositTokenCalls = depositTokenCalls;
-exports.mockWithdrawTokenToReturn = mockWithdrawTokenToReturn;
-exports.withdrawTokenCalls = withdrawTokenCalls;
+exports.mockDepositPaymentTokenToReturn = mockDepositPaymentTokenToReturn;
+exports.depositPaymentTokenCalls = depositPaymentTokenCalls;
+exports.mockWithdrawPaymentTokenToReturn = mockWithdrawPaymentTokenToReturn;
+exports.withdrawPaymentTokenCalls = withdrawPaymentTokenCalls;
 exports.mockWithdrawErc20TokenToTreasuryToReturn = mockWithdrawErc20TokenToTreasuryToReturn;
 exports.withdrawErc20TokenToTreasuryCalls = withdrawErc20TokenToTreasuryCalls;
 exports.mockClaimYieldAndGetMarketAmountToReturn = mockClaimYieldAndGetMarketAmountToReturn;

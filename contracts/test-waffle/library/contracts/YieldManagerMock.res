@@ -34,7 +34,8 @@ external claimYieldAndGetMarketAmountCall: (
 ) => JsPromise.t<claimYieldAndGetMarketAmountReturn> = "claimYieldAndGetMarketAmount"
 
 @send
-external depositToken: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> = "depositToken"
+external depositPaymentToken: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> =
+  "depositPaymentToken"
 
 type lastSettledReturn = Ethers.BigNumber.t
 @send
@@ -88,8 +89,8 @@ external withdrawErc20TokenToTreasury: (
 ) => JsPromise.t<transaction> = "withdrawErc20TokenToTreasury"
 
 @send
-external withdrawToken: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> =
-  "withdrawToken"
+external withdrawPaymentToken: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> =
+  "withdrawPaymentToken"
 
 @send
 external withdrawTreasuryFunds: t => JsPromise.t<transaction> = "withdrawTreasuryFunds"

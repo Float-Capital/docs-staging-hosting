@@ -175,7 +175,7 @@ let testExposed =
         ->Chai.withArgs5(marketIndex, amount, testWallet.address, amount, 1);
       });
       /*
-        fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
+        paymentTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
 
          batchedNextPriceDeposit[marketIndex].mintLong += amount;
          userNextPriceActions[marketIndex][msg.sender].mintLong += amount;

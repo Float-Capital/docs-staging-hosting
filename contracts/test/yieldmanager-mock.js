@@ -59,7 +59,7 @@ contract("YieldManagerMock (interface)", (accounts) => {
 
     // Deposit them into the yield manager.
     // THIS TX REVERTS - not sure why yet.
-    await yieldManager.depositToken(oneHundred, {
+    await yieldManager.depositPaymentToken(oneHundred, {
       from: user,
     });
   });
@@ -83,7 +83,7 @@ contract("YieldManagerMock (interface)", (accounts) => {
   });
 
   it("withdrawing from yield manager sets correct holdings", async () => {
-    await yieldManager.withdrawToken(fifty, {
+    await yieldManager.withdrawPaymentToken(fifty, {
       from: user,
     });
 

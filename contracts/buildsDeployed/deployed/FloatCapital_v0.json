@@ -12,8 +12,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -42,9 +41,9 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.3+commit.8d00100c\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"admin\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_admin\",\"type\":\"address\"}],\"name\":\"changeAdmin\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_admin\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"title\":\"Float Capital Contract \",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"changeAdmin(address)\":{\"notice\":\"MULTISIG ADMIN FUNCTIONS ///////\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/home/jasoons/Documents/code/monorepo/contracts/contracts/FloatCapital_v0.sol\":\"FloatCapital_v0\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/jasoons/Documents/code/monorepo/contracts/contracts/FloatCapital_v0.sol\":{\"keccak256\":\"0x6cb79b5d0a98f90f7e4e69280df9945384d5cd4264945f9295e961d28be72903\",\"license\":\"BUSL-1.1\",\"urls\":[\"bzz-raw://452b59b507e6973f4cc5a9bc5504e9ff53319ddecedd8f739b69057031c528c5\",\"dweb:/ipfs/QmdARr7HtEgrq4PiGdnrUnNU8EDgkpEiXJVgKAaGCEqwzc\"]},\"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\":{\"keccak256\":\"0x67d2f282a9678e58e878a0b774041ba7a01e2740a262aea97a3f681339914713\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://297df5725003e586651278a5d021b176457c5bb05a954c8490f21db2754e7352\",\"dweb:/ipfs/QmSe9AHjVnDn39NqT9hkjuCCGUwtc989WuZ5rWTe3GHrUD\"]}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b50610258806100206000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80638f28397014610046578063c4d66de81461005b578063f851a4401461006e575b600080fd5b6100596100543660046101f4565b6100a3565b005b6100596100693660046101f4565b61011e565b600054610087906201000090046001600160a01b031681565b6040516001600160a01b03909116815260200160405180910390f35b6000546201000090046001600160a01b031633146100f45760405162461bcd60e51b81526020600482015260096024820152682737ba1030b236b4b760b91b60448201526064015b60405180910390fd5b600080546001600160a01b03909216620100000262010000600160b01b0319909216919091179055565b600054610100900460ff1680610137575060005460ff16155b61019a5760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201526d191e481a5b9a5d1a585b1a5e995960921b60648201526084016100eb565b600054610100900460ff161580156101bc576000805461ffff19166101011790555b6000805462010000600160b01b031916620100006001600160a01b0385160217905580156101f0576000805461ff00191690555b5050565b600060208284031215610205578081fd5b81356001600160a01b038116811461021b578182fd5b939250505056fea264697066735822122036d34cbe9cf3e38bcf457335c7e1ff708e19e9ae720e3825b8ad35e1b084d31964736f6c63430008030033",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c80638f28397014610046578063c4d66de81461005b578063f851a4401461006e575b600080fd5b6100596100543660046101f4565b6100a3565b005b6100596100693660046101f4565b61011e565b600054610087906201000090046001600160a01b031681565b6040516001600160a01b03909116815260200160405180910390f35b6000546201000090046001600160a01b031633146100f45760405162461bcd60e51b81526020600482015260096024820152682737ba1030b236b4b760b91b60448201526064015b60405180910390fd5b600080546001600160a01b03909216620100000262010000600160b01b0319909216919091179055565b600054610100900460ff1680610137575060005460ff16155b61019a5760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201526d191e481a5b9a5d1a585b1a5e995960921b60648201526084016100eb565b600054610100900460ff161580156101bc576000805461ffff19166101011790555b6000805462010000600160b01b031916620100006001600160a01b0385160217905580156101f0576000805461ff00191690555b5050565b600060208284031215610205578081fd5b81356001600160a01b038116811461021b578182fd5b939250505056fea264697066735822122036d34cbe9cf3e38bcf457335c7e1ff708e19e9ae720e3825b8ad35e1b084d31964736f6c63430008030033",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.3+commit.8d00100c\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"admin\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_admin\",\"type\":\"address\"}],\"name\":\"changeAdmin\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_admin\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"title\":\"Float Capital Contract \",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"changeAdmin(address)\":{\"notice\":\"MULTISIG ADMIN FUNCTIONS ///////\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/Stent/MyDocuments/Projects/FloatCapital/monorepo/contracts/contracts/FloatCapital_v0.sol\":\"FloatCapital_v0\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/Stent/MyDocuments/Projects/FloatCapital/monorepo/contracts/contracts/FloatCapital_v0.sol\":{\"keccak256\":\"0x6cb79b5d0a98f90f7e4e69280df9945384d5cd4264945f9295e961d28be72903\",\"license\":\"BUSL-1.1\",\"urls\":[\"bzz-raw://452b59b507e6973f4cc5a9bc5504e9ff53319ddecedd8f739b69057031c528c5\",\"dweb:/ipfs/QmdARr7HtEgrq4PiGdnrUnNU8EDgkpEiXJVgKAaGCEqwzc\"]},\"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\":{\"keccak256\":\"0x67d2f282a9678e58e878a0b774041ba7a01e2740a262aea97a3f681339914713\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://297df5725003e586651278a5d021b176457c5bb05a954c8490f21db2754e7352\",\"dweb:/ipfs/QmSe9AHjVnDn39NqT9hkjuCCGUwtc989WuZ5rWTe3GHrUD\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50610258806100206000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80638f28397014610046578063c4d66de81461005b578063f851a4401461006e575b600080fd5b6100596100543660046101f4565b6100a3565b005b6100596100693660046101f4565b61011e565b600054610087906201000090046001600160a01b031681565b6040516001600160a01b03909116815260200160405180910390f35b6000546201000090046001600160a01b031633146100f45760405162461bcd60e51b81526020600482015260096024820152682737ba1030b236b4b760b91b60448201526064015b60405180910390fd5b600080546001600160a01b03909216620100000262010000600160b01b0319909216919091179055565b600054610100900460ff1680610137575060005460ff16155b61019a5760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201526d191e481a5b9a5d1a585b1a5e995960921b60648201526084016100eb565b600054610100900460ff161580156101bc576000805461ffff19166101011790555b6000805462010000600160b01b031916620100006001600160a01b0385160217905580156101f0576000805461ff00191690555b5050565b600060208284031215610205578081fd5b81356001600160a01b038116811461021b578182fd5b939250505056fea2646970667358221220440d0573e0ac8893c99c746b5e190456b372a8b5a4f8f2199feba5216640436e64736f6c63430008030033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c80638f28397014610046578063c4d66de81461005b578063f851a4401461006e575b600080fd5b6100596100543660046101f4565b6100a3565b005b6100596100693660046101f4565b61011e565b600054610087906201000090046001600160a01b031681565b6040516001600160a01b03909116815260200160405180910390f35b6000546201000090046001600160a01b031633146100f45760405162461bcd60e51b81526020600482015260096024820152682737ba1030b236b4b760b91b60448201526064015b60405180910390fd5b600080546001600160a01b03909216620100000262010000600160b01b0319909216919091179055565b600054610100900460ff1680610137575060005460ff16155b61019a5760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201526d191e481a5b9a5d1a585b1a5e995960921b60648201526084016100eb565b600054610100900460ff161580156101bc576000805461ffff19166101011790555b6000805462010000600160b01b031916620100006001600160a01b0385160217905580156101f0576000805461ff00191690555b5050565b600060208284031215610205578081fd5b81356001600160a01b038116811461021b578182fd5b939250505056fea2646970667358221220440d0573e0ac8893c99c746b5e190456b372a8b5a4f8f2199feba5216640436e64736f6c63430008030033",
   "immutableReferences": {},
   "generatedSources": [],
   "deployedGeneratedSources": [
@@ -888,15 +887,15 @@
   "sourceMap": "176:812:0:-:0;;;;;;;;;;;;;;;;;;;",
   "deployedSourceMap": "176:812:0:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;811:87;;;;;;:::i;:::-;;:::i;:::-;;595:86;;;;;;:::i;:::-;;:::i;224:20::-;;;;;;;;-1:-1:-1;;;;;224:20:0;;;;;;-1:-1:-1;;;;;489:32:71;;;471:51;;459:2;444:18;224:20:0;;;;;;;811:87;428:5;;;;;-1:-1:-1;;;;;428:5:0;414:10;:19;406:41;;;;-1:-1:-1;;;406:41:0;;1150:2:71;406:41:0;;;1132:21:71;1189:1;1169:18;;;1162:29;-1:-1:-1;;;1207:18:71;;;1200:39;1256:18;;406:41:0;;;;;;;;;877:5:::1;:14:::0;;-1:-1:-1;;;;;877:14:0;;::::1;::::0;::::1;-1:-1:-1::0;;;;;;877:14:0;;::::1;::::0;;;::::1;::::0;;811:87::o;595:86::-;1456:13:43;;;;;;;;:30;;-1:-1:-1;1474:12:43;;;;1473:13;1456:30;1448:89;;;;-1:-1:-1;;;1448:89:43;;735:2:71;1448:89:43;;;717:21:71;774:2;754:18;;;747:30;813:34;793:18;;;786:62;-1:-1:-1;;;864:18:71;;;857:44;918:19;;1448:89:43;707:236:71;1448:89:43;1548:19;1571:13;;;;;;1570:14;1594:98;;;;1628:13;:20;;-1:-1:-1;;1662:19:43;;;;;1594:98;660:5:0::1;:14:::0;;-1:-1:-1;;;;;;660:14:0::1;::::0;-1:-1:-1;;;;;660:14:0;::::1;;;::::0;;1714:66:43;;;;1764:5;1748:21;;-1:-1:-1;;1748:21:43;;;1714:66;595:86:0;;:::o;14:306:71:-;;126:2;114:9;105:7;101:23;97:32;94:2;;;147:6;139;132:22;94:2;178:23;;-1:-1:-1;;;;;230:31:71;;220:42;;210:2;;281:6;273;266:22;210:2;309:5;84:236;-1:-1:-1;;;84:236:71:o",
   "source": "// SPDX-License-Identifier: BUSL-1.1\n\npragma solidity 0.8.3;\n\nimport \"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\";\n\n/** @title Float Capital Contract */\ncontract FloatCapital_v0 is Initializable {\n    address public admin;\n\n    ////////////////////////////////////\n    /////////// MODIFIERS //////////////\n    ////////////////////////////////////\n\n    modifier onlyAdmin() {\n        require(msg.sender == admin, \"Not admin\");\n        _;\n    }\n\n    ////////////////////////////////////\n    ///// CONTRACT SET-UP //////////////\n    ////////////////////////////////////\n\n    function initialize(address _admin) public initializer {\n        admin = _admin;\n    }\n\n    ////////////////////////////////////\n    /// MULTISIG ADMIN FUNCTIONS ///////\n    ////////////////////////////////////\n\n    function changeAdmin(address _admin) external onlyAdmin {\n        admin = _admin;\n    }\n\n    /** Small percentage of float token to accrue here for project\n     development */\n}\n",
-  "sourcePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/FloatCapital_v0.sol",
+  "sourcePath": "/Users/Stent/MyDocuments/Projects/FloatCapital/monorepo/contracts/contracts/FloatCapital_v0.sol",
   "ast": {
-    "absolutePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/FloatCapital_v0.sol",
+    "absolutePath": "/Users/Stent/MyDocuments/Projects/FloatCapital/monorepo/contracts/contracts/FloatCapital_v0.sol",
     "exportedSymbols": {
       "FloatCapital_v0": [
         45
       ],
       "Initializable": [
-        16155
+        16144
       ]
     },
     "id": 46,
@@ -920,7 +919,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 46,
-        "sourceUnit": 16156,
+        "sourceUnit": 16145,
         "src": "62:75:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -933,7 +932,7 @@
               "id": 4,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 16155,
+              "referencedDeclaration": 16144,
               "src": "204:13:0"
             },
             "id": 5,
@@ -942,7 +941,7 @@
           }
         ],
         "contractDependencies": [
-          16155
+          16144
         ],
         "contractKind": "contract",
         "documentation": {
@@ -955,7 +954,7 @@
         "id": 45,
         "linearizedBaseContracts": [
           45,
-          16155
+          16144
         ],
         "name": "FloatCapital_v0",
         "nameLocation": "185:15:0",
@@ -1200,7 +1199,7 @@
                   "id": 23,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 16154,
+                  "referencedDeclaration": 16143,
                   "src": "638:11:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -1391,13 +1390,13 @@
     "src": "38:951:0"
   },
   "legacyAST": {
-    "absolutePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/FloatCapital_v0.sol",
+    "absolutePath": "/Users/Stent/MyDocuments/Projects/FloatCapital/monorepo/contracts/contracts/FloatCapital_v0.sol",
     "exportedSymbols": {
       "FloatCapital_v0": [
         45
       ],
       "Initializable": [
-        16155
+        16144
       ]
     },
     "id": 46,
@@ -1421,7 +1420,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 46,
-        "sourceUnit": 16156,
+        "sourceUnit": 16145,
         "src": "62:75:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -1434,7 +1433,7 @@
               "id": 4,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 16155,
+              "referencedDeclaration": 16144,
               "src": "204:13:0"
             },
             "id": 5,
@@ -1443,7 +1442,7 @@
           }
         ],
         "contractDependencies": [
-          16155
+          16144
         ],
         "contractKind": "contract",
         "documentation": {
@@ -1456,7 +1455,7 @@
         "id": 45,
         "linearizedBaseContracts": [
           45,
-          16155
+          16144
         ],
         "name": "FloatCapital_v0",
         "nameLocation": "185:15:0",
@@ -1701,7 +1700,7 @@
                   "id": 23,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 16154,
+                  "referencedDeclaration": 16143,
                   "src": "638:11:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -1902,9 +1901,8 @@
       "address": "0x044442964722D64F74cE23fD2dd673aA640dd826"
     }
   },
-  "schemaVersion": "3.3.4",
-  "updatedAt": "2021-07-01T15:21:55.746Z",
-  "networkType": "ethereum",
+  "schemaVersion": "3.4.1",
+  "updatedAt": "2021-07-02T11:12:33.989Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

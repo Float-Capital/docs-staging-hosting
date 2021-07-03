@@ -54,7 +54,7 @@ contract LongShortMockable is ILongShort, Initializable {
         mapping(uint32 => bool) public marketExists;
     mapping(uint32 => uint256) public assetPrice;
     mapping(uint32 => uint256) public marketUpdateIndex;
-    mapping(uint32 => IERC20) public fundTokens;
+    mapping(uint32 => IERC20) public paymentTokens;
     mapping(uint32 => IYieldManager) public yieldManagers;
     mapping(uint32 => IOracleManager) public oracleManagers;
 
@@ -107,7 +107,7 @@ contract LongShortMockable is ILongShort, Initializable {
         uint32 marketIndex,
         address longTokenAddress,
         address shortTokenAddress,
-        address fundToken,
+        address paymentToken,
         uint256 assetPrice,
         string name,
         string symbol,
@@ -365,13 +365,13 @@ contract LongShortMockable is ILongShort, Initializable {
     function newSyntheticMarket(
         string calldata syntheticName,
         string calldata syntheticSymbol,
-        address _fundToken,
+        address _paymentToken,
         address _oracleManager,
         address _yieldManager
     ) external adminOnly {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("newSyntheticMarket"))){
       
-      return mocker.newSyntheticMarketMock(syntheticName,syntheticSymbol,_fundToken,_oracleManager,_yieldManager);
+      return mocker.newSyntheticMarketMock(syntheticName,syntheticSymbol,_paymentToken,_oracleManager,_yieldManager);
     }
   
         latestMarket++;
@@ -394,20 +394,20 @@ contract LongShortMockable is ILongShort, Initializable {
             )
         );
 
-                fundTokens[latestMarket] = IERC20(_fundToken);
+                paymentTokens[latestMarket] = IERC20(_paymentToken);
         yieldManagers[latestMarket] = IYieldManager(_yieldManager);
         oracleManagers[latestMarket] = IOracleManager(_oracleManager);
         assetPrice[latestMarket] = uint256(
             oracleManagers[latestMarket].updatePrice()
         );
 
-                fundTokens[latestMarket].approve(_yieldManager, type(uint256).max);
+                paymentTokens[latestMarket].approve(_yieldManager, type(uint256).max);
 
         emit SyntheticTokenCreated(
             latestMarket,
             address(syntheticTokens[latestMarket][true]),
             address(syntheticTokens[latestMarket][false]),
-            _fundToken,
+            _paymentToken,
             assetPrice[latestMarket],
             syntheticName,
             syntheticSymbol,
@@ -873,7 +873,11 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._depositFundsMock(marketIndex,amount);
     }
   
-        fundTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
+        paymentTokens[marketIndex].transferFrom(
+            msg.sender,
+            address(this),
+            amount
+        );
     }
 
         function _lockFundsInMarket(uint32 marketIndex, uint256 amount) internal {
@@ -912,7 +916,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
         _transferFromYieldManager(marketIndex, totalAmount);
 
-                fundTokens[marketIndex].transfer(user, totalAmount);
+                paymentTokens[marketIndex].transfer(user, totalAmount);
 
         syntheticTokenPoolValue[marketIndex][true] -= amountLong;
         syntheticTokenPoolValue[marketIndex][false] -= amountShort;
@@ -956,7 +960,7 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._transferFundsToYieldManagerMock(marketIndex,amount);
     }
   
-                                                        yieldManagers[marketIndex].depositToken(amount);
+        yieldManagers[marketIndex].depositPaymentToken(amount);
     }
 
     
@@ -969,7 +973,7 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._transferFromYieldManagerMock(marketIndex,amount);
     }
   
-                        yieldManagers[marketIndex].withdrawToken(amount);
+                        yieldManagers[marketIndex].withdrawPaymentToken(amount);
     }
 
     
@@ -1148,7 +1152,7 @@ contract LongShortMockable is ILongShort, Initializable {
                     userCurrentNextPriceUpdateIndex[marketIndex][user]
                 ]
             );
-            fundTokens[marketIndex].transfer(user, amountToRedeem);
+            paymentTokens[marketIndex].transfer(user, amountToRedeem);
             emit ExecuteNextPriceRedeemSettlementUser(
                 user,
                 marketIndex,

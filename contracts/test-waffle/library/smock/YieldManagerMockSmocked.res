@@ -196,14 +196,14 @@ let setYieldRateCalls: t => array<setYieldRateCall> = _r => {
   })
 }
 
-let mockDepositTokenToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.depositToken.will.return()")
+let mockDepositPaymentTokenToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.depositPaymentToken.will.return()")
 }
 
-type depositTokenCall = {amount: Ethers.BigNumber.t}
+type depositPaymentTokenCall = {amount: Ethers.BigNumber.t}
 
-let depositTokenCalls: t => array<depositTokenCall> = _r => {
-  let array = %raw("_r.smocked.depositToken.calls")
+let depositPaymentTokenCalls: t => array<depositPaymentTokenCall> = _r => {
+  let array = %raw("_r.smocked.depositPaymentToken.calls")
   array->Array.map(_m => {
     let amount = _m->Array.getUnsafe(0)
 
@@ -213,14 +213,14 @@ let depositTokenCalls: t => array<depositTokenCall> = _r => {
   })
 }
 
-let mockWithdrawTokenToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.withdrawToken.will.return()")
+let mockWithdrawPaymentTokenToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.withdrawPaymentToken.will.return()")
 }
 
-type withdrawTokenCall = {amount: Ethers.BigNumber.t}
+type withdrawPaymentTokenCall = {amount: Ethers.BigNumber.t}
 
-let withdrawTokenCalls: t => array<withdrawTokenCall> = _r => {
-  let array = %raw("_r.smocked.withdrawToken.calls")
+let withdrawPaymentTokenCalls: t => array<withdrawPaymentTokenCall> = _r => {
+  let array = %raw("_r.smocked.withdrawPaymentToken.calls")
   array->Array.map(_m => {
     let amount = _m->Array.getUnsafe(0)
 
