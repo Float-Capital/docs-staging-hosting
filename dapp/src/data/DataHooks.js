@@ -798,7 +798,7 @@ function getUnixTime(date) {
   return date.getTime() / 1000 | 0;
 }
 
-function useSyntheticPrices(oracleAddress, timestamp, tokenSupply, totalLockedLong, totalLockedShort, syntheticPrice, syntheticPriceLastUpdated, tokenAddress, isLong) {
+function useSyntheticPrices(oracleAddress, timestamp, tokenSupply, totalLockedLong, totalLockedShort, syntheticPrice, syntheticPriceLastUpdated, tokenAddress, oldAssetPrice, isLong) {
   var initialTokenPriceResponse = useTokenPriceAtTime(tokenAddress, timestamp);
   var priceHistoryQuery = Curry.app(Queries.LatestPrice.use, [
         undefined,
@@ -832,9 +832,11 @@ function useSyntheticPrices(oracleAddress, timestamp, tokenSupply, totalLockedLo
     var match = response._0.priceIntervalManager;
     if (match !== undefined) {
       var match$1 = match.latestPriceInterval;
-      finalPriceResponse = Ethers$1.BigNumber.from(match$1.startTimestamp.getTime() / 1000 | 0).gt(syntheticPriceLastUpdated) ? ({
+      var endPrice = match$1.endPrice;
+      var priceQueryTime = Ethers$1.BigNumber.from(match$1.startTimestamp.getTime() / 1000 | 0);
+      finalPriceResponse = priceQueryTime.gt(syntheticPriceLastUpdated) && !oldAssetPrice.eq(endPrice) && priceQueryTime.gt(timestamp) ? ({
             TAG: 1,
-            _0: MarketSimulation.simulateMarketPriceChange(syntheticPrice, match$1.endPrice, totalLockedLong, totalLockedShort, tokenSupply, isLong),
+            _0: MarketSimulation.simulateMarketPriceChange(oldAssetPrice, endPrice, totalLockedLong, totalLockedShort, tokenSupply, isLong),
             [Symbol.for("name")]: "Response"
           }) : ({
             TAG: 1,

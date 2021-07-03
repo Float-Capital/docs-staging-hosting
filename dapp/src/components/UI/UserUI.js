@@ -345,7 +345,8 @@ function UserUI$UserPercentageGains(Props) {
   var syntheticPriceLastUpdated = Props.syntheticPriceLastUpdated;
   var tokenAddress = Props.tokenAddress;
   var isLong = Props.isLong;
-  var bothPrices = DataHooks.useSyntheticPrices(oracleAddress, timeLastUpdated, tokenSupply, totalLockedLong, totalLockedShort, syntheticPrice, syntheticPriceLastUpdated, tokenAddress, isLong);
+  var oldAssetPrice = Props.oldAssetPrice;
+  var bothPrices = DataHooks.useSyntheticPrices(oracleAddress, timeLastUpdated, tokenSupply, totalLockedLong, totalLockedShort, syntheticPrice, syntheticPriceLastUpdated, tokenAddress, oldAssetPrice, isLong);
   var tmp;
   if (typeof bothPrices === "number") {
     tmp = React.createElement(Loader.Tiny.make, {});
@@ -441,7 +442,8 @@ function UserUI$UserTokenBox(Props) {
                       syntheticPrice: price,
                       syntheticPriceLastUpdated: match$1.timeUpdated,
                       tokenAddress: tokenAddress,
-                      isLong: isLong
+                      isLong: isLong,
+                      oldAssetPrice: match$3.syntheticPrice
                     })), React.createElement("div", {
                   className: "self-center"
                 }, children));
@@ -558,7 +560,8 @@ function UserUI$UserStakeBox(Props) {
                       syntheticPrice: price,
                       syntheticPriceLastUpdated: synthLastUpdated,
                       tokenAddress: tokenAddress,
-                      isLong: isLong
+                      isLong: isLong,
+                      oldAssetPrice: match$1.syntheticPrice
                     })), React.createElement("div", {
                   className: "self-center"
                 }, children));
