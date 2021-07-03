@@ -1,3 +1,4 @@
+/*
 open Jest
 open Expect
 open ReactTestingLibrary
@@ -13,3 +14,4 @@ describe("example", () => {
     ->toMatchSnapshot
   )
 })
+ */
