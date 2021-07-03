@@ -270,13 +270,8 @@ contract LongShortMockable is ILongShort, Initializable {
     }
 
     
-<<<<<<< HEAD
 
 
-=======
-
-
->>>>>>> origin/dev
     function changeAdmin(address _admin) external adminOnly {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("changeAdmin"))){
       
@@ -376,11 +371,7 @@ contract LongShortMockable is ILongShort, Initializable {
     ) external adminOnly {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("newSyntheticMarket"))){
       
-<<<<<<< HEAD
       return mocker.newSyntheticMarketMock(syntheticName,syntheticSymbol,_paymentToken,_oracleManager,_yieldManager);
-=======
-      return mocker.newSyntheticMarketMock(syntheticName,syntheticSymbol,_fundToken,_oracleManager,_yieldManager);
->>>>>>> origin/dev
     }
   
         latestMarket++;
@@ -403,14 +394,14 @@ contract LongShortMockable is ILongShort, Initializable {
             )
         );
 
-        paymentTokens[latestMarket] = IERC20(_paymentToken);
+                paymentTokens[latestMarket] = IERC20(_paymentToken);
         yieldManagers[latestMarket] = IYieldManager(_yieldManager);
         oracleManagers[latestMarket] = IOracleManager(_oracleManager);
         assetPrice[latestMarket] = uint256(
             oracleManagers[latestMarket].updatePrice()
         );
 
-        paymentTokens[latestMarket].approve(_yieldManager, type(uint256).max);
+                paymentTokens[latestMarket].approve(_yieldManager, type(uint256).max);
 
         emit SyntheticTokenCreated(
             latestMarket,
@@ -882,7 +873,11 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._depositFundsMock(marketIndex,amount);
     }
   
-        paymentTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
+        paymentTokens[marketIndex].transferFrom(
+            msg.sender,
+            address(this),
+            amount
+        );
     }
 
         function _lockFundsInMarket(uint32 marketIndex, uint256 amount) internal {
@@ -921,11 +916,7 @@ contract LongShortMockable is ILongShort, Initializable {
 
         _transferFromYieldManager(marketIndex, totalAmount);
 
-<<<<<<< HEAD
                 paymentTokens[marketIndex].transfer(user, totalAmount);
-=======
-                fundTokens[marketIndex].transfer(user, totalAmount);
->>>>>>> origin/dev
 
         syntheticTokenPoolValue[marketIndex][true] -= amountLong;
         syntheticTokenPoolValue[marketIndex][false] -= amountShort;
@@ -969,15 +960,7 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._transferFundsToYieldManagerMock(marketIndex,amount);
     }
   
-<<<<<<< HEAD
-                                                        paymentTokens[marketIndex].approve(
-            address(yieldManagers[marketIndex]),
-            amount
-        );
         yieldManagers[marketIndex].depositPaymentToken(amount);
-=======
-                                                        yieldManagers[marketIndex].depositToken(amount);
->>>>>>> origin/dev
     }
 
     
@@ -990,11 +973,7 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._transferFromYieldManagerMock(marketIndex,amount);
     }
   
-<<<<<<< HEAD
                         yieldManagers[marketIndex].withdrawPaymentToken(amount);
-=======
-                        yieldManagers[marketIndex].withdrawToken(amount);
->>>>>>> origin/dev
     }
 
     

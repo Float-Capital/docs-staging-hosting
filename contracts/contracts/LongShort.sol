@@ -821,13 +821,7 @@ contract LongShort is ILongShort, Initializable {
     function _transferFundsToYieldManager(uint32 marketIndex, uint256 amount)
         internal
     {
-        // TODO STENT note there are 2 approvals & 2 transfers here:
-        //     1. approve transfer from this contract to yield manager contract
-        //     2. transfer from this contract to yield manager contract
-        //     3. approve transfer from yield manager contract to lendingPool contract
-        //     4. transfer from yield mnager contract to lendingPool contract
-        // Surely we can make this more efficient?
-        yieldManagers[marketIndex].depositToken(amount);
+        yieldManagers[marketIndex].depositPaymentToken(amount);
     }
 
     /*

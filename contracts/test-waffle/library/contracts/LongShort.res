@@ -90,10 +90,6 @@ external executeOutstandingNextPriceSettlementsUser: (
   ~marketIndex: int,
 ) => JsPromise.t<transaction> = "executeOutstandingNextPriceSettlementsUser"
 
-type paymentTokensReturn = Ethers.ethAddress
-@send
-external paymentTokens: (t, int) => JsPromise.t<paymentTokensReturn> = "paymentTokens"
-
 type getLongPcntForLongVsShortSplitReturn = Ethers.BigNumber.t
 @send
 external getLongPcntForLongVsShortSplit: (
@@ -202,6 +198,10 @@ external newSyntheticMarket: (
 type oracleManagersReturn = Ethers.ethAddress
 @send
 external oracleManagers: (t, int) => JsPromise.t<oracleManagersReturn> = "oracleManagers"
+
+type paymentTokensReturn = Ethers.ethAddress
+@send
+external paymentTokens: (t, int) => JsPromise.t<paymentTokensReturn> = "paymentTokens"
 
 @send
 external redeemLongNextPrice: (
@@ -412,10 +412,6 @@ module Exposed = {
     ~marketIndex: int,
   ) => JsPromise.t<transaction> = "executeOutstandingNextPriceSettlementsUser"
 
-  type paymentTokensReturn = Ethers.ethAddress
-  @send
-  external paymentTokens: (t, int) => JsPromise.t<paymentTokensReturn> = "paymentTokens"
-
   type getLongPcntForLongVsShortSplitReturn = Ethers.BigNumber.t
   @send
   external getLongPcntForLongVsShortSplit: (
@@ -524,6 +520,10 @@ module Exposed = {
   type oracleManagersReturn = Ethers.ethAddress
   @send
   external oracleManagers: (t, int) => JsPromise.t<oracleManagersReturn> = "oracleManagers"
+
+  type paymentTokensReturn = Ethers.ethAddress
+  @send
+  external paymentTokens: (t, int) => JsPromise.t<paymentTokensReturn> = "paymentTokens"
 
   @send
   external redeemLongNextPrice: (

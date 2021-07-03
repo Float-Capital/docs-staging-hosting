@@ -86,7 +86,7 @@ contract YieldManagerAave is IYieldManager {
         lendingPool = ILendingPool(_lendingPool);
 
         // Approve tokens for aave lending pool maximally.
-        token.approve(address(lendingPool), type(uint256).max);
+        paymentToken.approve(address(lendingPool), type(uint256).max);
     }
 
     /*╔═════════════════════════════╗
