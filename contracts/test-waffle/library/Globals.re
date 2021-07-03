@@ -50,13 +50,9 @@ let describeBoth =
   if (Config.isCI) {
     // In CI it is only run as an integration test
     //   this doesn't really matter - if integration tests are slower than unit tests, rather make this run as a unit test
-    if (Config.dontRunIntegrationTests) {
-      Js.log("THIS IS SKIPPING");
-      describe_skip;
-    } else {
-      describe;
+    if (Config.dontRunIntegrationTests) {describe_skip} else {
+      describe
     };
   } else {
-    Js.log("THIS IS NOTT SKIPPING");
     describe;
   };

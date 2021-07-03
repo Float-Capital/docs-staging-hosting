@@ -36,7 +36,7 @@ function recordEqualDeep(expected, actual) {
 
 var intEqual = ((message, number1, number2) => expect(number1, message).to.equal(number2));
 
-var addressEqual = ((message, number1, number2) => expect(number1, message).to.equal(number2));
+var addressEqual = ((message, address1, address2) => expect(address1, message).to.equal(address2));
 
 var boolEqual = ((message, number1, number2) => expect(number1, message).to.equal(number2));
 
