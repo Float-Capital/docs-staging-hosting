@@ -16,3 +16,8 @@ let dontRunIntegrationTests =
 external optDontRunUnitTests: option<string> = "process.env.DONT_RUN_UNIT_TESTS"
 let dontRunUnitTests =
   optDontRunUnitTests->Option.getWithDefault("false")->Js.String2.toLowerCase == "true"
+
+// The CI flag is set to true by defualt inside gh-actions: https://github.blog/changelog/2020-04-15-github-actions-sets-the-ci-environment-variable-to-true/
+@val
+external optIsCI: option<string> = "process.env.CI"
+let isCI = optIsCI->Option.getWithDefault("false")->Js.String2.toLowerCase == "true"

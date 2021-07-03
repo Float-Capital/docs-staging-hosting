@@ -51,10 +51,12 @@ module.exports = {
 
     "testing/LongShortInternalsExposed.sol",
     "testing/StakerInternalsExposed.sol",
-    "testing/generatedLongShortForInternalMocking.sol",
-    "testing/generatedLongShortMockable.sol",
-    "testing/generatedStakerForInternalMocking.sol",
-    "testing/generatedStakerMockable.sol"
+
+    "testing/generated/LongShortForInternalMocking.sol",
+    "testing/generated/LongShortMockable.sol",
+    "testing/generated/StakerForInternalMocking.sol",
+    "testing/generated/StakerMockable.sol"
   ],
   istanbulFolder: coverageReportOutputDirectory,
 };
+

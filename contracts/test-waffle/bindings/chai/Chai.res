@@ -43,6 +43,12 @@ let intEqual: (
   int,
 ) => unit = %raw(`(message, number1, number2) => expect(number1, message).to.equal(number2)`)
 
+let addressEqual: (
+  ~message: string=?,
+  ~otherAddress: Ethers.ethAddress,
+  Ethers.ethAddress,
+) => unit = %raw(`(message, number1, number2) => expect(number1, message).to.equal(number2)`)
+
 let boolEqual: (
   ~message: string=?,
   bool,

@@ -12,7 +12,10 @@ var dontRunIntegrationTests = Belt_Option.getWithDefault(process.env.DONT_RUN_IN
 
 var dontRunUnitTests = Belt_Option.getWithDefault(process.env.DONT_RUN_UNIT_TESTS, "false").toLowerCase() === "true";
 
+var isCI = Belt_Option.getWithDefault(process.env.CI, "false").toLowerCase() === "true";
+
 exports.runValueSimulations = runValueSimulations;
 exports.dontRunIntegrationTests = dontRunIntegrationTests;
 exports.dontRunUnitTests = dontRunUnitTests;
+exports.isCI = isCI;
 /*  Not a pure module */

@@ -28,66 +28,6 @@ module DataFetchers = {
 };
 
 module LongShortHelpers = {
-  let getFeesMint =
-      (longShort, ~marketIndex, ~amount, ~valueInEntrySide, ~valueInOtherSide) => {
-    // let%AwaitThen baseEntryFee =
-    //   longShort->LongShort.baseEntryFee(marketIndex);
-    let%AwaitThen badLiquidityEntryFee =
-      longShort->LongShort.badLiquidityEntryFee(marketIndex);
-
-    let%Await feeUnitsOfPrecision = longShort->LongShort.tEN_TO_THE_5;
-
-    let baseFee = bnFromInt(0); //amount->mul(baseEntryFee)->div(feeUnitsOfPrecision);
-    if (valueInEntrySide->bnGte(valueInOtherSide)) {
-      // All funds are causing imbalance
-      baseFee->add(
-        amount->mul(badLiquidityEntryFee)->div(feeUnitsOfPrecision),
-      );
-    } else if (valueInEntrySide->add(amount)->bnGt(valueInOtherSide)) {
-      let amountImbalancing =
-        amount->sub(valueInOtherSide->sub(valueInEntrySide));
-      let penaltyFee =
-        amountImbalancing
-        ->mul(badLiquidityEntryFee)
-        ->div(feeUnitsOfPrecision);
-
-      baseFee->add(penaltyFee);
-    } else {
-      baseFee;
-    };
-  };
-  let getFeesRedeemLazy =
-      (
-        longShort,
-        ~marketIndex,
-        ~amount,
-        ~valueInRemovalSide,
-        ~valueInOtherSide,
-      ) => {
-    let%AwaitThen badLiquidityExitFee =
-      longShort->LongShort.badLiquidityExitFee(marketIndex);
-
-    let%Await feeUnitsOfPrecision = longShort->LongShort.tEN_TO_THE_5;
-
-    let baseFee = CONSTANTS.zeroBn;
-    if (valueInOtherSide->bnGte(valueInRemovalSide)) {
-      // All funds are causing imbalance
-      baseFee->add(
-        amount->mul(badLiquidityExitFee)->div(feeUnitsOfPrecision),
-      );
-    } else if (valueInOtherSide->add(amount)->bnGt(valueInRemovalSide)) {
-      let amountImbalancing =
-        amount->sub(valueInRemovalSide->sub(valueInOtherSide));
-      let penaltyFee =
-        amountImbalancing
-        ->mul(badLiquidityExitFee)
-        ->div(feeUnitsOfPrecision);
-
-      baseFee->add(penaltyFee);
-    } else {
-      baseFee;
-    };
-  };
   type marketBalance = {
     longValue: Ethers.BigNumber.t,
     shortValue: Ethers.BigNumber.t,
@@ -96,45 +36,39 @@ module LongShortHelpers = {
     let%AwaitThen longValue =
       longShort->LongShort.syntheticTokenPoolValue(
         marketIndex,
-        true/*long*/,
+        true /*long*/,
       );
     let%Await shortValue =
       longShort->LongShort.syntheticTokenPoolValue(
         marketIndex,
-        false/*short*/,
+        false /*short*/,
       );
     {longValue, shortValue};
   };
-  let getSyntheticTokenPrice = 
-    (
-      longShort,
-      ~marketIndex,
-      ~isLong,
-    ) => {
-      let%AwaitThen syntheticTokenAddress = longShort->LongShort.syntheticTokens(marketIndex, isLong);
-      let%AwaitThen synthContract =
-        ContractHelpers.attachToContract(
-          "SyntheticToken",
-          ~contractAddress=syntheticTokenAddress,
-        );
-      let%AwaitThen totalSupply = synthContract->Obj.magic->SyntheticToken.totalSupply;
+  let getSyntheticTokenPrice = (longShort, ~marketIndex, ~isLong) => {
+    let%AwaitThen syntheticTokenAddress =
+      longShort->LongShort.syntheticTokens(marketIndex, isLong);
+    let%AwaitThen synthContract =
+      ContractHelpers.attachToContract(
+        "SyntheticToken",
+        ~contractAddress=syntheticTokenAddress,
+      );
+    let%AwaitThen totalSupply =
+      synthContract->Obj.magic->SyntheticToken.totalSupply;
 
-      let%Await syntheticTokenPoolValue = 
-         longShort->LongShort.syntheticTokenPoolValue(marketIndex, isLong);
+    let%Await syntheticTokenPoolValue =
+      longShort->LongShort.syntheticTokenPoolValue(marketIndex, isLong);
 
-      let syntheticTokenPrice = 
-         syntheticTokenPoolValue
-         ->mul(CONSTANTS.tenToThe18)
-         ->div(totalSupply);
+    let syntheticTokenPrice =
+      syntheticTokenPoolValue->mul(CONSTANTS.tenToThe18)->div(totalSupply);
 
-      syntheticTokenPrice;
-    };
+    syntheticTokenPrice;
+  };
 };
 
 module SyntheticTokenHelpers = {
   let getIsLong = synthToken => {
-    let%Await isLong =
-      synthToken->SyntheticToken.isLong;
-    isLong == true/*long*/;
+    let%Await isLong = synthToken->SyntheticToken.isLong;
+    isLong == true /*long*/;
   };
 };

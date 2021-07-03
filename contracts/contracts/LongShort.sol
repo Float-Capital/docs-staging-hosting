@@ -51,11 +51,6 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => IYieldManager) public yieldManagers;
     mapping(uint32 => IOracleManager) public oracleManagers;
 
-    mapping(uint32 => uint256) public baseEntryFee;
-    mapping(uint32 => uint256) public badLiquidityEntryFee;
-    mapping(uint32 => uint256) public baseExitFee;
-    mapping(uint32 => uint256) public badLiquidityExitFee;
-
     // Market + position (long/short) specific /////////////////
     mapping(uint32 => mapping(bool => ISyntheticToken)) public syntheticTokens;
     mapping(uint32 => mapping(bool => uint256)) public syntheticTokenPoolValue;
@@ -177,11 +172,6 @@ contract LongShort is ILongShort, Initializable {
         _;
     }
 
-    modifier treasuryOnly() {
-        require(msg.sender == treasury, "only treasury");
-        _;
-    }
-
     modifier assertMarketExists(uint32 marketIndex) {
         require(marketExists[marketIndex], "market doesn't exist");
         _;
@@ -234,43 +224,6 @@ contract LongShort is ILongShort, Initializable {
 
     function changeTreasury(address _treasury) external adminOnly {
         treasury = _treasury;
-    }
-
-    function changeFees(
-        uint32 marketIndex,
-        uint256 _baseEntryFee,
-        uint256 _badLiquidityEntryFee,
-        uint256 _baseExitFee,
-        uint256 _badLiquidityExitFee
-    ) external adminOnly {
-        _changeFees(
-            marketIndex,
-            _baseEntryFee,
-            _baseExitFee,
-            _badLiquidityEntryFee,
-            _badLiquidityExitFee
-        );
-    }
-
-    function _changeFees(
-        uint32 marketIndex,
-        uint256 _baseEntryFee,
-        uint256 _baseExitFee,
-        uint256 _badLiquidityEntryFee,
-        uint256 _badLiquidityExitFee
-    ) internal {
-        baseEntryFee[marketIndex] = _baseEntryFee;
-        baseExitFee[marketIndex] = _baseExitFee;
-        badLiquidityEntryFee[marketIndex] = _badLiquidityEntryFee;
-        badLiquidityExitFee[marketIndex] = _badLiquidityExitFee;
-
-        emit FeesChanges(
-            latestMarket,
-            _baseEntryFee,
-            _badLiquidityEntryFee,
-            _baseExitFee,
-            _badLiquidityExitFee
-        );
     }
 
     /**
@@ -379,10 +332,6 @@ contract LongShort is ILongShort, Initializable {
 
     function initializeMarket(
         uint32 marketIndex,
-        uint256 _baseEntryFee,
-        uint256 _badLiquidityEntryFee,
-        uint256 _baseExitFee,
-        uint256 _badLiquidityExitFee,
         uint256 kInitialMultiplier,
         uint256 kPeriod,
         uint256 initialMarketSeed
@@ -390,14 +339,6 @@ contract LongShort is ILongShort, Initializable {
         require(!marketExists[marketIndex] && marketIndex <= latestMarket);
 
         marketExists[marketIndex] = true;
-
-        _changeFees(
-            marketIndex,
-            _baseEntryFee,
-            _baseExitFee,
-            _badLiquidityEntryFee,
-            _badLiquidityExitFee
-        );
 
         // Add new staker funds with fresh synthetic tokens.
         staker.addNewStakingFund(
@@ -515,29 +456,30 @@ contract LongShort is ILongShort, Initializable {
         return marketPcntE5;
     }
 
-    /**
-     * Returns the amount of accrued value that should go to the market,
-     * and the amount that should be locked into the treasury. To incentivise
-     * market balance, more value goes to the market in proportion to how
-     * imbalanced it is.
-     */
-    function getTreasurySplit(uint32 marketIndex, uint256 amount)
-        public
-        view
-        returns (uint256 marketAmount, uint256 treasuryAmount)
-    {
-        uint256 marketPcntE5 = getMarketPcntForTreasuryVsMarketSplit(
-            marketIndex
-        );
+    // TODO: this is an unused function. Integrate it!
+    // /**
+    //  * Returns the amount of accrued value that should go to the market,
+    //  * and the amount that should be locked into the treasury. To incentivise
+    //  * market balance, more value goes to the market in proportion to how
+    //  * imbalanced it is.
+    //  */
+    // function _getTreasurySplit(uint32 marketIndex, uint256 amount)
+    //     internal
+    //     view
+    //     returns (uint256 marketAmount, uint256 treasuryAmount)
+    // {
+    //     uint256 marketPcntE5 = getMarketPcntForTreasuryVsMarketSplit(
+    //         marketIndex
+    //     );
 
-        marketAmount = (marketPcntE5 * amount) / TEN_TO_THE_5;
-        treasuryAmount = amount - marketAmount;
+    //     marketAmount = (marketPcntE5 * amount) / TEN_TO_THE_5;
+    //     treasuryAmount = amount - marketAmount;
 
-        return (marketAmount, treasuryAmount);
-    }
+    //     return (marketAmount, treasuryAmount);
+    // }
 
-    function getLongPcntForLongVsShortSplit(uint32 marketIndex)
-        public
+    function _getLongPcntForLongVsShortSplit(uint32 marketIndex)
+        internal
         view
         returns (uint256 longPcntE5)
     {
@@ -552,12 +494,12 @@ contract LongShort is ILongShort, Initializable {
      * market. To incentivise balance, more value goes to the weaker side in
      * proportion to how imbalanced the market is.
      */
-    function getMarketSplit(uint32 marketIndex, uint256 amount)
-        public
+    function _getMarketSplit(uint32 marketIndex, uint256 amount)
+        internal
         view
         returns (uint256 longAmount, uint256 shortAmount)
     {
-        uint256 longPcntE5 = getLongPcntForLongVsShortSplit(marketIndex);
+        uint256 longPcntE5 = _getLongPcntForLongVsShortSplit(marketIndex);
 
         longAmount = (amount * longPcntE5) / TEN_TO_THE_5;
         shortAmount = amount - longAmount;
@@ -573,7 +515,7 @@ contract LongShort is ILongShort, Initializable {
         internal
     {
         // Splits mostly to the weaker position to incentivise balance.
-        (uint256 longAmount, uint256 shortAmount) = getMarketSplit(
+        (uint256 longAmount, uint256 shortAmount) = _getMarketSplit(
             marketIndex,
             marketAmount
         );
