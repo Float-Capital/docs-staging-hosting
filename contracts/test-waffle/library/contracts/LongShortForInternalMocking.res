@@ -303,7 +303,8 @@ external getUsersConfirmedButNotSettledBalanceMock: (
   Ethers.ethAddress,
   int,
   bool,
-) => JsPromise.t<getUsersConfirmedButNotSettledBalanceMockReturn> = "getUsersConfirmedButNotSettledBalanceMock"
+) => JsPromise.t<getUsersConfirmedButNotSettledBalanceMockReturn> =
+  "getUsersConfirmedButNotSettledBalanceMock"
 
 type initializeMarketMockReturn
 @send

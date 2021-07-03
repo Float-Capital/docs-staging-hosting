@@ -22,18 +22,20 @@ describe("YieldManagerAave", (function () {
                                             accounts.contents = loadedAccounts;
                                             var admin = loadedAccounts[0];
                                             var treasury = loadedAccounts[1];
-                                            var daiAddress = ethers.Wallet.createRandom().address;
                                             var longShortAddress = ethers.Wallet.createRandom().address;
                                             var lendingPoolAddress = ethers.Wallet.createRandom().address;
                                             var fundTokenAddress = ethers.Wallet.createRandom().address;
-                                            return LetOps.AwaitThen.let_(ERC20Mock.make("TestADAI", "ADAI"), (function (erc20Mock) {
-                                                          return LetOps.AwaitThen.let_(YieldManagerAave.make(admin.address, longShortAddress, treasury.address, daiAddress, fundTokenAddress, lendingPoolAddress, 6543), (function (yieldManagerAave) {
-                                                                        return LetOps.Await.let_(erc20Mock.mint(yieldManagerAave.address, amountOfWMaticInYieldManager), (function (param) {
-                                                                                      contracts.contents = {
-                                                                                        erc20Mock: erc20Mock,
-                                                                                        yieldManagerAave: yieldManagerAave
-                                                                                      };
-                                                                                      
+                                            return LetOps.AwaitThen.let_(ERC20Mock.make("Payment Token Mock", "PaymentToken"), (function (paymentTokenMock) {
+                                                          var paymentTokenAddress = paymentTokenMock.address;
+                                                          return LetOps.AwaitThen.let_(ERC20Mock.make("Test APaymentToken", "APaymentToken"), (function (erc20Mock) {
+                                                                        return LetOps.AwaitThen.let_(YieldManagerAave.make(admin.address, longShortAddress, treasury.address, paymentTokenAddress, fundTokenAddress, lendingPoolAddress, 6543), (function (yieldManagerAave) {
+                                                                                      return LetOps.Await.let_(erc20Mock.mint(yieldManagerAave.address, amountOfWMaticInYieldManager), (function (param) {
+                                                                                                    contracts.contents = {
+                                                                                                      erc20Mock: erc20Mock,
+                                                                                                      yieldManagerAave: yieldManagerAave
+                                                                                                    };
+                                                                                                    
+                                                                                                  }));
                                                                                     }));
                                                                       }));
                                                         }));

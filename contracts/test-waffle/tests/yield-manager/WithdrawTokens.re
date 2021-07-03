@@ -15,19 +15,20 @@ describe("YieldManagerAave", () => {
         let admin = loadedAccounts->Array.getUnsafe(0);
         let treasury = loadedAccounts->Array.getUnsafe(1);
 
-        let daiAddress = Ethers.Wallet.createRandom().address;
         let longShortAddress = Ethers.Wallet.createRandom().address;
         let lendingPoolAddress = Ethers.Wallet.createRandom().address;
         let fundTokenAddress = Ethers.Wallet.createRandom().address;
+        let%AwaitThen paymentTokenMock = ERC20Mock.make(~name="Payment Token Mock", ~symbol="PaymentToken");
+        let paymentTokenAddress = paymentTokenMock.address;
 
         let%AwaitThen erc20Mock =
-          ERC20Mock.make(~name="TestADAI", ~symbol="ADAI");
+          ERC20Mock.make(~name="Test APaymentToken", ~symbol="APaymentToken");
         let%AwaitThen yieldManagerAave =
           YieldManagerAave.make(
             ~admin=admin.address,
             ~longShort=longShortAddress,
             ~treasury=treasury.address,
-            ~token=daiAddress,
+            ~token=paymentTokenAddress,
             ~aToken=fundTokenAddress,
             ~lendingPool=lendingPoolAddress,
             ~aaveReferalCode=6543,
@@ -40,6 +41,7 @@ describe("YieldManagerAave", () => {
         contracts :=
           {"erc20Mock": erc20Mock, "yieldManagerAave": yieldManagerAave};
       });
+
       it(
         "allows treasury to call 'transfer' function on any erc20 to transfer it to the treasury",
         () => {

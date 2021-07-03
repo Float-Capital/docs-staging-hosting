@@ -138,7 +138,8 @@ external getUsersConfirmedButNotSettledBalance: (
   ~user: Ethers.ethAddress,
   ~marketIndex: int,
   ~isLong: bool,
-) => JsPromise.t<getUsersConfirmedButNotSettledBalanceReturn> = "getUsersConfirmedButNotSettledBalance"
+) => JsPromise.t<getUsersConfirmedButNotSettledBalanceReturn> =
+  "getUsersConfirmedButNotSettledBalance"
 
 @send
 external initialize: (
@@ -459,7 +460,8 @@ module Exposed = {
     ~user: Ethers.ethAddress,
     ~marketIndex: int,
     ~isLong: bool,
-  ) => JsPromise.t<getUsersConfirmedButNotSettledBalanceReturn> = "getUsersConfirmedButNotSettledBalance"
+  ) => JsPromise.t<getUsersConfirmedButNotSettledBalanceReturn> =
+    "getUsersConfirmedButNotSettledBalance"
 
   @send
   external initialize: (
