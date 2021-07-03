@@ -42,11 +42,6 @@ const deployTestMarket = async (
   token
 ) => {
   console.log("Deploying test Market", syntheticName, syntheticSymbol);
-  // Default mint/redeem fees.
-  const _baseEntryFee = 0;
-  const _badLiquidityEntryFee = 50;
-  const _baseExitFee = 30;
-  const _badLiquidityExitFee = 50;
 
   // We mock out the oracle manager unless we're on BSC testnet.
   let oracleManager;
@@ -107,10 +102,6 @@ const deployTestMarket = async (
 
   await longShortInstance.initializeMarket(
     currentMarketIndex,
-    _baseEntryFee,
-    _badLiquidityEntryFee,
-    _baseExitFee,
-    _badLiquidityExitFee,
     kInitialMultiplier,
     kPeriod,
     new BN("1000000000000000000")
