@@ -1,7 +1,8 @@
 open LetOps;
 open Mocha;
+open Globals;
 
-let test =
+let testUnit =
     (
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
@@ -126,6 +127,77 @@ let test =
               ),
         );
       ();
+    });
+  });
+};
+
+let testIntegration =
+    (
+      ~contracts: ref(Helpers.coreContracts),
+      ~accounts: ref(array(Ethers.Wallet.t)),
+    ) => {
+  describe("initializeMarket", () => {
+    it("Shouldn't allow initialization of a market that doesn't exist", () => {
+      let nonExistantMarket = 654654;
+
+      Chai.expectRevert(
+        ~transaction=
+          contracts.contents.longShort
+          ->LongShort.initializeMarket(
+              ~marketIndex=nonExistantMarket,
+              ~kInitialMultiplier=CONSTANTS.oneBn,
+              ~kPeriod=CONSTANTS.oneBn,
+              ~initialMarketSeed=CONSTANTS.oneBn,
+            ),
+        ~reason="index too high",
+      );
+    });
+
+    it(
+      "Shouldn't allow initialization of a market that has already been initialized",
+      () => {
+      let {longShort, markets} = contracts.contents;
+      let {marketIndex} = markets->Array.getUnsafe(0);
+
+      Chai.expectRevert(
+        ~transaction=
+          longShort->LongShort.initializeMarket(
+            ~marketIndex,
+            ~kInitialMultiplier=CONSTANTS.oneBn,
+            ~kPeriod=CONSTANTS.oneBn,
+            ~initialMarketSeed=CONSTANTS.oneBn,
+          ),
+        ~reason="already initialized",
+      );
+    });
+
+    it(
+      "Shouldn't allow initialization with less than 0.1 eth units of payment token",
+      () => {
+      let {longShort, markets} = contracts.contents;
+      let {paymentToken, oracleManager, yieldManager} =
+        markets->Array.getUnsafe(0);
+
+      let%Await _ =
+        longShort->LongShort.newSyntheticMarket(
+          ~syntheticName="Test",
+          ~syntheticSymbol="T",
+          ~paymentToken=paymentToken.address,
+          ~oracleManager=oracleManager.address,
+          ~yieldManager=yieldManager.address,
+        );
+      let%Await latestMarket = longShort->LongShort.latestMarket;
+
+      Chai.expectRevert(
+        ~transaction=
+          longShort->LongShort.initializeMarket(
+            ~marketIndex=latestMarket,
+            ~kInitialMultiplier=CONSTANTS.tenToThe18,
+            ~kPeriod=CONSTANTS.oneBn,
+            ~initialMarketSeed=CONSTANTS.oneBn,
+          ),
+        ~reason="Insufficient market seed",
+      );
     });
   });
 };

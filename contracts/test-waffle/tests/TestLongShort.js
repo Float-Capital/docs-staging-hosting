@@ -35,7 +35,8 @@ describe("Float System", (function () {
                         
                       }));
                 LazyDeposit.testIntegration(contracts, accounts);
-                return LazyRedeem.testIntegration(contracts, accounts);
+                LazyRedeem.testIntegration(contracts, accounts);
+                return InitializeMarket.testIntegration(contracts, accounts);
               }));
         Globals.describeBoth("LongShort - Admin functions", (function (param) {
                 var contracts = {
@@ -134,7 +135,7 @@ describe("Float System", (function () {
                                                       }));
                                         }));
                           });
-                      return InitializeMarket.test(contracts, accounts);
+                      return InitializeMarket.testUnit(contracts, accounts);
                     }));
       }));
 

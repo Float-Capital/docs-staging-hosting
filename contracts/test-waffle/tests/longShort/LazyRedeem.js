@@ -10,7 +10,7 @@ var HelperActions = require("../../library/HelperActions.js");
 
 function testIntegration(contracts, accounts) {
   describe("lazyRedeem", (function () {
-          it.skip("[THIS TEST IS FLAKY] should work as expected happy path", (function () {
+          it("should work as expected happy path", (function () {
                   var testUser = accounts.contents[8];
                   var amountToNextPriceMint = Helpers.randomTokenAmount(undefined);
                   var match = contracts.contents;

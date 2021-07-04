@@ -3,12 +3,13 @@
 
 var Chai = require("../../bindings/chai/Chai.js");
 var LetOps = require("../../library/LetOps.js");
+var CONSTANTS = require("../../CONSTANTS.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var StakerSmocked = require("../../library/smock/StakerSmocked.js");
 var LongShortSmocked = require("../../library/smock/LongShortSmocked.js");
 var Smock = require("@eth-optimism/smock");
 
-function test(contracts, accounts) {
+function testUnit(contracts, accounts) {
   describe("initializeMarket", (function () {
           var stakerSmockedRef = {
             contents: undefined
@@ -75,5 +76,31 @@ function test(contracts, accounts) {
   
 }
 
-exports.test = test;
+function testIntegration(contracts, accounts) {
+  describe("initializeMarket", (function () {
+          it("Shouldn't allow initialization of a market that doesn't exist", (function () {
+                  return Chai.expectRevert(contracts.contents.longShort.initializeMarket(654654, CONSTANTS.oneBn, CONSTANTS.oneBn, CONSTANTS.oneBn), "index too high");
+                }));
+          it("Shouldn't allow initialization of a market that has already been initialized", (function () {
+                  var match = contracts.contents;
+                  var match$1 = match.markets[0];
+                  return Chai.expectRevert(match.longShort.initializeMarket(match$1.marketIndex, CONSTANTS.oneBn, CONSTANTS.oneBn, CONSTANTS.oneBn), "already initialized");
+                }));
+          it("Shouldn't allow initialization with less than 0.1 eth units of payment token", (function () {
+                  var match = contracts.contents;
+                  var longShort = match.longShort;
+                  var match$1 = match.markets[0];
+                  return LetOps.Await.let_(longShort.newSyntheticMarket("Test", "T", match$1.paymentToken.address, match$1.oracleManager.address, match$1.yieldManager.address), (function (param) {
+                                return LetOps.Await.let_(longShort.latestMarket(), (function (latestMarket) {
+                                              return Chai.expectRevert(longShort.initializeMarket(latestMarket, CONSTANTS.tenToThe18, CONSTANTS.oneBn, CONSTANTS.oneBn), "Insufficient market seed");
+                                            }));
+                              }));
+                }));
+          
+        }));
+  
+}
+
+exports.testUnit = testUnit;
+exports.testIntegration = testIntegration;
 /* Chai Not a pure module */

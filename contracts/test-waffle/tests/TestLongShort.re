@@ -38,6 +38,7 @@ describe("Float System", () => {
 
     LazyDeposit.testIntegration(~contracts, ~accounts);
     LazyRedeem.testIntegration(~contracts, ~accounts);
+    InitializeMarket.testIntegration(~contracts, ~accounts);
   });
 
   describeBoth("LongShort - Admin functions", () => {
@@ -196,6 +197,6 @@ describe("Float System", () => {
         );
       ();
     });
-    InitializeMarket.test(~contracts, ~accounts);
+    InitializeMarket.testUnit(~contracts, ~accounts);
   });
 });
