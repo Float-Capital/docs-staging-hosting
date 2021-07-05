@@ -298,7 +298,7 @@ module UserTokenBox = {
         <div className=`text-xs text-center text-gray-400`>
           {timestamp->Globals.formatTimestamp->React.string}
         </div>
-        // <UserPercentageGains isLong tokenAddress metadata /> // TODO: temp remove while innacurate
+        <UserPercentageGains isLong tokenAddress metadata />
       </div>
       <div className=`self-center`> {children} </div>
     </div>
@@ -372,7 +372,7 @@ module UserStakeBox = {
     ~isLong,
     ~tokens,
     ~value,
-    ~_tokenAddress=CONSTANTS.zeroAddress,
+    ~tokenAddress=CONSTANTS.zeroAddress,
     ~metadata: DataHooks.synthBalanceMetadata,
     ~creationTxHash,
     ~children,
@@ -399,7 +399,7 @@ module UserStakeBox = {
           className="text-xs text-center text-gray-400 hover:opacity-75">
           {timestamp->Globals.formatTimestamp->React.string}
         </a>
-        // <UserPercentageGains tokenAddress metadata isLong />   // TODO: temp remove while innacurate
+        <UserPercentageGains tokenAddress metadata isLong />
       </div>
       <div className=`self-center`> {children} </div>
     </div>
@@ -502,7 +502,7 @@ module UserStakesCard = {
         name
         isLong
         tokens
-        // tokenAddress={addr}
+        tokenAddress={addr}
         value={value->Misc.NumberFormat.formatEther}
         metadata
         creationTxHash>

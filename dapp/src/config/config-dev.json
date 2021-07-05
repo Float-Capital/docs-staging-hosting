@@ -1,6 +1,5 @@
 {
-  "graphEndpoint0": "https://test.graph.float.capital/subgraphs/name/float-capital/float-capital",
-  "graphEndpoint": "http://127.0.0.1:8000/subgraphs/name/float-capital/float-capital",
+  "graphEndpoint": "https://test.graph.float.capital/subgraphs/name/float-capital/float-capital",  
   "priceHistoryGraphEndpoint": "https://test.graph.float.capital/subgraphs/name/float-capital/float-oracle-prices",
   "networkId": 80001,
   "networkName": "mumbai testnet",
