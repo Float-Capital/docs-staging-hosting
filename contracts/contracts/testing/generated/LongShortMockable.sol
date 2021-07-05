@@ -410,21 +410,6 @@ contract LongShortMockable is ILongShort, Initializable {
     
 
 
-    function _getSyntheticTokenPrice(uint32 marketIndex, bool isLong)
-        internal
-        view
-        returns (uint256 syntheticTokenPrice)
-    {
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_getSyntheticTokenPrice"))){
-      
-      return mocker._getSyntheticTokenPriceMock(marketIndex,isLong);
-    }
-  
-        syntheticTokenPrice =
-            (syntheticTokenPoolValue[marketIndex][isLong] * TEN_TO_THE_18) /
-            syntheticTokens[marketIndex][isLong].totalSupply();
-    }
-
     function _getAmountPaymentToken(uint256 amountSynth, uint256 price)
         internal view returns (uint256)
     {
@@ -474,10 +459,9 @@ contract LongShortMockable is ILongShort, Initializable {
                 marketIndex
             ][isLong][user];
 
-            uint256 syntheticTokenPrice = _getSyntheticTokenPrice(
-                marketIndex,
-                isLong
-            );
+            uint256 syntheticTokenPrice = syntheticTokenPriceSnapshot[
+                marketIndex
+            ][isLong][marketUpdateIndex[marketIndex]];
 
             uint256 tokens = _getAmountSynthToken(
                 amountPaymentTokenDeposited,
@@ -690,62 +674,69 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._updateSystemStateInternalMock(marketIndex);
     }
   
-        uint256 syntheticTokenPriceLong = _getSyntheticTokenPrice(
-            marketIndex,
-            true
-        );
-        uint256 syntheticTokenPriceShort = _getSyntheticTokenPrice(
-            marketIndex,
-            false
-        );
-
-                
-                staker.addNewStateForFloatRewards(
-            marketIndex,
-            syntheticTokenPriceLong,
-            syntheticTokenPriceShort,
-            syntheticTokenPoolValue[marketIndex][true],
-            syntheticTokenPoolValue[marketIndex][false]
-        );
-
                 int256 newAssetPrice = oracleManagers[marketIndex].updatePrice();
         int256 oldAssetPrice = int256(assetPrice[marketIndex]);
 
-        if (oldAssetPrice == newAssetPrice) {
-            return;
+        bool assetPriceChanged = oldAssetPrice != newAssetPrice;
+
+        if (assetPriceChanged || msg.sender == address(staker)) {
+            uint256 syntheticTokenPriceLong = syntheticTokenPriceSnapshot[
+                marketIndex
+            ][true][marketUpdateIndex[marketIndex]];
+            uint256 syntheticTokenPriceShort = syntheticTokenPriceSnapshot[
+                marketIndex
+            ][false][marketUpdateIndex[marketIndex]];
+            staker.addNewStateForFloatRewards(
+                marketIndex,
+                syntheticTokenPriceLong,
+                syntheticTokenPriceShort,
+                syntheticTokenPoolValue[marketIndex][true],
+                syntheticTokenPoolValue[marketIndex][false]
+            );
+
+            if (!assetPriceChanged) {
+                return;
+            }
+
+            _claimAndDistributeYield(marketIndex);
+            _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
+
+                        syntheticTokenPriceLong = syntheticTokenPriceSnapshot[marketIndex][
+                true
+            ][marketUpdateIndex[marketIndex]];
+            syntheticTokenPriceShort = syntheticTokenPriceSnapshot[marketIndex][
+                false
+            ][marketUpdateIndex[marketIndex]];
+
+            assetPrice[marketIndex] = uint256(newAssetPrice);
+            marketUpdateIndex[marketIndex] += 1;
+
+            _saveSyntheticTokenPriceSnapshots(
+                marketIndex,
+                marketUpdateIndex[marketIndex],
+                syntheticTokenPriceLong,
+                syntheticTokenPriceShort
+            );
+            _performOustandingSettlements(
+                marketIndex,
+                marketUpdateIndex[marketIndex],
+                syntheticTokenPriceLong,
+                syntheticTokenPriceShort
+            );
+
+            emit SystemStateUpdated(
+                marketIndex,
+                marketUpdateIndex[marketIndex],
+                syntheticTokenPoolValue[marketIndex][true],
+                syntheticTokenPoolValue[marketIndex][false],
+                syntheticTokenPriceLong,
+                syntheticTokenPriceShort
+            );
         }
-
-        _claimAndDistributeYield(marketIndex);
-        _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
-
-        syntheticTokenPriceLong = _getSyntheticTokenPrice(marketIndex, true);
-        syntheticTokenPriceShort = _getSyntheticTokenPrice(marketIndex, false);
-
-        assetPrice[marketIndex] = uint256(newAssetPrice);
-        marketUpdateIndex[marketIndex] += 1;
-
-        _saveSyntheticTokenPriceSnapshots(
-            marketIndex,
-            marketUpdateIndex[marketIndex],
-            syntheticTokenPriceLong,
-            syntheticTokenPriceShort
-        );
-        _performOustandingSettlements(
-            marketIndex,
-            marketUpdateIndex[marketIndex],
-            syntheticTokenPriceLong,
-            syntheticTokenPriceShort
-        );
-
-        emit SystemStateUpdated(
-            marketIndex,
-            marketUpdateIndex[marketIndex],
-            syntheticTokenPoolValue[marketIndex][true],
-            syntheticTokenPoolValue[marketIndex][false],
-            syntheticTokenPriceLong,
-            syntheticTokenPriceShort
-        );
     }
+
+    
+
 
     function updateSystemState(uint32 marketIndex) external override {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("updateSystemState"))){

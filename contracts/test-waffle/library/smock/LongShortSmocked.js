@@ -778,28 +778,6 @@ function initializeMarketCalls$1(param) {
                   })));
 }
 
-function mock_getSyntheticTokenPriceToReturn(_param0) {
-  checkForExceptions("_getSyntheticTokenPrice");
-  Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._getSyntheticTokenPriceMock.will.return.with([_param0])));
-          
-        }));
-  
-}
-
-function _getSyntheticTokenPriceCalls(param) {
-  checkForExceptions("_getSyntheticTokenPrice");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._getSyntheticTokenPriceMock.calls;
-                    return Belt_Array.map(array, (function (param) {
-                                  return {
-                                          marketIndex: param[0],
-                                          isLong: param[1]
-                                        };
-                                }));
-                  })));
-}
-
 function mock_getAmountPaymentTokenToReturn(_param0) {
   checkForExceptions("_getAmountPaymentToken");
   Belt_Option.map(internalRef.contents, (function (_r) {
@@ -1627,8 +1605,6 @@ var InternalMock = {
   _seedMarketInitiallyCalls: _seedMarketInitiallyCalls,
   mockInitializeMarketToReturn: mockInitializeMarketToReturn$1,
   initializeMarketCalls: initializeMarketCalls$1,
-  mock_getSyntheticTokenPriceToReturn: mock_getSyntheticTokenPriceToReturn,
-  _getSyntheticTokenPriceCalls: _getSyntheticTokenPriceCalls,
   mock_getAmountPaymentTokenToReturn: mock_getAmountPaymentTokenToReturn,
   _getAmountPaymentTokenCalls: _getAmountPaymentTokenCalls,
   mock_getAmountSynthTokenToReturn: mock_getAmountSynthTokenToReturn,

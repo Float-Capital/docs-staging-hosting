@@ -275,10 +275,6 @@ contract StakerInternalsExposed is StakerMockable {
         );
     }
 
-    function _updateStateExternal(ISyntheticToken token) external {
-        _updateState(token);
-    }
-
     function _claimFloatExternal(uint32[] calldata marketIndex) external {
         _claimFloat(marketIndex);
     }

@@ -59,10 +59,6 @@ contract StakerForInternalMocking {
       return ();
     }
      
-    function _updateStateMock(ISyntheticToken) public pure {
-      return ();
-    }
-     
     function calculateAccumulatedFloatHelperMock(uint32,address,uint256,uint256,uint256) public pure returns (uint256 longFloatReward,uint256 shortFloatReward){
       return (abi.decode("",(uint256)),abi.decode("",(uint256)));
     }

@@ -734,28 +734,6 @@ function addNewStateForFloatRewardsCalls$1(param) {
                   })));
 }
 
-function mock_updateStateToReturn(param) {
-  checkForExceptions("_updateState");
-  Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._updateStateMock.will.return()));
-          
-        }));
-  
-}
-
-function _updateStateCalls(param) {
-  checkForExceptions("_updateState");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._updateStateMock.calls;
-                    return Belt_Array.map(array, (function (_m) {
-                                  var token = _m[0];
-                                  return {
-                                          token: token
-                                        };
-                                }));
-                  })));
-}
-
 function mockCalculateAccumulatedFloatHelperToReturn(_param0, _param1) {
   checkForExceptions("calculateAccumulatedFloatHelper");
   Belt_Option.map(internalRef.contents, (function (_r) {
@@ -1120,8 +1098,6 @@ var InternalMock = {
   setRewardObjectsCalls: setRewardObjectsCalls,
   mockAddNewStateForFloatRewardsToReturn: mockAddNewStateForFloatRewardsToReturn$1,
   addNewStateForFloatRewardsCalls: addNewStateForFloatRewardsCalls$1,
-  mock_updateStateToReturn: mock_updateStateToReturn,
-  _updateStateCalls: _updateStateCalls,
   mockCalculateAccumulatedFloatHelperToReturn: mockCalculateAccumulatedFloatHelperToReturn,
   calculateAccumulatedFloatHelperCalls: calculateAccumulatedFloatHelperCalls,
   mockCalculateAccumulatedFloatToReturn: mockCalculateAccumulatedFloatToReturn,

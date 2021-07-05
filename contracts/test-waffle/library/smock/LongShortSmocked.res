@@ -956,33 +956,6 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mock_getSyntheticTokenPriceToReturn: Ethers.BigNumber.t => unit = _param0 => {
-    checkForExceptions(~functionName="_getSyntheticTokenPrice")
-    let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked._getSyntheticTokenPriceMock.will.return.with([_param0])")
-    })
-  }
-
-  type _getSyntheticTokenPriceCall = {
-    marketIndex: int,
-    isLong: bool,
-  }
-
-  let _getSyntheticTokenPriceCalls: unit => array<_getSyntheticTokenPriceCall> = () => {
-    checkForExceptions(~functionName="_getSyntheticTokenPrice")
-    internalRef.contents
-    ->Option.map(_r => {
-      let array = %raw("_r.smocked._getSyntheticTokenPriceMock.calls")
-      array->Array.map(((marketIndex, isLong)) => {
-        {
-          marketIndex: marketIndex,
-          isLong: isLong,
-        }
-      })
-    })
-    ->Option.getExn
-  }
-
   let mock_getAmountPaymentTokenToReturn: Ethers.BigNumber.t => unit = _param0 => {
     checkForExceptions(~functionName="_getAmountPaymentToken")
     let _ = internalRef.contents->Option.map(_r => {

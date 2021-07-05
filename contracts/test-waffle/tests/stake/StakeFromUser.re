@@ -26,7 +26,6 @@ let test =
       mockTokenWalletRef := (accounts^)->Array.getExn(6);
 
       StakerSmocked.InternalMock.mockOnlyValidSyntheticToReturn();
-      StakerSmocked.InternalMock.mock_updateStateToReturn();
       StakerSmocked.InternalMock.mock_stakeToReturn();
 
       (stakerRef^)
@@ -49,11 +48,5 @@ let test =
           user: from,
         })
     );
-
-    it("calls _updateState with correct args", () => {
-      StakerSmocked.InternalMock._updateStateCalls()
-      ->Array.getExn(0)
-      ->Chai.recordEqualFlat({token: mockTokenWalletRef^.address})
-    });
   });
 };

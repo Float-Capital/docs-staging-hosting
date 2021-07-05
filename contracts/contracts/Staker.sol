@@ -452,10 +452,6 @@ contract Staker is IStaker, Initializable {
     // USER REWARD STATE FUNCTIONS /////
     ////////////////////////////////////
 
-    function _updateState(ISyntheticToken token) internal {
-        longShortCoreContract.updateSystemState(marketIndexOfToken[token]);
-    }
-
     function calculateAccumulatedFloatHelper(
         uint32 marketIndex,
         address user,
@@ -626,7 +622,9 @@ contract Staker is IStaker, Initializable {
         override
         onlyValidSynthetic(ISyntheticToken(msg.sender))
     {
-        _updateState(ISyntheticToken(msg.sender));
+        longShortCoreContract.updateSystemState(
+            marketIndexOfToken[ISyntheticToken(msg.sender)]
+        );
         _stake(ISyntheticToken(msg.sender), amount, from);
     }
 
@@ -686,12 +684,14 @@ contract Staker is IStaker, Initializable {
     }
 
     function withdraw(ISyntheticToken token, uint256 amount) external {
-        _updateState(token);
+        longShortCoreContract.updateSystemState(marketIndexOfToken[token]);
+
         _withdraw(token, amount);
     }
 
     function withdrawAll(ISyntheticToken token) external {
-        _updateState(token);
+        longShortCoreContract.updateSystemState(marketIndexOfToken[token]);
+
         _withdraw(token, userAmountStaked[token][msg.sender]);
     }
 }

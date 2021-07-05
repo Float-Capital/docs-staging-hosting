@@ -23,7 +23,6 @@ function test(contracts, accounts) {
                 return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "stakeFromUser", contracts, accounts), (function (param) {
                               mockTokenWalletRef.contents = Belt_Array.getExn(accounts.contents, 6);
                               StakerSmocked.InternalMock.mockOnlyValidSyntheticToReturn(undefined);
-                              StakerSmocked.InternalMock.mock_updateStateToReturn(undefined);
                               StakerSmocked.InternalMock.mock_stakeToReturn(undefined);
                               return stakerRef.contents.connect(mockTokenWalletRef.contents).stakeFromUser(from, amount);
                             }));
@@ -38,11 +37,6 @@ function test(contracts, accounts) {
                               token: mockTokenWalletRef.contents.address,
                               amount: amount,
                               user: from
-                            });
-                }));
-          it("calls _updateState with correct args", (function () {
-                  return Chai.recordEqualFlat(Belt_Array.getExn(StakerSmocked.InternalMock._updateStateCalls(undefined), 0), {
-                              token: mockTokenWalletRef.contents.address
                             });
                 }));
           
