@@ -604,8 +604,6 @@ contract LongShortMockable is ILongShort, Initializable {
             marketPercentE5
         );
 
-        console.log("market amount", marketAmount);
-
         if (marketAmount > 0) {
             _distributeMarketAmount(marketIndex, marketAmount);
         }
