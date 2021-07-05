@@ -417,31 +417,28 @@ function UserUI$UserPendingBox(Props) {
   var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toNumber());
   if (typeof lastOracleTimestamp === "number") {
     return React.createElement(Loader.Tiny.make, {});
-  }
-  if (lastOracleTimestamp.TAG === /* GraphError */0) {
+  } else if (lastOracleTimestamp.TAG === /* GraphError */0) {
     return React.createElement("p", undefined, lastOracleTimestamp._0);
+  } else {
+    return React.createElement("div", {
+                className: "flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative"
+              }, React.createElement("div", {
+                    className: "flex flex-row justify-between"
+                  }, React.createElement("div", {
+                        className: " text-sm self-center"
+                      }, name), React.createElement("div", {
+                        className: " text-sm self-center"
+                      }, isLong ? "Long" : "Short"), React.createElement("div", {
+                        className: "flex  text-sm self-center"
+                      }, React.createElement("img", {
+                            className: "h-5 pr-1",
+                            src: CONSTANTS.daiDisplayToken.iconUrl
+                          }), Ethers.Utils.formatEther(daiSpend))), React.createElement(ProgressBar.make, {
+                    txConfirmedTimestamp: txConfirmedTimestamp,
+                    nextPriceUpdateTimestamp: lastOracleTimestamp._0.toNumber() + 1200 | 0,
+                    rerenderCallback: rerenderCallback
+                  }));
   }
-  var lastOracleUpdateTimestamp = lastOracleTimestamp._0;
-  console.log("lastOracleTimestamp");
-  console.log(lastOracleUpdateTimestamp.toString());
-  return React.createElement("div", {
-              className: "flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative"
-            }, React.createElement("div", {
-                  className: "flex flex-row justify-between"
-                }, React.createElement("div", {
-                      className: " text-sm self-center"
-                    }, name), React.createElement("div", {
-                      className: " text-sm self-center"
-                    }, isLong ? "Long" : "Short"), React.createElement("div", {
-                      className: "flex  text-sm self-center"
-                    }, React.createElement("img", {
-                          className: "h-5 pr-1",
-                          src: CONSTANTS.daiDisplayToken.iconUrl
-                        }), Ethers.Utils.formatEther(daiSpend))), React.createElement("p", undefined, lastOracleUpdateTimestamp.toString()), React.createElement(ProgressBar.make, {
-                  txConfirmedTimestamp: txConfirmedTimestamp,
-                  nextPriceUpdateTimestamp: lastOracleUpdateTimestamp.toNumber() + 1200 | 0,
-                  rerenderCallback: rerenderCallback
-                }));
 }
 
 var UserPendingBox = {

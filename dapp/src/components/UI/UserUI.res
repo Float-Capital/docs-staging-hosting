@@ -322,8 +322,6 @@ module UserPendingBox = {
 
     switch lastOracleTimestamp {
     | Response(lastOracleUpdateTimestamp) =>
-      Js.log("lastOracleTimestamp")
-      Js.log(lastOracleUpdateTimestamp->Ethers.BigNumber.toString)
       <div
         className=`flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative`>
         <div className="flex flex-row justify-between">
@@ -334,7 +332,6 @@ module UserPendingBox = {
             {daiSpend->Ethers.Utils.formatEther->React.string}
           </div>
         </div>
-        <p> {lastOracleUpdateTimestamp->Ethers.BigNumber.toString->React.string} </p>
         <ProgressBar
           txConfirmedTimestamp
           nextPriceUpdateTimestamp={lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber +

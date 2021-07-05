@@ -21,7 +21,6 @@ var Router = require("next/router");
 var RootProvider = require("../libraries/RootProvider.js");
 var DisplayAddress = require("../components/UI/Base/DisplayAddress.js");
 var Format = require("date-fns/format").default;
-var UserSynthConfirmedBox = require("../components/User/UserSynthConfirmedBox.js");
 
 function useRerender(param) {
   var match = React.useState(function () {
@@ -39,42 +38,17 @@ function User$UserBalancesCard(Props) {
   var userId = Props.userId;
   var usersTokensQuery = DataHooks.useUsersBalances(userId);
   var usersPendingMintsQuery = DataHooks.useUsersPendingMints(userId);
-  var usersConfirmedMintsQuery = DataHooks.useUsersConfirmedMints(userId);
   var rerender = useRerender(undefined);
   var tmp;
-  if (typeof usersConfirmedMintsQuery === "number") {
-    tmp = React.createElement("div", {
-          className: "m-auto"
-        }, React.createElement(Loader.Mini.make, {}));
-  } else if (usersConfirmedMintsQuery.TAG === /* GraphError */0) {
-    tmp = usersConfirmedMintsQuery._0;
-  } else {
-    var confirmedMint = usersConfirmedMintsQuery._0;
-    tmp = React.createElement(React.Fragment, undefined, confirmedMint.length !== 0 ? React.createElement(UserUI.UserColumnTextCenter.make, {
-                children: null
-              }, React.createElement(UserUI.UserColumnText.make, {
-                    head: "✅ Confirmed synths",
-                    body: ""
-                  }), React.createElement("br", undefined)) : null, Belt_Array.map(confirmedMint, (function (param) {
-                var marketIndex = param.marketIndex;
-                return React.createElement(UserSynthConfirmedBox.make, {
-                            name: Backend.getMarketInfoUnsafe(marketIndex.toNumber()).name,
-                            isLong: param.isLong,
-                            daiSpend: param.amount,
-                            marketIndex: marketIndex
-                          });
-              })));
-  }
-  var tmp$1;
   if (typeof usersPendingMintsQuery === "number") {
-    tmp$1 = React.createElement("div", {
-          className: "m-auto"
+    tmp = React.createElement("div", {
+          className: "mx-auto"
         }, React.createElement(Loader.Mini.make, {}));
   } else if (usersPendingMintsQuery.TAG === /* GraphError */0) {
-    tmp$1 = usersPendingMintsQuery._0;
+    tmp = usersPendingMintsQuery._0;
   } else {
     var pendingMint = usersPendingMintsQuery._0;
-    tmp$1 = React.createElement(React.Fragment, undefined, pendingMint.length !== 0 ? React.createElement(UserUI.UserColumnTextCenter.make, {
+    tmp = React.createElement(React.Fragment, undefined, pendingMint.length !== 0 ? React.createElement(UserUI.UserColumnTextCenter.make, {
                 children: null
               }, React.createElement(UserUI.UserColumnText.make, {
                     head: "⏳ Pending synths",
@@ -91,16 +65,16 @@ function User$UserBalancesCard(Props) {
                           });
               })));
   }
-  var tmp$2;
+  var tmp$1;
   if (typeof usersTokensQuery === "number") {
-    tmp$2 = React.createElement("div", {
+    tmp$1 = React.createElement("div", {
           className: "m-auto"
         }, React.createElement(Loader.Mini.make, {}));
   } else if (usersTokensQuery.TAG === /* GraphError */0) {
-    tmp$2 = usersTokensQuery._0;
+    tmp$1 = usersTokensQuery._0;
   } else {
     var match = usersTokensQuery._0;
-    tmp$2 = React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnTextCenter.make, {
+    tmp$1 = React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnTextCenter.make, {
               children: React.createElement(UserUI.UserColumnText.make, {
                     head: "💰 Synth value",
                     body: "$" + Misc.NumberFormat.formatEther(undefined, match.totalBalance)
@@ -136,7 +110,7 @@ function User$UserBalancesCard(Props) {
                 }, "Synthetic assets", React.createElement("img", {
                       className: "inline h-5 ml-2",
                       src: "/img/coin.png"
-                    })), tmp, tmp$1, tmp$2);
+                    })), tmp, tmp$1);
 }
 
 var UserBalancesCard = {
