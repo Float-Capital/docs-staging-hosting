@@ -30,30 +30,6 @@ let adminCalls: t => array<adminCall> = _r => {
   })
 }
 
-let mockBatchedStakeToReturn: (
-  t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-) => unit = (_r, _param0, _param1, _param2) => {
-  let _ = %raw("_r.smocked.batchedStake.will.return.with([_param0,_param1,_param2])")
-}
-
-type batchedStakeCall = {
-  param0: int,
-  param1: Ethers.BigNumber.t,
-}
-
-let batchedStakeCalls: t => array<batchedStakeCall> = _r => {
-  let array = %raw("_r.smocked.batchedStake.calls")
-  array->Array.map(((param0, param1)) => {
-    {
-      param0: param0,
-      param1: param1,
-    }
-  })
-}
-
 let mockFloatCapitalToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.floatCapital.will.return.with([_param0])")
 }
@@ -203,23 +179,21 @@ let syntheticRewardParamsCalls: t => array<syntheticRewardParamsCall> = _r => {
   })
 }
 
-let mockSyntheticTokensToReturn: (t, Ethers.ethAddress, Ethers.ethAddress) => unit = (
-  _r,
-  _param0,
-  _param1,
-) => {
-  let _ = %raw("_r.smocked.syntheticTokens.will.return.with([_param0,_param1])")
+let mockSyntheticTokensToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.syntheticTokens.will.return.with([_param0])")
 }
 
-type syntheticTokensCall = {param0: int}
+type syntheticTokensCall = {
+  param0: int,
+  param1: bool,
+}
 
 let syntheticTokensCalls: t => array<syntheticTokensCall> = _r => {
   let array = %raw("_r.smocked.syntheticTokens.calls")
-  array->Array.map(_m => {
-    let param0 = _m->Array.getUnsafe(0)
-
+  array->Array.map(((param0, param1)) => {
     {
       param0: param0,
+      param1: param1,
     }
   })
 }

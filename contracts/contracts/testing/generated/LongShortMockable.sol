@@ -96,8 +96,6 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 shortPrice
     );
 
-    event FeesLevied(uint32 marketIndex, uint256 totalFees);
-
     event SyntheticTokenCreated(
         uint32 marketIndex,
         address longTokenAddress,
@@ -132,14 +130,6 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 oracleUpdateIndex
     );
 
-    event FeesChanges(
-        uint32 marketIndex,
-        uint256 baseEntryFee,
-        uint256 badLiquidityEntryFee,
-        uint256 baseExitFee,
-        uint256 badLiquidityExitFee
-    );
-
     event OracleUpdated(
         uint32 marketIndex,
         address oldOracleAddress,
@@ -154,6 +144,7 @@ contract LongShortMockable is ILongShort, Initializable {
         bool isLong,
         uint256 amount
     );
+
     event ExecuteNextPriceRedeemSettlementUser(
         address user,
         uint32 marketIndex,
@@ -162,6 +153,7 @@ contract LongShortMockable is ILongShort, Initializable {
     );
 
     event ExecuteNextPriceSettlementsUser(address user, uint32 marketIndex);
+
     
 
 

@@ -29,13 +29,9 @@ contract Staker is IStaker, Initializable {
     mapping(uint32 => uint256) public marketLaunchIncentivePeriod; // seconds
     mapping(uint32 => uint256) public marketLaunchIncentiveMultipliers; // e18 scale
 
-    mapping(ISyntheticToken => uint32) public marketIndexOfToken;
+    mapping(uint32 => mapping(bool => ISyntheticToken)) public syntheticTokens;
 
-    mapping(uint32 => SyntheticTokens) public syntheticTokens;
-    struct SyntheticTokens {
-        ISyntheticToken shortToken;
-        ISyntheticToken longToken;
-    }
+    mapping(ISyntheticToken => uint32) public marketIndexOfToken;
 
     // Reward specific
     mapping(uint32 => uint256) public latestRewardIndex;
@@ -91,9 +87,9 @@ contract Staker is IStaker, Initializable {
         uint256 multiplier
     );
 
-    ////////////////////////////////////
-    /////////// MODIFIERS //////////////
-    ////////////////////////////////////
+    /*╔═════════════════════════════╗
+      ║          MODIFIERS          ║
+      ╚═════════════════════════════╝*/
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "not admin");
@@ -107,7 +103,7 @@ contract Staker is IStaker, Initializable {
 
     modifier onlyValidMarket(uint32 marketIndex) {
         require(
-            address(syntheticTokens[marketIndex].longToken) != address(0),
+            address(syntheticTokens[marketIndex][true]) != address(0),
             "not valid market"
         );
         // require(latestRewardIndex[marketIndex] != 0, "not valid market");
@@ -119,9 +115,9 @@ contract Staker is IStaker, Initializable {
         _;
     }
 
-    ////////////////////////////////////
-    ///// CONTRACT SET-UP //////////////
-    ////////////////////////////////////
+    /*╔═════════════════════════════╗
+      ║       CONTRACT SET-UP       ║
+      ╚═════════════════════════════╝*/
 
     function initialize(
         address _admin,
@@ -138,9 +134,9 @@ contract Staker is IStaker, Initializable {
         emit DeployV1(_floatToken);
     }
 
-    ////////////////////////////////////
-    /// MULTISIG ADMIN FUNCTIONS ///////
-    ////////////////////////////////////
+    /*╔═════════════════════════════╗
+      ║       MULTI-SIG ADMIN       ║
+      ╚═════════════════════════════╝*/
 
     function changeAdmin(address _admin) external onlyAdmin {
         admin = _admin;
@@ -183,9 +179,9 @@ contract Staker is IStaker, Initializable {
         );
     }
 
-    ////////////////////////////////////
-    /////////// STAKING SETUP //////////
-    ////////////////////////////////////
+    /*╔═════════════════════════════╗
+      ║        STAKING SETUP        ║
+      ╚═════════════════════════════╝*/
 
     function addNewStakingFund(
         uint32 marketIndex,
@@ -202,8 +198,8 @@ contract Staker is IStaker, Initializable {
         syntheticRewardParams[marketIndex][0]
         .accumulativeFloatPerShortToken = 0;
 
-        syntheticTokens[marketIndex].longToken = longToken;
-        syntheticTokens[marketIndex].shortToken = shortToken;
+        syntheticTokens[marketIndex][true] = longToken;
+        syntheticTokens[marketIndex][false] = shortToken;
 
         _changeMarketLaunchIncentiveParameters(
             marketIndex,
@@ -458,8 +454,8 @@ contract Staker is IStaker, Initializable {
                 latestRewardIndex[marketIndex]
         );
 
-        ISyntheticToken longToken = syntheticTokens[marketIndex].longToken;
-        ISyntheticToken shortToken = syntheticTokens[marketIndex].shortToken;
+        ISyntheticToken longToken = syntheticTokens[marketIndex][true];
+        ISyntheticToken shortToken = syntheticTokens[marketIndex][false];
 
         if (amountStakedLong > 0) {
             uint256 accumDeltaLong = syntheticRewardParams[marketIndex][
@@ -502,8 +498,8 @@ contract Staker is IStaker, Initializable {
             uint256 shortFloatReward
         )
     {
-        ISyntheticToken longToken = syntheticTokens[marketIndex].longToken;
-        ISyntheticToken shortToken = syntheticTokens[marketIndex].shortToken;
+        ISyntheticToken longToken = syntheticTokens[marketIndex][true];
+        ISyntheticToken shortToken = syntheticTokens[marketIndex][false];
 
         uint256 amountStakedLong = userAmountStaked[longToken][user];
         uint256 amountStakedShort = userAmountStaked[shortToken][user];
