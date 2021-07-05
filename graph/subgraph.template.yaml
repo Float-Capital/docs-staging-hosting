@@ -14,6 +14,8 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
+        - ExecuteNextPriceMintSettlementUser
+        - ExecuteNextPriceRedeemSettlementUser
         - V1
         - SyntheticTokenCreated
         - LongMinted
@@ -28,8 +30,11 @@ dataSources:
           file: ./abis/LongShort.json
       eventHandlers:
         - event: V1(address,address,address,address)
-
           handler: handleV1
+        - event: ExecuteNextPriceMintSettlementUser(address,uint32,bool,uint256)
+          handler: handleExecuteNextPriceMintSettlementUser
+        - event: ExecuteNextPriceRedeemSettlementUser(address,uint32,bool,uint256)
+          handler: handleExecuteNextPriceRedeemSettlementUser
         - event: FeesLevied(uint32,uint256)
           handler: handleFeesLevied
         - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
