@@ -15,7 +15,6 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - V1
-        - FeesLevied
         - SyntheticTokenCreated
         - LongMinted
         - LongRedeem
@@ -23,7 +22,6 @@ dataSources:
         - ShortMinted
         - ShortRedeem
         - TokenPriceRefreshed
-        - FeesChanges
         - ValueLockedInSystem
       abis:
         - name: LongShort
@@ -49,8 +47,7 @@ dataSources:
 
         - event: ValueLockedInSystem(uint32,uint256,uint256,uint256)
           handler: handleValueLockedInSystem
-        - event: FeesChanges(uint32,uint256,uint256,uint256,uint256)
-          handler: handleFeesChanges
+
       file: ./src/float.ts
 
   - kind: ethereum/contract
