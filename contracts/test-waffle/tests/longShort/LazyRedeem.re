@@ -8,116 +8,133 @@ let testIntegration =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
   describe("lazyRedeem", () => {
-    it("should work as expected happy path", () => {
-      let testUser = accounts.contents->Array.getUnsafe(8);
-      let amountToNextPriceMint = Helpers.randomTokenAmount();
+    let runLazyRedeemTest = (~isLong) =>
+      it(
+        "should work as expected happy path for redeem "
+        ++ (isLong ? "Long" : "Short"),
+        () => {
+          let testUser = accounts.contents->Array.getUnsafe(8);
+          let amountToNextPriceMint = Helpers.randomTokenAmount();
 
-      let {longShort, markets} = contracts.contents;
+          let {longShort, markets} = contracts.contents;
 
-      let longShortUserConnected =
-        longShort->ContractHelpers.connect(~address=testUser);
+          let longShortUserConnected =
+            longShort->ContractHelpers.connect(~address=testUser);
 
-      let {paymentToken, oracleManager, longSynth, marketIndex} =
-        markets->Array.getUnsafe(0);
+          let {
+            paymentToken,
+            oracleManager,
+            longSynth,
+            shortSynth,
+            marketIndex,
+          } =
+            markets->Array.getUnsafe(0);
 
-      let%AwaitThen _longValueBefore =
-        longShort->LongShort.syntheticTokenPoolValue(
-          marketIndex,
-          true /*long*/,
-        );
+          let testSynth = isLong ? longSynth : shortSynth;
+          let redeemNextPriceFunction =
+            isLong
+              ? LongShort.redeemLongNextPrice : LongShort.redeemShortNextPrice;
 
-      let%AwaitThen _ =
-        paymentToken->ERC20Mock.mint(
-          ~_to=testUser.address,
-          ~amount=amountToNextPriceMint,
-        );
+          let%AwaitThen _longValueBefore =
+            longShort->LongShort.syntheticTokenPoolValue(marketIndex, isLong);
 
-      let%AwaitThen _ =
-        paymentToken->ERC20Mock.setShouldMockTransfer(~value=false);
+          let%AwaitThen _ =
+            paymentToken->ERC20Mock.mint(
+              ~_to=testUser.address,
+              ~amount=amountToNextPriceMint,
+            );
 
-      let%AwaitThen _ =
-        paymentToken
-        ->ContractHelpers.connect(~address=testUser)
-        ->ERC20Mock.approve(
-            ~spender=longShort.address,
-            ~amount=amountToNextPriceMint,
+          let%AwaitThen _ =
+            paymentToken->ERC20Mock.setShouldMockTransfer(~value=false);
+
+          let%AwaitThen _ =
+            paymentToken
+            ->ContractHelpers.connect(~address=testUser)
+            ->ERC20Mock.approve(
+                ~spender=longShort.address,
+                ~amount=amountToNextPriceMint,
+              );
+
+          let%AwaitThen _ =
+            HelperActions.mintDirect(
+              ~marketIndex,
+              ~amount=amountToNextPriceMint,
+              ~token=paymentToken,
+              ~user=testUser,
+              ~longShort,
+              ~oracleManagerMock=oracleManager,
+              ~isLong,
+            );
+
+          let%AwaitThen usersBalanceAvailableForRedeem =
+            testSynth->SyntheticToken.balanceOf(~account=testUser.address);
+          let%AwaitThen _ =
+            longShortUserConnected->redeemNextPriceFunction(
+              ~marketIndex,
+              ~tokensToRedeem=usersBalanceAvailableForRedeem,
+            );
+          let%AwaitThen usersBalanceAfterNextPriceRedeem =
+            testSynth->SyntheticToken.balanceOf(~account=testUser.address);
+
+          Chai.bnEqual(
+            ~message=
+              "Balance after price system update but before user settlement should be the same as after settlement",
+            usersBalanceAfterNextPriceRedeem,
+            CONSTANTS.zeroBn,
           );
 
-      let%AwaitThen _ =
-        HelperActions.mintDirect(
-          ~marketIndex,
-          ~amount=amountToNextPriceMint,
-          ~token=paymentToken,
-          ~user=testUser,
-          ~longShort,
-          ~oracleManagerMock=oracleManager,
-          ~isLong=true,
-        );
+          let%AwaitThen paymentTokenBalanceBeforeWithdrawal =
+            paymentToken->ERC20Mock.balanceOf(~account=testUser.address);
 
-      let%AwaitThen usersBalanceAvailableForRedeem =
-        longSynth->SyntheticToken.balanceOf(~account=testUser.address);
-      let%AwaitThen _ =
-        longShortUserConnected->LongShort.redeemLongNextPrice(
-          ~marketIndex,
-          ~tokensToRedeem=usersBalanceAvailableForRedeem,
-        );
-      let%AwaitThen usersBalanceAfterNextPriceRedeem =
-        longSynth->SyntheticToken.balanceOf(~account=testUser.address);
+          let%AwaitThen previousPrice =
+            oracleManager->OracleManagerMock.getLatestPrice;
 
-      Chai.bnEqual(
-        ~message=
-          "Balance after price system update but before user settlement should be the same as after settlement",
-        usersBalanceAfterNextPriceRedeem,
-        CONSTANTS.zeroBn,
+          let nextPrice =
+            previousPrice
+            ->mul(bnFromInt(12)) // 20% increase
+            ->div(bnFromInt(10));
+
+          let%AwaitThen _ =
+            oracleManager->OracleManagerMock.setPrice(~newPrice=nextPrice);
+
+          let%AwaitThen _ =
+            longShort->LongShort.updateSystemState(~marketIndex);
+          let%AwaitThen latestUpdateIndex =
+            longShort->LongShort.marketUpdateIndex(marketIndex);
+          let%AwaitThen redemptionPriceWithFees =
+            longShort->LongShort.syntheticTokenPriceSnapshot(
+              marketIndex,
+              isLong,
+              latestUpdateIndex,
+            );
+
+          let amountExpectedToBeRedeemed =
+            usersBalanceAvailableForRedeem
+            ->mul(redemptionPriceWithFees)
+            ->div(CONSTANTS.tenToThe18);
+
+          let%AwaitThen _ =
+            longShort->LongShort.executeOutstandingNextPriceSettlementsUser(
+              ~marketIndex,
+              ~user=testUser.address,
+            );
+
+          let%Await paymentTokenBalanceAfterWithdrawal =
+            paymentToken->ERC20Mock.balanceOf(~account=testUser.address);
+
+          let deltaBalanceChange =
+            paymentTokenBalanceAfterWithdrawal->sub(
+              paymentTokenBalanceBeforeWithdrawal,
+            );
+
+          Chai.bnEqual(
+            ~message="Balance of paymentToken didn't update correctly",
+            deltaBalanceChange,
+            amountExpectedToBeRedeemed,
+          );
+        },
       );
 
-      let%AwaitThen paymentTokenBalanceBeforeWithdrawal =
-        paymentToken->ERC20Mock.balanceOf(~account=testUser.address);
-
-      let%AwaitThen previousPrice =
-        oracleManager->OracleManagerMock.getLatestPrice;
-
-      let nextPrice =
-        previousPrice
-        ->mul(bnFromInt(12)) // 20% increase
-        ->div(bnFromInt(10));
-
-      let%AwaitThen _ =
-        oracleManager->OracleManagerMock.setPrice(~newPrice=nextPrice);
-
-      let%AwaitThen _ = longShort->LongShort.updateSystemState(~marketIndex);
-      let%AwaitThen latestUpdateIndex =
-        longShort->LongShort.marketUpdateIndex(marketIndex);
-      let%AwaitThen redemptionPriceWithFees =
-        longShort->LongShort.syntheticTokenPriceSnapshot(
-          marketIndex,
-          true /*long*/,
-          latestUpdateIndex,
-        );
-
-      let amountExpectedToBeRedeemed =
-        usersBalanceAvailableForRedeem
-        ->mul(redemptionPriceWithFees)
-        ->div(CONSTANTS.tenToThe18);
-
-      let%AwaitThen _ =
-        longShort->LongShort.executeOutstandingNextPriceSettlementsUser(
-          ~marketIndex,
-          ~user=testUser.address,
-        );
-
-      let%Await paymentTokenBalanceAfterWithdrawal =
-        paymentToken->ERC20Mock.balanceOf(~account=testUser.address);
-
-      let deltaBalanceChange =
-        paymentTokenBalanceAfterWithdrawal->sub(
-          paymentTokenBalanceBeforeWithdrawal,
-        );
-
-      Chai.bnEqual(
-        ~message="Balance of paymentToken didn't update correctly",
-        deltaBalanceChange,
-        amountExpectedToBeRedeemed,
-      );
-    })
+    runLazyRedeemTest(~isLong=true);
+    runLazyRedeemTest(~isLong=false);
   });
