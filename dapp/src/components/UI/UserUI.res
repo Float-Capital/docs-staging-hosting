@@ -381,7 +381,6 @@ module UserPendingBox = {
             {daiSpend->Ethers.Utils.formatEther->React.string}
           </div>
         </div>
-        <p> {lastOracleUpdateTimestamp->Ethers.BigNumber.toString->React.string} </p>
         <ProgressBar
           txConfirmedTimestamp
           nextPriceUpdateTimestamp={lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber +
