@@ -15,8 +15,6 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - ExecuteNextPriceSettlementsUser
-        - FeesChanges
-        - FeesLevied
         - NewMarketLaunchedAndSeeded
         - NextPriceDeposit
         - NextPriceRedeem
@@ -31,10 +29,6 @@ dataSources:
       eventHandlers:
         - event: ExecuteNextPriceSettlementsUser(address,uint32)
           handler: handleExecuteNextPriceSettlementsUser
-        - event: FeesChanges(uint32,uint256,uint256,uint256,uint256)
-          handler: handleFeesChanges
-        - event: FeesLevied(uint32,uint256)
-          handler: handleFeesLevied
         - event: NewMarketLaunchedAndSeeded(uint32,uint256)
           handler: handleNewMarketLaunchedAndSeeded
         - event: NextPriceDeposit(uint32,bool,uint256,address,uint256)

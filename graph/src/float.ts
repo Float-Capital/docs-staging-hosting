@@ -1,10 +1,8 @@
 import {
   V1,
-  FeesLevied,
   SyntheticTokenCreated,
   PriceUpdate,
   SystemStateUpdated,
-  FeesChanges,
   OracleUpdated,
   NextPriceDeposit,
   NewMarketLaunchedAndSeeded,
@@ -123,16 +121,6 @@ export function handleV1(event: V1): void {
   );
 }
 
-export function handleFeesLevied(event: FeesLevied): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
-  let marketIndex = event.params.marketIndex;
-  let totalFees = event.params.totalFees;
-
-  // State change - TODO
-}
 
 export function handleSystemStateUpdated(event: SystemStateUpdated): void {
   let marketIndex = event.params.marketIndex;
@@ -286,7 +274,7 @@ export function handleSyntheticTokenCreated(
   let marketIndex = event.params.marketIndex;
   let longTokenAddress = event.params.longTokenAddress;
   let shortTokenAddress = event.params.shortTokenAddress;
-  let collateralTokenAddress = event.params.fundToken;
+  let collateralTokenAddress = event.params.paymentToken;
   let initialAssetPrice = event.params.assetPrice;
 
   let oracleAddress = event.params.oracleAddress;
@@ -433,45 +421,6 @@ export function handleMarketOracleUpdated(event: OracleUpdated): void {
   syntheticMarket.save();
 }
 
-export function handleFeesChanges(event: FeesChanges): void {
-  let marketIndex = event.params.marketIndex;
-  let baseEntryFee = event.params.baseEntryFee;
-  let badLiquidityEntryFee = event.params.badLiquidityEntryFee;
-  let baseExitFee = event.params.baseExitFee;
-  let badLiquidityExitFee = event.params.badLiquidityExitFee;
-
-  let marketIndexString = marketIndex.toString();
-
-  let fees = FeeStructure.load(marketIndexString + "-fees");
-  fees.baseEntryFee = baseEntryFee;
-  fees.badLiquidityEntryFee = badLiquidityEntryFee;
-  fees.baseExitFee = baseExitFee;
-  fees.badLiquidityExitFee = badLiquidityExitFee;
-
-  fees.save();
-
-  saveEventToStateChange(
-    event,
-    "FeesChanges",
-    [
-      marketIndex.toString(),
-      baseEntryFee.toString(),
-      badLiquidityEntryFee.toString(),
-      baseExitFee.toString(),
-      badLiquidityExitFee.toString(),
-    ],
-    [
-      "marketIndex",
-      "baseEntryFee",
-      "badLiquidityEntryFee",
-      "baseExitFee",
-      "badLiquidityExitFee",
-    ],
-    ["uint32", "uint256", "uint256", "uint256", "uint256"],
-    [],
-    []
-  );
-}
 
 export function handlePriceUpdate(event: PriceUpdate): void {
   let marketIndex = event.params.marketIndex;

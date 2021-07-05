@@ -14,11 +14,7 @@ import "./interfaces/IYieldManager.sol";
 import "./interfaces/IOracleManager.sol";
 
 /**
- * @dev {LongShort} contract:
  **** visit https://float.capital *****
- *  - Ability for users to create synthetic long and short positions on value movements
- *  - Value movements could be derived from tradional or alternative asset classes, derivates, binary outcomes, etc...
- *  - Incentive mechansim providing fees to liquidity makers (users on both sides of order book)
  */
 
 contract LongShort is ILongShort, Initializable {
@@ -93,8 +89,6 @@ contract LongShort is ILongShort, Initializable {
         uint256 shortPrice
     );
 
-    event FeesLevied(uint32 marketIndex, uint256 totalFees);
-
     event SyntheticTokenCreated(
         uint32 marketIndex,
         address longTokenAddress,
@@ -129,14 +123,6 @@ contract LongShort is ILongShort, Initializable {
         uint256 oracleUpdateIndex
     );
 
-    event FeesChanges(
-        uint32 marketIndex,
-        uint256 baseEntryFee,
-        uint256 badLiquidityEntryFee,
-        uint256 baseExitFee,
-        uint256 badLiquidityExitFee
-    );
-
     event OracleUpdated(
         uint32 marketIndex,
         address oldOracleAddress,
@@ -151,6 +137,7 @@ contract LongShort is ILongShort, Initializable {
         bool isLong,
         uint256 amount
     );
+
     event ExecuteNextPriceRedeemSettlementUser(
         address user,
         uint32 marketIndex,
@@ -159,6 +146,7 @@ contract LongShort is ILongShort, Initializable {
     );
 
     event ExecuteNextPriceSettlementsUser(address user, uint32 marketIndex);
+
     /*╔═════════════════════════════╗
       ║          MODIFIERS          ║
       ╚═════════════════════════════╝*/
