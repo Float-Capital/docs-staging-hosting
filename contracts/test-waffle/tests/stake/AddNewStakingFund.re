@@ -57,13 +57,13 @@ let test =
       ();
     });
 
-    it'("calls the onlyFloatModifier", () => {
+    it("calls the onlyFloatModifier", () => {
       StakerSmocked.InternalMock.onlyFloatCalls()
       ->Array.length
       ->Chai.intEqual(1)
     });
 
-    it'(
+    it(
       "calls _changeMarketLaunchIncentiveParameters with correct arguments", () => {
       StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCalls()
       ->Array.getUnsafe(0)

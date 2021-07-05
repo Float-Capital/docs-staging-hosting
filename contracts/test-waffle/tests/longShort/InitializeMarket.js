@@ -25,7 +25,6 @@ function test(contracts, accounts) {
                           stakerSmockedRef.contents = smocked;
                           return LetOps.Await.let_(LongShortSmocked.InternalMock.setup(longShortRef.contents), (function (param) {
                                         return LetOps.Await.let_(LongShortSmocked.InternalMock.setupFunctionForUnitTesting(longShortRef.contents, "initializeMarket"), (function (param) {
-                                                      LongShortSmocked.InternalMock.mock_changeFeesToReturn(undefined);
                                                       LongShortSmocked.InternalMock.mockAdminOnlyToReturn(undefined);
                                                       LongShortSmocked.InternalMock.mock_seedMarketInitiallyToReturn(undefined);
                                                       return longShortRef.contents.setInitializeMarketParams(marketIndex, marketIndexValue, latestMarket, stakerSmockedRef.contents.address, sampleAddress, sampleAddress);
@@ -33,9 +32,9 @@ function test(contracts, accounts) {
                                       }));
                         }));
           };
-          it("calls all functions (staker.addNewStakingFund, _changeFees, adminOnly, seedMarketInitially) and mutates state (marketExists) correctly", (function () {
+          it("calls all functions (staker.addNewStakingFund, adminOnly, seedMarketInitially) and mutates state (marketExists) correctly", (function () {
                   return LetOps.Await.let_(setup(1, false, 1), (function (param) {
-                                return LetOps.Await.let_(longShortRef.contents.connect(accounts.contents[0]).initializeMarket(1, ethers.BigNumber.from("1"), ethers.BigNumber.from("2"), ethers.BigNumber.from("5"), ethers.BigNumber.from("3"), ethers.BigNumber.from("6"), ethers.BigNumber.from("4"), ethers.BigNumber.from("7")), (function (param) {
+                                return LetOps.Await.let_(longShortRef.contents.connect(accounts.contents[0]).initializeMarket(1, ethers.BigNumber.from("6"), ethers.BigNumber.from("4"), ethers.BigNumber.from("7")), (function (param) {
                                               var stakerCalls = StakerSmocked.addNewStakingFundCalls(stakerSmockedRef.contents);
                                               Chai.recordEqualFlatLabeled(Belt_Array.getExn(stakerCalls, 0), {
                                                     marketIndex: 1,
@@ -43,14 +42,6 @@ function test(contracts, accounts) {
                                                     shortToken: sampleAddress,
                                                     kInitialMultiplier: ethers.BigNumber.from("6"),
                                                     kPeriod: ethers.BigNumber.from("4")
-                                                  });
-                                              var changeFeeCalls = LongShortSmocked.InternalMock._changeFeesCalls(undefined);
-                                              Chai.recordEqualFlatLabeled(Belt_Array.getExn(changeFeeCalls, 0), {
-                                                    marketIndex: 1,
-                                                    baseEntryFee: ethers.BigNumber.from("1"),
-                                                    baseExitFee: ethers.BigNumber.from("5"),
-                                                    badLiquidityEntryFee: ethers.BigNumber.from("2"),
-                                                    badLiquidityExitFee: ethers.BigNumber.from("3")
                                                   });
                                               var seedMarketInitiallyCalls = LongShortSmocked.InternalMock._seedMarketInitiallyCalls(undefined);
                                               Chai.recordEqualFlatLabeled(Belt_Array.getExn(seedMarketInitiallyCalls, 0), {
@@ -67,14 +58,14 @@ function test(contracts, accounts) {
                 }));
           it("reverts if market exists", (function () {
                   return LetOps.Await.let_(setup(1, true, 1), (function (param) {
-                                return LetOps.Await.let_(Chai.expectRevertNoReason(longShortRef.contents.connect(accounts.contents[0]).initializeMarket(1, ethers.BigNumber.from("1"), ethers.BigNumber.from("2"), ethers.BigNumber.from("5"), ethers.BigNumber.from("3"), ethers.BigNumber.from("6"), ethers.BigNumber.from("4"), ethers.BigNumber.from("7"))), (function (param) {
+                                return LetOps.Await.let_(Chai.expectRevertNoReason(longShortRef.contents.connect(accounts.contents[0]).initializeMarket(1, ethers.BigNumber.from("6"), ethers.BigNumber.from("4"), ethers.BigNumber.from("7"))), (function (param) {
                                               
                                             }));
                               }));
                 }));
           it("reverts if market index is greater than latest market index", (function () {
                   return LetOps.Await.let_(setup(2, false, 1), (function (param) {
-                                return LetOps.Await.let_(Chai.expectRevertNoReason(longShortRef.contents.connect(accounts.contents[0]).initializeMarket(1, ethers.BigNumber.from("1"), ethers.BigNumber.from("2"), ethers.BigNumber.from("5"), ethers.BigNumber.from("3"), ethers.BigNumber.from("6"), ethers.BigNumber.from("4"), ethers.BigNumber.from("7"))), (function (param) {
+                                return LetOps.Await.let_(Chai.expectRevertNoReason(longShortRef.contents.connect(accounts.contents[0]).initializeMarket(1, ethers.BigNumber.from("6"), ethers.BigNumber.from("4"), ethers.BigNumber.from("7"))), (function (param) {
                                               
                                             }));
                               }));

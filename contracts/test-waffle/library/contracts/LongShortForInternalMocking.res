@@ -26,17 +26,6 @@ external _burnSynthTokensForRedemptionMock: (
   Ethers.BigNumber.t,
 ) => JsPromise.t<_burnSynthTokensForRedemptionMockReturn> = "_burnSynthTokensForRedemptionMock"
 
-type _changeFeesMockReturn
-@send
-external _changeFeesMock: (
-  t,
-  int,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-) => JsPromise.t<_changeFeesMockReturn> = "_changeFeesMock"
-
 type _claimAndDistributeYieldMockReturn
 @send
 external _claimAndDistributeYieldMock: (t, int) => JsPromise.t<_claimAndDistributeYieldMockReturn> =
@@ -99,6 +88,24 @@ external _getAmountSynthTokenMock: (
   Ethers.BigNumber.t,
   Ethers.BigNumber.t,
 ) => JsPromise.t<_getAmountSynthTokenMockReturn> = "_getAmountSynthTokenMock"
+
+type _getLongPcntForLongVsShortSplitMockReturn = Ethers.BigNumber.t
+@send
+external _getLongPcntForLongVsShortSplitMock: (
+  t,
+  int,
+) => JsPromise.t<_getLongPcntForLongVsShortSplitMockReturn> = "_getLongPcntForLongVsShortSplitMock"
+
+type _getMarketSplitMockReturn = {
+  longAmount: Ethers.BigNumber.t,
+  shortAmount: Ethers.BigNumber.t,
+}
+@send
+external _getMarketSplitMock: (
+  t,
+  int,
+  Ethers.BigNumber.t,
+) => JsPromise.t<_getMarketSplitMockReturn> = "_getMarketSplitMock"
 
 type _getSyntheticTokenPriceMockReturn = Ethers.BigNumber.t
 @send
@@ -228,17 +235,6 @@ type changeAdminMockReturn
 external changeAdminMock: (t, Ethers.ethAddress) => JsPromise.t<changeAdminMockReturn> =
   "changeAdminMock"
 
-type changeFeesMockReturn
-@send
-external changeFeesMock: (
-  t,
-  int,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-) => JsPromise.t<changeFeesMockReturn> = "changeFeesMock"
-
 type changeTreasuryMockReturn
 @send
 external changeTreasuryMock: (t, Ethers.ethAddress) => JsPromise.t<changeTreasuryMockReturn> =
@@ -262,13 +258,6 @@ external executeOutstandingNextPriceSettlementsUserMock: (
 ) => JsPromise.t<executeOutstandingNextPriceSettlementsUserMockReturn> =
   "executeOutstandingNextPriceSettlementsUserMock"
 
-type getLongPcntForLongVsShortSplitMockReturn = Ethers.BigNumber.t
-@send
-external getLongPcntForLongVsShortSplitMock: (
-  t,
-  int,
-) => JsPromise.t<getLongPcntForLongVsShortSplitMockReturn> = "getLongPcntForLongVsShortSplitMock"
-
 type getMarketPcntForTreasuryVsMarketSplitMockReturn = Ethers.BigNumber.t
 @send
 external getMarketPcntForTreasuryVsMarketSplitMock: (
@@ -276,25 +265,6 @@ external getMarketPcntForTreasuryVsMarketSplitMock: (
   int,
 ) => JsPromise.t<getMarketPcntForTreasuryVsMarketSplitMockReturn> =
   "getMarketPcntForTreasuryVsMarketSplitMock"
-
-type getMarketSplitMockReturn = {
-  longAmount: Ethers.BigNumber.t,
-  shortAmount: Ethers.BigNumber.t,
-}
-@send
-external getMarketSplitMock: (t, int, Ethers.BigNumber.t) => JsPromise.t<getMarketSplitMockReturn> =
-  "getMarketSplitMock"
-
-type getTreasurySplitMockReturn = {
-  marketAmount: Ethers.BigNumber.t,
-  treasuryAmount: Ethers.BigNumber.t,
-}
-@send
-external getTreasurySplitMock: (
-  t,
-  int,
-  Ethers.BigNumber.t,
-) => JsPromise.t<getTreasurySplitMockReturn> = "getTreasurySplitMock"
 
 type getUsersConfirmedButNotSettledBalanceMockReturn = Ethers.BigNumber.t
 @send
@@ -311,10 +281,6 @@ type initializeMarketMockReturn
 external initializeMarketMock: (
   t,
   int,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
   Ethers.BigNumber.t,
   Ethers.BigNumber.t,
   Ethers.BigNumber.t,
@@ -372,10 +338,6 @@ external redeemShortNextPriceMock: (
   int,
   Ethers.BigNumber.t,
 ) => JsPromise.t<redeemShortNextPriceMockReturn> = "redeemShortNextPriceMock"
-
-type treasuryOnlyMockReturn
-@send
-external treasuryOnlyMock: t => JsPromise.t<treasuryOnlyMockReturn> = "treasuryOnlyMock"
 
 type updateMarketOracleMockReturn
 @send

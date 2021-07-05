@@ -3,7 +3,6 @@
 
 var Chai = require("../../bindings/chai/Chai.js");
 var LetOps = require("../../library/LetOps.js");
-var Globals = require("../../library/Globals.js");
 var Helpers = require("../../library/Helpers.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var StakerHelpers = require("./StakerHelpers.js");
@@ -31,11 +30,12 @@ function test(contracts, accounts) {
                                           }));
                             }));
               });
-          return Globals.it$p("calls longShort updateState with the market index of the token", (function (param) {
-                        return Chai.recordEqualFlat(Belt_Array.getExn(LongShortSmocked.updateSystemStateCalls(longShortSmockedRef.contents), 0), {
-                                    marketIndex: marketIndex
-                                  });
-                      }));
+          it("calls longShort updateState with the market index of the token", (function () {
+                  return Chai.recordEqualFlat(Belt_Array.getExn(LongShortSmocked.updateSystemStateCalls(longShortSmockedRef.contents), 0), {
+                              marketIndex: marketIndex
+                            });
+                }));
+          
         }));
   
 }

@@ -1,11 +1,11 @@
 require("hardhat-spdx-license-identifier");
 require("@tenderly/hardhat-tenderly"); // https://hardhat.org/plugins/tenderly-hardhat-tenderly.html
+require("@float-capital/solidity-coverage");
 
 let runCoverage = !process.env.DONT_RUN_REPORT_SUMMARY || process.env.DONT_RUN_REPORT_SUMMARY.toUpperCase() != "TRUE";
 if (runCoverage) {
   require('hardhat-abi-exporter');
   require("hardhat-gas-reporter");
-  require("solidity-coverage");
 }
 let isWaffleTest =
   !!process.env.WAFFLE_TEST && process.env.WAFFLE_TEST.toUpperCase() == "TRUE";

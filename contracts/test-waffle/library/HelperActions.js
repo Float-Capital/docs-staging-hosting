@@ -162,4 +162,4 @@ exports.mintDirect = mintDirect;
 exports.mintAndStakeDirect = mintAndStakeDirect;
 exports.stakeRandomlyInMarkets = stakeRandomlyInMarkets;
 exports.stakeRandomlyInBothSidesOfMarket = stakeRandomlyInBothSidesOfMarket;
-/* Contract Not a pure module */
+/* Globals Not a pure module */

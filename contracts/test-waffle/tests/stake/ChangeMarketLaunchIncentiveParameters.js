@@ -25,16 +25,17 @@ function test(contracts, accounts) {
                                           }));
                             }));
               });
-          Globals.it$p("calls the onlyAdminModifier", (function (param) {
+          it("calls the onlyAdminModifier", (function () {
                   return Chai.intEqual(undefined, StakerSmocked.InternalMock.onlyAdminCalls(undefined).length, 1);
                 }));
-          return Globals.it$p("calls _changeMarketLaunchIncentiveParameters with correct arguments", (function (param) {
-                        return Chai.recordEqualFlat(StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCalls(undefined)[0], {
-                                    marketIndex: 2,
-                                    period: period,
-                                    initialMultiplier: initialMultiplier
-                                  });
-                      }));
+          it("calls _changeMarketLaunchIncentiveParameters with correct arguments", (function () {
+                  return Chai.recordEqualFlat(StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCalls(undefined)[0], {
+                              marketIndex: 2,
+                              period: period,
+                              initialMultiplier: initialMultiplier
+                            });
+                }));
+          
         }));
   describe("_changeMarketLaunchIncentiveParameters (internal)", (function () {
           var initialMultiplierFine = Helpers.randomInteger(undefined).mul(CONSTANTS.tenToThe18);

@@ -158,7 +158,7 @@ function createSyntheticMarket(admin, initialMarketSeedOpt, paymentToken, treasu
               return longShort.newSyntheticMarket(marketName, marketSymbol, paymentToken.address, param[0].address, yieldManager.address).then(function (param) {
                             return longShort.latestMarket();
                           }).then(function (marketIndex) {
-                          return longShort.initializeMarket(marketIndex, ethers.BigNumber.from(0), ethers.BigNumber.from(0), ethers.BigNumber.from(50), ethers.BigNumber.from(50), ethers.BigNumber.from("1000000000000000000"), ethers.BigNumber.from(0), initialMarketSeed);
+                          return longShort.initializeMarket(marketIndex, ethers.BigNumber.from("1000000000000000000"), ethers.BigNumber.from(0), initialMarketSeed);
                         });
             });
 }
@@ -262,4 +262,4 @@ exports.inititialize = inititialize;
 exports.increaseTime = increaseTime;
 exports.getBlock = getBlock;
 exports.getRandomTimestampInPast = getRandomTimestampInPast;
-/* No side effect */
+/* Globals Not a pure module */
