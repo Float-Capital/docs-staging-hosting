@@ -202,10 +202,6 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "_stakeExternal"
 
   @send
-  external _updateStateExternal: (t, ~token: Ethers.ethAddress) => JsPromise.t<transaction> =
-    "_updateStateExternal"
-
-  @send
   external _withdrawExternal: (
     t,
     ~token: Ethers.ethAddress,

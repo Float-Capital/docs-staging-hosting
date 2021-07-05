@@ -11,7 +11,6 @@ var GetKValue = require("./stake/GetKValue.js");
 var MintFloat = require("./stake/MintFloat.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var ClaimFloat = require("./stake/ClaimFloat.js");
-var UpdateState = require("./stake/UpdateState.js");
 var HelperActions = require("../library/HelperActions.js");
 var StakeFromUser = require("./stake/StakeFromUser.js");
 var ClaimFloatCustom = require("./stake/ClaimFloatCustom.js");
@@ -124,7 +123,6 @@ describe("Float System", (function () {
                               CalculateNewCumulativeRate.test(contracts, accounts);
                               SetRewardObjects.test(contracts, accounts);
                               AddNewStateForFloatRewards.test(contracts, accounts);
-                              UpdateState.test(contracts, accounts);
                               MintFloat.test(contracts, accounts);
                               MintAccumulatedFloat.test(contracts, accounts);
                               ClaimFloat.test(contracts, accounts);

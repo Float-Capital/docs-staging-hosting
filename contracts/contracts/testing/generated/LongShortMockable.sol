@@ -410,6 +410,21 @@ contract LongShortMockable is ILongShort, Initializable {
     
 
 
+    function _recalculateSyntheticTokenPrice(uint32 marketIndex, bool isLong)
+        internal
+        view
+        returns (uint256 syntheticTokenPrice)
+    {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_recalculateSyntheticTokenPrice"))){
+      
+      return mocker._recalculateSyntheticTokenPriceMock(marketIndex,isLong);
+    }
+  
+        syntheticTokenPrice =
+            (syntheticTokenPoolValue[marketIndex][isLong] * TEN_TO_THE_18) /
+            syntheticTokens[marketIndex][isLong].totalSupply();
+    }
+
     function _getAmountPaymentToken(uint256 amountSynth, uint256 price)
         internal view returns (uint256)
     {
@@ -701,12 +716,14 @@ contract LongShortMockable is ILongShort, Initializable {
             _claimAndDistributeYield(marketIndex);
             _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
 
-                        syntheticTokenPriceLong = syntheticTokenPriceSnapshot[marketIndex][
+            syntheticTokenPriceLong = _recalculateSyntheticTokenPrice(
+                marketIndex,
                 true
-            ][marketUpdateIndex[marketIndex]];
-            syntheticTokenPriceShort = syntheticTokenPriceSnapshot[marketIndex][
+            );
+            syntheticTokenPriceShort = _recalculateSyntheticTokenPrice(
+                marketIndex,
                 false
-            ][marketUpdateIndex[marketIndex]];
+            );
 
             assetPrice[marketIndex] = uint256(newAssetPrice);
             marketUpdateIndex[marketIndex] += 1;
@@ -734,9 +751,6 @@ contract LongShortMockable is ILongShort, Initializable {
             );
         }
     }
-
-    
-
 
     function updateSystemState(uint32 marketIndex) external override {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("updateSystemState"))){
@@ -1152,7 +1166,7 @@ contract LongShortMockable is ILongShort, Initializable {
                 syntheticTokenPrice
             );
 
-                        syntheticTokens[marketIndex][isLong].mint(
+                                    syntheticTokens[marketIndex][isLong].mint(
                 address(this),
                 numberOfTokens
             );
