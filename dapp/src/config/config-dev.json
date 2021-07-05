@@ -1,5 +1,5 @@
 {
-  "graphEndpoint": "https://test.graph.float.capital/subgraphs/name/float-capital/float-capital",
+  "graphEndpoint": "https://test.graph.float.capital/subgraphs/name/float-capital/float-capital",  
   "priceHistoryGraphEndpoint": "https://test.graph.float.capital/subgraphs/name/float-capital/float-oracle-prices",
   "networkId": 80001,
   "networkName": "mumbai testnet",
@@ -23,3 +23,4 @@
     "Dai": "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F"
   }
 }
+

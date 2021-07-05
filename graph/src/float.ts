@@ -8,6 +8,8 @@ import {
   NewMarketLaunchedAndSeeded,
   NextPriceRedeem,
   ExecuteNextPriceSettlementsUser,
+  ExecuteNextPriceRedeemSettlementUser,
+  ExecuteNextPriceMintSettlementUser,
 } from "../generated/LongShort/LongShort";
 import {
   SyntheticMarket,
@@ -38,10 +40,13 @@ import {
   getUser,
   getSyntheticMarket,
   getSyntheticTokenById,
+  getSyntheticTokenByMarketIdAndTokenType,
 } from "./utils/globalStateManager";
 import {
   createNewTokenDataSource,
   increaseUserMints,
+  updateBalanceTransfer,
+  updateUserBalance,
 } from "./utils/helperFunctions";
 import { decreaseOrCreateUserApprovals } from "./tokenTransfers";
 import {
@@ -200,8 +205,20 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
         .times(TEN_TO_THE_18)
         .div(shortTokenPrice);
 
-      increaseUserMints(user, syntheticTokenLong, tokensMintedLong);
-      increaseUserMints(user, syntheticTokenShort, tokensMintedShort);
+      let hasMint = tokensMintedLong.gt(ZERO) || tokensMintedShort.gt(ZERO);
+
+      if (hasMint) {
+        increaseUserMints(user, syntheticTokenLong, tokensMintedLong);
+        increaseUserMints(user, syntheticTokenShort, tokensMintedShort);
+        updateUserBalance(longTokenId, user, tokensMintedLong, true, timestamp);
+        updateUserBalance(
+          shortTokenId,
+          user,
+          tokensMintedShort,
+          true,
+          timestamp
+        );
+      }
 
       // TODO: add fees when they are implemented!
       let paymentTokensToRedeemLong = userNextPriceAction.amountSynthTokenForWithdrawalLong
@@ -224,7 +241,7 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
 
   saveEventToStateChange(
     event,
-    "ValueLockedInSystem",
+    "SystemStateUpdated",
     bigIntArrayToStringArray([
       marketIndex,
       updateIndex,
@@ -606,6 +623,65 @@ export function handleExecuteNextPriceSettlementsUser(
     [marketIndex.toString(), userAddress.toHex()],
     ["marketIndex", "userAddress"],
     ["uint32", "address"],
+    [userAddress],
+    []
+  );
+}
+
+export function handleExecuteNextPriceRedeemSettlementUser(
+  event: ExecuteNextPriceRedeemSettlementUser
+): void {
+  let marketIndex = event.params.marketIndex;
+  let userAddress = event.params.user;
+  let isLong = event.params.isLong;
+  let amount = event.params.amount;
+
+  // TODO: do something something
+
+  saveEventToStateChange(
+    event,
+    "ExecuteNextPriceRedeemSettlementUser",
+    [
+      marketIndex.toString(),
+      userAddress.toHex(),
+      isLong ? "true" : "false",
+      amount.toString(),
+    ],
+    ["marketIndex", "userAddress", "isLong", "amount"],
+    ["uint32", "address", "bool", "uint256"],
+    [userAddress],
+    []
+  );
+}
+
+export function handleExecuteNextPriceMintSettlementUser(
+  event: ExecuteNextPriceMintSettlementUser
+): void {
+  let marketIndex = event.params.marketIndex;
+  let userAddress = event.params.user;
+  let isLong = event.params.isLong;
+  let amount = event.params.amount;
+
+  let synthToken = getSyntheticTokenByMarketIdAndTokenType(marketIndex, isLong);
+
+  let user = getUser(userAddress);
+
+  // reverse double counting of tokenBalances from synth token TransferEvent
+  updateUserBalance(synthToken.id, user, amount, false, event.block.timestamp);
+
+  user.save();
+
+  saveEventToStateChange(
+    event,
+    "ExecuteNextPriceMintSettlementUser",
+    [
+      marketIndex.toString(),
+      userAddress.toHex(),
+      isLong ? "true" : "false",
+      amount.toString(),
+    ],
+    ["marketIndex", "userAddress", "isLong", "amount"],
+    ["uint32", "address", "bool", "uint256"],
     [userAddress],
     []
   );

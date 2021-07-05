@@ -265,6 +265,23 @@ export function getSyntheticTokenById(
   return syntheticTokenLong as SyntheticToken;
 }
 
+export function getSyntheticTokenByMarketIdAndTokenType(
+  marketIndex: BigInt,
+  isLong: bool
+): SyntheticToken {
+  let syntheticMarket = SyntheticMarket.load(marketIndex.toString());
+  if (syntheticMarket == null) {
+    log.critical("Synthetic market with id {} is undefined.", []);
+  }
+  if (isLong) {
+    return SyntheticToken.load(syntheticMarket.syntheticLong) as SyntheticToken;
+  } else {
+    return SyntheticToken.load(
+      syntheticMarket.syntheticShort
+    ) as SyntheticToken;
+  }
+}
+
 export function getOrCreateBalanceObject(
   tokenAddressString: string,
   userAddressString: string
