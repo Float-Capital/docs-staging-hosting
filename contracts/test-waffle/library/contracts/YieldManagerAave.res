@@ -53,7 +53,7 @@ external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction>
 external claimYieldAndGetMarketAmount: (
   t,
   ~totalValueRealizedForMarket: Ethers.BigNumber.t,
-  ~marketPcntE5: Ethers.BigNumber.t,
+  ~marketPercentE5: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "claimYieldAndGetMarketAmount"
 
 type claimYieldAndGetMarketAmountReturn = Ethers.BigNumber.t
@@ -61,7 +61,7 @@ type claimYieldAndGetMarketAmountReturn = Ethers.BigNumber.t
 external claimYieldAndGetMarketAmountCall: (
   t,
   ~totalValueRealizedForMarket: Ethers.BigNumber.t,
-  ~marketPcntE5: Ethers.BigNumber.t,
+  ~marketPercentE5: Ethers.BigNumber.t,
 ) => JsPromise.t<claimYieldAndGetMarketAmountReturn> = "claimYieldAndGetMarketAmount"
 
 @send

@@ -89,12 +89,13 @@ external _getAmountSynthTokenMock: (
   Ethers.BigNumber.t,
 ) => JsPromise.t<_getAmountSynthTokenMockReturn> = "_getAmountSynthTokenMock"
 
-type _getLongPcntForLongVsShortSplitMockReturn = Ethers.BigNumber.t
+type _getLongPercentForLongVsShortSplitMockReturn = Ethers.BigNumber.t
 @send
-external _getLongPcntForLongVsShortSplitMock: (
+external _getLongPercentForLongVsShortSplitMock: (
   t,
   int,
-) => JsPromise.t<_getLongPcntForLongVsShortSplitMockReturn> = "_getLongPcntForLongVsShortSplitMock"
+) => JsPromise.t<_getLongPercentForLongVsShortSplitMockReturn> =
+  "_getLongPercentForLongVsShortSplitMock"
 
 type _getMarketSplitMockReturn = {
   longAmount: Ethers.BigNumber.t,
@@ -258,13 +259,13 @@ external executeOutstandingNextPriceSettlementsUserMock: (
 ) => JsPromise.t<executeOutstandingNextPriceSettlementsUserMockReturn> =
   "executeOutstandingNextPriceSettlementsUserMock"
 
-type getMarketPcntForTreasuryVsMarketSplitMockReturn = Ethers.BigNumber.t
+type getMarketPercentForTreasuryVsMarketSplitMockReturn = Ethers.BigNumber.t
 @send
-external getMarketPcntForTreasuryVsMarketSplitMock: (
+external getMarketPercentForTreasuryVsMarketSplitMock: (
   t,
   int,
-) => JsPromise.t<getMarketPcntForTreasuryVsMarketSplitMockReturn> =
-  "getMarketPcntForTreasuryVsMarketSplitMock"
+) => JsPromise.t<getMarketPercentForTreasuryVsMarketSplitMockReturn> =
+  "getMarketPercentForTreasuryVsMarketSplitMock"
 
 type getUsersConfirmedButNotSettledBalanceMockReturn = Ethers.BigNumber.t
 @send

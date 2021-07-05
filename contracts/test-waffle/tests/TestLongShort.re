@@ -30,11 +30,7 @@ describe("Float System", () => {
       ();
     });
 
-    describe("_updateSystemState", () => {
-      // TODOs:
-      // Check it reverts if oracle returns a negative value.
-      ()
-    });
+    UpdateSystemState.testIntegration(~contracts, ~accounts);
 
     LazyDeposit.testIntegration(~contracts, ~accounts);
     LazyRedeem.testIntegration(~contracts, ~accounts);
@@ -198,5 +194,6 @@ describe("Float System", () => {
       ();
     });
     InitializeMarket.testUnit(~contracts, ~accounts);
+    UpdateSystemState.testUnit(~contracts, ~accounts);
   });
 });

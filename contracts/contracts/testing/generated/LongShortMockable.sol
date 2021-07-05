@@ -360,7 +360,7 @@ contract LongShortMockable is ILongShort, Initializable {
   
         require(
                         initialMarketSeed > 0.1 ether,
-            "Insufficient value to seed the market"
+            "Insufficient market seed"
         );
 
         _lockFundsInMarket(marketIndex, initialMarketSeed * 2);
@@ -391,7 +391,8 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker.initializeMarketMock(marketIndex,kInitialMultiplier,kPeriod,initialMarketSeed);
     }
   
-        require(!marketExists[marketIndex] && marketIndex <= latestMarket);
+        require(!marketExists[marketIndex], "already initialized");
+        require(marketIndex <= latestMarket, "index too high");
 
         marketExists[marketIndex] = true;
 
@@ -489,14 +490,14 @@ contract LongShortMockable is ILongShort, Initializable {
         }
     }
 
-    function getMarketPcntForTreasuryVsMarketSplit(uint32 marketIndex)
+    function getMarketPercentForTreasuryVsMarketSplit(uint32 marketIndex)
         public
         view
-        returns (uint256 marketPcntE5)
+        returns (uint256 marketPercentE5)
     {
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getMarketPcntForTreasuryVsMarketSplit"))){
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getMarketPercentForTreasuryVsMarketSplit"))){
       
-      return mocker.getMarketPcntForTreasuryVsMarketSplitMock(marketIndex);
+      return mocker.getMarketPercentForTreasuryVsMarketSplitMock(marketIndex);
     }
   
         uint256 totalValueLockedInMarket = syntheticTokenPoolValue[marketIndex][
@@ -507,33 +508,33 @@ contract LongShortMockable is ILongShort, Initializable {
             syntheticTokenPoolValue[marketIndex][true] >
             syntheticTokenPoolValue[marketIndex][false]
         ) {
-            marketPcntE5 =
+            marketPercentE5 =
                 ((syntheticTokenPoolValue[marketIndex][true] -
                     syntheticTokenPoolValue[marketIndex][false]) *
                     TEN_TO_THE_5) /
                 totalValueLockedInMarket;
         } else {
-            marketPcntE5 =
+            marketPercentE5 =
                 ((syntheticTokenPoolValue[marketIndex][false] -
                     syntheticTokenPoolValue[marketIndex][true]) *
                     TEN_TO_THE_5) /
                 totalValueLockedInMarket;
         }
 
-        return marketPcntE5;
+        return marketPercentE5;
     }
 
                                                             
         
         
-    function _getLongPcntForLongVsShortSplit(uint32 marketIndex)
+    function _getLongPercentForLongVsShortSplit(uint32 marketIndex)
         internal
         view
-        returns (uint256 longPcntE5)
+        returns (uint256 longPercentE5)
     {
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_getLongPcntForLongVsShortSplit"))){
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_getLongPercentForLongVsShortSplit"))){
       
-      return mocker._getLongPcntForLongVsShortSplitMock(marketIndex);
+      return mocker._getLongPercentForLongVsShortSplitMock(marketIndex);
     }
   
         return
@@ -554,9 +555,9 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._getMarketSplitMock(marketIndex,amount);
     }
   
-        uint256 longPcntE5 = _getLongPcntForLongVsShortSplit(marketIndex);
+        uint256 longPercentE5 = _getLongPercentForLongVsShortSplit(marketIndex);
 
-        longAmount = (amount * longPcntE5) / TEN_TO_THE_5;
+        longAmount = (amount * longPercentE5) / TEN_TO_THE_5;
         shortAmount = amount - longAmount;
 
         return (longAmount, shortAmount);
@@ -589,7 +590,7 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._claimAndDistributeYieldMock(marketIndex);
     }
   
-        uint256 marketPcntE5 = getMarketPcntForTreasuryVsMarketSplit(
+        uint256 marketPercentE5 = getMarketPercentForTreasuryVsMarketSplit(
             marketIndex
         );
 
@@ -600,7 +601,7 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 marketAmount = yieldManagers[marketIndex]
         .claimYieldAndGetMarketAmount(
             totalValueRealizedForMarket,
-            marketPcntE5
+            marketPercentE5
         );
 
         if (marketAmount > 0) {
@@ -698,6 +699,7 @@ contract LongShortMockable is ILongShort, Initializable {
             false
         );
 
+                
                 staker.addNewStateForFloatRewards(
             marketIndex,
             syntheticTokenPriceLong,

@@ -33,11 +33,11 @@ abstract contract IYieldManager {
      * Calculate the amount of yield that has yet to be claimed,
      * note how much is reserved for the treasury and return how
      * much is reserved for the market. The yield is split between
-     * the market and the treasury so treasuryPcnt = 1 - marketPcnt.
+     * the market and the treasury so treasuryPercent = 1 - marketPercent.
      */
     function claimYieldAndGetMarketAmount(
         uint256 totalValueRealizedForMarket,
-        uint256 marketPcntE5
+        uint256 marketPercentE5
     ) public virtual returns (uint256 marketAmount);
 
     /*

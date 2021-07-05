@@ -148,12 +148,12 @@ contract YieldManagerAave is IYieldManager {
      * Calculate the amount of yield that has yet to be claimed,
      * note how much is reserved for the treasury and return how
      * much is reserved for the market. The yield is split between
-     * the market and the treasury so treasuryPcnt = 1 - marketPcnt.
+     * the market and the treasury so treasuryPercent = 1 - marketPercent.
      */
     // TODO STENT not unit tested
     function claimYieldAndGetMarketAmount(
         uint256 totalValueRealizedForMarket,
-        uint256 marketPcntE5
+        uint256 marketPercentE5
     ) public override longShortOnly returns (uint256) {
         uint256 totalHeld = aToken.balanceOf(address(this));
 
@@ -165,7 +165,7 @@ contract YieldManagerAave is IYieldManager {
             return 0;
         }
 
-        uint256 amountForMarketIncetives = (unrealizedYield * marketPcntE5) /
+        uint256 amountForMarketIncetives = (unrealizedYield * marketPercentE5) /
             TEN_TO_THE_5;
 
         uint256 amountForTreasury = unrealizedYield - amountForMarketIncetives;

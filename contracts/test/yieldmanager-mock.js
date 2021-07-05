@@ -105,7 +105,7 @@ contract("YieldManagerMock (interface)", (accounts) => {
   });
 
   it("settling with yield increases holdings", async () => {
-    await yieldManager.settleWithYield(oneTenth, {
+    await yieldManager.settleWithYieldPercent(oneTenth, {
       from: admin,
     });
 

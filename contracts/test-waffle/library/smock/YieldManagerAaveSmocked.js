@@ -169,7 +169,7 @@ function claimYieldAndGetMarketAmountCalls(_r) {
   return Belt_Array.map(array, (function (param) {
                 return {
                         totalValueRealizedForMarket: param[0],
-                        marketPcntE5: param[1]
+                        marketPercentE5: param[1]
                       };
               }));
 }
