@@ -26,6 +26,37 @@ export function createNewTokenDataSource(address: Address): void {
   erc20.createWithContext(address, context);
 }
 
+export function updateUserBalance(
+  tokenAddressString: string,
+  user: User,
+  amount: BigInt,
+  add: boolean,
+  timestamp: BigInt
+): void {
+  let balanceFromObject = getOrCreateBalanceObject(tokenAddressString, user.id);
+
+  balanceFromObject.timeLastUpdated = timestamp;
+
+  if (add) {
+    balanceFromObject.tokenBalance = balanceFromObject.tokenBalance.plus(
+      amount
+    );
+  } else {
+    balanceFromObject.tokenBalance = balanceFromObject.tokenBalance.minus(
+      amount
+    );
+  }
+
+  // Add to previouslyOwnedTokens if not already there
+  user.tokenBalances =
+    user.tokenBalances.indexOf(balanceFromObject.id) === -1
+      ? user.tokenBalances.concat([balanceFromObject.id])
+      : user.tokenBalances;
+
+  balanceFromObject.save();
+  user.save();
+}
+
 export function updateBalanceTransfer(
   tokenAddressString: string,
   userAddress: Address,
@@ -43,6 +74,7 @@ export function updateBalanceTransfer(
       tokenAddressString,
       userAddressString
     );
+
     balanceFromObject.timeLastUpdated = event.block.timestamp;
 
     if (send) {

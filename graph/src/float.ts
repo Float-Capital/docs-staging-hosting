@@ -48,6 +48,7 @@ import {
   createNewTokenDataSource,
   increaseUserMints,
   updateBalanceTransfer,
+  updateUserBalance,
 } from "./utils/helperFunctions";
 import { decreaseOrCreateUserApprovals } from "./tokenTransfers";
 import {
@@ -216,26 +217,20 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
         .times(TEN_TO_THE_18)
         .div(shortTokenPrice);
 
-      increaseUserMints(user, syntheticTokenLong, tokensMintedLong);
-      increaseUserMints(user, syntheticTokenShort, tokensMintedShort);
+      let hasMint = tokensMintedLong.gt(ZERO) || tokensMintedShort.gt(ZERO);
 
-      // let hasMint = tokensMintedLong.gt(ZERO) || tokensMintedShort.gt(ZERO);
-      // if (hasMint) {
-      //   updateBalanceTransfer(
-      //     longTokenId,
-      //     userAddress,
-      //     tokensMintedLong,
-      //     false,
-      //     event
-      //   );
-      //   updateBalanceTransfer(
-      //     shortTokenId,
-      //     userAddress,
-      //     tokensMintedShort,
-      //     false,
-      //     event
-      //   );
-      // }
+      if (hasMint) {
+        increaseUserMints(user, syntheticTokenLong, tokensMintedLong);
+        increaseUserMints(user, syntheticTokenShort, tokensMintedShort);
+        updateUserBalance(longTokenId, user, tokensMintedLong, true, timestamp);
+        updateUserBalance(
+          shortTokenId,
+          user,
+          tokensMintedShort,
+          true,
+          timestamp
+        );
+      }
 
       // TODO: add fees when they are implemented!
       let paymentTokensToRedeemLong = userNextPriceAction.amountSynthTokenForWithdrawalLong
@@ -258,7 +253,7 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
 
   saveEventToStateChange(
     event,
-    "ValueLockedInSystem",
+    "SystemStateUpdated",
     bigIntArrayToStringArray([
       marketIndex,
       updateIndex,
@@ -718,15 +713,14 @@ export function handleExecuteNextPriceMintSettlementUser(
   let isLong = event.params.isLong;
   let amount = event.params.amount;
 
+  let synthToken = getSyntheticTokenByMarketIdAndTokenType(marketIndex, isLong);
+
+  let user = getUser(userAddress);
+
   // reverse double counting of tokenBalances from synth token TransferEvent
-  // let synthToken = getSyntheticTokenByMarketIdAndTokenType(marketIndex, isLong);
-  // updateBalanceTransfer(
-  //   synthToken.id,
-  //   userAddress,
-  //   amount,
-  //   true, // equivalent to minus
-  //   event
-  // );
+  updateUserBalance(synthToken.id, user, amount, false, event.block.timestamp);
+
+  user.save();
 
   saveEventToStateChange(
     event,
