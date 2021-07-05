@@ -22,7 +22,7 @@ contract LongShort is ILongShort, Initializable {
       ║          VARIABLES          ║
       ╚═════════════════════════════╝*/
 
-    // Fixed-precision constants ////////////////////////////////
+    // Fixed-precision constants
     address public constant DEAD_ADDRESS =
         0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
     uint256 public constant TEN_TO_THE_18 = 1e18;
@@ -30,7 +30,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 public constant TEN_TO_THE_5 = 10000;
     uint256[45] private __constantsGap;
 
-    // Global state ////////////////////////////////////////////
+    // Global state
     address public admin;
     address public treasury;
     uint32 public latestMarket;
@@ -39,7 +39,7 @@ contract LongShort is ILongShort, Initializable {
     ITokenFactory public tokenFactory;
     uint256[45] private __globalStateGap;
 
-    // Market specific /////////////////////////////////////////
+    // Market specific
     mapping(uint32 => bool) public marketExists;
     mapping(uint32 => uint256) public assetPrice;
     mapping(uint32 => uint256) public marketUpdateIndex;
@@ -47,7 +47,7 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => IYieldManager) public yieldManagers;
     mapping(uint32 => IOracleManager) public oracleManagers;
 
-    // Market + position (long/short) specific /////////////////
+    // Market + position (long/short) specific
     mapping(uint32 => mapping(bool => ISyntheticToken)) public syntheticTokens;
     mapping(uint32 => mapping(bool => uint256)) public syntheticTokenPoolValue;
 
@@ -59,7 +59,7 @@ contract LongShort is ILongShort, Initializable {
     mapping(uint32 => mapping(bool => uint256))
         public batchedAmountOfSynthTokensToRedeem;
 
-    // User specific ///////////////////////////////////////////
+    // User specific
     mapping(uint32 => mapping(address => uint256))
         public userCurrentNextPriceUpdateIndex;
 

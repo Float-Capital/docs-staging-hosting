@@ -9,77 +9,53 @@ import "./interfaces/IFloatToken.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/IStaker.sol";
 
-/*
-    ###### Purpose of contract ########
-    This smart contract allows users to securely stake synthetic asset
-    tokens created through the float protocol.
-
-    Staking sythentic tokens will ensure that the liquidity of the
-    synthetic market is increased, and entitle users to FLOAT rewards.
-*/
-
-/** @title Staker Contract */
 contract Staker is IStaker, Initializable {
+    /*╔═════════════════════════════╗
+      ║          VARIABLES          ║
+      ╚═════════════════════════════╝*/
+
+    // Fixed-precision constants
+    uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
+
+    // Global state
+    address public admin;
+    address public floatCapital;
+    uint16 public floatPercentage;
+
+    ILongShort public longShortCoreContract;
+    IFloatToken public floatToken;
+
+    // Market specific
+    mapping(uint32 => uint256) public marketLaunchIncentivePeriod; // seconds
+    mapping(uint32 => uint256) public marketLaunchIncentiveMultipliers; // e18 scale
+
+    mapping(ISyntheticToken => uint32) public marketIndexOfToken;
+
+    mapping(uint32 => SyntheticTokens) public syntheticTokens;
+    struct SyntheticTokens {
+        ISyntheticToken shortToken;
+        ISyntheticToken longToken;
+    }
+
+    // Reward specific
+    mapping(uint32 => uint256) public latestRewardIndex;
+    mapping(uint32 => mapping(uint256 => RewardState))
+        public syntheticRewardParams;
     struct RewardState {
         uint256 timestamp;
         uint256 accumulativeFloatPerLongToken;
         uint256 accumulativeFloatPerShortToken;
     }
-    struct SyntheticTokens {
-        ISyntheticToken shortToken;
-        ISyntheticToken longToken;
-    }
-    struct BatchedStake {
-        uint256 amountLong;
-        uint256 amountShort;
-        uint256 creationRewardIndex;
-    }
 
-    ////////////////////////////////////
-    //////// CONSTANTS /////////////////
-    ////////////////////////////////////
-
-    // Controls the k-factor, a multiplier for incentivising early stakers.
-    //   token market index -> value
-    uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
-    mapping(uint32 => uint256) public marketLaunchIncentivePeriod; // seconds
-    mapping(uint32 => uint256) public marketLaunchIncentiveMultipliers; // e18 scale
-    uint256[45] private __stakeParametersGap;
-
-    ////////////////////////////////////
-    //////// VARIABLES /////////////////
-    ////////////////////////////////////
-
-    // Global state.
-    address public admin;
-    address public floatCapital;
-    uint16 public floatPercentage;
-    ILongShort public longShortCoreContract;
-    IFloatToken public floatToken;
-    uint256[45] private __globalParamsGap;
-
-    // User state.
-    //   token -> user -> value
-    mapping(ISyntheticToken => mapping(address => uint256))
-        public userAmountStaked;
-    uint256[45] private __userInfoGap;
-
-    // Token state.
-    mapping(ISyntheticToken => uint32) public marketIndexOfToken; // token -> market index
-    uint256[45] private __tokenInfoGap;
-
-    // market state.
+    // User specific
     mapping(uint32 => mapping(address => uint256))
         public userIndexOfLastClaimedReward;
-    mapping(uint32 => mapping(uint256 => BatchedStake)) public batchedStake; // token -> index
-    mapping(uint32 => SyntheticTokens) public syntheticTokens; // token -> index -> state
-    mapping(uint32 => mapping(uint256 => RewardState))
-        public syntheticRewardParams; // token -> index -> state
-    mapping(uint32 => uint256) public latestRewardIndex; // token -> index
+    mapping(ISyntheticToken => mapping(address => uint256))
+        public userAmountStaked;
 
-    ////////////////////////////////////
-    /////////// EVENTS /////////////////
-    ////////////////////////////////////
+    /*╔════════════════════════════╗
+      ║           EVENTS           ║
+      ╚════════════════════════════╝*/
 
     event DeployV1(address floatToken);
 
