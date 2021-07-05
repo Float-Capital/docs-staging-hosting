@@ -36,7 +36,19 @@ type Price @entity {
 }
 
 type LatestPrice @entity {
-  id: ID! # latestPrice-<marketIndex>-<long/short>
+  id: ID! # latestPrice-<marketIndex>-<underlying>
+  price: Price!
+}
+
+type UnderlyingPrice @entity {
+  id: ID! # <marketIndex>-underlying-<timestamp>
+  price: BigInt!
+  timeUpdated: BigInt!
+  market: SyntheticMarket!
+}
+
+type LatestUnderlyingPrice @entity {
+  id: ID! # latestPrice-<marketIndex>-<underlying>
   price: Price!
 }
 
@@ -113,7 +125,7 @@ type SystemState @entity {
   txHash: Bytes!
   blockNumber: BigInt!
   marketIndex: BigInt!
-  syntheticPrice: BigInt! # TODO: this should be a reference to another entity that holds the price
+  underlyingPrice: LatestUnderlyingPrice!
   longTokenPrice: LatestPrice!
   shortTokenPrice: LatestPrice!
   longToken: SyntheticToken!

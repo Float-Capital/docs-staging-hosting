@@ -90,13 +90,12 @@ contract LongShortMockable is ILongShort, Initializable {
         event SystemStateUpdated(
         uint32 marketIndex,
         uint256 updateIndex,
+        int256 underlyingAssetPrice,
         uint256 longValue,
         uint256 shortValue,
         uint256 longPrice,
         uint256 shortPrice
     );
-
-    event FeesLevied(uint32 marketIndex, uint256 totalFees);
 
     event SyntheticTokenCreated(
         uint32 marketIndex,
@@ -132,14 +131,6 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 oracleUpdateIndex
     );
 
-    event FeesChanges(
-        uint32 marketIndex,
-        uint256 baseEntryFee,
-        uint256 badLiquidityEntryFee,
-        uint256 baseExitFee,
-        uint256 badLiquidityExitFee
-    );
-
     event OracleUpdated(
         uint32 marketIndex,
         address oldOracleAddress,
@@ -154,6 +145,7 @@ contract LongShortMockable is ILongShort, Initializable {
         bool isLong,
         uint256 amount
     );
+
     event ExecuteNextPriceRedeemSettlementUser(
         address user,
         uint32 marketIndex,
@@ -162,6 +154,7 @@ contract LongShortMockable is ILongShort, Initializable {
     );
 
     event ExecuteNextPriceSettlementsUser(address user, uint32 marketIndex);
+
     
 
 
@@ -744,6 +737,7 @@ contract LongShortMockable is ILongShort, Initializable {
             emit SystemStateUpdated(
                 marketIndex,
                 marketUpdateIndex[marketIndex],
+                newAssetPrice,
                 syntheticTokenPoolValue[marketIndex][true],
                 syntheticTokenPoolValue[marketIndex][false],
                 syntheticTokenPriceLong,
@@ -1166,7 +1160,7 @@ contract LongShortMockable is ILongShort, Initializable {
                 syntheticTokenPrice
             );
 
-                                    syntheticTokens[marketIndex][isLong].mint(
+            syntheticTokens[marketIndex][isLong].mint(
                 address(this),
                 numberOfTokens
             );

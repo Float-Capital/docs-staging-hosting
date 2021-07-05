@@ -10,9 +10,8 @@ import {
   SyntheticMarket,
   CollateralToken,
   UserCollateralTokenBalance,
-  BatchedNextPriceExec,
-  NextBatchedNextPriceExec,
-  UserNextPriceAction,
+  UnderlyingPrice,
+  LatestUnderlyingPrice,
 } from "../../generated/schema";
 import { BigInt, Bytes, log, ethereum, Address } from "@graphprotocol/graph-ts";
 import {
@@ -40,6 +39,20 @@ function createInitialTokenPrice(
   return initialTokenPrice as Price;
 }
 
+function createInitialUnderlyingPrice(
+  id: string,
+  marketId: string,
+  initialPrice: BigInt,
+  timestamp: BigInt
+): UnderlyingPrice {
+  let initialUnderlyingPrice = new UnderlyingPrice(id);
+  initialUnderlyingPrice.price = initialPrice;
+  initialUnderlyingPrice.market = marketId;
+  initialUnderlyingPrice.timeUpdated = timestamp;
+
+  return initialUnderlyingPrice as UnderlyingPrice;
+}
+
 class InitialState {
   systemState: SystemState;
   tokenPriceLong: Price;
@@ -51,6 +64,7 @@ export function createInitialSystemState(
   marketIndex: BigInt,
   latestStateChangeCounter: BigInt,
   event: ethereum.Event,
+  initialAssetPrice: BigInt,
   longTokenId: string,
   shortTokenId: string
 ): InitialState {
@@ -59,6 +73,8 @@ export function createInitialSystemState(
   let timestamp = event.block.timestamp;
   let initialLongPriceId = marketIndexId + "-long-" + timestamp.toString();
   let initialShortPriceId = marketIndexId + "-short-" + timestamp.toString();
+  let initialUnderlyingAssetPriceId =
+    marketIndexId + "-underlying-" + timestamp.toString();
 
   let initialLongTokenPrice = createInitialTokenPrice(
     initialLongPriceId,
@@ -70,24 +86,39 @@ export function createInitialSystemState(
     shortTokenId,
     timestamp
   );
+  let initialUnderlyingAssetPrice = createInitialUnderlyingPrice(
+    initialUnderlyingAssetPriceId,
+    marketIndexId,
+    initialAssetPrice,
+    timestamp
+  );
   let longCurrentTokenPrice = new LatestPrice(
     "latestPrice-" + marketIndexId + "-long"
   );
   let shortCurrentTokenPrice = new LatestPrice(
     "latestPrice-" + marketIndexId + "-short"
   );
+  let underlyingAssetPrice = new LatestUnderlyingPrice(
+    "latestPrice-" + marketIndexId + "-underlying"
+  );
   longCurrentTokenPrice.price = initialLongTokenPrice.id;
   shortCurrentTokenPrice.price = initialShortTokenPrice.id;
+  underlyingAssetPrice.price = initialUnderlyingAssetPrice.id;
+
   initialLongTokenPrice.save();
   initialShortTokenPrice.save();
+  initialUnderlyingAssetPrice.save();
+
   longCurrentTokenPrice.save();
   shortCurrentTokenPrice.save();
+  underlyingAssetPrice.save();
+
   let latestSystemState = new SystemState(marketIndexId + "-" + systemStateId);
   latestSystemState.timestamp = event.block.timestamp;
   latestSystemState.txHash = event.transaction.hash;
   latestSystemState.blockNumber = event.block.number;
   latestSystemState.marketIndex = marketIndex;
-  latestSystemState.syntheticPrice = ZERO;
+  latestSystemState.underlyingPrice = underlyingAssetPrice.id;
   latestSystemState.longTokenPrice = longCurrentTokenPrice.id;
   latestSystemState.shortTokenPrice = shortCurrentTokenPrice.id;
   latestSystemState.totalLockedLong = ZERO;
@@ -134,7 +165,7 @@ export function getOrCreateLatestSystemState(
     latestSystemState.txHash = event.transaction.hash;
     latestSystemState.blockNumber = event.block.number;
     latestSystemState.marketIndex = marketIndex;
-    latestSystemState.syntheticPrice = prevSystemState.syntheticPrice;
+    latestSystemState.underlyingPrice = prevSystemState.underlyingPrice;
     latestSystemState.longTokenPrice = prevSystemState.longTokenPrice;
     latestSystemState.shortTokenPrice = prevSystemState.shortTokenPrice;
     latestSystemState.totalLockedLong = prevSystemState.totalLockedLong;
