@@ -1,4 +1,4 @@
-open BsRecharts
+open Recharts
 let {ethAdrToLowerStr} = module(Ethers.Utils)
 
 type priceData = {

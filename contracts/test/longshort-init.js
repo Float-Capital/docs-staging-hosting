@@ -73,7 +73,7 @@ contract("LongShort (initialisation)", (accounts) => {
     });
 
     const user1LongTokens = await long.balanceOf(user1);
-    const user1FundTokens = await fund.balanceOf(user1);
+    const user1PaymentTokens = await fund.balanceOf(user1);
 
     console.log(
       user1LongTokens.toString(),
@@ -85,7 +85,7 @@ contract("LongShort (initialisation)", (accounts) => {
       defaultMintAmount.sub(defaultMintAmount.mul(entryFee).div(feeUnitsOfPrecision)).toString(),
       "Correct tokens not minted on initialization"
     );
-    assert.equal(user1FundTokens, 0, "Tokens not taken when minting position");
+    assert.equal(user1PaymentTokens, 0, "Tokens not taken when minting position");
   });
 
   it.skip("successfully initialises, short position can be created.", async () => {
@@ -97,14 +97,14 @@ contract("LongShort (initialisation)", (accounts) => {
     });
 
     const user1ShortTokens = await short.balanceOf(user1);
-    const user1FundTokens = await fund.balanceOf(user1);
+    const user1PaymentTokens = await fund.balanceOf(user1);
 
     assert.equal(
       user1ShortTokens,
       defaultMintAmount.sub(defaultMintAmount.mul(entryFee).div(feeUnitsOfPrecision)).toString(),
       "Correct tokens not minted on initialization"
     );
-    assert.equal(user1FundTokens, 0, "Tokens not taken when minting position");
+    assert.equal(user1PaymentTokens, 0, "Tokens not taken when minting position");
   });
 
   it.skip("succesfully initialises, long/short sides created with correct price/value", async () => {

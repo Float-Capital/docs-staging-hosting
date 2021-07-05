@@ -32,3 +32,7 @@ docker logs graph_graph-node_1 -f --tail 100
 
 Checkout the graph code you want to run.
 Go in the `scripts` folder, and run `./updateSelfHostedGraph.sh`.
+
+### Development tips
+
+- Add event logging to the graph by setting the `EVENT_LOGGING` variable to true inside the `src/config.ts` file (please avoid comitting this)

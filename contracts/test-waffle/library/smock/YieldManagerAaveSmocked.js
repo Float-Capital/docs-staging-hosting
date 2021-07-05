@@ -63,13 +63,13 @@ function longShortCalls(_r) {
               }));
 }
 
-function mockTokenToReturn(_r, _param0) {
-  ((_r.smocked.token.will.return.with([_param0])));
+function mockPaymentTokenToReturn(_r, _param0) {
+  ((_r.smocked.paymentToken.will.return.with([_param0])));
   
 }
 
-function tokenCalls(_r) {
-  var array = _r.smocked.token.calls;
+function paymentTokenCalls(_r) {
+  var array = _r.smocked.paymentToken.calls;
   return Belt_Array.map(array, (function (param) {
                 
               }));
@@ -114,13 +114,13 @@ function changeAdminCalls(_r) {
               }));
 }
 
-function mockDepositTokenToReturn(_r) {
-  ((_r.smocked.depositToken.will.return()));
+function mockDepositPaymentTokenToReturn(_r) {
+  ((_r.smocked.depositPaymentToken.will.return()));
   
 }
 
-function depositTokenCalls(_r) {
-  var array = _r.smocked.depositToken.calls;
+function depositPaymentTokenCalls(_r) {
+  var array = _r.smocked.depositPaymentToken.calls;
   return Belt_Array.map(array, (function (_m) {
                 var amount = _m[0];
                 return {
@@ -129,13 +129,13 @@ function depositTokenCalls(_r) {
               }));
 }
 
-function mockWithdrawTokenToReturn(_r) {
-  ((_r.smocked.withdrawToken.will.return()));
+function mockWithdrawPaymentTokenToReturn(_r) {
+  ((_r.smocked.withdrawPaymentToken.will.return()));
   
 }
 
-function withdrawTokenCalls(_r) {
-  var array = _r.smocked.withdrawToken.calls;
+function withdrawPaymentTokenCalls(_r) {
+  var array = _r.smocked.withdrawPaymentToken.calls;
   return Belt_Array.map(array, (function (_m) {
                 var amount = _m[0];
                 return {
@@ -169,7 +169,7 @@ function claimYieldAndGetMarketAmountCalls(_r) {
   return Belt_Array.map(array, (function (param) {
                 return {
                         totalValueRealizedForMarket: param[0],
-                        marketPcntE5: param[1]
+                        marketPercentE5: param[1]
                       };
               }));
 }
@@ -199,18 +199,18 @@ exports.mockLendingPoolToReturn = mockLendingPoolToReturn;
 exports.lendingPoolCalls = lendingPoolCalls;
 exports.mockLongShortToReturn = mockLongShortToReturn;
 exports.longShortCalls = longShortCalls;
-exports.mockTokenToReturn = mockTokenToReturn;
-exports.tokenCalls = tokenCalls;
+exports.mockPaymentTokenToReturn = mockPaymentTokenToReturn;
+exports.paymentTokenCalls = paymentTokenCalls;
 exports.mockTotalReservedForTreasuryToReturn = mockTotalReservedForTreasuryToReturn;
 exports.totalReservedForTreasuryCalls = totalReservedForTreasuryCalls;
 exports.mockTreasuryToReturn = mockTreasuryToReturn;
 exports.treasuryCalls = treasuryCalls;
 exports.mockChangeAdminToReturn = mockChangeAdminToReturn;
 exports.changeAdminCalls = changeAdminCalls;
-exports.mockDepositTokenToReturn = mockDepositTokenToReturn;
-exports.depositTokenCalls = depositTokenCalls;
-exports.mockWithdrawTokenToReturn = mockWithdrawTokenToReturn;
-exports.withdrawTokenCalls = withdrawTokenCalls;
+exports.mockDepositPaymentTokenToReturn = mockDepositPaymentTokenToReturn;
+exports.depositPaymentTokenCalls = depositPaymentTokenCalls;
+exports.mockWithdrawPaymentTokenToReturn = mockWithdrawPaymentTokenToReturn;
+exports.withdrawPaymentTokenCalls = withdrawPaymentTokenCalls;
 exports.mockWithdrawErc20TokenToTreasuryToReturn = mockWithdrawErc20TokenToTreasuryToReturn;
 exports.withdrawErc20TokenToTreasuryCalls = withdrawErc20TokenToTreasuryCalls;
 exports.mockClaimYieldAndGetMarketAmountToReturn = mockClaimYieldAndGetMarketAmountToReturn;

@@ -14,6 +14,10 @@ let make: (
 ) => JsPromise.t<t> = (~admin, ~longShort, ~treasury, ~token) =>
   deployContract4(contractName, admin, longShort, treasury, token)->Obj.magic
 
+type tEN_TO_THE_5Return = Ethers.BigNumber.t
+@send
+external tEN_TO_THE_5: t => JsPromise.t<tEN_TO_THE_5Return> = "TEN_TO_THE_5"
+
 type adminReturn = Ethers.ethAddress
 @send
 external admin: t => JsPromise.t<adminReturn> = "admin"
@@ -22,7 +26,7 @@ external admin: t => JsPromise.t<adminReturn> = "admin"
 external claimYieldAndGetMarketAmount: (
   t,
   ~totalValueRealizedForMarket: Ethers.BigNumber.t,
-  ~marketPcntE5: Ethers.BigNumber.t,
+  ~marketPercentE5: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "claimYieldAndGetMarketAmount"
 
 type claimYieldAndGetMarketAmountReturn = Ethers.BigNumber.t
@@ -30,11 +34,12 @@ type claimYieldAndGetMarketAmountReturn = Ethers.BigNumber.t
 external claimYieldAndGetMarketAmountCall: (
   t,
   ~totalValueRealizedForMarket: Ethers.BigNumber.t,
-  ~marketPcntE5: Ethers.BigNumber.t,
+  ~marketPercentE5: Ethers.BigNumber.t,
 ) => JsPromise.t<claimYieldAndGetMarketAmountReturn> = "claimYieldAndGetMarketAmount"
 
 @send
-external depositToken: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> = "depositToken"
+external depositPaymentToken: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> =
+  "depositPaymentToken"
 
 type lastSettledReturn = Ethers.BigNumber.t
 @send
@@ -56,8 +61,14 @@ external setYieldRate: (t, ~yieldRate: Ethers.BigNumber.t) => JsPromise.t<transa
 external settle: t => JsPromise.t<transaction> = "settle"
 
 @send
-external settleWithYield: (t, ~yield: Ethers.BigNumber.t) => JsPromise.t<transaction> =
-  "settleWithYield"
+external settleWithYieldAbsolute: (t, ~totalYield: Ethers.BigNumber.t) => JsPromise.t<transaction> =
+  "settleWithYieldAbsolute"
+
+@send
+external settleWithYieldPercent: (
+  t,
+  ~yieldPercent: Ethers.BigNumber.t,
+) => JsPromise.t<transaction> = "settleWithYieldPercent"
 
 type tokenReturn = Ethers.ethAddress
 @send
@@ -88,8 +99,8 @@ external withdrawErc20TokenToTreasury: (
 ) => JsPromise.t<transaction> = "withdrawErc20TokenToTreasury"
 
 @send
-external withdrawToken: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> =
-  "withdrawToken"
+external withdrawPaymentToken: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> =
+  "withdrawPaymentToken"
 
 @send
 external withdrawTreasuryFunds: t => JsPromise.t<transaction> = "withdrawTreasuryFunds"

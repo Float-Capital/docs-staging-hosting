@@ -34,13 +34,13 @@ let test =
       ();
     });
 
-    it'("calls the onlyAdminModifier", () => {
+    it("calls the onlyAdminModifier", () => {
       StakerSmocked.InternalMock.onlyAdminCalls()
       ->Array.length
       ->Chai.intEqual(1)
     });
 
-    it'(
+    it(
       "calls _changeMarketLaunchIncentiveParameters with correct arguments", () => {
       StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCalls()
       ->Array.getUnsafe(0)

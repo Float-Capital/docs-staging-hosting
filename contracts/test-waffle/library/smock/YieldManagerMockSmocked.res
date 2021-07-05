@@ -4,6 +4,19 @@ type t = {address: Ethers.ethAddress}
 
 let uninitializedValue: t = None->Obj.magic
 
+let mockTEN_TO_THE_5ToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.TEN_TO_THE_5.will.return.with([_param0])")
+}
+
+type tEN_TO_THE_5Call
+
+let tEN_TO_THE_5Calls: t => array<tEN_TO_THE_5Call> = _r => {
+  let array = %raw("_r.smocked.TEN_TO_THE_5.calls")
+  array->Array.map(() => {
+    ()->Obj.magic
+  })
+}
+
 let mockAdminToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.admin.will.return.with([_param0])")
 }
@@ -147,19 +160,36 @@ let settleCalls: t => array<settleCall> = _r => {
   })
 }
 
-let mockSettleWithYieldToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.settleWithYield.will.return()")
+let mockSettleWithYieldPercentToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.settleWithYieldPercent.will.return()")
 }
 
-type settleWithYieldCall = {yield: Ethers.BigNumber.t}
+type settleWithYieldPercentCall = {yieldPercent: Ethers.BigNumber.t}
 
-let settleWithYieldCalls: t => array<settleWithYieldCall> = _r => {
-  let array = %raw("_r.smocked.settleWithYield.calls")
+let settleWithYieldPercentCalls: t => array<settleWithYieldPercentCall> = _r => {
+  let array = %raw("_r.smocked.settleWithYieldPercent.calls")
   array->Array.map(_m => {
-    let yield = _m->Array.getUnsafe(0)
+    let yieldPercent = _m->Array.getUnsafe(0)
 
     {
-      yield: yield,
+      yieldPercent: yieldPercent,
+    }
+  })
+}
+
+let mockSettleWithYieldAbsoluteToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.settleWithYieldAbsolute.will.return()")
+}
+
+type settleWithYieldAbsoluteCall = {totalYield: Ethers.BigNumber.t}
+
+let settleWithYieldAbsoluteCalls: t => array<settleWithYieldAbsoluteCall> = _r => {
+  let array = %raw("_r.smocked.settleWithYieldAbsolute.calls")
+  array->Array.map(_m => {
+    let totalYield = _m->Array.getUnsafe(0)
+
+    {
+      totalYield: totalYield,
     }
   })
 }
@@ -196,14 +226,14 @@ let setYieldRateCalls: t => array<setYieldRateCall> = _r => {
   })
 }
 
-let mockDepositTokenToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.depositToken.will.return()")
+let mockDepositPaymentTokenToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.depositPaymentToken.will.return()")
 }
 
-type depositTokenCall = {amount: Ethers.BigNumber.t}
+type depositPaymentTokenCall = {amount: Ethers.BigNumber.t}
 
-let depositTokenCalls: t => array<depositTokenCall> = _r => {
-  let array = %raw("_r.smocked.depositToken.calls")
+let depositPaymentTokenCalls: t => array<depositPaymentTokenCall> = _r => {
+  let array = %raw("_r.smocked.depositPaymentToken.calls")
   array->Array.map(_m => {
     let amount = _m->Array.getUnsafe(0)
 
@@ -213,14 +243,14 @@ let depositTokenCalls: t => array<depositTokenCall> = _r => {
   })
 }
 
-let mockWithdrawTokenToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.withdrawToken.will.return()")
+let mockWithdrawPaymentTokenToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.withdrawPaymentToken.will.return()")
 }
 
-type withdrawTokenCall = {amount: Ethers.BigNumber.t}
+type withdrawPaymentTokenCall = {amount: Ethers.BigNumber.t}
 
-let withdrawTokenCalls: t => array<withdrawTokenCall> = _r => {
-  let array = %raw("_r.smocked.withdrawToken.calls")
+let withdrawPaymentTokenCalls: t => array<withdrawPaymentTokenCall> = _r => {
+  let array = %raw("_r.smocked.withdrawPaymentToken.calls")
   array->Array.map(_m => {
     let amount = _m->Array.getUnsafe(0)
 
@@ -253,15 +283,15 @@ let mockClaimYieldAndGetMarketAmountToReturn: (t, Ethers.BigNumber.t) => unit = 
 
 type claimYieldAndGetMarketAmountCall = {
   totalValueRealizedForMarket: Ethers.BigNumber.t,
-  marketPcntE5: Ethers.BigNumber.t,
+  marketPercentE5: Ethers.BigNumber.t,
 }
 
 let claimYieldAndGetMarketAmountCalls: t => array<claimYieldAndGetMarketAmountCall> = _r => {
   let array = %raw("_r.smocked.claimYieldAndGetMarketAmount.calls")
-  array->Array.map(((totalValueRealizedForMarket, marketPcntE5)) => {
+  array->Array.map(((totalValueRealizedForMarket, marketPercentE5)) => {
     {
       totalValueRealizedForMarket: totalValueRealizedForMarket,
-      marketPcntE5: marketPcntE5,
+      marketPercentE5: marketPercentE5,
     }
   })
 }

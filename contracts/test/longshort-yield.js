@@ -126,7 +126,7 @@ contract("LongShort (yield mechanism)", (accounts) => {
 
       // Accrue deterministic yield and update longshort system state.
       const yieldAmount = yieldFn(yieldScale);
-      await yieldManager.settleWithYield(yieldAmount, {
+      await yieldManager.settleWithYieldPercent(yieldAmount, {
         from: admin,
       });
       await longShort.updateSystemState(marketIndex);

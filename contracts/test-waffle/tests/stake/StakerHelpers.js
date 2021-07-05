@@ -17,4 +17,4 @@ function deployAndSetupStakerToUnitTest(stakerRef, functionName, contracts, acco
 }
 
 exports.deployAndSetupStakerToUnitTest = deployAndSetupStakerToUnitTest;
-/* StakerSmocked Not a pure module */
+/* Helpers Not a pure module */

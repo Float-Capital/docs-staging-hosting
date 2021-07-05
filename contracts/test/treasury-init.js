@@ -103,7 +103,7 @@ contract("LongShort (treasury)", (accounts) => {
     const synth = await populateMarket(0);
 
     // Settle yield manager with lots of yield.
-    await synth.yieldManager.settleWithYield(f100); // 100%
+    await synth.yieldManager.settleWithYieldPercent(f100); // 100%
 
     // Redeem users's tokens to trigger treasury yield accumulation.
     await longShort.redeemLong(synth.currentMarketIndex, f100, {

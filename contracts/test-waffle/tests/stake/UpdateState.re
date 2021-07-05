@@ -1,4 +1,3 @@
-open Globals;
 open LetOps;
 open StakerHelpers;
 open Mocha;
@@ -43,7 +42,7 @@ let test =
       ->Staker.Exposed._updateStateExternal(~token=syntheticAddress);
     });
 
-    it'("calls longShort updateState with the market index of the token", () => {
+    it("calls longShort updateState with the market index of the token", () => {
       (longShortSmockedRef^)
       ->LongShortSmocked.updateSystemStateCalls
       ->Array.getExn(0)

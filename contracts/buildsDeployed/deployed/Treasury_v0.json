@@ -12,8 +12,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -42,9 +41,9 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.3+commit.8d00100c\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"admin\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_admin\",\"type\":\"address\"}],\"name\":\"changeAdmin\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_admin\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"title\":\"Treasury Contract \",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"changeAdmin(address)\":{\"notice\":\"MULTISIG ADMIN FUNCTIONS ///////\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/home/jasoons/Documents/code/monorepo/contracts/contracts/Treasury_v0.sol\":\"Treasury_v0\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/jasoons/Documents/code/monorepo/contracts/contracts/Treasury_v0.sol\":{\"keccak256\":\"0x11e982ba8875c57533db1f41ebe8483056d251024eff185289eb22c17f7db31c\",\"license\":\"BUSL-1.1\",\"urls\":[\"bzz-raw://a0baec861e069f8243067a8890be9710e26f8aa416287b15af1ba58db380b497\",\"dweb:/ipfs/QmR1kKLZ1Rav788n2R3Rr53Ci3XZxhujYHMjmhj5iFjJ4J\"]},\"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\":{\"keccak256\":\"0x67d2f282a9678e58e878a0b774041ba7a01e2740a262aea97a3f681339914713\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://297df5725003e586651278a5d021b176457c5bb05a954c8490f21db2754e7352\",\"dweb:/ipfs/QmSe9AHjVnDn39NqT9hkjuCCGUwtc989WuZ5rWTe3GHrUD\"]}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b50610258806100206000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80638f28397014610046578063c4d66de81461005b578063f851a4401461006e575b600080fd5b6100596100543660046101f4565b6100a3565b005b6100596100693660046101f4565b61011e565b600054610087906201000090046001600160a01b031681565b6040516001600160a01b03909116815260200160405180910390f35b6000546201000090046001600160a01b031633146100f45760405162461bcd60e51b81526020600482015260096024820152682737ba1030b236b4b760b91b60448201526064015b60405180910390fd5b600080546001600160a01b03909216620100000262010000600160b01b0319909216919091179055565b600054610100900460ff1680610137575060005460ff16155b61019a5760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201526d191e481a5b9a5d1a585b1a5e995960921b60648201526084016100eb565b600054610100900460ff161580156101bc576000805461ffff19166101011790555b6000805462010000600160b01b031916620100006001600160a01b0385160217905580156101f0576000805461ff00191690555b5050565b600060208284031215610205578081fd5b81356001600160a01b038116811461021b578182fd5b939250505056fea2646970667358221220a294596e3542229c5ad5bba427430d6d28304a1eb35380202566ab3987acd8c164736f6c63430008030033",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c80638f28397014610046578063c4d66de81461005b578063f851a4401461006e575b600080fd5b6100596100543660046101f4565b6100a3565b005b6100596100693660046101f4565b61011e565b600054610087906201000090046001600160a01b031681565b6040516001600160a01b03909116815260200160405180910390f35b6000546201000090046001600160a01b031633146100f45760405162461bcd60e51b81526020600482015260096024820152682737ba1030b236b4b760b91b60448201526064015b60405180910390fd5b600080546001600160a01b03909216620100000262010000600160b01b0319909216919091179055565b600054610100900460ff1680610137575060005460ff16155b61019a5760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201526d191e481a5b9a5d1a585b1a5e995960921b60648201526084016100eb565b600054610100900460ff161580156101bc576000805461ffff19166101011790555b6000805462010000600160b01b031916620100006001600160a01b0385160217905580156101f0576000805461ff00191690555b5050565b600060208284031215610205578081fd5b81356001600160a01b038116811461021b578182fd5b939250505056fea2646970667358221220a294596e3542229c5ad5bba427430d6d28304a1eb35380202566ab3987acd8c164736f6c63430008030033",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.3+commit.8d00100c\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"admin\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_admin\",\"type\":\"address\"}],\"name\":\"changeAdmin\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_admin\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"title\":\"Treasury Contract \",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"changeAdmin(address)\":{\"notice\":\"MULTISIG ADMIN FUNCTIONS ///////\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/Stent/MyDocuments/Projects/FloatCapital/monorepo/contracts/contracts/Treasury_v0.sol\":\"Treasury_v0\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/Stent/MyDocuments/Projects/FloatCapital/monorepo/contracts/contracts/Treasury_v0.sol\":{\"keccak256\":\"0x11e982ba8875c57533db1f41ebe8483056d251024eff185289eb22c17f7db31c\",\"license\":\"BUSL-1.1\",\"urls\":[\"bzz-raw://a0baec861e069f8243067a8890be9710e26f8aa416287b15af1ba58db380b497\",\"dweb:/ipfs/QmR1kKLZ1Rav788n2R3Rr53Ci3XZxhujYHMjmhj5iFjJ4J\"]},\"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\":{\"keccak256\":\"0x67d2f282a9678e58e878a0b774041ba7a01e2740a262aea97a3f681339914713\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://297df5725003e586651278a5d021b176457c5bb05a954c8490f21db2754e7352\",\"dweb:/ipfs/QmSe9AHjVnDn39NqT9hkjuCCGUwtc989WuZ5rWTe3GHrUD\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50610258806100206000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80638f28397014610046578063c4d66de81461005b578063f851a4401461006e575b600080fd5b6100596100543660046101f4565b6100a3565b005b6100596100693660046101f4565b61011e565b600054610087906201000090046001600160a01b031681565b6040516001600160a01b03909116815260200160405180910390f35b6000546201000090046001600160a01b031633146100f45760405162461bcd60e51b81526020600482015260096024820152682737ba1030b236b4b760b91b60448201526064015b60405180910390fd5b600080546001600160a01b03909216620100000262010000600160b01b0319909216919091179055565b600054610100900460ff1680610137575060005460ff16155b61019a5760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201526d191e481a5b9a5d1a585b1a5e995960921b60648201526084016100eb565b600054610100900460ff161580156101bc576000805461ffff19166101011790555b6000805462010000600160b01b031916620100006001600160a01b0385160217905580156101f0576000805461ff00191690555b5050565b600060208284031215610205578081fd5b81356001600160a01b038116811461021b578182fd5b939250505056fea26469706673582212203d7cc09737c900836b47868f8b5095dcf24d2af1d717067e1e0e607af369d30864736f6c63430008030033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c80638f28397014610046578063c4d66de81461005b578063f851a4401461006e575b600080fd5b6100596100543660046101f4565b6100a3565b005b6100596100693660046101f4565b61011e565b600054610087906201000090046001600160a01b031681565b6040516001600160a01b03909116815260200160405180910390f35b6000546201000090046001600160a01b031633146100f45760405162461bcd60e51b81526020600482015260096024820152682737ba1030b236b4b760b91b60448201526064015b60405180910390fd5b600080546001600160a01b03909216620100000262010000600160b01b0319909216919091179055565b600054610100900460ff1680610137575060005460ff16155b61019a5760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201526d191e481a5b9a5d1a585b1a5e995960921b60648201526084016100eb565b600054610100900460ff161580156101bc576000805461ffff19166101011790555b6000805462010000600160b01b031916620100006001600160a01b0385160217905580156101f0576000805461ff00191690555b5050565b600060208284031215610205578081fd5b81356001600160a01b038116811461021b578182fd5b939250505056fea26469706673582212203d7cc09737c900836b47868f8b5095dcf24d2af1d717067e1e0e607af369d30864736f6c63430008030033",
   "immutableReferences": {},
   "generatedSources": [],
   "deployedGeneratedSources": [
@@ -888,12 +887,12 @@
   "sourceMap": "171:855:7:-:0;;;;;;;;;;;;;;;;;;;",
   "deployedSourceMap": "171:855:7:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;802:87;;;;;;:::i;:::-;;:::i;:::-;;586:86;;;;;;:::i;:::-;;:::i;215:20::-;;;;;;;;-1:-1:-1;;;;;215:20:7;;;;;;-1:-1:-1;;;;;489:32:71;;;471:51;;459:2;444:18;215:20:7;;;;;;;802:87;419:5;;;;;-1:-1:-1;;;;;419:5:7;405:10;:19;397:41;;;;-1:-1:-1;;;397:41:7;;1150:2:71;397:41:7;;;1132:21:71;1189:1;1169:18;;;1162:29;-1:-1:-1;;;1207:18:71;;;1200:39;1256:18;;397:41:7;;;;;;;;;868:5:::1;:14:::0;;-1:-1:-1;;;;;868:14:7;;::::1;::::0;::::1;-1:-1:-1::0;;;;;;868:14:7;;::::1;::::0;;;::::1;::::0;;802:87::o;586:86::-;1456:13:43;;;;;;;;:30;;-1:-1:-1;1474:12:43;;;;1473:13;1456:30;1448:89;;;;-1:-1:-1;;;1448:89:43;;735:2:71;1448:89:43;;;717:21:71;774:2;754:18;;;747:30;813:34;793:18;;;786:62;-1:-1:-1;;;864:18:71;;;857:44;918:19;;1448:89:43;707:236:71;1448:89:43;1548:19;1571:13;;;;;;1570:14;1594:98;;;;1628:13;:20;;-1:-1:-1;;1662:19:43;;;;;1594:98;651:5:7::1;:14:::0;;-1:-1:-1;;;;;;651:14:7::1;::::0;-1:-1:-1;;;;;651:14:7;::::1;;;::::0;;1714:66:43;;;;1764:5;1748:21;;-1:-1:-1;;1748:21:43;;;1714:66;586:86:7;;:::o;14:306:71:-;;126:2;114:9;105:7;101:23;97:32;94:2;;;147:6;139;132:22;94:2;178:23;;-1:-1:-1;;;;;230:31:71;;220:42;;210:2;;281:6;273;266:22;210:2;309:5;84:236;-1:-1:-1;;;84:236:71:o",
   "source": "// SPDX-License-Identifier: BUSL-1.1\n\npragma solidity 0.8.3;\n\nimport \"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\";\n\n/** @title Treasury Contract */\ncontract Treasury_v0 is Initializable {\n    address public admin;\n\n    ////////////////////////////////////\n    /////////// MODIFIERS //////////////\n    ////////////////////////////////////\n\n    modifier onlyAdmin() {\n        require(msg.sender == admin, \"Not admin\");\n        _;\n    }\n\n    ////////////////////////////////////\n    ///// CONTRACT SET-UP //////////////\n    ////////////////////////////////////\n\n    function initialize(address _admin) public initializer {\n        admin = _admin;\n    }\n\n    ////////////////////////////////////\n    /// MULTISIG ADMIN FUNCTIONS ///////\n    ////////////////////////////////////\n\n    function changeAdmin(address _admin) external onlyAdmin {\n        admin = _admin;\n    }\n\n    /** To be upgraded in future allowing governance of treasury \n    and function to buy and burn FLOAT off open market using DEX */\n}\n",
-  "sourcePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/Treasury_v0.sol",
+  "sourcePath": "/Users/Stent/MyDocuments/Projects/FloatCapital/monorepo/contracts/contracts/Treasury_v0.sol",
   "ast": {
-    "absolutePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/Treasury_v0.sol",
+    "absolutePath": "/Users/Stent/MyDocuments/Projects/FloatCapital/monorepo/contracts/contracts/Treasury_v0.sol",
     "exportedSymbols": {
       "Initializable": [
-        16155
+        16144
       ],
       "Treasury_v0": [
         4475
@@ -920,7 +919,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 4476,
-        "sourceUnit": 16156,
+        "sourceUnit": 16145,
         "src": "62:75:7",
         "symbolAliases": [],
         "unitAlias": ""
@@ -933,7 +932,7 @@
               "id": 4434,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 16155,
+              "referencedDeclaration": 16144,
               "src": "195:13:7"
             },
             "id": 4435,
@@ -942,7 +941,7 @@
           }
         ],
         "contractDependencies": [
-          16155
+          16144
         ],
         "contractKind": "contract",
         "documentation": {
@@ -955,7 +954,7 @@
         "id": 4475,
         "linearizedBaseContracts": [
           4475,
-          16155
+          16144
         ],
         "name": "Treasury_v0",
         "nameLocation": "180:11:7",
@@ -1200,7 +1199,7 @@
                   "id": 4453,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 16154,
+                  "referencedDeclaration": 16143,
                   "src": "629:11:7"
                 },
                 "nodeType": "ModifierInvocation",
@@ -1391,10 +1390,10 @@
     "src": "38:989:7"
   },
   "legacyAST": {
-    "absolutePath": "/home/jasoons/Documents/code/monorepo/contracts/contracts/Treasury_v0.sol",
+    "absolutePath": "/Users/Stent/MyDocuments/Projects/FloatCapital/monorepo/contracts/contracts/Treasury_v0.sol",
     "exportedSymbols": {
       "Initializable": [
-        16155
+        16144
       ],
       "Treasury_v0": [
         4475
@@ -1421,7 +1420,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 4476,
-        "sourceUnit": 16156,
+        "sourceUnit": 16145,
         "src": "62:75:7",
         "symbolAliases": [],
         "unitAlias": ""
@@ -1434,7 +1433,7 @@
               "id": 4434,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 16155,
+              "referencedDeclaration": 16144,
               "src": "195:13:7"
             },
             "id": 4435,
@@ -1443,7 +1442,7 @@
           }
         ],
         "contractDependencies": [
-          16155
+          16144
         ],
         "contractKind": "contract",
         "documentation": {
@@ -1456,7 +1455,7 @@
         "id": 4475,
         "linearizedBaseContracts": [
           4475,
-          16155
+          16144
         ],
         "name": "Treasury_v0",
         "nameLocation": "180:11:7",
@@ -1701,7 +1700,7 @@
                   "id": 4453,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 16154,
+                  "referencedDeclaration": 16143,
                   "src": "629:11:7"
                 },
                 "nodeType": "ModifierInvocation",
@@ -1903,9 +1902,8 @@
       "transactionHash": "0xb5fd812858b8178a4999674881329b57ac8ae60384bac47332819540676cca77"
     }
   },
-  "schemaVersion": "3.3.4",
-  "updatedAt": "2021-07-01T15:21:55.622Z",
-  "networkType": "ethereum",
+  "schemaVersion": "3.4.1",
+  "updatedAt": "2021-07-02T11:12:34.237Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

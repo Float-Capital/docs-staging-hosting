@@ -32,24 +32,6 @@ type assetPriceReturn = Ethers.BigNumber.t
 @send
 external assetPrice: (t, int) => JsPromise.t<assetPriceReturn> = "assetPrice"
 
-type badLiquidityEntryFeeReturn = Ethers.BigNumber.t
-@send
-external badLiquidityEntryFee: (t, int) => JsPromise.t<badLiquidityEntryFeeReturn> =
-  "badLiquidityEntryFee"
-
-type badLiquidityExitFeeReturn = Ethers.BigNumber.t
-@send
-external badLiquidityExitFee: (t, int) => JsPromise.t<badLiquidityExitFeeReturn> =
-  "badLiquidityExitFee"
-
-type baseEntryFeeReturn = Ethers.BigNumber.t
-@send
-external baseEntryFee: (t, int) => JsPromise.t<baseEntryFeeReturn> = "baseEntryFee"
-
-type baseExitFeeReturn = Ethers.BigNumber.t
-@send
-external baseExitFee: (t, int) => JsPromise.t<baseExitFeeReturn> = "baseExitFee"
-
 type batchedAmountOfSynthTokensToRedeemReturn = Ethers.BigNumber.t
 @send
 external batchedAmountOfSynthTokensToRedeem: (
@@ -70,16 +52,6 @@ external batchedAmountOfTokensToDeposit: (
 external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
 
 @send
-external changeFees: (
-  t,
-  ~marketIndex: int,
-  ~baseEntryFee: Ethers.BigNumber.t,
-  ~badLiquidityEntryFee: Ethers.BigNumber.t,
-  ~baseExitFee: Ethers.BigNumber.t,
-  ~badLiquidityExitFee: Ethers.BigNumber.t,
-) => JsPromise.t<transaction> = "changeFees"
-
-@send
 external changeTreasury: (t, ~treasury: Ethers.ethAddress) => JsPromise.t<transaction> =
   "changeTreasury"
 
@@ -90,46 +62,13 @@ external executeOutstandingNextPriceSettlementsUser: (
   ~marketIndex: int,
 ) => JsPromise.t<transaction> = "executeOutstandingNextPriceSettlementsUser"
 
-type fundTokensReturn = Ethers.ethAddress
+type getMarketPercentForTreasuryVsMarketSplitReturn = Ethers.BigNumber.t
 @send
-external fundTokens: (t, int) => JsPromise.t<fundTokensReturn> = "fundTokens"
-
-type getLongPcntForLongVsShortSplitReturn = Ethers.BigNumber.t
-@send
-external getLongPcntForLongVsShortSplit: (
+external getMarketPercentForTreasuryVsMarketSplit: (
   t,
   ~marketIndex: int,
-) => JsPromise.t<getLongPcntForLongVsShortSplitReturn> = "getLongPcntForLongVsShortSplit"
-
-type getMarketPcntForTreasuryVsMarketSplitReturn = Ethers.BigNumber.t
-@send
-external getMarketPcntForTreasuryVsMarketSplit: (
-  t,
-  ~marketIndex: int,
-) => JsPromise.t<getMarketPcntForTreasuryVsMarketSplitReturn> =
-  "getMarketPcntForTreasuryVsMarketSplit"
-
-type getMarketSplitReturn = {
-  longAmount: Ethers.BigNumber.t,
-  shortAmount: Ethers.BigNumber.t,
-}
-@send
-external getMarketSplit: (
-  t,
-  ~marketIndex: int,
-  ~amount: Ethers.BigNumber.t,
-) => JsPromise.t<getMarketSplitReturn> = "getMarketSplit"
-
-type getTreasurySplitReturn = {
-  marketAmount: Ethers.BigNumber.t,
-  treasuryAmount: Ethers.BigNumber.t,
-}
-@send
-external getTreasurySplit: (
-  t,
-  ~marketIndex: int,
-  ~amount: Ethers.BigNumber.t,
-) => JsPromise.t<getTreasurySplitReturn> = "getTreasurySplit"
+) => JsPromise.t<getMarketPercentForTreasuryVsMarketSplitReturn> =
+  "getMarketPercentForTreasuryVsMarketSplit"
 
 type getUsersConfirmedButNotSettledBalanceReturn = Ethers.BigNumber.t
 @send
@@ -138,7 +77,8 @@ external getUsersConfirmedButNotSettledBalance: (
   ~user: Ethers.ethAddress,
   ~marketIndex: int,
   ~isLong: bool,
-) => JsPromise.t<getUsersConfirmedButNotSettledBalanceReturn> = "getUsersConfirmedButNotSettledBalance"
+) => JsPromise.t<getUsersConfirmedButNotSettledBalanceReturn> =
+  "getUsersConfirmedButNotSettledBalance"
 
 @send
 external initialize: (
@@ -153,10 +93,6 @@ external initialize: (
 external initializeMarket: (
   t,
   ~marketIndex: int,
-  ~baseEntryFee: Ethers.BigNumber.t,
-  ~badLiquidityEntryFee: Ethers.BigNumber.t,
-  ~baseExitFee: Ethers.BigNumber.t,
-  ~badLiquidityExitFee: Ethers.BigNumber.t,
   ~kInitialMultiplier: Ethers.BigNumber.t,
   ~kPeriod: Ethers.BigNumber.t,
   ~initialMarketSeed: Ethers.BigNumber.t,
@@ -193,7 +129,7 @@ external newSyntheticMarket: (
   t,
   ~syntheticName: string,
   ~syntheticSymbol: string,
-  ~fundToken: Ethers.ethAddress,
+  ~paymentToken: Ethers.ethAddress,
   ~oracleManager: Ethers.ethAddress,
   ~yieldManager: Ethers.ethAddress,
 ) => JsPromise.t<transaction> = "newSyntheticMarket"
@@ -201,6 +137,10 @@ external newSyntheticMarket: (
 type oracleManagersReturn = Ethers.ethAddress
 @send
 external oracleManagers: (t, int) => JsPromise.t<oracleManagersReturn> = "oracleManagers"
+
+type paymentTokensReturn = Ethers.ethAddress
+@send
+external paymentTokens: (t, int) => JsPromise.t<paymentTokensReturn> = "paymentTokens"
 
 @send
 external redeemLongNextPrice: (
@@ -342,24 +282,6 @@ module Exposed = {
   @send
   external assetPrice: (t, int) => JsPromise.t<assetPriceReturn> = "assetPrice"
 
-  type badLiquidityEntryFeeReturn = Ethers.BigNumber.t
-  @send
-  external badLiquidityEntryFee: (t, int) => JsPromise.t<badLiquidityEntryFeeReturn> =
-    "badLiquidityEntryFee"
-
-  type badLiquidityExitFeeReturn = Ethers.BigNumber.t
-  @send
-  external badLiquidityExitFee: (t, int) => JsPromise.t<badLiquidityExitFeeReturn> =
-    "badLiquidityExitFee"
-
-  type baseEntryFeeReturn = Ethers.BigNumber.t
-  @send
-  external baseEntryFee: (t, int) => JsPromise.t<baseEntryFeeReturn> = "baseEntryFee"
-
-  type baseExitFeeReturn = Ethers.BigNumber.t
-  @send
-  external baseExitFee: (t, int) => JsPromise.t<baseExitFeeReturn> = "baseExitFee"
-
   type batchedAmountOfSynthTokensToRedeemReturn = Ethers.BigNumber.t
   @send
   external batchedAmountOfSynthTokensToRedeem: (
@@ -378,16 +300,6 @@ module Exposed = {
 
   @send
   external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
-
-  @send
-  external changeFees: (
-    t,
-    ~marketIndex: int,
-    ~baseEntryFee: Ethers.BigNumber.t,
-    ~badLiquidityEntryFee: Ethers.BigNumber.t,
-    ~baseExitFee: Ethers.BigNumber.t,
-    ~badLiquidityExitFee: Ethers.BigNumber.t,
-  ) => JsPromise.t<transaction> = "changeFees"
 
   @send
   external changeTreasury: (t, ~treasury: Ethers.ethAddress) => JsPromise.t<transaction> =
@@ -411,46 +323,13 @@ module Exposed = {
     ~marketIndex: int,
   ) => JsPromise.t<transaction> = "executeOutstandingNextPriceSettlementsUser"
 
-  type fundTokensReturn = Ethers.ethAddress
+  type getMarketPercentForTreasuryVsMarketSplitReturn = Ethers.BigNumber.t
   @send
-  external fundTokens: (t, int) => JsPromise.t<fundTokensReturn> = "fundTokens"
-
-  type getLongPcntForLongVsShortSplitReturn = Ethers.BigNumber.t
-  @send
-  external getLongPcntForLongVsShortSplit: (
+  external getMarketPercentForTreasuryVsMarketSplit: (
     t,
     ~marketIndex: int,
-  ) => JsPromise.t<getLongPcntForLongVsShortSplitReturn> = "getLongPcntForLongVsShortSplit"
-
-  type getMarketPcntForTreasuryVsMarketSplitReturn = Ethers.BigNumber.t
-  @send
-  external getMarketPcntForTreasuryVsMarketSplit: (
-    t,
-    ~marketIndex: int,
-  ) => JsPromise.t<getMarketPcntForTreasuryVsMarketSplitReturn> =
-    "getMarketPcntForTreasuryVsMarketSplit"
-
-  type getMarketSplitReturn = {
-    longAmount: Ethers.BigNumber.t,
-    shortAmount: Ethers.BigNumber.t,
-  }
-  @send
-  external getMarketSplit: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<getMarketSplitReturn> = "getMarketSplit"
-
-  type getTreasurySplitReturn = {
-    marketAmount: Ethers.BigNumber.t,
-    treasuryAmount: Ethers.BigNumber.t,
-  }
-  @send
-  external getTreasurySplit: (
-    t,
-    ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<getTreasurySplitReturn> = "getTreasurySplit"
+  ) => JsPromise.t<getMarketPercentForTreasuryVsMarketSplitReturn> =
+    "getMarketPercentForTreasuryVsMarketSplit"
 
   type getUsersConfirmedButNotSettledBalanceReturn = Ethers.BigNumber.t
   @send
@@ -459,7 +338,8 @@ module Exposed = {
     ~user: Ethers.ethAddress,
     ~marketIndex: int,
     ~isLong: bool,
-  ) => JsPromise.t<getUsersConfirmedButNotSettledBalanceReturn> = "getUsersConfirmedButNotSettledBalance"
+  ) => JsPromise.t<getUsersConfirmedButNotSettledBalanceReturn> =
+    "getUsersConfirmedButNotSettledBalance"
 
   @send
   external initialize: (
@@ -474,10 +354,6 @@ module Exposed = {
   external initializeMarket: (
     t,
     ~marketIndex: int,
-    ~baseEntryFee: Ethers.BigNumber.t,
-    ~badLiquidityEntryFee: Ethers.BigNumber.t,
-    ~baseExitFee: Ethers.BigNumber.t,
-    ~badLiquidityExitFee: Ethers.BigNumber.t,
     ~kInitialMultiplier: Ethers.BigNumber.t,
     ~kPeriod: Ethers.BigNumber.t,
     ~initialMarketSeed: Ethers.BigNumber.t,
@@ -514,7 +390,7 @@ module Exposed = {
     t,
     ~syntheticName: string,
     ~syntheticSymbol: string,
-    ~fundToken: Ethers.ethAddress,
+    ~paymentToken: Ethers.ethAddress,
     ~oracleManager: Ethers.ethAddress,
     ~yieldManager: Ethers.ethAddress,
   ) => JsPromise.t<transaction> = "newSyntheticMarket"
@@ -522,6 +398,10 @@ module Exposed = {
   type oracleManagersReturn = Ethers.ethAddress
   @send
   external oracleManagers: (t, int) => JsPromise.t<oracleManagersReturn> = "oracleManagers"
+
+  type paymentTokensReturn = Ethers.ethAddress
+  @send
+  external paymentTokens: (t, int) => JsPromise.t<paymentTokensReturn> = "paymentTokens"
 
   @send
   external redeemLongNextPrice: (

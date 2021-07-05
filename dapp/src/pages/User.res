@@ -2,6 +2,17 @@ open UserUI
 open DataHooks
 open Masonry
 
+let {add, mul, div, toNumber, eq, toString} = module(Ethers.BigNumber)
+
+let getUsersTotalTokenBalance = (balancesResponse: array<Queries.UserTokenBalance.t>) =>
+  balancesResponse->Array.reduce(CONSTANTS.zeroBN, (totalBalanceSum, balanceDataResponse) =>
+    totalBalanceSum->add(
+      balanceDataResponse.syntheticToken.latestPrice.price.price
+      ->mul(balanceDataResponse.tokenBalance)
+      ->div(CONSTANTS.tenToThe18),
+    )
+  )
+
 module UserBalancesCard = {
   let useRerender = () => {
     let (_v, setV) = React.useState(_ => 0)
@@ -31,11 +42,11 @@ module UserBalancesCard = {
           {pendingMint
           ->Array.map(({marketIndex, isLong, amount, confirmedTimestamp}) =>
             <UserPendingBox
-              name={(marketIndex->Ethers.BigNumber.toNumber->Backend.getMarketInfoUnsafe).name}
+              name={(marketIndex->toNumber->Backend.getMarketInfoUnsafe).name}
               isLong
               daiSpend=amount
               marketIndex
-              txConfirmedTimestamp={confirmedTimestamp->Ethers.BigNumber.toNumber}
+              txConfirmedTimestamp={confirmedTimestamp->toNumber}
               rerenderCallback=rerender
             />
           )
@@ -45,29 +56,28 @@ module UserBalancesCard = {
       {switch usersTokensQuery {
       | Loading => <div className="m-auto"> <Loader.Mini /> </div>
       | GraphError(string) => string->React.string
-      | Response({totalBalance, balances}) => <>
-          <UserColumnTextCenter>
-            <UserColumnText
-              head=`💰 Synth value` body={`$${totalBalance->Misc.NumberFormat.formatEther}`}
-            />
-          </UserColumnTextCenter>
-          {balances
-          ->Array.keep(({tokenBalance}) => !(tokenBalance->Ethers.BigNumber.eq(CONSTANTS.zeroBN)))
-          ->Array.map(({addr, name, symbol, isLong, tokenBalance, tokensValue, metadata}) =>
-            <UserTokenBox
-              key={`${name}-${isLong ? "long" : "short"}`}
-              name
-              isLong
-              tokenAddress={addr}
-              symbol
-              tokens={Misc.NumberFormat.formatEther(tokenBalance)}
-              value={Misc.NumberFormat.formatEther(tokensValue)}
-              metadata>
-              <UserMarketStakeOrRedeem synthAddress={addr->Ethers.Utils.ethAdrToLowerStr} isLong />
-            </UserTokenBox>
-          )
-          ->React.array}
-        </>
+      | Response(balancesQueryResponse) => {
+          let totalBalance = getUsersTotalTokenBalance(balancesQueryResponse)
+          let usersBalancesComponents =
+            balancesQueryResponse
+            ->Array.keep(({tokenBalance}) => !(tokenBalance->eq(CONSTANTS.zeroBN)))
+            ->Array.map(userBalanceData => {
+              <UserTokenBox userBalanceData>
+                <UserMarketStakeOrRedeem
+                  synthId=userBalanceData.syntheticToken.id
+                  syntheticSide=userBalanceData.syntheticToken.tokenType
+                />
+              </UserTokenBox>
+            })
+          <>
+            <UserColumnTextCenter>
+              <UserColumnText
+                head=`💰 Synth value` body={`$${totalBalance->Misc.NumberFormat.formatEther}`}
+              />
+            </UserColumnTextCenter>
+            {usersBalancesComponents->React.array}
+          </>
+        }
       }}
     </UserColumnCard>
   }
@@ -79,11 +89,8 @@ let getUsersTotalStakeValue = (~stakes) => {
   Array.forEach(stakes, (stake: Queries.CurrentStakeDetailed.t) => {
     let syntheticToken = stake.currentStake.syntheticToken
     let price = syntheticToken.latestPrice.price.price
-    let value =
-      stake.currentStake.amount
-      ->Ethers.BigNumber.mul(price)
-      ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
-    totalStakedValue := totalStakedValue.contents->Ethers.BigNumber.add(value)
+    let value = stake.currentStake.amount->mul(price)->div(CONSTANTS.tenToThe18)
+    totalStakedValue := totalStakedValue.contents->add(value)
   })
 
   totalStakedValue
@@ -93,18 +100,18 @@ module UserTotalInvestedCard = {
   @react.component
   let make = (~stakes, ~userId) => {
     let usersTokensQuery = DataHooks.useUsersBalances(~userId)
-
     let totalStakedValue = getUsersTotalStakeValue(~stakes)
 
     <>
       {switch usersTokensQuery {
       | Loading => <div className="m-auto"> <Loader.Mini /> </div>
       | GraphError(string) => string->React.string
-      | Response({totalBalance}) =>
+      | Response(usersBalanceData) =>
+        let totalBalance = getUsersTotalTokenBalance(usersBalanceData)
         <UserTotalValue
           totalValueNameSup=`Portfolio`
           totalValueNameSub=`Value`
-          totalValue={totalBalance->Ethers.BigNumber.add(totalStakedValue.contents)}
+          totalValue={totalBalance->add(totalStakedValue.contents)}
         />
       }}
     </>
@@ -131,8 +138,8 @@ module UserProfileCard = {
       ~trailingCharacters=3,
     )
     let joinedStr = userInfo.joinedAt->DateFns.format(#"do MMM ''yy")
-    let txStr = userInfo.transactionCount->Ethers.BigNumber.toString
-    let gasStr = userInfo.gasUsed->Ethers.BigNumber.toString->Misc.NumberFormat.formatInt
+    let txStr = userInfo.transactionCount->toString
+    let gasStr = userInfo.gasUsed->toString->Misc.NumberFormat.formatInt
 
     <UserColumnCard>
       <UserProfileHeader address={addressStr} />

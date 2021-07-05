@@ -2,9 +2,13 @@
 
 pragma solidity 0.8.3;
 
+import "hardhat/console.sol";
+
 import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 
 import "../interfaces/IYieldManager.sol";
+
+// TODO: it would be better to deprecate this mock and rather mock aave and use the `YieldManagerAave` to avoid duplicate code/logic that can easily go out of sync.
 
 /*
  * YieldManagerMock is an implementation of a yield manager that supports
@@ -29,6 +33,9 @@ contract YieldManagerMock is IYieldManager {
 
     uint256 public yieldRate; // pcnt per sec
     uint256 public lastSettled; // secs after epoch
+
+    // Fixed-precision constants ///////////////////////////////
+    uint256 public constant TEN_TO_THE_5 = 10000;
 
     ////////////////////////////////////
     /////////// MODIFIERS //////////////
@@ -88,11 +95,20 @@ contract YieldManagerMock is IYieldManager {
     }
 
     /**
-     * Adds the given yield to the token holdings.
+     * Adds the given yield percent to the token holdings.
      */
-    function settleWithYield(uint256 yield) public adminOnly {
-        uint256 totalYield = (totalHeld * yield) / yieldScale;
+    function settleWithYieldPercent(uint256 yieldPercent) public adminOnly {
+        uint256 totalYield = (totalHeld * yieldPercent) / yieldScale;
 
+        lastSettled = block.timestamp;
+        totalHeld = totalHeld + totalYield;
+        token.mint(address(this), totalYield);
+    }
+
+    /**
+     * Adds the given absolute yield to the token holdings.
+     */
+    function settleWithYieldAbsolute(uint256 totalYield) public adminOnly {
         lastSettled = block.timestamp;
         totalHeld = totalHeld + totalYield;
         token.mint(address(this), totalYield);
@@ -112,7 +128,7 @@ contract YieldManagerMock is IYieldManager {
         yieldRate = _yieldRate;
     }
 
-    function depositToken(uint256 amount) public override longShortOnly {
+    function depositPaymentToken(uint256 amount) public override longShortOnly {
         // Ensure token state is current.
         settle();
 
@@ -121,7 +137,11 @@ contract YieldManagerMock is IYieldManager {
         totalHeld = totalHeld + amount;
     }
 
-    function withdrawToken(uint256 amount) public override longShortOnly {
+    function withdrawPaymentToken(uint256 amount)
+        public
+        override
+        longShortOnly
+    {
         // Ensure token state is current.
         settle();
         require(amount <= totalHeld);
@@ -148,9 +168,24 @@ contract YieldManagerMock is IYieldManager {
     // TODO STENT need to change this and unit test it
     function claimYieldAndGetMarketAmount(
         uint256 totalValueRealizedForMarket,
-        uint256 marketPcntE5
+        uint256 marketPercentE5
     ) public override longShortOnly returns (uint256) {
-        return 0;
+        uint256 unrealizedYield = totalHeld -
+            totalValueRealizedForMarket -
+            totalReservedForTreasury;
+
+        if (unrealizedYield == 0) {
+            return 0;
+        }
+
+        uint256 amountForMarketIncetives = (unrealizedYield * marketPercentE5) /
+            TEN_TO_THE_5;
+
+        uint256 amountForTreasury = unrealizedYield - amountForMarketIncetives;
+
+        totalReservedForTreasury += amountForTreasury;
+
+        return amountForMarketIncetives;
     }
 
     // TODO STENT need to change this and unit test it

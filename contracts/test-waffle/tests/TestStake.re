@@ -3,7 +3,7 @@ open LetOps;
 open Mocha;
 
 describe("Float System", () => {
-  describe("Staking", () => {
+  describeIntegration("Staking", () => {
     let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
     let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
 
@@ -21,8 +21,8 @@ describe("Float System", () => {
       contracts := deployedContracts;
     });
 
-    it_skip(
-      "[BROKEN TEST] - should correctly be able to stake their long/short tokens and view their staked amount immediately",
+    it(
+      "should correctly be able to stake their long/short tokens and view their staked amount immediately",
       () => {
         let {longShort, markets, staker} = contracts.contents;
         let testUser = accounts.contents->Array.getUnsafe(1);
@@ -36,24 +36,7 @@ describe("Float System", () => {
 
         let%Await _ =
           synthsUserHasStakedIn
-          ->Array.map(
-              (
-                {
-                  marketIndex,
-                  synth,
-                  amount,
-                  valueInOtherSide,
-                  valueInEntrySide,
-                  priceOfSynthForAction,
-                },
-              ) => {
-              let%AwaitThen amountOfFees =
-                longShort->Contract.LongShortHelpers.getFeesMint(
-                  ~marketIndex,
-                  ~amount,
-                  ~valueInOtherSide,
-                  ~valueInEntrySide,
-                );
+          ->Array.map(({synth, amount, priceOfSynthForAction}) => {
               let%Await amountStaked =
                 staker->Staker.userAmountStaked(
                   synth.address,
@@ -62,11 +45,9 @@ describe("Float System", () => {
 
               let expectedStakeAmount =
                 amount
-                ->sub(amountOfFees)
                 ->mul(CONSTANTS.tenToThe18)
                 ->div(priceOfSynthForAction);
 
-              // THIS IS WRONG NOW
               Chai.bnEqual(
                 ~message="amount staked is greater than expected",
                 amountStaked,
@@ -77,8 +58,52 @@ describe("Float System", () => {
         ();
       },
     );
+
+    it("should update correct markets in the 'claimFloatCustom' function", () => {
+      let {longShort, markets, staker} = contracts.contents;
+      let testUser = accounts.contents->Array.getUnsafe(1);
+      let setupUser = accounts.contents->Array.getUnsafe(2);
+
+      let%Await _ =
+        HelperActions.stakeRandomlyInBothSidesOfMarket(
+          ~marketsToStakeIn=contracts^.markets,
+          ~userToStakeWith=setupUser,
+          ~longShort=contracts^.longShort,
+        );
+
+      let%Await (_synthsUserHasStakedIn, marketsUserHasStakedIn) =
+        HelperActions.stakeRandomlyInMarkets(
+          ~marketsToStakeIn=markets,
+          ~userToStakeWith=testUser,
+          ~longShort,
+        );
+
+      let%Await _ = Helpers.increaseTime(50);
+
+      let%Await _ =
+        staker
+        ->ContractHelpers.connect(~address=testUser)
+        ->Staker.claimFloatCustom(~marketIndexes=marketsUserHasStakedIn);
+
+      let%Await _ =
+        marketsUserHasStakedIn
+        ->Array.map(market => {
+            JsPromise.all2((
+              staker->Staker.userIndexOfLastClaimedReward(
+                market,
+                testUser.address,
+              ),
+              staker->Staker.latestRewardIndex(market),
+            ))
+            ->JsPromise.map(((userLastClaimed, latestRewardIndex)) => {
+                Chai.bnEqual(userLastClaimed, latestRewardIndex)
+              })
+          })
+        ->JsPromise.all;
+      ();
+    });
   });
-  describe("Staking - internals exposed", () => {
+  describeUnit("Staking - internals exposed", () => {
     let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
     let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
 

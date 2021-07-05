@@ -262,60 +262,19 @@ function useUsersBalances(userId) {
   var match = usersTokensQuery.data;
   if (match !== undefined) {
     var match$1 = match.user;
-    if (match$1 === undefined) {
+    if (match$1 !== undefined) {
       return {
               TAG: 1,
-              _0: {
-                totalBalance: CONSTANTS.zeroBN,
-                balances: []
-              },
+              _0: match$1.tokenBalances,
+              [Symbol.for("name")]: "Response"
+            };
+    } else {
+      return {
+              TAG: 1,
+              _0: [],
               [Symbol.for("name")]: "Response"
             };
     }
-    var result = Belt_Array.reduce(match$1.tokenBalances, {
-          totalBalance: CONSTANTS.zeroBN,
-          balances: []
-        }, (function (param, param$1) {
-            var match = param$1.syntheticToken;
-            var match$1 = match.latestPrice.price;
-            var price = match$1.price;
-            var match$2 = match.syntheticMarket;
-            var match$3 = match$2.latestSystemState;
-            var tokenBalance = param$1.tokenBalance;
-            var isLong = match.tokenType === "Long";
-            var newToken_addr = Ethers$1.utils.getAddress(match.id);
-            var newToken_name = match$2.name;
-            var newToken_symbol = match$2.symbol;
-            var newToken_tokensValue = price.mul(tokenBalance).div(CONSTANTS.tenToThe18);
-            var newToken_metadata = {
-              timeLastUpdated: param$1.timeLastUpdated,
-              oracleAddress: match$2.oracleAddress,
-              marketIndex: match$2.marketIndex,
-              tokenSupply: match.tokenSupply,
-              totalLockedLong: match$3.totalLockedLong,
-              totalLockedShort: match$3.totalLockedShort,
-              syntheticPrice: price,
-              syntheticPriceLastUpdated: match$1.timeUpdated
-            };
-            var newToken = {
-              addr: newToken_addr,
-              name: newToken_name,
-              symbol: newToken_symbol,
-              isLong: isLong,
-              tokenBalance: tokenBalance,
-              tokensValue: newToken_tokensValue,
-              metadata: newToken_metadata
-            };
-            return {
-                    totalBalance: param.totalBalance.add(newToken_tokensValue),
-                    balances: Belt_Array.concat(param.balances, [newToken])
-                  };
-          }));
-    return {
-            TAG: 1,
-            _0: result,
-            [Symbol.for("name")]: "Response"
-          };
   }
   var match$2 = usersTokensQuery.error;
   if (match$2 !== undefined) {
@@ -839,9 +798,8 @@ function getUnixTime(date) {
   return date.getTime() / 1000 | 0;
 }
 
-function useSyntheticPrices(param, tokenAddress, isLong) {
-  var syntheticPrice = param.syntheticPrice;
-  var initialTokenPriceResponse = useTokenPriceAtTime(tokenAddress, param.timeLastUpdated);
+function useSyntheticPrices(oracleAddress, timestamp, tokenSupply, totalLockedLong, totalLockedShort, syntheticPrice, syntheticPriceLastUpdated, tokenAddress, oldAssetPrice, isLong) {
+  var initialTokenPriceResponse = useTokenPriceAtTime(tokenAddress, timestamp);
   var priceHistoryQuery = Curry.app(Queries.LatestPrice.use, [
         undefined,
         Caml_option.some(Client.createContext(/* PriceHistory */1)),
@@ -857,7 +815,7 @@ function useSyntheticPrices(param, tokenAddress, isLong) {
         undefined,
         undefined,
         {
-          intervalId: Globals.ethAdrToLowerStr(param.oracleAddress) + "-" + String(CONSTANTS.fiveMinutesInSeconds)
+          intervalId: Globals.ethAdrToLowerStr(oracleAddress) + "-" + String(CONSTANTS.fiveMinutesInSeconds)
         }
       ]);
   var response = queryToResponse(priceHistoryQuery);
@@ -874,9 +832,11 @@ function useSyntheticPrices(param, tokenAddress, isLong) {
     var match = response._0.priceIntervalManager;
     if (match !== undefined) {
       var match$1 = match.latestPriceInterval;
-      finalPriceResponse = Ethers$1.BigNumber.from(match$1.startTimestamp.getTime() / 1000 | 0).gt(param.syntheticPriceLastUpdated) ? ({
+      var endPrice = match$1.endPrice;
+      var priceQueryTime = Ethers$1.BigNumber.from(match$1.startTimestamp.getTime() / 1000 | 0);
+      finalPriceResponse = priceQueryTime.gt(syntheticPriceLastUpdated) && !oldAssetPrice.eq(endPrice) && priceQueryTime.gt(timestamp) ? ({
             TAG: 1,
-            _0: MarketSimulation.simulateMarketPriceChange(syntheticPrice, match$1.endPrice, param.totalLockedLong, param.totalLockedShort, param.tokenSupply, isLong),
+            _0: MarketSimulation.simulateMarketPriceChange(oldAssetPrice, endPrice, totalLockedLong, totalLockedShort, tokenSupply, isLong),
             [Symbol.for("name")]: "Response"
           }) : ({
             TAG: 1,

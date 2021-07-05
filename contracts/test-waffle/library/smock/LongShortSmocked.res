@@ -86,74 +86,6 @@ let assetPriceCalls: t => array<assetPriceCall> = _r => {
   })
 }
 
-let mockBadLiquidityEntryFeeToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.badLiquidityEntryFee.will.return.with([_param0])")
-}
-
-type badLiquidityEntryFeeCall = {param0: int}
-
-let badLiquidityEntryFeeCalls: t => array<badLiquidityEntryFeeCall> = _r => {
-  let array = %raw("_r.smocked.badLiquidityEntryFee.calls")
-  array->Array.map(_m => {
-    let param0 = _m->Array.getUnsafe(0)
-
-    {
-      param0: param0,
-    }
-  })
-}
-
-let mockBadLiquidityExitFeeToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.badLiquidityExitFee.will.return.with([_param0])")
-}
-
-type badLiquidityExitFeeCall = {param0: int}
-
-let badLiquidityExitFeeCalls: t => array<badLiquidityExitFeeCall> = _r => {
-  let array = %raw("_r.smocked.badLiquidityExitFee.calls")
-  array->Array.map(_m => {
-    let param0 = _m->Array.getUnsafe(0)
-
-    {
-      param0: param0,
-    }
-  })
-}
-
-let mockBaseEntryFeeToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.baseEntryFee.will.return.with([_param0])")
-}
-
-type baseEntryFeeCall = {param0: int}
-
-let baseEntryFeeCalls: t => array<baseEntryFeeCall> = _r => {
-  let array = %raw("_r.smocked.baseEntryFee.calls")
-  array->Array.map(_m => {
-    let param0 = _m->Array.getUnsafe(0)
-
-    {
-      param0: param0,
-    }
-  })
-}
-
-let mockBaseExitFeeToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.baseExitFee.will.return.with([_param0])")
-}
-
-type baseExitFeeCall = {param0: int}
-
-let baseExitFeeCalls: t => array<baseExitFeeCall> = _r => {
-  let array = %raw("_r.smocked.baseExitFee.calls")
-  array->Array.map(_m => {
-    let param0 = _m->Array.getUnsafe(0)
-
-    {
-      param0: param0,
-    }
-  })
-}
-
 let mockBatchedAmountOfSynthTokensToRedeemToReturn: (t, Ethers.BigNumber.t) => unit = (
   _r,
   _param0,
@@ -193,23 +125,6 @@ let batchedAmountOfTokensToDepositCalls: t => array<batchedAmountOfTokensToDepos
     {
       param0: param0,
       param1: param1,
-    }
-  })
-}
-
-let mockFundTokensToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.fundTokens.will.return.with([_param0])")
-}
-
-type fundTokensCall = {param0: int}
-
-let fundTokensCalls: t => array<fundTokensCall> = _r => {
-  let array = %raw("_r.smocked.fundTokens.calls")
-  array->Array.map(_m => {
-    let param0 = _m->Array.getUnsafe(0)
-
-    {
-      param0: param0,
     }
   })
 }
@@ -269,6 +184,23 @@ type oracleManagersCall = {param0: int}
 
 let oracleManagersCalls: t => array<oracleManagersCall> = _r => {
   let array = %raw("_r.smocked.oracleManagers.calls")
+  array->Array.map(_m => {
+    let param0 = _m->Array.getUnsafe(0)
+
+    {
+      param0: param0,
+    }
+  })
+}
+
+let mockPaymentTokensToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.paymentTokens.will.return.with([_param0])")
+}
+
+type paymentTokensCall = {param0: int}
+
+let paymentTokensCalls: t => array<paymentTokensCall> = _r => {
+  let array = %raw("_r.smocked.paymentTokens.calls")
   array->Array.map(_m => {
     let param0 = _m->Array.getUnsafe(0)
 
@@ -514,37 +446,6 @@ let changeTreasuryCalls: t => array<changeTreasuryCall> = _r => {
   })
 }
 
-let mockChangeFeesToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.changeFees.will.return()")
-}
-
-type changeFeesCall = {
-  marketIndex: int,
-  baseEntryFee: Ethers.BigNumber.t,
-  badLiquidityEntryFee: Ethers.BigNumber.t,
-  baseExitFee: Ethers.BigNumber.t,
-  badLiquidityExitFee: Ethers.BigNumber.t,
-}
-
-let changeFeesCalls: t => array<changeFeesCall> = _r => {
-  let array = %raw("_r.smocked.changeFees.calls")
-  array->Array.map(((
-    marketIndex,
-    baseEntryFee,
-    badLiquidityEntryFee,
-    baseExitFee,
-    badLiquidityExitFee,
-  )) => {
-    {
-      marketIndex: marketIndex,
-      baseEntryFee: baseEntryFee,
-      badLiquidityEntryFee: badLiquidityEntryFee,
-      baseExitFee: baseExitFee,
-      badLiquidityExitFee: badLiquidityExitFee,
-    }
-  })
-}
-
 let mockUpdateMarketOracleToReturn: t => unit = _r => {
   let _ = %raw("_r.smocked.updateMarketOracle.will.return()")
 }
@@ -571,18 +472,24 @@ let mockNewSyntheticMarketToReturn: t => unit = _r => {
 type newSyntheticMarketCall = {
   syntheticName: string,
   syntheticSymbol: string,
-  fundToken: Ethers.ethAddress,
+  paymentToken: Ethers.ethAddress,
   oracleManager: Ethers.ethAddress,
   yieldManager: Ethers.ethAddress,
 }
 
 let newSyntheticMarketCalls: t => array<newSyntheticMarketCall> = _r => {
   let array = %raw("_r.smocked.newSyntheticMarket.calls")
-  array->Array.map(((syntheticName, syntheticSymbol, fundToken, oracleManager, yieldManager)) => {
+  array->Array.map(((
+    syntheticName,
+    syntheticSymbol,
+    paymentToken,
+    oracleManager,
+    yieldManager,
+  )) => {
     {
       syntheticName: syntheticName,
       syntheticSymbol: syntheticSymbol,
-      fundToken: fundToken,
+      paymentToken: paymentToken,
       oracleManager: oracleManager,
       yieldManager: yieldManager,
     }
@@ -595,10 +502,6 @@ let mockInitializeMarketToReturn: t => unit = _r => {
 
 type initializeMarketCall = {
   marketIndex: int,
-  baseEntryFee: Ethers.BigNumber.t,
-  badLiquidityEntryFee: Ethers.BigNumber.t,
-  baseExitFee: Ethers.BigNumber.t,
-  badLiquidityExitFee: Ethers.BigNumber.t,
   kInitialMultiplier: Ethers.BigNumber.t,
   kPeriod: Ethers.BigNumber.t,
   initialMarketSeed: Ethers.BigNumber.t,
@@ -606,22 +509,9 @@ type initializeMarketCall = {
 
 let initializeMarketCalls: t => array<initializeMarketCall> = _r => {
   let array = %raw("_r.smocked.initializeMarket.calls")
-  array->Array.map(((
-    marketIndex,
-    baseEntryFee,
-    badLiquidityEntryFee,
-    baseExitFee,
-    badLiquidityExitFee,
-    kInitialMultiplier,
-    kPeriod,
-    initialMarketSeed,
-  )) => {
+  array->Array.map(((marketIndex, kInitialMultiplier, kPeriod, initialMarketSeed)) => {
     {
       marketIndex: marketIndex,
-      baseEntryFee: baseEntryFee,
-      badLiquidityEntryFee: badLiquidityEntryFee,
-      baseExitFee: baseExitFee,
-      badLiquidityExitFee: badLiquidityExitFee,
       kInitialMultiplier: kInitialMultiplier,
       kPeriod: kPeriod,
       initialMarketSeed: initialMarketSeed,
@@ -629,7 +519,10 @@ let initializeMarketCalls: t => array<initializeMarketCall> = _r => {
   })
 }
 
-let mockGetUsersPendingBalanceToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+let mockGetUsersConfirmedButNotSettledBalanceToReturn: (t, Ethers.BigNumber.t) => unit = (
+  _r,
+  _param0,
+) => {
   let _ = %raw("_r.smocked.getUsersConfirmedButNotSettledBalance.will.return.with([_param0])")
 }
 
@@ -639,7 +532,9 @@ type getUsersConfirmedButNotSettledBalanceCall = {
   isLong: bool,
 }
 
-let getUsersConfirmedButNotSettledBalanceCalls: t => array<getUsersConfirmedButNotSettledBalanceCall> = _r => {
+let getUsersConfirmedButNotSettledBalanceCalls: t => array<
+  getUsersConfirmedButNotSettledBalanceCall,
+> = _r => {
   let array = %raw("_r.smocked.getUsersConfirmedButNotSettledBalance.calls")
   array->Array.map(((user, marketIndex, isLong)) => {
     {
@@ -650,87 +545,24 @@ let getUsersConfirmedButNotSettledBalanceCalls: t => array<getUsersConfirmedButN
   })
 }
 
-let mockGetMarketPcntForTreasuryVsMarketSplitToReturn: (t, Ethers.BigNumber.t) => unit = (
+let mockGetMarketPercentForTreasuryVsMarketSplitToReturn: (t, Ethers.BigNumber.t) => unit = (
   _r,
   _param0,
 ) => {
-  let _ = %raw("_r.smocked.getMarketPcntForTreasuryVsMarketSplit.will.return.with([_param0])")
+  let _ = %raw("_r.smocked.getMarketPercentForTreasuryVsMarketSplit.will.return.with([_param0])")
 }
 
-type getMarketPcntForTreasuryVsMarketSplitCall = {marketIndex: int}
+type getMarketPercentForTreasuryVsMarketSplitCall = {marketIndex: int}
 
-let getMarketPcntForTreasuryVsMarketSplitCalls: t => array<
-  getMarketPcntForTreasuryVsMarketSplitCall,
+let getMarketPercentForTreasuryVsMarketSplitCalls: t => array<
+  getMarketPercentForTreasuryVsMarketSplitCall,
 > = _r => {
-  let array = %raw("_r.smocked.getMarketPcntForTreasuryVsMarketSplit.calls")
+  let array = %raw("_r.smocked.getMarketPercentForTreasuryVsMarketSplit.calls")
   array->Array.map(_m => {
     let marketIndex = _m->Array.getUnsafe(0)
 
     {
       marketIndex: marketIndex,
-    }
-  })
-}
-
-let mockGetTreasurySplitToReturn: (t, Ethers.BigNumber.t, Ethers.BigNumber.t) => unit = (
-  _r,
-  _param0,
-  _param1,
-) => {
-  let _ = %raw("_r.smocked.getTreasurySplit.will.return.with([_param0,_param1])")
-}
-
-type getTreasurySplitCall = {
-  marketIndex: int,
-  amount: Ethers.BigNumber.t,
-}
-
-let getTreasurySplitCalls: t => array<getTreasurySplitCall> = _r => {
-  let array = %raw("_r.smocked.getTreasurySplit.calls")
-  array->Array.map(((marketIndex, amount)) => {
-    {
-      marketIndex: marketIndex,
-      amount: amount,
-    }
-  })
-}
-
-let mockGetLongPcntForLongVsShortSplitToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.getLongPcntForLongVsShortSplit.will.return.with([_param0])")
-}
-
-type getLongPcntForLongVsShortSplitCall = {marketIndex: int}
-
-let getLongPcntForLongVsShortSplitCalls: t => array<getLongPcntForLongVsShortSplitCall> = _r => {
-  let array = %raw("_r.smocked.getLongPcntForLongVsShortSplit.calls")
-  array->Array.map(_m => {
-    let marketIndex = _m->Array.getUnsafe(0)
-
-    {
-      marketIndex: marketIndex,
-    }
-  })
-}
-
-let mockGetMarketSplitToReturn: (t, Ethers.BigNumber.t, Ethers.BigNumber.t) => unit = (
-  _r,
-  _param0,
-  _param1,
-) => {
-  let _ = %raw("_r.smocked.getMarketSplit.will.return.with([_param0,_param1])")
-}
-
-type getMarketSplitCall = {
-  marketIndex: int,
-  amount: Ethers.BigNumber.t,
-}
-
-let getMarketSplitCalls: t => array<getMarketSplitCall> = _r => {
-  let array = %raw("_r.smocked.getMarketSplit.calls")
-  array->Array.map(((marketIndex, amount)) => {
-    {
-      marketIndex: marketIndex,
-      amount: amount,
     }
   })
 }
@@ -1000,84 +832,6 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mockChangeFeesToReturn: unit => unit = () => {
-    checkForExceptions(~functionName="changeFees")
-    let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked.changeFeesMock.will.return()")
-    })
-  }
-
-  type changeFeesCall = {
-    marketIndex: int,
-    baseEntryFee: Ethers.BigNumber.t,
-    badLiquidityEntryFee: Ethers.BigNumber.t,
-    baseExitFee: Ethers.BigNumber.t,
-    badLiquidityExitFee: Ethers.BigNumber.t,
-  }
-
-  let changeFeesCalls: unit => array<changeFeesCall> = () => {
-    checkForExceptions(~functionName="changeFees")
-    internalRef.contents
-    ->Option.map(_r => {
-      let array = %raw("_r.smocked.changeFeesMock.calls")
-      array->Array.map(((
-        marketIndex,
-        baseEntryFee,
-        badLiquidityEntryFee,
-        baseExitFee,
-        badLiquidityExitFee,
-      )) => {
-        {
-          marketIndex: marketIndex,
-          baseEntryFee: baseEntryFee,
-          badLiquidityEntryFee: badLiquidityEntryFee,
-          baseExitFee: baseExitFee,
-          badLiquidityExitFee: badLiquidityExitFee,
-        }
-      })
-    })
-    ->Option.getExn
-  }
-
-  let mock_changeFeesToReturn: unit => unit = () => {
-    checkForExceptions(~functionName="_changeFees")
-    let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked._changeFeesMock.will.return()")
-    })
-  }
-
-  type _changeFeesCall = {
-    marketIndex: int,
-    baseEntryFee: Ethers.BigNumber.t,
-    baseExitFee: Ethers.BigNumber.t,
-    badLiquidityEntryFee: Ethers.BigNumber.t,
-    badLiquidityExitFee: Ethers.BigNumber.t,
-  }
-
-  let _changeFeesCalls: unit => array<_changeFeesCall> = () => {
-    checkForExceptions(~functionName="_changeFees")
-    internalRef.contents
-    ->Option.map(_r => {
-      let array = %raw("_r.smocked._changeFeesMock.calls")
-      array->Array.map(((
-        marketIndex,
-        baseEntryFee,
-        baseExitFee,
-        badLiquidityEntryFee,
-        badLiquidityExitFee,
-      )) => {
-        {
-          marketIndex: marketIndex,
-          baseEntryFee: baseEntryFee,
-          baseExitFee: baseExitFee,
-          badLiquidityEntryFee: badLiquidityEntryFee,
-          badLiquidityExitFee: badLiquidityExitFee,
-        }
-      })
-    })
-    ->Option.getExn
-  }
-
   let mockUpdateMarketOracleToReturn: unit => unit = () => {
     checkForExceptions(~functionName="updateMarketOracle")
     let _ = internalRef.contents->Option.map(_r => {
@@ -1115,7 +869,7 @@ module InternalMock = {
   type newSyntheticMarketCall = {
     syntheticName: string,
     syntheticSymbol: string,
-    fundToken: Ethers.ethAddress,
+    paymentToken: Ethers.ethAddress,
     oracleManager: Ethers.ethAddress,
     yieldManager: Ethers.ethAddress,
   }
@@ -1128,14 +882,14 @@ module InternalMock = {
       array->Array.map(((
         syntheticName,
         syntheticSymbol,
-        fundToken,
+        paymentToken,
         oracleManager,
         yieldManager,
       )) => {
         {
           syntheticName: syntheticName,
           syntheticSymbol: syntheticSymbol,
-          fundToken: fundToken,
+          paymentToken: paymentToken,
           oracleManager: oracleManager,
           yieldManager: yieldManager,
         }
@@ -1180,10 +934,6 @@ module InternalMock = {
 
   type initializeMarketCall = {
     marketIndex: int,
-    baseEntryFee: Ethers.BigNumber.t,
-    badLiquidityEntryFee: Ethers.BigNumber.t,
-    baseExitFee: Ethers.BigNumber.t,
-    badLiquidityExitFee: Ethers.BigNumber.t,
     kInitialMultiplier: Ethers.BigNumber.t,
     kPeriod: Ethers.BigNumber.t,
     initialMarketSeed: Ethers.BigNumber.t,
@@ -1194,22 +944,9 @@ module InternalMock = {
     internalRef.contents
     ->Option.map(_r => {
       let array = %raw("_r.smocked.initializeMarketMock.calls")
-      array->Array.map(((
-        marketIndex,
-        baseEntryFee,
-        badLiquidityEntryFee,
-        baseExitFee,
-        badLiquidityExitFee,
-        kInitialMultiplier,
-        kPeriod,
-        initialMarketSeed,
-      )) => {
+      array->Array.map(((marketIndex, kInitialMultiplier, kPeriod, initialMarketSeed)) => {
         {
           marketIndex: marketIndex,
-          baseEntryFee: baseEntryFee,
-          badLiquidityEntryFee: badLiquidityEntryFee,
-          baseExitFee: baseExitFee,
-          badLiquidityExitFee: badLiquidityExitFee,
           kInitialMultiplier: kInitialMultiplier,
           kPeriod: kPeriod,
           initialMarketSeed: initialMarketSeed,
@@ -1300,10 +1037,12 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mockGetUsersPendingBalanceToReturn: Ethers.BigNumber.t => unit = _param0 => {
+  let mockGetUsersConfirmedButNotSettledBalanceToReturn: Ethers.BigNumber.t => unit = _param0 => {
     checkForExceptions(~functionName="getUsersConfirmedButNotSettledBalance")
     let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked.getUsersConfirmedButNotSettledBalanceMock.will.return.with([_param0])")
+      let _ = %raw(
+        "_r.smocked.getUsersConfirmedButNotSettledBalanceMock.will.return.with([_param0])"
+      )
     })
   }
 
@@ -1313,7 +1052,9 @@ module InternalMock = {
     isLong: bool,
   }
 
-  let getUsersConfirmedButNotSettledBalanceCalls: unit => array<getUsersConfirmedButNotSettledBalanceCall> = () => {
+  let getUsersConfirmedButNotSettledBalanceCalls: unit => array<
+    getUsersConfirmedButNotSettledBalanceCall,
+  > = () => {
     checkForExceptions(~functionName="getUsersConfirmedButNotSettledBalance")
     internalRef.contents
     ->Option.map(_r => {
@@ -1329,24 +1070,24 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mockGetMarketPcntForTreasuryVsMarketSplitToReturn: Ethers.BigNumber.t => unit = _param0 => {
-    checkForExceptions(~functionName="getMarketPcntForTreasuryVsMarketSplit")
+  let mockGetMarketPercentForTreasuryVsMarketSplitToReturn: Ethers.BigNumber.t => unit = _param0 => {
+    checkForExceptions(~functionName="getMarketPercentForTreasuryVsMarketSplit")
     let _ = internalRef.contents->Option.map(_r => {
       let _ = %raw(
-        "_r.smocked.getMarketPcntForTreasuryVsMarketSplitMock.will.return.with([_param0])"
+        "_r.smocked.getMarketPercentForTreasuryVsMarketSplitMock.will.return.with([_param0])"
       )
     })
   }
 
-  type getMarketPcntForTreasuryVsMarketSplitCall = {marketIndex: int}
+  type getMarketPercentForTreasuryVsMarketSplitCall = {marketIndex: int}
 
-  let getMarketPcntForTreasuryVsMarketSplitCalls: unit => array<
-    getMarketPcntForTreasuryVsMarketSplitCall,
+  let getMarketPercentForTreasuryVsMarketSplitCalls: unit => array<
+    getMarketPercentForTreasuryVsMarketSplitCall,
   > = () => {
-    checkForExceptions(~functionName="getMarketPcntForTreasuryVsMarketSplit")
+    checkForExceptions(~functionName="getMarketPercentForTreasuryVsMarketSplit")
     internalRef.contents
     ->Option.map(_r => {
-      let array = %raw("_r.smocked.getMarketPcntForTreasuryVsMarketSplitMock.calls")
+      let array = %raw("_r.smocked.getMarketPercentForTreasuryVsMarketSplitMock.calls")
       array->Array.map(_m => {
         let marketIndex = _m->Array.getUnsafe(0)
 
@@ -1358,52 +1099,22 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mockGetTreasurySplitToReturn: (Ethers.BigNumber.t, Ethers.BigNumber.t) => unit = (
-    _param0,
-    _param1,
-  ) => {
-    checkForExceptions(~functionName="getTreasurySplit")
+  let mock_getLongPercentForLongVsShortSplitToReturn: Ethers.BigNumber.t => unit = _param0 => {
+    checkForExceptions(~functionName="_getLongPercentForLongVsShortSplit")
     let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked.getTreasurySplitMock.will.return.with([_param0,_param1])")
+      let _ = %raw("_r.smocked._getLongPercentForLongVsShortSplitMock.will.return.with([_param0])")
     })
   }
 
-  type getTreasurySplitCall = {
-    marketIndex: int,
-    amount: Ethers.BigNumber.t,
-  }
+  type _getLongPercentForLongVsShortSplitCall = {marketIndex: int}
 
-  let getTreasurySplitCalls: unit => array<getTreasurySplitCall> = () => {
-    checkForExceptions(~functionName="getTreasurySplit")
-    internalRef.contents
-    ->Option.map(_r => {
-      let array = %raw("_r.smocked.getTreasurySplitMock.calls")
-      array->Array.map(((marketIndex, amount)) => {
-        {
-          marketIndex: marketIndex,
-          amount: amount,
-        }
-      })
-    })
-    ->Option.getExn
-  }
-
-  let mockGetLongPcntForLongVsShortSplitToReturn: Ethers.BigNumber.t => unit = _param0 => {
-    checkForExceptions(~functionName="getLongPcntForLongVsShortSplit")
-    let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked.getLongPcntForLongVsShortSplitMock.will.return.with([_param0])")
-    })
-  }
-
-  type getLongPcntForLongVsShortSplitCall = {marketIndex: int}
-
-  let getLongPcntForLongVsShortSplitCalls: unit => array<
-    getLongPcntForLongVsShortSplitCall,
+  let _getLongPercentForLongVsShortSplitCalls: unit => array<
+    _getLongPercentForLongVsShortSplitCall,
   > = () => {
-    checkForExceptions(~functionName="getLongPcntForLongVsShortSplit")
+    checkForExceptions(~functionName="_getLongPercentForLongVsShortSplit")
     internalRef.contents
     ->Option.map(_r => {
-      let array = %raw("_r.smocked.getLongPcntForLongVsShortSplitMock.calls")
+      let array = %raw("_r.smocked._getLongPercentForLongVsShortSplitMock.calls")
       array->Array.map(_m => {
         let marketIndex = _m->Array.getUnsafe(0)
 
@@ -1415,26 +1126,26 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mockGetMarketSplitToReturn: (Ethers.BigNumber.t, Ethers.BigNumber.t) => unit = (
+  let mock_getMarketSplitToReturn: (Ethers.BigNumber.t, Ethers.BigNumber.t) => unit = (
     _param0,
     _param1,
   ) => {
-    checkForExceptions(~functionName="getMarketSplit")
+    checkForExceptions(~functionName="_getMarketSplit")
     let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked.getMarketSplitMock.will.return.with([_param0,_param1])")
+      let _ = %raw("_r.smocked._getMarketSplitMock.will.return.with([_param0,_param1])")
     })
   }
 
-  type getMarketSplitCall = {
+  type _getMarketSplitCall = {
     marketIndex: int,
     amount: Ethers.BigNumber.t,
   }
 
-  let getMarketSplitCalls: unit => array<getMarketSplitCall> = () => {
-    checkForExceptions(~functionName="getMarketSplit")
+  let _getMarketSplitCalls: unit => array<_getMarketSplitCall> = () => {
+    checkForExceptions(~functionName="_getMarketSplit")
     internalRef.contents
     ->Option.map(_r => {
-      let array = %raw("_r.smocked.getMarketSplitMock.calls")
+      let array = %raw("_r.smocked._getMarketSplitMock.calls")
       array->Array.map(((marketIndex, amount)) => {
         {
           marketIndex: marketIndex,
@@ -2205,27 +1916,6 @@ module InternalMock = {
     internalRef.contents
     ->Option.map(_r => {
       let array = %raw("_r.smocked.adminOnlyMock.calls")
-      array->Array.map(() => {
-        ()->Obj.magic
-      })
-    })
-    ->Option.getExn
-  }
-
-  let mockTreasuryOnlyToReturn: unit => unit = () => {
-    checkForExceptions(~functionName="treasuryOnly")
-    let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked.treasuryOnlyMock.will.return()")
-    })
-  }
-
-  type treasuryOnlyCall
-
-  let treasuryOnlyCalls: unit => array<treasuryOnlyCall> = () => {
-    checkForExceptions(~functionName="treasuryOnly")
-    internalRef.contents
-    ->Option.map(_r => {
-      let array = %raw("_r.smocked.treasuryOnlyMock.calls")
       array->Array.map(() => {
         ()->Obj.magic
       })

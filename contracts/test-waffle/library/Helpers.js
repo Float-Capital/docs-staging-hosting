@@ -142,23 +142,23 @@ function randomAddress(param) {
   return ethers.Wallet.createRandom().address;
 }
 
-function createSyntheticMarket(admin, initialMarketSeedOpt, fundToken, treasury, marketName, marketSymbol, longShort) {
+function createSyntheticMarket(admin, initialMarketSeedOpt, paymentToken, treasury, marketName, marketSymbol, longShort) {
   var initialMarketSeed = initialMarketSeedOpt !== undefined ? Caml_option.valFromOption(initialMarketSeedOpt) : Globals.bnFromString("500000000000000000");
   return Promise.all([
                 OracleManagerMock.make(admin),
-                YieldManagerMock.make(admin, longShort.address, treasury, fundToken.address),
-                fundToken.mint(admin, Globals.mul(initialMarketSeed, Globals.bnFromInt(100))).then(function (param) {
-                      return fundToken.approve(longShort.address, Globals.mul(initialMarketSeed, Globals.bnFromInt(100)));
+                YieldManagerMock.make(admin, longShort.address, treasury, paymentToken.address),
+                paymentToken.mint(admin, Globals.mul(initialMarketSeed, Globals.bnFromInt(100))).then(function (param) {
+                      return paymentToken.approve(longShort.address, Globals.mul(initialMarketSeed, Globals.bnFromInt(100)));
                     })
               ]).then(function (param) {
               var yieldManager = param[1];
-              fundToken.MINTER_ROLE().then(function (minterRole) {
-                    return fundToken.grantRole(minterRole, yieldManager.address);
+              paymentToken.MINTER_ROLE().then(function (minterRole) {
+                    return paymentToken.grantRole(minterRole, yieldManager.address);
                   });
-              return longShort.newSyntheticMarket(marketName, marketSymbol, fundToken.address, param[0].address, yieldManager.address).then(function (param) {
+              return longShort.newSyntheticMarket(marketName, marketSymbol, paymentToken.address, param[0].address, yieldManager.address).then(function (param) {
                             return longShort.latestMarket();
                           }).then(function (marketIndex) {
-                          return longShort.initializeMarket(marketIndex, ethers.BigNumber.from(0), ethers.BigNumber.from(0), ethers.BigNumber.from(50), ethers.BigNumber.from(50), ethers.BigNumber.from("1000000000000000000"), ethers.BigNumber.from(0), initialMarketSeed);
+                          return longShort.initializeMarket(marketIndex, ethers.BigNumber.from("1000000000000000000"), ethers.BigNumber.from(0), initialMarketSeed);
                         });
             });
 }
@@ -169,7 +169,7 @@ function getAllMarkets(longShort) {
                                 return Promise.all([
                                               longShort.syntheticTokens(marketIndex, true).then(SyntheticToken.at),
                                               longShort.syntheticTokens(marketIndex, false).then(SyntheticToken.at),
-                                              longShort.fundTokens(marketIndex).then(ERC20Mock.at),
+                                              longShort.paymentTokens(marketIndex).then(ERC20Mock.at),
                                               longShort.oracleManagers(marketIndex).then(OracleManagerMock.at),
                                               longShort.yieldManagers(marketIndex).then(YieldManagerMock.at)
                                             ]).then(function (param) {
@@ -262,4 +262,4 @@ exports.inititialize = inititialize;
 exports.increaseTime = increaseTime;
 exports.getBlock = getBlock;
 exports.getRandomTimestampInPast = getRandomTimestampInPast;
-/* No side effect */
+/* Globals Not a pure module */
