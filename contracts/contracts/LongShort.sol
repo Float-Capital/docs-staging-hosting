@@ -310,7 +310,7 @@ contract LongShort is ILongShort, Initializable {
         require(
             // You require at least 10^17 of the underlying payment token to seed the market.
             initialMarketSeed > 0.1 ether,
-            "Insufficient value to seed the market"
+            "Insufficient market seed"
         );
 
         _lockFundsInMarket(marketIndex, initialMarketSeed * 2);
@@ -336,7 +336,8 @@ contract LongShort is ILongShort, Initializable {
         uint256 kPeriod,
         uint256 initialMarketSeed
     ) external adminOnly {
-        require(!marketExists[marketIndex] && marketIndex <= latestMarket);
+        require(!marketExists[marketIndex], "already initialized");
+        require(marketIndex <= latestMarket, "index too high");
 
         marketExists[marketIndex] = true;
 
@@ -383,7 +384,7 @@ contract LongShort is ILongShort, Initializable {
     }
 
     /*
-    2 possible states for next price actions:
+    4 possible states for next price actions:
         - "Pending" - means the next price update hasn't happened or been enacted on by the updateSystemState function.
         - "Confirmed" - means the next price has been updated by the updateSystemState function. There is still outstanding (lazy) computation that needs to be executed per user in the batch.
         - "Settled" - there is no more computation left for the user.

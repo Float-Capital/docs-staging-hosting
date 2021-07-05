@@ -8,7 +8,7 @@ let testIntegration =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
   describe("lazyRedeem", () => {
-    it_skip("[THIS TEST IS FLAKY] should work as expected happy path", () => {
+    it("should work as expected happy path", () => {
       let testUser = accounts.contents->Array.getUnsafe(8);
       let amountToNextPriceMint = Helpers.randomTokenAmount();
 
@@ -23,7 +23,7 @@ let testIntegration =
       let%AwaitThen _longValueBefore =
         longShort->LongShort.syntheticTokenPoolValue(
           marketIndex,
-          true/*long*/,
+          true /*long*/,
         );
 
       let%AwaitThen _ =
@@ -91,7 +91,7 @@ let testIntegration =
       let%AwaitThen redemptionPriceWithFees =
         longShort->LongShort.syntheticTokenPriceSnapshot(
           marketIndex,
-          true/*long*/,
+          true /*long*/,
           latestUpdateIndex,
         );
 
