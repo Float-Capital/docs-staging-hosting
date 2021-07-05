@@ -428,10 +428,10 @@ contract LongShort is ILongShort, Initializable {
         }
     }
 
-    function getMarketPcntForTreasuryVsMarketSplit(uint32 marketIndex)
+    function getMarketPercentForTreasuryVsMarketSplit(uint32 marketIndex)
         public
         view
-        returns (uint256 marketPcntE5)
+        returns (uint256 marketPercentE5)
     {
         uint256 totalValueLockedInMarket = syntheticTokenPoolValue[marketIndex][
             true
@@ -441,20 +441,20 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokenPoolValue[marketIndex][true] >
             syntheticTokenPoolValue[marketIndex][false]
         ) {
-            marketPcntE5 =
+            marketPercentE5 =
                 ((syntheticTokenPoolValue[marketIndex][true] -
                     syntheticTokenPoolValue[marketIndex][false]) *
                     TEN_TO_THE_5) /
                 totalValueLockedInMarket;
         } else {
-            marketPcntE5 =
+            marketPercentE5 =
                 ((syntheticTokenPoolValue[marketIndex][false] -
                     syntheticTokenPoolValue[marketIndex][true]) *
                     TEN_TO_THE_5) /
                 totalValueLockedInMarket;
         }
 
-        return marketPcntE5;
+        return marketPercentE5;
     }
 
     // TODO: this is an unused function. Integrate it!
@@ -469,20 +469,20 @@ contract LongShort is ILongShort, Initializable {
     //     view
     //     returns (uint256 marketAmount, uint256 treasuryAmount)
     // {
-    //     uint256 marketPcntE5 = getMarketPcntForTreasuryVsMarketSplit(
+    //     uint256 marketPercentE5 = getMarketPercentForTreasuryVsMarketSplit(
     //         marketIndex
     //     );
 
-    //     marketAmount = (marketPcntE5 * amount) / TEN_TO_THE_5;
+    //     marketAmount = (marketPercentE5 * amount) / TEN_TO_THE_5;
     //     treasuryAmount = amount - marketAmount;
 
     //     return (marketAmount, treasuryAmount);
     // }
 
-    function _getLongPcntForLongVsShortSplit(uint32 marketIndex)
+    function _getLongPercentForLongVsShortSplit(uint32 marketIndex)
         internal
         view
-        returns (uint256 longPcntE5)
+        returns (uint256 longPercentE5)
     {
         return
             (syntheticTokenPoolValue[marketIndex][false] * TEN_TO_THE_5) /
@@ -500,9 +500,9 @@ contract LongShort is ILongShort, Initializable {
         view
         returns (uint256 longAmount, uint256 shortAmount)
     {
-        uint256 longPcntE5 = _getLongPcntForLongVsShortSplit(marketIndex);
+        uint256 longPercentE5 = _getLongPercentForLongVsShortSplit(marketIndex);
 
-        longAmount = (amount * longPcntE5) / TEN_TO_THE_5;
+        longAmount = (amount * longPercentE5) / TEN_TO_THE_5;
         shortAmount = amount - longAmount;
 
         return (longAmount, shortAmount);
@@ -528,7 +528,7 @@ contract LongShort is ILongShort, Initializable {
      * Controls what happens with accrued yield manager interest.
      */
     function _claimAndDistributeYield(uint32 marketIndex) internal {
-        uint256 marketPcntE5 = getMarketPcntForTreasuryVsMarketSplit(
+        uint256 marketPercentE5 = getMarketPercentForTreasuryVsMarketSplit(
             marketIndex
         );
 
@@ -539,8 +539,10 @@ contract LongShort is ILongShort, Initializable {
         uint256 marketAmount = yieldManagers[marketIndex]
         .claimYieldAndGetMarketAmount(
             totalValueRealizedForMarket,
-            marketPcntE5
+            marketPercentE5
         );
+
+        console.log("market amount", marketAmount);
 
         if (marketAmount > 0) {
             _distributeMarketAmount(marketIndex, marketAmount);
@@ -623,6 +625,9 @@ contract LongShort is ILongShort, Initializable {
             marketIndex,
             false
         );
+
+        // TODO: Optimise this, no need to add new stake reward state every single state update. (ie. no need to call `addNewStateForFloatRewards` lots of the time)
+        //       Split this into a version for the staker to update the state?
 
         // Adding state point for rewards in staker contract
         staker.addNewStateForFloatRewards(

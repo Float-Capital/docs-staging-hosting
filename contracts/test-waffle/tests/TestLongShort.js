@@ -10,6 +10,7 @@ var LazyRedeem = require("./longShort/LazyRedeem.js");
 var LazyDeposit = require("./longShort/LazyDeposit.js");
 var HelperActions = require("../library/HelperActions.js");
 var InitializeMarket = require("./longShort/InitializeMarket.js");
+var UpdateSystemState = require("./longShort/UpdateSystemState.js");
 
 describe("Float System", (function () {
         Globals.describeIntegration("LongShort", (function (param) {
@@ -31,9 +32,7 @@ describe("Float System", (function () {
                                                 }));
                                   }));
                     });
-                describe("_updateSystemState", (function () {
-                        
-                      }));
+                UpdateSystemState.testIntegration(contracts, accounts);
                 LazyDeposit.testIntegration(contracts, accounts);
                 LazyRedeem.testIntegration(contracts, accounts);
                 return InitializeMarket.testIntegration(contracts, accounts);
@@ -135,7 +134,8 @@ describe("Float System", (function () {
                                                       }));
                                         }));
                           });
-                      return InitializeMarket.testUnit(contracts, accounts);
+                      InitializeMarket.testUnit(contracts, accounts);
+                      return UpdateSystemState.testUnit(contracts, accounts);
                     }));
       }));
 

@@ -545,19 +545,19 @@ let getUsersConfirmedButNotSettledBalanceCalls: t => array<
   })
 }
 
-let mockGetMarketPcntForTreasuryVsMarketSplitToReturn: (t, Ethers.BigNumber.t) => unit = (
+let mockGetMarketPercentForTreasuryVsMarketSplitToReturn: (t, Ethers.BigNumber.t) => unit = (
   _r,
   _param0,
 ) => {
-  let _ = %raw("_r.smocked.getMarketPcntForTreasuryVsMarketSplit.will.return.with([_param0])")
+  let _ = %raw("_r.smocked.getMarketPercentForTreasuryVsMarketSplit.will.return.with([_param0])")
 }
 
-type getMarketPcntForTreasuryVsMarketSplitCall = {marketIndex: int}
+type getMarketPercentForTreasuryVsMarketSplitCall = {marketIndex: int}
 
-let getMarketPcntForTreasuryVsMarketSplitCalls: t => array<
-  getMarketPcntForTreasuryVsMarketSplitCall,
+let getMarketPercentForTreasuryVsMarketSplitCalls: t => array<
+  getMarketPercentForTreasuryVsMarketSplitCall,
 > = _r => {
-  let array = %raw("_r.smocked.getMarketPcntForTreasuryVsMarketSplit.calls")
+  let array = %raw("_r.smocked.getMarketPercentForTreasuryVsMarketSplit.calls")
   array->Array.map(_m => {
     let marketIndex = _m->Array.getUnsafe(0)
 
@@ -1070,24 +1070,24 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mockGetMarketPcntForTreasuryVsMarketSplitToReturn: Ethers.BigNumber.t => unit = _param0 => {
-    checkForExceptions(~functionName="getMarketPcntForTreasuryVsMarketSplit")
+  let mockGetMarketPercentForTreasuryVsMarketSplitToReturn: Ethers.BigNumber.t => unit = _param0 => {
+    checkForExceptions(~functionName="getMarketPercentForTreasuryVsMarketSplit")
     let _ = internalRef.contents->Option.map(_r => {
       let _ = %raw(
-        "_r.smocked.getMarketPcntForTreasuryVsMarketSplitMock.will.return.with([_param0])"
+        "_r.smocked.getMarketPercentForTreasuryVsMarketSplitMock.will.return.with([_param0])"
       )
     })
   }
 
-  type getMarketPcntForTreasuryVsMarketSplitCall = {marketIndex: int}
+  type getMarketPercentForTreasuryVsMarketSplitCall = {marketIndex: int}
 
-  let getMarketPcntForTreasuryVsMarketSplitCalls: unit => array<
-    getMarketPcntForTreasuryVsMarketSplitCall,
+  let getMarketPercentForTreasuryVsMarketSplitCalls: unit => array<
+    getMarketPercentForTreasuryVsMarketSplitCall,
   > = () => {
-    checkForExceptions(~functionName="getMarketPcntForTreasuryVsMarketSplit")
+    checkForExceptions(~functionName="getMarketPercentForTreasuryVsMarketSplit")
     internalRef.contents
     ->Option.map(_r => {
-      let array = %raw("_r.smocked.getMarketPcntForTreasuryVsMarketSplitMock.calls")
+      let array = %raw("_r.smocked.getMarketPercentForTreasuryVsMarketSplitMock.calls")
       array->Array.map(_m => {
         let marketIndex = _m->Array.getUnsafe(0)
 
@@ -1099,22 +1099,22 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mock_getLongPcntForLongVsShortSplitToReturn: Ethers.BigNumber.t => unit = _param0 => {
-    checkForExceptions(~functionName="_getLongPcntForLongVsShortSplit")
+  let mock_getLongPercentForLongVsShortSplitToReturn: Ethers.BigNumber.t => unit = _param0 => {
+    checkForExceptions(~functionName="_getLongPercentForLongVsShortSplit")
     let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked._getLongPcntForLongVsShortSplitMock.will.return.with([_param0])")
+      let _ = %raw("_r.smocked._getLongPercentForLongVsShortSplitMock.will.return.with([_param0])")
     })
   }
 
-  type _getLongPcntForLongVsShortSplitCall = {marketIndex: int}
+  type _getLongPercentForLongVsShortSplitCall = {marketIndex: int}
 
-  let _getLongPcntForLongVsShortSplitCalls: unit => array<
-    _getLongPcntForLongVsShortSplitCall,
+  let _getLongPercentForLongVsShortSplitCalls: unit => array<
+    _getLongPercentForLongVsShortSplitCall,
   > = () => {
-    checkForExceptions(~functionName="_getLongPcntForLongVsShortSplit")
+    checkForExceptions(~functionName="_getLongPercentForLongVsShortSplit")
     internalRef.contents
     ->Option.map(_r => {
-      let array = %raw("_r.smocked._getLongPcntForLongVsShortSplitMock.calls")
+      let array = %raw("_r.smocked._getLongPercentForLongVsShortSplitMock.calls")
       array->Array.map(_m => {
         let marketIndex = _m->Array.getUnsafe(0)
 

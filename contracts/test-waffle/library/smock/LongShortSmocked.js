@@ -441,13 +441,13 @@ function getUsersConfirmedButNotSettledBalanceCalls(_r) {
               }));
 }
 
-function mockGetMarketPcntForTreasuryVsMarketSplitToReturn(_r, _param0) {
-  ((_r.smocked.getMarketPcntForTreasuryVsMarketSplit.will.return.with([_param0])));
+function mockGetMarketPercentForTreasuryVsMarketSplitToReturn(_r, _param0) {
+  ((_r.smocked.getMarketPercentForTreasuryVsMarketSplit.will.return.with([_param0])));
   
 }
 
-function getMarketPcntForTreasuryVsMarketSplitCalls(_r) {
-  var array = _r.smocked.getMarketPcntForTreasuryVsMarketSplit.calls;
+function getMarketPercentForTreasuryVsMarketSplitCalls(_r) {
+  var array = _r.smocked.getMarketPercentForTreasuryVsMarketSplit.calls;
   return Belt_Array.map(array, (function (_m) {
                 var marketIndex = _m[0];
                 return {
@@ -867,19 +867,19 @@ function getUsersConfirmedButNotSettledBalanceCalls$1(param) {
                   })));
 }
 
-function mockGetMarketPcntForTreasuryVsMarketSplitToReturn$1(_param0) {
-  checkForExceptions("getMarketPcntForTreasuryVsMarketSplit");
+function mockGetMarketPercentForTreasuryVsMarketSplitToReturn$1(_param0) {
+  checkForExceptions("getMarketPercentForTreasuryVsMarketSplit");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.getMarketPcntForTreasuryVsMarketSplitMock.will.return.with([_param0])));
+          ((_r.smocked.getMarketPercentForTreasuryVsMarketSplitMock.will.return.with([_param0])));
           
         }));
   
 }
 
-function getMarketPcntForTreasuryVsMarketSplitCalls$1(param) {
-  checkForExceptions("getMarketPcntForTreasuryVsMarketSplit");
+function getMarketPercentForTreasuryVsMarketSplitCalls$1(param) {
+  checkForExceptions("getMarketPercentForTreasuryVsMarketSplit");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.getMarketPcntForTreasuryVsMarketSplitMock.calls;
+                    var array = _r.smocked.getMarketPercentForTreasuryVsMarketSplitMock.calls;
                     return Belt_Array.map(array, (function (_m) {
                                   var marketIndex = _m[0];
                                   return {
@@ -889,19 +889,19 @@ function getMarketPcntForTreasuryVsMarketSplitCalls$1(param) {
                   })));
 }
 
-function mock_getLongPcntForLongVsShortSplitToReturn(_param0) {
-  checkForExceptions("_getLongPcntForLongVsShortSplit");
+function mock_getLongPercentForLongVsShortSplitToReturn(_param0) {
+  checkForExceptions("_getLongPercentForLongVsShortSplit");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._getLongPcntForLongVsShortSplitMock.will.return.with([_param0])));
+          ((_r.smocked._getLongPercentForLongVsShortSplitMock.will.return.with([_param0])));
           
         }));
   
 }
 
-function _getLongPcntForLongVsShortSplitCalls(param) {
-  checkForExceptions("_getLongPcntForLongVsShortSplit");
+function _getLongPercentForLongVsShortSplitCalls(param) {
+  checkForExceptions("_getLongPercentForLongVsShortSplit");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._getLongPcntForLongVsShortSplitMock.calls;
+                    var array = _r.smocked._getLongPercentForLongVsShortSplitMock.calls;
                     return Belt_Array.map(array, (function (_m) {
                                   var marketIndex = _m[0];
                                   return {
@@ -1635,10 +1635,10 @@ var InternalMock = {
   _getAmountSynthTokenCalls: _getAmountSynthTokenCalls,
   mockGetUsersConfirmedButNotSettledBalanceToReturn: mockGetUsersConfirmedButNotSettledBalanceToReturn$1,
   getUsersConfirmedButNotSettledBalanceCalls: getUsersConfirmedButNotSettledBalanceCalls$1,
-  mockGetMarketPcntForTreasuryVsMarketSplitToReturn: mockGetMarketPcntForTreasuryVsMarketSplitToReturn$1,
-  getMarketPcntForTreasuryVsMarketSplitCalls: getMarketPcntForTreasuryVsMarketSplitCalls$1,
-  mock_getLongPcntForLongVsShortSplitToReturn: mock_getLongPcntForLongVsShortSplitToReturn,
-  _getLongPcntForLongVsShortSplitCalls: _getLongPcntForLongVsShortSplitCalls,
+  mockGetMarketPercentForTreasuryVsMarketSplitToReturn: mockGetMarketPercentForTreasuryVsMarketSplitToReturn$1,
+  getMarketPercentForTreasuryVsMarketSplitCalls: getMarketPercentForTreasuryVsMarketSplitCalls$1,
+  mock_getLongPercentForLongVsShortSplitToReturn: mock_getLongPercentForLongVsShortSplitToReturn,
+  _getLongPercentForLongVsShortSplitCalls: _getLongPercentForLongVsShortSplitCalls,
   mock_getMarketSplitToReturn: mock_getMarketSplitToReturn,
   _getMarketSplitCalls: _getMarketSplitCalls,
   mock_distributeMarketAmountToReturn: mock_distributeMarketAmountToReturn,
@@ -1766,8 +1766,8 @@ exports.mockInitializeMarketToReturn = mockInitializeMarketToReturn;
 exports.initializeMarketCalls = initializeMarketCalls;
 exports.mockGetUsersConfirmedButNotSettledBalanceToReturn = mockGetUsersConfirmedButNotSettledBalanceToReturn;
 exports.getUsersConfirmedButNotSettledBalanceCalls = getUsersConfirmedButNotSettledBalanceCalls;
-exports.mockGetMarketPcntForTreasuryVsMarketSplitToReturn = mockGetMarketPcntForTreasuryVsMarketSplitToReturn;
-exports.getMarketPcntForTreasuryVsMarketSplitCalls = getMarketPcntForTreasuryVsMarketSplitCalls;
+exports.mockGetMarketPercentForTreasuryVsMarketSplitToReturn = mockGetMarketPercentForTreasuryVsMarketSplitToReturn;
+exports.getMarketPercentForTreasuryVsMarketSplitCalls = getMarketPercentForTreasuryVsMarketSplitCalls;
 exports.mockUpdateSystemStateToReturn = mockUpdateSystemStateToReturn;
 exports.updateSystemStateCalls = updateSystemStateCalls;
 exports.mockUpdateSystemStateMultiToReturn = mockUpdateSystemStateMultiToReturn;
