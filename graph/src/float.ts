@@ -13,7 +13,6 @@ import {
 } from "../generated/LongShort/LongShort";
 import {
   SyntheticMarket,
-  FeeStructure,
   GlobalState,
   Staker,
   TokenFactory,
@@ -121,7 +120,6 @@ export function handleV1(event: V1): void {
   );
 }
 
-
 export function handleSystemStateUpdated(event: SystemStateUpdated): void {
   let marketIndex = event.params.marketIndex;
   let marketIndexString = marketIndex.toString();
@@ -167,7 +165,6 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
 
     batchedNextPriceExec.mintPriceSnapshotLong = longTokenPrice;
     batchedNextPriceExec.mintPriceSnapshotShort = shortTokenPrice;
-    // TODO: when fees are added for redeem this will need to be updated!
     batchedNextPriceExec.redeemPriceSnapshotLong = longTokenPrice;
     batchedNextPriceExec.redeemPriceSnapshotShort = shortTokenPrice;
 
@@ -220,7 +217,6 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
         );
       }
 
-      // TODO: add fees when they are implemented!
       let paymentTokensToRedeemLong = userNextPriceAction.amountSynthTokenForWithdrawalLong
         .times(longTokenPrice)
         .div(TEN_TO_THE_18);
@@ -299,12 +295,6 @@ export function handleSyntheticTokenCreated(
     shortToken.id
   );
 
-  let fees = new FeeStructure(marketIndexString + "-fees");
-  fees.baseEntryFee = ZERO;
-  fees.badLiquidityEntryFee = ZERO;
-  fees.baseExitFee = ZERO;
-  fees.badLiquidityExitFee = ZERO;
-
   let syntheticMarket = new SyntheticMarket(marketIndexString);
   syntheticMarket.timestampCreated = timestamp;
   syntheticMarket.txHash = txHash;
@@ -317,7 +307,6 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.marketIndex = marketIndex;
   syntheticMarket.oracleAddress = oracleAddress;
   syntheticMarket.previousOracleAddresses = [];
-  syntheticMarket.feeStructure = fees.id;
   syntheticMarket.kPeriod = ZERO;
   syntheticMarket.kMultiplier = ZERO;
   syntheticMarket.totalFloatMinted = ZERO;
@@ -363,7 +352,6 @@ export function handleSyntheticTokenCreated(
   longToken.save();
   shortToken.save();
   initialState.systemState.save();
-  fees.save();
   globalState.save();
 
   saveEventToStateChange(
@@ -420,7 +408,6 @@ export function handleMarketOracleUpdated(event: OracleUpdated): void {
 
   syntheticMarket.save();
 }
-
 
 export function handlePriceUpdate(event: PriceUpdate): void {
   let marketIndex = event.params.marketIndex;

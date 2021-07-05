@@ -124,14 +124,6 @@ type SystemState @entity {
   setBy: Bytes! #Turn into a User entity
 }
 
-type FeeStructure @entity {
-  id: ID!
-  baseEntryFee: BigInt!
-  badLiquidityEntryFee: BigInt!
-  baseExitFee: BigInt!
-  badLiquidityExitFee: BigInt!
-}
-
 interface GenericTransfer {
   id: ID!
   from: String!
@@ -216,7 +208,6 @@ type SyntheticMarket @entity {
   syntheticLong: SyntheticToken!
   syntheticShort: SyntheticToken!
   latestSystemState: SystemState!
-  feeStructure: FeeStructure!
   kPeriod: BigInt!
   kMultiplier: BigInt!
   totalFloatMinted: BigInt!
