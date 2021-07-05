@@ -1006,8 +1006,6 @@ contract LongShort is ILongShort, Initializable {
                 syntheticTokenPrice
             );
 
-            // TODO STENT there are no token mint events emitted here, but there are on market initialization
-            //            -- jason reply - probably need to remove them from marketInitialize - they are legacy events...
             syntheticTokens[marketIndex][isLong].mint(
                 address(this),
                 numberOfTokens

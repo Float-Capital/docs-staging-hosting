@@ -11,6 +11,9 @@ let test =
   describe("stakeFromUser", () => {
     let stakerRef: ref(Staker.t) = ref(None->Obj.magic);
 
+    let longShortSmockedRef: ref(LongShortSmocked.t) = ref(None->Obj.magic);
+    let marketIndexForToken = Helpers.randomJsInteger();
+
     let from = Helpers.randomAddress();
     let amount = Helpers.randomTokenAmount();
     let mockTokenWalletRef: ref(Ethers.Wallet.t) = ref(None->Obj.magic);
@@ -23,7 +26,23 @@ let test =
           ~accounts,
         );
 
+      let {longShort} = contracts^;
+
+      let%Await longShortSmocked = longShort->LongShortSmocked.make;
+
+      let _ = longShortSmocked->LongShortSmocked.mockUpdateSystemStateToReturn;
+
+      longShortSmockedRef := longShortSmocked;
+
       mockTokenWalletRef := (accounts^)->Array.getExn(6);
+
+      let%Await _ =
+        (stakerRef^)
+        ->Staker.Exposed.setStakeFromUserParams(
+            ~longshort=longShortSmocked.address,
+            ~token=mockTokenWalletRef^.address,
+            ~marketIndexForToken,
+          );
 
       StakerSmocked.InternalMock.mockOnlyValidSyntheticToReturn();
       StakerSmocked.InternalMock.mock_stakeToReturn();
@@ -48,5 +67,12 @@ let test =
           user: from,
         })
     );
+
+    it("calls updateSystemState on longshort with correct args", () => {
+      (longShortSmockedRef^)
+      ->LongShortSmocked.updateSystemStateCalls
+      ->Array.getExn(0)
+      ->Chai.recordEqualFlat({marketIndex: marketIndexForToken})
+    });
   });
 };
