@@ -479,6 +479,14 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "setSetRewardObjectsParams"
 
   @send
+  external setStakeFromUserParams: (
+    t,
+    ~longshort: Ethers.ethAddress,
+    ~token: Ethers.ethAddress,
+    ~marketIndexForToken: int,
+  ) => JsPromise.t<transaction> = "setStakeFromUserParams"
+
+  @send
   external set_mintFloatParams: (
     t,
     ~floatToken: Ethers.ethAddress,
