@@ -23,14 +23,6 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function changeFeesMock(uint32,uint256,uint256,uint256,uint256) public pure {
-      return ();
-    }
-     
-    function _changeFeesMock(uint32,uint256,uint256,uint256,uint256) public pure {
-      return ();
-    }
-     
     function updateMarketOracleMock(uint32,address) public pure {
       return ();
     }
@@ -43,7 +35,7 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function initializeMarketMock(uint32,uint256,uint256,uint256,uint256,uint256,uint256,uint256) public pure {
+    function initializeMarketMock(uint32,uint256,uint256,uint256) public pure {
       return ();
     }
      
@@ -67,15 +59,11 @@ contract LongShortForInternalMocking {
       return (abi.decode("",(uint256)));
     }
      
-    function getTreasurySplitMock(uint32,uint256) public pure returns (uint256 marketAmount,uint256 treasuryAmount){
-      return (abi.decode("",(uint256)),abi.decode("",(uint256)));
-    }
-     
-    function getLongPcntForLongVsShortSplitMock(uint32) public pure returns (uint256 longPcntE5){
+    function _getLongPcntForLongVsShortSplitMock(uint32) public pure returns (uint256 longPcntE5){
       return (abi.decode("",(uint256)));
     }
      
-    function getMarketSplitMock(uint32,uint256) public pure returns (uint256 longAmount,uint256 shortAmount){
+    function _getMarketSplitMock(uint32,uint256) public pure returns (uint256 longAmount,uint256 shortAmount){
       return (abi.decode("",(uint256)),abi.decode("",(uint256)));
     }
      
@@ -184,10 +172,6 @@ contract LongShortForInternalMocking {
     }
      
     function adminOnlyMock() public pure {
-      return; 
-    }
-     
-    function treasuryOnlyMock() public pure {
       return; 
     }
      

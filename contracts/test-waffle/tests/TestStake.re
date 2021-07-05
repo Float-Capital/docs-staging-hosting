@@ -21,8 +21,8 @@ describe("Float System", () => {
       contracts := deployedContracts;
     });
 
-    it_skip(
-      "[BROKEN TEST] - should correctly be able to stake their long/short tokens and view their staked amount immediately",
+    it(
+      "should correctly be able to stake their long/short tokens and view their staked amount immediately",
       () => {
         let {longShort, markets, staker} = contracts.contents;
         let testUser = accounts.contents->Array.getUnsafe(1);
@@ -36,24 +36,7 @@ describe("Float System", () => {
 
         let%Await _ =
           synthsUserHasStakedIn
-          ->Array.map(
-              (
-                {
-                  marketIndex,
-                  synth,
-                  amount,
-                  valueInOtherSide,
-                  valueInEntrySide,
-                  priceOfSynthForAction,
-                },
-              ) => {
-              let%AwaitThen amountOfFees =
-                longShort->Contract.LongShortHelpers.getFeesMint(
-                  ~marketIndex,
-                  ~amount,
-                  ~valueInOtherSide,
-                  ~valueInEntrySide,
-                );
+          ->Array.map(({synth, amount, priceOfSynthForAction}) => {
               let%Await amountStaked =
                 staker->Staker.userAmountStaked(
                   synth.address,
@@ -62,11 +45,9 @@ describe("Float System", () => {
 
               let expectedStakeAmount =
                 amount
-                ->sub(amountOfFees)
                 ->mul(CONSTANTS.tenToThe18)
                 ->div(priceOfSynthForAction);
 
-              // THIS IS WRONG NOW
               Chai.bnEqual(
                 ~message="amount staked is greater than expected",
                 amountStaked,

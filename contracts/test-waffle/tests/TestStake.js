@@ -6,7 +6,6 @@ var Stake = require("./stake/Stake.js");
 var LetOps = require("../library/LetOps.js");
 var Globals = require("../library/Globals.js");
 var Helpers = require("../library/Helpers.js");
-var Contract = require("../library/Contract.js");
 var CONSTANTS = require("../CONSTANTS.js");
 var GetKValue = require("./stake/GetKValue.js");
 var MintFloat = require("./stake/MintFloat.js");
@@ -47,21 +46,17 @@ describe("Float System", (function () {
                                     
                                   }));
                     });
-                it.skip("[BROKEN TEST] - should correctly be able to stake their long/short tokens and view their staked amount immediately", (function () {
+                it("should correctly be able to stake their long/short tokens and view their staked amount immediately", (function () {
                         var match = contracts.contents;
-                        var longShort = match.longShort;
                         var staker = match.staker;
                         var testUser = accounts.contents[1];
-                        return LetOps.Await.let_(HelperActions.stakeRandomlyInMarkets(match.markets, testUser, longShort), (function (param) {
+                        return LetOps.Await.let_(HelperActions.stakeRandomlyInMarkets(match.markets, testUser, match.longShort), (function (param) {
                                       return LetOps.Await.let_(Promise.all(Belt_Array.map(param[0], (function (param) {
                                                             var priceOfSynthForAction = param.priceOfSynthForAction;
                                                             var amount = param.amount;
-                                                            var synth = param.synth;
-                                                            return LetOps.AwaitThen.let_(Contract.LongShortHelpers.getFeesMint(longShort, param.marketIndex, amount, param.valueInEntrySide, param.valueInOtherSide), (function (amountOfFees) {
-                                                                          return LetOps.Await.let_(staker.userAmountStaked(synth.address, testUser.address), (function (amountStaked) {
-                                                                                        var expectedStakeAmount = Globals.div(Globals.mul(Globals.sub(amount, amountOfFees), CONSTANTS.tenToThe18), priceOfSynthForAction);
-                                                                                        return Chai.bnEqual("amount staked is greater than expected", amountStaked, expectedStakeAmount);
-                                                                                      }));
+                                                            return LetOps.Await.let_(staker.userAmountStaked(param.synth.address, testUser.address), (function (amountStaked) {
+                                                                          var expectedStakeAmount = Globals.div(Globals.mul(amount, CONSTANTS.tenToThe18), priceOfSynthForAction);
+                                                                          return Chai.bnEqual("amount staked is greater than expected", amountStaked, expectedStakeAmount);
                                                                         }));
                                                           }))), (function (param) {
                                                     

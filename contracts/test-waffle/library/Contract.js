@@ -27,39 +27,6 @@ var DataFetchers = {
   marketIndexOfSynth: marketIndexOfSynth
 };
 
-function getFeesMint(longShort, marketIndex, amount, valueInEntrySide, valueInOtherSide) {
-  return LetOps.AwaitThen.let_(longShort.badLiquidityEntryFee(marketIndex), (function (badLiquidityEntryFee) {
-                return LetOps.Await.let_(longShort.TEN_TO_THE_5(), (function (feeUnitsOfPrecision) {
-                              var baseFee = Globals.bnFromInt(0);
-                              if (Globals.bnGte(valueInEntrySide, valueInOtherSide)) {
-                                return Globals.add(baseFee, Globals.div(Globals.mul(amount, badLiquidityEntryFee), feeUnitsOfPrecision));
-                              }
-                              if (!Globals.bnGt(Globals.add(valueInEntrySide, amount), valueInOtherSide)) {
-                                return baseFee;
-                              }
-                              var amountImbalancing = Globals.sub(amount, Globals.sub(valueInOtherSide, valueInEntrySide));
-                              var penaltyFee = Globals.div(Globals.mul(amountImbalancing, badLiquidityEntryFee), feeUnitsOfPrecision);
-                              return Globals.add(baseFee, penaltyFee);
-                            }));
-              }));
-}
-
-function getFeesRedeemLazy(longShort, marketIndex, amount, valueInRemovalSide, valueInOtherSide) {
-  return LetOps.AwaitThen.let_(longShort.badLiquidityExitFee(marketIndex), (function (badLiquidityExitFee) {
-                return LetOps.Await.let_(longShort.TEN_TO_THE_5(), (function (feeUnitsOfPrecision) {
-                              if (Globals.bnGte(valueInOtherSide, valueInRemovalSide)) {
-                                return Globals.add(CONSTANTS.zeroBn, Globals.div(Globals.mul(amount, badLiquidityExitFee), feeUnitsOfPrecision));
-                              }
-                              if (!Globals.bnGt(Globals.add(valueInOtherSide, amount), valueInRemovalSide)) {
-                                return CONSTANTS.zeroBn;
-                              }
-                              var amountImbalancing = Globals.sub(amount, Globals.sub(valueInRemovalSide, valueInOtherSide));
-                              var penaltyFee = Globals.div(Globals.mul(amountImbalancing, badLiquidityExitFee), feeUnitsOfPrecision);
-                              return Globals.add(CONSTANTS.zeroBn, penaltyFee);
-                            }));
-              }));
-}
-
 function getMarketBalance(longShort, marketIndex) {
   return LetOps.AwaitThen.let_(longShort.syntheticTokenPoolValue(marketIndex, true), (function (longValue) {
                 return LetOps.Await.let_(longShort.syntheticTokenPoolValue(marketIndex, false), (function (shortValue) {
@@ -84,8 +51,6 @@ function getSyntheticTokenPrice(longShort, marketIndex, isLong) {
 }
 
 var LongShortHelpers = {
-  getFeesMint: getFeesMint,
-  getFeesRedeemLazy: getFeesRedeemLazy,
   getMarketBalance: getMarketBalance,
   getSyntheticTokenPrice: getSyntheticTokenPrice
 };

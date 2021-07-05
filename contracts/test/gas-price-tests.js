@@ -37,12 +37,6 @@ contract("LongShort (gas prices)", (accounts) => {
   const syntheticName = "FTSE100";
   const syntheticSymbol = "FTSE";
 
-  // Fees
-  const _baseEntryFee = 0;
-  const _badLiquidityEntryFee = 50;
-  const _baseExitFee = 50;
-  const _badLiquidityExitFee = 50;
-
   // Default test values
   const admin = accounts[0];
   const user1 = accounts[1];

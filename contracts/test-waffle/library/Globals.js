@@ -90,6 +90,25 @@ var describeUnit = Config.dontRunUnitTests ? (function (prim0, prim1) {
       
     });
 
+var describeBoth = Config.isCI ? (
+    Config.dontRunIntegrationTests ? (function (prim0, prim1) {
+          describe.skip(prim0, (function () {
+                  return Curry._1(prim1, undefined);
+                }));
+          
+        }) : (function (prim0, prim1) {
+          describe(prim0, (function () {
+                  return Curry._1(prim1, undefined);
+                }));
+          
+        })
+  ) : (function (prim0, prim1) {
+      describe(prim0, (function () {
+              return Curry._1(prim1, undefined);
+            }));
+      
+    });
+
 exports.before_once$p = before_once$p;
 exports.add = add;
 exports.sub = sub;
@@ -104,4 +123,5 @@ exports.bnGte = bnGte;
 exports.bnLt = bnLt;
 exports.describeIntegration = describeIntegration;
 exports.describeUnit = describeUnit;
+exports.describeBoth = describeBoth;
 /* Config Not a pure module */

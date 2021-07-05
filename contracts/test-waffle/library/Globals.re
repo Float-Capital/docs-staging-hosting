@@ -40,6 +40,19 @@ let (
     lt,
   );
 
-let describeIntegration = Config.dontRunIntegrationTests ? describe_skip : describe;
+let describeIntegration =
+  Config.dontRunIntegrationTests ? describe_skip : describe;
 
 let describeUnit = Config.dontRunUnitTests ? describe_skip : describe;
+
+// Some tests should be counted towards the integration test code-coverage - but are really unit tests. For those tests use the bellow
+let describeBoth =
+  if (Config.isCI) {
+    // In CI it is only run as an integration test
+    //   this doesn't really matter - if integration tests are slower than unit tests, rather make this run as a unit test
+    if (Config.dontRunIntegrationTests) {describe_skip} else {
+      describe
+    };
+  } else {
+    describe;
+  };

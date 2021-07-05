@@ -24,8 +24,6 @@ let test =
         ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
             ~functionName="initializeMarket",
           );
-      let _ = LongShortSmocked.InternalMock.mock_changeFeesToReturn();
-
       let _ = LongShortSmocked.InternalMock.mockAdminOnlyToReturn();
 
       let _ = LongShortSmocked.InternalMock.mock_seedMarketInitiallyToReturn();
@@ -42,7 +40,7 @@ let test =
     };
 
     it(
-      "calls all functions (staker.addNewStakingFund, _changeFees, adminOnly, seedMarketInitially) and mutates state (marketExists) correctly",
+      "calls all functions (staker.addNewStakingFund, adminOnly, seedMarketInitially) and mutates state (marketExists) correctly",
       () => {
         let%Await _ =
           setup(~marketIndex=1, ~marketIndexValue=false, ~latestMarket=1);
@@ -51,11 +49,7 @@ let test =
           ->ContractHelpers.connect(~address=(accounts^)->Array.getUnsafe(0))
           ->LongShort.initializeMarket(
               ~marketIndex=1,
-              ~baseEntryFee=Ethers.BigNumber.fromUnsafe("1"),
-              ~badLiquidityEntryFee=Ethers.BigNumber.fromUnsafe("2"),
-              ~badLiquidityExitFee=Ethers.BigNumber.fromUnsafe("3"),
               ~kPeriod=Ethers.BigNumber.fromUnsafe("4"),
-              ~baseExitFee=Ethers.BigNumber.fromUnsafe("5"),
               ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
               ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
             );
@@ -72,19 +66,6 @@ let test =
             shortToken: sampleAddress,
             kPeriod: Ethers.BigNumber.fromUnsafe("4"),
           },
-        );
-
-        let changeFeeCalls = LongShortSmocked.InternalMock._changeFeesCalls();
-
-        Chai.recordEqualFlatLabeled(
-          ~actual={
-            marketIndex: 1,
-            baseEntryFee: Ethers.BigNumber.fromUnsafe("1"),
-            baseExitFee: Ethers.BigNumber.fromUnsafe("5"),
-            badLiquidityEntryFee: Ethers.BigNumber.fromUnsafe("2"),
-            badLiquidityExitFee: Ethers.BigNumber.fromUnsafe("3"),
-          },
-          ~expected=changeFeeCalls->Array.getExn(0),
         );
 
         let seedMarketInitiallyCalls =
@@ -120,11 +101,7 @@ let test =
               )
             ->LongShort.initializeMarket(
                 ~marketIndex=1,
-                ~baseEntryFee=Ethers.BigNumber.fromUnsafe("1"),
-                ~badLiquidityEntryFee=Ethers.BigNumber.fromUnsafe("2"),
-                ~badLiquidityExitFee=Ethers.BigNumber.fromUnsafe("3"),
                 ~kPeriod=Ethers.BigNumber.fromUnsafe("4"),
-                ~baseExitFee=Ethers.BigNumber.fromUnsafe("5"),
                 ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
                 ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
               ),
@@ -143,11 +120,7 @@ let test =
               )
             ->LongShort.initializeMarket(
                 ~marketIndex=1,
-                ~baseEntryFee=Ethers.BigNumber.fromUnsafe("1"),
-                ~badLiquidityEntryFee=Ethers.BigNumber.fromUnsafe("2"),
-                ~badLiquidityExitFee=Ethers.BigNumber.fromUnsafe("3"),
                 ~kPeriod=Ethers.BigNumber.fromUnsafe("4"),
-                ~baseExitFee=Ethers.BigNumber.fromUnsafe("5"),
                 ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
                 ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
               ),

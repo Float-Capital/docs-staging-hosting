@@ -98,10 +98,6 @@ let createSyntheticMarket = (
     ->JsPromise.then(marketIndex => {
       longShort->LongShort.initializeMarket(
         ~marketIndex,
-        ~baseEntryFee=Ethers.BigNumber.fromInt(0),
-        ~badLiquidityEntryFee=Ethers.BigNumber.fromInt(0),
-        ~baseExitFee=Ethers.BigNumber.fromInt(50),
-        ~badLiquidityExitFee=Ethers.BigNumber.fromInt(50),
         ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("1000000000000000000"),
         ~kPeriod=Ethers.BigNumber.fromInt(0),
         ~initialMarketSeed,
