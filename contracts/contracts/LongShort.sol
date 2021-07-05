@@ -345,7 +345,7 @@ contract LongShort is ILongShort, Initializable {
       ║       GETTER FUNCTIONS       ║
       ╚══════════════════════════════╝*/
 
-    function _getSyntheticTokenPrice(uint32 marketIndex, bool isLong)
+    function _recalculateSyntheticTokenPrice(uint32 marketIndex, bool isLong)
         internal
         view
         returns (uint256 syntheticTokenPrice)
@@ -400,10 +400,9 @@ contract LongShort is ILongShort, Initializable {
                 marketIndex
             ][isLong][user];
 
-            uint256 syntheticTokenPrice = _getSyntheticTokenPrice(
-                marketIndex,
-                isLong
-            );
+            uint256 syntheticTokenPrice = syntheticTokenPriceSnapshot[
+                marketIndex
+            ][isLong][marketUpdateIndex[marketIndex]];
 
             uint256 tokens = _getAmountSynthToken(
                 amountPaymentTokenDeposited,
@@ -603,65 +602,68 @@ contract LongShort is ILongShort, Initializable {
         internal
         assertMarketExists(marketIndex)
     {
-        uint256 syntheticTokenPriceLong = _getSyntheticTokenPrice(
-            marketIndex,
-            true
-        );
-        uint256 syntheticTokenPriceShort = _getSyntheticTokenPrice(
-            marketIndex,
-            false
-        );
-
-        // TODO: Optimise this, no need to add new stake reward state every single state update. (ie. no need to call `addNewStateForFloatRewards` lots of the time)
-        //       Split this into a version for the staker to update the state?
-
-        // Adding state point for rewards in staker contract
-        staker.addNewStateForFloatRewards(
-            marketIndex,
-            syntheticTokenPriceLong,
-            syntheticTokenPriceShort,
-            syntheticTokenPoolValue[marketIndex][true],
-            syntheticTokenPoolValue[marketIndex][false]
-        );
-
         // If a negative int is return this should fail.
         int256 newAssetPrice = oracleManagers[marketIndex].updatePrice();
         int256 oldAssetPrice = int256(assetPrice[marketIndex]);
 
-        if (oldAssetPrice == newAssetPrice) {
-            return;
+        bool assetPriceChanged = oldAssetPrice != newAssetPrice;
+
+        if (assetPriceChanged || msg.sender == address(staker)) {
+            uint256 syntheticTokenPriceLong = syntheticTokenPriceSnapshot[
+                marketIndex
+            ][true][marketUpdateIndex[marketIndex]];
+            uint256 syntheticTokenPriceShort = syntheticTokenPriceSnapshot[
+                marketIndex
+            ][false][marketUpdateIndex[marketIndex]];
+            staker.addNewStateForFloatRewards(
+                marketIndex,
+                syntheticTokenPriceLong,
+                syntheticTokenPriceShort,
+                syntheticTokenPoolValue[marketIndex][true],
+                syntheticTokenPoolValue[marketIndex][false]
+            );
+
+            if (!assetPriceChanged) {
+                return;
+            }
+
+            _claimAndDistributeYield(marketIndex);
+            _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
+
+            syntheticTokenPriceLong = _recalculateSyntheticTokenPrice(
+                marketIndex,
+                true
+            );
+            syntheticTokenPriceShort = _recalculateSyntheticTokenPrice(
+                marketIndex,
+                false
+            );
+
+            assetPrice[marketIndex] = uint256(newAssetPrice);
+            marketUpdateIndex[marketIndex] += 1;
+
+            _saveSyntheticTokenPriceSnapshots(
+                marketIndex,
+                marketUpdateIndex[marketIndex],
+                syntheticTokenPriceLong,
+                syntheticTokenPriceShort
+            );
+            _performOustandingSettlements(
+                marketIndex,
+                marketUpdateIndex[marketIndex],
+                syntheticTokenPriceLong,
+                syntheticTokenPriceShort
+            );
+
+            emit SystemStateUpdated(
+                marketIndex,
+                marketUpdateIndex[marketIndex],
+                syntheticTokenPoolValue[marketIndex][true],
+                syntheticTokenPoolValue[marketIndex][false],
+                syntheticTokenPriceLong,
+                syntheticTokenPriceShort
+            );
         }
-
-        _claimAndDistributeYield(marketIndex);
-        _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
-
-        syntheticTokenPriceLong = _getSyntheticTokenPrice(marketIndex, true);
-        syntheticTokenPriceShort = _getSyntheticTokenPrice(marketIndex, false);
-
-        assetPrice[marketIndex] = uint256(newAssetPrice);
-        marketUpdateIndex[marketIndex] += 1;
-
-        _saveSyntheticTokenPriceSnapshots(
-            marketIndex,
-            marketUpdateIndex[marketIndex],
-            syntheticTokenPriceLong,
-            syntheticTokenPriceShort
-        );
-        _performOustandingSettlements(
-            marketIndex,
-            marketUpdateIndex[marketIndex],
-            syntheticTokenPriceLong,
-            syntheticTokenPriceShort
-        );
-
-        emit SystemStateUpdated(
-            marketIndex,
-            marketUpdateIndex[marketIndex],
-            syntheticTokenPoolValue[marketIndex][true],
-            syntheticTokenPoolValue[marketIndex][false],
-            syntheticTokenPriceLong,
-            syntheticTokenPriceShort
-        );
     }
 
     function updateSystemState(uint32 marketIndex) external override {
@@ -992,7 +994,6 @@ contract LongShort is ILongShort, Initializable {
                 syntheticTokenPrice
             );
 
-            // TODO STENT there are no token mint events emitted here, but there are on market initialization
             syntheticTokens[marketIndex][isLong].mint(
                 address(this),
                 numberOfTokens

@@ -956,23 +956,25 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mock_getSyntheticTokenPriceToReturn: Ethers.BigNumber.t => unit = _param0 => {
-    checkForExceptions(~functionName="_getSyntheticTokenPrice")
+  let mock_recalculateSyntheticTokenPriceToReturn: Ethers.BigNumber.t => unit = _param0 => {
+    checkForExceptions(~functionName="_recalculateSyntheticTokenPrice")
     let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked._getSyntheticTokenPriceMock.will.return.with([_param0])")
+      let _ = %raw("_r.smocked._recalculateSyntheticTokenPriceMock.will.return.with([_param0])")
     })
   }
 
-  type _getSyntheticTokenPriceCall = {
+  type _recalculateSyntheticTokenPriceCall = {
     marketIndex: int,
     isLong: bool,
   }
 
-  let _getSyntheticTokenPriceCalls: unit => array<_getSyntheticTokenPriceCall> = () => {
-    checkForExceptions(~functionName="_getSyntheticTokenPrice")
+  let _recalculateSyntheticTokenPriceCalls: unit => array<
+    _recalculateSyntheticTokenPriceCall,
+  > = () => {
+    checkForExceptions(~functionName="_recalculateSyntheticTokenPrice")
     internalRef.contents
     ->Option.map(_r => {
-      let array = %raw("_r.smocked._getSyntheticTokenPriceMock.calls")
+      let array = %raw("_r.smocked._recalculateSyntheticTokenPriceMock.calls")
       array->Array.map(((marketIndex, isLong)) => {
         {
           marketIndex: marketIndex,

@@ -39,7 +39,7 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function _getSyntheticTokenPriceMock(uint32,bool) public pure returns (uint256 syntheticTokenPrice){
+    function _recalculateSyntheticTokenPriceMock(uint32,bool) public pure returns (uint256 syntheticTokenPrice){
       return (abi.decode("",(uint256)));
     }
      

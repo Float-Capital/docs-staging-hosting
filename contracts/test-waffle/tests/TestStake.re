@@ -136,7 +136,6 @@ describe("Float System", () => {
       CalculateNewCumulativeRate.test(~contracts, ~accounts);
       SetRewardObjects.test(~contracts, ~accounts);
       AddNewStateForFloatRewards.test(~contracts, ~accounts);
-      UpdateState.test(~contracts, ~accounts);
       MintFloat.test(~contracts, ~accounts);
       MintAccumulatedFloat.test(~contracts, ~accounts);
       ClaimFloat.test(~contracts, ~accounts);

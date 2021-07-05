@@ -489,15 +489,6 @@ contract StakerMockable is IStaker, Initializable {
     }
 
             
-    function _updateState(ISyntheticToken token) internal {
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_updateState"))){
-      
-      return mocker._updateStateMock(token);
-    }
-  
-        longShortCoreContract.updateSystemState(marketIndexOfToken[token]);
-    }
-
     function calculateAccumulatedFloatHelper(
         uint32 marketIndex,
         address user,
@@ -686,7 +677,9 @@ contract StakerMockable is IStaker, Initializable {
       return mocker.stakeFromUserMock(from,amount);
     }
   
-        _updateState(ISyntheticToken(msg.sender));
+        longShortCoreContract.updateSystemState(
+            marketIndexOfToken[ISyntheticToken(msg.sender)]
+        );
         _stake(ISyntheticToken(msg.sender), amount, from);
     }
 
@@ -754,7 +747,8 @@ contract StakerMockable is IStaker, Initializable {
       return mocker.withdrawMock(token,amount);
     }
   
-        _updateState(token);
+        longShortCoreContract.updateSystemState(marketIndexOfToken[token]);
+
         _withdraw(token, amount);
     }
 
@@ -764,7 +758,8 @@ contract StakerMockable is IStaker, Initializable {
       return mocker.withdrawAllMock(token);
     }
   
-        _updateState(token);
+        longShortCoreContract.updateSystemState(marketIndexOfToken[token]);
+
         _withdraw(token, userAmountStaked[token][msg.sender]);
     }
 }

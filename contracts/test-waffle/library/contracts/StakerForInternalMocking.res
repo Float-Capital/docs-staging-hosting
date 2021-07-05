@@ -39,11 +39,6 @@ external _stakeMock: (
   Ethers.ethAddress,
 ) => JsPromise.t<_stakeMockReturn> = "_stakeMock"
 
-type _updateStateMockReturn
-@send
-external _updateStateMock: (t, Ethers.ethAddress) => JsPromise.t<_updateStateMockReturn> =
-  "_updateStateMock"
-
 type _withdrawMockReturn
 @send
 external _withdrawMock: (

@@ -8,12 +8,18 @@ var Helpers = require("../../library/Helpers.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var StakerHelpers = require("./StakerHelpers.js");
 var StakerSmocked = require("../../library/smock/StakerSmocked.js");
+var LongShortSmocked = require("../../library/smock/LongShortSmocked.js");
+var Smock = require("@eth-optimism/smock");
 
 function test(contracts, accounts) {
   describe("stakeFromUser", (function () {
           var stakerRef = {
             contents: undefined
           };
+          var longShortSmockedRef = {
+            contents: undefined
+          };
+          var marketIndexForToken = Helpers.randomJsInteger(undefined);
           var from = Helpers.randomAddress(undefined);
           var amount = Helpers.randomTokenAmount(undefined);
           var mockTokenWalletRef = {
@@ -21,11 +27,17 @@ function test(contracts, accounts) {
           };
           Globals.before_once$p(function (param) {
                 return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "stakeFromUser", contracts, accounts), (function (param) {
-                              mockTokenWalletRef.contents = Belt_Array.getExn(accounts.contents, 6);
-                              StakerSmocked.InternalMock.mockOnlyValidSyntheticToReturn(undefined);
-                              StakerSmocked.InternalMock.mock_updateStateToReturn(undefined);
-                              StakerSmocked.InternalMock.mock_stakeToReturn(undefined);
-                              return stakerRef.contents.connect(mockTokenWalletRef.contents).stakeFromUser(from, amount);
+                              var match = contracts.contents;
+                              return LetOps.Await.let_(Smock.smockit(match.longShort), (function (longShortSmocked) {
+                                            LongShortSmocked.mockUpdateSystemStateToReturn(longShortSmocked);
+                                            longShortSmockedRef.contents = longShortSmocked;
+                                            mockTokenWalletRef.contents = Belt_Array.getExn(accounts.contents, 6);
+                                            return LetOps.Await.let_(stakerRef.contents.setStakeFromUserParams(longShortSmocked.address, mockTokenWalletRef.contents.address, marketIndexForToken), (function (param) {
+                                                          StakerSmocked.InternalMock.mockOnlyValidSyntheticToReturn(undefined);
+                                                          StakerSmocked.InternalMock.mock_stakeToReturn(undefined);
+                                                          return stakerRef.contents.connect(mockTokenWalletRef.contents).stakeFromUser(from, amount);
+                                                        }));
+                                          }));
                             }));
               });
           it("calls onlyValidSynthetic with correct args", (function () {
@@ -40,9 +52,9 @@ function test(contracts, accounts) {
                               user: from
                             });
                 }));
-          it("calls _updateState with correct args", (function () {
-                  return Chai.recordEqualFlat(Belt_Array.getExn(StakerSmocked.InternalMock._updateStateCalls(undefined), 0), {
-                              token: mockTokenWalletRef.contents.address
+          it("calls updateSystemState on longshort with correct args", (function () {
+                  return Chai.recordEqualFlat(Belt_Array.getExn(LongShortSmocked.updateSystemStateCalls(longShortSmockedRef.contents), 0), {
+                              marketIndex: marketIndexForToken
                             });
                 }));
           

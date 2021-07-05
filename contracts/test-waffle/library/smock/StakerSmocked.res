@@ -913,31 +913,6 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mock_updateStateToReturn: unit => unit = () => {
-    checkForExceptions(~functionName="_updateState")
-    let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked._updateStateMock.will.return()")
-    })
-  }
-
-  type _updateStateCall = {token: Ethers.ethAddress}
-
-  let _updateStateCalls: unit => array<_updateStateCall> = () => {
-    checkForExceptions(~functionName="_updateState")
-    internalRef.contents
-    ->Option.map(_r => {
-      let array = %raw("_r.smocked._updateStateMock.calls")
-      array->Array.map(_m => {
-        let token = _m->Array.getUnsafe(0)
-
-        {
-          token: token,
-        }
-      })
-    })
-    ->Option.getExn
-  }
-
   let mockCalculateAccumulatedFloatHelperToReturn: (
     Ethers.BigNumber.t,
     Ethers.BigNumber.t,

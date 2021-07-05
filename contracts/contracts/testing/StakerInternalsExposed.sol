@@ -4,6 +4,7 @@ pragma solidity 0.8.3;
 
 import "./generated/StakerMockable.sol";
 import "../interfaces/ISyntheticToken.sol";
+import "../interfaces/ILongShort.sol";
 import "hardhat/console.sol";
 
 /*
@@ -82,6 +83,15 @@ contract StakerInternalsExposed is StakerMockable {
         external
     {
         syntheticRewardParams[marketIndex][0].timestamp = timestamp;
+    }
+
+    function setStakeFromUserParams(
+        address longshort,
+        ISyntheticToken token,
+        uint32 marketIndexForToken
+    ) external {
+        longShortCoreContract = ILongShort(longshort);
+        marketIndexOfToken[token] = marketIndexForToken;
     }
 
     function setCalculateTimeDeltaParams(
@@ -273,10 +283,6 @@ contract StakerInternalsExposed is StakerMockable {
             longValue,
             shortValue
         );
-    }
-
-    function _updateStateExternal(ISyntheticToken token) external {
-        _updateState(token);
     }
 
     function _claimFloatExternal(uint32[] calldata marketIndex) external {

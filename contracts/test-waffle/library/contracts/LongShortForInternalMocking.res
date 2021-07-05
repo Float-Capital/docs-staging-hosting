@@ -108,14 +108,6 @@ external _getMarketSplitMock: (
   Ethers.BigNumber.t,
 ) => JsPromise.t<_getMarketSplitMockReturn> = "_getMarketSplitMock"
 
-type _getSyntheticTokenPriceMockReturn = Ethers.BigNumber.t
-@send
-external _getSyntheticTokenPriceMock: (
-  t,
-  int,
-  bool,
-) => JsPromise.t<_getSyntheticTokenPriceMockReturn> = "_getSyntheticTokenPriceMock"
-
 type _handleBatchedDepositSettlementMockReturn
 @send
 external _handleBatchedDepositSettlementMock: (
@@ -160,6 +152,14 @@ external _performOustandingSettlementsMock: (
   Ethers.BigNumber.t,
   Ethers.BigNumber.t,
 ) => JsPromise.t<_performOustandingSettlementsMockReturn> = "_performOustandingSettlementsMock"
+
+type _recalculateSyntheticTokenPriceMockReturn = Ethers.BigNumber.t
+@send
+external _recalculateSyntheticTokenPriceMock: (
+  t,
+  int,
+  bool,
+) => JsPromise.t<_recalculateSyntheticTokenPriceMockReturn> = "_recalculateSyntheticTokenPriceMock"
 
 type _redeemNextPriceMockReturn
 @send

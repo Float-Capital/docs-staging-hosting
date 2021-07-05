@@ -10,9 +10,7 @@ describe("Float System", () => {
     before_each(() => {
       let%Await loadedAccounts = Ethers.getSigners();
       accounts := loadedAccounts;
-      // });
 
-      // before_each(() => {
       let%AwaitThen deployedContracts =
         Helpers.inititialize(
           ~admin=accounts.contents->Array.getUnsafe(0),
