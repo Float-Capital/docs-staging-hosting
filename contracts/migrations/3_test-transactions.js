@@ -370,10 +370,10 @@ module.exports = async function(deployer, network, accounts) {
     );
 
     // Increase mock oracle price from 1 (default) to 1.1.
-    if (network != "mumbai")
+    if (network != "mumbai") {
       await oracleManager.setPrice(new BN("1100000000000000000"));
-
-    await longShort.updateSystemState(marketIndex);
+      await longShort.updateSystemState(marketIndex);
+    }
 
     // Requires synth token mint to have confirmed (oracle price update & updateSystemState)
     if (network != "mumbai") await stakeSynth("1", long, user1);

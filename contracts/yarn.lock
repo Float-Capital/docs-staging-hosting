@@ -15197,6 +15197,31 @@ solidity-ast@^0.4.15:
   resolved "https://registry.yarnpkg.com/solidity-ast/-/solidity-ast-0.4.25.tgz#1e0dc3d6024e69c29698c49d74e5ee9421fe426d"
   integrity sha512-8IpweS/vgHEpKvY4l0sfr3EsHk+JFIzRWqq/0JefRjzP/Wyi2xZYfx8aHlJ9kcEn2M2RCQK9PexuZ+scaa83OQ==
 
+solidity-coverage@^0.7.16:
+  version "0.7.16"
+  resolved "https://registry.yarnpkg.com/solidity-coverage/-/solidity-coverage-0.7.16.tgz#c8c8c46baa361e2817bbf275116ddd2ec90a55fb"
+  integrity sha512-ttBOStywE6ZOTJmmABSg4b8pwwZfYKG8zxu40Nz+sRF5bQX7JULXWj/XbX0KXps3Fsp8CJXg8P29rH3W54ipxw==
+  dependencies:
+    "@solidity-parser/parser" "^0.12.0"
+    "@truffle/provider" "^0.2.24"
+    chalk "^2.4.2"
+    death "^1.1.0"
+    detect-port "^1.3.0"
+    fs-extra "^8.1.0"
+    ganache-cli "^6.11.0"
+    ghost-testrpc "^0.0.2"
+    global-modules "^2.0.0"
+    globby "^10.0.1"
+    jsonschema "^1.2.4"
+    lodash "^4.17.15"
+    node-emoji "^1.10.0"
+    pify "^4.0.1"
+    recursive-readdir "^2.2.2"
+    sc-istanbul "^0.4.5"
+    semver "^7.3.4"
+    shelljs "^0.8.3"
+    web3-utils "^1.3.0"
+
 source-list-map@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/source-list-map/-/source-list-map-2.0.1.tgz#3993bd873bfc48479cca9ea3a547835c7c154b34"
@@ -16125,10 +16150,10 @@ truffle-interface-adapter@^0.2.5:
     lodash "^4.17.13"
     web3 "1.2.1"
 
-truffle-plugin-verify@^0.5.7:
-  version "0.5.9"
-  resolved "https://registry.yarnpkg.com/truffle-plugin-verify/-/truffle-plugin-verify-0.5.9.tgz#0d4d615e0a5bc259492e2c4e131e1d1a4f9b38e7"
-  integrity sha512-9V+ogMybZ+8GUw7Mf30xMn10vJIh/M8y4RXmMVb5aqIEsr8P78NfxbWwL3zPjmzYKwdS04OCSj3Y8n5i/+8BaA==
+truffle-plugin-verify@^0.5.10:
+  version "0.5.10"
+  resolved "https://registry.yarnpkg.com/truffle-plugin-verify/-/truffle-plugin-verify-0.5.10.tgz#7acc2b64a1d9dc52ba865e50760804a6ebeeb5c0"
+  integrity sha512-8nxZKxkMAja6t7OLGyUlej8vpo7MxQg2fhZfyn/Vfsg4HD/GX2NGphxEhm0c90vuv1ozZbxwXl/tM7ygrbEPuQ==
   dependencies:
     axios "^0.21.1"
     cli-logger "^0.5.40"
