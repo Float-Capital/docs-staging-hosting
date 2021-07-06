@@ -11,7 +11,6 @@ import "./interfaces/ISyntheticToken.sol";
 contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
     ILongShort public longShort;
     IStaker public staker;
-    // TODO: these values aren't set by the contructor/initializer
     uint32 public marketIndex;
     bool public isLong;
 
