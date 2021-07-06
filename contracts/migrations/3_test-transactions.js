@@ -38,7 +38,7 @@ const deployTestMarket = async (
   treasuryInstance,
   admin,
   networkName,
-  token
+  paymentToken
 ) => {
   console.log("Deploying test Market", syntheticName, syntheticSymbol);
 
@@ -69,13 +69,13 @@ const deployTestMarket = async (
       admin,
       longShortInstance.address,
       treasuryInstance.address,
-      token.address
+      paymentToken.address
     );
 
-    fundTokenAddress = token.address;
+    fundTokenAddress = paymentToken.address;
 
-    var mintRole = await token.MINTER_ROLE.call();
-    await token.grantRole(mintRole, yieldManager.address);
+    var mintRole = await paymentToken.MINTER_ROLE.call();
+    await paymentToken.grantRole(mintRole, yieldManager.address);
   }
 
   await longShortInstance.newSyntheticMarket(
@@ -92,7 +92,7 @@ const deployTestMarket = async (
 
   if (networkName != "mumbai") {
     await mintAndApprove(
-      token,
+      paymentToken,
       new BN("2000000000000000000"),
       admin,
       longShortInstance.address
@@ -138,6 +138,7 @@ const mintShortNextPriceWithSystemUpdate = async (
 };
 
 const stakeSynth = async (amount, synth, user) => {
+  await longShort.updateSystemState(marketIndex);
   const usersSynthTokenBalance = new BN(await synth.balanceOf(user));
   if (usersSynthTokenBalance.gt(new BN("0"))) {
     await synth.stake(new BN(amount), { from: user });
@@ -364,7 +365,8 @@ module.exports = async function(deployer, network, accounts) {
 
     await longShort.updateSystemState(marketIndex);
 
-    await stakeSynth("1", long, user1);
+    // Requires synth token mint to have confirmed (oracle price update & updateSystemState)
+    if (network != "mumbai") await stakeSynth("1", long, user1);
 
     // Simulate user 2 redeeming half his tokens.
     // const halfTokensMinted = new BN(tenMintAmount).div(new BN(2));
