@@ -10,7 +10,9 @@ const SyntheticToken = artifacts.require("SyntheticToken");
 const YieldManagerMock = artifacts.require("YieldManagerMock");
 const OracleManagerMock = artifacts.require("OracleManagerMock");
 const YieldManagerAave = artifacts.require("YieldManagerAave");
-const OracleManagerEthKiller = artifacts.require("OracleManagerEthKiller");
+const OracleManagerEthKillerChainlink = artifacts.require(
+  "OracleManagerEthKillerChainlink"
+);
 
 const mumbaiDaiAddress = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
 
@@ -18,10 +20,14 @@ const aavePoolAddressMumbai = "0x9198F13B08E299d85E096929fA9781A1E3d5d827";
 const mumabiADai = "0x639cB7b21ee2161DF9c882483C9D55c90c20Ca3e";
 
 /* See docs:
- *  https://kovan.etherscan.io/address/0xDA7a001b254CD22e46d3eAB04d937489c93174C3#code
- *  https://docs.matic.network/docs/develop/oracles/bandstandarddataset/
+    https://docs.chain.link/docs/matic-addresses/
  */
-const testnetBANDAddress = "0xDA7a001b254CD22e46d3eAB04d937489c93174C3";
+const testnetChainlinkDaiUsdAddress =
+  "0x0FCAa9c899EC5A91eBc3D5Dd869De833b06fB046";
+const testnetChainlinkEthUsdAddress =
+  "0x0715A7794a1dc8e42615F059dD6e406A6594651A";
+const testnetChainlinkMaticUsdAddress =
+  "0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada";
 
 const mintAndApprove = async (token, amount, user, approvedAddress) => {
   let bnAmount = new BN(amount);
@@ -43,15 +49,20 @@ const deployTestMarket = async (
 ) => {
   console.log("Deploying test Market", syntheticName, syntheticSymbol);
 
-  // We mock out the oracle manager unless we're on BSC testnet.
+  // We mock out the oracle manager unless we're on Mumbai testnet.
   let oracleManager;
   if (networkName == "mumbai") {
-    oracleManager = await OracleManagerEthKiller.new(admin, testnetBANDAddress);
+    oracleManager = await OracleManagerEthKillerChainlink.new(
+      admin,
+      testnetChainlinkDaiUsdAddress,
+      testnetChainlinkEthUsdAddress,
+      testnetChainlinkMaticUsdAddress
+    );
   } else {
     oracleManager = await OracleManagerMock.new(admin);
   }
 
-  // We mock out the yield manager unless we're on BSC testnet.
+  // We mock out the yield manager unless we're on Mumbai testnet.
   let yieldManager;
   let fundTokenAddress;
   if (networkName == "mumbai") {
@@ -187,7 +198,7 @@ const topupBalanceIfLow = async (from, to) => {
   }
 };
 
-module.exports = async function (deployer, network, accounts) {
+module.exports = async function(deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
@@ -267,7 +278,8 @@ module.exports = async function (deployer, network, accounts) {
       )} OracleManagerEthKiller@${await longShort.oracleManagers(
         marketIndex
       )} SyntheticToken@${await longShort.syntheticTokens(
-        marketIndex, true
+        marketIndex,
+        true
       )} SyntheticToken@${await longShort.syntheticTokens(marketIndex, false)}`;
     }
 
