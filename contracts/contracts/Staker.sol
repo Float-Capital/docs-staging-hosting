@@ -148,6 +148,14 @@ contract Staker is IStaker, Initializable {
         floatPercentage = _newPercentage;
     }
 
+    function changeUnstakeFee(uint32 marketIndex, uint256 _newPercentage)
+        external
+        onlyAdmin
+    {
+        require(_newPercentage <= 10000);
+        marketUnstakeFeeBasisPoints[marketIndex] = _newPercentage;
+    }
+
     function changeMarketLaunchIncentiveParameters(
         uint32 marketIndex,
         uint256 period,
