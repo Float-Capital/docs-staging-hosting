@@ -1,12 +1,8 @@
-import {
-  StateChange,
-  EventParam,
-  EventParams,
-  GlobalState,
-} from "../../generated/schema";
-import { Bytes, ethereum } from "@graphprotocol/graph-ts";
-import { ONE, ZERO_ADDRESS,  } from "../CONSTANTS";
+import { StateChange, EventParam, EventParams } from "../../generated/schema";
+import { BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { ONE, ZERO_ADDRESS } from "../CONSTANTS";
 import { getOrCreateGlobalState, getOrCreateUser } from "./globalStateManager";
+import { EVENT_LOGGING } from "../config";
 
 function getEventIndex(txHash: Bytes): i32 {
   let stateChange = StateChange.load(txHash.toHex());
@@ -152,6 +148,24 @@ export function saveEventToStateChange(
   affectedStakes: Array<string>,
   toFloatContracts: bool = true
 ): void {
+  if (EVENT_LOGGING) {
+    log.warning(
+      "\nEvent Name: {} \n  Params:\n    {}\n  ParamTypes\n    {}\n  ParamValues\n    {}\n\n",
+      [
+        eventName,
+        parameterNames.join(),
+        parameterTypes.join(),
+        parameterValues.join(),
+      ]
+    );
+  }
+
+  if (
+    parameterValues.length !== parameterNames.length ||
+    parameterNames.length !== parameterTypes.length
+  ) {
+    log.critical("The event parameters aren't the same length", []);
+  }
   let eventParamsArr: Array<string> = createEventParams(
     event.transaction.hash,
     parameterValues,
@@ -167,4 +181,12 @@ export function saveEventToStateChange(
     affectedStakes,
     toFloatContracts
   );
+}
+
+export function bigIntArrayToStringArray(bigIntArr: BigInt[]): string[] {
+  let returnArr = new Array<string>(bigIntArr.length);
+  for (let i = 0; i < bigIntArr.length; i++) {
+    returnArr[i] = bigIntArr[i].toString();
+  }
+  return returnArr;
 }

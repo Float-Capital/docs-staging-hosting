@@ -3,51 +3,52 @@
 
 var Ethers = require("./Ethers.js");
 
-var abi = Ethers.makeAbi(["function mint(address,uint256)"]);
+var abi = Ethers.makeAbi([
+      "function mintLongNextPrice(uint32 marketIndex,uint256 amount) @1970000",
+      "function mintShortNextPrice(uint32 marketIndex,uint256 amount) @1970000",
+      "function redeemLongNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
+      "function redeemShortNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
+      "function executeOutstandingNextPriceSettlementsUser(address user,uint32 marketIndex) @130000",
+      "function updateSystemState()"
+    ]);
 
 function make(address, providerOrSigner) {
   return Ethers.Contract.make(address, abi, providerOrSigner);
 }
 
-var TestErc20 = {
+var LongShort = {
   abi: abi,
   make: make
 };
 
 var abi$1 = Ethers.makeAbi([
-      "function mintLong(uint32 marketIndex,uint256 amount) @770000",
-      "function mintShort(uint32 marketIndex,uint256 amount) @770000",
-      "function redeemLong(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
-      "function redeemShort(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
-      "function mintLongAndStake(uint32 marketIndex, uint256 amount) @1000000",
-      "function mintShortAndStake(uint32 marketIndex, uint256 amount) @1000000",
-      "function _updateSystemState()",
-      "function longValue(uint32 marketIndex) public view returns (uint256)",
-      "function shortValue(uint32 marketIndex) public view returns (uint256)"
+      "function stake(address tokenAddress, uint256 amount)",
+      "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)  @1200000",
+      "function withdraw(address tokenAddress, uint256 amount) @5000000",
+      "function claimFloatCustom(uint32[] calldata marketIndexes) @2000000"
     ]);
 
 function make$1(address, providerOrSigner) {
   return Ethers.Contract.make(address, abi$1, providerOrSigner);
 }
 
-var LongShort = {
+var Staker = {
   abi: abi$1,
   make: make$1
 };
 
 var abi$2 = Ethers.makeAbi([
-      "function stake(address tokenAddress, uint256 amount)",
-      "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)  @1200000",
-      "function withdraw(address tokenAddress, uint256 amount) @5000000",
-      "function claimFloat(address[] memory tokenAddresses)",
-      "function claimFloatImmediately(address[] memory tokenAddresses) @2000000"
+      "function approve(address spender, uint256 amount) @100000",
+      "function balanceOf(address owner) public view returns (uint256 balance)",
+      "function allowance(address owner, address spender) public view returns (uint256 remaining)",
+      "function mint(uint256 value) public virtual returns (bool)"
     ]);
 
 function make$2(address, providerOrSigner) {
   return Ethers.Contract.make(address, abi$2, providerOrSigner);
 }
 
-var Staker = {
+var Erc20 = {
   abi: abi$2,
   make: make$2
 };
@@ -56,35 +57,18 @@ var abi$3 = Ethers.makeAbi([
       "function approve(address spender, uint256 amount) @100000",
       "function balanceOf(address owner) public view returns (uint256 balance)",
       "function allowance(address owner, address spender) public view returns (uint256 remaining)",
-      "function mint(uint256 value) public virtual returns (bool)"
+      "function stake(uint256 amount) external"
     ]);
 
 function make$3(address, providerOrSigner) {
   return Ethers.Contract.make(address, abi$3, providerOrSigner);
 }
 
-var Erc20 = {
+var Synth = {
   abi: abi$3,
   make: make$3
 };
 
-var abi$4 = Ethers.makeAbi([
-      "function approve(address spender, uint256 amount) @100000",
-      "function balanceOf(address owner) public view returns (uint256 balance)",
-      "function allowance(address owner, address spender) public view returns (uint256 remaining)",
-      "function stake(uint256 amount) external"
-    ]);
-
-function make$4(address, providerOrSigner) {
-  return Ethers.Contract.make(address, abi$4, providerOrSigner);
-}
-
-var Synth = {
-  abi: abi$4,
-  make: make$4
-};
-
-exports.TestErc20 = TestErc20;
 exports.LongShort = LongShort;
 exports.Staker = Staker;
 exports.Erc20 = Erc20;

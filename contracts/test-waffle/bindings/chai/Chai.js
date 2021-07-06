@@ -5,35 +5,50 @@
 const { expect } = require("chai");
 ;
 
-var bnEqual = ((number1, number2) => expect(number1).to.equal(number2));
+var bnEqual = ((message, number1, number2) => expect(number1, message).to.equal(number2));
+
+function recordEqualFlatLabeled(expected, actual) {
+  var a = ((expected, actual) => {
+    for(const key of Object.keys(actual)){
+      expect(actual[key]).to.equal(expected[key])
+    }
+  });
+  return a(expected, actual);
+}
+
+function recordEqualFlat(expected, actual) {
+  var a = ((expected, actual) => {
+    for(const key of Object.keys(actual)){
+      expect(actual[key]).to.equal(expected[key])
+    }
+  });
+  return a(expected, actual);
+}
+
+function recordEqualDeep(expected, actual) {
+  var a = ((expected, actual) => {
+    for(const key of Object.keys(actual)){
+      expect(actual[key]).to.deep.equal(expected[key])
+    }
+  });
+  return a(expected, actual);
+}
+
+var intEqual = ((message, number1, number2) => expect(number1, message).to.equal(number2));
+
+var addressEqual = ((message, address1, address2) => expect(address1, message).to.equal(address2));
+
+var boolEqual = ((message, number1, number2) => expect(number1, message).to.equal(number2));
 
 var bnWithin = ((number1, min, max) => expect(number1).to.be.within(min, max));
 
-var bnCloseTo = ((number1, number2, distance) => expect(number1).to.be.closeTo(number2, distance));
+var bnCloseTo = ((message, distance, number1, number2) => expect(number1, message).to.be.closeTo(number2, distance));
 
 var callEmitEvents = ((call, contract, eventName) => expect(call).to.emit(contract, eventName));
 
-var expectContractCall = ((functionName, contract) => expect(functionName).to.be.calledOnContract(contract));
-
-var expectContractCallArgsRaw = ((functionName, contract, args) => expect(functionName).to.be.calledOnContractWithArgs(contract, args));
-
-function expectContractCallArgs0(functionName, contract) {
-  return expectContractCallArgsRaw(functionName, contract, []);
+function expectToNotEmit(_eventCheck) {
+  return (_eventCheck.then(() => assert.fail('An event was emitted when it should not have been')).catch(() => {}));
 }
-
-var expectContractCallArgs1 = expectContractCallArgsRaw;
-
-var expectContractCallArgs2 = expectContractCallArgsRaw;
-
-var expectContractCallArgs3 = expectContractCallArgsRaw;
-
-var expectContractCallArgs4 = expectContractCallArgsRaw;
-
-var expectContractCallArgs5 = expectContractCallArgsRaw;
-
-var expectContractCallArgs6 = expectContractCallArgsRaw;
-
-var expectContractCallArgs7 = expectContractCallArgsRaw;
 
 var expectRevertNoReason = ((transaction) => expect(transaction).to.be.reverted);
 
@@ -50,19 +65,16 @@ var expectToBeHex = ((hexStr, hexLength) => expect(hexStr).to.be.properHex(hexLe
 var expectHexEqual = ((hex1, hex2) => expect(hex1).to.be.hexEqual(hex2));
 
 exports.bnEqual = bnEqual;
+exports.recordEqualFlatLabeled = recordEqualFlatLabeled;
+exports.recordEqualFlat = recordEqualFlat;
+exports.recordEqualDeep = recordEqualDeep;
+exports.intEqual = intEqual;
+exports.addressEqual = addressEqual;
+exports.boolEqual = boolEqual;
 exports.bnWithin = bnWithin;
 exports.bnCloseTo = bnCloseTo;
 exports.callEmitEvents = callEmitEvents;
-exports.expectContractCall = expectContractCall;
-exports.expectContractCallArgsRaw = expectContractCallArgsRaw;
-exports.expectContractCallArgs0 = expectContractCallArgs0;
-exports.expectContractCallArgs1 = expectContractCallArgs1;
-exports.expectContractCallArgs2 = expectContractCallArgs2;
-exports.expectContractCallArgs3 = expectContractCallArgs3;
-exports.expectContractCallArgs4 = expectContractCallArgs4;
-exports.expectContractCallArgs5 = expectContractCallArgs5;
-exports.expectContractCallArgs6 = expectContractCallArgs6;
-exports.expectContractCallArgs7 = expectContractCallArgs7;
+exports.expectToNotEmit = expectToNotEmit;
 exports.expectRevertNoReason = expectRevertNoReason;
 exports.expectRevert = expectRevert;
 exports.changeBallance = changeBallance;

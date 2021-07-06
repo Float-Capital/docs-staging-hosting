@@ -3,7 +3,7 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Config = require("../Config.js");
+var Config = require("../config/Config.js");
 var Ethers = require("ethers");
 var JsPromise = require("../libraries/Js.Promise/JsPromise.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");

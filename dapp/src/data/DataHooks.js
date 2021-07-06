@@ -169,9 +169,10 @@ function useTotalClaimableFloatForUser(userId, synthTokens) {
                   var match = curState._0;
                   var amount = stake.currentStake.amount;
                   var timestamp = stake.lastMintState.timestamp;
-                  var lastAccumulativeFloatPerToken = stake.lastMintState.accumulativeFloatPerToken;
-                  var accumulativeFloatPerToken = stake.syntheticToken.latestStakerState.accumulativeFloatPerToken;
-                  var floatRatePerTokenOverInterval = stake.syntheticToken.latestStakerState.floatRatePerTokenOverInterval;
+                  var isLong = stake.syntheticToken.id === stake.lastMintState.longToken.id;
+                  var lastAccumulativeFloatPerToken = isLong ? stake.lastMintState.accumulativeFloatPerTokenLong : stake.lastMintState.accumulativeFloatPerTokenShort;
+                  var accumulativeFloatPerToken = isLong ? stake.syntheticMarket.latestStakerState.accumulativeFloatPerTokenLong : stake.syntheticMarket.latestStakerState.accumulativeFloatPerTokenShort;
+                  var floatRatePerTokenOverInterval = isLong ? stake.syntheticMarket.latestStakerState.floatRatePerTokenOverIntervalLong : stake.syntheticMarket.latestStakerState.floatRatePerTokenOverIntervalShort;
                   var claimableFloat = accumulativeFloatPerToken.sub(lastAccumulativeFloatPerToken).mul(amount).div(CONSTANTS.tenToThe42).add(match[0]);
                   var predictedFloat = currentTimestamp.sub(timestamp).mul(floatRatePerTokenOverInterval).mul(amount).div(CONSTANTS.tenToThe42).add(match[1]);
                   return {
@@ -261,50 +262,79 @@ function useUsersBalances(userId) {
   var match = usersTokensQuery.data;
   if (match !== undefined) {
     var match$1 = match.user;
-    if (match$1 === undefined) {
+    if (match$1 !== undefined) {
       return {
               TAG: 1,
-              _0: {
-                totalBalance: CONSTANTS.zeroBN,
-                balances: []
-              },
+              _0: match$1.tokenBalances,
+              [Symbol.for("name")]: "Response"
+            };
+    } else {
+      return {
+              TAG: 1,
+              _0: [],
               [Symbol.for("name")]: "Response"
             };
     }
-    var result = Belt_Array.reduce(match$1.tokenBalances, {
-          totalBalance: CONSTANTS.zeroBN,
-          balances: []
-        }, (function (param, param$1) {
-            var match = param$1.syntheticToken;
-            var match$1 = match.syntheticMarket;
-            var match$2 = match$1.latestSystemState;
-            var tokenBalance = param$1.tokenBalance;
-            var isLong = match.tokenType === "Long";
-            var newToken_addr = Ethers$1.utils.getAddress(match.id);
-            var newToken_name = match$1.name;
-            var newToken_symbol = match$1.symbol;
-            var newToken_tokensValue = match.latestPrice.price.price.mul(tokenBalance).div(CONSTANTS.tenToThe18);
-            var newToken_metadata = {
-              timeLastUpdated: param$1.timeLastUpdated,
-              oracleAddress: match$1.oracleAddress,
-              marketIndex: match$1.marketIndex,
-              tokenSupply: match.tokenSupply,
-              totalLockedLong: match$2.totalLockedLong,
-              totalLockedShort: match$2.totalLockedShort,
-              syntheticPrice: match$2.syntheticPrice
+  }
+  var match$2 = usersTokensQuery.error;
+  if (match$2 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
+function useUsersPendingMints(userId) {
+  var usersPendingMintsQuery = Curry.app(Queries.UsersPendingMints.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: userId
+        }
+      ]);
+  var match = usersPendingMintsQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.user;
+    if (match$1 === undefined) {
+      return {
+              TAG: 1,
+              _0: [{
+                  isLong: false,
+                  amount: CONSTANTS.zeroBN,
+                  marketIndex: CONSTANTS.zeroBN,
+                  confirmedTimestamp: CONSTANTS.zeroBN
+                }],
+              [Symbol.for("name")]: "Response"
             };
-            var newToken = {
-              addr: newToken_addr,
-              name: newToken_name,
-              symbol: newToken_symbol,
-              isLong: isLong,
-              tokenBalance: tokenBalance,
-              tokensValue: newToken_tokensValue,
-              metadata: newToken_metadata
-            };
+    }
+    var result = Belt_Array.map(Belt_Array.keep(match$1.pendingNextPriceActions, (function (pendingNextPriceAction) {
+                if (pendingNextPriceAction.amountPaymentTokenForDepositShort.gt(CONSTANTS.zeroBN)) {
+                  return true;
+                } else {
+                  return pendingNextPriceAction.amountPaymentTokenForDepositLong.gt(CONSTANTS.zeroBN);
+                }
+              })), (function (pendingNextPriceAction) {
+            var isLong = pendingNextPriceAction.amountPaymentTokenForDepositLong.gt(CONSTANTS.zeroBN);
             return {
-                    totalBalance: param.totalBalance.add(newToken_tokensValue),
-                    balances: Belt_Array.concat(param.balances, [newToken])
+                    isLong: isLong,
+                    amount: isLong ? pendingNextPriceAction.amountPaymentTokenForDepositLong : pendingNextPriceAction.amountPaymentTokenForDepositShort,
+                    marketIndex: pendingNextPriceAction.marketIndex,
+                    confirmedTimestamp: pendingNextPriceAction.confirmedTimestamp
                   };
           }));
     return {
@@ -313,7 +343,72 @@ function useUsersBalances(userId) {
             [Symbol.for("name")]: "Response"
           };
   }
-  var match$2 = usersTokensQuery.error;
+  var match$2 = usersPendingMintsQuery.error;
+  if (match$2 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
+function useUsersConfirmedMints(userId) {
+  var usersConfirmedMintsQuery = Curry.app(Queries.UsersConfirmedMints.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        /* NetworkOnly */3,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: userId
+        }
+      ]);
+  var match = usersConfirmedMintsQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.user;
+    if (match$1 === undefined) {
+      return {
+              TAG: 1,
+              _0: [{
+                  isLong: false,
+                  amount: CONSTANTS.zeroBN,
+                  marketIndex: CONSTANTS.zeroBN
+                }],
+              [Symbol.for("name")]: "Response"
+            };
+    }
+    var result = Belt_Array.map(Belt_Array.keep(match$1.confirmedNextPriceActions, (function (confirmedNextPriceAction) {
+                if (confirmedNextPriceAction.amountPaymentTokenForDepositShort.gt(CONSTANTS.zeroBN)) {
+                  return true;
+                } else {
+                  return confirmedNextPriceAction.amountPaymentTokenForDepositLong.gt(CONSTANTS.zeroBN);
+                }
+              })), (function (confirmedNextPriceAction) {
+            var isLong = confirmedNextPriceAction.amountPaymentTokenForDepositLong.gt(CONSTANTS.zeroBN);
+            return {
+                    isLong: isLong,
+                    amount: isLong ? confirmedNextPriceAction.amountPaymentTokenForDepositLong : confirmedNextPriceAction.amountPaymentTokenForDepositShort,
+                    marketIndex: confirmedNextPriceAction.marketIndex
+                  };
+          }));
+    return {
+            TAG: 1,
+            _0: result,
+            [Symbol.for("name")]: "Response"
+          };
+  }
+  var match$2 = usersConfirmedMintsQuery.error;
   if (match$2 !== undefined) {
     return {
             TAG: 0,
@@ -703,11 +798,9 @@ function getUnixTime(date) {
   return date.getTime() / 1000 | 0;
 }
 
-function useSyntheticPrices(param, tokenAddress, isLong) {
-  var syntheticPrice = param.syntheticPrice;
-  var timestamp = param.timeLastUpdated;
+function useSyntheticPrices(oracleAddress, timestamp, tokenSupply, totalLockedLong, totalLockedShort, syntheticPrice, syntheticPriceLastUpdated, tokenAddress, oldAssetPrice, isLong) {
   var initialTokenPriceResponse = useTokenPriceAtTime(tokenAddress, timestamp);
-  var priceHistoryQuery = Curry.app(Queries.PriceHistory.use, [
+  var priceHistoryQuery = Curry.app(Queries.LatestPrice.use, [
         undefined,
         Caml_option.some(Client.createContext(/* PriceHistory */1)),
         undefined,
@@ -722,8 +815,7 @@ function useSyntheticPrices(param, tokenAddress, isLong) {
         undefined,
         undefined,
         {
-          intervalId: Globals.ethAdrToLowerStr(param.oracleAddress) + "-" + String(CONSTANTS.fiveMinutesInSeconds),
-          numDataPoints: 1
+          intervalId: Globals.ethAdrToLowerStr(oracleAddress) + "-" + String(CONSTANTS.fiveMinutesInSeconds)
         }
       ]);
   var response = queryToResponse(priceHistoryQuery);
@@ -739,25 +831,18 @@ function useSyntheticPrices(param, tokenAddress, isLong) {
   } else {
     var match = response._0.priceIntervalManager;
     if (match !== undefined) {
-      var match$1 = match.prices;
-      if (match$1.length !== 1) {
-        finalPriceResponse = {
-          TAG: 0,
-          _0: "Unspecifed graph error",
-          [Symbol.for("name")]: "GraphError"
-        };
-      } else {
-        var match$2 = match$1[0];
-        finalPriceResponse = Ethers$1.BigNumber.from(match$2.startTimestamp.getTime() / 1000 | 0).gt(timestamp) ? ({
-              TAG: 1,
-              _0: MarketSimulation.simulateMarketPriceChange(syntheticPrice, match$2.endPrice, param.totalLockedLong, param.totalLockedShort, param.tokenSupply, isLong),
-              [Symbol.for("name")]: "Response"
-            }) : ({
-              TAG: 1,
-              _0: syntheticPrice,
-              [Symbol.for("name")]: "Response"
-            });
-      }
+      var match$1 = match.latestPriceInterval;
+      var endPrice = match$1.endPrice;
+      var priceQueryTime = Ethers$1.BigNumber.from(match$1.startTimestamp.getTime() / 1000 | 0);
+      finalPriceResponse = priceQueryTime.gt(syntheticPriceLastUpdated) && !oldAssetPrice.eq(endPrice) && priceQueryTime.gt(timestamp) ? ({
+            TAG: 1,
+            _0: MarketSimulation.simulateMarketPriceChange(oldAssetPrice, endPrice, totalLockedLong, totalLockedShort, tokenSupply, isLong),
+            [Symbol.for("name")]: "Response"
+          }) : ({
+            TAG: 1,
+            _0: syntheticPrice,
+            [Symbol.for("name")]: "Response"
+          });
     } else {
       finalPriceResponse = {
         TAG: 0,
@@ -769,6 +854,45 @@ function useSyntheticPrices(param, tokenAddress, isLong) {
   return liftGraphResponse2(initialTokenPriceResponse, finalPriceResponse);
 }
 
+function useOracleLastUpdate(marketIndex) {
+  var oracleLastUpdateQuery = Curry.app(Queries.OraclesLastUpdate.use, [
+        undefined,
+        Caml_option.some(Client.createContext(/* PriceHistory */1)),
+        undefined,
+        undefined,
+        /* NetworkOnly */3,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          marketIndex: marketIndex
+        }
+      ]);
+  var match = oracleLastUpdateQuery.data;
+  if (match !== undefined) {
+    return {
+            TAG: 1,
+            _0: match.oracles[0].lastUpdatedTimestamp,
+            [Symbol.for("name")]: "Response"
+          };
+  }
+  var match$1 = oracleLastUpdateQuery.error;
+  if (match$1 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$1.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
 var ethAdrToLowerStr = Globals.ethAdrToLowerStr;
 
 exports.liftGraphResponse2 = liftGraphResponse2;
@@ -778,6 +902,8 @@ exports.useTotalClaimableFloatForUser = useTotalClaimableFloatForUser;
 exports.useClaimableFloatForUser = useClaimableFloatForUser;
 exports.useStakesForUser = useStakesForUser;
 exports.useUsersBalances = useUsersBalances;
+exports.useUsersPendingMints = useUsersPendingMints;
+exports.useUsersConfirmedMints = useUsersConfirmedMints;
 exports.useFloatBalancesForUser = useFloatBalancesForUser;
 exports.useBasicUserInfo = useBasicUserInfo;
 exports.useSyntheticTokenBalance = useSyntheticTokenBalance;
@@ -787,4 +913,5 @@ exports.Util = Util;
 exports.useTokenMarketId = useTokenMarketId;
 exports.getUnixTime = getUnixTime;
 exports.useSyntheticPrices = useSyntheticPrices;
+exports.useOracleLastUpdate = useOracleLastUpdate;
 /* Misc Not a pure module */

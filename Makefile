@@ -4,7 +4,7 @@ graph-test:
 
 .PHONY: install
 install:
-	cd graph && yarn && cd ../contracts && yarn
+	cd graph && yarn && cd ../contracts && yarn && cd ../dapp && yarn && cd ../scripts && yarn
 
 .PHONY: configure-contract-addresses
 configure-contract-addresses:

@@ -1,6 +1,6 @@
-open Contract
+open Globals
 type markets = {
-  paymentToken: PaymentToken.t,
+  paymentToken: ERC20Mock.t,
   oracleManager: OracleManagerMock.t,
   yieldManager: YieldManagerMock.t,
   longSynth: SyntheticToken.t,
@@ -8,7 +8,7 @@ type markets = {
   marketIndex: int,
 }
 type coreContracts = {
-  // floatCapital_v0: Contract.FloatCapital_v0.t,
+  floatCapital_v0: FloatCapital_v0.t,
   tokenFactory: TokenFactory.t,
   treasury: Treasury_v0.t,
   floatToken: FloatToken.t,
@@ -17,11 +17,25 @@ type coreContracts = {
   markets: array<markets>,
 }
 
-@ocaml.doc(`Generates random number between 1000 and 0.0001 of a token (10^18 in BigNumber units)`)
+module Tuple = {
+  let make2 = fn => (fn(), fn())
+  let make3 = fn => (fn(), fn(), fn())
+  let make4 = fn => (fn(), fn(), fn(), fn())
+  let make5 = fn => (fn(), fn(), fn(), fn(), fn())
+  let make6 = fn => (fn(), fn(), fn(), fn(), fn(), fn())
+  let make7 = fn => (fn(), fn(), fn(), fn(), fn(), fn(), fn())
+  let make8 = fn => (fn(), fn(), fn(), fn(), fn(), fn(), fn(), fn())
+}
+
+@ocaml.doc(`Generates random BigNumber between 1 and 2147483647 (max js int)`)
+let randomInteger = () => Js.Math.random_int(1, Js.Int.max)->Ethers.BigNumber.fromInt
+
+@ocaml.doc(`Generates a random JS integer between 0 and 2147483647 (max js int)`)
+let randomJsInteger = () => Js.Math.random_int(0, Js.Int.max)
+
+@ocaml.doc(`Generates random BigNumber between 0.00001 and 21474.83647 of a token (10^18 in BigNumber units)`)
 let randomTokenAmount = () =>
-  Js.Math.random_int(0, Js.Int.max)
-  ->Ethers.BigNumber.fromInt
-  ->Ethers.BigNumber.mul(Ethers.BigNumber.fromInt(100000))
+  randomInteger()->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("10000000000000"))
 
 type mint =
   | Long(Ethers.BigNumber.t)
@@ -38,23 +52,45 @@ let randomMintLongShort = () => {
   }
 }
 
+let randomAddress = () => Ethers.Wallet.createRandom().address
+
 let createSyntheticMarket = (
   ~admin,
-  ~longShort: LongShort.t,
-  ~fundToken: PaymentToken.t,
+  ~initialMarketSeed=bnFromString("500000000000000000"),
+  ~paymentToken: ERC20Mock.t,
+  ~treasury,
   ~marketName,
   ~marketSymbol,
+  longShort: LongShort.t,
 ) => {
-  JsPromise.all2((
-    OracleManagerMock.make(admin),
-    YieldManagerMock.make(admin, longShort.address, fundToken.address),
-  ))->JsPromise.then(((oracleManager, yieldManager)) => {
-    let _ignorePromise = fundToken->PaymentToken.grantMintRole(~user=yieldManager.address)
+  JsPromise.all3((
+    OracleManagerMock.make(~admin),
+    YieldManagerMock.make(
+      ~admin,
+      ~longShort=longShort.address,
+      ~token=paymentToken.address,
+      ~treasury,
+    ),
+    paymentToken
+    ->ERC20Mock.mint(~_to=admin, ~amount=initialMarketSeed->mul(bnFromInt(100)))
+    ->JsPromise.then(_ =>
+      paymentToken->ERC20Mock.approve(
+        ~spender=longShort.address,
+        ~amount=initialMarketSeed->mul(bnFromInt(100)),
+      )
+    ),
+  ))->JsPromise.then(((oracleManager, yieldManager, _)) => {
+    let _ignorePromise =
+      paymentToken
+      ->ERC20Mock.mINTER_ROLE
+      ->JsPromise.map(minterRole =>
+        paymentToken->ERC20Mock.grantRole(~role=minterRole, ~account=yieldManager.address)
+      )
     longShort
     ->LongShort.newSyntheticMarket(
-      ~marketName,
-      ~marketSymbol,
-      ~paymentToken=fundToken.address,
+      ~syntheticName=marketName,
+      ~syntheticSymbol=marketSymbol,
+      ~paymentToken=paymentToken.address,
       ~oracleManager=oracleManager.address,
       ~yieldManager=yieldManager.address,
     )
@@ -62,12 +98,9 @@ let createSyntheticMarket = (
     ->JsPromise.then(marketIndex => {
       longShort->LongShort.initializeMarket(
         ~marketIndex,
-        ~baseEntryFee=0,
-        ~badLiquidityEntryFee=50,
-        ~baseExitFee=50,
-        ~badLiquidityExitFee=50,
         ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("1000000000000000000"),
         ~kPeriod=Ethers.BigNumber.fromInt(0),
+        ~initialMarketSeed,
       )
     })
   })
@@ -82,14 +115,18 @@ let getAllMarkets = longShort => {
     Belt.Array.range(1, marketIndex)
     ->Array.map(marketIndex =>
       JsPromise.all5((
-        longShort->LongShort.longSynth(~marketIndex)->JsPromise.then(SyntheticToken.at),
-        longShort->LongShort.shortSynth(~marketIndex)->JsPromise.then(SyntheticToken.at),
-        longShort->LongShort.fundTokens(~marketIndex)->JsPromise.then(PaymentToken.at),
-        longShort->LongShort.oracleManagers(~marketIndex)->JsPromise.then(OracleManagerMock.at),
-        longShort->LongShort.yieldManagers(~marketIndex)->JsPromise.then(YieldManagerMock.at),
-      ))->JsPromise.map(((longSynth, shortSynth, fundToken, oracleManager, yieldManager)) => {
+        longShort
+        ->LongShort.syntheticTokens(marketIndex, true /* long */)
+        ->JsPromise.then(SyntheticToken.at),
+        longShort
+        ->LongShort.syntheticTokens(marketIndex, false /* short */)
+        ->JsPromise.then(SyntheticToken.at),
+        longShort->LongShort.paymentTokens(marketIndex)->JsPromise.then(ERC20Mock.at),
+        longShort->LongShort.oracleManagers(marketIndex)->JsPromise.then(OracleManagerMock.at),
+        longShort->LongShort.yieldManagers(marketIndex)->JsPromise.then(YieldManagerMock.at),
+      ))->JsPromise.map(((longSynth, shortSynth, paymentToken, oracleManager, yieldManager)) => {
         {
-          paymentToken: fundToken,
+          paymentToken: paymentToken,
           oracleManager: oracleManager,
           yieldManager: yieldManager,
           longSynth: longSynth,
@@ -102,16 +139,16 @@ let getAllMarkets = longShort => {
   })
 }
 
-let inititialize = (~admin: Ethers.Wallet.t) => {
+let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
   JsPromise.all6((
     FloatCapital_v0.make(),
     Treasury_v0.make(),
     FloatToken.make(),
-    Staker.make(),
-    LongShort.make(),
+    exposeInternals ? Staker.Exposed.make() : Staker.make(),
+    exposeInternals ? LongShort.Exposed.make() : LongShort.make(),
     JsPromise.all2((
-      PaymentToken.make(~name="Pay Token 1", ~symbol="PT1"),
-      PaymentToken.make(~name="Pay Token 2", ~symbol="PT2"),
+      ERC20Mock.make(~name="Pay Token 1", ~symbol="PT1"),
+      ERC20Mock.make(~name="Pay Token 2", ~symbol="PT2"),
     )),
   ))->JsPromise.then(((
     floatCapital,
@@ -121,31 +158,38 @@ let inititialize = (~admin: Ethers.Wallet.t) => {
     longShort,
     (payToken1, payToken2),
   )) => {
-    TokenFactory.make(admin.address, longShort.address)->JsPromise.then(tokenFactory => {
+    TokenFactory.make(
+      ~admin=admin.address,
+      ~longShort=longShort.address,
+    )->JsPromise.then(tokenFactory => {
       JsPromise.all4((
-        floatToken->FloatToken.setup("Float token", "FLOAT TOKEN", staker->Staker.address),
-        treasury->Treasury_v0.setup(admin.address),
-        longShort->LongShort.setup(
-          admin.address,
-          treasury.address,
-          tokenFactory.address,
-          staker->Staker.address,
+        floatToken->FloatToken.initialize3(
+          ~name="Float token",
+          ~symbol="FLOAT TOKEN",
+          ~stakerAddress=staker.address,
         ),
-        staker->Staker.setup(
-          admin.address,
-          longShort.address,
-          floatToken.address,
-          floatCapital.address,
+        treasury->Treasury_v0.initialize(~admin=admin.address),
+        longShort->LongShort.initialize(
+          ~admin=admin.address,
+          ~treasury=treasury.address,
+          ~tokenFactory=tokenFactory.address,
+          ~staker=staker.address,
+        ),
+        staker->Staker.initialize(
+          ~admin=admin.address,
+          ~longShortCoreContract=longShort.address,
+          ~floatToken=floatToken.address,
+          ~floatCapital=floatCapital.address,
         ),
       ))
       ->JsPromise.then(_ => {
         [payToken1, payToken1, payToken2, payToken1]
         ->Array.reduceWithIndex(JsPromise.resolve(), (previousPromise, paymentToken, index) => {
           previousPromise->JsPromise.then(() =>
-            createSyntheticMarket(
+            longShort->createSyntheticMarket(
               ~admin=admin.address,
-              ~longShort,
-              ~fundToken=paymentToken,
+              ~treasury=treasury.address,
+              ~paymentToken,
               ~marketName=`Test Market ${index->Int.toString}`,
               ~marketSymbol=`TM${index->Int.toString}`,
             )
@@ -162,6 +206,7 @@ let inititialize = (~admin: Ethers.Wallet.t) => {
         tokenFactory: tokenFactory,
         treasury: treasury,
         markets: markets,
+        floatCapital_v0: floatCapital,
       })
     })
   })
@@ -170,3 +215,12 @@ let inititialize = (~admin: Ethers.Wallet.t) => {
 let increaseTime: int => JsPromise.t<
   unit,
 > = %raw(`(seconds) => ethers.provider.send("evm_increaseTime", [seconds])`)
+
+type block = {timestamp: int}
+let getBlock: unit => JsPromise.t<block> = %raw(`() => ethers.provider.getBlock()`)
+
+let getRandomTimestampInPast = () => {
+  getBlock()->JsPromise.then(({timestamp}) => {
+    (timestamp - Js.Math.random_int(200, 630720000))->Ethers.BigNumber.fromInt->JsPromise.resolve
+  })
+}

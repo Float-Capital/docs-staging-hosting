@@ -61,7 +61,7 @@ function Loader$Tiny(Props) {
                 )
               }, ".");
   };
-  return React.createElement(React.Fragment, undefined, elipsisDot(inlineLoaderState === 0), elipsisDot(inlineLoaderState === 1), elipsisDot(inlineLoaderState === 2));
+  return React.createElement("div", undefined, elipsisDot(inlineLoaderState === 0), elipsisDot(inlineLoaderState === 1), elipsisDot(inlineLoaderState === 2));
 }
 
 var Tiny = {

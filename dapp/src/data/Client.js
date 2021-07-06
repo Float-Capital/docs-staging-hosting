@@ -2,7 +2,7 @@
 'use strict';
 
 var React = require("react");
-var Config = require("../Config.js");
+var Config = require("../config/Config.js");
 var Ethers = require("../ethereum/Ethers.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var ApolloClient = require("rescript-apollo-client/src/ApolloClient.js");
@@ -61,15 +61,15 @@ function querySwitcherLink(user) {
                 }
               }), httpLink(Config.graphEndpoint), ReasonMLCommunity__ApolloClient.Link.split((function (operation) {
                     var context = operation.getContext();
-                    var isPriceHistory;
-                    if (context !== undefined) {
-                      var match = context.context;
-                      isPriceHistory = match !== undefined ? match === 1 : false;
-                    } else {
-                      isPriceHistory = false;
+                    if (context === undefined) {
+                      return false;
                     }
-                    console.log("isPriceHistory", isPriceHistory);
-                    return isPriceHistory;
+                    var match = context.context;
+                    if (match !== undefined) {
+                      return match === 1;
+                    } else {
+                      return false;
+                    }
                   }), httpLink(Config.priceHistoryGraphEndpoint), ApolloClient__Link_Http_HttpLink.make((function (param) {
                         return "TODO: no (hasura) backend configured yet - http://localhost:8080/v1/graphql";
                       }), undefined, undefined, Caml_option.some(headers !== undefined ? headers : (function (prim) {
@@ -78,7 +78,7 @@ function querySwitcherLink(user) {
 }
 
 function makeClient(user) {
-  return ApolloClient.make(undefined, undefined, undefined, Caml_option.some(querySwitcherLink(user)), ApolloClient__Cache_InMemory_InMemoryCache.make(undefined, undefined, undefined, undefined, undefined, undefined), undefined, undefined, true, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+  return ApolloClient.make(undefined, undefined, undefined, Caml_option.some(querySwitcherLink(user)), ApolloClient__Cache_InMemory_InMemoryCache.make(undefined, undefined, undefined, undefined, undefined, undefined), undefined, undefined, Config.apolloConnectToDevTools, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
 }
 
 var defaultClient = makeClient(undefined);

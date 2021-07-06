@@ -13,8 +13,10 @@ contract FloatToken is ERC20PresetMinterPauser {
 */
 import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
 
-contract FloatToken is ERC20PresetMinterPauserUpgradeable {
-    function initialize(
+import "./interfaces/IFloatToken.sol";
+
+contract FloatToken is IFloatToken, ERC20PresetMinterPauserUpgradeable {
+    function initialize3(
         string calldata name,
         string calldata symbol,
         address stakerAddress
@@ -28,5 +30,15 @@ contract FloatToken is ERC20PresetMinterPauserUpgradeable {
         renounceRole(DEFAULT_ADMIN_ROLE, msg.sender);
         renounceRole(MINTER_ROLE, msg.sender);
         renounceRole(PAUSER_ROLE, msg.sender);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    ///////// FUNCTIONS INHERITED BY ERC20PresetMinterPauserUpgradeable ///////////
+    ///////////////////////////////////////////////////////////////////////////////
+    function mint(address to, uint256 amount)
+        public
+        override(IFloatToken, ERC20PresetMinterPauserUpgradeable)
+    {
+        ERC20PresetMinterPauserUpgradeable.mint(to, amount);
     }
 }

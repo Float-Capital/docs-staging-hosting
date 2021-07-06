@@ -2,28 +2,24 @@
 
 pragma solidity 0.8.3;
 
+import "./ISyntheticToken.sol";
+import "./ILongShort.sol";
+
 abstract contract IStaker {
     function addNewStakingFund(
         uint32 marketIndex,
-        address longTokenAddress,
-        address shortTokenAddress,
+        ISyntheticToken longTokenAddress,
+        ISyntheticToken shortTokenAddress,
         uint256 kInitialMultiplier,
         uint256 kPeriod
     ) external virtual;
 
     function addNewStateForFloatRewards(
-        address longTokenAddress,
-        address shortTokenAddress,
+        uint32 marketIndex,
         uint256 longTokenPrice,
         uint256 shortTokenPrice,
         uint256 longValue,
         uint256 shortValue
-    ) external virtual;
-
-    function stakeFromMint(
-        address tokenAddress,
-        uint256 amount,
-        address user
     ) external virtual;
 
     function stakeFromUser(address from, uint256 amount) public virtual;

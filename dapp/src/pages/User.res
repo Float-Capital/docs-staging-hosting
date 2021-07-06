@@ -2,48 +2,82 @@ open UserUI
 open DataHooks
 open Masonry
 
+let {add, mul, div, toNumber, eq, toString} = module(Ethers.BigNumber)
+
+let getUsersTotalTokenBalance = (balancesResponse: array<Queries.UserTokenBalance.t>) =>
+  balancesResponse->Array.reduce(CONSTANTS.zeroBN, (totalBalanceSum, balanceDataResponse) =>
+    totalBalanceSum->add(
+      balanceDataResponse.syntheticToken.latestPrice.price.price
+      ->mul(balanceDataResponse.tokenBalance)
+      ->div(CONSTANTS.tenToThe18),
+    )
+  )
+
 module UserBalancesCard = {
+  let useRerender = () => {
+    let (_v, setV) = React.useState(_ => 0)
+    () => setV(v => v + 1)
+  }
+
   @react.component
   let make = (~userId) => {
-    /*
-    TODO:
-    * Use the nicer way to get token prices: https://github.com/float-capital/monorepo/issues/228
-    * calculate the correct estimated value
-    * get the total value of the users tokens
- */
     let usersTokensQuery = DataHooks.useUsersBalances(~userId)
+    let usersPendingMintsQuery = DataHooks.useUsersPendingMints(~userId)
+
+    let rerender = useRerender()
 
     <UserColumnCard>
       <UserColumnHeader>
         {`Synthetic assets`->React.string} <img className="inline h-5 ml-2" src="/img/coin.png" />
       </UserColumnHeader>
-      {switch usersTokensQuery {
-      | Loading => <div className="m-auto"> <Loader.Mini /> </div>
+      {switch usersPendingMintsQuery {
+      | Loading => <div className="mx-auto"> <Loader.Mini /> </div>
       | GraphError(string) => string->React.string
-      | Response({totalBalance, balances}) => <>
-          <UserColumnTextCenter>
-            <UserColumnText
-              head=`💰 Synth value` body={`$${totalBalance->Misc.NumberFormat.formatEther}`}
-            />
-          </UserColumnTextCenter>
-          <br />
-          {balances
-          ->Array.keep(({tokenBalance}) => !(tokenBalance->Ethers.BigNumber.eq(CONSTANTS.zeroBN)))
-          ->Array.map(({addr, name, symbol, isLong, tokenBalance, tokensValue, metadata}) =>
-            <UserTokenBox
-              key={`${name}-${isLong ? "long" : "short"}`}
-              name
+      | Response(pendingMint) => <>
+          {pendingMint->Array.length > 0
+            ? <UserColumnTextCenter>
+                <UserColumnText head=`⏳ Pending synths` body={``} /> <br />
+              </UserColumnTextCenter>
+            : React.null}
+          {pendingMint
+          ->Array.map(({marketIndex, isLong, amount, confirmedTimestamp}) =>
+            <UserPendingBox
+              name={(marketIndex->toNumber->Backend.getMarketInfoUnsafe).name}
               isLong
-              tokenAddress={addr}
-              symbol
-              tokens={Misc.NumberFormat.formatEther(tokenBalance)}
-              value={Misc.NumberFormat.formatEther(tokensValue)}
-              metadata>
-              <UserMarketStakeOrRedeem synthAddress={addr->Ethers.Utils.ethAdrToLowerStr} isLong />
-            </UserTokenBox>
+              daiSpend=amount
+              marketIndex
+              txConfirmedTimestamp={confirmedTimestamp->toNumber}
+              rerenderCallback=rerender
+            />
           )
           ->React.array}
         </>
+      }}
+      {switch usersTokensQuery {
+      | Loading => <div className="m-auto"> <Loader.Mini /> </div>
+      | GraphError(string) => string->React.string
+      | Response(balancesQueryResponse) => {
+          let totalBalance = getUsersTotalTokenBalance(balancesQueryResponse)
+          let usersBalancesComponents =
+            balancesQueryResponse
+            ->Array.keep(({tokenBalance}) => !(tokenBalance->eq(CONSTANTS.zeroBN)))
+            ->Array.map(userBalanceData => {
+              <UserTokenBox userBalanceData>
+                <UserMarketStakeOrRedeem
+                  synthId=userBalanceData.syntheticToken.id
+                  syntheticSide=userBalanceData.syntheticToken.tokenType
+                />
+              </UserTokenBox>
+            })
+          <>
+            <UserColumnTextCenter>
+              <UserColumnText
+                head=`💰 Synth value` body={`$${totalBalance->Misc.NumberFormat.formatEther}`}
+              />
+            </UserColumnTextCenter>
+            {usersBalancesComponents->React.array}
+          </>
+        }
       }}
     </UserColumnCard>
   }
@@ -55,11 +89,8 @@ let getUsersTotalStakeValue = (~stakes) => {
   Array.forEach(stakes, (stake: Queries.CurrentStakeDetailed.t) => {
     let syntheticToken = stake.currentStake.syntheticToken
     let price = syntheticToken.latestPrice.price.price
-    let value =
-      stake.currentStake.amount
-      ->Ethers.BigNumber.mul(price)
-      ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
-    totalStakedValue := totalStakedValue.contents->Ethers.BigNumber.add(value)
+    let value = stake.currentStake.amount->mul(price)->div(CONSTANTS.tenToThe18)
+    totalStakedValue := totalStakedValue.contents->add(value)
   })
 
   totalStakedValue
@@ -69,18 +100,18 @@ module UserTotalInvestedCard = {
   @react.component
   let make = (~stakes, ~userId) => {
     let usersTokensQuery = DataHooks.useUsersBalances(~userId)
-
     let totalStakedValue = getUsersTotalStakeValue(~stakes)
 
     <>
       {switch usersTokensQuery {
       | Loading => <div className="m-auto"> <Loader.Mini /> </div>
       | GraphError(string) => string->React.string
-      | Response({totalBalance}) =>
+      | Response(usersBalanceData) =>
+        let totalBalance = getUsersTotalTokenBalance(usersBalanceData)
         <UserTotalValue
           totalValueNameSup=`Portfolio`
           totalValueNameSub=`Value`
-          totalValue={totalBalance->Ethers.BigNumber.add(totalStakedValue.contents)}
+          totalValue={totalBalance->add(totalStakedValue.contents)}
         />
       }}
     </>
@@ -107,8 +138,8 @@ module UserProfileCard = {
       ~trailingCharacters=3,
     )
     let joinedStr = userInfo.joinedAt->DateFns.format(#"do MMM ''yy")
-    let txStr = userInfo.transactionCount->Ethers.BigNumber.toString
-    let gasStr = userInfo.gasUsed->Ethers.BigNumber.toString->Misc.NumberFormat.formatInt
+    let txStr = userInfo.transactionCount->toString
+    let gasStr = userInfo.gasUsed->toString->Misc.NumberFormat.formatInt
 
     <UserColumnCard>
       <UserProfileHeader address={addressStr} />
@@ -119,8 +150,6 @@ module UserProfileCard = {
           <UserColumnText head=`⛽ Gas used` body={gasStr} />
           <UserColumnText head=`🏃 No. txs` body={txStr} />
         </div>
-        // TODO: fetch from graph somehow
-        // <UserColumnText icon="/img/discord.png" head=`Discord` body=`✅` />
       </UserColumnTextList>
     </UserColumnCard>
   }
@@ -141,7 +170,6 @@ let onQueryError = (msg: string) => {
 
 let onQuerySuccess = (data: userData) => {
   <UserContainer>
-    // <UserBanner />
     <Container>
       <Divider>
         <UserProfileCard userInfo={data.userInfo} />
@@ -164,7 +192,7 @@ let make = () => {
   let optCurrentUser = RootProvider.useCurrentUser()
   let router = Next.Router.useRouter()
   let user = switch Js.Dict.get(router.query, `user`) {
-  | None => `no user provided` // TODO: something more useful!
+  | None => `No user provided`
   | Some(userStr) => userStr->Js.String.toLowerCase
   }
 
@@ -199,9 +227,7 @@ let make = () => {
                       </p>
                     </UserColumnTextCenter>
                     <div className="w-40 mx-auto">
-                      <Next.Link href="/">
-                        <Button.Small> {`MARKETS`} </Button.Small>
-                      </Next.Link>
+                      <Next.Link href="/"> <Button.Small> {`MARKETS`} </Button.Small> </Next.Link>
                     </div>
                   </>
                 : notCurrentUserMessage()

@@ -6,9 +6,54 @@ const { expect } = require("chai");
 `)
 
 let bnEqual: (
+  ~message: string=?,
   Ethers.BigNumber.t,
   Ethers.BigNumber.t,
-) => unit = %raw(`(number1, number2) => expect(number1).to.equal(number2)`)
+) => unit = %raw(`(message, number1, number2) => expect(number1, message).to.equal(number2)`)
+
+let recordEqualFlatLabeled: (~expected: 'a, ~actual: 'a) => unit = (~expected, ~actual) => {
+  let a = %raw("(expected, actual) => {
+    for(const key of Object.keys(actual)){
+      expect(actual[key]).to.equal(expected[key])
+    }
+  }")
+  a(expected, actual)
+}
+
+let recordEqualFlat: ('a, 'a) => unit = (expected, actual) => {
+  let a = %raw("(expected, actual) => {
+    for(const key of Object.keys(actual)){
+      expect(actual[key]).to.equal(expected[key])
+    }
+  }")
+  a(expected, actual)
+}
+
+let recordEqualDeep: ('a, 'a) => unit = (expected, actual) => {
+  let a = %raw("(expected, actual) => {
+    for(const key of Object.keys(actual)){
+      expect(actual[key]).to.deep.equal(expected[key])
+    }
+  }")
+  a(expected, actual)
+}
+let intEqual: (
+  ~message: string=?,
+  int,
+  int,
+) => unit = %raw(`(message, number1, number2) => expect(number1, message).to.equal(number2)`)
+
+let addressEqual: (
+  ~message: string=?,
+  ~otherAddress: Ethers.ethAddress,
+  Ethers.ethAddress,
+) => unit = %raw(`(message, address1, address2) => expect(address1, message).to.equal(address2)`)
+
+let boolEqual: (
+  ~message: string=?,
+  bool,
+  bool,
+) => unit = %raw(`(message, number1, number2) => expect(number1, message).to.equal(number2)`)
 
 let bnWithin: (
   Ethers.BigNumber.t,
@@ -17,15 +62,16 @@ let bnWithin: (
 ) => unit = %raw(`(number1, min, max) => expect(number1).to.be.within(min, max)`)
 
 let bnCloseTo: (
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
+  ~message: string=?,
   ~distance: int,
-) => unit = %raw(`(number1, number2, distance) => expect(number1).to.be.closeTo(number2, distance)`)
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+) => unit = %raw(`(message, distance, number1, number2) => expect(number1, message).to.be.closeTo(number2, distance)`)
 
 type eventCheck
 let callEmitEvents: (
-  ~call: JsPromise.t<Contract.transaction>,
-  ~contract: Contract.t,
+  ~call: JsPromise.t<ContractHelpers.transaction>,
+  ~contract: ContractHelpers.t,
   ~eventName: string,
 ) => eventCheck = %raw(`(call, contract, eventName) => expect(call).to.emit(contract, eventName)`)
 @send external withArgs0: eventCheck => JsPromise.t<unit> = "withArgs"
@@ -34,65 +80,31 @@ let callEmitEvents: (
 @send external withArgs3: (eventCheck, 'a, 'b, 'c) => JsPromise.t<unit> = "withArgs"
 @send external withArgs4: (eventCheck, 'a, 'b, 'c, 'd) => JsPromise.t<unit> = "withArgs"
 @send external withArgs5: (eventCheck, 'a, 'b, 'c, 'd, 'e) => JsPromise.t<unit> = "withArgs"
+
+@send external withArgs5Return: (eventCheck, 'a, 'b, 'c, 'd, 'e) => eventCheck = "withArgs"
+
 @send external withArgs6: (eventCheck, 'a, 'b, 'c, 'd, 'e, 'f) => JsPromise.t<unit> = "withArgs"
 @send external withArgs7: (eventCheck, 'a, 'b, 'c, 'd, 'e, 'f, 'g) => JsPromise.t<unit> = "withArgs"
 @send
 external withArgs8: (eventCheck, 'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h) => JsPromise.t<unit> = "withArgs"
 
-let expectContractCall: (
-  ~functionName: string,
-  ~contract: Contract.t,
-) => unit = %raw(`(functionName, contract) => expect(functionName).to.be.calledOnContract(contract)`)
-
-type args // TODO: make this cleaner, more typesafe, and hide implementation detail...
-let expectContractCallArgsRaw: (
-  ~functionName: string,
-  ~contract: Contract.t,
-  args,
-) => unit = %raw(`(functionName, contract, args) => expect(functionName).to.be.calledOnContractWithArgs(contract, args)`)
-let expectContractCallArgs0 = (~functionName: string, ~contract: Contract.t) =>
-  expectContractCallArgsRaw(~functionName, ~contract, []->Obj.magic)
-let expectContractCallArgs1 = (~functionName: string, ~contract: Contract.t, ~args: array<'a>) =>
-  expectContractCallArgsRaw(~functionName, ~contract, args->Obj.magic)
-let expectContractCallArgs2 = (~functionName: string, ~contract: Contract.t, ~args: ('a, 'b)) =>
-  expectContractCallArgsRaw(~functionName, ~contract, args->Obj.magic)
-let expectContractCallArgs3 = (~functionName: string, ~contract: Contract.t, ~args: ('a, 'b, 'c)) =>
-  expectContractCallArgsRaw(~functionName, ~contract, args->Obj.magic)
-let expectContractCallArgs4 = (
-  ~functionName: string,
-  ~contract: Contract.t,
-  ~args: ('a, 'b, 'c, 'd),
-) => expectContractCallArgsRaw(~functionName, ~contract, args->Obj.magic)
-let expectContractCallArgs5 = (
-  ~functionName: string,
-  ~contract: Contract.t,
-  ~args: ('a, 'b, 'c, 'd, 'e),
-) => expectContractCallArgsRaw(~functionName, ~contract, args->Obj.magic)
-let expectContractCallArgs6 = (
-  ~functionName: string,
-  ~contract: Contract.t,
-  ~args: ('a, 'b, 'c, 'd, 'e, 'f),
-) => expectContractCallArgsRaw(~functionName, ~contract, args->Obj.magic)
-let expectContractCallArgs7 = (
-  ~functionName: string,
-  ~contract: Contract.t,
-  ~args: ('a, 'b, 'c, 'd, 'e, 'f, 'g),
-) => expectContractCallArgsRaw(~functionName, ~contract, args->Obj.magic)
+let expectToNotEmit: eventCheck => JsPromise.t<unit> = _eventCheck =>
+  %raw(`_eventCheck.then(() => assert.fail('An event was emitted when it should not have been')).catch(() => {})`)
 
 let expectRevertNoReason: (
-  ~transaction: JsPromise.t<Contract.transaction>,
+  ~transaction: JsPromise.t<ContractHelpers.transaction>,
 ) => JsPromise.t<unit> = %raw(`(transaction) => expect(transaction).to.be.reverted`)
 let expectRevert: (
-  ~transaction: JsPromise.t<Contract.transaction>,
+  ~transaction: JsPromise.t<ContractHelpers.transaction>,
   ~reason: string,
 ) => JsPromise.t<
   unit,
 > = %raw(`(transaction, reason) => expect(transaction).to.be.revertedWith(reason)`)
 
 let changeBallance: (
-  ~transaction: unit => JsPromise.t<Contract.transaction>,
-  ~token: Contract.t,
-  ~to_: Ethers.Wallet.t,
+  ~transaction: unit => JsPromise.t<ContractHelpers.transaction>,
+  ~token: ContractHelpers.t,
+  ~to_: Ethers.ethAddress,
   ~amount: Ethers.BigNumber.t,
 ) => JsPromise.t<
   unit,

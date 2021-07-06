@@ -10,12 +10,6 @@ module StakeForm = %form(
   }
 )
 
-let useBalanceAndApproved = (~erc20Address, ~spender) => {
-  let {Swr.data: optBalance} = ContractHooks.useErc20BalanceRefresh(~erc20Address)
-  let {data: optAmountApproved} = ContractHooks.useERC20ApprovedRefresh(~erc20Address, ~spender)
-  (optBalance, optAmountApproved)
-}
-
 module UnstakeTxStatusModal = {
   @react.component
   let make = (~txStateUnstake, ~resetFormButton) => {
@@ -73,10 +67,7 @@ module StakeFormInput = {
     ~buttonText,
   ) =>
     <Form className="" onSubmit>
-      // optBalance Todo
-      <AmountInput
-        value optBalance={optBalance} disabled onBlur onChange placeholder={"Unstake"} onMaxClick
-      />
+      <AmountInput value optBalance={optBalance} disabled onBlur onChange onMaxClick />
       <Button onClick={_ => onSubmit()} disabled={buttonDisabled}> {buttonText} </Button>
       {txStateModal}
     </Form>

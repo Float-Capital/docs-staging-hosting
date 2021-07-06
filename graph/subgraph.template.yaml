@@ -14,8 +14,9 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
+        - ExecuteNextPriceMintSettlementUser
+        - ExecuteNextPriceRedeemSettlementUser
         - V1
-        - FeesLevied
         - SyntheticTokenCreated
         - LongMinted
         - LongRedeem
@@ -23,17 +24,17 @@ dataSources:
         - ShortMinted
         - ShortRedeem
         - TokenPriceRefreshed
-        - FeesChanges
         - ValueLockedInSystem
       abis:
         - name: LongShort
           file: ./abis/LongShort.json
       eventHandlers:
-        - event: V1(address,address,address)
-
+        - event: V1(address,address,address,address)
           handler: handleV1
-        - event: FeesLevied(uint32,uint256)
-          handler: handleFeesLevied
+        - event: ExecuteNextPriceMintSettlementUser(address,uint32,bool,uint256)
+          handler: handleExecuteNextPriceMintSettlementUser
+        - event: ExecuteNextPriceRedeemSettlementUser(address,uint32,bool,uint256)
+          handler: handleExecuteNextPriceRedeemSettlementUser
         - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
           handler: handleSyntheticTokenCreated
         - event: LongMinted(uint32,uint256,uint256,uint256,address)
@@ -46,12 +47,10 @@ dataSources:
           handler: handleShortMinted
         - event: ShortRedeem(uint32,uint256,uint256,uint256,address)
           handler: handleShortRedeem
-        - event: TokenPriceRefreshed(uint32,uint256,uint256)
-          handler: handleTokenPriceRefreshed
+
         - event: ValueLockedInSystem(uint32,uint256,uint256,uint256)
           handler: handleValueLockedInSystem
-        - event: FeesChanges(uint32,uint256,uint256,uint256,uint256)
-          handler: handleFeesChanges
+
       file: ./src/float.ts
 
   - kind: ethereum/contract
@@ -66,27 +65,31 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - DeployV0
-        - StateAdded
-        - StakeWithdrawn
+        - DeployV1
         - FloatMinted
-        - FloatAccumulated
+        - MarketAddedToStaker
+        - MarketLaunchIncentiveParametersChanges
+        - StakeAdded
+        - StakeWithdrawn
+        - StateAdded
       abis:
         - name: Staker
           file: ./abis/Staker.json
       eventHandlers:
         - event: DeployV1(address)
           handler: handleDeployV1
-        - event: StateAdded(address,uint256,uint256,uint256)
-          handler: handleStateAdded
+        - event: FloatMinted(address,uint32,uint256,uint256,uint256)
+          handler: handleFloatMinted
+        - event: MarketAddedToStaker(uint32,uint256)
+          handler: handleMarketAddedToStaker
+        - event: MarketLaunchIncentiveParametersChanges(uint32,uint256,uint256)
+          handler: handleMarketLaunchIncentiveParametersChanges
         - event: StakeAdded(address,address,uint256,uint256)
           handler: handleStakeAdded
         - event: StakeWithdrawn(address,address,uint256)
           handler: handleStakeWithdrawn
-        - event: FloatMinted(address,address,uint256,uint256)
-          handler: handleFloatMinted
-        - event: KFactorParametersChanges(uint32,uint256,uint256)
-          handler: handleKFactorParametersChanges
+        - event: StateAdded(uint32,uint256,uint256,uint256)
+          handler: handleStateAdded
       file: ./src/staker.ts
 
 templates:

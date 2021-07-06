@@ -87,5 +87,3 @@ let simulateMarketPriceChange = (
     }
   }
 }
-
-// TO DO - INCLUDE YIELD (MAYBE), FEES, ETC.

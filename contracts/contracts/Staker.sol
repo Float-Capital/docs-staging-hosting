@@ -5,140 +5,139 @@ pragma solidity 0.8.3;
 import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
 
-import "./LongShort.sol";
-import "./FloatToken.sol";
+import "./interfaces/IFloatToken.sol";
+import "./interfaces/ILongShort.sol";
 import "./interfaces/IStaker.sol";
 
-/*
-    ###### Purpose of contract ########
-    This smart contract allows users to securely stake synthetic asset
-    tokens created through the float protocol.
-
-    Staking sythentic tokens will ensure that the liquidity of the
-    synthetic market is increased, and entitle users to FLOAT rewards.
-*/
-
-/** @title Staker Contract */
 contract Staker is IStaker, Initializable {
-    struct RewardState {
-        uint256 timestamp;
-        uint256 accumulativeFloatPerToken;
-    }
+    /*╔═════════════════════════════╗
+      ║          VARIABLES          ║
+      ╚═════════════════════════════╝*/
 
-    ////////////////////////////////////
-    //////// CONSTANTS /////////////////
-    ////////////////////////////////////
+    // Fixed-precision constants
+    uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
 
-    // Controls the k-factor, a multiplier for incentivising early stakers.
-    //   token market index -> value
-    mapping(uint256 => uint256) public kFactorPeriods; // seconds
-    mapping(uint256 => uint256) public kFactorInitialMultipliers; // e18 scale
-    uint256[45] private __stakeParametersGap;
-
-    ////////////////////////////////////
-    //////// VARIABLES /////////////////
-    ////////////////////////////////////
-
-    // Global state.
+    // Global state
     address public admin;
     address public floatCapital;
     uint16 public floatPercentage;
-    uint256 public initialTimestamp;
-    LongShort public floatContract;
-    FloatToken public floatToken;
-    uint256[45] private __globalParamsGap;
 
-    // User state.
-    //   token -> user -> value
-    mapping(address => mapping(address => uint256)) public userAmountStaked;
-    mapping(address => mapping(address => uint256))
+    ILongShort public longShortCoreContract;
+    IFloatToken public floatToken;
+
+    // Market specific
+    mapping(uint32 => uint256) public marketLaunchIncentivePeriod; // seconds
+    mapping(uint32 => uint256) public marketLaunchIncentiveMultipliers; // e18 scale
+    mapping(uint32 => uint256) public marketUnstakeFeeBasisPoints;
+
+    mapping(uint32 => mapping(bool => ISyntheticToken)) public syntheticTokens;
+
+    mapping(ISyntheticToken => uint32) public marketIndexOfToken;
+
+    // Reward specific
+    mapping(uint32 => uint256) public latestRewardIndex;
+    mapping(uint32 => mapping(uint256 => RewardState))
+        public syntheticRewardParams;
+    struct RewardState {
+        uint256 timestamp;
+        uint256 accumulativeFloatPerLongToken;
+        uint256 accumulativeFloatPerShortToken;
+    }
+
+    // User specific
+    mapping(uint32 => mapping(address => uint256))
         public userIndexOfLastClaimedReward;
-    uint256[45] private __userInfoGap;
+    mapping(ISyntheticToken => mapping(address => uint256))
+        public userAmountStaked;
 
-    // Token state.
-    mapping(address => bool) syntheticValid; // token -> is valid?
-    mapping(address => uint32) public marketIndexOfToken; // token -> market index
-    mapping(address => mapping(uint256 => RewardState))
-        public syntheticRewardParams; // token -> index -> state
-    mapping(address => uint256) public latestRewardIndex; // token -> index
-
-    ////////////////////////////////////
-    /////////// EVENTS /////////////////
-    ////////////////////////////////////
+    /*╔════════════════════════════╗
+      ║           EVENTS           ║
+      ╚════════════════════════════╝*/
 
     event DeployV1(address floatToken);
 
+    event MarketAddedToStaker(uint32 marketIndex, uint256 exitFeeBasisPoints);
+
     event StateAdded(
-        address tokenAddress,
+        uint32 marketIndex,
         uint256 stateIndex,
-        uint256 timestamp,
-        uint256 accumulative
+        uint256 accumulativeLong,
+        uint256 accumulativeShort
     );
 
     event StakeAdded(
         address user,
-        address tokenAddress,
+        address token,
         uint256 amount,
         uint256 lastMintIndex
     );
 
-    event StakeWithdrawn(address user, address tokenAddress, uint256 amount);
+    event StakeWithdrawn(address user, address token, uint256 amount);
 
     event FloatMinted(
         address user,
-        address tokenAddress,
-        uint256 amount,
+        uint32 marketIndex,
+        uint256 amountLong,
+        uint256 amountShort,
         uint256 lastMintIndex
     );
 
-    event KFactorParametersChanges(
+    event MarketLaunchIncentiveParametersChanges(
         uint32 marketIndex,
         uint256 period,
         uint256 multiplier
     );
 
-    ////////////////////////////////////
-    /////////// MODIFIERS //////////////
-    ////////////////////////////////////
+    /*╔═════════════════════════════╗
+      ║          MODIFIERS          ║
+      ╚═════════════════════════════╝*/
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "not admin");
         _;
     }
 
-    modifier onlyValidSynthetic(address _synthAddress) {
-        require(syntheticValid[_synthAddress], "not valid synth");
+    modifier onlyValidSynthetic(ISyntheticToken _synth) {
+        require(marketIndexOfToken[_synth] != 0, "not valid synth");
+        _;
+    }
+
+    modifier onlyValidMarket(uint32 marketIndex) {
+        require(
+            address(syntheticTokens[marketIndex][true]) != address(0),
+            "not valid market"
+        );
+        // require(latestRewardIndex[marketIndex] != 0, "not valid market");
         _;
     }
 
     modifier onlyFloat() {
-        require(msg.sender == address(floatContract));
+        require(msg.sender == address(longShortCoreContract));
         _;
     }
 
-    ////////////////////////////////////
-    ///// CONTRACT SET-UP //////////////
-    ////////////////////////////////////
+    /*╔═════════════════════════════╗
+      ║       CONTRACT SET-UP       ║
+      ╚═════════════════════════════╝*/
 
     function initialize(
         address _admin,
-        address _floatContract,
+        address _longShortCoreContract,
         address _floatToken,
         address _floatCapital
     ) public initializer {
         admin = _admin;
         floatCapital = _floatCapital;
-        initialTimestamp = block.timestamp;
-        floatContract = LongShort(_floatContract);
-        floatToken = FloatToken(_floatToken);
-        floatPercentage = 1500;
+        longShortCoreContract = ILongShort(_longShortCoreContract);
+        floatToken = IFloatToken(_floatToken);
+        floatPercentage = 2500;
 
         emit DeployV1(_floatToken);
     }
 
-    ////////////////////////////////////
-    /// MULTISIG ADMIN FUNCTIONS ///////
-    ////////////////////////////////////
+    /*╔═════════════════════════════╗
+      ║       MULTI-SIG ADMIN       ║
+      ╚═════════════════════════════╝*/
 
     function changeAdmin(address _admin) external onlyAdmin {
         admin = _admin;
@@ -149,58 +148,73 @@ contract Staker is IStaker, Initializable {
         floatPercentage = _newPercentage;
     }
 
-    function changeKFactorParameters(
+    function changeMarketLaunchIncentiveParameters(
         uint32 marketIndex,
         uint256 period,
         uint256 initialMultiplier
     ) external onlyAdmin {
-        _changeKFactorParameters(marketIndex, period, initialMultiplier);
+        _changeMarketLaunchIncentiveParameters(
+            marketIndex,
+            period,
+            initialMultiplier
+        );
     }
 
-    function _changeKFactorParameters(
+    function _changeMarketLaunchIncentiveParameters(
         uint32 marketIndex,
         uint256 period,
         uint256 initialMultiplier
     ) internal {
         require(
             initialMultiplier >= 1e18,
-            "Initial kFactorMultiplier must be >= 1e18"
+            "marketLaunchIncentiveMultiplier must be >= 1e18"
         );
 
-        kFactorPeriods[marketIndex] = period;
-        kFactorInitialMultipliers[marketIndex] = initialMultiplier;
+        marketLaunchIncentivePeriod[marketIndex] = period;
+        marketLaunchIncentiveMultipliers[marketIndex] = initialMultiplier;
 
-        emit KFactorParametersChanges(marketIndex, period, initialMultiplier);
+        emit MarketLaunchIncentiveParametersChanges(
+            marketIndex,
+            period,
+            initialMultiplier
+        );
     }
 
-    ////////////////////////////////////
-    /////////// STAKING SETUP //////////
-    ////////////////////////////////////
+    /*╔═════════════════════════════╗
+      ║        STAKING SETUP        ║
+      ╚═════════════════════════════╝*/
 
     function addNewStakingFund(
         uint32 marketIndex,
-        address longTokenAddress,
-        address shortTokenAddress,
+        ISyntheticToken longToken,
+        ISyntheticToken shortToken,
         uint256 kInitialMultiplier,
         uint256 kPeriod
     ) external override onlyFloat {
-        syntheticValid[longTokenAddress] = true;
-        syntheticValid[shortTokenAddress] = true;
-        marketIndexOfToken[longTokenAddress] = marketIndex;
-        marketIndexOfToken[shortTokenAddress] = marketIndex;
+        marketIndexOfToken[longToken] = marketIndex;
+        marketIndexOfToken[shortToken] = marketIndex;
 
-        syntheticRewardParams[longTokenAddress][0].timestamp = block.timestamp;
-        syntheticRewardParams[longTokenAddress][0]
-            .accumulativeFloatPerToken = 0;
+        syntheticRewardParams[marketIndex][0].timestamp = block.timestamp;
+        syntheticRewardParams[marketIndex][0].accumulativeFloatPerLongToken = 0;
+        syntheticRewardParams[marketIndex][0]
+        .accumulativeFloatPerShortToken = 0;
 
-        syntheticRewardParams[shortTokenAddress][0].timestamp = block.timestamp;
-        syntheticRewardParams[shortTokenAddress][0]
-            .accumulativeFloatPerToken = 0;
+        syntheticTokens[marketIndex][true] = longToken;
+        syntheticTokens[marketIndex][false] = shortToken;
 
-        _changeKFactorParameters(marketIndex, kPeriod, kInitialMultiplier);
+        _changeMarketLaunchIncentiveParameters(
+            marketIndex,
+            kPeriod,
+            kInitialMultiplier
+        );
 
-        emit StateAdded(longTokenAddress, 0, block.timestamp, 0);
-        emit StateAdded(shortTokenAddress, 0, block.timestamp, 0);
+        marketUnstakeFeeBasisPoints[marketIndex] = 50; /* Hardcoding 50 basis points for the time being */
+        emit MarketAddedToStaker(
+            marketIndex,
+            marketUnstakeFeeBasisPoints[marketIndex]
+        );
+
+        emit StateAdded(marketIndex, 0, 0, 0);
     }
 
     ////////////////////////////////////
@@ -208,61 +222,16 @@ contract Staker is IStaker, Initializable {
     ////////////////////////////////////
 
     /*
-     * Computes the current 'r' value, i.e. the number of float tokens a user
-     * earns per second for every longshort token they've staked. The returned
-     * value has a fixed decimal scale of 1e42 (!!!) for numerical stability.
-     */
-    function calculateFloatPerSecond(
-        uint256 longValue,
-        uint256 shortValue,
-        uint256 tokenPrice, // price of the token
-        address token, // long or short token address
-        bool isLong // whether it's the long or short token
-    ) public view returns (uint256) {
-        // Edge-case: no float is issued in an empty market.
-        if (longValue == 0 && shortValue == 0) {
-            return 0;
-        }
-
-        // Parameters controlling the float issuance multiplier.
-        (uint256 kPeriod, uint256 kInitialMultiplier) =
-            getKFactorParameters(marketIndexOfToken[token]);
-
-        // Sanity check - under normal circumstances, the multipliers should
-        // *never* be set to a value < 1e18, as there are guards against this.
-        assert(kInitialMultiplier >= 1e18);
-
-        // A float issuance multiplier that starts high and decreases linearly
-        // over time to a value of 1. This incentivises users to stake early.
-        uint256 k = 1e18;
-        if (block.timestamp - initialTimestamp <= kPeriod) {
-            k =
-                kInitialMultiplier -
-                (((kInitialMultiplier - 1e18) *
-                    (block.timestamp - initialTimestamp)) / kPeriod);
-        }
-
-        // Float is scaled by the percentage of the total market value held in
-        // the opposite position. This incentivises users to stake on the
-        // weaker position.
-        if (isLong) {
-            return ((k * shortValue) * tokenPrice) / (longValue + shortValue);
-        } else {
-            return ((k * longValue) * tokenPrice) / (longValue + shortValue);
-        }
-    }
-
-    /*
      * Returns the K factor parameters for the given market with sensible
      * defaults if they haven't been set yet.
      */
-    function getKFactorParameters(uint32 marketIndex)
+    function getMarketLaunchIncentiveParameters(uint32 marketIndex)
         internal
         view
         returns (uint256, uint256)
     {
-        uint256 period = kFactorPeriods[marketIndex];
-        uint256 multiplier = kFactorInitialMultipliers[marketIndex];
+        uint256 period = marketLaunchIncentivePeriod[marketIndex];
+        uint256 multiplier = marketLaunchIncentiveMultipliers[marketIndex];
         if (multiplier == 0) {
             multiplier = 1e18; // multiplier of 1 by default
         }
@@ -270,13 +239,78 @@ contract Staker is IStaker, Initializable {
         return (period, multiplier);
     }
 
+    function getKValue(uint32 marketIndex) internal view returns (uint256) {
+        // Parameters controlling the float issuance multiplier.
+        (
+            uint256 kPeriod,
+            uint256 kInitialMultiplier
+        ) = getMarketLaunchIncentiveParameters(marketIndex);
+
+        // Sanity check - under normal circumstances, the multipliers should
+        // *never* be set to a value < 1e18, as there are guards against this.
+        assert(kInitialMultiplier >= 1e18);
+
+        uint256 initialTimestamp = syntheticRewardParams[marketIndex][0]
+        .timestamp;
+
+        if (block.timestamp - initialTimestamp <= kPeriod) {
+            return
+                kInitialMultiplier -
+                (((kInitialMultiplier - 1e18) *
+                    (block.timestamp - initialTimestamp)) / kPeriod);
+        } else {
+            return 1e18;
+        }
+    }
+
+    /*
+     * Computes the current 'r' value, i.e. the number of float tokens a user
+     * earns per second for every longshort token they've staked. The returned
+     * value has a fixed decimal scale of 1e42 (!!!) for numerical stability.
+     */
+    function calculateFloatPerSecond(
+        uint32 marketIndex,
+        uint256 longPrice,
+        uint256 shortPrice,
+        uint256 longValue,
+        uint256 shortValue
+    )
+        internal
+        view
+        returns (uint256 longFloatPerSecond, uint256 shortFloatPerSecond)
+    {
+        // Edge-case: no float is issued in an empty market.
+        if (longValue == 0 && shortValue == 0) {
+            return (0, 0);
+        }
+
+        // A float issuance multiplier that starts high and decreases linearly
+        // over time to a value of 1. This incentivises users to stake early.
+        uint256 k = getKValue(marketIndex);
+
+        uint256 totalLocked = (longValue + shortValue);
+
+        // Float is scaled by the percentage of the total market value held in
+        // the opposite position. This incentivises users to stake on the
+        // weaker position.
+        return (
+            ((k * shortValue) * longPrice) / totalLocked,
+            ((k * longValue) * shortPrice) / totalLocked
+        );
+    }
+
     /*
      * Computes the time since last state point for the given token in seconds.
      */
-    function calculateTimeDelta(address token) internal view returns (uint256) {
+    function calculateTimeDelta(uint32 marketIndex)
+        internal
+        view
+        returns (uint256)
+    {
         return
             block.timestamp -
-            syntheticRewardParams[token][latestRewardIndex[token]].timestamp;
+            syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
+            .timestamp;
     }
 
     /*
@@ -284,89 +318,106 @@ contract Staker is IStaker, Initializable {
      * cumulative 'r' value to avoid looping during issuance. Note that the
      * cumulative sum is kept in 1e42 scale (!!!) to avoid numerical issues.
      */
-    function calculateNewCumulative(
+    function calculateNewCumulativeRate(
+        uint32 marketIndex,
+        uint256 longPrice,
+        uint256 shortPrice,
         uint256 longValue,
-        uint256 shortValue,
-        uint256 tokenPrice,
-        address token, // either long or short token address
-        bool isLong // tells us which one
-    ) internal view returns (uint256) {
+        uint256 shortValue
+    )
+        internal
+        view
+        returns (uint256 longCumulativeRates, uint256 shortCumulativeRates)
+    {
         // Compute the current 'r' value for float issuance per second.
-        uint256 floatPerSecond =
-            calculateFloatPerSecond(
-                longValue,
-                shortValue,
-                tokenPrice,
-                token,
-                isLong
-            );
+        (
+            uint256 longFloatPerSecond,
+            uint256 shortFloatPerSecond
+        ) = calculateFloatPerSecond(
+            marketIndex,
+            longPrice,
+            shortPrice,
+            longValue,
+            shortValue
+        );
 
         // Compute time since last state point for the given token.
-        uint256 timeDelta = calculateTimeDelta(token);
+        uint256 timeDelta = calculateTimeDelta(marketIndex);
 
-        // Compute new cumulative 'r' value total.
-        return
-            syntheticRewardParams[token][latestRewardIndex[token]]
-                .accumulativeFloatPerToken + (timeDelta * floatPerSecond);
+        // // Compute new cumulative 'r' value total.
+        return (
+            syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
+            .accumulativeFloatPerLongToken + (timeDelta * longFloatPerSecond),
+            syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
+            .accumulativeFloatPerShortToken + (timeDelta * shortFloatPerSecond)
+        );
     }
 
     /*
      * Creates a new state point for the given token and updates indexes.
      */
     function setRewardObjects(
+        uint32 marketIndex,
+        uint256 longPrice,
+        uint256 shortPrice,
         uint256 longValue,
-        uint256 shortValue,
-        uint256 tokenPrice, // long or short token price
-        address token,
-        bool isLong
+        uint256 shortValue
     ) internal {
-        uint256 newIndex = latestRewardIndex[token] + 1;
-
-        // Set cumulative 'r' value on new state point.
-        syntheticRewardParams[token][newIndex]
-            .accumulativeFloatPerToken = calculateNewCumulative(
+        (
+            uint256 longAccumulativeRates,
+            uint256 shortAccumulativeRates
+        ) = calculateNewCumulativeRate(
+            marketIndex,
+            longPrice,
+            shortPrice,
             longValue,
-            shortValue,
-            tokenPrice,
-            token,
-            isLong
+            shortValue
         );
 
+        uint256 newIndex = latestRewardIndex[marketIndex] + 1;
+
+        // Set cumulative 'r' value on new state point.
+        syntheticRewardParams[marketIndex][newIndex]
+        .accumulativeFloatPerLongToken = longAccumulativeRates;
+        syntheticRewardParams[marketIndex][newIndex]
+        .accumulativeFloatPerShortToken = shortAccumulativeRates;
+
         // Set timestamp on new state point.
-        syntheticRewardParams[token][newIndex].timestamp = block.timestamp;
+        syntheticRewardParams[marketIndex][newIndex].timestamp = block
+        .timestamp;
 
         // Update latest index to point to new state point.
-        latestRewardIndex[token] = newIndex;
+        latestRewardIndex[marketIndex] = newIndex;
 
         emit StateAdded(
-            token,
+            marketIndex,
             newIndex,
-            block.timestamp,
-            syntheticRewardParams[token][newIndex].accumulativeFloatPerToken
+            longAccumulativeRates,
+            shortAccumulativeRates
         );
     }
 
     /*
      * Adds new state points for the given long/short tokens. Called by the
-     * LongShort contract whenever there is a state change for a market.
+     * ILongShort contract whenever there is a state change for a market.
      */
     function addNewStateForFloatRewards(
-        address longToken,
-        address shortToken,
+        uint32 marketIndex,
         uint256 longPrice,
         uint256 shortPrice,
         uint256 longValue,
         uint256 shortValue
     ) external override onlyFloat {
         // Only add a new state point if some time has passed.
-        if (calculateTimeDelta(longToken) > 0) {
-            setRewardObjects(longValue, shortValue, longPrice, longToken, true);
+
+        // Time delta is fetched twice in below code, can pass through? Which is less gas?
+        if (calculateTimeDelta(marketIndex) > 0) {
             setRewardObjects(
-                longValue,
-                shortValue,
+                marketIndex,
+                longPrice,
                 shortPrice,
-                shortToken,
-                false
+                longValue,
+                shortValue
             );
         }
     }
@@ -375,33 +426,91 @@ contract Staker is IStaker, Initializable {
     // USER REWARD STATE FUNCTIONS /////
     ////////////////////////////////////
 
-    function _updateState(address tokenAddress) internal {
-        floatContract._updateSystemState(marketIndexOfToken[tokenAddress]);
-    }
-
-    function calculateAccumulatedFloat(address tokenAddress, address user)
+    function calculateAccumulatedFloatHelper(
+        uint32 marketIndex,
+        address user,
+        uint256 amountStakedLong,
+        uint256 amountStakedShort,
+        uint256 usersLastRewardIndex
+    )
         internal
         view
-        returns (uint256)
+        returns (
+            // NOTE: this returns the long and short reward separately for the sake of simplicity of the event and the graph. Would be more efficient to return as single value
+            uint256 longFloatReward,
+            uint256 shortFloatReward
+        )
     {
-        // Don't let users accumulate float immediately after staking, before
-        // the next reward state is indexed.
-        if (
-            userIndexOfLastClaimedReward[tokenAddress][user] >=
-            latestRewardIndex[tokenAddress]
-        ) {
-            return 0;
+        // Don't do the calculation and return zero immediately if there is no change
+        if (usersLastRewardIndex == latestRewardIndex[marketIndex]) {
+            return (0, 0);
         }
 
-        uint256 accumDelta =
-            syntheticRewardParams[tokenAddress][latestRewardIndex[tokenAddress]]
-                .accumulativeFloatPerToken -
-                syntheticRewardParams[tokenAddress][
-                    userIndexOfLastClaimedReward[tokenAddress][user]
-                ]
-                    .accumulativeFloatPerToken;
+        // Stake should always do a full system state update, so 'users last claimed index' should never be greater than the latest index
+        assert(
+            userIndexOfLastClaimedReward[marketIndex][user] <
+                latestRewardIndex[marketIndex]
+        );
 
-        return (accumDelta * userAmountStaked[tokenAddress][user]) / 1e42;
+        ISyntheticToken longToken = syntheticTokens[marketIndex][true];
+        ISyntheticToken shortToken = syntheticTokens[marketIndex][false];
+
+        if (amountStakedLong > 0) {
+            uint256 accumDeltaLong = syntheticRewardParams[marketIndex][
+                latestRewardIndex[marketIndex]
+            ]
+            .accumulativeFloatPerLongToken -
+                syntheticRewardParams[marketIndex][
+                    userIndexOfLastClaimedReward[marketIndex][user]
+                ]
+                .accumulativeFloatPerLongToken;
+            longFloatReward =
+                (accumDeltaLong * amountStakedLong) /
+                FLOAT_ISSUANCE_FIXED_DECIMAL;
+        }
+
+        if (amountStakedShort > 0) {
+            uint256 accumDeltaShort = syntheticRewardParams[marketIndex][
+                latestRewardIndex[marketIndex]
+            ]
+            .accumulativeFloatPerShortToken -
+                syntheticRewardParams[marketIndex][
+                    userIndexOfLastClaimedReward[marketIndex][user]
+                ]
+                .accumulativeFloatPerShortToken;
+            shortFloatReward =
+                (accumDeltaShort * amountStakedShort) /
+                FLOAT_ISSUANCE_FIXED_DECIMAL;
+        }
+
+        // explicit return
+        return (longFloatReward, shortFloatReward);
+    }
+
+    function calculateAccumulatedFloat(uint32 marketIndex, address user)
+        internal
+        view
+        returns (
+            // NOTE: this returns the long and short reward separately for the sake of simplicity of the event and the graph. Would be more efficient to return as single value
+            uint256 longFloatReward,
+            uint256 shortFloatReward
+        )
+    {
+        ISyntheticToken longToken = syntheticTokens[marketIndex][true];
+        ISyntheticToken shortToken = syntheticTokens[marketIndex][false];
+
+        uint256 amountStakedLong = userAmountStaked[longToken][user];
+        uint256 amountStakedShort = userAmountStaked[shortToken][user];
+
+        // explicit return
+        return
+            calculateAccumulatedFloatHelper(
+                marketIndex,
+                user,
+                amountStakedLong,
+                amountStakedShort,
+                userIndexOfLastClaimedReward[marketIndex][user]
+            );
     }
 
     function _mintFloat(address user, uint256 floatToMint) internal {
@@ -409,45 +518,56 @@ contract Staker is IStaker, Initializable {
         floatToken.mint(floatCapital, (floatToMint * floatPercentage) / 10000);
     }
 
-    function mintAccumulatedFloat(address tokenAddress, address user) internal {
-        uint256 floatToMint = calculateAccumulatedFloat(tokenAddress, user);
+    function mintAccumulatedFloat(uint32 marketIndex, address user) internal {
+        // NOTE: Could merge these two values already inside the `calculateAccumulatedFloat` function, but that would make it harder for the graph
+        (
+            uint256 floatToMintLong,
+            uint256 floatToMintShort
+        ) = calculateAccumulatedFloat(marketIndex, user);
 
+        uint256 floatToMint = floatToMintLong + floatToMintShort;
         if (floatToMint > 0) {
             // stops them setting this forward
-            userIndexOfLastClaimedReward[tokenAddress][
-                user
-            ] = latestRewardIndex[tokenAddress];
+            userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[
+                marketIndex
+            ];
 
             _mintFloat(user, floatToMint);
 
             emit FloatMinted(
                 user,
-                tokenAddress,
-                floatToMint,
-                latestRewardIndex[tokenAddress]
+                marketIndex,
+                floatToMintLong,
+                floatToMintShort,
+                latestRewardIndex[marketIndex]
             );
         }
     }
 
-    function _claimFloat(address[] calldata tokenAddresses) internal {
+    function _claimFloat(uint32[] calldata marketIndexes) internal {
         uint256 floatTotal = 0;
-        for (uint256 i = 0; i < tokenAddresses.length; i++) {
-            uint256 floatToMint =
-                calculateAccumulatedFloat(tokenAddresses[i], msg.sender);
+        for (uint256 i = 0; i < marketIndexes.length; i++) {
+            // NOTE: Could merge these two values already inside the `calculateAccumulatedFloat` function, but that would make it harder for the graph
+            (
+                uint256 floatToMintLong,
+                uint256 floatToMintShort
+            ) = calculateAccumulatedFloat(marketIndexes[i], msg.sender);
+
+            uint256 floatToMint = floatToMintLong + floatToMintShort;
 
             if (floatToMint > 0) {
                 // Set the user has claimed up until now.
-                userIndexOfLastClaimedReward[tokenAddresses[i]][
+                userIndexOfLastClaimedReward[marketIndexes[i]][
                     msg.sender
-                ] = latestRewardIndex[tokenAddresses[i]];
-
+                ] = latestRewardIndex[marketIndexes[i]];
                 floatTotal += floatToMint;
 
                 emit FloatMinted(
                     msg.sender,
-                    tokenAddresses[i],
-                    floatToMint,
-                    latestRewardIndex[tokenAddresses[i]]
+                    marketIndexes[i],
+                    floatToMintLong,
+                    floatToMintShort,
+                    latestRewardIndex[marketIndexes[i]]
                 );
             }
         }
@@ -456,21 +576,10 @@ contract Staker is IStaker, Initializable {
         }
     }
 
-    // TODO: deprecate in the future...
-    function claimFloatImmediately(address[] calldata tokenAddresses) external {
-        for (uint256 i = 0; i < tokenAddresses.length; i++) {
-            _updateState(tokenAddresses[i]);
-        }
-        _claimFloat(tokenAddresses);
-    }
-
-    function claimFloatCustom(
-        address[] calldata tokenAddresses,
-        uint32[] calldata marketIndexes
-    ) external {
-        require(tokenAddresses.length <= 10); // Set some limit on loop length
-        floatContract._updateSystemStateMulti(marketIndexes);
-        _claimFloat(tokenAddresses);
+    function claimFloatCustom(uint32[] calldata marketIndexes) external {
+        require(marketIndexes.length <= 50); // Set some (arbitrary) limit on loop length
+        longShortCoreContract.updateSystemStateMulti(marketIndexes);
+        _claimFloat(marketIndexes);
     }
 
     ////////////////////////////////////
@@ -485,52 +594,41 @@ contract Staker is IStaker, Initializable {
     function stakeFromUser(address from, uint256 amount)
         public
         override
-        onlyValidSynthetic(msg.sender)
+        onlyValidSynthetic(ISyntheticToken(msg.sender))
     {
-        _updateState(msg.sender);
-        _stake(msg.sender, amount, from);
-    }
-
-    /*
-     * Called by the float contract when a user mints and immediately stakes
-     * Updating the state is not necessary since this would have just been done
-     * during the minting process
-     */
-    function stakeFromMint(
-        address tokenAddress,
-        uint256 amount,
-        address user
-    ) external override onlyFloat() onlyValidSynthetic(tokenAddress) {
-        _stake(tokenAddress, amount, user);
+        longShortCoreContract.updateSystemState(
+            marketIndexOfToken[ISyntheticToken(msg.sender)]
+        );
+        _stake(ISyntheticToken(msg.sender), amount, from);
     }
 
     function _stake(
-        address tokenAddress,
+        ISyntheticToken token,
         uint256 amount,
         address user
     ) internal {
+        uint32 marketIndex = marketIndexOfToken[token];
+
         // If they already have staked and have rewards due, mint these.
         if (
-            userAmountStaked[tokenAddress][user] > 0 &&
-            userIndexOfLastClaimedReward[tokenAddress][user] <
-            latestRewardIndex[tokenAddress]
+            userIndexOfLastClaimedReward[marketIndex][user] != 0 &&
+            userIndexOfLastClaimedReward[marketIndex][user] <
+            latestRewardIndex[marketIndex]
         ) {
-            mintAccumulatedFloat(tokenAddress, user);
+            mintAccumulatedFloat(marketIndex, user);
         }
 
-        userAmountStaked[tokenAddress][user] =
-            userAmountStaked[tokenAddress][user] +
-            amount;
+        userAmountStaked[token][user] = userAmountStaked[token][user] + amount;
 
-        userIndexOfLastClaimedReward[tokenAddress][user] = latestRewardIndex[
-            tokenAddress
+        userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[
+            marketIndex
         ];
 
         emit StakeAdded(
             user,
-            tokenAddress,
+            address(token),
             amount,
-            userIndexOfLastClaimedReward[tokenAddress][user]
+            userIndexOfLastClaimedReward[marketIndex][user]
         );
     }
 
@@ -542,32 +640,32 @@ contract Staker is IStaker, Initializable {
     Withdraw function.
     Mint user any outstanding float before
     */
-    function _withdraw(address tokenAddress, uint256 amount) internal {
-        require(
-            userAmountStaked[tokenAddress][msg.sender] > 0,
-            "nothing to withdraw"
-        );
-        mintAccumulatedFloat(tokenAddress, msg.sender);
+    function _withdraw(ISyntheticToken token, uint256 amount) internal {
+        uint32 marketIndex = marketIndexOfToken[token];
+        require(userAmountStaked[token][msg.sender] > 0, "nothing to withdraw");
+        mintAccumulatedFloat(marketIndex, msg.sender);
 
-        userAmountStaked[tokenAddress][msg.sender] =
-            userAmountStaked[tokenAddress][msg.sender] -
+        userAmountStaked[token][msg.sender] =
+            userAmountStaked[token][msg.sender] -
             amount;
 
-        ERC20PresetMinterPauserUpgradeable(tokenAddress).transfer(
-            msg.sender,
-            amount
-        );
+        uint256 amountFees = (amount *
+            marketUnstakeFeeBasisPoints[marketIndex]) / 10000;
 
-        emit StakeWithdrawn(msg.sender, tokenAddress, amount);
+        token.transfer(msg.sender, amount - amountFees);
+
+        emit StakeWithdrawn(msg.sender, address(token), amount);
     }
 
-    function withdraw(address tokenAddress, uint256 amount) external {
-        _updateState(tokenAddress);
-        _withdraw(tokenAddress, amount);
+    function withdraw(ISyntheticToken token, uint256 amount) external {
+        longShortCoreContract.updateSystemState(marketIndexOfToken[token]);
+
+        _withdraw(token, amount);
     }
 
-    function withdrawAll(address tokenAddress) external {
-        _updateState(tokenAddress);
-        _withdraw(tokenAddress, userAmountStaked[tokenAddress][msg.sender]);
+    function withdrawAll(ISyntheticToken token) external {
+        longShortCoreContract.updateSystemState(marketIndexOfToken[token]);
+
+        _withdraw(token, userAmountStaked[token][msg.sender]);
     }
 }

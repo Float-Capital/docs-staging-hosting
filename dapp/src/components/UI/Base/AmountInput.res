@@ -1,6 +1,5 @@
 @react.component
 let make = (
-  ~placeholder,
   ~value,
   ~optBalance=None,
   ~disabled,
@@ -14,16 +13,16 @@ let make = (
       id="amount"
       className="py-2 font-normal text-grey-darkest w-full py-1 px-2 outline-none text-md text-gray-600"
       type_="text"
-      placeholder={placeholder}
+      placeholder={"0.0"}
       value={value}
       disabled={disabled}
       onBlur={onBlur}
       onChange={onChange}
     />
     {switch optCurrency {
-    | Some(currency) =>
-      <span className="flex items-center bg-white pr-3 text-md text-gray-300">
-        {currency->React.string}
+    | Some(currency: CONSTANTS.displayToken) =>
+      <span className="flex items-center bg-white pr-3 text-md text-gray-300 min-w-56">
+        <img src={currency.iconUrl} className="h-5 pr-1" /> {currency.name->React.string}
       </span>
     | _ => React.null
     }}

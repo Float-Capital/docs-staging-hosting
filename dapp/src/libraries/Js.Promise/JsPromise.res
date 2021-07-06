@@ -36,16 +36,7 @@ external _catch: (t<'a>, @uncurry (exn => t<'a>)) => t<'a> = "catch"
 
 let catch = (promise, callback) => {
   _catch(promise, err => {
-    // In future versions, we could use the better version:
     callback(Js.Exn.anyToExnInternal(err))
-
-    // // for now we need to bring our own JsError type
-    // let v = if Js.Exn.isCamlExceptionOrOpenVariant(err) {
-    //   err
-    // } else {
-    //   JsError(unsafeToJsExn(err))
-    // }
-    // callback(v)
   })
 }
 

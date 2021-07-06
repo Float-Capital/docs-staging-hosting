@@ -61,7 +61,6 @@ let querySwitcherLink = (~user) =>
         | _ => false
         }
 
-        Js.log2("isPriceHistory", isPriceHistory)
         isPriceHistory
       },
       ~whenTrue=httpLink(~uri=Config.priceHistoryGraphEndpoint),
@@ -88,8 +87,7 @@ let makeClient = (~user) => {
   open ApolloClient
   make(
     ~cache=Cache.InMemoryCache.make(),
-    // I would turn this off in production
-    ~connectToDevTools=true,
+    ~connectToDevTools=Config.apolloConnectToDevTools,
     ~link=querySwitcherLink(~user),
     (),
   )

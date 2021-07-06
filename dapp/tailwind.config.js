@@ -4,9 +4,7 @@ const lightGold = "#fff3e6";
 module.exports = {
   purge: {
     // Specify the paths to all of the template files in your project
-    content: [
-      "./src/**/*.res",
-    ],
+    content: ["./src/**/*.res"],
     options: {
       safelist: ["html", "body"],
     },
@@ -19,10 +17,6 @@ module.exports = {
         primary: primaryColor,
         "primary-light": primaryLightColor,
       }),
-      // // Doesn't include an opacity gradient, rather use direct css
-      // backgroundImage: (theme) => ({
-      //   "float-pixels": "url('/backgrounds/2.png')",
-      // }),
     },
     /* Most of the time we customize the font-sizes,
      so we added the Tailwind default values here for
@@ -40,12 +34,11 @@ module.exports = {
       "4xl": "2.25rem",
       "5xl": "3rem",
       "6xl": "4rem",
-      /// Below are custom sizes
-      // "600px": "600px",
     },
     minWidth: {
       "1/2": "50%",
       "3/4": "75%",
+      56: "56px",
     },
     minHeight: {
       "1/2": "50%",

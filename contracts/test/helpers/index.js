@@ -50,7 +50,7 @@ const initialize = async (admin) => {
   const floatToken = await FloatToken.new({
     from: admin,
   });
-  await floatToken.initialize("Float token", "FLOAT TOKEN", staker.address, {
+  await floatToken.initialize3("Float token", "FLOAT TOKEN", staker.address, {
     from: admin,
   });
 
@@ -92,10 +92,7 @@ const createSynthetic = async (
   longShort,
   syntheticName,
   syntheticSymbol,
-  _baseEntryFee,
-  _badLiquidityEntryFee,
-  _baseExitFee,
-  _badLiquidityExitFee
+  treasury,
 ) => {
   const fundToken = await erc20.new({
     from: admin,
@@ -105,13 +102,24 @@ const createSynthetic = async (
     from: admin,
   });
 
+  await fundToken.mint(admin, "1000000000000000000", { from: admin });
+  await fundToken.approve(longShort.address, "1000000000000000000", {
+    from: admin,
+  });
+
   const oracleManager = await OracleManager.new(admin, {
     from: admin,
   });
 
-  const yieldManager = await YieldManager.new(admin, longShort.address, fundToken.address, {
-    from: admin,
-  });
+  const yieldManager = await YieldManager.new(
+    admin,
+    longShort.address,
+    treasury.address,
+    fundToken.address,
+    {
+      from: admin,
+    }
+  );
 
   // Mock yield manager needs to be able to mint tokens to simulate yield.
   var mintRole = await fundToken.MINTER_ROLE.call();
@@ -133,17 +141,20 @@ const createSynthetic = async (
 
   await longShort.initializeMarket(
     currentMarketIndex,
-    _baseEntryFee,
-    _baseExitFee,
-    _badLiquidityEntryFee,
-    _badLiquidityExitFee,
     kInitialMultiplier,
     kPeriod,
+    "500000000000000000",
     { from: admin }
   );
 
-  const longAddress = await longShort.longTokens.call(currentMarketIndex);
-  const shortAddress = await longShort.shortTokens.call(currentMarketIndex);
+  const longAddress = await longShort.syntheticTokens.call(
+    currentMarketIndex,
+    0
+  );
+  const shortAddress = await longShort.syntheticTokens.call(
+    currentMarketIndex,
+    1
+  );
   let longToken = await SyntheticToken.at(longAddress);
   let shortToken = await SyntheticToken.at(shortAddress);
 
@@ -228,7 +239,12 @@ const feeCalculation = (
     }
   }
   // If greater than minFeeThreshold
-  if (amount.add(longValue).add(shortValue).gte(minThreshold)) {
+  if (
+    amount
+      .add(longValue)
+      .add(shortValue)
+      .gte(minThreshold)
+  ) {
     const TEN_TO_THE_18 = "1" + "000000000000000000";
     let betaDiff = new BN(TEN_TO_THE_18).sub(thinBeta); // TODO: when previous beta != 1
 
@@ -276,7 +292,10 @@ const logGasPrices = async (
   console.log(`USD Price: $${ethPriceUsd}`);
   const ethCost =
     Number(
-      totalCostEth.mul(new BN(ethPriceUsd)).mul(new BN(100)).div(ONE_ETH)
+      totalCostEth
+        .mul(new BN(ethPriceUsd))
+        .mul(new BN(100))
+        .div(ONE_ETH)
     ) / 100;
   console.log(`Cost on ETH Mainnet: $${ethCost}`);
 
@@ -288,9 +307,24 @@ const logGasPrices = async (
   console.log(`MATIC Price: $${maticPriceUsd}`);
   const maticCost =
     Number(
-      totalCostMatic.mul(new BN(maticPriceUsd)).mul(new BN(100)).div(ONE_ETH)
+      totalCostMatic
+        .mul(new BN(maticPriceUsd))
+        .mul(new BN(100))
+        .div(ONE_ETH)
     ) / 100;
   console.log(`Cost on BSC: $${maticCost}`);
+};
+
+const totalValueLockedInMarket = async (longShort, marketIndex) => {
+  const longValue = await longShort.syntheticTokenBackedValue.call(
+    0,
+    marketIndex
+  );
+  const shortValue = await longShort.syntheticTokenBackedValue.call(
+    1,
+    marketIndex
+  );
+  return new BN(longValue).add(new BN(shortValue));
 };
 
 module.exports = {
@@ -303,4 +337,5 @@ module.exports = {
   feeCalculation,
   createSynthetic,
   logGasPrices,
+  totalValueLockedInMarket,
 };

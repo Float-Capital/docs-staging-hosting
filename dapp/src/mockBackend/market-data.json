@@ -4,11 +4,11 @@
     "description": "EthKillers is an index comprised of TRON, XRP and EOS. This market is an average of the prices of the tokens of the three protocols seen as alternatives to ethereum. The EthKillers market allows users to gain long or short exposure to an equally weighted basket containing TRON, XRP and EOS." 
 },
 {    
-    "name": "Placeholder Market 1",
-    "description": "This is a testnet market." 
+    "name": "The Flippening",
+    "description": "The flippening represents a market between ethereum's market cap in relation to bitcoins market cap. Eth/BTC Dominance" 
 },
 {    
-    "name": "Placeholder Market 2",
-    "description": "This is a testnet market." 
+    "name": "Gold",
+    "description": "The Gold Market refers to the global market of buying and selling Gold commodities. Gold has been used as a trading commodity for millennia and still today its intrinsic value makes it ideal as a store of wealth." 
 }
 ]

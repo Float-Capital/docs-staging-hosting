@@ -1,20 +1,18 @@
 import {
   V1,
-  FeesLevied,
   SyntheticTokenCreated,
-  LongMinted,
-  LongRedeem,
   PriceUpdate,
-  ShortMinted,
-  ShortRedeem,
-  TokenPriceRefreshed,
-  ValueLockedInSystem,
-  FeesChanges,
+  SystemStateUpdated,
   OracleUpdated,
+  NextPriceDeposit,
+  NewMarketLaunchedAndSeeded,
+  NextPriceRedeem,
+  ExecuteNextPriceSettlementsUser,
+  ExecuteNextPriceRedeemSettlementUser,
+  ExecuteNextPriceMintSettlementUser,
 } from "../generated/LongShort/LongShort";
 import {
   SyntheticMarket,
-  FeeStructure,
   GlobalState,
   Staker,
   TokenFactory,
@@ -24,8 +22,11 @@ import {
   LatestPrice,
   Price,
 } from "../generated/schema";
-import { BigInt, log, Bytes } from "@graphprotocol/graph-ts";
-import { saveEventToStateChange } from "./utils/txEventHelpers";
+import { BigInt, log, Bytes, Address } from "@graphprotocol/graph-ts";
+import {
+  bigIntArrayToStringArray,
+  saveEventToStateChange,
+} from "./utils/txEventHelpers";
 import {
   getOrCreateLatestSystemState,
   getOrCreateStakerState,
@@ -34,10 +35,17 @@ import {
   createInitialSystemState,
   updateOrCreateCollateralToken,
   getOrCreateGlobalState,
+  getStakerStateId,
+  getUser,
+  getSyntheticMarket,
+  getSyntheticTokenById,
+  getSyntheticTokenByMarketIdAndTokenType,
 } from "./utils/globalStateManager";
 import {
   createNewTokenDataSource,
   increaseUserMints,
+  updateBalanceTransfer,
+  updateUserBalance,
 } from "./utils/helperFunctions";
 import { decreaseOrCreateUserApprovals } from "./tokenTransfers";
 import {
@@ -46,13 +54,29 @@ import {
   STAKER_ID,
   TOKEN_FACTORY_ID,
   LONG_SHORT_ID,
+  MARKET_SIDE_SHORT,
+  MARKET_SIDE_LONG,
+  ACTION_MINT,
+  ACTION_REDEEM,
+  TEN_TO_THE_18,
 } from "./CONSTANTS";
+import {
+  createOrUpdateUserNextPriceAction,
+  createUserNextPriceActionComponent,
+  createOrUpdateBatchedNextPriceExec,
+  getBatchedNextPriceExec,
+  getUserNextPriceActionById,
+  getUsersCurrentNextPriceAction,
+  doesBatchExist,
+} from "./utils/nextPrice";
 
 export function handleV1(event: V1): void {
   // event V1(address admin, address tokenFactory, address staker);
 
   let admin = event.params.admin;
   let tokenFactoryParam = event.params.tokenFactory;
+  // TODO: do something with the treasury - not recorded at the moment!
+  let treasury = event.params.treasury;
   let tokenFactoryString = tokenFactoryParam.toHex();
   let stakerParam = event.params.staker;
   let stakerString = stakerParam.toHex();
@@ -88,31 +112,25 @@ export function handleV1(event: V1): void {
   saveEventToStateChange(
     event,
     "V1",
-    [admin.toHex(), tokenFactoryString, stakerString],
-    ["admin", "tokenFactory", "staker"],
-    ["address", "address", "address"],
+    [admin.toHex(), treasury.toHex(), tokenFactoryString, stakerString],
+    ["admin", "treasury", "tokenFactory", "staker"],
+    ["address", "address", "address", "address"],
     [],
     []
   );
 }
 
-export function handleFeesLevied(event: FeesLevied): void {
-  let txHash = event.transaction.hash;
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
+export function handleSystemStateUpdated(event: SystemStateUpdated): void {
   let marketIndex = event.params.marketIndex;
-  let totalFees = event.params.totalFees;
-
-  // State change - TODO
-}
-
-export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
-  let marketIndex = event.params.marketIndex;
-  let totalValueLockedInMarket = event.params.totalValueLockedInMarket;
+  let marketIndexString = marketIndex.toString();
   let longValue = event.params.longValue;
+  let updateIndex = event.params.updateIndex;
   let shortValue = event.params.shortValue;
+  let longTokenPrice = event.params.longPrice;
+  let shortTokenPrice = event.params.shortPrice;
+  let totalValueLockedInMarket = longValue.plus(shortValue);
   let txHash = event.transaction.hash;
+  let timestamp = event.block.timestamp;
 
   let systemState = getOrCreateLatestSystemState(marketIndex, txHash, event);
   systemState.totalValueLocked = totalValueLockedInMarket;
@@ -121,17 +139,122 @@ export function handleValueLockedInSystem(event: ValueLockedInSystem): void {
 
   systemState.save();
 
+  let syntheticMarket = SyntheticMarket.load(marketIndexString);
+
+  syntheticMarket.latestSystemState = systemState.id;
+  syntheticMarket.save();
+
+  updateLatestTokenPrice(true, marketIndexString, longTokenPrice, timestamp);
+  updateLatestTokenPrice(false, marketIndexString, shortTokenPrice, timestamp);
+
+  let batchExists = doesBatchExist(marketIndex, updateIndex);
+  if (batchExists) {
+    let executedTimestamp = event.block.timestamp;
+
+    let syntheticMarket = getSyntheticMarket(marketIndex);
+    let longTokenId = syntheticMarket.syntheticLong;
+    let shortTokenId = syntheticMarket.syntheticShort;
+
+    let syntheticTokenLong = getSyntheticTokenById(longTokenId);
+    let syntheticTokenShort = getSyntheticTokenById(shortTokenId);
+
+    let batchedNextPriceExec = getBatchedNextPriceExec(
+      marketIndex,
+      updateIndex
+    );
+
+    batchedNextPriceExec.mintPriceSnapshotLong = longTokenPrice;
+    batchedNextPriceExec.mintPriceSnapshotShort = shortTokenPrice;
+    batchedNextPriceExec.redeemPriceSnapshotLong = longTokenPrice;
+    batchedNextPriceExec.redeemPriceSnapshotShort = shortTokenPrice;
+
+    batchedNextPriceExec.executedTimestamp = executedTimestamp;
+
+    let linkedUserNextPriceActions =
+      batchedNextPriceExec.linkedUserNextPriceActions;
+    let numberOfUsersInBatch = linkedUserNextPriceActions.length;
+
+    for (let i = 0; i < numberOfUsersInBatch; ++i) {
+      let userNextPriceActionId: string = linkedUserNextPriceActions[i];
+
+      let userNextPriceAction = getUserNextPriceActionById(
+        userNextPriceActionId
+      );
+      userNextPriceAction.confirmedTimestamp = event.block.timestamp;
+      userNextPriceAction.save();
+
+      let userAddress = Address.fromString(userNextPriceAction.user);
+      let user = getUser(userAddress);
+
+      user.pendingNextPriceActions = removeFromArrayAtIndex(
+        user.pendingNextPriceActions,
+        user.pendingNextPriceActions.indexOf(userNextPriceActionId)
+      );
+
+      user.confirmedNextPriceActions = user.confirmedNextPriceActions.concat([
+        userNextPriceActionId,
+      ]);
+
+      let tokensMintedLong = userNextPriceAction.amountPaymentTokenForDepositLong
+        .times(TEN_TO_THE_18)
+        .div(longTokenPrice);
+      let tokensMintedShort = userNextPriceAction.amountPaymentTokenForDepositShort
+        .times(TEN_TO_THE_18)
+        .div(shortTokenPrice);
+
+      let hasMint = tokensMintedLong.gt(ZERO) || tokensMintedShort.gt(ZERO);
+
+      if (hasMint) {
+        increaseUserMints(user, syntheticTokenLong, tokensMintedLong);
+        increaseUserMints(user, syntheticTokenShort, tokensMintedShort);
+        updateUserBalance(longTokenId, user, tokensMintedLong, true, timestamp);
+        updateUserBalance(
+          shortTokenId,
+          user,
+          tokensMintedShort,
+          true,
+          timestamp
+        );
+      }
+
+      let paymentTokensToRedeemLong = userNextPriceAction.amountSynthTokenForWithdrawalLong
+        .times(longTokenPrice)
+        .div(TEN_TO_THE_18);
+      let paymentTokensToRedeemShort = userNextPriceAction.amountSynthTokenForWithdrawalShort
+        .times(shortTokenPrice)
+        .div(TEN_TO_THE_18);
+      // TODO: read the below warning, take note...
+      log.warning(
+        "TODO: WARNING: we are not handling the redeems yet! Think through",
+        []
+      );
+
+      user.save();
+    }
+
+    batchedNextPriceExec.save();
+  }
+
   saveEventToStateChange(
     event,
-    "ValueLockedInSystem",
+    "SystemStateUpdated",
     bigIntArrayToStringArray([
       marketIndex,
-      totalValueLockedInMarket,
+      updateIndex,
       longValue,
       shortValue,
+      longTokenPrice,
+      shortTokenPrice,
     ]),
-    ["marketIndex", "totalValueLockedInMarket", "longValue", "shortValue"],
-    ["uint256", "uint256", "uint256", "uint256"],
+    [
+      "marketIndex",
+      "updateIndex",
+      "longValue",
+      "shortValue",
+      "longPrice",
+      "shortPrice",
+    ],
+    ["uint32", "uint256", "uint256", "uint256", "uint256", "uint256"],
     [],
     []
   );
@@ -147,7 +270,7 @@ export function handleSyntheticTokenCreated(
   let marketIndex = event.params.marketIndex;
   let longTokenAddress = event.params.longTokenAddress;
   let shortTokenAddress = event.params.shortTokenAddress;
-  let collateralTokenAddress = event.params.fundToken;
+  let collateralTokenAddress = event.params.paymentToken;
   let initialAssetPrice = event.params.assetPrice;
 
   let oracleAddress = event.params.oracleAddress;
@@ -172,12 +295,6 @@ export function handleSyntheticTokenCreated(
     shortToken.id
   );
 
-  let fees = new FeeStructure(marketIndexString + "-fees");
-  fees.baseEntryFee = ZERO;
-  fees.badLiquidityEntryFee = ZERO;
-  fees.baseExitFee = ZERO;
-  fees.badLiquidityExitFee = ZERO;
-
   let syntheticMarket = new SyntheticMarket(marketIndexString);
   syntheticMarket.timestampCreated = timestamp;
   syntheticMarket.txHash = txHash;
@@ -190,9 +307,11 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.marketIndex = marketIndex;
   syntheticMarket.oracleAddress = oracleAddress;
   syntheticMarket.previousOracleAddresses = [];
-  syntheticMarket.feeStructure = fees.id;
   syntheticMarket.kPeriod = ZERO;
   syntheticMarket.kMultiplier = ZERO;
+  syntheticMarket.totalFloatMinted = ZERO;
+  syntheticMarket.nextPriceActions = [];
+  syntheticMarket.settledNextPriceActions = [];
   initialState.systemState.syntheticPrice = initialAssetPrice; // change me
 
   // create new synthetic token object.
@@ -203,38 +322,36 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.collateralToken = collateralToken.id;
 
   let globalState = GlobalState.load(GLOBAL_STATE_ID);
+  if (globalState == null) {
+    log.critical("Global state is null in `handleSyntheticTokenCreated`", []);
+  }
   globalState.latestMarketIndex = globalState.latestMarketIndex.plus(
     BigInt.fromI32(1)
   );
 
-  let initialLongStakerState = getOrCreateStakerState(
-    longToken.id,
-    ZERO,
-    event
-  );
+  // Make sure the latest staker state has the correct ID even though the instance hasn't been created yet.
+  syntheticMarket.latestStakerState = getStakerStateId(marketIndexString, ZERO);
+
   longToken.syntheticMarket = syntheticMarket.id;
   longToken.latestPrice = initialState.latestTokenPriceLong.id;
   longToken.priceHistory = [initialState.tokenPriceLong.id];
-  longToken.latestStakerState = initialLongStakerState.id;
 
-  let initialShortStakerState = getOrCreateStakerState(
-    shortToken.id,
-    ZERO,
-    event
-  );
   shortToken.syntheticMarket = syntheticMarket.id;
   shortToken.latestPrice = initialState.latestTokenPriceShort.id;
   shortToken.priceHistory = [initialState.tokenPriceShort.id];
-  shortToken.latestStakerState = initialShortStakerState.id;
 
-  initialLongStakerState.save();
-  initialShortStakerState.save();
+  syntheticMarket.save();
+  // This function uses the synthetic market internally, so can only be created once the synthetic market has been created.
+  let initalLatestStakerState = getOrCreateStakerState(
+    syntheticMarket,
+    ZERO,
+    event
+  );
   collateralToken.save();
+  initalLatestStakerState.save();
   longToken.save();
   shortToken.save();
   initialState.systemState.save();
-  syntheticMarket.save();
-  fees.save();
   globalState.save();
 
   saveEventToStateChange(
@@ -248,7 +365,7 @@ export function handleSyntheticTokenCreated(
       syntheticName,
       syntheticSymbol,
       oracleAddress.toHex(),
-      collateralTokenAddress.toHex()
+      collateralTokenAddress.toHex(),
     ],
     [
       "marketIndex",
@@ -258,9 +375,18 @@ export function handleSyntheticTokenCreated(
       "name",
       "symbol",
       "oracleAddress",
-      "collateralAddress"
+      "collateralAddress",
     ],
-    ["uint256", "address", "address", "uint256", "string", "string", "address", "address"],
+    [
+      "uint256",
+      "address",
+      "address",
+      "uint256",
+      "string",
+      "string",
+      "address",
+      "address",
+    ],
     [],
     []
   );
@@ -281,117 +407,6 @@ export function handleMarketOracleUpdated(event: OracleUpdated): void {
   syntheticMarket.previousOracleAddresses = previousOracles;
 
   syntheticMarket.save();
-}
-
-export function handleFeesChanges(event: FeesChanges): void {
-  let marketIndex = event.params.marketIndex;
-  let baseEntryFee = event.params.baseEntryFee;
-  let badLiquidityEntryFee = event.params.badLiquidityEntryFee;
-  let baseExitFee = event.params.baseExitFee;
-  let badLiquidityExitFee = event.params.badLiquidityExitFee;
-
-  let marketIndexString = marketIndex.toString();
-
-  let fees = FeeStructure.load(marketIndexString + "-fees");
-  fees.baseEntryFee = baseEntryFee;
-  fees.badLiquidityEntryFee = badLiquidityEntryFee;
-  fees.baseExitFee = baseExitFee;
-  fees.badLiquidityExitFee = badLiquidityExitFee;
-
-  fees.save();
-
-  saveEventToStateChange(
-    event,
-    "FeesChanges",
-    [
-      marketIndex.toString(),
-      baseEntryFee.toString(),
-      badLiquidityEntryFee.toString(),
-      baseExitFee.toString(),
-      badLiquidityExitFee.toString(),
-    ],
-    [
-      "marketIndex",
-      "baseEntryFee",
-      "badLiquidityEntryFee",
-      "baseExitFee",
-      "badLiquidityExitFee",
-    ],
-    ["uint256", "uint256", "uint256", "uint256", "uint256"],
-    [],
-    []
-  );
-}
-
-export function handleLongMinted(event: LongMinted): void {
-  let marketIndex = event.params.marketIndex;
-  let depositAdded = event.params.depositAdded;
-  let finalDepositAmount = event.params.finalDepositAmount;
-  let tokensMinted = event.params.tokensMinted;
-  let userAddress = event.params.user;
-
-  let market = SyntheticMarket.load(marketIndex.toString());
-  let syntheticToken = SyntheticToken.load(market.syntheticLong);
-
-  increaseUserMints(userAddress, syntheticToken, tokensMinted, event);
-
-  let collateralToken = CollateralToken.load(market.collateralToken);
-  decreaseOrCreateUserApprovals(
-    userAddress,
-    event.params.depositAdded,
-    collateralToken,
-    event
-  );
-
-  saveEventToStateChange(
-    event,
-    "LongMinted",
-    bigIntArrayToStringArray([
-      marketIndex,
-      depositAdded,
-      finalDepositAmount,
-      tokensMinted,
-    ]).concat([userAddress.toHex()]),
-    [
-      "marketIndex",
-      "depositAdded",
-      "finalDepositAmount",
-      "tokensMinted",
-      "user",
-    ],
-    ["uint256", "uint256", "uint256", "uint256", "address"],
-    [userAddress],
-    []
-  );
-}
-
-export function handleLongRedeem(event: LongRedeem): void {
-  let marketIndex = event.params.marketIndex;
-  let tokensRedeemed = event.params.tokensRedeemed;
-  let valueOfRedemption = event.params.valueOfRedemption;
-  let finalRedeemValue = event.params.finalRedeemValue;
-  let user = event.params.user;
-
-  saveEventToStateChange(
-    event,
-    "LongRedeem",
-    bigIntArrayToStringArray([
-      marketIndex,
-      tokensRedeemed,
-      valueOfRedemption,
-      finalRedeemValue,
-    ]).concat([user.toHex()]),
-    [
-      "marketIndex",
-      "tokensRedeemed",
-      "valueOfRedemption",
-      "finalRedeem",
-      "user",
-    ],
-    ["uint256", "uint256", "uint256", "uint256", "address"],
-    [user],
-    []
-  );
 }
 
 export function handlePriceUpdate(event: PriceUpdate): void {
@@ -418,23 +433,52 @@ export function handlePriceUpdate(event: PriceUpdate): void {
       user.toHex(),
     ]),
     ["marketIndex", "newPrice", "oldPrice", "user"],
-    ["uint256", "uint256", "uint256", "address"],
+    ["uint32", "uint256", "uint256", "address"],
     [user],
     []
   );
 }
 
-export function handleShortMinted(event: ShortMinted): void {
-  let marketIndex = event.params.marketIndex;
+export function handleNextPriceDeposit(event: NextPriceDeposit): void {
   let depositAdded = event.params.depositAdded;
-  let finalDepositAmount = event.params.finalDepositAmount;
-  let tokensMinted = event.params.tokensMinted;
+  let marketIndex = event.params.marketIndex;
+  let oracleUpdateIndex = event.params.oracleUpdateIndex;
+  let isLong = event.params.isLong;
   let userAddress = event.params.user;
 
-  let market = SyntheticMarket.load(marketIndex.toString());
-  let syntheticToken = SyntheticToken.load(market.syntheticShort);
+  let user = getUser(userAddress);
+  let syntheticMarket = getSyntheticMarket(marketIndex);
 
-  let collateralToken = CollateralToken.load(market.collateralToken);
+  let userNextPriceActionComponent = createUserNextPriceActionComponent(
+    user,
+    syntheticMarket,
+    oracleUpdateIndex,
+    depositAdded,
+    ACTION_MINT,
+    isLong,
+    event
+  );
+
+  let batchedNextPriceExec = createOrUpdateBatchedNextPriceExec(
+    userNextPriceActionComponent
+  );
+  let userNextPriceAction = createOrUpdateUserNextPriceAction(
+    userNextPriceActionComponent,
+    syntheticMarket,
+    user
+  );
+
+  userNextPriceAction.save();
+  batchedNextPriceExec.save();
+
+  let collateralToken = CollateralToken.load(syntheticMarket.collateralToken);
+  if (collateralToken == null) {
+    log.critical(
+      "collateralToken is undefined when it shouldn't be, entity id: {}",
+      [syntheticMarket.collateralToken]
+    );
+  }
+
   decreaseOrCreateUserApprovals(
     userAddress,
     event.params.depositAdded,
@@ -442,55 +486,190 @@ export function handleShortMinted(event: ShortMinted): void {
     event
   );
 
-  increaseUserMints(userAddress, syntheticToken, tokensMinted, event);
-
   saveEventToStateChange(
     event,
-    "ShortMinted",
+    "NextPriceDeposit",
     bigIntArrayToStringArray([
-      marketIndex,
       depositAdded,
-      finalDepositAmount,
-      tokensMinted,
-    ]).concat([userAddress.toHex()]),
-    [
-      "marketIndex",
-      "depositAdded",
-      "finalDepositAmount",
-      "tokensMinted",
-      "user",
-    ],
-    ["uint256", "uint256", "uint256", "uint256", "address"],
+      marketIndex,
+      oracleUpdateIndex,
+    ]).concat([isLong ? "true" : "false", user.id]),
+    ["depositAdded", "marketIndex", "oracleUpdateIndex", "isLong", "user"],
+    ["uint256", "uint32", "uint256", "bool", "address"],
     [userAddress],
     []
   );
 }
 
-export function handleShortRedeem(event: ShortRedeem): void {
+export function handleNextPriceRedeem(event: NextPriceRedeem): void {
+  let depositAdded = event.params.synthRedeemed;
   let marketIndex = event.params.marketIndex;
-  let tokensRedeemed = event.params.tokensRedeemed;
-  let valueOfRedemption = event.params.valueOfRedemption;
-  let finalRedeemValue = event.params.finalRedeemValue;
-  let user = event.params.user;
+  let oracleUpdateIndex = event.params.oracleUpdateIndex;
+  let isLong = event.params.isLong;
+  let userAddress = event.params.user;
+
+  let user = getUser(userAddress);
+  let syntheticMarket = getSyntheticMarket(marketIndex);
+
+  let userNextPriceActionComponent = createUserNextPriceActionComponent(
+    user,
+    syntheticMarket,
+    oracleUpdateIndex,
+    depositAdded,
+    ACTION_REDEEM,
+    isLong,
+    event
+  );
+
+  let batchedNextPriceExec = createOrUpdateBatchedNextPriceExec(
+    userNextPriceActionComponent
+  );
+  let userNextPriceAction = createOrUpdateUserNextPriceAction(
+    userNextPriceActionComponent,
+    syntheticMarket,
+    user
+  );
+
+  userNextPriceAction.save();
+  batchedNextPriceExec.save();
 
   saveEventToStateChange(
     event,
-    "ShortRedeem",
+    "NextPriceRedeem",
     bigIntArrayToStringArray([
+      depositAdded,
       marketIndex,
-      tokensRedeemed,
-      valueOfRedemption,
-      finalRedeemValue,
-    ]).concat([user.toHex()]),
+      oracleUpdateIndex,
+    ]).concat([isLong ? "true" : "false", user.id]),
+    ["synthRedeemed", "marketIndex", "oracleUpdateIndex", "isLong", "user"],
+    ["uint256", "uint32", "uint256", "bool", "address"],
+    [userAddress],
+    []
+  );
+}
+
+export function handleNewMarketLaunchedAndSeeded(
+  event: NewMarketLaunchedAndSeeded
+): void {
+  // TODO - need to include the market seed initially
+  let marketIndex = event.params.marketIndex;
+  let initialSeed = event.params.initialSeed;
+
+  saveEventToStateChange(
+    event,
+    "NewMarketLaunchedAndSeeded",
+    [marketIndex.toString(), initialSeed.toHex()],
+    ["marketIndex", "initialMarketSeed"],
+    ["uint32", "uint256"],
+    [],
+    []
+  );
+}
+
+export function removeFromArrayAtIndex(
+  array: Array<string>,
+  index: i32
+): Array<string> {
+  if (array.length > index && index > -1) {
+    return array.slice(0, index).concat(array.slice(index + 1, array.length));
+  } else {
+    return array;
+  }
+}
+
+export function handleExecuteNextPriceSettlementsUser(
+  event: ExecuteNextPriceSettlementsUser
+): void {
+  let marketIndex = event.params.marketIndex;
+  let userAddress = event.params.user;
+
+  let userNextPriceAction = getUsersCurrentNextPriceAction(
+    userAddress,
+    marketIndex
+  );
+
+  userNextPriceAction.settledTimestamp = event.block.timestamp;
+  userNextPriceAction.save();
+
+  let user = getUser(userAddress);
+
+  user.confirmedNextPriceActions = removeFromArrayAtIndex(
+    user.confirmedNextPriceActions,
+    user.confirmedNextPriceActions.indexOf(userNextPriceAction.id)
+  );
+
+  user.settledNextPriceActions = user.settledNextPriceActions.concat([
+    userNextPriceAction.id,
+  ]);
+
+  user.save();
+
+  saveEventToStateChange(
+    event,
+    "ExecuteNextPriceSettlementsUser",
+    [marketIndex.toString(), userAddress.toHex()],
+    ["marketIndex", "userAddress"],
+    ["uint32", "address"],
+    [userAddress],
+    []
+  );
+}
+
+export function handleExecuteNextPriceRedeemSettlementUser(
+  event: ExecuteNextPriceRedeemSettlementUser
+): void {
+  let marketIndex = event.params.marketIndex;
+  let userAddress = event.params.user;
+  let isLong = event.params.isLong;
+  let amount = event.params.amount;
+
+  // TODO: do something something
+
+  saveEventToStateChange(
+    event,
+    "ExecuteNextPriceRedeemSettlementUser",
     [
-      "marketIndex",
-      "tokensRedeemed",
-      "valueOfRedemption",
-      "finalRedeem",
-      "user",
+      marketIndex.toString(),
+      userAddress.toHex(),
+      isLong ? "true" : "false",
+      amount.toString(),
     ],
-    ["uint256", "uint256", "uint256", "uint256", "address"],
-    [user],
+    ["marketIndex", "userAddress", "isLong", "amount"],
+    ["uint32", "address", "bool", "uint256"],
+    [userAddress],
+    []
+  );
+}
+
+export function handleExecuteNextPriceMintSettlementUser(
+  event: ExecuteNextPriceMintSettlementUser
+): void {
+  let marketIndex = event.params.marketIndex;
+  let userAddress = event.params.user;
+  let isLong = event.params.isLong;
+  let amount = event.params.amount;
+
+  let synthToken = getSyntheticTokenByMarketIdAndTokenType(marketIndex, isLong);
+
+  let user = getUser(userAddress);
+
+  // reverse double counting of tokenBalances from synth token TransferEvent
+  updateUserBalance(synthToken.id, user, amount, false, event.block.timestamp);
+
+  user.save();
+
+  saveEventToStateChange(
+    event,
+    "ExecuteNextPriceMintSettlementUser",
+    [
+      marketIndex.toString(),
+      userAddress.toHex(),
+      isLong ? "true" : "false",
+      amount.toString(),
+    ],
+    ["marketIndex", "userAddress", "isLong", "amount"],
+    ["uint32", "address", "bool", "uint256"],
+    [userAddress],
     []
   );
 }
@@ -543,42 +722,4 @@ function updateLatestTokenPrice(
     }
     syntheticToken.priceHistory.push(newPriceEntity.id);
   }
-}
-export function handleTokenPriceRefreshed(event: TokenPriceRefreshed): void {
-  let marketIndex = event.params.marketIndex;
-  let marketIndexString = marketIndex.toString();
-  let longTokenPrice = event.params.longTokenPrice;
-  let shortTokenPrice = event.params.shortTokenPrice;
-  let timestamp = event.block.timestamp;
-  let txHash = event.transaction.hash;
-
-  let syntheticMarket = SyntheticMarket.load(marketIndexString);
-
-  let systemState = getOrCreateLatestSystemState(marketIndex, txHash, event);
-
-  syntheticMarket.latestSystemState = systemState.id;
-  systemState.save();
-  syntheticMarket.save();
-
-  updateLatestTokenPrice(true, marketIndexString, longTokenPrice, timestamp);
-  updateLatestTokenPrice(false, marketIndexString, shortTokenPrice, timestamp);
-
-  saveEventToStateChange(
-    event,
-    "TokenPriceRefreshed",
-    bigIntArrayToStringArray([marketIndex, longTokenPrice, shortTokenPrice]),
-    ["marketIndex", "longTokenPrice", "shortTokenPrice"],
-    ["uint256", "uint256", "uint256"],
-    [],
-    []
-  );
-}
-
-// currently all params are BigInts -> in future may have to modify to support e.g. Addresses
-function bigIntArrayToStringArray(bigIntArr: BigInt[]): string[] {
-  let returnArr = new Array<string>(bigIntArr.length);
-  for (let i = 0; i < bigIntArr.length; i++) {
-    returnArr[i] = bigIntArr[i].toString();
-  }
-  return returnArr;
 }

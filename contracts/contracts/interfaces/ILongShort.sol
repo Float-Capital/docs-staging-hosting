@@ -2,14 +2,21 @@
 
 pragma solidity 0.8.3;
 
-contract ILongShort {
-    function redeemLong(uint32 marketIndex, uint256 tokensToRedeem)
-        external
-        virtual
-    {}
+abstract contract ILongShort {
+    function updateSystemState(uint32 marketIndex) external virtual;
 
-    function redeemShort(uint32 marketIndex, uint256 tokensToRedeem)
+    function updateSystemStateMulti(uint32[] calldata marketIndex)
         external
-        virtual
-    {}
+        virtual;
+
+    function getUsersConfirmedButNotSettledBalance(
+        address user,
+        uint32 marketIndex,
+        bool isLong
+    ) external view virtual returns (uint256 pendingBalance);
+
+    function executeOutstandingNextPriceSettlementsUser(
+        address user,
+        uint32 marketIndex
+    ) external virtual;
 }

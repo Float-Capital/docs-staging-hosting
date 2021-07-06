@@ -8,10 +8,12 @@ pragma solidity 0.8.3;
  * different markets may share an underlying fund token.
  */
 abstract contract IYieldManager {
+    function totalReservedForTreasury() external virtual returns (uint256);
+
     /*
      * Deposits the given amount of tokens into this yield manager.
      */
-    function depositToken(uint256 amount) public virtual;
+    function depositPaymentToken(uint256 amount) public virtual;
 
     /*
      * Withdraws the given amount of tokens from this yield manager.
@@ -20,15 +22,26 @@ abstract contract IYieldManager {
      *   underlying yield tokens if the protocol we use doesn't have
      *   enough liquidity.
      */
-    function withdrawToken(uint256 amount) public virtual;
+    function withdrawPaymentToken(uint256 amount) public virtual;
 
     /*
-     * Returns the total token value held by this yield manager.
+     *  Withdraw erc20 token to the treasury contract (WMATIC)
      */
-    function getTotalHeld() public virtual returns (uint256 amount);
+    function withdrawErc20TokenToTreasury(address erc20Token) external virtual;
 
     /*
-     * Returns the token held by this yield manager.
+     * Calculate the amount of yield that has yet to be claimed,
+     * note how much is reserved for the treasury and return how
+     * much is reserved for the market. The yield is split between
+     * the market and the treasury so treasuryPercent = 1 - marketPercent.
      */
-    function getHeldToken() public view virtual returns (address token);
+    function claimYieldAndGetMarketAmount(
+        uint256 totalValueRealizedForMarket,
+        uint256 marketPercentE5
+    ) public virtual returns (uint256 marketAmount);
+
+    /*
+     * Transfer tokens owed to the treasury to the treasury.
+     */
+    function withdrawTreasuryFunds() external virtual;
 }

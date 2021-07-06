@@ -8,6 +8,7 @@ var MainLayout = require("./layouts/MainLayout.js");
 var APYProvider = require("./libraries/APYProvider.js");
 var Router = require("next/router");
 var RootProvider = require("./libraries/RootProvider.js");
+var StartTrading = require("./components/UI/StartTrading.js");
 var ToastProvider = require("./components/UI/ToastProvider.js");
 var InjectedEthereum = require("./ethereum/InjectedEthereum.js");
 var StateChangeMonitor = require("./libraries/StateChangeMonitor.js");
@@ -20,16 +21,18 @@ function $$default(props) {
   InjectedEthereum.useReloadOnMetamaskChainChanged(undefined);
   return React.createElement(ToastProvider.make, {
               children: React.createElement(RootProvider.make, {
-                    children: null
-                  }, React.createElement(Client.make, {
-                        children: React.createElement(APYProvider.make, {
-                              children: React.createElement(StateChangeMonitor.make, {
-                                    children: React.createElement(MainLayout.make, {
-                                          children: content
+                    children: React.createElement(StartTrading.ClickedTradingProvider.make, {
+                          children: null
+                        }, React.createElement(Client.make, {
+                              children: React.createElement(APYProvider.make, {
+                                    children: React.createElement(StateChangeMonitor.make, {
+                                          children: React.createElement(MainLayout.make, {
+                                                children: content
+                                              })
                                         })
                                   })
-                            })
-                      }), React.createElement(Toast.make, {}))
+                            }), React.createElement(Toast.make, {}))
+                  })
             });
 }
 

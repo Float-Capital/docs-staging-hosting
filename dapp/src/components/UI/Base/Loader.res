@@ -28,11 +28,11 @@ module Tiny = {
 
     let elipsisDot = (~hide) =>
       <span className={`opacity-${hide ? "10" : "100"}`}> {`.`->React.string} </span>
-    <>
+    <div>
       {elipsisDot(~hide=inlineLoaderState == 0)}
       {elipsisDot(~hide=inlineLoaderState == 1)}
       {elipsisDot(~hide=inlineLoaderState == 2)}
-    </>
+    </div>
   }
 }
 

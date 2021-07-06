@@ -6,15 +6,24 @@ var Curry = require("rescript/lib/js/curry.js");
 var Modal = require("../UI/Base/Modal.js");
 var React = require("react");
 var Loader = require("../UI/Base/Loader.js");
+var Js_math = require("rescript/lib/js/js_math.js");
 var TweetButton = require("../UI/TweetButton.js");
+var ViewProfileButton = require("../UI/ViewProfileButton.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
-var ViewPositionButton = require("../UI/ViewPositionButton.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
 
 function StakeTxStatusModal(Props) {
   var txStateStake = Props.txStateStake;
   var resetFormButton = Props.resetFormButton;
   var tokenToStake = Props.tokenToStake;
+  var stakeTweetMessages = [
+    "Hey Siri, play “Celebrate” by Kool and The Gang 🥳, because I just staked my @float_capital synthetic assets to earn FLOAT tokens! 🌊",
+    "Stake that @float_capital! 🌊 I just staked my synthetic assets to earn FLOAT tokens! 🥳",
+    "Make it rain @float_capital! 💸 I just staked my synthetic assets to earn FLOAT tokens! 🥳",
+    "Stake that, all on the floor! Stake that, give me some more! 🎶 I just staked my synthetic assets to earn FLOAT tokens! @float_capital 🌊",
+    "Float like a butterfly, stake like a bee!🐝 I just staked to earn FLOAT tokens @float_capital 🌊"
+  ];
+  var randomStakeTweetMessage = stakeTweetMessages[Js_math.random_int(0, stakeTweetMessages.length)];
   if (typeof txStateStake === "number") {
     if (txStateStake === /* UnInitialised */0) {
       return null;
@@ -53,8 +62,8 @@ function StakeTxStatusModal(Props) {
                       }, React.createElement("div", {
                             className: "text-center m-3"
                           }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement(TweetButton.make, {
-                                message: "Float like a butterfly, stake like a bee!🐝 I just staked to earn Float tokens @float_capital 🌊 "
-                              }), React.createElement(ViewPositionButton.make, {})), Curry._1(resetFormButton, undefined)));
+                                message: randomStakeTweetMessage
+                              }), React.createElement(ViewProfileButton.make, {})), Curry._1(resetFormButton, undefined)));
     case /* Failed */3 :
         return React.createElement(Modal.make, {
                     id: "stake-6",

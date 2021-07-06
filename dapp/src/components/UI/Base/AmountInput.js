@@ -6,7 +6,6 @@ var Ethers = require("../../../ethereum/Ethers.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 
 function AmountInput(Props) {
-  var placeholder = Props.placeholder;
   var value = Props.value;
   var optBalanceOpt = Props.optBalance;
   var disabled = Props.disabled;
@@ -22,14 +21,17 @@ function AmountInput(Props) {
                   className: "py-2 font-normal text-grey-darkest w-full py-1 px-2 outline-none text-md text-gray-600",
                   id: "amount",
                   disabled: disabled,
-                  placeholder: placeholder,
+                  placeholder: "0.0",
                   type: "text",
                   value: value,
                   onBlur: onBlur,
                   onChange: onChange
                 }), optCurrency !== undefined ? React.createElement("span", {
-                    className: "flex items-center bg-white pr-3 text-md text-gray-300"
-                  }, optCurrency) : null, optBalance !== undefined ? React.createElement("span", {
+                    className: "flex items-center bg-white pr-3 text-md text-gray-300 min-w-56"
+                  }, React.createElement("img", {
+                        className: "h-5 pr-1",
+                        src: optCurrency.iconUrl
+                      }), optCurrency.name) : null, optBalance !== undefined ? React.createElement("span", {
                     className: "flex items-center bg-white px-1 text-xxs text-gray-400"
                   }, "balance " + Ethers.Utils.formatEtherToPrecision(Caml_option.valFromOption(optBalance), 2)) : null, React.createElement("span", {
                   className: "flex items-center bg-gray-200 hover:bg-white hover:text-gray-700 px-5 font-bold"

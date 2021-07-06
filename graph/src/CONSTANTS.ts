@@ -35,3 +35,8 @@ export let PRICE_HISTORY_INTERVALS: BigInt[] = [
   TWO_WEEKS_IN_SECONDS,
   ONE_MONTH_IN_SECONDS,
 ];
+
+export let MARKET_SIDE_LONG: string = "Long";
+export let MARKET_SIDE_SHORT: string = "Short";
+export let ACTION_MINT: string = "Mint";
+export let ACTION_REDEEM: string = "Redeem";

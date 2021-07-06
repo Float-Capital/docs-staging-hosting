@@ -1,13 +1,7 @@
-open Globals
 open APYProvider
 
-// Big numbers
-let zero = Ethers.BigNumber.fromUnsafe("0")
-let oneHundred = Ethers.BigNumber.fromUnsafe("100000000000000000000") // 10 ^ 20
-let oneInWei = Ethers.BigNumber.fromUnsafe("1000000000000000000") // 10 ^ 18
-
 let calculateDollarValue = (~tokenPrice: Ethers.BigNumber.t, ~amountStaked: Ethers.BigNumber.t) => {
-  tokenPrice->Ethers.BigNumber.mul(amountStaked)->Ethers.BigNumber.div(oneInWei)
+  tokenPrice->Ethers.BigNumber.mul(amountStaked)->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
 }
 
 let basicApyCalc = (collateralTokenApy: float, longVal: float, shortVal: float, tokenType) => {
@@ -32,11 +26,6 @@ let mappedBasicCalc = (apy, longVal, shortVal, tokenType) =>
   | a => a
   }
 
-// TODO: emit and pull these from graph. "kperiod, kInitialMultiplier."
-// For now going to hardcode them.
-let kperiodHardcode = Ethers.BigNumber.fromUnsafe("1664000") // ~20 days
-let kmultiplierHardcode = Ethers.BigNumber.fromUnsafe("5000000000000000000")
-
 type handleStakeButtonPress =
   | WaitingForInteraction
   | Loading
@@ -60,11 +49,9 @@ let make = (
     syntheticShort: {totalStaked: shortTotalStaked, tokenAddress: shortTokenAddress},
     syntheticLong: {totalStaked: longTotalStaked, tokenAddress: longTokenAddress},
   }: Queries.SyntheticMarketInfo.t,
-  ~optUserBalanceAddressSet=None: option<DataHooks.graphResponse<HashSet.String.t>>,
 ) => {
   let router = Next.Router.useRouter()
 
-  let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
   let apy = useAPY()
 
   let longDollarValueStaked = calculateDollarValue(
@@ -93,8 +80,8 @@ let make = (
   let longFloatApy = MarketCalculationHelpers.calculateFloatAPY(
     totalLockedLong,
     totalLockedShort,
-    kperiodHardcode,
-    kmultiplierHardcode,
+    CONSTANTS.kperiodHardcode,
+    CONSTANTS.kmultiplierHardcode,
     timestampCreated,
     currentTimestamp,
     "long",
@@ -103,21 +90,20 @@ let make = (
   let shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(
     totalLockedLong,
     totalLockedShort,
-    kperiodHardcode,
-    kmultiplierHardcode,
+    CONSTANTS.kperiodHardcode,
+    CONSTANTS.kmultiplierHardcode,
     timestampCreated,
     currentTimestamp,
     "short",
   )
 
-  let stakeOption = router.query->Js.Dict.get("tokenAddress")
-
   let stakeButtons = () =>
     <div className="flex flex-wrap justify-evenly">
       <Button.Small
-        onClick={_ => {
+        onClick={event => {
+          ReactEvent.Mouse.preventDefault(event)
           router->Next.Router.pushOptions(
-            `/stake?tokenAddress=${longTokenAddress->ethAdrToLowerStr}`,
+            `/stake?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=long&tokenId=${longTokenAddress->Ethers.Utils.ethAdrToLowerStr}`,
             None,
             {shallow: true, scroll: false},
           )
@@ -125,9 +111,10 @@ let make = (
         "Stake Long"
       </Button.Small>
       <Button.Small
-        onClick={_ => {
+        onClick={event => {
+          ReactEvent.Mouse.preventDefault(event)
           router->Next.Router.pushOptions(
-            `/stake?tokenAddress=${shortTokenAddress->ethAdrToLowerStr}`,
+            `/stake?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=short&tokenId=${shortTokenAddress->Ethers.Utils.ethAdrToLowerStr}`,
             None,
             {shallow: true, scroll: false},
           )
@@ -135,67 +122,6 @@ let make = (
         "Stake Short"
       </Button.Small>
     </div>
-
-  let stakeButtonPressState: handleStakeButtonPress =
-    stakeOption->Option.mapWithDefault(WaitingForInteraction, tokenAddress => {
-      let longAdrLower = longTokenAddress->ethAdrToLowerStr
-      let shortAdrLower = shortTokenAddress->ethAdrToLowerStr
-
-      if tokenAddress == longAdrLower || tokenAddress == shortAdrLower {
-        let redirect = () => Redirect({
-          actionOption: tokenAddress == longAdrLower ? "long" : "short",
-          marketIndex: marketIndex->Ethers.BigNumber.toString,
-        })
-        switch optUserBalanceAddressSet {
-        | Some(Loading) => Loading
-        | Some(Response(set)) =>
-          set->HashSet.String.has(
-            tokenAddress->Ethers.Utils.getAddressUnsafe->Ethers.Utils.ethAdrToStr,
-          )
-            ? Form(tokenAddress)
-            : redirect()
-        | _ => redirect()
-        }
-      } else {
-        WaitingForInteraction
-      }
-    })
-
-  React.useEffect1(_ => {
-    switch stakeButtonPressState {
-    | Redirect({actionOption, marketIndex}) => {
-        let routeToMint = () =>
-          router
-          ->Next.Router.pushPromise(
-            `/?marketIndex=${marketIndex}&actionOption=${actionOption}&tab=mint`,
-          )
-          ->JsPromise.then(_ => {
-            let _ = toastDispatch(
-              ToastProvider.Show(
-                `Mint some  ${marketName} ${actionOption} tokens to stake.`,
-                "",
-                ToastProvider.Info,
-              ),
-            )
-            ()->JsPromise.resolve
-          })
-          ->JsPromise.catch(e => {
-            Js.log(e)
-            ()->JsPromise.resolve
-          })
-        let _ =
-          router
-          ->Next.Router.replaceOptionsPromise(`/stake`, None, {shallow: true, scroll: false}) // for if user presses back
-          ->JsPromise.then(_ => routeToMint()->JsPromise.resolve)
-          ->JsPromise.catch(e => {
-            Js.log(e)
-            routeToMint()->JsPromise.resolve
-          })
-      }
-    | _ => ()
-    }
-    None
-  }, [stakeButtonPressState])
 
   let liquidityRatio = () =>
     <div className={`w-full`}>
@@ -205,19 +131,9 @@ let make = (
       }}
     </div>
 
-  let closeStakeFormButton = () =>
-    <button
-      className="absolute left-full pl-4 text-3xl leading-none outline-none focus:outline-none"
-      onClick={_ => {
-        router->Next.Router.pushOptions(`/stake`, None, {shallow: true, scroll: false})
-      }}>
-      <span className="opacity-4 block outline-none focus:outline-none">
-        {`×`->React.string}
-      </span>
-    </button>
-
-  <>
-    <div className="p-1 mb-8 rounded-lg flex flex-col bg-light-gold bg-opacity-75 my-5 shadow-lg">
+  <Next.Link href={`/?marketIndex=${marketIndex->Ethers.BigNumber.toString}&tab=stake`}>
+    <div
+      className="p-1 mb-8 rounded-lg flex flex-col bg-light-gold bg-opacity-75 hover:bg-opacity-60 cursor-pointer my-5 shadow-lg">
       <div className="flex justify-center w-full my-1">
         <h1 className="font-bold text-xl font-alphbeta">
           {marketName->React.string} <Tooltip tip={`This market tracks ${marketName}`} />
@@ -281,14 +197,6 @@ let make = (
         />
         <div className="block md:hidden pt-5 order-4 w-full"> {stakeButtons()} </div>
       </div>
-      {switch stakeButtonPressState {
-      | Form(tokenAddress) =>
-        <div className="w-96 mx-auto relative">
-          {closeStakeFormButton()} <StakeForm tokenId=tokenAddress />
-        </div>
-      | Loading => <Loader />
-      | _ => React.null
-      }}
     </div>
-  </>
+  </Next.Link>
 }

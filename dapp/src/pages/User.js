@@ -2,12 +2,14 @@
 'use strict';
 
 var Misc = require("../libraries/Misc.js");
+var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Button = require("../components/UI/Base/Button.js");
-var Config = require("../Config.js");
+var Config = require("../config/Config.js");
 var Ethers = require("../ethereum/Ethers.js");
 var Loader = require("../components/UI/Base/Loader.js");
 var UserUI = require("../components/UI/UserUI.js");
+var Backend = require("../mockBackend/Backend.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Masonry = require("../components/UI/Masonry.js");
 var CONSTANTS = require("../CONSTANTS.js");
@@ -20,46 +22,106 @@ var RootProvider = require("../libraries/RootProvider.js");
 var DisplayAddress = require("../components/UI/Base/DisplayAddress.js");
 var Format = require("date-fns/format").default;
 
+function add(prim0, prim1) {
+  return prim0.add(prim1);
+}
+
+function mul(prim0, prim1) {
+  return prim0.mul(prim1);
+}
+
+function div(prim0, prim1) {
+  return prim0.div(prim1);
+}
+
+function toNumber(prim) {
+  return prim.toNumber();
+}
+
+function eq(prim0, prim1) {
+  return prim0.eq(prim1);
+}
+
+function toString(prim) {
+  return prim.toString();
+}
+
+function getUsersTotalTokenBalance(balancesResponse) {
+  return Belt_Array.reduce(balancesResponse, CONSTANTS.zeroBN, (function (totalBalanceSum, balanceDataResponse) {
+                return totalBalanceSum.add(balanceDataResponse.syntheticToken.latestPrice.price.price.mul(balanceDataResponse.tokenBalance).div(CONSTANTS.tenToThe18));
+              }));
+}
+
+function useRerender(param) {
+  var match = React.useState(function () {
+        return 0;
+      });
+  var setV = match[1];
+  return function (param) {
+    return Curry._1(setV, (function (v) {
+                  return v + 1 | 0;
+                }));
+  };
+}
+
 function User$UserBalancesCard(Props) {
   var userId = Props.userId;
   var usersTokensQuery = DataHooks.useUsersBalances(userId);
+  var usersPendingMintsQuery = DataHooks.useUsersPendingMints(userId);
+  var rerender = useRerender(undefined);
   var tmp;
-  if (typeof usersTokensQuery === "number") {
+  if (typeof usersPendingMintsQuery === "number") {
     tmp = React.createElement("div", {
+          className: "mx-auto"
+        }, React.createElement(Loader.Mini.make, {}));
+  } else if (usersPendingMintsQuery.TAG === /* GraphError */0) {
+    tmp = usersPendingMintsQuery._0;
+  } else {
+    var pendingMint = usersPendingMintsQuery._0;
+    tmp = React.createElement(React.Fragment, undefined, pendingMint.length !== 0 ? React.createElement(UserUI.UserColumnTextCenter.make, {
+                children: null
+              }, React.createElement(UserUI.UserColumnText.make, {
+                    head: "⏳ Pending synths",
+                    body: ""
+                  }), React.createElement("br", undefined)) : null, Belt_Array.map(pendingMint, (function (param) {
+                var marketIndex = param.marketIndex;
+                return React.createElement(UserUI.UserPendingBox.make, {
+                            name: Backend.getMarketInfoUnsafe(marketIndex.toNumber()).name,
+                            isLong: param.isLong,
+                            daiSpend: param.amount,
+                            txConfirmedTimestamp: param.confirmedTimestamp.toNumber(),
+                            marketIndex: marketIndex,
+                            rerenderCallback: rerender
+                          });
+              })));
+  }
+  var tmp$1;
+  if (typeof usersTokensQuery === "number") {
+    tmp$1 = React.createElement("div", {
           className: "m-auto"
         }, React.createElement(Loader.Mini.make, {}));
   } else if (usersTokensQuery.TAG === /* GraphError */0) {
-    tmp = usersTokensQuery._0;
+    tmp$1 = usersTokensQuery._0;
   } else {
-    var match = usersTokensQuery._0;
-    tmp = React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnTextCenter.make, {
+    var balancesQueryResponse = usersTokensQuery._0;
+    var totalBalance = getUsersTotalTokenBalance(balancesQueryResponse);
+    var usersBalancesComponents = Belt_Array.map(Belt_Array.keep(balancesQueryResponse, (function (param) {
+                return !param.tokenBalance.eq(CONSTANTS.zeroBN);
+              })), (function (userBalanceData) {
+            return React.createElement(UserUI.UserTokenBox.make, {
+                        userBalanceData: userBalanceData,
+                        children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {
+                              synthId: userBalanceData.syntheticToken.id,
+                              syntheticSide: userBalanceData.syntheticToken.tokenType
+                            })
+                      });
+          }));
+    tmp$1 = React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnTextCenter.make, {
               children: React.createElement(UserUI.UserColumnText.make, {
                     head: "💰 Synth value",
-                    body: "$" + Misc.NumberFormat.formatEther(undefined, match.totalBalance)
+                    body: "$" + Misc.NumberFormat.formatEther(undefined, totalBalance)
                   })
-            }), React.createElement("br", undefined), Belt_Array.map(Belt_Array.keep(match.balances, (function (param) {
-                    return !param.tokenBalance.eq(CONSTANTS.zeroBN);
-                  })), (function (param) {
-                var isLong = param.isLong;
-                var name = param.name;
-                var addr = param.addr;
-                return React.createElement(UserUI.UserTokenBox.make, {
-                            name: name,
-                            isLong: isLong,
-                            tokens: Misc.NumberFormat.formatEther(undefined, param.tokenBalance),
-                            value: Misc.NumberFormat.formatEther(undefined, param.tokensValue),
-                            tokenAddress: addr,
-                            symbol: param.symbol,
-                            metadata: param.metadata,
-                            children: React.createElement(UserUI.UserMarketStakeOrRedeem.make, {
-                                  synthAddress: Ethers.Utils.ethAdrToLowerStr(addr),
-                                  isLong: isLong
-                                }),
-                            key: name + "-" + (
-                              isLong ? "long" : "short"
-                            )
-                          });
-              })));
+            }), usersBalancesComponents);
   }
   return React.createElement(UserUI.UserColumnCard.make, {
               children: null
@@ -68,10 +130,11 @@ function User$UserBalancesCard(Props) {
                 }, "Synthetic assets", React.createElement("img", {
                       className: "inline h-5 ml-2",
                       src: "/img/coin.png"
-                    })), tmp);
+                    })), tmp, tmp$1);
 }
 
 var UserBalancesCard = {
+  useRerender: useRerender,
   make: User$UserBalancesCard
 };
 
@@ -95,15 +158,20 @@ function User$UserTotalInvestedCard(Props) {
   var usersTokensQuery = DataHooks.useUsersBalances(userId);
   var totalStakedValue = getUsersTotalStakeValue(stakes);
   var tmp;
-  tmp = typeof usersTokensQuery === "number" ? React.createElement("div", {
+  if (typeof usersTokensQuery === "number") {
+    tmp = React.createElement("div", {
           className: "m-auto"
-        }, React.createElement(Loader.Mini.make, {})) : (
-      usersTokensQuery.TAG === /* GraphError */0 ? usersTokensQuery._0 : React.createElement(UserUI.UserTotalValue.make, {
-              totalValueNameSup: "Portfolio",
-              totalValueNameSub: "Value",
-              totalValue: usersTokensQuery._0.totalBalance.add(totalStakedValue.contents)
-            })
-    );
+        }, React.createElement(Loader.Mini.make, {}));
+  } else if (usersTokensQuery.TAG === /* GraphError */0) {
+    tmp = usersTokensQuery._0;
+  } else {
+    var totalBalance = getUsersTotalTokenBalance(usersTokensQuery._0);
+    tmp = React.createElement(UserUI.UserTotalValue.make, {
+          totalValueNameSup: "Portfolio",
+          totalValueNameSub: "Value",
+          totalValue: totalBalance.add(totalStakedValue.contents)
+        });
+  }
   return React.createElement(React.Fragment, undefined, tmp);
 }
 
@@ -199,7 +267,7 @@ function User(Props) {
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
   var router = Router.useRouter();
   var userStr = Js_dict.get(router.query, "user");
-  var user = userStr !== undefined ? userStr.toLowerCase() : "no user provided";
+  var user = userStr !== undefined ? userStr.toLowerCase() : "No user provided";
   var stakesQuery = DataHooks.useStakesForUser(user);
   var userInfoQuery = DataHooks.useBasicUserInfo(user);
   var notCurrentUserMessage = function (param) {
@@ -257,6 +325,13 @@ var make = User;
 
 var $$default = User;
 
+exports.add = add;
+exports.mul = mul;
+exports.div = div;
+exports.toNumber = toNumber;
+exports.eq = eq;
+exports.toString = toString;
+exports.getUsersTotalTokenBalance = getUsersTotalTokenBalance;
 exports.UserBalancesCard = UserBalancesCard;
 exports.getUsersTotalStakeValue = getUsersTotalStakeValue;
 exports.UserTotalInvestedCard = UserTotalInvestedCard;

@@ -6,13 +6,13 @@ var CssJs = require("bs-css-emotion/src/CssJs.js");
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Button = require("../components/UI/Base/Button.js");
-var Config = require("../Config.js");
 var Globals = require("../libraries/Globals.js");
+var Blockies = require("../bindings/ethereum-blockies-base64/Blockies.js");
 var Link = require("next/link").default;
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var RootProvider = require("../libraries/RootProvider.js");
-var DisplayAddress = require("../components/UI/Base/DisplayAddress.js");
+var StartTrading = require("../components/UI/StartTrading.js");
 
 function floatingMenuZoomStyle(shouldDisplay) {
   return CssJs.style([
@@ -61,7 +61,7 @@ function hamburgerSvg(param) {
               id: "Layer_1",
               height: "32px",
               width: "32px",
-              fill: "#555555",
+              fill: "#ffffff",
               version: "1.1"
             }, React.createElement("path", {
                   d: "M4,10h24c1.104,0,2-0.896,2-2s-0.896-2-2-2H4C2.896,6,2,6.896,2,8S2.896,10,4,10z M28,14H4c-1.104,0-2,0.896-2,2  s0.896,2,2,2h24c1.104,0,2-0.896,2-2S29.104,14,28,14z M28,22H4c-1.104,0-2,0.896-2,2s0.896,2,2,2h24c1.104,0,2-0.896,2-2  S29.104,22,28,22z"
@@ -97,15 +97,24 @@ function Navigation(Props) {
   var isOpen = match[0];
   var router = Router.useRouter();
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
+  var activeHighlight = function (path) {
+    if (router.pathname === path) {
+      return "underline";
+    } else {
+      return "";
+    }
+  };
+  var clickedTradingDispatch = React.useContext(StartTrading.ClickedTradingProvider.DispatchClickedTradingContext.context);
   var tmp;
   if (optCurrentUser !== undefined) {
     var currentUser = Caml_option.valFromOption(optCurrentUser);
     tmp = React.createElement(Link, {
           href: "/user/" + Globals.ethAdrToStr(currentUser),
           children: React.createElement("p", {
-                className: "px-3 bg-white hover:bg-black hover:text-gray-200 text-base cursor-pointer"
-              }, " 👤 ", React.createElement(DisplayAddress.make, {
-                    address: Globals.ethAdrToStr(currentUser)
+                className: "flex flex-row items-center px-3 bg-white hover:bg-black hover:text-white ml-1  text-base cursor-pointer " + activeHighlight("/user/[user]")
+              }, "PROFILE", React.createElement("img", {
+                    className: "inline h-4 rounded ml-2",
+                    src: Blockies.makeBlockie(Globals.ethAdrToStr(currentUser))
                   }))
         });
   } else {
@@ -121,16 +130,19 @@ function Navigation(Props) {
   if (optCurrentUser !== undefined) {
     var currentUser$1 = Caml_option.valFromOption(optCurrentUser);
     tmp$1 = React.createElement("p", {
-          className: "px-3 bg-white text-black hover:bg-black hover:text-gray-200 text-base cursor-pointer text-3xl",
+          className: "flex flex-row items-center px-3 bg-white text-black hover:bg-black hover:text-gray-200 \n                   cursor-pointer text-3xl",
           onClick: (function (param) {
               router.push("/user/" + Globals.ethAdrToStr(currentUser$1));
               return Curry._1(setIsOpen, (function (param) {
                             return false;
                           }));
             })
-        }, " 👤 ", React.createElement(DisplayAddress.make, {
-              address: Globals.ethAdrToStr(currentUser$1)
-            }));
+        }, React.createElement("img", {
+              className: "inline h-6 rounded mr-2",
+              src: Blockies.makeBlockie(Globals.ethAdrToStr(currentUser$1))
+            }), React.createElement("p", {
+              className: "flex flex-row items-center px-3 hover:bg-white  cursor-pointer " + activeHighlight("/user/[user]")
+            }, "PROFILE"));
   } else {
     tmp$1 = React.createElement(Button.Small.make, {
           onClick: (function (param) {
@@ -158,28 +170,29 @@ function Navigation(Props) {
                                       }))))
                     }), React.createElement("div", {
                       className: "hidden md:flex w-2/3 text-base items-center justify-end"
-                    }, React.createElement(Link, {
-                          href: "/",
+                    }, React.createElement("span", {
+                          onClick: (function (param) {
+                              return Curry._1(clickedTradingDispatch, /* Clicked */0);
+                            })
+                        }, React.createElement(Link, {
+                              href: "/",
+                              children: React.createElement("a", {
+                                    className: "px-3 hover:bg-white " + activeHighlight("/")
+                                  }, "MARKETS")
+                            })), React.createElement(Link, {
+                          href: "/stake-markets",
                           children: React.createElement("a", {
-                                className: "px-3 hover:bg-white"
-                              }, "MARKETS")
+                                className: "px-3 hover:bg-white "
+                              }, React.createElement("span", {
+                                    className: activeHighlight("/stake-markets")
+                                  }, "STAKE"), "🔥")
                         }), React.createElement(Link, {
-                          href: "/stake",
+                          href: "/stats",
                           children: React.createElement("a", {
-                                className: "px-3 hover:bg-white"
-                              }, "STAKE🔥")
-                        }), React.createElement(Link, {
-                          href: "/dashboard",
-                          children: React.createElement("a", {
-                                className: "px-3 hover:bg-white"
-                              }, "DASHBOARD")
-                        }), Config.networkId === 80001 ? React.createElement(Link, {
-                            href: "/faucet",
-                            children: React.createElement("a", {
-                                  className: "px-3 hover:bg-white"
-                                }, "FAUCET")
-                          }) : null, React.createElement("a", {
-                          className: "px-3 hover:bg-white mr-2",
+                                className: "px-3 hover:bg-white " + activeHighlight("/stats")
+                              }, "STATS")
+                        }), React.createElement("a", {
+                          className: "px-3 hover:bg-white",
                           href: "https://docs.float.capital",
                           target: "_blank"
                         }, "DOCS"), tmp), React.createElement("div", {
@@ -196,7 +209,7 @@ function Navigation(Props) {
                         }, React.createElement("div", {
                               className: "zoom-in-effect flex flex-col text-3xl text-white"
                             }, React.createElement("div", {
-                                  className: "px-3 bg-black m-2",
+                                  className: "px-3 bg-black m-2 " + activeHighlight("/"),
                                   onClick: (function (param) {
                                       router.push("/");
                                       return Curry._1(setIsOpen, (function (param) {
@@ -206,28 +219,22 @@ function Navigation(Props) {
                                 }, "MARKETS"), React.createElement("div", {
                                   className: "px-3 bg-black m-2",
                                   onClick: (function (param) {
-                                      router.push("/stake");
+                                      router.push("/stake-markets");
                                       return Curry._1(setIsOpen, (function (param) {
                                                     return false;
                                                   }));
                                     })
-                                }, "STAKE🔥"), React.createElement("div", {
-                                  className: "px-3 bg-black m-2",
+                                }, React.createElement("span", {
+                                      className: activeHighlight("/stake-markets")
+                                    }, "STAKE"), "🔥"), React.createElement("div", {
+                                  className: "px-3 bg-black m-2  " + activeHighlight("/stats"),
                                   onClick: (function (param) {
-                                      router.push("/dashboard");
+                                      router.push("/stats");
                                       return Curry._1(setIsOpen, (function (param) {
                                                     return false;
                                                   }));
                                     })
-                                }, "DASHBOARD"), Config.networkId === 80001 ? React.createElement("div", {
-                                    className: "px-3 bg-black m-2",
-                                    onClick: (function (param) {
-                                        router.push("/faucet");
-                                        return Curry._1(setIsOpen, (function (param) {
-                                                      return false;
-                                                    }));
-                                      })
-                                  }, "FAUCET") : null, React.createElement("a", {
+                                }, "STATS"), React.createElement("a", {
                                   className: "px-3 bg-black m-2",
                                   href: "https://docs.float.capital",
                                   rel: "noopener noreferrer",
