@@ -420,7 +420,8 @@ function initializeMarketCalls(_r) {
                         marketIndex: param[0],
                         kInitialMultiplier: param[1],
                         kPeriod: param[2],
-                        initialMarketSeed: param[3]
+                        unstakeFeeBasisPoints: param[3],
+                        initialMarketSeed: param[4]
                       };
               }));
 }
@@ -437,21 +438,6 @@ function getUsersConfirmedButNotSettledBalanceCalls(_r) {
                         user: param[0],
                         marketIndex: param[1],
                         isLong: param[2]
-                      };
-              }));
-}
-
-function mockGetMarketPercentForTreasuryVsMarketSplitToReturn(_r, _param0) {
-  ((_r.smocked.getMarketPercentForTreasuryVsMarketSplit.will.return.with([_param0])));
-  
-}
-
-function getMarketPercentForTreasuryVsMarketSplitCalls(_r) {
-  var array = _r.smocked.getMarketPercentForTreasuryVsMarketSplit.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var marketIndex = _m[0];
-                return {
-                        marketIndex: marketIndex
                       };
               }));
 }
@@ -772,7 +758,8 @@ function initializeMarketCalls$1(param) {
                                           marketIndex: param[0],
                                           kInitialMultiplier: param[1],
                                           kPeriod: param[2],
-                                          initialMarketSeed: param[3]
+                                          unstakeFeeBasisPoints: param[3],
+                                          initialMarketSeed: param[4]
                                         };
                                 }));
                   })));
@@ -867,19 +854,19 @@ function getUsersConfirmedButNotSettledBalanceCalls$1(param) {
                   })));
 }
 
-function mockGetMarketPercentForTreasuryVsMarketSplitToReturn$1(_param0) {
-  checkForExceptions("getMarketPercentForTreasuryVsMarketSplit");
+function mock_getMarketPercentForTreasuryVsMarketSplitToReturn(_param0) {
+  checkForExceptions("_getMarketPercentForTreasuryVsMarketSplit");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.getMarketPercentForTreasuryVsMarketSplitMock.will.return.with([_param0])));
+          ((_r.smocked._getMarketPercentForTreasuryVsMarketSplitMock.will.return.with([_param0])));
           
         }));
   
 }
 
-function getMarketPercentForTreasuryVsMarketSplitCalls$1(param) {
-  checkForExceptions("getMarketPercentForTreasuryVsMarketSplit");
+function _getMarketPercentForTreasuryVsMarketSplitCalls(param) {
+  checkForExceptions("_getMarketPercentForTreasuryVsMarketSplit");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.getMarketPercentForTreasuryVsMarketSplitMock.calls;
+                    var array = _r.smocked._getMarketPercentForTreasuryVsMarketSplitMock.calls;
                     return Belt_Array.map(array, (function (_m) {
                                   var marketIndex = _m[0];
                                   return {
@@ -1635,8 +1622,8 @@ var InternalMock = {
   _getAmountSynthTokenCalls: _getAmountSynthTokenCalls,
   mockGetUsersConfirmedButNotSettledBalanceToReturn: mockGetUsersConfirmedButNotSettledBalanceToReturn$1,
   getUsersConfirmedButNotSettledBalanceCalls: getUsersConfirmedButNotSettledBalanceCalls$1,
-  mockGetMarketPercentForTreasuryVsMarketSplitToReturn: mockGetMarketPercentForTreasuryVsMarketSplitToReturn$1,
-  getMarketPercentForTreasuryVsMarketSplitCalls: getMarketPercentForTreasuryVsMarketSplitCalls$1,
+  mock_getMarketPercentForTreasuryVsMarketSplitToReturn: mock_getMarketPercentForTreasuryVsMarketSplitToReturn,
+  _getMarketPercentForTreasuryVsMarketSplitCalls: _getMarketPercentForTreasuryVsMarketSplitCalls,
   mock_getLongPercentForLongVsShortSplitToReturn: mock_getLongPercentForLongVsShortSplitToReturn,
   _getLongPercentForLongVsShortSplitCalls: _getLongPercentForLongVsShortSplitCalls,
   mock_getMarketSplitToReturn: mock_getMarketSplitToReturn,
@@ -1766,8 +1753,6 @@ exports.mockInitializeMarketToReturn = mockInitializeMarketToReturn;
 exports.initializeMarketCalls = initializeMarketCalls;
 exports.mockGetUsersConfirmedButNotSettledBalanceToReturn = mockGetUsersConfirmedButNotSettledBalanceToReturn;
 exports.getUsersConfirmedButNotSettledBalanceCalls = getUsersConfirmedButNotSettledBalanceCalls;
-exports.mockGetMarketPercentForTreasuryVsMarketSplitToReturn = mockGetMarketPercentForTreasuryVsMarketSplitToReturn;
-exports.getMarketPercentForTreasuryVsMarketSplitCalls = getMarketPercentForTreasuryVsMarketSplitCalls;
 exports.mockUpdateSystemStateToReturn = mockUpdateSystemStateToReturn;
 exports.updateSystemStateCalls = updateSystemStateCalls;
 exports.mockUpdateSystemStateMultiToReturn = mockUpdateSystemStateMultiToReturn;

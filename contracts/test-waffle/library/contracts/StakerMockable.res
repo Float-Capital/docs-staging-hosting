@@ -21,6 +21,7 @@ external addNewStakingFund: (
   ~shortToken: Ethers.ethAddress,
   ~kInitialMultiplier: Ethers.BigNumber.t,
   ~kPeriod: Ethers.BigNumber.t,
+  ~unstakeFeeBasisPoints: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "addNewStakingFund"
 
 @send
@@ -102,6 +103,11 @@ type marketLaunchIncentivePeriodReturn = Ethers.BigNumber.t
 @send
 external marketLaunchIncentivePeriod: (t, int) => JsPromise.t<marketLaunchIncentivePeriodReturn> =
   "marketLaunchIncentivePeriod"
+
+type marketUnstakeFeeBasisPointsReturn = Ethers.BigNumber.t
+@send
+external marketUnstakeFeeBasisPoints: (t, int) => JsPromise.t<marketUnstakeFeeBasisPointsReturn> =
+  "marketUnstakeFeeBasisPoints"
 
 @send
 external setFunctionToNotMock: (t, ~functionToNotMock: string) => JsPromise.t<transaction> =

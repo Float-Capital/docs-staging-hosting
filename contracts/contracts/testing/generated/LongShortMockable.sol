@@ -376,11 +376,12 @@ contract LongShortMockable is ILongShort, Initializable {
         uint32 marketIndex,
         uint256 kInitialMultiplier,
         uint256 kPeriod,
+        uint256 unstakeFeeBasisPoints,
         uint256 initialMarketSeed
     ) external adminOnly {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("initializeMarket"))){
       
-      return mocker.initializeMarketMock(marketIndex,kInitialMultiplier,kPeriod,initialMarketSeed);
+      return mocker.initializeMarketMock(marketIndex,kInitialMultiplier,kPeriod,unstakeFeeBasisPoints,initialMarketSeed);
     }
   
         require(!marketExists[marketIndex], "already initialized");
@@ -393,7 +394,8 @@ contract LongShortMockable is ILongShort, Initializable {
             syntheticTokens[latestMarket][true],
             syntheticTokens[latestMarket][false],
             kInitialMultiplier,
-            kPeriod
+            kPeriod,
+            unstakeFeeBasisPoints
         );
 
         _seedMarketInitially(initialMarketSeed, marketIndex);
@@ -481,14 +483,14 @@ contract LongShortMockable is ILongShort, Initializable {
         }
     }
 
-    function getMarketPercentForTreasuryVsMarketSplit(uint32 marketIndex)
-        public
+    function _getMarketPercentForTreasuryVsMarketSplit(uint32 marketIndex)
+        internal
         view
         returns (uint256 marketPercentE5)
     {
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getMarketPercentForTreasuryVsMarketSplit"))){
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_getMarketPercentForTreasuryVsMarketSplit"))){
       
-      return mocker.getMarketPercentForTreasuryVsMarketSplitMock(marketIndex);
+      return mocker._getMarketPercentForTreasuryVsMarketSplitMock(marketIndex);
     }
   
         uint256 totalValueLockedInMarket = syntheticTokenPoolValue[marketIndex][
@@ -515,9 +517,6 @@ contract LongShortMockable is ILongShort, Initializable {
         return marketPercentE5;
     }
 
-                                                            
-        
-        
     function _getLongPercentForLongVsShortSplit(uint32 marketIndex)
         internal
         view
@@ -581,7 +580,7 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._claimAndDistributeYieldMock(marketIndex);
     }
   
-        uint256 marketPercentE5 = getMarketPercentForTreasuryVsMarketSplit(
+        uint256 marketPercentE5 = _getMarketPercentForTreasuryVsMarketSplit(
             marketIndex
         );
 
@@ -1158,7 +1157,7 @@ contract LongShortMockable is ILongShort, Initializable {
                 syntheticTokenPrice
             );
 
-                                    syntheticTokens[marketIndex][isLong].mint(
+            syntheticTokens[marketIndex][isLong].mint(
                 address(this),
                 numberOfTokens
             );

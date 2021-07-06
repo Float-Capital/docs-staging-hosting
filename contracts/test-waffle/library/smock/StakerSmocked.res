@@ -155,6 +155,23 @@ let marketLaunchIncentivePeriodCalls: t => array<marketLaunchIncentivePeriodCall
   })
 }
 
+let mockMarketUnstakeFeeBasisPointsToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.marketUnstakeFeeBasisPoints.will.return.with([_param0])")
+}
+
+type marketUnstakeFeeBasisPointsCall = {param0: int}
+
+let marketUnstakeFeeBasisPointsCalls: t => array<marketUnstakeFeeBasisPointsCall> = _r => {
+  let array = %raw("_r.smocked.marketUnstakeFeeBasisPoints.calls")
+  array->Array.map(_m => {
+    let param0 = _m->Array.getUnsafe(0)
+
+    {
+      param0: param0,
+    }
+  })
+}
+
 let mockSyntheticRewardParamsToReturn: (
   t,
   Ethers.BigNumber.t,
@@ -326,17 +343,26 @@ type addNewStakingFundCall = {
   shortToken: Ethers.ethAddress,
   kInitialMultiplier: Ethers.BigNumber.t,
   kPeriod: Ethers.BigNumber.t,
+  unstakeFeeBasisPoints: Ethers.BigNumber.t,
 }
 
 let addNewStakingFundCalls: t => array<addNewStakingFundCall> = _r => {
   let array = %raw("_r.smocked.addNewStakingFund.calls")
-  array->Array.map(((marketIndex, longToken, shortToken, kInitialMultiplier, kPeriod)) => {
+  array->Array.map(((
+    marketIndex,
+    longToken,
+    shortToken,
+    kInitialMultiplier,
+    kPeriod,
+    unstakeFeeBasisPoints,
+  )) => {
     {
       marketIndex: marketIndex,
       longToken: longToken,
       shortToken: shortToken,
       kInitialMultiplier: kInitialMultiplier,
       kPeriod: kPeriod,
+      unstakeFeeBasisPoints: unstakeFeeBasisPoints,
     }
   })
 }
@@ -647,6 +673,7 @@ module InternalMock = {
     shortToken: Ethers.ethAddress,
     kInitialMultiplier: Ethers.BigNumber.t,
     kPeriod: Ethers.BigNumber.t,
+    unstakeFeeBasisPoints: Ethers.BigNumber.t,
   }
 
   let addNewStakingFundCalls: unit => array<addNewStakingFundCall> = () => {
@@ -654,13 +681,21 @@ module InternalMock = {
     internalRef.contents
     ->Option.map(_r => {
       let array = %raw("_r.smocked.addNewStakingFundMock.calls")
-      array->Array.map(((marketIndex, longToken, shortToken, kInitialMultiplier, kPeriod)) => {
+      array->Array.map(((
+        marketIndex,
+        longToken,
+        shortToken,
+        kInitialMultiplier,
+        kPeriod,
+        unstakeFeeBasisPoints,
+      )) => {
         {
           marketIndex: marketIndex,
           longToken: longToken,
           shortToken: shortToken,
           kInitialMultiplier: kInitialMultiplier,
           kPeriod: kPeriod,
+          unstakeFeeBasisPoints: unstakeFeeBasisPoints,
         }
       })
     })

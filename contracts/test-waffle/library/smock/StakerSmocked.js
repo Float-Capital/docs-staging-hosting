@@ -139,6 +139,21 @@ function marketLaunchIncentivePeriodCalls(_r) {
               }));
 }
 
+function mockMarketUnstakeFeeBasisPointsToReturn(_r, _param0) {
+  ((_r.smocked.marketUnstakeFeeBasisPoints.will.return.with([_param0])));
+  
+}
+
+function marketUnstakeFeeBasisPointsCalls(_r) {
+  var array = _r.smocked.marketUnstakeFeeBasisPoints.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var param0 = _m[0];
+                return {
+                        param0: param0
+                      };
+              }));
+}
+
 function mockSyntheticRewardParamsToReturn(_r, _param0, _param1, _param2) {
   ((_r.smocked.syntheticRewardParams.will.return.with([_param0,_param1,_param2])));
   
@@ -275,7 +290,8 @@ function addNewStakingFundCalls(_r) {
                         longToken: param[1],
                         shortToken: param[2],
                         kInitialMultiplier: param[3],
-                        kPeriod: param[4]
+                        kPeriod: param[4],
+                        unstakeFeeBasisPoints: param[5]
                       };
               }));
 }
@@ -547,7 +563,8 @@ function addNewStakingFundCalls$1(param) {
                                           longToken: param[1],
                                           shortToken: param[2],
                                           kInitialMultiplier: param[3],
-                                          kPeriod: param[4]
+                                          kPeriod: param[4],
+                                          unstakeFeeBasisPoints: param[5]
                                         };
                                 }));
                   })));
@@ -1138,6 +1155,8 @@ exports.mockMarketLaunchIncentiveMultipliersToReturn = mockMarketLaunchIncentive
 exports.marketLaunchIncentiveMultipliersCalls = marketLaunchIncentiveMultipliersCalls;
 exports.mockMarketLaunchIncentivePeriodToReturn = mockMarketLaunchIncentivePeriodToReturn;
 exports.marketLaunchIncentivePeriodCalls = marketLaunchIncentivePeriodCalls;
+exports.mockMarketUnstakeFeeBasisPointsToReturn = mockMarketUnstakeFeeBasisPointsToReturn;
+exports.marketUnstakeFeeBasisPointsCalls = marketUnstakeFeeBasisPointsCalls;
 exports.mockSyntheticRewardParamsToReturn = mockSyntheticRewardParamsToReturn;
 exports.syntheticRewardParamsCalls = syntheticRewardParamsCalls;
 exports.mockSyntheticTokensToReturn = mockSyntheticTokensToReturn;

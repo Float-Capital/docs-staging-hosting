@@ -189,7 +189,8 @@ contract Staker is IStaker, Initializable {
         ISyntheticToken longToken,
         ISyntheticToken shortToken,
         uint256 kInitialMultiplier,
-        uint256 kPeriod
+        uint256 kPeriod,
+        uint256 unstakeFeeBasisPoints
     ) external override onlyFloat {
         marketIndexOfToken[longToken] = marketIndex;
         marketIndexOfToken[shortToken] = marketIndex;
@@ -208,7 +209,7 @@ contract Staker is IStaker, Initializable {
             kInitialMultiplier
         );
 
-        marketUnstakeFeeBasisPoints[marketIndex] = 50; /* Hardcoding 50 basis points for the time being */
+        marketUnstakeFeeBasisPoints[marketIndex] = unstakeFeeBasisPoints;
         emit MarketAddedToStaker(
             marketIndex,
             marketUnstakeFeeBasisPoints[marketIndex]

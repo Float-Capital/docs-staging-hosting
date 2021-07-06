@@ -56,6 +56,7 @@ external addNewStakingFundMock: (
   Ethers.ethAddress,
   Ethers.BigNumber.t,
   Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
 ) => JsPromise.t<addNewStakingFundMockReturn> = "addNewStakingFundMock"
 
 type addNewStateForFloatRewardsMockReturn

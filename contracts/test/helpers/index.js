@@ -92,7 +92,7 @@ const createSynthetic = async (
   longShort,
   syntheticName,
   syntheticSymbol,
-  treasury,
+  treasury
 ) => {
   const fundToken = await erc20.new({
     from: admin,
@@ -143,6 +143,7 @@ const createSynthetic = async (
     currentMarketIndex,
     kInitialMultiplier,
     kPeriod,
+    "50", //50 basis points unstake fee
     "500000000000000000",
     { from: admin }
   );

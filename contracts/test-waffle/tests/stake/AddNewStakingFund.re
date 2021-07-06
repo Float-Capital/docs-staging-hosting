@@ -17,6 +17,7 @@ let test =
     let sampleMockAddress = Helpers.randomAddress();
     let kInitialMultiplier = Helpers.randomInteger();
     let kPeriod = Helpers.randomInteger();
+    let unstakeFeeBasisPoints = Helpers.randomInteger();
 
     let timestampRef = ref(0);
 
@@ -51,6 +52,7 @@ let test =
             ~shortToken=sampleShortAddress,
             ~kInitialMultiplier,
             ~kPeriod,
+            ~unstakeFeeBasisPoints,
           );
       promiseRef := promise;
       let%Await _ = promise;

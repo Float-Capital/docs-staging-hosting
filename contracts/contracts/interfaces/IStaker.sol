@@ -11,7 +11,8 @@ abstract contract IStaker {
         ISyntheticToken longTokenAddress,
         ISyntheticToken shortTokenAddress,
         uint256 kInitialMultiplier,
-        uint256 kPeriod
+        uint256 kPeriod,
+        uint256 unstakeFeeBasisPoints
     ) external virtual;
 
     function addNewStateForFloatRewards(

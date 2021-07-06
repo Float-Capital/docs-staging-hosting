@@ -504,16 +504,24 @@ type initializeMarketCall = {
   marketIndex: int,
   kInitialMultiplier: Ethers.BigNumber.t,
   kPeriod: Ethers.BigNumber.t,
+  unstakeFeeBasisPoints: Ethers.BigNumber.t,
   initialMarketSeed: Ethers.BigNumber.t,
 }
 
 let initializeMarketCalls: t => array<initializeMarketCall> = _r => {
   let array = %raw("_r.smocked.initializeMarket.calls")
-  array->Array.map(((marketIndex, kInitialMultiplier, kPeriod, initialMarketSeed)) => {
+  array->Array.map(((
+    marketIndex,
+    kInitialMultiplier,
+    kPeriod,
+    unstakeFeeBasisPoints,
+    initialMarketSeed,
+  )) => {
     {
       marketIndex: marketIndex,
       kInitialMultiplier: kInitialMultiplier,
       kPeriod: kPeriod,
+      unstakeFeeBasisPoints: unstakeFeeBasisPoints,
       initialMarketSeed: initialMarketSeed,
     }
   })
@@ -541,28 +549,6 @@ let getUsersConfirmedButNotSettledBalanceCalls: t => array<
       user: user,
       marketIndex: marketIndex,
       isLong: isLong,
-    }
-  })
-}
-
-let mockGetMarketPercentForTreasuryVsMarketSplitToReturn: (t, Ethers.BigNumber.t) => unit = (
-  _r,
-  _param0,
-) => {
-  let _ = %raw("_r.smocked.getMarketPercentForTreasuryVsMarketSplit.will.return.with([_param0])")
-}
-
-type getMarketPercentForTreasuryVsMarketSplitCall = {marketIndex: int}
-
-let getMarketPercentForTreasuryVsMarketSplitCalls: t => array<
-  getMarketPercentForTreasuryVsMarketSplitCall,
-> = _r => {
-  let array = %raw("_r.smocked.getMarketPercentForTreasuryVsMarketSplit.calls")
-  array->Array.map(_m => {
-    let marketIndex = _m->Array.getUnsafe(0)
-
-    {
-      marketIndex: marketIndex,
     }
   })
 }
@@ -936,6 +922,7 @@ module InternalMock = {
     marketIndex: int,
     kInitialMultiplier: Ethers.BigNumber.t,
     kPeriod: Ethers.BigNumber.t,
+    unstakeFeeBasisPoints: Ethers.BigNumber.t,
     initialMarketSeed: Ethers.BigNumber.t,
   }
 
@@ -944,11 +931,18 @@ module InternalMock = {
     internalRef.contents
     ->Option.map(_r => {
       let array = %raw("_r.smocked.initializeMarketMock.calls")
-      array->Array.map(((marketIndex, kInitialMultiplier, kPeriod, initialMarketSeed)) => {
+      array->Array.map(((
+        marketIndex,
+        kInitialMultiplier,
+        kPeriod,
+        unstakeFeeBasisPoints,
+        initialMarketSeed,
+      )) => {
         {
           marketIndex: marketIndex,
           kInitialMultiplier: kInitialMultiplier,
           kPeriod: kPeriod,
+          unstakeFeeBasisPoints: unstakeFeeBasisPoints,
           initialMarketSeed: initialMarketSeed,
         }
       })
@@ -1072,24 +1066,24 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mockGetMarketPercentForTreasuryVsMarketSplitToReturn: Ethers.BigNumber.t => unit = _param0 => {
-    checkForExceptions(~functionName="getMarketPercentForTreasuryVsMarketSplit")
+  let mock_getMarketPercentForTreasuryVsMarketSplitToReturn: Ethers.BigNumber.t => unit = _param0 => {
+    checkForExceptions(~functionName="_getMarketPercentForTreasuryVsMarketSplit")
     let _ = internalRef.contents->Option.map(_r => {
       let _ = %raw(
-        "_r.smocked.getMarketPercentForTreasuryVsMarketSplitMock.will.return.with([_param0])"
+        "_r.smocked._getMarketPercentForTreasuryVsMarketSplitMock.will.return.with([_param0])"
       )
     })
   }
 
-  type getMarketPercentForTreasuryVsMarketSplitCall = {marketIndex: int}
+  type _getMarketPercentForTreasuryVsMarketSplitCall = {marketIndex: int}
 
-  let getMarketPercentForTreasuryVsMarketSplitCalls: unit => array<
-    getMarketPercentForTreasuryVsMarketSplitCall,
+  let _getMarketPercentForTreasuryVsMarketSplitCalls: unit => array<
+    _getMarketPercentForTreasuryVsMarketSplitCall,
   > = () => {
-    checkForExceptions(~functionName="getMarketPercentForTreasuryVsMarketSplit")
+    checkForExceptions(~functionName="_getMarketPercentForTreasuryVsMarketSplit")
     internalRef.contents
     ->Option.map(_r => {
-      let array = %raw("_r.smocked.getMarketPercentForTreasuryVsMarketSplitMock.calls")
+      let array = %raw("_r.smocked._getMarketPercentForTreasuryVsMarketSplitMock.calls")
       array->Array.map(_m => {
         let marketIndex = _m->Array.getUnsafe(0)
 

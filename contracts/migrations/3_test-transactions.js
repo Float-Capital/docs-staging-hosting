@@ -114,6 +114,7 @@ const deployTestMarket = async (
     currentMarketIndex,
     kInitialMultiplier,
     kPeriod,
+    new BN("50"), // 50 basis point unstake fee
     new BN("1000000000000000000")
   );
 };

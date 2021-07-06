@@ -19,6 +19,7 @@ function test(contracts, accounts) {
           var sampleMockAddress = Helpers.randomAddress(undefined);
           var kInitialMultiplier = Helpers.randomInteger(undefined);
           var kPeriod = Helpers.randomInteger(undefined);
+          var unstakeFeeBasisPoints = Helpers.randomInteger(undefined);
           var timestampRef = {
             contents: 0
           };
@@ -32,7 +33,7 @@ function test(contracts, accounts) {
                               return LetOps.AwaitThen.let_(stakerRef.contents.setAddNewStakingFundParams(1, sampleLongAddress, sampleShortAddress, sampleMockAddress), (function (param) {
                                             return LetOps.AwaitThen.let_(Helpers.getBlock(undefined), (function (param) {
                                                           timestampRef.contents = param.timestamp;
-                                                          var promise = stakerRef.contents.addNewStakingFund(1, sampleLongAddress, sampleShortAddress, kInitialMultiplier, kPeriod);
+                                                          var promise = stakerRef.contents.addNewStakingFund(1, sampleLongAddress, sampleShortAddress, kInitialMultiplier, kPeriod, unstakeFeeBasisPoints);
                                                           promiseRef.contents = promise;
                                                           return LetOps.Await.let_(promise, (function (param) {
                                                                         

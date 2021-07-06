@@ -27,7 +27,7 @@ contract StakerForInternalMocking {
       return ();
     }
      
-    function addNewStakingFundMock(uint32,ISyntheticToken,ISyntheticToken,uint256,uint256) public pure {
+    function addNewStakingFundMock(uint32,ISyntheticToken,ISyntheticToken,uint256,uint256,uint256) public pure {
       return ();
     }
      

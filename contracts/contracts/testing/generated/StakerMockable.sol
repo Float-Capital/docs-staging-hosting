@@ -38,7 +38,8 @@ contract StakerMockable is IStaker, Initializable {
     ILongShort public longShortCoreContract;
     IFloatToken public floatToken;
 
-        mapping(uint32 => uint256) public marketLaunchIncentivePeriod;     mapping(uint32 => uint256) public marketLaunchIncentiveMultipliers; 
+        mapping(uint32 => uint256) public marketLaunchIncentivePeriod;     mapping(uint32 => uint256) public marketLaunchIncentiveMultipliers;     mapping(uint32 => uint256) public marketUnstakeFeeBasisPoints;
+
     mapping(uint32 => mapping(bool => ISyntheticToken)) public syntheticTokens;
 
     mapping(ISyntheticToken => uint32) public marketIndexOfToken;
@@ -247,11 +248,12 @@ contract StakerMockable is IStaker, Initializable {
         ISyntheticToken longToken,
         ISyntheticToken shortToken,
         uint256 kInitialMultiplier,
-        uint256 kPeriod
+        uint256 kPeriod,
+        uint256 unstakeFeeBasisPoints
     ) external override onlyFloat {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("addNewStakingFund"))){
       
-      return mocker.addNewStakingFundMock(marketIndex,longToken,shortToken,kInitialMultiplier,kPeriod);
+      return mocker.addNewStakingFundMock(marketIndex,longToken,shortToken,kInitialMultiplier,kPeriod,unstakeFeeBasisPoints);
     }
   
         marketIndexOfToken[longToken] = marketIndex;
@@ -271,10 +273,10 @@ contract StakerMockable is IStaker, Initializable {
             kInitialMultiplier
         );
 
+        marketUnstakeFeeBasisPoints[marketIndex] = unstakeFeeBasisPoints;
         emit MarketAddedToStaker(
             marketIndex,
-            50 
-
+            marketUnstakeFeeBasisPoints[marketIndex]
         );
 
         emit StateAdded(marketIndex, 0, 0, 0);
@@ -733,7 +735,8 @@ contract StakerMockable is IStaker, Initializable {
             userAmountStaked[token][msg.sender] -
             amount;
 
-                uint256 amountFees = (amount * 50) / 10000;
+        uint256 amountFees = (amount *
+            marketUnstakeFeeBasisPoints[marketIndex]) / 10000;
 
         token.transfer(msg.sender, amount - amountFees);
 

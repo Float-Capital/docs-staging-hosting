@@ -62,9 +62,6 @@ contract YieldManagerAave is IYieldManager {
     /*
      * Initialises the yield manager with the given payment token
      * and corresponding venus aToken.
-     *
-     * TODO We have to check whether it's BNB, since BNB has a
-     * different interface to other ERC20 tokens in venus.io.
      */
     constructor(
         address _admin,
