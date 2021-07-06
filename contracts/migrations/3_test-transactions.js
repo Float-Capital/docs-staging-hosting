@@ -36,7 +36,6 @@ const deployTestMarket = async (
   syntheticSymbol,
   longShortInstance,
   treasuryInstance,
-  fundTokenInstance,
   admin,
   networkName,
   token
@@ -70,13 +69,13 @@ const deployTestMarket = async (
       admin,
       longShortInstance.address,
       treasuryInstance.address,
-      fundTokenInstance.address
+      token.address
     );
 
-    fundTokenAddress = fundTokenInstance.address;
+    fundTokenAddress = token.address;
 
-    var mintRole = await fundTokenInstance.MINTER_ROLE.call();
-    await fundTokenInstance.grantRole(mintRole, yieldManager.address);
+    var mintRole = await token.MINTER_ROLE.call();
+    await token.grantRole(mintRole, yieldManager.address);
   }
 
   await longShortInstance.newSyntheticMarket(
@@ -138,6 +137,15 @@ const mintShortNextPriceWithSystemUpdate = async (
   await longShort.updateSystemState(marketIndex);
 };
 
+const stakeSynth = async (amount, synth, user) => {
+  const usersSynthTokenBalance = new BN(await synth.balanceOf(user));
+  if (usersSynthTokenBalance.gt(new BN("0"))) {
+    await synth.stake(new BN(amount), { from: user });
+  } else {
+    console.log("user doesn't have any synth tokens");
+  }
+};
+
 const mintLongNextPriceWithSystemUpdate = async (
   amount,
   marketIndex,
@@ -187,7 +195,7 @@ const topupBalanceIfLow = async (from, to) => {
   }
 };
 
-module.exports = async function (deployer, network, accounts) {
+module.exports = async function(deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
@@ -225,7 +233,6 @@ module.exports = async function (deployer, network, accounts) {
     "ETHK",
     longShort,
     treasury,
-    token,
     admin,
     network,
     token
@@ -236,7 +243,6 @@ module.exports = async function (deployer, network, accounts) {
     "EBD",
     longShort,
     treasury,
-    token,
     admin,
     network,
     token
@@ -247,7 +253,6 @@ module.exports = async function (deployer, network, accounts) {
     "GOLD",
     longShort,
     treasury,
-    token,
     admin,
     network,
     token
@@ -267,7 +272,8 @@ module.exports = async function (deployer, network, accounts) {
       )} OracleManagerEthKiller@${await longShort.oracleManagers(
         marketIndex
       )} SyntheticToken@${await longShort.syntheticTokens(
-        marketIndex, true
+        marketIndex,
+        true
       )} SyntheticToken@${await longShort.syntheticTokens(marketIndex, false)}`;
     }
 
@@ -357,6 +363,8 @@ module.exports = async function (deployer, network, accounts) {
       await oracleManager.setPrice(new BN("1100000000000000000"));
 
     await longShort.updateSystemState(marketIndex);
+
+    await stakeSynth("1", long, user1);
 
     // Simulate user 2 redeeming half his tokens.
     // const halfTokensMinted = new BN(tenMintAmount).div(new BN(2));
