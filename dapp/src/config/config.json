@@ -12,14 +12,14 @@
   "discordInviteLink": "https://discord.gg/dqDwgrVYcU",
   "web3PollingInterval": 8000,
   "apolloConnectToDevTools": false,
-  "contracts": {
-    "FloatCapital_v0": "0x0506B685c961759852aFfb3AC434ffBc52D25802",
-    "FloatToken": "0x27D508fA1B4d39816FE7bEe35cD4eE55313d568C",
-    "LongShort": "0x2Ad2f96bc061Fbb9A8BDbA6cc50Ef2386F316E87",
-    "Migrations": "0xF8Da2698bDf276d8f4384C5A65C48E22d43d1b75",
-    "Staker": "0x1EFc923e8667d5ABf6AB722C5AA2711C08d4BbB2",
-    "TokenFactory": "0xAA301E1ebC674020b79Fe309Cdb0987aCA042C95",
-    "Treasury_v0": "0x2cD3a5Ccd4Bae98c3D2996B24C6d6CB78821f009",
-    "Dai": "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F"
+  "contracts": {    
+      "FloatCapital_v0": "0x0506B685c961759852aFfb3AC434ffBc52D25802",
+      "FloatToken": "0x35307D096E0F8De98C714E50E166432b5DdC02aa",
+      "LongShort": "0x4a23F8368fdF10e9BF90b96184990FED27ED0E6E",
+      "Migrations": "0x1DC60256140b20F6D6F92629c3b96D96565A231f",
+      "Staker": "0x56553320a9da37b178677e69Beee960B751d2309",
+      "TokenFactory": "0x294297f45Ca0CEbB46324A95f0508Fb6915b9D00",
+      "Treasury_v0": "0x5118f3E716Dd6fD75772ebA9BB7F9d6f9C89D3E3",
+      "Dai": "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F"    
   }
 }

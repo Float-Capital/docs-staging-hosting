@@ -12,7 +12,7 @@
 
 ```bash
 docker-compose -f docker-compose.mumbai.yaml down -v # make sure docker doesn't have any stale volumes that could cause errors
-docker-compose -f docker-compose.mumbai.yaml up -d # start the docker
+docker-compose -f docker-compose.mumbai.yml up -d # start the docker
 yarn codegen
 yarn create-local
 yarn deploy-local-mumbai
