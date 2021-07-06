@@ -86,12 +86,11 @@ let test =
     });
 
     it("mutates syntheticTokens", () => {
-      let%Await tokens = (stakerRef^)->Staker.syntheticTokens(1);
+      let%Await tokenLong = (stakerRef^)->Staker.syntheticTokens(1, true);
+      let%Await tokenShort = (stakerRef^)->Staker.syntheticTokens(1, false);
 
-      tokens->Chai.recordEqualFlat({
-        longToken: sampleLongAddress,
-        shortToken: sampleShortAddress,
-      });
+      Chai.addressEqual(~otherAddress=tokenLong, sampleLongAddress);
+      Chai.addressEqual(~otherAddress=tokenShort, sampleShortAddress);
     });
 
     it("mutates marketIndexOfTokens", () => {

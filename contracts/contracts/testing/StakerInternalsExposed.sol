@@ -32,8 +32,8 @@ contract StakerInternalsExposed is StakerMockable {
         userIndexOfLastClaimedReward[marketIndex][
             user
         ] = usersLatestClaimedReward;
-        syntheticTokens[marketIndex].longToken = longToken;
-        syntheticTokens[marketIndex].shortToken = shortToken;
+        syntheticTokens[marketIndex][true] = longToken;
+        syntheticTokens[marketIndex][false] = shortToken;
 
         syntheticRewardParams[marketIndex][newLatestRewardIndex]
         .accumulativeFloatPerLongToken = accumulativeFloatPerTokenLatestLong;
@@ -65,8 +65,8 @@ contract StakerInternalsExposed is StakerMockable {
         syntheticRewardParams[marketIndex][0]
         .accumulativeFloatPerShortToken = 1;
 
-        syntheticTokens[marketIndex].longToken = mockAddress;
-        syntheticTokens[marketIndex].shortToken = mockAddress;
+        syntheticTokens[marketIndex][true] = mockAddress;
+        syntheticTokens[marketIndex][false] = mockAddress;
     }
 
     function setGetMarketLaunchIncentiveParametersParams(

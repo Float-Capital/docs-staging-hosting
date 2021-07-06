@@ -31,21 +31,6 @@ function adminCalls(_r) {
               }));
 }
 
-function mockBatchedStakeToReturn(_r, _param0, _param1, _param2) {
-  ((_r.smocked.batchedStake.will.return.with([_param0,_param1,_param2])));
-  
-}
-
-function batchedStakeCalls(_r) {
-  var array = _r.smocked.batchedStake.calls;
-  return Belt_Array.map(array, (function (param) {
-                return {
-                        param0: param[0],
-                        param1: param[1]
-                      };
-              }));
-}
-
 function mockFloatCapitalToReturn(_r, _param0) {
   ((_r.smocked.floatCapital.will.return.with([_param0])));
   
@@ -169,17 +154,17 @@ function syntheticRewardParamsCalls(_r) {
               }));
 }
 
-function mockSyntheticTokensToReturn(_r, _param0, _param1) {
-  ((_r.smocked.syntheticTokens.will.return.with([_param0,_param1])));
+function mockSyntheticTokensToReturn(_r, _param0) {
+  ((_r.smocked.syntheticTokens.will.return.with([_param0])));
   
 }
 
 function syntheticTokensCalls(_r) {
   var array = _r.smocked.syntheticTokens.calls;
-  return Belt_Array.map(array, (function (_m) {
-                var param0 = _m[0];
+  return Belt_Array.map(array, (function (param) {
                 return {
-                        param0: param0
+                        param0: param[0],
+                        param1: param[1]
                       };
               }));
 }
@@ -1161,8 +1146,6 @@ exports.mockFLOAT_ISSUANCE_FIXED_DECIMALToReturn = mockFLOAT_ISSUANCE_FIXED_DECI
 exports.fLOAT_ISSUANCE_FIXED_DECIMALCalls = fLOAT_ISSUANCE_FIXED_DECIMALCalls;
 exports.mockAdminToReturn = mockAdminToReturn;
 exports.adminCalls = adminCalls;
-exports.mockBatchedStakeToReturn = mockBatchedStakeToReturn;
-exports.batchedStakeCalls = batchedStakeCalls;
 exports.mockFloatCapitalToReturn = mockFloatCapitalToReturn;
 exports.floatCapitalCalls = floatCapitalCalls;
 exports.mockFloatPercentageToReturn = mockFloatPercentageToReturn;
