@@ -28,6 +28,7 @@ contract Staker is IStaker, Initializable {
     // Market specific
     mapping(uint32 => uint256) public marketLaunchIncentivePeriod; // seconds
     mapping(uint32 => uint256) public marketLaunchIncentiveMultipliers; // e18 scale
+    mapping(uint32 => uint256) public marketUnstakeFeeBasisPoints;
 
     mapping(uint32 => mapping(bool => ISyntheticToken)) public syntheticTokens;
 
@@ -207,9 +208,10 @@ contract Staker is IStaker, Initializable {
             kInitialMultiplier
         );
 
+        marketUnstakeFeeBasisPoints[marketIndex] = 50; /* Hardcoding 50 basis points for the time being */
         emit MarketAddedToStaker(
             marketIndex,
-            50 /* Hardcoding 50 basis points for the time being */
+            marketUnstakeFeeBasisPoints[marketIndex]
         );
 
         emit StateAdded(marketIndex, 0, 0, 0);
@@ -649,8 +651,8 @@ contract Staker is IStaker, Initializable {
             userAmountStaked[token][msg.sender] -
             amount;
 
-        // TODO: this is just a hardcoded amount of fees, nothing is happening with the fees at the moment.
-        uint256 amountFees = (amount * 50) / 10000;
+        uint256 amountFees = (amount *
+            marketUnstakeFeeBasisPoints[marketIndex]) / 10000;
 
         token.transfer(msg.sender, amount - amountFees);
 
