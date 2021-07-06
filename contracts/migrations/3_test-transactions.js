@@ -138,7 +138,6 @@ const mintShortNextPriceWithSystemUpdate = async (
 };
 
 const stakeSynth = async (amount, synth, user) => {
-  await longShort.updateSystemState(marketIndex);
   const usersSynthTokenBalance = new BN(await synth.balanceOf(user));
   if (usersSynthTokenBalance.gt(new BN("0"))) {
     await synth.stake(new BN(amount), { from: user });
