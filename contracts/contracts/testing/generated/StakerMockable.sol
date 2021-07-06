@@ -10,11 +10,6 @@ import "../../interfaces/ILongShort.sol";
 import "../../interfaces/IStaker.sol";
 
 
-
-
-
-
-
 import "./StakerForInternalMocking.sol";
 contract StakerMockable is IStaker, Initializable {
   StakerForInternalMocking mocker;
@@ -31,44 +26,40 @@ contract StakerMockable is IStaker, Initializable {
   }
 
 
+    
+
+
+        uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
+
+        address public admin;
+    address public floatCapital;
+    uint16 public floatPercentage;
+
+    ILongShort public longShortCoreContract;
+    IFloatToken public floatToken;
+
+        mapping(uint32 => uint256) public marketLaunchIncentivePeriod;     mapping(uint32 => uint256) public marketLaunchIncentiveMultipliers; 
+    mapping(uint32 => mapping(bool => ISyntheticToken)) public syntheticTokens;
+
+    mapping(ISyntheticToken => uint32) public marketIndexOfToken;
+
+        mapping(uint32 => uint256) public latestRewardIndex;
+    mapping(uint32 => mapping(uint256 => RewardState))
+        public syntheticRewardParams;
     struct RewardState {
         uint256 timestamp;
         uint256 accumulativeFloatPerLongToken;
         uint256 accumulativeFloatPerShortToken;
     }
-    struct SyntheticTokens {
-        ISyntheticToken shortToken;
-        ISyntheticToken longToken;
-    }
-    struct BatchedStake {
-        uint256 amountLong;
-        uint256 amountShort;
-        uint256 creationRewardIndex;
-    }
-
-            
-            uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
-    mapping(uint32 => uint256) public marketLaunchIncentivePeriod;     mapping(uint32 => uint256) public marketLaunchIncentiveMultipliers;     uint256[45] private __stakeParametersGap;
-
-            
-        address public admin;
-    address public floatCapital;
-    uint16 public floatPercentage;
-    ILongShort public longShortCoreContract;
-    IFloatToken public floatToken;
-    uint256[45] private __globalParamsGap;
-
-            mapping(ISyntheticToken => mapping(address => uint256))
-        public userAmountStaked;
-    uint256[45] private __userInfoGap;
-
-        mapping(ISyntheticToken => uint32) public marketIndexOfToken;     uint256[45] private __tokenInfoGap;
 
         mapping(uint32 => mapping(address => uint256))
         public userIndexOfLastClaimedReward;
-    mapping(uint32 => mapping(uint256 => BatchedStake)) public batchedStake;     mapping(uint32 => SyntheticTokens) public syntheticTokens;     mapping(uint32 => mapping(uint256 => RewardState))
-        public syntheticRewardParams;     mapping(uint32 => uint256) public latestRewardIndex; 
-            
+    mapping(ISyntheticToken => mapping(address => uint256))
+        public userAmountStaked;
+
+    
+
+
     event DeployV1(address floatToken);
 
     event MarketAddedToStaker(uint32 marketIndex, uint256 exitFeeBasisPoints);
@@ -103,7 +94,9 @@ contract StakerMockable is IStaker, Initializable {
         uint256 multiplier
     );
 
-            
+    
+
+
     modifier onlyAdmin() {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("onlyAdmin"))){
         
@@ -138,7 +131,7 @@ contract StakerMockable is IStaker, Initializable {
     } else {
       
         require(
-            address(syntheticTokens[marketIndex].longToken) != address(0),
+            address(syntheticTokens[marketIndex][true]) != address(0),
             "not valid market"
         );
                 _;
@@ -159,7 +152,9 @@ contract StakerMockable is IStaker, Initializable {
     }
   }
 
-            
+    
+
+
     function initialize(
         address _admin,
         address _longShortCoreContract,
@@ -180,7 +175,9 @@ contract StakerMockable is IStaker, Initializable {
         emit DeployV1(_floatToken);
     }
 
-            
+    
+
+
     function changeAdmin(address _admin) external onlyAdmin {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("changeAdmin"))){
       
@@ -242,7 +239,9 @@ contract StakerMockable is IStaker, Initializable {
         );
     }
 
-            
+    
+
+
     function addNewStakingFund(
         uint32 marketIndex,
         ISyntheticToken longToken,
@@ -263,8 +262,8 @@ contract StakerMockable is IStaker, Initializable {
         syntheticRewardParams[marketIndex][0]
         .accumulativeFloatPerShortToken = 0;
 
-        syntheticTokens[marketIndex].longToken = longToken;
-        syntheticTokens[marketIndex].shortToken = shortToken;
+        syntheticTokens[marketIndex][true] = longToken;
+        syntheticTokens[marketIndex][false] = shortToken;
 
         _changeMarketLaunchIncentiveParameters(
             marketIndex,
@@ -517,8 +516,8 @@ contract StakerMockable is IStaker, Initializable {
                 latestRewardIndex[marketIndex]
         );
 
-        ISyntheticToken longToken = syntheticTokens[marketIndex].longToken;
-        ISyntheticToken shortToken = syntheticTokens[marketIndex].shortToken;
+        ISyntheticToken longToken = syntheticTokens[marketIndex][true];
+        ISyntheticToken shortToken = syntheticTokens[marketIndex][false];
 
         if (amountStakedLong > 0) {
             uint256 accumDeltaLong = syntheticRewardParams[marketIndex][
@@ -564,8 +563,8 @@ contract StakerMockable is IStaker, Initializable {
       return mocker.calculateAccumulatedFloatMock(marketIndex,user);
     }
   
-        ISyntheticToken longToken = syntheticTokens[marketIndex].longToken;
-        ISyntheticToken shortToken = syntheticTokens[marketIndex].shortToken;
+        ISyntheticToken longToken = syntheticTokens[marketIndex][true];
+        ISyntheticToken shortToken = syntheticTokens[marketIndex][false];
 
         uint256 amountStakedLong = userAmountStaked[longToken][user];
         uint256 amountStakedShort = userAmountStaked[shortToken][user];

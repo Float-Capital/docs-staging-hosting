@@ -37,15 +37,6 @@ type adminReturn = Ethers.ethAddress
 @send
 external admin: t => JsPromise.t<adminReturn> = "admin"
 
-type batchedStakeReturn = {
-  amountLong: Ethers.BigNumber.t,
-  amountShort: Ethers.BigNumber.t,
-  creationRewardIndex: Ethers.BigNumber.t,
-}
-@send
-external batchedStake: (t, int, Ethers.BigNumber.t) => JsPromise.t<batchedStakeReturn> =
-  "batchedStake"
-
 @send
 external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
 
@@ -131,12 +122,9 @@ external syntheticRewardParams: (
   Ethers.BigNumber.t,
 ) => JsPromise.t<syntheticRewardParamsReturn> = "syntheticRewardParams"
 
-type syntheticTokensReturn = {
-  shortToken: Ethers.ethAddress,
-  longToken: Ethers.ethAddress,
-}
+type syntheticTokensReturn = Ethers.ethAddress
 @send
-external syntheticTokens: (t, int) => JsPromise.t<syntheticTokensReturn> = "syntheticTokens"
+external syntheticTokens: (t, int, bool) => JsPromise.t<syntheticTokensReturn> = "syntheticTokens"
 
 type userAmountStakedReturn = Ethers.BigNumber.t
 @send
@@ -231,15 +219,6 @@ module Exposed = {
   type adminReturn = Ethers.ethAddress
   @send
   external admin: t => JsPromise.t<adminReturn> = "admin"
-
-  type batchedStakeReturn = {
-    amountLong: Ethers.BigNumber.t,
-    amountShort: Ethers.BigNumber.t,
-    creationRewardIndex: Ethers.BigNumber.t,
-  }
-  @send
-  external batchedStake: (t, int, Ethers.BigNumber.t) => JsPromise.t<batchedStakeReturn> =
-    "batchedStake"
 
   @send
   external calculateAccumulatedFloatExposed: (
@@ -531,12 +510,9 @@ module Exposed = {
     Ethers.BigNumber.t,
   ) => JsPromise.t<syntheticRewardParamsReturn> = "syntheticRewardParams"
 
-  type syntheticTokensReturn = {
-    shortToken: Ethers.ethAddress,
-    longToken: Ethers.ethAddress,
-  }
+  type syntheticTokensReturn = Ethers.ethAddress
   @send
-  external syntheticTokens: (t, int) => JsPromise.t<syntheticTokensReturn> = "syntheticTokens"
+  external syntheticTokens: (t, int, bool) => JsPromise.t<syntheticTokensReturn> = "syntheticTokens"
 
   type userAmountStakedReturn = Ethers.BigNumber.t
   @send

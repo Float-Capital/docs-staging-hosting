@@ -9,77 +9,49 @@ import "./interfaces/IFloatToken.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/IStaker.sol";
 
-/*
-    ###### Purpose of contract ########
-    This smart contract allows users to securely stake synthetic asset
-    tokens created through the float protocol.
-
-    Staking sythentic tokens will ensure that the liquidity of the
-    synthetic market is increased, and entitle users to FLOAT rewards.
-*/
-
-/** @title Staker Contract */
 contract Staker is IStaker, Initializable {
+    /*╔═════════════════════════════╗
+      ║          VARIABLES          ║
+      ╚═════════════════════════════╝*/
+
+    // Fixed-precision constants
+    uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
+
+    // Global state
+    address public admin;
+    address public floatCapital;
+    uint16 public floatPercentage;
+
+    ILongShort public longShortCoreContract;
+    IFloatToken public floatToken;
+
+    // Market specific
+    mapping(uint32 => uint256) public marketLaunchIncentivePeriod; // seconds
+    mapping(uint32 => uint256) public marketLaunchIncentiveMultipliers; // e18 scale
+
+    mapping(uint32 => mapping(bool => ISyntheticToken)) public syntheticTokens;
+
+    mapping(ISyntheticToken => uint32) public marketIndexOfToken;
+
+    // Reward specific
+    mapping(uint32 => uint256) public latestRewardIndex;
+    mapping(uint32 => mapping(uint256 => RewardState))
+        public syntheticRewardParams;
     struct RewardState {
         uint256 timestamp;
         uint256 accumulativeFloatPerLongToken;
         uint256 accumulativeFloatPerShortToken;
     }
-    struct SyntheticTokens {
-        ISyntheticToken shortToken;
-        ISyntheticToken longToken;
-    }
-    struct BatchedStake {
-        uint256 amountLong;
-        uint256 amountShort;
-        uint256 creationRewardIndex;
-    }
 
-    ////////////////////////////////////
-    //////// CONSTANTS /////////////////
-    ////////////////////////////////////
-
-    // Controls the k-factor, a multiplier for incentivising early stakers.
-    //   token market index -> value
-    uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
-    mapping(uint32 => uint256) public marketLaunchIncentivePeriod; // seconds
-    mapping(uint32 => uint256) public marketLaunchIncentiveMultipliers; // e18 scale
-    uint256[45] private __stakeParametersGap;
-
-    ////////////////////////////////////
-    //////// VARIABLES /////////////////
-    ////////////////////////////////////
-
-    // Global state.
-    address public admin;
-    address public floatCapital;
-    uint16 public floatPercentage;
-    ILongShort public longShortCoreContract;
-    IFloatToken public floatToken;
-    uint256[45] private __globalParamsGap;
-
-    // User state.
-    //   token -> user -> value
-    mapping(ISyntheticToken => mapping(address => uint256))
-        public userAmountStaked;
-    uint256[45] private __userInfoGap;
-
-    // Token state.
-    mapping(ISyntheticToken => uint32) public marketIndexOfToken; // token -> market index
-    uint256[45] private __tokenInfoGap;
-
-    // market state.
+    // User specific
     mapping(uint32 => mapping(address => uint256))
         public userIndexOfLastClaimedReward;
-    mapping(uint32 => mapping(uint256 => BatchedStake)) public batchedStake; // token -> index
-    mapping(uint32 => SyntheticTokens) public syntheticTokens; // token -> index -> state
-    mapping(uint32 => mapping(uint256 => RewardState))
-        public syntheticRewardParams; // token -> index -> state
-    mapping(uint32 => uint256) public latestRewardIndex; // token -> index
+    mapping(ISyntheticToken => mapping(address => uint256))
+        public userAmountStaked;
 
-    ////////////////////////////////////
-    /////////// EVENTS /////////////////
-    ////////////////////////////////////
+    /*╔════════════════════════════╗
+      ║           EVENTS           ║
+      ╚════════════════════════════╝*/
 
     event DeployV1(address floatToken);
 
@@ -115,9 +87,9 @@ contract Staker is IStaker, Initializable {
         uint256 multiplier
     );
 
-    ////////////////////////////////////
-    /////////// MODIFIERS //////////////
-    ////////////////////////////////////
+    /*╔═════════════════════════════╗
+      ║          MODIFIERS          ║
+      ╚═════════════════════════════╝*/
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "not admin");
@@ -131,7 +103,7 @@ contract Staker is IStaker, Initializable {
 
     modifier onlyValidMarket(uint32 marketIndex) {
         require(
-            address(syntheticTokens[marketIndex].longToken) != address(0),
+            address(syntheticTokens[marketIndex][true]) != address(0),
             "not valid market"
         );
         // require(latestRewardIndex[marketIndex] != 0, "not valid market");
@@ -143,9 +115,9 @@ contract Staker is IStaker, Initializable {
         _;
     }
 
-    ////////////////////////////////////
-    ///// CONTRACT SET-UP //////////////
-    ////////////////////////////////////
+    /*╔═════════════════════════════╗
+      ║       CONTRACT SET-UP       ║
+      ╚═════════════════════════════╝*/
 
     function initialize(
         address _admin,
@@ -162,9 +134,9 @@ contract Staker is IStaker, Initializable {
         emit DeployV1(_floatToken);
     }
 
-    ////////////////////////////////////
-    /// MULTISIG ADMIN FUNCTIONS ///////
-    ////////////////////////////////////
+    /*╔═════════════════════════════╗
+      ║       MULTI-SIG ADMIN       ║
+      ╚═════════════════════════════╝*/
 
     function changeAdmin(address _admin) external onlyAdmin {
         admin = _admin;
@@ -207,9 +179,9 @@ contract Staker is IStaker, Initializable {
         );
     }
 
-    ////////////////////////////////////
-    /////////// STAKING SETUP //////////
-    ////////////////////////////////////
+    /*╔═════════════════════════════╗
+      ║        STAKING SETUP        ║
+      ╚═════════════════════════════╝*/
 
     function addNewStakingFund(
         uint32 marketIndex,
@@ -226,8 +198,8 @@ contract Staker is IStaker, Initializable {
         syntheticRewardParams[marketIndex][0]
         .accumulativeFloatPerShortToken = 0;
 
-        syntheticTokens[marketIndex].longToken = longToken;
-        syntheticTokens[marketIndex].shortToken = shortToken;
+        syntheticTokens[marketIndex][true] = longToken;
+        syntheticTokens[marketIndex][false] = shortToken;
 
         _changeMarketLaunchIncentiveParameters(
             marketIndex,
@@ -478,8 +450,8 @@ contract Staker is IStaker, Initializable {
                 latestRewardIndex[marketIndex]
         );
 
-        ISyntheticToken longToken = syntheticTokens[marketIndex].longToken;
-        ISyntheticToken shortToken = syntheticTokens[marketIndex].shortToken;
+        ISyntheticToken longToken = syntheticTokens[marketIndex][true];
+        ISyntheticToken shortToken = syntheticTokens[marketIndex][false];
 
         if (amountStakedLong > 0) {
             uint256 accumDeltaLong = syntheticRewardParams[marketIndex][
@@ -522,8 +494,8 @@ contract Staker is IStaker, Initializable {
             uint256 shortFloatReward
         )
     {
-        ISyntheticToken longToken = syntheticTokens[marketIndex].longToken;
-        ISyntheticToken shortToken = syntheticTokens[marketIndex].shortToken;
+        ISyntheticToken longToken = syntheticTokens[marketIndex][true];
+        ISyntheticToken shortToken = syntheticTokens[marketIndex][false];
 
         uint256 amountStakedLong = userAmountStaked[longToken][user];
         uint256 amountStakedShort = userAmountStaked[shortToken][user];

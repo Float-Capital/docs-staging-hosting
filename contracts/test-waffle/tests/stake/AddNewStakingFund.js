@@ -61,11 +61,11 @@ function test(contracts, accounts) {
                               }));
                 }));
           it("mutates syntheticTokens", (function () {
-                  return LetOps.Await.let_(stakerRef.contents.syntheticTokens(1), (function (tokens) {
-                                return Chai.recordEqualFlat(tokens, {
-                                            shortToken: sampleShortAddress,
-                                            longToken: sampleLongAddress
-                                          });
+                  return LetOps.Await.let_(stakerRef.contents.syntheticTokens(1, true), (function (tokenLong) {
+                                return LetOps.Await.let_(stakerRef.contents.syntheticTokens(1, false), (function (tokenShort) {
+                                              Chai.addressEqual(undefined, tokenLong, sampleLongAddress);
+                                              return Chai.addressEqual(undefined, tokenShort, sampleShortAddress);
+                                            }));
                               }));
                 }));
           it("mutates marketIndexOfTokens", (function () {
