@@ -13,6 +13,9 @@ const YieldManagerAave = artifacts.require("YieldManagerAave");
 const OracleManagerEthKillerChainlink = artifacts.require(
   "OracleManagerEthKillerChainlink"
 );
+const OracleManagerEthKillerChainlinkTestnet = artifacts.require(
+  "OracleManagerEthKillerChainlinkTestnet"
+);
 
 const mumbaiDaiAddress = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
 
@@ -51,11 +54,12 @@ const deployTestMarket = async (
   // We mock out the oracle manager unless we're on Mumbai testnet.
   let oracleManager;
   if (networkName == "mumbai") {
-    oracleManager = await OracleManagerEthKillerChainlink.new(
+    oracleManager = await OracleManagerEthKillerChainlinkTestnet.new(
       admin,
       testnetChainlinkDaiUsdAddress,
       testnetChainlinkEthUsdAddress,
-      testnetChainlinkMaticUsdAddress
+      testnetChainlinkMaticUsdAddress,
+      60
     );
   } else {
     oracleManager = await OracleManagerMock.new(admin);
@@ -207,7 +211,7 @@ const topupBalanceIfLow = async (from, to) => {
   }
 };
 
-module.exports = async function (deployer, network, accounts) {
+module.exports = async function(deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
@@ -281,7 +285,7 @@ module.exports = async function (deployer, network, accounts) {
     ) {
       verifyString += ` YieldManagerAave@${await longShort.yieldManagers(
         marketIndex
-      )} OracleManagerEthKiller@${await longShort.oracleManagers(
+      )} OracleManagerEthKillerChainlinkTestnet@${await longShort.oracleManagers(
         marketIndex
       )} SyntheticToken@${await longShort.syntheticTokens(
         marketIndex,
