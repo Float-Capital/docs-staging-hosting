@@ -35,7 +35,7 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function initializeMarketMock(uint32,uint256,uint256,uint256) public pure {
+    function initializeMarketMock(uint32,uint256,uint256,uint256,uint256) public pure {
       return ();
     }
      
@@ -55,7 +55,7 @@ contract LongShortForInternalMocking {
       return (abi.decode("",(uint256)));
     }
      
-    function getMarketPercentForTreasuryVsMarketSplitMock(uint32) public pure returns (uint256 marketPercentE5){
+    function _getMarketPercentForTreasuryVsMarketSplitMock(uint32) public pure returns (uint256 marketPercentE5){
       return (abi.decode("",(uint256)));
     }
      

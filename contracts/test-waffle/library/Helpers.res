@@ -100,6 +100,7 @@ let createSyntheticMarket = (
         ~marketIndex,
         ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("1000000000000000000"),
         ~kPeriod=Ethers.BigNumber.fromInt(0),
+        ~unstakeFeeBasisPoints=Ethers.BigNumber.fromInt(50),
         ~initialMarketSeed,
       )
     })

@@ -52,6 +52,7 @@ let testUnit =
               ~marketIndex=1,
               ~kPeriod=Ethers.BigNumber.fromUnsafe("4"),
               ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
+              ~unstakeFeeBasisPoints=Ethers.BigNumber.fromInt(50),
               ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
             );
 
@@ -66,6 +67,7 @@ let testUnit =
             longToken: sampleAddress,
             shortToken: sampleAddress,
             kPeriod: Ethers.BigNumber.fromUnsafe("4"),
+            unstakeFeeBasisPoints: Ethers.BigNumber.fromInt(50),
           },
         );
 
@@ -104,6 +106,7 @@ let testUnit =
                 ~marketIndex=1,
                 ~kPeriod=Ethers.BigNumber.fromUnsafe("4"),
                 ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
+                ~unstakeFeeBasisPoints=Ethers.BigNumber.fromInt(50),
                 ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
               ),
         );
@@ -123,6 +126,7 @@ let testUnit =
                 ~marketIndex=1,
                 ~kPeriod=Ethers.BigNumber.fromUnsafe("4"),
                 ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
+                ~unstakeFeeBasisPoints=Ethers.BigNumber.fromInt(50),
                 ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
               ),
         );
@@ -147,6 +151,7 @@ let testIntegration =
               ~marketIndex=nonExistantMarket,
               ~kInitialMultiplier=CONSTANTS.oneBn,
               ~kPeriod=CONSTANTS.oneBn,
+              ~unstakeFeeBasisPoints=Ethers.BigNumber.fromInt(50),
               ~initialMarketSeed=CONSTANTS.oneBn,
             ),
         ~reason="index too high",
@@ -165,6 +170,7 @@ let testIntegration =
             ~marketIndex,
             ~kInitialMultiplier=CONSTANTS.oneBn,
             ~kPeriod=CONSTANTS.oneBn,
+            ~unstakeFeeBasisPoints=Ethers.BigNumber.fromInt(50),
             ~initialMarketSeed=CONSTANTS.oneBn,
           ),
         ~reason="already initialized",
@@ -194,6 +200,7 @@ let testIntegration =
             ~marketIndex=latestMarket,
             ~kInitialMultiplier=CONSTANTS.tenToThe18,
             ~kPeriod=CONSTANTS.oneBn,
+            ~unstakeFeeBasisPoints=Ethers.BigNumber.fromInt(50),
             ~initialMarketSeed=CONSTANTS.oneBn,
           ),
         ~reason="Insufficient market seed",

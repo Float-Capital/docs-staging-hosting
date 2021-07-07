@@ -139,6 +139,21 @@ function marketLaunchIncentivePeriodCalls(_r) {
               }));
 }
 
+function mockMarketUnstakeFeeBasisPointsToReturn(_r, _param0) {
+  ((_r.smocked.marketUnstakeFeeBasisPoints.will.return.with([_param0])));
+  
+}
+
+function marketUnstakeFeeBasisPointsCalls(_r) {
+  var array = _r.smocked.marketUnstakeFeeBasisPoints.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var param0 = _m[0];
+                return {
+                        param0: param0
+                      };
+              }));
+}
+
 function mockSyntheticRewardParamsToReturn(_r, _param0, _param1, _param2) {
   ((_r.smocked.syntheticRewardParams.will.return.with([_param0,_param1,_param2])));
   
@@ -239,9 +254,24 @@ function mockChangeFloatPercentageToReturn(_r) {
 function changeFloatPercentageCalls(_r) {
   var array = _r.smocked.changeFloatPercentage.calls;
   return Belt_Array.map(array, (function (_m) {
-                var newPercentage = _m[0];
+                var newFloatPercentage = _m[0];
                 return {
-                        newPercentage: newPercentage
+                        newFloatPercentage: newFloatPercentage
+                      };
+              }));
+}
+
+function mockChangeUnstakeFeeToReturn(_r) {
+  ((_r.smocked.changeUnstakeFee.will.return()));
+  
+}
+
+function changeUnstakeFeeCalls(_r) {
+  var array = _r.smocked.changeUnstakeFee.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        marketIndex: param[0],
+                        newMarketUnstakeFeeBasisPoints: param[1]
                       };
               }));
 }
@@ -275,7 +305,8 @@ function addNewStakingFundCalls(_r) {
                         longToken: param[1],
                         shortToken: param[2],
                         kInitialMultiplier: param[3],
-                        kPeriod: param[4]
+                        kPeriod: param[4],
+                        unstakeFeeBasisPoints: param[5]
                       };
               }));
 }
@@ -474,9 +505,53 @@ function changeFloatPercentageCalls$1(param) {
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
                     var array = _r.smocked.changeFloatPercentageMock.calls;
                     return Belt_Array.map(array, (function (_m) {
-                                  var newPercentage = _m[0];
+                                  var newFloatPercentage = _m[0];
                                   return {
-                                          newPercentage: newPercentage
+                                          newFloatPercentage: newFloatPercentage
+                                        };
+                                }));
+                  })));
+}
+
+function mock_changeUnstakeFeeToReturn(param) {
+  checkForExceptions("_changeUnstakeFee");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked._changeUnstakeFeeMock.will.return()));
+          
+        }));
+  
+}
+
+function _changeUnstakeFeeCalls(param) {
+  checkForExceptions("_changeUnstakeFee");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked._changeUnstakeFeeMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          newMarketUnstakeFeeBasisPoints: param[1]
+                                        };
+                                }));
+                  })));
+}
+
+function mockChangeUnstakeFeeToReturn$1(param) {
+  checkForExceptions("changeUnstakeFee");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.changeUnstakeFeeMock.will.return()));
+          
+        }));
+  
+}
+
+function changeUnstakeFeeCalls$1(param) {
+  checkForExceptions("changeUnstakeFee");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.changeUnstakeFeeMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          newMarketUnstakeFeeBasisPoints: param[1]
                                         };
                                 }));
                   })));
@@ -547,7 +622,8 @@ function addNewStakingFundCalls$1(param) {
                                           longToken: param[1],
                                           shortToken: param[2],
                                           kInitialMultiplier: param[3],
-                                          kPeriod: param[4]
+                                          kPeriod: param[4],
+                                          unstakeFeeBasisPoints: param[5]
                                         };
                                 }));
                   })));
@@ -1063,6 +1139,10 @@ var InternalMock = {
   changeAdminCalls: changeAdminCalls$1,
   mockChangeFloatPercentageToReturn: mockChangeFloatPercentageToReturn$1,
   changeFloatPercentageCalls: changeFloatPercentageCalls$1,
+  mock_changeUnstakeFeeToReturn: mock_changeUnstakeFeeToReturn,
+  _changeUnstakeFeeCalls: _changeUnstakeFeeCalls,
+  mockChangeUnstakeFeeToReturn: mockChangeUnstakeFeeToReturn$1,
+  changeUnstakeFeeCalls: changeUnstakeFeeCalls$1,
   mockChangeMarketLaunchIncentiveParametersToReturn: mockChangeMarketLaunchIncentiveParametersToReturn$1,
   changeMarketLaunchIncentiveParametersCalls: changeMarketLaunchIncentiveParametersCalls$1,
   mock_changeMarketLaunchIncentiveParametersToReturn: mock_changeMarketLaunchIncentiveParametersToReturn,
@@ -1138,6 +1218,8 @@ exports.mockMarketLaunchIncentiveMultipliersToReturn = mockMarketLaunchIncentive
 exports.marketLaunchIncentiveMultipliersCalls = marketLaunchIncentiveMultipliersCalls;
 exports.mockMarketLaunchIncentivePeriodToReturn = mockMarketLaunchIncentivePeriodToReturn;
 exports.marketLaunchIncentivePeriodCalls = marketLaunchIncentivePeriodCalls;
+exports.mockMarketUnstakeFeeBasisPointsToReturn = mockMarketUnstakeFeeBasisPointsToReturn;
+exports.marketUnstakeFeeBasisPointsCalls = marketUnstakeFeeBasisPointsCalls;
 exports.mockSyntheticRewardParamsToReturn = mockSyntheticRewardParamsToReturn;
 exports.syntheticRewardParamsCalls = syntheticRewardParamsCalls;
 exports.mockSyntheticTokensToReturn = mockSyntheticTokensToReturn;
@@ -1152,6 +1234,8 @@ exports.mockChangeAdminToReturn = mockChangeAdminToReturn;
 exports.changeAdminCalls = changeAdminCalls;
 exports.mockChangeFloatPercentageToReturn = mockChangeFloatPercentageToReturn;
 exports.changeFloatPercentageCalls = changeFloatPercentageCalls;
+exports.mockChangeUnstakeFeeToReturn = mockChangeUnstakeFeeToReturn;
+exports.changeUnstakeFeeCalls = changeUnstakeFeeCalls;
 exports.mockChangeMarketLaunchIncentiveParametersToReturn = mockChangeMarketLaunchIncentiveParametersToReturn;
 exports.changeMarketLaunchIncentiveParametersCalls = changeMarketLaunchIncentiveParametersCalls;
 exports.mockAddNewStakingFundToReturn = mockAddNewStakingFundToReturn;

@@ -62,14 +62,6 @@ external executeOutstandingNextPriceSettlementsUser: (
   ~marketIndex: int,
 ) => JsPromise.t<transaction> = "executeOutstandingNextPriceSettlementsUser"
 
-type getMarketPercentForTreasuryVsMarketSplitReturn = Ethers.BigNumber.t
-@send
-external getMarketPercentForTreasuryVsMarketSplit: (
-  t,
-  ~marketIndex: int,
-) => JsPromise.t<getMarketPercentForTreasuryVsMarketSplitReturn> =
-  "getMarketPercentForTreasuryVsMarketSplit"
-
 type getUsersConfirmedButNotSettledBalanceReturn = Ethers.BigNumber.t
 @send
 external getUsersConfirmedButNotSettledBalance: (
@@ -95,6 +87,7 @@ external initializeMarket: (
   ~marketIndex: int,
   ~kInitialMultiplier: Ethers.BigNumber.t,
   ~kPeriod: Ethers.BigNumber.t,
+  ~unstakeFeeBasisPoints: Ethers.BigNumber.t,
   ~initialMarketSeed: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "initializeMarket"
 

@@ -323,6 +323,7 @@ contract LongShort is ILongShort, Initializable {
         uint32 marketIndex,
         uint256 kInitialMultiplier,
         uint256 kPeriod,
+        uint256 unstakeFeeBasisPoints,
         uint256 initialMarketSeed
     ) external adminOnly {
         require(!marketExists[marketIndex], "already initialized");
@@ -336,7 +337,8 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokens[latestMarket][true],
             syntheticTokens[latestMarket][false],
             kInitialMultiplier,
-            kPeriod
+            kPeriod,
+            unstakeFeeBasisPoints
         );
 
         _seedMarketInitially(initialMarketSeed, marketIndex);
@@ -416,8 +418,8 @@ contract LongShort is ILongShort, Initializable {
         }
     }
 
-    function getMarketPercentForTreasuryVsMarketSplit(uint32 marketIndex)
-        public
+    function _getMarketPercentForTreasuryVsMarketSplit(uint32 marketIndex)
+        internal
         view
         returns (uint256 marketPercentE5)
     {
@@ -444,28 +446,6 @@ contract LongShort is ILongShort, Initializable {
 
         return marketPercentE5;
     }
-
-    // TODO: this is an unused function. Integrate it!
-    // /**
-    //  * Returns the amount of accrued value that should go to the market,
-    //  * and the amount that should be locked into the treasury. To incentivise
-    //  * market balance, more value goes to the market in proportion to how
-    //  * imbalanced it is.
-    //  */
-    // function _getTreasurySplit(uint32 marketIndex, uint256 amount)
-    //     internal
-    //     view
-    //     returns (uint256 marketAmount, uint256 treasuryAmount)
-    // {
-    //     uint256 marketPercentE5 = getMarketPercentForTreasuryVsMarketSplit(
-    //         marketIndex
-    //     );
-
-    //     marketAmount = (marketPercentE5 * amount) / TEN_TO_THE_5;
-    //     treasuryAmount = amount - marketAmount;
-
-    //     return (marketAmount, treasuryAmount);
-    // }
 
     function _getLongPercentForLongVsShortSplit(uint32 marketIndex)
         internal
@@ -516,7 +496,7 @@ contract LongShort is ILongShort, Initializable {
      * Controls what happens with accrued yield manager interest.
      */
     function _claimAndDistributeYield(uint32 marketIndex) internal {
-        uint256 marketPercentE5 = getMarketPercentForTreasuryVsMarketSplit(
+        uint256 marketPercentE5 = _getMarketPercentForTreasuryVsMarketSplit(
             marketIndex
         );
 
