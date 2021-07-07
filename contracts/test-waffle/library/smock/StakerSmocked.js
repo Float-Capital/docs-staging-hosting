@@ -238,7 +238,8 @@ function initializeCalls(_r) {
                         admin: param[0],
                         longShortCoreContract: param[1],
                         floatToken: param[2],
-                        floatCapital: param[3]
+                        floatCapital: param[3],
+                        floatPercentage: param[4]
                       };
               }));
 }
@@ -475,7 +476,8 @@ function initializeCalls$1(param) {
                                           admin: param[0],
                                           longShortCoreContract: param[1],
                                           floatToken: param[2],
-                                          floatCapital: param[3]
+                                          floatCapital: param[3],
+                                          floatPercentage: param[4]
                                         };
                                 }));
                   })));

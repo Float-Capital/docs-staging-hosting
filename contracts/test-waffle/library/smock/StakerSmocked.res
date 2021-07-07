@@ -56,7 +56,7 @@ let floatCapitalCalls: t => array<floatCapitalCall> = _r => {
   })
 }
 
-let mockFloatPercentageToReturn: (t, int) => unit = (_r, _param0) => {
+let mockFloatPercentageToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.floatPercentage.will.return.with([_param0])")
 }
 
@@ -275,16 +275,18 @@ type initializeCall = {
   longShortCoreContract: Ethers.ethAddress,
   floatToken: Ethers.ethAddress,
   floatCapital: Ethers.ethAddress,
+  floatPercentage: Ethers.BigNumber.t,
 }
 
 let initializeCalls: t => array<initializeCall> = _r => {
   let array = %raw("_r.smocked.initialize.calls")
-  array->Array.map(((admin, longShortCoreContract, floatToken, floatCapital)) => {
+  array->Array.map(((admin, longShortCoreContract, floatToken, floatCapital, floatPercentage)) => {
     {
       admin: admin,
       longShortCoreContract: longShortCoreContract,
       floatToken: floatToken,
       floatCapital: floatCapital,
+      floatPercentage: floatPercentage,
     }
   })
 }
@@ -561,6 +563,7 @@ module InternalMock = {
     longShortCoreContract: Ethers.ethAddress,
     floatToken: Ethers.ethAddress,
     floatCapital: Ethers.ethAddress,
+    floatPercentage: Ethers.BigNumber.t,
   }
 
   let initializeCalls: unit => array<initializeCall> = () => {
@@ -568,12 +571,19 @@ module InternalMock = {
     internalRef.contents
     ->Option.map(_r => {
       let array = %raw("_r.smocked.initializeMock.calls")
-      array->Array.map(((admin, longShortCoreContract, floatToken, floatCapital)) => {
+      array->Array.map(((
+        admin,
+        longShortCoreContract,
+        floatToken,
+        floatCapital,
+        floatPercentage,
+      )) => {
         {
           admin: admin,
           longShortCoreContract: longShortCoreContract,
           floatToken: floatToken,
           floatCapital: floatCapital,
+          floatPercentage: floatPercentage,
         }
       })
     })

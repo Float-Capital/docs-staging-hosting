@@ -72,7 +72,7 @@ type floatCapitalReturn = Ethers.ethAddress
 @send
 external floatCapital: t => JsPromise.t<floatCapitalReturn> = "floatCapital"
 
-type floatPercentageReturn = int
+type floatPercentageReturn = Ethers.BigNumber.t
 @send
 external floatPercentage: t => JsPromise.t<floatPercentageReturn> = "floatPercentage"
 
@@ -87,6 +87,7 @@ external initialize: (
   ~longShortCoreContract: Ethers.ethAddress,
   ~floatToken: Ethers.ethAddress,
   ~floatCapital: Ethers.ethAddress,
+  ~floatPercentage: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "initialize"
 
 type latestRewardIndexReturn = Ethers.BigNumber.t

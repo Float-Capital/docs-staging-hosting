@@ -73,6 +73,7 @@ const initialize = async (admin) => {
     longShort.address,
     floatToken.address,
     floatCapital.address,
+    "250000000000000000", // 25%
     {
       from: admin,
     }

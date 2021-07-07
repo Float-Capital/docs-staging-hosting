@@ -192,6 +192,7 @@ external initializeMock: (
   Ethers.ethAddress,
   Ethers.ethAddress,
   Ethers.ethAddress,
+  Ethers.BigNumber.t,
 ) => JsPromise.t<initializeMockReturn> = "initializeMock"
 
 type mintAccumulatedFloatMockReturn

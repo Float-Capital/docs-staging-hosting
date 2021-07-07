@@ -34,7 +34,7 @@ contract StakerMockable is IStaker, Initializable {
 
         address public admin;
     address public floatCapital;
-    uint16 public floatPercentage;
+    uint256 public floatPercentage;
 
     ILongShort public longShortCoreContract;
     IFloatToken public floatToken;
@@ -62,7 +62,7 @@ contract StakerMockable is IStaker, Initializable {
     
 
 
-    event DeployV1(address floatToken);
+    event StakerV1(address floatToken, uint256 _floatPercentage);
 
     event MarketAddedToStaker(uint32 marketIndex, uint256 exitFeeBasisPoints);
 
@@ -166,20 +166,30 @@ contract StakerMockable is IStaker, Initializable {
         address _admin,
         address _longShortCoreContract,
         address _floatToken,
-        address _floatCapital
+        address _floatCapital,
+        uint256 _floatPercentage
     ) public initializer {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("initialize"))){
       
-      return mocker.initializeMock(_admin,_longShortCoreContract,_floatToken,_floatCapital);
+      return mocker.initializeMock(_admin,_longShortCoreContract,_floatToken,_floatCapital,_floatPercentage);
     }
   
+        require(
+            _admin != address(0) &&
+                _floatCapital != address(0) &&
+                _longShortCoreContract != address(0) &&
+                _floatToken != address(0)
+        );
         admin = _admin;
         floatCapital = _floatCapital;
         longShortCoreContract = ILongShort(_longShortCoreContract);
         floatToken = IFloatToken(_floatToken);
-        floatPercentage = 2500;
 
-        emit DeployV1(_floatToken);
+                require(_floatPercentage <= TEN_TO_THE_18 && _floatPercentage >= 1e14);
+
+        floatPercentage = _floatPercentage;
+
+        emit StakerV1(_floatToken, floatPercentage);
     }
 
     
@@ -626,7 +636,10 @@ contract StakerMockable is IStaker, Initializable {
     }
   
         floatToken.mint(user, floatToMint);
-        floatToken.mint(floatCapital, (floatToMint * floatPercentage) / 10000);
+        floatToken.mint(
+            floatCapital,
+            (floatToMint * floatPercentage) / TEN_TO_THE_18
+        );
     }
 
     function mintAccumulatedFloat(uint32 marketIndex, address user) internal {
@@ -774,7 +787,7 @@ contract StakerMockable is IStaker, Initializable {
             amount;
 
         uint256 amountFees = (amount *
-            marketUnstakeFeeBasisPoints[marketIndex]) / 10000;
+            marketUnstakeFeeBasisPoints[marketIndex]) / TEN_TO_THE_18;
 
         token.transfer(msg.sender, amount - amountFees);
 

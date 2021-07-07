@@ -7,7 +7,7 @@ import "../../interfaces/IFloatToken.sol";
 import "../../interfaces/ILongShort.sol";
 import "../../interfaces/IStaker.sol";
 contract StakerForInternalMocking { 
-    function initializeMock(address,address,address,address) public pure {
+    function initializeMock(address,address,address,address,uint256) public pure {
       return ();
     }
      

@@ -21,7 +21,7 @@ contract Staker is IStaker, Initializable {
     // Global state
     address public admin;
     address public floatCapital;
-    uint16 public floatPercentage;
+    uint256 public floatPercentage;
 
     ILongShort public longShortCoreContract;
     IFloatToken public floatToken;
@@ -55,7 +55,7 @@ contract Staker is IStaker, Initializable {
       ║           EVENTS           ║
       ╚════════════════════════════╝*/
 
-    event DeployV1(address floatToken);
+    event StakerV1(address floatToken, uint256 _floatPercentage);
 
     event MarketAddedToStaker(uint32 marketIndex, uint256 exitFeeBasisPoints);
 
@@ -130,15 +130,26 @@ contract Staker is IStaker, Initializable {
         address _admin,
         address _longShortCoreContract,
         address _floatToken,
-        address _floatCapital
+        address _floatCapital,
+        uint256 _floatPercentage
     ) public initializer {
+        require(
+            _admin != address(0) &&
+                _floatCapital != address(0) &&
+                _longShortCoreContract != address(0) &&
+                _floatToken != address(0)
+        );
         admin = _admin;
         floatCapital = _floatCapital;
         longShortCoreContract = ILongShort(_longShortCoreContract);
         floatToken = IFloatToken(_floatToken);
-        floatPercentage = 2500;
 
-        emit DeployV1(_floatToken);
+        // Arbitrary requirement: less than 100%, more than 0.01%
+        require(_floatPercentage <= TEN_TO_THE_18 && _floatPercentage >= 1e14);
+
+        floatPercentage = _floatPercentage;
+
+        emit StakerV1(_floatToken, floatPercentage);
     }
 
     /*╔═════════════════════════════╗
@@ -546,7 +557,10 @@ contract Staker is IStaker, Initializable {
 
     function _mintFloat(address user, uint256 floatToMint) internal {
         floatToken.mint(user, floatToMint);
-        floatToken.mint(floatCapital, (floatToMint * floatPercentage) / 10000);
+        floatToken.mint(
+            floatCapital,
+            (floatToMint * floatPercentage) / TEN_TO_THE_18
+        );
     }
 
     function mintAccumulatedFloat(uint32 marketIndex, address user) internal {
@@ -681,7 +695,7 @@ contract Staker is IStaker, Initializable {
             amount;
 
         uint256 amountFees = (amount *
-            marketUnstakeFeeBasisPoints[marketIndex]) / 10000;
+            marketUnstakeFeeBasisPoints[marketIndex]) / TEN_TO_THE_18;
 
         token.transfer(msg.sender, amount - amountFees);
 

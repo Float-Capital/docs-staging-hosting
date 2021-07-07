@@ -211,7 +211,7 @@ function inititialize(admin, exposeInternals) {
                                           floatToken.initialize3("Float token", "FLOAT TOKEN", staker.address),
                                           treasury.initialize(admin.address),
                                           longShort.initialize(admin.address, treasury.address, tokenFactory.address, staker.address),
-                                          staker.initialize(admin.address, longShort.address, floatToken.address, floatCapital.address)
+                                          staker.initialize(admin.address, longShort.address, floatToken.address, floatCapital.address, Globals.bnFromString("250000000000000000"))
                                         ]).then(function (param) {
                                         return Belt_Array.reduceWithIndex([
                                                       payToken1,

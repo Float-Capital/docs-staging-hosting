@@ -1,5 +1,5 @@
 import {
-  DeployV1,
+  StakerV1,
   StateAdded,
   StakeAdded,
   StakeWithdrawn,
@@ -29,7 +29,7 @@ import {
 
 import { ZERO, ONE, GLOBAL_STATE_ID } from "./CONSTANTS";
 
-export function handleDeployV1(event: DeployV1): void {
+export function handleStakerV1(event: StakerV1): void {
   let floatAddress = event.params.floatToken;
 
   let context = new DataSourceContext();
@@ -39,7 +39,7 @@ export function handleDeployV1(event: DeployV1): void {
 
   saveEventToStateChange(
     event,
-    "DeployV1",
+    "StakerV1",
     [floatAddress.toHex()],
     ["floatAddress"],
     ["address"],

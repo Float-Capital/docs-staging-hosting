@@ -79,7 +79,7 @@ contract LongShortMockable is ILongShort, Initializable {
     
 
 
-    event V1(
+    event LongShortV1(
         address admin,
         address treasury,
         address tokenFactory,
@@ -234,7 +234,7 @@ contract LongShortMockable is ILongShort, Initializable {
         tokenFactory = _tokenFactory;
         staker = _staker;
 
-        emit V1(
+        emit LongShortV1(
             _admin,
             address(treasury),
             address(_tokenFactory),

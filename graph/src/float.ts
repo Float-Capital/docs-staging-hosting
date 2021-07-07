@@ -1,5 +1,5 @@
 import {
-  V1,
+  LongShortV1,
   SyntheticTokenCreated,
   PriceUpdate,
   SystemStateUpdated,
@@ -70,8 +70,8 @@ import {
   doesBatchExist,
 } from "./utils/nextPrice";
 
-export function handleV1(event: V1): void {
-  // event V1(address admin, address tokenFactory, address staker);
+export function handleLongShortV1(event: LongShortV1): void {
+  // event LongShortV1(address admin, address tokenFactory, address staker);
 
   let admin = event.params.admin;
   let tokenFactoryParam = event.params.tokenFactory;
@@ -111,7 +111,7 @@ export function handleV1(event: V1): void {
 
   saveEventToStateChange(
     event,
-    "V1",
+    "LongShortV1",
     [admin.toHex(), treasury.toHex(), tokenFactoryString, stakerString],
     ["admin", "treasury", "tokenFactory", "staker"],
     ["address", "address", "address", "address"],

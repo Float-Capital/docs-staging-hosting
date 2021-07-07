@@ -44,10 +44,10 @@ function test(contracts, accounts) {
                               amount: floatToMint
                             });
                 }));
-          it("calls mint on floatTokens for floatCapital for amount (floatToMint * floatPercentage) / 10000", (function () {
+          it("calls mint on floatTokens for floatCapital for amount (floatToMint * floatPercentage) / 1e18", (function () {
                   return Chai.recordEqualFlat(Belt_Array.getExn(FloatTokenSmocked.mintCalls(floatTokenSmockedRef.contents), 1), {
                               _to: floatCapitalAddressRef.contents,
-                              amount: floatToMint.mul(ethers.BigNumber.from(floatPercentage)).div(ethers.BigNumber.from(10000))
+                              amount: Globals.div(Globals.mul(floatToMint, Globals.bnFromInt(floatPercentage)), CONSTANTS.tenToThe18)
                             });
                 }));
           
