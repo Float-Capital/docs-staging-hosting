@@ -55,7 +55,8 @@ const deployTestMarket = async (
       admin,
       testnetChainlinkDaiUsdAddress,
       testnetChainlinkEthUsdAddress,
-      testnetChainlinkMaticUsdAddress
+      testnetChainlinkMaticUsdAddress,
+      60
     );
   } else {
     oracleManager = await OracleManagerMock.new(admin);
@@ -281,7 +282,7 @@ module.exports = async function (deployer, network, accounts) {
     ) {
       verifyString += ` YieldManagerAave@${await longShort.yieldManagers(
         marketIndex
-      )} OracleManagerEthKiller@${await longShort.oracleManagers(
+      )} OracleManagerEthKillerChainlinkTestnet@${await longShort.oracleManagers(
         marketIndex
       )} SyntheticToken@${await longShort.syntheticTokens(
         marketIndex,

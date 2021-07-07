@@ -80,16 +80,18 @@ contract OracleManagerEthKillerChainlink is IOracleManager {
         return (_tronPrice, _eosPrice, _xrpPrice);
     }
 
-    function updatePrice() external override returns (int256) {
-        (int256 newTronPrice, int256 newEosPrice, int256 newXrpPrice) =
-            _getAssetPrices();
+    function _updatePrice() internal virtual returns (int256) {
+        (
+            int256 newTronPrice,
+            int256 newEosPrice,
+            int256 newXrpPrice
+        ) = _getAssetPrices();
 
-        int256 valueOfChangeInIndex =
-            (int256(indexPrice) *
-                (_calcAbsolutePercentageChange(newTronPrice, tronPrice) +
-                    _calcAbsolutePercentageChange(newEosPrice, eosPrice) +
-                    _calcAbsolutePercentageChange(newXrpPrice, xrpPrice))) /
-                (3 * 1e18);
+        int256 valueOfChangeInIndex = (int256(indexPrice) *
+            (_calcAbsolutePercentageChange(newTronPrice, tronPrice) +
+                _calcAbsolutePercentageChange(newEosPrice, eosPrice) +
+                _calcAbsolutePercentageChange(newXrpPrice, xrpPrice))) /
+            (3 * 1e18);
 
         tronPrice = newTronPrice;
         eosPrice = newEosPrice;
@@ -98,6 +100,10 @@ contract OracleManagerEthKillerChainlink is IOracleManager {
         indexPrice = indexPrice + valueOfChangeInIndex;
 
         return indexPrice;
+    }
+
+    function updatePrice() external override returns (int256) {
+        return _updatePrice();
     }
 
     function _calcAbsolutePercentageChange(int256 newPrice, int256 basePrice)
