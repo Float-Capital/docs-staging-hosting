@@ -90,6 +90,7 @@ contract LongShortMockable is ILongShort, Initializable {
         event SystemStateUpdated(
         uint32 marketIndex,
         uint256 updateIndex,
+        int256 underlyingAssetPrice,
         uint256 longValue,
         uint256 shortValue,
         uint256 longPrice,
@@ -736,6 +737,7 @@ contract LongShortMockable is ILongShort, Initializable {
             emit SystemStateUpdated(
                 marketIndex,
                 marketUpdateIndex[marketIndex],
+                newAssetPrice,
                 syntheticTokenPoolValue[marketIndex][true],
                 syntheticTokenPoolValue[marketIndex][false],
                 syntheticTokenPriceLong,
@@ -1158,7 +1160,7 @@ contract LongShortMockable is ILongShort, Initializable {
                 syntheticTokenPrice
             );
 
-                                    syntheticTokens[marketIndex][isLong].mint(
+            syntheticTokens[marketIndex][isLong].mint(
                 address(this),
                 numberOfTokens
             );

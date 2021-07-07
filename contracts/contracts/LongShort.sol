@@ -83,6 +83,7 @@ contract LongShort is ILongShort, Initializable {
     event SystemStateUpdated(
         uint32 marketIndex,
         uint256 updateIndex,
+        int256 underlyingAssetPrice,
         uint256 longValue,
         uint256 shortValue,
         uint256 longPrice,
@@ -658,6 +659,7 @@ contract LongShort is ILongShort, Initializable {
             emit SystemStateUpdated(
                 marketIndex,
                 marketUpdateIndex[marketIndex],
+                newAssetPrice,
                 syntheticTokenPoolValue[marketIndex][true],
                 syntheticTokenPoolValue[marketIndex][false],
                 syntheticTokenPriceLong,
