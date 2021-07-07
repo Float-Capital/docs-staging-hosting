@@ -1,6 +1,6 @@
 module MintForm = %form(
-  type input = {amount: string, isStaking: bool}
-  type output = {amount: Ethers.BigNumber.t, isStaking: bool}
+  type input = {amount: string}
+  type output = {amount: Ethers.BigNumber.t}
 
   let validators = {
     amount: {
@@ -20,13 +20,11 @@ module MintForm = %form(
         }
       },
     },
-    isStaking: None,
   }
 )
 
 let initialInput: MintForm.input = {
   amount: "",
-  isStaking: true,
 }
 
 let useBalanceAndApproved = (~erc20Address, ~spender) => {
@@ -53,7 +51,6 @@ module SubmitButtonAndTxTracker = {
     ~tokenToMint,
     ~buttonText,
     ~buttonDisabled,
-    ~isStaking,
   ) => {
     let randomMintTweetMessage = (isLong, marketName) => {
       let position = isLong ? "long" : "short"
@@ -148,12 +145,10 @@ module SubmitButtonAndTxTracker = {
             <Tick />
             <p> {`Transaction complete 🎉`->React.string} </p>
             <TweetButton message={randomMintTweetMessage(isLong, marketName)} />
-            {!isStaking
-              ? <Metamask.AddTokenButton
-                  token={Config.config.contracts.floatToken}
-                  tokenSymbol={`${isLong ? `↗️` : `↘️`}${marketName}`}
-                />
-              : React.null}
+            <Metamask.AddTokenButton
+              token={Config.config.contracts.floatToken}
+              tokenSymbol={`${isLong ? `↗️` : `↘️`}${marketName}`}
+            />
             <ViewProfileButton />
           </div>
         </Modal>
@@ -194,10 +189,7 @@ module MintFormInput = {
     ~onChangeAmountInput=_ => (),
     ~onMaxClick=_ => (),
     ~optErrorMessage=None,
-    ~isStaking=true,
     ~disabled=false,
-    ~onBlurIsStaking=_ => (),
-    ~onChangeIsStaking=_ => (),
     ~submitButton=<Button> "Login & Mint" </Button>,
   ) => {
     let router = Next.Router.useRouter()
@@ -211,40 +203,13 @@ module MintFormInput = {
           disabled
           onBlur=onBlurAmount
           onChange=onChangeAmountInput
-          optCurrency={Some(Config.paymentTokenName)}
+          optCurrency={Some(CONSTANTS.daiDisplayToken)}
           onMaxClick
         />
         {switch optErrorMessage {
         | Some(message) => <div className="text-red-500 text-xs"> {message->React.string} </div>
         | None => React.null
         }}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <input
-              id="stake-checkbox"
-              type_="checkbox"
-              className="mr-2"
-              checked={isStaking}
-              disabled
-              onBlur=onBlurIsStaking
-              onChange=onChangeIsStaking
-            />
-            <label htmlFor="stake-checkbox" className="text-xs">
-              {`Stake ${isLong ? "long" : "short"} tokens `->React.string}
-            </label>
-            <div className="ml-1">
-              <Tooltip tip="Stake your synthetic asset tokens to earn FLOAT tokens" />
-            </div>
-          </div>
-          <p className="text-xxs hover:text-gray-500">
-            <a
-              href="https://docs.float.capital/docs/stake"
-              target="_blank"
-              rel="noopenner noreferrer">
-              {"Learn more about staking"->React.string}
-            </a>
-          </p>
-        </div>
       </>
 
     <div className="screen-centered-container h-full ">
@@ -289,7 +254,7 @@ module MintFormSignedIn = {
       ~spender=Config.longShort,
     )
 
-    let form = MintForm.useForm(~initialInput, ~onSubmit=({amount, isStaking}, _form) => {
+    let form = MintForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
       let approveFunction = () =>
         contractExecutionHandlerApprove(
           ~makeContractInstance=Contracts.Erc20.make(~address=Config.dai),
@@ -302,15 +267,8 @@ module MintFormSignedIn = {
         contractExecutionHandler(
           ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
           ~contractFunction=isLong
-            ? Contracts.LongShort.mintLong(~marketIndex=market.marketIndex, ~amount)
-            : Contracts.LongShort.mintShort(~marketIndex=market.marketIndex, ~amount),
-        )
-      let mintAndStakeFunction = () =>
-        contractExecutionHandler(
-          ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
-          ~contractFunction=isLong
-            ? Contracts.LongShort.mintLongAndStake(~marketIndex=market.marketIndex, ~amount)
-            : Contracts.LongShort.mintShortAndStake(~marketIndex=market.marketIndex, ~amount),
+            ? Contracts.LongShort.mintLongNextPrice(~marketIndex=market.marketIndex, ~amount)
+            : Contracts.LongShort.mintShortNextPrice(~marketIndex=market.marketIndex, ~amount),
         )
       let needsToApprove = isGreaterThanApproval(
         ~amount,
@@ -321,9 +279,9 @@ module MintFormSignedIn = {
 
       switch needsToApprove {
       | true =>
-        setContractActionToCallAfterApproval(_ => isStaking ? mintAndStakeFunction : mintFunction)
+        setContractActionToCallAfterApproval(_ => mintFunction)
         approveFunction()
-      | false => isStaking ? mintAndStakeFunction() : mintFunction()
+      | false => mintFunction()
       }
     })
 
@@ -345,9 +303,6 @@ module MintFormSignedIn = {
     let tokenToMint = isLong ? `long ${market.name}` : `short ${market.name}`
 
     let (optAdditionalErrorMessage, buttonText, buttonDisabled) = {
-      let stakingText = form.input.isStaking ? "Mint & Stake" : "Mint"
-      let approveConnector = form.input.isStaking ? "," : " &"
-
       let position = isLong ? "long" : "short"
       switch (formAmount, optDaiBalance, optDaiAmountApproved) {
       | (Some(amount), Some(balance), Some(amountApproved)) =>
@@ -358,13 +313,13 @@ module MintFormSignedIn = {
         | false => (
             None,
             switch needsToApprove {
-            | true => `Approve${approveConnector} ${stakingText} ${position} position`
-            | false => `${stakingText} ${position} position`
+            | true => `Approve & mint ${position} position`
+            | false => `Mint ${position} position`
             },
             !form.valid(),
           )
         }
-      | _ => (None, `${stakingText} ${position} position`, true)
+      | _ => (None, `Mint ${position} position`, true)
       }
     }
 
@@ -445,14 +400,12 @@ module MintFormSignedIn = {
       valueAmountInput=form.input.amount
       optDaiBalance
       onBlurAmount={_ => form.blurAmount()}
-      onChangeAmountInput={event => form.updateAmount((input, amount) => {
-          ...input,
+      onChangeAmountInput={event => form.updateAmount((_, amount) => {
           amount: amount,
         }, (event->ReactEvent.Form.target)["value"])}
       onMaxClick={_ =>
         form.updateAmount(
-          (input, amount) => {
-            ...input,
+          (_, amount) => {
             amount: amount,
           },
           switch optDaiBalance {
@@ -460,14 +413,7 @@ module MintFormSignedIn = {
           | _ => "0"
           },
         )}
-      isStaking={form.input.isStaking}
       disabled={form.submitting}
-      onBlurIsStaking={_ => form.blurIsStaking()}
-      onChangeIsStaking={event =>
-        form.updateIsStaking(
-          (input, value) => {...input, isStaking: value},
-          (event->ReactEvent.Form.target)["checked"],
-        )}
       optErrorMessage=optAdditionalErrorMessage
       submitButton={<SubmitButtonAndTxTracker
         buttonText
@@ -476,7 +422,6 @@ module MintFormSignedIn = {
         txStateApprove
         txStateMint=txState
         buttonDisabled
-        isStaking={form.input.isStaking}
         isLong
         marketName={market.name}
       />}

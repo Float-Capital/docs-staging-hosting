@@ -11,6 +11,50 @@ let bnEqual: (
   Ethers.BigNumber.t,
 ) => unit = %raw(`(message, number1, number2) => expect(number1, message).to.equal(number2)`)
 
+let recordEqualFlatLabeled: (~expected: 'a, ~actual: 'a) => unit = (~expected, ~actual) => {
+  let a = %raw("(expected, actual) => {
+    for(const key of Object.keys(actual)){
+      expect(actual[key]).to.equal(expected[key])
+    }
+  }")
+  a(expected, actual)
+}
+
+let recordEqualFlat: ('a, 'a) => unit = (expected, actual) => {
+  let a = %raw("(expected, actual) => {
+    for(const key of Object.keys(actual)){
+      expect(actual[key]).to.equal(expected[key])
+    }
+  }")
+  a(expected, actual)
+}
+
+let recordEqualDeep: ('a, 'a) => unit = (expected, actual) => {
+  let a = %raw("(expected, actual) => {
+    for(const key of Object.keys(actual)){
+      expect(actual[key]).to.deep.equal(expected[key])
+    }
+  }")
+  a(expected, actual)
+}
+let intEqual: (
+  ~message: string=?,
+  int,
+  int,
+) => unit = %raw(`(message, number1, number2) => expect(number1, message).to.equal(number2)`)
+
+let addressEqual: (
+  ~message: string=?,
+  ~otherAddress: Ethers.ethAddress,
+  Ethers.ethAddress,
+) => unit = %raw(`(message, address1, address2) => expect(address1, message).to.equal(address2)`)
+
+let boolEqual: (
+  ~message: string=?,
+  bool,
+  bool,
+) => unit = %raw(`(message, number1, number2) => expect(number1, message).to.equal(number2)`)
+
 let bnWithin: (
   Ethers.BigNumber.t,
   ~min: Ethers.BigNumber.t,
@@ -18,10 +62,11 @@ let bnWithin: (
 ) => unit = %raw(`(number1, min, max) => expect(number1).to.be.within(min, max)`)
 
 let bnCloseTo: (
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
+  ~message: string=?,
   ~distance: int,
-) => unit = %raw(`(number1, number2, distance) => expect(number1).to.be.closeTo(number2, distance)`)
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+) => unit = %raw(`(message, distance, number1, number2) => expect(number1, message).to.be.closeTo(number2, distance)`)
 
 type eventCheck
 let callEmitEvents: (
@@ -35,10 +80,16 @@ let callEmitEvents: (
 @send external withArgs3: (eventCheck, 'a, 'b, 'c) => JsPromise.t<unit> = "withArgs"
 @send external withArgs4: (eventCheck, 'a, 'b, 'c, 'd) => JsPromise.t<unit> = "withArgs"
 @send external withArgs5: (eventCheck, 'a, 'b, 'c, 'd, 'e) => JsPromise.t<unit> = "withArgs"
+
+@send external withArgs5Return: (eventCheck, 'a, 'b, 'c, 'd, 'e) => eventCheck = "withArgs"
+
 @send external withArgs6: (eventCheck, 'a, 'b, 'c, 'd, 'e, 'f) => JsPromise.t<unit> = "withArgs"
 @send external withArgs7: (eventCheck, 'a, 'b, 'c, 'd, 'e, 'f, 'g) => JsPromise.t<unit> = "withArgs"
 @send
 external withArgs8: (eventCheck, 'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h) => JsPromise.t<unit> = "withArgs"
+
+let expectToNotEmit: eventCheck => JsPromise.t<unit> = _eventCheck =>
+  %raw(`_eventCheck.then(() => assert.fail('An event was emitted when it should not have been')).catch(() => {})`)
 
 let expectRevertNoReason: (
   ~transaction: JsPromise.t<ContractHelpers.transaction>,

@@ -37,12 +37,6 @@ contract("LongShort (gas prices)", (accounts) => {
   const syntheticName = "FTSE100";
   const syntheticSymbol = "FTSE";
 
-  // Fees
-  const _baseEntryFee = 0;
-  const _badLiquidityEntryFee = 50;
-  const _baseExitFee = 50;
-  const _badLiquidityExitFee = 50;
-
   // Default test values
   const admin = accounts[0];
   const user1 = accounts[1];
@@ -78,7 +72,7 @@ contract("LongShort (gas prices)", (accounts) => {
     oracleManager = synthResult.oracleManager;
   });
 
-  it("check cost of minting without oracle movement", async () => {
+  it.skip("check cost of minting without oracle movement", async () => {
     await mintAndApprove(fund, defaultMintAmount, user1, longShort.address);
     const receipt = await longShort.mintLong(
       marketIndex,
@@ -97,7 +91,7 @@ contract("LongShort (gas prices)", (accounts) => {
     );
   });
 
-  it("mint and stake", async () => {
+  it.skip("mint and stake", async () => {
     await mintAndApprove(fund, defaultMintAmount, user1, longShort.address);
     const receipt = await longShort.mintLongAndStake(
       marketIndex,
@@ -116,7 +110,7 @@ contract("LongShort (gas prices)", (accounts) => {
     );
   });
 
-  it("check cost of minting with oracle movement", async () => {
+  it.skip("check cost of minting with oracle movement", async () => {
     await mintAndApprove(fund, defaultMintAmount, user1, longShort.address);
     await longShort.mintLong(marketIndex, new BN(defaultMintAmount), {
       from: user1,

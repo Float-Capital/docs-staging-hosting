@@ -1,6 +1,17 @@
-open BsMocha;
-let (it', it_skip', before_each', before') =
-  Promise.(it, it_skip, before_each, before);
+open LetOps;
+open Mocha;
+
+let before_once' = fn => {
+  let ranRef = ref(false);
+  before_each(() =>
+    if (ranRef^) {
+      ()->JsPromise.resolve;
+    } else {
+      let%Await _ = fn();
+      ranRef := true;
+    }
+  );
+};
 
 let (
   add,
@@ -28,5 +39,20 @@ let (
     gte,
     lt,
   );
-let (describe, it, it_skip, describe_skip, before, before_each) =
-  Mocha.(describe, describe_skip, it, it_skip, before, before_each);
+
+let describeIntegration =
+  Config.dontRunIntegrationTests ? describe_skip : describe;
+
+let describeUnit = Config.dontRunUnitTests ? describe_skip : describe;
+
+// Some tests should be counted towards the integration test code-coverage - but are really unit tests. For those tests use the bellow
+let describeBoth =
+  if (Config.isCI) {
+    // In CI it is only run as an integration test
+    //   this doesn't really matter - if integration tests are slower than unit tests, rather make this run as a unit test
+    if (Config.dontRunIntegrationTests) {describe_skip} else {
+      describe
+    };
+  } else {
+    describe;
+  };

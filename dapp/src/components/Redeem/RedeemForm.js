@@ -520,9 +520,9 @@ function RedeemForm$ConnectedRedeemForm(Props) {
           return Curry._2(contractExecutionHandler, (function (param) {
                         return Contracts.LongShort.make(Config.longShort, param);
                       }), isActuallyLong ? (function (param) {
-                          return param.redeemLong(marketIndex, amount);
+                          return param.redeemLongNextPrice(marketIndex, amount);
                         }) : (function (param) {
-                          return param.redeemShort(marketIndex, amount);
+                          return param.redeemShortNextPrice(marketIndex, amount);
                         }));
         }));
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
@@ -614,45 +614,52 @@ function RedeemForm$ConnectedRedeemForm(Props) {
           
         }), [txState]);
   if (match[2]) {
-    return React.createElement(RedeemForm$RedeemFormInput, {
-                onSubmit: form.submit,
-                value: form.input.amount,
-                optBalance: optTokenBalance,
-                disabled: form.submitting,
-                onChange: (function ($$event) {
-                    return Curry._2(form.updateAmount, (function (param, amount) {
-                                  return {
-                                          amount: amount
-                                        };
-                                }), $$event.target.value);
-                  }),
-                onBlur: (function (param) {
-                    return Curry._1(form.blurAmount, undefined);
-                  }),
-                onMaxClick: (function (param) {
-                    return Curry._2(form.updateAmount, (function (param, amount) {
-                                  return {
-                                          amount: amount
-                                        };
-                                }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
-                  }),
-                onChangeSide: (function (newPosition) {
-                    router.query["actionOption"] = newPosition;
-                    router.query["token"] = isActuallyLong ? Ethers.Utils.ethAdrToLowerStr(market.syntheticLong.tokenAddress) : Ethers.Utils.ethAdrToLowerStr(market.syntheticShort.tokenAddress);
-                    return Next.Router.pushObjShallow(router, {
-                                pathname: router.pathname,
-                                query: router.query
-                              });
-                  }),
-                isLong: isActuallyLong,
-                hasBothTokens: match[3],
-                submitButton: React.createElement(RedeemSubmitButtonAndTxStatusModal.make, {
-                      txStateRedeem: txState,
-                      resetFormButton: resetFormButton,
-                      buttonText: match$4[1],
-                      buttonDisabled: match$4[2]
-                    })
-              });
+    return React.createElement(React.Fragment, undefined, React.createElement(RedeemForm$RedeemFormInput, {
+                    onSubmit: form.submit,
+                    value: form.input.amount,
+                    optBalance: optTokenBalance,
+                    disabled: form.submitting,
+                    onChange: (function ($$event) {
+                        return Curry._2(form.updateAmount, (function (param, amount) {
+                                      return {
+                                              amount: amount
+                                            };
+                                    }), $$event.target.value);
+                      }),
+                    onBlur: (function (param) {
+                        return Curry._1(form.blurAmount, undefined);
+                      }),
+                    onMaxClick: (function (param) {
+                        return Curry._2(form.updateAmount, (function (param, amount) {
+                                      return {
+                                              amount: amount
+                                            };
+                                    }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
+                      }),
+                    onChangeSide: (function (newPosition) {
+                        router.query["actionOption"] = newPosition;
+                        router.query["token"] = isActuallyLong ? Ethers.Utils.ethAdrToLowerStr(market.syntheticLong.tokenAddress) : Ethers.Utils.ethAdrToLowerStr(market.syntheticShort.tokenAddress);
+                        return Next.Router.pushObjShallow(router, {
+                                    pathname: router.pathname,
+                                    query: router.query
+                                  });
+                      }),
+                    isLong: isActuallyLong,
+                    hasBothTokens: match[3],
+                    submitButton: React.createElement(RedeemSubmitButtonAndTxStatusModal.make, {
+                          txStateRedeem: txState,
+                          resetFormButton: resetFormButton,
+                          buttonText: match$4[1],
+                          buttonDisabled: true
+                        })
+                  }), React.createElement("p", {
+                    className: "text-center p-2"
+                  }, "Redeem is temporarily disabled on the app", React.createElement("br", undefined), React.createElement("a", {
+                        className: "underline text-xs",
+                        href: "http://gph.is/1fymjns",
+                        rel: "noopener noreferrer",
+                        target: "_"
+                      }, "mine")));
   } else {
     return React.createElement("p", undefined, "No tokens in this market to redeem");
   }

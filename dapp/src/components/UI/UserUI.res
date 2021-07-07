@@ -1,5 +1,7 @@
 open Globals
 
+let {add, mul, div, toNumber, eq, toString} = module(Ethers.BigNumber)
+
 module UserContainer = {
   @react.component
   let make = (~children) => {
@@ -240,8 +242,30 @@ module UserPercentageGains = {
     (displayDirection, percentStr)
   }
   @react.component
-  let make = (~metadata: DataHooks.synthBalanceMetadata, ~tokenAddress, ~isLong) => {
-    let bothPrices = DataHooks.useSyntheticPrices(~metadata, ~tokenAddress, ~isLong)
+  let make = (
+    ~oracleAddress,
+    ~timeLastUpdated,
+    ~tokenSupply,
+    ~totalLockedLong,
+    ~totalLockedShort,
+    ~syntheticPrice,
+    ~syntheticPriceLastUpdated,
+    ~tokenAddress,
+    ~isLong,
+    ~oldAssetPrice,
+  ) => {
+    let bothPrices = DataHooks.useSyntheticPrices(
+      ~oracleAddress,
+      ~timeLastUpdated,
+      ~tokenSupply,
+      ~totalLockedLong,
+      ~totalLockedShort,
+      ~syntheticPrice,
+      ~syntheticPriceLastUpdated,
+      ~tokenAddress,
+      ~isLong,
+      ~oldAssetPrice,
+    )
     <div className=`flex flex-col items-center justify-center`>
       {switch bothPrices {
       | Response((oldPrice, newPrice)) => {
@@ -264,17 +288,31 @@ module UserPercentageGains = {
 }
 module UserTokenBox = {
   @react.component
-  let make = (
-    ~name,
-    ~isLong,
-    ~tokens,
-    ~value,
-    ~tokenAddress=CONSTANTS.zeroAddress,
-    ~symbol="",
-    ~metadata: DataHooks.synthBalanceMetadata,
-    ~children,
-  ) => {
-    let {timeLastUpdated: timestamp} = metadata
+  let make = (~userBalanceData: Queries.UserTokenBalance.t, ~children) => {
+    let {
+      tokenBalance,
+      timeLastUpdated,
+      syntheticToken: {
+        id,
+        tokenType,
+        tokenSupply,
+        syntheticMarket: {
+          name,
+          symbol,
+          oracleAddress,
+          latestSystemState: {totalLockedLong, totalLockedShort, syntheticPrice: oldAssetPrice},
+        },
+        latestPrice: {price: {price, timeUpdated: synthPriceUpdated}},
+      },
+    } = userBalanceData
+
+    let tokenAddress = id->Ethers.Utils.getAddressUnsafe
+
+    let isLong = tokenType == #Long
+    let tokens = Misc.NumberFormat.formatEther(tokenBalance)
+    let tokensValue = price->mul(tokenBalance)->div(CONSTANTS.tenToThe18)
+    let value = Misc.NumberFormat.formatEther(tokensValue)
+
     <div
       className=`flex justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative`>
       <div className="absolute left-1 top-2">
@@ -283,7 +321,7 @@ module UserTokenBox = {
           tokenName={`${isLong ? "fu" : "fd"}${symbol}`}
         />
       </div>
-      <div className=`pl-3 text-sm self-center`>
+      <div className=`pl-3 text-xs self-center`>
         {name->React.string}
         <br className=`mt-1` />
         {(isLong ? `Long↗️` : `Short↘️`)->React.string}
@@ -296,12 +334,63 @@ module UserTokenBox = {
       </div>
       <div className=`flex flex-col items-center justify-center`>
         <div className=`text-xs text-center text-gray-400`>
-          {timestamp->Globals.formatTimestamp->React.string}
+          {timeLastUpdated->Globals.formatTimestamp->React.string}
         </div>
-        <UserPercentageGains isLong tokenAddress metadata />
+        <UserPercentageGains
+          oracleAddress
+          timeLastUpdated
+          tokenSupply
+          totalLockedLong
+          totalLockedShort
+          syntheticPrice=price
+          syntheticPriceLastUpdated=synthPriceUpdated
+          tokenAddress
+          isLong
+          oldAssetPrice
+        />
       </div>
       <div className=`self-center`> {children} </div>
     </div>
+  }
+}
+module UserPendingBox = {
+  @react.component
+  let make = (
+    ~name,
+    ~isLong,
+    ~daiSpend,
+    ~txConfirmedTimestamp,
+    ~marketIndex,
+    ~rerenderCallback,
+  ) => {
+    let lastOracleTimestamp = DataHooks.useOracleLastUpdate(
+      ~marketIndex=marketIndex->Ethers.BigNumber.toNumber,
+    )
+
+    let oracleHeartbeatForMarket = 1200 //TODO
+
+    switch lastOracleTimestamp {
+    | Response(lastOracleUpdateTimestamp) =>
+      <div
+        className=`flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative`>
+        <div className="flex flex-row justify-between">
+          <div className=` text-sm self-center`> {name->React.string} </div>
+          <div className=` text-sm self-center`> {(isLong ? "Long" : "Short")->React.string} </div>
+          <div className=`flex  text-sm self-center`>
+            <img src={CONSTANTS.daiDisplayToken.iconUrl} className="h-5 pr-1" />
+            {daiSpend->Ethers.Utils.formatEther->React.string}
+          </div>
+        </div>
+        <ProgressBar
+          txConfirmedTimestamp
+          nextPriceUpdateTimestamp={lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber +
+            oracleHeartbeatForMarket}
+          rerenderCallback
+        />
+      </div>
+    | GraphError(error) => <p> {error->React.string} </p>
+    | Loading => <Loader.Tiny />
+    }
   }
 }
 
@@ -327,17 +416,31 @@ module UserFloatEarnedFromStake = {
 
 module UserStakeBox = {
   @react.component
-  let make = (
-    ~name,
-    ~isLong,
-    ~tokens,
-    ~value,
-    ~tokenAddress=CONSTANTS.zeroAddress,
-    ~metadata: DataHooks.synthBalanceMetadata,
-    ~creationTxHash,
-    ~children,
-  ) => {
-    let {timeLastUpdated: timestamp} = metadata
+  let make = (~stake: Queries.CurrentStakeDetailed.t, ~children) => {
+    let syntheticToken = stake.currentStake.syntheticToken
+    let tokenAddress = syntheticToken.id->Ethers.Utils.getAddressUnsafe
+    let name = syntheticToken.syntheticMarket.name
+    let tokens = stake.currentStake.amount->Misc.NumberFormat.formatEther
+    let isLong = syntheticToken.tokenType->Obj.magic == "Long"
+    let price = syntheticToken.latestPrice.price.price
+
+    let synthLastUpdated = syntheticToken.latestPrice.price.timeUpdated
+
+    let {
+      tokenSupply,
+      syntheticMarket: {
+        oracleAddress,
+        latestSystemState: {totalLockedLong, totalLockedShort, syntheticPrice: oldAssetPrice},
+      },
+    } = syntheticToken
+
+    let value =
+      stake.currentStake.amount
+      ->Ethers.BigNumber.mul(price)
+      ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
+      ->Misc.NumberFormat.formatEther
+    let creationTxHash = stake.currentStake.creationTxHash
+
     <div
       className=`flex justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative`>
       <div className=`pl-3 text-sm self-center`>
@@ -357,9 +460,20 @@ module UserStakeBox = {
           target="_"
           rel="noopener noreferrer"
           className="text-xs text-center text-gray-400 hover:opacity-75">
-          {timestamp->Globals.formatTimestamp->React.string}
+          {stake.currentStake.timestamp->Globals.formatTimestamp->React.string}
         </a>
-        <UserPercentageGains tokenAddress metadata isLong />
+        <UserPercentageGains
+          tokenAddress
+          oracleAddress
+          timeLastUpdated=stake.currentStake.timestamp
+          tokenSupply
+          totalLockedLong
+          totalLockedShort
+          syntheticPrice=price
+          syntheticPriceLastUpdated=synthLastUpdated
+          isLong
+          oldAssetPrice
+        />
       </div>
       <div className=`self-center`> {children} </div>
     </div>
@@ -368,8 +482,8 @@ module UserStakeBox = {
 
 module UserMarketStakeOrRedeem = {
   @react.component
-  let make = (~synthAddress, ~isLong) => {
-    let marketIdResponse = DataHooks.useTokenMarketId(~tokenId=synthAddress)
+  let make = (~synthId, ~syntheticSide) => {
+    let marketIdResponse = DataHooks.useTokenMarketId(~tokenId=synthId)
 
     let marketId =
       DataHooks.Util.graphResponseToOption(marketIdResponse)->Option.getWithDefault("1")
@@ -377,11 +491,11 @@ module UserMarketStakeOrRedeem = {
     let router = Next.Router.useRouter()
     let stake = _ =>
       router->Next.Router.push(
-        `/?marketIndex=${marketId}&actionOption=${isLong ? "long" : "short"}&tab=stake`,
+        `/?marketIndex=${marketId}&actionOption=${syntheticSide->Obj.magic}&tab=stake`,
       )
     let redeem = _ =>
       router->Next.Router.push(
-        `/?marketIndex=${marketId}&actionOption=${isLong ? "long" : "short"}&tab=redeem`,
+        `/?marketIndex=${marketId}&actionOption=${syntheticSide->Obj.magic}&tab=redeem`,
       )
 
     <div className=`flex flex-col`>
@@ -424,45 +538,9 @@ module UserStakesCard = {
       let key = `user-stakes-${Belt.Int.toString(i)}`
       let syntheticToken = stake.currentStake.syntheticToken
       let addr = syntheticToken.id->Ethers.Utils.getAddressUnsafe
-      let name = syntheticToken.syntheticMarket.name
-      let tokens = stake.currentStake.amount->Misc.NumberFormat.formatEther
       let isLong = syntheticToken.tokenType->Obj.magic == "Long"
-      let price = syntheticToken.latestPrice.price.price
 
-      let {
-        tokenSupply,
-        syntheticMarket: {
-          oracleAddress,
-          marketIndex,
-          latestSystemState: {totalLockedLong, totalLockedShort, syntheticPrice},
-        },
-      } = syntheticToken
-
-      let metadata: DataHooks.synthBalanceMetadata = {
-        oracleAddress: oracleAddress,
-        marketIndex: marketIndex,
-        totalLockedLong: totalLockedLong,
-        tokenSupply: tokenSupply,
-        totalLockedShort: totalLockedShort,
-        syntheticPrice: syntheticPrice,
-        timeLastUpdated: stake.currentStake.timestamp,
-      }
-
-      let value =
-        stake.currentStake.amount
-        ->Ethers.BigNumber.mul(price)
-        ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
-      let creationTxHash = stake.currentStake.creationTxHash
-
-      <UserStakeBox
-        key
-        name
-        isLong
-        tokens
-        tokenAddress={addr}
-        value={value->Misc.NumberFormat.formatEther}
-        metadata
-        creationTxHash>
+      <UserStakeBox key stake>
         <UserFloatEarnedFromStake tokenAddress={addr} userId />
         <UserMarketUnstake synthAddress={addr} userId isLong />
       </UserStakeBox>

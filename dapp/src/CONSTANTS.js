@@ -62,6 +62,11 @@ var oneYearInSeconds = 31536000;
 
 var hotAPYThreshold = 0.15;
 
+var daiDisplayToken = {
+  name: "DAI",
+  iconUrl: "/icons/dai.svg"
+};
+
 exports.zeroAddressStr = zeroAddressStr;
 exports.zeroAddress = zeroAddress;
 exports.zeroBN = zeroBN;
@@ -88,4 +93,5 @@ exports.oneYearInSeconds = oneYearInSeconds;
 exports.hotAPYThreshold = hotAPYThreshold;
 exports.kperiodHardcode = kperiodHardcode;
 exports.kmultiplierHardcode = kmultiplierHardcode;
+exports.daiDisplayToken = daiDisplayToken;
 /* zeroAddress Not a pure module */

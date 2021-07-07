@@ -37,29 +37,6 @@ type adminReturn = Ethers.ethAddress
 @send
 external admin: t => JsPromise.t<adminReturn> = "admin"
 
-type batchedStakeReturn = {
-  amountLong: Ethers.BigNumber.t,
-  amountShort: Ethers.BigNumber.t,
-  creationRewardIndex: Ethers.BigNumber.t,
-}
-@send
-external batchedStake: (t, int, Ethers.BigNumber.t) => JsPromise.t<batchedStakeReturn> =
-  "batchedStake"
-
-type calculateFloatPerSecondReturn = {
-  longFloatPerSecond: Ethers.BigNumber.t,
-  shortFloatPerSecond: Ethers.BigNumber.t,
-}
-@send
-external calculateFloatPerSecond: (
-  t,
-  ~longValue: Ethers.BigNumber.t,
-  ~shortValue: Ethers.BigNumber.t,
-  ~longPrice: Ethers.BigNumber.t,
-  ~shortPrice: Ethers.BigNumber.t,
-  ~marketIndex: int,
-) => JsPromise.t<calculateFloatPerSecondReturn> = "calculateFloatPerSecond"
-
 @send
 external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
 
@@ -91,10 +68,6 @@ type floatTokenReturn = Ethers.ethAddress
 @send
 external floatToken: t => JsPromise.t<floatTokenReturn> = "floatToken"
 
-type initialTimestampReturn = Ethers.BigNumber.t
-@send
-external initialTimestamp: t => JsPromise.t<initialTimestampReturn> = "initialTimestamp"
-
 @send
 external initialize: (
   t,
@@ -122,32 +95,13 @@ type marketLaunchIncentiveMultipliersReturn = Ethers.BigNumber.t
 @send
 external marketLaunchIncentiveMultipliers: (
   t,
-  Ethers.BigNumber.t,
+  int,
 ) => JsPromise.t<marketLaunchIncentiveMultipliersReturn> = "marketLaunchIncentiveMultipliers"
 
 type marketLaunchIncentivePeriodReturn = Ethers.BigNumber.t
 @send
-external marketLaunchIncentivePeriod: (
-  t,
-  Ethers.BigNumber.t,
-) => JsPromise.t<marketLaunchIncentivePeriodReturn> = "marketLaunchIncentivePeriod"
-
-@send
-external stakeFromMint: (
-  t,
-  ~token: Ethers.ethAddress,
-  ~amount: Ethers.BigNumber.t,
-  ~user: Ethers.ethAddress,
-) => JsPromise.t<transaction> = "stakeFromMint"
-
-@send
-external stakeFromMintBatched: (
-  t,
-  ~marketIndex: int,
-  ~amount: Ethers.BigNumber.t,
-  ~oracleUpdateIndex: Ethers.BigNumber.t,
-  ~syntheticTokenType: int,
-) => JsPromise.t<transaction> = "stakeFromMintBatched"
+external marketLaunchIncentivePeriod: (t, int) => JsPromise.t<marketLaunchIncentivePeriodReturn> =
+  "marketLaunchIncentivePeriod"
 
 @send
 external stakeFromUser: (
@@ -168,22 +122,9 @@ external syntheticRewardParams: (
   Ethers.BigNumber.t,
 ) => JsPromise.t<syntheticRewardParamsReturn> = "syntheticRewardParams"
 
-type syntheticTokensReturn = {
-  shortToken: Ethers.ethAddress,
-  longToken: Ethers.ethAddress,
-}
+type syntheticTokensReturn = Ethers.ethAddress
 @send
-external syntheticTokens: (t, int) => JsPromise.t<syntheticTokensReturn> = "syntheticTokens"
-
-@send
-external transferBatchStakeToUser: (
-  t,
-  ~amountLong: Ethers.BigNumber.t,
-  ~amountShort: Ethers.BigNumber.t,
-  ~marketIndex: int,
-  ~oracleUpdateIndex: Ethers.BigNumber.t,
-  ~user: Ethers.ethAddress,
-) => JsPromise.t<transaction> = "transferBatchStakeToUser"
+external syntheticTokens: (t, int, bool) => JsPromise.t<syntheticTokensReturn> = "syntheticTokens"
 
 type userAmountStakedReturn = Ethers.BigNumber.t
 @send
@@ -222,11 +163,31 @@ module Exposed = {
     "FLOAT_ISSUANCE_FIXED_DECIMAL"
 
   @send
+  external _changeMarketLaunchIncentiveParametersExternal: (
+    t,
+    ~marketIndex: int,
+    ~period: Ethers.BigNumber.t,
+    ~initialMultiplier: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "_changeMarketLaunchIncentiveParametersExternal"
+
+  @send
+  external _claimFloatExternal: (t, ~marketIndex: array<int>) => JsPromise.t<transaction> =
+    "_claimFloatExternal"
+
+  @send
   external _mintFloatExternal: (
     t,
     ~user: Ethers.ethAddress,
     ~floatToMint: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "_mintFloatExternal"
+
+  @send
+  external _stakeExternal: (
+    t,
+    ~token: Ethers.ethAddress,
+    ~amount: Ethers.BigNumber.t,
+    ~user: Ethers.ethAddress,
+  ) => JsPromise.t<transaction> = "_stakeExternal"
 
   @send
   external _withdrawExternal: (
@@ -259,15 +220,6 @@ module Exposed = {
   @send
   external admin: t => JsPromise.t<adminReturn> = "admin"
 
-  type batchedStakeReturn = {
-    amountLong: Ethers.BigNumber.t,
-    amountShort: Ethers.BigNumber.t,
-    creationRewardIndex: Ethers.BigNumber.t,
-  }
-  @send
-  external batchedStake: (t, int, Ethers.BigNumber.t) => JsPromise.t<batchedStakeReturn> =
-    "batchedStake"
-
   @send
   external calculateAccumulatedFloatExposed: (
     t,
@@ -286,19 +238,40 @@ module Exposed = {
     ~user: Ethers.ethAddress,
   ) => JsPromise.t<calculateAccumulatedFloatExposedReturn> = "calculateAccumulatedFloatExposed"
 
-  type calculateFloatPerSecondReturn = {
+  type calculateFloatPerSecondExposedReturn = {
     longFloatPerSecond: Ethers.BigNumber.t,
     shortFloatPerSecond: Ethers.BigNumber.t,
   }
   @send
-  external calculateFloatPerSecond: (
+  external calculateFloatPerSecondExposed: (
     t,
-    ~longValue: Ethers.BigNumber.t,
-    ~shortValue: Ethers.BigNumber.t,
+    ~marketIndex: int,
     ~longPrice: Ethers.BigNumber.t,
     ~shortPrice: Ethers.BigNumber.t,
+    ~longValue: Ethers.BigNumber.t,
+    ~shortValue: Ethers.BigNumber.t,
+  ) => JsPromise.t<calculateFloatPerSecondExposedReturn> = "calculateFloatPerSecondExposed"
+
+  type calculateNewCumulativeRateExposedReturn = {
+    longCumulativeRates: Ethers.BigNumber.t,
+    shortCumulativeRates: Ethers.BigNumber.t,
+  }
+  @send
+  external calculateNewCumulativeRateExposed: (
+    t,
     ~marketIndex: int,
-  ) => JsPromise.t<calculateFloatPerSecondReturn> = "calculateFloatPerSecond"
+    ~longPrice: Ethers.BigNumber.t,
+    ~shortPrice: Ethers.BigNumber.t,
+    ~longValue: Ethers.BigNumber.t,
+    ~shortValue: Ethers.BigNumber.t,
+  ) => JsPromise.t<calculateNewCumulativeRateExposedReturn> = "calculateNewCumulativeRateExposed"
+
+  type calculateTimeDeltaExposedReturn = Ethers.BigNumber.t
+  @send
+  external calculateTimeDeltaExposed: (
+    t,
+    ~marketIndex: int,
+  ) => JsPromise.t<calculateTimeDeltaExposedReturn> = "calculateTimeDeltaExposed"
 
   @send
   external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
@@ -331,9 +304,21 @@ module Exposed = {
   @send
   external floatToken: t => JsPromise.t<floatTokenReturn> = "floatToken"
 
-  type initialTimestampReturn = Ethers.BigNumber.t
+  type getKValueExternalReturn = Ethers.BigNumber.t
   @send
-  external initialTimestamp: t => JsPromise.t<initialTimestampReturn> = "initialTimestamp"
+  external getKValueExternal: (t, ~marketIndex: int) => JsPromise.t<getKValueExternalReturn> =
+    "getKValueExternal"
+
+  type getMarketLaunchIncentiveParametersExternalReturn = {
+    param0: Ethers.BigNumber.t,
+    param1: Ethers.BigNumber.t,
+  }
+  @send
+  external getMarketLaunchIncentiveParametersExternal: (
+    t,
+    ~marketIndex: int,
+  ) => JsPromise.t<getMarketLaunchIncentiveParametersExternalReturn> =
+    "getMarketLaunchIncentiveParametersExternal"
 
   @send
   external initialize: (
@@ -362,15 +347,13 @@ module Exposed = {
   @send
   external marketLaunchIncentiveMultipliers: (
     t,
-    Ethers.BigNumber.t,
+    int,
   ) => JsPromise.t<marketLaunchIncentiveMultipliersReturn> = "marketLaunchIncentiveMultipliers"
 
   type marketLaunchIncentivePeriodReturn = Ethers.BigNumber.t
   @send
-  external marketLaunchIncentivePeriod: (
-    t,
-    Ethers.BigNumber.t,
-  ) => JsPromise.t<marketLaunchIncentivePeriodReturn> = "marketLaunchIncentivePeriod"
+  external marketLaunchIncentivePeriod: (t, int) => JsPromise.t<marketLaunchIncentivePeriodReturn> =
+    "marketLaunchIncentivePeriod"
 
   @send
   external mintAccumulatedFloatExternal: (
@@ -378,6 +361,38 @@ module Exposed = {
     ~marketIndex: int,
     ~user: Ethers.ethAddress,
   ) => JsPromise.t<transaction> = "mintAccumulatedFloatExternal"
+
+  @send
+  external setAddNewStakingFundParams: (
+    t,
+    ~marketIndex: int,
+    ~longToken: Ethers.ethAddress,
+    ~shortToken: Ethers.ethAddress,
+    ~mockAddress: Ethers.ethAddress,
+  ) => JsPromise.t<transaction> = "setAddNewStakingFundParams"
+
+  @send
+  external setCalculateNewCumulativeRateParams: (
+    t,
+    ~marketIndex: int,
+    ~latestRewardIndexForMarket: Ethers.BigNumber.t,
+    ~accumFloatLong: Ethers.BigNumber.t,
+    ~accumFloatShort: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "setCalculateNewCumulativeRateParams"
+
+  @send
+  external setCalculateTimeDeltaParams: (
+    t,
+    ~marketIndex: int,
+    ~latestRewardIndexForMarket: Ethers.BigNumber.t,
+    ~timestamp: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "setCalculateTimeDeltaParams"
+
+  @send
+  external setClaimFloatCustomParams: (
+    t,
+    ~longshort: Ethers.ethAddress,
+  ) => JsPromise.t<transaction> = "setClaimFloatCustomParams"
 
   @send
   external setFloatRewardCalcParams: (
@@ -397,21 +412,84 @@ module Exposed = {
   ) => JsPromise.t<transaction> = "setFloatRewardCalcParams"
 
   @send
-  external stakeFromMint: (
-    t,
-    ~token: Ethers.ethAddress,
-    ~amount: Ethers.BigNumber.t,
-    ~user: Ethers.ethAddress,
-  ) => JsPromise.t<transaction> = "stakeFromMint"
+  external setFunctionToNotMock: (t, ~functionToNotMock: string) => JsPromise.t<transaction> =
+    "setFunctionToNotMock"
 
   @send
-  external stakeFromMintBatched: (
+  external setGetKValueParams: (
     t,
     ~marketIndex: int,
-    ~amount: Ethers.BigNumber.t,
-    ~oracleUpdateIndex: Ethers.BigNumber.t,
-    ~syntheticTokenType: int,
-  ) => JsPromise.t<transaction> = "stakeFromMintBatched"
+    ~timestamp: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "setGetKValueParams"
+
+  @send
+  external setGetMarketLaunchIncentiveParametersParams: (
+    t,
+    ~marketIndex: int,
+    ~period: Ethers.BigNumber.t,
+    ~multiplier: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "setGetMarketLaunchIncentiveParametersParams"
+
+  @send
+  external setMintAccumulatedFloatAndClaimFloatParams: (
+    t,
+    ~marketIndex: int,
+    ~latestRewardIndexForMarket: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "setMintAccumulatedFloatAndClaimFloatParams"
+
+  @send
+  external setMocker: (t, ~mocker: Ethers.ethAddress) => JsPromise.t<transaction> = "setMocker"
+
+  @send
+  external setRewardObjectsExternal: (
+    t,
+    ~marketIndex: int,
+    ~longPrice: Ethers.BigNumber.t,
+    ~shortPrice: Ethers.BigNumber.t,
+    ~longValue: Ethers.BigNumber.t,
+    ~shortValue: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "setRewardObjectsExternal"
+
+  @send
+  external setSetRewardObjectsParams: (
+    t,
+    ~marketIndex: int,
+    ~latestRewardIndexForMarket: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "setSetRewardObjectsParams"
+
+  @send
+  external setStakeFromUserParams: (
+    t,
+    ~longshort: Ethers.ethAddress,
+    ~token: Ethers.ethAddress,
+    ~marketIndexForToken: int,
+  ) => JsPromise.t<transaction> = "setStakeFromUserParams"
+
+  @send
+  external set_mintFloatParams: (
+    t,
+    ~floatToken: Ethers.ethAddress,
+    ~floatPercentage: int,
+  ) => JsPromise.t<transaction> = "set_mintFloatParams"
+
+  @send
+  external set_stakeParams: (
+    t,
+    ~user: Ethers.ethAddress,
+    ~marketIndex: int,
+    ~latestRewardIndex: Ethers.BigNumber.t,
+    ~token: Ethers.ethAddress,
+    ~userAmountStaked: Ethers.BigNumber.t,
+    ~userLastRewardIndex: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "set_stakeParams"
+
+  @send
+  external set_updateStateParams: (
+    t,
+    ~longShort: Ethers.ethAddress,
+    ~token: Ethers.ethAddress,
+    ~tokenMarketIndex: int,
+  ) => JsPromise.t<transaction> = "set_updateStateParams"
 
   @send
   external stakeFromUser: (
@@ -432,22 +510,9 @@ module Exposed = {
     Ethers.BigNumber.t,
   ) => JsPromise.t<syntheticRewardParamsReturn> = "syntheticRewardParams"
 
-  type syntheticTokensReturn = {
-    shortToken: Ethers.ethAddress,
-    longToken: Ethers.ethAddress,
-  }
+  type syntheticTokensReturn = Ethers.ethAddress
   @send
-  external syntheticTokens: (t, int) => JsPromise.t<syntheticTokensReturn> = "syntheticTokens"
-
-  @send
-  external transferBatchStakeToUser: (
-    t,
-    ~amountLong: Ethers.BigNumber.t,
-    ~amountShort: Ethers.BigNumber.t,
-    ~marketIndex: int,
-    ~oracleUpdateIndex: Ethers.BigNumber.t,
-    ~user: Ethers.ethAddress,
-  ) => JsPromise.t<transaction> = "transferBatchStakeToUser"
+  external syntheticTokens: (t, int, bool) => JsPromise.t<syntheticTokensReturn> = "syntheticTokens"
 
   type userAmountStakedReturn = Ethers.BigNumber.t
   @send

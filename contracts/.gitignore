@@ -6,6 +6,9 @@ artifacts
 # Truffle
 build
 
+# Test codegen
+codegen
+
 # Openzeppelin
 .openzeppelin/.session
 .openzeppelin/unknown-*.json
@@ -23,3 +26,9 @@ lib
 
 coverage.json
 
+coverage-truffle
+coverage-all
+coverage-unit
+coverage-integration
+
+abis

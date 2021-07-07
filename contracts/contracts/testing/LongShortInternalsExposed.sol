@@ -1,113 +1,99 @@
 pragma solidity 0.8.3;
 
-import "../LongShort.sol";
+import "./generated/LongShortMockable.sol";
 
 /*
 NOTE: This contract is for testing purposes only!
 */
 
-contract LongShortInternalsExposed is LongShort {
-    bool overRideexecuteOutstandingLazySettlements;
+contract LongShortInternalsExposed is LongShortMockable {
+    bool overRideexecuteOutstandingNextPriceSettlements;
 
-    event executeOutstandingLazySettlementsMock(
+    event executeOutstandingNextPriceSettlementsMock(
         address _user,
         uint32 _marketIndex
     );
 
-    function setUseexecuteOutstandingLazySettlementsMock(bool shouldUseMock)
-        public
-    {
-        overRideexecuteOutstandingLazySettlements = shouldUseMock;
+    function setInitializeMarketParams(
+        uint32 marketIndex,
+        bool marketIndexValue,
+        uint32 _latestMarket,
+        address _staker,
+        address longAddress,
+        address shortAddress
+    ) public {
+        latestMarket = _latestMarket;
+        marketExists[marketIndex] = marketIndexValue;
+        staker = IStaker(_staker);
+        syntheticTokens[marketIndex][
+            true /*short*/
+        ] = ISyntheticToken(longAddress);
+        syntheticTokens[marketIndex][
+            false /*short*/
+        ] = ISyntheticToken(shortAddress);
     }
 
-    function _executeOutstandingLazySettlementsMock(
+    function setUseexecuteOutstandingNextPriceSettlementsMock(
+        bool shouldUseMock
+    ) public {
+        overRideexecuteOutstandingNextPriceSettlements = shouldUseMock;
+    }
+
+    function _executeOutstandingNextPriceSettlementsMock(
         address _user,
         uint32 _marketIndex
     ) internal {
-        emit executeOutstandingLazySettlementsMock(_user, _marketIndex);
+        emit executeOutstandingNextPriceSettlementsMock(_user, _marketIndex);
     }
 
-    modifier executeOutstandingLazySettlements(address user, uint32 marketIndex)
-        override {
-        if (overRideexecuteOutstandingLazySettlements) {
+    modifier executeOutstandingNextPriceSettlements(
+        address user,
+        uint32 marketIndex
+    ) override {
+        if (overRideexecuteOutstandingNextPriceSettlements) {
             // TODO: put a mock here?
-            _executeOutstandingLazySettlementsMock(user, marketIndex);
+            _executeOutstandingNextPriceSettlementsMock(user, marketIndex);
         } else {
-            _executeOutstandingLazySettlements(user, marketIndex);
+            _executeOutstandingNextPriceSettlements(user, marketIndex);
         }
 
         _;
     }
 
-    function refreshTokensPrice(uint32 marketIndex) external {
-        _refreshTokensPrice(marketIndex);
-    }
-
-    function feesMechanism(uint32 marketIndex, uint256 totalFees) external {
-        _feesMechanism(marketIndex, totalFees);
-    }
-
-    function yieldMechanism(uint32 marketIndex) external {
-        _yieldMechanism(marketIndex);
-    }
-
-    function minimum(uint256 liquidityOfPositionA, uint256 liquidityOfPositionB)
-        external
-        view
-        returns (uint256)
-    {
-        _minimum(liquidityOfPositionA, liquidityOfPositionB);
-    }
-
-    function calculateValueChangeForPriceMechanism(
-        uint32 marketIndex,
-        uint256 assetPriceGreater,
-        uint256 assetPriceLess,
-        uint256 baseValueExposure,
-        MarketSide winningSyntheticTokenType,
-        MarketSide losingSyntheticTokenType
-    ) external {
-        _calculateValueChangeForPriceMechanism(
-            marketIndex,
-            assetPriceGreater,
-            assetPriceLess,
-            baseValueExposure,
-            winningSyntheticTokenType,
-            losingSyntheticTokenType
-        );
+    function claimAndDistributeYield(uint32 marketIndex) external {
+        _claimAndDistributeYield(marketIndex);
     }
 
     function depositFunds(uint32 marketIndex, uint256 amount) external {
         _depositFunds(marketIndex, amount);
     }
 
-    function withdrawFunds(uint32 marketIndex, uint256 amount) external {
-        _withdrawFunds(marketIndex, amount, msg.sender);
+    function withdrawFunds(
+        uint32 marketIndex,
+        uint256 amountLong,
+        uint256 amountShort,
+        address user
+    ) external {
+        _withdrawFunds(marketIndex, amountLong, amountShort, msg.sender);
     }
 
-    function transferToYieldManager(uint32 marketIndex, uint256 amount)
+    function transferFundsToYieldManager(uint32 marketIndex, uint256 amount)
         external
     {
-        _transferToYieldManager(marketIndex, amount);
+        _transferFundsToYieldManager(marketIndex, amount);
     }
 
-    function transferFromYieldManager(uint32 marketIndex, uint256 amount)
-        external
-    {
-        _transferFromYieldManager(marketIndex, amount);
+    function adjustMarketBasedOnNewAssetPrice(
+        uint32 marketIndex,
+        int256 newAssetPrice
+    ) external returns (bool didUpdate) {
+        _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
     }
 
-    function priceChangeMechanism(uint32 marketIndex, uint256 newPrice)
-        external
-        returns (bool didUpdate)
-    {
-        _priceChangeMechanism(marketIndex, newPrice);
-    }
-
-    function _executeOutstandingLazySettlementsExposed(
+    function _executeOutstandingNextPriceSettlementsExposed(
         address user,
         uint32 marketIndex
     ) external {
-        _executeOutstandingLazySettlements(user, marketIndex);
+        _executeOutstandingNextPriceSettlements(user, marketIndex);
     }
 }

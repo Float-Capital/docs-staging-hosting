@@ -5,6 +5,7 @@ import {
   StakeWithdrawn,
   FloatMinted,
   MarketLaunchIncentiveParametersChanges,
+  MarketAddedToStaker,
 } from "../generated/Staker/Staker";
 import { erc20 } from "../generated/templates";
 import {
@@ -16,7 +17,10 @@ import {
   StakeState,
 } from "../generated/schema";
 import { log, DataSourceContext } from "@graphprotocol/graph-ts";
-import { saveEventToStateChange } from "./utils/txEventHelpers";
+import {
+  bigIntArrayToStringArray,
+  saveEventToStateChange,
+} from "./utils/txEventHelpers";
 import {
   getOrCreateUser,
   getOrCreateStakerState,
@@ -44,6 +48,21 @@ export function handleDeployV1(event: DeployV1): void {
   );
 }
 
+export function handleMarketAddedToStaker(event: MarketAddedToStaker): void {
+  let marketIndex = event.params.marketIndex;
+  let exitFeeBasisPoints = event.params.exitFeeBasisPoints;
+
+  saveEventToStateChange(
+    event,
+    "MarketAddedToStaker",
+    bigIntArrayToStringArray([marketIndex, exitFeeBasisPoints]),
+    ["marketIndex", "exitFeeBasisPoints"],
+    ["uint32", "uint256"],
+    [],
+    []
+  );
+}
+
 export function handleStateAdded(event: StateAdded): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
@@ -54,9 +73,6 @@ export function handleStateAdded(event: StateAdded): void {
   let stateIndex = event.params.stateIndex;
   let accumulativeLong = event.params.accumulativeLong;
   let accumulativeShort = event.params.accumulativeShort;
-  // don't necessarily need to emit this since we can get it from event.block
-  // TODO: remove the `timestamp` variable from the contracts
-  let timestampOfState = event.params.timestamp;
 
   let syntheticMarket = SyntheticMarket.load(marketIndexId);
   if (syntheticMarket == null) {
@@ -127,18 +143,11 @@ export function handleStateAdded(event: StateAdded): void {
     [
       marketIndexId,
       stateIndex.toString(),
-      timestamp.toString(),
       accumulativeLong.toString(),
       accumulativeShort.toString(),
     ],
-    [
-      "marketIndex",
-      "stateIndex",
-      "timestamp",
-      "accumulativeLong",
-      "accumulativeShort",
-    ],
-    ["uint32", "uint256", "uint256", "uint256", "uint256"],
+    ["marketIndex", "stateIndex", "accumulativeLong", "accumulativeShort"],
+    ["uint32", "uint256", "uint256", "uint256"],
     [],
     []
   );
@@ -344,14 +353,6 @@ export function handleFloatMinted(event: FloatMinted): void {
       [marketIndexId]
     );
   }
-  let syntheticLong = SyntheticToken.load(syntheticMarket.syntheticLong);
-  syntheticLong.floatMintedFromSpecificToken = syntheticLong.floatMintedFromSpecificToken.plus(
-    amountLong
-  );
-  let syntheticShort = SyntheticToken.load(syntheticMarket.syntheticShort);
-  syntheticShort.floatMintedFromSpecificToken = syntheticShort.floatMintedFromSpecificToken.plus(
-    amountShort
-  );
 
   let user = getOrCreateUser(userAddress, event);
   syntheticMarket.totalFloatMinted = syntheticMarket.totalFloatMinted.plus(
@@ -359,47 +360,50 @@ export function handleFloatMinted(event: FloatMinted): void {
   );
   user.totalMintedFloat = user.totalMintedFloat.plus(totalAmount);
 
-  // TODO - create a helper function the 'getOrCreate's the CurrentStake
-  let currentStakeLong = CurrentStake.load(
-    syntheticMarket.syntheticLong + "-" + userAddressString + "-currentStake"
-  );
-  let currentStakeShort = CurrentStake.load(
-    syntheticMarket.syntheticShort + "-" + userAddressString + "-currentStake"
-  );
-  if (currentStakeLong == null) {
-    currentStakeLong = new CurrentStake(
+  let changedStakesArray: Array<string> = [];
+  if (amountLong.gt(ZERO)) {
+    let syntheticLong = SyntheticToken.load(syntheticMarket.syntheticLong);
+    syntheticLong.floatMintedFromSpecificToken = syntheticLong.floatMintedFromSpecificToken.plus(
+      amountLong
+    );
+    // TODO - create a helper function the 'getOrCreate's the CurrentStake
+    let currentStakeLong = CurrentStake.load(
       syntheticMarket.syntheticLong + "-" + userAddressString + "-currentStake"
     );
-    currentStakeLong.user = user.id;
-    currentStakeLong.userAddress = user.address;
-    currentStakeLong.syntheticToken = syntheticLong.id;
-    currentStakeShort.syntheticMarket = syntheticMarket.id;
-    currentStakeLong.currentStake = "DOESN'T EXIST YET";
-
-    user.currentStakes = user.currentStakes.concat([currentStakeLong.id]);
+    if (currentStakeLong == null) {
+      log.critical("Current stake (long) is still null. ID {}", [
+        currentStakeLong.id,
+      ]);
+    }
+    currentStakeLong.lastMintState = state.id;
+    currentStakeLong.save();
+    syntheticLong.save();
+    changedStakesArray = changedStakesArray.concat([currentStakeLong.id]);
   }
-  if (currentStakeShort == null) {
-    currentStakeShort = new CurrentStake(
+
+  if (amountShort.gt(ZERO)) {
+    let syntheticShort = SyntheticToken.load(syntheticMarket.syntheticShort);
+    syntheticShort.floatMintedFromSpecificToken = syntheticShort.floatMintedFromSpecificToken.plus(
+      amountShort
+    );
+    let currentStakeShort = CurrentStake.load(
       syntheticMarket.syntheticShort + "-" + userAddressString + "-currentStake"
     );
-    currentStakeShort.user = user.id;
-    currentStakeShort.userAddress = user.address;
-    currentStakeShort.syntheticToken = syntheticShort.id;
-    currentStakeShort.syntheticMarket = syntheticMarket.id;
-    currentStakeShort.currentStake = "DOESN'T EXIST YET";
-
-    user.currentStakes = user.currentStakes.concat([currentStakeShort.id]);
+    if (currentStakeShort == null) {
+      log.critical("Current stake (short) is still null. ID {}", [
+        currentStakeShort.id,
+      ]);
+    }
+    currentStakeShort.lastMintState = state.id;
+    currentStakeShort.save();
+    syntheticShort.save();
+    changedStakesArray = changedStakesArray.concat([currentStakeShort.id]);
   }
-  currentStakeLong.lastMintState = state.id;
-  currentStakeShort.lastMintState = state.id;
 
   let globalState = GlobalState.load(GLOBAL_STATE_ID);
   globalState.totalFloatMinted = globalState.totalFloatMinted.plus(totalAmount);
 
-  syntheticLong.save();
   user.save();
-  currentStakeLong.save();
-  currentStakeShort.save();
   globalState.save();
 
   saveEventToStateChange(
@@ -415,6 +419,6 @@ export function handleFloatMinted(event: FloatMinted): void {
     ["user", "marketIndex", "amountLong", "amountShort", "lastMintIndex"],
     ["address", "uint32", "uint256", "uint256", "uint256"],
     [userAddress],
-    [currentStakeLong.id, currentStakeShort.id]
+    changedStakesArray
   );
 }

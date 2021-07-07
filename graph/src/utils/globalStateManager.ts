@@ -10,6 +10,8 @@ import {
   SyntheticMarket,
   CollateralToken,
   UserCollateralTokenBalance,
+  UnderlyingPrice,
+  LatestUnderlyingPrice,
 } from "../../generated/schema";
 import { BigInt, Bytes, log, ethereum, Address } from "@graphprotocol/graph-ts";
 import {
@@ -19,6 +21,8 @@ import {
   TEN_TO_THE_18,
   ZERO_ADDRESS,
   ZERO_ADDRESS_BYTES,
+  MARKET_SIDE_LONG,
+  MARKET_SIDE_SHORT,
 } from "../CONSTANTS";
 import { createNewTokenDataSource } from "./helperFunctions";
 
@@ -35,6 +39,20 @@ function createInitialTokenPrice(
   return initialTokenPrice as Price;
 }
 
+function createInitialUnderlyingPrice(
+  id: string,
+  marketId: string,
+  initialPrice: BigInt,
+  timestamp: BigInt
+): UnderlyingPrice {
+  let initialUnderlyingPrice = new UnderlyingPrice(id);
+  initialUnderlyingPrice.price = initialPrice;
+  initialUnderlyingPrice.market = marketId;
+  initialUnderlyingPrice.timeUpdated = timestamp;
+
+  return initialUnderlyingPrice as UnderlyingPrice;
+}
+
 class InitialState {
   systemState: SystemState;
   tokenPriceLong: Price;
@@ -46,6 +64,7 @@ export function createInitialSystemState(
   marketIndex: BigInt,
   latestStateChangeCounter: BigInt,
   event: ethereum.Event,
+  initialAssetPrice: BigInt,
   longTokenId: string,
   shortTokenId: string
 ): InitialState {
@@ -54,6 +73,8 @@ export function createInitialSystemState(
   let timestamp = event.block.timestamp;
   let initialLongPriceId = marketIndexId + "-long-" + timestamp.toString();
   let initialShortPriceId = marketIndexId + "-short-" + timestamp.toString();
+  let initialUnderlyingAssetPriceId =
+    marketIndexId + "-underlying-" + timestamp.toString();
 
   let initialLongTokenPrice = createInitialTokenPrice(
     initialLongPriceId,
@@ -65,24 +86,39 @@ export function createInitialSystemState(
     shortTokenId,
     timestamp
   );
+  let initialUnderlyingAssetPrice = createInitialUnderlyingPrice(
+    initialUnderlyingAssetPriceId,
+    marketIndexId,
+    initialAssetPrice,
+    timestamp
+  );
   let longCurrentTokenPrice = new LatestPrice(
     "latestPrice-" + marketIndexId + "-long"
   );
   let shortCurrentTokenPrice = new LatestPrice(
     "latestPrice-" + marketIndexId + "-short"
   );
+  let underlyingAssetPrice = new LatestUnderlyingPrice(
+    "latestPrice-" + marketIndexId + "-underlying"
+  );
   longCurrentTokenPrice.price = initialLongTokenPrice.id;
   shortCurrentTokenPrice.price = initialShortTokenPrice.id;
+  underlyingAssetPrice.price = initialUnderlyingAssetPrice.id;
+
   initialLongTokenPrice.save();
   initialShortTokenPrice.save();
+  initialUnderlyingAssetPrice.save();
+
   longCurrentTokenPrice.save();
   shortCurrentTokenPrice.save();
+  underlyingAssetPrice.save();
+
   let latestSystemState = new SystemState(marketIndexId + "-" + systemStateId);
   latestSystemState.timestamp = event.block.timestamp;
   latestSystemState.txHash = event.transaction.hash;
   latestSystemState.blockNumber = event.block.number;
   latestSystemState.marketIndex = marketIndex;
-  latestSystemState.syntheticPrice = ZERO;
+  latestSystemState.underlyingPrice = underlyingAssetPrice.id;
   latestSystemState.longTokenPrice = longCurrentTokenPrice.id;
   latestSystemState.shortTokenPrice = shortCurrentTokenPrice.id;
   latestSystemState.totalLockedLong = ZERO;
@@ -129,7 +165,7 @@ export function getOrCreateLatestSystemState(
     latestSystemState.txHash = event.transaction.hash;
     latestSystemState.blockNumber = event.block.number;
     latestSystemState.marketIndex = marketIndex;
-    latestSystemState.syntheticPrice = prevSystemState.syntheticPrice;
+    latestSystemState.underlyingPrice = prevSystemState.underlyingPrice;
     latestSystemState.longTokenPrice = prevSystemState.longTokenPrice;
     latestSystemState.shortTokenPrice = prevSystemState.shortTokenPrice;
     latestSystemState.totalLockedLong = prevSystemState.totalLockedLong;
@@ -216,6 +252,9 @@ export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
     user.collatoralBalances = [];
     user.tokenMints = [];
     user.stateChangesAffectingUser = [];
+    user.pendingNextPriceActions = [];
+    user.confirmedNextPriceActions = [];
+    user.settledNextPriceActions = [];
 
     let globalState = GlobalState.load(GLOBAL_STATE_ID);
     globalState.totalUsers = globalState.totalUsers.plus(ONE);
@@ -223,6 +262,55 @@ export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
   }
 
   return user as User;
+}
+export function getUser(address: Bytes): User {
+  let user = User.load(address.toHex());
+  if (user == null) {
+    log.critical(
+      "ERROR: user with address {} doesn't exist, rather use `getOrCreateUser` function",
+      [address.toHex()]
+    );
+  }
+
+  return user as User;
+}
+export function getSyntheticMarket(marketIndex: BigInt): SyntheticMarket {
+  let syntheticMarket = SyntheticMarket.load(marketIndex.toString());
+  if (syntheticMarket == null) {
+    log.critical(
+      "`getOrCreateLatestSystemState` called without SyntheticMarket with id #{} being created.",
+      [marketIndex.toString()]
+    );
+  }
+
+  return syntheticMarket as SyntheticMarket;
+}
+export function getSyntheticTokenById(
+  syntheticTokenId: string
+): SyntheticToken {
+  let syntheticTokenLong = SyntheticToken.load(syntheticTokenId);
+  if (syntheticTokenLong == null) {
+    log.critical("Synthetic Token with id {} is undefined.", []);
+  }
+
+  return syntheticTokenLong as SyntheticToken;
+}
+
+export function getSyntheticTokenByMarketIdAndTokenType(
+  marketIndex: BigInt,
+  isLong: bool
+): SyntheticToken {
+  let syntheticMarket = SyntheticMarket.load(marketIndex.toString());
+  if (syntheticMarket == null) {
+    log.critical("Synthetic market with id {} is undefined.", []);
+  }
+  if (isLong) {
+    return SyntheticToken.load(syntheticMarket.syntheticLong) as SyntheticToken;
+  } else {
+    return SyntheticToken.load(
+      syntheticMarket.syntheticShort
+    ) as SyntheticToken;
+  }
 }
 
 export function getOrCreateBalanceObject(
@@ -333,13 +421,13 @@ export function createSyntheticToken(tokenAddress: Bytes): SyntheticToken {
 
 export function createSyntheticTokenLong(tokenAddress: Bytes): SyntheticToken {
   let syntheticToken = createSyntheticToken(tokenAddress);
-  syntheticToken.tokenType = "Long";
+  syntheticToken.tokenType = MARKET_SIDE_LONG;
 
   return syntheticToken as SyntheticToken;
 }
 export function createSyntheticTokenShort(tokenAddress: Bytes): SyntheticToken {
   let syntheticToken = createSyntheticToken(tokenAddress);
-  syntheticToken.tokenType = "Short";
+  syntheticToken.tokenType = MARKET_SIDE_SHORT;
 
   return syntheticToken as SyntheticToken;
 }

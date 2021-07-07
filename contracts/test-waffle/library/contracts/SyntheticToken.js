@@ -9,8 +9,8 @@ function at(contractAddress) {
   return ContractHelpers.attachToContract(contractName, contractAddress);
 }
 
-function make(name, symbol, longShort, staker, marketIndex, syntheticTokenType) {
-  return ContractHelpers.deployContract6(contractName, name, symbol, longShort, staker, marketIndex, syntheticTokenType);
+function make(name, symbol, longShort, staker, marketIndex, isLong) {
+  return ContractHelpers.deployContract6(contractName, name, symbol, longShort, staker, marketIndex, isLong);
 }
 
 exports.contractName = contractName;

@@ -18,12 +18,12 @@ var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Float = require("rescript/lib/js/belt_Float.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
+var XAxis$Recharts = require("@float-capital/rescript-recharts/src/XAxis.js");
+var YAxis$Recharts = require("@float-capital/rescript-recharts/src/YAxis.js");
 var Format = require("date-fns/format").default;
-var BsRecharts__XAxis = require("@ahrefs/bs-recharts/src/BsRecharts__XAxis.js");
-var BsRecharts__YAxis = require("@ahrefs/bs-recharts/src/BsRecharts__YAxis.js");
-var BsRecharts__Tooltip = require("@ahrefs/bs-recharts/src/BsRecharts__Tooltip.js");
+var Tooltip$Recharts = require("@float-capital/rescript-recharts/src/Tooltip.js");
 var FromUnixTime = require("date-fns/fromUnixTime").default;
-var BsRecharts__ResponsiveContainer = require("@ahrefs/bs-recharts/src/BsRecharts__ResponsiveContainer.js");
+var ResponsiveContainer$Recharts = require("@float-capital/rescript-recharts/src/ResponsiveContainer.js");
 
 var ethAdrToLowerStr = Ethers.Utils.ethAdrToLowerStr;
 
@@ -38,7 +38,7 @@ function PriceGraph$LoadedGraph(Props) {
     maxYValue + totalRange * 0.05
   ];
   var isMobile = View.useIsTailwindMobile(undefined);
-  return React.createElement(Recharts.ResponsiveContainer, Curry._3(BsRecharts__ResponsiveContainer.makeProps(isMobile ? ({
+  return React.createElement(Recharts.ResponsiveContainer, Curry._3(ResponsiveContainer$Recharts.makeProps(isMobile ? ({
                             TAG: 0,
                             _0: 200,
                             [Symbol.for("name")]: "Px"
@@ -65,7 +65,7 @@ function PriceGraph$LoadedGraph(Props) {
                           dot: false,
                           stroke: "#0d4184",
                           strokeWidth: 2
-                        }), React.createElement(Recharts.Tooltip, Curry.app(BsRecharts__Tooltip.makeProps(undefined)(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined), [
+                        }), React.createElement(Recharts.Tooltip, Curry.app(Tooltip$Recharts.makeProps(undefined)(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined), [
                               undefined,
                               undefined,
                               undefined,
@@ -82,7 +82,7 @@ function PriceGraph$LoadedGraph(Props) {
                               undefined,
                               undefined,
                               undefined
-                            ])), React.createElement(Recharts.XAxis, Curry.app(BsRecharts__XAxis.makeProps(undefined)(undefined, undefined, undefined, undefined, undefined, undefined, "date", undefined, undefined, undefined), [
+                            ])), React.createElement(Recharts.XAxis, Curry.app(XAxis$Recharts.makeProps(undefined)(undefined, undefined, undefined, undefined, undefined, undefined, "date", undefined, undefined, undefined), [
                               undefined,
                               undefined,
                               undefined,
@@ -113,7 +113,7 @@ function PriceGraph$LoadedGraph(Props) {
                               undefined,
                               undefined,
                               undefined
-                            ])), React.createElement(Recharts.YAxis, Curry.app(BsRecharts__YAxis.makeProps(undefined)("number", undefined, undefined, undefined, false, undefined, undefined, yAxisRange, undefined, undefined), [
+                            ])), React.createElement(Recharts.YAxis, Curry.app(YAxis$Recharts.makeProps(undefined)("number", undefined, undefined, undefined, false, undefined, undefined, yAxisRange, undefined, undefined), [
                               undefined,
                               undefined,
                               undefined,

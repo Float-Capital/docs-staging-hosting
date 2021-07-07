@@ -59,7 +59,7 @@ contract("YieldManagerMock (interface)", (accounts) => {
 
     // Deposit them into the yield manager.
     // THIS TX REVERTS - not sure why yet.
-    await yieldManager.depositToken(oneHundred, {
+    await yieldManager.depositPaymentToken(oneHundred, {
       from: user,
     });
   });
@@ -83,7 +83,7 @@ contract("YieldManagerMock (interface)", (accounts) => {
   });
 
   it("withdrawing from yield manager sets correct holdings", async () => {
-    await yieldManager.withdrawToken(fifty, {
+    await yieldManager.withdrawPaymentToken(fifty, {
       from: user,
     });
 
@@ -105,7 +105,7 @@ contract("YieldManagerMock (interface)", (accounts) => {
   });
 
   it("settling with yield increases holdings", async () => {
-    await yieldManager.settleWithYield(oneTenth, {
+    await yieldManager.settleWithYieldPercent(oneTenth, {
       from: admin,
     });
 
@@ -115,25 +115,6 @@ contract("YieldManagerMock (interface)", (accounts) => {
       totalHeld.toString(),
       oneHundredTen.toString(),
       "Yield manager held wrong token value after settlement."
-    );
-  });
-
-  it("getTotalHeld should agree with actual holdings", async () => {
-    var getTotalHeld = await yieldManager.getTotalHeld.call();
-    var totalHeld = await yieldManager.totalHeld.call();
-    assert.equal(
-      getTotalHeld.toString(),
-      totalHeld.toString(),
-      "getTotalHeld doesn't agree with actual holdings"
-    );
-  });
-
-  it("getHeldToken should agree with actual underlying token", async () => {
-    var getHeldToken = await yieldManager.getHeldToken.call();
-    assert.equal(
-      getHeldToken,
-      token.address,
-      "getHeldToken doesn't return correct token address"
     );
   });
 });

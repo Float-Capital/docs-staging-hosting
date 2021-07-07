@@ -5,69 +5,50 @@ module LongShort = {
 
   let abi =
     [
-      "function mintLong(uint32 marketIndex,uint256 amount) @770000",
-      "function mintShort(uint32 marketIndex,uint256 amount) @770000",
-      "function redeemLong(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
-      "function redeemShort(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
-      "function mintLongAndStake(uint32 marketIndex, uint256 amount) @1000000",
-      "function mintShortAndStake(uint32 marketIndex, uint256 amount) @1000000",
-      "function _updateSystemState()",
-      "function longValue(uint32 marketIndex) public view returns (uint256)",
-      "function shortValue(uint32 marketIndex) public view returns (uint256)",
+      "function mintLongNextPrice(uint32 marketIndex,uint256 amount) @1970000",
+      "function mintShortNextPrice(uint32 marketIndex,uint256 amount) @1970000",
+      "function redeemLongNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
+      "function redeemShortNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
+      "function executeOutstandingNextPriceSettlementsUser(address user,uint32 marketIndex) @130000",
+      "function updateSystemState()",
     ]->Ethers.makeAbi
 
   let make = (~address, ~providerOrSigner): t =>
     Ethers.Contract.make(address, abi, providerOrSigner)
 
   @send
-  external mintLong: (
+  external mintLongNextPrice: (
     ~contract: t,
     ~marketIndex: Ethers.BigNumber.t,
     ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<Ethers.txSubmitted> = "mintLong"
+  ) => JsPromise.t<Ethers.txSubmitted> = "mintLongNextPrice"
   @send
-  external mintShort: (
+  external mintShortNextPrice: (
     ~contract: t,
     ~marketIndex: Ethers.BigNumber.t,
     ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<Ethers.txSubmitted> = "mintShort"
+  ) => JsPromise.t<Ethers.txSubmitted> = "mintShortNextPrice"
   @send
-  external redeemLong: (
+  external redeemLongNextPrice: (
     ~contract: t,
     ~marketIndex: Ethers.BigNumber.t,
     ~tokensToRedeem: Ethers.BigNumber.t,
-  ) => JsPromise.t<Ethers.txSubmitted> = "redeemLong"
+  ) => JsPromise.t<Ethers.txSubmitted> = "redeemLongNextPrice"
   @send
-  external redeemShort: (
+  external redeemShortNextPrice: (
     ~contract: t,
     ~marketIndex: Ethers.BigNumber.t,
     ~tokensToRedeem: Ethers.BigNumber.t,
-  ) => JsPromise.t<Ethers.txSubmitted> = "redeemShort"
+  ) => JsPromise.t<Ethers.txSubmitted> = "redeemShortNextPrice"
   @send
-  external mintShortAndStake: (
+  external executeOutstandingNextPriceSettlementsUser: (
     ~contract: t,
+    ~user: Ethers.ethAddress,
     ~marketIndex: Ethers.BigNumber.t,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<Ethers.txSubmitted> = "mintShortAndStake"
-  @send
-  external mintLongAndStake: (
-    ~contract: t,
-    ~marketIndex: Ethers.BigNumber.t,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<Ethers.txSubmitted> = "mintLongAndStake"
+  ) => JsPromise.t<Ethers.txSubmitted> = "executeOutstandingNextPriceSettlementsUser"
   @send
   external _updateSystemState: (~contract: t) => JsPromise.t<Ethers.txSubmitted> =
     "_updateSystemState"
-  @send
-  external longValue: (
-    ~contract: t,
-    ~marketIndex: Ethers.BigNumber.t,
-  ) => JsPromise.t<Ethers.BigNumber.t> = "longValue"
-  @send
-  external shortValue: (
-    ~contract: t,
-    ~marketIndex: Ethers.BigNumber.t,
-  ) => JsPromise.t<Ethers.BigNumber.t> = "shortValue"
 }
 
 module Staker = {

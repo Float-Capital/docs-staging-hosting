@@ -4,6 +4,8 @@
 var LetOps = require("./LetOps.js");
 var Staker = require("./contracts/Staker.js");
 var Globals = require("./Globals.js");
+var CONSTANTS = require("../CONSTANTS.js");
+var ContractHelpers = require("./ContractHelpers.js");
 
 function mintAndApprove(t, user, amount, spender) {
   return t.mint(user.address, amount).then(function (param) {
@@ -25,30 +27,46 @@ var DataFetchers = {
   marketIndexOfSynth: marketIndexOfSynth
 };
 
-function getFees(longShort, marketIndex, amount, valueInEntrySide, valueInOtherSide) {
-  return LetOps.AwaitThen.let_(longShort.baseEntryFee(marketIndex), (function (baseEntryFee) {
-                return LetOps.AwaitThen.let_(longShort.badLiquidityEntryFee(marketIndex), (function (badLiquidityEntryFee) {
-                              return LetOps.Await.let_(longShort.feeUnitsOfPrecision(), (function (feeUnitsOfPrecision) {
-                                            var baseFee = Globals.div(Globals.mul(amount, baseEntryFee), feeUnitsOfPrecision);
-                                            if (Globals.bnGte(valueInEntrySide, valueInOtherSide)) {
-                                              return Globals.add(baseFee, Globals.div(Globals.mul(amount, badLiquidityEntryFee), feeUnitsOfPrecision));
-                                            }
-                                            if (!Globals.bnGt(Globals.add(valueInEntrySide, amount), valueInOtherSide)) {
-                                              return baseFee;
-                                            }
-                                            var amountImbalancing = Globals.sub(amount, Globals.sub(valueInOtherSide, valueInEntrySide));
-                                            var penaltyFee = Globals.div(Globals.mul(amountImbalancing, badLiquidityEntryFee), feeUnitsOfPrecision);
-                                            return Globals.add(baseFee, penaltyFee);
+function getMarketBalance(longShort, marketIndex) {
+  return LetOps.AwaitThen.let_(longShort.syntheticTokenPoolValue(marketIndex, true), (function (longValue) {
+                return LetOps.Await.let_(longShort.syntheticTokenPoolValue(marketIndex, false), (function (shortValue) {
+                              return {
+                                      longValue: longValue,
+                                      shortValue: shortValue
+                                    };
+                            }));
+              }));
+}
+
+function getSyntheticTokenPrice(longShort, marketIndex, isLong) {
+  return LetOps.AwaitThen.let_(longShort.syntheticTokens(marketIndex, isLong), (function (syntheticTokenAddress) {
+                return LetOps.AwaitThen.let_(ContractHelpers.attachToContract("SyntheticToken", syntheticTokenAddress), (function (synthContract) {
+                              return LetOps.AwaitThen.let_(synthContract.totalSupply(), (function (totalSupply) {
+                                            return LetOps.Await.let_(longShort.syntheticTokenPoolValue(marketIndex, isLong), (function (syntheticTokenPoolValue) {
+                                                          return Globals.div(Globals.mul(syntheticTokenPoolValue, CONSTANTS.tenToThe18), totalSupply);
+                                                        }));
                                           }));
                             }));
               }));
 }
 
 var LongShortHelpers = {
-  getFees: getFees
+  getMarketBalance: getMarketBalance,
+  getSyntheticTokenPrice: getSyntheticTokenPrice
+};
+
+function getIsLong(synthToken) {
+  return LetOps.Await.let_(synthToken.isLong(), (function (isLong) {
+                return isLong === true;
+              }));
+}
+
+var SyntheticTokenHelpers = {
+  getIsLong: getIsLong
 };
 
 exports.PaymentTokenHelpers = PaymentTokenHelpers;
 exports.DataFetchers = DataFetchers;
 exports.LongShortHelpers = LongShortHelpers;
-/* No side effect */
+exports.SyntheticTokenHelpers = SyntheticTokenHelpers;
+/* Globals Not a pure module */

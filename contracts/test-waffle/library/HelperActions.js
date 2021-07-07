@@ -2,29 +2,37 @@
 'use strict';
 
 var LetOps = require("./LetOps.js");
+var Globals = require("./Globals.js");
 var Helpers = require("./Helpers.js");
 var Contract = require("./Contract.js");
-var CONSTANTS = require("../CONSTANTS.js");
-var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
+var Belt_Array = require("rescript/lib/js/belt_Array.js");
 
-function mintAndStake(marketIndex, amount, token, user, longShort, isLong) {
-  return LetOps.Await.let_(Contract.PaymentTokenHelpers.mintAndApprove(token, user, amount, longShort.address), (function (param) {
+function mintDirect(marketIndex, amount, token, user, longShort, oracleManagerMock, isLong) {
+  return LetOps.AwaitThen.let_(Contract.PaymentTokenHelpers.mintAndApprove(token, user, amount, longShort.address), (function (param) {
                 var contract = longShort.connect(user);
-                if (isLong) {
-                  return contract.mintLongAndStake(marketIndex, amount);
-                } else {
-                  return contract.mintShortAndStake(marketIndex, amount);
-                }
+                return LetOps.AwaitThen.let_(oracleManagerMock.getLatestPrice(), (function (currentOraclePrice) {
+                              var tempOraclePrice = Globals.add(currentOraclePrice, Globals.bnFromInt(1));
+                              oracleManagerMock.setPrice(tempOraclePrice);
+                              return LetOps.AwaitThen.let_(contract.updateSystemState(marketIndex), (function (param) {
+                                            return LetOps.AwaitThen.let_(isLong ? contract.mintLongNextPrice(marketIndex, amount) : contract.mintShortNextPrice(marketIndex, amount), (function (_mintNextPrice) {
+                                                          oracleManagerMock.setPrice(currentOraclePrice);
+                                                          return contract.updateSystemState(marketIndex);
+                                                        }));
+                                          }));
+                            }));
               }));
 }
 
-function getMarketBalance(longShort, marketIndex) {
-  return LetOps.AwaitThen.let_(longShort.syntheticTokenBackedValue(CONSTANTS.longTokenType, marketIndex), (function (longValue) {
-                return LetOps.Await.let_(longShort.syntheticTokenBackedValue(CONSTANTS.shortTokenType, marketIndex), (function (shortValue) {
-                              return {
-                                      longValue: longValue,
-                                      shortValue: shortValue
-                                    };
+function mintAndStakeDirect(marketIndex, amount, token, user, longShort, oracleManagerMock, synthToken) {
+  return LetOps.AwaitThen.let_(Contract.SyntheticTokenHelpers.getIsLong(synthToken), (function (isLong) {
+                return LetOps.AwaitThen.let_(synthToken.balanceOf(user.address), (function (balanceBeforeMinting) {
+                              return LetOps.AwaitThen.let_(mintDirect(marketIndex, amount, token, user, longShort, oracleManagerMock, isLong), (function (_mintDirect) {
+                                            return LetOps.AwaitThen.let_(synthToken.balanceOf(user.address), (function (availableToStakeAfter) {
+                                                          var amountToStake = Globals.sub(availableToStakeAfter, balanceBeforeMinting);
+                                                          var synthTokenConnected = synthToken.connect(user);
+                                                          return synthTokenConnected.stake(amountToStake);
+                                                        }));
+                                          }));
                             }));
               }));
 }
@@ -37,16 +45,17 @@ function stakeRandomlyInMarkets(marketsToStakeIn, userToStakeWith, longShort) {
                 var marketIndex = param.marketIndex;
                 var shortSynth = param.shortSynth;
                 var longSynth = param.longSynth;
+                var oracleManager = param.oracleManager;
                 var paymentToken = param.paymentToken;
                 return LetOps.AwaitThen.let_(currentValues, (function (param) {
                               var marketsUserHasStakedIn = param[1];
                               var synthsUserHasStakedIn = param[0];
                               var mintStake = function (param) {
                                 return function (param$1) {
-                                  return mintAndStake(marketIndex, param, paymentToken, userToStakeWith, longShort, param$1);
+                                  return mintAndStakeDirect(marketIndex, param, paymentToken, userToStakeWith, longShort, oracleManager, param$1);
                                 };
                               };
-                              return LetOps.AwaitThen.let_(getMarketBalance(longShort, marketIndex), (function (param) {
+                              return LetOps.AwaitThen.let_(Contract.LongShortHelpers.getMarketBalance(longShort, marketIndex), (function (param) {
                                             var valueShortBefore = param.shortValue;
                                             var valueLongBefore = param.longValue;
                                             var amount = Helpers.randomMintLongShort(undefined);
@@ -54,8 +63,8 @@ function stakeRandomlyInMarkets(marketsToStakeIn, userToStakeWith, longShort) {
                                             switch (amount.TAG | 0) {
                                               case /* Long */0 :
                                                   var amount$1 = amount._0;
-                                                  tmp = LetOps.AwaitThen.let_(mintStake(amount$1)(true), (function (param) {
-                                                          return LetOps.Await.let_(longShort.syntheticTokenPrice(CONSTANTS.longTokenType, marketIndex), (function (longTokenPrice) {
+                                                  tmp = LetOps.AwaitThen.let_(mintStake(amount$1)(longSynth), (function (param) {
+                                                          return LetOps.Await.let_(Contract.LongShortHelpers.getSyntheticTokenPrice(longShort, marketIndex, true), (function (longTokenPrice) {
                                                                         return Belt_Array.concat(synthsUserHasStakedIn, [{
                                                                                       marketIndex: marketIndex,
                                                                                       synth: longSynth,
@@ -69,8 +78,8 @@ function stakeRandomlyInMarkets(marketsToStakeIn, userToStakeWith, longShort) {
                                                   break;
                                               case /* Short */1 :
                                                   var amount$2 = amount._0;
-                                                  tmp = LetOps.AwaitThen.let_(mintStake(amount$2)(false), (function (param) {
-                                                          return LetOps.Await.let_(longShort.syntheticTokenPrice(CONSTANTS.shortTokenType, marketIndex), (function (shortTokenPrice) {
+                                                  tmp = LetOps.AwaitThen.let_(mintStake(amount$2)(shortSynth), (function (param) {
+                                                          return LetOps.Await.let_(Contract.LongShortHelpers.getSyntheticTokenPrice(longShort, marketIndex, false), (function (shortTokenPrice) {
                                                                         return Belt_Array.concat(synthsUserHasStakedIn, [{
                                                                                       marketIndex: marketIndex,
                                                                                       synth: shortSynth,
@@ -85,8 +94,8 @@ function stakeRandomlyInMarkets(marketsToStakeIn, userToStakeWith, longShort) {
                                               case /* Both */2 :
                                                   var shortAmount = amount._1;
                                                   var longAmount = amount._0;
-                                                  tmp = LetOps.AwaitThen.let_(mintStake(longAmount)(true), (function (param) {
-                                                          return LetOps.AwaitThen.let_(longShort.syntheticTokenPrice(CONSTANTS.longTokenType, marketIndex), (function (longTokenPrice) {
+                                                  tmp = LetOps.AwaitThen.let_(mintStake(longAmount)(longSynth), (function (param) {
+                                                          return LetOps.AwaitThen.let_(Contract.LongShortHelpers.getSyntheticTokenPrice(longShort, marketIndex, true), (function (longTokenPrice) {
                                                                         var newSynthsUserHasStakedIn = Belt_Array.concat(synthsUserHasStakedIn, [{
                                                                                 marketIndex: marketIndex,
                                                                                 synth: longSynth,
@@ -95,11 +104,11 @@ function stakeRandomlyInMarkets(marketsToStakeIn, userToStakeWith, longShort) {
                                                                                 valueInEntrySide: valueLongBefore,
                                                                                 valueInOtherSide: valueShortBefore
                                                                               }]);
-                                                                        return LetOps.AwaitThen.let_(getMarketBalance(longShort, marketIndex), (function (param) {
+                                                                        return LetOps.AwaitThen.let_(Contract.LongShortHelpers.getMarketBalance(longShort, marketIndex), (function (param) {
                                                                                       var valueShortBefore = param.shortValue;
                                                                                       var valueLongBefore = param.longValue;
-                                                                                      return LetOps.AwaitThen.let_(mintStake(shortAmount)(false), (function (param) {
-                                                                                                    return LetOps.Await.let_(longShort.syntheticTokenPrice(CONSTANTS.shortTokenType, marketIndex), (function (shortTokenPrice) {
+                                                                                      return LetOps.AwaitThen.let_(mintStake(shortAmount)(shortSynth), (function (param) {
+                                                                                                    return LetOps.Await.let_(Contract.LongShortHelpers.getSyntheticTokenPrice(longShort, marketIndex, false), (function (shortTokenPrice) {
                                                                                                                   return Belt_Array.concat(newSynthsUserHasStakedIn, [{
                                                                                                                                 marketIndex: marketIndex,
                                                                                                                                 synth: shortSynth,
@@ -130,15 +139,18 @@ function stakeRandomlyInMarkets(marketsToStakeIn, userToStakeWith, longShort) {
 function stakeRandomlyInBothSidesOfMarket(marketsToStakeIn, userToStakeWith, longShort) {
   return Belt_Array.reduce(marketsToStakeIn, Promise.resolve(undefined), (function (prevPromise, param) {
                 var marketIndex = param.marketIndex;
+                var shortSynth = param.shortSynth;
+                var longSynth = param.longSynth;
+                var oracleManager = param.oracleManager;
                 var paymentToken = param.paymentToken;
                 return LetOps.AwaitThen.let_(prevPromise, (function (param) {
                               var mintStake = function (param) {
                                 return function (param$1) {
-                                  return mintAndStake(marketIndex, param, paymentToken, userToStakeWith, longShort, param$1);
+                                  return mintAndStakeDirect(marketIndex, param, paymentToken, userToStakeWith, longShort, oracleManager, param$1);
                                 };
                               };
-                              return LetOps.AwaitThen.let_(mintStake(Helpers.randomTokenAmount(undefined))(true), (function (param) {
-                                            return LetOps.Await.let_(mintStake(Helpers.randomTokenAmount(undefined))(false), (function (param) {
+                              return LetOps.AwaitThen.let_(mintStake(Helpers.randomTokenAmount(undefined))(longSynth), (function (param) {
+                                            return LetOps.Await.let_(mintStake(Helpers.randomTokenAmount(undefined))(shortSynth), (function (param) {
                                                           
                                                         }));
                                           }));
@@ -146,8 +158,8 @@ function stakeRandomlyInBothSidesOfMarket(marketsToStakeIn, userToStakeWith, lon
               }));
 }
 
-exports.mintAndStake = mintAndStake;
-exports.getMarketBalance = getMarketBalance;
+exports.mintDirect = mintDirect;
+exports.mintAndStakeDirect = mintAndStakeDirect;
 exports.stakeRandomlyInMarkets = stakeRandomlyInMarkets;
 exports.stakeRandomlyInBothSidesOfMarket = stakeRandomlyInBothSidesOfMarket;
-/* Helpers Not a pure module */
+/* Globals Not a pure module */

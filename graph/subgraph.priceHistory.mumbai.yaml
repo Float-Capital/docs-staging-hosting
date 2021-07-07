@@ -6,9 +6,9 @@ dataSources:
     name: LongShort
     network: mumbai
     source:
-      address: "0x5bCa9c0823e7F5fBDB856Ae6a410ACaf2ff81B8D"
+      address: "0x2Ad2f96bc061Fbb9A8BDbA6cc50Ef2386F316E87"
       abi: LongShort
-      startBlock: 14217187
+      startBlock: 15798654
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -20,7 +20,7 @@ dataSources:
         - name: LongShort
           file: ./abis/LongShort.json
         - name: OracleManager
-          file: ./abis/OracleManager.json
+          file: ./abis/OracleManagerChainlink.json
       eventHandlers:
         - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
           handler: handleSyntheticTokenCreated
@@ -41,7 +41,7 @@ templates:
       apiVersion: 0.0.4
       abis:
         - name: OracleManager
-          file: ./abis/OracleManager.json
+          file: ./abis/OracleManagerChainlink.json
       language: wasm/assemblyscript
       entities: []
       eventHandlers: []

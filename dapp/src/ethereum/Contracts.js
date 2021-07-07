@@ -4,15 +4,12 @@
 var Ethers = require("./Ethers.js");
 
 var abi = Ethers.makeAbi([
-      "function mintLong(uint32 marketIndex,uint256 amount) @770000",
-      "function mintShort(uint32 marketIndex,uint256 amount) @770000",
-      "function redeemLong(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
-      "function redeemShort(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
-      "function mintLongAndStake(uint32 marketIndex, uint256 amount) @1000000",
-      "function mintShortAndStake(uint32 marketIndex, uint256 amount) @1000000",
-      "function _updateSystemState()",
-      "function longValue(uint32 marketIndex) public view returns (uint256)",
-      "function shortValue(uint32 marketIndex) public view returns (uint256)"
+      "function mintLongNextPrice(uint32 marketIndex,uint256 amount) @1970000",
+      "function mintShortNextPrice(uint32 marketIndex,uint256 amount) @1970000",
+      "function redeemLongNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
+      "function redeemShortNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
+      "function executeOutstandingNextPriceSettlementsUser(address user,uint32 marketIndex) @130000",
+      "function updateSystemState()"
     ]);
 
 function make(address, providerOrSigner) {

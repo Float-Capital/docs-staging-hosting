@@ -11,9 +11,8 @@ import "./interfaces/ISyntheticToken.sol";
 contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
     ILongShort public longShort;
     IStaker public staker;
-    // TODO: these values aren't set by the contructor/initializer
     uint32 public marketIndex;
-    ILongShort.MarketSide public syntheticTokenType;
+    bool public isLong;
 
     constructor(
         string memory name,
@@ -21,12 +20,12 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         ILongShort _longShort,
         IStaker _staker,
         uint32 _marketIndex,
-        ILongShort.MarketSide _syntheticTokenType
+        bool _isLong
     ) ERC20PresetMinterPauser(name, symbol) {
         longShort = _longShort;
         staker = _staker;
         marketIndex = _marketIndex;
-        syntheticTokenType = _syntheticTokenType;
+        isLong = _isLong;
     }
 
     function synthRedeemBurn(address account, uint256 amount)
@@ -59,38 +58,31 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         address sender,
         address recipient,
         uint256 amount
-    ) public virtual override(ERC20, IERC20) returns (bool) {
+    ) public override(ERC20, IERC20) returns (bool) {
         if (
             recipient == address(longShort) && msg.sender == address(longShort)
         ) {
+            // TODO STENT so this means that the longShort contract is sending to itself? There is no function call like this in the LongShort contract
             _transfer(sender, recipient, amount);
             return true;
         } else {
-            super.transferFrom(sender, recipient, amount);
+            return super.transferFrom(sender, recipient, amount);
         }
     }
 
-    // NOTE: we could use `_beforeTokenTransfer` here rather
-    function _transfer(
+    function _beforeTokenTransfer(
         address sender,
         address recipient,
         uint256 amount
     ) internal override {
-        uint256 sendersCurrentBalance = balanceOf(sender);
-        // TODO: this code is not in its final state. It should allow users to spend tokens before the lazy settlement (implementation belongs in longshort not here)
-        //       Case where next price update hasn't occurred
-        //            -- subcase 1: it is BELOW the safety threshold - keep exectution lazy and give the user the number of tokens they desire
-        //            -- subcase 2: it is ABOVE the safety threshold - do a full 'immediate' execution.
-        if (
-            msg.sender != address(longShort) && amount > sendersCurrentBalance
-        ) {
-            longShort.executeOutstandingLazySettlementsSynth(
+        if (sender != address(longShort)) {
+            longShort.executeOutstandingNextPriceSettlementsUser(
                 sender,
-                marketIndex,
-                syntheticTokenType
+                marketIndex
             );
         }
-        ERC20._transfer(sender, recipient, amount);
+        uint256 balance = ERC20.balanceOf(sender);
+        uint256 balanceAll = balanceOf(sender);
     }
 
     /**
@@ -104,10 +96,10 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
         returns (uint256)
     {
         return
-            longShort.getUsersPendingBalance(
+            longShort.getUsersConfirmedButNotSettledBalance(
                 account,
                 marketIndex,
-                syntheticTokenType
+                isLong
             ) + ERC20.balanceOf(account);
     }
 }

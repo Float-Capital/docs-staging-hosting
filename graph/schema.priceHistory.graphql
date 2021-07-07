@@ -26,6 +26,7 @@ type Oracle @entity {
   marketName: String!
   marketSymbol: String!
   latestPrice: BigInt!
+  lastUpdatedTimestamp: BigInt!
   active: Boolean!
   priceIntervals: [PriceIntervalManager!]!
 }

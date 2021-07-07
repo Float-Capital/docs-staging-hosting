@@ -14,46 +14,37 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - V1
-        - FeesLevied
-        - SyntheticTokenCreated
-        - LongMinted
-        - LongRedeem
-        - PriceUpdate
-        - ShortMinted
-        - ShortRedeem
-        - TokenPriceRefreshed
-        - FeesChanges
-        - ValueLockedInSystem
+        - ExecuteNextPriceSettlementsUser
+        - NewMarketLaunchedAndSeeded
+        - NextPriceDeposit
+        - NextPriceRedeem
         - OracleUpdated
+        - PriceUpdate
+        - SyntheticTokenCreated
+        - SystemStateUpdated
+        - V1
       abis:
         - name: LongShort
           file: ./abis/LongShort.json
       eventHandlers:
-        - event: V1(address,address,address,address)
-          handler: handleV1
-        - event: FeesLevied(uint32,uint256)
-          handler: handleFeesLevied
-        - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
-          handler: handleSyntheticTokenCreated
-        - event: LongMinted(uint32,uint256,uint256,uint256,address)
-          handler: handleLongMinted
-        - event: LongRedeem(uint32,uint256,uint256,uint256,address)
-          handler: handleLongRedeem
+        - event: ExecuteNextPriceSettlementsUser(address,uint32)
+          handler: handleExecuteNextPriceSettlementsUser
+        - event: NewMarketLaunchedAndSeeded(uint32,uint256)
+          handler: handleNewMarketLaunchedAndSeeded
+        - event: NextPriceDeposit(uint32,bool,uint256,address,uint256)
+          handler: handleNextPriceDeposit
+        - event: NextPriceRedeem(uint32,bool,uint256,address,uint256)
+          handler: handleNextPriceRedeem
+        - event: OracleUpdated(uint32,address,address)
+          handler: handleOracleUpdated
         - event: PriceUpdate(uint32,uint256,uint256,address)
           handler: handlePriceUpdate
-        - event: ShortMinted(uint32,uint256,uint256,uint256,address)
-          handler: handleShortMinted
-        - event: ShortRedeem(uint32,uint256,uint256,uint256,address)
-          handler: handleShortRedeem
-        - event: TokenPriceRefreshed(uint32,uint256,uint256)
-          handler: handleTokenPriceRefreshed
-        - event: ValueLockedInSystem(uint32,uint256,uint256,uint256)
-          handler: handleValueLockedInSystem
-        - event: FeesChanges(uint32,uint256,uint256,uint256,uint256)
-          handler: handleFeesChanges
-        - event: OracleUpdated(uint32,address,address)
-          handler: handleMarketOracleUpdated
+        - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
+          handler: handleSyntheticTokenCreated
+        - event: SystemStateUpdated(uint32,uint256,int256,uint256,uint256,uint256,uint256)
+          handler: handleSystemStateUpdated
+        - event: V1(address,address,address,address)
+          handler: handleV1
       file: ./src/float.ts
 
   - kind: ethereum/contract
@@ -68,27 +59,31 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - DeployV0
-        - StateAdded
-        - StakeWithdrawn
+        - DeployV1
         - FloatMinted
-        - FloatAccumulated
+        - MarketAddedToStaker
+        - MarketLaunchIncentiveParametersChanges
+        - StakeAdded
+        - StakeWithdrawn
+        - StateAdded
       abis:
         - name: Staker
           file: ./abis/Staker.json
       eventHandlers:
         - event: DeployV1(address)
           handler: handleDeployV1
-        - event: StateAdded(uint32,uint256,uint256,uint256,uint256)
-          handler: handleStateAdded
+        - event: FloatMinted(address,uint32,uint256,uint256,uint256)
+          handler: handleFloatMinted
+        - event: MarketAddedToStaker(uint32,uint256)
+          handler: handleMarketAddedToStaker
+        - event: MarketLaunchIncentiveParametersChanges(uint32,uint256,uint256)
+          handler: handleMarketLaunchIncentiveParametersChanges
         - event: StakeAdded(address,address,uint256,uint256)
           handler: handleStakeAdded
         - event: StakeWithdrawn(address,address,uint256)
           handler: handleStakeWithdrawn
-        - event: FloatMinted(address,uint32,uint256,uint256,uint256)
-          handler: handleFloatMinted
-        - event: MarketLaunchIncentiveParametersChanges(uint32,uint256,uint256)
-          handler: handleMarketLaunchIncentiveParametersChanges
+        - event: StateAdded(uint32,uint256,uint256,uint256)
+          handler: handleStateAdded
       file: ./src/staker.ts
 
 templates:

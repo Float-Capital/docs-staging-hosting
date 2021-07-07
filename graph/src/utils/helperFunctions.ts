@@ -15,6 +15,7 @@ import {
 } from "./globalStateManager";
 import {
   SyntheticToken,
+  User,
   UserSyntheticTokenMinted,
 } from "../../generated/schema";
 
@@ -23,6 +24,37 @@ export function createNewTokenDataSource(address: Address): void {
   context.setString("contractAddress", address.toHex());
   context.setBoolean("isFloatToken", false);
   erc20.createWithContext(address, context);
+}
+
+export function updateUserBalance(
+  tokenAddressString: string,
+  user: User,
+  amount: BigInt,
+  add: boolean,
+  timestamp: BigInt
+): void {
+  let balanceFromObject = getOrCreateBalanceObject(tokenAddressString, user.id);
+
+  balanceFromObject.timeLastUpdated = timestamp;
+
+  if (add) {
+    balanceFromObject.tokenBalance = balanceFromObject.tokenBalance.plus(
+      amount
+    );
+  } else {
+    balanceFromObject.tokenBalance = balanceFromObject.tokenBalance.minus(
+      amount
+    );
+  }
+
+  // Add to previouslyOwnedTokens if not already there
+  user.tokenBalances =
+    user.tokenBalances.indexOf(balanceFromObject.id) === -1
+      ? user.tokenBalances.concat([balanceFromObject.id])
+      : user.tokenBalances;
+
+  balanceFromObject.save();
+  user.save();
 }
 
 export function updateBalanceTransfer(
@@ -42,6 +74,7 @@ export function updateBalanceTransfer(
       tokenAddressString,
       userAddressString
     );
+
     balanceFromObject.timeLastUpdated = event.block.timestamp;
 
     if (send) {
@@ -131,19 +164,18 @@ export function updateBalanceFloatTransfer(
 }
 
 export function increaseUserMints(
-  userAddress: Address,
-  syntheticToken: SyntheticToken | null,
-  tokensMinted: BigInt, // user sending or receiving
-  event: ethereum.Event
+  user: User,
+  syntheticToken: SyntheticToken,
+  tokensMinted: BigInt // user sending or receiving
 ): void {
   //load user
-  let user = getOrCreateUser(userAddress, event);
   let userAddressString = user.address.toHex();
   let tokenAddressString = syntheticToken.tokenAddress.toHex();
 
   let minted = UserSyntheticTokenMinted.load(
     tokenAddressString + "-" + userAddressString + "-minted"
   );
+
   if (minted == null) {
     minted = new UserSyntheticTokenMinted(
       tokenAddressString + "-" + userAddressString + "-minted"

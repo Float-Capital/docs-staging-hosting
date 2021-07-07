@@ -28,32 +28,47 @@ module DataFetchers = {
 };
 
 module LongShortHelpers = {
-  let getFees =
-      (longShort, ~marketIndex, ~amount, ~valueInEntrySide, ~valueInOtherSide) => {
-    let%AwaitThen baseEntryFee =
-      longShort->LongShort.baseEntryFee(marketIndex);
-    let%AwaitThen badLiquidityEntryFee =
-      longShort->LongShort.badLiquidityEntryFee(marketIndex);
-
-    let%Await feeUnitsOfPrecision = longShort->LongShort.feeUnitsOfPrecision;
-
-    let baseFee = amount->mul(baseEntryFee)->div(feeUnitsOfPrecision);
-    if (valueInEntrySide->bnGte(valueInOtherSide)) {
-      // All funds are causing imbalance
-      baseFee->add(
-        amount->mul(badLiquidityEntryFee)->div(feeUnitsOfPrecision),
+  type marketBalance = {
+    longValue: Ethers.BigNumber.t,
+    shortValue: Ethers.BigNumber.t,
+  };
+  let getMarketBalance = (longShort, ~marketIndex) => {
+    let%AwaitThen longValue =
+      longShort->LongShort.syntheticTokenPoolValue(
+        marketIndex,
+        true /*long*/,
       );
-    } else if (valueInEntrySide->add(amount)->bnGt(valueInOtherSide)) {
-      let amountImbalancing =
-        amount->sub(valueInOtherSide->sub(valueInEntrySide));
-      let penaltyFee =
-        amountImbalancing
-        ->mul(badLiquidityEntryFee)
-        ->div(feeUnitsOfPrecision);
+    let%Await shortValue =
+      longShort->LongShort.syntheticTokenPoolValue(
+        marketIndex,
+        false /*short*/,
+      );
+    {longValue, shortValue};
+  };
+  let getSyntheticTokenPrice = (longShort, ~marketIndex, ~isLong) => {
+    let%AwaitThen syntheticTokenAddress =
+      longShort->LongShort.syntheticTokens(marketIndex, isLong);
+    let%AwaitThen synthContract =
+      ContractHelpers.attachToContract(
+        "SyntheticToken",
+        ~contractAddress=syntheticTokenAddress,
+      );
+    let%AwaitThen totalSupply =
+      synthContract->Obj.magic->SyntheticToken.totalSupply;
 
-      baseFee->add(penaltyFee);
-    } else {
-      baseFee;
-    };
+    let%Await syntheticTokenPoolValue =
+      longShort->LongShort.syntheticTokenPoolValue(marketIndex, isLong);
+
+    let syntheticTokenPrice =
+      syntheticTokenPoolValue->mul(CONSTANTS.tenToThe18)->div(totalSupply);
+
+    syntheticTokenPrice;
+  };
+};
+
+module SyntheticTokenHelpers = {
+  let getIsLong = synthToken => {
+    let%Await isLong = synthToken->SyntheticToken.isLong;
+    isLong == true /*long*/;
   };
 };

@@ -10,7 +10,7 @@ let make: (
   ~admin: Ethers.ethAddress,
   ~longShort: Ethers.ethAddress,
   ~treasury: Ethers.ethAddress,
-  ~token: Ethers.ethAddress,
+  ~paymentToken: Ethers.ethAddress,
   ~aToken: Ethers.ethAddress,
   ~lendingPool: Ethers.ethAddress,
   ~aaveReferalCode: int,
@@ -18,7 +18,7 @@ let make: (
   ~admin,
   ~longShort,
   ~treasury,
-  ~token,
+  ~paymentToken,
   ~aToken,
   ~lendingPool,
   ~aaveReferalCode,
@@ -28,11 +28,15 @@ let make: (
     admin,
     longShort,
     treasury,
-    token,
+    paymentToken,
     aToken,
     lendingPool,
     aaveReferalCode,
   )->Obj.magic
+
+type tEN_TO_THE_5Return = Ethers.BigNumber.t
+@send
+external tEN_TO_THE_5: t => JsPromise.t<tEN_TO_THE_5Return> = "TEN_TO_THE_5"
 
 type aTokenReturn = Ethers.ethAddress
 @send
@@ -46,15 +50,23 @@ external admin: t => JsPromise.t<adminReturn> = "admin"
 external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
 
 @send
-external depositToken: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> = "depositToken"
+external claimYieldAndGetMarketAmount: (
+  t,
+  ~totalValueRealizedForMarket: Ethers.BigNumber.t,
+  ~marketPercentE5: Ethers.BigNumber.t,
+) => JsPromise.t<transaction> = "claimYieldAndGetMarketAmount"
 
-type getHeldTokenReturn = Ethers.ethAddress
-@send
-external getHeldToken: t => JsPromise.t<getHeldTokenReturn> = "getHeldToken"
+type claimYieldAndGetMarketAmountReturn = Ethers.BigNumber.t
+@send @scope("callStatic")
+external claimYieldAndGetMarketAmountCall: (
+  t,
+  ~totalValueRealizedForMarket: Ethers.BigNumber.t,
+  ~marketPercentE5: Ethers.BigNumber.t,
+) => JsPromise.t<claimYieldAndGetMarketAmountReturn> = "claimYieldAndGetMarketAmount"
 
-type getTotalHeldReturn = Ethers.BigNumber.t
 @send
-external getTotalHeld: t => JsPromise.t<getTotalHeldReturn> = "getTotalHeld"
+external depositPaymentToken: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> =
+  "depositPaymentToken"
 
 type lendingPoolReturn = Ethers.ethAddress
 @send
@@ -64,9 +76,14 @@ type longShortReturn = Ethers.ethAddress
 @send
 external longShort: t => JsPromise.t<longShortReturn> = "longShort"
 
-type tokenReturn = Ethers.ethAddress
+type paymentTokenReturn = Ethers.ethAddress
 @send
-external token: t => JsPromise.t<tokenReturn> = "token"
+external paymentToken: t => JsPromise.t<paymentTokenReturn> = "paymentToken"
+
+type totalReservedForTreasuryReturn = Ethers.BigNumber.t
+@send
+external totalReservedForTreasury: t => JsPromise.t<totalReservedForTreasuryReturn> =
+  "totalReservedForTreasury"
 
 type treasuryReturn = Ethers.ethAddress
 @send
@@ -79,5 +96,8 @@ external withdrawErc20TokenToTreasury: (
 ) => JsPromise.t<transaction> = "withdrawErc20TokenToTreasury"
 
 @send
-external withdrawToken: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> =
-  "withdrawToken"
+external withdrawPaymentToken: (t, ~amount: Ethers.BigNumber.t) => JsPromise.t<transaction> =
+  "withdrawPaymentToken"
+
+@send
+external withdrawTreasuryFunds: t => JsPromise.t<transaction> = "withdrawTreasuryFunds"
