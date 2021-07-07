@@ -151,7 +151,8 @@ let testIntegration =
               ~marketIndex=nonExistantMarket,
               ~kInitialMultiplier=CONSTANTS.oneBn,
               ~kPeriod=CONSTANTS.oneBn,
-              ~unstakeFeeBasisPoints=Ethers.BigNumber.fromInt(50),
+              ~unstakeFeeBasisPoints=
+                Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
               ~initialMarketSeed=CONSTANTS.oneBn,
             ),
         ~reason="index too high",

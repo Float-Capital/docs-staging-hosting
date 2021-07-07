@@ -17,6 +17,19 @@ let fLOAT_ISSUANCE_FIXED_DECIMALCalls: t => array<fLOAT_ISSUANCE_FIXED_DECIMALCa
   })
 }
 
+let mockTEN_TO_THE_18ToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.TEN_TO_THE_18.will.return.with([_param0])")
+}
+
+type tEN_TO_THE_18Call
+
+let tEN_TO_THE_18Calls: t => array<tEN_TO_THE_18Call> = _r => {
+  let array = %raw("_r.smocked.TEN_TO_THE_18.calls")
+  array->Array.map(() => {
+    ()->Obj.magic
+  })
+}
+
 let mockAdminToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.admin.will.return.with([_param0])")
 }
@@ -43,7 +56,7 @@ let floatCapitalCalls: t => array<floatCapitalCall> = _r => {
   })
 }
 
-let mockFloatPercentageToReturn: (t, int) => unit = (_r, _param0) => {
+let mockFloatPercentageToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.floatPercentage.will.return.with([_param0])")
 }
 
@@ -262,16 +275,18 @@ type initializeCall = {
   longShortCoreContract: Ethers.ethAddress,
   floatToken: Ethers.ethAddress,
   floatCapital: Ethers.ethAddress,
+  floatPercentage: Ethers.BigNumber.t,
 }
 
 let initializeCalls: t => array<initializeCall> = _r => {
   let array = %raw("_r.smocked.initialize.calls")
-  array->Array.map(((admin, longShortCoreContract, floatToken, floatCapital)) => {
+  array->Array.map(((admin, longShortCoreContract, floatToken, floatCapital, floatPercentage)) => {
     {
       admin: admin,
       longShortCoreContract: longShortCoreContract,
       floatToken: floatToken,
       floatCapital: floatCapital,
+      floatPercentage: floatPercentage,
     }
   })
 }
@@ -297,7 +312,7 @@ let mockChangeFloatPercentageToReturn: t => unit = _r => {
   let _ = %raw("_r.smocked.changeFloatPercentage.will.return()")
 }
 
-type changeFloatPercentageCall = {newFloatPercentage: int}
+type changeFloatPercentageCall = {newFloatPercentage: Ethers.BigNumber.t}
 
 let changeFloatPercentageCalls: t => array<changeFloatPercentageCall> = _r => {
   let array = %raw("_r.smocked.changeFloatPercentage.calls")
@@ -548,6 +563,7 @@ module InternalMock = {
     longShortCoreContract: Ethers.ethAddress,
     floatToken: Ethers.ethAddress,
     floatCapital: Ethers.ethAddress,
+    floatPercentage: Ethers.BigNumber.t,
   }
 
   let initializeCalls: unit => array<initializeCall> = () => {
@@ -555,12 +571,19 @@ module InternalMock = {
     internalRef.contents
     ->Option.map(_r => {
       let array = %raw("_r.smocked.initializeMock.calls")
-      array->Array.map(((admin, longShortCoreContract, floatToken, floatCapital)) => {
+      array->Array.map(((
+        admin,
+        longShortCoreContract,
+        floatToken,
+        floatCapital,
+        floatPercentage,
+      )) => {
         {
           admin: admin,
           longShortCoreContract: longShortCoreContract,
           floatToken: floatToken,
           floatCapital: floatCapital,
+          floatPercentage: floatPercentage,
         }
       })
     })
@@ -592,6 +615,31 @@ module InternalMock = {
     ->Option.getExn
   }
 
+  let mock_changeFloatPercentageToReturn: unit => unit = () => {
+    checkForExceptions(~functionName="_changeFloatPercentage")
+    let _ = internalRef.contents->Option.map(_r => {
+      let _ = %raw("_r.smocked._changeFloatPercentageMock.will.return()")
+    })
+  }
+
+  type _changeFloatPercentageCall = {newFloatPercentage: Ethers.BigNumber.t}
+
+  let _changeFloatPercentageCalls: unit => array<_changeFloatPercentageCall> = () => {
+    checkForExceptions(~functionName="_changeFloatPercentage")
+    internalRef.contents
+    ->Option.map(_r => {
+      let array = %raw("_r.smocked._changeFloatPercentageMock.calls")
+      array->Array.map(_m => {
+        let newFloatPercentage = _m->Array.getUnsafe(0)
+
+        {
+          newFloatPercentage: newFloatPercentage,
+        }
+      })
+    })
+    ->Option.getExn
+  }
+
   let mockChangeFloatPercentageToReturn: unit => unit = () => {
     checkForExceptions(~functionName="changeFloatPercentage")
     let _ = internalRef.contents->Option.map(_r => {
@@ -599,7 +647,7 @@ module InternalMock = {
     })
   }
 
-  type changeFloatPercentageCall = {newFloatPercentage: int}
+  type changeFloatPercentageCall = {newFloatPercentage: Ethers.BigNumber.t}
 
   let changeFloatPercentageCalls: unit => array<changeFloatPercentageCall> = () => {
     checkForExceptions(~functionName="changeFloatPercentage")

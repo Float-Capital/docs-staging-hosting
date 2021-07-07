@@ -34,9 +34,9 @@ let make: (
     aaveReferalCode,
   )->Obj.magic
 
-type tEN_TO_THE_5Return = Ethers.BigNumber.t
+type tEN_TO_THE_18Return = Ethers.BigNumber.t
 @send
-external tEN_TO_THE_5: t => JsPromise.t<tEN_TO_THE_5Return> = "TEN_TO_THE_5"
+external tEN_TO_THE_18: t => JsPromise.t<tEN_TO_THE_18Return> = "TEN_TO_THE_18"
 
 type aTokenReturn = Ethers.ethAddress
 @send
@@ -53,7 +53,7 @@ external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction>
 external claimYieldAndGetMarketAmount: (
   t,
   ~totalValueRealizedForMarket: Ethers.BigNumber.t,
-  ~marketPercentE5: Ethers.BigNumber.t,
+  ~marketPercentE18: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "claimYieldAndGetMarketAmount"
 
 type claimYieldAndGetMarketAmountReturn = Ethers.BigNumber.t
@@ -61,7 +61,7 @@ type claimYieldAndGetMarketAmountReturn = Ethers.BigNumber.t
 external claimYieldAndGetMarketAmountCall: (
   t,
   ~totalValueRealizedForMarket: Ethers.BigNumber.t,
-  ~marketPercentE5: Ethers.BigNumber.t,
+  ~marketPercentE18: Ethers.BigNumber.t,
 ) => JsPromise.t<claimYieldAndGetMarketAmountReturn> = "claimYieldAndGetMarketAmount"
 
 @send

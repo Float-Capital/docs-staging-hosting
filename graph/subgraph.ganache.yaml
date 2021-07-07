@@ -24,7 +24,7 @@ dataSources:
         - PriceUpdate
         - SyntheticTokenCreated
         - SystemStateUpdated
-        - V1
+        - LongShortV1
       abis:
         - name: LongShort
           file: ./abis/LongShort.json
@@ -49,8 +49,8 @@ dataSources:
           handler: handleSyntheticTokenCreated
         - event: SystemStateUpdated(uint32,uint256,int256,uint256,uint256,uint256,uint256)
           handler: handleSystemStateUpdated
-        - event: V1(address,address,address,address)
-          handler: handleV1
+        - event: LongShortV1(address,address,address,address)
+          handler: handleLongShortV1
       file: ./src/float.ts
 
   - kind: ethereum/contract
@@ -65,19 +65,20 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - DeployV1
+        - StakerV1
         - FloatMinted
         - MarketAddedToStaker
         - MarketLaunchIncentiveParametersChanges
         - StakeAdded
         - StakeWithdrawn
         - StateAdded
+        - FloatPercentageUpdated
       abis:
         - name: Staker
           file: ./abis/Staker.json
       eventHandlers:
-        - event: DeployV1(address)
-          handler: handleDeployV1
+        - event: StakerV1(address,uint256)
+          handler: handleStakerV1
         - event: FloatMinted(address,uint32,uint256,uint256,uint256)
           handler: handleFloatMinted
         - event: MarketAddedToStaker(uint32,uint256)
@@ -92,6 +93,8 @@ dataSources:
           handler: handleStakeWithdrawn
         - event: StateAdded(uint32,uint256,uint256,uint256)
           handler: handleStateAdded
+        - event: FloatPercentageUpdated(uint256)
+          handler: handleFloatPercentageUpdated
       file: ./src/staker.ts
 
 templates:

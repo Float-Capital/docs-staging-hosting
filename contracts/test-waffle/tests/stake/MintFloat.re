@@ -57,7 +57,7 @@ let test =
     );
 
     it(
-      "calls mint on floatTokens for floatCapital for amount (floatToMint * floatPercentage) / 10000",
+      "calls mint on floatTokens for floatCapital for amount (floatToMint * floatPercentage) / 1e18",
       () =>
       (floatTokenSmockedRef^)
       ->FloatTokenSmocked.mintCalls
@@ -66,8 +66,8 @@ let test =
           _to: floatCapitalAddressRef^,
           amount:
             floatToMint
-            ->Ethers.BigNumber.mul(floatPercentage->Ethers.BigNumber.fromInt)
-            ->Ethers.BigNumber.div(10000->Ethers.BigNumber.fromInt),
+            ->mul(floatPercentage->bnFromInt)
+            ->div(CONSTANTS.tenToThe18),
         })
     );
   });

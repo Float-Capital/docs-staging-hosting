@@ -13,6 +13,10 @@ type fLOAT_ISSUANCE_FIXED_DECIMALReturn = Ethers.BigNumber.t
 external fLOAT_ISSUANCE_FIXED_DECIMAL: t => JsPromise.t<fLOAT_ISSUANCE_FIXED_DECIMALReturn> =
   "FLOAT_ISSUANCE_FIXED_DECIMAL"
 
+type tEN_TO_THE_18Return = Ethers.BigNumber.t
+@send
+external tEN_TO_THE_18: t => JsPromise.t<tEN_TO_THE_18Return> = "TEN_TO_THE_18"
+
 @send
 external addNewStakingFund: (
   t,
@@ -42,8 +46,10 @@ external admin: t => JsPromise.t<adminReturn> = "admin"
 external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
 
 @send
-external changeFloatPercentage: (t, ~newFloatPercentage: int) => JsPromise.t<transaction> =
-  "changeFloatPercentage"
+external changeFloatPercentage: (
+  t,
+  ~newFloatPercentage: Ethers.BigNumber.t,
+) => JsPromise.t<transaction> = "changeFloatPercentage"
 
 @send
 external changeMarketLaunchIncentiveParameters: (
@@ -68,7 +74,7 @@ type floatCapitalReturn = Ethers.ethAddress
 @send
 external floatCapital: t => JsPromise.t<floatCapitalReturn> = "floatCapital"
 
-type floatPercentageReturn = int
+type floatPercentageReturn = Ethers.BigNumber.t
 @send
 external floatPercentage: t => JsPromise.t<floatPercentageReturn> = "floatPercentage"
 
@@ -83,6 +89,7 @@ external initialize: (
   ~longShortCoreContract: Ethers.ethAddress,
   ~floatToken: Ethers.ethAddress,
   ~floatCapital: Ethers.ethAddress,
+  ~floatPercentage: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "initialize"
 
 type latestRewardIndexReturn = Ethers.BigNumber.t
@@ -174,6 +181,10 @@ module Exposed = {
   @send
   external fLOAT_ISSUANCE_FIXED_DECIMAL: t => JsPromise.t<fLOAT_ISSUANCE_FIXED_DECIMALReturn> =
     "FLOAT_ISSUANCE_FIXED_DECIMAL"
+
+  type tEN_TO_THE_18Return = Ethers.BigNumber.t
+  @send
+  external tEN_TO_THE_18: t => JsPromise.t<tEN_TO_THE_18Return> = "TEN_TO_THE_18"
 
   @send
   external _changeMarketLaunchIncentiveParametersExternal: (
@@ -291,8 +302,10 @@ module Exposed = {
   external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
 
   @send
-  external changeFloatPercentage: (t, ~newFloatPercentage: int) => JsPromise.t<transaction> =
-    "changeFloatPercentage"
+  external changeFloatPercentage: (
+    t,
+    ~newFloatPercentage: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "changeFloatPercentage"
 
   @send
   external changeMarketLaunchIncentiveParameters: (
@@ -317,7 +330,7 @@ module Exposed = {
   @send
   external floatCapital: t => JsPromise.t<floatCapitalReturn> = "floatCapital"
 
-  type floatPercentageReturn = int
+  type floatPercentageReturn = Ethers.BigNumber.t
   @send
   external floatPercentage: t => JsPromise.t<floatPercentageReturn> = "floatPercentage"
 
@@ -348,6 +361,7 @@ module Exposed = {
     ~longShortCoreContract: Ethers.ethAddress,
     ~floatToken: Ethers.ethAddress,
     ~floatCapital: Ethers.ethAddress,
+    ~floatPercentage: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "initialize"
 
   type latestRewardIndexReturn = Ethers.BigNumber.t

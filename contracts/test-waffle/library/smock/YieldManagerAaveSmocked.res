@@ -4,14 +4,14 @@ type t = {address: Ethers.ethAddress}
 
 let uninitializedValue: t = None->Obj.magic
 
-let mockTEN_TO_THE_5ToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.TEN_TO_THE_5.will.return.with([_param0])")
+let mockTEN_TO_THE_18ToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.TEN_TO_THE_18.will.return.with([_param0])")
 }
 
-type tEN_TO_THE_5Call
+type tEN_TO_THE_18Call
 
-let tEN_TO_THE_5Calls: t => array<tEN_TO_THE_5Call> = _r => {
-  let array = %raw("_r.smocked.TEN_TO_THE_5.calls")
+let tEN_TO_THE_18Calls: t => array<tEN_TO_THE_18Call> = _r => {
+  let array = %raw("_r.smocked.TEN_TO_THE_18.calls")
   array->Array.map(() => {
     ()->Obj.magic
   })
@@ -182,15 +182,15 @@ let mockClaimYieldAndGetMarketAmountToReturn: (t, Ethers.BigNumber.t) => unit = 
 
 type claimYieldAndGetMarketAmountCall = {
   totalValueRealizedForMarket: Ethers.BigNumber.t,
-  marketPercentE5: Ethers.BigNumber.t,
+  marketPercentE18: Ethers.BigNumber.t,
 }
 
 let claimYieldAndGetMarketAmountCalls: t => array<claimYieldAndGetMarketAmountCall> = _r => {
   let array = %raw("_r.smocked.claimYieldAndGetMarketAmount.calls")
-  array->Array.map(((totalValueRealizedForMarket, marketPercentE5)) => {
+  array->Array.map(((totalValueRealizedForMarket, marketPercentE18)) => {
     {
       totalValueRealizedForMarket: totalValueRealizedForMarket,
-      marketPercentE5: marketPercentE5,
+      marketPercentE18: marketPercentE18,
     }
   })
 }

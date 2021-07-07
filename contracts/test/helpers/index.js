@@ -73,6 +73,7 @@ const initialize = async (admin) => {
     longShort.address,
     floatToken.address,
     floatCapital.address,
+    "250000000000000000", // 25%
     {
       from: admin,
     }
@@ -143,7 +144,7 @@ const createSynthetic = async (
     currentMarketIndex,
     kInitialMultiplier,
     kPeriod,
-    "50", //50 basis points unstake fee
+    "5000000000000000", //50 basis points unstake fee
     "500000000000000000",
     { from: admin }
   );

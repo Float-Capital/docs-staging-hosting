@@ -19,6 +19,18 @@ function fLOAT_ISSUANCE_FIXED_DECIMALCalls(_r) {
               }));
 }
 
+function mockTEN_TO_THE_18ToReturn(_r, _param0) {
+  ((_r.smocked.TEN_TO_THE_18.will.return.with([_param0])));
+  
+}
+
+function tEN_TO_THE_18Calls(_r) {
+  var array = (_r.smocked.TEN_TO_THE_18.calls);
+  return Belt_Array.map(array, (function (param) {
+                
+              }));
+}
+
 function mockAdminToReturn(_r, _param0) {
   ((_r.smocked.admin.will.return.with([_param0])));
   
@@ -226,7 +238,8 @@ function initializeCalls(_r) {
                         admin: param[0],
                         longShortCoreContract: param[1],
                         floatToken: param[2],
-                        floatCapital: param[3]
+                        floatCapital: param[3],
+                        floatPercentage: param[4]
                       };
               }));
 }
@@ -463,7 +476,8 @@ function initializeCalls$1(param) {
                                           admin: param[0],
                                           longShortCoreContract: param[1],
                                           floatToken: param[2],
-                                          floatCapital: param[3]
+                                          floatCapital: param[3],
+                                          floatPercentage: param[4]
                                         };
                                 }));
                   })));
@@ -486,6 +500,28 @@ function changeAdminCalls$1(param) {
                                   var admin = _m[0];
                                   return {
                                           admin: admin
+                                        };
+                                }));
+                  })));
+}
+
+function mock_changeFloatPercentageToReturn(param) {
+  checkForExceptions("_changeFloatPercentage");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked._changeFloatPercentageMock.will.return()));
+          
+        }));
+  
+}
+
+function _changeFloatPercentageCalls(param) {
+  checkForExceptions("_changeFloatPercentage");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked._changeFloatPercentageMock.calls;
+                    return Belt_Array.map(array, (function (_m) {
+                                  var newFloatPercentage = _m[0];
+                                  return {
+                                          newFloatPercentage: newFloatPercentage
                                         };
                                 }));
                   })));
@@ -1137,6 +1173,8 @@ var InternalMock = {
   initializeCalls: initializeCalls$1,
   mockChangeAdminToReturn: mockChangeAdminToReturn$1,
   changeAdminCalls: changeAdminCalls$1,
+  mock_changeFloatPercentageToReturn: mock_changeFloatPercentageToReturn,
+  _changeFloatPercentageCalls: _changeFloatPercentageCalls,
   mockChangeFloatPercentageToReturn: mockChangeFloatPercentageToReturn$1,
   changeFloatPercentageCalls: changeFloatPercentageCalls$1,
   mock_changeUnstakeFeeToReturn: mock_changeUnstakeFeeToReturn,
@@ -1200,6 +1238,8 @@ var uninitializedValue;
 exports.uninitializedValue = uninitializedValue;
 exports.mockFLOAT_ISSUANCE_FIXED_DECIMALToReturn = mockFLOAT_ISSUANCE_FIXED_DECIMALToReturn;
 exports.fLOAT_ISSUANCE_FIXED_DECIMALCalls = fLOAT_ISSUANCE_FIXED_DECIMALCalls;
+exports.mockTEN_TO_THE_18ToReturn = mockTEN_TO_THE_18ToReturn;
+exports.tEN_TO_THE_18Calls = tEN_TO_THE_18Calls;
 exports.mockAdminToReturn = mockAdminToReturn;
 exports.adminCalls = adminCalls;
 exports.mockFloatCapitalToReturn = mockFloatCapitalToReturn;

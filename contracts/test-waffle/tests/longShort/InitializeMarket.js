@@ -80,7 +80,7 @@ function testUnit(contracts, accounts) {
 function testIntegration(contracts, accounts) {
   describe("initializeMarket", (function () {
           it("Shouldn't allow initialization of a market that doesn't exist", (function () {
-                  return Chai.expectRevert(contracts.contents.longShort.initializeMarket(654654, CONSTANTS.oneBn, CONSTANTS.oneBn, ethers.BigNumber.from(50), CONSTANTS.oneBn), "index too high");
+                  return Chai.expectRevert(contracts.contents.longShort.initializeMarket(654654, CONSTANTS.oneBn, CONSTANTS.oneBn, ethers.BigNumber.from("5000000000000000"), CONSTANTS.oneBn), "index too high");
                 }));
           it("Shouldn't allow initialization of a market that has already been initialized", (function () {
                   var match = contracts.contents;

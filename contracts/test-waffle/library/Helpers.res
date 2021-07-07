@@ -181,6 +181,7 @@ let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
           ~longShortCoreContract=longShort.address,
           ~floatToken=floatToken.address,
           ~floatCapital=floatCapital.address,
+          ~floatPercentage=bnFromString("250000000000000000"),
         ),
       ))
       ->JsPromise.then(_ => {
