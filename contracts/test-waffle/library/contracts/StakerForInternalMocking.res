@@ -18,6 +18,14 @@ external _changeMarketLaunchIncentiveParametersMock: (
 ) => JsPromise.t<_changeMarketLaunchIncentiveParametersMockReturn> =
   "_changeMarketLaunchIncentiveParametersMock"
 
+type _changeUnstakeFeeMockReturn
+@send
+external _changeUnstakeFeeMock: (
+  t,
+  int,
+  Ethers.BigNumber.t,
+) => JsPromise.t<_changeUnstakeFeeMockReturn> = "_changeUnstakeFeeMock"
+
 type _claimFloatMockReturn
 @send
 external _claimFloatMock: (t, array<int>) => JsPromise.t<_claimFloatMockReturn> = "_claimFloatMock"
@@ -147,6 +155,14 @@ external changeMarketLaunchIncentiveParametersMock: (
   Ethers.BigNumber.t,
 ) => JsPromise.t<changeMarketLaunchIncentiveParametersMockReturn> =
   "changeMarketLaunchIncentiveParametersMock"
+
+type changeUnstakeFeeMockReturn
+@send
+external changeUnstakeFeeMock: (
+  t,
+  int,
+  Ethers.BigNumber.t,
+) => JsPromise.t<changeUnstakeFeeMockReturn> = "changeUnstakeFeeMock"
 
 type claimFloatCustomMockReturn
 @send

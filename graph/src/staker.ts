@@ -6,6 +6,7 @@ import {
   FloatMinted,
   MarketLaunchIncentiveParametersChanges,
   MarketAddedToStaker,
+  StakeWithdrawalFeeUpdated,
 } from "../generated/Staker/Staker";
 import { erc20 } from "../generated/templates";
 import {
@@ -45,6 +46,23 @@ export function handleDeployV1(event: DeployV1): void {
     [],
     [],
     false
+  );
+}
+
+export function handleStakeWithdrawalFeeUpdated(
+  event: StakeWithdrawalFeeUpdated
+): void {
+  let marketIndex = event.params.marketIndex;
+  let stakeWithdralFee = event.params.stakeWithdralFee;
+
+  saveEventToStateChange(
+    event,
+    "StakeWithdrawalFeeUpdated",
+    bigIntArrayToStringArray([marketIndex, stakeWithdralFee]),
+    ["marketIndex", "stakeWithdralFee"],
+    ["uint32", "uint256"],
+    [],
+    []
   );
 }
 

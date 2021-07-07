@@ -19,6 +19,14 @@ contract StakerForInternalMocking {
       return ();
     }
      
+    function _changeUnstakeFeeMock(uint32,uint256) public pure {
+      return ();
+    }
+     
+    function changeUnstakeFeeMock(uint32,uint256) public pure {
+      return ();
+    }
+     
     function changeMarketLaunchIncentiveParametersMock(uint32,uint256,uint256) public pure {
       return ();
     }

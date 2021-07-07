@@ -42,7 +42,7 @@ external admin: t => JsPromise.t<adminReturn> = "admin"
 external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
 
 @send
-external changeFloatPercentage: (t, ~newPercentage: int) => JsPromise.t<transaction> =
+external changeFloatPercentage: (t, ~newFloatPercentage: int) => JsPromise.t<transaction> =
   "changeFloatPercentage"
 
 @send
@@ -52,6 +52,13 @@ external changeMarketLaunchIncentiveParameters: (
   ~period: Ethers.BigNumber.t,
   ~initialMultiplier: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "changeMarketLaunchIncentiveParameters"
+
+@send
+external changeUnstakeFee: (
+  t,
+  ~marketIndex: int,
+  ~newMarketUnstakeFeeBasisPoints: Ethers.BigNumber.t,
+) => JsPromise.t<transaction> = "changeUnstakeFee"
 
 @send
 external claimFloatCustom: (t, ~marketIndexes: array<int>) => JsPromise.t<transaction> =
@@ -284,7 +291,7 @@ module Exposed = {
   external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
 
   @send
-  external changeFloatPercentage: (t, ~newPercentage: int) => JsPromise.t<transaction> =
+  external changeFloatPercentage: (t, ~newFloatPercentage: int) => JsPromise.t<transaction> =
     "changeFloatPercentage"
 
   @send
@@ -294,6 +301,13 @@ module Exposed = {
     ~period: Ethers.BigNumber.t,
     ~initialMultiplier: Ethers.BigNumber.t,
   ) => JsPromise.t<transaction> = "changeMarketLaunchIncentiveParameters"
+
+  @send
+  external changeUnstakeFee: (
+    t,
+    ~marketIndex: int,
+    ~newMarketUnstakeFeeBasisPoints: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "changeUnstakeFee"
 
   @send
   external claimFloatCustom: (t, ~marketIndexes: array<int>) => JsPromise.t<transaction> =

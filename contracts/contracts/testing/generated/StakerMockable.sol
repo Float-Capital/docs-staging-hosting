@@ -95,6 +95,11 @@ contract StakerMockable is IStaker, Initializable {
         uint256 multiplier
     );
 
+    event StakeWithdrawalFeeUpdated(
+        uint32 marketIndex,
+        uint256 stakeWithdralFee
+    );
+
     
 
 
@@ -188,14 +193,47 @@ contract StakerMockable is IStaker, Initializable {
         admin = _admin;
     }
 
-    function changeFloatPercentage(uint16 _newPercentage) external onlyAdmin {
+    function changeFloatPercentage(uint16 newFloatPercentage)
+        external
+        onlyAdmin
+    {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("changeFloatPercentage"))){
       
-      return mocker.changeFloatPercentageMock(_newPercentage);
+      return mocker.changeFloatPercentageMock(newFloatPercentage);
     }
   
-        require(_newPercentage <= 10000);
-        floatPercentage = _newPercentage;
+        require(newFloatPercentage <= 10000);
+        floatPercentage = newFloatPercentage;
+    }
+
+    function _changeUnstakeFee(
+        uint32 marketIndex,
+        uint256 newMarketUnstakeFeeBasisPoints
+    ) internal {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_changeUnstakeFee"))){
+      
+      return mocker._changeUnstakeFeeMock(marketIndex,newMarketUnstakeFeeBasisPoints);
+    }
+  
+        require(newMarketUnstakeFeeBasisPoints <= 500);         marketUnstakeFeeBasisPoints[
+            marketIndex
+        ] = newMarketUnstakeFeeBasisPoints;
+    }
+
+    function changeUnstakeFee(
+        uint32 marketIndex,
+        uint256 newMarketUnstakeFeeBasisPoints
+    ) external onlyAdmin {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("changeUnstakeFee"))){
+      
+      return mocker.changeUnstakeFeeMock(marketIndex,newMarketUnstakeFeeBasisPoints);
+    }
+  
+        _changeUnstakeFee(marketIndex, newMarketUnstakeFeeBasisPoints);
+        emit StakeWithdrawalFeeUpdated(
+            marketIndex,
+            newMarketUnstakeFeeBasisPoints
+        );
     }
 
     function changeMarketLaunchIncentiveParameters(
@@ -273,7 +311,7 @@ contract StakerMockable is IStaker, Initializable {
             kInitialMultiplier
         );
 
-        marketUnstakeFeeBasisPoints[marketIndex] = unstakeFeeBasisPoints;
+        _changeUnstakeFee(marketIndex, unstakeFeeBasisPoints);
         emit MarketAddedToStaker(
             marketIndex,
             marketUnstakeFeeBasisPoints[marketIndex]

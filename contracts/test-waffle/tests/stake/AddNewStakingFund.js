@@ -29,6 +29,7 @@ function test(contracts, accounts) {
           Globals.before_once$p(function (param) {
                 return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "addNewStakingFund", contracts, accounts), (function (param) {
                               StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn(undefined);
+                              StakerSmocked.InternalMock.mock_changeUnstakeFeeToReturn(undefined);
                               StakerSmocked.InternalMock.mockOnlyFloatToReturn(undefined);
                               return LetOps.AwaitThen.let_(stakerRef.contents.setAddNewStakingFundParams(1, sampleLongAddress, sampleShortAddress, sampleMockAddress), (function (param) {
                                             return LetOps.AwaitThen.let_(Helpers.getBlock(undefined), (function (param) {
@@ -50,6 +51,12 @@ function test(contracts, accounts) {
                               marketIndex: 1,
                               period: kPeriod,
                               initialMultiplier: kInitialMultiplier
+                            });
+                }));
+          it("calls _changeUnstakeFee with correct arguments", (function () {
+                  return Chai.recordEqualFlat(StakerSmocked.InternalMock._changeUnstakeFeeCalls(undefined)[0], {
+                              marketIndex: 1,
+                              newMarketUnstakeFeeBasisPoints: unstakeFeeBasisPoints
                             });
                 }));
           it("mutates syntheticRewardParams", (function () {

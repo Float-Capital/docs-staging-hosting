@@ -88,6 +88,11 @@ contract Staker is IStaker, Initializable {
         uint256 multiplier
     );
 
+    event StakeWithdrawalFeeUpdated(
+        uint32 marketIndex,
+        uint256 stakeWithdralFee
+    );
+
     /*╔═════════════════════════════╗
       ║          MODIFIERS          ║
       ╚═════════════════════════════╝*/
@@ -143,17 +148,33 @@ contract Staker is IStaker, Initializable {
         admin = _admin;
     }
 
-    function changeFloatPercentage(uint16 _newPercentage) external onlyAdmin {
-        require(_newPercentage <= 10000);
-        floatPercentage = _newPercentage;
-    }
-
-    function changeUnstakeFee(uint32 marketIndex, uint256 _newPercentage)
+    function changeFloatPercentage(uint16 newFloatPercentage)
         external
         onlyAdmin
     {
-        require(_newPercentage <= 10000);
-        marketUnstakeFeeBasisPoints[marketIndex] = _newPercentage;
+        require(newFloatPercentage <= 10000);
+        floatPercentage = newFloatPercentage;
+    }
+
+    function _changeUnstakeFee(
+        uint32 marketIndex,
+        uint256 newMarketUnstakeFeeBasisPoints
+    ) internal {
+        require(newMarketUnstakeFeeBasisPoints <= 500); // 5% fee is the max fee possible.
+        marketUnstakeFeeBasisPoints[
+            marketIndex
+        ] = newMarketUnstakeFeeBasisPoints;
+    }
+
+    function changeUnstakeFee(
+        uint32 marketIndex,
+        uint256 newMarketUnstakeFeeBasisPoints
+    ) external onlyAdmin {
+        _changeUnstakeFee(marketIndex, newMarketUnstakeFeeBasisPoints);
+        emit StakeWithdrawalFeeUpdated(
+            marketIndex,
+            newMarketUnstakeFeeBasisPoints
+        );
     }
 
     function changeMarketLaunchIncentiveParameters(
@@ -217,7 +238,7 @@ contract Staker is IStaker, Initializable {
             kInitialMultiplier
         );
 
-        marketUnstakeFeeBasisPoints[marketIndex] = unstakeFeeBasisPoints;
+        _changeUnstakeFee(marketIndex, unstakeFeeBasisPoints);
         emit MarketAddedToStaker(
             marketIndex,
             marketUnstakeFeeBasisPoints[marketIndex]

@@ -80,6 +80,8 @@ dataSources:
           handler: handleMarketLaunchIncentiveParametersChanges
         - event: StakeAdded(address,address,uint256,uint256)
           handler: handleStakeAdded
+        - event: StakeWithdrawalFeeUpdated(uint32,uint256)
+          handler: handleStakeWithdrawalFeeUpdated
         - event: StakeWithdrawn(address,address,uint256)
           handler: handleStakeWithdrawn
         - event: StateAdded(uint32,uint256,uint256,uint256)
