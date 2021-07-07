@@ -312,7 +312,7 @@ let mockChangeFloatPercentageToReturn: t => unit = _r => {
   let _ = %raw("_r.smocked.changeFloatPercentage.will.return()")
 }
 
-type changeFloatPercentageCall = {newFloatPercentage: int}
+type changeFloatPercentageCall = {newFloatPercentage: Ethers.BigNumber.t}
 
 let changeFloatPercentageCalls: t => array<changeFloatPercentageCall> = _r => {
   let array = %raw("_r.smocked.changeFloatPercentage.calls")
@@ -615,6 +615,31 @@ module InternalMock = {
     ->Option.getExn
   }
 
+  let mock_changeFloatPercentageToReturn: unit => unit = () => {
+    checkForExceptions(~functionName="_changeFloatPercentage")
+    let _ = internalRef.contents->Option.map(_r => {
+      let _ = %raw("_r.smocked._changeFloatPercentageMock.will.return()")
+    })
+  }
+
+  type _changeFloatPercentageCall = {newFloatPercentage: Ethers.BigNumber.t}
+
+  let _changeFloatPercentageCalls: unit => array<_changeFloatPercentageCall> = () => {
+    checkForExceptions(~functionName="_changeFloatPercentage")
+    internalRef.contents
+    ->Option.map(_r => {
+      let array = %raw("_r.smocked._changeFloatPercentageMock.calls")
+      array->Array.map(_m => {
+        let newFloatPercentage = _m->Array.getUnsafe(0)
+
+        {
+          newFloatPercentage: newFloatPercentage,
+        }
+      })
+    })
+    ->Option.getExn
+  }
+
   let mockChangeFloatPercentageToReturn: unit => unit = () => {
     checkForExceptions(~functionName="changeFloatPercentage")
     let _ = internalRef.contents->Option.map(_r => {
@@ -622,7 +647,7 @@ module InternalMock = {
     })
   }
 
-  type changeFloatPercentageCall = {newFloatPercentage: int}
+  type changeFloatPercentageCall = {newFloatPercentage: Ethers.BigNumber.t}
 
   let changeFloatPercentageCalls: unit => array<changeFloatPercentageCall> = () => {
     checkForExceptions(~functionName="changeFloatPercentage")

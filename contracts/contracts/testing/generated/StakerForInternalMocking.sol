@@ -15,7 +15,11 @@ contract StakerForInternalMocking {
       return ();
     }
      
-    function changeFloatPercentageMock(uint16) public pure {
+    function _changeFloatPercentageMock(uint256) public pure {
+      return ();
+    }
+     
+    function changeFloatPercentageMock(uint256) public pure {
       return ();
     }
      

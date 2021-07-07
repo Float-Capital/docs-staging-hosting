@@ -62,7 +62,7 @@ contract StakerMockable is IStaker, Initializable {
     
 
 
-    event StakerV1(address floatToken, uint256 _floatPercentage);
+    event StakerV1(address floatToken, uint256 floatPercentage);
 
     event MarketAddedToStaker(uint32 marketIndex, uint256 exitFeeBasisPoints);
 
@@ -100,6 +100,8 @@ contract StakerMockable is IStaker, Initializable {
         uint32 marketIndex,
         uint256 stakeWithdralFee
     );
+
+    event FloatPercentageUpdated(uint256 floatPercentage);
 
     
 
@@ -185,9 +187,7 @@ contract StakerMockable is IStaker, Initializable {
         longShortCoreContract = ILongShort(_longShortCoreContract);
         floatToken = IFloatToken(_floatToken);
 
-                require(_floatPercentage <= TEN_TO_THE_18 && _floatPercentage >= 1e14);
-
-        floatPercentage = _floatPercentage;
+        _changeFloatPercentage(_floatPercentage);
 
         emit StakerV1(_floatToken, floatPercentage);
     }
@@ -204,7 +204,16 @@ contract StakerMockable is IStaker, Initializable {
         admin = _admin;
     }
 
-    function changeFloatPercentage(uint16 newFloatPercentage)
+    function _changeFloatPercentage(uint256 newFloatPercentage) internal {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_changeFloatPercentage"))){
+      
+      return mocker._changeFloatPercentageMock(newFloatPercentage);
+    }
+  
+        require(newFloatPercentage <= TEN_TO_THE_18 && newFloatPercentage > 0);         floatPercentage = newFloatPercentage;
+    }
+
+    function changeFloatPercentage(uint256 newFloatPercentage)
         external
         onlyAdmin
     {
@@ -213,7 +222,8 @@ contract StakerMockable is IStaker, Initializable {
       return mocker.changeFloatPercentageMock(newFloatPercentage);
     }
   
-        require(newFloatPercentage <= TEN_TO_THE_18);         floatPercentage = newFloatPercentage;
+        _changeFloatPercentage(newFloatPercentage);
+        emit FloatPercentageUpdated(newFloatPercentage);
     }
 
     function _changeUnstakeFee(

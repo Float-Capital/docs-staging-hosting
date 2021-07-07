@@ -7,6 +7,7 @@ import {
   MarketLaunchIncentiveParametersChanges,
   MarketAddedToStaker,
   StakeWithdrawalFeeUpdated,
+  FloatPercentageUpdated,
 } from "../generated/Staker/Staker";
 import { erc20 } from "../generated/templates";
 import {
@@ -31,6 +32,8 @@ import { ZERO, ONE, GLOBAL_STATE_ID } from "./CONSTANTS";
 
 export function handleStakerV1(event: StakerV1): void {
   let floatAddress = event.params.floatToken;
+  // TODO: add the floatPercentage to the graph.
+  let floatPercentage = event.params.floatPercentage;
 
   let context = new DataSourceContext();
   context.setString("contractAddress", floatAddress.toHex());
@@ -40,9 +43,9 @@ export function handleStakerV1(event: StakerV1): void {
   saveEventToStateChange(
     event,
     "StakerV1",
-    [floatAddress.toHex()],
-    ["floatAddress"],
-    ["address"],
+    [floatAddress.toHex(), floatPercentage.toString()],
+    ["floatAddress", "floatPercentage"],
+    ["address", "uint256"],
     [],
     [],
     false
@@ -438,5 +441,22 @@ export function handleFloatMinted(event: FloatMinted): void {
     ["address", "uint32", "uint256", "uint256", "uint256"],
     [userAddress],
     changedStakesArray
+  );
+}
+
+export function handleFloatPercentageUpdated(
+  event: FloatPercentageUpdated
+): void {
+  // TODO: update value in the graph!
+  let floatPercentage = event.params.floatPercentage;
+
+  saveEventToStateChange(
+    event,
+    "FloatPercentageUpdated",
+    [floatPercentage.toString()],
+    ["floatPercentage"],
+    ["uint256"],
+    [],
+    []
   );
 }

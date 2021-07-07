@@ -46,8 +46,10 @@ external admin: t => JsPromise.t<adminReturn> = "admin"
 external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
 
 @send
-external changeFloatPercentage: (t, ~newFloatPercentage: int) => JsPromise.t<transaction> =
-  "changeFloatPercentage"
+external changeFloatPercentage: (
+  t,
+  ~newFloatPercentage: Ethers.BigNumber.t,
+) => JsPromise.t<transaction> = "changeFloatPercentage"
 
 @send
 external changeMarketLaunchIncentiveParameters: (
@@ -300,8 +302,10 @@ module Exposed = {
   external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"
 
   @send
-  external changeFloatPercentage: (t, ~newFloatPercentage: int) => JsPromise.t<transaction> =
-    "changeFloatPercentage"
+  external changeFloatPercentage: (
+    t,
+    ~newFloatPercentage: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "changeFloatPercentage"
 
   @send
   external changeMarketLaunchIncentiveParameters: (

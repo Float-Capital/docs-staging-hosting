@@ -66,6 +66,7 @@ dataSources:
         - StakeAdded
         - StakeWithdrawn
         - StateAdded
+        - FloatPercentageUpdated
       abis:
         - name: Staker
           file: ./abis/Staker.json
@@ -86,6 +87,8 @@ dataSources:
           handler: handleStakeWithdrawn
         - event: StateAdded(uint32,uint256,uint256,uint256)
           handler: handleStateAdded
+        - event: FloatPercentageUpdated(uint256)
+          handler: handleFloatPercentageUpdated
       file: ./src/staker.ts
 
 templates:

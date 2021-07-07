@@ -8,6 +8,13 @@ let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
 
 let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic
 
+type _changeFloatPercentageMockReturn
+@send
+external _changeFloatPercentageMock: (
+  t,
+  Ethers.BigNumber.t,
+) => JsPromise.t<_changeFloatPercentageMockReturn> = "_changeFloatPercentageMock"
+
 type _changeMarketLaunchIncentiveParametersMockReturn
 @send
 external _changeMarketLaunchIncentiveParametersMock: (
@@ -143,8 +150,10 @@ external changeAdminMock: (t, Ethers.ethAddress) => JsPromise.t<changeAdminMockR
 
 type changeFloatPercentageMockReturn
 @send
-external changeFloatPercentageMock: (t, int) => JsPromise.t<changeFloatPercentageMockReturn> =
-  "changeFloatPercentageMock"
+external changeFloatPercentageMock: (
+  t,
+  Ethers.BigNumber.t,
+) => JsPromise.t<changeFloatPercentageMockReturn> = "changeFloatPercentageMock"
 
 type changeMarketLaunchIncentiveParametersMockReturn
 @send

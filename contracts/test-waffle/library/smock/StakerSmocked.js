@@ -505,6 +505,28 @@ function changeAdminCalls$1(param) {
                   })));
 }
 
+function mock_changeFloatPercentageToReturn(param) {
+  checkForExceptions("_changeFloatPercentage");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked._changeFloatPercentageMock.will.return()));
+          
+        }));
+  
+}
+
+function _changeFloatPercentageCalls(param) {
+  checkForExceptions("_changeFloatPercentage");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked._changeFloatPercentageMock.calls;
+                    return Belt_Array.map(array, (function (_m) {
+                                  var newFloatPercentage = _m[0];
+                                  return {
+                                          newFloatPercentage: newFloatPercentage
+                                        };
+                                }));
+                  })));
+}
+
 function mockChangeFloatPercentageToReturn$1(param) {
   checkForExceptions("changeFloatPercentage");
   Belt_Option.map(internalRef.contents, (function (_r) {
@@ -1151,6 +1173,8 @@ var InternalMock = {
   initializeCalls: initializeCalls$1,
   mockChangeAdminToReturn: mockChangeAdminToReturn$1,
   changeAdminCalls: changeAdminCalls$1,
+  mock_changeFloatPercentageToReturn: mock_changeFloatPercentageToReturn,
+  _changeFloatPercentageCalls: _changeFloatPercentageCalls,
   mockChangeFloatPercentageToReturn: mockChangeFloatPercentageToReturn$1,
   changeFloatPercentageCalls: changeFloatPercentageCalls$1,
   mock_changeUnstakeFeeToReturn: mock_changeUnstakeFeeToReturn,

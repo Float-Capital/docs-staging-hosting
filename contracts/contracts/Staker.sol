@@ -55,7 +55,7 @@ contract Staker is IStaker, Initializable {
       ║           EVENTS           ║
       ╚════════════════════════════╝*/
 
-    event StakerV1(address floatToken, uint256 _floatPercentage);
+    event StakerV1(address floatToken, uint256 floatPercentage);
 
     event MarketAddedToStaker(uint32 marketIndex, uint256 exitFeeBasisPoints);
 
@@ -93,6 +93,8 @@ contract Staker is IStaker, Initializable {
         uint32 marketIndex,
         uint256 stakeWithdralFee
     );
+
+    event FloatPercentageUpdated(uint256 floatPercentage);
 
     /*╔═════════════════════════════╗
       ║          MODIFIERS          ║
@@ -144,10 +146,7 @@ contract Staker is IStaker, Initializable {
         longShortCoreContract = ILongShort(_longShortCoreContract);
         floatToken = IFloatToken(_floatToken);
 
-        // Arbitrary requirement: less than 100%, more than 0.01%
-        require(_floatPercentage <= TEN_TO_THE_18 && _floatPercentage >= 1e14);
-
-        floatPercentage = _floatPercentage;
+        _changeFloatPercentage(_floatPercentage);
 
         emit StakerV1(_floatToken, floatPercentage);
     }
@@ -160,12 +159,17 @@ contract Staker is IStaker, Initializable {
         admin = _admin;
     }
 
-    function changeFloatPercentage(uint16 newFloatPercentage)
+    function _changeFloatPercentage(uint256 newFloatPercentage) internal {
+        require(newFloatPercentage <= TEN_TO_THE_18 && newFloatPercentage > 0); // less than 100% and greater than 0%
+        floatPercentage = newFloatPercentage;
+    }
+
+    function changeFloatPercentage(uint256 newFloatPercentage)
         external
         onlyAdmin
     {
-        require(newFloatPercentage <= TEN_TO_THE_18); // less than 100%
-        floatPercentage = newFloatPercentage;
+        _changeFloatPercentage(newFloatPercentage);
+        emit FloatPercentageUpdated(newFloatPercentage);
     }
 
     function _changeUnstakeFee(
