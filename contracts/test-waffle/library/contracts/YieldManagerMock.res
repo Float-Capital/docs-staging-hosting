@@ -14,9 +14,9 @@ let make: (
 ) => JsPromise.t<t> = (~admin, ~longShort, ~treasury, ~token) =>
   deployContract4(contractName, admin, longShort, treasury, token)->Obj.magic
 
-type tEN_TO_THE_5Return = Ethers.BigNumber.t
+type tEN_TO_THE_18Return = Ethers.BigNumber.t
 @send
-external tEN_TO_THE_5: t => JsPromise.t<tEN_TO_THE_5Return> = "TEN_TO_THE_5"
+external tEN_TO_THE_18: t => JsPromise.t<tEN_TO_THE_18Return> = "TEN_TO_THE_18"
 
 type adminReturn = Ethers.ethAddress
 @send
@@ -26,7 +26,7 @@ external admin: t => JsPromise.t<adminReturn> = "admin"
 external claimYieldAndGetMarketAmount: (
   t,
   ~totalValueRealizedForMarket: Ethers.BigNumber.t,
-  ~marketPercentE5: Ethers.BigNumber.t,
+  ~marketPercentE18: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "claimYieldAndGetMarketAmount"
 
 type claimYieldAndGetMarketAmountReturn = Ethers.BigNumber.t
@@ -34,7 +34,7 @@ type claimYieldAndGetMarketAmountReturn = Ethers.BigNumber.t
 external claimYieldAndGetMarketAmountCall: (
   t,
   ~totalValueRealizedForMarket: Ethers.BigNumber.t,
-  ~marketPercentE5: Ethers.BigNumber.t,
+  ~marketPercentE18: Ethers.BigNumber.t,
 ) => JsPromise.t<claimYieldAndGetMarketAmountReturn> = "claimYieldAndGetMarketAmount"
 
 @send
@@ -108,7 +108,3 @@ external withdrawTreasuryFunds: t => JsPromise.t<transaction> = "withdrawTreasur
 type yieldRateReturn = Ethers.BigNumber.t
 @send
 external yieldRate: t => JsPromise.t<yieldRateReturn> = "yieldRate"
-
-type yieldScaleReturn = Ethers.BigNumber.t
-@send
-external yieldScale: t => JsPromise.t<yieldScaleReturn> = "yieldScale"

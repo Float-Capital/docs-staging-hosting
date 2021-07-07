@@ -3,13 +3,13 @@
 
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 
-function mockTEN_TO_THE_5ToReturn(_r, _param0) {
-  ((_r.smocked.TEN_TO_THE_5.will.return.with([_param0])));
+function mockTEN_TO_THE_18ToReturn(_r, _param0) {
+  ((_r.smocked.TEN_TO_THE_18.will.return.with([_param0])));
   
 }
 
-function tEN_TO_THE_5Calls(_r) {
-  var array = (_r.smocked.TEN_TO_THE_5.calls);
+function tEN_TO_THE_18Calls(_r) {
+  var array = (_r.smocked.TEN_TO_THE_18.calls);
   return Belt_Array.map(array, (function (param) {
                 
               }));
@@ -169,7 +169,7 @@ function claimYieldAndGetMarketAmountCalls(_r) {
   return Belt_Array.map(array, (function (param) {
                 return {
                         totalValueRealizedForMarket: param[0],
-                        marketPercentE5: param[1]
+                        marketPercentE18: param[1]
                       };
               }));
 }
@@ -189,8 +189,8 @@ function withdrawTreasuryFundsCalls(_r) {
 var uninitializedValue;
 
 exports.uninitializedValue = uninitializedValue;
-exports.mockTEN_TO_THE_5ToReturn = mockTEN_TO_THE_5ToReturn;
-exports.tEN_TO_THE_5Calls = tEN_TO_THE_5Calls;
+exports.mockTEN_TO_THE_18ToReturn = mockTEN_TO_THE_18ToReturn;
+exports.tEN_TO_THE_18Calls = tEN_TO_THE_18Calls;
 exports.mockATokenToReturn = mockATokenToReturn;
 exports.aTokenCalls = aTokenCalls;
 exports.mockAdminToReturn = mockAdminToReturn;

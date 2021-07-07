@@ -43,19 +43,6 @@ let tEN_TO_THE_18_SIGNEDCalls: t => array<tEN_TO_THE_18_SIGNEDCall> = _r => {
   })
 }
 
-let mockTEN_TO_THE_5ToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.TEN_TO_THE_5.will.return.with([_param0])")
-}
-
-type tEN_TO_THE_5Call
-
-let tEN_TO_THE_5Calls: t => array<tEN_TO_THE_5Call> = _r => {
-  let array = %raw("_r.smocked.TEN_TO_THE_5.calls")
-  array->Array.map(() => {
-    ()->Obj.magic
-  })
-}
-
 let mockAdminToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.admin.will.return.with([_param0])")
 }

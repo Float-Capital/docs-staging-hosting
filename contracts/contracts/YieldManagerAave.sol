@@ -21,7 +21,7 @@ contract YieldManagerAave is IYieldManager {
       ╚═════════════════════════════╝*/
 
     // Fixed-precision constants ///////////////////////////////
-    uint256 public constant TEN_TO_THE_5 = 10000;
+    uint256 public constant TEN_TO_THE_18 = 1e18;
 
     // Addresses ///////////////////////////////////////////////
     address public admin;
@@ -150,7 +150,7 @@ contract YieldManagerAave is IYieldManager {
     // TODO STENT not unit tested
     function claimYieldAndGetMarketAmount(
         uint256 totalValueRealizedForMarket,
-        uint256 marketPercentE5
+        uint256 marketPercentE18
     ) public override longShortOnly returns (uint256) {
         uint256 totalHeld = aToken.balanceOf(address(this));
 
@@ -162,8 +162,8 @@ contract YieldManagerAave is IYieldManager {
             return 0;
         }
 
-        uint256 amountForMarketIncetives = (unrealizedYield * marketPercentE5) /
-            TEN_TO_THE_5;
+        uint256 amountForMarketIncetives = (unrealizedYield *
+            marketPercentE18) / TEN_TO_THE_18;
 
         uint256 amountForTreasury = unrealizedYield - amountForMarketIncetives;
 

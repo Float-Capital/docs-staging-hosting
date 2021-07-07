@@ -16,6 +16,7 @@ contract Staker is IStaker, Initializable {
 
     // Fixed-precision constants
     uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
+    uint256 public constant TEN_TO_THE_18 = 1e18;
 
     // Global state
     address public admin;
@@ -152,7 +153,7 @@ contract Staker is IStaker, Initializable {
         external
         onlyAdmin
     {
-        require(newFloatPercentage <= 10000);
+        require(newFloatPercentage <= TEN_TO_THE_18); // less than 100%
         floatPercentage = newFloatPercentage;
     }
 
@@ -160,7 +161,7 @@ contract Staker is IStaker, Initializable {
         uint32 marketIndex,
         uint256 newMarketUnstakeFeeBasisPoints
     ) internal {
-        require(newMarketUnstakeFeeBasisPoints <= 500); // 5% fee is the max fee possible.
+        require(newMarketUnstakeFeeBasisPoints <= 5e16); // 5% fee is the max fee possible.
         marketUnstakeFeeBasisPoints[
             marketIndex
         ] = newMarketUnstakeFeeBasisPoints;
@@ -195,7 +196,7 @@ contract Staker is IStaker, Initializable {
         uint256 initialMultiplier
     ) internal {
         require(
-            initialMultiplier >= 1e18,
+            initialMultiplier >= TEN_TO_THE_18,
             "marketLaunchIncentiveMultiplier must be >= 1e18"
         );
 
@@ -263,7 +264,7 @@ contract Staker is IStaker, Initializable {
         uint256 period = marketLaunchIncentivePeriod[marketIndex];
         uint256 multiplier = marketLaunchIncentiveMultipliers[marketIndex];
         if (multiplier == 0) {
-            multiplier = 1e18; // multiplier of 1 by default
+            multiplier = TEN_TO_THE_18; // multiplier of 1 by default
         }
 
         return (period, multiplier);
@@ -278,7 +279,7 @@ contract Staker is IStaker, Initializable {
 
         // Sanity check - under normal circumstances, the multipliers should
         // *never* be set to a value < 1e18, as there are guards against this.
-        assert(kInitialMultiplier >= 1e18);
+        assert(kInitialMultiplier >= TEN_TO_THE_18);
 
         uint256 initialTimestamp = syntheticRewardParams[marketIndex][0]
         .timestamp;
@@ -286,10 +287,10 @@ contract Staker is IStaker, Initializable {
         if (block.timestamp - initialTimestamp <= kPeriod) {
             return
                 kInitialMultiplier -
-                (((kInitialMultiplier - 1e18) *
+                (((kInitialMultiplier - TEN_TO_THE_18) *
                     (block.timestamp - initialTimestamp)) / kPeriod);
         } else {
-            return 1e18;
+            return TEN_TO_THE_18;
         }
     }
 

@@ -30,6 +30,7 @@ contract StakerMockable is IStaker, Initializable {
 
 
         uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
+    uint256 public constant TEN_TO_THE_18 = 1e18;
 
         address public admin;
     address public floatCapital;
@@ -202,8 +203,7 @@ contract StakerMockable is IStaker, Initializable {
       return mocker.changeFloatPercentageMock(newFloatPercentage);
     }
   
-        require(newFloatPercentage <= 10000);
-        floatPercentage = newFloatPercentage;
+        require(newFloatPercentage <= TEN_TO_THE_18);         floatPercentage = newFloatPercentage;
     }
 
     function _changeUnstakeFee(
@@ -215,7 +215,7 @@ contract StakerMockable is IStaker, Initializable {
       return mocker._changeUnstakeFeeMock(marketIndex,newMarketUnstakeFeeBasisPoints);
     }
   
-        require(newMarketUnstakeFeeBasisPoints <= 500);         marketUnstakeFeeBasisPoints[
+        require(newMarketUnstakeFeeBasisPoints <= 5e16);         marketUnstakeFeeBasisPoints[
             marketIndex
         ] = newMarketUnstakeFeeBasisPoints;
     }
@@ -264,7 +264,7 @@ contract StakerMockable is IStaker, Initializable {
     }
   
         require(
-            initialMultiplier >= 1e18,
+            initialMultiplier >= TEN_TO_THE_18,
             "marketLaunchIncentiveMultiplier must be >= 1e18"
         );
 
@@ -336,7 +336,7 @@ contract StakerMockable is IStaker, Initializable {
         uint256 period = marketLaunchIncentivePeriod[marketIndex];
         uint256 multiplier = marketLaunchIncentiveMultipliers[marketIndex];
         if (multiplier == 0) {
-            multiplier = 1e18;         }
+            multiplier = TEN_TO_THE_18;         }
 
         return (period, multiplier);
     }
@@ -352,7 +352,7 @@ contract StakerMockable is IStaker, Initializable {
             uint256 kInitialMultiplier
         ) = getMarketLaunchIncentiveParameters(marketIndex);
 
-                        assert(kInitialMultiplier >= 1e18);
+                        assert(kInitialMultiplier >= TEN_TO_THE_18);
 
         uint256 initialTimestamp = syntheticRewardParams[marketIndex][0]
         .timestamp;
@@ -360,10 +360,10 @@ contract StakerMockable is IStaker, Initializable {
         if (block.timestamp - initialTimestamp <= kPeriod) {
             return
                 kInitialMultiplier -
-                (((kInitialMultiplier - 1e18) *
+                (((kInitialMultiplier - TEN_TO_THE_18) *
                     (block.timestamp - initialTimestamp)) / kPeriod);
         } else {
-            return 1e18;
+            return TEN_TO_THE_18;
         }
     }
 

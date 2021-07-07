@@ -43,18 +43,6 @@ function tEN_TO_THE_18_SIGNEDCalls(_r) {
               }));
 }
 
-function mockTEN_TO_THE_5ToReturn(_r, _param0) {
-  ((_r.smocked.TEN_TO_THE_5.will.return.with([_param0])));
-  
-}
-
-function tEN_TO_THE_5Calls(_r) {
-  var array = (_r.smocked.TEN_TO_THE_5.calls);
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
 function mockAdminToReturn(_r, _param0) {
   ((_r.smocked.admin.will.return.with([_param0])));
   
@@ -1699,8 +1687,6 @@ exports.mockTEN_TO_THE_18ToReturn = mockTEN_TO_THE_18ToReturn;
 exports.tEN_TO_THE_18Calls = tEN_TO_THE_18Calls;
 exports.mockTEN_TO_THE_18_SIGNEDToReturn = mockTEN_TO_THE_18_SIGNEDToReturn;
 exports.tEN_TO_THE_18_SIGNEDCalls = tEN_TO_THE_18_SIGNEDCalls;
-exports.mockTEN_TO_THE_5ToReturn = mockTEN_TO_THE_5ToReturn;
-exports.tEN_TO_THE_5Calls = tEN_TO_THE_5Calls;
 exports.mockAdminToReturn = mockAdminToReturn;
 exports.adminCalls = adminCalls;
 exports.mockAssetPriceToReturn = mockAssetPriceToReturn;

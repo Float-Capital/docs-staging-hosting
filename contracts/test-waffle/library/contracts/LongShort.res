@@ -20,10 +20,6 @@ type tEN_TO_THE_18_SIGNEDReturn = Ethers.BigNumber.t
 @send
 external tEN_TO_THE_18_SIGNED: t => JsPromise.t<tEN_TO_THE_18_SIGNEDReturn> = "TEN_TO_THE_18_SIGNED"
 
-type tEN_TO_THE_5Return = Ethers.BigNumber.t
-@send
-external tEN_TO_THE_5: t => JsPromise.t<tEN_TO_THE_5Return> = "TEN_TO_THE_5"
-
 type adminReturn = Ethers.ethAddress
 @send
 external admin: t => JsPromise.t<adminReturn> = "admin"
@@ -240,10 +236,6 @@ module Exposed = {
   @send
   external tEN_TO_THE_18_SIGNED: t => JsPromise.t<tEN_TO_THE_18_SIGNEDReturn> =
     "TEN_TO_THE_18_SIGNED"
-
-  type tEN_TO_THE_5Return = Ethers.BigNumber.t
-  @send
-  external tEN_TO_THE_5: t => JsPromise.t<tEN_TO_THE_5Return> = "TEN_TO_THE_5"
 
   @send
   external _executeOutstandingNextPriceSettlementsExposed: (

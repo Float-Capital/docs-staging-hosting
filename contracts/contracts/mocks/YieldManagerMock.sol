@@ -21,8 +21,8 @@ contract YieldManagerMock is IYieldManager {
     address public longShort;
     address public treasury;
 
-    // Fixed-precision scale for interest percentages.
-    uint256 public constant yieldScale = 1e18;
+    // Fixed-precision scale for interest percentages and fees.
+    uint256 public constant TEN_TO_THE_18 = 1e18;
 
     // Global state.
     ERC20PresetMinterPauser public token;
@@ -33,9 +33,6 @@ contract YieldManagerMock is IYieldManager {
 
     uint256 public yieldRate; // pcnt per sec
     uint256 public lastSettled; // secs after epoch
-
-    // Fixed-precision constants ///////////////////////////////
-    uint256 public constant TEN_TO_THE_5 = 10000;
 
     ////////////////////////////////////
     /////////// MODIFIERS //////////////
@@ -85,7 +82,7 @@ contract YieldManagerMock is IYieldManager {
      */
     function settle() public {
         uint256 totalYieldRate = yieldRate * (block.timestamp - lastSettled);
-        uint256 totalYield = (totalHeld * totalYieldRate) / yieldScale;
+        uint256 totalYield = (totalHeld * totalYieldRate) / TEN_TO_THE_18;
 
         lastSettled = block.timestamp;
         totalHeld = totalHeld + totalYield;
@@ -98,7 +95,7 @@ contract YieldManagerMock is IYieldManager {
      * Adds the given yield percent to the token holdings.
      */
     function settleWithYieldPercent(uint256 yieldPercent) public adminOnly {
-        uint256 totalYield = (totalHeld * yieldPercent) / yieldScale;
+        uint256 totalYield = (totalHeld * yieldPercent) / TEN_TO_THE_18;
 
         lastSettled = block.timestamp;
         totalHeld = totalHeld + totalYield;
@@ -118,7 +115,7 @@ contract YieldManagerMock is IYieldManager {
      * Adds the given yield to the token holdings.
      */
     function mockHoldingAdditionalRewardYield() public adminOnly {
-        tokenOtherRewardERC20.mint(address(this), yieldScale * 2);
+        tokenOtherRewardERC20.mint(address(this), TEN_TO_THE_18 * 2);
     }
 
     /**
@@ -168,7 +165,7 @@ contract YieldManagerMock is IYieldManager {
     // TODO STENT need to change this and unit test it
     function claimYieldAndGetMarketAmount(
         uint256 totalValueRealizedForMarket,
-        uint256 marketPercentE5
+        uint256 marketPercentE18
     ) public override longShortOnly returns (uint256) {
         uint256 unrealizedYield = totalHeld -
             totalValueRealizedForMarket -
@@ -178,8 +175,8 @@ contract YieldManagerMock is IYieldManager {
             return 0;
         }
 
-        uint256 amountForMarketIncetives = (unrealizedYield * marketPercentE5) /
-            TEN_TO_THE_5;
+        uint256 amountForMarketIncetives = (unrealizedYield *
+            marketPercentE18) / TEN_TO_THE_18;
 
         uint256 amountForTreasury = unrealizedYield - amountForMarketIncetives;
 

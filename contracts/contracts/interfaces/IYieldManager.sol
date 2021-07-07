@@ -37,7 +37,7 @@ abstract contract IYieldManager {
      */
     function claimYieldAndGetMarketAmount(
         uint256 totalValueRealizedForMarket,
-        uint256 marketPercentE5
+        uint256 marketPercentE18
     ) public virtual returns (uint256 marketAmount);
 
     /*
