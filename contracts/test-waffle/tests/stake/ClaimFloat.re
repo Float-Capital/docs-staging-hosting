@@ -21,9 +21,6 @@ let smockedCalcAccumIterativeBinding = [%raw
 let iterativeMockCalculateAccumulatedFloatToReturn:
   array((Ethers.BigNumber.t, Ethers.BigNumber.t)) => unit =
   arr => {
-    StakerSmocked.InternalMock.checkForExceptions(
-      ~functionName="calculateAccumulatedFloatHelper",
-    );
     let _ =
       StakerSmocked.InternalMock.internalRef.contents
       ->Option.map(_r => smockedCalcAccumIterativeBinding(_r, arr));

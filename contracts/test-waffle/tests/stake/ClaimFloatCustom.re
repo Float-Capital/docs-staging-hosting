@@ -40,7 +40,7 @@ let test =
       let%AwaitThen _ =
         contracts^.staker
         ->Staker.Exposed.setClaimFloatCustomParams(
-            ~longshort=longShortSmockedRef^.address,
+            ~longshortAddress=longShortSmockedRef^.address,
           );
 
       let promise =

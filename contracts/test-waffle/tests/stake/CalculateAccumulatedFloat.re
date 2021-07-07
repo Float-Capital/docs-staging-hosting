@@ -123,42 +123,6 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
     );
 
     it(
-      "should throw (assert) if `usersLatestClaimedReward` is bigger than `newLatestRewardIndex`",
-      () => {
-        let {staker} = contracts.contents;
-        // exact value doesn't matter, must be zero!
-        let usersLatestClaimedReward = Helpers.randomInteger();
-        let newLatestRewardIndex =
-          usersLatestClaimedReward->sub(bnFromInt(1));
-
-        let%AwaitThen _ =
-          staker->Staker.Exposed.setFloatRewardCalcParams(
-            ~marketIndex,
-            ~longToken,
-            ~shortToken,
-            ~newLatestRewardIndex,
-            ~user,
-            ~usersLatestClaimedReward,
-            ~accumulativeFloatPerTokenLatestLong,
-            ~accumulativeFloatPerTokenLatestShort,
-            ~accumulativeFloatPerTokenUserLong,
-            ~accumulativeFloatPerTokenUserShort,
-            ~newUserAmountStakedLong,
-            ~newUserAmountStakedShort,
-          );
-        Chai.expectRevertNoReason(
-          ~transaction=
-            staker
-            ->Staker.Exposed.calculateAccumulatedFloatExposed(
-                ~marketIndex,
-                ~user,
-              )
-            ->Obj.magic,
-        );
-      },
-    );
-
-    it(
       "If the user has zero tokens staked they should get zero float tokens",
       () => {
       let {staker} = contracts.contents;

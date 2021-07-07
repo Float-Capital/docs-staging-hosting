@@ -180,7 +180,7 @@ let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
         ),
         staker->Staker.initialize(
           ~admin=admin.address,
-          ~longShortCoreContract=longShort.address,
+          ~longShort=longShort.address,
           ~floatToken=floatToken.address,
           ~floatCapital=floatCapital.address,
           ~floatPercentage=bnFromString("250000000000000000"),

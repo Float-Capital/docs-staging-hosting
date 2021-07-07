@@ -34,7 +34,7 @@ let test =
           ~contracts,
           ~accounts,
         );
-      StakerSmocked.InternalMock.mockCalculateNewCumulativeRateToReturn(
+      StakerSmocked.InternalMock.mockCalculateNewCumulativeValueToReturn(
         longAccum,
         shortAccum,
       );
@@ -64,8 +64,8 @@ let test =
       ();
     });
 
-    it("calls calculateNewCumulativeRate with correct arguments", () => {
-      StakerSmocked.InternalMock.calculateNewCumulativeRateCalls()
+    it("calls calculateNewCumulativeValue with correct arguments", () => {
+      StakerSmocked.InternalMock.calculateNewCumulativeValueCalls()
       ->Array.getExn(0)
       ->Chai.recordEqualFlat({
           marketIndex,
