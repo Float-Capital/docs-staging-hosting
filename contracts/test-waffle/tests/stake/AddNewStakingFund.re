@@ -32,6 +32,7 @@ let test =
           ~accounts,
         );
       StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn();
+      StakerSmocked.InternalMock.mock_changeUnstakeFeeToReturn();
       StakerSmocked.InternalMock.mockOnlyFloatToReturn();
       let%AwaitThen _ =
         (stakerRef^)
@@ -73,6 +74,15 @@ let test =
           marketIndex,
           period: kPeriod,
           initialMultiplier: kInitialMultiplier,
+        })
+    });
+
+    it("calls _changeUnstakeFee with correct arguments", () => {
+      StakerSmocked.InternalMock._changeUnstakeFeeCalls()
+      ->Array.getUnsafe(0)
+      ->Chai.recordEqualFlat({
+          marketIndex,
+          newMarketUnstakeFeeBasisPoints: unstakeFeeBasisPoints,
         })
     });
 

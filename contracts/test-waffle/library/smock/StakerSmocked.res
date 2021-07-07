@@ -297,15 +297,34 @@ let mockChangeFloatPercentageToReturn: t => unit = _r => {
   let _ = %raw("_r.smocked.changeFloatPercentage.will.return()")
 }
 
-type changeFloatPercentageCall = {newPercentage: int}
+type changeFloatPercentageCall = {newFloatPercentage: int}
 
 let changeFloatPercentageCalls: t => array<changeFloatPercentageCall> = _r => {
   let array = %raw("_r.smocked.changeFloatPercentage.calls")
   array->Array.map(_m => {
-    let newPercentage = _m->Array.getUnsafe(0)
+    let newFloatPercentage = _m->Array.getUnsafe(0)
 
     {
-      newPercentage: newPercentage,
+      newFloatPercentage: newFloatPercentage,
+    }
+  })
+}
+
+let mockChangeUnstakeFeeToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.changeUnstakeFee.will.return()")
+}
+
+type changeUnstakeFeeCall = {
+  marketIndex: int,
+  newMarketUnstakeFeeBasisPoints: Ethers.BigNumber.t,
+}
+
+let changeUnstakeFeeCalls: t => array<changeUnstakeFeeCall> = _r => {
+  let array = %raw("_r.smocked.changeUnstakeFee.calls")
+  array->Array.map(((marketIndex, newMarketUnstakeFeeBasisPoints)) => {
+    {
+      marketIndex: marketIndex,
+      newMarketUnstakeFeeBasisPoints: newMarketUnstakeFeeBasisPoints,
     }
   })
 }
@@ -580,7 +599,7 @@ module InternalMock = {
     })
   }
 
-  type changeFloatPercentageCall = {newPercentage: int}
+  type changeFloatPercentageCall = {newFloatPercentage: int}
 
   let changeFloatPercentageCalls: unit => array<changeFloatPercentageCall> = () => {
     checkForExceptions(~functionName="changeFloatPercentage")
@@ -588,10 +607,64 @@ module InternalMock = {
     ->Option.map(_r => {
       let array = %raw("_r.smocked.changeFloatPercentageMock.calls")
       array->Array.map(_m => {
-        let newPercentage = _m->Array.getUnsafe(0)
+        let newFloatPercentage = _m->Array.getUnsafe(0)
 
         {
-          newPercentage: newPercentage,
+          newFloatPercentage: newFloatPercentage,
+        }
+      })
+    })
+    ->Option.getExn
+  }
+
+  let mock_changeUnstakeFeeToReturn: unit => unit = () => {
+    checkForExceptions(~functionName="_changeUnstakeFee")
+    let _ = internalRef.contents->Option.map(_r => {
+      let _ = %raw("_r.smocked._changeUnstakeFeeMock.will.return()")
+    })
+  }
+
+  type _changeUnstakeFeeCall = {
+    marketIndex: int,
+    newMarketUnstakeFeeBasisPoints: Ethers.BigNumber.t,
+  }
+
+  let _changeUnstakeFeeCalls: unit => array<_changeUnstakeFeeCall> = () => {
+    checkForExceptions(~functionName="_changeUnstakeFee")
+    internalRef.contents
+    ->Option.map(_r => {
+      let array = %raw("_r.smocked._changeUnstakeFeeMock.calls")
+      array->Array.map(((marketIndex, newMarketUnstakeFeeBasisPoints)) => {
+        {
+          marketIndex: marketIndex,
+          newMarketUnstakeFeeBasisPoints: newMarketUnstakeFeeBasisPoints,
+        }
+      })
+    })
+    ->Option.getExn
+  }
+
+  let mockChangeUnstakeFeeToReturn: unit => unit = () => {
+    checkForExceptions(~functionName="changeUnstakeFee")
+    let _ = internalRef.contents->Option.map(_r => {
+      let _ = %raw("_r.smocked.changeUnstakeFeeMock.will.return()")
+    })
+  }
+
+  type changeUnstakeFeeCall = {
+    marketIndex: int,
+    newMarketUnstakeFeeBasisPoints: Ethers.BigNumber.t,
+  }
+
+  let changeUnstakeFeeCalls: unit => array<changeUnstakeFeeCall> = () => {
+    checkForExceptions(~functionName="changeUnstakeFee")
+    internalRef.contents
+    ->Option.map(_r => {
+      let array = %raw("_r.smocked.changeUnstakeFeeMock.calls")
+      array->Array.map(((marketIndex, newMarketUnstakeFeeBasisPoints)) => {
+        {
+          marketIndex: marketIndex,
+          newMarketUnstakeFeeBasisPoints: newMarketUnstakeFeeBasisPoints,
         }
       })
     })
