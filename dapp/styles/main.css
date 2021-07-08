@@ -17,16 +17,8 @@
   @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
 }
 
-.landing {
-  background: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)),
-    url("/backgrounds/clouds.png");
-  @apply font-default min-h-screen w-screen bg-right-bottom bg-cover bg-gray-50;
-}
-
-.ecosystem-partners {
-  background: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)),
-    url("/backgrounds/clouds-flipped.png");
-  @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
+.custom-cursor {
+  cursor: url("/cursors/pointer-colorful-edit.png"), auto;
 }
 
 .logo-container {

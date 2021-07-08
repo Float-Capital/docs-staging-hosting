@@ -139,18 +139,16 @@ function MarketCard$Mini(Props) {
   var match = param.latestSystemState;
   var totalValueLocked = match.totalValueLocked;
   var marketIndex = param.marketIndex;
-  var marketName = param.name;
+  var router = Router.useRouter();
   return React.createElement(Link, {
               href: "/?marketIndex=" + marketIndex.toString(),
               children: React.createElement("div", {
-                    className: "p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 cursor-pointer shadow-lg hover:shadow-xl h-full justify-center w-full"
+                    className: "p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 custom-cursor shadow-lg hover:shadow-xl h-full justify-center w-full"
                   }, React.createElement("div", {
                         className: "flex justify-center w-full my-1"
                       }, React.createElement("h1", {
-                            className: "font-bold text-xl font-alphbeta cursor-pointer hover:underline"
-                          }, marketName, React.createElement(Tooltip.make, {
-                                tip: "This market tracks " + marketName
-                              }))), React.createElement("div", {
+                            className: "font-bold text-xl font-alphbeta uppercase custom-cursor hover:underline"
+                          }, param.name)), React.createElement("div", {
                         className: "flex flex-wrap justify-center w-full"
                       }, React.createElement("div", {
                             className: "order-2  w-1/2  flex items-center flex grow flex-wrap flex-col"
@@ -168,7 +166,21 @@ function MarketCard$Mini(Props) {
                         className: "block pt-5"
                       }, React.createElement("div", {
                             className: "px-8"
-                          }, liquidityRatio(totalValueLocked, match.totalLockedLong)), mintButtons(marketIndex)))
+                          }, liquidityRatio(totalValueLocked, match.totalLockedLong)), React.createElement("div", {
+                            className: "flex w-full justify-around"
+                          }, React.createElement(Button.Tiny.make, {
+                                onClick: (function ($$event) {
+                                    $$event.preventDefault();
+                                    return Next.Router.pushShallow(router, "/mint?marketIndex=" + marketIndex.toString() + "&actionOption=long");
+                                  }),
+                                children: "Mint Long"
+                              }), React.createElement(Button.Tiny.make, {
+                                onClick: (function ($$event) {
+                                    $$event.preventDefault();
+                                    return Next.Router.pushShallow(router, "/mint?marketIndex=" + marketIndex.toString() + "&actionOption=short");
+                                  }),
+                                children: "Mint Short"
+                              }))))
             });
 }
 

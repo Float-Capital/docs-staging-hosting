@@ -181,12 +181,14 @@ module Mini = {
       latestSystemState: {totalLockedLong, totalValueLocked},
     }: Queries.SyntheticMarketInfo.t,
   ) => {
+    let router = Next.Router.useRouter()
+
     <Next.Link href={`/?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
       <div
-        className="p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 cursor-pointer shadow-lg hover:shadow-xl h-full justify-center w-full">
+        className="p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 custom-cursor shadow-lg hover:shadow-xl h-full justify-center w-full">
         <div className="flex justify-center w-full my-1">
-          <h1 className="font-bold text-xl font-alphbeta cursor-pointer hover:underline">
-            {marketName->React.string} <Tooltip tip={`This market tracks ${marketName}`} />
+          <h1 className="font-bold text-xl font-alphbeta uppercase custom-cursor hover:underline">
+            {marketName->React.string}
           </h1>
         </div>
         <div className="flex flex-wrap justify-center w-full">
@@ -208,7 +210,26 @@ module Mini = {
         </div>
         <div className="block pt-5">
           <div className="px-8"> {liquidityRatio(~totalValueLocked, ~totalLockedLong)} </div>
-          {mintButtons(~marketIndex)}
+          <div className={`flex w-full justify-around`}>
+            <Button.Tiny
+              onClick={event => {
+                ReactEvent.Mouse.preventDefault(event)
+                router->Next.Router.pushShallow(
+                  `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=long`,
+                )
+              }}>
+              "Mint Long"
+            </Button.Tiny>
+            <Button.Tiny
+              onClick={event => {
+                ReactEvent.Mouse.preventDefault(event)
+                router->Next.Router.pushShallow(
+                  `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=short`,
+                )
+              }}>
+              "Mint Short"
+            </Button.Tiny>
+          </div>
         </div>
       </div>
     </Next.Link>
