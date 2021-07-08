@@ -38,8 +38,6 @@ contract LongShortMockable is ILongShort, Initializable {
 
         address public constant DEAD_ADDRESS =
         0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
-    uint256 public constant TEN_TO_THE_18 = 1e18;
-    int256 public constant TEN_TO_THE_18_SIGNED = 1e18;
     uint256[45] private __constantsGap;
 
         address public admin;
@@ -415,7 +413,7 @@ contract LongShortMockable is ILongShort, Initializable {
     }
   
         syntheticTokenPrice =
-            (syntheticTokenPoolValue[marketIndex][isLong] * TEN_TO_THE_18) /
+            (syntheticTokenPoolValue[marketIndex][isLong] * 1e18) /
             syntheticTokens[marketIndex][isLong].totalSupply();
     }
 
@@ -427,7 +425,7 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._getAmountPaymentTokenMock(amountSynth,price);
     }
   
-        return (amountSynth * price) / TEN_TO_THE_18;
+        return (amountSynth * price) / 1e18;
     }
 
     function _getAmountSynthToken(uint256 amountPaymentToken, uint256 price)
@@ -438,7 +436,7 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._getAmountSynthTokenMock(amountPaymentToken,price);
     }
   
-        return (amountPaymentToken * TEN_TO_THE_18) / price;
+        return (amountPaymentToken * 1e18) / price;
     }
 
     
@@ -483,6 +481,19 @@ contract LongShortMockable is ILongShort, Initializable {
         }
     }
 
+    function floor(uint256 a, uint256 b) internal view returns (uint256) {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("floor"))){
+      
+      return mocker.floorMock(a,b);
+    }
+  
+        if (a > b) {
+            return b;
+        } else {
+            return a;
+        }
+    }
+
     
 
     function _getYieldSplit(
@@ -506,9 +517,14 @@ contract LongShortMockable is ILongShort, Initializable {
         } else {
             imbalance = longValue - shortValue;
         }
-                uint256 marketPercentE18 = ((imbalance * TEN_TO_THE_18) /
-            totalValueLockedInMarket);
-        treasuryPercentE18 = TEN_TO_THE_18 - marketPercentE18;
+
+        uint256 marketTreasurySplitSlopE18 = 1e18; 
+        uint256 marketPercentCalculatedE18 = (imbalance *
+            marketTreasurySplitSlopE18) / totalValueLockedInMarket;
+
+        uint256 marketPercentE18 = floor(marketPercentCalculatedE18, 1e18);
+
+        treasuryPercentE18 = 1e18 - marketPercentE18;
     }
 
     
@@ -565,11 +581,10 @@ contract LongShortMockable is ILongShort, Initializable {
             min = syntheticTokenPoolValue[marketIndex][false];
         }
 
-        int256 percentageChangeE18 = ((newAssetPrice - oldAssetPrice) *
-            TEN_TO_THE_18_SIGNED) / oldAssetPrice;
+        int256 percentageChangeE18 = ((newAssetPrice - oldAssetPrice) * 1e18) /
+            oldAssetPrice;
 
-        int256 valueChange = (percentageChangeE18 * int256(min)) /
-            TEN_TO_THE_18_SIGNED;
+        int256 valueChange = (percentageChangeE18 * int256(min)) / 1e18;
 
         if (valueChange > 0) {
             syntheticTokenPoolValue[marketIndex][true] += uint256(valueChange);

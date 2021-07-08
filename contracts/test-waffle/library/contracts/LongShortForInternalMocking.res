@@ -244,6 +244,11 @@ external executeOutstandingNextPriceSettlementsUserMock: (
 ) => JsPromise.t<executeOutstandingNextPriceSettlementsUserMockReturn> =
   "executeOutstandingNextPriceSettlementsUserMock"
 
+type floorMockReturn = Ethers.BigNumber.t
+@send
+external floorMock: (t, Ethers.BigNumber.t, Ethers.BigNumber.t) => JsPromise.t<floorMockReturn> =
+  "floorMock"
+
 type getUsersConfirmedButNotSettledBalanceMockReturn = Ethers.BigNumber.t
 @send
 external getUsersConfirmedButNotSettledBalanceMock: (

@@ -17,32 +17,6 @@ let dEAD_ADDRESSCalls: t => array<dEAD_ADDRESSCall> = _r => {
   })
 }
 
-let mockTEN_TO_THE_18ToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.TEN_TO_THE_18.will.return.with([_param0])")
-}
-
-type tEN_TO_THE_18Call
-
-let tEN_TO_THE_18Calls: t => array<tEN_TO_THE_18Call> = _r => {
-  let array = %raw("_r.smocked.TEN_TO_THE_18.calls")
-  array->Array.map(() => {
-    ()->Obj.magic
-  })
-}
-
-let mockTEN_TO_THE_18_SIGNEDToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.TEN_TO_THE_18_SIGNED.will.return.with([_param0])")
-}
-
-type tEN_TO_THE_18_SIGNEDCall
-
-let tEN_TO_THE_18_SIGNEDCalls: t => array<tEN_TO_THE_18_SIGNEDCall> = _r => {
-  let array = %raw("_r.smocked.TEN_TO_THE_18_SIGNED.calls")
-  array->Array.map(() => {
-    ()->Obj.magic
-  })
-}
-
 let mockAdminToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.admin.will.return.with([_param0])")
 }
@@ -1047,6 +1021,33 @@ module InternalMock = {
           user: user,
           marketIndex: marketIndex,
           isLong: isLong,
+        }
+      })
+    })
+    ->Option.getExn
+  }
+
+  let mockFloorToReturn: Ethers.BigNumber.t => unit = _param0 => {
+    checkForExceptions(~functionName="floor")
+    let _ = internalRef.contents->Option.map(_r => {
+      let _ = %raw("_r.smocked.floorMock.will.return.with([_param0])")
+    })
+  }
+
+  type floorCall = {
+    a: Ethers.BigNumber.t,
+    b: Ethers.BigNumber.t,
+  }
+
+  let floorCalls: unit => array<floorCall> = () => {
+    checkForExceptions(~functionName="floor")
+    internalRef.contents
+    ->Option.map(_r => {
+      let array = %raw("_r.smocked.floorMock.calls")
+      array->Array.map(((a, b)) => {
+        {
+          a: a,
+          b: b,
         }
       })
     })

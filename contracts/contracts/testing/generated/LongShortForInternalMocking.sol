@@ -55,6 +55,10 @@ contract LongShortForInternalMocking {
       return (abi.decode("",(uint256)));
     }
      
+    function floorMock(uint256,uint256) public pure returns (uint256 ){
+      return (abi.decode("",(uint256)));
+    }
+     
     function _getYieldSplitMock(uint256,uint256,uint256) public pure returns (bool isLongSideUnderbalanced,uint256 treasuryPercentE18){
       return (abi.decode("",(bool)),abi.decode("",(uint256)));
     }

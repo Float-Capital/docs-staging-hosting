@@ -19,30 +19,6 @@ function dEAD_ADDRESSCalls(_r) {
               }));
 }
 
-function mockTEN_TO_THE_18ToReturn(_r, _param0) {
-  ((_r.smocked.TEN_TO_THE_18.will.return.with([_param0])));
-  
-}
-
-function tEN_TO_THE_18Calls(_r) {
-  var array = (_r.smocked.TEN_TO_THE_18.calls);
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
-function mockTEN_TO_THE_18_SIGNEDToReturn(_r, _param0) {
-  ((_r.smocked.TEN_TO_THE_18_SIGNED.will.return.with([_param0])));
-  
-}
-
-function tEN_TO_THE_18_SIGNEDCalls(_r) {
-  var array = (_r.smocked.TEN_TO_THE_18_SIGNED.calls);
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
 function mockAdminToReturn(_r, _param0) {
   ((_r.smocked.admin.will.return.with([_param0])));
   
@@ -842,6 +818,28 @@ function getUsersConfirmedButNotSettledBalanceCalls$1(param) {
                   })));
 }
 
+function mockFloorToReturn(_param0) {
+  checkForExceptions("floor");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.floorMock.will.return.with([_param0])));
+          
+        }));
+  
+}
+
+function floorCalls(param) {
+  checkForExceptions("floor");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.floorMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          a: param[0],
+                                          b: param[1]
+                                        };
+                                }));
+                  })));
+}
+
 function mock_getYieldSplitToReturn(_param0, _param1) {
   checkForExceptions("_getYieldSplit");
   Belt_Option.map(internalRef.contents, (function (_r) {
@@ -1545,6 +1543,8 @@ var InternalMock = {
   _getAmountSynthTokenCalls: _getAmountSynthTokenCalls,
   mockGetUsersConfirmedButNotSettledBalanceToReturn: mockGetUsersConfirmedButNotSettledBalanceToReturn$1,
   getUsersConfirmedButNotSettledBalanceCalls: getUsersConfirmedButNotSettledBalanceCalls$1,
+  mockFloorToReturn: mockFloorToReturn,
+  floorCalls: floorCalls,
   mock_getYieldSplitToReturn: mock_getYieldSplitToReturn,
   _getYieldSplitCalls: _getYieldSplitCalls,
   mock_claimAndDistributeYieldToReturn: mock_claimAndDistributeYieldToReturn,
@@ -1612,10 +1612,6 @@ var uninitializedValue;
 exports.uninitializedValue = uninitializedValue;
 exports.mockDEAD_ADDRESSToReturn = mockDEAD_ADDRESSToReturn;
 exports.dEAD_ADDRESSCalls = dEAD_ADDRESSCalls;
-exports.mockTEN_TO_THE_18ToReturn = mockTEN_TO_THE_18ToReturn;
-exports.tEN_TO_THE_18Calls = tEN_TO_THE_18Calls;
-exports.mockTEN_TO_THE_18_SIGNEDToReturn = mockTEN_TO_THE_18_SIGNEDToReturn;
-exports.tEN_TO_THE_18_SIGNEDCalls = tEN_TO_THE_18_SIGNEDCalls;
 exports.mockAdminToReturn = mockAdminToReturn;
 exports.adminCalls = adminCalls;
 exports.mockAssetPriceToReturn = mockAssetPriceToReturn;
