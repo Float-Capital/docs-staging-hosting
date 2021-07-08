@@ -1,7 +1,12 @@
 const primaryColor = "#0d4184";
 const primaryLightColor = "#1151A6";
 const lightGold = "#fff3e6";
-const lightBlue = "#AAD4EC";
+const pastelBlue = "#AAD4EC";
+const pastelPurple = "#cec8e8";
+const pastelOrange = "#fcded4";
+const pastelPink = "#f1d7e4";
+const pastelDarkBlue = "#7497c6";
+const pastelYellow = "#E2F6F7";
 module.exports = {
   purge: {
     // Specify the paths to all of the template files in your project
@@ -17,7 +22,12 @@ module.exports = {
         ...theme("colors"),
         primary: primaryColor,
         "primary-light": primaryLightColor,
-        "theme-light-blue": lightBlue,
+        "pastel-blue": pastelBlue,
+        "pastel-purple": pastelPurple,
+        "pastel-orange": pastelOrange,
+        "pastel-pink": pastelPink,
+        "pastel-dark-blue": pastelDarkBlue,
+        "pastel-yellow": pastelYellow,
       }),
     },
     /* Most of the time we customize the font-sizes,
@@ -58,16 +68,34 @@ module.exports = {
       ...theme("colors"),
       DEFAULT: primaryColor,
       "primary-light": primaryLightColor,
+      "pastel-blue": pastelBlue,
+      "pastel-purple": pastelPurple,
+      "pastel-orange": pastelOrange,
+      "pastel-pink": pastelPink,
+      "pastel-dark-blue": pastelDarkBlue,
+      "pastel-yellow": pastelYellow,
     }),
     backgroundColor: (theme) => ({
       ...theme("colors"),
       primary: primaryColor,
       "primary-light": primaryLightColor,
       "light-gold": lightGold,
+      "pastel-blue": pastelBlue,
+      "pastel-purple": pastelPurple,
+      "pastel-orange": pastelOrange,
+      "pastel-pink": pastelPink,
+      "pastel-dark-blue": pastelDarkBlue,
+      "pastel-yellow": pastelYellow,
     }),
     textColor: {
       primary: primaryColor,
       "primary-light": primaryLightColor,
+      "pastel-blue": pastelBlue,
+      "pastel-purple": pastelPurple,
+      "pastel-orange": pastelOrange,
+      "pastel-pink": pastelPink,
+      "pastel-dark-blue": pastelDarkBlue,
+      "pastel-yellow": pastelYellow,
     },
     letterSpacing: {
       tighter: "-.05em",
