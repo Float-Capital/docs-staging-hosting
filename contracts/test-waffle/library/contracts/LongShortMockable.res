@@ -12,14 +12,6 @@ type dEAD_ADDRESSReturn = Ethers.ethAddress
 @send
 external dEAD_ADDRESS: t => JsPromise.t<dEAD_ADDRESSReturn> = "DEAD_ADDRESS"
 
-type tEN_TO_THE_18Return = Ethers.BigNumber.t
-@send
-external tEN_TO_THE_18: t => JsPromise.t<tEN_TO_THE_18Return> = "TEN_TO_THE_18"
-
-type tEN_TO_THE_18_SIGNEDReturn = Ethers.BigNumber.t
-@send
-external tEN_TO_THE_18_SIGNED: t => JsPromise.t<tEN_TO_THE_18_SIGNEDReturn> = "TEN_TO_THE_18_SIGNED"
-
 type adminReturn = Ethers.ethAddress
 @send
 external admin: t => JsPromise.t<adminReturn> = "admin"

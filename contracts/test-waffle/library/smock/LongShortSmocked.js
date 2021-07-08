@@ -19,30 +19,6 @@ function dEAD_ADDRESSCalls(_r) {
               }));
 }
 
-function mockTEN_TO_THE_18ToReturn(_r, _param0) {
-  ((_r.smocked.TEN_TO_THE_18.will.return.with([_param0])));
-  
-}
-
-function tEN_TO_THE_18Calls(_r) {
-  var array = (_r.smocked.TEN_TO_THE_18.calls);
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
-function mockTEN_TO_THE_18_SIGNEDToReturn(_r, _param0) {
-  ((_r.smocked.TEN_TO_THE_18_SIGNED.will.return.with([_param0])));
-  
-}
-
-function tEN_TO_THE_18_SIGNEDCalls(_r) {
-  var array = (_r.smocked.TEN_TO_THE_18_SIGNED.calls);
-  return Belt_Array.map(array, (function (param) {
-                
-              }));
-}
-
 function mockAdminToReturn(_r, _param0) {
   ((_r.smocked.admin.will.return.with([_param0])));
   
@@ -842,89 +818,46 @@ function getUsersConfirmedButNotSettledBalanceCalls$1(param) {
                   })));
 }
 
-function mock_getMarketPercentForTreasuryVsMarketSplitToReturn(_param0) {
-  checkForExceptions("_getMarketPercentForTreasuryVsMarketSplit");
+function mockFloorToReturn(_param0) {
+  checkForExceptions("floor");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._getMarketPercentForTreasuryVsMarketSplitMock.will.return.with([_param0])));
+          ((_r.smocked.floorMock.will.return.with([_param0])));
           
         }));
   
 }
 
-function _getMarketPercentForTreasuryVsMarketSplitCalls(param) {
-  checkForExceptions("_getMarketPercentForTreasuryVsMarketSplit");
+function floorCalls(param) {
+  checkForExceptions("floor");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._getMarketPercentForTreasuryVsMarketSplitMock.calls;
-                    return Belt_Array.map(array, (function (_m) {
-                                  var marketIndex = _m[0];
-                                  return {
-                                          marketIndex: marketIndex
-                                        };
-                                }));
-                  })));
-}
-
-function mock_getLongPercentForLongVsShortSplitToReturn(_param0) {
-  checkForExceptions("_getLongPercentForLongVsShortSplit");
-  Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._getLongPercentForLongVsShortSplitMock.will.return.with([_param0])));
-          
-        }));
-  
-}
-
-function _getLongPercentForLongVsShortSplitCalls(param) {
-  checkForExceptions("_getLongPercentForLongVsShortSplit");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._getLongPercentForLongVsShortSplitMock.calls;
-                    return Belt_Array.map(array, (function (_m) {
-                                  var marketIndex = _m[0];
-                                  return {
-                                          marketIndex: marketIndex
-                                        };
-                                }));
-                  })));
-}
-
-function mock_getMarketSplitToReturn(_param0, _param1) {
-  checkForExceptions("_getMarketSplit");
-  Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._getMarketSplitMock.will.return.with([_param0,_param1])));
-          
-        }));
-  
-}
-
-function _getMarketSplitCalls(param) {
-  checkForExceptions("_getMarketSplit");
-  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._getMarketSplitMock.calls;
+                    var array = _r.smocked.floorMock.calls;
                     return Belt_Array.map(array, (function (param) {
                                   return {
-                                          marketIndex: param[0],
-                                          amount: param[1]
+                                          a: param[0],
+                                          b: param[1]
                                         };
                                 }));
                   })));
 }
 
-function mock_distributeMarketAmountToReturn(param) {
-  checkForExceptions("_distributeMarketAmount");
+function mock_getYieldSplitToReturn(_param0, _param1) {
+  checkForExceptions("_getYieldSplit");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked._distributeMarketAmountMock.will.return()));
+          ((_r.smocked._getYieldSplitMock.will.return.with([_param0,_param1])));
           
         }));
   
 }
 
-function _distributeMarketAmountCalls(param) {
-  checkForExceptions("_distributeMarketAmount");
+function _getYieldSplitCalls(param) {
+  checkForExceptions("_getYieldSplit");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked._distributeMarketAmountMock.calls;
+                    var array = _r.smocked._getYieldSplitMock.calls;
                     return Belt_Array.map(array, (function (param) {
                                   return {
-                                          marketIndex: param[0],
-                                          marketAmount: param[1]
+                                          longValue: param[0],
+                                          shortValue: param[1],
+                                          totalValueLockedInMarket: param[2]
                                         };
                                 }));
                   })));
@@ -1610,14 +1543,10 @@ var InternalMock = {
   _getAmountSynthTokenCalls: _getAmountSynthTokenCalls,
   mockGetUsersConfirmedButNotSettledBalanceToReturn: mockGetUsersConfirmedButNotSettledBalanceToReturn$1,
   getUsersConfirmedButNotSettledBalanceCalls: getUsersConfirmedButNotSettledBalanceCalls$1,
-  mock_getMarketPercentForTreasuryVsMarketSplitToReturn: mock_getMarketPercentForTreasuryVsMarketSplitToReturn,
-  _getMarketPercentForTreasuryVsMarketSplitCalls: _getMarketPercentForTreasuryVsMarketSplitCalls,
-  mock_getLongPercentForLongVsShortSplitToReturn: mock_getLongPercentForLongVsShortSplitToReturn,
-  _getLongPercentForLongVsShortSplitCalls: _getLongPercentForLongVsShortSplitCalls,
-  mock_getMarketSplitToReturn: mock_getMarketSplitToReturn,
-  _getMarketSplitCalls: _getMarketSplitCalls,
-  mock_distributeMarketAmountToReturn: mock_distributeMarketAmountToReturn,
-  _distributeMarketAmountCalls: _distributeMarketAmountCalls,
+  mockFloorToReturn: mockFloorToReturn,
+  floorCalls: floorCalls,
+  mock_getYieldSplitToReturn: mock_getYieldSplitToReturn,
+  _getYieldSplitCalls: _getYieldSplitCalls,
   mock_claimAndDistributeYieldToReturn: mock_claimAndDistributeYieldToReturn,
   _claimAndDistributeYieldCalls: _claimAndDistributeYieldCalls,
   mock_adjustMarketBasedOnNewAssetPriceToReturn: mock_adjustMarketBasedOnNewAssetPriceToReturn,
@@ -1683,10 +1612,6 @@ var uninitializedValue;
 exports.uninitializedValue = uninitializedValue;
 exports.mockDEAD_ADDRESSToReturn = mockDEAD_ADDRESSToReturn;
 exports.dEAD_ADDRESSCalls = dEAD_ADDRESSCalls;
-exports.mockTEN_TO_THE_18ToReturn = mockTEN_TO_THE_18ToReturn;
-exports.tEN_TO_THE_18Calls = tEN_TO_THE_18Calls;
-exports.mockTEN_TO_THE_18_SIGNEDToReturn = mockTEN_TO_THE_18_SIGNEDToReturn;
-exports.tEN_TO_THE_18_SIGNEDCalls = tEN_TO_THE_18_SIGNEDCalls;
 exports.mockAdminToReturn = mockAdminToReturn;
 exports.adminCalls = adminCalls;
 exports.mockAssetPriceToReturn = mockAssetPriceToReturn;

@@ -25,8 +25,6 @@ contract LongShort is ILongShort, Initializable {
     // Fixed-precision constants
     address public constant DEAD_ADDRESS =
         0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
-    uint256 public constant TEN_TO_THE_18 = 1e18;
-    int256 public constant TEN_TO_THE_18_SIGNED = 1e18;
     uint256[45] private __constantsGap;
 
     // Global state
@@ -353,7 +351,7 @@ contract LongShort is ILongShort, Initializable {
         returns (uint256 syntheticTokenPrice)
     {
         syntheticTokenPrice =
-            (syntheticTokenPoolValue[marketIndex][isLong] * TEN_TO_THE_18) /
+            (syntheticTokenPoolValue[marketIndex][isLong] * 1e18) /
             syntheticTokens[marketIndex][isLong].totalSupply();
     }
 
@@ -362,7 +360,7 @@ contract LongShort is ILongShort, Initializable {
         pure
         returns (uint256)
     {
-        return (amountSynth * price) / TEN_TO_THE_18;
+        return (amountSynth * price) / 1e18;
     }
 
     function _getAmountSynthToken(uint256 amountPaymentToken, uint256 price)
@@ -370,7 +368,7 @@ contract LongShort is ILongShort, Initializable {
         pure
         returns (uint256)
     {
-        return (amountPaymentToken * TEN_TO_THE_18) / price;
+        return (amountPaymentToken * 1e18) / price;
     }
 
     /*
@@ -417,6 +415,14 @@ contract LongShort is ILongShort, Initializable {
         }
     }
 
+    function floor(uint256 a, uint256 b) internal pure returns (uint256) {
+        if (a > b) {
+            return b;
+        } else {
+            return a;
+        }
+    }
+
     /**
      * Returns the amount of accrued value that should go to each side of the
      * market. To incentivise balance, more value goes to the weaker side in
@@ -429,19 +435,24 @@ contract LongShort is ILongShort, Initializable {
     )
         internal
         view
-        returns (bool underBalancedSide, uint256 treasuryPercentE18)
+        returns (bool isLongSideUnderbalanced, uint256 treasuryPercentE18)
     {
-        underBalancedSide = longValue < shortValue;
+        isLongSideUnderbalanced = longValue < shortValue;
         uint256 imbalance;
-        if (underBalancedSide) {
-            imbalance = longValue - shortValue;
-        } else {
+        if (isLongSideUnderbalanced) {
             imbalance = shortValue - longValue;
+        } else {
+            imbalance = longValue - shortValue;
         }
-        // This is a stupid linear line... How to make this a better curve?
-        uint256 marketPercentE18 = ((imbalance * TEN_TO_THE_18) /
-            totalValueLockedInMarket);
-        treasuryPercentE18 = TEN_TO_THE_18 - marketPercentE18;
+
+        uint256 marketTreasurySplitSlopE18 = 1e18; // This slope can be adjusted.
+
+        uint256 marketPercentCalculatedE18 = (imbalance *
+            marketTreasurySplitSlopE18) / totalValueLockedInMarket;
+
+        uint256 marketPercentE18 = floor(marketPercentCalculatedE18, 1e18);
+
+        treasuryPercentE18 = 1e18 - marketPercentE18;
     }
 
     /*╔══════════════════════════════╗
@@ -457,7 +468,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 totalValueLockedInMarket = longValue + shortValue;
 
         (
-            bool underBalancedSide,
+            bool isLongSideUnderbalanced,
             uint256 treasuryYieldPercentE18
         ) = _getYieldSplit(longValue, shortValue, totalValueLockedInMarket);
 
@@ -469,7 +480,7 @@ contract LongShort is ILongShort, Initializable {
 
         if (marketAmount > 0) {
             syntheticTokenPoolValue[marketIndex][
-                underBalancedSide
+                isLongSideUnderbalanced
             ] += marketAmount;
         }
     }
@@ -490,11 +501,10 @@ contract LongShort is ILongShort, Initializable {
             min = syntheticTokenPoolValue[marketIndex][false];
         }
 
-        int256 percentageChangeE18 = ((newAssetPrice - oldAssetPrice) *
-            TEN_TO_THE_18_SIGNED) / oldAssetPrice;
+        int256 percentageChangeE18 = ((newAssetPrice - oldAssetPrice) * 1e18) /
+            oldAssetPrice;
 
-        int256 valueChange = (percentageChangeE18 * int256(min)) /
-            TEN_TO_THE_18_SIGNED;
+        int256 valueChange = (percentageChangeE18 * int256(min)) / 1e18;
 
         if (valueChange > 0) {
             syntheticTokenPoolValue[marketIndex][true] += uint256(valueChange);

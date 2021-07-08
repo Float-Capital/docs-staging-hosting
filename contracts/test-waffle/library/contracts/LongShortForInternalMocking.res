@@ -36,14 +36,6 @@ type _depositFundsMockReturn
 external _depositFundsMock: (t, int, Ethers.BigNumber.t) => JsPromise.t<_depositFundsMockReturn> =
   "_depositFundsMock"
 
-type _distributeMarketAmountMockReturn
-@send
-external _distributeMarketAmountMock: (
-  t,
-  int,
-  Ethers.BigNumber.t,
-) => JsPromise.t<_distributeMarketAmountMockReturn> = "_distributeMarketAmountMock"
-
 type _executeNextPriceMintsIfTheyExistMockReturn
 @send
 external _executeNextPriceMintsIfTheyExistMock: (
@@ -89,32 +81,17 @@ external _getAmountSynthTokenMock: (
   Ethers.BigNumber.t,
 ) => JsPromise.t<_getAmountSynthTokenMockReturn> = "_getAmountSynthTokenMock"
 
-type _getLongPercentForLongVsShortSplitMockReturn = Ethers.BigNumber.t
-@send
-external _getLongPercentForLongVsShortSplitMock: (
-  t,
-  int,
-) => JsPromise.t<_getLongPercentForLongVsShortSplitMockReturn> =
-  "_getLongPercentForLongVsShortSplitMock"
-
-type _getMarketPercentForTreasuryVsMarketSplitMockReturn = Ethers.BigNumber.t
-@send
-external _getMarketPercentForTreasuryVsMarketSplitMock: (
-  t,
-  int,
-) => JsPromise.t<_getMarketPercentForTreasuryVsMarketSplitMockReturn> =
-  "_getMarketPercentForTreasuryVsMarketSplitMock"
-
-type _getMarketSplitMockReturn = {
-  longAmount: Ethers.BigNumber.t,
-  shortAmount: Ethers.BigNumber.t,
+type _getYieldSplitMockReturn = {
+  isLongSideUnderbalanced: bool,
+  treasuryPercentE18: Ethers.BigNumber.t,
 }
 @send
-external _getMarketSplitMock: (
+external _getYieldSplitMock: (
   t,
-  int,
   Ethers.BigNumber.t,
-) => JsPromise.t<_getMarketSplitMockReturn> = "_getMarketSplitMock"
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+) => JsPromise.t<_getYieldSplitMockReturn> = "_getYieldSplitMock"
 
 type _handleBatchedDepositSettlementMockReturn
 @send
@@ -266,6 +243,11 @@ external executeOutstandingNextPriceSettlementsUserMock: (
   int,
 ) => JsPromise.t<executeOutstandingNextPriceSettlementsUserMockReturn> =
   "executeOutstandingNextPriceSettlementsUserMock"
+
+type floorMockReturn = Ethers.BigNumber.t
+@send
+external floorMock: (t, Ethers.BigNumber.t, Ethers.BigNumber.t) => JsPromise.t<floorMockReturn> =
+  "floorMock"
 
 type getUsersConfirmedButNotSettledBalanceMockReturn = Ethers.BigNumber.t
 @send
