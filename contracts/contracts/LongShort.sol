@@ -429,14 +429,14 @@ contract LongShort is ILongShort, Initializable {
     )
         internal
         view
-        returns (bool underBalancedSide, uint256 treasuryPercentE18)
+        returns (bool isLongSideUnderbalanced, uint256 treasuryPercentE18)
     {
-        underBalancedSide = longValue < shortValue;
+        isLongSideUnderbalanced = longValue < shortValue;
         uint256 imbalance;
-        if (underBalancedSide) {
-            imbalance = longValue - shortValue;
-        } else {
+        if (isLongSideUnderbalanced) {
             imbalance = shortValue - longValue;
+        } else {
+            imbalance = longValue - shortValue;
         }
         // This is a stupid linear line... How to make this a better curve?
         uint256 marketPercentE18 = ((imbalance * TEN_TO_THE_18) /
@@ -457,7 +457,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 totalValueLockedInMarket = longValue + shortValue;
 
         (
-            bool underBalancedSide,
+            bool isLongSideUnderbalanced,
             uint256 treasuryYieldPercentE18
         ) = _getYieldSplit(longValue, shortValue, totalValueLockedInMarket);
 
@@ -469,7 +469,7 @@ contract LongShort is ILongShort, Initializable {
 
         if (marketAmount > 0) {
             syntheticTokenPoolValue[marketIndex][
-                underBalancedSide
+                isLongSideUnderbalanced
             ] += marketAmount;
         }
     }

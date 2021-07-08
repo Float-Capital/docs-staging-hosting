@@ -483,96 +483,36 @@ contract LongShortMockable is ILongShort, Initializable {
         }
     }
 
-    function _getMarketPercentForTreasuryVsMarketSplit(uint32 marketIndex)
+    
+
+    function _getYieldSplit(
+        uint256 longValue,
+        uint256 shortValue,
+        uint256 totalValueLockedInMarket
+    )
         internal
         view
-        returns (uint256 marketPercentE18)
+        returns (bool isLongSideUnderbalanced, uint256 treasuryPercentE18)
     {
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_getMarketPercentForTreasuryVsMarketSplit"))){
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_getYieldSplit"))){
       
-      return mocker._getMarketPercentForTreasuryVsMarketSplitMock(marketIndex);
+      return mocker._getYieldSplitMock(longValue,shortValue,totalValueLockedInMarket);
     }
   
-        uint256 totalValueLockedInMarket = syntheticTokenPoolValue[marketIndex][
-            true
-        ] + syntheticTokenPoolValue[marketIndex][false];
-
-        if (
-            syntheticTokenPoolValue[marketIndex][true] >
-            syntheticTokenPoolValue[marketIndex][false]
-        ) {
-            marketPercentE18 =
-                ((syntheticTokenPoolValue[marketIndex][true] -
-                    syntheticTokenPoolValue[marketIndex][false]) *
-                    TEN_TO_THE_18) /
-                totalValueLockedInMarket;
+        isLongSideUnderbalanced = longValue < shortValue;
+        uint256 imbalance;
+        if (isLongSideUnderbalanced) {
+            imbalance = shortValue - longValue;
         } else {
-            marketPercentE18 =
-                ((syntheticTokenPoolValue[marketIndex][false] -
-                    syntheticTokenPoolValue[marketIndex][true]) *
-                    TEN_TO_THE_18) /
-                totalValueLockedInMarket;
+            imbalance = longValue - shortValue;
         }
-
-        return marketPercentE18;
-    }
-
-    function _getLongPercentForLongVsShortSplit(uint32 marketIndex)
-        internal
-        view
-        returns (uint256 longPercentE18)
-    {
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_getLongPercentForLongVsShortSplit"))){
-      
-      return mocker._getLongPercentForLongVsShortSplitMock(marketIndex);
-    }
-  
-        return
-            (syntheticTokenPoolValue[marketIndex][false] * TEN_TO_THE_18) /
-            (syntheticTokenPoolValue[marketIndex][true] +
-                syntheticTokenPoolValue[marketIndex][false]);
+                uint256 marketPercentE18 = ((imbalance * TEN_TO_THE_18) /
+            totalValueLockedInMarket);
+        treasuryPercentE18 = TEN_TO_THE_18 - marketPercentE18;
     }
 
     
 
-    function _getMarketSplit(uint32 marketIndex, uint256 amount)
-        internal
-        view
-        returns (uint256 longAmount, uint256 shortAmount)
-    {
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_getMarketSplit"))){
-      
-      return mocker._getMarketSplitMock(marketIndex,amount);
-    }
-  
-        uint256 longPercentE18 = _getLongPercentForLongVsShortSplit(
-            marketIndex
-        );
-
-        longAmount = (amount * longPercentE18) / TEN_TO_THE_18;
-        shortAmount = amount - longAmount;
-
-        return (longAmount, shortAmount);
-    }
-
-    
-
-
-    function _distributeMarketAmount(uint32 marketIndex, uint256 marketAmount)
-        internal
-    {
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_distributeMarketAmount"))){
-      
-      return mocker._distributeMarketAmountMock(marketIndex,marketAmount);
-    }
-  
-                (uint256 longAmount, uint256 shortAmount) = _getMarketSplit(
-            marketIndex,
-            marketAmount
-        );
-        syntheticTokenPoolValue[marketIndex][true] += longAmount;
-        syntheticTokenPoolValue[marketIndex][false] += shortAmount;
-    }
 
     
 
@@ -582,22 +522,25 @@ contract LongShortMockable is ILongShort, Initializable {
       return mocker._claimAndDistributeYieldMock(marketIndex);
     }
   
-        uint256 marketPercentE18 = _getMarketPercentForTreasuryVsMarketSplit(
-            marketIndex
-        );
+        uint256 longValue = syntheticTokenPoolValue[marketIndex][true];
+        uint256 shortValue = syntheticTokenPoolValue[marketIndex][false];
+        uint256 totalValueLockedInMarket = longValue + shortValue;
 
-        uint256 totalValueRealizedForMarket = syntheticTokenPoolValue[
-            marketIndex
-        ][true] + syntheticTokenPoolValue[marketIndex][false];
+        (
+            bool isLongSideUnderbalanced,
+            uint256 treasuryYieldPercentE18
+        ) = _getYieldSplit(longValue, shortValue, totalValueLockedInMarket);
 
         uint256 marketAmount = yieldManagers[marketIndex]
         .claimYieldAndGetMarketAmount(
-            totalValueRealizedForMarket,
-            marketPercentE18
+            totalValueLockedInMarket,
+            treasuryYieldPercentE18
         );
 
         if (marketAmount > 0) {
-            _distributeMarketAmount(marketIndex, marketAmount);
+            syntheticTokenPoolValue[marketIndex][
+                isLongSideUnderbalanced
+            ] += marketAmount;
         }
     }
 
