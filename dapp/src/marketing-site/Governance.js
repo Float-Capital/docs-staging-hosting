@@ -6,16 +6,26 @@ var Button = require("../components/UI/Base/Button.js");
 
 function Governance(Props) {
   return React.createElement("section", {
-              className: "bg-white"
-            }, React.createElement("div", undefined, React.createElement("img", {
-                      className: "w-10",
-                      src: "/img/float-token.svg"
-                    })), React.createElement("div", undefined, React.createElement("h3", undefined, "Governance"), React.createElement("p", undefined, "The FLT token governs the float capital protocol. The right governance model will direct and shape the protocol through community lead proposals in a decentralised and fair manor. The future of Float Capital is dictated by its users. 100% of the fees and yield from the protocol are distributed fairly with all FLT holders."), React.createElement("div", {
-                      className: "flex flex-row"
-                    }, React.createElement(Button.Small.make, {
-                          children: "Read more"
-                        }), React.createElement(Button.Small.make, {
-                          children: "Earn FLT"
+              className: "my-10"
+            }, React.createElement("div", {
+                  className: "flex flex-col md:flex-row justify-evenly items-center"
+                }, React.createElement("div", {
+                      className: "w-full md:w-1/2 order-2 md:order-1 p-4 md:p-0"
+                    }, React.createElement("h3", {
+                          className: "my-2 text-3xl uppercase font-bold"
+                        }, "Governance"), React.createElement("p", undefined, "The FLT token governs the float capital protocol. The right governance model will direct and shape the protocol through community lead proposals in a decentralised and fair manor. The future of Float Capital will be dictated by its users. FLT holders govern the Float Capital Treasury."), React.createElement("div", {
+                          className: "flex flex-row my-4 items-center justify-evenly md:justify-start  "
+                        }, React.createElement("div", {
+                              className: "mr-4"
+                            }, React.createElement(Button.Small.make, {
+                                  children: "Read more"
+                                })), React.createElement("div", undefined, React.createElement(Button.Small.make, {
+                                  children: "Earn FLT"
+                                })))), React.createElement("div", {
+                      className: "w-full md:w-1/2 order-1 md:order-2"
+                    }, React.createElement("img", {
+                          className: "mx-auto w-40",
+                          src: "/img/governance.svg"
                         }))));
 }
 

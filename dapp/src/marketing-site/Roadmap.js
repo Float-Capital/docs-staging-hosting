@@ -4,7 +4,7 @@
 var React = require("react");
 
 function Roadmap(Props) {
-  return React.createElement("section", undefined, "Roadmap");
+  return React.createElement("section", undefined, "");
 }
 
 var make = Roadmap;

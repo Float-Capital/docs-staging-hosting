@@ -2,13 +2,13 @@
 let make = () => {
   let router = Next.Router.useRouter()
 
-  <section className="min-h-screen">
+  <section className="min-h-screen landing">
     <SiteNav />
-    <div className="min-h-screen flex flex-row items-center">
-      <div className="w-2/5 mx-2 relative">
+    <div className="min-h-screen flex flex-col md:flex-row items-center">
+      <div className="w-full md:w-2/5 mx-2 relative">
         <div className="v-align-in-responsive-height">
           <div className="block static">
-            <div className="text-2.5xl font-bold leading-none min-w-400 my-2">
+            <div className="text-2.5xl font-bold leading-none w-full md:min-w-400 my-2">
               <h1> {"PEER TO PEER PERPETUAL "->React.string} </h1>
               <h1> {"SYNTHETIC ASSETS"->React.string} </h1>
             </div>
@@ -29,7 +29,7 @@ let make = () => {
           </div>
         </div>
       </div>
-      <div className="w-3/5"> <FeaturedMarkets /> </div>
+      <div className="w-full md:w-3/5"> <FeaturedMarkets /> </div>
     </div>
   </section>
 }

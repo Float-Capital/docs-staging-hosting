@@ -1,7 +1,7 @@
 module MarketingSite = {
   @react.component
   let make = () => {
-    <> <Landing /> <Roadmap /> <Governance /> <EcosystemPartners /> <Footer /> </>
+    <> <Landing /> <Roadmap /> <Governance /> <EcosystemPartners /> <Footer /> <TVL /> </>
   }
 }
 

@@ -4,15 +4,23 @@
 var React = require("react");
 
 function EcosystemPartners(Props) {
-  return React.createElement("section", undefined, React.createElement("h3", undefined, "Ecosystem partners"), React.createElement("div", {
-                  className: "grid grid-cols-4 gap-4 items-center"
+  return React.createElement("section", {
+              className: "my-10"
+            }, React.createElement("h3", {
+                  className: "m-2 text-3xl text-center uppercase font-bold"
+                }, "Ecosystem partners"), React.createElement("div", {
+                  className: "w-full mx-auto max-w-5xl flex flex-col md:flex-row items-center justify-evenly"
                 }, React.createElement("img", {
+                      className: "w-40",
                       src: "/img/partners/aave.png"
                     }), React.createElement("img", {
+                      className: "w-40",
                       src: "/img/partners/polygon.png"
                     }), React.createElement("img", {
-                      src: "/img/partners/chainlink.jpg"
+                      className: "w-40",
+                      src: "/img/partners/chainlink.png"
                     }), React.createElement("img", {
+                      className: "w-40",
                       src: "/img/partners/thegraph.png"
                     })));
 }

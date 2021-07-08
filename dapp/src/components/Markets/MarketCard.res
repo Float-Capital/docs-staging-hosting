@@ -31,18 +31,6 @@ let marketPositionHeadings = (~isLong) =>
     </div>
   </div>
 
-  
-@react.component
-let make = (
-  ~marketData as {
-    name: marketName,
-    marketIndex,
-    latestSystemState: {totalLockedLong, totalLockedShort, totalValueLocked},
-  }: Queries.SyntheticMarketInfo.t,
-) => {
-  let router = Next.Router.useRouter()
-  let marketIndexOption = router.query->Js.Dict.get("marketIndex")
-
 let marketPositionValues = (
   ~marketName,
   ~isLong,
@@ -108,7 +96,7 @@ let liquidityRatio = (~totalValueLocked, ~totalLockedLong) =>
 @react.component
 let make = (
   ~marketData as {
-    symbol: marketName, // TODO: next contract deployment switch name and symbol in deployment scripts
+    name: marketName,
     marketIndex,
     latestSystemState: {totalLockedLong, totalLockedShort, totalValueLocked},
   }: Queries.SyntheticMarketInfo.t,
@@ -188,7 +176,7 @@ module Mini = {
   @react.component
   let make = (
     ~marketData as {
-      symbol: marketName, // TODO: next contract deployment switch name and symbol in deployment scripts
+      name: marketName,
       marketIndex,
       latestSystemState: {totalLockedLong, totalValueLocked},
     }: Queries.SyntheticMarketInfo.t,

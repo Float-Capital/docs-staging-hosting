@@ -1,4 +1,4 @@
 @react.component
 let make = () => {
-  <section> {"Roadmap"->React.string} </section>
+  <section> {""->React.string} </section>
 }

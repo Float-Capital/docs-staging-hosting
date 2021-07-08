@@ -58,10 +58,10 @@ function FeaturedMarkets(Props) {
     } else {
       tmp = React.createElement(React.Fragment, undefined, Belt_Array.mapWithIndex(syntheticMarkets, (function (index, marketData) {
                   return React.createElement("div", {
-                              className: "max-w-lg min-w-340 mx-2 " + (
-                                index === 1 ? "transform -translate-y-48 translate-x-16 " : ""
+                              className: "max-w-lg w-full md:min-w-340 mx-2 " + (
+                                index === 1 ? "md:transform md:-translate-y-48 md:translate-x-16 " : ""
                               ) + " " + (
-                                index === 2 ? "transform translate-y-32 -translate-x-60" : ""
+                                index === 2 ? "md:transform md:translate-y-32 md:-translate-x-60" : ""
                               )
                             }, React.createElement(MarketCard.Mini.make, {
                                   marketData: marketData,
@@ -73,7 +73,7 @@ function FeaturedMarkets(Props) {
     tmp = "";
   }
   return React.createElement("div", {
-              className: "w-full mx-auto px-2 md:px-0 flex flex-row"
+              className: "w-full mx-auto px-2 md:px-0 flex flex-col md:flex-row"
             }, tmp);
 }
 

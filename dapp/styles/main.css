@@ -17,6 +17,15 @@ body {
   @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
 }
 
+.landing {
+  background: linear-gradient(
+      rgba(255, 255, 255, 0.4),
+      rgba(255, 255, 255, 0.4)
+    ),
+    url("/backgrounds/trial.jpg");
+  @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
+}
+
 .logo-container {
   @apply flex flex-row justify-between text-center;
 }

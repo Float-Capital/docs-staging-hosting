@@ -12,17 +12,17 @@ var FeaturedMarkets = require("./FeaturedMarkets.js");
 function Landing(Props) {
   var router = Router.useRouter();
   return React.createElement("section", {
-              className: "min-h-screen"
+              className: "min-h-screen landing"
             }, React.createElement(SiteNav.make, {}), React.createElement("div", {
-                  className: "min-h-screen flex flex-row items-center"
+                  className: "min-h-screen flex flex-col md:flex-row items-center"
                 }, React.createElement("div", {
-                      className: "w-2/5 mx-2 relative"
+                      className: "w-full md:w-2/5 mx-2 relative"
                     }, React.createElement("div", {
                           className: "v-align-in-responsive-height"
                         }, React.createElement("div", {
                               className: "block static"
                             }, React.createElement("div", {
-                                  className: "text-2.5xl font-bold leading-none min-w-400 my-2"
+                                  className: "text-2.5xl font-bold leading-none w-full md:min-w-400 my-2"
                                 }, React.createElement("h1", undefined, "PEER TO PEER PERPETUAL "), React.createElement("h1", undefined, "SYNTHETIC ASSETS")), React.createElement("h2", undefined, "No overcollateralization"), React.createElement("h2", undefined, "No liquidiation"), React.createElement("h2", undefined, "No centralisation"), React.createElement("div", {
                                   className: "flex flex-row items-center w-1/2"
                                 }, React.createElement(Button.make, {
@@ -45,7 +45,7 @@ function Landing(Props) {
                                           className: "h-12 cursor-pointer hover:opacity-75",
                                           src: "icons/twitter-sq.svg"
                                         })))))), React.createElement("div", {
-                      className: "w-3/5"
+                      className: "w-full md:w-3/5"
                     }, React.createElement(FeaturedMarkets.make, {}))));
 }
 
