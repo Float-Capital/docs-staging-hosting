@@ -39,7 +39,7 @@ function TVL(Props) {
   return React.createElement("div", {
               className: "fixed bottom-3 left-3 flex flex-col items-end invisible md:visible bg-white bg-opacity-75 rounded-lg shadow-lg px-2 py-1"
             }, React.createElement("div", {
-                  className: "text-sm cursor-pointer"
+                  className: "text-sm"
                 }, "TVL: $" + Misc.NumberFormat.formatEther(undefined, match$1.totalValueLocked)));
 }
 

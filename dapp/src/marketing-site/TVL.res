@@ -8,7 +8,7 @@ let make = () => {
       let {totalValueLocked, _} = StatsCalcs.getTotalValueLockedAndTotalStaked(syntheticMarkets)
       <div
         className="fixed bottom-3 left-3 flex flex-col items-end invisible md:visible bg-white bg-opacity-75 rounded-lg shadow-lg px-2 py-1">
-        <div className="text-sm cursor-pointer">
+        <div className="text-sm">
           {`TVL: $${totalValueLocked->Misc.NumberFormat.formatEther}`->React.string}
         </div>
       </div>

@@ -8,7 +8,7 @@ function Roadmap(Props) {
   return React.createElement("section", {
               className: "min-h-screen w-screen flex flex-col items-center justify-center bg-pastel-purple"
             }, React.createElement("h3", {
-                  className: "my-2 text-3xl uppercase font-bold "
+                  className: "my-2 text-5xl uppercase font-bold "
                 }, "ROADMAP"), React.createElement(Timeline.make, {}));
 }
 

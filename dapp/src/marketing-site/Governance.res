@@ -14,7 +14,7 @@ let make = () => {
         </div>
       </div>
       <div className="w-full md:w-1/2 order-1 md:order-2">
-        <img src="/img/governance.svg" className="ml-auto w-64" />
+        <img src="/img/governance.svg" className="mx-auto md:ml-auto md:mr-0 w-64" />
       </div>
     </div>
   </section>

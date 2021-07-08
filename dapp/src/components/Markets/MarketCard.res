@@ -185,7 +185,7 @@ module Mini = {
 
     <Next.Link href={`/?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
       <div
-        className="p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 custom-cursor shadow-lg hover:shadow-xl h-full justify-center w-full">
+        className="p-1 rounded-sm flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 custom-cursor shadow-lg hover:shadow-xl h-full justify-center w-full">
         <div className="flex justify-center w-full my-1">
           <h1 className="font-bold text-xl font-alphbeta uppercase custom-cursor hover:underline">
             {marketName->React.string}

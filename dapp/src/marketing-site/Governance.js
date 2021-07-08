@@ -26,7 +26,7 @@ function Governance(Props) {
                                 })))), React.createElement("div", {
                       className: "w-full md:w-1/2 order-1 md:order-2"
                     }, React.createElement("img", {
-                          className: "ml-auto w-64",
+                          className: "mx-auto md:ml-auto md:mr-0 w-64",
                           src: "/img/governance.svg"
                         }))));
 }

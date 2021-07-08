@@ -143,7 +143,7 @@ function MarketCard$Mini(Props) {
   return React.createElement(Link, {
               href: "/?marketIndex=" + marketIndex.toString(),
               children: React.createElement("div", {
-                    className: "p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 custom-cursor shadow-lg hover:shadow-xl h-full justify-center w-full"
+                    className: "p-1 rounded-sm flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 custom-cursor shadow-lg hover:shadow-xl h-full justify-center w-full"
                   }, React.createElement("div", {
                         className: "flex justify-center w-full my-1"
                       }, React.createElement("h1", {

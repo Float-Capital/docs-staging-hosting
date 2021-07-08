@@ -7,11 +7,11 @@ function Timeline(Props) {
   return React.createElement("div", {
               className: "container"
             }, React.createElement("div", {
-                  className: "flex flex-col md:grid grid-cols-9 mx-auto p-2 text-white"
+                  className: "flex flex-col md:grid grid-cols-9 mx-auto p-2 text-black"
                 }, React.createElement("div", {
                       className: "flex flex-row-reverse md:contents"
                     }, React.createElement("div", {
-                          className: "bg-primary col-start-1 col-end-5 p-4 rounded-xl my-4 ml-auto shadow-md"
+                          className: "bg-white col-start-1 col-end-5 p-4 border my-4 ml-auto shadow-md"
                         }, React.createElement("h3", {
                               className: "font-semibold text-lg mb-1"
                             }, "Q1 2021"), React.createElement("ul", undefined, React.createElement("li", undefined, "Protocol mechanism researched, designed"), React.createElement("li", undefined, "Core suite of smart contracts implemented"), React.createElement("li", undefined, "Basic UI created"), React.createElement("li", undefined, "Functional testnet deployment to BSC"))), React.createElement("div", {
@@ -19,9 +19,9 @@ function Timeline(Props) {
                         }, React.createElement("div", {
                               className: "h-full w-6 flex items-center justify-center"
                             }, React.createElement("div", {
-                                  className: "h-full w-1 bg-blue-800 pointer-events-none"
+                                  className: "h-full w-0.5 bg-primary pointer-events-none"
                                 })), React.createElement("div", {
-                              className: "w-6 h-6 absolute top-1/2 -mt-3 rounded-full bg-primary shadow"
+                              className: "w-2 h-2 absolute top-1/2 -mt-3 ml-2 rounded-full bg-white shadow"
                             }))), React.createElement("div", {
                       className: "flex md:contents"
                     }, React.createElement("div", {
@@ -29,17 +29,17 @@ function Timeline(Props) {
                         }, React.createElement("div", {
                               className: "h-full w-6 flex items-center justify-center"
                             }, React.createElement("div", {
-                                  className: "h-full w-1 bg-blue-800 pointer-events-none"
+                                  className: "h-full w-0.5 bg-primary pointer-events-none"
                                 })), React.createElement("div", {
-                              className: "w-6 h-6 absolute top-1/2 -mt-3 rounded-full bg-primary shadow"
+                              className: "w-2 h-2 absolute top-1/2 -mt-3 ml-2 rounded-full bg-white shadow"
                             })), React.createElement("div", {
-                          className: "bg-primary col-start-6 col-end-10 p-4 rounded-xl my-4 mr-auto shadow-md"
+                          className: "bg-white border col-start-6 col-end-10 p-4  my-4 mr-auto shadow-md"
                         }, React.createElement("h3", {
                               className: "font-semibold text-lg mb-1"
                             }, "Q2 2021"), React.createElement("ul", undefined, React.createElement("li", undefined, "UI Design and iteration"), React.createElement("li", undefined, "Move from BSC to Polygon (Matic)"), React.createElement("li", undefined, "Updated testnet deployment with using Chainlink and Aave integration"), React.createElement("li", undefined, "Fundraise to fund full time focus on protocol and sideline consulting")))), React.createElement("div", {
                       className: "flex flex-row-reverse md:contents"
                     }, React.createElement("div", {
-                          className: "bg-primary col-start-1 col-end-5 p-4 rounded-xl my-4 ml-auto shadow-md"
+                          className: "bg-white border col-start-1 col-end-5 p-4  my-4 ml-auto shadow-md"
                         }, React.createElement("h3", {
                               className: "font-semibold text-lg mb-1"
                             }, "Q3 2021"), React.createElement("ul", undefined, React.createElement("li", undefined, "Finalize protocol design "), React.createElement("li", undefined, "Audit smart contracts"), React.createElement("li", undefined, "Build dream team"), React.createElement("li", undefined, "UI/UX refinement"))), React.createElement("div", {
@@ -47,23 +47,9 @@ function Timeline(Props) {
                         }, React.createElement("div", {
                               className: "h-full w-6 flex items-center justify-center"
                             }, React.createElement("div", {
-                                  className: "h-full w-1 bg-blue-800 pointer-events-none"
+                                  className: "h-full w-0.5 bg-primary pointer-events-none"
                                 })), React.createElement("div", {
-                              className: "w-6 h-6 absolute top-1/2 -mt-3 rounded-full bg-primary shadow"
-                            }))), React.createElement("div", {
-                      className: "flex flex-row-reverse md:contents"
-                    }, React.createElement("div", {
-                          className: "bg-primary col-start-1 col-end-5 p-4 rounded-xl my-4 ml-auto shadow-md"
-                        }, React.createElement("h3", {
-                              className: "font-semibold text-lg mb-1"
-                            }, "Q3 2021"), React.createElement("ul", undefined, React.createElement("li", undefined, "Finalize protocol design "), React.createElement("li", undefined, "Audit smart contracts"), React.createElement("li", undefined, "Build dream team"), React.createElement("li", undefined, "UI/UX refinement"))), React.createElement("div", {
-                          className: "col-start-5 col-end-6 md:mx-auto relative mr-10"
-                        }, React.createElement("div", {
-                              className: "h-full w-6 flex items-center justify-center"
-                            }, React.createElement("div", {
-                                  className: "h-full w-1 bg-blue-800 pointer-events-none"
-                                })), React.createElement("div", {
-                              className: "w-6 h-6 absolute top-1/2 -mt-3 rounded-full bg-primary shadow"
+                              className: "w-2 h-2 absolute top-1/2 -mt-3 ml-2 rounded-full bg-white shadow"
                             }))), React.createElement("div", {
                       className: "flex md:contents"
                     }, React.createElement("div", {
@@ -71,11 +57,11 @@ function Timeline(Props) {
                         }, React.createElement("div", {
                               className: "h-full w-6 flex items-center justify-center"
                             }, React.createElement("div", {
-                                  className: "h-full w-1 bg-blue-800 pointer-events-none"
+                                  className: "h-full w-0.5 bg-primary pointer-events-none"
                                 })), React.createElement("div", {
-                              className: "w-6 h-6 absolute top-1/2 -mt-3 rounded-full bg-primary shadow"
+                              className: "w-2 h-2 absolute top-1/2 -mt-3 ml-2 rounded-full bg-white shadow"
                             })), React.createElement("div", {
-                          className: "bg-primary col-start-6 col-end-10 p-4 rounded-xl my-4 mr-auto shadow-md"
+                          className: "bg-white border col-start-6 col-end-10 p-4  my-4 mr-auto shadow-md"
                         }, React.createElement("h3", {
                               className: "font-semibold text-lg mb-1"
                             }, "Q4 2021"), React.createElement("ul", undefined, React.createElement("li", undefined, "10x"))))));
