@@ -79,9 +79,9 @@ let make = () => {
       <Link href="/">
         <a className="flex items-center">
           <span className="text-xl text-green-800 ml-2 align-middle font-semibold">
-            <div className="logo-container">
-              <img src="/img/float-capital-logo-long.svg" className="h-8 md:h-7 w-full md:w-auto" />
-            </div>
+            // <div className="logo-container">
+            //   <img src="/img/float-capital-logo-long.svg" className="h-8 md:h-7 w-full md:w-auto" />
+            // </div>
           </span>
         </a>
       </Link>

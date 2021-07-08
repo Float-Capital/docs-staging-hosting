@@ -23,7 +23,14 @@ function Landing(Props) {
                               className: "block static"
                             }, React.createElement("div", {
                                   className: "text-2.5xl font-bold leading-none w-full md:min-w-400 my-2"
-                                }, React.createElement("h1", undefined, "PEER TO PEER PERPETUAL "), React.createElement("h1", undefined, "SYNTHETIC ASSETS")), React.createElement("h2", undefined, "No overcollateralization"), React.createElement("h2", undefined, "No liquidiation"), React.createElement("h2", undefined, "No centralisation"), React.createElement("div", {
+                                }, React.createElement("div", {
+                                      className: "logo-container"
+                                    }, React.createElement("img", {
+                                          className: "h-10 md:h-24 my-5 w-full md:w-auto",
+                                          src: "/img/float-capital-logo-sq.svg"
+                                        })), React.createElement("h1", undefined, "PEER TO PEER PERPETUAL "), React.createElement("h1", undefined, "SYNTHETIC ASSETS")), React.createElement("div", {
+                                  className: "my-2"
+                                }, React.createElement("h2", undefined, "No overcollateralization"), React.createElement("h2", undefined, "No liquidiation"), React.createElement("h2", undefined, "No centralisation")), React.createElement("div", {
                                   className: "flex flex-row items-center w-1/2"
                                 }, React.createElement(Button.make, {
                                       onClick: (function (param) {

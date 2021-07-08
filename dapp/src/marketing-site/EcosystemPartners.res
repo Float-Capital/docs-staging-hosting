@@ -1,6 +1,6 @@
 @react.component
 let make = () => {
-  <section className="my-10">
+  <section className="py-10 bg-white">
     <h3 className="m-2 text-3xl text-center uppercase font-bold">
       {"Ecosystem partners"->React.string}
     </h3>

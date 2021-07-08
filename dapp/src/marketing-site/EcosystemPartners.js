@@ -5,7 +5,7 @@ var React = require("react");
 
 function EcosystemPartners(Props) {
   return React.createElement("section", {
-              className: "my-10"
+              className: "py-10 bg-white"
             }, React.createElement("h3", {
                   className: "m-2 text-3xl text-center uppercase font-bold"
                 }, "Ecosystem partners"), React.createElement("div", {

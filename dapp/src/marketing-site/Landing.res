@@ -9,12 +9,20 @@ let make = () => {
         <div className="v-align-in-responsive-height">
           <div className="block static">
             <div className="text-2.5xl font-bold leading-none w-full md:min-w-400 my-2">
+              <div className="logo-container">
+                <img
+                  src="/img/float-capital-logo-sq.svg"
+                  className="h-10 md:h-24 my-5 w-full md:w-auto"
+                />
+              </div>
               <h1> {"PEER TO PEER PERPETUAL "->React.string} </h1>
               <h1> {"SYNTHETIC ASSETS"->React.string} </h1>
             </div>
-            <h2> {"No overcollateralization"->React.string} </h2>
-            <h2> {"No liquidiation"->React.string} </h2>
-            <h2> {"No centralisation"->React.string} </h2>
+            <div className="my-2">
+              <h2> {"No overcollateralization"->React.string} </h2>
+              <h2> {"No liquidiation"->React.string} </h2>
+              <h2> {"No centralisation"->React.string} </h2>
+            </div>
             <div className="flex flex-row items-center w-1/2">
               <Button onClick={_ => router->Next.Router.pushShallow("/markets")}> {"APP"} </Button>
               <a href={Config.discordInviteLink} target="_" rel="noopenner noreferer">

@@ -1,6 +1,7 @@
 const primaryColor = "#0d4184";
 const primaryLightColor = "#1151A6";
 const lightGold = "#fff3e6";
+const lightBlue = "#AAD4EC";
 module.exports = {
   purge: {
     // Specify the paths to all of the template files in your project
@@ -16,6 +17,7 @@ module.exports = {
         ...theme("colors"),
         primary: primaryColor,
         "primary-light": primaryLightColor,
+        "theme-light-blue": lightBlue,
       }),
     },
     /* Most of the time we customize the font-sizes,

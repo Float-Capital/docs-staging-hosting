@@ -6,7 +6,7 @@ var Button = require("../components/UI/Base/Button.js");
 
 function Governance(Props) {
   return React.createElement("section", {
-              className: "my-10"
+              className: "py-10 bg-theme-light-blue"
             }, React.createElement("div", {
                   className: "max-w-5xl flex flex-col md:flex-row justify-evenly items-center mx-auto"
                 }, React.createElement("div", {

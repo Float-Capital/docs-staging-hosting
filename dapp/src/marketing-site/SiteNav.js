@@ -99,12 +99,7 @@ function SiteNav(Props) {
                             className: "flex items-center"
                           }, React.createElement("span", {
                                 className: "text-xl text-green-800 ml-2 align-middle font-semibold"
-                              }, React.createElement("div", {
-                                    className: "logo-container"
-                                  }, React.createElement("img", {
-                                        className: "h-8 md:h-7 w-full md:w-auto",
-                                        src: "/img/float-capital-logo-long.svg"
-                                      }))))
+                              }))
                     }), React.createElement("div", {
                       className: "hidden md:flex w-2/3 text-base items-center justify-end"
                     }, React.createElement("a", {
