@@ -2,7 +2,7 @@
 'use strict';
 
 
-var floatIssuanceFixedDecimal = ethers.BigNumber.from("1000000000000000000000000");
+var floatIssuanceFixedDecimal = ethers.BigNumber.from("1000000000000000000000000000000000000000000");
 
 var tenToThe18 = ethers.BigNumber.from("1000000000000000000");
 
