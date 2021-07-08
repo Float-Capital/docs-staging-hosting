@@ -417,102 +417,60 @@ contract LongShort is ILongShort, Initializable {
         }
     }
 
-    function _getMarketPercentForTreasuryVsMarketSplit(uint32 marketIndex)
-        internal
-        view
-        returns (uint256 marketPercentE18)
-    {
-        uint256 totalValueLockedInMarket = syntheticTokenPoolValue[marketIndex][
-            true
-        ] + syntheticTokenPoolValue[marketIndex][false];
-
-        if (
-            syntheticTokenPoolValue[marketIndex][true] >
-            syntheticTokenPoolValue[marketIndex][false]
-        ) {
-            marketPercentE18 =
-                ((syntheticTokenPoolValue[marketIndex][true] -
-                    syntheticTokenPoolValue[marketIndex][false]) *
-                    TEN_TO_THE_18) /
-                totalValueLockedInMarket;
-        } else {
-            marketPercentE18 =
-                ((syntheticTokenPoolValue[marketIndex][false] -
-                    syntheticTokenPoolValue[marketIndex][true]) *
-                    TEN_TO_THE_18) /
-                totalValueLockedInMarket;
-        }
-
-        return marketPercentE18;
-    }
-
-    function _getLongPercentForLongVsShortSplit(uint32 marketIndex)
-        internal
-        view
-        returns (uint256 longPercentE18)
-    {
-        return
-            (syntheticTokenPoolValue[marketIndex][false] * TEN_TO_THE_18) /
-            (syntheticTokenPoolValue[marketIndex][true] +
-                syntheticTokenPoolValue[marketIndex][false]);
-    }
-
     /**
      * Returns the amount of accrued value that should go to each side of the
      * market. To incentivise balance, more value goes to the weaker side in
      * proportion to how imbalanced the market is.
      */
-    function _getMarketSplit(uint32 marketIndex, uint256 amount)
+    function _getYieldSplit(
+        uint256 longValue,
+        uint256 shortValue,
+        uint256 totalValueLockedInMarket
+    )
         internal
         view
-        returns (uint256 longAmount, uint256 shortAmount)
+        returns (bool underBalancedSide, uint256 treasuryPercentE18)
     {
-        uint256 longPercentE18 = _getLongPercentForLongVsShortSplit(
-            marketIndex
-        );
-
-        longAmount = (amount * longPercentE18) / TEN_TO_THE_18;
-        shortAmount = amount - longAmount;
-
-        return (longAmount, shortAmount);
+        underBalancedSide = longValue < shortValue;
+        uint256 imbalance;
+        if (underBalancedSide) {
+            imbalance = longValue - shortValue;
+        } else {
+            imbalance = shortValue - longValue;
+        }
+        // This is a stupid linear line... How to make this a better curve?
+        uint256 marketPercentE18 = ((imbalance * TEN_TO_THE_18) /
+            totalValueLockedInMarket);
+        treasuryPercentE18 = TEN_TO_THE_18 - marketPercentE18;
     }
 
     /*╔══════════════════════════════╗
       ║       HELPER FUNCTIONS       ║
       ╚══════════════════════════════╝*/
 
-    function _distributeMarketAmount(uint32 marketIndex, uint256 marketAmount)
-        internal
-    {
-        // Splits mostly to the weaker position to incentivise balance.
-        (uint256 longAmount, uint256 shortAmount) = _getMarketSplit(
-            marketIndex,
-            marketAmount
-        );
-        syntheticTokenPoolValue[marketIndex][true] += longAmount;
-        syntheticTokenPoolValue[marketIndex][false] += shortAmount;
-    }
-
     /**
      * Controls what happens with accrued yield manager interest.
      */
     function _claimAndDistributeYield(uint32 marketIndex) internal {
-        uint256 marketPercentE18 = _getMarketPercentForTreasuryVsMarketSplit(
-            marketIndex
-        );
+        uint256 longValue = syntheticTokenPoolValue[marketIndex][true];
+        uint256 shortValue = syntheticTokenPoolValue[marketIndex][false];
+        uint256 totalValueLockedInMarket = longValue + shortValue;
 
-        uint256 totalValueRealizedForMarket = syntheticTokenPoolValue[
-            marketIndex
-        ][true] + syntheticTokenPoolValue[marketIndex][false];
+        (
+            bool underBalancedSide,
+            uint256 treasuryYieldPercentE18
+        ) = _getYieldSplit(longValue, shortValue, totalValueLockedInMarket);
 
         uint256 marketAmount = yieldManagers[marketIndex]
         .claimYieldAndGetMarketAmount(
-            totalValueRealizedForMarket,
-            marketPercentE18
+            totalValueLockedInMarket,
+            treasuryYieldPercentE18
         );
 
         if (marketAmount > 0) {
-            _distributeMarketAmount(marketIndex, marketAmount);
+            syntheticTokenPoolValue[marketIndex][
+                underBalancedSide
+            ] += marketAmount;
         }
     }
 
