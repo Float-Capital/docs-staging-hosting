@@ -1,11 +1,11 @@
-var secretsManager = require("../secretsManager.js");
-var ethers = require("ethers");
+const secretsManager = require("../secretsManager.js");
+const ethers = require("ethers");
 
 const longShortContractAddress = "0x4a23F8368fdF10e9BF90b96184990FED27ED0E6E";
 const longShortAbi = [
   "function getMarketSplit(uint32 marketIndex, uint256 amount) view returns (uint256 longAmount, uint256 shortAmount) @100000",
-  "function updateSystemState(uint32 marketIndex) external @400000", //TODO: Optimise the gas here
-  "function updateSystemStateMulti(uint32[] calldata marketIndexes) external @2800000", // TODO: remove _ in latest version of contracts
+  "function updateSystemState(uint32 marketIndex) external @400000",
+  "function updateSystemStateMulti(uint32[] calldata marketIndexes) external @2800000",
 ];
 
 // chainlink oracles that are used by oracle managers
