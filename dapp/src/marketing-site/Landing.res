@@ -2,23 +2,23 @@
 let make = () => {
   let router = Next.Router.useRouter()
 
-  <section className="min-h-screen landing">
+  <section className="min-h-screen bg-pastel-blue">
     <SiteNav />
     <div className="min-h-screen flex flex-col md:flex-row items-center">
       <div className="w-full md:w-2/5 mx-2 relative">
         <div className="v-align-in-responsive-height">
           <div className="block static">
-            <div className="text-2.5xl font-bold leading-none w-full md:min-w-400 my-2">
+            <div className="font-bold leading-none w-full md:min-w-400 my-2">
               <div className="logo-container">
                 <img
                   src="/img/float-capital-logo-sq.svg"
-                  className="h-10 md:h-24 my-5 w-full md:w-auto"
+                  className="h-10 md:h-32 my-5 w-full md:w-auto"
                 />
               </div>
-              <h1> {"PEER TO PEER PERPETUAL "->React.string} </h1>
-              <h1> {"SYNTHETIC ASSETS"->React.string} </h1>
+              <h1 className="text-3xl"> {"PEER TO PEER PERPETUAL "->React.string} </h1>
+              <h1 className="text-3xl"> {"SYNTHETIC ASSETS"->React.string} </h1>
             </div>
-            <div className="my-2">
+            <div className="my-2 text-lg">
               <h2> {"No overcollateralization"->React.string} </h2>
               <h2> {"No liquidiation"->React.string} </h2>
               <h2> {"No centralisation"->React.string} </h2>

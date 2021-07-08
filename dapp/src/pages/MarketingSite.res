@@ -3,10 +3,10 @@ module MarketingSite = {
   let make = () => {
     <>
       <Landing />
-      <EcosystemPartners />
-      <p> {"How it works"->React.string} </p>
-      <Governance />
+      <HowItWorks/>
       <Roadmap />
+      <EcosystemPartners />
+      <Governance />
       <Footer />
       <TVL />
     </>

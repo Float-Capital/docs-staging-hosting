@@ -5,8 +5,10 @@ var React = require("react");
 var Timeline = require("./Timeline.js");
 
 function Roadmap(Props) {
-  return React.createElement("section", undefined, React.createElement("h3", {
-                  className: "my-2 text-3xl uppercase font-bold"
+  return React.createElement("section", {
+              className: "min-h-screen w-screen flex flex-col items-center justify-center bg-pastel-purple"
+            }, React.createElement("h3", {
+                  className: "my-2 text-3xl uppercase font-bold "
                 }, "ROADMAP"), React.createElement(Timeline.make, {}));
 }
 

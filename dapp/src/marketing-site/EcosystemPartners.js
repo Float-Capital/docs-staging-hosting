@@ -5,22 +5,22 @@ var React = require("react");
 
 function EcosystemPartners(Props) {
   return React.createElement("section", {
-              className: "py-10 bg-white"
+              className: "py-10 bg-white min-h-screen w-screen flex flex-col items-center justify-center bg-pastel-yellow"
             }, React.createElement("h3", {
-                  className: "m-2 text-3xl text-center uppercase font-bold"
+                  className: "m-2 text-5xl text-center uppercase font-bold"
                 }, "Ecosystem partners"), React.createElement("div", {
-                  className: "w-full mx-auto max-w-5xl flex flex-col md:flex-row items-center justify-evenly"
+                  className: "w-full mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-evenly"
                 }, React.createElement("img", {
-                      className: "w-40",
+                      className: "w-64",
                       src: "/img/partners/aave.png"
                     }), React.createElement("img", {
-                      className: "w-40",
+                      className: "w-64",
                       src: "/img/partners/polygon.png"
                     }), React.createElement("img", {
-                      className: "w-40",
+                      className: "w-64",
                       src: "/img/partners/chainlink.png"
                     }), React.createElement("img", {
-                      className: "w-40",
+                      className: "w-64",
                       src: "/img/partners/thegraph.png"
                     })));
 }
