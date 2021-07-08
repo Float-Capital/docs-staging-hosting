@@ -1,7 +1,7 @@
 @react.component
 let make = () => {
   <section className="my-10">
-    <div className="flex flex-col md:flex-row justify-evenly items-center">
+    <div className="max-w-5xl flex flex-col md:flex-row justify-evenly items-center mx-auto">
       <div className="w-full md:w-1/2 order-2 md:order-1 p-4 md:p-0">
         <h3 className="my-2 text-3xl uppercase font-bold"> {"Governance"->React.string} </h3>
         <p>

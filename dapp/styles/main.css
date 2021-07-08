@@ -5,7 +5,7 @@
 @import "./ellipsis-loader.css";
 @import "./tick-animation.css";
 
-body {
+#app {
   /* It is possible to make this a utility (https://tailwindcss.com/docs/plugins#adding-utilities)
       - but probably not worth the confusion
   */

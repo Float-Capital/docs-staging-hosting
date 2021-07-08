@@ -8,7 +8,7 @@ function Governance(Props) {
   return React.createElement("section", {
               className: "my-10"
             }, React.createElement("div", {
-                  className: "flex flex-col md:flex-row justify-evenly items-center"
+                  className: "max-w-5xl flex flex-col md:flex-row justify-evenly items-center mx-auto"
                 }, React.createElement("div", {
                       className: "w-full md:w-1/2 order-2 md:order-1 p-4 md:p-0"
                     }, React.createElement("h3", {

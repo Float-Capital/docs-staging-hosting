@@ -3,7 +3,7 @@ import HtmlHeader from "src/components/HtmlHeader.js";
 
 export default function Index(props) {
   return (
-    <div>
+    <div className="siteBody">
       <HtmlHeader page="Home"></HtmlHeader>
       <Site {...props} />
     </div>
