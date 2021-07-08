@@ -11,9 +11,6 @@ var StakerHelpers = require("./StakerHelpers.js");
 var StakerSmocked = require("../../library/smock/StakerSmocked.js");
 
 function test(contracts, accounts) {
-  var stakerRef = {
-    contents: ""
-  };
   var promiseRef = {
     contents: undefined
   };
@@ -29,13 +26,13 @@ function test(contracts, accounts) {
   var longPrice = match[0];
   describe("addNewStateForFloatRewards", (function () {
           var setup = function (timeDelta) {
-            return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "addNewStateForFloatRewards", contracts, accounts), (function (param) {
+            return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest("addNewStateForFloatRewards", contracts, accounts), (function (param) {
                           StakerSmocked.InternalMock.mockOnlyFloatToReturn(undefined);
                           StakerSmocked.InternalMock.mockCalculateTimeDeltaToReturn(timeDelta);
                           StakerSmocked.InternalMock.mockSetRewardObjectsToReturn(undefined);
                           return LetOps.Await.let_(Helpers.getBlock(undefined), (function (param) {
                                         timestampRef.contents = ethers.BigNumber.from(param.timestamp + 1 | 0);
-                                        promiseRef.contents = stakerRef.contents.addNewStateForFloatRewards(marketIndex, longPrice, shortPrice, longValue, shortValue);
+                                        promiseRef.contents = contracts.contents.staker.addNewStateForFloatRewards(marketIndex, longPrice, shortPrice, longValue, shortValue);
                                         return LetOps.Await.let_(promiseRef.contents, (function (param) {
                                                       
                                                     }));

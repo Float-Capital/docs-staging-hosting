@@ -11,9 +11,6 @@ var StakerHelpers = require("./StakerHelpers.js");
 var StakerSmocked = require("../../library/smock/StakerSmocked.js");
 
 function test(contracts, accounts) {
-  var stakerRef = {
-    contents: ""
-  };
   var promiseRef = {
     contents: undefined
   };
@@ -31,12 +28,12 @@ function test(contracts, accounts) {
   var longAccum = match[0];
   describe("setRewardObjects", (function () {
           Globals.before_once$p(function (param) {
-                return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "setRewardObjects", contracts, accounts), (function (param) {
+                return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest("setRewardObjects", contracts, accounts), (function (param) {
                               StakerSmocked.InternalMock.mockCalculateNewCumulativeRateToReturn(longAccum, shortAccum);
-                              return LetOps.AwaitThen.let_(stakerRef.contents.setSetRewardObjectsParams(marketIndex, latestRewardIndexForMarket), (function (param) {
+                              return LetOps.AwaitThen.let_(contracts.contents.staker.setSetRewardObjectsParams(marketIndex, latestRewardIndexForMarket), (function (param) {
                                             return LetOps.Await.let_(Helpers.getBlock(undefined), (function (param) {
                                                           timestampRef.contents = ethers.BigNumber.from(param.timestamp + 1 | 0);
-                                                          promiseRef.contents = stakerRef.contents.setRewardObjectsExternal(marketIndex, longPrice, shortPrice, longValue, shortValue);
+                                                          promiseRef.contents = contracts.contents.staker.setRewardObjectsExternal(marketIndex, longPrice, shortPrice, longValue, shortValue);
                                                           return LetOps.Await.let_(promiseRef.contents, (function (param) {
                                                                         
                                                                       }));
@@ -55,12 +52,12 @@ function test(contracts, accounts) {
                 }));
           var mutatedIndex = latestRewardIndexForMarket.add(CONSTANTS.oneBn);
           it("mutates latestRewardIndex", (function () {
-                  return LetOps.Await.let_(stakerRef.contents.latestRewardIndex(marketIndex), (function (latestRewardIndex) {
+                  return LetOps.Await.let_(contracts.contents.staker.latestRewardIndex(marketIndex), (function (latestRewardIndex) {
                                 return Chai.bnEqual(undefined, latestRewardIndex, mutatedIndex);
                               }));
                 }));
           it("mutates syntheticRewardParams", (function () {
-                  return LetOps.Await.let_(stakerRef.contents.syntheticRewardParams(marketIndex, mutatedIndex), (function (rewardParams) {
+                  return LetOps.Await.let_(contracts.contents.staker.syntheticRewardParams(marketIndex, mutatedIndex), (function (rewardParams) {
                                 return Chai.recordEqualFlat(rewardParams, {
                                             timestamp: timestampRef.contents,
                                             accumulativeFloatPerLongToken: longAccum,
@@ -69,7 +66,7 @@ function test(contracts, accounts) {
                               }));
                 }));
           it("emits StateAddedEvent", (function () {
-                  return Chai.callEmitEvents(promiseRef.contents, stakerRef.contents, "StateAdded").withArgs(marketIndex, mutatedIndex, longAccum, shortAccum);
+                  return Chai.callEmitEvents(promiseRef.contents, contracts.contents.staker, "StateAdded").withArgs(marketIndex, mutatedIndex, longAccum, shortAccum);
                 }));
           
         }));

@@ -8,20 +8,12 @@ var CONSTANTS = require("../../CONSTANTS.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 
 function test(contracts) {
-  var stakerRef = {
-    contents: ""
-  };
   describe("getMarketLaunchParameters", (function () {
-          beforeEach(function () {
-                var match = contracts.contents;
-                stakerRef.contents = match.staker;
-                return Promise.resolve(undefined);
-              });
           var initialMultiplier = Helpers.randomInteger(undefined).add(CONSTANTS.oneBn);
           var initialPeriod = Helpers.randomInteger(undefined);
           var test = function (initialMultiplier, initialPeriod, expectedMultiplier, expectedPeriod, param) {
-            return LetOps.AwaitThen.let_(stakerRef.contents.setGetMarketLaunchIncentiveParametersParams(5, initialPeriod, initialMultiplier), (function (param) {
-                          return LetOps.Await.let_(stakerRef.contents.getMarketLaunchIncentiveParametersExternal(5), (function (result) {
+            return LetOps.AwaitThen.let_(contracts.contents.staker.setGetMarketLaunchIncentiveParametersParams(5, initialPeriod, initialMultiplier), (function (param) {
+                          return LetOps.Await.let_(contracts.contents.staker.getMarketLaunchIncentiveParametersExternal(5), (function (result) {
                                         var period = Belt_Array.getExn(result, 0);
                                         var multiplier = Belt_Array.getExn(result, 1);
                                         Chai.bnEqual(undefined, period, expectedPeriod);

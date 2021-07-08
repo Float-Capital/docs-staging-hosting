@@ -13,10 +13,6 @@ type fLOAT_ISSUANCE_FIXED_DECIMALReturn = Ethers.BigNumber.t
 external fLOAT_ISSUANCE_FIXED_DECIMAL: t => JsPromise.t<fLOAT_ISSUANCE_FIXED_DECIMALReturn> =
   "FLOAT_ISSUANCE_FIXED_DECIMAL"
 
-type tEN_TO_THE_18Return = Ethers.BigNumber.t
-@send
-external tEN_TO_THE_18: t => JsPromise.t<tEN_TO_THE_18Return> = "TEN_TO_THE_18"
-
 @send
 external addNewStakingFund: (
   t,
@@ -181,10 +177,6 @@ module Exposed = {
   @send
   external fLOAT_ISSUANCE_FIXED_DECIMAL: t => JsPromise.t<fLOAT_ISSUANCE_FIXED_DECIMALReturn> =
     "FLOAT_ISSUANCE_FIXED_DECIMAL"
-
-  type tEN_TO_THE_18Return = Ethers.BigNumber.t
-  @send
-  external tEN_TO_THE_18: t => JsPromise.t<tEN_TO_THE_18Return> = "TEN_TO_THE_18"
 
   @send
   external _changeMarketLaunchIncentiveParametersExternal: (

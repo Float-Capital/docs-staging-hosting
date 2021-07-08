@@ -9,8 +9,6 @@ let test =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("_stake", () => {
-    let stakerRef: ref(Staker.t) = ref(None->Obj.magic);
-
     let token = Helpers.randomAddress();
     let (userAmountStaked, userAmountToStake) =
       Helpers.Tuple.make2(Helpers.randomTokenAmount); // will be at least two
@@ -24,7 +22,7 @@ let test =
 
     let setup = (~userLastRewardIndex, ~latestRewardIndex) => {
       let%Await _ =
-        stakerRef->deployAndSetupStakerToUnitTest(
+        deployAndSetupStakerToUnitTest(
           ~functionName="_stake",
           ~contracts,
           ~accounts,
@@ -32,7 +30,7 @@ let test =
       StakerSmocked.InternalMock.mockMintAccumulatedFloatToReturn();
 
       let%AwaitThen _ =
-        (stakerRef^)
+        contracts^.staker
         ->Staker.Exposed.set_stakeParams(
             ~user,
             ~marketIndex,
@@ -42,7 +40,7 @@ let test =
             ~userLastRewardIndex,
           );
       let promise =
-        (stakerRef^)
+        contracts^.staker
         ->Staker.Exposed._stakeExternal(
             ~user,
             ~token,
@@ -73,7 +71,7 @@ let test =
       });
       it("mutates userAmountStaked", () => {
         let%Await amountStaked =
-          (stakerRef^)->Staker.userAmountStaked(token, user);
+          contracts^.staker->Staker.userAmountStaked(token, user);
         amountStaked->Chai.bnEqual(
           userAmountStaked->Ethers.BigNumber.add(userAmountToStake),
         );
@@ -81,7 +79,7 @@ let test =
 
       it("mutates userIndexOfLastClaimedReward", () => {
         let%Await lastClaimedReward =
-          (stakerRef^)
+          contracts^.staker
           ->Staker.userIndexOfLastClaimedReward(marketIndex, user);
 
         lastClaimedReward->Chai.bnEqual(latestRewardIndex);
@@ -90,7 +88,7 @@ let test =
       it("emits StakeAdded", () =>
         Chai.callEmitEvents(
           ~call=promiseRef^,
-          ~contract=(stakerRef^)->Obj.magic,
+          ~contract=contracts^.staker->Obj.magic,
           ~eventName="StakeAdded",
         )
         ->Chai.withArgs4(user, token, userAmountToStake, latestRewardIndex)

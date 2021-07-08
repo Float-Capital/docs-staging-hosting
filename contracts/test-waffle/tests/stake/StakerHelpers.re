@@ -1,6 +1,5 @@
 open LetOps;
-let deployAndSetupStakerToUnitTest =
-    (stakerRef, ~functionName, ~contracts, ~accounts) => {
+let deployAndSetupStakerToUnitTest = (~functionName, ~contracts, ~accounts) => {
   let%AwaitThen deployedContracts =
     Helpers.inititialize(
       ~admin=accounts.contents->Array.getUnsafe(0),
@@ -8,9 +7,8 @@ let deployAndSetupStakerToUnitTest =
     );
   contracts := deployedContracts;
   let {staker} = contracts^;
-  stakerRef := staker;
   let%Await _ =
-    (stakerRef^)
+    (staker)
     ->StakerSmocked.InternalMock.setupFunctionForUnitTesting(~functionName);
   ();
 };

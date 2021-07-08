@@ -8,7 +8,6 @@ let test =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  let stakerRef: ref(Staker.t) = ref(""->Obj.magic);
   let marketIndex = 2;
   let period = Helpers.randomInteger();
 
@@ -16,7 +15,7 @@ let test =
     let initialMultiplier = Helpers.randomInteger();
     before_once'(() => {
       let%AwaitThen _ =
-        stakerRef->deployAndSetupStakerToUnitTest(
+        deployAndSetupStakerToUnitTest(
           ~functionName="changeMarketLaunchIncentiveParameters",
           ~contracts,
           ~accounts,
@@ -25,7 +24,7 @@ let test =
       StakerSmocked.InternalMock.mockOnlyAdminToReturn();
 
       let%Await _ =
-        (stakerRef^)
+        contracts^.staker
         ->Staker.Exposed.changeMarketLaunchIncentiveParameters(
             ~marketIndex,
             ~period,
@@ -53,8 +52,7 @@ let test =
       Helpers.randomInteger()->Ethers.BigNumber.mul(CONSTANTS.tenToThe18);
     let initialMultiplierNotFine = CONSTANTS.oneBn;
 
-    let promise: ref(JsPromise.t(ContractHelpers.transaction)) =
-      ref(None->Obj.magic);
+    let changeMarketLaunchIncentiveParametersCall = ref(None->Obj.magic);
 
     let setup = (~initialMultiplier) => {
       let%Await deployedContracts =
@@ -63,42 +61,37 @@ let test =
           ~exposeInternals=true,
         );
       let {staker} = deployedContracts;
-      stakerRef := staker;
-      let prom =
-        (stakerRef^)
-        ->Staker.Exposed._changeMarketLaunchIncentiveParametersExternal(
-            ~marketIndex,
-            ~period,
-            ~initialMultiplier,
-          );
-      promise := prom;
+      contracts := deployedContracts;
+      changeMarketLaunchIncentiveParametersCall :=
+        staker->Staker.Exposed._changeMarketLaunchIncentiveParametersExternal(
+          ~marketIndex,
+          ~period,
+          ~initialMultiplier,
+        );
     };
 
     describe("passing transaction", () => {
-      before_once'(() => {
-        let%Await _ = setup(~initialMultiplier=initialMultiplierFine);
-        let%Await _ = promise^;
-        ();
-      });
+      before_once'(() => {setup(~initialMultiplier=initialMultiplierFine)});
 
       it("mutates marketLaunchIncentivePeriod", () => {
         let%Await setPeriod =
-          (stakerRef^)->Staker.marketLaunchIncentivePeriod(marketIndex);
+          contracts^.staker->Staker.marketLaunchIncentivePeriod(marketIndex);
 
         period->Chai.bnEqual(setPeriod);
       });
 
       it("mutates marketLaunchIncentiveMultiplier", () => {
         let%Await setMultiplier =
-          (stakerRef^)->Staker.marketLaunchIncentiveMultipliers(marketIndex);
+          contracts^.staker
+          ->Staker.marketLaunchIncentiveMultipliers(marketIndex);
 
         initialMultiplierFine->Chai.bnEqual(setMultiplier);
       });
 
       it("emits MarketLaunchIncentiveParametersChanges event", () => {
         Chai.callEmitEvents(
-          ~call=promise^,
-          ~contract=(stakerRef^)->Obj.magic,
+          ~call=changeMarketLaunchIncentiveParametersCall^,
+          ~contract=contracts^.staker->Obj.magic,
           ~eventName="MarketLaunchIncentiveParametersChanges",
         )
         ->Chai.withArgs3(marketIndex, period, initialMultiplierFine)
@@ -106,11 +99,13 @@ let test =
     });
 
     describe("failing transaction", () => {
-      before_once'(() => setup(~initialMultiplier=initialMultiplierNotFine));
+      before_once'(() => {
+        setup(~initialMultiplier=initialMultiplierNotFine)
+      });
       it("reverts if initialMultiplier < 1e18", () => {
         let%Await _ =
           Chai.expectRevert(
-            ~transaction=promise^,
+            ~transaction=changeMarketLaunchIncentiveParametersCall^,
             ~reason="marketLaunchIncentiveMultiplier must be >= 1e18",
           );
         ();

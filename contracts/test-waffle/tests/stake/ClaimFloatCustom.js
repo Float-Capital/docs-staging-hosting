@@ -20,9 +20,6 @@ function randomLengthIntegerArr(minLength, maxLength) {
 
 function test(contracts, accounts) {
   describe("claimFloatCustom", (function () {
-          var stakerRef = {
-            contents: ""
-          };
           var longShortSmockedRef = {
             contents: undefined
           };
@@ -30,13 +27,13 @@ function test(contracts, accounts) {
             contents: undefined
           };
           var setup = function (marketIndices, shouldWaitForTransactionToFinish) {
-            return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "claimFloatCustom", contracts, accounts), (function (param) {
+            return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest("claimFloatCustom", contracts, accounts), (function (param) {
                           return LetOps.AwaitThen.let_(Smock.smockit(contracts.contents.longShort), (function (longShortSmocked) {
                                         longShortSmockedRef.contents = longShortSmocked;
                                         LongShortSmocked.mockUpdateSystemStateMultiToReturn(longShortSmocked);
                                         StakerSmocked.InternalMock.mock_claimFloatToReturn(undefined);
-                                        return LetOps.AwaitThen.let_(stakerRef.contents.setClaimFloatCustomParams(longShortSmockedRef.contents.address), (function (param) {
-                                                      var promise = stakerRef.contents.claimFloatCustom(marketIndices);
+                                        return LetOps.AwaitThen.let_(contracts.contents.staker.setClaimFloatCustomParams(longShortSmockedRef.contents.address), (function (param) {
+                                                      var promise = contracts.contents.staker.claimFloatCustom(marketIndices);
                                                       promiseRef.contents = promise;
                                                       if (shouldWaitForTransactionToFinish) {
                                                         return promise;
