@@ -16,7 +16,6 @@ contract Staker is IStaker, Initializable {
 
     // Fixed-precision constants
     uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
-    uint256 public constant TEN_TO_THE_18 = 1e18;
 
     // Global state
     address public admin;
@@ -160,7 +159,7 @@ contract Staker is IStaker, Initializable {
     }
 
     function _changeFloatPercentage(uint256 newFloatPercentage) internal {
-        require(newFloatPercentage <= TEN_TO_THE_18 && newFloatPercentage > 0); // less than 100% and greater than 0%
+        require(newFloatPercentage <= 1e18 && newFloatPercentage > 0); // less than 100% and greater than 0%
         floatPercentage = newFloatPercentage;
     }
 
@@ -211,7 +210,7 @@ contract Staker is IStaker, Initializable {
         uint256 initialMultiplier
     ) internal {
         require(
-            initialMultiplier >= TEN_TO_THE_18,
+            initialMultiplier >= 1e18,
             "marketLaunchIncentiveMultiplier must be >= 1e18"
         );
 
@@ -279,7 +278,7 @@ contract Staker is IStaker, Initializable {
         uint256 period = marketLaunchIncentivePeriod[marketIndex];
         uint256 multiplier = marketLaunchIncentiveMultipliers[marketIndex];
         if (multiplier == 0) {
-            multiplier = TEN_TO_THE_18; // multiplier of 1 by default
+            multiplier = 1e18; // multiplier of 1 by default
         }
 
         return (period, multiplier);
@@ -294,7 +293,7 @@ contract Staker is IStaker, Initializable {
 
         // Sanity check - under normal circumstances, the multipliers should
         // *never* be set to a value < 1e18, as there are guards against this.
-        assert(kInitialMultiplier >= TEN_TO_THE_18);
+        assert(kInitialMultiplier >= 1e18);
 
         uint256 initialTimestamp = syntheticRewardParams[marketIndex][0]
         .timestamp;
@@ -302,10 +301,10 @@ contract Staker is IStaker, Initializable {
         if (block.timestamp - initialTimestamp <= kPeriod) {
             return
                 kInitialMultiplier -
-                (((kInitialMultiplier - TEN_TO_THE_18) *
+                (((kInitialMultiplier - 1e18) *
                     (block.timestamp - initialTimestamp)) / kPeriod);
         } else {
-            return TEN_TO_THE_18;
+            return 1e18;
         }
     }
 
@@ -339,6 +338,7 @@ contract Staker is IStaker, Initializable {
         // Float is scaled by the percentage of the total market value held in
         // the opposite position. This incentivises users to stake on the
         // weaker position.
+        // This value is float per second per synthetic token (hence the requirement to multiply by price)
         return (
             ((k * shortValue) * longPrice) / totalLocked,
             ((k * longValue) * shortPrice) / totalLocked
@@ -390,7 +390,7 @@ contract Staker is IStaker, Initializable {
         // Compute time since last state point for the given token.
         uint256 timeDelta = calculateTimeDelta(marketIndex);
 
-        // // Compute new cumulative 'r' value total.
+        // Compute new cumulative 'r' value total.
         return (
             syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
             .accumulativeFloatPerLongToken + (timeDelta * longFloatPerSecond),
@@ -561,10 +561,7 @@ contract Staker is IStaker, Initializable {
 
     function _mintFloat(address user, uint256 floatToMint) internal {
         floatToken.mint(user, floatToMint);
-        floatToken.mint(
-            floatCapital,
-            (floatToMint * floatPercentage) / TEN_TO_THE_18
-        );
+        floatToken.mint(floatCapital, (floatToMint * floatPercentage) / 1e18);
     }
 
     function mintAccumulatedFloat(uint32 marketIndex, address user) internal {
@@ -699,7 +696,7 @@ contract Staker is IStaker, Initializable {
             amount;
 
         uint256 amountFees = (amount *
-            marketUnstakeFeeBasisPoints[marketIndex]) / TEN_TO_THE_18;
+            marketUnstakeFeeBasisPoints[marketIndex]) / 1e18;
 
         token.transfer(msg.sender, amount - amountFees);
 

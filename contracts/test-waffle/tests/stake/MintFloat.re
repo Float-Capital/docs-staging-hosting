@@ -12,8 +12,6 @@ let test =
     let floatTokenSmockedRef: ref(FloatTokenSmocked.t) =
       ref(None->Obj.magic);
 
-    let stakerRef: ref(Staker.t) = ref(None->Obj.magic);
-
     let floatCapitalAddressRef: ref(Ethers.ethAddress) =
       ref(CONSTANTS.zeroAddress);
 
@@ -24,13 +22,13 @@ let test =
 
     before_once'(() => {
       let%Await _ =
-        stakerRef->deployAndSetupStakerToUnitTest(
+        deployAndSetupStakerToUnitTest(
           ~functionName="_mintFloat",
           ~contracts,
           ~accounts,
         );
 
-      let staker = stakerRef^;
+      let staker = contracts^.staker;
 
       floatCapitalAddressRef := contracts^.floatCapital_v0.address;
 

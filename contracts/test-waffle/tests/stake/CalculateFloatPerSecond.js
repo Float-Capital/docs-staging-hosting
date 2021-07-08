@@ -2,6 +2,7 @@
 'use strict';
 
 var Chai = require("../../bindings/chai/Chai.js");
+var Curry = require("rescript/lib/js/curry.js");
 var LetOps = require("../../library/LetOps.js");
 var Helpers = require("../../library/Helpers.js");
 var CONSTANTS = require("../../CONSTANTS.js");
@@ -10,20 +11,15 @@ var StakerHelpers = require("./StakerHelpers.js");
 var StakerSmocked = require("../../library/smock/StakerSmocked.js");
 
 function test(contracts, accounts) {
-  var stakerRef = {
-    contents: ""
-  };
   var marketIndex = Helpers.randomJsInteger(undefined);
   describe("calculateFloatPerSecond", (function () {
           var mockReturnFormula = function (k, oppositeSideValue, sidePrice, totalLocked) {
             return k.mul(oppositeSideValue).mul(sidePrice).div(totalLocked);
           };
-          var test = function (kVal, longPrice, shortPrice, longValue, shortValue, expectedLongFPS, expectedShortFPS) {
-            var match = contracts.contents;
-            stakerRef.contents = match.staker;
-            return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "calculateFloatPerSecond", contracts, accounts), (function (param) {
+          var testHelper = function (kVal, longPrice, shortPrice, longValue, shortValue, expectedLongFPS, expectedShortFPS) {
+            return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest("calculateFloatPerSecond", contracts, accounts), (function (param) {
                           StakerSmocked.InternalMock.mockGetKValueToReturn(kVal);
-                          return LetOps.Await.let_(stakerRef.contents.calculateFloatPerSecondExposed(marketIndex, longPrice, shortPrice, longValue, shortValue), (function (result) {
+                          return LetOps.Await.let_(contracts.contents.staker.calculateFloatPerSecondExposed(marketIndex, longPrice, shortPrice, longValue, shortValue), (function (result) {
                                         var longFloatPerSecond = Belt_Array.getExn(result, 0);
                                         var shortFloatPerSecond = Belt_Array.getExn(result, 1);
                                         Chai.bnEqual(undefined, longFloatPerSecond, expectedLongFPS);
@@ -39,7 +35,9 @@ function test(contracts, accounts) {
                   var longPrice = match[1];
                   var kVal = match[0];
                   var totalLocked = longValue.add(shortValue);
-                  return LetOps.Await.let_(test(kVal, longPrice, shortPrice, longValue, shortValue, mockReturnFormula(kVal, shortValue, longPrice, totalLocked), mockReturnFormula(kVal, longValue, shortPrice, totalLocked)), (function (param) {
+                  var expectedLongFPS = mockReturnFormula(kVal, shortValue, longPrice, totalLocked);
+                  var expectedShortFPS = mockReturnFormula(kVal, longValue, shortPrice, totalLocked);
+                  return LetOps.Await.let_(testHelper(kVal, longPrice, shortPrice, longValue, shortValue, expectedLongFPS, expectedShortFPS), (function (param) {
                                 
                               }));
                 }));
@@ -50,7 +48,16 @@ function test(contracts, accounts) {
                             });
                 }));
           it("returns 0 for empty markets", (function () {
-                  return test(Helpers.randomInteger(undefined), Helpers.randomInteger(undefined), Helpers.randomInteger(undefined), CONSTANTS.zeroBn, CONSTANTS.zeroBn, CONSTANTS.zeroBn, CONSTANTS.zeroBn);
+                  var partial_arg = Helpers.randomInteger(undefined);
+                  var func = function (param, param$1, param$2, param$3, param$4, param$5) {
+                    return testHelper(partial_arg, param, param$1, param$2, param$3, param$4, param$5);
+                  };
+                  return function (param) {
+                    var func$1 = Curry._1(func, param);
+                    return function (param) {
+                      return Curry._5(func$1, param, CONSTANTS.zeroBn, CONSTANTS.zeroBn, CONSTANTS.zeroBn, CONSTANTS.zeroBn);
+                    };
+                  };
                 }));
           
         }));

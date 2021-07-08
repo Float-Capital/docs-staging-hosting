@@ -11,9 +11,6 @@ var StakerSmocked = require("../../library/smock/StakerSmocked.js");
 
 function test(contracts, accounts) {
   describe("addNewStakingFund", (function () {
-          var stakerRef = {
-            contents: ""
-          };
           var sampleLongAddress = Helpers.randomAddress(undefined);
           var sampleShortAddress = Helpers.randomAddress(undefined);
           var sampleMockAddress = Helpers.randomAddress(undefined);
@@ -27,14 +24,14 @@ function test(contracts, accounts) {
             contents: Promise.resolve(undefined)
           };
           Globals.before_once$p(function (param) {
-                return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "addNewStakingFund", contracts, accounts), (function (param) {
+                return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest("addNewStakingFund", contracts, accounts), (function (param) {
                               StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn(undefined);
                               StakerSmocked.InternalMock.mock_changeUnstakeFeeToReturn(undefined);
                               StakerSmocked.InternalMock.mockOnlyFloatToReturn(undefined);
-                              return LetOps.AwaitThen.let_(stakerRef.contents.setAddNewStakingFundParams(1, sampleLongAddress, sampleShortAddress, sampleMockAddress), (function (param) {
+                              return LetOps.AwaitThen.let_(contracts.contents.staker.setAddNewStakingFundParams(1, sampleLongAddress, sampleShortAddress, sampleMockAddress), (function (param) {
                                             return LetOps.AwaitThen.let_(Helpers.getBlock(undefined), (function (param) {
                                                           timestampRef.contents = param.timestamp;
-                                                          var promise = stakerRef.contents.addNewStakingFund(1, sampleLongAddress, sampleShortAddress, kInitialMultiplier, kPeriod, unstakeFeeBasisPoints);
+                                                          var promise = contracts.contents.staker.addNewStakingFund(1, sampleLongAddress, sampleShortAddress, kInitialMultiplier, kPeriod, unstakeFeeBasisPoints);
                                                           promiseRef.contents = promise;
                                                           return LetOps.Await.let_(promise, (function (param) {
                                                                         
@@ -60,7 +57,7 @@ function test(contracts, accounts) {
                             });
                 }));
           it("mutates syntheticRewardParams", (function () {
-                  return LetOps.Await.let_(stakerRef.contents.syntheticRewardParams(1, CONSTANTS.zeroBn), (function (params) {
+                  return LetOps.Await.let_(contracts.contents.staker.syntheticRewardParams(1, CONSTANTS.zeroBn), (function (params) {
                                 return Chai.recordEqualFlat(params, {
                                             timestamp: ethers.BigNumber.from(timestampRef.contents + 1 | 0),
                                             accumulativeFloatPerLongToken: CONSTANTS.zeroBn,
@@ -69,23 +66,23 @@ function test(contracts, accounts) {
                               }));
                 }));
           it("mutates syntheticTokens", (function () {
-                  return LetOps.Await.let_(stakerRef.contents.syntheticTokens(1, true), (function (tokenLong) {
-                                return LetOps.Await.let_(stakerRef.contents.syntheticTokens(1, false), (function (tokenShort) {
+                  return LetOps.Await.let_(contracts.contents.staker.syntheticTokens(1, true), (function (tokenLong) {
+                                return LetOps.Await.let_(contracts.contents.staker.syntheticTokens(1, false), (function (tokenShort) {
                                               Chai.addressEqual(undefined, tokenLong, sampleLongAddress);
                                               return Chai.addressEqual(undefined, tokenShort, sampleShortAddress);
                                             }));
                               }));
                 }));
           it("mutates marketIndexOfTokens", (function () {
-                  return LetOps.AwaitThen.let_(stakerRef.contents.marketIndexOfToken(sampleLongAddress), (function (longMarketIndex) {
-                                return LetOps.Await.let_(stakerRef.contents.marketIndexOfToken(sampleShortAddress), (function (shortMarketIndex) {
+                  return LetOps.AwaitThen.let_(contracts.contents.staker.marketIndexOfToken(sampleLongAddress), (function (longMarketIndex) {
+                                return LetOps.Await.let_(contracts.contents.staker.marketIndexOfToken(sampleShortAddress), (function (shortMarketIndex) {
                                               Chai.intEqual(undefined, 1, longMarketIndex);
                                               return Chai.intEqual(undefined, 1, shortMarketIndex);
                                             }));
                               }));
                 }));
           it("emits StateAddedEvent", (function () {
-                  return Chai.callEmitEvents(promiseRef.contents, stakerRef.contents, "StateAdded").withArgs(1, CONSTANTS.zeroBn, CONSTANTS.zeroBn, CONSTANTS.zeroBn);
+                  return Chai.callEmitEvents(promiseRef.contents, contracts.contents.staker, "StateAdded").withArgs(1, CONSTANTS.zeroBn, CONSTANTS.zeroBn, CONSTANTS.zeroBn);
                 }));
           
         }));

@@ -9,8 +9,6 @@ let test =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("mintAccumulatedFloat", () => {
-    let stakerRef: ref(Staker.t) = ref(None->Obj.magic);
-
     let marketIndex = Helpers.randomJsInteger();
 
     let (floatToMintLong, floatToMintShort, latestRewardIndexForMarket) =
@@ -23,7 +21,7 @@ let test =
 
     let setup = (~floatToMintLong, ~floatToMintShort) => {
       let%AwaitThen _ =
-        stakerRef->deployAndSetupStakerToUnitTest(
+        deployAndSetupStakerToUnitTest(
           ~functionName="mintAccumulatedFloat",
           ~contracts,
           ~accounts,
@@ -37,14 +35,14 @@ let test =
       StakerSmocked.InternalMock.mock_mintFloatToReturn();
 
       let%AwaitThen _ =
-        (stakerRef^)
+        contracts^.staker
         ->Staker.Exposed.setMintAccumulatedFloatAndClaimFloatParams(
             ~marketIndex,
             ~latestRewardIndexForMarket,
           );
 
       promiseRef :=
-        (stakerRef^)
+        contracts^.staker
         ->Staker.Exposed.mintAccumulatedFloatExternal(~marketIndex, ~user);
 
       let%Await _ = promiseRef^;
@@ -77,7 +75,7 @@ let test =
       it("emits FloatMinted event", () =>
         Chai.callEmitEvents(
           ~call=promiseRef^,
-          ~contract=(stakerRef^)->Obj.magic,
+          ~contract=contracts^.staker->Obj.magic,
           ~eventName="FloatMinted",
         )
         ->Chai.withArgs5(
@@ -91,7 +89,7 @@ let test =
 
       it("mutates userIndexOfLastClaimedReward", () => {
         let%Await lastClaimed =
-          (stakerRef^)
+          contracts^.staker
           ->Staker.userIndexOfLastClaimedReward(marketIndex, user);
         lastClaimed->Chai.bnEqual(latestRewardIndexForMarket);
       });
@@ -123,7 +121,7 @@ let test =
 
       it("doesn't mutate userIndexOfLastClaimed", () => {
         let%Await lastClaimed =
-          (stakerRef^)
+          contracts^.staker
           ->Staker.userIndexOfLastClaimedReward(marketIndex, user);
         lastClaimed->Chai.bnEqual(CONSTANTS.zeroBn); // bit hacky but won't have been set yet
       });
@@ -131,7 +129,7 @@ let test =
       it("doesn't emit FloatMinted event", () => {
         Chai.callEmitEvents(
           ~call=promiseRef^,
-          ~contract=(stakerRef^)->Obj.magic,
+          ~contract=contracts^.staker->Obj.magic,
           ~eventName="FloatMinted",
         )
         ->Chai.expectToNotEmit

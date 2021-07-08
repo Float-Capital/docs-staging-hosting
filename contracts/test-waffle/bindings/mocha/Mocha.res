@@ -2,6 +2,8 @@
 external describe: (string, @uncurry (unit => unit)) => unit = "describe"
 @val
 external describe_skip: (string, @uncurry (unit => unit)) => unit = "describe.skip"
+@val
+external describe_only: (string, @uncurry (unit => unit)) => unit = "describe.only"
 
 // Why we use uncurry here: https://rescript-lang.org/docs/manual/latest/bind-to-js-function#extra-solution
 //    TLDR: then we don't need to use the `.` for uncurrying (https://rescript-lang.org/docs/manual/latest/function#uncurried-function)

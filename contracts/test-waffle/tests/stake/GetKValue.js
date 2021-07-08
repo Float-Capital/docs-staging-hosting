@@ -11,9 +11,6 @@ var StakerHelpers = require("./StakerHelpers.js");
 var StakerSmocked = require("../../library/smock/StakerSmocked.js");
 
 function test(contracts, accounts) {
-  var stakerRef = {
-    contents: ""
-  };
   var prom = {
     contents: undefined
   };
@@ -26,16 +23,16 @@ function test(contracts, accounts) {
             contents: CONSTANTS.zeroBn
           };
           var setup = function (multiplier, periodShouldBeOver) {
-            return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "getKValue", contracts, accounts), (function (param) {
+            return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest("getKValue", contracts, accounts), (function (param) {
                           return LetOps.AwaitThen.let_(Helpers.getRandomTimestampInPast(undefined), (function (pastTimestamp) {
                                         return LetOps.AwaitThen.let_(Helpers.getBlock(undefined), (function (param) {
                                                       diffRef.contents = ethers.BigNumber.from(param.timestamp + 1 | 0).sub(pastTimestamp);
                                                       var diff = diffRef.contents;
                                                       var period = periodShouldBeOver ? diff.sub(ethers.BigNumber.from(20)) : diff.add(ethers.BigNumber.from(20));
                                                       periodRef.contents = period;
-                                                      return LetOps.Await.let_(stakerRef.contents.setGetKValueParams(2, pastTimestamp), (function (param) {
+                                                      return LetOps.Await.let_(contracts.contents.staker.setGetKValueParams(2, pastTimestamp), (function (param) {
                                                                     StakerSmocked.InternalMock.mockGetMarketLaunchIncentiveParametersToReturn(period, multiplier);
-                                                                    prom.contents = stakerRef.contents.getKValueExternal(2);
+                                                                    prom.contents = contracts.contents.staker.getKValueExternal(2);
                                                                     
                                                                   }));
                                                     }));

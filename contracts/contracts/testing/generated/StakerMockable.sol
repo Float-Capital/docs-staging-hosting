@@ -30,7 +30,6 @@ contract StakerMockable is IStaker, Initializable {
 
 
         uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
-    uint256 public constant TEN_TO_THE_18 = 1e18;
 
         address public admin;
     address public floatCapital;
@@ -210,7 +209,7 @@ contract StakerMockable is IStaker, Initializable {
       return mocker._changeFloatPercentageMock(newFloatPercentage);
     }
   
-        require(newFloatPercentage <= TEN_TO_THE_18 && newFloatPercentage > 0);         floatPercentage = newFloatPercentage;
+        require(newFloatPercentage <= 1e18 && newFloatPercentage > 0);         floatPercentage = newFloatPercentage;
     }
 
     function changeFloatPercentage(uint256 newFloatPercentage)
@@ -284,7 +283,7 @@ contract StakerMockable is IStaker, Initializable {
     }
   
         require(
-            initialMultiplier >= TEN_TO_THE_18,
+            initialMultiplier >= 1e18,
             "marketLaunchIncentiveMultiplier must be >= 1e18"
         );
 
@@ -356,7 +355,7 @@ contract StakerMockable is IStaker, Initializable {
         uint256 period = marketLaunchIncentivePeriod[marketIndex];
         uint256 multiplier = marketLaunchIncentiveMultipliers[marketIndex];
         if (multiplier == 0) {
-            multiplier = TEN_TO_THE_18;         }
+            multiplier = 1e18;         }
 
         return (period, multiplier);
     }
@@ -372,7 +371,7 @@ contract StakerMockable is IStaker, Initializable {
             uint256 kInitialMultiplier
         ) = getMarketLaunchIncentiveParameters(marketIndex);
 
-                        assert(kInitialMultiplier >= TEN_TO_THE_18);
+                        assert(kInitialMultiplier >= 1e18);
 
         uint256 initialTimestamp = syntheticRewardParams[marketIndex][0]
         .timestamp;
@@ -380,10 +379,10 @@ contract StakerMockable is IStaker, Initializable {
         if (block.timestamp - initialTimestamp <= kPeriod) {
             return
                 kInitialMultiplier -
-                (((kInitialMultiplier - TEN_TO_THE_18) *
+                (((kInitialMultiplier - 1e18) *
                     (block.timestamp - initialTimestamp)) / kPeriod);
         } else {
-            return TEN_TO_THE_18;
+            return 1e18;
         }
     }
 
@@ -413,7 +412,7 @@ contract StakerMockable is IStaker, Initializable {
 
         uint256 totalLocked = (longValue + shortValue);
 
-                                return (
+                                        return (
             ((k * shortValue) * longPrice) / totalLocked,
             ((k * longValue) * shortPrice) / totalLocked
         );
@@ -646,10 +645,7 @@ contract StakerMockable is IStaker, Initializable {
     }
   
         floatToken.mint(user, floatToMint);
-        floatToken.mint(
-            floatCapital,
-            (floatToMint * floatPercentage) / TEN_TO_THE_18
-        );
+        floatToken.mint(floatCapital, (floatToMint * floatPercentage) / 1e18);
     }
 
     function mintAccumulatedFloat(uint32 marketIndex, address user) internal {
@@ -797,7 +793,7 @@ contract StakerMockable is IStaker, Initializable {
             amount;
 
         uint256 amountFees = (amount *
-            marketUnstakeFeeBasisPoints[marketIndex]) / TEN_TO_THE_18;
+            marketUnstakeFeeBasisPoints[marketIndex]) / 1e18;
 
         token.transfer(msg.sender, amount - amountFees);
 

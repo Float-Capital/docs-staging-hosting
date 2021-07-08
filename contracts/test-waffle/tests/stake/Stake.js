@@ -14,9 +14,6 @@ var StakerSmocked = require("../../library/smock/StakerSmocked.js");
 
 function test(contracts, accounts) {
   describe("_stake", (function () {
-          var stakerRef = {
-            contents: undefined
-          };
           var token = Helpers.randomAddress(undefined);
           var match = Helpers.Tuple.make2(Helpers.randomTokenAmount);
           var userAmountToStake = match[1];
@@ -27,10 +24,10 @@ function test(contracts, accounts) {
             contents: undefined
           };
           var setup = function (userLastRewardIndex, latestRewardIndex) {
-            return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "_stake", contracts, accounts), (function (param) {
+            return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest("_stake", contracts, accounts), (function (param) {
                           StakerSmocked.InternalMock.mockMintAccumulatedFloatToReturn(undefined);
-                          return LetOps.AwaitThen.let_(stakerRef.contents.set_stakeParams(user, marketIndex, latestRewardIndex, token, userAmountStaked, userLastRewardIndex), (function (param) {
-                                        var promise = stakerRef.contents._stakeExternal(token, userAmountToStake, user);
+                          return LetOps.AwaitThen.let_(contracts.contents.staker.set_stakeParams(user, marketIndex, latestRewardIndex, token, userAmountStaked, userLastRewardIndex), (function (param) {
+                                        var promise = contracts.contents.staker._stakeExternal(token, userAmountToStake, user);
                                         promiseRef.contents = promise;
                                         return promise;
                                       }));
@@ -51,17 +48,17 @@ function test(contracts, accounts) {
                                     });
                         }));
                   it("mutates userAmountStaked", (function () {
-                          return LetOps.Await.let_(stakerRef.contents.userAmountStaked(token, user), (function (amountStaked) {
+                          return LetOps.Await.let_(contracts.contents.staker.userAmountStaked(token, user), (function (amountStaked) {
                                         return Chai.bnEqual(undefined, amountStaked, userAmountStaked.add(userAmountToStake));
                                       }));
                         }));
                   it("mutates userIndexOfLastClaimedReward", (function () {
-                          return LetOps.Await.let_(stakerRef.contents.userIndexOfLastClaimedReward(marketIndex, user), (function (lastClaimedReward) {
+                          return LetOps.Await.let_(contracts.contents.staker.userIndexOfLastClaimedReward(marketIndex, user), (function (lastClaimedReward) {
                                         return Chai.bnEqual(undefined, lastClaimedReward, latestRewardIndex);
                                       }));
                         }));
                   it("emits StakeAdded", (function () {
-                          return Chai.callEmitEvents(promiseRef.contents, stakerRef.contents, "StakeAdded").withArgs(user, token, userAmountToStake, latestRewardIndex);
+                          return Chai.callEmitEvents(promiseRef.contents, contracts.contents.staker, "StakeAdded").withArgs(user, token, userAmountToStake, latestRewardIndex);
                         }));
                   
                 }));

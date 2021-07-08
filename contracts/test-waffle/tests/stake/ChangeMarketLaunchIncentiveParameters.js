@@ -10,17 +10,14 @@ var StakerHelpers = require("./StakerHelpers.js");
 var StakerSmocked = require("../../library/smock/StakerSmocked.js");
 
 function test(contracts, accounts) {
-  var stakerRef = {
-    contents: ""
-  };
   var period = Helpers.randomInteger(undefined);
   describe("changeMarketLaunchIncentiveParameters (external)", (function () {
           var initialMultiplier = Helpers.randomInteger(undefined);
           Globals.before_once$p(function (param) {
-                return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "changeMarketLaunchIncentiveParameters", contracts, accounts), (function (param) {
+                return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest("changeMarketLaunchIncentiveParameters", contracts, accounts), (function (param) {
                               StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn(undefined);
                               StakerSmocked.InternalMock.mockOnlyAdminToReturn(undefined);
-                              return LetOps.Await.let_(stakerRef.contents.changeMarketLaunchIncentiveParameters(2, period, initialMultiplier), (function (param) {
+                              return LetOps.Await.let_(contracts.contents.staker.changeMarketLaunchIncentiveParameters(2, period, initialMultiplier), (function (param) {
                                             
                                           }));
                             }));
@@ -39,37 +36,32 @@ function test(contracts, accounts) {
         }));
   describe("_changeMarketLaunchIncentiveParameters (internal)", (function () {
           var initialMultiplierFine = Helpers.randomInteger(undefined).mul(CONSTANTS.tenToThe18);
-          var promise = {
+          var changeMarketLaunchIncentiveParametersCall = {
             contents: undefined
           };
           var setup = function (initialMultiplier) {
             return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
-                          stakerRef.contents = deployedContracts.staker;
-                          var prom = stakerRef.contents._changeMarketLaunchIncentiveParametersExternal(2, period, initialMultiplier);
-                          promise.contents = prom;
+                          contracts.contents = deployedContracts;
+                          changeMarketLaunchIncentiveParametersCall.contents = deployedContracts.staker._changeMarketLaunchIncentiveParametersExternal(2, period, initialMultiplier);
                           
                         }));
           };
           describe("passing transaction", (function () {
                   Globals.before_once$p(function (param) {
-                        return LetOps.Await.let_(setup(initialMultiplierFine), (function (param) {
-                                      return LetOps.Await.let_(promise.contents, (function (param) {
-                                                    
-                                                  }));
-                                    }));
+                        return setup(initialMultiplierFine);
                       });
                   it("mutates marketLaunchIncentivePeriod", (function () {
-                          return LetOps.Await.let_(stakerRef.contents.marketLaunchIncentivePeriod(2), (function (setPeriod) {
+                          return LetOps.Await.let_(contracts.contents.staker.marketLaunchIncentivePeriod(2), (function (setPeriod) {
                                         return Chai.bnEqual(undefined, period, setPeriod);
                                       }));
                         }));
                   it("mutates marketLaunchIncentiveMultiplier", (function () {
-                          return LetOps.Await.let_(stakerRef.contents.marketLaunchIncentiveMultipliers(2), (function (setMultiplier) {
+                          return LetOps.Await.let_(contracts.contents.staker.marketLaunchIncentiveMultipliers(2), (function (setMultiplier) {
                                         return Chai.bnEqual(undefined, initialMultiplierFine, setMultiplier);
                                       }));
                         }));
                   it("emits MarketLaunchIncentiveParametersChanges event", (function () {
-                          return Chai.callEmitEvents(promise.contents, stakerRef.contents, "MarketLaunchIncentiveParametersChanges").withArgs(2, period, initialMultiplierFine);
+                          return Chai.callEmitEvents(changeMarketLaunchIncentiveParametersCall.contents, contracts.contents.staker, "MarketLaunchIncentiveParametersChanges").withArgs(2, period, initialMultiplierFine);
                         }));
                   
                 }));
@@ -78,7 +70,7 @@ function test(contracts, accounts) {
                         return setup(CONSTANTS.oneBn);
                       });
                   it("reverts if initialMultiplier < 1e18", (function () {
-                          return LetOps.Await.let_(Chai.expectRevert(promise.contents, "marketLaunchIncentiveMultiplier must be >= 1e18"), (function (param) {
+                          return LetOps.Await.let_(Chai.expectRevert(changeMarketLaunchIncentiveParametersCall.contents, "marketLaunchIncentiveMultiplier must be >= 1e18"), (function (param) {
                                         
                                       }));
                         }));

@@ -35,9 +35,6 @@ function iterativeMockCalculateAccumulatedFloatToReturn(arr) {
 
 function test(contracts, accounts) {
   describe("_claimFloat", (function () {
-          var stakerRef = {
-            contents: undefined
-          };
           var marketIndices = [
             Helpers.randomJsInteger(undefined),
             Helpers.randomJsInteger(undefined)
@@ -64,17 +61,17 @@ function test(contracts, accounts) {
             contents: undefined
           };
           var setup = function (marketIndices, latestRewardIndices, floatRewardsForMarkets) {
-            return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "_claimFloat", contracts, accounts), (function (param) {
+            return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest("_claimFloat", contracts, accounts), (function (param) {
                           userWalletRef.contents = accounts.contents[5];
                           iterativeMockCalculateAccumulatedFloatToReturn(floatRewardsForMarkets);
                           StakerSmocked.InternalMock.mock_mintFloatToReturn(undefined);
                           var setupPromise = Belt_Array.reduceWithIndex(marketIndices, Promise.resolve(undefined), (function (lastPromise, marketIndex, arrayIndex) {
                                   return LetOps.AwaitThen.let_(lastPromise, (function (param) {
-                                                return stakerRef.contents.setMintAccumulatedFloatAndClaimFloatParams(marketIndex, latestRewardIndices[arrayIndex]);
+                                                return contracts.contents.staker.setMintAccumulatedFloatAndClaimFloatParams(marketIndex, latestRewardIndices[arrayIndex]);
                                               }));
                                 }));
                           return LetOps.AwaitThen.let_(setupPromise, (function (param) {
-                                        promiseRef.contents = stakerRef.contents.connect(userWalletRef.contents)._claimFloatExternal(marketIndices);
+                                        promiseRef.contents = contracts.contents.staker.connect(userWalletRef.contents)._claimFloatExternal(marketIndices);
                                         return LetOps.Await.let_(promiseRef.contents, (function (param) {
                                                       return promiseRef.contents;
                                                     }));
@@ -100,12 +97,12 @@ function test(contracts, accounts) {
                                 }));
                           it("emits FloatMinted event", (function () {
                                   var match = floatRewardsForMarkets[0];
-                                  return LetOps.Await.let_(Chai.callEmitEvents(promiseRef.contents, stakerRef.contents, "FloatMinted").withArgs(userWalletRef.contents.address, Belt_Array.getExn(marketIndices, 0), match[0], match[1], Belt_Array.getExn(latestRewardIndices, 0)), (function (param) {
+                                  return LetOps.Await.let_(Chai.callEmitEvents(promiseRef.contents, contracts.contents.staker, "FloatMinted").withArgs(userWalletRef.contents.address, Belt_Array.getExn(marketIndices, 0), match[0], match[1], Belt_Array.getExn(latestRewardIndices, 0)), (function (param) {
                                                 
                                               }));
                                 }));
                           it("mutates userIndexOfLastClaimedReward", (function () {
-                                  return LetOps.Await.let_(stakerRef.contents.userIndexOfLastClaimedReward(marketIndices[0], userWalletRef.contents.address), (function (lastClaimed) {
+                                  return LetOps.Await.let_(contracts.contents.staker.userIndexOfLastClaimedReward(marketIndices[0], userWalletRef.contents.address), (function (lastClaimed) {
                                                 return Chai.bnEqual(undefined, lastClaimed, latestRewardIndices[0]);
                                               }));
                                 }));
@@ -113,12 +110,12 @@ function test(contracts, accounts) {
                         }));
                   describe("case market has no float to mint", (function () {
                           it("doesn't mutate userIndexOfLastClaimed", (function () {
-                                  return LetOps.Await.let_(stakerRef.contents.userIndexOfLastClaimedReward(marketIndices[1], userWalletRef.contents.address), (function (lastClaimed) {
+                                  return LetOps.Await.let_(contracts.contents.staker.userIndexOfLastClaimedReward(marketIndices[1], userWalletRef.contents.address), (function (lastClaimed) {
                                                 return Chai.bnEqual(undefined, lastClaimed, CONSTANTS.zeroBn);
                                               }));
                                 }));
                           it("doesn't emit FloatMinted event", (function () {
-                                  return Chai.expectToNotEmit(Chai.callEmitEvents(promiseRef.contents, stakerRef.contents, "FloatMinted").withArgs(userWalletRef.contents.address, Belt_Array.getExn(marketIndices, 1), CONSTANTS.zeroBn, CONSTANTS.zeroBn, Belt_Array.getExn(latestRewardIndices, 1)));
+                                  return Chai.expectToNotEmit(Chai.callEmitEvents(promiseRef.contents, contracts.contents.staker, "FloatMinted").withArgs(userWalletRef.contents.address, Belt_Array.getExn(marketIndices, 1), CONSTANTS.zeroBn, CONSTANTS.zeroBn, Belt_Array.getExn(latestRewardIndices, 1)));
                                 }));
                           
                         }));

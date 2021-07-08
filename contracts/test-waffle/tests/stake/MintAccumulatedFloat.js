@@ -12,9 +12,6 @@ var StakerSmocked = require("../../library/smock/StakerSmocked.js");
 
 function test(contracts, accounts) {
   describe("mintAccumulatedFloat", (function () {
-          var stakerRef = {
-            contents: undefined
-          };
           var marketIndex = Helpers.randomJsInteger(undefined);
           var match = Helpers.Tuple.make3(Helpers.randomTokenAmount);
           var latestRewardIndexForMarket = match[2];
@@ -25,11 +22,11 @@ function test(contracts, accounts) {
             contents: undefined
           };
           var setup = function (floatToMintLong, floatToMintShort) {
-            return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "mintAccumulatedFloat", contracts, accounts), (function (param) {
+            return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest("mintAccumulatedFloat", contracts, accounts), (function (param) {
                           StakerSmocked.InternalMock.mockCalculateAccumulatedFloatToReturn(floatToMintLong, floatToMintShort);
                           StakerSmocked.InternalMock.mock_mintFloatToReturn(undefined);
-                          return LetOps.AwaitThen.let_(stakerRef.contents.setMintAccumulatedFloatAndClaimFloatParams(marketIndex, latestRewardIndexForMarket), (function (param) {
-                                        promiseRef.contents = stakerRef.contents.mintAccumulatedFloatExternal(marketIndex, user);
+                          return LetOps.AwaitThen.let_(contracts.contents.staker.setMintAccumulatedFloatAndClaimFloatParams(marketIndex, latestRewardIndexForMarket), (function (param) {
+                                        promiseRef.contents = contracts.contents.staker.mintAccumulatedFloatExternal(marketIndex, user);
                                         return LetOps.Await.let_(promiseRef.contents, (function (param) {
                                                       return promiseRef.contents;
                                                     }));
@@ -53,10 +50,10 @@ function test(contracts, accounts) {
                                     });
                         }));
                   it("emits FloatMinted event", (function () {
-                          return Chai.callEmitEvents(promiseRef.contents, stakerRef.contents, "FloatMinted").withArgs(user, marketIndex, floatToMintLong, floatToMintShort, latestRewardIndexForMarket);
+                          return Chai.callEmitEvents(promiseRef.contents, contracts.contents.staker, "FloatMinted").withArgs(user, marketIndex, floatToMintLong, floatToMintShort, latestRewardIndexForMarket);
                         }));
                   it("mutates userIndexOfLastClaimedReward", (function () {
-                          return LetOps.Await.let_(stakerRef.contents.userIndexOfLastClaimedReward(marketIndex, user), (function (lastClaimed) {
+                          return LetOps.Await.let_(contracts.contents.staker.userIndexOfLastClaimedReward(marketIndex, user), (function (lastClaimed) {
                                         return Chai.bnEqual(undefined, lastClaimed, latestRewardIndexForMarket);
                                       }));
                         }));
@@ -76,12 +73,12 @@ function test(contracts, accounts) {
                           return Chai.intEqual(undefined, StakerSmocked.InternalMock._mintFloatCalls(undefined).length, 0);
                         }));
                   it("doesn't mutate userIndexOfLastClaimed", (function () {
-                          return LetOps.Await.let_(stakerRef.contents.userIndexOfLastClaimedReward(marketIndex, user), (function (lastClaimed) {
+                          return LetOps.Await.let_(contracts.contents.staker.userIndexOfLastClaimedReward(marketIndex, user), (function (lastClaimed) {
                                         return Chai.bnEqual(undefined, lastClaimed, CONSTANTS.zeroBn);
                                       }));
                         }));
                   it("doesn't emit FloatMinted event", (function () {
-                          return Chai.expectToNotEmit(Chai.callEmitEvents(promiseRef.contents, stakerRef.contents, "FloatMinted"));
+                          return Chai.expectToNotEmit(Chai.callEmitEvents(promiseRef.contents, contracts.contents.staker, "FloatMinted"));
                         }));
                   
                 }));

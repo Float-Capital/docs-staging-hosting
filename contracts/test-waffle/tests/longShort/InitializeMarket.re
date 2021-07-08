@@ -1,6 +1,5 @@
 open LetOps;
 open Mocha;
-open Globals;
 
 let testUnit =
     (

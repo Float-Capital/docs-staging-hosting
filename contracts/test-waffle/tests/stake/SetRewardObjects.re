@@ -8,8 +8,6 @@ let test =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  let stakerRef: ref(Staker.t) = ref(""->Obj.magic);
-
   let promiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
     ref(None->Obj.magic);
 
@@ -31,7 +29,7 @@ let test =
   describe("setRewardObjects", () => {
     before_once'(() => {
       let%AwaitThen _ =
-        stakerRef->deployAndSetupStakerToUnitTest(
+        deployAndSetupStakerToUnitTest(
           ~functionName="setRewardObjects",
           ~contracts,
           ~accounts,
@@ -42,7 +40,7 @@ let test =
       );
 
       let%AwaitThen _ =
-        (stakerRef^)
+        contracts^.staker
         ->Staker.Exposed.setSetRewardObjectsParams(
             ~marketIndex,
             ~latestRewardIndexForMarket,
@@ -53,7 +51,7 @@ let test =
       timestampRef := (timestamp + 1)->Ethers.BigNumber.fromInt; // one second per block
 
       promiseRef :=
-        (stakerRef^)
+        contracts^.staker
         ->Staker.Exposed.setRewardObjectsExternal(
             ~marketIndex,
             ~longPrice,
@@ -83,14 +81,15 @@ let test =
 
     it("mutates latestRewardIndex", () => {
       let%Await latestRewardIndex =
-        (stakerRef^)->Staker.latestRewardIndex(marketIndex);
+        contracts^.staker->Staker.latestRewardIndex(marketIndex);
 
       latestRewardIndex->Chai.bnEqual(mutatedIndex);
     });
 
     it("mutates syntheticRewardParams", () => {
       let%Await rewardParams =
-        (stakerRef^)->Staker.syntheticRewardParams(marketIndex, mutatedIndex);
+        contracts^.staker
+        ->Staker.syntheticRewardParams(marketIndex, mutatedIndex);
 
       rewardParams->Chai.recordEqualFlat({
         timestamp: timestampRef^,
@@ -101,15 +100,10 @@ let test =
     it("emits StateAddedEvent", () => {
       Chai.callEmitEvents(
         ~call=promiseRef^,
-        ~contract=(stakerRef^)->Obj.magic,
+        ~contract=contracts^.staker->Obj.magic,
         ~eventName="StateAdded",
       )
-      ->Chai.withArgs4(
-          marketIndex,
-          mutatedIndex,
-          longAccum,
-          shortAccum,
-        )
+      ->Chai.withArgs4(marketIndex, mutatedIndex, longAccum, shortAccum)
     });
   });
 };

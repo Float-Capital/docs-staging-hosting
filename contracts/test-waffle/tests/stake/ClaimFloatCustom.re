@@ -14,8 +14,6 @@ let test =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("claimFloatCustom", () => {
-    let stakerRef: ref(Staker.t) = ref(""->Obj.magic);
-
     let longShortSmockedRef: ref(LongShortSmocked.t) =
       ref(LongShortSmocked.uninitializedValue);
 
@@ -24,7 +22,7 @@ let test =
 
     let setup = (~marketIndices, ~shouldWaitForTransactionToFinish) => {
       let%AwaitThen _ =
-        stakerRef->deployAndSetupStakerToUnitTest(
+        deployAndSetupStakerToUnitTest(
           ~functionName="claimFloatCustom",
           ~contracts,
           ~accounts,
@@ -40,13 +38,14 @@ let test =
       StakerSmocked.InternalMock.mock_claimFloatToReturn();
 
       let%AwaitThen _ =
-        (stakerRef^)
+        contracts^.staker
         ->Staker.Exposed.setClaimFloatCustomParams(
             ~longshort=longShortSmockedRef^.address,
           );
 
       let promise =
-        (stakerRef^)->Staker.claimFloatCustom(~marketIndexes=marketIndices);
+        contracts^.staker
+        ->Staker.claimFloatCustom(~marketIndexes=marketIndices);
       promiseRef := promise;
       if (shouldWaitForTransactionToFinish) {
         promise;

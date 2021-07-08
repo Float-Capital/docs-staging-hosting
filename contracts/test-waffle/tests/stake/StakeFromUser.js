@@ -13,9 +13,6 @@ var Smock = require("@eth-optimism/smock");
 
 function test(contracts, accounts) {
   describe("stakeFromUser", (function () {
-          var stakerRef = {
-            contents: undefined
-          };
           var longShortSmockedRef = {
             contents: undefined
           };
@@ -26,16 +23,16 @@ function test(contracts, accounts) {
             contents: undefined
           };
           Globals.before_once$p(function (param) {
-                return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "stakeFromUser", contracts, accounts), (function (param) {
+                return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest("stakeFromUser", contracts, accounts), (function (param) {
                               var match = contracts.contents;
                               return LetOps.Await.let_(Smock.smockit(match.longShort), (function (longShortSmocked) {
                                             LongShortSmocked.mockUpdateSystemStateToReturn(longShortSmocked);
                                             longShortSmockedRef.contents = longShortSmocked;
                                             mockTokenWalletRef.contents = Belt_Array.getExn(accounts.contents, 6);
-                                            return LetOps.Await.let_(stakerRef.contents.setStakeFromUserParams(longShortSmocked.address, mockTokenWalletRef.contents.address, marketIndexForToken), (function (param) {
+                                            return LetOps.Await.let_(contracts.contents.staker.setStakeFromUserParams(longShortSmocked.address, mockTokenWalletRef.contents.address, marketIndexForToken), (function (param) {
                                                           StakerSmocked.InternalMock.mockOnlyValidSyntheticToReturn(undefined);
                                                           StakerSmocked.InternalMock.mock_stakeToReturn(undefined);
-                                                          return stakerRef.contents.connect(mockTokenWalletRef.contents).stakeFromUser(from, amount);
+                                                          return contracts.contents.staker.connect(mockTokenWalletRef.contents).stakeFromUser(from, amount);
                                                         }));
                                           }));
                             }));

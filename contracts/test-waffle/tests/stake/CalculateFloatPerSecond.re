@@ -7,7 +7,6 @@ let test =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  let stakerRef: ref(Staker.t) = ref(""->Obj.magic);
   let marketIndex = Helpers.randomJsInteger();
 
   describe("calculateFloatPerSecond", () => {
@@ -18,7 +17,7 @@ let test =
       ->Ethers.BigNumber.div(totalLocked);
     };
 
-    let test =
+    let testHelper =
         (
           ~kVal,
           ~longPrice,
@@ -28,10 +27,8 @@ let test =
           ~expectedLongFPS,
           ~expectedShortFPS,
         ) => {
-      let {staker} = contracts^;
-      stakerRef := staker;
       let%AwaitThen _ =
-        stakerRef->deployAndSetupStakerToUnitTest(
+        deployAndSetupStakerToUnitTest(
           ~functionName="calculateFloatPerSecond",
           ~contracts,
           ~accounts,
@@ -40,7 +37,7 @@ let test =
       StakerSmocked.InternalMock.mockGetKValueToReturn(kVal);
 
       let%Await result =
-        (stakerRef^)
+        contracts^.staker
         ->Staker.Exposed.calculateFloatPerSecondExposed(
             ~marketIndex,
             ~longPrice,
@@ -65,27 +62,29 @@ let test =
           Helpers.Tuple.make5(Helpers.randomInteger);
 
         let totalLocked = longValue->Ethers.BigNumber.add(shortValue);
+        let expectedLongFPS =
+          mockReturnFormula(
+            ~k=kVal,
+            ~oppositeSideValue=shortValue,
+            ~sidePrice=longPrice,
+            ~totalLocked,
+          );
+        let expectedShortFPS =
+          mockReturnFormula(
+            ~k=kVal,
+            ~oppositeSideValue=longValue,
+            ~sidePrice=shortPrice,
+            ~totalLocked,
+          );
         let%Await _ =
-          test(
+          testHelper(
             ~kVal,
             ~longValue,
             ~shortValue,
             ~longPrice,
             ~shortPrice,
-            ~expectedLongFPS=
-              mockReturnFormula(
-                ~k=kVal,
-                ~oppositeSideValue=shortValue,
-                ~sidePrice=longPrice,
-                ~totalLocked,
-              ),
-            ~expectedShortFPS=
-              mockReturnFormula(
-                ~k=kVal,
-                ~oppositeSideValue=longValue,
-                ~sidePrice=shortPrice,
-                ~totalLocked,
-              ),
+            ~expectedLongFPS,
+            ~expectedShortFPS,
           );
         ();
       },
@@ -99,12 +98,10 @@ let test =
     });
 
     it("returns 0 for empty markets", () => {
-      test(
+      testHelper(
         ~kVal=Helpers.randomInteger(),
         ~longValue=CONSTANTS.zeroBn,
         ~shortValue=CONSTANTS.zeroBn,
-        ~longPrice=Helpers.randomInteger(),
-        ~shortPrice=Helpers.randomInteger(),
         ~expectedLongFPS=CONSTANTS.zeroBn,
         ~expectedShortFPS=CONSTANTS.zeroBn,
       )

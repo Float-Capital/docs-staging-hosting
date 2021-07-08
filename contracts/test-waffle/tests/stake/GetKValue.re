@@ -8,7 +8,6 @@ let test =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  let stakerRef: ref(Staker.t) = ref(""->Obj.magic);
   let marketIndex = 2;
 
   let prom: ref(JsPromise.t(Staker.Exposed.getKValueExternalReturn)) =
@@ -21,7 +20,7 @@ let test =
     let periodRef = ref(CONSTANTS.zeroBn);
     let setup = (~multiplier, ~periodShouldBeOver) => {
       let%AwaitThen _ =
-        stakerRef->deployAndSetupStakerToUnitTest(
+        deployAndSetupStakerToUnitTest(
           ~functionName="getKValue",
           ~contracts,
           ~accounts,
@@ -49,7 +48,7 @@ let test =
       periodRef := period;
 
       let%Await _ =
-        (stakerRef^)
+        contracts^.staker
         ->Staker.Exposed.setGetKValueParams(
             ~marketIndex,
             ~timestamp=pastTimestamp,
@@ -59,7 +58,8 @@ let test =
         multiplier,
       );
 
-      prom := (stakerRef^)->Staker.Exposed.getKValueExternal(~marketIndex);
+      prom :=
+        contracts^.staker->Staker.Exposed.getKValueExternal(~marketIndex);
     };
 
     it(
@@ -98,8 +98,7 @@ let test =
         },
       );
 
-      it(
-        "calls getMarketLaunchIncentiveParameters with correct arguments", () => {
+      it("calls getMarketLaunchIncentiveParameters with correct arguments", () => {
         StakerSmocked.InternalMock.getMarketLaunchIncentiveParametersCalls()
         ->Array.getExn(0)
         ->Chai.recordEqualFlat({marketIndex: marketIndex})

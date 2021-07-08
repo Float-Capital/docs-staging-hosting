@@ -16,9 +16,6 @@ function test(contracts, accounts) {
           var floatTokenSmockedRef = {
             contents: undefined
           };
-          var stakerRef = {
-            contents: undefined
-          };
           var floatCapitalAddressRef = {
             contents: CONSTANTS.zeroAddress
           };
@@ -26,8 +23,8 @@ function test(contracts, accounts) {
           var floatToMint = Helpers.randomTokenAmount(undefined);
           var floatPercentage = Helpers.randomJsInteger(undefined) / 65536 | 0;
           Globals.before_once$p(function (param) {
-                return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "_mintFloat", contracts, accounts), (function (param) {
-                              var staker = stakerRef.contents;
+                return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest("_mintFloat", contracts, accounts), (function (param) {
+                              var staker = contracts.contents.staker;
                               floatCapitalAddressRef.contents = contracts.contents.floatCapital_v0.address;
                               return LetOps.AwaitThen.let_(Smock.smockit(contracts.contents.floatToken), (function (floatTokenSmocked) {
                                             FloatTokenSmocked.mockMintToReturn(floatTokenSmocked);

@@ -10,9 +10,6 @@ var StakerHelpers = require("./StakerHelpers.js");
 var StakerSmocked = require("../../library/smock/StakerSmocked.js");
 
 function test(contracts, accounts) {
-  var stakerRef = {
-    contents: ""
-  };
   var marketIndex = Helpers.randomJsInteger(undefined);
   var match = Helpers.Tuple.make6(Helpers.randomInteger);
   var timeDelta = match[5];
@@ -31,13 +28,13 @@ function test(contracts, accounts) {
             contents: undefined
           };
           Globals.before_once$p(function (param) {
-                return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest(stakerRef, "calculateNewCumulativeRate", contracts, accounts), (function (param) {
+                return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest("calculateNewCumulativeRate", contracts, accounts), (function (param) {
                               var match = contracts.contents;
-                              stakerRef.contents = match.staker;
+                              var staker = match.staker;
                               StakerSmocked.InternalMock.mockCalculateFloatPerSecondToReturn(longFloatPerSecond, shortFloatPerSecond);
                               StakerSmocked.InternalMock.mockCalculateTimeDeltaToReturn(timeDelta);
-                              return LetOps.Await.let_(stakerRef.contents.setCalculateNewCumulativeRateParams(marketIndex, latestRewardIndexForMarket, accumFloatLong, accumFloatShort), (function (param) {
-                                            promiseRef.contents = stakerRef.contents.calculateNewCumulativeRateExposed(marketIndex, longPrice, shortPrice, longValue, shortValue);
+                              return LetOps.Await.let_(staker.setCalculateNewCumulativeRateParams(marketIndex, latestRewardIndexForMarket, accumFloatLong, accumFloatShort), (function (param) {
+                                            promiseRef.contents = staker.calculateNewCumulativeRateExposed(marketIndex, longPrice, shortPrice, longValue, shortValue);
                                             return LetOps.Await.let_(promiseRef.contents, (function (param) {
                                                           
                                                         }));

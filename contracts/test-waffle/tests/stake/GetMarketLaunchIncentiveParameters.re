@@ -2,13 +2,7 @@ open LetOps;
 open Mocha;
 
 let test = (~contracts: ref(Helpers.coreContracts)) => {
-  let stakerRef: ref(Staker.t) = ref(""->Obj.magic);
   describe("getMarketLaunchParameters", () => {
-    before_each(() => {
-      let {staker} = contracts^;
-      stakerRef := staker;
-      ()->JsPromise.resolve;
-    });
     let marketIndex = 5;
 
     let initialMultiplier =
@@ -24,14 +18,14 @@ let test = (~contracts: ref(Helpers.coreContracts)) => {
           (),
         ) => {
       let%AwaitThen _ =
-        (stakerRef^)
+        contracts^.staker
         ->Staker.Exposed.setGetMarketLaunchIncentiveParametersParams(
             ~marketIndex,
             ~multiplier=initialMultiplier,
             ~period=initialPeriod,
           );
       let%Await result =
-        (stakerRef^)
+        contracts^.staker
         ->Staker.Exposed.getMarketLaunchIncentiveParametersExternal(
             ~marketIndex,
           );
