@@ -165,7 +165,7 @@ contract YieldManagerMock is IYieldManager {
     // TODO STENT need to change this and unit test it
     function claimYieldAndGetMarketAmount(
         uint256 totalValueRealizedForMarket,
-        uint256 marketPercentE18
+        uint256 treasuryPercentE18
     ) public override longShortOnly returns (uint256) {
         uint256 unrealizedYield = totalHeld -
             totalValueRealizedForMarket -
@@ -175,10 +175,9 @@ contract YieldManagerMock is IYieldManager {
             return 0;
         }
 
-        uint256 amountForMarketIncetives = (unrealizedYield *
-            marketPercentE18) / TEN_TO_THE_18;
-
-        uint256 amountForTreasury = unrealizedYield - amountForMarketIncetives;
+        uint256 amountForTreasury = (unrealizedYield * treasuryPercentE18) /
+            TEN_TO_THE_18;
+        uint256 amountForMarketIncetives = unrealizedYield - amountForTreasury;
 
         totalReservedForTreasury += amountForTreasury;
 
