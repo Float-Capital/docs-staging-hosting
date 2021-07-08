@@ -265,8 +265,8 @@ module.exports = async function(deployer, network, accounts) {
   );
 
   await deployTestMarket(
-    "Gold",
-    "GOLD",
+    "Doge Market",
+    "FL_DOGE",
     longShort,
     treasury,
     admin,
