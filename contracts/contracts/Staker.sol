@@ -339,10 +339,25 @@ contract Staker is IStaker, Initializable {
         // the opposite position. This incentivises users to stake on the
         // weaker position.
         // This value is float per second per synthetic token (hence the requirement to multiply by price)
-        return (
-            ((k * shortValue) * longPrice) / totalLocked,
-            ((k * longValue) * shortPrice) / totalLocked
-        );
+        if (shortValue < longValue) {
+            // Short should get more of the reward
+            uint256 longRewardUnscaled = ((((shortValue * 2)**2) /
+                (totalLocked)**2) / 2);
+            uint256 shortRewardUnscaled = 1e18 - longRewardUnscaled;
+            return (
+                longRewardUnscaled * k * longPrice,
+                shortRewardUnscaled * k * shortPrice
+            );
+        } else {
+            // Long should get more of the reward
+            uint256 shortRewardUnscaled = ((((longValue * 2)**2) /
+                (totalLocked)**2) / 2);
+            uint256 longRewardUnscaled = 1e18 - shortRewardUnscaled;
+            return (
+                longRewardUnscaled * k * Price,
+                shortRewardUnscaled * k * shortPrice
+            );
+        }
     }
 
     /*
