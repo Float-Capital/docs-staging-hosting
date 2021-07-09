@@ -312,6 +312,8 @@ contract Staker is IStaker, Initializable {
      * Computes the current 'r' value, i.e. the number of float tokens a user
      * earns per second for every longshort token they've staked. The returned
      * value has a fixed decimal scale of 1e42 (!!!) for numerical stability.
+     * The return values are float per second per synthetic token (hence the
+     * requirement to multiply by price)
      */
     function calculateFloatPerSecond(
         uint32 marketIndex,
@@ -335,26 +337,46 @@ contract Staker is IStaker, Initializable {
 
         uint256 totalLocked = (longValue + shortValue);
 
+        // HARDCODED FOR NOW!
+        uint256 exponent = 5;
+        int256 equilibriumOffset = 0; // base 1e18
+
+        // we need to scale this number by the totalLocked so that the offset remains consistent accross market size
+        int256 equilibriumOffsetMarketScaled = (equilibriumOffset *
+            int256(totalLocked)) / 1e18;
+
         // Float is scaled by the percentage of the total market value held in
         // the opposite position. This incentivises users to stake on the
         // weaker position.
-        // This value is float per second per synthetic token (hence the requirement to multiply by price)
-        if (shortValue < longValue) {
+        if (equilibriumOffsetMarketScaled >= int256(shortValue)) {
+            // edge case: imbalanced past the equilibrium offset - full rewards go to short token
+            return (0, 1e18 * k * shortPrice);
+        } else if (-equilibriumOffsetMarketScaled >= int256(longValue)) {
+            // edge case: imbalanced past the equilibrium offset - full rewards go to long token
+            return (1e18 * k * longPrice, 0);
+        } else if (
+            int256(shortValue) - equilibriumOffsetMarketScaled <
+            int256(longValue)
+        ) {
             // Short should get more of the reward
-            uint256 longRewardUnscaled = ((((shortValue * 2)**2) /
-                (totalLocked)**2) / 2);
+            uint256 longRewardUnscaled = ((((uint256(
+                int256(shortValue) - equilibriumOffsetMarketScaled
+            ) * 2)**exponent) / (totalLocked)**exponent) / 2);
             uint256 shortRewardUnscaled = 1e18 - longRewardUnscaled;
+
             return (
                 longRewardUnscaled * k * longPrice,
                 shortRewardUnscaled * k * shortPrice
             );
         } else {
             // Long should get more of the reward
-            uint256 shortRewardUnscaled = ((((longValue * 2)**2) /
-                (totalLocked)**2) / 2);
+            uint256 shortRewardUnscaled = ((((uint256(
+                int256(longValue) + equilibriumOffsetMarketScaled
+            ) * 2)**exponent) / (totalLocked)**exponent) / 2);
             uint256 longRewardUnscaled = 1e18 - shortRewardUnscaled;
+
             return (
-                longRewardUnscaled * k * Price,
+                longRewardUnscaled * k * longPrice,
                 shortRewardUnscaled * k * shortPrice
             );
         }
