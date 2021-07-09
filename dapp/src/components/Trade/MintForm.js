@@ -712,7 +712,7 @@ function MintForm$MintFormInput(Props) {
                     }, formInput), submitButton), Config.networkId === 80001 ? React.createElement("p", {
                     className: "cursor-pointer text-xxs py-2",
                     onClick: (function (param) {
-                        router.push("/faucet");
+                        router.push("/app/faucet");
                         
                       })
                   }, "Visit our ", React.createElement("a", {

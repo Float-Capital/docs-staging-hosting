@@ -219,7 +219,7 @@ module MintFormInput = {
       {if Config.networkId == 80001 {
         <p
           onClick={_ => {
-            router->Next.Router.push(`/faucet`)
+            router->Next.Router.push(`/app/faucet`)
           }}
           className="cursor-pointer text-xxs py-2">
           {"Visit our "->React.string}
