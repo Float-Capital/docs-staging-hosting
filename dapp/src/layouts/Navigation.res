@@ -110,8 +110,8 @@ let make = () => {
             {`🔥`->React.string}
           </a>
         </Link>
-        <Link href="/stats">
-          <a className={`px-3 hover:bg-white ${"/stats"->activeHighlight}`}>
+        <Link href="/app/stats">
+          <a className={`px-3 hover:bg-white ${"/app/stats"->activeHighlight}`}>
             {React.string("STATS")}
           </a>
         </Link>
@@ -172,10 +172,10 @@ let make = () => {
             </div>
             <div
               onClick={_ => {
-                router->Next.Router.push(`/stats`)
+                router->Next.Router.push(`/app/stats`)
                 setIsOpen(_ => false)
               }}
-              className={`px-3 bg-black m-2  ${"/stats"->activeHighlight}`}>
+              className={`px-3 bg-black m-2  ${"/app/stats"->activeHighlight}`}>
               {`STATS`->React.string}
             </div>
             <a

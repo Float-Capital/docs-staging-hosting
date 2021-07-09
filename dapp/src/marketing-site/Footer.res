@@ -5,7 +5,7 @@ let make = () => {
     <Next.Link href="/markets">
       <a className="px-3 hover:bg-white hover:text-black"> {"app"->React.string} </a>
     </Next.Link>
-    <Next.Link href="/stats">
+    <Next.Link href="/app/stats">
       <a className="px-3 hover:bg-white hover:text-black"> {"stats"->React.string} </a>
     </Next.Link>
     <a

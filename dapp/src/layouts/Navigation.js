@@ -187,9 +187,9 @@ function Navigation(Props) {
                                     className: activeHighlight("/stake-markets")
                                   }, "STAKE"), "🔥")
                         }), React.createElement(Link, {
-                          href: "/stats",
+                          href: "/app/stats",
                           children: React.createElement("a", {
-                                className: "px-3 hover:bg-white " + activeHighlight("/stats")
+                                className: "px-3 hover:bg-white " + activeHighlight("/app/stats")
                               }, "STATS")
                         }), React.createElement("a", {
                           className: "px-3 hover:bg-white",
@@ -227,9 +227,9 @@ function Navigation(Props) {
                                 }, React.createElement("span", {
                                       className: activeHighlight("/stake-markets")
                                     }, "STAKE"), "🔥"), React.createElement("div", {
-                                  className: "px-3 bg-black m-2  " + activeHighlight("/stats"),
+                                  className: "px-3 bg-black m-2  " + activeHighlight("/app/stats"),
                                   onClick: (function (param) {
-                                      router.push("/stats");
+                                      router.push("/app/stats");
                                       return Curry._1(setIsOpen, (function (param) {
                                                     return false;
                                                   }));

@@ -14,7 +14,7 @@ function Footer(Props) {
                         className: "px-3 hover:bg-white hover:text-black"
                       }, "app")
                 }), React.createElement(Link, {
-                  href: "/stats",
+                  href: "/app/stats",
                   children: React.createElement("a", {
                         className: "px-3 hover:bg-white hover:text-black"
                       }, "stats")
