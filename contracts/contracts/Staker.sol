@@ -29,6 +29,8 @@ contract Staker is IStaker, Initializable {
     mapping(uint32 => uint256) public marketLaunchIncentivePeriod; // seconds
     mapping(uint32 => uint256) public marketLaunchIncentiveMultipliers; // e18 scale
     mapping(uint32 => uint256) public marketUnstakeFeeBasisPoints;
+    mapping(uint32 => uint256) public balanceIncentiveCurveExponent;
+    mapping(uint32 => int256) public balanceIncentiveCurveEquilibriumOffset;
 
     mapping(uint32 => mapping(bool => ISyntheticToken)) public syntheticTokens;
 
@@ -56,7 +58,14 @@ contract Staker is IStaker, Initializable {
 
     event StakerV1(address floatToken, uint256 floatPercentage);
 
-    event MarketAddedToStaker(uint32 marketIndex, uint256 exitFeeBasisPoints);
+    event MarketAddedToStaker(
+        uint32 marketIndex,
+        uint256 exitFeeBasisPoints,
+        uint256 period,
+        uint256 multiplier,
+        uint256 balanceIncentiveExponent,
+        int256 balanceIncentiveEquilibriumOffset
+    );
 
     event StateAdded(
         uint32 marketIndex,
@@ -91,6 +100,16 @@ contract Staker is IStaker, Initializable {
     event StakeWithdrawalFeeUpdated(
         uint32 marketIndex,
         uint256 stakeWithdralFee
+    );
+
+    event BalanceIncentiveExponentUpdated(
+        uint32 marketIndex,
+        uint256 balanceIncentiveExponent
+    );
+
+    event BalanceIncentiveEquilibriumOffsetUpdated(
+        uint32 marketIndex,
+        int256 balanceIncentiveEquilibriumOffset
     );
 
     event FloatPercentageUpdated(uint256 floatPercentage);
@@ -202,6 +221,12 @@ contract Staker is IStaker, Initializable {
             period,
             initialMultiplier
         );
+
+        emit MarketLaunchIncentiveParametersChanges(
+            marketIndex,
+            period,
+            initialMultiplier
+        );
     }
 
     function _changeMarketLaunchIncentiveParameters(
@@ -216,11 +241,66 @@ contract Staker is IStaker, Initializable {
 
         marketLaunchIncentivePeriod[marketIndex] = period;
         marketLaunchIncentiveMultipliers[marketIndex] = initialMultiplier;
+    }
 
-        emit MarketLaunchIncentiveParametersChanges(
+    function _changBalanceIncentiveExponent(
+        uint32 marketIndex,
+        uint256 _balanceIncentiveCurveExponent
+    ) internal {
+        require(
+            _balanceIncentiveCurveExponent > 0 &&
+                _balanceIncentiveCurveExponent < 10000,
+            "balanceIncentiveCurveExponent out of bounds"
+        );
+
+        balanceIncentiveCurveExponent[
+            marketIndex
+        ] = _balanceIncentiveCurveExponent;
+    }
+
+    function changBalanceIncentiveExponent(
+        uint32 marketIndex,
+        uint256 _balanceIncentiveCurveExponent
+    ) external onlyAdmin {
+        _changBalanceIncentiveExponent(
             marketIndex,
-            period,
-            initialMultiplier
+            _balanceIncentiveCurveExponent
+        );
+
+        emit BalanceIncentiveExponentUpdated(
+            marketIndex,
+            _balanceIncentiveCurveExponent
+        );
+    }
+
+    function _changBalanceIncentiveEquilibriumOffset(
+        uint32 marketIndex,
+        int256 _balanceIncentiveCurveEquilibriumOffset
+    ) internal {
+        // Seems unreasonable that we would ever shift this more than 50% either way
+        require(
+            _balanceIncentiveCurveEquilibriumOffset > -5e17 &&
+                _balanceIncentiveCurveEquilibriumOffset < 5e17,
+            "balanceIncentiveCurveEquilibriumOffset out of bounds"
+        );
+
+        balanceIncentiveCurveEquilibriumOffset[
+            marketIndex
+        ] = _balanceIncentiveCurveEquilibriumOffset;
+    }
+
+    function changBalanceIncentiveEquilibriumOffset(
+        uint32 marketIndex,
+        int256 _balanceIncentiveCurveEquilibriumOffset
+    ) external onlyAdmin {
+        _changBalanceIncentiveEquilibriumOffset(
+            marketIndex,
+            _balanceIncentiveCurveEquilibriumOffset
+        );
+
+        emit BalanceIncentiveEquilibriumOffsetUpdated(
+            marketIndex,
+            _balanceIncentiveCurveEquilibriumOffset
         );
     }
 
@@ -234,7 +314,9 @@ contract Staker is IStaker, Initializable {
         ISyntheticToken shortToken,
         uint256 kInitialMultiplier,
         uint256 kPeriod,
-        uint256 unstakeFeeBasisPoints
+        uint256 unstakeFeeBasisPoints,
+        uint256 _balanceIncentiveCurveExponent,
+        int256 _balanceIncentiveCurveEquilibriumOffset
     ) external override onlyFloat {
         marketIndexOfToken[longToken] = marketIndex;
         marketIndexOfToken[shortToken] = marketIndex;
@@ -247,6 +329,14 @@ contract Staker is IStaker, Initializable {
         syntheticTokens[marketIndex][true] = longToken;
         syntheticTokens[marketIndex][false] = shortToken;
 
+        _changBalanceIncentiveExponent(
+            marketIndex,
+            _balanceIncentiveCurveExponent
+        );
+        _changBalanceIncentiveEquilibriumOffset(
+            marketIndex,
+            _balanceIncentiveCurveEquilibriumOffset
+        );
         _changeMarketLaunchIncentiveParameters(
             marketIndex,
             kPeriod,
@@ -254,9 +344,14 @@ contract Staker is IStaker, Initializable {
         );
 
         _changeUnstakeFee(marketIndex, unstakeFeeBasisPoints);
+
         emit MarketAddedToStaker(
             marketIndex,
-            marketUnstakeFeeBasisPoints[marketIndex]
+            unstakeFeeBasisPoints,
+            kPeriod,
+            kInitialMultiplier,
+            _balanceIncentiveCurveExponent,
+            _balanceIncentiveCurveEquilibriumOffset
         );
 
         emit StateAdded(marketIndex, 0, 0, 0);
@@ -337,31 +432,31 @@ contract Staker is IStaker, Initializable {
 
         uint256 totalLocked = (longValue + shortValue);
 
-        // HARDCODED FOR NOW!
-        uint256 exponent = 5;
-        int256 equilibriumOffset = 0; // base 1e18
-
         // we need to scale this number by the totalLocked so that the offset remains consistent accross market size
-        int256 equilibriumOffsetMarketScaled = (equilibriumOffset *
+
+
+            int256 equilibriumOffsetMarketScaled
+         = (balanceIncentiveCurveEquilibriumOffset[marketIndex] *
             int256(totalLocked)) / 1e18;
 
         // Float is scaled by the percentage of the total market value held in
         // the opposite position. This incentivises users to stake on the
         // weaker position.
-        if (equilibriumOffsetMarketScaled >= int256(shortValue)) {
-            // edge case: imbalanced past the equilibrium offset - full rewards go to short token
-            return (0, 1e18 * k * shortPrice);
-        } else if (-equilibriumOffsetMarketScaled >= int256(longValue)) {
-            // edge case: imbalanced past the equilibrium offset - full rewards go to long token
-            return (1e18 * k * longPrice, 0);
-        } else if (
+        if (
             int256(shortValue) - equilibriumOffsetMarketScaled <
             int256(longValue)
         ) {
+            if (equilibriumOffsetMarketScaled >= int256(shortValue)) {
+                // edge case: imbalanced far past the equilibrium offset - full rewards go to short token
+                //            extremeley unlikely to happen in practice
+                return (0, 1e18 * k * shortPrice);
+            }
+
             // Short should get more of the reward
             uint256 longRewardUnscaled = ((((uint256(
                 int256(shortValue) - equilibriumOffsetMarketScaled
-            ) * 2)**exponent) / (totalLocked)**exponent) / 2);
+            ) * 2)**balanceIncentiveCurveExponent[marketIndex]) /
+                (totalLocked)**balanceIncentiveCurveExponent[marketIndex]) / 2);
             uint256 shortRewardUnscaled = 1e18 - longRewardUnscaled;
 
             return (
@@ -369,10 +464,17 @@ contract Staker is IStaker, Initializable {
                 shortRewardUnscaled * k * shortPrice
             );
         } else {
+            if (-equilibriumOffsetMarketScaled >= int256(longValue)) {
+                // edge case: imbalanced far past the equilibrium offset - full rewards go to long token
+                //            extremeley unlikely to happen in practice
+                return (1e18 * k * longPrice, 0);
+            }
+
             // Long should get more of the reward
             uint256 shortRewardUnscaled = ((((uint256(
                 int256(longValue) + equilibriumOffsetMarketScaled
-            ) * 2)**exponent) / (totalLocked)**exponent) / 2);
+            ) * 2)**balanceIncentiveCurveExponent[marketIndex]) /
+                (totalLocked)**balanceIncentiveCurveExponent[marketIndex]) / 2);
             uint256 longRewardUnscaled = 1e18 - shortRewardUnscaled;
 
             return (

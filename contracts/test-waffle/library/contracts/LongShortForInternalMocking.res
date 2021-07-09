@@ -268,6 +268,8 @@ external initializeMarketMock: (
   Ethers.BigNumber.t,
   Ethers.BigNumber.t,
   Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
 ) => JsPromise.t<initializeMarketMockReturn> = "initializeMarketMock"
 
 type initializeMockReturn

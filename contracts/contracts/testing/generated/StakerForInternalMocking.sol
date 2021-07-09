@@ -39,7 +39,23 @@ contract StakerForInternalMocking {
       return ();
     }
      
-    function addNewStakingFundMock(uint32,ISyntheticToken,ISyntheticToken,uint256,uint256,uint256) public pure {
+    function _changBalanceIncentiveExponentMock(uint32,uint256) public pure {
+      return ();
+    }
+     
+    function changBalanceIncentiveExponentMock(uint32,uint256) public pure {
+      return ();
+    }
+     
+    function _changBalanceIncentiveEquilibriumOffsetMock(uint32,int256) public pure {
+      return ();
+    }
+     
+    function changBalanceIncentiveEquilibriumOffsetMock(uint32,int256) public pure {
+      return ();
+    }
+     
+    function addNewStakingFundMock(uint32,ISyntheticToken,ISyntheticToken,uint256,uint256,uint256,uint256,int256) public pure {
       return ();
     }
      

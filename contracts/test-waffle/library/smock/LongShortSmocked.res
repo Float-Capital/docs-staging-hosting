@@ -467,6 +467,8 @@ type initializeMarketCall = {
   kPeriod: Ethers.BigNumber.t,
   unstakeFeeBasisPoints: Ethers.BigNumber.t,
   initialMarketSeed: Ethers.BigNumber.t,
+  balanceIncentiveCurveExponent: Ethers.BigNumber.t,
+  balanceIncentiveCurveEquilibriumOffset: Ethers.BigNumber.t,
 }
 
 let initializeMarketCalls: t => array<initializeMarketCall> = _r => {
@@ -477,6 +479,8 @@ let initializeMarketCalls: t => array<initializeMarketCall> = _r => {
     kPeriod,
     unstakeFeeBasisPoints,
     initialMarketSeed,
+    balanceIncentiveCurveExponent,
+    balanceIncentiveCurveEquilibriumOffset,
   )) => {
     {
       marketIndex: marketIndex,
@@ -484,6 +488,8 @@ let initializeMarketCalls: t => array<initializeMarketCall> = _r => {
       kPeriod: kPeriod,
       unstakeFeeBasisPoints: unstakeFeeBasisPoints,
       initialMarketSeed: initialMarketSeed,
+      balanceIncentiveCurveExponent: balanceIncentiveCurveExponent,
+      balanceIncentiveCurveEquilibriumOffset: balanceIncentiveCurveEquilibriumOffset,
     }
   })
 }
@@ -885,6 +891,8 @@ module InternalMock = {
     kPeriod: Ethers.BigNumber.t,
     unstakeFeeBasisPoints: Ethers.BigNumber.t,
     initialMarketSeed: Ethers.BigNumber.t,
+    balanceIncentiveCurveExponent: Ethers.BigNumber.t,
+    balanceIncentiveCurveEquilibriumOffset: Ethers.BigNumber.t,
   }
 
   let initializeMarketCalls: unit => array<initializeMarketCall> = () => {
@@ -898,6 +906,8 @@ module InternalMock = {
         kPeriod,
         unstakeFeeBasisPoints,
         initialMarketSeed,
+        balanceIncentiveCurveExponent,
+        balanceIncentiveCurveEquilibriumOffset,
       )) => {
         {
           marketIndex: marketIndex,
@@ -905,6 +915,8 @@ module InternalMock = {
           kPeriod: kPeriod,
           unstakeFeeBasisPoints: unstakeFeeBasisPoints,
           initialMarketSeed: initialMarketSeed,
+          balanceIncentiveCurveExponent: balanceIncentiveCurveExponent,
+          balanceIncentiveCurveEquilibriumOffset: balanceIncentiveCurveEquilibriumOffset,
         }
       })
     })

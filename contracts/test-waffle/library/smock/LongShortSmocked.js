@@ -385,7 +385,9 @@ function initializeMarketCalls(_r) {
                         kInitialMultiplier: param[1],
                         kPeriod: param[2],
                         unstakeFeeBasisPoints: param[3],
-                        initialMarketSeed: param[4]
+                        initialMarketSeed: param[4],
+                        balanceIncentiveCurveExponent: param[5],
+                        balanceIncentiveCurveEquilibriumOffset: param[6]
                       };
               }));
 }
@@ -723,7 +725,9 @@ function initializeMarketCalls$1(param) {
                                           kInitialMultiplier: param[1],
                                           kPeriod: param[2],
                                           unstakeFeeBasisPoints: param[3],
-                                          initialMarketSeed: param[4]
+                                          initialMarketSeed: param[4],
+                                          balanceIncentiveCurveExponent: param[5],
+                                          balanceIncentiveCurveEquilibriumOffset: param[6]
                                         };
                                 }));
                   })));

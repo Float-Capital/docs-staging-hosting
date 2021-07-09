@@ -35,7 +35,7 @@ contract LongShortForInternalMocking {
       return ();
     }
      
-    function initializeMarketMock(uint32,uint256,uint256,uint256,uint256) public pure {
+    function initializeMarketMock(uint32,uint256,uint256,uint256,uint256,uint256,int256) public pure {
       return ();
     }
      

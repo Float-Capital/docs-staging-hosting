@@ -321,7 +321,9 @@ contract LongShort is ILongShort, Initializable {
         uint256 kInitialMultiplier,
         uint256 kPeriod,
         uint256 unstakeFeeBasisPoints,
-        uint256 initialMarketSeed
+        uint256 initialMarketSeed,
+        uint256 balanceIncentiveCurveExponent,
+        int256 balanceIncentiveCurveEquilibriumOffset
     ) external adminOnly {
         require(!marketExists[marketIndex], "already initialized");
         require(marketIndex <= latestMarket, "index too high");
@@ -335,7 +337,9 @@ contract LongShort is ILongShort, Initializable {
             syntheticTokens[latestMarket][false],
             kInitialMultiplier,
             kPeriod,
-            unstakeFeeBasisPoints
+            unstakeFeeBasisPoints,
+            balanceIncentiveCurveExponent,
+            balanceIncentiveCurveEquilibriumOffset
         );
 
         _seedMarketInitially(initialMarketSeed, marketIndex);

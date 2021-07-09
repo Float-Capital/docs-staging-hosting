@@ -52,6 +52,8 @@ let test =
             ~kInitialMultiplier,
             ~kPeriod,
             ~unstakeFeeBasisPoints,
+            ~balanceIncentiveCurveExponent=bnFromInt(5),
+            ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
           );
       promiseRef := promise;
       let%Await _ = promise;

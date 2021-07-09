@@ -8,6 +8,23 @@ let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
 
 let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic
 
+type _changBalanceIncentiveEquilibriumOffsetMockReturn
+@send
+external _changBalanceIncentiveEquilibriumOffsetMock: (
+  t,
+  int,
+  Ethers.BigNumber.t,
+) => JsPromise.t<_changBalanceIncentiveEquilibriumOffsetMockReturn> =
+  "_changBalanceIncentiveEquilibriumOffsetMock"
+
+type _changBalanceIncentiveExponentMockReturn
+@send
+external _changBalanceIncentiveExponentMock: (
+  t,
+  int,
+  Ethers.BigNumber.t,
+) => JsPromise.t<_changBalanceIncentiveExponentMockReturn> = "_changBalanceIncentiveExponentMock"
+
 type _changeFloatPercentageMockReturn
 @send
 external _changeFloatPercentageMock: (
@@ -69,6 +86,8 @@ external addNewStakingFundMock: (
   int,
   Ethers.ethAddress,
   Ethers.ethAddress,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
   Ethers.BigNumber.t,
   Ethers.BigNumber.t,
   Ethers.BigNumber.t,
@@ -142,6 +161,23 @@ type calculateTimeDeltaMockReturn = Ethers.BigNumber.t
 @send
 external calculateTimeDeltaMock: (t, int) => JsPromise.t<calculateTimeDeltaMockReturn> =
   "calculateTimeDeltaMock"
+
+type changBalanceIncentiveEquilibriumOffsetMockReturn
+@send
+external changBalanceIncentiveEquilibriumOffsetMock: (
+  t,
+  int,
+  Ethers.BigNumber.t,
+) => JsPromise.t<changBalanceIncentiveEquilibriumOffsetMockReturn> =
+  "changBalanceIncentiveEquilibriumOffsetMock"
+
+type changBalanceIncentiveExponentMockReturn
+@send
+external changBalanceIncentiveExponentMock: (
+  t,
+  int,
+  Ethers.BigNumber.t,
+) => JsPromise.t<changBalanceIncentiveExponentMockReturn> = "changBalanceIncentiveExponentMock"
 
 type changeAdminMockReturn
 @send

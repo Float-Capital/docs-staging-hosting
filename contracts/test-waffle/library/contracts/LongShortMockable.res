@@ -77,6 +77,8 @@ external initializeMarket: (
   ~kPeriod: Ethers.BigNumber.t,
   ~unstakeFeeBasisPoints: Ethers.BigNumber.t,
   ~initialMarketSeed: Ethers.BigNumber.t,
+  ~balanceIncentiveCurveExponent: Ethers.BigNumber.t,
+  ~balanceIncentiveCurveEquilibriumOffset: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "initializeMarket"
 
 type latestMarketReturn = int

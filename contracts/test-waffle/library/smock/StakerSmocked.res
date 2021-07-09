@@ -30,6 +30,45 @@ let adminCalls: t => array<adminCall> = _r => {
   })
 }
 
+let mockBalanceIncentiveCurveEquilibriumOffsetToReturn: (t, Ethers.BigNumber.t) => unit = (
+  _r,
+  _param0,
+) => {
+  let _ = %raw("_r.smocked.balanceIncentiveCurveEquilibriumOffset.will.return.with([_param0])")
+}
+
+type balanceIncentiveCurveEquilibriumOffsetCall = {param0: int}
+
+let balanceIncentiveCurveEquilibriumOffsetCalls: t => array<
+  balanceIncentiveCurveEquilibriumOffsetCall,
+> = _r => {
+  let array = %raw("_r.smocked.balanceIncentiveCurveEquilibriumOffset.calls")
+  array->Array.map(_m => {
+    let param0 = _m->Array.getUnsafe(0)
+
+    {
+      param0: param0,
+    }
+  })
+}
+
+let mockBalanceIncentiveCurveExponentToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.balanceIncentiveCurveExponent.will.return.with([_param0])")
+}
+
+type balanceIncentiveCurveExponentCall = {param0: int}
+
+let balanceIncentiveCurveExponentCalls: t => array<balanceIncentiveCurveExponentCall> = _r => {
+  let array = %raw("_r.smocked.balanceIncentiveCurveExponent.calls")
+  array->Array.map(_m => {
+    let param0 = _m->Array.getUnsafe(0)
+
+    {
+      param0: param0,
+    }
+  })
+}
+
 let mockFloatCapitalToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.floatCapital.will.return.with([_param0])")
 }
@@ -354,6 +393,46 @@ let changeMarketLaunchIncentiveParametersCalls: t => array<
   })
 }
 
+let mockChangBalanceIncentiveExponentToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.changBalanceIncentiveExponent.will.return()")
+}
+
+type changBalanceIncentiveExponentCall = {
+  marketIndex: int,
+  balanceIncentiveCurveExponent: Ethers.BigNumber.t,
+}
+
+let changBalanceIncentiveExponentCalls: t => array<changBalanceIncentiveExponentCall> = _r => {
+  let array = %raw("_r.smocked.changBalanceIncentiveExponent.calls")
+  array->Array.map(((marketIndex, balanceIncentiveCurveExponent)) => {
+    {
+      marketIndex: marketIndex,
+      balanceIncentiveCurveExponent: balanceIncentiveCurveExponent,
+    }
+  })
+}
+
+let mockChangBalanceIncentiveEquilibriumOffsetToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.changBalanceIncentiveEquilibriumOffset.will.return()")
+}
+
+type changBalanceIncentiveEquilibriumOffsetCall = {
+  marketIndex: int,
+  balanceIncentiveCurveEquilibriumOffset: Ethers.BigNumber.t,
+}
+
+let changBalanceIncentiveEquilibriumOffsetCalls: t => array<
+  changBalanceIncentiveEquilibriumOffsetCall,
+> = _r => {
+  let array = %raw("_r.smocked.changBalanceIncentiveEquilibriumOffset.calls")
+  array->Array.map(((marketIndex, balanceIncentiveCurveEquilibriumOffset)) => {
+    {
+      marketIndex: marketIndex,
+      balanceIncentiveCurveEquilibriumOffset: balanceIncentiveCurveEquilibriumOffset,
+    }
+  })
+}
+
 let mockAddNewStakingFundToReturn: t => unit = _r => {
   let _ = %raw("_r.smocked.addNewStakingFund.will.return()")
 }
@@ -365,6 +444,8 @@ type addNewStakingFundCall = {
   kInitialMultiplier: Ethers.BigNumber.t,
   kPeriod: Ethers.BigNumber.t,
   unstakeFeeBasisPoints: Ethers.BigNumber.t,
+  balanceIncentiveCurveExponent: Ethers.BigNumber.t,
+  balanceIncentiveCurveEquilibriumOffset: Ethers.BigNumber.t,
 }
 
 let addNewStakingFundCalls: t => array<addNewStakingFundCall> = _r => {
@@ -376,6 +457,8 @@ let addNewStakingFundCalls: t => array<addNewStakingFundCall> = _r => {
     kInitialMultiplier,
     kPeriod,
     unstakeFeeBasisPoints,
+    balanceIncentiveCurveExponent,
+    balanceIncentiveCurveEquilibriumOffset,
   )) => {
     {
       marketIndex: marketIndex,
@@ -384,6 +467,8 @@ let addNewStakingFundCalls: t => array<addNewStakingFundCall> = _r => {
       kInitialMultiplier: kInitialMultiplier,
       kPeriod: kPeriod,
       unstakeFeeBasisPoints: unstakeFeeBasisPoints,
+      balanceIncentiveCurveExponent: balanceIncentiveCurveExponent,
+      balanceIncentiveCurveEquilibriumOffset: balanceIncentiveCurveEquilibriumOffset,
     }
   })
 }
@@ -768,6 +853,120 @@ module InternalMock = {
     ->Option.getExn
   }
 
+  let mock_changBalanceIncentiveExponentToReturn: unit => unit = () => {
+    checkForExceptions(~functionName="_changBalanceIncentiveExponent")
+    let _ = internalRef.contents->Option.map(_r => {
+      let _ = %raw("_r.smocked._changBalanceIncentiveExponentMock.will.return()")
+    })
+  }
+
+  type _changBalanceIncentiveExponentCall = {
+    marketIndex: int,
+    balanceIncentiveCurveExponent: Ethers.BigNumber.t,
+  }
+
+  let _changBalanceIncentiveExponentCalls: unit => array<
+    _changBalanceIncentiveExponentCall,
+  > = () => {
+    checkForExceptions(~functionName="_changBalanceIncentiveExponent")
+    internalRef.contents
+    ->Option.map(_r => {
+      let array = %raw("_r.smocked._changBalanceIncentiveExponentMock.calls")
+      array->Array.map(((marketIndex, balanceIncentiveCurveExponent)) => {
+        {
+          marketIndex: marketIndex,
+          balanceIncentiveCurveExponent: balanceIncentiveCurveExponent,
+        }
+      })
+    })
+    ->Option.getExn
+  }
+
+  let mockChangBalanceIncentiveExponentToReturn: unit => unit = () => {
+    checkForExceptions(~functionName="changBalanceIncentiveExponent")
+    let _ = internalRef.contents->Option.map(_r => {
+      let _ = %raw("_r.smocked.changBalanceIncentiveExponentMock.will.return()")
+    })
+  }
+
+  type changBalanceIncentiveExponentCall = {
+    marketIndex: int,
+    balanceIncentiveCurveExponent: Ethers.BigNumber.t,
+  }
+
+  let changBalanceIncentiveExponentCalls: unit => array<changBalanceIncentiveExponentCall> = () => {
+    checkForExceptions(~functionName="changBalanceIncentiveExponent")
+    internalRef.contents
+    ->Option.map(_r => {
+      let array = %raw("_r.smocked.changBalanceIncentiveExponentMock.calls")
+      array->Array.map(((marketIndex, balanceIncentiveCurveExponent)) => {
+        {
+          marketIndex: marketIndex,
+          balanceIncentiveCurveExponent: balanceIncentiveCurveExponent,
+        }
+      })
+    })
+    ->Option.getExn
+  }
+
+  let mock_changBalanceIncentiveEquilibriumOffsetToReturn: unit => unit = () => {
+    checkForExceptions(~functionName="_changBalanceIncentiveEquilibriumOffset")
+    let _ = internalRef.contents->Option.map(_r => {
+      let _ = %raw("_r.smocked._changBalanceIncentiveEquilibriumOffsetMock.will.return()")
+    })
+  }
+
+  type _changBalanceIncentiveEquilibriumOffsetCall = {
+    marketIndex: int,
+    balanceIncentiveCurveEquilibriumOffset: Ethers.BigNumber.t,
+  }
+
+  let _changBalanceIncentiveEquilibriumOffsetCalls: unit => array<
+    _changBalanceIncentiveEquilibriumOffsetCall,
+  > = () => {
+    checkForExceptions(~functionName="_changBalanceIncentiveEquilibriumOffset")
+    internalRef.contents
+    ->Option.map(_r => {
+      let array = %raw("_r.smocked._changBalanceIncentiveEquilibriumOffsetMock.calls")
+      array->Array.map(((marketIndex, balanceIncentiveCurveEquilibriumOffset)) => {
+        {
+          marketIndex: marketIndex,
+          balanceIncentiveCurveEquilibriumOffset: balanceIncentiveCurveEquilibriumOffset,
+        }
+      })
+    })
+    ->Option.getExn
+  }
+
+  let mockChangBalanceIncentiveEquilibriumOffsetToReturn: unit => unit = () => {
+    checkForExceptions(~functionName="changBalanceIncentiveEquilibriumOffset")
+    let _ = internalRef.contents->Option.map(_r => {
+      let _ = %raw("_r.smocked.changBalanceIncentiveEquilibriumOffsetMock.will.return()")
+    })
+  }
+
+  type changBalanceIncentiveEquilibriumOffsetCall = {
+    marketIndex: int,
+    balanceIncentiveCurveEquilibriumOffset: Ethers.BigNumber.t,
+  }
+
+  let changBalanceIncentiveEquilibriumOffsetCalls: unit => array<
+    changBalanceIncentiveEquilibriumOffsetCall,
+  > = () => {
+    checkForExceptions(~functionName="changBalanceIncentiveEquilibriumOffset")
+    internalRef.contents
+    ->Option.map(_r => {
+      let array = %raw("_r.smocked.changBalanceIncentiveEquilibriumOffsetMock.calls")
+      array->Array.map(((marketIndex, balanceIncentiveCurveEquilibriumOffset)) => {
+        {
+          marketIndex: marketIndex,
+          balanceIncentiveCurveEquilibriumOffset: balanceIncentiveCurveEquilibriumOffset,
+        }
+      })
+    })
+    ->Option.getExn
+  }
+
   let mockAddNewStakingFundToReturn: unit => unit = () => {
     checkForExceptions(~functionName="addNewStakingFund")
     let _ = internalRef.contents->Option.map(_r => {
@@ -782,6 +981,8 @@ module InternalMock = {
     kInitialMultiplier: Ethers.BigNumber.t,
     kPeriod: Ethers.BigNumber.t,
     unstakeFeeBasisPoints: Ethers.BigNumber.t,
+    balanceIncentiveCurveExponent: Ethers.BigNumber.t,
+    balanceIncentiveCurveEquilibriumOffset: Ethers.BigNumber.t,
   }
 
   let addNewStakingFundCalls: unit => array<addNewStakingFundCall> = () => {
@@ -796,6 +997,8 @@ module InternalMock = {
         kInitialMultiplier,
         kPeriod,
         unstakeFeeBasisPoints,
+        balanceIncentiveCurveExponent,
+        balanceIncentiveCurveEquilibriumOffset,
       )) => {
         {
           marketIndex: marketIndex,
@@ -804,6 +1007,8 @@ module InternalMock = {
           kInitialMultiplier: kInitialMultiplier,
           kPeriod: kPeriod,
           unstakeFeeBasisPoints: unstakeFeeBasisPoints,
+          balanceIncentiveCurveExponent: balanceIncentiveCurveExponent,
+          balanceIncentiveCurveEquilibriumOffset: balanceIncentiveCurveEquilibriumOffset,
         }
       })
     })

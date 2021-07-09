@@ -3,6 +3,7 @@
 
 var Chai = require("../../bindings/chai/Chai.js");
 var LetOps = require("../../library/LetOps.js");
+var Globals = require("../../library/Globals.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var StakerSmocked = require("../../library/smock/StakerSmocked.js");
@@ -35,7 +36,7 @@ function testUnit(contracts, accounts) {
           };
           it("calls all functions (staker.addNewStakingFund, adminOnly, seedMarketInitially) and mutates state (marketExists) correctly", (function () {
                   return LetOps.Await.let_(setup(1, false, 1), (function (param) {
-                                return LetOps.Await.let_(longShortRef.contents.connect(accounts.contents[0]).initializeMarket(1, ethers.BigNumber.from("6"), ethers.BigNumber.from("4"), ethers.BigNumber.from(50), ethers.BigNumber.from("7")), (function (param) {
+                                return LetOps.Await.let_(longShortRef.contents.connect(accounts.contents[0]).initializeMarket(1, ethers.BigNumber.from("6"), ethers.BigNumber.from("4"), ethers.BigNumber.from(50), ethers.BigNumber.from("7"), Globals.bnFromInt(5), Globals.bnFromInt(0)), (function (param) {
                                               var stakerCalls = StakerSmocked.addNewStakingFundCalls(stakerSmockedRef.contents);
                                               Chai.recordEqualFlatLabeled(Belt_Array.getExn(stakerCalls, 0), {
                                                     marketIndex: 1,
@@ -43,7 +44,9 @@ function testUnit(contracts, accounts) {
                                                     shortToken: sampleAddress,
                                                     kInitialMultiplier: ethers.BigNumber.from("6"),
                                                     kPeriod: ethers.BigNumber.from("4"),
-                                                    unstakeFeeBasisPoints: ethers.BigNumber.from(50)
+                                                    unstakeFeeBasisPoints: ethers.BigNumber.from(50),
+                                                    balanceIncentiveCurveExponent: Globals.bnFromInt(5),
+                                                    balanceIncentiveCurveEquilibriumOffset: Globals.bnFromInt(0)
                                                   });
                                               var seedMarketInitiallyCalls = LongShortSmocked.InternalMock._seedMarketInitiallyCalls(undefined);
                                               Chai.recordEqualFlatLabeled(Belt_Array.getExn(seedMarketInitiallyCalls, 0), {
@@ -60,14 +63,14 @@ function testUnit(contracts, accounts) {
                 }));
           it("reverts if market exists", (function () {
                   return LetOps.Await.let_(setup(1, true, 1), (function (param) {
-                                return LetOps.Await.let_(Chai.expectRevertNoReason(longShortRef.contents.connect(accounts.contents[0]).initializeMarket(1, ethers.BigNumber.from("6"), ethers.BigNumber.from("4"), ethers.BigNumber.from(50), ethers.BigNumber.from("7"))), (function (param) {
+                                return LetOps.Await.let_(Chai.expectRevertNoReason(longShortRef.contents.connect(accounts.contents[0]).initializeMarket(1, ethers.BigNumber.from("6"), ethers.BigNumber.from("4"), ethers.BigNumber.from(50), ethers.BigNumber.from("7"), Globals.bnFromInt(5), Globals.bnFromInt(0))), (function (param) {
                                               
                                             }));
                               }));
                 }));
           it("reverts if market index is greater than latest market index", (function () {
                   return LetOps.Await.let_(setup(2, false, 1), (function (param) {
-                                return LetOps.Await.let_(Chai.expectRevertNoReason(longShortRef.contents.connect(accounts.contents[0]).initializeMarket(1, ethers.BigNumber.from("6"), ethers.BigNumber.from("4"), ethers.BigNumber.from(50), ethers.BigNumber.from("7"))), (function (param) {
+                                return LetOps.Await.let_(Chai.expectRevertNoReason(longShortRef.contents.connect(accounts.contents[0]).initializeMarket(1, ethers.BigNumber.from("6"), ethers.BigNumber.from("4"), ethers.BigNumber.from(50), ethers.BigNumber.from("7"), Globals.bnFromInt(5), Globals.bnFromInt(0))), (function (param) {
                                               
                                             }));
                               }));
@@ -80,12 +83,12 @@ function testUnit(contracts, accounts) {
 function testIntegration(contracts, accounts) {
   describe("initializeMarket", (function () {
           it("Shouldn't allow initialization of a market that doesn't exist", (function () {
-                  return Chai.expectRevert(contracts.contents.longShort.initializeMarket(654654, CONSTANTS.oneBn, CONSTANTS.oneBn, ethers.BigNumber.from("5000000000000000"), CONSTANTS.oneBn), "index too high");
+                  return Chai.expectRevert(contracts.contents.longShort.initializeMarket(654654, CONSTANTS.oneBn, CONSTANTS.oneBn, ethers.BigNumber.from("5000000000000000"), CONSTANTS.oneBn, Globals.bnFromInt(5), Globals.bnFromInt(0)), "index too high");
                 }));
           it("Shouldn't allow initialization of a market that has already been initialized", (function () {
                   var match = contracts.contents;
                   var match$1 = match.markets[0];
-                  return Chai.expectRevert(match.longShort.initializeMarket(match$1.marketIndex, CONSTANTS.oneBn, CONSTANTS.oneBn, ethers.BigNumber.from(50), CONSTANTS.oneBn), "already initialized");
+                  return Chai.expectRevert(match.longShort.initializeMarket(match$1.marketIndex, CONSTANTS.oneBn, CONSTANTS.oneBn, ethers.BigNumber.from(50), CONSTANTS.oneBn, Globals.bnFromInt(5), Globals.bnFromInt(0)), "already initialized");
                 }));
           it("Shouldn't allow initialization with less than 0.1 eth units of payment token", (function () {
                   var match = contracts.contents;
@@ -93,7 +96,7 @@ function testIntegration(contracts, accounts) {
                   var match$1 = match.markets[0];
                   return LetOps.Await.let_(longShort.newSyntheticMarket("Test", "T", match$1.paymentToken.address, match$1.oracleManager.address, match$1.yieldManager.address), (function (param) {
                                 return LetOps.Await.let_(longShort.latestMarket(), (function (latestMarket) {
-                                              return Chai.expectRevert(longShort.initializeMarket(latestMarket, CONSTANTS.tenToThe18, CONSTANTS.oneBn, ethers.BigNumber.from(50), CONSTANTS.oneBn), "Insufficient market seed");
+                                              return Chai.expectRevert(longShort.initializeMarket(latestMarket, CONSTANTS.tenToThe18, CONSTANTS.oneBn, ethers.BigNumber.from(50), CONSTANTS.oneBn, Globals.bnFromInt(5), Globals.bnFromInt(0)), "Insufficient market seed");
                                             }));
                               }));
                 }));

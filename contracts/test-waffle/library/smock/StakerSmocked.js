@@ -31,6 +31,36 @@ function adminCalls(_r) {
               }));
 }
 
+function mockBalanceIncentiveCurveEquilibriumOffsetToReturn(_r, _param0) {
+  ((_r.smocked.balanceIncentiveCurveEquilibriumOffset.will.return.with([_param0])));
+  
+}
+
+function balanceIncentiveCurveEquilibriumOffsetCalls(_r) {
+  var array = _r.smocked.balanceIncentiveCurveEquilibriumOffset.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var param0 = _m[0];
+                return {
+                        param0: param0
+                      };
+              }));
+}
+
+function mockBalanceIncentiveCurveExponentToReturn(_r, _param0) {
+  ((_r.smocked.balanceIncentiveCurveExponent.will.return.with([_param0])));
+  
+}
+
+function balanceIncentiveCurveExponentCalls(_r) {
+  var array = _r.smocked.balanceIncentiveCurveExponent.calls;
+  return Belt_Array.map(array, (function (_m) {
+                var param0 = _m[0];
+                return {
+                        param0: param0
+                      };
+              }));
+}
+
 function mockFloatCapitalToReturn(_r, _param0) {
   ((_r.smocked.floatCapital.will.return.with([_param0])));
   
@@ -293,6 +323,36 @@ function changeMarketLaunchIncentiveParametersCalls(_r) {
               }));
 }
 
+function mockChangBalanceIncentiveExponentToReturn(_r) {
+  ((_r.smocked.changBalanceIncentiveExponent.will.return()));
+  
+}
+
+function changBalanceIncentiveExponentCalls(_r) {
+  var array = _r.smocked.changBalanceIncentiveExponent.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        marketIndex: param[0],
+                        balanceIncentiveCurveExponent: param[1]
+                      };
+              }));
+}
+
+function mockChangBalanceIncentiveEquilibriumOffsetToReturn(_r) {
+  ((_r.smocked.changBalanceIncentiveEquilibriumOffset.will.return()));
+  
+}
+
+function changBalanceIncentiveEquilibriumOffsetCalls(_r) {
+  var array = _r.smocked.changBalanceIncentiveEquilibriumOffset.calls;
+  return Belt_Array.map(array, (function (param) {
+                return {
+                        marketIndex: param[0],
+                        balanceIncentiveCurveEquilibriumOffset: param[1]
+                      };
+              }));
+}
+
 function mockAddNewStakingFundToReturn(_r) {
   ((_r.smocked.addNewStakingFund.will.return()));
   
@@ -307,7 +367,9 @@ function addNewStakingFundCalls(_r) {
                         shortToken: param[2],
                         kInitialMultiplier: param[3],
                         kPeriod: param[4],
-                        unstakeFeeBasisPoints: param[5]
+                        unstakeFeeBasisPoints: param[5],
+                        balanceIncentiveCurveExponent: param[6],
+                        balanceIncentiveCurveEquilibriumOffset: param[7]
                       };
               }));
 }
@@ -627,6 +689,94 @@ function _changeMarketLaunchIncentiveParametersCalls(param) {
                   })));
 }
 
+function mock_changBalanceIncentiveExponentToReturn(param) {
+  checkForExceptions("_changBalanceIncentiveExponent");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked._changBalanceIncentiveExponentMock.will.return()));
+          
+        }));
+  
+}
+
+function _changBalanceIncentiveExponentCalls(param) {
+  checkForExceptions("_changBalanceIncentiveExponent");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked._changBalanceIncentiveExponentMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          balanceIncentiveCurveExponent: param[1]
+                                        };
+                                }));
+                  })));
+}
+
+function mockChangBalanceIncentiveExponentToReturn$1(param) {
+  checkForExceptions("changBalanceIncentiveExponent");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.changBalanceIncentiveExponentMock.will.return()));
+          
+        }));
+  
+}
+
+function changBalanceIncentiveExponentCalls$1(param) {
+  checkForExceptions("changBalanceIncentiveExponent");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.changBalanceIncentiveExponentMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          balanceIncentiveCurveExponent: param[1]
+                                        };
+                                }));
+                  })));
+}
+
+function mock_changBalanceIncentiveEquilibriumOffsetToReturn(param) {
+  checkForExceptions("_changBalanceIncentiveEquilibriumOffset");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked._changBalanceIncentiveEquilibriumOffsetMock.will.return()));
+          
+        }));
+  
+}
+
+function _changBalanceIncentiveEquilibriumOffsetCalls(param) {
+  checkForExceptions("_changBalanceIncentiveEquilibriumOffset");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked._changBalanceIncentiveEquilibriumOffsetMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          balanceIncentiveCurveEquilibriumOffset: param[1]
+                                        };
+                                }));
+                  })));
+}
+
+function mockChangBalanceIncentiveEquilibriumOffsetToReturn$1(param) {
+  checkForExceptions("changBalanceIncentiveEquilibriumOffset");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.changBalanceIncentiveEquilibriumOffsetMock.will.return()));
+          
+        }));
+  
+}
+
+function changBalanceIncentiveEquilibriumOffsetCalls$1(param) {
+  checkForExceptions("changBalanceIncentiveEquilibriumOffset");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.changBalanceIncentiveEquilibriumOffsetMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          marketIndex: param[0],
+                                          balanceIncentiveCurveEquilibriumOffset: param[1]
+                                        };
+                                }));
+                  })));
+}
+
 function mockAddNewStakingFundToReturn$1(param) {
   checkForExceptions("addNewStakingFund");
   Belt_Option.map(internalRef.contents, (function (_r) {
@@ -647,7 +797,9 @@ function addNewStakingFundCalls$1(param) {
                                           shortToken: param[2],
                                           kInitialMultiplier: param[3],
                                           kPeriod: param[4],
-                                          unstakeFeeBasisPoints: param[5]
+                                          unstakeFeeBasisPoints: param[5],
+                                          balanceIncentiveCurveExponent: param[6],
+                                          balanceIncentiveCurveEquilibriumOffset: param[7]
                                         };
                                 }));
                   })));
@@ -1173,6 +1325,14 @@ var InternalMock = {
   changeMarketLaunchIncentiveParametersCalls: changeMarketLaunchIncentiveParametersCalls$1,
   mock_changeMarketLaunchIncentiveParametersToReturn: mock_changeMarketLaunchIncentiveParametersToReturn,
   _changeMarketLaunchIncentiveParametersCalls: _changeMarketLaunchIncentiveParametersCalls,
+  mock_changBalanceIncentiveExponentToReturn: mock_changBalanceIncentiveExponentToReturn,
+  _changBalanceIncentiveExponentCalls: _changBalanceIncentiveExponentCalls,
+  mockChangBalanceIncentiveExponentToReturn: mockChangBalanceIncentiveExponentToReturn$1,
+  changBalanceIncentiveExponentCalls: changBalanceIncentiveExponentCalls$1,
+  mock_changBalanceIncentiveEquilibriumOffsetToReturn: mock_changBalanceIncentiveEquilibriumOffsetToReturn,
+  _changBalanceIncentiveEquilibriumOffsetCalls: _changBalanceIncentiveEquilibriumOffsetCalls,
+  mockChangBalanceIncentiveEquilibriumOffsetToReturn: mockChangBalanceIncentiveEquilibriumOffsetToReturn$1,
+  changBalanceIncentiveEquilibriumOffsetCalls: changBalanceIncentiveEquilibriumOffsetCalls$1,
   mockAddNewStakingFundToReturn: mockAddNewStakingFundToReturn$1,
   addNewStakingFundCalls: addNewStakingFundCalls$1,
   mockGetMarketLaunchIncentiveParametersToReturn: mockGetMarketLaunchIncentiveParametersToReturn,
@@ -1228,6 +1388,10 @@ exports.mockFLOAT_ISSUANCE_FIXED_DECIMALToReturn = mockFLOAT_ISSUANCE_FIXED_DECI
 exports.fLOAT_ISSUANCE_FIXED_DECIMALCalls = fLOAT_ISSUANCE_FIXED_DECIMALCalls;
 exports.mockAdminToReturn = mockAdminToReturn;
 exports.adminCalls = adminCalls;
+exports.mockBalanceIncentiveCurveEquilibriumOffsetToReturn = mockBalanceIncentiveCurveEquilibriumOffsetToReturn;
+exports.balanceIncentiveCurveEquilibriumOffsetCalls = balanceIncentiveCurveEquilibriumOffsetCalls;
+exports.mockBalanceIncentiveCurveExponentToReturn = mockBalanceIncentiveCurveExponentToReturn;
+exports.balanceIncentiveCurveExponentCalls = balanceIncentiveCurveExponentCalls;
 exports.mockFloatCapitalToReturn = mockFloatCapitalToReturn;
 exports.floatCapitalCalls = floatCapitalCalls;
 exports.mockFloatPercentageToReturn = mockFloatPercentageToReturn;
@@ -1264,6 +1428,10 @@ exports.mockChangeUnstakeFeeToReturn = mockChangeUnstakeFeeToReturn;
 exports.changeUnstakeFeeCalls = changeUnstakeFeeCalls;
 exports.mockChangeMarketLaunchIncentiveParametersToReturn = mockChangeMarketLaunchIncentiveParametersToReturn;
 exports.changeMarketLaunchIncentiveParametersCalls = changeMarketLaunchIncentiveParametersCalls;
+exports.mockChangBalanceIncentiveExponentToReturn = mockChangBalanceIncentiveExponentToReturn;
+exports.changBalanceIncentiveExponentCalls = changBalanceIncentiveExponentCalls;
+exports.mockChangBalanceIncentiveEquilibriumOffsetToReturn = mockChangBalanceIncentiveEquilibriumOffsetToReturn;
+exports.changBalanceIncentiveEquilibriumOffsetCalls = changBalanceIncentiveEquilibriumOffsetCalls;
 exports.mockAddNewStakingFundToReturn = mockAddNewStakingFundToReturn;
 exports.addNewStakingFundCalls = addNewStakingFundCalls;
 exports.mockAddNewStateForFloatRewardsToReturn = mockAddNewStateForFloatRewardsToReturn;

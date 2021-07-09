@@ -22,6 +22,8 @@ external addNewStakingFund: (
   ~kInitialMultiplier: Ethers.BigNumber.t,
   ~kPeriod: Ethers.BigNumber.t,
   ~unstakeFeeBasisPoints: Ethers.BigNumber.t,
+  ~balanceIncentiveCurveExponent: Ethers.BigNumber.t,
+  ~balanceIncentiveCurveEquilibriumOffset: Ethers.BigNumber.t,
 ) => JsPromise.t<transaction> = "addNewStakingFund"
 
 @send
@@ -37,6 +39,35 @@ external addNewStateForFloatRewards: (
 type adminReturn = Ethers.ethAddress
 @send
 external admin: t => JsPromise.t<adminReturn> = "admin"
+
+type balanceIncentiveCurveEquilibriumOffsetReturn = Ethers.BigNumber.t
+@send
+external balanceIncentiveCurveEquilibriumOffset: (
+  t,
+  int,
+) => JsPromise.t<balanceIncentiveCurveEquilibriumOffsetReturn> =
+  "balanceIncentiveCurveEquilibriumOffset"
+
+type balanceIncentiveCurveExponentReturn = Ethers.BigNumber.t
+@send
+external balanceIncentiveCurveExponent: (
+  t,
+  int,
+) => JsPromise.t<balanceIncentiveCurveExponentReturn> = "balanceIncentiveCurveExponent"
+
+@send
+external changBalanceIncentiveEquilibriumOffset: (
+  t,
+  ~marketIndex: int,
+  ~balanceIncentiveCurveEquilibriumOffset: Ethers.BigNumber.t,
+) => JsPromise.t<transaction> = "changBalanceIncentiveEquilibriumOffset"
+
+@send
+external changBalanceIncentiveExponent: (
+  t,
+  ~marketIndex: int,
+  ~balanceIncentiveCurveExponent: Ethers.BigNumber.t,
+) => JsPromise.t<transaction> = "changBalanceIncentiveExponent"
 
 @send
 external changeAdmin: (t, ~admin: Ethers.ethAddress) => JsPromise.t<transaction> = "changeAdmin"

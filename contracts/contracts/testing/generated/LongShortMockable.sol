@@ -375,11 +375,13 @@ contract LongShortMockable is ILongShort, Initializable {
         uint256 kInitialMultiplier,
         uint256 kPeriod,
         uint256 unstakeFeeBasisPoints,
-        uint256 initialMarketSeed
+        uint256 initialMarketSeed,
+        uint256 balanceIncentiveCurveExponent,
+        int256 balanceIncentiveCurveEquilibriumOffset
     ) external adminOnly {
     if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("initializeMarket"))){
       
-      return mocker.initializeMarketMock(marketIndex,kInitialMultiplier,kPeriod,unstakeFeeBasisPoints,initialMarketSeed);
+      return mocker.initializeMarketMock(marketIndex,kInitialMultiplier,kPeriod,unstakeFeeBasisPoints,initialMarketSeed,balanceIncentiveCurveExponent,balanceIncentiveCurveEquilibriumOffset);
     }
   
         require(!marketExists[marketIndex], "already initialized");
@@ -393,7 +395,9 @@ contract LongShortMockable is ILongShort, Initializable {
             syntheticTokens[latestMarket][false],
             kInitialMultiplier,
             kPeriod,
-            unstakeFeeBasisPoints
+            unstakeFeeBasisPoints,
+            balanceIncentiveCurveExponent,
+            balanceIncentiveCurveEquilibriumOffset
         );
 
         _seedMarketInitially(initialMarketSeed, marketIndex);
