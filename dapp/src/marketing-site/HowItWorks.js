@@ -5,9 +5,9 @@ var React = require("react");
 
 function HowItWorks(Props) {
   return React.createElement("section", {
-              className: "py-10 bg-white min-h-screen w-screen flex flex-col items-center justify-center bg-pastel-pink"
+              className: "py-10 bg-white min-h-screen w-screen flex flex-col items-center justify-center purple-moon"
             }, React.createElement("h3", {
-                  className: "m-2 text-5xl text-center uppercase font-bold"
+                  className: "m-2 text-5xl text-center uppercase  font-arimo font-extrabold"
                 }, "How it works"));
 }
 

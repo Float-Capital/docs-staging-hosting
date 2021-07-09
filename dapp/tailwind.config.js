@@ -135,6 +135,7 @@ module.exports = {
       ],
       alphbeta: ["alphbeta"],
       vt323: ["vt323"],
+      arimo: ["arimo"],
       default: ["menlo", "sans-serif"],
     },
   },

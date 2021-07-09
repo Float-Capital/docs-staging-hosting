@@ -11,7 +11,7 @@ var HowItWorks = require("../marketing-site/HowItWorks.js");
 var EcosystemPartners = require("../marketing-site/EcosystemPartners.js");
 
 function MarketingSite$MarketingSite(Props) {
-  return React.createElement(React.Fragment, undefined, React.createElement(Landing.make, {}), React.createElement(HowItWorks.make, {}), React.createElement(Roadmap.make, {}), React.createElement(EcosystemPartners.make, {}), React.createElement(Governance.make, {}), React.createElement(Footer.make, {}), React.createElement(TVL.make, {}));
+  return React.createElement(React.Fragment, undefined, React.createElement(Landing.make, {}), React.createElement(HowItWorks.make, {}), React.createElement(Roadmap.make, {}), React.createElement(Governance.make, {}), React.createElement(EcosystemPartners.make, {}), React.createElement(Footer.make, {}), React.createElement(TVL.make, {}));
 }
 
 var MarketingSite = {

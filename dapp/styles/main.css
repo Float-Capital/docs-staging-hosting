@@ -16,6 +16,23 @@
     url("/backgrounds/2.png");
   @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
 }
+.blue-dusk-island {
+  background: linear-gradient(
+      rgba(255, 255, 255, 0.3),
+      rgba(255, 255, 255, 0.3)
+    ),
+    url("/backgrounds/2.png");
+  @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
+}
+.purple-moon {
+  background: linear-gradient(
+      to bottom left,
+      rgba(255, 255, 255, 0),
+      rgba(255, 255, 255, 0)
+    ),
+    url("/backgrounds/purple-moon.jpg");
+  @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
+}
 
 .custom-cursor {
   cursor: url("/cursors/pointer-colorful-edit.png"), auto;

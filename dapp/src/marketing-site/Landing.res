@@ -2,7 +2,7 @@
 let make = () => {
   let router = Next.Router.useRouter()
 
-  <section className="min-h-screen bg-pastel-blue">
+  <section className="min-h-screen blue-dusk-island">
     <SiteNav />
     <div className="min-h-screen flex flex-col md:flex-row items-center">
       <div className="w-full md:w-2/5 mx-2 relative">
@@ -15,8 +15,12 @@ let make = () => {
                   className="h-10 md:h-32 my-5 w-full md:w-auto"
                 />
               </div>
-              <h1 className="text-3xl"> {"PEER TO PEER PERPETUAL "->React.string} </h1>
-              <h1 className="text-3xl"> {"SYNTHETIC ASSETS"->React.string} </h1>
+              <h1 className="text-3xl  font-arimo font-extrabold">
+                {"PEER TO PEER PERPETUAL "->React.string}
+              </h1>
+              <h1 className="text-3xl  font-arimo font-extrabold">
+                {"SYNTHETIC ASSETS"->React.string}
+              </h1>
             </div>
             <div className="my-2 text-lg">
               <h2> {"No overcollateralization"->React.string} </h2>

@@ -12,7 +12,7 @@ var FeaturedMarkets = require("./FeaturedMarkets.js");
 function Landing(Props) {
   var router = Router.useRouter();
   return React.createElement("section", {
-              className: "min-h-screen bg-pastel-blue"
+              className: "min-h-screen blue-dusk-island"
             }, React.createElement(SiteNav.make, {}), React.createElement("div", {
                   className: "min-h-screen flex flex-col md:flex-row items-center"
                 }, React.createElement("div", {
@@ -29,9 +29,9 @@ function Landing(Props) {
                                           className: "h-10 md:h-32 my-5 w-full md:w-auto",
                                           src: "/img/float-capital-logo-sq.svg"
                                         })), React.createElement("h1", {
-                                      className: "text-3xl"
+                                      className: "text-3xl  font-arimo font-extrabold"
                                     }, "PEER TO PEER PERPETUAL "), React.createElement("h1", {
-                                      className: "text-3xl"
+                                      className: "text-3xl  font-arimo font-extrabold"
                                     }, "SYNTHETIC ASSETS")), React.createElement("div", {
                                   className: "my-2 text-lg"
                                 }, React.createElement("h2", undefined, "No overcollateralization"), React.createElement("h2", undefined, "No liquidiation"), React.createElement("h2", undefined, "No centralisation")), React.createElement("div", {

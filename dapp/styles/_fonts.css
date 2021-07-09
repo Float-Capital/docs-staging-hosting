@@ -23,3 +23,8 @@ Example of using a google font as a self hosted .woff file
   font-family: "vt323";
   src: url("/fonts/vt323/vt323.ttf");
 }
+
+@font-face {
+  font-family: "arimo";
+  src: url("/fonts/arimo/arimo.ttf");
+}

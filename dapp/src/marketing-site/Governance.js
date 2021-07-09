@@ -12,7 +12,7 @@ function Governance(Props) {
                 }, React.createElement("div", {
                       className: "w-full md:w-1/2 order-2 md:order-1 p-4 md:p-0"
                     }, React.createElement("h3", {
-                          className: "my-2 text-5xl uppercase font-bold"
+                          className: "my-2 text-5xl uppercase font-arimo font-extrabold"
                         }, "Governance"), React.createElement("p", {
                           className: "text-2xl"
                         }, "The FLT token governs the float capital protocol. The right governance model will direct and shape the protocol through community lead proposals in a decentralised and fair manor. The future of Float Capital will be dictated by its users."), React.createElement("div", {

@@ -7,7 +7,7 @@ function EcosystemPartners(Props) {
   return React.createElement("section", {
               className: "py-10 bg-white min-h-screen w-screen flex flex-col items-center justify-center bg-pastel-yellow"
             }, React.createElement("h3", {
-                  className: "m-2 text-5xl text-center uppercase font-bold"
+                  className: "m-2 text-5xl text-center uppercase  font-arimo font-extrabold"
                 }, "Ecosystem partners"), React.createElement("div", {
                   className: "w-full mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-evenly"
                 }, React.createElement("img", {
