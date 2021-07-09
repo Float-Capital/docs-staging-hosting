@@ -8,6 +8,13 @@ pragma solidity 0.8.3;
  * different markets may share an underlying fund token.
  */
 abstract contract IYieldManager {
+    event WithdrawErc20TokenToTreasury(address erc20Token, uint256 amount);
+
+    event YieldDistributed(uint256 unrealizedYield, uint256 treasuryPercentE18);
+
+    // NOTE: This is purely saving some gas, but the subgraph will know how much is due for the treasury at all times - no need to include in event.
+    event WithdrawTreasuryFunds();
+
     function totalReservedForTreasury() external virtual returns (uint256);
 
     /*

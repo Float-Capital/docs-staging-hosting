@@ -137,8 +137,11 @@ contract YieldManagerAave is IYieldManager {
         );
 
         uint256 amount = IERC20Upgradeable(erc20Token).balanceOf(address(this));
+
         // Transfer tokens to treasury
         IERC20Upgradeable(erc20Token).transfer(treasury, amount);
+
+        emit WithdrawErc20TokenToTreasury(erc20Token, amount);
     }
 
     /*
@@ -168,6 +171,8 @@ contract YieldManagerAave is IYieldManager {
 
         totalReservedForTreasury += amountForTreasury;
 
+        emit YieldDistributed(unrealizedYield, treasuryPercentE18);
+
         return amountForMarketIncetives;
     }
 
@@ -186,5 +191,7 @@ contract YieldManagerAave is IYieldManager {
             amountToWithdrawForTreasury,
             treasury
         );
+
+        emit WithdrawTreasuryFunds();
     }
 }

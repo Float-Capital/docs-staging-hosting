@@ -84,7 +84,7 @@ contract LongShortMockable is ILongShort, Initializable {
         address staker
     );
 
-        event SystemStateUpdated(
+    event SystemStateUpdated(
         uint32 marketIndex,
         uint256 updateIndex,
         int256 underlyingAssetPrice,
@@ -99,10 +99,11 @@ contract LongShortMockable is ILongShort, Initializable {
         address longTokenAddress,
         address shortTokenAddress,
         address paymentToken,
-        uint256 assetPrice,
+        uint256 initialAssetPrice,
         string name,
         string symbol,
-        address oracleAddress
+        address oracleAddress,
+        address yieldManagerAddress
     );
 
     event PriceUpdate(
@@ -336,7 +337,8 @@ contract LongShortMockable is ILongShort, Initializable {
             assetPrice[latestMarket],
             syntheticName,
             syntheticSymbol,
-            _oracleManager
+            _oracleManager,
+            _yieldManager
         );
     }
 
@@ -518,7 +520,8 @@ contract LongShortMockable is ILongShort, Initializable {
             imbalance = longValue - shortValue;
         }
 
-        uint256 marketTreasurySplitSlopE18 = 1e18; 
+                uint256 marketTreasurySplitSlopE18 = 1e18;
+
         uint256 marketPercentCalculatedE18 = (imbalance *
             marketTreasurySplitSlopE18) / totalValueLockedInMarket;
 
