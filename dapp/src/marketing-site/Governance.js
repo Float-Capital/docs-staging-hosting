@@ -6,7 +6,8 @@ var Button = require("../components/UI/Base/Button.js");
 
 function Governance(Props) {
   return React.createElement("section", {
-              className: "py-10 min-h-screen w-screen flex flex-col items-center justify-center bg-pastel-orange"
+              className: "py-10 min-h-screen w-screen flex flex-col items-center justify-center bg-pastel-orange",
+              id: "governance"
             }, React.createElement("div", {
                   className: "max-w-5xl flex flex-col md:flex-row justify-evenly items-center mx-auto"
                 }, React.createElement("div", {

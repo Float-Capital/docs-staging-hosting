@@ -85,7 +85,7 @@ let make = () => {
     StartTrading.ClickedTradingProvider.DispatchClickedTradingContext.context,
   )
 
-  <>
+  <div className="absolute w-full py-1 top-10">
     <nav className="mx-auto w-full max-w-5xl p-2 h-12 flex justify-between items-center text-sm">
       <Link href="/">
         <a className="flex items-center">
@@ -235,5 +235,5 @@ let make = () => {
         </div>
       </div>
     </nav>
-  </>
+  </div>
 }

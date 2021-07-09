@@ -154,7 +154,9 @@ function Navigation(Props) {
           children: "LOGIN"
         });
   }
-  return React.createElement(React.Fragment, undefined, React.createElement("nav", {
+  return React.createElement("div", {
+              className: "absolute w-full py-1 top-10"
+            }, React.createElement("nav", {
                   className: "mx-auto w-full max-w-5xl p-2 h-12 flex justify-between items-center text-sm"
                 }, React.createElement(Link, {
                       href: "/",

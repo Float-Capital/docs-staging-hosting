@@ -1,6 +1,7 @@
 @react.component
 let make = () => {
   <section
+    id="governance"
     className="py-10 min-h-screen w-screen flex flex-col items-center justify-center bg-pastel-orange">
     <div className="max-w-5xl flex flex-col md:flex-row justify-evenly items-center mx-auto">
       <div className="w-full md:w-1/2 order-2 md:order-1 p-4 md:p-0">

@@ -1,49 +1,59 @@
+module Link = Next.Link
+
 @react.component
 let make = () => {
-  let router = Next.Router.useRouter()
-
-  <section className="min-h-screen blue-dusk-island">
-    <SiteNav />
-    <div className="min-h-screen flex flex-col md:flex-row items-center">
-      <div className="w-full md:w-2/5 mx-2 relative">
-        <div className="v-align-in-responsive-height">
-          <div className="block static">
-            <div className="font-bold leading-none w-full md:min-w-400 my-2">
-              <div className="logo-container">
-                <img
-                  src="/img/float-capital-logo-sq.svg"
-                  className="h-10 md:h-32 my-5 w-full md:w-auto"
-                />
-              </div>
-              <h1 className="text-3xl  font-arimo font-extrabold">
-                {"PEER TO PEER PERPETUAL "->React.string}
-              </h1>
-              <h1 className="text-3xl  font-arimo font-extrabold">
-                {"SYNTHETIC ASSETS"->React.string}
-              </h1>
+  <section className="blue-dusk-island flex flex-col md:flex-row items-center min-h-screen">
+    <div className="w-full mx-2 relative">
+      <div className="v-align-in-responsive-height">
+        <div className="block static">
+          <div className="font-bold leading-none w-full md:min-w-400 my-2">
+            <div className="logo-container mx-auto">
+              <img
+                src="/img/float-capital-logo-sq-center.svg"
+                className="h-14 md:h-44 my-5 w-full md:w-auto"
+              />
             </div>
-            <div className="my-2 text-lg">
-              <h2> {"No overcollateralization"->React.string} </h2>
-              <h2> {"No liquidiation"->React.string} </h2>
-              <h2> {"No centralisation"->React.string} </h2>
-            </div>
-            <div className="flex flex-row items-center w-1/2">
-              <Button onClick={_ => router->Next.Router.pushShallow("/app/markets")}>
-                {"APP"}
-              </Button>
-              <a href={Config.discordInviteLink} target="_" rel="noopenner noreferer">
-                <img
-                  src="icons/discord-sq.svg" className="h-12 mx-4 cursor-pointer hover:opacity-75"
-                />
-              </a>
-              <a href="https://twitter.com/float_capital" target="_" rel="noopenner noreferer">
-                <img src="icons/twitter-sq.svg" className="h-12 cursor-pointer hover:opacity-75" />
-              </a>
-            </div>
+            <h1 className="text-2xl font-vt323 font-extrabold text-center">
+              {"Peer-to-peer synthetic assets"->React.string}
+            </h1>
           </div>
+          <nav className="text-3xl font-vt323">
+            <div className="mx-auto">
+              <Link href="#how-it-works">
+                <div className="flex items-center hover:bg-white">
+                  <span className="text-2xl animate-pulse"> {">"->React.string} </span>
+                  <a className="px-3"> {`How it works`->React.string} </a>
+                </div>
+              </Link>
+              <Link href="#roadmap">
+                <div className="flex items-center hover:bg-white">
+                  <span className="text-2xl animate-pulse"> {">"->React.string} </span>
+                  <a className="px-3"> {`Roadmap`->React.string} </a>
+                </div>
+              </Link>
+              <Link href="#team">
+                <div className="flex items-center hover:bg-white">
+                  <span className="text-2xl animate-pulse"> {">"->React.string} </span>
+                  <a className="px-3"> {`Team`->React.string} </a>
+                </div>
+              </Link>
+              <Link href="#governance">
+                <div className="flex items-center hover:bg-white">
+                  <span className="text-2xl animate-pulse"> {">"->React.string} </span>
+                  <a className="px-3"> {`Governance`->React.string} </a>
+                </div>
+              </Link>
+              <Link href="#security">
+                <div className="flex items-center hover:bg-white">
+                  <span className="text-2xl animate-pulse"> {">"->React.string} </span>
+                  <a className="px-3"> {`Security`->React.string} </a>
+                </div>
+              </Link>
+            </div>
+          </nav>
         </div>
       </div>
-      <div className="w-full md:w-3/5"> <FeaturedMarkets /> </div>
     </div>
+    <EcosystemPartners />
   </section>
 }

@@ -5,6 +5,10 @@
 @import "./ellipsis-loader.css";
 @import "./tick-animation.css";
 
+html {
+  scroll-behavior: smooth;
+}
+
 #app {
   /* It is possible to make this a utility (https://tailwindcss.com/docs/plugins#adding-utilities)
       - but probably not worth the confusion
@@ -22,7 +26,7 @@
       rgba(255, 255, 255, 0.3)
     ),
     url("/backgrounds/2.png");
-  @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
+  @apply font-default w-screen bg-right-top bg-cover bg-gray-50;
 }
 .purple-moon {
   background: linear-gradient(

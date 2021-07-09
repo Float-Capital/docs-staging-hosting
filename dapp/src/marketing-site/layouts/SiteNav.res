@@ -29,6 +29,8 @@ let floatingMenuZoomStyle = shouldDisplay => {
   ])
 }
 
+module Link = Next.Link
+
 let hamburgerSvg = () =>
   <svg
     className={
@@ -66,16 +68,14 @@ let closeSvg = () =>
     />
   </svg>
 
-module Link = Next.Link
-
 @react.component
 let make = () => {
   let (isOpen, setIsOpen) = React.useState(_ => false)
 
   let router = Next.Router.useRouter()
 
-  <>
-    <nav className="mx-auto w-full max-w-5xl p-2 h-12 flex justify-between items-center text-sm">
+  <div className="absolute w-full py-1 top-10">
+    <nav className=" mx-auto  max-w-5xl p-2 h-12 flex justify-between items-center text-sm ">
       <Link href="/">
         <a className="flex items-center">
           <span className="text-xl text-green-800 ml-2 align-middle font-semibold" />
@@ -85,6 +85,14 @@ let make = () => {
         <a className="px-3 hover:bg-white" target="_blank" href="https://docs.float.capital">
           {React.string("DOCS")}
         </a>
+        <div className="flex flex-row items-center mr-1">
+          <a href={Config.discordInviteLink} target="_" rel="noopenner noreferer">
+            <img src="icons/discord-sq.svg" className="h-6 mx-1 cursor-pointer hover:opacity-75" />
+          </a>
+          <a href="https://twitter.com/float_capital" target="_" rel="noopenner noreferer">
+            <img src="icons/twitter-sq.svg" className="h-6 mx-1 cursor-pointer hover:opacity-75" />
+          </a>
+        </div>
         <Button.Small
           onClick={_ => {
             router->Next.Router.push(`/app/markets`)
@@ -120,5 +128,5 @@ let make = () => {
         </div>
       </div>
     </nav>
-  </>
+  </div>
 }

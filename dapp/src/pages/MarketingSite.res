@@ -5,8 +5,7 @@ module MarketingSite = {
       <Landing />
       <HowItWorks/>
       <Roadmap />
-      <Governance />
-      <EcosystemPartners />
+      <Governance />      
       <Footer />
       <TVL />
     </>

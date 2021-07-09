@@ -6,9 +6,9 @@ var Config = require("../config/Config.js");
 
 function ComingSoon(Props) {
   return React.createElement("div", {
-              className: "bg-primary p-1 mb-2 "
+              className: "absolute bg-primary p-1 mb-2 h-10 flex items-center w-full"
             }, React.createElement("div", {
-                  className: "text-center text-sm text-white mx-12"
+                  className: "text-center text-sm text-white mx-12 w-full"
                 }, "🏗 The protocol is under active development, join our ", React.createElement("a", {
                       className: "bg-white hover:bg-primary-light text-primary hover:text-white py-1 font-bold",
                       href: Config.discordInviteLink,

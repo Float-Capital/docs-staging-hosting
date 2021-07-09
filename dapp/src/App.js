@@ -5,6 +5,7 @@ var Toast = require("./components/UI/Base/Toast.js");
 var React = require("react");
 var Client = require("./data/Client.js");
 var MainLayout = require("./layouts/MainLayout.js");
+var SiteLayout = require("./marketing-site/layouts/SiteLayout.js");
 var APYProvider = require("./libraries/APYProvider.js");
 var Router = require("next/router");
 var RootProvider = require("./libraries/RootProvider.js");
@@ -20,7 +21,9 @@ function $$default(props) {
   var content = React.createElement(props.Component, props.pageProps);
   InjectedEthereum.useReloadOnMetamaskChainChanged(undefined);
   var match = router.route;
-  var tmp = match === "/" ? content : React.createElement(MainLayout.make, {
+  var tmp = match === "/" ? React.createElement(SiteLayout.make, {
+          children: content
+        }) : React.createElement(MainLayout.make, {
           children: content
         });
   return React.createElement(ToastProvider.make, {

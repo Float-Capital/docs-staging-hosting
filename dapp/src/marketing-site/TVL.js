@@ -26,21 +26,27 @@ function TVL(Props) {
         undefined
       ]);
   var match = marketDetailsQuery.data;
+  var tmp;
   if (marketDetailsQuery.loading) {
-    return React.createElement(Loader.Mini.make, {});
+    tmp = React.createElement(Loader.Tiny.make, {});
+  } else if (marketDetailsQuery.error !== undefined) {
+    tmp = React.createElement("span", {
+          className: "text-xs"
+        }, "Error Loading TVL");
+  } else if (match !== undefined) {
+    var match$1 = StatsCalcs.getTotalValueLockedAndTotalStaked(match.syntheticMarkets);
+    tmp = React.createElement("div", {
+          className: "text-sm flex flex-row items-center"
+        }, React.createElement("span", undefined, "TVL: "), React.createElement("img", {
+              className: "h-6 mx-1",
+              src: "/icons/dollar-coin.png"
+            }), React.createElement("span", undefined, Misc.NumberFormat.formatEther(undefined, match$1.totalValueLocked)));
+  } else {
+    tmp = React.createElement(React.Fragment, undefined, "");
   }
-  if (marketDetailsQuery.error !== undefined) {
-    return React.createElement(React.Fragment, undefined, "Error Loading TVL");
-  }
-  if (match === undefined) {
-    return React.createElement(React.Fragment, undefined, "");
-  }
-  var match$1 = StatsCalcs.getTotalValueLockedAndTotalStaked(match.syntheticMarkets);
   return React.createElement("div", {
               className: "fixed bottom-3 left-3 flex flex-col items-end invisible md:visible bg-white bg-opacity-75 rounded-lg shadow-lg px-2 py-1"
-            }, React.createElement("div", {
-                  className: "text-sm"
-                }, "TVL: $" + Misc.NumberFormat.formatEther(undefined, match$1.totalValueLocked)));
+            }, tmp);
 }
 
 var make = TVL;

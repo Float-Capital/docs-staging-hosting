@@ -5,7 +5,8 @@ var Css = require("bs-css-emotion/src/Css.js");
 var CssJs = require("bs-css-emotion/src/CssJs.js");
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Button = require("../components/UI/Base/Button.js");
+var Button = require("../../components/UI/Base/Button.js");
+var Config = require("../../config/Config.js");
 var Link = require("next/link").default;
 var Router = require("next/router");
 
@@ -91,8 +92,10 @@ function SiteNav(Props) {
   var setIsOpen = match[1];
   var isOpen = match[0];
   var router = Router.useRouter();
-  return React.createElement(React.Fragment, undefined, React.createElement("nav", {
-                  className: "mx-auto w-full max-w-5xl p-2 h-12 flex justify-between items-center text-sm"
+  return React.createElement("div", {
+              className: "absolute w-full py-1 top-10"
+            }, React.createElement("nav", {
+                  className: " mx-auto  max-w-5xl p-2 h-12 flex justify-between items-center text-sm "
                 }, React.createElement(Link, {
                       href: "/",
                       children: React.createElement("a", {
@@ -106,7 +109,23 @@ function SiteNav(Props) {
                           className: "px-3 hover:bg-white",
                           href: "https://docs.float.capital",
                           target: "_blank"
-                        }, "DOCS"), React.createElement(Button.Small.make, {
+                        }, "DOCS"), React.createElement("div", {
+                          className: "flex flex-row items-center mr-1"
+                        }, React.createElement("a", {
+                              href: Config.discordInviteLink,
+                              rel: "noopenner noreferer",
+                              target: "_"
+                            }, React.createElement("img", {
+                                  className: "h-6 mx-1 cursor-pointer hover:opacity-75",
+                                  src: "icons/discord-sq.svg"
+                                })), React.createElement("a", {
+                              href: "https://twitter.com/float_capital",
+                              rel: "noopenner noreferer",
+                              target: "_"
+                            }, React.createElement("img", {
+                                  className: "h-6 mx-1 cursor-pointer hover:opacity-75",
+                                  src: "icons/twitter-sq.svg"
+                                }))), React.createElement(Button.Small.make, {
                           onClick: (function (param) {
                               router.push("/app/markets");
                               
@@ -151,8 +170,8 @@ var Link$1;
 var make = SiteNav;
 
 exports.floatingMenuZoomStyle = floatingMenuZoomStyle;
+exports.Link = Link$1;
 exports.hamburgerSvg = hamburgerSvg;
 exports.closeSvg = closeSvg;
-exports.Link = Link$1;
 exports.make = make;
 /* Css Not a pure module */
