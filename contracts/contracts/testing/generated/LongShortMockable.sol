@@ -99,7 +99,7 @@ contract LongShortMockable is ILongShort, Initializable {
         address longTokenAddress,
         address shortTokenAddress,
         address paymentToken,
-        uint256 assetPrice,
+        uint256 initialAssetPrice,
         string name,
         string symbol,
         address oracleAddress,

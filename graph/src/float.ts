@@ -280,8 +280,9 @@ export function handleSyntheticTokenCreated(
   let marketIndex = event.params.marketIndex;
   let longTokenAddress = event.params.longTokenAddress;
   let shortTokenAddress = event.params.shortTokenAddress;
-  let collateralTokenAddress = event.params.paymentToken;
-  let initialAssetPrice = event.params.assetPrice;
+  let paymentToken = event.params.paymentToken;
+  let initialAssetPrice = event.params.initialAssetPrice;
+  let yieldManagerAddress = event.params.yieldManagerAddress;
 
   let oracleAddress = event.params.oracleAddress;
   let syntheticName = event.params.name;
@@ -371,24 +372,27 @@ export function handleSyntheticTokenCreated(
       marketIndex.toString(),
       longTokenAddress.toHex(),
       shortTokenAddress.toHex(),
+      initialAssetPrice.toHex(),
       initialAssetPrice.toString(),
       syntheticName,
       syntheticSymbol,
       oracleAddress.toHex(),
-      collateralTokenAddress.toHex(),
+      yieldManagerAddress.toHex(),
     ],
     [
       "marketIndex",
       "longTokenAddress",
       "shortTokenAddress",
-      "assetPrice",
+      "paymentAddress",
+      "initialAssetPrice",
       "name",
       "symbol",
       "oracleAddress",
-      "collateralAddress",
+      "yieldManagerAddress",
     ],
     [
-      "uint256",
+      "uint32",
+      "address",
       "address",
       "address",
       "uint256",

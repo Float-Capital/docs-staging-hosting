@@ -39,7 +39,7 @@ dataSources:
           handler: handleOracleUpdated
         - event: PriceUpdate(uint32,uint256,uint256,address)
           handler: handlePriceUpdate
-        - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
+        - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address,address)
           handler: handleSyntheticTokenCreated
         - event: SystemStateUpdated(uint32,uint256,int256,uint256,uint256,uint256,uint256)
           handler: handleSystemStateUpdated
