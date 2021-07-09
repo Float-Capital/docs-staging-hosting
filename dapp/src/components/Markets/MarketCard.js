@@ -46,7 +46,7 @@ function marketPositionValues(marketName, isLong, totalLockedLong, totalLockedSh
   return React.createElement("div", {
               className: "text-sm text-center m-auto mb-4"
             }, React.createElement("div", {
-                  className: "text-2xl tracking-widest font-alphbeta my-3"
+                  className: "text-2xl tracking-widest font-vt323 my-3"
                 }, "$" + value), React.createElement("span", {
                   className: "font-bold"
                 }, "Exposure "), React.createElement(Tooltip.make, {
@@ -101,7 +101,7 @@ function MarketCard(Props) {
                   }, React.createElement("div", {
                         className: "flex justify-center w-full my-1"
                       }, React.createElement("h1", {
-                            className: "font-bold text-xl font-alphbeta cursor-pointer hover:underline"
+                            className: "font-bold text-xl font-vt323 cursor-pointer hover:underline"
                           }, marketName, React.createElement(Tooltip.make, {
                                 tip: "This market tracks " + marketName
                               }))), React.createElement("div", {
@@ -117,7 +117,7 @@ function MarketCard(Props) {
                               }, React.createElement("span", {
                                     className: "font-bold"
                                   }, "TOTAL"), " Liquidity"), React.createElement("div", {
-                                className: "text-3xl font-alphbeta tracking-wider py-1"
+                                className: "text-3xl font-vt323 tracking-wider py-1"
                               }, "$" + Misc.NumberFormat.formatEther(undefined, totalValueLocked)), React.createElement("div", {
                                 className: "md:block hidden w-full"
                               }, liquidityRatio(totalValueLocked, totalLockedLong), mintButtons(marketIndex))), React.createElement("div", {
@@ -147,7 +147,7 @@ function MarketCard$Mini(Props) {
                   }, React.createElement("div", {
                         className: "flex justify-center w-full my-1"
                       }, React.createElement("h1", {
-                            className: "font-bold text-xl font-alphbeta uppercase custom-cursor hover:underline"
+                            className: "font-bold text-xl font-vt323 uppercase custom-cursor hover:underline"
                           }, param.name)), React.createElement("div", {
                         className: "flex flex-wrap justify-center w-full"
                       }, React.createElement("div", {
@@ -159,7 +159,7 @@ function MarketCard$Mini(Props) {
                               }, React.createElement("span", {
                                     className: "font-bold"
                                   }, "TOTAL"), " Liquidity"), React.createElement("div", {
-                                className: "text-3xl font-alphbeta tracking-wider py-1"
+                                className: "text-3xl font-vt323 tracking-wider py-1"
                               }, "$" + Misc.NumberFormat.formatEther(undefined, totalValueLocked))), React.createElement("div", {
                             className: "order-3 w-1/2 flex-grow flex-wrap flex-col"
                           }, marketPositionHeadings(false))), React.createElement("div", {

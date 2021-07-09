@@ -128,7 +128,7 @@ function UserUI$UserColumnHeader(Props) {
   return React.createElement("h1", {
               className: "text-center " + (
                 subheader ? "text-base" : "text-lg"
-              ) + " font-alphbeta mb-4 mt-2"
+              ) + " font-vt323 mb-4 mt-2"
             }, children);
 }
 

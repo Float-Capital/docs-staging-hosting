@@ -134,6 +134,7 @@ module.exports = {
         "monospace",
       ],
       alphbeta: ["alphbeta"],
+      vt323: ["vt323"],
       default: ["menlo", "sans-serif"],
     },
   },

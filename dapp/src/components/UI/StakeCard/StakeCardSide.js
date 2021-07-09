@@ -25,7 +25,7 @@ function StakeCardSide(Props) {
   var tmp;
   tmp = typeof apy === "number" ? React.createElement(Loader.Mini.make, {}) : (
       apy.TAG === /* Loaded */0 ? React.createElement("p", {
-              className: "text-xl tracking-widest font-alphbeta"
+              className: "text-xl tracking-widest font-vt323"
             }, mapVal(apy._0)) : React.createElement(Loader.Mini.make, {})
     );
   return React.createElement("div", {
@@ -41,7 +41,7 @@ function StakeCardSide(Props) {
                     }, React.createElement("span", {
                           className: "font-bold"
                         }, isLong ? "LONG" : "SHORT"), " FLOAT rewards"), React.createElement("p", {
-                      className: "text-2xl md:text-4xl tracking-widest font-alphbeta"
+                      className: "text-2xl md:text-4xl tracking-widest font-vt323"
                     }, mapVal(floatApy))), React.createElement("div", {
                   className: "flex flex-col items-center justify-center pt-0 mt-auto text-gray-600"
                 }, React.createElement("h3", {

@@ -43,7 +43,7 @@ function MarketStakeCard(Props) {
                     }, React.createElement("div", {
                           className: "flex justify-center w-full mb-2"
                         }, React.createElement("h1", {
-                              className: "font-bold text-xl font-alphbeta"
+                              className: "font-bold text-xl font-vt323"
                             }, marketName)), React.createElement("div", {
                           className: "flex flex-row items-center justify-between w-full mb-4"
                         }, React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("h2", {
@@ -51,13 +51,13 @@ function MarketStakeCard(Props) {
                                     }, React.createElement("span", {
                                           className: "font-bold "
                                         }, "📈 Long"), React.createElement("br", undefined), "liquidity")), React.createElement("div", {
-                                  className: "text-xs font-alphbeta tracking-wider py-1 text-gray-600"
+                                  className: "text-xs font-vt323 tracking-wider py-1 text-gray-600"
                                 }, "$" + Misc.NumberFormat.formatEther(undefined, totalLockedLong))), React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("h2", {
                                       className: "text-xs mt-1 text-center"
                                     }, React.createElement("span", {
                                           className: "font-bold pr-1"
                                         }, "TOTAL"), React.createElement("br", undefined), "Liquidity")), React.createElement("div", {
-                                  className: "text-2xl font-alphbeta tracking-wider "
+                                  className: "text-2xl font-vt323 tracking-wider "
                                 }, "$" + Misc.NumberFormat.formatEther(undefined, totalValueLocked))), React.createElement("div", {
                               className: "text-right"
                             }, React.createElement("div", undefined, React.createElement("h2", {
@@ -65,7 +65,7 @@ function MarketStakeCard(Props) {
                                     }, React.createElement("span", {
                                           className: "font-bold"
                                         }, "Short 📉"), React.createElement("br", undefined), "liquidity")), React.createElement("div", {
-                                  className: "text-xs font-alphbeta tracking-wider py-1 text-gray-600"
+                                  className: "text-xs font-vt323 tracking-wider py-1 text-gray-600"
                                 }, "$" + Misc.NumberFormat.formatEther(undefined, totalLockedShort)))), React.createElement("div", {
                           className: "w-full"
                         }, totalValueLocked.eq(CONSTANTS.zeroBN) ? null : React.createElement(MarketBar.make, {

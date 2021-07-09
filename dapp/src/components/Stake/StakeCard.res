@@ -135,7 +135,7 @@ let make = (
     <div
       className="p-1 mb-8 rounded-lg flex flex-col bg-light-gold bg-opacity-75 hover:bg-opacity-60 cursor-pointer my-5 shadow-lg">
       <div className="flex justify-center w-full my-1">
-        <h1 className="font-bold text-xl font-alphbeta">
+        <h1 className="font-bold text-xl font-vt323">
           {marketName->React.string} <Tooltip tip={`This market tracks ${marketName}`} />
         </h1>
       </div>
@@ -157,7 +157,7 @@ let make = (
                   {" staked"->React.string}
                 </h2>
               </div>
-              <div className="text-sm font-alphbeta tracking-wider py-1">
+              <div className="text-sm font-vt323 tracking-wider py-1">
                 {`$${longDollarValueStaked->Misc.NumberFormat.formatEther}`->React.string}
               </div>
             </div>
@@ -168,7 +168,7 @@ let make = (
                   {" Staked"->React.string}
                 </h2>
               </div>
-              <div className="text-3xl font-alphbeta tracking-wider py-1">
+              <div className="text-3xl font-vt323 tracking-wider py-1">
                 {`$${totalDollarValueStake->Misc.NumberFormat.formatEther}`->React.string}
               </div>
             </div>
@@ -179,7 +179,7 @@ let make = (
                   {` staked 📉`->React.string}
                 </h2>
               </div>
-              <div className="text-sm font-alphbeta tracking-wider py-1">
+              <div className="text-sm font-vt323 tracking-wider py-1">
                 {`$${shortDollarValueStaked->Misc.NumberFormat.formatEther}`->React.string}
               </div>
             </div>
