@@ -65,13 +65,13 @@ function mintButtons(marketIndex) {
             }, React.createElement(Button.Small.make, {
                   onClick: (function ($$event) {
                       $$event.preventDefault();
-                      return Next.Router.pushShallow(router, "/mint?marketIndex=" + marketIndex.toString() + "&actionOption=long");
+                      return Next.Router.pushShallow(router, "/app/mint?marketIndex=" + marketIndex.toString() + "&actionOption=long");
                     }),
                   children: "Mint Long"
                 }), React.createElement(Button.Small.make, {
                   onClick: (function ($$event) {
                       $$event.preventDefault();
-                      return Next.Router.pushShallow(router, "/mint?marketIndex=" + marketIndex.toString() + "&actionOption=short");
+                      return Next.Router.pushShallow(router, "/app/mint?marketIndex=" + marketIndex.toString() + "&actionOption=short");
                     }),
                   children: "Mint Short"
                 }));
@@ -171,13 +171,13 @@ function MarketCard$Mini(Props) {
                           }, React.createElement(Button.Tiny.make, {
                                 onClick: (function ($$event) {
                                     $$event.preventDefault();
-                                    return Next.Router.pushShallow(router, "/mint?marketIndex=" + marketIndex.toString() + "&actionOption=long");
+                                    return Next.Router.pushShallow(router, "/app/mint?marketIndex=" + marketIndex.toString() + "&actionOption=long");
                                   }),
                                 children: "Mint Long"
                               }), React.createElement(Button.Tiny.make, {
                                 onClick: (function ($$event) {
                                     $$event.preventDefault();
-                                    return Next.Router.pushShallow(router, "/mint?marketIndex=" + marketIndex.toString() + "&actionOption=short");
+                                    return Next.Router.pushShallow(router, "/app/mint?marketIndex=" + marketIndex.toString() + "&actionOption=short");
                                   }),
                                 children: "Mint Short"
                               }))))

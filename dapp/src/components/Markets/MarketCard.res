@@ -66,7 +66,7 @@ let mintButtons = (~marketIndex) => {
       onClick={event => {
         ReactEvent.Mouse.preventDefault(event)
         router->Next.Router.pushShallow(
-          `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=long`,
+          `/app/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=long`,
         )
       }}>
       "Mint Long"
@@ -75,7 +75,7 @@ let mintButtons = (~marketIndex) => {
       onClick={event => {
         ReactEvent.Mouse.preventDefault(event)
         router->Next.Router.pushShallow(
-          `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=short`,
+          `/app/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=short`,
         )
       }}>
       "Mint Short"
@@ -213,7 +213,7 @@ module Mini = {
               onClick={event => {
                 ReactEvent.Mouse.preventDefault(event)
                 router->Next.Router.pushShallow(
-                  `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=long`,
+                  `/app/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=long`,
                 )
               }}>
               "Mint Long"
@@ -222,7 +222,7 @@ module Mini = {
               onClick={event => {
                 ReactEvent.Mouse.preventDefault(event)
                 router->Next.Router.pushShallow(
-                  `/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=short`,
+                  `/app/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=short`,
                 )
               }}>
               "Mint Short"

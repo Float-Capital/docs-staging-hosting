@@ -38,7 +38,7 @@ function Landing(Props) {
                                   className: "flex flex-row items-center w-1/2"
                                 }, React.createElement(Button.make, {
                                       onClick: (function (param) {
-                                          return Next.Router.pushShallow(router, "/markets");
+                                          return Next.Router.pushShallow(router, "/app/markets");
                                         }),
                                       children: "APP"
                                     }), React.createElement("a", {

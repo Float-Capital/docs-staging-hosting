@@ -9,7 +9,7 @@ function Footer(Props) {
   return React.createElement("section", {
               className: "py-5 my-0 text:2xl md:text-lg flex flex-col md:flex-row items-end md:items-center md:justify-center bg-primary text-white"
             }, React.createElement(Link, {
-                  href: "/markets",
+                  href: "/app/markets",
                   children: React.createElement("a", {
                         className: "px-3 hover:bg-white hover:text-black"
                       }, "app")

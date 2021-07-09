@@ -108,7 +108,7 @@ function SiteNav(Props) {
                           target: "_blank"
                         }, "DOCS"), React.createElement(Button.Small.make, {
                           onClick: (function (param) {
-                              router.push("/markets");
+                              router.push("/app/markets");
                               
                             }),
                           children: "APP"
@@ -137,7 +137,7 @@ function SiteNav(Props) {
                                     })
                                 }, "DOCS"), React.createElement(Button.Small.make, {
                                   onClick: (function (param) {
-                                      router.push("/markets");
+                                      router.push("/app/markets");
                                       return Curry._1(setIsOpen, (function (param) {
                                                     return false;
                                                   }));

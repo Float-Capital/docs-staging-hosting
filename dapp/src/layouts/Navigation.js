@@ -109,9 +109,9 @@ function Navigation(Props) {
   if (optCurrentUser !== undefined) {
     var currentUser = Caml_option.valFromOption(optCurrentUser);
     tmp = React.createElement(Link, {
-          href: "/user/" + Globals.ethAdrToStr(currentUser),
+          href: "/app/user/" + Globals.ethAdrToStr(currentUser),
           children: React.createElement("p", {
-                className: "flex flex-row items-center px-3 bg-white hover:bg-black hover:text-white ml-1  text-base cursor-pointer " + activeHighlight("/user/[user]")
+                className: "flex flex-row items-center px-3 bg-white hover:bg-black hover:text-white ml-1  text-base cursor-pointer " + activeHighlight("/app/user/[user]")
               }, "PROFILE", React.createElement("img", {
                     className: "inline h-4 rounded ml-2",
                     src: Blockies.makeBlockie(Globals.ethAdrToStr(currentUser))
@@ -120,7 +120,7 @@ function Navigation(Props) {
   } else {
     tmp = React.createElement(Button.Small.make, {
           onClick: (function (param) {
-              router.push("/login?nextPath=" + router.asPath);
+              router.push("/app/login?nextPath=" + router.asPath);
               
             }),
           children: "LOGIN"
@@ -132,7 +132,7 @@ function Navigation(Props) {
     tmp$1 = React.createElement("p", {
           className: "flex flex-row items-center px-3 bg-white text-black hover:bg-black hover:text-gray-200 \n                   cursor-pointer text-3xl",
           onClick: (function (param) {
-              router.push("/user/" + Globals.ethAdrToStr(currentUser$1));
+              router.push("/app/user/" + Globals.ethAdrToStr(currentUser$1));
               return Curry._1(setIsOpen, (function (param) {
                             return false;
                           }));
@@ -141,12 +141,12 @@ function Navigation(Props) {
               className: "inline h-6 rounded mr-2",
               src: Blockies.makeBlockie(Globals.ethAdrToStr(currentUser$1))
             }), React.createElement("p", {
-              className: "flex flex-row items-center px-3 hover:bg-white  cursor-pointer " + activeHighlight("/user/[user]")
+              className: "flex flex-row items-center px-3 hover:bg-white  cursor-pointer " + activeHighlight("/app/user/[user]")
             }, "PROFILE"));
   } else {
     tmp$1 = React.createElement(Button.Small.make, {
           onClick: (function (param) {
-              router.push("/login?nextPath=" + router.asPath);
+              router.push("/app/login?nextPath=" + router.asPath);
               return Curry._1(setIsOpen, (function (param) {
                             return false;
                           }));
@@ -175,16 +175,16 @@ function Navigation(Props) {
                               return Curry._1(clickedTradingDispatch, /* Clicked */0);
                             })
                         }, React.createElement(Link, {
-                              href: "/",
+                              href: "/app/markets",
                               children: React.createElement("a", {
-                                    className: "px-3 hover:bg-white " + activeHighlight("/")
+                                    className: "px-3 hover:bg-white " + activeHighlight("/app/markets")
                                   }, "MARKETS")
                             })), React.createElement(Link, {
-                          href: "/stake-markets",
+                          href: "/app/stake-markets",
                           children: React.createElement("a", {
                                 className: "px-3 hover:bg-white "
                               }, React.createElement("span", {
-                                    className: activeHighlight("/stake-markets")
+                                    className: activeHighlight("/app/stake-markets")
                                   }, "STAKE"), "🔥")
                         }), React.createElement(Link, {
                           href: "/app/stats",
@@ -209,7 +209,7 @@ function Navigation(Props) {
                         }, React.createElement("div", {
                               className: "zoom-in-effect flex flex-col text-3xl text-white"
                             }, React.createElement("div", {
-                                  className: "px-3 bg-black m-2 " + activeHighlight("/"),
+                                  className: "px-3 bg-black m-2 " + activeHighlight("/app/markets"),
                                   onClick: (function (param) {
                                       router.push("/");
                                       return Curry._1(setIsOpen, (function (param) {
@@ -219,13 +219,13 @@ function Navigation(Props) {
                                 }, "MARKETS"), React.createElement("div", {
                                   className: "px-3 bg-black m-2",
                                   onClick: (function (param) {
-                                      router.push("/stake-markets");
+                                      router.push("/app/stake-markets");
                                       return Curry._1(setIsOpen, (function (param) {
                                                     return false;
                                                   }));
                                     })
                                 }, React.createElement("span", {
-                                      className: activeHighlight("/stake-markets")
+                                      className: activeHighlight("/app/stake-markets")
                                     }, "STAKE"), "🔥"), React.createElement("div", {
                                   className: "px-3 bg-black m-2  " + activeHighlight("/app/stats"),
                                   onClick: (function (param) {

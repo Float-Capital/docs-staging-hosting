@@ -78,7 +78,7 @@ function StakeCard(Props) {
               }, React.createElement(Button.Small.make, {
                     onClick: (function ($$event) {
                         $$event.preventDefault();
-                        router.push("/stake?marketIndex=" + marketIndex.toString() + "&actionOption=long&tokenId=" + Ethers.Utils.ethAdrToLowerStr(longTokenAddress), undefined, {
+                        router.push("/app/stake?marketIndex=" + marketIndex.toString() + "&actionOption=long&tokenId=" + Ethers.Utils.ethAdrToLowerStr(longTokenAddress), undefined, {
                               shallow: true,
                               scroll: false
                             });
@@ -88,7 +88,7 @@ function StakeCard(Props) {
                   }), React.createElement(Button.Small.make, {
                     onClick: (function ($$event) {
                         $$event.preventDefault();
-                        router.push("/stake?marketIndex=" + marketIndex.toString() + "&actionOption=short&tokenId=" + Ethers.Utils.ethAdrToLowerStr(shortTokenAddress), undefined, {
+                        router.push("/app/stake?marketIndex=" + marketIndex.toString() + "&actionOption=short&tokenId=" + Ethers.Utils.ethAdrToLowerStr(shortTokenAddress), undefined, {
                               shallow: true,
                               scroll: false
                             });

@@ -20,7 +20,7 @@ function $$default(props) {
   var content = React.createElement(props.Component, props.pageProps);
   InjectedEthereum.useReloadOnMetamaskChainChanged(undefined);
   var match = router.route;
-  var tmp = match === "/site" ? content : React.createElement(MainLayout.make, {
+  var tmp = match === "/" ? content : React.createElement(MainLayout.make, {
           children: content
         });
   return React.createElement(ToastProvider.make, {

@@ -28,7 +28,7 @@ function Stake$StakeDetailsWrapper(Props) {
   return React.createElement("div", {
               className: "max-w-lg mx-auto"
             }, React.createElement(Link, {
-                  href: "/stake-markets",
+                  href: "/app/stake-markets",
                   children: React.createElement("div", {
                         className: "uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mb-2"
                       }, "◀", React.createElement("span", {
@@ -94,7 +94,7 @@ function Stake(Props) {
                             className: "max-w-xs mx-auto"
                           }, React.createElement(Button.make, {
                                 onClick: (function (param) {
-                                    return Next.Router.pushShallow(router, "/mint?marketIndex=" + marketIndex + "&actionOption=" + actionOption);
+                                    return Next.Router.pushShallow(router, "/app/mint?marketIndex=" + marketIndex + "&actionOption=" + actionOption);
                                   }),
                                 children: "Mint"
                               }))) : React.createElement(StakeForm.make, {

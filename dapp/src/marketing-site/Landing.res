@@ -28,7 +28,9 @@ let make = () => {
               <h2> {"No centralisation"->React.string} </h2>
             </div>
             <div className="flex flex-row items-center w-1/2">
-              <Button onClick={_ => router->Next.Router.pushShallow("/markets")}> {"APP"} </Button>
+              <Button onClick={_ => router->Next.Router.pushShallow("/app/markets")}>
+                {"APP"}
+              </Button>
               <a href={Config.discordInviteLink} target="_" rel="noopenner noreferer">
                 <img
                   src="icons/discord-sq.svg" className="h-12 mx-4 cursor-pointer hover:opacity-75"

@@ -98,15 +98,15 @@ let make = () => {
       </Link>
       <div className="hidden md:flex w-2/3 text-base items-center justify-end">
         <span onClick={_ => clickedTradingDispatch(StartTrading.ClickedTradingProvider.Clicked)}>
-          <Link href="/">
-            <a className={`px-3 hover:bg-white ${"/"->activeHighlight}`}>
+          <Link href="/app/markets">
+            <a className={`px-3 hover:bg-white ${"/app/markets"->activeHighlight}`}>
               {React.string("MARKETS")}
             </a>
           </Link>
         </span>
-        <Link href="/stake-markets">
+        <Link href="/app/stake-markets">
           <a className={`px-3 hover:bg-white `}>
-            <span className={"/stake-markets"->activeHighlight}> {`STAKE`->React.string} </span>
+            <span className={"/app/stake-markets"->activeHighlight}> {`STAKE`->React.string} </span>
             {`🔥`->React.string}
           </a>
         </Link>
@@ -126,9 +126,9 @@ let make = () => {
           // </a>
           switch optCurrentUser {
           | Some(currentUser) =>
-            <Link href={`/user/${currentUser->ethAdrToStr}`}>
+            <Link href={`/app/user/${currentUser->ethAdrToStr}`}>
               <p
-                className={`flex flex-row items-center px-3 bg-white hover:bg-black hover:text-white ml-1  text-base cursor-pointer ${"/user/[user]"->activeHighlight}`}>
+                className={`flex flex-row items-center px-3 bg-white hover:bg-black hover:text-white ml-1  text-base cursor-pointer ${"/app/user/[user]"->activeHighlight}`}>
                 {"PROFILE"->React.string}
                 <img
                   className="inline h-4 rounded ml-2"
@@ -139,7 +139,7 @@ let make = () => {
           | None =>
             <Button.Small
               onClick={_ => {
-                router->Next.Router.push(`/login?nextPath=${router.asPath}`)
+                router->Next.Router.push(`/app/login?nextPath=${router.asPath}`)
               }}>
               "LOGIN"
             </Button.Small>
@@ -158,16 +158,18 @@ let make = () => {
                 router->Next.Router.push(`/`)
                 setIsOpen(_ => false)
               }}
-              className={`px-3 bg-black m-2 ${"/"->activeHighlight}`}>
+              className={`px-3 bg-black m-2 ${"/app/markets"->activeHighlight}`}>
               {React.string("MARKETS")}
             </div>
             <div
               onClick={_ => {
-                router->Next.Router.push(`/stake-markets`)
+                router->Next.Router.push(`/app/stake-markets`)
                 setIsOpen(_ => false)
               }}
               className={`px-3 bg-black m-2`}>
-              <span className={"/stake-markets"->activeHighlight}> {`STAKE`->React.string} </span>
+              <span className={"/app/stake-markets"->activeHighlight}>
+                {`STAKE`->React.string}
+              </span>
               {`🔥`->React.string}
             </div>
             <div
@@ -204,7 +206,7 @@ let make = () => {
               | Some(currentUser) =>
                 <p
                   onClick={_ => {
-                    router->Next.Router.push(`/user/${currentUser->ethAdrToStr}`)
+                    router->Next.Router.push(`/app/user/${currentUser->ethAdrToStr}`)
                     setIsOpen(_ => false)
                   }}
                   className="flex flex-row items-center px-3 bg-white text-black hover:bg-black hover:text-gray-200 
@@ -214,7 +216,7 @@ let make = () => {
                     src={Blockies.makeBlockie(currentUser->ethAdrToStr)}
                   />
                   <p
-                    className={`flex flex-row items-center px-3 hover:bg-white  cursor-pointer ${"/user/[user]"->activeHighlight}`}>
+                    className={`flex flex-row items-center px-3 hover:bg-white  cursor-pointer ${"/app/user/[user]"->activeHighlight}`}>
                     {"PROFILE"->React.string}
                   </p>
                 </p>
@@ -222,7 +224,7 @@ let make = () => {
               | None =>
                 <Button.Small
                   onClick={_ => {
-                    router->Next.Router.push(`/login?nextPath=${router.asPath}`)
+                    router->Next.Router.push(`/app/login?nextPath=${router.asPath}`)
                     setIsOpen(_ => false)
                   }}>
                   "LOGIN"

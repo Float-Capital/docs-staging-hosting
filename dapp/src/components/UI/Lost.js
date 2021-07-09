@@ -13,7 +13,7 @@ function Lost(Props) {
       });
   var setShow = match[1];
   var match$1 = router.route;
-  if (match$1 === "/") {
+  if (match$1 === "/app/markets") {
     return null;
   } else {
     return React.createElement("div", {

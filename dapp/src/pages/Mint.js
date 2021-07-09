@@ -21,7 +21,7 @@ function Mint$DetailsWrapper(Props) {
   return React.createElement("div", {
               className: "max-w-xl mx-auto"
             }, React.createElement(Link, {
-                  href: "/",
+                  href: "/app/markets",
                   children: React.createElement("div", {
                         className: "uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mb-2"
                       }, "◀", React.createElement("span", {

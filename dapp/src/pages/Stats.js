@@ -126,7 +126,7 @@ function syntheticAssetsCard(totalSynthValue) {
                             }, React.createElement(Tooltip.make, {
                                   tip: "Redeemable value of synths in the open market"
                                 }))))), React.createElement(Link, {
-                  href: "/",
+                  href: "/app/markets",
                   children: React.createElement("div", {
                         className: "w-full pb-4 text-sm cursor-pointer hover:opacity-70 mx-auto"
                       }, React.createElement("div", {

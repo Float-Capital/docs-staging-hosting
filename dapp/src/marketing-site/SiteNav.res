@@ -78,11 +78,7 @@ let make = () => {
     <nav className="mx-auto w-full max-w-5xl p-2 h-12 flex justify-between items-center text-sm">
       <Link href="/">
         <a className="flex items-center">
-          <span className="text-xl text-green-800 ml-2 align-middle font-semibold">
-            // <div className="logo-container">
-            //   <img src="/img/float-capital-logo-long.svg" className="h-8 md:h-7 w-full md:w-auto" />
-            // </div>
-          </span>
+          <span className="text-xl text-green-800 ml-2 align-middle font-semibold" />
         </a>
       </Link>
       <div className="hidden md:flex w-2/3 text-base items-center justify-end">
@@ -91,7 +87,7 @@ let make = () => {
         </a>
         <Button.Small
           onClick={_ => {
-            router->Next.Router.push(`/markets`)
+            router->Next.Router.push(`/app/markets`)
           }}>
           "APP"
         </Button.Small>
@@ -115,7 +111,7 @@ let make = () => {
             </a>
             <Button.Small
               onClick={_ => {
-                router->Next.Router.push(`/markets`)
+                router->Next.Router.push(`/app/markets`)
                 setIsOpen(_ => false)
               }}>
               "APP"

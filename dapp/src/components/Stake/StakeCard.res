@@ -103,7 +103,7 @@ let make = (
         onClick={event => {
           ReactEvent.Mouse.preventDefault(event)
           router->Next.Router.pushOptions(
-            `/stake?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=long&tokenId=${longTokenAddress->Ethers.Utils.ethAdrToLowerStr}`,
+            `/app/stake?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=long&tokenId=${longTokenAddress->Ethers.Utils.ethAdrToLowerStr}`,
             None,
             {shallow: true, scroll: false},
           )
@@ -114,7 +114,7 @@ let make = (
         onClick={event => {
           ReactEvent.Mouse.preventDefault(event)
           router->Next.Router.pushOptions(
-            `/stake?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=short&tokenId=${shortTokenAddress->Ethers.Utils.ethAdrToLowerStr}`,
+            `/app/stake?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=short&tokenId=${shortTokenAddress->Ethers.Utils.ethAdrToLowerStr}`,
             None,
             {shallow: true, scroll: false},
           )

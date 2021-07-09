@@ -2,7 +2,7 @@
 let make = () => {
   <section
     className="py-5 my-0 text:2xl md:text-lg flex flex-col md:flex-row items-end md:items-center md:justify-center bg-primary text-white">
-    <Next.Link href="/markets">
+    <Next.Link href="/app/markets">
       <a className="px-3 hover:bg-white hover:text-black"> {"app"->React.string} </a>
     </Next.Link>
     <Next.Link href="/app/stats">
