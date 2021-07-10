@@ -849,6 +849,28 @@ function getKValueCalls(param) {
                   })));
 }
 
+function mockGetRequiredAmountOfBitShiftForSafeExponentiationToReturn(_param0) {
+  checkForExceptions("getRequiredAmountOfBitShiftForSafeExponentiation");
+  Belt_Option.map(internalRef.contents, (function (_r) {
+          ((_r.smocked.getRequiredAmountOfBitShiftForSafeExponentiationMock.will.return.with([_param0])));
+          
+        }));
+  
+}
+
+function getRequiredAmountOfBitShiftForSafeExponentiationCalls(param) {
+  checkForExceptions("getRequiredAmountOfBitShiftForSafeExponentiation");
+  return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
+                    var array = _r.smocked.getRequiredAmountOfBitShiftForSafeExponentiationMock.calls;
+                    return Belt_Array.map(array, (function (param) {
+                                  return {
+                                          number: param[0],
+                                          exponent: param[1]
+                                        };
+                                }));
+                  })));
+}
+
 function mockCalculateFloatPerSecondToReturn(_param0, _param1) {
   checkForExceptions("calculateFloatPerSecond");
   Belt_Option.map(internalRef.contents, (function (_r) {
@@ -1339,6 +1361,8 @@ var InternalMock = {
   getMarketLaunchIncentiveParametersCalls: getMarketLaunchIncentiveParametersCalls,
   mockGetKValueToReturn: mockGetKValueToReturn,
   getKValueCalls: getKValueCalls,
+  mockGetRequiredAmountOfBitShiftForSafeExponentiationToReturn: mockGetRequiredAmountOfBitShiftForSafeExponentiationToReturn,
+  getRequiredAmountOfBitShiftForSafeExponentiationCalls: getRequiredAmountOfBitShiftForSafeExponentiationCalls,
   mockCalculateFloatPerSecondToReturn: mockCalculateFloatPerSecondToReturn,
   calculateFloatPerSecondCalls: calculateFloatPerSecondCalls,
   mockCalculateTimeDeltaToReturn: mockCalculateTimeDeltaToReturn,

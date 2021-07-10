@@ -42,7 +42,7 @@ function test(contracts, accounts) {
           var setup = function (initialMultiplier) {
             return LetOps.Await.let_(Helpers.inititialize(accounts.contents[0], true), (function (deployedContracts) {
                           contracts.contents = deployedContracts;
-                          changeMarketLaunchIncentiveParametersCall.contents = deployedContracts.staker._changeMarketLaunchIncentiveParametersExternal(2, period, initialMultiplier);
+                          changeMarketLaunchIncentiveParametersCall.contents = deployedContracts.staker.changeMarketLaunchIncentiveParameters(2, period, initialMultiplier);
                           
                         }));
           };

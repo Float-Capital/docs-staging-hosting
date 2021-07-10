@@ -303,12 +303,22 @@ module Exposed = {
     ~user: Ethers.ethAddress,
   ) => JsPromise.t<calculateAccumulatedFloatExposedReturn> = "calculateAccumulatedFloatExposed"
 
+  @send
+  external calculateFloatPerSecondExposed: (
+    t,
+    ~marketIndex: int,
+    ~longPrice: Ethers.BigNumber.t,
+    ~shortPrice: Ethers.BigNumber.t,
+    ~longValue: Ethers.BigNumber.t,
+    ~shortValue: Ethers.BigNumber.t,
+  ) => JsPromise.t<transaction> = "calculateFloatPerSecondExposed"
+
   type calculateFloatPerSecondExposedReturn = {
     longFloatPerSecond: Ethers.BigNumber.t,
     shortFloatPerSecond: Ethers.BigNumber.t,
   }
-  @send
-  external calculateFloatPerSecondExposed: (
+  @send @scope("callStatic")
+  external calculateFloatPerSecondExposedCall: (
     t,
     ~marketIndex: int,
     ~longPrice: Ethers.BigNumber.t,

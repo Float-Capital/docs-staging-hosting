@@ -229,6 +229,15 @@ external getMarketLaunchIncentiveParametersMock: (
 ) => JsPromise.t<getMarketLaunchIncentiveParametersMockReturn> =
   "getMarketLaunchIncentiveParametersMock"
 
+type getRequiredAmountOfBitShiftForSafeExponentiationMockReturn = Ethers.BigNumber.t
+@send
+external getRequiredAmountOfBitShiftForSafeExponentiationMock: (
+  t,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+) => JsPromise.t<getRequiredAmountOfBitShiftForSafeExponentiationMockReturn> =
+  "getRequiredAmountOfBitShiftForSafeExponentiationMock"
+
 type initializeMockReturn
 @send
 external initializeMock: (

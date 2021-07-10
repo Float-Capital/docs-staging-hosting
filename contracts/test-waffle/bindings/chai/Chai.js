@@ -64,6 +64,8 @@ var expectToBeHex = ((hexStr, hexLength) => expect(hexStr).to.be.properHex(hexLe
 
 var expectHexEqual = ((hex1, hex2) => expect(hex1).to.be.hexEqual(hex2));
 
+var expectTrue = ((value) => expect(value).to.be.true);
+
 exports.bnEqual = bnEqual;
 exports.recordEqualFlatLabeled = recordEqualFlatLabeled;
 exports.recordEqualFlat = recordEqualFlat;
@@ -82,4 +84,5 @@ exports.expectToBeAddress = expectToBeAddress;
 exports.expectToBePrivateKey = expectToBePrivateKey;
 exports.expectToBeHex = expectToBeHex;
 exports.expectHexEqual = expectHexEqual;
+exports.expectTrue = expectTrue;
 /*  Not a pure module */

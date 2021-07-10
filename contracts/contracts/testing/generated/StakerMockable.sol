@@ -500,6 +500,24 @@ contract StakerMockable is IStaker, Initializable {
         }
     }
 
+            function getRequiredAmountOfBitShiftForSafeExponentiation(
+        uint256 number,
+        uint256 exponent
+    ) internal view returns (uint256 amountOfBitShiftRequired) {
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("getRequiredAmountOfBitShiftForSafeExponentiation"))){
+      
+      return mocker.getRequiredAmountOfBitShiftForSafeExponentiationMock(number,exponent);
+    }
+  
+        uint256 targetMaxNumberSizeBinaryDigits = 257 / exponent;
+
+                uint256 targetMaxNumber = 2**targetMaxNumberSizeBinaryDigits;
+
+        while (number >> amountOfBitShiftRequired > targetMaxNumber) {
+            ++amountOfBitShiftRequired;
+        }
+    }
+
     
 
     function calculateFloatPerSecond(
@@ -518,9 +536,7 @@ contract StakerMockable is IStaker, Initializable {
       return mocker.calculateFloatPerSecondMock(marketIndex,longPrice,shortPrice,longValue,shortValue);
     }
   
-                if (longValue == 0 && shortValue == 0) {
-            return (0, 0);
-        }
+                assert(longValue != 0 && shortValue != 0);
 
                         uint256 k = getKValue(marketIndex);
 
@@ -532,6 +548,13 @@ contract StakerMockable is IStaker, Initializable {
          = (balanceIncentiveCurveEquilibriumOffset[marketIndex] *
             int256(totalLocked)) / 1e18;
 
+
+            uint256 requiredBitShifting
+         = getRequiredAmountOfBitShiftForSafeExponentiation(
+            totalLocked,
+            balanceIncentiveCurveExponent[marketIndex]
+        );
+
                                 if (
             int256(shortValue) - equilibriumOffsetMarketScaled <
             int256(longValue)
@@ -540,30 +563,40 @@ contract StakerMockable is IStaker, Initializable {
                                                 return (0, 1e18 * k * shortPrice);
             }
 
-                        uint256 longRewardUnscaled = ((((uint256(
+            uint256 numerator = (uint256(
                 int256(shortValue) - equilibriumOffsetMarketScaled
-            ) * 2)**balanceIncentiveCurveExponent[marketIndex]) /
-                (totalLocked)**balanceIncentiveCurveExponent[marketIndex]) / 2);
+            ) >> (requiredBitShifting - 1)) **
+                balanceIncentiveCurveExponent[marketIndex];
+
+            uint256 denominator = ((totalLocked >> requiredBitShifting) **
+                balanceIncentiveCurveExponent[marketIndex]) / 1e18;
+
+            uint256 longRewardUnscaled = (numerator / denominator) / 2;
             uint256 shortRewardUnscaled = 1e18 - longRewardUnscaled;
 
             return (
-                longRewardUnscaled * k * longPrice,
-                shortRewardUnscaled * k * shortPrice
+                (longRewardUnscaled * k * longPrice) / 1e18,
+                (shortRewardUnscaled * k * shortPrice) / 1e18
             );
         } else {
             if (-equilibriumOffsetMarketScaled >= int256(longValue)) {
                                                 return (1e18 * k * longPrice, 0);
             }
 
-                        uint256 shortRewardUnscaled = ((((uint256(
+            uint256 numerator = (uint256(
                 int256(longValue) + equilibriumOffsetMarketScaled
-            ) * 2)**balanceIncentiveCurveExponent[marketIndex]) /
-                (totalLocked)**balanceIncentiveCurveExponent[marketIndex]) / 2);
+            ) >> (requiredBitShifting - 1)) **
+                balanceIncentiveCurveExponent[marketIndex];
+
+            uint256 denominator = ((totalLocked >> requiredBitShifting) **
+                balanceIncentiveCurveExponent[marketIndex]) / 1e18;
+
+            uint256 shortRewardUnscaled = (numerator / denominator) / 2;
             uint256 longRewardUnscaled = 1e18 - shortRewardUnscaled;
 
             return (
-                longRewardUnscaled * k * longPrice,
-                shortRewardUnscaled * k * shortPrice
+                (longRewardUnscaled * k * longPrice) / 1e18,
+                (shortRewardUnscaled * k * shortPrice) / 1e18
             );
         }
     }
@@ -843,9 +876,10 @@ contract StakerMockable is IStaker, Initializable {
             uint256 floatToMint = floatToMintLong + floatToMintShort;
 
             if (floatToMint > 0) {
-                                userIndexOfLastClaimedReward[marketIndexes[i]][
+                                                                                userIndexOfLastClaimedReward[marketIndexes[i]][
                     msg.sender
                 ] = latestRewardIndex[marketIndexes[i]];
+
                 floatTotal += floatToMint;
 
                 emit FloatMinted(

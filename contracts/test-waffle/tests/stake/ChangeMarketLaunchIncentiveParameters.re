@@ -63,7 +63,7 @@ let test =
       let {staker} = deployedContracts;
       contracts := deployedContracts;
       changeMarketLaunchIncentiveParametersCall :=
-        staker->Staker.Exposed._changeMarketLaunchIncentiveParametersExternal(
+        staker->Staker.Exposed.changeMarketLaunchIncentiveParameters(
           ~marketIndex,
           ~period,
           ~initialMultiplier,

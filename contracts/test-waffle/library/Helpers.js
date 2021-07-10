@@ -107,7 +107,7 @@ function randomJsInteger(param) {
 }
 
 function randomTokenAmount(param) {
-  return ethers.BigNumber.from(Js_math.random_int(1, Js_int.max)).mul(ethers.BigNumber.from("10000000000000"));
+  return ethers.BigNumber.from(Js_math.random_int(1, Js_int.max)).mul(ethers.BigNumber.from("10000000000000000"));
 }
 
 function randomMintLongShort(param) {

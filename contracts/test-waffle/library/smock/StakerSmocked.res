@@ -1072,6 +1072,37 @@ module InternalMock = {
     ->Option.getExn
   }
 
+  let mockGetRequiredAmountOfBitShiftForSafeExponentiationToReturn: Ethers.BigNumber.t => unit = _param0 => {
+    checkForExceptions(~functionName="getRequiredAmountOfBitShiftForSafeExponentiation")
+    let _ = internalRef.contents->Option.map(_r => {
+      let _ = %raw(
+        "_r.smocked.getRequiredAmountOfBitShiftForSafeExponentiationMock.will.return.with([_param0])"
+      )
+    })
+  }
+
+  type getRequiredAmountOfBitShiftForSafeExponentiationCall = {
+    number: Ethers.BigNumber.t,
+    exponent: Ethers.BigNumber.t,
+  }
+
+  let getRequiredAmountOfBitShiftForSafeExponentiationCalls: unit => array<
+    getRequiredAmountOfBitShiftForSafeExponentiationCall,
+  > = () => {
+    checkForExceptions(~functionName="getRequiredAmountOfBitShiftForSafeExponentiation")
+    internalRef.contents
+    ->Option.map(_r => {
+      let array = %raw("_r.smocked.getRequiredAmountOfBitShiftForSafeExponentiationMock.calls")
+      array->Array.map(((number, exponent)) => {
+        {
+          number: number,
+          exponent: exponent,
+        }
+      })
+    })
+    ->Option.getExn
+  }
+
   let mockCalculateFloatPerSecondToReturn: (Ethers.BigNumber.t, Ethers.BigNumber.t) => unit = (
     _param0,
     _param1,

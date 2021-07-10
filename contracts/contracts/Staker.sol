@@ -403,6 +403,22 @@ contract Staker is IStaker, Initializable {
         }
     }
 
+    // TODO: turn this into a library.
+    //       make this a simple lookup table with appropriate aproximation
+    function getRequiredAmountOfBitShiftForSafeExponentiation(
+        uint256 number,
+        uint256 exponent
+    ) internal pure returns (uint256 amountOfBitShiftRequired) {
+        uint256 targetMaxNumberSizeBinaryDigits = 257 / exponent;
+
+        // Note this can be optimised, this gets a quick easy to compute safe upper bound, not the actuall upper bound.
+        uint256 targetMaxNumber = 2**targetMaxNumberSizeBinaryDigits;
+
+        while (number >> amountOfBitShiftRequired > targetMaxNumber) {
+            ++amountOfBitShiftRequired;
+        }
+    }
+
     /*
      * Computes the current 'r' value, i.e. the number of float tokens a user
      * earns per second for every longshort token they've staked. The returned
@@ -421,10 +437,8 @@ contract Staker is IStaker, Initializable {
         view
         returns (uint256 longFloatPerSecond, uint256 shortFloatPerSecond)
     {
-        // Edge-case: no float is issued in an empty market.
-        if (longValue == 0 && shortValue == 0) {
-            return (0, 0);
-        }
+        // Markets cannot be or become empty (since they are seeded with non-withdrawable capital)
+        assert(longValue != 0 && shortValue != 0);
 
         // A float issuance multiplier that starts high and decreases linearly
         // over time to a value of 1. This incentivises users to stake early.
@@ -439,6 +453,13 @@ contract Staker is IStaker, Initializable {
          = (balanceIncentiveCurveEquilibriumOffset[marketIndex] *
             int256(totalLocked)) / 1e18;
 
+
+            uint256 requiredBitShifting
+         = getRequiredAmountOfBitShiftForSafeExponentiation(
+            totalLocked,
+            balanceIncentiveCurveExponent[marketIndex]
+        );
+
         // Float is scaled by the percentage of the total market value held in
         // the opposite position. This incentivises users to stake on the
         // weaker position.
@@ -452,16 +473,20 @@ contract Staker is IStaker, Initializable {
                 return (0, 1e18 * k * shortPrice);
             }
 
-            // Short should get more of the reward
-            uint256 longRewardUnscaled = ((((uint256(
+            uint256 numerator = (uint256(
                 int256(shortValue) - equilibriumOffsetMarketScaled
-            ) * 2)**balanceIncentiveCurveExponent[marketIndex]) /
-                (totalLocked)**balanceIncentiveCurveExponent[marketIndex]) / 2);
+            ) >> (requiredBitShifting - 1)) **
+                balanceIncentiveCurveExponent[marketIndex];
+
+            uint256 denominator = ((totalLocked >> requiredBitShifting) **
+                balanceIncentiveCurveExponent[marketIndex]) / 1e18;
+
+            uint256 longRewardUnscaled = (numerator / denominator) / 2;
             uint256 shortRewardUnscaled = 1e18 - longRewardUnscaled;
 
             return (
-                longRewardUnscaled * k * longPrice,
-                shortRewardUnscaled * k * shortPrice
+                (longRewardUnscaled * k * longPrice) / 1e18,
+                (shortRewardUnscaled * k * shortPrice) / 1e18
             );
         } else {
             if (-equilibriumOffsetMarketScaled >= int256(longValue)) {
@@ -470,16 +495,20 @@ contract Staker is IStaker, Initializable {
                 return (1e18 * k * longPrice, 0);
             }
 
-            // Long should get more of the reward
-            uint256 shortRewardUnscaled = ((((uint256(
+            uint256 numerator = (uint256(
                 int256(longValue) + equilibriumOffsetMarketScaled
-            ) * 2)**balanceIncentiveCurveExponent[marketIndex]) /
-                (totalLocked)**balanceIncentiveCurveExponent[marketIndex]) / 2);
+            ) >> (requiredBitShifting - 1)) **
+                balanceIncentiveCurveExponent[marketIndex];
+
+            uint256 denominator = ((totalLocked >> requiredBitShifting) **
+                balanceIncentiveCurveExponent[marketIndex]) / 1e18;
+
+            uint256 shortRewardUnscaled = (numerator / denominator) / 2;
             uint256 longRewardUnscaled = 1e18 - shortRewardUnscaled;
 
             return (
-                longRewardUnscaled * k * longPrice,
-                shortRewardUnscaled * k * shortPrice
+                (longRewardUnscaled * k * longPrice) / 1e18,
+                (shortRewardUnscaled * k * shortPrice) / 1e18
             );
         }
     }
@@ -742,9 +771,13 @@ contract Staker is IStaker, Initializable {
 
             if (floatToMint > 0) {
                 // Set the user has claimed up until now.
+                // TODO: think very carefully if it is ok for this to be in this if statement. Safer would be to always set this value?
+                //       99.9% sure it is ok though, since `_stake` sets this value when someone joins.
+                //       Maybe just change for the sake of caution?
                 userIndexOfLastClaimedReward[marketIndexes[i]][
                     msg.sender
                 ] = latestRewardIndex[marketIndexes[i]];
+
                 floatTotal += floatToMint;
 
                 emit FloatMinted(

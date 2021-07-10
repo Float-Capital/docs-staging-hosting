@@ -185,7 +185,6 @@ contract StakerInternalsExposed is StakerMockable {
         uint256 shortValue
     )
         external
-        view
         returns (uint256 longFloatPerSecond, uint256 shortFloatPerSecond)
     {
         return

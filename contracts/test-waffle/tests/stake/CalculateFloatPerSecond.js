@@ -2,67 +2,106 @@
 'use strict';
 
 var Chai = require("../../bindings/chai/Chai.js");
-var Curry = require("rescript/lib/js/curry.js");
 var LetOps = require("../../library/LetOps.js");
+var Globals = require("../../library/Globals.js");
 var Helpers = require("../../library/Helpers.js");
 var CONSTANTS = require("../../CONSTANTS.js");
-var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var StakerHelpers = require("./StakerHelpers.js");
 var StakerSmocked = require("../../library/smock/StakerSmocked.js");
 
+function getRequiredAmountOfBitShiftForSafeExponentiation(number, exponent) {
+  var amountOfBitShiftRequired = Globals.bnFromInt(0);
+  var targetMaxNumberSizeBinaryDigits = Globals.div(Globals.bnFromInt(256), exponent);
+  var targetMaxNumber = Globals.pow(Globals.twoBn, targetMaxNumberSizeBinaryDigits);
+  while(Globals.bnGt(Globals.div(number, Globals.pow(Globals.twoBn, amountOfBitShiftRequired)), targetMaxNumber)) {
+    amountOfBitShiftRequired = Globals.add(amountOfBitShiftRequired, Globals.oneBn);
+  };
+  return amountOfBitShiftRequired;
+}
+
 function test(contracts, accounts) {
-  var marketIndex = Helpers.randomJsInteger(undefined);
+  var match = Helpers.Tuple.make5(Helpers.randomTokenAmount);
+  var value2 = match[4];
+  var value1 = match[3];
+  var shortPrice = match[2];
+  var longPrice = match[1];
+  var kVal = match[0];
   describe("calculateFloatPerSecond", (function () {
-          var mockReturnFormula = function (k, oppositeSideValue, sidePrice, totalLocked) {
-            return k.mul(oppositeSideValue).mul(sidePrice).div(totalLocked);
+          var calculateFloatPerSecondPerPaymentTokenLocked = function (underBalancedSideValue, overBalancedSideValue, exponent, equilibriumOffsetMarket, totalLocked, requiredBitShifting) {
+            var overflowProtectionDivision = Globals.pow(Globals.twoBn, requiredBitShifting);
+            Globals.pow(Globals.mul(Globals.div(Globals.sub(underBalancedSideValue, equilibriumOffsetMarket), overflowProtectionDivision), Globals.twoBn), exponent);
+            var numerator = Globals.pow(Globals.div(Globals.sub(underBalancedSideValue, equilibriumOffsetMarket), Globals.div(overflowProtectionDivision, Globals.twoBn)), exponent);
+            var denominator = Globals.div(Globals.pow(Globals.div(totalLocked, overflowProtectionDivision), exponent), Globals.tenToThe18);
+            var overBalancedSideRate = Globals.div(Globals.div(numerator, denominator), Globals.twoBn);
+            var underBalancedSideRate = Globals.sub(Globals.tenToThe18, overBalancedSideRate);
+            Chai.expectTrue(Globals.bnGte(underBalancedSideRate, overBalancedSideRate));
+            return [
+                    overBalancedSideRate,
+                    underBalancedSideRate
+                  ];
           };
-          var testHelper = function (kVal, longPrice, shortPrice, longValue, shortValue, expectedLongFPS, expectedShortFPS) {
-            return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest("calculateFloatPerSecond", contracts, accounts), (function (param) {
-                          StakerSmocked.InternalMock.mockGetKValueToReturn(kVal);
-                          return LetOps.Await.let_(contracts.contents.staker.calculateFloatPerSecondExposed(marketIndex, longPrice, shortPrice, longValue, shortValue), (function (result) {
-                                        var longFloatPerSecond = Belt_Array.getExn(result, 0);
-                                        var shortFloatPerSecond = Belt_Array.getExn(result, 1);
-                                        Chai.bnEqual(undefined, longFloatPerSecond, expectedLongFPS);
-                                        return Chai.bnEqual(undefined, shortFloatPerSecond, expectedShortFPS);
-                                      }));
+          var balanceIncentiveCurveExponent = {
+            contents: undefined
+          };
+          beforeEach(function () {
+                return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest("calculateFloatPerSecond", contracts, accounts), (function (param) {
+                              return LetOps.Await.let_(contracts.contents.staker.balanceIncentiveCurveExponent(1), (function (balanceIncentiveCurveExponentFetched) {
+                                            balanceIncentiveCurveExponent.contents = balanceIncentiveCurveExponentFetched;
+                                            getRequiredAmountOfBitShiftForSafeExponentiation(Globals.add(value1, value2), balanceIncentiveCurveExponentFetched);
+                                            return StakerSmocked.InternalMock.mockGetKValueToReturn(kVal);
+                                          }));
+                            }));
+              });
+          var testHelper = function (longPrice, shortPrice, longValue, shortValue) {
+            var totalLocked = Globals.add(longValue, shortValue);
+            var requiredBitShifting = getRequiredAmountOfBitShiftForSafeExponentiation(totalLocked, balanceIncentiveCurveExponent.contents);
+            StakerSmocked.InternalMock.mockGetRequiredAmountOfBitShiftForSafeExponentiationToReturn(requiredBitShifting);
+            return LetOps.Await.let_(contracts.contents.staker.callStatic.calculateFloatPerSecondExposed(1, longPrice, shortPrice, longValue, shortValue), (function (result) {
+                          var longFloatPerSecond = result.longFloatPerSecond;
+                          if (Globals.bnGte(longValue, shortValue)) {
+                            var match = calculateFloatPerSecondPerPaymentTokenLocked(shortValue, longValue, balanceIncentiveCurveExponent.contents, CONSTANTS.zeroBn, totalLocked, requiredBitShifting);
+                            var longRateScaled = Globals.div(Globals.mul(Globals.mul(match[0], kVal), longPrice), Globals.tenToThe18);
+                            var shortRateScaled = Globals.div(Globals.mul(Globals.mul(match[1], kVal), shortPrice), Globals.tenToThe18);
+                            Chai.bnEqual(undefined, longFloatPerSecond, longRateScaled);
+                            return Chai.bnEqual(undefined, shortRateScaled, shortRateScaled);
+                          }
+                          var match$1 = calculateFloatPerSecondPerPaymentTokenLocked(longValue, shortValue, balanceIncentiveCurveExponent.contents, CONSTANTS.zeroBn, totalLocked, requiredBitShifting);
+                          var longRateScaled$1 = Globals.div(Globals.mul(Globals.mul(match$1[1], kVal), longPrice), Globals.tenToThe18);
+                          var shortRateScaled$1 = Globals.div(Globals.mul(Globals.mul(match$1[0], kVal), shortPrice), Globals.tenToThe18);
+                          Chai.bnEqual(undefined, longFloatPerSecond, longRateScaled$1);
+                          return Chai.bnEqual(undefined, shortRateScaled$1, shortRateScaled$1);
                         }));
           };
-          it("returns (kVal * sidePrice * oppositeSideValue) / totalLocked for each market side and calls getKValue correctly", (function () {
-                  var match = Helpers.Tuple.make5(Helpers.randomInteger);
-                  var shortValue = match[4];
-                  var longValue = match[3];
-                  var shortPrice = match[2];
-                  var longPrice = match[1];
-                  var kVal = match[0];
-                  var totalLocked = longValue.add(shortValue);
-                  var expectedLongFPS = mockReturnFormula(kVal, shortValue, longPrice, totalLocked);
-                  var expectedShortFPS = mockReturnFormula(kVal, longValue, shortPrice, totalLocked);
-                  return LetOps.Await.let_(testHelper(kVal, longPrice, shortPrice, longValue, shortValue, expectedLongFPS, expectedShortFPS), (function (param) {
-                                
-                              }));
+          describe("returns correct longFloatPerSecond and shortFloatPerSecond for each market side and calls getKValue correctly", (function () {
+                  it("longValue > shortValue", (function () {
+                          return LetOps.Await.let_(testHelper(longPrice, shortPrice, Globals.add(value1, value2), value2), (function (param) {
+                                        
+                                      }));
+                        }));
+                  it("longValue < shortValue", (function () {
+                          return LetOps.Await.let_(testHelper(longPrice, shortPrice, value1, Globals.add(value1, value2)), (function (param) {
+                                        
+                                      }));
+                        }));
+                  
                 }));
           it("calls getKValue correctly", (function () {
-                  var call = StakerSmocked.InternalMock.getKValueCalls(undefined)[0];
-                  return Chai.recordEqualFlat(call, {
-                              marketIndex: marketIndex
-                            });
+                  StakerSmocked.InternalMock.mockGetRequiredAmountOfBitShiftForSafeExponentiationToReturn(Globals.bnFromInt(55));
+                  return LetOps.Await.let_(contracts.contents.staker.callStatic.calculateFloatPerSecondExposed(1, longPrice, shortPrice, value1, value2), (function (result) {
+                                var call = StakerSmocked.InternalMock.getKValueCalls(undefined)[0];
+                                return Chai.recordEqualFlat(call, {
+                                            marketIndex: 1
+                                          });
+                              }));
                 }));
-          it("returns 0 for empty markets", (function () {
-                  var partial_arg = Helpers.randomInteger(undefined);
-                  var func = function (param, param$1, param$2, param$3, param$4, param$5) {
-                    return testHelper(partial_arg, param, param$1, param$2, param$3, param$4, param$5);
-                  };
-                  return function (param) {
-                    var func$1 = Curry._1(func, param);
-                    return function (param) {
-                      return Curry._5(func$1, param, CONSTANTS.zeroBn, CONSTANTS.zeroBn, CONSTANTS.zeroBn, CONSTANTS.zeroBn);
-                    };
-                  };
+          it("reverts for empty markets", (function () {
+                  return Chai.expectRevertNoReason(contracts.contents.staker.calculateFloatPerSecondExposed(1, CONSTANTS.zeroBn, CONSTANTS.zeroBn, CONSTANTS.zeroBn, CONSTANTS.zeroBn));
                 }));
           
         }));
   
 }
 
+exports.getRequiredAmountOfBitShiftForSafeExponentiation = getRequiredAmountOfBitShiftForSafeExponentiation;
 exports.test = test;
 /* Chai Not a pure module */

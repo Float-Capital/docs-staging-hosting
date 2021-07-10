@@ -4,6 +4,7 @@
 var Curry = require("rescript/lib/js/curry.js");
 var Config = require("./Config.js");
 var LetOps = require("./LetOps.js");
+var CONSTANTS = require("../CONSTANTS.js");
 
 function before_once$p(fn) {
   var ranRef = {
@@ -28,6 +29,10 @@ function add(prim0, prim1) {
 
 function sub(prim0, prim1) {
   return prim0.sub(prim1);
+}
+
+function pow(prim0, prim1) {
+  return prim0.pow(prim1);
 }
 
 function bnFromString(prim) {
@@ -109,9 +114,16 @@ var describeBoth = Config.isCI ? (
       
     });
 
+var twoBn = CONSTANTS.twoBn;
+
+var oneBn = CONSTANTS.oneBn;
+
+var tenToThe18 = CONSTANTS.tenToThe18;
+
 exports.before_once$p = before_once$p;
 exports.add = add;
 exports.sub = sub;
+exports.pow = pow;
 exports.bnFromString = bnFromString;
 exports.bnFromInt = bnFromInt;
 exports.mul = mul;
@@ -121,6 +133,9 @@ exports.bnToInt = bnToInt;
 exports.bnGt = bnGt;
 exports.bnGte = bnGte;
 exports.bnLt = bnLt;
+exports.twoBn = twoBn;
+exports.oneBn = oneBn;
+exports.tenToThe18 = tenToThe18;
 exports.describeIntegration = describeIntegration;
 exports.describeUnit = describeUnit;
 exports.describeBoth = describeBoth;
