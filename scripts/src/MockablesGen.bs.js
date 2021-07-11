@@ -10,6 +10,7 @@ var Caml_option = require("rescript/lib/js/caml_option.js");
 var SmockableGen = require("./library/SmockableGen.bs.js");
 var Caml_exceptions = require("rescript/lib/js/caml_exceptions.js");
 var Belt_HashMapString = require("rescript/lib/js/belt_HashMapString.js");
+var MockablesGenTemplates = require("./templates/MockablesGenTemplates.bs.js");
 
 var filesToMockInternally = [
   "LongShort.sol",
@@ -61,7 +62,6 @@ function convertASTTypeToSolType(typeDescriptionStr) {
       if (typeDescriptionStr.startsWith("struct ")) {
         return typeDescriptionStr.replace(/struct\s+/g, "") + " memory ";
       }
-      console.log(typeDescriptionStr);
       throw {
             RE_EXN_ID: ScriptDoesNotSupportReturnValues,
             _1: defaultError,
@@ -112,10 +112,8 @@ var lineCommentsRe = /\/\/[^\n]*\n/g;
 
 var blockCommentsRe = /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g;
 
-var getArtifact = ((fileNameWithoutExtension) => require("../../contracts/codegen/truffle/" + fileNameWithoutExtension + ".json"));
-
-function getAbi(fileNameWithoutExtension) {
-  return getArtifact(fileNameWithoutExtension).abi;
+function getContractArtifact(fileNameWithoutExtension) {
+  return require("../../contracts/codegen/truffle/" + fileNameWithoutExtension + ".json");
 }
 
 var BadMatchingBlock = /* @__PURE__ */Caml_exceptions.create("MockablesGen.BadMatchingBlock");
@@ -210,7 +208,7 @@ function parseAbi(abi) {
 var bindingsDict = Belt_HashMapString.make(10);
 
 Belt_Array.forEach(abisToMockExternally, (function (contractName) {
-        var abi = getArtifact(contractName).abi;
+        var abi = getContractArtifact(contractName).abi;
         var functions = parseAbi(abi);
         return Belt_HashMapString.set(bindingsDict, contractName, SmockableGen.externalModule(functions, contractName));
       }));
@@ -254,7 +252,7 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
                             }));
               }));
         sol.contents = sol.contents.replace(blockCommentsRe, "\n");
-        var artifact = getArtifact(fileNameWithoutExtension);
+        var artifact = getContractArtifact(fileNameWithoutExtension);
         var contractDefinition = Belt_Array.getExn(Belt_Array.keep(artifact.ast.nodes, (function (x) {
                     return x.nodeType === "ContractDefinition";
                   })), 0);
@@ -279,17 +277,18 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
                 var mockerArguments = Globals.commafiy(Belt_Array.map(x.parameters, (function (x) {
                             return convertASTTypeToSolType(replaceFileNameTypeDefsWithMockableTypeDefs(x.type_));
                           })));
-                sol.contents = solPrefix + ("\n    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + x.name + "\"))){\n      " + reduceStrArr(Belt_Array.map(storageParameters, (function (x) {
-                              return "\n          " + convertASTTypeToSolType(removeFileNameFromTypeDefs(x.type_)) + " " + x.name + "_temp1 = " + x.name + ";\n        ";
-                            }))) + "\n      return mocker." + x.name + "Mock(" + mockerParameterCalls + ");\n    }\n  ") + solSuffix;
+                var storageParametersFormatted = reduceStrArr(Belt_Array.map(storageParameters, (function (x) {
+                            return "\n          " + convertASTTypeToSolType(removeFileNameFromTypeDefs(x.type_)) + " " + x.name + "_temp1 = " + x.name + ";\n        ";
+                          })));
+                sol.contents = solPrefix + MockablesGenTemplates.mockableFunctionBody(x.name, storageParametersFormatted, mockerParameterCalls) + solSuffix;
                 var arr = x.returnValues;
-                mockLogger.contents = mockLogger.contents + (" \n    function " + x.name + "Mock(" + mockerArguments + ") public pure " + (
-                    arr.length !== 0 ? "returns (" + Globals.commafiy(Belt_Array.map(arr, (function (x) {
-                                  return convertASTTypeToSolType(x.type_) + " " + x.name;
-                                }))) + ")" : ""
-                  ) + "{\n      return (" + Globals.commafiy(Belt_Array.map(x.returnValues, (function (y) {
-                              return "abi.decode(\"\",(" + convertASTTypeToSolType(y.type_) + "))";
-                            }))) + ");\n    }\n    ");
+                var mockerReturnValues = arr.length !== 0 ? "returns (" + Globals.commafiy(Belt_Array.map(arr, (function (x) {
+                              return convertASTTypeToSolType(x.type_) + " " + x.name;
+                            }))) + ")" : "";
+                var mockerReturn = Globals.commafiy(Belt_Array.map(x.returnValues, (function (y) {
+                            return "abi.decode(\"\",(" + convertASTTypeToSolType(y.type_) + "))";
+                          })));
+                mockLogger.contents = mockLogger.contents + MockablesGenTemplates.externalMockerFunctionBody(x.name, mockerArguments, mockerReturnValues, mockerReturn);
                 
               }));
         Belt_Array.forEach(modifiers(contractDefinition.nodes), (function (x) {
@@ -312,10 +311,11 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
                               return x.name;
                             }
                           })));
-                sol.contents = solPrefix + ("\n    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + x.name + "\"))){\n        " + reduceStrArr(Belt_Array.map(storageParameters, (function (x) {
-                              return "\n          " + convertASTTypeToSolType(removeFileNameFromTypeDefs(x.type_)) + " " + x.name + "_temp1 = " + x.name + ";\n        ";
-                            }))) + "\n      mocker." + x.name + "Mock(" + mockerParameterCalls + ");\n      _;\n    } else {\n      " + functionBody + "\n    }\n  ") + solSuffix;
-                mockLogger.contents = mockLogger.contents + (" \n    function " + x.name + "Mock(" + mockerArguments + ") public pure {\n      return; \n    }\n    ");
+                var storageParameters$1 = reduceStrArr(Belt_Array.map(storageParameters, (function (x) {
+                            return "\n            " + convertASTTypeToSolType(removeFileNameFromTypeDefs(x.type_)) + " " + x.name + "_temp1 = " + x.name + ";\n          ";
+                          })));
+                sol.contents = solPrefix + MockablesGenTemplates.mockableModifierBody(x.name, storageParameters$1, mockerParameterCalls, functionBody) + solSuffix;
+                mockLogger.contents = mockLogger.contents + MockablesGenTemplates.externalMockerModifierBody(x.name, mockerArguments);
                 
               }));
         var importsInFile = sol.contents.match(importRe);
@@ -338,19 +338,19 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
                               
                             }));
               }));
-        mockLogger.contents = "// SPDX-License-Identifier: BUSL-1.1 \n pragma solidity 0.8.3;\n" + ("import \"./" + fileNameWithoutExtension + "Mockable.sol\";\n") + Belt_Option.mapWithDefault(importsInFileReplaced, "", (function (i) {
+        var parentImports = Belt_Option.mapWithDefault(importsInFileReplaced, "", (function (i) {
                 return reduceStrArr(Belt_Array.map(i, (function (z) {
                                   return z + "\n";
                                 })));
-              })) + ("contract " + fileNameWithoutExtension + "ForInternalMocking {") + mockLogger.contents + "}";
+              }));
+        mockLogger.contents = MockablesGenTemplates.internalMockingFileTemplate(fileNameWithoutExtension, parentImports, mockLogger.contents);
         var indexOfContractDef = sol.contents.indexOf("contract ");
         var indexOfContractBlock = sol.contents.indexOf("{", indexOfContractDef);
         var indexOfContractName = sol.contents.indexOf(fileNameWithoutExtension, indexOfContractDef);
         var prefix = sol.contents.substring(0, indexOfContractDef);
-        var intermediate1 = sol.contents.substring(indexOfContractDef, indexOfContractName);
-        var intermediate2 = sol.contents.substring(indexOfContractName + fileNameWithoutExtension.length | 0, indexOfContractBlock + 1 | 0);
+        var modifiersAndOpener = sol.contents.substring(indexOfContractName + fileNameWithoutExtension.length | 0, indexOfContractBlock + 1 | 0);
         var suffix = sol.contents.substring(indexOfContractBlock + 1 | 0);
-        sol.contents = prefix + "\n" + ("import \"./" + fileNameWithoutExtension + "ForInternalMocking.sol\";") + "\n" + intermediate1 + fileNameWithoutExtension + "Mockable" + intermediate2 + ("\n  " + fileNameWithoutExtension + "ForInternalMocking mocker;\n  bool shouldUseMock;\n  string functionToNotMock;\n\n  function setMocker(" + fileNameWithoutExtension + "ForInternalMocking _mocker) external {\n    mocker = _mocker;\n    shouldUseMock = true;\n  }\n\n  function setFunctionToNotMock(string calldata _functionToNotMock) external {\n    functionToNotMock = _functionToNotMock;\n  }\n\n") + suffix;
+        sol.contents = MockablesGenTemplates.mockingFileTemplate(prefix, fileNameWithoutExtension, modifiersAndOpener, suffix);
         Fs.writeFileSync("../contracts/contracts/testing/generated/" + fileNameWithoutExtension + "Mockable.sol", sol.contents, "utf8");
         Fs.writeFileSync("../contracts/contracts/testing/generated/" + fileNameWithoutExtension + "ForInternalMocking.sol", mockLogger.contents, "utf8");
         var existingModuleDef = Belt_Array.some(abisToMockExternally, (function (x) {
@@ -383,8 +383,7 @@ exports.functions = functions;
 exports.modifiers = modifiers;
 exports.lineCommentsRe = lineCommentsRe;
 exports.blockCommentsRe = blockCommentsRe;
-exports.getArtifact = getArtifact;
-exports.getAbi = getAbi;
+exports.getContractArtifact = getContractArtifact;
 exports.BadMatchingBlock = BadMatchingBlock;
 exports.matchingBlockEndIndex = matchingBlockEndIndex;
 exports.importRe = importRe;
