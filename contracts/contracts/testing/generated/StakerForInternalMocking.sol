@@ -71,7 +71,7 @@ contract StakerForInternalMocking {
       return (abi.decode("",(uint256)));
     }
      
-    function calculateFloatPerSecondMock(uint32,uint256,uint256,uint256,uint256) public pure returns (uint256 longFloatPerSecond,uint256 shortFloatPerSecond){
+    function _calculateFloatPerSecondMock(uint32,uint256,uint256,uint256,uint256) public pure returns (uint256 longFloatPerSecond,uint256 shortFloatPerSecond){
       return (abi.decode("",(uint256)),abi.decode("",(uint256)));
     }
      

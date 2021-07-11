@@ -426,7 +426,7 @@ contract Staker is IStaker, Initializable {
      * The return values are float per second per synthetic token (hence the
      * requirement to multiply by price)
      */
-    function calculateFloatPerSecond(
+    function _calculateFloatPerSecond(
         uint32 marketIndex,
         uint256 longPrice,
         uint256 shortPrice,
@@ -547,7 +547,7 @@ contract Staker is IStaker, Initializable {
         (
             uint256 longFloatPerSecond,
             uint256 shortFloatPerSecond
-        ) = calculateFloatPerSecond(
+        ) = _calculateFloatPerSecond(
             marketIndex,
             longPrice,
             shortPrice,

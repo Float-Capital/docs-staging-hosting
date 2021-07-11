@@ -31,7 +31,7 @@ function test(contracts, accounts) {
                 return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest("calculateNewCumulativeRate", contracts, accounts), (function (param) {
                               var match = contracts.contents;
                               var staker = match.staker;
-                              StakerSmocked.InternalMock.mockCalculateFloatPerSecondToReturn(longFloatPerSecond, shortFloatPerSecond);
+                              StakerSmocked.InternalMock.mock_calculateFloatPerSecondToReturn(longFloatPerSecond, shortFloatPerSecond);
                               StakerSmocked.InternalMock.mockCalculateTimeDeltaToReturn(timeDelta);
                               return LetOps.Await.let_(staker.setCalculateNewCumulativeRateParams(marketIndex, latestRewardIndexForMarket, accumFloatLong, accumFloatShort), (function (param) {
                                             promiseRef.contents = staker.calculateNewCumulativeRateExposed(marketIndex, longPrice, shortPrice, longValue, shortValue);
@@ -53,7 +53,7 @@ function test(contracts, accounts) {
                               }));
                 }));
           it("calls calculateFloatPerSecond with correct arguments", (function () {
-                  var call = Belt_Array.getExn(StakerSmocked.InternalMock.calculateFloatPerSecondCalls(undefined), 0);
+                  var call = Belt_Array.getExn(StakerSmocked.InternalMock._calculateFloatPerSecondCalls(undefined), 0);
                   return Chai.recordEqualFlat(call, {
                               marketIndex: marketIndex,
                               longPrice: longPrice,

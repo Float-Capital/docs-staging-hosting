@@ -1103,17 +1103,17 @@ module InternalMock = {
     ->Option.getExn
   }
 
-  let mockCalculateFloatPerSecondToReturn: (Ethers.BigNumber.t, Ethers.BigNumber.t) => unit = (
+  let mock_calculateFloatPerSecondToReturn: (Ethers.BigNumber.t, Ethers.BigNumber.t) => unit = (
     _param0,
     _param1,
   ) => {
-    checkForExceptions(~functionName="calculateFloatPerSecond")
+    checkForExceptions(~functionName="_calculateFloatPerSecond")
     let _ = internalRef.contents->Option.map(_r => {
-      let _ = %raw("_r.smocked.calculateFloatPerSecondMock.will.return.with([_param0,_param1])")
+      let _ = %raw("_r.smocked._calculateFloatPerSecondMock.will.return.with([_param0,_param1])")
     })
   }
 
-  type calculateFloatPerSecondCall = {
+  type _calculateFloatPerSecondCall = {
     marketIndex: int,
     longPrice: Ethers.BigNumber.t,
     shortPrice: Ethers.BigNumber.t,
@@ -1121,11 +1121,11 @@ module InternalMock = {
     shortValue: Ethers.BigNumber.t,
   }
 
-  let calculateFloatPerSecondCalls: unit => array<calculateFloatPerSecondCall> = () => {
-    checkForExceptions(~functionName="calculateFloatPerSecond")
+  let _calculateFloatPerSecondCalls: unit => array<_calculateFloatPerSecondCall> = () => {
+    checkForExceptions(~functionName="_calculateFloatPerSecond")
     internalRef.contents
     ->Option.map(_r => {
-      let array = %raw("_r.smocked.calculateFloatPerSecondMock.calls")
+      let array = %raw("_r.smocked._calculateFloatPerSecondMock.calls")
       array->Array.map(((marketIndex, longPrice, shortPrice, longValue, shortValue)) => {
         {
           marketIndex: marketIndex,

@@ -520,7 +520,7 @@ contract StakerMockable is IStaker, Initializable {
 
     
 
-    function calculateFloatPerSecond(
+    function _calculateFloatPerSecond(
         uint32 marketIndex,
         uint256 longPrice,
         uint256 shortPrice,
@@ -531,9 +531,9 @@ contract StakerMockable is IStaker, Initializable {
         view
         returns (uint256 longFloatPerSecond, uint256 shortFloatPerSecond)
     {
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("calculateFloatPerSecond"))){
+    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("_calculateFloatPerSecond"))){
       
-      return mocker.calculateFloatPerSecondMock(marketIndex,longPrice,shortPrice,longValue,shortValue);
+      return mocker._calculateFloatPerSecondMock(marketIndex,longPrice,shortPrice,longValue,shortValue);
     }
   
                 assert(longValue != 0 && shortValue != 0);
@@ -640,7 +640,7 @@ contract StakerMockable is IStaker, Initializable {
                 (
             uint256 longFloatPerSecond,
             uint256 shortFloatPerSecond
-        ) = calculateFloatPerSecond(
+        ) = _calculateFloatPerSecond(
             marketIndex,
             longPrice,
             shortPrice,

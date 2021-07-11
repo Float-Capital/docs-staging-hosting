@@ -44,7 +44,7 @@ function test(contracts, accounts) {
             contents: undefined
           };
           beforeEach(function () {
-                return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest("calculateFloatPerSecond", contracts, accounts), (function (param) {
+                return LetOps.Await.let_(StakerHelpers.deployAndSetupStakerToUnitTest("_calculateFloatPerSecond", contracts, accounts), (function (param) {
                               return LetOps.Await.let_(contracts.contents.staker.balanceIncentiveCurveExponent(1), (function (balanceIncentiveCurveExponentFetched) {
                                             balanceIncentiveCurveExponent.contents = balanceIncentiveCurveExponentFetched;
                                             getRequiredAmountOfBitShiftForSafeExponentiation(Globals.add(value1, value2), balanceIncentiveCurveExponentFetched);
@@ -87,6 +87,7 @@ function test(contracts, accounts) {
                 }));
           it("calls getKValue correctly", (function () {
                   StakerSmocked.InternalMock.mockGetRequiredAmountOfBitShiftForSafeExponentiationToReturn(Globals.bnFromInt(55));
+                  StakerSmocked.InternalMock.mockGetKValueToReturn(kVal);
                   return LetOps.Await.let_(contracts.contents.staker.callStatic.calculateFloatPerSecondExposed(1, longPrice, shortPrice, value1, value2), (function (result) {
                                 var call = StakerSmocked.InternalMock.getKValueCalls(undefined)[0];
                                 return Chai.recordEqualFlat(call, {

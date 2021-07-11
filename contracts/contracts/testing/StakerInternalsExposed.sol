@@ -188,7 +188,7 @@ contract StakerInternalsExposed is StakerMockable {
         returns (uint256 longFloatPerSecond, uint256 shortFloatPerSecond)
     {
         return
-            calculateFloatPerSecond(
+            _calculateFloatPerSecond(
                 marketIndex,
                 longPrice,
                 shortPrice,

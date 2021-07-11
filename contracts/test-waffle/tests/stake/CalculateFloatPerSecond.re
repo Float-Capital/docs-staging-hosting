@@ -74,7 +74,7 @@ let test =
     before_each(() => {
       let%Await _ =
         deployAndSetupStakerToUnitTest(
-          ~functionName="calculateFloatPerSecond",
+          ~functionName="_calculateFloatPerSecond",
           ~contracts,
           ~accounts,
         );
@@ -182,6 +182,7 @@ let test =
       StakerSmocked.InternalMock.mockGetRequiredAmountOfBitShiftForSafeExponentiationToReturn(
         bnFromInt(55) // conservatively high
       );
+      StakerSmocked.InternalMock.mockGetKValueToReturn(kVal);
 
       let%Await result =
         contracts^.staker

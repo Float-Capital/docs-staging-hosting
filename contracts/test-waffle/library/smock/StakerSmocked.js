@@ -871,19 +871,19 @@ function getRequiredAmountOfBitShiftForSafeExponentiationCalls(param) {
                   })));
 }
 
-function mockCalculateFloatPerSecondToReturn(_param0, _param1) {
-  checkForExceptions("calculateFloatPerSecond");
+function mock_calculateFloatPerSecondToReturn(_param0, _param1) {
+  checkForExceptions("_calculateFloatPerSecond");
   Belt_Option.map(internalRef.contents, (function (_r) {
-          ((_r.smocked.calculateFloatPerSecondMock.will.return.with([_param0,_param1])));
+          ((_r.smocked._calculateFloatPerSecondMock.will.return.with([_param0,_param1])));
           
         }));
   
 }
 
-function calculateFloatPerSecondCalls(param) {
-  checkForExceptions("calculateFloatPerSecond");
+function _calculateFloatPerSecondCalls(param) {
+  checkForExceptions("_calculateFloatPerSecond");
   return Belt_Option.getExn(Belt_Option.map(internalRef.contents, (function (_r) {
-                    var array = _r.smocked.calculateFloatPerSecondMock.calls;
+                    var array = _r.smocked._calculateFloatPerSecondMock.calls;
                     return Belt_Array.map(array, (function (param) {
                                   return {
                                           marketIndex: param[0],
@@ -1363,8 +1363,8 @@ var InternalMock = {
   getKValueCalls: getKValueCalls,
   mockGetRequiredAmountOfBitShiftForSafeExponentiationToReturn: mockGetRequiredAmountOfBitShiftForSafeExponentiationToReturn,
   getRequiredAmountOfBitShiftForSafeExponentiationCalls: getRequiredAmountOfBitShiftForSafeExponentiationCalls,
-  mockCalculateFloatPerSecondToReturn: mockCalculateFloatPerSecondToReturn,
-  calculateFloatPerSecondCalls: calculateFloatPerSecondCalls,
+  mock_calculateFloatPerSecondToReturn: mock_calculateFloatPerSecondToReturn,
+  _calculateFloatPerSecondCalls: _calculateFloatPerSecondCalls,
   mockCalculateTimeDeltaToReturn: mockCalculateTimeDeltaToReturn,
   calculateTimeDeltaCalls: calculateTimeDeltaCalls,
   mockCalculateNewCumulativeRateToReturn: mockCalculateNewCumulativeRateToReturn,

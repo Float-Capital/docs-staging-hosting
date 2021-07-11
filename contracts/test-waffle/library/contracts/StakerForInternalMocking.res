@@ -8,6 +8,20 @@ let at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>
 
 let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic
 
+type _calculateFloatPerSecondMockReturn = {
+  longFloatPerSecond: Ethers.BigNumber.t,
+  shortFloatPerSecond: Ethers.BigNumber.t,
+}
+@send
+external _calculateFloatPerSecondMock: (
+  t,
+  int,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+  Ethers.BigNumber.t,
+) => JsPromise.t<_calculateFloatPerSecondMockReturn> = "_calculateFloatPerSecondMock"
+
 type _changBalanceIncentiveEquilibriumOffsetMockReturn
 @send
 external _changBalanceIncentiveEquilibriumOffsetMock: (
@@ -128,20 +142,6 @@ external calculateAccumulatedFloatMock: (
   int,
   Ethers.ethAddress,
 ) => JsPromise.t<calculateAccumulatedFloatMockReturn> = "calculateAccumulatedFloatMock"
-
-type calculateFloatPerSecondMockReturn = {
-  longFloatPerSecond: Ethers.BigNumber.t,
-  shortFloatPerSecond: Ethers.BigNumber.t,
-}
-@send
-external calculateFloatPerSecondMock: (
-  t,
-  int,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-) => JsPromise.t<calculateFloatPerSecondMockReturn> = "calculateFloatPerSecondMock"
 
 type calculateNewCumulativeRateMockReturn = {
   longCumulativeRates: Ethers.BigNumber.t,
