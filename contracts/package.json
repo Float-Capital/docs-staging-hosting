@@ -27,7 +27,8 @@
     "verify-contracts": "truffle run verify FloatToken LongShort@$LONGSHORT_IMPLEMENTATION Staker@$STAKER_IMPLEMENTATION FloatCapital_v0@$TREASURY_IMPLEMENTATIONTreasury_v0@$FLOAT_CAPITAL_IMPLEMENTATION FloatToken TokenFactory --network $NETWORK",
     "update-testnet-contracts": "yarn prepair-upgrade; rm -f .openzeppelin/unknown-{97,1337}.json; truffle migrate --network binanceTest --reset; mv .openzeppelin/unknown-1337.json .openzeppelin/unknown-97.json; yarn save-deployment",
     "generate-contract-interfaces": "yarn compile; node ../scripts/src/AbiInterfaceGen.bs.js; rescript format -all",
-    "generate-test-contracts": "mkdir -p codegen; cp -r contracts codegen; rm -rf codegen/contracts/testing; yarn truffle compile --contracts_directory codegen --contracts_build_directory codegen/truffle; node ../scripts/src/MockablesGen.bs.js; rescript format -all;"
+    "generate-test-contracts": "mkdir -p codegen; mv -f contracts/testing/* codegen;yarn compile --quiet; mv codegen/*Exposed.sol contracts/testing; node ../scripts/src/MockablesGen.bs.js; rescript format -all;",
+    "generate-all": "yarn generate-test-contracts; yarn compile; node ../scripts/src/AbiInterfaceGen.bs.js; rescript format -all;"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.1.7",

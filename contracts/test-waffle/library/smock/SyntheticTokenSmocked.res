@@ -81,6 +81,23 @@ let approveCalls: t => array<approveCall> = _r => {
   })
 }
 
+let mockBalanceOfToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.balanceOf.will.return.with([_param0])")
+}
+
+type balanceOfCall = {account: Ethers.ethAddress}
+
+let balanceOfCalls: t => array<balanceOfCall> = _r => {
+  let array = %raw("_r.smocked.balanceOf.calls")
+  array->Array.map(_m => {
+    let account = _m->Array.getUnsafe(0)
+
+    {
+      account: account,
+    }
+  })
+}
+
 let mockBurnToReturn: t => unit = _r => {
   let _ = %raw("_r.smocked.burn.will.return()")
 }
@@ -298,6 +315,25 @@ let marketIndexCalls: t => array<marketIndexCall> = _r => {
   })
 }
 
+let mockMintToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.mint.will.return()")
+}
+
+type mintCall = {
+  _to: Ethers.ethAddress,
+  amount: Ethers.BigNumber.t,
+}
+
+let mintCalls: t => array<mintCall> = _r => {
+  let array = %raw("_r.smocked.mint.calls")
+  array->Array.map(((_to, amount)) => {
+    {
+      _to: _to,
+      amount: amount,
+    }
+  })
+}
+
 let mockNameToReturn: (t, string) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.name.will.return.with([_param0])")
 }
@@ -375,6 +411,23 @@ let revokeRoleCalls: t => array<revokeRoleCall> = _r => {
   })
 }
 
+let mockStakeToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.stake.will.return()")
+}
+
+type stakeCall = {amount: Ethers.BigNumber.t}
+
+let stakeCalls: t => array<stakeCall> = _r => {
+  let array = %raw("_r.smocked.stake.calls")
+  array->Array.map(_m => {
+    let amount = _m->Array.getUnsafe(0)
+
+    {
+      amount: amount,
+    }
+  })
+}
+
 let mockStakerToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.staker.will.return.with([_param0])")
 }
@@ -418,6 +471,25 @@ let symbolCalls: t => array<symbolCall> = _r => {
   })
 }
 
+let mockSynthRedeemBurnToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.synthRedeemBurn.will.return()")
+}
+
+type synthRedeemBurnCall = {
+  account: Ethers.ethAddress,
+  amount: Ethers.BigNumber.t,
+}
+
+let synthRedeemBurnCalls: t => array<synthRedeemBurnCall> = _r => {
+  let array = %raw("_r.smocked.synthRedeemBurn.calls")
+  array->Array.map(((account, amount)) => {
+    {
+      account: account,
+      amount: amount,
+    }
+  })
+}
+
 let mockTotalSupplyToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.totalSupply.will.return.with([_param0])")
 }
@@ -450,74 +522,6 @@ let transferCalls: t => array<transferCall> = _r => {
   })
 }
 
-let mockUnpauseToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.unpause.will.return()")
-}
-
-type unpauseCall
-
-let unpauseCalls: t => array<unpauseCall> = _r => {
-  let array = %raw("_r.smocked.unpause.calls")
-  array->Array.map(() => {
-    ()->Obj.magic
-  })
-}
-
-let mockSynthRedeemBurnToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.synthRedeemBurn.will.return()")
-}
-
-type synthRedeemBurnCall = {
-  account: Ethers.ethAddress,
-  amount: Ethers.BigNumber.t,
-}
-
-let synthRedeemBurnCalls: t => array<synthRedeemBurnCall> = _r => {
-  let array = %raw("_r.smocked.synthRedeemBurn.calls")
-  array->Array.map(((account, amount)) => {
-    {
-      account: account,
-      amount: amount,
-    }
-  })
-}
-
-let mockStakeToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.stake.will.return()")
-}
-
-type stakeCall = {amount: Ethers.BigNumber.t}
-
-let stakeCalls: t => array<stakeCall> = _r => {
-  let array = %raw("_r.smocked.stake.calls")
-  array->Array.map(_m => {
-    let amount = _m->Array.getUnsafe(0)
-
-    {
-      amount: amount,
-    }
-  })
-}
-
-let mockMintToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.mint.will.return()")
-}
-
-type mintCall = {
-  _to: Ethers.ethAddress,
-  amount: Ethers.BigNumber.t,
-}
-
-let mintCalls: t => array<mintCall> = _r => {
-  let array = %raw("_r.smocked.mint.calls")
-  array->Array.map(((_to, amount)) => {
-    {
-      _to: _to,
-      amount: amount,
-    }
-  })
-}
-
 let mockTransferFromToReturn: (t, bool) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.transferFrom.will.return.with([_param0])")
 }
@@ -539,19 +543,15 @@ let transferFromCalls: t => array<transferFromCall> = _r => {
   })
 }
 
-let mockBalanceOfToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.balanceOf.will.return.with([_param0])")
+let mockUnpauseToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.unpause.will.return()")
 }
 
-type balanceOfCall = {account: Ethers.ethAddress}
+type unpauseCall
 
-let balanceOfCalls: t => array<balanceOfCall> = _r => {
-  let array = %raw("_r.smocked.balanceOf.calls")
-  array->Array.map(_m => {
-    let account = _m->Array.getUnsafe(0)
-
-    {
-      account: account,
-    }
+let unpauseCalls: t => array<unpauseCall> = _r => {
+  let array = %raw("_r.smocked.unpause.calls")
+  array->Array.map(() => {
+    ()->Obj.magic
   })
 }

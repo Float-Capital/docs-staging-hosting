@@ -57,7 +57,9 @@ const handleCompilation = async function (args, hre, runSuper) {
     const result = compileResult.sources[fileToPrintAst.fullPath]
 
     if (!result) {
-      throw new HardhatPluginError(`Could not find a contract with the name ${fileToPrintAst.contractName} at ${fileToPrintAst.fullPath} - please check your config carefully. \n\nAvailableFiles: \n${Object.keys(compileResult.sources).join("\n")}`);
+      console.log(`AvailableFiles: \n${Object.keys(compileResult.sources).join("\n")}`);
+      return
+      // throw new HardhatPluginError(`Could not find a contract with the name ${fileToPrintAst.contractName} at ${fileToPrintAst.fullPath} - please check your config carefully. \n\nAvailableFiles: \n${Object.keys(compileResult.sources).join("\n")}`);
     }
 
     const destination = path.resolve(

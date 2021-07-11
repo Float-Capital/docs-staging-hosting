@@ -372,6 +372,23 @@ let revokeRoleCalls: t => array<revokeRoleCall> = _r => {
   })
 }
 
+let mockSetShouldMockTransferToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.setShouldMockTransfer.will.return()")
+}
+
+type setShouldMockTransferCall = {value: bool}
+
+let setShouldMockTransferCalls: t => array<setShouldMockTransferCall> = _r => {
+  let array = %raw("_r.smocked.setShouldMockTransfer.calls")
+  array->Array.map(_m => {
+    let value = _m->Array.getUnsafe(0)
+
+    {
+      value: value,
+    }
+  })
+}
+
 let mockSupportsInterfaceToReturn: (t, bool) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.supportsInterface.will.return.with([_param0])")
 }
@@ -415,6 +432,25 @@ let totalSupplyCalls: t => array<totalSupplyCall> = _r => {
   })
 }
 
+let mockTransferToReturn: (t, bool) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.transfer.will.return.with([_param0])")
+}
+
+type transferCall = {
+  recipient: Ethers.ethAddress,
+  amount: Ethers.BigNumber.t,
+}
+
+let transferCalls: t => array<transferCall> = _r => {
+  let array = %raw("_r.smocked.transfer.calls")
+  array->Array.map(((recipient, amount)) => {
+    {
+      recipient: recipient,
+      amount: amount,
+    }
+  })
+}
+
 let mockTransferFromToReturn: (t, bool) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.transferFrom.will.return.with([_param0])")
 }
@@ -446,41 +482,5 @@ let unpauseCalls: t => array<unpauseCall> = _r => {
   let array = %raw("_r.smocked.unpause.calls")
   array->Array.map(() => {
     ()->Obj.magic
-  })
-}
-
-let mockSetShouldMockTransferToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.setShouldMockTransfer.will.return()")
-}
-
-type setShouldMockTransferCall = {value: bool}
-
-let setShouldMockTransferCalls: t => array<setShouldMockTransferCall> = _r => {
-  let array = %raw("_r.smocked.setShouldMockTransfer.calls")
-  array->Array.map(_m => {
-    let value = _m->Array.getUnsafe(0)
-
-    {
-      value: value,
-    }
-  })
-}
-
-let mockTransferToReturn: (t, bool) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.transfer.will.return.with([_param0])")
-}
-
-type transferCall = {
-  recipient: Ethers.ethAddress,
-  amount: Ethers.BigNumber.t,
-}
-
-let transferCalls: t => array<transferCall> = _r => {
-  let array = %raw("_r.smocked.transfer.calls")
-  array->Array.map(((recipient, amount)) => {
-    {
-      recipient: recipient,
-      amount: amount,
-    }
   })
 }

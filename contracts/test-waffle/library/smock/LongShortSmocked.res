@@ -90,6 +90,141 @@ let batchedAmountOfTokensToDepositCalls: t => array<batchedAmountOfTokensToDepos
   })
 }
 
+let mockChangeAdminToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.changeAdmin.will.return()")
+}
+
+type changeAdminCall = {admin: Ethers.ethAddress}
+
+let changeAdminCalls: t => array<changeAdminCall> = _r => {
+  let array = %raw("_r.smocked.changeAdmin.calls")
+  array->Array.map(_m => {
+    let admin = _m->Array.getUnsafe(0)
+
+    {
+      admin: admin,
+    }
+  })
+}
+
+let mockChangeTreasuryToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.changeTreasury.will.return()")
+}
+
+type changeTreasuryCall = {treasury: Ethers.ethAddress}
+
+let changeTreasuryCalls: t => array<changeTreasuryCall> = _r => {
+  let array = %raw("_r.smocked.changeTreasury.calls")
+  array->Array.map(_m => {
+    let treasury = _m->Array.getUnsafe(0)
+
+    {
+      treasury: treasury,
+    }
+  })
+}
+
+let mockExecuteOutstandingNextPriceSettlementsUserToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.executeOutstandingNextPriceSettlementsUser.will.return()")
+}
+
+type executeOutstandingNextPriceSettlementsUserCall = {
+  user: Ethers.ethAddress,
+  marketIndex: int,
+}
+
+let executeOutstandingNextPriceSettlementsUserCalls: t => array<
+  executeOutstandingNextPriceSettlementsUserCall,
+> = _r => {
+  let array = %raw("_r.smocked.executeOutstandingNextPriceSettlementsUser.calls")
+  array->Array.map(((user, marketIndex)) => {
+    {
+      user: user,
+      marketIndex: marketIndex,
+    }
+  })
+}
+
+let mockGetUsersConfirmedButNotSettledBalanceToReturn: (t, Ethers.BigNumber.t) => unit = (
+  _r,
+  _param0,
+) => {
+  let _ = %raw("_r.smocked.getUsersConfirmedButNotSettledBalance.will.return.with([_param0])")
+}
+
+type getUsersConfirmedButNotSettledBalanceCall = {
+  user: Ethers.ethAddress,
+  marketIndex: int,
+  isLong: bool,
+}
+
+let getUsersConfirmedButNotSettledBalanceCalls: t => array<
+  getUsersConfirmedButNotSettledBalanceCall,
+> = _r => {
+  let array = %raw("_r.smocked.getUsersConfirmedButNotSettledBalance.calls")
+  array->Array.map(((user, marketIndex, isLong)) => {
+    {
+      user: user,
+      marketIndex: marketIndex,
+      isLong: isLong,
+    }
+  })
+}
+
+let mockInitializeToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.initialize.will.return()")
+}
+
+type initializeCall = {
+  admin: Ethers.ethAddress,
+  treasury: Ethers.ethAddress,
+  tokenFactory: Ethers.ethAddress,
+  staker: Ethers.ethAddress,
+}
+
+let initializeCalls: t => array<initializeCall> = _r => {
+  let array = %raw("_r.smocked.initialize.calls")
+  array->Array.map(((admin, treasury, tokenFactory, staker)) => {
+    {
+      admin: admin,
+      treasury: treasury,
+      tokenFactory: tokenFactory,
+      staker: staker,
+    }
+  })
+}
+
+let mockInitializeMarketToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.initializeMarket.will.return()")
+}
+
+type initializeMarketCall = {
+  marketIndex: int,
+  kInitialMultiplier: Ethers.BigNumber.t,
+  kPeriod: Ethers.BigNumber.t,
+  unstakeFeeBasisPoints: Ethers.BigNumber.t,
+  initialMarketSeed: Ethers.BigNumber.t,
+}
+
+let initializeMarketCalls: t => array<initializeMarketCall> = _r => {
+  let array = %raw("_r.smocked.initializeMarket.calls")
+  array->Array.map(((
+    marketIndex,
+    kInitialMultiplier,
+    kPeriod,
+    unstakeFeeBasisPoints,
+    initialMarketSeed,
+  )) => {
+    {
+      marketIndex: marketIndex,
+      kInitialMultiplier: kInitialMultiplier,
+      kPeriod: kPeriod,
+      unstakeFeeBasisPoints: unstakeFeeBasisPoints,
+      initialMarketSeed: initialMarketSeed,
+    }
+  })
+}
+
 let mockLatestMarketToReturn: (t, int) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.latestMarket.will.return.with([_param0])")
 }
@@ -137,6 +272,75 @@ let marketUpdateIndexCalls: t => array<marketUpdateIndexCall> = _r => {
   })
 }
 
+let mockMintLongNextPriceToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.mintLongNextPrice.will.return()")
+}
+
+type mintLongNextPriceCall = {
+  marketIndex: int,
+  amount: Ethers.BigNumber.t,
+}
+
+let mintLongNextPriceCalls: t => array<mintLongNextPriceCall> = _r => {
+  let array = %raw("_r.smocked.mintLongNextPrice.calls")
+  array->Array.map(((marketIndex, amount)) => {
+    {
+      marketIndex: marketIndex,
+      amount: amount,
+    }
+  })
+}
+
+let mockMintShortNextPriceToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.mintShortNextPrice.will.return()")
+}
+
+type mintShortNextPriceCall = {
+  marketIndex: int,
+  amount: Ethers.BigNumber.t,
+}
+
+let mintShortNextPriceCalls: t => array<mintShortNextPriceCall> = _r => {
+  let array = %raw("_r.smocked.mintShortNextPrice.calls")
+  array->Array.map(((marketIndex, amount)) => {
+    {
+      marketIndex: marketIndex,
+      amount: amount,
+    }
+  })
+}
+
+let mockNewSyntheticMarketToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.newSyntheticMarket.will.return()")
+}
+
+type newSyntheticMarketCall = {
+  syntheticName: string,
+  syntheticSymbol: string,
+  paymentToken: Ethers.ethAddress,
+  oracleManager: Ethers.ethAddress,
+  yieldManager: Ethers.ethAddress,
+}
+
+let newSyntheticMarketCalls: t => array<newSyntheticMarketCall> = _r => {
+  let array = %raw("_r.smocked.newSyntheticMarket.calls")
+  array->Array.map(((
+    syntheticName,
+    syntheticSymbol,
+    paymentToken,
+    oracleManager,
+    yieldManager,
+  )) => {
+    {
+      syntheticName: syntheticName,
+      syntheticSymbol: syntheticSymbol,
+      paymentToken: paymentToken,
+      oracleManager: oracleManager,
+      yieldManager: yieldManager,
+    }
+  })
+}
+
 let mockOracleManagersToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.oracleManagers.will.return.with([_param0])")
 }
@@ -167,6 +371,44 @@ let paymentTokensCalls: t => array<paymentTokensCall> = _r => {
 
     {
       param0: param0,
+    }
+  })
+}
+
+let mockRedeemLongNextPriceToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.redeemLongNextPrice.will.return()")
+}
+
+type redeemLongNextPriceCall = {
+  marketIndex: int,
+  tokensToRedeem: Ethers.BigNumber.t,
+}
+
+let redeemLongNextPriceCalls: t => array<redeemLongNextPriceCall> = _r => {
+  let array = %raw("_r.smocked.redeemLongNextPrice.calls")
+  array->Array.map(((marketIndex, tokensToRedeem)) => {
+    {
+      marketIndex: marketIndex,
+      tokensToRedeem: tokensToRedeem,
+    }
+  })
+}
+
+let mockRedeemShortNextPriceToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.redeemShortNextPrice.will.return()")
+}
+
+type redeemShortNextPriceCall = {
+  marketIndex: int,
+  tokensToRedeem: Ethers.BigNumber.t,
+}
+
+let redeemShortNextPriceCalls: t => array<redeemShortNextPriceCall> = _r => {
+  let array = %raw("_r.smocked.redeemShortNextPrice.calls")
+  array->Array.map(((marketIndex, tokensToRedeem)) => {
+    {
+      marketIndex: marketIndex,
+      tokensToRedeem: tokensToRedeem,
     }
   })
 }
@@ -269,6 +511,59 @@ let treasuryCalls: t => array<treasuryCall> = _r => {
   })
 }
 
+let mockUpdateMarketOracleToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.updateMarketOracle.will.return()")
+}
+
+type updateMarketOracleCall = {
+  marketIndex: int,
+  newOracleManager: Ethers.ethAddress,
+}
+
+let updateMarketOracleCalls: t => array<updateMarketOracleCall> = _r => {
+  let array = %raw("_r.smocked.updateMarketOracle.calls")
+  array->Array.map(((marketIndex, newOracleManager)) => {
+    {
+      marketIndex: marketIndex,
+      newOracleManager: newOracleManager,
+    }
+  })
+}
+
+let mockUpdateSystemStateToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.updateSystemState.will.return()")
+}
+
+type updateSystemStateCall = {marketIndex: int}
+
+let updateSystemStateCalls: t => array<updateSystemStateCall> = _r => {
+  let array = %raw("_r.smocked.updateSystemState.calls")
+  array->Array.map(_m => {
+    let marketIndex = _m->Array.getUnsafe(0)
+
+    {
+      marketIndex: marketIndex,
+    }
+  })
+}
+
+let mockUpdateSystemStateMultiToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.updateSystemStateMulti.will.return()")
+}
+
+type updateSystemStateMultiCall = {marketIndexes: array<int>}
+
+let updateSystemStateMultiCalls: t => array<updateSystemStateMultiCall> = _r => {
+  let array = %raw("_r.smocked.updateSystemStateMulti.calls")
+  array->Array.map(_m => {
+    let marketIndexes = _m->Array.getUnsafe(0)
+
+    {
+      marketIndexes: marketIndexes,
+    }
+  })
+}
+
 let mockUserCurrentNextPriceUpdateIndexToReturn: (t, Ethers.BigNumber.t) => unit = (
   _r,
   _param0,
@@ -346,301 +641,6 @@ let yieldManagersCalls: t => array<yieldManagersCall> = _r => {
 
     {
       param0: param0,
-    }
-  })
-}
-
-let mockInitializeToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.initialize.will.return()")
-}
-
-type initializeCall = {
-  admin: Ethers.ethAddress,
-  treasury: Ethers.ethAddress,
-  tokenFactory: Ethers.ethAddress,
-  staker: Ethers.ethAddress,
-}
-
-let initializeCalls: t => array<initializeCall> = _r => {
-  let array = %raw("_r.smocked.initialize.calls")
-  array->Array.map(((admin, treasury, tokenFactory, staker)) => {
-    {
-      admin: admin,
-      treasury: treasury,
-      tokenFactory: tokenFactory,
-      staker: staker,
-    }
-  })
-}
-
-let mockChangeAdminToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.changeAdmin.will.return()")
-}
-
-type changeAdminCall = {admin: Ethers.ethAddress}
-
-let changeAdminCalls: t => array<changeAdminCall> = _r => {
-  let array = %raw("_r.smocked.changeAdmin.calls")
-  array->Array.map(_m => {
-    let admin = _m->Array.getUnsafe(0)
-
-    {
-      admin: admin,
-    }
-  })
-}
-
-let mockChangeTreasuryToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.changeTreasury.will.return()")
-}
-
-type changeTreasuryCall = {treasury: Ethers.ethAddress}
-
-let changeTreasuryCalls: t => array<changeTreasuryCall> = _r => {
-  let array = %raw("_r.smocked.changeTreasury.calls")
-  array->Array.map(_m => {
-    let treasury = _m->Array.getUnsafe(0)
-
-    {
-      treasury: treasury,
-    }
-  })
-}
-
-let mockUpdateMarketOracleToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.updateMarketOracle.will.return()")
-}
-
-type updateMarketOracleCall = {
-  marketIndex: int,
-  newOracleManager: Ethers.ethAddress,
-}
-
-let updateMarketOracleCalls: t => array<updateMarketOracleCall> = _r => {
-  let array = %raw("_r.smocked.updateMarketOracle.calls")
-  array->Array.map(((marketIndex, newOracleManager)) => {
-    {
-      marketIndex: marketIndex,
-      newOracleManager: newOracleManager,
-    }
-  })
-}
-
-let mockNewSyntheticMarketToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.newSyntheticMarket.will.return()")
-}
-
-type newSyntheticMarketCall = {
-  syntheticName: string,
-  syntheticSymbol: string,
-  paymentToken: Ethers.ethAddress,
-  oracleManager: Ethers.ethAddress,
-  yieldManager: Ethers.ethAddress,
-}
-
-let newSyntheticMarketCalls: t => array<newSyntheticMarketCall> = _r => {
-  let array = %raw("_r.smocked.newSyntheticMarket.calls")
-  array->Array.map(((
-    syntheticName,
-    syntheticSymbol,
-    paymentToken,
-    oracleManager,
-    yieldManager,
-  )) => {
-    {
-      syntheticName: syntheticName,
-      syntheticSymbol: syntheticSymbol,
-      paymentToken: paymentToken,
-      oracleManager: oracleManager,
-      yieldManager: yieldManager,
-    }
-  })
-}
-
-let mockInitializeMarketToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.initializeMarket.will.return()")
-}
-
-type initializeMarketCall = {
-  marketIndex: int,
-  kInitialMultiplier: Ethers.BigNumber.t,
-  kPeriod: Ethers.BigNumber.t,
-  unstakeFeeBasisPoints: Ethers.BigNumber.t,
-  initialMarketSeed: Ethers.BigNumber.t,
-}
-
-let initializeMarketCalls: t => array<initializeMarketCall> = _r => {
-  let array = %raw("_r.smocked.initializeMarket.calls")
-  array->Array.map(((
-    marketIndex,
-    kInitialMultiplier,
-    kPeriod,
-    unstakeFeeBasisPoints,
-    initialMarketSeed,
-  )) => {
-    {
-      marketIndex: marketIndex,
-      kInitialMultiplier: kInitialMultiplier,
-      kPeriod: kPeriod,
-      unstakeFeeBasisPoints: unstakeFeeBasisPoints,
-      initialMarketSeed: initialMarketSeed,
-    }
-  })
-}
-
-let mockGetUsersConfirmedButNotSettledBalanceToReturn: (t, Ethers.BigNumber.t) => unit = (
-  _r,
-  _param0,
-) => {
-  let _ = %raw("_r.smocked.getUsersConfirmedButNotSettledBalance.will.return.with([_param0])")
-}
-
-type getUsersConfirmedButNotSettledBalanceCall = {
-  user: Ethers.ethAddress,
-  marketIndex: int,
-  isLong: bool,
-}
-
-let getUsersConfirmedButNotSettledBalanceCalls: t => array<
-  getUsersConfirmedButNotSettledBalanceCall,
-> = _r => {
-  let array = %raw("_r.smocked.getUsersConfirmedButNotSettledBalance.calls")
-  array->Array.map(((user, marketIndex, isLong)) => {
-    {
-      user: user,
-      marketIndex: marketIndex,
-      isLong: isLong,
-    }
-  })
-}
-
-let mockUpdateSystemStateToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.updateSystemState.will.return()")
-}
-
-type updateSystemStateCall = {marketIndex: int}
-
-let updateSystemStateCalls: t => array<updateSystemStateCall> = _r => {
-  let array = %raw("_r.smocked.updateSystemState.calls")
-  array->Array.map(_m => {
-    let marketIndex = _m->Array.getUnsafe(0)
-
-    {
-      marketIndex: marketIndex,
-    }
-  })
-}
-
-let mockUpdateSystemStateMultiToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.updateSystemStateMulti.will.return()")
-}
-
-type updateSystemStateMultiCall = {marketIndexes: array<int>}
-
-let updateSystemStateMultiCalls: t => array<updateSystemStateMultiCall> = _r => {
-  let array = %raw("_r.smocked.updateSystemStateMulti.calls")
-  array->Array.map(_m => {
-    let marketIndexes = _m->Array.getUnsafe(0)
-
-    {
-      marketIndexes: marketIndexes,
-    }
-  })
-}
-
-let mockMintLongNextPriceToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.mintLongNextPrice.will.return()")
-}
-
-type mintLongNextPriceCall = {
-  marketIndex: int,
-  amount: Ethers.BigNumber.t,
-}
-
-let mintLongNextPriceCalls: t => array<mintLongNextPriceCall> = _r => {
-  let array = %raw("_r.smocked.mintLongNextPrice.calls")
-  array->Array.map(((marketIndex, amount)) => {
-    {
-      marketIndex: marketIndex,
-      amount: amount,
-    }
-  })
-}
-
-let mockMintShortNextPriceToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.mintShortNextPrice.will.return()")
-}
-
-type mintShortNextPriceCall = {
-  marketIndex: int,
-  amount: Ethers.BigNumber.t,
-}
-
-let mintShortNextPriceCalls: t => array<mintShortNextPriceCall> = _r => {
-  let array = %raw("_r.smocked.mintShortNextPrice.calls")
-  array->Array.map(((marketIndex, amount)) => {
-    {
-      marketIndex: marketIndex,
-      amount: amount,
-    }
-  })
-}
-
-let mockRedeemLongNextPriceToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.redeemLongNextPrice.will.return()")
-}
-
-type redeemLongNextPriceCall = {
-  marketIndex: int,
-  tokensToRedeem: Ethers.BigNumber.t,
-}
-
-let redeemLongNextPriceCalls: t => array<redeemLongNextPriceCall> = _r => {
-  let array = %raw("_r.smocked.redeemLongNextPrice.calls")
-  array->Array.map(((marketIndex, tokensToRedeem)) => {
-    {
-      marketIndex: marketIndex,
-      tokensToRedeem: tokensToRedeem,
-    }
-  })
-}
-
-let mockRedeemShortNextPriceToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.redeemShortNextPrice.will.return()")
-}
-
-type redeemShortNextPriceCall = {
-  marketIndex: int,
-  tokensToRedeem: Ethers.BigNumber.t,
-}
-
-let redeemShortNextPriceCalls: t => array<redeemShortNextPriceCall> = _r => {
-  let array = %raw("_r.smocked.redeemShortNextPrice.calls")
-  array->Array.map(((marketIndex, tokensToRedeem)) => {
-    {
-      marketIndex: marketIndex,
-      tokensToRedeem: tokensToRedeem,
-    }
-  })
-}
-
-let mockExecuteOutstandingNextPriceSettlementsUserToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.executeOutstandingNextPriceSettlementsUser.will.return()")
-}
-
-type executeOutstandingNextPriceSettlementsUserCall = {
-  user: Ethers.ethAddress,
-  marketIndex: int,
-}
-
-let executeOutstandingNextPriceSettlementsUserCalls: t => array<
-  executeOutstandingNextPriceSettlementsUserCall,
-> = _r => {
-  let array = %raw("_r.smocked.executeOutstandingNextPriceSettlementsUser.calls")
-  array->Array.map(((user, marketIndex)) => {
-    {
-      user: user,
-      marketIndex: marketIndex,
     }
   })
 }

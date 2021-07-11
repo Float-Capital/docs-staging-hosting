@@ -19,7 +19,7 @@ function externalMockerModifierBody(functionName, mockerArguments) {
 }
 
 function internalMockingFileTemplate(fileNameWithoutExtension, parentImports, contractBody) {
-  return "// SPDX-License-Identifier: BUSL-1.1 \n pragma solidity 0.8.3;\n\nimport \"./" + fileNameWithoutExtension + "Mockable.sol\"\n\n" + parentImports + "\n\ncontract " + fileNameWithoutExtension + "ForInternalMocking {\n  " + contractBody + "\n}";
+  return "// SPDX-License-Identifier: BUSL-1.1 \n pragma solidity 0.8.3;\n\nimport \"./" + fileNameWithoutExtension + "Mockable.sol\";\n\n" + parentImports + "\n\ncontract " + fileNameWithoutExtension + "ForInternalMocking {\n  " + contractBody + "\n}";
 }
 
 function mockingFileTemplate(prefix, fileNameWithoutExtension, modifiersAndOpener, suffix) {

@@ -43,6 +43,59 @@ let adminCalls: t => array<adminCall> = _r => {
   })
 }
 
+let mockChangeAdminToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.changeAdmin.will.return()")
+}
+
+type changeAdminCall = {admin: Ethers.ethAddress}
+
+let changeAdminCalls: t => array<changeAdminCall> = _r => {
+  let array = %raw("_r.smocked.changeAdmin.calls")
+  array->Array.map(_m => {
+    let admin = _m->Array.getUnsafe(0)
+
+    {
+      admin: admin,
+    }
+  })
+}
+
+let mockClaimYieldAndGetMarketAmountToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.claimYieldAndGetMarketAmount.will.return.with([_param0])")
+}
+
+type claimYieldAndGetMarketAmountCall = {
+  totalValueRealizedForMarket: Ethers.BigNumber.t,
+  treasuryPercentE18: Ethers.BigNumber.t,
+}
+
+let claimYieldAndGetMarketAmountCalls: t => array<claimYieldAndGetMarketAmountCall> = _r => {
+  let array = %raw("_r.smocked.claimYieldAndGetMarketAmount.calls")
+  array->Array.map(((totalValueRealizedForMarket, treasuryPercentE18)) => {
+    {
+      totalValueRealizedForMarket: totalValueRealizedForMarket,
+      treasuryPercentE18: treasuryPercentE18,
+    }
+  })
+}
+
+let mockDepositPaymentTokenToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.depositPaymentToken.will.return()")
+}
+
+type depositPaymentTokenCall = {amount: Ethers.BigNumber.t}
+
+let depositPaymentTokenCalls: t => array<depositPaymentTokenCall> = _r => {
+  let array = %raw("_r.smocked.depositPaymentToken.calls")
+  array->Array.map(_m => {
+    let amount = _m->Array.getUnsafe(0)
+
+    {
+      amount: amount,
+    }
+  })
+}
+
 let mockLendingPoolToReturn: (t, Ethers.ethAddress) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.lendingPool.will.return.with([_param0])")
 }
@@ -108,57 +161,6 @@ let treasuryCalls: t => array<treasuryCall> = _r => {
   })
 }
 
-let mockChangeAdminToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.changeAdmin.will.return()")
-}
-
-type changeAdminCall = {admin: Ethers.ethAddress}
-
-let changeAdminCalls: t => array<changeAdminCall> = _r => {
-  let array = %raw("_r.smocked.changeAdmin.calls")
-  array->Array.map(_m => {
-    let admin = _m->Array.getUnsafe(0)
-
-    {
-      admin: admin,
-    }
-  })
-}
-
-let mockDepositPaymentTokenToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.depositPaymentToken.will.return()")
-}
-
-type depositPaymentTokenCall = {amount: Ethers.BigNumber.t}
-
-let depositPaymentTokenCalls: t => array<depositPaymentTokenCall> = _r => {
-  let array = %raw("_r.smocked.depositPaymentToken.calls")
-  array->Array.map(_m => {
-    let amount = _m->Array.getUnsafe(0)
-
-    {
-      amount: amount,
-    }
-  })
-}
-
-let mockWithdrawPaymentTokenToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.withdrawPaymentToken.will.return()")
-}
-
-type withdrawPaymentTokenCall = {amount: Ethers.BigNumber.t}
-
-let withdrawPaymentTokenCalls: t => array<withdrawPaymentTokenCall> = _r => {
-  let array = %raw("_r.smocked.withdrawPaymentToken.calls")
-  array->Array.map(_m => {
-    let amount = _m->Array.getUnsafe(0)
-
-    {
-      amount: amount,
-    }
-  })
-}
-
 let mockWithdrawErc20TokenToTreasuryToReturn: t => unit = _r => {
   let _ = %raw("_r.smocked.withdrawErc20TokenToTreasury.will.return()")
 }
@@ -176,21 +178,19 @@ let withdrawErc20TokenToTreasuryCalls: t => array<withdrawErc20TokenToTreasuryCa
   })
 }
 
-let mockClaimYieldAndGetMarketAmountToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.claimYieldAndGetMarketAmount.will.return.with([_param0])")
+let mockWithdrawPaymentTokenToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.withdrawPaymentToken.will.return()")
 }
 
-type claimYieldAndGetMarketAmountCall = {
-  totalValueRealizedForMarket: Ethers.BigNumber.t,
-  treasuryPercentE18: Ethers.BigNumber.t,
-}
+type withdrawPaymentTokenCall = {amount: Ethers.BigNumber.t}
 
-let claimYieldAndGetMarketAmountCalls: t => array<claimYieldAndGetMarketAmountCall> = _r => {
-  let array = %raw("_r.smocked.claimYieldAndGetMarketAmount.calls")
-  array->Array.map(((totalValueRealizedForMarket, treasuryPercentE18)) => {
+let withdrawPaymentTokenCalls: t => array<withdrawPaymentTokenCall> = _r => {
+  let array = %raw("_r.smocked.withdrawPaymentToken.calls")
+  array->Array.map(_m => {
+    let amount = _m->Array.getUnsafe(0)
+
     {
-      totalValueRealizedForMarket: totalValueRealizedForMarket,
-      treasuryPercentE18: treasuryPercentE18,
+      amount: amount,
     }
   })
 }

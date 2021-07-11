@@ -30,6 +30,42 @@ let adminCalls: t => array<adminCall> = _r => {
   })
 }
 
+let mockClaimYieldAndGetMarketAmountToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.claimYieldAndGetMarketAmount.will.return.with([_param0])")
+}
+
+type claimYieldAndGetMarketAmountCall = {
+  totalValueRealizedForMarket: Ethers.BigNumber.t,
+  treasuryPercentE18: Ethers.BigNumber.t,
+}
+
+let claimYieldAndGetMarketAmountCalls: t => array<claimYieldAndGetMarketAmountCall> = _r => {
+  let array = %raw("_r.smocked.claimYieldAndGetMarketAmount.calls")
+  array->Array.map(((totalValueRealizedForMarket, treasuryPercentE18)) => {
+    {
+      totalValueRealizedForMarket: totalValueRealizedForMarket,
+      treasuryPercentE18: treasuryPercentE18,
+    }
+  })
+}
+
+let mockDepositPaymentTokenToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.depositPaymentToken.will.return()")
+}
+
+type depositPaymentTokenCall = {amount: Ethers.BigNumber.t}
+
+let depositPaymentTokenCalls: t => array<depositPaymentTokenCall> = _r => {
+  let array = %raw("_r.smocked.depositPaymentToken.calls")
+  array->Array.map(_m => {
+    let amount = _m->Array.getUnsafe(0)
+
+    {
+      amount: amount,
+    }
+  })
+}
+
 let mockLastSettledToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
   let _ = %raw("_r.smocked.lastSettled.will.return.with([_param0])")
 }
@@ -53,6 +89,85 @@ let longShortCalls: t => array<longShortCall> = _r => {
   let array = %raw("_r.smocked.longShort.calls")
   array->Array.map(() => {
     ()->Obj.magic
+  })
+}
+
+let mockMockHoldingAdditionalRewardYieldToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.mockHoldingAdditionalRewardYield.will.return()")
+}
+
+type mockHoldingAdditionalRewardYieldCall
+
+let mockHoldingAdditionalRewardYieldCalls: t => array<
+  mockHoldingAdditionalRewardYieldCall,
+> = _r => {
+  let array = %raw("_r.smocked.mockHoldingAdditionalRewardYield.calls")
+  array->Array.map(() => {
+    ()->Obj.magic
+  })
+}
+
+let mockSetYieldRateToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.setYieldRate.will.return()")
+}
+
+type setYieldRateCall = {yieldRate: Ethers.BigNumber.t}
+
+let setYieldRateCalls: t => array<setYieldRateCall> = _r => {
+  let array = %raw("_r.smocked.setYieldRate.calls")
+  array->Array.map(_m => {
+    let yieldRate = _m->Array.getUnsafe(0)
+
+    {
+      yieldRate: yieldRate,
+    }
+  })
+}
+
+let mockSettleToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.settle.will.return()")
+}
+
+type settleCall
+
+let settleCalls: t => array<settleCall> = _r => {
+  let array = %raw("_r.smocked.settle.calls")
+  array->Array.map(() => {
+    ()->Obj.magic
+  })
+}
+
+let mockSettleWithYieldAbsoluteToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.settleWithYieldAbsolute.will.return()")
+}
+
+type settleWithYieldAbsoluteCall = {totalYield: Ethers.BigNumber.t}
+
+let settleWithYieldAbsoluteCalls: t => array<settleWithYieldAbsoluteCall> = _r => {
+  let array = %raw("_r.smocked.settleWithYieldAbsolute.calls")
+  array->Array.map(_m => {
+    let totalYield = _m->Array.getUnsafe(0)
+
+    {
+      totalYield: totalYield,
+    }
+  })
+}
+
+let mockSettleWithYieldPercentToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.settleWithYieldPercent.will.return()")
+}
+
+type settleWithYieldPercentCall = {yieldPercent: Ethers.BigNumber.t}
+
+let settleWithYieldPercentCalls: t => array<settleWithYieldPercentCall> = _r => {
+  let array = %raw("_r.smocked.settleWithYieldPercent.calls")
+  array->Array.map(_m => {
+    let yieldPercent = _m->Array.getUnsafe(0)
+
+    {
+      yieldPercent: yieldPercent,
+    }
   })
 }
 
@@ -121,111 +236,19 @@ let treasuryCalls: t => array<treasuryCall> = _r => {
   })
 }
 
-let mockYieldRateToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.yieldRate.will.return.with([_param0])")
+let mockWithdrawErc20TokenToTreasuryToReturn: t => unit = _r => {
+  let _ = %raw("_r.smocked.withdrawErc20TokenToTreasury.will.return()")
 }
 
-type yieldRateCall
+type withdrawErc20TokenToTreasuryCall = {erc20Token: Ethers.ethAddress}
 
-let yieldRateCalls: t => array<yieldRateCall> = _r => {
-  let array = %raw("_r.smocked.yieldRate.calls")
-  array->Array.map(() => {
-    ()->Obj.magic
-  })
-}
-
-let mockSettleToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.settle.will.return()")
-}
-
-type settleCall
-
-let settleCalls: t => array<settleCall> = _r => {
-  let array = %raw("_r.smocked.settle.calls")
-  array->Array.map(() => {
-    ()->Obj.magic
-  })
-}
-
-let mockSettleWithYieldPercentToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.settleWithYieldPercent.will.return()")
-}
-
-type settleWithYieldPercentCall = {yieldPercent: Ethers.BigNumber.t}
-
-let settleWithYieldPercentCalls: t => array<settleWithYieldPercentCall> = _r => {
-  let array = %raw("_r.smocked.settleWithYieldPercent.calls")
+let withdrawErc20TokenToTreasuryCalls: t => array<withdrawErc20TokenToTreasuryCall> = _r => {
+  let array = %raw("_r.smocked.withdrawErc20TokenToTreasury.calls")
   array->Array.map(_m => {
-    let yieldPercent = _m->Array.getUnsafe(0)
+    let erc20Token = _m->Array.getUnsafe(0)
 
     {
-      yieldPercent: yieldPercent,
-    }
-  })
-}
-
-let mockSettleWithYieldAbsoluteToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.settleWithYieldAbsolute.will.return()")
-}
-
-type settleWithYieldAbsoluteCall = {totalYield: Ethers.BigNumber.t}
-
-let settleWithYieldAbsoluteCalls: t => array<settleWithYieldAbsoluteCall> = _r => {
-  let array = %raw("_r.smocked.settleWithYieldAbsolute.calls")
-  array->Array.map(_m => {
-    let totalYield = _m->Array.getUnsafe(0)
-
-    {
-      totalYield: totalYield,
-    }
-  })
-}
-
-let mockMockHoldingAdditionalRewardYieldToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.mockHoldingAdditionalRewardYield.will.return()")
-}
-
-type mockHoldingAdditionalRewardYieldCall
-
-let mockHoldingAdditionalRewardYieldCalls: t => array<
-  mockHoldingAdditionalRewardYieldCall,
-> = _r => {
-  let array = %raw("_r.smocked.mockHoldingAdditionalRewardYield.calls")
-  array->Array.map(() => {
-    ()->Obj.magic
-  })
-}
-
-let mockSetYieldRateToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.setYieldRate.will.return()")
-}
-
-type setYieldRateCall = {yieldRate: Ethers.BigNumber.t}
-
-let setYieldRateCalls: t => array<setYieldRateCall> = _r => {
-  let array = %raw("_r.smocked.setYieldRate.calls")
-  array->Array.map(_m => {
-    let yieldRate = _m->Array.getUnsafe(0)
-
-    {
-      yieldRate: yieldRate,
-    }
-  })
-}
-
-let mockDepositPaymentTokenToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.depositPaymentToken.will.return()")
-}
-
-type depositPaymentTokenCall = {amount: Ethers.BigNumber.t}
-
-let depositPaymentTokenCalls: t => array<depositPaymentTokenCall> = _r => {
-  let array = %raw("_r.smocked.depositPaymentToken.calls")
-  array->Array.map(_m => {
-    let amount = _m->Array.getUnsafe(0)
-
-    {
-      amount: amount,
+      erc20Token: erc20Token,
     }
   })
 }
@@ -247,42 +270,6 @@ let withdrawPaymentTokenCalls: t => array<withdrawPaymentTokenCall> = _r => {
   })
 }
 
-let mockWithdrawErc20TokenToTreasuryToReturn: t => unit = _r => {
-  let _ = %raw("_r.smocked.withdrawErc20TokenToTreasury.will.return()")
-}
-
-type withdrawErc20TokenToTreasuryCall = {erc20Token: Ethers.ethAddress}
-
-let withdrawErc20TokenToTreasuryCalls: t => array<withdrawErc20TokenToTreasuryCall> = _r => {
-  let array = %raw("_r.smocked.withdrawErc20TokenToTreasury.calls")
-  array->Array.map(_m => {
-    let erc20Token = _m->Array.getUnsafe(0)
-
-    {
-      erc20Token: erc20Token,
-    }
-  })
-}
-
-let mockClaimYieldAndGetMarketAmountToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.claimYieldAndGetMarketAmount.will.return.with([_param0])")
-}
-
-type claimYieldAndGetMarketAmountCall = {
-  totalValueRealizedForMarket: Ethers.BigNumber.t,
-  treasuryPercentE18: Ethers.BigNumber.t,
-}
-
-let claimYieldAndGetMarketAmountCalls: t => array<claimYieldAndGetMarketAmountCall> = _r => {
-  let array = %raw("_r.smocked.claimYieldAndGetMarketAmount.calls")
-  array->Array.map(((totalValueRealizedForMarket, treasuryPercentE18)) => {
-    {
-      totalValueRealizedForMarket: totalValueRealizedForMarket,
-      treasuryPercentE18: treasuryPercentE18,
-    }
-  })
-}
-
 let mockWithdrawTreasuryFundsToReturn: t => unit = _r => {
   let _ = %raw("_r.smocked.withdrawTreasuryFunds.will.return()")
 }
@@ -291,6 +278,19 @@ type withdrawTreasuryFundsCall
 
 let withdrawTreasuryFundsCalls: t => array<withdrawTreasuryFundsCall> = _r => {
   let array = %raw("_r.smocked.withdrawTreasuryFunds.calls")
+  array->Array.map(() => {
+    ()->Obj.magic
+  })
+}
+
+let mockYieldRateToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.yieldRate.will.return.with([_param0])")
+}
+
+type yieldRateCall
+
+let yieldRateCalls: t => array<yieldRateCall> = _r => {
+  let array = %raw("_r.smocked.yieldRate.calls")
   array->Array.map(() => {
     ()->Obj.magic
   })

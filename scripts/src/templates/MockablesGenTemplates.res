@@ -41,7 +41,7 @@ function ${functionName}Mock(${mockerArguments}) public pure {}
 let internalMockingFileTemplate = (~fileNameWithoutExtension, ~parentImports, ~contractBody) =>
   `// SPDX-License-Identifier: BUSL-1.1 \n pragma solidity 0.8.3;
 
-import "./${fileNameWithoutExtension}Mockable.sol"
+import "./${fileNameWithoutExtension}Mockable.sol";
 
 ${parentImports}
 

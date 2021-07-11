@@ -17,6 +17,19 @@ let adminCalls: t => array<adminCall> = _r => {
   })
 }
 
+let mockGetLatestPriceToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.getLatestPrice.will.return.with([_param0])")
+}
+
+type getLatestPriceCall
+
+let getLatestPriceCalls: t => array<getLatestPriceCall> = _r => {
+  let array = %raw("_r.smocked.getLatestPrice.calls")
+  array->Array.map(() => {
+    ()->Obj.magic
+  })
+}
+
 let mockSetPriceToReturn: t => unit = _r => {
   let _ = %raw("_r.smocked.setPrice.will.return()")
 }
@@ -42,19 +55,6 @@ type updatePriceCall
 
 let updatePriceCalls: t => array<updatePriceCall> = _r => {
   let array = %raw("_r.smocked.updatePrice.calls")
-  array->Array.map(() => {
-    ()->Obj.magic
-  })
-}
-
-let mockGetLatestPriceToReturn: (t, Ethers.BigNumber.t) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.getLatestPrice.will.return.with([_param0])")
-}
-
-type getLatestPriceCall
-
-let getLatestPriceCalls: t => array<getLatestPriceCall> = _r => {
-  let array = %raw("_r.smocked.getLatestPrice.calls")
   array->Array.map(() => {
     ()->Obj.magic
   })

@@ -113,7 +113,11 @@ var lineCommentsRe = /\/\/[^\n]*\n/g;
 var blockCommentsRe = /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g;
 
 function getContractArtifact(fileNameWithoutExtension) {
-  return require("../../contracts/codegen/truffle/" + fileNameWithoutExtension + ".json");
+  return require("../../contracts/abis/" + fileNameWithoutExtension + ".json");
+}
+
+function getContractAst(fileNameWithoutExtension) {
+  return require("../../contracts/ast/" + fileNameWithoutExtension + ".json");
 }
 
 var BadMatchingBlock = /* @__PURE__ */Caml_exceptions.create("MockablesGen.BadMatchingBlock");
@@ -208,7 +212,7 @@ function parseAbi(abi) {
 var bindingsDict = Belt_HashMapString.make(10);
 
 Belt_Array.forEach(abisToMockExternally, (function (contractName) {
-        var abi = getContractArtifact(contractName).abi;
+        var abi = getContractArtifact(contractName);
         var functions = parseAbi(abi);
         return Belt_HashMapString.set(bindingsDict, contractName, SmockableGen.externalModule(functions, contractName));
       }));
@@ -252,8 +256,8 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
                             }));
               }));
         sol.contents = sol.contents.replace(blockCommentsRe, "\n");
-        var artifact = getContractArtifact(fileNameWithoutExtension);
-        var contractDefinition = Belt_Array.getExn(Belt_Array.keep(artifact.ast.nodes, (function (x) {
+        var contractAst = getContractAst(fileNameWithoutExtension);
+        var contractDefinition = Belt_Array.getExn(Belt_Array.keep(contractAst.nodes, (function (x) {
                     return x.nodeType === "ContractDefinition";
                   })), 0);
         var mockLogger = {
@@ -351,8 +355,14 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
         var modifiersAndOpener = sol.contents.substring(indexOfContractName + fileNameWithoutExtension.length | 0, indexOfContractBlock + 1 | 0);
         var suffix = sol.contents.substring(indexOfContractBlock + 1 | 0);
         sol.contents = MockablesGenTemplates.mockingFileTemplate(prefix, fileNameWithoutExtension, modifiersAndOpener, suffix);
-        Fs.writeFileSync("../contracts/contracts/testing/generated/" + fileNameWithoutExtension + "Mockable.sol", sol.contents, "utf8");
-        Fs.writeFileSync("../contracts/contracts/testing/generated/" + fileNameWithoutExtension + "ForInternalMocking.sol", mockLogger.contents, "utf8");
+        var outputDirectory = "../contracts/contracts/testing/generated";
+        if (!Fs.existsSync(outputDirectory)) {
+          Fs.mkdirSync(outputDirectory, {
+                recursive: true
+              });
+        }
+        Fs.writeFileSync(outputDirectory + "/" + fileNameWithoutExtension + "Mockable.sol", sol.contents, "utf8");
+        Fs.writeFileSync(outputDirectory + "/" + fileNameWithoutExtension + "ForInternalMocking.sol", mockLogger.contents, "utf8");
         var existingModuleDef = Belt_Array.some(abisToMockExternally, (function (x) {
                 return x === fileNameWithoutExtension;
               })) ? Belt_Option.getExn(Belt_HashMapString.get(bindingsDict, fileNameWithoutExtension)) : "";
@@ -384,6 +394,7 @@ exports.modifiers = modifiers;
 exports.lineCommentsRe = lineCommentsRe;
 exports.blockCommentsRe = blockCommentsRe;
 exports.getContractArtifact = getContractArtifact;
+exports.getContractAst = getContractAst;
 exports.BadMatchingBlock = BadMatchingBlock;
 exports.matchingBlockEndIndex = matchingBlockEndIndex;
 exports.importRe = importRe;

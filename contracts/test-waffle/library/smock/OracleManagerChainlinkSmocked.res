@@ -31,19 +31,6 @@ let chainlinkOracleCalls: t => array<chainlinkOracleCall> = _r => {
   })
 }
 
-let mockOracleDecimalsToReturn: (t, int) => unit = (_r, _param0) => {
-  let _ = %raw("_r.smocked.oracleDecimals.will.return.with([_param0])")
-}
-
-type oracleDecimalsCall
-
-let oracleDecimalsCalls: t => array<oracleDecimalsCall> = _r => {
-  let array = %raw("_r.smocked.oracleDecimals.calls")
-  array->Array.map(() => {
-    ()->Obj.magic
-  })
-}
-
 let mockChangeAdminToReturn: t => unit = _r => {
   let _ = %raw("_r.smocked.changeAdmin.will.return()")
 }
@@ -69,6 +56,19 @@ type getLatestPriceCall
 
 let getLatestPriceCalls: t => array<getLatestPriceCall> = _r => {
   let array = %raw("_r.smocked.getLatestPrice.calls")
+  array->Array.map(() => {
+    ()->Obj.magic
+  })
+}
+
+let mockOracleDecimalsToReturn: (t, int) => unit = (_r, _param0) => {
+  let _ = %raw("_r.smocked.oracleDecimals.will.return.with([_param0])")
+}
+
+type oracleDecimalsCall
+
+let oracleDecimalsCalls: t => array<oracleDecimalsCall> = _r => {
+  let array = %raw("_r.smocked.oracleDecimals.calls")
   array->Array.map(() => {
     ()->Obj.magic
   })

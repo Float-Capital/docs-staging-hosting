@@ -88,11 +88,16 @@ let modifiers = nodeStatements => {
 let lineCommentsRe = %re("/\\/\\/[^\\n]*\\n/g")
 let blockCommentsRe = %re("/\\/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+\\//g")
 
+@module("fs") external folderExists: string => bool = "existsSync"
+@module("fs") external mkdirSync: (string, 'a) => unit = "mkdirSync"
+
 let _ = `artifacts/contracts/FloatCapital_v0.sol/FloatCapital_v0.json`
 @val external requireJson: string => 'a = "require"
 
 let getContractArtifact = fileNameWithoutExtension =>
-  requireJson(`../../contracts/codegen/truffle/${fileNameWithoutExtension}.json`)
+  requireJson(`../../contracts/abis/${fileNameWithoutExtension}.json`)
+let getContractAst = fileNameWithoutExtension =>
+  requireJson(`../../contracts/ast/${fileNameWithoutExtension}.json`)
 
 exception BadMatchingBlock
 let rec matchingBlockEndIndex = (str, startIndex, count) => {
@@ -160,7 +165,7 @@ let parseAbi = abi =>
 let bindingsDict: HashMap.String.t<string> = HashMap.String.make(~hintSize=10)
 
 abisToMockExternally->Array.forEach(contractName => {
-  let abi = getContractArtifact(contractName)["abi"]
+  let abi = getContractArtifact(contractName)
   let functions = abi->parseAbi
   bindingsDict->HashMap.String.set(
     contractName,
@@ -217,12 +222,10 @@ filesToMockInternally->Array.forEach(filePath => {
 
   sol := sol.contents->replaceByRe(blockCommentsRe, "\n")
 
-  let artifact = getContractArtifact(fileNameWithoutExtension)
+  let contractAst = getContractAst(fileNameWithoutExtension)
 
   let contractDefinition =
-    artifact["ast"]["nodes"]
-    ->Array.keep(x => x["nodeType"] == "ContractDefinition")
-    ->Array.getExn(0)
+    contractAst["nodes"]->Array.keep(x => x["nodeType"] == "ContractDefinition")->Array.getExn(0)
 
   let mockLogger = ref("")
 
@@ -400,12 +403,17 @@ filesToMockInternally->Array.forEach(filePath => {
 
   sol := mockingFileTemplate(~prefix, ~fileNameWithoutExtension, ~modifiersAndOpener, ~suffix)
 
+  let outputDirectory = "../contracts/contracts/testing/generated"
+  if !folderExists(outputDirectory) {
+    mkdirSync(outputDirectory, {"recursive": true})
+  }
+
   Node.Fs.writeFileAsUtf8Sync(
-    `../contracts/contracts/testing/generated/${fileNameWithoutExtension}Mockable.sol`,
+    `${outputDirectory}/${fileNameWithoutExtension}Mockable.sol`,
     sol.contents,
   )
   Node.Fs.writeFileAsUtf8Sync(
-    `../contracts/contracts/testing/generated/${fileNameWithoutExtension}ForInternalMocking.sol`,
+    `${outputDirectory}/${fileNameWithoutExtension}ForInternalMocking.sol`,
     mockLogger.contents,
   )
 
