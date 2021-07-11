@@ -12,7 +12,8 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "dev-price-update": "nodemon src/res/Index.bs.js",
-    "start": "node src/index.js",
+    "start": "node src/res/Index.bs.js",
+    "start-testnet": "node src/index.js",
     "res:build": "rescript",
     "res:start": "rescript build -w",
     "res:clean": "rescript clean"

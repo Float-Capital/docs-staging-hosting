@@ -10,7 +10,8 @@ var Belt_Array = require("rescript/lib/js/belt_Array.js");
 
 function getAggregatorAddresses(chainlinkOracleAddresses, wallet) {
   var signer = Ethers.getSigner(wallet);
-  return Promise.all(Belt_Array.map(chainlinkOracleAddresses, (function (address) {
+  return Promise.all(Belt_Array.map(Object.keys(chainlinkOracleAddresses), (function (addressString) {
+                    var address = Ethers$1.utils.getAddress(addressString);
                     var oracle = Contracts.Oracle.make(address, signer);
                     return oracle.phaseId().then(function (id) {
                                 return oracle.phaseAggregators(id);
@@ -50,7 +51,7 @@ var updateCounter = {
   contents: 0
 };
 
-function runUpdateSystemStateMulti(param) {
+function runUpdateSystemStateMulti(marketsToUpdate) {
   updateCounter.contents = updateCounter.contents + 1 | 0;
   console.log("running update", updateCounter.contents);
   var balanceBefore = {
@@ -62,11 +63,7 @@ function runUpdateSystemStateMulti(param) {
                     
                   })).then(function (param) {
                 var contract = Contracts.LongShort.make(Config.config.longShortContractAddress, Ethers.getSigner(wallet.contents));
-                return contract.functions.updateSystemStateMulti([
-                                  1,
-                                  2,
-                                  3
-                                ], defaultOptions).then(function (update) {
+                return contract.functions.updateSystemStateMulti(marketsToUpdate, defaultOptions).then(function (update) {
                                 console.log("submitted transaction", update.hash);
                                 return update.wait();
                               }).then(function (param) {
@@ -97,7 +94,7 @@ function setup(param) {
                   provider.contents = _provider;
                   wallet.contents = param[1].connect(_provider);
                   console.log("Initial update system state");
-                  return runUpdateSystemStateMulti(undefined);
+                  return runUpdateSystemStateMulti(Config.config.defaultMarkets);
                 }).then(function (param) {
                 console.log("-------------------------");
                 console.log("Getting aggregator addresses");
@@ -110,8 +107,10 @@ function setup(param) {
                         topics: filter_topics
                       };
                       provider.contents.on(filter, (function (param) {
-                              console.log("Price updated for oracle " + Ethers.ethAdrToStr(Config.config.chainlinkOracleAddresses[index]));
-                              runUpdateSystemStateMulti(undefined);
+                              var updatedOracleAddress = Object.keys(Config.config.chainlinkOracleAddresses)[index];
+                              var linkedMarketIds = Config.config.chainlinkOracleAddresses[updatedOracleAddress].linkedMarketIds;
+                              console.log("Price updated for oracle " + updatedOracleAddress);
+                              runUpdateSystemStateMulti(linkedMarketIds);
                               
                             }));
                       
