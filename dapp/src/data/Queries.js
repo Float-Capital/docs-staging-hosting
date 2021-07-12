@@ -166,32 +166,58 @@ var query$2 = (require("@apollo/client").gql`
     __typename
     totalLockedLong
     totalLockedShort
-    syntheticPrice
+    underlyingPrice  {
+      __typename
+      price  {
+        __typename
+        price
+      }
+    }
   }
 `);
 
 function parse$2(value) {
+  var value$1 = value.underlyingPrice;
+  var value$2 = value$1.price;
   return {
           __typename: value.__typename,
           totalLockedLong: GqlConverters.$$BigInt.parse(value.totalLockedLong),
           totalLockedShort: GqlConverters.$$BigInt.parse(value.totalLockedShort),
-          syntheticPrice: GqlConverters.$$BigInt.parse(value.syntheticPrice)
+          underlyingPrice: {
+            __typename: value$1.__typename,
+            price: {
+              __typename: value$2.__typename,
+              price: GqlConverters.$$BigInt.parse(value$2.price)
+            }
+          }
         };
 }
 
 function serialize$2(value) {
-  var value$1 = value.syntheticPrice;
-  var value$2 = GqlConverters.$$BigInt.serialize(value$1);
-  var value$3 = value.totalLockedShort;
+  var value$1 = value.underlyingPrice;
+  var value$2 = value$1.price;
+  var value$3 = value$2.price;
   var value$4 = GqlConverters.$$BigInt.serialize(value$3);
-  var value$5 = value.totalLockedLong;
-  var value$6 = GqlConverters.$$BigInt.serialize(value$5);
-  var value$7 = value.__typename;
+  var value$5 = value$2.__typename;
+  var price = {
+    __typename: value$5,
+    price: value$4
+  };
+  var value$6 = value$1.__typename;
+  var underlyingPrice = {
+    __typename: value$6,
+    price: price
+  };
+  var value$7 = value.totalLockedShort;
+  var value$8 = GqlConverters.$$BigInt.serialize(value$7);
+  var value$9 = value.totalLockedLong;
+  var value$10 = GqlConverters.$$BigInt.serialize(value$9);
+  var value$11 = value.__typename;
   return {
-          __typename: value$7,
-          totalLockedLong: value$6,
-          totalLockedShort: value$4,
-          syntheticPrice: value$2
+          __typename: value$11,
+          totalLockedLong: value$10,
+          totalLockedShort: value$8,
+          underlyingPrice: underlyingPrice
         };
 }
 
