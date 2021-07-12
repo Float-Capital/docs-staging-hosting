@@ -211,7 +211,7 @@ contract Staker is IStaker, Initializable {
     ) internal {
         require(
             initialMultiplier >= 1e18,
-            "marketLaunchIncentiveMultiplier must be >= 1e18"
+            "marketLaunchIncentiveMultiplier must be >= 1e181"
         );
 
         marketLaunchIncentivePeriod[marketIndex] = period;

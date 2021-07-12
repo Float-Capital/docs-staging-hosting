@@ -6,6 +6,8 @@ import "./generated/LongShortMockable.sol";
 NOTE: This contract is for testing purposes only!
 */
 
+// TODO: rename this contract to "LongShortInternalStateSettors" and remove all Exposed functions since they are part of the 'Mockable' contract now.
+//       Also update the contract-interface codegen so that it puts the correct functions as "Exposed".
 contract LongShortInternalsExposed is LongShortMockable {
     bool overRideexecuteOutstandingNextPriceSettlements;
 

@@ -36,6 +36,14 @@ var abisToMockExternally = [
   "OracleManagerMock"
 ];
 
+function convertASTTypeToSolTypeSimple(typeDescriptionStr) {
+  if (typeDescriptionStr.startsWith("contract ")) {
+    return typeDescriptionStr.replace(/contract\s+/g, "");
+  } else {
+    return typeDescriptionStr;
+  }
+}
+
 function convertASTTypeToSolType(typeDescriptionStr) {
   switch (typeDescriptionStr) {
     case "address" :
@@ -74,7 +82,8 @@ function nodeToTypedIdentifier(node) {
   return {
           name: node.name,
           type_: node.typeDescriptions.typeString,
-          storageLocation: node.storageLocation === "storage" ? /* Storage */0 : /* NotRelevant */1
+          storageLocation: node.storageLocation === "storage" ? /* Storage */0 : /* NotRelevant */1,
+          storageLocationString: node.storageLocation
         };
 }
 
@@ -86,12 +95,20 @@ function functions(nodeStatements) {
                       return false;
                     }
                   })), (function (x) {
-                return {
-                        name: x.name,
-                        parameters: Belt_Array.map(x.parameters.parameters, nodeToTypedIdentifier),
-                        returnValues: Belt_Array.map(x.returnParameters.parameters, nodeToTypedIdentifier),
-                        visibility: x.visibility === "public" || x.visibility === "external" ? /* Public */0 : /* Private */1
-                      };
+                var r_name = x.name;
+                var r_parameters = Belt_Array.map(x.parameters.parameters, nodeToTypedIdentifier);
+                var r_returnValues = Belt_Array.map(x.returnParameters.parameters, nodeToTypedIdentifier);
+                var r_visibility = x.visibility === "public" || x.visibility === "external" ? /* Public */0 : /* Private */1;
+                var r = {
+                  name: r_name,
+                  parameters: r_parameters,
+                  returnValues: r_returnValues,
+                  visibility: r_visibility
+                };
+                return [
+                        r,
+                        x
+                      ];
               }));
 }
 
@@ -113,7 +130,11 @@ var lineCommentsRe = /\/\/[^\n]*\n/g;
 var blockCommentsRe = /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g;
 
 function getContractArtifact(fileNameWithoutExtension) {
-  return require("../../contracts/codegen/truffle/" + fileNameWithoutExtension + ".json");
+  return require("../../contracts/abis/" + fileNameWithoutExtension + ".json");
+}
+
+function getContractAst(fileNameWithoutExtension) {
+  return require("../../contracts/ast/" + fileNameWithoutExtension + ".json");
 }
 
 var BadMatchingBlock = /* @__PURE__ */Caml_exceptions.create("MockablesGen.BadMatchingBlock");
@@ -187,7 +208,8 @@ function parseAbiTypes(types) {
                 return {
                         name: i.name,
                         type_: i.internalType,
-                        storageLocation: /* NotRelevant */1
+                        storageLocation: /* NotRelevant */1,
+                        storageLocationString: "callable"
                       };
               }));
 }
@@ -208,7 +230,7 @@ function parseAbi(abi) {
 var bindingsDict = Belt_HashMapString.make(10);
 
 Belt_Array.forEach(abisToMockExternally, (function (contractName) {
-        var abi = getContractArtifact(contractName).abi;
+        var abi = getContractArtifact(contractName);
         var functions = parseAbi(abi);
         return Belt_HashMapString.set(bindingsDict, contractName, SmockableGen.externalModule(functions, contractName));
       }));
@@ -252,17 +274,20 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
                             }));
               }));
         sol.contents = sol.contents.replace(blockCommentsRe, "\n");
-        var artifact = getContractArtifact(fileNameWithoutExtension);
-        var contractDefinition = Belt_Array.getExn(Belt_Array.keep(artifact.ast.nodes, (function (x) {
+        var contractAst = getContractAst(fileNameWithoutExtension);
+        var contractDefinition = Belt_Array.getExn(Belt_Array.keep(contractAst.nodes, (function (x) {
                     return x.nodeType === "ContractDefinition";
                   })), 0);
         var mockLogger = {
           contents: ""
         };
-        Belt_Array.forEach(functions(contractDefinition.nodes), (function (x) {
+        Belt_Array.forEach(functions(contractDefinition.nodes), (function (param) {
+                var original = param[1];
+                var x = param[0];
                 var indexOfOldFunctionDec = sol.contents.indexOf("function " + x.name + "(");
                 var indexOfOldFunctionBodyStart = sol.contents.indexOf("{", indexOfOldFunctionDec);
-                var solPrefix = sol.contents.substring(0, indexOfOldFunctionBodyStart + 1 | 0);
+                var solPrefix = sol.contents.substring(0, indexOfOldFunctionDec);
+                var functionDefinition = sol.contents.substring(indexOfOldFunctionDec, indexOfOldFunctionBodyStart + 1 | 0);
                 var solSuffix = sol.contents.substring(indexOfOldFunctionBodyStart + 1 | 0);
                 var storageParameters = Belt_Array.keep(x.parameters, (function (x) {
                         return x.storageLocation === /* Storage */0;
@@ -280,11 +305,19 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
                 var storageParametersFormatted = reduceStrArr(Belt_Array.map(storageParameters, (function (x) {
                             return "\n          " + convertASTTypeToSolType(removeFileNameFromTypeDefs(x.type_)) + " " + x.name + "_temp1 = " + x.name + ";\n        ";
                           })));
-                sol.contents = solPrefix + MockablesGenTemplates.mockableFunctionBody(x.name, storageParametersFormatted, mockerParameterCalls) + solSuffix;
                 var arr = x.returnValues;
                 var mockerReturnValues = arr.length !== 0 ? "returns (" + Globals.commafiy(Belt_Array.map(arr, (function (x) {
                               return convertASTTypeToSolType(x.type_) + " " + x.name;
                             }))) + ")" : "";
+                var exposedCallArguments = Globals.commafiy(Belt_Array.map(x.parameters, (function (x) {
+                            var storageLocation = x.storageLocationString === "default" ? "" : x.storageLocationString;
+                            return convertASTTypeToSolTypeSimple(x.type_) + " " + storageLocation + " " + x.name;
+                          })));
+                var match = x.visibility;
+                var exposedFunction = match ? "" : "function " + x.name + "Exposed(" + exposedCallArguments + ") external " + mockerReturnValues + " { " + x.name + "InternalLogic(" + mockerParameterCalls + ");}\n";
+                var stateMutabilityText = original.stateMutability === "nonpayable" ? "" : original.stateMutability;
+                var internalLogic = "function " + x.name + "InternalLogic(" + exposedCallArguments + ") internal " + stateMutabilityText + " " + mockerReturnValues + " {\n";
+                sol.contents = solPrefix + exposedFunction + functionDefinition + MockablesGenTemplates.mockableFunctionBody(x.name, storageParametersFormatted, mockerParameterCalls) + internalLogic + solSuffix;
                 var mockerReturn = Globals.commafiy(Belt_Array.map(x.returnValues, (function (y) {
                             return "abi.decode(\"\",(" + convertASTTypeToSolType(y.type_) + "))";
                           })));
@@ -351,12 +384,20 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
         var modifiersAndOpener = sol.contents.substring(indexOfContractName + fileNameWithoutExtension.length | 0, indexOfContractBlock + 1 | 0);
         var suffix = sol.contents.substring(indexOfContractBlock + 1 | 0);
         sol.contents = MockablesGenTemplates.mockingFileTemplate(prefix, fileNameWithoutExtension, modifiersAndOpener, suffix);
-        Fs.writeFileSync("../contracts/contracts/testing/generated/" + fileNameWithoutExtension + "Mockable.sol", sol.contents, "utf8");
-        Fs.writeFileSync("../contracts/contracts/testing/generated/" + fileNameWithoutExtension + "ForInternalMocking.sol", mockLogger.contents, "utf8");
+        var outputDirectory = "../contracts/contracts/testing/generated";
+        if (!Fs.existsSync(outputDirectory)) {
+          Fs.mkdirSync(outputDirectory, {
+                recursive: true
+              });
+        }
+        Fs.writeFileSync(outputDirectory + "/" + fileNameWithoutExtension + "Mockable.sol", sol.contents, "utf8");
+        Fs.writeFileSync(outputDirectory + "/" + fileNameWithoutExtension + "ForInternalMocking.sol", mockLogger.contents, "utf8");
         var existingModuleDef = Belt_Array.some(abisToMockExternally, (function (x) {
                 return x === fileNameWithoutExtension;
               })) ? Belt_Option.getExn(Belt_HashMapString.get(bindingsDict, fileNameWithoutExtension)) : "";
-        return Belt_HashMapString.set(bindingsDict, fileNameWithoutExtension, existingModuleDef + "\n\n" + SmockableGen.internalModule(Belt_Array.concat(functions(contractDefinition.nodes), modifiers(contractDefinition.nodes)), fileNameWithoutExtension));
+        return Belt_HashMapString.set(bindingsDict, fileNameWithoutExtension, existingModuleDef + "\n\n" + SmockableGen.internalModule(Belt_Array.concat(Belt_Array.map(functions(contractDefinition.nodes), (function (param) {
+                                  return param[0];
+                                })), modifiers(contractDefinition.nodes)), fileNameWithoutExtension));
       }));
 
 Belt_HashMapString.forEach(bindingsDict, (function (key, val) {
@@ -377,6 +418,7 @@ exports.contains = contains;
 exports.containsRe = containsRe;
 exports.commafiy = commafiy;
 exports.abisToMockExternally = abisToMockExternally;
+exports.convertASTTypeToSolTypeSimple = convertASTTypeToSolTypeSimple;
 exports.convertASTTypeToSolType = convertASTTypeToSolType;
 exports.nodeToTypedIdentifier = nodeToTypedIdentifier;
 exports.functions = functions;
@@ -384,6 +426,7 @@ exports.modifiers = modifiers;
 exports.lineCommentsRe = lineCommentsRe;
 exports.blockCommentsRe = blockCommentsRe;
 exports.getContractArtifact = getContractArtifact;
+exports.getContractAst = getContractAst;
 exports.BadMatchingBlock = BadMatchingBlock;
 exports.matchingBlockEndIndex = matchingBlockEndIndex;
 exports.importRe = importRe;
