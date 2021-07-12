@@ -40,4 +40,3 @@ test-waffle/library/smock/*
 !test-waffle/library/smock/.gitkeep
 
 contracts/testing/generated/*
-!contracts/testing/generated/.gitkeep
