@@ -9,17 +9,20 @@ function EcosystemPartners(Props) {
             }, React.createElement("div", {
                   className: "w-full mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-center"
                 }, React.createElement("img", {
-                      className: "w-24 mx-2",
+                      className: "h-12 mx-2",
                       src: "/img/partners/polygon.png"
                     }), React.createElement("img", {
-                      className: "w-24 mx-2",
+                      className: "h-12 mx-2",
                       src: "/img/partners/aave.png"
                     }), React.createElement("img", {
-                      className: "w-24 mx-2",
+                      className: "h-12 mx-2",
                       src: "/img/partners/chainlink.png"
                     }), React.createElement("img", {
-                      className: "w-24 mx-2",
+                      className: "h-12 mx-2",
                       src: "/img/partners/thegraph.png"
+                    }), React.createElement("img", {
+                      className: "h-12 mx-2",
+                      src: "/img/partners/poap.svg"
                     })));
 }
 

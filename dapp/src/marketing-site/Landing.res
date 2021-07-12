@@ -17,40 +17,7 @@ let make = () => {
               {"Peer-to-peer synthetic assets"->React.string}
             </h1>
           </div>
-          <nav className="text-3xl font-vt323">
-            <div className="mx-auto">
-              <Link href="#how-it-works">
-                <div className="flex items-center hover:bg-white">
-                  <span className="text-2xl animate-pulse"> {">"->React.string} </span>
-                  <a className="px-3"> {`How it works`->React.string} </a>
-                </div>
-              </Link>
-              <Link href="#roadmap">
-                <div className="flex items-center hover:bg-white">
-                  <span className="text-2xl animate-pulse"> {">"->React.string} </span>
-                  <a className="px-3"> {`Roadmap`->React.string} </a>
-                </div>
-              </Link>
-              <Link href="#team">
-                <div className="flex items-center hover:bg-white">
-                  <span className="text-2xl animate-pulse"> {">"->React.string} </span>
-                  <a className="px-3"> {`Team`->React.string} </a>
-                </div>
-              </Link>
-              <Link href="#governance">
-                <div className="flex items-center hover:bg-white">
-                  <span className="text-2xl animate-pulse"> {">"->React.string} </span>
-                  <a className="px-3"> {`Governance`->React.string} </a>
-                </div>
-              </Link>
-              <Link href="#security">
-                <div className="flex items-center hover:bg-white">
-                  <span className="text-2xl animate-pulse"> {">"->React.string} </span>
-                  <a className="px-3"> {`Security`->React.string} </a>
-                </div>
-              </Link>
-            </div>
-          </nav>
+          <LandingNav />
         </div>
       </div>
     </div>

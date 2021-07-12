@@ -2,7 +2,7 @@
 'use strict';
 
 var React = require("react");
-var Link = require("next/link").default;
+var LandingNav = require("./components/LandingNav.js");
 var EcosystemPartners = require("./EcosystemPartners.js");
 
 function Landing(Props) {
@@ -23,62 +23,13 @@ function Landing(Props) {
                                       src: "/img/float-capital-logo-sq-center.svg"
                                     })), React.createElement("h1", {
                                   className: "text-2xl font-vt323 font-extrabold text-center"
-                                }, "Peer-to-peer synthetic assets")), React.createElement("nav", {
-                              className: "text-3xl font-vt323"
-                            }, React.createElement("div", {
-                                  className: "mx-auto"
-                                }, React.createElement(Link, {
-                                      href: "#how-it-works",
-                                      children: React.createElement("div", {
-                                            className: "flex items-center hover:bg-white"
-                                          }, React.createElement("span", {
-                                                className: "text-2xl animate-pulse"
-                                              }, ">"), React.createElement("a", {
-                                                className: "px-3"
-                                              }, "How it works"))
-                                    }), React.createElement(Link, {
-                                      href: "#roadmap",
-                                      children: React.createElement("div", {
-                                            className: "flex items-center hover:bg-white"
-                                          }, React.createElement("span", {
-                                                className: "text-2xl animate-pulse"
-                                              }, ">"), React.createElement("a", {
-                                                className: "px-3"
-                                              }, "Roadmap"))
-                                    }), React.createElement(Link, {
-                                      href: "#team",
-                                      children: React.createElement("div", {
-                                            className: "flex items-center hover:bg-white"
-                                          }, React.createElement("span", {
-                                                className: "text-2xl animate-pulse"
-                                              }, ">"), React.createElement("a", {
-                                                className: "px-3"
-                                              }, "Team"))
-                                    }), React.createElement(Link, {
-                                      href: "#governance",
-                                      children: React.createElement("div", {
-                                            className: "flex items-center hover:bg-white"
-                                          }, React.createElement("span", {
-                                                className: "text-2xl animate-pulse"
-                                              }, ">"), React.createElement("a", {
-                                                className: "px-3"
-                                              }, "Governance"))
-                                    }), React.createElement(Link, {
-                                      href: "#security",
-                                      children: React.createElement("div", {
-                                            className: "flex items-center hover:bg-white"
-                                          }, React.createElement("span", {
-                                                className: "text-2xl animate-pulse"
-                                              }, ">"), React.createElement("a", {
-                                                className: "px-3"
-                                              }, "Security"))
-                                    })))))), React.createElement(EcosystemPartners.make, {}));
+                                }, "Peer-to-peer synthetic assets")), React.createElement(LandingNav.make, {})))), React.createElement(EcosystemPartners.make, {}));
 }
 
-var Link$1;
+var Link;
 
 var make = Landing;
 
-exports.Link = Link$1;
+exports.Link = Link;
 exports.make = make;
 /* react Not a pure module */
