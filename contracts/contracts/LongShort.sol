@@ -76,7 +76,6 @@ contract LongShort is ILongShort, Initializable {
         address staker
     );
 
-    // TODO: make sure this is emmited for batched actions too!
     event SystemStateUpdated(
         uint32 marketIndex,
         uint256 updateIndex,
@@ -92,10 +91,11 @@ contract LongShort is ILongShort, Initializable {
         address longTokenAddress,
         address shortTokenAddress,
         address paymentToken,
-        uint256 assetPrice,
+        uint256 initialAssetPrice,
         string name,
         string symbol,
-        address oracleAddress
+        address oracleAddress,
+        address yieldManagerAddress
     );
 
     event PriceUpdate(
@@ -286,7 +286,8 @@ contract LongShort is ILongShort, Initializable {
             assetPrice[latestMarket],
             syntheticName,
             syntheticSymbol,
-            _oracleManager
+            _oracleManager,
+            _yieldManager
         );
     }
 
@@ -326,7 +327,7 @@ contract LongShort is ILongShort, Initializable {
         int256 balanceIncentiveCurveEquilibriumOffset
     ) external adminOnly {
         require(!marketExists[marketIndex], "already initialized");
-        require(marketIndex <= latestMarket, "index too high");
+        require(marketIndex <= latestMarket, "index too highh");
 
         marketExists[marketIndex] = true;
 
@@ -449,7 +450,8 @@ contract LongShort is ILongShort, Initializable {
             imbalance = longValue - shortValue;
         }
 
-        uint256 marketTreasurySplitSlopE18 = 1e18; // This slope can be adjusted.
+        // This gradient/slope can be adjusted, it is in base 10^18
+        uint256 marketTreasurySplitSlopE18 = 1e18;
 
         uint256 marketPercentCalculatedE18 = (imbalance *
             marketTreasurySplitSlopE18) / totalValueLockedInMarket;

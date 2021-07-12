@@ -1,0 +1,21 @@
+{
+  "name": "system-update-bot",
+  "package-specs": [
+    {
+      "module": "commonjs",
+      "in-source": true
+    }
+  ],
+  "refmt": 3,
+  "sources": [
+    {
+      "dir": "src/res",
+      "subdirs": true
+    }
+  ],
+  "suffix": ".bs.js",
+  "bs-dependencies": [],
+  "bsc-flags": [
+    "-open Belt"
+  ]
+}

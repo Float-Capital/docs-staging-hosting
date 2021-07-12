@@ -3,7 +3,7 @@
 
 
 function mockableFunctionBody(functionName, storageParameters, mockerParameterCalls) {
-  return "\nif(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + functionName + "\"))){\n  " + storageParameters + "\n  return mocker." + functionName + "Mock(" + mockerParameterCalls + ");\n}\n";
+  return "\nif(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + functionName + "\"))){\n  " + storageParameters + "\n  return mocker." + functionName + "Mock(" + mockerParameterCalls + ");\n} else {\n  return " + functionName + "InternalLogic(" + mockerParameterCalls + ");\n}\n}\n";
 }
 
 function externalMockerFunctionBody(functionName, mockerArguments, mockerReturnValues, mockerReturn) {
@@ -19,7 +19,7 @@ function externalMockerModifierBody(functionName, mockerArguments) {
 }
 
 function internalMockingFileTemplate(fileNameWithoutExtension, parentImports, contractBody) {
-  return "// SPDX-License-Identifier: BUSL-1.1 \n pragma solidity 0.8.3;\n\nimport \"./" + fileNameWithoutExtension + "Mockable.sol\"\n\n" + parentImports + "\n\ncontract " + fileNameWithoutExtension + "ForInternalMocking {\n  " + contractBody + "\n}";
+  return "// SPDX-License-Identifier: BUSL-1.1 \n pragma solidity 0.8.3;\n\nimport \"./" + fileNameWithoutExtension + "Mockable.sol\";\n\n" + parentImports + "\n\ncontract " + fileNameWithoutExtension + "ForInternalMocking {\n  " + contractBody + "\n}";
 }
 
 function mockingFileTemplate(prefix, fileNameWithoutExtension, modifiersAndOpener, suffix) {

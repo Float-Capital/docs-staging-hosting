@@ -6,8 +6,8 @@
   "scripts": {
     "compile": "hardhat compile",
     "truffle-compile": "truffle compile --all",
-    "test": "hardhat test",
-    "test-waffle": "yarn generate-test-contracts; WAFFLE_TEST='true' hardhat test",
+    "test": "hardhat test # You need to run 'yarn generate-all' before this command - but alas, truffle tests will be removed soon",
+    "test-waffle": "yarn generate-all; WAFFLE_TEST='true' hardhat test",
     "test-waffle-compiled": "WAFFLE_TEST='true' hardhat test",
     "test-unit-compiled": "DONT_RUN_INTEGRATION_TESTS='true' yarn test-waffle-compiled",
     "test-integration-compiled": "DONT_RUN_UNIT_TESTS='true' yarn test-waffle-compiled",
@@ -21,17 +21,21 @@
     "res:build": "rescript",
     "res:start": "rescript build -w",
     "clean": "rm -rf build/contracts/* artifacts cache",
+    "lint-contracts": "solhint 'contracts/**/*.sol' --fix",
+    "format-contracts": "prettier --write 'contracts/**/*.sol'",
     "hardhat": "hardhat",
     "save-deployment": "/bin/bash -c 'mkdir -p ./buildsDeployed/deployed; \\cp ./build/contracts/{FloatCapital_v0,FloatToken,LongShort,Migrations,Staker,TokenFactory,Treasury_v0,Dai}.json ./buildsDeployed/deployed/'",
     "prepair-upgrade": "npm run clean; mkdir -p ./build/contracts; cp -r ./buildsDeployed/deployed/* ./build/contracts/; npm run truffle-compile",
     "verify-contracts": "truffle run verify FloatToken LongShort@$LONGSHORT_IMPLEMENTATION Staker@$STAKER_IMPLEMENTATION FloatCapital_v0@$TREASURY_IMPLEMENTATIONTreasury_v0@$FLOAT_CAPITAL_IMPLEMENTATION FloatToken TokenFactory --network $NETWORK",
     "update-testnet-contracts": "yarn prepair-upgrade; rm -f .openzeppelin/unknown-{97,1337}.json; truffle migrate --network binanceTest --reset; mv .openzeppelin/unknown-1337.json .openzeppelin/unknown-97.json; yarn save-deployment",
     "generate-contract-interfaces": "yarn compile; node ../scripts/src/AbiInterfaceGen.bs.js; rescript format -all",
-    "generate-test-contracts": "mkdir -p codegen; cp -r contracts codegen; rm -rf codegen/contracts/testing; yarn truffle compile --contracts_directory codegen --contracts_build_directory codegen/truffle; node ../scripts/src/MockablesGen.bs.js; rescript format -all;"
+    "generate-test-contracts": "mkdir -p codegen; cp -r contracts/testing/* codegen && rm -R contracts/testing/*;yarn compile --force --quiet; mv codegen/*Exposed.sol contracts/testing; node ../scripts/src/MockablesGen.bs.js; rescript format -all;",
+    "generate-all": "yarn generate-test-contracts; yarn compile; node ../scripts/src/AbiInterfaceGen.bs.js; yarn res:build;"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.1.7",
     "@eth-optimism/smock": "^1.1.6",
+    "@float-capital/solidity-coverage": "^0.7.17",
     "@nomiclabs/ethereumjs-vm": "^4.2.2",
     "@nomiclabs/hardhat-truffle5": "^2.0.0",
     "@nomiclabs/hardhat-web3": "^2.0.0",
@@ -43,8 +47,7 @@
     "chai": "^4.3.4",
     "ethers": "^5.4.1",
     "hardhat": "^2.4.1",
-    "hardhat-gas-reporter": "^1.0.4",
-    "@float-capital/solidity-coverage": "^0.7.17"
+    "hardhat-gas-reporter": "^1.0.4"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
@@ -57,7 +60,10 @@
     "ethereum-waffle": "^3.3.0",
     "hardhat-abi-exporter": "^2.2.1",
     "hardhat-spdx-license-identifier": "^2.0.3",
+    "prettier": "^2.3.2",
+    "prettier-plugin-solidity": "^1.0.0-beta.15",
     "rescript": "^9.1.4",
+    "solhint": "^3.3.6",
     "truffle": "^5.3.0",
     "truffle-plugin-verify": "^0.5.10"
   }
