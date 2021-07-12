@@ -65,23 +65,30 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - StakerV1
+        - BalanceIncentiveEquilibriumOffsetUpdated
+        - BalanceIncentiveExponentUpdated
         - FloatMinted
+        - FloatPercentageUpdated
         - MarketAddedToStaker
         - MarketLaunchIncentiveParametersChanges
         - StakeAdded
+        - StakeWithdrawalFeeUpdated
         - StakeWithdrawn
+        - StakerV1
         - StateAdded
-        - FloatPercentageUpdated
       abis:
         - name: Staker
           file: ./abis/Staker.json
       eventHandlers:
-        - event: StakerV1(address,uint256)
-          handler: handleStakerV1
+        - event: BalanceIncentiveEquilibriumOffsetUpdated(uint32,int256)
+          handler: handleBalanceIncentiveEquilibriumOffsetUpdated
+        - event: BalanceIncentiveExponentUpdated(uint32,uint256)
+          handler: handleBalanceIncentiveExponentUpdated
         - event: FloatMinted(address,uint32,uint256,uint256,uint256)
           handler: handleFloatMinted
-        - event: MarketAddedToStaker(uint32,uint256)
+        - event: FloatPercentageUpdated(uint256)
+          handler: handleFloatPercentageUpdated
+        - event: MarketAddedToStaker(uint32,uint256,uint256,uint256,uint256,int256)
           handler: handleMarketAddedToStaker
         - event: MarketLaunchIncentiveParametersChanges(uint32,uint256,uint256)
           handler: handleMarketLaunchIncentiveParametersChanges
@@ -91,10 +98,10 @@ dataSources:
           handler: handleStakeWithdrawalFeeUpdated
         - event: StakeWithdrawn(address,address,uint256)
           handler: handleStakeWithdrawn
+        - event: StakerV1(address,uint256)
+          handler: handleStakerV1
         - event: StateAdded(uint32,uint256,uint256,uint256)
           handler: handleStateAdded
-        - event: FloatPercentageUpdated(uint256)
-          handler: handleFloatPercentageUpdated
       file: ./src/staker.ts
 
 templates:

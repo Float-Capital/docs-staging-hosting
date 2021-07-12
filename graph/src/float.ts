@@ -18,7 +18,7 @@ import {
   TokenFactory,
   LongShortContract,
   SyntheticToken,
-  CollateralToken,
+  PaymentToken,
   LatestPrice,
   Price,
   LatestUnderlyingPrice,
@@ -35,7 +35,7 @@ import {
   createSyntheticTokenLong,
   createSyntheticTokenShort,
   createInitialSystemState,
-  updateOrCreateCollateralToken,
+  updateOrCreatePaymentToken,
   getOrCreateGlobalState,
   getStakerStateId,
   getUser,
@@ -326,11 +326,11 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.settledNextPriceActions = [];
 
   // create new synthetic token object.
-  let collateralToken = updateOrCreateCollateralToken(
-    collateralTokenAddress,
+  let paymentTokenEntity = updateOrCreatePaymentToken(
+    paymentToken,
     syntheticMarket
   );
-  syntheticMarket.collateralToken = collateralToken.id;
+  syntheticMarket.paymentToken = paymentTokenEntity.id;
 
   let globalState = GlobalState.load(GLOBAL_STATE_ID);
   if (globalState == null) {
@@ -358,7 +358,7 @@ export function handleSyntheticTokenCreated(
     ZERO,
     event
   );
-  collateralToken.save();
+  paymentTokenEntity.save();
   initalLatestStakerState.save();
   longToken.save();
   shortToken.save();
@@ -485,18 +485,18 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
   userNextPriceAction.save();
   batchedNextPriceExec.save();
 
-  let collateralToken = CollateralToken.load(syntheticMarket.collateralToken);
-  if (collateralToken == null) {
+  let paymentToken = PaymentToken.load(syntheticMarket.paymentToken);
+  if (paymentToken == null) {
     log.critical(
-      "collateralToken is undefined when it shouldn't be, entity id: {}",
-      [syntheticMarket.collateralToken]
+      "paymentToken is undefined when it shouldn't be, entity id: {}",
+      [syntheticMarket.paymentToken]
     );
   }
 
   decreaseOrCreateUserApprovals(
     userAddress,
     event.params.depositAdded,
-    collateralToken,
+    paymentToken,
     event
   );
 
