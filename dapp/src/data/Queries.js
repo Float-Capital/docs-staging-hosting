@@ -2694,43 +2694,39 @@ var LatestPrice = {
 var Raw$30 = {};
 
 var query$30 = (require("@apollo/client").gql`
-  query ($marketIndex: Int!)  {
-    oracles(where: {marketIndex: $marketIndex})  {
+  query ($marketIndex: String!)  {
+    underlyingPrices(where: {market: $marketIndex}, first: 1, orderBy: timeUpdated, orderDirection: desc)  {
       __typename
-      id
-      lastUpdatedTimestamp
+      timeUpdated
     }
   }
 `);
 
 function parse$30(value) {
-  var value$1 = value.oracles;
+  var value$1 = value.underlyingPrices;
   return {
-          oracles: value$1.map(function (value) {
+          underlyingPrices: value$1.map(function (value) {
                 return {
                         __typename: value.__typename,
-                        id: value.id,
-                        lastUpdatedTimestamp: GqlConverters.$$BigInt.parse(value.lastUpdatedTimestamp)
+                        timeUpdated: GqlConverters.$$BigInt.parse(value.timeUpdated)
                       };
               })
         };
 }
 
 function serialize$30(value) {
-  var value$1 = value.oracles;
-  var oracles = value$1.map(function (value) {
-        var value$1 = value.lastUpdatedTimestamp;
+  var value$1 = value.underlyingPrices;
+  var underlyingPrices = value$1.map(function (value) {
+        var value$1 = value.timeUpdated;
         var value$2 = GqlConverters.$$BigInt.serialize(value$1);
-        var value$3 = value.id;
-        var value$4 = value.__typename;
+        var value$3 = value.__typename;
         return {
-                __typename: value$4,
-                id: value$3,
-                lastUpdatedTimestamp: value$2
+                __typename: value$3,
+                timeUpdated: value$2
               };
       });
   return {
-          oracles: oracles
+          underlyingPrices: underlyingPrices
         };
 }
 

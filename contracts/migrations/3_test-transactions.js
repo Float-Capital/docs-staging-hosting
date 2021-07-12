@@ -10,9 +10,6 @@ const SyntheticToken = artifacts.require("SyntheticToken");
 const YieldManagerMock = artifacts.require("YieldManagerMock");
 const OracleManagerMock = artifacts.require("OracleManagerMock");
 const YieldManagerAave = artifacts.require("YieldManagerAave");
-const OracleManagerEthKillerChainlink = artifacts.require(
-  "OracleManagerEthKillerChainlink"
-);
 const OracleManagerEthKillerChainlinkTestnet = artifacts.require(
   "OracleManagerEthKillerChainlinkTestnet"
 );
@@ -287,7 +284,7 @@ module.exports = async function (deployer, network, accounts) {
     ) {
       verifyString += ` YieldManagerAave@${await longShort.yieldManagers(
         marketIndex
-      )} OracleManagerEthKillerChainlinkTestnet@${await longShort.oracleManagers(
+      )} OracleManagerEthKillerChainlinkTestnetTestnet@${await longShort.oracleManagers(
         marketIndex
       )} SyntheticToken@${await longShort.syntheticTokens(
         marketIndex,

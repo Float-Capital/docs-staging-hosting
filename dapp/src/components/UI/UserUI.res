@@ -368,10 +368,10 @@ module UserPendingBox = {
     ~rerenderCallback,
   ) => {
     let lastOracleTimestamp = DataHooks.useOracleLastUpdate(
-      ~marketIndex=marketIndex->Ethers.BigNumber.toNumber,
+      ~marketIndex=marketIndex->Ethers.BigNumber.toString,
     )
 
-    let oracleHeartbeatForMarket = 1200 //TODO
+    let oracleHeartbeatForMarket = 60 //TODO
 
     switch lastOracleTimestamp {
     | Response(lastOracleUpdateTimestamp) =>

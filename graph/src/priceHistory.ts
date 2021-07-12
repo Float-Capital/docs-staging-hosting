@@ -196,6 +196,11 @@ export function handleBlock(block: ethereum.Block): void {
   let state = getOrCreateGlobalState();
   let timestamp = block.timestamp;
 
+  // To make this subgraph a bit more efficient (hacky interim solution) only run on every 6th block (every 12 seconds)
+  if (block.number.toI32() % 6 != 0) {
+    return;
+  }
+
   let allOracles = state.oracles;
   for (let i = 0; i < allOracles.length; ++i) {
     let currentOracleId = allOracles[i];

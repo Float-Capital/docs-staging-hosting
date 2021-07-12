@@ -15,5 +15,7 @@ lib/
 
 .graphql_ppx_cache
 
+src/contractAddresses.json
+
 # Private code for scratchpad/testing
 *jasoonsPrivate*
