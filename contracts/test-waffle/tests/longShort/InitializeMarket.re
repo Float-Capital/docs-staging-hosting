@@ -1,5 +1,6 @@
 open LetOps;
 open Mocha;
+open Globals;
 
 let testUnit =
     (
@@ -53,6 +54,8 @@ let testUnit =
               ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
               ~unstakeFeeBasisPoints=Ethers.BigNumber.fromInt(50),
               ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
+              ~balanceIncentiveCurveExponent=bnFromInt(5),
+              ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
             );
 
         let stakerCalls =
@@ -67,6 +70,8 @@ let testUnit =
             shortToken: sampleAddress,
             kPeriod: Ethers.BigNumber.fromUnsafe("4"),
             unstakeFeeBasisPoints: Ethers.BigNumber.fromInt(50),
+            balanceIncentiveCurveExponent: bnFromInt(5),
+            balanceIncentiveCurveEquilibriumOffset: bnFromInt(0),
           },
         );
 
@@ -107,6 +112,8 @@ let testUnit =
                 ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
                 ~unstakeFeeBasisPoints=Ethers.BigNumber.fromInt(50),
                 ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
+                ~balanceIncentiveCurveExponent=bnFromInt(5),
+                ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
               ),
         );
       ();
@@ -127,6 +134,8 @@ let testUnit =
                 ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
                 ~unstakeFeeBasisPoints=Ethers.BigNumber.fromInt(50),
                 ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
+                ~balanceIncentiveCurveExponent=bnFromInt(5),
+                ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
               ),
         );
       ();
@@ -153,6 +162,8 @@ let testIntegration =
               ~unstakeFeeBasisPoints=
                 Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
               ~initialMarketSeed=CONSTANTS.oneBn,
+              ~balanceIncentiveCurveExponent=bnFromInt(5),
+              ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
             ),
         ~reason="index too high",
       );
@@ -172,6 +183,8 @@ let testIntegration =
             ~kPeriod=CONSTANTS.oneBn,
             ~unstakeFeeBasisPoints=Ethers.BigNumber.fromInt(50),
             ~initialMarketSeed=CONSTANTS.oneBn,
+            ~balanceIncentiveCurveExponent=bnFromInt(5),
+            ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
           ),
         ~reason="already initialized",
       );
@@ -202,6 +215,8 @@ let testIntegration =
             ~kPeriod=CONSTANTS.oneBn,
             ~unstakeFeeBasisPoints=Ethers.BigNumber.fromInt(50),
             ~initialMarketSeed=CONSTANTS.oneBn,
+            ~balanceIncentiveCurveExponent=bnFromInt(5),
+            ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
           ),
         ~reason="Insufficient market seed",
       );

@@ -126,3 +126,5 @@ let expectHexEqual: (
   ~hex1: string,
   ~hex2: string,
 ) => JsPromise.t<unit> = %raw(`(hex1, hex2) => expect(hex1).to.be.hexEqual(hex2)`)
+
+let expectTrue: bool => unit = %raw(`(value) => expect(value).to.be.true`)

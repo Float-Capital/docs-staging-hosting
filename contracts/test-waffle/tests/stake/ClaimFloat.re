@@ -159,7 +159,6 @@ let test =
 
       describe("case market has no float to mint", () => {
         // still calls calculateAccumulatedFloat but unwieldy to test
-
         it("doesn't mutate userIndexOfLastClaimed", () => {
           let%Await lastClaimed =
             contracts^.staker

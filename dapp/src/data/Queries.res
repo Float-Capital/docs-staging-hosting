@@ -32,7 +32,11 @@ fragment LatestSynthPrice on LatestPrice {
 fragment LatestSystemStateBasic on SystemState {
   totalLockedLong
   totalLockedShort
-  syntheticPrice
+  underlyingPrice {
+    price {
+      price
+    }
+  }
 }
 
 # Used in:

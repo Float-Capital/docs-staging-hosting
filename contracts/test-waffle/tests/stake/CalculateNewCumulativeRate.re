@@ -39,7 +39,7 @@ let test =
 
       let {staker} = contracts^;
 
-      StakerSmocked.InternalMock.mockCalculateFloatPerSecondToReturn(
+      StakerSmocked.InternalMock.mock_calculateFloatPerSecondToReturn(
         longFloatPerSecond,
         shortFloatPerSecond,
       );
@@ -99,7 +99,7 @@ let test =
 
     it("calls calculateFloatPerSecond with correct arguments", () => {
       let call =
-        StakerSmocked.InternalMock.calculateFloatPerSecondCalls()
+        StakerSmocked.InternalMock._calculateFloatPerSecondCalls()
         ->Array.getExn(0);
 
       call->Chai.recordEqualFlat({
