@@ -363,9 +363,8 @@ query ($intervalId: String!) @ppxConfig(schema: "graphql_schema_price_history.js
   }
 }`)
 module OraclesLastUpdate = %graphql(`
-query ($marketIndex: Int!) @ppxConfig(schema: "graphql_schema_price_history.json") {  
-  oracles (where: {marketIndex: $marketIndex}){
-    id
-		lastUpdatedTimestamp
+query ($marketIndex: String!) {  
+  underlyingPrices (where: {market: $marketIndex}, first: 1, orderBy: timeUpdated, orderDirection: desc) {
+    timeUpdated
   }
 }`)

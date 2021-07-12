@@ -481,6 +481,7 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
     syntheticMarket,
     user
   );
+  userNextPriceAction.confirmedTimestamp = event.block.timestamp;
 
   userNextPriceAction.save();
   batchedNextPriceExec.save();
@@ -543,6 +544,7 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
     syntheticMarket,
     user
   );
+  userNextPriceAction.confirmedTimestamp = event.block.timestamp;
 
   userNextPriceAction.save();
   batchedNextPriceExec.save();
