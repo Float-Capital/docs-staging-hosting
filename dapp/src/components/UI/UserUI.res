@@ -300,7 +300,11 @@ module UserTokenBox = {
           name,
           symbol,
           oracleAddress,
-          latestSystemState: {totalLockedLong, totalLockedShort, syntheticPrice: oldAssetPrice},
+          latestSystemState: {
+            totalLockedLong,
+            totalLockedShort,
+            underlyingPrice: {price: {price: oldAssetPrice}},
+          },
         },
         latestPrice: {price: {price, timeUpdated: synthPriceUpdated}},
       },
@@ -430,7 +434,11 @@ module UserStakeBox = {
       tokenSupply,
       syntheticMarket: {
         oracleAddress,
-        latestSystemState: {totalLockedLong, totalLockedShort, syntheticPrice: oldAssetPrice},
+        latestSystemState: {
+          totalLockedLong,
+          totalLockedShort,
+          underlyingPrice: {price: {price: oldAssetPrice}},
+        },
       },
     } = syntheticToken
 

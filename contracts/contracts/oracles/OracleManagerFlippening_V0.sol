@@ -14,180 +14,174 @@ import "../interfaces/IOracleManager.sol";
   look towards using oracles for it. 
 */
 contract OracleManagerFlippening_V0 is IOracleManager {
-    address public admin; // This will likely be the Gnosis safe
+  address public admin; // This will likely be the Gnosis safe
 
-    int256 public ethDominance;
+  int256 public ethDominance;
 
-    uint256 public ethSupply; // 18 decimals
-    uint256 public btcSupply; // 8 decimals
+  uint256 public ethSupply; // 18 decimals
+  uint256 public btcSupply; // 8 decimals
 
-    uint256 public btcBlocksPerDay;
-    uint256 public ethBlocksPerDay;
+  uint256 public btcBlocksPerDay;
+  uint256 public ethBlocksPerDay;
 
-    uint256 public btcBlockReward; // 8 decimals
-    uint256 public ethBlockReward; // 18 decimals
+  uint256 public btcBlockReward; // 8 decimals
+  uint256 public ethBlockReward; // 18 decimals
 
-    uint256 public ethUnclesPerDay;
+  uint256 public ethUnclesPerDay;
 
-    // Eth has a variable uncle reward:
-    //       - https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1234.md,
-    // Source here says it's roughly 75%:
-    //       - https://docs.ethhub.io/ethereum-basics/monetary-policy/
-    // Might be worth also looking into just taking it as the mean of the possibilities
-    //         = sum from 1 to 7 of (8 - sumIndex) * blockReward / 8 / 7
+  // Eth has a variable uncle reward:
+  //       - https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1234.md,
+  // Source here says it's roughly 75%:
+  //       - https://docs.ethhub.io/ethereum-basics/monetary-policy/
+  // Might be worth also looking into just taking it as the mean of the possibilities
+  //         = sum from 1 to 7 of (8 - sumIndex) * blockReward / 8 / 7
 
-    uint256 public ethUncleReward; // 18 decimals
+  uint256 public ethUncleReward; // 18 decimals
 
-    uint256 public ethNephewReward; // 18 decimals. currently = blockReward / 32
+  uint256 public ethNephewReward; // 18 decimals. currently = blockReward / 32
 
-    uint256 lastUpdated;
+  uint256 lastUpdated;
 
-    // Oracle addresses
-    AggregatorV3Interface public btcOracle;
-    AggregatorV3Interface public ethOracle;
+  // Oracle addresses
+  AggregatorV3Interface public btcOracle;
+  AggregatorV3Interface public ethOracle;
 
-    ////////////////////////////////////
-    /////////// MODIFIERS //////////////
-    ////////////////////////////////////
+  ////////////////////////////////////
+  /////////// MODIFIERS //////////////
+  ////////////////////////////////////
 
-    modifier adminOnly() {
-        require(msg.sender == admin);
-        _;
-    }
+  modifier adminOnly() {
+    require(msg.sender == admin);
+    _;
+  }
 
-    ////////////////////////////////////
-    ///// CONTRACT SET-UP //////////////
-    ////////////////////////////////////
+  ////////////////////////////////////
+  ///// CONTRACT SET-UP //////////////
+  ////////////////////////////////////
 
-    constructor(
-        address _admin,
-        address _btcOracle,
-        address _ethOracle,
-        uint256 _ethSupply,
-        uint256 _btcSupply,
-        uint256 _btcBlocksPerDay,
-        uint256 _ethBlocksPerDay,
-        uint256 _ethUnclesPerDay,
-        uint256 _btcBlockReward,
-        uint256 _ethBlockReward,
-        uint256 _ethUncleReward,
-        uint256 _ethNephewReward
-    ) {
-        admin = _admin;
+  constructor(
+    address _admin,
+    address _btcOracle,
+    address _ethOracle,
+    uint256 _ethSupply,
+    uint256 _btcSupply,
+    uint256 _btcBlocksPerDay,
+    uint256 _ethBlocksPerDay,
+    uint256 _ethUnclesPerDay,
+    uint256 _btcBlockReward,
+    uint256 _ethBlockReward,
+    uint256 _ethUncleReward,
+    uint256 _ethNephewReward
+  ) {
+    admin = _admin;
 
-        btcOracle = AggregatorV3Interface(_btcOracle);
-        ethOracle = AggregatorV3Interface(_ethOracle);
+    btcOracle = AggregatorV3Interface(_btcOracle);
+    ethOracle = AggregatorV3Interface(_ethOracle);
 
-        ethSupply = _ethSupply;
-        btcSupply = _btcSupply;
+    ethSupply = _ethSupply;
+    btcSupply = _btcSupply;
 
-        btcBlocksPerDay = _btcBlocksPerDay;
+    btcBlocksPerDay = _btcBlocksPerDay;
 
-        ethBlocksPerDay = _ethBlocksPerDay;
-        ethUnclesPerDay = _ethUnclesPerDay;
+    ethBlocksPerDay = _ethBlocksPerDay;
+    ethUnclesPerDay = _ethUnclesPerDay;
 
-        btcBlockReward = _btcBlockReward;
+    btcBlockReward = _btcBlockReward;
 
-        ethBlockReward = _ethBlockReward;
-        ethUncleReward = _ethUncleReward;
-        ethNephewReward = _ethNephewReward;
+    ethBlockReward = _ethBlockReward;
+    ethUncleReward = _ethUncleReward;
+    ethNephewReward = _ethNephewReward;
 
-        lastUpdated = block.timestamp;
+    lastUpdated = block.timestamp;
 
-        _updatePrice();
-    }
+    _updatePrice();
+  }
 
-    ////////////////////////////////////
-    /// MULTISIG ADMIN FUNCTIONS ///////
-    ////////////////////////////////////
+  ////////////////////////////////////
+  /// MULTISIG ADMIN FUNCTIONS ///////
+  ////////////////////////////////////
 
-    function changeAdmin(address _admin) external adminOnly {
-        admin = _admin;
-    }
+  function changeAdmin(address _admin) external adminOnly {
+    admin = _admin;
+  }
 
-    function changeEthSupply(uint256 supply) external adminOnly {
-        ethSupply = supply;
-    }
+  function changeEthSupply(uint256 supply) external adminOnly {
+    ethSupply = supply;
+  }
 
-    function changeBtcSupply(uint256 supply) external adminOnly {
-        btcSupply = supply;
-    }
+  function changeBtcSupply(uint256 supply) external adminOnly {
+    btcSupply = supply;
+  }
 
-    function changeBtcBlocksPerDay(uint256 blocks) external adminOnly {
-        btcBlocksPerDay = blocks;
-    }
+  function changeBtcBlocksPerDay(uint256 blocks) external adminOnly {
+    btcBlocksPerDay = blocks;
+  }
 
-    function changeEthBlocksPerDay(uint256 blocks) external adminOnly {
-        ethBlocksPerDay = blocks;
-    }
+  function changeEthBlocksPerDay(uint256 blocks) external adminOnly {
+    ethBlocksPerDay = blocks;
+  }
 
-    function changeEthUnclesPerDay(uint256 uncles) external adminOnly {
-        ethUnclesPerDay = uncles;
-    }
+  function changeEthUnclesPerDay(uint256 uncles) external adminOnly {
+    ethUnclesPerDay = uncles;
+  }
 
-    function changeBtcBlockReward(uint256 reward) external adminOnly {
-        btcBlockReward = reward;
-    }
+  function changeBtcBlockReward(uint256 reward) external adminOnly {
+    btcBlockReward = reward;
+  }
 
-    function changeEthBlockReward(uint256 reward) external adminOnly {
-        ethBlockReward = reward;
-    }
+  function changeEthBlockReward(uint256 reward) external adminOnly {
+    ethBlockReward = reward;
+  }
 
-    function changeEthUncleReward(uint256 reward) external adminOnly {
-        ethUncleReward = reward;
-    }
+  function changeEthUncleReward(uint256 reward) external adminOnly {
+    ethUncleReward = reward;
+  }
 
-    function changeEthNephewReward(uint256 reward) external adminOnly {
-        ethNephewReward = reward;
-    }
+  function changeEthNephewReward(uint256 reward) external adminOnly {
+    ethNephewReward = reward;
+  }
 
-    ////////////////////////////////////
-    ///// IMPLEMENTATION ///////////////
-    ////////////////////////////////////
+  ////////////////////////////////////
+  ///// IMPLEMENTATION ///////////////
+  ////////////////////////////////////
 
-    function _getBtcSupply() internal view returns (uint256) {
-        return
-            btcSupply +
-            (((block.timestamp - lastUpdated) *
-                btcBlocksPerDay *
-                btcBlockReward) / (1 days));
-    }
+  function _getBtcSupply() internal view returns (uint256) {
+    return
+      btcSupply + (((block.timestamp - lastUpdated) * btcBlocksPerDay * btcBlockReward) / (1 days));
+  }
 
-    function _getEthSupply() internal view returns (uint256) {
-        return
-            ethSupply +
-            (((block.timestamp - lastUpdated) *
-                (ethBlocksPerDay *
-                    ethBlockReward +
-                    ethUnclesPerDay *
-                    (ethNephewReward + ethUncleReward))) / 1 days);
-    }
+  function _getEthSupply() internal view returns (uint256) {
+    return
+      ethSupply +
+      (((block.timestamp - lastUpdated) *
+        (ethBlocksPerDay * ethBlockReward + ethUnclesPerDay * (ethNephewReward + ethUncleReward))) /
+        1 days);
+  }
 
-    function _updatePrice() private returns (int256) {
-        (, int256 _ethPrice, , , ) = ethOracle.latestRoundData();
-        (, int256 _btcPrice, , , ) = btcOracle.latestRoundData();
-        ethSupply = _getEthSupply();
-        btcSupply = _getBtcSupply();
+  function _updatePrice() private returns (int256) {
+    (, int256 _ethPrice, , , ) = ethOracle.latestRoundData();
+    (, int256 _btcPrice, , , ) = btcOracle.latestRoundData();
+    ethSupply = _getEthSupply();
+    btcSupply = _getBtcSupply();
 
-        lastUpdated = block.timestamp;
+    lastUpdated = block.timestamp;
 
-        // ethSupply * ethPrice = 26 decimals
-        // btcSupply * btcPrice = 16 decimals
+    // ethSupply * ethPrice = 26 decimals
+    // btcSupply * btcPrice = 16 decimals
 
-        // 1e20 as 18 decimals but as %
-        ethDominance = int256(
-            (uint256(_ethPrice) * ethSupply * 1e20) /
-                (uint256(_btcPrice) * btcSupply * 1e10)
-        );
+    // 1e20 as 18 decimals but as %
+    ethDominance = int256(
+      (uint256(_ethPrice) * ethSupply * 1e20) / (uint256(_btcPrice) * btcSupply * 1e10)
+    );
 
-        return ethDominance;
-    }
+    return ethDominance;
+  }
 
-    function updatePrice() external override returns (int256) {
-        return _updatePrice();
-    }
+  function updatePrice() external override returns (int256) {
+    return _updatePrice();
+  }
 
-    function getLatestPrice() external view override returns (int256) {
-        return ethDominance;
-    }
+  function getLatestPrice() external view override returns (int256) {
+    return ethDominance;
+  }
 }

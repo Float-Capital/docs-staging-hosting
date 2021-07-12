@@ -119,7 +119,9 @@ const deployTestMarket = async (
     kInitialMultiplier,
     kPeriod,
     new BN("5000000000000000"), // 50 basis point unstake fee
-    new BN("1000000000000000000")
+    new BN("1000000000000000000"),
+    5,
+    0
   );
 };
 
@@ -211,7 +213,7 @@ const topupBalanceIfLow = async (from, to) => {
   }
 };
 
-module.exports = async function(deployer, network, accounts) {
+module.exports = async function (deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];

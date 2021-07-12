@@ -9,52 +9,52 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
  * Implementation of an OracleManager that fetches prices from a Chainlink aggregate price feed.
  */
 contract OracleManagerChainlink is IOracleManager {
-    // Admin addresses.
-    address public admin;
+  // Admin addresses.
+  address public admin;
 
-    // Global state.
-    AggregatorV3Interface public chainlinkOracle;
-    uint8 public oracleDecimals;
+  // Global state.
+  AggregatorV3Interface public chainlinkOracle;
+  uint8 public oracleDecimals;
 
-    ////////////////////////////////////
-    /////////// MODIFIERS //////////////
-    ////////////////////////////////////
+  ////////////////////////////////////
+  /////////// MODIFIERS //////////////
+  ////////////////////////////////////
 
-    modifier adminOnly() {
-        require(msg.sender == admin, "Not admin");
-        _;
-    }
+  modifier adminOnly() {
+    require(msg.sender == admin, "Not admin");
+    _;
+  }
 
-    ////////////////////////////////////
-    ///// CONTRACT SET-UP //////////////
-    ////////////////////////////////////
-    constructor(address _admin, address _chainLinkOracle) {
-        admin = _admin;
-        chainlinkOracle = AggregatorV3Interface(_chainLinkOracle);
-        oracleDecimals = chainlinkOracle.decimals();
-    }
+  ////////////////////////////////////
+  ///// CONTRACT SET-UP //////////////
+  ////////////////////////////////////
+  constructor(address _admin, address _chainLinkOracle) {
+    admin = _admin;
+    chainlinkOracle = AggregatorV3Interface(_chainLinkOracle);
+    oracleDecimals = chainlinkOracle.decimals();
+  }
 
-    ////////////////////////////////////
-    /// MULTISIG ADMIN FUNCTIONS ///////
-    ////////////////////////////////////
+  ////////////////////////////////////
+  /// MULTISIG ADMIN FUNCTIONS ///////
+  ////////////////////////////////////
 
-    function changeAdmin(address _admin) external adminOnly {
-        admin = _admin;
-    }
+  function changeAdmin(address _admin) external adminOnly {
+    admin = _admin;
+  }
 
-    ////////////////////////////////////
-    ///// IMPLEMENTATION ///////////////
-    ////////////////////////////////////
-    function _getLatestPrice() internal view returns (int256) {
-        (, int256 price, , , ) = chainlinkOracle.latestRoundData();
-        return price;
-    }
+  ////////////////////////////////////
+  ///// IMPLEMENTATION ///////////////
+  ////////////////////////////////////
+  function _getLatestPrice() internal view returns (int256) {
+    (, int256 price, , , ) = chainlinkOracle.latestRoundData();
+    return price;
+  }
 
-    function getLatestPrice() external view override returns (int256) {
-        return _getLatestPrice();
-    }
+  function getLatestPrice() external view override returns (int256) {
+    return _getLatestPrice();
+  }
 
-    function updatePrice() external override returns (int256) {
-        return _getLatestPrice();
-    }
+  function updatePrice() external override returns (int256) {
+    return _getLatestPrice();
+  }
 }

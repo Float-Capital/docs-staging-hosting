@@ -8,6 +8,8 @@ import {
   MarketAddedToStaker,
   StakeWithdrawalFeeUpdated,
   FloatPercentageUpdated,
+  BalanceIncentiveEquilibriumOffsetUpdated,
+  BalanceIncentiveExponentUpdated,
 } from "../generated/Staker/Staker";
 import { erc20 } from "../generated/templates";
 import {
@@ -456,6 +458,63 @@ export function handleFloatPercentageUpdated(
     [floatPercentage.toString()],
     ["floatPercentage"],
     ["uint256"],
+    [],
+    []
+  );
+}
+
+/*
+  event StakeWithdrawalFeeUpdated(uint32 marketIndex, uint256 stakeWithdralFee);
+  event BalanceIncentiveExponentUpdated(uint32 marketIndex, uint256 balanceIncentiveExponent);
+*/
+export function handleBalanceIncentiveEquilibriumOffsetUpdated(
+  event: BalanceIncentiveEquilibriumOffsetUpdated
+): void {
+  // TODO: update value in the graph!
+  let marketIndex = event.params.marketIndex;
+  let balanceIncentiveEquilibriumOffset =
+    event.params.balanceIncentiveEquilibriumOffset;
+
+  saveEventToStateChange(
+    event,
+    "BalanceIncentiveEquilibriumOffsetUpdated",
+    [marketIndex.toString(), balanceIncentiveEquilibriumOffset.toString()],
+    ["marketIndex", "balanceIncentiveEquilibriumOffset"],
+    ["uint32", "int256"],
+    [],
+    []
+  );
+}
+export function handleBalanceIncentiveExponentUpdated(
+  event: BalanceIncentiveExponentUpdated
+): void {
+  // TODO: update value in the graph!
+  let marketIndex = event.params.marketIndex;
+  let balanceIncentiveExponent = event.params.balanceIncentiveExponent;
+
+  saveEventToStateChange(
+    event,
+    "BalanceIncentiveExponentUpdated",
+    [marketIndex.toString(), balanceIncentiveExponent.toString()],
+    ["marketIndex", "balanceIncentiveExponent"],
+    ["uint32", "uint256"],
+    [],
+    []
+  );
+}
+export function handleStakeWithdrawalFeeUpdate(
+  event: StakeWithdrawalFeeUpdated
+): void {
+  // TODO: update value in the graph!
+  let marketIndex = event.params.marketIndex;
+  let stakeWithdralFee = event.params.stakeWithdralFee;
+
+  saveEventToStateChange(
+    event,
+    "StakeWithdrawalFeeUpdate",
+    [marketIndex.toString(), stakeWithdralFee.toString()],
+    ["marketIndex", "stakeWithdralFee"],
+    ["uint32", "uint256"],
     [],
     []
   );

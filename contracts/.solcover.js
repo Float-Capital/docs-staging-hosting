@@ -7,7 +7,7 @@ if (isWaffleTest) {
     !!process.env.DONT_RUN_INTEGRATION_TESTS && process.env.DONT_RUN_INTEGRATION_TESTS.toUpperCase() == "TRUE"
   let isIntegrationTests =
     !!process.env.DONT_RUN_UNIT_TESTS && process.env.DONT_RUN_UNIT_TESTS.toUpperCase() == "TRUE"
-  if (isUnitTests && isIntegrationTests) {
+  if (!isUnitTests && !isIntegrationTests) { // if it is neither then it is both (wierd logic but it works)
     coverageReportOutputDirectory = "coverage-all"
   } else if (isUnitTests) {
     coverageReportOutputDirectory = "coverage-unit"
