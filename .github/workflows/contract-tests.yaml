@@ -50,7 +50,20 @@ jobs:
         with:
           node-version: 14.16.0
 
-      - name: Cache dependencies
+      - name: Cache scripts node_modules
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ./scripts/node_modules
+          key: modules-${{ hashFiles('scripts/yarn.lock') }}
+
+      - name: install scripts packages
+        if: steps.cache.outputs.cache-hit != 'true'
+        id: install_node_packages
+        run: |
+          cd scripts && yarn
+
+      - name: Cache contract node_modules
         id: cache
         uses: actions/cache@v2
         with:
@@ -61,7 +74,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         id: install_node_packages
         run: |
-          cd contracts && yarn && yarn res:build
+          cd contracts && yarn
 
       - name: run contract tests
         id: run_contract_tests
