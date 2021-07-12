@@ -3,7 +3,7 @@
 
 
 function mockableFunctionBody(functionName, storageParameters, mockerParameterCalls) {
-  return "\nif(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + functionName + "\"))){\n  " + storageParameters + "\n  return mocker." + functionName + "Mock(" + mockerParameterCalls + ");\n}\n";
+  return "\nif(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + functionName + "\"))){\n  " + storageParameters + "\n  return mocker." + functionName + "Mock(" + mockerParameterCalls + ");\n} else {\n  return " + functionName + "InternalLogic(" + mockerParameterCalls + ");\n}\n}\n";
 }
 
 function externalMockerFunctionBody(functionName, mockerArguments, mockerReturnValues, mockerReturn) {

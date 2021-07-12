@@ -3,6 +3,9 @@ let mockableFunctionBody = (~functionName, ~storageParameters, ~mockerParameterC
 if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("${functionName}"))){
   ${storageParameters}
   return mocker.${functionName}Mock(${mockerParameterCalls});
+} else {
+  return ${functionName}InternalLogic(${mockerParameterCalls});
+}
 }
 `
 let externalMockerFunctionBody = (

@@ -33,3 +33,11 @@ coverage-integration
 
 abis
 ast
+
+test-waffle/library/contracts/*
+!test-waffle/library/contracts/.gitkeep
+test-waffle/library/smock/*
+!test-waffle/library/smock/.gitkeep
+
+contracts/testing/generated/*
+!contracts/testing/generated/.gitkeep

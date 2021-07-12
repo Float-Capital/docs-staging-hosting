@@ -35,6 +35,12 @@ let abisToMockExternally = [
   "OracleManagerMock",
 ]
 
+let convertASTTypeToSolTypeSimple = typeDescriptionStr => {
+  switch typeDescriptionStr {
+  | t if t->startsWith("contract ") => typeDescriptionStr->replaceByRe(%re("/contract\s+/g"), "")
+  | t => t
+  }
+}
 let convertASTTypeToSolType = typeDescriptionStr => {
   switch typeDescriptionStr {
   | "bool"
@@ -55,6 +61,7 @@ let nodeToTypedIdentifier: 'a => Globals.typedIdentifier = node => {
   name: node["name"],
   type_: node["typeDescriptions"]["typeString"],
   storageLocation: node["storageLocation"] == "storage" ? Storage : NotRelevant,
+  storageLocationString: node["storageLocation"],
 }
 
 let functions = nodeStatements => {
@@ -67,7 +74,7 @@ let functions = nodeStatements => {
       returnValues: x["returnParameters"]["parameters"]->Array.map(y => y->nodeToTypedIdentifier),
       visibility: x["visibility"] == "public" || x["visibility"] == "external" ? Public : Private,
     }
-    r
+    (r, x)
   })
 }
 
@@ -143,6 +150,7 @@ let parseAbiTypes = types =>
   types->Array.map(i => {
     let r: Globals.typedIdentifier = {
       storageLocation: NotRelevant,
+      storageLocationString: "callable",
       type_: i["internalType"],
       name: i["name"],
     }
@@ -229,12 +237,14 @@ filesToMockInternally->Array.forEach(filePath => {
 
   let mockLogger = ref("")
 
-  functions(contractDefinition["nodes"])->Array.forEach(x => {
+  functions(contractDefinition["nodes"])->Array.forEach(((x, original)) => {
     let indexOfOldFunctionDec = sol.contents->indexOf("function " ++ x.name ++ "(")
 
     let indexOfOldFunctionBodyStart = sol.contents->indexOfFrom("{", indexOfOldFunctionDec)
 
-    let solPrefix = sol.contents->substring(~from=0, ~to_=indexOfOldFunctionBodyStart + 1)
+    let solPrefix = sol.contents->substring(~from=0, ~to_=indexOfOldFunctionDec)
+    let functionDefinition =
+      sol.contents->substring(~from=indexOfOldFunctionDec, ~to_=indexOfOldFunctionBodyStart + 1)
 
     let solSuffix = sol.contents->substringToEnd(~from=indexOfOldFunctionBodyStart + 1)
 
@@ -264,14 +274,6 @@ filesToMockInternally->Array.forEach(filePath => {
         `
       )
       ->reduceStrArr
-    sol :=
-      solPrefix ++
-      mockableFunctionBody(
-        ~functionName=x.name,
-        ~storageParameters=storageParametersFormatted,
-        ~mockerParameterCalls,
-      ) ++
-      solSuffix
 
     let mockerReturnValues = switch x.returnValues {
     | arr if arr->Array.length > 0 =>
@@ -280,6 +282,37 @@ filesToMockInternally->Array.forEach(filePath => {
         ->commafiy})`
     | _ => ""
     }
+
+    let exposedCallArguments =
+      x.parameters
+      ->Array.map(x => {
+        let storageLocation = x.storageLocationString == "default" ? "" : x.storageLocationString
+        `${x.type_->convertASTTypeToSolTypeSimple} ${storageLocation} ${x.name}`
+      })
+      ->commafiy
+    let exposedFunction = switch x.visibility {
+    | Public =>
+      `function ${x.name}Exposed(${exposedCallArguments}) external ${mockerReturnValues} { ${x.name}InternalLogic(${mockerParameterCalls});}
+`
+    | Private => ""
+    }
+    let stateMutabilityText =
+      original["stateMutability"] == "nonpayable" ? "" : original["stateMutability"]
+    let internalLogic = `function ${x.name}InternalLogic(${exposedCallArguments}) internal ${stateMutabilityText} ${mockerReturnValues} {
+`
+
+    sol :=
+      solPrefix ++
+      exposedFunction ++
+      functionDefinition ++
+      mockableFunctionBody(
+        ~functionName=x.name,
+        ~storageParameters=storageParametersFormatted,
+        ~mockerParameterCalls,
+      ) ++
+      internalLogic ++
+      solSuffix
+
     let mockerReturn =
       x.returnValues
       ->Array.map(y => "abi.decode(\"\",(" ++ y.type_->convertASTTypeToSolType ++ "))")
@@ -427,6 +460,7 @@ filesToMockInternally->Array.forEach(filePath => {
     existingModuleDef ++
     "\n\n" ++
     functions(contractDefinition["nodes"])
+    ->Array.map(((x, _)) => x)
     ->Array.concat(modifiers(contractDefinition["nodes"]))
     ->SmockableGen.internalModule(~contractName=fileNameWithoutExtension),
   )

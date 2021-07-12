@@ -42,6 +42,7 @@ type typedIdentifier = {
   name: string,
   type_: string,
   storageLocation: storageLocation,
+  storageLocationString: string,
 }
 type functionType = {
   name: string,
