@@ -325,7 +325,7 @@ contract LongShort is ILongShort, Initializable {
         uint256 initialMarketSeed
     ) external adminOnly {
         require(!marketExists[marketIndex], "already initialized");
-        require(marketIndex <= latestMarket, "index too high");
+        require(marketIndex <= latestMarket, "index too highh");
 
         marketExists[marketIndex] = true;
 
