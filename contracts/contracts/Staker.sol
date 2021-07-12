@@ -229,10 +229,10 @@ contract Staker is IStaker, Initializable {
     uint32 marketIndex,
     int256 _balanceIncentiveCurveEquilibriumOffset
   ) internal {
-    // Seems unreasonable that we would ever shift this more than 50% either way
+    // Unreasonable that we would ever shift this more than 90% either way
     require(
-      _balanceIncentiveCurveEquilibriumOffset > -5e17 &&
-        _balanceIncentiveCurveEquilibriumOffset < 5e17,
+      _balanceIncentiveCurveEquilibriumOffset > -9e17 &&
+        _balanceIncentiveCurveEquilibriumOffset < 9e17,
       "balanceIncentiveCurveEquilibriumOffset out of bounds"
     );
 
@@ -357,6 +357,7 @@ contract Staker is IStaker, Initializable {
    * value has a fixed decimal scale of 1e42 (!!!) for numerical stability.
    * The return values are float per second per synthetic token (hence the
    * requirement to multiply by price)
+   *  -- here is the graph of the curve used: https://www.desmos.com/calculator/vg7jlmn4mn
    */
   function _calculateFloatPerSecond(
     uint32 marketIndex,

@@ -25,14 +25,8 @@ let test =
     ) => {
   let marketIndex = 1;
 
-  let (kVal, longPrice, shortPrice, value1, value2) =
+  let (kVal, longPrice, shortPrice, randomValueLocked1, randomValueLocked2) =
     Helpers.Tuple.make5(Helpers.randomTokenAmount);
-
-  // let kVal = bnFromString("2000000000000000000"); // 2e18
-  // let longPrice = bnFromString("10000000000000000000"); // 1e19
-  // let shortPrice = bnFromString("15000000000000000000"); // 1.5e19
-  // let value1 = bnFromString("8841300250000000000000000"); // 8.8e24
-  // let value2 = bnFromString("12319741990000000000000000"); // 1.2e25
 
   describe("calculateFloatPerSecond", () => {
     let calculateFloatPerSecondPerPaymentTokenLocked =
@@ -46,12 +40,6 @@ let test =
         ) => {
       let overflowProtectionDivision = twoBn->pow(requiredBitShifting);
 
-      let numerator =
-        underBalancedSideValue
-        ->sub(equilibriumOffsetMarket)
-        ->div(overflowProtectionDivision)
-        ->mul(twoBn)
-        ->pow(exponent);
       let numerator =
         underBalancedSideValue
         ->sub(equilibriumOffsetMarket)
@@ -84,7 +72,7 @@ let test =
 
       let requiredBitShifting =
         getRequiredAmountOfBitShiftForSafeExponentiation(
-          value1->add(value2),
+          randomValueLocked1->add(randomValueLocked2),
           balanceIncentiveCurveExponentFetched,
         );
 
@@ -159,8 +147,8 @@ let test =
         it("longValue > shortValue", () => {
           let%Await _ =
             testHelper(
-              ~longValue=value1->add(value2),
-              ~shortValue=value2,
+              ~longValue=randomValueLocked1->add(randomValueLocked2),
+              ~shortValue=randomValueLocked2,
               ~longPrice,
               ~shortPrice,
             );
@@ -169,8 +157,8 @@ let test =
         it("longValue < shortValue", () => {
           let%Await _ =
             testHelper(
-              ~longValue=value1,
-              ~shortValue=value1->add(value2),
+              ~longValue=randomValueLocked1,
+              ~shortValue=randomValueLocked1->add(randomValueLocked2),
               ~longPrice,
               ~shortPrice,
             );
@@ -190,8 +178,8 @@ let test =
             ~marketIndex,
             ~longPrice,
             ~shortPrice,
-            ~longValue=value1,
-            ~shortValue=value2,
+            ~longValue=randomValueLocked1,
+            ~shortValue=randomValueLocked2,
           );
 
       let call =
