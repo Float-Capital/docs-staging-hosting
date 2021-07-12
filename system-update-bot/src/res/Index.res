@@ -3,10 +3,13 @@ open Ethers
 
 let {config, secrets} = module(Config)
 
-let getAggregatorAddresses = (chainlinkOracleAddresses: array<ethAddress>, wallet: Wallet.t) => {
+let getAggregatorAddresses = (chainlinkOracleAddresses, wallet: Wallet.t) => {
   let signer = wallet->getSigner
   JsPromise.all(
-    chainlinkOracleAddresses->Array.map(address => {
+    chainlinkOracleAddresses
+    ->Js.Dict.keys
+    ->Array.map(addressString => {
+      let address = Ethers.Utils.getAddressUnsafe(addressString)
       let oracle = Oracle.make(~address, ~providerOrSigner=signer)
 
       open Oracle
@@ -34,7 +37,7 @@ let wallet: ref<Ethers.Wallet.t> = ref(None->Obj.magic)
 let provider: ref<Ethers.Providers.t> = ref(None->Obj.magic)
 let updateCounter: ref<int> = ref(0)
 
-let runUpdateSystemStateMulti = () => {
+let runUpdateSystemStateMulti = (~marketsToUpdate) => {
   updateCounter := updateCounter.contents + 1
   Js.log2("running update", updateCounter.contents)
 
@@ -51,7 +54,7 @@ let runUpdateSystemStateMulti = () => {
     )
 
     contract
-    ->LongShort.updateSystemStateMulti(~marketIndexes=[1, 2, 3], ~gasOptions=defaultOptions)
+    ->LongShort.updateSystemStateMulti(~marketIndexes=marketsToUpdate, ~gasOptions=defaultOptions)
     ->JsPromise.then(update => {
       Js.log2("submitted transaction", update.hash)
       update.wait(.)
@@ -84,7 +87,8 @@ let setup = () => {
     wallet := unconnectedWallet->Wallet.connect(_provider)
 
     Js.log("Initial update system state")
-    runUpdateSystemStateMulti()
+    // TODO: only update markets that aren't up-to-date already
+    runUpdateSystemStateMulti(~marketsToUpdate=config.defaultMarkets)
   })
   ->JsPromise.then(_ => {
     Js.log("-------------------------")
@@ -100,12 +104,15 @@ let setup = () => {
       }
 
       provider.contents->Providers.on(filter, _ => {
-        Js.log(
-          `Price updated for oracle ${config.chainlinkOracleAddresses
-            ->Array.getUnsafe(index)
-            ->ethAdrToStr}`,
-        )
-        let _ = runUpdateSystemStateMulti()
+        let updatedOracleAddress =
+          config.chainlinkOracleAddresses->Js.Dict.keys->Array.getUnsafe(index)
+        let linkedMarketIds = (
+          config.chainlinkOracleAddresses->Js.Dict.unsafeGet(updatedOracleAddress)
+        ).linkedMarketIds
+
+        Js.log(`Price updated for oracle ${updatedOracleAddress}`)
+
+        let _ = runUpdateSystemStateMulti(~marketsToUpdate=linkedMarketIds)
       })
     })
     Js.log("Listening for new answers.")

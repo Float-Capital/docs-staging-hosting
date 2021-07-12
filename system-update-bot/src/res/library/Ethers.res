@@ -100,6 +100,9 @@ module Utils = {
 
   @module("ethers") @scope("utils")
   external id: string => string = "id"
+
+  @module("ethers") @scope("utils")
+  external getAddressUnsafe: string => ethAddress = "getAddress"
 }
 
 module Contract = {
