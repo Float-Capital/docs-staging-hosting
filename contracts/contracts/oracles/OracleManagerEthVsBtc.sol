@@ -11,69 +11,67 @@ import "../interfaces/IOracleManager.sol";
   Contract that gives price ration of ETH/BTC
 */
 contract OracleManagerEthVsBtc is IOracleManager {
-    address public admin; // This will likely be the Gnosis safe
+  address public admin; // This will likely be the Gnosis safe
 
-    int256 public ethDominance;
+  int256 public ethDominance;
 
-    // Oracle addresses
-    AggregatorV3Interface public btcOracle;
-    AggregatorV3Interface public ethOracle;
+  // Oracle addresses
+  AggregatorV3Interface public btcOracle;
+  AggregatorV3Interface public ethOracle;
 
-    ////////////////////////////////////
-    /////////// MODIFIERS //////////////
-    ////////////////////////////////////
+  ////////////////////////////////////
+  /////////// MODIFIERS //////////////
+  ////////////////////////////////////
 
-    modifier adminOnly() {
-        require(msg.sender == admin);
-        _;
-    }
+  modifier adminOnly() {
+    require(msg.sender == admin);
+    _;
+  }
 
-    ////////////////////////////////////
-    ///// CONTRACT SET-UP //////////////
-    ////////////////////////////////////
+  ////////////////////////////////////
+  ///// CONTRACT SET-UP //////////////
+  ////////////////////////////////////
 
-    constructor(
-        address _admin,
-        address _btcOracle,
-        address _ethOracle
-    ) {
-        admin = _admin;
+  constructor(
+    address _admin,
+    address _btcOracle,
+    address _ethOracle
+  ) {
+    admin = _admin;
 
-        btcOracle = AggregatorV3Interface(_btcOracle);
-        ethOracle = AggregatorV3Interface(_ethOracle);
+    btcOracle = AggregatorV3Interface(_btcOracle);
+    ethOracle = AggregatorV3Interface(_ethOracle);
 
-        _updatePrice();
-    }
+    _updatePrice();
+  }
 
-    ////////////////////////////////////
-    /// MULTISIG ADMIN FUNCTIONS ///////
-    ////////////////////////////////////
+  ////////////////////////////////////
+  /// MULTISIG ADMIN FUNCTIONS ///////
+  ////////////////////////////////////
 
-    function changeAdmin(address _admin) external adminOnly {
-        admin = _admin;
-    }
+  function changeAdmin(address _admin) external adminOnly {
+    admin = _admin;
+  }
 
-    ////////////////////////////////////
-    ///// IMPLEMENTATION ///////////////
-    ////////////////////////////////////
+  ////////////////////////////////////
+  ///// IMPLEMENTATION ///////////////
+  ////////////////////////////////////
 
-    function _updatePrice() private returns (int256) {
-        (, int256 _ethPrice, , , ) = ethOracle.latestRoundData();
-        (, int256 _btcPrice, , , ) = btcOracle.latestRoundData();
+  function _updatePrice() private returns (int256) {
+    (, int256 _ethPrice, , , ) = ethOracle.latestRoundData();
+    (, int256 _btcPrice, , , ) = btcOracle.latestRoundData();
 
-        // 1e20 as 18 decimals but as %
-        ethDominance = int256(
-            (uint256(_ethPrice) * 1e20) / (uint256(_btcPrice))
-        );
+    // 1e20 as 18 decimals but as %
+    ethDominance = int256((uint256(_ethPrice) * 1e20) / (uint256(_btcPrice)));
 
-        return ethDominance;
-    }
+    return ethDominance;
+  }
 
-    function updatePrice() external override returns (int256) {
-        return _updatePrice();
-    }
+  function updatePrice() external override returns (int256) {
+    return _updatePrice();
+  }
 
-    function getLatestPrice() external view override returns (int256) {
-        return ethDominance;
-    }
+  function getLatestPrice() external view override returns (int256) {
+    return ethDominance;
+  }
 }
