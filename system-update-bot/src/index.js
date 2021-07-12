@@ -74,7 +74,8 @@ const runUpdateSystemStateMultiContinuous = async () => {
     console.log("Fail safe try catch");
     console.log(e);
   }
-  await sleep(15000);
+  // Run every 63 seconds (max update time is 60 seconds so give some leway for network latency etc etc)
+  await sleep(63000);
 
   // recursive call
   runUpdateSystemStateMultiContinuous();
