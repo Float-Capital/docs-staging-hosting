@@ -21,6 +21,8 @@
     "res:build": "rescript",
     "res:start": "rescript build -w",
     "clean": "rm -rf build/contracts/* artifacts cache",
+    "lint-contracts": "solhint 'contracts/**/*.sol' --fix",
+    "format-contracts": "prettier --write 'contracts/**/*.sol'",
     "hardhat": "hardhat",
     "save-deployment": "/bin/bash -c 'mkdir -p ./buildsDeployed/deployed; \\cp ./build/contracts/{FloatCapital_v0,FloatToken,LongShort,Migrations,Staker,TokenFactory,Treasury_v0,Dai}.json ./buildsDeployed/deployed/'",
     "prepair-upgrade": "npm run clean; mkdir -p ./build/contracts; cp -r ./buildsDeployed/deployed/* ./build/contracts/; npm run truffle-compile",
@@ -32,6 +34,7 @@
   "dependencies": {
     "@chainlink/contracts": "^0.1.7",
     "@eth-optimism/smock": "^1.1.6",
+    "@float-capital/solidity-coverage": "^0.7.17",
     "@nomiclabs/ethereumjs-vm": "^4.2.2",
     "@nomiclabs/hardhat-truffle5": "^2.0.0",
     "@nomiclabs/hardhat-web3": "^2.0.0",
@@ -43,8 +46,7 @@
     "chai": "^4.3.4",
     "ethers": "^5.4.1",
     "hardhat": "^2.4.1",
-    "hardhat-gas-reporter": "^1.0.4",
-    "@float-capital/solidity-coverage": "^0.7.17"
+    "hardhat-gas-reporter": "^1.0.4"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
@@ -57,7 +59,10 @@
     "ethereum-waffle": "^3.3.0",
     "hardhat-abi-exporter": "^2.2.1",
     "hardhat-spdx-license-identifier": "^2.0.3",
+    "prettier": "^2.3.2",
+    "prettier-plugin-solidity": "^1.0.0-beta.15",
     "rescript": "^9.1.4",
+    "solhint": "^3.3.6",
     "truffle": "^5.3.0",
     "truffle-plugin-verify": "^0.5.10"
   }
