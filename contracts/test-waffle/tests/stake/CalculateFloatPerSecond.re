@@ -94,7 +94,7 @@ let test =
 
       let%Await result =
         contracts^.staker
-        ->Staker.Exposed.calculateFloatPerSecondExposedCall(
+        ->Staker.Exposed._calculateFloatPerSecondExposed(
             ~marketIndex,
             ~longPrice,
             ~shortPrice,
@@ -174,7 +174,7 @@ let test =
 
       let%Await result =
         contracts^.staker
-        ->Staker.Exposed.calculateFloatPerSecondExposedCall(
+        ->Staker.Exposed._calculateFloatPerSecondExposed(
             ~marketIndex,
             ~longPrice,
             ~shortPrice,
@@ -190,13 +190,14 @@ let test =
       Chai.expectRevertNoReason(
         ~transaction=
           contracts^.staker
-          ->Staker.Exposed.calculateFloatPerSecondExposed(
+          ->Staker.Exposed._calculateFloatPerSecondExposed(
               ~marketIndex,
               ~longPrice=CONSTANTS.zeroBn,
               ~shortPrice=CONSTANTS.zeroBn,
               ~longValue=CONSTANTS.zeroBn,
               ~shortValue=CONSTANTS.zeroBn,
-            ),
+            )
+          ->Obj.magic,
       )
     });
   });

@@ -44,7 +44,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           ~newUserAmountStakedShort,
         );
       let%Await floatDue =
-        staker->Staker.Exposed.calculateAccumulatedFloatExposedCall(
+        staker->Staker.Exposed.calculateAccumulatedFloatExposed(
           ~marketIndex,
           ~user,
         );
@@ -104,7 +104,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             ~newUserAmountStakedShort,
           );
         let%Await floatDue =
-          staker->Staker.Exposed.calculateAccumulatedFloatExposedCall(
+          staker->Staker.Exposed.calculateAccumulatedFloatExposed(
             ~marketIndex,
             ~user,
           );
@@ -148,10 +148,12 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           );
         Chai.expectRevertNoReason(
           ~transaction=
-            staker->Staker.Exposed.calculateAccumulatedFloatExposed(
-              ~marketIndex,
-              ~user,
-            ),
+            staker
+            ->Staker.Exposed.calculateAccumulatedFloatExposed(
+                ~marketIndex,
+                ~user,
+              )
+            ->Obj.magic,
         );
       },
     );
@@ -181,7 +183,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           ~newUserAmountStakedShort=Ethers.BigNumber.fromInt(0),
         );
       let%Await floatDue =
-        staker->Staker.Exposed.calculateAccumulatedFloatExposedCall(
+        staker->Staker.Exposed.calculateAccumulatedFloatExposed(
           ~marketIndex,
           ~user,
         );
