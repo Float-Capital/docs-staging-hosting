@@ -12,8 +12,6 @@ let test =
     let floatTokenSmockedRef: ref(FloatTokenSmocked.t) =
       ref(None->Obj.magic);
 
-    let stakerRef: ref(Staker.t) = ref(None->Obj.magic);
-
     let floatCapitalAddressRef: ref(Ethers.ethAddress) =
       ref(CONSTANTS.zeroAddress);
 
@@ -24,13 +22,13 @@ let test =
 
     before_once'(() => {
       let%Await _ =
-        stakerRef->deployAndSetupStakerToUnitTest(
+        deployAndSetupStakerToUnitTest(
           ~functionName="_mintFloat",
           ~contracts,
           ~accounts,
         );
 
-      let staker = stakerRef^;
+      let staker = contracts^.staker;
 
       floatCapitalAddressRef := contracts^.floatCapital_v0.address;
 
@@ -57,7 +55,7 @@ let test =
     );
 
     it(
-      "calls mint on floatTokens for floatCapital for amount (floatToMint * floatPercentage) / 10000",
+      "calls mint on floatTokens for floatCapital for amount (floatToMint * floatPercentage) / 1e18",
       () =>
       (floatTokenSmockedRef^)
       ->FloatTokenSmocked.mintCalls
@@ -66,8 +64,8 @@ let test =
           _to: floatCapitalAddressRef^,
           amount:
             floatToMint
-            ->Ethers.BigNumber.mul(floatPercentage->Ethers.BigNumber.fromInt)
-            ->Ethers.BigNumber.div(10000->Ethers.BigNumber.fromInt),
+            ->mul(floatPercentage->bnFromInt)
+            ->div(CONSTANTS.tenToThe18),
         })
     );
   });

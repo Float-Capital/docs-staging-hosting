@@ -10,8 +10,8 @@ const SyntheticToken = artifacts.require("SyntheticToken");
 const YieldManagerMock = artifacts.require("YieldManagerMock");
 const OracleManagerMock = artifacts.require("OracleManagerMock");
 const YieldManagerAave = artifacts.require("YieldManagerAave");
-const OracleManagerEthKillerChainlink = artifacts.require(
-  "OracleManagerEthKillerChainlink"
+const OracleManagerEthKillerChainlinkTestnet = artifacts.require(
+  "OracleManagerEthKillerChainlinkTestnet"
 );
 
 const mumbaiDaiAddress = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
@@ -51,11 +51,12 @@ const deployTestMarket = async (
   // We mock out the oracle manager unless we're on Mumbai testnet.
   let oracleManager;
   if (networkName == "mumbai") {
-    oracleManager = await OracleManagerEthKillerChainlink.new(
+    oracleManager = await OracleManagerEthKillerChainlinkTestnet.new(
       admin,
       testnetChainlinkDaiUsdAddress,
       testnetChainlinkEthUsdAddress,
-      testnetChainlinkMaticUsdAddress
+      testnetChainlinkMaticUsdAddress,
+      60
     );
   } else {
     oracleManager = await OracleManagerMock.new(admin);
@@ -114,7 +115,10 @@ const deployTestMarket = async (
     currentMarketIndex,
     kInitialMultiplier,
     kPeriod,
-    new BN("1000000000000000000")
+    new BN("5000000000000000"), // 50 basis point unstake fee
+    new BN("1000000000000000000"),
+    5,
+    0
   );
 };
 
@@ -206,7 +210,7 @@ const topupBalanceIfLow = async (from, to) => {
   }
 };
 
-module.exports = async function(deployer, network, accounts) {
+module.exports = async function (deployer, network, accounts) {
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
@@ -260,8 +264,8 @@ module.exports = async function(deployer, network, accounts) {
   );
 
   await deployTestMarket(
-    "Gold",
-    "GOLD",
+    "Doge Market",
+    "FL_DOGE",
     longShort,
     treasury,
     admin,
@@ -280,7 +284,7 @@ module.exports = async function(deployer, network, accounts) {
     ) {
       verifyString += ` YieldManagerAave@${await longShort.yieldManagers(
         marketIndex
-      )} OracleManagerEthKiller@${await longShort.oracleManagers(
+      )} OracleManagerEthKillerChainlinkTestnetTestnet@${await longShort.oracleManagers(
         marketIndex
       )} SyntheticToken@${await longShort.syntheticTokens(
         marketIndex,

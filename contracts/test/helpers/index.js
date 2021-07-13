@@ -73,6 +73,7 @@ const initialize = async (admin) => {
     longShort.address,
     floatToken.address,
     floatCapital.address,
+    "250000000000000000", // 25%
     {
       from: admin,
     }
@@ -92,7 +93,7 @@ const createSynthetic = async (
   longShort,
   syntheticName,
   syntheticSymbol,
-  treasury,
+  treasury
 ) => {
   const fundToken = await erc20.new({
     from: admin,
@@ -143,7 +144,10 @@ const createSynthetic = async (
     currentMarketIndex,
     kInitialMultiplier,
     kPeriod,
+    "5000000000000000", //50 basis points unstake fee
     "500000000000000000",
+    "5",
+    0,
     { from: admin }
   );
 

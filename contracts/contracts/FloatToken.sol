@@ -16,29 +16,29 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinte
 import "./interfaces/IFloatToken.sol";
 
 contract FloatToken is IFloatToken, ERC20PresetMinterPauserUpgradeable {
-    function initialize3(
-        string calldata name,
-        string calldata symbol,
-        address stakerAddress
-    ) public initializer {
-        initialize(name, symbol);
+  function initialize3(
+    string calldata name,
+    string calldata symbol,
+    address stakerAddress
+  ) public initializer {
+    initialize(name, symbol);
 
-        _setupRole(DEFAULT_ADMIN_ROLE, stakerAddress);
-        _setupRole(MINTER_ROLE, stakerAddress);
-        _setupRole(PAUSER_ROLE, stakerAddress);
+    _setupRole(DEFAULT_ADMIN_ROLE, stakerAddress);
+    _setupRole(MINTER_ROLE, stakerAddress);
+    _setupRole(PAUSER_ROLE, stakerAddress);
 
-        renounceRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        renounceRole(MINTER_ROLE, msg.sender);
-        renounceRole(PAUSER_ROLE, msg.sender);
-    }
+    renounceRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    renounceRole(MINTER_ROLE, msg.sender);
+    renounceRole(PAUSER_ROLE, msg.sender);
+  }
 
-    ///////////////////////////////////////////////////////////////////////////////
-    ///////// FUNCTIONS INHERITED BY ERC20PresetMinterPauserUpgradeable ///////////
-    ///////////////////////////////////////////////////////////////////////////////
-    function mint(address to, uint256 amount)
-        public
-        override(IFloatToken, ERC20PresetMinterPauserUpgradeable)
-    {
-        ERC20PresetMinterPauserUpgradeable.mint(to, amount);
-    }
+  ///////////////////////////////////////////////////////////////////////////////
+  ///////// FUNCTIONS INHERITED BY ERC20PresetMinterPauserUpgradeable ///////////
+  ///////////////////////////////////////////////////////////////////////////////
+  function mint(address to, uint256 amount)
+    public
+    override(IFloatToken, ERC20PresetMinterPauserUpgradeable)
+  {
+    ERC20PresetMinterPauserUpgradeable.mint(to, amount);
+  }
 }

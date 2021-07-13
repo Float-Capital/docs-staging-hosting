@@ -7,7 +7,6 @@ let test =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  let stakerRef: ref(Staker.t) = ref(""->Obj.magic);
   let promiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
     ref(None->Obj.magic);
   let timestampRef: ref(Ethers.BigNumber.t) = ref(CONSTANTS.zeroBn);
@@ -17,7 +16,7 @@ let test =
   describe("addNewStateForFloatRewards", () => {
     let setup = (~timeDelta) => {
       let%AwaitThen _ =
-        stakerRef->deployAndSetupStakerToUnitTest(
+        deployAndSetupStakerToUnitTest(
           ~functionName="addNewStateForFloatRewards",
           ~contracts,
           ~accounts,
@@ -28,7 +27,7 @@ let test =
       let%Await {timestamp} = Helpers.getBlock();
       timestampRef := (timestamp + 1)->Ethers.BigNumber.fromInt; // one second per block
       promiseRef :=
-        (stakerRef^)
+        contracts^.staker
         ->Staker.addNewStateForFloatRewards(
             ~marketIndex,
             ~longPrice,

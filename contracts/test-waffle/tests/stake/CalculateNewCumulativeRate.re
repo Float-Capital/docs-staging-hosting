@@ -9,7 +9,6 @@ let test =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  let stakerRef: ref(Staker.t) = ref(""->Obj.magic);
   let marketIndex = Helpers.randomJsInteger();
 
   let (
@@ -21,7 +20,6 @@ let test =
     timeDelta,
   ) =
     Helpers.Tuple.make6(Helpers.randomInteger);
-
   let (longValue, shortValue, longPrice, shortPrice) =
     Helpers.Tuple.make4(Helpers.randomInteger);
 
@@ -33,16 +31,15 @@ let test =
       ref(None->Obj.magic);
     before_once'(() => {
       let%AwaitThen _ =
-        stakerRef->deployAndSetupStakerToUnitTest(
+        deployAndSetupStakerToUnitTest(
           ~functionName="calculateNewCumulativeRate",
           ~contracts,
           ~accounts,
         );
 
       let {staker} = contracts^;
-      stakerRef := staker;
 
-      StakerSmocked.InternalMock.mockCalculateFloatPerSecondToReturn(
+      StakerSmocked.InternalMock.mock_calculateFloatPerSecondToReturn(
         longFloatPerSecond,
         shortFloatPerSecond,
       );
@@ -50,23 +47,21 @@ let test =
       StakerSmocked.InternalMock.mockCalculateTimeDeltaToReturn(timeDelta);
 
       let%Await _ =
-        (stakerRef^)
-        ->Staker.Exposed.setCalculateNewCumulativeRateParams(
-            ~marketIndex,
-            ~latestRewardIndexForMarket,
-            ~accumFloatLong,
-            ~accumFloatShort,
-          );
+        staker->Staker.Exposed.setCalculateNewCumulativeRateParams(
+          ~marketIndex,
+          ~latestRewardIndexForMarket,
+          ~accumFloatLong,
+          ~accumFloatShort,
+        );
 
       promiseRef :=
-        (stakerRef^)
-        ->Staker.Exposed.calculateNewCumulativeRateExposed(
-            ~marketIndex,
-            ~longPrice,
-            ~shortPrice,
-            ~longValue,
-            ~shortValue,
-          );
+        staker->Staker.Exposed.calculateNewCumulativeRateExposed(
+          ~marketIndex,
+          ~longPrice,
+          ~shortPrice,
+          ~longValue,
+          ~shortValue,
+        );
       let%Await _ = promiseRef^;
       ();
     });
@@ -104,7 +99,7 @@ let test =
 
     it("calls calculateFloatPerSecond with correct arguments", () => {
       let call =
-        StakerSmocked.InternalMock.calculateFloatPerSecondCalls()
+        StakerSmocked.InternalMock._calculateFloatPerSecondCalls()
         ->Array.getExn(0);
 
       call->Chai.recordEqualFlat({

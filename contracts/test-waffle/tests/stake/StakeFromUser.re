@@ -9,8 +9,6 @@ let test =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("stakeFromUser", () => {
-    let stakerRef: ref(Staker.t) = ref(None->Obj.magic);
-
     let longShortSmockedRef: ref(LongShortSmocked.t) = ref(None->Obj.magic);
     let marketIndexForToken = Helpers.randomJsInteger();
 
@@ -20,7 +18,7 @@ let test =
 
     before_once'(() => {
       let%Await _ =
-        stakerRef->deployAndSetupStakerToUnitTest(
+        deployAndSetupStakerToUnitTest(
           ~functionName="stakeFromUser",
           ~contracts,
           ~accounts,
@@ -37,7 +35,7 @@ let test =
       mockTokenWalletRef := (accounts^)->Array.getExn(6);
 
       let%Await _ =
-        (stakerRef^)
+        contracts^.staker
         ->Staker.Exposed.setStakeFromUserParams(
             ~longshort=longShortSmocked.address,
             ~token=mockTokenWalletRef^.address,
@@ -47,7 +45,7 @@ let test =
       StakerSmocked.InternalMock.mockOnlyValidSyntheticToReturn();
       StakerSmocked.InternalMock.mock_stakeToReturn();
 
-      (stakerRef^)
+      contracts^.staker
       ->ContractHelpers.connect(~address=mockTokenWalletRef^)
       ->Staker.stakeFromUser(~from, ~amount);
     });

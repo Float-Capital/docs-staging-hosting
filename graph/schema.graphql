@@ -36,8 +36,20 @@ type Price @entity {
 }
 
 type LatestPrice @entity {
-  id: ID! # latestPrice-<marketIndex>-<long/short>
+  id: ID! # latestPrice-<marketIndex>-<underlying>
   price: Price!
+}
+
+type UnderlyingPrice @entity {
+  id: ID! # <marketIndex>-underlying-<timestamp>
+  price: BigInt!
+  timeUpdated: BigInt!
+  market: SyntheticMarket!
+}
+
+type LatestUnderlyingPrice @entity {
+  id: ID! # latestPrice-<marketIndex>-<underlying>
+  price: UnderlyingPrice!
 }
 
 type NextBatchedNextPriceExec @entity {
@@ -113,7 +125,7 @@ type SystemState @entity {
   txHash: Bytes!
   blockNumber: BigInt!
   marketIndex: BigInt!
-  syntheticPrice: BigInt! # TODO: this should be a reference to another entity that holds the price
+  underlyingPrice: LatestUnderlyingPrice!
   longTokenPrice: LatestPrice!
   shortTokenPrice: LatestPrice!
   longToken: SyntheticToken!
@@ -139,12 +151,12 @@ type Transfer implements GenericTransfer @entity {
   token: SyntheticToken!
 }
 
-type CollateralTransfer implements GenericTransfer @entity {
+type PaymentTokenTransfer implements GenericTransfer @entity {
   id: ID!
   from: String!
   to: String!
   value: BigInt!
-  token: CollateralToken!
+  token: PaymentToken!
 }
 
 enum MarketSide {
@@ -164,31 +176,31 @@ type SyntheticToken @entity {
   priceHistory: [Price!]!
 }
 
-type CollateralToken @entity {
+type PaymentToken @entity {
   id: ID! # token address
   linkedMarkets: [SyntheticMarket!]!
 }
 
 type TokenApproval @entity {
   id: ID! # userAddress-tokenAddress
-  collateralToken: CollateralToken!
+  paymentToken: PaymentToken!
   user: User!
   approvedInnacurate: BigInt!
   timestamp: BigInt!
 }
 
-type UserCollateralTokenApproval @entity {
+type UserPaymentTokenApproval @entity {
   id: ID! # userAddress-tokenAddress
   approvalsHistory: [TokenApproval!]!
   updateTimestamp: BigInt!
-  collateralToken: CollateralToken!
+  paymentToken: PaymentToken!
   currentApproval: TokenApproval!
 }
 
-type UserCollateralTokenBalance @entity {
+type UserPaymentTokenBalance @entity {
   id: ID! # token address - user address - "balance"
   timeLastUpdated: BigInt!
-  collateralToken: CollateralToken!
+  paymentToken: PaymentToken!
   user: User!
   balanceInaccurate: BigInt!
 }
@@ -198,7 +210,7 @@ type SyntheticMarket @entity {
   timestampCreated: BigInt!
   txHash: Bytes!
   blockNumberCreated: BigInt!
-  collateralToken: CollateralToken!
+  paymentToken: PaymentToken!
   name: String!
   symbol: String!
   marketIndex: BigInt!
@@ -226,9 +238,9 @@ type User @entity {
   currentStakes: [CurrentStake!]!
   stateChangesAffectingUser: [StateChange!]!
   tokenBalances: [UserSyntheticTokenBalance!]!
-  collatoralBalances: [UserCollateralTokenBalance!]!
+  collatoralBalances: [UserPaymentTokenBalance!]!
   tokenMints: [UserSyntheticTokenMinted!]!
-  collatoralTokenApprovals: [UserCollateralTokenApproval!]!
+  collatoralTokenApprovals: [UserPaymentTokenApproval!]!
   pendingNextPriceActions: [UserNextPriceAction!]!
   confirmedNextPriceActions: [UserNextPriceAction!]!
   settledNextPriceActions: [UserNextPriceAction!]!

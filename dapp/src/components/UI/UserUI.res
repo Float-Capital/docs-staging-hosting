@@ -300,7 +300,11 @@ module UserTokenBox = {
           name,
           symbol,
           oracleAddress,
-          latestSystemState: {totalLockedLong, totalLockedShort, syntheticPrice: oldAssetPrice},
+          latestSystemState: {
+            totalLockedLong,
+            totalLockedShort,
+            underlyingPrice: {price: {price: oldAssetPrice}},
+          },
         },
         latestPrice: {price: {price, timeUpdated: synthPriceUpdated}},
       },
@@ -364,10 +368,10 @@ module UserPendingBox = {
     ~rerenderCallback,
   ) => {
     let lastOracleTimestamp = DataHooks.useOracleLastUpdate(
-      ~marketIndex=marketIndex->Ethers.BigNumber.toNumber,
+      ~marketIndex=marketIndex->Ethers.BigNumber.toString,
     )
 
-    let oracleHeartbeatForMarket = 1200 //TODO
+    let oracleHeartbeatForMarket = 60 //TODO
 
     switch lastOracleTimestamp {
     | Response(lastOracleUpdateTimestamp) =>
@@ -430,7 +434,11 @@ module UserStakeBox = {
       tokenSupply,
       syntheticMarket: {
         oracleAddress,
-        latestSystemState: {totalLockedLong, totalLockedShort, syntheticPrice: oldAssetPrice},
+        latestSystemState: {
+          totalLockedLong,
+          totalLockedShort,
+          underlyingPrice: {price: {price: oldAssetPrice}},
+        },
       },
     } = syntheticToken
 

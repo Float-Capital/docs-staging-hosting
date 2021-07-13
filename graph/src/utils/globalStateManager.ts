@@ -8,11 +8,10 @@ import {
   UserSyntheticTokenBalance,
   LatestPrice,
   SyntheticMarket,
-  CollateralToken,
-  UserCollateralTokenBalance,
-  BatchedNextPriceExec,
-  NextBatchedNextPriceExec,
-  UserNextPriceAction,
+  PaymentToken,
+  UserPaymentTokenBalance,
+  UnderlyingPrice,
+  LatestUnderlyingPrice,
 } from "../../generated/schema";
 import { BigInt, Bytes, log, ethereum, Address } from "@graphprotocol/graph-ts";
 import {
@@ -40,6 +39,20 @@ function createInitialTokenPrice(
   return initialTokenPrice as Price;
 }
 
+function createInitialUnderlyingPrice(
+  id: string,
+  marketId: string,
+  initialPrice: BigInt,
+  timestamp: BigInt
+): UnderlyingPrice {
+  let initialUnderlyingPrice = new UnderlyingPrice(id);
+  initialUnderlyingPrice.price = initialPrice;
+  initialUnderlyingPrice.market = marketId;
+  initialUnderlyingPrice.timeUpdated = timestamp;
+
+  return initialUnderlyingPrice as UnderlyingPrice;
+}
+
 class InitialState {
   systemState: SystemState;
   tokenPriceLong: Price;
@@ -51,6 +64,7 @@ export function createInitialSystemState(
   marketIndex: BigInt,
   latestStateChangeCounter: BigInt,
   event: ethereum.Event,
+  initialAssetPrice: BigInt,
   longTokenId: string,
   shortTokenId: string
 ): InitialState {
@@ -59,6 +73,8 @@ export function createInitialSystemState(
   let timestamp = event.block.timestamp;
   let initialLongPriceId = marketIndexId + "-long-" + timestamp.toString();
   let initialShortPriceId = marketIndexId + "-short-" + timestamp.toString();
+  let initialUnderlyingAssetPriceId =
+    marketIndexId + "-underlying-" + timestamp.toString();
 
   let initialLongTokenPrice = createInitialTokenPrice(
     initialLongPriceId,
@@ -70,24 +86,39 @@ export function createInitialSystemState(
     shortTokenId,
     timestamp
   );
+  let initialUnderlyingAssetPrice = createInitialUnderlyingPrice(
+    initialUnderlyingAssetPriceId,
+    marketIndexId,
+    initialAssetPrice,
+    timestamp
+  );
   let longCurrentTokenPrice = new LatestPrice(
     "latestPrice-" + marketIndexId + "-long"
   );
   let shortCurrentTokenPrice = new LatestPrice(
     "latestPrice-" + marketIndexId + "-short"
   );
+  let underlyingAssetPrice = new LatestUnderlyingPrice(
+    "latestPrice-" + marketIndexId + "-underlying"
+  );
   longCurrentTokenPrice.price = initialLongTokenPrice.id;
   shortCurrentTokenPrice.price = initialShortTokenPrice.id;
+  underlyingAssetPrice.price = initialUnderlyingAssetPrice.id;
+
   initialLongTokenPrice.save();
   initialShortTokenPrice.save();
+  initialUnderlyingAssetPrice.save();
+
   longCurrentTokenPrice.save();
   shortCurrentTokenPrice.save();
+  underlyingAssetPrice.save();
+
   let latestSystemState = new SystemState(marketIndexId + "-" + systemStateId);
   latestSystemState.timestamp = event.block.timestamp;
   latestSystemState.txHash = event.transaction.hash;
   latestSystemState.blockNumber = event.block.number;
   latestSystemState.marketIndex = marketIndex;
-  latestSystemState.syntheticPrice = ZERO;
+  latestSystemState.underlyingPrice = underlyingAssetPrice.id;
   latestSystemState.longTokenPrice = longCurrentTokenPrice.id;
   latestSystemState.shortTokenPrice = shortCurrentTokenPrice.id;
   latestSystemState.totalLockedLong = ZERO;
@@ -134,7 +165,7 @@ export function getOrCreateLatestSystemState(
     latestSystemState.txHash = event.transaction.hash;
     latestSystemState.blockNumber = event.block.number;
     latestSystemState.marketIndex = marketIndex;
-    latestSystemState.syntheticPrice = prevSystemState.syntheticPrice;
+    latestSystemState.underlyingPrice = prevSystemState.underlyingPrice;
     latestSystemState.longTokenPrice = prevSystemState.longTokenPrice;
     latestSystemState.shortTokenPrice = prevSystemState.shortTokenPrice;
     latestSystemState.totalLockedLong = prevSystemState.totalLockedLong;
@@ -321,13 +352,13 @@ export function getOrCreateBalanceObject(
 export function getOrCreateCollatoralBalanceObject(
   tokenAddressString: string,
   userAddressString: string
-): UserCollateralTokenBalance {
-  let balance = UserCollateralTokenBalance.load(
+): UserPaymentTokenBalance {
+  let balance = UserPaymentTokenBalance.load(
     tokenAddressString + "-" + userAddressString + "-balance"
   );
 
   if (balance == null) {
-    let newBalance = new UserCollateralTokenBalance(
+    let newBalance = new UserPaymentTokenBalance(
       tokenAddressString + "-" + userAddressString + "-balance"
     );
 
@@ -337,40 +368,40 @@ export function getOrCreateCollatoralBalanceObject(
     }
     newBalance.user = user.id;
 
-    let token = CollateralToken.load(tokenAddressString);
+    let token = PaymentToken.load(tokenAddressString);
     if (token == null) {
       log.critical("Synthetic Token is undefined with address {}", [
         tokenAddressString,
       ]);
     }
-    newBalance.collateralToken = token.id;
+    newBalance.paymentToken = token.id;
 
     newBalance.balanceInaccurate = ZERO;
     newBalance.timeLastUpdated = ZERO;
 
     return newBalance;
   } else {
-    return balance as UserCollateralTokenBalance;
+    return balance as UserPaymentTokenBalance;
   }
 }
 
-export function updateOrCreateCollateralToken(
+export function updateOrCreatePaymentToken(
   tokenAddress: Address,
   syntheticMarket: SyntheticMarket
-): CollateralToken {
+): PaymentToken {
   let tokenAddressString = tokenAddress.toHex();
-  let collateralToken = CollateralToken.load(tokenAddressString);
-  if (collateralToken == null) {
-    collateralToken = new CollateralToken(tokenAddressString);
-    collateralToken.linkedMarkets = [];
+  let paymentToken = PaymentToken.load(tokenAddressString);
+  if (paymentToken == null) {
+    paymentToken = new PaymentToken(tokenAddressString);
+    paymentToken.linkedMarkets = [];
     createNewTokenDataSource(tokenAddress);
   }
 
-  collateralToken.linkedMarkets = collateralToken.linkedMarkets.concat([
+  paymentToken.linkedMarkets = paymentToken.linkedMarkets.concat([
     syntheticMarket.id,
   ]);
 
-  return collateralToken as CollateralToken;
+  return paymentToken as PaymentToken;
 }
 
 export function createSyntheticToken(tokenAddress: Bytes): SyntheticToken {

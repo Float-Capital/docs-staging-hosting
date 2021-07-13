@@ -33,9 +33,9 @@ let randomInteger = () => Js.Math.random_int(1, Js.Int.max)->Ethers.BigNumber.fr
 @ocaml.doc(`Generates a random JS integer between 0 and 2147483647 (max js int)`)
 let randomJsInteger = () => Js.Math.random_int(0, Js.Int.max)
 
-@ocaml.doc(`Generates random BigNumber between 0.00001 and 21474.83647 of a token (10^18 in BigNumber units)`)
+@ocaml.doc(`Generates random BigNumber between 0.01 and 21474836.47 of a token (10^18 in BigNumber units)`)
 let randomTokenAmount = () =>
-  randomInteger()->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("10000000000000"))
+  randomInteger()->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("10000000000000000"))
 
 type mint =
   | Long(Ethers.BigNumber.t)
@@ -100,7 +100,10 @@ let createSyntheticMarket = (
         ~marketIndex,
         ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("1000000000000000000"),
         ~kPeriod=Ethers.BigNumber.fromInt(0),
+        ~unstakeFeeBasisPoints=Ethers.BigNumber.fromInt(50),
         ~initialMarketSeed,
+        ~balanceIncentiveCurveExponent=bnFromInt(5),
+        ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
       )
     })
   })
@@ -180,6 +183,7 @@ let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
           ~longShortCoreContract=longShort.address,
           ~floatToken=floatToken.address,
           ~floatCapital=floatCapital.address,
+          ~floatPercentage=bnFromString("250000000000000000"),
         ),
       ))
       ->JsPromise.then(_ => {

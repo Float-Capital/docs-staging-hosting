@@ -20,8 +20,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
       accumulativeFloatPerTokenUserShort->add(Helpers.randomTokenAmount());
     let newUserAmountStakedShort = Helpers.randomTokenAmount();
 
-    it(
-      "[HAPPY] should correctly return the float tokens due for the user", () => {
+    it("[HAPPY] should correctly return the float tokens due for the user", () => {
       let {staker} = contracts.contents;
 
       // Value of these two isn't important, as long as `usersLatestClaimedReward` is less than `newLatestRewardIndex`

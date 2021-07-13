@@ -10,6 +10,7 @@
 
 // TO ADD A FILE TO THIS: add filepath relative to ../contracts/contracts here. e.g. mocks/YieldManagerMock.sol
 open Js.String2
+open MockablesGenTemplates
 
 let filesToMockInternally = ["LongShort.sol", "Staker.sol"]
 
@@ -34,6 +35,12 @@ let abisToMockExternally = [
   "OracleManagerMock",
 ]
 
+let convertASTTypeToSolTypeSimple = typeDescriptionStr => {
+  switch typeDescriptionStr {
+  | t if t->startsWith("contract ") => typeDescriptionStr->replaceByRe(%re("/contract\s+/g"), "")
+  | t => t
+  }
+}
 let convertASTTypeToSolType = typeDescriptionStr => {
   switch typeDescriptionStr {
   | "bool"
@@ -44,13 +51,9 @@ let convertASTTypeToSolType = typeDescriptionStr => {
   | t if t->startsWith("int") => typeDescriptionStr
   | t if t->startsWith("contract ") => typeDescriptionStr->replaceByRe(%re("/contract\s+/g"), "")
   | t if t->startsWith("enum ") => t->replaceByRe(%re("/enum\s+/g"), "")
-
   | t if t->startsWith("struct ") =>
     typeDescriptionStr->replaceByRe(%re("/struct\s+/g"), "") ++ " memory "
-  | _ => {
-      Js.log(typeDescriptionStr)
-      raise(ScriptDoesNotSupportReturnValues(defaultError))
-    }
+  | _ => raise(ScriptDoesNotSupportReturnValues(defaultError))
   }
 }
 
@@ -58,6 +61,7 @@ let nodeToTypedIdentifier: 'a => Globals.typedIdentifier = node => {
   name: node["name"],
   type_: node["typeDescriptions"]["typeString"],
   storageLocation: node["storageLocation"] == "storage" ? Storage : NotRelevant,
+  storageLocationString: node["storageLocation"],
 }
 
 let functions = nodeStatements => {
@@ -70,7 +74,7 @@ let functions = nodeStatements => {
       returnValues: x["returnParameters"]["parameters"]->Array.map(y => y->nodeToTypedIdentifier),
       visibility: x["visibility"] == "public" || x["visibility"] == "external" ? Public : Private,
     }
-    r
+    (r, x)
   })
 }
 
@@ -90,9 +94,17 @@ let modifiers = nodeStatements => {
 
 let lineCommentsRe = %re("/\\/\\/[^\\n]*\\n/g")
 let blockCommentsRe = %re("/\\/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+\\//g")
-let getArtifact = %raw(`(fileNameWithoutExtension) => require("../../contracts/codegen/truffle/" + fileNameWithoutExtension + ".json")`)
 
-let getAbi = fileNameWithoutExtension => getArtifact(fileNameWithoutExtension)["abi"]
+@module("fs") external folderExists: string => bool = "existsSync"
+@module("fs") external mkdirSync: (string, 'a) => unit = "mkdirSync"
+
+let _ = `artifacts/contracts/FloatCapital_v0.sol/FloatCapital_v0.json`
+@val external requireJson: string => 'a = "require"
+
+let getContractArtifact = fileNameWithoutExtension =>
+  requireJson(`../../contracts/abis/${fileNameWithoutExtension}.json`)
+let getContractAst = fileNameWithoutExtension =>
+  requireJson(`../../contracts/ast/${fileNameWithoutExtension}.json`)
 
 exception BadMatchingBlock
 let rec matchingBlockEndIndex = (str, startIndex, count) => {
@@ -138,6 +150,7 @@ let parseAbiTypes = types =>
   types->Array.map(i => {
     let r: Globals.typedIdentifier = {
       storageLocation: NotRelevant,
+      storageLocationString: "callable",
       type_: i["internalType"],
       name: i["name"],
     }
@@ -160,7 +173,7 @@ let parseAbi = abi =>
 let bindingsDict: HashMap.String.t<string> = HashMap.String.make(~hintSize=10)
 
 abisToMockExternally->Array.forEach(contractName => {
-  let abi = contractName->getAbi
+  let abi = getContractArtifact(contractName)
   let functions = abi->parseAbi
   bindingsDict->HashMap.String.set(
     contractName,
@@ -217,21 +230,21 @@ filesToMockInternally->Array.forEach(filePath => {
 
   sol := sol.contents->replaceByRe(blockCommentsRe, "\n")
 
-  let artifact = getArtifact(fileNameWithoutExtension)
+  let contractAst = getContractAst(fileNameWithoutExtension)
 
   let contractDefinition =
-    artifact["ast"]["nodes"]
-    ->Array.keep(x => x["nodeType"] == "ContractDefinition")
-    ->Array.getExn(0)
+    contractAst["nodes"]->Array.keep(x => x["nodeType"] == "ContractDefinition")->Array.getExn(0)
 
   let mockLogger = ref("")
 
-  functions(contractDefinition["nodes"])->Array.forEach(x => {
+  functions(contractDefinition["nodes"])->Array.forEach(((x, original)) => {
     let indexOfOldFunctionDec = sol.contents->indexOf("function " ++ x.name ++ "(")
 
     let indexOfOldFunctionBodyStart = sol.contents->indexOfFrom("{", indexOfOldFunctionDec)
 
-    let solPrefix = sol.contents->substring(~from=0, ~to_=indexOfOldFunctionBodyStart + 1)
+    let solPrefix = sol.contents->substring(~from=0, ~to_=indexOfOldFunctionDec)
+    let functionDefinition =
+      sol.contents->substring(~from=indexOfOldFunctionDec, ~to_=indexOfOldFunctionBodyStart + 1)
 
     let solSuffix = sol.contents->substringToEnd(~from=indexOfOldFunctionBodyStart + 1)
 
@@ -251,39 +264,68 @@ filesToMockInternally->Array.forEach(filePath => {
       )
       ->commafiy
 
+    let storageParametersFormatted =
+      storageParameters
+      ->Array.map(x =>
+        `
+          ${x.type_
+          ->removeFileNameFromTypeDefs
+          ->convertASTTypeToSolType} ${x.name}_temp1 = ${x.name};
+        `
+      )
+      ->reduceStrArr
+
+    let mockerReturnValues = switch x.returnValues {
+    | arr if arr->Array.length > 0 =>
+      `returns (${arr
+        ->Array.map(x => x.type_->convertASTTypeToSolType ++ " " ++ x.name)
+        ->commafiy})`
+    | _ => ""
+    }
+
+    let exposedCallArguments =
+      x.parameters
+      ->Array.map(x => {
+        let storageLocation = x.storageLocationString == "default" ? "" : x.storageLocationString
+        `${x.type_->convertASTTypeToSolTypeSimple} ${storageLocation} ${x.name}`
+      })
+      ->commafiy
+    let exposedFunction = switch x.visibility {
+    | Public =>
+      `function ${x.name}Exposed(${exposedCallArguments}) external ${mockerReturnValues} { ${x.name}InternalLogic(${mockerParameterCalls});}
+`
+    | Private => ""
+    }
+    let stateMutabilityText =
+      original["stateMutability"] == "nonpayable" ? "" : original["stateMutability"]
+    let internalLogic = `function ${x.name}InternalLogic(${exposedCallArguments}) internal ${stateMutabilityText} ${mockerReturnValues} {
+`
+
     sol :=
       solPrefix ++
-      `
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("${x.name}"))){
-      ${storageParameters
-        ->Array.map(x =>
-          `
-          ${x.type_
-            ->removeFileNameFromTypeDefs
-            ->convertASTTypeToSolType} ${x.name}_temp1 = ${x.name};
-        `
-        )
-        ->reduceStrArr}
-      return mocker.${x.name}Mock(${mockerParameterCalls});
-    }
-  ` ++
+      exposedFunction ++
+      functionDefinition ++
+      mockableFunctionBody(
+        ~functionName=x.name,
+        ~storageParameters=storageParametersFormatted,
+        ~mockerParameterCalls,
+      ) ++
+      internalLogic ++
       solSuffix
+
+    let mockerReturn =
+      x.returnValues
+      ->Array.map(y => "abi.decode(\"\",(" ++ y.type_->convertASTTypeToSolType ++ "))")
+      ->commafiy
 
     mockLogger :=
       mockLogger.contents ++
-      ` 
-    function ${x.name}Mock(${mockerArguments}) public pure ${switch x.returnValues {
-        | arr if arr->Array.length > 0 =>
-          `returns (${arr
-            ->Array.map(x => x.type_->convertASTTypeToSolType ++ " " ++ x.name)
-            ->commafiy})`
-        | _ => ""
-        }}{
-      return (${x.returnValues
-        ->Array.map(y => "abi.decode(\"\",(" ++ y.type_->convertASTTypeToSolType ++ "))")
-        ->commafiy});
-    }
-    `
+      externalMockerFunctionBody(
+        ~functionName=x.name,
+        ~mockerArguments,
+        ~mockerReturnValues,
+        ~mockerReturn,
+      )
   })
 
   modifiers(contractDefinition["nodes"])->Array.forEach(x => {
@@ -315,34 +357,29 @@ filesToMockInternally->Array.forEach(filePath => {
         x.storageLocation == Storage ? x.name ++ "_temp1" : x.name
       })
       ->commafiy
+    let storageParameters =
+      storageParameters
+      ->Array.map(x =>
+        `
+            ${x.type_
+          ->removeFileNameFromTypeDefs
+          ->convertASTTypeToSolType} ${x.name}_temp1 = ${x.name};
+          `
+      )
+      ->reduceStrArr
+
     sol :=
       solPrefix ++
-      `
-    if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked("${x.name}"))){
-        ${storageParameters
-        ->Array.map(x =>
-          `
-          ${x.type_
-            ->removeFileNameFromTypeDefs
-            ->convertASTTypeToSolType} ${x.name}_temp1 = ${x.name};
-        `
-        )
-        ->reduceStrArr}
-      mocker.${x.name}Mock(${mockerParameterCalls});
-      _;
-    } else {
-      ${functionBody}
-    }
-  ` ++
+      mockableModifierBody(
+        ~functionName=x.name,
+        ~storageParameters,
+        ~mockerParameterCalls,
+        ~functionBody,
+      ) ++
       solSuffix
 
     mockLogger :=
-      mockLogger.contents ++
-      ` 
-    function ${x.name}Mock(${mockerArguments}) public pure {
-      return; 
-    }
-    `
+      mockLogger.contents ++ externalMockerModifierBody(~functionName=x.name, ~mockerArguments)
   })
 
   let importsInFile = sol.contents->match_(importRe)
@@ -372,15 +409,16 @@ filesToMockInternally->Array.forEach(filePath => {
     })
   )
 
-  mockLogger :=
-    "// SPDX-License-Identifier: BUSL-1.1 \n pragma solidity 0.8.3;\n" ++
-    `import "./${fileNameWithoutExtension}Mockable.sol";
-` ++
+  let parentImports =
     importsInFileReplaced->Option.mapWithDefault("", i =>
       i->Array.map(z => z ++ "\n")->reduceStrArr
-    ) ++
-    `contract ${fileNameWithoutExtension}ForInternalMocking {` ++
-    mockLogger.contents ++ `}`
+    )
+  mockLogger :=
+    internalMockingFileTemplate(
+      ~fileNameWithoutExtension,
+      ~parentImports,
+      ~contractBody=mockLogger.contents,
+    )
 
   let indexOfContractDef = sol.contents->indexOf("contract ")
 
@@ -389,46 +427,26 @@ filesToMockInternally->Array.forEach(filePath => {
   let indexOfContractName = sol.contents->indexOfFrom(fileNameWithoutExtension, indexOfContractDef)
 
   let prefix = sol.contents->substring(~from=0, ~to_=indexOfContractDef)
-  let intermediate1 = sol.contents->substring(~from=indexOfContractDef, ~to_=indexOfContractName)
-  let intermediate2 =
+  let modifiersAndOpener =
     sol.contents->substring(
       ~from=indexOfContractName + fileNameWithoutExtension->String.length,
       ~to_=indexOfContractBlock + 1,
     )
   let suffix = sol.contents->substringToEnd(~from=indexOfContractBlock + 1)
 
-  sol :=
-    prefix ++
-    "\n" ++
-    `import "./${fileNameWithoutExtension}ForInternalMocking.sol";` ++
-    "\n" ++
-    intermediate1 ++
-    fileNameWithoutExtension ++
-    "Mockable" ++
-    intermediate2 ++
-    `
-  ${fileNameWithoutExtension}ForInternalMocking mocker;
-  bool shouldUseMock;
-  string functionToNotMock;
+  sol := mockingFileTemplate(~prefix, ~fileNameWithoutExtension, ~modifiersAndOpener, ~suffix)
 
-  function setMocker(${fileNameWithoutExtension}ForInternalMocking _mocker) external {
-    mocker = _mocker;
-    shouldUseMock = true;
+  let outputDirectory = "../contracts/contracts/testing/generated"
+  if !folderExists(outputDirectory) {
+    mkdirSync(outputDirectory, {"recursive": true})
   }
-
-  function setFunctionToNotMock(string calldata _functionToNotMock) external {
-    functionToNotMock = _functionToNotMock;
-  }
-
-` ++
-    suffix
 
   Node.Fs.writeFileAsUtf8Sync(
-    `../contracts/contracts/testing/generated/${fileNameWithoutExtension}Mockable.sol`,
+    `${outputDirectory}/${fileNameWithoutExtension}Mockable.sol`,
     sol.contents,
   )
   Node.Fs.writeFileAsUtf8Sync(
-    `../contracts/contracts/testing/generated/${fileNameWithoutExtension}ForInternalMocking.sol`,
+    `${outputDirectory}/${fileNameWithoutExtension}ForInternalMocking.sol`,
     mockLogger.contents,
   )
 
@@ -442,11 +460,13 @@ filesToMockInternally->Array.forEach(filePath => {
     existingModuleDef ++
     "\n\n" ++
     functions(contractDefinition["nodes"])
+    ->Array.map(((x, _)) => x)
     ->Array.concat(modifiers(contractDefinition["nodes"]))
     ->SmockableGen.internalModule(~contractName=fileNameWithoutExtension),
   )
 })
 
+/// Generate rescript smocked interfaces
 bindingsDict->HashMap.String.forEach((key, val) => {
   Node.Fs.writeFileAsUtf8Sync(`../contracts/test-waffle/library/smock/${key}Smocked.res`, val)
 })
