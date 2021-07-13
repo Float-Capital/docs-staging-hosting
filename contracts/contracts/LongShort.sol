@@ -19,8 +19,8 @@ import "./interfaces/IOracleManager.sol";
 
 contract LongShort is ILongShort, Initializable {
   /*╔═════════════════════════════╗
-      ║          VARIABLES          ║
-      ╚═════════════════════════════╝*/
+    ║          VARIABLES          ║
+    ╚═════════════════════════════╝*/
 
   // Fixed-precision constants
   address public constant DEAD_ADDRESS = 0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
@@ -61,8 +61,8 @@ contract LongShort is ILongShort, Initializable {
     public userNextPriceRedemptionAmount;
 
   /*╔════════════════════════════╗
-      ║           EVENTS           ║
-      ╚════════════════════════════╝*/
+    ║           EVENTS           ║
+    ╚════════════════════════════╝*/
 
   event LongShortV1(address admin, address treasury, address tokenFactory, address staker);
 
@@ -127,8 +127,8 @@ contract LongShort is ILongShort, Initializable {
   event ExecuteNextPriceSettlementsUser(address user, uint32 marketIndex);
 
   /*╔═════════════════════════════╗
-      ║          MODIFIERS          ║
-      ╚═════════════════════════════╝*/
+    ║          MODIFIERS          ║
+    ╚═════════════════════════════╝*/
 
   /**
    * Necessary to update system state before any contract actions (deposits / withdraws)
@@ -156,8 +156,8 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔═════════════════════════════╗
-      ║       CONTRACT SET-UP       ║
-      ╚═════════════════════════════╝*/
+    ║       CONTRACT SET-UP       ║
+    ╚═════════════════════════════╝*/
 
   function initialize(
     address _admin,
@@ -395,8 +395,8 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔══════════════════════════════╗
-      ║       HELPER FUNCTIONS       ║
-      ╚══════════════════════════════╝*/
+    ║       HELPER FUNCTIONS       ║
+    ╚══════════════════════════════╝*/
 
   /**
    * Controls what happens with accrued yield manager interest.

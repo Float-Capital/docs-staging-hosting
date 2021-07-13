@@ -11,8 +11,8 @@ import "./interfaces/IStaker.sol";
 
 contract Staker is IStaker, Initializable {
   /*╔═════════════════════════════╗
-      ║          VARIABLES          ║
-      ╚═════════════════════════════╝*/
+    ║          VARIABLES          ║
+    ╚═════════════════════════════╝*/
 
   // Fixed-precision constants
   uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
@@ -50,8 +50,8 @@ contract Staker is IStaker, Initializable {
   mapping(ISyntheticToken => mapping(address => uint256)) public userAmountStaked;
 
   /*╔════════════════════════════╗
-      ║           EVENTS           ║
-      ╚════════════════════════════╝*/
+    ║           EVENTS           ║
+    ╚════════════════════════════╝*/
 
   event StakerV1(address floatToken, uint256 floatPercentage);
 
@@ -101,8 +101,8 @@ contract Staker is IStaker, Initializable {
   event FloatPercentageUpdated(uint256 floatPercentage);
 
   /*╔═════════════════════════════╗
-      ║          MODIFIERS          ║
-      ╚═════════════════════════════╝*/
+    ║          MODIFIERS          ║
+    ╚═════════════════════════════╝*/
 
   modifier onlyAdmin() {
     require(msg.sender == admin, "not admin");
@@ -126,8 +126,8 @@ contract Staker is IStaker, Initializable {
   }
 
   /*╔═════════════════════════════╗
-      ║       CONTRACT SET-UP       ║
-      ╚═════════════════════════════╝*/
+    ║       CONTRACT SET-UP       ║
+    ╚═════════════════════════════╝*/
 
   function initialize(
     address _admin,
@@ -153,8 +153,8 @@ contract Staker is IStaker, Initializable {
   }
 
   /*╔═════════════════════════════╗
-      ║       MULTI-SIG ADMIN       ║
-      ╚═════════════════════════════╝*/
+    ║       MULTI-SIG ADMIN       ║
+    ╚═════════════════════════════╝*/
 
   function changeAdmin(address _admin) external onlyAdmin {
     admin = _admin;
@@ -252,8 +252,8 @@ contract Staker is IStaker, Initializable {
   }
 
   /*╔═════════════════════════════╗
-      ║        STAKING SETUP        ║
-      ╚═════════════════════════════╝*/
+    ║        STAKING SETUP        ║
+    ╚═════════════════════════════╝*/
 
   function addNewStakingFund(
     uint32 marketIndex,
@@ -293,9 +293,9 @@ contract Staker is IStaker, Initializable {
     emit StateAdded(marketIndex, 0, 0, 0);
   }
 
-  ////////////////////////////////////
-  // GLOBAL REWARD STATE FUNCTIONS ///
-  ////////////////////////////////////
+  /*╔═════════════════════════════════════╗
+    ║    GLOBAL REWARD STATE FUNCTIONS    ║
+    ╚═════════════════════════════════════╝*/
 
   /*
    * Returns the K factor parameters for the given market with sensible
@@ -527,9 +527,9 @@ contract Staker is IStaker, Initializable {
     }
   }
 
-  ////////////////////////////////////
-  // USER REWARD STATE FUNCTIONS /////
-  ////////////////////////////////////
+  /*╔═══════════════════════════════════╗
+    ║    USER REWARD STATE FUNCTIONS    ║
+    ╚═══════════════════════════════════╝*/
 
   function calculateAccumulatedFloatHelper(
     uint32 marketIndex,
@@ -680,9 +680,9 @@ contract Staker is IStaker, Initializable {
     _claimFloat(marketIndexes);
   }
 
-  ////////////////////////////////////
-  /////////// STAKING ////////////////
-  ////////////////////////////////////
+  /*╔═══════════════════════╗
+    ║        STAKING        ║
+    ╚═══════════════════════╝*/
 
   /*
    * A user with synthetic tokens stakes by calling stake on the token
@@ -720,9 +720,9 @@ contract Staker is IStaker, Initializable {
     emit StakeAdded(user, address(token), amount, userIndexOfLastClaimedReward[marketIndex][user]);
   }
 
-  ////////////////////////////////////
-  /////// WITHDRAW n MINT ////////////
-  ////////////////////////////////////
+  /*╔════════════════════════════╗
+    ║    WITHDRAWAL & MINTING    ║
+    ╚════════════════════════════╝*/
 
   /*
     Withdraw function.

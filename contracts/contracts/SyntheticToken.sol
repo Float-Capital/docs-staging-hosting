@@ -42,9 +42,10 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
     staker.stakeFromUser(msg.sender, amount);
   }
 
-  ////////////////////////////////////////////////////////////////////
-  ///////// FUNCTIONS INHERITED BY ERC20PresetMinterPauser ///////////
-  ////////////////////////////////////////////////////////////////////
+  /*╔══════════════════════════════════════════════════════╗
+    ║    FUNCTIONS INHERITED BY ERC20PresetMinterPauser    ║
+    ╚══════════════════════════════════════════════════════╝*/
+
   function mint(address to, uint256 amount)
     public
     override(ISyntheticToken, ERC20PresetMinterPauser)
