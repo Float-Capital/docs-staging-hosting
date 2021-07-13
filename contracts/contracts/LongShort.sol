@@ -174,8 +174,8 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔═════════════════════════════╗
-      ║       MULTI-SIG ADMIN       ║
-      ╚═════════════════════════════╝*/
+    ║       MULTI-SIG ADMIN       ║
+    ╚═════════════════════════════╝*/
 
   function changeAdmin(address _admin) external adminOnly {
     admin = _admin;
@@ -197,8 +197,8 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔═════════════════════════════╗
-      ║       MARKET CREATION       ║
-      ╚═════════════════════════════╝*/
+    ║       MARKET CREATION       ║
+    ╚═════════════════════════════╝*/
 
   /**
    * Creates an entirely new long/short market tracking an underlying
@@ -293,8 +293,8 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔══════════════════════════════╗
-      ║       GETTER FUNCTIONS       ║
-      ╚══════════════════════════════╝*/
+    ║       GETTER FUNCTIONS       ║
+    ╚══════════════════════════════╝*/
 
   function _recalculateSyntheticTokenPrice(uint32 marketIndex, bool isLong)
     internal
@@ -463,8 +463,8 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔═══════════════════════════════╗
-      ║     UPDATING SYSTEM STATE     ║
-      ╚═══════════════════════════════╝*/
+    ║     UPDATING SYSTEM STATE     ║
+    ╚═══════════════════════════════╝*/
 
   /**
    * Updates the value of the long and short sides within the system.
@@ -540,8 +540,8 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔════════════════════════════════╗
-      ║      DEPOSIT + WITHDRAWAL      ║
-      ╚════════════════════════════════╝*/
+    ║      DEPOSIT + WITHDRAWAL      ║
+    ╚════════════════════════════════╝*/
 
   function _depositFunds(uint32 marketIndex, uint256 amount) internal {
     paymentTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
@@ -598,8 +598,8 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔══════════════════════════════════╗
-      ║     TREASURY + YIELD MANAGER     ║
-      ╚══════════════════════════════════╝*/
+    ║     TREASURY + YIELD MANAGER     ║
+    ╚══════════════════════════════════╝*/
 
   /*
    * Transfers locked funds from LongShort into the yield manager.
@@ -618,8 +618,8 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔═══════════════════════════╗
-      ║       MINT POSITION       ║
-      ╚═══════════════════════════╝*/
+    ║       MINT POSITION       ║
+    ╚═══════════════════════════╝*/
 
   function _mintNextPrice(
     uint32 marketIndex,
@@ -654,8 +654,8 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔═══════════════════════════╗
-      ║      REDEEM POSITION      ║
-      ╚═══════════════════════════╝*/
+    ║      REDEEM POSITION      ║
+    ╚═══════════════════════════╝*/
 
   function _redeemNextPrice(
     uint32 marketIndex,
@@ -691,8 +691,8 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔════════════════════════════════╗
-      ║     NEXT PRICE SETTLEMENTS     ║
-      ╚════════════════════════════════╝*/
+    ║     NEXT PRICE SETTLEMENTS     ║
+    ╚════════════════════════════════╝*/
 
   function _executeNextPriceMintsIfTheyExist(
     uint32 marketIndex,
@@ -755,8 +755,8 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔═══════════════════════════════════════════╗
-      ║   BATCHED NEXT PRICE SETTLEMENT ACTIONS   ║
-      ╚═══════════════════════════════════════════╝*/
+    ║   BATCHED NEXT PRICE SETTLEMENT ACTIONS   ║
+    ╚═══════════════════════════════════════════╝*/
 
   function _performOustandingSettlements(
     uint32 marketIndex,

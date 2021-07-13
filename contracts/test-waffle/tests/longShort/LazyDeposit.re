@@ -29,7 +29,7 @@ let testIntegration =
       let%AwaitThen _longValueBefore =
         longShort->LongShort.syntheticTokenPoolValue(
           marketIndex,
-          true/*long*/,
+          true /*long*/,
         );
 
       let%AwaitThen _ =
@@ -98,7 +98,7 @@ let testIntegration =
 
       let%Await longTokenPrice =
         longShort->Contract.LongShortHelpers.getSyntheticTokenPrice(
-          ~marketIndex=marketIndex,
+          ~marketIndex,
           ~isLong=true,
         );
 
@@ -120,7 +120,7 @@ let testExposed =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
-  describe("lazyDeposits", () => {
+  describe_only("lazyDeposits", () => {
     it("calls the executeOutstandingNextPriceSettlements modifier", () => {
       // TODO: turn this into a re-usable template (just pass in the transaction that should emmit the event)
       //       test all other relevant 'functions
@@ -199,7 +199,7 @@ let testExposed =
         let%Await mintAmount =
           longShort->LongShort.batchedAmountOfTokensToDeposit(
             marketIndex,
-            true/*long*/,
+            true /*long*/,
           );
 
         Chai.bnEqual(

@@ -1,5 +1,9 @@
 let coverageReportOutputDirectory = "coverage-truffle"
 
+let extraFilesToIgnore = [
+  "testing/generated/LongShortMockable.sol",
+  "testing/generated/StakerMockable.sol"
+]
 let isWaffleTest =
   !!process.env.WAFFLE_TEST && process.env.WAFFLE_TEST.toUpperCase() == "TRUE"
 if (isWaffleTest) {
@@ -9,8 +13,20 @@ if (isWaffleTest) {
     !!process.env.DONT_RUN_UNIT_TESTS && process.env.DONT_RUN_UNIT_TESTS.toUpperCase() == "TRUE"
   if (!isUnitTests && !isIntegrationTests) { // if it is neither then it is both (wierd logic but it works)
     coverageReportOutputDirectory = "coverage-all"
+    extraFilesToIgnore = []
   } else if (isUnitTests) {
     coverageReportOutputDirectory = "coverage-unit"
+    // extraFilesToIgnore = []
+    extraFilesToIgnore = [
+      "FloatCapital_v0.sol",
+      "FloatToken.sol",
+      "LongShort.sol",
+      "Staker.sol",
+      "SyntheticToken.sol",
+      "TokenFactory.sol",
+      "Treasury_v0.sol",
+      "YieldManagerAave.sol",
+    ]
   } else if (isIntegrationTests) {
     coverageReportOutputDirectory = "coverage-integration"
   } else {
@@ -46,6 +62,7 @@ module.exports = {
     "oracles/OracleManagerChainlink.sol",
     "oracles/OracleManagerEthKiller.sol",
     "oracles/OracleManagerEthKillerChainlink.sol",
+    "oracles/OracleManagerEthKillerChainlinkTestnet.sol",
     "oracles/OracleManagerEthVsBtc.sol",
     "oracles/OracleManagerFlippening_V0.sol",
 
@@ -53,10 +70,9 @@ module.exports = {
     "testing/StakerInternalsExposed.sol",
 
     "testing/generated/LongShortForInternalMocking.sol",
-    "testing/generated/LongShortMockable.sol",
     "testing/generated/StakerForInternalMocking.sol",
-    "testing/generated/StakerMockable.sol"
-  ],
+
+  ].concat(extraFilesToIgnore),
   istanbulFolder: coverageReportOutputDirectory,
 };
 
