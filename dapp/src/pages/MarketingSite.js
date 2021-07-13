@@ -6,11 +6,12 @@ var React = require("react");
 var Footer = require("../marketing-site/Footer.js");
 var Landing = require("../marketing-site/Landing.js");
 var Roadmap = require("../marketing-site/Roadmap.js");
+var Security = require("../marketing-site/Security.js");
 var Governance = require("../marketing-site/Governance.js");
 var HowItWorks = require("../marketing-site/HowItWorks.js");
 
 function MarketingSite$MarketingSite(Props) {
-  return React.createElement(React.Fragment, undefined, React.createElement(Landing.make, {}), React.createElement(HowItWorks.make, {}), React.createElement(Roadmap.make, {}), React.createElement(Governance.make, {}), React.createElement(Footer.make, {}), React.createElement(TVL.make, {}));
+  return React.createElement(React.Fragment, undefined, React.createElement(Landing.make, {}), React.createElement(HowItWorks.make, {}), React.createElement(Roadmap.make, {}), React.createElement(Governance.make, {}), React.createElement(Security.make, {}), React.createElement(Footer.make, {}), React.createElement(TVL.make, {}));
 }
 
 var MarketingSite = {

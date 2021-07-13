@@ -6,6 +6,7 @@ module MarketingSite = {
       <HowItWorks/>
       <Roadmap />
       <Governance />      
+      <Security />      
       <Footer />
       <TVL />
     </>
