@@ -4,13 +4,7 @@ let make = () => {
     <div
       className=" flex flex-col items-center justify-center pb-16 custom-height-for-above-footer">
       <div className="max-w-5xl flex flex-col justify-evenly items-center mx-auto">
-        <h3 className="my-2 text-5xl uppercase font-arimo font-extrabold flex items-center">
-          <span className="text-5xl font-vt323 animate-pulse font-bold mx-2">
-            {">"->React.string}
-          </span>
-          {"security"->React.string}
-          <span className="text-5xl mx-2"> {`🔐`->React.string} </span>
-        </h3>
+        <Heading title="security" suffixEmoji=`🔐` />
         <div className="grid grid-cols-3 gap-10 items-center justify-center">
           <div className="mx-4">
             <a className="custom-cursor" target="_blank" href="#" rel="noopener noreferrer">

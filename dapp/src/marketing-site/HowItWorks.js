@@ -2,23 +2,54 @@
 'use strict';
 
 var React = require("react");
-var FeaturedMarkets = require("./FeaturedMarkets.js");
+var Heading = require("./components/Heading.js");
 
 function HowItWorks(Props) {
   return React.createElement("section", {
               className: "py-10 bg-white min-h-screen w-screen flex flex-col items-center justify-center purple-moon",
               id: "how-it-works"
-            }, React.createElement("h3", {
-                  className: "m-2 text-5xl text-center uppercase  font-arimo font-extrabold"
-                }, "How it works"), React.createElement("div", {
-                  className: "flex flex-col md:flex-row items-center"
-                }, React.createElement("div", {
-                      className: "w-full md:w-2/5 mx-2 relative"
+            }, React.createElement("div", {
+                  className: "flex flex-col items-center"
+                }, React.createElement(Heading.make, {
+                      title: "how it works",
+                      suffixEmoji: "🔬"
+                    }), React.createElement("div", {
+                      className: "grid grid-cols-2 my-4 gap-10 md:flex-row items-center max-w-5xl"
                     }, React.createElement("div", {
-                          className: "my-2 text-lg"
-                        }, React.createElement("h2", undefined, "No overcollateralization"), React.createElement("h2", undefined, "No liquidiation"), React.createElement("h2", undefined, "No centralisation"))), React.createElement("div", {
-                      className: "w-full md:w-3/5"
-                    }, React.createElement(FeaturedMarkets.make, {}))));
+                          className: "bg-white bg-opacity-60 p-4 rounded-lg"
+                        }, React.createElement("h3", {
+                              className: "text-4xl flex flex-row items-center"
+                            }, React.createElement("span", undefined, "Mint"), React.createElement("img", {
+                                  className: "h-12",
+                                  src: "/icons/mint.png"
+                                })), React.createElement("p", {
+                              className: "text-xl"
+                            }, "Open a postion by depositing DAI into a market to mint synthetic tokens")), React.createElement("div", {
+                          className: "bg-white bg-opacity-60 p-4 rounded-lg"
+                        }, React.createElement("h3", {
+                              className: "text-4xl flex flex-row items-center"
+                            }, React.createElement("span", undefined, "Stake"), React.createElement("img", {
+                                  className: "h-12",
+                                  src: "/icons/stake.png"
+                                })), React.createElement("p", {
+                              className: "text-xl"
+                            }, "Stake your synth tokens to earn FLT token")), React.createElement("div", {
+                          className: "bg-white bg-opacity-60 p-4 rounded-lg"
+                        }, React.createElement("h3", {
+                              className: "text-4xl flex flex-row items-center"
+                            }, React.createElement("span", undefined, "Redeem "), React.createElement("span", {
+                                  className: "text-4xl"
+                                }, " 📈")), React.createElement("p", {
+                              className: "text-xl"
+                            }, "Redeem your synth tokens for DAI to close a position")), React.createElement("div", {
+                          className: "bg-white bg-opacity-60 p-4 rounded-lg"
+                        }, React.createElement("h3", {
+                              className: "text-4xl flex flex-row items-center"
+                            }, React.createElement("span", undefined, "Govern"), React.createElement("span", {
+                                  className: "text-4xl"
+                                }, " 🗳")), React.createElement("p", {
+                              className: "text-xl"
+                            }, "Use your FLT tokens to govern the future of the protocol")))));
 }
 
 var make = HowItWorks;

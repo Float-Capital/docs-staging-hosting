@@ -37,14 +37,15 @@ html {
     url("/backgrounds/purple-moon.gif");
   @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
 }
+/* background: linear-gradient(
+    to bottom left,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0)
+  ), */
 .fighter-blue {
-  background: linear-gradient(
-      to bottom left,
-      rgba(255, 255, 255, 0.3),
-      rgba(255, 255, 255, 0)
-    ),
-    url("/backgrounds/fighter-blue.gif");
-  @apply font-default min-h-screen w-screen bg-left-bottom bg-cover bg-gray-50;
+  background-image: url("/backgrounds/fighter-right.gif");
+  background-position: right bottom;
+  @apply font-default min-h-screen w-screen bg-cover;
 }
 .ballot-box {
   background: linear-gradient(
@@ -53,7 +54,7 @@ html {
       rgba(255, 255, 255, 0)
     ),
     url("/backgrounds/governance.png");
-  @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
+  @apply font-default min-h-screen w-screen bg-right bg-cover bg-gray-50;
 }
 .road {
   background: linear-gradient(

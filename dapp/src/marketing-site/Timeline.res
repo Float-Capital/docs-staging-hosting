@@ -3,7 +3,7 @@ let make = () => {
   <div className="container">
     <div className="flex flex-col md:grid grid-cols-9 mx-auto p-2 text-black">
       // <!-- left -->
-      <div className="flex flex-row-reverse md:contents">
+      <div className="flex flex-row-reverse md:contents  text-sm">
         <div className="bg-white col-start-1 col-end-5 p-4 border my-4 ml-auto shadow-md">
           <h3 className="font-semibold text-lg mb-1"> {"Q1 2021"->React.string} </h3>
           <ul>

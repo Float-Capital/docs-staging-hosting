@@ -3,6 +3,7 @@
 
 var React = require("react");
 var Footer = require("./Footer.js");
+var Heading = require("./components/Heading.js");
 
 function Security(Props) {
   return React.createElement("section", {
@@ -12,13 +13,10 @@ function Security(Props) {
                   className: " flex flex-col items-center justify-center pb-16 custom-height-for-above-footer"
                 }, React.createElement("div", {
                       className: "max-w-5xl flex flex-col justify-evenly items-center mx-auto"
-                    }, React.createElement("h3", {
-                          className: "my-2 text-5xl uppercase font-arimo font-extrabold flex items-center"
-                        }, React.createElement("span", {
-                              className: "text-5xl font-vt323 animate-pulse font-bold mx-2"
-                            }, ">"), "security", React.createElement("span", {
-                              className: "text-5xl mx-2"
-                            }, "🔐")), React.createElement("div", {
+                    }, React.createElement(Heading.make, {
+                          title: "security",
+                          suffixEmoji: "🔐"
+                        }), React.createElement("div", {
                           className: "grid grid-cols-3 gap-10 items-center justify-center"
                         }, React.createElement("div", {
                               className: "mx-4"

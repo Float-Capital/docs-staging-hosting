@@ -3,6 +3,7 @@
 
 var React = require("react");
 var Button = require("../components/UI/Base/Button.js");
+var Heading = require("./components/Heading.js");
 
 function Governance(Props) {
   return React.createElement("section", {
@@ -12,17 +13,18 @@ function Governance(Props) {
                   className: "max-w-5xl flex flex-col md:flex-row justify-evenly items-center mx-auto"
                 }, React.createElement("div", {
                       className: "w-full md:w-1/2 order-2 md:order-1 p-4 md:p-0"
-                    }, React.createElement("h3", {
-                          className: "my-2 text-5xl uppercase font-arimo font-extrabold"
-                        }, "Governance"), React.createElement("p", {
+                    }, React.createElement(Heading.make, {
+                          title: "governance",
+                          suffixEmoji: "👤"
+                        }), React.createElement("p", {
                           className: "text-2xl"
                         }, "The FLT token governs the float capital protocol. The right governance model will direct and shape the protocol through community lead proposals in a decentralised and fair manor. The future of Float Capital will be dictated by its users."), React.createElement("div", {
                           className: "flex flex-row my-4 items-center justify-evenly md:justify-start  "
                         }, React.createElement("div", {
                               className: "mr-4"
-                            }, React.createElement(Button.Small.make, {
+                            }, React.createElement(Button.make, {
                                   children: "Read more"
-                                })), React.createElement("div", undefined, React.createElement(Button.Small.make, {
+                                })), React.createElement("div", undefined, React.createElement(Button.make, {
                                   children: "Earn FLT"
                                 })))), React.createElement("div", {
                       className: "w-full md:w-1/2 order-1 md:order-2"

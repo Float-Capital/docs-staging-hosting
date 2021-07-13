@@ -9,7 +9,7 @@ function Timeline(Props) {
             }, React.createElement("div", {
                   className: "flex flex-col md:grid grid-cols-9 mx-auto p-2 text-black"
                 }, React.createElement("div", {
-                      className: "flex flex-row-reverse md:contents"
+                      className: "flex flex-row-reverse md:contents  text-sm"
                     }, React.createElement("div", {
                           className: "bg-white col-start-1 col-end-5 p-4 border my-4 ml-auto shadow-md"
                         }, React.createElement("h3", {
