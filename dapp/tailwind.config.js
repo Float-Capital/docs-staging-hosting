@@ -7,6 +7,7 @@ const pastelOrange = "#fcded4";
 const pastelPink = "#f1d7e4";
 const pastelDarkBlue = "#7497c6";
 const pastelYellow = "#E2F6F7";
+const pastelLightBlue = "#AAC0D8";
 module.exports = {
   purge: {
     // Specify the paths to all of the template files in your project
@@ -28,6 +29,7 @@ module.exports = {
         "pastel-pink": pastelPink,
         "pastel-dark-blue": pastelDarkBlue,
         "pastel-yellow": pastelYellow,
+        "pastel-light-blue": pastelLightBlue,
       }),
     },
     /* Most of the time we customize the font-sizes,
@@ -74,6 +76,7 @@ module.exports = {
       "pastel-pink": pastelPink,
       "pastel-dark-blue": pastelDarkBlue,
       "pastel-yellow": pastelYellow,
+      "pastel-light-blue": pastelLightBlue,
     }),
     backgroundColor: (theme) => ({
       ...theme("colors"),
@@ -86,6 +89,7 @@ module.exports = {
       "pastel-pink": pastelPink,
       "pastel-dark-blue": pastelDarkBlue,
       "pastel-yellow": pastelYellow,
+      "pastel-light-blue": pastelLightBlue,
     }),
     textColor: {
       primary: primaryColor,
@@ -96,6 +100,7 @@ module.exports = {
       "pastel-pink": pastelPink,
       "pastel-dark-blue": pastelDarkBlue,
       "pastel-yellow": pastelYellow,
+      "pastel-light-blue": pastelLightBlue,
     },
     letterSpacing: {
       tighter: "-.05em",

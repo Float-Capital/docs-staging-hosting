@@ -17,12 +17,12 @@ function Security(Props) {
                           title: "security",
                           suffixEmoji: "🔐"
                         }), React.createElement("div", {
-                          className: "grid grid-cols-3 gap-10 items-center justify-center"
+                          className: "grid grid-cols-3 gap-10 items-center justify-center my-4"
                         }, React.createElement("div", {
                               className: "mx-4"
                             }, React.createElement("a", {
                                   className: "custom-cursor",
-                                  href: "#",
+                                  href: "https://docs.float.capital/docs/security",
                                   rel: "noopener noreferrer",
                                   target: "_blank"
                                 }, React.createElement("img", {
@@ -30,11 +30,13 @@ function Security(Props) {
                                       src: "/icons/coverage.svg"
                                     }), React.createElement("p", {
                                       className: "text-center w-40 mx-auto hover:underline"
-                                    }, "Smart contract code coverage"))), React.createElement("div", {
+                                    }, "Smart contract code coverage"), React.createElement("p", {
+                                      className: "text-center mx-auto text-xs text-gray-500"
+                                    }, "coming soon"))), React.createElement("div", {
                               className: "mx-4"
                             }, React.createElement("a", {
                                   className: "custom-cursor",
-                                  href: "#",
+                                  href: "https://docs.float.capital/docs/security",
                                   rel: "noopener noreferrer",
                                   target: "_blank"
                                 }, React.createElement("img", {
@@ -42,11 +44,13 @@ function Security(Props) {
                                       src: "/icons/github-color.svg"
                                     }), React.createElement("p", {
                                       className: "text-center w-40 mx-auto hover:underline"
-                                    }, "Github code"))), React.createElement("div", {
+                                    }, "Github code"), React.createElement("p", {
+                                      className: "text-center mx-auto text-xs text-gray-500"
+                                    }, "coming soon"))), React.createElement("div", {
                               className: "mx-4"
                             }, React.createElement("a", {
                                   className: "custom-cursor",
-                                  href: "#",
+                                  href: "https://docs.float.capital/docs/security",
                                   rel: "noopener noreferrer",
                                   target: "_blank"
                                 }, React.createElement("img", {
@@ -54,7 +58,9 @@ function Security(Props) {
                                       src: "/icons/code-arena-sq.png"
                                     }), React.createElement("p", {
                                       className: "text-center  w-40 mx-auto hover:underline"
-                                    }, "Audit (Coming soon)")))))), React.createElement(Footer.make, {}));
+                                    }, "Audit"), React.createElement("p", {
+                                      className: "text-center mx-auto text-xs text-gray-500"
+                                    }, "coming soon")))))), React.createElement(Footer.make, {}));
 }
 
 var make = Security;

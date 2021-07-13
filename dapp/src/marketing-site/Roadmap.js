@@ -7,12 +7,14 @@ var Timeline = require("./Timeline.js");
 
 function Roadmap(Props) {
   return React.createElement("section", {
-              className: "min-h-screen w-screen flex flex-col items-center justify-center road",
+              className: "min-h-screen w-screen flex flex-col items-center justify-center bg-car",
               id: "roadmap"
-            }, React.createElement(Heading.make, {
-                  title: "roadmap",
-                  suffixEmoji: "🗺️"
-                }), React.createElement(Timeline.make, {}));
+            }, React.createElement("div", {
+                  className: "my-4"
+                }, React.createElement(Heading.make, {
+                      title: "roadmap",
+                      suffixEmoji: "🗺️"
+                    })), React.createElement(Timeline.make, {}));
 }
 
 var make = Roadmap;

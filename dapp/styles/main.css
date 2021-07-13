@@ -65,6 +65,24 @@ html {
     url("/backgrounds/road.gif");
   @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
 }
+.desert {
+  background: linear-gradient(
+      to bottom left,
+      rgba(255, 255, 255, 0),
+      rgba(255, 255, 255, 0)
+    ),
+    url("/backgrounds/desert.png");
+  @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
+}
+.bg-car {
+  background: linear-gradient(
+      to bottom left,
+      rgba(255, 255, 255, 0),
+      rgba(255, 255, 255, 0)
+    ),
+    url("/backgrounds/car.gif");
+  @apply font-default min-h-screen w-screen bg-left-bottom bg-cover bg-gray-50;
+}
 
 .custom-height-for-above-footer {
   height: calc(100vh - 4rem);
