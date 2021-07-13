@@ -4,7 +4,7 @@ if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(
   ${storageParameters}
   return mocker.${functionName}Mock(${mockerParameterCalls});
 } else {
-  return ${functionName}InternalLogic(${mockerParameterCalls});
+  return super.${functionName}(${mockerParameterCalls});
 }
 }
 `
@@ -52,11 +52,12 @@ contract ${fileNameWithoutExtension}ForInternalMocking {
   ${contractBody}
 }`
 
-let mockingFileTemplate = (~prefix, ~fileNameWithoutExtension, ~modifiersAndOpener, ~suffix) => {
+let mockingFileTemplate = (~prefix, ~fileNameWithoutExtension, ~fullBody) => {
   `${prefix}
 import "./${fileNameWithoutExtension}ForInternalMocking.sol";
+import "../../${fileNameWithoutExtension}.sol";
 
-contract ${fileNameWithoutExtension}Mockable${modifiersAndOpener}
+contract ${fileNameWithoutExtension}Mockable is ${fileNameWithoutExtension} {
 
   ${fileNameWithoutExtension}ForInternalMocking mocker;
   bool shouldUseMock;
@@ -71,6 +72,7 @@ contract ${fileNameWithoutExtension}Mockable${modifiersAndOpener}
     functionToNotMock = _functionToNotMock;
   }
 
-${suffix}
+${fullBody}
+}
 `
 }

@@ -12,7 +12,8 @@
 open Js.String2
 open MockablesGenTemplates
 
-let filesToMockInternally = ["LongShort.sol", "Staker.sol"]
+let filesToMockInternally = ["LongShort.sol"]
+// let filesToMockInternally = ["LongShort.sol", "Staker.sol"]
 
 exception ScriptDoesNotSupportReturnValues(string)
 
@@ -64,9 +65,14 @@ let nodeToTypedIdentifier: 'a => Globals.typedIdentifier = node => {
   storageLocationString: node["storageLocation"],
 }
 
-let functions = nodeStatements => {
+let functionsVirtual = nodeStatements => {
   nodeStatements
   ->Array.keep(x => x["nodeType"] == #FunctionDefinition && !(x["name"] == "")) // ignore constructors
+  ->Array.keep(x => {
+    Js.log("Is it virtual?")
+    Js.log(x["virtual"])
+    x["virtual"]
+  })
   ->Array.map(x => {
     let r: Globals.functionType = {
       name: x["name"],
@@ -86,6 +92,7 @@ let modifiers = nodeStatements => {
       name: x["name"],
       parameters: x["parameters"]["parameters"]->Array.map(y => y->nodeToTypedIdentifier),
       returnValues: [],
+      // TODO: modifiers are always internal ... unnecessary.
       visibility: x["visibility"] == "public" || x["visibility"] == "external" ? Public : Private,
     }
     r
@@ -229,7 +236,7 @@ filesToMockInternally->Array.forEach(filePath => {
   )
 
   sol := sol.contents->replaceByRe(blockCommentsRe, "\n")
-
+  let body = sol.contents
   let contractAst = getContractAst(fileNameWithoutExtension)
 
   let contractDefinition =
@@ -237,16 +244,35 @@ filesToMockInternally->Array.forEach(filePath => {
 
   let mockLogger = ref("")
 
-  functions(contractDefinition["nodes"])->Array.forEach(((x, original)) => {
-    let indexOfOldFunctionDec = sol.contents->indexOf("function " ++ x.name ++ "(")
+  let allFunctions = functionsVirtual(contractDefinition["nodes"])->Array.map(((x, original)) => {
+    Js.log(original["virtual"])
 
-    let indexOfOldFunctionBodyStart = sol.contents->indexOfFrom("{", indexOfOldFunctionDec)
+    let isPure = original["stateMutability"] == "pure"
 
-    let solPrefix = sol.contents->substring(~from=0, ~to_=indexOfOldFunctionDec)
+    Js.log("IS PURE")
+    Js.log(isPure)
+
+    let indexOfOldFunctionDec = body->indexOf("function " ++ x.name ++ "(")
+
+    let indexOfOldFunctionBodyStart = body->indexOfFrom("{", indexOfOldFunctionDec)
+
+    let solPrefix = body->substring(~from=0, ~to_=indexOfOldFunctionDec)
+    let originalFunctionDefinition =
+      body->substring(~from=indexOfOldFunctionDec, ~to_=indexOfOldFunctionBodyStart + 1)
+    let alreadyAnOverride = originalFunctionDefinition->indexOf("override") != -1
     let functionDefinition =
-      sol.contents->substring(~from=indexOfOldFunctionDec, ~to_=indexOfOldFunctionBodyStart + 1)
+      originalFunctionDefinition->replace("virtual", alreadyAnOverride ? "" : "override")
+    Js.log(
+      `
+    >>>>>>>>>>>>
+    >>>>>>>>>>>>
+    ${functionDefinition}
+    >>>>>>>>>>>>
+    >>>>>>>>>>>>
+    `,
+    )
 
-    let solSuffix = sol.contents->substringToEnd(~from=indexOfOldFunctionBodyStart + 1)
+    let solSuffixIncludingBody = body->substringToEnd(~from=indexOfOldFunctionBodyStart + 1)
 
     let storageParameters = x.parameters->Array.keep(x => x.storageLocation == Storage)
 
@@ -294,7 +320,7 @@ filesToMockInternally->Array.forEach(filePath => {
       original["stateMutability"] == "nonpayable" ? "" : original["stateMutability"]
     let exposedFunction = switch x.visibility {
     | Private =>
-      `function ${x.name}Exposed(${exposedCallArguments}) external ${stateMutabilityText} ${mockerReturnValues} { return ${x.name}InternalLogic(${mockerParameterCalls});}
+      `function ${x.name}Exposed(${exposedCallArguments}) external ${stateMutabilityText} ${mockerReturnValues} { return super.${x.name}(${mockerParameterCalls});}
 `
     | Public => ""
     }
@@ -302,17 +328,23 @@ filesToMockInternally->Array.forEach(filePath => {
     let internalLogic = `function ${x.name}InternalLogic(${exposedCallArguments}) internal ${stateMutabilityText} ${mockerReturnValues} {
 `
 
-    sol :=
-      solPrefix ++
-      exposedFunction ++
-      functionDefinition ++
-      mockableFunctionBody(
-        ~functionName=x.name,
-        ~storageParameters=storageParametersFormatted,
-        ~mockerParameterCalls,
-      ) ++
-      internalLogic ++
-      solSuffix
+    let result =
+      exposedFunction ++ (
+        isPure
+          ? "\n"
+          : functionDefinition ++
+            mockableFunctionBody(
+              ~functionName=x.name,
+              ~storageParameters=storageParametersFormatted,
+              ~mockerParameterCalls,
+            )
+      )
+    // Js.log(x.name)
+    // Js.log(result)
+    // internalLogic ++
+    // "/*more */" ++
+    // solSuffix
+    // sol := result
 
     let mockerReturn =
       x.returnValues
@@ -327,18 +359,19 @@ filesToMockInternally->Array.forEach(filePath => {
         ~mockerReturnValues,
         ~mockerReturn,
       )
+
+    result
   })
 
-  modifiers(contractDefinition["nodes"])->Array.forEach(x => {
-    let indexOfOldFunctionDec = sol.contents->indexOf("modifier " ++ x.name)
+  let modifiersArray = modifiers(contractDefinition["nodes"])->Array.map(x => {
+    let indexOfOldFunctionDec = body->indexOf("modifier " ++ x.name)
 
-    let indexOfOldFunctionBodyStart = sol.contents->indexOfFrom("{", indexOfOldFunctionDec)
+    let indexOfOldFunctionBodyStart = body->indexOfFrom("{", indexOfOldFunctionDec)
 
-    let indexOfOldFunctionBodyEnd =
-      sol.contents->matchingBlockEndIndex(indexOfOldFunctionBodyStart + 1, 1)
+    let indexOfOldFunctionBodyEnd = body->matchingBlockEndIndex(indexOfOldFunctionBodyStart + 1, 1)
 
     let functionBody =
-      sol.contents->substring(~from=indexOfOldFunctionBodyStart + 1, ~to_=indexOfOldFunctionBodyEnd)
+      body->substring(~from=indexOfOldFunctionBodyStart + 1, ~to_=indexOfOldFunctionBodyEnd)
 
     let mockerArguments =
       x.parameters
@@ -349,9 +382,11 @@ filesToMockInternally->Array.forEach(filePath => {
 
     let storageParameters = x.parameters->Array.keep(x => x.storageLocation == Storage)
 
-    let solPrefix = sol.contents->substring(~from=0, ~to_=indexOfOldFunctionBodyStart + 1)
+    let solPrefix =
+      body->substring(~from=indexOfOldFunctionDec, ~to_=indexOfOldFunctionBodyStart + 1)
+    Js.log(`prefix - ${solPrefix}`)
 
-    let solSuffix = sol.contents->substringToEnd(~from=indexOfOldFunctionBodyEnd)
+    // let solSuffix = body->substringToEnd(~from=indexOfOldFunctionBodyEnd)
     let mockerParameterCalls =
       x.parameters
       ->Array.map(x => {
@@ -369,22 +404,19 @@ filesToMockInternally->Array.forEach(filePath => {
       )
       ->reduceStrArr
 
-    sol :=
-      solPrefix ++
-      mockableModifierBody(
-        ~functionName=x.name,
-        ~storageParameters,
-        ~mockerParameterCalls,
-        ~functionBody,
-      ) ++
-      solSuffix
-
     mockLogger :=
       mockLogger.contents ++ externalMockerModifierBody(~functionName=x.name, ~mockerArguments)
+
+    solPrefix ++
+    mockableModifierBody(
+      ~functionName=x.name,
+      ~storageParameters,
+      ~mockerParameterCalls,
+      ~functionBody,
+    )
   })
 
-  let importsInFile = sol.contents->match_(importRe)
-
+  let importsInFile = body->match_(importRe)
   let importsInFileReplaced = importsInFile->Option.map(i =>
     i->Array.map(x => {
       if !(x->contains("..")) && !(x->contains("./")) {
@@ -414,6 +446,7 @@ filesToMockInternally->Array.forEach(filePath => {
     importsInFileReplaced->Option.mapWithDefault("", i =>
       i->Array.map(z => z ++ "\n")->reduceStrArr
     )
+
   mockLogger :=
     internalMockingFileTemplate(
       ~fileNameWithoutExtension,
@@ -421,21 +454,31 @@ filesToMockInternally->Array.forEach(filePath => {
       ~contractBody=mockLogger.contents,
     )
 
-  let indexOfContractDef = sol.contents->indexOf("contract ")
+  let indexOfFirstImports = body->indexOf("import")
+  let indexOfContractDef = body->indexOf("contract ")
 
-  let indexOfContractBlock = sol.contents->indexOfFrom("{", indexOfContractDef)
+  let indexOfContractBlock = body->indexOfFrom("{", indexOfContractDef)
 
-  let indexOfContractName = sol.contents->indexOfFrom(fileNameWithoutExtension, indexOfContractDef)
+  let indexOfContractName = body->indexOfFrom(fileNameWithoutExtension, indexOfContractDef)
 
-  let prefix = sol.contents->substring(~from=0, ~to_=indexOfContractDef)
-  let modifiersAndOpener =
-    sol.contents->substring(
-      ~from=indexOfContractName + fileNameWithoutExtension->String.length,
-      ~to_=indexOfContractBlock + 1,
-    )
-  let suffix = sol.contents->substringToEnd(~from=indexOfContractBlock + 1)
+  Js.log("importsInFile")
+  Js.log(parentImports)
+  let prefix = body->substring(~from=0, ~to_=indexOfFirstImports) ++ parentImports
+  // let prefix = importsInFile->Option.map(i =>
+  //   i->Array.reduceWithIndex(
+  //     currentString,
+  //     index,
+  //     imp,
+  //   ) => {
+  //     Js.log(currentString)
+  //     currentString->replace(imp, importsInFileReplaced->Option.getUnsafe->Array.getUnsafe(index))
+  //   })
+  // )
 
-  sol := mockingFileTemplate(~prefix, ~fileNameWithoutExtension, ~modifiersAndOpener, ~suffix)
+  let allFunctionsString = allFunctions->Js.Array2.joinWith("\n")
+  let fullBody = allFunctionsString
+
+  let contractMockable = mockingFileTemplate(~prefix, ~fileNameWithoutExtension, ~fullBody)
 
   let outputDirectory = "../contracts/contracts/testing/generated"
   if !folderExists(outputDirectory) {
@@ -444,7 +487,7 @@ filesToMockInternally->Array.forEach(filePath => {
 
   Node.Fs.writeFileAsUtf8Sync(
     `${outputDirectory}/${fileNameWithoutExtension}Mockable.sol`,
-    sol.contents,
+    contractMockable,
   )
   Node.Fs.writeFileAsUtf8Sync(
     `${outputDirectory}/${fileNameWithoutExtension}ForInternalMocking.sol`,
@@ -460,7 +503,7 @@ filesToMockInternally->Array.forEach(filePath => {
     fileNameWithoutExtension,
     existingModuleDef ++
     "\n\n" ++
-    functions(contractDefinition["nodes"])
+    functionsVirtual(contractDefinition["nodes"])
     ->Array.map(((x, _)) => x)
     ->Array.concat(modifiers(contractDefinition["nodes"]))
     ->SmockableGen.internalModule(~contractName=fileNameWithoutExtension),

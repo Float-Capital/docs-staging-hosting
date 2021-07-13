@@ -134,12 +134,12 @@ contract LongShort is ILongShort, Initializable {
    * Necessary to update system state before any contract actions (deposits / withdraws)
    */
 
-  modifier adminOnly() {
+  modifier adminOnly() virtual {
     require(msg.sender == admin, "only admin");
     _;
   }
 
-  modifier assertMarketExists(uint32 marketIndex) {
+  modifier assertMarketExists(uint32 marketIndex) virtual {
     require(marketExists[marketIndex], "market doesn't exist");
     _;
   }
@@ -149,7 +149,7 @@ contract LongShort is ILongShort, Initializable {
     _;
   }
 
-  modifier updateSystemStateMarket(uint32 marketIndex) {
+  modifier updateSystemStateMarket(uint32 marketIndex) virtual {
     _updateSystemStateInternal(marketIndex);
 
     _;
@@ -164,7 +164,7 @@ contract LongShort is ILongShort, Initializable {
     address _treasury,
     ITokenFactory _tokenFactory,
     IStaker _staker
-  ) public initializer {
+  ) public virtual initializer {
     admin = _admin;
     treasury = _treasury;
     tokenFactory = _tokenFactory;
@@ -174,21 +174,25 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔═════════════════════════════╗
-      ║       MULTI-SIG ADMIN       ║
-      ╚═════════════════════════════╝*/
+    ║       MULTI-SIG ADMIN       ║
+    ╚═════════════════════════════╝*/
 
-  function changeAdmin(address _admin) external adminOnly {
+  function changeAdmin(address _admin) external virtual adminOnly {
     admin = _admin;
   }
 
-  function changeTreasury(address _treasury) external adminOnly {
+  function changeTreasury(address _treasury) external virtual adminOnly {
     treasury = _treasury;
   }
 
   /**
    * Update oracle for a market
    */
-  function updateMarketOracle(uint32 marketIndex, address _newOracleManager) external adminOnly {
+  function updateMarketOracle(uint32 marketIndex, address _newOracleManager)
+    external
+    virtual
+    adminOnly
+  {
     // If not a oracle contract this would break things.. Test's arn't validating this
     // Ie require isOracle interface - ERC165
     address previousOracleManager = address(oracleManagers[marketIndex]);
@@ -197,8 +201,8 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔═════════════════════════════╗
-      ║       MARKET CREATION       ║
-      ╚═════════════════════════════╝*/
+    ║       MARKET CREATION       ║
+    ╚═════════════════════════════╝*/
 
   /**
    * Creates an entirely new long/short market tracking an underlying
@@ -210,7 +214,7 @@ contract LongShort is ILongShort, Initializable {
     address _paymentToken,
     address _oracleManager,
     address _yieldManager
-  ) external adminOnly {
+  ) external virtual adminOnly {
     latestMarket++;
 
     // Create new synthetic long token.
@@ -245,7 +249,7 @@ contract LongShort is ILongShort, Initializable {
     );
   }
 
-  function _seedMarketInitially(uint256 initialMarketSeed, uint32 marketIndex) internal {
+  function _seedMarketInitially(uint256 initialMarketSeed, uint32 marketIndex) internal virtual {
     require(
       // You require at least 10^17 of the underlying payment token to seed the market.
       initialMarketSeed > 0.1 ether,
@@ -271,7 +275,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 initialMarketSeed,
     uint256 balanceIncentiveCurveExponent,
     int256 balanceIncentiveCurveEquilibriumOffset
-  ) external adminOnly {
+  ) external virtual adminOnly {
     require(!marketExists[marketIndex], "already initialized");
     require(marketIndex <= latestMarket, "index too highh");
 
@@ -293,12 +297,13 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔══════════════════════════════╗
-      ║       GETTER FUNCTIONS       ║
-      ╚══════════════════════════════╝*/
+    ║       GETTER FUNCTIONS       ║
+    ╚══════════════════════════════╝*/
 
   function _recalculateSyntheticTokenPrice(uint32 marketIndex, bool isLong)
     internal
     view
+    virtual
     returns (uint256 syntheticTokenPrice)
   {
     syntheticTokenPrice =
@@ -309,6 +314,7 @@ contract LongShort is ILongShort, Initializable {
   function _getAmountPaymentToken(uint256 amountSynth, uint256 price)
     internal
     pure
+    virtual
     returns (uint256)
   {
     return (amountSynth * price) / 1e18;
@@ -317,6 +323,7 @@ contract LongShort is ILongShort, Initializable {
   function _getAmountSynthToken(uint256 amountPaymentToken, uint256 price)
     internal
     pure
+    virtual
     returns (uint256)
   {
     return (amountPaymentToken * 1e18) / price;
@@ -336,7 +343,14 @@ contract LongShort is ILongShort, Initializable {
     address user,
     uint32 marketIndex,
     bool isLong
-  ) external view override assertMarketExists(marketIndex) returns (uint256 pendingBalance) {
+  )
+    external
+    view
+    virtual
+    override
+    assertMarketExists(marketIndex)
+    returns (uint256 pendingBalance)
+  {
     if (
       userCurrentNextPriceUpdateIndex[marketIndex][user] != 0 &&
       userCurrentNextPriceUpdateIndex[marketIndex][user] <= marketUpdateIndex[marketIndex]
@@ -357,7 +371,7 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  function floor(uint256 a, uint256 b) internal pure returns (uint256) {
+  function floor(uint256 a, uint256 b) internal pure virtual returns (uint256) {
     if (a > b) {
       return b;
     } else {
@@ -374,7 +388,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 longValue,
     uint256 shortValue,
     uint256 totalValueLockedInMarket
-  ) internal view returns (bool isLongSideUnderbalanced, uint256 treasuryPercentE18) {
+  ) internal view virtual returns (bool isLongSideUnderbalanced, uint256 treasuryPercentE18) {
     isLongSideUnderbalanced = longValue < shortValue;
     uint256 imbalance;
     if (isLongSideUnderbalanced) {
@@ -401,7 +415,7 @@ contract LongShort is ILongShort, Initializable {
   /**
    * Controls what happens with accrued yield manager interest.
    */
-  function _claimAndDistributeYield(uint32 marketIndex) internal {
+  function _claimAndDistributeYield(uint32 marketIndex) internal virtual {
     uint256 longValue = syntheticTokenPoolValue[marketIndex][true];
     uint256 shortValue = syntheticTokenPoolValue[marketIndex][false];
     uint256 totalValueLockedInMarket = longValue + shortValue;
@@ -422,7 +436,10 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  function _adjustMarketBasedOnNewAssetPrice(uint32 marketIndex, int256 newAssetPrice) internal {
+  function _adjustMarketBasedOnNewAssetPrice(uint32 marketIndex, int256 newAssetPrice)
+    internal
+    virtual
+  {
     int256 oldAssetPrice = int256(assetPrice[marketIndex]);
 
     uint256 min;
@@ -452,7 +469,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 newLatestPriceStateIndex,
     uint256 syntheticTokenPriceLong,
     uint256 syntheticTokenPriceShort
-  ) internal {
+  ) internal virtual {
     syntheticTokenPriceSnapshot[marketIndex][true][
       newLatestPriceStateIndex
     ] = syntheticTokenPriceLong;
@@ -463,13 +480,17 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔═══════════════════════════════╗
-      ║     UPDATING SYSTEM STATE     ║
-      ╚═══════════════════════════════╝*/
+    ║     UPDATING SYSTEM STATE     ║
+    ╚═══════════════════════════════╝*/
 
   /**
    * Updates the value of the long and short sides within the system.
    */
-  function _updateSystemStateInternal(uint32 marketIndex) internal assertMarketExists(marketIndex) {
+  function _updateSystemStateInternal(uint32 marketIndex)
+    internal
+    virtual
+    assertMarketExists(marketIndex)
+  {
     // If a negative int is return this should fail.
     int256 newAssetPrice = oracleManagers[marketIndex].updatePrice();
     int256 oldAssetPrice = int256(assetPrice[marketIndex]);
@@ -529,26 +550,26 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  function updateSystemState(uint32 marketIndex) external override {
+  function updateSystemState(uint32 marketIndex) external virtual override {
     _updateSystemStateInternal(marketIndex);
   }
 
-  function updateSystemStateMulti(uint32[] calldata marketIndexes) external override {
+  function updateSystemStateMulti(uint32[] calldata marketIndexes) external virtual override {
     for (uint256 i = 0; i < marketIndexes.length; i++) {
       _updateSystemStateInternal(marketIndexes[i]);
     }
   }
 
   /*╔════════════════════════════════╗
-      ║      DEPOSIT + WITHDRAWAL      ║
-      ╚════════════════════════════════╝*/
+    ║      DEPOSIT + WITHDRAWAL      ║
+    ╚════════════════════════════════╝*/
 
-  function _depositFunds(uint32 marketIndex, uint256 amount) internal {
+  function _depositFunds(uint32 marketIndex, uint256 amount) internal virtual {
     paymentTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
   }
 
   // NOTE: Only used in seeding the market.
-  function _lockFundsInMarket(uint32 marketIndex, uint256 amount) internal {
+  function _lockFundsInMarket(uint32 marketIndex, uint256 amount) internal virtual {
     _depositFunds(marketIndex, amount);
     _transferFundsToYieldManager(marketIndex, amount);
   }
@@ -562,7 +583,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 amountLong,
     uint256 amountShort,
     address user
-  ) internal {
+  ) internal virtual {
     uint256 totalAmount = amountLong + amountShort;
 
     if (totalAmount == 0) {
@@ -587,7 +608,7 @@ contract LongShort is ILongShort, Initializable {
     uint32 marketIndex,
     uint256 amountSynthToRedeemLong,
     uint256 amountSynthToRedeemShort
-  ) internal {
+  ) internal virtual {
     if (amountSynthToRedeemLong > 0) {
       syntheticTokens[marketIndex][true].synthRedeemBurn(address(this), amountSynthToRedeemLong);
     }
@@ -598,28 +619,28 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔══════════════════════════════════╗
-      ║     TREASURY + YIELD MANAGER     ║
-      ╚══════════════════════════════════╝*/
+    ║     TREASURY + YIELD MANAGER     ║
+    ╚══════════════════════════════════╝*/
 
   /*
    * Transfers locked funds from LongShort into the yield manager.
    */
-  function _transferFundsToYieldManager(uint32 marketIndex, uint256 amount) internal {
+  function _transferFundsToYieldManager(uint32 marketIndex, uint256 amount) internal virtual {
     yieldManagers[marketIndex].depositPaymentToken(amount);
   }
 
   /*
    * Transfers locked funds from the yield manager into LongShort.
    */
-  function _transferFromYieldManager(uint32 marketIndex, uint256 amount) internal {
+  function _transferFromYieldManager(uint32 marketIndex, uint256 amount) internal virtual {
     // NB there will be issues here if not enough liquidity exists to withdraw
     // Boolean should be returned from yield manager and think how to appropriately handle this
     yieldManagers[marketIndex].withdrawPaymentToken(amount);
   }
 
   /*╔═══════════════════════════╗
-      ║       MINT POSITION       ║
-      ╚═══════════════════════════╝*/
+    ║       MINT POSITION       ║
+    ╚═══════════════════════════╝*/
 
   function _mintNextPrice(
     uint32 marketIndex,
@@ -627,6 +648,7 @@ contract LongShort is ILongShort, Initializable {
     bool isLong
   )
     internal
+    virtual
     updateSystemStateMarket(marketIndex)
     executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
   {
@@ -645,17 +667,17 @@ contract LongShort is ILongShort, Initializable {
     );
   }
 
-  function mintLongNextPrice(uint32 marketIndex, uint256 amount) external {
+  function mintLongNextPrice(uint32 marketIndex, uint256 amount) external virtual {
     _mintNextPrice(marketIndex, amount, true);
   }
 
-  function mintShortNextPrice(uint32 marketIndex, uint256 amount) external {
+  function mintShortNextPrice(uint32 marketIndex, uint256 amount) external virtual {
     _mintNextPrice(marketIndex, amount, false);
   }
 
   /*╔═══════════════════════════╗
-      ║      REDEEM POSITION      ║
-      ╚═══════════════════════════╝*/
+    ║      REDEEM POSITION      ║
+    ╚═══════════════════════════╝*/
 
   function _redeemNextPrice(
     uint32 marketIndex,
@@ -663,6 +685,7 @@ contract LongShort is ILongShort, Initializable {
     bool isLong
   )
     internal
+    virtual
     updateSystemStateMarket(marketIndex)
     executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
   {
@@ -682,23 +705,23 @@ contract LongShort is ILongShort, Initializable {
     );
   }
 
-  function redeemLongNextPrice(uint32 marketIndex, uint256 tokensToRedeem) external {
+  function redeemLongNextPrice(uint32 marketIndex, uint256 tokensToRedeem) external virtual {
     _redeemNextPrice(marketIndex, tokensToRedeem, true);
   }
 
-  function redeemShortNextPrice(uint32 marketIndex, uint256 tokensToRedeem) external {
+  function redeemShortNextPrice(uint32 marketIndex, uint256 tokensToRedeem) external virtual {
     _redeemNextPrice(marketIndex, tokensToRedeem, false);
   }
 
   /*╔════════════════════════════════╗
-      ║     NEXT PRICE SETTLEMENTS     ║
-      ╚════════════════════════════════╝*/
+    ║     NEXT PRICE SETTLEMENTS     ║
+    ╚════════════════════════════════╝*/
 
   function _executeNextPriceMintsIfTheyExist(
     uint32 marketIndex,
     address user,
     bool isLong
-  ) internal {
+  ) internal virtual {
     uint256 currentDepositAmount = userNextPriceDepositAmount[marketIndex][isLong][user];
     if (currentDepositAmount > 0) {
       userNextPriceDepositAmount[marketIndex][isLong][user] = 0;
@@ -718,7 +741,7 @@ contract LongShort is ILongShort, Initializable {
     uint32 marketIndex,
     address user,
     bool isLong
-  ) internal {
+  ) internal virtual {
     uint256 currentRedemptions = userNextPriceRedemptionAmount[marketIndex][isLong][user];
     if (currentRedemptions > 0) {
       userNextPriceRedemptionAmount[marketIndex][isLong][user] = 0;
@@ -733,7 +756,10 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  function _executeOutstandingNextPriceSettlements(address user, uint32 marketIndex) internal {
+  function _executeOutstandingNextPriceSettlements(address user, uint32 marketIndex)
+    internal
+    virtual
+  {
     uint256 currentUpdateIndex = userCurrentNextPriceUpdateIndex[marketIndex][user];
     if (currentUpdateIndex != 0 && currentUpdateIndex <= marketUpdateIndex[marketIndex]) {
       _executeNextPriceMintsIfTheyExist(marketIndex, user, true);
@@ -749,21 +775,22 @@ contract LongShort is ILongShort, Initializable {
 
   function executeOutstandingNextPriceSettlementsUser(address user, uint32 marketIndex)
     external
+    virtual
     override
   {
     _executeOutstandingNextPriceSettlements(user, marketIndex);
   }
 
   /*╔═══════════════════════════════════════════╗
-      ║   BATCHED NEXT PRICE SETTLEMENT ACTIONS   ║
-      ╚═══════════════════════════════════════════╝*/
+    ║   BATCHED NEXT PRICE SETTLEMENT ACTIONS   ║
+    ╚═══════════════════════════════════════════╝*/
 
   function _performOustandingSettlements(
     uint32 marketIndex,
     uint256 newLatestPriceStateIndex,
     uint256 syntheticTokenPriceLong,
     uint256 syntheticTokenPriceShort
-  ) internal {
+  ) internal virtual {
     _handleBatchedDepositSettlement(marketIndex, true, syntheticTokenPriceLong);
     _handleBatchedDepositSettlement(marketIndex, false, syntheticTokenPriceShort);
     _handleBatchedRedeemSettlement(marketIndex, syntheticTokenPriceLong, syntheticTokenPriceShort);
@@ -773,7 +800,7 @@ contract LongShort is ILongShort, Initializable {
     uint32 marketIndex,
     bool isLong,
     uint256 syntheticTokenPrice
-  ) internal {
+  ) internal virtual {
     uint256 amountToBatchDeposit = batchedAmountOfTokensToDeposit[marketIndex][isLong];
 
     if (amountToBatchDeposit > 0) {
@@ -792,7 +819,7 @@ contract LongShort is ILongShort, Initializable {
     uint32 marketIndex,
     uint256 syntheticTokenPriceLong,
     uint256 syntheticTokenPriceShort
-  ) internal {
+  ) internal virtual {
     _burnSynthTokensForRedemption(
       marketIndex,
       batchedAmountOfSynthTokensToRedeem[marketIndex][true],

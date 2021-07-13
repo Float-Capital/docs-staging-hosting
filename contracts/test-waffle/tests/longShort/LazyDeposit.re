@@ -29,7 +29,7 @@ let testIntegration =
       let%AwaitThen _longValueBefore =
         longShort->LongShort.syntheticTokenPoolValue(
           marketIndex,
-          true/*long*/,
+          true /*long*/,
         );
 
       let%AwaitThen _ =
@@ -98,7 +98,7 @@ let testIntegration =
 
       let%Await longTokenPrice =
         longShort->Contract.LongShortHelpers.getSyntheticTokenPrice(
-          ~marketIndex=marketIndex,
+          ~marketIndex,
           ~isLong=true,
         );
 
@@ -199,7 +199,7 @@ let testExposed =
         let%Await mintAmount =
           longShort->LongShort.batchedAmountOfTokensToDeposit(
             marketIndex,
-            true/*long*/,
+            true /*long*/,
           );
 
         Chai.bnEqual(
