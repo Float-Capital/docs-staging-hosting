@@ -36,8 +36,6 @@ let test =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("_claimFloat", () => {
-    let stakerRef: ref(Staker.t) = ref(None->Obj.magic);
-
     let marketIndices = [|
       Helpers.randomJsInteger(),
       Helpers.randomJsInteger(),
@@ -71,7 +69,7 @@ let test =
     let setup =
         (~marketIndices, ~latestRewardIndices, ~floatRewardsForMarkets) => {
       let%AwaitThen _ =
-        stakerRef->deployAndSetupStakerToUnitTest(
+        deployAndSetupStakerToUnitTest(
           ~functionName="_claimFloat",
           ~contracts,
           ~accounts,
@@ -88,7 +86,7 @@ let test =
           ()->JsPromise.resolve,
           (lastPromise, marketIndex, arrayIndex) => {
             let%AwaitThen _ = lastPromise;
-            (stakerRef^)
+            contracts^.staker
             ->Staker.Exposed.setMintAccumulatedFloatAndClaimFloatParams(
                 ~marketIndex,
                 ~latestRewardIndexForMarket=
@@ -98,7 +96,7 @@ let test =
         );
       let%AwaitThen _ = setupPromise;
       promiseRef :=
-        (stakerRef^)
+        contracts^.staker
         ->ContractHelpers.connect(~address=userWalletRef^)
         ->Staker.Exposed._claimFloatExternal(~marketIndex=marketIndices);
 
@@ -135,7 +133,7 @@ let test =
           let%Await _ =
             Chai.callEmitEvents(
               ~call=promiseRef^,
-              ~contract=(stakerRef^)->Obj.magic,
+              ~contract=contracts^.staker->Obj.magic,
               ~eventName="FloatMinted",
             )
             ->Chai.withArgs5(
@@ -150,7 +148,7 @@ let test =
 
         it("mutates userIndexOfLastClaimedReward", () => {
           let%Await lastClaimed =
-            (stakerRef^)
+            contracts^.staker
             ->Staker.userIndexOfLastClaimedReward(
                 marketIndices->Array.getUnsafe(0),
                 userWalletRef^.address,
@@ -161,10 +159,9 @@ let test =
 
       describe("case market has no float to mint", () => {
         // still calls calculateAccumulatedFloat but unwieldy to test
-
         it("doesn't mutate userIndexOfLastClaimed", () => {
           let%Await lastClaimed =
-            (stakerRef^)
+            contracts^.staker
             ->Staker.userIndexOfLastClaimedReward(
                 marketIndices->Array.getUnsafe(1),
                 userWalletRef^.address,
@@ -175,7 +172,7 @@ let test =
         it("doesn't emit FloatMinted event", () =>
           Chai.callEmitEvents(
             ~call=promiseRef^,
-            ~contract=(stakerRef^)->Obj.magic,
+            ~contract=contracts^.staker->Obj.magic,
             ~eventName="FloatMinted",
           )
           ->Chai.withArgs5Return(

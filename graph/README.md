@@ -33,6 +33,16 @@ docker logs graph_graph-node_1 -f --tail 100
 Checkout the graph code you want to run.
 Go in the `scripts` folder, and run `./updateSelfHostedGraph.sh`.
 
+By default this deploys the two graphs with names `float-capital` and `float-oracle-prices`. But sometimes you want a unique name for your graph. To do this set the environment variable `GRAPH_POSTFIX` to something.
+
+eg:
+
+```bash
+GRAPH_POSTFIX=2 ./updateSelfHostedGraph.sh
+```
+
+Would create and deploy graphs with names `float-capital` and `float-oracle-prices`. This is useful for versioning different graphs.
+
 ### Development tips
 
 - Add event logging to the graph by setting the `EVENT_LOGGING` variable to true inside the `src/config.ts` file (please avoid comitting this)

@@ -2,8 +2,6 @@ open LetOps;
 open Mocha;
 
 let test = (~contracts: ref(Helpers.coreContracts)) => {
-  let stakerRef: ref(Staker.t) = ref(""->Obj.magic);
-
   let marketIndex = Helpers.randomJsInteger();
   let latestMarketIndex = Helpers.randomInteger();
 
@@ -11,12 +9,10 @@ let test = (~contracts: ref(Helpers.coreContracts)) => {
     it(
       "returns the time difference since the last reward state for a market",
       () => {
-      let {staker} = contracts^;
-      stakerRef := staker;
       let%Await pastTimestamp = Helpers.getRandomTimestampInPast();
 
       let%AwaitThen _ =
-        (stakerRef^)
+        contracts^.staker
         ->Staker.Exposed.setCalculateTimeDeltaParams(
             ~marketIndex,
             ~latestRewardIndexForMarket=latestMarketIndex,
@@ -31,7 +27,8 @@ let test = (~contracts: ref(Helpers.coreContracts)) => {
         ->Ethers.BigNumber.sub(pastTimestamp);
 
       let%Await delta =
-        (stakerRef^)->Staker.Exposed.calculateTimeDeltaExposed(~marketIndex);
+        contracts^.staker
+        ->Staker.Exposed.calculateTimeDeltaExposed(~marketIndex);
 
       delta->Chai.bnEqual(expectedDelta);
     })

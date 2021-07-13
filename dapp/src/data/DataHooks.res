@@ -475,12 +475,12 @@ let useSyntheticPrices = (
 @ocaml.doc(`Returns the oracles last price update timestamp`)
 let useOracleLastUpdate = (~marketIndex) => {
   let oracleLastUpdateQuery = Queries.OraclesLastUpdate.use(
-    ~context=Client.createContext(Client.PriceHistory),
     {marketIndex: marketIndex},
     ~fetchPolicy=NetworkOnly,
   )
+
   switch oracleLastUpdateQuery {
-  | {data: Some({oracles})} => Response((oracles->Array.getUnsafe(0)).lastUpdatedTimestamp)
+  | {data: Some({underlyingPrices: [{timeUpdated}]})} => Response(timeUpdated)
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
   }

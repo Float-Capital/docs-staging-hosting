@@ -443,7 +443,7 @@ function UserUI$UserTokenBox(Props) {
                       syntheticPriceLastUpdated: match$1.timeUpdated,
                       tokenAddress: tokenAddress,
                       isLong: isLong,
-                      oldAssetPrice: match$3.syntheticPrice
+                      oldAssetPrice: match$3.underlyingPrice.price.price
                     })), React.createElement("div", {
                   className: "self-center"
                 }, children));
@@ -460,7 +460,7 @@ function UserUI$UserPendingBox(Props) {
   var txConfirmedTimestamp = Props.txConfirmedTimestamp;
   var marketIndex = Props.marketIndex;
   var rerenderCallback = Props.rerenderCallback;
-  var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toNumber());
+  var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toString());
   if (typeof lastOracleTimestamp === "number") {
     return React.createElement(Loader.Tiny.make, {});
   } else if (lastOracleTimestamp.TAG === /* GraphError */0) {
@@ -481,7 +481,7 @@ function UserUI$UserPendingBox(Props) {
                             src: CONSTANTS.daiDisplayToken.iconUrl
                           }), Ethers.Utils.formatEther(daiSpend))), React.createElement(ProgressBar.make, {
                     txConfirmedTimestamp: txConfirmedTimestamp,
-                    nextPriceUpdateTimestamp: lastOracleTimestamp._0.toNumber() + 1200 | 0,
+                    nextPriceUpdateTimestamp: lastOracleTimestamp._0.toNumber() + 60 | 0,
                     rerenderCallback: rerenderCallback
                   }));
   }
@@ -560,7 +560,7 @@ function UserUI$UserStakeBox(Props) {
                       syntheticPriceLastUpdated: synthLastUpdated,
                       tokenAddress: tokenAddress,
                       isLong: isLong,
-                      oldAssetPrice: match$1.syntheticPrice
+                      oldAssetPrice: match$1.underlyingPrice.price.price
                     })), React.createElement("div", {
                   className: "self-center"
                 }, children));

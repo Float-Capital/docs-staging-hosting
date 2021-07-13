@@ -217,7 +217,8 @@ contract("OracleManager (Flippening V0)", (accounts) => {
       );
     });
 
-    describe("increases linearly over time", async () => {
+    // flakey test see: https://github.com/Float-Capital/monorepo/issues/810
+    describe.skip("increases linearly over time", async () => {
       it(
         "case less than a day",
         testBtcSupplyGain({
@@ -360,7 +361,8 @@ contract("OracleManager (Flippening V0)", (accounts) => {
       );
     });
 
-    describe("increases linearly over time", () => {
+    // flakey test see: https://github.com/Float-Capital/monorepo/issues/810
+    describe.skip("increases linearly over time", () => {
       it(
         "case less than a day",
         testEthSupplyGain({

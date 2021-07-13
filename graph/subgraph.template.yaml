@@ -16,7 +16,7 @@ dataSources:
       entities:
         - ExecuteNextPriceMintSettlementUser
         - ExecuteNextPriceRedeemSettlementUser
-        - V1
+        - LongShortV1
         - SyntheticTokenCreated
         - LongMinted
         - LongRedeem
@@ -29,13 +29,13 @@ dataSources:
         - name: LongShort
           file: ./abis/LongShort.json
       eventHandlers:
-        - event: V1(address,address,address,address)
-          handler: handleV1
+        - event: LongShortV1(address,address,address,address)
+          handler: handleLongShortV1
         - event: ExecuteNextPriceMintSettlementUser(address,uint32,bool,uint256)
           handler: handleExecuteNextPriceMintSettlementUser
         - event: ExecuteNextPriceRedeemSettlementUser(address,uint32,bool,uint256)
           handler: handleExecuteNextPriceRedeemSettlementUser
-        - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address)
+        - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address,address)
           handler: handleSyntheticTokenCreated
         - event: LongMinted(uint32,uint256,uint256,uint256,address)
           handler: handleLongMinted
@@ -65,29 +65,41 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - DeployV1
+        - BalanceIncentiveEquilibriumOffsetUpdated
+        - BalanceIncentiveExponentUpdated
         - FloatMinted
+        - FloatPercentageUpdated
         - MarketAddedToStaker
         - MarketLaunchIncentiveParametersChanges
         - StakeAdded
+        - StakeWithdrawalFeeUpdated
         - StakeWithdrawn
+        - StakerV1
         - StateAdded
       abis:
         - name: Staker
           file: ./abis/Staker.json
       eventHandlers:
-        - event: DeployV1(address)
-          handler: handleDeployV1
+        - event: BalanceIncentiveEquilibriumOffsetUpdated(uint32,int256)
+          handler: handleBalanceIncentiveEquilibriumOffsetUpdated
+        - event: BalanceIncentiveExponentUpdated(uint32,uint256)
+          handler: handleBalanceIncentiveExponentUpdated
         - event: FloatMinted(address,uint32,uint256,uint256,uint256)
           handler: handleFloatMinted
-        - event: MarketAddedToStaker(uint32,uint256)
+        - event: FloatPercentageUpdated(uint256)
+          handler: handleFloatPercentageUpdated
+        - event: MarketAddedToStaker(uint32,uint256,uint256,uint256,uint256,int256)
           handler: handleMarketAddedToStaker
         - event: MarketLaunchIncentiveParametersChanges(uint32,uint256,uint256)
           handler: handleMarketLaunchIncentiveParametersChanges
         - event: StakeAdded(address,address,uint256,uint256)
           handler: handleStakeAdded
+        - event: StakeWithdrawalFeeUpdated(uint32,uint256)
+          handler: handleStakeWithdrawalFeeUpdated
         - event: StakeWithdrawn(address,address,uint256)
           handler: handleStakeWithdrawn
+        - event: StakerV1(address,uint256)
+          handler: handleStakerV1
         - event: StateAdded(uint32,uint256,uint256,uint256)
           handler: handleStateAdded
       file: ./src/staker.ts

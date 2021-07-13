@@ -16,6 +16,7 @@ let before_once' = fn => {
 let (
   add,
   sub,
+  pow,
   bnFromString,
   bnFromInt,
   mul,
@@ -29,6 +30,7 @@ let (
   Ethers.BigNumber.(
     add,
     sub,
+    pow,
     fromUnsafe,
     fromInt,
     mul,
@@ -39,6 +41,8 @@ let (
     gte,
     lt,
   );
+
+let (twoBn, oneBn, tenToThe18) = CONSTANTS.(twoBn, oneBn, tenToThe18);
 
 let describeIntegration =
   Config.dontRunIntegrationTests ? describe_skip : describe;

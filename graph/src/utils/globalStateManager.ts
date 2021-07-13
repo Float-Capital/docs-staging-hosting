@@ -8,8 +8,8 @@ import {
   UserSyntheticTokenBalance,
   LatestPrice,
   SyntheticMarket,
-  CollateralToken,
-  UserCollateralTokenBalance,
+  PaymentToken,
+  UserPaymentTokenBalance,
   UnderlyingPrice,
   LatestUnderlyingPrice,
 } from "../../generated/schema";
@@ -352,13 +352,13 @@ export function getOrCreateBalanceObject(
 export function getOrCreateCollatoralBalanceObject(
   tokenAddressString: string,
   userAddressString: string
-): UserCollateralTokenBalance {
-  let balance = UserCollateralTokenBalance.load(
+): UserPaymentTokenBalance {
+  let balance = UserPaymentTokenBalance.load(
     tokenAddressString + "-" + userAddressString + "-balance"
   );
 
   if (balance == null) {
-    let newBalance = new UserCollateralTokenBalance(
+    let newBalance = new UserPaymentTokenBalance(
       tokenAddressString + "-" + userAddressString + "-balance"
     );
 
@@ -368,40 +368,40 @@ export function getOrCreateCollatoralBalanceObject(
     }
     newBalance.user = user.id;
 
-    let token = CollateralToken.load(tokenAddressString);
+    let token = PaymentToken.load(tokenAddressString);
     if (token == null) {
       log.critical("Synthetic Token is undefined with address {}", [
         tokenAddressString,
       ]);
     }
-    newBalance.collateralToken = token.id;
+    newBalance.paymentToken = token.id;
 
     newBalance.balanceInaccurate = ZERO;
     newBalance.timeLastUpdated = ZERO;
 
     return newBalance;
   } else {
-    return balance as UserCollateralTokenBalance;
+    return balance as UserPaymentTokenBalance;
   }
 }
 
-export function updateOrCreateCollateralToken(
+export function updateOrCreatePaymentToken(
   tokenAddress: Address,
   syntheticMarket: SyntheticMarket
-): CollateralToken {
+): PaymentToken {
   let tokenAddressString = tokenAddress.toHex();
-  let collateralToken = CollateralToken.load(tokenAddressString);
-  if (collateralToken == null) {
-    collateralToken = new CollateralToken(tokenAddressString);
-    collateralToken.linkedMarkets = [];
+  let paymentToken = PaymentToken.load(tokenAddressString);
+  if (paymentToken == null) {
+    paymentToken = new PaymentToken(tokenAddressString);
+    paymentToken.linkedMarkets = [];
     createNewTokenDataSource(tokenAddress);
   }
 
-  collateralToken.linkedMarkets = collateralToken.linkedMarkets.concat([
+  paymentToken.linkedMarkets = paymentToken.linkedMarkets.concat([
     syntheticMarket.id,
   ]);
 
-  return collateralToken as CollateralToken;
+  return paymentToken as PaymentToken;
 }
 
 export function createSyntheticToken(tokenAddress: Bytes): SyntheticToken {

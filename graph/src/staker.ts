@@ -1,11 +1,15 @@
 import {
-  DeployV1,
+  StakerV1,
   StateAdded,
   StakeAdded,
   StakeWithdrawn,
   FloatMinted,
   MarketLaunchIncentiveParametersChanges,
   MarketAddedToStaker,
+  StakeWithdrawalFeeUpdated,
+  FloatPercentageUpdated,
+  BalanceIncentiveEquilibriumOffsetUpdated,
+  BalanceIncentiveExponentUpdated,
 } from "../generated/Staker/Staker";
 import { erc20 } from "../generated/templates";
 import {
@@ -28,8 +32,10 @@ import {
 
 import { ZERO, ONE, GLOBAL_STATE_ID } from "./CONSTANTS";
 
-export function handleDeployV1(event: DeployV1): void {
+export function handleStakerV1(event: StakerV1): void {
   let floatAddress = event.params.floatToken;
+  // TODO: add the floatPercentage to the graph.
+  let floatPercentage = event.params.floatPercentage;
 
   let context = new DataSourceContext();
   context.setString("contractAddress", floatAddress.toHex());
@@ -38,13 +44,30 @@ export function handleDeployV1(event: DeployV1): void {
 
   saveEventToStateChange(
     event,
-    "DeployV1",
-    [floatAddress.toHex()],
-    ["floatAddress"],
-    ["address"],
+    "StakerV1",
+    [floatAddress.toHex(), floatPercentage.toString()],
+    ["floatAddress", "floatPercentage"],
+    ["address", "uint256"],
     [],
     [],
     false
+  );
+}
+
+export function handleStakeWithdrawalFeeUpdated(
+  event: StakeWithdrawalFeeUpdated
+): void {
+  let marketIndex = event.params.marketIndex;
+  let stakeWithdralFee = event.params.stakeWithdralFee;
+
+  saveEventToStateChange(
+    event,
+    "StakeWithdrawalFeeUpdated",
+    bigIntArrayToStringArray([marketIndex, stakeWithdralFee]),
+    ["marketIndex", "stakeWithdralFee"],
+    ["uint32", "uint256"],
+    [],
+    []
   );
 }
 
@@ -420,5 +443,79 @@ export function handleFloatMinted(event: FloatMinted): void {
     ["address", "uint32", "uint256", "uint256", "uint256"],
     [userAddress],
     changedStakesArray
+  );
+}
+
+export function handleFloatPercentageUpdated(
+  event: FloatPercentageUpdated
+): void {
+  // TODO: update value in the graph!
+  let floatPercentage = event.params.floatPercentage;
+
+  saveEventToStateChange(
+    event,
+    "FloatPercentageUpdated",
+    [floatPercentage.toString()],
+    ["floatPercentage"],
+    ["uint256"],
+    [],
+    []
+  );
+}
+
+/*
+  event StakeWithdrawalFeeUpdated(uint32 marketIndex, uint256 stakeWithdralFee);
+  event BalanceIncentiveExponentUpdated(uint32 marketIndex, uint256 balanceIncentiveExponent);
+*/
+export function handleBalanceIncentiveEquilibriumOffsetUpdated(
+  event: BalanceIncentiveEquilibriumOffsetUpdated
+): void {
+  // TODO: update value in the graph!
+  let marketIndex = event.params.marketIndex;
+  let balanceIncentiveEquilibriumOffset =
+    event.params.balanceIncentiveEquilibriumOffset;
+
+  saveEventToStateChange(
+    event,
+    "BalanceIncentiveEquilibriumOffsetUpdated",
+    [marketIndex.toString(), balanceIncentiveEquilibriumOffset.toString()],
+    ["marketIndex", "balanceIncentiveEquilibriumOffset"],
+    ["uint32", "int256"],
+    [],
+    []
+  );
+}
+export function handleBalanceIncentiveExponentUpdated(
+  event: BalanceIncentiveExponentUpdated
+): void {
+  // TODO: update value in the graph!
+  let marketIndex = event.params.marketIndex;
+  let balanceIncentiveExponent = event.params.balanceIncentiveExponent;
+
+  saveEventToStateChange(
+    event,
+    "BalanceIncentiveExponentUpdated",
+    [marketIndex.toString(), balanceIncentiveExponent.toString()],
+    ["marketIndex", "balanceIncentiveExponent"],
+    ["uint32", "uint256"],
+    [],
+    []
+  );
+}
+export function handleStakeWithdrawalFeeUpdate(
+  event: StakeWithdrawalFeeUpdated
+): void {
+  // TODO: update value in the graph!
+  let marketIndex = event.params.marketIndex;
+  let stakeWithdralFee = event.params.stakeWithdralFee;
+
+  saveEventToStateChange(
+    event,
+    "StakeWithdrawalFeeUpdate",
+    [marketIndex.toString(), stakeWithdralFee.toString()],
+    ["marketIndex", "stakeWithdralFee"],
+    ["uint32", "uint256"],
+    [],
+    []
   );
 }

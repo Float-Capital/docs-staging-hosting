@@ -1,5 +1,5 @@
 import {
-  V1,
+  LongShortV1,
   SyntheticTokenCreated,
   PriceUpdate,
   SystemStateUpdated,
@@ -18,7 +18,7 @@ import {
   TokenFactory,
   LongShortContract,
   SyntheticToken,
-  CollateralToken,
+  PaymentToken,
   LatestPrice,
   Price,
   LatestUnderlyingPrice,
@@ -35,7 +35,7 @@ import {
   createSyntheticTokenLong,
   createSyntheticTokenShort,
   createInitialSystemState,
-  updateOrCreateCollateralToken,
+  updateOrCreatePaymentToken,
   getOrCreateGlobalState,
   getStakerStateId,
   getUser,
@@ -72,8 +72,8 @@ import {
   doesBatchExist,
 } from "./utils/nextPrice";
 
-export function handleV1(event: V1): void {
-  // event V1(address admin, address tokenFactory, address staker);
+export function handleLongShortV1(event: LongShortV1): void {
+  // event LongShortV1(address admin, address tokenFactory, address staker);
 
   let admin = event.params.admin;
   let tokenFactoryParam = event.params.tokenFactory;
@@ -113,7 +113,7 @@ export function handleV1(event: V1): void {
 
   saveEventToStateChange(
     event,
-    "V1",
+    "LongShortV1",
     [admin.toHex(), treasury.toHex(), tokenFactoryString, stakerString],
     ["admin", "treasury", "tokenFactory", "staker"],
     ["address", "address", "address", "address"],
@@ -280,8 +280,9 @@ export function handleSyntheticTokenCreated(
   let marketIndex = event.params.marketIndex;
   let longTokenAddress = event.params.longTokenAddress;
   let shortTokenAddress = event.params.shortTokenAddress;
-  let collateralTokenAddress = event.params.paymentToken;
-  let initialAssetPrice = event.params.assetPrice;
+  let paymentToken = event.params.paymentToken;
+  let initialAssetPrice = event.params.initialAssetPrice;
+  let yieldManagerAddress = event.params.yieldManagerAddress;
 
   let oracleAddress = event.params.oracleAddress;
   let syntheticName = event.params.name;
@@ -325,11 +326,11 @@ export function handleSyntheticTokenCreated(
   syntheticMarket.settledNextPriceActions = [];
 
   // create new synthetic token object.
-  let collateralToken = updateOrCreateCollateralToken(
-    collateralTokenAddress,
+  let paymentTokenEntity = updateOrCreatePaymentToken(
+    paymentToken,
     syntheticMarket
   );
-  syntheticMarket.collateralToken = collateralToken.id;
+  syntheticMarket.paymentToken = paymentTokenEntity.id;
 
   let globalState = GlobalState.load(GLOBAL_STATE_ID);
   if (globalState == null) {
@@ -357,7 +358,7 @@ export function handleSyntheticTokenCreated(
     ZERO,
     event
   );
-  collateralToken.save();
+  paymentTokenEntity.save();
   initalLatestStakerState.save();
   longToken.save();
   shortToken.save();
@@ -371,24 +372,27 @@ export function handleSyntheticTokenCreated(
       marketIndex.toString(),
       longTokenAddress.toHex(),
       shortTokenAddress.toHex(),
+      initialAssetPrice.toHex(),
       initialAssetPrice.toString(),
       syntheticName,
       syntheticSymbol,
       oracleAddress.toHex(),
-      collateralTokenAddress.toHex(),
+      yieldManagerAddress.toHex(),
     ],
     [
       "marketIndex",
       "longTokenAddress",
       "shortTokenAddress",
-      "assetPrice",
+      "paymentAddress",
+      "initialAssetPrice",
       "name",
       "symbol",
       "oracleAddress",
-      "collateralAddress",
+      "yieldManagerAddress",
     ],
     [
-      "uint256",
+      "uint32",
+      "address",
       "address",
       "address",
       "uint256",
@@ -477,22 +481,23 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
     syntheticMarket,
     user
   );
+  userNextPriceAction.confirmedTimestamp = event.block.timestamp;
 
   userNextPriceAction.save();
   batchedNextPriceExec.save();
 
-  let collateralToken = CollateralToken.load(syntheticMarket.collateralToken);
-  if (collateralToken == null) {
+  let paymentToken = PaymentToken.load(syntheticMarket.paymentToken);
+  if (paymentToken == null) {
     log.critical(
-      "collateralToken is undefined when it shouldn't be, entity id: {}",
-      [syntheticMarket.collateralToken]
+      "paymentToken is undefined when it shouldn't be, entity id: {}",
+      [syntheticMarket.paymentToken]
     );
   }
 
   decreaseOrCreateUserApprovals(
     userAddress,
     event.params.depositAdded,
-    collateralToken,
+    paymentToken,
     event
   );
 
@@ -539,6 +544,7 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
     syntheticMarket,
     user
   );
+  userNextPriceAction.confirmedTimestamp = event.block.timestamp;
 
   userNextPriceAction.save();
   batchedNextPriceExec.save();

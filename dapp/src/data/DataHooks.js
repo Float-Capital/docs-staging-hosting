@@ -857,7 +857,7 @@ function useSyntheticPrices(oracleAddress, timestamp, tokenSupply, totalLockedLo
 function useOracleLastUpdate(marketIndex) {
   var oracleLastUpdateQuery = Curry.app(Queries.OraclesLastUpdate.use, [
         undefined,
-        Caml_option.some(Client.createContext(/* PriceHistory */1)),
+        undefined,
         undefined,
         undefined,
         /* NetworkOnly */3,
@@ -875,17 +875,22 @@ function useOracleLastUpdate(marketIndex) {
       ]);
   var match = oracleLastUpdateQuery.data;
   if (match !== undefined) {
-    return {
-            TAG: 1,
-            _0: match.oracles[0].lastUpdatedTimestamp,
-            [Symbol.for("name")]: "Response"
-          };
+    var match$1 = match.underlyingPrices;
+    if (match$1.length === 1) {
+      var match$2 = match$1[0];
+      return {
+              TAG: 1,
+              _0: match$2.timeUpdated,
+              [Symbol.for("name")]: "Response"
+            };
+    }
+    
   }
-  var match$1 = oracleLastUpdateQuery.error;
-  if (match$1 !== undefined) {
+  var match$3 = oracleLastUpdateQuery.error;
+  if (match$3 !== undefined) {
     return {
             TAG: 0,
-            _0: match$1.message,
+            _0: match$3.message,
             [Symbol.for("name")]: "GraphError"
           };
   } else {
