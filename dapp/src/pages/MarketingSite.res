@@ -3,11 +3,11 @@ module MarketingSite = {
   let make = () => {
     <>
       <Landing />
-      <HowItWorks/>
+      <HowItWorks />
       <Roadmap />
-      <Governance />      
-      <Security />      
-      <Footer />
+      <Governance />
+      <Security />
+      // <Footer />
       <TVL />
     </>
   }

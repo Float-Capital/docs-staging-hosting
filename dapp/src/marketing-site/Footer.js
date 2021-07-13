@@ -7,7 +7,7 @@ var Link = require("next/link").default;
 
 function Footer(Props) {
   return React.createElement("section", {
-              className: "py-5 my-0 text:2xl md:text-lg flex flex-col md:flex-row items-end md:items-center md:justify-center bg-primary text-white"
+              className: "py-0 h-16 my-0 text:2xl md:text-lg flex flex-col md:flex-row items-end md:items-center md:justify-center bg-primary text-white"
             }, React.createElement(Link, {
                   href: "/app/markets",
                   children: React.createElement("a", {

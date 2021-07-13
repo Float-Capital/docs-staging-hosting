@@ -2,39 +2,61 @@
 'use strict';
 
 var React = require("react");
+var Footer = require("./Footer.js");
 
 function Security(Props) {
   return React.createElement("section", {
-              className: "py-10 min-h-screen w-screen flex flex-col items-center justify-center fighter-blue",
+              className: "min-h-screen w-screen  fighter-blue",
               id: "security"
             }, React.createElement("div", {
-                  className: "max-w-5xl flex flex-col justify-evenly items-center mx-auto"
-                }, React.createElement("h3", {
-                      className: "my-2 text-5xl uppercase font-arimo font-extrabold"
-                    }, "Security"), React.createElement("div", {
-                      className: "grid grid-cols-3 items-center justify-center"
-                    }, React.createElement("div", {
-                          className: "mx-4"
-                        }, React.createElement("img", {
-                              className: "h-36 mx-auto",
-                              src: "/icons/coverage.svg"
-                            }), React.createElement("p", {
-                              className: "text-center"
-                            }, "Smart contract code coverage")), React.createElement("div", {
-                          className: "mx-4"
-                        }, React.createElement("img", {
-                              className: "h-36 mx-auto",
-                              src: "/icons/github-color.svg"
-                            }), React.createElement("p", {
-                              className: "text-center"
-                            }, "Github code")), React.createElement("div", {
-                          className: "mx-4"
-                        }, React.createElement("img", {
-                              className: "h-36 mx-auto",
-                              src: "/icons/code-arena-sq.png"
-                            }), React.createElement("p", {
-                              className: "text-center"
-                            }, "Audit: Coming soon")))));
+                  className: " flex flex-col items-center justify-center pb-16 custom-height-for-above-footer"
+                }, React.createElement("div", {
+                      className: "max-w-5xl flex flex-col justify-evenly items-center mx-auto"
+                    }, React.createElement("h3", {
+                          className: "my-2 text-5xl uppercase font-arimo font-extrabold flex items-center"
+                        }, React.createElement("span", {
+                              className: "text-5xl font-vt323 animate-pulse font-bold mx-2"
+                            }, ">"), "security", React.createElement("span", {
+                              className: "text-5xl mx-2"
+                            }, "🔐")), React.createElement("div", {
+                          className: "grid grid-cols-3 gap-10 items-center justify-center"
+                        }, React.createElement("div", {
+                              className: "mx-4"
+                            }, React.createElement("a", {
+                                  className: "custom-cursor",
+                                  href: "#",
+                                  rel: "noopener noreferrer",
+                                  target: "_blank"
+                                }, React.createElement("img", {
+                                      className: "h-32 mx-auto  hover:opacity-80",
+                                      src: "/icons/coverage.svg"
+                                    }), React.createElement("p", {
+                                      className: "text-center w-40 mx-auto hover:underline"
+                                    }, "Smart contract code coverage"))), React.createElement("div", {
+                              className: "mx-4"
+                            }, React.createElement("a", {
+                                  className: "custom-cursor",
+                                  href: "#",
+                                  rel: "noopener noreferrer",
+                                  target: "_blank"
+                                }, React.createElement("img", {
+                                      className: "h-32 mx-auto  hover:opacity-80",
+                                      src: "/icons/github-color.svg"
+                                    }), React.createElement("p", {
+                                      className: "text-center w-40 mx-auto hover:underline"
+                                    }, "Github code"))), React.createElement("div", {
+                              className: "mx-4"
+                            }, React.createElement("a", {
+                                  className: "custom-cursor",
+                                  href: "#",
+                                  rel: "noopener noreferrer",
+                                  target: "_blank"
+                                }, React.createElement("img", {
+                                      className: "h-32 mx-auto  hover:opacity-80",
+                                      src: "/icons/code-arena-sq.png"
+                                    }), React.createElement("p", {
+                                      className: "text-center  w-40 mx-auto hover:underline"
+                                    }, "Audit (Coming soon)")))))), React.createElement(Footer.make, {}));
 }
 
 var make = Security;
