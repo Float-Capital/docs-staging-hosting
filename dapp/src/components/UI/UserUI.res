@@ -242,34 +242,19 @@ module UserPercentageGains = {
     (displayDirection, percentStr)
   }
   @react.component
-  let make = (
-    ~oracleAddress,
-    ~timeLastUpdated,
-    ~tokenSupply,
-    ~totalLockedLong,
-    ~totalLockedShort,
-    ~syntheticPrice,
-    ~syntheticPriceLastUpdated,
-    ~tokenAddress,
-    ~isLong,
-    ~oldAssetPrice,
-  ) => {
-    let bothPrices = DataHooks.useSyntheticPrices(
-      ~oracleAddress,
-      ~timeLastUpdated,
-      ~tokenSupply,
-      ~totalLockedLong,
-      ~totalLockedShort,
-      ~syntheticPrice,
-      ~syntheticPriceLastUpdated,
+  let make = (~tokenPositionLastUpdated, ~currentSyntheticPrice, ~tokenAddress) => {
+    let initialTokenPriceResponse = DataHooks.useTokenPriceAtTime(
       ~tokenAddress,
-      ~isLong,
-      ~oldAssetPrice,
+      ~timestamp=tokenPositionLastUpdated,
     )
+
     <div className=`flex flex-col items-center justify-center`>
-      {switch bothPrices {
-      | Response((oldPrice, newPrice)) => {
-          let (displayDirection, percentStr) = directionAndPercentageString(oldPrice, newPrice)
+      {switch initialTokenPriceResponse {
+      | Response(oldPrice) => {
+          let (displayDirection, percentStr) = directionAndPercentageString(
+            oldPrice,
+            currentSyntheticPrice,
+          )
 
           let (symbol, textClassName) = switch displayDirection {
           | Up => ("+", "text-green-500")
@@ -295,18 +280,8 @@ module UserTokenBox = {
       syntheticToken: {
         id,
         tokenType,
-        tokenSupply,
-        syntheticMarket: {
-          name,
-          symbol,
-          oracleAddress,
-          latestSystemState: {
-            totalLockedLong,
-            totalLockedShort,
-            underlyingPrice: {price: {price: oldAssetPrice}},
-          },
-        },
-        latestPrice: {price: {price, timeUpdated: synthPriceUpdated}},
+        syntheticMarket: {name, symbol},
+        latestPrice: {price: {price}},
       },
     } = userBalanceData
 
@@ -341,16 +316,7 @@ module UserTokenBox = {
           {timeLastUpdated->Globals.formatTimestamp->React.string}
         </div>
         <UserPercentageGains
-          oracleAddress
-          timeLastUpdated
-          tokenSupply
-          totalLockedLong
-          totalLockedShort
-          syntheticPrice=price
-          syntheticPriceLastUpdated=synthPriceUpdated
-          tokenAddress
-          isLong
-          oldAssetPrice
+          tokenPositionLastUpdated=timeLastUpdated currentSyntheticPrice=price tokenAddress
         />
       </div>
       <div className=`self-center`> {children} </div>
@@ -428,20 +394,6 @@ module UserStakeBox = {
     let isLong = syntheticToken.tokenType->Obj.magic == "Long"
     let price = syntheticToken.latestPrice.price.price
 
-    let synthLastUpdated = syntheticToken.latestPrice.price.timeUpdated
-
-    let {
-      tokenSupply,
-      syntheticMarket: {
-        oracleAddress,
-        latestSystemState: {
-          totalLockedLong,
-          totalLockedShort,
-          underlyingPrice: {price: {price: oldAssetPrice}},
-        },
-      },
-    } = syntheticToken
-
     let value =
       stake.currentStake.amount
       ->Ethers.BigNumber.mul(price)
@@ -472,15 +424,8 @@ module UserStakeBox = {
         </a>
         <UserPercentageGains
           tokenAddress
-          oracleAddress
-          timeLastUpdated=stake.currentStake.timestamp
-          tokenSupply
-          totalLockedLong
-          totalLockedShort
-          syntheticPrice=price
-          syntheticPriceLastUpdated=synthLastUpdated
-          isLong
-          oldAssetPrice
+          tokenPositionLastUpdated=stake.currentStake.timestamp
+          currentSyntheticPrice=price
         />
       </div>
       <div className=`self-center`> {children} </div>

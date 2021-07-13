@@ -336,41 +336,33 @@ function directionAndPercentageString(oldPrice, newPrice) {
 }
 
 function UserUI$UserPercentageGains(Props) {
-  var oracleAddress = Props.oracleAddress;
-  var timeLastUpdated = Props.timeLastUpdated;
-  var tokenSupply = Props.tokenSupply;
-  var totalLockedLong = Props.totalLockedLong;
-  var totalLockedShort = Props.totalLockedShort;
-  var syntheticPrice = Props.syntheticPrice;
-  var syntheticPriceLastUpdated = Props.syntheticPriceLastUpdated;
+  var tokenPositionLastUpdated = Props.tokenPositionLastUpdated;
+  var currentSyntheticPrice = Props.currentSyntheticPrice;
   var tokenAddress = Props.tokenAddress;
-  var isLong = Props.isLong;
-  var oldAssetPrice = Props.oldAssetPrice;
-  var bothPrices = DataHooks.useSyntheticPrices(oracleAddress, timeLastUpdated, tokenSupply, totalLockedLong, totalLockedShort, syntheticPrice, syntheticPriceLastUpdated, tokenAddress, oldAssetPrice, isLong);
+  var initialTokenPriceResponse = DataHooks.useTokenPriceAtTime(tokenAddress, tokenPositionLastUpdated);
   var tmp;
-  if (typeof bothPrices === "number") {
+  if (typeof initialTokenPriceResponse === "number") {
     tmp = React.createElement(Loader.Tiny.make, {});
-  } else if (bothPrices.TAG === /* GraphError */0) {
+  } else if (initialTokenPriceResponse.TAG === /* GraphError */0) {
     tmp = "";
   } else {
-    var match = bothPrices._0;
-    var match$1 = directionAndPercentageString(match[0], match[1]);
-    var match$2;
-    switch (match$1[0]) {
+    var match = directionAndPercentageString(initialTokenPriceResponse._0, currentSyntheticPrice);
+    var match$1;
+    switch (match[0]) {
       case /* Up */0 :
-          match$2 = [
+          match$1 = [
             "+",
             "text-green-500"
           ];
           break;
       case /* Down */1 :
-          match$2 = [
+          match$1 = [
             "-",
             "text-red-500"
           ];
           break;
       case /* Same */2 :
-          match$2 = [
+          match$1 = [
             "",
             "text-gray-400"
           ];
@@ -378,8 +370,8 @@ function UserUI$UserPercentageGains(Props) {
       
     }
     tmp = React.createElement("div", {
-          className: match$2[1] + " text-center text-lg"
-        }, match$2[0] + match$1[1] + "%");
+          className: match$1[1] + " text-center text-lg"
+        }, match$1[0] + match[1] + "%");
   }
   return React.createElement("div", {
               className: "flex flex-col items-center justify-center"
@@ -395,10 +387,8 @@ function UserUI$UserTokenBox(Props) {
   var userBalanceData = Props.userBalanceData;
   var children = Props.children;
   var match = userBalanceData.syntheticToken;
-  var match$1 = match.latestPrice.price;
-  var price = match$1.price;
-  var match$2 = match.syntheticMarket;
-  var match$3 = match$2.latestSystemState;
+  var price = match.latestPrice.price.price;
+  var match$1 = match.syntheticMarket;
   var timeLastUpdated = userBalanceData.timeLastUpdated;
   var tokenBalance = userBalanceData.tokenBalance;
   var tokenAddress = Ethers$1.utils.getAddress(match.id);
@@ -414,10 +404,10 @@ function UserUI$UserTokenBox(Props) {
                       tokenAddress: Ethers.Utils.ethAdrToStr(tokenAddress),
                       tokenName: (
                         isLong ? "fu" : "fd"
-                      ) + match$2.symbol
+                      ) + match$1.symbol
                     })), React.createElement("div", {
                   className: "pl-3 text-xs self-center"
-                }, match$2.name, React.createElement("br", {
+                }, match$1.name, React.createElement("br", {
                       className: "mt-1"
                     }), isLong ? "Long↗️" : "Short↘️"), React.createElement("div", {
                   className: "text-sm text-center self-center"
@@ -434,16 +424,9 @@ function UserUI$UserTokenBox(Props) {
                 }, React.createElement("div", {
                       className: "text-xs text-center text-gray-400"
                     }, Globals.formatTimestamp(timeLastUpdated)), React.createElement(UserUI$UserPercentageGains, {
-                      oracleAddress: match$2.oracleAddress,
-                      timeLastUpdated: timeLastUpdated,
-                      tokenSupply: match.tokenSupply,
-                      totalLockedLong: match$3.totalLockedLong,
-                      totalLockedShort: match$3.totalLockedShort,
-                      syntheticPrice: price,
-                      syntheticPriceLastUpdated: match$1.timeUpdated,
-                      tokenAddress: tokenAddress,
-                      isLong: isLong,
-                      oldAssetPrice: match$3.underlyingPrice.price.price
+                      tokenPositionLastUpdated: timeLastUpdated,
+                      currentSyntheticPrice: price,
+                      tokenAddress: tokenAddress
                     })), React.createElement("div", {
                   className: "self-center"
                 }, children));
@@ -522,9 +505,6 @@ function UserUI$UserStakeBox(Props) {
   var tokens = Misc.NumberFormat.formatEther(undefined, stake.currentStake.amount);
   var isLong = syntheticToken.tokenType === "Long";
   var price = syntheticToken.latestPrice.price.price;
-  var synthLastUpdated = syntheticToken.latestPrice.price.timeUpdated;
-  var match = syntheticToken.syntheticMarket;
-  var match$1 = match.latestSystemState;
   var value = Misc.NumberFormat.formatEther(undefined, stake.currentStake.amount.mul(price).div(CONSTANTS.tenToThe18));
   var creationTxHash = stake.currentStake.creationTxHash;
   return React.createElement("div", {
@@ -551,16 +531,9 @@ function UserUI$UserStakeBox(Props) {
                       rel: "noopener noreferrer",
                       target: "_"
                     }, Globals.formatTimestamp(stake.currentStake.timestamp)), React.createElement(UserUI$UserPercentageGains, {
-                      oracleAddress: match.oracleAddress,
-                      timeLastUpdated: stake.currentStake.timestamp,
-                      tokenSupply: syntheticToken.tokenSupply,
-                      totalLockedLong: match$1.totalLockedLong,
-                      totalLockedShort: match$1.totalLockedShort,
-                      syntheticPrice: price,
-                      syntheticPriceLastUpdated: synthLastUpdated,
-                      tokenAddress: tokenAddress,
-                      isLong: isLong,
-                      oldAssetPrice: match$1.underlyingPrice.price.price
+                      tokenPositionLastUpdated: stake.currentStake.timestamp,
+                      currentSyntheticPrice: price,
+                      tokenAddress: tokenAddress
                     })), React.createElement("div", {
                   className: "self-center"
                 }, children));

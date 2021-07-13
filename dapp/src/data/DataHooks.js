@@ -6,13 +6,11 @@ var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Client = require("./Client.js");
 var Ethers = require("../ethereum/Ethers.js");
-var Ethers$1 = require("ethers");
 var Globals = require("../libraries/Globals.js");
 var Queries = require("./Queries.js");
 var CONSTANTS = require("../CONSTANTS.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
-var MarketSimulation = require("../libraries/MarketSimulation.js");
 var FromUnixTime = require("date-fns/fromUnixTime").default;
 
 function liftGraphResponse2(a, b) {
@@ -798,62 +796,6 @@ function getUnixTime(date) {
   return date.getTime() / 1000 | 0;
 }
 
-function useSyntheticPrices(oracleAddress, timestamp, tokenSupply, totalLockedLong, totalLockedShort, syntheticPrice, syntheticPriceLastUpdated, tokenAddress, oldAssetPrice, isLong) {
-  var initialTokenPriceResponse = useTokenPriceAtTime(tokenAddress, timestamp);
-  var priceHistoryQuery = Curry.app(Queries.LatestPrice.use, [
-        undefined,
-        Caml_option.some(Client.createContext(/* PriceHistory */1)),
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        {
-          intervalId: Globals.ethAdrToLowerStr(oracleAddress) + "-" + String(CONSTANTS.fiveMinutesInSeconds)
-        }
-      ]);
-  var response = queryToResponse(priceHistoryQuery);
-  var finalPriceResponse;
-  if (typeof response === "number") {
-    finalPriceResponse = /* Loading */0;
-  } else if (response.TAG === /* GraphError */0) {
-    finalPriceResponse = {
-      TAG: 0,
-      _0: response._0,
-      [Symbol.for("name")]: "GraphError"
-    };
-  } else {
-    var match = response._0.priceIntervalManager;
-    if (match !== undefined) {
-      var match$1 = match.latestPriceInterval;
-      var endPrice = match$1.endPrice;
-      var priceQueryTime = Ethers$1.BigNumber.from(match$1.startTimestamp.getTime() / 1000 | 0);
-      finalPriceResponse = priceQueryTime.gt(syntheticPriceLastUpdated) && !oldAssetPrice.eq(endPrice) && priceQueryTime.gt(timestamp) ? ({
-            TAG: 1,
-            _0: MarketSimulation.simulateMarketPriceChange(oldAssetPrice, endPrice, totalLockedLong, totalLockedShort, tokenSupply, isLong),
-            [Symbol.for("name")]: "Response"
-          }) : ({
-            TAG: 1,
-            _0: syntheticPrice,
-            [Symbol.for("name")]: "Response"
-          });
-    } else {
-      finalPriceResponse = {
-        TAG: 0,
-        _0: "Unspecifed graph error",
-        [Symbol.for("name")]: "GraphError"
-      };
-    }
-  }
-  return liftGraphResponse2(initialTokenPriceResponse, finalPriceResponse);
-}
-
 function useOracleLastUpdate(marketIndex) {
   var oracleLastUpdateQuery = Curry.app(Queries.OraclesLastUpdate.use, [
         undefined,
@@ -917,6 +859,5 @@ exports.useTokenPriceAtTime = useTokenPriceAtTime;
 exports.Util = Util;
 exports.useTokenMarketId = useTokenMarketId;
 exports.getUnixTime = getUnixTime;
-exports.useSyntheticPrices = useSyntheticPrices;
 exports.useOracleLastUpdate = useOracleLastUpdate;
 /* Misc Not a pure module */
