@@ -53,35 +53,7 @@ contract LongShortInternalsExposed is LongShortMockable {
     _;
   }
 
-  function claimAndDistributeYield(uint32 marketIndex) external {
-    _claimAndDistributeYield(marketIndex);
-  }
-
-  function depositFunds(uint32 marketIndex, uint256 amount) external {
-    _depositFunds(marketIndex, amount);
-  }
-
-  function withdrawFunds(
-    uint32 marketIndex,
-    uint256 amountLong,
-    uint256 amountShort,
-    address user
-  ) external {
-    _withdrawFunds(marketIndex, amountLong, amountShort, msg.sender);
-  }
-
-  function transferFundsToYieldManager(uint32 marketIndex, uint256 amount) external {
-    _transferFundsToYieldManager(marketIndex, amount);
-  }
-
-  function adjustMarketBasedOnNewAssetPrice(uint32 marketIndex, int256 newAssetPrice)
-    external
-    returns (bool didUpdate)
-  {
-    _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
-  }
-
-  function _executeOutstandingNextPriceSettlementsExposed(address user, uint32 marketIndex)
+  function _executeOutstandingNextPriceSettlementsExposedWithEvent(address user, uint32 marketIndex)
     external
   {
     _executeOutstandingNextPriceSettlements(user, marketIndex);

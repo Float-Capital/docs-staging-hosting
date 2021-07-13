@@ -10,7 +10,7 @@ let test =
     ) => {
   let marketIndex = 2;
 
-  let prom: ref(JsPromise.t(Staker.Exposed.getKValueExternalReturn)) =
+  let prom: ref(JsPromise.t(Staker.Exposed.getKValueExposedReturn)) =
     ref(None->Obj.magic);
 
   let multiplier =
@@ -58,8 +58,7 @@ let test =
         multiplier,
       );
 
-      prom :=
-        contracts^.staker->Staker.Exposed.getKValueExternal(~marketIndex);
+      prom := contracts^.staker->Staker.Exposed.getKValueExposed(~marketIndex);
     };
 
     it(

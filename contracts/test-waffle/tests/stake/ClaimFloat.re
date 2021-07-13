@@ -98,7 +98,7 @@ let test =
       promiseRef :=
         contracts^.staker
         ->ContractHelpers.connect(~address=userWalletRef^)
-        ->Staker.Exposed._claimFloatExternal(~marketIndex=marketIndices);
+        ->Staker.Exposed._claimFloatExposed(~marketIndexes=marketIndices);
 
       let%Await _ = promiseRef^;
       promiseRef^;

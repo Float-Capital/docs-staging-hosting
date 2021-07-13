@@ -43,7 +43,7 @@ let test =
 
       promiseRef :=
         contracts^.staker
-        ->Staker.Exposed.mintAccumulatedFloatExternal(~marketIndex, ~user);
+        ->Staker.Exposed.mintAccumulatedFloatExposed(~marketIndex, ~user);
 
       let%Await _ = promiseRef^;
       promiseRef^;

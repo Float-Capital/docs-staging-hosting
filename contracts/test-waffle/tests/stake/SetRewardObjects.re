@@ -52,7 +52,7 @@ let test =
 
       promiseRef :=
         contracts^.staker
-        ->Staker.Exposed.setRewardObjectsExternal(
+        ->Staker.Exposed.setRewardObjectsExposed(
             ~marketIndex,
             ~longPrice,
             ~shortPrice,

@@ -41,7 +41,7 @@ let test =
           );
       let promise =
         contracts^.staker
-        ->Staker.Exposed._stakeExternal(
+        ->Staker.Exposed._stakeExposed(
             ~user,
             ~token,
             ~amount=userAmountToStake,

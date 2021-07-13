@@ -290,14 +290,15 @@ filesToMockInternally->Array.forEach(filePath => {
         `${x.type_->convertASTTypeToSolTypeSimple} ${storageLocation} ${x.name}`
       })
       ->commafiy
-    let exposedFunction = switch x.visibility {
-    | Public =>
-      `function ${x.name}Exposed(${exposedCallArguments}) external ${mockerReturnValues} { ${x.name}InternalLogic(${mockerParameterCalls});}
-`
-    | Private => ""
-    }
     let stateMutabilityText =
       original["stateMutability"] == "nonpayable" ? "" : original["stateMutability"]
+    let exposedFunction = switch x.visibility {
+    | Private =>
+      `function ${x.name}Exposed(${exposedCallArguments}) external ${stateMutabilityText} ${mockerReturnValues} { return ${x.name}InternalLogic(${mockerParameterCalls});}
+`
+    | Public => ""
+    }
+
     let internalLogic = `function ${x.name}InternalLogic(${exposedCallArguments}) internal ${stateMutabilityText} ${mockerReturnValues} {
 `
 
