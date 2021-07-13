@@ -127,7 +127,8 @@ interface ILendingPool {
    * @dev Emitted when a borrower is liquidated. This event is emitted by the LendingPool via
    * LendingPoolCollateral manager using a DELEGATECALL
    * This allows to have the events in the generated ABI for LendingPool.
-   * @param collateralAsset The address of the underlying asset used as collateral, to receive as result of the liquidation
+   * @param collateralAsset The address of the underlying asset used as collateral,
+   *                        to receive as result of the liquidation.
    * @param debtAsset The address of the underlying borrowed asset to be repaid with the liquidation
    * @param user The address of the borrower getting liquidated
    * @param debtToCover The debt amount of borrowed `asset` the liquidator wants to cover
@@ -255,8 +256,8 @@ interface ILendingPool {
    * @dev Rebalances the stable interest rate of a user to the current stable rate defined on the reserve.
    * - Users can be rebalanced if the following conditions are satisfied:
    *     1. Usage ratio is above 95%
-   *     2. the current deposit APY is below REBALANCE_UP_THRESHOLD * maxVariableBorrowRate, which means that too much has been
-   *        borrowed at a stable rate and depositors are not earning enough
+   *     2. the current deposit APY is below REBALANCE_UP_THRESHOLD * maxVariableBorrowRate,
+   *        which means that too much has been borrowed at a stable rate and depositors are not earning enough
    * @param asset The address of the underlying asset borrowed
    * @param user The address of the user to be rebalanced
    **/
@@ -273,7 +274,8 @@ interface ILendingPool {
    * @dev Function to liquidate a non-healthy position collateral-wise, with Health Factor below 1
    * - The caller (liquidator) covers `debtToCover` amount of debt of the user getting liquidated, and receives
    *   a proportionally amount of the `collateralAsset` plus a bonus to cover market risk
-   * @param collateralAsset The address of the underlying asset used as collateral, to receive as result of the liquidation
+   * @param collateralAsset The address of the underlying asset used as collateral,
+   *                        to receive as result of the liquidation.
    * @param debtAsset The address of the underlying borrowed asset to be repaid with the liquidation
    * @param user The address of the borrower getting liquidated
    * @param debtToCover The debt amount of borrowed `asset` the liquidator wants to cover
@@ -291,9 +293,11 @@ interface ILendingPool {
   /**
    * @dev Allows smartcontracts to access the liquidity of the pool within one transaction,
    * as long as the amount taken plus a fee is returned.
-   * IMPORTANT There are security concerns for developers of flashloan receiver contracts that must be kept into consideration.
+   * IMPORTANT There are security concerns for developers of flashloan receiver
+   *           contracts that must be kept into consideration.
    * For further details please visit https://developers.aave.com
-   * @param receiverAddress The address of the contract receiving the funds, implementing the IFlashLoanReceiver interface
+   * @param receiverAddress The address of the contract receiving the funds,
+   *                        implementing the IFlashLoanReceiver interface.
    * @param assets The addresses of the assets being flash-borrowed
    * @param amounts The amounts amounts being flash-borrowed
    * @param modes Types of the debt to open if the flash loan is not returned:

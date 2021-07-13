@@ -12,7 +12,8 @@ abstract contract IYieldManager {
 
   event YieldDistributed(uint256 unrealizedYield, uint256 treasuryPercentE18);
 
-  // NOTE: This is purely saving some gas, but the subgraph will know how much is due for the treasury at all times - no need to include in event.
+  // NOTE: This is purely saving some gas, but the subgraph will know how much is
+  //       due for the treasury at all times - no need to include in event.
   event WithdrawTreasuryFunds();
 
   function totalReservedForTreasury() external virtual returns (uint256);

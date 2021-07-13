@@ -8,7 +8,8 @@ import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol"
 
 import "../interfaces/IYieldManager.sol";
 
-// TODO: it would be better to deprecate this mock and rather mock aave and use the `YieldManagerAave` to avoid duplicate code/logic that can easily go out of sync.
+// TODO: it would be better to deprecate this mock and rather mock aave and use the
+//       `YieldManagerAave` to avoid duplicate code/logic that can easily go out of sync.
 
 /*
  * YieldManagerMock is an implementation of a yield manager that supports

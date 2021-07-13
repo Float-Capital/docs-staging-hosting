@@ -325,10 +325,12 @@ contract LongShort is ILongShort, Initializable {
   /*
     4 possible states for next price actions:
         - "Pending" - means the next price update hasn't happened or been enacted on by the updateSystemState function.
-        - "Confirmed" - means the next price has been updated by the updateSystemState function. There is still outstanding (lazy) computation that needs to be executed per user in the batch.
+        - "Confirmed" - means the next price has been updated by the updateSystemState function. There is still 
+        -               outstanding (lazy) computation that needs to be executed per user in the batch.
         - "Settled" - there is no more computation left for the user.
         - "Non-existant" - user has no next price actions.
-    This function returns a calculated value only in the case of 'confirmed' next price actions. It should return zero for all other types of next price actions.
+    This function returns a calculated value only in the case of 'confirmed' next price actions. 
+    It should return zero for all other types of next price actions.
     */
   function getUsersConfirmedButNotSettledBalance(
     address user,
@@ -339,7 +341,8 @@ contract LongShort is ILongShort, Initializable {
       userCurrentNextPriceUpdateIndex[marketIndex][user] != 0 &&
       userCurrentNextPriceUpdateIndex[marketIndex][user] <= marketUpdateIndex[marketIndex]
     ) {
-      // Update is still nextPrice but not past the next oracle update - display the amount the user would get if they executed immediately
+      // Update is still nextPrice but not past the next oracle update - display the
+      // amount the user would get if they executed immediately.
       uint256 amountPaymentTokenDeposited = userNextPriceDepositAmount[marketIndex][isLong][user];
 
       uint256 syntheticTokenPrice = syntheticTokenPriceSnapshot[marketIndex][isLong][

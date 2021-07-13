@@ -35,7 +35,8 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
   }
 
   function stake(uint256 amount) external override {
-    // NOTE: this is safe, this function will throw "ERC20: transfer amount exceeds balance" if amount exceeds users balance
+    // NOTE: this is safe, this function will throw "ERC20: transfer
+    //       amount exceeds balance" if amount exceeds users balance.
     _transfer(msg.sender, address(staker), amount);
 
     staker.stakeFromUser(msg.sender, amount);
@@ -57,7 +58,8 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
     uint256 amount
   ) public override(ERC20, IERC20) returns (bool) {
     if (recipient == address(longShort) && msg.sender == address(longShort)) {
-      // TODO STENT so this means that the longShort contract is sending to itself? There is no function call like this in the LongShort contract
+      // TODO STENT so this means that the longShort contract is sending to itself?
+      //      There is no function call like this in the LongShort contract.
       _transfer(sender, recipient, amount);
       return true;
     } else {

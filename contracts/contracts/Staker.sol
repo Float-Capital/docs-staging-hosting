@@ -541,7 +541,8 @@ contract Staker is IStaker, Initializable {
     internal
     view
     returns (
-      // NOTE: this returns the long and short reward separately for the sake of simplicity of the event and the graph. Would be more efficient to return as single value
+      // NOTE: this returns the long and short reward separately for the sake of simplicity
+      //       of the event and the graph. Would be more efficient to return as single value.
       uint256 longFloatReward,
       uint256 shortFloatReward
     )
@@ -551,7 +552,8 @@ contract Staker is IStaker, Initializable {
       return (0, 0);
     }
 
-    // Stake should always do a full system state update, so 'users last claimed index' should never be greater than the latest index
+    // Stake should always do a full system state update, so 'users last claimed
+    // index' should never be greater than the latest index.
     assert(userIndexOfLastClaimedReward[marketIndex][user] < latestRewardIndex[marketIndex]);
 
     ISyntheticToken longToken = syntheticTokens[marketIndex][true];
@@ -581,7 +583,8 @@ contract Staker is IStaker, Initializable {
     internal
     view
     returns (
-      // NOTE: this returns the long and short reward separately for the sake of simplicity of the event and the graph. Would be more efficient to return as single value
+      // NOTE: this returns the long and short reward separately for the sake of simplicity of
+      //       the event and the graph. Would be more efficient to return as single value.
       uint256 longFloatReward,
       uint256 shortFloatReward
     )
@@ -609,7 +612,8 @@ contract Staker is IStaker, Initializable {
   }
 
   function mintAccumulatedFloat(uint32 marketIndex, address user) internal {
-    // NOTE: Could merge these two values already inside the `calculateAccumulatedFloat` function, but that would make it harder for the graph
+    // NOTE: Could merge these two values already inside the `calculateAccumulatedFloat` function,
+    //       but that would make it harder for the graph.
     (uint256 floatToMintLong, uint256 floatToMintShort) = calculateAccumulatedFloat(
       marketIndex,
       user
@@ -635,7 +639,8 @@ contract Staker is IStaker, Initializable {
   function _claimFloat(uint32[] calldata marketIndexes) internal {
     uint256 floatTotal = 0;
     for (uint256 i = 0; i < marketIndexes.length; i++) {
-      // NOTE: Could merge these two values already inside the `calculateAccumulatedFloat` function, but that would make it harder for the graph
+      // NOTE: Could merge these two values already inside the `calculateAccumulatedFloat` function,
+      //       but that would make it harder for the graph.
       (uint256 floatToMintLong, uint256 floatToMintShort) = calculateAccumulatedFloat(
         marketIndexes[i],
         msg.sender
@@ -645,7 +650,8 @@ contract Staker is IStaker, Initializable {
 
       if (floatToMint > 0) {
         // Set the user has claimed up until now.
-        // TODO: think very carefully if it is ok for this to be in this if statement. Safer would be to always set this value?
+        // TODO: think very carefully if it is ok for this to be in this if statement.
+        //       Safer would be to always set this value?
         //       99.9% sure it is ok though, since `_stake` sets this value when someone joins.
         //       Maybe just change for the sake of caution?
         userIndexOfLastClaimedReward[marketIndexes[i]][msg.sender] = latestRewardIndex[
