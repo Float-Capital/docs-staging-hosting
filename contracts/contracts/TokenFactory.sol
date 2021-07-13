@@ -7,10 +7,9 @@ import "./interfaces/ILongShort.sol";
 import "./interfaces/ITokenFactory.sol";
 
 contract TokenFactory is ITokenFactory {
-  ////////////////////////////////////
-  /////////////// STATE //////////////
-  ////////////////////////////////////
-
+  /*╔═══════════════════════════╗
+    ║           STATE           ║
+    ╚═══════════════════════════╝*/
   address public admin;
   ILongShort public longShort;
 
@@ -18,9 +17,9 @@ contract TokenFactory is ITokenFactory {
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
   bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
 
-  ////////////////////////////////////
-  /////////// MODIFIERS //////////////
-  ////////////////////////////////////
+  /*╔═══════════════════════════╗
+    ║         MODIFIERS         ║
+    ╚═══════════════════════════╝*/
 
   modifier adminOnly() {
     require(msg.sender == admin);
@@ -32,18 +31,18 @@ contract TokenFactory is ITokenFactory {
     _;
   }
 
-  ////////////////////////////////////
-  //////////// SET-UP ////////////////
-  ////////////////////////////////////
+  /*╔════════════════════════════╗
+    ║           SET-UP           ║
+    ╚════════════════════════════╝*/
 
   constructor(address _admin, ILongShort _longShort) {
     admin = _admin;
     longShort = _longShort;
   }
 
-  ////////////////////////////////////
-  /// MULTISIG ADMIN FUNCTIONS ///////
-  ////////////////////////////////////
+  /*╔════════════════════════════════╗
+    ║    MULTISIG ADMIN FUNCTIONS    ║
+    ╚════════════════════════════════╝*/
 
   function changeAdmin(address _admin) external adminOnly {
     admin = _admin;
@@ -53,9 +52,9 @@ contract TokenFactory is ITokenFactory {
     longShort = _longShort;
   }
 
-  ////////////////////////////////////
-  ///////// TOKEN CREATION ///////////
-  ////////////////////////////////////
+  /*╔════════════════════════════╗
+    ║       TOKEN CREATION       ║
+    ╚════════════════════════════╝*/
 
   function setupPermissions(SyntheticToken tokenContract) internal {
     // Give minter roles

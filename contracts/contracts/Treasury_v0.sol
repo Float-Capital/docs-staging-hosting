@@ -8,26 +8,26 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 contract Treasury_v0 is Initializable {
   address public admin;
 
-  ////////////////////////////////////
-  /////////// MODIFIERS //////////////
-  ////////////////////////////////////
+  /*╔═════════════════════════════╗
+    ║          MODIFIERS          ║
+    ╚═════════════════════════════╝*/
 
   modifier onlyAdmin() {
     require(msg.sender == admin, "Not admin");
     _;
   }
 
-  ////////////////////////////////////
-  ///// CONTRACT SET-UP //////////////
-  ////////////////////////////////////
+  /*╔══════════════════════════════╗
+    ║        CONTRACT SETUP        ║
+    ╚══════════════════════════════╝*/
 
   function initialize(address _admin) public initializer {
     admin = _admin;
   }
 
-  ////////////////////////////////////
-  /// MULTISIG ADMIN FUNCTIONS ///////
-  ////////////////////////////////////
+  /*╔════════════════════════════════╗
+    ║    MULTISIG ADMIN FUNCTIONS    ║
+    ╚════════════════════════════════╝*/
 
   function changeAdmin(address _admin) external onlyAdmin {
     admin = _admin;
