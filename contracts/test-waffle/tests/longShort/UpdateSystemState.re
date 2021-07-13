@@ -4,8 +4,8 @@ open Globals;
 
 let testUnit =
     (
-      ~contracts: ref(Helpers.coreContracts),
-      ~accounts: ref(array(Ethers.Wallet.t)),
+      ~contracts as _: ref(Helpers.coreContracts),
+      ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("updateSystemState", () => {
     // TODO
@@ -16,7 +16,7 @@ let testUnit =
 let testIntegration =
     (
       ~contracts: ref(Helpers.coreContracts),
-      ~accounts: ref(array(Ethers.Wallet.t)),
+      ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("updateSystemState", () => {
     it("distribute yield to markets flow", () => {

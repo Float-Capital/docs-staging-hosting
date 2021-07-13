@@ -146,7 +146,7 @@ let testUnit =
 let testIntegration =
     (
       ~contracts: ref(Helpers.coreContracts),
-      ~accounts: ref(array(Ethers.Wallet.t)),
+      ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("initializeMarket", () => {
     it("Shouldn't allow initialization of a market that doesn't exist", () => {
