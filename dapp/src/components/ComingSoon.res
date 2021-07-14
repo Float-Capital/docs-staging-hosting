@@ -1,6 +1,6 @@
 @react.component
 let make = () => {
-  <div className="absolute bg-primary p-1 mb-2 h-10 flex items-center w-full">
+  <div className="absolute bg-primary p-1 mb-2 h-10 flex items-center w-full font-default">
     <div className="text-center text-sm text-white mx-12 w-full">
       {`🏗 The protocol is under active development, join our `->React.string}
       <a

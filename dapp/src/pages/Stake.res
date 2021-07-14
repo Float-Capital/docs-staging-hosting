@@ -11,7 +11,8 @@ module StakeDetailsWrapper = {
       <div className="p-5 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg">
         <div className="flex justify-between items-center mb-2">
           <div className="text-xl"> {`${market.name} (${market.symbol})`->React.string} </div>
-          <Next.Link href={`/?marketIndex=${marketIndex}&actionOption=${actionOption}&tab=stake`}>
+          <Next.Link
+            href={`/app/?marketIndex=${marketIndex}&actionOption=${actionOption}&tab=stake`}>
             <div className="text-xxs hover:underline cursor-pointer">
               {`view details`->React.string}
             </div>

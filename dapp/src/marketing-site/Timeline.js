@@ -11,13 +11,13 @@ function Timeline(Props) {
                 }, React.createElement("div", {
                       className: "w-1/2"
                     }, React.createElement("div", {
-                          className: "bg-white p-4 border my-4 shadow-md inline-block"
+                          className: "bg-white p-4 rounded-md rounded-br-none my-4 shadow-md inline-block"
                         }, React.createElement("h3", {
                               className: "font-semibold text-lg mb-1"
                             }, "Q1 2021"), React.createElement("ul", undefined, React.createElement("li", undefined, "Protocol mechanism researched & designed"), React.createElement("li", undefined, "Core suite of smart contracts implemented"), React.createElement("li", undefined, "MVP UI created"), React.createElement("li", undefined, "Functional testnet deployment to BSC")))), React.createElement("div", {
                       className: "w-1/2"
                     }, React.createElement("div", {
-                          className: "bg-white p-4 border my-4 shadow-md  inline-block"
+                          className: "bg-white p-4 rounded-md rounded-br-none my-4 shadow-md  inline-block"
                         }, React.createElement("h3", {
                               className: "font-semibold text-lg mb-1"
                             }, "Q3 2021"), React.createElement("ul", undefined, React.createElement("li", undefined, "Finalize protocol design"), React.createElement("li", undefined, "Audit smart contracts"), React.createElement("li", undefined, "Build dream team"), React.createElement("li", undefined, "UI/UX refinement"))))), React.createElement("hr", undefined), React.createElement("div", {
@@ -25,13 +25,13 @@ function Timeline(Props) {
                 }, React.createElement("div", {
                       className: "w-1/4"
                     }), React.createElement("div", {
-                      className: "bg-white p-4 border my-4 shadow-md  inline-block"
+                      className: "bg-white p-4 rounded-md rounded-tr-none my-4 shadow-md  inline-block"
                     }, React.createElement("h3", {
                           className: "font-semibold text-lg mb-1"
                         }, "Q2 2021"), React.createElement("ul", undefined, React.createElement("li", undefined, "UI Design and iteration"), React.createElement("li", undefined, "Move from BSC to Polygon"), React.createElement("li", undefined, "Integrate Chainlink and Aave"), React.createElement("li", undefined, "Raise seed funding"))), React.createElement("div", {
                       className: "w-1/4"
                     }), React.createElement("div", {
-                      className: "bg-white p-4 border my-4 shadow-md  inline-block"
+                      className: "bg-white p-4 rounded-md rounded-tr-none my-4 shadow-md  inline-block"
                     }, React.createElement("h3", {
                           className: "font-semibold text-lg mb-1"
                         }, "Q4 2021"), React.createElement("ul", undefined, React.createElement("li", undefined, "Launch new markets"), React.createElement("li", undefined, "Pull the rug"), React.createElement("li", undefined, "Raise Series A"), React.createElement("li", undefined, "Implement Governance module")))));

@@ -34,7 +34,7 @@ function Mint$DetailsWrapper(Props) {
                     }, React.createElement("div", {
                           className: "text-xl"
                         }, market.name + " (" + market.symbol + ")"), React.createElement(Link, {
-                          href: "/?marketIndex=" + marketIndex + "&actionOption=" + actionOption,
+                          href: "/app/?marketIndex=" + marketIndex + "&actionOption=" + actionOption,
                           children: React.createElement("div", {
                                 className: "text-xxs hover:underline cursor-pointer"
                               }, "view details")

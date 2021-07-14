@@ -6,7 +6,7 @@ var Config = require("../config/Config.js");
 
 function ComingSoon(Props) {
   return React.createElement("div", {
-              className: "absolute bg-primary p-1 mb-2 h-10 flex items-center w-full"
+              className: "absolute bg-primary p-1 mb-2 h-10 flex items-center w-full font-default"
             }, React.createElement("div", {
                   className: "text-center text-sm text-white mx-12 w-full"
                 }, "🏗 The protocol is under active development, join our ", React.createElement("a", {

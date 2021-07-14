@@ -99,12 +99,12 @@ let make = (
     latestSystemState: {totalLockedLong, totalLockedShort, totalValueLocked},
   }: Queries.SyntheticMarketInfo.t,
 ) => {
-  <Next.Link href={`/?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
+  <Next.Link href={`/app/?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
     <div
       className="p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 cursor-pointer shadow-lg hover:shadow-xl h-full justify-center w-full">
       <div className="flex justify-center w-full my-1">
         <h1 className="font-bold text-xl font-vt323 cursor-pointer hover:underline">
-          {marketName->React.string} <Tooltip tip={`This market tracks ${marketName}`} />
+          {marketName->React.string}
         </h1>
       </div>
       <div className="flex flex-wrap justify-center w-full">
@@ -181,7 +181,7 @@ module Mini = {
   ) => {
     let router = Next.Router.useRouter()
 
-    <Next.Link href={`/?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
+    <Next.Link href={`/app/?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
       <div
         className="p-1 rounded-sm flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 custom-cursor shadow-lg hover:shadow-xl h-full justify-center w-full">
         <div className="flex justify-center w-full my-1">

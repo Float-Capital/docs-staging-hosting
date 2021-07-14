@@ -38,6 +38,10 @@ function LandingNav(Props) {
   var router = Router.useRouter();
   var landingNav = [
     {
+      title: "App",
+      link: "/app/markets"
+    },
+    {
       title: "How it Works",
       link: "#how-it-works"
     },

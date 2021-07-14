@@ -3,7 +3,7 @@ let make = () => {
   <div className="container">
     <div className="flex flex-row">
       <div className="w-1/2">
-        <div className="bg-white p-4 border my-4 shadow-md inline-block">
+        <div className="bg-white p-4 rounded-md rounded-br-none my-4 shadow-md inline-block">
           <h3 className="font-semibold text-lg mb-1"> {"Q1 2021"->React.string} </h3>
           <ul>
             <li> {"Protocol mechanism researched & designed"->React.string} </li>
@@ -14,7 +14,7 @@ let make = () => {
         </div>
       </div>
       <div className="w-1/2">
-        <div className="bg-white p-4 border my-4 shadow-md  inline-block">
+        <div className="bg-white p-4 rounded-md rounded-br-none my-4 shadow-md  inline-block">
           <h3 className="font-semibold text-lg mb-1"> {"Q3 2021"->React.string} </h3>
           <ul>
             <li> {"Finalize protocol design"->React.string} </li>
@@ -28,7 +28,7 @@ let make = () => {
     <hr />
     <div className="flex flex-row">
       <div className="w-1/4" />
-      <div className="bg-white p-4 border my-4 shadow-md  inline-block">
+      <div className="bg-white p-4 rounded-md rounded-tr-none my-4 shadow-md  inline-block">
         <h3 className="font-semibold text-lg mb-1"> {"Q2 2021"->React.string} </h3>
         <ul>
           <li> {"UI Design and iteration"->React.string} </li>
@@ -38,7 +38,7 @@ let make = () => {
         </ul>
       </div>
       <div className="w-1/4" />
-      <div className="bg-white p-4 border my-4 shadow-md  inline-block">
+      <div className="bg-white p-4 rounded-md rounded-tr-none my-4 shadow-md  inline-block">
         <h3 className="font-semibold text-lg mb-1"> {"Q4 2021"->React.string} </h3>
         <ul>
           <li> {"Launch new markets"->React.string} </li>

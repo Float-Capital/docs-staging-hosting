@@ -16,25 +16,25 @@ function HowItWorks(Props) {
                     }), React.createElement("div", {
                       className: "grid grid-cols-2 my-4 gap-10 md:flex-row items-center max-w-5xl"
                     }, React.createElement("div", {
-                          className: "bg-white bg-opacity-60 p-4 rounded-lg"
+                          className: "bg-white bg-opacity-60 p-4 rounded-md"
                         }, React.createElement("h3", {
                               className: "text-4xl flex flex-row items-center"
                             }, React.createElement("span", undefined, "Mint"), React.createElement("img", {
-                                  className: "h-12",
+                                  className: "h-10",
                                   src: "/icons/mint.png"
                                 })), React.createElement("p", {
                               className: "text-xl"
                             }, "Open a postion by depositing DAI into a market to mint synthetic tokens")), React.createElement("div", {
-                          className: "bg-white bg-opacity-60 p-4 rounded-lg"
+                          className: "bg-white bg-opacity-60 p-4 rounded-md"
                         }, React.createElement("h3", {
                               className: "text-4xl flex flex-row items-center"
                             }, React.createElement("span", undefined, "Stake"), React.createElement("img", {
-                                  className: "h-12",
+                                  className: "h-10",
                                   src: "/icons/stake.png"
                                 })), React.createElement("p", {
                               className: "text-xl"
                             }, "Stake your synth tokens to earn FLT token")), React.createElement("div", {
-                          className: "bg-white bg-opacity-60 p-4 rounded-lg"
+                          className: "bg-white bg-opacity-60 p-4 rounded-md"
                         }, React.createElement("h3", {
                               className: "text-4xl flex flex-row items-center"
                             }, React.createElement("span", undefined, "Redeem "), React.createElement("span", {
@@ -42,7 +42,7 @@ function HowItWorks(Props) {
                                 }, " 📈")), React.createElement("p", {
                               className: "text-xl"
                             }, "Redeem your synth tokens for DAI to close a position")), React.createElement("div", {
-                          className: "bg-white bg-opacity-60 p-4 rounded-lg"
+                          className: "bg-white bg-opacity-60 p-4 rounded-md"
                         }, React.createElement("h3", {
                               className: "text-4xl flex flex-row items-center"
                             }, React.createElement("span", undefined, "Govern"), React.createElement("span", {

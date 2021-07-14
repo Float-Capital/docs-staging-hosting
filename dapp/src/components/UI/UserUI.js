@@ -577,11 +577,11 @@ function UserUI$UserMarketStakeOrRedeem(Props) {
   var marketId = Belt_Option.getWithDefault(DataHooks.Util.graphResponseToOption(marketIdResponse), "1");
   var router = Router.useRouter();
   var stake = function (param) {
-    router.push("/?marketIndex=" + marketId + "&actionOption=" + syntheticSide + "&tab=stake");
+    router.push("/app/?marketIndex=" + marketId + "&actionOption=" + syntheticSide + "&tab=stake");
     
   };
   var redeem = function (param) {
-    router.push("/?marketIndex=" + marketId + "&actionOption=" + syntheticSide + "&tab=redeem");
+    router.push("/app/?marketIndex=" + marketId + "&actionOption=" + syntheticSide + "&tab=redeem");
     
   };
   return React.createElement("div", {
@@ -608,7 +608,7 @@ function UserUI$UserMarketUnstake(Props) {
   var marketId = Belt_Option.getWithDefault(DataHooks.Util.graphResponseToOption(marketIdResponse), "1");
   var router = Router.useRouter();
   var unstake = function (param) {
-    router.push("/?marketIndex=" + marketId + "&tab=unstake&actionOption=" + (
+    router.push("/app/?marketIndex=" + marketId + "&tab=unstake&actionOption=" + (
           isLong ? "long" : "short"
         ));
     

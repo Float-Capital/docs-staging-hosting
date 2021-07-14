@@ -41,7 +41,7 @@ function Stake$StakeDetailsWrapper(Props) {
                     }, React.createElement("div", {
                           className: "text-xl"
                         }, market.name + " (" + market.symbol + ")"), React.createElement(Link, {
-                          href: "/?marketIndex=" + marketIndex + "&actionOption=" + actionOption + "&tab=stake",
+                          href: "/app/?marketIndex=" + marketIndex + "&actionOption=" + actionOption + "&tab=stake",
                           children: React.createElement("div", {
                                 className: "text-xxs hover:underline cursor-pointer"
                               }, "view details")

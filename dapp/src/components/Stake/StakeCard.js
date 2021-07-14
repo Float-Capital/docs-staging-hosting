@@ -5,7 +5,6 @@ var Misc = require("../../libraries/Misc.js");
 var React = require("react");
 var Button = require("../UI/Base/Button.js");
 var Ethers = require("../../ethereum/Ethers.js");
-var Tooltip = require("../UI/Base/Tooltip.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 var MarketBar = require("../UI/MarketCard/MarketBar.js");
 var Link = require("next/link").default;
@@ -106,16 +105,14 @@ function StakeCard(Props) {
                     }));
   };
   return React.createElement(Link, {
-              href: "/?marketIndex=" + marketIndex.toString() + "&tab=stake",
+              href: "/app/?marketIndex=" + marketIndex.toString() + "&tab=stake",
               children: React.createElement("div", {
                     className: "p-1 mb-8 rounded-lg flex flex-col bg-light-gold bg-opacity-75 hover:bg-opacity-60 cursor-pointer my-5 shadow-lg"
                   }, React.createElement("div", {
                         className: "flex justify-center w-full my-1"
                       }, React.createElement("h1", {
                             className: "font-bold text-xl font-vt323"
-                          }, marketName, React.createElement(Tooltip.make, {
-                                tip: "This market tracks " + marketName
-                              }))), React.createElement("div", {
+                          }, marketName)), React.createElement("div", {
                         className: "flex flex-wrap justify-center w-full"
                       }, React.createElement(StakeCardSide.make, {
                             orderPostion: 1,

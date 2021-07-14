@@ -131,13 +131,11 @@ let make = (
       }}
     </div>
 
-  <Next.Link href={`/?marketIndex=${marketIndex->Ethers.BigNumber.toString}&tab=stake`}>
+  <Next.Link href={`/app/?marketIndex=${marketIndex->Ethers.BigNumber.toString}&tab=stake`}>
     <div
       className="p-1 mb-8 rounded-lg flex flex-col bg-light-gold bg-opacity-75 hover:bg-opacity-60 cursor-pointer my-5 shadow-lg">
       <div className="flex justify-center w-full my-1">
-        <h1 className="font-bold text-xl font-vt323">
-          {marketName->React.string} <Tooltip tip={`This market tracks ${marketName}`} />
-        </h1>
+        <h1 className="font-bold text-xl font-vt323"> {marketName->React.string} </h1>
       </div>
       <div className="flex flex-wrap justify-center w-full">
         <StakeCardSide

@@ -39,8 +39,7 @@ const googleAnalyticsMeasurementId = "G-CP1WC8846P";
 // not work!
 const App = (props) => {
   const router = useRouter();
-  if (router.pathname == "/site") {
-    // todo: switch to "/" when ready
+  if (router.pathname == "/") {
     return <ResApp {...props} />;
   } else {
     return (
