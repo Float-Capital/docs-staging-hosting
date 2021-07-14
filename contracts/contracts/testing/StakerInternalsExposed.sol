@@ -54,8 +54,10 @@ contract StakerInternalsExposed is StakerMockable {
     uint32 marketIndex,
     ISyntheticToken longToken,
     ISyntheticToken shortToken,
-    ISyntheticToken mockAddress
+    ISyntheticToken mockAddress,
+    address longShortAddress
   ) public {
+    longShortCoreContract = ILongShort(longShortAddress);
     marketIndexOfToken[longToken] = marketIndex;
     marketIndexOfToken[shortToken] = marketIndex;
 
@@ -65,6 +67,10 @@ contract StakerInternalsExposed is StakerMockable {
 
     syntheticTokens[marketIndex][true] = mockAddress;
     syntheticTokens[marketIndex][false] = mockAddress;
+  }
+
+  function setAddNewStateForFloatRewardsParams(address longShort) external {
+    longShortCoreContract = ILongShort(longShort);
   }
 
   function setGetMarketLaunchIncentiveParametersParams(
