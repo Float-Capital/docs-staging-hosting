@@ -131,7 +131,7 @@ let make = (
       }}
     </div>
 
-  <Next.Link href={`/app/?marketIndex=${marketIndex->Ethers.BigNumber.toString}&tab=stake`}>
+  <Next.Link href={`/app/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}&tab=stake`}>
     <div
       className="p-1 mb-8 rounded-lg flex flex-col bg-light-gold bg-opacity-75 hover:bg-opacity-60 cursor-pointer my-5 shadow-lg">
       <div className="flex justify-center w-full my-1">

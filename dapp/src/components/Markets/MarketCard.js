@@ -95,7 +95,7 @@ function MarketCard(Props) {
   var marketIndex = param.marketIndex;
   var marketName = param.name;
   return React.createElement(Link, {
-              href: "/app/?marketIndex=" + marketIndex.toString(),
+              href: "/app/markets?marketIndex=" + marketIndex.toString(),
               children: React.createElement("div", {
                     className: "p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 cursor-pointer shadow-lg hover:shadow-xl h-full justify-center w-full"
                   }, React.createElement("div", {
@@ -139,7 +139,7 @@ function MarketCard$Mini(Props) {
   var marketIndex = param.marketIndex;
   var router = Router.useRouter();
   return React.createElement(Link, {
-              href: "/app/?marketIndex=" + marketIndex.toString(),
+              href: "/app/markets?marketIndex=" + marketIndex.toString(),
               children: React.createElement("div", {
                     className: "p-1 rounded-sm flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 custom-cursor shadow-lg hover:shadow-xl h-full justify-center w-full"
                   }, React.createElement("div", {
