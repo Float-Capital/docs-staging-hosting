@@ -104,12 +104,12 @@ contract Staker is IStaker, Initializable {
     ║          MODIFIERS          ║
     ╚═════════════════════════════╝*/
 
-  modifier onlyAdmin() {
+  modifier onlyAdmin() virtual {
     require(msg.sender == admin, "not admin");
     _;
   }
 
-  modifier onlyValidSynthetic(ISyntheticToken _synth) {
+  modifier onlyValidSynthetic(ISyntheticToken _synth) virtual {
     require(marketIndexOfToken[_synth] != 0, "not valid synth");
     _;
   }
@@ -120,7 +120,7 @@ contract Staker is IStaker, Initializable {
     _;
   }
 
-  modifier onlyFloat() {
+  modifier onlyFloat() virtual {
     require(msg.sender == address(longShortCoreContract));
     _;
   }
@@ -135,7 +135,7 @@ contract Staker is IStaker, Initializable {
     address _floatToken,
     address _floatCapital,
     uint256 _floatPercentage
-  ) public initializer {
+  ) public virtual initializer {
     require(
       _admin != address(0) &&
         _floatCapital != address(0) &&
@@ -160,7 +160,7 @@ contract Staker is IStaker, Initializable {
     admin = _admin;
   }
 
-  function _changeFloatPercentage(uint256 newFloatPercentage) internal {
+  function _changeFloatPercentage(uint256 newFloatPercentage) internal virtual {
     require(newFloatPercentage <= 1e18 && newFloatPercentage > 0); // less than 100% and greater than 0%
     floatPercentage = newFloatPercentage;
   }
@@ -170,7 +170,10 @@ contract Staker is IStaker, Initializable {
     emit FloatPercentageUpdated(newFloatPercentage);
   }
 
-  function _changeUnstakeFee(uint32 marketIndex, uint256 newMarketUnstakeFeeBasisPoints) internal {
+  function _changeUnstakeFee(uint32 marketIndex, uint256 newMarketUnstakeFeeBasisPoints)
+    internal
+    virtual
+  {
     require(newMarketUnstakeFeeBasisPoints <= 5e16); // 5% fee is the max fee possible.
     marketUnstakeFeeBasisPoints[marketIndex] = newMarketUnstakeFeeBasisPoints;
   }
@@ -197,7 +200,7 @@ contract Staker is IStaker, Initializable {
     uint32 marketIndex,
     uint256 period,
     uint256 initialMultiplier
-  ) internal {
+  ) internal virtual {
     require(initialMultiplier >= 1e18, "marketLaunchIncentiveMultiplier must be >= 1e181");
 
     marketLaunchIncentivePeriod[marketIndex] = period;
@@ -207,7 +210,7 @@ contract Staker is IStaker, Initializable {
   function _changBalanceIncentiveExponent(
     uint32 marketIndex,
     uint256 _balanceIncentiveCurveExponent
-  ) internal {
+  ) internal virtual {
     require(
       _balanceIncentiveCurveExponent > 0 && _balanceIncentiveCurveExponent < 10000,
       "balanceIncentiveCurveExponent out of bounds"
@@ -228,7 +231,7 @@ contract Staker is IStaker, Initializable {
   function _changBalanceIncentiveEquilibriumOffset(
     uint32 marketIndex,
     int256 _balanceIncentiveCurveEquilibriumOffset
-  ) internal {
+  ) internal virtual {
     // Unreasonable that we would ever shift this more than 90% either way
     require(
       _balanceIncentiveCurveEquilibriumOffset > -9e17 &&
@@ -304,6 +307,7 @@ contract Staker is IStaker, Initializable {
   function getMarketLaunchIncentiveParameters(uint32 marketIndex)
     internal
     view
+    virtual
     returns (uint256, uint256)
   {
     uint256 period = marketLaunchIncentivePeriod[marketIndex];
@@ -315,7 +319,7 @@ contract Staker is IStaker, Initializable {
     return (period, multiplier);
   }
 
-  function getKValue(uint32 marketIndex) internal view returns (uint256) {
+  function getKValue(uint32 marketIndex) internal view virtual returns (uint256) {
     // Parameters controlling the float issuance multiplier.
     (uint256 kPeriod, uint256 kInitialMultiplier) = getMarketLaunchIncentiveParameters(marketIndex);
 
@@ -339,6 +343,7 @@ contract Staker is IStaker, Initializable {
   function getRequiredAmountOfBitShiftForSafeExponentiation(uint256 number, uint256 exponent)
     internal
     pure
+    virtual
     returns (uint256 amountOfBitShiftRequired)
   {
     uint256 targetMaxNumberSizeBinaryDigits = 257 / exponent;
@@ -365,7 +370,7 @@ contract Staker is IStaker, Initializable {
     uint256 shortPrice,
     uint256 longValue,
     uint256 shortValue
-  ) internal view returns (uint256 longFloatPerSecond, uint256 shortFloatPerSecond) {
+  ) internal view virtual returns (uint256 longFloatPerSecond, uint256 shortFloatPerSecond) {
     // Markets cannot be or become empty (since they are seeded with non-withdrawable capital)
     assert(longValue != 0 && shortValue != 0);
 
@@ -434,7 +439,7 @@ contract Staker is IStaker, Initializable {
   /*
    * Computes the time since last state point for the given token in seconds.
    */
-  function calculateTimeDelta(uint32 marketIndex) internal view returns (uint256) {
+  function calculateTimeDelta(uint32 marketIndex) internal view virtual returns (uint256) {
     return
       block.timestamp -
       syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]].timestamp;
@@ -451,7 +456,7 @@ contract Staker is IStaker, Initializable {
     uint256 shortPrice,
     uint256 longValue,
     uint256 shortValue
-  ) internal view returns (uint256 longCumulativeRates, uint256 shortCumulativeRates) {
+  ) internal view virtual returns (uint256 longCumulativeRates, uint256 shortCumulativeRates) {
     // Compute the current 'r' value for float issuance per second.
     (uint256 longFloatPerSecond, uint256 shortFloatPerSecond) = _calculateFloatPerSecond(
       marketIndex,
@@ -482,7 +487,7 @@ contract Staker is IStaker, Initializable {
     uint256 shortPrice,
     uint256 longValue,
     uint256 shortValue
-  ) internal {
+  ) internal virtual {
     (uint256 longAccumulativeRates, uint256 shortAccumulativeRates) = calculateNewCumulativeRate(
       marketIndex,
       longPrice,
@@ -540,6 +545,7 @@ contract Staker is IStaker, Initializable {
   )
     internal
     view
+    virtual
     returns (
       // NOTE: this returns the long and short reward separately for the sake of simplicity
       //       of the event and the graph. Would be more efficient to return as single value.
@@ -582,6 +588,7 @@ contract Staker is IStaker, Initializable {
   function calculateAccumulatedFloat(uint32 marketIndex, address user)
     internal
     view
+    virtual
     returns (
       // NOTE: this returns the long and short reward separately for the sake of simplicity of
       //       the event and the graph. Would be more efficient to return as single value.
@@ -606,12 +613,12 @@ contract Staker is IStaker, Initializable {
       );
   }
 
-  function _mintFloat(address user, uint256 floatToMint) internal {
+  function _mintFloat(address user, uint256 floatToMint) internal virtual {
     floatToken.mint(user, floatToMint);
     floatToken.mint(floatCapital, (floatToMint * floatPercentage) / 1e18);
   }
 
-  function mintAccumulatedFloat(uint32 marketIndex, address user) internal {
+  function mintAccumulatedFloat(uint32 marketIndex, address user) internal virtual {
     // NOTE: Could merge these two values already inside the `calculateAccumulatedFloat` function,
     //       but that would make it harder for the graph.
     (uint256 floatToMintLong, uint256 floatToMintShort) = calculateAccumulatedFloat(
@@ -636,7 +643,7 @@ contract Staker is IStaker, Initializable {
     }
   }
 
-  function _claimFloat(uint32[] calldata marketIndexes) internal {
+  function _claimFloat(uint32[] calldata marketIndexes) internal virtual {
     uint256 floatTotal = 0;
     for (uint256 i = 0; i < marketIndexes.length; i++) {
       // NOTE: Could merge these two values already inside the `calculateAccumulatedFloat` function,
@@ -691,6 +698,7 @@ contract Staker is IStaker, Initializable {
    */
   function stakeFromUser(address from, uint256 amount)
     public
+    virtual
     override
     onlyValidSynthetic(ISyntheticToken(msg.sender))
   {
@@ -702,7 +710,7 @@ contract Staker is IStaker, Initializable {
     ISyntheticToken token,
     uint256 amount,
     address user
-  ) internal {
+  ) internal virtual {
     uint32 marketIndex = marketIndexOfToken[token];
 
     // If they already have staked and have rewards due, mint these.
@@ -728,7 +736,7 @@ contract Staker is IStaker, Initializable {
     Withdraw function.
     Mint user any outstanding float before
     */
-  function _withdraw(ISyntheticToken token, uint256 amount) internal {
+  function _withdraw(ISyntheticToken token, uint256 amount) internal virtual {
     uint32 marketIndex = marketIndexOfToken[token];
     require(userAmountStaked[token][msg.sender] > 0, "nothing to withdraw");
     mintAccumulatedFloat(marketIndex, msg.sender);

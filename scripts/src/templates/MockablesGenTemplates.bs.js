@@ -11,7 +11,7 @@ function externalMockerFunctionBody(functionName, mockerArguments, mockerReturnV
 }
 
 function mockableModifierBody(functionName, storageParameters, mockerParameterCalls, functionBody) {
-  return "\nif(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + functionName + "\"))){\n  " + storageParameters + "\n  mocker." + functionName + "Mock(" + mockerParameterCalls + ");\n  _;\n} else {\n  " + functionBody + "\n}\n";
+  return "\nif(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + functionName + "\"))){\n  " + storageParameters + "\n  mocker." + functionName + "Mock(" + mockerParameterCalls + ");\n  _;\n} else {\n  " + functionBody + "\n}\n}\n";
 }
 
 function externalMockerModifierBody(functionName, mockerArguments) {

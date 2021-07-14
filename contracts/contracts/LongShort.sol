@@ -177,22 +177,18 @@ contract LongShort is ILongShort, Initializable {
     ║       MULTI-SIG ADMIN       ║
     ╚═════════════════════════════╝*/
 
-  function changeAdmin(address _admin) external virtual adminOnly {
+  function changeAdmin(address _admin) external adminOnly {
     admin = _admin;
   }
 
-  function changeTreasury(address _treasury) external virtual adminOnly {
+  function changeTreasury(address _treasury) external adminOnly {
     treasury = _treasury;
   }
 
   /**
    * Update oracle for a market
    */
-  function updateMarketOracle(uint32 marketIndex, address _newOracleManager)
-    external
-    virtual
-    adminOnly
-  {
+  function updateMarketOracle(uint32 marketIndex, address _newOracleManager) external adminOnly {
     // If not a oracle contract this would break things.. Test's arn't validating this
     // Ie require isOracle interface - ERC165
     address previousOracleManager = address(oracleManagers[marketIndex]);
@@ -214,7 +210,7 @@ contract LongShort is ILongShort, Initializable {
     address _paymentToken,
     address _oracleManager,
     address _yieldManager
-  ) external virtual adminOnly {
+  ) external adminOnly {
     latestMarket++;
 
     // Create new synthetic long token.
@@ -275,7 +271,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 initialMarketSeed,
     uint256 balanceIncentiveCurveExponent,
     int256 balanceIncentiveCurveEquilibriumOffset
-  ) external virtual adminOnly {
+  ) external adminOnly {
     require(!marketExists[marketIndex], "already initialized");
     require(marketIndex <= latestMarket, "index too highh");
 
@@ -550,11 +546,11 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  function updateSystemState(uint32 marketIndex) external virtual override {
+  function updateSystemState(uint32 marketIndex) external override {
     _updateSystemStateInternal(marketIndex);
   }
 
-  function updateSystemStateMulti(uint32[] calldata marketIndexes) external virtual override {
+  function updateSystemStateMulti(uint32[] calldata marketIndexes) external override {
     for (uint256 i = 0; i < marketIndexes.length; i++) {
       _updateSystemStateInternal(marketIndexes[i]);
     }
@@ -667,11 +663,11 @@ contract LongShort is ILongShort, Initializable {
     );
   }
 
-  function mintLongNextPrice(uint32 marketIndex, uint256 amount) external virtual {
+  function mintLongNextPrice(uint32 marketIndex, uint256 amount) external {
     _mintNextPrice(marketIndex, amount, true);
   }
 
-  function mintShortNextPrice(uint32 marketIndex, uint256 amount) external virtual {
+  function mintShortNextPrice(uint32 marketIndex, uint256 amount) external {
     _mintNextPrice(marketIndex, amount, false);
   }
 
@@ -705,11 +701,11 @@ contract LongShort is ILongShort, Initializable {
     );
   }
 
-  function redeemLongNextPrice(uint32 marketIndex, uint256 tokensToRedeem) external virtual {
+  function redeemLongNextPrice(uint32 marketIndex, uint256 tokensToRedeem) external {
     _redeemNextPrice(marketIndex, tokensToRedeem, true);
   }
 
-  function redeemShortNextPrice(uint32 marketIndex, uint256 tokensToRedeem) external virtual {
+  function redeemShortNextPrice(uint32 marketIndex, uint256 tokensToRedeem) external {
     _redeemNextPrice(marketIndex, tokensToRedeem, false);
   }
 
@@ -775,7 +771,6 @@ contract LongShort is ILongShort, Initializable {
 
   function executeOutstandingNextPriceSettlementsUser(address user, uint32 marketIndex)
     external
-    virtual
     override
   {
     _executeOutstandingNextPriceSettlements(user, marketIndex);

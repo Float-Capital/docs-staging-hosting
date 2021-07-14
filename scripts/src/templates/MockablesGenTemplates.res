@@ -34,6 +34,7 @@ if(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(
 } else {
   ${functionBody}
 }
+}
 `
 
 let externalMockerModifierBody = (~functionName, ~mockerArguments) =>

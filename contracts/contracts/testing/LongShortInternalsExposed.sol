@@ -43,17 +43,6 @@ contract LongShortInternalsExposed is LongShortMockable {
     emit executeOutstandingNextPriceSettlementsMock(_user, _marketIndex);
   }
 
-  modifier executeOutstandingNextPriceSettlements(address user, uint32 marketIndex) override {
-    if (overRideexecuteOutstandingNextPriceSettlements) {
-      // TODO: put a mock here?
-      _executeOutstandingNextPriceSettlementsMock(user, marketIndex);
-    } else {
-      _executeOutstandingNextPriceSettlements(user, marketIndex);
-    }
-
-    _;
-  }
-
   function _executeOutstandingNextPriceSettlementsExposedWithEvent(address user, uint32 marketIndex)
     external
   {

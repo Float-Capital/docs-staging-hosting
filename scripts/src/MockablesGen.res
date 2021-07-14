@@ -12,8 +12,7 @@
 open Js.String2
 open MockablesGenTemplates
 
-let filesToMockInternally = ["LongShort.sol"]
-// let filesToMockInternally = ["LongShort.sol", "Staker.sol"]
+let filesToMockInternally = ["LongShort.sol", "Staker.sol"]
 
 exception ScriptDoesNotSupportReturnValues(string)
 
@@ -69,8 +68,6 @@ let functionsVirtual = nodeStatements => {
   nodeStatements
   ->Array.keep(x => x["nodeType"] == #FunctionDefinition && !(x["name"] == "")) // ignore constructors
   ->Array.keep(x => {
-    Js.log("Is it virtual?")
-    Js.log(x["virtual"])
     x["virtual"]
   })
   ->Array.map(x => {
@@ -95,7 +92,7 @@ let modifiers = nodeStatements => {
       // TODO: modifiers are always internal ... unnecessary.
       visibility: x["visibility"] == "public" || x["visibility"] == "external" ? Public : Private,
     }
-    r
+    (r, x)
   })
 }
 
@@ -245,34 +242,18 @@ filesToMockInternally->Array.forEach(filePath => {
   let mockLogger = ref("")
 
   let allFunctions = functionsVirtual(contractDefinition["nodes"])->Array.map(((x, original)) => {
-    Js.log(original["virtual"])
-
     let isPure = original["stateMutability"] == "pure"
-
-    Js.log("IS PURE")
-    Js.log(isPure)
+    let isExternal = original["visibility"] == "external"
 
     let indexOfOldFunctionDec = body->indexOf("function " ++ x.name ++ "(")
 
     let indexOfOldFunctionBodyStart = body->indexOfFrom("{", indexOfOldFunctionDec)
 
-    let solPrefix = body->substring(~from=0, ~to_=indexOfOldFunctionDec)
     let originalFunctionDefinition =
       body->substring(~from=indexOfOldFunctionDec, ~to_=indexOfOldFunctionBodyStart + 1)
     let alreadyAnOverride = originalFunctionDefinition->indexOf("override") != -1
     let functionDefinition =
       originalFunctionDefinition->replace("virtual", alreadyAnOverride ? "" : "override")
-    Js.log(
-      `
-    >>>>>>>>>>>>
-    >>>>>>>>>>>>
-    ${functionDefinition}
-    >>>>>>>>>>>>
-    >>>>>>>>>>>>
-    `,
-    )
-
-    let solSuffixIncludingBody = body->substringToEnd(~from=indexOfOldFunctionBodyStart + 1)
 
     let storageParameters = x.parameters->Array.keep(x => x.storageLocation == Storage)
 
@@ -325,26 +306,18 @@ filesToMockInternally->Array.forEach(filePath => {
     | Public => ""
     }
 
-    let internalLogic = `function ${x.name}InternalLogic(${exposedCallArguments}) internal ${stateMutabilityText} ${mockerReturnValues} {
-`
-
-    let result =
-      exposedFunction ++ (
-        isPure
-          ? "\n"
-          : functionDefinition ++
-            mockableFunctionBody(
-              ~functionName=x.name,
-              ~storageParameters=storageParametersFormatted,
-              ~mockerParameterCalls,
-            )
-      )
-    // Js.log(x.name)
-    // Js.log(result)
-    // internalLogic ++
-    // "/*more */" ++
-    // solSuffix
-    // sol := result
+    let result = isExternal
+      ? ""
+      : exposedFunction ++ (
+          isPure
+            ? "\n"
+            : functionDefinition ++
+              mockableFunctionBody(
+                ~functionName=x.name,
+                ~storageParameters=storageParametersFormatted,
+                ~mockerParameterCalls,
+              )
+        )
 
     let mockerReturn =
       x.returnValues
@@ -363,57 +336,69 @@ filesToMockInternally->Array.forEach(filePath => {
     result
   })
 
-  let modifiersArray = modifiers(contractDefinition["nodes"])->Array.map(x => {
-    let indexOfOldFunctionDec = body->indexOf("modifier " ++ x.name)
+  let modifiersArray = modifiers(contractDefinition["nodes"])->Array.map(((x, original)) => {
+    let isVirtual = original["virtual"]
+    Js.log("isVirtual")
+    Js.log(x.name)
+    Js.log(isVirtual)
+    if !isVirtual {
+      ""
+    } else {
+      let indexOfOldFunctionDec = body->indexOf("modifier " ++ x.name)
 
-    let indexOfOldFunctionBodyStart = body->indexOfFrom("{", indexOfOldFunctionDec)
+      let indexOfOldFunctionBodyStart = body->indexOfFrom("{", indexOfOldFunctionDec)
 
-    let indexOfOldFunctionBodyEnd = body->matchingBlockEndIndex(indexOfOldFunctionBodyStart + 1, 1)
+      let indexOfOldFunctionBodyEnd =
+        body->matchingBlockEndIndex(indexOfOldFunctionBodyStart + 1, 1)
 
-    let functionBody =
-      body->substring(~from=indexOfOldFunctionBodyStart + 1, ~to_=indexOfOldFunctionBodyEnd)
+      let functionBody =
+        body->substring(~from=indexOfOldFunctionBodyStart + 1, ~to_=indexOfOldFunctionBodyEnd)
 
-    let mockerArguments =
-      x.parameters
-      ->Array.map(x =>
-        x.type_->replaceFileNameTypeDefsWithMockableTypeDefs->convertASTTypeToSolType
-      )
-      ->commafiy
+      let mockerArguments =
+        x.parameters
+        ->Array.map(x =>
+          x.type_->replaceFileNameTypeDefsWithMockableTypeDefs->convertASTTypeToSolType
+        )
+        ->commafiy
 
-    let storageParameters = x.parameters->Array.keep(x => x.storageLocation == Storage)
+      let storageParameters = x.parameters->Array.keep(x => x.storageLocation == Storage)
 
-    let solPrefix =
-      body->substring(~from=indexOfOldFunctionDec, ~to_=indexOfOldFunctionBodyStart + 1)
-    Js.log(`prefix - ${solPrefix}`)
+      let originalModifierDefinition =
+        body->substring(~from=indexOfOldFunctionDec, ~to_=indexOfOldFunctionBodyStart + 1)
+            let alreadyAnOverride = originalModifierDefinition->indexOf("override") != -1
+    let modifierDefinition =
+      originalModifierDefinition->replace("virtual", alreadyAnOverride ? "" : "override")
 
-    // let solSuffix = body->substringToEnd(~from=indexOfOldFunctionBodyEnd)
-    let mockerParameterCalls =
-      x.parameters
-      ->Array.map(x => {
-        x.storageLocation == Storage ? x.name ++ "_temp1" : x.name
-      })
-      ->commafiy
-    let storageParameters =
-      storageParameters
-      ->Array.map(x =>
-        `
-            ${x.type_
-          ->removeFileNameFromTypeDefs
-          ->convertASTTypeToSolType} ${x.name}_temp1 = ${x.name};
+
+      // let solSuffix = body->substringToEnd(~from=indexOfOldFunctionBodyEnd)
+      let mockerParameterCalls =
+        x.parameters
+        ->Array.map(x => {
+          x.storageLocation == Storage ? x.name ++ "_temp1" : x.name
+        })
+        ->commafiy
+      let storageParameters =
+        storageParameters
+        ->Array.map(x =>
           `
+            ${x.type_
+            ->removeFileNameFromTypeDefs
+            ->convertASTTypeToSolType} ${x.name}_temp1 = ${x.name};
+          `
+        )
+        ->reduceStrArr
+
+      mockLogger :=
+        mockLogger.contents ++ externalMockerModifierBody(~functionName=x.name, ~mockerArguments)
+
+      modifierDefinition ++
+      mockableModifierBody(
+        ~functionName=x.name,
+        ~storageParameters,
+        ~mockerParameterCalls,
+        ~functionBody,
       )
-      ->reduceStrArr
-
-    mockLogger :=
-      mockLogger.contents ++ externalMockerModifierBody(~functionName=x.name, ~mockerArguments)
-
-    solPrefix ++
-    mockableModifierBody(
-      ~functionName=x.name,
-      ~storageParameters,
-      ~mockerParameterCalls,
-      ~functionBody,
-    )
+    }
   })
 
   let importsInFile = body->match_(importRe)
@@ -455,28 +440,12 @@ filesToMockInternally->Array.forEach(filePath => {
     )
 
   let indexOfFirstImports = body->indexOf("import")
-  let indexOfContractDef = body->indexOf("contract ")
 
-  let indexOfContractBlock = body->indexOfFrom("{", indexOfContractDef)
-
-  let indexOfContractName = body->indexOfFrom(fileNameWithoutExtension, indexOfContractDef)
-
-  Js.log("importsInFile")
-  Js.log(parentImports)
   let prefix = body->substring(~from=0, ~to_=indexOfFirstImports) ++ parentImports
-  // let prefix = importsInFile->Option.map(i =>
-  //   i->Array.reduceWithIndex(
-  //     currentString,
-  //     index,
-  //     imp,
-  //   ) => {
-  //     Js.log(currentString)
-  //     currentString->replace(imp, importsInFileReplaced->Option.getUnsafe->Array.getUnsafe(index))
-  //   })
-  // )
 
+  let allModifiersString = modifiersArray->Js.Array2.joinWith("\n")
   let allFunctionsString = allFunctions->Js.Array2.joinWith("\n")
-  let fullBody = allFunctionsString
+  let fullBody = allModifiersString ++ "\n" ++ allFunctionsString
 
   let contractMockable = mockingFileTemplate(~prefix, ~fileNameWithoutExtension, ~fullBody)
 
@@ -504,8 +473,8 @@ filesToMockInternally->Array.forEach(filePath => {
     existingModuleDef ++
     "\n\n" ++
     functionsVirtual(contractDefinition["nodes"])
-    ->Array.map(((x, _)) => x)
     ->Array.concat(modifiers(contractDefinition["nodes"]))
+    ->Array.map(((x, _)) => x)
     ->SmockableGen.internalModule(~contractName=fileNameWithoutExtension),
   )
 })
