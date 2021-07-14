@@ -6,6 +6,7 @@ var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Loader = require("../../components/UI/Base/Loader.js");
 var Queries = require("../../data/Queries.js");
+var CONSTANTS = require("../../CONSTANTS.js");
 var StatsCalcs = require("../../libraries/StatsCalcs.js");
 
 function TVL(Props) {
@@ -26,27 +27,35 @@ function TVL(Props) {
         undefined
       ]);
   var match = marketDetailsQuery.data;
-  var tmp;
   if (marketDetailsQuery.loading) {
-    tmp = React.createElement(Loader.Tiny.make, {});
-  } else if (marketDetailsQuery.error !== undefined) {
-    tmp = React.createElement("span", {
-          className: "text-xs"
-        }, "Error Loading TVL");
-  } else if (match !== undefined) {
-    var match$1 = StatsCalcs.getTotalValueLockedAndTotalStaked(match.syntheticMarkets);
-    tmp = React.createElement("div", {
-          className: "text-sm flex flex-row items-center"
-        }, React.createElement("span", undefined, "TVL: "), React.createElement("img", {
-              className: "h-6 mx-1",
-              src: "/icons/dollar-coin.png"
-            }), React.createElement("span", undefined, Misc.NumberFormat.formatEther(undefined, match$1.totalValueLocked)));
-  } else {
-    tmp = React.createElement(React.Fragment, undefined, "");
+    return React.createElement(Loader.Tiny.make, {});
   }
-  return React.createElement("div", {
-              className: "fixed bottom-3 left-3 flex flex-col items-end invisible md:visible bg-white bg-opacity-75 rounded-lg shadow-lg px-2 py-1"
-            }, tmp);
+  if (marketDetailsQuery.error !== undefined) {
+    return React.createElement("div", {
+                className: "fixed bottom-3 left-3 flex flex-col items-end invisible md:visible bg-white bg-opacity-75 rounded-lg shadow-lg px-2 py-1"
+              }, React.createElement("span", {
+                    className: "text-xxs"
+                  }, "Error loading TVL"));
+  }
+  if (match === undefined) {
+    return React.createElement(React.Fragment, undefined, "");
+  }
+  var match$1 = StatsCalcs.getTotalValueLockedAndTotalStaked(match.syntheticMarkets);
+  var totalValueLocked = match$1.totalValueLocked;
+  if (totalValueLocked.gte(CONSTANTS.fiveHundredThousandInWei)) {
+    return React.createElement("div", {
+                className: "fixed bottom-3 left-3 flex flex-col items-end invisible md:visible bg-white bg-opacity-75 rounded-lg shadow-lg px-2 py-1"
+              }, React.createElement("div", {
+                    className: "text-sm flex flex-row items-center"
+                  }, React.createElement("span", undefined, "TVL: $"), React.createElement("span", {
+                        className: "font-bold"
+                      }, Misc.NumberFormat.formatEther(undefined, totalValueLocked)), React.createElement("img", {
+                        className: "h-6 mx-1",
+                        src: "/icons/dollar-coin.png"
+                      })));
+  } else {
+    return null;
+  }
 }
 
 var make = TVL;

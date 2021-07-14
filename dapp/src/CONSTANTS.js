@@ -19,6 +19,8 @@ var tenToThe18 = Ethers.BigNumber.from("1000000000000000000");
 
 var oneHundredThousandInWei = tenToThe18.mul(tenToThe5);
 
+var fiveHundredThousandInWei = tenToThe18.mul(tenToThe6).div(Ethers.BigNumber.from(2));
+
 var oneMillionInWei = tenToThe18.mul(tenToThe6);
 
 var tenToThe42 = tenToThe6.mul(tenToThe18).mul(tenToThe18);
@@ -75,6 +77,7 @@ exports.tenToThe6 = tenToThe6;
 exports.tenToThe9 = tenToThe9;
 exports.tenToThe18 = tenToThe18;
 exports.oneHundredThousandInWei = oneHundredThousandInWei;
+exports.fiveHundredThousandInWei = fiveHundredThousandInWei;
 exports.oneMillionInWei = oneMillionInWei;
 exports.tenToThe42 = tenToThe42;
 exports.oneHundredEth = oneHundredEth;
