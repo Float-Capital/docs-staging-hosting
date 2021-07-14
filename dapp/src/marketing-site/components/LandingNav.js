@@ -39,7 +39,7 @@ function LandingNav(Props) {
   var landingNav = [
     {
       title: "App",
-      link: "/app/markets"
+      link: "app/markets"
     },
     {
       title: "How it Works",
