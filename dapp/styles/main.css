@@ -51,24 +51,6 @@ html {
     url("/backgrounds/governance.png");
   @apply font-default min-h-screen w-screen bg-right bg-cover bg-gray-50;
 }
-.road {
-  background: linear-gradient(
-      to bottom left,
-      rgba(255, 255, 255, 0),
-      rgba(255, 255, 255, 0)
-    ),
-    url("/backgrounds/road.gif");
-  @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
-}
-.desert {
-  background: linear-gradient(
-      to bottom left,
-      rgba(255, 255, 255, 0),
-      rgba(255, 255, 255, 0)
-    ),
-    url("/backgrounds/desert.png");
-  @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
-}
 .bg-car {
   background: linear-gradient(
       to bottom left,
