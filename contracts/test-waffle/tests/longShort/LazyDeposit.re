@@ -120,7 +120,7 @@ let testExposed =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
-  describe_only("lazyDeposits", () => {
+  describe("lazyDeposits", () => {
     it("calls the executeOutstandingNextPriceSettlements modifier", () => {
       // TODO: turn this into a re-usable template (just pass in the transaction that should emmit the event)
       //       test all other relevant 'functions
