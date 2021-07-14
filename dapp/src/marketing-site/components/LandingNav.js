@@ -42,7 +42,7 @@ function LandingNav(Props) {
       link: "app/markets"
     },
     {
-      title: "How it Works",
+      title: "How it works",
       link: "#how-it-works"
     },
     {
