@@ -7,6 +7,8 @@ let tenToThe6 = Ethers.BigNumber.fromUnsafe("1000000")
 let tenToThe9 = Ethers.BigNumber.fromUnsafe("1000000000")
 let tenToThe18 = Ethers.BigNumber.fromUnsafe("1000000000000000000")
 let oneHundredThousandInWei = tenToThe18->Ethers.BigNumber.mul(tenToThe5)
+let fiveHundredThousandInWei =
+  tenToThe18->Ethers.BigNumber.mul(tenToThe6)->Ethers.BigNumber.div(Ethers.BigNumber.fromInt(2))
 let oneMillionInWei = tenToThe18->Ethers.BigNumber.mul(tenToThe6)
 let tenToThe42 = tenToThe6->Ethers.BigNumber.mul(tenToThe18)->Ethers.BigNumber.mul(tenToThe18)
 let oneHundredEth = Ethers.BigNumber.fromUnsafe("100000000000000000000") // 10 ^ 20
