@@ -37,15 +37,16 @@ html {
     url("/backgrounds/purple-moon.gif");
   @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
 }
-/* background: linear-gradient(
-    to bottom left,
-    rgba(255, 255, 255, 0.3),
-    rgba(255, 255, 255, 0)
-  ), */
+
 .fighter-blue {
-  background-image: url("/backgrounds/fighter-right.gif");
+  background: url("/backgrounds/fighter-right.gif"),
+    linear-gradient(
+      to bottom left,
+      rgba(86, 136, 241, 0.2),
+      rgba(62, 77, 167, 0.6)
+    );
   background-position: right bottom;
-  @apply font-default min-h-screen w-screen bg-cover;
+  @apply font-default min-h-screen bg-right-bottom w-screen bg-cover;
 }
 .ballot-box {
   background: linear-gradient(

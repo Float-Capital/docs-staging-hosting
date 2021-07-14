@@ -17,44 +17,44 @@ function Security(Props) {
                           title: "security",
                           suffixEmoji: "🔐"
                         }), React.createElement("div", {
-                          className: "grid grid-cols-3 gap-10 items-center justify-center my-4"
+                          className: "grid grid-cols-1 md:grid-cols-3 gap-10 items-center justify-center my-4"
                         }, React.createElement("div", {
-                              className: "mx-4"
+                              className: "mx-4 order-3 md:order-1"
                             }, React.createElement("a", {
                                   className: "custom-cursor",
                                   href: "https://docs.float.capital/docs/security",
                                   rel: "noopener noreferrer",
                                   target: "_blank"
                                 }, React.createElement("img", {
-                                      className: "h-32 mx-auto  hover:opacity-80",
+                                      className: "h-16 md:h-32 mx-auto  hover:opacity-80",
                                       src: "/icons/coverage.svg"
                                     }), React.createElement("p", {
                                       className: "text-center w-40 mx-auto hover:underline"
                                     }, "Smart contract code coverage"), React.createElement("p", {
                                       className: "text-center mx-auto text-xs text-gray-500"
                                     }, "coming soon"))), React.createElement("div", {
-                              className: "mx-4"
+                              className: "mx-4 order-2"
                             }, React.createElement("a", {
                                   className: "custom-cursor",
                                   href: "https://docs.float.capital/docs/security",
                                   rel: "noopener noreferrer",
                                   target: "_blank"
                                 }, React.createElement("img", {
-                                      className: "h-32 mx-auto  hover:opacity-80",
+                                      className: "h-16 md:h-32 mx-auto  hover:opacity-80",
                                       src: "/icons/github-color.svg"
                                     }), React.createElement("p", {
                                       className: "text-center w-40 mx-auto hover:underline"
                                     }, "Github code"), React.createElement("p", {
                                       className: "text-center mx-auto text-xs text-gray-500"
                                     }, "coming soon"))), React.createElement("div", {
-                              className: "mx-4"
+                              className: "mx-4  order-1 md:order-3"
                             }, React.createElement("a", {
                                   className: "custom-cursor",
                                   href: "https://docs.float.capital/docs/security",
                                   rel: "noopener noreferrer",
                                   target: "_blank"
                                 }, React.createElement("img", {
-                                      className: "h-32 mx-auto  hover:opacity-80",
+                                      className: "h-16 md:h-32 mx-auto  hover:opacity-80",
                                       src: "/icons/code-arena-sq.png"
                                     }), React.createElement("p", {
                                       className: "text-center  w-40 mx-auto hover:underline"

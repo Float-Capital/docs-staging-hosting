@@ -5,7 +5,8 @@ let make = () => {
     className="py-10 bg-white min-h-screen w-screen flex flex-col items-center justify-center purple-moon">
     <div className="flex flex-col items-center">
       <Heading title="how it works" suffixEmoji=`🔬` />
-      <div className="grid grid-cols-2 my-4 gap-10 md:flex-row items-center max-w-5xl">
+      <div
+        className="grid grid-cols-1 md:grid-cols-2 mx-4 my-4 gap-10 md:flex-row items-center max-w-5xl">
         <div className="bg-white bg-opacity-60 p-4 rounded-md">
           <h3 className="text-4xl flex flex-row items-center">
             <span> {"Mint"->React.string} </span> <img src="/icons/mint.png" className="h-10" />

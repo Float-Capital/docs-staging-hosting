@@ -98,7 +98,7 @@ function LandingNav(Props) {
           
         }), [downClicked]);
   return React.createElement("nav", {
-              className: "text-3xl font-vt323"
+              className: "text-xl md:text-3xl font-vt323"
             }, React.createElement("div", {
                   className: "mx-auto custom-cursor"
                 }, Belt_Array.mapWithIndex(landingNav, (function (index, nav) {

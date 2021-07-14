@@ -14,7 +14,7 @@ function HowItWorks(Props) {
                       title: "how it works",
                       suffixEmoji: "🔬"
                     }), React.createElement("div", {
-                      className: "grid grid-cols-2 my-4 gap-10 md:flex-row items-center max-w-5xl"
+                      className: "grid grid-cols-1 md:grid-cols-2 mx-4 my-4 gap-10 md:flex-row items-center max-w-5xl"
                     }, React.createElement("div", {
                           className: "bg-white bg-opacity-60 p-4 rounded-md"
                         }, React.createElement("h3", {

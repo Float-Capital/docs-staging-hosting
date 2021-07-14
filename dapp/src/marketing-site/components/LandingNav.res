@@ -76,7 +76,7 @@ let make = () => {
     None
   }, [downClicked])
 
-  <nav className="text-3xl font-vt323">
+  <nav className="text-xl md:text-3xl font-vt323">
     <div className="mx-auto custom-cursor">
       {landingNav
       ->Array.mapWithIndex((index, nav) => {
