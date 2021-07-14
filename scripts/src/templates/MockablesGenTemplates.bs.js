@@ -3,7 +3,7 @@
 
 
 function mockableFunctionBody(functionName, storageParameters, mockerParameterCalls) {
-  return "\nif(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + functionName + "\"))){\n  " + storageParameters + "\n  return mocker." + functionName + "Mock(" + mockerParameterCalls + ");\n} else {\n  return " + functionName + "InternalLogic(" + mockerParameterCalls + ");\n}\n}\n";
+  return "\nif(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + functionName + "\"))){\n  " + storageParameters + "\n  return mocker." + functionName + "Mock(" + mockerParameterCalls + ");\n} else {\n  return super." + functionName + "(" + mockerParameterCalls + ");\n}\n}\n";
 }
 
 function externalMockerFunctionBody(functionName, mockerArguments, mockerReturnValues, mockerReturn) {
@@ -11,7 +11,7 @@ function externalMockerFunctionBody(functionName, mockerArguments, mockerReturnV
 }
 
 function mockableModifierBody(functionName, storageParameters, mockerParameterCalls, functionBody) {
-  return "\nif(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + functionName + "\"))){\n  " + storageParameters + "\n  mocker." + functionName + "Mock(" + mockerParameterCalls + ");\n  _;\n} else {\n  " + functionBody + "\n}\n";
+  return "\nif(shouldUseMock && keccak256(abi.encodePacked(functionToNotMock)) != keccak256(abi.encodePacked(\"" + functionName + "\"))){\n  " + storageParameters + "\n  mocker." + functionName + "Mock(" + mockerParameterCalls + ");\n  _;\n} else {\n  " + functionBody + "\n}\n}\n";
 }
 
 function externalMockerModifierBody(functionName, mockerArguments) {
@@ -22,8 +22,8 @@ function internalMockingFileTemplate(fileNameWithoutExtension, parentImports, co
   return "// SPDX-License-Identifier: BUSL-1.1 \n pragma solidity 0.8.3;\n\nimport \"./" + fileNameWithoutExtension + "Mockable.sol\";\n\n" + parentImports + "\n\ncontract " + fileNameWithoutExtension + "ForInternalMocking {\n  " + contractBody + "\n}";
 }
 
-function mockingFileTemplate(prefix, fileNameWithoutExtension, modifiersAndOpener, suffix) {
-  return prefix + "\nimport \"./" + fileNameWithoutExtension + "ForInternalMocking.sol\";\n\ncontract " + fileNameWithoutExtension + "Mockable" + modifiersAndOpener + "\n\n  " + fileNameWithoutExtension + "ForInternalMocking mocker;\n  bool shouldUseMock;\n  string functionToNotMock;\n\n  function setMocker(" + fileNameWithoutExtension + "ForInternalMocking _mocker) external {\n    mocker = _mocker;\n    shouldUseMock = true;\n  }\n\n  function setFunctionToNotMock(string calldata _functionToNotMock) external {\n    functionToNotMock = _functionToNotMock;\n  }\n\n" + suffix + "\n";
+function mockingFileTemplate(prefix, fileNameWithoutExtension, fullBody) {
+  return prefix + "\nimport \"./" + fileNameWithoutExtension + "ForInternalMocking.sol\";\nimport \"../../" + fileNameWithoutExtension + ".sol\";\n\ncontract " + fileNameWithoutExtension + "Mockable is " + fileNameWithoutExtension + " {\n\n  " + fileNameWithoutExtension + "ForInternalMocking mocker;\n  bool shouldUseMock;\n  string functionToNotMock;\n\n  function setMocker(" + fileNameWithoutExtension + "ForInternalMocking _mocker) external {\n    mocker = _mocker;\n    shouldUseMock = true;\n  }\n\n  function setFunctionToNotMock(string calldata _functionToNotMock) external {\n    functionToNotMock = _functionToNotMock;\n  }\n\n" + fullBody + "\n}\n";
 }
 
 exports.mockableFunctionBody = mockableFunctionBody;

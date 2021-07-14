@@ -1,5 +1,6 @@
 let coverageReportOutputDirectory = "coverage-truffle"
 
+let extraFilesToIgnore = []
 let isWaffleTest =
   !!process.env.WAFFLE_TEST && process.env.WAFFLE_TEST.toUpperCase() == "TRUE"
 if (isWaffleTest) {
@@ -11,6 +12,14 @@ if (isWaffleTest) {
     coverageReportOutputDirectory = "coverage-all"
   } else if (isUnitTests) {
     coverageReportOutputDirectory = "coverage-unit"
+    extraFilesToIgnore = [
+      "FloatCapital_v0.sol",
+      "FloatToken.sol",
+      "SyntheticToken.sol",
+      "TokenFactory.sol",
+      "Treasury_v0.sol",
+      "YieldManagerAave.sol",
+    ]
   } else if (isIntegrationTests) {
     coverageReportOutputDirectory = "coverage-integration"
   } else {
@@ -46,6 +55,7 @@ module.exports = {
     "oracles/OracleManagerChainlink.sol",
     "oracles/OracleManagerEthKiller.sol",
     "oracles/OracleManagerEthKillerChainlink.sol",
+    "oracles/OracleManagerEthKillerChainlinkTestnet.sol",
     "oracles/OracleManagerEthVsBtc.sol",
     "oracles/OracleManagerFlippening_V0.sol",
 
@@ -53,10 +63,10 @@ module.exports = {
     "testing/StakerInternalsExposed.sol",
 
     "testing/generated/LongShortForInternalMocking.sol",
-    "testing/generated/LongShortMockable.sol",
     "testing/generated/StakerForInternalMocking.sol",
+    "testing/generated/LongShortMockable.sol",
     "testing/generated/StakerMockable.sol"
-  ],
+  ].concat(extraFilesToIgnore),
   istanbulFolder: coverageReportOutputDirectory,
 };
 

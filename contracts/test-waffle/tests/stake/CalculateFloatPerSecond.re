@@ -32,7 +32,6 @@ let test =
     let calculateFloatPerSecondPerPaymentTokenLocked =
         (
           ~underBalancedSideValue,
-          ~overBalancedSideValue,
           ~exponent,
           ~equilibriumOffsetMarket,
           ~totalLocked,
@@ -70,12 +69,6 @@ let test =
         contracts^.staker->Staker.balanceIncentiveCurveExponent(marketIndex);
       balanceIncentiveCurveExponent := balanceIncentiveCurveExponentFetched;
 
-      let requiredBitShifting =
-        getRequiredAmountOfBitShiftForSafeExponentiation(
-          randomValueLocked1->add(randomValueLocked2),
-          balanceIncentiveCurveExponentFetched,
-        );
-
       StakerSmocked.InternalMock.mockGetKValueToReturn(kVal);
     });
 
@@ -108,7 +101,6 @@ let test =
         let (longRate, shortRate) =
           calculateFloatPerSecondPerPaymentTokenLocked(
             ~underBalancedSideValue=shortValue,
-            ~overBalancedSideValue=longValue,
             ~exponent=balanceIncentiveCurveExponent^,
             ~equilibriumOffsetMarket=CONSTANTS.zeroBn,
             ~totalLocked,
@@ -120,12 +112,11 @@ let test =
         let shortRateScaled =
           shortRate->mul(kVal)->mul(shortPrice)->div(tenToThe18);
         longFloatPerSecond->Chai.bnEqual(longRateScaled);
-        shortRateScaled->Chai.bnEqual(shortRateScaled);
+        shortFloatPerSecond->Chai.bnEqual(shortRateScaled);
       } else {
         let (shortRate, longRate) =
           calculateFloatPerSecondPerPaymentTokenLocked(
             ~underBalancedSideValue=longValue,
-            ~overBalancedSideValue=shortValue,
             ~exponent=balanceIncentiveCurveExponent^,
             ~equilibriumOffsetMarket=CONSTANTS.zeroBn,
             ~totalLocked,
@@ -137,7 +128,7 @@ let test =
         let shortRateScaled =
           shortRate->mul(kVal)->mul(shortPrice)->div(tenToThe18);
         longFloatPerSecond->Chai.bnEqual(longRateScaled);
-        shortRateScaled->Chai.bnEqual(shortRateScaled);
+        shortFloatPerSecond->Chai.bnEqual(shortRateScaled);
       };
     };
 
@@ -172,7 +163,7 @@ let test =
       );
       StakerSmocked.InternalMock.mockGetKValueToReturn(kVal);
 
-      let%Await result =
+      let%Await _result =
         contracts^.staker
         ->Staker.Exposed._calculateFloatPerSecondExposed(
             ~marketIndex,

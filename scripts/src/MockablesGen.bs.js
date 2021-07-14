@@ -87,13 +87,15 @@ function nodeToTypedIdentifier(node) {
         };
 }
 
-function functions(nodeStatements) {
-  return Belt_Array.map(Belt_Array.keep(nodeStatements, (function (x) {
-                    if (x.nodeType === "FunctionDefinition") {
-                      return x.name !== "";
-                    } else {
-                      return false;
-                    }
+function functionsVirtual(nodeStatements) {
+  return Belt_Array.map(Belt_Array.keep(Belt_Array.keep(nodeStatements, (function (x) {
+                        if (x.nodeType === "FunctionDefinition") {
+                          return x.name !== "";
+                        } else {
+                          return false;
+                        }
+                      })), (function (x) {
+                    return x.virtual;
                   })), (function (x) {
                 var r_name = x.name;
                 var r_parameters = Belt_Array.map(x.parameters.parameters, nodeToTypedIdentifier);
@@ -116,12 +118,20 @@ function modifiers(nodeStatements) {
   return Belt_Array.map(Belt_Array.keep(nodeStatements, (function (x) {
                     return x.nodeType === "ModifierDefinition";
                   })), (function (x) {
-                return {
-                        name: x.name,
-                        parameters: Belt_Array.map(x.parameters.parameters, nodeToTypedIdentifier),
-                        returnValues: [],
-                        visibility: x.visibility === "public" || x.visibility === "external" ? /* Public */0 : /* Private */1
-                      };
+                var r_name = x.name;
+                var r_parameters = Belt_Array.map(x.parameters.parameters, nodeToTypedIdentifier);
+                var r_returnValues = [];
+                var r_visibility = x.visibility === "public" || x.visibility === "external" ? /* Public */0 : /* Private */1;
+                var r = {
+                  name: r_name,
+                  parameters: r_parameters,
+                  returnValues: r_returnValues,
+                  visibility: r_visibility
+                };
+                return [
+                        r,
+                        x
+                      ];
               }));
 }
 
@@ -274,6 +284,7 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
                             }));
               }));
         sol.contents = sol.contents.replace(blockCommentsRe, "\n");
+        var body = sol.contents;
         var contractAst = getContractAst(fileNameWithoutExtension);
         var contractDefinition = Belt_Array.getExn(Belt_Array.keep(contractAst.nodes, (function (x) {
                     return x.nodeType === "ContractDefinition";
@@ -281,14 +292,16 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
         var mockLogger = {
           contents: ""
         };
-        Belt_Array.forEach(functions(contractDefinition.nodes), (function (param) {
+        var allFunctions = Belt_Array.map(functionsVirtual(contractDefinition.nodes), (function (param) {
                 var original = param[1];
                 var x = param[0];
-                var indexOfOldFunctionDec = sol.contents.indexOf("function " + x.name + "(");
-                var indexOfOldFunctionBodyStart = sol.contents.indexOf("{", indexOfOldFunctionDec);
-                var solPrefix = sol.contents.substring(0, indexOfOldFunctionDec);
-                var functionDefinition = sol.contents.substring(indexOfOldFunctionDec, indexOfOldFunctionBodyStart + 1 | 0);
-                var solSuffix = sol.contents.substring(indexOfOldFunctionBodyStart + 1 | 0);
+                var isPure = original.stateMutability === "pure";
+                var isExternal = original.visibility === "external";
+                var indexOfOldFunctionDec = body.indexOf("function " + x.name + "(");
+                var indexOfOldFunctionBodyStart = body.indexOf("{", indexOfOldFunctionDec);
+                var originalFunctionDefinition = body.substring(indexOfOldFunctionDec, indexOfOldFunctionBodyStart + 1 | 0);
+                var alreadyAnOverride = originalFunctionDefinition.indexOf("override") !== -1;
+                var functionDefinition = originalFunctionDefinition.replace("virtual", alreadyAnOverride ? "" : "override");
                 var storageParameters = Belt_Array.keep(x.parameters, (function (x) {
                         return x.storageLocation === /* Storage */0;
                       }));
@@ -315,28 +328,38 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
                           })));
                 var stateMutabilityText = original.stateMutability === "nonpayable" ? "" : original.stateMutability;
                 var match = x.visibility;
-                var exposedFunction = match ? "function " + x.name + "Exposed(" + exposedCallArguments + ") external " + stateMutabilityText + " " + mockerReturnValues + " { return " + x.name + "InternalLogic(" + mockerParameterCalls + ");}\n" : "";
-                var internalLogic = "function " + x.name + "InternalLogic(" + exposedCallArguments + ") internal " + stateMutabilityText + " " + mockerReturnValues + " {\n";
-                sol.contents = solPrefix + exposedFunction + functionDefinition + MockablesGenTemplates.mockableFunctionBody(x.name, storageParametersFormatted, mockerParameterCalls) + internalLogic + solSuffix;
+                var exposedFunction = match ? "function " + x.name + "Exposed(" + exposedCallArguments + ") external " + stateMutabilityText + " " + mockerReturnValues + " { return super." + x.name + "(" + mockerParameterCalls + ");}\n" : "";
+                var result = isExternal ? "" : exposedFunction + (
+                    isPure ? "\n" : functionDefinition + MockablesGenTemplates.mockableFunctionBody(x.name, storageParametersFormatted, mockerParameterCalls)
+                  );
                 var mockerReturn = Globals.commafiy(Belt_Array.map(x.returnValues, (function (y) {
                             return "abi.decode(\"\",(" + convertASTTypeToSolType(y.type_) + "))";
                           })));
                 mockLogger.contents = mockLogger.contents + MockablesGenTemplates.externalMockerFunctionBody(x.name, mockerArguments, mockerReturnValues, mockerReturn);
-                
+                return result;
               }));
-        Belt_Array.forEach(modifiers(contractDefinition.nodes), (function (x) {
-                var indexOfOldFunctionDec = sol.contents.indexOf("modifier " + x.name);
-                var indexOfOldFunctionBodyStart = sol.contents.indexOf("{", indexOfOldFunctionDec);
-                var indexOfOldFunctionBodyEnd = matchingBlockEndIndex(sol.contents, indexOfOldFunctionBodyStart + 1 | 0, 1);
-                var functionBody = sol.contents.substring(indexOfOldFunctionBodyStart + 1 | 0, indexOfOldFunctionBodyEnd);
+        var modifiersArray = Belt_Array.map(modifiers(contractDefinition.nodes), (function (param) {
+                var x = param[0];
+                var isVirtual = param[1].virtual;
+                console.log("isVirtual");
+                console.log(x.name);
+                console.log(isVirtual);
+                if (!isVirtual) {
+                  return "";
+                }
+                var indexOfOldFunctionDec = body.indexOf("modifier " + x.name);
+                var indexOfOldFunctionBodyStart = body.indexOf("{", indexOfOldFunctionDec);
+                var indexOfOldFunctionBodyEnd = matchingBlockEndIndex(body, indexOfOldFunctionBodyStart + 1 | 0, 1);
+                var functionBody = body.substring(indexOfOldFunctionBodyStart + 1 | 0, indexOfOldFunctionBodyEnd);
                 var mockerArguments = Globals.commafiy(Belt_Array.map(x.parameters, (function (x) {
                             return convertASTTypeToSolType(replaceFileNameTypeDefsWithMockableTypeDefs(x.type_));
                           })));
                 var storageParameters = Belt_Array.keep(x.parameters, (function (x) {
                         return x.storageLocation === /* Storage */0;
                       }));
-                var solPrefix = sol.contents.substring(0, indexOfOldFunctionBodyStart + 1 | 0);
-                var solSuffix = sol.contents.substring(indexOfOldFunctionBodyEnd);
+                var originalModifierDefinition = body.substring(indexOfOldFunctionDec, indexOfOldFunctionBodyStart + 1 | 0);
+                var alreadyAnOverride = originalModifierDefinition.indexOf("override") !== -1;
+                var modifierDefinition = originalModifierDefinition.replace("virtual", alreadyAnOverride ? "" : "override");
                 var mockerParameterCalls = Globals.commafiy(Belt_Array.map(x.parameters, (function (x) {
                             if (x.storageLocation === /* Storage */0) {
                               return x.name + "_temp1";
@@ -347,11 +370,10 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
                 var storageParameters$1 = reduceStrArr(Belt_Array.map(storageParameters, (function (x) {
                             return "\n            " + convertASTTypeToSolType(removeFileNameFromTypeDefs(x.type_)) + " " + x.name + "_temp1 = " + x.name + ";\n          ";
                           })));
-                sol.contents = solPrefix + MockablesGenTemplates.mockableModifierBody(x.name, storageParameters$1, mockerParameterCalls, functionBody) + solSuffix;
                 mockLogger.contents = mockLogger.contents + MockablesGenTemplates.externalMockerModifierBody(x.name, mockerArguments);
-                
+                return modifierDefinition + MockablesGenTemplates.mockableModifierBody(x.name, storageParameters$1, mockerParameterCalls, functionBody);
               }));
-        var importsInFile = sol.contents.match(importRe);
+        var importsInFile = body.match(importRe);
         var importsInFile$1 = importsInFile === null ? undefined : Caml_option.some(importsInFile);
         var importsInFileReplaced = Belt_Option.map(importsInFile$1, (function (i) {
                 return Belt_Array.map(i, (function (x) {
@@ -377,27 +399,26 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
                                 })));
               }));
         mockLogger.contents = MockablesGenTemplates.internalMockingFileTemplate(fileNameWithoutExtension, parentImports, mockLogger.contents);
-        var indexOfContractDef = sol.contents.indexOf("contract ");
-        var indexOfContractBlock = sol.contents.indexOf("{", indexOfContractDef);
-        var indexOfContractName = sol.contents.indexOf(fileNameWithoutExtension, indexOfContractDef);
-        var prefix = sol.contents.substring(0, indexOfContractDef);
-        var modifiersAndOpener = sol.contents.substring(indexOfContractName + fileNameWithoutExtension.length | 0, indexOfContractBlock + 1 | 0);
-        var suffix = sol.contents.substring(indexOfContractBlock + 1 | 0);
-        sol.contents = MockablesGenTemplates.mockingFileTemplate(prefix, fileNameWithoutExtension, modifiersAndOpener, suffix);
+        var indexOfFirstImports = body.indexOf("import");
+        var prefix = body.substring(0, indexOfFirstImports) + parentImports;
+        var allModifiersString = modifiersArray.join("\n");
+        var allFunctionsString = allFunctions.join("\n");
+        var fullBody = allModifiersString + "\n" + allFunctionsString;
+        var contractMockable = MockablesGenTemplates.mockingFileTemplate(prefix, fileNameWithoutExtension, fullBody);
         var outputDirectory = "../contracts/contracts/testing/generated";
         if (!Fs.existsSync(outputDirectory)) {
           Fs.mkdirSync(outputDirectory, {
                 recursive: true
               });
         }
-        Fs.writeFileSync(outputDirectory + "/" + fileNameWithoutExtension + "Mockable.sol", sol.contents, "utf8");
+        Fs.writeFileSync(outputDirectory + "/" + fileNameWithoutExtension + "Mockable.sol", contractMockable, "utf8");
         Fs.writeFileSync(outputDirectory + "/" + fileNameWithoutExtension + "ForInternalMocking.sol", mockLogger.contents, "utf8");
         var existingModuleDef = Belt_Array.some(abisToMockExternally, (function (x) {
                 return x === fileNameWithoutExtension;
               })) ? Belt_Option.getExn(Belt_HashMapString.get(bindingsDict, fileNameWithoutExtension)) : "";
-        return Belt_HashMapString.set(bindingsDict, fileNameWithoutExtension, existingModuleDef + "\n\n" + SmockableGen.internalModule(Belt_Array.concat(Belt_Array.map(functions(contractDefinition.nodes), (function (param) {
-                                  return param[0];
-                                })), modifiers(contractDefinition.nodes)), fileNameWithoutExtension));
+        return Belt_HashMapString.set(bindingsDict, fileNameWithoutExtension, existingModuleDef + "\n\n" + SmockableGen.internalModule(Belt_Array.map(Belt_Array.concat(functionsVirtual(contractDefinition.nodes), modifiers(contractDefinition.nodes)), (function (param) {
+                              return param[0];
+                            })), fileNameWithoutExtension));
       }));
 
 Belt_HashMapString.forEach(bindingsDict, (function (key, val) {
@@ -421,7 +442,7 @@ exports.abisToMockExternally = abisToMockExternally;
 exports.convertASTTypeToSolTypeSimple = convertASTTypeToSolTypeSimple;
 exports.convertASTTypeToSolType = convertASTTypeToSolType;
 exports.nodeToTypedIdentifier = nodeToTypedIdentifier;
-exports.functions = functions;
+exports.functionsVirtual = functionsVirtual;
 exports.modifiers = modifiers;
 exports.lineCommentsRe = lineCommentsRe;
 exports.blockCommentsRe = blockCommentsRe;
