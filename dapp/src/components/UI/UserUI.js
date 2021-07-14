@@ -725,7 +725,7 @@ function UserUI$UserFloatCard(Props) {
                         className: "flex flex-row items-center justify-center"
                       }, React.createElement("h3", undefined, "Float rewards"), React.createElement("img", {
                             className: "ml-2 h-5",
-                            src: "/img/float-token-coin-v3.svg"
+                            src: "/img/F-float-token.svg"
                           }))
                 }), tmp);
 }

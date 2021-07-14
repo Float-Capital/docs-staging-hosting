@@ -587,7 +587,7 @@ module UserFloatCard = {
       <UserColumnHeader>
         <div className="flex flex-row items-center justify-center">
           <h3> {`Float rewards`->React.string} </h3>
-          <img src="/img/float-token-coin-v3.svg" className="ml-2 h-5" />
+          <img src="/img/F-float-token.svg" className="ml-2 h-5" />
         </div>
       </UserColumnHeader>
       {switch DataHooks.liftGraphResponse2(floatBalances, claimableFloat) {
