@@ -7,7 +7,7 @@ var EcosystemPartners = require("./components/EcosystemPartners.js");
 
 function Landing(Props) {
   return React.createElement("section", {
-              className: "blue-dusk-island flex flex-col md:flex-row items-center min-h-screen"
+              className: "island flex flex-col md:flex-row items-center min-h-screen"
             }, React.createElement("div", {
                   className: "w-full mx-2 block md:relative"
                 }, React.createElement("div", {

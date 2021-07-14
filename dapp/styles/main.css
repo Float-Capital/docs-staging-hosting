@@ -9,7 +9,8 @@ html {
   scroll-behavior: smooth;
 }
 
-#app {
+#app,
+.island {
   /* It is possible to make this a utility (https://tailwindcss.com/docs/plugins#adding-utilities)
       - but probably not worth the confusion
   */
@@ -17,17 +18,10 @@ html {
       rgba(255, 255, 255, 0.3),
       rgba(255, 255, 255, 0.3)
     ),
-    url("/backgrounds/2.png");
+    url("/backgrounds/island.png");
   @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
 }
-.blue-dusk-island {
-  background: linear-gradient(
-      rgba(255, 255, 255, 0.3),
-      rgba(255, 255, 255, 0.3)
-    ),
-    url("/backgrounds/2.png");
-  @apply font-default w-screen bg-right-top bg-cover bg-gray-50;
-}
+
 .purple-moon {
   background: linear-gradient(
       to bottom left,
@@ -56,24 +50,6 @@ html {
     ),
     url("/backgrounds/governance.png");
   @apply font-default min-h-screen w-screen bg-right bg-cover bg-gray-50;
-}
-.road {
-  background: linear-gradient(
-      to bottom left,
-      rgba(255, 255, 255, 0),
-      rgba(255, 255, 255, 0)
-    ),
-    url("/backgrounds/road.gif");
-  @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
-}
-.desert {
-  background: linear-gradient(
-      to bottom left,
-      rgba(255, 255, 255, 0),
-      rgba(255, 255, 255, 0)
-    ),
-    url("/backgrounds/desert.png");
-  @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
 }
 .bg-car {
   background: linear-gradient(

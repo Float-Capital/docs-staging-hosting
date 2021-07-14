@@ -4,8 +4,10 @@
 var React = require("react");
 var Button = require("../components/UI/Base/Button.js");
 var Heading = require("./components/Heading.js");
+var Router = require("next/router");
 
 function Governance(Props) {
+  var router = Router.useRouter();
   return React.createElement("section", {
               className: "py-10 min-h-screen w-screen flex flex-col items-center justify-center ballot-box",
               id: "governance"
@@ -22,9 +24,17 @@ function Governance(Props) {
                           className: "flex flex-row my-4 items-center justify-evenly md:justify-start  "
                         }, React.createElement("div", {
                               className: "mr-4"
-                            }, React.createElement(Button.make, {
-                                  children: "Read more"
-                                })), React.createElement("div", undefined, React.createElement(Button.make, {
+                            }, React.createElement("a", {
+                                  href: "https://docs.float.capital/docs/governance",
+                                  rel: "noopener noreferrer",
+                                  target: "_blank"
+                                }, React.createElement(Button.make, {
+                                      children: "Read more"
+                                    }))), React.createElement("div", undefined, React.createElement(Button.make, {
+                                  onClick: (function (param) {
+                                      router.push("/app/stake-markets");
+                                      
+                                    }),
                                   children: "Earn FLT"
                                 })))), React.createElement("div", {
                       className: "w-full md:w-1/2 order-1 md:order-2"

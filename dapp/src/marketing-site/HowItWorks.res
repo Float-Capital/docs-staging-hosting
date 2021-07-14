@@ -44,21 +44,6 @@ let make = () => {
           </p>
         </div>
       </div>
-      // <div className="my-2 text-4xl">
-      //   <p className="text-md">
-      //     {"Float Capital is a peer to peer mechanism which means there is;"->React.string}
-      //   </p>
-      //   <h2> {"No over-collateralization"->React.string} </h2>
-      //   <h2> {"No liquidiation"->React.string} </h2>
-      //   <h2> {"No centralization"->React.string} </h2>
-      // </div>
     </div>
   </section>
 }
-
-// <div className="flex flex-col md:flex-row items-center">
-//   <div className="w-full md:w-2/5 mx-2 relative">
-//     <Heading title="how it works" suffixEmoji=`🔬` />
-//   </div>
-//   <div className="w-full md:w-3/5"> <FeaturedMarkets /> </div>
-// </div>

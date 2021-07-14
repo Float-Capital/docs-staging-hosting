@@ -12,7 +12,7 @@ module StakeDetailsWrapper = {
         <div className="flex justify-between items-center mb-2">
           <div className="text-xl"> {`${market.name} (${market.symbol})`->React.string} </div>
           <Next.Link
-            href={`/app/?marketIndex=${marketIndex}&actionOption=${actionOption}&tab=stake`}>
+            href={`/app/markets?marketIndex=${marketIndex}&actionOption=${actionOption}&tab=stake`}>
             <div className="text-xxs hover:underline cursor-pointer">
               {`view details`->React.string}
             </div>
@@ -57,7 +57,7 @@ let make = () => {
                     <Button
                       onClick={_ =>
                         router->Next.Router.pushShallow(
-                          `/app/mint?marketIndex=${marketIndex}&actionOption=${actionOption}`,
+                          `/app/mint/markets?marketIndex=${marketIndex}&actionOption=${actionOption}`,
                         )}>
                       "Mint"
                     </Button>

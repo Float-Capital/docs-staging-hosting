@@ -35,8 +35,8 @@ let make = () => {
   let router = Next.Router.useRouter()
 
   let landingNav: array<landingNavType> = [
-    {title: "App", link: "/app/markets"},
-    {title: "How it Works", link: "#how-it-works"},
+    {title: "App", link: "app/markets"},
+    {title: "How it works", link: "#how-it-works"},
     {title: "Roadmap", link: "#roadmap"},
     {title: "Team", link: "#team"},
     {title: "Governance", link: "#governance"},

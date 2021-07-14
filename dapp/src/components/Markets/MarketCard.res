@@ -99,7 +99,7 @@ let make = (
     latestSystemState: {totalLockedLong, totalLockedShort, totalValueLocked},
   }: Queries.SyntheticMarketInfo.t,
 ) => {
-  <Next.Link href={`/app/?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
+  <Next.Link href={`/app/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
     <div
       className="p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 cursor-pointer shadow-lg hover:shadow-xl h-full justify-center w-full">
       <div className="flex justify-center w-full my-1">
@@ -181,7 +181,7 @@ module Mini = {
   ) => {
     let router = Next.Router.useRouter()
 
-    <Next.Link href={`/app/?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
+    <Next.Link href={`/app/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
       <div
         className="p-1 rounded-sm flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 custom-cursor shadow-lg hover:shadow-xl h-full justify-center w-full">
         <div className="flex justify-center w-full my-1">
