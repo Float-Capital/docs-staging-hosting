@@ -2,7 +2,7 @@ module Link = Next.Link
 
 @react.component
 let make = () => {
-  <section className="blue-dusk-island flex flex-col md:flex-row items-center min-h-screen">
+  <section className="island flex flex-col md:flex-row items-center min-h-screen">
     <div className="w-full mx-2 block md:relative">
       <div className="v-align-in-responsive-height min-w-3/4 md:min-w-400">
         <div className="block static">
