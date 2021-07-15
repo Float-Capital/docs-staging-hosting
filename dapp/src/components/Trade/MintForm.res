@@ -216,7 +216,7 @@ module MintFormInput = {
       <Form className="h-full" onSubmit>
         <div className="relative"> {formInput} </div> {submitButton}
       </Form>
-      {if Config.networkId == 80001 {
+      {if Config.networkId == 80001 && router.pathname != "/" {
         <p
           onClick={_ => {
             router->Next.Router.push(`/app/faucet`)

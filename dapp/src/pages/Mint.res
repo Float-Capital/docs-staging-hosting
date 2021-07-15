@@ -1,14 +1,28 @@
+type detailsWrapperView = LandingPage | MintView
+
 module DetailsWrapper = {
   @react.component
-  let make = (~market: Queries.SyntheticMarketInfo.t, ~marketIndex, ~actionOption, ~children) =>
+  let make = (
+    ~market: Queries.SyntheticMarketInfo.t,
+    ~marketIndex,
+    ~actionOption,
+    ~children,
+    ~view: detailsWrapperView,
+  ) =>
     <div className="max-w-xl mx-auto">
-      <Next.Link href="/app/markets">
-        <div className="uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mb-2">
-          {`◀`->React.string}
-          <span className="text-xxs"> {" Back to markets"->React.string} </span>
-        </div>
-      </Next.Link>
-      <div className="p-5 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg">
+      {view == LandingPage
+        ? React.null
+        : <Next.Link href="/app/markets">
+            <div
+              className="uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mb-2 hover:z-50">
+              {`◀`->React.string}
+              <span className="text-xxs"> {" Back to markets"->React.string} </span>
+            </div>
+          </Next.Link>}
+      <div
+        className={`p-5 rounded-lg flex flex-col bg-white bg-opacity-${view == LandingPage
+            ? "100 border"
+            : "70"} shadow-lg`}>
         <div className="flex justify-between items-center mb-2">
           <div className="text-xl"> {`${market.name} (${market.symbol})`->React.string} </div>
           <Next.Link href={`/app/markets?marketIndex=${marketIndex}&actionOption=${actionOption}`}>
@@ -39,7 +53,7 @@ let make = (~withHeader=true) => {
       switch optFirstMarket {
       | Some(firstMarket) =>
         withHeader
-          ? <DetailsWrapper market=firstMarket marketIndex actionOption>
+          ? <DetailsWrapper market=firstMarket marketIndex actionOption view={MintView}>
               <MintForm market={firstMarket} isLong={actionOption == "short" ? false : true} />
             </DetailsWrapper>
           : <MintForm market={firstMarket} isLong={actionOption == "short" ? false : true} />
