@@ -296,33 +296,44 @@ contract LongShort is ILongShort, Initializable {
     ║       GETTER FUNCTIONS       ║
     ╚══════════════════════════════╝*/
 
-  function _recalculateSyntheticTokenPrice(uint32 marketIndex, bool isLong)
-    internal
-    view
-    virtual
-    returns (uint256 syntheticTokenPrice)
-  {
-    syntheticTokenPrice =
-      (syntheticTokenPoolValue[marketIndex][isLong] * 1e18) /
-      syntheticTokens[marketIndex][isLong].totalSupply();
-  }
-
-  function _getAmountPaymentToken(uint256 amountSynth, uint256 price)
+  function _getSyntheticTokenPrice(uint256 amountPaymentToken, uint256 amountSynthToken)
     internal
     pure
     virtual
-    returns (uint256)
+    returns (uint256 syntheticTokenPrice)
   {
-    return (amountSynth * price) / 1e18;
+    return (amountPaymentToken * 1e18) / amountSynthToken;
+  }
+
+  function _getAmountPaymentToken(uint256 amountSynthToken, uint256 price)
+    internal
+    pure
+    virtual
+    returns (uint256 amountPaymentToken)
+  {
+    return (amountSynthToken * price) / 1e18;
   }
 
   function _getAmountSynthToken(uint256 amountPaymentToken, uint256 price)
     internal
     pure
     virtual
-    returns (uint256)
+    returns (uint256 amountSynthToken)
   {
     return (amountPaymentToken * 1e18) / price;
+  }
+
+  function _recalculateSyntheticTokenPrice(uint32 marketIndex, bool isLong)
+    internal
+    view
+    virtual
+    returns (uint256 syntheticTokenPrice)
+  {
+    return
+      _getSyntheticTokenPrice(
+        syntheticTokenPoolValue[marketIndex][isLong],
+        syntheticTokens[marketIndex][isLong].totalSupply()
+      );
   }
 
   /*
