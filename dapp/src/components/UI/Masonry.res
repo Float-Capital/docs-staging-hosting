@@ -21,5 +21,5 @@ module Card = {
 module Header = {
   @react.component
   let make = (~children) =>
-    <h1 className="font-bold text-center pt-5 text-lg font-alphbeta"> {children} </h1>
+    <h1 className="font-bold text-center pt-5 text-lg font-vt323"> {children} </h1>
 }

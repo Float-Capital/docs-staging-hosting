@@ -128,7 +128,7 @@ function UserUI$UserColumnHeader(Props) {
   return React.createElement("h1", {
               className: "text-center " + (
                 subheader ? "text-base" : "text-lg"
-              ) + " font-alphbeta mb-4 mt-2"
+              ) + " font-vt323 mb-4 mt-2"
             }, children);
 }
 
@@ -550,11 +550,11 @@ function UserUI$UserMarketStakeOrRedeem(Props) {
   var marketId = Belt_Option.getWithDefault(DataHooks.Util.graphResponseToOption(marketIdResponse), "1");
   var router = Router.useRouter();
   var stake = function (param) {
-    router.push("/?marketIndex=" + marketId + "&actionOption=" + syntheticSide + "&tab=stake");
+    router.push("/app/markets?marketIndex=" + marketId + "&actionOption=" + syntheticSide + "&tab=stake");
     
   };
   var redeem = function (param) {
-    router.push("/?marketIndex=" + marketId + "&actionOption=" + syntheticSide + "&tab=redeem");
+    router.push("/app/markets?marketIndex=" + marketId + "&actionOption=" + syntheticSide + "&tab=redeem");
     
   };
   return React.createElement("div", {
@@ -581,7 +581,7 @@ function UserUI$UserMarketUnstake(Props) {
   var marketId = Belt_Option.getWithDefault(DataHooks.Util.graphResponseToOption(marketIdResponse), "1");
   var router = Router.useRouter();
   var unstake = function (param) {
-    router.push("/?marketIndex=" + marketId + "&tab=unstake&actionOption=" + (
+    router.push("/app/markets?marketIndex=" + marketId + "&tab=unstake&actionOption=" + (
           isLong ? "long" : "short"
         ));
     
@@ -698,7 +698,7 @@ function UserUI$UserFloatCard(Props) {
                         className: "flex flex-row items-center justify-center"
                       }, React.createElement("h3", undefined, "Float rewards"), React.createElement("img", {
                             className: "ml-2 h-5",
-                            src: "/img/float-token-coin-v3.svg"
+                            src: "/img/F-float-token.svg"
                           }))
                 }), tmp);
 }

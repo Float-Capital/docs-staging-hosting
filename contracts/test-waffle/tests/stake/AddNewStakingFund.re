@@ -65,7 +65,7 @@ let test =
       ();
     });
 
-    it_skip("calls the onlyFloatModifier", () => {
+    it_skip("calls the onlyLongShortModifier", () => {
       // StakerSmocked.InternalMock.onlyFloatCalls()
       // ->Array.length
       // ->Chai.intEqual(1)

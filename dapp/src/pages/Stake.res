@@ -2,7 +2,7 @@ module StakeDetailsWrapper = {
   @react.component
   let make = (~market: Queries.SyntheticMarketInfo.t, ~marketIndex, ~actionOption, ~children) =>
     <div className="max-w-lg mx-auto">
-      <Next.Link href="/stake-markets">
+      <Next.Link href="/app/stake-markets">
         <div className="uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mb-2">
           {`◀`->React.string}
           <span className="text-xxs"> {" Back to stake markets"->React.string} </span>
@@ -11,7 +11,8 @@ module StakeDetailsWrapper = {
       <div className="p-5 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg">
         <div className="flex justify-between items-center mb-2">
           <div className="text-xl"> {`${market.name} (${market.symbol})`->React.string} </div>
-          <Next.Link href={`/?marketIndex=${marketIndex}&actionOption=${actionOption}&tab=stake`}>
+          <Next.Link
+            href={`/app/markets?marketIndex=${marketIndex}&actionOption=${actionOption}&tab=stake`}>
             <div className="text-xxs hover:underline cursor-pointer">
               {`view details`->React.string}
             </div>
@@ -56,7 +57,7 @@ let make = () => {
                     <Button
                       onClick={_ =>
                         router->Next.Router.pushShallow(
-                          `/mint?marketIndex=${marketIndex}&actionOption=${actionOption}`,
+                          `/app/mint/markets?marketIndex=${marketIndex}&actionOption=${actionOption}`,
                         )}>
                       "Mint"
                     </Button>

@@ -683,7 +683,7 @@ function RedeemForm$1(Props) {
   } else {
     return React.createElement("div", {
                 onClick: (function (param) {
-                    router.push("/login?nextPath=" + router.asPath);
+                    router.push("/app/login?nextPath=" + router.asPath);
                     
                   })
               }, React.createElement(RedeemForm$RedeemFormInput, {

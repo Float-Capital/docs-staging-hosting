@@ -74,7 +74,7 @@ let make = (
       />
       <div className="w-full md:w-1/2 flex items-center justify-center flex-col order-1 md:order-2">
         <div className="flex justify-center w-full mb-2">
-          <h1 className="font-bold text-xl font-alphbeta"> {marketName->React.string} </h1>
+          <h1 className="font-bold text-xl font-vt323"> {marketName->React.string} </h1>
         </div>
         <div className="flex flex-row items-center justify-between w-full mb-4">
           <div>
@@ -85,7 +85,7 @@ let make = (
                 {"liquidity"->React.string}
               </h2>
             </div>
-            <div className="text-xs font-alphbeta tracking-wider py-1 text-gray-600">
+            <div className="text-xs font-vt323 tracking-wider py-1 text-gray-600">
               {`$${totalLockedLong->Misc.NumberFormat.formatEther}`->React.string}
             </div>
           </div>
@@ -97,7 +97,7 @@ let make = (
                 {"Liquidity"->React.string}
               </h2>
             </div>
-            <div className="text-2xl font-alphbeta tracking-wider ">
+            <div className="text-2xl font-vt323 tracking-wider ">
               {`$${totalValueLocked->Misc.NumberFormat.formatEther}`->React.string}
             </div>
           </div>
@@ -109,7 +109,7 @@ let make = (
                 {`liquidity`->React.string}
               </h2>
             </div>
-            <div className="text-xs font-alphbeta tracking-wider py-1 text-gray-600">
+            <div className="text-xs font-vt323 tracking-wider py-1 text-gray-600">
               {`$${totalLockedShort->Misc.NumberFormat.formatEther}`->React.string}
             </div>
           </div>

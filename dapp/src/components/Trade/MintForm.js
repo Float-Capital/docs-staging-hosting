@@ -709,10 +709,10 @@ function MintForm$MintFormInput(Props) {
                   children: null
                 }, React.createElement("div", {
                       className: "relative"
-                    }, formInput), submitButton), Config.networkId === 80001 ? React.createElement("p", {
+                    }, formInput), submitButton), Config.networkId === 80001 && router.pathname !== "/" ? React.createElement("p", {
                     className: "cursor-pointer text-xxs py-2",
                     onClick: (function (param) {
-                        router.push("/faucet");
+                        router.push("/app/faucet");
                         
                       })
                   }, "Visit our ", React.createElement("a", {
@@ -992,7 +992,7 @@ function MintForm$1(Props) {
   } else {
     return React.createElement("div", {
                 onClick: (function (param) {
-                    router.push("/login?nextPath=" + router.asPath);
+                    router.push("/app/login?nextPath=" + router.asPath);
                     
                   })
               }, React.createElement(MintForm$MintFormInput, {

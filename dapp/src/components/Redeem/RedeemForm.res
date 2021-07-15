@@ -227,7 +227,7 @@ let make = (~market: Queries.SyntheticMarketInfo.t, ~isLong) => {
   switch optSigner {
   | Some(signer) => <ConnectedRedeemForm signer market isLong />
   | None =>
-    <div onClick={_ => router->Next.Router.push(`/login?nextPath=${router.asPath}`)}>
+    <div onClick={_ => router->Next.Router.push(`/app/login?nextPath=${router.asPath}`)}>
       <RedeemFormInput isLong hasBothTokens={false} />
     </div>
   }

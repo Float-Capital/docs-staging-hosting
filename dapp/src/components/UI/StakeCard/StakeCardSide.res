@@ -20,7 +20,7 @@ let make = (~orderPostion, ~orderPostionMobile, ~marketName, ~isLong, ~apy, ~flo
         <span className="font-bold"> {isLong ? "LONG"->React.string : "SHORT"->React.string} </span>
         {" FLOAT rewards"->React.string}
       </h3>
-      <p className="text-2xl md:text-4xl tracking-widest font-alphbeta"> {floatApy->mapVal} </p>
+      <p className="text-2xl md:text-4xl tracking-widest font-vt323"> {floatApy->mapVal} </p>
     </div>
     <div className="flex flex-col items-center justify-center pt-0 mt-auto text-gray-600">
       <h3 className="text-xxs mt-1">
@@ -28,8 +28,7 @@ let make = (~orderPostion, ~orderPostionMobile, ~marketName, ~isLong, ~apy, ~flo
         {" APY"->React.string}
       </h3>
       {switch apy {
-      | Loaded(apyVal) =>
-        <p className="text-xl tracking-widest font-alphbeta"> {apyVal->mapVal} </p>
+      | Loaded(apyVal) => <p className="text-xl tracking-widest font-vt323"> {apyVal->mapVal} </p>
       | _ => <Loader.Mini />
       }}
     </div>

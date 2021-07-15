@@ -59,7 +59,7 @@ module UserColumnCard = {
 module UserColumnHeader = {
   @react.component
   let make = (~children, ~subheader=false) => {
-    <h1 className={`text-center ${subheader ? "text-base" : "text-lg"} font-alphbeta mb-4 mt-2`}>
+    <h1 className={`text-center ${subheader ? "text-base" : "text-lg"} font-vt323 mb-4 mt-2`}>
       {children}
     </h1>
   }
@@ -444,11 +444,11 @@ module UserMarketStakeOrRedeem = {
     let router = Next.Router.useRouter()
     let stake = _ =>
       router->Next.Router.push(
-        `/?marketIndex=${marketId}&actionOption=${syntheticSide->Obj.magic}&tab=stake`,
+        `/app/markets?marketIndex=${marketId}&actionOption=${syntheticSide->Obj.magic}&tab=stake`,
       )
     let redeem = _ =>
       router->Next.Router.push(
-        `/?marketIndex=${marketId}&actionOption=${syntheticSide->Obj.magic}&tab=redeem`,
+        `/app/markets?marketIndex=${marketId}&actionOption=${syntheticSide->Obj.magic}&tab=redeem`,
       )
 
     <div className=`flex flex-col`>
@@ -471,7 +471,9 @@ module UserMarketUnstake = {
     let router = Next.Router.useRouter()
     let unstake = _ =>
       router->Next.Router.push(
-        `/?marketIndex=${marketId}&tab=unstake&actionOption=${isLong ? "long" : "short"}`,
+        `/app/markets?marketIndex=${marketId}&tab=unstake&actionOption=${isLong
+            ? "long"
+            : "short"}`,
       )
 
     let optLoggedInUser = RootProvider.useCurrentUser()
@@ -532,7 +534,7 @@ module UserFloatCard = {
       <UserColumnHeader>
         <div className="flex flex-row items-center justify-center">
           <h3> {`Float rewards`->React.string} </h3>
-          <img src="/img/float-token-coin-v3.svg" className="ml-2 h-5" />
+          <img src="/img/F-float-token.svg" className="ml-2 h-5" />
         </div>
       </UserColumnHeader>
       {switch DataHooks.liftGraphResponse2(floatBalances, claimableFloat) {

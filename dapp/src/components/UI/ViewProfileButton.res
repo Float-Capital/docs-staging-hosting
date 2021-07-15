@@ -3,7 +3,7 @@ let make = () => {
   let optCurrentUser = RootProvider.useCurrentUser()
 
   let userPage = switch optCurrentUser {
-  | Some(address) => `/user/${address->Ethers.Utils.ethAdrToLowerStr}`
+  | Some(address) => `/app/user/${address->Ethers.Utils.ethAdrToLowerStr}`
   | None => `/`
   }
 

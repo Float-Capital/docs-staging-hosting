@@ -216,10 +216,10 @@ module MintFormInput = {
       <Form className="h-full" onSubmit>
         <div className="relative"> {formInput} </div> {submitButton}
       </Form>
-      {if Config.networkId == 80001 {
+      {if Config.networkId == 80001 && router.pathname != "/" {
         <p
           onClick={_ => {
-            router->Next.Router.push(`/faucet`)
+            router->Next.Router.push(`/app/faucet`)
           }}
           className="cursor-pointer text-xxs py-2">
           {"Visit our "->React.string}
@@ -437,7 +437,7 @@ let make = (~market: Queries.SyntheticMarketInfo.t, ~isLong) => {
   switch optSigner {
   | Some(signer) => <MintFormSignedIn signer market isLong />
   | None =>
-    <div onClick={_ => router->Next.Router.push(`/login?nextPath=${router.asPath}`)}>
+    <div onClick={_ => router->Next.Router.push(`/app/login?nextPath=${router.asPath}`)}>
       <MintFormInput isLong />
     </div>
   }
