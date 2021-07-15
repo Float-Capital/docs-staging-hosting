@@ -28,8 +28,8 @@ function test(contracts, accounts) {
           var setup = function (timeDelta) {
             var longShortAddress = accounts.contents[5];
             return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest("addNewStateForFloatRewards", contracts, accounts), (function (param) {
-                          StakerSmocked.InternalMock.mockCalculateTimeDeltaToReturn(timeDelta);
-                          StakerSmocked.InternalMock.mockSetRewardObjectsToReturn(undefined);
+                          StakerSmocked.InternalMock.mock_calculateTimeDeltaToReturn(timeDelta);
+                          StakerSmocked.InternalMock.mock_setRewardObjectsToReturn(undefined);
                           return LetOps.AwaitThen.let_(Helpers.getBlock(undefined), (function (param) {
                                         timestampRef.contents = ethers.BigNumber.from(param.timestamp + 1 | 0);
                                         return LetOps.AwaitThen.let_(contracts.contents.staker.setAddNewStateForFloatRewardsParams(longShortAddress.address), (function (param) {
@@ -49,12 +49,12 @@ function test(contracts, accounts) {
                           
                         }));
                   it("calls calculateTimeDelta with correct arguments", (function () {
-                          return Chai.recordEqualFlat(Belt_Array.getExn(StakerSmocked.InternalMock.calculateTimeDeltaCalls(undefined), 0), {
+                          return Chai.recordEqualFlat(Belt_Array.getExn(StakerSmocked.InternalMock._calculateTimeDeltaCalls(undefined), 0), {
                                       marketIndex: marketIndex
                                     });
                         }));
                   it("calls setRewardObjects with correct arguments", (function () {
-                          return Chai.recordEqualFlat(Belt_Array.getExn(StakerSmocked.InternalMock.setRewardObjectsCalls(undefined), 0), {
+                          return Chai.recordEqualFlat(Belt_Array.getExn(StakerSmocked.InternalMock._setRewardObjectsCalls(undefined), 0), {
                                       marketIndex: marketIndex,
                                       longPrice: longPrice,
                                       shortPrice: shortPrice,
@@ -67,7 +67,7 @@ function test(contracts, accounts) {
           describe("case timeDelta == 0", (function () {
                   it("doesn't call setRewardObjects", (function () {
                           return LetOps.Await.let_(setup(CONSTANTS.zeroBn), (function (param) {
-                                        return Chai.intEqual(undefined, StakerSmocked.InternalMock.setRewardObjectsCalls(undefined).length, 0);
+                                        return Chai.intEqual(undefined, StakerSmocked.InternalMock._setRewardObjectsCalls(undefined).length, 0);
                                       }));
                         }));
                   

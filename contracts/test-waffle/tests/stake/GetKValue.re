@@ -10,7 +10,7 @@ let test =
     ) => {
   let marketIndex = 2;
 
-  let prom: ref(JsPromise.t(Staker.Exposed.getKValueExposedReturn)) =
+  let prom: ref(JsPromise.t(Staker.Exposed._getKValueExposedReturn)) =
     ref(None->Obj.magic);
 
   let multiplier =
@@ -53,12 +53,13 @@ let test =
             ~marketIndex,
             ~timestamp=pastTimestamp,
           );
-      StakerSmocked.InternalMock.mockGetMarketLaunchIncentiveParametersToReturn(
+      StakerSmocked.InternalMock.mock_getMarketLaunchIncentiveParametersToReturn(
         period,
         multiplier,
       );
 
-      prom := contracts^.staker->Staker.Exposed.getKValueExposed(~marketIndex);
+      prom :=
+        contracts^.staker->Staker.Exposed._getKValueExposed(~marketIndex);
     };
 
     it(
@@ -98,7 +99,7 @@ let test =
       );
 
       it("calls getMarketLaunchIncentiveParameters with correct arguments", () => {
-        StakerSmocked.InternalMock.getMarketLaunchIncentiveParametersCalls()
+        StakerSmocked.InternalMock._getMarketLaunchIncentiveParametersCalls()
         ->Array.getExn(0)
         ->Chai.recordEqualFlat({marketIndex: marketIndex})
       });

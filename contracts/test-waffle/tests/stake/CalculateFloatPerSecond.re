@@ -69,7 +69,7 @@ let test =
         contracts^.staker->Staker.balanceIncentiveCurveExponent(marketIndex);
       balanceIncentiveCurveExponent := balanceIncentiveCurveExponentFetched;
 
-      StakerSmocked.InternalMock.mockGetKValueToReturn(kVal);
+      StakerSmocked.InternalMock.mock_getKValueToReturn(kVal);
     });
 
     let testHelper = (~longPrice, ~shortPrice, ~longValue, ~shortValue) => {
@@ -161,7 +161,7 @@ let test =
       StakerSmocked.InternalMock.mockGetRequiredAmountOfBitShiftForSafeExponentiationToReturn(
         bnFromInt(55) // conservatively high
       );
-      StakerSmocked.InternalMock.mockGetKValueToReturn(kVal);
+      StakerSmocked.InternalMock.mock_getKValueToReturn(kVal);
 
       let%Await _result =
         contracts^.staker
@@ -174,7 +174,7 @@ let test =
           );
 
       let call =
-        StakerSmocked.InternalMock.getKValueCalls()->Array.getUnsafe(0);
+        StakerSmocked.InternalMock._getKValueCalls()->Array.getUnsafe(0);
       call->Chai.recordEqualFlat({marketIndex: marketIndex});
     });
     it("reverts for empty markets", () => {
