@@ -28,8 +28,7 @@ let test =
         );
 
       StakerSmocked.InternalMock.mock_calculateAccumulatedFloatToReturn(
-        floatToMintLong,
-        floatToMintShort,
+        floatToMintLong->add(floatToMintShort),
       );
 
       StakerSmocked.InternalMock.mock_mintFloatToReturn();
@@ -78,13 +77,7 @@ let test =
           ~contract=contracts^.staker->Obj.magic,
           ~eventName="FloatMinted",
         )
-        ->Chai.withArgs5(
-            user,
-            marketIndex,
-            floatToMintLong,
-            floatToMintShort,
-            latestRewardIndexForMarket,
-          )
+        ->Chai.withArgs2(user, marketIndex)
       );
 
       it("mutates userIndexOfLastClaimedReward", () => {

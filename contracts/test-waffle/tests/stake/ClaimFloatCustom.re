@@ -35,7 +35,7 @@ let test =
 
       longShortSmocked->LongShortSmocked.mockUpdateSystemStateMultiToReturn;
 
-      StakerSmocked.InternalMock.mock_claimFloatToReturn();
+      StakerSmocked.InternalMock.mock_mintAccumulatedFloatMultiToReturn();
 
       let%AwaitThen _ =
         contracts^.staker
@@ -67,10 +67,13 @@ let test =
         ->Chai.recordEqualDeep({marketIndexes: marketIndices})
       });
 
-      it("calls _claimFloat with the correct arguments", () => {
-        StakerSmocked.InternalMock._claimFloatCalls()
+      it("calls _mintAccumulatedFloatMulti with the correct arguments", () => {
+        StakerSmocked.InternalMock._mintAccumulatedFloatMultiCalls()
         ->Array.getExn(0)
-        ->Chai.recordEqualDeep({marketIndexes: marketIndices})
+        ->Chai.recordEqualDeep({
+            marketIndexes: marketIndices,
+            user: accounts.contents->Array.getUnsafe(0).address,
+          })
       });
     });
 

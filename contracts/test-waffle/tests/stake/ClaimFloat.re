@@ -19,7 +19,7 @@ let smockedCalcAccumIterativeBinding = [%raw
 // smocked allows functions to be passed as return vals,
 // this is a simple binding to allow for repeated calls.
 let iterativeMockCalculateAccumulatedFloatToReturn:
-  array((Ethers.BigNumber.t, Ethers.BigNumber.t)) => unit =
+  array(Ethers.BigNumber.t) => unit =
   arr => {
     let _ =
       StakerSmocked.InternalMock.internalRef.contents
@@ -32,7 +32,7 @@ let test =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe("_claimFloat", () => {
+  describe("_mintAccumulatedFloatMulti", () => {
     let marketIndices = [|
       Helpers.randomJsInteger(),
       Helpers.randomJsInteger(),
@@ -43,21 +43,14 @@ let test =
       Helpers.randomInteger(),
     |];
 
-    let floatRewardsForMarkets = [|
-      Helpers.Tuple.make2(Helpers.randomTokenAmount), // market 0 reward for both
-      Helpers.Tuple.make2(() => CONSTANTS.zeroBn) // market 1 no reward for both
-    |];
+    // let (floatRewardsLongFirst,floatRewardsLongSecond) = Helpers.Tuple.make2(Helpers.randomTokenAmount), // market 0 reward for both
+    // let Helpers.Tuple.make2(() => CONSTANTS.zeroBn) // market 1 no reward for both
+    let floatRewardsForMarkets = [|Helpers.randomTokenAmount(), zeroBn|];
 
     let sumFloatRewards = floatRewards =>
-      floatRewards->Array.reduce(
-        CONSTANTS.zeroBn,
-        (prev, curr) => {
-          let (longReward, shortReward) = curr;
-          prev
-          ->Ethers.BigNumber.add(longReward)
-          ->Ethers.BigNumber.add(shortReward);
-        },
-      );
+      floatRewards->Array.reduce(CONSTANTS.zeroBn, (prev, curr) => {
+        prev->Ethers.BigNumber.add(curr)
+      });
 
     let userWalletRef: ref(Ethers.Wallet.t) = ref(None->Obj.magic);
     let promiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
@@ -65,9 +58,9 @@ let test =
 
     let setup =
         (~marketIndices, ~latestRewardIndices, ~floatRewardsForMarkets) => {
-      let%AwaitThen _ =
+      let%Await _ =
         deployAndSetupStakerToUnitTest(
-          ~functionName="_claimFloat",
+          ~functionName="_mintAccumulatedFloatMulti",
           ~contracts,
           ~accounts,
         );
@@ -78,7 +71,7 @@ let test =
 
       StakerSmocked.InternalMock.mock_mintFloatToReturn();
 
-      let setupPromise =
+      let%Await _ =
         marketIndices->Array.reduceWithIndex(
           ()->JsPromise.resolve,
           (lastPromise, marketIndex, arrayIndex) => {
@@ -91,13 +84,14 @@ let test =
               );
           },
         );
-      let%AwaitThen _ = setupPromise;
       promiseRef :=
         contracts^.staker
         ->ContractHelpers.connect(~address=userWalletRef^)
-        ->Staker.Exposed._claimFloatExposed(~marketIndexes=marketIndices);
+        ->Staker.Exposed._mintAccumulatedFloatMultiExposed(
+            ~marketIndexes=marketIndices,
+            ~user=userWalletRef.contents.address,
+          );
 
-      let%Await _ = promiseRef^;
       promiseRef^;
     };
 
@@ -125,22 +119,15 @@ let test =
             })
         );
         it("emits FloatMinted event", () => {
-          let (floatLong, floatShort) =
-            floatRewardsForMarkets->Array.getUnsafe(0);
-          let%Await _ =
-            Chai.callEmitEvents(
-              ~call=promiseRef^,
-              ~contract=contracts^.staker->Obj.magic,
-              ~eventName="FloatMinted",
+          Chai.callEmitEvents(
+            ~call=promiseRef^,
+            ~contract=contracts^.staker->Obj.magic,
+            ~eventName="FloatMinted",
+          )
+          ->Chai.withArgs2(
+              userWalletRef^.address,
+              marketIndices->Array.getExn(0),
             )
-            ->Chai.withArgs5(
-                userWalletRef^.address,
-                marketIndices->Array.getExn(0),
-                floatLong,
-                floatShort,
-                latestRewardIndices->Array.getExn(0),
-              );
-          ();
         });
 
         it("mutates userIndexOfLastClaimedReward", () => {
@@ -186,12 +173,11 @@ let test =
 
     describe("case no market has float to be minted", () => {
       before_once'(() => {
-        let zero2Tuple = (CONSTANTS.zeroBn, CONSTANTS.zeroBn);
         setup(
           ~marketIndices,
-          ~floatRewardsForMarkets=[|zero2Tuple, zero2Tuple|],
+          ~floatRewardsForMarkets=[|zeroBn, zeroBn|],
           ~latestRewardIndices,
-        );
+        )
       });
 
       // doesn't do a lot of other stuff as well but unwieldy to test
@@ -200,7 +186,6 @@ let test =
         ->Array.length
         ->Chai.intEqual(0)
       });
-      ();
     });
   });
 };

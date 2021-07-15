@@ -75,13 +75,7 @@ contract Staker is IStaker, Initializable {
 
   event StakeWithdrawn(address user, address token, uint256 amount);
 
-  event FloatMinted(
-    address user,
-    uint32 marketIndex,
-    uint256 amountLong,
-    uint256 amountShort,
-    uint256 lastMintIndex
-  );
+  event FloatMinted(address user, uint32 marketIndex);
 
   event MarketLaunchIncentiveParametersChanges(
     uint32 marketIndex,
@@ -547,12 +541,7 @@ contract Staker is IStaker, Initializable {
     internal
     view
     virtual
-    returns (
-      // NOTE: this returns the long and short reward separately for the sake of simplicity of
-      //       the event and the graph. Would be more efficient to return as single value.
-      uint256 longFloatReward,
-      uint256 shortFloatReward
-    )
+    returns (uint256 floatReward)
   {
     ISyntheticToken longToken = syntheticTokens[marketIndex][true];
     ISyntheticToken shortToken = syntheticTokens[marketIndex][false];
@@ -564,7 +553,7 @@ contract Staker is IStaker, Initializable {
 
     // Don't do the calculation and return zero immediately if there is no change
     if (usersLastRewardIndex == latestRewardIndex[marketIndex]) {
-      return (0, 0);
+      return 0;
     }
 
     if (amountStakedLong > 0) {
@@ -572,17 +561,17 @@ contract Staker is IStaker, Initializable {
       .accumulativeFloatPerLongToken -
         syntheticRewardParams[marketIndex][userIndexOfLastClaimedReward[marketIndex][user]]
         .accumulativeFloatPerLongToken;
-      longFloatReward = (accumDeltaLong * amountStakedLong) / FLOAT_ISSUANCE_FIXED_DECIMAL;
+      floatReward += (accumDeltaLong * amountStakedLong) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
 
     if (amountStakedShort > 0) {
       uint256 accumDeltaShort = syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
       .accumulativeFloatPerShortToken -
         syntheticRewardParams[marketIndex][usersLastRewardIndex].accumulativeFloatPerShortToken;
-      shortFloatReward = (accumDeltaShort * amountStakedShort) / FLOAT_ISSUANCE_FIXED_DECIMAL;
+      floatReward += (accumDeltaShort * amountStakedShort) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
 
-    return (longFloatReward, shortFloatReward);
+    return floatReward;
   }
 
   function _mintFloat(address user, uint256 floatToMint) internal virtual {
@@ -591,72 +580,50 @@ contract Staker is IStaker, Initializable {
   }
 
   function _mintAccumulatedFloat(uint32 marketIndex, address user) internal virtual {
-    // NOTE: Could merge these two values already inside the `_calculateAccumulatedFloat` function,
-    //       but that would make it harder for the graph (since it uses the events to log this information).
-    (uint256 floatToMintLong, uint256 floatToMintShort) = _calculateAccumulatedFloat(
-      marketIndex,
-      user
-    );
+    uint256 floatToMint = _calculateAccumulatedFloat(marketIndex, user);
 
-    uint256 floatToMint = floatToMintLong + floatToMintShort;
     if (floatToMint > 0) {
-      // stops them setting this forward
+      // Set the user has claimed up until now, stops them setting this forward
       userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[marketIndex];
 
-      _mintFloat(user, floatToMint);
+      emit FloatMinted(user, marketIndex);
 
-      emit FloatMinted(
-        user,
-        marketIndex,
-        floatToMintLong,
-        floatToMintShort,
-        latestRewardIndex[marketIndex]
-      );
+      _mintFloat(user, floatToMint);
     }
   }
 
-  function _claimFloat(uint32[] calldata marketIndexes) internal virtual {
+  function _mintAccumulatedFloatMulti(uint32[] calldata marketIndexes, address user)
+    internal
+    virtual
+  {
     uint256 floatTotal = 0;
     for (uint256 i = 0; i < marketIndexes.length; i++) {
-      // NOTE: Could merge these two values already inside the `calculateAccumulatedFloat` function,
-      //       but that would make it harder for the graph.
-      (uint256 floatToMintLong, uint256 floatToMintShort) = _calculateAccumulatedFloat(
-        marketIndexes[i],
-        msg.sender
-      );
-
-      uint256 floatToMint = floatToMintLong + floatToMintShort;
+      uint256 floatToMint = _calculateAccumulatedFloat(marketIndexes[i], user);
 
       if (floatToMint > 0) {
-        // Set the user has claimed up until now.
-        // TODO: think very carefully if it is ok for this to be in this if statement.
-        //       Safer would be to always set this value?
-        //       99.9% sure it is ok though, since `_stake` sets this value when someone joins.
-        //       Maybe just change for the sake of caution?
-        userIndexOfLastClaimedReward[marketIndexes[i]][msg.sender] = latestRewardIndex[
-          marketIndexes[i]
-        ];
+        // Set the user has claimed up until now, stops them setting this forward
+        userIndexOfLastClaimedReward[marketIndexes[i]][user] = latestRewardIndex[marketIndexes[i]];
+
+        emit FloatMinted(user, marketIndexes[i]);
 
         floatTotal += floatToMint;
-
-        emit FloatMinted(
-          msg.sender,
-          marketIndexes[i],
-          floatToMintLong,
-          floatToMintShort,
-          latestRewardIndex[marketIndexes[i]]
-        );
       }
     }
     if (floatTotal > 0) {
-      _mintFloat(msg.sender, floatTotal);
+      _mintFloat(user, floatTotal);
     }
   }
 
   function claimFloatCustom(uint32[] calldata marketIndexes) external {
-    require(marketIndexes.length <= 50); // Set some (arbitrary) limit on loop length
+    require(marketIndexes.length <= 50, "cannot claim float from more than 50 markets"); // Set some (arbitrary) limit on loop length
     longShort.updateSystemStateMulti(marketIndexes);
-    _claimFloat(marketIndexes);
+    _mintAccumulatedFloatMulti(marketIndexes, msg.sender);
+  }
+
+  function claimFloatCustomFor(uint32[] calldata marketIndexes, address user) external {
+    require(marketIndexes.length <= 50, "cannot claim float from more than 50 markets"); // Set some (arbitrary) limit on loop length
+    longShort.updateSystemStateMulti(marketIndexes);
+    _mintAccumulatedFloatMulti(marketIndexes, user);
   }
 
   /*╔═══════════════════════╗
@@ -724,6 +691,7 @@ contract Staker is IStaker, Initializable {
   }
 
   function withdraw(ISyntheticToken token, uint256 amount) external {
+    // TODO: possibly make a 'updateSystemState' (and 'updateSystemStateMulti') modifiers?
     longShort.updateSystemState(marketIndexOfToken[token]);
 
     _withdraw(token, amount);
