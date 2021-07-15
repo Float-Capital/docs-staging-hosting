@@ -42,16 +42,12 @@ function LandingNav(Props) {
       link: "app/markets"
     },
     {
-      title: "How it works",
-      link: "#how-it-works"
+      title: "What is Float?",
+      link: "#what-is-float"
     },
     {
       title: "Roadmap",
       link: "#roadmap"
-    },
-    {
-      title: "Team",
-      link: "#team"
     },
     {
       title: "Governance",
