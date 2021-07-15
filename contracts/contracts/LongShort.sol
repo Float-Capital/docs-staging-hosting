@@ -527,12 +527,7 @@ contract LongShort is ILongShort, Initializable {
         syntheticTokenPriceLong,
         syntheticTokenPriceShort
       );
-      _performOustandingSettlements(
-        marketIndex,
-        marketUpdateIndex[marketIndex],
-        syntheticTokenPriceLong,
-        syntheticTokenPriceShort
-      );
+      _performOustandingSettlements(marketIndex, syntheticTokenPriceLong, syntheticTokenPriceShort);
 
       emit SystemStateUpdated(
         marketIndex,
@@ -577,8 +572,7 @@ contract LongShort is ILongShort, Initializable {
   function _withdrawFunds(
     uint32 marketIndex,
     uint256 amountLong,
-    uint256 amountShort,
-    address user
+    uint256 amountShort
   ) internal virtual {
     uint256 totalAmount = amountLong + amountShort;
 
@@ -592,9 +586,6 @@ contract LongShort is ILongShort, Initializable {
     );
 
     _transferFromYieldManager(marketIndex, totalAmount);
-
-    // Transfer funds to the sender.
-    paymentTokens[marketIndex].transfer(user, totalAmount);
 
     syntheticTokenPoolValue[marketIndex][true] -= amountLong;
     syntheticTokenPoolValue[marketIndex][false] -= amountShort;
@@ -782,7 +773,6 @@ contract LongShort is ILongShort, Initializable {
 
   function _performOustandingSettlements(
     uint32 marketIndex,
-    uint256 newLatestPriceStateIndex,
     uint256 syntheticTokenPriceLong,
     uint256 syntheticTokenPriceShort
   ) internal virtual {
@@ -836,8 +826,7 @@ contract LongShort is ILongShort, Initializable {
     _withdrawFunds(
       marketIndex,
       longAmountOfPaymentTokenToRedeem,
-      shortAmountOfPaymentTokenToRedeem,
-      address(this)
+      shortAmountOfPaymentTokenToRedeem
     );
   }
 }
