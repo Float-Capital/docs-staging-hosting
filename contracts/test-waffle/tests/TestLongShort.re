@@ -193,5 +193,6 @@ describe("Float System", () => {
     });
     InitializeMarket.testUnit(~contracts, ~accounts);
     UpdateSystemState.testUnit(~contracts, ~accounts);
+    GetUsersConfirmedButNotSettledBalance.testUnit(~contracts, ~accounts);
   });
 });
