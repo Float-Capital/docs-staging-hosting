@@ -395,7 +395,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 longValue,
     uint256 shortValue,
     uint256 totalValueLockedInMarket
-  ) internal view virtual returns (bool isLongSideUnderbalanced, uint256 treasuryPercentE18) {
+  ) internal pure virtual returns (bool isLongSideUnderbalanced, uint256 treasuryPercentE18) {
     isLongSideUnderbalanced = longValue < shortValue;
     uint256 imbalance;
     if (isLongSideUnderbalanced) {
@@ -439,26 +439,29 @@ contract LongShort is ILongShort, Initializable {
     );
 
     if (marketAmount > 0) {
+      // NOTE: potential optimization:
+      //       this storage variable is set multiple times in the `_updateSystemStateInternal` here,
+      //       in the `_adjustMarketBasedOnNewAssetPrice` and when the users deposits are added.
+      //       IDEA: keep it in memory and pass it around until the very end.
       syntheticTokenPoolValue[marketIndex][isLongSideUnderbalanced] += marketAmount;
     }
   }
 
-  function _adjustMarketBasedOnNewAssetPrice(uint32 marketIndex, int256 newAssetPrice)
-    internal
-    virtual
-  {
-    int256 oldAssetPrice = int256(assetPrice[marketIndex]);
-
-    uint256 min;
-    if (syntheticTokenPoolValue[marketIndex][true] < syntheticTokenPoolValue[marketIndex][false]) {
-      min = syntheticTokenPoolValue[marketIndex][true];
-    } else {
-      min = syntheticTokenPoolValue[marketIndex][false];
-    }
+  function _adjustMarketBasedOnNewAssetPrice(
+    uint32 marketIndex,
+    int256 oldAssetPrice,
+    int256 newAssetPrice
+  ) internal virtual {
+    int256 smallerTokenPoolSize = int256(
+      floor(syntheticTokenPoolValue[marketIndex][true], syntheticTokenPoolValue[marketIndex][false])
+    );
 
     int256 percentageChangeE18 = ((newAssetPrice - oldAssetPrice) * 1e18) / oldAssetPrice;
 
-    int256 valueChange = (percentageChangeE18 * int256(min)) / 1e18;
+    int256 valueChange = (percentageChangeE18 * smallerTokenPoolSize) / 1e18;
+    // TODO: try refactor? Seems to be the same but have issues on edge cases. but removes need to multiply then divide by 1e18
+    // int256 valueChangeRefactorAttempt = ((newAssetPrice - oldAssetPrice) * smallerTokenPoolSize) /
+    //   oldAssetPrice;
 
     if (valueChange > 0) {
       syntheticTokenPoolValue[marketIndex][true] += uint256(valueChange);
@@ -468,9 +471,12 @@ contract LongShort is ILongShort, Initializable {
       syntheticTokenPoolValue[marketIndex][false] += uint256(valueChange * -1);
     }
 
-    emit PriceUpdate(marketIndex, assetPrice[marketIndex], uint256(newAssetPrice), msg.sender);
+    // TODO: optimization - no need to emit the `oldAssetPrice` in this event (also no need to care about msg.sender, can get that from the tx info!!)
+    //       The asset price is also emitted already in SystemStateUpdated, so this event should go!
+    emit PriceUpdate(marketIndex, uint256(oldAssetPrice), uint256(newAssetPrice), msg.sender);
   }
 
+  // TODO: Think about inlining this?
   function _saveSyntheticTokenPriceSnapshots(
     uint32 marketIndex,
     uint256 newLatestPriceStateIndex,
@@ -523,8 +529,9 @@ contract LongShort is ILongShort, Initializable {
         return;
       }
 
+      // TODO: these two functions could be combined? Too much risk that they will be called out of order or something similar.
       _claimAndDistributeYield(marketIndex);
-      _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
+      _adjustMarketBasedOnNewAssetPrice(marketIndex, oldAssetPrice, newAssetPrice);
 
       syntheticTokenPriceLong = _recalculateSyntheticTokenPrice(marketIndex, true);
       syntheticTokenPriceShort = _recalculateSyntheticTokenPrice(marketIndex, false);
@@ -579,7 +586,7 @@ contract LongShort is ILongShort, Initializable {
   /*
    * Returns locked funds from the market to the sender.
    */
-  // TODO STENT only called in 1 place: _handleBatchedRedeemSettlement
+  // TODO STENT only called in 1 place: _handleBatchedRedeemSettlement - JASON - agree this can be inlined.
   function _withdrawFunds(
     uint32 marketIndex,
     uint256 amountLong,
