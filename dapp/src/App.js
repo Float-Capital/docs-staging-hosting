@@ -5,6 +5,7 @@ var Toast = require("./components/UI/Base/Toast.js");
 var React = require("react");
 var Client = require("./data/Client.js");
 var MainLayout = require("./layouts/MainLayout.js");
+var SiteLayout = require("./marketing-site/layouts/SiteLayout.js");
 var APYProvider = require("./libraries/APYProvider.js");
 var Router = require("next/router");
 var RootProvider = require("./libraries/RootProvider.js");
@@ -16,9 +17,15 @@ var StateChangeMonitor = require("./libraries/StateChangeMonitor.js");
 var PageComponent = {};
 
 function $$default(props) {
-  Router.useRouter();
+  var router = Router.useRouter();
   var content = React.createElement(props.Component, props.pageProps);
   InjectedEthereum.useReloadOnMetamaskChainChanged(undefined);
+  var match = router.route;
+  var tmp = match === "/" ? React.createElement(SiteLayout.make, {
+          children: content
+        }) : React.createElement(MainLayout.make, {
+          children: content
+        });
   return React.createElement(ToastProvider.make, {
               children: React.createElement(RootProvider.make, {
                     children: React.createElement(StartTrading.ClickedTradingProvider.make, {
@@ -26,9 +33,7 @@ function $$default(props) {
                         }, React.createElement(Client.make, {
                               children: React.createElement(APYProvider.make, {
                                     children: React.createElement(StateChangeMonitor.make, {
-                                          children: React.createElement(MainLayout.make, {
-                                                children: content
-                                              })
+                                          children: tmp
                                         })
                                   })
                             }), React.createElement(Toast.make, {}))

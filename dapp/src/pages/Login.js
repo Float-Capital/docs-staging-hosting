@@ -158,7 +158,7 @@ function Login(Props) {
                   }, React.createElement("div", undefined, React.createElement("p", {
                             className: "text-lg text-bf mb-8"
                           }, "To use ", React.createElement("span", {
-                                className: "font-alphbeta text-xl pr-1"
+                                className: "font-vt323 text-xl pr-1"
                               }, "FLOAT"), ", please connect to the " + Config.networkName), Belt_SetInt.has(metamaskDefaultChainIds, Config.networkId) ? React.createElement("div", undefined, React.createElement("ul", {
                                   className: "list-decimal pl-10"
                                 }, React.createElement("li", {

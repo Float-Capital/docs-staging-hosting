@@ -5,7 +5,6 @@ var Misc = require("../../libraries/Misc.js");
 var React = require("react");
 var Button = require("../UI/Base/Button.js");
 var Ethers = require("../../ethereum/Ethers.js");
-var Tooltip = require("../UI/Base/Tooltip.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 var MarketBar = require("../UI/MarketCard/MarketBar.js");
 var Link = require("next/link").default;
@@ -78,7 +77,7 @@ function StakeCard(Props) {
               }, React.createElement(Button.Small.make, {
                     onClick: (function ($$event) {
                         $$event.preventDefault();
-                        router.push("/stake?marketIndex=" + marketIndex.toString() + "&actionOption=long&tokenId=" + Ethers.Utils.ethAdrToLowerStr(longTokenAddress), undefined, {
+                        router.push("/app/stake?marketIndex=" + marketIndex.toString() + "&actionOption=long&tokenId=" + Ethers.Utils.ethAdrToLowerStr(longTokenAddress), undefined, {
                               shallow: true,
                               scroll: false
                             });
@@ -88,7 +87,7 @@ function StakeCard(Props) {
                   }), React.createElement(Button.Small.make, {
                     onClick: (function ($$event) {
                         $$event.preventDefault();
-                        router.push("/stake?marketIndex=" + marketIndex.toString() + "&actionOption=short&tokenId=" + Ethers.Utils.ethAdrToLowerStr(shortTokenAddress), undefined, {
+                        router.push("/app/stake?marketIndex=" + marketIndex.toString() + "&actionOption=short&tokenId=" + Ethers.Utils.ethAdrToLowerStr(shortTokenAddress), undefined, {
                               shallow: true,
                               scroll: false
                             });
@@ -106,16 +105,14 @@ function StakeCard(Props) {
                     }));
   };
   return React.createElement(Link, {
-              href: "/?marketIndex=" + marketIndex.toString() + "&tab=stake",
+              href: "/app/markets?marketIndex=" + marketIndex.toString() + "&tab=stake",
               children: React.createElement("div", {
                     className: "p-1 mb-8 rounded-lg flex flex-col bg-light-gold bg-opacity-75 hover:bg-opacity-60 cursor-pointer my-5 shadow-lg"
                   }, React.createElement("div", {
                         className: "flex justify-center w-full my-1"
                       }, React.createElement("h1", {
-                            className: "font-bold text-xl font-alphbeta"
-                          }, marketName, React.createElement(Tooltip.make, {
-                                tip: "This market tracks " + marketName
-                              }))), React.createElement("div", {
+                            className: "font-bold text-xl font-vt323"
+                          }, marketName)), React.createElement("div", {
                         className: "flex flex-wrap justify-center w-full"
                       }, React.createElement(StakeCardSide.make, {
                             orderPostion: 1,
@@ -133,13 +130,13 @@ function StakeCard(Props) {
                                           }, React.createElement("span", {
                                                 className: "font-bold"
                                               }, "📈 Long"), " staked")), React.createElement("div", {
-                                        className: "text-sm font-alphbeta tracking-wider py-1"
+                                        className: "text-sm font-vt323 tracking-wider py-1"
                                       }, "$" + Misc.NumberFormat.formatEther(undefined, longDollarValueStaked))), React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("h2", {
                                             className: "text-xs mt-1 flex justify-center"
                                           }, React.createElement("span", {
                                                 className: "font-bold pr-1"
                                               }, "TOTAL"), " Staked")), React.createElement("div", {
-                                        className: "text-3xl font-alphbeta tracking-wider py-1"
+                                        className: "text-3xl font-vt323 tracking-wider py-1"
                                       }, "$" + Misc.NumberFormat.formatEther(undefined, totalDollarValueStake))), React.createElement("div", {
                                     className: "text-right"
                                   }, React.createElement("div", undefined, React.createElement("h2", {
@@ -147,7 +144,7 @@ function StakeCard(Props) {
                                           }, React.createElement("span", {
                                                 className: "font-bold"
                                               }, "Short"), " staked 📉")), React.createElement("div", {
-                                        className: "text-sm font-alphbeta tracking-wider py-1"
+                                        className: "text-sm font-vt323 tracking-wider py-1"
                                       }, "$" + Misc.NumberFormat.formatEther(undefined, shortDollarValueStaked)))), liquidityRatio(undefined), React.createElement("div", {
                                 className: "md:block hidden w-full flex justify-around"
                               }, stakeButtons(undefined))), React.createElement(StakeCardSide.make, {

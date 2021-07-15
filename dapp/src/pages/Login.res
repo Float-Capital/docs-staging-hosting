@@ -138,7 +138,7 @@ let make = () => {
         <div>
           <p className="text-lg text-bf mb-8">
             {`To use `->React.string}
-            <span className="font-alphbeta text-xl pr-1"> {"FLOAT"->React.string} </span>
+            <span className="font-vt323 text-xl pr-1"> {"FLOAT"->React.string} </span>
             {`, please connect to the ${Config.networkName}`->React.string}
           </p>
           {switch Config.networkId {

@@ -6,12 +6,10 @@ var Next = require("../../bindings/Next.js");
 var React = require("react");
 var Button = require("../UI/Base/Button.js");
 var Globals = require("../../libraries/Globals.js");
-var Js_dict = require("rescript/lib/js/js_dict.js");
 var Tooltip = require("../UI/Base/Tooltip.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 var MarketBar = require("../UI/MarketCard/MarketBar.js");
 var Link = require("next/link").default;
-var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Router = require("next/router");
 
 function calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, isLong) {
@@ -28,6 +26,66 @@ function calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, isLo
   }
 }
 
+function marketPositionHeadings(isLong) {
+  return React.createElement("div", {
+              className: "flex flex-col items-center justify-center"
+            }, React.createElement("div", {
+                  className: "pt-2 mt-auto"
+                }, React.createElement("h3", {
+                      className: "text-xs mt-1"
+                    }, React.createElement("span", {
+                          className: "font-bold"
+                        }, isLong ? "LONG" : "SHORT"), " Liquidity")));
+}
+
+function marketPositionValues(marketName, isLong, totalLockedLong, totalLockedShort, totalValueLocked) {
+  var longBeta = calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, true);
+  var shortBeta = calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, false);
+  var value = Misc.NumberFormat.formatEther(undefined, isLong ? totalLockedLong : totalLockedShort);
+  var beta = isLong ? longBeta : shortBeta;
+  return React.createElement("div", {
+              className: "text-sm text-center m-auto mb-4"
+            }, React.createElement("div", {
+                  className: "text-2xl tracking-widest font-vt323 my-3"
+                }, "$" + value), React.createElement("span", {
+                  className: "font-bold"
+                }, "Exposure "), React.createElement(Tooltip.make, {
+                  tip: "The impact " + marketName + " price movements have on " + (
+                    isLong ? "long" : "short"
+                  ) + " value"
+                }), React.createElement("span", {
+                  className: "font-bold"
+                }, ": "), beta + "%");
+}
+
+function mintButtons(marketIndex) {
+  var router = Router.useRouter();
+  return React.createElement("div", {
+              className: "flex w-full justify-around"
+            }, React.createElement(Button.Small.make, {
+                  onClick: (function ($$event) {
+                      $$event.preventDefault();
+                      return Next.Router.pushShallow(router, "/app/mint?marketIndex=" + marketIndex.toString() + "&actionOption=long");
+                    }),
+                  children: "Mint Long"
+                }), React.createElement(Button.Small.make, {
+                  onClick: (function ($$event) {
+                      $$event.preventDefault();
+                      return Next.Router.pushShallow(router, "/app/mint?marketIndex=" + marketIndex.toString() + "&actionOption=short");
+                    }),
+                  children: "Mint Short"
+                }));
+}
+
+function liquidityRatio(totalValueLocked, totalLockedLong) {
+  return React.createElement("div", {
+              className: "w-full"
+            }, totalValueLocked.eq(CONSTANTS.zeroBN) ? null : React.createElement(MarketBar.make, {
+                    totalLockedLong: totalLockedLong,
+                    totalValueLocked: totalValueLocked
+                  }));
+}
+
 function MarketCard(Props) {
   var param = Props.marketData;
   var match = param.latestSystemState;
@@ -36,109 +94,105 @@ function MarketCard(Props) {
   var totalLockedLong = match.totalLockedLong;
   var marketIndex = param.marketIndex;
   var marketName = param.name;
-  var router = Router.useRouter();
-  var marketIndexOption = Js_dict.get(router.query, "marketIndex");
-  var longBeta = calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, true);
-  var shortBeta = calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, false);
-  var marketPositionHeadings = function (isLong) {
-    return React.createElement("div", {
-                className: "flex flex-col items-center justify-center"
-              }, React.createElement("h2", {
-                    className: "font-bold text-sm"
-                  }, marketName, React.createElement("span", {
-                        className: "text-xs"
-                      }, isLong ? "↗️" : "↘️")), React.createElement("div", {
-                    className: "pt-2 mt-auto"
-                  }, React.createElement("h3", {
-                        className: "text-xs mt-1"
-                      }, React.createElement("span", {
-                            className: "font-bold"
-                          }, isLong ? "LONG" : "SHORT"), " Liquidity")));
-  };
-  var marketPositionValues = function (isLong) {
-    var value = Misc.NumberFormat.formatEther(undefined, isLong ? totalLockedLong : totalLockedShort);
-    var beta = isLong ? longBeta : shortBeta;
-    return React.createElement("div", {
-                className: "text-sm text-center m-auto mb-4"
-              }, React.createElement("div", {
-                    className: "text-2xl tracking-widest font-alphbeta my-3"
-                  }, "$" + value), React.createElement("span", {
-                    className: "font-bold"
-                  }, "Exposure "), React.createElement(Tooltip.make, {
-                    tip: "The impact " + marketName + " price movements have on " + (
-                      isLong ? "long" : "short"
-                    ) + " value"
-                  }), React.createElement("span", {
-                    className: "font-bold"
-                  }, ": "), beta + "%");
-  };
-  var liquidityRatio = function (param) {
-    return React.createElement("div", {
-                className: "w-full"
-              }, totalValueLocked.eq(CONSTANTS.zeroBN) ? null : React.createElement(MarketBar.make, {
-                      totalLockedLong: totalLockedLong,
-                      totalValueLocked: totalValueLocked
-                    }));
-  };
-  var mintButtons = function (param) {
-    return React.createElement("div", {
-                className: "flex w-full justify-around"
-              }, React.createElement(Button.Small.make, {
-                    onClick: (function ($$event) {
-                        $$event.preventDefault();
-                        return Next.Router.pushShallow(router, "/mint?marketIndex=" + marketIndex.toString() + "&actionOption=long");
-                      }),
-                    children: "Mint Long"
-                  }), React.createElement(Button.Small.make, {
-                    onClick: (function ($$event) {
-                        $$event.preventDefault();
-                        return Next.Router.pushShallow(router, "/mint?marketIndex=" + marketIndex.toString() + "&actionOption=short");
-                      }),
-                    children: "Mint Short"
-                  }));
-  };
   return React.createElement(Link, {
-              href: "/?marketIndex=" + marketIndex.toString(),
+              href: "/app/markets?marketIndex=" + marketIndex.toString(),
               children: React.createElement("div", {
                     className: "p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 cursor-pointer shadow-lg hover:shadow-xl h-full justify-center w-full"
                   }, React.createElement("div", {
                         className: "flex justify-center w-full my-1"
                       }, React.createElement("h1", {
-                            className: "font-bold text-xl font-alphbeta cursor-pointer hover:underline"
-                          }, marketName, React.createElement(Tooltip.make, {
-                                tip: "This market tracks " + marketName
-                              }))), React.createElement("div", {
+                            className: "font-bold text-xl font-vt323 cursor-pointer hover:underline"
+                          }, marketName)), React.createElement("div", {
                         className: "flex flex-wrap justify-center w-full"
                       }, React.createElement("div", {
                             className: "order-2 md:order-1 w-1/2 md:w-1/4 flex items-center flex grow flex-wrap flex-col"
                           }, marketPositionHeadings(true), React.createElement("div", {
                                 className: "md:block hidden"
-                              }, marketPositionValues(true))), React.createElement("div", {
+                              }, marketPositionValues(marketName, true, totalLockedLong, totalLockedShort, totalValueLocked))), React.createElement("div", {
                             className: "order-1 md:order-2 w-full md:w-1/2 flex items-center flex-col"
                           }, React.createElement("h2", {
                                 className: "text-xs mt-1"
                               }, React.createElement("span", {
                                     className: "font-bold"
                                   }, "TOTAL"), " Liquidity"), React.createElement("div", {
-                                className: "text-3xl font-alphbeta tracking-wider py-1"
+                                className: "text-3xl font-vt323 tracking-wider py-1"
                               }, "$" + Misc.NumberFormat.formatEther(undefined, totalValueLocked)), React.createElement("div", {
                                 className: "md:block hidden w-full"
-                              }, liquidityRatio(undefined), Belt_Option.isNone(marketIndexOption) ? mintButtons(undefined) : null)), React.createElement("div", {
+                              }, liquidityRatio(totalValueLocked, totalLockedLong), mintButtons(marketIndex))), React.createElement("div", {
                             className: "order-3 w-1/2 md:w-1/4 flex-grow flex-wrap flex-col"
                           }, marketPositionHeadings(false), React.createElement("div", {
                                 className: "md:block hidden"
-                              }, marketPositionValues(false)))), React.createElement("div", {
+                              }, marketPositionValues(marketName, false, totalLockedLong, totalLockedShort, totalValueLocked)))), React.createElement("div", {
                         className: "block md:hidden pt-5"
                       }, React.createElement("div", {
                             className: "px-8"
-                          }, liquidityRatio(undefined)), React.createElement("div", {
+                          }, liquidityRatio(totalValueLocked, totalLockedLong)), React.createElement("div", {
                             className: "flex md:hidden"
-                          }, marketPositionValues(true), marketPositionValues(false)), Belt_Option.isNone(marketIndexOption) ? mintButtons(undefined) : null))
+                          }, marketPositionValues(marketName, true, totalLockedLong, totalLockedShort, totalValueLocked), marketPositionValues(marketName, false, totalLockedLong, totalLockedShort, totalValueLocked)), mintButtons(marketIndex)))
             });
 }
+
+function MarketCard$Mini(Props) {
+  var param = Props.marketData;
+  var match = param.latestSystemState;
+  var totalValueLocked = match.totalValueLocked;
+  var marketIndex = param.marketIndex;
+  var router = Router.useRouter();
+  return React.createElement(Link, {
+              href: "/app/markets?marketIndex=" + marketIndex.toString(),
+              children: React.createElement("div", {
+                    className: "p-1 rounded-sm flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 custom-cursor shadow-lg hover:shadow-xl h-full justify-center w-full"
+                  }, React.createElement("div", {
+                        className: "flex justify-center w-full my-1"
+                      }, React.createElement("h1", {
+                            className: "font-bold text-xl font-vt323 uppercase custom-cursor hover:underline"
+                          }, param.name)), React.createElement("div", {
+                        className: "flex flex-wrap justify-center w-full"
+                      }, React.createElement("div", {
+                            className: "order-2  w-1/2  flex items-center flex grow flex-wrap flex-col"
+                          }, marketPositionHeadings(true)), React.createElement("div", {
+                            className: "order-1  w-full  flex items-center flex-col"
+                          }, React.createElement("h2", {
+                                className: "text-xs mt-1"
+                              }, React.createElement("span", {
+                                    className: "font-bold"
+                                  }, "TOTAL"), " Liquidity"), React.createElement("div", {
+                                className: "text-3xl font-vt323 tracking-wider py-1"
+                              }, "$" + Misc.NumberFormat.formatEther(undefined, totalValueLocked))), React.createElement("div", {
+                            className: "order-3 w-1/2 flex-grow flex-wrap flex-col"
+                          }, marketPositionHeadings(false))), React.createElement("div", {
+                        className: "block pt-5"
+                      }, React.createElement("div", {
+                            className: "px-8"
+                          }, liquidityRatio(totalValueLocked, match.totalLockedLong)), React.createElement("div", {
+                            className: "flex w-full justify-around"
+                          }, React.createElement(Button.Tiny.make, {
+                                onClick: (function ($$event) {
+                                    $$event.preventDefault();
+                                    return Next.Router.pushShallow(router, "/app/mint?marketIndex=" + marketIndex.toString() + "&actionOption=long");
+                                  }),
+                                children: "Mint Long"
+                              }), React.createElement(Button.Tiny.make, {
+                                onClick: (function ($$event) {
+                                    $$event.preventDefault();
+                                    return Next.Router.pushShallow(router, "/app/mint?marketIndex=" + marketIndex.toString() + "&actionOption=short");
+                                  }),
+                                children: "Mint Short"
+                              }))))
+            });
+}
+
+var Mini = {
+  make: MarketCard$Mini
+};
 
 var make = MarketCard;
 
 exports.calculateBeta = calculateBeta;
+exports.marketPositionHeadings = marketPositionHeadings;
+exports.marketPositionValues = marketPositionValues;
+exports.mintButtons = mintButtons;
+exports.liquidityRatio = liquidityRatio;
 exports.make = make;
+exports.Mini = Mini;
 /* Misc Not a pure module */

@@ -81,7 +81,7 @@ function totalValueCard(totalValueLocked) {
   return React.createElement("div", {
               className: "mb-2 md:mb-5 mx-3 p-5 md:mt-7 self-center text-center bg-white bg-opacity-75 rounded-lg shadow-lg"
             }, React.createElement("span", {
-                  className: "font-alphbeta text-xl"
+                  className: "font-vt323 text-xl"
                 }, "Total Value"), React.createElement("span", {
                   className: "text-sm"
                 }, " 🏦 in Float Protocol: "), React.createElement("span", {
@@ -126,7 +126,7 @@ function syntheticAssetsCard(totalSynthValue) {
                             }, React.createElement(Tooltip.make, {
                                   tip: "Redeemable value of synths in the open market"
                                 }))))), React.createElement(Link, {
-                  href: "/",
+                  href: "/app/markets",
                   children: React.createElement("div", {
                         className: "w-full pb-4 text-sm cursor-pointer hover:opacity-70 mx-auto"
                       }, React.createElement("div", {

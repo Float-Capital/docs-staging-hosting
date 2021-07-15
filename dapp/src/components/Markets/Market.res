@@ -1,7 +1,7 @@
 @react.component
 let make = (~marketData: Queries.SyntheticMarketInfo.t) => {
   <div>
-    <Next.Link href="/">
+    <Next.Link href="/app/markets">
       <div className="uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mb-4">
         {`◀`->React.string} <span className="text-xs"> {" Back to markets"->React.string} </span>
       </div>
