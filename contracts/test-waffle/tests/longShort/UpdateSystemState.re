@@ -7,9 +7,86 @@ let testUnit =
       ~contracts as _: ref(Helpers.coreContracts),
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe("updateSystemState", () => {
-    // TODO
-    ()
+  describeUnit("updateSystemState", () => {
+    describe("_updateSystemStateInternal", () => {
+      it("calls for the latest price from the oracle", () =>
+        Js.log("TODO")
+      );
+      it(
+        "it shouldn't modify state or call other functions IF the `msg.sender` isn't the staker AND the price didn't change",
+        () =>
+        Js.log("TODO")
+      );
+
+      it(
+        "it should call the addNewStateForFloatRewards on the staker function if the `msg.sender` is the staker (with NO price change)",
+        () =>
+        Js.log("TODO")
+      );
+
+      describe("There is a price change", () => {
+        // TODO: there could also be a test to ensure that _claimAndDistributeYield happens before _adjustMarketBasedOnNewAssetPrice
+        it(
+          "it should call the addNewStateForFloatRewards on the staker function if the `msg.sender` is the staker (WITH a price change)",
+          () =>
+          Js.log("TODO")
+        );
+
+        it(
+          "it should call `_claimAndDistributeYield` with correct arguments",
+          () =>
+          Js.log("TODO")
+        );
+        it(
+          "it should call `_adjustMarketBasedOnNewAssetPrice` with correct arguments",
+          () =>
+          Js.log("TODO")
+        );
+        it(
+          "it should call `_recalculateSyntheticTokenPrice` twice (one for long, other for short) with correct arguments",
+          () =>
+          Js.log("TODO")
+        );
+        it(
+          "it should call `_saveSyntheticTokenPriceSnapshots` with correct arguments (",
+          () =>
+          Js.log("TODO")
+        );
+        it(
+          "it should call `_performOustandingSettlements` with correct arguments",
+          () =>
+          Js.log("TODO")
+        );
+        it(
+          "it should update the (underlying) asset price with correct arguments",
+          () =>
+          Js.log("TODO")
+        );
+        it("it should increment the marketUpdateIndex by 1", () =>
+          Js.log("TODO")
+        );
+        it(
+          "it should emit the SystemStateUpdated event with the correct arguments",
+          () =>
+          Js.log("TODO")
+        );
+      });
+    });
+
+    describe("updateSystemStateMulti", () => {
+      it(
+        "should call `_updateSystemStateInternal` for each market in the array",
+        () =>
+        Js.log("TODO")
+      )
+    });
+    describe("updateSystemState", () => {
+      it(
+        "should call to `_updateSystemStateInternal` with the correct market as an argument",
+        () =>
+        Js.log("TODO")
+      )
+    });
   });
 };
 
