@@ -478,22 +478,6 @@ contract LongShort is ILongShort, Initializable {
     emit PriceUpdate(marketIndex, uint256(oldAssetPrice), uint256(newAssetPrice), msg.sender);
   }
 
-  // TODO: Think about inlining this?
-  function _saveSyntheticTokenPriceSnapshots(
-    uint32 marketIndex,
-    uint256 newLatestPriceStateIndex,
-    uint256 syntheticTokenPriceLong,
-    uint256 syntheticTokenPriceShort
-  ) internal virtual {
-    syntheticTokenPriceSnapshot[marketIndex][true][
-      newLatestPriceStateIndex
-    ] = syntheticTokenPriceLong;
-
-    syntheticTokenPriceSnapshot[marketIndex][false][
-      newLatestPriceStateIndex
-    ] = syntheticTokenPriceShort;
-  }
-
   /*╔═══════════════════════════════╗
     ║     UPDATING SYSTEM STATE     ║
     ╚═══════════════════════════════╝*/
@@ -542,12 +526,14 @@ contract LongShort is ILongShort, Initializable {
       assetPrice[marketIndex] = uint256(newAssetPrice);
       marketUpdateIndex[marketIndex] += 1;
 
-      _saveSyntheticTokenPriceSnapshots(
-        marketIndex,
-        marketUpdateIndex[marketIndex],
-        syntheticTokenPriceLong,
-        syntheticTokenPriceShort
-      );
+      syntheticTokenPriceSnapshot[marketIndex][true][
+        marketUpdateIndex[marketIndex]
+      ] = syntheticTokenPriceLong;
+
+      syntheticTokenPriceSnapshot[marketIndex][false][
+        marketUpdateIndex[marketIndex]
+      ] = syntheticTokenPriceShort;
+
       _performOustandingBatchedSettlements(
         marketIndex,
         syntheticTokenPriceLong,
