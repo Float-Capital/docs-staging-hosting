@@ -8,7 +8,7 @@ let testUnit =
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("getUsersConfirmedButNotSettledBalance", () => {
-    it_only(
+    it(
       "should call the _getAmountSynthToken function with the correct parameters and return its result",
       () => {
         let user = Helpers.randomAddress();
