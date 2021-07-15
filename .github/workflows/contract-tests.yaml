@@ -64,7 +64,7 @@ jobs:
           cd scripts && yarn
 
       - name: Cache contract node_modules
-        id: cache
+        id: cache2
         uses: actions/cache@v2
         with:
           path: ./contracts/node_modules
