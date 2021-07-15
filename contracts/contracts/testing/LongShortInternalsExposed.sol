@@ -48,4 +48,22 @@ contract LongShortInternalsExposed is LongShortMockable {
   {
     _executeOutstandingNextPriceSettlements(user, marketIndex);
   }
+
+  function setGetUsersConfirmedButNotSettledBalanceGlobals(
+    uint32 marketIndex,
+    address user,
+    bool isLong,
+    uint256 _userCurrentNextPriceUpdateIndex,
+    uint256 _marketUpdateIndex,
+    uint256 _userNextPriceDepositAmount,
+    uint256 _syntheticTokenPriceSnapshot
+  ) external {
+    marketExists[marketIndex] = true;
+    userCurrentNextPriceUpdateIndex[marketIndex][user] = _userCurrentNextPriceUpdateIndex;
+    marketUpdateIndex[marketIndex] = _marketUpdateIndex;
+    userNextPriceDepositAmount[marketIndex][isLong][user] = _userNextPriceDepositAmount;
+    syntheticTokenPriceSnapshot[marketIndex][isLong][
+      _marketUpdateIndex
+    ] = _syntheticTokenPriceSnapshot;
+  }
 }
