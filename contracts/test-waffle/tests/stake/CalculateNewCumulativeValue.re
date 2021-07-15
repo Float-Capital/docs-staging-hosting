@@ -23,16 +23,16 @@ let test =
   let (longValue, shortValue, longPrice, shortPrice) =
     Helpers.Tuple.make4(Helpers.randomInteger);
 
-  describe("calculateNewCumulativeRate", () => {
+  describe("calculateNewCumulativeValue", () => {
     let promiseRef:
       ref(
-        JsPromise.t(Staker.Exposed.calculateNewCumulativeRateExposedReturn),
+        JsPromise.t(Staker.Exposed.calculateNewCumulativeValueExposedReturn),
       ) =
       ref(None->Obj.magic);
     before_once'(() => {
       let%AwaitThen _ =
         deployAndSetupStakerToUnitTest(
-          ~functionName="calculateNewCumulativeRate",
+          ~functionName="calculateNewCumulativeValue",
           ~contracts,
           ~accounts,
         );
@@ -55,7 +55,7 @@ let test =
         );
 
       promiseRef :=
-        staker->Staker.Exposed.calculateNewCumulativeRateExposed(
+        staker->Staker.Exposed.calculateNewCumulativeValueExposed(
           ~marketIndex,
           ~longPrice,
           ~shortPrice,

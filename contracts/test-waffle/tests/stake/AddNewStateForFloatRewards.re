@@ -31,7 +31,7 @@ let test =
       let%AwaitThen _ =
         contracts^.staker
         ->Staker.Exposed.setAddNewStateForFloatRewardsParams(
-            ~longShort=longShortAddress.address,
+            ~longShortAddress=longShortAddress.address,
           );
       promiseRef :=
         contracts^.staker
@@ -51,7 +51,7 @@ let test =
     describe("case timeDelta > 0", () => {
       before_once'(() => setup(~timeDelta=timeDeltaGreaterThanZero));
 
-      it_skip("calls the onlyFloat modifier", () => {
+      it_skip("calls the onlyLongShort modifier", () => {
         // StakerSmocked.InternalMock.onlyFloatCalls()
         // ->Array.length
         // ->Chai.intEqual(1)
@@ -78,7 +78,7 @@ let test =
     });
 
     describe("case timeDelta == 0", () => {
-      // still calls onlyFloat + calculateTimeDelta but unwieldy to test twice
+      // still calls onlyLongShort + calculateTimeDelta but unwieldy to test twice
       it("doesn't call setRewardObjects", () => {
         let%Await _ = setup(~timeDelta=CONSTANTS.zeroBn);
         StakerSmocked.InternalMock.setRewardObjectsCalls()

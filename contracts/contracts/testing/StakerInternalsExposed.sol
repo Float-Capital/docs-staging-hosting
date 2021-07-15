@@ -57,7 +57,7 @@ contract StakerInternalsExposed is StakerMockable {
     ISyntheticToken mockAddress,
     address longShortAddress
   ) public {
-    longShortCoreContract = ILongShort(longShortAddress);
+    longShort = ILongShort(longShortAddress);
     marketIndexOfToken[longToken] = marketIndex;
     marketIndexOfToken[shortToken] = marketIndex;
 
@@ -69,8 +69,8 @@ contract StakerInternalsExposed is StakerMockable {
     syntheticTokens[marketIndex][false] = mockAddress;
   }
 
-  function setAddNewStateForFloatRewardsParams(address longShort) external {
-    longShortCoreContract = ILongShort(longShort);
+  function setAddNewStateForFloatRewardsParams(address longShortAddress) external {
+    longShort = ILongShort(longShortAddress);
   }
 
   function setGetMarketLaunchIncentiveParametersParams(
@@ -91,7 +91,7 @@ contract StakerInternalsExposed is StakerMockable {
     ISyntheticToken token,
     uint32 marketIndexForToken
   ) external {
-    longShortCoreContract = ILongShort(longshort);
+    longShort = ILongShort(longshort);
     marketIndexOfToken[token] = marketIndexForToken;
   }
 
@@ -129,7 +129,7 @@ contract StakerInternalsExposed is StakerMockable {
     ISyntheticToken token,
     uint32 tokenMarketIndex
   ) public {
-    longShortCoreContract = longShort;
+    longShort = longShort;
     marketIndexOfToken[token] = tokenMarketIndex;
   }
 
@@ -145,8 +145,8 @@ contract StakerInternalsExposed is StakerMockable {
     latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
   }
 
-  function setClaimFloatCustomParams(address longshort) external {
-    longShortCoreContract = ILongShort(longshort);
+  function setClaimFloatCustomParams(address longshortAddress) external {
+    longShort = ILongShort(longshortAddress);
   }
 
   function set_stakeParams(

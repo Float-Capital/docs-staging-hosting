@@ -133,7 +133,7 @@ describe("Float System", () => {
       AddNewStakingFund.test(~contracts, ~accounts);
       GetKValue.test(~contracts, ~accounts);
       CalculateFloatPerSecond.test(~contracts, ~accounts);
-      CalculateNewCumulativeRate.test(~contracts, ~accounts);
+      CalculateNewCumulativeValue.test(~contracts, ~accounts);
       SetRewardObjects.test(~contracts, ~accounts);
       AddNewStateForFloatRewards.test(~contracts, ~accounts);
       MintFloat.test(~contracts, ~accounts);
