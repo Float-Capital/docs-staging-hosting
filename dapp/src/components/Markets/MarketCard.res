@@ -181,55 +181,57 @@ module Mini = {
   ) => {
     let router = Next.Router.useRouter()
 
-    <Next.Link href={`/app/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
-      <div
-        className="p-1 rounded-sm flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 custom-cursor shadow-lg hover:shadow-xl h-full justify-center w-full">
-        <div className="flex justify-center w-full my-1">
-          <h1 className="font-bold text-xl font-vt323 uppercase custom-cursor hover:underline">
-            {marketName->React.string}
-          </h1>
-        </div>
-        <div className="flex flex-wrap justify-center w-full">
-          <div className="order-2  w-1/2  flex items-center flex grow flex-wrap flex-col">
-            {marketPositionHeadings(~isLong={true})}
+    <div className="w-2/3">
+      <Next.Link href={`/app/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}`}>
+        <div
+          className="p-1 rounded-sm flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 custom-cursor shadow-lg hover:shadow-xl h-full justify-center w-full">
+          <div className="flex justify-center w-full my-1">
+            <h1 className="font-bold text-xl font-vt323 uppercase custom-cursor hover:underline">
+              {marketName->React.string}
+            </h1>
           </div>
-          <div className="order-1  w-full  flex items-center flex-col">
-            <h2 className="text-xs mt-1">
-              <span className="font-bold"> {"TOTAL"->React.string} </span>
-              {" Liquidity"->React.string}
-            </h2>
-            <div className="text-3xl font-vt323 tracking-wider py-1">
-              {`$${totalValueLocked->Misc.NumberFormat.formatEther}`->React.string}
+          <div className="flex flex-wrap justify-center w-full">
+            <div className="order-2  w-1/2  flex items-center flex grow flex-wrap flex-col">
+              {marketPositionHeadings(~isLong={true})}
+            </div>
+            <div className="order-1  w-full  flex items-center flex-col">
+              <h2 className="text-xs mt-1">
+                <span className="font-bold"> {"TOTAL"->React.string} </span>
+                {" Liquidity"->React.string}
+              </h2>
+              <div className="text-3xl font-vt323 tracking-wider py-1">
+                {`$${totalValueLocked->Misc.NumberFormat.formatEther}`->React.string}
+              </div>
+            </div>
+            <div className="order-3 w-1/2 flex-grow flex-wrap flex-col">
+              {marketPositionHeadings(~isLong={false})}
             </div>
           </div>
-          <div className="order-3 w-1/2 flex-grow flex-wrap flex-col">
-            {marketPositionHeadings(~isLong={false})}
+          <div className="block pt-5">
+            <div className="px-8"> {liquidityRatio(~totalValueLocked, ~totalLockedLong)} </div>
+            <div className={`flex w-full justify-around`}>
+              <Button.Tiny
+                onClick={event => {
+                  ReactEvent.Mouse.preventDefault(event)
+                  router->Next.Router.pushShallow(
+                    `/app/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=long`,
+                  )
+                }}>
+                "Mint Long"
+              </Button.Tiny>
+              <Button.Tiny
+                onClick={event => {
+                  ReactEvent.Mouse.preventDefault(event)
+                  router->Next.Router.pushShallow(
+                    `/app/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=short`,
+                  )
+                }}>
+                "Mint Short"
+              </Button.Tiny>
+            </div>
           </div>
         </div>
-        <div className="block pt-5">
-          <div className="px-8"> {liquidityRatio(~totalValueLocked, ~totalLockedLong)} </div>
-          <div className={`flex w-full justify-around`}>
-            <Button.Tiny
-              onClick={event => {
-                ReactEvent.Mouse.preventDefault(event)
-                router->Next.Router.pushShallow(
-                  `/app/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=long`,
-                )
-              }}>
-              "Mint Long"
-            </Button.Tiny>
-            <Button.Tiny
-              onClick={event => {
-                ReactEvent.Mouse.preventDefault(event)
-                router->Next.Router.pushShallow(
-                  `/app/mint?marketIndex=${marketIndex->Ethers.BigNumber.toString}&actionOption=short`,
-                )
-              }}>
-              "Mint Short"
-            </Button.Tiny>
-          </div>
-        </div>
-      </div>
-    </Next.Link>
+      </Next.Link>
+    </div>
   }
 }

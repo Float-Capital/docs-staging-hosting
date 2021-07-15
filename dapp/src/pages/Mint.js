@@ -18,17 +18,20 @@ function Mint$DetailsWrapper(Props) {
   var marketIndex = Props.marketIndex;
   var actionOption = Props.actionOption;
   var children = Props.children;
+  var view = Props.view;
   return React.createElement("div", {
               className: "max-w-xl mx-auto"
-            }, React.createElement(Link, {
-                  href: "/app/markets",
-                  children: React.createElement("div", {
-                        className: "uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mb-2"
-                      }, "◀", React.createElement("span", {
-                            className: "text-xxs"
-                          }, " Back to markets"))
-                }), React.createElement("div", {
-                  className: "p-5 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
+            }, view === /* LandingPage */0 ? null : React.createElement(Link, {
+                    href: "/app/markets",
+                    children: React.createElement("div", {
+                          className: "uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mb-2 hover:z-50"
+                        }, "◀", React.createElement("span", {
+                              className: "text-xxs"
+                            }, " Back to markets"))
+                  }), React.createElement("div", {
+                  className: "p-5 rounded-lg flex flex-col bg-white bg-opacity-" + (
+                    view === /* LandingPage */0 ? "100 border" : "70"
+                  ) + " shadow-lg"
                 }, React.createElement("div", {
                       className: "flex justify-between items-center mb-2"
                     }, React.createElement("div", {
@@ -83,7 +86,8 @@ function Mint(Props) {
                 children: React.createElement(MintForm.make, {
                       market: optFirstMarket,
                       isLong: actionOption !== "short"
-                    })
+                    }),
+                view: /* MintView */1
               }) : React.createElement(MintForm.make, {
                 market: optFirstMarket,
                 isLong: actionOption !== "short"

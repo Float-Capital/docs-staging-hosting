@@ -138,48 +138,50 @@ function MarketCard$Mini(Props) {
   var totalValueLocked = match.totalValueLocked;
   var marketIndex = param.marketIndex;
   var router = Router.useRouter();
-  return React.createElement(Link, {
-              href: "/app/markets?marketIndex=" + marketIndex.toString(),
-              children: React.createElement("div", {
-                    className: "p-1 rounded-sm flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 custom-cursor shadow-lg hover:shadow-xl h-full justify-center w-full"
-                  }, React.createElement("div", {
-                        className: "flex justify-center w-full my-1"
-                      }, React.createElement("h1", {
-                            className: "font-bold text-xl font-vt323 uppercase custom-cursor hover:underline"
-                          }, param.name)), React.createElement("div", {
-                        className: "flex flex-wrap justify-center w-full"
+  return React.createElement("div", {
+              className: "w-2/3"
+            }, React.createElement(Link, {
+                  href: "/app/markets?marketIndex=" + marketIndex.toString(),
+                  children: React.createElement("div", {
+                        className: "p-1 rounded-sm flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 custom-cursor shadow-lg hover:shadow-xl h-full justify-center w-full"
                       }, React.createElement("div", {
-                            className: "order-2  w-1/2  flex items-center flex grow flex-wrap flex-col"
-                          }, marketPositionHeadings(true)), React.createElement("div", {
-                            className: "order-1  w-full  flex items-center flex-col"
-                          }, React.createElement("h2", {
-                                className: "text-xs mt-1"
-                              }, React.createElement("span", {
-                                    className: "font-bold"
-                                  }, "TOTAL"), " Liquidity"), React.createElement("div", {
-                                className: "text-3xl font-vt323 tracking-wider py-1"
-                              }, "$" + Misc.NumberFormat.formatEther(undefined, totalValueLocked))), React.createElement("div", {
-                            className: "order-3 w-1/2 flex-grow flex-wrap flex-col"
-                          }, marketPositionHeadings(false))), React.createElement("div", {
-                        className: "block pt-5"
-                      }, React.createElement("div", {
-                            className: "px-8"
-                          }, liquidityRatio(totalValueLocked, match.totalLockedLong)), React.createElement("div", {
-                            className: "flex w-full justify-around"
-                          }, React.createElement(Button.Tiny.make, {
-                                onClick: (function ($$event) {
-                                    $$event.preventDefault();
-                                    return Next.Router.pushShallow(router, "/app/mint?marketIndex=" + marketIndex.toString() + "&actionOption=long");
-                                  }),
-                                children: "Mint Long"
-                              }), React.createElement(Button.Tiny.make, {
-                                onClick: (function ($$event) {
-                                    $$event.preventDefault();
-                                    return Next.Router.pushShallow(router, "/app/mint?marketIndex=" + marketIndex.toString() + "&actionOption=short");
-                                  }),
-                                children: "Mint Short"
-                              }))))
-            });
+                            className: "flex justify-center w-full my-1"
+                          }, React.createElement("h1", {
+                                className: "font-bold text-xl font-vt323 uppercase custom-cursor hover:underline"
+                              }, param.name)), React.createElement("div", {
+                            className: "flex flex-wrap justify-center w-full"
+                          }, React.createElement("div", {
+                                className: "order-2  w-1/2  flex items-center flex grow flex-wrap flex-col"
+                              }, marketPositionHeadings(true)), React.createElement("div", {
+                                className: "order-1  w-full  flex items-center flex-col"
+                              }, React.createElement("h2", {
+                                    className: "text-xs mt-1"
+                                  }, React.createElement("span", {
+                                        className: "font-bold"
+                                      }, "TOTAL"), " Liquidity"), React.createElement("div", {
+                                    className: "text-3xl font-vt323 tracking-wider py-1"
+                                  }, "$" + Misc.NumberFormat.formatEther(undefined, totalValueLocked))), React.createElement("div", {
+                                className: "order-3 w-1/2 flex-grow flex-wrap flex-col"
+                              }, marketPositionHeadings(false))), React.createElement("div", {
+                            className: "block pt-5"
+                          }, React.createElement("div", {
+                                className: "px-8"
+                              }, liquidityRatio(totalValueLocked, match.totalLockedLong)), React.createElement("div", {
+                                className: "flex w-full justify-around"
+                              }, React.createElement(Button.Tiny.make, {
+                                    onClick: (function ($$event) {
+                                        $$event.preventDefault();
+                                        return Next.Router.pushShallow(router, "/app/mint?marketIndex=" + marketIndex.toString() + "&actionOption=long");
+                                      }),
+                                    children: "Mint Long"
+                                  }), React.createElement(Button.Tiny.make, {
+                                    onClick: (function ($$event) {
+                                        $$event.preventDefault();
+                                        return Next.Router.pushShallow(router, "/app/mint?marketIndex=" + marketIndex.toString() + "&actionOption=short");
+                                      }),
+                                    children: "Mint Short"
+                                  }))))
+                }));
 }
 
 var Mini = {
