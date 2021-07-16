@@ -82,13 +82,12 @@ let testUnit =
         "Should deposit the correct amount into the yield manager if batchedDeposits > batchedRedeems",
         () => {
           let amountPaymentTokenRedeemPerSide = Helpers.randomTokenAmount();
-          let halfCalculatedAmountToDeposit = Helpers.randomTokenAmount();
-          let calculatedAmountToDeposit =
-            halfCalculatedAmountToDeposit->mul(twoBn);
           let amountPaymentTokenDepositPerSide =
             // Ensure that batchedDeposits > batchedRedeems
-            amountPaymentTokenRedeemPerSide
-            ->add(halfCalculatedAmountToDeposit)
+            amountPaymentTokenRedeemPerSide->add(Helpers.randomTokenAmount());
+          let calculatedAmountToDeposit =
+            amountPaymentTokenDepositPerSide
+            ->sub(amountPaymentTokenRedeemPerSide)
             ->mul(twoBn);
 
           let%Await _ =

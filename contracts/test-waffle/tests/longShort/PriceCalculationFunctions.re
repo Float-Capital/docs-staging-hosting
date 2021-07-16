@@ -1,6 +1,5 @@
 open LetOps;
 open Mocha;
-open Globals;
 open Helpers;
 
 let testUnit =
@@ -21,9 +20,11 @@ let testUnit =
           );
 
       let expectedResult =
-        randomAmountPaymentToken
-        ->mul(CONSTANTS.tenToThe18)
-        ->div(randomAmountSynthToken);
+        Contract.LongShortHelpers.calcSyntheticTokenPrice(
+          ~amountPaymentToken=randomAmountPaymentToken,
+          ~amountSynthToken=randomAmountSynthToken,
+        );
+
       Chai.bnEqual(
         ~message=
           "expected result different to actual result for _getSyntheticTokenPrice call",
@@ -46,9 +47,10 @@ let testUnit =
           );
 
       let expectedResult =
-        randomAmountSynthToken
-        ->mul(randomTokenPrice)
-        ->div(CONSTANTS.tenToThe18);
+        Contract.LongShortHelpers.calcAmountPaymentToken(
+          ~amountSynthToken=randomAmountSynthToken,
+          ~price=randomTokenPrice,
+        );
       Chai.bnEqual(
         ~message=
           "expected result different to actual result for _getAmountPaymentToken call",
@@ -71,9 +73,11 @@ let testUnit =
           );
 
       let expectedResult =
-        randomAmountPaymentToken
-        ->mul(CONSTANTS.tenToThe18)
-        ->div(randomTokenPrice);
+        Contract.LongShortHelpers.calcAmountSynthToken(
+          ~amountPaymentToken=randomAmountPaymentToken,
+          ~price=randomTokenPrice,
+        );
+
       Chai.bnEqual(
         ~message=
           "expected result different to actual result for _getAmountSynthTokencd call",
