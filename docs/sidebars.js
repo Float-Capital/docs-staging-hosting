@@ -11,5 +11,6 @@ module.exports = {
     "User Guide": ["mint", "redeem", "stake", "gas-costs", "testnet"],
     Developer: ["smart-contracts", "api"],
     Resources: ["terminology"],
+    Jobs: ["marketing-lead"],
   },
 };
