@@ -113,7 +113,7 @@ let make = () => {
         </div>
       </div>
       <div className="md:border-b w-full order-4 md:order-6" />
-      <div className="w-1/8  order-5 md:order-7" />
+      <div className="w-1/10  order-5 md:order-7" />
       <div className="w-full md:w-1/4 md:max-w-1/2 mx-4 md:mx-0 order-2 md:order-8">
         <div
           className="bg-primary md:w-full text-white p-4 rounded-md rounded-tl-none md:rounded-tl-md md:rounded-tr-none my-4 shadow-md  inline-block w-full md:w-auto relative">

@@ -33,6 +33,7 @@ module.exports = {
       }),
       width: {
         "1/8": "12%",
+        "1/10": "10%",
       },
     },
     /* Most of the time we customize the font-sizes,

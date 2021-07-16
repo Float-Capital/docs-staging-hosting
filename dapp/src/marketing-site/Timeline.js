@@ -172,7 +172,7 @@ function Timeline(Props) {
                             }))), React.createElement("div", {
                       className: "md:border-b w-full order-4 md:order-6"
                     }), React.createElement("div", {
-                      className: "w-1/8  order-5 md:order-7"
+                      className: "w-1/10  order-5 md:order-7"
                     }), React.createElement("div", {
                       className: "w-full md:w-1/4 md:max-w-1/2 mx-4 md:mx-0 order-2 md:order-8"
                     }, React.createElement("div", {
