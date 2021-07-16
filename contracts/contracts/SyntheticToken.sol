@@ -27,15 +27,9 @@ contract SyntheticToken is ISyntheticToken {
     isLong = _isLong;
   }
 
-  function burn(uint256 amount) public override {
+  function _burn(address account, uint256 amount) internal override {
     require(msg.sender == address(longShort), "Only longSHORT contract");
-
-    _burn(msg.sender, amount);
-  }
-
-  function burnFrom(address account, uint256 amount) public override {
-    require(msg.sender == address(longShort), "Only longSHORT contract");
-    _burn(account, amount);
+    super._burn(account, amount);
   }
 
   function stake(uint256 amount) external override {
@@ -74,9 +68,6 @@ contract SyntheticToken is ISyntheticToken {
     address recipient,
     uint256 amount
   ) internal override {
-    // make sure users can't transfer if paused
-    super._beforeTokenTransfer(sender, recipient, amount);
-
     if (sender != address(longShort)) {
       longShort.executeOutstandingNextPriceSettlementsUser(sender, marketIndex);
     }
