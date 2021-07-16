@@ -10,7 +10,7 @@ function Roadmap(Props) {
               className: "min-h-screen w-screen flex flex-col items-center justify-center bg-car",
               id: "roadmap"
             }, React.createElement("div", {
-                  className: "my-4"
+                  className: "mb-2"
                 }, React.createElement(Heading.make, {
                       title: "roadmap",
                       suffixEmoji: "🗺️"
