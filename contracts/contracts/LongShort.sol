@@ -378,7 +378,10 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  function floor(uint256 a, uint256 b) internal pure virtual returns (uint256) {
+  /**
+   * Return the minimum of the 2 parameters. If they are equal return the first parameter.
+   */
+  function getMin(uint256 a, uint256 b) internal pure virtual returns (uint256) {
     if (a > b) {
       return b;
     } else {
@@ -410,7 +413,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 marketPercentCalculatedE18 = (imbalance * marketTreasurySplitSlopE18) /
       totalValueLockedInMarket;
 
-    uint256 marketPercentE18 = floor(marketPercentCalculatedE18, 1e18);
+    uint256 marketPercentE18 = getMin(marketPercentCalculatedE18, 1e18);
 
     treasuryPercentE18 = 1e18 - marketPercentE18;
   }
@@ -453,7 +456,10 @@ contract LongShort is ILongShort, Initializable {
     int256 newAssetPrice
   ) internal virtual {
     int256 smallerTokenPoolSize = int256(
-      floor(syntheticTokenPoolValue[marketIndex][true], syntheticTokenPoolValue[marketIndex][false])
+      getMin(
+        syntheticTokenPoolValue[marketIndex][true],
+        syntheticTokenPoolValue[marketIndex][false]
+      )
     );
 
     int256 percentageChangeE18 = ((newAssetPrice - oldAssetPrice) * 1e18) / oldAssetPrice;
