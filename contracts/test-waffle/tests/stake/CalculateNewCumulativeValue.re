@@ -26,7 +26,9 @@ let test =
   describe("calculateNewCumulativeValue", () => {
     let promiseRef:
       ref(
-        JsPromise.t(Staker.Exposed.calculateNewCumulativeValueExposedReturn),
+        JsPromise.t(
+          Staker.Exposed._calculateNewCumulativeIssuancePerStakedSynthExposedReturn,
+        ),
       ) =
       ref(None->Obj.magic);
     before_once'(() => {
@@ -44,7 +46,7 @@ let test =
         shortFloatPerSecond,
       );
 
-      StakerSmocked.InternalMock.mockCalculateTimeDeltaToReturn(timeDelta);
+      StakerSmocked.InternalMock.mock_calculateTimeDeltaToReturn(timeDelta);
 
       let%Await _ =
         staker->Staker.Exposed.setCalculateNewCumulativeRateParams(
@@ -55,7 +57,7 @@ let test =
         );
 
       promiseRef :=
-        staker->Staker.Exposed.calculateNewCumulativeValueExposed(
+        staker->Staker.Exposed._calculateNewCumulativeIssuancePerStakedSynthExposed(
           ~marketIndex,
           ~longPrice,
           ~shortPrice,
@@ -113,7 +115,7 @@ let test =
 
     it("calls calculateTimeDelta with correct arguments", () => {
       let call =
-        StakerSmocked.InternalMock.calculateTimeDeltaCalls()
+        StakerSmocked.InternalMock._calculateTimeDeltaCalls()
         ->Array.getUnsafe(0);
       call->Chai.recordEqualFlat({marketIndex: marketIndex});
     });

@@ -13,7 +13,7 @@ let makeIterator = anyArray => {
 };
 
 let smockedCalcAccumIterativeBinding = [%raw
-  {|(_r, arr) => _r.smocked.calculateAccumulatedFloatMock.will.return.with(makeIterator(arr))|}
+  {|(_r, arr) => _r.smocked._calculateAccumulatedFloatMock.will.return.with(makeIterator(arr))|}
 ];
 
 // smocked allows functions to be passed as return vals,
@@ -117,7 +117,7 @@ let test =
 
       describe("case market has float to mint", () => {
         it("calls calculateAccumulatedFloat with correct arguments", () =>
-          StakerSmocked.InternalMock.calculateAccumulatedFloatCalls()
+          StakerSmocked.InternalMock._calculateAccumulatedFloatCalls()
           ->Array.getExn(0)
           ->Chai.recordEqualFlat({
               marketIndex: marketIndices->Array.getUnsafe(0),

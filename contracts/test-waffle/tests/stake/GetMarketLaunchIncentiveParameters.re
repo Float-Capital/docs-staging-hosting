@@ -26,7 +26,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) => {
           );
       let%Await result =
         contracts^.staker
-        ->Staker.Exposed.getMarketLaunchIncentiveParametersExposed(
+        ->Staker.Exposed._getMarketLaunchIncentiveParametersExposed(
             ~marketIndex,
           );
 

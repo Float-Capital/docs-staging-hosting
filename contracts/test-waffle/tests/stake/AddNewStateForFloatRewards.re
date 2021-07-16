@@ -23,8 +23,8 @@ let test =
           ~accounts,
         );
       // StakerSmocked.InternalMock.mockOnlyFloatToReturn();
-      StakerSmocked.InternalMock.mockCalculateTimeDeltaToReturn(timeDelta);
-      StakerSmocked.InternalMock.mockSetRewardObjectsToReturn();
+      StakerSmocked.InternalMock.mock_calculateTimeDeltaToReturn(timeDelta);
+      StakerSmocked.InternalMock.mock_setRewardObjectsToReturn();
       let%AwaitThen {timestamp} = Helpers.getBlock();
       timestampRef := (timestamp + 1)->Ethers.BigNumber.fromInt; // one second per block
 
@@ -59,13 +59,13 @@ let test =
       });
 
       it("calls calculateTimeDelta with correct arguments", () => {
-        StakerSmocked.InternalMock.calculateTimeDeltaCalls()
+        StakerSmocked.InternalMock._calculateTimeDeltaCalls()
         ->Array.getExn(0)
         ->Chai.recordEqualFlat({marketIndex: marketIndex})
       });
 
       it("calls setRewardObjects with correct arguments", () => {
-        StakerSmocked.InternalMock.setRewardObjectsCalls()
+        StakerSmocked.InternalMock._setRewardObjectsCalls()
         ->Array.getExn(0)
         ->Chai.recordEqualFlat({
             marketIndex,
@@ -81,7 +81,7 @@ let test =
       // still calls onlyLongShort + calculateTimeDelta but unwieldy to test twice
       it("doesn't call setRewardObjects", () => {
         let%Await _ = setup(~timeDelta=CONSTANTS.zeroBn);
-        StakerSmocked.InternalMock.setRewardObjectsCalls()
+        StakerSmocked.InternalMock._setRewardObjectsCalls()
         ->Array.length
         ->Chai.intEqual(0);
       })

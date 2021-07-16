@@ -70,14 +70,12 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
 
   function _beforeTokenTransfer(
     address sender,
-    address recipient,
-    uint256 amount
+    address,
+    uint256
   ) internal override {
     if (sender != address(longShort)) {
       longShort.executeOutstandingNextPriceSettlementsUser(sender, marketIndex);
     }
-    uint256 balance = ERC20.balanceOf(sender);
-    uint256 balanceAll = balanceOf(sender);
   }
 
   /**

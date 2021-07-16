@@ -44,7 +44,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           ~newUserAmountStakedShort,
         );
       let%Await floatDue =
-        staker->Staker.Exposed.calculateAccumulatedFloatExposed(
+        staker->Staker.Exposed._calculateAccumulatedFloatExposed(
           ~marketIndex,
           ~user,
         );
@@ -104,7 +104,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             ~newUserAmountStakedShort,
           );
         let%Await floatDue =
-          staker->Staker.Exposed.calculateAccumulatedFloatExposed(
+          staker->Staker.Exposed._calculateAccumulatedFloatExposed(
             ~marketIndex,
             ~user,
           );
@@ -147,7 +147,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           ~newUserAmountStakedShort=Ethers.BigNumber.fromInt(0),
         );
       let%Await floatDue =
-        staker->Staker.Exposed.calculateAccumulatedFloatExposed(
+        staker->Staker.Exposed._calculateAccumulatedFloatExposed(
           ~marketIndex,
           ~user,
         );
