@@ -816,7 +816,7 @@ contract LongShort is ILongShort, Initializable {
 
       batchedAmountOfSynthTokensToRedeem[marketIndex][isLong] = 0;
 
-      syntheticTokens[marketIndex][isLong].synthRedeemBurn(address(this), amountSynthToRedeem);
+      syntheticTokens[marketIndex][isLong].burn(amountSynthToRedeem);
 
       syntheticTokenPoolValue[marketIndex][isLong] -= amountOfPaymentTokenToRedeemFromYieldManager;
     }

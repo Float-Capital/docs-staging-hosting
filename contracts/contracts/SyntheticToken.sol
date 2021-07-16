@@ -3,12 +3,11 @@
 pragma solidity 0.8.3;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 import "./interfaces/IStaker.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/ISyntheticToken.sol";
 
-contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
+contract SyntheticToken is ISyntheticToken {
   ILongShort public longShort;
   IStaker public staker;
   uint32 public marketIndex;
@@ -28,10 +27,9 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
     isLong = _isLong;
   }
 
-  function synthRedeemBurn(address account, uint256 amount) external override {
+  function _burn(address account, uint256 amount) internal override {
     require(msg.sender == address(longShort), "Only longSHORT contract");
-
-    _burn(account, amount);
+    super._burn(account, amount);
   }
 
   function stake(uint256 amount) external override {
@@ -46,10 +44,7 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
     ║    FUNCTIONS INHERITED BY ERC20PresetMinterPauser    ║
     ╚══════════════════════════════════════════════════════╝*/
 
-  function mint(address to, uint256 amount)
-    public
-    override(ISyntheticToken, ERC20PresetMinterPauser)
-  {
+  function mint(address to, uint256 amount) public override {
     ERC20PresetMinterPauser.mint(to, amount);
   }
 
@@ -57,7 +52,7 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
     address sender,
     address recipient,
     uint256 amount
-  ) public override(ERC20, IERC20) returns (bool) {
+  ) public override returns (bool) {
     if (recipient == address(longShort) && msg.sender == address(longShort)) {
       // TODO STENT so this means that the longShort contract is sending to itself?
       //      There is no function call like this in the LongShort contract.
@@ -81,13 +76,7 @@ contract SyntheticToken is ISyntheticToken, ERC20PresetMinterPauser {
   /**
    * @dev See {IERC20-balanceOf}.
    */
-  function balanceOf(address account)
-    public
-    view
-    virtual
-    override(ERC20, IERC20)
-    returns (uint256)
-  {
+  function balanceOf(address account) public view virtual override returns (uint256) {
     return
       longShort.getUsersConfirmedButNotSettledBalance(account, marketIndex, isLong) +
       ERC20.balanceOf(account);
