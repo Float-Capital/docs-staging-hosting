@@ -64,6 +64,15 @@ module LongShortHelpers = {
 
     syntheticTokenPrice;
   };
+  let calcSyntheticTokenPrice = (~amountPaymentToken, ~amountSynthToken) => {
+    amountPaymentToken->mul(CONSTANTS.tenToThe18)->div(amountSynthToken);
+  };
+  let calcAmountPaymentToken = (~amountSynthToken, ~price) => {
+    amountSynthToken->mul(price)->div(CONSTANTS.tenToThe18);
+  };
+  let calcAmountSynthToken = (~amountPaymentToken, ~price) => {
+    amountPaymentToken->mul(CONSTANTS.tenToThe18)->div(price);
+  };
 };
 
 module SyntheticTokenHelpers = {

@@ -11,6 +11,12 @@ let bnEqual: (
   Ethers.BigNumber.t,
 ) => unit = %raw(`(message, number1, number2) => expect(number1, message).to.equal(number2)`)
 
+let intEqual: (
+  ~message: string=?,
+  int,
+  int,
+) => unit = %raw(`(message, number1, number2) => expect(number1, message).to.equal(number2)`)
+
 let recordEqualFlatLabeled: (~expected: 'a, ~actual: 'a) => unit = (~expected, ~actual) => {
   let a = %raw("(expected, actual) => {
     for(const key of Object.keys(actual)){
@@ -28,6 +34,12 @@ let recordEqualFlat: ('a, 'a) => unit = (expected, actual) => {
   }")
   a(expected, actual)
 }
+let recordArrayEqualFlat: (array<'a>, array<'a>) => unit = (expected, actual) => {
+  intEqual(expected->Array.length, actual->Array.length)
+  expected->Array.forEachWithIndex((i, expectedResult) =>
+    recordEqualFlat(expectedResult, actual->Array.getUnsafe(i))
+  )
+}
 
 let recordEqualDeep: ('a, 'a) => unit = (expected, actual) => {
   let a = %raw("(expected, actual) => {
@@ -37,11 +49,12 @@ let recordEqualDeep: ('a, 'a) => unit = (expected, actual) => {
   }")
   a(expected, actual)
 }
-let intEqual: (
-  ~message: string=?,
-  int,
-  int,
-) => unit = %raw(`(message, number1, number2) => expect(number1, message).to.equal(number2)`)
+let recordArrayDeepEqualFlat: (array<'a>, array<'a>) => unit = (expected, actual) => {
+  intEqual(expected->Array.length, actual->Array.length)
+  expected->Array.forEachWithIndex((i, expectedResult) =>
+    recordEqualDeep(expectedResult, actual->Array.getUnsafe(i))
+  )
+}
 
 let addressEqual: (
   ~message: string=?,
