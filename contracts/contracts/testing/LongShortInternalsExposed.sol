@@ -33,6 +33,35 @@ contract LongShortInternalsExposed is LongShortMockable {
     ] = ISyntheticToken(shortAddress);
   }
 
+  function set_updateSystemStateInternalGlobals(
+    uint32 marketIndex,
+    uint256 _latestUpdateIndexForMarket,
+    uint256 syntheticTokenPriceLong,
+    uint256 syntheticTokenPriceShort,
+    uint256 _assetPrice,
+    uint256 longValue,
+    uint256 shortValue,
+    address oracleManager,
+    address _staker
+  ) public {
+    marketExists[marketIndex] = true;
+    marketUpdateIndex[marketIndex] = _latestUpdateIndexForMarket;
+    syntheticTokenPriceSnapshot[marketIndex][true][
+      _latestUpdateIndexForMarket
+    ] = syntheticTokenPriceLong;
+    syntheticTokenPriceSnapshot[marketIndex][false][
+      _latestUpdateIndexForMarket
+    ] = syntheticTokenPriceShort;
+
+    syntheticTokenPoolValue[marketIndex][true] = longValue;
+    syntheticTokenPoolValue[marketIndex][false] = shortValue;
+
+    assetPrice[marketIndex] = _assetPrice;
+    oracleManagers[marketIndex] = IOracleManager(oracleManager);
+
+    staker = IStaker(_staker);
+  }
+
   function setUseexecuteOutstandingNextPriceSettlementsMock(bool shouldUseMock) public {
     overRideexecuteOutstandingNextPriceSettlements = shouldUseMock;
   }
