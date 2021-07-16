@@ -3,7 +3,6 @@
 
 var React = require("react");
 var Button = require("../components/UI/Base/Button.js");
-var Heading = require("./components/Heading.js");
 var Router = require("next/router");
 
 function Governance(Props) {
@@ -15,12 +14,11 @@ function Governance(Props) {
                   className: "max-w-5xl flex flex-col md:flex-row justify-evenly items-center mx-auto"
                 }, React.createElement("div", {
                       className: "w-full md:w-1/2 order-2 md:order-1 p-4 md:p-0"
-                    }, React.createElement(Heading.make, {
-                          title: "governance",
-                          suffixEmoji: "👤"
-                        }), React.createElement("p", {
+                    }, React.createElement("h3", {
+                          className: "text-2xl md:text-4xl flex flex-row items-center my-2 font-bold leading-tight"
+                        }, "Simple", React.createElement("br", undefined), "Community First", React.createElement("br", undefined), "Governance"), React.createElement("p", {
                           className: "text-lg md:text-2xl p-4 md:p-0 bg-white bg-opacity-80 rounded-lg md:bg-transparent"
-                        }, "The FLT token governs the float capital protocol. The right governance model will direct and shape the protocol through community lead proposals in a decentralised and fair manor. The future of Float Capital will be dictated by its users."), React.createElement("div", {
+                        }, "Float Capital will be managed by the decentralized community of FLT token-holders. Simply use FLT to author, propose and vote on protocol upgrades."), React.createElement("div", {
                           className: "flex flex-row my-4 items-center justify-evenly md:justify-start  "
                         }, React.createElement("div", {
                               className: "mr-4"

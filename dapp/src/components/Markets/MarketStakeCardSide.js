@@ -28,7 +28,7 @@ function MarketStakeCardSide(Props) {
   var tmp;
   tmp = typeof apy === "number" ? React.createElement(Loader.Tiny.make, {}) : (
       apy.TAG === /* Loaded */0 ? React.createElement("p", {
-              className: "text-lg  tracking-widest font-vt323"
+              className: "text-lg  tracking-widest font-alphbeta"
             }, mapAPY(apy._0)) : React.createElement(Loader.Tiny.make, {})
     );
   return React.createElement("div", {
@@ -44,7 +44,7 @@ function MarketStakeCardSide(Props) {
                     }, React.createElement("span", {
                           className: "font-bold  text-gray-600"
                         }, isLong ? "LONG" : "SHORT"), " FLOAT rewards"), React.createElement("p", {
-                      className: "text-lg md:text-xl tracking-widest font-vt323"
+                      className: "text-lg md:text-xl tracking-widest font-alphbeta"
                     }, mapAPY(floatApy))), React.createElement("div", {
                   className: "flex flex-col justify-center pt-0 my-1"
                 }, React.createElement("h3", {
@@ -60,7 +60,7 @@ function MarketStakeCardSide(Props) {
                         }, "Exposure "), React.createElement(Tooltip.make, {
                           tip: "The impact " + marketName + " price movements have on the " + tradeType + " value"
                         })), React.createElement("p", {
-                      className: "text-lg tracking-widest font-vt323"
+                      className: "text-lg tracking-widest font-alphbeta"
                     }, beta + "%")));
 }
 
