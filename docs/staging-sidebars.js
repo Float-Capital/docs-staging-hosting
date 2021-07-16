@@ -11,6 +11,7 @@ module.exports = {
     "User Guide": ["mint", "redeem", "stake", "gas-costs"],
     Developer: ["smart-contracts", "api"],
     Resources: ["resources"],
+    Jobs: ["marketing-lead"],
     Cheatsheets: ["md-cheatsheet", "mdx-cheatsheet"],
   },
 };

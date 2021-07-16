@@ -59,7 +59,7 @@ module UserColumnCard = {
 module UserColumnHeader = {
   @react.component
   let make = (~children, ~subheader=false) => {
-    <h1 className={`text-center ${subheader ? "text-base" : "text-lg"} font-vt323 mb-4 mt-2`}>
+    <h1 className={`text-center ${subheader ? "text-base" : "text-lg"} font-alphbeta mb-4 mt-2`}>
       {children}
     </h1>
   }

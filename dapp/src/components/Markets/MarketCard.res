@@ -49,7 +49,9 @@ let marketPositionValues = (
   let value = (isLong ? totalLockedLong : totalLockedShort)->Misc.NumberFormat.formatEther
   let beta = isLong ? longBeta : shortBeta
   <div className="text-sm text-center m-auto mb-4">
-    <div className="text-2xl tracking-widest font-vt323 my-3"> {`\$${value}`->React.string} </div>
+    <div className="text-2xl tracking-widest font-alphbeta my-3">
+      {`\$${value}`->React.string}
+    </div>
     <span className="font-bold"> {`Exposure `->React.string} </span>
     <Tooltip
       tip={`The impact ${marketName} price movements have on ${isLong ? "long" : "short"} value`}
@@ -103,7 +105,7 @@ let make = (
     <div
       className="p-1 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 cursor-pointer shadow-lg hover:shadow-xl h-full justify-center w-full">
       <div className="flex justify-center w-full my-1">
-        <h1 className="font-bold text-xl font-vt323 cursor-pointer hover:underline">
+        <h1 className="font-bold text-xl font-alphbeta cursor-pointer hover:underline">
           {marketName->React.string}
         </h1>
       </div>
@@ -126,7 +128,7 @@ let make = (
             <span className="font-bold"> {"TOTAL"->React.string} </span>
             {" Liquidity"->React.string}
           </h2>
-          <div className="text-3xl font-vt323 tracking-wider py-1">
+          <div className="text-3xl font-alphbeta tracking-wider py-1">
             {`$${totalValueLocked->Misc.NumberFormat.formatEther}`->React.string}
           </div>
           <div className="md:block hidden w-full">
@@ -186,7 +188,7 @@ module Mini = {
         <div
           className="p-1 rounded-sm flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 custom-cursor shadow-lg hover:shadow-xl h-full justify-center w-full">
           <div className="flex justify-center w-full my-1">
-            <h1 className="font-bold text-xl font-vt323 uppercase custom-cursor hover:underline">
+            <h1 className="font-bold text-xl font-alphbeta uppercase custom-cursor hover:underline">
               {marketName->React.string}
             </h1>
           </div>
@@ -199,7 +201,7 @@ module Mini = {
                 <span className="font-bold"> {"TOTAL"->React.string} </span>
                 {" Liquidity"->React.string}
               </h2>
-              <div className="text-3xl font-vt323 tracking-wider py-1">
+              <div className="text-3xl font-alphbeta tracking-wider py-1">
                 {`$${totalValueLocked->Misc.NumberFormat.formatEther}`->React.string}
               </div>
             </div>

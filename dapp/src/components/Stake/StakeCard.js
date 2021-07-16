@@ -111,7 +111,7 @@ function StakeCard(Props) {
                   }, React.createElement("div", {
                         className: "flex justify-center w-full my-1"
                       }, React.createElement("h1", {
-                            className: "font-bold text-xl font-vt323"
+                            className: "font-bold text-xl font-alphbeta"
                           }, marketName)), React.createElement("div", {
                         className: "flex flex-wrap justify-center w-full"
                       }, React.createElement(StakeCardSide.make, {
@@ -130,13 +130,13 @@ function StakeCard(Props) {
                                           }, React.createElement("span", {
                                                 className: "font-bold"
                                               }, "📈 Long"), " staked")), React.createElement("div", {
-                                        className: "text-sm font-vt323 tracking-wider py-1"
+                                        className: "text-sm font-alphbeta tracking-wider py-1"
                                       }, "$" + Misc.NumberFormat.formatEther(undefined, longDollarValueStaked))), React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("h2", {
                                             className: "text-xs mt-1 flex justify-center"
                                           }, React.createElement("span", {
                                                 className: "font-bold pr-1"
                                               }, "TOTAL"), " Staked")), React.createElement("div", {
-                                        className: "text-3xl font-vt323 tracking-wider py-1"
+                                        className: "text-3xl font-alphbeta tracking-wider py-1"
                                       }, "$" + Misc.NumberFormat.formatEther(undefined, totalDollarValueStake))), React.createElement("div", {
                                     className: "text-right"
                                   }, React.createElement("div", undefined, React.createElement("h2", {
@@ -144,7 +144,7 @@ function StakeCard(Props) {
                                           }, React.createElement("span", {
                                                 className: "font-bold"
                                               }, "Short"), " staked 📉")), React.createElement("div", {
-                                        className: "text-sm font-vt323 tracking-wider py-1"
+                                        className: "text-sm font-alphbeta tracking-wider py-1"
                                       }, "$" + Misc.NumberFormat.formatEther(undefined, shortDollarValueStaked)))), liquidityRatio(undefined), React.createElement("div", {
                                 className: "md:block hidden w-full flex justify-around"
                               }, stakeButtons(undefined))), React.createElement(StakeCardSide.make, {

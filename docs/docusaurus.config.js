@@ -23,7 +23,7 @@ module.exports = {
       title: "",
       logo: {
         alt: "Float Capital Logo",
-        src: "img/float-capital-logo-med.png",
+        src: "img/float-capital-logo-long.svg",
         href: "https://float.capital/",
       },
       items: [

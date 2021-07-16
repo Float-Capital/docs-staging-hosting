@@ -39,7 +39,7 @@ var Card = {
 function Masonry$Header(Props) {
   var children = Props.children;
   return React.createElement("h1", {
-              className: "font-bold text-center pt-5 text-lg font-vt323"
+              className: "font-bold text-center pt-5 text-lg font-alphbeta"
             }, children);
 }
 
