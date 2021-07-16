@@ -66,4 +66,15 @@ contract LongShortInternalsExposed is LongShortMockable {
       _marketUpdateIndex
     ] = _syntheticTokenPriceSnapshot;
   }
+
+  function setClaimAndDistributeYieldGlobals(
+    uint32 marketIndex,
+    address yieldManager,
+    uint256 syntheticTokenPoolValueLong,
+    uint256 syntheticTokenPoolValueShort
+  ) external {
+    yieldManagers[marketIndex] = IYieldManager(yieldManager);
+    syntheticTokenPoolValue[marketIndex][true] = syntheticTokenPoolValueLong;
+    syntheticTokenPoolValue[marketIndex][false] = syntheticTokenPoolValueShort;
+  }
 }
