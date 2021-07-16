@@ -16,8 +16,8 @@ function WhatIsFloat(Props) {
                     }, React.createElement("div", {
                           className: "w-full md:w-1/2 m-4 md:m-0 "
                         }, React.createElement("h3", {
-                              className: "text-2xl md:text-4xl flex flex-row items-center my-2 font-bold"
-                            }, "Synthetic assets reimagined"), React.createElement("p", {
+                              className: "text-2xl leading-tight md:text-4xl flex flex-row items-center my-2 font-bold"
+                            }, "Synthetic Assets Reimagined"), React.createElement("p", {
                               className: "text-lg md:text-xl my-2"
                             }, React.createElement("span", undefined, "The "), React.createElement("span", {
                                   className: "font-bold"

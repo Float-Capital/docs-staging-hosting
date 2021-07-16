@@ -6,8 +6,9 @@ let make = () => {
     <div className="flex flex-col items-center">
       <div className="flex flex-row my-4 items-center justify-between max-w-6xl">
         <div className="w-full md:w-1/2 m-4 md:m-0 ">
-          <h3 className="text-2xl md:text-4xl flex flex-row items-center my-2 font-bold">
-            {`Synthetic assets reimagined`->React.string}
+          <h3
+            className="text-2xl leading-tight md:text-4xl flex flex-row items-center my-2 font-bold">
+            {`Synthetic Assets Reimagined`->React.string}
           </h3>
           <p className="text-lg md:text-xl my-2">
             <span> {"The "->React.string} </span>
