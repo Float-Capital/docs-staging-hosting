@@ -34,7 +34,7 @@ let test =
           ~contracts,
           ~accounts,
         );
-      StakerSmocked.InternalMock.mockCalculateNewCumulativeRateToReturn(
+      StakerSmocked.InternalMock.mock_calculateNewCumulativeIssuancePerStakedSynthToReturn(
         longAccum,
         shortAccum,
       );
@@ -52,7 +52,7 @@ let test =
 
       promiseRef :=
         contracts^.staker
-        ->Staker.Exposed.setRewardObjectsExternal(
+        ->Staker.Exposed._setRewardObjectsExposed(
             ~marketIndex,
             ~longPrice,
             ~shortPrice,
@@ -64,8 +64,10 @@ let test =
       ();
     });
 
-    it("calls calculateNewCumulativeRate with correct arguments", () => {
-      StakerSmocked.InternalMock.calculateNewCumulativeRateCalls()
+    it(
+      "calls calculateNewCumulativeIssuancePerStakedSynth with correct arguments",
+      () => {
+      StakerSmocked.InternalMock._calculateNewCumulativeIssuancePerStakedSynthCalls()
       ->Array.getExn(0)
       ->Chai.recordEqualFlat({
           marketIndex,

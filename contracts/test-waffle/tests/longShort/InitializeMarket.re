@@ -25,7 +25,6 @@ let testUnit =
         ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
             ~functionName="initializeMarket",
           );
-      let _ = LongShortSmocked.InternalMock.mockAdminOnlyToReturn();
 
       let _ = LongShortSmocked.InternalMock.mock_seedMarketInitiallyToReturn();
 
@@ -87,9 +86,9 @@ let testUnit =
         );
 
         // No arguments
-        let adminOnlyCalls = LongShortSmocked.InternalMock.adminOnlyCalls();
+        //let adminOnlyCalls = LongShortSmocked.InternalMock.adminOnlyCalls();
 
-        Chai.intEqual(1, adminOnlyCalls->Array.length);
+        // Chai.intEqual(1, adminOnlyCalls->Array.length);
 
         let%Await isMarket = (longShortRef^)->LongShort.marketExists(1);
 
@@ -146,7 +145,7 @@ let testUnit =
 let testIntegration =
     (
       ~contracts: ref(Helpers.coreContracts),
-      ~accounts: ref(array(Ethers.Wallet.t)),
+      ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("initializeMarket", () => {
     it("Shouldn't allow initialization of a market that doesn't exist", () => {

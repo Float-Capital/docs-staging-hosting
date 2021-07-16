@@ -17,8 +17,8 @@ import "./interfaces/aave/ILendingPool.sol";
  */
 contract YieldManagerAave is IYieldManager {
   /*╔═════════════════════════════╗
-      ║          VARIABLES          ║
-      ╚═════════════════════════════╝*/
+    ║          VARIABLES          ║
+    ╚═════════════════════════════╝*/
 
   // Fixed-precision constants ///////////////////////////////
   uint256 public constant TEN_TO_THE_18 = 1e18;
@@ -37,8 +37,8 @@ contract YieldManagerAave is IYieldManager {
   uint256 public override totalReservedForTreasury;
 
   /*╔═════════════════════════════╗
-      ║          MODIFIERS          ║
-      ╚═════════════════════════════╝*/
+    ║          MODIFIERS          ║
+    ╚═════════════════════════════╝*/
 
   modifier adminOnly() {
     require(msg.sender == admin, "Not admin");
@@ -56,8 +56,8 @@ contract YieldManagerAave is IYieldManager {
   }
 
   /*╔═════════════════════════════╗
-      ║       CONTRACT SET-UP       ║
-      ╚═════════════════════════════╝*/
+    ║       CONTRACT SET-UP       ║
+    ╚═════════════════════════════╝*/
 
   /*
    * Initialises the yield manager with the given payment token
@@ -87,16 +87,16 @@ contract YieldManagerAave is IYieldManager {
   }
 
   /*╔═════════════════════════════╗
-      ║       MULTI-SIG ADMIN       ║
-      ╚═════════════════════════════╝*/
+    ║       MULTI-SIG ADMIN       ║
+    ╚═════════════════════════════╝*/
 
   function changeAdmin(address _admin) external adminOnly {
     admin = _admin;
   }
 
   /*╔════════════════════════╗
-      ║     IMPLEMENTATION     ║
-      ╚════════════════════════╝*/
+    ║     IMPLEMENTATION     ║
+    ╚════════════════════════╝*/
 
   function depositPaymentToken(uint256 amount) public override longShortOnly {
     // Transfer tokens to manager contract.

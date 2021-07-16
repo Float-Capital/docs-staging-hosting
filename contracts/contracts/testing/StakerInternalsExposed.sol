@@ -54,8 +54,10 @@ contract StakerInternalsExposed is StakerMockable {
     uint32 marketIndex,
     ISyntheticToken longToken,
     ISyntheticToken shortToken,
-    ISyntheticToken mockAddress
+    ISyntheticToken mockAddress,
+    address longShortAddress
   ) public {
+    longShort = ILongShort(longShortAddress);
     marketIndexOfToken[longToken] = marketIndex;
     marketIndexOfToken[shortToken] = marketIndex;
 
@@ -65,6 +67,10 @@ contract StakerInternalsExposed is StakerMockable {
 
     syntheticTokens[marketIndex][true] = mockAddress;
     syntheticTokens[marketIndex][false] = mockAddress;
+  }
+
+  function setAddNewStateForFloatRewardsParams(address longShortAddress) external {
+    longShort = ILongShort(longShortAddress);
   }
 
   function setGetMarketLaunchIncentiveParametersParams(
@@ -85,7 +91,7 @@ contract StakerInternalsExposed is StakerMockable {
     ISyntheticToken token,
     uint32 marketIndexForToken
   ) external {
-    longShortCoreContract = ILongShort(longshort);
+    longShort = ILongShort(longshort);
     marketIndexOfToken[token] = marketIndexForToken;
   }
 
@@ -123,7 +129,7 @@ contract StakerInternalsExposed is StakerMockable {
     ISyntheticToken token,
     uint32 tokenMarketIndex
   ) public {
-    longShortCoreContract = longShort;
+    longShort = longShort;
     marketIndexOfToken[token] = tokenMarketIndex;
   }
 
@@ -139,8 +145,8 @@ contract StakerInternalsExposed is StakerMockable {
     latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
   }
 
-  function setClaimFloatCustomParams(address longshort) external {
-    longShortCoreContract = ILongShort(longshort);
+  function setClaimFloatCustomParams(address longshortAddress) external {
+    longShort = ILongShort(longshortAddress);
   }
 
   function set_stakeParams(
@@ -155,93 +161,5 @@ contract StakerInternalsExposed is StakerMockable {
     latestRewardIndex[marketIndex] = _latestRewardIndex;
     userAmountStaked[token][user] = _userAmountStaked;
     userIndexOfLastClaimedReward[marketIndex][user] = userLastRewardIndex;
-  }
-
-  ///////////////////////////////////////////
-  //////////// EXPOSED Functions ////////////
-  ///////////////////////////////////////////
-  function calculateAccumulatedFloatExposed(uint32 marketIndex, address user)
-    external
-    returns (uint256 longFloatReward, uint256 shortFloatReward)
-  {
-    return calculateAccumulatedFloat(marketIndex, user);
-  }
-
-  function calculateFloatPerSecondExposed(
-    uint32 marketIndex,
-    uint256 longPrice,
-    uint256 shortPrice,
-    uint256 longValue,
-    uint256 shortValue
-  ) external returns (uint256 longFloatPerSecond, uint256 shortFloatPerSecond) {
-    return _calculateFloatPerSecond(marketIndex, longPrice, shortPrice, longValue, shortValue);
-  }
-
-  function mintAccumulatedFloatExternal(uint32 marketIndex, address user) external {
-    mintAccumulatedFloat(marketIndex, user);
-  }
-
-  function _mintFloatExternal(address user, uint256 floatToMint) external {
-    _mintFloat(user, floatToMint);
-  }
-
-  function _withdrawExternal(ISyntheticToken token, uint256 amount) external {
-    _withdraw(token, amount);
-  }
-
-  function _changeMarketLaunchIncentiveParametersExternal(
-    uint32 marketIndex,
-    uint256 period,
-    uint256 initialMultiplier
-  ) external {
-    _changeMarketLaunchIncentiveParameters(marketIndex, period, initialMultiplier);
-  }
-
-  function getMarketLaunchIncentiveParametersExternal(uint32 marketIndex)
-    external
-    view
-    returns (uint256, uint256)
-  {
-    return getMarketLaunchIncentiveParameters(marketIndex);
-  }
-
-  function calculateTimeDeltaExposed(uint32 marketIndex) external view returns (uint256) {
-    return calculateTimeDelta(marketIndex);
-  }
-
-  function calculateNewCumulativeRateExposed(
-    uint32 marketIndex,
-    uint256 longPrice,
-    uint256 shortPrice,
-    uint256 longValue,
-    uint256 shortValue
-  ) external view returns (uint256 longCumulativeRates, uint256 shortCumulativeRates) {
-    return calculateNewCumulativeRate(marketIndex, longPrice, shortPrice, longValue, shortValue);
-  }
-
-  function getKValueExternal(uint32 marketIndex) external view returns (uint256) {
-    return getKValue(marketIndex);
-  }
-
-  function setRewardObjectsExternal(
-    uint32 marketIndex,
-    uint256 longPrice,
-    uint256 shortPrice,
-    uint256 longValue,
-    uint256 shortValue
-  ) external {
-    setRewardObjects(marketIndex, longPrice, shortPrice, longValue, shortValue);
-  }
-
-  function _claimFloatExternal(uint32[] calldata marketIndex) external {
-    _claimFloat(marketIndex);
-  }
-
-  function _stakeExternal(
-    ISyntheticToken token,
-    uint256 amount,
-    address user
-  ) external {
-    _stake(token, amount, user);
   }
 }

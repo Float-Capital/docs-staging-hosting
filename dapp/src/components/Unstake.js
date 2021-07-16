@@ -543,7 +543,7 @@ function Unstake$ConnectedStakeForm(Props) {
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
   var router = Router.useRouter();
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
-  var userPage = optCurrentUser !== undefined ? "/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser)) : "/";
+  var userPage = optCurrentUser !== undefined ? "/app/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser)) : "/";
   React.useEffect((function () {
           if (typeof txState === "number") {
             if (txState !== /* UnInitialised */0) {

@@ -32,9 +32,10 @@ contract FloatToken is IFloatToken, ERC20PresetMinterPauserUpgradeable {
     renounceRole(PAUSER_ROLE, msg.sender);
   }
 
-  ///////////////////////////////////////////////////////////////////////////////
-  ///////// FUNCTIONS INHERITED BY ERC20PresetMinterPauserUpgradeable ///////////
-  ///////////////////////////////////////////////////////////////////////////////
+  /*╔═══════════════════════════════════════════════════════════════════╗
+    ║    FUNCTIONS INHERITED BY ERC20PresetMinterPauserUpgradeable      ║
+    ╚═══════════════════════════════════════════════════════════════════╝*/
+
   function mint(address to, uint256 amount)
     public
     override(IFloatToken, ERC20PresetMinterPauserUpgradeable)

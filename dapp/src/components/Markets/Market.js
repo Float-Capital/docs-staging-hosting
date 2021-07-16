@@ -11,7 +11,7 @@ var MarketInteractionCard = require("./MarketInteractionCard.js");
 function Market(Props) {
   var marketData = Props.marketData;
   return React.createElement("div", undefined, React.createElement(Link, {
-                  href: "/",
+                  href: "/app/markets",
                   children: React.createElement("div", {
                         className: "uppercase text-sm text-gray-600 hover:text-gray-500 cursor-pointer mb-4"
                       }, "◀", React.createElement("span", {

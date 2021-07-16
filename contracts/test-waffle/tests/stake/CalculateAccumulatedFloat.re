@@ -44,7 +44,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           ~newUserAmountStakedShort,
         );
       let%Await floatDue =
-        staker->Staker.Exposed.calculateAccumulatedFloatExposedCall(
+        staker->Staker.Exposed._calculateAccumulatedFloatExposed(
           ~marketIndex,
           ~user,
         );
@@ -104,7 +104,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             ~newUserAmountStakedShort,
           );
         let%Await floatDue =
-          staker->Staker.Exposed.calculateAccumulatedFloatExposedCall(
+          staker->Staker.Exposed._calculateAccumulatedFloatExposed(
             ~marketIndex,
             ~user,
           );
@@ -118,40 +118,6 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           floatDue.shortFloatReward,
           bnFromInt(0),
           ~message="calculated float (short) due should be zero",
-        );
-      },
-    );
-
-    it(
-      "should throw (assert) if `usersLatestClaimedReward` is bigger than `newLatestRewardIndex`",
-      () => {
-        let {staker} = contracts.contents;
-        // exact value doesn't matter, must be zero!
-        let usersLatestClaimedReward = Helpers.randomInteger();
-        let newLatestRewardIndex =
-          usersLatestClaimedReward->sub(bnFromInt(1));
-
-        let%AwaitThen _ =
-          staker->Staker.Exposed.setFloatRewardCalcParams(
-            ~marketIndex,
-            ~longToken,
-            ~shortToken,
-            ~newLatestRewardIndex,
-            ~user,
-            ~usersLatestClaimedReward,
-            ~accumulativeFloatPerTokenLatestLong,
-            ~accumulativeFloatPerTokenLatestShort,
-            ~accumulativeFloatPerTokenUserLong,
-            ~accumulativeFloatPerTokenUserShort,
-            ~newUserAmountStakedLong,
-            ~newUserAmountStakedShort,
-          );
-        Chai.expectRevertNoReason(
-          ~transaction=
-            staker->Staker.Exposed.calculateAccumulatedFloatExposed(
-              ~marketIndex,
-              ~user,
-            ),
         );
       },
     );
@@ -181,7 +147,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           ~newUserAmountStakedShort=Ethers.BigNumber.fromInt(0),
         );
       let%Await floatDue =
-        staker->Staker.Exposed.calculateAccumulatedFloatExposedCall(
+        staker->Staker.Exposed._calculateAccumulatedFloatExposed(
           ~marketIndex,
           ~user,
         );

@@ -6,7 +6,8 @@ import "./generated/LongShortMockable.sol";
 NOTE: This contract is for testing purposes only!
 */
 
-// TODO: rename this contract to "LongShortInternalStateSettors" and remove all Exposed functions since they are part of the 'Mockable' contract now.
+// TODO: rename this contract to "LongShortInternalStateSettors" and remove all
+//       exposed functions since they are part of the 'Mockable' contract now.
 //       Also update the contract-interface codegen so that it puts the correct functions as "Exposed".
 contract LongShortInternalsExposed is LongShortMockable {
   bool overRideexecuteOutstandingNextPriceSettlements;
@@ -42,48 +43,27 @@ contract LongShortInternalsExposed is LongShortMockable {
     emit executeOutstandingNextPriceSettlementsMock(_user, _marketIndex);
   }
 
-  modifier executeOutstandingNextPriceSettlements(address user, uint32 marketIndex) override {
-    if (overRideexecuteOutstandingNextPriceSettlements) {
-      // TODO: put a mock here?
-      _executeOutstandingNextPriceSettlementsMock(user, marketIndex);
-    } else {
-      _executeOutstandingNextPriceSettlements(user, marketIndex);
-    }
-
-    _;
-  }
-
-  function claimAndDistributeYield(uint32 marketIndex) external {
-    _claimAndDistributeYield(marketIndex);
-  }
-
-  function depositFunds(uint32 marketIndex, uint256 amount) external {
-    _depositFunds(marketIndex, amount);
-  }
-
-  function withdrawFunds(
-    uint32 marketIndex,
-    uint256 amountLong,
-    uint256 amountShort,
-    address user
-  ) external {
-    _withdrawFunds(marketIndex, amountLong, amountShort, msg.sender);
-  }
-
-  function transferFundsToYieldManager(uint32 marketIndex, uint256 amount) external {
-    _transferFundsToYieldManager(marketIndex, amount);
-  }
-
-  function adjustMarketBasedOnNewAssetPrice(uint32 marketIndex, int256 newAssetPrice)
-    external
-    returns (bool didUpdate)
-  {
-    _adjustMarketBasedOnNewAssetPrice(marketIndex, newAssetPrice);
-  }
-
-  function _executeOutstandingNextPriceSettlementsExposed(address user, uint32 marketIndex)
+  function _executeOutstandingNextPriceSettlementsExposedWithEvent(address user, uint32 marketIndex)
     external
   {
     _executeOutstandingNextPriceSettlements(user, marketIndex);
+  }
+
+  function setGetUsersConfirmedButNotSettledBalanceGlobals(
+    uint32 marketIndex,
+    address user,
+    bool isLong,
+    uint256 _userCurrentNextPriceUpdateIndex,
+    uint256 _marketUpdateIndex,
+    uint256 _userNextPriceDepositAmount,
+    uint256 _syntheticTokenPriceSnapshot
+  ) external {
+    marketExists[marketIndex] = true;
+    userCurrentNextPriceUpdateIndex[marketIndex][user] = _userCurrentNextPriceUpdateIndex;
+    marketUpdateIndex[marketIndex] = _marketUpdateIndex;
+    userNextPriceDepositAmount[marketIndex][isLong][user] = _userNextPriceDepositAmount;
+    syntheticTokenPriceSnapshot[marketIndex][isLong][
+      _marketUpdateIndex
+    ] = _syntheticTokenPriceSnapshot;
   }
 }

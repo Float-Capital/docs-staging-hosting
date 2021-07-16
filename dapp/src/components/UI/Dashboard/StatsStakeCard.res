@@ -5,7 +5,7 @@ let mapVal = apy =>
 
 @react.component
 let make = (~marketName, ~isLong, ~yield, ~rewards) =>
-  <Next.Link href="/stake">
+  <Next.Link href="/app/stake">
     <div
       className="mb-5 flex w-11/12 mx-auto border-2 border-light-purple rounded-lg z-10 shadow cursor-pointer">
       <div className="my-2 ml-5 text-sm">

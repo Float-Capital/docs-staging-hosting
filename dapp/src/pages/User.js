@@ -312,7 +312,7 @@ function User(Props) {
                                       }), React.createElement("div", {
                                         className: "w-40 mx-auto"
                                       }, React.createElement(Link, {
-                                            href: "/",
+                                            href: "/app/markets",
                                             children: React.createElement(Button.Small.make, {
                                                   children: "MARKETS"
                                                 })

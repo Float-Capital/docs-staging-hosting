@@ -27,7 +27,7 @@ let test =
           ~contracts,
           ~accounts,
         );
-      StakerSmocked.InternalMock.mockMintAccumulatedFloatToReturn();
+      StakerSmocked.InternalMock.mock_mintAccumulatedFloatToReturn();
 
       let%AwaitThen _ =
         contracts^.staker
@@ -41,7 +41,7 @@ let test =
           );
       let promise =
         contracts^.staker
-        ->Staker.Exposed._stakeExternal(
+        ->Staker.Exposed._stakeExposed(
             ~user,
             ~token,
             ~amount=userAmountToStake,
@@ -65,7 +65,7 @@ let test =
       );
 
       it("calls mintAccumulatedFloat with correct args", () => {
-        StakerSmocked.InternalMock.mintAccumulatedFloatCalls()
+        StakerSmocked.InternalMock._mintAccumulatedFloatCalls()
         ->Array.getExn(0)
         ->Chai.recordEqualFlat({marketIndex, user})
       });
@@ -105,7 +105,7 @@ let test =
       );
 
       it("doesn't call mintAccumulatedFloat", () => {
-        StakerSmocked.InternalMock.mintAccumulatedFloatCalls()
+        StakerSmocked.InternalMock._mintAccumulatedFloatCalls()
         ->Array.length
         ->Chai.intEqual(0)
       });
@@ -119,7 +119,7 @@ let test =
       );
 
       it("doesn't call mintAccumulatedFloat", () => {
-        StakerSmocked.InternalMock.mintAccumulatedFloatCalls()
+        StakerSmocked.InternalMock._mintAccumulatedFloatCalls()
         ->Array.length
         ->Chai.intEqual(0)
       });

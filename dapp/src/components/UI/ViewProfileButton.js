@@ -9,7 +9,7 @@ var RootProvider = require("../../libraries/RootProvider.js");
 
 function ViewProfileButton(Props) {
   var optCurrentUser = RootProvider.useCurrentUser(undefined);
-  var userPage = optCurrentUser !== undefined ? "/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser)) : "/";
+  var userPage = optCurrentUser !== undefined ? "/app/user/" + Ethers.Utils.ethAdrToLowerStr(Caml_option.valFromOption(optCurrentUser)) : "/";
   return React.createElement(Link, {
               href: userPage,
               children: React.createElement("button", {

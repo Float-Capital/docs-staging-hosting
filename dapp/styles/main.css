@@ -5,7 +5,12 @@
 @import "./ellipsis-loader.css";
 @import "./tick-animation.css";
 
-body {
+html {
+  scroll-behavior: smooth;
+}
+
+#app,
+.island {
   /* It is possible to make this a utility (https://tailwindcss.com/docs/plugins#adding-utilities)
       - but probably not worth the confusion
   */
@@ -13,8 +18,55 @@ body {
       rgba(255, 255, 255, 0.3),
       rgba(255, 255, 255, 0.3)
     ),
-    url("/backgrounds/2.png");
+    url("/backgrounds/island.png");
   @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
+}
+
+.purple-moon {
+  background: linear-gradient(
+      to bottom left,
+      rgba(255, 255, 255, 0),
+      rgba(255, 255, 255, 0)
+    ),
+    url("/backgrounds/purple-moon.gif");
+  @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
+}
+
+.fighter-blue {
+  background: url("/backgrounds/fighter-right.gif"),
+    linear-gradient(
+      to bottom left,
+      rgba(86, 136, 241, 0.2),
+      rgba(62, 77, 167, 0.6)
+    );
+  background-position: right bottom;
+  @apply font-default min-h-screen bg-right-bottom w-screen bg-cover;
+}
+.ballot-box {
+  background: linear-gradient(
+      to bottom left,
+      rgba(255, 255, 255, 0),
+      rgba(255, 255, 255, 0)
+    ),
+    url("/backgrounds/governance.png");
+  @apply font-default min-h-screen w-screen bg-right bg-cover bg-gray-50;
+}
+.bg-car {
+  background: linear-gradient(
+      to bottom left,
+      rgba(255, 255, 255, 0),
+      rgba(255, 255, 255, 0)
+    ),
+    url("/backgrounds/car.gif");
+  @apply font-default min-h-screen w-screen bg-left-bottom bg-cover bg-gray-50;
+}
+
+.custom-height-for-above-footer {
+  height: calc(100vh - 4rem);
+}
+
+.custom-cursor {
+  cursor: url("/cursors/pointer-colorful-edit.png"), auto;
 }
 
 .logo-container {

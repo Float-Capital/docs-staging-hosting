@@ -44,7 +44,7 @@ let test =
           ~floatPercentage,
         );
 
-      staker->Staker.Exposed._mintFloatExternal(~user, ~floatToMint);
+      staker->Staker.Exposed._mintFloatExposed(~user, ~floatToMint);
     });
 
     it("calls mint on floatToken for user for amount floatToMint", () =>

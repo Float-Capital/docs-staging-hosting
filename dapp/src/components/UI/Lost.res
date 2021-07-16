@@ -4,7 +4,7 @@ let make = () => {
   let (show, setShow) = React.useState(_ => false)
 
   switch router.route {
-  | "/" => React.null
+  | "/app/markets" => React.null
   | _ =>
     <div className="fixed bottom-3 right-5 flex flex-col items-end invisible md:visible">
       <div className="font-alphbeta text-2xl cursor-pointer" onClick={_ => setShow(show => !show)}>

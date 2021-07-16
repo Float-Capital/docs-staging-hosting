@@ -193,5 +193,10 @@ describe("Float System", () => {
     });
     InitializeMarket.testUnit(~contracts, ~accounts);
     UpdateSystemState.testUnit(~contracts, ~accounts);
+    ClaimAndDistributeYield.testUnit(~contracts, ~accounts);
+    AdjustMarketBasedOnNewAssetPrice.testUnit(~contracts, ~accounts);
+    UtilsHelpers.testUnit(~contracts, ~accounts);
+    GetUsersConfirmedButNotSettledBalance.testUnit(~contracts, ~accounts);
+    PriceCalculationFunctions.testUnit(~contracts, ~accounts);
   });
 });
