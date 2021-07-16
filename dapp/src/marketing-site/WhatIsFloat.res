@@ -38,6 +38,11 @@ let make = () => {
               {"No fees"->React.string}
             </li>
           </ul>
+          <div className="my-2 inline-block">
+            <a href="https://docs.float.capital/docs/" target="_blank" rel="noopener noreferrer">
+              <Button> {"Learn more"} </Button>
+            </a>
+          </div>
         </div>
       </div>
       <div className="hidden md:block absolute bottom-10 right-10"> <FeaturedMarkets /> </div>

@@ -2,6 +2,7 @@
 'use strict';
 
 var React = require("react");
+var Button = require("../components/UI/Base/Button.js");
 var FeaturedMarkets = require("./FeaturedMarkets.js");
 
 function WhatIsFloat(Props) {
@@ -36,7 +37,15 @@ function WhatIsFloat(Props) {
                                       className: "font-vt323 font-bold mr-2"
                                     }, ">"), "No front-running"), React.createElement("li", undefined, React.createElement("span", {
                                       className: "font-vt323 font-bold mr-2"
-                                    }, ">"), "No fees")))), React.createElement("div", {
+                                    }, ">"), "No fees")), React.createElement("div", {
+                              className: "my-2 inline-block"
+                            }, React.createElement("a", {
+                                  href: "https://docs.float.capital/docs/",
+                                  rel: "noopener noreferrer",
+                                  target: "_blank"
+                                }, React.createElement(Button.make, {
+                                      children: "Learn more"
+                                    }))))), React.createElement("div", {
                       className: "hidden md:block absolute bottom-10 right-10"
                     }, React.createElement(FeaturedMarkets.make, {}))));
 }
