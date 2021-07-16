@@ -27,7 +27,7 @@ let make = (~orderPostion, ~orderPostionMobile, ~marketName, ~isLong, ~apy, ~flo
         </span>
         {" FLOAT rewards"->React.string}
       </h3>
-      <p className="text-lg md:text-xl tracking-widest font-vt323">
+      <p className="text-lg md:text-xl tracking-widest font-alphbeta">
         {floatApy->mapAPY->React.string}
       </p>
     </div>
@@ -40,7 +40,7 @@ let make = (~orderPostion, ~orderPostionMobile, ~marketName, ~isLong, ~apy, ~flo
       </h3>
       {switch apy {
       | Loaded(apyVal) =>
-        <p className="text-lg  tracking-widest font-vt323"> {apyVal->mapAPY->React.string} </p>
+        <p className="text-lg  tracking-widest font-alphbeta"> {apyVal->mapAPY->React.string} </p>
       | _ => <Loader.Tiny />
       }}
     </div>
@@ -49,7 +49,7 @@ let make = (~orderPostion, ~orderPostionMobile, ~marketName, ~isLong, ~apy, ~flo
         <span className="font-bold  text-gray-600"> {`Exposure `->React.string} </span>
         <Tooltip tip={`The impact ${marketName} price movements have on the ${tradeType} value`} />
       </h3>
-      <p className="text-lg tracking-widest font-vt323"> {`${beta}%`->React.string} </p>
+      <p className="text-lg tracking-widest font-alphbeta"> {`${beta}%`->React.string} </p>
     </div>
   </div>
 }
