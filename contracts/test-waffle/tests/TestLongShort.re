@@ -172,7 +172,7 @@ describe("Float System", () => {
     });
 
     before_each(() => {
-      let%AwaitThen deployedContracts =
+      let%Await deployedContracts =
         Helpers.inititialize(
           ~admin=accounts.contents->Array.getUnsafe(0),
           ~exposeInternals=true,
@@ -183,13 +183,11 @@ describe("Float System", () => {
 
       let testUser = accounts.contents->Array.getUnsafe(1);
 
-      let%Await _ =
-        firstMarketPaymentToken->Contract.PaymentTokenHelpers.mintAndApprove(
-          ~user=testUser,
-          ~spender=deployedContracts.longShort.address,
-          ~amount=Ethers.BigNumber.fromUnsafe("10000000000000000000000"),
-        );
-      ();
+      firstMarketPaymentToken->Contract.PaymentTokenHelpers.mintAndApprove(
+        ~user=testUser,
+        ~spender=deployedContracts.longShort.address,
+        ~amount=Ethers.BigNumber.fromUnsafe("10000000000000000000000"),
+      );
     });
     InitializeMarket.testUnit(~contracts, ~accounts);
     UpdateSystemState.testUnit(~contracts, ~accounts);
@@ -198,5 +196,6 @@ describe("Float System", () => {
     UtilsHelpers.testUnit(~contracts, ~accounts);
     GetUsersConfirmedButNotSettledBalance.testUnit(~contracts, ~accounts);
     PriceCalculationFunctions.testUnit(~contracts, ~accounts);
+    BatchedSettlement.testUnit(~contracts, ~accounts);
   });
 });
