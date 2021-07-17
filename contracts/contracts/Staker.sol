@@ -8,6 +8,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinte
 import "./interfaces/IFloatToken.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/IStaker.sol";
+import "./interfaces/ISyntheticToken.sol";
 
 contract Staker is IStaker, Initializable {
   /*╔═════════════════════════════╗
@@ -22,8 +23,8 @@ contract Staker is IStaker, Initializable {
   address public floatCapital;
   uint256 public floatPercentage;
 
-  ILongShort public longShort;
-  IFloatToken public floatToken;
+  address public longShort;
+  address public floatToken;
 
   // Market specific
   mapping(uint32 => uint256) public marketLaunchIncentivePeriod; // seconds
@@ -32,9 +33,9 @@ contract Staker is IStaker, Initializable {
   mapping(uint32 => uint256) public balanceIncentiveCurveExponent;
   mapping(uint32 => int256) public balanceIncentiveCurveEquilibriumOffset;
 
-  mapping(uint32 => mapping(bool => ISyntheticToken)) public syntheticTokens;
+  mapping(uint32 => mapping(bool => address)) public syntheticTokens;
 
-  mapping(ISyntheticToken => uint32) public marketIndexOfToken;
+  mapping(address => uint32) public marketIndexOfToken;
 
   // Reward specific
   mapping(uint32 => uint256) public latestRewardIndex;
@@ -47,7 +48,7 @@ contract Staker is IStaker, Initializable {
 
   // User specific
   mapping(uint32 => mapping(address => uint256)) public userIndexOfLastClaimedReward;
-  mapping(ISyntheticToken => mapping(address => uint256)) public userAmountStaked;
+  mapping(address => mapping(address => uint256)) public userAmountStaked;
 
   /*╔════════════════════════════╗
     ║           EVENTS           ║
@@ -109,7 +110,7 @@ contract Staker is IStaker, Initializable {
     _;
   }
 
-  modifier onlyValidSynthetic(ISyntheticToken _synth) virtual {
+  modifier onlyValidSynthetic(address _synth) virtual {
     require(marketIndexOfToken[_synth] != 0, "not valid synth");
     _;
   }
@@ -144,8 +145,8 @@ contract Staker is IStaker, Initializable {
     );
     admin = _admin;
     floatCapital = _floatCapital;
-    longShort = ILongShort(_longShort);
-    floatToken = IFloatToken(_floatToken);
+    longShort = (_longShort);
+    floatToken = (_floatToken);
 
     _changeFloatPercentage(_floatPercentage);
 
@@ -260,8 +261,8 @@ contract Staker is IStaker, Initializable {
 
   function addNewStakingFund(
     uint32 marketIndex,
-    ISyntheticToken longToken,
-    ISyntheticToken shortToken,
+    address longToken,
+    address shortToken,
     uint256 kInitialMultiplier,
     uint256 kPeriod,
     uint256 unstakeFeeBasisPoints,
@@ -554,8 +555,8 @@ contract Staker is IStaker, Initializable {
       uint256 shortFloatReward
     )
   {
-    ISyntheticToken longToken = syntheticTokens[marketIndex][true];
-    ISyntheticToken shortToken = syntheticTokens[marketIndex][false];
+    address longToken = syntheticTokens[marketIndex][true];
+    address shortToken = syntheticTokens[marketIndex][false];
 
     uint256 amountStakedLong = userAmountStaked[longToken][user];
     uint256 amountStakedShort = userAmountStaked[shortToken][user];
@@ -586,8 +587,8 @@ contract Staker is IStaker, Initializable {
   }
 
   function _mintFloat(address user, uint256 floatToMint) internal virtual {
-    floatToken.mint(user, floatToMint);
-    floatToken.mint(floatCapital, (floatToMint * floatPercentage) / 1e18);
+    IFloatToken(floatToken).mint(user, floatToMint);
+    IFloatToken(floatToken).mint(floatCapital, (floatToMint * floatPercentage) / 1e18);
   }
 
   function _mintAccumulatedFloat(uint32 marketIndex, address user) internal virtual {
@@ -655,7 +656,7 @@ contract Staker is IStaker, Initializable {
 
   function claimFloatCustom(uint32[] calldata marketIndexes) external {
     require(marketIndexes.length <= 50); // Set some (arbitrary) limit on loop length
-    longShort.updateSystemStateMulti(marketIndexes);
+    ILongShort(longShort).updateSystemStateMulti(marketIndexes);
     _claimFloat(marketIndexes);
   }
 
@@ -672,14 +673,14 @@ contract Staker is IStaker, Initializable {
     public
     virtual
     override
-    onlyValidSynthetic(ISyntheticToken(msg.sender))
+    onlyValidSynthetic((msg.sender))
   {
-    longShort.updateSystemState(marketIndexOfToken[ISyntheticToken(msg.sender)]);
-    _stake(ISyntheticToken(msg.sender), amount, from);
+    ILongShort(longShort).updateSystemState(marketIndexOfToken[(msg.sender)]);
+    _stake((msg.sender), amount, from);
   }
 
   function _stake(
-    ISyntheticToken token,
+    address token,
     uint256 amount,
     address user
   ) internal virtual {
@@ -708,7 +709,7 @@ contract Staker is IStaker, Initializable {
     Withdraw function.
     Mint user any outstanding float before
     */
-  function _withdraw(ISyntheticToken token, uint256 amount) internal virtual {
+  function _withdraw(address token, uint256 amount) internal virtual {
     uint32 marketIndex = marketIndexOfToken[token];
     require(userAmountStaked[token][msg.sender] > 0, "nothing to withdraw");
     _mintAccumulatedFloat(marketIndex, msg.sender);
@@ -718,19 +719,19 @@ contract Staker is IStaker, Initializable {
     // TODO STENT what happens with the fees that are left in this contract?
     uint256 amountFees = (amount * marketUnstakeFeeBasisPoints[marketIndex]) / 1e18;
 
-    token.transfer(msg.sender, amount - amountFees);
+    IERC20(token).transfer(msg.sender, amount - amountFees);
 
     emit StakeWithdrawn(msg.sender, address(token), amount);
   }
 
-  function withdraw(ISyntheticToken token, uint256 amount) external {
-    longShort.updateSystemState(marketIndexOfToken[token]);
+  function withdraw(address token, uint256 amount) external {
+    ILongShort(longShort).updateSystemState(marketIndexOfToken[token]);
 
     _withdraw(token, amount);
   }
 
-  function withdrawAll(ISyntheticToken token) external {
-    longShort.updateSystemState(marketIndexOfToken[token]);
+  function withdrawAll(address token) external {
+    ILongShort(longShort).updateSystemState(marketIndexOfToken[token]);
 
     _withdraw(token, userAmountStaked[token][msg.sender]);
   }

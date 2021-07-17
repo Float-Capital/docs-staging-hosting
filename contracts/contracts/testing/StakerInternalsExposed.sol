@@ -3,9 +3,6 @@
 pragma solidity 0.8.3;
 
 import "./generated/StakerMockable.sol";
-import "../interfaces/ISyntheticToken.sol";
-import "../interfaces/ILongShort.sol";
-import "hardhat/console.sol";
 
 /*
 NOTE: This contract is for testing purposes only!
@@ -17,8 +14,8 @@ contract StakerInternalsExposed is StakerMockable {
   ///////////////////////////////////////////////
   function setFloatRewardCalcParams(
     uint32 marketIndex,
-    ISyntheticToken longToken,
-    ISyntheticToken shortToken,
+    address longToken,
+    address shortToken,
     uint256 newLatestRewardIndex,
     address user,
     uint256 usersLatestClaimedReward,
@@ -52,12 +49,12 @@ contract StakerInternalsExposed is StakerMockable {
 
   function setAddNewStakingFundParams(
     uint32 marketIndex,
-    ISyntheticToken longToken,
-    ISyntheticToken shortToken,
-    ISyntheticToken mockAddress,
+    address longToken,
+    address shortToken,
+    address mockAddress,
     address longShortAddress
   ) public {
-    longShort = ILongShort(longShortAddress);
+    longShort = address(longShortAddress);
     marketIndexOfToken[longToken] = marketIndex;
     marketIndexOfToken[shortToken] = marketIndex;
 
@@ -70,7 +67,7 @@ contract StakerInternalsExposed is StakerMockable {
   }
 
   function setAddNewStateForFloatRewardsParams(address longShortAddress) external {
-    longShort = ILongShort(longShortAddress);
+    longShort = (longShortAddress);
   }
 
   function setGetMarketLaunchIncentiveParametersParams(
@@ -88,10 +85,10 @@ contract StakerInternalsExposed is StakerMockable {
 
   function setStakeFromUserParams(
     address longshort,
-    ISyntheticToken token,
+    address token,
     uint32 marketIndexForToken
   ) external {
-    longShort = ILongShort(longshort);
+    longShort = address(longshort);
     marketIndexOfToken[token] = marketIndexForToken;
   }
 
@@ -125,15 +122,15 @@ contract StakerInternalsExposed is StakerMockable {
   }
 
   function set_updateStateParams(
-    ILongShort longShort,
-    ISyntheticToken token,
+    address longShort,
+    address token,
     uint32 tokenMarketIndex
   ) public {
     longShort = longShort;
     marketIndexOfToken[token] = tokenMarketIndex;
   }
 
-  function set_mintFloatParams(IFloatToken _floatToken, uint16 _floatPercentage) public {
+  function set_mintFloatParams(address _floatToken, uint16 _floatPercentage) public {
     floatToken = _floatToken;
     floatPercentage = _floatPercentage;
   }
@@ -146,14 +143,14 @@ contract StakerInternalsExposed is StakerMockable {
   }
 
   function setClaimFloatCustomParams(address longshortAddress) external {
-    longShort = ILongShort(longshortAddress);
+    longShort = address(longshortAddress);
   }
 
   function set_stakeParams(
     address user,
     uint32 marketIndex,
     uint256 _latestRewardIndex,
-    ISyntheticToken token,
+    address token,
     uint256 _userAmountStaked,
     uint256 userLastRewardIndex
   ) external {
