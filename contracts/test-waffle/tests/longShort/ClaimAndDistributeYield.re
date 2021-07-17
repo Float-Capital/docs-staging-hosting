@@ -1,6 +1,7 @@
+open LetOps;
 open Mocha;
 open Globals;
-open LetOps;
+open Helpers;
 
 let testUnit =
     (
@@ -13,7 +14,8 @@ let testUnit =
     let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
     let syntheticTokenPoolValueShort = Helpers.randomTokenAmount();
     let mockedYieldManager = ref(None->Obj.magic);
-    before_each(() => {
+
+    let setup = (~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort) => {
       let {markets, longShort} = contracts.contents;
       let {yieldManager} = markets->Array.getUnsafe(marketIndex);
       let%Await mockYieldManager = yieldManager->YieldManagerMockSmocked.make;
@@ -37,50 +39,116 @@ let testUnit =
       mockYieldManager->YieldManagerMockSmocked.mockClaimYieldAndGetMarketAmountToReturn(
         targetMarketAmount,
       );
-    });
-    it(
+    };
+    it_only(
       "gets the yield split from _getYieldSplit (passing it the correct parameters)",
-      () =>
-      Js.log("TODO")
-    );
-    it(
-      "gets the yield accreud for the market the yield manager by calling `claimYieldAndGetMarketAmount` with the correct arguments",
       () => {
+        let%Await _ =
+          setup(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
         let longShort = contracts.contents.longShort;
         let totalValueRealizedForMarket =
           syntheticTokenPoolValueLong->add(syntheticTokenPoolValueShort);
 
+        let%Await _ =
+          longShort->LongShort.Exposed._getYieldSplitExposed(
+            ~longValue=syntheticTokenPoolValueLong,
+            ~shortValue=syntheticTokenPoolValueShort,
+            ~totalValueLockedInMarket=totalValueRealizedForMarket,
+          );
+        ();
+      },
+    );
+    it_only(
+      "gets the yield accrued for the market from yield manager by calling `claimYieldAndGetMarketAmount` with the correct arguments",
+      () => {
+        let%Await _ =
+          setup(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+        let longShort = contracts.contents.longShort;
+        let totalValueRealizedForMarket =
+          syntheticTokenPoolValueLong->add(syntheticTokenPoolValueShort);
         let%Await {treasuryPercentE18} =
           longShort->LongShort.Exposed._getYieldSplitExposed(
             ~longValue=syntheticTokenPoolValueLong,
             ~shortValue=syntheticTokenPoolValueShort,
             ~totalValueLockedInMarket=totalValueRealizedForMarket,
           );
-
         let%Await _ =
           longShort->LongShort.Exposed._claimAndDistributeYieldExposed(
             ~marketIndex,
           );
-
         let claimYieldAndGetMarketAmountCalls =
           mockedYieldManager.contents
           ->YieldManagerMockSmocked.claimYieldAndGetMarketAmountCalls;
-
         Chai.recordArrayDeepEqualFlat(
           claimYieldAndGetMarketAmountCalls,
           [|{totalValueRealizedForMarket, treasuryPercentE18}|],
         );
       },
     );
-    it(
-      "adds the amount due for the market to the `syntheticTokenPoolValue` of the under balanced side (when long is under balanced)",
-      () =>
-      Js.log("TODO")
+
+    let testPoolValueUpdatesCorrectly =
+        (~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort) => {
+      let longShort = contracts.contents.longShort;
+
+      let isLongSideUnderbalanced =
+        syntheticTokenPoolValueLong->bnLt(syntheticTokenPoolValueShort);
+
+      let expectedResult =
+        isLongSideUnderbalanced
+          ? syntheticTokenPoolValueLong->add(targetMarketAmount)
+          : syntheticTokenPoolValueShort->add(targetMarketAmount);
+
+      let%Await _ =
+        setup(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+
+      let%Await _ =
+        longShort->LongShort.Exposed._claimAndDistributeYieldExposed(
+          ~marketIndex,
+        );
+
+      let%Await marketAmountAfterCall =
+        longShort->LongShort.syntheticTokenPoolValue(
+          marketIndex,
+          isLongSideUnderbalanced,
+        );
+
+      Chai.bnEqual(
+        ~message=
+          "expectedResult and result after `_claimAndDistributeYield` not the same",
+        expectedResult,
+        marketAmountAfterCall,
+      );
+    };
+
+    it_only(
+      "adds the amount due for the market to the `syntheticTokenPoolValue` of the underbalanced side (when long is underbalanced)",
+      () => {
+        let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
+        let syntheticTokenPoolValueShort =
+          syntheticTokenPoolValueLong->add(Helpers.randomTokenAmount());
+
+        testPoolValueUpdatesCorrectly(
+          ~syntheticTokenPoolValueLong,
+          ~syntheticTokenPoolValueShort,
+        );
+      },
     );
-    it(
-      "adds the amount due for the market to the `syntheticTokenPoolValue` of the under balanced side (when short is under balanced)",
-      () =>
-      Js.log("TODO")
+
+    it_only(
+      "adds the amount due for the market to the `syntheticTokenPoolValue` of the underbalanced side (when short is underbalanced)",
+      () => {
+        let syntheticTokenPoolValueShort = Helpers.randomTokenAmount();
+        let syntheticTokenPoolValueLong =
+          syntheticTokenPoolValueShort->add(
+            Helpers.randomTokenAmount()->add(Helpers.randomTokenAmount()),
+          );
+
+        testPoolValueUpdatesCorrectly(
+          ~syntheticTokenPoolValueLong,
+          ~syntheticTokenPoolValueShort,
+        );
+      },
     );
+    ();
   });
 };
