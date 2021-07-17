@@ -749,6 +749,7 @@ contract LongShort is ILongShort, Initializable {
     int256 agregateSynthTokensToMintLong;
     int256 agregateSynthTokensToMintShort;
 
+    // Handle batched deposits LONG
     uint256 amountPaymentTokensToDepositToYieldManagerLong = batchedAmountOfTokensToDeposit[
       marketIndex
     ][true];
@@ -765,6 +766,7 @@ contract LongShort is ILongShort, Initializable {
       );
     }
 
+    // Handle batched deposits SHORT
     uint256 amountPaymentTokensToDepositToYieldManagerShort = batchedAmountOfTokensToDeposit[
       marketIndex
     ][false];
@@ -781,6 +783,7 @@ contract LongShort is ILongShort, Initializable {
       );
     }
 
+    // Handle batched redeems LONG
     uint256 amountSynthToRedeemLong = batchedAmountOfSynthTokensToRedeem[marketIndex][true];
     if (amountSynthToRedeemLong > 0) {
       updatedPooledAmountLong -= int256(
@@ -791,6 +794,7 @@ contract LongShort is ILongShort, Initializable {
       batchedAmountOfSynthTokensToRedeem[marketIndex][true] = 0;
     }
 
+    // Handle batched redeems SHORT
     uint256 amountSynthToRedeemShort = batchedAmountOfSynthTokensToRedeem[marketIndex][false];
     if (amountSynthToRedeemShort > 0) {
       updatedPooledAmountShort -= int256(
