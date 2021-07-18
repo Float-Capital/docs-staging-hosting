@@ -40,25 +40,24 @@ let testUnit =
         targetMarketAmount,
       );
     };
-    it_only(
+    it(
       "gets the yield split from _getYieldSplit (passing it the correct parameters)",
       () => {
-        let%Await _ =
-          setup(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
-        let longShort = contracts.contents.longShort;
-        let totalValueRealizedForMarket =
-          syntheticTokenPoolValueLong->add(syntheticTokenPoolValueShort);
+      let%Await _ =
+        setup(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+      let longShort = contracts.contents.longShort;
+      let totalValueRealizedForMarket =
+        syntheticTokenPoolValueLong->add(syntheticTokenPoolValueShort);
 
-        let%Await _ =
-          longShort->LongShort.Exposed._getYieldSplitExposed(
-            ~longValue=syntheticTokenPoolValueLong,
-            ~shortValue=syntheticTokenPoolValueShort,
-            ~totalValueLockedInMarket=totalValueRealizedForMarket,
-          );
-        ();
-      },
-    );
-    it_only(
+      let%Await _ =
+        longShort->LongShort.Exposed._getYieldSplitExposed(
+          ~longValue=syntheticTokenPoolValueLong,
+          ~shortValue=syntheticTokenPoolValueShort,
+          ~totalValueLockedInMarket=totalValueRealizedForMarket,
+        );
+      ();
+    });
+    it(
       "gets the yield accrued for the market from yield manager by calling `claimYieldAndGetMarketAmount` with the correct arguments",
       () => {
         let%Await _ =
@@ -120,7 +119,7 @@ let testUnit =
       );
     };
 
-    it_only(
+    it(
       "adds the amount due for the market to the `syntheticTokenPoolValue` of the underbalanced side (when long is underbalanced)",
       () => {
         let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
@@ -134,7 +133,7 @@ let testUnit =
       },
     );
 
-    it_only(
+    it(
       "adds the amount due for the market to the `syntheticTokenPoolValue` of the underbalanced side (when short is underbalanced)",
       () => {
         let syntheticTokenPoolValueShort = Helpers.randomTokenAmount();
