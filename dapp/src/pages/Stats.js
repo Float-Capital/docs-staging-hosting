@@ -114,7 +114,7 @@ function syntheticAssetsCard(totalSynthValue) {
                   children: null
                 }, "Synthetic Assets", React.createElement("img", {
                       className: "inline h-5 ml-2",
-                      src: "/img/coin.png"
+                      src: "/icons/dollar-coin.png"
                     })), React.createElement("div", {
                   className: "p-6 py-4 text-center"
                 }, React.createElement("div", undefined, React.createElement("span", {

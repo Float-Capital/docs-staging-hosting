@@ -165,14 +165,26 @@ function useTotalClaimableFloatForUser(userId, synthTokens) {
                           };
                   }
                   var match = curState._0;
+                  var totalPredicted = match[1];
+                  var totalClaimable = match[0];
+                  if (stake.currentStake.withdrawn) {
+                    return {
+                            TAG: 1,
+                            _0: [
+                              totalClaimable,
+                              totalPredicted
+                            ],
+                            [Symbol.for("name")]: "Response"
+                          };
+                  }
                   var amount = stake.currentStake.amount;
                   var timestamp = stake.lastMintState.timestamp;
                   var isLong = stake.syntheticToken.id === stake.lastMintState.longToken.id;
                   var lastAccumulativeFloatPerToken = isLong ? stake.lastMintState.accumulativeFloatPerTokenLong : stake.lastMintState.accumulativeFloatPerTokenShort;
                   var accumulativeFloatPerToken = isLong ? stake.syntheticMarket.latestStakerState.accumulativeFloatPerTokenLong : stake.syntheticMarket.latestStakerState.accumulativeFloatPerTokenShort;
                   var floatRatePerTokenOverInterval = isLong ? stake.syntheticMarket.latestStakerState.floatRatePerTokenOverIntervalLong : stake.syntheticMarket.latestStakerState.floatRatePerTokenOverIntervalShort;
-                  var claimableFloat = accumulativeFloatPerToken.sub(lastAccumulativeFloatPerToken).mul(amount).div(CONSTANTS.tenToThe42).add(match[0]);
-                  var predictedFloat = currentTimestamp.sub(timestamp).mul(floatRatePerTokenOverInterval).mul(amount).div(CONSTANTS.tenToThe42).add(match[1]);
+                  var claimableFloat = accumulativeFloatPerToken.sub(lastAccumulativeFloatPerToken).mul(amount).div(CONSTANTS.tenToThe42).add(totalClaimable);
+                  var predictedFloat = currentTimestamp.sub(timestamp).mul(floatRatePerTokenOverInterval).mul(amount).div(CONSTANTS.tenToThe42).add(totalPredicted);
                   return {
                           TAG: 1,
                           _0: [
@@ -222,7 +234,9 @@ function useStakesForUser(userId) {
   if (match !== undefined) {
     return {
             TAG: 1,
-            _0: match.currentStakes,
+            _0: Belt_Array.keep(match.currentStakes, (function (x) {
+                    return x.currentStake.withdrawn === false;
+                  })),
             [Symbol.for("name")]: "Response"
           };
   }
