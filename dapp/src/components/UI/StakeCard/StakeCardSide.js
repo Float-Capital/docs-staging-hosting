@@ -18,7 +18,6 @@ function mapVal(apy) {
 function StakeCardSide(Props) {
   var orderPostion = Props.orderPostion;
   var orderPostionMobile = Props.orderPostionMobile;
-  var marketName = Props.marketName;
   var isLong = Props.isLong;
   var apy = Props.apy;
   var floatApy = Props.floatApy;
@@ -30,12 +29,8 @@ function StakeCardSide(Props) {
     );
   return React.createElement("div", {
               className: "order-" + String(orderPostionMobile) + " md:order-" + String(orderPostion) + " w-1/2 md:w-1/4 flex items-center flex grow flex-wrap flex-col"
-            }, React.createElement("h2", {
-                  className: "font-bold text-sm"
-                }, marketName, React.createElement("span", {
-                      className: "text-xs"
-                    }, isLong ? "↗️" : "↘️")), React.createElement("div", {
-                  className: "flex flex-col items-center justify-center pt-0 mt-auto"
+            }, React.createElement("div", {
+                  className: "flex flex-col items-center justify-center pt-0"
                 }, React.createElement("h3", {
                       className: "text-xs mt-2"
                     }, React.createElement("span", {
@@ -43,7 +38,7 @@ function StakeCardSide(Props) {
                         }, isLong ? "LONG" : "SHORT"), " FLOAT rewards"), React.createElement("p", {
                       className: "text-2xl md:text-4xl tracking-widest font-alphbeta"
                     }, mapVal(floatApy))), React.createElement("div", {
-                  className: "flex flex-col items-center justify-center pt-0 mt-auto text-gray-600"
+                  className: "flex flex-col items-center justify-center pt-0 text-gray-600"
                 }, React.createElement("h3", {
                       className: "text-xxs mt-1"
                     }, React.createElement("span", {

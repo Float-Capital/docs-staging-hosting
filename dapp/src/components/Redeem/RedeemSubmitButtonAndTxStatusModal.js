@@ -8,14 +8,32 @@ var React = require("react");
 var Button = require("../UI/Base/Button.js");
 var Config = require("../../config/Config.js");
 var Loader = require("../UI/Base/Loader.js");
+var DataHooks = require("../../data/DataHooks.js");
+var ProgressBar = require("../UI/Base/ProgressBar.js");
+var ViewProfileButton = require("../UI/ViewProfileButton.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
+
+function useRerender(param) {
+  var match = React.useState(function () {
+        return 0;
+      });
+  var setV = match[1];
+  return function (param) {
+    return Curry._1(setV, (function (v) {
+                  return v + 1 | 0;
+                }));
+  };
+}
 
 function RedeemSubmitButtonAndTxStatusModal(Props) {
   var txStateRedeem = Props.txStateRedeem;
   var resetFormButton = Props.resetFormButton;
   var buttonText = Props.buttonText;
   var buttonDisabled = Props.buttonDisabled;
+  var marketIndex = Props.marketIndex;
+  var rerender = useRerender(undefined);
+  var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toString());
   if (typeof txStateRedeem === "number") {
     if (txStateRedeem === /* UnInitialised */0) {
       return React.createElement(Button.make, {
@@ -48,7 +66,9 @@ function RedeemSubmitButtonAndTxStatusModal(Props) {
                               className: "text-center m-3"
                             }, React.createElement("div", {
                                   className: "m-2"
-                                }, React.createElement(Loader.Mini.make, {})), React.createElement("p", undefined, "Redeem transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                                }, React.createElement(Loader.Mini.make, {})), React.createElement("p", undefined, "Redeem transaction pending... "), React.createElement("p", {
+                                  className: "text-xxs text-yellow-600"
+                                }, "⚡ Redeeming your position requires a second withdraw transaction once the oracle price has updated ⚡"), React.createElement(ViewOnBlockExplorer.make, {
                                   txHash: txStateRedeem._0
                                 }))
                       }), React.createElement(Button.make, {
@@ -66,11 +86,23 @@ function RedeemSubmitButtonAndTxStatusModal(Props) {
                             }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {}))
                       }), Curry._1(resetFormButton, undefined));
     case /* Complete */2 :
+        var tmp;
+        tmp = typeof lastOracleTimestamp === "number" ? React.createElement(Loader.Tiny.make, {}) : (
+            lastOracleTimestamp.TAG === /* GraphError */0 ? React.createElement("p", undefined, lastOracleTimestamp._0) : React.createElement(ProgressBar.make, {
+                    txConfirmedTimestamp: 1,
+                    nextPriceUpdateTimestamp: lastOracleTimestamp._0.toNumber() + 30 | 0,
+                    rerenderCallback: rerender
+                  })
+          );
         return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
                         id: 8,
                         children: React.createElement("div", {
                               className: "text-center m-3"
-                            }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"))
+                            }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement("p", {
+                                  className: "text-xxs text-gray-700"
+                                }, "You can withdraw your " + Config.paymentTokenName + " on the next oracle price update"), tmp, React.createElement(ViewOnBlockExplorer.make, {
+                                  txHash: txStateRedeem._0.transactionHash
+                                }), React.createElement(ViewProfileButton.make, {}))
                       }), Curry._1(resetFormButton, undefined));
     case /* Failed */3 :
         return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
@@ -87,5 +119,6 @@ function RedeemSubmitButtonAndTxStatusModal(Props) {
 
 var make = RedeemSubmitButtonAndTxStatusModal;
 
+exports.useRerender = useRerender;
 exports.make = make;
 /* Tick Not a pure module */

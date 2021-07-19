@@ -27,7 +27,7 @@ var RedeemSubmitButtonAndTxStatusModal = require("./RedeemSubmitButtonAndTxStatu
 
 var validators = {
   amount: {
-    strategy: /* OnFirstBlur */0,
+    strategy: /* OnFirstSuccessOrFirstBlur */3,
     validate: (function (param) {
         return Form.Validators.etherNumberInput(param.amount);
       })
@@ -455,7 +455,9 @@ function RedeemForm$RedeemFormInput(Props) {
                   onBlur: onBlur,
                   onChange: onChange,
                   onMaxClick: onMaxClick
-                }), submitButton);
+                }), submitButton, value === "" ? null : React.createElement("p", {
+                    className: "text-xxs text-yellow-600 text-center mt-3"
+                  }, "⚡ Redeeming your position requires a second withdraw transaction once the oracle price has updated ⚡"));
 }
 
 var RedeemFormInput = {
@@ -614,52 +616,46 @@ function RedeemForm$ConnectedRedeemForm(Props) {
           
         }), [txState]);
   if (match[2]) {
-    return React.createElement(React.Fragment, undefined, React.createElement(RedeemForm$RedeemFormInput, {
-                    onSubmit: form.submit,
-                    value: form.input.amount,
-                    optBalance: optTokenBalance,
-                    disabled: form.submitting,
-                    onChange: (function ($$event) {
-                        return Curry._2(form.updateAmount, (function (param, amount) {
-                                      return {
-                                              amount: amount
-                                            };
-                                    }), $$event.target.value);
-                      }),
-                    onBlur: (function (param) {
-                        return Curry._1(form.blurAmount, undefined);
-                      }),
-                    onMaxClick: (function (param) {
-                        return Curry._2(form.updateAmount, (function (param, amount) {
-                                      return {
-                                              amount: amount
-                                            };
-                                    }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
-                      }),
-                    onChangeSide: (function (newPosition) {
-                        router.query["actionOption"] = newPosition;
-                        router.query["token"] = isActuallyLong ? Ethers.Utils.ethAdrToLowerStr(market.syntheticLong.tokenAddress) : Ethers.Utils.ethAdrToLowerStr(market.syntheticShort.tokenAddress);
-                        return Next.Router.pushObjShallow(router, {
-                                    pathname: router.pathname,
-                                    query: router.query
-                                  });
-                      }),
-                    isLong: isActuallyLong,
-                    hasBothTokens: match[3],
-                    submitButton: React.createElement(RedeemSubmitButtonAndTxStatusModal.make, {
-                          txStateRedeem: txState,
-                          resetFormButton: resetFormButton,
-                          buttonText: match$4[1],
-                          buttonDisabled: true
-                        })
-                  }), React.createElement("p", {
-                    className: "text-center p-2"
-                  }, "Redeem is temporarily disabled on the app", React.createElement("br", undefined), React.createElement("a", {
-                        className: "underline text-xs",
-                        href: "http://gph.is/1fymjns",
-                        rel: "noopener noreferrer",
-                        target: "_"
-                      }, "mine")));
+    return React.createElement(RedeemForm$RedeemFormInput, {
+                onSubmit: form.submit,
+                value: form.input.amount,
+                optBalance: optTokenBalance,
+                disabled: form.submitting,
+                onChange: (function ($$event) {
+                    return Curry._2(form.updateAmount, (function (param, amount) {
+                                  return {
+                                          amount: amount
+                                        };
+                                }), $$event.target.value);
+                  }),
+                onBlur: (function (param) {
+                    return Curry._1(form.blurAmount, undefined);
+                  }),
+                onMaxClick: (function (param) {
+                    return Curry._2(form.updateAmount, (function (param, amount) {
+                                  return {
+                                          amount: amount
+                                        };
+                                }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
+                  }),
+                onChangeSide: (function (newPosition) {
+                    router.query["actionOption"] = newPosition;
+                    router.query["token"] = isActuallyLong ? Ethers.Utils.ethAdrToLowerStr(market.syntheticLong.tokenAddress) : Ethers.Utils.ethAdrToLowerStr(market.syntheticShort.tokenAddress);
+                    return Next.Router.pushObjShallow(router, {
+                                pathname: router.pathname,
+                                query: router.query
+                              });
+                  }),
+                isLong: isActuallyLong,
+                hasBothTokens: match[3],
+                submitButton: React.createElement(RedeemSubmitButtonAndTxStatusModal.make, {
+                      txStateRedeem: txState,
+                      resetFormButton: resetFormButton,
+                      buttonText: match$4[1],
+                      buttonDisabled: match$4[2],
+                      marketIndex: marketIndex
+                    })
+              });
   } else {
     return React.createElement("p", undefined, "No tokens in this market to redeem");
   }

@@ -6,7 +6,7 @@ let make = (~children) => {
       <div className="flex flex-col h-screen">
         <ComingSoon />
         <Navigation />
-        <div className="m-auto w-full pt-20">
+        <div className="m-auto w-full pt-20 overflow-y-scroll">
           {switch chainId {
           | Some(chainId) if chainId == Config.networkId => children
           | None => children
