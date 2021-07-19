@@ -16,7 +16,7 @@ module.exports = {
   organizationName: "float-capital",
   projectName: "float.Capital docs",
   themeConfig: {
-    googleAnalytics: {
+    gtag: {
       trackingID: "G-C6SBFSRFEQ",
     },
     navbar: {
@@ -102,7 +102,6 @@ module.exports = {
       "@docusaurus/preset-classic",
       {
         docs: {
-          // sidebarPath: require.resolve("./sidebars.js"),
           sidebarPath:
             process.env.ENVIRONMENT == "staging"
               ? require.resolve("./staging-sidebars.js")
