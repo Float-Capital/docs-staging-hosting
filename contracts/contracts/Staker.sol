@@ -75,7 +75,17 @@ contract Staker is IStaker, Initializable {
 
   event StakeWithdrawn(address user, address token, uint256 amount);
 
-  event FloatMinted(address user, uint32 marketIndex);
+  // TODO: remove `FloatMinted` and replace it with `FloatMintedNew`
+  event FloatMinted(
+    address user,
+    uint32 marketIndex,
+    uint256 amountLong,
+    uint256 amountShort,
+    uint256 lastMintIndex
+  );
+
+  // Note: the `amountFloatMinted` isn't strictly needed by the graph, but it is good to add it to validate calculations are accurate.
+  event FloatMintedNew(address user, uint32 marketIndex, uint256 amountFloatMinted);
 
   event MarketLaunchIncentiveParametersChanges(
     uint32 marketIndex,
@@ -586,9 +596,16 @@ contract Staker is IStaker, Initializable {
       // Set the user has claimed up until now, stops them setting this forward
       userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[marketIndex];
 
-      emit FloatMinted(user, marketIndex);
-
       _mintFloat(user, floatToMint);
+      // TODO: remove `FloatMinted` and replace it with `FloatMintedNew`
+      emit FloatMinted(
+        user,
+        marketIndex,
+        floatToMint,
+        0, /*Setting this to zero has no effect on the graph, just here so the graph doesn't break in the mean time*/
+        latestRewardIndex[marketIndex]
+      );
+      emit FloatMintedNew(user, marketIndex, floatToMint);
     }
   }
 
@@ -604,9 +621,17 @@ contract Staker is IStaker, Initializable {
         // Set the user has claimed up until now, stops them setting this forward
         userIndexOfLastClaimedReward[marketIndexes[i]][user] = latestRewardIndex[marketIndexes[i]];
 
-        emit FloatMinted(user, marketIndexes[i]);
-
         floatTotal += floatToMint;
+
+        // TODO: remove `FloatMinted` and replace it with `FloatMintedNew`
+        emit FloatMinted(
+          user,
+          marketIndexes[i],
+          floatToMint,
+          0, /*Setting this to zero has no effect on the graph, just here so the graph doesn't break in the mean time*/
+          latestRewardIndex[marketIndexes[i]]
+        );
+        emit FloatMintedNew(user, marketIndexes[i], floatToMint);
       }
     }
     if (floatTotal > 0) {
