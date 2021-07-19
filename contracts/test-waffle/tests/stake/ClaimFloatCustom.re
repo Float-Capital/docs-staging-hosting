@@ -76,18 +76,5 @@ let test =
           })
       });
     });
-
-    describe("case more than 50 markets", () => {
-      before_each(() =>
-        setup(
-          ~marketIndices=
-            randomLengthIntegerArr(~minLength=51, ~maxLength=120),
-          ~shouldWaitForTransactionToFinish=false,
-        )
-      );
-      it("reverts", () => {
-        Chai.expectRevertNoReason(~transaction=promiseRef^)
-      });
-    });
   });
 };

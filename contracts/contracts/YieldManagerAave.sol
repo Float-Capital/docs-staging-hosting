@@ -20,9 +20,6 @@ contract YieldManagerAave is IYieldManager {
     ║          VARIABLES          ║
     ╚═════════════════════════════╝*/
 
-  // Fixed-precision constants ///////////////////////////////
-  uint256 public constant TEN_TO_THE_18 = 1e18;
-
   // Addresses ///////////////////////////////////////////////
   address public admin;
   address public longShort;
@@ -115,6 +112,10 @@ contract YieldManagerAave is IYieldManager {
     paymentToken.transfer(longShort, amount);
   }
 
+  /*
+   * This is mainly for withdrawing Matic tokens. Aave rewards these Matic tokens
+   * on Polygon as opposed to the Aave tokens on mainnet.
+   */
   function withdrawErc20TokenToTreasury(address erc20Token) external override treasuryOnly {
     // Redeem other erc20 tokens.
     // Transfer tokens back to Treasury contract.
@@ -134,20 +135,21 @@ contract YieldManagerAave is IYieldManager {
    * much is reserved for the market. The yield is split between
    * the market and the treasury so treasuryPercent = 1 - marketPercent.
    */
-  // TODO STENT not unit tested
   function claimYieldAndGetMarketAmount(
     uint256 totalValueRealizedForMarket,
     uint256 treasuryPercentE18
   ) public override longShortOnly returns (uint256) {
     uint256 totalHeld = aToken.balanceOf(address(this));
 
-    uint256 unrealizedYield = totalHeld - totalValueRealizedForMarket - totalReservedForTreasury;
+    uint256 totalRealized = totalValueRealizedForMarket + totalReservedForTreasury;
 
-    if (unrealizedYield == 0) {
+    if (totalRealized >= totalHeld) {
       return 0;
     }
 
-    uint256 amountForTreasury = (unrealizedYield * treasuryPercentE18) / TEN_TO_THE_18;
+    uint256 unrealizedYield = totalHeld - totalRealized;
+
+    uint256 amountForTreasury = (unrealizedYield * treasuryPercentE18) / 1e18;
     uint256 amountForMarketIncetives = unrealizedYield - amountForTreasury;
 
     totalReservedForTreasury += amountForTreasury;
