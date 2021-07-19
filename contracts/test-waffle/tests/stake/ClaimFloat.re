@@ -43,8 +43,6 @@ let test =
       Helpers.randomInteger(),
     |];
 
-    // let (floatRewardsLongFirst,floatRewardsLongSecond) = Helpers.Tuple.make2(Helpers.randomTokenAmount), // market 0 reward for both
-    // let Helpers.Tuple.make2(() => CONSTANTS.zeroBn) // market 1 no reward for both
     let floatRewardsForMarkets = [|Helpers.randomTokenAmount(), zeroBn|];
 
     let sumFloatRewards = floatRewards =>
@@ -122,11 +120,12 @@ let test =
           Chai.callEmitEvents(
             ~call=promiseRef^,
             ~contract=contracts^.staker->Obj.magic,
-            ~eventName="FloatMinted",
+            ~eventName="FloatMintedNew",
           )
-          ->Chai.withArgs2(
+          ->Chai.withArgs3(
               userWalletRef^.address,
               marketIndices->Array.getExn(0),
+              floatRewardsForMarkets->Array.getUnsafe(0),
             )
         });
 
