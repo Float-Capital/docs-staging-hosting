@@ -143,7 +143,7 @@ contract StakerInternalsExposed is StakerMockable {
   }
 
   function setClaimFloatCustomParams(address longshortAddress) external {
-    longShort = address(longshortAddress);
+    longShort = longshortAddress;
   }
 
   function set_stakeParams(
