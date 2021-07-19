@@ -71,14 +71,18 @@ let test =
           })
       );
 
-      it("emits FloatMinted event", () =>
+      it("emits FloatMinted event", () => {
         Chai.callEmitEvents(
           ~call=promiseRef^,
           ~contract=contracts^.staker->Obj.magic,
-          ~eventName="FloatMinted",
+          ~eventName="FloatMintedNew",
         )
-        ->Chai.withArgs2(user, marketIndex)
-      );
+        ->Chai.withArgs3(
+            user,
+            marketIndex,
+            floatToMintLong->add(floatToMintShort),
+          )
+      });
 
       it("mutates userIndexOfLastClaimedReward", () => {
         let%Await lastClaimed =
