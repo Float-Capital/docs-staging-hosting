@@ -120,11 +120,12 @@ let test =
           Chai.callEmitEvents(
             ~call=promiseRef^,
             ~contract=contracts^.staker->Obj.magic,
-            ~eventName="FloatMinted",
+            ~eventName="FloatMintedNew",
           )
-          ->Chai.withArgs2(
+          ->Chai.withArgs3(
               userWalletRef^.address,
               marketIndices->Array.getExn(0),
+              floatRewardsForMarkets->Array.getUnsafe(0),
             )
         });
 

@@ -728,7 +728,7 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  function handleTotalValueChangeForMarketWithYieldManager(
+  function handleChangeInSynthTokensTotalSuply(
     uint32 marketIndex,
     bool isLong,
     int256 changeInSynthTokensTotalSuply
@@ -808,15 +808,7 @@ contract LongShort is ILongShort, Initializable {
     int256 totalValueChangeForMarket = valueChangeForLong + valueChangeForShort;
     handleTotalValueChangeForMarketWithYieldManager(marketIndex, totalValueChangeForMarket);
 
-    handleTotalValueChangeForMarketWithYieldManager(
-      marketIndex,
-      true,
-      longChangeInSynthTokensTotalSuply
-    );
-    handleTotalValueChangeForMarketWithYieldManager(
-      marketIndex,
-      true,
-      shortChangeInSynthTokensTotalSuply
-    );
+    handleChangeInSynthTokensTotalSuply(marketIndex, true, longChangeInSynthTokensTotalSuply);
+    handleChangeInSynthTokensTotalSuply(marketIndex, false, shortChangeInSynthTokensTotalSuply);
   }
 }
