@@ -129,7 +129,7 @@ function User$UserBalancesCard(Props) {
                   children: null
                 }, "Synthetic assets", React.createElement("img", {
                       className: "inline h-5 ml-2",
-                      src: "/img/coin.png"
+                      src: "/icons/dollar-coin.png"
                     })), tmp, tmp$1);
 }
 
