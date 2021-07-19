@@ -17,6 +17,11 @@ import "./interfaces/IOracleManager.sol";
  **** visit https://float.capital *****
  */
 
+/// @title Core logic of Float Protocal markets
+/// @author float.capital
+/// @notice visit https://float.capital for more info
+/// @dev All functions in this file are currently `virtual`. This is NOT to encourage inheritance. It is merely for convenince when unit testing.
+/// @custom:auditors This contract balances long and short sides.
 contract LongShort is ILongShort, Initializable {
   /*╔═════════════════════════════╗
     ║          VARIABLES          ║
@@ -200,10 +205,13 @@ contract LongShort is ILongShort, Initializable {
     ║       MARKET CREATION       ║
     ╚═════════════════════════════╝*/
 
-  /**
-   * Creates an entirely new long/short market tracking an underlying
-   * oracle price. Make sure the synthetic names/symbols are unique.
-   */
+  /// @notice Creates an entirely new long/short market tracking an underlying oracle price. Make sure the synthetic names/symbols are unique.
+  /// @dev This does not make the market active. That `initializeMarket` function was split out separately to this function to reduce costs.
+  /// @param syntheticName Name of the synthetic asset
+  /// @param syntheticSymbol Symbol for the synthetic asset
+  /// @param _paymentToken The address of the erc20 token used to buy this synthetic asset
+  /// @param _oracleManager The address of the oracle manager that provides the price feed for this market
+  /// @param _yieldManager The contract that manages depositing the paymentToken into a yield bearing protocol
   function newSyntheticMarket(
     string calldata syntheticName,
     string calldata syntheticSymbol,
