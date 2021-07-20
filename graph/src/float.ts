@@ -1,7 +1,6 @@
 import {
   LongShortV1,
   SyntheticTokenCreated,
-  PriceUpdate,
   SystemStateUpdated,
   OracleUpdated,
   NextPriceDeposit,
@@ -421,36 +420,6 @@ export function handleMarketOracleUpdated(event: OracleUpdated): void {
   syntheticMarket.previousOracleAddresses = previousOracles;
 
   syntheticMarket.save();
-}
-
-// TODO: will remove this event in #824
-export function handlePriceUpdate(event: PriceUpdate): void {
-  let marketIndex = event.params.marketIndex;
-  let marketIndexString = marketIndex.toString();
-
-  let newPrice = event.params.newPrice;
-  let oldPrice = event.params.oldPrice;
-  let user = event.params.user;
-  let txHash = event.transaction.hash;
-
-  let syntheticMarket = SyntheticMarket.load(marketIndexString);
-
-  let systemState = getOrCreateLatestSystemState(marketIndex, txHash, event);
-  syntheticMarket.latestSystemState = systemState.id;
-  systemState.save();
-  syntheticMarket.save();
-
-  saveEventToStateChange(
-    event,
-    "PriceUpdate",
-    bigIntArrayToStringArray([marketIndex, oldPrice, newPrice]).concat([
-      user.toHex(),
-    ]),
-    ["marketIndex", "newPrice", "oldPrice", "user"],
-    ["uint32", "uint256", "uint256", "address"],
-    [user],
-    []
-  );
 }
 
 export function handleNextPriceDeposit(event: NextPriceDeposit): void {

@@ -28,7 +28,8 @@ module UserBalancesCard = {
 
     <UserColumnCard>
       <UserColumnHeader>
-        {`Synthetic assets`->React.string} <img className="inline h-5 ml-2" src="/img/coin.png" />
+        {`Synthetic assets`->React.string}
+        <img className="inline h-5 ml-2" src="/icons/dollar-coin.png" />
       </UserColumnHeader>
       {switch usersPendingMintsQuery {
       | Loading => <div className="mx-auto"> <Loader.Mini /> </div>

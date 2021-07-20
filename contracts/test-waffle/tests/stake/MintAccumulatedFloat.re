@@ -28,8 +28,7 @@ let test =
         );
 
       StakerSmocked.InternalMock.mock_calculateAccumulatedFloatToReturn(
-        floatToMintLong,
-        floatToMintShort,
+        floatToMintLong->add(floatToMintShort),
       );
 
       StakerSmocked.InternalMock.mock_mintFloatToReturn();
@@ -72,20 +71,18 @@ let test =
           })
       );
 
-      it("emits FloatMinted event", () =>
+      it("emits FloatMinted event", () => {
         Chai.callEmitEvents(
           ~call=promiseRef^,
           ~contract=contracts^.staker->Obj.magic,
-          ~eventName="FloatMinted",
+          ~eventName="FloatMintedNew",
         )
-        ->Chai.withArgs5(
+        ->Chai.withArgs3(
             user,
             marketIndex,
-            floatToMintLong,
-            floatToMintShort,
-            latestRewardIndexForMarket,
+            floatToMintLong->add(floatToMintShort),
           )
-      );
+      });
 
       it("mutates userIndexOfLastClaimedReward", () => {
         let%Await lastClaimed =

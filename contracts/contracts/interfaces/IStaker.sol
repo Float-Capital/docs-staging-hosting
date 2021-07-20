@@ -2,14 +2,11 @@
 
 pragma solidity 0.8.3;
 
-import "./ISyntheticToken.sol";
-import "./ILongShort.sol";
-
 abstract contract IStaker {
   function addNewStakingFund(
     uint32 marketIndex,
-    ISyntheticToken longTokenAddress,
-    ISyntheticToken shortTokenAddress,
+    address longTokenAddress,
+    address shortTokenAddress,
     uint256 kInitialMultiplier,
     uint256 kPeriod,
     uint256 unstakeFeeBasisPoints,

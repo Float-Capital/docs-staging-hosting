@@ -49,7 +49,6 @@ let test =
       let promise =
         contracts^.staker
         ->ContractHelpers.connect(~address=longShortAddress)
-        ->Obj.magic
         ->Staker.Exposed.addNewStakingFund(
             ~marketIndex,
             ~longToken=sampleLongAddress,

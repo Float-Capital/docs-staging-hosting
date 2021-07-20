@@ -24,13 +24,13 @@ contract LongShortInternalsExposed is LongShortMockable {
   ) public {
     latestMarket = _latestMarket;
     marketExists[marketIndex] = marketIndexValue;
-    staker = IStaker(_staker);
+    staker = (_staker);
     syntheticTokens[marketIndex][
       true /*short*/
-    ] = ISyntheticToken(longAddress);
+    ] = (longAddress);
     syntheticTokens[marketIndex][
       false /*short*/
-    ] = ISyntheticToken(shortAddress);
+    ] = (shortAddress);
   }
 
   function set_updateSystemStateInternalGlobals(

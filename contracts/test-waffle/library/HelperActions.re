@@ -112,7 +112,7 @@ let stakeRandomlyInMarkets =
             let%AwaitThen _ = mintStake(~synthToken=longSynth, ~amount);
             let%Await longTokenPrice =
               longShort->LongShortHelpers.getSyntheticTokenPrice(
-                ~marketIndex=marketIndex,
+                ~marketIndex,
                 ~isLong=true,
               );
 
@@ -130,7 +130,7 @@ let stakeRandomlyInMarkets =
             let%AwaitThen _ = mintStake(~synthToken=shortSynth, ~amount);
             let%Await shortTokenPrice =
               longShort->LongShortHelpers.getSyntheticTokenPrice(
-                ~marketIndex=marketIndex,
+                ~marketIndex,
                 ~isLong=false,
               );
             synthsUserHasStakedIn->Array.concat([|
@@ -148,7 +148,7 @@ let stakeRandomlyInMarkets =
               mintStake(~synthToken=longSynth, ~amount=longAmount);
             let%AwaitThen longTokenPrice =
               longShort->LongShortHelpers.getSyntheticTokenPrice(
-                ~marketIndex=marketIndex,
+                ~marketIndex,
                 ~isLong=true,
               );
             let newSynthsUserHasStakedIn =
@@ -171,7 +171,7 @@ let stakeRandomlyInMarkets =
               mintStake(~synthToken=shortSynth, ~amount=shortAmount);
             let%Await shortTokenPrice =
               longShort->LongShortHelpers.getSyntheticTokenPrice(
-                ~marketIndex=marketIndex,
+                ~marketIndex,
                 ~isLong=false,
               );
             newSynthsUserHasStakedIn->Array.concat([|
