@@ -338,11 +338,11 @@ contract LongShort is ILongShort, Initializable {
   /*
     4 possible states for next price actions:
         - "Pending" - means the next price update hasn't happened or been enacted on by the updateSystemState function.
-        - "Confirmed" - means the next price has been updated by the updateSystemState function. There is still 
+        - "Confirmed" - means the next price has been updated by the updateSystemState function. There is still
         -               outstanding (lazy) computation that needs to be executed per user in the batch.
         - "Settled" - there is no more computation left for the user.
         - "Non-existant" - user has no next price actions.
-    This function returns a calculated value only in the case of 'confirmed' next price actions. 
+    This function returns a calculated value only in the case of 'confirmed' next price actions.
     It should return zero for all other types of next price actions.
     */
   function getUsersConfirmedButNotSettledBalance(
@@ -380,7 +380,7 @@ contract LongShort is ILongShort, Initializable {
   /**
    * Return the minimum of the 2 parameters. If they are equal return the first parameter.
    */
-  function getMin(uint256 a, uint256 b) internal pure virtual returns (uint256) {
+  function _getMin(uint256 a, uint256 b) internal pure virtual returns (uint256) {
     if (a > b) {
       return b;
     } else {
@@ -412,7 +412,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 marketPercentCalculatedE18 = (imbalance * marketTreasurySplitSlopE18) /
       totalValueLockedInMarket;
 
-    uint256 marketPercentE18 = getMin(marketPercentCalculatedE18, 1e18);
+    uint256 marketPercentE18 = _getMin(marketPercentCalculatedE18, 1e18);
 
     treasuryPercentE18 = 1e18 - marketPercentE18;
   }
@@ -452,7 +452,7 @@ contract LongShort is ILongShort, Initializable {
       }
     }
 
-    int256 unbalancedSidePoolValue = int256(getMin(longValue, shortValue));
+    int256 unbalancedSidePoolValue = int256(_getMin(longValue, shortValue));
 
     int256 percentageChangeE18 = ((newAssetPrice - oldAssetPrice) * 1e18) / oldAssetPrice;
 
