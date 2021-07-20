@@ -33,6 +33,12 @@ contract LongShortInternalsExposed is LongShortMockable {
     ] = (shortAddress);
   }
 
+  function setMarketExistsMulti(uint32[] calldata marketIndexes) external {
+    for (uint256 i = 0; i < marketIndexes.length; i++) {
+      marketExists[marketIndexes[i]] = true;
+    }
+  }
+
   function set_updateSystemStateInternalGlobals(
     uint32 marketIndex,
     uint256 _latestUpdateIndexForMarket,
@@ -42,7 +48,9 @@ contract LongShortInternalsExposed is LongShortMockable {
     uint256 longValue,
     uint256 shortValue,
     address oracleManager,
-    address _staker
+    address _staker,
+    address synthLong,
+    address synthShort
   ) public {
     marketExists[marketIndex] = true;
     marketUpdateIndex[marketIndex] = _latestUpdateIndexForMarket;
@@ -57,9 +65,12 @@ contract LongShortInternalsExposed is LongShortMockable {
     syntheticTokenPoolValue[marketIndex][false] = shortValue;
 
     assetPrice[marketIndex] = _assetPrice;
-    oracleManagers[marketIndex] = IOracleManager(oracleManager);
+    oracleManagers[marketIndex] = oracleManager;
 
-    staker = IStaker(_staker);
+    syntheticTokens[marketIndex][true] = synthLong;
+    syntheticTokens[marketIndex][false] = synthShort;
+
+    staker = _staker;
   }
 
   function setUseexecuteOutstandingNextPriceSettlementsMock(bool shouldUseMock) public {
