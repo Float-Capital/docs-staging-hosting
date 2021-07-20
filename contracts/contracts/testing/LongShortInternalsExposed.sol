@@ -140,4 +140,14 @@ contract LongShortInternalsExposed is LongShortMockable {
     ] = _syntheticTokenPriceSnapshot;
     paymentTokens[marketIndex] = paymentToken;
   }
+
+  function setExecuteOutstandingNextPriceSettlementsGlobals(
+    uint32 marketIndex,
+    address user,
+    uint256 _userCurrentNextPriceUpdateIndex,
+    uint256 _marketUpdateIndex
+  ) external {
+    userCurrentNextPriceUpdateIndex[marketIndex][user] = _userCurrentNextPriceUpdateIndex;
+    marketUpdateIndex[marketIndex] = _marketUpdateIndex;
+  }
 }

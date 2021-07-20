@@ -198,5 +198,6 @@ describe("Float System", () => {
     PriceCalculationFunctions.testUnit(~contracts, ~accounts);
     BatchedSettlement.testUnit(~contracts, ~accounts);
     ExecuteNextPriceAction.testUnit(~contracts, ~accounts);
+    ExecuteOutstandingNextPriceSettlements.testUnit(~contracts, ~accounts);
   });
 });
