@@ -666,7 +666,7 @@ contract LongShort is ILongShort, Initializable {
     ║     NEXT PRICE SETTLEMENTS     ║
     ╚════════════════════════════════╝*/
 
-  function _executeNextPriceMintsIfTheyExist(
+  function _executeOutstandingNextPriceMints(
     uint32 marketIndex,
     address user,
     bool isLong
@@ -711,8 +711,8 @@ contract LongShort is ILongShort, Initializable {
   {
     uint256 currentUpdateIndex = userCurrentNextPriceUpdateIndex[marketIndex][user];
     if (currentUpdateIndex != 0 && currentUpdateIndex <= marketUpdateIndex[marketIndex]) {
-      _executeNextPriceMintsIfTheyExist(marketIndex, user, true);
-      _executeNextPriceMintsIfTheyExist(marketIndex, user, false);
+      _executeOutstandingNextPriceMints(marketIndex, user, true);
+      _executeOutstandingNextPriceMints(marketIndex, user, false);
       _executeOutstandingNextPriceRedeems(marketIndex, user, true);
       _executeOutstandingNextPriceRedeems(marketIndex, user, false);
 
