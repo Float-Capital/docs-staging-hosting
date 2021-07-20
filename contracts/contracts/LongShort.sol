@@ -338,11 +338,11 @@ contract LongShort is ILongShort, Initializable {
   /*
     4 possible states for next price actions:
         - "Pending" - means the next price update hasn't happened or been enacted on by the updateSystemState function.
-        - "Confirmed" - means the next price has been updated by the updateSystemState function. There is still 
+        - "Confirmed" - means the next price has been updated by the updateSystemState function. There is still
         -               outstanding (lazy) computation that needs to be executed per user in the batch.
         - "Settled" - there is no more computation left for the user.
         - "Non-existant" - user has no next price actions.
-    This function returns a calculated value only in the case of 'confirmed' next price actions. 
+    This function returns a calculated value only in the case of 'confirmed' next price actions.
     It should return zero for all other types of next price actions.
     */
   function getUsersConfirmedButNotSettledBalance(
@@ -666,7 +666,7 @@ contract LongShort is ILongShort, Initializable {
     ║     NEXT PRICE SETTLEMENTS     ║
     ╚════════════════════════════════╝*/
 
-  function _executeNextPriceMintsIfTheyExist(
+  function _executeOutstandingNextPriceMints(
     uint32 marketIndex,
     address user,
     bool isLong
@@ -711,8 +711,8 @@ contract LongShort is ILongShort, Initializable {
   {
     uint256 currentUpdateIndex = userCurrentNextPriceUpdateIndex[marketIndex][user];
     if (currentUpdateIndex != 0 && currentUpdateIndex <= marketUpdateIndex[marketIndex]) {
-      _executeNextPriceMintsIfTheyExist(marketIndex, user, true);
-      _executeNextPriceMintsIfTheyExist(marketIndex, user, false);
+      _executeOutstandingNextPriceMints(marketIndex, user, true);
+      _executeOutstandingNextPriceMints(marketIndex, user, false);
       _executeOutstandingNextPriceRedeems(marketIndex, user, true);
       _executeOutstandingNextPriceRedeems(marketIndex, user, false);
 
