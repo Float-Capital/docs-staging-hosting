@@ -10,8 +10,8 @@ let testUnit =
   describeUnit("Long Short Utilities and helpers", () => {
     describe("_getMin(a,b)", () => {
       it("returns `a` when `a < b`", () => {
-        let a = Js.Math.random_int(0, Js.Int.max);
-        let b = Js.Math.random_int(a, Js.Int.max);
+        let a = Js.Math.random_int(0, Js.Int.max - 1);
+        let b = Js.Math.random_int(a + 1, Js.Int.max);
 
         let expectedResult = bnFromInt(a);
 
@@ -30,8 +30,8 @@ let testUnit =
       });
 
       it("returns `b` when `b < a`", () => {
-        let b = Js.Math.random_int(0, Js.Int.max);
-        let a = Js.Math.random_int(b, Js.Int.max);
+        let b = Js.Math.random_int(0, Js.Int.max - 1);
+        let a = Js.Math.random_int(b + 1, Js.Int.max);
 
         let expectedResult = bnFromInt(b);
 
