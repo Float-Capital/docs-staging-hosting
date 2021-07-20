@@ -10,16 +10,16 @@ let testUnit =
   describeUnit("Long Short Utilities and helpers", () => {
     describe("_getMin", () => {
       it("returns smaller number when numbers are not equal", () => {
-        let a = Js.Math.random_int(1, Js.Int.max);
-        let b = Js.Math.random_int(1, Js.Int.max);
+        let a = Helpers.randomJsInteger();
+        let b = Helpers.randomJsInteger();
 
-        let expectedResult = Js.Math.min_int(a, b)->Ethers.BigNumber.fromInt;
+        let expectedResult = Js.Math.min_int(a, b)->bnFromInt;
 
         let%Await actualResult =
           contracts.contents.longShort
           ->LongShort.Exposed._getMinExposed(
-              ~a=Ethers.BigNumber.fromInt(a),
-              ~b=Ethers.BigNumber.fromInt(b),
+              ~a=bnFromInt(a),
+              ~b=bnFromInt(b),
             );
 
         Chai.bnEqual(
