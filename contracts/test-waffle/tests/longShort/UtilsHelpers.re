@@ -8,12 +8,12 @@ let testUnit =
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describeUnit("Long Short Utilities and helpers", () => {
-    describe("_getMin", () => {
-      it("returns smaller number when numbers are not equal", () => {
-        let a = Helpers.randomJsInteger();
-        let b = Helpers.randomJsInteger();
+    describe("_getMin(a,b)", () => {
+      it("returns `a` when `a < b`", () => {
+        let a = Js.Math.random_int(0, Js.Int.max);
+        let b = Js.Math.random_int(a, Js.Int.max);
 
-        let expectedResult = Js.Math.min_int(a, b)->bnFromInt;
+        let expectedResult = bnFromInt(a);
 
         let%Await actualResult =
           contracts.contents.longShort
@@ -23,11 +23,51 @@ let testUnit =
             );
 
         Chai.bnEqual(
-          ~message="incorrect number returned from _getMin",
+          ~message={j|incorrect number returned from _getMin (a=$a ; b=$b)|j},
           actualResult,
           expectedResult,
         );
-      })
+      });
+
+      it("returns `b` when `b < a`", () => {
+        let b = Js.Math.random_int(0, Js.Int.max);
+        let a = Js.Math.random_int(b, Js.Int.max);
+
+        let expectedResult = bnFromInt(b);
+
+        let%Await actualResult =
+          contracts.contents.longShort
+          ->LongShort.Exposed._getMinExposed(
+              ~a=bnFromInt(a),
+              ~b=bnFromInt(b),
+            );
+
+        Chai.bnEqual(
+          ~message={j|incorrect number returned from _getMin (a=$a ; b=$b)|j},
+          actualResult,
+          expectedResult,
+        );
+      });
+
+      it("returns `a` when `a == b`", () => {
+        let a = Js.Math.random_int(0, Js.Int.max);
+        let b = a;
+
+        let expectedResult = bnFromInt(a);
+
+        let%Await actualResult =
+          contracts.contents.longShort
+          ->LongShort.Exposed._getMinExposed(
+              ~a=bnFromInt(a),
+              ~b=bnFromInt(b),
+            );
+
+        Chai.bnEqual(
+          ~message={j|incorrect number returned from _getMin (a=$a ; b=$b)|j},
+          actualResult,
+          expectedResult,
+        );
+      });
     });
 
     describe("_getYieldSplit", () => {
