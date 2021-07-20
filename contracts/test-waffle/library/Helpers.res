@@ -142,7 +142,7 @@ let getAllMarkets = longShort => {
   })
 }
 
-let inititialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
+let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
   JsPromise.all6((
     FloatCapital_v0.make(),
     Treasury_v0.make(),

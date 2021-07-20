@@ -192,7 +192,7 @@ describeSkippable("Float System", () => {
 
   before_each(() => {
     let%Await deployedContracts =
-      Helpers.inititialize(
+      Helpers.initialize(
         ~admin=accounts.contents->Array.getUnsafe(0),
         ~exposeInternals=false,
       );

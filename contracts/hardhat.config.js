@@ -4,6 +4,8 @@ require("@float-capital/solidity-coverage");
 
 require("./hardhat-plugins/codegen")
 
+require('hardhat-docgen');
+
 let runCoverage = !process.env.DONT_RUN_REPORT_SUMMARY || process.env.DONT_RUN_REPORT_SUMMARY.toUpperCase() != "TRUE";
 if (runCoverage) {
   require('hardhat-abi-exporter');
@@ -86,5 +88,16 @@ module.exports = {
       ':OracleManagerMock$'
     ],
     spacing: 2
+  },
+  docgen: {
+    path: './contract-docs',
+    only: [
+      "^contracts/LongShort",
+      "^contracts/Staker",
+      "^contracts/FloatToken",
+      "^contracts/SyntheticToken",
+      "^contracts/TokenFactory",
+      "^contracts/YieldManagerAave",
+    ]
   }
 };

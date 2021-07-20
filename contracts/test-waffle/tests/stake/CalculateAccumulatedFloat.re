@@ -55,12 +55,6 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
         ->mul(newUserAmountStakedLong)
         ->div(CONSTANTS.floatIssuanceFixedDecimal);
 
-      Chai.bnEqual(
-        floatDue.longFloatReward,
-        expectedFloatDueLong,
-        ~message="calculated float due is incorrect",
-      );
-
       let expectedFloatDueShort =
         accumulativeFloatPerTokenLatestShort
         ->sub(accumulativeFloatPerTokenUserShort)
@@ -68,13 +62,8 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
         ->div(CONSTANTS.floatIssuanceFixedDecimal);
 
       Chai.bnEqual(
-        floatDue.longFloatReward,
-        expectedFloatDueLong,
-        ~message="calculated float due is incorrect",
-      );
-      Chai.bnEqual(
-        floatDue.shortFloatReward,
-        expectedFloatDueShort,
+        floatDue,
+        expectedFloatDueLong->add(expectedFloatDueShort),
         ~message="calculated float due is incorrect",
       );
     });
@@ -110,14 +99,9 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           );
 
         Chai.bnEqual(
-          floatDue.longFloatReward,
+          floatDue,
           bnFromInt(0),
-          ~message="calculated float (long) due should be zero",
-        );
-        Chai.bnEqual(
-          floatDue.shortFloatReward,
-          bnFromInt(0),
-          ~message="calculated float (short) due should be zero",
+          ~message="calculated float due should be zero",
         );
       },
     );
@@ -152,14 +136,9 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           ~user,
         );
       Chai.bnEqual(
-        floatDue.longFloatReward,
+        floatDue,
         bnFromInt(0),
-        ~message="calculated float (long) due should be zero",
-      );
-      Chai.bnEqual(
-        floatDue.shortFloatReward,
-        bnFromInt(0),
-        ~message="calculated float (short) due should be zero",
+        ~message="calculated float due should be zero",
       );
     });
   });

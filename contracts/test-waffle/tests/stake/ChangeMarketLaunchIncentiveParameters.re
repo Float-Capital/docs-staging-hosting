@@ -56,7 +56,7 @@ let test =
 
     let setup = (~initialMultiplier) => {
       let%Await deployedContracts =
-        Helpers.inititialize(
+        Helpers.initialize(
           ~admin=accounts.contents->Array.getUnsafe(0),
           ~exposeInternals=true,
         );

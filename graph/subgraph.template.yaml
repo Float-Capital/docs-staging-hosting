@@ -20,7 +20,6 @@ dataSources:
         - SyntheticTokenCreated
         - LongMinted
         - LongRedeem
-        - PriceUpdate
         - ShortMinted
         - ShortRedeem
         - TokenPriceRefreshed
@@ -41,8 +40,6 @@ dataSources:
           handler: handleLongMinted
         - event: LongRedeem(uint32,uint256,uint256,uint256,address)
           handler: handleLongRedeem
-        - event: PriceUpdate(uint32,uint256,uint256,address)
-          handler: handlePriceUpdate
         - event: ShortMinted(uint32,uint256,uint256,uint256,address)
           handler: handleShortMinted
         - event: ShortRedeem(uint32,uint256,uint256,uint256,address)

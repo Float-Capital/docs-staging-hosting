@@ -12,7 +12,7 @@ describe("Float System", () => {
       accounts := loadedAccounts;
 
       let%AwaitThen deployedContracts =
-        Helpers.inititialize(
+        Helpers.initialize(
           ~admin=accounts.contents->Array.getUnsafe(0),
           ~exposeInternals=false,
         );
@@ -44,7 +44,7 @@ describe("Float System", () => {
       accounts := loadedAccounts;
 
       let%Await deployedContracts =
-        Helpers.inititialize(
+        Helpers.initialize(
           ~admin=accounts.contents->Array.getUnsafe(0),
           ~exposeInternals=false,
         );
@@ -173,7 +173,7 @@ describe("Float System", () => {
 
     before_each(() => {
       let%Await deployedContracts =
-        Helpers.inititialize(
+        Helpers.initialize(
           ~admin=accounts.contents->Array.getUnsafe(0),
           ~exposeInternals=true,
         );
