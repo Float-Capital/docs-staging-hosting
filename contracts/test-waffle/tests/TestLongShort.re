@@ -197,5 +197,6 @@ describe("Float System", () => {
     GetUsersConfirmedButNotSettledBalance.testUnit(~contracts, ~accounts);
     PriceCalculationFunctions.testUnit(~contracts, ~accounts);
     BatchedSettlement.testUnit(~contracts, ~accounts);
+    ExecuteNextPriceAction.testUnit(~contracts, ~accounts);
   });
 });

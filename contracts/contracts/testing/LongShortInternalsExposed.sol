@@ -66,4 +66,21 @@ contract LongShortInternalsExposed is LongShortMockable {
       _marketUpdateIndex
     ] = _syntheticTokenPriceSnapshot;
   }
+
+  function setExecuteOutstandingNextPriceMintsGlobals(
+    uint32 marketIndex,
+    address user,
+    bool isLong,
+    address syntheticToken,
+    uint256 _userNextPriceRedemptionAmount,
+    uint256 _userCurrentNextPriceUpdateIndex,
+    uint256 _syntheticTokenPriceSnapshot
+  ) external {
+    userNextPriceDepositAmount[marketIndex][isLong][user] = _userNextPriceRedemptionAmount;
+    userCurrentNextPriceUpdateIndex[marketIndex][user] = _userCurrentNextPriceUpdateIndex;
+    syntheticTokenPriceSnapshot[marketIndex][isLong][
+      _userCurrentNextPriceUpdateIndex
+    ] = _syntheticTokenPriceSnapshot;
+    syntheticTokens[marketIndex][isLong] = syntheticToken;
+  }
 }

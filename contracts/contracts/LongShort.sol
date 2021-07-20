@@ -574,7 +574,7 @@ contract LongShort is ILongShort, Initializable {
     ╚════════════════════════════════╝*/
 
   function _depositFunds(uint32 marketIndex, uint256 amount) internal virtual {
-    IERC20(paymentTokens[marketIndex]).transferFrom(msg.sender, address(this), amount);
+    require(IERC20(paymentTokens[marketIndex]).transferFrom(msg.sender, address(this), amount));
   }
 
   // NOTE: Only used in seeding the market.
@@ -634,10 +634,12 @@ contract LongShort is ILongShort, Initializable {
     updateSystemStateMarket(marketIndex)
     executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
   {
-    ISyntheticToken(syntheticTokens[marketIndex][isLong]).transferFrom(
-      msg.sender,
-      address(this),
-      tokensToRedeem
+    require(
+      ISyntheticToken(syntheticTokens[marketIndex][isLong]).transferFrom(
+        msg.sender,
+        address(this),
+        tokensToRedeem
+      )
     );
 
     userNextPriceRedemptionAmount[marketIndex][isLong][msg.sender] += tokensToRedeem;
@@ -680,7 +682,9 @@ contract LongShort is ILongShort, Initializable {
           userCurrentNextPriceUpdateIndex[marketIndex][user]
         ]
       );
-      ISyntheticToken(syntheticTokens[marketIndex][isLong]).transfer(user, tokensToTransferToUser);
+      require(
+        ISyntheticToken(syntheticTokens[marketIndex][isLong]).transfer(user, tokensToTransferToUser)
+      );
 
       emit ExecuteNextPriceMintSettlementUser(user, marketIndex, isLong, tokensToTransferToUser);
     }
@@ -700,7 +704,8 @@ contract LongShort is ILongShort, Initializable {
           userCurrentNextPriceUpdateIndex[marketIndex][user]
         ]
       );
-      IERC20(paymentTokens[marketIndex]).transfer(user, amountToRedeem);
+      // This means all erc20 tokens we use as payment tokens must return a boolean
+      require(IERC20(paymentTokens[marketIndex]).transfer(user, amountToRedeem));
       emit ExecuteNextPriceRedeemSettlementUser(user, marketIndex, isLong, amountToRedeem);
     }
   }
