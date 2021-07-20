@@ -101,7 +101,9 @@ let callEmitEvents: (
 @send
 external withArgs8: (eventCheck, 'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h) => JsPromise.t<unit> = "withArgs"
 
-let expectToNotEmit: eventCheck => JsPromise.t<unit> = %raw(`eventCheck => {  let shouldRevert = true;
+let expectToNotEmit: eventCheck => JsPromise.t<
+  unit,
+> = %raw(`eventCheck => {  let shouldRevert = true;
   return (eventCheck
     .catch(() =>
       shouldRevert = false
