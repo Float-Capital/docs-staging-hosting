@@ -19,7 +19,6 @@ dataSources:
         - NextPriceDeposit
         - NextPriceRedeem
         - OracleUpdated
-        - PriceUpdate
         - SyntheticTokenCreated
         - SystemStateUpdated
         - LongShortV1
@@ -37,8 +36,6 @@ dataSources:
           handler: handleNextPriceRedeem
         - event: OracleUpdated(uint32,address,address)
           handler: handleOracleUpdated
-        - event: PriceUpdate(uint32,uint256,uint256,address)
-          handler: handlePriceUpdate
         - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address,address)
           handler: handleSyntheticTokenCreated
         - event: SystemStateUpdated(uint32,uint256,int256,uint256,uint256,uint256,uint256)

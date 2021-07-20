@@ -8,137 +8,138 @@ let testUnit =
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describeUnit("Batched Settlement", () => {
-    describe("_performOustandingBatchedSettlements", () => {
-      let marketIndex = Helpers.randomJsInteger();
-      let syntheticTokenPriceLong = Helpers.randomTokenAmount();
-      let syntheticTokenPriceShort = Helpers.randomTokenAmount();
+    /* //TODO: re-implement tests!
+       describe("_performOustandingBatchedSettlements", () => {
+            let marketIndex = Helpers.randomJsInteger();
+            let syntheticTokenPriceLong = Helpers.randomTokenAmount();
+            let syntheticTokenPriceShort = Helpers.randomTokenAmount();
 
-      let setup =
-          (
-            ~amountPaymentTokenDepositPerSide,
-            ~amountPaymentTokenRedeemPerSide,
-          ) => {
-        let {longShort} = contracts.contents;
+            let setup =
+                (
+                  ~amountPaymentTokenDepositPerSide,
+                  ~amountPaymentTokenRedeemPerSide,
+                ) => {
+              let {longShort} = contracts.contents;
 
-        let%Await _ =
-          longShort->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
-            ~functionName="_performOustandingBatchedSettlements",
-          );
-        LongShortSmocked.InternalMock.mock_handleBatchedDepositSettlementToReturn(
-          amountPaymentTokenDepositPerSide,
-        );
-        LongShortSmocked.InternalMock.mock_handleBatchedRedeemSettlementToReturn(
-          amountPaymentTokenRedeemPerSide,
-        );
-        let%Await _ =
-          longShort->LongShort.Exposed._performOustandingBatchedSettlementsExposed(
-            ~marketIndex,
-            ~syntheticTokenPriceLong,
-            ~syntheticTokenPriceShort,
-          );
-        ();
-      };
+              let%Await _ =
+                longShort->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
+                  ~functionName="_performOustandingBatchedSettlements",
+                );
+              LongShortSmocked.InternalMock.mock_handleBatchedDepositSettlementToReturn(
+                amountPaymentTokenDepositPerSide,
+              );
+              LongShortSmocked.InternalMock.mock_handleBatchedRedeemSettlementToReturn(
+                amountPaymentTokenRedeemPerSide,
+              );
+              let%Await _ =
+                longShort->LongShort.Exposed._performOustandingBatchedSettlementsExposed(
+                  ~marketIndex,
+                  ~syntheticTokenPriceLong,
+                  ~syntheticTokenPriceShort,
+                );
+              ();
+            };
 
-      it(
-        "Should call `_handleBatchedDepositSettlement` and `_handleBatchedRedeemSettlement` for both long and short",
-        () => {
-          let amountPaymentTokenDepositPerSide = Helpers.randomTokenAmount();
-          let amountPaymentTokenRedeemPerSide = Helpers.randomTokenAmount();
+            it(
+              "Should call `_handleBatchedDepositSettlement` and `_handleBatchedRedeemSettlement` for both long and short",
+              () => {
+                let amountPaymentTokenDepositPerSide = Helpers.randomTokenAmount();
+                let amountPaymentTokenRedeemPerSide = Helpers.randomTokenAmount();
 
-          let%Await _ =
-            setup(
-              ~amountPaymentTokenDepositPerSide,
-              ~amountPaymentTokenRedeemPerSide,
+                let%Await _ =
+                  setup(
+                    ~amountPaymentTokenDepositPerSide,
+                    ~amountPaymentTokenRedeemPerSide,
+                  );
+                let batchedDepositSettlementCalls =
+                  LongShortSmocked.InternalMock._handleBatchedDepositSettlementCalls();
+                let batchedRedeemSettlementCalls =
+                  LongShortSmocked.InternalMock._handleBatchedRedeemSettlementCalls();
+
+                let batchedCallArguments = [|
+                  {
+                    "marketIndex": marketIndex,
+                    "isLong": true,
+                    "syntheticTokenPrice": syntheticTokenPriceLong,
+                  },
+                  {
+                    "marketIndex": marketIndex,
+                    "isLong": false,
+                    "syntheticTokenPrice": syntheticTokenPriceShort,
+                  },
+                |];
+
+                Chai.recordArrayDeepEqualFlat(
+                  batchedDepositSettlementCalls,
+                  batchedCallArguments->Obj.magic,
+                );
+                Chai.recordArrayDeepEqualFlat(
+                  batchedRedeemSettlementCalls,
+                  batchedCallArguments->Obj.magic,
+                );
+              },
             );
-          let batchedDepositSettlementCalls =
-            LongShortSmocked.InternalMock._handleBatchedDepositSettlementCalls();
-          let batchedRedeemSettlementCalls =
-            LongShortSmocked.InternalMock._handleBatchedRedeemSettlementCalls();
+            it(
+              "Should deposit the correct amount into the yield manager if batchedDeposits > batchedRedeems",
+              () => {
+                let amountPaymentTokenRedeemPerSide = Helpers.randomTokenAmount();
+                let amountPaymentTokenDepositPerSide =
+                  // Ensure that batchedDeposits > batchedRedeems
+                  amountPaymentTokenRedeemPerSide->add(Helpers.randomTokenAmount());
+                let calculatedAmountToDeposit =
+                  amountPaymentTokenDepositPerSide
+                  ->sub(amountPaymentTokenRedeemPerSide)
+                  ->mul(twoBn);
 
-          let batchedCallArguments = [|
-            {
-              "marketIndex": marketIndex,
-              "isLong": true,
-              "syntheticTokenPrice": syntheticTokenPriceLong,
-            },
-            {
-              "marketIndex": marketIndex,
-              "isLong": false,
-              "syntheticTokenPrice": syntheticTokenPriceShort,
-            },
-          |];
+                let%Await _ =
+                  setup(
+                    ~amountPaymentTokenDepositPerSide,
+                    ~amountPaymentTokenRedeemPerSide,
+                  );
+                let transferFundsToYieldManagerCalls =
+                  LongShortSmocked.InternalMock._transferFundsToYieldManagerCalls();
+                let transferFromYieldManagerCalls =
+                  LongShortSmocked.InternalMock._transferFromYieldManagerCalls();
 
-          Chai.recordArrayDeepEqualFlat(
-            batchedDepositSettlementCalls,
-            batchedCallArguments->Obj.magic,
-          );
-          Chai.recordArrayDeepEqualFlat(
-            batchedRedeemSettlementCalls,
-            batchedCallArguments->Obj.magic,
-          );
-        },
-      );
-      it(
-        "Should deposit the correct amount into the yield manager if batchedDeposits > batchedRedeems",
-        () => {
-          let amountPaymentTokenRedeemPerSide = Helpers.randomTokenAmount();
-          let amountPaymentTokenDepositPerSide =
-            // Ensure that batchedDeposits > batchedRedeems
-            amountPaymentTokenRedeemPerSide->add(Helpers.randomTokenAmount());
-          let calculatedAmountToDeposit =
-            amountPaymentTokenDepositPerSide
-            ->sub(amountPaymentTokenRedeemPerSide)
-            ->mul(twoBn);
-
-          let%Await _ =
-            setup(
-              ~amountPaymentTokenDepositPerSide,
-              ~amountPaymentTokenRedeemPerSide,
+                Chai.recordArrayDeepEqualFlat(
+                  transferFundsToYieldManagerCalls,
+                  [|{marketIndex, amount: calculatedAmountToDeposit}|],
+                );
+                Chai.intEqual(transferFromYieldManagerCalls->Array.length, 0);
+              },
             );
-          let transferFundsToYieldManagerCalls =
-            LongShortSmocked.InternalMock._transferFundsToYieldManagerCalls();
-          let transferFromYieldManagerCalls =
-            LongShortSmocked.InternalMock._transferFromYieldManagerCalls();
+            it(
+              "Should withdraw the correct amount into the yield manager if batchedDeposits < batchedRedeems",
+              () => {
+                let amountPaymentTokenDepositPerSide = Helpers.randomTokenAmount();
+                let amountPaymentTokenRedeemPerSide =
+                  // Ensure that batchedDeposits < batchedRedeems
+                  amountPaymentTokenDepositPerSide->add(
+                    Helpers.randomTokenAmount(),
+                  );
+                let calculatedAmountToWithdraw =
+                  amountPaymentTokenRedeemPerSide
+                  ->sub(amountPaymentTokenDepositPerSide)
+                  ->mul(twoBn);
 
-          Chai.recordArrayDeepEqualFlat(
-            transferFundsToYieldManagerCalls,
-            [|{marketIndex, amount: calculatedAmountToDeposit}|],
-          );
-          Chai.intEqual(transferFromYieldManagerCalls->Array.length, 0);
-        },
-      );
-      it(
-        "Should withdraw the correct amount into the yield manager if batchedDeposits < batchedRedeems",
-        () => {
-          let amountPaymentTokenDepositPerSide = Helpers.randomTokenAmount();
-          let amountPaymentTokenRedeemPerSide =
-            // Ensure that batchedDeposits < batchedRedeems
-            amountPaymentTokenDepositPerSide->add(
-              Helpers.randomTokenAmount(),
+                let%Await _ =
+                  setup(
+                    ~amountPaymentTokenDepositPerSide,
+                    ~amountPaymentTokenRedeemPerSide,
+                  );
+                let transferFundsToYieldManagerCalls =
+                  LongShortSmocked.InternalMock._transferFundsToYieldManagerCalls();
+                let transferFromYieldManagerCalls =
+                  LongShortSmocked.InternalMock._transferFromYieldManagerCalls();
+
+                Chai.recordArrayDeepEqualFlat(
+                  transferFromYieldManagerCalls,
+                  [|{marketIndex, amount: calculatedAmountToWithdraw}|],
+                );
+                Chai.intEqual(transferFundsToYieldManagerCalls->Array.length, 0);
+              },
             );
-          let calculatedAmountToWithdraw =
-            amountPaymentTokenRedeemPerSide
-            ->sub(amountPaymentTokenDepositPerSide)
-            ->mul(twoBn);
-
-          let%Await _ =
-            setup(
-              ~amountPaymentTokenDepositPerSide,
-              ~amountPaymentTokenRedeemPerSide,
-            );
-          let transferFundsToYieldManagerCalls =
-            LongShortSmocked.InternalMock._transferFundsToYieldManagerCalls();
-          let transferFromYieldManagerCalls =
-            LongShortSmocked.InternalMock._transferFromYieldManagerCalls();
-
-          Chai.recordArrayDeepEqualFlat(
-            transferFromYieldManagerCalls,
-            [|{marketIndex, amount: calculatedAmountToWithdraw}|],
-          );
-          Chai.intEqual(transferFundsToYieldManagerCalls->Array.length, 0);
-        },
-      );
-    });
+          }); */
     describe("_handleBatchedDepositSettlement", () => {
       // TODO: should repeat these tests for long and short
       it(

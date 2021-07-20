@@ -93,8 +93,6 @@ contract LongShort is ILongShort, Initializable {
     address yieldManagerAddress
   );
 
-  event PriceUpdate(uint32 marketIndex, uint256 oldPrice, uint256 newPrice, address user);
-
   event NextPriceRedeem(
     uint32 marketIndex,
     bool isLong,
@@ -337,19 +335,6 @@ contract LongShort is ILongShort, Initializable {
     return (amountPaymentToken * 1e18) / price;
   }
 
-  function _recalculateSyntheticTokenPrice(uint32 marketIndex, bool isLong)
-    internal
-    view
-    virtual
-    returns (uint256 syntheticTokenPrice)
-  {
-    return
-      _getSyntheticTokenPrice(
-        syntheticTokenPoolValue[marketIndex][isLong],
-        ISyntheticToken(syntheticTokens[marketIndex][isLong]).totalSupply()
-      );
-  }
-
   /*
     4 possible states for next price actions:
         - "Pending" - means the next price update hasn't happened or been enacted on by the updateSystemState function.
@@ -439,9 +424,13 @@ contract LongShort is ILongShort, Initializable {
   /**
    * Controls what happens with accrued yield manager interest.
    */
-  function _claimAndDistributeYield(uint32 marketIndex) internal virtual {
-    uint256 longValue = syntheticTokenPoolValue[marketIndex][true];
-    uint256 shortValue = syntheticTokenPoolValue[marketIndex][false];
+  function _claimAndDistributeYieldThenRebalanceMarket(
+    uint32 marketIndex,
+    int256 newAssetPrice,
+    int256 oldAssetPrice
+  ) internal virtual returns (uint256 longValue, uint256 shortValue) {
+    longValue = syntheticTokenPoolValue[marketIndex][true];
+    shortValue = syntheticTokenPoolValue[marketIndex][false];
     uint256 totalValueLockedInMarket = longValue + shortValue;
 
     (bool isLongSideUnderbalanced, uint256 treasuryYieldPercentE18) = _getYieldSplit(
@@ -456,46 +445,30 @@ contract LongShort is ILongShort, Initializable {
     );
 
     if (marketAmount > 0) {
-      // NOTE: potential optimization:
-      //       this storage variable is set multiple times in the `_updateSystemStateInternal` here,
-      //       in the `_adjustMarketBasedOnNewAssetPrice` and when the users deposits are added.
-      //       IDEA: keep it in memory and pass it around until the very end.
-      syntheticTokenPoolValue[marketIndex][isLongSideUnderbalanced] += marketAmount;
+      if (isLongSideUnderbalanced) {
+        longValue += marketAmount;
+      } else {
+        shortValue += marketAmount;
+      }
     }
-  }
 
-  function _adjustMarketBasedOnNewAssetPrice(
-    uint32 marketIndex,
-    int256 oldAssetPrice,
-    int256 newAssetPrice
-  ) internal virtual {
-    int256 smallerTokenPoolSize = int256(
-      getMin(
-        syntheticTokenPoolValue[marketIndex][true],
-        syntheticTokenPoolValue[marketIndex][false]
-      )
-    );
+    int256 unbalancedSidePoolValue = int256(getMin(longValue, shortValue));
 
     int256 percentageChangeE18 = ((newAssetPrice - oldAssetPrice) * 1e18) / oldAssetPrice;
 
-    int256 valueChange = (percentageChangeE18 * smallerTokenPoolSize) / 1e18;
+    int256 valueChange = (percentageChangeE18 * unbalancedSidePoolValue) / 1e18;
     // TODO: try refactor? Seems to be the same but have issues on edge cases,
     //       but removes need to multiply then divide by 1e18
-    // int256 valueChangeRefactorAttempt = ((newAssetPrice - oldAssetPrice) * smallerTokenPoolSize) /
+    // int256 valueChangeRefactorAttempt = ((newAssetPrice - oldAssetPrice) * unbalancedSidePoolValue) /
     //   oldAssetPrice;
 
     if (valueChange > 0) {
-      syntheticTokenPoolValue[marketIndex][true] += uint256(valueChange);
-      syntheticTokenPoolValue[marketIndex][false] -= uint256(valueChange);
+      longValue += uint256(valueChange);
+      shortValue -= uint256(valueChange);
     } else {
-      syntheticTokenPoolValue[marketIndex][true] -= uint256(valueChange * -1);
-      syntheticTokenPoolValue[marketIndex][false] += uint256(valueChange * -1);
+      longValue -= uint256(valueChange * -1);
+      shortValue += uint256(valueChange * -1);
     }
-
-    // TODO: optimization - no need to emit the `oldAssetPrice` in this event
-    //       (also no need to care about msg.sender, can get that from the tx info!!)
-    //       The asset price is also emitted already in SystemStateUpdated, so this event should go!
-    emit PriceUpdate(marketIndex, uint256(oldAssetPrice), uint256(newAssetPrice), msg.sender);
   }
 
   /*╔═══════════════════════════════╗
@@ -535,13 +508,19 @@ contract LongShort is ILongShort, Initializable {
         return;
       }
 
-      // TODO: these two functions could be combined?
-      //       too much risk that they will be called out of order or something similar.
-      _claimAndDistributeYield(marketIndex);
-      _adjustMarketBasedOnNewAssetPrice(marketIndex, oldAssetPrice, newAssetPrice);
+      (
+        uint256 newLongPoolValue,
+        uint256 newShortPoolValue
+      ) = _claimAndDistributeYieldThenRebalanceMarket(marketIndex, oldAssetPrice, newAssetPrice);
 
-      syntheticTokenPriceLong = _recalculateSyntheticTokenPrice(marketIndex, true);
-      syntheticTokenPriceShort = _recalculateSyntheticTokenPrice(marketIndex, false);
+      syntheticTokenPriceLong = _getSyntheticTokenPrice(
+        newLongPoolValue,
+        ISyntheticToken(syntheticTokens[marketIndex][true]).totalSupply()
+      );
+      syntheticTokenPriceShort = _getSyntheticTokenPrice(
+        newShortPoolValue,
+        ISyntheticToken(syntheticTokens[marketIndex][false]).totalSupply()
+      );
 
       assetPrice[marketIndex] = uint256(newAssetPrice);
       marketUpdateIndex[marketIndex] += 1;
@@ -554,18 +533,26 @@ contract LongShort is ILongShort, Initializable {
         marketUpdateIndex[marketIndex]
       ] = syntheticTokenPriceShort;
 
-      _performOustandingBatchedSettlements(
+      (
+        int256 valueChangeForLong,
+        int256 valueChangeForShort
+      ) = _performOustandingBatchedSettlements(
         marketIndex,
         syntheticTokenPriceLong,
         syntheticTokenPriceShort
       );
 
+      newLongPoolValue = uint256(int256(newLongPoolValue) + valueChangeForLong);
+      newShortPoolValue = uint256(int256(newShortPoolValue) + valueChangeForShort);
+      syntheticTokenPoolValue[marketIndex][true] = newLongPoolValue;
+      syntheticTokenPoolValue[marketIndex][false] = newShortPoolValue;
+
       emit SystemStateUpdated(
         marketIndex,
         marketUpdateIndex[marketIndex],
         newAssetPrice,
-        syntheticTokenPoolValue[marketIndex][true],
-        syntheticTokenPoolValue[marketIndex][false],
+        newLongPoolValue,
+        newShortPoolValue,
         syntheticTokenPriceLong,
         syntheticTokenPriceShort
       );
@@ -593,27 +580,7 @@ contract LongShort is ILongShort, Initializable {
   // NOTE: Only used in seeding the market.
   function _lockFundsInMarket(uint32 marketIndex, uint256 amount) internal virtual {
     _depositFunds(marketIndex, amount);
-    _transferFundsToYieldManager(marketIndex, amount);
-  }
-
-  /*╔══════════════════════════════════╗
-    ║     TREASURY + YIELD MANAGER     ║
-    ╚══════════════════════════════════╝*/
-
-  /*
-   * Transfers locked funds from LongShort into the yield manager.
-   */
-  function _transferFundsToYieldManager(uint32 marketIndex, uint256 amount) internal virtual {
     IYieldManager(yieldManagers[marketIndex]).depositPaymentToken(amount);
-  }
-
-  /*
-   * Transfers locked funds from the yield manager into LongShort.
-   */
-  function _transferFromYieldManager(uint32 marketIndex, uint256 amount) internal virtual {
-    // NB there will be issues here if not enough liquidity exists to withdraw
-    // Boolean should be returned from yield manager and think how to appropriately handle this
-    IYieldManager(yieldManagers[marketIndex]).withdrawPaymentToken(amount);
   }
 
   /*╔═══════════════════════════╗
@@ -766,77 +733,106 @@ contract LongShort is ILongShort, Initializable {
     ║   BATCHED NEXT PRICE SETTLEMENT ACTIONS   ║
     ╚═══════════════════════════════════════════╝*/
 
+  function handleTotalValueChangeForMarketWithYieldManager(
+    uint32 marketIndex,
+    int256 totalValueChangeForMarket
+  ) internal {
+    if (totalValueChangeForMarket > 0) {
+      IYieldManager(yieldManagers[marketIndex]).depositPaymentToken(
+        uint256(totalValueChangeForMarket)
+      );
+    } else if (totalValueChangeForMarket < 0) {
+      // NB there will be issues here if not enough liquidity exists to withdraw
+      // Boolean should be returned from yield manager and think how to appropriately handle this
+      IYieldManager(yieldManagers[marketIndex]).withdrawPaymentToken(
+        uint256(-totalValueChangeForMarket)
+      );
+    }
+  }
+
+  function handleChangeInSynthTokensTotalSuply(
+    uint32 marketIndex,
+    bool isLong,
+    int256 changeInSynthTokensTotalSuply
+  ) internal {
+    if (changeInSynthTokensTotalSuply > 0) {
+      ISyntheticToken(syntheticTokens[marketIndex][isLong]).mint(
+        address(this),
+        uint256(changeInSynthTokensTotalSuply)
+      );
+    } else if (changeInSynthTokensTotalSuply < 0) {
+      ISyntheticToken(syntheticTokens[marketIndex][isLong]).burn(
+        uint256(-changeInSynthTokensTotalSuply)
+      );
+    }
+  }
+
   // QUESTION: is the word "Settlements" confusing, since after this function the users are only
   //           "confirmed" not "settled"
   function _performOustandingBatchedSettlements(
     uint32 marketIndex,
     uint256 syntheticTokenPriceLong,
     uint256 syntheticTokenPriceShort
-  ) internal virtual {
-    int256 agregatePaymentTokenForYieldManagerChange;
-    agregatePaymentTokenForYieldManagerChange += int256(
-      _handleBatchedDepositSettlement(marketIndex, true, syntheticTokenPriceLong)
-    );
-    agregatePaymentTokenForYieldManagerChange += int256(
-      _handleBatchedDepositSettlement(marketIndex, false, syntheticTokenPriceShort)
-    );
-    agregatePaymentTokenForYieldManagerChange -= int256(
-      _handleBatchedRedeemSettlement(marketIndex, true, syntheticTokenPriceLong)
-    );
-    agregatePaymentTokenForYieldManagerChange -= int256(
-      _handleBatchedRedeemSettlement(marketIndex, false, syntheticTokenPriceShort)
-    );
+  ) internal virtual returns (int256 valueChangeForLong, int256 valueChangeForShort) {
+    int256 longChangeInSynthTokensTotalSuply;
+    int256 shortChangeInSynthTokensTotalSuply;
 
-    if (agregatePaymentTokenForYieldManagerChange > 0) {
-      _transferFundsToYieldManager(marketIndex, uint256(agregatePaymentTokenForYieldManagerChange));
-    } else {
-      _transferFromYieldManager(marketIndex, uint256(-agregatePaymentTokenForYieldManagerChange));
+    // Handle batched deposits LONG
+    uint256 batchedAmountOfTokensToDepositLong = batchedAmountOfTokensToDeposit[marketIndex][true];
+    if (batchedAmountOfTokensToDepositLong > 0) {
+      valueChangeForLong += int256(batchedAmountOfTokensToDepositLong);
+
+      batchedAmountOfTokensToDeposit[marketIndex][true] = 0;
+
+      longChangeInSynthTokensTotalSuply += int256(
+        _getAmountSynthToken(batchedAmountOfTokensToDepositLong, syntheticTokenPriceLong)
+      );
     }
-  }
 
-  function _handleBatchedDepositSettlement(
-    uint32 marketIndex,
-    bool isLong,
-    uint256 syntheticTokenPrice
-  ) internal virtual returns (uint256 amountPaymentTokensToDepositToYieldManager) {
-    amountPaymentTokensToDepositToYieldManager = batchedAmountOfTokensToDeposit[marketIndex][
-      isLong
+    // Handle batched deposits SHORT
+    uint256 batchedAmountOfTokensToDepositShort = batchedAmountOfTokensToDeposit[marketIndex][
+      false
     ];
+    if (batchedAmountOfTokensToDepositShort > 0) {
+      valueChangeForShort += int256(batchedAmountOfTokensToDepositShort);
 
-    if (amountPaymentTokensToDepositToYieldManager > 0) {
-      batchedAmountOfTokensToDeposit[marketIndex][isLong] = 0;
+      batchedAmountOfTokensToDeposit[marketIndex][false] = 0;
 
-      uint256 numberOfTokens = _getAmountSynthToken(
-        amountPaymentTokensToDepositToYieldManager,
-        syntheticTokenPrice
+      shortChangeInSynthTokensTotalSuply += int256(
+        _getAmountSynthToken(batchedAmountOfTokensToDepositShort, syntheticTokenPriceShort)
       );
-
-      ISyntheticToken(syntheticTokens[marketIndex][isLong]).mint(address(this), numberOfTokens);
-
-      syntheticTokenPoolValue[marketIndex][isLong] += amountPaymentTokensToDepositToYieldManager;
     }
-  }
 
-  function _handleBatchedRedeemSettlement(
-    uint32 marketIndex,
-    bool isLong,
-    uint256 syntheticTokenPrice
-  ) internal virtual returns (uint256 amountOfPaymentTokenToRedeemFromYieldManager) {
-    uint256 amountSynthToRedeem = batchedAmountOfSynthTokensToRedeem[marketIndex][isLong];
-    if (amountSynthToRedeem > 0) {
-      amountOfPaymentTokenToRedeemFromYieldManager = _getAmountPaymentToken(
-        amountSynthToRedeem,
-        syntheticTokenPrice
+    // Handle batched redeems LONG
+    uint256 batchedAmountOfSynthTokensToRedeemLong = batchedAmountOfSynthTokensToRedeem[
+      marketIndex
+    ][true];
+    if (batchedAmountOfSynthTokensToRedeemLong > 0) {
+      valueChangeForLong -= int256(
+        _getAmountPaymentToken(batchedAmountOfSynthTokensToRedeemLong, syntheticTokenPriceLong)
       );
-      assert(
-        syntheticTokenPoolValue[marketIndex][isLong] >= amountOfPaymentTokenToRedeemFromYieldManager
-      );
+      longChangeInSynthTokensTotalSuply -= int256(batchedAmountOfSynthTokensToRedeemLong);
 
-      batchedAmountOfSynthTokensToRedeem[marketIndex][isLong] = 0;
-
-      ISyntheticToken(syntheticTokens[marketIndex][isLong]).burn(amountSynthToRedeem);
-
-      syntheticTokenPoolValue[marketIndex][isLong] -= amountOfPaymentTokenToRedeemFromYieldManager;
+      batchedAmountOfSynthTokensToRedeem[marketIndex][true] = 0;
     }
+
+    // Handle batched redeems SHORT
+    uint256 batchedAmountOfSynthTokensToRedeemShort = batchedAmountOfSynthTokensToRedeem[
+      marketIndex
+    ][false];
+    if (batchedAmountOfSynthTokensToRedeemShort > 0) {
+      valueChangeForShort -= int256(
+        _getAmountPaymentToken(batchedAmountOfSynthTokensToRedeemShort, syntheticTokenPriceShort)
+      );
+      shortChangeInSynthTokensTotalSuply -= int256(batchedAmountOfSynthTokensToRedeemShort);
+
+      batchedAmountOfSynthTokensToRedeem[marketIndex][false] = 0;
+    }
+
+    int256 totalValueChangeForMarket = valueChangeForLong + valueChangeForShort;
+    handleTotalValueChangeForMarketWithYieldManager(marketIndex, totalValueChangeForMarket);
+
+    handleChangeInSynthTokensTotalSuply(marketIndex, true, longChangeInSynthTokensTotalSuply);
+    handleChangeInSynthTokensTotalSuply(marketIndex, false, shortChangeInSynthTokensTotalSuply);
   }
 }
