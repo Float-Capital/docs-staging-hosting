@@ -35,6 +35,16 @@ let testUnit =
           contracts^.longShort
           ->LongShort.Exposed._getAmountSynthTokenExposed(
               ~amountPaymentToken=userNextPriceDepositAmount,
+          /**
+           * Return the minimum of the 2 parameters. If they are equal return the first parameter.
+           */
+          function _getMin(uint256 a, uint256 b) internal pure virtual returns (uint256) {
+            if (a > b) {
+              return b;
+            } else {
+              return a;
+            }
+          }
               ~price=syntheticTokenPriceSnapshot,
             );
 
