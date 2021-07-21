@@ -18,7 +18,8 @@ describe("YieldManagerAave", () => {
         let longShortAddress = Ethers.Wallet.createRandom().address;
         let lendingPoolAddress = Ethers.Wallet.createRandom().address;
         let fundTokenAddress = Ethers.Wallet.createRandom().address;
-        let%AwaitThen paymentTokenMock = ERC20Mock.make(~name="Payment Token Mock", ~symbol="PaymentToken");
+        let%AwaitThen paymentTokenMock =
+          ERC20Mock.make(~name="Payment Token Mock", ~symbol="PaymentToken");
         let paymentTokenAddress = paymentTokenMock.address;
 
         let%AwaitThen erc20Mock =

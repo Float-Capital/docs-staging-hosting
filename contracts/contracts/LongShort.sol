@@ -407,9 +407,9 @@ contract LongShort is ILongShort, Initializable {
     }
 
     // This gradient/slope can be adjusted, it is in base 10^18
-    uint256 marketTreasurySplitSlopE18 = 1e18;
+    uint256 marketTreasurySplitGradientE18 = 1e18;
 
-    uint256 marketPercentCalculatedE18 = (imbalance * marketTreasurySplitSlopE18) /
+    uint256 marketPercentCalculatedE18 = (imbalance * marketTreasurySplitGradientE18) /
       totalValueLockedInMarket;
 
     uint256 marketPercentE18 = _getMin(marketPercentCalculatedE18, 1e18);

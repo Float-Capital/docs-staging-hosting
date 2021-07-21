@@ -186,7 +186,7 @@ let testExposed =
         let {longShort, markets} = contracts.contents;
         let paymentToken = markets->Array.getUnsafe(1).paymentToken;
 
-        Chai.changeBallance(
+        Chai.changeBalance(
           ~transaction=() => mintLongNextPriceTxPromise.contents,
           ~token=paymentToken->Obj.magic,
           ~to_=longShort->Obj.magic,
