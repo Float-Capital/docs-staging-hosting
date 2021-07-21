@@ -30,8 +30,8 @@ describe("Float System", () => {
 
     UpdateSystemState.testIntegration(~contracts, ~accounts);
 
-    LazyDeposit.testIntegration(~contracts, ~accounts);
-    LazyRedeem.testIntegration(~contracts, ~accounts);
+    MintNextPrice.testIntegration(~contracts, ~accounts);
+    RedeemNextPrice.testIntegration(~contracts, ~accounts);
     InitializeMarket.testIntegration(~contracts, ~accounts);
   });
 
@@ -195,6 +195,7 @@ describe("Float System", () => {
     GetUsersConfirmedButNotSettledBalance.testUnit(~contracts, ~accounts);
     PriceCalculationFunctions.testUnit(~contracts, ~accounts);
     BatchedSettlement.testUnit(~contracts, ~accounts);
+    MintNextPrice.testUnit(~contracts, ~accounts);
     ExecuteNextPriceAction.testUnit(~contracts, ~accounts);
   });
 });

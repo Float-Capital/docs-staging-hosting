@@ -115,104 +115,137 @@ let testIntegration =
     })
   });
 
-let testExposed =
+let testUnit =
     (
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
-    ) =>
-  describe("lazyDeposits", () => {
-    it("calls the executeOutstandingNextPriceSettlements modifier", () => {
-      // TODO: turn this into a re-usable template (just pass in the transaction that should emmit the event)
-      //       test all other relevant 'functions
-      let {longShort} = contracts.contents;
-      let marketIndex = 1;
-      let amount = bnFromInt(1);
-      let testWallet = accounts.contents->Array.getUnsafe(1);
+    ) => {
+  describe("mintNextPrice", () => {
+    let marketIndex = 1;
+    let marketUpdateIndex = Helpers.randomInteger();
+    let amount = Helpers.randomTokenAmount();
 
-      let%Await _ =
-        longShort->LongShort.Exposed.setUseexecuteOutstandingNextPriceSettlementsMock(
-          ~shouldUseMock=true,
-        );
+    let setup = (~isLong, ~testWallet: Ethers.walletType) => {
+      let%AwaitThen _ =
+        contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
 
-      let _ =
-        Chai.callEmitEvents(
-          ~call=
-            longShort
-            ->ContractHelpers.connect(~address=testWallet)
-            ->LongShort.mintLongNextPrice(~marketIndex, ~amount),
-          ~eventName="executeOutstandingNextPriceSettlementsMock",
-          ~contract=longShort->Obj.magic,
-        )
-        ->Chai.withArgs2((testWallet, marketIndex));
-      ();
-    });
-    describe("mintLongNextPrice", () => {
-      let mintLongNextPriceTxPromise:
-        ref(JsPromise.t(ContractHelpers.transaction)) =
-        ref(None->Obj.magic);
-      let marketIndex = 1;
-      let amount = bnFromInt(1);
-
-      before_each(() => {
-        let {longShort} = contracts.contents;
-        let testWallet = accounts.contents->Array.getUnsafe(1);
-
-        mintLongNextPriceTxPromise :=
-          longShort
-          ->ContractHelpers.connect(~address=testWallet)
-          ->LongShort.mintLongNextPrice(~marketIndex, ~amount);
-      });
-
-      it("should emit the correct event", () => {
-        let {longShort} = contracts.contents;
-        let testWallet = accounts.contents->Array.getUnsafe(1);
-
-        Chai.callEmitEvents(
-          ~call=mintLongNextPriceTxPromise.contents,
-          ~eventName="NextPriceLongMinted",
-          ~contract=longShort->Obj.magic,
-        )
-        ->Chai.withArgs5(marketIndex, amount, testWallet.address, amount, 1);
-      });
-      /*
-        paymentTokens[marketIndex].transferFrom(msg.sender, address(this), amount);
-
-         batchedNextPriceDeposit[marketIndex].mintLong += amount;
-         userNextPriceActions[marketIndex][msg.sender].mintLong += amount;
-         userNextPriceActions[marketIndex][msg.sender].usersCurrentUpdateIndex =
-             latestUpdateIndex[marketIndex] +
-       */
-      it("transfer all the payment tokens to the LongShort contract", () => {
-        let {longShort, markets} = contracts.contents;
-        let paymentToken = markets->Array.getUnsafe(1).paymentToken;
-
-        Chai.changeBalance(
-          ~transaction=() => mintLongNextPriceTxPromise.contents,
-          ~token=paymentToken->Obj.magic,
-          ~to_=longShort->Obj.magic,
-          ~amount,
-        );
-      });
-      it("updates the mintLong value for the market", () => {
-        let {longShort} = contracts.contents;
-        let%AwaitThen _ = mintLongNextPriceTxPromise.contents;
-        let%Await mintAmount =
-          longShort->LongShort.batchedAmountOfTokensToDeposit(
-            marketIndex,
-            true /*long*/,
+      let%AwaitThen _ =
+        contracts.contents.longShort
+        ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
+            ~functionName="_mintNextPrice",
           );
 
+      let%AwaitThen _ =
+        contracts.contents.longShort
+        ->LongShort.Exposed.setMintNextPriceGlobals(
+            ~marketIndex,
+            ~marketUpdateIndex,
+          );
+
+      let longShort =
+        contracts.contents.longShort
+        ->ContractHelpers.connect(~address=testWallet);
+
+      longShort->LongShort.Exposed._mintNextPriceExposed(
+        ~marketIndex,
+        ~amount,
+        ~isLong,
+      );
+    };
+
+    let testMarketSide = (~isLong) => {
+      it("calls the executeOutstandingNextPriceSettlements modifier", () => {
+        let testWallet = accounts.contents->Array.getUnsafe(1);
+
+        let%Await _ = setup(~isLong, ~testWallet);
+
+        let executeOutstandingNextPriceSettlementsCalls =
+          LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCalls();
+
+        executeOutstandingNextPriceSettlementsCalls->Chai.recordArrayDeepEqualFlat([|
+          {user: testWallet.address, marketIndex},
+        |]);
+      });
+
+      it("emits the NextPriceDeposit event", () => {
+        let testWallet = accounts.contents->Array.getUnsafe(1);
+
+        Chai.callEmitEvents(
+          ~call=setup(~isLong, ~testWallet),
+          ~eventName="NextPriceDeposit",
+          ~contract=contracts.contents.longShort->Obj.magic,
+        )
+        ->Chai.withArgs5(
+            marketIndex,
+            isLong,
+            amount,
+            testWallet.address,
+            marketUpdateIndex->add(oneBn),
+          );
+      });
+
+      it("calls depositFunds with correct parameters", () => {
+        let testWallet = accounts.contents->Array.getUnsafe(1);
+
+        let%Await _ = setup(~isLong, ~testWallet);
+
+        let depositFundsCalls =
+          LongShortSmocked.InternalMock._depositFundsCalls();
+
+        depositFundsCalls->Chai.recordArrayDeepEqualFlat([|
+          {marketIndex, amount},
+        |]);
+      });
+
+      it("updates the correct state variables with correct values", () => {
+        let testWallet = accounts.contents->Array.getUnsafe(1);
+
+        let%AwaitThen _ = setup(~isLong, ~testWallet);
+
+        let%AwaitThen updatedBatchedAmountOfTokensToDeposit =
+          contracts.contents.longShort
+          ->LongShort.batchedAmountOfTokensToDeposit(marketIndex, isLong);
+
+        let%AwaitThen updatedUserNextPriceDepositAmount =
+          contracts.contents.longShort
+          ->LongShort.userNextPriceDepositAmount(
+              marketIndex,
+              isLong,
+              testWallet.address,
+            );
+
+        let%Await updatedUserCurrentNextPriceUpdateIndex =
+          contracts.contents.longShort
+          ->LongShort.userCurrentNextPriceUpdateIndex(
+              marketIndex,
+              testWallet.address,
+            );
+
         Chai.bnEqual(
-          ~message="Incorrect batched lazy deposit mint long",
+          ~message="batchedAmountOfTokensToDeposit not updated correctly",
+          updatedBatchedAmountOfTokensToDeposit,
           amount,
-          mintAmount,
+        );
+
+        Chai.bnEqual(
+          ~message="userNextPriceDepositAmount not updated correctly",
+          updatedUserNextPriceDepositAmount,
+          amount,
+        );
+
+        Chai.bnEqual(
+          ~message="userCurrentNextPriceUpdateIndex not updated correctly",
+          updatedUserCurrentNextPriceUpdateIndex,
+          marketUpdateIndex->add(oneBn),
         );
       });
-      it("updates the user's batched mint long amount", () =>
-        JsPromise.resolve()
-      );
-      it("updates the user's oracle index for lazy minting", () =>
-        JsPromise.resolve()
-      );
+    };
+
+    describe("long", () => {
+      testMarketSide(~isLong=true)
+    });
+    describe("short", () => {
+      testMarketSide(~isLong=false)
     });
   });
+};

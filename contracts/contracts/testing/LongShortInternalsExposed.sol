@@ -107,6 +107,10 @@ contract LongShortInternalsExposed is LongShortMockable {
     ] = _syntheticTokenPriceSnapshot;
   }
 
+  function setMintNextPriceGlobals(uint32 marketIndex, uint256 _marketUpdateIndex) external {
+    marketUpdateIndex[marketIndex] = _marketUpdateIndex;
+  }
+
   function setExecuteOutstandingNextPriceMintsGlobals(
     uint32 marketIndex,
     address user,
