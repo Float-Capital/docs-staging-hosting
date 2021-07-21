@@ -122,11 +122,11 @@ contract StakerInternalsExposed is StakerMockable {
   }
 
   function set_updateStateParams(
-    address longShort,
+    address _longShort,
     address token,
     uint32 tokenMarketIndex
   ) public {
-    longShort = longShort;
+    longShort = _longShort;
     marketIndexOfToken[token] = tokenMarketIndex;
   }
 
