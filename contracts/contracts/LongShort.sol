@@ -360,29 +360,53 @@ contract LongShort is ILongShort, Initializable {
     address user,
     uint32 marketIndex,
     bool isLong
-  )
-    external
-    view
-    virtual
-    override
-    assertMarketExists(marketIndex)
-    returns (uint256 pendingBalance)
-  {
+  ) external view virtual override assertMarketExists(marketIndex) returns (int256 pendingBalance) {
+    uint256 currentMarketUpdateIndex = marketUpdateIndex[marketIndex];
     if (
       userCurrentNextPriceUpdateIndex[marketIndex][user] != 0 &&
-      userCurrentNextPriceUpdateIndex[marketIndex][user] <= marketUpdateIndex[marketIndex]
+      userCurrentNextPriceUpdateIndex[marketIndex][user] <= currentMarketUpdateIndex
     ) {
+      int256 balanceDeltaFromConfirmedActions;
+
       // Update is still nextPrice but not past the next oracle update - display the
       // amount the user would get if they executed immediately.
       uint256 amountPaymentTokenDeposited = userNextPriceDepositAmount[marketIndex][isLong][user];
 
-      uint256 syntheticTokenPrice = syntheticTokenPriceSnapshot[marketIndex][isLong][
-        marketUpdateIndex[marketIndex]
+      if (amountPaymentTokenDeposited > 0) {
+        uint256 syntheticTokenPrice = syntheticTokenPriceSnapshot[marketIndex][isLong][
+          currentMarketUpdateIndex
+        ];
+
+        balanceDeltaFromConfirmedActions += int256(
+          _getAmountSynthToken(amountPaymentTokenDeposited, syntheticTokenPrice)
+        );
+      }
+
+      balanceDeltaFromConfirmedActions += userNextPriceRedeemAmount[marketIndex][isLong][user];
+
+      balanceDeltaFromConfirmedActions -= userNextPriceShiftMarketSideAmount[marketIndex][isLong][
+        user
       ];
 
-      uint256 tokens = _getAmountSynthToken(amountPaymentTokenDeposited, syntheticTokenPrice);
+      uint256 synthTokensShiftedAwayFromOtherSide = userNextPriceShiftMarketSideAmount[marketIndex][
+        !isLong
+      ][user];
 
-      return tokens;
+      if (synthTokensShiftedAwayFromOtherSide > 0) {
+        uint256 paymentTokensToShift = _getAmountPaymentToken(
+          synthTokensShiftedAwayFromOtherSide,
+          syntheticTokenPriceSnapshot[marketIndex][!isLong][currentMarketUpdateIndex]
+        );
+
+        balanceDeltaFromConfirmedActions += int256(
+          _getAmountSynthToken(
+            paymentTokensToShift,
+            syntheticTokenPriceSnapshot[marketIndex][isLong][currentMarketUpdateIndex]
+          )
+        );
+      }
+
+      return balanceDeltaFromConfirmedActions;
     } else {
       return 0;
     }
@@ -748,6 +772,27 @@ contract LongShort is ILongShort, Initializable {
   }
 
   function _executeOutstandingNextPriceRedeems(
+    uint32 marketIndex,
+    address user,
+    bool isLong
+  ) internal virtual {
+    uint256 currentRedemptions = userNextPriceRedemptionAmount[marketIndex][isLong][user];
+    if (currentRedemptions > 0) {
+      userNextPriceRedemptionAmount[marketIndex][isLong][user] = 0;
+      uint256 amountToRedeem = _getAmountPaymentToken(
+        currentRedemptions,
+        syntheticTokenPriceSnapshot[marketIndex][isLong][
+          userCurrentNextPriceUpdateIndex[marketIndex][user]
+        ]
+      );
+      // This means all erc20 tokens we use as payment tokens must return a boolean
+      require(IERC20(paymentTokens[marketIndex]).transfer(user, amountToRedeem));
+
+      emit ExecuteNextPriceRedeemSettlementUser(user, marketIndex, isLong, amountToRedeem);
+    }
+  }
+
+  function _executeOutstandingNextPriceTokenShifts(
     uint32 marketIndex,
     address user,
     bool isLong
