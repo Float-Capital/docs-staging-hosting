@@ -35,7 +35,11 @@ let recordEqualFlat: ('a, 'a) => unit = (expected, actual) => {
   a(expected, actual)
 }
 let recordArrayEqualFlat: (array<'a>, array<'a>) => unit = (expected, actual) => {
-  intEqual(expected->Array.length, actual->Array.length)
+  intEqual(
+    ~message="cannot compare arrays of integers with different lengths",
+    expected->Array.length,
+    actual->Array.length,
+  )
   expected->Array.forEachWithIndex((i, expectedResult) =>
     recordEqualFlat(expectedResult, actual->Array.getUnsafe(i))
   )
@@ -122,7 +126,7 @@ let expectRevert: (
   unit,
 > = %raw(`(transaction, reason) => expect(transaction).to.be.revertedWith(reason)`)
 
-let changeBallance: (
+let changeBalance: (
   ~transaction: unit => JsPromise.t<ContractHelpers.transaction>,
   ~token: ContractHelpers.t,
   ~to_: Ethers.ethAddress,
@@ -130,8 +134,8 @@ let changeBallance: (
 ) => JsPromise.t<
   unit,
 > = %raw(`(transaction, token, to, amount) => expect(transaction).to.changeTokenBalance(token, to, amount)`)
-// TODO: implement changeBallanceMulti to test transactions that change the balance of multiple accounts
-// let changeBallanceMulti = %raw(`expect(transaction).to.changeTokenBalance(token, wallets, amounts)`)
+// TODO: implement changeBalanceMulti to test transactions that change the balance of multiple accounts
+// let changeBalanceMulti = %raw(`expect(transaction).to.changeTokenBalance(token, wallets, amounts)`)
 
 let expectToBeAddress: (
   ~address: Ethers.ethAddress,

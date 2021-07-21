@@ -8,7 +8,8 @@ let deployAndSetupStakerToUnitTest = (~functionName, ~contracts, ~accounts) => {
   contracts := deployedContracts;
   let {staker} = contracts^;
   let%Await _ =
-    (staker)
-    ->StakerSmocked.InternalMock.setupFunctionForUnitTesting(~functionName);
+    staker->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
+      ~functionName,
+    );
   ();
 };

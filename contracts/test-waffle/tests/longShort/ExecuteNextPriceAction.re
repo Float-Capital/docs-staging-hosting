@@ -23,7 +23,7 @@ let testUnit =
             ~userCurrentNextPriceUpdateIndex,
             ~syntheticTokenPriceSnapshot,
           ) => {
-        let {longShort, markets} = contracts^;
+        let {longShort, markets} = contracts.contents;
         let {longSynth, shortSynth} = markets->Array.getUnsafe(0);
         longShortRef := longShort;
         let%Await smockedLongSynth = SyntheticTokenSmocked.make(longSynth);

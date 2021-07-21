@@ -71,15 +71,63 @@ let testUnit =
     });
 
     describe("_getYieldSplit", () => {
-      it("works as expected if longValue > shortValue", () =>
-        Js.log("TODO")
-      );
-      it("works as expected if shortValue > longValue", () =>
-        Js.log("TODO")
-      );
-      it("works as expected if shortValue == longValue", () =>
-        Js.log("TODO")
-      );
+      let test = (~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort) => {
+        let totalValueLockedInMarket =
+          syntheticTokenPoolValueLong->add(syntheticTokenPoolValueShort);
+
+        let isLongSideUnderbalanced =
+          syntheticTokenPoolValueShort->bnGte(syntheticTokenPoolValueLong);
+
+        let imbalance =
+          isLongSideUnderbalanced
+            ? syntheticTokenPoolValueShort->sub(syntheticTokenPoolValueLong)
+            : syntheticTokenPoolValueLong->sub(syntheticTokenPoolValueShort);
+
+        let marketTreasurySplitGradientE18 = CONSTANTS.tenToThe18;
+        let marketPercentCalculatedE18 =
+          imbalance
+          ->mul(marketTreasurySplitGradientE18)
+          ->div(totalValueLockedInMarket);
+        let marketPercentE18 =
+          min(marketPercentCalculatedE18, CONSTANTS.tenToThe18);
+        let treasuryPercentE18 = CONSTANTS.tenToThe18->sub(marketPercentE18);
+        let expectedResult = treasuryPercentE18;
+
+        let%Await actualResult =
+          contracts.contents.longShort
+          ->LongShort.Exposed._getYieldSplitExposed(
+              ~longValue=syntheticTokenPoolValueLong,
+              ~shortValue=syntheticTokenPoolValueShort,
+              ~totalValueLockedInMarket,
+            );
+        Chai.bnEqual(
+          ~message=
+            "expectedResult and result after `_getYieldSplit` not the same",
+          expectedResult,
+          actualResult.treasuryPercentE18,
+        );
+      };
+
+      it("works as expected if longValue > shortValue", () => {
+        let syntheticTokenPoolValueShort = Helpers.randomTokenAmount();
+        let syntheticTokenPoolValueLong =
+          syntheticTokenPoolValueShort->add(Helpers.randomTokenAmount());
+
+        test(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+      });
+      it("works as expected if shortValue > longValue", () => {
+        let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
+        let syntheticTokenPoolValueShort =
+          syntheticTokenPoolValueLong->add(Helpers.randomTokenAmount());
+
+        test(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+      });
+      it("works as expected if shortValue == longValue", () => {
+        let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
+        let syntheticTokenPoolValueShort = syntheticTokenPoolValueLong;
+
+        test(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+      });
     });
   });
 };
