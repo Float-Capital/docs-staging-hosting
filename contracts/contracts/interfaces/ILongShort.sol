@@ -11,7 +11,7 @@ abstract contract ILongShort {
     address user,
     uint32 marketIndex,
     bool isLong
-  ) external view virtual returns (uint256 pendingBalance);
+  ) external view virtual returns (int256 pendingBalance);
 
   function executeOutstandingNextPriceSettlementsUser(address user, uint32 marketIndex)
     external

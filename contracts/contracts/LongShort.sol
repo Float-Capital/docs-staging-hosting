@@ -389,11 +389,13 @@ contract LongShort is ILongShort, Initializable {
         );
       }
 
-      balanceDeltaFromConfirmedActions += userNextPriceRedeemAmount[marketIndex][isLong][user];
+      balanceDeltaFromConfirmedActions += int256(
+        userNextPriceRedemptionAmount[marketIndex][isLong][user]
+      );
 
-      balanceDeltaFromConfirmedActions -= userNextPriceShiftMarketSideAmount[marketIndex][isLong][
-        user
-      ];
+      balanceDeltaFromConfirmedActions -= int256(
+        userNextPriceShiftMarketSideAmount[marketIndex][isLong][user]
+      );
 
       uint256 synthTokensShiftedAwayFromOtherSide = userNextPriceShiftMarketSideAmount[marketIndex][
         !isLong
@@ -808,14 +810,15 @@ contract LongShort is ILongShort, Initializable {
       isShiftFromLong
     ][user];
     if (synthTokensShiftedAwayFromMarketSide > 0) {
+      uint256 usersCurrentNextPriceUpdateIndex = userCurrentNextPriceUpdateIndex[marketIndex][user];
       uint256 paymentTokensToShift = _getAmountPaymentToken(
         synthTokensShiftedAwayFromMarketSide,
-        syntheticTokenPriceSnapshot[marketIndex][!isShiftFromLong][currentMarketUpdateIndex]
+        syntheticTokenPriceSnapshot[marketIndex][!isShiftFromLong][usersCurrentNextPriceUpdateIndex]
       );
 
       uint256 amountSynthTokenRecievedOnOtherSide = _getAmountSynthToken(
         paymentTokensToShift,
-        syntheticTokenPriceSnapshot[marketIndex][isShiftFromLong][currentMarketUpdateIndex]
+        syntheticTokenPriceSnapshot[marketIndex][isShiftFromLong][usersCurrentNextPriceUpdateIndex]
       );
 
       require(
@@ -829,7 +832,7 @@ contract LongShort is ILongShort, Initializable {
         user,
         marketIndex,
         isShiftFromLong,
-        amountToRedeem
+        amountSynthTokenRecievedOnOtherSide
       );
     }
   }
