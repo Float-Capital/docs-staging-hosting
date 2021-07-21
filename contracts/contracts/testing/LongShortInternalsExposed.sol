@@ -112,7 +112,9 @@ contract LongShortInternalsExposed is LongShortMockable {
     uint256 batchedAmountOfTokensToDepositLong,
     uint256 batchedAmountOfTokensToDepositShort,
     uint256 batchedAmountOfSynthTokensToRedeemLong,
-    uint256 batchedAmountOfSynthTokensToRedeemShort
+    uint256 batchedAmountOfSynthTokensToRedeemShort,
+    uint256 batchedAmountOfSynthTokensToShiftFromLong,
+    uint256 batchedAmountOfSynthTokensToShiftFromShort
   ) external {
     batchedAmountOfTokensToDeposit[marketIndex][true] = batchedAmountOfTokensToDepositLong;
     batchedAmountOfTokensToDeposit[marketIndex][false] = batchedAmountOfTokensToDepositShort;
@@ -120,6 +122,12 @@ contract LongShortInternalsExposed is LongShortMockable {
     batchedAmountOfSynthTokensToRedeem[marketIndex][
       false
     ] = batchedAmountOfSynthTokensToRedeemShort;
+    batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][
+      true
+    ] = batchedAmountOfSynthTokensToShiftFromLong;
+    batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][
+      false
+    ] = batchedAmountOfSynthTokensToShiftFromShort;
   }
 
   function setHandleChangeInSynthTokensTotalSupplyGlobals(

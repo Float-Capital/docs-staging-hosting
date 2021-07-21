@@ -9,7 +9,7 @@ let testUnit =
     ) => {
   describeUnit("Batched Settlement", () => {
     let marketIndex = Helpers.randomJsInteger();
-    describe("_performOustandingBatchedSettlements", () => {
+    describe_only("_performOustandingBatchedSettlements", () => {
       let syntheticTokenPriceLong = Helpers.randomTokenAmount();
       let syntheticTokenPriceShort = Helpers.randomTokenAmount();
 
@@ -19,6 +19,8 @@ let testUnit =
             ~batchedAmountOfTokensToDepositShort,
             ~batchedAmountOfSynthTokensToRedeemLong,
             ~batchedAmountOfSynthTokensToRedeemShort,
+            ~batchedAmountOfSynthTokensToShiftFromLong,
+            ~batchedAmountOfSynthTokensToShiftFromShort,
           ) => {
         let {longShort} = contracts.contents;
         let%AwaitThen _ =
@@ -36,6 +38,8 @@ let testUnit =
             ~batchedAmountOfTokensToDepositShort,
             ~batchedAmountOfSynthTokensToRedeemLong,
             ~batchedAmountOfSynthTokensToRedeemShort,
+            ~batchedAmountOfSynthTokensToShiftFromLong,
+            ~batchedAmountOfSynthTokensToShiftFromShort,
           );
 
         longShort->LongShort.Exposed._performOustandingBatchedSettlementsExposedCall(
@@ -51,11 +55,17 @@ let testUnit =
             ~batchedAmountOfTokensToDepositShort,
             ~batchedAmountOfSynthTokensToRedeemLong,
             ~batchedAmountOfSynthTokensToRedeemShort,
+            ~batchedAmountOfSynthTokensToShiftFromLong,
+            ~batchedAmountOfSynthTokensToShiftFromShort,
           ) => {
         let batchedAmountOfSynthTokensToMintLong = ref(None->Obj.magic);
         let batchedAmountOfSynthTokensToMintShort = ref(None->Obj.magic);
         let batchedAmountOfPaymentTokensToBurnLong = ref(None->Obj.magic);
         let batchedAmountOfPaymentTokensToBurnShort = ref(None->Obj.magic);
+        let batchedAmountOfPaymentTokensToShiftToLong = ref(None->Obj.magic);
+        let batchedAmountOfPaymentTokensToShiftToShort = ref(None->Obj.magic);
+        let batchedAmountOfSynthTokensToShiftToLong = ref(None->Obj.magic);
+        let batchedAmountOfSynthTokensToShiftToShort = ref(None->Obj.magic);
         let calculatedValueChangeForLong = ref(None->Obj.magic);
         let calculatedValueChangeForShort = ref(None->Obj.magic);
         let calculatedValueChangeInSynthSupplyLong = ref(None->Obj.magic);
@@ -70,6 +80,8 @@ let testUnit =
               ~batchedAmountOfTokensToDepositShort,
               ~batchedAmountOfSynthTokensToRedeemLong,
               ~batchedAmountOfSynthTokensToRedeemShort,
+              ~batchedAmountOfSynthTokensToShiftFromLong,
+              ~batchedAmountOfSynthTokensToShiftFromShort,
             );
 
           batchedAmountOfSynthTokensToMintLong :=
@@ -93,21 +105,51 @@ let testUnit =
               ~price=syntheticTokenPriceShort,
             );
 
+          batchedAmountOfPaymentTokensToShiftToLong :=
+            Contract.LongShortHelpers.calcAmountPaymentToken(
+              ~amountSynthToken=batchedAmountOfSynthTokensToShiftFromShort,
+              ~price=syntheticTokenPriceShort,
+            );
+          batchedAmountOfPaymentTokensToShiftToShort :=
+            Contract.LongShortHelpers.calcAmountPaymentToken(
+              ~amountSynthToken=batchedAmountOfSynthTokensToShiftFromLong,
+              ~price=syntheticTokenPriceLong,
+            );
+
+          batchedAmountOfSynthTokensToShiftToLong :=
+            Contract.LongShortHelpers.calcAmountSynthToken(
+              ~amountPaymentToken=
+                batchedAmountOfPaymentTokensToShiftToLong.contents,
+              ~price=syntheticTokenPriceLong,
+            );
+          batchedAmountOfSynthTokensToShiftToShort :=
+            Contract.LongShortHelpers.calcAmountSynthToken(
+              ~amountPaymentToken=
+                batchedAmountOfPaymentTokensToShiftToShort.contents,
+              ~price=syntheticTokenPriceShort,
+            );
+
           calculatedValueChangeForLong :=
-            batchedAmountOfTokensToDepositLong->sub(
-              batchedAmountOfPaymentTokensToBurnLong.contents,
-            );
+            batchedAmountOfTokensToDepositLong
+            ->sub(batchedAmountOfPaymentTokensToBurnLong.contents)
+            ->add(batchedAmountOfPaymentTokensToShiftToLong.contents)
+            ->sub(batchedAmountOfPaymentTokensToShiftToShort.contents);
           calculatedValueChangeForShort :=
-            batchedAmountOfTokensToDepositShort->sub(
-              batchedAmountOfPaymentTokensToBurnShort.contents,
-            );
+            batchedAmountOfTokensToDepositShort
+            ->sub(batchedAmountOfPaymentTokensToBurnShort.contents)
+            ->add(batchedAmountOfPaymentTokensToShiftToShort.contents)
+            ->sub(batchedAmountOfPaymentTokensToShiftToLong.contents);
 
           calculatedValueChangeInSynthSupplyLong :=
             batchedAmountOfSynthTokensToMintLong.contents
-            ->sub(batchedAmountOfSynthTokensToRedeemLong);
+            ->sub(batchedAmountOfSynthTokensToRedeemLong)
+            ->add(batchedAmountOfSynthTokensToShiftToLong.contents)
+            ->sub(batchedAmountOfSynthTokensToShiftFromLong);
           calculatedValueChangeInSynthSupplyShort :=
             batchedAmountOfSynthTokensToMintShort.contents
-            ->sub(batchedAmountOfSynthTokensToRedeemShort);
+            ->sub(batchedAmountOfSynthTokensToRedeemShort)
+            ->add(batchedAmountOfSynthTokensToShiftToShort.contents)
+            ->sub(batchedAmountOfSynthTokensToShiftFromShort);
           returnOfPerformOustandingBatchedSettlements := functionCallReturn;
         });
         it(
@@ -166,6 +208,8 @@ let testUnit =
           ~batchedAmountOfTokensToDepositShort=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
+          ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
+          ~batchedAmountOfSynthTokensToShiftFromShort=zeroBn,
         )
       });
       describe("there is 1 deposit long", () => {
@@ -174,6 +218,8 @@ let testUnit =
           ~batchedAmountOfTokensToDepositShort=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
+          ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
+          ~batchedAmountOfSynthTokensToShiftFromShort=zeroBn,
         )
       });
       describe("there is 1 deposit short", () => {
@@ -182,6 +228,8 @@ let testUnit =
           ~batchedAmountOfTokensToDepositShort=Helpers.randomTokenAmount(),
           ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
+          ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
+          ~batchedAmountOfSynthTokensToShiftFromShort=zeroBn,
         )
       });
       describe("there is 1 withdraw long", () => {
@@ -190,6 +238,8 @@ let testUnit =
           ~batchedAmountOfTokensToDepositShort=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemLong=Helpers.randomTokenAmount(),
           ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
+          ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
+          ~batchedAmountOfSynthTokensToShiftFromShort=zeroBn,
         )
       });
       describe("there is 1 withdraw short", () => {
@@ -198,16 +248,44 @@ let testUnit =
           ~batchedAmountOfTokensToDepositShort=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemShort=Helpers.randomTokenAmount(),
+          ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
+          ~batchedAmountOfSynthTokensToShiftFromShort=zeroBn,
+        )
+      });
+      describe("there is 1 shift from long to short", () => {
+        runTest(
+          ~batchedAmountOfTokensToDepositLong=zeroBn,
+          ~batchedAmountOfTokensToDepositShort=zeroBn,
+          ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
+          ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
+          ~batchedAmountOfSynthTokensToShiftFromLong=
+            Helpers.randomTokenAmount(),
+          ~batchedAmountOfSynthTokensToShiftFromShort=zeroBn,
+        )
+      });
+      describe("there is 1 shift from short to long", () => {
+        runTest(
+          ~batchedAmountOfTokensToDepositLong=zeroBn,
+          ~batchedAmountOfTokensToDepositShort=zeroBn,
+          ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
+          ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
+          ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
+          ~batchedAmountOfSynthTokensToShiftFromShort=
+            Helpers.randomTokenAmount(),
         )
       });
       describe(
-        "there random deposits and withdrawals (we could be more specific with this test possibly?)",
+        "[FLAKY - sometimes off by one!]there random deposits and withdrawals (we could be more specific with this test possibly?)",
         () => {
         runTest(
           ~batchedAmountOfTokensToDepositLong=Helpers.randomTokenAmount(),
           ~batchedAmountOfTokensToDepositShort=Helpers.randomTokenAmount(),
           ~batchedAmountOfSynthTokensToRedeemLong=Helpers.randomTokenAmount(),
           ~batchedAmountOfSynthTokensToRedeemShort=Helpers.randomTokenAmount(),
+          ~batchedAmountOfSynthTokensToShiftFromLong=
+            Helpers.randomTokenAmount(),
+          ~batchedAmountOfSynthTokensToShiftFromShort=
+            Helpers.randomTokenAmount(),
         )
       });
     });
