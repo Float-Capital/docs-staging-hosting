@@ -739,10 +739,10 @@ contract LongShort is ILongShort, Initializable {
     ║   BATCHED NEXT PRICE SETTLEMENT ACTIONS   ║
     ╚═══════════════════════════════════════════╝*/
 
-  function handleTotalValueChangeForMarketWithYieldManager(
+  function _handleTotalValueChangeForMarketWithYieldManager(
     uint32 marketIndex,
     int256 totalValueChangeForMarket
-  ) internal {
+  ) internal virtual {
     if (totalValueChangeForMarket > 0) {
       IYieldManager(yieldManagers[marketIndex]).depositPaymentToken(
         uint256(totalValueChangeForMarket)
@@ -756,19 +756,19 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  function handleChangeInSynthTokensTotalSuply(
+  function _handleChangeInSynthTokensTotalSupply(
     uint32 marketIndex,
     bool isLong,
-    int256 changeInSynthTokensTotalSuply
-  ) internal {
-    if (changeInSynthTokensTotalSuply > 0) {
+    int256 changeInSynthTokensTotalSupply
+  ) internal virtual {
+    if (changeInSynthTokensTotalSupply > 0) {
       ISyntheticToken(syntheticTokens[marketIndex][isLong]).mint(
         address(this),
-        uint256(changeInSynthTokensTotalSuply)
+        uint256(changeInSynthTokensTotalSupply)
       );
-    } else if (changeInSynthTokensTotalSuply < 0) {
+    } else if (changeInSynthTokensTotalSupply < 0) {
       ISyntheticToken(syntheticTokens[marketIndex][isLong]).burn(
-        uint256(-changeInSynthTokensTotalSuply)
+        uint256(-changeInSynthTokensTotalSupply)
       );
     }
   }
@@ -780,8 +780,8 @@ contract LongShort is ILongShort, Initializable {
     uint256 syntheticTokenPriceLong,
     uint256 syntheticTokenPriceShort
   ) internal virtual returns (int256 valueChangeForLong, int256 valueChangeForShort) {
-    int256 longChangeInSynthTokensTotalSuply;
-    int256 shortChangeInSynthTokensTotalSuply;
+    int256 longChangeInSynthTokensTotalSupply;
+    int256 shortChangeInSynthTokensTotalSupply;
 
     // Handle batched deposits LONG
     uint256 batchedAmountOfTokensToDepositLong = batchedAmountOfTokensToDeposit[marketIndex][true];
@@ -790,7 +790,7 @@ contract LongShort is ILongShort, Initializable {
 
       batchedAmountOfTokensToDeposit[marketIndex][true] = 0;
 
-      longChangeInSynthTokensTotalSuply += int256(
+      longChangeInSynthTokensTotalSupply += int256(
         _getAmountSynthToken(batchedAmountOfTokensToDepositLong, syntheticTokenPriceLong)
       );
     }
@@ -804,7 +804,7 @@ contract LongShort is ILongShort, Initializable {
 
       batchedAmountOfTokensToDeposit[marketIndex][false] = 0;
 
-      shortChangeInSynthTokensTotalSuply += int256(
+      shortChangeInSynthTokensTotalSupply += int256(
         _getAmountSynthToken(batchedAmountOfTokensToDepositShort, syntheticTokenPriceShort)
       );
     }
@@ -817,7 +817,7 @@ contract LongShort is ILongShort, Initializable {
       valueChangeForLong -= int256(
         _getAmountPaymentToken(batchedAmountOfSynthTokensToRedeemLong, syntheticTokenPriceLong)
       );
-      longChangeInSynthTokensTotalSuply -= int256(batchedAmountOfSynthTokensToRedeemLong);
+      longChangeInSynthTokensTotalSupply -= int256(batchedAmountOfSynthTokensToRedeemLong);
 
       batchedAmountOfSynthTokensToRedeem[marketIndex][true] = 0;
     }
@@ -830,15 +830,15 @@ contract LongShort is ILongShort, Initializable {
       valueChangeForShort -= int256(
         _getAmountPaymentToken(batchedAmountOfSynthTokensToRedeemShort, syntheticTokenPriceShort)
       );
-      shortChangeInSynthTokensTotalSuply -= int256(batchedAmountOfSynthTokensToRedeemShort);
+      shortChangeInSynthTokensTotalSupply -= int256(batchedAmountOfSynthTokensToRedeemShort);
 
       batchedAmountOfSynthTokensToRedeem[marketIndex][false] = 0;
     }
 
     int256 totalValueChangeForMarket = valueChangeForLong + valueChangeForShort;
-    handleTotalValueChangeForMarketWithYieldManager(marketIndex, totalValueChangeForMarket);
+    _handleTotalValueChangeForMarketWithYieldManager(marketIndex, totalValueChangeForMarket);
 
-    handleChangeInSynthTokensTotalSuply(marketIndex, true, longChangeInSynthTokensTotalSuply);
-    handleChangeInSynthTokensTotalSuply(marketIndex, false, shortChangeInSynthTokensTotalSuply);
+    _handleChangeInSynthTokensTotalSupply(marketIndex, true, longChangeInSynthTokensTotalSupply);
+    _handleChangeInSynthTokensTotalSupply(marketIndex, false, shortChangeInSynthTokensTotalSupply);
   }
 }

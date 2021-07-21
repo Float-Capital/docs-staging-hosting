@@ -107,6 +107,37 @@ contract LongShortInternalsExposed is LongShortMockable {
     ] = _syntheticTokenPriceSnapshot;
   }
 
+  function setPerformOustandingBatchedSettlementsGlobals(
+    uint32 marketIndex,
+    uint256 batchedAmountOfTokensToDepositLong,
+    uint256 batchedAmountOfTokensToDepositShort,
+    uint256 batchedAmountOfSynthTokensToRedeemLong,
+    uint256 batchedAmountOfSynthTokensToRedeemShort
+  ) external {
+    batchedAmountOfTokensToDeposit[marketIndex][true] = batchedAmountOfTokensToDepositLong;
+    batchedAmountOfTokensToDeposit[marketIndex][false] = batchedAmountOfTokensToDepositShort;
+    batchedAmountOfSynthTokensToRedeem[marketIndex][true] = batchedAmountOfSynthTokensToRedeemLong;
+    batchedAmountOfSynthTokensToRedeem[marketIndex][
+      false
+    ] = batchedAmountOfSynthTokensToRedeemShort;
+  }
+
+  function setHandleChangeInSynthTokensTotalSupplyGlobals(
+    uint32 marketIndex,
+    address longSynthToken,
+    address shortSynthToken
+  ) external {
+    syntheticTokens[marketIndex][true] = longSynthToken;
+    syntheticTokens[marketIndex][false] = shortSynthToken;
+  }
+
+  function setHandleTotalValueChangeForMarketWithYieldManagerGlobals(
+    uint32 marketIndex,
+    address yieldManager
+  ) external {
+    yieldManagers[marketIndex] = yieldManager;
+  }
+
   function setMintNextPriceGlobals(uint32 marketIndex, uint256 _marketUpdateIndex) external {
     marketUpdateIndex[marketIndex] = _marketUpdateIndex;
   }
