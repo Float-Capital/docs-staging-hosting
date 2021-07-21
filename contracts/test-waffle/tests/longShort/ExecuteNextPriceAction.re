@@ -16,8 +16,6 @@ let testUnit =
       let shortSynthSmocked = ref(SyntheticTokenSmocked.uninitializedValue);
       let longShortRef: ref(LongShort.t) = ref(""->Obj.magic);
 
-      let sampleAddress = Ethers.Wallet.createRandom().address;
-
       let setup =
           (
             ~isLong,

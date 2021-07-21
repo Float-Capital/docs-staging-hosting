@@ -122,11 +122,10 @@ let testUnit =
     ) => {
   describe("mintNextPrice", () => {
     let marketIndex = 1;
-    let marketUpdateIndex = bnFromInt(1);
-    let amount = bnFromInt(10);
-    let isLong = true;
+    let marketUpdateIndex = Helpers.randomInteger();
+    let amount = Helpers.randomTokenAmount();
 
-    let setup = (~testWallet: Ethers.walletType) => {
+    let setup = (~isLong, ~testWallet: Ethers.walletType) => {
       let%AwaitThen _ =
         contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
 
@@ -135,8 +134,6 @@ let testUnit =
         ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
             ~functionName="_mintNextPrice",
           );
-
-      LongShortSmocked.InternalMock.mock_depositFundsToReturn();
 
       let%AwaitThen _ =
         contracts.contents.longShort
@@ -156,97 +153,99 @@ let testUnit =
       );
     };
 
-    it("calls the executeOutstandingNextPriceSettlements modifier", () => {
-      let testWallet = accounts.contents->Array.getUnsafe(1);
+    let testMarketSide = (~isLong) => {
+      it("calls the executeOutstandingNextPriceSettlements modifier", () => {
+        let testWallet = accounts.contents->Array.getUnsafe(1);
 
-      let%Await _ = setup(~testWallet);
+        let%Await _ = setup(~isLong, ~testWallet);
 
-      let executeOutstandingNextPriceSettlementsCalls =
-        LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCalls();
+        let executeOutstandingNextPriceSettlementsCalls =
+          LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCalls();
 
-      Chai.intEqual(
-        executeOutstandingNextPriceSettlementsCalls->Array.length,
-        1,
-      );
+        executeOutstandingNextPriceSettlementsCalls->Chai.recordArrayDeepEqualFlat([|
+          {user: testWallet.address, marketIndex},
+        |]);
+      });
 
-      executeOutstandingNextPriceSettlementsCalls->Chai.recordArrayDeepEqualFlat([|
-        {user: testWallet.address, marketIndex},
-      |]);
-    });
+      it("emits the NextPriceDeposit event", () => {
+        let testWallet = accounts.contents->Array.getUnsafe(1);
 
-    it("emits the NextPriceDeposit event", () => {
-      let testWallet = accounts.contents->Array.getUnsafe(1);
-
-      Chai.callEmitEvents(
-        ~call=setup(~testWallet),
-        ~eventName="NextPriceDeposit",
-        ~contract=contracts.contents.longShort->Obj.magic,
-      )
-      ->Chai.withArgs5(
-          marketIndex,
-          isLong,
-          amount,
-          testWallet.address,
-          marketUpdateIndex->add(oneBn),
-        );
-    });
-
-    it("calls depositFunds with correct parameters", () => {
-      let testWallet = accounts.contents->Array.getUnsafe(1);
-
-      let%Await _ = setup(~testWallet);
-
-      let depositFundsCalls =
-        LongShortSmocked.InternalMock._depositFundsCalls();
-
-      Chai.intEqual(depositFundsCalls->Array.length, 1);
-
-      depositFundsCalls->Chai.recordArrayDeepEqualFlat([|
-        {marketIndex, amount},
-      |]);
-    });
-
-    it("updates the correct state variables with correct values", () => {
-      let testWallet = accounts.contents->Array.getUnsafe(1);
-
-      let%AwaitThen _ = setup(~testWallet);
-
-      let%AwaitThen updatedBatchedAmountOfTokensToDeposit =
-        contracts.contents.longShort
-        ->LongShort.batchedAmountOfTokensToDeposit(marketIndex, isLong);
-
-      let%AwaitThen updatedUserNextPriceDepositAmount =
-        contracts.contents.longShort
-        ->LongShort.userNextPriceDepositAmount(
+        Chai.callEmitEvents(
+          ~call=setup(~isLong, ~testWallet),
+          ~eventName="NextPriceDeposit",
+          ~contract=contracts.contents.longShort->Obj.magic,
+        )
+        ->Chai.withArgs5(
             marketIndex,
             isLong,
+            amount,
             testWallet.address,
+            marketUpdateIndex->add(oneBn),
           );
+      });
 
-      let%Await updatedUserCurrentNextPriceUpdateIndex =
-        contracts.contents.longShort
-        ->LongShort.userCurrentNextPriceUpdateIndex(
-            marketIndex,
-            testWallet.address,
-          );
+      it("calls depositFunds with correct parameters", () => {
+        let testWallet = accounts.contents->Array.getUnsafe(1);
 
-      Chai.bnEqual(
-        ~message="batchedAmountOfTokensToDeposit not updated correctly",
-        updatedBatchedAmountOfTokensToDeposit,
-        amount,
-      );
+        let%Await _ = setup(~isLong, ~testWallet);
 
-      Chai.bnEqual(
-        ~message="userNextPriceDepositAmount not updated correctly",
-        updatedUserNextPriceDepositAmount,
-        amount,
-      );
+        let depositFundsCalls =
+          LongShortSmocked.InternalMock._depositFundsCalls();
 
-      Chai.bnEqual(
-        ~message="userCurrentNextPriceUpdateIndex not updated correctly",
-        updatedUserCurrentNextPriceUpdateIndex,
-        marketUpdateIndex->add(oneBn),
-      );
+        depositFundsCalls->Chai.recordArrayDeepEqualFlat([|
+          {marketIndex, amount},
+        |]);
+      });
+
+      it("updates the correct state variables with correct values", () => {
+        let testWallet = accounts.contents->Array.getUnsafe(1);
+
+        let%AwaitThen _ = setup(~isLong, ~testWallet);
+
+        let%AwaitThen updatedBatchedAmountOfTokensToDeposit =
+          contracts.contents.longShort
+          ->LongShort.batchedAmountOfTokensToDeposit(marketIndex, isLong);
+
+        let%AwaitThen updatedUserNextPriceDepositAmount =
+          contracts.contents.longShort
+          ->LongShort.userNextPriceDepositAmount(
+              marketIndex,
+              isLong,
+              testWallet.address,
+            );
+
+        let%Await updatedUserCurrentNextPriceUpdateIndex =
+          contracts.contents.longShort
+          ->LongShort.userCurrentNextPriceUpdateIndex(
+              marketIndex,
+              testWallet.address,
+            );
+
+        Chai.bnEqual(
+          ~message="batchedAmountOfTokensToDeposit not updated correctly",
+          updatedBatchedAmountOfTokensToDeposit,
+          amount,
+        );
+
+        Chai.bnEqual(
+          ~message="userNextPriceDepositAmount not updated correctly",
+          updatedUserNextPriceDepositAmount,
+          amount,
+        );
+
+        Chai.bnEqual(
+          ~message="userCurrentNextPriceUpdateIndex not updated correctly",
+          updatedUserCurrentNextPriceUpdateIndex,
+          marketUpdateIndex->add(oneBn),
+        );
+      });
+    };
+
+    describe("long", () => {
+      testMarketSide(~isLong=true)
+    });
+    describe("short", () => {
+      testMarketSide(~isLong=false)
     });
   });
 };
