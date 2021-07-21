@@ -3,7 +3,7 @@
 //     * https://tailwindui.com/components/application-ui/overlays/modals
 
 @react.component
-let make = (~id, ~closeModal=_ => (), ~title="", ~children) => {
+let make = (~id, ~title="", ~children) => {
   let (showModal, setShowModal) = React.useState(_ => true)
 
   React.useEffect1(() => {
@@ -23,7 +23,6 @@ let make = (~id, ~closeModal=_ => (), ~title="", ~children) => {
   showModal
     ? <>
         <div
-          onClick=closeModal
           className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
           <div
             className="relative my-6 mx-auto max-w-3xl p-5 border-0 rounded-sm shadow-lg relative flex flex-col  bg-white outline-none focus:outline-none">

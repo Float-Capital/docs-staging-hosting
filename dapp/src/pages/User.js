@@ -11,6 +11,7 @@ var UserUI = require("../components/UI/UserUI.js");
 var Backend = require("../mockBackend/Backend.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Masonry = require("../components/UI/Masonry.js");
+var Withdraw = require("../components/Withdraw/Withdraw.js");
 var CONSTANTS = require("../CONSTANTS.js");
 var DataHooks = require("../data/DataHooks.js");
 var Link = require("next/link").default;
@@ -18,6 +19,7 @@ var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var RootProvider = require("../libraries/RootProvider.js");
+var ContractHooks = require("../components/Testing/Admin/ContractHooks.js");
 var DisplayAddress = require("../components/UI/Base/DisplayAddress.js");
 var Format = require("date-fns/format").default;
 
@@ -111,11 +113,8 @@ function User$UserBalancesCard(Props) {
   return React.createElement(UserUI.UserColumnCard.make, {
               children: null
             }, React.createElement(UserUI.UserColumnHeader.make, {
-                  children: null
-                }, "Synthetic assets", React.createElement("img", {
-                      className: "inline h-5 ml-2",
-                      src: "/img/coin.png"
-                    })), tmp, tmp$1);
+                  children: "Synthetic assets"
+                }), tmp, tmp$1);
 }
 
 var UserBalancesCard = {
@@ -177,23 +176,67 @@ var UserTotalStakedCard = {
   make: User$UserTotalStakedCard
 };
 
+function User$IncompleteWithdrawalsCard(Props) {
+  var userId = Props.userId;
+  DataHooks.useUsersPendingRedeems(userId);
+  var usersConfirmedRedeemsQuery = DataHooks.useUsersConfirmedRedeems(userId);
+  if (typeof usersConfirmedRedeemsQuery === "number") {
+    return React.createElement("div", {
+                className: "m-auto"
+              }, React.createElement(Loader.Mini.make, {}));
+  }
+  if (usersConfirmedRedeemsQuery.TAG === /* GraphError */0) {
+    return usersConfirmedRedeemsQuery._0;
+  }
+  var confirmedRedeems = usersConfirmedRedeemsQuery._0;
+  if (confirmedRedeems.length !== 0) {
+    return React.createElement("div", {
+                className: "p-5 mb-5 bg-white bg-opacity-75 rounded-lg shadow-lg"
+              }, React.createElement("h1", {
+                    className: "text-center text-lg font-alphbeta mb-4 mt-2"
+                  }, "Available withdrawals"), React.createElement("div", {
+                    className: "flex flex-col"
+                  }, Belt_Array.map(confirmedRedeems, (function (param) {
+                          var marketIndex = param.marketIndex;
+                          var marketName = Backend.getMarketInfoUnsafe(marketIndex.toNumber()).name;
+                          return React.createElement("div", {
+                                      className: "flex items-center justify-between "
+                                    }, marketName, param.isLong ? "↗️" : "↘️", React.createElement(Withdraw.make, {
+                                          marketIndex: marketIndex
+                                        }));
+                        }))));
+  } else {
+    return null;
+  }
+}
+
+var IncompleteWithdrawalsCard = {
+  make: User$IncompleteWithdrawalsCard
+};
+
 function User$UserProfileCard(Props) {
   var userInfo = Props.userInfo;
   var addressStr = DisplayAddress.ellipsifyMiddle(userInfo.id, 8, 3);
   var joinedStr = Format(userInfo.joinedAt, "do MMM ''yy");
   var txStr = userInfo.transactionCount.toString();
   var gasStr = Misc.NumberFormat.formatInt(userInfo.gasUsed.toString());
+  var match = ContractHooks.useErc20BalanceRefresh(Config.config.contracts.Dai);
+  var optDaiBalance = match.data;
   return React.createElement(UserUI.UserColumnCard.make, {
               children: null
             }, React.createElement(UserUI.UserProfileHeader.make, {
                   address: addressStr
                 }), React.createElement(UserUI.UserColumnTextList.make, {
                   children: React.createElement("div", {
-                        className: "p-4"
+                        className: "px-4"
                       }, React.createElement(UserUI.UserColumnText.make, {
                             head: "📮 Address",
                             body: addressStr
-                          }), React.createElement(UserUI.UserColumnText.make, {
+                          }), optDaiBalance !== undefined ? React.createElement(UserUI.UserColumnText.make, {
+                              icon: CONSTANTS.daiDisplayToken.iconUrl,
+                              head: "DAI balance",
+                              body: "$" + Misc.NumberFormat.formatEther(2, Caml_option.valFromOption(optDaiBalance))
+                            }) : null, React.createElement(UserUI.UserColumnText.make, {
                             head: "🎉 Joined",
                             body: joinedStr
                           }), React.createElement(UserUI.UserColumnText.make, {
@@ -226,6 +269,8 @@ function onQuerySuccess(data) {
                         children: null
                       }, React.createElement(User$UserProfileCard, {
                             userInfo: data.userInfo
+                          }), React.createElement(User$IncompleteWithdrawalsCard, {
+                            userId: data.user
                           }), React.createElement(UserUI.UserFloatCard.make, {
                             userId: data.user,
                             stakes: data.stakes
@@ -320,6 +365,7 @@ exports.UserBalancesCard = UserBalancesCard;
 exports.getUsersTotalStakeValue = getUsersTotalStakeValue;
 exports.UserTotalInvestedCard = UserTotalInvestedCard;
 exports.UserTotalStakedCard = UserTotalStakedCard;
+exports.IncompleteWithdrawalsCard = IncompleteWithdrawalsCard;
 exports.UserProfileCard = UserProfileCard;
 exports.onQueryError = onQueryError;
 exports.onQuerySuccess = onQuerySuccess;

@@ -3,7 +3,6 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
-var Loader = require("./Loader.js");
 var Tooltip = require("./Tooltip.js");
 var Caml_int32 = require("rescript/lib/js/caml_int32.js");
 var FormatDuration = require("date-fns/formatDuration").default;
@@ -12,12 +11,9 @@ var IntervalToDuration = require("date-fns/intervalToDuration").default;
 function ProgressBar(Props) {
   var txConfirmedTimestampOpt = Props.txConfirmedTimestamp;
   var nextPriceUpdateTimestampOpt = Props.nextPriceUpdateTimestamp;
-  var rerenderCallbackOpt = Props.rerenderCallback;
+  var setTimerFinished = Props.setTimerFinished;
   var txConfirmedTimestamp = txConfirmedTimestampOpt !== undefined ? txConfirmedTimestampOpt : 0;
   var nextPriceUpdateTimestamp = nextPriceUpdateTimestampOpt !== undefined ? nextPriceUpdateTimestampOpt : 100;
-  var rerenderCallback = rerenderCallbackOpt !== undefined ? rerenderCallbackOpt : (function (param) {
-        
-      });
   var totalSecondsUntilExecution = nextPriceUpdateTimestamp - txConfirmedTimestamp | 0;
   var match = React.useState(function () {
         return 0;
@@ -38,17 +34,23 @@ function ProgressBar(Props) {
                     Curry._1(setSecondsUntilExecution, (function (param) {
                             return totalSecondsUntilExecution - countup.contents | 0;
                           }));
-                    Curry._1(setCountupPercentage, (function (param) {
-                            return Caml_int32.div(Math.imul(countup.contents, 100), totalSecondsUntilExecution);
-                          }));
-                  }
-                  if (Caml_int32.div(Math.imul(countup.contents, 100), totalSecondsUntilExecution) < 100 && Caml_int32.div(Math.imul(countup.contents, 100), totalSecondsUntilExecution) % 10 === 0) {
-                    return Curry._1(rerenderCallback, undefined);
+                    return Curry._1(setCountupPercentage, (function (param) {
+                                  return Caml_int32.div(Math.imul(countup.contents, 100), totalSecondsUntilExecution);
+                                }));
                   }
                   
                 }), 1000);
           
         }), [nextPriceUpdateTimestamp]);
+  React.useEffect((function () {
+          var timerNotFinished = countupPercentage < 100;
+          if (!timerNotFinished) {
+            Curry._1(setTimerFinished, (function (param) {
+                    return true;
+                  }));
+          }
+          
+        }), [countupPercentage]);
   if (countupPercentage < 100) {
     return React.createElement("div", {
                 className: "relative pt-1"
@@ -86,9 +88,7 @@ function ProgressBar(Props) {
                                 }
                               })))));
   } else {
-    return React.createElement("div", {
-                className: "mx-auto"
-              }, React.createElement(Loader.Tiny.make, {}));
+    return null;
   }
 }
 

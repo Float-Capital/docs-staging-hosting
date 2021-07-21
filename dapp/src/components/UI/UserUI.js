@@ -9,6 +9,7 @@ var Config = require("../../config/Config.js");
 var Ethers = require("../../ethereum/Ethers.js");
 var Loader = require("./Base/Loader.js");
 var Ethers$1 = require("ethers");
+var Backend = require("../../mockBackend/Backend.js");
 var Globals = require("../../libraries/Globals.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Tooltip = require("./Base/Tooltip.js");
@@ -67,6 +68,8 @@ function UserUI$UserTotalValue(Props) {
   var totalValueNameSup = Props.totalValueNameSup;
   var totalValueNameSub = Props.totalValueNameSub;
   var totalValue = Props.totalValue;
+  var tokenIconUrlOpt = Props.tokenIconUrl;
+  var tokenIconUrl = tokenIconUrlOpt !== undefined ? Caml_option.valFromOption(tokenIconUrlOpt) : undefined;
   var isABaller = totalValue.gte(CONSTANTS.oneHundredThousandInWei);
   var isAWhale = totalValue.gte(CONSTANTS.oneMillionInWei);
   return React.createElement("div", {
@@ -78,10 +81,13 @@ function UserUI$UserTotalValue(Props) {
                     }, totalValueNameSup), React.createElement("span", {
                       className: "text-lg font-bold leading-tight"
                     }, totalValueNameSub)), React.createElement("div", undefined, React.createElement("span", {
-                      className: (
+                      className: "flex flex-row items-center  " + (
                         isABaller ? "text-xl" : "text-2xl"
                       ) + " text-primary"
-                    }, "$" + Misc.NumberFormat.formatEther(isAWhale ? 1 : 2, totalValue))));
+                    }, "$" + Misc.NumberFormat.formatEther(isAWhale ? 1 : 2, totalValue), tokenIconUrl !== undefined ? React.createElement("img", {
+                            className: "h-6 pr-1",
+                            src: tokenIconUrl
+                          }) : null)));
 }
 
 var UserTotalValue = {
@@ -141,7 +147,7 @@ function UserUI$UserProfileHeader(Props) {
   return React.createElement("div", {
               className: "w-full flex flex-row justify-around"
             }, React.createElement("div", {
-                  className: "w-24 h-24 rounded-full border-2 border-light-purple flex items-center justify-center"
+                  className: "w-20 h-20 rounded-full border-2 border-light-purple flex items-center justify-center"
                 }, React.createElement("img", {
                       className: "inline h-10 rounded",
                       src: Blockies.makeBlockie(address)
@@ -182,7 +188,7 @@ function UserUI$UserColumnText(Props) {
   return React.createElement("div", {
               className: "mb-1"
             }, icon !== undefined ? React.createElement("img", {
-                    className: "inline mr-1 h-5",
+                    className: "inline mr-2 h-4",
                     src: icon
                   }) : "", React.createElement("span", {
                   className: "text-sm"
@@ -443,6 +449,10 @@ function UserUI$UserPendingBox(Props) {
   var txConfirmedTimestamp = Props.txConfirmedTimestamp;
   var marketIndex = Props.marketIndex;
   var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toString());
+  var oracleHeartbeatForMarket = Backend.getMarketInfoUnsafe(marketIndex.toNumber()).oracleHeartbeat;
+  var match = React.useState(function () {
+        return false;
+      });
   if (typeof lastOracleTimestamp === "number") {
     return React.createElement(Loader.Tiny.make, {});
   } else if (lastOracleTimestamp.TAG === /* GraphError */0) {
@@ -463,7 +473,8 @@ function UserUI$UserPendingBox(Props) {
                             src: CONSTANTS.daiDisplayToken.iconUrl
                           }), Ethers.Utils.formatEther(daiSpend))), React.createElement(ProgressBar.make, {
                     txConfirmedTimestamp: txConfirmedTimestamp,
-                    nextPriceUpdateTimestamp: lastOracleTimestamp._0.toNumber() + 60 | 0
+                    nextPriceUpdateTimestamp: lastOracleTimestamp._0.toNumber() + oracleHeartbeatForMarket | 0,
+                    setTimerFinished: match[1]
                   }));
   }
 }

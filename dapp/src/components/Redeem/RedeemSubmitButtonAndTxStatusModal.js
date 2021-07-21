@@ -8,6 +8,8 @@ var React = require("react");
 var Button = require("../UI/Base/Button.js");
 var Config = require("../../config/Config.js");
 var Loader = require("../UI/Base/Loader.js");
+var Backend = require("../../mockBackend/Backend.js");
+var Withdraw = require("../Withdraw/Withdraw.js");
 var DataHooks = require("../../data/DataHooks.js");
 var ProgressBar = require("../UI/Base/ProgressBar.js");
 var ViewProfileButton = require("../UI/ViewProfileButton.js");
@@ -18,25 +20,24 @@ function RedeemSubmitButtonAndTxStatusModal$ConfirmedTransactionModal(Props) {
   var marketIndex = Props.marketIndex;
   var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toString());
   var match = React.useState(function () {
+        return false;
+      });
+  var oracleHeartBeat = Backend.getMarketInfoUnsafe(marketIndex.toNumber()).oracleHeartbeat;
+  var match$1 = React.useState(function () {
         return Date.now() / 1000;
       });
-  var completeTimestamp = match[0];
   var tmp;
-  if (typeof lastOracleTimestamp === "number") {
-    tmp = React.createElement(Loader.Tiny.make, {});
-  } else if (lastOracleTimestamp.TAG === /* GraphError */0) {
-    tmp = React.createElement("p", undefined, lastOracleTimestamp._0);
-  } else {
-    var lastOracleUpdateTimestamp = lastOracleTimestamp._0;
-    console.log("completeTimestamp");
-    console.log(completeTimestamp);
-    console.log("lastOracleTimestamp");
-    console.log(lastOracleUpdateTimestamp.toNumber());
-    tmp = React.createElement(ProgressBar.make, {
-          txConfirmedTimestamp: completeTimestamp | 0,
-          nextPriceUpdateTimestamp: lastOracleUpdateTimestamp.toNumber() + 120 | 0
-        });
-  }
+  tmp = typeof lastOracleTimestamp === "number" ? React.createElement(Loader.Tiny.make, {}) : (
+      lastOracleTimestamp.TAG === /* GraphError */0 ? React.createElement("p", undefined, lastOracleTimestamp._0) : (
+          match[0] ? React.createElement(Withdraw.make, {
+                  marketIndex: marketIndex
+                }) : React.createElement(ProgressBar.make, {
+                  txConfirmedTimestamp: match$1[0] | 0,
+                  nextPriceUpdateTimestamp: lastOracleTimestamp._0.toNumber() + oracleHeartBeat | 0,
+                  setTimerFinished: match[1]
+                })
+        )
+    );
   return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
                   id: 8,
                   children: React.createElement("div", {

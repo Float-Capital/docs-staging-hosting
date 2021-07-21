@@ -138,19 +138,19 @@ let useUsersBalances = (~userId) => {
   }
 }
 
-type userPendingMint = {
+type userPendingAction = {
   isLong: bool,
   amount: Ethers.BigNumber.t,
   marketIndex: Ethers.BigNumber.t,
   confirmedTimestamp: Ethers.BigNumber.t,
 }
 
-@ocaml.doc(`Returns a sumary of the users synthetic tokens`)
+@ocaml.doc(`Returns a summary of the users synthetic tokens`)
 let useUsersPendingMints = (~userId) => {
   let usersPendingMintsQuery = Queries.UsersPendingMints.use({userId: userId})
   switch usersPendingMintsQuery {
   | {data: Some({user: Some({pendingNextPriceActions})})} =>
-    let result: array<userPendingMint> =
+    let result: array<userPendingAction> =
       pendingNextPriceActions
       ->Array.keep(pendingNextPriceAction =>
         pendingNextPriceAction.amountPaymentTokenForDepositShort->Ethers.BigNumber.gt(
@@ -191,7 +191,53 @@ let useUsersPendingMints = (~userId) => {
   }
 }
 
-type userConfirmedButNotYetSettledMints = {
+@ocaml.doc(`Returns a summary of the users synthetic tokens`)
+let useUsersPendingRedeems = (~userId) => {
+  let usersPendingRedeemsQuery = Queries.UsersPendingRedeems.use({userId: userId})
+  switch usersPendingRedeemsQuery {
+  | {data: Some({user: Some({pendingNextPriceActions})})} =>
+    let result: array<userPendingAction> =
+      pendingNextPriceActions
+      ->Array.keep(pendingNextPriceAction =>
+        pendingNextPriceAction.amountSynthTokenForWithdrawalShort->Ethers.BigNumber.gt(
+          CONSTANTS.zeroBN,
+        ) ||
+          pendingNextPriceAction.amountSynthTokenForWithdrawalLong->Ethers.BigNumber.gt(
+            CONSTANTS.zeroBN,
+          )
+      )
+      ->Array.map(pendingNextPriceAction => {
+        let isLong =
+          pendingNextPriceAction.amountSynthTokenForWithdrawalLong->Ethers.BigNumber.gt(
+            CONSTANTS.zeroBN,
+          )
+
+        {
+          isLong: isLong,
+          amount: isLong
+            ? pendingNextPriceAction.amountSynthTokenForWithdrawalLong
+            : pendingNextPriceAction.amountSynthTokenForWithdrawalShort,
+          marketIndex: pendingNextPriceAction.marketIndex,
+          confirmedTimestamp: pendingNextPriceAction.confirmedTimestamp,
+        }
+      })
+
+    Response(result)
+  | {data: Some({user: None})} =>
+    Response([
+      {
+        isLong: false,
+        amount: CONSTANTS.zeroBN,
+        marketIndex: CONSTANTS.zeroBN,
+        confirmedTimestamp: CONSTANTS.zeroBN,
+      },
+    ])
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
+  }
+}
+
+type userConfirmedButNotYetSettledAction = {
   isLong: bool,
   amount: Ethers.BigNumber.t,
   marketIndex: Ethers.BigNumber.t,
@@ -205,7 +251,7 @@ let useUsersConfirmedMints = (~userId) => {
   )
   switch usersConfirmedMintsQuery {
   | {data: Some({user: Some({confirmedNextPriceActions})})} =>
-    let result: array<userConfirmedButNotYetSettledMints> =
+    let result: array<userConfirmedButNotYetSettledAction> =
       confirmedNextPriceActions
       ->Array.keep(confirmedNextPriceAction =>
         confirmedNextPriceAction.amountPaymentTokenForDepositShort->Ethers.BigNumber.gt(
@@ -226,6 +272,53 @@ let useUsersConfirmedMints = (~userId) => {
           amount: isLong
             ? confirmedNextPriceAction.amountPaymentTokenForDepositLong
             : confirmedNextPriceAction.amountPaymentTokenForDepositShort,
+          marketIndex: confirmedNextPriceAction.marketIndex,
+        }
+      })
+
+    Response(result)
+  | {data: Some({user: None})} =>
+    Response([
+      {
+        isLong: false,
+        amount: CONSTANTS.zeroBN,
+        marketIndex: CONSTANTS.zeroBN,
+      },
+    ])
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
+  }
+}
+
+@ocaml.doc(`Returns a summary of the users pending redeems`)
+let useUsersConfirmedRedeems = (~userId) => {
+  let usersConfirmedRedeemsQuery = Queries.UsersConfirmedRedeems.use(
+    {userId: userId},
+    ~fetchPolicy=NetworkOnly,
+  )
+  switch usersConfirmedRedeemsQuery {
+  | {data: Some({user: Some({confirmedNextPriceActions})})} =>
+    let result: array<userConfirmedButNotYetSettledAction> =
+      confirmedNextPriceActions
+      ->Array.keep(confirmedNextPriceAction =>
+        confirmedNextPriceAction.amountSynthTokenForWithdrawalLong->Ethers.BigNumber.gt(
+          CONSTANTS.zeroBN,
+        ) ||
+          confirmedNextPriceAction.amountSynthTokenForWithdrawalLong->Ethers.BigNumber.gt(
+            CONSTANTS.zeroBN,
+          )
+      )
+      ->Array.map(confirmedNextPriceAction => {
+        let isLong =
+          confirmedNextPriceAction.amountSynthTokenForWithdrawalLong->Ethers.BigNumber.gt(
+            CONSTANTS.zeroBN,
+          )
+
+        {
+          isLong: isLong,
+          amount: isLong
+            ? confirmedNextPriceAction.amountSynthTokenForWithdrawalLong
+            : confirmedNextPriceAction.amountSynthTokenForWithdrawalShort,
           marketIndex: confirmedNextPriceAction.marketIndex,
         }
       })

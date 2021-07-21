@@ -5,7 +5,11 @@ module ConfirmedTransactionModal = {
       ~marketIndex=marketIndex->Ethers.BigNumber.toString,
     )
 
-    let oracleHeartBeat = 120 // TODO
+    let (timerFinished, setTimerFinished) = React.useState(_ => false)
+
+    let oracleHeartBeat = Backend.getMarketInfoUnsafe(
+      marketIndex->Ethers.BigNumber.toNumber,
+    ).oracleHeartbeat
 
     let milisecondsInSecond = 1000.
     let (completeTimestamp, _setCompleteTimestamp) = React.useState(_ =>
@@ -21,18 +25,15 @@ module ConfirmedTransactionModal = {
             {`You can withdraw your ${Config.paymentTokenName} on the next oracle price update`->React.string}
           </p>
           {switch lastOracleTimestamp {
-          | Response(lastOracleUpdateTimestamp) => {
-              Js.log("completeTimestamp")
-              Js.log(completeTimestamp)
-
-              Js.log("lastOracleTimestamp")
-              Js.log(lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber)
-              <ProgressBar
-                txConfirmedTimestamp={completeTimestamp->Belt.Int.fromFloat}
-                nextPriceUpdateTimestamp={lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber +
-                  oracleHeartBeat}
-              />
-            }
+          | Response(lastOracleUpdateTimestamp) =>
+            !timerFinished
+              ? <ProgressBar
+                  txConfirmedTimestamp={completeTimestamp->Belt.Int.fromFloat}
+                  nextPriceUpdateTimestamp={lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber +
+                    oracleHeartBeat}
+                  setTimerFinished
+                />
+              : <Withdraw marketIndex />
           | GraphError(error) => <p> {error->React.string} </p>
           | Loading => <Loader.Tiny />
           }}

@@ -6,12 +6,8 @@ var React = require("react");
 
 function Modal(Props) {
   var id = Props.id;
-  var closeModalOpt = Props.closeModal;
   var titleOpt = Props.title;
   var children = Props.children;
-  var closeModal = closeModalOpt !== undefined ? closeModalOpt : (function (param) {
-        
-      });
   var title = titleOpt !== undefined ? titleOpt : "";
   var match = React.useState(function () {
         return true;
@@ -35,8 +31,7 @@ function Modal(Props) {
           }, "×"));
   if (match[0]) {
     return React.createElement(React.Fragment, undefined, React.createElement("div", {
-                    className: "justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none",
-                    onClick: closeModal
+                    className: "justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
                   }, React.createElement("div", {
                         className: "relative my-6 mx-auto max-w-3xl p-5 border-0 rounded-sm shadow-lg relative flex flex-col  bg-white outline-none focus:outline-none"
                       }, React.createElement("div", {

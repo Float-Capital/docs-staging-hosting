@@ -20,9 +20,7 @@ module UserBalancesCard = {
     let usersPendingMintsQuery = DataHooks.useUsersPendingMints(~userId)
 
     <UserColumnCard>
-      <UserColumnHeader>
-        {`Synthetic assets`->React.string} <img className="inline h-5 ml-2" src="/img/coin.png" />
-      </UserColumnHeader>
+      <UserColumnHeader> {`Synthetic assets`->React.string} </UserColumnHeader>
       {switch usersPendingMintsQuery {
       | Loading => <div className="mx-auto"> <Loader.Mini /> </div>
       | GraphError(string) => string->React.string
@@ -121,6 +119,41 @@ module UserTotalStakedCard = {
   }
 }
 
+module IncompleteWithdrawalsCard = {
+  @react.component
+  let make = (~userId) => {
+    let _usersPendingRedeemsQuery = DataHooks.useUsersPendingRedeems(~userId)
+    let usersConfirmedRedeemsQuery = DataHooks.useUsersConfirmedRedeems(~userId)
+
+    {
+      switch usersConfirmedRedeemsQuery {
+      | Loading => <div className="m-auto"> <Loader.Mini /> </div>
+      | GraphError(string) => string->React.string
+      | Response(confirmedRedeems) =>
+        confirmedRedeems->Array.length > 0
+          ? <div className=`p-5 mb-5 bg-white bg-opacity-75 rounded-lg shadow-lg`>
+              <h1 className={`text-center text-lg font-alphbeta mb-4 mt-2`}>
+                {"Available withdrawals"->React.string}
+              </h1>
+              <div className=`flex flex-col`>
+                {confirmedRedeems
+                ->Array.map(({isLong, amount: _, marketIndex}) => {
+                  let marketName = (marketIndex->toNumber->Backend.getMarketInfoUnsafe).name
+                  <div className=`flex items-center justify-between `>
+                    {marketName->React.string}
+                    {(isLong ? `↗️` : `↘️`)->React.string}
+                    <Withdraw marketIndex />
+                  </div>
+                })
+                ->React.array}
+              </div>
+            </div>
+          : React.null
+      }
+    }
+  }
+}
+
 module UserProfileCard = {
   @react.component
   let make = (~userInfo) => {
@@ -132,12 +165,24 @@ module UserProfileCard = {
     let joinedStr = userInfo.joinedAt->DateFns.format(#"do MMM ''yy")
     let txStr = userInfo.transactionCount->toString
     let gasStr = userInfo.gasUsed->toString->Misc.NumberFormat.formatInt
+    let {Swr.data: optDaiBalance} = ContractHooks.useErc20BalanceRefresh(
+      ~erc20Address=Config.config.contracts.dai,
+    )
 
     <UserColumnCard>
       <UserProfileHeader address={addressStr} />
       <UserColumnTextList>
-        <div className="p-4">
+        <div className="px-4">
           <UserColumnText head=`📮 Address` body={addressStr} />
+          {switch optDaiBalance {
+          | Some(daiBalance) =>
+            <UserColumnText
+              icon=CONSTANTS.daiDisplayToken.iconUrl
+              head=`DAI balance`
+              body={`$${daiBalance->Misc.NumberFormat.formatEther(~digits=2)}`}
+            />
+          | None => React.null
+          }}
           <UserColumnText head=`🎉 Joined` body={joinedStr} />
           <UserColumnText head=`⛽ Gas used` body={gasStr} />
           <UserColumnText head=`🏃 No. txs` body={txStr} />
@@ -165,6 +210,7 @@ let onQuerySuccess = (data: userData) => {
     <Container>
       <Divider>
         <UserProfileCard userInfo={data.userInfo} />
+        <IncompleteWithdrawalsCard userId={data.user} />
         <UserFloatCard userId={data.user} stakes={data.stakes} />
       </Divider>
       <Divider>
