@@ -105,8 +105,16 @@ let callEmitEvents: (
 @send
 external withArgs8: (eventCheck, 'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h) => JsPromise.t<unit> = "withArgs"
 
-let expectToNotEmit: eventCheck => JsPromise.t<unit> = _eventCheck =>
-  %raw(`_eventCheck.then(() => assert.fail('An event was emitted when it should not have been')).catch(() => {})`)
+let expectToNotEmit: eventCheck => JsPromise.t<
+  unit,
+> = %raw(`eventCheck => {  let shouldRevert = true;
+  return (eventCheck
+    .catch(() =>
+      shouldRevert = false
+    ))
+    .then(() => { if (shouldRevert) { require("chai").assert.fail('An event was emitted when it should not have been') } }
+    );
+}`)
 
 let expectRevertNoReason: (
   ~transaction: JsPromise.t<ContractHelpers.transaction>,

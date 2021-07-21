@@ -107,14 +107,37 @@ contract LongShortInternalsExposed is LongShortMockable {
     ] = _syntheticTokenPriceSnapshot;
   }
 
-  function setClaimAndDistributeYieldGlobals(
+  function setExecuteOutstandingNextPriceMintsGlobals(
     uint32 marketIndex,
-    address yieldManager,
-    uint256 syntheticTokenPoolValueLong,
-    uint256 syntheticTokenPoolValueShort
+    address user,
+    bool isLong,
+    address syntheticToken,
+    uint256 _userNextPriceRedemptionAmount,
+    uint256 _userCurrentNextPriceUpdateIndex,
+    uint256 _syntheticTokenPriceSnapshot
   ) external {
-    yieldManagers[marketIndex] = yieldManager;
-    syntheticTokenPoolValue[marketIndex][true] = syntheticTokenPoolValueLong;
-    syntheticTokenPoolValue[marketIndex][false] = syntheticTokenPoolValueShort;
+    userNextPriceDepositAmount[marketIndex][isLong][user] = _userNextPriceRedemptionAmount;
+    userCurrentNextPriceUpdateIndex[marketIndex][user] = _userCurrentNextPriceUpdateIndex;
+    syntheticTokenPriceSnapshot[marketIndex][isLong][
+      _userCurrentNextPriceUpdateIndex
+    ] = _syntheticTokenPriceSnapshot;
+    syntheticTokens[marketIndex][isLong] = syntheticToken;
+  }
+
+  function setExecuteOutstandingNextPriceRedeemsGlobals(
+    uint32 marketIndex,
+    address user,
+    bool isLong,
+    address paymentToken,
+    uint256 _userNextPriceRedemptionAmount,
+    uint256 _userCurrentNextPriceUpdateIndex,
+    uint256 _syntheticTokenPriceSnapshot
+  ) external {
+    userNextPriceRedemptionAmount[marketIndex][isLong][user] = _userNextPriceRedemptionAmount;
+    userCurrentNextPriceUpdateIndex[marketIndex][user] = _userCurrentNextPriceUpdateIndex;
+    syntheticTokenPriceSnapshot[marketIndex][isLong][
+      _userCurrentNextPriceUpdateIndex
+    ] = _syntheticTokenPriceSnapshot;
+    paymentTokens[marketIndex] = paymentToken;
   }
 }
