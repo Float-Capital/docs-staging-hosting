@@ -2,7 +2,6 @@
 'use strict';
 
 var Misc = require("../libraries/Misc.js");
-var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Button = require("../components/UI/Base/Button.js");
 var Config = require("../config/Config.js");
@@ -52,23 +51,10 @@ function getUsersTotalTokenBalance(balancesResponse) {
               }));
 }
 
-function useRerender(param) {
-  var match = React.useState(function () {
-        return 0;
-      });
-  var setV = match[1];
-  return function (param) {
-    return Curry._1(setV, (function (v) {
-                  return v + 1 | 0;
-                }));
-  };
-}
-
 function User$UserBalancesCard(Props) {
   var userId = Props.userId;
   var usersTokensQuery = DataHooks.useUsersBalances(userId);
   var usersPendingMintsQuery = DataHooks.useUsersPendingMints(userId);
-  var rerender = useRerender(undefined);
   var tmp;
   if (typeof usersPendingMintsQuery === "number") {
     tmp = React.createElement("div", {
@@ -90,8 +76,7 @@ function User$UserBalancesCard(Props) {
                             isLong: param.isLong,
                             daiSpend: param.amount,
                             txConfirmedTimestamp: param.confirmedTimestamp.toNumber(),
-                            marketIndex: marketIndex,
-                            rerenderCallback: rerender
+                            marketIndex: marketIndex
                           });
               })));
   }
@@ -134,7 +119,6 @@ function User$UserBalancesCard(Props) {
 }
 
 var UserBalancesCard = {
-  useRerender: useRerender,
   make: User$UserBalancesCard
 };
 

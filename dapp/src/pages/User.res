@@ -14,17 +14,10 @@ let getUsersTotalTokenBalance = (balancesResponse: array<Queries.UserTokenBalanc
   )
 
 module UserBalancesCard = {
-  let useRerender = () => {
-    let (_v, setV) = React.useState(_ => 0)
-    () => setV(v => v + 1)
-  }
-
   @react.component
   let make = (~userId) => {
     let usersTokensQuery = DataHooks.useUsersBalances(~userId)
     let usersPendingMintsQuery = DataHooks.useUsersPendingMints(~userId)
-
-    let rerender = useRerender()
 
     <UserColumnCard>
       <UserColumnHeader>
@@ -47,7 +40,6 @@ module UserBalancesCard = {
               daiSpend=amount
               marketIndex
               txConfirmedTimestamp={confirmedTimestamp->toNumber}
-              rerenderCallback=rerender
             />
           )
           ->React.array}

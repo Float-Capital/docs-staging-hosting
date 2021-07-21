@@ -442,7 +442,6 @@ function UserUI$UserPendingBox(Props) {
   var daiSpend = Props.daiSpend;
   var txConfirmedTimestamp = Props.txConfirmedTimestamp;
   var marketIndex = Props.marketIndex;
-  var rerenderCallback = Props.rerenderCallback;
   var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toString());
   if (typeof lastOracleTimestamp === "number") {
     return React.createElement(Loader.Tiny.make, {});
@@ -464,8 +463,7 @@ function UserUI$UserPendingBox(Props) {
                             src: CONSTANTS.daiDisplayToken.iconUrl
                           }), Ethers.Utils.formatEther(daiSpend))), React.createElement(ProgressBar.make, {
                     txConfirmedTimestamp: txConfirmedTimestamp,
-                    nextPriceUpdateTimestamp: lastOracleTimestamp._0.toNumber() + 60 | 0,
-                    rerenderCallback: rerenderCallback
+                    nextPriceUpdateTimestamp: lastOracleTimestamp._0.toNumber() + 60 | 0
                   }));
   }
 }

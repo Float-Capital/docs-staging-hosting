@@ -1,18 +1,50 @@
-let useRerender = () => {
-  let (_v, setV) = React.useState(_ => 0)
-  () => setV(v => v + 1)
+module ConfirmedTransactionModal = {
+  @react.component
+  let make = (~marketIndex) => {
+    let lastOracleTimestamp = DataHooks.useOracleLastUpdate(
+      ~marketIndex=marketIndex->Ethers.BigNumber.toString,
+    )
+
+    let oracleHeartBeat = 120 // TODO
+
+    let milisecondsInSecond = 1000.
+    let (completeTimestamp, _setCompleteTimestamp) = React.useState(_ =>
+      Js.Date.now() /. milisecondsInSecond
+    )
+
+    <>
+      <Modal id={8}>
+        <div className="text-center m-3">
+          <Tick />
+          <p> {`Transaction complete 🎉`->React.string} </p>
+          <p className="text-xxs text-gray-700">
+            {`You can withdraw your ${Config.paymentTokenName} on the next oracle price update`->React.string}
+          </p>
+          {switch lastOracleTimestamp {
+          | Response(lastOracleUpdateTimestamp) => {
+              Js.log("completeTimestamp")
+              Js.log(completeTimestamp)
+
+              Js.log("lastOracleTimestamp")
+              Js.log(lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber)
+              <ProgressBar
+                txConfirmedTimestamp={completeTimestamp->Belt.Int.fromFloat}
+                nextPriceUpdateTimestamp={lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber +
+                  oracleHeartBeat}
+              />
+            }
+          | GraphError(error) => <p> {error->React.string} </p>
+          | Loading => <Loader.Tiny />
+          }}
+          <ViewProfileButton />
+        </div>
+      </Modal>
+    </>
+  }
 }
 
 @react.component
 let make = (~txStateRedeem, ~resetFormButton, ~buttonText, ~buttonDisabled, ~marketIndex) => {
-  let rerender = useRerender()
-
-  let lastOracleTimestamp = DataHooks.useOracleLastUpdate(
-    ~marketIndex=marketIndex->Ethers.BigNumber.toString,
-  )
-
-  let oracleHeartBeat = 30 // TODO
-
   switch txStateRedeem {
   | ContractActions.Created => <>
       <Modal id={5}>
@@ -37,31 +69,7 @@ let make = (~txStateRedeem, ~resetFormButton, ~buttonText, ~buttonDisabled, ~mar
       </Modal>
       <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
     </>
-  | ContractActions.Complete({transactionHash: txHash}) => <>
-      <Modal id={8}>
-        <div className="text-center m-3">
-          <Tick />
-          <p> {`Transaction complete 🎉`->React.string} </p>
-          <p className="text-xxs text-gray-700">
-            {`You can withdraw your ${Config.paymentTokenName} on the next oracle price update`->React.string}
-          </p>
-          {switch lastOracleTimestamp {
-          | Response(lastOracleUpdateTimestamp) =>
-            <ProgressBar
-              txConfirmedTimestamp={1} // TODO: now
-              nextPriceUpdateTimestamp={lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber +
-                oracleHeartBeat}
-              rerenderCallback=rerender
-            />
-          | GraphError(error) => <p> {error->React.string} </p>
-          | Loading => <Loader.Tiny />
-          }}
-          <ViewOnBlockExplorer txHash />
-          <ViewProfileButton />
-        </div>
-      </Modal>
-      {resetFormButton()}
-    </>
+  | ContractActions.Complete(_) => <ConfirmedTransactionModal marketIndex />
   | ContractActions.Declined(_message) => <>
       <Modal id={9}>
         <div className="text-center m-3">

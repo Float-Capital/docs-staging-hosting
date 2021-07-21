@@ -12,9 +12,12 @@ var IntervalToDuration = require("date-fns/intervalToDuration").default;
 function ProgressBar(Props) {
   var txConfirmedTimestampOpt = Props.txConfirmedTimestamp;
   var nextPriceUpdateTimestampOpt = Props.nextPriceUpdateTimestamp;
-  var rerenderCallback = Props.rerenderCallback;
+  var rerenderCallbackOpt = Props.rerenderCallback;
   var txConfirmedTimestamp = txConfirmedTimestampOpt !== undefined ? txConfirmedTimestampOpt : 0;
   var nextPriceUpdateTimestamp = nextPriceUpdateTimestampOpt !== undefined ? nextPriceUpdateTimestampOpt : 100;
+  var rerenderCallback = rerenderCallbackOpt !== undefined ? rerenderCallbackOpt : (function (param) {
+        
+      });
   var totalSecondsUntilExecution = nextPriceUpdateTimestamp - txConfirmedTimestamp | 0;
   var match = React.useState(function () {
         return 0;

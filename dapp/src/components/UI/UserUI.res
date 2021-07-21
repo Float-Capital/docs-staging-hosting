@@ -325,14 +325,7 @@ module UserTokenBox = {
 }
 module UserPendingBox = {
   @react.component
-  let make = (
-    ~name,
-    ~isLong,
-    ~daiSpend,
-    ~txConfirmedTimestamp,
-    ~marketIndex,
-    ~rerenderCallback,
-  ) => {
+  let make = (~name, ~isLong, ~daiSpend, ~txConfirmedTimestamp, ~marketIndex) => {
     let lastOracleTimestamp = DataHooks.useOracleLastUpdate(
       ~marketIndex=marketIndex->Ethers.BigNumber.toString,
     )
@@ -355,7 +348,6 @@ module UserPendingBox = {
           txConfirmedTimestamp
           nextPriceUpdateTimestamp={lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber +
             oracleHeartbeatForMarket}
-          rerenderCallback
         />
       </div>
     | GraphError(error) => <p> {error->React.string} </p>
