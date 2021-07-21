@@ -106,7 +106,7 @@ contract LongShort is ILongShort, Initializable {
 
   event NextPriceSyntheticPositionShift(
     uint32 marketIndex,
-    bool shiftingFromLong,
+    bool isShiftFromLong,
     uint256 synthShifted,
     address user,
     uint256 oracleUpdateIndex
@@ -135,6 +135,13 @@ contract LongShort is ILongShort, Initializable {
     address user,
     uint32 marketIndex,
     bool isLong,
+    uint256 amount
+  );
+
+  event ExecuteNextPriceMarketSideShiftSettlementUser(
+    address user,
+    uint32 marketIndex,
+    bool isShiftFromLong,
     uint256 amount
   );
 
@@ -795,21 +802,35 @@ contract LongShort is ILongShort, Initializable {
   function _executeOutstandingNextPriceTokenShifts(
     uint32 marketIndex,
     address user,
-    bool isLong
+    bool isShiftFromLong
   ) internal virtual {
-    uint256 currentRedemptions = userNextPriceRedemptionAmount[marketIndex][isLong][user];
-    if (currentRedemptions > 0) {
-      userNextPriceRedemptionAmount[marketIndex][isLong][user] = 0;
-      uint256 amountToRedeem = _getAmountPaymentToken(
-        currentRedemptions,
-        syntheticTokenPriceSnapshot[marketIndex][isLong][
-          userCurrentNextPriceUpdateIndex[marketIndex][user]
-        ]
+    uint256 synthTokensShiftedAwayFromMarketSide = userNextPriceShiftMarketSideAmount[marketIndex][
+      isShiftFromLong
+    ][user];
+    if (synthTokensShiftedAwayFromMarketSide > 0) {
+      uint256 paymentTokensToShift = _getAmountPaymentToken(
+        synthTokensShiftedAwayFromMarketSide,
+        syntheticTokenPriceSnapshot[marketIndex][!isShiftFromLong][currentMarketUpdateIndex]
       );
-      // This means all erc20 tokens we use as payment tokens must return a boolean
-      require(IERC20(paymentTokens[marketIndex]).transfer(user, amountToRedeem));
 
-      emit ExecuteNextPriceRedeemSettlementUser(user, marketIndex, isLong, amountToRedeem);
+      uint256 amountSynthTokenRecievedOnOtherSide = _getAmountSynthToken(
+        paymentTokensToShift,
+        syntheticTokenPriceSnapshot[marketIndex][isShiftFromLong][currentMarketUpdateIndex]
+      );
+
+      require(
+        ISyntheticToken(syntheticTokens[marketIndex][!isShiftFromLong]).transfer(
+          user,
+          amountSynthTokenRecievedOnOtherSide
+        )
+      );
+
+      emit ExecuteNextPriceMarketSideShiftSettlementUser(
+        user,
+        marketIndex,
+        isShiftFromLong,
+        amountToRedeem
+      );
     }
   }
 
@@ -823,6 +844,8 @@ contract LongShort is ILongShort, Initializable {
       _executeOutstandingNextPriceMints(marketIndex, user, false);
       _executeOutstandingNextPriceRedeems(marketIndex, user, true);
       _executeOutstandingNextPriceRedeems(marketIndex, user, false);
+      _executeOutstandingNextPriceTokenShifts(marketIndex, user, true);
+      _executeOutstandingNextPriceTokenShifts(marketIndex, user, false);
 
       userCurrentNextPriceUpdateIndex[marketIndex][user] = 0;
 
