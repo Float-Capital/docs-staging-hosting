@@ -7,7 +7,7 @@ let testUnit =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe("Execute next price action", () => {
+  describeUnit("Execute next price action", () => {
     let marketIndex = Helpers.randomJsInteger();
     let user = Helpers.randomAddress();
 
@@ -32,6 +32,7 @@ let testUnit =
         let%Await smockedShortSynth = SyntheticTokenSmocked.make(shortSynth);
 
         smockedLongSynth->SyntheticTokenSmocked.mockTransferToReturn(true);
+        smockedShortSynth->SyntheticTokenSmocked.mockTransferToReturn(true);
 
         longSynthSmocked := smockedLongSynth;
         shortSynthSmocked := smockedShortSynth;
@@ -94,8 +95,6 @@ let testUnit =
             ref("Undefined"->Obj.magic);
           let userNextPriceRedemptionAmount = Helpers.randomTokenAmount();
           let syntheticTokenPriceSnapshot = Helpers.randomTokenAmount();
-
-          let isLong = true;
 
           before_each(() => {
             let%Await _ =
@@ -273,7 +272,7 @@ let testUnit =
           });
 
           it(
-            "should call transfer on the correct amount of synthetic tokens to the user",
+            "should call transfer on the correct amount of Payment Tokens to the user",
             () => {
             let%Await _ = executeOutstandingNextPriceRedeemsTx.contents;
             let transferCalls =
