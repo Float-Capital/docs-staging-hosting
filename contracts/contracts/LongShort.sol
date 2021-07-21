@@ -706,6 +706,7 @@ contract LongShort is ILongShort, Initializable {
       );
       // This means all erc20 tokens we use as payment tokens must return a boolean
       require(IERC20(paymentTokens[marketIndex]).transfer(user, amountToRedeem));
+
       emit ExecuteNextPriceRedeemSettlementUser(user, marketIndex, isLong, amountToRedeem);
     }
   }
