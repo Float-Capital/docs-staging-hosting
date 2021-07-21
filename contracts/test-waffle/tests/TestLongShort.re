@@ -197,5 +197,6 @@ describe("Float System", () => {
     BatchedSettlement.testUnit(~contracts, ~accounts);
     MintNextPrice.testUnit(~contracts, ~accounts);
     ExecuteNextPriceAction.testUnit(~contracts, ~accounts);
+    ExecuteOutstandingNextPriceSettlements.testUnit(~contracts, ~accounts);
   });
 });
