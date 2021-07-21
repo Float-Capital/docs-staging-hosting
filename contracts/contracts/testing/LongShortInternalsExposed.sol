@@ -113,7 +113,7 @@ contract LongShortInternalsExposed is LongShortMockable {
     uint256 syntheticTokenPoolValueLong,
     uint256 syntheticTokenPoolValueShort
   ) external {
-    yieldManagers[marketIndex] = IYieldManager(yieldManager);
+    yieldManagers[marketIndex] = yieldManager;
     syntheticTokenPoolValue[marketIndex][true] = syntheticTokenPoolValueLong;
     syntheticTokenPoolValue[marketIndex][false] = syntheticTokenPoolValueShort;
   }

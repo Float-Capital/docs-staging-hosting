@@ -108,21 +108,21 @@ let testUnit =
         );
       };
 
-      it_only("works as expected if longValue > shortValue", () => {
+      it("works as expected if longValue > shortValue", () => {
         let syntheticTokenPoolValueShort = Helpers.randomTokenAmount();
         let syntheticTokenPoolValueLong =
           syntheticTokenPoolValueShort->add(Helpers.randomTokenAmount());
 
         test(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
       });
-      it_only("works as expected if shortValue > longValue", () => {
+      it("works as expected if shortValue > longValue", () => {
         let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
         let syntheticTokenPoolValueShort =
           syntheticTokenPoolValueLong->add(Helpers.randomTokenAmount());
 
         test(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
       });
-      it_only("works as expected if shortValue == longValue", () => {
+      it("works as expected if shortValue == longValue", () => {
         let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
         let syntheticTokenPoolValueShort = syntheticTokenPoolValueLong;
 
