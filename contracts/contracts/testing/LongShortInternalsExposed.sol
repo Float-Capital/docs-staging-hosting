@@ -33,6 +33,46 @@ contract LongShortInternalsExposed is LongShortMockable {
     ] = (shortAddress);
   }
 
+  function setMarketExistsMulti(uint32[] calldata marketIndexes) external {
+    for (uint256 i = 0; i < marketIndexes.length; i++) {
+      marketExists[marketIndexes[i]] = true;
+    }
+  }
+
+  function set_updateSystemStateInternalGlobals(
+    uint32 marketIndex,
+    uint256 _latestUpdateIndexForMarket,
+    uint256 syntheticTokenPriceLong,
+    uint256 syntheticTokenPriceShort,
+    uint256 _assetPrice,
+    uint256 longValue,
+    uint256 shortValue,
+    address oracleManager,
+    address _staker,
+    address synthLong,
+    address synthShort
+  ) public {
+    marketExists[marketIndex] = true;
+    marketUpdateIndex[marketIndex] = _latestUpdateIndexForMarket;
+    syntheticTokenPriceSnapshot[marketIndex][true][
+      _latestUpdateIndexForMarket
+    ] = syntheticTokenPriceLong;
+    syntheticTokenPriceSnapshot[marketIndex][false][
+      _latestUpdateIndexForMarket
+    ] = syntheticTokenPriceShort;
+
+    syntheticTokenPoolValue[marketIndex][true] = longValue;
+    syntheticTokenPoolValue[marketIndex][false] = shortValue;
+
+    assetPrice[marketIndex] = _assetPrice;
+    oracleManagers[marketIndex] = oracleManager;
+
+    syntheticTokens[marketIndex][true] = synthLong;
+    syntheticTokens[marketIndex][false] = synthShort;
+
+    staker = _staker;
+  }
+
   function setUseexecuteOutstandingNextPriceSettlementsMock(bool shouldUseMock) public {
     overRideexecuteOutstandingNextPriceSettlements = shouldUseMock;
   }
@@ -69,5 +109,39 @@ contract LongShortInternalsExposed is LongShortMockable {
 
   function setMintNextPriceGlobals(uint32 marketIndex, uint256 _marketUpdateIndex) external {
     marketUpdateIndex[marketIndex] = _marketUpdateIndex;
+  }
+
+  function setExecuteOutstandingNextPriceMintsGlobals(
+    uint32 marketIndex,
+    address user,
+    bool isLong,
+    address syntheticToken,
+    uint256 _userNextPriceRedemptionAmount,
+    uint256 _userCurrentNextPriceUpdateIndex,
+    uint256 _syntheticTokenPriceSnapshot
+  ) external {
+    userNextPriceDepositAmount[marketIndex][isLong][user] = _userNextPriceRedemptionAmount;
+    userCurrentNextPriceUpdateIndex[marketIndex][user] = _userCurrentNextPriceUpdateIndex;
+    syntheticTokenPriceSnapshot[marketIndex][isLong][
+      _userCurrentNextPriceUpdateIndex
+    ] = _syntheticTokenPriceSnapshot;
+    syntheticTokens[marketIndex][isLong] = syntheticToken;
+  }
+
+  function setExecuteOutstandingNextPriceRedeemsGlobals(
+    uint32 marketIndex,
+    address user,
+    bool isLong,
+    address paymentToken,
+    uint256 _userNextPriceRedemptionAmount,
+    uint256 _userCurrentNextPriceUpdateIndex,
+    uint256 _syntheticTokenPriceSnapshot
+  ) external {
+    userNextPriceRedemptionAmount[marketIndex][isLong][user] = _userNextPriceRedemptionAmount;
+    userCurrentNextPriceUpdateIndex[marketIndex][user] = _userCurrentNextPriceUpdateIndex;
+    syntheticTokenPriceSnapshot[marketIndex][isLong][
+      _userCurrentNextPriceUpdateIndex
+    ] = _syntheticTokenPriceSnapshot;
+    paymentTokens[marketIndex] = paymentToken;
   }
 }
