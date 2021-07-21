@@ -93,7 +93,7 @@ let testUnit =
         contracts^.longShort
         ->LongShort.userCurrentNextPriceUpdateIndex(marketIndex, user);
 
-      Chai.bnEqual(updatedUserCurrentNextPriceUpdateIndex, oneBn);
+      Chai.bnEqual(updatedUserCurrentNextPriceUpdateIndex, zeroBn);
     });
 
     it(
