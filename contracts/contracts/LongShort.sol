@@ -716,7 +716,7 @@ contract LongShort is ILongShort, Initializable {
     virtual
   {
     uint256 userCurrentUpdateIndex = userCurrentNextPriceUpdateIndex[marketIndex][user];
-    if (userCurrentUpdateIndex != 0) {
+    if (userCurrentUpdateIndex != 0 && userCurrentUpdateIndex <= marketUpdateIndex[marketIndex]) {
       _executeOutstandingNextPriceMints(marketIndex, user, true);
       _executeOutstandingNextPriceMints(marketIndex, user, false);
       _executeOutstandingNextPriceRedeems(marketIndex, user, true);

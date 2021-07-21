@@ -10,10 +10,11 @@ let testUnit =
   describe("executeOutstandingNextPriceSettlements", () => {
     let marketIndex = 1;
     let user = Helpers.randomAddress();
-    let userCurrentNextPriceUpdateIndex = bnFromInt(22);
-    let marketUpdateIndex = userCurrentNextPriceUpdateIndex->add(oneBn);
+    let defaultUserCurrentNextPriceUpdateIndex = bnFromInt(22);
+    let defaultMarketUpdateIndex =
+      defaultUserCurrentNextPriceUpdateIndex->add(oneBn);
 
-    let setup = (~userCurrentNextPriceUpdateIndex) => {
+    let setup = (~userCurrentNextPriceUpdateIndex, ~marketUpdateIndex) => {
       let%AwaitThen _ =
         contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
 
@@ -22,9 +23,6 @@ let testUnit =
         ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
             ~functionName="_executeOutstandingNextPriceSettlements",
           );
-
-      LongShortSmocked.InternalMock.mock_executeOutstandingNextPriceMintsToReturn();
-      LongShortSmocked.InternalMock.mock_executeOutstandingNextPriceRedeemsToReturn();
 
       let%AwaitThen _ =
         contracts.contents.longShort
@@ -45,7 +43,11 @@ let testUnit =
     it(
       "emits ExecuteNextPriceSettlementsUser event with correct parameters", () => {
       Chai.callEmitEvents(
-        ~call=setup(~userCurrentNextPriceUpdateIndex),
+        ~call=
+          setup(
+            ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
+            ~marketUpdateIndex=defaultMarketUpdateIndex,
+          ),
         ~eventName="ExecuteNextPriceSettlementsUser",
         ~contract=contracts.contents.longShort->Obj.magic,
       )
@@ -55,7 +57,11 @@ let testUnit =
     it(
       "calls nextPriceMint/nextPriceRedeem functions with correct arguments",
       () => {
-      let%Await _ = setup(~userCurrentNextPriceUpdateIndex);
+      let%Await _ =
+        setup(
+          ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
+          ~marketUpdateIndex=defaultMarketUpdateIndex,
+        );
 
       let executeOutstandingNextPriceMintsCalls =
         LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsCalls();
@@ -77,20 +83,28 @@ let testUnit =
     });
 
     it("sets userCurrentNextPriceUpdateIndex[marketIndex][user] to 0", () => {
-      let%AwaitThen _ = setup(~userCurrentNextPriceUpdateIndex);
+      let%AwaitThen _ =
+        setup(
+          ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
+          ~marketUpdateIndex=defaultMarketUpdateIndex,
+        );
 
       let%Await updatedUserCurrentNextPriceUpdateIndex =
         contracts^.longShort
         ->LongShort.userCurrentNextPriceUpdateIndex(marketIndex, user);
 
-      Chai.bnEqual(updatedUserCurrentNextPriceUpdateIndex, bnFromInt(0));
+      Chai.bnEqual(updatedUserCurrentNextPriceUpdateIndex, oneBn);
     });
 
     it(
       "doesn't emit ExecuteNextPriceSettlementsUser event if userCurrentNextPriceUpdateIndex[marketIndex][user] = 0",
       () => {
       Chai.callEmitEvents(
-        ~call=setup(~userCurrentNextPriceUpdateIndex=bnFromInt(0)),
+        ~call=
+          setup(
+            ~userCurrentNextPriceUpdateIndex=bnFromInt(0),
+            ~marketUpdateIndex=defaultMarketUpdateIndex,
+          ),
         ~eventName="ExecuteNextPriceSettlementsUser",
         ~contract=contracts.contents.longShort->Obj.magic,
       )
@@ -100,7 +114,50 @@ let testUnit =
     it(
       "doesn't call nextPriceMint/nextPriceRedeem functions if userCurrentNextPriceUpdateIndex[marketIndex][user] = 0",
       () => {
-        let%Await _ = setup(~userCurrentNextPriceUpdateIndex=bnFromInt(0));
+        let%Await _ =
+          setup(
+            ~userCurrentNextPriceUpdateIndex=bnFromInt(0),
+            ~marketUpdateIndex=defaultMarketUpdateIndex,
+          );
+
+        let executeOutstandingNextPriceMintsCalls =
+          LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsCalls();
+        let executeOutstandingNextPriceRedeemCalls =
+          LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsCalls();
+
+        Chai.intEqual(executeOutstandingNextPriceMintsCalls->Array.length, 0);
+        Chai.intEqual(
+          executeOutstandingNextPriceRedeemCalls->Array.length,
+          0,
+        );
+      },
+    );
+
+    it(
+      "doesn't emit ExecuteNextPriceSettlementsUser event if userCurrentNextPriceUpdateIndex[marketIndex][user] > marketUpdateIndex[marketIndex]",
+      () => {
+      Chai.callEmitEvents(
+        ~call=
+          setup(
+            ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
+            ~marketUpdateIndex=
+              defaultUserCurrentNextPriceUpdateIndex->sub(oneBn),
+          ),
+        ~eventName="ExecuteNextPriceSettlementsUser",
+        ~contract=contracts.contents.longShort->Obj.magic,
+      )
+      ->Chai.expectToNotEmit
+    });
+
+    it(
+      "doesn't call nextPriceMint/nextPriceRedeem functions if userCurrentNextPriceUpdateIndex[marketIndex][user] > marketUpdateIndex[marketIndex]",
+      () => {
+        let%Await _ =
+          setup(
+            ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
+            ~marketUpdateIndex=
+              defaultUserCurrentNextPriceUpdateIndex->sub(oneBn),
+          );
 
         let executeOutstandingNextPriceMintsCalls =
           LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsCalls();
