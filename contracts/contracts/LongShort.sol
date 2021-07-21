@@ -511,7 +511,7 @@ contract LongShort is ILongShort, Initializable {
       (
         uint256 newLongPoolValue,
         uint256 newShortPoolValue
-      ) = _claimAndDistributeYieldThenRebalanceMarket(marketIndex, oldAssetPrice, newAssetPrice);
+      ) = _claimAndDistributeYieldThenRebalanceMarket(marketIndex, newAssetPrice, oldAssetPrice);
 
       syntheticTokenPriceLong = _getSyntheticTokenPrice(
         newLongPoolValue,
