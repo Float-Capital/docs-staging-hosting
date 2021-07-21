@@ -389,7 +389,7 @@ contract LongShort is ILongShort, Initializable {
         );
       }
 
-      balanceDeltaFromConfirmedActions += int256(
+      balanceDeltaFromConfirmedActions -= int256(
         userNextPriceRedemptionAmount[marketIndex][isLong][user]
       );
 
