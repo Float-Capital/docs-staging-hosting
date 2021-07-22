@@ -566,6 +566,7 @@ contract LongShort is ILongShort, Initializable {
           syntheticTokenPriceShort,
           syntheticTokenPoolValue[marketIndex][true],
           syntheticTokenPoolValue[marketIndex][false],
+          // This variable could allow users to do any next price actions in the future (not just synthetic side shifts)
           userCurrentNextPriceUpdateIndex[marketIndex][staker]
         );
       } else {

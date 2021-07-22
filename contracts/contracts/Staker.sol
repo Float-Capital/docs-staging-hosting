@@ -56,6 +56,8 @@ contract Staker is IStaker, Initializable {
   mapping(uint256 => uint256) public tokenShiftIndexToStakerStateMapping;
   mapping(uint256 => uint256) public longShortMarketPriceSnapshotIndex;
   mapping(uint32 => mapping(address => uint256)) public shiftIndex;
+  // This value is an `int256` so it can represent shifts in either direction.
+  // Possitive is a shift from long, negative is a shift from short.
   mapping(uint32 => mapping(address => int256)) public amountToShiftUser;
 
   /*╔════════════════════════════╗
@@ -504,8 +506,7 @@ contract Staker is IStaker, Initializable {
     uint256 longPrice,
     uint256 shortPrice,
     uint256 longValue,
-    uint256 shortValue,
-    uint256 longShortMarketPriceSnapshotIndexIfShiftExecuted // This value should be ALWAYS be zero if no shift occured
+    uint256 shortValue
   ) internal virtual {
     (
       uint256 newLongAccumaltiveValue,
@@ -519,16 +520,6 @@ contract Staker is IStaker, Initializable {
     );
 
     uint256 newIndex = latestRewardIndex[marketIndex] + 1;
-
-    if (longShortMarketPriceSnapshotIndexIfShiftExecuted > 0) {
-      longShortMarketPriceSnapshotIndex[
-        nextTokenShiftIndex[marketIndex]
-      ] = longShortMarketPriceSnapshotIndexIfShiftExecuted;
-      tokenShiftIndexToStakerStateMapping[nextTokenShiftIndex[marketIndex]] = newIndex;
-      nextTokenShiftIndex[marketIndex] += 1;
-
-      emit SynthTokensShifted();
-    }
 
     // Set cumulative 'r' value on new state point.
     syntheticRewardParams[marketIndex][newIndex]
@@ -560,18 +551,22 @@ contract Staker is IStaker, Initializable {
   ) external override onlyLongShort {
     // Only add a new state point if some time has passed.
 
+    // the `longShortMarketPriceSnapshotIndexIfShiftExecuted` value will be 0 if there is no staker related action in an executed batch
+    if (longShortMarketPriceSnapshotIndexIfShiftExecuted > 0) {
+      longShortMarketPriceSnapshotIndex[
+        nextTokenShiftIndex[marketIndex]
+      ] = longShortMarketPriceSnapshotIndexIfShiftExecuted;
+      tokenShiftIndexToStakerStateMapping[nextTokenShiftIndex[marketIndex]] =
+        latestRewardIndex[marketIndex] +
+        1;
+      nextTokenShiftIndex[marketIndex] += 1;
+
+      emit SynthTokensShifted();
+    }
+
     // Time delta is fetched twice in below code, can pass through? Which is less gas?
-    if (
-      _calculateTimeDelta(marketIndex) > 0 || longShortMarketPriceSnapshotIndexIfShiftExecuted > 0
-    ) {
-      _setRewardObjects(
-        marketIndex,
-        longPrice,
-        shortPrice,
-        longValue,
-        shortValue,
-        longShortMarketPriceSnapshotIndexIfShiftExecuted
-      );
+    if (_calculateTimeDelta(marketIndex) > 0) {
+      _setRewardObjects(marketIndex, longPrice, shortPrice, longValue, shortValue);
     }
   }
 
@@ -579,6 +574,7 @@ contract Staker is IStaker, Initializable {
     ║    USER REWARD STATE FUNCTIONS    ║
     ╚═══════════════════════════════════╝*/
 
+  /// @dev Calculates the accumulated float in a specific range of staker snapshots
   function _calculateAccumulatedFloatInRange(
     uint32 marketIndex,
     uint256 amountStakedLong,
@@ -620,6 +616,7 @@ contract Staker is IStaker, Initializable {
     }
 
     uint256 usersShiftIndex = shiftIndex[marketIndex][user];
+    // if there is a change in the users tokens held due to a token shift (or possibly another action in the future)
     if (usersShiftIndex > 0 && usersShiftIndex < nextTokenShiftIndex[marketIndex]) {
       floatReward = _calculateAccumulatedFloatInRange(
         marketIndex,
@@ -629,6 +626,7 @@ contract Staker is IStaker, Initializable {
         tokenShiftIndexToStakerStateMapping[usersShiftIndex]
       );
 
+      // Update the users balances
       if (amountToShiftUser[marketIndex][user] > 0) {
         amountStakedShort += ILongShort(longShort).getAmountSynthTokenShifted(
           marketIndex,
@@ -649,6 +647,10 @@ contract Staker is IStaker, Initializable {
         // TODO: investigate how casting negative numbers works in solidity
         amountStakedShort -= uint256(-amountToShiftUser[marketIndex][user]);
       }
+
+      // Save the users updated staked amounts
+      userAmountStaked[longToken][user] = amountStakedLong;
+      userAmountStaked[shortToken][user] = amountStakedShort;
 
       floatReward += _calculateAccumulatedFloatInRange(
         marketIndex,
