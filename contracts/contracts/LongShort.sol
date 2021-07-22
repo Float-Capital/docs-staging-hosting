@@ -735,6 +735,15 @@ contract LongShort is ILongShort, Initializable {
     _executeOutstandingNextPriceSettlements(user, marketIndex);
   }
 
+  function executeOutstandingNextPriceSettlementsUserMulti(
+    address user,
+    uint32[] memory marketIndexes
+  ) external {
+    for (uint256 i = 0; i < marketIndexes.length; i++) {
+      _executeOutstandingNextPriceSettlements(user, marketIndexes[i]);
+    }
+  }
+
   /*╔═══════════════════════════════════════════╗
     ║   BATCHED NEXT PRICE SETTLEMENT ACTIONS   ║
     ╚═══════════════════════════════════════════╝*/
