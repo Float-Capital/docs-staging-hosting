@@ -55,7 +55,7 @@ contract LongShort is ILongShort, Initializable {
   mapping(uint32 => mapping(bool => mapping(uint256 => uint256)))
     public syntheticTokenPriceSnapshot;
 
-  mapping(uint32 => mapping(bool => uint256)) public batchedAmountOfTokensToDeposit;
+  mapping(uint32 => mapping(bool => uint256)) public batchedAmountOfPaymentTokenTokensToDeposit;
   mapping(uint32 => mapping(bool => uint256)) public batchedAmountOfSynthTokensToRedeem;
   mapping(uint32 => mapping(bool => uint256)) public batchedAmountOfSynthTokensToShiftMarketSide;
 
@@ -66,7 +66,7 @@ contract LongShort is ILongShort, Initializable {
   mapping(uint32 => mapping(bool => mapping(address => uint256)))
     public userNextPriceRedemptionAmount;
   mapping(uint32 => mapping(bool => mapping(address => uint256)))
-    public userNextPriceShiftMarketSideAmount;
+    public userNextPrice_amountSynthToShiftFromMarketSide;
 
   /*╔════════════════════════════╗
     ║           EVENTS           ║
@@ -380,18 +380,23 @@ contract LongShort is ILongShort, Initializable {
     This function returns a calculated value only in the case of 'confirmed' next price actions.
     It should return zero for all other types of next price actions.
     */
-  function getUsersConfirmedButNotSettledBalance(
+  function getUsersConfirmedButNotSettledSynthBalance(
     address user,
     uint32 marketIndex,
     bool isLong
-  ) external view virtual override assertMarketExists(marketIndex) returns (int256 pendingBalance) {
+  )
+    external
+    view
+    virtual
+    override
+    assertMarketExists(marketIndex)
+    returns (int256 confirmedButNotSettledBalance)
+  {
     uint256 currentMarketUpdateIndex = marketUpdateIndex[marketIndex];
     if (
       userCurrentNextPriceUpdateIndex[marketIndex][user] != 0 &&
       userCurrentNextPriceUpdateIndex[marketIndex][user] <= currentMarketUpdateIndex
     ) {
-      int256 balanceDeltaFromConfirmedActions;
-
       // Update is still nextPrice but not past the next oracle update - display the
       // amount the user would get if they executed immediately.
       uint256 amountPaymentTokenDeposited = userNextPriceDepositAmount[marketIndex][isLong][user];
@@ -401,22 +406,22 @@ contract LongShort is ILongShort, Initializable {
           currentMarketUpdateIndex
         ];
 
-        balanceDeltaFromConfirmedActions += int256(
+        confirmedButNotSettledBalance += int256(
           _getAmountSynthToken(amountPaymentTokenDeposited, syntheticTokenPrice)
         );
       }
 
-      balanceDeltaFromConfirmedActions -= int256(
+      confirmedButNotSettledBalance -= int256(
         userNextPriceRedemptionAmount[marketIndex][isLong][user]
       );
 
-      balanceDeltaFromConfirmedActions -= int256(
-        userNextPriceShiftMarketSideAmount[marketIndex][isLong][user]
+      confirmedButNotSettledBalance -= int256(
+        userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][isLong][user]
       );
 
-      uint256 synthTokensShiftedAwayFromOtherSide = userNextPriceShiftMarketSideAmount[marketIndex][
-        !isLong
-      ][user];
+      uint256 synthTokensShiftedAwayFromOtherSide = userNextPrice_amountSynthToShiftFromMarketSide[
+        marketIndex
+      ][!isLong][user];
 
       if (synthTokensShiftedAwayFromOtherSide > 0) {
         uint256 paymentTokensToShift = _getAmountPaymentToken(
@@ -424,7 +429,7 @@ contract LongShort is ILongShort, Initializable {
           syntheticTokenPriceSnapshot[marketIndex][!isLong][currentMarketUpdateIndex]
         );
 
-        balanceDeltaFromConfirmedActions += int256(
+        confirmedButNotSettledBalance += int256(
           _getAmountSynthToken(
             paymentTokensToShift,
             syntheticTokenPriceSnapshot[marketIndex][isLong][currentMarketUpdateIndex]
@@ -432,7 +437,7 @@ contract LongShort is ILongShort, Initializable {
         );
       }
 
-      return balanceDeltaFromConfirmedActions;
+      return confirmedButNotSettledBalance;
     } else {
       return 0;
     }
@@ -675,7 +680,7 @@ contract LongShort is ILongShort, Initializable {
   {
     _depositFunds(marketIndex, amount);
 
-    batchedAmountOfTokensToDeposit[marketIndex][isLong] += amount;
+    batchedAmountOfPaymentTokenTokensToDeposit[marketIndex][isLong] += amount;
     userNextPriceDepositAmount[marketIndex][isLong][msg.sender] += amount;
     userCurrentNextPriceUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
 
@@ -762,12 +767,14 @@ contract LongShort is ILongShort, Initializable {
       )
     );
 
-    userNextPriceShiftMarketSideAmount[marketIndex][isLong][msg.sender] += synthTokensToShift;
+    userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][isLong][
+      msg.sender
+    ] += synthTokensToShift;
     userCurrentNextPriceUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
 
     batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][isLong] += synthTokensToShift;
 
-    emit NextPriceRedeem(
+    emit NextPriceSyntheticPositionShift(
       marketIndex,
       isLong,
       synthTokensToShift,
@@ -842,9 +849,9 @@ contract LongShort is ILongShort, Initializable {
     address user,
     bool isShiftFromLong
   ) internal virtual {
-    uint256 synthTokensShiftedAwayFromMarketSide = userNextPriceShiftMarketSideAmount[marketIndex][
-      isShiftFromLong
-    ][user];
+    uint256 synthTokensShiftedAwayFromMarketSide = userNextPrice_amountSynthToShiftFromMarketSide[
+      marketIndex
+    ][isShiftFromLong][user];
     if (synthTokensShiftedAwayFromMarketSide > 0) {
       uint256 amountSynthTokenRecievedOnOtherSide = getAmountSynthTokenShifted(
         marketIndex,
@@ -945,12 +952,14 @@ contract LongShort is ILongShort, Initializable {
 
     // NOTE: These variables currently only includes the amount to deposit
     //       to save variable space (precious EVM stack) we share and update the same variable later to include the shift.
-    uint256 batchedAmountOfTokensToDepositOrShiftedLong = batchedAmountOfTokensToDeposit[
-      marketIndex
-    ][true];
-    uint256 batchedAmountOfTokensToDepositOrShiftedShort = batchedAmountOfTokensToDeposit[
-      marketIndex
-    ][false];
+
+
+      uint256 batchedAmountOfPaymentTokensToDepositOrShiftToLong
+     = batchedAmountOfPaymentTokenTokensToDeposit[marketIndex][true];
+
+
+      uint256 batchedAmountOfPaymentTokensToDepositOrShiftToShort
+     = batchedAmountOfPaymentTokenTokensToDeposit[marketIndex][false];
 
     // NOTE: These variables currently only includes the amount to shift
     //       to save variable space (precious EVM stack) we share and update the same variable later to include the reedem.
@@ -965,7 +974,7 @@ contract LongShort is ILongShort, Initializable {
 
     // Handle shift tokens from LONG to SHORT
     if (batchedAmountOfSynthTokensToRedeemOrShiftFromLong > 0) {
-      batchedAmountOfTokensToDepositOrShiftedShort += _getAmountPaymentToken(
+      batchedAmountOfPaymentTokensToDepositOrShiftToShort += _getAmountPaymentToken(
         batchedAmountOfSynthTokensToRedeemOrShiftFromLong,
         syntheticTokenPriceLong
       );
@@ -975,7 +984,7 @@ contract LongShort is ILongShort, Initializable {
 
     // Handle shift tokens from SHORT to LONG
     if (batchedAmountOfSynthTokensToRedeemOrShiftFromShort > 0) {
-      batchedAmountOfTokensToDepositOrShiftedLong += _getAmountPaymentToken(
+      batchedAmountOfPaymentTokensToDepositOrShiftToLong += _getAmountPaymentToken(
         batchedAmountOfSynthTokensToRedeemOrShiftFromShort,
         syntheticTokenPriceShort
       );
@@ -984,24 +993,30 @@ contract LongShort is ILongShort, Initializable {
     }
 
     // Handle batched deposits LONG
-    if (batchedAmountOfTokensToDepositOrShiftedLong > 0) {
-      valueChangeForLong += int256(batchedAmountOfTokensToDepositOrShiftedLong);
+    if (batchedAmountOfPaymentTokensToDepositOrShiftToLong > 0) {
+      valueChangeForLong += int256(batchedAmountOfPaymentTokensToDepositOrShiftToLong);
 
-      batchedAmountOfTokensToDeposit[marketIndex][true] = 0;
+      batchedAmountOfPaymentTokenTokensToDeposit[marketIndex][true] = 0;
 
       longChangeInSynthTokensTotalSupply += int256(
-        _getAmountSynthToken(batchedAmountOfTokensToDepositOrShiftedLong, syntheticTokenPriceLong)
+        _getAmountSynthToken(
+          batchedAmountOfPaymentTokensToDepositOrShiftToLong,
+          syntheticTokenPriceLong
+        )
       );
     }
 
     // Handle batched deposits SHORT
-    if (batchedAmountOfTokensToDepositOrShiftedShort > 0) {
-      valueChangeForShort += int256(batchedAmountOfTokensToDepositOrShiftedShort);
+    if (batchedAmountOfPaymentTokensToDepositOrShiftToShort > 0) {
+      valueChangeForShort += int256(batchedAmountOfPaymentTokensToDepositOrShiftToShort);
 
-      batchedAmountOfTokensToDeposit[marketIndex][false] = 0;
+      batchedAmountOfPaymentTokenTokensToDeposit[marketIndex][false] = 0;
 
       shortChangeInSynthTokensTotalSupply += int256(
-        _getAmountSynthToken(batchedAmountOfTokensToDepositOrShiftedShort, syntheticTokenPriceShort)
+        _getAmountSynthToken(
+          batchedAmountOfPaymentTokensToDepositOrShiftToShort,
+          syntheticTokenPriceShort
+        )
       );
     }
 

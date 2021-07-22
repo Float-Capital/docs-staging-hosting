@@ -80,7 +80,11 @@ contract SyntheticToken is ISyntheticToken {
     return
       uint256(
         int256(ERC20.balanceOf(account)) +
-          ILongShort(longShort).getUsersConfirmedButNotSettledBalance(account, marketIndex, isLong)
+          ILongShort(longShort).getUsersConfirmedButNotSettledSynthBalance(
+            account,
+            marketIndex,
+            isLong
+          )
       );
   }
 }

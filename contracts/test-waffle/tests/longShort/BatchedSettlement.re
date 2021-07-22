@@ -15,8 +15,8 @@ let testUnit =
 
       let setup =
           (
-            ~batchedAmountOfTokensToDepositLong,
-            ~batchedAmountOfTokensToDepositShort,
+            ~batchedAmountOfPaymentTokenTokensToDepositLong,
+            ~batchedAmountOfPaymentTokenTokensToDepositShort,
             ~batchedAmountOfSynthTokensToRedeemLong,
             ~batchedAmountOfSynthTokensToRedeemShort,
             ~batchedAmountOfSynthTokensToShiftFromLong,
@@ -34,8 +34,8 @@ let testUnit =
         let%AwaitThen _ =
           longShort->LongShort.Exposed.setPerformOustandingBatchedSettlementsGlobals(
             ~marketIndex,
-            ~batchedAmountOfTokensToDepositLong,
-            ~batchedAmountOfTokensToDepositShort,
+            ~batchedAmountOfPaymentTokenTokensToDepositLong,
+            ~batchedAmountOfPaymentTokenTokensToDepositShort,
             ~batchedAmountOfSynthTokensToRedeemLong,
             ~batchedAmountOfSynthTokensToRedeemShort,
             ~batchedAmountOfSynthTokensToShiftFromLong,
@@ -51,8 +51,8 @@ let testUnit =
 
       let runTest =
           (
-            ~batchedAmountOfTokensToDepositLong,
-            ~batchedAmountOfTokensToDepositShort,
+            ~batchedAmountOfPaymentTokenTokensToDepositLong,
+            ~batchedAmountOfPaymentTokenTokensToDepositShort,
             ~batchedAmountOfSynthTokensToRedeemLong,
             ~batchedAmountOfSynthTokensToRedeemShort,
             ~batchedAmountOfSynthTokensToShiftFromLong,
@@ -76,8 +76,8 @@ let testUnit =
         before_each(() => {
           let%Await functionCallReturn =
             setup(
-              ~batchedAmountOfTokensToDepositLong,
-              ~batchedAmountOfTokensToDepositShort,
+              ~batchedAmountOfPaymentTokenTokensToDepositLong,
+              ~batchedAmountOfPaymentTokenTokensToDepositShort,
               ~batchedAmountOfSynthTokensToRedeemLong,
               ~batchedAmountOfSynthTokensToRedeemShort,
               ~batchedAmountOfSynthTokensToShiftFromLong,
@@ -86,12 +86,12 @@ let testUnit =
 
           batchedAmountOfSynthTokensToMintLong :=
             Contract.LongShortHelpers.calcAmountSynthToken(
-              ~amountPaymentToken=batchedAmountOfTokensToDepositLong,
+              ~amountPaymentToken=batchedAmountOfPaymentTokenTokensToDepositLong,
               ~price=syntheticTokenPriceLong,
             );
           batchedAmountOfSynthTokensToMintShort :=
             Contract.LongShortHelpers.calcAmountSynthToken(
-              ~amountPaymentToken=batchedAmountOfTokensToDepositShort,
+              ~amountPaymentToken=batchedAmountOfPaymentTokenTokensToDepositShort,
               ~price=syntheticTokenPriceShort,
             );
           batchedAmountOfPaymentTokensToBurnLong :=
@@ -130,12 +130,12 @@ let testUnit =
             );
 
           calculatedValueChangeForLong :=
-            batchedAmountOfTokensToDepositLong
+            batchedAmountOfPaymentTokenTokensToDepositLong
             ->sub(batchedAmountOfPaymentTokensToBurnLong.contents)
             ->add(batchedAmountOfPaymentTokensToShiftToLong.contents)
             ->sub(batchedAmountOfPaymentTokensToShiftToShort.contents);
           calculatedValueChangeForShort :=
-            batchedAmountOfTokensToDepositShort
+            batchedAmountOfPaymentTokenTokensToDepositShort
             ->sub(batchedAmountOfPaymentTokensToBurnShort.contents)
             ->add(batchedAmountOfPaymentTokensToShiftToShort.contents)
             ->sub(batchedAmountOfPaymentTokensToShiftToLong.contents);
@@ -226,8 +226,8 @@ let testUnit =
 
       describe("there are no actions in the batch", () => {
         runTest(
-          ~batchedAmountOfTokensToDepositLong=zeroBn,
-          ~batchedAmountOfTokensToDepositShort=zeroBn,
+          ~batchedAmountOfPaymentTokenTokensToDepositLong=zeroBn,
+          ~batchedAmountOfPaymentTokenTokensToDepositShort=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
@@ -236,8 +236,9 @@ let testUnit =
       });
       describe("there is 1 deposit long", () => {
         runTest(
-          ~batchedAmountOfTokensToDepositLong=Helpers.randomTokenAmount(),
-          ~batchedAmountOfTokensToDepositShort=zeroBn,
+          ~batchedAmountOfPaymentTokenTokensToDepositLong=
+            Helpers.randomTokenAmount(),
+          ~batchedAmountOfPaymentTokenTokensToDepositShort=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
@@ -246,8 +247,9 @@ let testUnit =
       });
       describe("there is 1 deposit short", () => {
         runTest(
-          ~batchedAmountOfTokensToDepositLong=zeroBn,
-          ~batchedAmountOfTokensToDepositShort=Helpers.randomTokenAmount(),
+          ~batchedAmountOfPaymentTokenTokensToDepositLong=zeroBn,
+          ~batchedAmountOfPaymentTokenTokensToDepositShort=
+            Helpers.randomTokenAmount(),
           ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
@@ -256,8 +258,8 @@ let testUnit =
       });
       describe("there is 1 withdraw long", () => {
         runTest(
-          ~batchedAmountOfTokensToDepositLong=zeroBn,
-          ~batchedAmountOfTokensToDepositShort=zeroBn,
+          ~batchedAmountOfPaymentTokenTokensToDepositLong=zeroBn,
+          ~batchedAmountOfPaymentTokenTokensToDepositShort=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemLong=Helpers.randomTokenAmount(),
           ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
@@ -266,8 +268,8 @@ let testUnit =
       });
       describe("there is 1 withdraw short", () => {
         runTest(
-          ~batchedAmountOfTokensToDepositLong=zeroBn,
-          ~batchedAmountOfTokensToDepositShort=zeroBn,
+          ~batchedAmountOfPaymentTokenTokensToDepositLong=zeroBn,
+          ~batchedAmountOfPaymentTokenTokensToDepositShort=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemShort=Helpers.randomTokenAmount(),
           ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
@@ -276,8 +278,8 @@ let testUnit =
       });
       describe("there is 1 shift from long to short", () => {
         runTest(
-          ~batchedAmountOfTokensToDepositLong=zeroBn,
-          ~batchedAmountOfTokensToDepositShort=zeroBn,
+          ~batchedAmountOfPaymentTokenTokensToDepositLong=zeroBn,
+          ~batchedAmountOfPaymentTokenTokensToDepositShort=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromLong=
@@ -287,8 +289,8 @@ let testUnit =
       });
       describe("there is 1 shift from short to long", () => {
         runTest(
-          ~batchedAmountOfTokensToDepositLong=zeroBn,
-          ~batchedAmountOfTokensToDepositShort=zeroBn,
+          ~batchedAmountOfPaymentTokenTokensToDepositLong=zeroBn,
+          ~batchedAmountOfPaymentTokenTokensToDepositShort=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
           ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
@@ -300,8 +302,10 @@ let testUnit =
         "[FLAKY - sometimes off by one!]there random deposits and withdrawals (we could be more specific with this test possibly?)",
         () => {
         runTest(
-          ~batchedAmountOfTokensToDepositLong=Helpers.randomTokenAmount(),
-          ~batchedAmountOfTokensToDepositShort=Helpers.randomTokenAmount(),
+          ~batchedAmountOfPaymentTokenTokensToDepositLong=
+            Helpers.randomTokenAmount(),
+          ~batchedAmountOfPaymentTokenTokensToDepositShort=
+            Helpers.randomTokenAmount(),
           ~batchedAmountOfSynthTokensToRedeemLong=Helpers.randomTokenAmount(),
           ~batchedAmountOfSynthTokensToRedeemShort=Helpers.randomTokenAmount(),
           ~batchedAmountOfSynthTokensToShiftFromLong=

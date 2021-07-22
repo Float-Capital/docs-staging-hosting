@@ -7,11 +7,11 @@ abstract contract ILongShort {
 
   function updateSystemStateMulti(uint32[] calldata marketIndex) external virtual;
 
-  function getUsersConfirmedButNotSettledBalance(
+  function getUsersConfirmedButNotSettledSynthBalance(
     address user,
     uint32 marketIndex,
     bool isLong
-  ) external view virtual returns (int256 pendingBalance);
+  ) external view virtual returns (int256 confirmedButNotSettledBalance);
 
   function executeOutstandingNextPriceSettlementsUser(address user, uint32 marketIndex)
     external

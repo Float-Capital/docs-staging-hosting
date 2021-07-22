@@ -274,6 +274,7 @@ let testUnit =
                 shortPrice: oldShortPrice,
                 longValue: oldLongValue,
                 shortValue: oldShortValue,
+                longShortMarketPriceSnapshotIndexIfShiftExecuted: zeroBn,
               },
             |]);
 
@@ -303,6 +304,7 @@ let testUnit =
                   shortPrice: oldShortPrice,
                   longValue: oldLongValue,
                   shortValue: oldShortValue,
+                  longShortMarketPriceSnapshotIndexIfShiftExecuted: zeroBn,
                 },
               |]);
           },
