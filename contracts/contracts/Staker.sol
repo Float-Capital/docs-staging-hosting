@@ -583,16 +583,16 @@ contract Staker is IStaker, Initializable {
     uint256 rewardIndexTo
   ) internal view virtual returns (uint256 floatReward) {
     if (amountStakedLong > 0) {
-      uint256 accumDeltaLong = syntheticRewardParams[marketIndex][rewardIndexFrom]
+      uint256 accumDeltaLong = syntheticRewardParams[marketIndex][rewardIndexTo]
       .accumulativeFloatPerLongToken -
-        syntheticRewardParams[marketIndex][rewardIndexTo].accumulativeFloatPerLongToken;
+        syntheticRewardParams[marketIndex][rewardIndexFrom].accumulativeFloatPerLongToken;
       floatReward += (accumDeltaLong * amountStakedLong) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
 
     if (amountStakedShort > 0) {
-      uint256 accumDeltaShort = syntheticRewardParams[marketIndex][rewardIndexFrom]
+      uint256 accumDeltaShort = syntheticRewardParams[marketIndex][rewardIndexTo]
       .accumulativeFloatPerShortToken -
-        syntheticRewardParams[marketIndex][rewardIndexTo].accumulativeFloatPerShortToken;
+        syntheticRewardParams[marketIndex][rewardIndexFrom].accumulativeFloatPerShortToken;
       floatReward += (accumDeltaShort * amountStakedShort) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
   }
