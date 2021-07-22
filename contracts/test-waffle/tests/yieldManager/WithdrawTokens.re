@@ -6,7 +6,7 @@ let testUnit =
       ~contracts: ref(Contract.YieldManagerAaveHelpers.contractsType),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe_only("Withdrawing tokens", () => {
+  describe("Withdrawing tokens", () => {
     describe("withdrawErc20TokenToTreasuryTxPromise", () => {
       let amountOfWMaticInYieldManager = Helpers.randomTokenAmount();
 

@@ -86,7 +86,8 @@ module.exports = {
       ':Treasury_v0',
       ':OracleManager$',
       ':OracleManagerChainlink$',
-      ':OracleManagerMock$'
+      ':OracleManagerMock$',
+      ':LendingPoolAaveMock'
     ],
     spacing: 2
   },

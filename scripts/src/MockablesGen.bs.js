@@ -33,7 +33,8 @@ var abisToMockExternally = [
   "Staker",
   "Treasury_v0",
   "OracleManagerChainlink",
-  "OracleManagerMock"
+  "OracleManagerMock",
+  "LendingPoolAaveMock"
 ];
 
 function convertASTTypeToSolTypeSimple(typeDescriptionStr) {

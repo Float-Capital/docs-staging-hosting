@@ -33,6 +33,7 @@ let abisToMockExternally = [
   "Treasury_v0",
   "OracleManagerChainlink",
   "OracleManagerMock",
+  "LendingPoolAaveMock",
 ]
 
 let convertASTTypeToSolTypeSimple = typeDescriptionStr => {
