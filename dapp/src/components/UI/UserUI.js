@@ -448,11 +448,9 @@ function UserUI$UserPendingBox(Props) {
   var daiSpend = Props.daiSpend;
   var txConfirmedTimestamp = Props.txConfirmedTimestamp;
   var marketIndex = Props.marketIndex;
+  var setTimerFinished = Props.setTimerFinished;
   var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toString());
   var oracleHeartbeatForMarket = Backend.getMarketInfoUnsafe(marketIndex.toNumber()).oracleHeartbeat;
-  var match = React.useState(function () {
-        return false;
-      });
   if (typeof lastOracleTimestamp === "number") {
     return React.createElement(Loader.Tiny.make, {});
   } else if (lastOracleTimestamp.TAG === /* GraphError */0) {
@@ -474,7 +472,7 @@ function UserUI$UserPendingBox(Props) {
                           }), Ethers.Utils.formatEther(daiSpend))), React.createElement(ProgressBar.make, {
                     txConfirmedTimestamp: txConfirmedTimestamp,
                     nextPriceUpdateTimestamp: lastOracleTimestamp._0.toNumber() + oracleHeartbeatForMarket | 0,
-                    setTimerFinished: match[1]
+                    setTimerFinished: setTimerFinished
                   }));
   }
 }

@@ -4,6 +4,7 @@
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Button = require("../UI/Base/Button.js");
+var Client = require("../../data/Client.js");
 var Config = require("../../config/Config.js");
 var Ethers = require("../../ethereum/Ethers.js");
 var Queries = require("../../data/Queries.js");
@@ -21,6 +22,10 @@ function Withdraw(Props) {
   var contractExecutionHandler = match[0];
   var user = RootProvider.useCurrentUserExn(undefined);
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
+  var client = Client.useApolloClient(undefined);
+  var reqVariables = {
+    userId: Ethers.Utils.ethAdrToLowerStr(user)
+  };
   React.useEffect((function () {
           if (typeof txState === "number") {
             if (txState !== /* UnInitialised */0) {
@@ -51,24 +56,6 @@ function Withdraw(Props) {
                       });
                   break;
               case /* Complete */2 :
-                  Curry.app(Queries.UsersConfirmedRedeems.use, [
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        /* NetworkOnly */3,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        {
-                          userId: Ethers.Utils.ethAdrToLowerStr(user)
-                        }
-                      ]);
                   Curry._1(toastDispatch, {
                         _0: "Withdraw transaction confirmed 🎉",
                         _1: "",
@@ -88,6 +75,34 @@ function Withdraw(Props) {
             }
           }
           
+        }), [txState]);
+  React.useEffect((function () {
+          var timeout = setTimeout((function (param) {
+                  Curry._6(client.rescript_query, {
+                          query: Queries.UsersConfirmedRedeems.query,
+                          Raw: Queries.UsersConfirmedRedeems.Raw,
+                          parse: Queries.UsersConfirmedRedeems.parse,
+                          serialize: Queries.UsersConfirmedRedeems.serialize,
+                          serializeVariables: Queries.UsersConfirmedRedeems.serializeVariables
+                        }, undefined, undefined, /* NetworkOnly */2, undefined, reqVariables).then(function (queryResult) {
+                        if (queryResult.TAG === /* Ok */0 && queryResult._0.data.user !== undefined) {
+                          Curry._1(client.rescript_writeQuery, {
+                                query: Queries.UsersConfirmedRedeems.query,
+                                Raw: Queries.UsersConfirmedRedeems.Raw,
+                                parse: Queries.UsersConfirmedRedeems.parse,
+                                serialize: Queries.UsersConfirmedRedeems.serialize,
+                                serializeVariables: Queries.UsersConfirmedRedeems.serializeVariables
+                              });
+                          return ;
+                        }
+                        
+                      });
+                  
+                }), 1000);
+          return (function (param) {
+                    clearTimeout(timeout);
+                    
+                  });
         }), [txState]);
   return React.createElement(React.Fragment, undefined, React.createElement(Button.Tiny.make, {
                   onClick: (function (param) {

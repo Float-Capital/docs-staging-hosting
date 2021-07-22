@@ -10,6 +10,11 @@ let make = (~marketIndex) => {
 
   let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
 
+  let client = Client.useApolloClient()
+  let reqVariables = {
+    Queries.UsersConfirmedRedeems.userId: user->Ethers.Utils.ethAdrToLowerStr,
+  }
+
   React.useEffect1(() => {
     switch txState {
     | Created =>
@@ -27,18 +32,48 @@ let make = (~marketIndex) => {
         ),
       )
     | Complete(_) =>
-      let _ = Queries.UsersConfirmedRedeems.use(
-        {userId: user->Ethers.Utils.ethAdrToLowerStr},
-        ~fetchPolicy=NetworkOnly,
-      )
       toastDispatch(
         ToastProvider.Show(`Withdraw transaction confirmed 🎉`, "", ToastProvider.Success),
       )
+
     | Failed(_) =>
       toastDispatch(ToastProvider.Show(`The transaction failed`, "", ToastProvider.Error))
     | _ => ()
     }
+
     None
+  }, [txState])
+
+  React.useEffect1(() => {
+    let timeForGraphToUpdate = 1000 // Give the graph a chance to capture the data before making the request
+    let timeout = Js.Global.setTimeout(() => {
+      let _ = client.query(
+        ~query=module(Queries.UsersConfirmedRedeems),
+        ~fetchPolicy=NetworkOnly,
+        reqVariables,
+      )->JsPromise.map(queryResult => {
+        switch queryResult {
+        | Ok({data: {user}}) =>
+          switch user {
+          | Some(usr) => {
+              let _ = client.writeQuery(
+                ~query=module(Queries.UsersConfirmedRedeems),
+                ~data={
+                  user: Some({
+                    __typename: usr.__typename,
+                    confirmedNextPriceActions: usr.confirmedNextPriceActions,
+                  }),
+                },
+              )
+            }
+          | None => ()
+          }
+
+        | _ => ()
+        }
+      })
+    }, timeForGraphToUpdate)
+    Some(() => Js.Global.clearTimeout(timeout))
   }, [txState])
 
   let executeNextPriceSettlementsCall = _ =>

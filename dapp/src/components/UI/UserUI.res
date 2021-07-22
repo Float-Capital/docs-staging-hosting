@@ -332,7 +332,14 @@ module UserTokenBox = {
 }
 module UserPendingBox = {
   @react.component
-  let make = (~name, ~isLong, ~daiSpend, ~txConfirmedTimestamp, ~marketIndex) => {
+  let make = (
+    ~name,
+    ~isLong,
+    ~daiSpend,
+    ~txConfirmedTimestamp,
+    ~marketIndex,
+    ~setTimerFinished,
+  ) => {
     let lastOracleTimestamp = DataHooks.useOracleLastUpdate(
       ~marketIndex=marketIndex->Ethers.BigNumber.toString,
     )
@@ -340,8 +347,6 @@ module UserPendingBox = {
     let oracleHeartbeatForMarket = Backend.getMarketInfoUnsafe(
       marketIndex->Ethers.BigNumber.toNumber,
     ).oracleHeartbeat
-
-    let (_timerFinished, setTimerFinished) = React.useState(_ => false)
 
     switch lastOracleTimestamp {
     | Response(lastOracleUpdateTimestamp) =>

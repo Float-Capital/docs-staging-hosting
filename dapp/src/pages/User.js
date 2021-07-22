@@ -2,8 +2,10 @@
 'use strict';
 
 var Misc = require("../libraries/Misc.js");
+var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Button = require("../components/UI/Base/Button.js");
+var Client = require("../data/Client.js");
 var Config = require("../config/Config.js");
 var Ethers = require("../ethereum/Ethers.js");
 var Loader = require("../components/UI/Base/Loader.js");
@@ -11,12 +13,14 @@ var UserUI = require("../components/UI/UserUI.js");
 var Backend = require("../mockBackend/Backend.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Masonry = require("../components/UI/Masonry.js");
+var Queries = require("../data/Queries.js");
 var Withdraw = require("../components/Withdraw/Withdraw.js");
 var CONSTANTS = require("../CONSTANTS.js");
 var DataHooks = require("../data/DataHooks.js");
 var Link = require("next/link").default;
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
+var ProgressBar = require("../components/UI/Base/ProgressBar.js");
 var Router = require("next/router");
 var RootProvider = require("../libraries/RootProvider.js");
 var ContractHooks = require("../components/Testing/Admin/ContractHooks.js");
@@ -53,35 +57,80 @@ function getUsersTotalTokenBalance(balancesResponse) {
               }));
 }
 
+function User$UserPendingMintItem(Props) {
+  var userId = Props.userId;
+  var pendingMint = Props.pendingMint;
+  var match = React.useState(function () {
+        return false;
+      });
+  var setTimerFinished = match[1];
+  var client = Client.useApolloClient(undefined);
+  var reqVariables = {
+    userId: userId
+  };
+  React.useEffect((function () {
+          var timeout = setTimeout((function (param) {
+                  Curry._6(client.rescript_query, {
+                          query: Queries.UsersConfirmedMints.query,
+                          Raw: Queries.UsersConfirmedMints.Raw,
+                          parse: Queries.UsersConfirmedMints.parse,
+                          serialize: Queries.UsersConfirmedMints.serialize,
+                          serializeVariables: Queries.UsersConfirmedMints.serializeVariables
+                        }, undefined, undefined, /* NetworkOnly */2, undefined, reqVariables).then(function (queryResult) {
+                        if (queryResult.TAG === /* Ok */0 && queryResult._0.data.user !== undefined) {
+                          Curry._1(client.rescript_writeQuery, {
+                                query: Queries.UsersConfirmedMints.query,
+                                Raw: Queries.UsersConfirmedMints.Raw,
+                                parse: Queries.UsersConfirmedMints.parse,
+                                serialize: Queries.UsersConfirmedMints.serialize,
+                                serializeVariables: Queries.UsersConfirmedMints.serializeVariables
+                              });
+                          return ;
+                        }
+                        
+                      });
+                  
+                }), 1000);
+          return (function (param) {
+                    clearTimeout(timeout);
+                    
+                  });
+        }), [match[0]]);
+  return React.createElement(React.Fragment, undefined, pendingMint.length !== 0 ? React.createElement(UserUI.UserColumnTextCenter.make, {
+                    children: null
+                  }, React.createElement(UserUI.UserColumnText.make, {
+                        head: "⏳ Pending synths",
+                        body: ""
+                      }), React.createElement("br", undefined)) : null, Belt_Array.map(pendingMint, (function (param) {
+                    var marketIndex = param.marketIndex;
+                    return React.createElement(UserUI.UserPendingBox.make, {
+                                name: Backend.getMarketInfoUnsafe(marketIndex.toNumber()).name,
+                                isLong: param.isLong,
+                                daiSpend: param.amount,
+                                txConfirmedTimestamp: param.confirmedTimestamp.toNumber(),
+                                marketIndex: marketIndex,
+                                setTimerFinished: setTimerFinished
+                              });
+                  })));
+}
+
+var UserPendingMintItem = {
+  make: User$UserPendingMintItem
+};
+
 function User$UserBalancesCard(Props) {
   var userId = Props.userId;
   var usersTokensQuery = DataHooks.useUsersBalances(userId);
   var usersPendingMintsQuery = DataHooks.useUsersPendingMints(userId);
   var tmp;
-  if (typeof usersPendingMintsQuery === "number") {
-    tmp = React.createElement("div", {
+  tmp = typeof usersPendingMintsQuery === "number" ? React.createElement("div", {
           className: "mx-auto"
-        }, React.createElement(Loader.Mini.make, {}));
-  } else if (usersPendingMintsQuery.TAG === /* GraphError */0) {
-    tmp = usersPendingMintsQuery._0;
-  } else {
-    var pendingMint = usersPendingMintsQuery._0;
-    tmp = React.createElement(React.Fragment, undefined, pendingMint.length !== 0 ? React.createElement(UserUI.UserColumnTextCenter.make, {
-                children: null
-              }, React.createElement(UserUI.UserColumnText.make, {
-                    head: "⏳ Pending synths",
-                    body: ""
-                  }), React.createElement("br", undefined)) : null, Belt_Array.map(pendingMint, (function (param) {
-                var marketIndex = param.marketIndex;
-                return React.createElement(UserUI.UserPendingBox.make, {
-                            name: Backend.getMarketInfoUnsafe(marketIndex.toNumber()).name,
-                            isLong: param.isLong,
-                            daiSpend: param.amount,
-                            txConfirmedTimestamp: param.confirmedTimestamp.toNumber(),
-                            marketIndex: marketIndex
-                          });
-              })));
-  }
+        }, React.createElement(Loader.Mini.make, {})) : (
+      usersPendingMintsQuery.TAG === /* GraphError */0 ? usersPendingMintsQuery._0 : React.createElement(User$UserPendingMintItem, {
+              userId: userId,
+              pendingMint: usersPendingMintsQuery._0
+            })
+    );
   var tmp$1;
   if (typeof usersTokensQuery === "number") {
     tmp$1 = React.createElement("div", {
@@ -176,38 +225,118 @@ var UserTotalStakedCard = {
   make: User$UserTotalStakedCard
 };
 
+function User$PendingRedeemItem(Props) {
+  var pendingRedeem = Props.pendingRedeem;
+  var userId = Props.userId;
+  var marketIndex = pendingRedeem.marketIndex;
+  console.log(pendingRedeem.amount);
+  var match = React.useState(function () {
+        return false;
+      });
+  var client = Client.useApolloClient(undefined);
+  var reqVariables = {
+    userId: userId
+  };
+  React.useEffect((function () {
+          var timeout = setTimeout((function (param) {
+                  Curry._6(client.rescript_query, {
+                          query: Queries.UsersConfirmedRedeems.query,
+                          Raw: Queries.UsersConfirmedRedeems.Raw,
+                          parse: Queries.UsersConfirmedRedeems.parse,
+                          serialize: Queries.UsersConfirmedRedeems.serialize,
+                          serializeVariables: Queries.UsersConfirmedRedeems.serializeVariables
+                        }, undefined, undefined, /* NetworkOnly */2, undefined, reqVariables).then(function (queryResult) {
+                        if (queryResult.TAG === /* Ok */0 && queryResult._0.data.user !== undefined) {
+                          Curry._1(client.rescript_writeQuery, {
+                                query: Queries.UsersConfirmedRedeems.query,
+                                Raw: Queries.UsersConfirmedRedeems.Raw,
+                                parse: Queries.UsersConfirmedRedeems.parse,
+                                serialize: Queries.UsersConfirmedRedeems.serialize,
+                                serializeVariables: Queries.UsersConfirmedRedeems.serializeVariables
+                              });
+                          return ;
+                        }
+                        
+                      });
+                  
+                }), 1000);
+          return (function (param) {
+                    clearTimeout(timeout);
+                    
+                  });
+        }), [match[0]]);
+  var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toString());
+  var oracleHeartbeatForMarket = Backend.getMarketInfoUnsafe(marketIndex.toNumber()).oracleHeartbeat;
+  if (typeof lastOracleTimestamp === "number") {
+    return React.createElement(Loader.Tiny.make, {});
+  }
+  if (lastOracleTimestamp.TAG === /* GraphError */0) {
+    return React.createElement("p", undefined, lastOracleTimestamp._0);
+  }
+  var nextPriceUpdate = lastOracleTimestamp._0.toNumber() + oracleHeartbeatForMarket | 0;
+  return React.createElement(ProgressBar.make, {
+              txConfirmedTimestamp: pendingRedeem.confirmedTimestamp.toNumber(),
+              nextPriceUpdateTimestamp: nextPriceUpdate,
+              setTimerFinished: match[1]
+            });
+}
+
+var PendingRedeemItem = {
+  make: User$PendingRedeemItem
+};
+
 function User$IncompleteWithdrawalsCard(Props) {
   var userId = Props.userId;
-  DataHooks.useUsersPendingRedeems(userId);
+  var usersPendingRedeemsQuery = DataHooks.useUsersPendingRedeems(userId);
   var usersConfirmedRedeemsQuery = DataHooks.useUsersConfirmedRedeems(userId);
-  if (typeof usersConfirmedRedeemsQuery === "number") {
-    return React.createElement("div", {
-                className: "m-auto"
-              }, React.createElement(Loader.Mini.make, {}));
-  }
-  if (usersConfirmedRedeemsQuery.TAG === /* GraphError */0) {
-    return usersConfirmedRedeemsQuery._0;
-  }
-  var confirmedRedeems = usersConfirmedRedeemsQuery._0;
-  if (confirmedRedeems.length !== 0) {
-    return React.createElement("div", {
-                className: "p-5 mb-5 bg-white bg-opacity-75 rounded-lg shadow-lg"
-              }, React.createElement("h1", {
-                    className: "text-center text-lg font-alphbeta mb-4 mt-2"
-                  }, "Available withdrawals"), React.createElement("div", {
-                    className: "flex flex-col"
-                  }, Belt_Array.map(confirmedRedeems, (function (param) {
-                          var marketIndex = param.marketIndex;
-                          var marketName = Backend.getMarketInfoUnsafe(marketIndex.toNumber()).name;
-                          return React.createElement("div", {
-                                      className: "flex items-center justify-between "
-                                    }, marketName, param.isLong ? "↗️" : "↘️", React.createElement(Withdraw.make, {
-                                          marketIndex: marketIndex
-                                        }));
-                        }))));
+  var tmp;
+  if (typeof usersPendingRedeemsQuery === "number") {
+    tmp = React.createElement("div", {
+          className: "m-auto"
+        }, React.createElement(Loader.Tiny.make, {}));
+  } else if (usersPendingRedeemsQuery.TAG === /* GraphError */0) {
+    tmp = usersPendingRedeemsQuery._0;
   } else {
-    return null;
+    var pendingRedeems = usersPendingRedeemsQuery._0;
+    tmp = pendingRedeems.length !== 0 ? React.createElement("div", {
+            className: "p-5 mb-5 bg-white bg-opacity-75 rounded-lg shadow-lg"
+          }, React.createElement("h1", {
+                className: "text-center text-lg font-alphbeta mb-4 mt-2"
+              }, "Pending withdrawals"), React.createElement("div", {
+                className: "flex flex-col"
+              }, Belt_Array.map(pendingRedeems, (function (pendingRedeem) {
+                      return React.createElement(User$PendingRedeemItem, {
+                                  pendingRedeem: pendingRedeem,
+                                  userId: userId
+                                });
+                    })))) : null;
   }
+  var tmp$1;
+  if (typeof usersConfirmedRedeemsQuery === "number") {
+    tmp$1 = React.createElement("div", {
+          className: "m-auto"
+        }, React.createElement(Loader.Tiny.make, {}));
+  } else if (usersConfirmedRedeemsQuery.TAG === /* GraphError */0) {
+    tmp$1 = usersConfirmedRedeemsQuery._0;
+  } else {
+    var confirmedRedeems = usersConfirmedRedeemsQuery._0;
+    tmp$1 = confirmedRedeems.length !== 0 ? React.createElement("div", {
+            className: "p-5 mb-5 bg-white bg-opacity-75 rounded-lg shadow-lg"
+          }, React.createElement("h1", {
+                className: "text-center text-lg font-alphbeta mb-4 mt-2"
+              }, "Available withdrawals"), React.createElement("div", {
+                className: "flex flex-col"
+              }, Belt_Array.map(confirmedRedeems, (function (param) {
+                      var marketIndex = param.marketIndex;
+                      var marketName = Backend.getMarketInfoUnsafe(marketIndex.toNumber()).name;
+                      return React.createElement("div", {
+                                  className: "flex items-center justify-between "
+                                }, marketName, React.createElement(Withdraw.make, {
+                                      marketIndex: marketIndex
+                                    }));
+                    })))) : null;
+  }
+  return React.createElement(React.Fragment, undefined, tmp, tmp$1);
 }
 
 var IncompleteWithdrawalsCard = {
@@ -361,10 +490,12 @@ exports.toNumber = toNumber;
 exports.eq = eq;
 exports.toString = toString;
 exports.getUsersTotalTokenBalance = getUsersTotalTokenBalance;
+exports.UserPendingMintItem = UserPendingMintItem;
 exports.UserBalancesCard = UserBalancesCard;
 exports.getUsersTotalStakeValue = getUsersTotalStakeValue;
 exports.UserTotalInvestedCard = UserTotalInvestedCard;
 exports.UserTotalStakedCard = UserTotalStakedCard;
+exports.PendingRedeemItem = PendingRedeemItem;
 exports.IncompleteWithdrawalsCard = IncompleteWithdrawalsCard;
 exports.UserProfileCard = UserProfileCard;
 exports.onQueryError = onQueryError;

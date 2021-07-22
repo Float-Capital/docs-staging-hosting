@@ -13,6 +13,70 @@ let getUsersTotalTokenBalance = (balancesResponse: array<Queries.UserTokenBalanc
     )
   )
 
+module UserPendingMintItem = {
+  @react.component
+  let make = (~userId, ~pendingMint) => {
+    let (timerFinished, setTimerFinished) = React.useState(_ => false)
+
+    let client = Client.useApolloClient()
+    let reqVariables = {
+      Queries.UsersConfirmedMints.userId: userId,
+    }
+
+    React.useEffect1(() => {
+      let timeForGraphToUpdate = 1000 // Give the graph a chance to capture the data before making the request
+      let timeout = Js.Global.setTimeout(() => {
+        let _ = client.query(
+          ~query=module(Queries.UsersConfirmedMints),
+          ~fetchPolicy=NetworkOnly,
+          reqVariables,
+        )->JsPromise.map(queryResult => {
+          switch queryResult {
+          | Ok({data: {user}}) =>
+            switch user {
+            | Some(usr) => {
+                let _ = client.writeQuery(
+                  ~query=module(Queries.UsersConfirmedMints),
+                  ~data={
+                    user: Some({
+                      __typename: usr.__typename,
+                      confirmedNextPriceActions: usr.confirmedNextPriceActions,
+                    }),
+                  },
+                )
+              }
+            | None => ()
+            }
+
+          | _ => ()
+          }
+        })
+      }, timeForGraphToUpdate)
+      Some(() => Js.Global.clearTimeout(timeout))
+    }, [timerFinished])
+
+    <>
+      {pendingMint->Array.length > 0
+        ? <UserColumnTextCenter>
+            <UserColumnText head=`⏳ Pending synths` body={``} /> <br />
+          </UserColumnTextCenter>
+        : React.null}
+      {pendingMint
+      ->Array.map(({marketIndex, isLong, amount, confirmedTimestamp}) =>
+        <UserPendingBox
+          name={(marketIndex->toNumber->Backend.getMarketInfoUnsafe).name}
+          isLong
+          daiSpend=amount
+          marketIndex
+          txConfirmedTimestamp={confirmedTimestamp->toNumber}
+          setTimerFinished
+        />
+      )
+      ->React.array}
+    </>
+  }
+}
+
 module UserBalancesCard = {
   @react.component
   let make = (~userId) => {
@@ -24,24 +88,7 @@ module UserBalancesCard = {
       {switch usersPendingMintsQuery {
       | Loading => <div className="mx-auto"> <Loader.Mini /> </div>
       | GraphError(string) => string->React.string
-      | Response(pendingMint) => <>
-          {pendingMint->Array.length > 0
-            ? <UserColumnTextCenter>
-                <UserColumnText head=`⏳ Pending synths` body={``} /> <br />
-              </UserColumnTextCenter>
-            : React.null}
-          {pendingMint
-          ->Array.map(({marketIndex, isLong, amount, confirmedTimestamp}) =>
-            <UserPendingBox
-              name={(marketIndex->toNumber->Backend.getMarketInfoUnsafe).name}
-              isLong
-              daiSpend=amount
-              marketIndex
-              txConfirmedTimestamp={confirmedTimestamp->toNumber}
-            />
-          )
-          ->React.array}
-        </>
+      | Response(pendingMint) => <UserPendingMintItem userId pendingMint />
       }}
       {switch usersTokensQuery {
       | Loading => <div className="m-auto"> <Loader.Mini /> </div>
@@ -119,15 +166,104 @@ module UserTotalStakedCard = {
   }
 }
 
+module PendingRedeemItem = {
+  @react.component
+  let make = (~pendingRedeem, ~userId) => {
+    let {marketIndex, amount, confirmedTimestamp} = pendingRedeem
+
+    Js.log(amount)
+
+    let (timerFinished, setTimerFinished) = React.useState(_ => false)
+
+    let client = Client.useApolloClient()
+    let reqVariables = {
+      Queries.UsersConfirmedRedeems.userId: userId,
+    }
+
+    React.useEffect1(() => {
+      let timeForGraphToUpdate = 1000 // Give the graph a chance to capture the data before making the request
+      let timeout = Js.Global.setTimeout(() => {
+        let _ = client.query(
+          ~query=module(Queries.UsersConfirmedRedeems),
+          ~fetchPolicy=NetworkOnly,
+          reqVariables,
+        )->JsPromise.map(queryResult => {
+          switch queryResult {
+          | Ok({data: {user}}) =>
+            switch user {
+            | Some(usr) => {
+                let _ = client.writeQuery(
+                  ~query=module(Queries.UsersConfirmedRedeems),
+                  ~data={
+                    user: Some({
+                      __typename: usr.__typename,
+                      confirmedNextPriceActions: usr.confirmedNextPriceActions,
+                    }),
+                  },
+                )
+              }
+            | None => ()
+            }
+
+          | _ => ()
+          }
+        })
+      }, timeForGraphToUpdate)
+      Some(() => Js.Global.clearTimeout(timeout))
+    }, [timerFinished])
+
+    let lastOracleTimestamp = DataHooks.useOracleLastUpdate(
+      ~marketIndex=marketIndex->Ethers.BigNumber.toString,
+    )
+
+    let oracleHeartbeatForMarket = Backend.getMarketInfoUnsafe(
+      marketIndex->Ethers.BigNumber.toNumber,
+    ).oracleHeartbeat
+
+    switch lastOracleTimestamp {
+    | Loading => <Loader.Tiny />
+    | GraphError(error) => <p> {error->React.string} </p>
+    | Response(lastOracleUpdateTimestamp) => {
+        let nextPriceUpdate =
+          lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber + oracleHeartbeatForMarket
+        <ProgressBar
+          txConfirmedTimestamp={confirmedTimestamp->Ethers.BigNumber.toNumber}
+          nextPriceUpdateTimestamp={nextPriceUpdate}
+          setTimerFinished
+        />
+      }
+    }
+  }
+}
+
 module IncompleteWithdrawalsCard = {
   @react.component
   let make = (~userId) => {
-    let _usersPendingRedeemsQuery = DataHooks.useUsersPendingRedeems(~userId)
+    let usersPendingRedeemsQuery = DataHooks.useUsersPendingRedeems(~userId)
     let usersConfirmedRedeemsQuery = DataHooks.useUsersConfirmedRedeems(~userId)
 
-    {
-      switch usersConfirmedRedeemsQuery {
-      | Loading => <div className="m-auto"> <Loader.Mini /> </div>
+    <>
+      {switch usersPendingRedeemsQuery {
+      | Loading => <div className="m-auto"> <Loader.Tiny /> </div>
+      | GraphError(string) => string->React.string
+      | Response(pendingRedeems) =>
+        pendingRedeems->Array.length > 0
+          ? <div className=`p-5 mb-5 bg-white bg-opacity-75 rounded-lg shadow-lg`>
+              <h1 className={`text-center text-lg font-alphbeta mb-4 mt-2`}>
+                {"Pending withdrawals"->React.string}
+              </h1>
+              <div className=`flex flex-col`>
+                {pendingRedeems
+                ->Array.map(pendingRedeem => {
+                  <PendingRedeemItem pendingRedeem userId />
+                })
+                ->React.array}
+              </div>
+            </div>
+          : React.null
+      }}
+      {switch usersConfirmedRedeemsQuery {
+      | Loading => <div className="m-auto"> <Loader.Tiny /> </div>
       | GraphError(string) => string->React.string
       | Response(confirmedRedeems) =>
         confirmedRedeems->Array.length > 0
@@ -137,20 +273,18 @@ module IncompleteWithdrawalsCard = {
               </h1>
               <div className=`flex flex-col`>
                 {confirmedRedeems
-                ->Array.map(({isLong, amount: _, marketIndex}) => {
+                ->Array.map(({amount: _, marketIndex}) => {
                   let marketName = (marketIndex->toNumber->Backend.getMarketInfoUnsafe).name
                   <div className=`flex items-center justify-between `>
-                    {marketName->React.string}
-                    {(isLong ? `↗️` : `↘️`)->React.string}
-                    <Withdraw marketIndex />
+                    {marketName->React.string} <Withdraw marketIndex />
                   </div>
                 })
                 ->React.array}
               </div>
             </div>
           : React.null
-      }
-    }
+      }}
+    </>
   }
 }
 
