@@ -7243,7 +7243,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Price",
+                "name": "UnderlyingPrice",
                 "ofType": null
               }
             }
@@ -8273,7 +8273,7 @@
             "deprecationReason": null,
             "description": null,
             "isDeprecated": false,
-            "name": "Withdraw"
+            "name": "Redeem"
           }
         ],
         "fields": null,
