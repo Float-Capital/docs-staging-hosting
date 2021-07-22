@@ -40,136 +40,145 @@ let testUnit =
         );
     };
 
-    it(
-      "emits ExecuteNextPriceSettlementsUser event with correct parameters", () => {
-      Chai.callEmitEvents(
-        ~call=
-          setup(
-            ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
-            ~marketUpdateIndex=defaultMarketUpdateIndex,
-          ),
-        ~eventName="ExecuteNextPriceSettlementsUser",
-        ~contract=contracts.contents.longShort->Obj.magic,
-      )
-      ->Chai.withArgs2(user, marketIndex)
-    });
-
-    it(
-      "calls nextPriceMint/nextPriceRedeem functions with correct arguments",
-      () => {
-      let%Await _ =
+    describe("happy case", () => {
+      before_once'(() =>
         setup(
           ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
           ~marketUpdateIndex=defaultMarketUpdateIndex,
-        );
+        )
+      );
 
-      let executeOutstandingNextPriceMintsCalls =
-        LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsCalls();
-      let executeOutstandingNextPriceRedeemCalls =
-        LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsCalls();
-
-      Chai.intEqual(executeOutstandingNextPriceMintsCalls->Array.length, 2);
-      Chai.intEqual(executeOutstandingNextPriceRedeemCalls->Array.length, 2);
-
-      executeOutstandingNextPriceMintsCalls->Chai.recordArrayDeepEqualFlat([|
-        {marketIndex, user, isLong: true},
-        {marketIndex, user, isLong: false},
-      |]);
-
-      executeOutstandingNextPriceRedeemCalls->Chai.recordArrayDeepEqualFlat([|
-        {marketIndex, user, isLong: true},
-        {marketIndex, user, isLong: false},
-      |]);
-    });
-
-    it("sets userCurrentNextPriceUpdateIndex[marketIndex][user] to 0", () => {
-      let%AwaitThen _ =
-        setup(
-          ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
-          ~marketUpdateIndex=defaultMarketUpdateIndex,
-        );
-
-      let%Await updatedUserCurrentNextPriceUpdateIndex =
-        contracts^.longShort
-        ->LongShort.userCurrentNextPriceUpdateIndex(marketIndex, user);
-
-      Chai.bnEqual(updatedUserCurrentNextPriceUpdateIndex, zeroBn);
-    });
-
-    it(
-      "doesn't emit ExecuteNextPriceSettlementsUser event if userCurrentNextPriceUpdateIndex[marketIndex][user] = 0",
-      () => {
-      Chai.callEmitEvents(
-        ~call=
-          setup(
-            ~userCurrentNextPriceUpdateIndex=bnFromInt(0),
-            ~marketUpdateIndex=defaultMarketUpdateIndex,
-          ),
-        ~eventName="ExecuteNextPriceSettlementsUser",
-        ~contract=contracts.contents.longShort->Obj.magic,
-      )
-      ->Chai.expectToNotEmit
-    });
-
-    it(
-      "doesn't call nextPriceMint/nextPriceRedeem functions if userCurrentNextPriceUpdateIndex[marketIndex][user] = 0",
-      () => {
-        let%Await _ =
-          setup(
-            ~userCurrentNextPriceUpdateIndex=bnFromInt(0),
-            ~marketUpdateIndex=defaultMarketUpdateIndex,
-          );
-
+      it(
+        "calls nextPriceMint/nextPriceRedeem functions with correct arguments",
+        () => {
         let executeOutstandingNextPriceMintsCalls =
           LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsCalls();
         let executeOutstandingNextPriceRedeemCalls =
           LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsCalls();
 
-        Chai.intEqual(executeOutstandingNextPriceMintsCalls->Array.length, 0);
+        Chai.intEqual(executeOutstandingNextPriceMintsCalls->Array.length, 2);
         Chai.intEqual(
           executeOutstandingNextPriceRedeemCalls->Array.length,
-          0,
+          2,
         );
-      },
-    );
 
-    it(
-      "doesn't emit ExecuteNextPriceSettlementsUser event if userCurrentNextPriceUpdateIndex[marketIndex][user] > marketUpdateIndex[marketIndex]",
-      () => {
-      Chai.callEmitEvents(
-        ~call=
-          setup(
-            ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
-            ~marketUpdateIndex=
-              defaultUserCurrentNextPriceUpdateIndex->sub(oneBn),
-          ),
-        ~eventName="ExecuteNextPriceSettlementsUser",
-        ~contract=contracts.contents.longShort->Obj.magic,
-      )
-      ->Chai.expectToNotEmit
+        executeOutstandingNextPriceMintsCalls->Chai.recordArrayDeepEqualFlat([|
+          {marketIndex, user, isLong: true},
+          {marketIndex, user, isLong: false},
+        |]);
+
+        executeOutstandingNextPriceRedeemCalls->Chai.recordArrayDeepEqualFlat([|
+          {marketIndex, user, isLong: true},
+          {marketIndex, user, isLong: false},
+        |]);
+      });
+
+      it("sets userCurrentNextPriceUpdateIndex[marketIndex][user] to 0", () => {
+        let%Await updatedUserCurrentNextPriceUpdateIndex =
+          contracts^.longShort
+          ->LongShort.userCurrentNextPriceUpdateIndex(marketIndex, user);
+
+        Chai.bnEqual(updatedUserCurrentNextPriceUpdateIndex, zeroBn);
+      });
+
+      it(
+        "emits ExecuteNextPriceSettlementsUser event with correct parameters",
+        () => {
+        Chai.callEmitEvents(
+          ~call=
+            setup(
+              ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
+              ~marketUpdateIndex=defaultMarketUpdateIndex,
+            ),
+          ~eventName="ExecuteNextPriceSettlementsUser",
+          ~contract=contracts.contents.longShort->Obj.magic,
+        )
+        ->Chai.withArgs2(user, marketIndex)
+      });
     });
 
-    it(
-      "doesn't call nextPriceMint/nextPriceRedeem functions if userCurrentNextPriceUpdateIndex[marketIndex][user] > marketUpdateIndex[marketIndex]",
-      () => {
-        let%Await _ =
-          setup(
-            ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
-            ~marketUpdateIndex=
-              defaultUserCurrentNextPriceUpdateIndex->sub(oneBn),
+    describe("sad cases", () => {
+      it(
+        "doesn't emit ExecuteNextPriceSettlementsUser event if userCurrentNextPriceUpdateIndex[marketIndex][user] = 0",
+        () => {
+        Chai.callEmitEvents(
+          ~call=
+            setup(
+              ~userCurrentNextPriceUpdateIndex=bnFromInt(0),
+              ~marketUpdateIndex=defaultMarketUpdateIndex,
+            ),
+          ~eventName="ExecuteNextPriceSettlementsUser",
+          ~contract=contracts.contents.longShort->Obj.magic,
+        )
+        ->Chai.expectToNotEmit
+      });
+
+      it(
+        "doesn't call nextPriceMint/nextPriceRedeem functions if userCurrentNextPriceUpdateIndex[marketIndex][user] = 0",
+        () => {
+          let%Await _ =
+            setup(
+              ~userCurrentNextPriceUpdateIndex=bnFromInt(0),
+              ~marketUpdateIndex=defaultMarketUpdateIndex,
+            );
+
+          let executeOutstandingNextPriceMintsCalls =
+            LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsCalls();
+          let executeOutstandingNextPriceRedeemCalls =
+            LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsCalls();
+
+          Chai.intEqual(
+            executeOutstandingNextPriceMintsCalls->Array.length,
+            0,
           );
+          Chai.intEqual(
+            executeOutstandingNextPriceRedeemCalls->Array.length,
+            0,
+          );
+        },
+      );
 
-        let executeOutstandingNextPriceMintsCalls =
-          LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsCalls();
-        let executeOutstandingNextPriceRedeemCalls =
-          LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsCalls();
+      it(
+        "doesn't emit ExecuteNextPriceSettlementsUser event if userCurrentNextPriceUpdateIndex[marketIndex][user] > marketUpdateIndex[marketIndex]",
+        () => {
+        Chai.callEmitEvents(
+          ~call=
+            setup(
+              ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
+              ~marketUpdateIndex=
+                defaultUserCurrentNextPriceUpdateIndex->sub(oneBn),
+            ),
+          ~eventName="ExecuteNextPriceSettlementsUser",
+          ~contract=contracts.contents.longShort->Obj.magic,
+        )
+        ->Chai.expectToNotEmit
+      });
 
-        Chai.intEqual(executeOutstandingNextPriceMintsCalls->Array.length, 0);
-        Chai.intEqual(
-          executeOutstandingNextPriceRedeemCalls->Array.length,
-          0,
-        );
-      },
-    );
+      it(
+        "doesn't call nextPriceMint/nextPriceRedeem functions if userCurrentNextPriceUpdateIndex[marketIndex][user] > marketUpdateIndex[marketIndex]",
+        () => {
+          let%Await _ =
+            setup(
+              ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
+              ~marketUpdateIndex=
+                defaultUserCurrentNextPriceUpdateIndex->sub(oneBn),
+            );
+
+          let executeOutstandingNextPriceMintsCalls =
+            LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsCalls();
+          let executeOutstandingNextPriceRedeemCalls =
+            LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsCalls();
+
+          Chai.intEqual(
+            executeOutstandingNextPriceMintsCalls->Array.length,
+            0,
+          );
+          Chai.intEqual(
+            executeOutstandingNextPriceRedeemCalls->Array.length,
+            0,
+          );
+        },
+      );
+    });
   });
 };
