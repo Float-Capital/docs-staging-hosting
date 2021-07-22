@@ -184,6 +184,29 @@ contract LongShortInternalsExposed is LongShortMockable {
     paymentTokens[marketIndex] = paymentToken;
   }
 
+  function setExecuteOutstandingNextPriceTokenShiftsGlobals(
+    uint32 marketIndex,
+    address user,
+    bool isShiftFromLong,
+    address syntheticTokenShiftedTo,
+    uint256 _userNextPriceShiftMarketSideAmount,
+    uint256 _userCurrentNextPriceUpdateIndex,
+    uint256 _syntheticTokenPriceSnapshotShiftedFrom,
+    uint256 _syntheticTokenPriceSnapshotShiftedTo
+  ) external {
+    userNextPriceShiftMarketSideAmount[marketIndex][isShiftFromLong][
+      user
+    ] = _userNextPriceShiftMarketSideAmount;
+    userCurrentNextPriceUpdateIndex[marketIndex][user] = _userCurrentNextPriceUpdateIndex;
+    syntheticTokenPriceSnapshot[marketIndex][isShiftFromLong][
+      _userCurrentNextPriceUpdateIndex
+    ] = _syntheticTokenPriceSnapshotShiftedFrom;
+    syntheticTokenPriceSnapshot[marketIndex][!isShiftFromLong][
+      _userCurrentNextPriceUpdateIndex
+    ] = _syntheticTokenPriceSnapshotShiftedTo;
+    syntheticTokens[marketIndex][!isShiftFromLong] = syntheticTokenShiftedTo;
+  }
+
   function setExecuteOutstandingNextPriceSettlementsGlobals(
     uint32 marketIndex,
     address user,
