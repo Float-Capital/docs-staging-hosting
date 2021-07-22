@@ -33,7 +33,7 @@ let test =
         );
     };
 
-    before_once'(() => setup());
+    before_each(() => setup());
 
     it_skip("calls the onlyAdminModifier", () => {
       // StakerSmocked.InternalMock.onlyAdminCalls()
