@@ -557,14 +557,27 @@ contract LongShort is ILongShort, Initializable {
       uint256 syntheticTokenPriceShort = syntheticTokenPriceSnapshot[marketIndex][false][
         marketUpdateIndex[marketIndex]
       ];
-      IStaker(staker).addNewStateForFloatRewards(
-        marketIndex,
-        syntheticTokenPriceLong,
-        syntheticTokenPriceShort,
-        syntheticTokenPoolValue[marketIndex][true],
-        syntheticTokenPoolValue[marketIndex][false],
-        0 // TODO: this isn't implemented yet!!
-      );
+      // if there is a price change and the 'staker' contract has pending updates, pusht the stakers price snapshot index to the staker
+      // (so the staker can handle its internal accounting)
+      if (userCurrentNextPriceUpdateIndex[marketIndex][staker] > 0 && assetPriceChanged) {
+        IStaker(staker).addNewStateForFloatRewards(
+          marketIndex,
+          syntheticTokenPriceLong,
+          syntheticTokenPriceShort,
+          syntheticTokenPoolValue[marketIndex][true],
+          syntheticTokenPoolValue[marketIndex][false],
+          userCurrentNextPriceUpdateIndex[marketIndex][staker]
+        );
+      } else {
+        IStaker(staker).addNewStateForFloatRewards(
+          marketIndex,
+          syntheticTokenPriceLong,
+          syntheticTokenPriceShort,
+          syntheticTokenPoolValue[marketIndex][true],
+          syntheticTokenPoolValue[marketIndex][false],
+          0
+        );
+      }
 
       if (!assetPriceChanged) {
         return;
