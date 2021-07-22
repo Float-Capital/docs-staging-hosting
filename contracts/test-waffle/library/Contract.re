@@ -81,3 +81,12 @@ module SyntheticTokenHelpers = {
     isLong == true /*long*/;
   };
 };
+
+module YieldManagerAaveHelpers = {
+  type contractsType = {
+    .
+    "erc20Mock": ERC20Mock.t,
+    "yieldManagerAave": YieldManagerAave.t,
+    "paymentToken": ERC20MockSmocked.t,
+  };
+};
