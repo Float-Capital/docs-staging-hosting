@@ -50,6 +50,16 @@ contract Staker is IStaker, Initializable {
   mapping(uint32 => mapping(address => uint256)) public userIndexOfLastClaimedReward;
   mapping(address => mapping(address => uint256)) public userAmountStaked;
 
+  // Token shift management
+  mapping(uint32 => uint256) public nextTokenShiftIndex;
+  // TODO: could pack these two into a struct of two uint128 for storage space optimization.
+  mapping(uint256 => uint256) public tokenShiftIndexToStakerStateMapping;
+  mapping(uint256 => uint256) public longShortMarketPriceSnapshotIndex;
+  mapping(uint32 => mapping(address => uint256)) public shiftIndex;
+  // This value is an `int256` so it can represent shifts in either direction.
+  // Possitive is a shift from long, negative is a shift from short.
+  mapping(uint32 => mapping(address => int256)) public amountToShiftUser;
+
   /*╔════════════════════════════╗
     ║           EVENTS           ║
     ╚════════════════════════════╝*/
@@ -104,6 +114,8 @@ contract Staker is IStaker, Initializable {
   );
 
   event FloatPercentageUpdated(uint256 floatPercentage);
+
+  event SynthTokensShifted();
 
   /*╔═════════════════════════════╗
     ║          MODIFIERS          ║
@@ -534,9 +546,23 @@ contract Staker is IStaker, Initializable {
     uint256 longPrice,
     uint256 shortPrice,
     uint256 longValue,
-    uint256 shortValue
+    uint256 shortValue,
+    uint256 longShortMarketPriceSnapshotIndexIfShiftExecuted // This value should be ALWAYS be zero if no shift occured
   ) external override onlyLongShort {
     // Only add a new state point if some time has passed.
+
+    // the `longShortMarketPriceSnapshotIndexIfShiftExecuted` value will be 0 if there is no staker related action in an executed batch
+    if (longShortMarketPriceSnapshotIndexIfShiftExecuted > 0) {
+      longShortMarketPriceSnapshotIndex[
+        nextTokenShiftIndex[marketIndex]
+      ] = longShortMarketPriceSnapshotIndexIfShiftExecuted;
+      tokenShiftIndexToStakerStateMapping[nextTokenShiftIndex[marketIndex]] =
+        latestRewardIndex[marketIndex] +
+        1;
+      nextTokenShiftIndex[marketIndex] += 1;
+
+      emit SynthTokensShifted();
+    }
 
     // Time delta is fetched twice in below code, can pass through? Which is less gas?
     if (_calculateTimeDelta(marketIndex) > 0) {
@@ -548,9 +574,31 @@ contract Staker is IStaker, Initializable {
     ║    USER REWARD STATE FUNCTIONS    ║
     ╚═══════════════════════════════════╝*/
 
+  /// @dev Calculates the accumulated float in a specific range of staker snapshots
+  function _calculateAccumulatedFloatInRange(
+    uint32 marketIndex,
+    uint256 amountStakedLong,
+    uint256 amountStakedShort,
+    uint256 rewardIndexFrom,
+    uint256 rewardIndexTo
+  ) internal view virtual returns (uint256 floatReward) {
+    if (amountStakedLong > 0) {
+      uint256 accumDeltaLong = syntheticRewardParams[marketIndex][rewardIndexFrom]
+      .accumulativeFloatPerLongToken -
+        syntheticRewardParams[marketIndex][rewardIndexTo].accumulativeFloatPerLongToken;
+      floatReward += (accumDeltaLong * amountStakedLong) / FLOAT_ISSUANCE_FIXED_DECIMAL;
+    }
+
+    if (amountStakedShort > 0) {
+      uint256 accumDeltaShort = syntheticRewardParams[marketIndex][rewardIndexFrom]
+      .accumulativeFloatPerShortToken -
+        syntheticRewardParams[marketIndex][rewardIndexTo].accumulativeFloatPerShortToken;
+      floatReward += (accumDeltaShort * amountStakedShort) / FLOAT_ISSUANCE_FIXED_DECIMAL;
+    }
+  }
+
   function _calculateAccumulatedFloat(uint32 marketIndex, address user)
     internal
-    view
     virtual
     returns (uint256 floatReward)
   {
@@ -567,22 +615,62 @@ contract Staker is IStaker, Initializable {
       return 0;
     }
 
-    if (amountStakedLong > 0) {
-      uint256 accumDeltaLong = syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
-      .accumulativeFloatPerLongToken -
-        syntheticRewardParams[marketIndex][userIndexOfLastClaimedReward[marketIndex][user]]
-        .accumulativeFloatPerLongToken;
-      floatReward += (accumDeltaLong * amountStakedLong) / FLOAT_ISSUANCE_FIXED_DECIMAL;
-    }
+    uint256 usersShiftIndex = shiftIndex[marketIndex][user];
+    // if there is a change in the users tokens held due to a token shift (or possibly another action in the future)
+    if (usersShiftIndex > 0 && usersShiftIndex < nextTokenShiftIndex[marketIndex]) {
+      floatReward = _calculateAccumulatedFloatInRange(
+        marketIndex,
+        amountStakedLong,
+        amountStakedShort,
+        usersLastRewardIndex,
+        tokenShiftIndexToStakerStateMapping[usersShiftIndex]
+      );
 
-    if (amountStakedShort > 0) {
-      uint256 accumDeltaShort = syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
-      .accumulativeFloatPerShortToken -
-        syntheticRewardParams[marketIndex][usersLastRewardIndex].accumulativeFloatPerShortToken;
-      floatReward += (accumDeltaShort * amountStakedShort) / FLOAT_ISSUANCE_FIXED_DECIMAL;
-    }
+      // Update the users balances
+      if (amountToShiftUser[marketIndex][user] > 0) {
+        amountStakedShort += ILongShort(longShort).getAmountSynthTokenShifted(
+          marketIndex,
+          uint256(amountToShiftUser[marketIndex][user]),
+          true,
+          longShortMarketPriceSnapshotIndex[usersShiftIndex]
+        );
 
-    return floatReward;
+        amountStakedLong -= uint256(amountToShiftUser[marketIndex][user]);
+      } else {
+        amountStakedLong += ILongShort(longShort).getAmountSynthTokenShifted(
+          marketIndex,
+          uint256(-amountToShiftUser[marketIndex][user]),
+          false,
+          longShortMarketPriceSnapshotIndex[usersShiftIndex]
+        );
+
+        // TODO: investigate how casting negative numbers works in solidity
+        amountStakedShort -= uint256(-amountToShiftUser[marketIndex][user]);
+      }
+
+      // Save the users updated staked amounts
+      userAmountStaked[longToken][user] = amountStakedLong;
+      userAmountStaked[shortToken][user] = amountStakedShort;
+
+      floatReward += _calculateAccumulatedFloatInRange(
+        marketIndex,
+        amountStakedLong,
+        amountStakedShort,
+        tokenShiftIndexToStakerStateMapping[usersShiftIndex],
+        latestRewardIndex[marketIndex]
+      );
+
+      amountToShiftUser[marketIndex][user] = 0;
+      shiftIndex[marketIndex][user] = 0;
+    } else {
+      floatReward = _calculateAccumulatedFloatInRange(
+        marketIndex,
+        amountStakedLong,
+        amountStakedShort,
+        usersLastRewardIndex,
+        latestRewardIndex[marketIndex]
+      );
+    }
   }
 
   function _mintFloat(address user, uint256 floatToMint) internal virtual {
@@ -691,6 +779,41 @@ contract Staker is IStaker, Initializable {
     userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[marketIndex];
 
     emit StakeAdded(user, address(token), amount, userIndexOfLastClaimedReward[marketIndex][user]);
+  }
+
+  // Token shifting
+  function shiftTokens(
+    uint256 synthTokensToShift,
+    uint32 marketIndex,
+    bool isShiftFromLong
+  ) external virtual {
+    address token = syntheticTokens[marketIndex][isShiftFromLong];
+    require(
+      userAmountStaked[token][msg.sender] >= synthTokensToShift,
+      "Not enough tokens to shift"
+    );
+
+    // For simplicity, avoid this edge case!
+    require(
+      shiftIndex[marketIndex][msg.sender] == nextTokenShiftIndex[marketIndex],
+      "cannot have multiple pending token shifts"
+    );
+
+    // If the user has outstanding token shift that have already been confirmed in the LongShort
+    // contract, execute them first.
+    if (shiftIndex[marketIndex][msg.sender] < nextTokenShiftIndex[marketIndex]) {
+      _mintAccumulatedFloat(marketIndex, msg.sender);
+    }
+
+    if (isShiftFromLong) {
+      ILongShort(longShort).shiftPositionFromLongNextPrice(marketIndex, synthTokensToShift);
+      amountToShiftUser[marketIndex][msg.sender] = int256(synthTokensToShift);
+    } else {
+      ILongShort(longShort).shiftPositionFromShortNextPrice(marketIndex, synthTokensToShift);
+      amountToShiftUser[marketIndex][msg.sender] = -int256(synthTokensToShift);
+    }
+
+    shiftIndex[marketIndex][msg.sender] = nextTokenShiftIndex[marketIndex];
   }
 
   /*╔════════════════════════════╗
