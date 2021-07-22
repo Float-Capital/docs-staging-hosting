@@ -353,6 +353,23 @@ contract LongShort is ILongShort, Initializable {
     return (amountPaymentToken * 1e18) / price;
   }
 
+  function getAmountSynthTokenShifted(
+    uint32 marketIndex,
+    uint256 amountSynthTokenShifted,
+    bool isShiftFromLong,
+    uint256 priceSnapshotIndex
+  ) public view virtual override returns (uint256 amountSynthShiftedToOtherSide) {
+    uint256 paymentTokensToShift = _getAmountPaymentToken(
+      amountSynthTokenShifted,
+      syntheticTokenPriceSnapshot[marketIndex][isShiftFromLong][priceSnapshotIndex]
+    );
+
+    amountSynthShiftedToOtherSide = _getAmountSynthToken(
+      paymentTokensToShift,
+      syntheticTokenPriceSnapshot[marketIndex][!isShiftFromLong][priceSnapshotIndex]
+    );
+  }
+
   /*
     4 possible states for next price actions:
         - "Pending" - means the next price update hasn't happened or been enacted on by the updateSystemState function.
@@ -545,7 +562,8 @@ contract LongShort is ILongShort, Initializable {
         syntheticTokenPriceLong,
         syntheticTokenPriceShort,
         syntheticTokenPoolValue[marketIndex][true],
-        syntheticTokenPoolValue[marketIndex][false]
+        syntheticTokenPoolValue[marketIndex][false],
+        0 // TODO: this isn't implemented yet!!
       );
 
       if (!assetPriceChanged) {
@@ -744,12 +762,16 @@ contract LongShort is ILongShort, Initializable {
     );
   }
 
-  function shiftPositionFromLongNextPrice(uint32 marketIndex, uint256 synthTokensToShift) external {
+  function shiftPositionFromLongNextPrice(uint32 marketIndex, uint256 synthTokensToShift)
+    external
+    override
+  {
     _shiftPositionNextPrice(marketIndex, synthTokensToShift, true);
   }
 
   function shiftPositionFromShortNextPrice(uint32 marketIndex, uint256 synthTokensToShift)
     external
+    override
   {
     _shiftPositionNextPrice(marketIndex, synthTokensToShift, false);
   }
@@ -810,15 +832,11 @@ contract LongShort is ILongShort, Initializable {
       isShiftFromLong
     ][user];
     if (synthTokensShiftedAwayFromMarketSide > 0) {
-      uint256 usersCurrentNextPriceUpdateIndex = userCurrentNextPriceUpdateIndex[marketIndex][user];
-      uint256 paymentTokensToShift = _getAmountPaymentToken(
+      uint256 amountSynthTokenRecievedOnOtherSide = getAmountSynthTokenShifted(
+        marketIndex,
         synthTokensShiftedAwayFromMarketSide,
-        syntheticTokenPriceSnapshot[marketIndex][!isShiftFromLong][usersCurrentNextPriceUpdateIndex]
-      );
-
-      uint256 amountSynthTokenRecievedOnOtherSide = _getAmountSynthToken(
-        paymentTokensToShift,
-        syntheticTokenPriceSnapshot[marketIndex][isShiftFromLong][usersCurrentNextPriceUpdateIndex]
+        isShiftFromLong,
+        userCurrentNextPriceUpdateIndex[marketIndex][user]
       );
 
       require(
