@@ -249,8 +249,6 @@ let testUnit =
           let userNextPriceRedemptionAmount = Helpers.randomTokenAmount();
           let syntheticTokenPriceSnapshot = Helpers.randomTokenAmount();
 
-          let isLong = true;
-
           before_each(() => {
             let%Await _ =
               setup(
@@ -330,6 +328,193 @@ let testUnit =
       );
       describe("Short Side", () =>
         testExecuteOutstandingNextPriceRedeems(~isLong=false)
+      );
+    });
+
+    describe("_executeOutstandingNextPriceTokenShifts", () => {
+      let longSynthSmocked = ref(SyntheticTokenSmocked.uninitializedValue);
+      let shortSynthSmocked = ref(SyntheticTokenSmocked.uninitializedValue);
+
+      let setup =
+          (
+            ~isShiftFromLong,
+            ~userNextPriceShiftMarketSideAmount,
+            ~userCurrentNextPriceUpdateIndex,
+            ~syntheticTokenPriceSnapshotShiftedFrom,
+            ~syntheticTokenPriceSnapshotShiftedTo,
+          ) => {
+        let {longShort, markets} = contracts.contents;
+        let {longSynth, shortSynth} = markets->Array.getUnsafe(0);
+
+        let%Await smockedLongSynth = SyntheticTokenSmocked.make(longSynth);
+        let%Await smockedShortSynth = SyntheticTokenSmocked.make(shortSynth);
+
+        smockedLongSynth->SyntheticTokenSmocked.mockTransferToReturn(true);
+        smockedShortSynth->SyntheticTokenSmocked.mockTransferToReturn(true);
+
+        longSynthSmocked := smockedLongSynth;
+        shortSynthSmocked := smockedShortSynth;
+
+        longShort->LongShort.Exposed.setExecuteOutstandingNextPriceTokenShiftsGlobals(
+          ~marketIndex,
+          ~user,
+          ~isShiftFromLong,
+          ~syntheticTokenShiftedTo=
+            (isShiftFromLong ? smockedShortSynth : smockedLongSynth).address,
+          ~userNextPriceShiftMarketSideAmount,
+          ~userCurrentNextPriceUpdateIndex,
+          ~syntheticTokenPriceSnapshotShiftedFrom,
+          ~syntheticTokenPriceSnapshotShiftedTo,
+        );
+      };
+      let testExecuteOutstandingNextPriceRedeems = (~isShiftFromLong) => {
+        describe("synthTokensShiftedAwayFromMarketSide == 0", () => {
+          let executeOutstandingNextPriceRedeemsTx =
+            ref("Undefined"->Obj.magic);
+
+          before_each(() => {
+            let%Await _ =
+              setup(
+                ~isShiftFromLong,
+                ~userNextPriceShiftMarketSideAmount=zeroBn,
+                ~userCurrentNextPriceUpdateIndex=Helpers.randomInteger(),
+                ~syntheticTokenPriceSnapshotShiftedFrom=
+                  Helpers.randomTokenAmount(),
+                ~syntheticTokenPriceSnapshotShiftedTo=
+                  Helpers.randomTokenAmount(),
+              );
+
+            executeOutstandingNextPriceRedeemsTx :=
+              contracts.contents.longShort
+              ->LongShort.Exposed._executeOutstandingNextPriceTokenShiftsExposed(
+                  ~marketIndex,
+                  ~user,
+                  ~isShiftFromLong,
+                );
+          });
+          it("should not call any functions or change any state", () => {
+            let%Await _ = executeOutstandingNextPriceRedeemsTx.contents;
+
+            let transferCalls =
+              (isShiftFromLong ? shortSynthSmocked : longSynthSmocked).contents
+              ->SyntheticTokenSmocked.transferCalls;
+
+            Chai.recordArrayDeepEqualFlat(transferCalls, [||]);
+          });
+
+          it(
+            "should not emit the ExecuteNextPriceRedeemSettlementUser event",
+            () => {
+            Chai.callEmitEvents(
+              ~call=executeOutstandingNextPriceRedeemsTx.contents,
+              ~contract=contracts.contents.longShort->Obj.magic,
+              ~eventName="ExecuteNextPriceRedeemSettlementUser",
+            )
+            ->Chai.expectToNotEmit
+          });
+        });
+        describe("userNextPriceDepositAmount > 0", () => {
+          let executeOutstandingNextPriceRedeemsTx =
+            ref("Undefined"->Obj.magic);
+          let userNextPriceShiftMarketSideAmount = Helpers.randomTokenAmount();
+          let syntheticTokenPriceSnapshotShiftedFrom =
+            Helpers.randomTokenAmount();
+          let syntheticTokenPriceSnapshotShiftedTo =
+            Helpers.randomTokenAmount();
+
+          before_each(() => {
+            let%Await _ =
+              setup(
+                ~isShiftFromLong,
+                ~userNextPriceShiftMarketSideAmount,
+                ~userCurrentNextPriceUpdateIndex=Helpers.randomInteger(),
+                ~syntheticTokenPriceSnapshotShiftedFrom,
+                ~syntheticTokenPriceSnapshotShiftedTo,
+              );
+
+            executeOutstandingNextPriceRedeemsTx :=
+              contracts.contents.longShort
+              ->LongShort.Exposed._executeOutstandingNextPriceTokenShiftsExposed(
+                  ~marketIndex,
+                  ~user,
+                  ~isShiftFromLong,
+                );
+          });
+
+          it(
+            "should call transfer on the correct amount of Syntetic Tokens to the user",
+            () => {
+            let%Await _ = executeOutstandingNextPriceRedeemsTx.contents;
+            let transferCalls =
+              (isShiftFromLong ? shortSynthSmocked : longSynthSmocked).contents
+              ->SyntheticTokenSmocked.transferCalls;
+
+            let expectedAmountOfPaymentTokenToRecieve =
+              Contract.LongShortHelpers.calcAmountPaymentToken(
+                ~amountSynthToken=userNextPriceShiftMarketSideAmount,
+                ~price=syntheticTokenPriceSnapshotShiftedFrom,
+              );
+
+            let expectedAmountOfOtherSynthTokenToRecieve =
+              Contract.LongShortHelpers.calcAmountSynthToken(
+                ~amountPaymentToken=expectedAmountOfPaymentTokenToRecieve,
+                ~price=syntheticTokenPriceSnapshotShiftedTo,
+              );
+            Chai.recordArrayDeepEqualFlat(
+              transferCalls,
+              [|
+                {
+                  recipient: user,
+                  amount: expectedAmountOfOtherSynthTokenToRecieve,
+                },
+              |],
+            );
+          });
+
+          it(
+            "should emit the ExecuteNextPriceRedeemSettlementUser event with the correct arguments",
+            () => {
+              let expectedAmountOfPaymentTokenToRecieve =
+                Contract.LongShortHelpers.calcAmountPaymentToken(
+                  ~amountSynthToken=userNextPriceShiftMarketSideAmount,
+                  ~price=syntheticTokenPriceSnapshotShiftedFrom,
+                );
+              let expectedAmountOfOtherSynthTokenToRecieve =
+                Contract.LongShortHelpers.calcAmountSynthToken(
+                  ~amountPaymentToken=expectedAmountOfPaymentTokenToRecieve,
+                  ~price=syntheticTokenPriceSnapshotShiftedTo,
+                );
+
+              Chai.callEmitEvents(
+                ~call=executeOutstandingNextPriceRedeemsTx.contents,
+                ~contract=contracts.contents.longShort->Obj.magic,
+                ~eventName="ExecuteNextPriceMarketSideShiftSettlementUser",
+              )
+              ->Chai.withArgs4(
+                  user,
+                  marketIndex,
+                  isShiftFromLong,
+                  expectedAmountOfOtherSynthTokenToRecieve,
+                );
+            },
+          );
+          it("should reset userNextPriceShiftMarketSideAmount to zero", () => {
+            let%Await userNextPriceShiftMarketSideAmount =
+              contracts.contents.longShort
+              ->LongShort.userNextPriceShiftMarketSideAmount(
+                  marketIndex,
+                  isShiftFromLong,
+                  user,
+                );
+            Chai.bnEqual(zeroBn, userNextPriceShiftMarketSideAmount);
+          });
+        });
+      };
+      describe("Long Side", () =>
+        testExecuteOutstandingNextPriceRedeems(~isShiftFromLong=true)
+      );
+      describe("Short Side", () =>
+        testExecuteOutstandingNextPriceRedeems(~isShiftFromLong=false)
       );
     });
   });
