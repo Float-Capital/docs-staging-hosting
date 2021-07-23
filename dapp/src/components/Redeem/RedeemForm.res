@@ -4,7 +4,7 @@ module RedeemForm = %form(
 
   let validators = {
     amount: {
-      strategy: OnFirstBlur,
+      strategy: OnFirstSuccessOrFirstBlur,
       validate: ({amount}) => Form.Validators.etherNumberInput(amount),
     },
   }
@@ -31,6 +31,11 @@ module RedeemFormInput = {
         : React.null}
       <AmountInput value optBalance disabled onBlur onChange onMaxClick />
       {submitButton}
+      {value == ""
+        ? React.null
+        : <p className="text-xxs text-yellow-600 text-center mt-3">
+            {`⚡ Redeeming your position requires a second withdraw transaction once the oracle price has updated ⚡`->React.string}
+          </p>}
     </Form>
   }
 }
@@ -128,7 +133,7 @@ module ConnectedRedeemForm = {
     | _ => None
     }
 
-    let (_optAdditionalErrorMessage, buttonText, _buttonDisabled) = {
+    let (_optAdditionalErrorMessage, buttonText, buttonDisabled) = {
       let position = isLong ? "long" : "short"
       switch (formAmount, optTokenBalance) {
       | (Some(amount), Some(balance)) =>
@@ -167,54 +172,41 @@ module ConnectedRedeemForm = {
     }, [txState])
 
     hasTokens
-      ? <>
-          <RedeemFormInput
-            onSubmit=form.submit
-            value={form.input.amount}
-            optBalance={optTokenBalance}
-            disabled=form.submitting
-            onBlur={_ => form.blurAmount()}
-            onChange={event => form.updateAmount((_, amount) => {
+      ? <RedeemFormInput
+          onSubmit=form.submit
+          value={form.input.amount}
+          optBalance={optTokenBalance}
+          disabled=form.submitting
+          onBlur={_ => form.blurAmount()}
+          onChange={event => form.updateAmount((_, amount) => {
+              amount: amount,
+            }, (event->ReactEvent.Form.target)["value"])}
+          onMaxClick={_ =>
+            form.updateAmount(
+              (_, amount) => {
                 amount: amount,
-              }, (event->ReactEvent.Form.target)["value"])}
-            onMaxClick={_ =>
-              form.updateAmount(
-                (_, amount) => {
-                  amount: amount,
-                },
-                switch optTokenBalance {
-                | Some(tokenBalance) => tokenBalance->Ethers.Utils.formatEther
-                | _ => "0"
-                },
-              )}
-            onChangeSide={newPosition => {
-              router.query->Js.Dict.set("actionOption", newPosition)
-              router.query->Js.Dict.set(
-                "token",
-                isActuallyLong
-                  ? market.syntheticLong.tokenAddress->Ethers.Utils.ethAdrToLowerStr
-                  : market.syntheticShort.tokenAddress->Ethers.Utils.ethAdrToLowerStr,
-              )
-              router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
-            }}
-            isLong={isActuallyLong}
-            hasBothTokens
-            submitButton={<RedeemSubmitButtonAndTxStatusModal
-              buttonText resetFormButton txStateRedeem=txState buttonDisabled=true
-            />}
-          />
-          <p className="text-center p-2">
-            {`Redeem is temporarily disabled on the app`->React.string}
-            <br />
-            <a
-              href="http://gph.is/1fymjns"
-              target="_"
-              rel="noopener noreferrer"
-              className="underline text-xs">
-              {`mine`->React.string}
-            </a>
-          </p>
-        </>
+              },
+              switch optTokenBalance {
+              | Some(tokenBalance) => tokenBalance->Ethers.Utils.formatEther
+              | _ => "0"
+              },
+            )}
+          onChangeSide={newPosition => {
+            router.query->Js.Dict.set("actionOption", newPosition)
+            router.query->Js.Dict.set(
+              "token",
+              isActuallyLong
+                ? market.syntheticLong.tokenAddress->Ethers.Utils.ethAdrToLowerStr
+                : market.syntheticShort.tokenAddress->Ethers.Utils.ethAdrToLowerStr,
+            )
+            router->Next.Router.pushObjShallow({pathname: router.pathname, query: router.query})
+          }}
+          isLong={isActuallyLong}
+          hasBothTokens
+          submitButton={<RedeemSubmitButtonAndTxStatusModal
+            buttonText resetFormButton txStateRedeem=txState buttonDisabled marketIndex
+          />}
+        />
       : <p> {"No tokens in this market to redeem"->React.string} </p>
   }
 }

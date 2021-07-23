@@ -141,7 +141,6 @@ let make = (
         <StakeCardSide
           orderPostionMobile={2}
           orderPostion={1}
-          marketName={marketName}
           isLong={true}
           apy={longApy}
           floatApy={longFloatApy->Ethers.Utils.formatEther->Js.Float.fromString}
@@ -188,7 +187,6 @@ let make = (
         <StakeCardSide
           orderPostionMobile={3}
           orderPostion={3}
-          marketName={marketName}
           isLong={false}
           apy={shortApy}
           floatApy={shortFloatApy->Ethers.Utils.formatEther->Js.Float.fromString}

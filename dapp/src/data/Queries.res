@@ -129,12 +129,33 @@ fragment UserTokenBalance on UserSyntheticTokenBalance {
 }
 
 # Used in:
+#   Queries: useUsersConfirmedRedeems
+fragment UserConfirmedRedeems on UserNextPriceAction {
+  id    
+  marketIndex
+  updateIndex
+  amountSynthTokenForWithdrawalLong
+  amountSynthTokenForWithdrawalShort  
+}
+
+# Used in:
 #   Queries: useUsersConfirmedMints
 fragment UserConfirmedMints on UserNextPriceAction {
   id    
   marketIndex
+  updateIndex
   amountPaymentTokenForDepositLong
   amountPaymentTokenForDepositShort  
+}
+
+# Used in:
+#   Queries: useUsersPendingRedeems
+fragment UserPendingRedeems on UserNextPriceAction {
+  id    
+  marketIndex
+  amountSynthTokenForWithdrawalLong
+  amountSynthTokenForWithdrawalShort  
+  confirmedTimestamp
 }
 
 # Used in:
@@ -239,6 +260,16 @@ query ($userId: String!) {
   }
 }`)
 
+// Used externally in: useUsersPendingRedeems (datahook), User.res
+module UsersPendingRedeems = %graphql(`
+query ($userId: String!) {
+  user (id: $userId) {
+    pendingNextPriceActions { 
+      ...UserPendingRedeems
+    }
+  }
+}`)
+
 // Used externally in: useUsersConfirmedMints (datahook), User.res
 module UsersConfirmedMints = %graphql(`
 query ($userId: String!) {
@@ -246,6 +277,26 @@ query ($userId: String!) {
     confirmedNextPriceActions { 
       ...UserConfirmedMints
     }
+  }
+}`)
+
+// Used externally in: useUsersConfirmedRedeems (datahook), User.res
+module UsersConfirmedRedeems = %graphql(`
+query ($userId: String!) {
+  user (id: $userId) {
+    confirmedNextPriceActions { 
+      ...UserConfirmedRedeems
+    }
+  }
+}`)
+
+// Used externally in: useBatchedSynthPrices (datahook), User.res
+module BatchedSynthPrices = %graphql(`
+query ($batchId: String!) {
+  batchedNextPriceExec (id: $batchId) {
+    id
+		redeemPriceSnapshotLong
+    redeemPriceSnapshotShort
   }
 }`)
 

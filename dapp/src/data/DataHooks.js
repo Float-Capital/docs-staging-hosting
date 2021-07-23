@@ -367,6 +367,73 @@ function useUsersPendingMints(userId) {
   }
 }
 
+function useUsersPendingRedeems(userId) {
+  var usersPendingRedeemsQuery = Curry.app(Queries.UsersPendingRedeems.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: userId
+        }
+      ]);
+  var match = usersPendingRedeemsQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.user;
+    if (match$1 === undefined) {
+      return {
+              TAG: 1,
+              _0: [{
+                  isLong: false,
+                  amount: CONSTANTS.zeroBN,
+                  marketIndex: CONSTANTS.zeroBN,
+                  confirmedTimestamp: CONSTANTS.zeroBN
+                }],
+              [Symbol.for("name")]: "Response"
+            };
+    }
+    var result = Belt_Array.map(Belt_Array.keep(match$1.pendingNextPriceActions, (function (pendingNextPriceAction) {
+                if (pendingNextPriceAction.amountSynthTokenForWithdrawalShort.gt(CONSTANTS.zeroBN)) {
+                  return true;
+                } else {
+                  return pendingNextPriceAction.amountSynthTokenForWithdrawalLong.gt(CONSTANTS.zeroBN);
+                }
+              })), (function (pendingNextPriceAction) {
+            var isLong = pendingNextPriceAction.amountSynthTokenForWithdrawalLong.gt(CONSTANTS.zeroBN);
+            return {
+                    isLong: isLong,
+                    amount: isLong ? pendingNextPriceAction.amountSynthTokenForWithdrawalLong : pendingNextPriceAction.amountSynthTokenForWithdrawalShort,
+                    marketIndex: pendingNextPriceAction.marketIndex,
+                    confirmedTimestamp: pendingNextPriceAction.confirmedTimestamp
+                  };
+          }));
+    return {
+            TAG: 1,
+            _0: result,
+            [Symbol.for("name")]: "Response"
+          };
+  }
+  var match$2 = usersPendingRedeemsQuery.error;
+  if (match$2 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
 function useUsersConfirmedMints(userId) {
   var usersConfirmedMintsQuery = Curry.app(Queries.UsersConfirmedMints.use, [
         undefined,
@@ -395,7 +462,8 @@ function useUsersConfirmedMints(userId) {
               _0: [{
                   isLong: false,
                   amount: CONSTANTS.zeroBN,
-                  marketIndex: CONSTANTS.zeroBN
+                  marketIndex: CONSTANTS.zeroBN,
+                  updateIndex: CONSTANTS.zeroBN
                 }],
               [Symbol.for("name")]: "Response"
             };
@@ -411,7 +479,8 @@ function useUsersConfirmedMints(userId) {
             return {
                     isLong: isLong,
                     amount: isLong ? confirmedNextPriceAction.amountPaymentTokenForDepositLong : confirmedNextPriceAction.amountPaymentTokenForDepositShort,
-                    marketIndex: confirmedNextPriceAction.marketIndex
+                    marketIndex: confirmedNextPriceAction.marketIndex,
+                    updateIndex: confirmedNextPriceAction.updateIndex
                   };
           }));
     return {
@@ -421,6 +490,127 @@ function useUsersConfirmedMints(userId) {
           };
   }
   var match$2 = usersConfirmedMintsQuery.error;
+  if (match$2 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
+function useBatchedSynthPrices(marketIndex, updateIndex) {
+  var batchedExecsSynthPricesQuery = Curry.app(Queries.BatchedSynthPrices.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        /* NetworkOnly */3,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          batchId: "batched-" + marketIndex.toString() + "-" + updateIndex.toString()
+        }
+      ]);
+  var match = batchedExecsSynthPricesQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.batchedNextPriceExec;
+    if (match$1 !== undefined) {
+      return {
+              TAG: 1,
+              _0: {
+                redeemPriceSnapshotLong: match$1.redeemPriceSnapshotLong,
+                redeemPriceSnapshotShort: match$1.redeemPriceSnapshotShort
+              },
+              [Symbol.for("name")]: "Response"
+            };
+    } else {
+      return {
+              TAG: 1,
+              _0: {
+                redeemPriceSnapshotLong: CONSTANTS.zeroBN,
+                redeemPriceSnapshotShort: CONSTANTS.zeroBN
+              },
+              [Symbol.for("name")]: "Response"
+            };
+    }
+  }
+  var match$2 = batchedExecsSynthPricesQuery.error;
+  if (match$2 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
+function useUsersConfirmedRedeems(userId) {
+  var usersConfirmedRedeemsQuery = Curry.app(Queries.UsersConfirmedRedeems.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        /* NetworkOnly */3,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: userId
+        }
+      ]);
+  var match = usersConfirmedRedeemsQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.user;
+    if (match$1 === undefined) {
+      return {
+              TAG: 1,
+              _0: [{
+                  isLong: false,
+                  amount: CONSTANTS.zeroBN,
+                  marketIndex: CONSTANTS.zeroBN,
+                  updateIndex: CONSTANTS.zeroBN
+                }],
+              [Symbol.for("name")]: "Response"
+            };
+    }
+    var result = Belt_Array.map(Belt_Array.keep(match$1.confirmedNextPriceActions, (function (confirmedNextPriceAction) {
+                if (confirmedNextPriceAction.amountSynthTokenForWithdrawalLong.gt(CONSTANTS.zeroBN)) {
+                  return true;
+                } else {
+                  return confirmedNextPriceAction.amountSynthTokenForWithdrawalLong.gt(CONSTANTS.zeroBN);
+                }
+              })), (function (confirmedNextPriceAction) {
+            var isLong = confirmedNextPriceAction.amountSynthTokenForWithdrawalLong.gt(CONSTANTS.zeroBN);
+            return {
+                    isLong: isLong,
+                    amount: isLong ? confirmedNextPriceAction.amountSynthTokenForWithdrawalLong : confirmedNextPriceAction.amountSynthTokenForWithdrawalShort,
+                    marketIndex: confirmedNextPriceAction.marketIndex,
+                    updateIndex: confirmedNextPriceAction.updateIndex
+                  };
+          }));
+    return {
+            TAG: 1,
+            _0: result,
+            [Symbol.for("name")]: "Response"
+          };
+  }
+  var match$2 = usersConfirmedRedeemsQuery.error;
   if (match$2 !== undefined) {
     return {
             TAG: 0,
@@ -864,7 +1054,10 @@ exports.useClaimableFloatForUser = useClaimableFloatForUser;
 exports.useStakesForUser = useStakesForUser;
 exports.useUsersBalances = useUsersBalances;
 exports.useUsersPendingMints = useUsersPendingMints;
+exports.useUsersPendingRedeems = useUsersPendingRedeems;
 exports.useUsersConfirmedMints = useUsersConfirmedMints;
+exports.useBatchedSynthPrices = useBatchedSynthPrices;
+exports.useUsersConfirmedRedeems = useUsersConfirmedRedeems;
 exports.useFloatBalancesForUser = useFloatBalancesForUser;
 exports.useBasicUserInfo = useBasicUserInfo;
 exports.useSyntheticTokenBalance = useSyntheticTokenBalance;

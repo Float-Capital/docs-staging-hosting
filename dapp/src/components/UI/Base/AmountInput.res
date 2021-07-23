@@ -18,6 +18,7 @@ let make = (
       disabled={disabled}
       onBlur={onBlur}
       onChange={onChange}
+      autoComplete="off"
     />
     {switch optCurrency {
     | Some(currency: CONSTANTS.displayToken) =>

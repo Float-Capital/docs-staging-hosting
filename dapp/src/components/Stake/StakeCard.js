@@ -61,7 +61,6 @@ function StakeCard(Props) {
   var longTokenAddress = match$2.tokenAddress;
   var timestampCreated = param.timestampCreated;
   var marketIndex = param.marketIndex;
-  var marketName = param.name;
   var router = Router.useRouter();
   var apy = APYProvider.useAPY(undefined);
   var longDollarValueStaked = calculateDollarValue(match.longTokenPrice.price.price, match$2.totalStaked);
@@ -112,12 +111,11 @@ function StakeCard(Props) {
                         className: "flex justify-center w-full my-1"
                       }, React.createElement("h1", {
                             className: "font-bold text-xl font-alphbeta"
-                          }, marketName)), React.createElement("div", {
+                          }, param.name)), React.createElement("div", {
                         className: "flex flex-wrap justify-center w-full"
                       }, React.createElement(StakeCardSide.make, {
                             orderPostion: 1,
                             orderPostionMobile: 2,
-                            marketName: marketName,
                             isLong: true,
                             apy: longApy,
                             floatApy: Number(Ethers.Utils.formatEther(longFloatApy))
@@ -150,7 +148,6 @@ function StakeCard(Props) {
                               }, stakeButtons(undefined))), React.createElement(StakeCardSide.make, {
                             orderPostion: 3,
                             orderPostionMobile: 3,
-                            marketName: marketName,
                             isLong: false,
                             apy: shortApy,
                             floatApy: Number(Ethers.Utils.formatEther(shortFloatApy))
