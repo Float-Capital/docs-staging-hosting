@@ -14,6 +14,7 @@ if (runCoverage) {
 let isWaffleTest =
   !!process.env.WAFFLE_TEST && process.env.WAFFLE_TEST.toUpperCase() == "TRUE";
 if (isWaffleTest) {
+  require("./test-waffle/Setup.js").mochaSetup();
   require("@nomiclabs/hardhat-waffle");
 } else {
   require("@nomiclabs/hardhat-truffle5");
@@ -46,12 +47,12 @@ module.exports = {
   },
   networks: {
     hardhat: {
-      allowUnlimitedContractSize: true
+      allowUnlimitedContractSize: true,
     },
     mumbai: {
       chainId: 80001,
       url: "https://rpc-mumbai.maticvigil.com/v1",
-    }
+    },
   },
   paths: {
     tests: isWaffleTest ? "./test-waffle" : "./test",
@@ -98,6 +99,6 @@ module.exports = {
       "^contracts/SyntheticToken",
       "^contracts/TokenFactory",
       "^contracts/YieldManagerAave",
-    ]
-  }
+    ],
+  },
 };
