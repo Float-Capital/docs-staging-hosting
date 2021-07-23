@@ -390,7 +390,7 @@ contract LongShort is ILongShort, Initializable {
     virtual
     override
     assertMarketExists(marketIndex)
-    returns (int256 confirmedButNotSettledBalance)
+    returns (uint256 confirmedButNotSettledBalance)
   {
     uint256 currentMarketUpdateIndex = marketUpdateIndex[marketIndex];
     if (
@@ -406,18 +406,11 @@ contract LongShort is ILongShort, Initializable {
           currentMarketUpdateIndex
         ];
 
-        confirmedButNotSettledBalance += int256(
-          _getAmountSynthToken(amountPaymentTokenDeposited, syntheticTokenPrice)
+        confirmedButNotSettledBalance += _getAmountSynthToken(
+          amountPaymentTokenDeposited,
+          syntheticTokenPrice
         );
       }
-
-      confirmedButNotSettledBalance -= int256(
-        userNextPriceRedemptionAmount[marketIndex][isLong][user]
-      );
-
-      confirmedButNotSettledBalance -= int256(
-        userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][isLong][user]
-      );
 
       uint256 synthTokensShiftedAwayFromOtherSide = userNextPrice_amountSynthToShiftFromMarketSide[
         marketIndex
@@ -429,11 +422,9 @@ contract LongShort is ILongShort, Initializable {
           syntheticTokenPriceSnapshot[marketIndex][!isLong][currentMarketUpdateIndex]
         );
 
-        confirmedButNotSettledBalance += int256(
-          _getAmountSynthToken(
-            paymentTokensToShift,
-            syntheticTokenPriceSnapshot[marketIndex][isLong][currentMarketUpdateIndex]
-          )
+        confirmedButNotSettledBalance += _getAmountSynthToken(
+          paymentTokensToShift,
+          syntheticTokenPriceSnapshot[marketIndex][isLong][currentMarketUpdateIndex]
         );
       }
 
