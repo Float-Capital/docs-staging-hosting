@@ -169,9 +169,7 @@ module UserTotalStakedCard = {
 module PendingRedeemItem = {
   @react.component
   let make = (~pendingRedeem, ~userId) => {
-    let {marketIndex, amount, confirmedTimestamp} = pendingRedeem
-
-    Js.log(amount)
+    let {marketIndex, confirmedTimestamp} = pendingRedeem
 
     let (timerFinished, setTimerFinished) = React.useState(_ => false)
 
@@ -236,6 +234,39 @@ module PendingRedeemItem = {
   }
 }
 
+module IncompleteWithdrawalItem = {
+  @react.component
+  let make = (~marketIndex, ~updateIndex, ~amount, ~isLong) => {
+    let syntheticPricesQuery = DataHooks.useBatchedSynthPrices(~marketIndex, ~updateIndex)
+
+    switch syntheticPricesQuery {
+    | Loading => <div className="m-auto"> <Loader.Tiny /> </div>
+    | GraphError(string) => string->React.string
+    | Response(syntheticPrices) => {
+        let marketName = (marketIndex->toNumber->Backend.getMarketInfoUnsafe).name
+
+        let syntheticTokenPrice = isLong
+          ? syntheticPrices.redeemPriceSnapshotLong
+          : syntheticPrices.redeemPriceSnapshotShort
+
+        let daiAmount =
+          amount
+          ->Ethers.BigNumber.mul(syntheticTokenPrice)
+          ->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
+
+        <div className=`flex items-center justify-between `>
+          <p> {marketName->React.string} </p>
+          <span className="flex flex-row items-center">
+            <img src={CONSTANTS.daiDisplayToken.iconUrl} className="h-4 mr-1" />
+            {daiAmount->Misc.NumberFormat.formatEther->React.string}
+          </span>
+          <Withdraw marketIndex />
+        </div>
+      }
+    }
+  }
+}
+
 module IncompleteWithdrawalsCard = {
   @react.component
   let make = (~userId) => {
@@ -250,7 +281,7 @@ module IncompleteWithdrawalsCard = {
         pendingRedeems->Array.length > 0
           ? <div className=`p-5 mb-5 bg-white bg-opacity-75 rounded-lg shadow-lg`>
               <h1 className={`text-center text-lg font-alphbeta mb-4 mt-2`}>
-                {"Pending withdrawals"->React.string}
+                {"Pending redeems"->React.string}
               </h1>
               <div className=`flex flex-col`>
                 {pendingRedeems
@@ -273,11 +304,8 @@ module IncompleteWithdrawalsCard = {
               </h1>
               <div className=`flex flex-col`>
                 {confirmedRedeems
-                ->Array.map(({amount: _, marketIndex}) => {
-                  let marketName = (marketIndex->toNumber->Backend.getMarketInfoUnsafe).name
-                  <div className=`flex items-center justify-between `>
-                    {marketName->React.string} <Withdraw marketIndex />
-                  </div>
+                ->Array.map(({amount, marketIndex, isLong, updateIndex}) => {
+                  <IncompleteWithdrawalItem amount marketIndex updateIndex isLong />
                 })
                 ->React.array}
               </div>

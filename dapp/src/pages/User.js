@@ -229,7 +229,6 @@ function User$PendingRedeemItem(Props) {
   var pendingRedeem = Props.pendingRedeem;
   var userId = Props.userId;
   var marketIndex = pendingRedeem.marketIndex;
-  console.log(pendingRedeem.amount);
   var match = React.useState(function () {
         return false;
       });
@@ -285,6 +284,40 @@ var PendingRedeemItem = {
   make: User$PendingRedeemItem
 };
 
+function User$IncompleteWithdrawalItem(Props) {
+  var marketIndex = Props.marketIndex;
+  var updateIndex = Props.updateIndex;
+  var amount = Props.amount;
+  var isLong = Props.isLong;
+  var syntheticPricesQuery = DataHooks.useBatchedSynthPrices(marketIndex, updateIndex);
+  if (typeof syntheticPricesQuery === "number") {
+    return React.createElement("div", {
+                className: "m-auto"
+              }, React.createElement(Loader.Tiny.make, {}));
+  }
+  if (syntheticPricesQuery.TAG === /* GraphError */0) {
+    return syntheticPricesQuery._0;
+  }
+  var syntheticPrices = syntheticPricesQuery._0;
+  var marketName = Backend.getMarketInfoUnsafe(marketIndex.toNumber()).name;
+  var syntheticTokenPrice = isLong ? syntheticPrices.redeemPriceSnapshotLong : syntheticPrices.redeemPriceSnapshotShort;
+  var daiAmount = amount.mul(syntheticTokenPrice).div(CONSTANTS.tenToThe18);
+  return React.createElement("div", {
+              className: "flex items-center justify-between "
+            }, React.createElement("p", undefined, marketName), React.createElement("span", {
+                  className: "flex flex-row items-center"
+                }, React.createElement("img", {
+                      className: "h-4 mr-1",
+                      src: CONSTANTS.daiDisplayToken.iconUrl
+                    }), Misc.NumberFormat.formatEther(undefined, daiAmount)), React.createElement(Withdraw.make, {
+                  marketIndex: marketIndex
+                }));
+}
+
+var IncompleteWithdrawalItem = {
+  make: User$IncompleteWithdrawalItem
+};
+
 function User$IncompleteWithdrawalsCard(Props) {
   var userId = Props.userId;
   var usersPendingRedeemsQuery = DataHooks.useUsersPendingRedeems(userId);
@@ -302,7 +335,7 @@ function User$IncompleteWithdrawalsCard(Props) {
             className: "p-5 mb-5 bg-white bg-opacity-75 rounded-lg shadow-lg"
           }, React.createElement("h1", {
                 className: "text-center text-lg font-alphbeta mb-4 mt-2"
-              }, "Pending withdrawals"), React.createElement("div", {
+              }, "Pending redeems"), React.createElement("div", {
                 className: "flex flex-col"
               }, Belt_Array.map(pendingRedeems, (function (pendingRedeem) {
                       return React.createElement(User$PendingRedeemItem, {
@@ -327,13 +360,12 @@ function User$IncompleteWithdrawalsCard(Props) {
               }, "Available withdrawals"), React.createElement("div", {
                 className: "flex flex-col"
               }, Belt_Array.map(confirmedRedeems, (function (param) {
-                      var marketIndex = param.marketIndex;
-                      var marketName = Backend.getMarketInfoUnsafe(marketIndex.toNumber()).name;
-                      return React.createElement("div", {
-                                  className: "flex items-center justify-between "
-                                }, marketName, React.createElement(Withdraw.make, {
-                                      marketIndex: marketIndex
-                                    }));
+                      return React.createElement(User$IncompleteWithdrawalItem, {
+                                  marketIndex: param.marketIndex,
+                                  updateIndex: param.updateIndex,
+                                  amount: param.amount,
+                                  isLong: param.isLong
+                                });
                     })))) : null;
   }
   return React.createElement(React.Fragment, undefined, tmp, tmp$1);
@@ -496,6 +528,7 @@ exports.getUsersTotalStakeValue = getUsersTotalStakeValue;
 exports.UserTotalInvestedCard = UserTotalInvestedCard;
 exports.UserTotalStakedCard = UserTotalStakedCard;
 exports.PendingRedeemItem = PendingRedeemItem;
+exports.IncompleteWithdrawalItem = IncompleteWithdrawalItem;
 exports.IncompleteWithdrawalsCard = IncompleteWithdrawalsCard;
 exports.UserProfileCard = UserProfileCard;
 exports.onQueryError = onQueryError;

@@ -133,6 +133,7 @@ fragment UserTokenBalance on UserSyntheticTokenBalance {
 fragment UserConfirmedRedeems on UserNextPriceAction {
   id    
   marketIndex
+  updateIndex
   amountSynthTokenForWithdrawalLong
   amountSynthTokenForWithdrawalShort  
 }
@@ -142,6 +143,7 @@ fragment UserConfirmedRedeems on UserNextPriceAction {
 fragment UserConfirmedMints on UserNextPriceAction {
   id    
   marketIndex
+  updateIndex
   amountPaymentTokenForDepositLong
   amountPaymentTokenForDepositShort  
 }
@@ -284,6 +286,16 @@ query ($userId: String!) {
     confirmedNextPriceActions { 
       ...UserConfirmedRedeems
     }
+  }
+}`)
+
+// Used externally in: useBatchedSynthPrices (datahook), User.res
+module BatchedSynthPrices = %graphql(`
+query ($batchId: String!) {
+  batchedNextPriceExec (id: $batchId) {
+    id
+		redeemPriceSnapshotLong
+    redeemPriceSnapshotShort
   }
 }`)
 

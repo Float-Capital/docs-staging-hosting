@@ -448,7 +448,8 @@ function useUsersConfirmedMints(userId) {
               _0: [{
                   isLong: false,
                   amount: CONSTANTS.zeroBN,
-                  marketIndex: CONSTANTS.zeroBN
+                  marketIndex: CONSTANTS.zeroBN,
+                  updateIndex: CONSTANTS.zeroBN
                 }],
               [Symbol.for("name")]: "Response"
             };
@@ -464,7 +465,8 @@ function useUsersConfirmedMints(userId) {
             return {
                     isLong: isLong,
                     amount: isLong ? confirmedNextPriceAction.amountPaymentTokenForDepositLong : confirmedNextPriceAction.amountPaymentTokenForDepositShort,
-                    marketIndex: confirmedNextPriceAction.marketIndex
+                    marketIndex: confirmedNextPriceAction.marketIndex,
+                    updateIndex: confirmedNextPriceAction.updateIndex
                   };
           }));
     return {
@@ -474,6 +476,60 @@ function useUsersConfirmedMints(userId) {
           };
   }
   var match$2 = usersConfirmedMintsQuery.error;
+  if (match$2 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$2.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
+function useBatchedSynthPrices(marketIndex, updateIndex) {
+  var batchedExecsSynthPricesQuery = Curry.app(Queries.BatchedSynthPrices.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        /* NetworkOnly */3,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          batchId: "batched-" + marketIndex.toString() + "-" + updateIndex.toString()
+        }
+      ]);
+  var match = batchedExecsSynthPricesQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.batchedNextPriceExec;
+    if (match$1 !== undefined) {
+      return {
+              TAG: 1,
+              _0: {
+                redeemPriceSnapshotLong: match$1.redeemPriceSnapshotLong,
+                redeemPriceSnapshotShort: match$1.redeemPriceSnapshotShort
+              },
+              [Symbol.for("name")]: "Response"
+            };
+    } else {
+      return {
+              TAG: 1,
+              _0: {
+                redeemPriceSnapshotLong: CONSTANTS.zeroBN,
+                redeemPriceSnapshotShort: CONSTANTS.zeroBN
+              },
+              [Symbol.for("name")]: "Response"
+            };
+    }
+  }
+  var match$2 = batchedExecsSynthPricesQuery.error;
   if (match$2 !== undefined) {
     return {
             TAG: 0,
@@ -513,7 +569,8 @@ function useUsersConfirmedRedeems(userId) {
               _0: [{
                   isLong: false,
                   amount: CONSTANTS.zeroBN,
-                  marketIndex: CONSTANTS.zeroBN
+                  marketIndex: CONSTANTS.zeroBN,
+                  updateIndex: CONSTANTS.zeroBN
                 }],
               [Symbol.for("name")]: "Response"
             };
@@ -529,7 +586,8 @@ function useUsersConfirmedRedeems(userId) {
             return {
                     isLong: isLong,
                     amount: isLong ? confirmedNextPriceAction.amountSynthTokenForWithdrawalLong : confirmedNextPriceAction.amountSynthTokenForWithdrawalShort,
-                    marketIndex: confirmedNextPriceAction.marketIndex
+                    marketIndex: confirmedNextPriceAction.marketIndex,
+                    updateIndex: confirmedNextPriceAction.updateIndex
                   };
           }));
     return {
@@ -984,6 +1042,7 @@ exports.useUsersBalances = useUsersBalances;
 exports.useUsersPendingMints = useUsersPendingMints;
 exports.useUsersPendingRedeems = useUsersPendingRedeems;
 exports.useUsersConfirmedMints = useUsersConfirmedMints;
+exports.useBatchedSynthPrices = useBatchedSynthPrices;
 exports.useUsersConfirmedRedeems = useUsersConfirmedRedeems;
 exports.useFloatBalancesForUser = useFloatBalancesForUser;
 exports.useBasicUserInfo = useBasicUserInfo;

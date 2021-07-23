@@ -241,6 +241,7 @@ type userConfirmedButNotYetSettledAction = {
   isLong: bool,
   amount: Ethers.BigNumber.t,
   marketIndex: Ethers.BigNumber.t,
+  updateIndex: Ethers.BigNumber.t,
 }
 
 @ocaml.doc(`Returns a sumary of the users synthetic tokens`)
@@ -273,6 +274,7 @@ let useUsersConfirmedMints = (~userId) => {
             ? confirmedNextPriceAction.amountPaymentTokenForDepositLong
             : confirmedNextPriceAction.amountPaymentTokenForDepositShort,
           marketIndex: confirmedNextPriceAction.marketIndex,
+          updateIndex: confirmedNextPriceAction.updateIndex,
         }
       })
 
@@ -283,8 +285,40 @@ let useUsersConfirmedMints = (~userId) => {
         isLong: false,
         amount: CONSTANTS.zeroBN,
         marketIndex: CONSTANTS.zeroBN,
+        updateIndex: CONSTANTS.zeroBN,
       },
     ])
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
+  }
+}
+
+type batchedSynthPrices = {
+  redeemPriceSnapshotLong: Ethers.BigNumber.t,
+  redeemPriceSnapshotShort: Ethers.BigNumber.t,
+}
+
+@ocaml.doc(`Returns the prices of the synths for that market at that update index`)
+let useBatchedSynthPrices = (~marketIndex, ~updateIndex) => {
+  let batchedExecsSynthPricesQuery = Queries.BatchedSynthPrices.use(
+    {
+      batchId: `batched-${marketIndex->Ethers.BigNumber.toString}-${updateIndex->Ethers.BigNumber.toString}`,
+    },
+    ~fetchPolicy=NetworkOnly,
+  )
+  switch batchedExecsSynthPricesQuery {
+  | {
+      data: Some({batchedNextPriceExec: Some({redeemPriceSnapshotLong, redeemPriceSnapshotShort})}),
+    } =>
+    Response({
+      redeemPriceSnapshotLong: redeemPriceSnapshotLong,
+      redeemPriceSnapshotShort: redeemPriceSnapshotShort,
+    })
+  | {data: Some({batchedNextPriceExec: None})} =>
+    Response({
+      redeemPriceSnapshotLong: CONSTANTS.zeroBN,
+      redeemPriceSnapshotShort: CONSTANTS.zeroBN,
+    })
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
   }
@@ -320,6 +354,7 @@ let useUsersConfirmedRedeems = (~userId) => {
             ? confirmedNextPriceAction.amountSynthTokenForWithdrawalLong
             : confirmedNextPriceAction.amountSynthTokenForWithdrawalShort,
           marketIndex: confirmedNextPriceAction.marketIndex,
+          updateIndex: confirmedNextPriceAction.updateIndex,
         }
       })
 
@@ -330,6 +365,7 @@ let useUsersConfirmedRedeems = (~userId) => {
         isLong: false,
         amount: CONSTANTS.zeroBN,
         marketIndex: CONSTANTS.zeroBN,
+        updateIndex: CONSTANTS.zeroBN,
       },
     ])
   | {error: Some({message})} => GraphError(message)
